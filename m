@@ -2,257 +2,108 @@ Return-Path: <SRS0=B8lj=SL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CBF2C10F0E
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 21:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01CD9C10F0E
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 21:53:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 94E9420883
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 21:36:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDF522082A
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 21:53:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="YZMpPxXV"
+	dkim=pass (1024-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Sp3SgkGp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726559AbfDIVgk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Apr 2019 17:36:40 -0400
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:34732 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726547AbfDIVgk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Apr 2019 17:36:40 -0400
-Received: by mail-qk1-f195.google.com with SMTP id n68so11283725qka.1
-        for <linux-block@vger.kernel.org>; Tue, 09 Apr 2019 14:36:39 -0700 (PDT)
+        id S1726633AbfDIVxg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Apr 2019 17:53:36 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:46951 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726592AbfDIVxf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Apr 2019 17:53:35 -0400
+Received: by mail-qk1-f196.google.com with SMTP id s81so11248113qke.13
+        for <linux-block@vger.kernel.org>; Tue, 09 Apr 2019 14:53:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=xk1yFLTE0k7l2bzRkG2k5Qpy+I1cGdbvKin44r0TQGc=;
-        b=YZMpPxXVMzIfBJCgbpgkvQQ91vDJg4sDPSnrCP1mFF404HD5mAMSWVbdmnlsKMTOr9
-         Lvylbd1XtsNK6kf7ri/ITf0gehPL+Cia7GbKVHOutc0Nhh4O+S2RDMwFIUoAKxzI5IRy
-         cIUJV1ZEtHer9q5OgwpQT9Mwr51kHmdxbujKc=
+        bh=W7pyMXwpQbZqEHPi/aCyWEBfA0A1BbmCszWUq1Ub6/0=;
+        b=Sp3SgkGptSSrLUETQPF+PuH8DgW2EuphMexCDQAxV2b573fJVrB3obuvgz6LjKztDu
+         Non/B22kP3rMsz31h4+jyKqMGtRj7JrIvEFRIAQB6AX4y3/2FQUx1DrCUEmCqbQlLhzj
+         iwdz9kvhVXlcE+TZC1usTnqWRxssTmCQUtLM8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=xk1yFLTE0k7l2bzRkG2k5Qpy+I1cGdbvKin44r0TQGc=;
-        b=fyWkHc1vwa/VlpyjSrctb4C/P+ExFDTpsIJHPZ/bSAeSRO3gx7PqnQx9WrabdCpTvw
-         IUI/qGKMHemsbo+V/K/hPmL8uXXR9R/neXcKOH1InEAa4auJv7XQy5K55FuVMuAKhmTj
-         N8pJM07h67744nfNm4fS3lMSBz790U70lUvd7DYYNFtFAS82Dxe6eRoDowb/ygEIEGEe
-         A/QCkGRIsdT3FPAPKKspl3j5KwN48c+QDUCk4bCoPS9d9RFTnD7VEJwVj0GcEshZEAXT
-         rQpJNodak0RscT5NwTy9eBCZZgB/OSFbRUGR7n9E1OzXsaCU+8O0rMi6hR9Y8B+cheS9
-         Vrbg==
-X-Gm-Message-State: APjAAAWgfugTm96c1uoPkBsmXnleg1TcyGMJ4rRzS26qjqp7dhlZRTbZ
-        EgjVtsaGE168HMV4J2yc7JiVGiLmQ5tZjMC2YSoxjw==
-X-Google-Smtp-Source: APXvYqyLWhn/5Xj0HlMmazNP9lr6R1rg8cOsdKZjtggtmene5Y5+QCJ6YcdBkqMkFIpk1SMRyZL8zIbctMrMywpSzUE=
-X-Received: by 2002:a05:620a:14bc:: with SMTP id x28mr30815857qkj.221.1554845799135;
- Tue, 09 Apr 2019 14:36:39 -0700 (PDT)
+        bh=W7pyMXwpQbZqEHPi/aCyWEBfA0A1BbmCszWUq1Ub6/0=;
+        b=BgFdycH+juU/mgjG4a3b8NBpj32f+5deyNhVEs54D/f2x5UOmCM5srNvwKX7HS2W6I
+         opQqjzhNEjyUQvQBOTJAYO2w8qVWNDMcBLVcz3y/TyTHAU51GfFCdrY7uM0pQ67lDw3Z
+         JLUyIb/X5T/OWQIZw+MiqNLjgviKIsC1nHuBPt0DE3Inx9xuSrbfHBCTB2a8XY6biFVV
+         dZLYXqaHTtW1H4AySHvacH5/0I1HvWUh+rcnTQ48U0/MEW7ztaCjQOrdQo4JXBtx7UD5
+         cgaHDxJk2iHgZVfcj/A6dkyUBUaDZr2li0opZBX1FVIjGXvz+T7FFuHlKyt3ewxQYTXN
+         dKwA==
+X-Gm-Message-State: APjAAAUhrAvFdw3jQdVryWiae1g8IJBzf+qbkeYHil5yTphePrFh5i2g
+        eItxiImVZXpeQUIZNsycxfuihsmgVdao6aEOFuLYQw==
+X-Google-Smtp-Source: APXvYqzZjGxV/LHLwnzKXzeWCUse1D/5RuexUKRTVivI0g4FIlukrNQxZmAfRIJWnIwsjMgQJ7BVj9mRtNTExdig6LI=
+X-Received: by 2002:a05:620a:14bc:: with SMTP id x28mr30881640qkj.221.1554846814859;
+ Tue, 09 Apr 2019 14:53:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAJX3CtjkBYRa21OetDfCZ0W5UZyjzCwBw8C9ZnBKnDOcrKJP3A@mail.gmail.com>
- <b3b72ebf-3402-1dfc-5dd6-fbaca65171ed@interlog.com>
-In-Reply-To: <b3b72ebf-3402-1dfc-5dd6-fbaca65171ed@interlog.com>
+References: <1554846371-33660-1-git-send-email-jalee@purestorage.com>
+In-Reply-To: <1554846371-33660-1-git-send-email-jalee@purestorage.com>
 From:   Jaesoo Lee <jalee@purestorage.com>
-Date:   Tue, 9 Apr 2019 14:36:28 -0700
-Message-ID: <CAJX3CtgZw7Tcz5mzzmy2QuULJTp+2LP4W_oYjwnHiJH26YSJHg@mail.gmail.com>
-Subject: Re: [bug report][scsi blk_mq] data corruption due to a bug in SCSI
- LLD error handling
-To:     Douglas Gilbert <dgilbert@interlog.com>,
-        Jens Axboe <axboe@kernel.dk>, Lee Duncan <lduncan@suse.com>,
-        Chris Leech <cleech@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     linux-block@vger.kernel.org, open-iscsi@googlegroups.com,
-        linux-scsi@vger.kernel.org
+Date:   Tue, 9 Apr 2019 14:53:24 -0700
+Message-ID: <CAJX3CthodX6+G1agGR==ZTbc6J0gg55ca+ABQ7hmy3TPT+dsDw@mail.gmail.com>
+Subject: [PATCH] scsi: core: set result when the command cannot be dispatched
+To:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Douglas Gilbert <dgilbert@interlog.com>
+Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Roland Dreier <roland@purestorage.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+When SCSI blk-mq is enabled, there is a bug in handling errors in scsi_queue_rq.
+Specifically, the bug is not setting result field of scsi_request correctly when
+the dispatch of the command has been failed. Since the upper layer code
+including the sg_io ioctl expects to receive any error status from result field
+of scsi_request, the error is silently ignored and this could cause data
+corruptions for some applications. This commit also fixes another bug that the
+result field is not initialized when scsi_request is allocated.
 
-Thanks for the comments.
+Signed-off-by: Jaesoo Lee <jalee@purestorage.com>
+---
+ block/scsi_ioctl.c      | 1 +
+ drivers/scsi/scsi_lib.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-I tried to run sg_write_same over sg device and I am seeing the same problem.
+diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+index 533f4ae..f2d7979 100644
+--- a/block/scsi_ioctl.c
++++ b/block/scsi_ioctl.c
+@@ -723,6 +723,7 @@ void scsi_req_init(struct scsi_request *req)
+        req->cmd = req->__cmd;
+        req->cmd_len = BLK_MAX_CDB;
+        req->sense_len = 0;
++       req->result = 0;
+ }
+ EXPORT_SYMBOL(scsi_req_init);
 
-The result is as follows:
-
-0. Kernel configs
-Version: 5.1-rc1
-Boot parameter: dm_mod.use_blk_mq=Y scsi_mod.use_blk_mq=Y
-
-1. Normal state
-: (As expected) The command succeeded
-
-$ sg_write_same --lba=100 --xferlen=512 /dev/sg5
-$
-
-2. Immediately after bringing down the iSCSI interface at the target
-: (As expected) Failed with DID_TRANSPORT_DISRUPTED after a few seconds
-
-$ sg_write_same --lba=100 --xferlen=512 /dev/sg5
-Write same: transport: Host_status=0x0e [DID_TRANSPORT_DISRUPTED]
-Driver_status=0x00 [DRIVER_OK, SUGGEST_OK]
-
-Write same(10) command failed
-
-3. Immediately after the DID_TRANSPORT_DISRUPTED error
-: (BUG) The command succeeded after a few seconds
-
-$ sg_write_same --lba=100 --xferlen=512 /dev/sg5
-$
-
-: Kernel logs
-Apr  8 18:28:03 init21-16 kernel: session1: session recovery timed out
-after 10 secs
-Apr  8 18:28:03 init21-16 kernel: sd 8:0:0:5: rejecting I/O to offline device
-
-4. Issued IO again
-: (As expected) The command failed
-
-$ sg_write_same --lba=100 --xferlen=512 /dev/sg5
-Write same: pass through os error: No such device or address
-Write same(10) command failed
-
-Let me upload my fix for this and please give me some comments on that.
-
-Thanks,
-
-Jaesoo Lee.
-
----------- Forwarded message ---------
-From: Douglas Gilbert <dgilbert@interlog.com>
-Date: Wed, Apr 3, 2019 at 2:06 PM
-Subject: Re: [bug report][scsi blk_mq] data corruption due to a bug in
-SCSI LLD error handling
-To: Jaesoo Lee <jalee@purestorage.com>, Jens Axboe <axboe@kernel.dk>,
-Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>, James
-E.J. Bottomley <jejb@linux.vnet.ibm.com>, Martin K. Petersen
-<martin.petersen@oracle.com>
-Cc: <linux-block@vger.kernel.org>, <open-iscsi@googlegroups.com>,
-<linux-scsi@vger.kernel.org>
-
-
-On 2019-04-03 4:18 p.m., Jaesoo Lee wrote:
-> Hello All,
->
-> I encountered this bug while trying to enable dm_blk_mq for our
-> iSCSI/FCP targets.
->
-> The bug is that the sg_io issued to scsi_blk_mq would succeed even if
-> LLD wants to error out those requests.
->
-> Let me explain the scenario in more details.
->
-> Setup:
-> 0. Host kernel configuration
-> - 4.19.9, 4.20.16
-> - boot parameter: dm_mod.use_blk_mq=Y scsi_mod.use_blk_mq=Y
-> scsi_transport_iscsi.debug_session=1 scsi_transport_iscsi.debug_conn=1
->
-> Scenario:
-> 1. Connect the host to iSCSI target via four paths
-> : A dm device is created for those target devices
-> 2. Start an application in the host which generates sg_io ioctl for
-> XCOPY and WSAME to the dm device with the ratio of around 50%
-> (pread/pwrite for the rest).
-> 3. Perform system crash (sysrq-trigger) in the iSCSI target
->
-> Expected result:
-> - Any outstanding IOs should get failed with errors
->
-> Actual results:
-> - Normal read/write IOs get failed as expected
-> - SG_IO ioctls SUCCEEDED!!
-
-Not all ioctl(SG_IO)s are created equal!
-
-If you are using the sg v3 interface (i.e. struct sg_io_hdr) then I would
-expect DRIVER_TIMEOUT in sg_io_obj.driver_status or DID_TIME_OUT in
-sg_io_obj.host_status to be set on completion. [BTW You will _not_ see
-a ETIMEDOUT errno; only errors prior to submission yield errno style
-errors.]
-
-If you don't see that with ioctl(SG_IO) on a block device then try again on
-a sg device. If neither report that then the mid-level error processing
-is broken.
-
-Doug Gilbert
-
-
-> - log message:
-> [Tue Apr  2 11:26:34 2019]  session3: session recovery timed out after 11 secs
-> [Tue Apr  2 11:26:34 2019]  session3: session_recovery_timedout:
-> Unblocking SCSI target
-> ..
-> [Tue Apr  2 11:26:34 2019] sd 8:0:0:8: scsi_prep_state_check:
-> rejecting I/O to offline device
-> [Tue Apr  2 11:26:34 2019] sd 8:0:0:8: scsi_prep_state_check:
-> rejecting I/O to offline device
-> [Tue Apr  2 11:26:34 2019] sd 8:0:0:8: scsi_prep_state_check:
-> rejecting I/O to offline device
-> [Tue Apr  2 11:26:34 2019] print_req_error: I/O error, dev sdi, sector 30677580
-> [Tue Apr  2 11:26:34 2019] device-mapper: multipath: Failing path 8:128.
-> [Tue Apr  2 11:26:34 2019] SG_IO disk=sdi, result=0x0
->
-> - This causes the DATA corruption for the application
->
-> Relavant call stacks: (SG_IO issue path)
-> [Tue Apr  2 11:26:33 2019] sd 8:0:0:8: [sdi] sd_ioctl: disk=sdi, cmd=0x2285
-> [Tue Apr  2 11:26:33 2019] SG_IO disk=sdi, retried 1 cmd 93
-> [Tue Apr  2 11:26:33 2019] CPU: 30 PID: 16080 Comm: iostress Not
-> tainted 4.19.9-purekernel_dbg.x86_64+ #30
-> [Tue Apr  2 11:26:33 2019] Hardware name:  /0JP31P, BIOS 2.0.19 08/29/2013
-> [Tue Apr  2 11:26:33 2019] Call Trace:
-> [Tue Apr  2 11:26:33 2019]  dump_stack+0x63/0x85
-> [Tue Apr  2 11:26:33 2019]  sg_io+0x41e/0x480
-> [Tue Apr  2 11:26:33 2019]  scsi_cmd_ioctl+0x297/0x420
-> [Tue Apr  2 11:26:33 2019]  ? sdev_prefix_printk+0xe9/0x120
-> [Tue Apr  2 11:26:33 2019]  ? _cond_resched+0x1a/0x50
-> [Tue Apr  2 11:26:33 2019]  scsi_cmd_blk_ioctl+0x51/0x70
-> [Tue Apr  2 11:26:33 2019]  sd_ioctl+0x95/0x1a0 [sd_mod]
-> [Tue Apr  2 11:26:33 2019]  __blkdev_driver_ioctl+0x25/0x30
-> [Tue Apr  2 11:26:33 2019]  dm_blk_ioctl+0x79/0x100 [dm_mod]
-> [Tue Apr  2 11:26:33 2019]  blkdev_ioctl+0x89a/0x940
-> [Tue Apr  2 11:26:33 2019]  ? do_nanosleep+0xae/0x180
-> [Tue Apr  2 11:26:33 2019]  block_ioctl+0x3d/0x50
-> [Tue Apr  2 11:26:33 2019]  do_vfs_ioctl+0xa6/0x600
-> [Tue Apr  2 11:26:33 2019]  ? __audit_syscall_entry+0xe9/0x130
-> [Tue Apr  2 11:26:33 2019]  ksys_ioctl+0x6d/0x80
-> ).[Tue Apr  2 11:26:33 2019]  __x64_sys_ioctl+0x1a/0x20
-> [Tue Apr  2 11:26:33 2019]  do_syscall_64+0x60/0x180
-> [Tue Apr  2 11:26:33 2019]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
->
-> According to the analysis, it seems that there is a bug in propagating
-> errors for iSCSI session timeout (i.e., session_recovery_timedout).
-> Compared to this, legacy SCSI queue handles the errors in
-> scsi_request_fn by killing the request as can be seen below.
->
-> 1872 static void scsi_request_fn(struct request_queue *q)
-> 1873         __releases(q->queue_lock)
-> 1874         __acquires(q->queue_lock)
-> 1875 {
-> ..
-> 1886         for (;;) {
-> ..
-> 1893                 req = blk_peek_request(q);
-> 1894                 if (!req)
-> 1895                         break;
-> 1896
-> 1897                 if (unlikely(!scsi_device_online(sdev))) {
-> 1898                         sdev_printk(KERN_ERR, sdev,
-> 1899                                     "scsi_request_fn: rejecting
-> I/O to offline device\n");
-> 1900                         scsi_kill_request(req, q);
-> 1901                         continue;
-> 1902                 }
-> 1903
->
-> I am not sure in which layer we have to fix this, LLD or scsi_queue_rq().
->
-> Could someone please take a look? Or, could someone guide me on how to
-> fix this bug?
->
-> Thanks,
->
-> Jaesoo Lee.
->
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 2018967..af1488d 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1699,6 +1699,7 @@ static blk_status_t scsi_queue_rq(struct
+blk_mq_hw_ctx *hctx,
+                        ret = BLK_STS_DEV_RESOURCE;
+                break;
+        default:
++               scsi_req(req)->result = DID_NO_CONNECT << 16;
+                /*
+                 * Make sure to release all allocated ressources when
+                 * we hit an error, as we will never see this command
+--
+2.7.4
