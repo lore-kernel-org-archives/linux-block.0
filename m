@@ -2,68 +2,89 @@ Return-Path: <SRS0=B8lj=SL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E961C10F0E
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 10:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1821C282CE
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 10:26:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 67AD32083E
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 10:06:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1B182084F
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 10:26:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726112AbfDIKGD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Apr 2019 06:06:03 -0400
-Received: from verein.lst.de ([213.95.11.211]:49312 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726062AbfDIKGD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 9 Apr 2019 06:06:03 -0400
-Received: by newverein.lst.de (Postfix, from userid 2407)
-        id A338868C4E; Tue,  9 Apr 2019 12:05:49 +0200 (CEST)
-Date:   Tue, 9 Apr 2019 12:05:48 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/5] block: don't allow multiple bio_iov_iter_get_pages
- calls per bio
-Message-ID: <20190409100548.GA7361@lst.de>
-References: <20190408104641.4905-1-hch@lst.de> <20190408104641.4905-4-hch@lst.de> <1554761855.118779.285.camel@acm.org>
+        id S1726486AbfDIK0B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Apr 2019 06:26:01 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50992 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726091AbfDIK0B (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 9 Apr 2019 06:26:01 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 4F51CADC7;
+        Tue,  9 Apr 2019 10:25:59 +0000 (UTC)
+Date:   Tue, 9 Apr 2019 12:25:58 +0200
+From:   Johannes Thumshirn <jthumshirn@suse.de>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Qu Wenruo <quwenruo.btrfs@gmx.com>,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH] block: don't use for-inside-for in
+ bio_for_each_segment_all
+Message-ID: <20190409102558.GC5099@linux-x5ow.site>
+References: <20190406215428.3131-1-ming.lei@redhat.com>
+ <20190407065205.GA8799@lst.de>
+ <f0c82caf-24f3-dba7-0bf0-85dd0e056e73@suse.de>
+ <20190408141203.GT22763@bombadil.infradead.org>
+ <20190409094839.GA6827@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1554761855.118779.285.camel@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190409094839.GA6827@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 08, 2019 at 03:17:35PM -0700, Bart Van Assche wrote:
-> On Mon, 2019-04-08 at 12:46 +0200, Christoph Hellwig wrote:
-> > No caller uses bio_iov_iter_get_pages multiple times on a given bio,
-> > and that funtionality isn't all that useful.  Removing it will make
-> > some future changes a little easier and also simplifies the function
-> > a bit.
+On Tue, Apr 09, 2019 at 11:48:39AM +0200, Christoph Hellwig wrote:
+> On Mon, Apr 08, 2019 at 07:12:04AM -0700, Matthew Wilcox wrote:
+> > On Mon, Apr 08, 2019 at 08:07:55AM +0200, Hannes Reinecke wrote:
+> > > Oh yes, please do.
+> > > The macros are fast becoming unparseable :-)
 > > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > ---
-> >  block/bio.c | 15 ++++++---------
-> >  1 file changed, 6 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/block/bio.c b/block/bio.c
-> > index ad346082a971..2fa624db21c7 100644
-> > --- a/block/bio.c
-> > +++ b/block/bio.c
-> > @@ -958,7 +958,10 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
-> >  int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
-> >  {
-> >         const bool is_bvec = iov_iter_is_bvec(iter);
-> > -       unsigned short orig_vcnt = bio->bi_vcnt;
-> > +       int ret = -EFAULT;
+> > I think something that would help is removing the mandatory 'i' parameter
+> > to this iterator.  Most of the users don't use it, and the ones that do
+> > can implement it themselves.  eg:
 > 
-> Is the value -EFAULT used anywhere? In other words, can " = -EFAULT" be left
-> out? Otherwise this patch looks good to me.
+> Yeah, I quickly hacked this up during a meeting yesterday and we have
+> exactly two users of the iterator.  Patch against the for-linus tree
+> below, although it conflicts with some of the 5.2 work.  Maybe it is
+> best to merge this just after the next rc1..
+> 
+> --
+> From 6a872f0186846a64a898b149be54d385f9f03f8b Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Mon, 8 Apr 2019 18:11:44 +0200
+> Subject: block: remove the i argument to bio_for_each_segment_all
+> 
+> We only have two callers that need the simple loop iterator, and
+> they can easily do it themselves.
+> 
+> Suggested-by: Matthew Wilcox <willy@infradead.org>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-True, it could be dropped.  The assignment is a leftover from an earlier
-version of the patch.
+Nice cleanup!
+
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+-- 
+Johannes Thumshirn                            SUSE Labs Filesystems
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
