@@ -2,182 +2,231 @@ Return-Path: <SRS0=B8lj=SL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D69C10F0E
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 11:38:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8248C282DA
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 12:28:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7254920857
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 11:38:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ObAAT8SS"
+	by mail.kernel.org (Postfix) with ESMTP id 8F85E21841
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 12:28:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726513AbfDILip (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Apr 2019 07:38:45 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:58046 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726615AbfDILip (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Apr 2019 07:38:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=Meh4al5aFt82Z3ezghYD3996IugezgBOZu9ESekqR4E=; b=ObAAT8SSpTtrdXeyH0SQNwElA
-        Jztd0acL4D2dKvQNP42nFdoJ/7q88N9xQCE27h4WtW3DoiBtqtPDXIpJTLsfQIllId+LBniib2D/R
-        dzKbwt4KBuxYKC8uTHSByzz/Laj+8ei82+KgCher6v0bSByDpoMpPaWUR7fsWbyaH2ZeK8YA1BCrx
-        QI1OyTkTX/MxJLEblkVMkRMURFR+xwljiZWcpQPWo3UXMT1XrgHHMDarpNW/L8VZ7z7eQ7jLPOvSp
-        9Js4iclSf+UQN+Z507nQM8aaEAZ1j9ToWcy0Uw7UuGgqXOVc7UkG4cpg3AgVRGYe2hEOaFkphZCy/
-        /ppvUPFgA==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hDp5N-0003l6-Ow; Tue, 09 Apr 2019 11:38:41 +0000
-Date:   Tue, 9 Apr 2019 04:38:41 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Qu Wenruo <quwenruo.btrfs@gmx.com>,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>
-Subject: Re: [PATCH] block: don't use for-inside-for in
- bio_for_each_segment_all
-Message-ID: <20190409113841.GZ22763@bombadil.infradead.org>
-References: <20190406215428.3131-1-ming.lei@redhat.com>
- <20190407065205.GA8799@lst.de>
- <f0c82caf-24f3-dba7-0bf0-85dd0e056e73@suse.de>
- <20190408141203.GT22763@bombadil.infradead.org>
- <20190409094839.GA6827@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190409094839.GA6827@lst.de>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+        id S1726655AbfDIM2o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Apr 2019 08:28:44 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:34658 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726001AbfDIM2n (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Apr 2019 08:28:43 -0400
+Received: by mail-qt1-f193.google.com with SMTP id k2so19476959qtm.1
+        for <linux-block@vger.kernel.org>; Tue, 09 Apr 2019 05:28:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=hC5Ru/QY1tmBjG26dnKAwq2FofQs90W+dJuN5exhNtc=;
+        b=aVPSYVGJ+Ba9VScYtiXFWnLseWeB0vJGEcbyGQks/bydpYrWHFL0R+LZ/515VHnkRw
+         fH2peV6YVtIN1guT3KR26v4beFjD2VXg75uAzUKwHHjL8UR7C6RFFpLBm1HgT6DozB9N
+         IMfcZRLnWaWz0iIT5e0Sz26bKM+Qt3r3B615zHjz86q2XUFLCZq/Jrfp3RIBd3p7NF0d
+         HPBPMpsT+h9K2gr6VeQqo5bNuUtof4ZWLCsQaTfnLShwe0RYcH/gM9hx9RESFAGzN9Lr
+         WKlQUDB6NYO1whxxHoZm6mGiMYwQsLPfTsLtVKFLuxymhKHMnGg46SnXe4csGrKKXmCp
+         sXqw==
+X-Gm-Message-State: APjAAAUYHaflv8Jtb7/MgseTDN3Prh/7XMVWAWbpt8Z2iDHcloSUN6uU
+        Rns8cOGTVxhTzRzyr9xcXg/jiQ==
+X-Google-Smtp-Source: APXvYqw0zUhSmg7IwbJpT231GuQgzlXP1MeDu+A7i770nexKvGUPYc9z4Q5vb4IGxlrSYzqgQya0HA==
+X-Received: by 2002:ac8:2a2e:: with SMTP id k43mr30340515qtk.353.1554812922421;
+        Tue, 09 Apr 2019 05:28:42 -0700 (PDT)
+Received: from 2600-6c64-4e80-00f1-4f34-e35d-3415-c460.dhcp6.chtrptr.net (2600-6c64-4e80-00f1-4f34-e35d-3415-c460.dhcp6.chtrptr.net. [2600:6c64:4e80:f1:4f34:e35d:3415:c460])
+        by smtp.gmail.com with ESMTPSA id w13sm20794717qtc.26.2019.04.09.05.28.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 09 Apr 2019 05:28:41 -0700 (PDT)
+Message-ID: <f2703a1e76262820cbe0e40ed7110771606ec2f6.camel@redhat.com>
+Subject: Re: [PATCH] block: Fix blk_mq_try_issue_directly()
+From:   Laurence Oberman <loberman@redhat.com>
+To:     "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        James Smart <james.smart@broadcom.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>, stable@vger.kernel.org
+Date:   Tue, 09 Apr 2019 08:28:40 -0400
+In-Reply-To: <328a5660-8355-ddad-be0e-32cbaa76cc84@oracle.com>
+References: <20190403201126.22819-1-bvanassche@acm.org>
+         <2c3dbaa5-dad9-12a4-b535-5e1e614c43e1@oracle.com>
+         <2254e259-107f-38d4-1692-e542271db654@oracle.com>
+         <328a5660-8355-ddad-be0e-32cbaa76cc84@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 09, 2019 at 11:48:39AM +0200, Christoph Hellwig wrote:
-> On Mon, Apr 08, 2019 at 07:12:04AM -0700, Matthew Wilcox wrote:
-> > On Mon, Apr 08, 2019 at 08:07:55AM +0200, Hannes Reinecke wrote:
-> > > Oh yes, please do.
-> > > The macros are fast becoming unparseable :-)
-> > 
-> > I think something that would help is removing the mandatory 'i' parameter
-> > to this iterator.  Most of the users don't use it, and the ones that do
-> > can implement it themselves.  eg:
+On Tue, 2019-04-09 at 09:31 +0800, jianchao.wang wrote:
 > 
-> Yeah, I quickly hacked this up during a meeting yesterday and we have
-> exactly two users of the iterator.  Patch against the for-linus tree
+> On 4/8/19 10:36 AM, jianchao.wang wrote:
+> > 
+> > 
+> > On 4/8/19 10:07 AM, jianchao.wang wrote:
+> > > Hi Bart
+> > > 
+> > > On 4/4/19 4:11 AM, Bart Van Assche wrote:
+> > > > If blk_mq_try_issue_directly() returns BLK_STS*_RESOURCE that
+> > > > means that
+> > > > the request has not been queued and that the caller should
+> > > > retry to submit
+> > > > the request. Both blk_mq_request_bypass_insert() and
+> > > > blk_mq_sched_insert_request() guarantee that a request will be
+> > > > processed.
+> > > > Hence return BLK_STS_OK if one of these functions is called.
+> > > > This patch
+> > > > avoids that blk_mq_dispatch_rq_list() crashes when using dm-
+> > > > mpath.
+> > > 
+> > > Sorry, I seem to miss the original mail list that reported this
+> > > issue.
+> > > As your comment, it looks like that the request is handled again
+> > > when
+> > > the blk_mq_try_issue_directly return BLK_STS*_RESOURCE, right ?
+> > > 
+> > > The usage of this helper interface is,
+> > > if care about the return value and want to handle the request
+> > > yourself when
+> > > return BLK_STS*_RESOURCE, pass 'byass' as true.
+> > > otherwise, just pass 'bypass' as false, then
+> > > blk_mq_try_issue_directly would
+> > > take over all of the work including requeue or complete the
+> > > request.
+> > > 
+> > > if dm-mpath case, the driver should only invoke
+> > > dm_dispatch_clone_request,
+> > > the 'bypass' parameter should only be true.
+> > > as the blk_mq_try_issue_directly,
+> > > it would return BLK_STS_OK when have to insert the request,
+> > > otherwise,
+> > > it would do nothing but return BLK_STS*_RESOURCE.
+> > > 
+> > > Would you please show the cause that the dm-mpath driver invoke
+> > > blk_mq_try_issue_direclty
+> > > with 'bypass == false' ?
+> > > 
+> > 
+> > The issue seems to be here,
+> > 
+> > blk_mq_try_issue_directly
+> > 
+> > 
+> >     if (unlikely(blk_mq_hctx_stopped(hctx) ||
+> > blk_queue_quiesced(q))) {
+> >         run_queue = false;
+> >         bypass = false;          //------> HERE !!!
+> >         goto out_unlock;
+> >     }
+> > 
+> > 
+> >     case BLK_STS_RESOURCE:
+> >         if (force) {
+> >             blk_mq_request_bypass_insert(rq, run_queue);
+> >             ret = bypass ? BLK_STS_OK : ret;
+> >         } else if (!bypass) {
+> >             blk_mq_sched_insert_request(rq, false,
+> >                             run_queue, false);
+> >         }
+> >         break;
+> > 
+> > Then the request will be inserted and blk_mq_try_issue_dreictly
+> > returns BLK_STS_RESOURCE.
+> > 
+> > 
+> > Could following patch fix the issue ?
+> 
+> Hi Laurence
+> 
+> Would you please test this patch to see whether the issue could be
+> fixed ?
+> 
+> Thanks
+> Jianchao
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index a9c1816..a3394f2 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -1813,7 +1813,7 @@ blk_status_t blk_mq_try_issue_directly(struct
+> > blk_mq_hw_ctx *hctx,
+> >          */
+> >         if (unlikely(blk_mq_hctx_stopped(hctx) ||
+> > blk_queue_quiesced(q))) {
+> >                 run_queue = false;
+> > -               bypass = false;
+> > +               force = true;
+> >                 goto out_unlock;
+> >         }
+> > 
+> > Thanks
+> > Jianchao
+> > 
+> > > 
+> > > > 
+> > > > Cc: Christoph Hellwig <hch@infradead.org>
+> > > > Cc: Hannes Reinecke <hare@suse.com>
+> > > > Cc: James Smart <james.smart@broadcom.com>
+> > > > Cc: Ming Lei <ming.lei@redhat.com>
+> > > > Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+> > > > Cc: Keith Busch <keith.busch@intel.com>
+> > > > Cc: Dongli Zhang <dongli.zhang@oracle.com>
+> > > > Cc: Laurence Oberman <loberman@redhat.com>
+> > > > Tested-by: Laurence Oberman <loberman@redhat.com>
+> > > > Reviewed-by: Laurence Oberman <loberman@redhat.com>
+> > > > Reported-by: Laurence Oberman <loberman@redhat.com>
+> > > > Fixes: 7f556a44e61d ("blk-mq: refactor the code of issue
+> > > > request directly") # v5.0.
+> > > > Cc: <stable@vger.kernel.org>
+> > > > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> > > > ---
+> > > >  block/blk-mq.c | 9 ++-------
+> > > >  1 file changed, 2 insertions(+), 7 deletions(-)
+> > > > 
+> > > > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > > > index 652d0c6d5945..b2c20dce8a30 100644
+> > > > --- a/block/blk-mq.c
+> > > > +++ b/block/blk-mq.c
+> > > > @@ -1859,16 +1859,11 @@ blk_status_t
+> > > > blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+> > > >  	case BLK_STS_RESOURCE:
+> > > >  		if (force) {
+> > > >  			blk_mq_request_bypass_insert(rq,
+> > > > run_queue);
+> > > > -			/*
+> > > > -			 * We have to return BLK_STS_OK for the
+> > > > DM
+> > > > -			 * to avoid livelock. Otherwise, we
+> > > > return
+> > > > -			 * the real result to indicate whether
+> > > > the
+> > > > -			 * request is direct-issued
+> > > > successfully.
+> > > > -			 */
+> > > > -			ret = bypass ? BLK_STS_OK : ret;
+> > > > +			ret = BLK_STS_OK;
+> > > >  		} else if (!bypass) {
+> > > >  			blk_mq_sched_insert_request(rq, false,
+> > > >  						    run_queue,
+> > > > false);
+> > > > +			ret = BLK_STS_OK;
+> > > >  		}
+> > > >  		break;
+> > > >  	default:
+> > > > 
+Hello Sir
+I think Jens already took the revert patch though.
+I will try this when I gat a chance.
+Need to wait until I can reboot the targetserver again.
+Regards
+Laurence
 
-three in the below patch ...
-
-> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-> index 64def336f053..aa793fef52eb 100644
-> --- a/drivers/md/bcache/btree.c
-> +++ b/drivers/md/bcache/btree.c
-> @@ -429,14 +429,16 @@ static void do_btree_node_write(struct btree *b)
->  		       bset_sector_offset(&b->keys, i));
->  
->  	if (!bch_bio_alloc_pages(b->bio, __GFP_NOWARN|GFP_NOWAIT)) {
-> -		int j;
-> +		int j = 0;
->  		struct bio_vec *bv;
->  		void *base = (void *) ((unsigned long) i & ~(PAGE_SIZE - 1));
->  		struct bvec_iter_all iter_all;
->  
-> -		bio_for_each_segment_all(bv, b->bio, j, iter_all)
-> +		bio_for_each_segment_all(bv, b->bio, iter_all) {
->  			memcpy(page_address(bv->bv_page),
->  			       base + j * PAGE_SIZE, PAGE_SIZE);
-> +			j++;
-> +		}
-
-I think this one works better to replace 'base' with 'addr':
-
-@@ -429,14 +429,14 @@ static void do_btree_node_write(struct btree *b)
-                       bset_sector_offset(&b->keys, i));
- 
-        if (!bch_bio_alloc_pages(b->bio, __GFP_NOWARN|GFP_NOWAIT)) {
--               int j;
-                struct bio_vec *bv;
--               void *base = (void *) ((unsigned long) i & ~(PAGE_SIZE - 1));
-+               void *addr = (void *) ((unsigned long) i & ~(PAGE_SIZE - 1));
-                struct bvec_iter_all iter_all;
- 
--               bio_for_each_segment_all(bv, b->bio, j, iter_all)
--                       memcpy(page_address(bv->bv_page),
--                              base + j * PAGE_SIZE, PAGE_SIZE);
-+               bio_for_each_segment_all(bv, b->bio, iter_all) {
-+                       memcpy(page_address(bv->bv_page), addr, PAGE_SIZE);
-+                       addr += PAGE_SIZE;
-+               }
- 
-                bch_submit_bbio(b->bio, b->c, &k.key, 0);
- 
-> +++ b/drivers/md/raid1.c
-> @@ -2110,7 +2110,7 @@ static void process_checks(struct r1bio *r1_bio)
->  		}
->  	r1_bio->read_disk = primary;
->  	for (i = 0; i < conf->raid_disks * 2; i++) {
-> -		int j;
-> +		int j = 0;
->  		struct bio *pbio = r1_bio->bios[primary];
->  		struct bio *sbio = r1_bio->bios[i];
->  		blk_status_t status = sbio->bi_status;
-> @@ -2125,8 +2125,8 @@ static void process_checks(struct r1bio *r1_bio)
->  		/* Now we can 'fixup' the error value */
->  		sbio->bi_status = 0;
->  
-> -		bio_for_each_segment_all(bi, sbio, j, iter_all)
-> -			page_len[j] = bi->bv_len;
-> +		bio_for_each_segment_all(bi, sbio, iter_all)
-> +			page_len[j++] = bi->bv_len;
-
-Yes.
-
-> +++ b/fs/btrfs/inode.c
-> @@ -7919,7 +7918,7 @@ static void btrfs_retry_endio(struct bio *bio)
->  	struct bio_vec *bvec;
->  	int uptodate;
->  	int ret;
-> -	int i;
-> +	int i = 0;
->  	struct bvec_iter_all iter_all;
->  
->  	if (bio->bi_status)
-> @@ -7934,7 +7933,7 @@ static void btrfs_retry_endio(struct bio *bio)
->  	failure_tree = &BTRFS_I(inode)->io_failure_tree;
->  
->  	ASSERT(!bio_flagged(bio, BIO_CLONED));
-> -	bio_for_each_segment_all(bvec, bio, i, iter_all) {
-> +	bio_for_each_segment_all(bvec, bio, iter_all) {
->  		ret = __readpage_endio_check(inode, io_bio, i, bvec->bv_page,
->  					     bvec->bv_offset, done->start,
->  					     bvec->bv_len);
-> @@ -7946,6 +7945,7 @@ static void btrfs_retry_endio(struct bio *bio)
->  					 bvec->bv_offset);
->  		else
->  			uptodate = 0;
-> +		i++;
->  	}
-
-I'd be tempted to instead:
-
-@@ -7935,7 +7935,7 @@ static void btrfs_retry_endio(struct bio *bio)
- 
-        ASSERT(!bio_flagged(bio, BIO_CLONED));
-        bio_for_each_segment_all(bvec, bio, i, iter_all) {
--               ret = __readpage_endio_check(inode, io_bio, i, bvec->bv_page,
-+               ret = __readpage_endio_check(inode, io_bio, i++, bvec->bv_page,
-                                             bvec->bv_offset, done->start,
-                                             bvec->bv_len);
-                if (!ret)
-
-(i is used nowhere else in this loop, and it's a mercifully short loop with
-no breaks or continues).
-
-Thanks for turning this musing into a patch.
