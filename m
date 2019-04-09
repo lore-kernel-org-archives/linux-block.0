@@ -2,91 +2,103 @@ Return-Path: <SRS0=B8lj=SL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E39AEC10F0E
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 15:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84897C10F0E
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 15:35:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BCDDF2084F
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 15:19:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BDA220830
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 15:35:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726471AbfDIPTg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Apr 2019 11:19:36 -0400
-Received: from iolanthe.rowland.org ([192.131.102.54]:46142 "HELO
-        iolanthe.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1726456AbfDIPTf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Apr 2019 11:19:35 -0400
-Received: (qmail 3066 invoked by uid 2102); 9 Apr 2019 11:19:35 -0400
-Received: from localhost (sendmail-bs@127.0.0.1)
-  by localhost with SMTP; 9 Apr 2019 11:19:35 -0400
-Date:   Tue, 9 Apr 2019 11:19:35 -0400 (EDT)
-From:   Alan Stern <stern@rowland.harvard.edu>
-X-X-Sender: stern@iolanthe.rowland.org
-To:     "Bollinger, Seth" <Seth.Bollinger@digi.com>,
-        Jens Axboe <axboe@kernel.dk>
-cc:     USB list <linux-usb@vger.kernel.org>, <linux-block@vger.kernel.org>
-Subject: Re: Bug: VHCI + USB 3.0
-In-Reply-To: <26C1E17D-86C3-42A9-AC21-DBB4554FB901@digi.com>
-Message-ID: <Pine.LNX.4.44L0.1904091057120.1599-100000@iolanthe.rowland.org>
+        id S1726517AbfDIPfe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Apr 2019 11:35:34 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52716 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726515AbfDIPfe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 9 Apr 2019 11:35:34 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 1C7ABACC1;
+        Tue,  9 Apr 2019 15:35:33 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 2679FDA88B; Tue,  9 Apr 2019 17:36:40 +0200 (CEST)
+Date:   Tue, 9 Apr 2019 17:36:39 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Qu Wenruo <quwenruo.btrfs@gmx.com>,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH] block: don't use for-inside-for in
+ bio_for_each_segment_all
+Message-ID: <20190409153639.GL29086@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Qu Wenruo <quwenruo.btrfs@gmx.com>,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>
+References: <20190406215428.3131-1-ming.lei@redhat.com>
+ <20190407065205.GA8799@lst.de>
+ <f0c82caf-24f3-dba7-0bf0-85dd0e056e73@suse.de>
+ <20190408141203.GT22763@bombadil.infradead.org>
+ <20190409094839.GA6827@lst.de>
+ <20190409113841.GZ22763@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190409113841.GZ22763@bombadil.infradead.org>
+User-Agent: Mutt/1.5.23.1 (2014-03-12)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 9 Apr 2019, Bollinger, Seth wrote:
-
-> > No, that trace did not show any failure.  Did you see the corresponding 
-> > error messages in the kernel log while you were collecting the trace?
-> > Maybe you can try again.
+On Tue, Apr 09, 2019 at 04:38:41AM -0700, Matthew Wilcox wrote:
+> > +++ b/fs/btrfs/inode.c
+> > @@ -7919,7 +7918,7 @@ static void btrfs_retry_endio(struct bio *bio)
+> >  	struct bio_vec *bvec;
+> >  	int uptodate;
+> >  	int ret;
+> > -	int i;
+> > +	int i = 0;
+> >  	struct bvec_iter_all iter_all;
+> >  
+> >  	if (bio->bi_status)
+> > @@ -7934,7 +7933,7 @@ static void btrfs_retry_endio(struct bio *bio)
+> >  	failure_tree = &BTRFS_I(inode)->io_failure_tree;
+> >  
+> >  	ASSERT(!bio_flagged(bio, BIO_CLONED));
+> > -	bio_for_each_segment_all(bvec, bio, i, iter_all) {
+> > +	bio_for_each_segment_all(bvec, bio, iter_all) {
+> >  		ret = __readpage_endio_check(inode, io_bio, i, bvec->bv_page,
+> >  					     bvec->bv_offset, done->start,
+> >  					     bvec->bv_len);
+> > @@ -7946,6 +7945,7 @@ static void btrfs_retry_endio(struct bio *bio)
+> >  					 bvec->bv_offset);
+> >  		else
+> >  			uptodate = 0;
+> > +		i++;
+> >  	}
 > 
-> Ok, I have it this time.  I must have sniffed the wrong bus last time.
+> I'd be tempted to instead:
 > 
-> 2019-04-09 13:09:32 AW24-D00005 user.notice awusbd[2514]: bulk A 000004bf ty 03 st 00000000 T 3584 L 0 ch 00000081 ep 1 fl 0
-> 2019-04-09 13:09:32 AW24-D00005 user.notice awusbd[2514]: bulk A 000004bf ty 03 st 00000000 T 4096 L 0 ch 00000081 ep 1 fl 0
-> 2019-04-09 13:09:32 AW24-D00005 user.notice awusbd[2514]: message repeated 2 times: [ bulk A 000004bf ty 03 st 00000000 T 4096 L 0 ch 00000081 ep 1 fl 0]
-> 2019-04-09 13:09:32 AW24-D00005 user.notice awusbd[2514]: BI completion: st 0 stat -75 AL 0 ec 0 returning -75
-> 2019-04-09 13:09:32 AW24-D00005 user.notice awusbd[2514]: bulk A 000004bf ty 03 st 00000000 T 4096 L 0 ch 00000081 ep 1 fl 0
-> 2019-04-09 13:09:32 AW24-D00005 user.notice awusbd[2514]: message repeated 3 times: [ bulk A 000004bf ty 03 st 00000000 T 4096 L 0 ch 00000081 ep 1 fl 0]
-> 2019-04-09 13:09:32 AW24-D00005 user.notice awusbd[2514]: BI completion: st 0 stat -2 AL 0 ec 0 returning -2
-> 2019-04-09 13:09:32 AW24-D00005 user.notice awusbd[2514]: message repeated 6 times: [ BI completion: st 0 stat -2 AL 0 ec 0 returning -2]
-> 2019-04-09 13:09:32 AW24-D00005 user.notice awusbd[2514]: bulk A 000004bf ty 03 st 00000000 T 13 L 0 ch 00000081 ep 0 fl 4271644
-> 2019-04-09 13:09:32 AW24-D00005 user.notice awusbd[2514]: BI completion: st 0 stat -71 AL 0 ec 0 returning -71
+> @@ -7935,7 +7935,7 @@ static void btrfs_retry_endio(struct bio *bio)
+>  
+>         ASSERT(!bio_flagged(bio, BIO_CLONED));
+>         bio_for_each_segment_all(bvec, bio, i, iter_all) {
+> -               ret = __readpage_endio_check(inode, io_bio, i, bvec->bv_page,
+> +               ret = __readpage_endio_check(inode, io_bio, i++, bvec->bv_page,
+>                                              bvec->bv_offset, done->start,
+>                                              bvec->bv_len);
+>                 if (!ret)
+> 
+> (i is used nowhere else in this loop, and it's a mercifully short loop with
+> no breaks or continues).
 
-All right, now I see the problem.  It's here:
-
-> ffff800074057b40 1058554625 S Bo:2:098:2 -115 31 = 55534243 07010000 007e0000 80000a28 000001ff c100003f 00000000 000000
-> ffff800074057b40 1058554638 C Bo:2:098:2 0 31 >
-> ffff800074057cc0 1058555039 S Bi:2:098:1 -115 3584 <
-> ffff800074057cc0 1058555066 C Bi:2:098:1 -75 3584 = 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> ffff800073e0fb40 1058555113 S Bi:2:098:1 -115 4096 <
-> ffff8000723f5f00 1058555129 S Bi:2:098:1 -115 4096 <
-> ffff8000723f5c00 1058555148 S Bi:2:098:1 -115 4096 <
-> ffff8000723f5b40 1058555202 S Bi:2:098:1 -115 4096 <
-> ffff8000723f5a80 1058555224 S Bi:2:098:1 -115 4096 <
-> ffff8000711d8780 1058555237 S Bi:2:098:1 -115 4096 <
-> ffff800074091900 1058555255 S Bi:2:098:1 -115 4096 <
-> ffff800073e0fb40 1058555769 C Bi:2:098:1 -2 4096 = 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-
-This is a READ command asking for 63 blocks (31.5 KB) of data.  The
-device sends 7 4096-byte packets followed by a 3584-byte packet, but
-the kernel's scatter-gather list contains a 3584-byte buffer followed
-by 7 4096-byte buffers.  Since the VHCI driver doesn't have full native
-SG support, it needs each packet to be stored in a contiguous region of
-memory.  In this case the first packet causes an overrun error.
-
-The best way to fix the problem would be to improve the SG support in
-VHCI.  Short of that, we would like to tell the block layer that this
-device requires all scatterlist elements (except the last one) for any
-single command to be multiples of 1024 bytes, in spite of the fact that
-the device claims to have a block size of 512 bytes.
-
-Jens (or anyone who knows more about the block layer than I do), what's 
-the right way to do this?
-
-Any help would be appreciated.
-
-Alan Stern
-
+I'd rather keep the separate statement than having parameters with
+sideefects.
