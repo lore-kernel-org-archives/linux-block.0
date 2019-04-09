@@ -2,102 +2,182 @@ Return-Path: <SRS0=B8lj=SL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53695C10F0E
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 11:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D69C10F0E
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 11:38:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 233D22133D
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 11:28:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7254920857
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 11:38:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oty1tY91"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ObAAT8SS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726066AbfDIL2B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Apr 2019 07:28:01 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:34010 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726388AbfDIL1s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Apr 2019 07:27:48 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x39BIrr7142644;
-        Tue, 9 Apr 2019 11:27:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : cc : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=pWumepPcTxhskpyg9O7WSTJj/P75JPumuGN+584Dbmo=;
- b=oty1tY91/H+AyPcA+OFlR01ADnIAdD5RYuOX4fTotexzQ93/47Rsz30pU1pmhbZPTkPL
- 99IsQCtoPjGsTMQ/4C/nG9pka9BkKSHM95E02AaLs4JEZmV4Jj5kXbUf5ntOOTZqO+hp
- rbEHRfdzeFo+/UNM/5MCKpdlwKkKaDLHbt+/AqTXBU0nHM6/tw3ARB4gGFssjgglKspg
- H8P/UpTQD2qsiKSquszDdezW+7MRPaTx65K5vKBgndbuXwtm4j9jqnFrAbxeeul4qpBO
- i38t+b6zEesEgOvP7Rw8cvH0Br4WzEZ1mqlCtUlUpAzOGFBWlXlMlL/WcoMmt/aGLJN1 4Q== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2130.oracle.com with ESMTP id 2rphmecfts-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 09 Apr 2019 11:27:37 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x39BRbC2182693;
-        Tue, 9 Apr 2019 11:27:37 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2rpytbj5ub-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 09 Apr 2019 11:27:37 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x39BRRdQ010373;
-        Tue, 9 Apr 2019 11:27:27 GMT
-Received: from [10.191.22.92] (/10.191.22.92)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 09 Apr 2019 04:27:27 -0700
-Subject: Re: [RESEND PATCH] blk-mq: fix hang caused by freeze/unfreeze
- sequence
-To:     Bob Liu <bob.liu@oracle.com>
-References: <20190409090828.16282-1-bob.liu@oracle.com>
-Cc:     linux-block@vger.kernel.org, shirley.ma@oracle.com,
-        martin.petersen@oracle.com,
-        Roman Pen <roman.penyaev@profitbricks.com>,
-        Akinobu Mita <akinobu.mita@gmail.com>,
-        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <051bab97-5294-d832-0a03-0600fdd96d6a@oracle.com>
-Date:   Tue, 9 Apr 2019 19:27:18 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1726513AbfDILip (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Apr 2019 07:38:45 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:58046 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726615AbfDILip (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Apr 2019 07:38:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=Meh4al5aFt82Z3ezghYD3996IugezgBOZu9ESekqR4E=; b=ObAAT8SSpTtrdXeyH0SQNwElA
+        Jztd0acL4D2dKvQNP42nFdoJ/7q88N9xQCE27h4WtW3DoiBtqtPDXIpJTLsfQIllId+LBniib2D/R
+        dzKbwt4KBuxYKC8uTHSByzz/Laj+8ei82+KgCher6v0bSByDpoMpPaWUR7fsWbyaH2ZeK8YA1BCrx
+        QI1OyTkTX/MxJLEblkVMkRMURFR+xwljiZWcpQPWo3UXMT1XrgHHMDarpNW/L8VZ7z7eQ7jLPOvSp
+        9Js4iclSf+UQN+Z507nQM8aaEAZ1j9ToWcy0Uw7UuGgqXOVc7UkG4cpg3AgVRGYe2hEOaFkphZCy/
+        /ppvUPFgA==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hDp5N-0003l6-Ow; Tue, 09 Apr 2019 11:38:41 +0000
+Date:   Tue, 9 Apr 2019 04:38:41 -0700
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Qu Wenruo <quwenruo.btrfs@gmx.com>,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH] block: don't use for-inside-for in
+ bio_for_each_segment_all
+Message-ID: <20190409113841.GZ22763@bombadil.infradead.org>
+References: <20190406215428.3131-1-ming.lei@redhat.com>
+ <20190407065205.GA8799@lst.de>
+ <f0c82caf-24f3-dba7-0bf0-85dd0e056e73@suse.de>
+ <20190408141203.GT22763@bombadil.infradead.org>
+ <20190409094839.GA6827@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20190409090828.16282-1-bob.liu@oracle.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9221 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1904090074
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9221 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904090074
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190409094839.GA6827@lst.de>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 04/09/2019 05:08 PM, Bob Liu wrote:
-> This patch was proposed by Roman Pen[3] years ago.
-> Recently we hit a bug which is likely caused by the same reason,so rebased his
-> fix to v5.1 and resend.
-> Below is almost copied from that patch[3].
+On Tue, Apr 09, 2019 at 11:48:39AM +0200, Christoph Hellwig wrote:
+> On Mon, Apr 08, 2019 at 07:12:04AM -0700, Matthew Wilcox wrote:
+> > On Mon, Apr 08, 2019 at 08:07:55AM +0200, Hannes Reinecke wrote:
+> > > Oh yes, please do.
+> > > The macros are fast becoming unparseable :-)
+> > 
+> > I think something that would help is removing the mandatory 'i' parameter
+> > to this iterator.  Most of the users don't use it, and the ones that do
+> > can implement it themselves.  eg:
 > 
+> Yeah, I quickly hacked this up during a meeting yesterday and we have
+> exactly two users of the iterator.  Patch against the for-linus tree
 
-Hi Bod,
+three in the below patch ...
 
-I think the commit message is not applicable to the most recent linux. Perhaps
-re-write the message based on the most recent version?
+> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+> index 64def336f053..aa793fef52eb 100644
+> --- a/drivers/md/bcache/btree.c
+> +++ b/drivers/md/bcache/btree.c
+> @@ -429,14 +429,16 @@ static void do_btree_node_write(struct btree *b)
+>  		       bset_sector_offset(&b->keys, i));
+>  
+>  	if (!bch_bio_alloc_pages(b->bio, __GFP_NOWARN|GFP_NOWAIT)) {
+> -		int j;
+> +		int j = 0;
+>  		struct bio_vec *bv;
+>  		void *base = (void *) ((unsigned long) i & ~(PAGE_SIZE - 1));
+>  		struct bvec_iter_all iter_all;
+>  
+> -		bio_for_each_segment_all(bv, b->bio, j, iter_all)
+> +		bio_for_each_segment_all(bv, b->bio, iter_all) {
+>  			memcpy(page_address(bv->bv_page),
+>  			       base + j * PAGE_SIZE, PAGE_SIZE);
+> +			j++;
+> +		}
 
-Thank you very much!
+I think this one works better to replace 'base' with 'addr':
 
-Dongli Zhang
+@@ -429,14 +429,14 @@ static void do_btree_node_write(struct btree *b)
+                       bset_sector_offset(&b->keys, i));
+ 
+        if (!bch_bio_alloc_pages(b->bio, __GFP_NOWARN|GFP_NOWAIT)) {
+-               int j;
+                struct bio_vec *bv;
+-               void *base = (void *) ((unsigned long) i & ~(PAGE_SIZE - 1));
++               void *addr = (void *) ((unsigned long) i & ~(PAGE_SIZE - 1));
+                struct bvec_iter_all iter_all;
+ 
+-               bio_for_each_segment_all(bv, b->bio, j, iter_all)
+-                       memcpy(page_address(bv->bv_page),
+-                              base + j * PAGE_SIZE, PAGE_SIZE);
++               bio_for_each_segment_all(bv, b->bio, iter_all) {
++                       memcpy(page_address(bv->bv_page), addr, PAGE_SIZE);
++                       addr += PAGE_SIZE;
++               }
+ 
+                bch_submit_bbio(b->bio, b->c, &k.key, 0);
+ 
+> +++ b/drivers/md/raid1.c
+> @@ -2110,7 +2110,7 @@ static void process_checks(struct r1bio *r1_bio)
+>  		}
+>  	r1_bio->read_disk = primary;
+>  	for (i = 0; i < conf->raid_disks * 2; i++) {
+> -		int j;
+> +		int j = 0;
+>  		struct bio *pbio = r1_bio->bios[primary];
+>  		struct bio *sbio = r1_bio->bios[i];
+>  		blk_status_t status = sbio->bi_status;
+> @@ -2125,8 +2125,8 @@ static void process_checks(struct r1bio *r1_bio)
+>  		/* Now we can 'fixup' the error value */
+>  		sbio->bi_status = 0;
+>  
+> -		bio_for_each_segment_all(bi, sbio, j, iter_all)
+> -			page_len[j] = bi->bv_len;
+> +		bio_for_each_segment_all(bi, sbio, iter_all)
+> +			page_len[j++] = bi->bv_len;
+
+Yes.
+
+> +++ b/fs/btrfs/inode.c
+> @@ -7919,7 +7918,7 @@ static void btrfs_retry_endio(struct bio *bio)
+>  	struct bio_vec *bvec;
+>  	int uptodate;
+>  	int ret;
+> -	int i;
+> +	int i = 0;
+>  	struct bvec_iter_all iter_all;
+>  
+>  	if (bio->bi_status)
+> @@ -7934,7 +7933,7 @@ static void btrfs_retry_endio(struct bio *bio)
+>  	failure_tree = &BTRFS_I(inode)->io_failure_tree;
+>  
+>  	ASSERT(!bio_flagged(bio, BIO_CLONED));
+> -	bio_for_each_segment_all(bvec, bio, i, iter_all) {
+> +	bio_for_each_segment_all(bvec, bio, iter_all) {
+>  		ret = __readpage_endio_check(inode, io_bio, i, bvec->bv_page,
+>  					     bvec->bv_offset, done->start,
+>  					     bvec->bv_len);
+> @@ -7946,6 +7945,7 @@ static void btrfs_retry_endio(struct bio *bio)
+>  					 bvec->bv_offset);
+>  		else
+>  			uptodate = 0;
+> +		i++;
+>  	}
+
+I'd be tempted to instead:
+
+@@ -7935,7 +7935,7 @@ static void btrfs_retry_endio(struct bio *bio)
+ 
+        ASSERT(!bio_flagged(bio, BIO_CLONED));
+        bio_for_each_segment_all(bvec, bio, i, iter_all) {
+-               ret = __readpage_endio_check(inode, io_bio, i, bvec->bv_page,
++               ret = __readpage_endio_check(inode, io_bio, i++, bvec->bv_page,
+                                             bvec->bv_offset, done->start,
+                                             bvec->bv_len);
+                if (!ret)
+
+(i is used nowhere else in this loop, and it's a mercifully short loop with
+no breaks or continues).
+
+Thanks for turning this musing into a patch.
