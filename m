@@ -2,126 +2,73 @@ Return-Path: <SRS0=B8lj=SL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 595D6C282CE
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 16:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F13AC282DA
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 18:17:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2442F2084F
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 16:35:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 061D720857
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 18:17:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Td2OyzsE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UeE2LcmT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726644AbfDIQfn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Apr 2019 12:35:43 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:56304 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726572AbfDIQfj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Apr 2019 12:35:39 -0400
-Received: by mail-wm1-f68.google.com with SMTP id o25so4315751wmf.5
-        for <linux-block@vger.kernel.org>; Tue, 09 Apr 2019 09:35:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=kVY6gm93IxOicC2fEC0J47/R327+OQXdPKJ+Wc5c6E8=;
-        b=Td2OyzsETjXiNxxyrCwZCh3GbsO7MDlHuRiQ/LCapEbezj4Hggno5+xpcDaZgiNDU7
-         7ZHOZ7L+MOlC53rlvf7uQTEyC+QcKwTd5nOa9f85wD5IHJeIQcCu31tcM1m9Wf+0D59p
-         4M/UIZo39IezGeCUHRWuy6fi3FLj/3toP4epYwKypwg6zoJHcGhuUkJ9LxNvUJUK7ASg
-         QN5SCQksYWRlv2/2Rl6ciZs1ix1L/tDleCBGaba4mCGgKjnx9y6RMzftBak1rdnkl4Ww
-         d0Kkbu2YoiFrGf5Bg6EZKlihq4BXkwLFZIoK5+gOsl2HO04KXXvvCm/DkfYlhdDkJWSv
-         anJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=kVY6gm93IxOicC2fEC0J47/R327+OQXdPKJ+Wc5c6E8=;
-        b=knxr66v81rO7qWdntkEV6Wb61LXEmmUEgtUZBHVq2RGUude93UkEJ6gqsSQLPhhrKS
-         0bxop8KlBracubmYUy+NGcw4ZU4tbKcocqlTvNec7la/jaDQeiFjFl/WupAI+IbScuoJ
-         cML8bpyVkMrD+HFjnwLXEWEB7m3NZ8viqRyK4J3ovGJVE9HZeu+zpVyprJd2kxTpLTJu
-         L22+ASQqPJvjo+wDgtFhMp2/tlegJPwErrs1hvQfAjyB3FHHmdVRZop8aW2MarN5FUBC
-         bte8A5I6CjskvoXNd4EJZd/TOLOsRafWagd4+HuM9RWsO9pHg3Fm6zEhJMsYnziU5V/q
-         i8ZA==
-X-Gm-Message-State: APjAAAWTBsMVII+WTWirRnRYj2ZFPgZp2woncwuPcqMbMsRiK73fmwze
-        gp8cJjH8ns3LRJejIEe9FYbCbw==
-X-Google-Smtp-Source: APXvYqz2TDdi7UCDhvoeR1eOs1eAO1vnYR+6NdJrUCh3mNN3DAxteX/OYqTz3dLe2c+WXCh8QLRMVA==
-X-Received: by 2002:a1c:a7c5:: with SMTP id q188mr15353008wme.126.1554827737361;
-        Tue, 09 Apr 2019 09:35:37 -0700 (PDT)
-Received: from [192.168.0.105] ([88.147.54.190])
-        by smtp.gmail.com with ESMTPSA id j11sm44523040wrw.85.2019.04.09.09.35.36
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Apr 2019 09:35:36 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: Thinkpad X60: regression with 5.1-rc1 and 5.1-rc4
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20190409163304.GA23829@amd>
-Date:   Tue, 9 Apr 2019 18:35:35 +0200
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>, rjw@rjwysocki.net,
-        lenb@kernel.org, linux-acpi@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F6306562-0022-4043-BBF8-13FE4872CA31@linaro.org>
-References: <20190408173914.GA13260@amd>
- <678ab058-986c-9727-58d7-d3f5283e2225@kernel.dk> <20190409163304.GA23829@amd>
-To:     Pavel Machek <pavel@ucw.cz>
-X-Mailer: Apple Mail (2.3445.102.3)
+        id S1726509AbfDISRn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Apr 2019 14:17:43 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:42286 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726431AbfDISRn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Apr 2019 14:17:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=w4Tq1tlD1boxk5aZkvP55taQSNxKwcRyVY1dumhNGOI=; b=UeE2LcmTeAh20O8k5k6RvyAk8
+        AOR0rCbN2dd3lCKoV6MrYu8FExp40szAdowOJd6Fa0ay8gNYE452laKROK497ZzWqrCHbakL9pLJx
+        TisYe9MPALrzmGNugCkLCHK8CfYdxt7+aiqHYcbzwJ45D2WJGFqmnVDFAFybt9Htsjzb2nMeMpJI1
+        e8FSIGwfTyMGvv06ZmCUlYZQa12D7P1aBYzHxT3ZCnvtJfZ5vfl1YNg9vWKHDTSw5qeJYLS5v7COF
+        PHmcsv8g05sxfj9z9pVRntQbLQQF2MNnVWN7h2Hf+tnGEoJADxM36tAGDaLPfJe6UVSA5LFwFD6WZ
+        eVXnOMhHQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hDvJW-00080j-C9; Tue, 09 Apr 2019 18:17:42 +0000
+Date:   Tue, 9 Apr 2019 11:17:42 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-api@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] io_uring: add support for barrier fsync
+Message-ID: <20190409181742.GA24925@infradead.org>
+References: <7c7276e4-8ffa-495a-6abf-926a58ee899e@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7c7276e4-8ffa-495a-6abf-926a58ee899e@kernel.dk>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Apr 09, 2019 at 10:27:43AM -0600, Jens Axboe wrote:
+> It's a quite common use case to issue a bunch of writes, then an fsync
+> or fdatasync when they complete. Since io_uring doesn't guarantee any
+> type of ordering, the application must track issued writes and wait
+> with the fsync issue until they have completed.
+> 
+> Add an IORING_FSYNC_BARRIER flag that helps with this so the application
+> doesn't have to do this manually. If this flag is set for the fsync
+> request, we won't issue it until pending IO has already completed.
 
+I think we need a much more detailed explanation of the semantics,
+preferably in man page format.
 
-> Il giorno 9 apr 2019, alle ore 18:33, Pavel Machek <pavel@ucw.cz> ha =
-scritto:
->=20
-> On Mon 2019-04-08 11:41:18, Jens Axboe wrote:
->> On 4/8/19 11:39 AM, Pavel Machek wrote:
->>> Hi!
->>>=20
->>> For some reason, Thinkpad X60 now crashes during boot. I see some
->>> weird backtraces, and it may be bfq related... or maybe ACPI idle.
->>>=20
->>> Does x86-32 work for you?
->>>=20
->>> Weird thing is, 5.1.0-rc3-next-20190408 boots here (but later has
->>> problems during resume, making it unusable, too). They may not have
->>> 100% same configs.
->=20
-> I now noticed it said:
->=20
-> EIP is in bfq_bfqq_expire
->=20
->> Can you try and revert:
->>=20
->> 9dee8b3b057e1
->>=20
->> and see if that helps?
->=20
-> Yes, I tried and yes, it helps. What are the next steps?=20
->=20
-
-Try my fix:
-
-=
-https://lore.kernel.org/linux-block/20190409191420.3f56d493@fire.localdoma=
-in/T/#m30a14045e710b870f00f7c51cdaa7c403977b767
-
-and cross your fingers :)
-
-Thanks,
-Paolo
-
-> 									=
-Pavel
->=20
-> --=20
-> (english) http://www.livejournal.com/~pavelmachek
-> (cesky, pictures) =
-http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
-
+Barrier at least in Linux traditionally means all previously submitted
+requests have finished and no new ones are started until the
+barrier request finishes, which is very heavy handed.  Is that what
+this is supposed to do?  If not what are the exact guarantees vs
+ordering and or barrier semantics?
