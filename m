@@ -2,96 +2,160 @@ Return-Path: <SRS0=B8lj=SL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE752C10F0E
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 09:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 679E3C10F0E
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 09:30:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7EF9D20818
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 09:20:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1554801647;
-	bh=ZHDTajHOpGP8T3Fta/OBev7zHubmKMsYTyu2qwGJLjs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Q0wYHVjkhIFJnjo6pb59NsmhOG540eqpq8xm1LbGymoIBwm1rg0nhvZzezlpAnzAp
-	 1MeC4qXmAGqovgTXvlv/tBZwpZD2CF/+c0rNJoFCwIq8HU27hj4wJvk9H8vi4xOHGy
-	 otNCNOS0HI0f904uNehEXI/L4+pq19xHcZVdpKDo=
+	by mail.kernel.org (Postfix) with ESMTP id 3263420833
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 09:30:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aGnDMBWt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726668AbfDIJUq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Apr 2019 05:20:46 -0400
-Received: from mx2.suse.de ([195.135.220.15]:38886 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726530AbfDIJUq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 9 Apr 2019 05:20:46 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 8F75FAEDF;
-        Tue,  9 Apr 2019 09:20:44 +0000 (UTC)
-Date:   Tue, 9 Apr 2019 11:20:42 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Vlastimil Babka <vbabka@suse.cz>
-Cc:     Christoph Hellwig <hch@lst.de>, Christopher Lameter <cl@linux.com>,
-        linux-mm@kvack.org, Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        lsf-pc@lists.linux-foundation.org
-Subject: Re: [RFC 0/2] guarantee natural alignment for kmalloc()
-Message-ID: <20190409092042.GB10383@dhcp22.suse.cz>
-References: <20190319211108.15495-1-vbabka@suse.cz>
- <01000169988d4e34-b4178f68-c390-472b-b62f-a57a4f459a76-000000@email.amazonses.com>
- <5d7fee9c-1a80-6ac9-ac1d-b1ce05ed27a8@suse.cz>
- <010001699c5563f8-36c6909f-ed43-4839-82da-b5f9f21594b8-000000@email.amazonses.com>
- <4d2a55dc-b29f-1309-0a8e-83b057e186e6@suse.cz>
- <01000169a68852ed-d621a35c-af0c-4759-a8a3-e97e7dfc17a5-000000@email.amazonses.com>
- <2b129aec-f9a5-7ab8-ca4a-0a325621d111@suse.cz>
- <20190407080020.GA9949@lst.de>
- <af1e0b95-f654-4fa9-d400-af01043907ab@suse.cz>
+        id S1726832AbfDIJ3z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Apr 2019 05:29:55 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:33378 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726981AbfDIJ3z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Apr 2019 05:29:55 -0400
+Received: by mail-ot1-f66.google.com with SMTP id j10so14955419otq.0;
+        Tue, 09 Apr 2019 02:29:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=/lPkJNKAbh4YluUe8wkzivO7jBarzDZkEmu1FMVG3GQ=;
+        b=aGnDMBWtmpLTdQTm9E6aK+e7QRyTXyCpmqfp9w1FOho/D+h9pMERi+bbOX1sRHSHtg
+         SRGD80dLCHWLD18WCy//UP4tepcwUJrf9p/1maM74Uz1zQJvlz/GRz3nrG6lWGeQp8Jv
+         BsA89mVR3O7O/o/SqiQkzn3pzWVZO7GcCJQoR6f3pt14w7UHH/l01bGlolaq21QtmB7G
+         fa/hIKlQL50cf3jd6ZKlsqOMhx00zpYsHrpGbN8RZJeLyzfWcMUwW9dWAwU0DGz61HU7
+         PukIMJK1/mMeLluV4DbJYkaM2fQ/QSnGtsbc0N8oy/OpvN2okLB2NSfrDnNCt6DKWst/
+         NxQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=/lPkJNKAbh4YluUe8wkzivO7jBarzDZkEmu1FMVG3GQ=;
+        b=FozpherMoKIkVp3xRzLOKJQveJdMv32NoKBLb4nYv7XLFKv6FqmDHgdwSmLK2G++o1
+         LEXjW2V7IjKJGdUIRRS4Rr7IZfU0O1NbKP7Be9/BTRXYK8avNJWgppMHzEAZanPnJLtQ
+         jrURbZZHq5DvUpdlqhlDHeeP/8f831KCzoTJRwR8KnoK/vpqm3x5DKK+q9u9gDdK8sLD
+         67DQTC2iGiN45gBOed9q+CrowtWlQM7+Yi5lslC5NubV9k5ul1CESQP+nNIzz+tWu7MZ
+         yEeS7hgoI70+EI6Icxrdw34itEzs06m5E7xiug81FKRvIA+us8+G2xcapDEQpJVCrji9
+         Ex4w==
+X-Gm-Message-State: APjAAAVSFB+TZXZAaYp0LUEQBC4eDmv0glWGuhTFl98iO4uB4lHhnMOL
+        Hr1TqyhOFsuf16xEsfWsqj1ZshqHZFFkIjyDeNo=
+X-Google-Smtp-Source: APXvYqyyVxeJFmcXe1tajnKk3eMMkpvqF0BmL0LkUcQFBdssEWr5RsoTCo4nEn4dyUWhse8FJEHXLDSRlTe+EG37mX8=
+X-Received: by 2002:a05:6830:183:: with SMTP id q3mr23049815ota.204.1554802194207;
+ Tue, 09 Apr 2019 02:29:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <af1e0b95-f654-4fa9-d400-af01043907ab@suse.cz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20190409090828.16282-1-bob.liu@oracle.com>
+In-Reply-To: <20190409090828.16282-1-bob.liu@oracle.com>
+From:   Jinpu Wang <jinpuwang@gmail.com>
+Date:   Tue, 9 Apr 2019 11:29:42 +0200
+Message-ID: <CAD9gYJKYu15b7ZuAvud-BzG5fRP=B33yPJuEq84nsN_8y3EC1Q@mail.gmail.com>
+Subject: Re: [RESEND PATCH] blk-mq: fix hang caused by freeze/unfreeze sequence
+To:     Bob Liu <bob.liu@oracle.com>, r.peniaev@gmail.com
+Cc:     linux-block@vger.kernel.org, shirley.ma@oracle.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Akinobu Mita <akinobu.mita@gmail.com>,
+        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 09-04-19 10:07:42, Vlastimil Babka wrote:
-> On 4/7/19 10:00 AM, Christoph Hellwig wrote:
-> > On Fri, Apr 05, 2019 at 07:11:17PM +0200, Vlastimil Babka wrote:
-> >> On 3/22/19 6:52 PM, Christopher Lameter wrote:
-> >> > On Thu, 21 Mar 2019, Vlastimil Babka wrote:
-> >> > 
-> >> >> That however doesn't work well for the xfs/IO case where block sizes are
-> >> >> not known in advance:
-> >> >>
-> >> >> https://lore.kernel.org/linux-fsdevel/20190225040904.5557-1-ming.lei@redhat.com/T/#ec3a292c358d05a6b29cc4a9ce3ae6b2faf31a23f
-> >> > 
-> >> > I thought we agreed to use custom slab caches for that?
-> >> 
-> >> Hm maybe I missed something but my impression was that xfs/IO folks would have
-> >> to create lots of them for various sizes not known in advance, and that it
-> >> wasn't practical and would welcome if kmalloc just guaranteed the alignment.
-> >> But so far they haven't chimed in here in this thread, so I guess I'm wrong.
-> > 
-> > Yes, in XFS we might have quite a few.  Never mind all the other
-> > block level consumers that might have similar reasonable expectations
-> > but haven't triggered the problematic drivers yet.
-> 
-> What about a LSF session/BoF to sort this out, then? Would need to have people
-> from all three MM+FS+IO groups, I suppose.
+Bob Liu <bob.liu@oracle.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=889=E6=97=A5=E5=
+=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=8811:11=E5=86=99=E9=81=93=EF=BC=9A
+>
+> This patch was proposed by Roman Pen[3] years ago.
+> Recently we hit a bug which is likely caused by the same reason,so rebase=
+d his
+> fix to v5.1 and resend.
+> Below is almost copied from that patch[3].
+>
+> ------
+> Long time ago there was a similar fix proposed by Akinobu Mita[1],
+> but it seems that time everyone decided to fix this subtle race in
+> percpu-refcount and Tejun Heo[2] did an attempt (as I can see that
+> patchset was not applied).
+>
+> The following is a description of a hang in blk_mq_freeze_queue_wait() -
+> same fix but a bug from another angle.
+>
+> The hang happens on attempt to freeze a queue while another task does
+> queue unfreeze.
+>
+> The root cause is an incorrect sequence of percpu_ref_reinit() and
+> percpu_ref_kill() and as a result those two can be swapped:
+>
+>  CPU#0               CPU#1
+>  ----------------    -----------------
+>  percpu_ref_kill()
+>
+>                      percpu_ref_kill() << atomic reference does
+>  percpu_ref_reinit()                   << not guarantee the order
+>
+>                      blk_mq_freeze_queue_wait() << HANG HERE
+>
+>                      percpu_ref_reinit()
+>
+> Firstly this wrong sequence raises two kernel warnings:
+>
+>   1st. WARNING at lib/percpu-recount.c:309
+>        percpu_ref_kill_and_confirm called more than once
+>
+>   2nd. WARNING at lib/percpu-refcount.c:331
+>
+> But the most unpleasant effect is a hang of a blk_mq_freeze_queue_wait(),
+> which waits for a zero of a q_usage_counter, which never happens
+> because percpu-ref was reinited (instead of being killed) and stays in
+> PERCPU state forever.
+>
+> The simplified sequence above can be reproduced on shared tags, when
+> queue A is going to die meanwhile another queue B is in init state and
+> is trying to freeze the queue A, which shares the same tags set:
+>
+>  CPU#0                           CPU#1
+>  ------------------------------- ------------------------------------
+>  q1 =3D blk_mq_init_queue(shared_tags)
+>
+>                                 q2 =3D blk_mq_init_queue(shared_tags):
+>                                   blk_mq_add_queue_tag_set(shared_tags):
+>                                     blk_mq_update_tag_set_depth(shared_ta=
+gs):
+>                                       blk_mq_freeze_queue(q1)
+>  blk_cleanup_queue(q1)                 ...
+>    blk_mq_freeze_queue(q1)   <<<->>>   blk_mq_unfreeze_queue(q1)
+>
+> [1] Message id: 1443287365-4244-7-git-send-email-akinobu.mita@gmail.com
+> [2] Message id: 1443563240-29306-6-git-send-email-tj@kernel.org
+> [3] https://patchwork.kernel.org/patch/9268199/
+>
+> Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+> Signed-off-by: Bob Liu <bob.liu@oracle.com>
+> Cc: Akinobu Mita <akinobu.mita@gmail.com>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: linux-block@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+>
 
-Sounds like a good plan. Care to send an email to lsf-pc mailing list so
-that it doesn't fall through cracks please?
+Replaced Roman's email address.
 
--- 
-Michal Hocko
-SUSE Labs
+We at 1 & 1 IONOS (former ProfitBricks) have been carried this patch
+for some years,
+it has been running in production for some years too, would be good to
+see it in upstream :)
+
+Thanks,
+
+Jack Wang
+Linux Kernel Developer @ 1 & 1 IONOS
