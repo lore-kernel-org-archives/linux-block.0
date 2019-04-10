@@ -2,157 +2,207 @@ Return-Path: <SRS0=Dmuf=SM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 194C0C10F11
-	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 08:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A17DAC10F11
+	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 08:27:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA28B204FD
-	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 08:14:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 644A02075B
+	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 08:27:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="R8JOlQuZ";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="c5tajRur"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G0kIOolM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728632AbfDJIOh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Apr 2019 04:14:37 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:24036 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727281AbfDJIOg (ORCPT
+        id S1729588AbfDJI1Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Apr 2019 04:27:16 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36798 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729543AbfDJI1Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Apr 2019 04:14:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1554884077; x=1586420077;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=G2jElJOZfyFLvKNco3d0kYTjmqiC54i1dFEbi6nG2pY=;
-  b=R8JOlQuZcdkuCIKP27VkWZzVtEpwRxVHR4g+wWAXNoI7ExNsceAr3+/L
-   +U2hJJNbJ+2kriKOTmgpVGZ0Kgmta2xwlDM5eEHyfLaf0Bd4xDc7tCMET
-   pmk4IoM4yBSI8qo4+TwjfqonizWFdZNDlndX9dLv5JFhBeivhQ7kjkSEV
-   X/KoXRxvhTPY1ixoXwPuUocaYdEApzr8FOx1kHZjohV7u/2Wc7Io1WJl9
-   zSfV1ATQxO5Q4U+m5lbzvQxdBqMhXpoBTD+rD9aLppavKHKHV6lrGni0y
-   AehlpfzAxA54400SdtoskRYP7S2DcyTy632H+Hy7c+XNXl/+zdYM4wCZi
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.60,332,1549900800"; 
-   d="scan'208";a="110465852"
-Received: from mail-dm3nam05lp2053.outbound.protection.outlook.com (HELO NAM05-DM3-obe.outbound.protection.outlook.com) ([104.47.49.53])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Apr 2019 16:14:34 +0800
+        Wed, 10 Apr 2019 04:27:16 -0400
+Received: by mail-wm1-f65.google.com with SMTP id h18so1564331wml.1
+        for <linux-block@vger.kernel.org>; Wed, 10 Apr 2019 01:27:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8lIqLI/DVitg1S5kqbJ248Cy3u2sA757cKd8OqZR6rQ=;
- b=c5tajRurR0btbva+49+Lj3A7qh+wd8QSUokLJoGUPXQJYdaNFx1Ysoq25iBRnHLl0bKCi3f6K5AQ8bmCwQO/qmqGZawgvA+K5O8+Hc4mQV1d9BJPDG5Zld56RRaL6tUhFMYrFPT1YikDCnhkkm97PRGVFvs/rxBII1u5kx49MEs=
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.58.207) by
- BYAPR04MB4424.namprd04.prod.outlook.com (20.176.252.21) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1771.16; Wed, 10 Apr 2019 08:14:32 +0000
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::ec3e:1844:ecb1:6637]) by BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::ec3e:1844:ecb1:6637%5]) with mapi id 15.20.1771.016; Wed, 10 Apr 2019
- 08:14:32 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Alasdair Kergon <agk@redhat.com>
-CC:     Mike Snitzer <snitzer@redhat.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Omar Sandoval <osandov@fb.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Greg Edwards <gedwards@ddn.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v3] dm zoned: Silence a static checker warning
-Thread-Topic: [PATCH v3] dm zoned: Silence a static checker warning
-Thread-Index: AQHU73U2dRjJHQuw8UiU6PKHQBhQFQ==
-Date:   Wed, 10 Apr 2019 08:14:32 +0000
-Message-ID: <BYAPR04MB581696AA3EF70BE5328A9C95E72E0@BYAPR04MB5816.namprd04.prod.outlook.com>
-References: <20190410081231.GA31089@kadam>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [199.255.47.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bb5877b0-7f67-4a25-f914-08d6bd8c8fba
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4424;
-x-ms-traffictypediagnostic: BYAPR04MB4424:
-wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <BYAPR04MB4424F6D5B97B84BAB412219DE72E0@BYAPR04MB4424.namprd04.prod.outlook.com>
-x-forefront-prvs: 00032065B2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(39860400002)(396003)(366004)(136003)(346002)(189003)(199004)(486006)(102836004)(110136005)(68736007)(74316002)(86362001)(6506007)(72206003)(53546011)(97736004)(14454004)(478600001)(6436002)(186003)(105586002)(76176011)(476003)(26005)(446003)(55016002)(9686003)(2906002)(7696005)(256004)(106356001)(52536014)(66066001)(99286004)(229853002)(4326008)(8936002)(25786009)(3846002)(14444005)(54906003)(5660300002)(53936002)(7736002)(305945005)(81156014)(81166006)(316002)(8676002)(71200400001)(6116002)(71190400001)(33656002)(7416002)(6246003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4424;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 1NA3YnNAQOGJPheFCvcLznXiL8akZ3o7xWWD+oemQIVP6YHlYQlPJRh7HU63RHMHScoKeLVwFK8KZUitN97r07poTOt0/FGsLB5b4m9SYsHJyHOrF5Zu0YL9qWNyElIEl0WU9rLIdiJ7BL/QjSrt1vkK2wSr9O2omddNMGGEzwua+kA6AOjomUFsKv5yskUsfIabsA442g/d78Uc9g3saH7gFkZJ1/VHHMcagYTURWW1GMOEkXakc8fSnXGg1GxY+phHt8VPgO37SftbuI8YRiBE63F81m41wOaaycz5/D+/rB9vKzr4knxG22ebnuQ0hJnEpKJep/V724E9/JWzCp4G8WU+AEuYCRpGrojNH4viY/d9k0KvXBmjFmdJgX++0qSM6zPj3h95xxkE0ojKipKQQUCIgvxn0UiXUkbjspE=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XX9dSz/AtUZ52Tp2kC2tWYDeGDmBEkI/+RsqbAt06sQ=;
+        b=G0kIOolMKYhh02MFYzgheBFwKwDXDSs9OqwbN4hvVkZQDMZgzfWji2bCQtJLh/Z/+u
+         A5Wk6eJ7Kf7LTeQ36bNYKHtjQN3BAMsGpnFSOYwKmtdPUrxfaa1d9u70tyY750KrLmo0
+         JTqa9XcElwSrBQYmLKzTfuvv3XVO+mRvWMU9nUH2tmJ5SiP15b8qUc86kFa73JXoerLF
+         2o//ls8QofjNHUDqmtTBjHS4bz46nL2zia2GPw7paMOOzKb32onW5/jEVjQ0zRm4HP5U
+         6yyicKdMElz8onp+I1tj4h1PdO6kx/mnq2ZA3g0z9F2TsVu88VZehxYxCA2ARB7AEc8v
+         12QA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XX9dSz/AtUZ52Tp2kC2tWYDeGDmBEkI/+RsqbAt06sQ=;
+        b=mX2rIgLfYkTI0TrqI4Tw+CRw0mXJERHS1/6nxRxS8G0dbrxiDG8CcH/0TZO2qj74VW
+         +OzRnzTdVZFgrrqjy1F8pJbJSu36pAOEWpP+pQXLMMN4y78KRr5GmgsOLIN5ewgxM9Ou
+         EPt3eggYxLiNmM3c/JXPIxlHEXCVPy6qssiQ02u9S5tT0/okKBLSRskj6XKjcRULowtk
+         EBVi8QWty4PlPAj+H1LQdygjQLK+hZkJNhkRJ9tiYg4kWSH+ysnu3S53pZdbnWGdqmDY
+         9Q6DQSQnKvbAJsd809AEN7kHnD7GN3cxnGGH/a8Sgh5/rOBuQR974JDBrYC0eZfaypQC
+         puHg==
+X-Gm-Message-State: APjAAAW9tgISTEmrbCkVdqmQBJypKSAmLH62+iQEadQB/N981KPkzEWl
+        7+exKL0xsFeReG2Y3yH/dNWkXA==
+X-Google-Smtp-Source: APXvYqwl5phlBjVWWmZZs+rryyYgJ9REQaM7/AuykfJIXLP0N4nKSqMOafroPMqy6/fe0HIyqZZOMA==
+X-Received: by 2002:a1c:7211:: with SMTP id n17mr1780519wmc.32.1554884833651;
+        Wed, 10 Apr 2019 01:27:13 -0700 (PDT)
+Received: from wifi-122_dhcprange-158.wifi.unimo.it ([155.185.122.158])
+        by smtp.gmail.com with ESMTPSA id y125sm2293921wmc.39.2019.04.10.01.27.12
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 10 Apr 2019 01:27:12 -0700 (PDT)
+From:   Paolo Valente <paolo.valente@linaro.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ulf.hansson@linaro.org, linus.walleij@linaro.org,
+        broonie@kernel.org, bfq-iosched@googlegroups.com,
+        oleksandr@natalenko.name, Paolo Valente <paolo.valente@linaro.org>,
+        Dmitrii Tcvetkov <demfloro@demfloro.ru>,
+        Douglas Anderson <dianders@chromium.org>
+Subject: [PATCH] block, bfq: fix use after free in bfq_bfqq_expire
+Date:   Wed, 10 Apr 2019 10:26:46 +0200
+Message-Id: <20190410082646.14221-1-paolo.valente@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb5877b0-7f67-4a25-f914-08d6bd8c8fba
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Apr 2019 08:14:32.2039
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4424
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/04/10 17:13, Dan Carpenter wrote:=0A=
-> My static checker complains about this line from dmz_get_zoned_device()=
-=0A=
-> =0A=
-> 	aligned_capacity =3D dev->capacity & ~(blk_queue_zone_sectors(q) - 1);=
-=0A=
-> =0A=
-> The problem is that "aligned_capacity" and "dev->capacity" are sector_t=
-=0A=
-> type (which is a u64 under most configs) but blk_queue_zone_sectors(q)=0A=
-> returns a u32 so the higher 32 bits in aligned_capacity are cleared to=0A=
-> zero.  This patch adds a cast to address the issue.=0A=
-> =0A=
-> Fixes: 114e025968b5 ("dm zoned: ignore last smaller runt zone")=0A=
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>=0A=
-> ---=0A=
-> v2: The v1 patch declared blk_queue_zone_sectors() as sector_t but the=0A=
->     v2 cast added a cast to u64.=0A=
-> v3: Cast it to sector_t instead=0A=
-> =0A=
->  drivers/md/dm-zoned-target.c | 3 ++-=0A=
->  1 file changed, 2 insertions(+), 1 deletion(-)=0A=
-> =0A=
-> diff --git a/drivers/md/dm-zoned-target.c b/drivers/md/dm-zoned-target.c=
-=0A=
-> index 8865c1709e16..51d029bbb740 100644=0A=
-> --- a/drivers/md/dm-zoned-target.c=0A=
-> +++ b/drivers/md/dm-zoned-target.c=0A=
-> @@ -643,7 +643,8 @@ static int dmz_get_zoned_device(struct dm_target *ti,=
- char *path)=0A=
->  =0A=
->  	q =3D bdev_get_queue(dev->bdev);=0A=
->  	dev->capacity =3D i_size_read(dev->bdev->bd_inode) >> SECTOR_SHIFT;=0A=
-> -	aligned_capacity =3D dev->capacity & ~(blk_queue_zone_sectors(q) - 1);=
-=0A=
-> +	aligned_capacity =3D dev->capacity &=0A=
-> +				~((sector_t)blk_queue_zone_sectors(q) - 1);=0A=
->  	if (ti->begin ||=0A=
->  	    ((ti->len !=3D dev->capacity) && (ti->len !=3D aligned_capacity))) =
-{=0A=
->  		ti->error =3D "Partial mapping not supported";=0A=
-> =0A=
-=0A=
-Thanks for fixing this !=0A=
-=0A=
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+The function bfq_bfqq_expire() invokes the function
+__bfq_bfqq_expire(), and the latter may free the in-service bfq-queue.
+If this happens, then no other instruction of bfq_bfqq_expire() must
+be executed, or a use-after-free will occur.
+
+Basing on the assumption that __bfq_bfqq_expire() invokes
+bfq_put_queue() on the in-service bfq-queue exactly once, the queue is
+assumed to be freed if its refcounter is equal to one right before
+invoking __bfq_bfqq_expire().
+
+But, since commit 9dee8b3b057e1 ("block, bfq: fix queue removal from
+weights tree") this assumption is false. __bfq_bfqq_expire() may also
+invoke bfq_weights_tree_remove() and, since commit 9dee8b3b057e1, also
+the latter function may invoke bfq_put_queue(). So __bfq_bfqq_expire()
+may invoke bfq_put_queue() twice, and this is the actual case where
+the in-service queue may happen to be freed.
+
+To address this issue, this commit moves the check on the refcounter
+of the queue right around the last bfq_put_queue() that may be invoked
+on the queue.
+
+Reported-by: Dmitrii Tcvetkov <demfloro@demfloro.ru>
+Reported-by: Douglas Anderson <dianders@chromium.org>
+Tested-by: Dmitrii Tcvetkov <demfloro@demfloro.ru>
+Tested-by: Douglas Anderson <dianders@chromium.org>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-iosched.c | 15 +++++++--------
+ block/bfq-iosched.h |  2 +-
+ block/bfq-wf2q.c    | 17 +++++++++++++++--
+ 3 files changed, 23 insertions(+), 11 deletions(-)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index fac188dd78fa..30b88ec7ad26 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -2822,7 +2822,7 @@ static void bfq_dispatch_remove(struct request_queue *q, struct request *rq)
+ 	bfq_remove_request(q, rq);
+ }
+ 
+-static void __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++static bool __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ {
+ 	/*
+ 	 * If this bfqq is shared between multiple processes, check
+@@ -2855,9 +2855,11 @@ static void __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 	/*
+ 	 * All in-service entities must have been properly deactivated
+ 	 * or requeued before executing the next function, which
+-	 * resets all in-service entites as no more in service.
++	 * resets all in-service entites as no more in service. This
++	 * may cause bfqq to be freed. If this happens, the next
++	 * function returns true.
+ 	 */
+-	__bfq_bfqd_reset_in_service(bfqd);
++	return __bfq_bfqd_reset_in_service(bfqd);
+ }
+ 
+ /**
+@@ -3262,7 +3264,6 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 	bool slow;
+ 	unsigned long delta = 0;
+ 	struct bfq_entity *entity = &bfqq->entity;
+-	int ref;
+ 
+ 	/*
+ 	 * Check whether the process is slow (see bfq_bfqq_is_slow).
+@@ -3347,10 +3348,8 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 	 * reason.
+ 	 */
+ 	__bfq_bfqq_recalc_budget(bfqd, bfqq, reason);
+-	ref = bfqq->ref;
+-	__bfq_bfqq_expire(bfqd, bfqq);
+-
+-	if (ref == 1) /* bfqq is gone, no more actions on it */
++	if (__bfq_bfqq_expire(bfqd, bfqq))
++		/* bfqq is gone, no more actions on it */
+ 		return;
+ 
+ 	bfqq->injected_service = 0;
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 062e1c4787f4..86394e503ca9 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -995,7 +995,7 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity,
+ 			     bool ins_into_idle_tree);
+ bool next_queue_may_preempt(struct bfq_data *bfqd);
+ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd);
+-void __bfq_bfqd_reset_in_service(struct bfq_data *bfqd);
++bool __bfq_bfqd_reset_in_service(struct bfq_data *bfqd);
+ void bfq_deactivate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 			 bool ins_into_idle_tree, bool expiration);
+ void bfq_activate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index a11bef75483d..ae4d000ac0af 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -1605,7 +1605,8 @@ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
+ 	return bfqq;
+ }
+ 
+-void __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
++/* returns true if the in-service queue gets freed */
++bool __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
+ {
+ 	struct bfq_queue *in_serv_bfqq = bfqd->in_service_queue;
+ 	struct bfq_entity *in_serv_entity = &in_serv_bfqq->entity;
+@@ -1629,8 +1630,20 @@ void __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
+ 	 * service tree either, then release the service reference to
+ 	 * the queue it represents (taken with bfq_get_entity).
+ 	 */
+-	if (!in_serv_entity->on_st)
++	if (!in_serv_entity->on_st) {
++		/*
++		 * If no process is referencing in_serv_bfqq any
++		 * longer, then the service reference may be the only
++		 * reference to the queue. If this is the case, then
++		 * bfqq gets freed here.
++		 */
++		int ref = in_serv_bfqq->ref;
+ 		bfq_put_queue(in_serv_bfqq);
++		if (ref == 1)
++			return true;
++	}
++
++	return false;
+ }
+ 
+ void bfq_deactivate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+-- 
+2.20.1
+
