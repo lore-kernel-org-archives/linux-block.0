@@ -2,113 +2,93 @@ Return-Path: <SRS0=Dmuf=SM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FBEBC10F11
-	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 14:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB292C10F11
+	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 15:04:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 628152064A
-	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 14:52:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82E4C21741
+	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 15:04:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732875AbfDJOwh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Apr 2019 10:52:37 -0400
-Received: from iolanthe.rowland.org ([192.131.102.54]:49950 "HELO
-        iolanthe.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1732870AbfDJOwh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Apr 2019 10:52:37 -0400
-Received: (qmail 4391 invoked by uid 2102); 10 Apr 2019 10:52:36 -0400
-Received: from localhost (sendmail-bs@127.0.0.1)
-  by localhost with SMTP; 10 Apr 2019 10:52:36 -0400
-Date:   Wed, 10 Apr 2019 10:52:36 -0400 (EDT)
-From:   Alan Stern <stern@rowland.harvard.edu>
-X-X-Sender: stern@iolanthe.rowland.org
-To:     "Bollinger, Seth" <Seth.Bollinger@digi.com>
-cc:     Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-        USB list <linux-usb@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: Bug: VHCI + USB 3.0
-In-Reply-To: <D5C0CBE7-AD66-4CF6-AD7D-2A0064FDA464@digi.com>
-Message-ID: <Pine.LNX.4.44L0.1904101047230.1629-100000@iolanthe.rowland.org>
+        id S1732875AbfDJPEz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Apr 2019 11:04:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43878 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732868AbfDJPEz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Apr 2019 11:04:55 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 649A22D81A;
+        Wed, 10 Apr 2019 15:04:55 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-28.pek2.redhat.com [10.72.8.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 511781073027;
+        Wed, 10 Apr 2019 15:04:43 +0000 (UTC)
+Date:   Wed, 10 Apr 2019 23:04:38 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        James Smart <james.smart@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH V4 0/2] blk-mq/nvme: cancel request synchronously
+Message-ID: <20190410150436.GA23621@ming.t460p>
+References: <20190408223122.29844-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190408223122.29844-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Wed, 10 Apr 2019 15:04:55 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 10 Apr 2019, Bollinger, Seth wrote:
-
-> > On Apr 9, 2019, at 2:13 PM, Bollinger, Seth <Seth.Bollinger@digi.com<mailto:Seth.Bollinger@digi.com>> wrote:
-> >
-> > > Seth, you can try adding:
-> > >
-> > >  blk_queue_virt_boundary(sdev->request_queue, 1024 - 1)
-> > >
-> > > in drivers/usb/storage/scsiglue.c:slave_alloc(), just after the call to
-> > > blk_queue_update_dma_alignment().  Perhaps that will help
-> > >
-> >
-> > I will do that as a test.  However, I’m concerned that we’re solving only a specific case.  Won’t it fail in a similar way if a different subsystem does the same thing (USB modem or > video drivers, etc.)?
+On Tue, Apr 09, 2019 at 06:31:20AM +0800, Ming Lei wrote:
+> Hi,
 > 
-> Just to follow up, this does seem to solve the specific problem.
+> This patchset introduces blk_mq_complete_request_sync() for canceling
+> request synchronously in error handler context, then one race between
+> completing request remotely and destroying contoller/queues can be fixed.
+> 
+> 
+> V4:
+> 	- drop return value
+> 	- don't handle fake timeout
+> 
+> V3:
+> 	- avoid extra cost to blk_mq_complete_request
+> 
+> V2:
+> 	- export via EXPORT_SYMBOL_GPL
+> 	- minor commit log change
+> 
+> Ming Lei (2):
+>   blk-mq: introduce blk_mq_complete_request_sync()
+>   nvme: cancel request synchronously
+> 
+>  block/blk-mq.c           | 7 +++++++
+>  drivers/nvme/host/core.c | 2 +-
+>  include/linux/blk-mq.h   | 1 +
+>  3 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> Cc: Keith Busch <kbusch@kernel.org>
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: James Smart <james.smart@broadcom.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: linux-nvme@lists.infradead.org
+> 
 
-Great!  Okay, here's an actual patch for you to try.  I have removed 
-the blk_queue_update_dma_alignment() call because it doesn't seem to 
-be necessary.  The starting location of each scatterlist element is 
-unimportant; only the length matters.
+Hi Jens,
 
-If this works, I will submit it as a bugfix for the kernel.
+These two patches have been posted for a while, any chance to make them
+in v5.1?
 
-Alan Stern
-
-
- drivers/usb/storage/scsiglue.c |   21 ++++++++-------------
- 1 file changed, 8 insertions(+), 13 deletions(-)
-
-Index: usb-4.x/drivers/usb/storage/scsiglue.c
-===================================================================
---- usb-4.x.orig/drivers/usb/storage/scsiglue.c
-+++ usb-4.x/drivers/usb/storage/scsiglue.c
-@@ -65,6 +65,7 @@ static const char* host_info(struct Scsi
- static int slave_alloc (struct scsi_device *sdev)
- {
- 	struct us_data *us = host_to_us(sdev->host);
-+	int maxp;
- 
- 	/*
- 	 * Set the INQUIRY transfer length to 36.  We don't use any of
-@@ -74,22 +75,16 @@ static int slave_alloc (struct scsi_devi
- 	sdev->inquiry_len = 36;
- 
- 	/*
--	 * USB has unusual DMA-alignment requirements: Although the
--	 * starting address of each scatter-gather element doesn't matter,
-+	 * USB has unusual scatter-gather requirements: Although the
-+	 * starting address of each scatterlist element doesn't matter,
- 	 * the length of each element except the last must be divisible
--	 * by the Bulk maxpacket value.  There's currently no way to
--	 * express this by block-layer constraints, so we'll cop out
--	 * and simply require addresses to be aligned at 512-byte
--	 * boundaries.  This is okay since most block I/O involves
--	 * hardware sectors that are multiples of 512 bytes in length,
--	 * and since host controllers up through USB 2.0 have maxpacket
--	 * values no larger than 512.
-+	 * by the Bulk maxpacket value.  Fortunately this value is always
-+	 * a power of 2.
- 	 *
--	 * But it doesn't suffice for Wireless USB, where Bulk maxpacket
--	 * values can be as large as 2048.  To make that work properly
--	 * will require changes to the block layer.
-+	 * Inform the block layer about this requirement.
- 	 */
--	blk_queue_update_dma_alignment(sdev->request_queue, (512 - 1));
-+	maxp = usb_maxpacket(us->pusb_dev, us->recv_bulk_pipe, 0);
-+	blk_queue_virt_boundary(sdev->request_queue, maxp - 1);
- 
- 	/* Tell the SCSI layer if we know there is more than one LUN */
- 	if (us->protocol == USB_PR_BULK && us->max_lun > 0)
-
+Thanks,
+Ming
