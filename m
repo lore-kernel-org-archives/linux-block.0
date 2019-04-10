@@ -2,144 +2,174 @@ Return-Path: <SRS0=Dmuf=SM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE8BC10F11
-	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 17:39:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A7DBC10F11
+	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 17:57:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AFAA22077C
-	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 17:39:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB3102063F
+	for <linux-block@archiver.kernel.org>; Wed, 10 Apr 2019 17:57:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="h6PyZat0"
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="puxKlU07"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729785AbfDJRjF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Apr 2019 13:39:05 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:56930 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729786AbfDJRjF (ORCPT
+        id S1730777AbfDJR5F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Apr 2019 13:57:05 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:41596 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730774AbfDJR5E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Apr 2019 13:39:05 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3AHXqvJ073777;
-        Wed, 10 Apr 2019 17:39:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : cc : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=r9d+4HJ1YhTsTNJNafCIeJauD4NOh20rQoicT9MoGWc=;
- b=h6PyZat0Ncx+Z1/u3SnZ+QCmYMdXMQ+Twv4/YLrpLAZ4CtluC25b5oWzeDLx6UkYbGz6
- XplJZHpun3veGev9u5smWhIEuKSBBhvNhrSziKNWTntiGkZ7hqJVddfQDvsOdCls0voy
- DRVjkb0PPDEl8Q2UwJcEzzaO7Ficiu1GmmBBO3GjkjK8el2vekmmGTnRmz767sO93NXA
- VNubyf16jo5LQXCPTohHcC0rF3Bp1PtYMrF+VXPVPLaj1w7EA5tv5NT/aEZ/yLqBuKVb
- nRufNLIBm63MMFl66qf47nfjkK0WvmHPnNIYk+d8EVmcwy82SIQ6qVYStaEgY5Vi/D6U Vw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2130.oracle.com with ESMTP id 2rphmempsu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 10 Apr 2019 17:39:00 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3AHcQwU004824;
-        Wed, 10 Apr 2019 17:38:59 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2rpj5bapkd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 10 Apr 2019 17:38:59 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3AHcvcN005911;
-        Wed, 10 Apr 2019 17:38:59 GMT
-Received: from [192.168.2.8] (/106.39.148.99)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 10 Apr 2019 10:38:57 -0700
-Subject: Re: [PATCH 1/1] blk-mq: do not splice ctx->rq_lists[type] to
- hctx->dispatch if ctx is not mapped to hctx
-To:     axboe@kernel.dk
-References: <1554721973-32456-1-git-send-email-dongli.zhang@oracle.com>
-Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <f30ce403-3af1-3e55-e080-0ef0bb9d5c50@oracle.com>
-Date:   Thu, 11 Apr 2019 01:38:47 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        Wed, 10 Apr 2019 13:57:04 -0400
+Received: by mail-lj1-f193.google.com with SMTP id k8so2953433lja.8
+        for <linux-block@vger.kernel.org>; Wed, 10 Apr 2019 10:57:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bEw+KO2/ka8nKlM3JMAkOLDxT8xAxL50hihSpr0VWC4=;
+        b=puxKlU07gNV3QUgf1ZXEnEdM5Ip7pvi3eCYsldM+D5+C+YWicqYoef35yl8fXQO2u3
+         5o8zzdYr0esWOKglNpbGkaPO+EGg+qIcA24H9g1Lty2yg3jRVDwwqOwoX5rNGLaSrTQs
+         snqijvwq+EJzz4n9zAOc8yxXGXm0pZh2M0oo+sHkgHZaTeoYrabFujtm8zXi5yBNKcDC
+         R1l7xn//9rodLBtfyOvq53wgZm5VIfQVw+Zz8XUAXUxaydX1jdI9DOf5KLoCTFYWfiLl
+         ebppf6XPN8Ka0eHujjH9NSkGAelCgzhE+GmvitmXIgDVn9chBMx+PpILMi9gHmrqolIh
+         E5Qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bEw+KO2/ka8nKlM3JMAkOLDxT8xAxL50hihSpr0VWC4=;
+        b=RzmShgv3wjbcWb42CsqMFZv4KF5TFuQ+/3eSxWhkrkM5lX2/WA70h4AdLsC2ETKTh9
+         BaRUFVZ7Hc+UAW7qpePulnYl7q2PdmlERj+kMVcRzgoxcMyv/feQTtskQRsLSvp1opyw
+         c3j0MqL4LewL0iNZVxjNNow7s3nOlzaT1LBm4AkoE4SginuM3n8xRGOJ/0oYa4BtkWWo
+         R/MvtCVQ+6VmJV1royV+Z6OuuEghAneYr49kaJ2jhe4JQohXNY5zHYzSJuWnoAfx4g0B
+         Odd4y1o882/mbBvIO0waU9tWpv7gjm11iF/fdLH7xwNTWcsGN6M+WPDWo1S017pctW7j
+         qcMQ==
+X-Gm-Message-State: APjAAAUFlWFForqHz3hXlg9N1YZYikX/rfqPbyhnp90hHb5tiFFXM6ur
+        qAS3ENxV8LGaBQyMizFPCFYj7Q==
+X-Google-Smtp-Source: APXvYqwHdcmP9bf9wwpn9Jb7eJ2yB2f9t+TlsSC239drRYIGErjUkw8D8aGE10HOFkqBJEDgPlef0g==
+X-Received: by 2002:a2e:8446:: with SMTP id u6mr23207712ljh.71.1554919022671;
+        Wed, 10 Apr 2019 10:57:02 -0700 (PDT)
+Received: from skyninja.webspeed.dk (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
+        by smtp.gmail.com with ESMTPSA id r20sm7357190ljj.22.2019.04.10.10.57.01
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 10 Apr 2019 10:57:01 -0700 (PDT)
+From:   =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To:     axboe@fb.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL] lightnvm: pblk: fix crash in pblk_end_partial_read due to multipage bvecs
+Date:   Wed, 10 Apr 2019 19:56:43 +0200
+Message-Id: <20190410175643.11000-1-mb@lightnvm.io>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-In-Reply-To: <1554721973-32456-1-git-send-email-dongli.zhang@oracle.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9223 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1904100118
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9223 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904100117
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-On 04/08/2019 07:12 PM, Dongli Zhang wrote:
-> When a cpu is offline, blk_mq_hctx_notify_dead() is called once for each
-> hctx for the offline cpu.
-> 
-> While blk_mq_hctx_notify_dead() is used to splice all ctx->rq_lists[type]
-> to hctx->dispatch, it never checks whether the ctx is already mapped to the
-> hctx.
-> 
-> For example, on a VM (with nvme) of 4 cpu, to offline cpu 2 out of the
-> 4 cpu (0-3), blk_mq_hctx_notify_dead() is called once for each io queue
-> hctx:
-> 
-> 1st: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 3
-> 2nd: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 2
-> 3rd: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 1
-> 4th: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 0
-> 
-> Although blk_mq_ctx->cpu = 2 is only mapped to blk_mq_hw_ctx->queue_num = 2
-> in this case, its ctx->rq_lists[type] will however be moved to
-> blk_mq_hw_ctx->queue_num = 3 during the 1st call of
-> blk_mq_hctx_notify_dead().
-> 
-> This patch would return and go ahead to next call of
-> blk_mq_hctx_notify_dead() if ctx is not mapped to hctx.
-> 
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+The introduction of multipage bio vectors broke pblk's partial read
+logic due to it not being prepared for multipage bio vectors.
 
-Would you consider this one?
+Use bio vector iterators instead of direct bio vector indexing.
 
-In addition to Ming's Reviewed-by, there is another Reviewed-by from Keith as in
-below link.
+Fixes: 07173c3ec276 ("block: enable multipage bvecs")
+Reported-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Updated description.
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
 
-https://lore.kernel.org/linux-block/20190408153627.GF32498@localhost.localdomain/
+ drivers/lightnvm/pblk-read.c | 50 ++++++++++++++++++++----------------
+ 1 file changed, 28 insertions(+), 22 deletions(-)
 
-Thank you very much!
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 3789185144da..0b7d5fb4548d 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -231,14 +231,14 @@ static void pblk_end_partial_read(struct nvm_rq *rqd)
+ 	struct pblk_sec_meta *meta;
+ 	struct bio *new_bio = rqd->bio;
+ 	struct bio *bio = pr_ctx->orig_bio;
+-	struct bio_vec src_bv, dst_bv;
+ 	void *meta_list = rqd->meta_list;
+-	int bio_init_idx = pr_ctx->bio_init_idx;
+ 	unsigned long *read_bitmap = pr_ctx->bitmap;
++	struct bvec_iter orig_iter = BVEC_ITER_ALL_INIT;
++	struct bvec_iter new_iter = BVEC_ITER_ALL_INIT;
+ 	int nr_secs = pr_ctx->orig_nr_secs;
+ 	int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+ 	void *src_p, *dst_p;
+-	int hole, i;
++	int bit, i;
+ 
+ 	if (unlikely(nr_holes == 1)) {
+ 		struct ppa_addr ppa;
+@@ -257,33 +257,39 @@ static void pblk_end_partial_read(struct nvm_rq *rqd)
+ 
+ 	/* Fill the holes in the original bio */
+ 	i = 0;
+-	hole = find_first_zero_bit(read_bitmap, nr_secs);
+-	do {
+-		struct pblk_line *line;
++	for (bit = 0; bit < nr_secs; bit++) {
++		if (!test_bit(bit, read_bitmap)) {
++			struct bio_vec dst_bv, src_bv;
++			struct pblk_line *line;
+ 
+-		line = pblk_ppa_to_line(pblk, rqd->ppa_list[i]);
+-		kref_put(&line->ref, pblk_line_put);
++			line = pblk_ppa_to_line(pblk, rqd->ppa_list[i]);
++			kref_put(&line->ref, pblk_line_put);
+ 
+-		meta = pblk_get_meta(pblk, meta_list, hole);
+-		meta->lba = cpu_to_le64(pr_ctx->lba_list_media[i]);
++			meta = pblk_get_meta(pblk, meta_list, bit);
++			meta->lba = cpu_to_le64(pr_ctx->lba_list_media[i]);
+ 
+-		src_bv = new_bio->bi_io_vec[i++];
+-		dst_bv = bio->bi_io_vec[bio_init_idx + hole];
++			dst_bv = bio_iter_iovec(bio, orig_iter);
++			src_bv = bio_iter_iovec(new_bio, new_iter);
+ 
+-		src_p = kmap_atomic(src_bv.bv_page);
+-		dst_p = kmap_atomic(dst_bv.bv_page);
++			src_p = kmap_atomic(src_bv.bv_page);
++			dst_p = kmap_atomic(dst_bv.bv_page);
+ 
+-		memcpy(dst_p + dst_bv.bv_offset,
+-			src_p + src_bv.bv_offset,
+-			PBLK_EXPOSED_PAGE_SIZE);
++			memcpy(dst_p + dst_bv.bv_offset,
++				src_p + src_bv.bv_offset,
++				PBLK_EXPOSED_PAGE_SIZE);
+ 
+-		kunmap_atomic(src_p);
+-		kunmap_atomic(dst_p);
++			kunmap_atomic(src_p);
++			kunmap_atomic(dst_p);
+ 
+-		mempool_free(src_bv.bv_page, &pblk->page_bio_pool);
++			flush_dcache_page(dst_bv.bv_page);
++			mempool_free(src_bv.bv_page, &pblk->page_bio_pool);
+ 
+-		hole = find_next_zero_bit(read_bitmap, nr_secs, hole + 1);
+-	} while (hole < nr_secs);
++			bio_advance_iter(new_bio, &new_iter,
++					PBLK_EXPOSED_PAGE_SIZE);
++			i++;
++		}
++		bio_advance_iter(bio, &orig_iter, PBLK_EXPOSED_PAGE_SIZE);
++	}
+ 
+ 	bio_put(new_bio);
+ 	kfree(pr_ctx);
+-- 
+2.19.1
 
-Dongli Zhang
-
-> ---
->  block/blk-mq.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index a935483..9612746 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2219,6 +2219,10 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
->  	enum hctx_type type;
->  
->  	hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
-> +
-> +	if (!cpumask_test_cpu(cpu, hctx->cpumask))
-> +		return 0;
-> +
->  	ctx = __blk_mq_get_ctx(hctx->queue, cpu);
->  	type = hctx->type;
->  
-> 
