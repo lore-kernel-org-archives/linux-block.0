@@ -2,70 +2,115 @@ Return-Path: <SRS0=bAqE=SN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F5CC10F13
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 15:34:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 359DBC10F13
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 15:37:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BFEE92083E
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 15:34:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0483020850
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 15:37:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BgdtZopq"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="sJW7ncZf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726536AbfDKPeU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Apr 2019 11:34:20 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:50058 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726073AbfDKPeU (ORCPT
+        id S1726106AbfDKPhZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Apr 2019 11:37:25 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:41848 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726599AbfDKPhV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Apr 2019 11:34:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=T28W5zwe2deBjNrmDnAVx0OMglLxvM9TAIaZxWl3Nms=; b=BgdtZopqpJgrRkBc5gzuTGY//
-        vgnGIBjhN76K065UdNZZLTerLFKF6XcK60Ts7hn5DEG4LXY1Z4+fuFSmVUsgjqfBT6I5uA0dOYa//
-        ZYmZQiSez6LXeL9EPfoQYmmaTrU9BsPLZFLce88FB0zdh2VNYhmuIZvyu4Ke357MTUyJOOCIFQVtC
-        cDmOED04jjuXTbav0An2bZ3HrQka26biArlyJhg9xpX2sIXpf95CTEAYD/L3Ie3jDgEazquaLtKq/
-        Y1O8Xnb2kiu9iIlBVXTcY9mRXzEtLGs7LRdWTCmpcE1W95E22QSvo7VvcqxQKQItFIzYPvbRVZPnP
-        vOvIU0vJw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hEbiN-0004na-G3; Thu, 11 Apr 2019 15:34:11 +0000
-Date:   Thu, 11 Apr 2019 08:34:11 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Gao Xiang <gaoxiang25@huawei.com>, linux-block@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        "linux-erofs@lists.ozlabs.org" <linux-erofs@lists.ozlabs.org>,
-        Jens Axboe <axboe@kernel.dk>, Chao Yu <yuchao0@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: Some new bio merging behaviors in __bio_try_merge_page
-Message-ID: <20190411153411.GA16987@infradead.org>
-References: <85c5fa1a-a506-e26f-c354-1554d47d8b2b@huawei.com>
- <20190411070807.GA421@ming.t460p>
- <cb392476-a00e-09ce-fa6b-9e088242ecc6@huawei.com>
- <20190411080953.GE421@ming.t460p>
+        Thu, 11 Apr 2019 11:37:21 -0400
+Received: by mail-pl1-f194.google.com with SMTP id d1so3589188plj.8
+        for <linux-block@vger.kernel.org>; Thu, 11 Apr 2019 08:37:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=4JMqohJALClyFjLSz39Tgapkrkhd/P2KdOrlaoSuV/Y=;
+        b=sJW7ncZfs5C8C0YtqdlUB9/LsCCPbfG1qj471IKZgotwq8ojQgjFckwRbBk79UToaH
+         b8JtdrcGM6s+VsuQoac56FGPkUvImp9yZsWAbgqPdlmHvjY5T/RdHQEaZMOoc6iAKX+p
+         wKiwXxQJ7JMKLfcyuYrZN9o49nDvOj6xTezSembfUcxRwL3PEgByXP06hSEIV9IB8aLa
+         yK+MwlHnxuBPWdq/jPXEsfQj/ETPqOSJApw3YiNhxieRvbopW1Z8VMwR5CvVyy6/CcCh
+         4Huig2zPsm7AseJu0gzJ3C5KrHzfluz9fOs1++YsKazln5keI0PF5FWXbR7OmtE6cEQY
+         v/xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4JMqohJALClyFjLSz39Tgapkrkhd/P2KdOrlaoSuV/Y=;
+        b=GInorCiPpsZ9nb8ADXE58ZHgp3213n8cgqtORJFK0IUQdptedlwsdjr319REBRwuoJ
+         OVqNHsY+Syzx+i+9rUcluXjJNqyy1ocordjxZkT3r5eCdzUQDeCFU/sMqrGd7ZmaYlP+
+         azxUZpCU6m5WDGmhpR7OsIynGFeWo5Jn4fm3+Ge+JO3iSQ4nF7RDV9FCrLnYqzxtKbG8
+         W1QH4S91dvUiUSyrHRYBlU8GInMe/YvWClVnxLlL1x0jmZS6EIzAR6NkvzIORxFQbn+D
+         oOPCRyFsYoBF/IAqMgVnB1iS6KZYhC+cMmr2VSPFrABtZos6kicpDyPOs2Lkw0rL5NyN
+         sFPg==
+X-Gm-Message-State: APjAAAXa6z0LUA/FM29hcHgrqiSwBDvQHySEjCUfJghPnlvN24rRbGu1
+        oAEyg3GT3nxfoMX8KXcgrBvEycm5r8Qe8Q==
+X-Google-Smtp-Source: APXvYqwhJWHQqt51fnvecziClL9MpZoYMNaEcBPUB81JVJRLMZCnv46VXPeBcn+tvb0r7LB23s1ZOQ==
+X-Received: by 2002:a17:902:a9c7:: with SMTP id b7mr48883259plr.145.1554997040139;
+        Thu, 11 Apr 2019 08:37:20 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id p128sm93351596pfp.30.2019.04.11.08.37.18
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 11 Apr 2019 08:37:19 -0700 (PDT)
+Subject: Re: [GIT PULL] nvme fixes for 5.1
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+References: <20190411153134.GA16359@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <581989af-bc97-f578-d676-fecf7d0b906c@kernel.dk>
+Date:   Thu, 11 Apr 2019 09:37:17 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190411080953.GE421@ming.t460p>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20190411153134.GA16359@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 11, 2019 at 04:09:54PM +0800, Ming Lei wrote:
-> I don't think it is a good behaviour to use bio->bi_max_vecs to limit
-> max allowed page, you may see the idea from the naming simply...
+On 4/11/19 9:31 AM, Christoph Hellwig wrote:
+> Hi Jens,
 > 
-> If there were other such drivers, we may fix it easily, and the following
-> patch should fix your issue:
+> two nvme fixes for 5.1 - fixing the initial CSN for nvme-fc, and handle
+> log page offsets properly in the target.
+> 
+> The following changes since commit a3761c3c91209b58b6f33bf69dd8bb8ec0c9d925:
+> 
+>   block: do not leak memory in bio_copy_user_iov() (2019-04-10 16:14:40 -0600)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.infradead.org/nvme.git nvme-5.1
+> 
+> for you to fetch changes up to d808b7f759b50acf0784ce6230ffa63e12ef465d:
+> 
+>   nvmet: fix discover log page when offsets are used (2019-04-11 17:28:30 +0200)
+> 
+> ----------------------------------------------------------------
+> James Smart (1):
+>       nvme-fc: correct csn initialization and increments on error
+> 
+> Keith Busch (1):
+>       nvmet: fix discover log page when offsets are used
+> 
+>  drivers/nvme/host/fc.c          | 20 +++++++++---
+>  drivers/nvme/target/admin-cmd.c |  5 +++
+>  drivers/nvme/target/discovery.c | 68 +++++++++++++++++++++++++++--------------
+>  drivers/nvme/target/nvmet.h     |  1 +
+>  include/linux/nvme.h            |  9 ++++--
+>  5 files changed, 73 insertions(+), 30 deletions(-)
 
-Yep.  Consumers of the block layer really have no business at all
-looking at bi_vcnt.
+Pulled, thanks.
+
+-- 
+Jens Axboe
+
