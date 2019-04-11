@@ -2,88 +2,316 @@ Return-Path: <SRS0=bAqE=SN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB281C10F13
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 16:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A312EC282DA
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 21:08:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8929B2083E
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 16:25:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=aol.com header.i=@aol.com header.b="J8qMadnT"
+	by mail.kernel.org (Postfix) with ESMTP id 67034218AE
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 21:08:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726264AbfDKQZf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Apr 2019 12:25:35 -0400
-Received: from sonic301-22.consmr.mail.gq1.yahoo.com ([98.137.64.148]:35860
-        "EHLO sonic301-22.consmr.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726536AbfDKQZc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Apr 2019 12:25:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aol.com; s=a2048; t=1554999931; bh=I9/9b8JzNUiEkC+ANGk8ni2bQCTQ2fH3InVBXrkHSjk=; h=Subject:To:Cc:References:From:Date:In-Reply-To:From:Subject; b=J8qMadnTT6/WX10x774CADuqbZiUgg6SrHB+BTxEzi7/uZsXTI0mkRHfLbvMjQNOlLWR0tet/Y7tEqRZ6Q9a5bBcjHwyrEdkPCMDeKPf6TltTccR+lFuYdl0dLdQrnlV8Vg7skxVj0jMlf9OTpt39FNtVQnUJt7hhxR4xAnO3GaDkwbmXBpFFD/bsfJrvU/nZWrAmdyR95coxH/aJXGSS1+YeZTDLYKKx5u4Np+LVSLbaT+kHdh4wvTmSJ+CQD048Yp4uwUQBpbYypus/t7QDZ1uwwy+PT86t+XNOV5+bByhiMS7e2Io+vZrCZBNvY5NBZYPL6MBu1Jg3bI+3D9S3g==
-X-YMail-OSG: KpcX.CwVM1n_5Zl1Q_TBEyil7KB_aXoJzta5M_NbNyGD8Rga7WlWL3LV_VI1ZPb
- c5a5ug2adA6d1YnXdasO_O8H.LZCp2P7WBTYLFE3QyIhr6l8Pe.cLnl1eTYYgXY6z9wNy75IIpMx
- Ryc5bK5hgVTnq4kNLIGh0ELfWW5rGP22zk9GRiA1CNrZHLk61k1qpkofeaMLaxMRUV1wO_Hw.hUa
- GLkUp83m4GWfQlRiGQ1_JTErmVDK6zr0A7D2oImiCsvkdJG5qsfL2k.XAd2apmVcn0bZvJ6Dq782
- qh00eEEu1mniHypnOQpgbiX6pnl9EfjsFGRNhbGjAYIHWixy3SbsOCsKHoQ38SXLrXlCc7TsnINM
- rS5iVF8U_fxIL5VWfVz2ZZRURhW2JqRbkIORS9xA6BQ5lcqaU0iUTm5NM5nBhfYsEMo5Sl7GTElL
- 7BLkmIC7CEHf41GV0_ODRL0p7DM6wBhhLVpuHAYaMQ4zb1qR469Z3FVH5xTgpkYXXurmeL6xMWv_
- vFt8RRwnFkBB5rUZJ4RnufCLDO6oBLj0v.T6V9WtfpfxVv_vYTvXgn32RNfIo7ZD46NrgPoocDw3
- HYBOw4RERMxTzZzg2pLlMcWy4S01pXqWxAawyCBerkYBPx7IQ3NFKuU3Xoh5_qfVrBqIPVL.yOWp
- Vq0zjSBe8pM89R0KYRnddkrx7gnaeQrtP0cRwLVdDOCdxr7maKIS.lzMMsVQsFSAIjswsVOZsgt9
- YntLjYimLK3jyZyh0CZFJEfrDI.EILoC_EueHPP2arIdUqyqkOAajxomF_Z.3UdeVi6vO1FKDvbS
- gL43xJnJXQBvbvRVvsgRek8B3EcyKMfBWoX8cBIxQWWIfYw84MdUyGUM556oLAa7HXdNpLSo5m.x
- 5Q5dI2IEn5Ps14vuD15G5o3y74rB9muQlsYIzNQxxQCUK5okAPtWOkNOM4byLnC7sErsexnfdCPl
- QnpjYYe3DEoMGqePOltxaVa4PYfBFk7sQMVXNtai8S8pKC15sUg4DLUNxHE0FOQ172dpuco9w7Le
- BHX_0s4GvqO9V9lZyQDlh9XPai4yFLDdyGhAHfcOP7oSet_leUjzBKmuHYbAu95wb6Y8-
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.gq1.yahoo.com with HTTP; Thu, 11 Apr 2019 16:25:31 +0000
-Received: from 183.134.187.219 (EHLO [10.1.1.220]) ([183.134.187.219])
-          by smtp417.mail.gq1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID f05c167cc9395c75445739520518f23b;
-          Thu, 11 Apr 2019 16:25:27 +0000 (UTC)
-Subject: Re: Some new bio merging behaviors in __bio_try_merge_page
-To:     Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        "linux-erofs@lists.ozlabs.org" <linux-erofs@lists.ozlabs.org>
-References: <85c5fa1a-a506-e26f-c354-1554d47d8b2b@huawei.com>
- <20190411070807.GA421@ming.t460p>
- <cb392476-a00e-09ce-fa6b-9e088242ecc6@huawei.com>
- <20190411080953.GE421@ming.t460p> <20190411153411.GA16987@infradead.org>
-From:   Gao Xiang <hsiangkao@aol.com>
-Message-ID: <9aa607da-6ccb-8166-22df-735a3b127f2e@aol.com>
-Date:   Fri, 12 Apr 2019 00:25:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726723AbfDKVIw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Apr 2019 17:08:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53956 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726763AbfDKVIu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Apr 2019 17:08:50 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 909725AFF4;
+        Thu, 11 Apr 2019 21:08:49 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.20.6.236])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB0BE5C219;
+        Thu, 11 Apr 2019 21:08:47 +0000 (UTC)
+From:   jglisse@redhat.com
+To:     linux-kernel@vger.kernel.org
+Cc:     =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, John Hubbard <jhubbard@nvidia.com>,
+        Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Wilcox <willy@infradead.org>, Coly Li <colyli@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-bcache@vger.kernel.org
+Subject: [PATCH v1 03/15] block: introduce bvec_page()/bvec_set_page() to get/set bio_vec.bv_page
+Date:   Thu, 11 Apr 2019 17:08:22 -0400
+Message-Id: <20190411210834.4105-4-jglisse@redhat.com>
+In-Reply-To: <20190411210834.4105-1-jglisse@redhat.com>
+References: <20190411210834.4105-1-jglisse@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190411153411.GA16987@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Thu, 11 Apr 2019 21:08:49 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Jérôme Glisse <jglisse@redhat.com>
 
+This add an helper to lookup the page a bvec struct points to. We want
+to convert all direct dereference of bvec->page to call to those helpers
+so that we can change the bvec->page fields.
 
-On 2019/4/11 23:34, Christoph Hellwig wrote:
-> On Thu, Apr 11, 2019 at 04:09:54PM +0800, Ming Lei wrote:
->> I don't think it is a good behaviour to use bio->bi_max_vecs to limit
->> max allowed page, you may see the idea from the naming simply...
->>
->> If there were other such drivers, we may fix it easily, and the following
->> patch should fix your issue:
-> 
-> Yep.  Consumers of the block layer really have no business at all
-> looking at bi_vcnt.
+To make coccinelle convertion (in latter patch) easier this patch also
+do update some macro and some code that coccinelle is not able to match.
 
-Thanks for pointing out, Ming's solution is enough to solve erofs issue.
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: linux-mm@kvack.org
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Dave Chinner <david@fromorbit.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Matthew Wilcox <willy@infradead.org>
+Cc: Coly Li <colyli@suse.de>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: linux-bcache@vger.kernel.org
+---
+ block/bounce.c            |  2 +-
+ drivers/block/rbd.c       |  2 +-
+ drivers/md/bcache/btree.c |  2 +-
+ include/linux/bvec.h      | 14 ++++++++++++--
+ lib/iov_iter.c            | 32 ++++++++++++++++----------------
+ 5 files changed, 31 insertions(+), 21 deletions(-)
 
-Thanks,
-Gao XIang
+diff --git a/block/bounce.c b/block/bounce.c
+index 47eb7e936e22..d6ba1cac969f 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -85,7 +85,7 @@ static void bounce_copy_vec(struct bio_vec *to, unsigned char *vfrom)
+ #else /* CONFIG_HIGHMEM */
+ 
+ #define bounce_copy_vec(to, vfrom)	\
+-	memcpy(page_address((to)->bv_page) + (to)->bv_offset, vfrom, (to)->bv_len)
++	memcpy(page_address(bvec_page(to)) + (to)->bv_offset, vfrom, (to)->bv_len)
+ 
+ #endif /* CONFIG_HIGHMEM */
+ 
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 2210c1b9491b..aa3b82be5946 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -2454,7 +2454,7 @@ static bool is_zero_bvecs(struct bio_vec *bvecs, u32 bytes)
+ 	};
+ 
+ 	ceph_bvec_iter_advance_step(&it, bytes, ({
+-		if (memchr_inv(page_address(bv.bv_page) + bv.bv_offset, 0,
++		if (memchr_inv(page_address(bvec_page(&bv)) + bv.bv_offset, 0,
+ 			       bv.bv_len))
+ 			return false;
+ 	}));
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 64def336f053..b5f3168dc5ff 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -435,7 +435,7 @@ static void do_btree_node_write(struct btree *b)
+ 		struct bvec_iter_all iter_all;
+ 
+ 		bio_for_each_segment_all(bv, b->bio, j, iter_all)
+-			memcpy(page_address(bv->bv_page),
++			memcpy(page_address(bvec_page(bv)),
+ 			       base + j * PAGE_SIZE, PAGE_SIZE);
+ 
+ 		bch_submit_bbio(b->bio, b->c, &k.key, 0);
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index f6275c4da13a..44866555258a 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -51,6 +51,16 @@ struct bvec_iter_all {
+ 	unsigned	done;
+ };
+ 
++static inline struct page *bvec_page(const struct bio_vec *bvec)
++{
++	return bvec->bv_page;
++}
++
++static inline void bvec_set_page(struct bio_vec *bvec, struct page *page)
++{
++	bvec->bv_page = page;
++}
++
+ static inline struct page *bvec_nth_page(struct page *page, int idx)
+ {
+ 	return idx == 0 ? page : nth_page(page, idx);
+@@ -64,7 +74,7 @@ static inline struct page *bvec_nth_page(struct page *page, int idx)
+ 
+ /* multi-page (mp_bvec) helpers */
+ #define mp_bvec_iter_page(bvec, iter)				\
+-	(__bvec_iter_bvec((bvec), (iter))->bv_page)
++	(bvec_page(__bvec_iter_bvec((bvec), (iter))))
+ 
+ #define mp_bvec_iter_len(bvec, iter)				\
+ 	min((iter).bi_size,					\
+@@ -192,6 +202,6 @@ static inline void mp_bvec_last_segment(const struct bio_vec *bvec,
+ #define mp_bvec_for_each_page(pg, bv, i)				\
+ 	for (i = (bv)->bv_offset / PAGE_SIZE;				\
+ 		(i <= (((bv)->bv_offset + (bv)->bv_len - 1) / PAGE_SIZE)) && \
+-		(pg = bvec_nth_page((bv)->bv_page, i)); i += 1)
++		(pg = bvec_nth_page(bvec_page(bv), i)); i += 1)
+ 
+ #endif /* __LINUX_BVEC_ITER_H */
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index ea36dc355da1..e20a3b1d8b0e 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -608,7 +608,7 @@ size_t _copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
+ 		might_fault();
+ 	iterate_and_advance(i, bytes, v,
+ 		copyout(v.iov_base, (from += v.iov_len) - v.iov_len, v.iov_len),
+-		memcpy_to_page(v.bv_page, v.bv_offset,
++		memcpy_to_page(bvec_page(&v), v.bv_offset,
+ 			       (from += v.bv_len) - v.bv_len, v.bv_len),
+ 		memcpy(v.iov_base, (from += v.iov_len) - v.iov_len, v.iov_len)
+ 	)
+@@ -709,7 +709,7 @@ size_t _copy_to_iter_mcsafe(const void *addr, size_t bytes, struct iov_iter *i)
+ 	iterate_and_advance(i, bytes, v,
+ 		copyout_mcsafe(v.iov_base, (from += v.iov_len) - v.iov_len, v.iov_len),
+ 		({
+-		rem = memcpy_mcsafe_to_page(v.bv_page, v.bv_offset,
++		rem = memcpy_mcsafe_to_page(bvec_page(&v), v.bv_offset,
+                                (from += v.bv_len) - v.bv_len, v.bv_len);
+ 		if (rem) {
+ 			curr_addr = (unsigned long) from;
+@@ -744,7 +744,7 @@ size_t _copy_from_iter(void *addr, size_t bytes, struct iov_iter *i)
+ 		might_fault();
+ 	iterate_and_advance(i, bytes, v,
+ 		copyin((to += v.iov_len) - v.iov_len, v.iov_base, v.iov_len),
+-		memcpy_from_page((to += v.bv_len) - v.bv_len, v.bv_page,
++		memcpy_from_page((to += v.bv_len) - v.bv_len, bvec_page(&v),
+ 				 v.bv_offset, v.bv_len),
+ 		memcpy((to += v.iov_len) - v.iov_len, v.iov_base, v.iov_len)
+ 	)
+@@ -770,7 +770,7 @@ bool _copy_from_iter_full(void *addr, size_t bytes, struct iov_iter *i)
+ 				      v.iov_base, v.iov_len))
+ 			return false;
+ 		0;}),
+-		memcpy_from_page((to += v.bv_len) - v.bv_len, v.bv_page,
++		memcpy_from_page((to += v.bv_len) - v.bv_len, bvec_page(&v),
+ 				 v.bv_offset, v.bv_len),
+ 		memcpy((to += v.iov_len) - v.iov_len, v.iov_base, v.iov_len)
+ 	)
+@@ -790,7 +790,7 @@ size_t _copy_from_iter_nocache(void *addr, size_t bytes, struct iov_iter *i)
+ 	iterate_and_advance(i, bytes, v,
+ 		__copy_from_user_inatomic_nocache((to += v.iov_len) - v.iov_len,
+ 					 v.iov_base, v.iov_len),
+-		memcpy_from_page((to += v.bv_len) - v.bv_len, v.bv_page,
++		memcpy_from_page((to += v.bv_len) - v.bv_len, bvec_page(&v),
+ 				 v.bv_offset, v.bv_len),
+ 		memcpy((to += v.iov_len) - v.iov_len, v.iov_base, v.iov_len)
+ 	)
+@@ -824,7 +824,7 @@ size_t _copy_from_iter_flushcache(void *addr, size_t bytes, struct iov_iter *i)
+ 	iterate_and_advance(i, bytes, v,
+ 		__copy_from_user_flushcache((to += v.iov_len) - v.iov_len,
+ 					 v.iov_base, v.iov_len),
+-		memcpy_page_flushcache((to += v.bv_len) - v.bv_len, v.bv_page,
++		memcpy_page_flushcache((to += v.bv_len) - v.bv_len, bvec_page(&v),
+ 				 v.bv_offset, v.bv_len),
+ 		memcpy_flushcache((to += v.iov_len) - v.iov_len, v.iov_base,
+ 			v.iov_len)
+@@ -849,7 +849,7 @@ bool _copy_from_iter_full_nocache(void *addr, size_t bytes, struct iov_iter *i)
+ 					     v.iov_base, v.iov_len))
+ 			return false;
+ 		0;}),
+-		memcpy_from_page((to += v.bv_len) - v.bv_len, v.bv_page,
++		memcpy_from_page((to += v.bv_len) - v.bv_len, bvec_page(&v),
+ 				 v.bv_offset, v.bv_len),
+ 		memcpy((to += v.iov_len) - v.iov_len, v.iov_base, v.iov_len)
+ 	)
+@@ -951,7 +951,7 @@ size_t iov_iter_zero(size_t bytes, struct iov_iter *i)
+ 		return pipe_zero(bytes, i);
+ 	iterate_and_advance(i, bytes, v,
+ 		clear_user(v.iov_base, v.iov_len),
+-		memzero_page(v.bv_page, v.bv_offset, v.bv_len),
++		memzero_page(bvec_page(&v), v.bv_offset, v.bv_len),
+ 		memset(v.iov_base, 0, v.iov_len)
+ 	)
+ 
+@@ -974,7 +974,7 @@ size_t iov_iter_copy_from_user_atomic(struct page *page,
+ 	}
+ 	iterate_all_kinds(i, bytes, v,
+ 		copyin((p += v.iov_len) - v.iov_len, v.iov_base, v.iov_len),
+-		memcpy_from_page((p += v.bv_len) - v.bv_len, v.bv_page,
++		memcpy_from_page((p += v.bv_len) - v.bv_len, bvec_page(&v),
+ 				 v.bv_offset, v.bv_len),
+ 		memcpy((p += v.iov_len) - v.iov_len, v.iov_base, v.iov_len)
+ 	)
+@@ -1300,7 +1300,7 @@ ssize_t iov_iter_get_pages(struct iov_iter *i,
+ 	0;}),({
+ 		/* can't be more than PAGE_SIZE */
+ 		*start = v.bv_offset;
+-		get_page(*pages = v.bv_page);
++		get_page(*pages = bvec_page(&v));
+ 		return v.bv_len;
+ 	}),({
+ 		return -EFAULT;
+@@ -1387,7 +1387,7 @@ ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
+ 		*pages = p = get_pages_array(1);
+ 		if (!p)
+ 			return -ENOMEM;
+-		get_page(*p = v.bv_page);
++		get_page(*p = bvec_page(&v));
+ 		return v.bv_len;
+ 	}),({
+ 		return -EFAULT;
+@@ -1419,7 +1419,7 @@ size_t csum_and_copy_from_iter(void *addr, size_t bytes, __wsum *csum,
+ 		}
+ 		err ? v.iov_len : 0;
+ 	}), ({
+-		char *p = kmap_atomic(v.bv_page);
++		char *p = kmap_atomic(bvec_page(&v));
+ 		sum = csum_and_memcpy((to += v.bv_len) - v.bv_len,
+ 				      p + v.bv_offset, v.bv_len,
+ 				      sum, off);
+@@ -1461,7 +1461,7 @@ bool csum_and_copy_from_iter_full(void *addr, size_t bytes, __wsum *csum,
+ 		off += v.iov_len;
+ 		0;
+ 	}), ({
+-		char *p = kmap_atomic(v.bv_page);
++		char *p = kmap_atomic(bvec_page(&v));
+ 		sum = csum_and_memcpy((to += v.bv_len) - v.bv_len,
+ 				      p + v.bv_offset, v.bv_len,
+ 				      sum, off);
+@@ -1507,7 +1507,7 @@ size_t csum_and_copy_to_iter(const void *addr, size_t bytes, void *csump,
+ 		}
+ 		err ? v.iov_len : 0;
+ 	}), ({
+-		char *p = kmap_atomic(v.bv_page);
++		char *p = kmap_atomic(bvec_page(&v));
+ 		sum = csum_and_memcpy(p + v.bv_offset,
+ 				      (from += v.bv_len) - v.bv_len,
+ 				      v.bv_len, sum, off);
+@@ -1696,10 +1696,10 @@ int iov_iter_for_each_range(struct iov_iter *i, size_t bytes,
+ 		return 0;
+ 
+ 	iterate_all_kinds(i, bytes, v, -EINVAL, ({
+-		w.iov_base = kmap(v.bv_page) + v.bv_offset;
++		w.iov_base = kmap(bvec_page(&v)) + v.bv_offset;
+ 		w.iov_len = v.bv_len;
+ 		err = f(&w, context);
+-		kunmap(v.bv_page);
++		kunmap(bvec_page(&v));
+ 		err;}), ({
+ 		w = v;
+ 		err = f(&w, context);})
+-- 
+2.20.1
 
-> 
