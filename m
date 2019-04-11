@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A37C10F13
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 15:07:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E06FEC10F14
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 15:07:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A25A72173C
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 15:07:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A76B82173C
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 15:07:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="kcNTcBDQ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SlEVa//9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726730AbfDKPHJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726691AbfDKPHJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 11 Apr 2019 11:07:09 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:45713 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726691AbfDKPHH (ORCPT
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:42365 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726720AbfDKPHJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Apr 2019 11:07:07 -0400
-Received: by mail-pl1-f193.google.com with SMTP id bf11so3529380plb.12
-        for <linux-block@vger.kernel.org>; Thu, 11 Apr 2019 08:07:07 -0700 (PDT)
+        Thu, 11 Apr 2019 11:07:09 -0400
+Received: by mail-pf1-f195.google.com with SMTP id w25so3584670pfi.9
+        for <linux-block@vger.kernel.org>; Thu, 11 Apr 2019 08:07:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=1GPpeKHWEA2m0dkYAegg4EerGsYnByjaw0MduNABJfc=;
-        b=kcNTcBDQLCB4Jyc/VaX8pgU8T6HHJ+CnhHxk9gzPWwnQVGQswrAnzlLDT70jiBuVfY
-         stgMDmTc72U06gFlmfwfbfnG95mW+dUMfHG5Pi0gmDf/JMx8XRV7YPHFDltU+WGYwmcj
-         Z1sBTb4d0mncq4AYb9hboYsYLKYw7TojYn9q0cVLdlNE6sHBNJ0VF7pIrPJEfsYeloZD
-         h8IWC8ibPCa2UvLi47qo6tmmtH/7AZz91VVI2cKxk46oHLYsRjmy7rf1c/3YdI937eQh
-         kRa7cyQXgewpankpV7IVqxr+xKFddjxtOYD83esfNCSltsZhoKEIfbRc1Nr/ZbTyDs92
-         5YbA==
+        bh=iuB1ApSmWHl1Z7hb4Y495EoDB4EP5Q2kVOYnRigTN3I=;
+        b=SlEVa//97OWmKVs9xnnpYSS7rQ2+WmX+nCJb4yLi+O8vKTNfC5W6J96zXMCi8MbBDa
+         E253pb5a+ykHn8mjioMidEbu/2K6V9DnYbdjHG9RmArvzTZzTh1EqSTMgVat51NeT3cf
+         rYKLxs2MFnWtGDI2eCWQ92bt3RmZmbdS2CbH91b513uG3VUoqH2bshLRnlaxzXmkh4mv
+         FPvPBN7ZXUbUSo6EHzkvC8Pt+t0tySsiiKvycJml+od22s04fuoOJZDm3T/Sw5ONTr62
+         tupNOXq3cqwo38T5LWC4CXaHoleCITml8gnMh6oLsdImcuR9aDQNBHc16E9dJTO1NfeC
+         IevA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=1GPpeKHWEA2m0dkYAegg4EerGsYnByjaw0MduNABJfc=;
-        b=qBaGpv6rvXJ+o51wwucga7Ff98rIV+duYXpLlpRJMt5MUqJYV79LI9Yz9jeTWZ071P
-         uml1oSgbqxyshczLZcLtj6R6WyGf7YelV1EeHPxV6HGdYEm9aNIrFuwwb1rFyMfW7UKx
-         33Jftro8NdC3mUyV/kHjN6JvEDI9nTO0k4tVT+RWXxrcamaKOUyR3biYbww5seR58uBa
-         1DC9BjcxtyDW+99fQvjIXqYWCW4l3lj+MfN4PR9GHivZzcPDAQmMjiICEkR12oDxdA1G
-         iVmH0EFtoPS++Hq5WQqm54z87zzt3C0ZWwEeUbAmoyNle9xsqUDqmeGrMp5KEDVPb3ee
-         LQiw==
-X-Gm-Message-State: APjAAAW/jOpsF3JMyYFilvL5f/GQnvLmAJdilJW1h22ERFbCeeQI7P1H
-        Wj/SloYhvut33L4/mk/ykgi2Xg==
-X-Google-Smtp-Source: APXvYqzIIgPXjggpCDmOerBOQ9LLgctGjsGwmEImXnqlwj0axahB886pp4z8CwQN6Z0SxfB530ewxA==
-X-Received: by 2002:a17:902:5a2:: with SMTP id f31mr49033319plf.119.1554995226865;
-        Thu, 11 Apr 2019 08:07:06 -0700 (PDT)
+        bh=iuB1ApSmWHl1Z7hb4Y495EoDB4EP5Q2kVOYnRigTN3I=;
+        b=A42K8rTH1hDbnBGxstbfZiSE/lWfdw/wnq5MAwjICVccL7hu6tUCQlJe+Rl0hn/52i
+         3iLrxcPFLiJtVMCzO7JtAHLGMXlGfBVZRrEMfraf7gvVG/NiF8RkkBvfqnfbFUHF10y3
+         Q8N7ILqsOMF7hqGdGMKdU0QZlOFJkczaw+OcFY3Iv0xzbXG2yAcNoevWTT8h7DgwzTU3
+         9WC+6zp7uE4kdHh1IExAMP97lK75alL8xBrDstMvElXuTT6ZxhMW9tOe0z0lEs4zX7jO
+         fIKLUxxVj34gUcE2+lImevgA4ImWh5PDvXtVNneBe+yoWxJ3P9aKEQ8hDbeZFstkKbLY
+         X3cg==
+X-Gm-Message-State: APjAAAUDJxfXRsw9+bpOBmUetZMGeX5w9c/Z2HN2LpI5O4lXmKo3dr2L
+        oTMlJezPPDBgYenn3gRPvE2v+w==
+X-Google-Smtp-Source: APXvYqwE/S9DcJ3Ov2vxwLgGTu3Fyx4a3uUzEw3ZO+w5Ci93K41ymVLjWAW/u5CbR5YU4FJyxWcGLQ==
+X-Received: by 2002:a62:12c8:: with SMTP id 69mr50675200pfs.184.1554995228626;
+        Thu, 11 Apr 2019 08:07:08 -0700 (PDT)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id s12sm62905062pgc.28.2019.04.11.08.07.05
+        by smtp.gmail.com with ESMTPSA id s12sm62905062pgc.28.2019.04.11.08.07.07
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 11 Apr 2019 08:07:05 -0700 (PDT)
+        Thu, 11 Apr 2019 08:07:07 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     hch@infradead.org, clm@fb.com, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/3] fs: add sync_file_range() helper
-Date:   Thu, 11 Apr 2019 09:06:56 -0600
-Message-Id: <20190411150657.18480-3-axboe@kernel.dk>
+Subject: [PATCH 3/3] io_uring: add support for IORING_OP_SYNC_FILE_RANGE
+Date:   Thu, 11 Apr 2019 09:06:57 -0600
+Message-Id: <20190411150657.18480-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190411150657.18480-1-axboe@kernel.dk>
 References: <20190411150657.18480-1-axboe@kernel.dk>
@@ -68,205 +68,103 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This just pulls out the ksys_sync_file_range() code to work on a struct
-file instead of an fd, so we can use it elsewhere.
+This behaves just like sync_file_range(2) does.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/sync.c          | 135 ++++++++++++++++++++++++---------------------
- include/linux/fs.h |   3 +
- 2 files changed, 74 insertions(+), 64 deletions(-)
+ fs/io_uring.c                 | 51 +++++++++++++++++++++++++++++++++++
+ include/uapi/linux/io_uring.h |  2 ++
+ 2 files changed, 53 insertions(+)
 
-diff --git a/fs/sync.c b/fs/sync.c
-index b54e0541ad89..01e82170545a 100644
---- a/fs/sync.c
-+++ b/fs/sync.c
-@@ -234,58 +234,10 @@ SYSCALL_DEFINE1(fdatasync, unsigned int, fd)
- 	return do_fsync(fd, 1);
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index a10fd5900a17..cc9854cd99f5 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -1167,6 +1167,54 @@ static int io_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 	return 0;
  }
  
--/*
-- * sys_sync_file_range() permits finely controlled syncing over a segment of
-- * a file in the range offset .. (offset+nbytes-1) inclusive.  If nbytes is
-- * zero then sys_sync_file_range() will operate from offset out to EOF.
-- *
-- * The flag bits are:
-- *
-- * SYNC_FILE_RANGE_WAIT_BEFORE: wait upon writeout of all pages in the range
-- * before performing the write.
-- *
-- * SYNC_FILE_RANGE_WRITE: initiate writeout of all those dirty pages in the
-- * range which are not presently under writeback. Note that this may block for
-- * significant periods due to exhaustion of disk request structures.
-- *
-- * SYNC_FILE_RANGE_WAIT_AFTER: wait upon writeout of all pages in the range
-- * after performing the write.
-- *
-- * Useful combinations of the flag bits are:
-- *
-- * SYNC_FILE_RANGE_WAIT_BEFORE|SYNC_FILE_RANGE_WRITE: ensures that all pages
-- * in the range which were dirty on entry to sys_sync_file_range() are placed
-- * under writeout.  This is a start-write-for-data-integrity operation.
-- *
-- * SYNC_FILE_RANGE_WRITE: start writeout of all dirty pages in the range which
-- * are not presently under writeout.  This is an asynchronous flush-to-disk
-- * operation.  Not suitable for data integrity operations.
-- *
-- * SYNC_FILE_RANGE_WAIT_BEFORE (or SYNC_FILE_RANGE_WAIT_AFTER): wait for
-- * completion of writeout of all pages in the range.  This will be used after an
-- * earlier SYNC_FILE_RANGE_WAIT_BEFORE|SYNC_FILE_RANGE_WRITE operation to wait
-- * for that operation to complete and to return the result.
-- *
-- * SYNC_FILE_RANGE_WAIT_BEFORE|SYNC_FILE_RANGE_WRITE|SYNC_FILE_RANGE_WAIT_AFTER:
-- * a traditional sync() operation.  This is a write-for-data-integrity operation
-- * which will ensure that all pages in the range which were dirty on entry to
-- * sys_sync_file_range() are committed to disk.
-- *
-- *
-- * SYNC_FILE_RANGE_WAIT_BEFORE and SYNC_FILE_RANGE_WAIT_AFTER will detect any
-- * I/O errors or ENOSPC conditions and will return those to the caller, after
-- * clearing the EIO and ENOSPC flags in the address_space.
-- *
-- * It should be noted that none of these operations write out the file's
-- * metadata.  So unless the application is strictly performing overwrites of
-- * already-instantiated disk blocks, there are no guarantees here that the data
-- * will be available after a crash.
-- */
--int ksys_sync_file_range(int fd, loff_t offset, loff_t nbytes,
--			 unsigned int flags)
-+int sync_file_range(struct file *file, loff_t offset, loff_t nbytes,
-+		    unsigned int flags)
- {
- 	int ret;
--	struct fd f;
- 	struct address_space *mapping;
- 	loff_t endbyte;			/* inclusive */
- 	umode_t i_mode;
-@@ -325,41 +277,96 @@ int ksys_sync_file_range(int fd, loff_t offset, loff_t nbytes,
- 	else
- 		endbyte--;		/* inclusive */
- 
--	ret = -EBADF;
--	f = fdget(fd);
--	if (!f.file)
--		goto out;
--
--	i_mode = file_inode(f.file)->i_mode;
-+	i_mode = file_inode(file)->i_mode;
- 	ret = -ESPIPE;
- 	if (!S_ISREG(i_mode) && !S_ISBLK(i_mode) && !S_ISDIR(i_mode) &&
- 			!S_ISLNK(i_mode))
--		goto out_put;
-+		goto out;
- 
--	mapping = f.file->f_mapping;
-+	mapping = file->f_mapping;
- 	ret = 0;
- 	if (flags & SYNC_FILE_RANGE_WAIT_BEFORE) {
--		ret = file_fdatawait_range(f.file, offset, endbyte);
-+		ret = file_fdatawait_range(file, offset, endbyte);
- 		if (ret < 0)
--			goto out_put;
-+			goto out;
- 	}
- 
- 	if (flags & SYNC_FILE_RANGE_WRITE) {
- 		ret = __filemap_fdatawrite_range(mapping, offset, endbyte,
- 						 WB_SYNC_NONE);
- 		if (ret < 0)
--			goto out_put;
-+			goto out;
- 	}
- 
- 	if (flags & SYNC_FILE_RANGE_WAIT_AFTER)
--		ret = file_fdatawait_range(f.file, offset, endbyte);
-+		ret = file_fdatawait_range(file, offset, endbyte);
- 
--out_put:
--	fdput(f);
- out:
- 	return ret;
- }
- 
-+/*
-+ * sys_sync_file_range() permits finely controlled syncing over a segment of
-+ * a file in the range offset .. (offset+nbytes-1) inclusive.  If nbytes is
-+ * zero then sys_sync_file_range() will operate from offset out to EOF.
-+ *
-+ * The flag bits are:
-+ *
-+ * SYNC_FILE_RANGE_WAIT_BEFORE: wait upon writeout of all pages in the range
-+ * before performing the write.
-+ *
-+ * SYNC_FILE_RANGE_WRITE: initiate writeout of all those dirty pages in the
-+ * range which are not presently under writeback. Note that this may block for
-+ * significant periods due to exhaustion of disk request structures.
-+ *
-+ * SYNC_FILE_RANGE_WAIT_AFTER: wait upon writeout of all pages in the range
-+ * after performing the write.
-+ *
-+ * Useful combinations of the flag bits are:
-+ *
-+ * SYNC_FILE_RANGE_WAIT_BEFORE|SYNC_FILE_RANGE_WRITE: ensures that all pages
-+ * in the range which were dirty on entry to sys_sync_file_range() are placed
-+ * under writeout.  This is a start-write-for-data-integrity operation.
-+ *
-+ * SYNC_FILE_RANGE_WRITE: start writeout of all dirty pages in the range which
-+ * are not presently under writeout.  This is an asynchronous flush-to-disk
-+ * operation.  Not suitable for data integrity operations.
-+ *
-+ * SYNC_FILE_RANGE_WAIT_BEFORE (or SYNC_FILE_RANGE_WAIT_AFTER): wait for
-+ * completion of writeout of all pages in the range.  This will be used after an
-+ * earlier SYNC_FILE_RANGE_WAIT_BEFORE|SYNC_FILE_RANGE_WRITE operation to wait
-+ * for that operation to complete and to return the result.
-+ *
-+ * SYNC_FILE_RANGE_WAIT_BEFORE|SYNC_FILE_RANGE_WRITE|SYNC_FILE_RANGE_WAIT_AFTER:
-+ * a traditional sync() operation.  This is a write-for-data-integrity operation
-+ * which will ensure that all pages in the range which were dirty on entry to
-+ * sys_sync_file_range() are committed to disk.
-+ *
-+ *
-+ * SYNC_FILE_RANGE_WAIT_BEFORE and SYNC_FILE_RANGE_WAIT_AFTER will detect any
-+ * I/O errors or ENOSPC conditions and will return those to the caller, after
-+ * clearing the EIO and ENOSPC flags in the address_space.
-+ *
-+ * It should be noted that none of these operations write out the file's
-+ * metadata.  So unless the application is strictly performing overwrites of
-+ * already-instantiated disk blocks, there are no guarantees here that the data
-+ * will be available after a crash.
-+ */
-+int ksys_sync_file_range(int fd, loff_t offset, loff_t nbytes,
-+			 unsigned int flags)
++static int io_prep_sfr(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 +{
-+	int ret;
-+	struct fd f;
++	struct io_ring_ctx *ctx = req->ctx;
++	int ret = 0;
 +
-+	ret = -EBADF;
-+	f = fdget(fd);
-+	if (f.file)
-+		ret = sync_file_range(f.file, offset, nbytes, flags);
++	if (!req->file)
++		return -EBADF;
++	/* Prep already done (EAGAIN retry) */
++	if (req->flags & REQ_F_PREPPED)
++		return 0;
 +
-+	fdput(f);
++	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
++		return -EINVAL;
++	if (unlikely(sqe->addr || sqe->ioprio || sqe->buf_index))
++		return -EINVAL;
++
++	req->flags |= REQ_F_PREPPED;
 +	return ret;
 +}
 +
- SYSCALL_DEFINE4(sync_file_range, int, fd, loff_t, offset, loff_t, nbytes,
- 				unsigned int, flags)
- {
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 8b42df09b04c..84e2c45ff989 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2782,6 +2782,9 @@ extern int vfs_fsync_range(struct file *file, loff_t start, loff_t end,
- 			   int datasync);
- extern int vfs_fsync(struct file *file, int datasync);
- 
-+extern int sync_file_range(struct file *file, loff_t offset, loff_t nbytes,
-+				unsigned int flags);
++static int io_sync_file_range(struct io_kiocb *req,
++			      const struct io_uring_sqe *sqe,
++			      bool force_nonblock)
++{
++	loff_t sqe_off;
++	loff_t sqe_len;
++	unsigned flags;
++	int ret;
 +
++	ret = io_prep_sfr(req, sqe);
++	if (ret)
++		return ret;
++
++	/* sync_file_range always requires a blocking context */
++	if (force_nonblock)
++		return -EAGAIN;
++
++	sqe_off = READ_ONCE(sqe->off);
++	sqe_len = READ_ONCE(sqe->len);
++	flags = READ_ONCE(sqe->sync_range_flags);
++
++	ret = sync_file_range(req->rw.ki_filp, sqe_off, sqe_len, flags);
++
++	io_cqring_add_event(req->ctx, sqe->user_data, ret, 0);
++	io_put_req(req);
++	return 0;
++}
++
+ static void io_poll_remove_one(struct io_kiocb *req)
+ {
+ 	struct io_poll_iocb *poll = &req->poll;
+@@ -1450,6 +1498,9 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 	case IORING_OP_POLL_REMOVE:
+ 		ret = io_poll_remove(req, s->sqe);
+ 		break;
++	case IORING_OP_SYNC_FILE_RANGE:
++		ret = io_sync_file_range(req, s->sqe, force_nonblock);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index a7a6384d0c70..e707a17c6908 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -26,6 +26,7 @@ struct io_uring_sqe {
+ 		__kernel_rwf_t	rw_flags;
+ 		__u32		fsync_flags;
+ 		__u16		poll_events;
++		__u32		sync_range_flags;
+ 	};
+ 	__u64	user_data;	/* data to be passed back at completion time */
+ 	union {
+@@ -55,6 +56,7 @@ struct io_uring_sqe {
+ #define IORING_OP_WRITE_FIXED	5
+ #define IORING_OP_POLL_ADD	6
+ #define IORING_OP_POLL_REMOVE	7
++#define IORING_OP_SYNC_FILE_RANGE	8
+ 
  /*
-  * Sync the bytes written if this was a synchronous write.  Expect ki_pos
-  * to already be updated for the write, and will return either the amount
+  * sqe->fsync_flags
 -- 
 2.17.1
 
