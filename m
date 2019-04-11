@@ -2,72 +2,87 @@ Return-Path: <SRS0=bAqE=SN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C62A4C10F13
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 13:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 184B0C282CE
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 13:28:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9480F2184B
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 13:25:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCEC5217F4
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 13:28:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VuRmDIon"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726615AbfDKNZw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Apr 2019 09:25:52 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47684 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726536AbfDKNZv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Apr 2019 09:25:51 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 674E0AEB7;
-        Thu, 11 Apr 2019 13:25:50 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id AC7FCDA862; Thu, 11 Apr 2019 15:26:54 +0200 (CEST)
-Date:   Thu, 11 Apr 2019 15:26:53 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        Qu Wenruo <quwenruo.btrfs@gmx.com>,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH V3] block: don't use for-inside-for in
- bio_for_each_segment_all
-Message-ID: <20190411132652.GP29086@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        Qu Wenruo <quwenruo.btrfs@gmx.com>, linux-btrfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20190408110238.30478-1-ming.lei@redhat.com>
- <b55becef-d644-6f6d-428b-e25216016218@kernel.dk>
+        id S1726603AbfDKN2W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Apr 2019 09:28:22 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:34362 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726264AbfDKN2W (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Apr 2019 09:28:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=6VFuhNCf+gH+llXbEHsi41/TZwlA6SKkFNV6Ppyi0Os=; b=VuRmDIoncI2k8GTzl20u00d+I
+        eBhCx9kBdWBraFVeGej9WAi4QaDRhmbyH/CzYXmIptJtzET/2Ef9e5tiQjpr+gNDEyvF6o6rA6a+B
+        L1PNZQuCwUsgEDdCXc0zlu/agnCQZcjLOhjgWiQyijKVVlVUqAQ5hDpJ9uHAy0ZuX7KUNhSWP1WA8
+        wmoiN/M18X7Xv831vE/Mllly0QDoMn+hoOHwmNFn4CdifhpWJ+GJxr0IBUOdFdRJo1fR+sIJ4pSvL
+        SvAfzuuSCLahhHVKDCR5q2suIN4ZfSpC0ze5sJTxpbt/wT3b5E0+b+TThbtMOLxMq8a/PJA4vqv7y
+        yYvVTtgsA==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hEZkZ-0007O7-Cw; Thu, 11 Apr 2019 13:28:19 +0000
+Date:   Thu, 11 Apr 2019 06:28:19 -0700
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Vlastimil Babka <vbabka@suse.cz>
+Cc:     lsf-pc@lists.linux-foundation.org,
+        Linux-FSDevel <linux-fsdevel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, linux-block@vger.kernel.org,
+        Michal Hocko <mhocko@kernel.org>,
+        Christoph Lameter <cl@linux.com>,
+        David Rientjes <rientjes@google.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-xfs@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <david@fromorbit.com>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>
+Subject: Re: [LSF/MM TOPIC] guarantee natural alignment for kmalloc()?
+Message-ID: <20190411132819.GB22763@bombadil.infradead.org>
+References: <790b68b7-3689-0ff6-08ae-936728bc6458@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b55becef-d644-6f6d-428b-e25216016218@kernel.dk>
-User-Agent: Mutt/1.5.23.1 (2014-03-12)
+In-Reply-To: <790b68b7-3689-0ff6-08ae-936728bc6458@suse.cz>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 08, 2019 at 08:19:59AM -0600, Jens Axboe wrote:
-> On 4/8/19 5:02 AM, Ming Lei wrote:
-> > Commit 6dc4f100c175 ("block: allow bio_for_each_segment_all() to
-> > iterate over multi-page bvec") changes bio_for_each_segment_all()
-> > to use for-inside-for.
-> > 
-> > This way breaks all bio_for_each_segment_all() call with error out
-> > branch via 'break', since now 'break' can only break from the inner
-> > loop.
-> > 
-> > Fixes this issue by implementing bio_for_each_segment_all() via
-> > single 'for' loop, and now the logic is very similar with normal
-> > bvec iterator.
-> 
-> Applied, thanks Ming.
+On Thu, Apr 11, 2019 at 02:52:08PM +0200, Vlastimil Babka wrote:
+> In the session I hope to resolve the question whether this is indeed the
+> right thing to do for all kmalloc() users, without an explicit alignment
+> requests, and if it's worth the potentially worse
+> performance/fragmentation it would impose on a hypothetical new slab
+> implementation for which it wouldn't be optimal to split power-of-two
+> sized pages into power-of-two-sized objects (or whether there are any
+> other downsides).
 
-What's the merge target please? This affects btrfs testing so I wonder
-if we should start adding workarounds or just wait for the next rc.
-Thanks.
+I think this is exactly the kind of discussion that LSFMM is for!  It's
+really a whole-system question; is Linux better-off having the flexibility
+for allocators to return non-power-of-two aligned memory, or allowing
+consumers of the kmalloc API to assume that "sufficiently large" memory
+is naturally aligned.
+
+Another possibility that should be considered is introducing a kmalloc()
+variant like posix_memalign() that allows for specifying the alignment,
+or just kmalloc_naturally_aligned().
+
+And we probably need to reiterate for the benefit of those not following
+the discussion that creating a slab cache (which does allow for alignment
+to be specified) is impractical for this use case because the actual
+allocations are of variable size, but always need to be 512-byte aligned.
