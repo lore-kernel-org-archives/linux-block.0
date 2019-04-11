@@ -2,172 +2,149 @@ Return-Path: <SRS0=bAqE=SN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10363C10F13
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 07:36:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6CBDC10F13
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 07:43:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D99CD20873
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 07:36:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3A06217D4
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 07:43:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726145AbfDKHgU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Apr 2019 03:36:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57278 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726137AbfDKHgU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Apr 2019 03:36:20 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BD2F0308794A;
-        Thu, 11 Apr 2019 07:36:19 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-33.pek2.redhat.com [10.72.8.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3534B5D961;
-        Thu, 11 Apr 2019 07:36:14 +0000 (UTC)
-Date:   Thu, 11 Apr 2019 15:36:09 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 4/5] block: change how we get page references in
- bio_iov_iter_get_pages
-Message-ID: <20190411073608.GD421@ming.t460p>
-References: <20190411062331.27800-1-hch@lst.de>
- <20190411062331.27800-5-hch@lst.de>
+        id S1726230AbfDKHnj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Apr 2019 03:43:39 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:57558 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726104AbfDKHnj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Apr 2019 03:43:39 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 52BF599CD303C71DD8AD;
+        Thu, 11 Apr 2019 15:43:36 +0800 (CST)
+Received: from [10.151.23.176] (10.151.23.176) by smtp.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server (TLS) id 14.3.408.0; Thu, 11 Apr
+ 2019 15:43:28 +0800
+Subject: Re: Some new bio merging behaviors in __bio_try_merge_page
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <linux-block@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        "linux-erofs@lists.ozlabs.org" <linux-erofs@lists.ozlabs.org>,
+        Jens Axboe <axboe@kernel.dk>, Chao Yu <yuchao0@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <85c5fa1a-a506-e26f-c354-1554d47d8b2b@huawei.com>
+ <20190411070807.GA421@ming.t460p>
+From:   Gao Xiang <gaoxiang25@huawei.com>
+Message-ID: <cb392476-a00e-09ce-fa6b-9e088242ecc6@huawei.com>
+Date:   Thu, 11 Apr 2019 15:43:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190411062331.27800-5-hch@lst.de>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Thu, 11 Apr 2019 07:36:19 +0000 (UTC)
+In-Reply-To: <20190411070807.GA421@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.151.23.176]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 11, 2019 at 08:23:30AM +0200, Christoph Hellwig wrote:
-> Instead of needing a special macro to iterate over all pages in
-> a bvec just do a second passs over the whole bio.  This also matches
-> what we do on the release side.  The release side helper is moved
-> up to where we need the get helper to clearly express the symmetry.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/bio.c          | 51 ++++++++++++++++++++++----------------------
->  include/linux/bvec.h |  5 -----
->  2 files changed, 25 insertions(+), 31 deletions(-)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index c2a389b1509a..d3490aeb1a7e 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -861,6 +861,26 @@ int bio_add_page(struct bio *bio, struct page *page,
->  }
->  EXPORT_SYMBOL(bio_add_page);
->  
-> +static void bio_get_pages(struct bio *bio)
-> +{
-> +	struct bvec_iter_all iter_all;
-> +	struct bio_vec *bvec;
-> +	int i;
-> +
-> +	bio_for_each_segment_all(bvec, bio, i, iter_all)
-> +		get_page(bvec->bv_page);
-> +}
-> +
-> +static void bio_release_pages(struct bio *bio)
-> +{
-> +	struct bvec_iter_all iter_all;
-> +	struct bio_vec *bvec;
-> +	int i;
-> +
-> +	bio_for_each_segment_all(bvec, bio, i, iter_all)
-> +		put_page(bvec->bv_page);
-> +}
-> +
->  static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
->  {
->  	const struct bio_vec *bv = iter->bvec;
-> @@ -875,15 +895,6 @@ static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
->  				bv->bv_offset + iter->iov_offset);
->  	if (unlikely(size != len))
->  		return -EINVAL;
-> -
-> -	if (!bio_flagged(bio, BIO_NO_PAGE_REF)) {
-> -		struct page *page;
-> -		int i;
-> -
-> -		mp_bvec_for_each_page(page, bv, i)
-> -			get_page(page);
-> -	}
-> -
->  	iov_iter_advance(iter, size);
->  	return 0;
->  }
-> @@ -963,13 +974,6 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  	if (WARN_ON_ONCE(bio->bi_vcnt))
->  		return -EINVAL;
->  
-> -	/*
-> -	 * If this is a BVEC iter, then the pages are kernel pages. Don't
-> -	 * release them on IO completion, if the caller asked us to.
-> -	 */
-> -	if (is_bvec && iov_iter_bvec_no_ref(iter))
-> -		bio_set_flag(bio, BIO_NO_PAGE_REF);
-> -
->  	do {
->  		if (is_bvec)
->  			ret = __bio_iov_bvec_add_pages(bio, iter);
-> @@ -977,6 +981,11 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  			ret = __bio_iov_iter_get_pages(bio, iter);
->  	} while (!ret && iov_iter_count(iter) && !bio_full(bio));
->  
-> +	if (iov_iter_bvec_no_ref(iter))
-> +		bio_set_flag(bio, BIO_NO_PAGE_REF);
-> +	else
-> +		bio_get_pages(bio);
-> +
->  	return bio->bi_vcnt ? 0 : ret;
->  }
->  
-> @@ -1670,16 +1679,6 @@ void bio_set_pages_dirty(struct bio *bio)
->  	}
->  }
->  
-> -static void bio_release_pages(struct bio *bio)
-> -{
-> -	struct bio_vec *bvec;
-> -	int i;
-> -	struct bvec_iter_all iter_all;
-> -
-> -	bio_for_each_segment_all(bvec, bio, i, iter_all)
-> -		put_page(bvec->bv_page);
-> -}
-> -
->  /*
->   * bio_check_pages_dirty() will check that all the BIO's pages are still dirty.
->   * If they are, then fine.  If, however, some pages are clean then they must
-> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-> index f6275c4da13a..307bbda62b7b 100644
-> --- a/include/linux/bvec.h
-> +++ b/include/linux/bvec.h
-> @@ -189,9 +189,4 @@ static inline void mp_bvec_last_segment(const struct bio_vec *bvec,
->  	}
->  }
->  
-> -#define mp_bvec_for_each_page(pg, bv, i)				\
-> -	for (i = (bv)->bv_offset / PAGE_SIZE;				\
-> -		(i <= (((bv)->bv_offset + (bv)->bv_len - 1) / PAGE_SIZE)) && \
-> -		(pg = bvec_nth_page((bv)->bv_page, i)); i += 1)
-> -
->  #endif /* __LINUX_BVEC_ITER_H */
-> -- 
-> 2.20.1
-> 
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
--- 
-Ming
+On 2019/4/11 15:08, Ming Lei wrote:
+> Hi Gao Xiang,
+> 
+> On Thu, Apr 11, 2019 at 01:47:49PM +0800, Gao Xiang wrote:
+>> Hi Ming,
+>>
+>> I found a erofs issue after commit 07173c3ec276
+>> ("block: enable multipage bvecs") is merged. It seems that
+>> it tries to merge more physical continuous pages in one iovec.
+>>
+>> However it breaks the current erofs_read_raw_page logic since it uses
+>> nr_iovecs of bio_alloc to limit the maximum number of physical
+> 
+> I believe you can do the limit outside easily, such as by checking
+> how many pages have been added to the bio.
+
+Yes, I agree that. However, I noticed that bio_add_page is exported as
+EXPORT_SYMBOL. I have no idea how many out-of-tree drivers break as well.
+
+Is there no way to take old behavior into consideration in the block layer as well?
+
+> 
+>> continuous blocks as well. It was practicable since the old
+>> __bio_try_merge_page only tries to merge in the same page.
+>> it is a kAPI behavior change which also affects bio_alloc...
+>>
+>> ...
+>> 231                 err = erofs_map_blocks(inode, &map, EROFS_GET_BLOCKS_RAW);
+>> 232                 if (unlikely(err))
+>> 233                         goto err_out;
+>> ...
+>> 284                 /* max # of continuous pages */
+>> 285                 if (nblocks > DIV_ROUND_UP(map.m_plen, PAGE_SIZE))
+>> 286                         nblocks = DIV_ROUND_UP(map.m_plen, PAGE_SIZE);
+>> 287                 if (nblocks > BIO_MAX_PAGES)
+>> 288                         nblocks = BIO_MAX_PAGES;
+>> 289
+>> 290                 bio = erofs_grab_bio(sb, blknr, nblocks, sb,
+>> 291                                      read_endio, false);
+> 
+> Previously this bio is allowed to add at most 'nblocks' pages, however,
+> now we are allowed to add at most 'nblocks' io vecs, instead of pages.
+> 
+>> 292                 if (IS_ERR(bio)) {
+>> 293                         err = PTR_ERR(bio);
+>> 294                         bio = NULL;
+>> 295                         goto err_out;
+>> 296                 }
+>> 297         }
+>> 298
+>> 299         err = bio_add_page(bio, page, PAGE_SIZE, 0);
+>> 300         /* out of the extent or bio is full */
+>> 301         if (err < PAGE_SIZE)
+>> 302                 goto submit_bio_retry;
+>> ...
+>>
+>> After commit 07173c3ec276 ("block: enable multipage bvecs"), erofs could
+>> read more beyond what erofs_map_blocks assigns, and out-of-bound data could
+>> be read and it breaks tail-end inline determination.
+> 
+> I don't understand why, could you explain a bit why erofs reads more?
+
+In current erofs, file could be break in two parts (non tail-end and tail-end blocks).
+Considering this on-disk layout,
+ ________________________________________________________________
+|     non tail-end data              |   meta data               |
+|____________________________________|_(inode) + non-inline data_|
+                          ^          ^
+                          |          |        
+                          bio start  \-- what nr_iovecs indicates as well:
+                                         the end of the non tail-end data.
+
+Before this commit, it will stop just before the next meta data. However,
+if the new bio merging behavior is introduced, it could add pages more than
+nr_iovecs, thus meta data will be read as the normal data...
+
+
+> 
+> The amount depends on how many pages you added to the bio.
+> 
+>>
+>> I can change the logic in erofs. However, out of curiosity, I have no idea
+>> if some other places also are designed like this.
+>>
+>> IMO, it's better to provide a total count which indicates how many real
+>> pages have been added in this bio. some thoughts?
+> 
+> As I mentioned, you may count how many pages added to bio, or you still
+> can get the number via bio_segments(bio).
+
+It is unsuitable to introduce bio_segments for each bio_add_page...
+
+Thanks,
+Gao Xiang
+
+> 
+> Thanks,
+> Ming
+> 
