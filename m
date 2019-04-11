@@ -2,118 +2,156 @@ Return-Path: <SRS0=bAqE=SN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F89C10F13
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 07:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF8EC10F13
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 07:09:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA4402082E
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 07:08:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97DF6217D4
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 07:09:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726145AbfDKHIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Apr 2019 03:08:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33838 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726137AbfDKHIV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Apr 2019 03:08:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AE89789C36;
-        Thu, 11 Apr 2019 07:08:20 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-33.pek2.redhat.com [10.72.8.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 721505C29A;
-        Thu, 11 Apr 2019 07:08:12 +0000 (UTC)
-Date:   Thu, 11 Apr 2019 15:08:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Gao Xiang <gaoxiang25@huawei.com>
-Cc:     linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        "linux-erofs@lists.ozlabs.org" <linux-erofs@lists.ozlabs.org>,
-        Jens Axboe <axboe@kernel.dk>, Chao Yu <yuchao0@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: Some new bio merging behaviors in __bio_try_merge_page
-Message-ID: <20190411070807.GA421@ming.t460p>
-References: <85c5fa1a-a506-e26f-c354-1554d47d8b2b@huawei.com>
+        id S1726706AbfDKHJX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Apr 2019 03:09:23 -0400
+Received: from smtp2.provo.novell.com ([137.65.250.81]:34197 "EHLO
+        smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726104AbfDKHJW (ORCPT
+        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
+        Thu, 11 Apr 2019 03:09:22 -0400
+Received: from apollon-2.fritz.box (prva10-snat226-2.provo.novell.com [137.65.226.36])
+        by smtp2.provo.novell.com with ESMTP (TLS encrypted); Thu, 11 Apr 2019 01:09:15 -0600
+Message-ID: <b2ea8fa5ea37fdf137b21515c7f555b5e4b1f49d.camel@suse.com>
+Subject: Re: [PATCH v3 0/5] block: skip media change event handling if
+ unsupported
+From:   Martin Wilck <mwilck@suse.com>
+To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.de>
+Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, mwilck@suse.com
+Date:   Thu, 11 Apr 2019 09:09:12 +0200
+In-Reply-To: <20190327135105.30893-1-mwilck@suse.com>
+References: <20190327135105.30893-1-mwilck@suse.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <85c5fa1a-a506-e26f-c354-1554d47d8b2b@huawei.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Thu, 11 Apr 2019 07:08:20 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Gao Xiang,
+Hello Jens,
 
-On Thu, Apr 11, 2019 at 01:47:49PM +0800, Gao Xiang wrote:
-> Hi Ming,
+as Hannes and Christoph have reviewed and acked this set, is there
+anything more I can do to get it merged?
+
+Best regards,
+Martin
+
+On Wed, 2019-03-27 at 14:51 +0100, Martin Wilck wrote:
+> The block layer currently can't distinguish between gendisk devices
+> that
+> don't support any media change events, and devices that do support
+> them,
+> but only for internal purposes. Therefore the check_events() function
+> is
+> called e.g. for ordinary non-removable SCSI disks. While these
+> devices
+> are not polled under normal conditions, the check_events function is
+> called on certain synchronization points, in particular while the
+> device
+> is opened, closed, or probed.
 > 
-> I found a erofs issue after commit 07173c3ec276
-> ("block: enable multipage bvecs") is merged. It seems that
-> it tries to merge more physical continuous pages in one iovec.
+> Under unfavorable conditions this can lead to processes being stalled
+> on
+> a blocked queue: a close() schedules a work item for check_events()
+> which gets blocked in the work queue, and subsequent open() tries to
+> flush the workqueue. The flush then stalls too, as long as the the
+> blocked work item can't finish.
 > 
-> However it breaks the current erofs_read_raw_page logic since it uses
-> nr_iovecs of bio_alloc to limit the maximum number of physical
-
-I believe you can do the limit outside easily, such as by checking
-how many pages have been added to the bio.
-
-> continuous blocks as well. It was practicable since the old
-> __bio_try_merge_page only tries to merge in the same page.
-> it is a kAPI behavior change which also affects bio_alloc...
+> In principle, the gendisk->events field would make it very easy for
+> the
+> block layer to check only for events actually supported by the
+> device.
+> Currently this is impossible, because there are lots of drivers which
+> don't set gendisk->events although they implement the check_events()
+> method.  This was introduced in commit 7c88a168da80 ("block: don't
+> propagate unlisted DISK_EVENTs to userland") and follow-up patches
+> because uevent generation by these drivers was found to possibly
+> generate infinite event loops between kernel and user space. A side
+> effect of these patches was that the distinction between such devices
+> and devices supporting no events at all was lost.
 > 
-> ...
-> 231                 err = erofs_map_blocks(inode, &map, EROFS_GET_BLOCKS_RAW);
-> 232                 if (unlikely(err))
-> 233                         goto err_out;
-> ...
-> 284                 /* max # of continuous pages */
-> 285                 if (nblocks > DIV_ROUND_UP(map.m_plen, PAGE_SIZE))
-> 286                         nblocks = DIV_ROUND_UP(map.m_plen, PAGE_SIZE);
-> 287                 if (nblocks > BIO_MAX_PAGES)
-> 288                         nblocks = BIO_MAX_PAGES;
-> 289
-> 290                 bio = erofs_grab_bio(sb, blknr, nblocks, sb,
-> 291                                      read_endio, false);
-
-Previously this bio is allowed to add at most 'nblocks' pages, however,
-now we are allowed to add at most 'nblocks' io vecs, instead of pages.
-
-> 292                 if (IS_ERR(bio)) {
-> 293                         err = PTR_ERR(bio);
-> 294                         bio = NULL;
-> 295                         goto err_out;
-> 296                 }
-> 297         }
-> 298
-> 299         err = bio_add_page(bio, page, PAGE_SIZE, 0);
-> 300         /* out of the extent or bio is full */
-> 301         if (err < PAGE_SIZE)
-> 302                 goto submit_bio_retry;
-> ...
+> This series implements a slightly different approach to event
+> handling
+> and uevent suppression. The drivers are changed to set the events
+> field
+> again.  Whether or not uevents should be generated is controlled by a
+> separate flag bit, which is only set by the drivers that are known to
+> generate proper uevents (sd and sr). Once this is done, devices that
+> don't support any media change events can be clearly identified, and
+> the
+> whole events checking code path can be skipped. This simplifies
+> handling
+> of non-removable SCSI disks.
 > 
-> After commit 07173c3ec276 ("block: enable multipage bvecs"), erofs could
-> read more beyond what erofs_map_blocks assigns, and out-of-bound data could
-> be read and it breaks tail-end inline determination.
-
-I don't understand why, could you explain a bit why erofs reads more?
-
-The amount depends on how many pages you added to the bio.
-
+> I have tested this with removable and non-removable SCSI disks, SCSI
+> cdrom, and ide-cd.
 > 
-> I can change the logic in erofs. However, out of curiosity, I have no idea
-> if some other places also are designed like this.
+> This patch set targets the same problem as Hannes' late submission
+> "sd:
+> skip non-removable devices in sd_check_events()".
 > 
-> IMO, it's better to provide a total count which indicates how many real
-> pages have been added in this bio. some thoughts?
+> Changes in v3:
+> 
+>  - Improved formatting of commit messages (Christoph)
+>  - 2/5: Rather than adding the event flag bits to the "events" field,
+>    add a new field  "event_flags" to struct gendisk (Christoph)
+>  - 2/5: Add a pair of parentheses around flag test (Christoph)
+> 
+> Changes in v2:
+> 
+> Removed the unused async_events field from struct gendisk.
+> This simplifies the event handling logic a bit.
+> 
+> Martin Wilck (5):
+>   block: genhd: remove async_events field
+>   block: disk_events: introduce event flags
+>   Revert "ide: unexport DISK_EVENT_MEDIA_CHANGE for ide-gd and ide-
+> cd"
+>   Revert "block: unexport DISK_EVENT_MEDIA_CHANGE for legacy/fringe
+>     drivers"
+>   block: check_events: don't bother with events if unsupported
+> 
+>  block/genhd.c              | 48 ++++++++++++++++++++++------------
+> ----
+>  drivers/block/amiflop.c    |  1 +
+>  drivers/block/ataflop.c    |  1 +
+>  drivers/block/floppy.c     |  1 +
+>  drivers/block/paride/pcd.c |  1 +
+>  drivers/block/paride/pd.c  |  1 +
+>  drivers/block/paride/pf.c  |  1 +
+>  drivers/block/pktcdvd.c    |  1 -
+>  drivers/block/swim.c       |  1 +
+>  drivers/block/swim3.c      |  1 +
+>  drivers/block/xsysace.c    |  1 +
+>  drivers/cdrom/gdrom.c      |  1 +
+>  drivers/ide/ide-cd.c       |  1 +
+>  drivers/ide/ide-cd_ioctl.c |  5 ++--
+>  drivers/ide/ide-gd.c       |  6 +++--
+>  drivers/scsi/sd.c          |  1 +
+>  drivers/scsi/sr.c          |  1 +
+>  include/linux/genhd.h      | 11 +++++++--
+>  18 files changed, 57 insertions(+), 27 deletions(-)
+> 
 
-As I mentioned, you may count how many pages added to bio, or you still
-can get the number via bio_segments(bio).
+-- 
+Dr. Martin Wilck <mwilck@suse.com>, Tel. +49 (0)911 74053 2107
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
 
-Thanks,
-Ming
+
