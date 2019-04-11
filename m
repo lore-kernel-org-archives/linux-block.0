@@ -2,172 +2,124 @@ Return-Path: <SRS0=bAqE=SN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B615C10F14
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 06:24:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67FDAC10F13
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 06:28:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 49598204EC
-	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 06:24:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lnYvL2Uh"
+	by mail.kernel.org (Postfix) with ESMTP id 3637720850
+	for <linux-block@archiver.kernel.org>; Thu, 11 Apr 2019 06:28:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726763AbfDKGYj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Apr 2019 02:24:39 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:60428 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726104AbfDKGYj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Apr 2019 02:24:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
-        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=iYShD2iYjoJ3N/yaubBfhjrzHLqObdxLLALOYXoIRk0=; b=lnYvL2Uhqz1DUuCb/NiH6zxB4/
-        nWI9ufhVg7JCSmW/iSfxcDVR8/s1utOEX1DDYTB9emI+EXggVOCHycG46NYDQRgGJY93PvTbcgoP0
-        TNOcXxw406Knzeujlgi3g8Net/ZA6sL8pURNkeCv+yLlhmD9Ro+lP6iNeEPrbgqo9Sao+AHDgBjCd
-        0hyzmNU2YWvlQh+gK0g44S//vttQbE3AR2nNoyWkNxmfgt+I/Yfijn3RLVHu8WB69thTN+NXRbyoU
-        +rKZ8QPDrUnnc2QU06mnveVyNEqyeNnpxH8VqwTwogYCCOm4mRIwxU9LZAqjI/moDTsSVq27Ozyey
-        8Hns2mqQ==;
-Received: from 089144214194.atnat0023.highway.a1.net ([89.144.214.194] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hET82-0005NG-H8; Thu, 11 Apr 2019 06:24:06 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Subject: [PATCH 4/5] block: change how we get page references in bio_iov_iter_get_pages
-Date:   Thu, 11 Apr 2019 08:23:30 +0200
-Message-Id: <20190411062331.27800-5-hch@lst.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190411062331.27800-1-hch@lst.de>
-References: <20190411062331.27800-1-hch@lst.de>
+        id S1726649AbfDKG2W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Apr 2019 02:28:22 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:6725 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726635AbfDKG2W (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Apr 2019 02:28:22 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 71140E42A0289F0B5339;
+        Thu, 11 Apr 2019 14:28:20 +0800 (CST)
+Received: from huawei.com (10.175.124.28) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.408.0; Thu, 11 Apr 2019
+ 14:28:10 +0800
+From:   Jason Yan <yanaijie@huawei.com>
+To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC:     <miaoxie@huawei.com>, <zhaohongjiang@huawei.com>,
+        Jason Yan <yanaijie@huawei.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] block: fix the return errno for direct IO
+Date:   Thu, 11 Apr 2019 14:45:49 +0800
+Message-ID: <20190411064549.13318-1-yanaijie@huawei.com>
+X-Mailer: git-send-email 2.17.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.28]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of needing a special macro to iterate over all pages in
-a bvec just do a second passs over the whole bio.  This also matches
-what we do on the release side.  The release side helper is moved
-up to where we need the get helper to clearly express the symmetry.
+If the last bio returned is not dio->bio, the status of the bio will
+not assigned to dio->bio if it is error. This will cause the whole IO
+status wrong.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+    ksoftirqd/21-117   [021] ..s.  4017.966090:   8,0    C   N 4883648 [0]
+          <idle>-0     [018] ..s.  4017.970888:   8,0    C  WS 4924800 + 1024 [0]
+          <idle>-0     [018] ..s.  4017.970909:   8,0    D  WS 4935424 + 1024 [<idle>]
+          <idle>-0     [018] ..s.  4017.970924:   8,0    D  WS 4936448 + 321 [<idle>]
+    ksoftirqd/21-117   [021] ..s.  4017.995033:   8,0    C   R 4883648 + 336 [65475]
+    ksoftirqd/21-117   [021] d.s.  4018.001988: myprobe1: (blkdev_bio_end_io+0x0/0x168) bi_status=7
+    ksoftirqd/21-117   [021] d.s.  4018.001992: myprobe: (aio_complete_rw+0x0/0x148) x0=0xffff802f2595ad80 res=0x12a000 res2=0x0
+
+We always have to assign bio->bi_status to dio->bio.bi_status because we
+will only check dio->bio.bi_status when we return the whole IO to
+the upper layer.
+
+Fixes: 542ff7bf18c6 ("block: new direct I/O implementation")
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jason Yan <yanaijie@huawei.com>
 ---
- block/bio.c          | 51 ++++++++++++++++++++++----------------------
- include/linux/bvec.h |  5 -----
- 2 files changed, 25 insertions(+), 31 deletions(-)
+ fs/block_dev.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index c2a389b1509a..d3490aeb1a7e 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -861,6 +861,26 @@ int bio_add_page(struct bio *bio, struct page *page,
- }
- EXPORT_SYMBOL(bio_add_page);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 78d3257435c0..0fead5520a7e 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -84,7 +84,7 @@ void kill_bdev(struct block_device *bdev)
  
-+static void bio_get_pages(struct bio *bio)
-+{
-+	struct bvec_iter_all iter_all;
-+	struct bio_vec *bvec;
-+	int i;
-+
-+	bio_for_each_segment_all(bvec, bio, i, iter_all)
-+		get_page(bvec->bv_page);
+ 	invalidate_bh_lrus();
+ 	truncate_inode_pages(mapping, 0);
+-}	
 +}
+ EXPORT_SYMBOL(kill_bdev);
+ 
+ /* Invalidate clean unused buffers and pagecache. */
+@@ -307,10 +307,10 @@ static void blkdev_bio_end_io(struct bio *bio)
+ 	struct blkdev_dio *dio = bio->bi_private;
+ 	bool should_dirty = dio->should_dirty;
+ 
+-	if (dio->multi_bio && !atomic_dec_and_test(&dio->ref)) {
+-		if (bio->bi_status && !dio->bio.bi_status)
+-			dio->bio.bi_status = bio->bi_status;
+-	} else {
++	if (bio->bi_status && !dio->bio.bi_status)
++		dio->bio.bi_status = bio->bi_status;
 +
-+static void bio_release_pages(struct bio *bio)
-+{
-+	struct bvec_iter_all iter_all;
-+	struct bio_vec *bvec;
-+	int i;
++	if (!dio->multi_bio || atomic_dec_and_test(&dio->ref)) {
+ 		if (!dio->is_sync) {
+ 			struct kiocb *iocb = dio->iocb;
+ 			ssize_t ret;
+@@ -670,13 +670,13 @@ static loff_t block_llseek(struct file *file, loff_t offset, int whence)
+ 	inode_unlock(bd_inode);
+ 	return retval;
+ }
+-	
 +
-+	bio_for_each_segment_all(bvec, bio, i, iter_all)
-+		put_page(bvec->bv_page);
-+}
-+
- static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
+ int blkdev_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
  {
- 	const struct bio_vec *bv = iter->bvec;
-@@ -875,15 +895,6 @@ static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
- 				bv->bv_offset + iter->iov_offset);
- 	if (unlikely(size != len))
- 		return -EINVAL;
--
--	if (!bio_flagged(bio, BIO_NO_PAGE_REF)) {
--		struct page *page;
--		int i;
--
--		mp_bvec_for_each_page(page, bv, i)
--			get_page(page);
--	}
--
- 	iov_iter_advance(iter, size);
- 	return 0;
- }
-@@ -963,13 +974,6 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	if (WARN_ON_ONCE(bio->bi_vcnt))
- 		return -EINVAL;
- 
--	/*
--	 * If this is a BVEC iter, then the pages are kernel pages. Don't
--	 * release them on IO completion, if the caller asked us to.
--	 */
--	if (is_bvec && iov_iter_bvec_no_ref(iter))
--		bio_set_flag(bio, BIO_NO_PAGE_REF);
--
- 	do {
- 		if (is_bvec)
- 			ret = __bio_iov_bvec_add_pages(bio, iter);
-@@ -977,6 +981,11 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 			ret = __bio_iov_iter_get_pages(bio, iter);
- 	} while (!ret && iov_iter_count(iter) && !bio_full(bio));
- 
-+	if (iov_iter_bvec_no_ref(iter))
-+		bio_set_flag(bio, BIO_NO_PAGE_REF);
-+	else
-+		bio_get_pages(bio);
+ 	struct inode *bd_inode = bdev_file_inode(filp);
+ 	struct block_device *bdev = I_BDEV(bd_inode);
+ 	int error;
+-	
 +
- 	return bio->bi_vcnt ? 0 : ret;
+ 	error = file_write_and_wait_range(filp, start, end);
+ 	if (error)
+ 		return error;
+@@ -983,7 +983,7 @@ void bdput(struct block_device *bdev)
  }
  
-@@ -1670,16 +1679,6 @@ void bio_set_pages_dirty(struct bio *bio)
- 	}
- }
- 
--static void bio_release_pages(struct bio *bio)
--{
--	struct bio_vec *bvec;
--	int i;
--	struct bvec_iter_all iter_all;
--
--	bio_for_each_segment_all(bvec, bio, i, iter_all)
--		put_page(bvec->bv_page);
--}
--
- /*
-  * bio_check_pages_dirty() will check that all the BIO's pages are still dirty.
-  * If they are, then fine.  If, however, some pages are clean then they must
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index f6275c4da13a..307bbda62b7b 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -189,9 +189,4 @@ static inline void mp_bvec_last_segment(const struct bio_vec *bvec,
- 	}
- }
- 
--#define mp_bvec_for_each_page(pg, bv, i)				\
--	for (i = (bv)->bv_offset / PAGE_SIZE;				\
--		(i <= (((bv)->bv_offset + (bv)->bv_len - 1) / PAGE_SIZE)) && \
--		(pg = bvec_nth_page((bv)->bv_page, i)); i += 1)
--
- #endif /* __LINUX_BVEC_ITER_H */
+ EXPORT_SYMBOL(bdput);
+- 
++
+ static struct block_device *bd_acquire(struct inode *inode)
+ {
+ 	struct block_device *bdev;
 -- 
-2.20.1
+2.17.2
 
