@@ -2,28 +2,28 @@ Return-Path: <SRS0=iV0P=SO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E629AC10F0E
-	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 08:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A94EC10F0E
+	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 10:55:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BBC712083E
-	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 08:23:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FB512084D
+	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 10:55:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726024AbfDLIXK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Apr 2019 04:23:10 -0400
-Received: from mx2.suse.de ([195.135.220.15]:43308 "EHLO mx1.suse.de"
+        id S1726697AbfDLKzO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Apr 2019 06:55:14 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50014 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726217AbfDLIXK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Apr 2019 04:23:10 -0400
+        id S1726709AbfDLKzO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Apr 2019 06:55:14 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 872DFAE7A;
-        Fri, 12 Apr 2019 08:23:08 +0000 (UTC)
-Subject: Re: [PATCH V5 2/9] blk-mq: move cancel of requeue_work into
- blk_mq_release
+        by mx1.suse.de (Postfix) with ESMTP id 36772AC44;
+        Fri, 12 Apr 2019 10:55:12 +0000 (UTC)
+Subject: Re: [PATCH V5 1/9] blk-mq: grab .q_usage_counter when queuing request
+ from plug code path
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Dongli Zhang <dongli.zhang@oracle.com>,
@@ -35,71 +35,15 @@ Cc:     linux-block@vger.kernel.org,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
         jianchao wang <jianchao.w.wang@oracle.com>
 References: <20190412033032.10418-1-ming.lei@redhat.com>
- <20190412033032.10418-3-ming.lei@redhat.com>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <acd7589d-6d44-4ee3-c079-7c38097715a8@suse.de>
-Date:   Fri, 12 Apr 2019 10:23:08 +0200
+ <20190412033032.10418-2-ming.lei@redhat.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <e6050974-08a9-eb60-88ac-a52c9c05dc66@suse.de>
+Date:   Fri, 12 Apr 2019 12:55:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190412033032.10418-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190412033032.10418-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -107,12 +51,90 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+On 4/12/19 5:30 AM, Ming Lei wrote:
+> Just like aio/io_uring, we need to grab 2 refcount for queuing one
+> request, one is for submission, another is for completion.
+> 
+> If the request isn't queued from plug code path, the refcount grabbed
+> in generic_make_request() serves for submission. In theroy, this
+> refcount should have been released after the sumission(async run queue)
+> is done. blk_freeze_queue() works with blk_sync_queue() together
+> for avoiding race between cleanup queue and IO submission, given async
+> run queue activities are canceled because hctx->run_work is scheduled with
+> the refcount held, so it is fine to not hold the refcount when
+> running the run queue work function for dispatch IO.
+> 
+> However, if request is staggered into plug list, and finally queued
+> from plug code path, the refcount in submission side is actually missed.
+> And we may start to run queue after queue is removed because the queue's
+> kobject refcount isn't guaranteed to be grabbed in flushing plug list
+> context, then kernel oops is triggered, see the following race:
+> 
+> blk_mq_flush_plug_list():
+>          blk_mq_sched_insert_requests()
+>                  insert requests to sw queue or scheduler queue
+>                  blk_mq_run_hw_queue
+> 
+> Because of concurrent run queue, all requests inserted above may be
+> completed before calling the above blk_mq_run_hw_queue. Then queue can
+> be freed during the above blk_mq_run_hw_queue().
+> 
+> Fixes the issue by grab .q_usage_counter before calling
+> blk_mq_sched_insert_requests() in blk_mq_flush_plug_list(). This way is
+> safe because the queue is absolutely alive before inserting request.
+> 
+> Cc: Dongli Zhang <dongli.zhang@oracle.com>
+> Cc: James Smart <james.smart@broadcom.com>
+> Cc: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: linux-scsi@vger.kernel.org,
+> Cc: Martin K . Petersen <martin.petersen@oracle.com>,
+> Cc: Christoph Hellwig <hch@lst.de>,
+> Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
+> Cc: jianchao wang <jianchao.w.wang@oracle.com>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-mq.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 3ff3d7b49969..5b586affee09 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1728,9 +1728,12 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+>   		if (rq->mq_hctx != this_hctx || rq->mq_ctx != this_ctx) {
+>   			if (this_hctx) {
+>   				trace_block_unplug(this_q, depth, !from_schedule);
+> +
+> +				percpu_ref_get(&this_q->q_usage_counter);
+>   				blk_mq_sched_insert_requests(this_hctx, this_ctx,
+>   								&rq_list,
+>   								from_schedule);
+> +				percpu_ref_put(&this_q->q_usage_counter);
+>   			}
+>   
+>   			this_q = rq->q;
+> @@ -1749,8 +1752,11 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+>   	 */
+>   	if (this_hctx) {
+>   		trace_block_unplug(this_q, depth, !from_schedule);
+> +
+> +		percpu_ref_get(&this_q->q_usage_counter);
+>   		blk_mq_sched_insert_requests(this_hctx, this_ctx, &rq_list,
+>   						from_schedule);
+> +		percpu_ref_put(&this_q->q_usage_counter);
+>   	}
+>   }
+>   
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Cheers,
+
+Hannes
 -- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
 SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
 GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
 HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
