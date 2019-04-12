@@ -2,28 +2,28 @@ Return-Path: <SRS0=iV0P=SO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D35F9C10F0E
-	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 11:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B311EC10F0E
+	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 11:08:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC1512171F
-	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 11:06:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A39C2083E
+	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 11:08:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726753AbfDLLGK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Apr 2019 07:06:10 -0400
-Received: from mx2.suse.de ([195.135.220.15]:53570 "EHLO mx1.suse.de"
+        id S1726788AbfDLLIa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Apr 2019 07:08:30 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54506 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726697AbfDLLGK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Apr 2019 07:06:10 -0400
+        id S1726244AbfDLLI3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Apr 2019 07:08:29 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 9E390ABCF;
-        Fri, 12 Apr 2019 11:06:07 +0000 (UTC)
-Subject: Re: [PATCH V5 6/9] blk-mq: always free hctx after request queue is
- freed
+        by mx1.suse.de (Postfix) with ESMTP id 7E1FDAC6E;
+        Fri, 12 Apr 2019 11:08:28 +0000 (UTC)
+Subject: Re: [PATCH V5 7/9] blk-mq: move cancel of hctx->run_work into
+ blk_mq_hw_sysfs_release
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Dongli Zhang <dongli.zhang@oracle.com>,
@@ -35,14 +35,14 @@ Cc:     linux-block@vger.kernel.org,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
         jianchao wang <jianchao.w.wang@oracle.com>
 References: <20190412033032.10418-1-ming.lei@redhat.com>
- <20190412033032.10418-7-ming.lei@redhat.com>
+ <20190412033032.10418-8-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <3e4c2137-2a3e-cf00-45ec-3d54dbc4fc6a@suse.de>
-Date:   Fri, 12 Apr 2019 13:06:07 +0200
+Message-ID: <2405e0a5-8c49-e23a-ed58-8e8e0b7a9d32@suse.de>
+Date:   Fri, 12 Apr 2019 13:08:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190412033032.10418-7-ming.lei@redhat.com>
+In-Reply-To: <20190412033032.10418-8-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -52,20 +52,13 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 4/12/19 5:30 AM, Ming Lei wrote:
-> In normal queue cleanup path, hctx is released after request queue
-> is freed, see blk_mq_release().
+> hctx is always released after requeue is freed.
 > 
-> However, in __blk_mq_update_nr_hw_queues(), hctx may be freed because
-> of hw queues shrinking. This way is easy to cause use-after-free,
-> because: one implicit rule is that it is safe to call almost all block
-> layer APIs if the request queue is alive; and one hctx may be retrieved
-> by one API, then the hctx can be freed by blk_mq_update_nr_hw_queues();
-> finally use-after-free is triggered.
+> With holding queue's kobject refcount, it is safe for driver to run queue,
+> so one run queue might be scheduled after blk_sync_queue() is done.
 > 
-> Fixes this issue by always freeing hctx after releasing request queue.
-> If some hctxs are removed in blk_mq_update_nr_hw_queues(), introduce
-> a per-queue list to hold them, then try to resuse these hctxs if numa
-> node is matched.
+> So moving the cancel of hctx->run_work into blk_mq_hw_sysfs_release()
+> for avoiding run released queue.
 > 
 > Cc: Dongli Zhang <dongli.zhang@oracle.com>
 > Cc: James Smart <james.smart@broadcom.com>
@@ -75,140 +68,14 @@ On 4/12/19 5:30 AM, Ming Lei wrote:
 > Cc: Christoph Hellwig <hch@lst.de>,
 > Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
 > Cc: jianchao wang <jianchao.w.wang@oracle.com>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->   block/blk-mq.c         | 40 +++++++++++++++++++++++++++-------------
->   include/linux/blk-mq.h |  2 ++
->   include/linux/blkdev.h |  7 +++++++
->   3 files changed, 36 insertions(+), 13 deletions(-)
+>   block/blk-core.c     | 8 --------
+>   block/blk-mq-sysfs.c | 2 ++
+>   2 files changed, 2 insertions(+), 8 deletions(-)
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 71996fe494eb..886fbb678617 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2260,6 +2260,10 @@ static void blk_mq_exit_hctx(struct request_queue *q,
->   		set->ops->exit_hctx(hctx, hctx_idx);
->   
->   	blk_mq_remove_cpuhp(hctx);
-> +
-> +	spin_lock(&q->dead_hctx_lock);
-> +	list_add(&hctx->hctx_list, &q->dead_hctx_list);
-> +	spin_unlock(&q->dead_hctx_lock);
->   }
->   
->   static void blk_mq_exit_hw_queues(struct request_queue *q,
-> @@ -2660,15 +2664,13 @@ static int blk_mq_alloc_ctxs(struct request_queue *q)
->    */
->   void blk_mq_release(struct request_queue *q)
->   {
-> -	struct blk_mq_hw_ctx *hctx;
-> -	unsigned int i;
-> +	struct blk_mq_hw_ctx *hctx, *next;
->   
->   	cancel_delayed_work_sync(&q->requeue_work);
->   
-> -	/* hctx kobj stays in hctx */
-> -	queue_for_each_hw_ctx(q, hctx, i) {
-> -		if (!hctx)
-> -			continue;
-> +	/* all hctx are in .dead_hctx_list now */
-> +	list_for_each_entry_safe(hctx, next, &q->dead_hctx_list, hctx_list) {
-> +		list_del_init(&hctx->hctx_list);
->   		kobject_put(&hctx->kobj);
->   	}
->   
-> @@ -2735,9 +2737,22 @@ static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
->   		struct blk_mq_tag_set *set, struct request_queue *q,
->   		int hctx_idx, int node)
->   {
-> -	struct blk_mq_hw_ctx *hctx;
-> +	struct blk_mq_hw_ctx *hctx = NULL, *tmp;
-> +
-> +	/* reuse dead hctx first */
-> +	spin_lock(&q->dead_hctx_lock);
-> +	list_for_each_entry(tmp, &q->dead_hctx_list, hctx_list) {
-> +		if (tmp->numa_node == node) {
-> +			hctx = tmp;
-> +			break;
-> +		}
-> +	}
-> +	if (hctx)
-> +		list_del_init(&hctx->hctx_list);
-> +	spin_unlock(&q->dead_hctx_lock);
->   
-> -	hctx = blk_mq_alloc_hctx(q, set, hctx_idx, node);
-> +	if (!hctx)
-> +		hctx = blk_mq_alloc_hctx(q, set, hctx_idx, node);
->   	if (!hctx)
->   		goto fail;
->   
-> @@ -2775,10 +2790,8 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
->   
->   		hctx = blk_mq_alloc_and_init_hctx(set, q, i, node);
->   		if (hctx) {
-> -			if (hctxs[i]) {
-> +			if (hctxs[i])
->   				blk_mq_exit_hctx(q, set, hctxs[i], i);
-> -				kobject_put(&hctxs[i]->kobj);
-> -			}
->   			hctxs[i] = hctx;
->   		} else {
->   			if (hctxs[i])
-> @@ -2809,9 +2822,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
->   			if (hctx->tags)
->   				blk_mq_free_map_and_requests(set, j);
->   			blk_mq_exit_hctx(q, set, hctx, j);
-> -			kobject_put(&hctx->kobj);
->   			hctxs[j] = NULL;
-> -
->   		}
->   	}
->   	mutex_unlock(&q->sysfs_lock);
-> @@ -2854,6 +2865,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
->   	if (!q->queue_hw_ctx)
->   		goto err_sys_init;
->   
-> +	INIT_LIST_HEAD(&q->dead_hctx_list);
-> +	spin_lock_init(&q->dead_hctx_lock);
-> +
->   	blk_mq_realloc_hw_ctxs(set, q);
->   	if (!q->nr_hw_queues)
->   		goto err_hctxs;
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index cb2aa7ecafff..a44c3f95dcc1 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -70,6 +70,8 @@ struct blk_mq_hw_ctx {
->   	struct dentry		*sched_debugfs_dir;
->   #endif
->   
-> +	struct list_head	hctx_list;
-> +
->   	/* Must be the last member - see also blk_mq_hw_ctx_size(). */
->   	struct srcu_struct	srcu[0];
->   };
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 4b85dc066264..1325f941f0be 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -535,6 +535,13 @@ struct request_queue {
->   
->   	struct mutex		sysfs_lock;
->   
-> +	/*
-> +	 * for reusing dead hctx instance in case of updating
-> +	 * nr_hw_queues
-> +	 */
-> +	struct list_head	dead_hctx_list;
-> +	spinlock_t		dead_hctx_lock;
-> +
->   	atomic_t		mq_freeze_depth;
->   
->   #if defined(CONFIG_BLK_DEV_BSG)
-> 
-I actually had been looking into this, too, but couldn't convince myself 
-that the code really is a problem.
-Did you see this happening in real life?
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
 
