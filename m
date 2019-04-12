@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 392AEC10F0E
-	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 08:20:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E629AC10F0E
+	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 08:23:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0AF742083E
-	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 08:20:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBC712083E
+	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 08:23:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726217AbfDLIUE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Apr 2019 04:20:04 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41136 "EHLO mx1.suse.de"
+        id S1726024AbfDLIXK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Apr 2019 04:23:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43308 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725973AbfDLIUE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Apr 2019 04:20:04 -0400
+        id S1726217AbfDLIXK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Apr 2019 04:23:10 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id F2851AEA1;
-        Fri, 12 Apr 2019 08:20:01 +0000 (UTC)
-Subject: Re: [PATCH V5 1/9] blk-mq: grab .q_usage_counter when queuing request
- from plug code path
+        by mx1.suse.de (Postfix) with ESMTP id 872DFAE7A;
+        Fri, 12 Apr 2019 08:23:08 +0000 (UTC)
+Subject: Re: [PATCH V5 2/9] blk-mq: move cancel of requeue_work into
+ blk_mq_release
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Dongli Zhang <dongli.zhang@oracle.com>,
@@ -35,7 +35,7 @@ Cc:     linux-block@vger.kernel.org,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
         jianchao wang <jianchao.w.wang@oracle.com>
 References: <20190412033032.10418-1-ming.lei@redhat.com>
- <20190412033032.10418-2-ming.lei@redhat.com>
+ <20190412033032.10418-3-ming.lei@redhat.com>
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
@@ -93,12 +93,12 @@ Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
  l2t2TyTuHm7wVUY2J3gJYgG723/PUGW4LaoqNrYQUr/rqo6NXw6c+EglRpm1BdpkwPwAng63
  W5VOQMdnozD2RsDM5GfA4aEFi5m00tE+8XPICCtkduyWw+Z+zIqYk2v+zraPLs9Gs0X2C7X0
  yvqY9voUoJjG6skkOToGZbqtMX9K4GOv9JAxVs075QRXL3brHtHONDt6udYobzz+
-Message-ID: <ea33e819-015e-cdf5-7b23-afaaac7ea455@suse.de>
-Date:   Fri, 12 Apr 2019 10:20:00 +0200
+Message-ID: <acd7589d-6d44-4ee3-c079-7c38097715a8@suse.de>
+Date:   Fri, 12 Apr 2019 10:23:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.3.0
 MIME-Version: 1.0
-In-Reply-To: <20190412033032.10418-2-ming.lei@redhat.com>
+In-Reply-To: <20190412033032.10418-3-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -109,7 +109,6 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Looks good,
 Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-
 -- 
 Johannes Thumshirn                            SUSE Labs Filesystems
 jthumshirn@suse.de                                +49 911 74053 689
