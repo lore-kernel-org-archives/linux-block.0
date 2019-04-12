@@ -3,27 +3,27 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B311EC10F0E
-	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 11:08:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A99DC10F0E
+	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 11:09:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A39C2083E
-	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 11:08:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B66F2083E
+	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 11:09:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726788AbfDLLIa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Apr 2019 07:08:30 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54506 "EHLO mx1.suse.de"
+        id S1726867AbfDLLJH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Apr 2019 07:09:07 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54796 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726244AbfDLLI3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Apr 2019 07:08:29 -0400
+        id S1726244AbfDLLJH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Apr 2019 07:09:07 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 7E1FDAC6E;
-        Fri, 12 Apr 2019 11:08:28 +0000 (UTC)
-Subject: Re: [PATCH V5 7/9] blk-mq: move cancel of hctx->run_work into
- blk_mq_hw_sysfs_release
+        by mx1.suse.de (Postfix) with ESMTP id 6D7FEACBD;
+        Fri, 12 Apr 2019 11:09:06 +0000 (UTC)
+Subject: Re: [PATCH V5 8/9] block: don't drain in-progress dispatch in
+ blk_cleanup_queue()
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Dongli Zhang <dongli.zhang@oracle.com>,
@@ -35,14 +35,14 @@ Cc:     linux-block@vger.kernel.org,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
         jianchao wang <jianchao.w.wang@oracle.com>
 References: <20190412033032.10418-1-ming.lei@redhat.com>
- <20190412033032.10418-8-ming.lei@redhat.com>
+ <20190412033032.10418-9-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <2405e0a5-8c49-e23a-ed58-8e8e0b7a9d32@suse.de>
-Date:   Fri, 12 Apr 2019 13:08:28 +0200
+Message-ID: <e47c5100-f6e7-14c1-6554-df0f26550517@suse.de>
+Date:   Fri, 12 Apr 2019 13:09:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190412033032.10418-8-ming.lei@redhat.com>
+In-Reply-To: <20190412033032.10418-9-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -52,13 +52,14 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 4/12/19 5:30 AM, Ming Lei wrote:
-> hctx is always released after requeue is freed.
+> Now freeing hw queue resource is moved to hctx's release handler,
+> we don't need to worry about the race between blk_cleanup_queue and
+> run queue any more.
 > 
-> With holding queue's kobject refcount, it is safe for driver to run queue,
-> so one run queue might be scheduled after blk_sync_queue() is done.
+> So don't drain in-progress dispatch in blk_cleanup_queue().
 > 
-> So moving the cancel of hctx->run_work into blk_mq_hw_sysfs_release()
-> for avoiding run released queue.
+> This is basically revert of c2856ae2f315 ("blk-mq: quiesce queue before
+> freeing queue").
 > 
 > Cc: Dongli Zhang <dongli.zhang@oracle.com>
 > Cc: James Smart <james.smart@broadcom.com>
@@ -71,9 +72,8 @@ On 4/12/19 5:30 AM, Ming Lei wrote:
 > Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->   block/blk-core.c     | 8 --------
->   block/blk-mq-sysfs.c | 2 ++
->   2 files changed, 2 insertions(+), 8 deletions(-)
+>   block/blk-core.c | 12 ------------
+>   1 file changed, 12 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
