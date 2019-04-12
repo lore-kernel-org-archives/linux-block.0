@@ -4,26 +4,26 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A94EC10F0E
-	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 10:55:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A99C10F0E
+	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 11:03:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FB512084D
-	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 10:55:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FB632083E
+	for <linux-block@archiver.kernel.org>; Fri, 12 Apr 2019 11:03:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726697AbfDLKzO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Apr 2019 06:55:14 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50014 "EHLO mx1.suse.de"
+        id S1726867AbfDLLDk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Apr 2019 07:03:40 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52184 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726709AbfDLKzO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Apr 2019 06:55:14 -0400
+        id S1726711AbfDLLDj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Apr 2019 07:03:39 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 36772AC44;
-        Fri, 12 Apr 2019 10:55:12 +0000 (UTC)
-Subject: Re: [PATCH V5 1/9] blk-mq: grab .q_usage_counter when queuing request
- from plug code path
+        by mx1.suse.de (Postfix) with ESMTP id A1A14AC84;
+        Fri, 12 Apr 2019 11:03:37 +0000 (UTC)
+Subject: Re: [PATCH V5 3/9] blk-mq: free hw queue's resource in hctx's release
+ handler
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Dongli Zhang <dongli.zhang@oracle.com>,
@@ -33,16 +33,17 @@ Cc:     linux-block@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        jianchao wang <jianchao.w.wang@oracle.com>
+        jianchao wang <jianchao.w.wang@oracle.com>,
+        stable@vger.kernel.org
 References: <20190412033032.10418-1-ming.lei@redhat.com>
- <20190412033032.10418-2-ming.lei@redhat.com>
+ <20190412033032.10418-4-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <e6050974-08a9-eb60-88ac-a52c9c05dc66@suse.de>
-Date:   Fri, 12 Apr 2019 12:55:11 +0200
+Message-ID: <27ec3b64-1104-236d-bc54-1dbb954da13c@suse.de>
+Date:   Fri, 12 Apr 2019 13:03:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190412033032.10418-2-ming.lei@redhat.com>
+In-Reply-To: <20190412033032.10418-4-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -52,36 +53,33 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 4/12/19 5:30 AM, Ming Lei wrote:
-> Just like aio/io_uring, we need to grab 2 refcount for queuing one
-> request, one is for submission, another is for completion.
+> Once blk_cleanup_queue() returns, tags shouldn't be used any more,
+> because blk_mq_free_tag_set() may be called. Commit 45a9c9d909b2
+> ("blk-mq: Fix a use-after-free") fixes this issue exactly.
 > 
-> If the request isn't queued from plug code path, the refcount grabbed
-> in generic_make_request() serves for submission. In theroy, this
-> refcount should have been released after the sumission(async run queue)
-> is done. blk_freeze_queue() works with blk_sync_queue() together
-> for avoiding race between cleanup queue and IO submission, given async
-> run queue activities are canceled because hctx->run_work is scheduled with
-> the refcount held, so it is fine to not hold the refcount when
-> running the run queue work function for dispatch IO.
+> However, that commit introduces another issue. Before 45a9c9d909b2,
+> we are allowed to run queue during cleaning up queue if the queue's
+> kobj refcount is held. After that commit, queue can't be run during
+> queue cleaning up, otherwise oops can be triggered easily because
+> some fields of hctx are freed by blk_mq_free_queue() in blk_cleanup_queue().
 > 
-> However, if request is staggered into plug list, and finally queued
-> from plug code path, the refcount in submission side is actually missed.
-> And we may start to run queue after queue is removed because the queue's
-> kobject refcount isn't guaranteed to be grabbed in flushing plug list
-> context, then kernel oops is triggered, see the following race:
+> We have invented ways for addressing this kind of issue before, such as:
 > 
-> blk_mq_flush_plug_list():
->          blk_mq_sched_insert_requests()
->                  insert requests to sw queue or scheduler queue
->                  blk_mq_run_hw_queue
+> 	8dc765d438f1 ("SCSI: fix queue cleanup race before queue initialization is done")
+> 	c2856ae2f315 ("blk-mq: quiesce queue before freeing queue")
 > 
-> Because of concurrent run queue, all requests inserted above may be
-> completed before calling the above blk_mq_run_hw_queue. Then queue can
-> be freed during the above blk_mq_run_hw_queue().
+> But still can't cover all cases, recently James reports another such
+> kind of issue:
 > 
-> Fixes the issue by grab .q_usage_counter before calling
-> blk_mq_sched_insert_requests() in blk_mq_flush_plug_list(). This way is
-> safe because the queue is absolutely alive before inserting request.
+> 	https://marc.info/?l=linux-scsi&m=155389088124782&w=2
+> 
+> This issue can be quite hard to address by previous way, given
+> scsi_run_queue() may run requeues for other LUNs.
+> 
+> Fixes the above issue by freeing hctx's resources in its release handler, and this
+> way is safe becasue tags isn't needed for freeing such hctx resource.
+> 
+> This approach follows typical design pattern wrt. kobject's release handler.
 > 
 > Cc: Dongli Zhang <dongli.zhang@oracle.com>
 > Cc: James Smart <james.smart@broadcom.com>
@@ -91,42 +89,114 @@ On 4/12/19 5:30 AM, Ming Lei wrote:
 > Cc: Christoph Hellwig <hch@lst.de>,
 > Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
 > Cc: jianchao wang <jianchao.w.wang@oracle.com>
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> Reported-by: James Smart <james.smart@broadcom.com>
+> Fixes: 45a9c9d909b2 ("blk-mq: Fix a use-after-free")
+> Cc: stable@vger.kernel.org
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->   block/blk-mq.c | 6 ++++++
->   1 file changed, 6 insertions(+)
+>   block/blk-core.c     | 2 +-
+>   block/blk-mq-sysfs.c | 6 ++++++
+>   block/blk-mq.c       | 8 ++------
+>   block/blk-mq.h       | 2 +-
+>   4 files changed, 10 insertions(+), 8 deletions(-)
 > 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 6583d67f3e34..20298aa5a77c 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -374,7 +374,7 @@ void blk_cleanup_queue(struct request_queue *q)
+>   	blk_exit_queue(q);
+>   
+>   	if (queue_is_mq(q))
+> -		blk_mq_free_queue(q);
+> +		blk_mq_exit_queue(q);
+>   
+>   	percpu_ref_exit(&q->q_usage_counter);
+>   
+> diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+> index 3f9c3f4ac44c..4040e62c3737 100644
+> --- a/block/blk-mq-sysfs.c
+> +++ b/block/blk-mq-sysfs.c
+> @@ -10,6 +10,7 @@
+>   #include <linux/smp.h>
+>   
+>   #include <linux/blk-mq.h>
+> +#include "blk.h"
+>   #include "blk-mq.h"
+>   #include "blk-mq-tag.h"
+>   
+> @@ -33,6 +34,11 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
+>   {
+>   	struct blk_mq_hw_ctx *hctx = container_of(kobj, struct blk_mq_hw_ctx,
+>   						  kobj);
+> +
+> +	if (hctx->flags & BLK_MQ_F_BLOCKING)
+> +		cleanup_srcu_struct(hctx->srcu);
+> +	blk_free_flush_queue(hctx->fq);
+> +	sbitmap_free(&hctx->ctx_map);
+>   	free_cpumask_var(hctx->cpumask);
+>   	kfree(hctx->ctxs);
+>   	kfree(hctx);
 > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 3ff3d7b49969..5b586affee09 100644
+> index b512ba0cb359..afc9912e2e42 100644
 > --- a/block/blk-mq.c
 > +++ b/block/blk-mq.c
-> @@ -1728,9 +1728,12 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
->   		if (rq->mq_hctx != this_hctx || rq->mq_ctx != this_ctx) {
->   			if (this_hctx) {
->   				trace_block_unplug(this_q, depth, !from_schedule);
-> +
-> +				percpu_ref_get(&this_q->q_usage_counter);
->   				blk_mq_sched_insert_requests(this_hctx, this_ctx,
->   								&rq_list,
->   								from_schedule);
-> +				percpu_ref_put(&this_q->q_usage_counter);
->   			}
+> @@ -2259,12 +2259,7 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+>   	if (set->ops->exit_hctx)
+>   		set->ops->exit_hctx(hctx, hctx_idx);
 >   
->   			this_q = rq->q;
-> @@ -1749,8 +1752,11 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
->   	 */
->   	if (this_hctx) {
->   		trace_block_unplug(this_q, depth, !from_schedule);
-> +
-> +		percpu_ref_get(&this_q->q_usage_counter);
->   		blk_mq_sched_insert_requests(this_hctx, this_ctx, &rq_list,
->   						from_schedule);
-> +		percpu_ref_put(&this_q->q_usage_counter);
->   	}
+> -	if (hctx->flags & BLK_MQ_F_BLOCKING)
+> -		cleanup_srcu_struct(hctx->srcu);
+> -
+>   	blk_mq_remove_cpuhp(hctx);
+> -	blk_free_flush_queue(hctx->fq);
+> -	sbitmap_free(&hctx->ctx_map);
 >   }
 >   
+>   static void blk_mq_exit_hw_queues(struct request_queue *q,
+> @@ -2899,7 +2894,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>   }
+>   EXPORT_SYMBOL(blk_mq_init_allocated_queue);
+>   
+> -void blk_mq_free_queue(struct request_queue *q)
+> +/* tags can _not_ be used after returning from blk_mq_exit_queue */
+> +void blk_mq_exit_queue(struct request_queue *q)
+>   {
+>   	struct blk_mq_tag_set	*set = q->tag_set;
+>   
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index d704fc7766f4..c421e3a16e36 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -37,7 +37,7 @@ struct blk_mq_ctx {
+>   	struct kobject		kobj;
+>   } ____cacheline_aligned_in_smp;
+>   
+> -void blk_mq_free_queue(struct request_queue *q);
+> +void blk_mq_exit_queue(struct request_queue *q);
+>   int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
+>   void blk_mq_wake_waiters(struct request_queue *q);
+>   bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *, bool);
 > 
+Hmm. While this is a good point, I'm somehow not convinced that it fixes 
+the mentioned problem.
+
+For the sbitmap_any_set() case, the problem appears to be the racy 
+interaction between nvme_scan_queues() and nvme_reset_ctrl().
+Both can (and do) run in parallel, and as nvme_scan_queue() is not able 
+to update the nvme namespace list race-free (nvme_ns_remove() will kill 
+the namespace before removing it from the queue) we'll hit issues where 
+nvme_start_queues() is called on namespaces which are halfway through 
+nvme_ns_remove(), causing all sorts of issues.
+
+See "[PATCHv2 RFC] nvme: use nvme_set_queue_dying() during namespace 
+rescanning" for my attempt to fix this.
+That patch is actually not complete; there is another one under testing 
+currently to not remove namespaces at all during nvme_reset_ctrl(), but 
+results are not in yet.
+
+Otherwise:
+
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
