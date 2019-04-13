@@ -2,104 +2,106 @@ Return-Path: <SRS0=i+2c=SP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0352C10F11
-	for <linux-block@archiver.kernel.org>; Sat, 13 Apr 2019 09:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE8AC10F11
+	for <linux-block@archiver.kernel.org>; Sat, 13 Apr 2019 09:24:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A37852084E
-	for <linux-block@archiver.kernel.org>; Sat, 13 Apr 2019 09:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E8F72084E
+	for <linux-block@archiver.kernel.org>; Sat, 13 Apr 2019 09:24:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kt0rczLJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wz7CGqzK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726933AbfDMJQp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 13 Apr 2019 05:16:45 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:54250 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725776AbfDMJQo (ORCPT
+        id S1726946AbfDMJYA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 13 Apr 2019 05:24:00 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38616 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726898AbfDMJYA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 Apr 2019 05:16:44 -0400
-Received: by mail-wm1-f68.google.com with SMTP id q16so14072002wmj.3
-        for <linux-block@vger.kernel.org>; Sat, 13 Apr 2019 02:16:43 -0700 (PDT)
+        Sat, 13 Apr 2019 05:24:00 -0400
+Received: by mail-wm1-f67.google.com with SMTP id w15so13760644wmc.3;
+        Sat, 13 Apr 2019 02:23:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jl+uqjoeWS/UcgHLALZ6qCxkCHGd15eqjy0ND1OxQ38=;
-        b=kt0rczLJS0l2WB//H8zeSaoysdEPOxpVPz5hCZNKM+Djr13cBsf7raaBugU+SkLVOp
-         1+NIsotBMe9oSfCz78cEENx9qtlnEPpWU+Zl4Svfrv6vSe0R/OapU1xsvByBp5M6/N+u
-         H9z8z7V6c/XmTfrKgYqIlXgIqtnrKL3fpxpGnmsG7Q82KxtfyJk5dLuhkTCOaq9zRI4Y
-         BOE5U0SXHaPIr5WJconuyC332WkMRAzfgA8W1vVIfvjtAvp1BlF/go/6ojkotKUt7MNb
-         /YhXBXXQIyQ5VLjvntj8TZxCkf2ZnY1oq/H2DJ/lakRg4IQRoRiC9LQQChaE05H7IQHJ
-         CGAg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=uA9/xlxsSJ148+2ceiEFkZVsJ7Hdw5UodlftNZwI7BI=;
+        b=Wz7CGqzK2542nOZFGiCs7c8aKRlHG7sU4MP1YgYbHaS/uH7OX++qg2V2fhH+CeFwKx
+         Bb+i2lSpkLLdFzvwJH+dqtpa8QakuALZLO9enby0cJWvEcweJiwHyWCvmeqlj3R/wrid
+         J/s2Prztyt/PY5I/OgGe6l4IGu74l3ibhXFJ+UalYf10Jb9szfdl3NQ2/vUlJR/INi3n
+         MuhCdzhMWQluEpHXXoA1Mfz+qPBXPcjzJcFeqSdV/4J6yE3QSzB/lGYBJMeYzi26Z7Wb
+         eeSFXOjL0psNOLTkwW966VIE+OnK/H5NfRgMQ/VDAiDs+9SrkWlA0c+EqphR3lmKrrMh
+         AUlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jl+uqjoeWS/UcgHLALZ6qCxkCHGd15eqjy0ND1OxQ38=;
-        b=kWE3yxtSl8ws9WCTcUOZ1gpzrwyLfcJmWY50EJ6N8dBOJlb+JI1/6eM6mLdKTdpBBY
-         4lmODGCFbBeP1nWmGmDaRwd+FgG/9grZhyO+a977HIEZjLp0lXhb/gOQ/ExKKjGS1cgc
-         TwFK0uMsE7SSHjpSe3vhO8aQxwiD28OsK+aHYXsnqTykSQy8q6TE+sj+aTEjxD1TeZhG
-         EzJ48pR+Pmzu0bzdSx2pDaFQUwFNxhlk1LwDfv90jjV2m2cfg5s18uUwC8Wx06IWdOl1
-         Pdo/H/Y01t7PCEwhfhuH1gdOEKC0eqO0TmxakjrNqrwu9OFRvfAf3fFQNskFLo/GOs7A
-         c6iA==
-X-Gm-Message-State: APjAAAUJhoCuT9dHmpT4AxlCP2wBsTlb/FSvh6rPXg3nDjNMbvaWfbUJ
-        6BjyAr3U3z3SDQgtoIo50yvf6A==
-X-Google-Smtp-Source: APXvYqy9XbFNWkLCB4XsR2KSrlYNMqiBRD7wYV15yyOcjY0qoJWLnPoTqfBcggVFn8NMPyvvMDgwjQ==
-X-Received: by 2002:a1c:6587:: with SMTP id z129mr14551454wmb.84.1555147002937;
-        Sat, 13 Apr 2019 02:16:42 -0700 (PDT)
-Received: from localhost.localdomain ([37.161.76.141])
-        by smtp.gmail.com with ESMTPSA id c2sm33134379wrr.13.2019.04.13.02.16.41
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 13 Apr 2019 02:16:42 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ulf.hansson@linaro.org, linus.walleij@linaro.org,
-        broonie@kernel.org, bfq-iosched@googlegroups.com,
-        oleksandr@natalenko.name, Paolo Valente <paolo.valente@linaro.org>,
-        Anders Roxell <anders.roxell@linaro.org>
-Subject: [PATCH] block, Kconfig.iosched: set default value of IOSCHED_BFQ to yes
-Date:   Sat, 13 Apr 2019 11:16:26 +0200
-Message-Id: <20190413091626.20286-1-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=uA9/xlxsSJ148+2ceiEFkZVsJ7Hdw5UodlftNZwI7BI=;
+        b=qy/I6zZazVUjW18Add1a7uVS1n6bgdB1lukKmTiPYblAvL+N8NFUHAjgatX3zJAjq9
+         o+i1k9QEWSJiGtBslmzzD7Pe8aVLWlX3TZX1BnsiOcvfYYQjvHegddkv+dW+Ycpb7opr
+         ueJFzUSeiw1Chpm1sS7s7X4vU2N5kRjhCq3tskumdnCb2QnS27DN1NQ8l+tpIafhL3Nn
+         p9VzoyfewYma65rdpyKJRRTkccoJacW9hGWO0x55adZfUPvRHCn/pow6GF5WSjMHsEwQ
+         brBEC0Wf0A1A7fWXsd4tBGGtN+Ay/E0VOlHq4lUxP4ZiP+fdql3dGlmSdBJ0lU3ukU3h
+         MFqg==
+X-Gm-Message-State: APjAAAXk7dvWzzZ+Y8bXNE8uNAEuLTkHihByJoc0uTqL41pv5QN+y1QR
+        J/k3rxfdgXLxODcF4+qvdzSNgBRtCVtZ6NWlbWY=
+X-Google-Smtp-Source: APXvYqwcpgMiHzB928lS2IGsAqmluTu3w9N9RhH90+CpPS415spsrqIW+p+mibiLzHskHFYz8l0m+brzqBjQZAOWG6c=
+X-Received: by 2002:a7b:c408:: with SMTP id k8mr14669537wmi.69.1555147438276;
+ Sat, 13 Apr 2019 02:23:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190412033032.10418-1-ming.lei@redhat.com> <20190412033032.10418-10-ming.lei@redhat.com>
+ <yq1o95akbxj.fsf@oracle.com> <20190413065608.GA9108@ming.t460p>
+In-Reply-To: <20190413065608.GA9108@ming.t460p>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Sat, 13 Apr 2019 17:23:46 +0800
+Message-ID: <CACVXFVN4K3f=4mFLYjxpzWsFKyR8fDj=9gJb_OoskzFQX+bbUg@mail.gmail.com>
+Subject: Re: [PATCH V5 9/9] SCSI: don't hold device refcount in IO path
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        jianchao wang <jianchao.w.wang@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When I added bfq to Kconfig.iosched, I forgot to add the line that
-sets to yes the default value of IOSCHED_BFQ, as it is the case for
-the other two I/O schedulers. Such a piece of information is used by
-popular build systems, when making kernel configs automatically. So,
-the lack of this line for bfq makes it hard and confusing to have bfq
-in the kernel generated by these systems.
+On Sat, Apr 13, 2019 at 2:57 PM Ming Lei <ming.lei@redhat.com> wrote:
+>
+> On Fri, Apr 12, 2019 at 08:04:40PM -0400, Martin K. Petersen wrote:
+> >
+> > Ming,
+> >
+> > > scsi_device's refcount is always grabbed in IO path.
+> > >
+> > > Turns out it isn't necessary, because blk_queue_cleanup() will
+> > > drain any in-flight IOs, then cancel timeout/requeue work, and
+> > > SCSI's requeue_work is canceled too in __scsi_remove_device().
+> > >
+> > > Also scsi_device won't go away until blk_cleanup_queue() is done.
+> > >
+> > > So don't hold the refcount in IO path, especially the refcount isn't
+> > > required in IO path since blk_queue_enter() / blk_queue_exit()
+> > > is introduced in the legacy block layer.
+> >
+> > This all looks good to me. I assume it will go through Jens' tree?
+> >
+> > Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+>
+> Hi Nartin,
 
-This commit adds this missing line.
+Martin, sorry for the typo, :-(
 
-Reported-by: Anders Roxell <anders.roxell@linaro.org>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/Kconfig.iosched | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
-index 4626b88b2d5a..01d05ab68322 100644
---- a/block/Kconfig.iosched
-+++ b/block/Kconfig.iosched
-@@ -20,6 +20,7 @@ config MQ_IOSCHED_KYBER
- 
- config IOSCHED_BFQ
- 	tristate "BFQ I/O scheduler"
-+	default y
- 	---help---
- 	BFQ I/O scheduler for BLK-MQ. BFQ distributes the bandwidth of
- 	of the device among all processes according to their weights,
--- 
-2.20.1
-
+Thanks,
+Ming Lei
