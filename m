@@ -2,194 +2,134 @@ Return-Path: <SRS0=vbI/=SQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96191C10F13
-	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 16:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C72A3C10F13
+	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 20:56:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5507120896
-	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 16:52:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EBF72084D
+	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 20:56:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="CzvkC8fo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ahx3p9m2";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="EmZAHZpv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725829AbfDNQwC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Apr 2019 12:52:02 -0400
-Received: from mail.stbuehler.de ([5.9.32.208]:50604 "EHLO mail.stbuehler.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725780AbfDNQwC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Apr 2019 12:52:02 -0400
-X-Greylist: delayed 457 seconds by postgrey-1.27 at vger.kernel.org; Sun, 14 Apr 2019 12:52:00 EDT
-Received: from [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6] (unknown [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6])
-        by mail.stbuehler.de (Postfix) with ESMTPSA id CD96DC02FCA;
-        Sun, 14 Apr 2019 16:44:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=stbuehler.de;
-        s=stbuehler1; t=1555260262;
-        bh=3XyFFBlNKwOQ7hscmO0AEmqi5+VPmigYe4kWSMklXrg=;
-        h=To:From:Subject:Date:From;
-        b=CzvkC8foTOp/7XA8p3txdYi9bd6UHlRju0INHJmtP9s68TsBjhtxEec3ITbuMZdWJ
-         DdvZ3yUx4vWTknilm4NHluHN5KwX26N2s+LNqhheLvgEvudj/Y0RuqOpmjgoLnK3mj
-         pYS+rxs3pFYYO66FR8A0ONp1pUE+3S7ByovS1oY4=
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-From:   =?UTF-8?Q?Stefan_B=c3=bchler?= <source@stbuehler.de>
-Subject: io_uring memory ordering (and broken queue-is-full checks)
-Message-ID: <608965d0-84e0-4d96-8835-afab2b6f2a1a@stbuehler.de>
-Date:   Sun, 14 Apr 2019 18:44:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        id S1725829AbfDNU4r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Apr 2019 16:56:47 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:11458 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725797AbfDNU4q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 14 Apr 2019 16:56:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1555275407; x=1586811407;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=cd5ub4Pp6zbWDpqzYwWqsjd7M6n6iiMUdXyEfj2J58I=;
+  b=ahx3p9m25YO/iVt5fwjBuhAmoqQi2sqh7MrHladRHgthcIqSeurlTb6f
+   p9wfpaooCa3Tr/FUt4N8wW6Yd6UTIg89v/J2vIrB+bDCjYsKe8qGSvIgl
+   /Wj2MywKykcHdGdvak/Fr37+DQ8XDBviTSfrR8lKATw7Oo90xdfimHq1B
+   pt41/q2yzMmXl1YA1hWWpRnvV7CW+RKITHjpkJvEQd6X4EsLNgPsrAwKX
+   EahunawbWtqlW1TIWUReNOnSyYpiyzNywtUf4NB6mU6fpPuwzBQntyW+w
+   em2WZGJ4xaNDc9/DFftqsDFI7NhNCx/tKw+Fq+AoE5emuf9ukoJ1Dx3kI
+   g==;
+X-IronPort-AV: E=Sophos;i="5.60,350,1549900800"; 
+   d="scan'208";a="110901532"
+Received: from mail-dm3nam03lp2054.outbound.protection.outlook.com (HELO NAM03-DM3-obe.outbound.protection.outlook.com) ([104.47.41.54])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Apr 2019 04:56:46 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IGchLinfSRdWp3k3HGTclM56zaX7tPOwZvjBx6Q5bp0=;
+ b=EmZAHZpvIyaOhdC4Z7tA5jkGSpGfDxY3jyhL8vAlpfl4Tuu7bjSZtnxeAs8pg6KN/aDWX8WV1/iRknd+rrM1mnjiKV35KX1GPw87xbvhWCm7hJ49+TLgk9KkLaGF8D8mF/8FNV5FEsTitRxD+V51cMCErpa7CMjINtPwlWHJ3iU=
+Received: from SN6PR04MB4527.namprd04.prod.outlook.com (52.135.120.25) by
+ SN6PR04MB4957.namprd04.prod.outlook.com (52.135.114.90) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1792.14; Sun, 14 Apr 2019 20:56:39 +0000
+Received: from SN6PR04MB4527.namprd04.prod.outlook.com
+ ([fe80::c95e:c178:8d66:3703]) by SN6PR04MB4527.namprd04.prod.outlook.com
+ ([fe80::c95e:c178:8d66:3703%3]) with mapi id 15.20.1792.018; Sun, 14 Apr 2019
+ 20:56:39 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 1/3] blk-mq.c: Add documention of function
+ blk_mq_init_queue
+Thread-Topic: [PATCH 1/3] blk-mq.c: Add documention of function
+ blk_mq_init_queue
+Thread-Index: AQHU8m/HLdPDeAf/P0uPICQqO5JEvg==
+Date:   Sun, 14 Apr 2019 20:56:39 +0000
+Message-ID: <SN6PR04MB45273134A4D981D4BCBB391C862A0@SN6PR04MB4527.namprd04.prod.outlook.com>
+References: <20190414031055.26350-1-marcos.souza.org@gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.44.175]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4518c6c1-6764-4fd1-b4fd-08d6c11bb0fb
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600139)(711020)(4605104)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:SN6PR04MB4957;
+x-ms-traffictypediagnostic: SN6PR04MB4957:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <SN6PR04MB4957B6D90B8D8F269126C9B2862A0@SN6PR04MB4957.namprd04.prod.outlook.com>
+x-forefront-prvs: 00073DB75F
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(136003)(366004)(376002)(346002)(396003)(189003)(199004)(7736002)(305945005)(476003)(7696005)(99286004)(486006)(446003)(74316002)(2501003)(102836004)(53546011)(76176011)(25786009)(2906002)(6116002)(4744005)(316002)(52536014)(6506007)(3846002)(256004)(97736004)(14444005)(26005)(68736007)(14454004)(186003)(106356001)(86362001)(229853002)(54906003)(55016002)(478600001)(8676002)(53936002)(33656002)(6436002)(81166006)(4326008)(71200400001)(71190400001)(9686003)(5660300002)(8936002)(66066001)(81156014)(110136005)(105586002)(6246003)(72206003);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR04MB4957;H:SN6PR04MB4527.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: YbOVWUW9O8dsNgKgetqzt4LVyxFanvl6RZSjM6ZFbAIoReOl1gXUUs+29hcLEaRR+MFtwU33lzj6f2prggWWDknGNPZeyiRnwpJNYwz+51yFldK/8DMSbIIUb3fBWK+gJhJ3tAtDo/JxePfltSvJhz1sDm/PUSnWpb86ZBuWjIkCNnqhcGlugF3UCh6CVoRpESd9eyFYrcnumQK9sf13OO6VkQhxzwsQtw/9GBeaDeGdWItUserYP05TMt6XrDeibo30fFQejrljpfOL5D3GExauOGMaVJ0EyXx7lWlBBOe+4oBasWpR5ELknanyk94hkeFiKChUFZFA+gm/H7GUCo8WtNPZaPXAx/N9NW1DZmlDs+PySfub/mKuBRxjGimwD5AbBb6pkjIIMZaM8hf4LkgnPL5d+haVufYM9wdyquo=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4518c6c1-6764-4fd1-b4fd-08d6c11bb0fb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Apr 2019 20:56:39.5576
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4957
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
-
-For the record my review was done with commit 4443f8e6ac:
-    Merge tag 'for-linus-20190412' of git://git.kernel.dk/linux-block
-
-I'm also rather new to memory ordering problems.
-
-I didn't look into whether the CQ and the SQ need to be synced in any
-way to prevent CQ overflows; my apologies if I deemed barriers
-unnecessary if they were designed for this (to be honest though: such
-barriers should be documented accordingly).
-
-All in all the io_uring memory ordering instructions look rather broken
-to me.
-
-This starts with the initial description at the top of io_uring.c:
-
-> [...] When the application reads the CQ ring
-> tail, it must use an appropriate smp_rmb() to order with the smp_wmb()
-> the kernel uses after writing the tail. Failure to do so could cause a
-> delay in when the application notices that completion events available.
-> This isn't a fatal condition. [...]
-
-I disagree: a read barrier before reading tail is not useful, and a read
-barrier afterwards is NOT optional, otherwise you might read old CQ
-entries (this is NOT the same as getting completion events "late" - you
-get broken ones).  `smp_load_acquire(tail)` is the correct choice imho
-(although we don't need the store ordering).
-
-The kernel already uses the matching `smp_store_release` to write the CQ
-tail; the `smp_wmb()` following it is imho not needed.
-
-> [...] Likewise, the application must use an
-> appropriate smp_wmb() both before writing the SQ tail, and after writing
-> the SQ tail. The first one orders the sqe writes with the tail write, and
-> the latter is paired with the smp_rmb() the kernel will issue before
-> reading the SQ tail on submission.
-
-The write barrier before is required of course, but the one after is not
-needed imho; what would it order against? Userspace doesn't have
-significant writes after it.
-
-Again imho the correct choice here would be `smp_store_release` to write
-the tail (although we don't need the store ordering).
-
-Now to the actual code:
-
-`io_get_cqring` uses a read barrier before reading the CQ head; this
-looks unnecessary to me.  I'd again use `smp_load_acquire(head)` here,
-but I guess as the conditional depends on the load of head subsequent
-stores might already be ordered.
-
-`io_get_sqring` too uses a read barrier before reading the SQ tail,
-which looks unnecessary to me.  But this time the following reads *need*
-to be ordered after reading the SQ tail, so either a read barrier after
-reading SQ tail or `smp_load_acquire(tail)` is needed.
-
-The `smp_wmb()` at the end of `io_get_sqring` is not needed imho; the
-store to `dropped` only needs to be visible once SQ head gets written,
-which uses `smp_store_release` and already syncs previous stores.
-
-Setting `IORING_SQ_NEED_WAKEUP` in `io_sq_thread` needs a full barrier
-(`smp_mb()`) afterwards though: the store to flags needs to come before
-the load of the SQ tail.  The existing `smp_wmb()` in `io_sq_thread` and
-the `smp_rmb()` in `io_get_sqring` are NOT a full barrier (afaik).
-(This needs a full barrier in userspace too to check for.)
-
-Resetting `IORING_SQ_NEED_WAKEUP` doesn't need any barrier though: it is
-best effort anyway, and an additional wakeup must not break anything.
-
-`io_cqring_wait`: imho this can return even when `min_events` is not
-fulfilled (because userspace might read from the queue just before it
-returns).  So the only important thing is that it doesn't block once
-`min_events` events have been queued in CQ.
-
-It uses read barriers before `io_cqring_events`: the first one isn't
-needed because it isn't critical (and there is nothing to sync with),
-and `prepare_to_wait` already includes a full barrier.
-
-The `smp_rmb()` in `io_uring_poll` actually looks correct; imho
-`poll_wait` should include a read barrier (lots of usages look like they
-assume it does), but I couldn't find it.  The other end `wq_has_sleeper`
-has a full memory barrier to sync with, and the `smp_wmb()` in
-`io_commit_cqring` preceding it is not needed imho.
-
-
-The "userspace" liburing looks even worse.  For starters,
-`io_uring_get_completion` cannot safely return a pointer to the CQ entry
-*AND* increment head: you need to actually read the entry before
-incrementing head.
-
-
-Last but not least the kernel side has two lines it checks whether a
-queue is full or not and uses `tail + 1 == head`: this is only true if
-there were U32_MAX entries in the queue.  You should check `(tail -
-head) == SIZE` instead.
-
-cheers,
-Stefan
-
-PS: I'm not subscribed to the lists, so please keep me in CC when you
-expect me to read it :)
-
-PPS:
-
-I came up with some pseudo-code for the basic queue handling (as I think
-it should look like), maybe this helps:
-
-queue writer (writes tail, reads head):
-
-```
-    cached_head := load_acquire(p_head)
-    while want_write_more_entries() && (local_tail - cached_head) < SIZE:
-        entry[MASKED(local_tail++)] = ...
-    store_release(p_tail, local_tail)
-
-    // userspace: if we need to check whether kernel thread is sleeping
-    // and needs wakeup (IORING_SETUP_SQPOLL)
-    smp_barrier(); // tail store vs flags load: both read and write barrier
-    if load(p_flags) & NEED_WAKEUP:
-        wakeup_kernel_thread()
-```
-
-queue reader (writes head, reads tail):
-
-```
-    cached_tail := load_acquire(tail)
-handle_entries:
-    while want_read_more_entries() && local_head != cached_tail:
-        yield entry[MASKED(local_head++)]
-    store_release(p_head, local_head)
-
-    // kernel side: sq read thread (IORING_SETUP_SQPOLL) can go sleeping;
-    // userspace checks flag *after* storing tail whether a wakeup is needed
-    prepare_to_wait(...);
-    flags |= NEED_WAKEUP
-    smp_barrier(); // flags store vs tail load: both read and write barrier
-    cached_tail := load_acquire(tail)
-    if local_head != cached_tail:
-        flags &= ~NEED_WAKEUP
-        goto handle_entries
-    else:
-        sleep()
-```
+Looks good.=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+=0A=
+On 4/13/19 8:11 PM, Marcos Paulo de Souza wrote:=0A=
+> Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>=0A=
+> ---=0A=
+>   block/blk-mq.c | 9 +++++++++=0A=
+>   1 file changed, 9 insertions(+)=0A=
+> =0A=
+> diff --git a/block/blk-mq.c b/block/blk-mq.c=0A=
+> index 9516304a38ee..4a8277a54c03 100644=0A=
+> --- a/block/blk-mq.c=0A=
+> +++ b/block/blk-mq.c=0A=
+> @@ -2650,6 +2650,15 @@ void blk_mq_release(struct request_queue *q)=0A=
+>   	blk_mq_sysfs_deinit(q);=0A=
+>   }=0A=
+>   =0A=
+> +/**=0A=
+> + * blk_mq_init_queue - Create a new request queue associating a blk_mq_t=
+ag_set=0A=
+> + * @set: tag_set to be associated with the request queue=0A=
+> + *=0A=
+> + * Description:=0A=
+> + * This function creates a new request queue, associating @set with it.=
+=0A=
+> + *=0A=
+> + * Returns a new request queue on success, or ERR_PTR() on failure.=0A=
+> + */=0A=
+>   struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)=0A=
+>   {=0A=
+>   	struct request_queue *uninit_q, *q;=0A=
+> =0A=
+=0A=
