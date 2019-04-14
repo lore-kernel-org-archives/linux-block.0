@@ -2,209 +2,194 @@ Return-Path: <SRS0=vbI/=SQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.7 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3DEFC10F13
-	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 16:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96191C10F13
+	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 16:52:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B37062084E
-	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 16:48:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5507120896
+	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 16:52:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="CzvkC8fo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727177AbfDNQsH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Apr 2019 12:48:07 -0400
-Received: from mail-it1-f197.google.com ([209.85.166.197]:39000 "EHLO
-        mail-it1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726355AbfDNQsG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Apr 2019 12:48:06 -0400
-Received: by mail-it1-f197.google.com with SMTP id z125so13753003itf.4
-        for <linux-block@vger.kernel.org>; Sun, 14 Apr 2019 09:48:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=mSSjFCuhcv8r/pTSYyS6CPzjHpZzHqNcR6G/1+sloD4=;
-        b=JKSPRuAfi+UGT895ZPWRUG36XHNF11c0BWfnrOyOPSvSaxiA7VeyzcvoU0gEnFRipc
-         lpwzH+dfm21ROdnyV1AHLTDo5Y7MjjL72CDkhamQpiNRLuU3r5soeKB4d8n2mXbBvLNH
-         470tJbCe+6CadM5HPadyNbEENxcQa1FPU6cmVB2Gyd2xmgAGz+l5id9poOmeEAaBIU3U
-         xq+oejQI7VIUOQd8mEwnlHC/shJzaXAFvWwBT6ocEDC+le6vehGtzL//3odf/6MpcHEa
-         CTRK8AoT4zbrhGaifP0j9WCl3ShZ9O96SNgjlcMZo19JLfVlbDph6QQOeGMxX3Vo27zY
-         CwmQ==
-X-Gm-Message-State: APjAAAVIWDgjF6TA1Y9hWu1q6JhZu65h4i02dy/h/S2/0NrQ2kFzrQed
-        nVZdpCEB5K29XY9QzgHmtv5NQZsbESxFvnbNDQX1UJT8qjDK
-X-Google-Smtp-Source: APXvYqzLw3qWcBz98OKceFOokavxKmPolyxPUvNqvWnPrcw/soASAU3lDGzxyMatLYA8xrdp5ZWsXxH5VGHJ5IactQ6UQ2KiD/+u
+        id S1725829AbfDNQwC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Apr 2019 12:52:02 -0400
+Received: from mail.stbuehler.de ([5.9.32.208]:50604 "EHLO mail.stbuehler.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725780AbfDNQwC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 14 Apr 2019 12:52:02 -0400
+X-Greylist: delayed 457 seconds by postgrey-1.27 at vger.kernel.org; Sun, 14 Apr 2019 12:52:00 EDT
+Received: from [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6] (unknown [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6])
+        by mail.stbuehler.de (Postfix) with ESMTPSA id CD96DC02FCA;
+        Sun, 14 Apr 2019 16:44:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=stbuehler.de;
+        s=stbuehler1; t=1555260262;
+        bh=3XyFFBlNKwOQ7hscmO0AEmqi5+VPmigYe4kWSMklXrg=;
+        h=To:From:Subject:Date:From;
+        b=CzvkC8foTOp/7XA8p3txdYi9bd6UHlRju0INHJmtP9s68TsBjhtxEec3ITbuMZdWJ
+         DdvZ3yUx4vWTknilm4NHluHN5KwX26N2s+LNqhheLvgEvudj/Y0RuqOpmjgoLnK3mj
+         pYS+rxs3pFYYO66FR8A0ONp1pUE+3S7ByovS1oY4=
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+From:   =?UTF-8?Q?Stefan_B=c3=bchler?= <source@stbuehler.de>
+Subject: io_uring memory ordering (and broken queue-is-full checks)
+Message-ID: <608965d0-84e0-4d96-8835-afab2b6f2a1a@stbuehler.de>
+Date:   Sun, 14 Apr 2019 18:44:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Received: by 2002:a24:d603:: with SMTP id o3mr5706347itg.17.1555260486031;
- Sun, 14 Apr 2019 09:48:06 -0700 (PDT)
-Date:   Sun, 14 Apr 2019 09:48:06 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000cda1680586804c05@google.com>
-Subject: KASAN: use-after-free Read in blkcg_print_stat
-From:   syzbot <syzbot+18a2377b010d621c950e@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Hi all,
 
-syzbot found the following crash on:
+For the record my review was done with commit 4443f8e6ac:
+    Merge tag 'for-linus-20190412' of git://git.kernel.dk/linux-block
 
-HEAD commit:    4443f8e6 Merge tag 'for-linus-20190412' of git://git.kerne..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1225b1fd200000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4fb64439e07a1ec0
-dashboard link: https://syzkaller.appspot.com/bug?extid=18a2377b010d621c950e
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+I'm also rather new to memory ordering problems.
 
-Unfortunately, I don't have any reproducer for this crash yet.
+I didn't look into whether the CQ and the SQ need to be synced in any
+way to prevent CQ overflows; my apologies if I deemed barriers
+unnecessary if they were designed for this (to be honest though: such
+barriers should be documented accordingly).
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+18a2377b010d621c950e@syzkaller.appspotmail.com
+All in all the io_uring memory ordering instructions look rather broken
+to me.
 
-==================================================================
-BUG: KASAN: use-after-free in dev_name include/linux/device.h:1087 [inline]
-BUG: KASAN: use-after-free in blkg_dev_name block/blk-cgroup.c:477 [inline]
-BUG: KASAN: use-after-free in blkcg_print_stat+0xa27/0xb30  
-block/blk-cgroup.c:947
-Read of size 8 at addr ffff8880928a3490 by task syz-executor.0/31903
+This starts with the initial description at the top of io_uring.c:
 
-CPU: 1 PID: 31903 Comm: syz-executor.0 Not tainted 5.1.0-rc4+ #69
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
-  print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
-  kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
-  __asan_report_load8_noabort+0x14/0x20 mm/kasan/generic_report.c:132
-  dev_name include/linux/device.h:1087 [inline]
-  blkg_dev_name block/blk-cgroup.c:477 [inline]
-  blkcg_print_stat+0xa27/0xb30 block/blk-cgroup.c:947
-  cgroup_seqfile_show+0x1aa/0x310 kernel/cgroup/cgroup.c:3612
-  kernfs_seq_show+0x155/0x1b0 fs/kernfs/file.c:168
-  seq_read+0x4db/0x1130 fs/seq_file.c:229
-  kernfs_fop_read+0xed/0x560 fs/kernfs/file.c:252
-  do_loop_readv_writev fs/read_write.c:701 [inline]
-  do_loop_readv_writev fs/read_write.c:688 [inline]
-  do_iter_read+0x4a9/0x660 fs/read_write.c:922
-  vfs_readv+0xf0/0x160 fs/read_write.c:984
-  do_readv+0x15e/0x370 fs/read_write.c:1017
-  __do_sys_readv fs/read_write.c:1104 [inline]
-  __se_sys_readv fs/read_write.c:1101 [inline]
-  __x64_sys_readv+0x75/0xb0 fs/read_write.c:1101
-  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x458c29
-Code: ad b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 7b b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007f4b93306c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000013
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000458c29
-RDX: 000000000000017c RSI: 00000000200002c0 RDI: 0000000000000004
-RBP: 000000000073bf00 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f4b933076d4
-R13: 00000000004c5985 R14: 00000000004d9fe0 R15: 00000000ffffffff
+> [...] When the application reads the CQ ring
+> tail, it must use an appropriate smp_rmb() to order with the smp_wmb()
+> the kernel uses after writing the tail. Failure to do so could cause a
+> delay in when the application notices that completion events available.
+> This isn't a fatal condition. [...]
 
-Allocated by task 7596:
-  save_stack+0x45/0xd0 mm/kasan/common.c:75
-  set_track mm/kasan/common.c:87 [inline]
-  __kasan_kmalloc mm/kasan/common.c:497 [inline]
-  __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:470
-  kasan_kmalloc+0x9/0x10 mm/kasan/common.c:511
-  kmem_cache_alloc_trace+0x151/0x760 mm/slab.c:3623
-  kmalloc include/linux/slab.h:547 [inline]
-  kzalloc include/linux/slab.h:742 [inline]
-  device_create_groups_vargs+0x8e/0x270 drivers/base/core.c:2693
-  device_create_vargs+0x45/0x60 drivers/base/core.c:2751
-  bdi_register_va.part.0+0x38/0x740 mm/backing-dev.c:882
-  bdi_register_va mm/backing-dev.c:910 [inline]
-  bdi_register+0x12a/0x140 mm/backing-dev.c:907
-  bdi_register_owner+0x61/0x110 mm/backing-dev.c:917
-  __device_add_disk+0xd72/0x1170 block/genhd.c:717
-  device_add_disk+0x2b/0x40 block/genhd.c:741
-  add_disk include/linux/genhd.h:422 [inline]
-  loop_add+0x635/0x8d0 drivers/block/loop.c:2013
-  loop_probe+0x161/0x1a0 drivers/block/loop.c:2085
-  kobj_lookup+0x265/0x460 drivers/base/map.c:124
-  get_gendisk+0x4d/0x380 block/genhd.c:849
-  bdev_get_gendisk fs/block_dev.c:1122 [inline]
-  __blkdev_get+0x45a/0x1660 fs/block_dev.c:1508
-  blkdev_get+0xc4/0x990 fs/block_dev.c:1667
-  blkdev_open+0x205/0x290 fs/block_dev.c:1825
-  do_dentry_open+0x4e2/0x1250 fs/open.c:777
-  vfs_open+0xa0/0xd0 fs/open.c:886
-  do_last fs/namei.c:3416 [inline]
-  path_openat+0x10e9/0x46e0 fs/namei.c:3533
-  do_filp_open+0x1a1/0x280 fs/namei.c:3563
-  do_sys_open+0x3fe/0x5d0 fs/open.c:1069
-  __do_sys_open fs/open.c:1087 [inline]
-  __se_sys_open fs/open.c:1082 [inline]
-  __x64_sys_open+0x7e/0xc0 fs/open.c:1082
-  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+I disagree: a read barrier before reading tail is not useful, and a read
+barrier afterwards is NOT optional, otherwise you might read old CQ
+entries (this is NOT the same as getting completion events "late" - you
+get broken ones).  `smp_load_acquire(tail)` is the correct choice imho
+(although we don't need the store ordering).
 
-Freed by task 31901:
-  save_stack+0x45/0xd0 mm/kasan/common.c:75
-  set_track mm/kasan/common.c:87 [inline]
-  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:459
-  kasan_slab_free+0xe/0x10 mm/kasan/common.c:467
-  __cache_free mm/slab.c:3500 [inline]
-  kfree+0xcf/0x230 mm/slab.c:3823
-  device_create_release+0x16/0x20 drivers/base/cpu.c:409
-  device_release+0x7d/0x210 drivers/base/core.c:1064
-  kobject_cleanup lib/kobject.c:662 [inline]
-  kobject_release lib/kobject.c:691 [inline]
-  kref_put include/linux/kref.h:67 [inline]
-  kobject_put.cold+0x28f/0x2ec lib/kobject.c:708
-  put_device drivers/base/core.c:2205 [inline]
-  device_unregister+0x28/0x30 drivers/base/core.c:2302
-  bdi_unregister+0x41c/0x5e0 mm/backing-dev.c:949
-  del_gendisk+0x8a5/0xa90 block/genhd.c:788
-  loop_remove+0x3c/0xd0 drivers/block/loop.c:2031
-  loop_control_ioctl drivers/block/loop.c:2130 [inline]
-  loop_control_ioctl+0x320/0x360 drivers/block/loop.c:2096
-  vfs_ioctl fs/ioctl.c:46 [inline]
-  file_ioctl fs/ioctl.c:509 [inline]
-  do_vfs_ioctl+0xd6e/0x1390 fs/ioctl.c:696
-  ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
-  __do_sys_ioctl fs/ioctl.c:720 [inline]
-  __se_sys_ioctl fs/ioctl.c:718 [inline]
-  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
-  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+The kernel already uses the matching `smp_store_release` to write the CQ
+tail; the `smp_wmb()` following it is imho not needed.
 
-The buggy address belongs to the object at ffff8880928a3440
-  which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 80 bytes inside of
-  2048-byte region [ffff8880928a3440, ffff8880928a3c40)
-The buggy address belongs to the page:
-page:ffffea00024a2880 count:1 mapcount:0 mapping:ffff88812c3f0c40  
-index:0xffff8880928a2bc0 compound_mapcount: 0
-flags: 0x1fffc0000010200(slab|head)
-raw: 01fffc0000010200 ffffea0002611f08 ffffea0002476788 ffff88812c3f0c40
-raw: ffff8880928a2bc0 ffff8880928a2340 0000000100000002 0000000000000000
-page dumped because: kasan: bad access detected
+> [...] Likewise, the application must use an
+> appropriate smp_wmb() both before writing the SQ tail, and after writing
+> the SQ tail. The first one orders the sqe writes with the tail write, and
+> the latter is paired with the smp_rmb() the kernel will issue before
+> reading the SQ tail on submission.
 
-Memory state around the buggy address:
-  ffff8880928a3380: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-  ffff8880928a3400: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
-> ffff8880928a3480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                          ^
-  ffff8880928a3500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff8880928a3580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+The write barrier before is required of course, but the one after is not
+needed imho; what would it order against? Userspace doesn't have
+significant writes after it.
+
+Again imho the correct choice here would be `smp_store_release` to write
+the tail (although we don't need the store ordering).
+
+Now to the actual code:
+
+`io_get_cqring` uses a read barrier before reading the CQ head; this
+looks unnecessary to me.  I'd again use `smp_load_acquire(head)` here,
+but I guess as the conditional depends on the load of head subsequent
+stores might already be ordered.
+
+`io_get_sqring` too uses a read barrier before reading the SQ tail,
+which looks unnecessary to me.  But this time the following reads *need*
+to be ordered after reading the SQ tail, so either a read barrier after
+reading SQ tail or `smp_load_acquire(tail)` is needed.
+
+The `smp_wmb()` at the end of `io_get_sqring` is not needed imho; the
+store to `dropped` only needs to be visible once SQ head gets written,
+which uses `smp_store_release` and already syncs previous stores.
+
+Setting `IORING_SQ_NEED_WAKEUP` in `io_sq_thread` needs a full barrier
+(`smp_mb()`) afterwards though: the store to flags needs to come before
+the load of the SQ tail.  The existing `smp_wmb()` in `io_sq_thread` and
+the `smp_rmb()` in `io_get_sqring` are NOT a full barrier (afaik).
+(This needs a full barrier in userspace too to check for.)
+
+Resetting `IORING_SQ_NEED_WAKEUP` doesn't need any barrier though: it is
+best effort anyway, and an additional wakeup must not break anything.
+
+`io_cqring_wait`: imho this can return even when `min_events` is not
+fulfilled (because userspace might read from the queue just before it
+returns).  So the only important thing is that it doesn't block once
+`min_events` events have been queued in CQ.
+
+It uses read barriers before `io_cqring_events`: the first one isn't
+needed because it isn't critical (and there is nothing to sync with),
+and `prepare_to_wait` already includes a full barrier.
+
+The `smp_rmb()` in `io_uring_poll` actually looks correct; imho
+`poll_wait` should include a read barrier (lots of usages look like they
+assume it does), but I couldn't find it.  The other end `wq_has_sleeper`
+has a full memory barrier to sync with, and the `smp_wmb()` in
+`io_commit_cqring` preceding it is not needed imho.
 
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+The "userspace" liburing looks even worse.  For starters,
+`io_uring_get_completion` cannot safely return a pointer to the CQ entry
+*AND* increment head: you need to actually read the entry before
+incrementing head.
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+Last but not least the kernel side has two lines it checks whether a
+queue is full or not and uses `tail + 1 == head`: this is only true if
+there were U32_MAX entries in the queue.  You should check `(tail -
+head) == SIZE` instead.
+
+cheers,
+Stefan
+
+PS: I'm not subscribed to the lists, so please keep me in CC when you
+expect me to read it :)
+
+PPS:
+
+I came up with some pseudo-code for the basic queue handling (as I think
+it should look like), maybe this helps:
+
+queue writer (writes tail, reads head):
+
+```
+    cached_head := load_acquire(p_head)
+    while want_write_more_entries() && (local_tail - cached_head) < SIZE:
+        entry[MASKED(local_tail++)] = ...
+    store_release(p_tail, local_tail)
+
+    // userspace: if we need to check whether kernel thread is sleeping
+    // and needs wakeup (IORING_SETUP_SQPOLL)
+    smp_barrier(); // tail store vs flags load: both read and write barrier
+    if load(p_flags) & NEED_WAKEUP:
+        wakeup_kernel_thread()
+```
+
+queue reader (writes head, reads tail):
+
+```
+    cached_tail := load_acquire(tail)
+handle_entries:
+    while want_read_more_entries() && local_head != cached_tail:
+        yield entry[MASKED(local_head++)]
+    store_release(p_head, local_head)
+
+    // kernel side: sq read thread (IORING_SETUP_SQPOLL) can go sleeping;
+    // userspace checks flag *after* storing tail whether a wakeup is needed
+    prepare_to_wait(...);
+    flags |= NEED_WAKEUP
+    smp_barrier(); // flags store vs tail load: both read and write barrier
+    cached_tail := load_acquire(tail)
+    if local_head != cached_tail:
+        flags &= ~NEED_WAKEUP
+        goto handle_entries
+    else:
+        sleep()
+```
