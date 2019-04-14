@@ -2,50 +2,49 @@ Return-Path: <SRS0=vbI/=SQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3061AC10F13
-	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 16:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3DEFC10F13
+	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 16:48:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0120D20693
-	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 16:42:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B37062084E
+	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 16:48:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbfDNQmH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Apr 2019 12:42:07 -0400
-Received: from mail-it1-f197.google.com ([209.85.166.197]:56394 "EHLO
+        id S1727177AbfDNQsH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Apr 2019 12:48:07 -0400
+Received: from mail-it1-f197.google.com ([209.85.166.197]:39000 "EHLO
         mail-it1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726159AbfDNQmH (ORCPT
+        with ESMTP id S1726355AbfDNQsG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Apr 2019 12:42:07 -0400
-Received: by mail-it1-f197.google.com with SMTP id s21so14304785ite.6
-        for <linux-block@vger.kernel.org>; Sun, 14 Apr 2019 09:42:06 -0700 (PDT)
+        Sun, 14 Apr 2019 12:48:06 -0400
+Received: by mail-it1-f197.google.com with SMTP id z125so13753003itf.4
+        for <linux-block@vger.kernel.org>; Sun, 14 Apr 2019 09:48:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=r+Qr4jZyW79WGL/BfJtQpxRO1LNuAzql4OucEtTkgLc=;
-        b=ngGPNO9OXk8mwsYJHBVkZPtmuIuQGjmwqHrmBHYU8ECZw+oqA4LxbmLBtHvxR7+1RP
-         MxN9x7mEHK19Pn8fXo1Aqcp3hz2qkBdqxommdr282C23EEbXo8IkAfa5yhww0HYsCira
-         dja47B13uEPiTiBJG1+ATrEZGjKQYGDl9JcnYMjZUI98wWlOX3Z5MTyBzXhil77rXgPP
-         45IRy+XbX/rD6EUMHh9UNn3IpCzfrLnXp+utqUnCo2nU3wuNONxBdH+NaX6VLPSYlGF3
-         GAnOooBNztkiLDDApwsOIXQyIzxRoSrwmrMW3wxCEDAheL2oGC0U++jBj8rYjKeHioX4
-         jT3A==
-X-Gm-Message-State: APjAAAWsjdBkgDEWTKWzc8s3RIDrUJ9aXz1KoDVoGQ7S0PxXPaTQDkw3
-        4nAm3P8HgFZMDqRNtzvh6bk6o8wTgnhy7fZcv0gVsODa8XZ3
-X-Google-Smtp-Source: APXvYqwsh4hl6evIqF7z9nmn6xPb8mzJSDvEL/lT9ufy51+yf3t/PAhjSeFSaFNmeI/YUHtYXmGdCBze4UUudZIpNUzXD9LUJaag
+        bh=mSSjFCuhcv8r/pTSYyS6CPzjHpZzHqNcR6G/1+sloD4=;
+        b=JKSPRuAfi+UGT895ZPWRUG36XHNF11c0BWfnrOyOPSvSaxiA7VeyzcvoU0gEnFRipc
+         lpwzH+dfm21ROdnyV1AHLTDo5Y7MjjL72CDkhamQpiNRLuU3r5soeKB4d8n2mXbBvLNH
+         470tJbCe+6CadM5HPadyNbEENxcQa1FPU6cmVB2Gyd2xmgAGz+l5id9poOmeEAaBIU3U
+         xq+oejQI7VIUOQd8mEwnlHC/shJzaXAFvWwBT6ocEDC+le6vehGtzL//3odf/6MpcHEa
+         CTRK8AoT4zbrhGaifP0j9WCl3ShZ9O96SNgjlcMZo19JLfVlbDph6QQOeGMxX3Vo27zY
+         CwmQ==
+X-Gm-Message-State: APjAAAVIWDgjF6TA1Y9hWu1q6JhZu65h4i02dy/h/S2/0NrQ2kFzrQed
+        nVZdpCEB5K29XY9QzgHmtv5NQZsbESxFvnbNDQX1UJT8qjDK
+X-Google-Smtp-Source: APXvYqzLw3qWcBz98OKceFOokavxKmPolyxPUvNqvWnPrcw/soASAU3lDGzxyMatLYA8xrdp5ZWsXxH5VGHJ5IactQ6UQ2KiD/+u
 MIME-Version: 1.0
-X-Received: by 2002:a24:3d8e:: with SMTP id n136mr5838434itn.3.1555260125982;
- Sun, 14 Apr 2019 09:42:05 -0700 (PDT)
-Date:   Sun, 14 Apr 2019 09:42:05 -0700
+X-Received: by 2002:a24:d603:: with SMTP id o3mr5706347itg.17.1555260486031;
+ Sun, 14 Apr 2019 09:48:06 -0700 (PDT)
+Date:   Sun, 14 Apr 2019 09:48:06 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000057bb08058680371f@google.com>
-Subject: INFO: task hung in __x64_sys_io_uring_enter
-From:   syzbot <syzbot+91ba19608804b5c53ca7@syzkaller.appspotmail.com>
+Message-ID: <000000000000cda1680586804c05@google.com>
+Subject: KASAN: use-after-free Read in blkcg_print_stat
+From:   syzbot <syzbot+18a2377b010d621c950e@syzkaller.appspotmail.com>
 To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -56,147 +55,150 @@ Hello,
 
 syzbot found the following crash on:
 
-HEAD commit:    bcb67f0f Add linux-next specific files for 20190412
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c15fc3200000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=35c479ecf64ba753
-dashboard link: https://syzkaller.appspot.com/bug?extid=91ba19608804b5c53ca7
+HEAD commit:    4443f8e6 Merge tag 'for-linus-20190412' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1225b1fd200000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4fb64439e07a1ec0
+dashboard link: https://syzkaller.appspot.com/bug?extid=18a2377b010d621c950e
 compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
 
 Unfortunately, I don't have any reproducer for this crash yet.
 
 IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+91ba19608804b5c53ca7@syzkaller.appspotmail.com
+Reported-by: syzbot+18a2377b010d621c950e@syzkaller.appspotmail.com
 
-INFO: task syz-executor.3:27713 blocked for more than 143 seconds.
-       Not tainted 5.1.0-rc4-next-20190412 #24
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-syz-executor.3  D29480 27713   7953 0x00000004
-Call Trace:
-  context_switch kernel/sched/core.c:2877 [inline]
-  __schedule+0x817/0x1cc0 kernel/sched/core.c:3518
-  schedule+0x92/0x180 kernel/sched/core.c:3562
-  schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:3620
-  __mutex_lock_common kernel/locking/mutex.c:1002 [inline]
-  __mutex_lock+0x726/0x1310 kernel/locking/mutex.c:1072
-  mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:1087
-  __do_sys_io_uring_enter fs/io_uring.c:2697 [inline]
-  __se_sys_io_uring_enter fs/io_uring.c:2634 [inline]
-  __x64_sys_io_uring_enter+0x7de/0xac0 fs/io_uring.c:2634
-  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x458c29
-Code: cc 64 48 8b 0c 25 f8 ff ff ff 48 3b 61 10 0f 86 df 00 00 00 48 83 ec  
-30 48 89 6c 24 28 48 8d 6c 24 28 48 8b 42 08 48 8b 48 70 <48> 89 4c 24 20  
-48 8b 10 48 89 54 24 18 48 8b 40 08 48 89 44 24 10
-RSP: 002b:00007f6f44f0ec78 EFLAGS: 00000246 ORIG_RAX: 00000000000001aa
-RAX: ffffffffffffffda RBX: 0000000000000006 RCX: 0000000000458c29
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 000000000073bf00 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000003 R11: 0000000000000246 R12: 00007f6f44f0f6d4
-R13: 00000000004bfe3c R14: 00000000004d2120 R15: 00000000ffffffff
-INFO: task syz-executor.3:27724 blocked for more than 143 seconds.
-       Not tainted 5.1.0-rc4-next-20190412 #24
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-syz-executor.3  D30320 27724   7953 0x00000004
-Call Trace:
-  context_switch kernel/sched/core.c:2877 [inline]
-  __schedule+0x817/0x1cc0 kernel/sched/core.c:3518
-  schedule+0x92/0x180 kernel/sched/core.c:3562
-  schedule_timeout+0x717/0xc50 kernel/time/timer.c:1783
-  do_wait_for_common kernel/sched/completion.c:83 [inline]
-  __wait_for_common kernel/sched/completion.c:104 [inline]
-  wait_for_common kernel/sched/completion.c:115 [inline]
-  wait_for_completion+0x29c/0x440 kernel/sched/completion.c:136
-  __io_uring_register+0xb6/0x1fd0 fs/io_uring.c:2926
-  __do_sys_io_uring_register fs/io_uring.c:2976 [inline]
-  __se_sys_io_uring_register fs/io_uring.c:2958 [inline]
-  __x64_sys_io_uring_register+0x193/0x1f0 fs/io_uring.c:2958
-  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x458c29
-Code: cc 64 48 8b 0c 25 f8 ff ff ff 48 3b 61 10 0f 86 df 00 00 00 48 83 ec  
-30 48 89 6c 24 28 48 8d 6c 24 28 48 8b 42 08 48 8b 48 70 <48> 89 4c 24 20  
-48 8b 10 48 89 54 24 18 48 8b 40 08 48 89 44 24 10
-RSP: 002b:00007f6f44eccc78 EFLAGS: 00000246 ORIG_RAX: 00000000000001ab
-RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 0000000000458c29
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000003
-RBP: 000000000073c040 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f6f44ecd6d4
-R13: 00000000004cb6f0 R14: 00000000004d2168 R15: 00000000ffffffff
+==================================================================
+BUG: KASAN: use-after-free in dev_name include/linux/device.h:1087 [inline]
+BUG: KASAN: use-after-free in blkg_dev_name block/blk-cgroup.c:477 [inline]
+BUG: KASAN: use-after-free in blkcg_print_stat+0xa27/0xb30  
+block/blk-cgroup.c:947
+Read of size 8 at addr ffff8880928a3490 by task syz-executor.0/31903
 
-Showing all locks held in the system:
-1 lock held by khungtaskd/1041:
-  #0: 00000000646c174a (rcu_read_lock){....}, at:  
-debug_show_all_locks+0x5f/0x27e kernel/locking/lockdep.c:5061
-2 locks held by getty/7909:
-  #0: 000000004ed5ef6e (&tty->ldisc_sem){++++}, at:  
-ldsem_down_read+0x33/0x40 drivers/tty/tty_ldsem.c:341
-  #1: 0000000015f069f9 (&ldata->atomic_read_lock){+.+.}, at:  
-n_tty_read+0x232/0x1b70 drivers/tty/n_tty.c:2156
-2 locks held by getty/7910:
-  #0: 0000000028dc5235 (&tty->ldisc_sem){++++}, at:  
-ldsem_down_read+0x33/0x40 drivers/tty/tty_ldsem.c:341
-  #1: 000000003e5c2584 (&ldata->atomic_read_lock){+.+.}, at:  
-n_tty_read+0x232/0x1b70 drivers/tty/n_tty.c:2156
-2 locks held by getty/7911:
-  #0: 0000000009c1d545 (&tty->ldisc_sem){++++}, at:  
-ldsem_down_read+0x33/0x40 drivers/tty/tty_ldsem.c:341
-  #1: 0000000097341bd0 (&ldata->atomic_read_lock){+.+.}, at:  
-n_tty_read+0x232/0x1b70 drivers/tty/n_tty.c:2156
-2 locks held by getty/7912:
-  #0: 00000000e304bd09 (&tty->ldisc_sem){++++}, at:  
-ldsem_down_read+0x33/0x40 drivers/tty/tty_ldsem.c:341
-  #1: 00000000fbaacf70 (&ldata->atomic_read_lock){+.+.}, at:  
-n_tty_read+0x232/0x1b70 drivers/tty/n_tty.c:2156
-2 locks held by getty/7913:
-  #0: 00000000aac8c1e7 (&tty->ldisc_sem){++++}, at:  
-ldsem_down_read+0x33/0x40 drivers/tty/tty_ldsem.c:341
-  #1: 00000000eb37cc5c (&ldata->atomic_read_lock){+.+.}, at:  
-n_tty_read+0x232/0x1b70 drivers/tty/n_tty.c:2156
-2 locks held by getty/7914:
-  #0: 00000000dd76f9bc (&tty->ldisc_sem){++++}, at:  
-ldsem_down_read+0x33/0x40 drivers/tty/tty_ldsem.c:341
-  #1: 000000003dfcb9c8 (&ldata->atomic_read_lock){+.+.}, at:  
-n_tty_read+0x232/0x1b70 drivers/tty/n_tty.c:2156
-2 locks held by getty/7915:
-  #0: 00000000859ecc38 (&tty->ldisc_sem){++++}, at:  
-ldsem_down_read+0x33/0x40 drivers/tty/tty_ldsem.c:341
-  #1: 0000000086483d71 (&ldata->atomic_read_lock){+.+.}, at:  
-n_tty_read+0x232/0x1b70 drivers/tty/n_tty.c:2156
-1 lock held by syz-executor.3/27713:
-  #0: 0000000060ca5ec1 (&ctx->uring_lock){+.+.}, at: __do_sys_io_uring_enter  
-fs/io_uring.c:2697 [inline]
-  #0: 0000000060ca5ec1 (&ctx->uring_lock){+.+.}, at: __se_sys_io_uring_enter  
-fs/io_uring.c:2634 [inline]
-  #0: 0000000060ca5ec1 (&ctx->uring_lock){+.+.}, at:  
-__x64_sys_io_uring_enter+0x7de/0xac0 fs/io_uring.c:2634
-1 lock held by syz-executor.3/27724:
-  #0: 0000000060ca5ec1 (&ctx->uring_lock){+.+.}, at:  
-__do_sys_io_uring_register fs/io_uring.c:2975 [inline]
-  #0: 0000000060ca5ec1 (&ctx->uring_lock){+.+.}, at:  
-__se_sys_io_uring_register fs/io_uring.c:2958 [inline]
-  #0: 0000000060ca5ec1 (&ctx->uring_lock){+.+.}, at:  
-__x64_sys_io_uring_register+0x182/0x1f0 fs/io_uring.c:2958
-
-=============================================
-
-NMI backtrace for cpu 1
-CPU: 1 PID: 1041 Comm: khungtaskd Not tainted 5.1.0-rc4-next-20190412 #24
+CPU: 1 PID: 31903 Comm: syz-executor.0 Not tainted 5.1.0-rc4+ #69
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
 Google 01/01/2011
 Call Trace:
   __dump_stack lib/dump_stack.c:77 [inline]
   dump_stack+0x172/0x1f0 lib/dump_stack.c:113
-  nmi_cpu_backtrace.cold+0x63/0xa4 lib/nmi_backtrace.c:101
-  nmi_trigger_cpumask_backtrace+0x1be/0x236 lib/nmi_backtrace.c:62
-  arch_trigger_cpumask_backtrace+0x14/0x20 arch/x86/kernel/apic/hw_nmi.c:38
-  trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
-  check_hung_uninterruptible_tasks kernel/hung_task.c:204 [inline]
-  watchdog+0x9b7/0xec0 kernel/hung_task.c:288
-  kthread+0x357/0x430 kernel/kthread.c:254
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
-Sending NMI from CPU 1 to CPUs 0:
+  print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
+  kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
+  __asan_report_load8_noabort+0x14/0x20 mm/kasan/generic_report.c:132
+  dev_name include/linux/device.h:1087 [inline]
+  blkg_dev_name block/blk-cgroup.c:477 [inline]
+  blkcg_print_stat+0xa27/0xb30 block/blk-cgroup.c:947
+  cgroup_seqfile_show+0x1aa/0x310 kernel/cgroup/cgroup.c:3612
+  kernfs_seq_show+0x155/0x1b0 fs/kernfs/file.c:168
+  seq_read+0x4db/0x1130 fs/seq_file.c:229
+  kernfs_fop_read+0xed/0x560 fs/kernfs/file.c:252
+  do_loop_readv_writev fs/read_write.c:701 [inline]
+  do_loop_readv_writev fs/read_write.c:688 [inline]
+  do_iter_read+0x4a9/0x660 fs/read_write.c:922
+  vfs_readv+0xf0/0x160 fs/read_write.c:984
+  do_readv+0x15e/0x370 fs/read_write.c:1017
+  __do_sys_readv fs/read_write.c:1104 [inline]
+  __se_sys_readv fs/read_write.c:1101 [inline]
+  __x64_sys_readv+0x75/0xb0 fs/read_write.c:1101
+  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x458c29
+Code: ad b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
+ff 0f 83 7b b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007f4b93306c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000013
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000458c29
+RDX: 000000000000017c RSI: 00000000200002c0 RDI: 0000000000000004
+RBP: 000000000073bf00 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f4b933076d4
+R13: 00000000004c5985 R14: 00000000004d9fe0 R15: 00000000ffffffff
+
+Allocated by task 7596:
+  save_stack+0x45/0xd0 mm/kasan/common.c:75
+  set_track mm/kasan/common.c:87 [inline]
+  __kasan_kmalloc mm/kasan/common.c:497 [inline]
+  __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:470
+  kasan_kmalloc+0x9/0x10 mm/kasan/common.c:511
+  kmem_cache_alloc_trace+0x151/0x760 mm/slab.c:3623
+  kmalloc include/linux/slab.h:547 [inline]
+  kzalloc include/linux/slab.h:742 [inline]
+  device_create_groups_vargs+0x8e/0x270 drivers/base/core.c:2693
+  device_create_vargs+0x45/0x60 drivers/base/core.c:2751
+  bdi_register_va.part.0+0x38/0x740 mm/backing-dev.c:882
+  bdi_register_va mm/backing-dev.c:910 [inline]
+  bdi_register+0x12a/0x140 mm/backing-dev.c:907
+  bdi_register_owner+0x61/0x110 mm/backing-dev.c:917
+  __device_add_disk+0xd72/0x1170 block/genhd.c:717
+  device_add_disk+0x2b/0x40 block/genhd.c:741
+  add_disk include/linux/genhd.h:422 [inline]
+  loop_add+0x635/0x8d0 drivers/block/loop.c:2013
+  loop_probe+0x161/0x1a0 drivers/block/loop.c:2085
+  kobj_lookup+0x265/0x460 drivers/base/map.c:124
+  get_gendisk+0x4d/0x380 block/genhd.c:849
+  bdev_get_gendisk fs/block_dev.c:1122 [inline]
+  __blkdev_get+0x45a/0x1660 fs/block_dev.c:1508
+  blkdev_get+0xc4/0x990 fs/block_dev.c:1667
+  blkdev_open+0x205/0x290 fs/block_dev.c:1825
+  do_dentry_open+0x4e2/0x1250 fs/open.c:777
+  vfs_open+0xa0/0xd0 fs/open.c:886
+  do_last fs/namei.c:3416 [inline]
+  path_openat+0x10e9/0x46e0 fs/namei.c:3533
+  do_filp_open+0x1a1/0x280 fs/namei.c:3563
+  do_sys_open+0x3fe/0x5d0 fs/open.c:1069
+  __do_sys_open fs/open.c:1087 [inline]
+  __se_sys_open fs/open.c:1082 [inline]
+  __x64_sys_open+0x7e/0xc0 fs/open.c:1082
+  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+
+Freed by task 31901:
+  save_stack+0x45/0xd0 mm/kasan/common.c:75
+  set_track mm/kasan/common.c:87 [inline]
+  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:459
+  kasan_slab_free+0xe/0x10 mm/kasan/common.c:467
+  __cache_free mm/slab.c:3500 [inline]
+  kfree+0xcf/0x230 mm/slab.c:3823
+  device_create_release+0x16/0x20 drivers/base/cpu.c:409
+  device_release+0x7d/0x210 drivers/base/core.c:1064
+  kobject_cleanup lib/kobject.c:662 [inline]
+  kobject_release lib/kobject.c:691 [inline]
+  kref_put include/linux/kref.h:67 [inline]
+  kobject_put.cold+0x28f/0x2ec lib/kobject.c:708
+  put_device drivers/base/core.c:2205 [inline]
+  device_unregister+0x28/0x30 drivers/base/core.c:2302
+  bdi_unregister+0x41c/0x5e0 mm/backing-dev.c:949
+  del_gendisk+0x8a5/0xa90 block/genhd.c:788
+  loop_remove+0x3c/0xd0 drivers/block/loop.c:2031
+  loop_control_ioctl drivers/block/loop.c:2130 [inline]
+  loop_control_ioctl+0x320/0x360 drivers/block/loop.c:2096
+  vfs_ioctl fs/ioctl.c:46 [inline]
+  file_ioctl fs/ioctl.c:509 [inline]
+  do_vfs_ioctl+0xd6e/0x1390 fs/ioctl.c:696
+  ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
+  __do_sys_ioctl fs/ioctl.c:720 [inline]
+  __se_sys_ioctl fs/ioctl.c:718 [inline]
+  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
+  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+
+The buggy address belongs to the object at ffff8880928a3440
+  which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 80 bytes inside of
+  2048-byte region [ffff8880928a3440, ffff8880928a3c40)
+The buggy address belongs to the page:
+page:ffffea00024a2880 count:1 mapcount:0 mapping:ffff88812c3f0c40  
+index:0xffff8880928a2bc0 compound_mapcount: 0
+flags: 0x1fffc0000010200(slab|head)
+raw: 01fffc0000010200 ffffea0002611f08 ffffea0002476788 ffff88812c3f0c40
+raw: ffff8880928a2bc0 ffff8880928a2340 0000000100000002 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+  ffff8880928a3380: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+  ffff8880928a3400: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
+> ffff8880928a3480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                          ^
+  ffff8880928a3500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8880928a3580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
 
 ---
