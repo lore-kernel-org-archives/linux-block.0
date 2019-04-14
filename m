@@ -2,112 +2,203 @@ Return-Path: <SRS0=vbI/=SQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3E0C10F13
-	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 13:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 834F1C10F13
+	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 15:45:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA7352148E
-	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 13:10:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E6D820880
+	for <linux-block@archiver.kernel.org>; Sun, 14 Apr 2019 15:45:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dBYe7cHq"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="FAaNgiCV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726262AbfDNNKU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Apr 2019 09:10:20 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:43876 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725791AbfDNNKU (ORCPT
+        id S1726262AbfDNPpO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Apr 2019 11:45:14 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:35009 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726055AbfDNPpO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Apr 2019 09:10:20 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3ED9XdH090767;
-        Sun, 14 Apr 2019 13:10:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=s/vRKsZnbEF2PHEx3aLsv+Ea+RUVqcytRWZdLiC55kA=;
- b=dBYe7cHqwr3IWM3+VtfaNvutZSwwxKi5Nhgyv8xs0+AWJLdY6f4heSFeElyXS3bcaRE1
- Uy0AOUDcmWq/HQ4y6LtlUzrHvEku42YDMGiYdiOIWAfcSwGQpYnbvhsq/pX5PTHf2tia
- cQGZAgOn5JhhzZ6yQZRtIZJkhBdPcEucYQ4G6uwG6vXjd0QlJh5T8Z33vde7bX/wgaUU
- 6MR6D4XkXJZbdz9UqJvv1qM2bKBlseUT2XpJ688avfzplhp7TNemtoDcWvp3YMKHG54E
- ToMfTRJBaxaS8z/Ejqln8oHVDyUhvWATtRkW1T1ClgGvzqkoVAfgHU8a2K2Bnz3weJTg LQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2130.oracle.com with ESMTP id 2ru59cu9jt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 14 Apr 2019 13:10:08 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3EDA5Ri052252;
-        Sun, 14 Apr 2019 13:10:08 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2rv2tts247-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 14 Apr 2019 13:10:07 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x3ED9twE021557;
-        Sun, 14 Apr 2019 13:09:55 GMT
-Received: from [192.168.1.12] (/180.165.90.201)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 14 Apr 2019 13:09:55 +0000
-Subject: Re: [RESEND PATCH] blk-mq: fix hang caused by freeze/unfreeze
- sequence
-To:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
-Cc:     shirley.ma@oracle.com, martin.petersen@oracle.com,
-        Roman Pen <roman.penyaev@profitbricks.com>,
-        Akinobu Mita <akinobu.mita@gmail.com>,
-        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org
-References: <20190409090828.16282-1-bob.liu@oracle.com>
- <0763cb5a-5598-69e3-e5ac-765989aab5b1@acm.org>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <9ca4314d-fe45-9b24-8ba0-44d80f790502@oracle.com>
-Date:   Sun, 14 Apr 2019 21:09:43 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        Sun, 14 Apr 2019 11:45:14 -0400
+Received: by mail-lj1-f196.google.com with SMTP id t4so4771746ljc.2
+        for <linux-block@vger.kernel.org>; Sun, 14 Apr 2019 08:45:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=PlH6DVciqBqUE6BUONsJ3XVvlK7kIDjCkwIdaT79IgU=;
+        b=FAaNgiCVZFcPbdlLedr8VjErKQCgfCEwrs+hOLbjeGObHyIcNMAgQa27DzxurhyHy6
+         LnGLfJ4MhjQQeUsbR/WVp8BIaQg1fpBV12iEkp5Nts2QAvaVthmI5/SR7aEuBddK6cU8
+         URLF24qNZ3uiPhqQ6nQeoxdboCLrvxJhsUASzRMIOA1WnKjmwruB67sIuy8CxZCtbris
+         5QSRsasz/dIbTL07Zh1W92XnD9pKRc6aWNMxqmYmkyTtfFp5f2fAknJsGdLWjXx4T4nO
+         9r9b/dMJvSNiq0og2A86RqHw3UkBc3q6xJp3BdP+lHpgBSJkOMB3DrflC2ocMnRAgeCQ
+         ONRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=PlH6DVciqBqUE6BUONsJ3XVvlK7kIDjCkwIdaT79IgU=;
+        b=PBG0+rEVt4djpz+1oXerVLhiCkKlV2/wC2xp2f079ZbPpO2wRwFLA9WSofwKvnAXcM
+         vTw3qFk5IPk4YLNwE1o8DTlyXgJK7uh82eJLf6sKQF64UjsbXn3ayju+CJQnkJQXEwVP
+         4PIx0P3O/1uxpZ/HLVZCdzP25JVjBwPKkCptkg6rrv2SEW9BC4pEtdl24G6JvtA0G64U
+         bgrfDrVQXnvQIQWY/CoPIeJIQISkwS786c2l8w80DzxmPWRM/NK3L3kgzd/iTL4h+/M6
+         4/58mvBd55oQO9HQPztzCst/QFJqOJ0krc7LwmThk00DrBxKFfporsWCuVJO2scOWvZh
+         UteA==
+X-Gm-Message-State: APjAAAXvk4hOiDQhWKwFwZGH78QjgfRhl3j4YgwgX42eQ8qXGys0+kqf
+        BDDu4HUk9ZI23jjYi4QVlFrMdbO1yvLNc8FZT7Q8ww==
+X-Google-Smtp-Source: APXvYqykcI2TvXB3N6OpnePlf9QMOkGvaR3xaRdNXY4E9zyqJ4fPijwVmAGMOQ7kaGsfLKzD6925D29jzir1CYj/LIk=
+X-Received: by 2002:a2e:74f:: with SMTP id i15mr31218118ljd.156.1555256712162;
+ Sun, 14 Apr 2019 08:45:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0763cb5a-5598-69e3-e5ac-765989aab5b1@acm.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9226 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1904140098
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9226 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904140099
+References: <000000000000dfd87b0586652bf3@google.com> <778cd3c3-5b2c-4a87-64dc-5b8f5b0edc7a@kernel.dk>
+In-Reply-To: <778cd3c3-5b2c-4a87-64dc-5b8f5b0edc7a@kernel.dk>
+From:   Jens Axboe <axboe@kernel.dk>
+Date:   Sun, 14 Apr 2019 09:45:00 -0600
+Message-ID: <CAKb3OG_adYHath5LfT66RDy9gsrxvPT7Q10ns6308F9MyEzp6A@mail.gmail.com>
+Subject: Re: WARNING in io_uring_setup
+To:     syzbot <syzbot+cd714a07c6de2bc34293@syzkaller.appspotmail.com>,
+        Hannes Reinecke <hare@suse.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/13/19 11:42 AM, Bart Van Assche wrote:
-> On 4/9/19 2:08 AM, Bob Liu wrote:
->>  void blk_freeze_queue_start(struct request_queue *q)
->>  {
->> -	int freeze_depth;
->> -
->> -	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
->> -	if (freeze_depth == 1) {
->> +	mutex_lock(&q->mq_freeze_lock);
->> +	if (++q->mq_freeze_depth == 1) {
->>  		percpu_ref_kill(&q->q_usage_counter);
->> +		mutex_unlock(&q->mq_freeze_lock);
->>  		if (queue_is_mq(q))
->>  			blk_mq_run_hw_queues(q, false);
->> +	} else {
->> +		mutex_unlock(&q->mq_freeze_lock);
->>  	}
->>  }
-> Have you considered to move the mutex_unlock() call to the end of the function
-> such that there is only one mutex_unlock() call instead of two? In case you> would be worried about holding the mutex around the code that runs the queue,
-> how about changing the blk_mq_run_hw_queues() call such that the queues are
-> run async?
+On 4/13/19 9:25 AM, Jens Axboe wrote:
+> On 4/13/19 2:26 AM, syzbot wrote:
+>> Hello,
+>>
+>> syzbot found the following crash on:
+>>
+>> HEAD commit:    8ee15f32 Merge tag 'dma-mapping-5.1-1' of git://git.infrad..
+>> git tree:       upstream
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=146b7cd3200000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=4fb64439e07a1ec0
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=cd714a07c6de2bc34293
+>> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15d8b397200000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10b62ab7200000
+>>
+>> The bug was bisected to:
+>>
+>> commit 6c271ce2f1d572f7fa225700a13cfe7ced492434
+>> Author: Jens Axboe <axboe@kernel.dk>
+>> Date:   Thu Jan 10 18:22:30 2019 +0000
+>>
+>>      io_uring: add submission polling
+>>
+>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=170a286b200000
+>> final crash:    https://syzkaller.appspot.com/x/report.txt?x=148a286b200000
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=108a286b200000
+>>
+>> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+>> Reported-by: syzbot+cd714a07c6de2bc34293@syzkaller.appspotmail.com
+>> Fixes: 6c271ce2f1d5 ("io_uring: add submission polling")
+>>
+>> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121 cpu_max_bits_warn
+>> include/linux/cpumask.h:121 [inline]
+>> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121 cpumask_check
+>> include/linux/cpumask.h:128 [inline]
+>> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121 cpumask_test_cpu
+>> include/linux/cpumask.h:344 [inline]
+>> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121
+>> io_sq_offload_start fs/io_uring.c:2244 [inline]
+>> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121 io_uring_create
+>> fs/io_uring.c:2851 [inline]
+>> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121
+>> io_uring_setup+0x13b2/0x1990 fs/io_uring.c:2903
+>> Kernel panic - not syncing: panic_on_warn set ...
+>> CPU: 1 PID: 7600 Comm: syz-executor594 Not tainted 5.1.0-rc4+ #65
+>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+>> Google 01/01/2011
+>> Call Trace:
+>>   __dump_stack lib/dump_stack.c:77 [inline]
+>>   dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+>>   panic+0x2cb/0x65c kernel/panic.c:214
+>>   __warn.cold+0x20/0x45 kernel/panic.c:571
+>>   report_bug+0x263/0x2b0 lib/bug.c:186
+>>   fixup_bug arch/x86/kernel/traps.c:179 [inline]
+>>   fixup_bug arch/x86/kernel/traps.c:174 [inline]
+>>   do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:272
+>>   do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:291
+>>   invalid_op+0x14/0x20 arch/x86/entry/entry_64.S:973
+>> RIP: 0010:cpu_max_bits_warn include/linux/cpumask.h:121 [inline]
+>> RIP: 0010:cpumask_check include/linux/cpumask.h:128 [inline]
+>> RIP: 0010:cpumask_test_cpu include/linux/cpumask.h:344 [inline]
+>> RIP: 0010:io_sq_offload_start fs/io_uring.c:2244 [inline]
+>> RIP: 0010:io_uring_create fs/io_uring.c:2851 [inline]
+>> RIP: 0010:io_uring_setup+0x13b2/0x1990 fs/io_uring.c:2903
+>> Code: 00 00 00 00 fc ff df 48 89 da 48 c1 ea 03 80 3c 02 00 0f 84 18 fe ff
+>> ff 48 89 df e8 e8 80 e0 ff e9 0b fe ff ff e8 2e 79 a8 ff <0f> 0b e9 db f8
+>> ff ff e8 22 79 a8 ff 49 8d 9c 24 88 00 00 00 48 b8
+>> RSP: 0018:ffff8880a8eb7dc0 EFLAGS: 00010293
+>> RAX: ffff88808cdd8700 RBX: 0000000000000400 RCX: ffffffff81c80eab
+>> RDX: 0000000000000000 RSI: ffffffff81c815d2 RDI: 0000000000000005
+>> RBP: ffff8880a8eb7ef0 R08: ffff88808cdd8700 R09: ffffed1011c75244
+>> R10: ffffed1011c75243 R11: ffff88808e3a921f R12: ffff88808d34a480
+>> R13: ffff8880a8eb7ec8 R14: ffff88808d34a4c0 R15: ffff88808d34a4d4
+>>   __do_sys_io_uring_setup fs/io_uring.c:2916 [inline]
+>>   __se_sys_io_uring_setup fs/io_uring.c:2913 [inline]
+>>   __x64_sys_io_uring_setup+0x54/0x80 fs/io_uring.c:2913
+>>   do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
+>>   entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>> RIP: 0033:0x440239
+>> Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7
+>> 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff
+>> ff 0f 83 fb 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
+>> RSP: 002b:00007fff32156718 EFLAGS: 00000246 ORIG_RAX: 00000000000001a9
+>> RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 0000000000440239
+>> RDX: 0000000000400b60 RSI: 0000000020000200 RDI: 0000000000000c9f
+>> RBP: 00000000006ca018 R08: 0000000000000000 R09: 0000000000000000
+>> R10: 00000000ffffffff R11: 0000000000000246 R12: 0000000000401ac0
+>> R13: 0000000000401b50 R14: 0000000000000000 R15: 0000000000000000
+>> Kernel Offset: disabled
+>> Rebooting in 86400 seconds..
 >
- 
-Yes, but this bug is difficult to reproduce. I'd prefer keep the change minimum.
+> Thanks for the report, below should fix it.
+
+Forgot to include the patch, apparently. Here it is:
+
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 07d6ef195d05..c9bd17d6571c 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2236,19 +2241,19 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
+        mmgrab(current->mm);
+        ctx->sqo_mm = current->mm;
+
+-       ctx->sq_thread_idle = msecs_to_jiffies(p->sq_thread_idle);
+-       if (!ctx->sq_thread_idle)
+-               ctx->sq_thread_idle = HZ;
+-
+-       ret = -EINVAL;
+-       if (!cpu_possible(p->sq_thread_cpu))
+-               goto err;
+-
+        if (ctx->flags & IORING_SETUP_SQPOLL) {
++               ctx->sq_thread_idle = msecs_to_jiffies(p->sq_thread_idle);
++               if (!ctx->sq_thread_idle)
++                       ctx->sq_thread_idle = HZ;
++
+                if (p->flags & IORING_SETUP_SQ_AFF) {
+                        int cpu;
+
+                        cpu = array_index_nospec(p->sq_thread_cpu, NR_CPUS);
++                       ret = -EINVAL;
++                       if (!cpu_possible(p->sq_thread_cpu))
++                               goto err;
++
+                        ctx->sqo_thread = kthread_create_on_cpu(io_sq_thread,
+                                                        ctx, cpu,
+                                                        "io_uring-sq");
+
+
+--
+Jens Axboe
