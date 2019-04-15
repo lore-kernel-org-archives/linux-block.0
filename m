@@ -2,103 +2,88 @@ Return-Path: <SRS0=7FI7=SR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D884C282DD
-	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 15:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 567D6C10F0E
+	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 15:56:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 254C8218FF
-	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 15:24:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2762B20825
+	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 15:56:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727447AbfDOPYo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Apr 2019 11:24:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43084 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726522AbfDOPYo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Apr 2019 11:24:44 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BBDC330BC67C;
-        Mon, 15 Apr 2019 15:24:38 +0000 (UTC)
-Received: from redhat.com (unknown [10.20.6.236])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 350F9608C0;
-        Mon, 15 Apr 2019 15:24:35 +0000 (UTC)
-Date:   Mon, 15 Apr 2019 11:24:33 -0400
-From:   Jerome Glisse <jglisse@redhat.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        John Hubbard <jhubbard@nvidia.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v1 10/15] block: add gup flag to
- bio_add_page()/bio_add_pc_page()/__bio_add_page()
-Message-ID: <20190415152433.GB3436@redhat.com>
-References: <20190411210834.4105-1-jglisse@redhat.com>
- <20190411210834.4105-11-jglisse@redhat.com>
- <20190415145952.GE13684@quack2.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190415145952.GE13684@quack2.suse.cz>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Mon, 15 Apr 2019 15:24:43 +0000 (UTC)
+        id S1727702AbfDOP4i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Apr 2019 11:56:38 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:43563 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727692AbfDOP4i (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Apr 2019 11:56:38 -0400
+Received: by mail-pg1-f195.google.com with SMTP id z9so8775775pgu.10
+        for <linux-block@vger.kernel.org>; Mon, 15 Apr 2019 08:56:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=fi/6r48jSEz80r9PXbD+VjmhxGFECO8Y9+g4T/CEUtg=;
+        b=FfycooSyh45/aPgg3Yq0RlTuXCRZ1laIhV+UtrlOmbK3s8p2Y5Gjw4r+EtdHeKclvl
+         ytPbGSkNQXwEZpX13Zhb1Ynaxtz7UngKsoKZuXC67vEWiDt4OmQaWLzTJ6+DwlNLtHHT
+         ryZde18W/KjQ4v+oQeFKnxSFqjVrHxijHgBOnoCTfKT76pG1KjWg9rr+6SkbIf5KgoIy
+         YVWyKDK7XIHWEP5LZt5BaMVenwEfSNn5Rfdt+1wbNJnECVwDB5h+aYtzenRa5u/e9QvI
+         JyNC1DfXQ8yhV7mUdOOtOgCQI+d7MYOMLget5rhu6Wzj1YgtVOA/9Fn5K0keTIklWcMD
+         PtwA==
+X-Gm-Message-State: APjAAAV0SrliwreLoRu+xyjYFF86gUlapYmRPb+OHftZs7oyelXYCHWG
+        0Vm9Dlxx3sLIEpurh1drsRU=
+X-Google-Smtp-Source: APXvYqzsvtkVn7xtdtL3wHJHJQdOHwwZBOKZwFClRdj+hyq2q/R0hiAAEKeLrRq5xY7OBQQknyhdJQ==
+X-Received: by 2002:a65:6410:: with SMTP id a16mr57641540pgv.315.1555343797761;
+        Mon, 15 Apr 2019 08:56:37 -0700 (PDT)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id s21sm33191009pfm.3.2019.04.15.08.56.36
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 15 Apr 2019 08:56:36 -0700 (PDT)
+Message-ID: <1555343795.161891.103.camel@acm.org>
+Subject: Re: [PATCH v3] block: fix use-after-free on gendisk
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk, jack@suse.cz
+Cc:     viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
+        linux-block@vger.kernel.org
+Date:   Mon, 15 Apr 2019 08:56:35 -0700
+In-Reply-To: <20190402120634.51040-1-yuyufen@huawei.com>
+References: <20190402120634.51040-1-yuyufen@huawei.com>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 15, 2019 at 04:59:52PM +0200, Jan Kara wrote:
-> Hi Jerome!
-> 
-> On Thu 11-04-19 17:08:29, jglisse@redhat.com wrote:
-> > From: Jérôme Glisse <jglisse@redhat.com>
-> > 
-> > We want to keep track of how we got a reference on page added to bio_vec
-> > ie wether the page was reference through GUP (get_user_page*) or not. So
-> > add a flag to bio_add_page()/bio_add_pc_page()/__bio_add_page() to that
-> > effect.
-> 
-> Thanks for writing this patch set! Looking through patches like this one,
-> I'm a bit concerned. With so many bio_add_page() callers it's difficult to
-> get things right and not regress in the future. I'm wondering whether the
-> things won't be less error-prone if we required that all page reference
-> from bio are gup-like (not necessarily taken by GUP, if creator of the bio
-> gets to struct page he needs via some other means (e.g. page cache lookup),
-> he could just use get_gup_pin() helper we'd provide).  After all, a page
-> reference in bio means that the page is pinned for the duration of IO and
-> can be DMAed to/from so it even makes some sense to track the reference
-> like that. Then bio_put() would just unconditionally do put_user_page() and
-> we won't have to propagate the information in the bio.
-> 
-> Do you think this would be workable and easier?
+On Tue, 2019-04-02 at 20:06 +-0800, Yufen Yu wrote:
++AD4 diff --git a/block/genhd.c b/block/genhd.c
++AD4 index 961b2bc4634f..a4ef0068dbb2 100644
++AD4 --- a/block/genhd.c
++AD4 +-+-+- b/block/genhd.c
++AD4 +AEAAQA -529,6 +-529,18 +AEAAQA void blk+AF8-free+AF8-devt(dev+AF8-t devt)
++AD4         +AH0
++AD4  +AH0
++AD4  
++AD4 +-/+ACoAKg
++AD4 +- +ACo     We invalidate devt by assigning NULL pointer for devt in idr.
++AD4 +- +ACo-/
++AD4 +-void blk+AF8-invalidate+AF8-devt(dev+AF8-t devt)
++AD4 +-+AHs
++AD4 +-       if (MAJOR(devt) +AD0APQ BLOCK+AF8-EXT+AF8-MAJOR) +AHs
++AD4 +-               spin+AF8-lock+AF8-bh(+ACY-ext+AF8-devt+AF8-lock)+ADs
++AD4 +-               idr+AF8-replace(+ACY-ext+AF8-devt+AF8-idr, NULL, blk+AF8-mangle+AF8-minor(MINOR(devt)))+ADs
++AD4 +-               spin+AF8-unlock+AF8-bh(+ACY-ext+AF8-devt+AF8-lock)+ADs
++AD4 +-       +AH0
++AD4 +-+AH0
 
-It might be workable but i am not sure it is any simpler. bio_add_page*()
-does not take page reference it is up to the caller to take the proper
-page reference so the complexity would be push there (just in a different
-place) so i don't think it would be any simpler. This means that we would
-have to update more code than this patchset does.
+Did you perhaps copy the above code from blk+AF8-free+AF8-devt()? If so, please modify
+blk+AF8-free+AF8-devt() such that it calls blk+AF8-invalidate+AF8-devt() instead of introducing a
+copy of most of blk+AF8-free+AF8-devt().
 
-This present patch is just a coccinelle semantic patch and even if it
-is scary to see that many call site, they are not that many that need
-to worry about the GUP parameter and they all are in patch 11, 12, 13
-and 14.
+Thanks,
 
-So i believe this patchset is simpler than converting everyone to take
-a GUP like page reference. Also doing so means we loose the information
-about GUP kind of defeat the purpose. So i believe it would be better
-to limit special reference to GUP only pages.
-
-Cheers,
-Jérôme
+Bart.
