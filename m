@@ -2,113 +2,116 @@ Return-Path: <SRS0=7FI7=SR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C468C10F11
-	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 07:47:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B93C10F0E
+	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 09:46:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 56FD720833
-	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 07:47:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2EB720833
+	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 09:46:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726380AbfDOHrN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Apr 2019 03:47:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40068 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725779AbfDOHrN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Apr 2019 03:47:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CB9F6821C3;
-        Mon, 15 Apr 2019 07:47:12 +0000 (UTC)
-Received: from [10.72.12.206] (ovpn-12-206.pek2.redhat.com [10.72.12.206])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 19B3E5D9CA;
-        Mon, 15 Apr 2019 07:47:00 +0000 (UTC)
-Subject: Re: [PATCH v1 15/15] ceph: use put_user_pages() instead of
- ceph_put_page_vector()
-To:     jglisse@redhat.com, linux-kernel@vger.kernel.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, John Hubbard <jhubbard@nvidia.com>,
-        Jan Kara <jack@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Wilcox <willy@infradead.org>,
-        Sage Weil <sage@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-        ceph-devel@vger.kernel.org
-References: <20190411210834.4105-1-jglisse@redhat.com>
- <20190411210834.4105-16-jglisse@redhat.com>
-From:   "Yan, Zheng" <zyan@redhat.com>
-Message-ID: <df4da184-fe8b-c189-43e5-fac58adb3ed9@redhat.com>
-Date:   Mon, 15 Apr 2019 15:46:59 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1725939AbfDOJqG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Apr 2019 05:46:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56964 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725816AbfDOJqG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Apr 2019 05:46:06 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 981F6B020;
+        Mon, 15 Apr 2019 09:46:04 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190411210834.4105-16-jglisse@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Mon, 15 Apr 2019 07:47:13 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 15 Apr 2019 11:46:04 +0200
+From:   Roman Penyaev <rpenyaev@suse.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Bob Liu <bob.liu@oracle.com>, linux-block@vger.kernel.org,
+        shirley.ma@oracle.com, martin.petersen@oracle.com,
+        Roman Pen <roman.penyaev@profitbricks.com>,
+        Akinobu Mita <akinobu.mita@gmail.com>,
+        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
+        linux-block-owner@vger.kernel.org
+Subject: Re: [RESEND PATCH] blk-mq: fix hang caused by freeze/unfreeze
+ sequence
+In-Reply-To: <0763cb5a-5598-69e3-e5ac-765989aab5b1@acm.org>
+References: <20190409090828.16282-1-bob.liu@oracle.com>
+ <0763cb5a-5598-69e3-e5ac-765989aab5b1@acm.org>
+Message-ID: <84cf04edf8f3f3b87b78383a1837aff3@suse.de>
+X-Sender: rpenyaev@suse.de
+User-Agent: Roundcube Webmail
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/12/19 5:08 AM, jglisse@redhat.com wrote:
-> From: Jérôme Glisse <jglisse@redhat.com>
-> 
-> When page reference were taken through GUP (get_user_page*()) we need
-> to drop them with put_user_pages().
-> 
-> Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-> Cc: linux-fsdevel@vger.kernel.org
-> Cc: linux-block@vger.kernel.org
-> Cc: linux-mm@kvack.org
-> Cc: John Hubbard <jhubbard@nvidia.com>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> Cc: Johannes Thumshirn <jthumshirn@suse.de>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Dave Chinner <david@fromorbit.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Matthew Wilcox <willy@infradead.org>
-> Cc: Yan Zheng <zyan@redhat.com>
-> Cc: Sage Weil <sage@redhat.com>
-> Cc: Ilya Dryomov <idryomov@gmail.com>
-> Cc: ceph-devel@vger.kernel.org
-> ---
->   fs/ceph/file.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/ceph/file.c b/fs/ceph/file.c
-> index 6c5b85f01721..5842ad3a4218 100644
-> --- a/fs/ceph/file.c
-> +++ b/fs/ceph/file.c
-> @@ -667,7 +667,8 @@ static ssize_t ceph_sync_read(struct kiocb *iocb, struct iov_iter *to,
->   			} else {
->   				iov_iter_advance(to, 0);
->   			}
-> -			ceph_put_page_vector(pages, num_pages, false);
-> +			/* iov_iter_get_pages_alloc() did call GUP */
-> +			put_user_pages(pages, num_pages);
+On 2019-04-13 05:42, Bart Van Assche wrote:
+> On 4/9/19 2:08 AM, Bob Liu wrote:
+>>  void blk_freeze_queue_start(struct request_queue *q)
+>>  {
+>> -	int freeze_depth;
+>> -
+>> -	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
+>> -	if (freeze_depth == 1) {
+>> +	mutex_lock(&q->mq_freeze_lock);
+>> +	if (++q->mq_freeze_depth == 1) {
+>>  		percpu_ref_kill(&q->q_usage_counter);
+>> +		mutex_unlock(&q->mq_freeze_lock);
+>>  		if (queue_is_mq(q))
+>>  			blk_mq_run_hw_queues(q, false);
+>> +	} else {
+>> +		mutex_unlock(&q->mq_freeze_lock);
+>>  	}
+>>  }
+> Have you considered to move the mutex_unlock() call to the end of the 
+> function
+> such that there is only one mutex_unlock() call instead of two? In case 
+> you
+> would be worried about holding the mutex around the code that runs the 
+> queue,
+> how about changing the blk_mq_run_hw_queues() call such that the queues 
+> are
+> run async?
 
-pages in pipe were not from get_user_pages(). Am I missing anything?
+Hi Bart,
 
-Regards
-Yan, Zheng
+The only purpose of 'mq_freeze_lock' is to avoid race between 
+mq_freeze_depth
+variable and the following usage of q_usage_counter percpu ref.  I admit 
+that
+my original comment is quite unclear, but locked section should be as 
+short
+as possible, so returning to your question: better to have two unlock 
+calls
+instead of expanding locked critical section.
 
->   		} else {
->   			int idx = 0;
->   			size_t left = ret > 0 ? ret : 0;
-> 
+Unfortunately I do not have hardware to play again with the issue, but I 
+see
+there is a nice candidate for a quick reproduction:  null_blk queues 
+with
+shared tags.  Having several queues with shared tags and a script, which
+powers on/off (I mean 'power' entry of configfs of the null_blk) 
+different
+null devices from different cpus it is quite possible to trigger the 
+issue.
+Random short msdelay() in correct places can help to increase 
+probability to
+hit the issue quite fast.
 
+
+But Bob, what is the backtrace of the issue you hit?  What is the 
+device?
+Conditions to reproduce the issue are quite specific and frankly I did 
+not
+find any "naked" (without any locks) calls of blk_mq_freeze/unfreeze 
+sequence,
+the only candidate which I found, seems, null_blk (not 100% sure, but 
+worth to
+try).
+
+
+--
+Roman
