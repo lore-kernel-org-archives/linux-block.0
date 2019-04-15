@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21BB5C10F12
-	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 19:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40F68C10F0E
+	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 19:27:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DBCA520880
-	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 19:23:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00C2D20651
+	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 19:27:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1555356200;
-	bh=WVeBqYPgdfpR+mnim3L5Wgt9NBJzLhKP1/afZf0EBUk=;
+	s=default; t=1555356428;
+	bh=CrZYAjP2WGzdACf1lr9S+LIp/ticMjMkB1aqPe/IXVU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=pGKOBaaw7xF0NqAaQfOvztlqB9cvmVs0ZkZ4+jjMPGT03H+Vz4TV4lbV38JcEJUVA
-	 1kSSrtQHoCv2FlJjHZfXnIUPsXBfwTDG8nlq+K2/UAxecUDbx4/R3WKjQrggYLJI+V
-	 cJvkeJTdWD9OoINJ53D18uIXuL5FH//itQqRKcPw=
+	b=IFg437tkMqfP/nueAm7A5Bs/wGBlbH0AmYw1mdnm+m0LOF4zTOzOhXtwLWSGmBHFS
+	 vsoOVSMr6JtGBQMAIU7j6EVaTUKQzkjBMBUWlFwN8K9Ab3hfAJruhnFsC6uMbQh8Bo
+	 xBSINGlDxSBl+pDvAmOui5fhpLPZX4Pj4WBW+sG4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730265AbfDOTHl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Apr 2019 15:07:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42750 "EHLO mail.kernel.org"
+        id S1728665AbfDOTEJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Apr 2019 15:04:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36778 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730252AbfDOTHl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Apr 2019 15:07:41 -0400
+        id S1728284AbfDOTEI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Apr 2019 15:04:08 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4A2442087C;
-        Mon, 15 Apr 2019 19:07:40 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9230321902;
+        Mon, 15 Apr 2019 19:04:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1555355260;
-        bh=WVeBqYPgdfpR+mnim3L5Wgt9NBJzLhKP1/afZf0EBUk=;
+        s=default; t=1555355048;
+        bh=CrZYAjP2WGzdACf1lr9S+LIp/ticMjMkB1aqPe/IXVU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=y8d6RlI72ZTDGU1bHCgqO8JbvRdh73yitBVKMeLNIhydszt5gPAH56rd9KpoeFtqr
-         DnmRqQxElUhYGdK7AK3So85VTjZcOIcqqjjaY8g5VSY8d08BwwleuGiHxZztXI1Xd5
-         g5HRS9F4jj0R2r714Y9EQNy65kxC8cWbSUD27MFs=
+        b=fKlOWhLtc0Sv+B4Mr3Qey6pla6MmRCNRofleAWVw4s1HBwQjCi2/Y4b2tZFPWl3UB
+         2YFYZYx1jjloUdX/avONjtuPRECV5THY6FL9hg3mjRA1r/6gRPRwBgLiIIAU7/DGNv
+         ayvv4tqSe7bMGbPsSWudxkE3O1nrSkGznQkXglI8=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -46,12 +46,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4.19 071/101] block: do not leak memory in bio_copy_user_iov()
-Date:   Mon, 15 Apr 2019 20:59:09 +0200
-Message-Id: <20190415183744.225068525@linuxfoundation.org>
+Subject: [PATCH 4.14 49/69] block: do not leak memory in bio_copy_user_iov()
+Date:   Mon, 15 Apr 2019 20:59:07 +0200
+Message-Id: <20190415183734.095752921@linuxfoundation.org>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190415183740.341577907@linuxfoundation.org>
-References: <20190415183740.341577907@linuxfoundation.org>
+In-Reply-To: <20190415183726.036654568@linuxfoundation.org>
+References: <20190415183726.036654568@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -82,7 +82,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -1240,8 +1240,11 @@ struct bio *bio_copy_user_iov(struct req
+@@ -1280,8 +1280,11 @@ struct bio *bio_copy_user_iov(struct req
  			}
  		}
  
