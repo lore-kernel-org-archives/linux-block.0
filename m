@@ -2,99 +2,145 @@ Return-Path: <SRS0=7JUc=SS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 994BFC10F13
-	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 17:03:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01521C10F14
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 17:07:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 649CA2087C
-	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 17:03:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AXSNCiEW"
+	by mail.kernel.org (Postfix) with ESMTP id CE39520872
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 17:07:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726946AbfDPRDD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Apr 2019 13:03:03 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:41575 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726230AbfDPRDD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Apr 2019 13:03:03 -0400
-Received: by mail-io1-f65.google.com with SMTP id v10so18230229iom.8
-        for <linux-block@vger.kernel.org>; Tue, 16 Apr 2019 10:03:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=CTATxVA+Sh1XdJKMCxdbliZy7iFAhuisG2PQl7eeoGs=;
-        b=AXSNCiEWtbQnp7lWLobNjD+yb7kXkJhLTIt4n0Gm9WKI86IyLbrbJFsh1BMT8gFSdg
-         5Ke62CozAzTVTDQIelQ3MZWzEx/Zl4xH0c3F5lKhV/SaRCAmLKj/c76Roi2lL4qU5znS
-         0EgROEeRUbRxu48leRois/2qrYO94Sb7cydUNIo9FE4PYPRg/GdUdOC6+yaa/otVbOKY
-         LX9eEnHrTYwB7oXFGkq9MedaAXCUlkrNmTMVwuHQgndsn7ShwqeVW25++LPEWvaG0WTo
-         Kg6mWKOCo1jV84P78YykHOAcYMXrBH+14fTblYjhIv6ZkoqMDwfIBn5IObrxK0N0k0tr
-         2SlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CTATxVA+Sh1XdJKMCxdbliZy7iFAhuisG2PQl7eeoGs=;
-        b=BDo7DnVe80LQJTiP1t7p6QNMkr8qAw1bRrcO2QL0u0TEBCZzBrq+ZDAbF3Quk5ymwU
-         l51j4fkD8C+MT9El5183zLCbjcEpX9Y92ER4RHdye3az3VZVKkp/wOHBAITxAHjA+NDw
-         kVmEedxDwp0eyeM1dSBbVoLCPtqAyW3Y7E/6uWa3vKNaIOtoMKjMp+GKWC2VDM0550dY
-         3J2/yh9/FxJt9av3Zqs8T+itxO+cxQl3fkbssz4Q2XoZxbIOFZCubRZD0SMVeNF6Lsdg
-         Un3Ywyp02riuj31ayhr/5gxRg1kOGaXQbap7Dl19SQfxTiim40+tRGv2et4YSgGG6kIj
-         /zUw==
-X-Gm-Message-State: APjAAAWUKzzWH3X0ff+J/yVevC6BQoJB2mwHZPRY2uHrUfYcnSI433xk
-        iQHL3pOCt/U0m8i3ME1qBo+J7KUuBRpccw==
-X-Google-Smtp-Source: APXvYqxekrIvGaMQJxxPgqpZoFfM3OCXCLD7jvbF/GH+WAy+e2vtKcntuTdgk9zdIWZK9E6mryC3vA==
-X-Received: by 2002:a5e:8706:: with SMTP id y6mr56943104ioj.160.1555434182682;
-        Tue, 16 Apr 2019 10:03:02 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id i23sm19157227ion.40.2019.04.16.10.03.01
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Apr 2019 10:03:01 -0700 (PDT)
-Subject: Re: [PATCH] block: make sure that bvec length can't be overflowed
-To:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>
-References: <20190416153847.8173-1-ming.lei@redhat.com>
- <20190416164658.GA4030@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9d0f5255-c37a-1830-7632-6f4d7158b21b@kernel.dk>
-Date:   Tue, 16 Apr 2019 11:03:00 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1728083AbfDPRHa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Apr 2019 13:07:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55938 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726230AbfDPRH3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Apr 2019 13:07:29 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6F60F88317;
+        Tue, 16 Apr 2019 17:07:29 +0000 (UTC)
+Received: from redhat.com (unknown [10.20.6.236])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D0B2419C71;
+        Tue, 16 Apr 2019 17:07:25 +0000 (UTC)
+Date:   Tue, 16 Apr 2019 13:07:24 -0400
+From:   Jerome Glisse <jglisse@redhat.com>
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        John Hubbard <jhubbard@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH v1 10/15] block: add gup flag to
+ bio_add_page()/bio_add_pc_page()/__bio_add_page()
+Message-ID: <20190416170723.GC3254@redhat.com>
+References: <20190411210834.4105-1-jglisse@redhat.com>
+ <20190411210834.4105-11-jglisse@redhat.com>
+ <20190415145952.GE13684@quack2.suse.cz>
+ <20190415152433.GB3436@redhat.com>
+ <20190416164658.GB17148@quack2.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20190416164658.GA4030@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190416164658.GB17148@quack2.suse.cz>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Tue, 16 Apr 2019 17:07:29 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/16/19 10:46 AM, Christoph Hellwig wrote:
-> s/overflowed/overflow/ in the subject.
+On Tue, Apr 16, 2019 at 06:46:58PM +0200, Jan Kara wrote:
+> On Mon 15-04-19 11:24:33, Jerome Glisse wrote:
+> > On Mon, Apr 15, 2019 at 04:59:52PM +0200, Jan Kara wrote:
+> > > Hi Jerome!
+> > > 
+> > > On Thu 11-04-19 17:08:29, jglisse@redhat.com wrote:
+> > > > From: Jérôme Glisse <jglisse@redhat.com>
+> > > > 
+> > > > We want to keep track of how we got a reference on page added to bio_vec
+> > > > ie wether the page was reference through GUP (get_user_page*) or not. So
+> > > > add a flag to bio_add_page()/bio_add_pc_page()/__bio_add_page() to that
+> > > > effect.
+> > > 
+> > > Thanks for writing this patch set! Looking through patches like this one,
+> > > I'm a bit concerned. With so many bio_add_page() callers it's difficult to
+> > > get things right and not regress in the future. I'm wondering whether the
+> > > things won't be less error-prone if we required that all page reference
+> > > from bio are gup-like (not necessarily taken by GUP, if creator of the bio
+> > > gets to struct page he needs via some other means (e.g. page cache lookup),
+> > > he could just use get_gup_pin() helper we'd provide).  After all, a page
+> > > reference in bio means that the page is pinned for the duration of IO and
+> > > can be DMAed to/from so it even makes some sense to track the reference
+> > > like that. Then bio_put() would just unconditionally do put_user_page() and
+> > > we won't have to propagate the information in the bio.
+> > > 
+> > > Do you think this would be workable and easier?
+> > 
+> > It might be workable but i am not sure it is any simpler. bio_add_page*()
+> > does not take page reference it is up to the caller to take the proper
+> > page reference so the complexity would be push there (just in a different
+> > place) so i don't think it would be any simpler. This means that we would
+> > have to update more code than this patchset does.
 > 
-> Otherwise this looks good to me:
+> I agree that the amount of work in this patch set is about the same
+> (although you don't have to pass the information about reference type in
+> the biovec so you save the complexities there). But for the future the
+> rule that "bio references must be gup-pins" is IMO easier to grasp for
+> developers and you can reasonably assert it in bio_add_page().
 > 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > This present patch is just a coccinelle semantic patch and even if it
+> > is scary to see that many call site, they are not that many that need
+> > to worry about the GUP parameter and they all are in patch 11, 12, 13
+> > and 14.
+> > 
+> > So i believe this patchset is simpler than converting everyone to take
+> > a GUP like page reference. Also doing so means we loose the information
+> > about GUP kind of defeat the purpose. So i believe it would be better
+> > to limit special reference to GUP only pages.
 > 
-> Although this will create yet another conflict between Linus' tree
-> and the 5.2 block tree.
+> So what's the difference whether the page reference has been acquired via
+> GUP or via some other means? I don't think that really matters. If say
+> infiniband introduced new ioctl() that takes file descriptor, offset, and
+> length and just takes pages from page cache and attaches them to their RDMA
+> scatter-gather lists, then they'd need to use 'pin' references anyway...
 > 
-> Although maybe Jens still reset the tree and move the merge past this..
+> Then why do we work on differentiating between GUP pins and other page
+> references?  Because it matters what the reference is going to be used for
+> and what is it's lifetime. And generally GUP references are used to do IO
+> to/from page and may even be controlled by userspace so that's why we need
+> to make them different. But in principle the 'gup-pin' reference is not about
+> the fact that the reference has been obtained from GUP but about the fact
+> that it is used to do IO. Hence I think that the rule "bio references must
+> be gup-pins" makes some sense.
 
-That was my main worry too... But I'll probably just deal with it and
-redo the merge, I don't want to do two, and I don't want to have to
-deal with answering for why we get repeated conflicts in this area.
+It will break things like page protection i am working on (KSM for file
+back page). Pages can go through bio for mundane reasons (crypto, network,
+gpu, ...) that have nothing to do with I/O for fs and do not have to block
+any of the fs operation. If we GUP bias all those pages then we will
+effectively make the situation worse in that pages will have a high likely-
+hood to always look GUPed while it is just going through some bio for one
+of those mundane reasons (and page is not being written to just use as
+a source).
 
-For the patch, I do generally prefer doing an AND with PAGE_MASK
-rather than a modulo with PAGE_SIZE. I know the compiler will take
-care of it, but still, it's more prudent imho.
+I understand why conceptualy it looks appealing but we would be loosing
+information here. I really want to be able to determine if a page is GUPed
+or not. If we GUP bias everyone in bio then we loose that.
 
--- 
-Jens Axboe
+Also i want to point out that the complexity of biasing all page in bio
+are much bigger than this patchset it will require changes to all call
+site of bio_add_page*() at very least.
 
+Cheers,
+Jérôme
