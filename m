@@ -2,78 +2,102 @@ Return-Path: <SRS0=7JUc=SS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 294ABC10F14
-	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 15:00:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71029C282DA
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 15:38:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB2B220652
-	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 15:00:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F04B21773
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 15:38:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="c0EbnDaE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729782AbfDPPAk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Apr 2019 11:00:40 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:35281 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729300AbfDPPAj (ORCPT
+        id S1729112AbfDPPiz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Apr 2019 11:38:55 -0400
+Received: from a9-92.smtp-out.amazonses.com ([54.240.9.92]:37986 "EHLO
+        a9-92.smtp-out.amazonses.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728028AbfDPPiz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Apr 2019 11:00:39 -0400
-Received: by mail-pl1-f193.google.com with SMTP id w24so10485701plp.2;
-        Tue, 16 Apr 2019 08:00:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=YzEbblBmSVEVYraSVJmAXHJjfIQS4JnfPJ5pABW9bwM=;
-        b=MpMnHx1uPX3QbKmpn+4VaIY1oCOc6JN/A2pbqI4+lu4AV1eXCW2WIDlms7gtEyg3m3
-         qyRx7AnMnEA9+0hqe2hGvh6jSRl1O1NFVQ0cISOnlwbSqoltnFUjOdYNQhz/pyPFCgs7
-         BmTrqEmej1OoIfvkY9SCHR+n1YE2BMcjwGrCAamP03qqsM7h4rLePDIr1htX51Ic0u/s
-         sv2JUsZuEEggcVJZYUqZhMptBm3sfTcSP6qyAFpRqLiYi1SQZSjKm8TiAu9TyhwCvsP/
-         EVQfwLBrDTxv7lx+r9kky0mjNeBYuZNWPfitL9LdtSLJ+5wmnW48Clx1op4cviglpA9A
-         UZZg==
-X-Gm-Message-State: APjAAAXMBxIttr55eDXu2uV6GauXvJkTOSz+V5qxE9bkTxmmqhW3UjBn
-        gwWU+y+lvotHLQPA7VaAP7o=
-X-Google-Smtp-Source: APXvYqySzSzXOj0Lmriu7HG7Tij+Jv6tCo5HjivT6quvsGdRuy1XM1U7v9j5by0iBOoTZTx/2bx+WQ==
-X-Received: by 2002:a17:902:7081:: with SMTP id z1mr83359372plk.252.1555426838881;
-        Tue, 16 Apr 2019 08:00:38 -0700 (PDT)
-Received: from [10.128.207.50] ([66.201.36.5])
-        by smtp.gmail.com with ESMTPSA id l1sm59682001pgp.9.2019.04.16.08.00.37
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 16 Apr 2019 08:00:37 -0700 (PDT)
-Message-ID: <1555426836.35423.1.camel@acm.org>
-Subject: Re: [PATCH v2 1/3] blk-mq.c: Add documention of function
- blk_mq_init_queue
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
-        linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        Chaitanya.Kulkarni@wdc.com
-Date:   Tue, 16 Apr 2019 08:00:36 -0700
-In-Reply-To: <20190416032801.200694-1-marcos.souza.org@gmail.com>
-References: <20190416032801.200694-1-marcos.souza.org@gmail.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Tue, 16 Apr 2019 11:38:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+        s=6gbrjpgwjskckoa6a5zn6fwqkn67xbtw; d=amazonses.com; t=1555429134;
+        h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:MIME-Version:Content-Type:Feedback-ID;
+        bh=TkFGn3ILZJOMrhJJWyNYT4Envk++7Wre6S8alltMeeY=;
+        b=c0EbnDaEW3zUT6p0YLvxaJaN9q71+L8TwSXqTYicpNStWsmfJLiHz9GBqoKrUXEH
+        B9uClT3C17ecNZWrhw68u/JHJ8Pk+MmBB9rQGjLFhWX5DjFn7EAOtAwBSyLiW/o0Mpe
+        KIuqWKNgNj/Tan5o58Me3mKYhFONWLbQasxaZzrE=
+Date:   Tue, 16 Apr 2019 15:38:54 +0000
+From:   Christopher Lameter <cl@linux.com>
+X-X-Sender: cl@nuc-kabylake
+To:     Vlastimil Babka <vbabka@suse.cz>
+cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        lsf-pc@lists.linux-foundation.org,
+        Linux-FSDevel <linux-fsdevel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, linux-block@vger.kernel.org,
+        Michal Hocko <mhocko@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-xfs@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <david@fromorbit.com>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>
+Subject: Re: [LSF/MM TOPIC] guarantee natural alignment for kmalloc()?
+In-Reply-To: <68385367-8744-50c3-8a81-be3a4637ea80@suse.cz>
+Message-ID: <0100016a26cd1058-d1ed3b2e-0cca-4e61-8837-79dfeca68682-000000@email.amazonses.com>
+References: <790b68b7-3689-0ff6-08ae-936728bc6458@suse.cz> <1555053293.3046.4.camel@HansenPartnership.com> <68385367-8744-50c3-8a81-be3a4637ea80@suse.cz>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+X-SES-Outgoing: 2019.04.16-54.240.9.92
+Feedback-ID: 1.us-east-1.fQZZZ0Xtj2+TD7V5apTT/NrT6QKuPgzCT/IC7XYgDKI=:AmazonSES
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2019-04-16 at 00:27 -0300, Marcos Paulo de Souza wrote:
-+AD4 Reviewed-by: Chaitanya Kulkarni +ADw-chaitanya.kulkarni+AEA-wdc.com+AD4
-+AD4 Signed-off-by: Marcos Paulo de Souza +ADw-marcos.souza.org+AEA-gmail.com+AD4
-+AD4 ---
-+AD4 
-+AD4  No changes from v1.
-+AD4 
-+AD4  block/blk-mq.c +AHw 9 +++++++++
-+AD4  1 file changed, 9 insertions()
+On Fri, 12 Apr 2019, Vlastimil Babka wrote:
 
-Please always include a cover letter with a patch series that gives an
-overview of the purpose of the patch series.
+> On 4/12/19 9:14 AM, James Bottomley wrote:
+> >> In the session I hope to resolve the question whether this is indeed
+> >> the right thing to do for all kmalloc() users, without an explicit
+> >> alignment requests, and if it's worth the potentially worse
+> >> performance/fragmentation it would impose on a hypothetical new slab
+> >> implementation for which it wouldn't be optimal to split power-of-two
+> >> sized pages into power-of-two-sized objects (or whether there are any
+> >> other downsides).
+> >
+> > I think so.  The question is how aligned?  explicit flushing arch's
+> > definitely need at least cache line alignment when using kmalloc for
+> > I/O and if allocations cross cache lines they have serious coherency
+> > problems.   The question of how much more aligned than this is
+> > interesting ... I've got to say that the power of two allocator implies
+> > same alignment as size and we seem to keep growing use cases that
+> > assume this.
 
-Thanks,
+Well that can be controlled on a  per arch level through KMALLOC_MIN_ALIGN
+already. There are architectues that align to cache line boundaries.
+However you sometimes have hardware with ridiculous large cache line
+length configurations like VSMP with 4k.
 
-Bart.
+> Right, by "natural alignment" I meant exactly that - align to size for
+> power-of-two sizes.
+
+Well for which sizes? Double word till PAGE_SIZE? This gets us into weird
+and difficult to comprehend rules for how objects are aligned. Or do we
+start on the cache line size to provide cacheline alignment and do word
+alignment before?
+
+Consistency is important I think and if you want something different then
+you need to say so in one way or another.
+
+
+> > I'm not so keen on growing a separate API unless there's
+> > a really useful mm efficiency in breaking the kmalloc alignment
+> > assumptions.
+>
+> I'd argue there's not.
+
+
