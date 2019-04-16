@@ -2,103 +2,99 @@ Return-Path: <SRS0=7JUc=SS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4858CC10F0E
-	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 00:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F34D1C10F0E
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 02:12:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 23A2220830
-	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 00:22:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDE4520652
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 02:12:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JFqHYFpD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727012AbfDPAWL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Apr 2019 20:22:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44554 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726038AbfDPAWL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Apr 2019 20:22:11 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D0A8C59451;
-        Tue, 16 Apr 2019 00:22:10 +0000 (UTC)
-Received: from redhat.com (ovpn-121-42.rdu2.redhat.com [10.10.121.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 60EFC19C68;
-        Tue, 16 Apr 2019 00:22:06 +0000 (UTC)
-Date:   Mon, 15 Apr 2019 20:22:04 -0400
-From:   Jerome Glisse <jglisse@redhat.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        John Hubbard <jhubbard@nvidia.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v1 10/15] block: add gup flag to
- bio_add_page()/bio_add_pc_page()/__bio_add_page()
-Message-ID: <20190416002203.GA3158@redhat.com>
-References: <20190411210834.4105-1-jglisse@redhat.com>
- <20190411210834.4105-11-jglisse@redhat.com>
- <20190415145952.GE13684@quack2.suse.cz>
+        id S1728036AbfDPCMT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Apr 2019 22:12:19 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:47874 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727214AbfDPCMT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Apr 2019 22:12:19 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3G29Odf130284;
+        Tue, 16 Apr 2019 02:12:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=bhRnco9VI6wuxPVZ3Jcg05UXTBexEYy01kJAz5iP4a8=;
+ b=JFqHYFpDYcz+DceEwA1Hf05yfUG5u1KN2rR6U7YqB+7pBCheri9lqY3Q022IiyGeJvZ7
+ LLj1AWBWA5/08XYVj90s+gsnxPUn+jjSm54jx7VSReCUrXBv0KSQ5i0KjQXth92RG2Ui
+ DWRm0WnAX487xs5R2LSEAHStTK0wlKLbWVI406umFvJSmj4d3LbF9NfvId368KGbI5Cu
+ Z96x/i+goVSenIe/jV5WPqUOm4AktOKFthhJP4tg7bENxx0fq5Klf1pwll7FCe/woR5O
+ ExB/WZA5PG7KfVKQFvdr9MzY4zpw/DLd/10/Qm+N3JARoJswfA4Jx1+3uP64UKXyltr5 hQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2rusnequxp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Apr 2019 02:12:10 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3G2B3Id039331;
+        Tue, 16 Apr 2019 02:12:10 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 2ru4vsx7d1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Apr 2019 02:12:10 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x3G2C8dV003429;
+        Tue, 16 Apr 2019 02:12:09 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 15 Apr 2019 19:12:08 -0700
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        jianchao wang <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH V5 9/9] SCSI: don't hold device refcount in IO path
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190412033032.10418-1-ming.lei@redhat.com>
+        <20190412033032.10418-10-ming.lei@redhat.com>
+        <yq1o95akbxj.fsf@oracle.com> <20190413065608.GA9108@ming.t460p>
+Date:   Mon, 15 Apr 2019 22:12:04 -0400
+In-Reply-To: <20190413065608.GA9108@ming.t460p> (Ming Lei's message of "Sat,
+        13 Apr 2019 14:56:09 +0800")
+Message-ID: <yq1imvehf63.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190415145952.GE13684@quack2.suse.cz>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Tue, 16 Apr 2019 00:22:11 +0000 (UTC)
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9228 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=598
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1904160013
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9228 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=627 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1904160013
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 15, 2019 at 04:59:52PM +0200, Jan Kara wrote:
-> Hi Jerome!
-> 
-> On Thu 11-04-19 17:08:29, jglisse@redhat.com wrote:
-> > From: Jérôme Glisse <jglisse@redhat.com>
-> > 
-> > We want to keep track of how we got a reference on page added to bio_vec
-> > ie wether the page was reference through GUP (get_user_page*) or not. So
-> > add a flag to bio_add_page()/bio_add_pc_page()/__bio_add_page() to that
-> > effect.
-> 
-> Thanks for writing this patch set! Looking through patches like this one,
-> I'm a bit concerned. With so many bio_add_page() callers it's difficult to
-> get things right and not regress in the future. I'm wondering whether the
-> things won't be less error-prone if we required that all page reference
-> from bio are gup-like (not necessarily taken by GUP, if creator of the bio
-> gets to struct page he needs via some other means (e.g. page cache lookup),
-> he could just use get_gup_pin() helper we'd provide).  After all, a page
-> reference in bio means that the page is pinned for the duration of IO and
-> can be DMAed to/from so it even makes some sense to track the reference
-> like that. Then bio_put() would just unconditionally do put_user_page() and
-> we won't have to propagate the information in the bio.
-> 
-> Do you think this would be workable and easier?
 
-Thinking again on this, i can drop that patch and just add a new
-bio_add_page_from_gup() and then it would be much more obvious that
-only very few places need to use that new version and they are mostly
-obvious places. It is usualy GUP then right away add the pages to bio
-or bvec.
+Ming,
 
-We can probably add documentation around GUP explaining that if you
-want to build a bio or bvec from GUP you must pay attention to which
-function you use.
+> This patch doesn't depend on patch 1~8, so please take it via scsi
+> tree if you are fine.
 
-Also pages going in a bio are not necessarily written too, they can
-be use as source (writting to block) or as destination (reading from
-block). So having all of them with refcount bias as GUP would muddy
-the water somemore between pages we can no longer clean (ie GUPed)
-and those that are just being use in regular read or write operation.
+Applied, thanks!
 
-Cheers,
-Jérôme
+-- 
+Martin K. Petersen	Oracle Linux Engineering
