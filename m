@@ -2,133 +2,129 @@ Return-Path: <SRS0=7JUc=SS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E76C10F13
-	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 18:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA23C10F13
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 18:47:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 659442075B
-	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 18:32:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8E50206BA
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 18:47:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729582AbfDPScg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Apr 2019 14:32:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53094 "EHLO mx1.redhat.com"
+        id S1728801AbfDPSrW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Apr 2019 14:47:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54338 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727136AbfDPScf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Apr 2019 14:32:35 -0400
+        id S1727136AbfDPSrW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Apr 2019 14:47:22 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8C77630018F6;
-        Tue, 16 Apr 2019 18:32:34 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id C3CA1307D846;
+        Tue, 16 Apr 2019 18:47:20 +0000 (UTC)
 Received: from redhat.com (unknown [10.20.6.236])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C0FA360142;
-        Tue, 16 Apr 2019 18:32:30 +0000 (UTC)
-Date:   Tue, 16 Apr 2019 14:32:29 -0400
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2644C6013D;
+        Tue, 16 Apr 2019 18:47:13 +0000 (UTC)
+Date:   Tue, 16 Apr 2019 14:47:11 -0400
 From:   Jerome Glisse <jglisse@redhat.com>
-To:     Jan Kara <jack@suse.cz>
+To:     Boaz Harrosh <boaz@plexistor.com>
 Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, linux-mm@kvack.org,
-        John Hubbard <jhubbard@nvidia.com>,
+        John Hubbard <jhubbard@nvidia.com>, Jan Kara <jack@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Johannes Thumshirn <jthumshirn@suse.de>,
         Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v1 10/15] block: add gup flag to
- bio_add_page()/bio_add_pc_page()/__bio_add_page()
-Message-ID: <20190416183228.GA21526@redhat.com>
+        Ming Lei <ming.lei@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Wilcox <willy@infradead.org>,
+        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, Yan Zheng <zyan@redhat.com>,
+        Sage Weil <sage@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+        Alex Elder <elder@kernel.org>, ceph-devel@vger.kernel.org,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        devel@lists.orangefs.org,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        v9fs-developer@lists.sourceforge.net, Coly Li <colyli@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-bcache@vger.kernel.org,
+        Ernesto =?iso-8859-1?Q?A=2E_Fern=E1ndez?= 
+        <ernesto.mnd.fernandez@gmail.com>
+Subject: Re: [PATCH v1 00/15] Keep track of GUPed pages in fs and block
+Message-ID: <20190416184711.GB21526@redhat.com>
 References: <20190411210834.4105-1-jglisse@redhat.com>
- <20190411210834.4105-11-jglisse@redhat.com>
- <20190415145952.GE13684@quack2.suse.cz>
- <20190416002203.GA3158@redhat.com>
- <20190416165206.GC17148@quack2.suse.cz>
+ <2c124cc4-b97e-ee28-2926-305bc6bc74bd@plexistor.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190416165206.GC17148@quack2.suse.cz>
+In-Reply-To: <2c124cc4-b97e-ee28-2926-305bc6bc74bd@plexistor.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 16 Apr 2019 18:32:35 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 16 Apr 2019 18:47:21 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 16, 2019 at 06:52:06PM +0200, Jan Kara wrote:
-> On Mon 15-04-19 20:22:04, Jerome Glisse wrote:
-> > On Mon, Apr 15, 2019 at 04:59:52PM +0200, Jan Kara wrote:
-> > > Hi Jerome!
-> > > 
-> > > On Thu 11-04-19 17:08:29, jglisse@redhat.com wrote:
-> > > > From: Jérôme Glisse <jglisse@redhat.com>
-> > > > 
-> > > > We want to keep track of how we got a reference on page added to bio_vec
-> > > > ie wether the page was reference through GUP (get_user_page*) or not. So
-> > > > add a flag to bio_add_page()/bio_add_pc_page()/__bio_add_page() to that
-> > > > effect.
-> > > 
-> > > Thanks for writing this patch set! Looking through patches like this one,
-> > > I'm a bit concerned. With so many bio_add_page() callers it's difficult to
-> > > get things right and not regress in the future. I'm wondering whether the
-> > > things won't be less error-prone if we required that all page reference
-> > > from bio are gup-like (not necessarily taken by GUP, if creator of the bio
-> > > gets to struct page he needs via some other means (e.g. page cache lookup),
-> > > he could just use get_gup_pin() helper we'd provide).  After all, a page
-> > > reference in bio means that the page is pinned for the duration of IO and
-> > > can be DMAed to/from so it even makes some sense to track the reference
-> > > like that. Then bio_put() would just unconditionally do put_user_page() and
-> > > we won't have to propagate the information in the bio.
-> > > 
-> > > Do you think this would be workable and easier?
+On Tue, Apr 16, 2019 at 09:35:04PM +0300, Boaz Harrosh wrote:
+> On Thu, Apr 11, 2019 at 05:08:19PM -0400, jglisse@redhat.com wrote:
+> > From: Jérôme Glisse <jglisse@redhat.com>
 > > 
-> > Thinking again on this, i can drop that patch and just add a new
-> > bio_add_page_from_gup() and then it would be much more obvious that
-> > only very few places need to use that new version and they are mostly
-> > obvious places. It is usualy GUP then right away add the pages to bio
-> > or bvec.
+> > This patchset depends on various small fixes [1] and also on patchset
+> > which introduce put_user_page*() [2] and thus is 5.3 material as those
+> > pre-requisite will get in 5.2 at best. Nonetheless i am posting it now
+> > so that it can get review and comments on how and what should be done
+> > to test things.
+> > 
+> > For various reasons [2] [3] we want to track page reference through GUP
+> > differently than "regular" page reference. Thus we need to keep track
+> > of how we got a page within the block and fs layer. To do so this patch-
+> > set change the bio_bvec struct to store a pfn and flags instead of a
+> > direct pointer to a page. This way we can flag page that are coming from
+> > GUP.
+> > 
+> > This patchset is divided as follow:
+> >     - First part of the patchset is just small cleanup i believe they
+> >       can go in as his assuming people are ok with them.
 > 
-> Yes, that's another option. Probably second preferred by me after my own
-> proposal ;)
 > 
-> > We can probably add documentation around GUP explaining that if you
-> > want to build a bio or bvec from GUP you must pay attention to which
-> > function you use.
+> >     - Second part convert bio_vec->bv_page to bio_vec->bv_pfn this is
+> >       done in multi-step, first we replace all direct dereference of
+> >       the field by call to inline helper, then we introduce macro for
+> >       bio_bvec that are initialized on the stack. Finaly we change the
+> >       bv_page field to bv_pfn.
 > 
-> Yes, although we both know how careful people are in reading
-> documentation...
+> Why do we need a bv_pfn. Why not just use the lowest bit of the page-ptr
+> as a flag (pointer always aligned to 64 bytes in our case).
+> 
+> So yes we need an inline helper for reference of the page but is it not clearer
+> that we assume a page* and not any kind of pfn ?
+> It will not be the first place using low bits of a pointer for flags.
 
-Yes i know this is a sad state, but if enough people see comments in
-enough places we should end up with more eyes aware of the gotcha and
-hopefully increase the likelyhood of catching any new user.
+Yes i can use the lower bit of struct page * pointer it should be safe on
+all architecture. I wanted to change the bv_page field name to make sure
+that we catch anyone doing any direct dereference. Do you prefer keeping a
+page pointer there ?
 
 > 
-> > Also pages going in a bio are not necessarily written too, they can
-> > be use as source (writting to block) or as destination (reading from
-> > block). So having all of them with refcount bias as GUP would muddy
-> > the water somemore between pages we can no longer clean (ie GUPed)
-> > and those that are just being use in regular read or write operation.
+> That said. Why we need it at all? I mean why not have it as a bio flag. If it exist
+> at all that a user has a GUP and none-GUP pages to IO at the same request he/she
+> can just submit them as two separate BIOs (chained at the block layer).
 > 
-> Why would the difference matter here?
+> Many users just submit one page bios and let elevator merge them any way.
 
-Restricting GUP like status to GUP insure that we only ever back-off
-because of GUP and not because of some innocuous I/O.
-
-I am working on a v2 that just add a new variant to add page, but i
-will have to run (x)fstest before re-posting.
-
-I also have the scatterlist convertion mostly ready:
-
-https://cgit.freedesktop.org/~glisse/linux/log/?h=gup-scatterlist-v1
-
-After that GUP is mostly isolated to individual driver and much easier
-to track and update.
+The issue is that bio_vec is use, on its own, outside of bios and for
+those use cases i need to track the GUP status within the bio_vec. Thus
+it is easier to use the same mechanisms for bio too as adding a flag to
+bio would mean that i also have to audit all code path that could merge
+bios. While i believe it should be restrictred to block/blk-merge.c it
+seems some block and some fs have spawn some custom bio manipulation
+(md comes to mind). So using same mechanism for bio_vec and bio seems
+like a safer and easier course of action.
 
 Cheers,
 Jérôme
