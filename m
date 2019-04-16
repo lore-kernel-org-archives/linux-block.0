@@ -6,245 +6,193 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CE0C282DA
-	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 10:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CF10C10F14
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 10:19:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CC6E8206BA
-	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 10:19:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 455D8206BA
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 10:19:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728961AbfDPKTl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Apr 2019 06:19:41 -0400
+        id S1727087AbfDPKTn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Apr 2019 06:19:43 -0400
 Received: from mga07.intel.com ([134.134.136.100]:15522 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727783AbfDPKTl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Apr 2019 06:19:41 -0400
+        id S1727783AbfDPKTn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Apr 2019 06:19:43 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Apr 2019 03:19:40 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Apr 2019 03:19:42 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.60,357,1549958400"; 
-   d="scan'208";a="337927061"
+   d="scan'208";a="337927071"
 Received: from gklab-107-059.igk.intel.com ([10.102.107.59])
-  by fmsmga006.fm.intel.com with ESMTP; 16 Apr 2019 03:19:39 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 16 Apr 2019 03:19:41 -0700
 From:   Igor Konopko <igor.j.konopko@intel.com>
 To:     mb@lightnvm.io, javier@javigon.com, hans.holmberg@cnexlabs.com
 Cc:     linux-block@vger.kernel.org, igor.j.konopko@intel.com
-Subject: [PATCH v4 5/7] lightnvm: pblk: use nvm_rq_to_ppa_list()
-Date:   Tue, 16 Apr 2019 12:16:46 +0200
-Message-Id: <20190416101648.10045-6-igor.j.konopko@intel.com>
+Subject: [PATCH v4 6/7] lightnvm: track inflight target creations
+Date:   Tue, 16 Apr 2019 12:16:47 +0200
+Message-Id: <20190416101648.10045-7-igor.j.konopko@intel.com>
 X-Mailer: git-send-email 2.9.5
 In-Reply-To: <20190416101648.10045-1-igor.j.konopko@intel.com>
 References: <20190416101648.10045-1-igor.j.konopko@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch replaces few remaining usages of rqd->ppa_list[] with
-existing nvm_rq_to_ppa_list() helpers. This is needed for theoretical
-devices with ws_min/ws_opt equal to 1.
+When creation process is still in progress, target is not yet on
+targets list. This causes a chance for removing whole lightnvm
+subsystem by calling nvm_unregister() in the meantime and finally by
+causing kernel panic inside target init function.
+
+This patch changes the behaviour by adding kref variable which tracks
+all the users of nvm_dev structure. When nvm_dev is allocated, kref
+value is set to 1. Then before every target creation the value is
+increased and decreased after target removal. The extra reference
+is decreased when nvm subsystem is unregistered.
 
 Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-Reviewed-by: Javier González <javier@javigon.com>
 ---
- drivers/lightnvm/pblk-core.c     | 26 ++++++++++++++------------
- drivers/lightnvm/pblk-recovery.c | 13 ++++++++-----
- 2 files changed, 22 insertions(+), 17 deletions(-)
+ drivers/lightnvm/core.c  | 41 +++++++++++++++++++++++++++++++----------
+ include/linux/lightnvm.h |  1 +
+ 2 files changed, 32 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index e6b9295..9cf894a 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -562,11 +562,9 @@ int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd)
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index e2abe88..0e9f7996 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -45,6 +45,8 @@ struct nvm_dev_map {
+ 	int num_ch;
+ };
  
- int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd)
++static void nvm_free(struct kref *ref);
++
+ static struct nvm_target *nvm_find_target(struct nvm_dev *dev, const char *name)
  {
--	struct ppa_addr *ppa_list;
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 	int ret;
- 
--	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
--
- 	pblk_down_chunk(pblk, ppa_list[0]);
- 	ret = pblk_submit_io_sync(pblk, rqd);
- 	pblk_up_chunk(pblk, ppa_list[0]);
-@@ -727,6 +725,7 @@ static int pblk_line_smeta_read_copy(struct pblk *pblk,
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	struct bio *bio;
-+	struct ppa_addr *ppa_list;
- 	struct nvm_rq rqd;
- 	int i, ret;
- 
-@@ -749,6 +748,7 @@ static int pblk_line_smeta_read_copy(struct pblk *pblk,
- 	rqd.opcode = NVM_OP_PREAD;
- 	rqd.nr_ppas = lm->smeta_sec;
- 	rqd.is_seq = 1;
-+	ppa_list = nvm_rq_to_ppa_list(&rqd);
- 
- 	for (i = 0; i < rqd.nr_ppas; i++, paddr++) {
- 		struct ppa_addr ppa = addr_to_gen_ppa(pblk, paddr, line->id);
-@@ -760,7 +760,7 @@ static int pblk_line_smeta_read_copy(struct pblk *pblk,
- 			pos = pblk_ppa_to_pos(geo, ppa);
- 		}
- 
--		rqd.ppa_list[i] = ppa;
-+		ppa_list[i] = ppa;
- 		pblk_get_meta(pblk, rqd.meta_list, i)->lba =
- 				  cpu_to_le64(ADDR_EMPTY);
+ 	struct nvm_target *tgt;
+@@ -501,6 +503,7 @@ static int nvm_remove_tgt(struct nvm_dev *dev, struct nvm_ioctl_remove *remove)
  	}
-@@ -811,6 +811,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line)
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	struct bio *bio;
-+	struct ppa_addr *ppa_list;
- 	struct nvm_rq rqd;
- 	__le64 *lba_list = emeta_to_lbas(pblk, line->emeta->buf);
- 	__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
-@@ -862,6 +863,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line)
- 	rqd.opcode = NVM_OP_PWRITE;
- 	rqd.nr_ppas = smeta_wr_sec;
- 	rqd.is_seq = 1;
-+	ppa_list = nvm_rq_to_ppa_list(&rqd);
+ 	__nvm_remove_target(t, true);
+ 	mutex_unlock(&dev->mlock);
++	kref_put(&dev->ref, nvm_free);
  
- 	for (i = 0; i < rqd.nr_ppas; i++, paddr++) {
- 		void *meta_list = rqd.meta_list;
-@@ -874,7 +876,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line)
- 			pos = pblk_ppa_to_pos(geo, ppa);
- 		}
- 
--		rqd.ppa_list[i] = ppa;
-+		ppa_list[i] = ppa;
- 		pblk_get_meta(pblk, meta_list, i)->lba = addr_empty;
- 		lba_list[paddr] = addr_empty;
- 	}
-@@ -910,8 +912,9 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct pblk_line_meta *lm = &pblk->lm;
--	void *ppa_list, *meta_list;
-+	void *ppa_list_buf, *meta_list;
- 	struct bio *bio;
-+	struct ppa_addr *ppa_list;
- 	struct nvm_rq rqd;
- 	u64 paddr = line->emeta_ssec;
- 	dma_addr_t dma_ppa_list, dma_meta_list;
-@@ -927,7 +930,7 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 	if (!meta_list)
- 		return -ENOMEM;
- 
--	ppa_list = meta_list + pblk_dma_meta_size(pblk);
-+	ppa_list_buf = meta_list + pblk_dma_meta_size(pblk);
- 	dma_ppa_list = dma_meta_list + pblk_dma_meta_size(pblk);
- 
- next_rq:
-@@ -948,11 +951,12 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 
- 	rqd.bio = bio;
- 	rqd.meta_list = meta_list;
--	rqd.ppa_list = ppa_list;
-+	rqd.ppa_list = ppa_list_buf;
- 	rqd.dma_meta_list = dma_meta_list;
- 	rqd.dma_ppa_list = dma_ppa_list;
- 	rqd.opcode = NVM_OP_PREAD;
- 	rqd.nr_ppas = rq_ppas;
-+	ppa_list = nvm_rq_to_ppa_list(&rqd);
- 
- 	for (i = 0; i < rqd.nr_ppas; ) {
- 		struct ppa_addr ppa = addr_to_gen_ppa(pblk, paddr, line_id);
-@@ -980,7 +984,7 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 		}
- 
- 		for (j = 0; j < min; j++, i++, paddr++)
--			rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line_id);
-+			ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line_id);
- 	}
- 
- 	ret = pblk_submit_io_sync(pblk, &rqd);
-@@ -1605,11 +1609,9 @@ void pblk_ppa_to_line_put(struct pblk *pblk, struct ppa_addr ppa)
- 
- void pblk_rq_to_line_put(struct pblk *pblk, struct nvm_rq *rqd)
- {
--	struct ppa_addr *ppa_list;
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 	int i;
- 
--	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
--
- 	for (i = 0; i < rqd->nr_ppas; i++)
- 		pblk_ppa_to_line_put(pblk, ppa_list[i]);
+ 	return 0;
  }
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 9a992af..2fca21e 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -181,6 +181,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
- 	struct pblk_pad_rq *pad_rq;
- 	struct nvm_rq *rqd;
- 	struct bio *bio;
-+	struct ppa_addr *ppa_list;
- 	void *data;
- 	__le64 *lba_list = emeta_to_lbas(pblk, line->emeta->buf);
- 	u64 w_ptr = line->cur_sec;
-@@ -241,6 +242,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
- 	rqd->end_io = pblk_end_io_recov;
- 	rqd->private = pad_rq;
+@@ -1094,15 +1097,16 @@ static int nvm_core_init(struct nvm_dev *dev)
+ 	return ret;
+ }
  
-+	ppa_list = nvm_rq_to_ppa_list(rqd);
- 	meta_list = rqd->meta_list;
+-static void nvm_free(struct nvm_dev *dev)
++static void nvm_free(struct kref *ref)
+ {
+-	if (!dev)
+-		return;
++	struct nvm_dev *dev = container_of(ref, struct nvm_dev, ref);
  
- 	for (i = 0; i < rqd->nr_ppas; ) {
-@@ -268,17 +270,17 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
- 			lba_list[w_ptr] = addr_empty;
- 			meta = pblk_get_meta(pblk, meta_list, i);
- 			meta->lba = addr_empty;
--			rqd->ppa_list[i] = dev_ppa;
-+			ppa_list[i] = dev_ppa;
- 		}
+ 	if (dev->dma_pool)
+ 		dev->ops->destroy_dma_pool(dev->dma_pool);
+ 
+-	nvm_unregister_map(dev);
++	if (dev->rmap)
++		nvm_unregister_map(dev);
++
+ 	kfree(dev->lun_map);
+ 	kfree(dev);
+ }
+@@ -1139,7 +1143,13 @@ static int nvm_init(struct nvm_dev *dev)
+ 
+ struct nvm_dev *nvm_alloc_dev(int node)
+ {
+-	return kzalloc_node(sizeof(struct nvm_dev), GFP_KERNEL, node);
++	struct nvm_dev *dev;
++
++	dev = kzalloc_node(sizeof(struct nvm_dev), GFP_KERNEL, node);
++	if (dev)
++		kref_init(&dev->ref);
++
++	return dev;
+ }
+ EXPORT_SYMBOL(nvm_alloc_dev);
+ 
+@@ -1147,12 +1157,16 @@ int nvm_register(struct nvm_dev *dev)
+ {
+ 	int ret, exp_pool_size;
+ 
+-	if (!dev->q || !dev->ops)
++	if (!dev->q || !dev->ops) {
++		kref_put(&dev->ref, nvm_free);
+ 		return -EINVAL;
++	}
+ 
+ 	ret = nvm_init(dev);
+-	if (ret)
++	if (ret) {
++		kref_put(&dev->ref, nvm_free);
+ 		return ret;
++	}
+ 
+ 	exp_pool_size = max_t(int, PAGE_SIZE,
+ 			      (NVM_MAX_VLBA * (sizeof(u64) + dev->geo.sos)));
+@@ -1162,7 +1176,7 @@ int nvm_register(struct nvm_dev *dev)
+ 						  exp_pool_size);
+ 	if (!dev->dma_pool) {
+ 		pr_err("nvm: could not create dma pool\n");
+-		nvm_free(dev);
++		kref_put(&dev->ref, nvm_free);
+ 		return -ENOMEM;
  	}
  
- 	kref_get(&pad_rq->ref);
--	pblk_down_chunk(pblk, rqd->ppa_list[0]);
-+	pblk_down_chunk(pblk, ppa_list[0]);
- 
- 	ret = pblk_submit_io(pblk, rqd);
- 	if (ret) {
- 		pblk_err(pblk, "I/O submission failed: %d\n", ret);
--		pblk_up_chunk(pblk, rqd->ppa_list[0]);
-+		pblk_up_chunk(pblk, ppa_list[0]);
- 		kref_put(&pad_rq->ref, pblk_recov_complete);
- 		pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
- 		bio_put(bio);
-@@ -424,6 +426,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
- 	rqd->ppa_list = ppa_list;
- 	rqd->dma_ppa_list = dma_ppa_list;
- 	rqd->dma_meta_list = dma_meta_list;
-+	ppa_list = nvm_rq_to_ppa_list(rqd);
- 
- 	if (pblk_io_aligned(pblk, rq_ppas))
- 		rqd->is_seq = 1;
-@@ -442,7 +445,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
- 		}
- 
- 		for (j = 0; j < pblk->min_write_pgs; j++, i++)
--			rqd->ppa_list[i] =
-+			ppa_list[i] =
- 				addr_to_gen_ppa(pblk, paddr + j, line->id);
- 	}
- 
-@@ -490,7 +493,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+@@ -1184,6 +1198,7 @@ void nvm_unregister(struct nvm_dev *dev)
+ 		if (t->dev->parent != dev)
  			continue;
+ 		__nvm_remove_target(t, false);
++		kref_put(&dev->ref, nvm_free);
+ 	}
+ 	mutex_unlock(&dev->mlock);
  
- 		line->nr_valid_lbas++;
--		pblk_update_map(pblk, lba, rqd->ppa_list[i]);
-+		pblk_update_map(pblk, lba, ppa_list[i]);
+@@ -1191,13 +1206,14 @@ void nvm_unregister(struct nvm_dev *dev)
+ 	list_del(&dev->devices);
+ 	up_write(&nvm_lock);
+ 
+-	nvm_free(dev);
++	kref_put(&dev->ref, nvm_free);
+ }
+ EXPORT_SYMBOL(nvm_unregister);
+ 
+ static int __nvm_configure_create(struct nvm_ioctl_create *create)
+ {
+ 	struct nvm_dev *dev;
++	int ret;
+ 
+ 	down_write(&nvm_lock);
+ 	dev = nvm_find_nvm_dev(create->dev);
+@@ -1208,7 +1224,12 @@ static int __nvm_configure_create(struct nvm_ioctl_create *create)
+ 		return -EINVAL;
  	}
  
- 	left_ppas -= rq_ppas;
+-	return nvm_create_tgt(dev, create);
++	kref_get(&dev->ref);
++	ret = nvm_create_tgt(dev, create);
++	if (ret)
++		kref_put(&dev->ref, nvm_free);
++
++	return ret;
+ }
+ 
+ static long nvm_ioctl_info(struct file *file, void __user *arg)
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index d3b0270..4d0d565 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -428,6 +428,7 @@ struct nvm_dev {
+ 	char name[DISK_NAME_LEN];
+ 	void *private_data;
+ 
++	struct kref ref;
+ 	void *rmap;
+ 
+ 	struct mutex mlock;
 -- 
 2.9.5
 
