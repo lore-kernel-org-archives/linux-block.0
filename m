@@ -1,124 +1,128 @@
-Return-Path: <SRS0=7FI7=SR=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=7JUc=SS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E634DC10F12
-	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 21:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F330C10F12
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 00:00:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B2C2A2070D
-	for <linux-block@archiver.kernel.org>; Mon, 15 Apr 2019 21:36:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YciWsYOF"
+	by mail.kernel.org (Postfix) with ESMTP id 06A702084B
+	for <linux-block@archiver.kernel.org>; Tue, 16 Apr 2019 00:00:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728143AbfDOVgn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Apr 2019 17:36:43 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:34355 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727413AbfDOVgm (ORCPT
+        id S1727214AbfDPAAi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Apr 2019 20:00:38 -0400
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:56327 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726118AbfDPAAh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Apr 2019 17:36:42 -0400
-Received: by mail-pg1-f193.google.com with SMTP id v12so9233941pgq.1
-        for <linux-block@vger.kernel.org>; Mon, 15 Apr 2019 14:36:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+4qKTodmcdfLx4hSSwpki61mlxSH1Iz4ZVv16WFnNrE=;
-        b=YciWsYOFZe/GiIi7S2IZP0DTK7yeFNpN50riFKaeU91vOUa/jdBooOzE09rz4VO95g
-         k5MbU3bdyQzzKU6w+VSu0dM/a1Pw0p9RyFNjz3M+k5WFkiKkUm9CsMo3GZiQIrMl23O6
-         /ZicI07hegeArAmCxsmAMPW8NNSMt7UWOytaxoC639Q8MT0YzBMfXiuabNU54u17U9IO
-         PIAybo3mYsPyqKYPGturvyO6MCrcM4GGAZlk/jtrC1Ll/M4dVKKq+xSpVlopsgGmq0hq
-         ka1DmDtWXKSWZbKf4DJj2aQFok+Sd/ajSsTvg78KSuPhQo04LqB/c6/KvWVfQhN04fFF
-         Mmmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+4qKTodmcdfLx4hSSwpki61mlxSH1Iz4ZVv16WFnNrE=;
-        b=oSZ+6ASQRGwWSune37u/0okLEywbju7ltONMnkCox2AYoG/lR4X2r+1BieeFg+w5MF
-         EuC2utXiP/AXUXtsYnc59Ilcvagi1A5RLUBk6Ks7t5UKkQ6LuoqTDp4sXtl+KI+CIwKe
-         B6Ff4x08NYv2Q0J2ZpD/7U9A7y5FhympuOzNUjvkR9GjpOynEum3Wwg8bDt4yemI5Kq3
-         R29aIFFoqh+A6FT/IWjb1OiSGPPh3LDZw/NmhgDl324gbMfnvVfF1iPlW0B9I6KPmobj
-         33xvrZASNHILwyhxn4pMRn37Heg/gjGUCYdyZFNOwcgN9hKpvnvuYXyHNyP8P9BgM8dn
-         XqGw==
-X-Gm-Message-State: APjAAAWUwu2+ZGVrWc82/TmwV0GMF+9KPm3yAt9z67nweX4sRqG8LLaP
-        XIJruBjPO1ntNVWXuTLso/+fiNeX9Rc7YQ==
-X-Google-Smtp-Source: APXvYqymuWgbE7yJm1DgdtOKH+ybQVV51AniESwnK7V4tCp37qXc9nkGsVChFDV+WAiJ8l+zcIBo6Q==
-X-Received: by 2002:a65:4341:: with SMTP id k1mr73399029pgq.88.1555364201783;
-        Mon, 15 Apr 2019 14:36:41 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id w3sm98219007pfn.179.2019.04.15.14.36.39
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 15 Apr 2019 14:36:40 -0700 (PDT)
-Subject: Re: [PATCH v3] block: fix use-after-free on gendisk
-To:     Yufen Yu <yuyufen@huawei.com>, jack@suse.cz
-Cc:     viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
-        linux-block@vger.kernel.org
-References: <20190402120634.51040-1-yuyufen@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c5e3ace1-6388-cb23-1ea2-d2fbc1b9cca8@kernel.dk>
-Date:   Mon, 15 Apr 2019 15:36:38 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Mon, 15 Apr 2019 20:00:37 -0400
+Received: from dread.disaster.area (pa49-195-160-97.pa.nsw.optusnet.com.au [49.195.160.97])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 6CF0A43B815;
+        Tue, 16 Apr 2019 10:00:23 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92)
+        (envelope-from <david@fromorbit.com>)
+        id 1hGBWQ-0001Bf-TP; Tue, 16 Apr 2019 10:00:22 +1000
+Date:   Tue, 16 Apr 2019 10:00:22 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     jglisse@redhat.com
+Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        John Hubbard <jhubbard@nvidia.com>, Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Wilcox <willy@infradead.org>,
+        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, Yan Zheng <zyan@redhat.com>,
+        Sage Weil <sage@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+        Alex Elder <elder@kernel.org>, ceph-devel@vger.kernel.org,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        devel@lists.orangefs.org,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        v9fs-developer@lists.sourceforge.net, Coly Li <colyli@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-bcache@vger.kernel.org,
+        Ernesto A =?iso-8859-1?Q?=2E_Fern=E1ndez?= 
+        <ernesto.mnd.fernandez@gmail.com>
+Subject: Re: [PATCH v1 00/15] Keep track of GUPed pages in fs and block
+Message-ID: <20190416000022.GA1454@dread.disaster.area>
+References: <20190411210834.4105-1-jglisse@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190402120634.51040-1-yuyufen@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190411210834.4105-1-jglisse@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.2 cv=FNpr/6gs c=1 sm=1 tr=0 cx=a_idp_d
+        a=EHa8gIBQe3daEtuMEU8ptg==:117 a=EHa8gIBQe3daEtuMEU8ptg==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=8nJEP1OIZ-IA:10 a=oexKYjalfGEA:10
+        a=20KFwNOVAAAA:8 a=7-415B0cAAAA:8 a=8ER2NWrdpJKUM3wQwksA:9
+        a=wPNLvfGTeEIA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/2/19 6:06 AM, Yufen Yu wrote:
-> commit 2da78092dda "block: Fix dev_t minor allocation lifetime"
-> specifically moved blk_free_devt(dev->devt) call to part_release()
-> to avoid reallocating device number before the device is fully
-> shutdown.
+On Thu, Apr 11, 2019 at 05:08:19PM -0400, jglisse@redhat.com wrote:
+> From: Jérôme Glisse <jglisse@redhat.com>
 > 
-> However, it can cause use-after-free on gendisk in get_gendisk().
-> We use md device as example to show the race scenes:
+> This patchset depends on various small fixes [1] and also on patchset
+> which introduce put_user_page*() [2] and thus is 5.3 material as those
+> pre-requisite will get in 5.2 at best. Nonetheless i am posting it now
+> so that it can get review and comments on how and what should be done
+> to test things.
 > 
-> Process1		Worker			Process2
-> md_free
-> 						blkdev_open
-> del_gendisk
->   add delete_partition_work_fn() to wq
->   						__blkdev_get
-> 						get_gendisk
-> put_disk
->   disk_release
->     kfree(disk)
->     						find part from ext_devt_idr
-> 						get_disk_and_module(disk)
->     					  	cause use after free
+> For various reasons [2] [3] we want to track page reference through GUP
+> differently than "regular" page reference. Thus we need to keep track
+> of how we got a page within the block and fs layer. To do so this patch-
+> set change the bio_bvec struct to store a pfn and flags instead of a
+> direct pointer to a page. This way we can flag page that are coming from
+> GUP.
 > 
->     			delete_partition_work_fn
-> 			put_device(part)
->     		  	part_release
-> 		    	remove part from ext_devt_idr
+> This patchset is divided as follow:
+>     - First part of the patchset is just small cleanup i believe they
+>       can go in as his assuming people are ok with them.
+>     - Second part convert bio_vec->bv_page to bio_vec->bv_pfn this is
+>       done in multi-step, first we replace all direct dereference of
+>       the field by call to inline helper, then we introduce macro for
+>       bio_bvec that are initialized on the stack. Finaly we change the
+>       bv_page field to bv_pfn.
+>     - Third part replace put_page(bv_page(bio_vec)) with a new helper
+>       which will use put_user_page() when the page in the bio_vec is
+>       coming from GUP.
+>     - Fourth part update BIO to use bv_set_user_page() for page that
+>       are coming from GUP this means updating bio_add_page*() to pass
+>       down the origin of the page (GUP or not).
+>     - Fith part convert few more places that directly use bvec_io or
+>       BIO.
 > 
-> Before <devt, hd_struct pointer> is removed from ext_devt_idr by
-> delete_partition_work_fn(), we can find the devt and then access
-> gendisk by hd_struct pointer. But, if we access the gendisk after
-> it have been freed, it can cause in use-after-freeon gendisk in
-> get_gendisk().
+> Note that after this patchset they are still places in the kernel where
+> we should use put_user_page*(). The intention is to separate that task
+> in chewable chunk (driver by driver, sub-system by sub-system).
 > 
-> We fix this by adding a new helper blk_invalidate_devt() in
-> delete_partition() and del_gendisk(). It replaces hd_struct
-> pointer in idr with value 'NULL', and deletes the entry from
-> idr in part_release() as we do now.
 > 
-> Thanks to Jan Kara for providing the solution and more clear comments
-> for the code.
+> I have only lightly tested this patchset (branch [4]) on my desktop and
+> have not seen anything obviously wrong but i might have miss something.
+> What kind of test suite should i run to stress test the vfs/block layer
+> around DIO and BIO ?
 
-Applied, thanks.
+Such widespread changes need full correctness tests run on them. I'd
+suggest fstests (auto group) be run on all the filesystems it
+supports that are affected by the changes in the patchset. Given you
+touched bio_add_page() here, that's probably all of them....
 
+Cheers,
+
+Dave.
 -- 
-Jens Axboe
-
+Dave Chinner
+david@fromorbit.com
