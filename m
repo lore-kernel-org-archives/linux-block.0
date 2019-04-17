@@ -2,49 +2,40 @@ Return-Path: <SRS0=3KWi=ST=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAABFC282DA
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 12:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1950C282DA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 12:16:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 804B2206BA
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 12:10:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A95182173C
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 12:16:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731508AbfDQMKV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Apr 2019 08:10:21 -0400
-Received: from mx2.suse.de ([195.135.220.15]:46258 "EHLO mx1.suse.de"
+        id S1731566AbfDQMQv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Apr 2019 08:16:51 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47390 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731116AbfDQMKU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Apr 2019 08:10:20 -0400
+        id S1731499AbfDQMQv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Apr 2019 08:16:51 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id B16C1AFFC;
-        Wed, 17 Apr 2019 12:10:18 +0000 (UTC)
-Subject: Re: [PATCH V6 9/9] nvme: hold request queue's refcount in ns's whole
- lifetime
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-nvme@lists.infradead.org, Sagi Grimberg <sagi@grimberg.me>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        James Smart <james.smart@broadcom.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        jianchao wang <jianchao.w.wang@oracle.com>
-References: <20190417034410.31957-1-ming.lei@redhat.com>
- <20190417034410.31957-10-ming.lei@redhat.com>
+        by mx1.suse.de (Postfix) with ESMTP id 9FAA5B031;
+        Wed, 17 Apr 2019 12:16:50 +0000 (UTC)
+Subject: Re: Adding QCOW2 reading/writing support
+To:     Manuel Bentele <manuel-bentele@web.de>,
+        Ming Lei <tom.leiming@gmail.com>
+Cc:     linux-block <linux-block@vger.kernel.org>
+References: <60bbe5e0-317d-8ead-0eb8-d1dc79927bc8@web.de>
+ <CACVXFVPKHUgbgsbFZSDWqF7GTPyBzKJjKCSq7EYygre_GvpbyQ@mail.gmail.com>
+ <2fbeba35-38f3-22cf-a4d5-49f8af5e6802@web.de>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <bc4b8607-9fe7-aece-97f7-9d7d1c2c4e0b@suse.de>
-Date:   Wed, 17 Apr 2019 14:10:15 +0200
+Message-ID: <39218225-a402-fb3a-dbc6-db2d95e51bd3@suse.de>
+Date:   Wed, 17 Apr 2019 14:16:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20190417034410.31957-10-ming.lei@redhat.com>
+In-Reply-To: <2fbeba35-38f3-22cf-a4d5-49f8af5e6802@web.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -53,88 +44,52 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/17/19 5:44 AM, Ming Lei wrote:
-> Hennes reported the following kernel oops:
+On 4/17/19 1:32 PM, Manuel Bentele wrote:
+> Hi,
 > 
->      There is a race condition between namespace rescanning and
->      controller reset; during controller reset all namespaces are
->      quiesed vie nams_stop_ctrl(), and after reset all namespaces
->      are unquiesced again.
->      When namespace scanning was active by the time controller reset
->      was triggered the rescan code will call nvme_ns_remove(), which
->      then will cause a kernel crash in nvme_start_ctrl() as it'll trip
->      over uninitialized namespaces.
+> On 17.04.19 03:35, Ming Lei wrote:
+>> Hi,
+>>
+>> On Wed, Apr 17, 2019 at 5:33 AM Manuel Bentele <manuel-bentele@web.de> wrote:
+>>> Hi everyone
+>>>
+>>> I'm going to implement an in-kernel reading of QCOW2 images.
+>>> In the project, I only need the reading of QCOW2 images, but it's
+>>> essential to make thoughts for the implementation of the writing, too.
+>>> One of the difficulties seems to be the support of making an image
+>>> sparse (resizing the disk image).
+>> Could you describe this requirement in a bit more detail? Especially why
+>> do you want to read/write QCOW2 in kernel?
 > 
-> Patch "blk-mq: free hw queue's resource in hctx's release handler"
-> should make this issue quite difficult to trigger. However it can't
-> kill the issue completely becasue pre-condition of that patch is to
-> hold request queue's refcount before calling block layer API, and
-> there is still a small window between blk_cleanup_queue() and removing
-> the ns from the controller namspace list in nvme_ns_remove().
+> Yes, of course. The implementation of reading a QCOW2 disk image
+> in-kernel is required for an already existing system in the university
+> environment.
+> At the moment, the Linux kernel, initramfs, etc. for each client in the
+> system is loaded via PXE boot and then the block device with the default
+> file system is included with the help of a modified nbd version, called
+> dnbd (distributed nbd).
+> Due to the fact that the data on the default file system is only for non
+> persistent one-time provision of a client, read access is sufficient.
+> The user related data is stored on a network storage, as mostly done in
+> large scale infrastructures.
 > 
-> Hold request queue's refcount until the ns is freed, then the above race
-> can be avoided completely. Given the 'namespaces_rwsem' is always held
-> to retrieve ns for starting/stopping request queue, this lock can prevent
-> namespaces from being freed.
+> Now, the goal is to minimize the network usage and avoid nbd.
+> Furthermore, fixed configured and packed boot images should be avoided.
+> Therefore, the advantage of the sparse and compression functionality of
+> QCOW2 should be used.
+> A workaround for that problem could be the local usage of nbd to include
+> the QCOW2 disk image as block device, but it involves a lot of
+> interaction between user and kernel space and thus an decreasing
+> performance. That leads to the motivation to implement the reading of
+> QCOW2 disk images directly in the kernel and aim for an merge into the
+> mainline kernel source to avoid out-of-kernel-tree maintenance.
 > 
-> Cc: Dongli Zhang <dongli.zhang@oracle.com>
-> Cc: James Smart <james.smart@broadcom.com>
-> Cc: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: linux-scsi@vger.kernel.org,
-> Cc: Martin K . Petersen <martin.petersen@oracle.com>,
-> Cc: Christoph Hellwig <hch@lst.de>,
-> Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
-> Cc: jianchao wang <jianchao.w.wang@oracle.com>
-> Reported-by: Hannes Reinecke <hare@suse.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->   drivers/nvme/host/core.c | 10 +++++++++-
->   1 file changed, 9 insertions(+), 1 deletion(-)
+> If you have any questions related to the described use case or if you
+> require more information, please let me know.
+> Thanks for your help.
 > 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 248ff3b48041..82cda6602ca7 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -406,6 +406,7 @@ static void nvme_free_ns(struct kref *kref)
->   		nvme_nvm_unregister(ns);
->   
->   	put_disk(ns->disk);
-> +	blk_put_queue(ns->queue);
->   	nvme_put_ns_head(ns->head);
->   	nvme_put_ctrl(ns->ctrl);
->   	kfree(ns);
-> @@ -3229,6 +3230,11 @@ static int nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
->   		goto out_free_ns;
->   	}
->   
-> +	if (!blk_get_queue(ns->queue)) {
-> +		ret = -ENXIO;
-> +		goto out_free_queue;
-> +	}
-> +
->   	blk_queue_flag_set(QUEUE_FLAG_NONROT, ns->queue);
->   	if (ctrl->ops->flags & NVME_F_PCI_P2PDMA)
->   		blk_queue_flag_set(QUEUE_FLAG_PCI_P2PDMA, ns->queue);
-> @@ -3245,7 +3251,7 @@ static int nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
->   	id = nvme_identify_ns(ctrl, nsid);
->   	if (!id) {
->   		ret = -EIO;
-> -		goto out_free_queue;
-> +		goto out_put_queue;
->   	}
->   
->   	if (id->ncap == 0) {
-> @@ -3304,6 +3310,8 @@ static int nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
->   	nvme_put_ns_head(ns->head);
->    out_free_id:
->   	kfree(id);
-> + out_put_queue:
-> +	blk_put_queue(ns->queue);
->    out_free_queue:
->   	blk_cleanup_queue(ns->queue);
->    out_free_ns:
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+cramfs?
+Or btrfs with compression enabled?
 
 Cheers,
 
