@@ -2,110 +2,93 @@ Return-Path: <SRS0=3KWi=ST=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D22DC282DA
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 11:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC9DEC282DA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 11:52:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E99920835
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 11:52:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N/HX4jmJ"
+	by mail.kernel.org (Postfix) with ESMTP id 82C4A20835
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 11:52:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732007AbfDQLwN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Apr 2019 07:52:13 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35691 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731996AbfDQLwM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Apr 2019 07:52:12 -0400
-Received: by mail-wm1-f65.google.com with SMTP id y197so3267074wmd.0;
-        Wed, 17 Apr 2019 04:52:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wNrUcFXZtZVOpOyjGHVxelfd7oqF6M4NUvr3N76BLC4=;
-        b=N/HX4jmJ6mNx9A/ZtPcvByfjkkCNexHqkNgZWEcbC3vhY9IINFczfICav80NpdO7KO
-         eYoKZzGwmUs5MpzzcreVc9QaxErQFBSmjklzteyZhjh71weKPpSo9dfBIHEWbQ3wppBu
-         A6ollH9X8rsIDrrYD7lA5MK43zKag7v1sZ4t6SUibHqsPRSJBmadeP575kIssnFa6tox
-         i31QP2hKKg0qVGFN561OupXywjADrKnGe4X/6EOBjm3gSw7CE/tOGyRd2mF1RJK2d0r6
-         nQD/mN7hsp7MKzlSvbaMf/W7cmsIN1k16K+8iBB+psdPp1PG0TXPRYWS9wINDNCdJgBT
-         iPaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=wNrUcFXZtZVOpOyjGHVxelfd7oqF6M4NUvr3N76BLC4=;
-        b=slo8g1teIqCvWxKyfMX6DsZtQ2RCojG/RiyTBNfx+m1kiK0Uf7VQg7JV+EYLTLK7qI
-         3nzOqckG648y5iyTYLiVEBltzi/GBu7OegxdkX0uoNCIj3T91fPGl6NEphZ9qQBZiZL7
-         q8xO6fE7RgLnogKTrIaZ4YYI2njWhK8TZjNoIbkVLEavIXT97jMdCv3d8fh9LE3WmeOV
-         4YuaU/O8KePemxkePxrOSoeOU/fJx/DRA8NLyPpbApJIyHeCAenAjsUOlkFizeggDz1Z
-         Q6Dq0SEwseWopr2wlW20FmAv4GX8zcykWEqyaJgOb02PudpENuZljJgtH5eSLQ54MJ7f
-         Vuyw==
-X-Gm-Message-State: APjAAAW1hw2ne1Btld2u9lUbQ5SvCawvyiH6vwPPHJNVZr2frO3eOw90
-        jbt2gr050w3OB9yRQSf1VqYcWPtP
-X-Google-Smtp-Source: APXvYqzEK0bXLo8zt4+Vm2BuGbzWGQ0BGCgPHPI0eeLvJ+scl218SPAMItrdv8c8H1K0YmZJUCMnug==
-X-Received: by 2002:a1c:a7c5:: with SMTP id q188mr30657080wme.126.1555501930041;
-        Wed, 17 Apr 2019 04:52:10 -0700 (PDT)
-Received: from donizetti.redhat.com ([2001:b07:6468:f312:ac27:aac4:c65c:6eb])
-        by smtp.gmail.com with ESMTPSA id y1sm153840247wrd.34.2019.04.17.04.52.08
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 17 Apr 2019 04:52:09 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     stefanha@redhat.com, stable@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org (open list:BLOCK LAYER)
-Subject: [PATCH v2] block: bio_map_user_iov should not be limited to BIO_MAX_PAGES
-Date:   Wed, 17 Apr 2019 13:52:07 +0200
-Message-Id: <20190417115207.30202-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.21.0
+        id S1731996AbfDQLwx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Apr 2019 07:52:53 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43262 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729898AbfDQLwx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Apr 2019 07:52:53 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id E96F2AFFB;
+        Wed, 17 Apr 2019 11:52:51 +0000 (UTC)
+Subject: Re: [PATCH] block: make sure that bvec length can't be overflowed
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Yi Zhang <yi.zhang@redhat.com>
+References: <20190416153847.8173-1-ming.lei@redhat.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <b36ab484-ce43-67b7-16d4-bdca59fd9e9a@suse.de>
+Date:   Wed, 17 Apr 2019 13:52:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
+In-Reply-To: <20190416153847.8173-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Because bio_kmalloc uses inline iovecs, the limit on the number of entries
-is not BIO_MAX_PAGES but rather UIO_MAXIOV, which indeed is already checked
-in bio_kmalloc.  This could cause SG_IO requests to be truncated and the HBA
-to report a DMA overrun.
+On 4/16/19 5:38 PM, Ming Lei wrote:
+> bvec->bv_offset may be bigger than PAGE_SIZE sometimes, such as,
+> when one bio is splitted in the middle of one bvec via bio_split(),
+> and bi_iter.bi_bvec_done is used to build offset of the 1st bvec of
+> remained bio.
+> 
+> So we have to make sure that every bvec's offset is less than
+> PAGE_SIZE from bio_for_each_segment().
+> 
+> This patch fixes this issue reported by Zhang Yi When running nvme/011.
+> 
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Yi Zhang <yi.zhang@redhat.com>
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Fixes: 6dc4f100c175 ("block: allow bio_for_each_segment_all() to iterate over multi-page bvec")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   include/linux/bvec.h | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+> index 3bc91879e1e2..f179b370066f 100644
+> --- a/include/linux/bvec.h
+> +++ b/include/linux/bvec.h
+> @@ -160,8 +160,9 @@ static inline void bvec_advance(const struct bio_vec *bvec,
+>   		bv->bv_page = nth_page(bv->bv_page, 1);
+>   		bv->bv_offset = 0;
+>   	} else {
+> -		bv->bv_page = bvec->bv_page;
+> -		bv->bv_offset = bvec->bv_offset;
+> +		bv->bv_page = bvec_nth_page(bvec->bv_page, bvec->bv_offset /
+> +					    PAGE_SIZE);
+> +		bv->bv_offset = bvec->bv_offset % PAGE_SIZE;
+>   	}
+>   	bv->bv_len = min_t(unsigned int, PAGE_SIZE - bv->bv_offset,
+>   			   bvec->bv_len - iter_all->done);
+> 
+Looks okay.
 
-Note that if the argument to iov_iter_npages were changed to UIO_MAXIOV,
-we would still truncate SG_IO requests beyond UIO_MAXIOV pages.  Changing
-it to UIO_MAXIOV + 1 instead ensures that bio_kmalloc notices that the
-request is too big and blocks it.
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Cc: stable@vger.kernel.org
-Cc: Al Viro <viro@zeniv.linux.org.uk>
-Fixes: b282cc766958 ("bio_map_user_iov(): get rid of the iov_for_each()", 2017-10-11)
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Cheers,
 
----
-	v1->v2: now with "git commit"
----
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 4db1008309ed..0914ae4adae9 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1299,7 +1299,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
- 	if (!iov_iter_count(iter))
- 		return ERR_PTR(-EINVAL);
- 
--	bio = bio_kmalloc(gfp_mask, iov_iter_npages(iter, BIO_MAX_PAGES));
-+	bio = bio_kmalloc(gfp_mask, iov_iter_npages(iter, UIO_MAXIOV + 1));
- 	if (!bio)
- 		return ERR_PTR(-ENOMEM);
- 
+Hannes
 -- 
-2.21.0
-
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                              +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
