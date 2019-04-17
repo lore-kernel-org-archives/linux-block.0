@@ -5,97 +5,95 @@ X-Spam-Level:
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 704E7C10F14
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 02:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1FC6C10F14
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 03:27:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 337722075B
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 02:11:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58D3A2177B
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 03:27:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZLbL2WxK"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="QPIGeHZj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729412AbfDQCKr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Apr 2019 22:10:47 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:40119 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728032AbfDQCKq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Apr 2019 22:10:46 -0400
-Received: by mail-qt1-f194.google.com with SMTP id x12so25694693qts.7;
-        Tue, 16 Apr 2019 19:10:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=8E78349DtaExhsNzU6Me959vfhX7B7zUGIpotLMFF2I=;
-        b=ZLbL2WxKC4V8eUvL4j4y8/cfMt4imMzxpgnSW8TT/W1Lk1S0XHv4A90dsU4pa+9XLj
-         dfk7PKpWE2TJssTV6hc2G9ysXYJvwvmrM+y9DMMt2FENm+YPjhWbWm7mxuqQtbAGT6fl
-         mjOtBR0nQlCj7K2RTNaxvE1MEsBzAgE1z9cm8yAV4gJV6awLKUTd2BH53VDXucIVUyk6
-         Ow6DDGkgK0RrvwIu4N7okFaKx4OB+vNkrZE0dDNyKYht9q7WolVXr5r5Z4wTwje/8yQ8
-         t1MIq4Ts9Vtaie+FFeo1U0tMnf9tN3m1qM0QG9wbORenQUKAMaGXQ6Bxg//MnFY3w1mf
-         3M5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=8E78349DtaExhsNzU6Me959vfhX7B7zUGIpotLMFF2I=;
-        b=bZQmMMW11ZmkUTBysaiBYoynkHpwOEUzsfD5PxbIms4GHGsS7u0r5JPysj/QMPdays
-         24RdzFTO0Ixni8kKX622D/Us/R0izIF7caFr4RpziVMJndlbbFwON+IcrJqUiT6hfOG5
-         mEBAnKbciLOoVh2gAOseSIZ3I136fnl2yPIDZXVpVu9fVU/Dg5szIYlCilSZs4ZjGN65
-         THxn/QuCa+VeByhmIfR68NeW/v2vjyublUgMmznQwieFlHMMPEhuals7T2Ybff5qbxhy
-         G5LkEBSx+iECvaWSlK9c3tPEky7FzRprYMQmFXKb7VNTwbGWbFBtN1F8W4yK8ycY+64y
-         KB9A==
-X-Gm-Message-State: APjAAAWaOj5XosiheetBmmbONMPsHCvNKdVaRhijWhyY21CYPr2w6GKc
-        kTD9wrn4zqDchZy+6bZFlqn4+aFeH8M=
-X-Google-Smtp-Source: APXvYqxvxUqxORYbV1jyE1YtjRpHEvYpjR4KSxpxdf6ROl3/ctKbGDhNSUX457PyJiQE03oH9Jus9A==
-X-Received: by 2002:ac8:2f11:: with SMTP id j17mr69439487qta.334.1555467045293;
-        Tue, 16 Apr 2019 19:10:45 -0700 (PDT)
-Received: from localhost.localdomain (179.187.200.226.dynamic.adsl.gvt.net.br. [179.187.200.226])
-        by smtp.gmail.com with ESMTPSA id s55sm1497228qte.17.2019.04.16.19.10.41
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Apr 2019 19:10:44 -0700 (PDT)
-From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-To:     linux-kernel@vger.kernel.org, marcos.souza.org@gmail.com
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk, bvanassche@acm.org,
-        Chaitanya.Kulkarni@wdc.com
-Subject: [PATCH v3 1/3] blk-mq.c: Add documention of function blk_mq_init_queue
-Date:   Tue, 16 Apr 2019 23:10:28 -0300
-Message-Id: <20190417021030.82998-2-marcos.souza.org@gmail.com>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20190417021030.82998-1-marcos.souza.org@gmail.com>
-References: <20190417021030.82998-1-marcos.souza.org@gmail.com>
+        id S1728083AbfDQD1R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Apr 2019 23:27:17 -0400
+Received: from m50-132.163.com ([123.125.50.132]:49080 "EHLO m50-132.163.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729079AbfDQD1R (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Apr 2019 23:27:17 -0400
+X-Greylist: delayed 905 seconds by postgrey-1.27 at vger.kernel.org; Tue, 16 Apr 2019 23:27:16 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=From:Subject:Date:Message-Id; bh=pa90oONOQE2aayBbcS
+        fTUNDIb3aN4WNHk8cBOwnKV9k=; b=QPIGeHZjtRc8PxLcJ88ZoKfF4B54r3fRh2
+        SXIHDXaOkiWPdFTskE/w7V7lwSPNuPT1XllxM8gB6XQmOVk3ORVdyWYZAcWQsKNt
+        +j8ncjWEpohlqgOG+LvztIa249yqKFDBiDqJnYbmbZD9jeLzwSIIGn3EzpGp26fz
+        SpsRC4SMc=
+Received: from bp.localdomain (unknown [218.106.182.174])
+        by smtp2 (Coremail) with SMTP id DNGowAC3Xv98mbZcFKkoAA--.242S3;
+        Wed, 17 Apr 2019 11:12:07 +0800 (CST)
+From:   Pan Bian <bianpan2016@163.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Pan Bian <bianpan2016@163.com>
+Subject: scsi: bsg-lib: drop device reference on error path
+Date:   Wed, 17 Apr 2019 11:11:55 +0800
+Message-Id: <1555470715-55702-1-git-send-email-bianpan2016@163.com>
+X-Mailer: git-send-email 2.7.4
+X-CM-TRANSID: DNGowAC3Xv98mbZcFKkoAA--.242S3
+X-Coremail-Antispam: 1Uf129KBjvdXoW7GFWxJr47ZrykuryxJr45Awb_yoWkGrX_CF
+        y093s7Xrn5CFWfCF4YkFWUtr92gF4DXF1IvF4UtF93ZFyUGrZxJa1UZr15urZ8Ww4fu3W2
+        v3ZrZFWfCr1SqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjwID3UUUUU==
+X-Originating-IP: [218.106.182.174]
+X-CM-SenderInfo: held01tdqsiiqw6rljoofrz/xtbBzweZclaD2NPpCgAAse
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
----
- block/blk-mq.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+The function put_device is not called to drop the device reference taken
+by get_device on error paths. This patch fixes the bug.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9516304a38ee..4a8277a54c03 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2650,6 +2650,15 @@ void blk_mq_release(struct request_queue *q)
- 	blk_mq_sysfs_deinit(q);
+Fixes: cd2f076f1d7("bsg: convert to use blk-mq")
+Signed-off-by: Pan Bian <bianpan2016@163.com>
+---
+ block/bsg-lib.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 005e2b7..fe9e0cc 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -281,21 +281,24 @@ static blk_status_t bsg_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct bsg_set *bset =
+ 		container_of(q->tag_set, struct bsg_set, tag_set);
+ 	int ret;
++	blk_status_t status = BLK_STS_IOERR;
+ 
+ 	blk_mq_start_request(req);
+ 
+ 	if (!get_device(dev))
+-		return BLK_STS_IOERR;
++		return status;
+ 
+ 	if (!bsg_prepare_job(dev, req))
+-		return BLK_STS_IOERR;
++		goto out;
+ 
+ 	ret = bset->job_fn(blk_mq_rq_to_pdu(req));
+ 	if (ret)
+-		return BLK_STS_IOERR;
++		goto out;
+ 
++	status = BLK_STS_OK;
++out:
+ 	put_device(dev);
+-	return BLK_STS_OK;
++	return status;
  }
  
-+/**
-+ * blk_mq_init_queue - Create a new request queue associating a blk_mq_tag_set
-+ * @set: tag_set to be associated with the request queue
-+ *
-+ * Description:
-+ * This function creates a new request queue, associating @set with it.
-+ *
-+ * Returns a new request queue on success, or ERR_PTR() on failure.
-+ */
- struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
- {
- 	struct request_queue *uninit_q, *q;
+ /* called right after the request is allocated for the request_queue */
 -- 
-2.16.4
+2.7.4
+
 
