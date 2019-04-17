@@ -2,101 +2,223 @@ Return-Path: <SRS0=3KWi=ST=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1950C282DA
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 12:16:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DBF3C282DA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 13:00:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A95182173C
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 12:16:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49F892173C
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 13:00:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731566AbfDQMQv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Apr 2019 08:16:51 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47390 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731499AbfDQMQv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Apr 2019 08:16:51 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 9FAA5B031;
-        Wed, 17 Apr 2019 12:16:50 +0000 (UTC)
-Subject: Re: Adding QCOW2 reading/writing support
-To:     Manuel Bentele <manuel-bentele@web.de>,
-        Ming Lei <tom.leiming@gmail.com>
-Cc:     linux-block <linux-block@vger.kernel.org>
-References: <60bbe5e0-317d-8ead-0eb8-d1dc79927bc8@web.de>
- <CACVXFVPKHUgbgsbFZSDWqF7GTPyBzKJjKCSq7EYygre_GvpbyQ@mail.gmail.com>
- <2fbeba35-38f3-22cf-a4d5-49f8af5e6802@web.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <39218225-a402-fb3a-dbc6-db2d95e51bd3@suse.de>
-Date:   Wed, 17 Apr 2019 14:16:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1732180AbfDQNAB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Apr 2019 09:00:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55400 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729318AbfDQNAB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Apr 2019 09:00:01 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 60CBF3086214;
+        Wed, 17 Apr 2019 13:00:00 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6005519C77;
+        Wed, 17 Apr 2019 12:59:49 +0000 (UTC)
+Date:   Wed, 17 Apr 2019 20:59:44 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.com>,
+        Keith Busch <keith.busch@intel.com>,
+        linux-nvme@lists.infradead.org, Sagi Grimberg <sagi@grimberg.me>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        jianchao wang <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH V6 6/9] blk-mq: always free hctx after request queue is
+ freed
+Message-ID: <20190417125943.GB5007@ming.t460p>
+References: <20190417034410.31957-1-ming.lei@redhat.com>
+ <20190417034410.31957-7-ming.lei@redhat.com>
+ <63c09210-c20e-6b4a-56fa-b9eac2807cc1@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <2fbeba35-38f3-22cf-a4d5-49f8af5e6802@web.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <63c09210-c20e-6b4a-56fa-b9eac2807cc1@suse.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Wed, 17 Apr 2019 13:00:00 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/17/19 1:32 PM, Manuel Bentele wrote:
-> Hi,
-> 
-> On 17.04.19 03:35, Ming Lei wrote:
->> Hi,
->>
->> On Wed, Apr 17, 2019 at 5:33 AM Manuel Bentele <manuel-bentele@web.de> wrote:
->>> Hi everyone
->>>
->>> I'm going to implement an in-kernel reading of QCOW2 images.
->>> In the project, I only need the reading of QCOW2 images, but it's
->>> essential to make thoughts for the implementation of the writing, too.
->>> One of the difficulties seems to be the support of making an image
->>> sparse (resizing the disk image).
->> Could you describe this requirement in a bit more detail? Especially why
->> do you want to read/write QCOW2 in kernel?
-> 
-> Yes, of course. The implementation of reading a QCOW2 disk image
-> in-kernel is required for an already existing system in the university
-> environment.
-> At the moment, the Linux kernel, initramfs, etc. for each client in the
-> system is loaded via PXE boot and then the block device with the default
-> file system is included with the help of a modified nbd version, called
-> dnbd (distributed nbd).
-> Due to the fact that the data on the default file system is only for non
-> persistent one-time provision of a client, read access is sufficient.
-> The user related data is stored on a network storage, as mostly done in
-> large scale infrastructures.
-> 
-> Now, the goal is to minimize the network usage and avoid nbd.
-> Furthermore, fixed configured and packed boot images should be avoided.
-> Therefore, the advantage of the sparse and compression functionality of
-> QCOW2 should be used.
-> A workaround for that problem could be the local usage of nbd to include
-> the QCOW2 disk image as block device, but it involves a lot of
-> interaction between user and kernel space and thus an decreasing
-> performance. That leads to the motivation to implement the reading of
-> QCOW2 disk images directly in the kernel and aim for an merge into the
-> mainline kernel source to avoid out-of-kernel-tree maintenance.
-> 
-> If you have any questions related to the described use case or if you
-> require more information, please let me know.
-> Thanks for your help.
-> 
-cramfs?
-Or btrfs with compression enabled?
+On Wed, Apr 17, 2019 at 02:08:59PM +0200, Hannes Reinecke wrote:
+> On 4/17/19 5:44 AM, Ming Lei wrote:
+> > In normal queue cleanup path, hctx is released after request queue
+> > is freed, see blk_mq_release().
+> > 
+> > However, in __blk_mq_update_nr_hw_queues(), hctx may be freed because
+> > of hw queues shrinking. This way is easy to cause use-after-free,
+> > because: one implicit rule is that it is safe to call almost all block
+> > layer APIs if the request queue is alive; and one hctx may be retrieved
+> > by one API, then the hctx can be freed by blk_mq_update_nr_hw_queues();
+> > finally use-after-free is triggered.
+> > 
+> > Fixes this issue by always freeing hctx after releasing request queue.
+> > If some hctxs are removed in blk_mq_update_nr_hw_queues(), introduce
+> > a per-queue list to hold them, then try to resuse these hctxs if numa
+> > node is matched.
+> > 
+> > Cc: Dongli Zhang <dongli.zhang@oracle.com>
+> > Cc: James Smart <james.smart@broadcom.com>
+> > Cc: Bart Van Assche <bart.vanassche@wdc.com>
+> > Cc: linux-scsi@vger.kernel.org,
+> > Cc: Martin K . Petersen <martin.petersen@oracle.com>,
+> > Cc: Christoph Hellwig <hch@lst.de>,
+> > Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
+> > Cc: jianchao wang <jianchao.w.wang@oracle.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >   block/blk-mq.c         | 40 +++++++++++++++++++++++++++-------------
+> >   include/linux/blk-mq.h |  2 ++
+> >   include/linux/blkdev.h |  7 +++++++
+> >   3 files changed, 36 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index eeebba6ec0f7..2ca4395f794d 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -2274,6 +2274,10 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+> >   		set->ops->exit_hctx(hctx, hctx_idx);
+> >   	blk_mq_remove_cpuhp(hctx);
+> > +
+> > +	spin_lock(&q->dead_hctx_lock);
+> > +	list_add(&hctx->hctx_list, &q->dead_hctx_list);
+> > +	spin_unlock(&q->dead_hctx_lock);
+> >   }
+> >   static void blk_mq_exit_hw_queues(struct request_queue *q,
+> > @@ -2675,15 +2679,13 @@ static int blk_mq_alloc_ctxs(struct request_queue *q)
+> >    */
+> >   void blk_mq_release(struct request_queue *q)
+> >   {
+> > -	struct blk_mq_hw_ctx *hctx;
+> > -	unsigned int i;
+> > +	struct blk_mq_hw_ctx *hctx, *next;
+> >   	cancel_delayed_work_sync(&q->requeue_work);
+> > -	/* hctx kobj stays in hctx */
+> > -	queue_for_each_hw_ctx(q, hctx, i) {
+> > -		if (!hctx)
+> > -			continue;
+> > +	/* all hctx are in .dead_hctx_list now */
+> > +	list_for_each_entry_safe(hctx, next, &q->dead_hctx_list, hctx_list) {
+> > +		list_del_init(&hctx->hctx_list);
+> >   		kobject_put(&hctx->kobj);
+> >   	}
+> > @@ -2750,9 +2752,22 @@ static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
+> >   		struct blk_mq_tag_set *set, struct request_queue *q,
+> >   		int hctx_idx, int node)
+> >   {
+> > -	struct blk_mq_hw_ctx *hctx;
+> > +	struct blk_mq_hw_ctx *hctx = NULL, *tmp;
+> > +
+> > +	/* reuse dead hctx first */
+> > +	spin_lock(&q->dead_hctx_lock);
+> > +	list_for_each_entry(tmp, &q->dead_hctx_list, hctx_list) {
+> > +		if (tmp->numa_node == node) {
+> > +			hctx = tmp;
+> > +			break;
+> > +		}
+> > +	}
+> > +	if (hctx)
+> > +		list_del_init(&hctx->hctx_list);
+> > +	spin_unlock(&q->dead_hctx_lock);
+> > -	hctx = blk_mq_alloc_hctx(q, set, hctx_idx, node);
+> > +	if (!hctx)
+> > +		hctx = blk_mq_alloc_hctx(q, set, hctx_idx, node);
+> >   	if (!hctx)
+> >   		goto fail;
+> > @@ -2790,10 +2805,8 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+> >   		hctx = blk_mq_alloc_and_init_hctx(set, q, i, node);
+> >   		if (hctx) {
+> > -			if (hctxs[i]) {
+> > +			if (hctxs[i])
+> >   				blk_mq_exit_hctx(q, set, hctxs[i], i);
+> > -				kobject_put(&hctxs[i]->kobj);
+> > -			}
+> >   			hctxs[i] = hctx;
+> >   		} else {
+> >   			if (hctxs[i])
+> > @@ -2824,9 +2837,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+> >   			if (hctx->tags)
+> >   				blk_mq_free_map_and_requests(set, j);
+> >   			blk_mq_exit_hctx(q, set, hctx, j);
+> > -			kobject_put(&hctx->kobj);
+> >   			hctxs[j] = NULL;
+> > -
+> >   		}
+> >   	}
+> >   	mutex_unlock(&q->sysfs_lock);
+> > @@ -2869,6 +2880,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+> >   	if (!q->queue_hw_ctx)
+> >   		goto err_sys_init;
+> > +	INIT_LIST_HEAD(&q->dead_hctx_list);
+> > +	spin_lock_init(&q->dead_hctx_lock);
+> > +
+> >   	blk_mq_realloc_hw_ctxs(set, q);
+> >   	if (!q->nr_hw_queues)
+> >   		goto err_hctxs;
+> > diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> > index db29928de467..15d1aa53d96c 100644
+> > --- a/include/linux/blk-mq.h
+> > +++ b/include/linux/blk-mq.h
+> > @@ -70,6 +70,8 @@ struct blk_mq_hw_ctx {
+> >   	struct dentry		*sched_debugfs_dir;
+> >   #endif
+> > +	struct list_head	hctx_list;
+> > +
+> >   	/* Must be the last member - see also blk_mq_hw_ctx_size(). */
+> >   	struct srcu_struct	srcu[0];
+> >   };
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index 4b85dc066264..1325f941f0be 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -535,6 +535,13 @@ struct request_queue {
+> >   	struct mutex		sysfs_lock;
+> > +	/*
+> > +	 * for reusing dead hctx instance in case of updating
+> > +	 * nr_hw_queues
+> > +	 */
+> > +	struct list_head	dead_hctx_list;
+> > +	spinlock_t		dead_hctx_lock;
+> > +
+> >   	atomic_t		mq_freeze_depth;
+> >   #if defined(CONFIG_BLK_DEV_BSG)
+> > 
+> Hmm.
+> I don't particularly like this approach.
+> The much saner approach would be to avoid having I/O in-flight in the first
+> place by setting the queue to something else than live, no?
 
-Cheers,
+There isn't any in-flight IO since blk_mq_freeze_queue() is returned
+from __blk_mq_update_nr_hw_queues().
 
-Hannes
--- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                              +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
+However, there can be reference to hctx in other code paths via
+arbitrary block layer APIs.
+
+Quiesce can't avoid the use-after-free too given RCU read lock may
+not be held in lots of reference to hctx, such as queue_for_each_hw_ctx().
+
+So this patch might be the simplest approach to fix this issue, IMO.
+
+However, I am open to any solution for this issue.
+
+Thanks,
+Ming
