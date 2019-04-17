@@ -2,169 +2,213 @@ Return-Path: <SRS0=3KWi=ST=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D046C282DA
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 21:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61803C282DA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 21:53:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0DD9A2183E
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 21:53:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 255AB2184B
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 21:53:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="ahVNkPW8"
+	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="mNXBi6fQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728093AbfDQVxa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Apr 2019 17:53:30 -0400
-Received: from mout.web.de ([212.227.15.4]:34901 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728074AbfDQVxa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Apr 2019 17:53:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1555538006;
-        bh=tAIU2MX5C+RDnAFZClySY77Xnj/34BeXjYcMjTQI33M=;
-        h=X-UI-Sender-Class:Subject:To:References:From:Cc:Date:In-Reply-To;
-        b=ahVNkPW8spXP/+LekbcaoI7Ty/BrWKnL+FY8GfJhB7GYeE7KTB+WqKk9l97UDoodh
-         /La1WEJGdVeTqTKtSxBAjfsZ6hSi8OECGH7jawnQ8A+MbmN+Cb1nPbZ/1MYJBdiAN2
-         D6qeGinCeEYWVEgbST5xIJwMqLJkYB1/aa093Oak=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from laptop.manuel.cli.intranet ([109.192.218.194]) by smtp.web.de
- (mrweb002 [213.165.67.108]) with ESMTPSA (Nemesis) id
- 0MBkWd-1h67vd2zPr-00An85; Wed, 17 Apr 2019 23:53:26 +0200
-Subject: Re: Adding QCOW2 reading/writing support
-To:     Hannes Reinecke <hare@suse.de>
-References: <60bbe5e0-317d-8ead-0eb8-d1dc79927bc8@web.de>
- <c6b31507-bb02-c886-aea6-4165606f215d@suse.de>
-From:   Manuel Bentele <manuel-bentele@web.de>
-Openpgp: id=5260D26DAE5C7FDF3113C572EC7CB9F864CA371E
-Autocrypt: addr=manuel-bentele@web.de; prefer-encrypt=mutual; keydata=
- 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
-Cc:     linux-block@vger.kernel.org
-Message-ID: <762bceb9-c66c-0a45-7d6b-e5ed0df56cbf@web.de>
-Date:   Wed, 17 Apr 2019 23:53:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726162AbfDQVxl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Apr 2019 17:53:41 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:34569 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387440AbfDQVxl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Apr 2019 17:53:41 -0400
+Received: by mail-oi1-f195.google.com with SMTP id v10so37232oib.1
+        for <linux-block@vger.kernel.org>; Wed, 17 Apr 2019 14:53:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=bmWs4cfcbPpVqJOif+pRxG1XcZMU7gy3yov8rwtSMcA=;
+        b=mNXBi6fQESbyNgWoPJY7N13rwrd4xj6HYS5Lh3w1uIDtpX1jEKuq/1CY0sXLMgffyd
+         8fZ6OewqjPjD5p1dwCTsSN1W1JI3+mAdGAgxxXw75SBC6d+ViIpSkPHWX5e5RJagZjvQ
+         yjyjDElcbDvHNl9O5W+P579YMN+Hj4U+LrEN+x8Tx6zusmLLB4Z4jJcmnJV1+UsdIb3F
+         1jz7zS/16yvMO624WsnVUtKXz4hREDASy23Mdu0AVjgHo/MQiqVzCTWgdALrvHGuAXsn
+         Ga4vq1ZdMjyFyMjjBa4qxfrflIh+TF3ZFVeRDTP9cYV0z9LNe75WG0zQVSvJDsu+rJAK
+         ZpTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=bmWs4cfcbPpVqJOif+pRxG1XcZMU7gy3yov8rwtSMcA=;
+        b=ZQksNLFm7mBtLD6/rozbpP8TmTETti0F/Sp/U+s1W9Cwh16TwgyEIG2TtqfA3bQT/S
+         4cW0CK8iSHJxAwPtoghsdi3scGhflDJC1CPmgZxpnVZtrGq8DGTDJZ/pT24o7B7b4vbg
+         g5PLa5Pq9F87jY4bRJEjxyuSuHEVAj+wimI6J/5LZlC0vgIdiGVfKanAUjhUs01i9Ls/
+         Ign3tXshFvasv6VzTGmMrmEOIfDOxrYo2/mJvJd2/HB1BJ9X+H42cmzd1FhGVky1I2pO
+         IgrbntDfY9fam8jERoAZcZY69QnXYPf0EzcrzC1bYjXUtlWW1c8qRstRgsrUNQfKGcBd
+         Tz5Q==
+X-Gm-Message-State: APjAAAWHuRc65NJ93aN0ISEvYXo2GfJztX0qTJOnbklWr65EkG+5kfCs
+        bXUzlSbP4+/IJGIIAie8+AJDtpZpsAeSqJ91ZElp2g==
+X-Google-Smtp-Source: APXvYqyIfM8qxAG0J70YozmGmBKyUMmNKkQ53mBEzGEECW5CLl3/GymyVafAOCfvYgHDugLDiei1oDZqZT6jsakABBE=
+X-Received: by 2002:aca:e64f:: with SMTP id d76mr587154oih.105.1555538019809;
+ Wed, 17 Apr 2019 14:53:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <c6b31507-bb02-c886-aea6-4165606f215d@suse.de>
-Content-Type: text/plain; charset=utf-8
+References: <20190411210834.4105-1-jglisse@redhat.com> <2c124cc4-b97e-ee28-2926-305bc6bc74bd@plexistor.com>
+ <20190416185922.GA12818@kmo-pixel> <CAPcyv4jLrQ6evLAJzsASh=H6Tzx8E1oiF+YR3L2fOpbZYNUWGg@mail.gmail.com>
+ <20190416194936.GD21526@redhat.com>
+In-Reply-To: <20190416194936.GD21526@redhat.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 17 Apr 2019 14:53:28 -0700
+Message-ID: <CAPcyv4i-YHH+dH8za1i1aMcHzQXfovVSrRFp_nfa-KYN-XhAvw@mail.gmail.com>
+Subject: Re: [PATCH v1 00/15] Keep track of GUPed pages in fs and block
+To:     Jerome Glisse <jglisse@redhat.com>
+Cc:     Kent Overstreet <kent.overstreet@gmail.com>,
+        Boaz Harrosh <boaz@plexistor.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org, Linux MM <linux-mm@kvack.org>,
+        John Hubbard <jhubbard@nvidia.com>, Jan Kara <jack@suse.cz>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Wilcox <willy@infradead.org>,
+        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, Yan Zheng <zyan@redhat.com>,
+        Sage Weil <sage@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+        Alex Elder <elder@kernel.org>, ceph-devel@vger.kernel.org,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        devel@lists.orangefs.org,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        v9fs-developer@lists.sourceforge.net, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org,
+        =?UTF-8?Q?Ernesto_A=2E_Fern=C3=A1ndez?= 
+        <ernesto.mnd.fernandez@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Provags-ID: V03:K1:cTyPHx0iEwyAGrln6Aq2RLsLOKCxK2/fLSkw/2ZQb5Flxr+riQv
- lH2waWyQODbf42ARX9FjBYNwfY8fKgGzYzwWqELNLA4rNrzix+2/v4wvWIkAekfBNXKkO8X
- W2Awcorv3l9zFxMJdAtnCKO5l1KQPsyicTqXHegLyaIwX2zJzsU6V5HyMLsRmPnr7jybbWs
- 2n2qn90TCtlYWNDe/7wcA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:SSNjNfnGZnA=:aE1KoXCiv2s/D7a+DwQgYS
- tTQI9pZHdlxi9Cbv2pMKe11CO8z2Yig1HDXcxeibCOSNDNs73XPO3XK8zCcINZ8WNRl2ORYy4
- VYmkkj4fKzXcN4fs/Xnz+/MBbFWVqib/YLV16oJPYIXUnnAYSeWBEp9PxjBDsW67zT8Q0XbYQ
- 0kYEDdOW8AfjomrH4Zb4SrooXkTQour8Lj2gRnbAOV1yIvwSYH0QX8HhoVE63Rf7LY2MEM/Gz
- SA8CG+nL4HFZyhl1PClQUuJ3g+7sb87+UcPtYRYRu/dkPYmoGVazjsiACf3Fd7thAbnVcMozu
- AREVcTAouPnXTtUF7Q1NJ3i7SNRwQAB408b1koo02x0+rwoMZiJcHeIe2I0poDIugBdQRViC/
- /d6ocHi/G/zo4WIEDJ5w7U/0+Izd/TN8tcxgz6l3HNObTVx3cdY3xHd9q2Sj3O7bpDFd+GPzc
- 0SLnggjKwNNn5KWT+use65O9vHr2Xd3AXHSqNcqL75wt1er/aNhjy3B76nT4TN3emLfDlnMim
- 5XqxvVm0ryvL0PaBilmvoYKag4XB43QSl5buFJv3y0mYY7l2tvQhmkmVF65lKnUOfWhzOPw/L
- W5CGgtvSVEs2MVfJg3iHHP/uaMtadENvf+BNO7vaFqfTU+sm5ReDUgSKt03eGRYOBuQ1bf7R0
- RZSLpyYG721Z+MbeAyY/kRLtvLqfNz5W7Ej/Jh+u3952vLtqkisF2tGXGe43VGXaoxJ9F/Ked
- uxDOJLi1wn9l5pzswLtGbm1+vy+9gwz6VlTiDd/FwoxUmolFAHdeBv/rW7Cg6na3n9MLzwIyE
- VEM+b6SpjWRo4wNm921jNVmEjY6laAfyHX99QOGdlnTNL9C/3Q9eRCQZwZ7L+DDCyI1keVZlK
- e4E+g5ANkpfaDjGTgbmyhWe9TxEbGfn/iCPnoIRGkh9pDdrJjn+lKJSOqzmZYjCuvylfZpBHB
- BpKXBaJ9vyQ==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 17.04.19 13:58, Hannes Reinecke wrote:
-> On 4/16/19 11:30 PM, Manuel Bentele wrote:
->> Hi everyone
->>
->> I'm going to implement an in-kernel reading of QCOW2 images.
->> In the project, I only need the reading of QCOW2 images, but it's
->> essential to make thoughts for the implementation of the writing, too.=
-
->> One of the difficulties seems to be the support of making an image
->> sparse (resizing the disk image).
->>
->> Now, I want to ask you for advice: What is the best approach to achiev=
-e
->> this?
->>
->> =C2=A0=C2=A0 * Implement the reading/writing in the device mapper?
->> =C2=A0=C2=A0 * Extend the loop device?
->> =C2=A0=C2=A0 * Create a new subsystem for the processing of sparse dev=
-ices or
->> images?
->>
->> Or do you have any other idea?
->>
-> I'm not sure if that would be met with universal acclaim; file formats
-> are regarded as userland policies, and shouldn't be handled in the
-> kernel at all.
-> Have you looked at fuse?
+On Tue, Apr 16, 2019 at 12:50 PM Jerome Glisse <jglisse@redhat.com> wrote:
 >
-> Cheers,
+> On Tue, Apr 16, 2019 at 12:12:27PM -0700, Dan Williams wrote:
+> > On Tue, Apr 16, 2019 at 11:59 AM Kent Overstreet
+> > <kent.overstreet@gmail.com> wrote:
+> > >
+> > > On Tue, Apr 16, 2019 at 09:35:04PM +0300, Boaz Harrosh wrote:
+> > > > On Thu, Apr 11, 2019 at 05:08:19PM -0400, jglisse@redhat.com wrote:
+> > > > > From: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> > > > >
+> > > > > This patchset depends on various small fixes [1] and also on patc=
+hset
+> > > > > which introduce put_user_page*() [2] and thus is 5.3 material as =
+those
+> > > > > pre-requisite will get in 5.2 at best. Nonetheless i am posting i=
+t now
+> > > > > so that it can get review and comments on how and what should be =
+done
+> > > > > to test things.
+> > > > >
+> > > > > For various reasons [2] [3] we want to track page reference throu=
+gh GUP
+> > > > > differently than "regular" page reference. Thus we need to keep t=
+rack
+> > > > > of how we got a page within the block and fs layer. To do so this=
+ patch-
+> > > > > set change the bio_bvec struct to store a pfn and flags instead o=
+f a
+> > > > > direct pointer to a page. This way we can flag page that are comi=
+ng from
+> > > > > GUP.
+> > > > >
+> > > > > This patchset is divided as follow:
+> > > > >     - First part of the patchset is just small cleanup i believe =
+they
+> > > > >       can go in as his assuming people are ok with them.
+> > > >
+> > > >
+> > > > >     - Second part convert bio_vec->bv_page to bio_vec->bv_pfn thi=
+s is
+> > > > >       done in multi-step, first we replace all direct dereference=
+ of
+> > > > >       the field by call to inline helper, then we introduce macro=
+ for
+> > > > >       bio_bvec that are initialized on the stack. Finaly we chang=
+e the
+> > > > >       bv_page field to bv_pfn.
+> > > >
+> > > > Why do we need a bv_pfn. Why not just use the lowest bit of the pag=
+e-ptr
+> > > > as a flag (pointer always aligned to 64 bytes in our case).
+> > > >
+> > > > So yes we need an inline helper for reference of the page but is it=
+ not clearer
+> > > > that we assume a page* and not any kind of pfn ?
+> > > > It will not be the first place using low bits of a pointer for flag=
+s.
+> > > >
+> > > > That said. Why we need it at all? I mean why not have it as a bio f=
+lag. If it exist
+> > > > at all that a user has a GUP and none-GUP pages to IO at the same r=
+equest he/she
+> > > > can just submit them as two separate BIOs (chained at the block lay=
+er).
+> > > >
+> > > > Many users just submit one page bios and let elevator merge them an=
+y way.
+> > >
+> > > Let's please not add additional flags and weirdness to struct bio - "=
+if this
+> > > flag is set interpret one way, if not interpret another" - or eventua=
+lly bios
+> > > will be as bad as skbuffs. I would much prefer just changing bv_page =
+to bv_pfn.
+> >
+> > This all reminds of the failed attempt to teach the block layer to
+> > operate without pages:
+> >
+> > https://lore.kernel.org/lkml/20150316201640.33102.33761.stgit@dwillia2-=
+desk3.amr.corp.intel.com/
+> >
+> > >
+> > > Question though - why do we need a flag for whether a page is a GUP p=
+age or not?
+> > > Couldn't the needed information just be determined by what range the =
+pfn is not
+> > > (i.e. whether or not it has a struct page associated with it)?
+> >
+> > That amounts to a pfn_valid() check which is a bit heavier than if we
+> > can store a flag in the bv_pfn entry directly.
+> >
+> > I'd say create a new PFN_* flag, and make bv_pfn a 'pfn_t' rather than
+> > an 'unsigned long'.
+> >
+> > That said, I'm still in favor of Jan's proposal to just make the
+> > bv_page semantics uniform. Otherwise we're complicating this core
+> > infrastructure for some yet to be implemented GPU memory management
+> > capabilities with yet to be determined value. Circle back when that
+> > value is clear, but in the meantime fix the GUP bug.
 >
-> Hannes
-I agree with your notice that file formats should stay outside the
-kernel space.
-Fuse would be a very good approach to reach the goal, but it's only
-intended for file systems.
-But QCOW2 in general can be seen as a container or virtual disk node
-containing various data.
-Therefore, functionality like blkdev_reread_part for partition scanning
-or fsck is needed, but it is not available in the user space. That
-means, code must be translated and duplicated which is again not an
-appropriate solution.
+> This has nothing to do with GPU, what make you think so ? Here i am
+> trying to solve GUP and to keep the value of knowing wether a page
+> has been GUP or not. I argue that if we bias every page in every bio
+> then we loose that information and thus the value.
+>
+> I gave the page protection mechanisms as an example that would be
+> impacted but it is not the only one. Knowing if a page has been GUP
+> can be useful for memory reclaimation, compaction, NUMA balancing,
 
-I have seen, that the tool vmware-mount for the VMDK file format is
-based on fuse and supports all the mentioned block device functionality.
-I was wondering how they achieved that but I don't want to know how much
-code was duplicated.
+Right, this is what I was reacting to in your pushback to Jan's
+proposal. You're claiming value for not doing the simple thing for
+some future "may be useful in these contexts". To my knowledge those
+things are not broken today. You're asking for the complexity to be
+carried today for some future benefit, and I'm asking for the
+simplicity to be maintained as much as possible today and let the
+value of future changes stand on their own to push for more complexity
+later.
 
-If you have an idea to solve the opposition for file formats that are
-acting as a container or virtual disk node for various data, please let
-me know.
-
-Regards,
-Manuel
-
+Effectively don't use this bug fix to push complexity for a future
+agenda where the value has yet to be quantified.
