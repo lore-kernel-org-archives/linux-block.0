@@ -2,169 +2,93 @@ Return-Path: <SRS0=3KWi=ST=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81AAFC282DA
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 21:34:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA5EEC282DA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 21:40:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5AB7C21850
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 21:34:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7CA32186A
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 21:40:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="H979Z0A0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730230AbfDQVec (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Apr 2019 17:34:32 -0400
-Received: from mga09.intel.com ([134.134.136.24]:9681 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725848AbfDQVec (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Apr 2019 17:34:32 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Apr 2019 14:34:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,363,1549958400"; 
-   d="scan'208";a="162824918"
-Received: from unknown (HELO localhost.lm.intel.com) ([10.232.112.69])
-  by fmsmga004.fm.intel.com with ESMTP; 17 Apr 2019 14:34:31 -0700
-From:   Keith Busch <keith.busch@intel.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     Keith Busch <keith.busch@intel.com>
-Subject: [PATCH] fio: Add advise THP option to mmap engine
-Date:   Wed, 17 Apr 2019 15:28:16 -0600
-Message-Id: <20190417212816.6460-1-keith.busch@intel.com>
-X-Mailer: git-send-email 2.13.6
+        id S1729099AbfDQVkZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Apr 2019 17:40:25 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:44127 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725848AbfDQVkZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Apr 2019 17:40:25 -0400
+Received: by mail-pf1-f193.google.com with SMTP id y13so64115pfm.11
+        for <linux-block@vger.kernel.org>; Wed, 17 Apr 2019 14:40:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=wDaJRhkBAXEhybk4i42gb/avmEZoj5yUWgW0zAY3o1A=;
+        b=H979Z0A07HUx/VAlZJ7jiiO7iOsDWml2EPLjeyPaSD03ZPIppPub0PCAbJPOcFfW6N
+         F/5EZ5nGXpKns8qsctQrSbgGfeEUjxIHQNeRriTD1r57VkkZIH2U+cFESHF690zCyhzQ
+         GzIuCJ6B69YgYtz9Y+kcCdte8oJ6YbSDRUEvZxPSIBCaoGif+P+QOI326JbZr+27utJu
+         F64PBABtfGmYeM1ML7wYki5oqwX0jpXef89RgaG3nAdQrENo1fewKl5o/VPArapRnSuE
+         n+dogkbhKz1maxpn12x8jIjCf7Jnn/rd55UHZ9SaNtdb7bZacQHbOMLhVkO69eJ5Pi+x
+         U+bA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=wDaJRhkBAXEhybk4i42gb/avmEZoj5yUWgW0zAY3o1A=;
+        b=TolUMRemuGErvpqqm2MtHmJiny2GErdlpdc73bmR/uqIP0gDdUyXdrsB9uEyPCdjgI
+         aLmDTu3uJ94jbYGiprdJ9yMyaEspzoCobfamX5xoTSqZBJEAeCH3yKiItbIpxmIZfV6N
+         8rD4mdylkWPj5B++//+vC0oKqySjFdXxLKm+4fpsBsdX/yY6tXorYgnbaxix4UTk1mqu
+         sUblAvu15Px/1WKbRMiQwBAeYER57mrRpw+RBUCT0ju6NTGvMuwZksqAcLz6jg7Gq6R5
+         /QeSTexCH3NEwYJYHJaORf7jPkWy461kOkozyMfLpTLlQnR8aBi8zj91tizDRK3C4rrd
+         wXzw==
+X-Gm-Message-State: APjAAAUh0nQ37M+5BqY+PoUgrmvm9a3wutXWNmGKqt8ntpLZDanJTBFv
+        5EqzTnDvr2tntk6FY5VzJaGngw==
+X-Google-Smtp-Source: APXvYqx25BpsEVB4RHJWZ38KLKauivVg0qFA/vbZjXDVfprdxIMCV+gUj0/nB4sS90JuZbiN7Zo5SQ==
+X-Received: by 2002:aa7:8494:: with SMTP id u20mr64421720pfn.76.1555537224315;
+        Wed, 17 Apr 2019 14:40:24 -0700 (PDT)
+Received: from vader ([2620:10d:c090:180::8abe])
+        by smtp.gmail.com with ESMTPSA id i129sm164974pfc.163.2019.04.17.14.40.23
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 17 Apr 2019 14:40:23 -0700 (PDT)
+Date:   Wed, 17 Apr 2019 14:40:23 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
+        Eric Sandeen <esandeen@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org
+Subject: Re: [PATCH] nvme/012 & 013: avoid extremely slow xfs IO
+Message-ID: <20190417214023.GA18727@vader>
+References: <20190415012229.20689-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190415012229.20689-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The transparent hugepage Linux-specific memory advisory has potentially
-significant implications for how the memory management behaves. Add a
-new mmap specific option that enables private TLP mmap mode when set so
-we can test running fio with anonymous memory (i.e. mmap /dev/zero).
+On Mon, Apr 15, 2019 at 09:22:29AM +0800, Ming Lei wrote:
+> It is observed that nvme/012 may take ~17 minutes to complete on aarch64,
+> even worse it may trigger IO timeout on nvme-loop.
+> 
+> Eric and Dave replied that it is because of too small log size on small
+> disk.
+> 
+> So pass '-l size=32m' to avoid the issue.
+> 
+> With this patch, nvme/012 can be completed in one minute.
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
----
- engines/mmap.c | 39 ++++++++++++++++++++++++++++++++++++---
- optgroup.h     |  2 ++
- 2 files changed, 38 insertions(+), 3 deletions(-)
+Nice:
 
-diff --git a/engines/mmap.c b/engines/mmap.c
-index 308b4665..7bca6c20 100644
---- a/engines/mmap.c
-+++ b/engines/mmap.c
-@@ -11,6 +11,7 @@
- #include <sys/mman.h>
- 
- #include "../fio.h"
-+#include "../optgroup.h"
- #include "../verify.h"
- 
- /*
-@@ -26,6 +27,26 @@ struct fio_mmap_data {
- 	off_t mmap_off;
- };
- 
-+struct mmap_options {
-+	void *pad;
-+	unsigned int thp;
-+};
-+
-+static struct fio_option options[] = {
-+	{
-+		.name	= "thp",
-+		.lname	= "Transparent Huge Pages",
-+		.type	= FIO_OPT_INT,
-+		.off1	= offsetof(struct mmap_options, thp),
-+		.help	= "Memory Advise Huge Page",
-+		.category = FIO_OPT_C_ENGINE,
-+		.group	= FIO_OPT_G_MMAP,
-+	},
-+	{
-+		.name = NULL,
-+	},
-+};
-+
- static bool fio_madvise_file(struct thread_data *td, struct fio_file *f,
- 			     size_t length)
- 
-@@ -54,7 +75,8 @@ static int fio_mmap_file(struct thread_data *td, struct fio_file *f,
- 			 size_t length, off_t off)
- {
- 	struct fio_mmap_data *fmd = FILE_ENG_DATA(f);
--	int flags = 0;
-+	struct mmap_options *o = td->eo;
-+	int flags = 0, shared = MAP_SHARED;
- 
- 	if (td_rw(td) && !td->o.verify_only)
- 		flags = PROT_READ | PROT_WRITE;
-@@ -66,7 +88,12 @@ static int fio_mmap_file(struct thread_data *td, struct fio_file *f,
- 	} else
- 		flags = PROT_READ;
- 
--	fmd->mmap_ptr = mmap(NULL, length, flags, MAP_SHARED, f->fd, off);
-+#if FIO_OS==os_linux
-+	if (o->thp)
-+		shared = MAP_PRIVATE;
-+#endif
-+
-+	fmd->mmap_ptr = mmap(NULL, length, flags, shared, f->fd, off);
- 	if (fmd->mmap_ptr == MAP_FAILED) {
- 		fmd->mmap_ptr = NULL;
- 		td_verror(td, errno, "mmap");
-@@ -146,6 +173,7 @@ static int fio_mmapio_prep(struct thread_data *td, struct io_u *io_u)
- {
- 	struct fio_file *f = io_u->file;
- 	struct fio_mmap_data *fmd = FILE_ENG_DATA(f);
-+	struct mmap_options *o = td->eo;
- 	int ret;
- 
- 	/*
-@@ -170,10 +198,13 @@ static int fio_mmapio_prep(struct thread_data *td, struct io_u *io_u)
- 		if (ret)
- 			return ret;
- 	}
--
- done:
- 	io_u->mmap_data = fmd->mmap_ptr + io_u->offset - fmd->mmap_off -
- 				f->file_offset;
-+#if FIO_OS==os_linux
-+	if (o->thp)
-+		madvise(io_u->mmap_data, fmd->mmap_sz, MADV_HUGEPAGE);
-+#endif
- 	return 0;
- }
- 
-@@ -275,6 +306,8 @@ static struct ioengine_ops ioengine = {
- 	.close_file	= fio_mmapio_close_file,
- 	.get_file_size	= generic_get_file_size,
- 	.flags		= FIO_SYNCIO | FIO_NOEXTEND,
-+	.options		= options,
-+	.option_struct_size	= sizeof(struct mmap_options),
- };
- 
- static void fio_init fio_mmapio_register(void)
-diff --git a/optgroup.h b/optgroup.h
-index adf4d09b..bf1bb036 100644
---- a/optgroup.h
-+++ b/optgroup.h
-@@ -61,6 +61,7 @@ enum opt_category_group {
- 	__FIO_OPT_G_MTD,
- 	__FIO_OPT_G_HDFS,
- 	__FIO_OPT_G_SG,
-+	__FIO_OPT_G_MMAP,
- 	__FIO_OPT_G_NR,
- 
- 	FIO_OPT_G_RATE		= (1ULL << __FIO_OPT_G_RATE),
-@@ -97,6 +98,7 @@ enum opt_category_group {
- 	FIO_OPT_G_MTD		= (1ULL << __FIO_OPT_G_MTD),
- 	FIO_OPT_G_HDFS		= (1ULL << __FIO_OPT_G_HDFS),
- 	FIO_OPT_G_SG		= (1ULL << __FIO_OPT_G_SG),
-+	FIO_OPT_G_MMAP		= (1ULL << __FIO_OPT_G_MMAP),
- 	FIO_OPT_G_INVALID	= (1ULL << __FIO_OPT_G_NR),
- };
- 
--- 
-2.14.4
+nvme/012 (run mkfs and data verification fio job on NVMeOF block device-backed ns) [passed]
+    runtime  402.605s  ...  27.431s
 
+Thanks, Ming, applied.
