@@ -2,38 +2,36 @@ Return-Path: <SRS0=3KWi=ST=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC9DEC282DA
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 11:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA4B9C282DA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 11:58:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 82C4A20835
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 11:52:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F56D206BA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 11:58:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731996AbfDQLwx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Apr 2019 07:52:53 -0400
-Received: from mx2.suse.de ([195.135.220.15]:43262 "EHLO mx1.suse.de"
+        id S1731472AbfDQL6h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Apr 2019 07:58:37 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44474 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729898AbfDQLwx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Apr 2019 07:52:53 -0400
+        id S1731454AbfDQL6g (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Apr 2019 07:58:36 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id E96F2AFFB;
-        Wed, 17 Apr 2019 11:52:51 +0000 (UTC)
-Subject: Re: [PATCH] block: make sure that bvec length can't be overflowed
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Yi Zhang <yi.zhang@redhat.com>
-References: <20190416153847.8173-1-ming.lei@redhat.com>
+        by mx1.suse.de (Postfix) with ESMTP id CDC12ABE9;
+        Wed, 17 Apr 2019 11:58:35 +0000 (UTC)
+Subject: Re: Adding QCOW2 reading/writing support
+To:     Manuel Bentele <manuel-bentele@web.de>, linux-block@vger.kernel.org
+References: <60bbe5e0-317d-8ead-0eb8-d1dc79927bc8@web.de>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <b36ab484-ce43-67b7-16d4-bdca59fd9e9a@suse.de>
-Date:   Wed, 17 Apr 2019 13:52:49 +0200
+Message-ID: <c6b31507-bb02-c886-aea6-4165606f215d@suse.de>
+Date:   Wed, 17 Apr 2019 13:58:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20190416153847.8173-1-ming.lei@redhat.com>
+In-Reply-To: <60bbe5e0-317d-8ead-0eb8-d1dc79927bc8@web.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -42,46 +40,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/16/19 5:38 PM, Ming Lei wrote:
-> bvec->bv_offset may be bigger than PAGE_SIZE sometimes, such as,
-> when one bio is splitted in the middle of one bvec via bio_split(),
-> and bi_iter.bi_bvec_done is used to build offset of the 1st bvec of
-> remained bio.
+On 4/16/19 11:30 PM, Manuel Bentele wrote:
+> Hi everyone
 > 
-> So we have to make sure that every bvec's offset is less than
-> PAGE_SIZE from bio_for_each_segment().
+> I'm going to implement an in-kernel reading of QCOW2 images.
+> In the project, I only need the reading of QCOW2 images, but it's
+> essential to make thoughts for the implementation of the writing, too.
+> One of the difficulties seems to be the support of making an image
+> sparse (resizing the disk image).
 > 
-> This patch fixes this issue reported by Zhang Yi When running nvme/011.
+> Now, I want to ask you for advice: What is the best approach to achieve
+> this?
 > 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Yi Zhang <yi.zhang@redhat.com>
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Fixes: 6dc4f100c175 ("block: allow bio_for_each_segment_all() to iterate over multi-page bvec")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->   include/linux/bvec.h | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
+>    * Implement the reading/writing in the device mapper?
+>    * Extend the loop device?
+>    * Create a new subsystem for the processing of sparse devices or images?
 > 
-> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-> index 3bc91879e1e2..f179b370066f 100644
-> --- a/include/linux/bvec.h
-> +++ b/include/linux/bvec.h
-> @@ -160,8 +160,9 @@ static inline void bvec_advance(const struct bio_vec *bvec,
->   		bv->bv_page = nth_page(bv->bv_page, 1);
->   		bv->bv_offset = 0;
->   	} else {
-> -		bv->bv_page = bvec->bv_page;
-> -		bv->bv_offset = bvec->bv_offset;
-> +		bv->bv_page = bvec_nth_page(bvec->bv_page, bvec->bv_offset /
-> +					    PAGE_SIZE);
-> +		bv->bv_offset = bvec->bv_offset % PAGE_SIZE;
->   	}
->   	bv->bv_len = min_t(unsigned int, PAGE_SIZE - bv->bv_offset,
->   			   bvec->bv_len - iter_all->done);
+> Or do you have any other idea?
 > 
-Looks okay.
-
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+I'm not sure if that would be met with universal acclaim; file formats 
+are regarded as userland policies, and shouldn't be handled in the 
+kernel at all.
+Have you looked at fuse?
 
 Cheers,
 
