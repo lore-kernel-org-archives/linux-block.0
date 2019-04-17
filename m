@@ -2,98 +2,121 @@ Return-Path: <SRS0=3KWi=ST=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1FC6C10F14
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 03:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 294BAC10F12
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 03:44:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58D3A2177B
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 03:27:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="QPIGeHZj"
+	by mail.kernel.org (Postfix) with ESMTP id 0294820835
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 03:44:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728083AbfDQD1R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Apr 2019 23:27:17 -0400
-Received: from m50-132.163.com ([123.125.50.132]:49080 "EHLO m50-132.163.com"
+        id S1728440AbfDQDor (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Apr 2019 23:44:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52318 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729079AbfDQD1R (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Apr 2019 23:27:17 -0400
-X-Greylist: delayed 905 seconds by postgrey-1.27 at vger.kernel.org; Tue, 16 Apr 2019 23:27:16 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id; bh=pa90oONOQE2aayBbcS
-        fTUNDIb3aN4WNHk8cBOwnKV9k=; b=QPIGeHZjtRc8PxLcJ88ZoKfF4B54r3fRh2
-        SXIHDXaOkiWPdFTskE/w7V7lwSPNuPT1XllxM8gB6XQmOVk3ORVdyWYZAcWQsKNt
-        +j8ncjWEpohlqgOG+LvztIa249yqKFDBiDqJnYbmbZD9jeLzwSIIGn3EzpGp26fz
-        SpsRC4SMc=
-Received: from bp.localdomain (unknown [218.106.182.174])
-        by smtp2 (Coremail) with SMTP id DNGowAC3Xv98mbZcFKkoAA--.242S3;
-        Wed, 17 Apr 2019 11:12:07 +0800 (CST)
-From:   Pan Bian <bianpan2016@163.com>
+        id S1727219AbfDQDor (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Apr 2019 23:44:47 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6B38D3199362;
+        Wed, 17 Apr 2019 03:44:46 +0000 (UTC)
+Received: from localhost (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D214719C67;
+        Wed, 17 Apr 2019 03:44:42 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Pan Bian <bianpan2016@163.com>
-Subject: scsi: bsg-lib: drop device reference on error path
-Date:   Wed, 17 Apr 2019 11:11:55 +0800
-Message-Id: <1555470715-55702-1-git-send-email-bianpan2016@163.com>
-X-Mailer: git-send-email 2.7.4
-X-CM-TRANSID: DNGowAC3Xv98mbZcFKkoAA--.242S3
-X-Coremail-Antispam: 1Uf129KBjvdXoW7GFWxJr47ZrykuryxJr45Awb_yoWkGrX_CF
-        y093s7Xrn5CFWfCF4YkFWUtr92gF4DXF1IvF4UtF93ZFyUGrZxJa1UZr15urZ8Ww4fu3W2
-        v3ZrZFWfCr1SqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjwID3UUUUU==
-X-Originating-IP: [218.106.182.174]
-X-CM-SenderInfo: held01tdqsiiqw6rljoofrz/xtbBzweZclaD2NPpCgAAse
+Cc:     linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Keith Busch <keith.busch@intel.com>,
+        linux-nvme@lists.infradead.org, Sagi Grimberg <sagi@grimberg.me>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        jianchao wang <jianchao.w.wang@oracle.com>
+Subject: [PATCH V6 0/9] blk-mq: fix races related with freeing queue
+Date:   Wed, 17 Apr 2019 11:44:01 +0800
+Message-Id: <20190417034410.31957-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 17 Apr 2019 03:44:47 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The function put_device is not called to drop the device reference taken
-by get_device on error paths. This patch fixes the bug.
+Hi,
 
-Fixes: cd2f076f1d7("bsg: convert to use blk-mq")
-Signed-off-by: Pan Bian <bianpan2016@163.com>
----
- block/bsg-lib.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Since 45a9c9d909b2 ("blk-mq: Fix a use-after-free"), run queue isn't
+allowed during cleanup queue even though queue refcount is held.
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 005e2b7..fe9e0cc 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -281,21 +281,24 @@ static blk_status_t bsg_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	struct bsg_set *bset =
- 		container_of(q->tag_set, struct bsg_set, tag_set);
- 	int ret;
-+	blk_status_t status = BLK_STS_IOERR;
- 
- 	blk_mq_start_request(req);
- 
- 	if (!get_device(dev))
--		return BLK_STS_IOERR;
-+		return status;
- 
- 	if (!bsg_prepare_job(dev, req))
--		return BLK_STS_IOERR;
-+		goto out;
- 
- 	ret = bset->job_fn(blk_mq_rq_to_pdu(req));
- 	if (ret)
--		return BLK_STS_IOERR;
-+		goto out;
- 
-+	status = BLK_STS_OK;
-+out:
- 	put_device(dev);
--	return BLK_STS_OK;
-+	return status;
- }
- 
- /* called right after the request is allocated for the request_queue */
+This change has caused lots of kernel oops triggered in run queue path,
+turns out it isn't easy to fix them all.
+
+So move freeing of hw queue resources into hctx's release handler, then
+the above issue is fixed. Meantime, this way is safe given freeing hw
+queue resource doesn't require tags.
+
+V3 covers more races.
+
+V6:
+	- remove previous SCSI patch which will be routed via SCSI tree
+	- add reviewed-by tag
+	- fix one related NVMe scan vs reset race
+
+V5:
+	- refactor blk_mq_alloc_and_init_hctx()
+	- fix race related updating nr_hw_queues by always freeing hctx
+	  after request queue is released
+
+V4:
+	- add patch for fixing potential use-after-free in blk_mq_update_nr_hw_queues
+	- fix comment in the last patch
+
+V3:
+	- cancel q->requeue_work in queue's release handler
+	- cancel hctx->run_work in hctx's release handler
+	- add patch 1 for fixing race in plug code path
+	- the last patch is added for avoiding to grab SCSI's refcont
+	in IO path
+
+V2:
+	- moving freeing hw queue resources into hctx's release handler
+
+Ming Lei (9):
+  blk-mq: grab .q_usage_counter when queuing request from plug code path
+  blk-mq: move cancel of requeue_work into blk_mq_release
+  blk-mq: free hw queue's resource in hctx's release handler
+  blk-mq: move all hctx alloction & initialization into
+    __blk_mq_alloc_and_init_hctx
+  blk-mq: split blk_mq_alloc_and_init_hctx into two parts
+  blk-mq: always free hctx after request queue is freed
+  blk-mq: move cancel of hctx->run_work into blk_mq_hw_sysfs_release
+  block: don't drain in-progress dispatch in blk_cleanup_queue()
+  nvme: hold request queue's refcount in ns's whole lifetime
+
+ block/blk-core.c         |  23 +-----
+ block/blk-mq-sysfs.c     |   8 ++
+ block/blk-mq.c           | 195 ++++++++++++++++++++++++++++-------------------
+ block/blk-mq.h           |   2 +-
+ drivers/nvme/host/core.c |  10 ++-
+ include/linux/blk-mq.h   |   2 +
+ include/linux/blkdev.h   |   7 ++
+ 7 files changed, 143 insertions(+), 104 deletions(-)
+
+Cc: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-scsi@vger.kernel.org,
+Cc: Martin K . Petersen <martin.petersen@oracle.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
+Cc: jianchao wang <jianchao.w.wang@oracle.com>
 -- 
-2.7.4
-
+2.9.5
 
