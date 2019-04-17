@@ -3,27 +3,27 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C74AC282DA
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 12:03:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34682C282DA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 12:03:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E384206BA
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 12:03:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3BD7206BA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 12:03:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731520AbfDQMDA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Apr 2019 08:03:00 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45172 "EHLO mx1.suse.de"
+        id S1731659AbfDQMDr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Apr 2019 08:03:47 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45348 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731508AbfDQMC7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Apr 2019 08:02:59 -0400
+        id S1729578AbfDQMDr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Apr 2019 08:03:47 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 5339AAFFB;
-        Wed, 17 Apr 2019 12:02:58 +0000 (UTC)
-Subject: Re: [PATCH V6 3/9] blk-mq: free hw queue's resource in hctx's release
- handler
+        by mx1.suse.de (Postfix) with ESMTP id 17741AFBF;
+        Wed, 17 Apr 2019 12:03:46 +0000 (UTC)
+Subject: Re: [PATCH V6 4/9] blk-mq: move all hctx alloction & initialization
+ into __blk_mq_alloc_and_init_hctx
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
         Keith Busch <keith.busch@intel.com>,
@@ -35,17 +35,16 @@ Cc:     linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        jianchao wang <jianchao.w.wang@oracle.com>,
-        stable@vger.kernel.org
+        jianchao wang <jianchao.w.wang@oracle.com>
 References: <20190417034410.31957-1-ming.lei@redhat.com>
- <20190417034410.31957-4-ming.lei@redhat.com>
+ <20190417034410.31957-5-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <ec6aed0d-a6dc-f829-46f4-10140c7c37df@suse.de>
-Date:   Wed, 17 Apr 2019 14:02:55 +0200
+Message-ID: <37609e16-351a-fc5b-68bf-8ac7cc2608cb@suse.de>
+Date:   Wed, 17 Apr 2019 14:03:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20190417034410.31957-4-ming.lei@redhat.com>
+In-Reply-To: <20190417034410.31957-5-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -55,33 +54,10 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 4/17/19 5:44 AM, Ming Lei wrote:
-> Once blk_cleanup_queue() returns, tags shouldn't be used any more,
-> because blk_mq_free_tag_set() may be called. Commit 45a9c9d909b2
-> ("blk-mq: Fix a use-after-free") fixes this issue exactly.
-> 
-> However, that commit introduces another issue. Before 45a9c9d909b2,
-> we are allowed to run queue during cleaning up queue if the queue's
-> kobj refcount is held. After that commit, queue can't be run during
-> queue cleaning up, otherwise oops can be triggered easily because
-> some fields of hctx are freed by blk_mq_free_queue() in blk_cleanup_queue().
-> 
-> We have invented ways for addressing this kind of issue before, such as:
-> 
-> 	8dc765d438f1 ("SCSI: fix queue cleanup race before queue initialization is done")
-> 	c2856ae2f315 ("blk-mq: quiesce queue before freeing queue")
-> 
-> But still can't cover all cases, recently James reports another such
-> kind of issue:
-> 
-> 	https://marc.info/?l=linux-scsi&m=155389088124782&w=2
-> 
-> This issue can be quite hard to address by previous way, given
-> scsi_run_queue() may run requeues for other LUNs.
-> 
-> Fixes the above issue by freeing hctx's resources in its release handler, and this
-> way is safe becasue tags isn't needed for freeing such hctx resource.
-> 
-> This approach follows typical design pattern wrt. kobject's release handler.
+> Move all hctx related allocation and initialization into
+> __blk_mq_alloc_and_init_hctx, and prepare for splitting blk_mq_alloc_and_init_hctx
+> into real two functions, one is for allocate everything, and another is for
+> initializing everyting.
 > 
 > Cc: Dongli Zhang <dongli.zhang@oracle.com>
 > Cc: James Smart <james.smart@broadcom.com>
@@ -91,18 +67,11 @@ On 4/17/19 5:44 AM, Ming Lei wrote:
 > Cc: Christoph Hellwig <hch@lst.de>,
 > Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
 > Cc: jianchao wang <jianchao.w.wang@oracle.com>
-> Reported-by: James Smart <james.smart@broadcom.com>
-> Fixes: 45a9c9d909b2 ("blk-mq: Fix a use-after-free")
-> Cc: stable@vger.kernel.org
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->   block/blk-core.c     | 2 +-
->   block/blk-mq-sysfs.c | 6 ++++++
->   block/blk-mq.c       | 8 ++------
->   block/blk-mq.h       | 2 +-
->   4 files changed, 10 insertions(+), 8 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+>   block/blk-mq.c | 93 +++++++++++++++++++++++++++-------------------------------
+>   1 file changed, 44 insertions(+), 49 deletions(-)
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
 
