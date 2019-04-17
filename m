@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41108C10F12
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 03:44:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7EE6C10F12
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 03:44:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 17F532177B
-	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 03:44:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E7FE20835
+	for <linux-block@archiver.kernel.org>; Wed, 17 Apr 2019 03:44:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728888AbfDQDow (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Apr 2019 23:44:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54434 "EHLO mx1.redhat.com"
+        id S1729254AbfDQDo6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Apr 2019 23:44:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53310 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727219AbfDQDow (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Apr 2019 23:44:52 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1727219AbfDQDo5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Apr 2019 23:44:57 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id ED8A23DE0E;
-        Wed, 17 Apr 2019 03:44:51 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5F1EE356DE;
+        Wed, 17 Apr 2019 03:44:57 +0000 (UTC)
 Received: from localhost (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F22FB1001DCC;
-        Wed, 17 Apr 2019 03:44:48 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7651B5D719;
+        Wed, 17 Apr 2019 03:44:54 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
@@ -40,48 +40,26 @@ Cc:     linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
         jianchao wang <jianchao.w.wang@oracle.com>
-Subject: [PATCH V6 1/9] blk-mq: grab .q_usage_counter when queuing request from plug code path
-Date:   Wed, 17 Apr 2019 11:44:02 +0800
-Message-Id: <20190417034410.31957-2-ming.lei@redhat.com>
+Subject: [PATCH V6 2/9] blk-mq: move cancel of requeue_work into blk_mq_release
+Date:   Wed, 17 Apr 2019 11:44:03 +0800
+Message-Id: <20190417034410.31957-3-ming.lei@redhat.com>
 In-Reply-To: <20190417034410.31957-1-ming.lei@redhat.com>
 References: <20190417034410.31957-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 17 Apr 2019 03:44:52 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Wed, 17 Apr 2019 03:44:57 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just like aio/io_uring, we need to grab 2 refcount for queuing one
-request, one is for submission, another is for completion.
+With holding queue's kobject refcount, it is safe for driver
+to schedule requeue. However, blk_mq_kick_requeue_list() may
+be called after blk_sync_queue() is done because of concurrent
+requeue activities, then requeue work may not be completed when
+freeing queue, and kernel oops is triggered.
 
-If the request isn't queued from plug code path, the refcount grabbed
-in generic_make_request() serves for submission. In theroy, this
-refcount should have been released after the sumission(async run queue)
-is done. blk_freeze_queue() works with blk_sync_queue() together
-for avoiding race between cleanup queue and IO submission, given async
-run queue activities are canceled because hctx->run_work is scheduled with
-the refcount held, so it is fine to not hold the refcount when
-running the run queue work function for dispatch IO.
-
-However, if request is staggered into plug list, and finally queued
-from plug code path, the refcount in submission side is actually missed.
-And we may start to run queue after queue is removed because the queue's
-kobject refcount isn't guaranteed to be grabbed in flushing plug list
-context, then kernel oops is triggered, see the following race:
-
-blk_mq_flush_plug_list():
-        blk_mq_sched_insert_requests()
-                insert requests to sw queue or scheduler queue
-                blk_mq_run_hw_queue
-
-Because of concurrent run queue, all requests inserted above may be
-completed before calling the above blk_mq_run_hw_queue. Then queue can
-be freed during the above blk_mq_run_hw_queue().
-
-Fixes the issue by grab .q_usage_counter before calling
-blk_mq_sched_insert_requests() in blk_mq_flush_plug_list(). This way is
-safe because the queue is absolutely alive before inserting request.
+So moving the cancel of requeue_work into blk_mq_release() for
+avoiding race between requeue and freeing queue.
 
 Cc: Dongli Zhang <dongli.zhang@oracle.com>
 Cc: James Smart <james.smart@broadcom.com>
@@ -93,41 +71,37 @@ Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
 Cc: jianchao wang <jianchao.w.wang@oracle.com>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ block/blk-core.c | 1 -
+ block/blk-mq.c   | 2 ++
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a55389ba8779..93dc588fabe2 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -237,7 +237,6 @@ void blk_sync_queue(struct request_queue *q)
+ 		struct blk_mq_hw_ctx *hctx;
+ 		int i;
+ 
+-		cancel_delayed_work_sync(&q->requeue_work);
+ 		queue_for_each_hw_ctx(q, hctx, i)
+ 			cancel_delayed_work_sync(&hctx->run_work);
+ 	}
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9516304a38ee..ef5a16a2d6fb 100644
+index ef5a16a2d6fb..55776a6e2586 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1736,9 +1736,12 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 		if (rq->mq_hctx != this_hctx || rq->mq_ctx != this_ctx) {
- 			if (this_hctx) {
- 				trace_block_unplug(this_q, depth, !from_schedule);
-+
-+				percpu_ref_get(&this_q->q_usage_counter);
- 				blk_mq_sched_insert_requests(this_hctx, this_ctx,
- 								&rq_list,
- 								from_schedule);
-+				percpu_ref_put(&this_q->q_usage_counter);
- 			}
+@@ -2640,6 +2640,8 @@ void blk_mq_release(struct request_queue *q)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	unsigned int i;
  
- 			this_q = rq->q;
-@@ -1757,8 +1760,11 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 	 */
- 	if (this_hctx) {
- 		trace_block_unplug(this_q, depth, !from_schedule);
++	cancel_delayed_work_sync(&q->requeue_work);
 +
-+		percpu_ref_get(&this_q->q_usage_counter);
- 		blk_mq_sched_insert_requests(this_hctx, this_ctx, &rq_list,
- 						from_schedule);
-+		percpu_ref_put(&this_q->q_usage_counter);
- 	}
- }
- 
+ 	/* hctx kobj stays in hctx */
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (!hctx)
 -- 
 2.9.5
 
