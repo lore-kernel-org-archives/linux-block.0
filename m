@@ -2,214 +2,279 @@ Return-Path: <SRS0=aY0t=SU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92CFDC10F0E
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 21:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A798DC10F0E
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 22:04:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5FFE320693
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 21:57:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MlUaT5mn"
+	by mail.kernel.org (Postfix) with ESMTP id 7418C20693
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 22:04:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725916AbfDRV5J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Apr 2019 17:57:09 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:45122 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725875AbfDRV5J (ORCPT
+        id S1725892AbfDRWEy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Apr 2019 18:04:54 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:49614 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725887AbfDRWEy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Apr 2019 17:57:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=T3gahklMMlmAdxs/1TrGgTz2aV7A/nBCyInv02Ahbug=; b=MlUaT5mnagR5NTQhsSKqiWB3+d
-        Sk7ryvjtw8Din3FmXhEO5Bcm86IFLAkjtrXos1mQwONyJJgZJbpdWJubnb5ZkOYAr1NBJgn2E2b30
-        mPBMl4YxUetfVftkTONBAD+5463RUMTGaVmaHsPwrNuiwv/j1xO1+3LuNXoYO4mspgbBmB2pZfSNv
-        j1frRxYfMwF+VqHSacNbcggTyK5XFdrsmWLOPRLs3wsVeYDFk1V9W6jYKJaZLiSMGB1xnH8HfsCsf
-        T5wAdiG75R1w5dqBfoKecEqxf6g3OHSpz/8ODEEHq7QovMM9T47ka9A8auZ+Icv+dPz7qkl9U9xCM
-        3fzM8nlQ==;
-Received: from static-50-53-52-16.bvtn.or.frontiernet.net ([50.53.52.16] helo=midway.dunlab)
-        by merlin.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hHF1h-0007JF-UZ; Thu, 18 Apr 2019 21:57:02 +0000
-Subject: Re: [RFC PATCH 1/1] lightnvm: add lzbd - a zoned block device target
-To:     hans@owltronix.com,
-        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Cc:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Igor Konopko <igor.j.konopko@intel.com>,
-        Heiner Litz <hlitz@ucsc.edu>,
-        Klaus Jensen <klaus.jensen@cnexlabs.com>,
-        Simon Lund <slund@cnexlabs.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-References: <1555588885-22546-1-git-send-email-hans@owltronix.com>
- <1555588885-22546-2-git-send-email-hans@owltronix.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <341dfda3-40cd-0ad4-b0f0-0d488d523d58@infradead.org>
-Date:   Thu, 18 Apr 2019 14:56:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Thu, 18 Apr 2019 18:04:54 -0400
+Received: from mail-qk1-f197.google.com ([209.85.222.197])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <gpiccoli@canonical.com>)
+        id 1hHF9I-00050B-0u
+        for linux-block@vger.kernel.org; Thu, 18 Apr 2019 22:04:52 +0000
+Received: by mail-qk1-f197.google.com with SMTP id 23so2864529qkl.16
+        for <linux-block@vger.kernel.org>; Thu, 18 Apr 2019 15:04:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nyeFXOjqKLFt3eJ8elJq5KwOzSRh1y1w19XMk2cP5II=;
+        b=fcTnhlNZ8NilHhYRPDsIrpApEl54cVTwhenlc1JOQNfuA969Zx4I9WcRqC4n5zas4E
+         /aICz4CX8y1E3oOi6icqPXz8or6DIA/bfWISXGLrbbMStxomRqJGIbrzIZo2jOTgLEZa
+         ykpjwvtOVGsOYMhF4znDKx1V0uW/mld2dKbbpV//JcsnflJpg2CD3L38xBOyuH1jaEJC
+         lxaJWDJ/BOZEuVRZV54C/kqiGjjS7NNQt3FUSUduOYiEg6kLYp6MwNBt2vuqYTGxzvrc
+         iwmxTD1pEuTn+KsEUkAok2HzZRHqjjquSiF+bZq0wJXlZzRxGyCIy+2em4RfNA9Orsxc
+         5C9A==
+X-Gm-Message-State: APjAAAWC4mcOV8K8zTFXw0wvLU5faya1gCPEXBOqllpUdk5pJdj6oqzo
+        t5SKytwCIKfTYtAW1DS65ciyWfJNu5eJHtpjgrVlvfHr0DADiPreTmdarRWSr4sJ+RuWFAnZZbz
+        fqXkYL9o6osgVfNY+MAeIAr8M8YCd0ug1RHwxFBc+
+X-Received: by 2002:ac8:2246:: with SMTP id p6mr384085qtp.225.1555625091168;
+        Thu, 18 Apr 2019 15:04:51 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqywF7IvrJi0Ts+N8+BEIHKPOkJDTXEv7ToP6bwKyWpzHlzv5+ZWzxfbiJVxRHJHxHWTlmtinw==
+X-Received: by 2002:ac8:2246:: with SMTP id p6mr384064qtp.225.1555625090899;
+        Thu, 18 Apr 2019 15:04:50 -0700 (PDT)
+Received: from localhost ([177.103.98.6])
+        by smtp.gmail.com with ESMTPSA id v6sm1490044qkd.46.2019.04.18.15.04.49
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 18 Apr 2019 15:04:50 -0700 (PDT)
+From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
+To:     axboe@kernel.dk, linux-raid@vger.kernel.org
+Cc:     gpiccoli@canonical.com, jay.vosburgh@canonical.com,
+        kernel@gpiccoli.net, neilb@suse.com, dm-devel@redhat.com,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [RFC] [PATCH V2 0/1] Introduce emergency raid0 stop for mounted arrays
+Date:   Thu, 18 Apr 2019 19:04:47 -0300
+Message-Id: <20190418220448.7219-1-gpiccoli@canonical.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <1555588885-22546-2-git-send-email-hans@owltronix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Currently the md driver completely relies in the userspace to stop an
+array in case of some failure - for raid0, if we remove a raid0 member like via
+PCI hot(un)plugging an NVMe device, and the raid0 array is _mounted_, mdadm
+cannot stop the array, since the tool tries to open the block device to perform
+the ioctl with the O_EXCL flag.
 
-On 4/18/19 5:01 AM, hans@owltronix.com wrote:
-> diff --git a/Documentation/lightnvm/lzbd.txt b/Documentation/lightnvm/lzbd.txt
-> new file mode 100644
-> index 000000000000..8bdbc01a25be
-> --- /dev/null
-> +++ b/Documentation/lightnvm/lzbd.txt
-> @@ -0,0 +1,122 @@
-> +lzbd: A Zoned Block Device LightNVM Target
-> +==========================================
-> +
-> +The lzbd lightnvm target makes it possible to expose an Open-Channel 2.0 SSD
-> +as one or more zoned block devices.
-> +
-> +Each lightnvm target is assigned a range of parallel units. Parallel units(PUs)
-> +are not shared among targets avoiding I/O QoS disturbances between targets as
+So, an array in this situation is "alive" - users may write to it and unless
+they check the kernel log or some other monitor tool, everything will seem fine
+and the writes are completed with no errors. Being more precise, direct
+writes will not work, but since usually writes are done in a regular form
+(backed by the page cache) the most common scenario is an user being able to
+regularly write to a broken raid0, and get all their data corrupted.
 
-(prefer:)               targets,
 
-> +far as possible.
-> +
-> +For more information on lightnvm, see [1]
+PROPOSAL:
+The idea proposed here to fix this behavior is mimic other block devices:
+if one have a filesystem mounted in a block device on top of an NVMe or
+SCSI disk and the disk gets removed, writes are prevented, errors are
+observed and it's obvious something is wrong; same goes for USB sticks.
 
-end with period above, as the 2 below are done.
+We believe right now the md driver is not behaving properly for raid0
+arrays (it is handling these errors for other levels though). The approach
+took for raid-0 is basically an emergency removal procedure, in which I/O
+is blocked from the device, the regular clean-up happens and the associate
+disk is deleted. It went to extensive testing, as detailed below.
 
-> +For more information on Open-Channel 2.0, see [2].
-> +For more information on zoned block devices see [3].
-> +
-> +lzbd is designed to act as a slim adaptor, making it possible to plug
-> +OCSSD 2.0 SSDs into the zone block device ecosystem.
-> +
-> +lzbd manages zone to chunk mapping, read/write restrictions,  wear leveling
-> +and write errors.
-> +
-> +Zone geometry
-> +-------------
-> +
-> +From a user perspective, lzbd targets form a number of sequential-write-required
-> +(BLK_ZONE_TYPE_SEQWRITE_REQ) zones.
-> +
-> +Not all of the target's capacity is exposed to the user.
-> +Some chunks are reserved for metadata and over-provisioning.
-> +
-> +The zones follow the same constraints as described in [3].
-> +
-> +All zones are of the same size (SZ).
-> +
-> +Simple example:
-> +
-> +Sector	 		Zone type
-> +		 _______________________
-> +0    -->	| Sequential write req. |
-> +		|                       |
-> +		|_______________________|
-> +SZ   -->	| Sequential write req. |
-> +		|                       |
-> +		|_______________________|
-> +SZ*2..-->	| Sequential write req. |
-> +		|                       |
-> +..........	.........................
-> +		|_______________________|
-> +SZ*N-1 -->	| Sequential write req. |
-> +		|_______________________|
-> +
-> +
-> +SZ is configurable, but is restricted to a multiple of
-> +(chunk size (CLBA) * Number of PUs).
-> +
-> +Zone to chunk mapping
-> +---------------------
-> +
-> +Zones are spread across PUs to allow maximum write throughput through striping.
-> +One or more chunks (CHK) per PU is assigned.
-> +
-> +Example:
-> +
-> +OCSSD 2.0 Geometry: 4 PUs, 16 chunks per PU.
-> +Zones: 3
-> +
-> + Zone	  PU0	PU1   PU2   PU3
-> +_______  _____ _____ _____ _____
-> +        |CHK 0|CHK 0|CHK A|CHK 0|
-> + 0      |CHK 2|CHK 3|CHK 3|CHK 1|
-> +_______ |_____|_____|_____|_____|
-> +        |CHK 3|CHK B|CHK 8|CHK A|
-> + 1      |CHK 7|CHK F|CHK 2|CHK 3|
-> +_______ |_____|_____|_____|_____|
-> +        |CHK 8|CHK 2|CHK 7|CHK 4|
-> + 2      |CHK 1|CHK A|CHK 5|CHK 2|
-> +_______ |_____|_____|_____|_____|
-> +
-> +Chunks are assigned to a zone when it is opened based on the chunk wear index.
-> +
-> +Note: The disk's Maximum Open Chunks (MAXOC) limit puts an upper bound on
-> +maximum simultaneously open zones (unless MAXOC = 0).
-> +
-> +Meta data and over-provisioning
-> +-------------------------------
+Not all are roses, we have some caveats that need to be resolved.
+Feedback is much appreciated.
+There is a caveats / questions / polemic choices section below the test
+section.
 
-My dictionary searches all use metadata as one word, not two.
+V1 link: https://marc.info/?l=linux-raid&m=153313538013458
 
-> +
-> +lzbd needs the following meta data to be persisted:
-> +
-> +* a zone-to chunk mapping (Z2C) table, size: 4 bytes * Number of chunks
-> +* a superblock containing target configuration, guuid, on-disk format version,
+Thanks in advance,
 
-what is guuid, please?
 
-> +  etc.
-> +
-> +Additionally, chunks need to be reserved for handling:
-> +
-> +* write errors
-> +* chunks wearing out and going offline
-> +* persisting data not aligned with the minimal write constraint
-> +
-> +The meta data is stored a separate set of chunks from the user data.
-> +
-> +Host memory requirements
-> +------------------------
-> +
-> +The Z2C mapping table needs to be kept in host memory (see above), and:
-> +
-> +* in order to achieve maximum throughput and alignment requirements,
-> +  a small write buffer is needed
-> +	Size: Optimal Write Size (WS_OPT) * Maximum number of open zones.
-> +
-> +* to satisify OCSSD 2.0 read restrictions, a read buffer is needed.
+Guilherme
 
-        satisfy
 
-> +	Size: Number of PUs * Cache Minimum Write Size Units (MW_CUNITS) *
-> +	Maximum number of open zones.
-> +
-> +If MW_CUNITS = 0, no read buffer is needed and data can be written without
-> +any host copying/buffering (except for handling WS_OPT alignment).
-> +
-> +References
-> +----------
-> +
-> +[1] Lightnvm website: http://lightnvm.io/
-> +[2] OCSSD 2.0 Specification: http://lightnvm.io/docs/OCSSD-2_0-20180129.pdf
-> +[3] ZBC / Zoned block device support: https://lwn.net/Articles/703871/
-> +
+* Testing:
 
-thanks.
+The device topology for the tests is as follows:
+
+                            md6
+                             |
+              |******************************|
+              |                              |
+             md4                            md5
+              |                              |
+       |*************|                |*************|
+       |             |                |             |
+      md0           md2              md1           md3
+       |             |                |             |
+   |*******|       |***|            |***|       |*******|
+   |       |       |   |            |   |       |       |
+nvme1n1 nvme0n1   sda sdd          sde sdf   nvme2n1 nvme3n1
+
+
+We chose to test such complex topology to expose corner cases and timing
+issues (which were found in the development phase). There are 3 test
+subsets basically: the whole set of devices, called here "md cascade", and
+2 small branches, called here "md direct" testing.
+
+So, in summary:
+### md direct (single arrays composed of SCSI/NVMe block devices) ###
+A1 = md1      A2 = md3
+C1 = sde      C1 = nvme2n1
+C2 = sdf      C2 = nvme3n1
+
+### md cascade (array composed of md devices) ###
+A3 = md6
+underlying component UC1 = nvme1n1
+underlying component UC2 = sdd
+underlying component UC3 = sdf
+underlying component UC4 = nvme2n1
+
+
+### Method of removal ###
+- For NVMe devices, "echo 1 > /sys/block/nvmeXnY/device/device/remove"
+- For SCSI devices, "echo 1 > /sys/block/sdX/device/delete"
+
+
+### Test ###
+Write a file using the command: "dd if=/dev/zero of=tmpfile bs=X" where
+X might be 8K or 384K (varied in the tests).
+
+Each array also contains a valid file to be checked later, in order to
+validate that filesystem didn't get severely corrupted after the
+procedure.
+
+Tests marked with @ indicate direct writes were tested too.
+Tests with a [] indicator exhibited some oddity/issue, detailed in the
+caveats section.
+
+After each test, guest was rebooted.
+
+Tests were performed in kernel v5.1-rc5.
+
+
+* Test results
+("partition X" means we have a GPT table with 2 partitions in the device)
+
+
+### md direct
+
+Remove members and start writing to array right after:
+A1 with:                               A2 with:
+ -ext4                                  -ext4
+ --Removed C1: PASSED @                 --Removed C2: PASSED @
+
+ -xfs                                   -xfs
+ --Removed C2: PASSED                   --Removed C1: PASSED
+
+ -partition 1 + ext4                    -partition 1 + xfs
+ -partition 2 + xfs                     -partition 2 + ext4
+ --Removed C1: PASSED                   --Removed C2: PASSED
+
+
+Start writing to array and remove member right after:
+A1 with:                               A2 with:
+ -ext4                                  -ext4
+ --Removed C1: PASSED                   --Removed C1: PASSED
+ --Removed C2: PASSED @
+
+ -xfs                                   -xfs
+ --Removed C1: PASSED                   --Removed C1: PASSED
+                                        --Removed C2: PASSED @
+
+ -partition 1 + ext4                    -partition 1 + xfs
+ -partition 2 + xfs                     -partition 2 + ext4
+ --Removed C2: PASSED                   --Removed C1: PASSED @
+
+
+### md cascade
+Remove members and start writing to array right after:
+A3 with:
+ -ext4:
+ --Removed UC2: PASSED
+ --Removed UC4: PASSED @
+
+  -xfs:
+ --Removed UC2: PASSED @
+ --Removed UC4: PASSED
+
+ -partition 1 + ext4
+ -partition 2 + xfs
+ --Removed UC1: PASSED @
+ --Removed UC3: PASSED
+
+
+Start writing to array and remove member right after:
+A3 with:
+ -ext4:
+ --Removed UC2: PASSED
+ --Removed UC4: PARTIAL @ [(a) (b)]
+
+  -xfs:
+ --Removed UC2: PASSED
+ --Removed UC4: PARTIAL @ [(c)]
+
+ -partition 1 + ext4
+ -partition 2 + xfs
+ --Removed UC1: PASSED
+ --Removed UC3: PARTIAL @ [(b)]
+
+
+* Caveats / points of uncertainty / questions:
+
+=> Some arrays  still show in /dev after the removal. We noticed if FS
+is unmounted and "mdadm --detail" is tried against that, it hangs.
+
+#For md cascade only (nested arrays):
+
+a) After direct writes, if we issue a regular right (backed by page
+cache), observed an oops sometimes, in ext4 filesystem.
+
+b) We might face an ext4 journal task blocked in io_schedule().
+Backtrace: https://pastebin.ubuntu.com/p/KgvHjRn6Pg
+
+c) Hung task in xfs after direct I/O only, when trying to write again after
+failing one of the members (2nd write is using page cache).
+Backtrace: https://pastebin.ubuntu.com/p/7NMRV9fG2H
+
+
+
+#Generic questions / polemic choices:
+
+i) With this patch, the STOP_ARRAY ioctl won't proceed in case a disk is
+removed and emergency stop routine already started to act, even in case of
+unmounted md arrays. This is a change in the old behavior, triggered by
+the way we check for failed members in raid0 driver.
+
+ii) Currently, the patch implements a kernel-only removal policy - shall
+it rely on userspace (mdadm) to do it? A first approach was based in
+userspace, but it proved to be more problematic in tests.
+
+iii) Would a new state ("error") for RAID0 be a better solution? I'm
+experimenting a simpler approach that would introduce a new state, but
+wouldn't force the removal of the device.
+
+Guilherme G. Piccoli (1):
+  md/raid0: Introduce emergency stop for raid0 arrays
+
+ drivers/md/md.c    | 123 +++++++++++++++++++++++++++++++++++++++++----
+ drivers/md/md.h    |   6 +++
+ drivers/md/raid0.c |  14 ++++++
+ 3 files changed, 134 insertions(+), 9 deletions(-)
+
 -- 
-~Randy
+2.21.0
+
+
