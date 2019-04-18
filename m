@@ -2,232 +2,201 @@ Return-Path: <SRS0=aY0t=SU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB68DC282DD
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 14:06:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B3CC282DD
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 14:27:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9487F2083D
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 14:06:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7C0020835
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 14:27:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389416AbfDROGp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Apr 2019 10:06:45 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49672 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2389363AbfDROGo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Apr 2019 10:06:44 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 62C8FAFDB;
-        Thu, 18 Apr 2019 14:06:42 +0000 (UTC)
-From:   Hannes Reinecke <hare@suse.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Bart van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@gmail.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [PATCH] block: use static bio_set for bio_split() calls
-Date:   Thu, 18 Apr 2019 16:06:32 +0200
-Message-Id: <20190418140632.60606-1-hare@suse.de>
-X-Mailer: git-send-email 2.16.4
+        id S2388841AbfDRO1m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Apr 2019 10:27:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52088 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1733192AbfDRO1l (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Apr 2019 10:27:41 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D1F1DDBD73;
+        Thu, 18 Apr 2019 14:27:40 +0000 (UTC)
+Received: from redhat.com (unknown [10.20.6.236])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 39EAC600C1;
+        Thu, 18 Apr 2019 14:27:31 +0000 (UTC)
+Date:   Thu, 18 Apr 2019 10:27:29 -0400
+From:   Jerome Glisse <jglisse@redhat.com>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Boaz Harrosh <boaz@plexistor.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org, Linux MM <linux-mm@kvack.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Wilcox <willy@infradead.org>,
+        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, Yan Zheng <zyan@redhat.com>,
+        Sage Weil <sage@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+        Alex Elder <elder@kernel.org>, ceph-devel@vger.kernel.org,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        devel@lists.orangefs.org,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        v9fs-developer@lists.sourceforge.net, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org,
+        Ernesto =?iso-8859-1?Q?A=2E_Fern=E1ndez?= 
+        <ernesto.mnd.fernandez@gmail.com>
+Subject: Re: [PATCH v1 00/15] Keep track of GUPed pages in fs and block
+Message-ID: <20190418142729.GB3288@redhat.com>
+References: <20190411210834.4105-1-jglisse@redhat.com>
+ <2c124cc4-b97e-ee28-2926-305bc6bc74bd@plexistor.com>
+ <20190416185922.GA12818@kmo-pixel>
+ <CAPcyv4jLrQ6evLAJzsASh=H6Tzx8E1oiF+YR3L2fOpbZYNUWGg@mail.gmail.com>
+ <20190416194936.GD21526@redhat.com>
+ <CAPcyv4i-YHH+dH8za1i1aMcHzQXfovVSrRFp_nfa-KYN-XhAvw@mail.gmail.com>
+ <20190417222858.GA4146@redhat.com>
+ <20190418104205.GA28541@quack2.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190418104205.GA28541@quack2.suse.cz>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Thu, 18 Apr 2019 14:27:41 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When calling blk_queue_split() it will be using the per-queue
-bioset to allocate the split bio from. However, blk_steal_bios()
-might move the bio to another queue, _and_ the original queue
-might be removed completely (nvme is especially prone to do so).
-That leaves the bvecs of the split bio with a missing / destroyed
-mempool, and a really fun crash in bio_endio().
+On Thu, Apr 18, 2019 at 12:42:05PM +0200, Jan Kara wrote:
+> On Wed 17-04-19 18:28:58, Jerome Glisse wrote:
+> > On Wed, Apr 17, 2019 at 02:53:28PM -0700, Dan Williams wrote:
+> > > On Tue, Apr 16, 2019 at 12:50 PM Jerome Glisse <jglisse@redhat.com> wrote:
+> > > >
+> > > > On Tue, Apr 16, 2019 at 12:12:27PM -0700, Dan Williams wrote:
+> > > > > On Tue, Apr 16, 2019 at 11:59 AM Kent Overstreet
+> > > > > <kent.overstreet@gmail.com> wrote:
+> > > > > >
+> > > > > > On Tue, Apr 16, 2019 at 09:35:04PM +0300, Boaz Harrosh wrote:
+> > > > > > > On Thu, Apr 11, 2019 at 05:08:19PM -0400, jglisse@redhat.com wrote:
+> > > > > > > > From: Jérôme Glisse <jglisse@redhat.com>
+> > > > > > > >
+> > > > > > > > This patchset depends on various small fixes [1] and also on patchset
+> > > > > > > > which introduce put_user_page*() [2] and thus is 5.3 material as those
+> > > > > > > > pre-requisite will get in 5.2 at best. Nonetheless i am posting it now
+> > > > > > > > so that it can get review and comments on how and what should be done
+> > > > > > > > to test things.
+> > > > > > > >
+> > > > > > > > For various reasons [2] [3] we want to track page reference through GUP
+> > > > > > > > differently than "regular" page reference. Thus we need to keep track
+> > > > > > > > of how we got a page within the block and fs layer. To do so this patch-
+> > > > > > > > set change the bio_bvec struct to store a pfn and flags instead of a
+> > > > > > > > direct pointer to a page. This way we can flag page that are coming from
+> > > > > > > > GUP.
+> > > > > > > >
+> > > > > > > > This patchset is divided as follow:
+> > > > > > > >     - First part of the patchset is just small cleanup i believe they
+> > > > > > > >       can go in as his assuming people are ok with them.
+> > > > > > >
+> > > > > > >
+> > > > > > > >     - Second part convert bio_vec->bv_page to bio_vec->bv_pfn this is
+> > > > > > > >       done in multi-step, first we replace all direct dereference of
+> > > > > > > >       the field by call to inline helper, then we introduce macro for
+> > > > > > > >       bio_bvec that are initialized on the stack. Finaly we change the
+> > > > > > > >       bv_page field to bv_pfn.
+> > > > > > >
+> > > > > > > Why do we need a bv_pfn. Why not just use the lowest bit of the page-ptr
+> > > > > > > as a flag (pointer always aligned to 64 bytes in our case).
+> > > > > > >
+> > > > > > > So yes we need an inline helper for reference of the page but is it not clearer
+> > > > > > > that we assume a page* and not any kind of pfn ?
+> > > > > > > It will not be the first place using low bits of a pointer for flags.
+> > > > > > >
+> > > > > > > That said. Why we need it at all? I mean why not have it as a bio flag. If it exist
+> > > > > > > at all that a user has a GUP and none-GUP pages to IO at the same request he/she
+> > > > > > > can just submit them as two separate BIOs (chained at the block layer).
+> > > > > > >
+> > > > > > > Many users just submit one page bios and let elevator merge them any way.
+> > > > > >
+> > > > > > Let's please not add additional flags and weirdness to struct bio - "if this
+> > > > > > flag is set interpret one way, if not interpret another" - or eventually bios
+> > > > > > will be as bad as skbuffs. I would much prefer just changing bv_page to bv_pfn.
+> > > > >
+> > > > > This all reminds of the failed attempt to teach the block layer to
+> > > > > operate without pages:
+> > > > >
+> > > > > https://lore.kernel.org/lkml/20150316201640.33102.33761.stgit@dwillia2-desk3.amr.corp.intel.com/
+> > > > >
+> > > > > >
+> > > > > > Question though - why do we need a flag for whether a page is a GUP page or not?
+> > > > > > Couldn't the needed information just be determined by what range the pfn is not
+> > > > > > (i.e. whether or not it has a struct page associated with it)?
+> > > > >
+> > > > > That amounts to a pfn_valid() check which is a bit heavier than if we
+> > > > > can store a flag in the bv_pfn entry directly.
+> > > > >
+> > > > > I'd say create a new PFN_* flag, and make bv_pfn a 'pfn_t' rather than
+> > > > > an 'unsigned long'.
+> > > > >
+> > > > > That said, I'm still in favor of Jan's proposal to just make the
+> > > > > bv_page semantics uniform. Otherwise we're complicating this core
+> > > > > infrastructure for some yet to be implemented GPU memory management
+> > > > > capabilities with yet to be determined value. Circle back when that
+> > > > > value is clear, but in the meantime fix the GUP bug.
+> > > >
+> > > > This has nothing to do with GPU, what make you think so ? Here i am
+> > > > trying to solve GUP and to keep the value of knowing wether a page
+> > > > has been GUP or not. I argue that if we bias every page in every bio
+> > > > then we loose that information and thus the value.
+> > > >
+> > > > I gave the page protection mechanisms as an example that would be
+> > > > impacted but it is not the only one. Knowing if a page has been GUP
+> > > > can be useful for memory reclaimation, compaction, NUMA balancing,
+> > > 
+> > > Right, this is what I was reacting to in your pushback to Jan's
+> > > proposal. You're claiming value for not doing the simple thing for
+> > > some future "may be useful in these contexts". To my knowledge those
+> > > things are not broken today. You're asking for the complexity to be
+> > > carried today for some future benefit, and I'm asking for the
+> > > simplicity to be maintained as much as possible today and let the
+> > > value of future changes stand on their own to push for more complexity
+> > > later.
+> > > 
+> > > Effectively don't use this bug fix to push complexity for a future
+> > > agenda where the value has yet to be quantified.
+> > 
+> > Except that this solution (biasing everyone in bio) would _more complex_
+> > it is only conceptualy appealing. The changes are on the other hand much
+> > deeper and much riskier but you decided to ignore that and focus on some-
+> > thing i was just giving as an example.
+> 
+> Yeah, after going and reading several places like fs/iomap.c, fs/mpage.c,
+> drivers/md/dm-io.c I agree with you. The places that are not doing direct
+> IO usually just don't hold any page reference that could be directly
+> attributed to the bio (and they don't drop it when bio finishes). They
+> rather use other means (like PageLocked, PageWriteback) to make sure the
+> page stays alive so mandating gup-pin reference for all pages attached to a
+> bio would require a lot of reworking of places that are not related to our
+> problem and currently work just fine. So I withdraw my suggestion. Nice in
+> theory, too much work in practice ;).
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
----
- block/blk-core.c       |  9 +--------
- block/blk-merge.c      | 36 ++++++++++++++++++++++++------------
- block/blk-sysfs.c      |  2 --
- include/linux/blkdev.h |  1 -
- 4 files changed, 25 insertions(+), 23 deletions(-)
+Have you seem Boaz proposal ? I have started it and it does not look to
+bad (but you knwo taste and color :)) You can take a peek:
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 4673ebe42255..9317e3de2337 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -474,7 +474,6 @@ static void blk_timeout_work(struct work_struct *work)
- struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- {
- 	struct request_queue *q;
--	int ret;
- 
- 	q = kmem_cache_alloc_node(blk_requestq_cachep,
- 				gfp_mask | __GFP_ZERO, node_id);
-@@ -488,13 +487,9 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	if (q->id < 0)
- 		goto fail_q;
- 
--	ret = bioset_init(&q->bio_split, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
--	if (ret)
--		goto fail_id;
--
- 	q->backing_dev_info = bdi_alloc_node(gfp_mask, node_id);
- 	if (!q->backing_dev_info)
--		goto fail_split;
-+		goto fail_id;
- 
- 	q->stats = blk_alloc_queue_stats();
- 	if (!q->stats)
-@@ -544,8 +539,6 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	blk_free_queue_stats(q->stats);
- fail_stats:
- 	bdi_put(q->backing_dev_info);
--fail_split:
--	bioset_exit(&q->bio_split);
- fail_id:
- 	ida_simple_remove(&blk_queue_ida, q->id);
- fail_q:
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 8f96d683b577..9c8636794944 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -12,6 +12,12 @@
- 
- #include "blk.h"
- 
-+/*
-+ * bio_split_bio_set is the bio-set containing bio and iovec memory pools used
-+ * by bio_split.
-+ */
-+struct bio_set bio_split_bio_set;
-+
- /*
-  * Check if the two bvecs from two bios can be merged to one segment.  If yes,
-  * no need to check gap between the two bios since the 1st bio and the 1st bvec
-@@ -77,7 +83,6 @@ static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
- 
- static struct bio *blk_bio_discard_split(struct request_queue *q,
- 					 struct bio *bio,
--					 struct bio_set *bs,
- 					 unsigned *nsegs)
- {
- 	unsigned int max_discard_sectors, granularity;
-@@ -116,11 +121,11 @@ static struct bio *blk_bio_discard_split(struct request_queue *q,
- 	if (split_sectors > tmp)
- 		split_sectors -= tmp;
- 
--	return bio_split(bio, split_sectors, GFP_NOIO, bs);
-+	return bio_split(bio, split_sectors, GFP_NOIO, &bio_split_bio_set);
- }
- 
- static struct bio *blk_bio_write_zeroes_split(struct request_queue *q,
--		struct bio *bio, struct bio_set *bs, unsigned *nsegs)
-+		struct bio *bio, unsigned *nsegs)
- {
- 	*nsegs = 1;
- 
-@@ -130,12 +135,12 @@ static struct bio *blk_bio_write_zeroes_split(struct request_queue *q,
- 	if (bio_sectors(bio) <= q->limits.max_write_zeroes_sectors)
- 		return NULL;
- 
--	return bio_split(bio, q->limits.max_write_zeroes_sectors, GFP_NOIO, bs);
-+	return bio_split(bio, q->limits.max_write_zeroes_sectors, GFP_NOIO,
-+			 &bio_split_bio_set);
- }
- 
- static struct bio *blk_bio_write_same_split(struct request_queue *q,
- 					    struct bio *bio,
--					    struct bio_set *bs,
- 					    unsigned *nsegs)
- {
- 	*nsegs = 1;
-@@ -146,7 +151,8 @@ static struct bio *blk_bio_write_same_split(struct request_queue *q,
- 	if (bio_sectors(bio) <= q->limits.max_write_same_sectors)
- 		return NULL;
- 
--	return bio_split(bio, q->limits.max_write_same_sectors, GFP_NOIO, bs);
-+	return bio_split(bio, q->limits.max_write_same_sectors, GFP_NOIO,
-+			 &bio_split_bio_set);
- }
- 
- static inline unsigned get_max_io_size(struct request_queue *q,
-@@ -230,7 +236,6 @@ static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
- 
- static struct bio *blk_bio_segment_split(struct request_queue *q,
- 					 struct bio *bio,
--					 struct bio_set *bs,
- 					 unsigned *segs)
- {
- 	struct bio_vec bv, bvprv, *bvprvp = NULL;
-@@ -290,7 +295,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	*segs = nsegs;
- 
- 	if (do_split) {
--		new = bio_split(bio, sectors, GFP_NOIO, bs);
-+		new = bio_split(bio, sectors, GFP_NOIO, &bio_split_bio_set);
- 		if (new)
- 			bio = new;
- 	}
-@@ -310,16 +315,16 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
- 	switch (bio_op(*bio)) {
- 	case REQ_OP_DISCARD:
- 	case REQ_OP_SECURE_ERASE:
--		split = blk_bio_discard_split(q, *bio, &q->bio_split, &nsegs);
-+		split = blk_bio_discard_split(q, *bio, &nsegs);
- 		break;
- 	case REQ_OP_WRITE_ZEROES:
--		split = blk_bio_write_zeroes_split(q, *bio, &q->bio_split, &nsegs);
-+		split = blk_bio_write_zeroes_split(q, *bio, &nsegs);
- 		break;
- 	case REQ_OP_WRITE_SAME:
--		split = blk_bio_write_same_split(q, *bio, &q->bio_split, &nsegs);
-+		split = blk_bio_write_same_split(q, *bio, &nsegs);
- 		break;
- 	default:
--		split = blk_bio_segment_split(q, *bio, &q->bio_split, &nsegs);
-+		split = blk_bio_segment_split(q, *bio, &nsegs);
- 		break;
- 	}
- 
-@@ -979,3 +984,10 @@ enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
- 		return ELEVATOR_FRONT_MERGE;
- 	return ELEVATOR_NO_MERGE;
- }
-+
-+static int __init blk_bio_split_init(void)
-+{
-+	return bioset_init(&bio_split_bio_set, BIO_POOL_SIZE, 0,
-+			   BIOSET_NEED_BVECS);
-+}
-+subsys_initcall(blk_bio_split_init);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 422327089e0f..e72785751f1a 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -868,8 +868,6 @@ static void __blk_release_queue(struct work_struct *work)
- 	if (queue_is_mq(q))
- 		blk_mq_debugfs_unregister(q);
- 
--	bioset_exit(&q->bio_split);
--
- 	ida_simple_remove(&blk_queue_ida, q->id);
- 	call_rcu(&q->rcu_head, blk_free_queue_rcu);
- }
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4b85dc066264..31e9b37e71d4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -552,7 +552,6 @@ struct request_queue {
- 
- 	struct blk_mq_tag_set	*tag_set;
- 	struct list_head	tag_set_list;
--	struct bio_set		bio_split;
- 
- #ifdef CONFIG_BLK_DEBUG_FS
- 	struct dentry		*debugfs_dir;
--- 
-2.16.4
+https://cgit.freedesktop.org/~glisse/linux/log/?h=gup-bio-v2
 
+I need to finish that and run fstests on bunch of different fs before
+posting. Dunno if i will have enough time to do that before LSF/MM.
+
+Cheers,
+Jérôme
