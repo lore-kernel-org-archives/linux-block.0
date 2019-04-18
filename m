@@ -2,87 +2,200 @@ Return-Path: <SRS0=aY0t=SU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 664E2C10F0E
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 18:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DA1C10F0E
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 18:58:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2AB9220693
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 18:37:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7529214DA
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 18:58:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kwteLQdy"
+	dkim=pass (2048-bit key) header.d=dilger-ca.20150623.gappssmtp.com header.i=@dilger-ca.20150623.gappssmtp.com header.b="MfU9AJa0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389769AbfDRShn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Apr 2019 14:37:43 -0400
-Received: from mail-qt1-f175.google.com ([209.85.160.175]:35472 "EHLO
-        mail-qt1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389757AbfDRShn (ORCPT
+        id S2389939AbfDRS6T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Apr 2019 14:58:19 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:38322 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728531AbfDRS6T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Apr 2019 14:37:43 -0400
-Received: by mail-qt1-f175.google.com with SMTP id h39so3265135qte.2
-        for <linux-block@vger.kernel.org>; Thu, 18 Apr 2019 11:37:42 -0700 (PDT)
+        Thu, 18 Apr 2019 14:58:19 -0400
+Received: by mail-pl1-f193.google.com with SMTP id f36so1581124plb.5
+        for <linux-block@vger.kernel.org>; Thu, 18 Apr 2019 11:58:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=STJkyaIjzZOnylWmChU6MjAWkvyJjy9lWlWcjt6Tlds=;
-        b=kwteLQdy9K5FZFEEDYf1/9Saka0d4DqD0meIXIuK6dYu3HlUbguNnjCuHOR7jBM4HW
-         oT4XhmtdTjRex5mysnVrjFhczIXe29t/+6tAZRT67cOIN42dt3USBYhi5EbNjox8eoUy
-         +ykFnRi+5aOZCZl9VdIoDXB1m6iXox5BfkB5+9d0Hwuqw/NRRnk8TGJitk2/uCGH38HC
-         +tCKBFRR0rLqKw2xeOkfkAlQ4Jpkdc94fR/p4wJH5tBQZLbReEFUpLY3BF/78YlqRbcT
-         rvG8LRQlyTZIReYyrs4X9FBjuLecJSY67QDsRX7HGL1UcT6vVOHtJxGiG8NM1lXCR4YR
-         d28Q==
+        d=dilger-ca.20150623.gappssmtp.com; s=20150623;
+        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
+         :references;
+        bh=Rls8ZXKxpitLdToJVhs5aQI6eogfraGi8L51K73vZHA=;
+        b=MfU9AJa0duArcFo2+QYl8UPFXdYay3Rc1DAlk633euOpRQos/H2Qsq8hI9EHE0VglA
+         l3lJzLNDZseM4FhVy+SjIJow8umIWXKZfKWSe+B/13SayWTmuivmwKEHIOFQd1yLkPCh
+         d0axKanB3162FWykYa48SdDp9Oo982oGwQz//7yRu/0ny1j+dY1oUTW8Tsmyj9NGB4Kr
+         +MXj6AUB8Qts7YFGyvOe0AU5DPwcFh/5C3QZMDFqarBOoMDaL72tVjlnHRT172BKo6I/
+         lpXDf4aU4cbrZZ5HW/IsBD0Gu1lkBL9BxDPv+K4tWSOC8F6+GFyTiNHRznNuWH0EHqz/
+         +e6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=STJkyaIjzZOnylWmChU6MjAWkvyJjy9lWlWcjt6Tlds=;
-        b=mOBW3fRFUT61VZ8f5OSFUaHiMynLtmknTamQsjQZxi63EfKmzYPvc/y7iLJCSupn+u
-         2ui8B5KAOlP0LdWi4nJZPQDWuSyVEsioSaZ9ZtFu6n1C9nWjy/OuJJBK+HAjN85ICZX4
-         UQV89y9sFClHV1HOMQ04Mn+qM5DJQ2+vMJcPGtwHV5bYDcaVnIdMRgsLsa9erg02C0pU
-         1BU9bpd/q+D8P6U3KiEQyeGzJ1kPo2d1IMdUwiOHwLl95mzfCssDNoP0RQiUvYZnxVkI
-         DT24H1UPW8OmfK4KsjDPmY6tPwMI0WpdOphgVERR879obWlz19kko1UBxiZRM575SqcP
-         FMVg==
-X-Gm-Message-State: APjAAAU2EvwPLXrSQegoQNMGz1GjW3XlfKbn2c8M3ovXSB+u1uMsfHvR
-        xguX3OWAVbYN52rgB+KXUJ+WpnziGq69pCf/4aupQajcyXU=
-X-Google-Smtp-Source: APXvYqxCTA9HbvKRCCwdHYTsSAndiZ3YvaFmEzuhnKU4is2Gf8eq2TVNWfwEyRlEjqKkmoMmuQD5tmPZwhFg3v1n0zE=
-X-Received: by 2002:a0c:96eb:: with SMTP id b40mr76223036qvd.131.1555612662107;
- Thu, 18 Apr 2019 11:37:42 -0700 (PDT)
-MIME-Version: 1.0
-From:   David Ford <firefighterblu3@gmail.com>
-Date:   Thu, 18 Apr 2019 14:37:31 -0400
-Message-ID: <CAFZ8Xq7WbZFWzXvSiQ0vTFd4b4LySO7w1DJ-+T4HKzdq8q2_bA@mail.gmail.com>
-Subject: Mounting partitions with same label as filesystem mountpoint name
-To:     linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        h=x-gm-message-state:from:message-id:mime-version:subject:date
+         :in-reply-to:cc:to:references;
+        bh=Rls8ZXKxpitLdToJVhs5aQI6eogfraGi8L51K73vZHA=;
+        b=dEbxGB1gHTDk/Ptf8fGyaqjufWID54cqjkanj/bhx5CUq/UGKaT0AlY1bQlVkC3+5O
+         mrrvCDUgGyCdTLmtLZCcYgSYzx1M5lVf645VOjIBNEVmhr9spdouwbmlHBJQEIjoYSKx
+         ITh1rDMASQWCGBAf3MZvGAQIUUNy0b5JJhLCFT1q/eqt43Cd48Z4v3KmBwUS8+Mn1q49
+         mPdmX6yHIMPsev2O8FlFdMPvyW6YMllfi1R9WvA3O3uHjjrKCMMqSQHCbY5Bouvh6iuG
+         TwLzYhERxOWjQ9H7udSxIvh6CJ4PQACFFNrTLPLCxOlFPW7Xc79hLY3W5jQBddOnjNZ8
+         w82g==
+X-Gm-Message-State: APjAAAUfH812DBzKqBMto7NMNgvXsoZxYXXWjIOUZImnEIMc4eG3/WZt
+        JwvWXFkHrhCVx/LOYrRFHd8o8g==
+X-Google-Smtp-Source: APXvYqzX8/1l6sox8PUa5IqTovbL1mZTLZLDYQpGPrG8X1cAjahdf+PnEQIsTOk7eecHLzVgnAafIw==
+X-Received: by 2002:a17:902:581:: with SMTP id f1mr55594044plf.304.1555613897955;
+        Thu, 18 Apr 2019 11:58:17 -0700 (PDT)
+Received: from cabot-wlan.adilger.int (S0106a84e3fe4b223.cg.shawcable.net. [70.77.216.213])
+        by smtp.gmail.com with ESMTPSA id u5sm4225156pfm.121.2019.04.18.11.58.16
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 18 Apr 2019 11:58:17 -0700 (PDT)
+From:   Andreas Dilger <adilger@dilger.ca>
+Message-Id: <9BD0C782-5967-4DCB-9D01-E5BCC73E653C@dilger.ca>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_E3FEA83A-9256-40CD-B4F8-E3FF6FED0F48";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v4 4/7] block: introduce write-hint to stream-id
+ conversion
+Date:   Thu, 18 Apr 2019 12:58:14 -0600
+In-Reply-To: <20190418140603.GL28541@quack2.suse.cz>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-nvme@lists.infradead.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, prakash.v@samsung.com
+To:     Jan Kara <jack@suse.cz>
+References: <1555523406-2380-1-git-send-email-joshi.k@samsung.com>
+ <CGME20190417175358epcas1p41a0a4e349dfe0a70bdcc244161c71604@epcas1p4.samsung.com>
+ <1555523406-2380-5-git-send-email-joshi.k@samsung.com>
+ <20190418140603.GL28541@quack2.suse.cz>
+X-Mailer: Apple Mail (2.3273)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-kernel: 5.0.7-arch1-1-ARCH
 
-Is this a known oddity? I tried to mount a partition today that has
-the gpt label and partlabel of "backups" to /mnt/backups. The syscall
-succeeds but in reality, it silently failed. dmesg reports the
-filesystem was mounted.
+--Apple-Mail=_E3FEA83A-9256-40CD-B4F8-E3FF6FED0F48
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-mount("/dev/sdc3", "/mnt/backups", "ext4", 0, NULL) =3D 0
-[...]
-[259524.127545] EXT4-fs (sdc3): mounted filesystem with ordered data
-mode. Opts: (null)
+On Apr 18, 2019, at 8:06 AM, Jan Kara <jack@suse.cz> wrote:
+>=20
+> On Wed 17-04-19 23:20:03, Kanchan Joshi wrote:
+>> This patch moves write-hint-to-stream-id conversion in block-layer.
+>> Earlier this was done by driver (nvme). Current conversion is of the
+>> form "streamid =3D write-hint - 1", for both user and kernel streams.
+>> Conversion takes stream limit (maintained in request queue) into
+>> account. Write-hints beyond the exposed limit turn to 0.
+>> A new field 'streamid' has been added in request. While 'write-hint'
+>> field continues to exist. It keeps original value passed from upper
+>> layer, and used during merging checks.
+>>=20
+>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>> ---
+>> block/blk-core.c       | 20 ++++++++++++++++++++
+>> include/linux/blkdev.h |  1 +
+>> 2 files changed, 21 insertions(+)
+>>=20
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index a55389b..712e6b7 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -730,6 +730,25 @@ bool blk_attempt_plug_merge(struct request_queue =
+*q, struct bio *bio,
+>> 	return false;
+>> }
+>>=20
+>> +enum rw_hint blk_write_hint_to_streamid(struct request *req,
+>> +				        struct bio *bio)
+>> +{
+>> +	enum rw_hint streamid, nr_streams;
+>> +	struct request_queue *q =3D req->q;
+>> +	nr_streams =3D q->limits.nr_streams;
+>> +
+>> +	streamid =3D bio->bi_write_hint;
+>> +	if (!nr_streams || streamid =3D=3D WRITE_LIFE_NOT_SET ||
+>> +	    streamid =3D=3D WRITE_LIFE_NONE)
+>> +		streamid =3D 0;
+>> +	else {
+>> +		--streamid;
+>> +		if(streamid > nr_streams)
+>> +			streamid =3D 0;
+>> +	}
+>> +	return streamid;
+>> +}
+>> +
+>=20
+> Someone told me that stream ids are potentially persistent on the =
+storage
+> so it isn't great to change the id for the same thing e.g. if we add
+> another user hint. So maybe we should allocate kernel hints from top =
+as
+> Dave Chinner suggested? I.e., something like the following mapping =
+function:
+>=20
+> 	if (streamid <=3D BLK_MAX_USER_HINTS) {
+> 		streamid--;
+> 		if (streamid > nr_streams)
+> 			streamid =3D 0;
+> 	} else {
+> 		/* Kernel hints get allocated from top */
+> 		streamid -=3D WRITE_LIFE_KERN_MIN;
+> 		if (streamid > nr_streams - BLK_MAX_USER_HINTS)
+> 			streamid =3D 0;
+> 		else
+> 			streamid =3D nr_streams - streamid - 1;
+> 	}
+>=20
+> what do you think?
 
-It isn't actually mounted nor is there any mount data reflected
-anywhere in /proc or /sys for it. If the mount point is named
-differently, it succeeds.
+Dave has expressed this sentiment several times, and I agree.  We don't
+want the filesystem hint values/mapping to change over time, or it will
+conflict with data that was written with the previous hints (e.g. if
+data was written with a "short lifetime" hint suddenly changes to be
+grouped with a "long lifetime" hint).  This is easily avoided with some
+simple changes now, but harder to fix after this patch has landed.
 
-=E2=94=94=E2=94=80> ls -ald /mnt/backups
-drwxr-xr-x 2 root root 4096 Apr 18 10:41 /mnt/backups
-=E2=94=94=E2=94=80> mv /mnt/backups /mnt/backitup
-=E2=94=94=E2=94=80> mount /dev/sdc3 /mnt/backtitup
-=E2=94=94=E2=94=80> df|grep backit
-/dev/sdc3            3.8T   68M  3.6T   1% /mnt/backitup
+Cheers, Andreas
+
+
+
+
+
+
+--Apple-Mail=_E3FEA83A-9256-40CD-B4F8-E3FF6FED0F48
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iQIzBAEBCAAdFiEEDb73u6ZejP5ZMprvcqXauRfMH+AFAly4yMcACgkQcqXauRfM
+H+D0PRAAqc1IZBlPSc3z+RpgV6C85m4l3Yd3cAYdG+R0kOOUx23t/z/vT9Sb0Qgr
+mohRguY/t1dzZ9Kmu/XPYpuMVX2VNnymVjldxVVea7V0NYuEb7qDzMvPKrGr1tIR
+rHh4vrrx+Riq+4K6TqjfgsJI6hdjIhCTU37VcCcAW9/3tHOTHPpYuhcvSpIzAGxc
+60Zm+btRFcrx0wKRd/F0x9D1tbv0LKXJlaC3bD6OquZ0QbM8Z4TncHkl4NjwG7IN
+iNJOOoYJKm623G3aJMLyPlXnJ5KCTgr9Swy4fiJDQOqtFb1oU0Jd2/1+gIXSmIVD
+sZ+72FId74kf5Iu3Upr9tFtRdFs/IkUVVJVKDOmpeTO0FJXVkIgejpKwhJTzhWE8
+E50OkTAgEg11+6VfI072rhudkK5FbXZ3ACVnJp+htOdLiT6etlyYEfpE35l+mUhE
+XJ2TavOJi9P+SQ3VSsSpEXzNBDfho838ZkwaH43LdmBIWeZCdymf2FHS3DJ9mDOi
+ihGr0DQGQAqLwbgD+zjNI9dCXoTiGp4+SDA0CcfwNPc6j8CPtFpguCmrQu/FJTRF
+GjXBTeu07u+kw0Nh0B3nDbieS87ObR8XOqGtvQHCC0sOkIfr78KnKahgICXsqAna
+Mo9d9G6Iq6nW/oY4fgk2ZVFgL+ubMJX0h2ho4I9MxtdonFabeTk=
+=vct3
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_E3FEA83A-9256-40CD-B4F8-E3FF6FED0F48--
