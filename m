@@ -2,131 +2,114 @@ Return-Path: <SRS0=aY0t=SU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2524FC10F0E
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 18:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55917C10F0E
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 18:28:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E765A214DA
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 18:26:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 280222064A
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 18:28:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bwvQnf1L"
+	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="Pi+d5jcD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390777AbfDRS03 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Apr 2019 14:26:29 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:37731 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390704AbfDRS02 (ORCPT
+        id S2390771AbfDRS2Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Apr 2019 14:28:16 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:36355 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390935AbfDRSD3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Apr 2019 14:26:28 -0400
-Received: by mail-pf1-f194.google.com with SMTP id 8so1484852pfr.4
-        for <linux-block@vger.kernel.org>; Thu, 18 Apr 2019 11:26:28 -0700 (PDT)
+        Thu, 18 Apr 2019 14:03:29 -0400
+Received: by mail-ot1-f65.google.com with SMTP id o74so2451879ota.3
+        for <linux-block@vger.kernel.org>; Thu, 18 Apr 2019 11:03:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=0dLjWuLOVM1BXsffnF2r4B5OR17QMluC6b0XNSw767Y=;
-        b=bwvQnf1LOSQjz0QUM5GLmlUK7C8xEFzxc+5BZdMEUxKXZwxTtLNRqxDR15v80wAYTr
-         6VX2y8FKuxofoCTFp83IKm2CGNE9NxMXwAg9JnWiPBq4q3ueRu+K51iTGMaVV5iHRy+x
-         063KVHqGZfDrBl0WSMolBnGvFKK/9fiQVCxossNWaE/HSaialkeBV6GpidA/nxe3EpUS
-         D91fg4SUqIauwJdcRVQYYlmlQUkdVS6RsIU4pAE/Mjcj6XywRutqjnINSJrS8lMihtgj
-         phfgpb442CBbCwo0fVoX4faLPYr9FOSKidM96k2AM+rqUP8s7WK4s84NY3RiEhad62EK
-         0D/w==
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mE/aKnKM07J0Pu0N2LzFy/Q/VzfI3mw7PzAs98ACEDg=;
+        b=Pi+d5jcDSHcAWLBXnKRmKYoO1iabyeSTCoyHSoTOFhkKyRX8hG7BC/wJxV3ZiaaTHg
+         gqUwMreZZXfYu6yxSY7fNS7+AsxCZBLdai0E/tgX6dakt1Vg7YlSVn+Kd4PHdtbWvxpF
+         TSE8bBAh2jy9I7OZP0MbdtJ8NCo7BAmZBkwOAOr+qoYXbL1jhwkEAvy/iZ54jbMkgpV4
+         rBamBDXT4Dgdgo3L1ust6B79WCBZ4JuMx34GdC915WYRLYth1m5lgCn2Db3Xc95wXzsu
+         UUa6wvLnoXjP1x2Yymhffr1xJqHpgJqMCmXfQUe0Pi5RFu42SttM5KWp/xKnctdKTUYZ
+         OPrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=0dLjWuLOVM1BXsffnF2r4B5OR17QMluC6b0XNSw767Y=;
-        b=CmKyTqxm7C1eZ9izpzI8iYsoxhTd5OfWKHGYoCgyMNJ6A5WsDvTppOH+NIxswXDpj7
-         z51vMwGW8cK66PV7XEcTdgjn7gjI+pLH0mm12G4GJn9HoB5ciLGwNvyVDznIBz4Guo5Y
-         h7aOwj4E+DUqw+9PyojNu9OWq09ndM5m+ShbVsja3Lbz9Rn0U56MxvO7tCbmPjlEtneV
-         faRDcavEbWZ6bzOt1MxPPWhDUlpxlLSpV6ZT42IpJdTTedePb9hmpELb2EnI4Dc0O0qS
-         af3h3ETBYJoBG8doOfTXWSJvNUq5HvumASV9QhhLOMyEQSxJqQspaWwHNGGQSPIodYxC
-         u1VQ==
-X-Gm-Message-State: APjAAAXtPa76+DWpIAiiEIlICFcOzmOndsU09Uiv9ct13fwJgTDqeRR9
-        +31zS1ff7VCaP/wE4EdBXl4=
-X-Google-Smtp-Source: APXvYqxo9VHaVEhtPkxwgjHK13sFoaixlCU1iNTsTliYWUsSy/Cyy5E7EQHOEP2ZO019p1AwpOONwQ==
-X-Received: by 2002:a62:be13:: with SMTP id l19mr97037323pff.137.1555611988093;
-        Thu, 18 Apr 2019 11:26:28 -0700 (PDT)
-Received: from localhost.localdomain ([2001:4898:80e8:7:4410:95ba:6d7:2a33])
-        by smtp.gmail.com with ESMTPSA id p66sm5660606pfb.4.2019.04.18.11.26.26
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Apr 2019 11:26:27 -0700 (PDT)
-Subject: Re: [PATCH] block: use static bio_set for bio_split() calls
-To:     Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.com>,
-        Bart van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@gmail.com>, neilb@suse.com,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-References: <20190418140632.60606-1-hare@suse.de>
- <20190418143429.GA19175@ming.t460p>
- <28f8343f-3159-9ca2-f98f-a37ecce31fd5@suse.de>
-From:   "Edmund Nadolski (Microsoft)" <edmund.f.nadolski@gmail.com>
-Message-ID: <532b6027-3bc9-def3-0fd8-2b6f32c4463b@gmail.com>
-Date:   Thu, 18 Apr 2019 11:26:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mE/aKnKM07J0Pu0N2LzFy/Q/VzfI3mw7PzAs98ACEDg=;
+        b=jU93O8fps0E9QFD1899TUXXn2Sctu1J5GUzQCKCiY19pspbm3W5GCXgy1BMR5pmO3K
+         NvBobQqG6HX0TVXHzDNVQdNHkYpivkCCNXbfLkbikI1mb5UQukeK7bz+YzlFK7vil4Eq
+         djm6Hpj4OsfqDaQ+ddIgDaLEzuVtnAfo+8TaGXgZrFqoem4YsZULSGSR7d5Eweb/Y64q
+         YU1TRDfkfs3GbSqUV5En0KbG3IPc8wkwze4anjAGMnh74QJc4jTl3rue5g7SVhI5jr9o
+         76EHXQ12TCuVoKV+KcTmMUPd1gMqKUelqTeovR4td9Gxsw5voEdFnXKA2fhdIEpMFBfp
+         JaUw==
+X-Gm-Message-State: APjAAAXJ3q1mwgjwIOLCA3T8PeSgiht/+Y2jlRBhbCCpsCg0MLkeNHA3
+        RfZNrOBrK5vfzvr1BUXxppLJ7Gejucpe0q81NdgFDQ==
+X-Google-Smtp-Source: APXvYqx4tO5lZ9wTPWxuvQfWFmrPptbNCa+xEdfDv7AiLwjobEZcCsrg/NKC/qicGh9+cjnVUqPevHsybbd7Ng30nHg=
+X-Received: by 2002:a9d:27e3:: with SMTP id c90mr60419177otb.214.1555610608522;
+ Thu, 18 Apr 2019 11:03:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <28f8343f-3159-9ca2-f98f-a37ecce31fd5@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190411210834.4105-1-jglisse@redhat.com> <2c124cc4-b97e-ee28-2926-305bc6bc74bd@plexistor.com>
+ <20190416185922.GA12818@kmo-pixel> <CAPcyv4jLrQ6evLAJzsASh=H6Tzx8E1oiF+YR3L2fOpbZYNUWGg@mail.gmail.com>
+ <20190416194936.GD21526@redhat.com> <CAPcyv4i-YHH+dH8za1i1aMcHzQXfovVSrRFp_nfa-KYN-XhAvw@mail.gmail.com>
+ <20190417222858.GA4146@redhat.com> <20190418104205.GA28541@quack2.suse.cz>
+In-Reply-To: <20190418104205.GA28541@quack2.suse.cz>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Thu, 18 Apr 2019 11:03:16 -0700
+Message-ID: <CAPcyv4iSyM2r5fv=p4B=h=1sR8Zok3gxb1BVsQOy6FHmQtjGCg@mail.gmail.com>
+Subject: Re: [PATCH v1 00/15] Keep track of GUPed pages in fs and block
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jerome Glisse <jglisse@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Boaz Harrosh <boaz@plexistor.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org, Linux MM <linux-mm@kvack.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Wilcox <willy@infradead.org>,
+        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, Yan Zheng <zyan@redhat.com>,
+        Sage Weil <sage@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+        Alex Elder <elder@kernel.org>, ceph-devel@vger.kernel.org,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        devel@lists.orangefs.org,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        v9fs-developer@lists.sourceforge.net, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org,
+        =?UTF-8?Q?Ernesto_A=2E_Fern=C3=A1ndez?= 
+        <ernesto.mnd.fernandez@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/18/19 8:02 AM, Hannes Reinecke wrote:
-> On 4/18/19 4:34 PM, Ming Lei wrote:
->> Hi Hannes,
->> 
->> On Thu, Apr 18, 2019 at 04:06:32PM +0200, Hannes Reinecke wrote:
->>> When calling blk_queue_split() it will be using the per-queue
->>> bioset to allocate the split bio from. However, blk_steal_bios()
->>> might move the bio to another queue, _and_ the original queue
->>> might be removed completely (nvme is especially prone to do so).
->> 
->> Could you explain a bit how the original queue is removed in case
->> that blk_steal_bios() is involved?
->> 
-> It's not blk_steal_bios() which removes the queue. What happens is:
-> 
-> - bio returns with error
-> - blk_steal_bios() moves bio over to a different queue
-> - nvme_reset_ctrl() is called
-> - Error detection finds that the original device is gone
-> - nvme calls nvme_remove_ns()
-> - nvme_remove_ns() removes the original request queue alongside the
-> bio_set from which the bvecs have been allocated from.
-> - 'stolen' bio is completed
-> - 'stolen' bio calls bio_endio()
-> - bio_endio() calls mempool_free() on the bvecs, referencing the mempool
-> from the original queue
-> - crash
-> 
->>> That leaves the bvecs of the split bio with a missing / destroyed
->>> mempool, and a really fun crash in bio_endio().
->> 
->> per-queue bioset is used originally for avoiding deadlock, are you
->> sure the static bioset is safe?
->> 
-> If that turns out be be an issue we could be having a per 'ns_head'
-> bio_set for allocating the split bio from.
-> But the main point is that we cannot use the bioset from the request
-> queue as the queue (and the bioset) might be removed during the lifetime
-> of the bio.
+On Thu, Apr 18, 2019 at 3:42 AM Jan Kara <jack@suse.cz> wrote:
+> > Except that this solution (biasing everyone in bio) would _more complex_
+> > it is only conceptualy appealing. The changes are on the other hand much
+> > deeper and much riskier but you decided to ignore that and focus on some-
+> > thing i was just giving as an example.
+>
+> Yeah, after going and reading several places like fs/iomap.c, fs/mpage.c,
+> drivers/md/dm-io.c I agree with you. The places that are not doing direct
+> IO usually just don't hold any page reference that could be directly
+> attributed to the bio (and they don't drop it when bio finishes). They
+> rather use other means (like PageLocked, PageWriteback) to make sure the
+> page stays alive so mandating gup-pin reference for all pages attached to a
+> bio would require a lot of reworking of places that are not related to our
+> problem and currently work just fine. So I withdraw my suggestion. Nice in
+> theory, too much work in practice ;).
 
-Does this mean that as-is, this is safe because nvme (currently) is the 
-only consumer of blk_steal_bios()?
-
-(Sorry if this is a lame question, I'm in the process of learning this 
-code.)
-
-TIA,
-Ed
-
+Is it though? We already have BIO_NO_PAGE_REF, so it seems it would be
+a useful cleanup to have all locations that don't participate in page
+references use that existing flag and then teach all other locations
+to use gup-pinned pages.
