@@ -2,189 +2,180 @@ Return-Path: <SRS0=aY0t=SU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B28FC10F0E
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 10:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6409FC10F0E
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 12:02:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DDD162083D
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 10:42:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CD272183E
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 12:02:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="teyby3rV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388713AbfDRKmN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Apr 2019 06:42:13 -0400
-Received: from mx2.suse.de ([195.135.220.15]:34040 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2388550AbfDRKmN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Apr 2019 06:42:13 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 14079B00E;
-        Thu, 18 Apr 2019 10:42:10 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 182081E15AE; Thu, 18 Apr 2019 12:42:05 +0200 (CEST)
-Date:   Thu, 18 Apr 2019 12:42:05 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Jerome Glisse <jglisse@redhat.com>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Boaz Harrosh <boaz@plexistor.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org, Linux MM <linux-mm@kvack.org>,
-        John Hubbard <jhubbard@nvidia.com>, Jan Kara <jack@suse.cz>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Wilcox <willy@infradead.org>,
-        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, Yan Zheng <zyan@redhat.com>,
-        Sage Weil <sage@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-        Alex Elder <elder@kernel.org>, ceph-devel@vger.kernel.org,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        devel@lists.orangefs.org,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        v9fs-developer@lists.sourceforge.net, Coly Li <colyli@suse.de>,
-        linux-bcache@vger.kernel.org,
-        Ernesto =?iso-8859-1?Q?A=2E_Fern=E1ndez?= 
-        <ernesto.mnd.fernandez@gmail.com>
-Subject: Re: [PATCH v1 00/15] Keep track of GUPed pages in fs and block
-Message-ID: <20190418104205.GA28541@quack2.suse.cz>
-References: <20190411210834.4105-1-jglisse@redhat.com>
- <2c124cc4-b97e-ee28-2926-305bc6bc74bd@plexistor.com>
- <20190416185922.GA12818@kmo-pixel>
- <CAPcyv4jLrQ6evLAJzsASh=H6Tzx8E1oiF+YR3L2fOpbZYNUWGg@mail.gmail.com>
- <20190416194936.GD21526@redhat.com>
- <CAPcyv4i-YHH+dH8za1i1aMcHzQXfovVSrRFp_nfa-KYN-XhAvw@mail.gmail.com>
- <20190417222858.GA4146@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190417222858.GA4146@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S2388898AbfDRMCP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Apr 2019 08:02:15 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:39171 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388897AbfDRMCP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Apr 2019 08:02:15 -0400
+Received: by mail-lj1-f195.google.com with SMTP id l7so1699481ljg.6
+        for <linux-block@vger.kernel.org>; Thu, 18 Apr 2019 05:02:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=S78YZJAKtE8N2Uzsmqz3nEmuAtHZYrQ7X+IGoi6+ZFA=;
+        b=teyby3rVsiZUtnrIRk/rXJGJfwYtwLla94602mogMtMk0tJtj/p8RgBo56D259Y/zw
+         h65IL66mNgAB1vfw15WTnxMLwfGb9Xz5+QceZ8JG3OmMlwz/Ja5IBc3DsSR+Ck5dGGcW
+         03Z7fLgEDYnvGf9Ys+g/Osw3CbzPQRCedzn/WnYsZB781bIf+7xk72jSmZoLonCliEL1
+         gx7phwuRilAdoR2XFVbpdp+oztvrHwiQ9m2l1ncfD0xF8PvA4H9KIWpGl7Y1tHrerINk
+         KvA9u/zUArUG+nuPGvA7t5QRU7g1mgR1TSLit/rO5rEdOjN5CLq7QG/lXGG03LQuMKD8
+         vEbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=S78YZJAKtE8N2Uzsmqz3nEmuAtHZYrQ7X+IGoi6+ZFA=;
+        b=tUEkK6yRT52KqZ3Ri0ksTNQjEaDs9oMX9TA6u78HumKYIp6TQ2JUTw9YFIgXa2xvhI
+         ITWc9GZ1H5M7FeXGS+pOFPMyd2x6G4iRluKVXLfEgmCXHnqPxYKQduJNgu+CgJyjhEDp
+         cey1iIJZDAeqGr7inSXLQXLcl92cA55sNZtLfq9NZTuIXxRykf574HZ7GqM1vq+7vhIE
+         cBbyUlXkuXBQWlkBp8898FD60hxWW2EBpyO0FQ3nHpfpqEXo0nKcPfbFzBApZ2dn5Un6
+         GUtP8epPMgqjFdHRTkr0/VlhFl476bbP7PkFLIroE090cXtcCFStT0I4DTQv43tL7EvP
+         Ef4g==
+X-Gm-Message-State: APjAAAW80OZ5joJDHNseYYY/jwmzojgaVeG8e1CDb1Z983LCjKqBETls
+        nXZjsG68LnrbQsgYHyIEWgDB/w==
+X-Google-Smtp-Source: APXvYqx5yNS7Ty1ho4w9cIOwMmoTMUSW7i+6rMNezdwUKcDnTwnS0D4b1CKfH6yePpemJY/VfsBbVw==
+X-Received: by 2002:a2e:5b5c:: with SMTP id p89mr50731370ljb.177.1555588933021;
+        Thu, 18 Apr 2019 05:02:13 -0700 (PDT)
+Received: from titan.bredbandsbolaget.se (c-bebee655.03-91-6d6c6d4.bbcust.telenor.se. [85.230.190.190])
+        by smtp.gmail.com with ESMTPSA id l16sm409659lfk.44.2019.04.18.05.02.11
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Thu, 18 Apr 2019 05:02:11 -0700 (PDT)
+From:   hans@owltronix.com
+To:     =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Cc:     =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        Igor Konopko <igor.j.konopko@intel.com>,
+        Heiner Litz <hlitz@ucsc.edu>,
+        Klaus Jensen <klaus.jensen@cnexlabs.com>,
+        Simon Lund <slund@cnexlabs.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: [RFC PATCH 0/1] Introduce a new target: lzbd - LightNVM Zoned Block Device
+Date:   Thu, 18 Apr 2019 14:01:24 +0200
+Message-Id: <1555588885-22546-1-git-send-email-hans@owltronix.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 17-04-19 18:28:58, Jerome Glisse wrote:
-> On Wed, Apr 17, 2019 at 02:53:28PM -0700, Dan Williams wrote:
-> > On Tue, Apr 16, 2019 at 12:50 PM Jerome Glisse <jglisse@redhat.com> wrote:
-> > >
-> > > On Tue, Apr 16, 2019 at 12:12:27PM -0700, Dan Williams wrote:
-> > > > On Tue, Apr 16, 2019 at 11:59 AM Kent Overstreet
-> > > > <kent.overstreet@gmail.com> wrote:
-> > > > >
-> > > > > On Tue, Apr 16, 2019 at 09:35:04PM +0300, Boaz Harrosh wrote:
-> > > > > > On Thu, Apr 11, 2019 at 05:08:19PM -0400, jglisse@redhat.com wrote:
-> > > > > > > From: Jérôme Glisse <jglisse@redhat.com>
-> > > > > > >
-> > > > > > > This patchset depends on various small fixes [1] and also on patchset
-> > > > > > > which introduce put_user_page*() [2] and thus is 5.3 material as those
-> > > > > > > pre-requisite will get in 5.2 at best. Nonetheless i am posting it now
-> > > > > > > so that it can get review and comments on how and what should be done
-> > > > > > > to test things.
-> > > > > > >
-> > > > > > > For various reasons [2] [3] we want to track page reference through GUP
-> > > > > > > differently than "regular" page reference. Thus we need to keep track
-> > > > > > > of how we got a page within the block and fs layer. To do so this patch-
-> > > > > > > set change the bio_bvec struct to store a pfn and flags instead of a
-> > > > > > > direct pointer to a page. This way we can flag page that are coming from
-> > > > > > > GUP.
-> > > > > > >
-> > > > > > > This patchset is divided as follow:
-> > > > > > >     - First part of the patchset is just small cleanup i believe they
-> > > > > > >       can go in as his assuming people are ok with them.
-> > > > > >
-> > > > > >
-> > > > > > >     - Second part convert bio_vec->bv_page to bio_vec->bv_pfn this is
-> > > > > > >       done in multi-step, first we replace all direct dereference of
-> > > > > > >       the field by call to inline helper, then we introduce macro for
-> > > > > > >       bio_bvec that are initialized on the stack. Finaly we change the
-> > > > > > >       bv_page field to bv_pfn.
-> > > > > >
-> > > > > > Why do we need a bv_pfn. Why not just use the lowest bit of the page-ptr
-> > > > > > as a flag (pointer always aligned to 64 bytes in our case).
-> > > > > >
-> > > > > > So yes we need an inline helper for reference of the page but is it not clearer
-> > > > > > that we assume a page* and not any kind of pfn ?
-> > > > > > It will not be the first place using low bits of a pointer for flags.
-> > > > > >
-> > > > > > That said. Why we need it at all? I mean why not have it as a bio flag. If it exist
-> > > > > > at all that a user has a GUP and none-GUP pages to IO at the same request he/she
-> > > > > > can just submit them as two separate BIOs (chained at the block layer).
-> > > > > >
-> > > > > > Many users just submit one page bios and let elevator merge them any way.
-> > > > >
-> > > > > Let's please not add additional flags and weirdness to struct bio - "if this
-> > > > > flag is set interpret one way, if not interpret another" - or eventually bios
-> > > > > will be as bad as skbuffs. I would much prefer just changing bv_page to bv_pfn.
-> > > >
-> > > > This all reminds of the failed attempt to teach the block layer to
-> > > > operate without pages:
-> > > >
-> > > > https://lore.kernel.org/lkml/20150316201640.33102.33761.stgit@dwillia2-desk3.amr.corp.intel.com/
-> > > >
-> > > > >
-> > > > > Question though - why do we need a flag for whether a page is a GUP page or not?
-> > > > > Couldn't the needed information just be determined by what range the pfn is not
-> > > > > (i.e. whether or not it has a struct page associated with it)?
-> > > >
-> > > > That amounts to a pfn_valid() check which is a bit heavier than if we
-> > > > can store a flag in the bv_pfn entry directly.
-> > > >
-> > > > I'd say create a new PFN_* flag, and make bv_pfn a 'pfn_t' rather than
-> > > > an 'unsigned long'.
-> > > >
-> > > > That said, I'm still in favor of Jan's proposal to just make the
-> > > > bv_page semantics uniform. Otherwise we're complicating this core
-> > > > infrastructure for some yet to be implemented GPU memory management
-> > > > capabilities with yet to be determined value. Circle back when that
-> > > > value is clear, but in the meantime fix the GUP bug.
-> > >
-> > > This has nothing to do with GPU, what make you think so ? Here i am
-> > > trying to solve GUP and to keep the value of knowing wether a page
-> > > has been GUP or not. I argue that if we bias every page in every bio
-> > > then we loose that information and thus the value.
-> > >
-> > > I gave the page protection mechanisms as an example that would be
-> > > impacted but it is not the only one. Knowing if a page has been GUP
-> > > can be useful for memory reclaimation, compaction, NUMA balancing,
-> > 
-> > Right, this is what I was reacting to in your pushback to Jan's
-> > proposal. You're claiming value for not doing the simple thing for
-> > some future "may be useful in these contexts". To my knowledge those
-> > things are not broken today. You're asking for the complexity to be
-> > carried today for some future benefit, and I'm asking for the
-> > simplicity to be maintained as much as possible today and let the
-> > value of future changes stand on their own to push for more complexity
-> > later.
-> > 
-> > Effectively don't use this bug fix to push complexity for a future
-> > agenda where the value has yet to be quantified.
-> 
-> Except that this solution (biasing everyone in bio) would _more complex_
-> it is only conceptualy appealing. The changes are on the other hand much
-> deeper and much riskier but you decided to ignore that and focus on some-
-> thing i was just giving as an example.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Yeah, after going and reading several places like fs/iomap.c, fs/mpage.c,
-drivers/md/dm-io.c I agree with you. The places that are not doing direct
-IO usually just don't hold any page reference that could be directly
-attributed to the bio (and they don't drop it when bio finishes). They
-rather use other means (like PageLocked, PageWriteback) to make sure the
-page stays alive so mandating gup-pin reference for all pages attached to a
-bio would require a lot of reworking of places that are not related to our
-problem and currently work just fine. So I withdraw my suggestion. Nice in
-theory, too much work in practice ;).
+Introduce a new target: lzbd - LightNVM Zoned Block Device
 
-								Honza
+The new target makes it possible to expose an
+Open-Channel 2.0 SSD as one or more zoned block devices exposing
+BLK_ZONE_TYPE_SEQWRITE_REQ zones.
+
+I've been playing around with this the last couple of months and
+now I'd love to get some feedback.
+
+It's very been useful to look at null_blk's zone support when
+doing the plumbing work and Simon and Klaus has also been very helpful
+when figuring out the design. Thanks guys!
+
+Naming is sometimes the hardest thing. I named this thing lzbd, as
+I found that most descriptive acronym.
+
+NOTE: This is an early prototype and lacking some vital
+features at the moment. It is worth looking at and playing
+around with for those interested, but beware of dragons :)
+
+See the lzbd documentation(Documentation/lightnvm/lzbd.txt) for my ideas on how
+a full implementation would look like.
+
+What is supported(for now):
+
+	* Reads
+	* Sequential writes
+	* Unaligned writes (a per-zone ws_opt alignment buffer is used)
+	* Zone resets
+	* Zone reporting
+	* Wear leveling(sort of, wear indices are not upated on reset yet)
+
+I've mainly tested in QEMU (cunits=0, ws_min=4, ws_opt=8).
+
+The zoned block device tests in blktests (tests/zbd) passes, and I've done
+a bunch of general smoke testing(aligned/unaligned writes with verification
+using dd and fio, ..), so the general plumbing seems to hold up, but 
+more testing is needed.
+
+Performance is definately not what it should be yet. Only one chunk per zone
+is being written to at a time, effectively rate-limiting writes per zone,
+which is an interesting constraint, but probably not what we want.
+
+What is not supported(yet):
+
+	* Metadata persistance (when the instance is removed, data is lost)
+		- Zone to chunks mapping needs to be stored
+
+	* Sync handling (flushing alignment buffers)
+		- Zone Aligment buffer needs to be flushed to disk
+
+	* Write error handling
+		- Write errors will require zone -> chunk remapping
+		  of the failing chunk.
+
+	* Chuck reset error handling (chunks going offline)
+	* Updating wear indices on chunk resets
+		- This is low hanging fruit to fix
+
+	* Cunits read buffering
+
+
+Final thoughts, for now:
+
+Since lzbd (and pblk for that matter) are not entirely unlike file systems,
+it would be nice to create a mkfs/fsck/dmzadm-like tool that would:
+
+	* Format the drive and persist instance configuration in a superblock
+	  contained in the instance metadata.
+	* Repair broken(i.e. powerfailed) instances
+	  Per-sector metadata is currently not utilized in lzbd, but would
+	  be helpful in recovery scenarios.	
+
+
+The patch is based on Matias for5.2/core branch in the github 
+openchannel project. It is also available at [1] (branch for-5.2/lzbd)
+
+
+Thanks,
+Hans
+
+[1] CNEX Labs linux github project: https://github.com/CNEX-Labs/linux
+
+
+Hans Holmberg (1):
+  lightnvm: add lzbd - a zoned block device target
+
+ Documentation/lightnvm/lzbd.txt | 122 +++++++++++
+ drivers/lightnvm/Kconfig        |  11 +
+ drivers/lightnvm/Makefile       |   3 +
+ drivers/lightnvm/lzbd-io.c      | 342 +++++++++++++++++++++++++++++++
+ drivers/lightnvm/lzbd-target.c  | 392 +++++++++++++++++++++++++++++++++++
+ drivers/lightnvm/lzbd-user.c    | 310 ++++++++++++++++++++++++++++
+ drivers/lightnvm/lzbd-zone.c    | 444 ++++++++++++++++++++++++++++++++++++++++
+ drivers/lightnvm/lzbd.h         | 139 +++++++++++++
+ 8 files changed, 1763 insertions(+)
+ create mode 100644 Documentation/lightnvm/lzbd.txt
+ create mode 100644 drivers/lightnvm/lzbd-io.c
+ create mode 100644 drivers/lightnvm/lzbd-target.c
+ create mode 100644 drivers/lightnvm/lzbd-user.c
+ create mode 100644 drivers/lightnvm/lzbd-zone.c
+ create mode 100644 drivers/lightnvm/lzbd.h
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.7.4
+
