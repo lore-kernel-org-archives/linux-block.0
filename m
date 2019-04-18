@@ -2,216 +2,235 @@ Return-Path: <SRS0=aY0t=SU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA0EC10F0E
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 15:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62838C10F0E
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 16:32:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D864120675
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 15:36:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F1042183F
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 16:32:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389519AbfDRPge (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Apr 2019 11:36:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56542 "EHLO mx1.redhat.com"
+        id S2388301AbfDRQcO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Apr 2019 12:32:14 -0400
+Received: from mga14.intel.com ([192.55.52.115]:18987 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387519AbfDRPge (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Apr 2019 11:36:34 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CB06A308A10D;
-        Thu, 18 Apr 2019 15:36:32 +0000 (UTC)
-Received: from redhat.com (unknown [10.20.6.236])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C764A5C224;
-        Thu, 18 Apr 2019 15:36:20 +0000 (UTC)
-Date:   Thu, 18 Apr 2019 11:36:19 -0400
-From:   Jerome Glisse <jglisse@redhat.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Boaz Harrosh <boaz@plexistor.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org, Linux MM <linux-mm@kvack.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Wilcox <willy@infradead.org>,
-        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, Yan Zheng <zyan@redhat.com>,
-        Sage Weil <sage@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-        Alex Elder <elder@kernel.org>, ceph-devel@vger.kernel.org,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        devel@lists.orangefs.org,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        v9fs-developer@lists.sourceforge.net, Coly Li <colyli@suse.de>,
-        linux-bcache@vger.kernel.org,
-        Ernesto =?iso-8859-1?Q?A=2E_Fern=E1ndez?= 
-        <ernesto.mnd.fernandez@gmail.com>
-Subject: Re: [PATCH v1 00/15] Keep track of GUPed pages in fs and block
-Message-ID: <20190418153618.GE3288@redhat.com>
-References: <20190411210834.4105-1-jglisse@redhat.com>
- <2c124cc4-b97e-ee28-2926-305bc6bc74bd@plexistor.com>
- <20190416185922.GA12818@kmo-pixel>
- <CAPcyv4jLrQ6evLAJzsASh=H6Tzx8E1oiF+YR3L2fOpbZYNUWGg@mail.gmail.com>
- <20190416194936.GD21526@redhat.com>
- <CAPcyv4i-YHH+dH8za1i1aMcHzQXfovVSrRFp_nfa-KYN-XhAvw@mail.gmail.com>
- <20190417222858.GA4146@redhat.com>
- <20190418104205.GA28541@quack2.suse.cz>
- <20190418142729.GB3288@redhat.com>
- <20190418153047.GN28541@quack2.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190418153047.GN28541@quack2.suse.cz>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Thu, 18 Apr 2019 15:36:33 +0000 (UTC)
+        id S1727807AbfDRQcL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Apr 2019 12:32:11 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Apr 2019 09:32:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,366,1549958400"; 
+   d="scan'208";a="224674371"
+Received: from unknown (HELO localhost.lm.intel.com) ([10.232.112.69])
+  by orsmga001.jf.intel.com with ESMTP; 18 Apr 2019 09:32:10 -0700
+From:   Keith Busch <keith.busch@intel.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     Keith Busch <keith.busch@intel.com>
+Subject: [PATCHv2] fio: Add advise THP option to mmap engine
+Date:   Thu, 18 Apr 2019 10:25:56 -0600
+Message-Id: <20190418162556.7829-1-keith.busch@intel.com>
+X-Mailer: git-send-email 2.13.6
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 18, 2019 at 05:30:47PM +0200, Jan Kara wrote:
-> On Thu 18-04-19 10:27:29, Jerome Glisse wrote:
-> > On Thu, Apr 18, 2019 at 12:42:05PM +0200, Jan Kara wrote:
-> > > On Wed 17-04-19 18:28:58, Jerome Glisse wrote:
-> > > > On Wed, Apr 17, 2019 at 02:53:28PM -0700, Dan Williams wrote:
-> > > > > On Tue, Apr 16, 2019 at 12:50 PM Jerome Glisse <jglisse@redhat.com> wrote:
-> > > > > >
-> > > > > > On Tue, Apr 16, 2019 at 12:12:27PM -0700, Dan Williams wrote:
-> > > > > > > On Tue, Apr 16, 2019 at 11:59 AM Kent Overstreet
-> > > > > > > <kent.overstreet@gmail.com> wrote:
-> > > > > > > >
-> > > > > > > > On Tue, Apr 16, 2019 at 09:35:04PM +0300, Boaz Harrosh wrote:
-> > > > > > > > > On Thu, Apr 11, 2019 at 05:08:19PM -0400, jglisse@redhat.com wrote:
-> > > > > > > > > > From: Jérôme Glisse <jglisse@redhat.com>
-> > > > > > > > > >
-> > > > > > > > > > This patchset depends on various small fixes [1] and also on patchset
-> > > > > > > > > > which introduce put_user_page*() [2] and thus is 5.3 material as those
-> > > > > > > > > > pre-requisite will get in 5.2 at best. Nonetheless i am posting it now
-> > > > > > > > > > so that it can get review and comments on how and what should be done
-> > > > > > > > > > to test things.
-> > > > > > > > > >
-> > > > > > > > > > For various reasons [2] [3] we want to track page reference through GUP
-> > > > > > > > > > differently than "regular" page reference. Thus we need to keep track
-> > > > > > > > > > of how we got a page within the block and fs layer. To do so this patch-
-> > > > > > > > > > set change the bio_bvec struct to store a pfn and flags instead of a
-> > > > > > > > > > direct pointer to a page. This way we can flag page that are coming from
-> > > > > > > > > > GUP.
-> > > > > > > > > >
-> > > > > > > > > > This patchset is divided as follow:
-> > > > > > > > > >     - First part of the patchset is just small cleanup i believe they
-> > > > > > > > > >       can go in as his assuming people are ok with them.
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > >     - Second part convert bio_vec->bv_page to bio_vec->bv_pfn this is
-> > > > > > > > > >       done in multi-step, first we replace all direct dereference of
-> > > > > > > > > >       the field by call to inline helper, then we introduce macro for
-> > > > > > > > > >       bio_bvec that are initialized on the stack. Finaly we change the
-> > > > > > > > > >       bv_page field to bv_pfn.
-> > > > > > > > >
-> > > > > > > > > Why do we need a bv_pfn. Why not just use the lowest bit of the page-ptr
-> > > > > > > > > as a flag (pointer always aligned to 64 bytes in our case).
-> > > > > > > > >
-> > > > > > > > > So yes we need an inline helper for reference of the page but is it not clearer
-> > > > > > > > > that we assume a page* and not any kind of pfn ?
-> > > > > > > > > It will not be the first place using low bits of a pointer for flags.
-> > > > > > > > >
-> > > > > > > > > That said. Why we need it at all? I mean why not have it as a bio flag. If it exist
-> > > > > > > > > at all that a user has a GUP and none-GUP pages to IO at the same request he/she
-> > > > > > > > > can just submit them as two separate BIOs (chained at the block layer).
-> > > > > > > > >
-> > > > > > > > > Many users just submit one page bios and let elevator merge them any way.
-> > > > > > > >
-> > > > > > > > Let's please not add additional flags and weirdness to struct bio - "if this
-> > > > > > > > flag is set interpret one way, if not interpret another" - or eventually bios
-> > > > > > > > will be as bad as skbuffs. I would much prefer just changing bv_page to bv_pfn.
-> > > > > > >
-> > > > > > > This all reminds of the failed attempt to teach the block layer to
-> > > > > > > operate without pages:
-> > > > > > >
-> > > > > > > https://lore.kernel.org/lkml/20150316201640.33102.33761.stgit@dwillia2-desk3.amr.corp.intel.com/
-> > > > > > >
-> > > > > > > >
-> > > > > > > > Question though - why do we need a flag for whether a page is a GUP page or not?
-> > > > > > > > Couldn't the needed information just be determined by what range the pfn is not
-> > > > > > > > (i.e. whether or not it has a struct page associated with it)?
-> > > > > > >
-> > > > > > > That amounts to a pfn_valid() check which is a bit heavier than if we
-> > > > > > > can store a flag in the bv_pfn entry directly.
-> > > > > > >
-> > > > > > > I'd say create a new PFN_* flag, and make bv_pfn a 'pfn_t' rather than
-> > > > > > > an 'unsigned long'.
-> > > > > > >
-> > > > > > > That said, I'm still in favor of Jan's proposal to just make the
-> > > > > > > bv_page semantics uniform. Otherwise we're complicating this core
-> > > > > > > infrastructure for some yet to be implemented GPU memory management
-> > > > > > > capabilities with yet to be determined value. Circle back when that
-> > > > > > > value is clear, but in the meantime fix the GUP bug.
-> > > > > >
-> > > > > > This has nothing to do with GPU, what make you think so ? Here i am
-> > > > > > trying to solve GUP and to keep the value of knowing wether a page
-> > > > > > has been GUP or not. I argue that if we bias every page in every bio
-> > > > > > then we loose that information and thus the value.
-> > > > > >
-> > > > > > I gave the page protection mechanisms as an example that would be
-> > > > > > impacted but it is not the only one. Knowing if a page has been GUP
-> > > > > > can be useful for memory reclaimation, compaction, NUMA balancing,
-> > > > > 
-> > > > > Right, this is what I was reacting to in your pushback to Jan's
-> > > > > proposal. You're claiming value for not doing the simple thing for
-> > > > > some future "may be useful in these contexts". To my knowledge those
-> > > > > things are not broken today. You're asking for the complexity to be
-> > > > > carried today for some future benefit, and I'm asking for the
-> > > > > simplicity to be maintained as much as possible today and let the
-> > > > > value of future changes stand on their own to push for more complexity
-> > > > > later.
-> > > > > 
-> > > > > Effectively don't use this bug fix to push complexity for a future
-> > > > > agenda where the value has yet to be quantified.
-> > > > 
-> > > > Except that this solution (biasing everyone in bio) would _more complex_
-> > > > it is only conceptualy appealing. The changes are on the other hand much
-> > > > deeper and much riskier but you decided to ignore that and focus on some-
-> > > > thing i was just giving as an example.
-> > > 
-> > > Yeah, after going and reading several places like fs/iomap.c, fs/mpage.c,
-> > > drivers/md/dm-io.c I agree with you. The places that are not doing direct
-> > > IO usually just don't hold any page reference that could be directly
-> > > attributed to the bio (and they don't drop it when bio finishes). They
-> > > rather use other means (like PageLocked, PageWriteback) to make sure the
-> > > page stays alive so mandating gup-pin reference for all pages attached to a
-> > > bio would require a lot of reworking of places that are not related to our
-> > > problem and currently work just fine. So I withdraw my suggestion. Nice in
-> > > theory, too much work in practice ;).
-> > 
-> > Have you seem Boaz proposal ? I have started it and it does not look to
-> > bad (but you knwo taste and color :)) You can take a peek:
-> > 
-> > https://cgit.freedesktop.org/~glisse/linux/log/?h=gup-bio-v2
-> > 
-> > I need to finish that and run fstests on bunch of different fs before
-> > posting. Dunno if i will have enough time to do that before LSF/MM.
-> 
-> Yes, I've seen it. I just wasn't sure how the result will look like. What
-> you have in your tree looks pretty clean so far. BTW (I know I'm repeating
-> myself ;) what if we made iov_iter_get_pages() & iov_iter_get_pages_alloc()
-> always return gup-pin reference? That would get rid of the need for two
-> ioend handlers for each call site...
+The Linux specific transparent hugepage memory advisory has potentially
+significant implications for how the memory management behaves. If the
+platform supports it, add a new mmap ioengine specific option that advises
+HUGEPAGE on an mmap'ed range. The option availability is detected during
+configure. If the option is set, fio can test THP when used with private
+anonymous memory (i.e. mmap /dev/zero).
 
-No it would not everywhere, some of the callsite have more way to fill
-the bio then just iov_iter_get_pages*() so i expect a good chunk of
-the patches i have would stay the same because of that. So in the end
-it might now simplify much maybe couple place.
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+---
+v1 -> v2:
 
-Cheers,
-Jérôme
+  Added a 'configure' check for MADV_HUGEPAGE support rather than just
+  consider only OS Linux
+
+  Fixed cases when MADV_HUGEPAGE is not supported
+
+  Run madvise when after the original mmap() rather than during prep
+
+  Changelog updates
+
+ configure      | 27 +++++++++++++++++++++++++++
+ engines/mmap.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ optgroup.h     |  2 ++
+ 3 files changed, 81 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 6e549cdc..3c882f0f 100755
+--- a/configure
++++ b/configure
+@@ -2326,6 +2326,30 @@ if compile_prog "-Wimplicit-fallthrough" "" "-Wimplicit-fallthrough"; then
+ fi
+ print_config "-Wimplicit-fallthrough" "$fallthrough"
+ 
++##########################################
++# check for MADV_HUGEPAGE support
++if test "$thp" != "yes" ; then
++  thp="no"
++fi
++if test "$esx" != "yes" ; then
++  cat > $TMPC <<EOF
++#include <sys/mman.h>
++int main(void)
++{
++  return madvise(0, 0x1000, MADV_HUGEPAGE);
++}
++EOF
++  if compile_prog "" "" "thp" ; then
++    thp=yes
++  else
++    if test "$thp" = "yes" ; then
++      feature_not_found "Transparent Huge Page" ""
++    fi
++    thp=no
++  fi
++fi
++print_config "MADV_HUGEPAGE" "$thp"
++
+ #############################################################################
+ 
+ if test "$wordsize" = "64" ; then
+@@ -2600,6 +2624,9 @@ fi
+ if test "$fallthrough" = "yes"; then
+   CFLAGS="$CFLAGS -Wimplicit-fallthrough"
+ fi
++if test "$thp" = "yes" ; then
++  output_sym "CONFIG_HAVE_THP"
++fi
+ 
+ echo "LIBS+=$LIBS" >> $config_host_mak
+ echo "GFIO_LIBS+=$GFIO_LIBS" >> $config_host_mak
+diff --git a/engines/mmap.c b/engines/mmap.c
+index 308b4665..55ba1ab3 100644
+--- a/engines/mmap.c
++++ b/engines/mmap.c
+@@ -11,6 +11,7 @@
+ #include <sys/mman.h>
+ 
+ #include "../fio.h"
++#include "../optgroup.h"
+ #include "../verify.h"
+ 
+ /*
+@@ -26,11 +27,40 @@ struct fio_mmap_data {
+ 	off_t mmap_off;
+ };
+ 
++#ifdef CONFIG_HAVE_THP
++struct mmap_options {
++	void *pad;
++	unsigned int thp;
++};
++
++static struct fio_option options[] = {
++	{
++		.name	= "thp",
++		.lname	= "Transparent Huge Pages",
++		.type	= FIO_OPT_INT,
++		.off1	= offsetof(struct mmap_options, thp),
++		.help	= "Memory Advise Huge Page",
++		.category = FIO_OPT_C_ENGINE,
++		.group	= FIO_OPT_G_MMAP,
++	},
++	{
++		.name = NULL,
++	},
++};
++#endif
++
+ static bool fio_madvise_file(struct thread_data *td, struct fio_file *f,
+ 			     size_t length)
+ 
+ {
+ 	struct fio_mmap_data *fmd = FILE_ENG_DATA(f);
++#ifdef CONFIG_HAVE_THP
++	struct mmap_options *o = td->eo;
++
++	/* Ignore errors on this optional advisory */
++	if (o->thp)
++		madvise(fmd->mmap_ptr, length, MADV_HUGEPAGE);
++#endif
+ 
+ 	if (!td->o.fadvise_hint)
+ 		return true;
+@@ -50,11 +80,27 @@ static bool fio_madvise_file(struct thread_data *td, struct fio_file *f,
+ 	return true;
+ }
+ 
++#ifdef CONFIG_HAVE_THP
++static int fio_mmap_get_shared(struct thread_data *td)
++{
++	struct mmap_options *o = td->eo;
++
++	if (o->thp)
++		return MAP_PRIVATE;
++	return MAP_SHARED;
++}
++#else
++static int fio_mmap_get_shared(struct thread_data *td)
++{
++	return MAP_SHARED;
++}
++#endif
++
+ static int fio_mmap_file(struct thread_data *td, struct fio_file *f,
+ 			 size_t length, off_t off)
+ {
+ 	struct fio_mmap_data *fmd = FILE_ENG_DATA(f);
+-	int flags = 0;
++	int flags = 0, shared = fio_mmap_get_shared(td);
+ 
+ 	if (td_rw(td) && !td->o.verify_only)
+ 		flags = PROT_READ | PROT_WRITE;
+@@ -66,7 +112,7 @@ static int fio_mmap_file(struct thread_data *td, struct fio_file *f,
+ 	} else
+ 		flags = PROT_READ;
+ 
+-	fmd->mmap_ptr = mmap(NULL, length, flags, MAP_SHARED, f->fd, off);
++	fmd->mmap_ptr = mmap(NULL, length, flags, shared, f->fd, off);
+ 	if (fmd->mmap_ptr == MAP_FAILED) {
+ 		fmd->mmap_ptr = NULL;
+ 		td_verror(td, errno, "mmap");
+@@ -275,6 +321,10 @@ static struct ioengine_ops ioengine = {
+ 	.close_file	= fio_mmapio_close_file,
+ 	.get_file_size	= generic_get_file_size,
+ 	.flags		= FIO_SYNCIO | FIO_NOEXTEND,
++#ifdef CONFIG_HAVE_THP
++	.options	= options,
++	.option_struct_size = sizeof(struct mmap_options),
++#endif
+ };
+ 
+ static void fio_init fio_mmapio_register(void)
+diff --git a/optgroup.h b/optgroup.h
+index adf4d09b..bf1bb036 100644
+--- a/optgroup.h
++++ b/optgroup.h
+@@ -61,6 +61,7 @@ enum opt_category_group {
+ 	__FIO_OPT_G_MTD,
+ 	__FIO_OPT_G_HDFS,
+ 	__FIO_OPT_G_SG,
++	__FIO_OPT_G_MMAP,
+ 	__FIO_OPT_G_NR,
+ 
+ 	FIO_OPT_G_RATE		= (1ULL << __FIO_OPT_G_RATE),
+@@ -97,6 +98,7 @@ enum opt_category_group {
+ 	FIO_OPT_G_MTD		= (1ULL << __FIO_OPT_G_MTD),
+ 	FIO_OPT_G_HDFS		= (1ULL << __FIO_OPT_G_HDFS),
+ 	FIO_OPT_G_SG		= (1ULL << __FIO_OPT_G_SG),
++	FIO_OPT_G_MMAP		= (1ULL << __FIO_OPT_G_MMAP),
+ 	FIO_OPT_G_INVALID	= (1ULL << __FIO_OPT_G_NR),
+ };
+ 
+-- 
+2.14.4
+
