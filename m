@@ -2,200 +2,214 @@ Return-Path: <SRS0=aY0t=SU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DA1C10F0E
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 18:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92CFDC10F0E
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 21:57:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D7529214DA
-	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 18:58:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FFE320693
+	for <linux-block@archiver.kernel.org>; Thu, 18 Apr 2019 21:57:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=dilger-ca.20150623.gappssmtp.com header.i=@dilger-ca.20150623.gappssmtp.com header.b="MfU9AJa0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MlUaT5mn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389939AbfDRS6T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Apr 2019 14:58:19 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:38322 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728531AbfDRS6T (ORCPT
+        id S1725916AbfDRV5J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Apr 2019 17:57:09 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:45122 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725875AbfDRV5J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Apr 2019 14:58:19 -0400
-Received: by mail-pl1-f193.google.com with SMTP id f36so1581124plb.5
-        for <linux-block@vger.kernel.org>; Thu, 18 Apr 2019 11:58:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dilger-ca.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=Rls8ZXKxpitLdToJVhs5aQI6eogfraGi8L51K73vZHA=;
-        b=MfU9AJa0duArcFo2+QYl8UPFXdYay3Rc1DAlk633euOpRQos/H2Qsq8hI9EHE0VglA
-         l3lJzLNDZseM4FhVy+SjIJow8umIWXKZfKWSe+B/13SayWTmuivmwKEHIOFQd1yLkPCh
-         d0axKanB3162FWykYa48SdDp9Oo982oGwQz//7yRu/0ny1j+dY1oUTW8Tsmyj9NGB4Kr
-         +MXj6AUB8Qts7YFGyvOe0AU5DPwcFh/5C3QZMDFqarBOoMDaL72tVjlnHRT172BKo6I/
-         lpXDf4aU4cbrZZ5HW/IsBD0Gu1lkBL9BxDPv+K4tWSOC8F6+GFyTiNHRznNuWH0EHqz/
-         +e6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=Rls8ZXKxpitLdToJVhs5aQI6eogfraGi8L51K73vZHA=;
-        b=dEbxGB1gHTDk/Ptf8fGyaqjufWID54cqjkanj/bhx5CUq/UGKaT0AlY1bQlVkC3+5O
-         mrrvCDUgGyCdTLmtLZCcYgSYzx1M5lVf645VOjIBNEVmhr9spdouwbmlHBJQEIjoYSKx
-         ITh1rDMASQWCGBAf3MZvGAQIUUNy0b5JJhLCFT1q/eqt43Cd48Z4v3KmBwUS8+Mn1q49
-         mPdmX6yHIMPsev2O8FlFdMPvyW6YMllfi1R9WvA3O3uHjjrKCMMqSQHCbY5Bouvh6iuG
-         TwLzYhERxOWjQ9H7udSxIvh6CJ4PQACFFNrTLPLCxOlFPW7Xc79hLY3W5jQBddOnjNZ8
-         w82g==
-X-Gm-Message-State: APjAAAUfH812DBzKqBMto7NMNgvXsoZxYXXWjIOUZImnEIMc4eG3/WZt
-        JwvWXFkHrhCVx/LOYrRFHd8o8g==
-X-Google-Smtp-Source: APXvYqzX8/1l6sox8PUa5IqTovbL1mZTLZLDYQpGPrG8X1cAjahdf+PnEQIsTOk7eecHLzVgnAafIw==
-X-Received: by 2002:a17:902:581:: with SMTP id f1mr55594044plf.304.1555613897955;
-        Thu, 18 Apr 2019 11:58:17 -0700 (PDT)
-Received: from cabot-wlan.adilger.int (S0106a84e3fe4b223.cg.shawcable.net. [70.77.216.213])
-        by smtp.gmail.com with ESMTPSA id u5sm4225156pfm.121.2019.04.18.11.58.16
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Apr 2019 11:58:17 -0700 (PDT)
-From:   Andreas Dilger <adilger@dilger.ca>
-Message-Id: <9BD0C782-5967-4DCB-9D01-E5BCC73E653C@dilger.ca>
-Content-Type: multipart/signed;
- boundary="Apple-Mail=_E3FEA83A-9256-40CD-B4F8-E3FF6FED0F48";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v4 4/7] block: introduce write-hint to stream-id
- conversion
-Date:   Thu, 18 Apr 2019 12:58:14 -0600
-In-Reply-To: <20190418140603.GL28541@quack2.suse.cz>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-nvme@lists.infradead.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, prakash.v@samsung.com
-To:     Jan Kara <jack@suse.cz>
-References: <1555523406-2380-1-git-send-email-joshi.k@samsung.com>
- <CGME20190417175358epcas1p41a0a4e349dfe0a70bdcc244161c71604@epcas1p4.samsung.com>
- <1555523406-2380-5-git-send-email-joshi.k@samsung.com>
- <20190418140603.GL28541@quack2.suse.cz>
-X-Mailer: Apple Mail (2.3273)
+        Thu, 18 Apr 2019 17:57:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=T3gahklMMlmAdxs/1TrGgTz2aV7A/nBCyInv02Ahbug=; b=MlUaT5mnagR5NTQhsSKqiWB3+d
+        Sk7ryvjtw8Din3FmXhEO5Bcm86IFLAkjtrXos1mQwONyJJgZJbpdWJubnb5ZkOYAr1NBJgn2E2b30
+        mPBMl4YxUetfVftkTONBAD+5463RUMTGaVmaHsPwrNuiwv/j1xO1+3LuNXoYO4mspgbBmB2pZfSNv
+        j1frRxYfMwF+VqHSacNbcggTyK5XFdrsmWLOPRLs3wsVeYDFk1V9W6jYKJaZLiSMGB1xnH8HfsCsf
+        T5wAdiG75R1w5dqBfoKecEqxf6g3OHSpz/8ODEEHq7QovMM9T47ka9A8auZ+Icv+dPz7qkl9U9xCM
+        3fzM8nlQ==;
+Received: from static-50-53-52-16.bvtn.or.frontiernet.net ([50.53.52.16] helo=midway.dunlab)
+        by merlin.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hHF1h-0007JF-UZ; Thu, 18 Apr 2019 21:57:02 +0000
+Subject: Re: [RFC PATCH 1/1] lightnvm: add lzbd - a zoned block device target
+To:     hans@owltronix.com,
+        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Cc:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        Igor Konopko <igor.j.konopko@intel.com>,
+        Heiner Litz <hlitz@ucsc.edu>,
+        Klaus Jensen <klaus.jensen@cnexlabs.com>,
+        Simon Lund <slund@cnexlabs.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+References: <1555588885-22546-1-git-send-email-hans@owltronix.com>
+ <1555588885-22546-2-git-send-email-hans@owltronix.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <341dfda3-40cd-0ad4-b0f0-0d488d523d58@infradead.org>
+Date:   Thu, 18 Apr 2019 14:56:53 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <1555588885-22546-2-git-send-email-hans@owltronix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
---Apple-Mail=_E3FEA83A-9256-40CD-B4F8-E3FF6FED0F48
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+On 4/18/19 5:01 AM, hans@owltronix.com wrote:
+> diff --git a/Documentation/lightnvm/lzbd.txt b/Documentation/lightnvm/lzbd.txt
+> new file mode 100644
+> index 000000000000..8bdbc01a25be
+> --- /dev/null
+> +++ b/Documentation/lightnvm/lzbd.txt
+> @@ -0,0 +1,122 @@
+> +lzbd: A Zoned Block Device LightNVM Target
+> +==========================================
+> +
+> +The lzbd lightnvm target makes it possible to expose an Open-Channel 2.0 SSD
+> +as one or more zoned block devices.
+> +
+> +Each lightnvm target is assigned a range of parallel units. Parallel units(PUs)
+> +are not shared among targets avoiding I/O QoS disturbances between targets as
 
-On Apr 18, 2019, at 8:06 AM, Jan Kara <jack@suse.cz> wrote:
->=20
-> On Wed 17-04-19 23:20:03, Kanchan Joshi wrote:
->> This patch moves write-hint-to-stream-id conversion in block-layer.
->> Earlier this was done by driver (nvme). Current conversion is of the
->> form "streamid =3D write-hint - 1", for both user and kernel streams.
->> Conversion takes stream limit (maintained in request queue) into
->> account. Write-hints beyond the exposed limit turn to 0.
->> A new field 'streamid' has been added in request. While 'write-hint'
->> field continues to exist. It keeps original value passed from upper
->> layer, and used during merging checks.
->>=20
->> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
->> ---
->> block/blk-core.c       | 20 ++++++++++++++++++++
->> include/linux/blkdev.h |  1 +
->> 2 files changed, 21 insertions(+)
->>=20
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index a55389b..712e6b7 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -730,6 +730,25 @@ bool blk_attempt_plug_merge(struct request_queue =
-*q, struct bio *bio,
->> 	return false;
->> }
->>=20
->> +enum rw_hint blk_write_hint_to_streamid(struct request *req,
->> +				        struct bio *bio)
->> +{
->> +	enum rw_hint streamid, nr_streams;
->> +	struct request_queue *q =3D req->q;
->> +	nr_streams =3D q->limits.nr_streams;
->> +
->> +	streamid =3D bio->bi_write_hint;
->> +	if (!nr_streams || streamid =3D=3D WRITE_LIFE_NOT_SET ||
->> +	    streamid =3D=3D WRITE_LIFE_NONE)
->> +		streamid =3D 0;
->> +	else {
->> +		--streamid;
->> +		if(streamid > nr_streams)
->> +			streamid =3D 0;
->> +	}
->> +	return streamid;
->> +}
->> +
->=20
-> Someone told me that stream ids are potentially persistent on the =
-storage
-> so it isn't great to change the id for the same thing e.g. if we add
-> another user hint. So maybe we should allocate kernel hints from top =
-as
-> Dave Chinner suggested? I.e., something like the following mapping =
-function:
->=20
-> 	if (streamid <=3D BLK_MAX_USER_HINTS) {
-> 		streamid--;
-> 		if (streamid > nr_streams)
-> 			streamid =3D 0;
-> 	} else {
-> 		/* Kernel hints get allocated from top */
-> 		streamid -=3D WRITE_LIFE_KERN_MIN;
-> 		if (streamid > nr_streams - BLK_MAX_USER_HINTS)
-> 			streamid =3D 0;
-> 		else
-> 			streamid =3D nr_streams - streamid - 1;
-> 	}
->=20
-> what do you think?
+(prefer:)               targets,
 
-Dave has expressed this sentiment several times, and I agree.  We don't
-want the filesystem hint values/mapping to change over time, or it will
-conflict with data that was written with the previous hints (e.g. if
-data was written with a "short lifetime" hint suddenly changes to be
-grouped with a "long lifetime" hint).  This is easily avoided with some
-simple changes now, but harder to fix after this patch has landed.
+> +far as possible.
+> +
+> +For more information on lightnvm, see [1]
 
-Cheers, Andreas
+end with period above, as the 2 below are done.
 
+> +For more information on Open-Channel 2.0, see [2].
+> +For more information on zoned block devices see [3].
+> +
+> +lzbd is designed to act as a slim adaptor, making it possible to plug
+> +OCSSD 2.0 SSDs into the zone block device ecosystem.
+> +
+> +lzbd manages zone to chunk mapping, read/write restrictions,  wear leveling
+> +and write errors.
+> +
+> +Zone geometry
+> +-------------
+> +
+> +From a user perspective, lzbd targets form a number of sequential-write-required
+> +(BLK_ZONE_TYPE_SEQWRITE_REQ) zones.
+> +
+> +Not all of the target's capacity is exposed to the user.
+> +Some chunks are reserved for metadata and over-provisioning.
+> +
+> +The zones follow the same constraints as described in [3].
+> +
+> +All zones are of the same size (SZ).
+> +
+> +Simple example:
+> +
+> +Sector	 		Zone type
+> +		 _______________________
+> +0    -->	| Sequential write req. |
+> +		|                       |
+> +		|_______________________|
+> +SZ   -->	| Sequential write req. |
+> +		|                       |
+> +		|_______________________|
+> +SZ*2..-->	| Sequential write req. |
+> +		|                       |
+> +..........	.........................
+> +		|_______________________|
+> +SZ*N-1 -->	| Sequential write req. |
+> +		|_______________________|
+> +
+> +
+> +SZ is configurable, but is restricted to a multiple of
+> +(chunk size (CLBA) * Number of PUs).
+> +
+> +Zone to chunk mapping
+> +---------------------
+> +
+> +Zones are spread across PUs to allow maximum write throughput through striping.
+> +One or more chunks (CHK) per PU is assigned.
+> +
+> +Example:
+> +
+> +OCSSD 2.0 Geometry: 4 PUs, 16 chunks per PU.
+> +Zones: 3
+> +
+> + Zone	  PU0	PU1   PU2   PU3
+> +_______  _____ _____ _____ _____
+> +        |CHK 0|CHK 0|CHK A|CHK 0|
+> + 0      |CHK 2|CHK 3|CHK 3|CHK 1|
+> +_______ |_____|_____|_____|_____|
+> +        |CHK 3|CHK B|CHK 8|CHK A|
+> + 1      |CHK 7|CHK F|CHK 2|CHK 3|
+> +_______ |_____|_____|_____|_____|
+> +        |CHK 8|CHK 2|CHK 7|CHK 4|
+> + 2      |CHK 1|CHK A|CHK 5|CHK 2|
+> +_______ |_____|_____|_____|_____|
+> +
+> +Chunks are assigned to a zone when it is opened based on the chunk wear index.
+> +
+> +Note: The disk's Maximum Open Chunks (MAXOC) limit puts an upper bound on
+> +maximum simultaneously open zones (unless MAXOC = 0).
+> +
+> +Meta data and over-provisioning
+> +-------------------------------
 
+My dictionary searches all use metadata as one word, not two.
 
+> +
+> +lzbd needs the following meta data to be persisted:
+> +
+> +* a zone-to chunk mapping (Z2C) table, size: 4 bytes * Number of chunks
+> +* a superblock containing target configuration, guuid, on-disk format version,
 
+what is guuid, please?
 
+> +  etc.
+> +
+> +Additionally, chunks need to be reserved for handling:
+> +
+> +* write errors
+> +* chunks wearing out and going offline
+> +* persisting data not aligned with the minimal write constraint
+> +
+> +The meta data is stored a separate set of chunks from the user data.
+> +
+> +Host memory requirements
+> +------------------------
+> +
+> +The Z2C mapping table needs to be kept in host memory (see above), and:
+> +
+> +* in order to achieve maximum throughput and alignment requirements,
+> +  a small write buffer is needed
+> +	Size: Optimal Write Size (WS_OPT) * Maximum number of open zones.
+> +
+> +* to satisify OCSSD 2.0 read restrictions, a read buffer is needed.
 
---Apple-Mail=_E3FEA83A-9256-40CD-B4F8-E3FF6FED0F48
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
+        satisfy
 
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
+> +	Size: Number of PUs * Cache Minimum Write Size Units (MW_CUNITS) *
+> +	Maximum number of open zones.
+> +
+> +If MW_CUNITS = 0, no read buffer is needed and data can be written without
+> +any host copying/buffering (except for handling WS_OPT alignment).
+> +
+> +References
+> +----------
+> +
+> +[1] Lightnvm website: http://lightnvm.io/
+> +[2] OCSSD 2.0 Specification: http://lightnvm.io/docs/OCSSD-2_0-20180129.pdf
+> +[3] ZBC / Zoned block device support: https://lwn.net/Articles/703871/
+> +
 
-iQIzBAEBCAAdFiEEDb73u6ZejP5ZMprvcqXauRfMH+AFAly4yMcACgkQcqXauRfM
-H+D0PRAAqc1IZBlPSc3z+RpgV6C85m4l3Yd3cAYdG+R0kOOUx23t/z/vT9Sb0Qgr
-mohRguY/t1dzZ9Kmu/XPYpuMVX2VNnymVjldxVVea7V0NYuEb7qDzMvPKrGr1tIR
-rHh4vrrx+Riq+4K6TqjfgsJI6hdjIhCTU37VcCcAW9/3tHOTHPpYuhcvSpIzAGxc
-60Zm+btRFcrx0wKRd/F0x9D1tbv0LKXJlaC3bD6OquZ0QbM8Z4TncHkl4NjwG7IN
-iNJOOoYJKm623G3aJMLyPlXnJ5KCTgr9Swy4fiJDQOqtFb1oU0Jd2/1+gIXSmIVD
-sZ+72FId74kf5Iu3Upr9tFtRdFs/IkUVVJVKDOmpeTO0FJXVkIgejpKwhJTzhWE8
-E50OkTAgEg11+6VfI072rhudkK5FbXZ3ACVnJp+htOdLiT6etlyYEfpE35l+mUhE
-XJ2TavOJi9P+SQ3VSsSpEXzNBDfho838ZkwaH43LdmBIWeZCdymf2FHS3DJ9mDOi
-ihGr0DQGQAqLwbgD+zjNI9dCXoTiGp4+SDA0CcfwNPc6j8CPtFpguCmrQu/FJTRF
-GjXBTeu07u+kw0Nh0B3nDbieS87ObR8XOqGtvQHCC0sOkIfr78KnKahgICXsqAna
-Mo9d9G6Iq6nW/oY4fgk2ZVFgL+ubMJX0h2ho4I9MxtdonFabeTk=
-=vct3
------END PGP SIGNATURE-----
-
---Apple-Mail=_E3FEA83A-9256-40CD-B4F8-E3FF6FED0F48--
+thanks.
+-- 
+~Randy
