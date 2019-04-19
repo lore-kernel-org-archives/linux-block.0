@@ -2,110 +2,195 @@ Return-Path: <SRS0=cp6W=SV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27573C282E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 20:35:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25AE7C282E1
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 21:05:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E339F20869
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 20:35:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E24672171F
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 21:05:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YIp8wlHp"
+	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="K9xmqfkk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725895AbfDSUf5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Apr 2019 16:35:57 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:41225 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725878AbfDSUf5 (ORCPT
+        id S1727960AbfDSVFu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Apr 2019 17:05:50 -0400
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:56714 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726984AbfDSVFu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Apr 2019 16:35:57 -0400
-Received: by mail-pg1-f196.google.com with SMTP id f6so3092062pgs.8
-        for <linux-block@vger.kernel.org>; Fri, 19 Apr 2019 13:35:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=h+YgfeLbCyP7h2J6H6EvbHAS9wXC4NfpGet1Up2O/eA=;
-        b=YIp8wlHpv3NKirjUTNRYPsE1SgJ7dzD5ZU3fBCpmzksw9C5ua1m3F9OvBYeGLcGeSR
-         uiex/MgPC4jcSsIYTd7OOANpA1AQg4PBdSky70g5X3y7mtdAB3Wk+KSnAClN5wDmZAmY
-         zx/aDR2/FZq8Q9AzJMVr3Lpl4n16PD8Hw0UgPOUDZlid0mQkLI5+N5oYcgPNj9KsWZiP
-         ujampXAg15UJXGrgCb3GvfgEJMfZi6YnWVUu5wnk+/tQI0hrui2GPvZl1qnlLV0FTsnE
-         +tgdhSz1lkBCdKViQjZMlJRzPCVp2fOHN+A852Sbu2SawV3eCx/ZizY3nIWZ1sYkNxkn
-         qiUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=h+YgfeLbCyP7h2J6H6EvbHAS9wXC4NfpGet1Up2O/eA=;
-        b=lbU0PBXt4tCir7N6IDeCdYnTuirHtkkzlG45Kq3ADZ8hrYLDxnvh+jrq46UwroF3/p
-         dtMHMgbYu+kuN4DKSsRXo6RAlynR1BcA5IGGPg/Cys3OKZXa9L8Q1PmRm1ItSWzL7WF3
-         Yt+YQPTW3D4wTObvof1qC6fIYHJITxW8EqVPxM0y0LG7sk39W/iY4CrGMhowdVYwm5C9
-         0LSHuNrt+AvX0uAg7JEcIc7IU1VPB/Vhi3q6g4CIBZJ16HqAzUVqLACow5aiWPuRKqZ/
-         oBG3VwlaLFqo/2KB1yhNR7F6jogCV0/u2A7z0T+Eb7863Ik2J+RpFdYZlDDQWnmgshbf
-         RVbw==
-X-Gm-Message-State: APjAAAVNsCyoxU1o7mSO2eH7CCkY5dV5U3X2zBjM0j4RImPwxU89GHnx
-        r26nXrQ9AL/Zbh8BF6fwU+BCmFNG3SDDSw==
-X-Google-Smtp-Source: APXvYqykKLFRSsaS8HmvcP3p4wNN0G94oGAu1Fi1xOhe0YKIYv7efa3aAkuT5EDYY21jF7UZAQzioQ==
-X-Received: by 2002:a63:fc43:: with SMTP id r3mr5738070pgk.44.1555706156191;
-        Fri, 19 Apr 2019 13:35:56 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::2:5cfc])
-        by smtp.gmail.com with ESMTPSA id 17sm9583359pfw.65.2019.04.19.13.35.55
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 19 Apr 2019 13:35:55 -0700 (PDT)
-From:   Jes Sorensen <jes.sorensen@gmail.com>
-X-Google-Original-From: Jes Sorensen <Jes.Sorensen@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     kernel-team@fb.com, Jes Sorensen <jsorensen@fb.com>
-Subject: [PATCH 1/1] blk-mq: Fix memory leak in error handling
-Date:   Fri, 19 Apr 2019 16:35:44 -0400
-Message-Id: <20190419203544.11725-2-Jes.Sorensen@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190419203544.11725-1-Jes.Sorensen@gmail.com>
-References: <20190419203544.11725-1-Jes.Sorensen@gmail.com>
+        Fri, 19 Apr 2019 17:05:50 -0400
+Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3JL2W7L024432;
+        Fri, 19 Apr 2019 14:04:50 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-type; s=facebook; bh=zYjDSd3XuCc47jZjiVF/Rfy9GmUE8190SFepVb8uGzQ=;
+ b=K9xmqfkku/cobwl6W24/4Y/EgyERrBe+AnPrJ2Ko5TFsuvK7llT18JYGYmNX/g+oQf9A
+ Hib5sizknUPCNvF+FesaVx2UrtbyM4NWt7S0KOyyfNk543Oo4aTpqY72lStAArUKSTTz
+ F5/6VobKQtkIU/D3s70Y+t9UkR+yH/Ei43c= 
+Received: from mail.thefacebook.com (mailout.thefacebook.com [199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 2ryjuw90m2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 19 Apr 2019 14:04:50 -0700
+Received: from mmullins-1.thefacebook.com (2620:10d:c081:10::13) by
+ mail.thefacebook.com (2620:10d:c081:35::127) with Microsoft SMTP Server id
+ 15.1.1713.5; Fri, 19 Apr 2019 14:04:49 -0700
+From:   Matt Mullins <mmullins@fb.com>
+To:     <hall@fb.com>, <mmullins@fb.com>, <ast@kernel.org>,
+        <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        "Jens Axboe" <axboe@kernel.dk>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        <linux-block@vger.kernel.org>, <nbd@other.debian.org>
+Subject: [PATCH bpf-next v3 3/5] nbd: add tracepoints for send/receive timing
+Date:   Fri, 19 Apr 2019 14:04:07 -0700
+Message-ID: <20190419210409.5021-4-mmullins@fb.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190419210409.5021-1-mmullins@fb.com>
+References: <20190419210409.5021-1-mmullins@fb.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [2620:10d:c081:10::13]
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-19_12:,,
+ signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-FB-Internal: Safe
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jes Sorensen <jsorensen@fb.com>
+From: Andrew Hall <hall@fb.com>
 
-If blk_mq_init_allocated_queue() fails, make sure to free the poll
-stat callback struct allocated.
+This adds four tracepoints to nbd, enabling separate tracing of payload
+and header sending/receipt.
 
-Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+In the send path for headers that have already been sent, we also
+explicitly initialize the handle so it can be referenced by the later
+tracepoint.
+
+Signed-off-by: Andrew Hall <hall@fb.com>
 ---
- block/blk-mq.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/block/nbd.c        |  8 ++++++
+ include/trace/events/nbd.h | 51 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9516304a38ee..7aa90c0b056b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2838,7 +2838,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 		goto err_exit;
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 7393d04d255c..cb5ae6711ee0 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -513,6 +513,10 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 	if (sent) {
+ 		if (sent >= sizeof(request)) {
+ 			skip = sent - sizeof(request);
++
++			/* initialize handle for tracing purposes */
++			handle = nbd_cmd_handle(cmd);
++
+ 			goto send_pages;
+ 		}
+ 		iov_iter_advance(&from, sent);
+@@ -536,6 +540,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 		(unsigned long long)blk_rq_pos(req) << 9, blk_rq_bytes(req));
+ 	result = sock_xmit(nbd, index, 1, &from,
+ 			(type == NBD_CMD_WRITE) ? MSG_MORE : 0, &sent);
++	trace_nbd_header_sent(req, handle);
+ 	if (result <= 0) {
+ 		if (was_interrupted(result)) {
+ 			/* If we havne't sent anything we can just return BUSY,
+@@ -608,6 +613,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 		bio = next;
+ 	}
+ out:
++	trace_nbd_payload_sent(req, handle);
+ 	nsock->pending = NULL;
+ 	nsock->sent = 0;
+ 	return 0;
+@@ -655,6 +661,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 			tag, req);
+ 		return ERR_PTR(-ENOENT);
+ 	}
++	trace_nbd_header_received(req, handle);
+ 	cmd = blk_mq_rq_to_pdu(req);
  
- 	if (blk_mq_alloc_ctxs(q))
--		goto err_exit;
-+		goto err_poll;
+ 	mutex_lock(&cmd->lock);
+@@ -708,6 +715,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 		}
+ 	}
+ out:
++	trace_nbd_payload_received(req, handle);
+ 	mutex_unlock(&cmd->lock);
+ 	return ret ? ERR_PTR(ret) : cmd;
+ }
+diff --git a/include/trace/events/nbd.h b/include/trace/events/nbd.h
+index 5928255ed02e..9849956f34d8 100644
+--- a/include/trace/events/nbd.h
++++ b/include/trace/events/nbd.h
+@@ -7,6 +7,57 @@
  
- 	/* init q->mq_kobj and sw queues' kobjects */
- 	blk_mq_sysfs_init(q);
-@@ -2899,6 +2899,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	kfree(q->queue_hw_ctx);
- err_sys_init:
- 	blk_mq_sysfs_deinit(q);
-+err_poll:
-+	blk_stat_free_callback(q->poll_cb);
-+	q->poll_cb = NULL;
- err_exit:
- 	q->mq_ops = NULL;
- 	return ERR_PTR(-ENOMEM);
+ #include <linux/tracepoint.h>
+ 
++DECLARE_EVENT_CLASS(nbd_transport_event,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle),
++
++	TP_STRUCT__entry(
++		__field(struct request *, req)
++		__field(u64, handle)
++	),
++
++	TP_fast_assign(
++		__entry->req = req;
++		__entry->handle = handle;
++	),
++
++	TP_printk(
++		"nbd transport event: request %p, handle 0x%016llx",
++		__entry->req,
++		__entry->handle
++	)
++);
++
++DEFINE_EVENT(nbd_transport_event, nbd_header_sent,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle)
++);
++
++DEFINE_EVENT(nbd_transport_event, nbd_payload_sent,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle)
++);
++
++DEFINE_EVENT(nbd_transport_event, nbd_header_received,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle)
++);
++
++DEFINE_EVENT(nbd_transport_event, nbd_payload_received,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle)
++);
++
+ DECLARE_EVENT_CLASS(nbd_send_request,
+ 
+ 	TP_PROTO(struct nbd_request *nbd_request, int index,
 -- 
 2.17.1
 
