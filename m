@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A8EAC282E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFDCC282E1
 	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:24:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 132B420652
+	by mail.kernel.org (Postfix) with ESMTP id 35D31222AF
 	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:24:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727512AbfDSSYP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727735AbfDSSYP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 19 Apr 2019 14:24:15 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33592 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:33588 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727850AbfDSSXq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1727658AbfDSSXq (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Fri, 19 Apr 2019 14:23:46 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 96BD0AFB0;
-        Fri, 19 Apr 2019 16:05:43 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id A101CAFC3;
+        Fri, 19 Apr 2019 16:06:18 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [RFC PATCH v2 06/16] bcache: add failure check to run_cache_set() for journal replay
-Date:   Sat, 20 Apr 2019 00:04:59 +0800
-Message-Id: <20190419160509.66298-7-colyli@suse.de>
+Subject: [RFC PATCH v2 14/16] bcache: try to flush btree nodes as many as possible
+Date:   Sat, 20 Apr 2019 00:05:07 +0800
+Message-Id: <20190419160509.66298-15-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190419160509.66298-1-colyli@suse.de>
 References: <20190419160509.66298-1-colyli@suse.de>
@@ -36,85 +36,79 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently run_cache_set() has no return value, if there is failure in
-bch_journal_replay(), the caller of run_cache_set() has no idea about
-such failure and just continue to execute following code after
-run_cache_set().  The internal failure is triggered inside
-bch_journal_replay() and being handled in async way. This behavior is
-inefficient, while failure handling inside bch_journal_replay(), cache
-register code is still running to start the cache set. Registering and
-unregistering code running as same time may introduce some rare race
-condition, and make the code to be more hard to be understood.
+When btree_flush_write() is called, it means the journal space is
+exhuasted already. Current code only selects a single btree node to
+write out, which may introduce huge cache bounce from the spinlock on
+multiple cpu cores, when a lot of kworkers on journaling code path to
+call btree_flush_write() for journal space reclaiming.
 
-This patch adds return value to run_cache_set(), and returns -EIO if
-bch_journal_rreplay() fails. Then caller of run_cache_set() may detect
-such failure and stop registering code flow immedidately inside
-register_cache_set(). 
+This patch tries to flush as many btree node as possible inside
+a single call to btree_flush_write(), then the frequence of calling
+btree_flush_write() can be reduced, which in turn reduces the cache
+bounce from spinlock on multiple cpu cores. Please notice that this
+patch does not reduce the total times of acquiring spinlock, a spin
+lock is still acquired when select every single btree node to write
+out, but this patch will try best to hold the spinlock on same cpu
+core, which avoids the cache bounce where the spinlock is acquired by
+multiple different cpu cores.
 
-If journal replay fails, run_cache_set() can report error immediately
-to register_cache_set(). This patch makes the failure handling for
-bch_journal_replay() be in synchronized way, easier to understand and
-debug, and avoid poetential race condition for register-and-unregister
-in same time.
+After the patch applied, in my pressure testing, 'top' shows more than
+50% sys cpu time reduced from the kworks which competing spinlock
+inside btree_flush_write().
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/super.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ drivers/md/bcache/journal.c | 7 ++++++-
+ drivers/md/bcache/journal.h | 4 ++--
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a697a3a923cd..036bffad0bfe 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1775,7 +1775,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 	return NULL;
- }
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index bc0e01151155..8536e76fcac9 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -514,6 +514,7 @@ static void btree_flush_write(struct cache_set *c)
+ 	 */
+ 	struct btree *b;
+ 	int i;
++	int n = FLUSH_BTREE_HEAP;
  
--static void run_cache_set(struct cache_set *c)
-+static int run_cache_set(struct cache_set *c)
- {
- 	const char *err = "cannot allocate memory";
- 	struct cached_dev *dc, *t;
-@@ -1869,7 +1869,9 @@ static void run_cache_set(struct cache_set *c)
- 		if (j->version < BCACHE_JSET_VERSION_UUID)
- 			__uuid_write(c);
+ 	atomic_long_inc(&c->flush_write);
  
--		bch_journal_replay(c, &journal);
-+		err = "bcache: replay journal failed";
-+		if (bch_journal_replay(c, &journal))
-+			goto err;
- 	} else {
- 		pr_notice("invalidating existing data");
+@@ -552,6 +553,10 @@ static void btree_flush_write(struct cache_set *c)
  
-@@ -1937,11 +1939,13 @@ static void run_cache_set(struct cache_set *c)
- 	flash_devs_run(c);
- 
- 	set_bit(CACHE_SET_RUNNING, &c->flags);
--	return;
-+	return 0;
- err:
- 	closure_sync(&cl);
- 	/* XXX: test this, it's broken */
- 	bch_cache_set_error(c, "%s", err);
+ 		__bch_btree_node_write(b, NULL);
+ 		mutex_unlock(&b->write_lock);
 +
-+	return -EIO;
++		/* try to flush btree nodes as many as possible */
++		if (--n > 0)
++			goto retry;
+ 	}
  }
  
- static bool can_attach_cache(struct cache *ca, struct cache_set *c)
-@@ -2005,8 +2009,11 @@ static const char *register_cache_set(struct cache *ca)
- 	ca->set->cache[ca->sb.nr_this_dev] = ca;
- 	c->cache_by_alloc[c->caches_loaded++] = ca;
+@@ -1102,7 +1107,7 @@ int bch_journal_alloc(struct cache_set *c)
+ 	j->w[0].c = c;
+ 	j->w[1].c = c;
  
--	if (c->caches_loaded == c->sb.nr_in_set)
--		run_cache_set(c);
-+	if (c->caches_loaded == c->sb.nr_in_set) {
-+		err = "failed to run cache set";
-+		if (run_cache_set(c) < 0)
-+			goto err;
-+	}
+-	if (!(init_heap(&c->flush_btree, 128, GFP_KERNEL)) ||
++	if (!(init_heap(&c->flush_btree, FLUSH_BTREE_HEAP, GFP_KERNEL)) ||
+ 	    !(init_fifo(&j->pin, JOURNAL_PIN, GFP_KERNEL)) ||
+ 	    !(j->w[0].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)) ||
+ 	    !(j->w[1].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)))
+diff --git a/drivers/md/bcache/journal.h b/drivers/md/bcache/journal.h
+index 55f81443f304..a8be14c6f6d9 100644
+--- a/drivers/md/bcache/journal.h
++++ b/drivers/md/bcache/journal.h
+@@ -158,8 +158,8 @@ struct journal_device {
+ #define journal_pin_cmp(c, l, r)				\
+ 	(fifo_idx(&(c)->journal.pin, (l)) > fifo_idx(&(c)->journal.pin, (r)))
  
- 	return NULL;
- err:
+-#define JOURNAL_PIN	20000
+-
++#define FLUSH_BTREE_HEAP	128
++#define JOURNAL_PIN		20000
+ /* Reserved jouranl space in sectors */
+ #define BCH_JOURNAL_RPLY_RESERVE	6U
+ #define BCH_JOURNAL_RESERVE		7U
 -- 
 2.16.4
 
