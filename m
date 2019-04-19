@@ -2,47 +2,66 @@ Return-Path: <SRS0=cp6W=SV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC65DC282E2
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 21:06:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1404CC282E2
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 21:16:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85E852171F
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 21:06:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFFB7208C0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 21:16:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="U7OCpjRr"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="nSTCPbRY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726560AbfDSVGA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Apr 2019 17:06:00 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:56710 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726358AbfDSVFu (ORCPT
+        id S1727478AbfDSVQF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Apr 2019 17:16:05 -0400
+Received: from mail-yb1-f196.google.com ([209.85.219.196]:35862 "EHLO
+        mail-yb1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727038AbfDSVQE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Apr 2019 17:05:50 -0400
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3JL2emV024485;
-        Fri, 19 Apr 2019 14:04:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-type; s=facebook; bh=rMwQjjTZ+akQnxvymjBr0KY97eJBNSDfYXyiQkSVyQM=;
- b=U7OCpjRrofwOZVxM47nswMdQf2WVbYCAiXJyjpP6+6wGOHncmkF4sS0Zfde+0pAULAuI
- yE4SroJEKHpCooYEJsHjNe7gebBfq9dEhUuCObISNEMdHRPwHDlXlgfC013cVqmI6+85
- ZltWTZWp5T7ta2lUMVxqXf9NyXuLmvkZrGg= 
-Received: from mail.thefacebook.com (mailout.thefacebook.com [199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2ryjuw90kw-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Fri, 19 Apr 2019 14:04:46 -0700
-Received: from mmullins-1.thefacebook.com (2620:10d:c081:10::13) by
- mail.thefacebook.com (2620:10d:c081:35::127) with Microsoft SMTP Server id
- 15.1.1713.5; Fri, 19 Apr 2019 14:04:45 -0700
-From:   Matt Mullins <mmullins@fb.com>
-To:     <hall@fb.com>, <mmullins@fb.com>, <ast@kernel.org>,
-        <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        "Jens Axboe" <axboe@kernel.dk>,
+        Fri, 19 Apr 2019 17:16:04 -0400
+Received: by mail-yb1-f196.google.com with SMTP id e76so2442611ybc.3
+        for <linux-block@vger.kernel.org>; Fri, 19 Apr 2019 14:16:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=xvy7HgBvQxPibDqza6Jr3TiPxxT6rvAWs37Ags1f7Lo=;
+        b=nSTCPbRYTEIgxw3cmo56NSkRNdXMdM8TxOjPmyhJa2EQ4UQRMD9rngl7EeAWnrJ06+
+         Znr24aaUkdR9VwJjdlMz525Q0oWwrax9QtbBK1DUhARf1bORZZPdtrg+oDbhDel/MMgV
+         Ss6LbCv/HAHrtKP8lXyqA/7s6icsJgb/cjem0JHZI+EjR9GgNrLnmDCwV5TT6VvalDd8
+         vDrbGRzIU1T2sAjuGk0xucYqVezDuMlQ7f0Qe1+KdDUiulVCWXm9PGQ4Tw6eKpxVEr3X
+         bPlPnwlarzhuKS22Unvy+sJrunqN/jjXeYToKHL2gpgoP62sYQjHWyFQEDoqC/xybjPb
+         xa8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=xvy7HgBvQxPibDqza6Jr3TiPxxT6rvAWs37Ags1f7Lo=;
+        b=UngbLhxL7RdvoTOskqq2rtb3l763eD6xX0weFsOqD+Lb/VZD7U3AX8WN//7fZwphDK
+         o6DMXBTGt3WtEi3pIYFyCduHYa6EsAJ301oGMY1SyMgjedq2HNa8ED3KE4gwkhfkLNqw
+         N/ifjdcoWXgOk8VgNsR14bkLo7ByOkWcDL+i9D3FzfZWHvMpql4MrJVVAEEniD0L4Y5b
+         idwE5EQz1cvOZ9fVHkD0xcJPulnA8+jdE/C4eHQ3seFX2pZgqphY5yxZAwz6HJkM4ATd
+         5MEwLEJkFEt2IG4/IicMpOteWVtZKo//CHmPUs6ksdz02NalyAeXKD9O5wolKnTSbtQN
+         O8IA==
+X-Gm-Message-State: APjAAAVEOPC6I2W3Z2OrQpFfi5PnOa0HOYCQCREjIOpLc5Gv0DTjpqaT
+        /CHSxfrjMF+7DVs20cQiWCveqg==
+X-Google-Smtp-Source: APXvYqwIKKJWngdm9zOVWZd6SWqoGyLx5nOQ+b8mY7u5jXE3U1TCkhaA37xIAh23KYlT23+3w4RhBQ==
+X-Received: by 2002:a25:378f:: with SMTP id e137mr5114437yba.326.1555708563953;
+        Fri, 19 Apr 2019 14:16:03 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:180::1c6c])
+        by smtp.gmail.com with ESMTPSA id 139sm1981177ywk.83.2019.04.19.14.16.02
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 19 Apr 2019 14:16:03 -0700 (PDT)
+Date:   Fri, 19 Apr 2019 17:16:01 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Matt Mullins <mmullins@fb.com>
+Cc:     hall@fb.com, ast@kernel.org, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
         Steven Rostedt <rostedt@goodmis.org>,
         Ingo Molnar <mingo@redhat.com>,
         Daniel Borkmann <daniel@iogearbox.net>,
@@ -52,137 +71,34 @@ CC:     <linux-kernel@vger.kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Nicolas Ferre <nicolas.ferre@microchip.com>,
-        <linux-block@vger.kernel.org>, <nbd@other.debian.org>
-Subject: [PATCH bpf-next v3 2/5] nbd: trace sending nbd requests
-Date:   Fri, 19 Apr 2019 14:04:06 -0700
-Message-ID: <20190419210409.5021-3-mmullins@fb.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190419210409.5021-1-mmullins@fb.com>
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: Re: [PATCH bpf-next v3 2/5] nbd: trace sending nbd requests
+Message-ID: <20190419211600.5dvflqu6ryvjgwjg@macbook-pro-91.dhcp.thefacebook.com>
 References: <20190419210409.5021-1-mmullins@fb.com>
+ <20190419210409.5021-3-mmullins@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [2620:10d:c081:10::13]
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-19_12:,,
- signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-FB-Internal: Safe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190419210409.5021-3-mmullins@fb.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds a tracepoint that can both observe the nbd request being sent
-to the server, as well as modify that request , e.g., setting a flag in
-the request that will cause the server to collect detailed tracing data.
+On Fri, Apr 19, 2019 at 02:04:06PM -0700, Matt Mullins wrote:
+> This adds a tracepoint that can both observe the nbd request being sent
+> to the server, as well as modify that request , e.g., setting a flag in
+> the request that will cause the server to collect detailed tracing data.
+> 
+> The struct request * being handled is included to permit correlation
+> with the block tracepoints.
+> 
+> Signed-off-by: Matt Mullins <mmullins@fb.com>
+> ---
 
-The struct request * being handled is included to permit correlation
-with the block tracepoints.
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-Signed-off-by: Matt Mullins <mmullins@fb.com>
----
- MAINTAINERS                |  1 +
- drivers/block/nbd.c        |  5 ++++
- include/trace/events/nbd.h | 56 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 62 insertions(+)
- create mode 100644 include/trace/events/nbd.h
+Thanks,
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e17ebf70b548..6db583d2b0ea 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10737,6 +10737,7 @@ L:	linux-block@vger.kernel.org
- L:	nbd@other.debian.org
- F:	Documentation/blockdev/nbd.txt
- F:	drivers/block/nbd.c
-+F:	include/trace/events/nbd.h
- F:	include/uapi/linux/nbd.h
- 
- NETWORK DROP MONITOR
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 90ba9f4c03f3..7393d04d255c 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -44,6 +44,9 @@
- #include <linux/nbd-netlink.h>
- #include <net/genetlink.h>
- 
-+#define CREATE_TRACE_POINTS
-+#include <trace/events/nbd.h>
-+
- static DEFINE_IDR(nbd_index_idr);
- static DEFINE_MUTEX(nbd_index_mutex);
- static int nbd_total_devices = 0;
-@@ -526,6 +529,8 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 	handle = nbd_cmd_handle(cmd);
- 	memcpy(request.handle, &handle, sizeof(handle));
- 
-+	trace_nbd_send_request(&request, nbd->index, blk_mq_rq_from_pdu(cmd));
-+
- 	dev_dbg(nbd_to_dev(nbd), "request %p: sending control (%s@%llu,%uB)\n",
- 		req, nbdcmd_to_ascii(type),
- 		(unsigned long long)blk_rq_pos(req) << 9, blk_rq_bytes(req));
-diff --git a/include/trace/events/nbd.h b/include/trace/events/nbd.h
-new file mode 100644
-index 000000000000..5928255ed02e
---- /dev/null
-+++ b/include/trace/events/nbd.h
-@@ -0,0 +1,56 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM nbd
-+
-+#if !defined(_TRACE_NBD_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_NBD_H
-+
-+#include <linux/tracepoint.h>
-+
-+DECLARE_EVENT_CLASS(nbd_send_request,
-+
-+	TP_PROTO(struct nbd_request *nbd_request, int index,
-+		 struct request *rq),
-+
-+	TP_ARGS(nbd_request, index, rq),
-+
-+	TP_STRUCT__entry(
-+		__field(struct nbd_request *, nbd_request)
-+		__field(u64, dev_index)
-+		__field(struct request *, request)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->nbd_request = 0;
-+		__entry->dev_index = index;
-+		__entry->request = rq;
-+	),
-+
-+	TP_printk("nbd%lld: request %p", __entry->dev_index, __entry->request)
-+);
-+
-+#ifdef DEFINE_EVENT_WRITABLE
-+#undef NBD_DEFINE_EVENT
-+#define NBD_DEFINE_EVENT(template, call, proto, args, size)		\
-+	DEFINE_EVENT_WRITABLE(template, call, PARAMS(proto),		\
-+			      PARAMS(args), size)
-+#else
-+#undef NBD_DEFINE_EVENT
-+#define NBD_DEFINE_EVENT(template, call, proto, args, size)		\
-+	DEFINE_EVENT(template, call, PARAMS(proto), PARAMS(args))
-+#endif
-+
-+NBD_DEFINE_EVENT(nbd_send_request, nbd_send_request,
-+
-+	TP_PROTO(struct nbd_request *nbd_request, int index,
-+		 struct request *rq),
-+
-+	TP_ARGS(nbd_request, index, rq),
-+
-+	sizeof(struct nbd_request)
-+);
-+
-+#endif
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
--- 
-2.17.1
-
+Josef
