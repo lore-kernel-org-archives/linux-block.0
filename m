@@ -2,117 +2,138 @@ Return-Path: <SRS0=cp6W=SV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE8EC282E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BBBC282DA
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:24:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7EA1222CC
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B774222CC
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:24:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727855AbfDSSXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727868AbfDSSXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 19 Apr 2019 14:23:55 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33628 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:33632 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727868AbfDSSXs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Apr 2019 14:23:48 -0400
+        id S1727867AbfDSSXr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Apr 2019 14:23:47 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 263D2AD0C;
-        Fri, 19 Apr 2019 16:05:16 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 10844AFBF;
+        Fri, 19 Apr 2019 16:06:07 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [RFC PATCH v2 00/16] bcache: fix journal no-space deadlock 
-Date:   Sat, 20 Apr 2019 00:04:53 +0800
-Message-Id: <20190419160509.66298-1-colyli@suse.de>
+Subject: [RFC PATCH v2 12/16] bcache: add pendings_cleanup to stop pending bcache device
+Date:   Sat, 20 Apr 2019 00:05:05 +0800
+Message-Id: <20190419160509.66298-13-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20190419160509.66298-1-colyli@suse.de>
+References: <20190419160509.66298-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The initial journal no-space deadlock issue was known as several
-kthreads or kworkers were reported by kernel to hang for quite long
-time. The reason was a deadlock happened when there is no more journal
-space avialable for new coming journal request.
+If a bcache device is in dirty state and its cache set is not
+registered, this bcache deivce will not appear in /dev/bcache<N>,
+and there is no way to stop it or remove the bcache kernel module.
 
-In v1 RFC series, I though the journal no-space deadlock was from two
-conditions, which was not the truth. After long time testing and
-debugging, I realize the journal deadlock was a result of a series of
-problems hidden in current code.
+This is an as-designed behavior, but sometimes people has to reboot
+whole system to release or stop the pending backing device.
 
-Now I make progress in v2 series, and all known problems related to the
-journal no-space deadlock are fixed. I don't observe journal deadlock
-and related I/O hang warning any more.
+This sysfs interface may remove such pending bcache devices when
+write anything into the sysfs file manually.
 
-Unfortunately we can not apply this whole series at this moment, because
-after fixing the journal no-space deadlock issue, I find a race in dirty
-btree node flushing. Beside normal dirty btree node flushing, when there
-is no journal space, btree_flush_write() will be called to write down
-the oldest dirty btree node. Once the oldest dirty btree node is written
-from memory into cache device, its associated journal reference will be
-released, this operation is necessary to reclaim oldest busy journal
-bucket when no-space in journal buckets.
-
-The problem of this race is, when building c->flush_btree heap, all
-dirty btree node from for_each_cached_btree() are not protected or
-referenced, so there is a race that after the heap c->flush_btree is
-built and before the oldest node is selected from the heap, the oldest
-node is already written in normal code path, and the memory is
-released/reused.
-
-From my testing, a kernel panic triggered by wild pointer deference or
-un-paired mutex_lock/unlock can be observed from btree_flush_write(),
-this is because the selected btree node was written and released
-already, btree_flush_write() just references invalid memory object.
-
-So far I don't have good idea to fix such race without hurting I/O
-performance, and IMHO the bcache I/O hang by journal is kind of better
-than kenrel panic. Therefore before the race of dirty btree nodes
-writting gets fixed, I won't apply the whole series.
-
-But there are still some helpful and non-major fixes which can go into
-upstream, to reduce the whole patch set and avoid huge changes in a
-single kernel merge.
-
-The patch 'bcache: acquire c->journal.lock in bch_btree_leaf_dirty()` in
-v1 series was removed from v2 series. I still feel this is a problem to
-access journal pipo without any protection, but this fix is limited and
-I need to think about a more thoughtful way to fix.
-
-Any review comment or suggestion are warmly welcome.
-
-Thanks in advance for your help.
-
-Coly Li
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
+ drivers/md/bcache/super.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
-Coly Li (16):
-  bcache: move definition of 'int ret' out of macro read_bucket()
-  bcache: never set 0 to KEY_PTRS of jouranl key in journal_reclaim()
-  bcache: reload jouranl key information during journal replay
-  bcache: fix journal deadlock during jouranl replay
-  bcache: reserve space for journal_meta() in run time
-  bcache: add failure check to run_cache_set() for journal replay
-  bcache: add comments for kobj release callback routine
-  bcache: return error immediately in bch_journal_replay()
-  bcache: add error check for calling register_bdev()
-  bcache: Add comments for blkdev_put() in registration code path
-  bcache: add comments for closure_fn to be called in closure_queue()
-  bcache: add pendings_cleanup to stop pending bcache device
-  bcache: fix fifo index swapping condition in btree_flush_write()
-  bcache: try to flush btree nodes as many as possible
-  bcache: improve bcache_reboot()
-  bcache: introduce spinlock_t flush_write_lock in struct journal
-
- drivers/md/bcache/journal.c | 312 ++++++++++++++++++++++++++++++++++++++++----
- drivers/md/bcache/journal.h |   8 +-
- drivers/md/bcache/super.c   | 112 ++++++++++++++--
- 3 files changed, 393 insertions(+), 39 deletions(-)
-
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 9b41e0b62cc0..e988e46a6479 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -2246,9 +2246,13 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
+ 
+ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 			       const char *buffer, size_t size);
++static ssize_t bch_pending_bdevs_cleanup(struct kobject *k,
++					 struct kobj_attribute *attr,
++					 const char *buffer, size_t size);
+ 
+ kobj_attribute_write(register,		register_bcache);
+ kobj_attribute_write(register_quiet,	register_bcache);
++kobj_attribute_write(pendings_cleanup,	bch_pending_bdevs_cleanup);
+ 
+ static bool bch_is_open_backing(struct block_device *bdev)
+ {
+@@ -2373,6 +2377,56 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 	goto out;
+ }
+ 
++
++struct pdev {
++	struct list_head list;
++	struct cached_dev *dc;
++};
++
++static ssize_t bch_pending_bdevs_cleanup(struct kobject *k,
++					 struct kobj_attribute *attr,
++					 const char *buffer,
++					 size_t size)
++{
++	LIST_HEAD(pending_devs);
++	ssize_t ret = size;
++	struct cached_dev *dc, *tdc;
++	struct pdev *pdev, *tpdev;
++	struct cache_set *c, *tc;
++
++	mutex_lock(&bch_register_lock);
++	list_for_each_entry_safe(dc, tdc, &uncached_devices, list) {
++		pdev = kmalloc(sizeof(struct pdev), GFP_KERNEL);
++		if (!pdev)
++			break;
++		pdev->dc = dc;
++		list_add(&pdev->list, &pending_devs);
++	}
++
++	list_for_each_entry_safe(pdev, tpdev, &pending_devs, list) {
++		list_for_each_entry_safe(c, tc, &bch_cache_sets, list) {
++			char *pdev_set_uuid = pdev->dc->sb.set_uuid;
++			char *set_uuid = c->sb.uuid;
++
++			if (!memcmp(pdev_set_uuid, set_uuid, 16)) {
++				list_del(&pdev->list);
++				kfree(pdev);
++				break;
++			}
++		}
++	}
++	mutex_unlock(&bch_register_lock);
++
++	list_for_each_entry_safe(pdev, tpdev, &pending_devs, list) {
++		pr_info("delete pdev %p", pdev);
++		list_del(&pdev->list);
++		bcache_device_stop(&pdev->dc->disk);
++		kfree(pdev);
++	}
++
++	return ret;
++}
++
+ static int bcache_reboot(struct notifier_block *n, unsigned long code, void *x)
+ {
+ 	if (code == SYS_DOWN ||
+@@ -2483,6 +2537,7 @@ static int __init bcache_init(void)
+ 	static const struct attribute *files[] = {
+ 		&ksysfs_register.attr,
+ 		&ksysfs_register_quiet.attr,
++		&ksysfs_pendings_cleanup.attr,
+ 		NULL
+ 	};
+ 
 -- 
 2.16.4
 
