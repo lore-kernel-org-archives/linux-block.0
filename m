@@ -2,94 +2,127 @@ Return-Path: <SRS0=cp6W=SV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9437C282DA
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:29:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 520B3C282DF
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:35:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA708204FD
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:29:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FF81204EC
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:35:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LcKh5vtn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l4zpDSt0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727641AbfDSS3h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Apr 2019 14:29:37 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:37480 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727591AbfDSS3g (ORCPT
+        id S1727527AbfDSSfr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Apr 2019 14:35:47 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:40176 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727493AbfDSSfr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Apr 2019 14:29:36 -0400
-Received: by mail-io1-f68.google.com with SMTP id a23so1267509iot.4
-        for <linux-block@vger.kernel.org>; Fri, 19 Apr 2019 11:29:36 -0700 (PDT)
+        Fri, 19 Apr 2019 14:35:47 -0400
+Received: by mail-pl1-f194.google.com with SMTP id b3so2945250plr.7
+        for <linux-block@vger.kernel.org>; Fri, 19 Apr 2019 11:35:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=w6SCNzvdEDsSzOeJ01+rJcS4jyKcld2PmSC2Ub2aHRc=;
-        b=LcKh5vtn+WTIYHOOLGAyE9oIAnP+JWCufQY4KOAfsyBZ27JaVx7WGwUEk+yFvPWHCO
-         p2qbDfuvqwiZ21dU4HAsX4cAmMxZhm2/hMyeYJw8BNpSdQ79eKQyoe18hFF0aiNKIyRa
-         WTlaB7KgMPj2HUSAq+2ZD8BXDNk5uNauVC4IqRrK0ZDjLDjXZcOQqXqh3tnrsyFuAAO+
-         F1XiL/yiO4SJewLdNHN7Ar4BHzyC0QUSWz4B0Ab6SOHOBz2jcrOMJ2Q/4fc5yVuA9G4J
-         /19RiBDw+JDyOWZ1gTbzwAa1O5hYjQ1/Bo9Zlaj06p0hS3al8lM2EVqHDHDtcx+XcntS
-         rFuA==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=GdHeQhMspb/jfnjTqAtbREfQlvPtb2Eq4MQ0jcoRY84=;
+        b=l4zpDSt0S3gHz27tXEb8Z4GGz07yEIYM+jBRgN10CI0B4ShkrENnbGDnK6G6x/3xuX
+         JM9vZc85ekBCFNYItK20RYSImAy8JAkO24VqZLsXL26Txn3fDbzq08SoWyX8N2Uu1Cpl
+         I/s3wEi6t739U5RmFZK15Ll6TxdMO/X09EDZMzBjvGxgXMfntZRBLmGoKq0k7+IILQBM
+         vGkiXZvKT0peStbiCWrhaBsCnDnonHR5hDeKsEHolys2GrRtN0eNCSN87w0BI7VmLyJK
+         IQ3kHQq3enBEj7T1+H8yFPClsNDyhm1lYqFrb2da0GxTzINIAa/D5txhGxBdwdGbAsTK
+         +AdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=w6SCNzvdEDsSzOeJ01+rJcS4jyKcld2PmSC2Ub2aHRc=;
-        b=V1q1VeDxubC6vPihR3nbvmqVE/ygIPDw2BPMzu0biEonLHPqnTkR16cB3N255qKOsV
-         cGJ7jtY2qLgvfv0VhszEkJB59F6gsh47TPYsLw17Hgo87o0GfBKRS7H0v1h+ZH4d4k1m
-         hfhmKFdVqsJSO17GAApvu+7quccptd4n4u8hCIe+aEt4NFEvkSuz7SzaufbT9tIpNFSf
-         e+/TiXgF9JcP01AxTJPDp9mSE2wqbG+xCwKUMV7NoPYXc9m81Fjvf4rXwMLRj/bpXUmS
-         vn1/cy8KKG3q0PI2AmcyDK/pGLjurHgKwuKOkC64SZ4FioF5QxVGx+hwhnT0m6eXYQIN
-         rEPg==
-X-Gm-Message-State: APjAAAW0hURM3GI+KQzNW/v+DL2gGZH3/WrFgIyiZm5pr6ydY2l+wrcC
-        8hdaV3Hy4+emhKSBh2VWcz4KAz7TtghO7w==
-X-Google-Smtp-Source: APXvYqzgg+pTJPn56X1Rjf9So2QiWDKrBMF6RAMY3bqS3BusdyqssGdFdkGaQ+3EJvdsTFKfhRjYLA==
-X-Received: by 2002:a5e:c24b:: with SMTP id w11mr3389115iop.264.1555695150563;
-        Fri, 19 Apr 2019 10:32:30 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id x68sm2620352ita.40.2019.04.19.10.32.28
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=GdHeQhMspb/jfnjTqAtbREfQlvPtb2Eq4MQ0jcoRY84=;
+        b=IgXtxrn3QtaRGlAJckwLcSoGytBRnSPS1Zj/stVqDclYSB+pZJ4zKs80TBCRIbQnEJ
+         rwXaMFQBhmWHJbyhxRLcJEdNIC3kpH6vbGiyEA8/hmRTLvicNxB8kqqkIsmczVlEumej
+         qrR2U3oInfl5RAc9OyLsk7KiqGOYNWa/Jj7gRv86GsP722Qr+wHpEzrkj9+B/U1Sqi4d
+         //wRBcKFoECxqqwJZnkg/+TigSzbByxKrHYnY+fsnZPHwFMAIQdwaRRU5TUoSXCI8VEy
+         BusHNKcBNghDPtEvd79yWkuQQ+YhjPHj4qXqjOIIPt2j0ubpgTUBwZmmKM7Za5q9AOTs
+         J6tA==
+X-Gm-Message-State: APjAAAXIeiEifxXCoT0Ts34EZcU5QHzR2OipIlW491nBkcF9HpxTIZI3
+        KUeV19rmxK3xmuoF2GYAong=
+X-Google-Smtp-Source: APXvYqzEozBujWf5qlENeJsBcShWqvoSv1BfVvRkPA0NABnzmRrKf8MjTUc6Sm7R128wyTJZLJBXaw==
+X-Received: by 2002:a17:902:e305:: with SMTP id cg5mr5338151plb.112.1555698946251;
+        Fri, 19 Apr 2019 11:35:46 -0700 (PDT)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id a85sm10124713pfa.166.2019.04.19.11.35.44
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 19 Apr 2019 10:32:29 -0700 (PDT)
-Subject: Re: [PATCH V2] block: make sure that bvec length can't be overflow
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Yi Zhang <yi.zhang@redhat.com>
-References: <20190417011126.20430-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <454b9ed8-d35f-cc19-ec88-855fed00631d@kernel.dk>
-Date:   Fri, 19 Apr 2019 11:32:28 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Fri, 19 Apr 2019 11:35:45 -0700 (PDT)
+Date:   Fri, 19 Apr 2019 11:35:43 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: avoid scatterlist offsets > PAGE_SIZE
+Message-ID: <20190419183543.GA7292@roeck-us.net>
+References: <20190419065624.25583-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20190417011126.20430-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190419065624.25583-1-hch@lst.de>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/16/19 7:11 PM, Ming Lei wrote:
-> bvec->bv_offset may be bigger than PAGE_SIZE sometimes, such as,
-> when one bio is splitted in the middle of one bvec via bio_split(),
-> and bi_iter.bi_bvec_done is used to build offset of the 1st bvec of
-> remained bio. And the remained bio's bvec may be re-submitted to fs
-> layer via ITER_IBVEC, such as loop and nvme-loop.
+On Fri, Apr 19, 2019 at 08:56:24AM +0200, Christoph Hellwig wrote:
+> While we generally allow scatterlists to have offsets larger than page
+> size for an entry, and other subsystems like the crypto code make use of
+> that, the block layer isn't quite ready for that.  Flip the switch back
+> to avoid them for now, and revisit that decision early in a merge window
+> once the known offenders are fixed.
 > 
-> So we have to make sure that every bvec's offset is less than
-> PAGE_SIZE from bio_for_each_segment_all() because some drivers(loop,
-> nvme-loop) passes the splitted bvec to fs layer via ITER_BVEC.
+> Fixes: 8a96a0e40810 ("block: rewrite blk_bvec_map_sg to avoid a nth_page call")
+> Reported-by: Guenter Roeck <linux@roeck-us.net>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+
+(cautious)
+
+Tested-by: Guenter Roeck <linux@roeck-us.net>
+
+Cautious because there are currently a number if crashes and runtime
+warnings in -next. I don't think any are related to the block code,
+but I may be wrong.
+
+Guenter
+
+> ---
+>  block/blk-merge.c | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
 > 
-> This patch fixes this issue reported by Zhang Yi When running nvme/011.
-
-Applied, thanks.
-
--- 
-Jens Axboe
-
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 247b17f2a0f6..21e87a714a73 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -474,9 +474,21 @@ static unsigned blk_bvec_map_sg(struct request_queue *q,
+>  	while (nbytes > 0) {
+>  		unsigned offset = bvec->bv_offset + total;
+>  		unsigned len = min(get_max_segment_size(q, offset), nbytes);
+> +		struct page *page = bvec->bv_page;
+> +
+> +		/*
+> +		 * Unfortunately a fair number of drivers barf on scatterlists
+> +		 * that have an offset larger than PAGE_SIZE, despite other
+> +		 * subsystems dealing with that invariant just fine.  For now
+> +		 * stick to the legacy format where we never present those from
+> +		 * the block layer, but the code below should be removed once
+> +		 * these offenders (mostly MMC/SD drivers) are fixed.
+> +		 */
+> +		page += (offset >> PAGE_SHIFT);
+> +		offset &= ~PAGE_MASK;
+>  
+>  		*sg = blk_next_sg(sg, sglist);
+> -		sg_set_page(*sg, bvec->bv_page, len, offset);
+> +		sg_set_page(*sg, page, len, offset);
+>  
+>  		total += len;
+>  		nbytes -= len;
+> -- 
+> 2.20.1
+> 
