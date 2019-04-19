@@ -4,31 +4,30 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFD8C282E1
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D29BC282DF
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 68A66222CC
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4083222CC
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727887AbfDSSXw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Apr 2019 14:23:52 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33638 "EHLO mx1.suse.de"
+        id S1727800AbfDSSXy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Apr 2019 14:23:54 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33626 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727873AbfDSSXs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1727855AbfDSSXs (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Fri, 19 Apr 2019 14:23:48 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 49A5CAF94;
-        Fri, 19 Apr 2019 16:05:29 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id CC0B1AFBC;
+        Fri, 19 Apr 2019 16:05:58 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        stable@vger.kernel.org
-Subject: [RFC PATCH v2 03/16] bcache: reload jouranl key information during journal replay
-Date:   Sat, 20 Apr 2019 00:04:56 +0800
-Message-Id: <20190419160509.66298-4-colyli@suse.de>
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [RFC PATCH v2 10/16] bcache: Add comments for blkdev_put() in registration code path
+Date:   Sat, 20 Apr 2019 00:05:03 +0800
+Message-Id: <20190419160509.66298-11-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190419160509.66298-1-colyli@suse.de>
 References: <20190419160509.66298-1-colyli@suse.de>
@@ -37,158 +36,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When bcache journal initiates during running cache set, cache set
-journal.blocks_free is initiated as 0. Then during journal replay if
-journal_meta() is called and an empty jset is written to cache device,
-journal_reclaim() is called. If there is available journal bucket to
-reclaim, c->journal.blocks_free is set to numbers of blocks of a journal
-bucket, which is c->sb.bucket_size >> c->block_bits.
+Add comments to explain why in register_bcache() blkdev_put() won't
+be called in two location. Add comments to explain why blkdev_put()
+must be called in register_cache() when cache_alloc() failed.
 
-Most of time the above process works correctly, expect the condtion
-when journal space is almost full. "Almost full" means there is no free
-journal bucket, but there are still free blocks in last available
-bucket indexed by ja->cur_idx.
-
-If system crashes or reboots when journal space is almost full, problem
-comes. During cache set reload after the reboot, c->journal.blocks_free
-is initialized as 0, when jouranl replay process writes bcache jouranl,
-journal_reclaim() will be called to reclaim available journal bucket and
-set c->journal.blocks_free to c->sb.bucket_size >> c->block_bits. But
-there is no fully free bucket to reclaim in journal_reclaim(), so value
-of c->journal.blocks_free will keep 0. If the first journal entry
-processed by journal_replay() causes btree split and requires writing
-journal space by journal_meta(), journal_meta() has to go into an
-infinite loop to reclaim jouranl bucket, and blocks the whole cache set
-to run.
-
-Such buggy situation can be solved if we do following things before
-journal replay starts,
-- Recover previous value of c->journal.blocks_free in last run time,
-  and set it to current c->journal.blocks_free as initial value.
-- Recover previous value of ja->cur_idx in last run time, and set it to
-  KEY_PTR of current c->journal.key as initial value.
-
-After c->journal.blocks_free and c->journal.key are recovered, in
-condition when jouranl space is almost full and cache set is reloaded,
-meta journal entry from journal reply can be written into free blocks of
-the last available journal bucket, then old jouranl entries can be
-replayed and reclaimed for further journaling request.
-
-This patch adds bch_journal_key_reload() to recover journal blocks_free
-and key ptr value for above purpose. bch_journal_key_reload() is called
-in bch_journal_read() before replying journal by bch_journal_replay().
-
-Cc: stable@vger.kernel.org
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/journal.c | 87 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 87 insertions(+)
+ drivers/md/bcache/super.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index 5180bed911ef..a6deb16c15c8 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -143,6 +143,89 @@ reread:		left = ca->sb.bucket_size - offset;
- 	return ret;
- }
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index a435c506edba..83a7cb0e0e45 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -2191,6 +2191,12 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
  
-+static int bch_journal_key_reload(struct cache_set *c)
-+{
-+	struct cache *ca;
-+	unsigned int iter, n = 0;
-+	struct bkey *k = &c->journal.key;
-+	int ret = 0;
-+
-+	for_each_cache(ca, c, iter) {
-+		struct journal_device *ja = &ca->journal;
-+		struct bio *bio = &ja->bio;
-+		struct jset *j, *data = c->journal.w[0].data;
-+		struct closure cl;
-+		unsigned int len, left;
-+		unsigned int offset = 0, used_blocks = 0;
-+		sector_t bucket = bucket_to_sector(c, ca->sb.d[ja->cur_idx]);
-+
-+		closure_init_stack(&cl);
-+
-+		while (offset < ca->sb.bucket_size) {
-+reread:			left = ca->sb.bucket_size - offset;
-+			len = min_t(unsigned int,
-+				    left, PAGE_SECTORS << JSET_BITS);
-+
-+			bio_reset(bio);
-+			bio->bi_iter.bi_sector = bucket + offset;
-+			bio_set_dev(bio, ca->bdev);
-+			bio->bi_iter.bi_size = len << 9;
-+
-+			bio->bi_end_io = journal_read_endio;
-+			bio->bi_private = &cl;
-+			bio_set_op_attrs(bio, REQ_OP_READ, 0);
-+			bch_bio_map(bio, data);
-+
-+			closure_bio_submit(c, bio, &cl);
-+			closure_sync(&cl);
-+
-+			j = data;
-+			while (len) {
-+				size_t blocks, bytes = set_bytes(j);
-+
-+				if (j->magic != jset_magic(&ca->sb))
-+					goto out;
-+
-+				if (bytes > left << 9 ||
-+				    bytes > PAGE_SIZE << JSET_BITS) {
-+					pr_err("jset may be correpted: too big");
-+					ret = -EIO;
-+					goto err;
-+				}
-+
-+				if (bytes > len << 9)
-+					goto reread;
-+
-+				if (j->csum != csum_set(j)) {
-+					pr_err("jset may be corrupted: bad csum");
-+					ret = -EIO;
-+					goto err;
-+				}
-+
-+				blocks = set_blocks(j, block_bytes(c));
-+				used_blocks += blocks;
-+
-+				offset	+= blocks * ca->sb.block_size;
-+				len	-= blocks * ca->sb.block_size;
-+				j = ((void *) j) + blocks * block_bytes(ca);
-+			}
-+		}
-+out:
-+		c->journal.blocks_free =
-+			(c->sb.bucket_size >> c->block_bits) -
-+			used_blocks;
-+
-+		k->ptr[n++] = MAKE_PTR(0, bucket, ca->sb.nr_this_dev);
-+	}
-+
-+	BUG_ON(n == 0);
-+	bkey_init(k);
-+	SET_KEY_PTRS(k, n);
-+
-+err:
-+	return ret;
-+}
-+
- int bch_journal_read(struct cache_set *c, struct list_head *list)
- {
- #define read_bucket(b)							\
-@@ -268,6 +351,10 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
- 					    struct journal_replay,
- 					    list)->j.seq;
+ 	ret = cache_alloc(ca);
+ 	if (ret != 0) {
++		/*
++		 * If we failed here, it means ca->kobj is not initialzed yet,
++		 * kobject_put() won't be called and there is no chance to
++		 * call blkdev_put() to bdev in bch_cache_release(). So we
++		 * explictly call blkdev_put() here.
++		 */
+ 		blkdev_put(bdev, FMODE_READ|FMODE_WRITE|FMODE_EXCL);
+ 		if (ret == -ENOMEM)
+ 			err = "cache_alloc(): -ENOMEM";
+@@ -2331,6 +2337,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 		mutex_lock(&bch_register_lock);
+ 		ret = register_bdev(sb, sb_page, bdev, dc);
+ 		mutex_unlock(&bch_register_lock);
++		/* blkdev_put() will be called in cached_dev_free() */
+ 		if (ret < 0)
+ 			goto err;
+ 	} else {
+@@ -2339,6 +2346,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 		if (!ca)
+ 			goto err_close;
  
-+	/* Initial value of c->journal.blocks_free should be 0 */
-+	BUG_ON(c->journal.blocks_free != 0);
-+	ret = bch_journal_key_reload(c);
-+
- 	return ret;
- #undef read_bucket
- }
++		/* blkdev_put() will be called in bch_cache_release() */
+ 		if (register_cache(sb, sb_page, bdev, ca) != 0)
+ 			goto err;
+ 	}
 -- 
 2.16.4
 
