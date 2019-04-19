@@ -7,40 +7,39 @@ X-Spam-Status: No, score=-7.7 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19CF2C282E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CE04C282DA
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:49:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D162320643
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:49:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E9392064A
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:49:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="O1cIkxV4"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="UkxfDmma"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728448AbfDSStU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1728454AbfDSStU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 19 Apr 2019 14:49:20 -0400
-Received: from mail.stbuehler.de ([5.9.32.208]:51612 "EHLO mail.stbuehler.de"
+Received: from mail.stbuehler.de ([5.9.32.208]:51614 "EHLO mail.stbuehler.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727812AbfDSStT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1728448AbfDSStT (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Fri, 19 Apr 2019 14:49:19 -0400
 Received: from chromobil.fritz.box (unknown [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6])
-        by mail.stbuehler.de (Postfix) with ESMTPSA id D12E5C030C5;
+        by mail.stbuehler.de (Postfix) with ESMTPSA id 475A8C02FFB;
         Fri, 19 Apr 2019 09:57:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=stbuehler.de;
-        s=stbuehler1; t=1555667868;
-        bh=wb/i8BcN5fqgSFtX3SfggrE1MGsKCMGq/XvRrOHXams=;
+        s=stbuehler1; t=1555667867;
+        bh=E+pBak04zce3NEXwB6UZ70CJv2w7yxoGBE8YB3hIvbc=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=O1cIkxV4R1bYjDmqx2QOq2FUcethemPxBsHsTN4nG323xtTUytLoGFkpFkWg+MJC3
-         hQoNW/dTHuNtvbG2VPUagGtqVo6FEq9DSDUIDoBxlNDg+rr2uK6wT10KgRBiu15MYy
-         MD1LChw5x1m7uaVj4c3RvnCaHSi++IfAfYITiaJo=
+        b=UkxfDmmaBlMsD+SvMH6htxk7T+F5toeN5ZN0zoSXu/FBpS60woRYbiFmw6eWlJ/Ar
+         U/bZhzmg/6B3mPkEfERFnar9ySsFeLHT0L6fpHFtajil5Vzg49H98Qa3lSGvmQUM+l
+         tEybbw5yzCjxMpjeQvFwmcU/Sf2TCY4IFDJ4tkQQ=
 From:   =?UTF-8?q?Stefan=20B=C3=BChler?= <source@stbuehler.de>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org
-Subject: [PATCH v1 3/3] io_uring: fix poll full SQ detection
-Date:   Fri, 19 Apr 2019 11:57:46 +0200
-Message-Id: <20190419095746.22894-3-source@stbuehler.de>
+Subject: [PATCH v1 1/3] io_uring: fix race condition reading SQ entries
+Date:   Fri, 19 Apr 2019 11:57:44 +0200
+Message-Id: <20190419095746.22894-1-source@stbuehler.de>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190419095746.22894-1-source@stbuehler.de>
+In-Reply-To: <54496e17-97de-9f9a-9972-c448226bb768@stbuehler.de>
 References: <54496e17-97de-9f9a-9972-c448226bb768@stbuehler.de>
- <20190419095746.22894-1-source@stbuehler.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -49,9 +48,11 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-io_uring_poll shouldn't signal EPOLLOUT | EPOLLWRNORM if the queue is
-full; the old check would always signal EPOLLOUT | EPOLLWRNORM (unless
-there were U32_MAX - 1 entries in the SQ queue).
+A read memory barrier is required between reading SQ tail and reading
+the actual data belonging to the SQ entry.
+
+Userspace needs a matching write barrier between writing SQ entries and
+updating SQ tail (using smp_store_release to update tail will do).
 
 Signed-off-by: Stefan Bühler <source@stbuehler.de>
 ---
@@ -59,19 +60,19 @@ Signed-off-by: Stefan Bühler <source@stbuehler.de>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 912b0b304d90..047a0aa7a58c 100644
+index f65f85d89217..96863e4780b7 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -2576,7 +2576,8 @@ static __poll_t io_uring_poll(struct file *file, poll_table *wait)
- 	poll_wait(file, &ctx->cq_wait, wait);
+@@ -1739,7 +1739,8 @@ static bool io_get_sqring(struct io_ring_ctx *ctx, struct sqe_submit *s)
+ 	head = ctx->cached_sq_head;
  	/* See comment at the top of this file */
  	smp_rmb();
--	if (READ_ONCE(ctx->sq_ring->r.tail) + 1 != ctx->cached_sq_head)
-+	if (READ_ONCE(ctx->sq_ring->r.tail) - ctx->cached_sq_head !=
-+	    ctx->sq_ring->ring_entries)
- 		mask |= EPOLLOUT | EPOLLWRNORM;
- 	if (READ_ONCE(ctx->cq_ring->r.head) != ctx->cached_cq_tail)
- 		mask |= EPOLLIN | EPOLLRDNORM;
+-	if (head == READ_ONCE(ring->r.tail))
++	/* make sure SQ entry isn't read before tail */
++	if (head == smp_load_acquire(&ring->r.tail))
+ 		return false;
+ 
+ 	head = READ_ONCE(ring->array[head & ctx->sq_mask]);
 -- 
 2.20.1
 
