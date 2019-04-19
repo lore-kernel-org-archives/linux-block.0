@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE66EC282E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E5F2C282DF
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B7EAA222D2
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17345222CC
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727881AbfDSSXs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Apr 2019 14:23:48 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33642 "EHLO mx1.suse.de"
+        id S1727794AbfDSSXt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Apr 2019 14:23:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33626 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727875AbfDSSXr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1727869AbfDSSXr (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Fri, 19 Apr 2019 14:23:47 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 5793CAEA1;
-        Fri, 19 Apr 2019 16:05:20 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 2E1EAAFBE;
+        Fri, 19 Apr 2019 16:06:03 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [RFC PATCH v2 01/16] bcache: move definition of 'int ret' out of macro read_bucket()
-Date:   Sat, 20 Apr 2019 00:04:54 +0800
-Message-Id: <20190419160509.66298-2-colyli@suse.de>
+Subject: [RFC PATCH v2 11/16] bcache: add comments for closure_fn to be called in closure_queue()
+Date:   Sat, 20 Apr 2019 00:05:04 +0800
+Message-Id: <20190419160509.66298-12-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190419160509.66298-1-colyli@suse.de>
 References: <20190419160509.66298-1-colyli@suse.de>
@@ -36,45 +36,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-'int ret' is defined as a local variable inside macro read_bucket().
-Since this macro is called multiple times, and following patches will
-use a 'int ret' variable in bch_journal_read(), this patch moves
-definition of 'int ret' from macro read_bucket() to range of function
-bch_journal_read().
+Add code comments to explain which call back function might be called
+for the closure_queue(). This is an effort to make code to be more
+understandable for readers.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/journal.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/md/bcache/super.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index b2fd412715b1..6e18057d1d82 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -147,7 +147,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 83a7cb0e0e45..9b41e0b62cc0 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -662,6 +662,11 @@ static const struct block_device_operations bcache_ops = {
+ void bcache_device_stop(struct bcache_device *d)
  {
- #define read_bucket(b)							\
- 	({								\
--		int ret = journal_read_bucket(ca, list, b);		\
-+		ret = journal_read_bucket(ca, list, b);			\
- 		__set_bit(b, bitmap);					\
- 		if (ret < 0)						\
- 			return ret;					\
-@@ -156,6 +156,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
+ 	if (!test_and_set_bit(BCACHE_DEV_CLOSING, &d->flags))
++		/*
++		 * closure_fn set to
++		 * - cached device: cached_dev_flush()
++		 * - flash dev: flash_dev_flush()
++		 */
+ 		closure_queue(&d->cl);
+ }
  
- 	struct cache *ca;
- 	unsigned int iter;
-+	int ret = 0;
- 
- 	for_each_cache(ca, c, iter) {
- 		struct journal_device *ja = &ca->journal;
-@@ -267,7 +268,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
- 					    struct journal_replay,
- 					    list)->j.seq;
- 
--	return 0;
-+	return ret;
- #undef read_bucket
+@@ -1677,6 +1682,7 @@ static void __cache_set_unregister(struct closure *cl)
+ void bch_cache_set_stop(struct cache_set *c)
+ {
+ 	if (!test_and_set_bit(CACHE_SET_STOPPING, &c->flags))
++		/* closure_fn set to __cache_set_unregister() */
+ 		closure_queue(&c->caching);
  }
  
 -- 
