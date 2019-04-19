@@ -2,312 +2,91 @@ Return-Path: <SRS0=cp6W=SV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7858BC282E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:54:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FC4C282E0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 20:35:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3C87920645
-	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 18:54:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E9BC20869
+	for <linux-block@archiver.kernel.org>; Fri, 19 Apr 2019 20:35:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tEFaDngL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rp1iU2d4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728505AbfDSSyk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Apr 2019 14:54:40 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:37825 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726103AbfDSSyk (ORCPT
+        id S1726163AbfDSUfv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Apr 2019 16:35:51 -0400
+Received: from mail-pl1-f173.google.com ([209.85.214.173]:45168 "EHLO
+        mail-pl1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726109AbfDSUfv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Apr 2019 14:54:40 -0400
-Received: by mail-qt1-f196.google.com with SMTP id z16so6354343qtn.4;
-        Fri, 19 Apr 2019 11:54:39 -0700 (PDT)
+        Fri, 19 Apr 2019 16:35:51 -0400
+Received: by mail-pl1-f173.google.com with SMTP id bf11so3045493plb.12
+        for <linux-block@vger.kernel.org>; Fri, 19 Apr 2019 13:35:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6OX8QmZYj0hr+oLgo00BxZddLqGFTJRCEZDmukfFVL4=;
-        b=tEFaDngLq91muzfywnkioRqKY6zJvqe07mUkjAghzPjQ2PwkOkCXwPnKkgiBGbIULd
-         vNCmq7xpYa+sX4eChNUbQ/jxk4rx9aR4/MIXjgCv6TeyG8Xl5THg4YToLH7py8P1wHIn
-         fnAwUnlTmpCxYD1rXz7iALVUaBM+taD8CMj/FpGBa+5nA7vaNUEavg6QLzP0m8ZMeUpO
-         QxAjdkEbk9kraiuxDf96zmsUhQkEyTj+UGy7H6RvzhzZm8vKqMzlFhNVw2OE0w34A77y
-         PWr/rn5lbGpkhZNHPNScEJWO+uqnl1hUyyrNtNOvzwtaaH6bW2DvuHE97mXSa4+VPGFS
-         1bHw==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zPi5LhrK9g7xvx6+mwGpbKf5P625PAJk/QWxhSdBCNg=;
+        b=rp1iU2d4c5zG0sApkNhMqDyC9hXel0pZWKGiYv9HifwdRRy5NWccfxeEr5JgGMCpyj
+         X2VCkdgUqBDdtPwk8HRaGRL4KPwsJaiBkXKPdn+GZL5tjy4f/IAEGlJruk66Bj7uwbX4
+         9x+7ioQi7k7hqwYk2yNP3U1Zo7s1GeyXa6YPjkopVbzOrZW4XCq/3f/uHIRMkvJuDQRY
+         mkDWqYX5GXlJ9rqivNI/c4SynqoS11C/ALAq8Lh60TpZgmvpbxi6gDCUfVWJho2k1gPe
+         1JrUvF+CtDwFLy5mzAw3RLM4iUKpqptzPWdEbWWSZ0/HxeigONfXzFAVJipKMW6n2aCA
+         6zVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6OX8QmZYj0hr+oLgo00BxZddLqGFTJRCEZDmukfFVL4=;
-        b=M0zMa+N/t0fqi9p63AVaL4qZQbxjraWo9o+N1EUvwyBtfZo/jeeCLb4sM+na+y/Q3f
-         OQQSTWR+U5kZF/cMlDupL4Bzk8SOgfW442cZZ7qje1GFDzCrX+smHFbVG4Jn0UTHiD6r
-         3eDjJwsjLfrQyPLkr5GgdJDAbnefspF+NJl0ud7HDLCbqLgC73t4FPQEVN5cx18RVxny
-         O9Nve8V/GmzvfNHD8dhPYnEHCcxlytK/aowHQM0ZGGMX3caRPGzhltELpWJbTTpiKyn0
-         Xoi9V6ErKlHFgkekMxvuH+6S8l/5vLVh47oG8ecEys8tD9RtS2nC78V2/0VSoNAxg2/i
-         lePA==
-X-Gm-Message-State: APjAAAUm7rhC/Z3bgG/m1p+ejnkstQDwqYX2bgbI6d70epDqtPdWu4F2
-        16bGuDLY4cY+E8aZng1gojhdCtoiZjeuRo+TMJ99hg==
-X-Google-Smtp-Source: APXvYqxFAqiApkF3sjhQzH/zQIQukb28XuuR61QJo0MJxSI+FIkJo07FiJQPbQ3DazG9/EmmMdGl5YWYBXcMltFy5BY=
-X-Received: by 2002:aed:3e94:: with SMTP id n20mr4197553qtf.268.1555693732318;
- Fri, 19 Apr 2019 10:08:52 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zPi5LhrK9g7xvx6+mwGpbKf5P625PAJk/QWxhSdBCNg=;
+        b=IqfTmwTKx/U41n8j1tAqmSRV6cNMKoRiitduyVRVZ7Y/9XqyKh7CbncmJC+SB5Xap7
+         9M8v1g+BU2mUc7C5/Z+fr4g/MdQTxl2WoEiYmMfbRpByriKqrAMJBWhs9iDJrShCxk9g
+         nhsp1pAmaPJb0gbfnNssxE/s4f8uBrLgwLDh2NBfq5NEALR28sYP8TWBSgBObAR+24aY
+         /sctqzeICfOQh3AW0MUpjNJrNsPf+rR1WlLQr0HTukKW4jcUC/uS5FlwBFNios0DdFQx
+         AXRoWQi0odTTfPrLslVLOvO/3otqPahTa1kg+kfqiTA5P8ZI9i+O9Hdx1qRdN+0HJ97g
+         LqNQ==
+X-Gm-Message-State: APjAAAUC184IQVjqs0+VKyPEZrE5kTxIPc3aNViE1O0aq9lOzLU2c0TN
+        3WfTO7ftR6Dmy8uNpckXzZMLSX7KtYfAjA==
+X-Google-Smtp-Source: APXvYqwRtZ9hDiSUHcAkzRQBphXv38nILgMcygrPyjT3aMWz5HDFgN6opQ1VRyRInv5CXlq/l7U6SQ==
+X-Received: by 2002:a17:902:20c9:: with SMTP id v9mr5794978plg.239.1555706150420;
+        Fri, 19 Apr 2019 13:35:50 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::2:5cfc])
+        by smtp.gmail.com with ESMTPSA id h189sm11598937pfc.125.2019.04.19.13.35.49
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 19 Apr 2019 13:35:49 -0700 (PDT)
+From:   Jes Sorensen <jes.sorensen@gmail.com>
+X-Google-Original-From: Jes Sorensen <Jes.Sorensen@gmail.com>
+To:     linux-block@vger.kernel.org
+Cc:     kernel-team@fb.com, Jes Sorensen <jsorensen@fb.com>
+Subject: [PATCH 0/1] blk-mq error handling memory leak
+Date:   Fri, 19 Apr 2019 16:35:43 -0400
+Message-Id: <20190419203544.11725-1-Jes.Sorensen@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20190418220448.7219-1-gpiccoli@canonical.com>
-In-Reply-To: <20190418220448.7219-1-gpiccoli@canonical.com>
-From:   Song Liu <liu.song.a23@gmail.com>
-Date:   Fri, 19 Apr 2019 10:08:39 -0700
-Message-ID: <CAPhsuW4k5zz2pJBPL60VzjTcj6NTnhBh-RjvWASLcOxAk+yDEw@mail.gmail.com>
-Subject: Re: [RFC] [PATCH V2 0/1] Introduce emergency raid0 stop for mounted arrays
-To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Cc:     axboe@kernel.dk, linux-raid <linux-raid@vger.kernel.org>,
-        jay.vosburgh@canonical.com, kernel@gpiccoli.net,
-        NeilBrown <neilb@suse.com>, dm-devel@redhat.com,
-        Linux-Fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 18, 2019 at 3:05 PM Guilherme G. Piccoli
-<gpiccoli@canonical.com> wrote:
->
-> Currently the md driver completely relies in the userspace to stop an
-> array in case of some failure - for raid0, if we remove a raid0 member like via
-> PCI hot(un)plugging an NVMe device, and the raid0 array is _mounted_, mdadm
-> cannot stop the array, since the tool tries to open the block device to perform
-> the ioctl with the O_EXCL flag.
->
-> So, an array in this situation is "alive" - users may write to it and unless
-> they check the kernel log or some other monitor tool, everything will seem fine
-> and the writes are completed with no errors. Being more precise, direct
-> writes will not work, but since usually writes are done in a regular form
-> (backed by the page cache) the most common scenario is an user being able to
-> regularly write to a broken raid0, and get all their data corrupted.
->
->
-> PROPOSAL:
-> The idea proposed here to fix this behavior is mimic other block devices:
-> if one have a filesystem mounted in a block device on top of an NVMe or
-> SCSI disk and the disk gets removed, writes are prevented, errors are
-> observed and it's obvious something is wrong; same goes for USB sticks.
->
-> We believe right now the md driver is not behaving properly for raid0
-> arrays (it is handling these errors for other levels though). The approach
-> took for raid-0 is basically an emergency removal procedure, in which I/O
-> is blocked from the device, the regular clean-up happens and the associate
-> disk is deleted. It went to extensive testing, as detailed below.
->
-> Not all are roses, we have some caveats that need to be resolved.
-> Feedback is much appreciated.
-> There is a caveats / questions / polemic choices section below the test
-> section.
->
-> V1 link: https://marc.info/?l=linux-raid&m=153313538013458
+From: Jes Sorensen <jsorensen@fb.com>
 
-I read through the discussion in V1, and I would agree with Neil that
-current behavior is reasonable.
+Hi,
 
-For the following example:
+Digging through this, I don't see the callback data getting freed in
+case of errors in blk_mq_init_allocated_queue() unless I am missing
+some obscure path that cleans it up later?
 
-fd = open("file", "w");
-write(fd, buf, size);
-ret = fsync(fd);
+Cheers,
+Jes
 
-If "size" is big enough, the write is not expected to be atomic for
-md or other drives. If we remove the underlining block device
-after write() and before fsync(), the file could get corrupted. This
-is the same for md or NVMe/SCSI drives.
+Jes Sorensen (1):
+  blk-mq: Fix memory leak in error handling
 
-The application need to check "ret" from fsync(), the data is safe
-only when fsync() returns 0.
+ block/blk-mq.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Does this make sense?
+-- 
+2.17.1
 
-Also, could you please highlight changes from V1 (if more than
-just rebase)?
-
-Thanks,
-Song
-
->
-> Thanks in advance,
->
->
-> Guilherme
->
->
-> * Testing:
->
-> The device topology for the tests is as follows:
->
->                             md6
->                              |
->               |******************************|
->               |                              |
->              md4                            md5
->               |                              |
->        |*************|                |*************|
->        |             |                |             |
->       md0           md2              md1           md3
->        |             |                |             |
->    |*******|       |***|            |***|       |*******|
->    |       |       |   |            |   |       |       |
-> nvme1n1 nvme0n1   sda sdd          sde sdf   nvme2n1 nvme3n1
->
->
-> We chose to test such complex topology to expose corner cases and timing
-> issues (which were found in the development phase). There are 3 test
-> subsets basically: the whole set of devices, called here "md cascade", and
-> 2 small branches, called here "md direct" testing.
->
-> So, in summary:
-> ### md direct (single arrays composed of SCSI/NVMe block devices) ###
-> A1 = md1      A2 = md3
-> C1 = sde      C1 = nvme2n1
-> C2 = sdf      C2 = nvme3n1
->
-> ### md cascade (array composed of md devices) ###
-> A3 = md6
-> underlying component UC1 = nvme1n1
-> underlying component UC2 = sdd
-> underlying component UC3 = sdf
-> underlying component UC4 = nvme2n1
->
->
-> ### Method of removal ###
-> - For NVMe devices, "echo 1 > /sys/block/nvmeXnY/device/device/remove"
-> - For SCSI devices, "echo 1 > /sys/block/sdX/device/delete"
->
->
-> ### Test ###
-> Write a file using the command: "dd if=/dev/zero of=tmpfile bs=X" where
-> X might be 8K or 384K (varied in the tests).
->
-> Each array also contains a valid file to be checked later, in order to
-> validate that filesystem didn't get severely corrupted after the
-> procedure.
->
-> Tests marked with @ indicate direct writes were tested too.
-> Tests with a [] indicator exhibited some oddity/issue, detailed in the
-> caveats section.
->
-> After each test, guest was rebooted.
->
-> Tests were performed in kernel v5.1-rc5.
->
->
-> * Test results
-> ("partition X" means we have a GPT table with 2 partitions in the device)
->
->
-> ### md direct
->
-> Remove members and start writing to array right after:
-> A1 with:                               A2 with:
->  -ext4                                  -ext4
->  --Removed C1: PASSED @                 --Removed C2: PASSED @
->
->  -xfs                                   -xfs
->  --Removed C2: PASSED                   --Removed C1: PASSED
->
->  -partition 1 + ext4                    -partition 1 + xfs
->  -partition 2 + xfs                     -partition 2 + ext4
->  --Removed C1: PASSED                   --Removed C2: PASSED
->
->
-> Start writing to array and remove member right after:
-> A1 with:                               A2 with:
->  -ext4                                  -ext4
->  --Removed C1: PASSED                   --Removed C1: PASSED
->  --Removed C2: PASSED @
->
->  -xfs                                   -xfs
->  --Removed C1: PASSED                   --Removed C1: PASSED
->                                         --Removed C2: PASSED @
->
->  -partition 1 + ext4                    -partition 1 + xfs
->  -partition 2 + xfs                     -partition 2 + ext4
->  --Removed C2: PASSED                   --Removed C1: PASSED @
->
->
-> ### md cascade
-> Remove members and start writing to array right after:
-> A3 with:
->  -ext4:
->  --Removed UC2: PASSED
->  --Removed UC4: PASSED @
->
->   -xfs:
->  --Removed UC2: PASSED @
->  --Removed UC4: PASSED
->
->  -partition 1 + ext4
->  -partition 2 + xfs
->  --Removed UC1: PASSED @
->  --Removed UC3: PASSED
->
->
-> Start writing to array and remove member right after:
-> A3 with:
->  -ext4:
->  --Removed UC2: PASSED
->  --Removed UC4: PARTIAL @ [(a) (b)]
->
->   -xfs:
->  --Removed UC2: PASSED
->  --Removed UC4: PARTIAL @ [(c)]
->
->  -partition 1 + ext4
->  -partition 2 + xfs
->  --Removed UC1: PASSED
->  --Removed UC3: PARTIAL @ [(b)]
->
->
-> * Caveats / points of uncertainty / questions:
->
-> => Some arrays  still show in /dev after the removal. We noticed if FS
-> is unmounted and "mdadm --detail" is tried against that, it hangs.
->
-> #For md cascade only (nested arrays):
->
-> a) After direct writes, if we issue a regular right (backed by page
-> cache), observed an oops sometimes, in ext4 filesystem.
->
-> b) We might face an ext4 journal task blocked in io_schedule().
-> Backtrace: https://pastebin.ubuntu.com/p/KgvHjRn6Pg
->
-> c) Hung task in xfs after direct I/O only, when trying to write again after
-> failing one of the members (2nd write is using page cache).
-> Backtrace: https://pastebin.ubuntu.com/p/7NMRV9fG2H
->
->
->
-> #Generic questions / polemic choices:
->
-> i) With this patch, the STOP_ARRAY ioctl won't proceed in case a disk is
-> removed and emergency stop routine already started to act, even in case of
-> unmounted md arrays. This is a change in the old behavior, triggered by
-> the way we check for failed members in raid0 driver.
->
-> ii) Currently, the patch implements a kernel-only removal policy - shall
-> it rely on userspace (mdadm) to do it? A first approach was based in
-> userspace, but it proved to be more problematic in tests.
->
-> iii) Would a new state ("error") for RAID0 be a better solution? I'm
-> experimenting a simpler approach that would introduce a new state, but
-> wouldn't force the removal of the device.
->
-> Guilherme G. Piccoli (1):
->   md/raid0: Introduce emergency stop for raid0 arrays
->
->  drivers/md/md.c    | 123 +++++++++++++++++++++++++++++++++++++++++----
->  drivers/md/md.h    |   6 +++
->  drivers/md/raid0.c |  14 ++++++
->  3 files changed, 134 insertions(+), 9 deletions(-)
->
-> --
-> 2.21.0
->
->
