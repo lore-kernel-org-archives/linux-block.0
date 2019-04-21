@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DBE6C10F14
-	for <linux-block@archiver.kernel.org>; Sun, 21 Apr 2019 17:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8745EC10F14
+	for <linux-block@archiver.kernel.org>; Sun, 21 Apr 2019 18:00:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10C3E20833
-	for <linux-block@archiver.kernel.org>; Sun, 21 Apr 2019 17:52:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EE2E2080D
+	for <linux-block@archiver.kernel.org>; Sun, 21 Apr 2019 18:00:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Q20gpZm9";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Z4pWNurU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="HPZPeyZR";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="hc8KiS9i"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726076AbfDURwx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 21 Apr 2019 13:52:53 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:48258 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725774AbfDURwx (ORCPT
+        id S1725888AbfDUSAt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 Apr 2019 14:00:49 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:23950 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725774AbfDUSAs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Apr 2019 13:52:53 -0400
+        Sun, 21 Apr 2019 14:00:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1555869173; x=1587405173;
+  t=1555869648; x=1587405648;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=moSYFJDFPPjMpxbhqLbD6FytShSrWt+RnP/H92rqDzM=;
-  b=Q20gpZm9GZCqSQ03Wb2EzdI23wQket9BEiGHDnEQlNi65vEcjEaSD70C
-   9Vaycj13sHkllfvWFEHldF+NB5z5l9K51QYCMips/bxFoGi5B3nFQNyar
-   TQCOrXAe9Ltm/53z3VhjGYfq0W7Fx6CaRV5Yov70nAjIZpRftFde1DUZI
-   21YTlFdWDZii9SyFcjbh1DlEeH0J5gdGQ2O7GY5qhWffHZbW0o+hnvQ0R
-   tb7amjdoiixuzbUShc1EzM8E7fdbsKI6xp9TXXL9i9/PVxeyqKpfOE+o1
-   0x3pxA4gEh/IvNWpxvYObHAJh3bn46defeOWYpiU5ale0TC8T6jQbi61h
-   A==;
+  bh=pw4uThmUznol5VdbKDc3pW+iQNa8xKtk6oKGYwUAOl4=;
+  b=HPZPeyZR+L3CPn4OgwtgVF6cwhYytmzdqWO3PBwmzk/s4AFWLas42Bpg
+   qADyEl6kzJkGdz3zB/aPlwo76IyRHOdSTxmjCVZCOUTqooy1Zs9qTSutD
+   r5sRHjeF6WDgxkbGuMHpokUQ/GiBcFA72dZbU/aHC/NZn7itXkzl4NGIr
+   gRHp3uqFWsHPP6jAk3jAKCWP3XIvNr8MmztMFq5lMENKnAJPsBNthSx15
+   AsXLF+V4whQjREv2aKLnlfUM0surdOVF4v0MPddgiP8vixQIO559BRNri
+   P0PuDLrX3vNaXoPyuGR07l/wwu+58QyGvTbE/5Ob/ts5KX6fbgE/Umwll
+   Q==;
 X-IronPort-AV: E=Sophos;i="5.60,378,1549900800"; 
-   d="scan'208";a="108188178"
-Received: from mail-cys01nam02lp2055.outbound.protection.outlook.com (HELO NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.55])
-  by ob1.hgst.iphmx.com with ESMTP; 22 Apr 2019 01:52:52 +0800
+   d="scan'208";a="107678516"
+Received: from mail-cys01nam02lp2054.outbound.protection.outlook.com (HELO NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.54])
+  by ob1.hgst.iphmx.com with ESMTP; 22 Apr 2019 02:00:47 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T+PfsKijfd0og39yfnT6GVO0Acaf9O6nzxLERYvL8h0=;
- b=Z4pWNurUrHOhDV9Auq6KaVR6p3t/xl6dHi/aSrBBhOhD87Xr0HQVF2leHEjTzm4MHAKFpoBTGMg2868Kp4fuv3TDL/qsWMFwsTSAj+5WvYNN4mNuqAhjX9g8SUY9U2BsjGRXUihtkC4RYjdZgYwJkkDQQVda1LdDY9bkmZKN+gw=
+ bh=dCgFz1PC6iBkYn2Qr+VdP1fyB5o+3zSy2sSZcGsWTRY=;
+ b=hc8KiS9ipvmgzLNJPKQKph18T1wYMZPRfjAOW3C+xnw/qEILANsOf0Y7oQ0igGhlKjuipaBcJuQTY89INUs3/ZSgnqTk3MnRuBSKd4HAmYVTHkv4RUueaEE7+Cq42dC4uv6g+YEwg9OC30NVOetcCmLnd3nfHoKhTOR8V1pX7f4=
 Received: from SN6PR04MB4527.namprd04.prod.outlook.com (52.135.120.25) by
- SN6PR04MB3822.namprd04.prod.outlook.com (52.135.81.31) with Microsoft SMTP
+ SN6PR04MB4816.namprd04.prod.outlook.com (52.135.122.202) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1813.14; Sun, 21 Apr 2019 17:52:51 +0000
+ 15.20.1813.11; Sun, 21 Apr 2019 18:00:45 +0000
 Received: from SN6PR04MB4527.namprd04.prod.outlook.com
  ([fe80::c95e:c178:8d66:3703]) by SN6PR04MB4527.namprd04.prod.outlook.com
  ([fe80::c95e:c178:8d66:3703%3]) with mapi id 15.20.1813.017; Sun, 21 Apr 2019
- 17:52:50 +0000
+ 18:00:45 +0000
 From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
 To:     Coly Li <colyli@suse.de>,
         "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
 CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [RFC PATCH v2 07/16] bcache: add comments for kobj release
- callback routine
-Thread-Topic: [RFC PATCH v2 07/16] bcache: add comments for kobj release
- callback routine
-Thread-Index: AQHU9t0qhc4pNiBi/UqK15favPi46w==
-Date:   Sun, 21 Apr 2019 17:52:49 +0000
-Message-ID: <SN6PR04MB4527A75662BE15841ED5F56286210@SN6PR04MB4527.namprd04.prod.outlook.com>
+Subject: Re: [RFC PATCH v2 09/16] bcache: add error check for calling
+ register_bdev()
+Thread-Topic: [RFC PATCH v2 09/16] bcache: add error check for calling
+ register_bdev()
+Thread-Index: AQHU9t0mf9RVOj+rPkuuKiseFAOKBg==
+Date:   Sun, 21 Apr 2019 18:00:45 +0000
+Message-ID: <SN6PR04MB45279113170759A73CFB40AB86210@SN6PR04MB4527.namprd04.prod.outlook.com>
 References: <20190419160509.66298-1-colyli@suse.de>
- <20190419160509.66298-8-colyli@suse.de>
+ <20190419160509.66298-10-colyli@suse.de>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -73,94 +73,139 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
 x-originating-ip: [199.255.45.63]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4e43010b-3638-40e0-b2b2-08d6c6822c3e
+x-ms-office365-filtering-correlation-id: bb7d7c41-fdef-4d48-21a9-08d6c68346fe
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:SN6PR04MB3822;
-x-ms-traffictypediagnostic: SN6PR04MB3822:
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600141)(711020)(4605104)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:SN6PR04MB4816;
+x-ms-traffictypediagnostic: SN6PR04MB4816:
 wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <SN6PR04MB3822AA67CE342F495B3400BB86210@SN6PR04MB3822.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <SN6PR04MB48161C34B2E8DC70417AC7F786210@SN6PR04MB4816.namprd04.prod.outlook.com>
 x-forefront-prvs: 0014E2CF50
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(366004)(39860400002)(376002)(346002)(396003)(189003)(199004)(81166006)(8676002)(4326008)(81156014)(53546011)(66066001)(6506007)(25786009)(2906002)(102836004)(26005)(71190400001)(71200400001)(99286004)(8936002)(66446008)(97736004)(6116002)(64756008)(66476007)(14444005)(66556008)(5024004)(73956011)(66946007)(3846002)(76176011)(186003)(76116006)(256004)(91956017)(33656002)(72206003)(478600001)(52536014)(476003)(446003)(305945005)(53936002)(7736002)(6246003)(486006)(74316002)(9686003)(316002)(14454004)(7696005)(2501003)(86362001)(6436002)(55016002)(68736007)(110136005)(5660300002)(229853002);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR04MB3822;H:SN6PR04MB4527.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(366004)(136003)(346002)(376002)(39860400002)(189003)(199004)(26005)(102836004)(76176011)(86362001)(2501003)(256004)(14444005)(186003)(53546011)(6506007)(55016002)(9686003)(53936002)(6246003)(68736007)(72206003)(8936002)(478600001)(71200400001)(71190400001)(33656002)(4326008)(25786009)(5660300002)(97736004)(66066001)(81156014)(81166006)(229853002)(14454004)(73956011)(7736002)(316002)(110136005)(446003)(8676002)(6116002)(3846002)(74316002)(486006)(91956017)(76116006)(7696005)(476003)(6436002)(2906002)(66476007)(99286004)(305945005)(66446008)(64756008)(66556008)(52536014)(66946007);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR04MB4816;H:SN6PR04MB4527.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 7kjQno0+0y0No21hyxcZ3va2qkZQc4l89GVmdPc9m8az1crrutl2b1hhxPO8y8Lw8iMmxslhwD4Dj2rpez2yTU/v/pwKQ47csoGG2XJWtJ++nvWBuZTdqlom76JYxtbl2Amm/hyKYkcEf4DvMljox8UU/aRHkXx5J6qunZ48+KymjpIsI4kkD0kOoSgv4R8rX2gHOl0x+SJ/GxXamRKSnBItXPKMFRQ89qGiht8CgsGhAZJcIS21pswRQj69o/tki/ofyHx/vu3ZiidSa3S0NKd947KPz3jWr1kmzHVpm5haKLLBC3AFbL4/MhpTpCspQSCIayTamFOk7ZHXYGyi8NHnZFNddABH352MehFqUkBjlIXGQ4wMgL5sw1dZzMV49Ol2djBaGWymJcyDJUtalR6zcwFcjRStgUFPrO/hr4g=
+x-microsoft-antispam-message-info: 0H9B33lLEKwlpMuhrysN2/eSi7J4pcoJPHxrsDTV7iYUrniuv+eoUfBfSiqEHnUALuGpl+NGMAY92ij4yjvHbOcMpJbnAhRwGiYCvRtgGYAx+NiTTkdoOKk1y0WgUvY4gj9572y/jGXnqtg1BVTulonOnqUyXEU3miKj5OaM9dKXjnDh5tBDiGe8FIC+S/UXJOGGTSDCl1j4PmK4Zx6bu/wyQkZSC5BPmXep+b+EedrOXERCqz9j2oreeGU7zObYTlGSZUy/3lY9HBAFH/moOj9VUsVKdPqi1oVAJ9rv1FBii6h/zmEemN3w+aMFxbg4+UuJ6/rI7DW9pMutpL4+/OCWYSnHBtes8fUMwLuPDXhEjcQ7XKmBGa9ph0jgGR6ESFoO+eoQarG/JdZdFXM82qCGJPASiJEmz9AwYDskcgc=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e43010b-3638-40e0-b2b2-08d6c6822c3e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Apr 2019 17:52:50.8807
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb7d7c41-fdef-4d48-21a9-08d6c68346fe
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Apr 2019 18:00:45.2828
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB3822
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4816
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good.=0A=
-=0A=
-Reviewed-by:- Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-=0A=
 On 04/19/2019 11:24 AM, Coly Li wrote:=0A=
-> Bcache has several routines to release resources in implicit way, they=0A=
-> are called when the associated kobj released. This patch adds code=0A=
-> comments to notice when and which release callback will be called,=0A=
-> - When dc->disk.kobj released:=0A=
->    void bch_cached_dev_release(struct kobject *kobj)=0A=
-> - When d->kobj released:=0A=
->    void bch_flash_dev_release(struct kobject *kobj)=0A=
-> - When c->kobj released:=0A=
->    void bch_cache_set_release(struct kobject *kobj)=0A=
-> - When ca->kobj released=0A=
->    void bch_cache_release(struct kobject *kobj)=0A=
+> This patch adds return value to register_bdev(). Then if failure happens=
+=0A=
+> inside register_bdev(), its caller register_bcache() may detect and=0A=
+> handle the failure more properly.=0A=
 >=0A=
 > Signed-off-by: Coly Li <colyli@suse.de>=0A=
 > ---=0A=
->   drivers/md/bcache/super.c | 4 ++++=0A=
->   1 file changed, 4 insertions(+)=0A=
+>   drivers/md/bcache/super.c | 16 ++++++++++------=0A=
+>   1 file changed, 10 insertions(+), 6 deletions(-)=0A=
 >=0A=
 > diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c=0A=
-> index 036bffad0bfe..400af446c372 100644=0A=
+> index 400af446c372..a435c506edba 100644=0A=
 > --- a/drivers/md/bcache/super.c=0A=
 > +++ b/drivers/md/bcache/super.c=0A=
-> @@ -1174,6 +1174,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, st=
-ruct cache_set *c,=0A=
->   	return 0;=0A=
->   }=0A=
+> @@ -1281,7 +1281,7 @@ static int cached_dev_init(struct cached_dev *dc, u=
+nsigned int block_size)=0A=
 >=0A=
-> +/* when dc->disk.kobj released */=0A=
->   void bch_cached_dev_release(struct kobject *kobj)=0A=
+>   /* Cached device - bcache superblock */=0A=
+>=0A=
+> -static void register_bdev(struct cache_sb *sb, struct page *sb_page,=0A=
+> +static int register_bdev(struct cache_sb *sb, struct page *sb_page,=0A=
+>   				 struct block_device *bdev,=0A=
+>   				 struct cached_dev *dc)=0A=
 >   {=0A=
->   	struct cached_dev *dc =3D container_of(kobj, struct cached_dev,=0A=
-> @@ -1326,6 +1327,7 @@ static void register_bdev(struct cache_sb *sb, stru=
-ct page *sb_page,=0A=
+> @@ -1319,10 +1319,11 @@ static void register_bdev(struct cache_sb *sb, st=
+ruct page *sb_page,=0A=
+>   	    BDEV_STATE(&dc->sb) =3D=3D BDEV_STATE_STALE)=0A=
+>   		bch_cached_dev_run(dc);=0A=
+>=0A=
+> -	return;=0A=
+> +	return 0;=0A=
+>   err:=0A=
+>   	pr_notice("error %s: %s", dc->backing_dev_name, err);=0A=
+>   	bcache_device_stop(&dc->disk);=0A=
+So register_bdev has couple of goto err; calls where kobject interface =0A=
+is used directly :-=0A=
+=0A=
+register_bdev=0A=
+	kobject_add=0A=
+=0A=
+and=0A=
+=0A=
+indirectly :-=0A=
+register_bdev=0A=
+	bch_cache_accounting_add_kobjs=0A=
+=0A=
+		kobject_add=0A=
+Here we return -EIO, we should catch the error code from kobject calls =0A=
+and return that error instead of -EIO. Any thoughts ?=0A=
+=0A=
+> +	return -EIO;=0A=
+>   }=0A=
 >=0A=
 >   /* Flash only volumes */=0A=
->=0A=
-> +/* When d->kobj released */=0A=
->   void bch_flash_dev_release(struct kobject *kobj)=0A=
->   {=0A=
->   	struct bcache_device *d =3D container_of(kobj, struct bcache_device,=
+> @@ -2273,7 +2274,7 @@ static bool bch_is_open(struct block_device *bdev)=
 =0A=
-> @@ -1496,6 +1498,7 @@ bool bch_cache_set_error(struct cache_set *c, const=
- char *fmt, ...)=0A=
->   	return true;=0A=
+>   static ssize_t register_bcache(struct kobject *k, struct kobj_attribute=
+ *attr,=0A=
+>   			       const char *buffer, size_t size)=0A=
+>   {=0A=
+> -	ssize_t ret =3D size;=0A=
+> +	ssize_t ret =3D -EINVAL;=0A=
+>   	const char *err =3D "cannot allocate memory";=0A=
+>   	char *path =3D NULL;=0A=
+>   	struct cache_sb *sb =3D NULL;=0A=
+> @@ -2307,7 +2308,7 @@ static ssize_t register_bcache(struct kobject *k, s=
+truct kobj_attribute *attr,=0A=
+>   			if (!IS_ERR(bdev))=0A=
+>   				bdput(bdev);=0A=
+>   			if (attr =3D=3D &ksysfs_register_quiet)=0A=
+> -				goto out;=0A=
+> +				goto quiet_out;=0A=
+>   		}=0A=
+>   		goto err;=0A=
+>   	}=0A=
+> @@ -2328,8 +2329,10 @@ static ssize_t register_bcache(struct kobject *k, =
+struct kobj_attribute *attr,=0A=
+>   			goto err_close;=0A=
+>=0A=
+>   		mutex_lock(&bch_register_lock);=0A=
+> -		register_bdev(sb, sb_page, bdev, dc);=0A=
+> +		ret =3D register_bdev(sb, sb_page, bdev, dc);=0A=
+>   		mutex_unlock(&bch_register_lock);=0A=
+> +		if (ret < 0)=0A=
+> +			goto err;=0A=
+>   	} else {=0A=
+>   		struct cache *ca =3D kzalloc(sizeof(*ca), GFP_KERNEL);=0A=
+>=0A=
+> @@ -2339,6 +2342,8 @@ static ssize_t register_bcache(struct kobject *k, s=
+truct kobj_attribute *attr,=0A=
+>   		if (register_cache(sb, sb_page, bdev, ca) !=3D 0)=0A=
+>   			goto err;=0A=
+>   	}=0A=
+> +quiet_out:=0A=
+> +	ret =3D size;=0A=
+>   out:=0A=
+>   	if (sb_page)=0A=
+>   		put_page(sb_page);=0A=
+> @@ -2351,7 +2356,6 @@ static ssize_t register_bcache(struct kobject *k, s=
+truct kobj_attribute *attr,=0A=
+>   	blkdev_put(bdev, FMODE_READ|FMODE_WRITE|FMODE_EXCL);=0A=
+>   err:=0A=
+>   	pr_info("error %s: %s", path, err);=0A=
+> -	ret =3D -EINVAL;=0A=
+>   	goto out;=0A=
 >   }=0A=
 >=0A=
-> +/* When c->kobj released */=0A=
->   void bch_cache_set_release(struct kobject *kobj)=0A=
->   {=0A=
->   	struct cache_set *c =3D container_of(kobj, struct cache_set, kobj);=0A=
-> @@ -2023,6 +2026,7 @@ static const char *register_cache_set(struct cache =
-*ca)=0A=
->=0A=
->   /* Cache device */=0A=
->=0A=
-> +/* When ca->kobj released */=0A=
->   void bch_cache_release(struct kobject *kobj)=0A=
->   {=0A=
->   	struct cache *ca =3D container_of(kobj, struct cache, kobj);=0A=
 >=0A=
 =0A=
