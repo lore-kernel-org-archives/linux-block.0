@@ -2,217 +2,683 @@ Return-Path: <SRS0=Rcoh=SY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE1E5C282CE
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6AABC10F11
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:36:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 76AC42064A
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:33:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="iRXdnekE"
+	by mail.kernel.org (Postfix) with ESMTP id 781892087E
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:36:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1555940203;
+	bh=kJefC+kj/qkWAsOTFkG/9yNK6Jh7EjlgSxUCylOR8MQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=Vua5ResAqKZZKby7LOLADPfrC7HQ4xjAqP04W5Zj25Jrb7HNxRIIEMQR7Tf4VKYKI
+	 ctvRZlxrvR+UXrm2zVHblK+ZHSs3xeBiaRR7xF+yfiJ/fovDTtgxu5PVtbLwcyL35i
+	 kJA0Z5uacUh6ZZFAclNw3lWT9ZF44LlffK+VdGsg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728119AbfDVNdq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Apr 2019 09:33:46 -0400
-Received: from mailout4.samsung.com ([203.254.224.34]:60537 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727951AbfDVNdh (ORCPT
+        id S1728026AbfDVNgZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Apr 2019 09:36:25 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:36850 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727393AbfDVN2O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Apr 2019 09:33:37 -0400
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20190422133334epoutp049892564bfda8e304d0b7b21d97f96e34~XzzMdeYbN3150731507epoutp04Z
-        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2019 13:33:34 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20190422133334epoutp049892564bfda8e304d0b7b21d97f96e34~XzzMdeYbN3150731507epoutp04Z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1555940014;
-        bh=sd1eXOswPa5nm3ChHzPMI6ycwmTgYTh2kSxeQr83gps=;
-        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-        b=iRXdnekELPof2kfJ7X6gZ2lNgNh4o3GO21KL4ff3QHBRiNvRzYbX27uv5hFKY0jRA
-         D3a8/mbd8LVGiiw4FZMTdkAQT3glHgMzIE/UFeJJWeeY6mQlsNB4QLOIbgiF3a/fln
-         iFwPpXzGwiOVV1B1F1QVeAq+sJxwPR7CSTpEAj4U=
-Received: from epsmges5p3new.samsung.com (unknown [182.195.42.75]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20190422133334epcas5p213f3bd9d0a6e87699340c0194eb398c0~XzzMPww3C0991409914epcas5p2s;
-        Mon, 22 Apr 2019 13:33:34 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        54.A6.04067.EA2CDBC5; Mon, 22 Apr 2019 22:33:34 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20190422133333epcas5p2aadec7a5e0134b70292317801e6473cb~XzzLeS1Ee0205302053epcas5p25;
-        Mon, 22 Apr 2019 13:33:33 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20190422133333epsmtrp1c14056d80db481a53ec843fa708cebba~XzzLdqcp_1100311003epsmtrp1_;
-        Mon, 22 Apr 2019 13:33:33 +0000 (GMT)
-X-AuditID: b6c32a4b-78bff70000000fe3-e8-5cbdc2ae806b
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        59.33.03692.DA2CDBC5; Mon, 22 Apr 2019 22:33:33 +0900 (KST)
-Received: from JOSHIK01 (unknown [107.111.93.135]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20190422133332epsmtip25b7698b956f516489d129fa863c670ca~XzzKK-S4G1746417464epsmtip2c;
-        Mon, 22 Apr 2019 13:33:32 +0000 (GMT)
-From:   "kanchan" <joshi.k@samsung.com>
-To:     "'Andreas Dilger'" <adilger@dilger.ca>, "'Jan Kara'" <jack@suse.cz>
-Cc:     "'open list'" <linux-kernel@vger.kernel.org>,
-        "'linux-block'" <linux-block@vger.kernel.org>,
-        <linux-nvme@lists.infradead.org>,
-        "'linux-fsdevel'" <linux-fsdevel@vger.kernel.org>,
-        <linux-ext4@vger.kernel.org>, <prakash.v@samsung.com>
-In-Reply-To: <9BD0C782-5967-4DCB-9D01-E5BCC73E653C@dilger.ca>
-Subject: RE: [PATCH v4 4/7] block: introduce write-hint to stream-id
- conversion
-Date:   Mon, 22 Apr 2019 19:03:23 +0530
-Message-ID: <009b01d4f90f$fb2a3520$f17e9f60$@samsung.com>
+        Mon, 22 Apr 2019 09:28:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=nzpPKCCjilOFo0BC461Lp0J2JC52ZZui4A5atHysJcA=; b=GTPeopaFe+sbdxr1raFPXyiiFs
+        49ewk9X6yld0ycgkT2ljA6m0Gmf63GnTdechW72JjFuI2wWbUS+BxUOPqw/rW0OO4kWaTFkoO5RNQ
+        S4LcxUkIPCaoSJMfUT1Qm2pUpAVtPWlcGZI4e+37rEKyQ22yjjY1R5EWUWOEM7Ivoj1rybCgJu6rK
+        0zV6gRr6l93ZiS9Sd1YpH5JXrRoVOyXMcvGkcq91bzSr7NMZLEMq46yrDTWD0pW8pwoaluSLMI0B4
+        2yGsyzfoPXH2AKbLOAKrbTdzXJQiqsL1is0bSlPMe24nBJJPxqMY8hcb9uAPSdXlmFwbH0Y80rywp
+        Vyj31Q5g==;
+Received: from 179.176.125.229.dynamic.adsl.gvt.net.br ([179.176.125.229] helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hIYzU-0005HY-Lp; Mon, 22 Apr 2019 13:28:13 +0000
+Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
+        (envelope-from <mchehab@bombadil.infradead.org>)
+        id 1hIYzS-0005jt-E9; Mon, 22 Apr 2019 10:28:10 -0300
+From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Jens Axboe <axboe@kernel.dk>, Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH v2 07/79] docs: cdrom: convert docs to ReST and rename to *.rst
+Date:   Mon, 22 Apr 2019 10:26:56 -0300
+Message-Id: <0854a3c10b65376044b4d803bd325f3a99ffc469.1555938375.git.mchehab+samsung@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <cover.1555938375.git.mchehab+samsung@kernel.org>
+References: <cover.1555938375.git.mchehab+samsung@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQK8/LoE/AuxJQqBdxKlIaVgudw56QGc9em7AVEQUzUCVhRCvgLBb+oYpDf4POA=
-Content-Language: en-us
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrAKsWRmVeSWpSXmKPExsWy7bCmlu66Q3tjDD5dk7ZYdvIRk8Xs6c1M
-        FntvaVvMnHeHzWLP3pMsFpd3zWGzmL/sKbvFlSmLmB04PFo2l3tsXlLv0bdlFaPHmQVH2D0+
-        b5ILYI3isklJzcksSy3St0vgylh/9zhjwWaZilUvJzE2MF4T62Lk5JAQMJE42bOLpYuRi0NI
-        YDejxN3lTewQzidGicNHVjBDON8YJRa8ecYI0zJ57TqoxF5GidXnPrFCOM8ZJTpOTmAGqWIT
-        UJW496OXDcQWEXCXWP74MhNIEbPAR0aJeW0LgRIcHJwCthLft5iB1AgLBEo0H30D1ssC1Pu4
-        ZQXYNl4BS4krd46zQtiCEidnPmEBsZkF5CW2v53DDHGRgsTuT0dZIXb5Sdx+f5ARokZc4uXR
-        I2D/SAi8Z5OYfnEG1AsuEv1P3zBB2MISr45vYYewpSRe9rdB2cUSv+4cZYZo7mCUuN4wkwUi
-        YS9xcc9fJpAHmAU0Jdbv0odYxifR+/sJWFhCgFeio00IolpR4t6kp6wQtrjEwxlLoGwPieP3
-        jrJPYFScheS1WUhem4XkhVkIyxYwsqxilEwtKM5NTy02LTDOSy3XK07MLS7NS9dLzs/dxAhO
-        R1reOxg3nfM5xCjAwajEw/th1Z4YIdbEsuLK3EOMEhzMSiK8v9KAQrwpiZVVqUX58UWlOanF
-        hxilOViUxHnnys6NFhJITyxJzU5NLUgtgskycXBKNTBmqN9YFFNT0tDeFSz0NGrRlnU5i1eu
-        uaMceftyu+LVJP7Wn1pxP64xfn+f8VRa+cqnXsUNDoXb/LZ7bz5pEtAQtql5W3WZCO9aL9XX
-        ik0Ryn/5JiRM6ihcIRzcr/ibSfLD4o3tUUv3z5f86JH6i3dvqZvgJ8H2WOs/GZ8eLVBXlp6T
-        aJ6k8VCJpTgj0VCLuag4EQAH2FquQwMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprIIsWRmVeSWpSXmKPExsWy7bCSvO7aQ3tjDGY+UrBYdvIRk8Xs6c1M
-        FntvaVvMnHeHzWLP3pMsFpd3zWGzmL/sKbvFlSmLmB04PFo2l3tsXlLv0bdlFaPHmQVH2D0+
-        b5ILYI3isklJzcksSy3St0vgylh/9zhjwWaZilUvJzE2MF4T62Lk5JAQMJGYvHYdcxcjF4eQ
-        wG5GiQ9v7zBDJMQlmq/9YIewhSVW/nvODlH0lFFizuefjCAJNgFViXs/etlAbBEBT4lNU6aD
-        FTELfGWUmH7vAAtExxImiS2HdwJVcXBwCthKfN9iBtIgLOAv0XDlNhOIzQI06HHLCrChvAKW
-        ElfuHGeFsAUlTs58wgLSyiygJ9G2EayEWUBeYvvbOVCHKkjs/nSUFeIGP4nb7w9C1YhLvDx6
-        hH0Co/AsJJNmIUyahWTSLCQdCxhZVjFKphYU56bnFhsWGOallusVJ+YWl+al6yXn525iBEeU
-        luYOxstL4g8xCnAwKvHwfli1J0aINbGsuDL3EKMEB7OSCO+vNKAQb0piZVVqUX58UWlOavEh
-        RmkOFiVx3qd5xyKFBNITS1KzU1MLUotgskwcnFINjBZrM/VvsVjuv/XU6+zbX7OXb5173M2v
-        7NNnux+PrbN/Gr/447jc7KbxCSknRzsRyezWn2duFsQxJnFw3Tm76OINlqSF4W/5ig3VrDoL
-        2Bh7v8iV18/TkdZgmMd8h3V15EXz39Uzyl5rTf59+5Sk2XL/215CGz29BKrOxQqblH6beeam
-        a3LuUSWW4oxEQy3mouJEAKdo9gukAgAA
-X-CMS-MailID: 20190422133333epcas5p2aadec7a5e0134b70292317801e6473cb
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-X-CMS-RootMailID: 20190417175358epcas1p41a0a4e349dfe0a70bdcc244161c71604
-References: <1555523406-2380-1-git-send-email-joshi.k@samsung.com>
-        <CGME20190417175358epcas1p41a0a4e349dfe0a70bdcc244161c71604@epcas1p4.samsung.com>
-        <1555523406-2380-5-git-send-email-joshi.k@samsung.com>
-        <20190418140603.GL28541@quack2.suse.cz>
-        <9BD0C782-5967-4DCB-9D01-E5BCC73E653C@dilger.ca>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> Someone told me that stream ids are potentially persistent on the 
-> storage so it isn't great to change the id for the same thing e.g. if 
-> we add another user hint. So maybe we should allocate kernel hints 
-> from top as Dave Chinner suggested? I.e., something like the following
-mapping function:
+The stuff there is almost already at ReST format. A
+conversion for them is trivial: just add a missing titles
+and fix some scape codes for them to match ReST syntax.
 
-This function is good. Thank you for sharing. 
+While here, rename the cdrom-standard.txt, with was converted
+from LaTeX to ReST on the previous patch, and add it to the
+index file.
 
------Original Message-----
-From: Andreas Dilger [mailto:adilger@dilger.ca] 
-Sent: Friday, April 19, 2019 12:28 AM
-To: Jan Kara <jack@suse.cz>
-Cc: Kanchan Joshi <joshi.k@samsung.com>; open list
-<linux-kernel@vger.kernel.org>; linux-block <linux-block@vger.kernel.org>;
-linux-nvme@lists.infradead.org; linux-fsdevel
-<linux-fsdevel@vger.kernel.org>; linux-ext4@vger.kernel.org;
-prakash.v@samsung.com
-Subject: Re: [PATCH v4 4/7] block: introduce write-hint to stream-id
-conversion
+At its new index.rst, let's add a :orphan: while this is not linked to
+the main index.rst file, in order to avoid build warnings.
 
-On Apr 18, 2019, at 8:06 AM, Jan Kara <jack@suse.cz> wrote:
-> 
-> On Wed 17-04-19 23:20:03, Kanchan Joshi wrote:
->> This patch moves write-hint-to-stream-id conversion in block-layer.
->> Earlier this was done by driver (nvme). Current conversion is of the 
->> form "streamid = write-hint - 1", for both user and kernel streams.
->> Conversion takes stream limit (maintained in request queue) into 
->> account. Write-hints beyond the exposed limit turn to 0.
->> A new field 'streamid' has been added in request. While 'write-hint'
->> field continues to exist. It keeps original value passed from upper 
->> layer, and used during merging checks.
->> 
->> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
->> ---
->> block/blk-core.c       | 20 ++++++++++++++++++++
->> include/linux/blkdev.h |  1 +
->> 2 files changed, 21 insertions(+)
->> 
->> diff --git a/block/blk-core.c b/block/blk-core.c index 
->> a55389b..712e6b7 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -730,6 +730,25 @@ bool blk_attempt_plug_merge(struct request_queue *q,
-struct bio *bio,
->> 	return false;
->> }
->> 
->> +enum rw_hint blk_write_hint_to_streamid(struct request *req,
->> +				        struct bio *bio)
->> +{
->> +	enum rw_hint streamid, nr_streams;
->> +	struct request_queue *q = req->q;
->> +	nr_streams = q->limits.nr_streams;
->> +
->> +	streamid = bio->bi_write_hint;
->> +	if (!nr_streams || streamid == WRITE_LIFE_NOT_SET ||
->> +	    streamid == WRITE_LIFE_NONE)
->> +		streamid = 0;
->> +	else {
->> +		--streamid;
->> +		if(streamid > nr_streams)
->> +			streamid = 0;
->> +	}
->> +	return streamid;
->> +}
->> +
-> 
-> Someone told me that stream ids are potentially persistent on the 
-> storage so it isn't great to change the id for the same thing e.g. if 
-> we add another user hint. So maybe we should allocate kernel hints 
-> from top as Dave Chinner suggested? I.e., something like the following
-mapping function:
-> 
-> 	if (streamid <= BLK_MAX_USER_HINTS) {
-> 		streamid--;
-> 		if (streamid > nr_streams)
-> 			streamid = 0;
-> 	} else {
-> 		/* Kernel hints get allocated from top */
-> 		streamid -= WRITE_LIFE_KERN_MIN;
-> 		if (streamid > nr_streams - BLK_MAX_USER_HINTS)
-> 			streamid = 0;
-> 		else
-> 			streamid = nr_streams - streamid - 1;
-> 	}
-> 
-> what do you think?
+Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+---
+ ...{cdrom-standard.txt => cdrom-standard.rst} |   0
+ Documentation/cdrom/{ide-cd => ide-cd.rst}    | 178 +++++++++---------
+ Documentation/cdrom/index.rst                 |  19 ++
+ ...{packet-writing.txt => packet-writing.rst} |  27 ++-
+ MAINTAINERS                                   |   2 +-
+ drivers/block/Kconfig                         |   2 +-
+ drivers/cdrom/cdrom.c                         |   2 +-
+ drivers/ide/ide-cd.c                          |   2 +-
+ 8 files changed, 131 insertions(+), 101 deletions(-)
+ rename Documentation/cdrom/{cdrom-standard.txt => cdrom-standard.rst} (100%)
+ rename Documentation/cdrom/{ide-cd => ide-cd.rst} (84%)
+ create mode 100644 Documentation/cdrom/index.rst
+ rename Documentation/cdrom/{packet-writing.txt => packet-writing.rst} (91%)
 
-Dave has expressed this sentiment several times, and I agree.  We don't want
-the filesystem hint values/mapping to change over time, or it will conflict
-with data that was written with the previous hints (e.g. if data was written
-with a "short lifetime" hint suddenly changes to be grouped with a "long
-lifetime" hint).  This is easily avoided with some simple changes now, but
-harder to fix after this patch has landed.
-
-Cheers, Andreas
-
-
-
-
-
+diff --git a/Documentation/cdrom/cdrom-standard.txt b/Documentation/cdrom/cdrom-standard.rst
+similarity index 100%
+rename from Documentation/cdrom/cdrom-standard.txt
+rename to Documentation/cdrom/cdrom-standard.rst
+diff --git a/Documentation/cdrom/ide-cd b/Documentation/cdrom/ide-cd.rst
+similarity index 84%
+rename from Documentation/cdrom/ide-cd
+rename to Documentation/cdrom/ide-cd.rst
+index a5f2a7f1ff46..dadc94ef6b6c 100644
+--- a/Documentation/cdrom/ide-cd
++++ b/Documentation/cdrom/ide-cd.rst
+@@ -1,18 +1,20 @@
+ IDE-CD driver documentation
+-Originally by scott snyder  <snyder@fnald0.fnal.gov> (19 May 1996)
+-Carrying on the torch is: Erik Andersen <andersee@debian.org>
+-New maintainers (19 Oct 1998): Jens Axboe <axboe@image.dk>
++===========================
++
++:Originally by: scott snyder  <snyder@fnald0.fnal.gov> (19 May 1996)
++:Carrying on the torch is: Erik Andersen <andersee@debian.org>
++:New maintainers (19 Oct 1998): Jens Axboe <axboe@image.dk>
+ 
+ 1. Introduction
+ ---------------
+ 
+-The ide-cd driver should work with all ATAPI ver 1.2 to ATAPI 2.6 compliant 
++The ide-cd driver should work with all ATAPI ver 1.2 to ATAPI 2.6 compliant
+ CDROM drives which attach to an IDE interface.  Note that some CDROM vendors
+ (including Mitsumi, Sony, Creative, Aztech, and Goldstar) have made
+ both ATAPI-compliant drives and drives which use a proprietary
+ interface.  If your drive uses one of those proprietary interfaces,
+ this driver will not work with it (but one of the other CDROM drivers
+-probably will).  This driver will not work with `ATAPI' drives which
++probably will).  This driver will not work with `ATAPI` drives which
+ attach to the parallel port.  In addition, there is at least one drive
+ (CyCDROM CR520ie) which attaches to the IDE port but is not ATAPI;
+ this driver will not work with drives like that either (but see the
+@@ -31,7 +33,7 @@ This driver provides the following features:
+    from audio tracks.  The program cdda2wav can be used for this.
+    Note, however, that only some drives actually support this.
+ 
+- - There is now support for CDROM changers which comply with the 
++ - There is now support for CDROM changers which comply with the
+    ATAPI 2.6 draft standard (such as the NEC CDR-251).  This additional
+    functionality includes a function call to query which slot is the
+    currently selected slot, a function call to query which slots contain
+@@ -49,11 +51,11 @@ This driver provides the following features:
+    driver.
+ 
+ 1. Make sure that the ide and ide-cd drivers are compiled into the
+-   kernel you're using.  When configuring the kernel, in the section 
+-   entitled "Floppy, IDE, and other block devices", say either `Y' 
+-   (which will compile the support directly into the kernel) or `M'
++   kernel you're using.  When configuring the kernel, in the section
++   entitled "Floppy, IDE, and other block devices", say either `Y`
++   (which will compile the support directly into the kernel) or `M`
+    (to compile support as a module which can be loaded and unloaded)
+-   to the options: 
++   to the options::
+ 
+       ATA/ATAPI/MFM/RLL support
+       Include IDE/ATAPI CDROM support
+@@ -72,35 +74,35 @@ This driver provides the following features:
+    address and an IRQ number, the standard assignments being
+    0x1f0 and 14 for the primary interface and 0x170 and 15 for the
+    secondary interface.  Each interface can control up to two devices,
+-   where each device can be a hard drive, a CDROM drive, a floppy drive, 
+-   or a tape drive.  The two devices on an interface are called `master'
+-   and `slave'; this is usually selectable via a jumper on the drive.
++   where each device can be a hard drive, a CDROM drive, a floppy drive,
++   or a tape drive.  The two devices on an interface are called `master`
++   and `slave`; this is usually selectable via a jumper on the drive.
+ 
+    Linux names these devices as follows.  The master and slave devices
+-   on the primary IDE interface are called `hda' and `hdb',
++   on the primary IDE interface are called `hda` and `hdb`,
+    respectively.  The drives on the secondary interface are called
+-   `hdc' and `hdd'.  (Interfaces at other locations get other letters
++   `hdc` and `hdd`.  (Interfaces at other locations get other letters
+    in the third position; see Documentation/ide/ide.txt.)
+ 
+    If you want your CDROM drive to be found automatically by the
+    driver, you should make sure your IDE interface uses either the
+    primary or secondary addresses mentioned above.  In addition, if
+    the CDROM drive is the only device on the IDE interface, it should
+-   be jumpered as `master'.  (If for some reason you cannot configure
++   be jumpered as `master`.  (If for some reason you cannot configure
+    your system in this manner, you can probably still use the driver.
+    You may have to pass extra configuration information to the kernel
+    when you boot, however.  See Documentation/ide/ide.txt for more
+    information.)
+ 
+ 4. Boot the system.  If the drive is recognized, you should see a
+-   message which looks like
++   message which looks like::
+ 
+      hdb: NEC CD-ROM DRIVE:260, ATAPI CDROM drive
+ 
+    If you do not see this, see section 5 below.
+ 
+ 5. You may want to create a symbolic link /dev/cdrom pointing to the
+-   actual device.  You can do this with the command
++   actual device.  You can do this with the command::
+ 
+      ln -s  /dev/hdX  /dev/cdrom
+ 
+@@ -108,14 +110,14 @@ This driver provides the following features:
+    drive is installed.
+ 
+ 6. You should be able to see any error messages from the driver with
+-   the `dmesg' command.
++   the `dmesg` command.
+ 
+ 
+ 3. Basic usage
+ --------------
+ 
+-An ISO 9660 CDROM can be mounted by putting the disc in the drive and 
+-typing (as root)
++An ISO 9660 CDROM can be mounted by putting the disc in the drive and
++typing (as root)::
+ 
+   mount -t iso9660 /dev/cdrom /mnt/cdrom
+ 
+@@ -123,7 +125,7 @@ where it is assumed that /dev/cdrom is a link pointing to the actual
+ device (as described in step 5 of the last section) and /mnt/cdrom is
+ an empty directory.  You should now be able to see the contents of the
+ CDROM under the /mnt/cdrom directory.  If you want to eject the CDROM,
+-you must first dismount it with a command like
++you must first dismount it with a command like::
+ 
+   umount /mnt/cdrom
+ 
+@@ -148,7 +150,7 @@ such as cdda2wav.  The only types of drive which I've heard support
+ this are Sony and Toshiba drives.  You will get errors if you try to
+ use this function on a drive which does not support it.
+ 
+-For supported changers, you can use the `cdchange' program (appended to
++For supported changers, you can use the `cdchange` program (appended to
+ the end of this file) to switch between changer slots.  Note that the
+ drive should be unmounted before attempting this.  The program takes
+ two arguments:  the CDROM device, and the slot number to which you wish
+@@ -165,7 +167,7 @@ Documentation/ide/ide.txt for current information about the underlying
+ IDE support code.  Some of these items apply only to earlier versions
+ of the driver, but are mentioned here for completeness.
+ 
+-In most cases, you should probably check with `dmesg' for any errors
++In most cases, you should probably check with `dmesg` for any errors
+ from the driver.
+ 
+ a. Drive is not detected during booting.
+@@ -184,9 +186,9 @@ a. Drive is not detected during booting.
+ 
+    - If the autoprobing is not finding your drive, you can tell the
+      driver to assume that one exists by using a lilo option of the
+-     form `hdX=cdrom', where X is the drive letter corresponding to
+-     where your drive is installed.  Note that if you do this and you 
+-     see a boot message like
++     form `hdX=cdrom`, where X is the drive letter corresponding to
++     where your drive is installed.  Note that if you do this and you
++     see a boot message like::
+ 
+        hdX: ATAPI cdrom (?)
+ 
+@@ -220,7 +222,7 @@ b. Timeout/IRQ errors.
+     probably not making it to the host.
+ 
+   - IRQ problems may also be indicated by the message
+-    `IRQ probe failed (<n>)' while booting.  If <n> is zero, that
++    `IRQ probe failed (<n>)` while booting.  If <n> is zero, that
+     means that the system did not see an interrupt from the drive when
+     it was expecting one (on any feasible IRQ).  If <n> is negative,
+     that means the system saw interrupts on multiple IRQ lines, when
+@@ -240,27 +242,27 @@ b. Timeout/IRQ errors.
+     there are hardware problems with the interrupt setup; they
+     apparently don't use interrupts.
+ 
+-  - If you own a Pioneer DR-A24X, you _will_ get nasty error messages 
++  - If you own a Pioneer DR-A24X, you _will_ get nasty error messages
+     on boot such as "irq timeout: status=0x50 { DriveReady SeekComplete }"
+     The Pioneer DR-A24X CDROM drives are fairly popular these days.
+     Unfortunately, these drives seem to become very confused when we perform
+     the standard Linux ATA disk drive probe. If you own one of these drives,
+-    you can bypass the ATA probing which confuses these CDROM drives, by 
+-    adding `append="hdX=noprobe hdX=cdrom"' to your lilo.conf file and running 
+-    lilo (again where X is the drive letter corresponding to where your drive 
++    you can bypass the ATA probing which confuses these CDROM drives, by
++    adding `append="hdX=noprobe hdX=cdrom"` to your lilo.conf file and running
++    lilo (again where X is the drive letter corresponding to where your drive
+     is installed.)
+-    
++
+ c. System hangups.
+ 
+   - If the system locks up when you try to access the CDROM, the most
+     likely cause is that you have a buggy IDE adapter which doesn't
+     properly handle simultaneous transactions on multiple interfaces.
+     The most notorious of these is the CMD640B chip.  This problem can
+-    be worked around by specifying the `serialize' option when
++    be worked around by specifying the `serialize` option when
+     booting.  Recent kernels should be able to detect the need for
+     this automatically in most cases, but the detection is not
+     foolproof.  See Documentation/ide/ide.txt for more information
+-    about the `serialize' option and the CMD640B.
++    about the `serialize` option and the CMD640B.
+ 
+   - Note that many MS-DOS CDROM drivers will work with such buggy
+     hardware, apparently because they never attempt to overlap CDROM
+@@ -269,14 +271,14 @@ c. System hangups.
+ 
+ d. Can't mount a CDROM.
+ 
+-  - If you get errors from mount, it may help to check `dmesg' to see
++  - If you get errors from mount, it may help to check `dmesg` to see
+     if there are any more specific errors from the driver or from the
+     filesystem.
+ 
+   - Make sure there's a CDROM loaded in the drive, and that's it's an
+     ISO 9660 disc.  You can't mount an audio CD.
+ 
+-  - With the CDROM in the drive and unmounted, try something like
++  - With the CDROM in the drive and unmounted, try something like::
+ 
+       cat /dev/cdrom | od | more
+ 
+@@ -284,9 +286,9 @@ d. Can't mount a CDROM.
+     OK, and the problem is at the filesystem level (i.e., the CDROM is
+     not ISO 9660 or has errors in the filesystem structure).
+ 
+-  - If you see `not a block device' errors, check that the definitions
++  - If you see `not a block device` errors, check that the definitions
+     of the device special files are correct.  They should be as
+-    follows:
++    follows::
+ 
+       brw-rw----   1 root     disk       3,   0 Nov 11 18:48 /dev/hda
+       brw-rw----   1 root     disk       3,  64 Nov 11 18:48 /dev/hdb
+@@ -301,7 +303,7 @@ d. Can't mount a CDROM.
+     If you have a /dev/cdrom symbolic link, check that it is pointing
+     to the correct device file.
+ 
+-    If you hear people talking of the devices `hd1a' and `hd1b', these
++    If you hear people talking of the devices `hd1a` and `hd1b`, these
+     were old names for what are now called hdc and hdd.  Those names
+     should be considered obsolete.
+ 
+@@ -311,8 +313,8 @@ d. Can't mount a CDROM.
+     always give meaningful error messages.
+ 
+ 
+-e. Directory listings are unpredictably truncated, and `dmesg' shows
+-   `buffer botch' error messages from the driver.
++e. Directory listings are unpredictably truncated, and `dmesg` shows
++   `buffer botch` error messages from the driver.
+ 
+   - There was a bug in the version of the driver in 1.2.x kernels
+     which could cause this.  It was fixed in 1.3.0.  If you can't
+@@ -335,34 +337,36 @@ f. Data corruption.
+ 5. cdchange.c
+ -------------
+ 
+-/*
+- * cdchange.c  [-v]  <device>  [<slot>]
+- *
+- * This loads a CDROM from a specified slot in a changer, and displays 
+- * information about the changer status.  The drive should be unmounted before 
+- * using this program.
+- *
+- * Changer information is displayed if either the -v flag is specified
+- * or no slot was specified.
+- *
+- * Based on code originally from Gerhard Zuber <zuber@berlin.snafu.de>.
+- * Changer status information, and rewrite for the new Uniform CDROM driver
+- * interface by Erik Andersen <andersee@debian.org>.
+- */
++::
+ 
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <errno.h>
+-#include <string.h>
+-#include <unistd.h>
+-#include <fcntl.h>
+-#include <sys/ioctl.h>
+-#include <linux/cdrom.h>
++  /*
++   * cdchange.c  [-v]  <device>  [<slot>]
++   *
++   * This loads a CDROM from a specified slot in a changer, and displays
++   * information about the changer status.  The drive should be unmounted before
++   * using this program.
++   *
++   * Changer information is displayed if either the -v flag is specified
++   * or no slot was specified.
++   *
++   * Based on code originally from Gerhard Zuber <zuber@berlin.snafu.de>.
++   * Changer status information, and rewrite for the new Uniform CDROM driver
++   * interface by Erik Andersen <andersee@debian.org>.
++   */
+ 
++  #include <stdio.h>
++  #include <stdlib.h>
++  #include <errno.h>
++  #include <string.h>
++  #include <unistd.h>
++  #include <fcntl.h>
++  #include <sys/ioctl.h>
++  #include <linux/cdrom.h>
+ 
+-int
+-main (int argc, char **argv)
+-{
++
++  int
++  main (int argc, char **argv)
++  {
+ 	char *program;
+ 	char *device;
+ 	int fd;           /* file descriptor for CD-ROM device */
+@@ -382,30 +386,30 @@ main (int argc, char **argv)
+ 		fprintf (stderr, "       Slots are numbered 1 -- n.\n");
+ 		exit (1);
+ 	}
+- 
++
+        if (strcmp (argv[0], "-v") == 0) {
+                 verbose = 1;
+                 ++argv;
+                 --argc;
+         }
+- 
++
+ 	device = argv[0];
+- 
++
+ 	if (argc == 2)
+ 		slot = atoi (argv[1]) - 1;
+ 
+-	/* open device */ 
++	/* open device */
+ 	fd = open(device, O_RDONLY | O_NONBLOCK);
+ 	if (fd < 0) {
+-		fprintf (stderr, "%s: open failed for `%s': %s\n",
++		fprintf (stderr, "%s: open failed for `%s`: %s\n",
+ 			 program, device, strerror (errno));
+ 		exit (1);
+ 	}
+ 
+-	/* Check CD player status */ 
++	/* Check CD player status */
+ 	total_slots_available = ioctl (fd, CDROM_CHANGER_NSLOTS);
+ 	if (total_slots_available <= 1 ) {
+-		fprintf (stderr, "%s: Device `%s' is not an ATAPI "
++		fprintf (stderr, "%s: Device `%s` is not an ATAPI "
+ 			"compliant CD changer.\n", program, device);
+ 		exit (1);
+ 	}
+@@ -418,7 +422,7 @@ main (int argc, char **argv)
+ 			exit (1);
+ 		}
+ 
+-		/* load */ 
++		/* load */
+ 		slot=ioctl (fd, CDROM_SELECT_DISC, slot);
+ 		if (slot<0) {
+ 			fflush(stdout);
+@@ -462,14 +466,14 @@ main (int argc, char **argv)
+ 
+ 		for (x_slot=0; x_slot<total_slots_available; x_slot++) {
+ 			printf ("Slot %2d: ", x_slot+1);
+-             		status = ioctl (fd, CDROM_DRIVE_STATUS, x_slot);
+-             		if (status<0) {
+-             		     perror(" CDROM_DRIVE_STATUS");
+-             		} else switch(status) {
++			status = ioctl (fd, CDROM_DRIVE_STATUS, x_slot);
++			if (status<0) {
++			     perror(" CDROM_DRIVE_STATUS");
++			} else switch(status) {
+ 			case CDS_DISC_OK:
+ 				printf ("Disc present.");
+ 				break;
+-			case CDS_NO_DISC: 
++			case CDS_NO_DISC:
+ 				printf ("Empty slot.");
+ 				break;
+ 			case CDS_TRAY_OPEN:
+@@ -507,11 +511,11 @@ main (int argc, char **argv)
+ 				break;
+ 			}
+ 			}
+-                  	status = ioctl (fd, CDROM_MEDIA_CHANGED, x_slot);
+-                  	if (status<0) {
++			status = ioctl (fd, CDROM_MEDIA_CHANGED, x_slot);
++			if (status<0) {
+ 				perror(" CDROM_MEDIA_CHANGED");
+-                  	}
+-		  	switch (status) {
++			}
++			switch (status) {
+ 			case 1:
+ 				printf ("Changed.\n");
+ 				break;
+@@ -525,10 +529,10 @@ main (int argc, char **argv)
+ 	/* close device */
+ 	status = close (fd);
+ 	if (status != 0) {
+-		fprintf (stderr, "%s: close failed for `%s': %s\n",
++		fprintf (stderr, "%s: close failed for `%s`: %s\n",
+ 			 program, device, strerror (errno));
+ 		exit (1);
+ 	}
+- 
++
+ 	exit (0);
+-}
++  }
+diff --git a/Documentation/cdrom/index.rst b/Documentation/cdrom/index.rst
+new file mode 100644
+index 000000000000..efbd5d111825
+--- /dev/null
++++ b/Documentation/cdrom/index.rst
+@@ -0,0 +1,19 @@
++:orphan:
++
++=====
++cdrom
++=====
++
++.. toctree::
++    :maxdepth: 1
++
++    cdrom-standard
++    ide-cd
++    packet-writing
++
++.. only::  subproject and html
++
++   Indices
++   =======
++
++   * :ref:`genindex`
+diff --git a/Documentation/cdrom/packet-writing.txt b/Documentation/cdrom/packet-writing.rst
+similarity index 91%
+rename from Documentation/cdrom/packet-writing.txt
+rename to Documentation/cdrom/packet-writing.rst
+index 2834170d821e..c5c957195a5a 100644
+--- a/Documentation/cdrom/packet-writing.txt
++++ b/Documentation/cdrom/packet-writing.rst
+@@ -1,3 +1,7 @@
++==============
++Packet writing
++==============
++
+ Getting started quick
+ ---------------------
+ 
+@@ -10,13 +14,16 @@ Getting started quick
+   Download from http://sourceforge.net/projects/linux-udf/
+ 
+ - Grab a new CD-RW disc and format it (assuming CD-RW is hdc, substitute
+-  as appropriate):
++  as appropriate)::
++
+ 	# cdrwtool -d /dev/hdc -q
+ 
+-- Setup your writer
++- Setup your writer::
++
+ 	# pktsetup dev_name /dev/hdc
+ 
+-- Now you can mount /dev/pktcdvd/dev_name and copy files to it. Enjoy!
++- Now you can mount /dev/pktcdvd/dev_name and copy files to it. Enjoy::
++
+ 	# mount /dev/pktcdvd/dev_name /cdrom -t udf -o rw,noatime
+ 
+ 
+@@ -25,11 +32,11 @@ Packet writing for DVD-RW media
+ 
+ DVD-RW discs can be written to much like CD-RW discs if they are in
+ the so called "restricted overwrite" mode. To put a disc in restricted
+-overwrite mode, run:
++overwrite mode, run::
+ 
+ 	# dvd+rw-format /dev/hdc
+ 
+-You can then use the disc the same way you would use a CD-RW disc:
++You can then use the disc the same way you would use a CD-RW disc::
+ 
+ 	# pktsetup dev_name /dev/hdc
+ 	# mount /dev/pktcdvd/dev_name /cdrom -t udf -o rw,noatime
+@@ -41,7 +48,7 @@ Packet writing for DVD+RW media
+ According to the DVD+RW specification, a drive supporting DVD+RW discs
+ shall implement "true random writes with 2KB granularity", which means
+ that it should be possible to put any filesystem with a block size >=
+-2KB on such a disc. For example, it should be possible to do:
++2KB on such a disc. For example, it should be possible to do::
+ 
+ 	# dvd+rw-format /dev/hdc   (only needed if the disc has never
+ 	                            been formatted)
+@@ -54,7 +61,7 @@ follow the specification, but suffer bad performance problems if the
+ writes are not 32KB aligned.
+ 
+ Both problems can be solved by using the pktcdvd driver, which always
+-generates aligned writes.
++generates aligned writes::
+ 
+ 	# dvd+rw-format /dev/hdc
+ 	# pktsetup dev_name /dev/hdc
+@@ -83,7 +90,7 @@ Notes
+ 
+ - Since the pktcdvd driver makes the disc appear as a regular block
+   device with a 2KB block size, you can put any filesystem you like on
+-  the disc. For example, run:
++  the disc. For example, run::
+ 
+ 	# /sbin/mke2fs /dev/pktcdvd/dev_name
+ 
+@@ -97,7 +104,7 @@ Since Linux 2.6.20, the pktcdvd module has a sysfs interface
+ and can be controlled by it. For example the "pktcdvd" tool uses
+ this interface. (see http://tom.ist-im-web.de/download/pktcdvd )
+ 
+-"pktcdvd" works similar to "pktsetup", e.g.:
++"pktcdvd" works similar to "pktsetup", e.g.::
+ 
+ 	# pktcdvd -a dev_name /dev/hdc
+ 	# mkudffs /dev/pktcdvd/dev_name
+@@ -115,7 +122,7 @@ For a description of the sysfs interface look into the file:
+ Using the pktcdvd debugfs interface
+ -----------------------------------
+ 
+-To read pktcdvd device infos in human readable form, do:
++To read pktcdvd device infos in human readable form, do::
+ 
+ 	# cat /sys/kernel/debug/pktcdvd/pktcdvd[0-7]/info
+ 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 285c2eee36d1..c8eebc8da565 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -7545,7 +7545,7 @@ IDE/ATAPI DRIVERS
+ M:	Borislav Petkov <bp@alien8.de>
+ L:	linux-ide@vger.kernel.org
+ S:	Maintained
+-F:	Documentation/cdrom/ide-cd
++F:	Documentation/cdrom/ide-cd.rst
+ F:	drivers/ide/ide-cd*
+ 
+ IDEAPAD LAPTOP EXTRAS DRIVER
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 20bb4bfa4be6..96ec7e0fc1ea 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -347,7 +347,7 @@ config CDROM_PKTCDVD
+ 	  is possible.
+ 	  DVD-RW disks must be in restricted overwrite mode.
+ 
+-	  See the file <file:Documentation/cdrom/packet-writing.txt>
++	  See the file <file:Documentation/cdrom/packet-writing.rst>
+ 	  for further information on the use of this driver.
+ 
+ 	  To compile this driver as a module, choose M here: the
+diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+index 5d1e0a4a7d84..ac42ae4651ce 100644
+--- a/drivers/cdrom/cdrom.c
++++ b/drivers/cdrom/cdrom.c
+@@ -7,7 +7,7 @@
+    License.  See linux/COPYING for more information.
+ 
+    Uniform CD-ROM driver for Linux.
+-   See Documentation/cdrom/cdrom-standard.txt for usage information.
++   See Documentation/cdrom/cdrom-standard.rst for usage information.
+ 
+    The routines in the file provide a uniform interface between the
+    software that uses CD-ROMs and the various low-level drivers that
+diff --git a/drivers/ide/ide-cd.c b/drivers/ide/ide-cd.c
+index 3b15adc6ce98..9d117936bee1 100644
+--- a/drivers/ide/ide-cd.c
++++ b/drivers/ide/ide-cd.c
+@@ -9,7 +9,7 @@
+  * May be copied or modified under the terms of the GNU General Public
+  * License.  See linux/COPYING for more information.
+  *
+- * See Documentation/cdrom/ide-cd for usage information.
++ * See Documentation/cdrom/ide-cd.rst for usage information.
+  *
+  * Suggestions are welcome. Patches that work are more welcome though. ;-)
+  *
+-- 
+2.20.1
 
