@@ -2,145 +2,95 @@ Return-Path: <SRS0=Rcoh=SY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C6EAC282E1
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:37:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D55C10F11
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:41:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA83F20685
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:37:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55C792064A
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:41:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="tbvMAjDk"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VoS3xNhu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727986AbfDVNhR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Apr 2019 09:37:17 -0400
-Received: from mailout1.samsung.com ([203.254.224.24]:59581 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728342AbfDVNhQ (ORCPT
+        id S1727177AbfDVNlq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Apr 2019 09:41:46 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:35177 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726801AbfDVNlq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Apr 2019 09:37:16 -0400
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20190422133713epoutp01a2d3d32062f77d8df99314891c42103e~Xz2YjCjPN1915019150epoutp01Y
-        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2019 13:37:13 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20190422133713epoutp01a2d3d32062f77d8df99314891c42103e~Xz2YjCjPN1915019150epoutp01Y
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1555940233;
-        bh=iQqPP7aCWriecL0kX4i4+1/X7zYRmvCB7M1O0zcQtrc=;
-        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-        b=tbvMAjDkAacoOLtW4B2uSz7FzIjC7kiYMqxL0tUyB0OGSnDktSwEX6ggiK5y6jnqc
-         BihxqDE1O1rsM+Ba3q/3f+MQYu9oeZriGXahAubhDBQp+TorF251kjOElGC15KwMh1
-         F+k9njpQPqtXD3IwdeiVCCP5om+x+epWWZyB/8zM=
-Received: from epsmges5p3new.samsung.com (unknown [182.195.42.75]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20190422133713epcas5p3c1a2f7936bfa9fab70a08604a5c2d093~Xz2YLnDBT1537215372epcas5p3G;
-        Mon, 22 Apr 2019 13:37:13 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A7.F6.04067.983CDBC5; Mon, 22 Apr 2019 22:37:13 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20190422133712epcas5p2c70652336c2410d17bf3133c2cfd201a~Xz2Xb3EFE1998619986epcas5p2f;
-        Mon, 22 Apr 2019 13:37:12 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20190422133712epsmtrp1a6dfab65aaac932f42611bdaf071483c~Xz2XbPqPk1100311003epsmtrp1Z;
-        Mon, 22 Apr 2019 13:37:12 +0000 (GMT)
-X-AuditID: b6c32a4b-7a3ff70000000fe3-53-5cbdc3890061
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        5C.43.03692.883CDBC5; Mon, 22 Apr 2019 22:37:12 +0900 (KST)
-Received: from JOSHIK01 (unknown [107.111.93.135]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20190422133711epsmtip1cb27adc831d3e21db31cfcf22b8135a5~Xz2WTNuq72063720637epsmtip1H;
-        Mon, 22 Apr 2019 13:37:11 +0000 (GMT)
-From:   "kanchan" <joshi.k@samsung.com>
-To:     "'Jens Axboe'" <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-ext4@vger.kernel.org>
-Cc:     <prakash.v@samsung.com>
-In-Reply-To: <6850a3ad-805f-4232-1bc7-f3249e1fba96@kernel.dk>
-Subject: RE: [PATCH v4 4/7] block: introduce write-hint to stream-id
- conversion
-Date:   Mon, 22 Apr 2019 19:06:49 +0530
-Message-ID: <009c01d4f910$7db6ec40$7924c4c0$@samsung.com>
+        Mon, 22 Apr 2019 09:41:46 -0400
+Received: by mail-io1-f67.google.com with SMTP id r18so8684809ioh.2
+        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2019 06:41:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=u3wViDHeG/89EKKZKpQYGfSxP6Rpc7NezXV58Gpag2I=;
+        b=VoS3xNhupmKe++zC0Ywd2E/SLtayfiV5JaZLzbJuhPkWZAqBPhOdpoUaZjf5ikK1vA
+         AQ1C24RDc9ON6KSCfQY7z+1MxuCKmLwlWXj3gYYkvqeozad7ctZBGlAygXzd27kisReZ
+         cCGq7N8J5Til4elE6JJ8HxILJo1M6vY+qcBnr4MLOMHtkMPLyfnInS0Aewd90cKI8Ey3
+         Om2TGCrh8RtvQtI70vAIl4f3WIH8jpJBfx05tvXKZXIrzORdiF15IH9iYAEHhWRaK8AY
+         0gXFIPsjiO8raXVzwBTZ1gKxRnBo7gRwD9x3NfriqlHL0db/llRgY+MBdyb/SYx500y1
+         r8Jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=u3wViDHeG/89EKKZKpQYGfSxP6Rpc7NezXV58Gpag2I=;
+        b=DT8tdSf7/kWCzj49OG5GVaeX3dxpuHk6VEMsokN2ij/FYKaChKRBz/ZkGxaN/N6Vx6
+         MVmj5AOZXaAooPbbQsLATzlf6u4ItnmNtMcRFSrAPLRbik34K8MxdCRCuSIBrkzpPRXw
+         z2YT9nZ28kqZLem3cLTieFQEquRjPHDj+zT+lSs2dpOk1nrN4ySaVYkEo2GdTD3XoZvh
+         afaRfq5LeNFchu8a9KLklXcXsq3nQ/bUgnF+PWLR+s/hqAfcxQZxeDv7yoAP3DVdcbg3
+         +8MqGrf3cQ/JhPriFF/Mp9NwJlEbhko5+r60eNyttoHawLHwJ2UyKfZQj0i/sW7uBvmW
+         fBdg==
+X-Gm-Message-State: APjAAAWtpggs73U0I6UilSVPpJJAjNY5OJqwfvfH7lwb27fc2FcTmc6B
+        FSabVApn+scyDSTWrKahzPv1pt76nLAF6XFNi8JY28OxqE4=
+X-Google-Smtp-Source: APXvYqzkcjSDfD2kj2NaOWWE/XH4GRlcsu1qKP9UA9ItsTxThbqvQCZa1IdMqr3pJCA58pFbZSOUi7YAIsT+Vv2vB4o=
+X-Received: by 2002:a5e:9b17:: with SMTP id j23mr13318367iok.60.1555940505285;
+ Mon, 22 Apr 2019 06:41:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQK8/LoE/AuxJQqBdxKlIaVgudw56QGc9em7AVEQUzUCUdAPjaROKAng
-Content-Language: en-us
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrGKsWRmVeSWpSXmKPExsWy7bCmpm7n4b0xBueWSVusvtvPZrH3lrbF
-        zHl32Cz27D3JYnF51xw2i/nLnrJbXJmyiNmB3ePy2VKPzUvqPfq2rGL0+LxJLoAlissmJTUn
-        syy1SN8ugSvjytyfLAW3uSs+XP7J1MD4gLOLkZNDQsBE4sHfKexdjFwcQgK7GSUW7F3ICOF8
-        YpRou3SQFcL5xijR/uYsM0zLtMnbWCASexklFn+YzQzhPGeUaPw1hRWkik1AVeLej142kISI
-        wAlGiRXtN9hBEswC0hITb+1lBLE5BWwl/p78DmYLCwRKNB99A7aCBah50vlOFhCbV8BSYsWe
-        d4wQtqDEyZlPWCDmaEssW/ga6iQFid2fjoItFhFwk5j6+z0bRI24xMujR8C+kxC4zSbR9f4J
-        UBEHkOMicaC1DqJXWOLV8S3sELaUxMv+Nii7WOLXnaPMEL0djBLXG2ayQCTsJS7u+csEModZ
-        QFNi/S59iF18Er2/nzBBjOeV6GgTgqhWlLg36SkrhC0u8XDGEijbQ+L4vaPsExgVZyH5bBaS
-        z2Yh+WAWwrIFjCyrGCVTC4pz01OLTQuM81LL9YoTc4tL89L1kvNzNzGCU4+W9w7GTed8DjEK
-        cDAq8fB+WLUnRog1say4MvcQowQHs5II7680oBBvSmJlVWpRfnxRaU5q8SFGaQ4WJXHeubJz
-        o4UE0hNLUrNTUwtSi2CyTBycUg2MReLxgtr2Rnu9l1hvOqrlOIH5fCjztJttdW2q3ve3RnK3
-        qk/8+vy83jzPH1IJ+v3/4zkZ9+3ZLH5c81h/w4IbrzRsl/RqJm+bpOOtaun9/fQuiUt72rbu
-        mWhfc6wzamX0gh8zrZxesBYWSXUcabFI1OMoUHoxI3jF/DDviudilbUuzHH/5nErsRRnJBpq
-        MRcVJwIArqIj3jkDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupgkeLIzCtJLcpLzFFi42LZdlhJTrfj8N4Yg2W9yhar7/azWey9pW0x
-        c94dNos9e0+yWFzeNYfNYv6yp+wWV6YsYnZg97h8ttRj85J6j74tqxg9Pm+SC2CJ4rJJSc3J
-        LEst0rdL4MrYfq2JsWA/d8XS9Q4NjEc4uxg5OSQETCSmTd7G0sXIxSEksJtRYsGD7SwQCXGJ
-        5ms/2CFsYYmV/56zQxQ9ZZQ4+wciwSagKnHvRy8bSEJE4ByjxJ35f8C6mQWkJSbe2ssIYgsJ
-        /GGU+NGQDGJzCthK/D35HSwuLOAv0XDlNhOIzQI0aNL5TrBeXgFLiRV73jFC2IISJ2c+gZqp
-        LdH7sJURxl628DUzxHUKErs/HWUFsUUE3CSm/n7PBlEjLvHy6BH2CYzCs5CMmoVk1Cwko2Yh
-        aVnAyLKKUTK1oDg3PbfYsMAwL7Vcrzgxt7g0L10vOT93EyM4frQ0dzBeXhJ/iFGAg1GJh/fD
-        qj0xQqyJZcWVuYcYJTiYlUR4f6UBhXhTEiurUovy44tKc1KLDzFKc7AoifM+zTsWKSSQnliS
-        mp2aWpBaBJNl4uCUamD05w5szzk+aceLXXOn8d8+seGw26t2zxoFxaNytxwjll7JXdR5UMh6
-        ka/aTMcER0Hh/a8msv3cvMfn1LvUyf8utv8u9Y3vzg+qKp0TFcSoqNkXsPh0yw/Ja+VK9jtD
-        q6b++nWmfUaj60+GaFHRiDdxl68pP2gss867EBG653zgm76v7Ed6r9QqsRRnJBpqMRcVJwIA
-        FJj5OJsCAAA=
-X-CMS-MailID: 20190422133712epcas5p2c70652336c2410d17bf3133c2cfd201a
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-X-CMS-RootMailID: 20190417175358epcas1p41a0a4e349dfe0a70bdcc244161c71604
-References: <1555523406-2380-1-git-send-email-joshi.k@samsung.com>
-        <CGME20190417175358epcas1p41a0a4e349dfe0a70bdcc244161c71604@epcas1p4.samsung.com>
-        <1555523406-2380-5-git-send-email-joshi.k@samsung.com>
-        <6850a3ad-805f-4232-1bc7-f3249e1fba96@kernel.dk>
+References: <CAKv+Gu-fprVgQ576__VDZ1L8HRghtCus_E-F0Q3gRzDLN=pjtQ@mail.gmail.com>
+In-Reply-To: <CAKv+Gu-fprVgQ576__VDZ1L8HRghtCus_E-F0Q3gRzDLN=pjtQ@mail.gmail.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Mon, 22 Apr 2019 15:41:34 +0200
+Message-ID: <CAKv+Gu-WZLo7UJd8k9Q2piEaJ8E319XRGheratuR47sfbH_DUg@mail.gmail.com>
+Subject: Re: breakage after "io_uring: offload write to async worker in case
+ of -EAGAIN"
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        rpenyaev@suse.de,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> Why not just use the bio write hint? We already disallow merging of dissi=
-milar write hints, so req->bio->bi_write_hint is known to be identical with=
- the rest of the bio's in that chain.
+On Sun, 21 Apr 2019 at 10:33, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>
+> Hello all,
+>
+> I ran into an issue booting a graphical desktop (GNOME) on an ARM
+> based system with nvidia graphics and the nouveau driver (which is the
+> only one available on arm64). Bisect identified the following commit
+> as the culprit
+>
+> commit 9bf7933fc3f306bc4ce74ad734f690a71670178a
+> Author: Roman Penyaev <rpenyaev@suse.de>
+> Date:   Mon Mar 25 20:09:24 2019 +0100
+>
+>     io_uring: offload write to async worker in case of -EAGAIN
+>
+> and reverting that on top of v5.1-rc5 gives me a working system again.
+>
+> I don't see any errors in the kernel log, but the graphical desktop
+> never comes up. I can still ssh into the system and everything else
+> appears to work normally.
+>
+> I'm a bit out of my depth there, so could you please help me diagnose
+> this further? Any conditions I should check in the 'else' path?
+>
 
-Yes, that is better. Thanks for suggesting it.
-
------Original Message-----
-From: Jens Axboe =5Bmailto:axboe=40kernel.dk=5D=20
-Sent: Wednesday, April 17, 2019 11:28 PM
-To: Kanchan Joshi <joshi.k=40samsung.com>; linux-kernel=40vger.kernel.org; =
-linux-block=40vger.kernel.org; linux-nvme=40lists.infradead.org; linux-fsde=
-vel=40vger.kernel.org; linux-ext4=40vger.kernel.org
-Cc: prakash.v=40samsung.com
-Subject: Re: =5BPATCH v4 4/7=5D block: introduce write-hint to stream-id co=
-nversion
-
-On 4/17/19 11:50 AM, Kanchan Joshi wrote:
-> This patch moves write-hint-to-stream-id conversion in block-layer.
-> Earlier this was done by driver (nvme). Current conversion is of the=20
-> form =22streamid =3D write-hint - 1=22, for both user and kernel streams.
-> Conversion takes stream limit (maintained in request queue) into=20
-> account. Write-hints beyond the exposed limit turn to 0.
-> A new field 'streamid' has been added in request. While 'write-hint'
-> field continues to exist. It keeps original value passed from upper=20
-> layer, and used during merging checks.
-
-Why not just use the bio write hint? We already disallow merging of dissimi=
-lar write hints, so req->bio->bi_write_hint is known to be identical with t=
-he rest of the bio's in that chain.
-
---
-Jens Axboe
-
-
+Actually, I am struggling to understand why this particular commit
+would make a difference on a Debian Stretch based userland, since I
+don't suppose the new syscalls are being used there yet ...
