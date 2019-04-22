@@ -2,84 +2,122 @@ Return-Path: <SRS0=Rcoh=SY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8319C10F11
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 14:37:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72639C10F11
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 15:11:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7C1120685
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 14:37:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fcTH1VfO"
+	by mail.kernel.org (Postfix) with ESMTP id 4C18020656
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 15:11:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727640AbfDVOh0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Apr 2019 10:37:26 -0400
-Received: from mail-it1-f195.google.com ([209.85.166.195]:40241 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726098AbfDVOh0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Apr 2019 10:37:26 -0400
-Received: by mail-it1-f195.google.com with SMTP id k64so18474517itb.5
-        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2019 07:37:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=8DzvcEfUpC0InwEqRFXqEPgc1/Zvi3D4guz08oELezc=;
-        b=fcTH1VfOoxB7zDoNHN5KZofP7zh1FDottFfundbWKbGRqvIhOqMase2dBYzNTGXQNi
-         ifkOFf2VA+0Duia6boMm8gxisZ0vXWAu8VALRnYpT5okqlqbk8ra8FRY+KdsiNPbfwmK
-         hllxOi4sXO8S30CMHV8ul3zvzGiBJsTsQWAf4KyF00Edq4qS09oqRxyl3TB255mJ4Rbk
-         C6lposoBnMPy2LkZZGqJkGv7nIIUsgC7N4hsr33ddX0Rue5pA+tc3VGQt87yl3n47EeG
-         ZBLa91OycccXGDqii3WoW4+qjOUAEMHAV8ObX/6SlDz/MypbvQD88GlD2DLJ8Bx8Z2Kk
-         djhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8DzvcEfUpC0InwEqRFXqEPgc1/Zvi3D4guz08oELezc=;
-        b=e4ZNe8Np3NNPAVVthO+ABDfJEnkez5UDIFIaf6xZjNGv0JKy37bW9BAXw2jqF/R2iO
-         kJE+AK2gr+R2pyOUDZa3PXzHGquHGbzWnTyZ/4EDKQcXE6mvk/1nNyB6Bh39rtb0GwyS
-         H/IaM6ynYgBgANvO6pXeJHTZtQji6Reihb3jaAa8OEji4avv+LC7nWlvPo0HRbACgWZg
-         G98In51EmVYUfG32vNGBu93MMWvLzZMIs7TKGgnhmXMNjbc8yxu0Eg9Ik3iiBh8B1dcB
-         qPECZ0ztSDnESiqHAuKpBkhumAVntrHZJJjP+Srs3x6lUbdiem9xANbmlvAGyQQTA7rc
-         nJCQ==
-X-Gm-Message-State: APjAAAU4difg2PUwzgxzYLgcIXIz9ggk4LqQH9iBhv6L/duQqTBGc264
-        Od/K27wUGjruhJwnjCgbK3BfVWloNcCgww==
-X-Google-Smtp-Source: APXvYqzuafVd9cF/VknHZoI6b3X1b96+XZyuEJI5ecWcyG8LUS/pwal/QQAgkm+OWs75JYyn1o2NKA==
-X-Received: by 2002:a02:1a89:: with SMTP id 131mr12630279jai.78.1555943844306;
-        Mon, 22 Apr 2019 07:37:24 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id 136sm6195241itk.28.2019.04.22.07.37.22
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Apr 2019 07:37:22 -0700 (PDT)
-Subject: Re: [PATCH v2] block: don't show io_timeout if driver has no timeout
- handler
-To:     bvanassche@acm.org, hch@infradead.org, linux-block@vger.kernel.org
-References: <20190402131424.GA12935@192.168.3.9>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ce6c2af7-dc4c-7893-8253-5c49105b8ffd@kernel.dk>
-Date:   Mon, 22 Apr 2019 08:37:21 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1727934AbfDVPLi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Apr 2019 11:11:38 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41408 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726132AbfDVPLi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Apr 2019 11:11:38 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 6F435AD7B;
+        Mon, 22 Apr 2019 15:11:36 +0000 (UTC)
+Subject: Re: [RFC PATCH v2 01/16] bcache: move definition of 'int ret' out of
+ macro read_bucket()
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20190419160509.66298-1-colyli@suse.de>
+ <20190419160509.66298-2-colyli@suse.de>
+ <SN6PR04MB45273AEF543F22F2443B83B486210@SN6PR04MB4527.namprd04.prod.outlook.com>
+From:   Coly Li <colyli@suse.de>
+Openpgp: preference=signencrypt
+Organization: SUSE Labs
+Message-ID: <a39ed6a2-1c9c-8a1a-41f4-60ab3e62074c@suse.de>
+Date:   Mon, 22 Apr 2019 23:11:29 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190402131424.GA12935@192.168.3.9>
+In-Reply-To: <SN6PR04MB45273AEF543F22F2443B83B486210@SN6PR04MB4527.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/2/19 7:14 AM, Weiping Zhang wrote:
-> If the low level driver has no timeout handler, the
-> /sys/block/<disk>/queue/io_timeout will not be displayed.
+On 2019/4/22 1:47 上午, Chaitanya Kulkarni wrote:
+> May be we should make this as an inline function instead of macro ?
+> Reason being:-
+> 1. It is not a simple substitution.
+> 2. It has multiple function calls.
+> 3. With this patch it is now dependent on local variable declared
+>     outside of macro.
+> 
+> Any thoughts ?
+> 
 
-Applied, thanks.
+Hi Chaitanya,
+
+I agree with you. There are some symbol names shared with "caller" of
+read_bucket(), so it is not very simple change to change the macro into
+an inline function. At this moment I will keep the change as simple as
+possible, and later I will think of change this macro into an inline
+routine.
+
+Thanks.
+
+Coly Li
+
+
+> 
+> On 04/19/2019 11:24 AM, Coly Li wrote:
+>> 'int ret' is defined as a local variable inside macro read_bucket().
+>> Since this macro is called multiple times, and following patches will
+>> use a 'int ret' variable in bch_journal_read(), this patch moves
+>> definition of 'int ret' from macro read_bucket() to range of function
+>> bch_journal_read().
+>>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> ---
+>>   drivers/md/bcache/journal.c | 5 +++--
+>>   1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+>> index b2fd412715b1..6e18057d1d82 100644
+>> --- a/drivers/md/bcache/journal.c
+>> +++ b/drivers/md/bcache/journal.c
+>> @@ -147,7 +147,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
+>>   {
+>>   #define read_bucket(b)							\
+>>   	({								\
+>> -		int ret = journal_read_bucket(ca, list, b);		\
+>> +		ret = journal_read_bucket(ca, list, b);			\
+>>   		__set_bit(b, bitmap);					\
+>>   		if (ret < 0)						\
+>>   			return ret;					\
+>> @@ -156,6 +156,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
+>>
+>>   	struct cache *ca;
+>>   	unsigned int iter;
+>> +	int ret = 0;
+>>
+>>   	for_each_cache(ca, c, iter) {
+>>   		struct journal_device *ja = &ca->journal;
+>> @@ -267,7 +268,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
+>>   					    struct journal_replay,
+>>   					    list)->j.seq;
+>>
+>> -	return 0;
+>> +	return ret;
+>>   #undef read_bucket
+>>   }
+>>
+>>
+> 
+
 
 -- 
-Jens Axboe
 
+Coly Li
