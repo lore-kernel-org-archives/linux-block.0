@@ -2,95 +2,182 @@ Return-Path: <SRS0=Rcoh=SY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D55C10F11
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14571C10F11
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:43:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 55C792064A
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:41:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA7C020685
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 13:43:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VoS3xNhu"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="hR/TZnlB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727177AbfDVNlq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Apr 2019 09:41:46 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:35177 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726801AbfDVNlq (ORCPT
+        id S1727401AbfDVNne (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Apr 2019 09:43:34 -0400
+Received: from mailout1.samsung.com ([203.254.224.24]:60729 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726098AbfDVNnd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Apr 2019 09:41:46 -0400
-Received: by mail-io1-f67.google.com with SMTP id r18so8684809ioh.2
-        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2019 06:41:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=u3wViDHeG/89EKKZKpQYGfSxP6Rpc7NezXV58Gpag2I=;
-        b=VoS3xNhupmKe++zC0Ywd2E/SLtayfiV5JaZLzbJuhPkWZAqBPhOdpoUaZjf5ikK1vA
-         AQ1C24RDc9ON6KSCfQY7z+1MxuCKmLwlWXj3gYYkvqeozad7ctZBGlAygXzd27kisReZ
-         cCGq7N8J5Til4elE6JJ8HxILJo1M6vY+qcBnr4MLOMHtkMPLyfnInS0Aewd90cKI8Ey3
-         Om2TGCrh8RtvQtI70vAIl4f3WIH8jpJBfx05tvXKZXIrzORdiF15IH9iYAEHhWRaK8AY
-         0gXFIPsjiO8raXVzwBTZ1gKxRnBo7gRwD9x3NfriqlHL0db/llRgY+MBdyb/SYx500y1
-         r8Jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=u3wViDHeG/89EKKZKpQYGfSxP6Rpc7NezXV58Gpag2I=;
-        b=DT8tdSf7/kWCzj49OG5GVaeX3dxpuHk6VEMsokN2ij/FYKaChKRBz/ZkGxaN/N6Vx6
-         MVmj5AOZXaAooPbbQsLATzlf6u4ItnmNtMcRFSrAPLRbik34K8MxdCRCuSIBrkzpPRXw
-         z2YT9nZ28kqZLem3cLTieFQEquRjPHDj+zT+lSs2dpOk1nrN4ySaVYkEo2GdTD3XoZvh
-         afaRfq5LeNFchu8a9KLklXcXsq3nQ/bUgnF+PWLR+s/hqAfcxQZxeDv7yoAP3DVdcbg3
-         +8MqGrf3cQ/JhPriFF/Mp9NwJlEbhko5+r60eNyttoHawLHwJ2UyKfZQj0i/sW7uBvmW
-         fBdg==
-X-Gm-Message-State: APjAAAWtpggs73U0I6UilSVPpJJAjNY5OJqwfvfH7lwb27fc2FcTmc6B
-        FSabVApn+scyDSTWrKahzPv1pt76nLAF6XFNi8JY28OxqE4=
-X-Google-Smtp-Source: APXvYqzkcjSDfD2kj2NaOWWE/XH4GRlcsu1qKP9UA9ItsTxThbqvQCZa1IdMqr3pJCA58pFbZSOUi7YAIsT+Vv2vB4o=
-X-Received: by 2002:a5e:9b17:: with SMTP id j23mr13318367iok.60.1555940505285;
- Mon, 22 Apr 2019 06:41:45 -0700 (PDT)
+        Mon, 22 Apr 2019 09:43:33 -0400
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20190422134331epoutp01eea59ca9aa6968b284d1cc3676aaaae8~Xz74nyKb11981819818epoutp01d
+        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2019 13:43:31 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20190422134331epoutp01eea59ca9aa6968b284d1cc3676aaaae8~Xz74nyKb11981819818epoutp01d
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1555940611;
+        bh=Eollxodl1iSBFBD6n5kK6/yIyrhANd8zRovulBS+xeg=;
+        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+        b=hR/TZnlBgQ0mojeh1mI/gg+gEKcroxWzpJIwEq/PdwykOjz96CPeJekpFwW7D6XFH
+         Cq+xDqJSETg32AdKdrFac//r8vJnTDuBbslQp1nAcZIcuxvmKcqe09euFXrsxAoRSv
+         TwPqBvNJlLmy4KadGp8F77vDUQz+GHgKz0+VCDX4=
+Received: from epsmges5p3new.samsung.com (unknown [182.195.42.75]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20190422134331epcas5p3ddc61f0da70dc38a7950712fe59fe93f~Xz74PV4II1733117331epcas5p3R;
+        Mon, 22 Apr 2019 13:43:31 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        6E.77.04067.305CDBC5; Mon, 22 Apr 2019 22:43:31 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20190422134330epcas5p2105a2dd5545c7e3164dd9bcbcddcad20~Xz73IK03_2826228262epcas5p2E;
+        Mon, 22 Apr 2019 13:43:30 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20190422134330epsmtrp2ac6827b9126ad9367fdbb4034745ca48~Xz73FD0lP2592225922epsmtrp2t;
+        Mon, 22 Apr 2019 13:43:30 +0000 (GMT)
+X-AuditID: b6c32a4b-78bff70000000fe3-ac-5cbdc5033808
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        40.63.03692.205CDBC5; Mon, 22 Apr 2019 22:43:30 +0900 (KST)
+Received: from JOSHIK01 (unknown [107.111.93.135]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20190422134329epsmtip1949dba93da3cfe88086a2b5a435a2032~Xz718vHHP1320213202epsmtip1K;
+        Mon, 22 Apr 2019 13:43:28 +0000 (GMT)
+From:   "kanchan" <joshi.k@samsung.com>
+To:     "'Jan Kara'" <jack@suse.cz>
+Cc:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-ext4@vger.kernel.org>, <prakash.v@samsung.com>
+In-Reply-To: <20190418135223.GK28541@quack2.suse.cz>
+Subject: RE: [PATCH v4 5/7] nvme: register stream info with block layer
+Date:   Mon, 22 Apr 2019 19:13:20 +0530
+Message-ID: <009d01d4f911$5ec3af70$1c4b0e50$@samsung.com>
 MIME-Version: 1.0
-References: <CAKv+Gu-fprVgQ576__VDZ1L8HRghtCus_E-F0Q3gRzDLN=pjtQ@mail.gmail.com>
-In-Reply-To: <CAKv+Gu-fprVgQ576__VDZ1L8HRghtCus_E-F0Q3gRzDLN=pjtQ@mail.gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 22 Apr 2019 15:41:34 +0200
-Message-ID: <CAKv+Gu-WZLo7UJd8k9Q2piEaJ8E319XRGheratuR47sfbH_DUg@mail.gmail.com>
-Subject: Re: breakage after "io_uring: offload write to async worker in case
- of -EAGAIN"
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        rpenyaev@suse.de,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AQK8/LoE/AuxJQqBdxKlIaVgudw56QHF1WnNAplKfBECo7wDuqRAENqw
+Content-Language: en-us
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrBKsWRmVeSWpSXmKPExsWy7bCmpi7z0b0xBqufiFvMnt7MZLH3lrbF
+        zHl32Cz27D3JYnF51xw2i/nLnrJbXJmyiNmB3WPzknqPvi2rGD3OLDjC7vF5k1wASxSXTUpq
+        TmZZapG+XQJXxrY3l5kL3ohWrN7ewNjA+E2wi5GTQ0LARGLimQ62LkYuDiGB3YwSP1d3Qjmf
+        GCW2bzjBDuF8Y5S49WA/O0zL958nWSASexklPt/9ygzhPGeUOHZ1HStIFZuAqsS9H71sILaI
+        gLzEjGXPGUGKmAX2M0o031jPCJLgBBrV83Il2FhhAXeJOTe3MYPYLEDNnXOXgtXwClhKbDtw
+        gg3CFpQ4OfMJC4jNDDR0+9s5zBAnKUjs/nSUFWKZm8SLZY+ZIGrEJV4ePQL2g4TAYzaJvzd3
+        MUE0uEg8/LYXqllY4tXxLVC/SUl8freXDcIulvh15ygzRHMHo8T1hpksEAl7iYt7/gIN4gDa
+        oCmxfpc+xDI+id7fT8DCEgK8Eh1tQhDVihL3Jj1lhbDFJR7OWAJle0i0tV1mmsCoOAvJa7OQ
+        vDYLyQuzEJYtYGRZxSiZWlCcm55abFpgnJdarlecmFtcmpeul5yfu4kRnH60vHcwbjrnc4hR
+        gINRiYf3w6o9MUKsiWXFlbmHGCU4mJVEeH+lAYV4UxIrq1KL8uOLSnNSiw8xSnOwKInzzpWd
+        Gy0kkJ5YkpqdmlqQWgSTZeLglGpgDCmacPj+C9MbhssdHbZ5Xlmz9WSfh/HFCocztt+2603b
+        /Ik3OqNG7OnSs7Ii3c1NJeeMzi5Z88xD2DVRdItG7pP3QplOs02f6e3/4WF0c+bV/yUtf3lW
+        MiTwC3gtn/Ox7UVR6QVlu0Lj9FS3BXP1ZvWnqVk+Tbt47pCiy4G5Lw5bXW8/Hp5YoMRSnJFo
+        qMVcVJwIAFpnvj07AwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupkkeLIzCtJLcpLzFFi42LZdlhJTpfp6N4Yg117OS1mT29msth7S9ti
+        5rw7bBZ79p5ksbi8aw6bxfxlT9ktrkxZxOzA7rF5Sb1H35ZVjB5nFhxh9/i8SS6AJYrLJiU1
+        J7MstUjfLoErY9uby8wFb0QrVm9vYGxg/CbYxcjJISFgIvH950mWLkYuDiGB3YwSf5rPM0Ek
+        xCWar/1gh7CFJVb+e84OUfSUUaKh/SILSIJNQFXi3o9eNhBbREBeYsay54wgRcwCRxklXh/q
+        hur4zCjx9cAeRpAqTqB9PS9Xgo0VFnCXmHNzGzOIzQI0qXPuUrAaXgFLiW0HTrBB2IISJ2c+
+        AdrGATRVT6JtI1gJM9Cy7W/nMENcpyCx+9NRVogj3CReLHvMBFEjLvHy6BH2CYzCs5BMmoUw
+        aRaSSbOQdCxgZFnFKJlaUJybnltsWGCYl1quV5yYW1yal66XnJ+7iREcQVqaOxgvL4k/xCjA
+        wajEw/th1Z4YIdbEsuLK3EOMEhzMSiK8v9KAQrwpiZVVqUX58UWlOanFhxilOViUxHmf5h2L
+        FBJITyxJzU5NLUgtgskycXBKNTDmBzxv++nayrjA/2zGBK6jCUk3ZGbouzG3ia84/JZR7eLV
+        EzNlvxnt4To8qfXoG2mWH1PFrtjMzZGpV+M/3pSYzKpykc1xVt9LSevVjEu3zpMVnZTEMtuH
+        j1FP4vqb9EnHfIMep77Pv2r2/q/huon2T+Uj0o18pjT1rj6jcOCTf4vHlxXq8k+VWIozEg21
+        mIuKEwEdiMslnAIAAA==
+X-CMS-MailID: 20190422134330epcas5p2105a2dd5545c7e3164dd9bcbcddcad20
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20190417175400epcas2p2b166bfaef69f5a02e856743be76199f3
+References: <1555523406-2380-1-git-send-email-joshi.k@samsung.com>
+        <CGME20190417175400epcas2p2b166bfaef69f5a02e856743be76199f3@epcas2p2.samsung.com>
+        <1555523406-2380-6-git-send-email-joshi.k@samsung.com>
+        <20190418135223.GK28541@quack2.suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 21 Apr 2019 at 10:33, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->
-> Hello all,
->
-> I ran into an issue booting a graphical desktop (GNOME) on an ARM
-> based system with nvidia graphics and the nouveau driver (which is the
-> only one available on arm64). Bisect identified the following commit
-> as the culprit
->
-> commit 9bf7933fc3f306bc4ce74ad734f690a71670178a
-> Author: Roman Penyaev <rpenyaev@suse.de>
-> Date:   Mon Mar 25 20:09:24 2019 +0100
->
->     io_uring: offload write to async worker in case of -EAGAIN
->
-> and reverting that on top of v5.1-rc5 gives me a working system again.
->
-> I don't see any errors in the kernel log, but the graphical desktop
-> never comes up. I can still ssh into the system and everything else
-> appears to work normally.
->
-> I'm a bit out of my depth there, so could you please help me diagnose
-> this further? Any conditions I should check in the 'else' path?
->
+> This changes the current behavior, doesn't it? Previously devices with
+less than 5 hints got streams completely disabled, now they will have
+streams enabled but ids beyond supported max will be mapped to 0. I'm not
+against this but I guess it should be spelled out explicitely in the
+changelog.
 
-Actually, I am struggling to understand why this particular commit
-would make a difference on a Debian Stretch based userland, since I
-don't suppose the new syscalls are being used there yet ...
+Yes, that is a change in current behavior. Will add that in next version,
+thanks.
+
+-----Original Message-----
+From: Jan Kara [mailto:jack@suse.cz] 
+Sent: Thursday, April 18, 2019 7:22 PM
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: linux-kernel@vger.kernel.org; linux-block@vger.kernel.org;
+linux-nvme@lists.infradead.org; linux-fsdevel@vger.kernel.org;
+linux-ext4@vger.kernel.org; prakash.v@samsung.com
+Subject: Re: [PATCH v4 5/7] nvme: register stream info with block layer
+
+On Wed 17-04-19 23:20:04, Kanchan Joshi wrote:
+> Make nvme driver register number of streams with block layer. Block 
+> layer will use that for write-hint to stream-id conversion. 
+> Registration is done for each namespace. Since NVMe spec allow all 
+> available streams (within subsystem) to be used by all namespaces, no 
+> attempt has been made to add reservation at namespace level.
+> 
+> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> ---
+>  drivers/nvme/host/core.c | 23 ++++++-----------------
+>  1 file changed, 6 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c index 
+> 2c43e12..81b86fa 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -464,10 +464,6 @@ static int nvme_toggle_streams(struct nvme_ctrl
+*ctrl, bool enable)
+>  	return nvme_submit_sync_cmd(ctrl->admin_q, &c, NULL, 0);  }
+>  
+> -static int nvme_disable_streams(struct nvme_ctrl *ctrl) -{
+> -	return nvme_toggle_streams(ctrl, false);
+> -}
+>  
+>  static int nvme_enable_streams(struct nvme_ctrl *ctrl)  { @@ -510,14 
+> +506,7 @@ static int nvme_configure_directives(struct nvme_ctrl *ctrl)
+>  		return ret;
+>  
+>  	ctrl->nssa = le16_to_cpu(s.nssa);
+> -	if (ctrl->nssa < BLK_MAX_WRITE_HINTS - 1) {
+> -		dev_info(ctrl->device, "too few streams (%u) available\n",
+> -					ctrl->nssa);
+> -		nvme_disable_streams(ctrl);
+> -		return 0;
+> -	}
+> -
+> -	ctrl->nr_streams = min_t(unsigned, ctrl->nssa, BLK_MAX_WRITE_HINTS -
+1);
+> +	ctrl->nr_streams = ctrl->nssa;
+>  	dev_info(ctrl->device, "Using %u streams\n", ctrl->nr_streams);
+>  	return 0;
+>  }
+
+This changes the current behavior, doesn't it? Previously devices with less
+than 5 hints got streams completely disabled, now they will have streams
+enabled but ids beyond supported max will be mapped to 0. I'm not against
+this but I guess it should be spelled out explicitely in the changelog.
+
+								Honza
+--
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
+
