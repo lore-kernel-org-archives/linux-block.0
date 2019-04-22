@@ -3,83 +3,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D0C3C10F11
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 14:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8319C10F11
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 14:37:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C0B020685
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 14:36:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7C1120685
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 14:37:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HrCZPw13"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fcTH1VfO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727648AbfDVOgI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Apr 2019 10:36:08 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43290 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726098AbfDVOgI (ORCPT
+        id S1727640AbfDVOh0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Apr 2019 10:37:26 -0400
+Received: from mail-it1-f195.google.com ([209.85.166.195]:40241 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726098AbfDVOh0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Apr 2019 10:36:08 -0400
-Received: by mail-wr1-f65.google.com with SMTP id k17so16015041wrx.10
-        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2019 07:36:07 -0700 (PDT)
+        Mon, 22 Apr 2019 10:37:26 -0400
+Received: by mail-it1-f195.google.com with SMTP id k64so18474517itb.5
+        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2019 07:37:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=62uCNZQS4zr/oMrXJTdPwrYX7H4DT5oqjx33inDCXys=;
-        b=HrCZPw13pgUeMtO7jygN1AuxCySCSb+Ivmoh0vhxEBO9NMt9GPw2dI5uHHuxjh/qkN
-         7q82nq4ZdWwk+eGBJlwGfOAV9ZgGg00zu2Wolm9KJ8ipXwRvyHW6LdI4HXIPRS7Tqn6+
-         sec0KAx6L47K5nUf+yngA1KJjARNhBg/xz9WWhZEFllFK8vV+tSsdrN2NBxjEvwVwdpd
-         6zqQpH35z63UVSu+PsQWO7Y4H5M+KSHDkErFTQWdrRvNAwkBpSxXZWl5PSSSjvo11Des
-         LxXSqEebrOKoiM/DaIdU6ZdBwpRsbzEZDmlBOtUSYPWmqdjRxuRzZJd8LuNG5Ka99lG/
-         B6jA==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=8DzvcEfUpC0InwEqRFXqEPgc1/Zvi3D4guz08oELezc=;
+        b=fcTH1VfOoxB7zDoNHN5KZofP7zh1FDottFfundbWKbGRqvIhOqMase2dBYzNTGXQNi
+         ifkOFf2VA+0Duia6boMm8gxisZ0vXWAu8VALRnYpT5okqlqbk8ra8FRY+KdsiNPbfwmK
+         hllxOi4sXO8S30CMHV8ul3zvzGiBJsTsQWAf4KyF00Edq4qS09oqRxyl3TB255mJ4Rbk
+         C6lposoBnMPy2LkZZGqJkGv7nIIUsgC7N4hsr33ddX0Rue5pA+tc3VGQt87yl3n47EeG
+         ZBLa91OycccXGDqii3WoW4+qjOUAEMHAV8ObX/6SlDz/MypbvQD88GlD2DLJ8Bx8Z2Kk
+         djhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=62uCNZQS4zr/oMrXJTdPwrYX7H4DT5oqjx33inDCXys=;
-        b=MdwT4sxrL1kAbjdMR3JaZWSYVSH8+vUGXcm98eYvq0SdozPDp7SYcqrujDoP9b5fyH
-         hb0I1uYYox3OK5ldVnklOUpoMDo7IXMeNvjXuMFUtnYSrfFvf7BVaZp4QsWi2tFKJVIS
-         UeKbM90LHNpdUTLAg3Oq++mIhAK36IY3E9YK0jOnL1gjATZAKyCmaiAT+5uK6+RHHog+
-         NHXdSKJrHBPT16RLXCKLh17t/HK3T2igP2pOt32bIZh0YfOEho9rFGV1vefUo+ZW+kp4
-         pfKHDlTI0upcSxqkIGLP6EYHRDt4YAcMlWu2i9jMmcd/qnHVewdPMIJwXISCMvajcsEl
-         CqDg==
-X-Gm-Message-State: APjAAAVRYrKc2vRv9GZcrdC9Ifdskm2W2j2htKyY6UmIx3WGT7XcY+Jz
-        P5LxYKWZ6Tr54Sh+scQJFk76c/EeySrJd8WINmY=
-X-Google-Smtp-Source: APXvYqz+0JVIEsU24bFnQau8S2BrdGiGnZxRBMosJgbBUb1NmoIJj/vsmwJn15692JJkcLSHa5dudKqXB8mA9JM6wOE=
-X-Received: by 2002:adf:b646:: with SMTP id i6mr48942wre.12.1555943766413;
- Mon, 22 Apr 2019 07:36:06 -0700 (PDT)
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8DzvcEfUpC0InwEqRFXqEPgc1/Zvi3D4guz08oELezc=;
+        b=e4ZNe8Np3NNPAVVthO+ABDfJEnkez5UDIFIaf6xZjNGv0JKy37bW9BAXw2jqF/R2iO
+         kJE+AK2gr+R2pyOUDZa3PXzHGquHGbzWnTyZ/4EDKQcXE6mvk/1nNyB6Bh39rtb0GwyS
+         H/IaM6ynYgBgANvO6pXeJHTZtQji6Reihb3jaAa8OEji4avv+LC7nWlvPo0HRbACgWZg
+         G98In51EmVYUfG32vNGBu93MMWvLzZMIs7TKGgnhmXMNjbc8yxu0Eg9Ik3iiBh8B1dcB
+         qPECZ0ztSDnESiqHAuKpBkhumAVntrHZJJjP+Srs3x6lUbdiem9xANbmlvAGyQQTA7rc
+         nJCQ==
+X-Gm-Message-State: APjAAAU4difg2PUwzgxzYLgcIXIz9ggk4LqQH9iBhv6L/duQqTBGc264
+        Od/K27wUGjruhJwnjCgbK3BfVWloNcCgww==
+X-Google-Smtp-Source: APXvYqzuafVd9cF/VknHZoI6b3X1b96+XZyuEJI5ecWcyG8LUS/pwal/QQAgkm+OWs75JYyn1o2NKA==
+X-Received: by 2002:a02:1a89:: with SMTP id 131mr12630279jai.78.1555943844306;
+        Mon, 22 Apr 2019 07:37:24 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id 136sm6195241itk.28.2019.04.22.07.37.22
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 22 Apr 2019 07:37:22 -0700 (PDT)
+Subject: Re: [PATCH v2] block: don't show io_timeout if driver has no timeout
+ handler
+To:     bvanassche@acm.org, hch@infradead.org, linux-block@vger.kernel.org
+References: <20190402131424.GA12935@192.168.3.9>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ce6c2af7-dc4c-7893-8253-5c49105b8ffd@kernel.dk>
+Date:   Mon, 22 Apr 2019 08:37:21 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190402131424.GA12935@192.168.3.9> <1554310465.118779.227.camel@acm.org>
-In-Reply-To: <1554310465.118779.227.camel@acm.org>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Mon, 22 Apr 2019 22:35:55 +0800
-Message-ID: <CAA70yB5BaGk0LLxvkNcYbbf+dyOy0sm+5hAXTM4arhcvCA4Fng@mail.gmail.com>
-Subject: Re: [PATCH v2] block: don't show io_timeout if driver has no timeout handler
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Weiping Zhang <zhangweiping@didiglobal.com>,
-        Jens Axboe <axboe@kernel.dk>, hch@infradead.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190402131424.GA12935@192.168.3.9>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On 4/2/19 7:14 AM, Weiping Zhang wrote:
+> If the low level driver has no timeout handler, the
+> /sys/block/<disk>/queue/io_timeout will not be displayed.
 
-Ping
+Applied, thanks.
 
-Bart Van Assche <bvanassche@acm.org> =E4=BA=8E2019=E5=B9=B44=E6=9C=884=E6=
-=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=8812:54=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Tue, 2019-04-02 at 21:14 +0800, Weiping Zhang wrote:
-> > If the low level driver has no timeout handler, the
-> > /sys/block/<disk>/queue/io_timeout will not be displayed.
->
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
->
->
+-- 
+Jens Axboe
+
