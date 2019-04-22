@@ -3,86 +3,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4893AC10F11
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 14:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D0C3C10F11
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 14:36:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 11AB1206A3
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 14:22:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C0B020685
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 14:36:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="zfzbdKVO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HrCZPw13"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727568AbfDVOW1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Apr 2019 10:22:27 -0400
-Received: from mail-it1-f194.google.com ([209.85.166.194]:36051 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727519AbfDVOW1 (ORCPT
+        id S1727648AbfDVOgI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Apr 2019 10:36:08 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43290 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726098AbfDVOgI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Apr 2019 10:22:27 -0400
-Received: by mail-it1-f194.google.com with SMTP id y10so18433951itc.1
-        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2019 07:22:27 -0700 (PDT)
+        Mon, 22 Apr 2019 10:36:08 -0400
+Received: by mail-wr1-f65.google.com with SMTP id k17so16015041wrx.10
+        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2019 07:36:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xg76K0fZdEsoPtBtQ5C2TWI0YD1xFpLJldINbqy9x7c=;
-        b=zfzbdKVO3AvDGPbiINEfnf0FRQGFtx7or/Y0zguLz4lLekcTQjc+LrHWha8RaL/GF1
-         Z0GKmZONc4NfwYcFKmv1cZQtqZWEIf1py9dFxx1oJ3aaGP9ud4q77ls759b0BzQuzEar
-         WsMDU1TYnfR3ecuuDUI0jpgDE9nRHAS5PksQp0UXYjV5V28JHqsRaU5/gWkCNe7rHR10
-         4/lT/ugQEEZszQSwocuyoXmoERR9dX74VyywQeK2kfmBI8zRSagIcuqdAZnWovwzGa+V
-         7tCXFHq1F0HMYX1bbun34WeORzex4GUeymj670Ke25KMs+h6f/g6AG2RLiIyfK/VbQdg
-         JJuA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=62uCNZQS4zr/oMrXJTdPwrYX7H4DT5oqjx33inDCXys=;
+        b=HrCZPw13pgUeMtO7jygN1AuxCySCSb+Ivmoh0vhxEBO9NMt9GPw2dI5uHHuxjh/qkN
+         7q82nq4ZdWwk+eGBJlwGfOAV9ZgGg00zu2Wolm9KJ8ipXwRvyHW6LdI4HXIPRS7Tqn6+
+         sec0KAx6L47K5nUf+yngA1KJjARNhBg/xz9WWhZEFllFK8vV+tSsdrN2NBxjEvwVwdpd
+         6zqQpH35z63UVSu+PsQWO7Y4H5M+KSHDkErFTQWdrRvNAwkBpSxXZWl5PSSSjvo11Des
+         LxXSqEebrOKoiM/DaIdU6ZdBwpRsbzEZDmlBOtUSYPWmqdjRxuRzZJd8LuNG5Ka99lG/
+         B6jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xg76K0fZdEsoPtBtQ5C2TWI0YD1xFpLJldINbqy9x7c=;
-        b=kfdeWtvST0sYq/JdkAB8FfFDEOC6vdvblYJDoopw5mjd+/DkGwHYY3/DrDSlgCJ842
-         jkzJXtt5KKaIbdVoDysyiuPifIc6V6fzo2CjuRHOitsNL2OrQLSCm/vNps2RYAQQHKCW
-         L5dWsFB1lT/BMkjzoDkz8OH23n7AEdBjXQlwf1hsLgj8F9WVoQwzVTHilillsLWajuvI
-         HGHbBXD6epAfcRe8FJBqbIZtsRiOZeMj4Ptk42kjIGORBwmHJnV26R7fxxjn2vZpcxMC
-         4TG1iG4qYGDXXwWUDO88bmiCeXzwlHDToxSIyJ+MvUh9OSWYIQr5o/ZCBcJdYr/RJ9EP
-         A2bA==
-X-Gm-Message-State: APjAAAUN9NRtFfn41AajFbpWtccuzvPiNf2ImCLdlWO7hXFMMd4dawet
-        QGr6zBdVyY/uIN+8ZPOzWLEcUUlidUdB9A==
-X-Google-Smtp-Source: APXvYqyykwF+gaT8LkKeH+69eAzaZ83E45jKYfLCT1KzYFcwT/qGamivOB0xs7YfLNcdnGgSbxf95g==
-X-Received: by 2002:a02:ac9a:: with SMTP id x26mr13660033jan.129.1555942946212;
-        Mon, 22 Apr 2019 07:22:26 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id j23sm4364838iog.59.2019.04.22.07.22.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Apr 2019 07:22:24 -0700 (PDT)
-Subject: Re: [PATCH] block: avoid scatterlist offsets > PAGE_SIZE
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux@roeck-us.net, linux-block@vger.kernel.org
-References: <20190419065624.25583-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <13421aa4-8a95-464c-39c5-f0f00b17891f@kernel.dk>
-Date:   Mon, 22 Apr 2019 08:22:24 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=62uCNZQS4zr/oMrXJTdPwrYX7H4DT5oqjx33inDCXys=;
+        b=MdwT4sxrL1kAbjdMR3JaZWSYVSH8+vUGXcm98eYvq0SdozPDp7SYcqrujDoP9b5fyH
+         hb0I1uYYox3OK5ldVnklOUpoMDo7IXMeNvjXuMFUtnYSrfFvf7BVaZp4QsWi2tFKJVIS
+         UeKbM90LHNpdUTLAg3Oq++mIhAK36IY3E9YK0jOnL1gjATZAKyCmaiAT+5uK6+RHHog+
+         NHXdSKJrHBPT16RLXCKLh17t/HK3T2igP2pOt32bIZh0YfOEho9rFGV1vefUo+ZW+kp4
+         pfKHDlTI0upcSxqkIGLP6EYHRDt4YAcMlWu2i9jMmcd/qnHVewdPMIJwXISCMvajcsEl
+         CqDg==
+X-Gm-Message-State: APjAAAVRYrKc2vRv9GZcrdC9Ifdskm2W2j2htKyY6UmIx3WGT7XcY+Jz
+        P5LxYKWZ6Tr54Sh+scQJFk76c/EeySrJd8WINmY=
+X-Google-Smtp-Source: APXvYqz+0JVIEsU24bFnQau8S2BrdGiGnZxRBMosJgbBUb1NmoIJj/vsmwJn15692JJkcLSHa5dudKqXB8mA9JM6wOE=
+X-Received: by 2002:adf:b646:: with SMTP id i6mr48942wre.12.1555943766413;
+ Mon, 22 Apr 2019 07:36:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190419065624.25583-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190402131424.GA12935@192.168.3.9> <1554310465.118779.227.camel@acm.org>
+In-Reply-To: <1554310465.118779.227.camel@acm.org>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Mon, 22 Apr 2019 22:35:55 +0800
+Message-ID: <CAA70yB5BaGk0LLxvkNcYbbf+dyOy0sm+5hAXTM4arhcvCA4Fng@mail.gmail.com>
+Subject: Re: [PATCH v2] block: don't show io_timeout if driver has no timeout handler
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Weiping Zhang <zhangweiping@didiglobal.com>,
+        Jens Axboe <axboe@kernel.dk>, hch@infradead.org,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/19/19 12:56 AM, Christoph Hellwig wrote:
-> While we generally allow scatterlists to have offsets larger than page
-> size for an entry, and other subsystems like the crypto code make use of
-> that, the block layer isn't quite ready for that.  Flip the switch back
-> to avoid them for now, and revisit that decision early in a merge window
-> once the known offenders are fixed.
+Hi Jens,
 
-Applied, thanks.
+Ping
 
--- 
-Jens Axboe
-
+Bart Van Assche <bvanassche@acm.org> =E4=BA=8E2019=E5=B9=B44=E6=9C=884=E6=
+=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=8812:54=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Tue, 2019-04-02 at 21:14 +0800, Weiping Zhang wrote:
+> > If the low level driver has no timeout handler, the
+> > /sys/block/<disk>/queue/io_timeout will not be displayed.
+>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+>
+>
