@@ -2,122 +2,151 @@ Return-Path: <SRS0=Rcoh=SY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72639C10F11
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 15:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58FD1C282E1
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 16:06:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C18020656
-	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 15:11:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31BAF20881
+	for <linux-block@archiver.kernel.org>; Mon, 22 Apr 2019 16:06:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727934AbfDVPLi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Apr 2019 11:11:38 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41408 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726132AbfDVPLi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Apr 2019 11:11:38 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 6F435AD7B;
-        Mon, 22 Apr 2019 15:11:36 +0000 (UTC)
-Subject: Re: [RFC PATCH v2 01/16] bcache: move definition of 'int ret' out of
- macro read_bucket()
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20190419160509.66298-1-colyli@suse.de>
- <20190419160509.66298-2-colyli@suse.de>
- <SN6PR04MB45273AEF543F22F2443B83B486210@SN6PR04MB4527.namprd04.prod.outlook.com>
-From:   Coly Li <colyli@suse.de>
-Openpgp: preference=signencrypt
-Organization: SUSE Labs
-Message-ID: <a39ed6a2-1c9c-8a1a-41f4-60ab3e62074c@suse.de>
-Date:   Mon, 22 Apr 2019 23:11:29 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
+        id S1726421AbfDVQGG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Apr 2019 12:06:06 -0400
+Received: from mail-it1-f198.google.com ([209.85.166.198]:52053 "EHLO
+        mail-it1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726761AbfDVQGF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Apr 2019 12:06:05 -0400
+Received: by mail-it1-f198.google.com with SMTP id y127so12928575itb.1
+        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2019 09:06:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=7f2B0qDJ0NGKdfmC5nRFEVu9THrNzuuLQq94MmJHVqQ=;
+        b=LXAkZavcMDpAr+StaBhC3jutOwIFDgTSnl8cNqcLrp52e+GmUiGdVsABJGoPNc+lxV
+         JMiix98/2iz0IkjeggNzcgJ4l7jifcYoRQe1/v1UaDIHFRS86HkkCadaJbsLxmog2sb2
+         NIFbD/aQT1fsW5aTvhELOESM9S+gCBUSo3FUFjwRc6+mYu16DPvJp6tpSJo6G4C974B3
+         kKkQnU1U8HQnuZPFKCBGd5/A3yn8eoAbdKhIvM+mke5pKKrPd8hWFyVVMHug0pjB0wrv
+         q5DfLFC/nmuGCtIxM70i/M1r3X9sjfNM7qcDUzMRpQfivi3EKp6LOCcnvkQyFWRifTke
+         UhSQ==
+X-Gm-Message-State: APjAAAWOKtFODAvxKbZ4foX8NIPkH9kQcsEEFMVjX7uGqNXmvUJwVBtY
+        5LWkWIwLndy02jLMANPdY77Arqyl+nQbUtUEp2OV3uFUQxgf
+X-Google-Smtp-Source: APXvYqyiIeoejZHRLVRlzClbMGkAsacRLzUQppmw76boahG2dDk+oC18efBUJJNOKiFhJBEwHtznRpbtZ4fOUGfVJRgHUYp5P7ni
 MIME-Version: 1.0
-In-Reply-To: <SN6PR04MB45273AEF543F22F2443B83B486210@SN6PR04MB4527.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6602:2109:: with SMTP id x9mr6515182iox.94.1555949164951;
+ Mon, 22 Apr 2019 09:06:04 -0700 (PDT)
+Date:   Mon, 22 Apr 2019 09:06:04 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000043fe9c058720a5d3@google.com>
+Subject: WARNING in percpu_ref_kill_and_confirm
+From:   syzbot <syzbot+10d25e23199614b7721f@syzkaller.appspotmail.com>
+To:     arnd@arndb.de, axboe@kernel.dk, bp@alien8.de,
+        darrick.wong@oracle.com, gregkh@linuxfoundation.org, hpa@zytor.com,
+        linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luto@kernel.org,
+        mathieu.desnoyers@efficios.com, mingo@redhat.com,
+        mpe@ellerman.id.au, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, torvalds@linux-foundation.org,
+        viro@zeniv.linux.org.uk, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/4/22 1:47 上午, Chaitanya Kulkarni wrote:
-> May be we should make this as an inline function instead of macro ?
-> Reason being:-
-> 1. It is not a simple substitution.
-> 2. It has multiple function calls.
-> 3. With this patch it is now dependent on local variable declared
->     outside of macro.
-> 
-> Any thoughts ?
-> 
+Hello,
 
-Hi Chaitanya,
+syzbot found the following crash on:
 
-I agree with you. There are some symbol names shared with "caller" of
-read_bucket(), so it is not very simple change to change the macro into
-an inline function. At this moment I will keep the change as simple as
-possible, and later I will think of change this macro into an inline
-routine.
+HEAD commit:    9e5de623 Merge tag 'nfs-for-5.1-5' of git://git.linux-nfs...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15624257200000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=856fc6d0fbbeede9
+dashboard link: https://syzkaller.appspot.com/bug?extid=10d25e23199614b7721f
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+userspace arch: i386
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17ff39f3200000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15758647200000
 
-Thanks.
+The bug was bisected to:
 
-Coly Li
+commit 38e7571c07be01f9f19b355a9306a4e3d5cb0f5b
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Mar 8 22:48:40 2019 +0000
+
+     Merge tag 'io_uring-2019-03-06' of git://git.kernel.dk/linux-block
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1736bc57200000
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=14b6bc57200000
+console output: https://syzkaller.appspot.com/x/log.txt?x=10b6bc57200000
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+10d25e23199614b7721f@syzkaller.appspotmail.com
+Fixes: 38e7571c07be ("Merge tag 'io_uring-2019-03-06' of  
+git://git.kernel.dk/linux-block")
+
+------------[ cut here ]------------
+percpu_ref_kill_and_confirm called more than once on io_ring_ctx_ref_free!
+WARNING: CPU: 1 PID: 7815 at lib/percpu-refcount.c:335  
+percpu_ref_kill_and_confirm+0x341/0x3b0 lib/percpu-refcount.c:335
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 1 PID: 7815 Comm: syz-executor269 Not tainted 5.1.0-rc5+ #77
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+  panic+0x2cb/0x65c kernel/panic.c:214
+  __warn.cold+0x20/0x45 kernel/panic.c:571
+  report_bug+0x263/0x2b0 lib/bug.c:186
+  fixup_bug arch/x86/kernel/traps.c:179 [inline]
+  fixup_bug arch/x86/kernel/traps.c:174 [inline]
+  do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:272
+  do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:291
+  invalid_op+0x14/0x20 arch/x86/entry/entry_64.S:973
+RIP: 0010:percpu_ref_kill_and_confirm+0x341/0x3b0 lib/percpu-refcount.c:335
+Code: 42 e0 2a 06 01 48 89 fa 48 c1 ea 03 80 3c 02 00 75 76 49 8b 54 24 10  
+48 c7 c6 a0 71 a1 87 48 c7 c7 40 71 a1 87 e8 ad 92 13 fe <0f> 0b 48 b8 00  
+00 00 00 00 fc ff df 4c 89 ea 48 c1 ea 03 80 3c 02
+RSP: 0018:ffff8880a96cfce0 EFLAGS: 00010086
+RAX: 0000000000000000 RBX: 0000607f5142e35b RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff815afcf6 RDI: ffffed10152d9f8e
+RBP: ffff8880a96cfd10 R08: ffff8880a85c40c0 R09: fffffbfff1133639
+R10: fffffbfff1133638 R11: ffffffff8899b1c3 R12: ffff88809ee571c0
+R13: ffff88809ee571c8 R14: 0000000000000286 R15: 0000000000000000
+  percpu_ref_kill include/linux/percpu-refcount.h:128 [inline]
+  __io_uring_register+0xa7/0x1fe0 fs/io_uring.c:2937
+  __do_sys_io_uring_register fs/io_uring.c:2998 [inline]
+  __se_sys_io_uring_register fs/io_uring.c:2980 [inline]
+  __ia32_sys_io_uring_register+0x193/0x1f0 fs/io_uring.c:2980
+  do_syscall_32_irqs_on arch/x86/entry/common.c:326 [inline]
+  do_fast_syscall_32+0x281/0xc98 arch/x86/entry/common.c:397
+  entry_SYSENTER_compat+0x70/0x7f arch/x86/entry/entry_64_compat.S:139
+RIP: 0023:0xf7f16869
+Code: 85 d2 74 02 89 0a 5b 5d c3 8b 04 24 c3 8b 14 24 c3 8b 3c 24 c3 90 90  
+90 90 90 90 90 90 90 90 90 90 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90  
+90 90 90 eb 0d 90 90 90 90 90 90 90 90 90 90 90 90
+RSP: 002b:00000000f7ef11ec EFLAGS: 00000296 ORIG_RAX: 00000000000001ab
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
 
 
-> 
-> On 04/19/2019 11:24 AM, Coly Li wrote:
->> 'int ret' is defined as a local variable inside macro read_bucket().
->> Since this macro is called multiple times, and following patches will
->> use a 'int ret' variable in bch_journal_read(), this patch moves
->> definition of 'int ret' from macro read_bucket() to range of function
->> bch_journal_read().
->>
->> Signed-off-by: Coly Li <colyli@suse.de>
->> ---
->>   drivers/md/bcache/journal.c | 5 +++--
->>   1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
->> index b2fd412715b1..6e18057d1d82 100644
->> --- a/drivers/md/bcache/journal.c
->> +++ b/drivers/md/bcache/journal.c
->> @@ -147,7 +147,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
->>   {
->>   #define read_bucket(b)							\
->>   	({								\
->> -		int ret = journal_read_bucket(ca, list, b);		\
->> +		ret = journal_read_bucket(ca, list, b);			\
->>   		__set_bit(b, bitmap);					\
->>   		if (ret < 0)						\
->>   			return ret;					\
->> @@ -156,6 +156,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
->>
->>   	struct cache *ca;
->>   	unsigned int iter;
->> +	int ret = 0;
->>
->>   	for_each_cache(ca, c, iter) {
->>   		struct journal_device *ja = &ca->journal;
->> @@ -267,7 +268,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
->>   					    struct journal_replay,
->>   					    list)->j.seq;
->>
->> -	return 0;
->> +	return ret;
->>   #undef read_bucket
->>   }
->>
->>
-> 
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-
--- 
-
-Coly Li
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
