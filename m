@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 659C2C10F14
-	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 07:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F59DC10F14
+	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 07:04:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 33FDE206BA
-	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 07:03:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2AC59206BA
+	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 07:04:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725937AbfDWHDm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Apr 2019 03:03:42 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59854 "EHLO mx1.suse.de"
+        id S1725954AbfDWHEd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Apr 2019 03:04:33 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60082 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725888AbfDWHDm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Apr 2019 03:03:42 -0400
+        id S1725888AbfDWHEd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Apr 2019 03:04:33 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 4C86EAE78;
-        Tue, 23 Apr 2019 07:03:41 +0000 (UTC)
-Subject: Re: [RFC PATCH v2 07/16] bcache: add comments for kobj release
- callback routine
+        by mx1.suse.de (Postfix) with ESMTP id 63D4CAE78;
+        Tue, 23 Apr 2019 07:04:32 +0000 (UTC)
+Subject: Re: [RFC PATCH v2 08/16] bcache: return error immediately in
+ bch_journal_replay()
 To:     Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org
 References: <20190419160509.66298-1-colyli@suse.de>
- <20190419160509.66298-8-colyli@suse.de>
+ <20190419160509.66298-9-colyli@suse.de>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <fd617000-dc8f-216c-a8fc-c7b06e0be4ac@suse.de>
-Date:   Tue, 23 Apr 2019 09:03:41 +0200
+Message-ID: <64c405c1-61ef-abe7-b5ef-e2174320fbb7@suse.de>
+Date:   Tue, 23 Apr 2019 09:04:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190419160509.66298-8-colyli@suse.de>
+In-Reply-To: <20190419160509.66298-9-colyli@suse.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -44,63 +44,46 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 4/19/19 6:05 PM, Coly Li wrote:
-> Bcache has several routines to release resources in implicit way, they
-> are called when the associated kobj released. This patch adds code
-> comments to notice when and which release callback will be called,
-> - When dc->disk.kobj released:
->    void bch_cached_dev_release(struct kobject *kobj)
-> - When d->kobj released:
->    void bch_flash_dev_release(struct kobject *kobj)
-> - When c->kobj released:
->    void bch_cache_set_release(struct kobject *kobj)
-> - When ca->kobj released
->    void bch_cache_release(struct kobject *kobj)
+> When failure happens inside bch_journal_replay(), calling
+> cache_set_err_on() and handling the failure in async way is not a good
+> idea. Because after bch_journal_replay() returns, registering code will
+> continue to execute following steps, and unregistering code triggered
+> by cache_set_err_on() is running in same time. First it is unnecessary
+> to handle failure and unregister cache set in an async way, second there
+> might be potential race condition to run register and unregister code
+> for same cache set.
+> 
+> So in this patch, if failure happens in bch_journal_replay(), we don't
+> call cache_set_err_on(), and just print out the same error message to
+> kernel message buffer, then return -EIO immediately caller. Then caller
+> can detect such failure and handle it in synchrnozied way.
 > 
 > Signed-off-by: Coly Li <colyli@suse.de>
 > ---
->   drivers/md/bcache/super.c | 4 ++++
->   1 file changed, 4 insertions(+)
+>   drivers/md/bcache/journal.c | 9 ++++++---
+>   1 file changed, 6 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> index 036bffad0bfe..400af446c372 100644
-> --- a/drivers/md/bcache/super.c
-> +++ b/drivers/md/bcache/super.c
-> @@ -1174,6 +1174,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
->   	return 0;
->   }
+> diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+> index 6aa68ab7cd78..bdb6f9cefe48 100644
+> --- a/drivers/md/bcache/journal.c
+> +++ b/drivers/md/bcache/journal.c
+> @@ -420,9 +420,12 @@ int bch_journal_replay(struct cache_set *s, struct list_head *list)
+>   	list_for_each_entry(i, list, list) {
+>   		BUG_ON(i->pin && atomic_read(i->pin) != 1);
 >   
-> +/* when dc->disk.kobj released */
->   void bch_cached_dev_release(struct kobject *kobj)
->   {
->   	struct cached_dev *dc = container_of(kobj, struct cached_dev,
-> @@ -1326,6 +1327,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
+> -		cache_set_err_on(n != i->j.seq, s,
+> -"bcache: journal entries %llu-%llu missing! (replaying %llu-%llu)",
+> -				 n, i->j.seq - 1, start, end);
+> +		if (n != i->j.seq) {
+> +			pr_err("bcache: journal entries %llu-%llu missing! (replaying %llu-%llu)",
+> +			n, i->j.seq - 1, start, end);
+> +			ret = -EIO;
+> +			goto err;
+> +		}
 >   
->   /* Flash only volumes */
->   
-> +/* When d->kobj released */
->   void bch_flash_dev_release(struct kobject *kobj)
->   {
->   	struct bcache_device *d = container_of(kobj, struct bcache_device,
-> @@ -1496,6 +1498,7 @@ bool bch_cache_set_error(struct cache_set *c, const char *fmt, ...)
->   	return true;
->   }
->   
-> +/* When c->kobj released */
->   void bch_cache_set_release(struct kobject *kobj)
->   {
->   	struct cache_set *c = container_of(kobj, struct cache_set, kobj);
-> @@ -2023,6 +2026,7 @@ static const char *register_cache_set(struct cache *ca)
->   
->   /* Cache device */
->   
-> +/* When ca->kobj released */
->   void bch_cache_release(struct kobject *kobj)
->   {
->   	struct cache *ca = container_of(kobj, struct cache, kobj);
+>   		for (k = i->j.start;
+>   		     k < bset_bkey_last(&i->j);
 > 
-This could be inferred from the 'container_of' statement for each relase 
-function, but if you want ...
-
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
