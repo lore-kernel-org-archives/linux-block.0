@@ -4,41 +4,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7DA8C282E1
-	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 06:56:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD238C10F14
+	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 06:59:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B458520656
-	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 06:56:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E1EF206BA
+	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 06:59:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725970AbfDWG4Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Apr 2019 02:56:24 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59188 "EHLO mx1.suse.de"
+        id S1725946AbfDWG7k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Apr 2019 02:59:40 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59438 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725888AbfDWG4Y (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Apr 2019 02:56:24 -0400
+        id S1725888AbfDWG7k (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Apr 2019 02:59:40 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 957B5AE32;
-        Tue, 23 Apr 2019 06:56:22 +0000 (UTC)
-Subject: Re: [RFC PATCH v2 03/16] bcache: reload jouranl key information
- during journal replay
-To:     Hannes Reinecke <hare@suse.de>, linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, stable@vger.kernel.org
+        by mx1.suse.de (Postfix) with ESMTP id 7FC32AE32;
+        Tue, 23 Apr 2019 06:59:38 +0000 (UTC)
+Subject: Re: [RFC PATCH v2 04/16] bcache: fix journal deadlock during jouranl
+ replay
+To:     Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
 References: <20190419160509.66298-1-colyli@suse.de>
- <20190419160509.66298-4-colyli@suse.de>
- <74048171-b86f-f913-6df0-97114fe7d0fd@suse.de>
-From:   Coly Li <colyli@suse.de>
-Openpgp: preference=signencrypt
-Organization: SUSE Labs
-Message-ID: <6c124c55-3275-8983-dd32-10885ec0b5c2@suse.de>
-Date:   Tue, 23 Apr 2019 14:56:11 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
+ <20190419160509.66298-5-colyli@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <bde96118-9d47-2d5e-bc59-a04260b700f5@suse.de>
+Date:   Tue, 23 Apr 2019 08:59:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <74048171-b86f-f913-6df0-97114fe7d0fd@suse.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190419160509.66298-5-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -46,162 +43,94 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/4/23 2:54 下午, Hannes Reinecke wrote:
-> On 4/19/19 6:04 PM, Coly Li wrote:
->> When bcache journal initiates during running cache set, cache set
->> journal.blocks_free is initiated as 0. Then during journal replay if
->> journal_meta() is called and an empty jset is written to cache device,
->> journal_reclaim() is called. If there is available journal bucket to
->> reclaim, c->journal.blocks_free is set to numbers of blocks of a journal
->> bucket, which is c->sb.bucket_size >> c->block_bits.
->>
->> Most of time the above process works correctly, expect the condtion
->> when journal space is almost full. "Almost full" means there is no free
->> journal bucket, but there are still free blocks in last available
->> bucket indexed by ja->cur_idx.
->>
->> If system crashes or reboots when journal space is almost full, problem
->> comes. During cache set reload after the reboot, c->journal.blocks_free
->> is initialized as 0, when jouranl replay process writes bcache jouranl,
->> journal_reclaim() will be called to reclaim available journal bucket and
->> set c->journal.blocks_free to c->sb.bucket_size >> c->block_bits. But
->> there is no fully free bucket to reclaim in journal_reclaim(), so value
->> of c->journal.blocks_free will keep 0. If the first journal entry
->> processed by journal_replay() causes btree split and requires writing
->> journal space by journal_meta(), journal_meta() has to go into an
->> infinite loop to reclaim jouranl bucket, and blocks the whole cache set
->> to run.
->>
->> Such buggy situation can be solved if we do following things before
->> journal replay starts,
->> - Recover previous value of c->journal.blocks_free in last run time,
->>    and set it to current c->journal.blocks_free as initial value.
->> - Recover previous value of ja->cur_idx in last run time, and set it to
->>    KEY_PTR of current c->journal.key as initial value.
->>
->> After c->journal.blocks_free and c->journal.key are recovered, in
->> condition when jouranl space is almost full and cache set is reloaded,
->> meta journal entry from journal reply can be written into free blocks of
->> the last available journal bucket, then old jouranl entries can be
->> replayed and reclaimed for further journaling request.
->>
->> This patch adds bch_journal_key_reload() to recover journal blocks_free
->> and key ptr value for above purpose. bch_journal_key_reload() is called
->> in bch_journal_read() before replying journal by bch_journal_replay().
->>
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Coly Li <colyli@suse.de>
->> ---
->>   drivers/md/bcache/journal.c | 87
->> +++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 87 insertions(+)
->>
->> diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
->> index 5180bed911ef..a6deb16c15c8 100644
->> --- a/drivers/md/bcache/journal.c
->> +++ b/drivers/md/bcache/journal.c
->> @@ -143,6 +143,89 @@ reread:        left = ca->sb.bucket_size - offset;
->>       return ret;
->>   }
->>   +static int bch_journal_key_reload(struct cache_set *c)
->> +{
->> +    struct cache *ca;
->> +    unsigned int iter, n = 0;
->> +    struct bkey *k = &c->journal.key;
->> +    int ret = 0;
->> +
->> +    for_each_cache(ca, c, iter) {
->> +        struct journal_device *ja = &ca->journal;
->> +        struct bio *bio = &ja->bio;
->> +        struct jset *j, *data = c->journal.w[0].data;
->> +        struct closure cl;
->> +        unsigned int len, left;
->> +        unsigned int offset = 0, used_blocks = 0;
->> +        sector_t bucket = bucket_to_sector(c, ca->sb.d[ja->cur_idx]);
->> +
->> +        closure_init_stack(&cl);
->> +
->> +        while (offset < ca->sb.bucket_size) {
->> +reread:            left = ca->sb.bucket_size - offset;
+On 4/19/19 6:04 PM, Coly Li wrote:
+> A deadlock of bcache jouranling may happen during journal replay. Such
+> deadlock happens when,
+> - Journal space is totally full (no any free blocks) and system crashes
+>    or reboots.
+> - After reboot, the first journal entry handled by jouranl replay causes
+>    btree split and jouranl_meta() is called to write an empty jset to
+>    journal space.
+> - There is no journal space to write and journal_reclaim() fails to get
+>    any available bucket because this is the first replayed journal entry
+>    to be blocked.
+> Then the whole cache set is blocked from running.
 > 
-> Please place the label on a line of its own.
+> This patch is an effort to fix such journal replay deadlock in a simpler
+> way,
+> - Add a bool varialbe 'in_replay' in struct journal, set it to true when
+>    journal replay starts, and set it to false when journal replay
+>    completed. in_replay is initialized to be false.
+> - Reserve 6 sectors in journal bucket, do not use them in normal bcache
+>    runtime. These sectors are only permitted to use during journal
+>    replay (when c->jouranl.in_replay is true)
 > 
->> +            len = min_t(unsigned int,
->> +                    left, PAGE_SECTORS << JSET_BITS);
->> +
->> +            bio_reset(bio);
->> +            bio->bi_iter.bi_sector = bucket + offset;
->> +            bio_set_dev(bio, ca->bdev);
->> +            bio->bi_iter.bi_size = len << 9;
->> +
->> +            bio->bi_end_io = journal_read_endio;
->> +            bio->bi_private = &cl;
->> +            bio_set_op_attrs(bio, REQ_OP_READ, 0);
->> +            bch_bio_map(bio, data);
->> +
->> +            closure_bio_submit(c, bio, &cl);
->> +            closure_sync(&cl);
->> +
->> +            j = data;
->> +            while (len) {
->> +                size_t blocks, bytes = set_bytes(j);
->> +
->> +                if (j->magic != jset_magic(&ca->sb))
->> +                    goto out;
->> +
->> +                if (bytes > left << 9 ||
->> +                    bytes > PAGE_SIZE << JSET_BITS) {
->> +                    pr_err("jset may be correpted: too big");
->> +                    ret = -EIO;
->> +                    goto err;
->> +                }
->> +
->> +                if (bytes > len << 9)
->> +                    goto reread;
->> +
->> +                if (j->csum != csum_set(j)) {
->> +                    pr_err("jset may be corrupted: bad csum");
->> +                    ret = -EIO;
->> +                    goto err;
->> +                }
->> +
->> +                blocks = set_blocks(j, block_bytes(c));
->> +                used_blocks += blocks;
->> +
->> +                offset    += blocks * ca->sb.block_size;
->> +                len    -= blocks * ca->sb.block_size;
->> +                j = ((void *) j) + blocks * block_bytes(ca);
->> +            }
->> +        }
->> +out:
->> +        c->journal.blocks_free =
->> +            (c->sb.bucket_size >> c->block_bits) -
->> +            used_blocks;
->> +
->> +        k->ptr[n++] = MAKE_PTR(0, bucket, ca->sb.nr_this_dev);
->> +    }
->> +
->> +    BUG_ON(n == 0);
->> +    bkey_init(k);
->> +    SET_KEY_PTRS(k, n);
->> +
->> +err:
->> +    return ret;
->> +}
->> +
->>   int bch_journal_read(struct cache_set *c, struct list_head *list)
->>   {
->>   #define read_bucket(b)                            \
-> This is a _quite_ convoluted nested loop.
-> It would be far better if it could be split into functions, so as to
-> avoid the loop-within-loop constructs.
-> Oh, and some documentation (especially the 'reread' bit) would be nice.
+> Then in normal bcache runtime, journal space won't be totally full and
+> there are 6 sectors are always reserved for journal replay time. After
+> system reboots, if bch_btree_insert() in bch_journal_replay() causes
+> btree split and bch_journal_beta() gets called to require 1 sector
+> from journal buckets to write an empty jset, there are enough reserved
+> space to serve.
+> 
+> The reason to reserve 6 sectors is, we should choose a number that won't
+> fix into a bucket size. If the reserved space happens to be a whole
+> bucket, more logic has to be added in journal_replay() to handle
+> journal.blocks_free with reserved spaces in journal replay time. This is
+> why 6 sectors is choosed, it is 3KB and won't be any proper block size
+> or bucket size.
+> 
+> The bcache btree node size is quite large, so btree node split won't be
+> a frequent event. And when btree node split happens, new added key will
+> be insert directly into uppper level or neighbor nodes and won't go into
+> journal again, only bch_journal_meta() is called to write jset metadata
+> which occupies 1 block in journal space. If blocksize is set to 4K size,
+> reserve 6 sectors indeed is 2 blocks, so there can be two continuously
+> btree splitting happen during journal replay, this is very very rare in
+> practice. As default blocksize is set to sector size, that equals to
+> 6 blocks reserved. Contiously splitting the btree for 6 times in journal
+> replay is almost impossible, so the reserved space seems to be enough
+> in my humble opinion.
+> 
+> If in future the reserved space turns out to be not enough, let's extend
+> it then.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> ---
+>   drivers/md/bcache/journal.c | 100 ++++++++++++++++++++++++++++++++++++++++----
+>   drivers/md/bcache/journal.h |   4 ++
+>   2 files changed, 97 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+> index a6deb16c15c8..c60a702f53a9 100644
+> --- a/drivers/md/bcache/journal.c
+> +++ b/drivers/md/bcache/journal.c
+> @@ -415,6 +415,8 @@ int bch_journal_replay(struct cache_set *s, struct list_head *list)
+>   	uint64_t start = i->j.last_seq, end = i->j.seq, n = start;
+>   	struct keylist keylist;
+>   
+> +	s->journal.in_replay = true;
+> +
+>   	list_for_each_entry(i, list, list) {
+>   		BUG_ON(i->pin && atomic_read(i->pin) != 1);
+>   
+> @@ -448,6 +450,7 @@ int bch_journal_replay(struct cache_set *s, struct list_head *list)
+>   	pr_info("journal replay done, %i keys in %i entries, seq %llu",
+>   		keys, entries, end);
+>   err:
+> +	s->journal.in_replay = false;
+>   	while (!list_empty(list)) {
+>   		i = list_first_entry(list, struct journal_replay, list);
+>   		list_del(&i->list);
 
-Hi Hannes,
+What about locking here?
+Doesn't 'in_replay' need to be guarded by a spinlock or something?
 
-Sure I will fix them in next version. Thanks.
+Cheers,
 
-
+Hannes
 -- 
-
-Coly Li
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
