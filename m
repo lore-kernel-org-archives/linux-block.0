@@ -6,38 +6,37 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18869C282E3
-	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 07:16:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECAC2C10F14
+	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 07:18:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E43222077C
-	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 07:16:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C44F52077C
+	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 07:18:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726415AbfDWHQk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Apr 2019 03:16:40 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33632 "EHLO mx1.suse.de"
+        id S1725935AbfDWHSL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Apr 2019 03:18:11 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33834 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726336AbfDWHQg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Apr 2019 03:16:36 -0400
+        id S1725888AbfDWHSL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Apr 2019 03:18:11 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id A9893AD1A;
-        Tue, 23 Apr 2019 07:16:34 +0000 (UTC)
-Subject: Re: [RFC PATCH v2 13/16] bcache: fix fifo index swapping condition in
- btree_flush_write()
+        by mx1.suse.de (Postfix) with ESMTP id E3DA3AD1A;
+        Tue, 23 Apr 2019 07:18:09 +0000 (UTC)
+Subject: Re: [RFC PATCH v2 15/16] bcache: improve bcache_reboot()
 To:     Hannes Reinecke <hare@suse.de>, linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, stable@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
 References: <20190419160509.66298-1-colyli@suse.de>
- <20190419160509.66298-14-colyli@suse.de>
- <0f302a9e-3718-e042-abb0-0ed518ee1583@suse.de>
+ <20190419160509.66298-16-colyli@suse.de>
+ <2ae959a2-bb2a-34cf-1dd4-dd7c6f06a0d2@suse.de>
 From:   Coly Li <colyli@suse.de>
 Openpgp: preference=signencrypt
 Organization: SUSE Labs
-Message-ID: <997a12a1-8002-b3b7-efc4-c4b9d122f42b@suse.de>
-Date:   Tue, 23 Apr 2019 15:16:25 +0800
+Message-ID: <f4ca2eaa-4b27-f282-b2a2-441e9c3bb4d6@suse.de>
+Date:   Tue, 23 Apr 2019 15:18:00 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
  Gecko/20100101 Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <0f302a9e-3718-e042-abb0-0ed518ee1583@suse.de>
+In-Reply-To: <2ae959a2-bb2a-34cf-1dd4-dd7c6f06a0d2@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -46,101 +45,63 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/4/23 3:09 下午, Hannes Reinecke wrote:
+On 2019/4/23 3:13 下午, Hannes Reinecke wrote:
 > On 4/19/19 6:05 PM, Coly Li wrote:
->> Current journal_max_cmp() and journal_min_cmp() assume that smaller fifo
->> index indicating elder journal entries, but this is only true when fifo
->> index is not swapped.
+>> This patch tries to release mutex bch_register_lock early, to give
+>> chance to stop cache set and bcache device early.
 >>
->> Fifo structure journal.pin is implemented by a cycle buffer, if the head
->> index reaches highest location of the cycle buffer, it will be swapped
->> to 0. Once the swapping happens, it means a smaller fifo index might be
->> associated to a newer journal entry. So the btree node with oldest
->> journal entry won't be selected by btree_flush_write() to flush out to
->> cache device. The result is, the oldest journal entries may always has
->> no chance to be written into cache device, and after a reboot
->> bch_journal_replay() may complain some journal entries are missing.
+>> This patch also expends time out of stopping all bcache device from
+>> 2 seconds to 10 seconds, because stopping writeback rate update worker
+>> may delay for 5 seconds, 2 seconds is not enough.
 >>
->> This patch handles the fifo index swapping conditions properly, then in
->> btree_flush_write() the btree node with oldest journal entry can be
->> slected from c->flush_btree correctly.
+>> After this patch applied, stopping bcache devices during system reboot
+>> or shutdown is very hard to be observed any more.
 >>
->> Cc: stable@vger.kernel.org
 >> Signed-off-by: Coly Li <colyli@suse.de>
 >> ---
->>   drivers/md/bcache/journal.c | 47
->> +++++++++++++++++++++++++++++++++++++++------
->>   1 file changed, 41 insertions(+), 6 deletions(-)
+>>   drivers/md/bcache/super.c | 6 ++++--
+>>   1 file changed, 4 insertions(+), 2 deletions(-)
 >>
->> diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
->> index bdb6f9cefe48..bc0e01151155 100644
->> --- a/drivers/md/bcache/journal.c
->> +++ b/drivers/md/bcache/journal.c
->> @@ -464,12 +464,47 @@ int bch_journal_replay(struct cache_set *s,
->> struct list_head *list)
->>   }
->>     /* Journalling */
->> -#define journal_max_cmp(l, r) \
->> -    (fifo_idx(&c->journal.pin, btree_current_write(l)->journal) < \
->> -     fifo_idx(&(c)->journal.pin, btree_current_write(r)->journal))
->> -#define journal_min_cmp(l, r) \
->> -    (fifo_idx(&c->journal.pin, btree_current_write(l)->journal) > \
->> -     fifo_idx(&(c)->journal.pin, btree_current_write(r)->journal))
->> +#define journal_max_cmp(l, r)                        \
->> +({                                    \
->> +    int l_idx, r_idx, f_idx, b_idx;                    \
->> +    bool _ret = true;                        \
->> +                                    \
->> +    l_idx = fifo_idx(&c->journal.pin,
->> btree_current_write(l)->journal); \
->> +    r_idx = fifo_idx(&c->journal.pin,
->> btree_current_write(r)->journal); \
->> +    f_idx = c->journal.pin.front;                    \
->> +    b_idx = c->journal.pin.back;                    \
->> +                                    \
->> +    _ret = (l_idx < r_idx);                        \
->> +    /* in case fifo back pointer is swapped */            \
->> +    if (b_idx < f_idx) {                         \
->> +        if (l_idx <= b_idx && r_idx >= f_idx)            \
->> +            _ret = false;                    \
->> +        else if (l_idx >= f_idx && r_idx <= b_idx)        \
->> +            _ret = true;                    \
->> +    }                                \
->> +    _ret;                                \
->> +})
+>> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+>> index e988e46a6479..2d377a4a182f 100644
+>> --- a/drivers/md/bcache/super.c
+>> +++ b/drivers/md/bcache/super.c
+>> @@ -2453,10 +2453,13 @@ static int bcache_reboot(struct notifier_block
+>> *n, unsigned long code, void *x)
+>>           list_for_each_entry_safe(dc, tdc, &uncached_devices, list)
+>>               bcache_device_stop(&dc->disk);
+>>   +        mutex_unlock(&bch_register_lock);
 >> +
->> +#define journal_min_cmp(l, r)                        \
->> +({                                    \
->> +    int l_idx, r_idx, f_idx, b_idx;                    \
->> +    bool _ret = true;                        \
->> +                                    \
->> +    l_idx = fifo_idx(&c->journal.pin,
->> btree_current_write(l)->journal); \
->> +    r_idx = fifo_idx(&c->journal.pin,
->> btree_current_write(r)->journal); \
->> +    f_idx = c->journal.pin.front;                    \
->> +    b_idx = c->journal.pin.back;                    \
->> +                                    \
->> +    _ret = (l_idx > r_idx);                        \
->> +    /* in case fifo back pointer is swapped */            \
->> +    if (b_idx < f_idx) {                        \
->> +        if (l_idx <= b_idx && r_idx >= f_idx)            \
->> +            _ret = true;                    \
->> +        else if (l_idx >= f_idx && r_idx <= b_idx)        \
->> +            _ret = false;                    \
->> +    }                                \
->> +    _ret;                                \
->> +})
->>     static void btree_flush_write(struct cache_set *c)
->>   {
->>
-> Please make it a proper function.
-> This is far too convoluted for being handled via #define, and it would
-> avoid cluttering the function namespace with hidden variables.
+>>           /* What's a condition variable? */
+>>           while (1) {
+>> -            long timeout = start + 2 * HZ - jiffies;
+>> +            long timeout = start + 10 * HZ - jiffies;
+>>   +            mutex_lock(&bch_register_lock);
+>>               stopped = list_empty(&bch_cache_sets) &&
+>>                   list_empty(&uncached_devices);
+>>   @@ -2468,7 +2471,6 @@ static int bcache_reboot(struct notifier_block
+>> *n, unsigned long code, void *x)
+>>                 mutex_unlock(&bch_register_lock);
+>>               schedule_timeout(timeout);
+>> -            mutex_lock(&bch_register_lock);
+>>           }
+>>             finish_wait(&unregister_wait, &wait);
+>> Maybe you should even call 'schedule()' after the first mutex_unlock() 
+> to force execution of other tasks.
+> But anyway:
+> 
 
 Hi Hannes,
 
-Sure let me do it in next version. Thanks.
+It makes sense for an explicit schedule(). I will add it in next
+version. Thanks.
+
+
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> 
+> Cheers,
+> 
+> Hannes
 
 
 -- 
