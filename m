@@ -2,279 +2,684 @@ Return-Path: <SRS0=N4qE=SZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94039C10F14
-	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 13:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03FB2C10F14
+	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 13:51:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58A59214AE
-	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 13:30:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B08EB206BA
+	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 13:51:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727666AbfDWNae (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Apr 2019 09:30:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35130 "EHLO mx1.redhat.com"
+        id S1728279AbfDWNv5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Apr 2019 09:51:57 -0400
+Received: from mga18.intel.com ([134.134.136.126]:36536 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726421AbfDWNae (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Apr 2019 09:30:34 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 814BE18DF7A;
-        Tue, 23 Apr 2019 13:30:33 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FBC15D9C8;
-        Tue, 23 Apr 2019 13:30:21 +0000 (UTC)
-Date:   Tue, 23 Apr 2019 21:30:17 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.com>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-nvme@lists.infradead.org, Sagi Grimberg <sagi@grimberg.me>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        James Smart <james.smart@broadcom.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        jianchao wang <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH V6 6/9] blk-mq: always free hctx after request queue is
- freed
-Message-ID: <20190423133015.GA31728@ming.t460p>
-References: <20190417034410.31957-1-ming.lei@redhat.com>
- <20190417034410.31957-7-ming.lei@redhat.com>
- <63c09210-c20e-6b4a-56fa-b9eac2807cc1@suse.de>
- <20190417125943.GB5007@ming.t460p>
- <20190422033057.GC21375@ming.t460p>
- <9d93cb74-0683-bb42-2545-b4bb2bfbb831@suse.de>
+        id S1728142AbfDWNv4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Apr 2019 09:51:56 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Apr 2019 06:51:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,386,1549958400"; 
+   d="scan'208";a="340004300"
+Received: from ikonopko-mobl.ger.corp.intel.com (HELO [10.237.142.246]) ([10.237.142.246])
+  by fmsmga005.fm.intel.com with ESMTP; 23 Apr 2019 06:51:53 -0700
+Subject: Re: [PATCH v4 2/7] lightnvm: pblk: simplify partial read path
+To:     Heiner Litz <hlitz@ucsc.edu>
+Cc:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org
+References: <20190416101648.10045-1-igor.j.konopko@intel.com>
+ <20190416101648.10045-3-igor.j.konopko@intel.com>
+ <CAJbgVnUgZVTdrP4rY0z2Q5JQ-ukjs4ykJhBmR7_ASo1-tcdixg@mail.gmail.com>
+From:   Igor Konopko <igor.j.konopko@intel.com>
+Message-ID: <834414a0-3297-11f9-261d-3da2a687489f@intel.com>
+Date:   Tue, 23 Apr 2019 15:51:52 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9d93cb74-0683-bb42-2545-b4bb2bfbb831@suse.de>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Tue, 23 Apr 2019 13:30:33 +0000 (UTC)
+In-Reply-To: <CAJbgVnUgZVTdrP4rY0z2Q5JQ-ukjs4ykJhBmR7_ASo1-tcdixg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Hannes,
 
-Thanks for your response.
 
-On Tue, Apr 23, 2019 at 01:19:33PM +0200, Hannes Reinecke wrote:
-> On 4/22/19 5:30 AM, Ming Lei wrote:
-> > On Wed, Apr 17, 2019 at 08:59:43PM +0800, Ming Lei wrote:
-> > > On Wed, Apr 17, 2019 at 02:08:59PM +0200, Hannes Reinecke wrote:
-> > > > On 4/17/19 5:44 AM, Ming Lei wrote:
-> > > > > In normal queue cleanup path, hctx is released after request queue
-> > > > > is freed, see blk_mq_release().
-> > > > > 
-> > > > > However, in __blk_mq_update_nr_hw_queues(), hctx may be freed because
-> > > > > of hw queues shrinking. This way is easy to cause use-after-free,
-> > > > > because: one implicit rule is that it is safe to call almost all block
-> > > > > layer APIs if the request queue is alive; and one hctx may be retrieved
-> > > > > by one API, then the hctx can be freed by blk_mq_update_nr_hw_queues();
-> > > > > finally use-after-free is triggered.
-> > > > > 
-> > > > > Fixes this issue by always freeing hctx after releasing request queue.
-> > > > > If some hctxs are removed in blk_mq_update_nr_hw_queues(), introduce
-> > > > > a per-queue list to hold them, then try to resuse these hctxs if numa
-> > > > > node is matched.
-> > > > > 
-> > > > > Cc: Dongli Zhang <dongli.zhang@oracle.com>
-> > > > > Cc: James Smart <james.smart@broadcom.com>
-> > > > > Cc: Bart Van Assche <bart.vanassche@wdc.com>
-> > > > > Cc: linux-scsi@vger.kernel.org,
-> > > > > Cc: Martin K . Petersen <martin.petersen@oracle.com>,
-> > > > > Cc: Christoph Hellwig <hch@lst.de>,
-> > > > > Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
-> > > > > Cc: jianchao wang <jianchao.w.wang@oracle.com>
-> > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > > > ---
-> > > > >    block/blk-mq.c         | 40 +++++++++++++++++++++++++++-------------
-> > > > >    include/linux/blk-mq.h |  2 ++
-> > > > >    include/linux/blkdev.h |  7 +++++++
-> > > > >    3 files changed, 36 insertions(+), 13 deletions(-)
-> > > > > 
-> > > > > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > > > > index eeebba6ec0f7..2ca4395f794d 100644
-> > > > > --- a/block/blk-mq.c
-> > > > > +++ b/block/blk-mq.c
-> > > > > @@ -2274,6 +2274,10 @@ static void blk_mq_exit_hctx(struct request_queue *q,
-> > > > >    		set->ops->exit_hctx(hctx, hctx_idx);
-> > > > >    	blk_mq_remove_cpuhp(hctx);
-> > > > > +
-> > > > > +	spin_lock(&q->dead_hctx_lock);
-> > > > > +	list_add(&hctx->hctx_list, &q->dead_hctx_list);
-> > > > > +	spin_unlock(&q->dead_hctx_lock);
-> > > > >    }
-> > > > >    static void blk_mq_exit_hw_queues(struct request_queue *q,
-> > > > > @@ -2675,15 +2679,13 @@ static int blk_mq_alloc_ctxs(struct request_queue *q)
-> > > > >     */
-> > > > >    void blk_mq_release(struct request_queue *q)
-> > > > >    {
-> > > > > -	struct blk_mq_hw_ctx *hctx;
-> > > > > -	unsigned int i;
-> > > > > +	struct blk_mq_hw_ctx *hctx, *next;
-> > > > >    	cancel_delayed_work_sync(&q->requeue_work);
-> > > > > -	/* hctx kobj stays in hctx */
-> > > > > -	queue_for_each_hw_ctx(q, hctx, i) {
-> > > > > -		if (!hctx)
-> > > > > -			continue;
-> > > > > +	/* all hctx are in .dead_hctx_list now */
-> > > > > +	list_for_each_entry_safe(hctx, next, &q->dead_hctx_list, hctx_list) {
-> > > > > +		list_del_init(&hctx->hctx_list);
-> > > > >    		kobject_put(&hctx->kobj);
-> > > > >    	}
-> > > > > @@ -2750,9 +2752,22 @@ static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
-> > > > >    		struct blk_mq_tag_set *set, struct request_queue *q,
-> > > > >    		int hctx_idx, int node)
-> > > > >    {
-> > > > > -	struct blk_mq_hw_ctx *hctx;
-> > > > > +	struct blk_mq_hw_ctx *hctx = NULL, *tmp;
-> > > > > +
-> > > > > +	/* reuse dead hctx first */
-> > > > > +	spin_lock(&q->dead_hctx_lock);
-> > > > > +	list_for_each_entry(tmp, &q->dead_hctx_list, hctx_list) {
-> > > > > +		if (tmp->numa_node == node) {
-> > > > > +			hctx = tmp;
-> > > > > +			break;
-> > > > > +		}
-> > > > > +	}
-> > > > > +	if (hctx)
-> > > > > +		list_del_init(&hctx->hctx_list);
-> > > > > +	spin_unlock(&q->dead_hctx_lock);
-> > > > > -	hctx = blk_mq_alloc_hctx(q, set, hctx_idx, node);
-> > > > > +	if (!hctx)
-> > > > > +		hctx = blk_mq_alloc_hctx(q, set, hctx_idx, node);
-> > > > >    	if (!hctx)
-> > > > >    		goto fail;
-> > > > > @@ -2790,10 +2805,8 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
-> > > > >    		hctx = blk_mq_alloc_and_init_hctx(set, q, i, node);
-> > > > >    		if (hctx) {
-> > > > > -			if (hctxs[i]) {
-> > > > > +			if (hctxs[i])
-> > > > >    				blk_mq_exit_hctx(q, set, hctxs[i], i);
-> > > > > -				kobject_put(&hctxs[i]->kobj);
-> > > > > -			}
-> > > > >    			hctxs[i] = hctx;
-> > > > >    		} else {
-> > > > >    			if (hctxs[i])
-> > > > > @@ -2824,9 +2837,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
-> > > > >    			if (hctx->tags)
-> > > > >    				blk_mq_free_map_and_requests(set, j);
-> > > > >    			blk_mq_exit_hctx(q, set, hctx, j);
-> > > > > -			kobject_put(&hctx->kobj);
-> > > > >    			hctxs[j] = NULL;
-> > > > > -
-> > > > >    		}
-> > > > >    	}
-> > > > >    	mutex_unlock(&q->sysfs_lock);
-> > > > > @@ -2869,6 +2880,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
-> > > > >    	if (!q->queue_hw_ctx)
-> > > > >    		goto err_sys_init;
-> > > > > +	INIT_LIST_HEAD(&q->dead_hctx_list);
-> > > > > +	spin_lock_init(&q->dead_hctx_lock);
-> > > > > +
-> > > > >    	blk_mq_realloc_hw_ctxs(set, q);
-> > > > >    	if (!q->nr_hw_queues)
-> > > > >    		goto err_hctxs;
-> > > > > diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> > > > > index db29928de467..15d1aa53d96c 100644
-> > > > > --- a/include/linux/blk-mq.h
-> > > > > +++ b/include/linux/blk-mq.h
-> > > > > @@ -70,6 +70,8 @@ struct blk_mq_hw_ctx {
-> > > > >    	struct dentry		*sched_debugfs_dir;
-> > > > >    #endif
-> > > > > +	struct list_head	hctx_list;
-> > > > > +
-> > > > >    	/* Must be the last member - see also blk_mq_hw_ctx_size(). */
-> > > > >    	struct srcu_struct	srcu[0];
-> > > > >    };
-> > > > > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > > > > index 4b85dc066264..1325f941f0be 100644
-> > > > > --- a/include/linux/blkdev.h
-> > > > > +++ b/include/linux/blkdev.h
-> > > > > @@ -535,6 +535,13 @@ struct request_queue {
-> > > > >    	struct mutex		sysfs_lock;
-> > > > > +	/*
-> > > > > +	 * for reusing dead hctx instance in case of updating
-> > > > > +	 * nr_hw_queues
-> > > > > +	 */
-> > > > > +	struct list_head	dead_hctx_list;
-> > > > > +	spinlock_t		dead_hctx_lock;
-> > > > > +
-> > > > >    	atomic_t		mq_freeze_depth;
-> > > > >    #if defined(CONFIG_BLK_DEV_BSG)
-> > > > > 
-> > > > Hmm.
-> > > > I don't particularly like this approach.
-> > > > The much saner approach would be to avoid having I/O in-flight in the first
-> > > > place by setting the queue to something else than live, no?
-> > > 
-> > > There isn't any in-flight IO since blk_mq_freeze_queue() is returned
-> > > from __blk_mq_update_nr_hw_queues().
-> > > 
-> > > However, there can be reference to hctx in other code paths via
-> > > arbitrary block layer APIs.
-> > > 
-> > > Quiesce can't avoid the use-after-free too given RCU read lock may
-> > > not be held in lots of reference to hctx, such as queue_for_each_hw_ctx().
-> > > 
-> > > So this patch might be the simplest approach to fix this issue, IMO.
-> > > 
-> > > However, I am open to any solution for this issue.
-> > 
-> > Hi Hannes,
-> > 
-> > Could you please let us know if you have better idea for this issue?
-> > Otherwise, I think we need to move on since it is real issue, and users
-> > want to fix that.
-> > 
-> Okay. Having looked over the problem and possible alternatives, it looks
-> indeed like a viable solution.
-> I do agree that it's a sensible design to have an additional holding area
-> for hardware context elements, given that they might be reassigned during
-> blk_mq_realloc_hw_ctxs().
+On 17.04.2019 19:11, Heiner Litz wrote:
+> Hi Igor,
+> thank you for doing this. For the most part, this looks great. Some comments:
 > 
-> However, I would rename the 'dead' elements to 'unused' (ie unused_hctx_list
-> etc).
+> 1. When performing cached reads, you can bio_advance all sectors at
+> once. So you try reading all from the cache and only if successful,
+> you bio_advance all the cached-read sectors. This means you can always
+> retry and do not have to goto end.
 
-OK, looks the name of 'unused' is better.
+I'm not sure how you would like to do this instead. The goal of using 
+bio_advance() here was to allow pblk_rb_copy_to_bio() to call bio_data() 
+in order to get proper buffer to write the data from cache. If you have 
+some other idea how to access the particular part of bio data buffer 
+without using bio_advance() let me know.
+
+> 2. should we set
+>   split->bi_rw |= REQ_NOMERGE
+> as in blk_queue_split?
+
+So I check the other users of bio_split() (like md) and they did not set 
+this flag, so looks like it is not needed in that case.
+
+> 3. Did you test rqds where sequences of cached and non-cached segments
+> alternate?
+
+Yes, I did some testing including such a scenarios (with debug prints 
+not included in this patch).
 
 > 
-> And I would deallocate q->queue_hw_ctx in blk_mq_exit_queue() to make things
-> more consistent.
-
-No, that is wrong.
-
-The request queue's refcount is often held when blk_cleanup_queue() is running,
-and blk_mq_exit_queue() is called directly by blk_cleanup_queue(). One invariant
-is that we have to allow most APIs running well if the request queue is live
-from kobject view. If q->queue_hw_ctx is freed in blk_mq_exit_queue(),
-it is quite easy to cause use-after-free.
-
-> Problem with the current patch is that in blk_mq_release() we iterate
-> the 'dead_hctx_list' and free up everything in there, but then blindly call
-> 'kfree(q->queue_hw_ctx)' without checking if there are any context pointers
-> left.
-
-If request queue is dead, it is safe to assume that there isn't any
-reference to request queue and q->queue_hw_ctx. Otherwise, it must be
-a bug somewhere.
-
-> When moving the call to blk_mq_exit_queue() we could to a simple
-> WARN_ON(q->queue_hw_ctx) in blk_mq_release() to ensure that everything got
-> deallocated properly.
-
-At that time, hctx instance might be active, but that is fine given hctx
-is covered by its own kobject. What we need to do is to make sure that no
-any references to q->queue_hw_ctx and the request queue.
-
-Thanks,
-Ming
+> Heiner
+> 
+> On Tue, Apr 16, 2019 at 3:19 AM Igor Konopko <igor.j.konopko@intel.com> wrote:
+>>
+>> This patch changes the approach to handling partial read path.
+>>
+>> In old approach merging of data from round buffer and drive was fully
+>> made by drive. This had some disadvantages - code was complex and
+>> relies on bio internals, so it was hard to maintain and was strongly
+>> dependent on bio changes.
+>>
+>> In new approach most of the handling is done mostly by block layer
+>> functions such as bio_split(), bio_chain() and generic_make request()
+>> and generally is less complex and easier to maintain. Below some more
+>> details of the new approach.
+>>
+>> When read bio arrives, it is cloned for pblk internal purposes. All
+>> the L2P mapping, which includes copying data from round buffer to bio
+>> and thus bio_advance() calls is done on the cloned bio, so the original
+>> bio is untouched. If we found that we have partial read case, we
+>> still have original bio untouched, so we can split it and continue to
+>> process only first part of it in current context, when the rest will be
+>> called as separate bio request which is passed to generic_make_request()
+>> for further processing.
+>>
+>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+>> ---
+>>   drivers/lightnvm/pblk-core.c |  13 +-
+>>   drivers/lightnvm/pblk-rb.c   |  11 +-
+>>   drivers/lightnvm/pblk-read.c | 333 +++++++++++--------------------------------
+>>   drivers/lightnvm/pblk.h      |  18 +--
+>>   4 files changed, 100 insertions(+), 275 deletions(-)
+>>
+>> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+>> index 73be3a0..07270ba 100644
+>> --- a/drivers/lightnvm/pblk-core.c
+>> +++ b/drivers/lightnvm/pblk-core.c
+>> @@ -2147,8 +2147,8 @@ void pblk_update_map_dev(struct pblk *pblk, sector_t lba,
+>>          spin_unlock(&pblk->trans_lock);
+>>   }
+>>
+>> -void pblk_lookup_l2p_seq(struct pblk *pblk, struct ppa_addr *ppas,
+>> -                        sector_t blba, int nr_secs)
+>> +int pblk_lookup_l2p_seq(struct pblk *pblk, struct ppa_addr *ppas,
+>> +                        sector_t blba, int nr_secs, bool *from_cache)
+>>   {
+>>          int i;
+>>
+>> @@ -2162,10 +2162,19 @@ void pblk_lookup_l2p_seq(struct pblk *pblk, struct ppa_addr *ppas,
+>>                  if (!pblk_ppa_empty(ppa) && !pblk_addr_in_cache(ppa)) {
+>>                          struct pblk_line *line = pblk_ppa_to_line(pblk, ppa);
+>>
+>> +                       if (i > 0 && *from_cache)
+>> +                               break;
+>> +                       *from_cache = false;
+>> +
+>>                          kref_get(&line->ref);
+>> +               } else {
+>> +                       if (i > 0 && !*from_cache)
+>> +                               break;
+>> +                       *from_cache = true;
+>>                  }
+>>          }
+>>          spin_unlock(&pblk->trans_lock);
+>> +       return i;
+>>   }
+>>
+>>   void pblk_lookup_l2p_rand(struct pblk *pblk, struct ppa_addr *ppas,
+>> diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+>> index 3555014..5abb170 100644
+>> --- a/drivers/lightnvm/pblk-rb.c
+>> +++ b/drivers/lightnvm/pblk-rb.c
+>> @@ -642,7 +642,7 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
+>>    * be directed to disk.
+>>    */
+>>   int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
+>> -                       struct ppa_addr ppa, int bio_iter, bool advanced_bio)
+>> +                       struct ppa_addr ppa)
+>>   {
+>>          struct pblk *pblk = container_of(rb, struct pblk, rwb);
+>>          struct pblk_rb_entry *entry;
+>> @@ -673,15 +673,6 @@ int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
+>>                  ret = 0;
+>>                  goto out;
+>>          }
+>> -
+>> -       /* Only advance the bio if it hasn't been advanced already. If advanced,
+>> -        * this bio is at least a partial bio (i.e., it has partially been
+>> -        * filled with data from the cache). If part of the data resides on the
+>> -        * media, we will read later on
+>> -        */
+>> -       if (unlikely(!advanced_bio))
+>> -               bio_advance(bio, bio_iter * PBLK_EXPOSED_PAGE_SIZE);
+>> -
+>>          data = bio_data(bio);
+>>          memcpy(data, entry->data, rb->seg_size);
+>>
+>> diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+>> index 0953c34..d98ea39 100644
+>> --- a/drivers/lightnvm/pblk-read.c
+>> +++ b/drivers/lightnvm/pblk-read.c
+>> @@ -26,8 +26,7 @@
+>>    * issued.
+>>    */
+>>   static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
+>> -                               sector_t lba, struct ppa_addr ppa,
+>> -                               int bio_iter, bool advanced_bio)
+>> +                               sector_t lba, struct ppa_addr ppa)
+>>   {
+>>   #ifdef CONFIG_NVM_PBLK_DEBUG
+>>          /* Callers must ensure that the ppa points to a cache address */
+>> @@ -35,73 +34,75 @@ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
+>>          BUG_ON(!pblk_addr_in_cache(ppa));
+>>   #endif
+>>
+>> -       return pblk_rb_copy_to_bio(&pblk->rwb, bio, lba, ppa,
+>> -                                               bio_iter, advanced_bio);
+>> +       return pblk_rb_copy_to_bio(&pblk->rwb, bio, lba, ppa);
+>>   }
+>>
+>> -static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>> +static int pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>>                                   struct bio *bio, sector_t blba,
+>> -                                unsigned long *read_bitmap)
+>> +                                bool *from_cache)
+>>   {
+>>          void *meta_list = rqd->meta_list;
+>> -       struct ppa_addr ppas[NVM_MAX_VLBA];
+>> -       int nr_secs = rqd->nr_ppas;
+>> -       bool advanced_bio = false;
+>> -       int i, j = 0;
+>> +       int nr_secs, i;
+>>
+>> -       pblk_lookup_l2p_seq(pblk, ppas, blba, nr_secs);
+>> +retry:
+>> +       nr_secs = pblk_lookup_l2p_seq(pblk, rqd->ppa_list, blba, rqd->nr_ppas,
+>> +                                       from_cache);
+>> +
+>> +       if (!*from_cache)
+>> +               goto end;
+>>
+>>          for (i = 0; i < nr_secs; i++) {
+>> -               struct ppa_addr p = ppas[i];
+>>                  struct pblk_sec_meta *meta = pblk_get_meta(pblk, meta_list, i);
+>>                  sector_t lba = blba + i;
+>>
+>> -retry:
+>> -               if (pblk_ppa_empty(p)) {
+>> +               if (pblk_ppa_empty(rqd->ppa_list[i])) {
+>>                          __le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+>>
+>> -                       WARN_ON(test_and_set_bit(i, read_bitmap));
+>>                          meta->lba = addr_empty;
+>> -
+>> -                       if (unlikely(!advanced_bio)) {
+>> -                               bio_advance(bio, (i) * PBLK_EXPOSED_PAGE_SIZE);
+>> -                               advanced_bio = true;
+>> +               } else if (pblk_addr_in_cache(rqd->ppa_list[i])) {
+>> +                       /*
+>> +                        * Try to read from write buffer. The address is later
+>> +                        * checked on the write buffer to prevent retrieving
+>> +                        * overwritten data.
+>> +                        */
+>> +                       if (!pblk_read_from_cache(pblk, bio, lba,
+>> +                                                       rqd->ppa_list[i])) {
+>> +                               if (i == 0) {
+>> +                                       /*
+>> +                                        * We didn't call with bio_advance()
+>> +                                        * yet, so we can just retry.
+>> +                                        */
+>> +                                       goto retry;
+>> +                               } else {
+>> +                                       /*
+>> +                                        * We already call bio_advance()
+>> +                                        * so we cannot retry and we need
+>> +                                        * to quit that function in order
+>> +                                        * to allow caller to handle the bio
+>> +                                        * splitting in the current sector
+>> +                                        * position.
+>> +                                        */
+>> +                                       nr_secs = i;
+>> +                                       goto end;
+>> +                               }
+>>                          }
+>> -
+>> -                       goto next;
+>> -               }
+>> -
+>> -               /* Try to read from write buffer. The address is later checked
+>> -                * on the write buffer to prevent retrieving overwritten data.
+>> -                */
+>> -               if (pblk_addr_in_cache(p)) {
+>> -                       if (!pblk_read_from_cache(pblk, bio, lba, p, i,
+>> -                                                               advanced_bio)) {
+>> -                               pblk_lookup_l2p_seq(pblk, &p, lba, 1);
+>> -                               goto retry;
+>> -                       }
+>> -                       WARN_ON(test_and_set_bit(i, read_bitmap));
+>>                          meta->lba = cpu_to_le64(lba);
+>> -                       advanced_bio = true;
+>>   #ifdef CONFIG_NVM_PBLK_DEBUG
+>>                          atomic_long_inc(&pblk->cache_reads);
+>>   #endif
+>> -               } else {
+>> -                       /* Read from media non-cached sectors */
+>> -                       rqd->ppa_list[j++] = p;
+>>                  }
+>> -
+>> -next:
+>> -               if (advanced_bio)
+>> -                       bio_advance(bio, PBLK_EXPOSED_PAGE_SIZE);
+>> +               bio_advance(bio, PBLK_EXPOSED_PAGE_SIZE);
+>>          }
+>>
+>> +end:
+>>          if (pblk_io_aligned(pblk, nr_secs))
+>>                  rqd->is_seq = 1;
+>>
+>>   #ifdef CONFIG_NVM_PBLK_DEBUG
+>>          atomic_long_add(nr_secs, &pblk->inflight_reads);
+>>   #endif
+>> +
+>> +       return nr_secs;
+>>   }
+>>
+>>
+>> @@ -197,9 +198,7 @@ static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
+>>                  pblk_log_read_err(pblk, rqd);
+>>
+>>          pblk_read_check_seq(pblk, rqd, r_ctx->lba);
+>> -
+>> -       if (int_bio)
+>> -               bio_put(int_bio);
+>> +       bio_put(int_bio);
+>>
+>>          if (put_line)
+>>                  pblk_rq_to_line_put(pblk, rqd);
+>> @@ -223,177 +222,13 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+>>          __pblk_end_io_read(pblk, rqd, true);
+>>   }
+>>
+>> -static void pblk_end_partial_read(struct nvm_rq *rqd)
+>> -{
+>> -       struct pblk *pblk = rqd->private;
+>> -       struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+>> -       struct pblk_pr_ctx *pr_ctx = r_ctx->private;
+>> -       struct pblk_sec_meta *meta;
+>> -       struct bio *new_bio = rqd->bio;
+>> -       struct bio *bio = pr_ctx->orig_bio;
+>> -       struct bio_vec src_bv, dst_bv;
+>> -       void *meta_list = rqd->meta_list;
+>> -       int bio_init_idx = pr_ctx->bio_init_idx;
+>> -       unsigned long *read_bitmap = pr_ctx->bitmap;
+>> -       int nr_secs = pr_ctx->orig_nr_secs;
+>> -       int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+>> -       void *src_p, *dst_p;
+>> -       int hole, i;
+>> -
+>> -       if (unlikely(nr_holes == 1)) {
+>> -               struct ppa_addr ppa;
+>> -
+>> -               ppa = rqd->ppa_addr;
+>> -               rqd->ppa_list = pr_ctx->ppa_ptr;
+>> -               rqd->dma_ppa_list = pr_ctx->dma_ppa_list;
+>> -               rqd->ppa_list[0] = ppa;
+>> -       }
+>> -
+>> -       for (i = 0; i < nr_secs; i++) {
+>> -               meta = pblk_get_meta(pblk, meta_list, i);
+>> -               pr_ctx->lba_list_media[i] = le64_to_cpu(meta->lba);
+>> -               meta->lba = cpu_to_le64(pr_ctx->lba_list_mem[i]);
+>> -       }
+>> -
+>> -       /* Fill the holes in the original bio */
+>> -       i = 0;
+>> -       hole = find_first_zero_bit(read_bitmap, nr_secs);
+>> -       do {
+>> -               struct pblk_line *line;
+>> -
+>> -               line = pblk_ppa_to_line(pblk, rqd->ppa_list[i]);
+>> -               kref_put(&line->ref, pblk_line_put);
+>> -
+>> -               meta = pblk_get_meta(pblk, meta_list, hole);
+>> -               meta->lba = cpu_to_le64(pr_ctx->lba_list_media[i]);
+>> -
+>> -               src_bv = new_bio->bi_io_vec[i++];
+>> -               dst_bv = bio->bi_io_vec[bio_init_idx + hole];
+>> -
+>> -               src_p = kmap_atomic(src_bv.bv_page);
+>> -               dst_p = kmap_atomic(dst_bv.bv_page);
+>> -
+>> -               memcpy(dst_p + dst_bv.bv_offset,
+>> -                       src_p + src_bv.bv_offset,
+>> -                       PBLK_EXPOSED_PAGE_SIZE);
+>> -
+>> -               kunmap_atomic(src_p);
+>> -               kunmap_atomic(dst_p);
+>> -
+>> -               mempool_free(src_bv.bv_page, &pblk->page_bio_pool);
+>> -
+>> -               hole = find_next_zero_bit(read_bitmap, nr_secs, hole + 1);
+>> -       } while (hole < nr_secs);
+>> -
+>> -       bio_put(new_bio);
+>> -       kfree(pr_ctx);
+>> -
+>> -       /* restore original request */
+>> -       rqd->bio = NULL;
+>> -       rqd->nr_ppas = nr_secs;
+>> -
+>> -       pblk_end_user_read(bio, rqd->error);
+>> -       __pblk_end_io_read(pblk, rqd, false);
+>> -}
+>> -
+>> -static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+>> -                           unsigned int bio_init_idx,
+>> -                           unsigned long *read_bitmap,
+>> -                           int nr_holes)
+>> -{
+>> -       void *meta_list = rqd->meta_list;
+>> -       struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+>> -       struct pblk_pr_ctx *pr_ctx;
+>> -       struct bio *new_bio, *bio = r_ctx->private;
+>> -       int nr_secs = rqd->nr_ppas;
+>> -       int i;
+>> -
+>> -       new_bio = bio_alloc(GFP_KERNEL, nr_holes);
+>> -
+>> -       if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+>> -               goto fail_bio_put;
+>> -
+>> -       if (nr_holes != new_bio->bi_vcnt) {
+>> -               WARN_ONCE(1, "pblk: malformed bio\n");
+>> -               goto fail_free_pages;
+>> -       }
+>> -
+>> -       pr_ctx = kzalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
+>> -       if (!pr_ctx)
+>> -               goto fail_free_pages;
+>> -
+>> -       for (i = 0; i < nr_secs; i++) {
+>> -               struct pblk_sec_meta *meta = pblk_get_meta(pblk, meta_list, i);
+>> -
+>> -               pr_ctx->lba_list_mem[i] = le64_to_cpu(meta->lba);
+>> -       }
+>> -
+>> -       new_bio->bi_iter.bi_sector = 0; /* internal bio */
+>> -       bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
+>> -
+>> -       rqd->bio = new_bio;
+>> -       rqd->nr_ppas = nr_holes;
+>> -
+>> -       pr_ctx->orig_bio = bio;
+>> -       bitmap_copy(pr_ctx->bitmap, read_bitmap, NVM_MAX_VLBA);
+>> -       pr_ctx->bio_init_idx = bio_init_idx;
+>> -       pr_ctx->orig_nr_secs = nr_secs;
+>> -       r_ctx->private = pr_ctx;
+>> -
+>> -       if (unlikely(nr_holes == 1)) {
+>> -               pr_ctx->ppa_ptr = rqd->ppa_list;
+>> -               pr_ctx->dma_ppa_list = rqd->dma_ppa_list;
+>> -               rqd->ppa_addr = rqd->ppa_list[0];
+>> -       }
+>> -       return 0;
+>> -
+>> -fail_free_pages:
+>> -       pblk_bio_free_pages(pblk, new_bio, 0, new_bio->bi_vcnt);
+>> -fail_bio_put:
+>> -       bio_put(new_bio);
+>> -
+>> -       return -ENOMEM;
+>> -}
+>> -
+>> -static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+>> -                                unsigned int bio_init_idx,
+>> -                                unsigned long *read_bitmap, int nr_secs)
+>> -{
+>> -       int nr_holes;
+>> -       int ret;
+>> -
+>> -       nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+>> -
+>> -       if (pblk_setup_partial_read(pblk, rqd, bio_init_idx, read_bitmap,
+>> -                                   nr_holes))
+>> -               return NVM_IO_ERR;
+>> -
+>> -       rqd->end_io = pblk_end_partial_read;
+>> -
+>> -       ret = pblk_submit_io(pblk, rqd);
+>> -       if (ret) {
+>> -               bio_put(rqd->bio);
+>> -               pblk_err(pblk, "partial read IO submission failed\n");
+>> -               goto err;
+>> -       }
+>> -
+>> -       return NVM_IO_OK;
+>> -
+>> -err:
+>> -       pblk_err(pblk, "failed to perform partial read\n");
+>> -
+>> -       /* Free allocated pages in new bio */
+>> -       pblk_bio_free_pages(pblk, rqd->bio, 0, rqd->bio->bi_vcnt);
+>> -       return NVM_IO_ERR;
+>> -}
+>> -
+>>   static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd, struct bio *bio,
+>> -                        sector_t lba, unsigned long *read_bitmap)
+>> +                        sector_t lba, bool *from_cache)
+>>   {
+>>          struct pblk_sec_meta *meta = pblk_get_meta(pblk, rqd->meta_list, 0);
+>>          struct ppa_addr ppa;
+>>
+>> -       pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
+>> +       pblk_lookup_l2p_seq(pblk, &ppa, lba, 1, from_cache);
+>>
+>>   #ifdef CONFIG_NVM_PBLK_DEBUG
+>>          atomic_long_inc(&pblk->inflight_reads);
+>> @@ -403,7 +238,6 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd, struct bio *bio,
+>>          if (pblk_ppa_empty(ppa)) {
+>>                  __le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+>>
+>> -               WARN_ON(test_and_set_bit(0, read_bitmap));
+>>                  meta->lba = addr_empty;
+>>                  return;
+>>          }
+>> @@ -412,12 +246,11 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd, struct bio *bio,
+>>           * write buffer to prevent retrieving overwritten data.
+>>           */
+>>          if (pblk_addr_in_cache(ppa)) {
+>> -               if (!pblk_read_from_cache(pblk, bio, lba, ppa, 0, 1)) {
+>> -                       pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
+>> +               if (!pblk_read_from_cache(pblk, bio, lba, ppa)) {
+>> +                       pblk_lookup_l2p_seq(pblk, &ppa, lba, 1, from_cache);
+>>                          goto retry;
+>>                  }
+>>
+>> -               WARN_ON(test_and_set_bit(0, read_bitmap));
+>>                  meta->lba = cpu_to_le64(lba);
+>>
+>>   #ifdef CONFIG_NVM_PBLK_DEBUG
+>> @@ -434,17 +267,14 @@ void pblk_submit_read(struct pblk *pblk, struct bio *bio)
+>>          struct request_queue *q = dev->q;
+>>          sector_t blba = pblk_get_lba(bio);
+>>          unsigned int nr_secs = pblk_get_secs(bio);
+>> +       bool from_cache;
+>>          struct pblk_g_ctx *r_ctx;
+>>          struct nvm_rq *rqd;
+>> -       struct bio *int_bio;
+>> -       unsigned int bio_init_idx;
+>> -       DECLARE_BITMAP(read_bitmap, NVM_MAX_VLBA);
+>> +       struct bio *int_bio, *split_bio;
+>>
+>>          generic_start_io_acct(q, REQ_OP_READ, bio_sectors(bio),
+>>                                &pblk->disk->part0);
+>>
+>> -       bitmap_zero(read_bitmap, nr_secs);
+>> -
+>>          rqd = pblk_alloc_rqd(pblk, PBLK_READ);
+>>
+>>          rqd->opcode = NVM_OP_PREAD;
+>> @@ -456,11 +286,6 @@ void pblk_submit_read(struct pblk *pblk, struct bio *bio)
+>>          r_ctx->start_time = jiffies;
+>>          r_ctx->lba = blba;
+>>
+>> -       /* Save the index for this bio's start. This is needed in case
+>> -        * we need to fill a partial read.
+>> -        */
+>> -       bio_init_idx = pblk_get_bi_idx(bio);
+>> -
+>>          if (pblk_alloc_rqd_meta(pblk, rqd)) {
+>>                  bio_io_error(bio);
+>>                  pblk_free_rqd(pblk, rqd, PBLK_READ);
+>> @@ -469,46 +294,58 @@ void pblk_submit_read(struct pblk *pblk, struct bio *bio)
+>>
+>>          /* Clone read bio to deal internally with:
+>>           * -read errors when reading from drive
+>> -        * -bio_advance() calls during l2p lookup and cache reads
+>> +        * -bio_advance() calls during cache reads
+>>           */
+>>          int_bio = bio_clone_fast(bio, GFP_KERNEL, &pblk_bio_set);
+>>
+>>          if (nr_secs > 1)
+>> -               pblk_read_ppalist_rq(pblk, rqd, bio, blba, read_bitmap);
+>> +               nr_secs = pblk_read_ppalist_rq(pblk, rqd, int_bio, blba,
+>> +                                               &from_cache);
+>>          else
+>> -               pblk_read_rq(pblk, rqd, bio, blba, read_bitmap);
+>> +               pblk_read_rq(pblk, rqd, int_bio, blba, &from_cache);
+>>
+>> +split_retry:
+>>          r_ctx->private = bio; /* original bio */
+>>          rqd->bio = int_bio; /* internal bio */
+>>
+>> -       if (bitmap_full(read_bitmap, nr_secs)) {
+>> +       if (from_cache && nr_secs == rqd->nr_ppas) {
+>> +               /* All data was read from cache, we can complete the IO. */
+>>                  pblk_end_user_read(bio, 0);
+>>                  atomic_inc(&pblk->inflight_io);
+>>                  __pblk_end_io_read(pblk, rqd, false);
+>> -               return;
+>> -       }
+>> -
+>> -       if (!bitmap_empty(read_bitmap, rqd->nr_ppas)) {
+>> +       } else if (nr_secs != rqd->nr_ppas) {
+>>                  /* The read bio request could be partially filled by the write
+>>                   * buffer, but there are some holes that need to be read from
+>> -                * the drive.
+>> +                * the drive. In order to handle this, we will use block layer
+>> +                * mechanism to split this request in to smaller ones and make
+>> +                * a chain of it.
+>>                   */
+>> -               bio_put(int_bio);
+>> -               rqd->bio = NULL;
+>> -               if (pblk_partial_read_bio(pblk, rqd, bio_init_idx, read_bitmap,
+>> -                                           nr_secs)) {
+>> -                       pblk_err(pblk, "read IO submission failed\n");
+>> -                       bio_io_error(bio);
+>> -                       __pblk_end_io_read(pblk, rqd, false);
+>> -               }
+>> -               return;
+>> -       }
+>> +               split_bio = bio_split(bio, nr_secs * NR_PHY_IN_LOG, GFP_KERNEL,
+>> +                                       &pblk_bio_set);
+>> +               bio_chain(split_bio, bio);
+>> +               generic_make_request(bio);
+>> +
+>> +               /* New bio contains first N sectors of the previous one, so
+>> +                * we can continue to use existing rqd, but we need to shrink
+>> +                * the number of PPAs in it. New bio is also guaranteed that
+>> +                * it contains only either data from cache or from drive, newer
+>> +                * mix of them.
+>> +                */
+>> +               bio = split_bio;
+>> +               rqd->nr_ppas = nr_secs;
+>> +               if (rqd->nr_ppas == 1)
+>> +                       rqd->ppa_addr = rqd->ppa_list[0];
+>>
+>> -       /* All sectors are to be read from the device */
+>> -       if (pblk_submit_io(pblk, rqd)) {
+>> -               pblk_err(pblk, "read IO submission failed\n");
+>> -               bio_io_error(bio);
+>> -               __pblk_end_io_read(pblk, rqd, false);
+>> +               /* Recreate int_bio - existing might have some needed internal
+>> +                * fields modified already.
+>> +                */
+>> +               bio_put(int_bio);
+>> +               int_bio = bio_clone_fast(bio, GFP_KERNEL, &pblk_bio_set);
+>> +               goto split_retry;
+>> +       } else if (pblk_submit_io(pblk, rqd)) {
+>> +               /* Submitting IO to drive failed, let's report an error */
+>> +               rqd->error = -ENODEV;
+>> +               pblk_end_io_read(rqd);
+>>          }
+>>   }
+>>
+>> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+>> index 17ced12..a678553 100644
+>> --- a/drivers/lightnvm/pblk.h
+>> +++ b/drivers/lightnvm/pblk.h
+>> @@ -121,18 +121,6 @@ struct pblk_g_ctx {
+>>          u64 lba;
+>>   };
+>>
+>> -/* partial read context */
+>> -struct pblk_pr_ctx {
+>> -       struct bio *orig_bio;
+>> -       DECLARE_BITMAP(bitmap, NVM_MAX_VLBA);
+>> -       unsigned int orig_nr_secs;
+>> -       unsigned int bio_init_idx;
+>> -       void *ppa_ptr;
+>> -       dma_addr_t dma_ppa_list;
+>> -       u64 lba_list_mem[NVM_MAX_VLBA];
+>> -       u64 lba_list_media[NVM_MAX_VLBA];
+>> -};
+>> -
+>>   /* Pad context */
+>>   struct pblk_pad_rq {
+>>          struct pblk *pblk;
+>> @@ -759,7 +747,7 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
+>>                                   unsigned int pos, unsigned int nr_entries,
+>>                                   unsigned int count);
+>>   int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
+>> -                       struct ppa_addr ppa, int bio_iter, bool advanced_bio);
+>> +                       struct ppa_addr ppa);
+>>   unsigned int pblk_rb_read_commit(struct pblk_rb *rb, unsigned int entries);
+>>
+>>   unsigned int pblk_rb_sync_init(struct pblk_rb *rb, unsigned long *flags);
+>> @@ -859,8 +847,8 @@ int pblk_update_map_gc(struct pblk *pblk, sector_t lba, struct ppa_addr ppa,
+>>                         struct pblk_line *gc_line, u64 paddr);
+>>   void pblk_lookup_l2p_rand(struct pblk *pblk, struct ppa_addr *ppas,
+>>                            u64 *lba_list, int nr_secs);
+>> -void pblk_lookup_l2p_seq(struct pblk *pblk, struct ppa_addr *ppas,
+>> -                        sector_t blba, int nr_secs);
+>> +int pblk_lookup_l2p_seq(struct pblk *pblk, struct ppa_addr *ppas,
+>> +                        sector_t blba, int nr_secs, bool *from_cache);
+>>   void *pblk_get_meta_for_writes(struct pblk *pblk, struct nvm_rq *rqd);
+>>   void pblk_get_packed_meta(struct pblk *pblk, struct nvm_rq *rqd);
+>>
+>> --
+>> 2.9.5
+>>
