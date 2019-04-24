@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-7.7 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95D49C10F11
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7A9C282CE
 	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 21:54:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C7D420811
+	by mail.kernel.org (Postfix) with ESMTP id 2FDBC20685
 	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 21:54:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="X/OcvXly"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="qS9snzxl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728103AbfDXVyZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 17:54:25 -0400
-Received: from mail.stbuehler.de ([5.9.32.208]:41014 "EHLO mail.stbuehler.de"
+        id S1731710AbfDXVy3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 17:54:29 -0400
+Received: from mail.stbuehler.de ([5.9.32.208]:41028 "EHLO mail.stbuehler.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731763AbfDXVyZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 17:54:25 -0400
+        id S1731858AbfDXVy1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Apr 2019 17:54:27 -0400
 Received: from chromobil.fritz.box (unknown [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6])
-        by mail.stbuehler.de (Postfix) with ESMTPSA id 46327C030BD;
-        Wed, 24 Apr 2019 21:54:23 +0000 (UTC)
+        by mail.stbuehler.de (Postfix) with ESMTPSA id 25D3AC030C6;
+        Wed, 24 Apr 2019 21:54:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=stbuehler.de;
-        s=stbuehler1; t=1556142863;
-        bh=j00YEKIBIYx8iSi1Y8E2AsbiGHpsyQBbnqztzAtf1uE=;
+        s=stbuehler1; t=1556142864;
+        bh=l9WN3oodFm2l6ZgdbAKryqOBl7w8r+hOq9d0s2jkX8I=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=X/OcvXlyLV6MDawzUJ6YwlKQ9k84bUI0JnIL3yFch0mWe/Gt2DnZCJgbW5Vgk8/zE
-         K6rNDpIXYp0txCL9Cw1eATrjana3yCnzKjac4Zrnjh6mP4JhwiKuK3d8Y7a5Fgr5Ij
-         ij+SHikoHgGn61q1+fT9RszJTJNxgM/WzqOySGcc=
+        b=qS9snzxloRrBXnQv9qv/9yvuBAvUAOyRL4SYfdts3Z65zEH4AFCRwOsDM1a/+40qu
+         6D5+EDcZ63nS1+Q+4HQLjGruZmd1fzXCsOWfC5cZ4p2/7VLknMq2LouYvPKjFCiOJv
+         YxxIIXtyqXuIQYQo+jUBA61u1fNxFTTk92PBt7ss=
 From:   =?UTF-8?q?Stefan=20B=C3=BChler?= <source@stbuehler.de>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org
-Subject: [PATCH barrier cleanup v1 3/7] io_uring: remove unnecessary barrier before reading cq head
-Date:   Wed, 24 Apr 2019 23:54:18 +0200
-Message-Id: <20190424215422.7404-3-source@stbuehler.de>
+Subject: [PATCH barrier cleanup v1 6/7] io_uring: remove unnecessary barrier after incrementing dropped counter
+Date:   Wed, 24 Apr 2019 23:54:21 +0200
+Message-Id: <20190424215422.7404-6-source@stbuehler.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190424215422.7404-1-source@stbuehler.de>
 References: <54496e17-97de-9f9a-9972-c448226bb768@stbuehler.de>
@@ -49,34 +49,26 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The memory operations before reading cq head are unrelated and we
-don't care about their order.
-
-Document that the control dependency in combination with READ_ONCE and
-WRITE_ONCE forms a barrier we need.
+smp_store_release in io_commit_sqring already orders the store to
+dropped before the update to SQ head.
 
 Signed-off-by: Stefan Bühler <source@stbuehler.de>
 ---
- fs/io_uring.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ fs/io_uring.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 1f4419f38ef1..2c101230df71 100644
+index f93a9fca8311..0287f6694e3b 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -431,8 +431,11 @@ static struct io_uring_cqe *io_get_cqring(struct io_ring_ctx *ctx)
- 	unsigned tail;
- 
- 	tail = ctx->cached_cq_tail;
--	/* See comment at the top of the file */
--	smp_rmb();
-+	/*
-+	 * writes to the cq entry need to come after reading head; the
-+	 * control dependency is enough as we're using WRITE_ONCE to
-+	 * fill the cq entry
-+	 */
- 	if (tail - READ_ONCE(ring->r.head) == ring->ring_entries)
- 		return NULL;
+@@ -1843,8 +1843,6 @@ static bool io_get_sqring(struct io_ring_ctx *ctx, struct sqe_submit *s)
+ 	/* drop invalid entries */
+ 	ctx->cached_sq_head++;
+ 	ring->dropped++;
+-	/* See comment at the top of this file */
+-	smp_wmb();
+ 	return false;
+ }
  
 -- 
 2.20.1
