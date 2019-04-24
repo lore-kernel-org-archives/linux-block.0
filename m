@@ -1,106 +1,119 @@
-Return-Path: <SRS0=N4qE=SZ=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=lHMQ=S2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13142C10F03
-	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 22:07:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E6CC10F03
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 00:46:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFA4021738
-	for <linux-block@archiver.kernel.org>; Tue, 23 Apr 2019 22:07:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="o7d6v/cb"
+	by mail.kernel.org (Postfix) with ESMTP id 71C70218D3
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 00:46:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728079AbfDWWH5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Apr 2019 18:07:57 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:46970 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727929AbfDWWH4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Apr 2019 18:07:56 -0400
-Received: by mail-pg1-f193.google.com with SMTP id v2so5857907pge.13
-        for <linux-block@vger.kernel.org>; Tue, 23 Apr 2019 15:07:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:references:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=E+6aRvz4Z09evBiibOHD3ZNcSjXr3mNiHU4Qco54pcU=;
-        b=o7d6v/cbAsVH2XoEkHi83W5JcavIKrSXT27FOuf4sCRGAdC8833TaMgkOEFpVETBdM
-         wqlfaRW/Ug5yy82uJo8kUsOLuz66CBvWtyQxaRuI43t6RrfdF2eqI+14aQCUua4aHmxo
-         UkmKU/sLqA4RQ2VzShqHtX/XaGKZnt6/pP30sg5BCQK0c27P+5x2wrHPn0U7agR9ULwE
-         nNwHOWTKdpehSYkm8ZPsxCfjJaH7muA4L82h+ZVVU6SMfG8m5N+HFEee07e8yW5LRRBv
-         jxL0792W2g84xme+I0cQwXzEqZiig1wVCShGWYe6kxRaw6F2b8+stjbZUX4hyB2EV1Sg
-         4x+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=E+6aRvz4Z09evBiibOHD3ZNcSjXr3mNiHU4Qco54pcU=;
-        b=C7/WQN8kPhjaiOwO8MQgBT7GUdzZIN4K4px81SKqsjtg/xJC+gBjlPYfviyMDZa2IG
-         3uppxCjJvUgH0inco8YpAiViFwyxj0otT3Z34LLDQaoDRPtjS+1uuYqH5eV19HMuiT3m
-         nsiqx5fD7bMzPqH5zkIyZ4eRDZ4mIxaDvRLhutukWDshHBqYjGnIez7NIMjB5D93dcv4
-         wcZqTD1d5Er3C22cLHlbi1Y8ORQzprLYRojD1WDTqE109E7gYCNa0c8w4Btc5dwOFXfx
-         iQF0M6o53a0mSY18FAsi0wU0Q0qzcMKLuhH8cGydh9LrOAGD68Vy2wOhMrjqik+T6sEw
-         6naA==
-X-Gm-Message-State: APjAAAUccE4QeKx8CCtsl08VHIDipx0HEkpiOgPsINsxkdHUrcWKvDxt
-        EegdXnlh721PW1f27wS5dxcocA==
-X-Google-Smtp-Source: APXvYqxeXKnny36PVIadE59Z0qTZp4Gg3iXoneCNv8Q6KIXfwKmxFfHhz2YkfB/hoN5NWsrt13IOMw==
-X-Received: by 2002:a63:161d:: with SMTP id w29mr3979135pgl.395.1556057276054;
-        Tue, 23 Apr 2019 15:07:56 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id a10sm22000583pfc.21.2019.04.23.15.07.54
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 23 Apr 2019 15:07:55 -0700 (PDT)
-Subject: Re: io_uring: not good enough for release
-From:   Jens Axboe <axboe@kernel.dk>
-To:     =?UTF-8?Q?Stefan_B=c3=bchler?= <source@stbuehler.de>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <366484f9-cc5b-e477-6cc5-6c65f21afdcb@stbuehler.de>
- <37071226-375a-07a6-d3d3-21323145de71@kernel.dk>
-Message-ID: <bc077192-56cc-7497-ee43-6a0bcc369d16@kernel.dk>
-Date:   Tue, 23 Apr 2019 16:07:53 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1728615AbfDXAqg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Apr 2019 20:46:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40862 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726841AbfDXAqf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Apr 2019 20:46:35 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A9627C7C31;
+        Wed, 24 Apr 2019 00:46:35 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2435916BE5;
+        Wed, 24 Apr 2019 00:46:27 +0000 (UTC)
+Date:   Wed, 24 Apr 2019 08:46:22 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 1/2] scsi: core: avoid to pre-allocate big chunk for
+ protection meta data
+Message-ID: <20190424004621.GA634@ming.t460p>
+References: <20190423103240.29864-1-ming.lei@redhat.com>
+ <20190423103240.29864-2-ming.lei@redhat.com>
+ <1556033627.161891.120.camel@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <37071226-375a-07a6-d3d3-21323145de71@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1556033627.161891.120.camel@acm.org>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Wed, 24 Apr 2019 00:46:35 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/23/19 2:31 PM, Jens Axboe wrote:
->> 1. An error for a submission should be returned as completion for that
->> submission.  Please don't break my main event loop with strange error
->> codes just because a single operation is broken/not supported/...
+On Tue, Apr 23, 2019 at 08:33:47AM -0700, Bart Van Assche wrote:
+> On Tue, 2019-04-23 at 18:32 +0800, Ming Lei wrote:
+> > +/*
+> > + * Size of integrity meta data size is usually small, 1 inline sg
+>                         ^^^^^^^^^^^^^^
+> Please change this into "metadata". Mentioning "size" twice is not
+> useful.
+
+OK
+
+> > + * should cover normal cases.
+> > + */
+> > +#define  SCSI_INLINE_PROT_SG_CNT  1
+> > +
+> >  static struct kmem_cache *scsi_sdb_cache;
+> >  static struct kmem_cache *scsi_sense_cache;
+> >  static struct kmem_cache *scsi_sense_isadma_cache;
+> > @@ -553,12 +559,21 @@ static void scsi_uninit_cmd(struct scsi_cmnd *cmd)
+> >         }
+> >  }
+> >  
+> > +static inline bool scsi_prot_use_inline_sg(struct scsi_cmnd *cmd)
+> > +{
+> > +       if (!scsi_prot_sglist(cmd))
+> > +               return false;
 > 
-> So that's the case I was referring to above. We can just make that change,
-> there's absolutely no reason to have errors passed back through a different
-> channel.
+> Since scsi_prot_use_inline_sg() is only called if scsi_prot_sg_count() > 0,
+> is the above test necessary?
 
-Thinking about this a bit more, and I think the current approach is the
-best one. The issue is that only submission side events tied to an sqe
-can return an cqe, the rest have to be returned through the system call
-value. So I think it's cleaner to keep it as-is, honestly.
+Yeah, the check can be removed.
 
->> (Also RWF_NOWAIT doesn't work in io_uring right now: IOCB_NOWAIT is
->> always removed in the workqueue context, and I don't see an early EAGAIN
->> completion).
 > 
-> That's a case I didn't consider, that you'd want to see EAGAIN after
-> it's been punted. Once punted, we're not going to return EAGAIN since
-> we can now block. Not sure how you'd want to handle that any better...
+> > +       return cmd->prot_sdb->table.sgl ==
+> > +               (struct scatterlist *)(cmd->prot_sdb + 1);
+> > +}
+> > +
+> >  static void scsi_mq_free_sgtables(struct scsi_cmnd *cmd)
+> >  {
+> >         if (cmd->sdb.table.nents)
+> >                 sg_free_table_chained(&cmd->sdb.table, true);
+> > -       if (scsi_prot_sg_count(cmd))
+> > -               sg_free_table_chained(&cmd->prot_sdb->table, true);
+> > +       if (scsi_prot_sg_count(cmd) && !scsi_prot_use_inline_sg(cmd))
+> > +               sg_free_table_chained(&cmd->prot_sdb->table, false);
+> >  }
+> >  
+> >  static void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd)
+> > @@ -1044,9 +1059,11 @@ blk_status_t scsi_init_io(struct scsi_cmnd *cmd)
+> >                 }
+> >  
+> >                 ivecs = blk_rq_count_integrity_sg(rq->q, rq->bio);
+> > -
+> > -               if (sg_alloc_table_chained(&prot_sdb->table, ivecs,
+> > -                               prot_sdb->table.sgl)) {
+> > +               if (ivecs <= SCSI_INLINE_PROT_SG_CNT)
+> > +                       prot_sdb->table.nents = prot_sdb->table.orig_nents =
+> > +                               SCSI_INLINE_PROT_SG_CNT;
+> 
+> Please call sg_init_table() instead of open-coding it.
 
-I think I grok this one too now - what you're saying is that if the
-caller has RWF_NOWAIT set, then the EAGAIN should be returned instead of
-being punted to the workqueue? I totally agree with that, that's a bug.
+OK.
 
--- 
-Jens Axboe
-
+Thanks,
+Ming
