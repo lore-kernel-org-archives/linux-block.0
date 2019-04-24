@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E43C282CE
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 14:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7123FC282CE
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 14:51:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 21C6921900
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 14:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 430C7218FC
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 14:51:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1556117345;
-	bh=6BTYkSw2N77HIKsqXak+KZ3BJdvB4MeM8uudiKeaLig=;
+	s=default; t=1556117506;
+	bh=g0/hQWvUSHhGfjIbEH4nnfsVp7xs9k3e+Ct+8cLFrJs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=kz7D+0UwoDfq1jP96ZzjenhLR4YhRbr/0bbaXWJmSCRN7pAD6YjUQ8EMEY44QwCfp
-	 82Fg9TtW4o4kBMEczrfFl1xRWGbVTo18V1jgIOU2l5pFKyu9gKuBCMx5ZrJu17GC1X
-	 7aiaq3dz47XRzQlxbVAM8cUGum/eBJnM8GOqjv8Q=
+	b=m++dIRLT6PwxDL+nnndKiLKUxTkJH8evnatZSm2LjjSU36K1MNnXbt8Lo113xvP56
+	 OqO6hD8QIzsAlb57t2EUXvn2XGm0lgBCOik+c7282V0jFyoZxmSeB9iJt+FQ1SU2L0
+	 G2lUBjo/s6VpF42Y+Y774g86LiK417xZSfa4FWYo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732507AbfDXOsm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 10:48:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48308 "EHLO mail.kernel.org"
+        id S1732817AbfDXOv3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 10:51:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50672 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731042AbfDXOsk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 10:48:40 -0400
+        id S1732808AbfDXOv2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Apr 2019 10:51:28 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AB5CA218FC;
-        Wed, 24 Apr 2019 14:48:37 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 66FD721905;
+        Wed, 24 Apr 2019 14:51:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1556117319;
-        bh=6BTYkSw2N77HIKsqXak+KZ3BJdvB4MeM8uudiKeaLig=;
+        s=default; t=1556117487;
+        bh=g0/hQWvUSHhGfjIbEH4nnfsVp7xs9k3e+Ct+8cLFrJs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0F7iT+bXFzx6MhmmNhsSjedjHHiGaK8QZNWhzzsz8ogEyHbW81Cs/8Sqmf3E9Ip14
-         w+ltrLnfpjjy9zYEAyiuBP2bXy+AUJUsrwpROPNTVu+jrslc+9NBdVlJeNIbJnbUnI
-         TgcTGQvIsLOAKnx7zI64+ILVieM6fMwXu+09d25Q=
+        b=WnG0A+usO4hEoKvRoowGe0tHj271fH1RGdyXRnXX95MWWn0ySPtsfjwKk5QqUceqb
+         lSiud+neB75MLpUpHRxPL8+IojU1L/Ud/cb1wbj51YsgJ5EYwC5oFNTS8AQcSY7lOu
+         fFPYkVt1QI6wlUXgFnk0soezPucIVohx5nus5xXg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Guenter Roeck <linux@roeck-us.net>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 33/35] xsysace: Fix error handling in ace_setup
-Date:   Wed, 24 Apr 2019 10:47:07 -0400
-Message-Id: <20190424144709.30215-33-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 26/28] xsysace: Fix error handling in ace_setup
+Date:   Wed, 24 Apr 2019 10:50:10 -0400
+Message-Id: <20190424145012.30886-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190424144709.30215-1-sashal@kernel.org>
-References: <20190424144709.30215-1-sashal@kernel.org>
+In-Reply-To: <20190424145012.30886-1-sashal@kernel.org>
+References: <20190424145012.30886-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -124,10 +124,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/block/xsysace.c b/drivers/block/xsysace.c
-index 14459d66ef0c..51ff7ee1b2b1 100644
+index c4328d9d9981..f838119d12b2 100644
 --- a/drivers/block/xsysace.c
 +++ b/drivers/block/xsysace.c
-@@ -1063,6 +1063,8 @@ static int ace_setup(struct ace_device *ace)
+@@ -1062,6 +1062,8 @@ static int ace_setup(struct ace_device *ace)
  	return 0;
  
  err_read:
