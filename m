@@ -6,29 +6,29 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4391BC10F11
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 407A3C282CE
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1CCE0206A3
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BC2F218FE
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732560AbfDXQtG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 12:49:06 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59850 "EHLO mx1.suse.de"
+        id S1732757AbfDXQtK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 12:49:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59870 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726935AbfDXQtG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 12:49:06 -0400
+        id S1732574AbfDXQtK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Apr 2019 12:49:10 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id D568CAF58;
-        Wed, 24 Apr 2019 16:49:04 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 10C81AF58;
+        Wed, 24 Apr 2019 16:49:09 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     axboe@kernel.dk
 Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Guoju Fang <fangguoju@gmail.com>, Coly Li <colyli@suse.de>
-Subject: [PATCH 02/18] bcache: fix inaccurate result of unused buckets
-Date:   Thu, 25 Apr 2019 00:48:27 +0800
-Message-Id: <20190424164843.29535-3-colyli@suse.de>
+        Arnd Bergmann <arnd@arndb.de>, Coly Li <colyli@suse.de>
+Subject: [PATCH 03/18] bcache: avoid clang -Wunintialized warning
+Date:   Thu, 25 Apr 2019 00:48:28 +0800
+Message-Id: <20190424164843.29535-4-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190424164843.29535-1-colyli@suse.de>
 References: <20190424164843.29535-1-colyli@suse.de>
@@ -37,31 +37,71 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Guoju Fang <fangguoju@gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
 
-To get the amount of unused buckets in sysfs_priority_stats, the code
-count the buckets which GC_SECTORS_USED is zero. It's correct and should
-not be overwritten by the count of buckets which prio is zero.
+clang has identified a code path in which it thinks a
+variable may be unused:
 
-Signed-off-by: Guoju Fang <fangguoju@gmail.com>
+drivers/md/bcache/alloc.c:333:4: error: variable 'bucket' is used uninitialized whenever 'if' condition is false
+      [-Werror,-Wsometimes-uninitialized]
+                        fifo_pop(&ca->free_inc, bucket);
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+drivers/md/bcache/util.h:219:27: note: expanded from macro 'fifo_pop'
+ #define fifo_pop(fifo, i)       fifo_pop_front(fifo, (i))
+                                ^~~~~~~~~~~~~~~~~~~~~~~~~
+drivers/md/bcache/util.h:189:6: note: expanded from macro 'fifo_pop_front'
+        if (_r) {                                                       \
+            ^~
+drivers/md/bcache/alloc.c:343:46: note: uninitialized use occurs here
+                        allocator_wait(ca, bch_allocator_push(ca, bucket));
+                                                                  ^~~~~~
+drivers/md/bcache/alloc.c:287:7: note: expanded from macro 'allocator_wait'
+                if (cond)                                               \
+                    ^~~~
+drivers/md/bcache/alloc.c:333:4: note: remove the 'if' if its condition is always true
+                        fifo_pop(&ca->free_inc, bucket);
+                        ^
+drivers/md/bcache/util.h:219:27: note: expanded from macro 'fifo_pop'
+ #define fifo_pop(fifo, i)       fifo_pop_front(fifo, (i))
+                                ^
+drivers/md/bcache/util.h:189:2: note: expanded from macro 'fifo_pop_front'
+        if (_r) {                                                       \
+        ^
+drivers/md/bcache/alloc.c:331:15: note: initialize the variable 'bucket' to silence this warning
+                        long bucket;
+                                   ^
+
+This cannot happen in practice because we only enter the loop
+if there is at least one element in the list.
+
+Slightly rearranging the code makes this clearer to both the
+reader and the compiler, which avoids the warning.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/sysfs.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/md/bcache/alloc.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 17bae9c14ca0..6cd44d3cf906 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -996,8 +996,6 @@ SHOW(__bch_cache)
- 		       !cached[n - 1])
- 			--n;
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index 5002838ea476..f8986effcb50 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -327,10 +327,11 @@ static int bch_allocator_thread(void *arg)
+ 		 * possibly issue discards to them, then we add the bucket to
+ 		 * the free list:
+ 		 */
+-		while (!fifo_empty(&ca->free_inc)) {
++		while (1) {
+ 			long bucket;
  
--		unused = ca->sb.nbuckets - n;
--
- 		while (cached < p + n &&
- 		       *cached == BTREE_PRIO)
- 			cached++, n--;
+-			fifo_pop(&ca->free_inc, bucket);
++			if (!fifo_pop(&ca->free_inc, bucket))
++				break;
+ 
+ 			if (ca->discard) {
+ 				mutex_unlock(&ca->set->bucket_lock);
 -- 
 2.16.4
 
