@@ -6,29 +6,30 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F8AC10F11
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E08BC282CE
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B3082218FE
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3A65206A3
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732764AbfDXQtU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 12:49:20 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59964 "EHLO mx1.suse.de"
+        id S1732769AbfDXQtY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 12:49:24 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59984 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732215AbfDXQtU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 12:49:20 -0400
+        id S1732215AbfDXQtY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Apr 2019 12:49:24 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id B3BE4AF67;
-        Wed, 24 Apr 2019 16:49:17 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 2B4CDAF68;
+        Wed, 24 Apr 2019 16:49:22 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     axboe@kernel.dk
 Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        George Spelvin <lkml@sdf.org>, Coly Li <colyli@suse.de>
-Subject: [PATCH 05/18] bcache: Clean up bch_get_congested()
-Date:   Thu, 25 Apr 2019 00:48:30 +0800
-Message-Id: <20190424164843.29535-6-colyli@suse.de>
+        Liang Chen <liangchen.linux@gmail.com>, stable@vger.kernel.org,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH 06/18] bcache: fix a race between cache register and cacheset unregister
+Date:   Thu, 25 Apr 2019 00:48:31 +0800
+Message-Id: <20190424164843.29535-7-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190424164843.29535-1-colyli@suse.de>
 References: <20190424164843.29535-1-colyli@suse.de>
@@ -37,173 +38,79 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: George Spelvin <lkml@sdf.org>
+From: Liang Chen <liangchen.linux@gmail.com>
 
-There are a few nits in this function.  They could in theory all
-be separate patches, but that's probably taking small commits
-too far.
+There is a race between cache device register and cache set unregister.
+For an already registered cache device, register_bcache will call
+bch_is_open to iterate through all cachesets and check every cache
+there. The race occurs if cache_set_free executes at the same time and
+clears the caches right before ca is dereferenced in bch_is_open_cache.
+To close the race, let's make sure the clean up work is protected by
+the bch_register_lock as well.
 
-1) I added a brief comment saying what it does.
+This issue can be reproduced as follows,
+while true; do echo /dev/XXX> /sys/fs/bcache/register ; done&
+while true; do echo 1> /sys/block/XXX/bcache/set/unregister ; done &
 
-2) I like to declare pointer parameters "const" where possible
-   for documentation reasons.
+and results in the following oops,
 
-3) It uses bitmap_weight(&rand, BITS_PER_LONG) to compute the Hamming
-weight of a 32-bit random number (giving a random integer with
-mean 16 and variance 8).  Passing by reference in a 64-bit variable
-is silly; just use hweight32().
+[  +0.000053] BUG: unable to handle kernel NULL pointer dereference at 0000000000000998
+[  +0.000457] #PF error: [normal kernel read fault]
+[  +0.000464] PGD 800000003ca9d067 P4D 800000003ca9d067 PUD 3ca9c067 PMD 0
+[  +0.000388] Oops: 0000 [#1] SMP PTI
+[  +0.000269] CPU: 1 PID: 3266 Comm: bash Not tainted 5.0.0+ #6
+[  +0.000346] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.11.0-2.fc28 04/01/2014
+[  +0.000472] RIP: 0010:register_bcache+0x1829/0x1990 [bcache]
+[  +0.000344] Code: b0 48 83 e8 50 48 81 fa e0 e1 10 c0 0f 84 a9 00 00 00 48 89 c6 48 89 ca 0f b7 ba 54 04 00 00 4c 8b 82 60 0c 00 00 85 ff 74 2f <49> 3b a8 98 09 00 00 74 4e 44 8d 47 ff 31 ff 49 c1 e0 03 eb 0d
+[  +0.000839] RSP: 0018:ffff92ee804cbd88 EFLAGS: 00010202
+[  +0.000328] RAX: ffffffffc010e190 RBX: ffff918b5c6b5000 RCX: ffff918b7d8e0000
+[  +0.000399] RDX: ffff918b7d8e0000 RSI: ffffffffc010e190 RDI: 0000000000000001
+[  +0.000398] RBP: ffff918b7d318340 R08: 0000000000000000 R09: ffffffffb9bd2d7a
+[  +0.000385] R10: ffff918b7eb253c0 R11: ffffb95980f51200 R12: ffffffffc010e1a0
+[  +0.000411] R13: fffffffffffffff2 R14: 000000000000000b R15: ffff918b7e232620
+[  +0.000384] FS:  00007f955bec2740(0000) GS:ffff918b7eb00000(0000) knlGS:0000000000000000
+[  +0.000420] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  +0.000801] CR2: 0000000000000998 CR3: 000000003cad6000 CR4: 00000000001406e0
+[  +0.000837] Call Trace:
+[  +0.000682]  ? _cond_resched+0x10/0x20
+[  +0.000691]  ? __kmalloc+0x131/0x1b0
+[  +0.000710]  kernfs_fop_write+0xfa/0x170
+[  +0.000733]  __vfs_write+0x2e/0x190
+[  +0.000688]  ? inode_security+0x10/0x30
+[  +0.000698]  ? selinux_file_permission+0xd2/0x120
+[  +0.000752]  ? security_file_permission+0x2b/0x100
+[  +0.000753]  vfs_write+0xa8/0x1a0
+[  +0.000676]  ksys_write+0x4d/0xb0
+[  +0.000699]  do_syscall_64+0x3a/0xf0
+[  +0.000692]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
 
-4) Its helper function fract_exp_two is unnecessarily tangled.
-Gcc can optimize the multiply by (1 << x) to a shift, but it can
-be written in a much more straightforward way at the cost of one
-more bit of internal precision.  Some analysis reveals that this
-bit is always available.
-
-This shrinks the object code for fract_exp_two(x, 6) from 23 bytes:
-
-0000000000000000 <foo1>:
-   0:   89 f9                   mov    %edi,%ecx
-   2:   c1 e9 06                shr    $0x6,%ecx
-   5:   b8 01 00 00 00          mov    $0x1,%eax
-   a:   d3 e0                   shl    %cl,%eax
-   c:   83 e7 3f                and    $0x3f,%edi
-   f:   d3 e7                   shl    %cl,%edi
-  11:   c1 ef 06                shr    $0x6,%edi
-  14:   01 f8                   add    %edi,%eax
-  16:   c3                      retq
-
-To 19:
-
-0000000000000017 <foo2>:
-  17:   89 f8                   mov    %edi,%eax
-  19:   83 e0 3f                and    $0x3f,%eax
-  1c:   83 c0 40                add    $0x40,%eax
-  1f:   89 f9                   mov    %edi,%ecx
-  21:   c1 e9 06                shr    $0x6,%ecx
-  24:   d3 e0                   shl    %cl,%eax
-  26:   c1 e8 06                shr    $0x6,%eax
-  29:   c3                      retq
-
-(Verified with 0 <= frac_bits <= 8, 0 <= x < 16<<frac_bits;
-both versions produce the same output.)
-
-5) And finally, the call to bch_get_congested() in check_should_bypass()
-is separated from the use of the value by multiple tests which
-could moot the need to compute it.  Move the computation down to
-where it's needed.  This also saves a local register to hold the
-computed value.
-
-Signed-off-by: George Spelvin <lkml@sdf.org>
+Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+Cc: stable@vger.kernel.org
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/request.c | 15 ++++++++-------
- drivers/md/bcache/request.h |  2 +-
- drivers/md/bcache/util.h    | 26 +++++++++++++++++++-------
- 3 files changed, 28 insertions(+), 15 deletions(-)
+ drivers/md/bcache/super.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index f11123079fe0..41adcd1546f1 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -329,12 +329,13 @@ void bch_data_insert(struct closure *cl)
- 	bch_data_insert_start(cl);
- }
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 6e618cb6126c..53c5e3e0ac22 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1514,6 +1514,7 @@ static void cache_set_free(struct closure *cl)
+ 	bch_btree_cache_free(c);
+ 	bch_journal_free(c);
  
--/* Congested? */
--
--unsigned int bch_get_congested(struct cache_set *c)
-+/*
-+ * Congested?  Return 0 (not congested) or the limit (in sectors)
-+ * beyond which we should bypass the cache due to congestion.
-+ */
-+unsigned int bch_get_congested(const struct cache_set *c)
- {
- 	int i;
--	long rand;
++	mutex_lock(&bch_register_lock);
+ 	for_each_cache(ca, c, i)
+ 		if (ca) {
+ 			ca->set = NULL;
+@@ -1532,7 +1533,6 @@ static void cache_set_free(struct closure *cl)
+ 	mempool_exit(&c->search);
+ 	kfree(c->devices);
  
- 	if (!c->congested_read_threshold_us &&
- 	    !c->congested_write_threshold_us)
-@@ -353,8 +354,7 @@ unsigned int bch_get_congested(struct cache_set *c)
- 	if (i > 0)
- 		i = fract_exp_two(i, 6);
+-	mutex_lock(&bch_register_lock);
+ 	list_del(&c->list);
+ 	mutex_unlock(&bch_register_lock);
  
--	rand = get_random_int();
--	i -= bitmap_weight(&rand, BITS_PER_LONG);
-+	i -= hweight32(get_random_u32());
- 
- 	return i > 0 ? i : 1;
- }
-@@ -376,7 +376,7 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
- {
- 	struct cache_set *c = dc->disk.c;
- 	unsigned int mode = cache_mode(dc);
--	unsigned int sectors, congested = bch_get_congested(c);
-+	unsigned int sectors, congested;
- 	struct task_struct *task = current;
- 	struct io *i;
- 
-@@ -412,6 +412,7 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
- 			goto rescale;
- 	}
- 
-+	congested = bch_get_congested(c);
- 	if (!congested && !dc->sequential_cutoff)
- 		goto rescale;
- 
-diff --git a/drivers/md/bcache/request.h b/drivers/md/bcache/request.h
-index 721bf336ed1a..c64dbd7a91aa 100644
---- a/drivers/md/bcache/request.h
-+++ b/drivers/md/bcache/request.h
-@@ -33,7 +33,7 @@ struct data_insert_op {
- 	BKEY_PADDED(replace_key);
- };
- 
--unsigned int bch_get_congested(struct cache_set *c);
-+unsigned int bch_get_congested(const struct cache_set *c);
- void bch_data_insert(struct closure *cl);
- 
- void bch_cached_dev_request_init(struct cached_dev *dc);
-diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
-index 00aab6abcfe4..1fbced94e4cc 100644
---- a/drivers/md/bcache/util.h
-+++ b/drivers/md/bcache/util.h
-@@ -560,17 +560,29 @@ static inline uint64_t bch_crc64_update(uint64_t crc,
- 	return crc;
- }
- 
--/* Does linear interpolation between powers of two */
-+/*
-+ * A stepwise-linear pseudo-exponential.  This returns 1 << (x >>
-+ * frac_bits), with the less-significant bits filled in by linear
-+ * interpolation.
-+ *
-+ * This can also be interpreted as a floating-point number format,
-+ * where the low frac_bits are the mantissa (with implicit leading
-+ * 1 bit), and the more significant bits are the exponent.
-+ * The return value is 1.mantissa * 2^exponent.
-+ *
-+ * The way this is used, fract_bits is 6 and the largest possible
-+ * input is CONGESTED_MAX-1 = 1023 (exponent 16, mantissa 0x1.fc),
-+ * so the maximum output is 0x1fc00.
-+ */
- static inline unsigned int fract_exp_two(unsigned int x,
- 					 unsigned int fract_bits)
- {
--	unsigned int fract = x & ~(~0 << fract_bits);
--
--	x >>= fract_bits;
--	x   = 1 << x;
--	x  += (x * fract) >> fract_bits;
-+	unsigned int mantissa = 1 << fract_bits;	/* Implicit bit */
- 
--	return x;
-+	mantissa += x & (mantissa - 1);
-+	x >>= fract_bits;	/* The exponent */
-+	/* Largest intermediate value 0x7f0000 */
-+	return mantissa << x >> fract_bits;
- }
- 
- void bch_bio_map(struct bio *bio, void *base);
 -- 
 2.16.4
 
