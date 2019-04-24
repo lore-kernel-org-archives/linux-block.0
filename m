@@ -2,118 +2,108 @@ Return-Path: <SRS0=lHMQ=S2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E6CC10F03
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 00:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A37C10F03
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 01:10:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 71C70218D3
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 00:46:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 070182148D
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 01:10:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gsdnSyt4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728615AbfDXAqg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Apr 2019 20:46:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40862 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726841AbfDXAqf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Apr 2019 20:46:35 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A9627C7C31;
-        Wed, 24 Apr 2019 00:46:35 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2435916BE5;
-        Wed, 24 Apr 2019 00:46:27 +0000 (UTC)
-Date:   Wed, 24 Apr 2019 08:46:22 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH 1/2] scsi: core: avoid to pre-allocate big chunk for
- protection meta data
-Message-ID: <20190424004621.GA634@ming.t460p>
-References: <20190423103240.29864-1-ming.lei@redhat.com>
- <20190423103240.29864-2-ming.lei@redhat.com>
- <1556033627.161891.120.camel@acm.org>
+        id S1728729AbfDXBKk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Apr 2019 21:10:40 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:42197 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726840AbfDXBKk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Apr 2019 21:10:40 -0400
+Received: by mail-qt1-f196.google.com with SMTP id p20so18430609qtc.9;
+        Tue, 23 Apr 2019 18:10:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=tkHovkGoLeUJmBUAXRcEdP2u6Q/Uk6F1LzPacVk5rJ8=;
+        b=gsdnSyt4gtUMCnRM+azrKEaFIk36F6Mmvah/m9Ubdw7XaljkcKtMQFPWJh2uj7HUwF
+         9ALRfjtxdkmZKf0rUYWCz/D6MA237XSRKdr2SK7Fkw1/iP5/AQbdGiOHBrguVDI4BrsO
+         rUvvUA9CPK/xSD8bEn3TXMI7+RCq+MbL2yLh5Ewkuhgk4QvbP06RcVrvgZczegUqG1En
+         /przdaZi/2UhDpY5Tav1+Ng2uMB8r0X6MN1uwVyrXw3eUDDGsGYdMx077Tpv26OC5cAA
+         DdB+GqvbZBhY+NlogbC+/cBGGAHtgR5Nv/qIQueQZ9N6HONFwVLowAdcVHfG/pzmvCkM
+         gLnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=tkHovkGoLeUJmBUAXRcEdP2u6Q/Uk6F1LzPacVk5rJ8=;
+        b=WSj6R3xhJNbLqMsq1d8c/ha581V3Fe7qdZnHuW0NTDXOP5PXkdFjkU0AKyAe9jBrPF
+         /GV9edlnwb7sVGVXY2dUPcSTO75MWOmKAv3oRWfze14nIguokf/UtdqlQgu7RKO5V3UT
+         N0R45XNxSiN5y/kiy5U7v8JzO9H7CKpF4B6PTGdbsQAy57bs4VlVTsKZKTOgey8XR6tU
+         FILDyiQUJJ55SeVz3LBHEw5mLTb1VbN/kR/TjuhfC6NfXGM0cStMQR5tS2Xo5asR0sGo
+         TEAQDrDPl7Destz2LH25raojXs2jGduq0+Q2JJGXpW/oyYd+5+mLWM6VIBYaPK9+NNjz
+         CXBQ==
+X-Gm-Message-State: APjAAAUnSQihUU40g0SAyWfpRZ5qUk3Ktj7LQTcGNMh0ZuAT9Z6ULw6l
+        XSnd2iyBncHQBH8hOdFCJi8nStQgdD4=
+X-Google-Smtp-Source: APXvYqzn9IFQO1GLAIwF4rLgEpLc4SQzDHcjNwDRT6Jzs8JSL/iV2acm2dlR+MGywIAeBpUGEaPYPA==
+X-Received: by 2002:aed:2314:: with SMTP id h20mr24005362qtc.24.1556068238795;
+        Tue, 23 Apr 2019 18:10:38 -0700 (PDT)
+Received: from geeko ([179.183.202.242])
+        by smtp.gmail.com with ESMTPSA id h27sm11319955qtc.1.2019.04.23.18.10.35
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 23 Apr 2019 18:10:37 -0700 (PDT)
+Date:   Tue, 23 Apr 2019 22:10:28 -0300
+From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk, bvanassche@acm.org,
+        Chaitanya.Kulkarni@wdc.com
+Subject: Re: [PATCH v3 0/3] Add documentation of some blk-mq functions
+Message-ID: <20190424011025.GA32345@geeko>
+References: <20190417021030.82998-1-marcos.souza.org@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1556033627.161891.120.camel@acm.org>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Wed, 24 Apr 2019 00:46:35 +0000 (UTC)
+In-Reply-To: <20190417021030.82998-1-marcos.souza.org@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 23, 2019 at 08:33:47AM -0700, Bart Van Assche wrote:
-> On Tue, 2019-04-23 at 18:32 +0800, Ming Lei wrote:
-> > +/*
-> > + * Size of integrity meta data size is usually small, 1 inline sg
->                         ^^^^^^^^^^^^^^
-> Please change this into "metadata". Mentioning "size" twice is not
-> useful.
+gentle ping.
 
-OK
-
-> > + * should cover normal cases.
-> > + */
-> > +#define  SCSI_INLINE_PROT_SG_CNT  1
-> > +
-> >  static struct kmem_cache *scsi_sdb_cache;
-> >  static struct kmem_cache *scsi_sense_cache;
-> >  static struct kmem_cache *scsi_sense_isadma_cache;
-> > @@ -553,12 +559,21 @@ static void scsi_uninit_cmd(struct scsi_cmnd *cmd)
-> >         }
-> >  }
-> >  
-> > +static inline bool scsi_prot_use_inline_sg(struct scsi_cmnd *cmd)
-> > +{
-> > +       if (!scsi_prot_sglist(cmd))
-> > +               return false;
+On Tue, Apr 16, 2019 at 11:10:27PM -0300, Marcos Paulo de Souza wrote:
+> blk_mq_init_sq_queue and blk_mq_init_queue are being documented, more will be
+> added in further patches.
 > 
-> Since scsi_prot_use_inline_sg() is only called if scsi_prot_sg_count() > 0,
-> is the above test necessary?
-
-Yeah, the check can be removed.
-
+> I would like to thank Chaitanya and Bart for their reviews.
 > 
-> > +       return cmd->prot_sdb->table.sgl ==
-> > +               (struct scatterlist *)(cmd->prot_sdb + 1);
-> > +}
-> > +
-> >  static void scsi_mq_free_sgtables(struct scsi_cmnd *cmd)
-> >  {
-> >         if (cmd->sdb.table.nents)
-> >                 sg_free_table_chained(&cmd->sdb.table, true);
-> > -       if (scsi_prot_sg_count(cmd))
-> > -               sg_free_table_chained(&cmd->prot_sdb->table, true);
-> > +       if (scsi_prot_sg_count(cmd) && !scsi_prot_use_inline_sg(cmd))
-> > +               sg_free_table_chained(&cmd->prot_sdb->table, false);
-> >  }
-> >  
-> >  static void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd)
-> > @@ -1044,9 +1059,11 @@ blk_status_t scsi_init_io(struct scsi_cmnd *cmd)
-> >                 }
-> >  
-> >                 ivecs = blk_rq_count_integrity_sg(rq->q, rq->bio);
-> > -
-> > -               if (sg_alloc_table_chained(&prot_sdb->table, ivecs,
-> > -                               prot_sdb->table.sgl)) {
-> > +               if (ivecs <= SCSI_INLINE_PROT_SG_CNT)
-> > +                       prot_sdb->table.nents = prot_sdb->table.orig_nents =
-> > +                               SCSI_INLINE_PROT_SG_CNT;
+> Changes from v2:
+> * Changed the description of argument @set of blk_mq_init_sq_queue, making it
+>   less obvious and more informative. Now this argument has two example of
+>   possible flags for tag_set (suggested by Bart)
+> * Cover letter added (suggested by Bart)
 > 
-> Please call sg_init_table() instead of open-coding it.
+> Changes from v1:
+> * Change "SQ" to "only one hw_queue (SQ)" in the function signature
+>   documentation (suggested by Chaitanya)
+> 
+> Marcos Paulo de Souza (3):
+>   blk-mq.c: Add documention of function blk_mq_init_queue
+>   blk-mq.c: Rework documention of blk_mq_init_sq_queue function
+>   Documentation: kernel-api.rst: Add block/blk-mq.c
+> 
+>  Documentation/core-api/kernel-api.rst |  6 ++++++
+>  block/blk-mq.c                        | 27 ++++++++++++++++++++++++---
+>  2 files changed, 30 insertions(+), 3 deletions(-)
+> 
+> -- 
+> 2.16.4
+> 
 
-OK.
-
+-- 
 Thanks,
-Ming
+Marcos
