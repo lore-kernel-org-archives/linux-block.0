@@ -2,98 +2,81 @@ Return-Path: <SRS0=lHMQ=S2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4C9C282E1
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 18:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88AB6C10F11
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 18:56:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7E4B2084F
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 18:12:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1556129530;
-	bh=6Kj/fMTnjLTWJOq409dK0XleAtsCLZBMkE1roOZ66a0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=YyTF2jTd8uFxpjEDQmzqSTXQGlx7JVB4Qekh/Jp+IxlAabiBjrMGTV2RDeoUskKIa
-	 q4Z3WAMeXkwc5fNEEyQ94lh3HcYSlZ4wRvWFI5tAfG6gvtwe6OhSGe5t2wKUBbSora
-	 wZqyBlFxoE7pAueenBISTIIy6RCSBSPA7BLh+Hpw=
+	by mail.kernel.org (Postfix) with ESMTP id 5E9AD208E4
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 18:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733305AbfDXRNL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 13:13:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37160 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733277AbfDXRNJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 13:13:09 -0400
-Received: from localhost (62-193-50-229.as16211.net [62.193.50.229])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B0ED621903;
-        Wed, 24 Apr 2019 17:13:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1556125989;
-        bh=6Kj/fMTnjLTWJOq409dK0XleAtsCLZBMkE1roOZ66a0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LxcjSzhuCG/fUJ/nIm8zpNz3SR/vIyo/goQTxTQSBX3kV9GbAnDDIZUi4iKhCryhT
-         G3HuKREJCuKnR7YCacRGJeJDKQe+sK3J2xxF36qnYevtFbVyDcKiwoQAw+RgvgqzKB
-         KD+ibmgHIhkLNYgIQPWLHFG7lEndNrruf9yhcvpU=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, linux-block@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3.18 054/104] block: do not leak memory in bio_copy_user_iov()
-Date:   Wed, 24 Apr 2019 19:09:11 +0200
-Message-Id: <20190424170902.295902372@linuxfoundation.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190424170839.996641496@linuxfoundation.org>
-References: <20190424170839.996641496@linuxfoundation.org>
-User-Agent: quilt/0.66
+        id S1727847AbfDXS4I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 14:56:08 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57194 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727503AbfDXS4I (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Apr 2019 14:56:08 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 05828AC32;
+        Wed, 24 Apr 2019 18:56:06 +0000 (UTC)
+Subject: Re: [PATCH] block: use static bio_set for bio_split() calls
+To:     Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.com>,
+        Bart van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@gmail.com>, neilb@suse.com,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+References: <20190418140632.60606-1-hare@suse.de>
+ <20190418143429.GA19175@ming.t460p>
+ <98d8549a-2663-b404-e38a-6f55dfb575bf@grimberg.me>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <69845bdb-cfc6-58d4-4fea-b06c2dd44872@suse.de>
+Date:   Wed, 24 Apr 2019 20:56:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <98d8549a-2663-b404-e38a-6f55dfb575bf@grimberg.me>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jérôme Glisse <jglisse@redhat.com>
+On 4/24/19 7:20 PM, Sagi Grimberg wrote:
+> 
+>> per-queue bioset is used originally for avoiding deadlock, are you
+>> sure the static bioset is safe?
+> 
+> Can you explain this? I didn't find any indication of that in the change
+> log history...
+> 
+> Originally introduced by Kent:
+> -- 
+> commit 54efd50bfd873e2dbf784e0b21a8027ba4299a3e
+> Author: Kent Overstreet <kent.overstreet@gmail.com>
+> Date:   Thu Apr 23 22:37:18 2015 -0700
+> 
+Phew. I was wondering whether I'd been too stupid to find it.
+And having looked at it a bit closer, moving the bioset into the holding 
+structure would induce more churn, as we'd need to pass the bioset into
+blk_queue_split(), which would mean to update all drivers (11 in total) 
+for no real gain IMO; bio splitting shouldn't really be a regular 
+occurrence and hence the bioset should only be used infrequently.
 
-commit a3761c3c91209b58b6f33bf69dd8bb8ec0c9d925 upstream.
+However, I really would like to get feedback to the actual patch, as 
+this solves a real customer issues we've had (or still have, depending 
+on the view :-)
 
-When bio_add_pc_page() fails in bio_copy_user_iov() we should free
-the page we just allocated otherwise we are leaking it.
+Cheers,
 
-Cc: linux-block@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: stable@vger.kernel.org
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
----
- block/bio.c |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1217,8 +1217,11 @@ struct bio *bio_copy_user_iov(struct req
- 			}
- 		}
- 
--		if (bio_add_pc_page(q, bio, page, bytes, offset) < bytes)
-+		if (bio_add_pc_page(q, bio, page, bytes, offset) < bytes) {
-+			if (!map_data)
-+				__free_page(page);
- 			break;
-+		}
- 
- 		len -= bytes;
- 		offset = 0;
-
-
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                              +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
