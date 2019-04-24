@@ -2,82 +2,72 @@ Return-Path: <SRS0=lHMQ=S2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45470C282CE
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 21:54:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40992C10F11
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 22:14:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0AEBA20685
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 21:54:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="r3/rEDTr"
+	by mail.kernel.org (Postfix) with ESMTP id 167E620835
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 22:14:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732070AbfDXVyd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 17:54:33 -0400
-Received: from mail.stbuehler.de ([5.9.32.208]:41030 "EHLO mail.stbuehler.de"
+        id S1731043AbfDXWOh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 18:14:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40213 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731763AbfDXVy1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 17:54:27 -0400
-Received: from chromobil.fritz.box (unknown [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6])
-        by mail.stbuehler.de (Postfix) with ESMTPSA id 7326BC030C7;
-        Wed, 24 Apr 2019 21:54:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=stbuehler.de;
-        s=stbuehler1; t=1556142864;
-        bh=N03kNgSxQvwPesqZAQBECnNE0NAOvlkik1vWzNpvW9M=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=r3/rEDTr3hECbwd0JPZ8bV76XhFC4XD1AR86EzMkvv+1dOOhelErwbUvUceVGzBXg
-         1mByDZqsu38CjS7cEC7rbzM4L51kXap76dbv+4G4xwKEged9ncl7YVT0J39ZPmE9ks
-         iLuo4hSLoIgBlEtndqyyrn2vF+Hd4+n4CgSR+zQY=
-From:   =?UTF-8?q?Stefan=20B=C3=BChler?= <source@stbuehler.de>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: [PATCH barrier cleanup v1 7/7] io_uring: remove unnecessary barrier after unsetting IORING_SQ_NEED_WAKEUP
-Date:   Wed, 24 Apr 2019 23:54:22 +0200
-Message-Id: <20190424215422.7404-7-source@stbuehler.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190424215422.7404-1-source@stbuehler.de>
-References: <54496e17-97de-9f9a-9972-c448226bb768@stbuehler.de>
- <20190424215422.7404-1-source@stbuehler.de>
+        id S1730399AbfDXWOg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Apr 2019 18:14:36 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 73DD7E9506;
+        Wed, 24 Apr 2019 22:14:36 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B9D919729;
+        Wed, 24 Apr 2019 22:14:28 +0000 (UTC)
+Date:   Thu, 25 Apr 2019 06:14:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        Hannes Reinecke <hare@suse.com>,
+        Bart van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@gmail.com>, neilb@suse.com,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Subject: Re: [PATCH] block: use static bio_set for bio_split() calls
+Message-ID: <20190424221422.GA21351@ming.t460p>
+References: <20190418140632.60606-1-hare@suse.de>
+ <20190418143429.GA19175@ming.t460p>
+ <98d8549a-2663-b404-e38a-6f55dfb575bf@grimberg.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <98d8549a-2663-b404-e38a-6f55dfb575bf@grimberg.me>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Wed, 24 Apr 2019 22:14:36 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no operation to order with afterwards, and removing the flag is
-not critical in any way.
+On Wed, Apr 24, 2019 at 10:20:46AM -0700, Sagi Grimberg wrote:
+> 
+> > per-queue bioset is used originally for avoiding deadlock, are you
+> > sure the static bioset is safe?
+> 
+> Can you explain this? I didn't find any indication of that in the change
+> log history...
+> 
+> Originally introduced by Kent:
 
-There will always be a "race condition" where the application will
-trigger IORING_ENTER_SQ_WAKEUP when it isn't actually needed.
+bio split can be run from stacking drivers, for example, MD over NVMe,
+if the global reserved mempool is consumed by MD bio splitting, then
+no any progress can be made when splitting on bio submitted to NVMe.
 
-Signed-off-by: Stefan Bühler <source@stbuehler.de>
----
- fs/io_uring.c | 2 --
- 1 file changed, 2 deletions(-)
+Kent may have more details...
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 0287f6694e3b..da084bcbd408 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -1966,13 +1966,11 @@ static int io_sq_thread(void *data)
- 				finish_wait(&ctx->sqo_wait, &wait);
- 
- 				ctx->sq_ring->flags &= ~IORING_SQ_NEED_WAKEUP;
--				smp_wmb();
- 				continue;
- 			}
- 			finish_wait(&ctx->sqo_wait, &wait);
- 
- 			ctx->sq_ring->flags &= ~IORING_SQ_NEED_WAKEUP;
--			smp_wmb();
- 		}
- 
- 		i = 0;
--- 
-2.20.1
-
+Thanks,
+Ming
