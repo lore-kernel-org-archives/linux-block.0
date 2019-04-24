@@ -2,117 +2,131 @@ Return-Path: <SRS0=lHMQ=S2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 932F2C10F11
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:48:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34974C10F11
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 584B8218FE
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:48:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BFE6206A3
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732343AbfDXQs5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 12:48:57 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59794 "EHLO mx1.suse.de"
+        id S1732551AbfDXQtB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 12:49:01 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59820 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726935AbfDXQs5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 12:48:57 -0400
+        id S1726935AbfDXQtB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Apr 2019 12:49:01 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 512B2AF58;
-        Wed, 24 Apr 2019 16:48:56 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 374B1AF67;
+        Wed, 24 Apr 2019 16:49:00 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     axboe@kernel.dk
 Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH 00/18] bcache patches for Linux v5.2 
-Date:   Thu, 25 Apr 2019 00:48:25 +0800
-Message-Id: <20190424164843.29535-1-colyli@suse.de>
+        Guoju Fang <fangguoju@gmail.com>, Coly Li <colyli@suse.de>
+Subject: [PATCH 01/18] bcache: fix crashes stopping bcache device before read miss done
+Date:   Thu, 25 Apr 2019 00:48:26 +0800
+Message-Id: <20190424164843.29535-2-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20190424164843.29535-1-colyli@suse.de>
+References: <20190424164843.29535-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+From: Guoju Fang <fangguoju@gmail.com>
 
-Here are the bcache patches for Linux v5.2.
+The bio from upper layer is considered completed when bio_complete()
+returns. In most scenarios bio_complete() is called in search_free(),
+but when read miss happens, the bio_compete() is called when backing
+device reading completed, while the struct search is still in use until
+cache inserting finished.
 
-Most of the patches are bug fixes. We don't introduce new feature in
-this run, people continue to focus on code quality improvement for now.
+If someone stops the bcache device just then, the device may be closed
+and released, but after cache inserting finished the struct search will
+access a freed struct cached_dev.
 
-Juhui Tang and I make some fixes related to bcache journal, the changes
-include,
-- Fix KEY_PTRS set to 0 error under very heavy small I/O pressure, to
-  avoid potential missing for journal and uuid update to cache device.
-- Add code comments to make code more understandable.
-- Minor code cleanup.
+This patch add the reference of bcache device before bio_complete() when
+read miss happens, and put it after the search is not used.
 
-Liang Chen, Guoju Fang and Shenghui Wang contribute useful and important
-fixes for,
-- Avoid a crash in cached_dev_read_done() by adding reference before
-  calling bio_complete()
-- Improve unused buckets statistic
-- Fix a race between cache register and unregister
-- Potential use-after-free and memory leak bugs
-
-Arnd Bergmann and George Spelvin also contriubte useful code clean up
-to fix clang warning and make bch_get_congested() more clear.
-
-Please pick them for the 5.2 merge window.
-
-Thanks you in advance.
-
-Coly Li
+Signed-off-by: Guoju Fang <fangguoju@gmail.com>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
+ drivers/md/bcache/request.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
-Arnd Bergmann (1):
-  bcache: avoid clang -Wunintialized warning
-
-Coly Li (9):
-  bcache: move definition of 'int ret' out of macro read_bucket()
-  bcache: never set KEY_PTRS of jouranl key to 0 in journal_reclaim()
-  bcache: add failure check to run_cache_set() for journal replay
-  bcache: add comments for kobj release callback routine
-  bcache: return error immediately in bch_journal_replay()
-  bcache: add error check for calling register_bdev()
-  bcache: Add comments for blkdev_put() in registration code path
-  bcache: add comments for closure_fn to be called in closure_queue()
-  bcache: improve bcache_reboot()
-
-Geliang Tang (1):
-  bcache: use kmemdup_nul for CACHED_LABEL buffer
-
-George Spelvin (1):
-  bcache: Clean up bch_get_congested()
-
-Guoju Fang (2):
-  bcache: fix crashes stopping bcache device before read miss done
-  bcache: fix inaccurate result of unused buckets
-
-Liang Chen (1):
-  bcache: fix a race between cache register and cacheset unregister
-
-Shenghui Wang (2):
-  bcache: fix wrong usage use-after-freed on keylist in out_nocoalesce
-    branch of btree_gc_coalesce
-  bcache: avoid potential memleak of list of journal_replay(s) in the
-    CACHE_SYNC branch of run_cache_set
-
-Tang Junhui (1):
-  bcache: fix failure in journal relplay
-
- drivers/md/bcache/alloc.c   |  5 +--
- drivers/md/bcache/btree.c   |  2 +-
- drivers/md/bcache/journal.c | 42 ++++++++++++++++++-----
- drivers/md/bcache/request.c | 41 +++++++++++++++-------
- drivers/md/bcache/request.h |  2 +-
- drivers/md/bcache/super.c   | 83 ++++++++++++++++++++++++++++++++++-----------
- drivers/md/bcache/sysfs.c   |  2 --
- drivers/md/bcache/util.h    | 26 ++++++++++----
- 8 files changed, 149 insertions(+), 54 deletions(-)
-
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index f101bfe8657a..f11123079fe0 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -706,14 +706,14 @@ static void search_free(struct closure *cl)
+ {
+ 	struct search *s = container_of(cl, struct search, cl);
+ 
+-	atomic_dec(&s->d->c->search_inflight);
++	atomic_dec(&s->iop.c->search_inflight);
+ 
+ 	if (s->iop.bio)
+ 		bio_put(s->iop.bio);
+ 
+ 	bio_complete(s);
+ 	closure_debug_destroy(cl);
+-	mempool_free(s, &s->d->c->search);
++	mempool_free(s, &s->iop.c->search);
+ }
+ 
+ static inline struct search *search_alloc(struct bio *bio,
+@@ -756,13 +756,13 @@ static void cached_dev_bio_complete(struct closure *cl)
+ 	struct search *s = container_of(cl, struct search, cl);
+ 	struct cached_dev *dc = container_of(s->d, struct cached_dev, disk);
+ 
+-	search_free(cl);
+ 	cached_dev_put(dc);
++	search_free(cl);
+ }
+ 
+ /* Process reads */
+ 
+-static void cached_dev_cache_miss_done(struct closure *cl)
++static void cached_dev_read_error_done(struct closure *cl)
+ {
+ 	struct search *s = container_of(cl, struct search, cl);
+ 
+@@ -800,7 +800,22 @@ static void cached_dev_read_error(struct closure *cl)
+ 		closure_bio_submit(s->iop.c, bio, cl);
+ 	}
+ 
+-	continue_at(cl, cached_dev_cache_miss_done, NULL);
++	continue_at(cl, cached_dev_read_error_done, NULL);
++}
++
++static void cached_dev_cache_miss_done(struct closure *cl)
++{
++	struct search *s = container_of(cl, struct search, cl);
++	struct bcache_device *d = s->d;
++
++	if (s->iop.replace_collision)
++		bch_mark_cache_miss_collision(s->iop.c, s->d);
++
++	if (s->iop.bio)
++		bio_free_pages(s->iop.bio);
++
++	cached_dev_bio_complete(cl);
++	closure_put(&d->cl);
+ }
+ 
+ static void cached_dev_read_done(struct closure *cl)
+@@ -833,6 +848,7 @@ static void cached_dev_read_done(struct closure *cl)
+ 	if (verify(dc) && s->recoverable && !s->read_dirty_data)
+ 		bch_data_verify(dc, s->orig_bio);
+ 
++	closure_get(&dc->disk.cl);
+ 	bio_complete(s);
+ 
+ 	if (s->iop.bio &&
 -- 
 2.16.4
 
