@@ -2,109 +2,83 @@ Return-Path: <SRS0=lHMQ=S2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 740CAC10F11
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 08:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7600C10F11
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 09:35:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 502A420656
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 08:42:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89EDA20878
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 09:35:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727513AbfDXIl7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 04:41:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45228 "EHLO mx1.redhat.com"
+        id S1726218AbfDXJft (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 05:35:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44598 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727007AbfDXIl7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 04:41:59 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1726107AbfDXJfs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Apr 2019 05:35:48 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D6D498765E;
-        Wed, 24 Apr 2019 08:41:58 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A14151001DD0;
-        Wed, 24 Apr 2019 08:41:51 +0000 (UTC)
-Date:   Wed, 24 Apr 2019 16:41:46 +0800
+        by mx1.redhat.com (Postfix) with ESMTPS id A969489C4C;
+        Wed, 24 Apr 2019 09:35:48 +0000 (UTC)
+Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DE53A5C220;
+        Wed, 24 Apr 2019 09:35:45 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
         linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
         "Ewan D . Milne" <emilne@redhat.com>,
         Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH 2/2] scsi: core: avoid to pre-allocate big chunk for sg
- list
-Message-ID: <20190424084145.GB32345@ming.t460p>
-References: <20190423103240.29864-1-ming.lei@redhat.com>
- <20190423103240.29864-3-ming.lei@redhat.com>
- <20190424055317.GF12136@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190424055317.GF12136@lst.de>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Wed, 24 Apr 2019 08:41:58 +0000 (UTC)
+Subject: [PATCH V2 0/2] scis: core: avoid big pre-allocation for sg list
+Date:   Wed, 24 Apr 2019 17:35:38 +0800
+Message-Id: <20190424093540.15526-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 24 Apr 2019 09:35:48 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 24, 2019 at 07:53:17AM +0200, Christoph Hellwig wrote:
-> On Tue, Apr 23, 2019 at 06:32:40PM +0800, Ming Lei wrote:
-> > big, the whole pre-allocation for sg list can consume huge memory.
-> > For example of lpfc, nr_hw_queues can be 70, each queue's depth
-> > can be 3781, so the pre-allocation for data sg list can be 70*3781*2k
-> > =517MB for single HBA.
-> 
-> We should probably limit the number of queues to something actually
-> useful, independent of your patch..
-> 
-> > +static bool scsi_use_inline_sg(struct scsi_cmnd *cmd)
-> > +{
-> > +	struct scatterlist *sg = (void *)cmd + sizeof(struct scsi_cmnd) +
-> > +		cmd->device->host->hostt->cmd_size;
-> > +
-> > +	return cmd->sdb.table.sgl == sg;
-> > +}
-> 
-> It might make more sense to have a helper to calculate the inline
-> sg address and use that for the comparism in scsi_mq_free_sgtables
-> and any other place that wants the address.
+Hi,
 
-Good idea, and the helper can be used in scsi_mq_prep_fn() too.
+Since supporting to blk-mq, big pre-allocation for sg list is introduced,
+this way is very unfriendly wrt. memory consumption.
 
-> 
-> > +	if (cmd->sdb.table.nents && !scsi_use_inline_sg(cmd))
-> > +		sg_free_table_chained(&cmd->sdb.table, false);
-> 
-> This removes the last use of the first_chunk paramter to
-> sg_free_table_chained, please remove the paramter in an additional
-> patch.
+There were Red Hat internal reports that some scsi_debug based tests
+can't be run any more because of too big pre-allocation.
 
-NVMe FC/RDMA still uses first_chunk.
+Also lpfc users commplained that 1GB+ ram is pre-allocatd for single
+HBA.
 
-> 
-> > +	if (nr_segs <= SCSI_INLINE_SG_CNT)
-> > +		sdb->table.nents = sdb->table.orig_nents =
-> > +			SCSI_INLINE_SG_CNT;
-> 
-> Don't we need a sg_init_table here?
+The two patches try to address this issue by allocating sg list runtime,
+meantime pre-allocating one or two inline sg entries for small IO. This
+ways follows NVMe's approach wrt. sg list allocation.
 
-Will do it in V2.
+V2:
+	- move inline sg table initializetion into one helper
+	- introduce new helper for getting inline sg
+	- comment log fix
 
-> 
-> > +	else if (unlikely(sg_alloc_table_chained(&sdb->table, nr_segs,
-> > +					NULL)))
-> >  		return BLK_STS_RESOURCE;
-> 
-> We should probably also be able to drop the last parameter to
-> sg_alloc_table_chained now.
 
-NVMe FC/RDMA still uses first_chunk.
+Ming Lei (2):
+  scsi: core: avoid to pre-allocate big chunk for protection meta data
+  scsi: core: avoid to pre-allocate big chunk for sg list
 
-Thanks,
-Ming
+ drivers/scsi/scsi_lib.c | 78 ++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 55 insertions(+), 23 deletions(-)
+
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Ewan D. Milne <emilne@redhat.com>
+Cc: Hannes Reinecke <hare@suse.com>
+
+
+-- 
+2.9.5
+
