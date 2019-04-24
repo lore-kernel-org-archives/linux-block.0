@@ -3,135 +3,144 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58749C282CE
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 11:03:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E63C10F11
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 11:15:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 31822218D3
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 11:03:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A49632089F
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 11:15:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727785AbfDXLDQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 07:03:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46128 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726074AbfDXLDQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 07:03:16 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D1BA67CBB0;
-        Wed, 24 Apr 2019 11:03:15 +0000 (UTC)
-Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 16C435C220;
-        Wed, 24 Apr 2019 11:03:14 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Keith Busch <keith.busch@intel.com>,
+        id S1726754AbfDXLPS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 07:15:18 -0400
+Received: from smtp.nue.novell.com ([195.135.221.5]:43736 "EHLO
+        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726135AbfDXLPS (ORCPT
+        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
+        Wed, 24 Apr 2019 07:15:18 -0400
+Received: from [10.160.4.48] (charybdis.suse.de [149.44.162.66])
+        by smtp.nue.novell.com with ESMTP (TLS encrypted); Wed, 24 Apr 2019 13:15:16 +0200
+Subject: Re: [PATCH V7 6/9] blk-mq: always free hctx after request queue is
+ freed
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Keith Busch <keith.busch@intel.com>,
         linux-nvme@lists.infradead.org, Sagi Grimberg <sagi@grimberg.me>,
         James Smart <james.smart@broadcom.com>,
-        Ming Lei <ming.lei@redhat.com>,
         Dongli Zhang <dongli.zhang@oracle.com>,
         Bart Van Assche <bart.vanassche@wdc.com>,
         linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Subject: [PATCH V7 9/9] nvme: hold request queue's refcount in ns's whole lifetime
-Date:   Wed, 24 Apr 2019 19:02:21 +0800
-Message-Id: <20190424110221.17435-10-ming.lei@redhat.com>
-In-Reply-To: <20190424110221.17435-1-ming.lei@redhat.com>
 References: <20190424110221.17435-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Wed, 24 Apr 2019 11:03:16 +0000 (UTC)
+ <20190424110221.17435-7-ming.lei@redhat.com>
+From:   Hannes Reinecke <hare@suse.com>
+Message-ID: <eb76b2b7-dc20-f600-357f-610827188b86@suse.com>
+Date:   Wed, 24 Apr 2019 13:15:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190424110221.17435-7-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hennes reported the following kernel oops:
+On 4/24/19 1:02 PM, Ming Lei wrote:
+> In normal queue cleanup path, hctx is released after request queue
+> is freed, see blk_mq_release().
+> 
+> However, in __blk_mq_update_nr_hw_queues(), hctx may be freed because
+> of hw queues shrinking. This way is easy to cause use-after-free,
+> because: one implicit rule is that it is safe to call almost all block
+> layer APIs if the request queue is alive; and one hctx may be retrieved
+> by one API, then the hctx can be freed by blk_mq_update_nr_hw_queues();
+> finally use-after-free is triggered.
+> 
+> Fixes this issue by always freeing hctx after releasing request queue.
+> If some hctxs are removed in blk_mq_update_nr_hw_queues(), introduce
+> a per-queue list to hold them, then try to resuse these hctxs if numa
+> node is matched.
+> 
+> Cc: Dongli Zhang <dongli.zhang@oracle.com>
+> Cc: James Smart <james.smart@broadcom.com>
+> Cc: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: linux-scsi@vger.kernel.org,
+> Cc: Martin K . Petersen <martin.petersen@oracle.com>,
+> Cc: Christoph Hellwig <hch@lst.de>,
+> Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
+> Tested-by: James Smart <james.smart@broadcom.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-mq.c         | 46 +++++++++++++++++++++++++++++++++-------------
+>   include/linux/blk-mq.h |  2 ++
+>   include/linux/blkdev.h |  7 +++++++
+>   3 files changed, 42 insertions(+), 13 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 1eceeb26ae7d..b9d711d12cae 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2274,6 +2274,10 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+>   		set->ops->exit_hctx(hctx, hctx_idx);
+>   
+>   	blk_mq_remove_cpuhp(hctx);
+> +
+> +	spin_lock(&q->unused_hctx_lock);
+> +	list_add(&hctx->hctx_list, &q->unused_hctx_list);
+> +	spin_unlock(&q->unused_hctx_lock);
+>   }
+>   
+>   static void blk_mq_exit_hw_queues(struct request_queue *q,
+> @@ -2362,6 +2366,8 @@ blk_mq_alloc_hctx(struct request_queue *q,
+>   	hctx->queue = q;
+>   	hctx->flags = set->flags & ~BLK_MQ_F_TAG_SHARED;
+>   
+> +	INIT_LIST_HEAD(&hctx->hctx_list);
+> +
+>   	/*
+>   	 * Allocate space for all possible cpus to avoid allocation at
+>   	 * runtime
+> @@ -2675,15 +2681,17 @@ static int blk_mq_alloc_ctxs(struct request_queue *q)
+>    */
+>   void blk_mq_release(struct request_queue *q)
+>   {
+> -	struct blk_mq_hw_ctx *hctx;
+> -	unsigned int i;
+> +	struct blk_mq_hw_ctx *hctx, *next;
+> +	int i;
+>   
+>   	cancel_delayed_work_sync(&q->requeue_work);
+>   
+> -	/* hctx kobj stays in hctx */
+> -	queue_for_each_hw_ctx(q, hctx, i) {
+> -		if (!hctx)
+> -			continue;
+> +	queue_for_each_hw_ctx(q, hctx, i)
+> +		WARN_ON_ONCE(hctx && list_empty(&hctx->hctx_list));
+> +
+> +	/* all hctx are in .unused_hctx_list now */
+> +	list_for_each_entry_safe(hctx, next, &q->unused_hctx_list, hctx_list) {
+> +		list_del_init(&hctx->hctx_list);
+>   		kobject_put(&hctx->kobj);
+>   	}
+>   
+I would consider it a bug if the hctx is still assigned to 
+->queue_hw_ctx at this point.
+But that's a minor issue.
 
-    There is a race condition between namespace rescanning and
-    controller reset; during controller reset all namespaces are
-    quiesed vie nams_stop_ctrl(), and after reset all namespaces
-    are unquiesced again.
-    When namespace scanning was active by the time controller reset
-    was triggered the rescan code will call nvme_ns_remove(), which
-    then will cause a kernel crash in nvme_start_ctrl() as it'll trip
-    over uninitialized namespaces.
-
-Patch "blk-mq: free hw queue's resource in hctx's release handler"
-should make this issue quite difficult to trigger. However it can't
-kill the issue completely becasue pre-condition of that patch is to
-hold request queue's refcount before calling block layer API, and
-there is still a small window between blk_cleanup_queue() and removing
-the ns from the controller namspace list in nvme_ns_remove().
-
-Hold request queue's refcount until the ns is freed, then the above race
-can be avoided completely. Given the 'namespaces_rwsem' is always held
-to retrieve ns for starting/stopping request queue, this lock can prevent
-namespaces from being freed.
-
-Cc: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
-Cc: Martin K . Petersen <martin.petersen@oracle.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
-Reported-by: Hannes Reinecke <hare@suse.com>
 Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Keith Busch <keith.busch@intel.com>
-Tested-by: James Smart <james.smart@broadcom.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/core.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 248ff3b48041..82cda6602ca7 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -406,6 +406,7 @@ static void nvme_free_ns(struct kref *kref)
- 		nvme_nvm_unregister(ns);
- 
- 	put_disk(ns->disk);
-+	blk_put_queue(ns->queue);
- 	nvme_put_ns_head(ns->head);
- 	nvme_put_ctrl(ns->ctrl);
- 	kfree(ns);
-@@ -3229,6 +3230,11 @@ static int nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 		goto out_free_ns;
- 	}
- 
-+	if (!blk_get_queue(ns->queue)) {
-+		ret = -ENXIO;
-+		goto out_free_queue;
-+	}
-+
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, ns->queue);
- 	if (ctrl->ops->flags & NVME_F_PCI_P2PDMA)
- 		blk_queue_flag_set(QUEUE_FLAG_PCI_P2PDMA, ns->queue);
-@@ -3245,7 +3251,7 @@ static int nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	id = nvme_identify_ns(ctrl, nsid);
- 	if (!id) {
- 		ret = -EIO;
--		goto out_free_queue;
-+		goto out_put_queue;
- 	}
- 
- 	if (id->ncap == 0) {
-@@ -3304,6 +3310,8 @@ static int nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	nvme_put_ns_head(ns->head);
-  out_free_id:
- 	kfree(id);
-+ out_put_queue:
-+	blk_put_queue(ns->queue);
-  out_free_queue:
- 	blk_cleanup_queue(ns->queue);
-  out_free_ns:
+Cheers,
+
+Hannes
 -- 
-2.9.5
-
+Dr. Hannes Reinecke		               zSeries & Storage
+hare@suse.com			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
