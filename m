@@ -3,32 +3,32 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 665FCC282E1
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D58C10F11
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3DFB0218FE
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 001B6206A3
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:49:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732788AbfDXQtf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 12:49:35 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60070 "EHLO mx1.suse.de"
+        id S1732215AbfDXQtj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 12:49:39 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60112 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732215AbfDXQtf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 12:49:35 -0400
+        id S1732635AbfDXQtj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Apr 2019 12:49:39 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 28D6CAF68;
-        Wed, 24 Apr 2019 16:49:34 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 0D06DAF68;
+        Wed, 24 Apr 2019 16:49:38 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     axboe@kernel.dk
 Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
         Coly Li <colyli@suse.de>
-Subject: [PATCH 09/18] bcache: add failure check to run_cache_set() for journal replay
-Date:   Thu, 25 Apr 2019 00:48:34 +0800
-Message-Id: <20190424164843.29535-10-colyli@suse.de>
+Subject: [PATCH 10/18] bcache: add comments for kobj release callback routine
+Date:   Thu, 25 Apr 2019 00:48:35 +0800
+Message-Id: <20190424164843.29535-11-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190424164843.29535-1-colyli@suse.de>
 References: <20190424164843.29535-1-colyli@suse.de>
@@ -37,85 +37,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently run_cache_set() has no return value, if there is failure in
-bch_journal_replay(), the caller of run_cache_set() has no idea about
-such failure and just continue to execute following code after
-run_cache_set().  The internal failure is triggered inside
-bch_journal_replay() and being handled in async way. This behavior is
-inefficient, while failure handling inside bch_journal_replay(), cache
-register code is still running to start the cache set. Registering and
-unregistering code running as same time may introduce some rare race
-condition, and make the code to be more hard to be understood.
-
-This patch adds return value to run_cache_set(), and returns -EIO if
-bch_journal_rreplay() fails. Then caller of run_cache_set() may detect
-such failure and stop registering code flow immedidately inside
-register_cache_set().
-
-If journal replay fails, run_cache_set() can report error immediately
-to register_cache_set(). This patch makes the failure handling for
-bch_journal_replay() be in synchronized way, easier to understand and
-debug, and avoid poetential race condition for register-and-unregister
-in same time.
+Bcache has several routines to release resources in implicit way, they
+are called when the associated kobj released. This patch adds code
+comments to notice when and which release callback will be called,
+- When dc->disk.kobj released:
+  void bch_cached_dev_release(struct kobject *kobj)
+- When d->kobj released:
+  void bch_flash_dev_release(struct kobject *kobj)
+- When c->kobj released:
+  void bch_cache_set_release(struct kobject *kobj)
+- When ca->kobj released
+  void bch_cache_release(struct kobject *kobj)
 
 Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/md/bcache/super.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ drivers/md/bcache/super.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 53c5e3e0ac22..8c7fdada0acf 100644
+index 8c7fdada0acf..f8d80adcafec 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
-@@ -1773,7 +1773,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 	return NULL;
+@@ -1172,6 +1172,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ 	return 0;
  }
  
--static void run_cache_set(struct cache_set *c)
-+static int run_cache_set(struct cache_set *c)
++/* when dc->disk.kobj released */
+ void bch_cached_dev_release(struct kobject *kobj)
  {
- 	const char *err = "cannot allocate memory";
- 	struct cached_dev *dc, *t;
-@@ -1867,7 +1867,9 @@ static void run_cache_set(struct cache_set *c)
- 		if (j->version < BCACHE_JSET_VERSION_UUID)
- 			__uuid_write(c);
+ 	struct cached_dev *dc = container_of(kobj, struct cached_dev,
+@@ -1324,6 +1325,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
  
--		bch_journal_replay(c, &journal);
-+		err = "bcache: replay journal failed";
-+		if (bch_journal_replay(c, &journal))
-+			goto err;
- 	} else {
- 		pr_notice("invalidating existing data");
+ /* Flash only volumes */
  
-@@ -1935,11 +1937,13 @@ static void run_cache_set(struct cache_set *c)
- 	flash_devs_run(c);
- 
- 	set_bit(CACHE_SET_RUNNING, &c->flags);
--	return;
-+	return 0;
- err:
- 	closure_sync(&cl);
- 	/* XXX: test this, it's broken */
- 	bch_cache_set_error(c, "%s", err);
-+
-+	return -EIO;
++/* When d->kobj released */
+ void bch_flash_dev_release(struct kobject *kobj)
+ {
+ 	struct bcache_device *d = container_of(kobj, struct bcache_device,
+@@ -1494,6 +1496,7 @@ bool bch_cache_set_error(struct cache_set *c, const char *fmt, ...)
+ 	return true;
  }
  
- static bool can_attach_cache(struct cache *ca, struct cache_set *c)
-@@ -2003,8 +2007,11 @@ static const char *register_cache_set(struct cache *ca)
- 	ca->set->cache[ca->sb.nr_this_dev] = ca;
- 	c->cache_by_alloc[c->caches_loaded++] = ca;
++/* When c->kobj released */
+ void bch_cache_set_release(struct kobject *kobj)
+ {
+ 	struct cache_set *c = container_of(kobj, struct cache_set, kobj);
+@@ -2021,6 +2024,7 @@ static const char *register_cache_set(struct cache *ca)
  
--	if (c->caches_loaded == c->sb.nr_in_set)
--		run_cache_set(c);
-+	if (c->caches_loaded == c->sb.nr_in_set) {
-+		err = "failed to run cache set";
-+		if (run_cache_set(c) < 0)
-+			goto err;
-+	}
+ /* Cache device */
  
- 	return NULL;
- err:
++/* When ca->kobj released */
+ void bch_cache_release(struct kobject *kobj)
+ {
+ 	struct cache *ca = container_of(kobj, struct cache, kobj);
 -- 
 2.16.4
 
