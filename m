@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5F2C282CE
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 11:02:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE39C10F11
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 11:02:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B7D1C2175B
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 11:02:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 772362175B
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 11:02:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727335AbfDXLCz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 07:02:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51562 "EHLO mx1.redhat.com"
+        id S1727348AbfDXLC6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 07:02:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45036 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726074AbfDXLCz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 07:02:55 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1726074AbfDXLC6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Apr 2019 07:02:58 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A73EA40258;
-        Wed, 24 Apr 2019 11:02:54 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id E75FD30A8195;
+        Wed, 24 Apr 2019 11:02:57 +0000 (UTC)
 Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9FA92600C1;
-        Wed, 24 Apr 2019 11:02:51 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0A1F460BE0;
+        Wed, 24 Apr 2019 11:02:56 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
@@ -39,22 +39,22 @@ Cc:     linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Subject: [PATCH V7 4/9] blk-mq: move all hctx alloction & initialization into __blk_mq_alloc_and_init_hctx
-Date:   Wed, 24 Apr 2019 19:02:16 +0800
-Message-Id: <20190424110221.17435-5-ming.lei@redhat.com>
+Subject: [PATCH V7 5/9] blk-mq: split blk_mq_alloc_and_init_hctx into two parts
+Date:   Wed, 24 Apr 2019 19:02:17 +0800
+Message-Id: <20190424110221.17435-6-ming.lei@redhat.com>
 In-Reply-To: <20190424110221.17435-1-ming.lei@redhat.com>
 References: <20190424110221.17435-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Wed, 24 Apr 2019 11:02:54 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 24 Apr 2019 11:02:58 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move all hctx related allocation and initialization into
-__blk_mq_alloc_and_init_hctx, and prepare for splitting blk_mq_alloc_and_init_hctx
-into real two functions, one is for allocate everything, and another is for
-initializing everyting.
+Split blk_mq_alloc_and_init_hctx into two parts, and one is
+blk_mq_alloc_hctx() which is for allocating all hctx resources,
+another is blk_mq_init_hctx() which is for initializing hctx, and
+serves as counter-part of blk_mq_exit_hctx().
 
 Cc: Dongli Zhang <dongli.zhang@oracle.com>
 Cc: James Smart <james.smart@broadcom.com>
@@ -67,139 +67,146 @@ Reviewed-by: Hannes Reinecke <hare@suse.com>
 Tested-by: James Smart <james.smart@broadcom.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 93 +++++++++++++++++++++++++++-------------------------------
- 1 file changed, 44 insertions(+), 49 deletions(-)
+ block/blk-mq.c | 76 +++++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 49 insertions(+), 27 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 862eb41f24f8..fea25363488d 100644
+index fea25363488d..1eceeb26ae7d 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2290,15 +2290,45 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
- 	}
+@@ -2304,10 +2304,38 @@ static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
+ 	return hw_ctx_size;
  }
  
--static int blk_mq_init_hctx(struct request_queue *q,
--		struct blk_mq_tag_set *set,
--		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
-+static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
- {
--	int node;
-+	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
++static int blk_mq_init_hctx(struct request_queue *q,
++			    struct blk_mq_tag_set *set,
++			    struct blk_mq_hw_ctx *hctx,
++			    unsigned hctx_idx)
++{
++	hctx->queue_num = hctx_idx;
 +
-+	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, srcu),
-+			   __alignof__(struct blk_mq_hw_ctx)) !=
-+		     sizeof(struct blk_mq_hw_ctx));
++	cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
 +
-+	if (tag_set->flags & BLK_MQ_F_BLOCKING)
-+		hw_ctx_size += sizeof(struct srcu_struct);
++	hctx->tags = set->tags[hctx_idx];
 +
-+	return hw_ctx_size;
++	if (set->ops->init_hctx &&
++	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
++		goto unregister_cpu_notifier;
++
++	if (blk_mq_init_request(set, hctx->fq->flush_rq, hctx_idx,
++				hctx->numa_node))
++		goto exit_hctx;
++	return 0;
++
++ exit_hctx:
++	if (set->ops->exit_hctx)
++		set->ops->exit_hctx(hctx, hctx_idx);
++ unregister_cpu_notifier:
++	blk_mq_remove_cpuhp(hctx);
++	return -1;
 +}
 +
-+static struct blk_mq_hw_ctx *
-+__blk_mq_alloc_and_init_hctx(struct request_queue *q,
-+			     struct blk_mq_tag_set *set,
-+			     unsigned hctx_idx, int node)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+
-+	hctx = kzalloc_node(blk_mq_hw_ctx_size(set),
-+			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
-+			node);
-+	if (!hctx)
-+		goto fail_alloc_hctx;
-+
-+	if (!zalloc_cpumask_var_node(&hctx->cpumask,
-+				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
-+				node))
-+		goto free_hctx;
-+
-+	atomic_set(&hctx->nr_active, 0);
-+	hctx->numa_node = node;
-+	hctx->queue_num = hctx_idx;
+ static struct blk_mq_hw_ctx *
+-__blk_mq_alloc_and_init_hctx(struct request_queue *q,
+-			     struct blk_mq_tag_set *set,
+-			     unsigned hctx_idx, int node)
++blk_mq_alloc_hctx(struct request_queue *q,
++		  struct blk_mq_tag_set *set,
++		  unsigned hctx_idx, int node)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
  
--	node = hctx->numa_node;
+@@ -2324,8 +2352,6 @@ __blk_mq_alloc_and_init_hctx(struct request_queue *q,
+ 
+ 	atomic_set(&hctx->nr_active, 0);
+ 	hctx->numa_node = node;
+-	hctx->queue_num = hctx_idx;
+-
  	if (node == NUMA_NO_NODE)
--		node = hctx->numa_node = set->numa_node;
-+		hctx->numa_node = set->numa_node;
-+	node = hctx->numa_node;
+ 		hctx->numa_node = set->numa_node;
+ 	node = hctx->numa_node;
+@@ -2336,10 +2362,6 @@ __blk_mq_alloc_and_init_hctx(struct request_queue *q,
+ 	hctx->queue = q;
+ 	hctx->flags = set->flags & ~BLK_MQ_F_TAG_SHARED;
  
- 	INIT_DELAYED_WORK(&hctx->run_work, blk_mq_run_work_fn);
- 	spin_lock_init(&hctx->lock);
-@@ -2343,8 +2373,9 @@ static int blk_mq_init_hctx(struct request_queue *q,
+-	cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
+-
+-	hctx->tags = set->tags[hctx_idx];
+-
+ 	/*
+ 	 * Allocate space for all possible cpus to avoid allocation at
+ 	 * runtime
+@@ -2347,29 +2369,21 @@ __blk_mq_alloc_and_init_hctx(struct request_queue *q,
+ 	hctx->ctxs = kmalloc_array_node(nr_cpu_ids, sizeof(void *),
+ 			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY, node);
+ 	if (!hctx->ctxs)
+-		goto unregister_cpu_notifier;
++		goto free_cpumask;
+ 
+ 	if (sbitmap_init_node(&hctx->ctx_map, nr_cpu_ids, ilog2(8),
+ 				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY, node))
+ 		goto free_ctxs;
+-
+ 	hctx->nr_ctx = 0;
+ 
+ 	spin_lock_init(&hctx->dispatch_wait_lock);
+ 	init_waitqueue_func_entry(&hctx->dispatch_wait, blk_mq_dispatch_wake);
+ 	INIT_LIST_HEAD(&hctx->dispatch_wait.entry);
+ 
+-	if (set->ops->init_hctx &&
+-	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
+-		goto free_bitmap;
+-
+ 	hctx->fq = blk_alloc_flush_queue(q, hctx->numa_node, set->cmd_size,
+ 			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY);
+ 	if (!hctx->fq)
+-		goto exit_hctx;
+-
+-	if (blk_mq_init_request(set, hctx->fq->flush_rq, hctx_idx, node))
+-		goto free_fq;
++		goto free_bitmap;
  
  	if (hctx->flags & BLK_MQ_F_BLOCKING)
  		init_srcu_struct(hctx->srcu);
-+	blk_mq_hctx_kobj_init(hctx);
+@@ -2377,17 +2391,11 @@ __blk_mq_alloc_and_init_hctx(struct request_queue *q,
  
--	return 0;
-+	return hctx;
+ 	return hctx;
  
-  free_fq:
- 	blk_free_flush_queue(hctx->fq);
-@@ -2357,7 +2388,11 @@ static int blk_mq_init_hctx(struct request_queue *q,
+- free_fq:
+-	blk_free_flush_queue(hctx->fq);
+- exit_hctx:
+-	if (set->ops->exit_hctx)
+-		set->ops->exit_hctx(hctx, hctx_idx);
+  free_bitmap:
+ 	sbitmap_free(&hctx->ctx_map);
+  free_ctxs:
  	kfree(hctx->ctxs);
-  unregister_cpu_notifier:
- 	blk_mq_remove_cpuhp(hctx);
--	return -1;
-+	free_cpumask_var(hctx->cpumask);
-+ free_hctx:
-+	kfree(hctx);
-+ fail_alloc_hctx:
-+	return NULL;
- }
- 
- static void blk_mq_init_cpu_queues(struct request_queue *q,
-@@ -2703,51 +2738,11 @@ struct request_queue *blk_mq_init_sq_queue(struct blk_mq_tag_set *set,
- }
- EXPORT_SYMBOL(blk_mq_init_sq_queue);
- 
--static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
--{
--	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
--
--	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, srcu),
--			   __alignof__(struct blk_mq_hw_ctx)) !=
--		     sizeof(struct blk_mq_hw_ctx));
--
--	if (tag_set->flags & BLK_MQ_F_BLOCKING)
--		hw_ctx_size += sizeof(struct srcu_struct);
--
--	return hw_ctx_size;
--}
--
- static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
+- unregister_cpu_notifier:
+-	blk_mq_remove_cpuhp(hctx);
++ free_cpumask:
+ 	free_cpumask_var(hctx->cpumask);
+  free_hctx:
+ 	kfree(hctx);
+@@ -2742,7 +2750,21 @@ static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
  		struct blk_mq_tag_set *set, struct request_queue *q,
  		int hctx_idx, int node)
  {
--	struct blk_mq_hw_ctx *hctx;
--
--	hctx = kzalloc_node(blk_mq_hw_ctx_size(set),
--			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
--			node);
--	if (!hctx)
--		return NULL;
--
--	if (!zalloc_cpumask_var_node(&hctx->cpumask,
--				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
--				node)) {
--		kfree(hctx);
--		return NULL;
--	}
--
--	atomic_set(&hctx->nr_active, 0);
--	hctx->numa_node = node;
--	hctx->queue_num = hctx_idx;
--
--	if (blk_mq_init_hctx(q, set, hctx, hctx_idx)) {
--		free_cpumask_var(hctx->cpumask);
--		kfree(hctx);
--		return NULL;
--	}
--	blk_mq_hctx_kobj_init(hctx);
--
--	return hctx;
-+	return __blk_mq_alloc_and_init_hctx(q, set, hctx_idx, node);
+-	return __blk_mq_alloc_and_init_hctx(q, set, hctx_idx, node);
++	struct blk_mq_hw_ctx *hctx;
++
++	hctx = blk_mq_alloc_hctx(q, set, hctx_idx, node);
++	if (!hctx)
++		goto fail;
++
++	if (blk_mq_init_hctx(q, set, hctx, hctx_idx))
++		goto free_hctx;
++
++	return hctx;
++
++ free_hctx:
++	kobject_put(&hctx->kobj);
++ fail:
++	return NULL;
  }
  
  static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
