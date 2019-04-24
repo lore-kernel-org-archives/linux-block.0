@@ -2,117 +2,125 @@ Return-Path: <SRS0=lHMQ=S2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B19C10F11
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 15:49:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EFC2C10F11
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:06:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9801B21900
-	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 15:49:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ekkeg6jk";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="jyQtSjH9"
+	by mail.kernel.org (Postfix) with ESMTP id 29E4D21900
+	for <linux-block@archiver.kernel.org>; Wed, 24 Apr 2019 16:06:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731409AbfDXPt5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Apr 2019 11:49:57 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:36020 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730625AbfDXPt4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Apr 2019 11:49:56 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id E26808EE0CC;
-        Wed, 24 Apr 2019 08:49:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1556120994;
-        bh=CI45K2qhxG3dzOoPvggE5tLTbmFq+daAESU03zqD1SI=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=ekkeg6jk5QJ5LRAg6aQMPPxHlWdHmtVnzNk7aEr0PIvdK2c6IvjV8gcwgUZGepq4u
-         zy6cXn2UQ6hmr3YlrmRRLS7k/QVGFmEp6p874Q5Ad61ro9/+HuTg7nQMFQ0o7aSN16
-         c8hhzm9h6UZUB0Iq6fakTmqtjdRU9mQB/PwJFxY0=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id zDipnyIluNOH; Wed, 24 Apr 2019 08:49:54 -0700 (PDT)
-Received: from [153.66.254.194] (unknown [50.35.68.20])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 509EE8EE0BA;
-        Wed, 24 Apr 2019 08:49:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1556120993;
-        bh=CI45K2qhxG3dzOoPvggE5tLTbmFq+daAESU03zqD1SI=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=jyQtSjH9lFd9uv4D0/rf6NVz/D0YSdWLOn4yKrshgS26A66IgQIMe5ByUbiHwjnyd
-         kqC3V8qvYZEnqj1UI+P0hMbOXUgkSKrDGlrVjVJfxgCTgUVuDP4k7lhKcLL/EzbTXl
-         5wJI4OphMXZgF5t2G/U94/1AabQb/lAFbVZJ8cZo=
-Message-ID: <1556120991.3043.20.camel@HansenPartnership.com>
-Subject: Re: [PATCH 2/2] scsi: core: avoid to pre-allocate big chunk for sg
- list
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Hannes Reinecke <hare@suse.com>
-Date:   Wed, 24 Apr 2019 08:49:51 -0700
-In-Reply-To: <1556119951.161891.126.camel@acm.org>
-References: <20190423103240.29864-1-ming.lei@redhat.com>
-         <20190423103240.29864-3-ming.lei@redhat.com>
-         <1556033835.161891.123.camel@acm.org> <20190424075233.GA32345@ming.t460p>
-         <1556119450.3043.8.camel@HansenPartnership.com>
-         <1556119951.161891.126.camel@acm.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1731195AbfDXQGa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Apr 2019 12:06:30 -0400
+Received: from mx2.suse.de ([195.135.220.15]:53002 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729027AbfDXQGa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Apr 2019 12:06:30 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 6C013AC31;
+        Wed, 24 Apr 2019 16:06:28 +0000 (UTC)
+Subject: Re: [RFC PATCH v2 06/16] bcache: add failure check to run_cache_set()
+ for journal replay
+To:     Hannes Reinecke <hare@suse.de>, linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20190419160509.66298-1-colyli@suse.de>
+ <20190419160509.66298-7-colyli@suse.de>
+ <e9d7f597-05f5-be5b-1a08-9d80673ad13f@suse.de>
+From:   Coly Li <colyli@suse.de>
+Openpgp: preference=signencrypt
+Organization: SUSE Labs
+Message-ID: <cf83e384-a2cf-92cf-0752-2f0f3e88b7be@suse.de>
+Date:   Thu, 25 Apr 2019 00:06:20 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <e9d7f597-05f5-be5b-1a08-9d80673ad13f@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2019-04-24 at 08:32 -0700, Bart Van Assche wrote:
-> On Wed, 2019-04-24 at 08:24 -0700, James Bottomley wrote:
-> > On Wed, 2019-04-24 at 15:52 +0800, Ming Lei wrote:
-> > > On Tue, Apr 23, 2019 at 08:37:15AM -0700, Bart Van Assche wrote:
-> > > > On Tue, 2019-04-23 at 18:32 +0800, Ming Lei wrote:
-> > > > >  #define  SCSI_INLINE_PROT_SG_CNT  1
-> > > > >  
-> > > > > +#define  SCSI_INLINE_SG_CNT  2
-> > > > 
-> > > > So this patch inserts one kmalloc() and one kfree() call in the
-> > > > hot path for every SCSI request with more than two elements in
-> > > > its scatterlist? Isn't
-> > > 
-> > > Slab or its variants are designed for fast path, and NVMe PCI
-> > > uses slab for allocating sg list in fast path too.
-> > 
-> > Actually, that's not really true  base kmalloc can do all sorts of
-> > things including kick off reclaim so it's not really something we
-> > like using in the fast path.  The only fast and safe kmalloc you
-> > can rely on  in the fast path is GFP_ATOMIC which will fail quickly
-> > if no memory can easily be found.  *However* the sg_table
-> > allocation functions are all pool backed (lib/sg_pool.c), so they
-> > use the lightweight GFP_ATOMIC mechanism for kmalloc initially
-> > coupled with a backing pool in case of failure to ensure forward
-> > progress.
-> > 
-> > So, I think you're both right: you shouldn't simply use kmalloc,
-> > but this implementation doesn't, it uses the sg_table allocation
-> > functions which correctly control kmalloc to be lightweight and
-> > efficient and able to make forward progress.
-> 
-> Another concern is whether this change can cause a livelock. If the
-> system is running out of memory and the page cache submits a write
-> request with a scatterlist with more than two elements, if the
-> kmalloc() for the scatterlist fails, will that prevent the page cache
-> from making any progress with writeback?
+On 2019/4/23 3:02 下午, Hannes Reinecke wrote:
+> On 4/19/19 6:04 PM, Coly Li wrote:
+>> Currently run_cache_set() has no return value, if there is failure in
+>> bch_journal_replay(), the caller of run_cache_set() has no idea about
+>> such failure and just continue to execute following code after
+>> run_cache_set().  The internal failure is triggered inside
+>> bch_journal_replay() and being handled in async way. This behavior is
+>> inefficient, while failure handling inside bch_journal_replay(), cache
+>> register code is still running to start the cache set. Registering and
+>> unregistering code running as same time may introduce some rare race
+>> condition, and make the code to be more hard to be understood.
+>>
+>> This patch adds return value to run_cache_set(), and returns -EIO if
+>> bch_journal_rreplay() fails. Then caller of run_cache_set() may detect
+>> such failure and stop registering code flow immedidately inside
+>> register_cache_set().
+>>
+>> If journal replay fails, run_cache_set() can report error immediately
+>> to register_cache_set(). This patch makes the failure handling for
+>> bch_journal_replay() be in synchronized way, easier to understand and
+>> debug, and avoid poetential race condition for register-and-unregister
+>> in same time.
+>>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> ---
+>>   drivers/md/bcache/super.c | 17 ++++++++++++-----
+>>   1 file changed, 12 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+>> index a697a3a923cd..036bffad0bfe 100644
+>> --- a/drivers/md/bcache/super.c
+>> +++ b/drivers/md/bcache/super.c
+>> @@ -1775,7 +1775,7 @@ struct cache_set *bch_cache_set_alloc(struct
+>> cache_sb *sb)
+>>       return NULL;
+>>   }
+>>   -static void run_cache_set(struct cache_set *c)
+>> +static int run_cache_set(struct cache_set *c)
+>>   {
+>>       const char *err = "cannot allocate memory";
+>>       struct cached_dev *dc, *t;
+>> @@ -1869,7 +1869,9 @@ static void run_cache_set(struct cache_set *c)
+>>           if (j->version < BCACHE_JSET_VERSION_UUID)
+>>               __uuid_write(c);
+>>   -        bch_journal_replay(c, &journal);
+>> +        err = "bcache: replay journal failed";
+>> +        if (bch_journal_replay(c, &journal))
+>> +            goto err;
+>>       } else {
+>>           pr_notice("invalidating existing data");
+>>   @@ -1937,11 +1939,13 @@ static void run_cache_set(struct cache_set *c)
+>>       flash_devs_run(c);
+>>         set_bit(CACHE_SET_RUNNING, &c->flags);
+>> -    return;
+>> +    return 0;
+>>   err:
+>>       closure_sync(&cl);
+>>       /* XXX: test this, it's broken */
+>>       bch_cache_set_error(c, "%s", err);
+>> +
+>> +    return -EIO;
+>>   }
+>>   
+> Shouldn't you differentiate between -EIO if the journal replay failed
+> and -ENOMEM?
 
-It's pool backed, as I said.  Is the concern there isn't enough depth
-in the pools for a large write?
+Hi Hannes,
 
-James
+After a little research on the code, differentiate error code to return
+needs more work, I need to make sure some sub-routines also return
+proper error code. It could be a later work, at this moment, return a
+non-zero value to caller of run_cache_set() should work well.
 
+Thanks.
+
+-- 
+
+Coly Li
