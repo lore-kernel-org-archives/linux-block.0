@@ -2,71 +2,58 @@ Return-Path: <SRS0=cXaM=S3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 534E6C10F03
-	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 06:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7811CC10F03
+	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 07:03:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D11120811
-	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 06:06:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41CE2218AD
+	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 07:03:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DM+LxS8F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727887AbfDYGGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Apr 2019 02:06:02 -0400
-Received: from mx2.suse.de ([195.135.220.15]:51976 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727504AbfDYGGC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Apr 2019 02:06:02 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 4F27FAD5E;
-        Thu, 25 Apr 2019 06:06:01 +0000 (UTC)
-Subject: Re: [PATCH] block: use static bio_set for bio_split() calls
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@gmail.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.com>
-References: <20190418140632.60606-1-hare@suse.de>
- <1556135351.161891.138.camel@acm.org>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <3ff02420-8063-490a-271d-b7032c9d3b42@suse.de>
-Date:   Thu, 25 Apr 2019 08:06:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1729902AbfDYHD2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Apr 2019 03:03:28 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:46652 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725970AbfDYHD2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Apr 2019 03:03:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=MG7jUpC2RPm3275BGAuRtJMlGOIcN9H5ysqi5ABuATo=; b=DM+LxS8FpvNXUrgnZIR7vZ8K8
+        1uLtNDTPHYUHW+XM9JdKC5edQNNTPkBdCeOLVSewk432VJZ0QApiRWTK+0MKeRXtdrl9vi4y14oF1
+        s7kiivpG9qHVuQNC9LSBtsaayz7Y9WgQscISNJ6GWZ1RfnngQtui3tsCc9C7rcPTI3ckryLdG8/ut
+        84cTF0+TO+izzTnrP+wHH3e7O2Sy91HMbtbJzTLEmPdki36lFCvGE6F13FXSXJSHaAjLG3N1CrTJz
+        wo4u7V6kU4bCYptHCbrHZcLh0YPKBPjx2Dl6ZmamEa70MJUfIidi4ZK3e32hEv3U1NWHwcenS+ydr
+        xQ3jeBdbg==;
+Received: from 213-225-37-80.nat.highway.a1.net ([213.225.37.80] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hJYPn-0006CW-4W; Thu, 25 Apr 2019 07:03:27 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Matthew Wilcox <willy@infradead.org>, linux-block@vger.kernel.org,
+        linux-bcache@vger.kernel.org
+Subject: simplify bio_for_each_segment_all
+Date:   Thu, 25 Apr 2019 09:02:58 +0200
+Message-Id: <20190425070300.3388-1-hch@lst.de>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <1556135351.161891.138.camel@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/24/19 9:49 PM, Bart Van Assche wrote:
-> On Thu, 2019-04-18 at 16:06 +0200, Hannes Reinecke wrote:
->> +static int __init blk_bio_split_init(void)
->> +{
->> +       return bioset_init(&bio_split_bio_set, BIO_POOL_SIZE, 0,
->> +                          BIOSET_NEED_BVECS);
->> +}
-> 
-> The slab allocator uses __init for some of its initialization. Can it happen
-> that blk_bio_split_init() is called before slab initialization has finished?
-> 
-> Otherwise this patch looks fine to me.
-> 
-Most unlikely.
-We have another static bioset (fs_bio_set in block/bio.c) which is 
-initialised in the same manner.
+Hi Jens,
 
-Cheers,
+this series simplifies bio_for_each_segment_all a bit, as suggested
+by willy.
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
