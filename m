@@ -2,359 +2,169 @@ Return-Path: <SRS0=cXaM=S3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CF53C282E1
-	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 11:20:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C176CC10F03
+	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 11:23:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 45B0D2084B
-	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 11:20:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73561218D3
+	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 11:23:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="piWEIq1J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726813AbfDYLUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Apr 2019 07:20:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40744 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725935AbfDYLUm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Apr 2019 07:20:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1255AD571A;
-        Thu, 25 Apr 2019 11:20:41 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D7A5A1001DC0;
-        Thu, 25 Apr 2019 11:20:33 +0000 (UTC)
-Date:   Thu, 25 Apr 2019 19:20:28 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH V2 1/2] scsi: core: avoid to pre-allocate big chunk for
- protection meta data
-Message-ID: <20190425112027.GC28630@ming.t460p>
-References: <20190424093540.15526-1-ming.lei@redhat.com>
- <20190424093540.15526-2-ming.lei@redhat.com>
- <20190424143704.GC21209@lst.de>
- <20190425093729.GB28630@ming.t460p>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190425093729.GB28630@ming.t460p>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Thu, 25 Apr 2019 11:20:41 +0000 (UTC)
+        id S1727814AbfDYLXx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Apr 2019 07:23:53 -0400
+Received: from mailout4.samsung.com ([203.254.224.34]:33216 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725935AbfDYLXx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Apr 2019 07:23:53 -0400
+Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20190425112348epoutp04bd689f55863d0331c51df4b67f7c2194~Ys9v3MUWi0936909369epoutp04c;
+        Thu, 25 Apr 2019 11:23:48 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20190425112348epoutp04bd689f55863d0331c51df4b67f7c2194~Ys9v3MUWi0936909369epoutp04c
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1556191428;
+        bh=Qb44Fw5D9COaD1U8JoeC5CdpDtMwZZct+PLZkv9jaZM=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=piWEIq1JH/w+4vWjtvkXWfWAFjmXlIoHNKoUx5+jueZ/G9KWy1ML/HuQiHpbPzH43
+         XTcQsvkWHZYeN5sBBge2Hnz19z8+xItHJ29nH5dgqC9U5m6rs/JhMwc4ifMZ8dzYNg
+         kKEAH9c8V/kdnhaDqdT7UlJi6HZ7y1rkRDbjFTPs=
+Received: from epsmges2p3.samsung.com (unknown [182.195.42.71]) by
+        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
+        20190425112348epcas2p20fb94b4c3711c4a4d59f90ae237be6f9~Ys9vWA0-G2452224522epcas2p2w;
+        Thu, 25 Apr 2019 11:23:48 +0000 (GMT)
+Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
+        epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
+        4C.B9.04206.3C891CC5; Thu, 25 Apr 2019 20:23:47 +0900 (KST)
+Received: from epsmgms2p2new.samsung.com (unknown [182.195.42.143]) by
+        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
+        20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61~Ys9urcw5x2606226062epcas2p1P;
+        Thu, 25 Apr 2019 11:23:47 +0000 (GMT)
+X-AuditID: b6c32a47-14bff7000000106e-c7-5cc198c37f76
+Received: from epmmp2 ( [203.254.227.17]) by epsmgms2p2new.samsung.com
+        (Symantec Messaging Gateway) with SMTP id 46.4D.03620.3C891CC5; Thu, 25 Apr
+        2019 20:23:47 +0900 (KST)
+Received: from test-PowerEdge-R720.sa.corp.samsungelectronics.net
+        ([107.108.221.212]) by mmp2.samsung.com (Oracle Communications Messaging
+        Server 7.0.5.31.0 64bit (built May  5 2014)) with ESMTPA id
+        <0PQI007Z2KZ7JR40@mmp2.samsung.com>; Thu, 25 Apr 2019 20:23:47 +0900 (KST)
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org
+Cc:     prakash.v@samsung.com, anshul@samsung.com,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: [PATCH v5 0/7] Extend write-hint framework, and add write-hint for
+ Ext4 journal
+Date:   Thu, 25 Apr 2019 16:49:55 +0530
+Message-id: <1556191202-3245-1-git-send-email-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.7.4
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmphkeLIzCtJLcpLzFFi42LZdljTVPfwjIMxBm+mW1r8nj6F1eLo/7ds
+        FntvaVvMnHeHzWLP3pMsFpd3zWGzmL/sKbvFlSmLmB04PDYvqffo27KK0ePzJrkA5igum5TU
+        nMyy1CJ9uwSujEdn37EU/BCrmLH8BFMDY7tQFyMHh4SAicSM89FdjFwcQgI7GCX+r3vNCuF8
+        Z5SYfWwzI0xR+1l+iPgGRonbkx6zQDjTmSSWrvkCVsQmoClxYXIpSFxEYA6jxLJ905i7GDk5
+        mAVCJFY8WcUCYgsLREmsnf6EEcRmEVCV+HzkBRtIL6+Ak8Tlo14gYQkBOYmb5zqZIeyXrBK7
+        b0hC2C4Sm85eYIOwpSWerdrICGEXS/y6c5QZZK+EQAejxPWGmSwQCXuJi3v+MkHcwCfRcfgv
+        O8QzvBIdbUIQJR4SD99C/CgkECtx+brUBEbxBYwMqxjFUguKc9NTi40KjPWKE3OLS/PS9ZLz
+        czcxguNGy30H47ZzPocYBTgYlXh4FSIPxAixJpYVV+YeYpTgYFYS4VU3PRgjxJuSWFmVWpQf
+        X1Sak1p8iFGag0VJnPeh9NxoIYH0xJLU7NTUgtQimCwTB6dUA2PBlI2nllyskAo4d8ZNZ7O3
+        eNXz5plbN/07uk7y8UXBhWIuDO5vArPsjD+/nX1l0/lOgU97JFSiPl3or9tit3pX0dnXLxN1
+        Pziu8/377MyS3XWxgXFnmo78ZZ3e4rz46MNNl6YVKtR0RwQeOPBbeZ/HjR8ZK9uf6cz9Mo/d
+        nEutqu3kI484Z8UDSizFGYmGWsxFxYkANG0e+pcCAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNJMWRmVeSWpSXmKPExsVy+t9jQd3DMw7GGExdyW/xe/oUVouj/9+y
+        Wey9pW0xc94dNos9e0+yWFzeNYfNYv6yp+wWV6YsYnbg8Ni8pN6jb8sqRo/Pm+QCmKO4bFJS
+        czLLUov07RK4Mh6dfcdS8EOsYsbyE0wNjO1CXYwcHBICJhLtZ/m7GLk4hATWMUoc+N7KBuHM
+        ZJJ4dmsRG0gRm4CmxIXJpSBxEYE5jBI9u9ezdjFycjALhEjMevaYDcQWFoiS6Hw9jQnEZhFQ
+        lfh85AVYL6+Ak8Tlo14gYQkBOYmb5zqZJzByLWBkWMUomVpQnJueW2xUYJSXWq5XnJhbXJqX
+        rpecn7uJERgE2w5r9e9gfLwk/hCjAAejEg+vQuSBGCHWxLLiytxDjBIczEoivOqmB2OEeFMS
+        K6tSi/Lji0pzUosPMUpzsCiJ8/LnH4sUEkhPLEnNTk0tSC2CyTJxcEo1MCYVtxgUKO7vOpZX
+        6/b26USJyY9yvVI9O99InNzo+v2Ox/5fbae/53aevnfVyCFlliTnH0X+Ln05wyfXPx4U4Mru
+        fc1XL+Fx3WLTory7ZTGm4v/9fOY6KC/Mdel6HOLf87z0wJ869rd7s+6vfvk47aLv6q41LhEq
+        POEsH79Xx7zb9W0r8/xVEUosxRmJhlrMRcWJAGM3ON/+AQAA
+X-CMS-MailID: 20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61
+CMS-TYPE: 102P
+X-CMS-RootMailID: 20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61
+References: <CGME20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61@epcas2p1.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 25, 2019 at 05:37:29PM +0800, Ming Lei wrote:
-> On Wed, Apr 24, 2019 at 04:37:04PM +0200, Christoph Hellwig wrote:
-> > > -	if (scsi_prot_sg_count(cmd))
-> > > -		sg_free_table_chained(&cmd->prot_sdb->table, true);
-> > > +	if (scsi_prot_sg_count(cmd) && cmd->prot_sdb->table.sgl !=
-> > > +			scsi_prot_inline_sg(cmd))
-> > > +		sg_free_table_chained(&cmd->prot_sdb->table, false);
-> > 
-> > Nipick: I usually find it easier to read if we break around conditions
-> > instead of inside them:
-> > 
-> > 	if (scsi_prot_sg_count(cmd) &&
-> > 	    cmd->prot_sdb->table.sgl != scsi_prot_inline_sg(cmd))
-> 
-> OK.
-> 
-> > 
-> > > +		if (ivecs <= SCSI_INLINE_PROT_SG_CNT) {
-> > > +			scsi_init_inline_sg_table(&prot_sdb->table,
-> > > +						  scsi_prot_inline_sg(cmd),
-> > > +						  SCSI_INLINE_PROT_SG_CNT);
-> > > +		} else if (sg_alloc_table_chained(&prot_sdb->table,
-> > > +						  ivecs, NULL)) {
-> > 
-> > Hmm.  Maybe we just need to pass an nr_inline_vecs argument
-> > to sg_alloc_table_chained to replace the SG_CHUNK_SIZE argument instead
-> > of open coding this logic?
-> 
-> We can do that, however the current scatterlist code assumes that size
-> of each SGL is fixed. We may change the logic to support this feature,
-> seems not too difficult to do that.
-> 
-> Please let us know if you are fine to change the scatterlist code for
-> supporting customized size of the 1st SGL.
+V5 series, towards extending write-hint/streams infrastructure for
+kernel-components, and adding support for sending write-hint with Ext4/JBD2 journal.
 
-Especially, something like the following change is needed:
+Here is the history/changelog -
 
- include/linux/scatterlist.h | 27 ++++++++++++++++++++-----
- lib/scatterlist.c           | 36 ++++++++++++++++++++++------------
- lib/sg_pool.c               | 48 ++++++++++++++++++++++++++++++---------------
- 3 files changed, 77 insertions(+), 34 deletions(-)
+Changes since v4:
+- Removed write-hint field from request. bi_write_hint in bio is used for
+  merging checks now.
+- Modified write-hint-to-stream conversion logic. Now, kernel hints are mapped
+  to upper range of stream-ids, while user-hints continue to remain mapped to
+  lower range of stream-ids.
 
-diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index b4be960c7e5d..045d7aa81f2c 100644
---- a/include/linux/scatterlist.h
-+++ b/include/linux/scatterlist.h
-@@ -266,10 +266,11 @@ int sg_split(struct scatterlist *in, const int in_mapped_nents,
- typedef struct scatterlist *(sg_alloc_fn)(unsigned int, gfp_t);
- typedef void (sg_free_fn)(struct scatterlist *, unsigned int);
- 
--void __sg_free_table(struct sg_table *, unsigned int, bool, sg_free_fn *);
-+void __sg_free_table(struct sg_table *, unsigned int, unsigned int,
-+		     sg_free_fn *);
- void sg_free_table(struct sg_table *);
- int __sg_alloc_table(struct sg_table *, unsigned int, unsigned int,
--		     struct scatterlist *, gfp_t, sg_alloc_fn *);
-+		     struct scatterlist *, unsigned int, gfp_t, sg_alloc_fn *);
- int sg_alloc_table(struct sg_table *, unsigned int, gfp_t);
- int __sg_alloc_table_from_pages(struct sg_table *sgt, struct page **pages,
- 				unsigned int n_pages, unsigned int offset,
-@@ -331,9 +332,25 @@ size_t sg_zero_buffer(struct scatterlist *sgl, unsigned int nents,
- #endif
- 
- #ifdef CONFIG_SG_POOL
--void sg_free_table_chained(struct sg_table *table, bool first_chunk);
--int sg_alloc_table_chained(struct sg_table *table, int nents,
--			   struct scatterlist *first_chunk);
-+void __sg_free_table_chained(struct sg_table *table,
-+			     unsigned nents_first_chunk);
-+int __sg_alloc_table_chained(struct sg_table *table, int nents,
-+			     struct scatterlist *first_chunk,
-+			     unsigned nents_first_chunk);
-+
-+static inline void sg_free_table_chained(struct sg_table *table,
-+					 bool first_chunk)
-+{
-+	__sg_free_table_chained(table, first_chunk ? SG_CHUNK_SIZE : 0);
-+}
-+
-+static inline int sg_alloc_table_chained(struct sg_table *table,
-+					 int nents,
-+					 struct scatterlist *first_chunk)
-+{
-+	return __sg_alloc_table_chained(table, nents, first_chunk,
-+					first_chunk ? SG_CHUNK_SIZE : 0);
-+}
- #endif
- 
- /*
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index 739dc9fe2c55..401dd38080bc 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -181,7 +181,8 @@ static void sg_kfree(struct scatterlist *sg, unsigned int nents)
-  * __sg_free_table - Free a previously mapped sg table
-  * @table:	The sg table header to use
-  * @max_ents:	The maximum number of entries per single scatterlist
-- * @skip_first_chunk: don't free the (preallocated) first scatterlist chunk
-+ * @nrents_first_chunk: Number of entries int the (preallocated) first
-+ * 	scatterlist chunk, 0 means skipping to free the first chunk
-  * @free_fn:	Free function
-  *
-  *  Description:
-@@ -191,9 +192,10 @@ static void sg_kfree(struct scatterlist *sg, unsigned int nents)
-  *
-  **/
- void __sg_free_table(struct sg_table *table, unsigned int max_ents,
--		     bool skip_first_chunk, sg_free_fn *free_fn)
-+		     unsigned int nents_first_chunk, sg_free_fn *free_fn)
- {
- 	struct scatterlist *sgl, *next;
-+	unsigned curr_max_ents = nents_first_chunk ?: max_ents;
- 
- 	if (unlikely(!table->sgl))
- 		return;
-@@ -209,9 +211,9 @@ void __sg_free_table(struct sg_table *table, unsigned int max_ents,
- 		 * sg_size is then one less than alloc size, since the last
- 		 * element is the chain pointer.
- 		 */
--		if (alloc_size > max_ents) {
--			next = sg_chain_ptr(&sgl[max_ents - 1]);
--			alloc_size = max_ents;
-+		if (alloc_size > curr_max_ents) {
-+			next = sg_chain_ptr(&sgl[curr_max_ents - 1]);
-+			alloc_size = curr_max_ents;
- 			sg_size = alloc_size - 1;
- 		} else {
- 			sg_size = alloc_size;
-@@ -219,11 +221,12 @@ void __sg_free_table(struct sg_table *table, unsigned int max_ents,
- 		}
- 
- 		table->orig_nents -= sg_size;
--		if (skip_first_chunk)
--			skip_first_chunk = false;
-+		if (nents_first_chunk)
-+			nents_first_chunk = 0;
- 		else
- 			free_fn(sgl, alloc_size);
- 		sgl = next;
-+		curr_max_ents = max_ents;
- 	}
- 
- 	table->sgl = NULL;
-@@ -246,6 +249,8 @@ EXPORT_SYMBOL(sg_free_table);
-  * @table:	The sg table header to use
-  * @nents:	Number of entries in sg list
-  * @max_ents:	The maximum number of entries the allocator returns per call
-+ * @nrents_first_chunk: Number of entries int the (preallocated) first
-+ * 	scatterlist chunk, 0 means no such 1st chunk provided by user
-  * @gfp_mask:	GFP allocation mask
-  * @alloc_fn:	Allocator to use
-  *
-@@ -262,10 +267,13 @@ EXPORT_SYMBOL(sg_free_table);
-  **/
- int __sg_alloc_table(struct sg_table *table, unsigned int nents,
- 		     unsigned int max_ents, struct scatterlist *first_chunk,
--		     gfp_t gfp_mask, sg_alloc_fn *alloc_fn)
-+		     unsigned int nents_first_chunk, gfp_t gfp_mask,
-+		     sg_alloc_fn *alloc_fn)
- {
- 	struct scatterlist *sg, *prv;
- 	unsigned int left;
-+	unsigned curr_max_ents = nents_first_chunk ?: max_ents;
-+	unsigned prv_max_ents;
- 
- 	memset(table, 0, sizeof(*table));
- 
-@@ -281,8 +289,8 @@ int __sg_alloc_table(struct sg_table *table, unsigned int nents,
- 	do {
- 		unsigned int sg_size, alloc_size = left;
- 
--		if (alloc_size > max_ents) {
--			alloc_size = max_ents;
-+		if (alloc_size > curr_max_ents) {
-+			alloc_size = curr_max_ents;
- 			sg_size = alloc_size - 1;
- 		} else
- 			sg_size = alloc_size;
-@@ -316,7 +324,7 @@ int __sg_alloc_table(struct sg_table *table, unsigned int nents,
- 		 * If this is not the first mapping, chain previous part.
- 		 */
- 		if (prv)
--			sg_chain(prv, max_ents, sg);
-+			sg_chain(prv, prv_max_ents, sg);
- 		else
- 			table->sgl = sg;
- 
-@@ -327,6 +335,8 @@ int __sg_alloc_table(struct sg_table *table, unsigned int nents,
- 			sg_mark_end(&sg[sg_size - 1]);
- 
- 		prv = sg;
-+		prv_max_ents = curr_max_ents;
-+		curr_max_ents = max_ents;
- 	} while (left);
- 
- 	return 0;
-@@ -349,9 +359,9 @@ int sg_alloc_table(struct sg_table *table, unsigned int nents, gfp_t gfp_mask)
- 	int ret;
- 
- 	ret = __sg_alloc_table(table, nents, SG_MAX_SINGLE_ALLOC,
--			       NULL, gfp_mask, sg_kmalloc);
-+			       NULL, 0, gfp_mask, sg_kmalloc);
- 	if (unlikely(ret))
--		__sg_free_table(table, SG_MAX_SINGLE_ALLOC, false, sg_kfree);
-+		__sg_free_table(table, SG_MAX_SINGLE_ALLOC, 0, sg_kfree);
- 
- 	return ret;
- }
-diff --git a/lib/sg_pool.c b/lib/sg_pool.c
-index d1c1e6388eaa..e0f4bc0de8bd 100644
---- a/lib/sg_pool.c
-+++ b/lib/sg_pool.c
-@@ -67,56 +67,72 @@ static struct scatterlist *sg_pool_alloc(unsigned int nents, gfp_t gfp_mask)
- }
- 
- /**
-- * sg_free_table_chained - Free a previously mapped sg table
-+ * __sg_free_table_chained - Free a previously mapped sg table
-  * @table:	The sg table header to use
-- * @first_chunk: was first_chunk not NULL in sg_alloc_table_chained?
-+ * @nents_first_chunk: size of the first_chunk SGL passed to
-+ *		__sg_alloc_table_chained
-  *
-  *  Description:
-  *    Free an sg table previously allocated and setup with
-- *    sg_alloc_table_chained().
-+ *    __sg_alloc_table_chained().
-+ *
-+ *    @nents_first_chunk has to be same with that same parameter passed
-+ *    to __sg_alloc_table_chained().
-  *
-  **/
--void sg_free_table_chained(struct sg_table *table, bool first_chunk)
-+void __sg_free_table_chained(struct sg_table *table,
-+		unsigned nents_first_chunk)
- {
--	if (first_chunk && table->orig_nents <= SG_CHUNK_SIZE)
-+	if (table->orig_nents <= nents_first_chunk)
- 		return;
--	__sg_free_table(table, SG_CHUNK_SIZE, first_chunk, sg_pool_free);
-+
-+	if (nents_first_chunk == 1)
-+		nents_first_chunk = 0;
-+
-+	__sg_free_table(table, SG_CHUNK_SIZE, nents_first_chunk, sg_pool_free);
- }
--EXPORT_SYMBOL_GPL(sg_free_table_chained);
-+EXPORT_SYMBOL_GPL(__sg_free_table_chained);
- 
- /**
-- * sg_alloc_table_chained - Allocate and chain SGLs in an sg table
-+ * __sg_alloc_table_chained - Allocate and chain SGLs in an sg table
-  * @table:	The sg table header to use
-  * @nents:	Number of entries in sg list
-  * @first_chunk: first SGL
-+ * @nents_first_chunk: number of the SGL of @first_chunk
-  *
-  *  Description:
-  *    Allocate and chain SGLs in an sg table. If @nents@ is larger than
-- *    SG_CHUNK_SIZE a chained sg table will be setup.
-+ *    @nents_first_chunk a chained sg table will be setup.
-  *
-  **/
--int sg_alloc_table_chained(struct sg_table *table, int nents,
--		struct scatterlist *first_chunk)
-+int __sg_alloc_table_chained(struct sg_table *table, int nents,
-+		struct scatterlist *first_chunk, unsigned nents_first_chunk)
- {
- 	int ret;
- 
- 	BUG_ON(!nents);
- 
--	if (first_chunk) {
--		if (nents <= SG_CHUNK_SIZE) {
-+	if (first_chunk && nents_first_chunk) {
-+		if (nents <= nents_first_chunk) {
- 			table->nents = table->orig_nents = nents;
- 			sg_init_table(table->sgl, nents);
- 			return 0;
- 		}
- 	}
- 
-+	if (nents_first_chunk == 1) {
-+		first_chunk = NULL;
-+		nents_first_chunk = 0;
-+	}
-+
- 	ret = __sg_alloc_table(table, nents, SG_CHUNK_SIZE,
--			       first_chunk, GFP_ATOMIC, sg_pool_alloc);
-+			       first_chunk, nents_first_chunk,
-+			       GFP_ATOMIC, sg_pool_alloc);
- 	if (unlikely(ret))
--		sg_free_table_chained(table, (bool)first_chunk);
-+		__sg_free_table_chained(table, nents_first_chunk);
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(sg_alloc_table_chained);
-+EXPORT_SYMBOL_GPL(__sg_alloc_table_chained);
- 
- static __init int sg_pool_init(void)
- {
+Changes since v3:
+- Correction in grouping related changes into patches
+- Rectification in commit text at places
 
-Thanks,
-Ming
+Changes since v2:
+- Introduce API in block layer so that drivers can register stream info. Added
+  new limit in request queue for this purpose.
+- Block layer does the conversion from write-hint to stream-id.
+- Stream feature is not disabled anymore if device reports less streams than
+  a particular number (which was set as 4 earlier).
+- Any write-hint beyond reported stream-count turn to 0.
+- New macro "WRITE_LIFE_KERN_MIN" can be used as base by kernel mode components.
+
+Changes since v1:
+- introduce four more hints for in-kernel use, as recommended by Dave chinner
+  & Jens axboe. This isolates kernel-mode hints from user-mode ones.
+- remove mount-option to specify write-hint, as recommended by Jan kara &
+  Dave chinner. Rather, FS always sets write-hint for journal. This gets ignored
+  if device does not support stream.
+- Removed code-redundancy for write_dirty_buffer (Jan kara's review comment)
+
+V4 patch:
+https://lkml.org/lkml/2019/4/17/870
+
+V3 patch:
+https://marc.info/?l=linux-block&m=155384631909082&w=2
+
+V2 patch:
+https://patchwork.kernel.org/cover/10754405/
+
+V1 patch:
+https://marc.info/?l=linux-fsdevel&m=154444637519020&w=2
+
+
+Kanchan Joshi (7):
+  fs: introduce write-hint start point for in-kernel hints
+  block: increase stream count for in-kernel use
+  block: introduce API to register stream information with block-layer
+  block: introduce write-hint to stream-id conversion
+  nvme: register stream info with block layer
+  fs: introduce APIs to enable passing write-hint with buffer-head
+  fs/ext4,jbd2: add support for sending write-hint with journal
+
+ block/blk-core.c            | 29 ++++++++++++++++++++++++++++-
+ block/blk-merge.c           |  4 ++--
+ block/blk-settings.c        | 12 ++++++++++++
+ drivers/nvme/host/core.c    | 23 ++++++-----------------
+ fs/buffer.c                 | 18 ++++++++++++++++--
+ fs/ext4/ext4_jbd2.h         |  1 +
+ fs/ext4/super.c             |  2 ++
+ fs/jbd2/commit.c            | 11 +++++++----
+ fs/jbd2/journal.c           |  3 ++-
+ fs/jbd2/revoke.c            |  3 ++-
+ include/linux/blkdev.h      |  8 ++++++--
+ include/linux/buffer_head.h |  3 +++
+ include/linux/fs.h          |  2 ++
+ include/linux/jbd2.h        |  8 ++++++++
+ 14 files changed, 97 insertions(+), 30 deletions(-)
+
+-- 
+2.7.4
+
