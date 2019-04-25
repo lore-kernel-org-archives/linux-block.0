@@ -2,91 +2,91 @@ Return-Path: <SRS0=cXaM=S3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B24D6C10F03
-	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 08:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E35A9C10F03
+	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 09:37:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8CA92208E4
-	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 08:36:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA38920685
+	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 09:37:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729479AbfDYIgx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Apr 2019 04:36:53 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47606 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726272AbfDYIgw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Apr 2019 04:36:52 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 9DA66AC66;
-        Thu, 25 Apr 2019 08:36:51 +0000 (UTC)
-Subject: Re: [PATCH 2/2] block: remove the i argument to
- bio_for_each_segment_all
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Matthew Wilcox <willy@infradead.org>, linux-block@vger.kernel.org,
-        linux-bcache@vger.kernel.org,
-        Johannes Thumshirn <jthumshirn@suse.de>
-References: <20190425070300.3388-1-hch@lst.de>
- <20190425070300.3388-3-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <09de7bb0-7d35-a346-1021-5ee2192d6ec2@suse.de>
-Date:   Thu, 25 Apr 2019 10:36:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1728295AbfDYJhm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Apr 2019 05:37:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43536 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728258AbfDYJhl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Apr 2019 05:37:41 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8CC3E86671;
+        Thu, 25 Apr 2019 09:37:41 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 711741001E7D;
+        Thu, 25 Apr 2019 09:37:35 +0000 (UTC)
+Date:   Thu, 25 Apr 2019 17:37:30 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH V2 1/2] scsi: core: avoid to pre-allocate big chunk for
+ protection meta data
+Message-ID: <20190425093729.GB28630@ming.t460p>
+References: <20190424093540.15526-1-ming.lei@redhat.com>
+ <20190424093540.15526-2-ming.lei@redhat.com>
+ <20190424143704.GC21209@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20190425070300.3388-3-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190424143704.GC21209@lst.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Thu, 25 Apr 2019 09:37:41 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/25/19 9:03 AM, Christoph Hellwig wrote:
-> We only have two callers that need the integer loop iterator, and they
-> can easily maintain it themselves.
+On Wed, Apr 24, 2019 at 04:37:04PM +0200, Christoph Hellwig wrote:
+> > -	if (scsi_prot_sg_count(cmd))
+> > -		sg_free_table_chained(&cmd->prot_sdb->table, true);
+> > +	if (scsi_prot_sg_count(cmd) && cmd->prot_sdb->table.sgl !=
+> > +			scsi_prot_inline_sg(cmd))
+> > +		sg_free_table_chained(&cmd->prot_sdb->table, false);
 > 
-> Suggested-by: Matthew Wilcox <willy@infradead.org>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->   block/bio.c                       | 29 ++++++++++-------------------
->   block/bounce.c                    |  3 +--
->   drivers/md/bcache/btree.c         |  3 +--
->   drivers/md/dm-crypt.c             |  3 +--
->   drivers/md/raid1.c                |  6 +++---
->   drivers/staging/erofs/data.c      |  3 +--
->   drivers/staging/erofs/unzip_vle.c |  3 +--
->   fs/block_dev.c                    |  6 ++----
->   fs/btrfs/compression.c            |  3 +--
->   fs/btrfs/disk-io.c                |  4 ++--
->   fs/btrfs/extent_io.c              | 10 ++++------
->   fs/btrfs/inode.c                  |  8 ++++----
->   fs/btrfs/raid56.c                 |  3 +--
->   fs/crypto/bio.c                   |  3 +--
->   fs/direct-io.c                    |  3 +--
->   fs/ext4/page-io.c                 |  3 +--
->   fs/ext4/readpage.c                |  3 +--
->   fs/f2fs/data.c                    |  9 +++------
->   fs/gfs2/lops.c                    |  3 +--
->   fs/gfs2/meta_io.c                 |  3 +--
->   fs/iomap.c                        |  6 ++-	---
->   fs/mpage.c                        |  3 +--
->   fs/xfs/xfs_aops.c                 |  3 +--
->   include/linux/bio.h               |  5 ++---
->   24 files changed, 47 insertions(+), 81 deletions(-)
+> Nipick: I usually find it easier to read if we break around conditions
+> instead of inside them:
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+> 	if (scsi_prot_sg_count(cmd) &&
+> 	    cmd->prot_sdb->table.sgl != scsi_prot_inline_sg(cmd))
 
-Cheers,
+OK.
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
+> 
+> > +		if (ivecs <= SCSI_INLINE_PROT_SG_CNT) {
+> > +			scsi_init_inline_sg_table(&prot_sdb->table,
+> > +						  scsi_prot_inline_sg(cmd),
+> > +						  SCSI_INLINE_PROT_SG_CNT);
+> > +		} else if (sg_alloc_table_chained(&prot_sdb->table,
+> > +						  ivecs, NULL)) {
+> 
+> Hmm.  Maybe we just need to pass an nr_inline_vecs argument
+> to sg_alloc_table_chained to replace the SG_CHUNK_SIZE argument instead
+> of open coding this logic?
+
+We can do that, however the current scatterlist code assumes that size
+of each SGL is fixed. We may change the logic to support this feature,
+seems not too difficult to do that.
+
+Please let us know if you are fine to change the scatterlist code for
+supporting customized size of the 1st SGL.
+
+
+Thanks,
+Ming
