@@ -6,33 +6,33 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD7ABC43218
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 13:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B11C43218
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 13:38:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ADE28206E0
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 13:38:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1933206E0
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 13:38:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726074AbfDZNiN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Apr 2019 09:38:13 -0400
+        id S1726193AbfDZNiP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Apr 2019 09:38:15 -0400
 Received: from mga18.intel.com ([134.134.136.126]:36534 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726138AbfDZNiN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Apr 2019 09:38:13 -0400
+        id S1726138AbfDZNiP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Apr 2019 09:38:15 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Apr 2019 06:38:12 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Apr 2019 06:38:14 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.60,397,1549958400"; 
-   d="scan'208";a="152591265"
+   d="scan'208";a="152591272"
 Received: from gklab-107-059.igk.intel.com ([10.102.107.59])
-  by FMSMGA003.fm.intel.com with ESMTP; 26 Apr 2019 06:38:11 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 26 Apr 2019 06:38:13 -0700
 From:   Igor Konopko <igor.j.konopko@intel.com>
 To:     mb@lightnvm.io, javier@javigon.com, hans.holmberg@cnexlabs.com
 Cc:     linux-block@vger.kernel.org, igor.j.konopko@intel.com
-Subject: [PATCH v5 2/3] lightnvm: pblk: use nvm_rq_to_ppa_list()
-Date:   Fri, 26 Apr 2019 15:35:12 +0200
-Message-Id: <20190426133513.23966-3-igor.j.konopko@intel.com>
+Subject: [PATCH v5 3/3] lightnvm: pblk: store multiple copies of smeta
+Date:   Fri, 26 Apr 2019 15:35:13 +0200
+Message-Id: <20190426133513.23966-4-igor.j.konopko@intel.com>
 X-Mailer: git-send-email 2.9.5
 In-Reply-To: <20190426133513.23966-1-igor.j.konopko@intel.com>
 References: <20190426133513.23966-1-igor.j.konopko@intel.com>
@@ -44,200 +44,371 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch replaces few remaining usages of rqd->ppa_list[] with
-existing nvm_rq_to_ppa_list() helpers. This is needed for theoretical
-devices with ws_min/ws_opt equal to 1.
+Currently there is only one copy of smeta stored per line in pblk. This
+is risky, because in case of read error on such a chunk, we are losing
+all the data from whole line, what leads to silent data corruption.
+
+This patch changes this behaviour and allows to store more then one
+copy of the smeta (specified by module parameter) in order to provide
+higher reliability by storing mirrored copies of smeta struct and
+providing possibility to failover to another copy of that struct in
+case of read error. Such an approach ensures that copies of that
+critical structures will be stored on different dies and thus predicted
+UBER is multiple times higher
 
 Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 Reviewed-by: Javier González <javier@javigon.com>
 ---
- drivers/lightnvm/pblk-core.c     | 26 ++++++++++++++------------
- drivers/lightnvm/pblk-recovery.c | 13 ++++++++-----
- 2 files changed, 22 insertions(+), 17 deletions(-)
+ drivers/lightnvm/pblk-core.c     | 124 ++++++++++++++++++++++++++++++++-------
+ drivers/lightnvm/pblk-init.c     |  23 ++++++--
+ drivers/lightnvm/pblk-recovery.c |  14 +++--
+ drivers/lightnvm/pblk-rl.c       |   3 +-
+ drivers/lightnvm/pblk.h          |   1 +
+ 5 files changed, 132 insertions(+), 33 deletions(-)
 
 diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 07270ba..7735378 100644
+index 7735378..9cf894a 100644
 --- a/drivers/lightnvm/pblk-core.c
 +++ b/drivers/lightnvm/pblk-core.c
-@@ -562,11 +562,9 @@ int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd)
+@@ -718,14 +718,15 @@ u64 pblk_line_smeta_start(struct pblk *pblk, struct pblk_line *line)
+ 	return bit * geo->ws_opt;
+ }
  
- int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd)
+-int pblk_line_smeta_read(struct pblk *pblk, struct pblk_line *line)
++static int pblk_line_smeta_read_copy(struct pblk *pblk,
++				     struct pblk_line *line, u64 paddr)
  {
--	struct ppa_addr *ppa_list;
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 	int ret;
- 
--	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
--
- 	pblk_down_chunk(pblk, ppa_list[0]);
- 	ret = pblk_submit_io_sync(pblk, rqd);
- 	pblk_up_chunk(pblk, ppa_list[0]);
-@@ -725,6 +723,7 @@ int pblk_line_smeta_read(struct pblk *pblk, struct pblk_line *line)
  	struct nvm_tgt_dev *dev = pblk->dev;
++	struct nvm_geo *geo = &dev->geo;
  	struct pblk_line_meta *lm = &pblk->lm;
  	struct bio *bio;
-+	struct ppa_addr *ppa_list;
+ 	struct ppa_addr *ppa_list;
  	struct nvm_rq rqd;
- 	u64 paddr = pblk_line_smeta_start(pblk, line);
+-	u64 paddr = pblk_line_smeta_start(pblk, line);
  	int i, ret;
-@@ -748,9 +747,10 @@ int pblk_line_smeta_read(struct pblk *pblk, struct pblk_line *line)
- 	rqd.opcode = NVM_OP_PREAD;
- 	rqd.nr_ppas = lm->smeta_sec;
- 	rqd.is_seq = 1;
-+	ppa_list = nvm_rq_to_ppa_list(&rqd);
  
- 	for (i = 0; i < lm->smeta_sec; i++, paddr++)
--		rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
-+		ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
+@@ -749,8 +750,20 @@ int pblk_line_smeta_read(struct pblk *pblk, struct pblk_line *line)
+ 	rqd.is_seq = 1;
+ 	ppa_list = nvm_rq_to_ppa_list(&rqd);
+ 
+-	for (i = 0; i < lm->smeta_sec; i++, paddr++)
+-		ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
++	for (i = 0; i < rqd.nr_ppas; i++, paddr++) {
++		struct ppa_addr ppa = addr_to_gen_ppa(pblk, paddr, line->id);
++		int pos = pblk_ppa_to_pos(geo, ppa);
++
++		while (test_bit(pos, line->blk_bitmap)) {
++			paddr += pblk->min_write_pgs;
++			ppa = addr_to_gen_ppa(pblk, paddr, line->id);
++			pos = pblk_ppa_to_pos(geo, ppa);
++		}
++
++		ppa_list[i] = ppa;
++		pblk_get_meta(pblk, rqd.meta_list, i)->lba =
++				  cpu_to_le64(ADDR_EMPTY);
++	}
  
  	ret = pblk_submit_io_sync(pblk, &rqd);
  	if (ret) {
-@@ -777,6 +777,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line,
+@@ -771,17 +784,64 @@ int pblk_line_smeta_read(struct pblk *pblk, struct pblk_line *line)
+ 	return ret;
+ }
+ 
+-static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line,
+-				 u64 paddr)
++int pblk_line_smeta_read(struct pblk *pblk, struct pblk_line *line)
++{
++	struct pblk_line_meta *lm = &pblk->lm;
++	int i, ret = 0;
++	u64 paddr = pblk_line_smeta_start(pblk, line);
++
++	for (i = 0; i < lm->smeta_copies; i++) {
++		ret = pblk_line_smeta_read_copy(pblk, line,
++						paddr + (i * lm->smeta_sec));
++		if (!ret) {
++			/*
++			 * Just one successfully read copy of smeta is
++			 * enough for us for recovery, don't need to
++			 * read another one.
++			 */
++			return ret;
++		}
++	}
++	return ret;
++}
++
++static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line)
+ {
  	struct nvm_tgt_dev *dev = pblk->dev;
++	struct nvm_geo *geo = &dev->geo;
  	struct pblk_line_meta *lm = &pblk->lm;
  	struct bio *bio;
-+	struct ppa_addr *ppa_list;
+ 	struct ppa_addr *ppa_list;
  	struct nvm_rq rqd;
  	__le64 *lba_list = emeta_to_lbas(pblk, line->emeta->buf);
  	__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
-@@ -801,12 +802,13 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line,
- 	rqd.opcode = NVM_OP_PWRITE;
- 	rqd.nr_ppas = lm->smeta_sec;
- 	rqd.is_seq = 1;
-+	ppa_list = nvm_rq_to_ppa_list(&rqd);
+-	int i, ret;
++	u64 paddr = 0;
++	int smeta_wr_len = lm->smeta_len;
++	int smeta_wr_sec = lm->smeta_sec;
++	int i, ret, rq_writes;
++
++	/*
++	 * Check if we can write all the smeta copies with
++	 * a single write command.
++	 * If yes -> copy smeta sector into multiple copies
++	 * in buffer to write.
++	 * If no -> issue writes one by one using the same
++	 * buffer space.
++	 * Only if all the copies are written correctly
++	 * we are treating this line as valid for proper
++	 * UBER reliability.
++	 */
++	if (lm->smeta_sec * lm->smeta_copies > pblk->max_write_pgs) {
++		rq_writes = lm->smeta_copies;
++	} else {
++		rq_writes = 1;
++		for (i = 1; i < lm->smeta_copies; i++) {
++			memcpy(line->smeta + i * lm->smeta_len,
++			       line->smeta, lm->smeta_len);
++		}
++		smeta_wr_len *= lm->smeta_copies;
++		smeta_wr_sec *= lm->smeta_copies;
++	}
  
- 	for (i = 0; i < lm->smeta_sec; i++, paddr++) {
- 		struct pblk_sec_meta *meta = pblk_get_meta(pblk,
- 							   rqd.meta_list, i);
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
  
--		rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
-+		ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
- 		meta->lba = lba_list[paddr] = addr_empty;
- 	}
+@@ -789,7 +849,8 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line,
+ 	if (ret)
+ 		return ret;
  
-@@ -836,8 +838,9 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct pblk_line_meta *lm = &pblk->lm;
--	void *ppa_list, *meta_list;
-+	void *ppa_list_buf, *meta_list;
- 	struct bio *bio;
-+	struct ppa_addr *ppa_list;
- 	struct nvm_rq rqd;
- 	u64 paddr = line->emeta_ssec;
- 	dma_addr_t dma_ppa_list, dma_meta_list;
-@@ -853,7 +856,7 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 	if (!meta_list)
- 		return -ENOMEM;
- 
--	ppa_list = meta_list + pblk_dma_meta_size(pblk);
-+	ppa_list_buf = meta_list + pblk_dma_meta_size(pblk);
- 	dma_ppa_list = dma_meta_list + pblk_dma_meta_size(pblk);
- 
- next_rq:
-@@ -874,11 +877,12 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
+-	bio = bio_map_kern(dev->q, line->smeta, lm->smeta_len, GFP_KERNEL);
++next_rq:
++	bio = bio_map_kern(dev->q, line->smeta, smeta_wr_len, GFP_KERNEL);
+ 	if (IS_ERR(bio)) {
+ 		ret = PTR_ERR(bio);
+ 		goto clear_rqd;
+@@ -800,16 +861,24 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line,
  
  	rqd.bio = bio;
- 	rqd.meta_list = meta_list;
--	rqd.ppa_list = ppa_list;
-+	rqd.ppa_list = ppa_list_buf;
- 	rqd.dma_meta_list = dma_meta_list;
- 	rqd.dma_ppa_list = dma_ppa_list;
- 	rqd.opcode = NVM_OP_PREAD;
- 	rqd.nr_ppas = rq_ppas;
-+	ppa_list = nvm_rq_to_ppa_list(&rqd);
+ 	rqd.opcode = NVM_OP_PWRITE;
+-	rqd.nr_ppas = lm->smeta_sec;
++	rqd.nr_ppas = smeta_wr_sec;
+ 	rqd.is_seq = 1;
+ 	ppa_list = nvm_rq_to_ppa_list(&rqd);
  
- 	for (i = 0; i < rqd.nr_ppas; ) {
- 		struct ppa_addr ppa = addr_to_gen_ppa(pblk, paddr, line_id);
-@@ -906,7 +910,7 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 		}
+-	for (i = 0; i < lm->smeta_sec; i++, paddr++) {
+-		struct pblk_sec_meta *meta = pblk_get_meta(pblk,
+-							   rqd.meta_list, i);
++	for (i = 0; i < rqd.nr_ppas; i++, paddr++) {
++		void *meta_list = rqd.meta_list;
++		struct ppa_addr ppa = addr_to_gen_ppa(pblk, paddr, line->id);
++		int pos = pblk_ppa_to_pos(geo, ppa);
  
- 		for (j = 0; j < min; j++, i++, paddr++)
--			rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line_id);
-+			ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line_id);
+-		ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
+-		meta->lba = lba_list[paddr] = addr_empty;
++		while (test_bit(pos, line->blk_bitmap)) {
++			paddr += pblk->min_write_pgs;
++			ppa = addr_to_gen_ppa(pblk, paddr, line->id);
++			pos = pblk_ppa_to_pos(geo, ppa);
++		}
++
++		ppa_list[i] = ppa;
++		pblk_get_meta(pblk, meta_list, i)->lba = addr_empty;
++		lba_list[paddr] = addr_empty;
  	}
  
- 	ret = pblk_submit_io_sync(pblk, &rqd);
-@@ -1525,11 +1529,9 @@ void pblk_ppa_to_line_put(struct pblk *pblk, struct ppa_addr ppa)
+ 	ret = pblk_submit_io_sync_sem(pblk, &rqd);
+@@ -824,8 +893,13 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line,
+ 	if (rqd.error) {
+ 		pblk_log_write_err(pblk, &rqd);
+ 		ret = -EIO;
++		goto clear_rqd;
+ 	}
  
- void pblk_rq_to_line_put(struct pblk *pblk, struct nvm_rq *rqd)
- {
--	struct ppa_addr *ppa_list;
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 	int i;
++	rq_writes--;
++	if (rq_writes > 0)
++		goto next_rq;
++
+ clear_rqd:
+ 	pblk_free_rqd_meta(pblk, &rqd);
+ 	return ret;
+@@ -1024,7 +1098,7 @@ static void pblk_line_setup_metadata(struct pblk_line *line,
+ 	line->smeta = l_mg->sline_meta[meta_line];
+ 	line->emeta = l_mg->eline_meta[meta_line];
  
--	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
--
- 	for (i = 0; i < rqd->nr_ppas; i++)
- 		pblk_ppa_to_line_put(pblk, ppa_list[i]);
- }
+-	memset(line->smeta, 0, lm->smeta_len);
++	memset(line->smeta, 0, lm->smeta_len * lm->smeta_copies);
+ 	memset(line->emeta->buf, 0, lm->emeta_len[0]);
+ 
+ 	line->emeta->mem = 0;
+@@ -1151,7 +1225,7 @@ static int pblk_line_init_bb(struct pblk *pblk, struct pblk_line *line,
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+ 	u64 off;
+ 	int bit = -1;
+-	int emeta_secs;
++	int emeta_secs, smeta_secs;
+ 
+ 	line->sec_in_line = lm->sec_per_line;
+ 
+@@ -1167,13 +1241,19 @@ static int pblk_line_init_bb(struct pblk *pblk, struct pblk_line *line,
+ 	}
+ 
+ 	/* Mark smeta metadata sectors as bad sectors */
+-	bit = find_first_zero_bit(line->blk_bitmap, lm->blk_per_line);
+-	off = bit * geo->ws_opt;
+-	bitmap_set(line->map_bitmap, off, lm->smeta_sec);
+-	line->sec_in_line -= lm->smeta_sec;
+-	line->cur_sec = off + lm->smeta_sec;
++	smeta_secs = lm->smeta_sec * lm->smeta_copies;
++	bit = -1;
++	while (smeta_secs) {
++		bit = find_next_zero_bit(line->blk_bitmap, lm->blk_per_line,
++					bit + 1);
++		off = bit * geo->ws_opt;
++		bitmap_set(line->map_bitmap, off, geo->ws_opt);
++		line->cur_sec = off + geo->ws_opt;
++		smeta_secs -= lm->smeta_sec;
++	}
++	line->sec_in_line -= (lm->smeta_sec * lm->smeta_copies);
+ 
+-	if (init && pblk_line_smeta_write(pblk, line, off)) {
++	if (init && pblk_line_smeta_write(pblk, line)) {
+ 		pblk_debug(pblk, "line smeta I/O failed. Retry\n");
+ 		return 0;
+ 	}
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index b351c7f..4f6d214 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -27,6 +27,11 @@ static unsigned int write_buffer_size;
+ module_param(write_buffer_size, uint, 0644);
+ MODULE_PARM_DESC(write_buffer_size, "number of entries in a write buffer");
+ 
++static unsigned int smeta_copies = 1;
++
++module_param(smeta_copies, int, 0644);
++MODULE_PARM_DESC(smeta_copies, "number of smeta copies");
++
+ struct pblk_global_caches {
+ 	struct kmem_cache	*ws;
+ 	struct kmem_cache	*rec;
+@@ -864,7 +869,8 @@ static int pblk_line_mg_init(struct pblk *pblk)
+ 	 * emeta depends on the number of LUNs allocated to the pblk instance
+ 	 */
+ 	for (i = 0; i < PBLK_DATA_LINES; i++) {
+-		l_mg->sline_meta[i] = kmalloc(lm->smeta_len, GFP_KERNEL);
++		l_mg->sline_meta[i] = kmalloc(lm->smeta_len
++						* lm->smeta_copies, GFP_KERNEL);
+ 		if (!l_mg->sline_meta[i])
+ 			goto fail_free_smeta;
+ 	}
+@@ -964,6 +970,12 @@ static int pblk_line_meta_init(struct pblk *pblk)
+ 	lm->mid_thrs = lm->sec_per_line / 2;
+ 	lm->high_thrs = lm->sec_per_line / 4;
+ 	lm->meta_distance = (geo->all_luns / 2) * pblk->min_write_pgs;
++	lm->smeta_copies = smeta_copies;
++
++	if (lm->smeta_copies < 1 || lm->smeta_copies > geo->all_luns) {
++		pblk_err(pblk, "unsupported smeta copies parameter\n");
++		return -EINVAL;
++	}
+ 
+ 	/* Calculate necessary pages for smeta. See comment over struct
+ 	 * line_smeta definition
+@@ -995,10 +1007,11 @@ static int pblk_line_meta_init(struct pblk *pblk)
+ 
+ 	lm->emeta_bb = geo->all_luns > i ? geo->all_luns - i : 0;
+ 
+-	lm->min_blk_line = 1;
+-	if (geo->all_luns > 1)
+-		lm->min_blk_line += DIV_ROUND_UP(lm->smeta_sec +
+-					lm->emeta_sec[0], geo->clba);
++	lm->min_blk_line = lm->smeta_copies;
++	if (geo->all_luns > lm->smeta_copies) {
++		lm->min_blk_line += DIV_ROUND_UP((lm->smeta_sec
++			* lm->smeta_copies) + lm->emeta_sec[0], geo->clba);
++	}
+ 
+ 	if (lm->min_blk_line > lm->blk_per_line) {
+ 		pblk_err(pblk, "config. not supported. Min. LUN in line:%d\n",
 diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index a9085b0..e6dda04 100644
+index e6dda04..2fca21e 100644
 --- a/drivers/lightnvm/pblk-recovery.c
 +++ b/drivers/lightnvm/pblk-recovery.c
-@@ -179,6 +179,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
- 	struct pblk_pad_rq *pad_rq;
- 	struct nvm_rq *rqd;
- 	struct bio *bio;
-+	struct ppa_addr *ppa_list;
+@@ -51,7 +51,8 @@ static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
+ 	if (!lba_list)
+ 		return 1;
+ 
+-	data_start = pblk_line_smeta_start(pblk, line) + lm->smeta_sec;
++	data_start = pblk_line_smeta_start(pblk, line)
++					+ (lm->smeta_sec * lm->smeta_copies);
+ 	data_end = line->emeta_ssec;
+ 	nr_valid_lbas = le64_to_cpu(emeta_buf->nr_valid_lbas);
+ 
+@@ -134,7 +135,8 @@ static u64 pblk_sec_in_open_line(struct pblk *pblk, struct pblk_line *line)
+ 	if (lm->blk_per_line - nr_bb != valid_chunks)
+ 		pblk_err(pblk, "recovery line %d is bad\n", line->id);
+ 
+-	pblk_update_line_wp(pblk, line, written_secs - lm->smeta_sec);
++	pblk_update_line_wp(pblk, line, written_secs -
++					(lm->smeta_sec * lm->smeta_copies));
+ 
+ 	return written_secs;
+ }
+@@ -379,12 +381,14 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
  	void *data;
- 	__le64 *lba_list = emeta_to_lbas(pblk, line->emeta->buf);
- 	u64 w_ptr = line->cur_sec;
-@@ -239,6 +240,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
- 	rqd->end_io = pblk_end_io_recov;
- 	rqd->private = pad_rq;
+ 	dma_addr_t dma_ppa_list, dma_meta_list;
+ 	__le64 *lba_list;
+-	u64 paddr = pblk_line_smeta_start(pblk, line) + lm->smeta_sec;
++	u64 paddr = pblk_line_smeta_start(pblk, line) +
++					(lm->smeta_sec * lm->smeta_copies);
+ 	bool padded = false;
+ 	int rq_ppas, rq_len;
+ 	int i, j;
+ 	int ret;
+-	u64 left_ppas = pblk_sec_in_open_line(pblk, line) - lm->smeta_sec;
++	u64 left_ppas = pblk_sec_in_open_line(pblk, line) -
++					(lm->smeta_sec * lm->smeta_copies);
  
-+	ppa_list = nvm_rq_to_ppa_list(rqd);
- 	meta_list = rqd->meta_list;
+ 	if (pblk_line_wps_are_unbalanced(pblk, line))
+ 		pblk_warn(pblk, "recovering unbalanced line (%d)\n", line->id);
+@@ -709,7 +713,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
  
- 	for (i = 0; i < rqd->nr_ppas; ) {
-@@ -266,17 +268,17 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
- 			lba_list[w_ptr] = addr_empty;
- 			meta = pblk_get_meta(pblk, meta_list, i);
- 			meta->lba = addr_empty;
--			rqd->ppa_list[i] = dev_ppa;
-+			ppa_list[i] = dev_ppa;
- 		}
- 	}
+ 		line = &pblk->lines[i];
  
- 	kref_get(&pad_rq->ref);
--	pblk_down_chunk(pblk, rqd->ppa_list[0]);
-+	pblk_down_chunk(pblk, ppa_list[0]);
+-		memset(smeta, 0, lm->smeta_len);
++		memset(smeta, 0, lm->smeta_len * lm->smeta_copies);
+ 		line->smeta = smeta;
+ 		line->lun_bitmap = ((void *)(smeta_buf)) +
+ 						sizeof(struct line_smeta);
+diff --git a/drivers/lightnvm/pblk-rl.c b/drivers/lightnvm/pblk-rl.c
+index a5f8bc2..c74ec73 100644
+--- a/drivers/lightnvm/pblk-rl.c
++++ b/drivers/lightnvm/pblk-rl.c
+@@ -218,7 +218,8 @@ void pblk_rl_init(struct pblk_rl *rl, int budget, int threshold)
+ 	unsigned int rb_windows;
  
- 	ret = pblk_submit_io(pblk, rqd);
- 	if (ret) {
- 		pblk_err(pblk, "I/O submission failed: %d\n", ret);
--		pblk_up_chunk(pblk, rqd->ppa_list[0]);
-+		pblk_up_chunk(pblk, ppa_list[0]);
- 		kref_put(&pad_rq->ref, pblk_recov_complete);
- 		pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
- 		bio_put(bio);
-@@ -420,6 +422,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
- 	rqd->ppa_list = ppa_list;
- 	rqd->dma_ppa_list = dma_ppa_list;
- 	rqd->dma_meta_list = dma_meta_list;
-+	ppa_list = nvm_rq_to_ppa_list(rqd);
+ 	/* Consider sectors used for metadata */
+-	sec_meta = (lm->smeta_sec + lm->emeta_sec[0]) * l_mg->nr_free_lines;
++	sec_meta = ((lm->smeta_sec * lm->smeta_copies)
++			+ lm->emeta_sec[0]) * l_mg->nr_free_lines;
+ 	blk_meta = DIV_ROUND_UP(sec_meta, geo->clba);
  
- 	if (pblk_io_aligned(pblk, rq_ppas))
- 		rqd->is_seq = 1;
-@@ -438,7 +441,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
- 		}
+ 	rl->high = pblk->op_blks - blk_meta - lm->blk_per_line;
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index a678553..183bc99 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -548,6 +548,7 @@ struct pblk_line_mgmt {
+ struct pblk_line_meta {
+ 	unsigned int smeta_len;		/* Total length for smeta */
+ 	unsigned int smeta_sec;		/* Sectors needed for smeta */
++	unsigned int smeta_copies;	/* Number of smeta copies */
  
- 		for (j = 0; j < pblk->min_write_pgs; j++, i++)
--			rqd->ppa_list[i] =
-+			ppa_list[i] =
- 				addr_to_gen_ppa(pblk, paddr + j, line->id);
- 	}
- 
-@@ -486,7 +489,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
- 			continue;
- 
- 		line->nr_valid_lbas++;
--		pblk_update_map(pblk, lba, rqd->ppa_list[i]);
-+		pblk_update_map(pblk, lba, ppa_list[i]);
- 	}
- 
- 	left_ppas -= rq_ppas;
+ 	unsigned int emeta_len[4];	/* Lengths for emeta:
+ 					 *  [0]: Total
 -- 
 2.9.5
 
