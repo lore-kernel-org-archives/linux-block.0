@@ -1,81 +1,114 @@
-Return-Path: <SRS0=cXaM=S3=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=I+xz=S4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 510F7C43219
-	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 21:19:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0062C43219
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 00:21:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 647A3216C4
-	for <linux-block@archiver.kernel.org>; Thu, 25 Apr 2019 21:19:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9F7F206BA
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 00:21:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T/PIB/8L"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729340AbfDYVTO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Apr 2019 17:19:14 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:57521 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728469AbfDYVTN (ORCPT
+        id S1727100AbfDZAVM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Apr 2019 20:21:12 -0400
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:35695 "EHLO
+        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726703AbfDZAVM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Apr 2019 17:19:13 -0400
-Received: from callcc.thunk.org (guestnat-104-133-0-109.corp.google.com [104.133.0.109] (may be forged))
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x3PLJ6g3014498
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 25 Apr 2019 17:19:07 -0400
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id 442D7420EEC; Thu, 25 Apr 2019 17:19:06 -0400 (EDT)
-Date:   Thu, 25 Apr 2019 17:19:06 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [LSF/MM TOPIC] Lightning round?
-Message-ID: <20190425211906.GH4739@mit.edu>
-Mail-Followup-To: Theodore Ts'o <tytso@mit.edu>,
-        Jens Axboe <axboe@kernel.dk>, lsf-pc@lists.linux-foundation.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190425200012.GA6391@redhat.com>
- <83fda245-849a-70cc-dde0-5c451938ee97@kernel.dk>
+        Thu, 25 Apr 2019 20:21:12 -0400
+Received: by mail-yw1-f68.google.com with SMTP id d132so585293ywa.2
+        for <linux-block@vger.kernel.org>; Thu, 25 Apr 2019 17:21:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ztWRd3wHw2jMAG4RUdsq7Ojt2d2mraX7SmXYPZ/MnB0=;
+        b=T/PIB/8Lc6vYgzuQJ8WyhCqUybuwJcntoclecPqwSVy8vdtmcJ46V3R12gLPxntX5m
+         oKUIhY0b7xMXR3qSo+XLUsPMjKu1h3YkNo3dCArXU4PgqKmLs5rqxVq12LSEM+3oqdc9
+         AdafnSp4DwfEhJASOFe7K4vSRMr2xewWB2igOw9Vm7x2kMvYNk6ACg+bALaruANzw2E4
+         DIXFfBZvMtVoqRF+1n3ADC9Bz/i8/CajTj2dLbhUxCZa08X+qkD4n5wxPq2a1Jq6Tol7
+         9D5/iJH8Wkd16mFn6h61KsUqGZeab7U8PhQSagqFsxABSBooNHrYH3WDKk0DAiHEgHvK
+         98ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ztWRd3wHw2jMAG4RUdsq7Ojt2d2mraX7SmXYPZ/MnB0=;
+        b=lh+JAsOr+JPHwl5UozwDBw21Dr7x7qmiRllhmhtE+Rum6dUvl+UWTo2EE8h3YC1mJe
+         z9xCGUsxeLHqdaGbPsDZzpf9eZ8icIIj8V4GMPCWYRlRpw5nc21NuPp05VU04+2mJOdR
+         /BEkgs94le+1az+3AqLutSOnpyukBmzcKIK9gQqER5SDcyibsnJm4TRn6oJ/87taS2nz
+         rnGJsE9CrgK59DSyff0wTgyeVKUKU57ejBH6Zn8dSoC6hknpFzj1mPglNTjSDYBj4tGO
+         bCh84rgn7D9g87sViYdcrDGePLwsNWeMKAlfHW3qkh7qqJwUUI7M+pbNVj1uPxkQzvRi
+         wtVg==
+X-Gm-Message-State: APjAAAVuehbifw+3x4Pbjv80+vkoK1tiSKptACrwJ7FmRrAvxrgJWKtx
+        OpdQ9WospmgwkIl6Hl1pUtfEelZc
+X-Google-Smtp-Source: APXvYqwIMFmebQ8NgHU5D8xfOh65Ce6Wh40gKZvxSso7E5ae1LXLTq7PqNiRYhTKYfQZGHeklfBsQA==
+X-Received: by 2002:a0d:eacf:: with SMTP id t198mr12637378ywe.495.1556238071015;
+        Thu, 25 Apr 2019 17:21:11 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:180::5484])
+        by smtp.gmail.com with ESMTPSA id 191sm8242546ywg.12.2019.04.25.17.21.09
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 25 Apr 2019 17:21:09 -0700 (PDT)
+From:   Jes Sorensen <jes.sorensen@gmail.com>
+X-Google-Original-From: Jes Sorensen <Jes.Sorensen@gmail.com>
+To:     linux-block@vger.kernel.org
+Cc:     josef@toxicpanda.com, kernel-team@fb.com
+Subject: [PATCH 0/5] RFC blk-mq device stats
+Date:   Thu, 25 Apr 2019 20:20:45 -0400
+Message-Id: <20190426002050.15499-1-Jes.Sorensen@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <83fda245-849a-70cc-dde0-5c451938ee97@kernel.dk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 25, 2019 at 02:03:34PM -0600, Jens Axboe wrote:
-> 
-> which also includes a link to the schedule. Here it is:
-> 
-> https://docs.google.com/spreadsheets/d/1Z1pDL-XeUT1ZwMWrBL8T8q3vtSqZpLPgF3Bzu_jejfk
+From: Jes Sorensen <jsorensen@fb.com>
 
-It looks like there are still quite a few open slots on Thursday?
-Could we perhaps schedule a session for lightning talks?
+Hi,
 
-I've got at least one thing that I'm hoping to be able to plug as a
-lightning round topic.  Folks may remember that a year or two ago I
-had given an LSF/MM talk about changes to the block layer to support
-inline encryption engines[1] (where the data gets encrypted/decrypted
-between the DMA engine and the storage device, typically EMCC/UFS
-flash).
+This patchset adds per-device histogram statistics of read, write, and
+discard request sizes, as well as number of requests for each
+bucket. It uses the blk-stat infrastructure and only collects stats
+for devices for which it has been explicitly enabled by writing 1 to
+/sys/block/<dev>/queue/histstat
 
-[1]  https://marc.info/?l=linux-fsdevel&m=148190956210784&w=2
+In addition it builds on top of two patches I recklessly stole from
+Josef - thanks!
 
-Between the Android team really trying to get aligned with upstream,
-and multiple SOC vendors interested in providing inline encryption
-support in hardware, we (finally) have a few engineers who have been
-on implementing this design for the past few months.  If all goes
-well, hopefully RFC patches will be published on linux-block,
-linux-fsdevel, and linux-fscrypto by early next week.  Assuming this
-happens on schedule, it would be perfect for a lightning talk, with
-the goal of commending this patch series for feedback.
+Thoughts or oppinions on this approach? I am not married to the
+naming, so happy to change that if wanted.
 
-						- Ted
+Thanks,
+Jes
+
+
+Jes Sorensen (3):
+  Use blk-stat infrastructure to collect per queue device stats
+  Export block dev stats to sysfs
+  Expand block stats to export number of of requests per bucket
+
+Josef Bacik (2):
+  blk-stat: rename batch to time
+  block: keep track of per-device io sizes in stats
+
+ block/blk-iolatency.c     |  2 +-
+ block/blk-mq.c            | 56 ++++++++++++++++++++++++++++--
+ block/blk-stat.c          | 16 +++++----
+ block/blk-stat.h          |  3 +-
+ block/blk-sysfs.c         | 71 +++++++++++++++++++++++++++++++++++++++
+ block/blk-throttle.c      |  3 +-
+ include/linux/blk_types.h |  3 +-
+ include/linux/blkdev.h    | 12 +++++--
+ 8 files changed, 149 insertions(+), 17 deletions(-)
+
+-- 
+2.17.1
+
