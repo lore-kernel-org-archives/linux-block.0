@@ -2,132 +2,71 @@ Return-Path: <SRS0=I+xz=S4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E15EC43219
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 12:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3222FC43218
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 12:44:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA85C2084F
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 12:34:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0C20206C1
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 12:44:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="csKgkKtE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iNyi5n/3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726048AbfDZMeP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Apr 2019 08:34:15 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:35495 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbfDZMeP (ORCPT
+        id S1726074AbfDZMoh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Apr 2019 08:44:37 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:38072 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726025AbfDZMoh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Apr 2019 08:34:15 -0400
-Received: by mail-ed1-f66.google.com with SMTP id y67so3051572ede.2
-        for <linux-block@vger.kernel.org>; Fri, 26 Apr 2019 05:34:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=h9Qvxw4CKconppiqk0DxMblQ7mmN22jDdhn77epRE0M=;
-        b=csKgkKtEWslrrdAjohfzZyAITl+p8Un6rA7lhOdMtDOb+WzhGEK/BvjCNDD0eeb3eL
-         KZI5hinbR9VrHR6rNlb/1L2SogfpAhP1zLYfYHk47ixSzHFfjA/QZ9jnCHQG1SpaMtpJ
-         4CAK0vEt/kCm1sm90SyZatHtXl5BfTlpabCrUxT6o2bCeVanfHkTeBPOAA/VBnV+ittM
-         C9ZKekLzngVDSc9Xt4aiYgpJyZqxK1Zc2cZFMFlUCyZVxpsIhq6c041xW5jFt2jKcWUg
-         wQg0hx0PaHtNhwWUNj4xyiyHJry6Lzy1LLUJhBUIbkjYVKAMB4gjfpvIR8qHZ5/ZYqSJ
-         ixzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=h9Qvxw4CKconppiqk0DxMblQ7mmN22jDdhn77epRE0M=;
-        b=WcUrGwN5//QjHzL+pKeo6UfdXhvRXX0Fhx0obfCShR8GYwUdS8shWZUwhTZaR7TIEj
-         o3crvBNw8Jv/Oi88XKM9quebi4Kpb1JN+YuKEsJarNNv8tX85KW+SE5+365DjUvzZ3Ri
-         laba/fOns3L9YnCCDxuPIq8MlVcapk/fpb/w//bohAO3nSD84A0DVJRpj8FhzUshk+VZ
-         jZPMinmwzvWVY85mwGx6jAsaBKPEMNVxDYeHe2fHhGIQqtsb3Ntmkr2kjuFZCGSFI06C
-         oRlCKkdIOXjAwAJ+Lvr3JgPydfPt6IhA9yw4ggdS+5iTpq0VbT1iNVdlszcjByrEZmAA
-         lFgQ==
-X-Gm-Message-State: APjAAAVCtF551bVl/bn+d/fecDrTMD2S74Gp9G7DkIaDYPxUX2BRqzwK
-        lFZD3/bGRa7hFQPlO0cZOjU28AIpb/A=
-X-Google-Smtp-Source: APXvYqzKOHpBt1phsmMWjQKWTz4cfExiEqFAWh5KacyqbKlcQQCHqieEoV2awcxrwZuMy6FEt5KKxg==
-X-Received: by 2002:a17:906:1ed2:: with SMTP id m18mr11000666ejj.106.1556282053755;
-        Fri, 26 Apr 2019 05:34:13 -0700 (PDT)
-Received: from [192.168.0.36] (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
-        by smtp.googlemail.com with ESMTPSA id n15sm752388ejl.52.2019.04.26.05.34.11
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 26 Apr 2019 05:34:12 -0700 (PDT)
-Subject: Re: [PATCH v4 0/7] lightnvm: next set of improvements for 5.2
-To:     Igor Konopko <igor.j.konopko@intel.com>, javier@javigon.com,
-        hans.holmberg@cnexlabs.com
-Cc:     linux-block@vger.kernel.org
-References: <20190416101648.10045-1-igor.j.konopko@intel.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <34c1c987-f208-8e28-cb76-26cb7a9ec07d@lightnvm.io>
-Date:   Fri, 26 Apr 2019 14:34:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Fri, 26 Apr 2019 08:44:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=R9HefWxmjnbBCWyJ1I7EFkjSPnM6RsFGxMlHsXjL/9A=; b=iNyi5n/3mbA1YefPB2WpbLZTa
+        Nx/ODr94C0dc8Xb3SI7yNiXqHCxu0C5h5DSHxgUi8KhfV5uaAWBF3My1tvZVfCAzv48LPkLdto6uX
+        rtL28/bwWHN594em6AJ/Bc0mpjGfQygMXeLjaPmyjv4AdL71LSMZ7rRIuIsvrl7kcMfIzblAYcc0/
+        wLqWPiGV8DzgnoK51LzWrnWdf4S4NnVgIRg8Pn8ok8CoqOSftrPE758/z8C1i5c+oqwPwcnIFuzsT
+        IJIyguOcIPVuspeMm+k/hSi2/HsUzqsJuxvrdVbmTBKoGGR9d3l+kD+YrOrwcpigKqCIWtyp4UQ5A
+        pVUT5ErnQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hK0DU-00069W-3F; Fri, 26 Apr 2019 12:44:36 +0000
+Date:   Fri, 26 Apr 2019 05:44:35 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] iov_iter: fix iov_iter_type
+Message-ID: <20190426124435.GA12339@infradead.org>
+References: <20190426104521.30602-1-ming.lei@redhat.com>
+ <20190426104521.30602-3-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190416101648.10045-1-igor.j.konopko@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190426104521.30602-3-ming.lei@redhat.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/16/19 12:16 PM, Igor Konopko wrote:
-> This is another set of fixes and improvements to both pblk and lightnvm
-> core.
-> 
-> First & second patches are the most crutial, since they changes
-> the approach to the partial read path, so detailed review is needed
-> especially here.
-> 
-> Other patches are my other findings related to some bugs or potential
-> improvements, mostly related to some corner cases.
-> 
-> Changes v3 -> v4:
-> -dropped patches which were already pulled into for-5.2/core branch
-> -major changes for patch #2 based on code review
-> -patch #6 modified to use krefs
-> -new patch #7 which extends the patch #6
-> 
-> Changes v2 -> v3:
-> -dropped some not needed patches
-> -dropped patches which were already pulled into for-5.2/core branch
-> -commit messages cleanup
-> 
-> Changes v1 -> v2:
-> -dropped some not needed patches
-> -review feedback incorporated for some of the patches
-> -partial read path changes patch splited into two patches
-> 
-> Igor Konopko (7):
->    lightnvm: pblk: IO path reorganization
->    lightnvm: pblk: simplify partial read path
->    lightnvm: pblk: recover only written metadata
->    lightnvm: pblk: store multiple copies of smeta
->    lightnvm: pblk: use nvm_rq_to_ppa_list()
->    lightnvm: track inflight target creations
->    lightnvm: do not remove instance under global lock
-> 
->   drivers/lightnvm/core.c          |  75 +++++---
->   drivers/lightnvm/pblk-cache.c    |   8 +-
->   drivers/lightnvm/pblk-core.c     | 159 +++++++++++++----
->   drivers/lightnvm/pblk-init.c     |  37 ++--
->   drivers/lightnvm/pblk-rb.c       |  11 +-
->   drivers/lightnvm/pblk-read.c     | 376 +++++++++++----------------------------
->   drivers/lightnvm/pblk-recovery.c |  35 ++--
->   drivers/lightnvm/pblk-rl.c       |   3 +-
->   drivers/lightnvm/pblk.h          |  23 +--
->   include/linux/lightnvm.h         |   1 +
->   10 files changed, 333 insertions(+), 395 deletions(-)
-> 
+On Fri, Apr 26, 2019 at 06:45:21PM +0800, Ming Lei wrote:
+>  static inline enum iter_type iov_iter_type(const struct iov_iter *i)
+>  {
+> -	return i->type & ~(READ | WRITE);
+> +	return i->type & ~(READ | WRITE | ITER_BVEC_FLAG_NO_REF);
 
-Thanks Igor!
+The way we handle i->type is a complete mess.  I think we need
+three different values:
 
-Picked 1, 3, 6 and 7. Could you please rebase 2 and 5? I'm still 
-noodling over 4.
+   .rw (can be READ or WRITE)
+   .type (ITER_IOVEC, ITER_KVEC, ITER_BVEC, ITER_PIPE, ITER_DISCARD)
+   .flags (ITER_BVEC_FLAG_NO_REF)
 
--Matias
-
+.type seems to be worth an u8 on its own.  And at least as long
+as we have space rw and flags should probably be their own u8 aswell,
+although we could use accessors to fold them.
