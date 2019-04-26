@@ -2,104 +2,123 @@ Return-Path: <SRS0=I+xz=S4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E48C43218
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 13:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 292D6C43218
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 14:45:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3C915206E0
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 13:46:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDA572077B
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 14:45:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XNRLx+/7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726120AbfDZNql (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Apr 2019 09:46:41 -0400
-Received: from mga03.intel.com ([134.134.136.65]:38269 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726060AbfDZNql (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Apr 2019 09:46:41 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Apr 2019 06:46:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,397,1549958400"; 
-   d="scan'208";a="153986651"
-Received: from ikonopko-mobl.ger.corp.intel.com (HELO [10.237.142.109]) ([10.237.142.109])
-  by orsmga002.jf.intel.com with ESMTP; 26 Apr 2019 06:46:39 -0700
-Subject: Re: [PATCH] lightnvm: pblk: Introduce hot-cold data separation
-To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
-Cc:     Heiner Litz <hlitz@ucsc.edu>,
-        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190425052152.6571-1-hlitz@ucsc.edu>
- <66434cc7-2bac-dd10-6edc-4560e6a0f89f@intel.com>
- <F305CAB7-F566-40D7-BC91-E88DE821520B@javigon.com>
-From:   Igor Konopko <igor.j.konopko@intel.com>
-Message-ID: <a1df8967-2169-1c43-c55a-e2144fa53b9a@intel.com>
-Date:   Fri, 26 Apr 2019 15:46:38 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726206AbfDZOpo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Apr 2019 10:45:44 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:40602 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726039AbfDZOpn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Apr 2019 10:45:43 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3QEYTmS120579;
+        Fri, 26 Apr 2019 14:45:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=LE9A4smiUcCKHhSGSOEPiRFSN9l8MMhyxEeH0NKsxbs=;
+ b=XNRLx+/7PRD7ym+fUsYzMt4wfLPh6UCuLh8UnZvF78EJKnzruNlOdccbiJhgIe5kl7iY
+ /9OEHv5GBUe4aq9tvnaP5wYY5IbDsy5yihOkZoZCkrAW7ZA1xqgEUUx+NajOUoPXuKJ9
+ C2AMf75B4eucFzdtrJ7zycj0pu3kEKwUlztJlb3v84VlNwiqroxJ6fOvRI7FmTSAZIvF
+ zMdqTAl0Z3VewQl2Ja7q9uniTaJIEhuHFZ+qwCCMXvMN8MyY/sD+80Vtope085wYE5sD
+ nc+bGpF/Uv68G9ZIaDzryOOFJ2dpdAmebCxw9dP4Zl/qBP8mOQpadPQIboCcOl4IgIJM BA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 2ryrxder02-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 26 Apr 2019 14:45:10 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3QEipin179053;
+        Fri, 26 Apr 2019 14:45:09 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2s0dwg2app-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 26 Apr 2019 14:45:09 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3QEj7FI016013;
+        Fri, 26 Apr 2019 14:45:07 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 26 Apr 2019 07:45:07 -0700
+Date:   Fri, 26 Apr 2019 07:45:07 -0700
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        Jerome Glisse <jglisse@redhat.com>,
+        lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [LSF/MM TOPIC] Direct block mapping through fs for device
+Message-ID: <20190426144507.GB178347@magnolia>
+References: <20190426013814.GB3350@redhat.com>
+ <20190426062816.GG1454@dread.disaster.area>
+ <20190426124553.GB12339@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <F305CAB7-F566-40D7-BC91-E88DE821520B@javigon.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190426124553.GB12339@infradead.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9238 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1904260101
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9238 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1904260101
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Apr 26, 2019 at 05:45:53AM -0700, Christoph Hellwig wrote:
+> On Fri, Apr 26, 2019 at 04:28:16PM +1000, Dave Chinner wrote:
+> > i.e. go look at how xfs_pnfs.c works to hand out block mappings to
+> > remote pNFS clients so they can directly access the underlying
+> > storage. Basically, anyone wanting to map blocks needs a file layout
+> > lease and then to manage the filesystem state over that range via
+> > these methods in the struct export_operations:
+> > 
+> >         int (*get_uuid)(struct super_block *sb, u8 *buf, u32 *len, u64 *offset);
+> >         int (*map_blocks)(struct inode *inode, loff_t offset,
+> >                           u64 len, struct iomap *iomap,
+> >                           bool write, u32 *device_generation);
+> >         int (*commit_blocks)(struct inode *inode, struct iomap *iomaps,
+> >                              int nr_iomaps, struct iattr *iattr);
+> 
+> Nipick:  get_uuid isn't needed for the least itself, it just works
+> around the fact that the original pNFS/block protocol is braindead.
+> The pNFS/SCSI prototocol already switches to a device UUID, and other
+> users that work locally shouldn't need it either.
 
+Hmmm, this lease interface still doesn't support COW, right?
 
-On 26.04.2019 12:04, Javier González wrote:
-> 
->> On 26 Apr 2019, at 11.11, Igor Konopko <igor.j.konopko@intel.com> wrote:
->>
->> On 25.04.2019 07:21, Heiner Litz wrote:
->>> Introduce the capability to manage multiple open lines. Maintain one line
->>> for user writes (hot) and a second line for gc writes (cold). As user and
->>> gc writes still utilize a shared ring buffer, in rare cases a multi-sector
->>> write will contain both gc and user data. This is acceptable, as on a
->>> tested SSD with minimum write size of 64KB, less than 1% of all writes
->>> contain both hot and cold sectors.
->>
->> Hi Heiner
->>
->> Generally I really like this changes, I was thinking about sth similar since a while, so it is very good to see that patch.
->>
->> I have a one question related to this patch, since it is not very clear for me - how you ensure the data integrity in following scenarios:
->> -we have open line X for user data and line Y for GC
->> -GC writes LBA=N to line Y
->> -user writes LBA=N to line X
->> -we have power failure when both line X and Y were not written completely
->> -during pblk creation we are executing OOB metadata recovery
->> And here is the question, how we distinguish whether LBA=N from line Y or LBA=N from line X is the valid one?
->> Line X and Y might have seq_id either descending or ascending - this would create two possible scenarios too.
->>
->> Thanks
->> Igor
->>
-> 
-> You are right, I think this is possible in the current implementation.
-> 
-> We need an extra constrain so that we only GC lines above the GC line
-> ID. This way, when we order lines on recovery, we can guarantee
-> consistency. This means potentially that we would need several open
-> lines for GC to avoid padding in case this constrain forces to choose a
-> line with an ID higher than the GC line ID.
-> 
-> What do you think?
+(Right, xfs_pnfs.c bails out with -ENXIO for reflink files)
 
-I'm not sure yet about your approach, I need to think and analyze this a 
-little more.
+It occurs to me that maybe we don't want Goldwyn's IOMAP_DAX_COW
+approach (hide the read address in the iomap->inline_data pointer); we
+just want two physical source addresses.  Then the dax code can turn
+that into a memory pointer and file lessees can do sector accesses or
+whatever they need to do to write the range before calling
+->commit_blocks.
 
-I also believe that probably we need to ensure that current user data 
-line seq_id is always above the current GC line seq_id or sth like that. 
-We cannot also then GC any data from the lines which are still open, but 
-I believe that this is a case even right now.
+Oh, right, both of you commented about a dual iomap approach on the v2
+btrfs dax support series.
 
-> 
-> Thanks,
-> Javier
-> 
+/me goes back to drinking coffee.
+
+--D
