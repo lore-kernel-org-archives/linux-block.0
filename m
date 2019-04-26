@@ -2,75 +2,115 @@ Return-Path: <SRS0=I+xz=S4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35296C43218
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 02:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C81C43218
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 02:40:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20E84206BA
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 02:39:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BEB0208E4
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 02:40:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LLcbJytR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727468AbfDZCjr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Apr 2019 22:39:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39062 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726855AbfDZCjr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Apr 2019 22:39:47 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 439A9308623E;
-        Fri, 26 Apr 2019 02:39:47 +0000 (UTC)
-Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D07C360BE5;
-        Fri, 26 Apr 2019 02:39:43 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Omar Sandoval <osandov@fb.com>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH] block/028: check if T10 verification fails
-Date:   Fri, 26 Apr 2019 10:39:37 +0800
-Message-Id: <20190426023937.19584-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Fri, 26 Apr 2019 02:39:47 +0000 (UTC)
+        id S1729198AbfDZCj7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Apr 2019 22:39:59 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:44441 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726855AbfDZCj6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Apr 2019 22:39:58 -0400
+Received: by mail-pl1-f196.google.com with SMTP id y12so753496plk.11
+        for <linux-block@vger.kernel.org>; Thu, 25 Apr 2019 19:39:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=VO3iBFMkWhmrJrV24wpgxspECFNCTyofN0BzMsoUTLQ=;
+        b=LLcbJytR27KzYvODS/mG8EoR/6HefQiMUIVwP3LP27thQ7cSxfvw637TF9QubMQB/G
+         gNdKVY9Ohe6zolUH3G9KKkoCqddapgRAYzQUQma9W4SKsZi6dpC0/E3DugJW7YIrJrNL
+         Ipb855ozjGSuuY96EsxTDP98p+pkiXoj+DaB8lS0+TBjKGeG5bLN5is9tbQ8LY4nLh2p
+         11gTllvu4bVXmrltM7J0yT1NTMDxSwEhmU9g+l40ydLVx6RxbsS4HQtIdN7Cm8JKglRk
+         iY1CbEgf0AUKw9F1v2LnFXdRFt0s+azuUJp9e1CffftnwJ/ypp16Na/T4pkjBN4y1ly7
+         Arfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=VO3iBFMkWhmrJrV24wpgxspECFNCTyofN0BzMsoUTLQ=;
+        b=VbvqypgxiAaLOPIviYa+noH2lxfcZkujWWVqvJyjRPoZdhPpDaA6iD1diV3VTcSFF+
+         RtcPWPzY1rMB8IIZxA9Wx5vA9jzB3Jlzu0kzSUQV9+YCLK7LRE05Tpu4benCMxQpMfbB
+         iMiIUdHVWAlPFwmzkXkU+WJnKUORpsLUku3Jpw2b++lVMg/9mxp2xeQCnSw5DJRwjt4J
+         1FHSUHcVdYjmnE6vth4H/+BHQF5bE5yVCBamnu0QGSE59bfbN9I141lSDUfei7h8jRiH
+         uyMol71KmfIdEVXOL9QETLWK0yTz8NIK6ZVhvoU4pZx8kPwUnxlK6e8EGLxWcaXE6hcZ
+         Rhjg==
+X-Gm-Message-State: APjAAAUasxJUxTzz42RuH9qaBoxbnQrDnpxbdKNdemZZov09TfstC0rr
+        giiFYyt8gpPlaSaCNxON/WaNmQ==
+X-Google-Smtp-Source: APXvYqwVFhKqwvVZkXVmb6SFTLR1hz5lT4AQByaHEtQDU6UXaJfhlw3/073UFDsW8JGZTPHaB0iK3w==
+X-Received: by 2002:a17:902:bb90:: with SMTP id m16mr5819205pls.340.1556246398081;
+        Thu, 25 Apr 2019 19:39:58 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id b19sm30534749pgb.51.2019.04.25.19.39.56
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 25 Apr 2019 19:39:57 -0700 (PDT)
+Subject: Re: [LSF/MM TOPIC] Lightning round?
+To:     Theodore Ts'o <tytso@mit.edu>, lsf-pc@lists.linux-foundation.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190425200012.GA6391@redhat.com>
+ <83fda245-849a-70cc-dde0-5c451938ee97@kernel.dk>
+ <20190425211906.GH4739@mit.edu>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <cf2c4c2b-678a-bda9-bcee-7dd28894e53d@kernel.dk>
+Date:   Thu, 25 Apr 2019 20:39:55 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190425211906.GH4739@mit.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When T10 verification fails, the error code of BLK_STS_PROTECTION
-may not be propagated to user space, see mpage_end_io().
+On 4/25/19 3:19 PM, Theodore Ts'o wrote:
+> On Thu, Apr 25, 2019 at 02:03:34PM -0600, Jens Axboe wrote:
+>>
+>> which also includes a link to the schedule. Here it is:
+>>
+>> https://docs.google.com/spreadsheets/d/1Z1pDL-XeUT1ZwMWrBL8T8q3vtSqZpLPgF3Bzu_jejfk
+> 
+> It looks like there are still quite a few open slots on Thursday?
+> Could we perhaps schedule a session for lightning talks?
 
-So seems the only reliable way for detecting the failure is to
-check dmesg.
+Yes good idea, I've added it. Like previous years, I imagine the
+schedule will remain fluid, both as we go into the conference, but also
+during. So we can always add and/or move things around.
 
-Cc: Martin K . Petersen <martin.petersen@oracle.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- tests/block/028 | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> I've got at least one thing that I'm hoping to be able to plug as a
+> lightning round topic.  Folks may remember that a year or two ago I
+> had given an LSF/MM talk about changes to the block layer to support
+> inline encryption engines[1] (where the data gets encrypted/decrypted
+> between the DMA engine and the storage device, typically EMCC/UFS
+> flash).
+> 
+> [1]  https://marc.info/?l=linux-fsdevel&m=148190956210784&w=2
+> 
+> Between the Android team really trying to get aligned with upstream,
+> and multiple SOC vendors interested in providing inline encryption
+> support in hardware, we (finally) have a few engineers who have been
+> on implementing this design for the past few months.  If all goes
+> well, hopefully RFC patches will be published on linux-block,
+> linux-fsdevel, and linux-fscrypto by early next week.  Assuming this
+> happens on schedule, it would be perfect for a lightning talk, with
+> the goal of commending this patch series for feedback.
 
-diff --git a/tests/block/028 b/tests/block/028
-index 7bee691c0515..a0ab9ff208db 100755
---- a/tests/block/028
-+++ b/tests/block/028
-@@ -38,6 +38,14 @@ test() {
- 			test_pi "$dix" "$dif"
- 			echo "Test(dix:$dix dif:$dif) complete"
- 		done
-+		if dmesg | grep -q "guard tag error at sector"; then
-+			echo "Fail"
-+			break
-+		fi
-+		if dmesg | grep -q "ref tag error at location"; then
-+			echo "Fail"
-+			break
-+		fi
- 	done
- 
- 	rm -f "$FULL"
+Agree
+
 -- 
-2.9.5
+Jens Axboe
 
