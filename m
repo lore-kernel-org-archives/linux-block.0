@@ -2,115 +2,69 @@ Return-Path: <SRS0=I+xz=S4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C81C43218
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 02:40:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C85C43218
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 05:20:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5BEB0208E4
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 02:40:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LLcbJytR"
+	by mail.kernel.org (Postfix) with ESMTP id 472B62077B
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 05:20:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1556256017;
+	bh=jHjp/RKUd+4qML9WHRoeuGUfUqN4FzQenu/2bfqLz8s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=shKOBvXGZxgrFSZUzDbCMfjehqU9YQB+piJW5wDk5TkkVI10JJ4yRElsmR+Nmz2p+
+	 ZNtFQGYy7oGr38I537gsAt3QNzAzqNw7txYjTM0VlhVra3RdDGkIHO1uDEAE2G7jGM
+	 X0vppzxWpXE9+hNTJhnGu+ITQDjk7h5KSe8FMl+c=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729198AbfDZCj7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Apr 2019 22:39:59 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:44441 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726855AbfDZCj6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Apr 2019 22:39:58 -0400
-Received: by mail-pl1-f196.google.com with SMTP id y12so753496plk.11
-        for <linux-block@vger.kernel.org>; Thu, 25 Apr 2019 19:39:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=VO3iBFMkWhmrJrV24wpgxspECFNCTyofN0BzMsoUTLQ=;
-        b=LLcbJytR27KzYvODS/mG8EoR/6HefQiMUIVwP3LP27thQ7cSxfvw637TF9QubMQB/G
-         gNdKVY9Ohe6zolUH3G9KKkoCqddapgRAYzQUQma9W4SKsZi6dpC0/E3DugJW7YIrJrNL
-         Ipb855ozjGSuuY96EsxTDP98p+pkiXoj+DaB8lS0+TBjKGeG5bLN5is9tbQ8LY4nLh2p
-         11gTllvu4bVXmrltM7J0yT1NTMDxSwEhmU9g+l40ydLVx6RxbsS4HQtIdN7Cm8JKglRk
-         iY1CbEgf0AUKw9F1v2LnFXdRFt0s+azuUJp9e1CffftnwJ/ypp16Na/T4pkjBN4y1ly7
-         Arfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=VO3iBFMkWhmrJrV24wpgxspECFNCTyofN0BzMsoUTLQ=;
-        b=VbvqypgxiAaLOPIviYa+noH2lxfcZkujWWVqvJyjRPoZdhPpDaA6iD1diV3VTcSFF+
-         RtcPWPzY1rMB8IIZxA9Wx5vA9jzB3Jlzu0kzSUQV9+YCLK7LRE05Tpu4benCMxQpMfbB
-         iMiIUdHVWAlPFwmzkXkU+WJnKUORpsLUku3Jpw2b++lVMg/9mxp2xeQCnSw5DJRwjt4J
-         1FHSUHcVdYjmnE6vth4H/+BHQF5bE5yVCBamnu0QGSE59bfbN9I141lSDUfei7h8jRiH
-         uyMol71KmfIdEVXOL9QETLWK0yTz8NIK6ZVhvoU4pZx8kPwUnxlK6e8EGLxWcaXE6hcZ
-         Rhjg==
-X-Gm-Message-State: APjAAAUasxJUxTzz42RuH9qaBoxbnQrDnpxbdKNdemZZov09TfstC0rr
-        giiFYyt8gpPlaSaCNxON/WaNmQ==
-X-Google-Smtp-Source: APXvYqwVFhKqwvVZkXVmb6SFTLR1hz5lT4AQByaHEtQDU6UXaJfhlw3/073UFDsW8JGZTPHaB0iK3w==
-X-Received: by 2002:a17:902:bb90:: with SMTP id m16mr5819205pls.340.1556246398081;
-        Thu, 25 Apr 2019 19:39:58 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id b19sm30534749pgb.51.2019.04.25.19.39.56
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 25 Apr 2019 19:39:57 -0700 (PDT)
-Subject: Re: [LSF/MM TOPIC] Lightning round?
-To:     Theodore Ts'o <tytso@mit.edu>, lsf-pc@lists.linux-foundation.org,
+        id S1727259AbfDZFUQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Apr 2019 01:20:16 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41324 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725877AbfDZFUQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Apr 2019 01:20:16 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id A8130AD2B;
+        Fri, 26 Apr 2019 05:20:14 +0000 (UTC)
+Date:   Fri, 26 Apr 2019 07:20:13 +0200
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Theodore Ts'o <tytso@mit.edu>
+Cc:     Jens Axboe <axboe@kernel.dk>, lsf-pc@lists.linux-foundation.org,
         linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [LSF/MM TOPIC] Lightning round?
+Message-ID: <20190426052013.GA12337@dhcp22.suse.cz>
 References: <20190425200012.GA6391@redhat.com>
  <83fda245-849a-70cc-dde0-5c451938ee97@kernel.dk>
  <20190425211906.GH4739@mit.edu>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <cf2c4c2b-678a-bda9-bcee-7dd28894e53d@kernel.dk>
-Date:   Thu, 25 Apr 2019 20:39:55 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <20190425211906.GH4739@mit.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/25/19 3:19 PM, Theodore Ts'o wrote:
+On Thu 25-04-19 17:19:06, Theodore Ts'o wrote:
 > On Thu, Apr 25, 2019 at 02:03:34PM -0600, Jens Axboe wrote:
->>
->> which also includes a link to the schedule. Here it is:
->>
->> https://docs.google.com/spreadsheets/d/1Z1pDL-XeUT1ZwMWrBL8T8q3vtSqZpLPgF3Bzu_jejfk
+> > 
+> > which also includes a link to the schedule. Here it is:
+> > 
+> > https://docs.google.com/spreadsheets/d/1Z1pDL-XeUT1ZwMWrBL8T8q3vtSqZpLPgF3Bzu_jejfk
 > 
 > It looks like there are still quite a few open slots on Thursday?
+
+Please note that the agenda is still not finalized. I do not know about
+other tracks but MM is not complete.
+
 > Could we perhaps schedule a session for lightning talks?
 
-Yes good idea, I've added it. Like previous years, I imagine the
-schedule will remain fluid, both as we go into the conference, but also
-during. So we can always add and/or move things around.
-
-> I've got at least one thing that I'm hoping to be able to plug as a
-> lightning round topic.  Folks may remember that a year or two ago I
-> had given an LSF/MM talk about changes to the block layer to support
-> inline encryption engines[1] (where the data gets encrypted/decrypted
-> between the DMA engine and the storage device, typically EMCC/UFS
-> flash).
-> 
-> [1]  https://marc.info/?l=linux-fsdevel&m=148190956210784&w=2
-> 
-> Between the Android team really trying to get aligned with upstream,
-> and multiple SOC vendors interested in providing inline encryption
-> support in hardware, we (finally) have a few engineers who have been
-> on implementing this design for the past few months.  If all goes
-> well, hopefully RFC patches will be published on linux-block,
-> linux-fsdevel, and linux-fscrypto by early next week.  Assuming this
-> happens on schedule, it would be perfect for a lightning talk, with
-> the goal of commending this patch series for feedback.
-
-Agree
-
+I am pretty sure there will be some room for that as well.
 -- 
-Jens Axboe
-
+Michal Hocko
+SUSE Labs
