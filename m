@@ -3,127 +3,182 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CF9EC43218
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 19:54:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA501C43218
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 20:29:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C6FA5206DD
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 19:54:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95D6A2077B
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 20:29:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="tm7Ll0mq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="g6IwIPNY";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="F9VWz34b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726571AbfDZTyB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Apr 2019 15:54:01 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:45256 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726458AbfDZTyB (ORCPT
+        id S1726190AbfDZU3N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Apr 2019 16:29:13 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:59612 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725966AbfDZU3N (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Apr 2019 15:54:01 -0400
-Received: by mail-ed1-f66.google.com with SMTP id k92so1642167edc.12
-        for <linux-block@vger.kernel.org>; Fri, 26 Apr 2019 12:53:59 -0700 (PDT)
+        Fri, 26 Apr 2019 16:29:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1556310587; x=1587846587;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=HNM2W8SJG84FZ/v1RIln/6hNqIOXm6lImV3TLBaLJtU=;
+  b=g6IwIPNYUopu051DRbfuGSgKEaYH93rLfq8hPkvNaytgLyz72u/6gKkt
+   mUyovxrv+xecapwMwKTAhslfmcmrC9el3E2VuY3MDCmyzs+OD1hlUU2+s
+   AxgM2R2pRGwlo7kDN5FC/TfHvgwBoTjt/qS4xtQBEw1b912mAzfOv7/c/
+   EeSQ8rmBi3Ip8kbyT/pmrCIgZuCcX7+jRuZIOxdRRZMwHOxs1UkYPAD/Y
+   frLNBkT9IluUmC0ConaVGAwdcBmlBi/+HIuzOPbzZ4xU5XixMG4cUZvS1
+   IBoHNQa979AarjpFeFjil9W1fk/o1MVA871DjF25XJ0Acw36G4+InqK+R
+   A==;
+X-IronPort-AV: E=Sophos;i="5.60,398,1549900800"; 
+   d="scan'208";a="206100344"
+Received: from mail-bn3nam01lp2051.outbound.protection.outlook.com (HELO NAM01-BN3-obe.outbound.protection.outlook.com) ([104.47.33.51])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Apr 2019 04:28:49 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=CclSjEmiXiSlhJvEM0nCka2oVLetq2OrybfVhVCKkf4=;
-        b=tm7Ll0mqO6L7BLKjJljJoeSgMHTudSSJLpPCj2pF4XYHMU+RzGfje9567zd4y/B9N0
-         d+3wDh77oIH3DBKRTD1wDd4v6Jeyi8s+1r0hyO4x7Ej3V0YjckFsR7vaxQD3xQL3Mt3s
-         47AygZ3kOby78oWs1zLLZ6UN31eoaDR1W7wwxxZgO8WLdr/TNE3gClkow5BZnPYL7jgv
-         +ysWa/QJktlj6PgduM/CJZayTVs/m7+RfZ6QQKUfXSkRtusffvcsb1J+ERzejhhYLR13
-         dK9CPeH0e9KNq7W7VlBzaEBQxInLpE7aEut5h80xw5/7koSJioR54P5GCMVYU9a5s1gC
-         gTJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CclSjEmiXiSlhJvEM0nCka2oVLetq2OrybfVhVCKkf4=;
-        b=JLFiP0v7ImK6LZ1qo/WgtwibI3tuEKPbaj9dIWj1jtKM6S9DT2PKWGUoDDOVqukMOU
-         6NyPZq9URqiFlUnNuMnUNkc3bBVae6AhSHE/gREBMSDYBafOrGrN1GQY55oySc2ygFY/
-         Tf5pnGFFBpmd7PFWzxtjqSgjVhiMrPdHy/Z0BqS4gf9ytHHs3REE/i5yV9gkou76fnMS
-         RybKVNBfsSXfdXt68D4IoQU7WLJVA9HeLSKUOk6u/fzK6HhIubsU2MFqL4SbwKTXRm/z
-         vfAjgJEWdM/Ybd7PCfHTVIQN3PLv5dVH/Ip/2PndzJRX/t5Rm1+dGZG8dRmE9dIGklSV
-         dusw==
-X-Gm-Message-State: APjAAAXLWVJWEbIJJxajVrwEupmEXjBqWVMMlLFfmym0P/XXwxdzL4yl
-        DuQVrfikyL0zTAOGYRSnsFCvv6fksMM=
-X-Google-Smtp-Source: APXvYqyTBFVEZXdtmhErdUBXpgG4farfeWxxxbedcaNrBP2506cJHQXTE639LatmoqCoo7jeNTmg+w==
-X-Received: by 2002:a17:906:6312:: with SMTP id p18mr2142505ejk.143.1556308439031;
-        Fri, 26 Apr 2019 12:53:59 -0700 (PDT)
-Received: from [192.168.0.36] (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
-        by smtp.googlemail.com with ESMTPSA id q24sm1296980eda.25.2019.04.26.12.53.57
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 26 Apr 2019 12:53:58 -0700 (PDT)
-Subject: Re: [PATCH v5 0/3] lightnvm: next set of improvements for 5.2
-To:     Igor Konopko <igor.j.konopko@intel.com>, javier@javigon.com,
-        hans.holmberg@cnexlabs.com
-Cc:     linux-block@vger.kernel.org
-References: <20190426133513.23966-1-igor.j.konopko@intel.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <087e8d6e-8cdc-87ff-6e2f-cb1fa2fd0396@lightnvm.io>
-Date:   Fri, 26 Apr 2019 21:53:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HNM2W8SJG84FZ/v1RIln/6hNqIOXm6lImV3TLBaLJtU=;
+ b=F9VWz34bjrYyWfTfbuKJSP5bNAHHxw7Glmq88bK9EM8awQmxscNgmCcdkDbBu0V9DNuxhYYLhuvCG4F1GQId0NsktSEERvRf4nFg8lVvmTiltf/gyTXB44RuyVsspgjzZGwb1ogezZ4UMfFthIV0Vt/WWAqtgSe6seKdY1lg/ws=
+Received: from BYAPR04MB4357.namprd04.prod.outlook.com (20.176.251.147) by
+ BYAPR04MB3832.namprd04.prod.outlook.com (52.135.214.27) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1835.13; Fri, 26 Apr 2019 20:28:33 +0000
+Received: from BYAPR04MB4357.namprd04.prod.outlook.com
+ ([fe80::cd90:ee8f:e618:321a]) by BYAPR04MB4357.namprd04.prod.outlook.com
+ ([fe80::cd90:ee8f:e618:321a%2]) with mapi id 15.20.1813.017; Fri, 26 Apr 2019
+ 20:28:33 +0000
+From:   Adam Manzanares <Adam.Manzanares@wdc.com>
+To:     "jglisse@redhat.com" <jglisse@redhat.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>
+CC:     "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [LSF/MM TOPIC] Direct block mapping through fs for device
+Thread-Topic: [LSF/MM TOPIC] Direct block mapping through fs for device
+Thread-Index: AQHU+/FIGwzRMarUD0ilz403o/BcAKZO5VgA
+Date:   Fri, 26 Apr 2019 20:28:32 +0000
+Message-ID: <b24c6f711d2e23792d6577a4ca508d75b0af4d9e.camel@wdc.com>
+References: <20190426013814.GB3350@redhat.com>
+In-Reply-To: <20190426013814.GB3350@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Adam.Manzanares@wdc.com; 
+x-originating-ip: [199.255.44.173]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6dd75ba4-1034-4521-affd-08d6ca85c0b4
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB3832;
+x-ms-traffictypediagnostic: BYAPR04MB3832:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <BYAPR04MB38329BBB705EBF474D519FA3F03E0@BYAPR04MB3832.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 001968DD50
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(136003)(376002)(396003)(39860400002)(346002)(199004)(189003)(305945005)(53936002)(7736002)(6246003)(25786009)(8676002)(6512007)(86362001)(229853002)(6486002)(5660300002)(256004)(66574012)(6436002)(14444005)(97736004)(4326008)(71200400001)(71190400001)(3846002)(6116002)(2616005)(486006)(6506007)(11346002)(446003)(76176011)(14454004)(2906002)(26005)(478600001)(66066001)(72206003)(186003)(102836004)(8936002)(110136005)(316002)(118296001)(99286004)(66476007)(66446008)(64756008)(66556008)(66946007)(73956011)(76116006)(2501003)(36756003)(81156014)(81166006)(68736007)(54906003)(476003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB3832;H:BYAPR04MB4357.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: v1USip/7YhZGyUnK5YJYPZzLdd+uGKr87nJYDDuBpW5XIVvV019SNMoP3CZKsW7JdqcuuSVc9ddT/VN1e5bSbTnPNroVXNDocePbclV8auJlASYOdckZY/5OXICOk15HlLSsGiP9FonQ4N0HqnkYxl/6DpgCoVkYoGy6Ti8YxqnJ9nto2q1Auywzxv9S1mH1+o9hobiA1R1qw/C+v1UldZxlbh1cqyzt3t5M602lxVv9O26ZfxGAuBwdoDc6oTa7aKhVUVtI1p3hWvXfH95t7XoAALtoNioI6PxPY4lcOgN/KpIf3iPfRUbHOaiQGYxVXrtVKa6JeZs/Pwk+4yyJroOreEhb24RhYlRPY7T9cfpZEaDSCfeihAQ5YEocqpWdm6gb4SICwJUc20N9Gt1Ckr60SqWbxJFhdTfAqfdr+AI=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F7617180EA7B7940928F12F11051F43A@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190426133513.23966-1-igor.j.konopko@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6dd75ba4-1034-4521-affd-08d6ca85c0b4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Apr 2019 20:28:33.0040
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB3832
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks Igor. I've picked up 1 + 2.
-
-The third I'm still noodling on. I think maybe one should bump the disk 
-format, since it's changed. Also, if it is, it should be a static setup 
-(i.e., 1,2,3), and not user configurable. Although, I do expect the 
-separate parallel units to have enough device-side redundancy to provide 
-adequate UBER.
-
-
-
-On 4/26/19 3:35 PM, Igor Konopko wrote:
-> This is another set of fixes and improvements to both pblk and lightnvm
-> core.
-> 
-> Changes v4 -> v5:
-> -dropped patches which were already pulled into for-5.2/core branch
-> -rebasing of other patches
-> -multiple copies of smeta patch moved into last position in series
-> so it would be easier to pull only previous patches if needed
-> 
-> Changes v3 -> v4:
-> -dropped patches which were already pulled into for-5.2/core branch
-> -major changes for patch #2 based on code review
-> -patch #6 modified to use krefs
-> -new patch #7 which extends the patch #6
-> 
-> Changes v2 -> v3:
-> -dropped some not needed patches
-> -dropped patches which were already pulled into for-5.2/core branch
-> -commit messages cleanup
-> 
-> Changes v1 -> v2:
-> -dropped some not needed patches
-> -review feedback incorporated for some of the patches
-> -partial read path changes patch splited into two patches
-> 
-> 
-> Igor Konopko (3):
->    lightnvm: pblk: simplify partial read path
->    lightnvm: pblk: use nvm_rq_to_ppa_list()
->    lightnvm: pblk: store multiple copies of smeta
-> 
->   drivers/lightnvm/pblk-core.c     | 159 ++++++++++++++----
->   drivers/lightnvm/pblk-init.c     |  23 ++-
->   drivers/lightnvm/pblk-rb.c       |  11 +-
->   drivers/lightnvm/pblk-read.c     | 339 ++++++++++-----------------------------
->   drivers/lightnvm/pblk-recovery.c |  27 ++--
->   drivers/lightnvm/pblk-rl.c       |   3 +-
->   drivers/lightnvm/pblk.h          |  19 +--
->   7 files changed, 252 insertions(+), 329 deletions(-)
-> 
-
+T24gVGh1LCAyMDE5LTA0LTI1IGF0IDIxOjM4IC0wNDAwLCBKZXJvbWUgR2xpc3NlIHdyb3RlOg0K
+PiBJIHNlZSB0aGF0IHRoZXkgYXJlIHN0aWxsIGVtcHR5IHNwb3QgaW4gTFNGL01NIHNjaGVkdWxl
+IHNvIGkgd291bGQNCj4gbGlrZSB0bw0KPiBoYXZlIGEgZGlzY3Vzc2lvbiBvbiBhbGxvd2luZyBk
+aXJlY3QgYmxvY2sgbWFwcGluZyBvZiBmaWxlIGZvcg0KPiBkZXZpY2VzIChuaWMsDQo+IGdwdSwg
+ZnBnYSwgLi4uKS4gVGhpcyBpcyBtbSwgZnMgYW5kIGJsb2NrIGRpc2N1c3Npb24sIHRob3VnaHQg
+dGhlIG1tDQo+IHNpZGUNCj4gaXMgcHJldHR5IGxpZ2h0IGllIG9ubHkgYWRkaW5nIDIgY2FsbGJh
+Y2sgdG8gdm1fb3BlcmF0aW9uc19zdHJ1Y3Q6DQo+IA0KPiAgICAgaW50ICgqZGV2aWNlX21hcCko
+c3RydWN0IHZtX2FyZWFfc3RydWN0ICp2bWEsDQo+ICAgICAgICAgICAgICAgICAgICAgICBzdHJ1
+Y3QgZGV2aWNlICppbXBvcnRlciwNCj4gICAgICAgICAgICAgICAgICAgICAgIHN0cnVjdCBkbWFf
+YnVmICoqYnVmcCwNCj4gICAgICAgICAgICAgICAgICAgICAgIHVuc2lnbmVkIGxvbmcgc3RhcnQs
+DQo+ICAgICAgICAgICAgICAgICAgICAgICB1bnNpZ25lZCBsb25nIGVuZCwNCj4gICAgICAgICAg
+ICAgICAgICAgICAgIHVuc2lnbmVkIGZsYWdzLA0KPiAgICAgICAgICAgICAgICAgICAgICAgZG1h
+X2FkZHJfdCAqcGEpOw0KPiANCj4gICAgIC8vIFNvbWUgZmxhZ3MgaSBjYW4gdGhpbmsgb2Y6DQo+
+ICAgICBERVZJQ0VfTUFQX0ZMQUdfUElOIC8vIGllIHJldHVybiBhIGRtYV9idWYgb2JqZWN0DQo+
+ICAgICBERVZJQ0VfTUFQX0ZMQUdfV1JJVEUgLy8gaW1wb3J0ZXIgd2FudCB0byBiZSBhYmxlIHRv
+IHdyaXRlDQo+ICAgICBERVZJQ0VfTUFQX0ZMQUdfU1VQUE9SVF9BVE9NSUNfT1AgLy8gaW1wb3J0
+ZXIgd2FudCB0byBkbyBhdG9taWMNCj4gb3BlcmF0aW9uDQo+ICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgLy8gb24gdGhlIG1hcHBpbmcNCj4gDQo+ICAgICB2b2lkICgqZGV2
+aWNlX3VubWFwKShzdHJ1Y3Qgdm1fYXJlYV9zdHJ1Y3QgKnZtYSwNCj4gICAgICAgICAgICAgICAg
+ICAgICAgICAgIHN0cnVjdCBkZXZpY2UgKmltcG9ydGVyLA0KPiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgdW5zaWduZWQgbG9uZyBzdGFydCwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgIHVu
+c2lnbmVkIGxvbmcgZW5kLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgZG1hX2FkZHJfdCAq
+cGEpOw0KPiANCj4gRWFjaCBmaWxlc3lzdGVtIGNvdWxkIGFkZCB0aGlzIGNhbGxiYWNrIGFuZCBk
+ZWNpZGUgd2V0aGVyIG9yIG5vdCB0bw0KPiBhbGxvdw0KPiB0aGUgaW1wb3J0ZXIgdG8gZGlyZWN0
+bHkgbWFwIGJsb2NrLiBGaWxlc3lzdGVtIGNhbiB1c2Ugd2hhdCBldmVyDQo+IGxvZ2ljIHRoZXkN
+Cj4gd2FudCB0byBtYWtlIHRoYXQgZGVjaXNpb24uIEZvciBpbnN0YW5jZSBpZiB0aGV5IGFyZSBw
+YWdlIGluIHRoZSBwYWdlDQo+IGNhY2hlDQo+IGZvciB0aGUgcmFuZ2UgdGhlbiBpdCBjYW4gc2F5
+IG5vIGFuZCB0aGUgZGV2aWNlIHdvdWxkIGZhbGxiYWNrIHRvDQo+IG1haW4NCj4gbWVtb3J5LiBG
+aWxlc3lzdGVtIGNhbiBhbHNvIHVwZGF0ZSBpdHMgaW50ZXJuYWwgZGF0YSBzdHJ1Y3R1cmUgdG8N
+Cj4ga2VlcA0KPiB0cmFjayBvZiBkaXJlY3QgYmxvY2sgbWFwcGluZy4NCj4gDQo+IElmIGZpbGVz
+eXN0ZW0gZGVjaWRlIHRvIGFsbG93IHRoZSBkaXJlY3QgYmxvY2sgbWFwcGluZyB0aGVuIGl0DQo+
+IGZvcndhcmQgdGhlDQo+IHJlcXVlc3QgdG8gdGhlIGJsb2NrIGRldmljZSB3aGljaCBpdHNlbGYg
+Y2FuIGRlY2lkZSB0byBmb3JiaWQgdGhlDQo+IGRpcmVjdA0KPiBtYXBwaW5nIGFnYWluIGZvciBh
+bnkgcmVhc29ucy4gRm9yIGluc3RhbmNlIHJ1bm5pbmcgb3V0IG9mIEJBUiBzcGFjZQ0KPiBvcg0K
+PiBwZWVyIHRvIHBlZXIgYmV0d2VlbiBibG9jayBkZXZpY2UgYW5kIGltcG9ydGVyIGRldmljZSBp
+cyBub3QNCj4gc3VwcG9ydGVkIG9yDQo+IGJsb2NrIGRldmljZSBkb2VzIG5vdCB3YW50IHRvIGFs
+bG93IHdyaXRlYWJsZSBwZWVyIG1hcHBpbmcgLi4uDQo+IA0KPiANCj4gU28gZXZlbnQgZmxvdyBp
+czoNCj4gICAgIDEgIHByb2dyYW0gbW1hcCBhIGZpbGUgKGVuZCBuZXZlciBpbnRlbmQgdG8gYWNj
+ZXNzIGl0IHdpdGggQ1BVKQ0KPiAgICAgMiAgcHJvZ3JhbSB0cnkgdG8gYWNjZXNzIHRoZSBtbWFw
+IGZyb20gYSBkZXZpY2UgQQ0KPiAgICAgMyAgZGV2aWNlIEEgZHJpdmVyIHNlZSBkZXZpY2VfbWFw
+IGNhbGxiYWNrIG9uIHRoZSB2bWEgYW5kIGNhbGwgaXQNCj4gICAgIDRhIG9uIHN1Y2Nlc3MgZGV2
+aWNlIEEgZHJpdmVyIHByb2dyYW0gdGhlIGRldmljZSB0byBtYXBwZWQgZG1hDQo+IGFkZHJlc3MN
+Cj4gICAgIDRiIG9uIGZhaWx1cmUgZGV2aWNlIEEgZHJpdmVyIGZhbGxiYWNrIHRvIGZhdWx0aW5n
+IHNvIHRoYXQgaXQgY2FuDQo+IHVzZQ0KPiAgICAgICAgcGFnZSBmcm9tIHBhZ2UgY2FjaGUNCj4g
+DQo+IFRoaXMgQVBJIGFzc3VtZSB0aGF0IHRoZSBpbXBvcnRlciBkb2VzIHN1cHBvcnQgbW11IG5v
+dGlmaWVyIGFuZCB0aHVzDQo+IHRoYXQNCj4gdGhlIGZzIGNhbiBpbnZhbGlkYXRlIGRldmljZSBt
+YXBwaW5nIGF0IF9hbnlfIHRpbWUgYnkgc2VuZGluZyBtbXUNCj4gbm90aWZpZXINCj4gdG8gYWxs
+IG1hcHBpbmcgb2YgdGhlIGZpbGUgKGZvciBhIGdpdmVuIHJhbmdlIGluIHRoZSBmaWxlIG9yIGZv
+ciB0aGUNCj4gd2hvbGUNCj4gZmlsZSkuIE9idmlvdXNseSB5b3Ugd2FudCB0byBtaW5pbWl6ZSBk
+aXNydXB0aW9uIGFuZCB0aHVzIG9ubHkNCj4gaW52YWxpZGF0ZQ0KPiB3aGVuIG5lY2Vzc2FyeS4N
+Cj4gDQo+IFRoZSBkbWFfYnVmIHBhcmFtZXRlciBjYW4gYmUgdXNlIHRvIGFkZCBwaW5uaW5nIHN1
+cHBvcnQgZm9yDQo+IGZpbGVzeXN0ZW0gd2hvDQo+IHdpc2ggdG8gc3VwcG9ydCB0aGF0IGNhc2Ug
+dG9vLiBIZXJlIHRoZSBtYXBwaW5nIGxpZmV0aW1lIGdldA0KPiBkaXNjb25uZWN0ZWQNCj4gZnJv
+bSB0aGUgdm1hIGFuZCBpcyB0cmFuc2ZlciB0byB0aGUgZG1hX2J1ZiBhbGxvY2F0ZWQgYnkgZmls
+ZXN5c3RlbS4NCj4gQWdhaW4NCj4gZmlsZXN5c3RlbSBjYW4gZGVjaWRlIHRvIHNheSBubyBhcyBw
+aW5uaW5nIGJsb2NrcyBoYXMgZHJhc3RpYw0KPiBjb25zZXF1ZW5jZQ0KPiBmb3IgZmlsZXN5c3Rl
+bSBhbmQgYmxvY2sgZGV2aWNlLg0KPiANCj4gDQo+IFRoaXMgaGFzIHNvbWUgc2ltaWxhcml0aWVz
+IHRvIHRoZSBobW1hcCBhbmQgY2FjaGluZyB0b3BpYyAod2hpY2ggaXMNCj4gbWFwcGluZw0KPiBi
+bG9jayBkaXJlY3RseSB0byBDUFUgQUZBSVUpIGJ1dCBkZXZpY2UgbWFwcGluZyBjYW4gY3V0IHNv
+bWUgY29ybmVyDQo+IGZvcg0KPiBpbnN0YW5jZSBzb21lIGRldmljZSBjYW4gZm9yZ28gYXRvbWlj
+IG9wZXJhdGlvbiBvbiBzdWNoIG1hcHBpbmcgYW5kDQo+IHRodXMNCj4gY2FuIHdvcmsgb3ZlciBQ
+Q0lFIHdoaWxlIENQVSBjYW4gbm90IGRvIGF0b21pYyB0byBQQ0lFIEJBUi4NCj4gDQo+IEFsc28g
+dGhpcyBBUEkgaGVyZSBjYW4gYmUgdXNlIHRvIGFsbG93IHBlZXIgdG8gcGVlciBhY2Nlc3MgYmV0
+d2Vlbg0KPiBkZXZpY2VzDQo+IHdoZW4gdGhlIHZtYSBpcyBhIG1tYXAgb2YgYSBkZXZpY2UgZmls
+ZSBhbmQgdGh1cyB2bV9vcGVyYXRpb25zX3N0cnVjdA0KPiBjb21lDQo+IGZyb20gc29tZSBleHBv
+cnRlciBkZXZpY2UgZHJpdmVyLiBTbyBzYW1lIDIgdm1fb3BlcmF0aW9uc19zdHJ1Y3QgY2FsbA0K
+PiBiYWNrDQo+IGNhbiBiZSB1c2UgaW4gbW9yZSBjYXNlcyB0aGFuIHdoYXQgaSBqdXN0IGRlc2Ny
+aWJlZCBoZXJlLg0KPiANCj4gDQo+IFNvIGkgd291bGQgbGlrZSB0byBnYXRoZXIgcGVvcGxlIGZl
+ZWRiYWNrIG9uIGdlbmVyYWwgYXBwcm9hY2ggYW5kIGZldw0KPiB0aGluZ3MNCj4gbGlrZToNCj4g
+ICAgIC0gRG8gYmxvY2sgZGV2aWNlIG5lZWQgdG8gYmUgYWJsZSB0byBpbnZhbGlkYXRlIHN1Y2gg
+bWFwcGluZyB0b28NCj4gPw0KPiANCj4gICAgICAgSXQgaXMgZWFzeSBmb3IgZnMgdGhlIHRvIGlu
+dmFsaWRhdGUgYXMgaXQgY2FuIHdhbGsgZmlsZQ0KPiBtYXBwaW5ncw0KPiAgICAgICBidXQgYmxv
+Y2sgZGV2aWNlIGRvIG5vdCBrbm93IGFib3V0IGZpbGUuDQo+IA0KPiAgICAgLSBEbyB3ZSB3YW50
+IHRvIHByb3ZpZGUgc29tZSBnZW5lcmljIGltcGxlbWVudGF0aW9uIHRvIHNoYXJlDQo+IGFjY3Jv
+c3MNCj4gICAgICAgZnMgPw0KPiANCj4gICAgIC0gTWF5YmUgc29tZSBzaGFyZSBoZWxwZXJzIGZv
+ciBibG9jayBkZXZpY2VzIHRoYXQgY291bGQgdHJhY2sNCj4gZmlsZQ0KPiAgICAgICBjb3JyZXNw
+b25kaW5nIHRvIHBlZXIgbWFwcGluZyA/DQoNCkknbSBpbnRlcmVzdGVkIGluIGJlaW5nIGEgcGFy
+dCBvZiB0aGlzIGRpc2N1c3Npb24uDQoNCj4gDQo+IA0KPiBDaGVlcnMsDQo+IErDqXLDtG1lDQo=
