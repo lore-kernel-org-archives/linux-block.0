@@ -2,119 +2,829 @@ Return-Path: <SRS0=I+xz=S4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D2D0C4321A
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 06:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7372C43219
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 09:11:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D01A206BA
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 06:28:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9623A206E0
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 09:11:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726124AbfDZG2X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Apr 2019 02:28:23 -0400
-Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:33994 "EHLO
-        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725800AbfDZG2X (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Apr 2019 02:28:23 -0400
-Received: from dread.disaster.area (pa49-181-171-240.pa.nsw.optusnet.com.au [49.181.171.240])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 8E06D43C0BA;
-        Fri, 26 Apr 2019 16:28:18 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92)
-        (envelope-from <david@fromorbit.com>)
-        id 1hJuLJ-0006GU-0F; Fri, 26 Apr 2019 16:28:17 +1000
-Date:   Fri, 26 Apr 2019 16:28:16 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Jerome Glisse <jglisse@redhat.com>
-Cc:     lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [LSF/MM TOPIC] Direct block mapping through fs for device
-Message-ID: <20190426062816.GG1454@dread.disaster.area>
-References: <20190426013814.GB3350@redhat.com>
+        id S1725935AbfDZJLH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Apr 2019 05:11:07 -0400
+Received: from mga11.intel.com ([192.55.52.93]:17994 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725881AbfDZJLG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Apr 2019 05:11:06 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Apr 2019 02:11:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,397,1549958400"; 
+   d="scan'208";a="319152851"
+Received: from ikonopko-mobl.ger.corp.intel.com (HELO [10.237.142.109]) ([10.237.142.109])
+  by orsmga005.jf.intel.com with ESMTP; 26 Apr 2019 02:11:02 -0700
+Subject: Re: [PATCH] lightnvm: pblk: Introduce hot-cold data separation
+To:     Heiner Litz <hlitz@ucsc.edu>, mb@lightnvm.io
+Cc:     javier@javigon.com, hans.holmberg@cnexlabs.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190425052152.6571-1-hlitz@ucsc.edu>
+From:   Igor Konopko <igor.j.konopko@intel.com>
+Message-ID: <66434cc7-2bac-dd10-6edc-4560e6a0f89f@intel.com>
+Date:   Fri, 26 Apr 2019 11:11:01 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190426013814.GB3350@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0 cx=a_idp_d
-        a=LhzQONXuMOhFZtk4TmSJIw==:117 a=LhzQONXuMOhFZtk4TmSJIw==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=oexKYjalfGEA:10
-        a=7-415B0cAAAA:8 a=VUkQmcHZEWhioDgAkr4A:9 a=CjuIK1q_8ugA:10
-        a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <20190425052152.6571-1-hlitz@ucsc.edu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 25, 2019 at 09:38:14PM -0400, Jerome Glisse wrote:
-> I see that they are still empty spot in LSF/MM schedule so i would like to
-> have a discussion on allowing direct block mapping of file for devices (nic,
-> gpu, fpga, ...). This is mm, fs and block discussion, thought the mm side
-> is pretty light ie only adding 2 callback to vm_operations_struct:
 
-The filesystem already has infrastructure for the bits it needs to
-provide. They are called file layout leases (how many times do I
-have to keep telling people this!), and what you do with the lease
-for the LBA range the filesystem maps for you is then something you
-can negotiate with the underlying block device.
 
-i.e. go look at how xfs_pnfs.c works to hand out block mappings to
-remote pNFS clients so they can directly access the underlying
-storage. Basically, anyone wanting to map blocks needs a file layout
-lease and then to manage the filesystem state over that range via
-these methods in the struct export_operations:
-
-        int (*get_uuid)(struct super_block *sb, u8 *buf, u32 *len, u64 *offset);
-        int (*map_blocks)(struct inode *inode, loff_t offset,
-                          u64 len, struct iomap *iomap,
-                          bool write, u32 *device_generation);
-        int (*commit_blocks)(struct inode *inode, struct iomap *iomaps,
-                             int nr_iomaps, struct iattr *iattr);
-
-Basically, before you read/write data, you map the blocks. if you've
-written data, then you need to commit the blocks (i.e. tell the fs
-they've been written to).
-
-The iomap will give you a contiguous LBA range and the block device
-they belong to, and you can then use that to whatever smart DMA stuff
-you need to do through the block device directly.
-
-If the filesystem wants the space back (e.g. because truncate) then
-the lease will be revoked. The client then must finish off it's
-outstanding operations, commit them and release the lease. To access
-the file range again, it must renew the lease and remap the file
-through ->map_blocks....
-
-> So i would like to gather people feedback on general approach and few things
-> like:
->     - Do block device need to be able to invalidate such mapping too ?
+On 25.04.2019 07:21, Heiner Litz wrote:
+> Introduce the capability to manage multiple open lines. Maintain one line
+> for user writes (hot) and a second line for gc writes (cold). As user and
+> gc writes still utilize a shared ring buffer, in rare cases a multi-sector
+> write will contain both gc and user data. This is acceptable, as on a
+> tested SSD with minimum write size of 64KB, less than 1% of all writes
+> contain both hot and cold sectors.
 > 
->       It is easy for fs the to invalidate as it can walk file mappings
->       but block device do not know about file.
 
-If you are needing the block device to invalidate filesystem level
-information, then your model is all wrong.
+Hi Heiner
 
->     - Do we want to provide some generic implementation to share accross
->       fs ?
+Generally I really like this changes, I was thinking about sth similar 
+since a while, so it is very good to see that patch.
 
-We already have a generic interface, filesystems other than XFS will
-need to implement them.
+I have a one question related to this patch, since it is not very clear 
+for me - how you ensure the data integrity in following scenarios:
+-we have open line X for user data and line Y for GC
+-GC writes LBA=N to line Y
+-user writes LBA=N to line X
+-we have power failure when both line X and Y were not written completely
+-during pblk creation we are executing OOB metadata recovery
+And here is the question, how we distinguish whether LBA=N from line Y 
+or LBA=N from line X is the valid one?
+Line X and Y might have seq_id either descending or ascending - this 
+would create two possible scenarios too.
 
->     - Maybe some share helpers for block devices that could track file
->       corresponding to peer mapping ?
+Thanks
+Igor
 
-If the application hasn't supplied the peer with the file it needs
-to access, get a lease from and then map an LBA range out of, then
-you are doing it all wrong.
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+> For a zipfian random distribution of LBA writes with theta-zipf of 1.2,
+> this patch reduces write amplification from 2.5 to 1.3 and increases user
+> write IOPS by 2.1x.
+> 
+> Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
+> ---
+>   drivers/lightnvm/pblk-core.c     | 157 +++++++++++++++++++++++--------
+>   drivers/lightnvm/pblk-init.c     |   9 +-
+>   drivers/lightnvm/pblk-map.c      |  29 +++---
+>   drivers/lightnvm/pblk-recovery.c |  43 ++++++---
+>   drivers/lightnvm/pblk-write.c    |  37 +++++---
+>   drivers/lightnvm/pblk.h          |  28 ++++--
+>   6 files changed, 213 insertions(+), 90 deletions(-)
+> 
+> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+> index 73be3a0311ff..bbb216788bc8 100644
+> --- a/drivers/lightnvm/pblk-core.c
+> +++ b/drivers/lightnvm/pblk-core.c
+> @@ -1294,7 +1294,7 @@ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
+>   	int ret;
+>   
+>   	spin_lock(&l_mg->free_lock);
+> -	l_mg->data_line = line;
+> +	pblk_line_set_data_line(pblk, PBLK_LINETYPE_DATA, line);
+>   	list_del(&line->list);
+>   
+>   	ret = pblk_line_prepare(pblk, line);
+> @@ -1410,7 +1410,7 @@ struct pblk_line *pblk_line_get(struct pblk *pblk)
+>   }
+>   
+>   static struct pblk_line *pblk_line_retry(struct pblk *pblk,
+> -					 struct pblk_line *line)
+> +					 struct pblk_line *line, int type)
+>   {
+>   	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+>   	struct pblk_line *retry_line;
+> @@ -1419,7 +1419,7 @@ static struct pblk_line *pblk_line_retry(struct pblk *pblk,
+>   	spin_lock(&l_mg->free_lock);
+>   	retry_line = pblk_line_get(pblk);
+>   	if (!retry_line) {
+> -		l_mg->data_line = NULL;
+> +		pblk_line_set_data_line(pblk, type, NULL);
+>   		spin_unlock(&l_mg->free_lock);
+>   		return NULL;
+>   	}
+> @@ -1432,7 +1432,7 @@ static struct pblk_line *pblk_line_retry(struct pblk *pblk,
+>   
+>   	pblk_line_reinit(line);
+>   
+> -	l_mg->data_line = retry_line;
+> +	pblk_line_set_data_line(pblk, type, retry_line);
+>   	spin_unlock(&l_mg->free_lock);
+>   
+>   	pblk_rl_free_lines_dec(&pblk->rl, line, false);
+> @@ -1450,37 +1450,29 @@ static void pblk_set_space_limit(struct pblk *pblk)
+>   	atomic_set(&rl->rb_space, 0);
+>   }
+>   
+> -struct pblk_line *pblk_line_get_first_data(struct pblk *pblk)
+> +struct pblk_line *pblk_line_get_first_data(struct pblk *pblk, int type)
+>   {
+>   	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+>   	struct pblk_line *line;
+>   
+>   	spin_lock(&l_mg->free_lock);
+> -	line = pblk_line_get(pblk);
+> +	line = pblk_line_init_data_line(pblk, type);
+>   	if (!line) {
+>   		spin_unlock(&l_mg->free_lock);
+>   		return NULL;
+>   	}
+>   
+> -	line->seq_nr = l_mg->d_seq_nr++;
+> -	line->type = PBLK_LINETYPE_DATA;
+> -	l_mg->data_line = line;
+> -
+>   	pblk_line_setup_metadata(line, l_mg, &pblk->lm);
+>   
+>   	/* Allocate next line for preparation */
+> -	l_mg->data_next = pblk_line_get(pblk);
+> -	if (!l_mg->data_next) {
+> +	if (!pblk_line_init_next_line(pblk, type)) {
+>   		/* If we cannot get a new line, we need to stop the pipeline.
+>   		 * Only allow as many writes in as we can store safely and then
+>   		 * fail gracefully
+>   		 */
+>   		pblk_set_space_limit(pblk);
+>   
+> -		l_mg->data_next = NULL;
+> -	} else {
+> -		l_mg->data_next->seq_nr = l_mg->d_seq_nr++;
+> -		l_mg->data_next->type = PBLK_LINETYPE_DATA;
+> +		pblk_line_set_next_line(pblk, type, NULL);
+>   	}
+>   	spin_unlock(&l_mg->free_lock);
+>   
+> @@ -1488,14 +1480,14 @@ struct pblk_line *pblk_line_get_first_data(struct pblk *pblk)
+>   		return NULL;
+>   
+>   	if (pblk_line_erase(pblk, line)) {
+> -		line = pblk_line_retry(pblk, line);
+> +		line = pblk_line_retry(pblk, line, type);
+>   		if (!line)
+>   			return NULL;
+>   	}
+>   
+>   retry_setup:
+>   	if (!pblk_line_init_metadata(pblk, line, NULL)) {
+> -		line = pblk_line_retry(pblk, line);
+> +		line = pblk_line_retry(pblk, line, type);
+>   		if (!line)
+>   			return NULL;
+>   
+> @@ -1503,7 +1495,7 @@ struct pblk_line *pblk_line_get_first_data(struct pblk *pblk)
+>   	}
+>   
+>   	if (!pblk_line_init_bb(pblk, line, 1)) {
+> -		line = pblk_line_retry(pblk, line);
+> +		line = pblk_line_retry(pblk, line, type);
+>   		if (!line)
+>   			return NULL;
+>   
+> @@ -1596,12 +1588,18 @@ void __pblk_pipeline_flush(struct pblk *pblk)
+>   	pblk_flush_writer(pblk);
+>   	pblk_wait_for_meta(pblk);
+>   
+> -	ret = pblk_recov_pad(pblk);
+> +	ret = pblk_recov_pad(pblk, PBLK_LINETYPE_DATA);
+>   	if (ret) {
+>   		pblk_err(pblk, "could not close data on teardown(%d)\n", ret);
+>   		return;
+>   	}
+>   
+> +	ret = pblk_recov_pad(pblk, PBLK_LINETYPE_GC);
+> +	if (ret) {
+> +		pblk_err(pblk, "could not close gc on teardown(%d)\n", ret);
+> +		return;
+> +	}
+> +
+>   	flush_workqueue(pblk->bb_wq);
+>   	pblk_line_close_meta_sync(pblk);
+>   }
+> @@ -1613,8 +1611,10 @@ void __pblk_pipeline_stop(struct pblk *pblk)
+>   	spin_lock(&l_mg->free_lock);
+>   	pblk->state = PBLK_STATE_STOPPED;
+>   	trace_pblk_state(pblk_disk_name(pblk), pblk->state);
+> -	l_mg->data_line = NULL;
+> -	l_mg->data_next = NULL;
+> +	pblk_line_set_data_line(pblk, PBLK_LINETYPE_DATA, NULL);
+> +	pblk_line_set_data_line(pblk, PBLK_LINETYPE_GC, NULL);
+> +	pblk_line_set_next_line(pblk, PBLK_LINETYPE_DATA, NULL);
+> +	pblk_line_set_next_line(pblk, PBLK_LINETYPE_GC, NULL);
+>   	spin_unlock(&l_mg->free_lock);
+>   }
+>   
+> @@ -1624,19 +1624,20 @@ void pblk_pipeline_stop(struct pblk *pblk)
+>   	__pblk_pipeline_stop(pblk);
+>   }
+>   
+> -struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
+> +struct pblk_line *pblk_line_replace_data(struct pblk *pblk, int type)
+>   {
+>   	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+>   	struct pblk_line *cur, *new = NULL;
+>   	unsigned int left_seblks;
+>   
+> -	new = l_mg->data_next;
+> +	new = pblk_line_get_next_line(pblk, type);
+>   	if (!new)
+>   		goto out;
+>   
+>   	spin_lock(&l_mg->free_lock);
+> -	cur = l_mg->data_line;
+> -	l_mg->data_line = new;
+> +
+> +	cur = pblk_line_get_data_line(pblk, type);
+> +	pblk_line_set_data_line(pblk, type, new);
+>   
+>   	pblk_line_setup_metadata(new, l_mg, &pblk->lm);
+>   	spin_unlock(&l_mg->free_lock);
+> @@ -1659,7 +1660,7 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
+>   
+>   retry_setup:
+>   	if (!pblk_line_init_metadata(pblk, new, cur)) {
+> -		new = pblk_line_retry(pblk, new);
+> +		new = pblk_line_retry(pblk, new, type);
+>   		if (!new)
+>   			goto out;
+>   
+> @@ -1667,7 +1668,7 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
+>   	}
+>   
+>   	if (!pblk_line_init_bb(pblk, new, 1)) {
+> -		new = pblk_line_retry(pblk, new);
+> +		new = pblk_line_retry(pblk, new, type);
+>   		if (!new)
+>   			goto out;
+>   
+> @@ -1678,17 +1679,12 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
+>   
+>   	/* Allocate next line for preparation */
+>   	spin_lock(&l_mg->free_lock);
+> -	l_mg->data_next = pblk_line_get(pblk);
+> -	if (!l_mg->data_next) {
+> +	if (!pblk_line_init_next_line(pblk, type)) {
+>   		/* If we cannot get a new line, we need to stop the pipeline.
+>   		 * Only allow as many writes in as we can store safely and then
+>   		 * fail gracefully
+>   		 */
+>   		pblk_stop_writes(pblk, new);
+> -		l_mg->data_next = NULL;
+> -	} else {
+> -		l_mg->data_next->seq_nr = l_mg->d_seq_nr++;
+> -		l_mg->data_next->type = PBLK_LINETYPE_DATA;
+>   	}
+>   	spin_unlock(&l_mg->free_lock);
+>   
+> @@ -1801,15 +1797,100 @@ int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr ppa)
+>   	return err;
+>   }
+>   
+> -struct pblk_line *pblk_line_get_data(struct pblk *pblk)
+> +struct pblk_line *pblk_line_get_data_line(struct pblk *pblk, int type)
+>   {
+> -	return pblk->l_mg.data_line;
+> +	switch (type) {
+> +	case PBLK_LINETYPE_DATA:
+> +		return pblk->l_mg.data_line;
+> +	case PBLK_LINETYPE_GC:
+> +		return pblk->l_mg.gc_line;
+> +	case PBLK_LINETYPE_LOG:
+> +		return pblk->l_mg.log_line;
+> +	default:
+> +		WARN(1, "Unsupported line type\n");
+> +		return NULL;
+> +	}
+>   }
+>   
+>   /* For now, always erase next line */
+> -struct pblk_line *pblk_line_get_erase(struct pblk *pblk)
+> +struct pblk_line *pblk_line_get_next_line(struct pblk *pblk, int type)
+>   {
+> -	return pblk->l_mg.data_next;
+> +	switch (type) {
+> +	case PBLK_LINETYPE_DATA:
+> +		return pblk->l_mg.data_next;
+> +	case PBLK_LINETYPE_GC:
+> +		return pblk->l_mg.gc_next;
+> +	case PBLK_LINETYPE_LOG:
+> +		return pblk->l_mg.log_next;
+> +	default:
+> +		WARN(1, "Unsupported line type\n");
+> +		return NULL;
+> +	}
+> +}
+> +
+> +void pblk_line_set_data_line(struct pblk *pblk, int type, struct pblk_line *line)
+> +{
+> +	switch (type) {
+> +	case PBLK_LINETYPE_DATA:
+> +		pblk->l_mg.data_line = line;
+> +		break;
+> +	case PBLK_LINETYPE_GC:
+> +		pblk->l_mg.gc_line = line;
+> +		break;
+> +	case PBLK_LINETYPE_LOG:
+> +		pblk->l_mg.log_line = line;
+> +		break;
+> +	default:
+> +		WARN(1, "Unsupported line type\n");
+> +	}
+> +}
+> +
+> +/* For now, always erase next line */
+> +void pblk_line_set_next_line(struct pblk *pblk, int type, struct pblk_line *line)
+> +{
+> +	switch (type) {
+> +	case PBLK_LINETYPE_DATA:
+> +		pblk->l_mg.data_next = line;
+> +		break;
+> +	case PBLK_LINETYPE_GC:
+> +		pblk->l_mg.gc_next = line;
+> +		break;
+> +	case PBLK_LINETYPE_LOG:
+> +		pblk->l_mg.log_next = line;
+> +		break;
+> +	default:
+> +		WARN(1, "Unsupported line type\n");
+> +	}
+> +}
+> +
+> +struct pblk_line *pblk_line_init_data_line(struct pblk *pblk, int type)
+> +{
+> +	struct pblk_line *line = pblk_line_get(pblk);
+> +	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+> +
+> +	lockdep_assert_held(&l_mg->free_lock);
+> +
+> +	if (line) {
+> +		line->seq_nr = l_mg->d_seq_nr++;
+> +		line->type = type;
+> +		pblk_line_set_data_line(pblk, type, line);
+> +	}
+> +	return line;
+> +}
+> +
+> +struct pblk_line *pblk_line_init_next_line(struct pblk *pblk, int type)
+> +{
+> +	struct pblk_line *line = pblk_line_get(pblk);
+> +	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+> +
+> +	lockdep_assert_held(&l_mg->free_lock);
+> +
+> +	if (line) {
+> +		line->seq_nr = l_mg->d_seq_nr++;
+> +		line->type = type;
+> +		pblk_line_set_next_line(pblk, type, line);
+> +	}
+> +	return line;
+>   }
+>   
+>   int pblk_line_is_full(struct pblk_line *line)
+> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+> index 1e227a08e54a..0d127e32d556 100644
+> --- a/drivers/lightnvm/pblk-init.c
+> +++ b/drivers/lightnvm/pblk-init.c
+> @@ -139,11 +139,16 @@ static int pblk_l2p_recover(struct pblk *pblk, bool factory_init)
+>   
+>   	if (!line) {
+>   		/* Configure next line for user data */
+> -		line = pblk_line_get_first_data(pblk);
+> +		line = pblk_line_get_first_data(pblk, PBLK_LINETYPE_DATA);
+>   		if (!line)
+>   			return -EFAULT;
+>   	}
+>   
+> +	/* Configure next line for gc data */
+> +	line = pblk_line_get_first_data(pblk, PBLK_LINETYPE_GC);
+> +	if (!line)
+> +		return -EFAULT;
+> +
+>   	return 0;
+>   }
+>   
+> @@ -832,7 +837,7 @@ static int pblk_line_mg_init(struct pblk *pblk)
+>   	int i, bb_distance;
+>   
+>   	l_mg->nr_lines = geo->num_chk;
+> -	l_mg->log_line = l_mg->data_line = NULL;
+> +	l_mg->log_line = l_mg->data_line = l_mg->gc_line = NULL;
+>   	l_mg->l_seq_nr = l_mg->d_seq_nr = 0;
+>   	l_mg->nr_free_lines = 0;
+>   	bitmap_zero(&l_mg->meta_bitmap, PBLK_DATA_LINES);
+> diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+> index 5408e32b2f13..9b0539137df0 100644
+> --- a/drivers/lightnvm/pblk-map.c
+> +++ b/drivers/lightnvm/pblk-map.c
+> @@ -23,9 +23,9 @@ static int pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+>   			      struct ppa_addr *ppa_list,
+>   			      unsigned long *lun_bitmap,
+>   			      void *meta_list,
+> -			      unsigned int valid_secs)
+> +			      unsigned int valid_secs, int type)
+>   {
+> -	struct pblk_line *line = pblk_line_get_data(pblk);
+> +	struct pblk_line *line = pblk_line_get_data_line(pblk, type);
+>   	struct pblk_emeta *emeta;
+>   	struct pblk_w_ctx *w_ctx;
+>   	__le64 *lba_list;
+> @@ -42,7 +42,7 @@ static int pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+>   		/* If we cannot allocate a new line, make sure to store metadata
+>   		 * on current line and then fail
+>   		 */
+> -		line = pblk_line_replace_data(pblk);
+> +		line = pblk_line_replace_data(pblk, type);
+>   		pblk_line_close_meta(pblk, prev_line);
+>   
+>   		if (!line) {
+> @@ -94,8 +94,8 @@ static int pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+>   }
+>   
+>   int pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
+> -		 unsigned long *lun_bitmap, unsigned int valid_secs,
+> -		 unsigned int off)
+> +		unsigned long *lun_bitmap, unsigned int valid_secs,
+> +		unsigned int off, int type)
+>   {
+>   	void *meta_list = pblk_get_meta_for_writes(pblk, rqd);
+>   	void *meta_buffer;
+> @@ -110,7 +110,7 @@ int pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
+>   		meta_buffer = pblk_get_meta(pblk, meta_list, i);
+>   
+>   		ret = pblk_map_page_data(pblk, sentry + i, &ppa_list[i],
+> -					lun_bitmap, meta_buffer, map_secs);
+> +					 lun_bitmap, meta_buffer, map_secs, type);
+>   		if (ret)
+>   			return ret;
+>   	}
+> @@ -120,8 +120,9 @@ int pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
+>   
+>   /* only if erase_ppa is set, acquire erase semaphore */
+>   int pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+> -		       unsigned int sentry, unsigned long *lun_bitmap,
+> -		       unsigned int valid_secs, struct ppa_addr *erase_ppa)
+> +		      unsigned int sentry, unsigned long *lun_bitmap,
+> +		      unsigned int valid_secs, struct ppa_addr *erase_ppa,
+> +		      int type)
+>   {
+>   	struct nvm_tgt_dev *dev = pblk->dev;
+>   	struct nvm_geo *geo = &dev->geo;
+> @@ -141,7 +142,7 @@ int pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>   		meta_buffer = pblk_get_meta(pblk, meta_list, i);
+>   
+>   		ret = pblk_map_page_data(pblk, sentry + i, &ppa_list[i],
+> -					lun_bitmap, meta_buffer, map_secs);
+> +					 lun_bitmap, meta_buffer, map_secs, type);
+>   		if (ret)
+>   			return ret;
+>   
+> @@ -150,10 +151,10 @@ int pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>   		/* line can change after page map. We might also be writing the
+>   		 * last line.
+>   		 */
+> -		e_line = pblk_line_get_erase(pblk);
+> +		e_line = pblk_line_get_next_line(pblk, type);
+>   		if (!e_line)
+>   			return pblk_map_rq(pblk, rqd, sentry, lun_bitmap,
+> -							valid_secs, i + min);
+> +					   valid_secs, i + min, type);
+>   
+>   		spin_lock(&e_line->lock);
+>   		if (!test_bit(erase_lun, e_line->erase_bitmap)) {
+> @@ -168,17 +169,17 @@ int pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>   
+>   			/* Avoid evaluating e_line->left_eblks */
+>   			return pblk_map_rq(pblk, rqd, sentry, lun_bitmap,
+> -							valid_secs, i + min);
+> +					   valid_secs, i + min, type);
+>   		}
+>   		spin_unlock(&e_line->lock);
+>   	}
+>   
+> -	d_line = pblk_line_get_data(pblk);
+> +	d_line = pblk_line_get_data_line(pblk, type);
+>   
+>   	/* line can change after page map. We might also be writing the
+>   	 * last line.
+>   	 */
+> -	e_line = pblk_line_get_erase(pblk);
+> +	e_line = pblk_line_get_next_line(pblk, type);
+>   	if (!e_line)
+>   		return -ENOSPC;
+>   
+> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+> index 865fe310cab4..38bf7b28e73f 100644
+> --- a/drivers/lightnvm/pblk-recovery.c
+> +++ b/drivers/lightnvm/pblk-recovery.c
+> @@ -677,12 +677,12 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+>   {
+>   	struct pblk_line_meta *lm = &pblk->lm;
+>   	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+> -	struct pblk_line *line, *tline, *data_line = NULL;
+> +	struct pblk_line *line, *tline, *data_line = NULL, *gc_line = NULL;
+>   	struct pblk_smeta *smeta;
+>   	struct pblk_emeta *emeta;
+>   	struct line_smeta *smeta_buf;
+>   	int found_lines = 0, recovered_lines = 0, open_lines = 0;
+> -	int is_next = 0;
+> +	int is_data_next = 0, is_gc_next = 0;
+>   	int meta_line;
+>   	int i, valid_uuid = 0;
+>   	LIST_HEAD(recov_list);
+> @@ -838,7 +838,11 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+>   			trace_pblk_line_state(pblk_disk_name(pblk), line->id,
+>   					line->state);
+>   
+> -			data_line = line;
+> +			if (line->type == PBLK_LINETYPE_DATA)
+> +				data_line = line;
+> +			else if (line->type == PBLK_LINETYPE_GC)
+> +				gc_line = line;
+> +
+>   			line->meta_line = meta_line;
+>   
+>   			open_lines++;
+> @@ -852,19 +856,30 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+>   		spin_unlock(&l_mg->free_lock);
+>   	} else {
+>   		spin_lock(&l_mg->free_lock);
+> -		l_mg->data_line = data_line;
+> -		/* Allocate next line for preparation */
+> -		l_mg->data_next = pblk_line_get(pblk);
+> -		if (l_mg->data_next) {
+> -			l_mg->data_next->seq_nr = l_mg->d_seq_nr++;
+> -			l_mg->data_next->type = PBLK_LINETYPE_DATA;
+> -			is_next = 1;
+> +		if (data_line) {
+> +			pblk_line_set_data_line(pblk, PBLK_LINETYPE_DATA,
+> +						data_line);
+> +			/* Allocate next line for preparation */
+> +			if (pblk_line_init_next_line(pblk, PBLK_LINETYPE_DATA))
+> +				is_data_next = 1;
+> +		}
+> +		if (gc_line) {
+> +			pblk_line_set_data_line(pblk, PBLK_LINETYPE_GC,
+> +						gc_line);
+> +			/* Allocate next line for preparation */
+> +			if (pblk_line_init_next_line(pblk, PBLK_LINETYPE_GC))
+> +				is_gc_next = 1;
+>   		}
+> +
+>   		spin_unlock(&l_mg->free_lock);
+>   	}
+>   
+> -	if (is_next)
+> -		pblk_line_erase(pblk, l_mg->data_next);
+> +	if (is_data_next)
+> +		pblk_line_erase(pblk, pblk_line_get_next_line(pblk,
+> +							   PBLK_LINETYPE_DATA));
+> +	if (is_gc_next)
+> +		pblk_line_erase(pblk, pblk_line_get_next_line(pblk,
+> +							   PBLK_LINETYPE_GC));
+>   
+>   out:
+>   	if (found_lines != recovered_lines)
+> @@ -877,7 +892,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+>   /*
+>    * Pad current line
+>    */
+> -int pblk_recov_pad(struct pblk *pblk)
+> +int pblk_recov_pad(struct pblk *pblk, int type)
+>   {
+>   	struct pblk_line *line;
+>   	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+> @@ -885,7 +900,7 @@ int pblk_recov_pad(struct pblk *pblk)
+>   	int ret = 0;
+>   
+>   	spin_lock(&l_mg->free_lock);
+> -	line = l_mg->data_line;
+> +	line = pblk_line_get_data_line(pblk, type);
+>   	left_msecs = line->left_msecs;
+>   	spin_unlock(&l_mg->free_lock);
+>   
+> diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+> index 4e63f9b5954c..1e38adc63800 100644
+> --- a/drivers/lightnvm/pblk-write.c
+> +++ b/drivers/lightnvm/pblk-write.c
+> @@ -313,10 +313,10 @@ static int pblk_alloc_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>   }
+>   
+>   static int pblk_setup_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+> -			   struct ppa_addr *erase_ppa)
+> +			   struct ppa_addr *erase_ppa, int type)
+>   {
+>   	struct pblk_line_meta *lm = &pblk->lm;
+> -	struct pblk_line *e_line = pblk_line_get_erase(pblk);
+> +	struct pblk_line *e_line = pblk_line_get_next_line(pblk, type);
+>   	struct pblk_c_ctx *c_ctx = nvm_rq_to_pdu(rqd);
+>   	unsigned int valid = c_ctx->nr_valid;
+>   	unsigned int padded = c_ctx->nr_padded;
+> @@ -337,10 +337,10 @@ static int pblk_setup_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>   
+>   	if (likely(!e_line || !atomic_read(&e_line->left_eblks)))
+>   		ret = pblk_map_rq(pblk, rqd, c_ctx->sentry, lun_bitmap,
+> -							valid, 0);
+> +				  valid, 0, type);
+>   	else
+>   		ret = pblk_map_erase_rq(pblk, rqd, c_ctx->sentry, lun_bitmap,
+> -							valid, erase_ppa);
+> +					valid, erase_ppa, type);
+>   
+>   	return ret;
+>   }
+> @@ -446,12 +446,13 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+>   
+>   static inline bool pblk_valid_meta_ppa(struct pblk *pblk,
+>   				       struct pblk_line *meta_line,
+> -				       struct nvm_rq *data_rqd)
+> +				       struct nvm_rq *data_rqd,
+> +				       int type)
+>   {
+>   	struct nvm_tgt_dev *dev = pblk->dev;
+>   	struct nvm_geo *geo = &dev->geo;
+>   	struct pblk_c_ctx *data_c_ctx = nvm_rq_to_pdu(data_rqd);
+> -	struct pblk_line *data_line = pblk_line_get_data(pblk);
+> +	struct pblk_line *data_line = pblk_line_get_data_line(pblk, type);
+>   	struct ppa_addr ppa, ppa_opt;
+>   	u64 paddr;
+>   	int pos_opt;
+> @@ -481,7 +482,8 @@ static inline bool pblk_valid_meta_ppa(struct pblk *pblk,
+>   }
+>   
+>   static struct pblk_line *pblk_should_submit_meta_io(struct pblk *pblk,
+> -						    struct nvm_rq *data_rqd)
+> +						    struct nvm_rq *data_rqd,
+> +						    int type)
+>   {
+>   	struct pblk_line_meta *lm = &pblk->lm;
+>   	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+> @@ -499,13 +501,13 @@ static struct pblk_line *pblk_should_submit_meta_io(struct pblk *pblk,
+>   	}
+>   	spin_unlock(&l_mg->close_lock);
+>   
+> -	if (!pblk_valid_meta_ppa(pblk, meta_line, data_rqd))
+> +	if (!pblk_valid_meta_ppa(pblk, meta_line, data_rqd, type))
+>   		return NULL;
+>   
+>   	return meta_line;
+>   }
+>   
+> -static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
+> +static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd, int type)
+>   {
+>   	struct ppa_addr erase_ppa;
+>   	struct pblk_line *meta_line;
+> @@ -514,13 +516,13 @@ static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
+>   	pblk_ppa_set_empty(&erase_ppa);
+>   
+>   	/* Assign lbas to ppas and populate request structure */
+> -	err = pblk_setup_w_rq(pblk, rqd, &erase_ppa);
+> +	err = pblk_setup_w_rq(pblk, rqd, &erase_ppa, type);
+>   	if (err) {
+>   		pblk_err(pblk, "could not setup write request: %d\n", err);
+>   		return NVM_IO_ERR;
+>   	}
+>   
+> -	meta_line = pblk_should_submit_meta_io(pblk, rqd);
+> +	meta_line = pblk_should_submit_meta_io(pblk, rqd, type);
+>   
+>   	/* Submit data write for current data line */
+>   	err = pblk_submit_io(pblk, rqd);
+> @@ -532,11 +534,12 @@ static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
+>   	if (!pblk_ppa_empty(erase_ppa)) {
+>   		/* Submit erase for next data line */
+>   		if (pblk_blk_erase_async(pblk, erase_ppa)) {
+> -			struct pblk_line *e_line = pblk_line_get_erase(pblk);
+> +			struct pblk_line *e_line;
+>   			struct nvm_tgt_dev *dev = pblk->dev;
+>   			struct nvm_geo *geo = &dev->geo;
+>   			int bit;
+>   
+> +			e_line = pblk_line_get_next_line(pblk, type);
+>   			atomic_inc(&e_line->left_eblks);
+>   			bit = pblk_ppa_to_pos(geo, erase_ppa);
+>   			WARN_ON(!test_and_clear_bit(bit, e_line->erase_bitmap));
+> @@ -574,6 +577,9 @@ static int pblk_submit_write(struct pblk *pblk, int *secs_left)
+>   	unsigned int secs_to_flush, packed_meta_pgs;
+>   	unsigned long pos;
+>   	unsigned int resubmit;
+> +	int type;
+> +	struct pblk_w_ctx *w_ctx;
+> +	struct pblk_rb_entry *entry;
+>   
+>   	*secs_left = 0;
+>   
+> @@ -633,13 +639,18 @@ static int pblk_submit_write(struct pblk *pblk, int *secs_left)
+>   	rqd = pblk_alloc_rqd(pblk, PBLK_WRITE);
+>   	rqd->bio = bio;
+>   
+> +	entry = &pblk->rwb.entries[pos];
+> +	w_ctx = &entry->w_ctx;
+> +	type = w_ctx->flags & PBLK_IOTYPE_GC ?
+> +		PBLK_LINETYPE_GC : PBLK_LINETYPE_DATA;
+> +
+>   	if (pblk_rb_read_to_bio(&pblk->rwb, rqd, pos, secs_to_sync,
+>   								secs_avail)) {
+>   		pblk_err(pblk, "corrupted write bio\n");
+>   		goto fail_put_bio;
+>   	}
+>   
+> -	if (pblk_submit_io_set(pblk, rqd))
+> +	if (pblk_submit_io_set(pblk, rqd, type))
+>   		goto fail_free_bio;
+>   
+>   #ifdef CONFIG_NVM_PBLK_DEBUG
+> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> index e304754aaa3c..93ef5a2bffe6 100644
+> --- a/drivers/lightnvm/pblk.h
+> +++ b/drivers/lightnvm/pblk.h
+> @@ -316,6 +316,7 @@ enum {
+>   	PBLK_LINETYPE_FREE = 0,
+>   	PBLK_LINETYPE_LOG = 1,
+>   	PBLK_LINETYPE_DATA = 2,
+> +	PBLK_LINETYPE_GC = 3,
+>   
+>   	/* Line state */
+>   	PBLK_LINESTATE_NEW = 9,
+> @@ -526,8 +527,10 @@ struct pblk_line_mgmt {
+>   
+>   	struct pblk_line *log_line;	/* Current FTL log line */
+>   	struct pblk_line *data_line;	/* Current data line */
+> +	struct pblk_line *gc_line;	/* Current gc line */
+>   	struct pblk_line *log_next;	/* Next FTL log line */
+>   	struct pblk_line *data_next;	/* Next data line */
+> +	struct pblk_line *gc_next;	/* Next gc line */
+>   
+>   	struct list_head emeta_list;	/* Lines queued to schedule emeta */
+>   
+> @@ -804,14 +807,20 @@ struct bio *pblk_bio_map_addr(struct pblk *pblk, void *data,
+>   			      unsigned int nr_secs, unsigned int len,
+>   			      int alloc_type, gfp_t gfp_mask);
+>   struct pblk_line *pblk_line_get(struct pblk *pblk);
+> -struct pblk_line *pblk_line_get_first_data(struct pblk *pblk);
+> -struct pblk_line *pblk_line_replace_data(struct pblk *pblk);
+> +struct pblk_line *pblk_line_get_first_data(struct pblk *pblk, int type);
+> +struct pblk_line *pblk_line_replace_data(struct pblk *pblk, int type);
+>   void pblk_ppa_to_line_put(struct pblk *pblk, struct ppa_addr ppa);
+>   void pblk_rq_to_line_put(struct pblk *pblk, struct nvm_rq *rqd);
+>   int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line);
+>   void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line);
+> -struct pblk_line *pblk_line_get_data(struct pblk *pblk);
+> -struct pblk_line *pblk_line_get_erase(struct pblk *pblk);
+> +struct pblk_line *pblk_line_get_data_line(struct pblk *pblk, int type);
+> +struct pblk_line *pblk_line_get_next_line(struct pblk *pblk, int type);
+> +void pblk_line_set_data_line(struct pblk *pblk, int type,
+> +			     struct pblk_line *line);
+> +void pblk_line_set_next_line(struct pblk *pblk, int type,
+> +			     struct pblk_line *line);
+> +struct pblk_line *pblk_line_init_next_line(struct pblk *pblk, int type);
+> +struct pblk_line *pblk_line_init_data_line(struct pblk *pblk, int type);
+>   int pblk_line_erase(struct pblk *pblk, struct pblk_line *line);
+>   int pblk_line_is_full(struct pblk_line *line);
+>   void pblk_line_free(struct pblk_line *line);
+> @@ -875,11 +884,12 @@ int pblk_write_gc_to_cache(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
+>    * pblk map
+>    */
+>   int pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+> -		       unsigned int sentry, unsigned long *lun_bitmap,
+> -		       unsigned int valid_secs, struct ppa_addr *erase_ppa);
+> +		      unsigned int sentry, unsigned long *lun_bitmap,
+> +		      unsigned int valid_secs, struct ppa_addr *erase_ppa,
+> +		      int type);
+>   int pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
+> -		 unsigned long *lun_bitmap, unsigned int valid_secs,
+> -		 unsigned int off);
+> +		unsigned long *lun_bitmap, unsigned int valid_secs,
+> +		unsigned int off, int type);
+>   
+>   /*
+>    * pblk write thread
+> @@ -899,7 +909,7 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
+>    * pblk recovery
+>    */
+>   struct pblk_line *pblk_recov_l2p(struct pblk *pblk);
+> -int pblk_recov_pad(struct pblk *pblk);
+> +int pblk_recov_pad(struct pblk *pblk, int type);
+>   int pblk_recov_check_emeta(struct pblk *pblk, struct line_emeta *emeta);
+>   
+>   /*
+> 
