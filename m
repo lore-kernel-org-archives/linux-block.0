@@ -2,111 +2,197 @@ Return-Path: <SRS0=I+xz=S4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F27EC43219
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 18:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D12F0C43219
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 18:51:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C5C6A2077B
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 18:24:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E26720B7C
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 18:51:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="TQT2vQ/d";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="SwJSU0Te"
+	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="g2Dw3CIV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726005AbfDZSYM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Apr 2019 14:24:12 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:19969 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725875AbfDZSYM (ORCPT
+        id S1726359AbfDZSvP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Apr 2019 14:51:15 -0400
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:41144 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726349AbfDZSvO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Apr 2019 14:24:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1556303050; x=1587839050;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=o76s8JFwOh5j8SGvBsX4QXeSXMSuXWHg7CDH4t2CEo4=;
-  b=TQT2vQ/dp/EniRkADnFwq6aXYpYHsicMv4QyEI5LDwteyAeMymZk1Ro5
-   kgyt2W5K9CgLQj0sJSdtSSaP8p77BoTfdQOWMAVk+ZbOqzdyYcoHcuUI+
-   5U7m5BPLsh+GZ690WPLeoKWg1uLttj8OE8PUAKhVwMwl64bKWAmJFqFwf
-   UkcAKxP7V50BKrYX+c+xTfGGcLj9YT69bqTX/B8uectkYso5zjLooIXm2
-   QKRly+WAk6WT2w97yJqRRQwzlELT7N6zewd5+BylfNg9pZY9h7CnOjVqm
-   +Cteq4dp+g7g8mcB4VZoaGttFzzogXQiNgGQb2ehP5RCqwSv61AVvTMd2
-   w==;
-X-IronPort-AV: E=Sophos;i="5.60,398,1549900800"; 
-   d="scan'208";a="111887461"
-Received: from mail-sn1nam01lp2058.outbound.protection.outlook.com (HELO NAM01-SN1-obe.outbound.protection.outlook.com) ([104.47.32.58])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Apr 2019 02:24:10 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o76s8JFwOh5j8SGvBsX4QXeSXMSuXWHg7CDH4t2CEo4=;
- b=SwJSU0Te+DYiww7zgvoezPvUUC6l9n6ylrzA7qEq+vVwbIAhL5ZtTLRq3Mnheg/0bmjHVaebJArrCnd4FI1LP2/5XXpGRi5o2FQbZLor19klG55DDdyIX64kCLxxmNo664czkg0o/9xhG4d7/Vznlfx8gq9io+N8CzaOqWCuFCc=
-Received: from SN6PR04MB4527.namprd04.prod.outlook.com (52.135.120.25) by
- SN6PR04MB4782.namprd04.prod.outlook.com (52.135.122.152) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1835.13; Fri, 26 Apr 2019 18:24:08 +0000
-Received: from SN6PR04MB4527.namprd04.prod.outlook.com
- ([fe80::c95e:c178:8d66:3703]) by SN6PR04MB4527.namprd04.prod.outlook.com
- ([fe80::c95e:c178:8d66:3703%3]) with mapi id 15.20.1813.017; Fri, 26 Apr 2019
- 18:24:08 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-CC:     Omar Sandoval <osandov@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH] block/028: check if T10 verification fails
-Thread-Topic: [PATCH] block/028: check if T10 verification fails
-Thread-Index: AQHU+/FQSzR65fIaLky7wQv5PejQ6g==
-Date:   Fri, 26 Apr 2019 18:24:08 +0000
-Message-ID: <SN6PR04MB452733A7DC62133964DEA4E9863E0@SN6PR04MB4527.namprd04.prod.outlook.com>
-References: <20190426023937.19584-1-ming.lei@redhat.com>
- <20190426145711.GA12338@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.44.250]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 17d0aca3-e8f9-4a76-5ecf-08d6ca745f94
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:SN6PR04MB4782;
-x-ms-traffictypediagnostic: SN6PR04MB4782:
-wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <SN6PR04MB478209CDA887FB0F83E3B4A4863E0@SN6PR04MB4782.namprd04.prod.outlook.com>
-x-forefront-prvs: 001968DD50
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(366004)(39860400002)(396003)(376002)(189003)(199004)(14444005)(86362001)(55016002)(97736004)(6436002)(229853002)(256004)(9686003)(81156014)(53936002)(81166006)(8676002)(316002)(4326008)(6246003)(7736002)(25786009)(305945005)(26005)(186003)(74316002)(478600001)(14454004)(72206003)(486006)(15650500001)(3846002)(2906002)(6116002)(446003)(8936002)(33656002)(99286004)(110136005)(54906003)(7696005)(52536014)(66066001)(76176011)(6506007)(53546011)(5660300002)(102836004)(4744005)(71190400001)(71200400001)(73956011)(476003)(91956017)(76116006)(66946007)(66476007)(66446008)(64756008)(66556008)(68736007);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR04MB4782;H:SN6PR04MB4527.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: yUmB64/6iw0heIKybSwHUPZmEB7gCReFJBgXofUAmXVbZI4UagVNTmQk4Vm7LBv2Dn6m6Dv13HInSzQ+WXIyk0/ISwoeUJzz+L44VKP13fukWHyMSoLBm1dfKCJ7XjJtsO2PDTLhy+eKVmW0Xg9nEFwzgwOu59GF8z39Sgk2f0BYeRrIQxAiz9Y1o2IzsKM5rYBwPxveZgDrIe65VsdD3MfRE7Jr00pt2+Gsa2e8r0gF8pkJmL1rBKiA2JpcK004nGQo7a2yum9MU+WaU+n2URGYPJn1pJVSs7scAKCqiGYt7kTBEzWer3L0xfYY0t8D5Z7b/aQSGufzSaApaf6inWOLwu8+a8GcbFDnXwC/rTm2A2/ND0OTP04rmEsfBTf4/iP9A4cDj42Tih2dR51OhePTyBAYk2VEC5GsGBQyyhM=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 26 Apr 2019 14:51:14 -0400
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3QInV9t004908;
+        Fri, 26 Apr 2019 11:50:14 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-type; s=facebook; bh=KK74Ik6tG2c+y4kydUC2rWejPCIIYS31jlFNwlYDWlY=;
+ b=g2Dw3CIV+d90V0Gi3uxQCIMeGWlYAMMF/hWXCnPBOy/FLvthgVIolECguxsNJUtDOBeQ
+ SwY0pEkDxXZYlucUaYRgPG0QjZzQDn7EfPX8RzowBYdp9+5UEhZ0jX800ezzOP4LA51F
+ 6rMH4jIP2nC+iakM3DHtrq8keOT/1kWU8xg= 
+Received: from mail.thefacebook.com (mailout.thefacebook.com [199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 2s447r0s22-2
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 26 Apr 2019 11:50:14 -0700
+Received: from mmullins-1.thefacebook.com (2620:10d:c081:10::13) by
+ mail.thefacebook.com (2620:10d:c081:35::125) with Microsoft SMTP Server id
+ 15.1.1713.5; Fri, 26 Apr 2019 11:50:13 -0700
+From:   Matt Mullins <mmullins@fb.com>
+To:     <hall@fb.com>, <mmullins@fb.com>, <ast@kernel.org>,
+        <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        "Jens Axboe" <axboe@kernel.dk>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        <linux-block@vger.kernel.org>, <nbd@other.debian.org>
+Subject: [PATCH bpf-next v5 3/5] nbd: add tracepoints for send/receive timing
+Date:   Fri, 26 Apr 2019 11:49:49 -0700
+Message-ID: <20190426184951.21812-4-mmullins@fb.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190426184951.21812-1-mmullins@fb.com>
+References: <20190426184951.21812-1-mmullins@fb.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 17d0aca3-e8f9-4a76-5ecf-08d6ca745f94
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Apr 2019 18:24:08.6659
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4782
+Content-Type: text/plain
+X-Originating-IP: [2620:10d:c081:10::13]
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-26_12:,,
+ signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-FB-Internal: Safe
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Until we fix this, I'm okay to have this change in the blktest, if this =0A=
-is breaking any exiting behavior.=0A=
-=0A=
-On 4/26/19 7:57 AM, Christoph Hellwig wrote:=0A=
-> On Fri, Apr 26, 2019 at 10:39:37AM +0800, Ming Lei wrote:=0A=
->> When T10 verification fails, the error code of BLK_STS_PROTECTION=0A=
->> may not be propagated to user space, see mpage_end_io().=0A=
-> =0A=
-> Well, we should probably fix that instead of papering over it..=0A=
-> =0A=
-=0A=
+From: Andrew Hall <hall@fb.com>
+
+This adds four tracepoints to nbd, enabling separate tracing of payload
+and header sending/receipt.
+
+In the send path for headers that have already been sent, we also
+explicitly initialize the handle so it can be referenced by the later
+tracepoint.
+
+Signed-off-by: Andrew Hall <hall@fb.com>
+Signed-off-by: Matt Mullins <mmullins@fb.com>
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+---
+ drivers/block/nbd.c        |  8 ++++++
+ include/trace/events/nbd.h | 51 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 24cc10d1f0b4..3e6c3d5dadc8 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -513,6 +513,10 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 	if (sent) {
+ 		if (sent >= sizeof(request)) {
+ 			skip = sent - sizeof(request);
++
++			/* initialize handle for tracing purposes */
++			handle = nbd_cmd_handle(cmd);
++
+ 			goto send_pages;
+ 		}
+ 		iov_iter_advance(&from, sent);
+@@ -536,6 +540,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 		(unsigned long long)blk_rq_pos(req) << 9, blk_rq_bytes(req));
+ 	result = sock_xmit(nbd, index, 1, &from,
+ 			(type == NBD_CMD_WRITE) ? MSG_MORE : 0, &sent);
++	trace_nbd_header_sent(req, handle);
+ 	if (result <= 0) {
+ 		if (was_interrupted(result)) {
+ 			/* If we havne't sent anything we can just return BUSY,
+@@ -608,6 +613,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 		bio = next;
+ 	}
+ out:
++	trace_nbd_payload_sent(req, handle);
+ 	nsock->pending = NULL;
+ 	nsock->sent = 0;
+ 	return 0;
+@@ -655,6 +661,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 			tag, req);
+ 		return ERR_PTR(-ENOENT);
+ 	}
++	trace_nbd_header_received(req, handle);
+ 	cmd = blk_mq_rq_to_pdu(req);
+ 
+ 	mutex_lock(&cmd->lock);
+@@ -708,6 +715,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 		}
+ 	}
+ out:
++	trace_nbd_payload_received(req, handle);
+ 	mutex_unlock(&cmd->lock);
+ 	return ret ? ERR_PTR(ret) : cmd;
+ }
+diff --git a/include/trace/events/nbd.h b/include/trace/events/nbd.h
+index 5928255ed02e..9849956f34d8 100644
+--- a/include/trace/events/nbd.h
++++ b/include/trace/events/nbd.h
+@@ -7,6 +7,57 @@
+ 
+ #include <linux/tracepoint.h>
+ 
++DECLARE_EVENT_CLASS(nbd_transport_event,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle),
++
++	TP_STRUCT__entry(
++		__field(struct request *, req)
++		__field(u64, handle)
++	),
++
++	TP_fast_assign(
++		__entry->req = req;
++		__entry->handle = handle;
++	),
++
++	TP_printk(
++		"nbd transport event: request %p, handle 0x%016llx",
++		__entry->req,
++		__entry->handle
++	)
++);
++
++DEFINE_EVENT(nbd_transport_event, nbd_header_sent,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle)
++);
++
++DEFINE_EVENT(nbd_transport_event, nbd_payload_sent,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle)
++);
++
++DEFINE_EVENT(nbd_transport_event, nbd_header_received,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle)
++);
++
++DEFINE_EVENT(nbd_transport_event, nbd_payload_received,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle)
++);
++
+ DECLARE_EVENT_CLASS(nbd_send_request,
+ 
+ 	TP_PROTO(struct nbd_request *nbd_request, int index,
+-- 
+2.17.1
+
