@@ -2,188 +2,128 @@ Return-Path: <SRS0=I+xz=S4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D288C43218
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 18:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CF9EC43218
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 19:54:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 511C520B7C
-	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 18:51:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6FA5206DD
+	for <linux-block@archiver.kernel.org>; Fri, 26 Apr 2019 19:54:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="Z/UPKfti"
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="tm7Ll0mq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726571AbfDZSvP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Apr 2019 14:51:15 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:41146 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726341AbfDZSvO (ORCPT
+        id S1726571AbfDZTyB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Apr 2019 15:54:01 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:45256 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726458AbfDZTyB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Apr 2019 14:51:14 -0400
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3QInV9s004908;
-        Fri, 26 Apr 2019 11:50:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-type; s=facebook; bh=U9btbdN6iOLmTBHesjvAEFIqWr3Fke2ki4D7RR67zXM=;
- b=Z/UPKftiJ8XiofxlO5x2DsI+p3g5we+YSCz7paHOVeel1DOhQskVGA8X9hQrkFWSdjFn
- 0iIHZ5ythrjkhjXx0CRDbGhK+DJyS78GCVHnK2uxvHHto5/haleZ1RvlS+5zO7MNaB0B
- feT+mLyBSv7PZsies/XLIgy1PzbCW1oUYMg= 
-Received: from mail.thefacebook.com (mailout.thefacebook.com [199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2s447r0s22-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Fri, 26 Apr 2019 11:50:14 -0700
-Received: from mmullins-1.thefacebook.com (2620:10d:c081:10::13) by
- mail.thefacebook.com (2620:10d:c081:35::125) with Microsoft SMTP Server id
- 15.1.1713.5; Fri, 26 Apr 2019 11:50:12 -0700
-From:   Matt Mullins <mmullins@fb.com>
-To:     <hall@fb.com>, <mmullins@fb.com>, <ast@kernel.org>,
-        <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        "Jens Axboe" <axboe@kernel.dk>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Martin KaFai Lau <kafai@fb.com>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        <linux-block@vger.kernel.org>, <nbd@other.debian.org>
-Subject: [PATCH bpf-next v5 2/5] nbd: trace sending nbd requests
-Date:   Fri, 26 Apr 2019 11:49:48 -0700
-Message-ID: <20190426184951.21812-3-mmullins@fb.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190426184951.21812-1-mmullins@fb.com>
-References: <20190426184951.21812-1-mmullins@fb.com>
+        Fri, 26 Apr 2019 15:54:01 -0400
+Received: by mail-ed1-f66.google.com with SMTP id k92so1642167edc.12
+        for <linux-block@vger.kernel.org>; Fri, 26 Apr 2019 12:53:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=CclSjEmiXiSlhJvEM0nCka2oVLetq2OrybfVhVCKkf4=;
+        b=tm7Ll0mqO6L7BLKjJljJoeSgMHTudSSJLpPCj2pF4XYHMU+RzGfje9567zd4y/B9N0
+         d+3wDh77oIH3DBKRTD1wDd4v6Jeyi8s+1r0hyO4x7Ej3V0YjckFsR7vaxQD3xQL3Mt3s
+         47AygZ3kOby78oWs1zLLZ6UN31eoaDR1W7wwxxZgO8WLdr/TNE3gClkow5BZnPYL7jgv
+         +ysWa/QJktlj6PgduM/CJZayTVs/m7+RfZ6QQKUfXSkRtusffvcsb1J+ERzejhhYLR13
+         dK9CPeH0e9KNq7W7VlBzaEBQxInLpE7aEut5h80xw5/7koSJioR54P5GCMVYU9a5s1gC
+         gTJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=CclSjEmiXiSlhJvEM0nCka2oVLetq2OrybfVhVCKkf4=;
+        b=JLFiP0v7ImK6LZ1qo/WgtwibI3tuEKPbaj9dIWj1jtKM6S9DT2PKWGUoDDOVqukMOU
+         6NyPZq9URqiFlUnNuMnUNkc3bBVae6AhSHE/gREBMSDYBafOrGrN1GQY55oySc2ygFY/
+         Tf5pnGFFBpmd7PFWzxtjqSgjVhiMrPdHy/Z0BqS4gf9ytHHs3REE/i5yV9gkou76fnMS
+         RybKVNBfsSXfdXt68D4IoQU7WLJVA9HeLSKUOk6u/fzK6HhIubsU2MFqL4SbwKTXRm/z
+         vfAjgJEWdM/Ybd7PCfHTVIQN3PLv5dVH/Ip/2PndzJRX/t5Rm1+dGZG8dRmE9dIGklSV
+         dusw==
+X-Gm-Message-State: APjAAAXLWVJWEbIJJxajVrwEupmEXjBqWVMMlLFfmym0P/XXwxdzL4yl
+        DuQVrfikyL0zTAOGYRSnsFCvv6fksMM=
+X-Google-Smtp-Source: APXvYqyTBFVEZXdtmhErdUBXpgG4farfeWxxxbedcaNrBP2506cJHQXTE639LatmoqCoo7jeNTmg+w==
+X-Received: by 2002:a17:906:6312:: with SMTP id p18mr2142505ejk.143.1556308439031;
+        Fri, 26 Apr 2019 12:53:59 -0700 (PDT)
+Received: from [192.168.0.36] (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
+        by smtp.googlemail.com with ESMTPSA id q24sm1296980eda.25.2019.04.26.12.53.57
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 26 Apr 2019 12:53:58 -0700 (PDT)
+Subject: Re: [PATCH v5 0/3] lightnvm: next set of improvements for 5.2
+To:     Igor Konopko <igor.j.konopko@intel.com>, javier@javigon.com,
+        hans.holmberg@cnexlabs.com
+Cc:     linux-block@vger.kernel.org
+References: <20190426133513.23966-1-igor.j.konopko@intel.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <087e8d6e-8cdc-87ff-6e2f-cb1fa2fd0396@lightnvm.io>
+Date:   Fri, 26 Apr 2019 21:53:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [2620:10d:c081:10::13]
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-26_12:,,
- signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-FB-Internal: Safe
+In-Reply-To: <20190426133513.23966-1-igor.j.konopko@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds a tracepoint that can both observe the nbd request being sent
-to the server, as well as modify that request , e.g., setting a flag in
-the request that will cause the server to collect detailed tracing data.
+Thanks Igor. I've picked up 1 + 2.
 
-The struct request * being handled is included to permit correlation
-with the block tracepoints.
+The third I'm still noodling on. I think maybe one should bump the disk 
+format, since it's changed. Also, if it is, it should be a static setup 
+(i.e., 1,2,3), and not user configurable. Although, I do expect the 
+separate parallel units to have enough device-side redundancy to provide 
+adequate UBER.
 
-Signed-off-by: Matt Mullins <mmullins@fb.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
----
- MAINTAINERS                |  1 +
- drivers/block/nbd.c        |  5 ++++
- include/trace/events/nbd.h | 56 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 62 insertions(+)
- create mode 100644 include/trace/events/nbd.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 72dfb80e8721..025c6d27789e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10741,6 +10741,7 @@ L:	linux-block@vger.kernel.org
- L:	nbd@other.debian.org
- F:	Documentation/blockdev/nbd.txt
- F:	drivers/block/nbd.c
-+F:	include/trace/events/nbd.h
- F:	include/uapi/linux/nbd.h
- 
- NETWORK DROP MONITOR
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 92b8aafb8bb4..24cc10d1f0b4 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -44,6 +44,9 @@
- #include <linux/nbd-netlink.h>
- #include <net/genetlink.h>
- 
-+#define CREATE_TRACE_POINTS
-+#include <trace/events/nbd.h>
-+
- static DEFINE_IDR(nbd_index_idr);
- static DEFINE_MUTEX(nbd_index_mutex);
- static int nbd_total_devices = 0;
-@@ -526,6 +529,8 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 	handle = nbd_cmd_handle(cmd);
- 	memcpy(request.handle, &handle, sizeof(handle));
- 
-+	trace_nbd_send_request(&request, nbd->index, blk_mq_rq_from_pdu(cmd));
-+
- 	dev_dbg(nbd_to_dev(nbd), "request %p: sending control (%s@%llu,%uB)\n",
- 		req, nbdcmd_to_ascii(type),
- 		(unsigned long long)blk_rq_pos(req) << 9, blk_rq_bytes(req));
-diff --git a/include/trace/events/nbd.h b/include/trace/events/nbd.h
-new file mode 100644
-index 000000000000..5928255ed02e
---- /dev/null
-+++ b/include/trace/events/nbd.h
-@@ -0,0 +1,56 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM nbd
-+
-+#if !defined(_TRACE_NBD_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_NBD_H
-+
-+#include <linux/tracepoint.h>
-+
-+DECLARE_EVENT_CLASS(nbd_send_request,
-+
-+	TP_PROTO(struct nbd_request *nbd_request, int index,
-+		 struct request *rq),
-+
-+	TP_ARGS(nbd_request, index, rq),
-+
-+	TP_STRUCT__entry(
-+		__field(struct nbd_request *, nbd_request)
-+		__field(u64, dev_index)
-+		__field(struct request *, request)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->nbd_request = 0;
-+		__entry->dev_index = index;
-+		__entry->request = rq;
-+	),
-+
-+	TP_printk("nbd%lld: request %p", __entry->dev_index, __entry->request)
-+);
-+
-+#ifdef DEFINE_EVENT_WRITABLE
-+#undef NBD_DEFINE_EVENT
-+#define NBD_DEFINE_EVENT(template, call, proto, args, size)		\
-+	DEFINE_EVENT_WRITABLE(template, call, PARAMS(proto),		\
-+			      PARAMS(args), size)
-+#else
-+#undef NBD_DEFINE_EVENT
-+#define NBD_DEFINE_EVENT(template, call, proto, args, size)		\
-+	DEFINE_EVENT(template, call, PARAMS(proto), PARAMS(args))
-+#endif
-+
-+NBD_DEFINE_EVENT(nbd_send_request, nbd_send_request,
-+
-+	TP_PROTO(struct nbd_request *nbd_request, int index,
-+		 struct request *rq),
-+
-+	TP_ARGS(nbd_request, index, rq),
-+
-+	sizeof(struct nbd_request)
-+);
-+
-+#endif
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
--- 
-2.17.1
+
+On 4/26/19 3:35 PM, Igor Konopko wrote:
+> This is another set of fixes and improvements to both pblk and lightnvm
+> core.
+> 
+> Changes v4 -> v5:
+> -dropped patches which were already pulled into for-5.2/core branch
+> -rebasing of other patches
+> -multiple copies of smeta patch moved into last position in series
+> so it would be easier to pull only previous patches if needed
+> 
+> Changes v3 -> v4:
+> -dropped patches which were already pulled into for-5.2/core branch
+> -major changes for patch #2 based on code review
+> -patch #6 modified to use krefs
+> -new patch #7 which extends the patch #6
+> 
+> Changes v2 -> v3:
+> -dropped some not needed patches
+> -dropped patches which were already pulled into for-5.2/core branch
+> -commit messages cleanup
+> 
+> Changes v1 -> v2:
+> -dropped some not needed patches
+> -review feedback incorporated for some of the patches
+> -partial read path changes patch splited into two patches
+> 
+> 
+> Igor Konopko (3):
+>    lightnvm: pblk: simplify partial read path
+>    lightnvm: pblk: use nvm_rq_to_ppa_list()
+>    lightnvm: pblk: store multiple copies of smeta
+> 
+>   drivers/lightnvm/pblk-core.c     | 159 ++++++++++++++----
+>   drivers/lightnvm/pblk-init.c     |  23 ++-
+>   drivers/lightnvm/pblk-rb.c       |  11 +-
+>   drivers/lightnvm/pblk-read.c     | 339 ++++++++++-----------------------------
+>   drivers/lightnvm/pblk-recovery.c |  27 ++--
+>   drivers/lightnvm/pblk-rl.c       |   3 +-
+>   drivers/lightnvm/pblk.h          |  19 +--
+>   7 files changed, 252 insertions(+), 329 deletions(-)
+> 
 
