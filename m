@@ -2,316 +2,198 @@ Return-Path: <SRS0=GE/Q=S5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FEDC43219
-	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 01:25:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED7E2C43219
+	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 01:40:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4FC6F2077B
-	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 01:25:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEEEE20C01
+	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 01:40:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1556329224;
+	bh=UJ46uSBSSQA/uiBoyOanVdRq7ujc6qhFCgyEJZABu7Y=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=Gxcxdd96sU1VQH0kHRVd0G0OCJFgRuX+8a3ygvTkxe7Rhg8uCExJmAj1PHdVo4VE9
+	 la9v3cYkBbIYZ5ff1DsP+RaNTGbjDxd/mh4Ho2U//3wlocsEIwl9VLtu91MiURVqnH
+	 Vg5qXWBMlrhYRSIcCqViu1569su4/PxyNdmNnIN4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727199AbfD0BZ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Apr 2019 21:25:26 -0400
-Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:46943 "EHLO
-        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727178AbfD0BZZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Apr 2019 21:25:25 -0400
-Received: from dread.disaster.area (pa49-181-171-240.pa.nsw.optusnet.com.au [49.181.171.240])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id D3AB510D444;
-        Sat, 27 Apr 2019 11:25:17 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92)
-        (envelope-from <david@fromorbit.com>)
-        id 1hKC5c-0004jm-8u; Sat, 27 Apr 2019 11:25:16 +1000
-Date:   Sat, 27 Apr 2019 11:25:16 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Jerome Glisse <jglisse@redhat.com>
-Cc:     lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [LSF/MM TOPIC] Direct block mapping through fs for device
-Message-ID: <20190427012516.GH1454@dread.disaster.area>
-References: <20190426013814.GB3350@redhat.com>
- <20190426062816.GG1454@dread.disaster.area>
- <20190426152044.GB13360@redhat.com>
+        id S1727959AbfD0BkX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Apr 2019 21:40:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43886 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727360AbfD0BkW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Apr 2019 21:40:22 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4FA14214AE;
+        Sat, 27 Apr 2019 01:40:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1556329221;
+        bh=UJ46uSBSSQA/uiBoyOanVdRq7ujc6qhFCgyEJZABu7Y=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=LuoWzH4rjs5gDLDix4JnUNpwt8CWhLTfieD7kZvWU1hIV0M+gm7FyCYosd0YmZDer
+         tILYETTDDEIABvRT4c7fziU1Ep11ZOevUOdTVGJLsE+CXVAdnsbE9d7hEb7ElMTqz6
+         zXKOUEyk5bQ2ytN/gOCyuGviUA8VMTyzhr3Y2sB4=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.0 64/79] block, bfq: fix use after free in bfq_bfqq_expire
+Date:   Fri, 26 Apr 2019 21:38:23 -0400
+Message-Id: <20190427013838.6596-64-sashal@kernel.org>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190427013838.6596-1-sashal@kernel.org>
+References: <20190427013838.6596-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190426152044.GB13360@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0 cx=a_idp_d
-        a=LhzQONXuMOhFZtk4TmSJIw==:117 a=LhzQONXuMOhFZtk4TmSJIw==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=oexKYjalfGEA:10
-        a=7-415B0cAAAA:8 a=SilY-4-awVSwrndW5ZYA:9 a=hHpGJbNLqnb1Yhi3:21
-        a=WGQLJQAUvfBwYTRy:21 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 26, 2019 at 11:20:45AM -0400, Jerome Glisse wrote:
-> On Fri, Apr 26, 2019 at 04:28:16PM +1000, Dave Chinner wrote:
-> > On Thu, Apr 25, 2019 at 09:38:14PM -0400, Jerome Glisse wrote:
-> > > I see that they are still empty spot in LSF/MM schedule so i would like to
-> > > have a discussion on allowing direct block mapping of file for devices (nic,
-> > > gpu, fpga, ...). This is mm, fs and block discussion, thought the mm side
-> > > is pretty light ie only adding 2 callback to vm_operations_struct:
-> > 
-> > The filesystem already has infrastructure for the bits it needs to
-> > provide. They are called file layout leases (how many times do I
-> > have to keep telling people this!), and what you do with the lease
-> > for the LBA range the filesystem maps for you is then something you
-> > can negotiate with the underlying block device.
-> > 
-> > i.e. go look at how xfs_pnfs.c works to hand out block mappings to
-> > remote pNFS clients so they can directly access the underlying
-> > storage. Basically, anyone wanting to map blocks needs a file layout
-> > lease and then to manage the filesystem state over that range via
-> > these methods in the struct export_operations:
-> > 
-> >         int (*get_uuid)(struct super_block *sb, u8 *buf, u32 *len, u64 *offset);
-> >         int (*map_blocks)(struct inode *inode, loff_t offset,
-> >                           u64 len, struct iomap *iomap,
-> >                           bool write, u32 *device_generation);
-> >         int (*commit_blocks)(struct inode *inode, struct iomap *iomaps,
-> >                              int nr_iomaps, struct iattr *iattr);
-> > 
-> > Basically, before you read/write data, you map the blocks. if you've
-> > written data, then you need to commit the blocks (i.e. tell the fs
-> > they've been written to).
-> > 
-> > The iomap will give you a contiguous LBA range and the block device
-> > they belong to, and you can then use that to whatever smart DMA stuff
-> > you need to do through the block device directly.
-> > 
-> > If the filesystem wants the space back (e.g. because truncate) then
-> > the lease will be revoked. The client then must finish off it's
-> > outstanding operations, commit them and release the lease. To access
-> > the file range again, it must renew the lease and remap the file
-> > through ->map_blocks....
-> 
-> Sorry i should have explain why lease do not work. Here are list of
-> lease shortcoming AFAIK:
->     - only one process
+From: Paolo Valente <paolo.valente@linaro.org>
 
-Sorry, what? The lease is taken by a application process that then
-hands out the mapping to whatever parts of it - processes, threads,
-remote clients, etc - need access. If your application doesn't
-have an access co-ordination method, then you're already completely
-screwed.
+[ Upstream commit eed47d19d9362bdd958e4ab56af480b9dbf6b2b6 ]
 
->     - program ie userspace is responsible for doing the right thing
->       so heavy burden on userspace program
+The function bfq_bfqq_expire() invokes the function
+__bfq_bfqq_expire(), and the latter may free the in-service bfq-queue.
+If this happens, then no other instruction of bfq_bfqq_expire() must
+be executed, or a use-after-free will occur.
 
-You're asking for direct access to storage owned by the filesystem.
-The application *must* play by the filesystem rules. Stop trying to
-hack around the fact that the filesystem controls access to the
-block mapping.
+Basing on the assumption that __bfq_bfqq_expire() invokes
+bfq_put_queue() on the in-service bfq-queue exactly once, the queue is
+assumed to be freed if its refcounter is equal to one right before
+invoking __bfq_bfqq_expire().
 
->     - lease break time induce latency
+But, since commit 9dee8b3b057e ("block, bfq: fix queue removal from
+weights tree") this assumption is false. __bfq_bfqq_expire() may also
+invoke bfq_weights_tree_remove() and, since commit 9dee8b3b057e
+("block, bfq: fix queue removal from weights tree"), also
+the latter function may invoke bfq_put_queue(). So __bfq_bfqq_expire()
+may invoke bfq_put_queue() twice, and this is the actual case where
+the in-service queue may happen to be freed.
 
-Lease breaks should never happen in normal workloads, so this isn't
-an issue. IF you have an application that requires exclusive access,
-then ensure that the file can only be accessed by the application
-and the lease should never be broken.
+To address this issue, this commit moves the check on the refcounter
+of the queue right around the last bfq_put_queue() that may be invoked
+on the queue.
 
-But if you are going to ask for filesystems to hand out block
-mapping for thrid party access, the 3rd parties need to play by the
-filesystem's access rules, and that means they /must/ break access
-if the filesystem asks them to.
+Fixes: 9dee8b3b057e ("block, bfq: fix queue removal from weights tree")
+Reported-by: Dmitrii Tcvetkov <demfloro@demfloro.ru>
+Reported-by: Douglas Anderson <dianders@chromium.org>
+Tested-by: Dmitrii Tcvetkov <demfloro@demfloro.ru>
+Tested-by: Douglas Anderson <dianders@chromium.org>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/bfq-iosched.c | 15 +++++++--------
+ block/bfq-iosched.h |  2 +-
+ block/bfq-wf2q.c    | 17 +++++++++++++++--
+ 3 files changed, 23 insertions(+), 11 deletions(-)
 
->     - lease may require privileges for the applications
-
-If you can directly access the underlying block device (which
-requires root/CAP_SYS_ADMIN) then the application has sufficient
-privilege to get a file layout lease.
-
->     - work on file descriptor not virtual addresses
-
-Sorry, what? You want direct access to the underlying storage device
-for direct DMA, not access to the page cache. i.e. you need a
-mapping for a range of a file (from offset X to Y) and you most
-definitely do not need the file to be virtually mapped for that.
-
-If you want to DMA from a userspace or peer device memory to storage
-directly, then you definitely do not want the file to mapped into
-the page cache, and so mmap() is most definitely the wrong interface
-to be using to set up direct storage access to a file.
-
-> While what i am trying to achieve is:
->     - support any number of process
-
-file leases don't prevent that.
-
->     - work on virtual addresses
-
-like direct io, get_user_pages() works just fine for this.
-
->     - is an optimization ie falling back to page cache is _always_
->       acceptable
-
-No, it isn't. Falling back to the page cache will break the layout
-lease because the lock filesystem does IO that breaks existing
-leases. You can't have both a layout lease and page cache access to
-the same file.
-
->     - no changes to userspace program ie existing program can
->       benefit from this by just running on a kernel with the
->       feature on the system with hardware that support this.
-
-That's a pipe dream. Existing direct access applications /don't work/ with
-file-backed mmap() ranges. They will not work with DAX, either, so
-please stop with the "work with unmodified existing applications"
-already.
-
-If you want peer to peer DMA to filesystem managed storage, then you
-*must* use the filesystem to manage access to that storage.
-
->     - allow multiple different devices to map the block (can be
->       read only if the fabric between devices is not cache coherent)
-
-Nothing about a layout lease prevents that. What the application
-does with the layout lease is it's own business.
-
->     - it is an optimization ie avoiding to waste main memory if file
->       is only accessed by device
-
-Layout leases don't prevent this - they are explicitly for allowing
-this sort of access to be made safely.
-
->     - there is _no pin_ and it can be revoke at _any_ time from within
->       the kernel ie there is no need to rely on application to do the
->       right thing
-
-Revoke how, exactly? Are you really proposing sending SEGV to user
-processes as the revoke mechanism?
-
->     - not only support filesystem but also vma that comes from device
->       file
-
-What's a "device file" and how is that any difference from a normal
-kernel file?
-
-> The motivation is coming from new storage technology (NVMe with CMB for
-> instance) where block device can offer byte addressable access to block.
-> It can be read only or read and write. When you couple this with gpu,
-> fgpa, tpu that can crunch massive data set (in the tera bytes ranges)
-> then avoiding going through main memory becomes an appealing prospect.
->
-> If we can achieve that with no disruption to the application programming
-> model the better it is. By allowing to mediate direct block access through
-> vma we can achieve that.
-
-I have a hammer that I can use to mediate direct block access, too.
-
-That doesn't mean it's the right tool for the job. At it's most
-fundamental level, the block mapping is between an inode, the file
-offset and the LBA range in the block device that the storage device
-presents to users. This is entirely /filesystem information/ and we
-already have interfaces to manage and arbitrate safe direct storage
-access for third parties.
-
-Stop trying to re-invent the wheel and use the one we already have.
-
-> This is why i am believe something at the vma level is better suited to
-> make such thing as easy and transparent as possible. Note that unlike
-> GUP there is _no pinning_ so filesystem is always in total control and
-> can revoke at _any_ time.
-
-Revoke how, exactly? And how do applications pause and restart when
-this undefined revoke mechanism is invoked? What happens to access
-latency when this revoke occurs and why is this any different to
-having a file layout lease revoked?
-
-> Also because it is all kernel side we should
-> achieve much better latency (flushing device page table is usualy faster
-> then switching to userspace and having userspace calling back into the
-> driver).
-> 
-> 
-> > 
-> > > So i would like to gather people feedback on general approach and few things
-> > > like:
-> > >     - Do block device need to be able to invalidate such mapping too ?
-> > > 
-> > >       It is easy for fs the to invalidate as it can walk file mappings
-> > >       but block device do not know about file.
-> > 
-> > If you are needing the block device to invalidate filesystem level
-> > information, then your model is all wrong.
-> 
-> It is _not_ a requirement. It is a feature and it does not need to be
-> implemented right away the motivation comes from block device that can
-> manage their PCIE BAR address space dynamicly and they might want to
-> unmap some block to make room for other block. For this they would need
-> to make sure that they can revoke access from device or CPU they might
-> have mapped the block they want to evict.
-
-This has nothing to do with the /layout lease/. Layout leases are
-for managing direct device access, not how the application interacts
-with the hardware that it has been given a block mapping for.
-
-Jerome, it seems to me like you're conflating hardware management
-issues with block device access and LBA management. These are
-completely separate things that the application has to manage - the
-filesystem and the layout lease doesn't give a shit about whether
-the application has exhausted the hardware PCIE BAR space.  i.e.
-hardware kicking out a user address mapping does not invalidate the
-layout lease in any way - it just requires the application to set up
-that direct access map in the hardware again.  The file offset to
-LBA mapping that the layout lease manages is entirely unaffected by
-this sort of problem.
-
-> > >     - Maybe some share helpers for block devices that could track file
-> > >       corresponding to peer mapping ?
-> > 
-> > If the application hasn't supplied the peer with the file it needs
-> > to access, get a lease from and then map an LBA range out of, then
-> > you are doing it all wrong.
-> 
-> I do not have the same programming model than one you have in mind, i
-> want to allow existing application which mmap files and access that
-> mapping through a device or CPU to directly access those blocks through
-> the virtual address.
-
-Which is the *wrong model*.
-
-mmap() of a file-backed mapping does not provide a sane, workable
-direct storage access management API. It's fundamentally flawed
-because it does not provide any guarantee about the underlying
-filesystem information (e.g. the block mapping) and as such, results
-in a largely unworkable model that we need all sorts of complexity
-to sorta make work.
-
-Layout leases and the export ops provide the application with the
-exact information they need to directly access the storage
-underneath the filesystem in a safe manner. They do not, in any way,
-control how the application then uses that information. If you
-really want to use mmap() to access the storage, then you can mmap()
-the ranges of the block device the ->map_blocks() method tells you
-belong to that file. 
-
-You can do whatever you want with those vmas and the filesystem
-doesn't care - it's not involved in /any way whatsoever/ with the
-data transfer into and out of the storage because ->map_blocks has
-guaranteed that the storage is allocated. All the application needs
-to do is call ->commit_blocks on each range of the mapping it writes
-data into to tell the filesystem it now contains valid data.  It's
-simple, straight forward, and hard to get wrong from both userspace
-and the kernel filesystem side.
-
-Please stop trying to invent new and excitingly complex ways to do
-direct block access because we ialready have infrastructure we know
-works, we already support and is flexible enough to provide exactly
-the sort of direct block device access mechainsms that you are
-asking for.
-
-Cheers,
-
-Dave.
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index e5ed28629271..72510c470001 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -2804,7 +2804,7 @@ static void bfq_dispatch_remove(struct request_queue *q, struct request *rq)
+ 	bfq_remove_request(q, rq);
+ }
+ 
+-static void __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++static bool __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ {
+ 	/*
+ 	 * If this bfqq is shared between multiple processes, check
+@@ -2837,9 +2837,11 @@ static void __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 	/*
+ 	 * All in-service entities must have been properly deactivated
+ 	 * or requeued before executing the next function, which
+-	 * resets all in-service entites as no more in service.
++	 * resets all in-service entities as no more in service. This
++	 * may cause bfqq to be freed. If this happens, the next
++	 * function returns true.
+ 	 */
+-	__bfq_bfqd_reset_in_service(bfqd);
++	return __bfq_bfqd_reset_in_service(bfqd);
+ }
+ 
+ /**
+@@ -3244,7 +3246,6 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 	bool slow;
+ 	unsigned long delta = 0;
+ 	struct bfq_entity *entity = &bfqq->entity;
+-	int ref;
+ 
+ 	/*
+ 	 * Check whether the process is slow (see bfq_bfqq_is_slow).
+@@ -3313,10 +3314,8 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 	 * reason.
+ 	 */
+ 	__bfq_bfqq_recalc_budget(bfqd, bfqq, reason);
+-	ref = bfqq->ref;
+-	__bfq_bfqq_expire(bfqd, bfqq);
+-
+-	if (ref == 1) /* bfqq is gone, no more actions on it */
++	if (__bfq_bfqq_expire(bfqd, bfqq))
++		/* bfqq is gone, no more actions on it */
+ 		return;
+ 
+ 	bfqq->injected_service = 0;
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 746bd570b85a..ca98c98a8179 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -993,7 +993,7 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity,
+ 			     bool ins_into_idle_tree);
+ bool next_queue_may_preempt(struct bfq_data *bfqd);
+ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd);
+-void __bfq_bfqd_reset_in_service(struct bfq_data *bfqd);
++bool __bfq_bfqd_reset_in_service(struct bfq_data *bfqd);
+ void bfq_deactivate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 			 bool ins_into_idle_tree, bool expiration);
+ void bfq_activate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index 4aab1a8191f0..8077bf71d2ac 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -1599,7 +1599,8 @@ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
+ 	return bfqq;
+ }
+ 
+-void __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
++/* returns true if the in-service queue gets freed */
++bool __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
+ {
+ 	struct bfq_queue *in_serv_bfqq = bfqd->in_service_queue;
+ 	struct bfq_entity *in_serv_entity = &in_serv_bfqq->entity;
+@@ -1623,8 +1624,20 @@ void __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
+ 	 * service tree either, then release the service reference to
+ 	 * the queue it represents (taken with bfq_get_entity).
+ 	 */
+-	if (!in_serv_entity->on_st)
++	if (!in_serv_entity->on_st) {
++		/*
++		 * If no process is referencing in_serv_bfqq any
++		 * longer, then the service reference may be the only
++		 * reference to the queue. If this is the case, then
++		 * bfqq gets freed here.
++		 */
++		int ref = in_serv_bfqq->ref;
+ 		bfq_put_queue(in_serv_bfqq);
++		if (ref == 1)
++			return true;
++	}
++
++	return false;
+ }
+ 
+ void bfq_deactivate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
 -- 
-Dave Chinner
-david@fromorbit.com
+2.19.1
+
