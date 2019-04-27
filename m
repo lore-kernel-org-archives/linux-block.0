@@ -2,102 +2,48 @@ Return-Path: <SRS0=GE/Q=S5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9751AC43218
-	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 15:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DF36C43219
+	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 16:05:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 66681208C2
-	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 15:58:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26C312087F
+	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 16:05:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="rMsRMqDC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726253AbfD0P6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Apr 2019 11:58:44 -0400
-Received: from mx2.suse.de ([195.135.220.15]:35714 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726231AbfD0P6o (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Apr 2019 11:58:44 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 08058AE14;
-        Sat, 27 Apr 2019 15:58:42 +0000 (UTC)
-Subject: Re: [LSF/MM] Preliminary agenda ? Anyone ... anyone ? Bueller ?
-To:     Jens Axboe <axboe@kernel.dk>, Jerome Glisse <jglisse@redhat.com>,
-        lsf-pc@lists.linux-foundation.org
-Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lsf@lists.linux-foundation.org
-References: <20190425200012.GA6391@redhat.com>
- <83fda245-849a-70cc-dde0-5c451938ee97@kernel.dk>
-From:   Vlastimil Babka <vbabka@suse.cz>
-Openpgp: preference=signencrypt
-Autocrypt: addr=vbabka@suse.cz; prefer-encrypt=mutual; keydata=
- mQINBFZdmxYBEADsw/SiUSjB0dM+vSh95UkgcHjzEVBlby/Fg+g42O7LAEkCYXi/vvq31JTB
- KxRWDHX0R2tgpFDXHnzZcQywawu8eSq0LxzxFNYMvtB7sV1pxYwej2qx9B75qW2plBs+7+YB
- 87tMFA+u+L4Z5xAzIimfLD5EKC56kJ1CsXlM8S/LHcmdD9Ctkn3trYDNnat0eoAcfPIP2OZ+
- 9oe9IF/R28zmh0ifLXyJQQz5ofdj4bPf8ecEW0rhcqHfTD8k4yK0xxt3xW+6Exqp9n9bydiy
- tcSAw/TahjW6yrA+6JhSBv1v2tIm+itQc073zjSX8OFL51qQVzRFr7H2UQG33lw2QrvHRXqD
- Ot7ViKam7v0Ho9wEWiQOOZlHItOOXFphWb2yq3nzrKe45oWoSgkxKb97MVsQ+q2SYjJRBBH4
- 8qKhphADYxkIP6yut/eaj9ImvRUZZRi0DTc8xfnvHGTjKbJzC2xpFcY0DQbZzuwsIZ8OPJCc
- LM4S7mT25NE5kUTG/TKQCk922vRdGVMoLA7dIQrgXnRXtyT61sg8PG4wcfOnuWf8577aXP1x
- 6mzw3/jh3F+oSBHb/GcLC7mvWreJifUL2gEdssGfXhGWBo6zLS3qhgtwjay0Jl+kza1lo+Cv
- BB2T79D4WGdDuVa4eOrQ02TxqGN7G0Biz5ZLRSFzQSQwLn8fbwARAQABtCBWbGFzdGltaWwg
- QmFia2EgPHZiYWJrYUBzdXNlLmN6PokCVAQTAQoAPgIbAwULCQgHAwUVCgkICwUWAgMBAAIe
- AQIXgBYhBKlA1DSZLC6OmRA9UCJPp+fMgqZkBQJcbbyGBQkH8VTqAAoJECJPp+fMgqZkpGoP
- /1jhVihakxw1d67kFhPgjWrbzaeAYOJu7Oi79D8BL8Vr5dmNPygbpGpJaCHACWp+10KXj9yz
- fWABs01KMHnZsAIUytVsQv35DMMDzgwVmnoEIRBhisMYOQlH2bBn/dqBjtnhs7zTL4xtqEcF
- 1hoUFEByMOey7gm79utTk09hQE/Zo2x0Ikk98sSIKBETDCl4mkRVRlxPFl4O/w8dSaE4eczH
- LrKezaFiZOv6S1MUKVKzHInonrCqCNbXAHIeZa3JcXCYj1wWAjOt9R3NqcWsBGjFbkgoKMGD
- usiGabetmQjXNlVzyOYdAdrbpVRNVnaL91sB2j8LRD74snKsV0Wzwt90YHxDQ5z3M75YoIdl
- byTKu3BUuqZxkQ/emEuxZ7aRJ1Zw7cKo/IVqjWaQ1SSBDbZ8FAUPpHJxLdGxPRN8Pfw8blKY
- 8mvLJKoF6i9T6+EmlyzxqzOFhcc4X5ig5uQoOjTIq6zhLO+nqVZvUDd2Kz9LMOCYb516cwS/
- Enpi0TcZ5ZobtLqEaL4rupjcJG418HFQ1qxC95u5FfNki+YTmu6ZLXy+1/9BDsPuZBOKYpUm
- 3HWSnCS8J5Ny4SSwfYPH/JrtberWTcCP/8BHmoSpS/3oL3RxrZRRVnPHFzQC6L1oKvIuyXYF
- rkybPXYbmNHN+jTD3X8nRqo+4Qhmu6SHi3VquQENBFsZNQwBCACuowprHNSHhPBKxaBX7qOv
- KAGCmAVhK0eleElKy0sCkFghTenu1sA9AV4okL84qZ9gzaEoVkgbIbDgRbKY2MGvgKxXm+kY
- n8tmCejKoeyVcn9Xs0K5aUZiDz4Ll9VPTiXdf8YcjDgeP6/l4kHb4uSW4Aa9ds0xgt0gP1Xb
- AMwBlK19YvTDZV5u3YVoGkZhspfQqLLtBKSt3FuxTCU7hxCInQd3FHGJT/IIrvm07oDO2Y8J
- DXWHGJ9cK49bBGmK9B4ajsbe5GxtSKFccu8BciNluF+BqbrIiM0upJq5Xqj4y+Xjrpwqm4/M
- ScBsV0Po7qdeqv0pEFIXKj7IgO/d4W2bABEBAAGJA3IEGAEKACYWIQSpQNQ0mSwujpkQPVAi
- T6fnzIKmZAUCWxk1DAIbAgUJA8JnAAFACRAiT6fnzIKmZMB0IAQZAQoAHRYhBKZ2GgCcqNxn
- k0Sx9r6Fd25170XjBQJbGTUMAAoJEL6Fd25170XjDBUH/2jQ7a8g+FC2qBYxU/aCAVAVY0NE
- YuABL4LJ5+iWwmqUh0V9+lU88Cv4/G8fWwU+hBykSXhZXNQ5QJxyR7KWGy7LiPi7Cvovu+1c
- 9Z9HIDNd4u7bxGKMpn19U12ATUBHAlvphzluVvXsJ23ES/F1c59d7IrgOnxqIcXxr9dcaJ2K
- k9VP3TfrjP3g98OKtSsyH0xMu0MCeyewf1piXyukFRRMKIErfThhmNnLiDbaVy6biCLx408L
- Mo4cCvEvqGKgRwyckVyo3JuhqreFeIKBOE1iHvf3x4LU8cIHdjhDP9Wf6ws1XNqIvve7oV+w
- B56YWoalm1rq00yUbs2RoGcXmtX1JQ//aR/paSuLGLIb3ecPB88rvEXPsizrhYUzbe1TTkKc
- 4a4XwW4wdc6pRPVFMdd5idQOKdeBk7NdCZXNzoieFntyPpAq+DveK01xcBoXQ2UktIFIsXey
- uSNdLd5m5lf7/3f0BtaY//f9grm363NUb9KBsTSnv6Vx7Co0DWaxgC3MFSUhxzBzkJNty+2d
- 10jvtwOWzUN+74uXGRYSq5WefQWqqQNnx+IDb4h81NmpIY/X0PqZrapNockj3WHvpbeVFAJ0
- 9MRzYP3x8e5OuEuJfkNnAbwRGkDy98nXW6fKeemREjr8DWfXLKFWroJzkbAVmeIL0pjXATxr
- +tj5JC0uvMrrXefUhXTo0SNoTsuO/OsAKOcVsV/RHHTwCDR2e3W8mOlA3QbYXsscgjghbuLh
- J3oTRrOQa8tUXWqcd5A0+QPo5aaMHIK0UAthZsry5EmCY3BrbXUJlt+23E93hXQvfcsmfi0N
- rNh81eknLLWRYvMOsrbIqEHdZBT4FHHiGjnck6EYx/8F5BAZSodRVEAgXyC8IQJ+UVa02QM5
- D2VL8zRXZ6+wARKjgSrW+duohn535rG/ypd0ctLoXS6dDrFokwTQ2xrJiLbHp9G+noNTHSan
- ExaRzyLbvmblh3AAznb68cWmM3WVkceWACUalsoTLKF1sGrrIBj5updkKkzbKOq5gcC5AQ0E
- Wxk1NQEIAJ9B+lKxYlnKL5IehF1XJfknqsjuiRzj5vnvVrtFcPlSFL12VVFVUC2tT0A1Iuo9
- NAoZXEeuoPf1dLDyHErrWnDyn3SmDgb83eK5YS/K363RLEMOQKWcawPJGGVTIRZgUSgGusKL
- NuZqE5TCqQls0x/OPljufs4gk7E1GQEgE6M90Xbp0w/r0HB49BqjUzwByut7H2wAdiNAbJWZ
- F5GNUS2/2IbgOhOychHdqYpWTqyLgRpf+atqkmpIJwFRVhQUfwztuybgJLGJ6vmh/LyNMRr8
- J++SqkpOFMwJA81kpjuGR7moSrUIGTbDGFfjxmskQV/W/c25Xc6KaCwXah3OJ40AEQEAAYkC
- PAQYAQoAJhYhBKlA1DSZLC6OmRA9UCJPp+fMgqZkBQJbGTU1AhsMBQkDwmcAAAoJECJPp+fM
- gqZkPN4P/Ra4NbETHRj5/fM1fjtngt4dKeX/6McUPDIRuc58B6FuCQxtk7sX3ELs+1+w3eSV
- rHI5cOFRSdgw/iKwwBix8D4Qq0cnympZ622KJL2wpTPRLlNaFLoe5PkoORAjVxLGplvQIlhg
- miljQ3R63ty3+MZfkSVsYITlVkYlHaSwP2t8g7yTVa+q8ZAx0NT9uGWc/1Sg8j/uoPGrctml
- hFNGBTYyPq6mGW9jqaQ8en3ZmmJyw3CHwxZ5FZQ5qc55xgshKiy8jEtxh+dgB9d8zE/S/UGI
- E99N/q+kEKSgSMQMJ/CYPHQJVTi4YHh1yq/qTkHRX+ortrF5VEeDJDv+SljNStIxUdroPD29
- 2ijoaMFTAU+uBtE14UP5F+LWdmRdEGS1Ah1NwooL27uAFllTDQxDhg/+LJ/TqB8ZuidOIy1B
- xVKRSg3I2m+DUTVqBy7Lixo73hnW69kSjtqCeamY/NSu6LNP+b0wAOKhwz9hBEwEHLp05+mj
- 5ZFJyfGsOiNUcMoO/17FO4EBxSDP3FDLllpuzlFD7SXkfJaMWYmXIlO0jLzdfwfcnDzBbPwO
- hBM8hvtsyq8lq8vJOxv6XD6xcTtj5Az8t2JjdUX6SF9hxJpwhBU0wrCoGDkWp4Bbv6jnF7zP
- Nzftr4l8RuJoywDIiJpdaNpSlXKpj/K6KrnyAI/joYc7
-Message-ID: <503ba1f9-ad78-561a-9614-1dcb139439a6@suse.cz>
-Date:   Sat, 27 Apr 2019 17:55:20 +0200
+        id S1726071AbfD0QFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Apr 2019 12:05:48 -0400
+Received: from mail.stbuehler.de ([5.9.32.208]:56948 "EHLO mail.stbuehler.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725942AbfD0QFs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 Apr 2019 12:05:48 -0400
+Received: from [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6] (unknown [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6])
+        by mail.stbuehler.de (Postfix) with ESMTPSA id 4044AC00AD7;
+        Sat, 27 Apr 2019 16:05:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=stbuehler.de;
+        s=stbuehler1; t=1556381146;
+        bh=2aDIRT40jN0x7yXFPvlwlyjY4FL3cGNxBbJpbs5+vn4=;
+        h=Subject:To:References:From:Date:In-Reply-To:From;
+        b=rMsRMqDCXhP7zGJwkfNXAgH09HExn3KGjbxbn2xA3v+KoJ1LZMZoLk2XMWZqL68Gi
+         aypc5KvD3NAlZX7/OxcvjmRZBCCJGhEWhUEP5omtIbqYLNtzFJvUiNFEaRxqVS29K9
+         B5Pz4HVjpOs2o/rOsLR1c7wmWC+T5KcoHT48dxAc=
+Subject: Re: io_uring: RWF_NOWAIT support
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <366484f9-cc5b-e477-6cc5-6c65f21afdcb@stbuehler.de>
+ <37071226-375a-07a6-d3d3-21323145de71@kernel.dk>
+ <bc077192-56cc-7497-ee43-6a0bcc369d16@kernel.dk>
+ <740192f8-1d64-9e64-0aea-a73e5d6d4d46@kernel.dk>
+From:   =?UTF-8?Q?Stefan_B=c3=bchler?= <source@stbuehler.de>
+Message-ID: <7bcb0eb3-46d1-70e4-1108-dfd9a348bb7c@stbuehler.de>
+Date:   Sat, 27 Apr 2019 18:05:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <83fda245-849a-70cc-dde0-5c451938ee97@kernel.dk>
+In-Reply-To: <740192f8-1d64-9e64-0aea-a73e5d6d4d46@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -106,22 +52,64 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/25/19 10:03 PM, Jens Axboe wrote:
-> On 4/25/19 2:00 PM, Jerome Glisse wrote:
->> Did i miss preliminary agenda somewhere ? In previous year i think
->> there use to be one by now :)
-> 
-> You should have received an email from LF this morning with a subject
-> of:
-> 
-> LSFMM 2019: 8 Things to Know Before You Arrive!
-> 
-> which also includes a link to the schedule. Here it is:
-> 
-> https://docs.google.com/spreadsheets/d/1Z1pDL-XeUT1ZwMWrBL8T8q3vtSqZpLPgF3Bzu_jejfk
+Hi,
 
-In previous years years there also used to be an attendee list, which is
-now an empty tab. Is that intentional due to GDPR?
+On 24.04.19 18:09, Jens Axboe wrote:
+> On 4/23/19 4:07 PM, Jens Axboe wrote:
+>>>> (Also RWF_NOWAIT doesn't work in io_uring right now: IOCB_NOWAIT is
+>>>> always removed in the workqueue context, and I don't see an early EAGAIN
+>>>> completion).
+>>>
+>>> That's a case I didn't consider, that you'd want to see EAGAIN after
+>>> it's been punted. Once punted, we're not going to return EAGAIN since
+>>> we can now block. Not sure how you'd want to handle that any better...
+>>
+>> I think I grok this one too now - what you're saying is that if the
+>> caller has RWF_NOWAIT set, then the EAGAIN should be returned instead of
+>> being punted to the workqueue? I totally agree with that, that's a bug.
+> 
+> This should do it for the EAGAIN part, if the user has set RWF_NOWAIT
+> in the sqe, then we don't do the automatic punt to workqueue. We just
+> return the EAGAIN instead.
+> 
+> 
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index 58ec6e449fd8..6c0d49c3736b 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -822,7 +822,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct sqe_submit *s,
+>  	ret = kiocb_set_rw_flags(kiocb, READ_ONCE(sqe->rw_flags));
+>  	if (unlikely(ret))
+>  		return ret;
+> -	if (force_nonblock) {
+> +	if (force_nonblock && !(kiocb->ki_flags & IOCB_NOWAIT)) {
+>  		kiocb->ki_flags |= IOCB_NOWAIT;
+>  		req->flags |= REQ_F_FORCE_NONBLOCK;
+>  	}
+> @@ -1828,7 +1828,7 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+>  	}
+>  
+>  	ret = __io_submit_sqe(ctx, req, s, true);
+> -	if (ret == -EAGAIN) {
+> +	if (ret == -EAGAIN && (req->flags & REQ_F_FORCE_NONBLOCK)) {
+>  		struct io_uring_sqe *sqe_copy;
+>  
+>  		sqe_copy = kmalloc(sizeof(*sqe_copy), GFP_KERNEL);
+> 
 
-Thanks,
-Vlastimil
+I think this breaks other request types.
+
+Only io_prep_rw ever sets REQ_F_FORCE_NONBLOCK, but e.g. IORING_OP_FSYNC
+always wants to punt.
+
+Given that REQ_F_FORCE_NONBLOCK wasn't actually used before (never read
+afaict), maybe remove it and insert a new flag REQ_F_NOWAIT that will
+prevent the punt (inverted semantics!), e.g:
+
+> -	if (ret == -EAGAIN) {
+> +	if (ret == -EAGAIN && !(req->flags & REQ_F_NOWAIT)) {
+
+And set this flag in io_prep_rw if RWF_NOWAIT is set.
+
+cheers,
+Stefan
