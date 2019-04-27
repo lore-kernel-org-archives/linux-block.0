@@ -8,82 +8,106 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB272C43218
-	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 11:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B430C43218
+	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 11:38:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 73E37208C2
-	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 11:38:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D11EF208C2
+	for <linux-block@archiver.kernel.org>; Sat, 27 Apr 2019 11:38:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="uxg1b4bH"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="LAGA5g9R"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726071AbfD0Li3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Apr 2019 07:38:29 -0400
-Received: from smtpbgsg2.qq.com ([54.254.200.128]:60955 "EHLO smtpbgsg2.qq.com"
+        id S1725912AbfD0Lid (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Apr 2019 07:38:33 -0400
+Received: from smtpbgau1.qq.com ([54.206.16.166]:53798 "EHLO smtpbgau1.qq.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725912AbfD0Li3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Apr 2019 07:38:29 -0400
+        id S1726048AbfD0Lid (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 Apr 2019 07:38:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-        s=s201512; t=1556365101;
-        bh=QoEPkHGf2GjvrA+JuHxH7RdWJXrNTx0c6VmRvcWcY7o=;
+        s=s201512; t=1556365099;
+        bh=vLUFUvpFiIreG6THVGdX48y3hXtx8bK/toBtLsurNdA=;
         h=From:To:Subject:Date:Message-Id:MIME-Version;
-        b=uxg1b4bHSkNllpH5cppRYr3HXQj5fAsCABJggV2TKq5MjpzrwtCKPgjRdZwf7jg0m
-         gfTW0iBJTqlAiXe1DKDq7bBByudRcXhD/hOe5KM0w1z6q4IRKuClmf6Q6bNhIuh6rX
-         +AfMK6dC7RWWy4gJHhhdFZTPqDPrE/ENInjn+2dc=
-X-QQ-mid: esmtp2t1556365099tcvlbqsdz
+        b=LAGA5g9RhAzBoIFbgORIeCjHXXK6/fquibOISaVMQ5fNTLZbvAlpBxwsRs7GG41Dn
+         CADvBzWUAcRuN3yxM78YhPBh+9+xTddOxVL1KiHMgwefI2+Scz/qT0EYem1AS92I6g
+         PJQzbVHI3p7BfkghPfj7+hLBVcYco4amyC/DT/08=
+X-QQ-mid: esmtp2t1556365097tnkj7r0ra
 Received: from localhost.localdomain (unknown [61.48.57.6])
         by esmtp4.qq.com (ESMTP) with 
-        id ; Sat, 27 Apr 2019 19:38:19 +0800 (CST)
+        id ; Sat, 27 Apr 2019 19:38:07 +0800 (CST)
 X-QQ-SSF: 01000000000000F0FH3000000000000
-X-QQ-FEAT: IWL+UNg1+673L6sz+QPiAKL5jKE7NrynKe2ng7dm8KYpy94uxGvWYB1texm3z
-        KbpQTbrPNQ2T2id6fSYcYvWSev+Iu7wWyOOXRzEOSttHEZaTH6tHoRV/zSpclx9VxZE1iLL
-        Ih7j43jGMAkAnjVCl9i1y0y+9SHB+U/+h8JIAYgsp/BzMNYCCMyZfl7Jt6Zvlk9aRuuHp9l
-        PWRSpsC+lHVZvEEFWrFlhMxTkPjNgZ7mpdeuGN5dAnyIMXIf/HvE1MYPELHVeX2cAO6XMlt
-        GaYMjBGX+pefc4a6a//FeY+DDFfeEW4pwS4w==
+X-QQ-FEAT: 3kJJdZsYhnEmXivFD25zt8z658xCS4w6Wox8ZGa6vDwrxa9FBDSdsTSWH+Fuz
+        liXC05jmLk3J1tWotVDEOShAwzFOrJrx7kMyXxVKyw7jSHrRKNrvLm74Vy8oP5FXwR0M+tc
+        vnNxFHTt0KpIKFJDHNPMIKOUcC5ZLv9ZUQ4aoS0Po723dQWOecZNW/Rp5CEpNAd6wd2ByoF
+        PYTBf2JNCwXGREO/0SHh7rh9ddkHYVQgHBs0CJ6BbOHsuqgXLOjOxknL7r4d7raNSodaZlI
+        DEZUVAa++fpYcG1NoK85wWyc3/Ayexzlzg/GYsRcyMnfj9
 X-QQ-GoodBg: 0
 From:   Shenghui Wang <shhuiw@foxmail.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 2/2] io_uring: free ctx->sq_ring if array size overflow detected in io_allocate_scq_urings
-Date:   Sat, 27 Apr 2019 19:38:07 +0800
-Message-Id: <20190427113807.4933-2-shhuiw@foxmail.com>
+Subject: [PATCH 1/2] io_uring: unaccount scq mem properly
+Date:   Sat, 27 Apr 2019 19:38:06 +0800
+Message-Id: <20190427113807.4933-1-shhuiw@foxmail.com>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190427113807.4933-1-shhuiw@foxmail.com>
-References: <20190427113807.4933-1-shhuiw@foxmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
-Feedback-ID: esmtp:foxmail.com:bgforeign:bgforeign4
+Feedback-ID: esmtp:foxmail.com:bgforeign:bgforeign2
 X-QQ-Bgrelay: 1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Free ctx->sq_ring before return -EOVERFLOW.
+io_allocate_scq_urings() may fail to allocate scq rings, and fail to
+set ctx->sq_entries or ctx->cq_entries. In io_ring_ctx_free(), the code
+'
+    if (ctx->account_mem)
+        io_unaccount_mem(ctx->user,
+             ring_pages(ctx->sq_entries, ctx->cq_entries));
+'
+may not unaccount properly.
+
+E.g, in io_uring_create(), we have ctx allocated with zero filled.
+Later, io_allocate_scq_urings() fails, and we may still have
+0-valued ctx->sq_entries & ctx->cq_entries. Then the unaccount code
+cannot unaccout what io_account_mem() has changed.
 
 Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- fs/io_uring.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ fs/io_uring.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 9d382ac27e63..6e1d22cbb029 100644
+index f65f85d89217..9d382ac27e63 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -2743,8 +2743,10 @@ static int io_allocate_scq_urings(struct io_ring_ctx *ctx,
+@@ -2741,7 +2741,6 @@ static int io_allocate_scq_urings(struct io_ring_ctx *ctx,
+ 	sq_ring->ring_mask = p->sq_entries - 1;
+ 	sq_ring->ring_entries = p->sq_entries;
  	ctx->sq_mask = sq_ring->ring_mask;
+-	ctx->sq_entries = sq_ring->ring_entries;
  
  	size = array_size(sizeof(struct io_uring_sqe), p->sq_entries);
--	if (size == SIZE_MAX)
-+	if (size == SIZE_MAX) {
-+		io_mem_free(ctx->sq_ring);
- 		return -EOVERFLOW;
-+	}
+ 	if (size == SIZE_MAX)
+@@ -2764,7 +2763,6 @@ static int io_allocate_scq_urings(struct io_ring_ctx *ctx,
+ 	cq_ring->ring_mask = p->cq_entries - 1;
+ 	cq_ring->ring_entries = p->cq_entries;
+ 	ctx->cq_mask = cq_ring->ring_mask;
+-	ctx->cq_entries = cq_ring->ring_entries;
+ 	return 0;
+ }
  
- 	ctx->sq_sqes = io_mem_alloc(size);
- 	if (!ctx->sq_sqes) {
+@@ -2854,6 +2852,8 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p)
+ 	ctx->compat = in_compat_syscall();
+ 	ctx->account_mem = account_mem;
+ 	ctx->user = user;
++	ctx->sq_entries = p->sq_entries;
++	ctx->cq_entries = p->cq_entries;
+ 
+ 	ret = io_allocate_scq_urings(ctx, p);
+ 	if (ret)
 -- 
 2.20.1
+
 
 
 
