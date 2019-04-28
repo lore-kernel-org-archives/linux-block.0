@@ -2,99 +2,57 @@ Return-Path: <SRS0=nOxH=S6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E707C43219
-	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 08:14:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20457C43218
+	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 12:03:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F11882075D
-	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 08:14:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCD1520843
+	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 12:03:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TeIGe5pT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726653AbfD1IOv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Apr 2019 04:14:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:1043 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726648AbfD1IOv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Apr 2019 04:14:51 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0BAE019D05E;
-        Sun, 28 Apr 2019 08:14:51 +0000 (UTC)
-Received: from localhost (ovpn-8-32.pek2.redhat.com [10.72.8.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B6BDD69282;
-        Sun, 28 Apr 2019 08:14:47 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        James Smart <james.smart@broadcom.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Subject: [PATCH V8 7/7] block: don't drain in-progress dispatch in blk_cleanup_queue()
-Date:   Sun, 28 Apr 2019 16:14:08 +0800
-Message-Id: <20190428081408.27331-8-ming.lei@redhat.com>
-In-Reply-To: <20190428081408.27331-1-ming.lei@redhat.com>
-References: <20190428081408.27331-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Sun, 28 Apr 2019 08:14:51 +0000 (UTC)
+        id S1726552AbfD1MDO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Apr 2019 08:03:14 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:53886 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726359AbfD1MDO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 Apr 2019 08:03:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=TeIGe5pTsacj0bp3QXWWFhaZf
+        SSEbvPTdEgffT+X01mSiFBwHVuw6kUYZah4LO/o7Lgqve1q96qnOzDdMg7KgASYGcYarJwgoXRiw2
+        rFEKpgLXpRrARLSCdPcQryqpjX/ps+VHSzyQqoekhvK/D1djJZPKkUx16pm07qllx7A6QlweAtLaH
+        OpktEt7WY6bT7UiPz2dpu2NNv+ECACorQ3TMGop3FjQazOwkDgGxdO2l8S38+k2rSAeODO0EDUj4v
+        z9lakdVM895jJpH3X5+j3uMPBY2WQbkl2HNmpmLRXWSsSmWjTiqhfhpzoDfNHMb7Tq8PmuZdMNN0H
+        oJiHW92+A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hKiWX-0002Ya-L7; Sun, 28 Apr 2019 12:03:13 +0000
+Date:   Sun, 28 Apr 2019 05:03:13 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Minwoo Im <minwoo.im.dev@gmail.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] block: Move tag field position in struct request
+Message-ID: <20190428120313.GA9759@infradead.org>
+References: <20190428074803.19484-1-minwoo.im.dev@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190428074803.19484-1-minwoo.im.dev@gmail.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now freeing hw queue resource is moved to hctx's release handler,
-we don't need to worry about the race between blk_cleanup_queue and
-run queue any more.
+Looks good:
 
-So don't drain in-progress dispatch in blk_cleanup_queue().
-
-This is basically revert of c2856ae2f315 ("blk-mq: quiesce queue before
-freeing queue").
-
-Cc: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
-Cc: Martin K . Petersen <martin.petersen@oracle.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Tested-by: James Smart <james.smart@broadcom.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c | 12 ------------
- 1 file changed, 12 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index f5b5f21ae4fd..e24cfcefdc19 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -338,18 +338,6 @@ void blk_cleanup_queue(struct request_queue *q)
- 
- 	blk_queue_flag_set(QUEUE_FLAG_DEAD, q);
- 
--	/*
--	 * make sure all in-progress dispatch are completed because
--	 * blk_freeze_queue() can only complete all requests, and
--	 * dispatch may still be in-progress since we dispatch requests
--	 * from more than one contexts.
--	 *
--	 * We rely on driver to deal with the race in case that queue
--	 * initialization isn't done.
--	 */
--	if (queue_is_mq(q) && blk_queue_init_done(q))
--		blk_mq_quiesce_queue(q);
--
- 	/* for synchronous bio-based driver finish in-flight integrity i/o */
- 	blk_flush_integrity();
- 
--- 
-2.9.5
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
