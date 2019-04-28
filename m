@@ -4,28 +4,28 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 072DDC4321A
-	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 08:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0E29C43218
+	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 08:14:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2E4621473
-	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 08:14:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 712402075D
+	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 08:14:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726617AbfD1IOb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Apr 2019 04:14:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56024 "EHLO mx1.redhat.com"
+        id S1726628AbfD1IOe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Apr 2019 04:14:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41354 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726488AbfD1IOb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Apr 2019 04:14:31 -0400
+        id S1726488AbfD1IOe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 Apr 2019 04:14:34 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5DAF2309178C;
-        Sun, 28 Apr 2019 08:14:30 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id D6175356CE;
+        Sun, 28 Apr 2019 08:14:33 +0000 (UTC)
 Received: from localhost (ovpn-8-32.pek2.redhat.com [10.72.8.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C366512FE;
-        Sun, 28 Apr 2019 08:14:29 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB714171EE;
+        Sun, 28 Apr 2019 08:14:32 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -35,47 +35,23 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        stable@vger.kernel.org
-Subject: [PATCH V8 3/7] blk-mq: free hw queue's resource in hctx's release handler
-Date:   Sun, 28 Apr 2019 16:14:04 +0800
-Message-Id: <20190428081408.27331-4-ming.lei@redhat.com>
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Subject: [PATCH V8 4/7] blk-mq: split blk_mq_alloc_and_init_hctx into two parts
+Date:   Sun, 28 Apr 2019 16:14:05 +0800
+Message-Id: <20190428081408.27331-5-ming.lei@redhat.com>
 In-Reply-To: <20190428081408.27331-1-ming.lei@redhat.com>
 References: <20190428081408.27331-1-ming.lei@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Sun, 28 Apr 2019 08:14:30 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Sun, 28 Apr 2019 08:14:33 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Once blk_cleanup_queue() returns, tags shouldn't be used any more,
-because blk_mq_free_tag_set() may be called. Commit 45a9c9d909b2
-("blk-mq: Fix a use-after-free") fixes this issue exactly.
-
-However, that commit introduces another issue. Before 45a9c9d909b2,
-we are allowed to run queue during cleaning up queue if the queue's
-kobj refcount is held. After that commit, queue can't be run during
-queue cleaning up, otherwise oops can be triggered easily because
-some fields of hctx are freed by blk_mq_free_queue() in blk_cleanup_queue().
-
-We have invented ways for addressing this kind of issue before, such as:
-
-	8dc765d438f1 ("SCSI: fix queue cleanup race before queue initialization is done")
-	c2856ae2f315 ("blk-mq: quiesce queue before freeing queue")
-
-But still can't cover all cases, recently James reports another such
-kind of issue:
-
-	https://marc.info/?l=linux-scsi&m=155389088124782&w=2
-
-This issue can be quite hard to address by previous way, given
-scsi_run_queue() may run requeues for other LUNs.
-
-Fixes the above issue by freeing hctx's resources in its release handler, and this
-way is safe becasue tags isn't needed for freeing such hctx resource.
-
-This approach follows typical design pattern wrt. kobject's release handler.
+Split blk_mq_alloc_and_init_hctx into two parts, and one is
+blk_mq_alloc_hctx() for allocating all hctx resources, another
+is blk_mq_init_hctx() for initializing hctx, which serves as
+counter-part of blk_mq_exit_hctx().
 
 Cc: Dongli Zhang <dongli.zhang@oracle.com>
 Cc: James Smart <james.smart@broadcom.com>
@@ -84,97 +60,221 @@ Cc: linux-scsi@vger.kernel.org,
 Cc: Martin K . Petersen <martin.petersen@oracle.com>,
 Cc: Christoph Hellwig <hch@lst.de>,
 Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
-Reported-by: James Smart <james.smart@broadcom.com>
-Fixes: 45a9c9d909b2 ("blk-mq: Fix a use-after-free")
-Cc: stable@vger.kernel.org
 Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 Tested-by: James Smart <james.smart@broadcom.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c     | 2 +-
- block/blk-mq-sysfs.c | 6 ++++++
- block/blk-mq.c       | 8 ++------
- block/blk-mq.h       | 2 +-
- 4 files changed, 10 insertions(+), 8 deletions(-)
+ block/blk-mq.c | 138 ++++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 77 insertions(+), 61 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 93dc588fabe2..2dd94b3e9ece 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -374,7 +374,7 @@ void blk_cleanup_queue(struct request_queue *q)
- 	blk_exit_queue(q);
- 
- 	if (queue_is_mq(q))
--		blk_mq_free_queue(q);
-+		blk_mq_exit_queue(q);
- 
- 	percpu_ref_exit(&q->q_usage_counter);
- 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 3f9c3f4ac44c..4040e62c3737 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -10,6 +10,7 @@
- #include <linux/smp.h>
- 
- #include <linux/blk-mq.h>
-+#include "blk.h"
- #include "blk-mq.h"
- #include "blk-mq-tag.h"
- 
-@@ -33,6 +34,11 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
- {
- 	struct blk_mq_hw_ctx *hctx = container_of(kobj, struct blk_mq_hw_ctx,
- 						  kobj);
-+
-+	if (hctx->flags & BLK_MQ_F_BLOCKING)
-+		cleanup_srcu_struct(hctx->srcu);
-+	blk_free_flush_queue(hctx->fq);
-+	sbitmap_free(&hctx->ctx_map);
- 	free_cpumask_var(hctx->cpumask);
- 	kfree(hctx->ctxs);
- 	kfree(hctx);
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 89781309a108..d98cb9614dfa 100644
+index d98cb9614dfa..44ecca6b0cac 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2267,12 +2267,7 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
- 
--	if (hctx->flags & BLK_MQ_F_BLOCKING)
--		cleanup_srcu_struct(hctx->srcu);
--
- 	blk_mq_remove_cpuhp(hctx);
--	blk_free_flush_queue(hctx->fq);
--	sbitmap_free(&hctx->ctx_map);
+@@ -2284,15 +2284,70 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+ 	}
  }
  
- static void blk_mq_exit_hw_queues(struct request_queue *q,
-@@ -2907,7 +2902,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- }
- EXPORT_SYMBOL(blk_mq_init_allocated_queue);
- 
--void blk_mq_free_queue(struct request_queue *q)
-+/* tags can _not_ be used after returning from blk_mq_exit_queue */
-+void blk_mq_exit_queue(struct request_queue *q)
++static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
++{
++	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
++
++	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, srcu),
++			   __alignof__(struct blk_mq_hw_ctx)) !=
++		     sizeof(struct blk_mq_hw_ctx));
++
++	if (tag_set->flags & BLK_MQ_F_BLOCKING)
++		hw_ctx_size += sizeof(struct srcu_struct);
++
++	return hw_ctx_size;
++}
++
+ static int blk_mq_init_hctx(struct request_queue *q,
+ 		struct blk_mq_tag_set *set,
+ 		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
  {
- 	struct blk_mq_tag_set	*set = q->tag_set;
+-	int node;
++	hctx->queue_num = hctx_idx;
  
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 423ea88ab6fb..633a5a77ee8b 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -37,7 +37,7 @@ struct blk_mq_ctx {
- 	struct kobject		kobj;
- } ____cacheline_aligned_in_smp;
+-	node = hctx->numa_node;
++	cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
++
++	hctx->tags = set->tags[hctx_idx];
++
++	if (set->ops->init_hctx &&
++	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
++		goto unregister_cpu_notifier;
++
++	if (blk_mq_init_request(set, hctx->fq->flush_rq, hctx_idx,
++				hctx->numa_node))
++		goto exit_hctx;
++	return 0;
++
++ exit_hctx:
++	if (set->ops->exit_hctx)
++		set->ops->exit_hctx(hctx, hctx_idx);
++ unregister_cpu_notifier:
++	blk_mq_remove_cpuhp(hctx);
++	return -1;
++}
++
++static struct blk_mq_hw_ctx *
++blk_mq_alloc_hctx(struct request_queue *q,
++		struct blk_mq_tag_set *set,
++		unsigned hctx_idx, int node)
++{
++	struct blk_mq_hw_ctx *hctx;
++
++	hctx = kzalloc_node(blk_mq_hw_ctx_size(set),
++			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
++			node);
++	if (!hctx)
++		goto fail_alloc_hctx;
++
++	if (!zalloc_cpumask_var_node(&hctx->cpumask,
++				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
++				node))
++		goto free_hctx;
++
++	atomic_set(&hctx->nr_active, 0);
++	hctx->numa_node = node;
+ 	if (node == NUMA_NO_NODE)
+-		node = hctx->numa_node = set->numa_node;
++		hctx->numa_node = set->numa_node;
++	node = hctx->numa_node;
  
--void blk_mq_free_queue(struct request_queue *q);
-+void blk_mq_exit_queue(struct request_queue *q);
- int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
- void blk_mq_wake_waiters(struct request_queue *q);
- bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *, bool);
+ 	INIT_DELAYED_WORK(&hctx->run_work, blk_mq_run_work_fn);
+ 	spin_lock_init(&hctx->lock);
+@@ -2300,10 +2355,6 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	hctx->queue = q;
+ 	hctx->flags = set->flags & ~BLK_MQ_F_TAG_SHARED;
+ 
+-	cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
+-
+-	hctx->tags = set->tags[hctx_idx];
+-
+ 	/*
+ 	 * Allocate space for all possible cpus to avoid allocation at
+ 	 * runtime
+@@ -2311,47 +2362,38 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	hctx->ctxs = kmalloc_array_node(nr_cpu_ids, sizeof(void *),
+ 			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY, node);
+ 	if (!hctx->ctxs)
+-		goto unregister_cpu_notifier;
++		goto free_cpumask;
+ 
+ 	if (sbitmap_init_node(&hctx->ctx_map, nr_cpu_ids, ilog2(8),
+ 				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY, node))
+ 		goto free_ctxs;
+-
+ 	hctx->nr_ctx = 0;
+ 
+ 	spin_lock_init(&hctx->dispatch_wait_lock);
+ 	init_waitqueue_func_entry(&hctx->dispatch_wait, blk_mq_dispatch_wake);
+ 	INIT_LIST_HEAD(&hctx->dispatch_wait.entry);
+ 
+-	if (set->ops->init_hctx &&
+-	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
+-		goto free_bitmap;
+-
+ 	hctx->fq = blk_alloc_flush_queue(q, hctx->numa_node, set->cmd_size,
+ 			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY);
+ 	if (!hctx->fq)
+-		goto exit_hctx;
+-
+-	if (blk_mq_init_request(set, hctx->fq->flush_rq, hctx_idx, node))
+-		goto free_fq;
++		goto free_bitmap;
+ 
+ 	if (hctx->flags & BLK_MQ_F_BLOCKING)
+ 		init_srcu_struct(hctx->srcu);
++	blk_mq_hctx_kobj_init(hctx);
+ 
+-	return 0;
++	return hctx;
+ 
+- free_fq:
+-	blk_free_flush_queue(hctx->fq);
+- exit_hctx:
+-	if (set->ops->exit_hctx)
+-		set->ops->exit_hctx(hctx, hctx_idx);
+  free_bitmap:
+ 	sbitmap_free(&hctx->ctx_map);
+  free_ctxs:
+ 	kfree(hctx->ctxs);
+- unregister_cpu_notifier:
+-	blk_mq_remove_cpuhp(hctx);
+-	return -1;
++ free_cpumask:
++	free_cpumask_var(hctx->cpumask);
++ free_hctx:
++	kfree(hctx);
++ fail_alloc_hctx:
++	return NULL;
+ }
+ 
+ static void blk_mq_init_cpu_queues(struct request_queue *q,
+@@ -2697,51 +2739,25 @@ struct request_queue *blk_mq_init_sq_queue(struct blk_mq_tag_set *set,
+ }
+ EXPORT_SYMBOL(blk_mq_init_sq_queue);
+ 
+-static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
+-{
+-	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
+-
+-	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, srcu),
+-			   __alignof__(struct blk_mq_hw_ctx)) !=
+-		     sizeof(struct blk_mq_hw_ctx));
+-
+-	if (tag_set->flags & BLK_MQ_F_BLOCKING)
+-		hw_ctx_size += sizeof(struct srcu_struct);
+-
+-	return hw_ctx_size;
+-}
+-
+ static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
+ 		struct blk_mq_tag_set *set, struct request_queue *q,
+ 		int hctx_idx, int node)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 
+-	hctx = kzalloc_node(blk_mq_hw_ctx_size(set),
+-			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
+-			node);
++	hctx = blk_mq_alloc_hctx(q, set, hctx_idx, node);
+ 	if (!hctx)
+-		return NULL;
+-
+-	if (!zalloc_cpumask_var_node(&hctx->cpumask,
+-				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
+-				node)) {
+-		kfree(hctx);
+-		return NULL;
+-	}
++		goto fail;
+ 
+-	atomic_set(&hctx->nr_active, 0);
+-	hctx->numa_node = node;
+-	hctx->queue_num = hctx_idx;
+-
+-	if (blk_mq_init_hctx(q, set, hctx, hctx_idx)) {
+-		free_cpumask_var(hctx->cpumask);
+-		kfree(hctx);
+-		return NULL;
+-	}
+-	blk_mq_hctx_kobj_init(hctx);
++	if (blk_mq_init_hctx(q, set, hctx, hctx_idx))
++		goto free_hctx;
+ 
+ 	return hctx;
++
++ free_hctx:
++	kobject_put(&hctx->kobj);
++ fail:
++	return NULL;
+ }
+ 
+ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
 -- 
 2.9.5
 
