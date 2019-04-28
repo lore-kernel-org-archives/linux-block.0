@@ -2,67 +2,47 @@ Return-Path: <SRS0=nOxH=S6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.3 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4C8C43219
-	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 13:55:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC15C43218
+	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 15:55:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9186620652
-	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 13:55:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B8762067D
+	for <linux-block@archiver.kernel.org>; Sun, 28 Apr 2019 15:55:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fuks5tKa"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="zMTU2xdz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726659AbfD1NzH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Apr 2019 09:55:07 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:38685 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726637AbfD1NzH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Apr 2019 09:55:07 -0400
-Received: by mail-pg1-f193.google.com with SMTP id j26so3893588pgl.5
-        for <linux-block@vger.kernel.org>; Sun, 28 Apr 2019 06:55:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=P1Z33zzLF8gYAAAOBRAHn3QQXFbFqwOCd40uaPGzWZA=;
-        b=fuks5tKadXLX2DdYRAkpCkY0j8cFptq273gAjpEze06gDgH+OborWb4Cm60xKiea9F
-         qS7XQxB6w5ToOGaQK7ppIHqPbwP4uyC30+RyuD8EvHgfrVfnW7Qh4CY09P2lXEcaltxa
-         0f+ZRHKPlCXI3iw0wMjyaV7TRlYWodim8YdI9sNBN8KfwcLyRxa4dogrlPc9BZ7MVDcV
-         v4AHGKc33aWiu1vBgoinRb5xx2CLVSqvSc+QTrs+A2sctBfqHzjcY+cAVq0hBbRp6ndo
-         v9ICd8RBh2Z/b0hMRB+9nxHhn9ZfVWbimYnRY6Tz6g14+1dVKd26uhtxO7M0dxjEPJGG
-         lfxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=P1Z33zzLF8gYAAAOBRAHn3QQXFbFqwOCd40uaPGzWZA=;
-        b=mxDIRv3sYDefSNGATjVzaOc/vEYEHlnok6N6N+i8Hkz3x3+t4p25/DVi8VJcFB0SPm
-         LCYvgIICpe7i5GnAu+/QNwxMflfbnO0qxURKKM1I09i7MLgUS1eK6xVvuUGoBUVAn17g
-         SWemO9KtuCwdZX622FRPFD2SqjlyIsevgShEIBKyQ8KoZLMnGMATcRQDAyw1wYMIXwcX
-         pasdUMxI0446lfP5pzvt7qZ3m1xRYPAIy4UZiJnp+HnulKR06IoJgxTzp5Bd8ODthUlQ
-         a+iW2KG+77HCfWeEY10CPurT8LPgnUefugQ0m0O8GsPEd1SRWMdqqv069SLe72IMGj0a
-         2NbQ==
-X-Gm-Message-State: APjAAAXQ1jNOEgOUkT8Axg9HppL3toy99XIOInsYE/XJlaIx8HGeidKG
-        TDvpPQJ8v/Vmo+E5vpcK/y6VmQoynN9yzw==
-X-Google-Smtp-Source: APXvYqzuIqhnkFIEqsbM9gqM3uvAWhyldalG1E+EGWI7ZT3PMM364WpGsEYqAIItRiE5nLTosMPNBw==
-X-Received: by 2002:a63:2ad3:: with SMTP id q202mr35995852pgq.423.1556459706444;
-        Sun, 28 Apr 2019 06:55:06 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id 13sm44808150pfi.172.2019.04.28.06.55.04
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 28 Apr 2019 06:55:05 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Storage fixes for 5.1-rc7
-Message-ID: <32d1cc79-7db1-6017-9626-2eb1845dd9e0@kernel.dk>
-Date:   Sun, 28 Apr 2019 07:55:03 -0600
+        id S1726801AbfD1PzC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Apr 2019 11:55:02 -0400
+Received: from mail.stbuehler.de ([5.9.32.208]:36480 "EHLO mail.stbuehler.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726744AbfD1PzC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 Apr 2019 11:55:02 -0400
+Received: from [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6] (unknown [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6])
+        by mail.stbuehler.de (Postfix) with ESMTPSA id A5171C02DA2;
+        Sun, 28 Apr 2019 15:54:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=stbuehler.de;
+        s=stbuehler1; t=1556466899;
+        bh=vIICOetRT2foW+XJ2sJTv1rxKYYUInFPZehv/4S3EoI=;
+        h=Subject:To:References:From:Date:In-Reply-To:From;
+        b=zMTU2xdzgDGCGJWYEey6cs7vZooIgtXbNaFW2mMKe53+6Yu2uoI+mvB3MvcfROnDW
+         cGHUQZi/bWcIpLlpdjV4vaOwHegDDJvZMGYQ5XPNyS2pb8IIHMn/mn9Ua9/jiCJVOx
+         z43aWK7WLIiPKFS2RTwbwxM+0gL3xDZF9KP7lI4E=
+Subject: Re: io_uring: O_NONBLOCK/IOCB_NOWAIT/RWF_NOWAIT mess
+To:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <366484f9-cc5b-e477-6cc5-6c65f21afdcb@stbuehler.de>
+ <37071226-375a-07a6-d3d3-21323145de71@kernel.dk>
+From:   =?UTF-8?Q?Stefan_B=c3=bchler?= <source@stbuehler.de>
+Message-ID: <a60b2461-1db0-32cf-6eb2-35f7751a04ec@stbuehler.de>
+Date:   Sun, 28 Apr 2019 17:54:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <37071226-375a-07a6-d3d3-21323145de71@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -71,38 +51,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Hi,
 
-Set of io_uring fixes that should go into this release. In particular,
-this pull request contains:
+On 23.04.19 22:31, Jens Axboe wrote:
+> On 4/23/19 1:06 PM, Stefan Bühler wrote:
+>> 2. {read,write}_iter and FMODE_NOWAIT / IOCB_NOWAIT is broken at the vfs
+>> layer: vfs_{read,write} should set IOCB_NOWAIT if O_NONBLOCK is set when
+>> they call {read,write}_iter (i.e. init_sync_kiocb/iocb_flags needs to
+>> convert the flag).
+>>
+>> And all {read,write}_iter should check IOCB_NOWAIT instead of O_NONBLOCK
+>> (hi there pipe.c!), and set FMODE_NOWAIT if they support IOCB_NOWAIT.
+>>
+>> {read,write}_iter should only queue the IOCB though if is_sync_kiocb()
+>> returns false (i.e. if ki_callback is set).
+> 
+> That's a trivial fix. I agree that it should be done.
 
-- The mutex lock vs ctx ref count fix (me)
+Doesn't look trivial to me.
 
-- Removal of a dead variable (me)
+Various functions take rwf_t flags, e.g. do_readv, which is called with
+0 from readv and with flags from userspace in preadv2.
 
-- Two races fixes (Stefan)
+Now is preadv2() supposed to be non-blocking if the file has O_NONBLOCK,
+or only if RWF_NOWAIT was passed?
 
-- Ring head/tail condition fix for poll full SQ detection (Stefan)
+Other places seem (at least to me) explicitly mean "please block" if
+they don't pass RWF_NOWAIT, e.g. ovl_read_iter from fs/overlayfs, which
+uses ovl_iocb_to_rwf to convert iocb flags back to rwf.
 
-Please pull!
+Imho the clean way is to ignore O_NONBLOCK when there are rwf_t flags;
+e.g. kiocb_set_rw_flags should unset IOCB_NOWAIT if RWF_NOWAIT was not set.
+
+But then various functions (like readv) will need to create rwf_t
+"default" flags from a file (similar to iocb_flags) instead of using 0.
+And ovl_iocb_to_rwf should probably be used in more places as well.
+
+There is also generic_file_splice_read, which should use
+SPLICE_F_NONBLOCK to trigger IOCB_NOWAIT; again it is unclear whether
+O_NONBLOCK should trigger IOCB_NOWAIT too (do_sendfile explicitly does
+NOT with a "need to debate" comment).
 
 
-  git://git.kernel.dk/linux-block.git tags/for-linus-20190428
+I don't think I'm the right person to do this - I think it requires a
+deeper understanding of all the code involved.
 
+I do have patches for pipe.c and and socket.c to ignore O_NONBLOCK, use
+IOCB_NOWAIT and set FMODE_NOAWAIT after the fs part is ready.
 
-----------------------------------------------------------------
-Jens Axboe (2):
-      io_uring: fail io_uring_register(2) on a dying io_uring instance
-      io_uring: remove 'state' argument from io_{read,write} path
-
-Stefan Bühler (3):
-      io_uring: fix race condition reading SQ entries
-      io_uring: fix race condition when sq threads goes sleeping
-      io_uring: fix poll full SQ detection
-
- fs/io_uring.c | 42 ++++++++++++++++++++++++++----------------
- 1 file changed, 26 insertions(+), 16 deletions(-)
-
--- 
-Jens Axboe
-
+cheers,
+Stefan
