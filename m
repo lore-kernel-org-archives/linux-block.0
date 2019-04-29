@@ -2,124 +2,93 @@ Return-Path: <SRS0=IEWf=S7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A6E9C04AA6
-	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 12:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFE2C43219
+	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 12:17:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFF4121670
-	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 12:05:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C03D22075E
+	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 12:17:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JO93+Zd8"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ogISHwwq";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ogISHwwq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727991AbfD2MFr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Apr 2019 08:05:47 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35106 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727913AbfD2MFq (ORCPT
+        id S1727956AbfD2MRX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Apr 2019 08:17:23 -0400
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:59524 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727936AbfD2MRW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Apr 2019 08:05:46 -0400
-Received: by mail-wm1-f65.google.com with SMTP id y197so15408715wmd.0;
-        Mon, 29 Apr 2019 05:05:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mail-followup-to
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=20OOFr0oVOG3w2tDZNbxmeNviUJCH2+i2oLY/RHV008=;
-        b=JO93+Zd8tjqmorRYNflToRliUbhCKK5M21vq9vLHkRNDCFRlVVKVTuxlxHqSr/fnuB
-         JL8os2aJKJUI1EVOX/eQnvS0Yv2/kH/CwFI+DhhSOyTMelMH5wPi1mmsPPT1wYpBiO4t
-         M7wR5chm33A5fRGtpXvEGJCAgy19+ts98hEvYL+AuXDGhC/XAsxVoH9Fkq2PIGOAfKmw
-         LQi2S3+EEgmztn6i7l4T1kDO8KVlnWuV0bDHNM20+A2tRcHBmeY/qGt8ePCO1sYZTRwA
-         ol8xp1YnibDI9cSpsiz5id0DklVX4tCDskHZ3loBYI7vrfJRb0epSOInLyIN+1WBYHeq
-         D++Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=20OOFr0oVOG3w2tDZNbxmeNviUJCH2+i2oLY/RHV008=;
-        b=rCXlZ3GBbIwAMeW2DSNVzg2QAhjMxf+pVHkhHfLQdn8pur7v5TcPoz39KNNi3cou3Q
-         n7zw99kzfTqEPGKqGsx4wHVE2l7w4DXCK9GCP91aFnvadMA/9tMVCD+RAc0NO69L6rFg
-         faF4ppX+89KapgBXu5CyNXm+N36B37ewf1RueOmQDFQEgbVrUQL/DAaCLf5oeaC5cN8D
-         Anc+3RWTOEATwEyVC3UL7IC20G1lMr664PU7gbTpLZAgLc1wAcI+3S3/avQXaSU7gUnc
-         mU9Hg1Ni+yq4WF3a7NqgeIFdRFbIlHqTn0QbqXkVDVgetBC1R2NNaOyudrPvrMPPnwbo
-         p5nw==
-X-Gm-Message-State: APjAAAUYBsmjZgeC7I2/5Z69h8BbVr/21zLte7c8nfbQ4uuiYykIjMef
-        Vy8McT93DX+1BKlt+lX74CCdMPRGJHY=
-X-Google-Smtp-Source: APXvYqyCR3xeg68owtki/FaZ1ocnf+R+zsT5L1/6gp47ZgExmjY0bREset3gyISWSH62B/rUJc+wCg==
-X-Received: by 2002:a7b:c218:: with SMTP id x24mr4555674wmi.57.1556539544773;
-        Mon, 29 Apr 2019 05:05:44 -0700 (PDT)
-Received: from lorien (lorien.valinor.li. [2a01:4f8:192:61d5::2])
-        by smtp.gmail.com with ESMTPSA id q4sm35120101wrx.25.2019.04.29.05.05.43
-        (version=TLS1 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 29 Apr 2019 05:05:43 -0700 (PDT)
-Date:   Mon, 29 Apr 2019 14:05:42 +0200
-From:   Salvatore Bonaccorso <carnil@debian.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>,
-        928125@bugs.debian.org, Brad Barnett <debian-bugs2@L8R.net>
-Subject: Re: Revert commit 310ca162d77
-Message-ID: <20190429120542.wybwf5vqwzhv6nkf@lorien.valinor.li>
-Mail-Followup-To: Jan Kara <jack@suse.cz>, stable@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Greg KH <gregkh@linuxfoundation.org>, 928125@bugs.debian.org,
-        Brad Barnett <debian-bugs2@L8R.net>
-References: <20190320125806.GD9485@quack2.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190320125806.GD9485@quack2.suse.cz>
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Mon, 29 Apr 2019 08:17:22 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 5EBF28EE1D8;
+        Mon, 29 Apr 2019 05:17:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1556540242;
+        bh=V8W4i17PSPDCdFQgaQ9datYSRuZ6HJF8DVD1l4ouvDk=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=ogISHwwqWQR46xjt+1BXFuVlmD/ievw37QJxSJbIs+glnx90FnZ+stHg6eYqOk1Xb
+         rctKlGG5rAmGXfePLpiFcA27yJVAbeN8WjUk0pFm101/zHrbYEZ66fEW7yidn5un9H
+         TclnOUVVeIjNrhPBHgoz44MCM1/Pyu/9mzlGebfc=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id eMNwNV-9nJIS; Mon, 29 Apr 2019 05:17:22 -0700 (PDT)
+Received: from [192.168.100.227] (unknown [24.246.103.29])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 534438EE03B;
+        Mon, 29 Apr 2019 05:17:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1556540242;
+        bh=V8W4i17PSPDCdFQgaQ9datYSRuZ6HJF8DVD1l4ouvDk=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=ogISHwwqWQR46xjt+1BXFuVlmD/ievw37QJxSJbIs+glnx90FnZ+stHg6eYqOk1Xb
+         rctKlGG5rAmGXfePLpiFcA27yJVAbeN8WjUk0pFm101/zHrbYEZ66fEW7yidn5un9H
+         TclnOUVVeIjNrhPBHgoz44MCM1/Pyu/9mzlGebfc=
+Message-ID: <1556540228.3119.10.camel@HansenPartnership.com>
+Subject: Re: [Lsf] [LSF/MM] Preliminary agenda ? Anyone ... anyone ? Bueller
+ ?
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, lsf@lists.linux-foundation.org,
+        linux-mm@kvack.org, Jerome Glisse <jglisse@redhat.com>,
+        linux-fsdevel@vger.kernel.org, lsf-pc@lists.linux-foundation.org,
+        Vlastimil Babka <vbabka@suse.cz>
+Date:   Mon, 29 Apr 2019 08:17:08 -0400
+In-Reply-To: <yq1zho911sg.fsf@oracle.com>
+References: <20190425200012.GA6391@redhat.com>
+         <83fda245-849a-70cc-dde0-5c451938ee97@kernel.dk>
+         <503ba1f9-ad78-561a-9614-1dcb139439a6@suse.cz> <yq1v9yx2inc.fsf@oracle.com>
+         <1556537518.3119.6.camel@HansenPartnership.com>
+         <yq1zho911sg.fsf@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jan, hi Greg,
-
-On Wed, Mar 20, 2019 at 01:58:06PM +0100, Jan Kara wrote:
-> Hello,
+On Mon, 2019-04-29 at 07:36 -0400, Martin K. Petersen wrote:
+> James,
 > 
-> commit 310ca162d77 "block/loop: Use global lock for ioctl() operation." has
-> been pushed to multiple stable trees. This patch is a part of larger series
-> that overhauls the locking inside loopback device upstream and for 4.4,
-> 4.9, and 4.14 stable trees only this patch from the series is applied. Our
-> testing now has shown [1] that the patch alone makes present deadlocks
-> inside loopback driver more likely (the openqa test in our infrastructure
-> didn't hit the deadlock before whereas with the new kernel it hits it
-> reliably every time). So I would suggest we revert 310ca162d77 from 4.4,
-> 4.9, and 4.14 kernels.
+> > Next year, simply expand the blurb to "sponsors, partners and
+> > attendees" to make it more clear ... or better yet separate them so
+> > people can opt out of partner spam and still be on the attendee
+> > list.
+> 
+> We already made a note that we need an "opt-in to be on the attendee
+> list" as part of the registration process next year. That's how other
+> conferences go about it...
 
-A user in Debian reported [1], providing the following testcase which showed up
-after the recent update to 4.9.168-1 in Debian stretch (based on upstream
-v4.9.168) as follows:
+But for this year, I'd just assume the "event partners" checkbox covers
+publication of attendee data to attendees, because if you assume the
+opposite, since you've asked no additional permission of your speakers
+either, that would make publishing the agenda a GDPR violation.
 
-	dd if=/dev/zero of=/tmp/ff1.raw bs=1G seek=8 count=0
-	sync
-	sleep 1
-	parted /tmp/ff1.raw mklabel msdos
-	parted -s /tmp/ff1.raw mkpart primary linux-swap 1 100
-	parted -s -- /tmp/ff1.raw mkpart primary ext2 101 -1
-	parted -s -- /tmp/ff1.raw set 2 boot on
-	sleep 5
-	losetup -Pf /tmp/ff1.raw --show
+James
 
-I have verified that the same happens with v4.9.171 where the mentioned commit
-was not reverted, and bisecting of the testcase showed it was introduced with
-3ae3d167f5ec2c7bb5fcd12b7772cfadc93b2305 (v4.9.152~9) (which is the backport of
-310ca162d77 for 4.9).
-
-Reverting 3ae3d167f5ec2c7bb5fcd12b7772cfadc93b2305 on top of v4.9.171 worked
-and fixed the respective issue.
-
-Can this commit in meanwhile be reverted or is there further ongoing work in
-integrating the followup fixes as mentioned in
-https://lore.kernel.org/stable/20190321104110.GF29086@quack2.suse.cz/ .
-
-Regards,
-Salvatore
-
- [1] https://bugs.debian.org/928125
