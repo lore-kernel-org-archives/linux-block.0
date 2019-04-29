@@ -2,138 +2,138 @@ Return-Path: <SRS0=IEWf=S7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E69C43219
-	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 10:54:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11AE4C43219
+	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 11:13:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 303C320673
-	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 10:54:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C75AF2087B
+	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 11:13:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="TS4HdT5A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727767AbfD2Ky0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Apr 2019 06:54:26 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:53336 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727693AbfD2Ky0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Apr 2019 06:54:26 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8E52680D;
-        Mon, 29 Apr 2019 03:54:25 -0700 (PDT)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 023AB3F5AF;
-        Mon, 29 Apr 2019 03:54:23 -0700 (PDT)
-Date:   Mon, 29 Apr 2019 11:54:19 +0100
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     syzbot <syzbot+cd714a07c6de2bc34293@syzkaller.appspotmail.com>,
-        Hannes Reinecke <hare@suse.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Subject: Re: WARNING in io_uring_setup
-Message-ID: <20190429105418.GA2182@lakrids.cambridge.arm.com>
-References: <000000000000dfd87b0586652bf3@google.com>
- <778cd3c3-5b2c-4a87-64dc-5b8f5b0edc7a@kernel.dk>
- <CAKb3OG_adYHath5LfT66RDy9gsrxvPT7Q10ns6308F9MyEzp6A@mail.gmail.com>
+        id S1727817AbfD2LNh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Apr 2019 07:13:37 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:42645 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727710AbfD2LNh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Apr 2019 07:13:37 -0400
+Received: by mail-lj1-f193.google.com with SMTP id r72so4592118ljb.9
+        for <linux-block@vger.kernel.org>; Mon, 29 Apr 2019 04:13:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=wnGwLl0JPrexqdzwboidg01aM/JzVSKvEZRFwCgiSIM=;
+        b=TS4HdT5AFTmGjwDpY/uP5NncYFALYG/8X6w7YUMfcxXvZEnDlClQLL/d6oCPDr+dQK
+         0EKXtL2jdsE1LfZ1CvUy3Do4RVXcb5UMEL8rddn6JD5W0BNoGT7hZmr1bWA2sw4hbmM9
+         q2dPXhMHBMWfpETuLI5VkeZZD8UvJlxWk9BcqqsmjZ8lW+unjUV2/0cmOzq3KE9b10k+
+         FP37Phw1lCDkwM20lgN0crCTp9h62oYU6Mnt0KUQ0mhnceEow+aGMGK67LqMurMuO7Mm
+         CivUYM9U2n8B/MLT9X/jPOCyobPVRFFGFjnwt+p4HCJNeHnt770j25UEa4QVoicZISpV
+         zHoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=wnGwLl0JPrexqdzwboidg01aM/JzVSKvEZRFwCgiSIM=;
+        b=IcROh1yjVtU8bvpVO3GJcZcUjYlW+CNX/7Zxz8fkfUHLOulfL4VjXYvVpST0HolmZN
+         Akp/BRJXMHgCxe7RLVqdzjmB24dTCpy6mYW77ikUUCesPDVWLTDhA79vAGPBUGG5fUmu
+         U3xsfe5OZQp2DSjQnvnOnOLU08rKfWXfi/8Zx/Q76AAa21kfIdqK2ofTTZwxVDSTh381
+         7kvtz8zidRHEIsQRxt0VruGXpIO8ttjuGbGpUlvXkrVCZ38S+4BNXAzFiYR5WPIKWGOY
+         Chw+1XoUmeGRofybg87IKJ4IYW48BTSM7F9VJdZyCwPkamTHZRfLLJMvnusttCKk8SN4
+         wzog==
+X-Gm-Message-State: APjAAAUyc3+zimeRfWQckI3SctEqCCl5TquhSDQRzG09209Wc5hsAvxA
+        bpO5L/Q+LQBHLNtRq4P9/h9f69R0uYCsDIpyp+J84Q==
+X-Google-Smtp-Source: APXvYqyJ+Cc41ifg25IUw7XdZkRvWFCvdUUUyrfKjMD7fLewU4lWnxgpd6X8CN+VsGzAWbzD5IaoZwTt6CnP5p4SUhg=
+X-Received: by 2002:a2e:9a18:: with SMTP id o24mr3406381lji.18.1556536415012;
+ Mon, 29 Apr 2019 04:13:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKb3OG_adYHath5LfT66RDy9gsrxvPT7Q10ns6308F9MyEzp6A@mail.gmail.com>
-User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
+References: <20190426133513.23966-1-igor.j.konopko@intel.com> <087e8d6e-8cdc-87ff-6e2f-cb1fa2fd0396@lightnvm.io>
+In-Reply-To: <087e8d6e-8cdc-87ff-6e2f-cb1fa2fd0396@lightnvm.io>
+From:   Hans Holmberg <hans@owltronix.com>
+Date:   Mon, 29 Apr 2019 07:13:24 -0400
+Message-ID: <CANr-nt0c-4H5PfaH=b-CPrLbMhs=r4skr-oskOGQsyNB=gOMug@mail.gmail.com>
+Subject: Re: [PATCH v5 0/3] lightnvm: next set of improvements for 5.2
+To:     =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
+Cc:     Igor Konopko <igor.j.konopko@intel.com>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Fri, Apr 26, 2019 at 3:54 PM Matias Bj=C3=B8rling <mb@lightnvm.io> wrote=
+:
+>
+> Thanks Igor. I've picked up 1 + 2.
+>
+> The third I'm still noodling on. I think maybe one should bump the disk
+> format, since it's changed. Also, if it is, it should be a static setup
+> (i.e., 1,2,3), and not user configurable. Although, I do expect the
+> separate parallel units to have enough device-side redundancy to provide
+> adequate UBER.
 
-On Sun, Apr 14, 2019 at 09:45:00AM -0600, Jens Axboe wrote:
-> On 4/13/19 9:25 AM, Jens Axboe wrote:
-> > On 4/13/19 2:26 AM, syzbot wrote:
-> >> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121 cpu_max_bits_warn
-> >> include/linux/cpumask.h:121 [inline]
-> >> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121 cpumask_check
-> >> include/linux/cpumask.h:128 [inline]
-> >> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121 cpumask_test_cpu
-> >> include/linux/cpumask.h:344 [inline]
-> >> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121
-> >> io_sq_offload_start fs/io_uring.c:2244 [inline]
-> >> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121 io_uring_create
-> >> fs/io_uring.c:2851 [inline]
-> >> WARNING: CPU: 1 PID: 7600 at include/linux/cpumask.h:121
-> >> io_uring_setup+0x13b2/0x1990 fs/io_uring.c:2903
+The change is backwards- and forwards-compatible (a disk written with
+both an older and a newer
+kernel would be readable, since smeta sectors are marked as ADD_EMPTY)
+ as far as I can tell,
+buy did you test this Igor?
 
-As a heads-up, I'm seeing this on arm64 in v5.1-rc7; example splat below. I
-believe that commit:
-
-  917257daa0fea7a0 ("io_uring: only test SQPOLL cpu after we've verified it")
-
-... was intended to fix this?
-
-IIUC, the problem is that cpu_possible(cpu) can't accept a cpu index above
-nr_cpu_ids, since it is defined as:
-
-  cpumask_test_cpu((cpu), cpu_possible_mask)
-
-... and so we should first check whether cpu >= nr_cpu_ids.
-
-Arguably that could/should live directly in cpu_possible(), but I see that's
-open-coded in a few places:
-
-[mark@lakrids:~/src/linux]% git grep -w cpu_possible | grep nr_cpu_ids
-arch/x86/mm/numa.c:     if (cpu >= nr_cpu_ids || !cpu_possible(cpu)) {
-arch/x86/xen/smp_pv.c:          for (cpu = nr_cpu_ids - 1; !cpu_possible(cpu); cpu--)
-drivers/base/cpu.c:     if (cpu < nr_cpu_ids && cpu_possible(cpu))
-drivers/scsi/libfc/fc_exch.c:   if (cpu >= nr_cpu_ids || !cpu_possible(cpu)) {
-drivers/xen/cpu_hotplug.c:      if (cpu >= nr_cpu_ids || !cpu_possible(cpu))
+I think we might as well bump SMETA_VERSION_MINOR anyway, so we can keep
+track of this format change for the future(i.e if we build an offline
+recovery tool)
 
 Thanks,
-Mark.
-
-WARNING: CPU: 1 PID: 27601 at include/linux/cpumask.h:121 cpu_max_bits_warn include/linux/cpumask.h:121 [inline]
-WARNING: CPU: 1 PID: 27601 at include/linux/cpumask.h:121 cpumask_check include/linux/cpumask.h:128 [inline]
-WARNING: CPU: 1 PID: 27601 at include/linux/cpumask.h:121 cpumask_test_cpu include/linux/cpumask.h:344 [inline]
-WARNING: CPU: 1 PID: 27601 at include/linux/cpumask.h:121 io_sq_offload_start fs/io_uring.c:2244 [inline]
-WARNING: CPU: 1 PID: 27601 at include/linux/cpumask.h:121 io_uring_create fs/io_uring.c:2864 [inline]
-WARNING: CPU: 1 PID: 27601 at include/linux/cpumask.h:121 io_uring_setup+0x1108/0x15a0 fs/io_uring.c:2916
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 1 PID: 27601 Comm: syz-executor.0 Not tainted 5.1.0-rc7 #3
-Hardware name: linux,dummy-virt (DT)
-Call trace:
- dump_backtrace+0x0/0x2f0 include/linux/compiler.h:193
- show_stack+0x20/0x30 arch/arm64/kernel/traps.c:158
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x110/0x190 lib/dump_stack.c:113
- panic+0x384/0x68c kernel/panic.c:214
- __warn+0x2bc/0x2c0 kernel/panic.c:571
- report_bug+0x228/0x2d8 lib/bug.c:186
- bug_handler+0xa0/0x1a0 arch/arm64/kernel/traps.c:956
- call_break_hook arch/arm64/kernel/debug-monitors.c:301 [inline]
- brk_handler+0x1d4/0x388 arch/arm64/kernel/debug-monitors.c:316
- do_debug_exception+0x1a0/0x468 arch/arm64/mm/fault.c:831
- el1_dbg+0x18/0x8c
- cpu_max_bits_warn include/linux/cpumask.h:121 [inline]
- cpumask_check include/linux/cpumask.h:128 [inline]
- cpumask_test_cpu include/linux/cpumask.h:344 [inline]
- io_sq_offload_start fs/io_uring.c:2244 [inline]
- io_uring_create fs/io_uring.c:2864 [inline]
- io_uring_setup+0x1108/0x15a0 fs/io_uring.c:2916
- __do_sys_io_uring_setup fs/io_uring.c:2929 [inline]
- __se_sys_io_uring_setup fs/io_uring.c:2926 [inline]
- __arm64_sys_io_uring_setup+0x50/0x70 fs/io_uring.c:2926
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall arch/arm64/kernel/syscall.c:47 [inline]
- el0_svc_common.constprop.0+0x148/0x2e0 arch/arm64/kernel/syscall.c:83
- el0_svc_handler+0xdc/0x100 arch/arm64/kernel/syscall.c:129
- el0_svc+0x8/0xc arch/arm64/kernel/entry.S:948
-SMP: stopping secondary CPUs
-Dumping ftrace buffer:
-   (ftrace buffer empty)
-Kernel Offset: disabled
-CPU features: 0x002,23000438
-Memory Limit: none
-Rebooting in 1 seconds..
+Hans
+>
+>
+>
+> On 4/26/19 3:35 PM, Igor Konopko wrote:
+> > This is another set of fixes and improvements to both pblk and lightnvm
+> > core.
+> >
+> > Changes v4 -> v5:
+> > -dropped patches which were already pulled into for-5.2/core branch
+> > -rebasing of other patches
+> > -multiple copies of smeta patch moved into last position in series
+> > so it would be easier to pull only previous patches if needed
+> >
+> > Changes v3 -> v4:
+> > -dropped patches which were already pulled into for-5.2/core branch
+> > -major changes for patch #2 based on code review
+> > -patch #6 modified to use krefs
+> > -new patch #7 which extends the patch #6
+> >
+> > Changes v2 -> v3:
+> > -dropped some not needed patches
+> > -dropped patches which were already pulled into for-5.2/core branch
+> > -commit messages cleanup
+> >
+> > Changes v1 -> v2:
+> > -dropped some not needed patches
+> > -review feedback incorporated for some of the patches
+> > -partial read path changes patch splited into two patches
+> >
+> >
+> > Igor Konopko (3):
+> >    lightnvm: pblk: simplify partial read path
+> >    lightnvm: pblk: use nvm_rq_to_ppa_list()
+> >    lightnvm: pblk: store multiple copies of smeta
+> >
+> >   drivers/lightnvm/pblk-core.c     | 159 ++++++++++++++----
+> >   drivers/lightnvm/pblk-init.c     |  23 ++-
+> >   drivers/lightnvm/pblk-rb.c       |  11 +-
+> >   drivers/lightnvm/pblk-read.c     | 339 ++++++++++--------------------=
+---------
+> >   drivers/lightnvm/pblk-recovery.c |  27 ++--
+> >   drivers/lightnvm/pblk-rl.c       |   3 +-
+> >   drivers/lightnvm/pblk.h          |  19 +--
+> >   7 files changed, 252 insertions(+), 329 deletions(-)
+> >
+>
