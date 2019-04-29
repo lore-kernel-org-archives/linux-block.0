@@ -2,161 +2,96 @@ Return-Path: <SRS0=IEWf=S7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C255AC43219
-	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 06:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2579FC43219
+	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 10:47:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C6742075E
-	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 06:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAB6F20675
+	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 10:47:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="d4vzn3xs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727343AbfD2GFf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Apr 2019 02:05:35 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47356 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727016AbfD2GFe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Apr 2019 02:05:34 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id BA09CABD5;
-        Mon, 29 Apr 2019 06:05:31 +0000 (UTC)
-Subject: Re: [PATCH V8 4/7] blk-mq: split blk_mq_alloc_and_init_hctx into two
- parts
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        James Smart <james.smart@broadcom.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-References: <20190428081408.27331-1-ming.lei@redhat.com>
- <20190428081408.27331-5-ming.lei@redhat.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <24ecd123-5707-9b70-d284-b3228951813f@suse.de>
-Date:   Mon, 29 Apr 2019 08:05:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1727693AbfD2KrI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Apr 2019 06:47:08 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:35630 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727746AbfD2KrI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Apr 2019 06:47:08 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3TAdHHc136722;
+        Mon, 29 Apr 2019 10:46:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=W1oy+Qiknzzs4w6utFbw9cgJsjZug4WD/Z2or50vcRs=;
+ b=d4vzn3xsa1Y3tfRyDs0fEWmHZf2cRfM7hoxv6zgUe5YTwkI5qHBk9/nufJvLCekPG0Ak
+ DxelAGEh+0bgJ3a6je2+Xd4ITkwpEGMVfkKoejCmOrjiioPQxqUI8zBN9ooufsLUIvzo
+ GjcnK/nPTGyz8sshQQ4+QjwefSw5LKOqhnlPvROXMHdQBV5BbgXoXLcsDL6b+a9vs1Ko
+ 6iBkVoBmbUg5rPN3nhHppNrkOkSKZSgsMuFIhR+DOzUn3IdV23dV+bPQ/xsqOUt25qK0
+ tZXqw2FSfk3ANkjL6m/L+hH8MCmE6WMoZJCxaM7M3JGFwte5gGBw3TO+Q/g2/G8g91az HQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2s4fqpwgy9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 29 Apr 2019 10:46:57 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3TAkqng024841;
+        Mon, 29 Apr 2019 10:46:56 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 2s4ew0ksbb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 29 Apr 2019 10:46:56 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x3TAkpPm018609;
+        Mon, 29 Apr 2019 10:46:54 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 29 Apr 2019 03:46:50 -0700
+To:     Vlastimil Babka <vbabka@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jerome Glisse <jglisse@redhat.com>,
+        lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, lsf@lists.linux-foundation.org
+Subject: Re: [LSF/MM] Preliminary agenda ? Anyone ... anyone ? Bueller ?
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190425200012.GA6391@redhat.com>
+        <83fda245-849a-70cc-dde0-5c451938ee97@kernel.dk>
+        <503ba1f9-ad78-561a-9614-1dcb139439a6@suse.cz>
+Date:   Mon, 29 Apr 2019 06:46:47 -0400
+In-Reply-To: <503ba1f9-ad78-561a-9614-1dcb139439a6@suse.cz> (Vlastimil Babka's
+        message of "Sat, 27 Apr 2019 17:55:20 +0200")
+Message-ID: <yq1v9yx2inc.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20190428081408.27331-5-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9241 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=675
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1904290078
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9241 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=717 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1904290078
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/28/19 10:14 AM, Ming Lei wrote:
-> Split blk_mq_alloc_and_init_hctx into two parts, and one is
-> blk_mq_alloc_hctx() for allocating all hctx resources, another
-> is blk_mq_init_hctx() for initializing hctx, which serves as
-> counter-part of blk_mq_exit_hctx().
-> 
-> Cc: Dongli Zhang <dongli.zhang@oracle.com>
-> Cc: James Smart <james.smart@broadcom.com>
-> Cc: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: linux-scsi@vger.kernel.org,
-> Cc: Martin K . Petersen <martin.petersen@oracle.com>,
-> Cc: Christoph Hellwig <hch@lst.de>,
-> Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
-> Reviewed-by: Hannes Reinecke <hare@suse.com>
-> Tested-by: James Smart <james.smart@broadcom.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->   block/blk-mq.c | 138 ++++++++++++++++++++++++++++++++-------------------------
->   1 file changed, 77 insertions(+), 61 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d98cb9614dfa..44ecca6b0cac 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2284,15 +2284,70 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
->   	}
->   }
->   
-> +static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
-> +{
-> +	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
-> +
-> +	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, srcu),
-> +			   __alignof__(struct blk_mq_hw_ctx)) !=
-> +		     sizeof(struct blk_mq_hw_ctx));
-> +
-> +	if (tag_set->flags & BLK_MQ_F_BLOCKING)
-> +		hw_ctx_size += sizeof(struct srcu_struct);
-> +
-> +	return hw_ctx_size;
-> +}
-> +
->   static int blk_mq_init_hctx(struct request_queue *q,
->   		struct blk_mq_tag_set *set,
->   		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
->   {
-> -	int node;
-> +	hctx->queue_num = hctx_idx;
->   
-> -	node = hctx->numa_node;
-> +	cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
-> +
-> +	hctx->tags = set->tags[hctx_idx];
-> +
-> +	if (set->ops->init_hctx &&
-> +	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
-> +		goto unregister_cpu_notifier;
-> +
-> +	if (blk_mq_init_request(set, hctx->fq->flush_rq, hctx_idx,
-> +				hctx->numa_node))
-> +		goto exit_hctx;
-> +	return 0;
-> +
-> + exit_hctx:
-> +	if (set->ops->exit_hctx)
-> +		set->ops->exit_hctx(hctx, hctx_idx);
-> + unregister_cpu_notifier:
-> +	blk_mq_remove_cpuhp(hctx);
-> +	return -1;
-> +}
-> +
-> +static struct blk_mq_hw_ctx *
-> +blk_mq_alloc_hctx(struct request_queue *q,
-> +		struct blk_mq_tag_set *set,
-> +		unsigned hctx_idx, int node)
-> +{
-> +	struct blk_mq_hw_ctx *hctx;
-> +
-> +	hctx = kzalloc_node(blk_mq_hw_ctx_size(set),
-> +			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
-> +			node);
-> +	if (!hctx)
-> +		goto fail_alloc_hctx;
-> +
-> +	if (!zalloc_cpumask_var_node(&hctx->cpumask,
-> +				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
-> +				node))
-> +		goto free_hctx;
-> +
-> +	atomic_set(&hctx->nr_active, 0);
-> +	hctx->numa_node = node;
->   	if (node == NUMA_NO_NODE)
-> -		node = hctx->numa_node = set->numa_node;
-> +		hctx->numa_node = set->numa_node;
-> +	node = hctx->numa_node;
->   
->   	INIT_DELAYED_WORK(&hctx->run_work, blk_mq_run_work_fn);
->   	spin_lock_init(&hctx->lock);
-The 'hctx_idx' argument is now unused, and should be removed from the 
-function definition.
 
-Cheers,
+Vlastimil,
 
-Hannes
+> In previous years years there also used to be an attendee list, which
+> is now an empty tab. Is that intentional due to GDPR?
+
+Yes.
+
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
+Martin K. Petersen	Oracle Linux Engineering
