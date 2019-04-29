@@ -2,115 +2,153 @@ Return-Path: <SRS0=IEWf=S7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFB9C43219
-	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 12:32:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C977C43219
+	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 12:32:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 96FF420673
-	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 12:32:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66F1320675
+	for <linux-block@archiver.kernel.org>; Mon, 29 Apr 2019 12:32:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EsykfS/V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EJgWPIuu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728144AbfD2McM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Apr 2019 08:32:12 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:56062 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728058AbfD2McL (ORCPT
+        id S1728087AbfD2Mc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Apr 2019 08:32:27 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:43803 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728025AbfD2Mc1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Apr 2019 08:32:11 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3TCJCh9004325;
-        Mon, 29 Apr 2019 12:31:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=YpLMQQrkPzj0xaZUB7vT4ZsT4KZR9loVYJdQY42icWA=;
- b=EsykfS/VRtTiG1PT3w2/JyYHxbzIQTpln/YmGWDk5ntThTU/geQoO1SD48MdHk8A9HdN
- 5ZqsJGUnFMkz433YFcPCCfQX6H4uort4e6vlGrXXjfXEJAbfujEIjOHsoOHgaOGZIO1+
- oNpocLsQU22CiZ6YZ22v0+Ap5RBRe2Dm76oIKo5G5XfZXkTHKZemHTlCkhnWrxKF8DMF
- /g9d7kJ6btUGWhaZLVj9pPmohy8kv4KqhNCHhyHv+ivZFa8k6jkTNZsxZs8f58Ms+S3I
- HwNc9+O6bQqciEPTHjRhGwuReiGIP99fN3yeUzrhIZbsEcY3VgEBnuZFT5qzPnhD2Scd 6g== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2130.oracle.com with ESMTP id 2s4ckd67xx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Apr 2019 12:31:58 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3TCVXMN182219;
-        Mon, 29 Apr 2019 12:31:57 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 2s4yy8xm6m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Apr 2019 12:31:57 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x3TCVtt1008055;
-        Mon, 29 Apr 2019 12:31:55 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 29 Apr 2019 05:31:55 -0700
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lsf@lists.linux-foundation.org,
-        linux-mm@kvack.org, Jerome Glisse <jglisse@redhat.com>,
-        linux-fsdevel@vger.kernel.org, lsf-pc@lists.linux-foundation.org,
-        Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [Lsf] [LSF/MM] Preliminary agenda ? Anyone ... anyone ? Bueller ?
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20190425200012.GA6391@redhat.com>
-        <83fda245-849a-70cc-dde0-5c451938ee97@kernel.dk>
-        <503ba1f9-ad78-561a-9614-1dcb139439a6@suse.cz>
-        <yq1v9yx2inc.fsf@oracle.com>
-        <1556537518.3119.6.camel@HansenPartnership.com>
-        <yq1zho911sg.fsf@oracle.com>
-        <1556540228.3119.10.camel@HansenPartnership.com>
-Date:   Mon, 29 Apr 2019 08:31:52 -0400
-In-Reply-To: <1556540228.3119.10.camel@HansenPartnership.com> (James
-        Bottomley's message of "Mon, 29 Apr 2019 08:17:08 -0400")
-Message-ID: <yq11s1l0z7r.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9241 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1904290089
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9241 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904290089
+        Mon, 29 Apr 2019 08:32:27 -0400
+Received: by mail-pl1-f193.google.com with SMTP id n8so4997702plp.10;
+        Mon, 29 Apr 2019 05:32:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=rPe/3xADwYrAoEjP8Q48sld2BYo1tLyw2GTQz4U4xbw=;
+        b=EJgWPIuusv7Kl1N8bGa9VTgBciy+zPdeRNWHYig+fP8t/MKtm+UorsKjEH0cXNTl6U
+         XcnI/EImMevT9eKGFFuoSWmRl8ZnWUyP0ae2v9wE8gtRj0zWXhcDTkc9gfyj/uIAL2dT
+         4PxgvTWU/10hFQO6GPQ/AGgdFG455fAP/z1kZe7Y64zpADfwmO7a4RASi25X4cdeuG1z
+         RjOUqkdUrefnalcXo2meAuCiSxwIEBCBDlglUOCMEmTqUIS5nciLE7gbD2XmpJuIAKa2
+         RFlJbOlus5+qll9w7V7mDpzpiCDULLmR+ASLGXi6IAP5oQTZX0FtLGM+0gOH9sXH58DJ
+         m3oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=rPe/3xADwYrAoEjP8Q48sld2BYo1tLyw2GTQz4U4xbw=;
+        b=G5kyog4IhKpW8bSETRItMwxWPm/S8nWJnzw7GwwSBGX3GvOcuRGQ6FD9sbyS8pP1hr
+         C42a/D8Itvgow4nrW9nXsfnxugx38pBZY9pomZuTYrfdHN7ne5pBNCG9b43lvgDwelX4
+         RnuAvWnIe+hQyhgIe09nc2hN/ds3qKMCpiK7IIhk5Rrqd1VSOO/8o4qKmGEP6N2hzOTB
+         UTdX79ZQ1Ex2F4/npsEieV2Xji8OpY7jju3ieglz/39uCJVkyO4s1LdVyn1t3S2mDrxS
+         9ikvA0yQiHlHRuUmUbWK/y4HQKv9CPsk/yLxD71ma0mu/H2r3Cuc8xW0OZR9ZEDT6cfP
+         cAVA==
+X-Gm-Message-State: APjAAAXw3joYUSkBvZiKZ+IugPOeEyZt/ToAvlIc26OxbI4pTKalFQzO
+        zO/4eHHITv2Jwrn2RH1pFpo=
+X-Google-Smtp-Source: APXvYqzFPRgbsIlk2oXaEbCWGawn9uL3z2EQwx2hvHYY4VW3K/j/dof2AutLWuVvtGhfiU2TMkOGqw==
+X-Received: by 2002:a17:902:6b0b:: with SMTP id o11mr25145727plk.266.1556541146818;
+        Mon, 29 Apr 2019 05:32:26 -0700 (PDT)
+Received: from localhost.localdomain (172.96.249.239.16clouds.com. [172.96.249.239])
+        by smtp.gmail.com with ESMTPSA id c62sm76305823pfg.33.2019.04.29.05.32.25
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 29 Apr 2019 05:32:25 -0700 (PDT)
+From:   Guoju Fang <fangguoju@gmail.com>
+To:     colyli@suse.de
+Cc:     kent.overstreet@gmail.com, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, Guoju Fang <fangguoju@gmail.com>
+Subject: [PATCH] bcache: fix memleak when error occurred before journal replay
+Date:   Mon, 29 Apr 2019 08:30:59 -0400
+Message-Id: <1556541059-21234-1-git-send-email-fangguoju@gmail.com>
+X-Mailer: git-send-email 1.7.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+A list of struct journal_replay is allocated when register cache device
+and will be freed when journal replay complete. It will cause memory
+leaks if some error occurred before journal replay.
 
-James,
+Signed-off-by: Guoju Fang <fangguoju@gmail.com>
+---
+ drivers/md/bcache/super.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-> But for this year, I'd just assume the "event partners" checkbox
-> covers publication of attendee data to attendees, because if you
-> assume the opposite, since you've asked no additional permission of
-> your speakers either, that would make publishing the agenda a GDPR
-> violation.
-
-Speakers have proposed a topic by posting a message to a public mailing
-list. Whereas not all attendees have indicated their desire to attend in
-a public forum.
-
-I don't think there's a problem publishing the list of people that sent
-an ATTEND. My concern is the ones that didn't. And if the attendee list
-is not comprehensive, I am not sure how helpful it is.
-
-From a more practical perspective, I also don't have access to whether
-people clicked the "event partners" box or not during registration.
-Although I can reach out to LF and see whether I can get access to that
-information.
-
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index a697a3a..e4289291 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1782,6 +1782,7 @@ static void run_cache_set(struct cache_set *c)
+ 	struct cache *ca;
+ 	struct closure cl;
+ 	unsigned int i;
++	LIST_HEAD(journal);
+ 
+ 	closure_init_stack(&cl);
+ 
+@@ -1790,7 +1791,6 @@ static void run_cache_set(struct cache_set *c)
+ 	set_gc_sectors(c);
+ 
+ 	if (CACHE_SYNC(&c->sb)) {
+-		LIST_HEAD(journal);
+ 		struct bkey *k;
+ 		struct jset *j;
+ 
+@@ -1820,25 +1820,25 @@ static void run_cache_set(struct cache_set *c)
+ 
+ 		err = "bad btree root";
+ 		if (__bch_btree_ptr_invalid(c, k))
+-			goto err;
++			goto free_journal;
+ 
+ 		err = "error reading btree root";
+ 		c->root = bch_btree_node_get(c, NULL, k,
+ 					     j->btree_level,
+ 					     true, NULL);
+ 		if (IS_ERR_OR_NULL(c->root))
+-			goto err;
++			goto free_journal;
+ 
+ 		list_del_init(&c->root->list);
+ 		rw_unlock(true, c->root);
+ 
+ 		err = uuid_read(c, j, &cl);
+ 		if (err)
+-			goto err;
++			goto free_journal;
+ 
+ 		err = "error in recovery";
+ 		if (bch_btree_check(c))
+-			goto err;
++			goto free_journal;
+ 
+ 		bch_journal_mark(c, &journal);
+ 		bch_initial_gc_finish(c);
+@@ -1854,7 +1854,7 @@ static void run_cache_set(struct cache_set *c)
+ 		err = "error starting allocator thread";
+ 		for_each_cache(ca, c, i)
+ 			if (bch_cache_allocator_start(ca))
+-				goto err;
++				goto free_journal;
+ 
+ 		/*
+ 		 * First place it's safe to allocate: btree_check() and
+@@ -1938,6 +1938,14 @@ static void run_cache_set(struct cache_set *c)
+ 
+ 	set_bit(CACHE_SET_RUNNING, &c->flags);
+ 	return;
++
++free_journal:
++	while (!list_empty(&journal)) {
++		struct journal_replay *jr = list_first_entry(&journal,
++			    struct journal_replay, list);
++		list_del(&jr->list);
++		kfree(jr);
++	}
+ err:
+ 	closure_sync(&cl);
+ 	/* XXX: test this, it's broken */
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+1.8.3.1
+
