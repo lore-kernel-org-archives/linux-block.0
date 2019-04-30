@@ -2,137 +2,155 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.3 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 598A8C43219
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 18:12:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A42BAC43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 18:16:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1783220854
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 18:12:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D5B620854
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 18:16:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="nel2FF2x"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="4ZL+q/Jr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726883AbfD3SMG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 14:12:06 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:45562 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726766AbfD3SMD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 14:12:03 -0400
-Received: by mail-pf1-f193.google.com with SMTP id e24so7443482pfi.12
-        for <linux-block@vger.kernel.org>; Tue, 30 Apr 2019 11:12:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=keqoE4yrofLz8kYqjDMsHSkr0S8YueMxYzrRDWUbwAc=;
-        b=nel2FF2xXr6lovHX+5X+lMHSYLpbHBP2n/K5tXZUUpLin3UbJtXhYnNgYyPfij7qIo
-         BJ9uWdtOXq8wi0NQ5nwUPx5CUIAgXpAZ4y1XR0C4aL3LUHVdCK93F5EKXPgPuwdX9S+J
-         I7ytgmMcPPyO5VBUGx7rbCK6J6BAkOaZAB/6yyHN0JCf9WAo0OAXirXbebwl+gyLWRWN
-         j1Oxn1GaRKyXPS6ydD6j7sll8hiPZguc3LLILFJdntPk7IXRoOO9quyvCj7VeR8iJc85
-         7M+M5c/lDdbpj0FJD7y5B1NoIt5SOLsBi3SHAkV7ueuw6eRKjyjuiHU3hMiQf+uOkgAA
-         Kv6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=keqoE4yrofLz8kYqjDMsHSkr0S8YueMxYzrRDWUbwAc=;
-        b=kYFsUtBJlQuJ/naE9OPzbEi3r1bEEkKmfX6hPGCRe+TI8ScJ2qwtyASh5Qnp4Q6DjH
-         mvH5YvlR0YCv+Yp21DSBFPYtrNCaJthhCYmvI1meMcyjd3ouEl94b9Vbd+zQF1awGOEk
-         TjeVEA5+GF7UYHzm/MZK1Ha9i2VWLb6P7W71TKAuxXeijQP9j7KDGxd8DdIcwcdQOp3p
-         rzKjNq7fT/1df6xdtGlNlvJhYqSj5BgK91j8S/IxCFyppMsajzrcE9b2TT0u1c9Ko8oN
-         n2GZplEXNUxFgz9hP2prjDTzhpyYQfOIkZTyrE0BGwhhLdfdyoy4ExpUcFQaIb35JvzD
-         8bOQ==
-X-Gm-Message-State: APjAAAV7xEzlBq5H+KWxorna3gi7T+vssQCoYiDVD1z1k/VXO4xDacDH
-        l7Mpnh8umNwAgDhIsvlT/mloZnZjFhkzng==
-X-Google-Smtp-Source: APXvYqxJznYkLaG36rMsocKbpuE5EXZvpj3VByEQMt0piXbUrjmJroHQ3MSuCS/BLz8CGIk3QrdYPA==
-X-Received: by 2002:a63:7504:: with SMTP id q4mr37268203pgc.443.1556647921914;
-        Tue, 30 Apr 2019 11:12:01 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id b144sm13157642pfb.68.2019.04.30.11.12.00
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Apr 2019 11:12:00 -0700 (PDT)
-Subject: Re: [PATCH] io_uring: avoid page allocation warnings
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20190430132405.8268-1-mark.rutland@arm.com>
- <20190430141810.GF13796@bombadil.infradead.org>
- <20190430145938.GA8314@lakrids.cambridge.arm.com>
- <a1af3017-6572-e828-dc8a-a5c8458e6b5a@kernel.dk>
- <20190430170302.GD8314@lakrids.cambridge.arm.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0bd395a0-e0d3-16a5-e29f-557e97782a48@kernel.dk>
-Date:   Tue, 30 Apr 2019 12:11:59 -0600
+        id S1726006AbfD3SQF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 14:16:05 -0400
+Received: from mail.stbuehler.de ([5.9.32.208]:40334 "EHLO mail.stbuehler.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725950AbfD3SQF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Apr 2019 14:16:05 -0400
+Received: from [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6] (unknown [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6])
+        by mail.stbuehler.de (Postfix) with ESMTPSA id C81F7C02FB9;
+        Tue, 30 Apr 2019 18:16:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=stbuehler.de;
+        s=stbuehler1; t=1556648162;
+        bh=dNPRffawg0+ybO8pzwlTlOMbqgV+OFyJM3IZuJK5bQI=;
+        h=Subject:To:References:From:Date:In-Reply-To:From;
+        b=4ZL+q/JroJlsCPDMpdWZXDuBSQMCeWE5Gqp5ujEhMNKzJqG7h7eJ/Iu0tJcQy/6Al
+         fJQyYz4BIdxJsJlsATosaAVFCYG5sQS8ZrDLbPa4nPpGTLwTrcgzM3o4ti4PPr0yGB
+         1qI7fA34mNkWl+n6r/CARgrysq5qW6OK8UvGuYO0=
+Subject: Re: io_uring: submission error handling
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <366484f9-cc5b-e477-6cc5-6c65f21afdcb@stbuehler.de>
+ <37071226-375a-07a6-d3d3-21323145de71@kernel.dk>
+ <bc077192-56cc-7497-ee43-6a0bcc369d16@kernel.dk>
+ <66fb4ed7-a267-1b0b-d609-af34d9e1aa54@stbuehler.de>
+ <8ce7be42-4183-b441-9a26-6b3441ed5fef@kernel.dk>
+ <4fe4bfb0-81a8-82da-66a2-ffe6fd972a7b@kernel.dk>
+From:   =?UTF-8?Q?Stefan_B=c3=bchler?= <source@stbuehler.de>
+Message-ID: <9a16ac43-da5c-613a-3581-9acc6ba4cff0@stbuehler.de>
+Date:   Tue, 30 Apr 2019 20:15:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190430170302.GD8314@lakrids.cambridge.arm.com>
+In-Reply-To: <4fe4bfb0-81a8-82da-66a2-ffe6fd972a7b@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/30/19 11:03 AM, Mark Rutland wrote:
-> On Tue, Apr 30, 2019 at 10:21:03AM -0600, Jens Axboe wrote:
->> On 4/30/19 8:59 AM, Mark Rutland wrote:
->>> On Tue, Apr 30, 2019 at 07:18:10AM -0700, Matthew Wilcox wrote:
->>>> On Tue, Apr 30, 2019 at 02:24:05PM +0100, Mark Rutland wrote:
->>>>> In io_sqe_buffer_register() we allocate a number of arrays based on the
->>>>> iov_len from the user-provided iov. While we limit iov_len to SZ_1G,
->>>>> we can still attempt to allocate arrays exceeding MAX_ORDER.
+Hi,
+
+On 30.04.19 18:15, Jens Axboe wrote:
+> On 4/30/19 10:02 AM, Jens Axboe wrote:
+>> On 4/27/19 9:50 AM, Stefan Bühler wrote:
+>>> Hi,
+>>>
+>>> On 24.04.19 00:07, Jens Axboe wrote:
+>>>> On 4/23/19 2:31 PM, Jens Axboe wrote:
+>>>>>> 1. An error for a submission should be returned as completion for that
+>>>>>> submission.  Please don't break my main event loop with strange error
+>>>>>> codes just because a single operation is broken/not supported/...
 >>>>>
->>>>> On a 64-bit system with 4KiB pages, for an iov where iov_base = 0x10 and
->>>>> iov_len = SZ_1G, we'll calculate that nr_pages = 262145. When we try to
->>>>> allocate a corresponding array of (16-byte) bio_vecs, requiring 4194320
->>>>> bytes, which is greater than 4MiB. This results in SLUB warning that
->>>>> we're trying to allocate greater than MAX_ORDER, and failing the
->>>>> allocation.
->>>>>
->>>>> Avoid this by passing __GFP_NOWARN when allocating arrays for the
->>>>> user-provided iov_len. We'll gracefully handle the failed allocation,
->>>>> returning -ENOMEM to userspace.
->>>>>
->>>>> We should probably consider lowering the limit below SZ_1G, or reworking
->>>>> the array allocations.
+>>>>> So that's the case I was referring to above. We can just make that change,
+>>>>> there's absolutely no reason to have errors passed back through a different
+>>>>> channel.
 >>>>
->>>> I'd suggest that kvmalloc is probably our friend here ... we don't really
->>>> want to return -ENOMEM to userspace for this case, I don't think.
+>>>> Thinking about this a bit more, and I think the current approach is the
+>>>> best one. The issue is that only submission side events tied to an sqe
+>>>> can return an cqe, the rest have to be returned through the system call
+>>>> value. So I think it's cleaner to keep it as-is, honestly.
 >>>
->>> Sure. I'll go verify that the uring code doesn't assume this memory is
->>> physically contiguous.
+>>> Not sure we're talking about the same.
 >>>
->>> I also guess we should be passing GFP_KERNEL_ACCOUNT rateh than a plain
->>> GFP_KERNEL.
+>>> I'm talking about the errors returned by io_submit_sqe: io_submit_sqes
+>>> (called by the SQ thread) calls io_cqring_add_event if there was an
+>>> error, but io_ring_submit (called by io_uring_enter) doesn't: instead,
+>>> if there were successfully submitted entries before, it will just return
+>>> those (and "undo" the current SQE), otherwise it will return the error,
+>>> which will then be returned by io_uring_enter.
+>>>
+>>> But if I get an error from io_uring_enter I have no idea whether it was
+>>> some generic error (say EINVAL for broken flags or EBADF for a
+>>> non-io-uring filedescriptor) or an error related to a single submission.
+>>>
+>>> I think io_ring_submit should call io_cqring_add_event on errors too
+>>> (like io_submit_sqes), and not stop handling submissions (and never
+>>> return an error).
+>>>
+>>> Maybe io_cqring_add_event could then even be moved to io_submit_sqe and
+>>> just return whether the job is already done or not (io_submit_sqes
+>>> returns the new "inflight" jobs, and io_ring_submit the total number of
+>>> submitted jobs).
 >>
->> kvmalloc() is fine, the io_uring code doesn't care about the layout of
->> the memory, it just uses it as an index.
+>> I think we are talking about the same thing, actually. See below patch.
+>> This changes it so that any error that occurs on behalf of a specific
+>> sqe WILL trigger a completion event, instead of returning it through
+>> io_uring_enter(). io_uring_enter() can still return -ERROR for errors
+>> that aren't specific to an sqe.
+>>
+>> I think this is what you had in mind?
+>>
+>> Totally untested, will do so now.
 > 
-> I've just had a go at that, but when using kvmalloc() with or without
-> GFP_KERNEL_ACCOUNT I hit OOM and my system hangs within a few seconds with the
-> syzkaller prog below:
+> Seems to work for me, just needed to adjust the -EAGAIN test case in
+> liburing.
 > 
-> ----
-> Syzkaller reproducer:
-> # {Threaded:false Collide:false Repeat:false RepeatTimes:0 Procs:1 Sandbox: Fault:false FaultCall:-1 FaultNth:0 EnableTun:false EnableNetDev:false EnableNetReset:false EnableCgroups:false EnableBinfmtMisc:false EnableCloseFds:false UseTmpDir:false HandleSegv:false Repro:false Trace:false}
-> r0 = io_uring_setup(0x378, &(0x7f00000000c0))
-> sendmsg$SEG6_CMD_SET_TUNSRC(0xffffffffffffffff, &(0x7f0000000240)={&(0x7f0000000000)={0x10, 0x0, 0x0, 0x40000000}, 0xc, 0x0, 0x1, 0x0, 0x0, 0x10}, 0x800)
-> io_uring_register$IORING_REGISTER_BUFFERS(r0, 0x0, &(0x7f0000000000), 0x1)
-> ----
+> I forgot to mention, but this will still stall the submission sequence.
+> Before, if you wanted to queue 8 sqes and we had an error on the 5th, we'd
+> return ret == 4 and the application would have to look at the sqring to
+> figure out what is wrong with the head entry. Now we'd return 5, and
+> have a cqe posted for the 5th entry that had an error. The app can then
+> decide if it needs to do anything about this. If it doesn't, it just
+> needs to call io_uring_enter() again to submit the remaining 3 entries.
 > 
-> ... I'm a bit worried that opens up a trivial DoS.
-> 
-> Thoughts?
+> I do like this change. Any error on an sqe will result in a cqe being
+> posted, instead of having the submission be slightly different and have
+> the cqe be dependent on where the error occurred.
 
-Can you post the patch you used?
+I think you forgot to attach the patch - I can't find it :)
 
--- 
-Jens Axboe
+Without seeing the patch I'd like to point out the stalling is buggy
+right now: if you stall you must not wait for an event (unless you
+decrease min_complete by the number of events you didn't submit,
+min(...) is wrong), as the event that possibly might wake up the loop
+might not have been submitted in the first place.
 
+The patch I was working on locally didn't stall so it also indirectly
+fixed that bug; the challenge with stalling will be how to detect it:
+"submitted < to_submit" does not indicate a stall if we accept that
+applications are allowed to pass "to_submit" values larger than what is
+actually in the queue.
+
+While I agree that for special applications stalling on errors might be
+an interesting feature, for more "general purpose" libraries stalling is
+probably not useful (also note that the SQ thread won't stall either).
+
+Maybe other solutions can be found: e.g. mark submissions as depending
+on other submissions (including a barrier), and fail if the previous one
+fails.
+
+One last thing about stalling: the ring documentation so far describes
+pending SQ elements as "owned by kernel"; allowing the application to
+update it afterwards might make the documentation more complex (I don't
+see a technical problem: without SQ thread the kernel never accesses the
+submission queue outside io_uring_enter; but the application mustn't
+modify SQ head).
+
+cheers,
+Stefan
