@@ -2,78 +2,111 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFDBC43219
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 10:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3032CC43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 10:52:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0972A21670
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 10:11:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1556619086;
-	bh=o1wMCDHFwGgVwrps+DSjmA5A0wEtpqb0cJ+nZ5axszI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=fdI7LrJxP/T00Xflyix8WxBKVf94eCUKPMzj3//XiDqLdOC71H3ewmvprsTcNezCJ
-	 frRaeH6Fol3mdb6c3zAD/GsuWIJqK9DWUR6yKZsm2PN9DvVVK58lJ2LokEElQ179aQ
-	 mUjW84LsLB48QIrHcHIyL4HCDry17eT53X+w4bXA=
+	by mail.kernel.org (Postfix) with ESMTP id F2DF121670
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 10:52:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZoSzjyAF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726648AbfD3KLZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 06:11:25 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49236 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726539AbfD3KLZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 06:11:25 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id B4ED0AF56;
-        Tue, 30 Apr 2019 10:11:23 +0000 (UTC)
-Date:   Tue, 30 Apr 2019 06:11:20 -0400
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jerome Glisse <jglisse@redhat.com>,
-        lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: Scheduling conflicts
-Message-ID: <20190430101120.GD3715@dhcp22.suse.cz>
-References: <20190425200012.GA6391@redhat.com>
- <83fda245-849a-70cc-dde0-5c451938ee97@kernel.dk>
- <20190429235440.GA13796@bombadil.infradead.org>
+        id S1727512AbfD3Kwi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 06:52:38 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:34110 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727253AbfD3Kwi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Apr 2019 06:52:38 -0400
+Received: by mail-qk1-f195.google.com with SMTP id n68so7836653qka.1;
+        Tue, 30 Apr 2019 03:52:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=LnKYy8jFj+JVpVc0C/UzgZXSpL4E0hdFTQaCn24mwco=;
+        b=ZoSzjyAFUIkT/IJEHAragzsBdlhhXZzJTUJVioDNkVtECy/vvUL0m8oBhzUu+irnqG
+         OkN4BD3T9QdnGO7JhpIvWx3ufxUQST4hhDUljQiTj5W9n7aM+a1ZaQx35XSwQneiwz9R
+         ZfwuvPcaSOEcH9oMkTtq2YbB/0hWzmP4qAlKhF/2HhOqniJRShrkgJboNt0yK+0vks48
+         /lNukNAOpB241V+d0DDTcM5aQBXRfvAEhWgnET/BS4JvN9iodjsmHIUeMD0G9fzbPJPe
+         ddROflj3IUdU+gmVAYmnEsg6sfmsePB1ZPudkwyMJvJQojxZpIOuKbYdozVTLoCqlae5
+         5LxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=LnKYy8jFj+JVpVc0C/UzgZXSpL4E0hdFTQaCn24mwco=;
+        b=iPwAt18yxPHA9pA3RfCyeIvsrbhNfV7zUAJ47XwNVAM5CyxEsjVNFWswzGJZFz/rXW
+         pjtwog6Fj+yKcW2yOTDlm5lj/o1TqVvG1uPOBVDOne1Wn4G8EfGyVeP1PEQtOjvIZF0T
+         6oNSuxhO4fkZmiBMF5oENyG/TSg/uMATdNV9cM+UMekENMZ8taXaoB7Jhz/ZFC8s8sw6
+         /bqURkwgCqM/bpZ/fwlsfWB3EzUBLEla6+p1UDuFOB3PcVQwszzY26FpUQzU1d9GsC1s
+         aQGjWl8v3ue1K/YYhIKyNhwIJHj2LCinw8vPJlUnlhZzFoD5O6db4v5xAqOYAGsseuiH
+         Hvbg==
+X-Gm-Message-State: APjAAAWzjpHd41ZVkAFbVuLgyjZCwDcH2waWobXUbT2+xEhvNgvq7P6N
+        lOlTRY6IW8JjAnLcDiVR2H0=
+X-Google-Smtp-Source: APXvYqyEp/ZdUavjs8KgOwRCEG3lYrIV4mo1aOsdTDyV2iNrHd2FUdrlCSxBq31I546BoDKGayR3PQ==
+X-Received: by 2002:a37:2c06:: with SMTP id s6mr48810567qkh.142.1556621557170;
+        Tue, 30 Apr 2019 03:52:37 -0700 (PDT)
+Received: from laptop (189.26.185.89.dynamic.adsl.gvt.net.br. [189.26.185.89])
+        by smtp.gmail.com with ESMTPSA id w58sm19627363qtw.93.2019.04.30.03.52.32
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 30 Apr 2019 03:52:35 -0700 (PDT)
+Date:   Tue, 30 Apr 2019 07:52:15 -0300
+From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Hannes Reinecke <hare@suse.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Greg Edwards <gedwards@ddn.com>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/2] blkdev.h: Introduce size_to_sectors hlper function
+Message-ID: <20190430105212.GA1642767@laptop>
+References: <20190430013205.1561708-1-marcos.souza.org@gmail.com>
+ <20190430013205.1561708-2-marcos.souza.org@gmail.com>
+ <yq1bm0ow6iv.fsf@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190429235440.GA13796@bombadil.infradead.org>
+In-Reply-To: <yq1bm0ow6iv.fsf@oracle.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 29-04-19 16:54:41, Matthew Wilcox wrote:
-> On Thu, Apr 25, 2019 at 02:03:34PM -0600, Jens Axboe wrote:
-> > On 4/25/19 2:00 PM, Jerome Glisse wrote:
-> > > Did i miss preliminary agenda somewhere ? In previous year i think
-> > > there use to be one by now :)
-> > 
-> > You should have received an email from LF this morning with a subject
-> > of:
-> > 
-> > LSFMM 2019: 8 Things to Know Before You Arrive!
-> > 
-> > which also includes a link to the schedule. Here it is:
-> > 
-> > https://docs.google.com/spreadsheets/d/1Z1pDL-XeUT1ZwMWrBL8T8q3vtSqZpLPgF3Bzu_jejfk
+On Mon, Apr 29, 2019 at 10:50:32PM -0400, Martin K. Petersen wrote:
 > 
-> The schedule continues to evolve ... I would very much like to have
-> Christoph Hellwig in the room for the Eliminating Tail Pages discussion,
-> but he's now scheduled to speak in a session at the same time (16:00
-> Tuesday).  I assume there'll be time for agenda-bashing at 9am tomorrow?
+> Hi Marco,
+> 
+> > +static inline sector_t size_to_sectors(long long size)
+> > +{
+> > +	return size >> SECTOR_SHIFT;
+> > +}
+> > +
+> 
+> FWIW, in SCSI we have:
+> 
+> 	logical_to_sectors()
+>         logical_to_bytes()
+>         bytes_to_logical()
+>         sectors_to_logical()
+> 
+> I'm not attached to "bytes" in any way but it would be nice to be
+> consistent.
+> 
 
-I have swapped slots at 16:00 and 16:30 so there shouldn't be any
-conflict now. Let me know if that doesn't fit.
+Thanks for the suggestion. I will send a new version using "bytes_to_sectors"
+instead.
+
+> -- 
+> Martin K. Petersen	Oracle Linux Engineering
 
 -- 
-Michal Hocko
-SUSE Labs
+Thanks,
+Marcos
