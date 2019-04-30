@@ -2,148 +2,197 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B440C43219
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 16:16:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B4AC43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 16:20:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 693FC20835
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 16:16:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AR1t0EJi"
+	by mail.kernel.org (Postfix) with ESMTP id 0A3FB21670
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 16:20:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726359AbfD3QQD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 12:16:03 -0400
-Received: from mail-it1-f176.google.com ([209.85.166.176]:38834 "EHLO
-        mail-it1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725950AbfD3QQC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 12:16:02 -0400
-Received: by mail-it1-f176.google.com with SMTP id q19so5657990itk.3
-        for <linux-block@vger.kernel.org>; Tue, 30 Apr 2019 09:16:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:references:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=OD9cUVtGMZ8nWjuT5InBrU2Wv9vKngRSovSQaY9v9ag=;
-        b=AR1t0EJigdlWLAm1bpe1jBedpB3UAIshTS6z3x7oKe+a4UkX0sw8lvHtH7+J9INbtq
-         9nOOS/UNdWY84ePUPVQpAbcdOIEbQ+2Gl9V75TKaS/amKt1/M9gZTWDLA887JAfaGUDf
-         k5Ux5uktNtO8tLWu1RuUqsVmEcIk3RHCLQ4BilV+BTieMjEHVM9RNuhYUtexjiXSZr1J
-         21i2rhgUKbKG7ltDOmAGOGU7HPeEd+RoDJsPExaiymWDpSgs+BB9RHA1y1csxKmgF9XS
-         iy3D4A+8tIR9kYvAp8+ksXQsMbM4P3zKqV5FZ7HxD+Zme/mCZ2F7p2E+z4crVlALIum/
-         DCTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OD9cUVtGMZ8nWjuT5InBrU2Wv9vKngRSovSQaY9v9ag=;
-        b=pzBdOBMfjblz84Uv1dNbUAYet32DkoOFMH0/WpePq0JpPoQBlIJdQTnS6iS5gHHAZL
-         Qvah026zmerhp27UHRVVGd9JYo3wS9tEyK30E7rvY32wp3ScK15uJybc3oE26tlngoRa
-         3Wucm166EKGAk4aDovsrlAUS5dJ4LZWkDB9ywQyXq+wJwPAxFPBARPpfz3TfSD+hZ8te
-         V8vVmVtVJftdKp7nHFPw1QlqfMeWDiyhkjBtMipFWvfmfTL1XBqYmG5Kr5UmUfcZSLFK
-         lyvQBiGF84vYsGYyVMNY6HTV1TFK4B5WhMSyXo18LUT+xeElJypNWS37x1gbPXZ0k0zR
-         av/g==
-X-Gm-Message-State: APjAAAUk7WiWkvZICIe3RH15U+GWDNZTWwFGGH5ahwApKiZatOV5ouMp
-        GweJ/jhP5odvEXu/ArExADF+bw==
-X-Google-Smtp-Source: APXvYqwkIpfQeZGKskqHrEpU0VnfF17rCLM0fAMMJO2Dh+a53wrey/ZhXzWdo0xFDEbRozJHmaHGLQ==
-X-Received: by 2002:a24:274e:: with SMTP id g75mr4005402ita.34.1556640961643;
-        Tue, 30 Apr 2019 09:16:01 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id 125sm1715130itx.21.2019.04.30.09.15.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Apr 2019 09:16:00 -0700 (PDT)
-Subject: Re: io_uring: submission error handling
-From:   Jens Axboe <axboe@kernel.dk>
-To:     =?UTF-8?Q?Stefan_B=c3=bchler?= <source@stbuehler.de>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <366484f9-cc5b-e477-6cc5-6c65f21afdcb@stbuehler.de>
- <37071226-375a-07a6-d3d3-21323145de71@kernel.dk>
- <bc077192-56cc-7497-ee43-6a0bcc369d16@kernel.dk>
- <66fb4ed7-a267-1b0b-d609-af34d9e1aa54@stbuehler.de>
- <8ce7be42-4183-b441-9a26-6b3441ed5fef@kernel.dk>
-Message-ID: <4fe4bfb0-81a8-82da-66a2-ffe6fd972a7b@kernel.dk>
-Date:   Tue, 30 Apr 2019 10:15:58 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <8ce7be42-4183-b441-9a26-6b3441ed5fef@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1726291AbfD3QU2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 12:20:28 -0400
+Received: from foss.arm.com ([217.140.101.70]:49742 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726102AbfD3QU2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Apr 2019 12:20:28 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3C129374;
+        Tue, 30 Apr 2019 09:20:27 -0700 (PDT)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id CB1973F5C1;
+        Tue, 30 Apr 2019 09:20:25 -0700 (PDT)
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org
+Cc:     Mark Rutland <mark.rutland@arm.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.or
+Subject: [PATCH] io_uring: free allocated io_memory once
+Date:   Tue, 30 Apr 2019 17:20:18 +0100
+Message-Id: <20190430162018.40040-1-mark.rutland@arm.com>
+X-Mailer: git-send-email 2.11.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/30/19 10:02 AM, Jens Axboe wrote:
-> On 4/27/19 9:50 AM, Stefan Bühler wrote:
->> Hi,
->>
->> On 24.04.19 00:07, Jens Axboe wrote:
->>> On 4/23/19 2:31 PM, Jens Axboe wrote:
->>>>> 1. An error for a submission should be returned as completion for that
->>>>> submission.  Please don't break my main event loop with strange error
->>>>> codes just because a single operation is broken/not supported/...
->>>>
->>>> So that's the case I was referring to above. We can just make that change,
->>>> there's absolutely no reason to have errors passed back through a different
->>>> channel.
->>>
->>> Thinking about this a bit more, and I think the current approach is the
->>> best one. The issue is that only submission side events tied to an sqe
->>> can return an cqe, the rest have to be returned through the system call
->>> value. So I think it's cleaner to keep it as-is, honestly.
->>
->> Not sure we're talking about the same.
->>
->> I'm talking about the errors returned by io_submit_sqe: io_submit_sqes
->> (called by the SQ thread) calls io_cqring_add_event if there was an
->> error, but io_ring_submit (called by io_uring_enter) doesn't: instead,
->> if there were successfully submitted entries before, it will just return
->> those (and "undo" the current SQE), otherwise it will return the error,
->> which will then be returned by io_uring_enter.
->>
->> But if I get an error from io_uring_enter I have no idea whether it was
->> some generic error (say EINVAL for broken flags or EBADF for a
->> non-io-uring filedescriptor) or an error related to a single submission.
->>
->> I think io_ring_submit should call io_cqring_add_event on errors too
->> (like io_submit_sqes), and not stop handling submissions (and never
->> return an error).
->>
->> Maybe io_cqring_add_event could then even be moved to io_submit_sqe and
->> just return whether the job is already done or not (io_submit_sqes
->> returns the new "inflight" jobs, and io_ring_submit the total number of
->> submitted jobs).
-> 
-> I think we are talking about the same thing, actually. See below patch.
-> This changes it so that any error that occurs on behalf of a specific
-> sqe WILL trigger a completion event, instead of returning it through
-> io_uring_enter(). io_uring_enter() can still return -ERROR for errors
-> that aren't specific to an sqe.
-> 
-> I think this is what you had in mind?
-> 
-> Totally untested, will do so now.
+If io_allocate_scq_urings() fails to allocate an sq_* region, it will
+call io_mem_free() for any previously allocated regions, but leave
+dangling pointers to these regions in the ctx. Any regions which have
+not yet been allocated are left NULL. Note that when returning
+-EOVERFLOW, the previously allocated sq_ring is not freed, which appears
+to be an unintentional leak.
 
-Seems to work for me, just needed to adjust the -EAGAIN test case in
-liburing.
+When io_allocate_scq_urings() fails, io_uring_create() will call
+io_ring_ctx_wait_and_kill(), which calls io_mem_free() on all the sq_*
+regions, assuming the pointers are valid and not NULL.
 
-I forgot to mention, but this will still stall the submission sequence.
-Before, if you wanted to queue 8 sqes and we had an error on the 5th, we'd
-return ret == 4 and the application would have to look at the sqring to
-figure out what is wrong with the head entry. Now we'd return 5, and
-have a cqe posted for the 5th entry that had an error. The app can then
-decide if it needs to do anything about this. If it doesn't, it just
-needs to call io_uring_enter() again to submit the remaining 3 entries.
+This can result in pages being freed multiple times, which has been
+observed to corrupt the page state, leading to subsequent fun. This can
+also result in virt_to_page() on NULL, resulting in the use of bogus
+page addresses, and yet more subsequent fun. The latter can be detected
+with CONFIG_DEBUG_VIRTUAL on arm64.
 
-I do like this change. Any error on an sqe will result in a cqe being
-posted, instead of having the submission be slightly different and have
-the cqe be dependent on where the error occurred.
+Adding a cleanup path to io_allocate_scq_urings() complicates the logic,
+so let's leave it to io_ring_ctx_free() to consistently free these
+pointers, and simplify the io_allocate_scq_urings() error paths.
 
+Full splats from before this patch below. Note that the pointer logged
+by the DEBUG_VIRTUAL "non-linear address" warning has been hashed, and
+is actually NULL.
+
+[   26.098129] page:ffff80000e949a00 count:0 mapcount:-128 mapping:0000000000000000 index:0x0
+[   26.102976] flags: 0x63fffc000000()
+[   26.104373] raw: 000063fffc000000 ffff80000e86c188 ffff80000ea3df08 0000000000000000
+[   26.108917] raw: 0000000000000000 0000000000000001 00000000ffffff7f 0000000000000000
+[   26.137235] page dumped because: VM_BUG_ON_PAGE(page_ref_count(page) == 0)
+[   26.143960] ------------[ cut here ]------------
+[   26.146020] kernel BUG at include/linux/mm.h:547!
+[   26.147586] Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+[   26.149163] Modules linked in:
+[   26.150287] Process syz-executor.21 (pid: 20204, stack limit = 0x000000000e9cefeb)
+[   26.153307] CPU: 2 PID: 20204 Comm: syz-executor.21 Not tainted 5.1.0-rc7-00004-g7d30b2ea43d6 #18
+[   26.156566] Hardware name: linux,dummy-virt (DT)
+[   26.158089] pstate: 40400005 (nZcv daif +PAN -UAO)
+[   26.159869] pc : io_mem_free+0x9c/0xa8
+[   26.161436] lr : io_mem_free+0x9c/0xa8
+[   26.162720] sp : ffff000013003d60
+[   26.164048] x29: ffff000013003d60 x28: ffff800025048040
+[   26.165804] x27: 0000000000000000 x26: ffff800025048040
+[   26.167352] x25: 00000000000000c0 x24: ffff0000112c2820
+[   26.169682] x23: 0000000000000000 x22: 0000000020000080
+[   26.171899] x21: ffff80002143b418 x20: ffff80002143b400
+[   26.174236] x19: ffff80002143b280 x18: 0000000000000000
+[   26.176607] x17: 0000000000000000 x16: 0000000000000000
+[   26.178997] x15: 0000000000000000 x14: 0000000000000000
+[   26.181508] x13: 00009178a5e077b2 x12: 0000000000000001
+[   26.183863] x11: 0000000000000000 x10: 0000000000000980
+[   26.186437] x9 : ffff000013003a80 x8 : ffff800025048a20
+[   26.189006] x7 : ffff8000250481c0 x6 : ffff80002ffe9118
+[   26.191359] x5 : ffff80002ffe9118 x4 : 0000000000000000
+[   26.193863] x3 : ffff80002ffefe98 x2 : 44c06ddd107d1f00
+[   26.196642] x1 : 0000000000000000 x0 : 000000000000003e
+[   26.198892] Call trace:
+[   26.199893]  io_mem_free+0x9c/0xa8
+[   26.201155]  io_ring_ctx_wait_and_kill+0xec/0x180
+[   26.202688]  io_uring_setup+0x6c4/0x6f0
+[   26.204091]  __arm64_sys_io_uring_setup+0x18/0x20
+[   26.205576]  el0_svc_common.constprop.0+0x7c/0xe8
+[   26.207186]  el0_svc_handler+0x28/0x78
+[   26.208389]  el0_svc+0x8/0xc
+[   26.209408] Code: aa0203e0 d0006861 9133a021 97fcdc3c (d4210000)
+[   26.211995] ---[ end trace bdb81cd43a21e50d ]---
+
+[   81.770626] ------------[ cut here ]------------
+[   81.825015] virt_to_phys used for non-linear address: 000000000d42f2c7 (          (null))
+[   81.827860] WARNING: CPU: 1 PID: 30171 at arch/arm64/mm/physaddr.c:15 __virt_to_phys+0x48/0x68
+[   81.831202] Modules linked in:
+[   81.832212] CPU: 1 PID: 30171 Comm: syz-executor.20 Not tainted 5.1.0-rc7-00004-g7d30b2ea43d6 #19
+[   81.835616] Hardware name: linux,dummy-virt (DT)
+[   81.836863] pstate: 60400005 (nZCv daif +PAN -UAO)
+[   81.838727] pc : __virt_to_phys+0x48/0x68
+[   81.840572] lr : __virt_to_phys+0x48/0x68
+[   81.842264] sp : ffff80002cf67c70
+[   81.843858] x29: ffff80002cf67c70 x28: ffff800014358e18
+[   81.846463] x27: 0000000000000000 x26: 0000000020000080
+[   81.849148] x25: 0000000000000000 x24: ffff80001bb01f40
+[   81.851986] x23: ffff200011db06c8 x22: ffff2000127e3c60
+[   81.854351] x21: ffff800014358cc0 x20: ffff800014358d98
+[   81.856711] x19: 0000000000000000 x18: 0000000000000000
+[   81.859132] x17: 0000000000000000 x16: 0000000000000000
+[   81.861586] x15: 0000000000000000 x14: 0000000000000000
+[   81.863905] x13: 0000000000000000 x12: ffff1000037603e9
+[   81.866226] x11: 1ffff000037603e8 x10: 0000000000000980
+[   81.868776] x9 : ffff80002cf67840 x8 : ffff80001bb02920
+[   81.873272] x7 : ffff1000037603e9 x6 : ffff80001bb01f47
+[   81.875266] x5 : ffff1000037603e9 x4 : dfff200000000000
+[   81.876875] x3 : ffff200010087528 x2 : ffff1000059ecf58
+[   81.878751] x1 : 44c06ddd107d1f00 x0 : 0000000000000000
+[   81.880453] Call trace:
+[   81.881164]  __virt_to_phys+0x48/0x68
+[   81.882919]  io_mem_free+0x18/0x110
+[   81.886585]  io_ring_ctx_wait_and_kill+0x13c/0x1f0
+[   81.891212]  io_uring_setup+0xa60/0xad0
+[   81.892881]  __arm64_sys_io_uring_setup+0x2c/0x38
+[   81.894398]  el0_svc_common.constprop.0+0xac/0x150
+[   81.896306]  el0_svc_handler+0x34/0x88
+[   81.897744]  el0_svc+0x8/0xc
+[   81.898715] ---[ end trace b4a703802243cbba ]---
+
+Fixes: 2b188cc1bb857a9d ("Add io_uring IO interface")
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-block@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org
+Cc: linux-kernel@vger.kernel.or
+---
+ fs/io_uring.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 25fc8cb56fc5..5228e9b41708 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2552,9 +2552,12 @@ static void io_ring_ctx_free(struct io_ring_ctx *ctx)
+ 		sock_release(ctx->ring_sock);
+ #endif
+ 
+-	io_mem_free(ctx->sq_ring);
+-	io_mem_free(ctx->sq_sqes);
+-	io_mem_free(ctx->cq_ring);
++	if (ctx->sq_ring)
++		io_mem_free(ctx->sq_ring);
++	if (ctx->sq_sqes)
++		io_mem_free(ctx->sq_sqes);
++	if (ctx->cq_ring)
++		io_mem_free(ctx->cq_ring);
+ 
+ 	percpu_ref_exit(&ctx->refs);
+ 	if (ctx->account_mem)
+@@ -2747,17 +2750,12 @@ static int io_allocate_scq_urings(struct io_ring_ctx *ctx,
+ 		return -EOVERFLOW;
+ 
+ 	ctx->sq_sqes = io_mem_alloc(size);
+-	if (!ctx->sq_sqes) {
+-		io_mem_free(ctx->sq_ring);
++	if (!ctx->sq_sqes)
+ 		return -ENOMEM;
+-	}
+ 
+ 	cq_ring = io_mem_alloc(struct_size(cq_ring, cqes, p->cq_entries));
+-	if (!cq_ring) {
+-		io_mem_free(ctx->sq_ring);
+-		io_mem_free(ctx->sq_sqes);
++	if (!cq_ring)
+ 		return -ENOMEM;
+-	}
+ 
+ 	ctx->cq_ring = cq_ring;
+ 	cq_ring->ring_mask = p->cq_entries - 1;
 -- 
-Jens Axboe
+2.11.0
 
