@@ -2,171 +2,165 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1058C43219
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 01:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B87C43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 01:38:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F94921655
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 01:32:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BDF921670
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 01:38:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ckgv0Kft"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gVGyLx2A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729855AbfD3Bcf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Apr 2019 21:32:35 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:33081 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729238AbfD3Bce (ORCPT
+        id S1729755AbfD3Bin (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Apr 2019 21:38:43 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:45106 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729238AbfD3Bim (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Apr 2019 21:32:34 -0400
-Received: by mail-qt1-f193.google.com with SMTP id g7so14439132qtc.0;
-        Mon, 29 Apr 2019 18:32:34 -0700 (PDT)
+        Mon, 29 Apr 2019 21:38:42 -0400
+Received: by mail-pl1-f195.google.com with SMTP id o5so5934119pls.12;
+        Mon, 29 Apr 2019 18:38:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=R2C7F3zzlU+QPhzu9XF5UnJK2sqppWmuGAOu6ts1R9w=;
-        b=Ckgv0KftBBtUaRjQf6tuEYnGV8juQ+fQFqXelBVcbX/kSn/KWHYTBltiv+ktilC7j4
-         lSM8GJye2ERzg6UxJqSZ4z1x8HnBti6XafeWH5VP9+Q4HAqM6ttTckZsGxLO4Xmuwwdi
-         TdIgNBErAG9Ay4NM0gN7NVWb/73llIxhea12elVC3UUuoP2ItLM9UYVYS+ysIk0z4uiL
-         a0fy1UocumprtUeJBBI9StmdIN+NONmSIoeNbynhuy0VSYHxGx/3wEkziJ4wN4FNXWzF
-         ei3VxwPKTsJ61iRGfH1x838SnVMO94tPp7noLAa5iPM9uPT3iTUOvqoM6B3Um7CrsI35
-         Cwpg==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=ZynxS8wT5VQN7Zq/7F3IMTMeMTQDk53jffD4iJ3yhmA=;
+        b=gVGyLx2A3iju9B9qEL8zugMCjbJJf/08jaXqerWXIVUH+jhOcnZ/u3HsPt/mf5fmX4
+         vMq/HK2Cs8hLMXiKQYjYh/i7u/xy7B++Dy2phG8XziWS+WMEv8lCngHJBYWCLrGCvhnu
+         +w3trQUvT+Q6IDYyQWy4/MUqDfXsDN9bzvku/PU33uKBJGZSQDiNqUJyaiYwLMdE/ljh
+         cHDsFaIJCNfHcCyIQh/TnVroYYTswHeOeDbHrMZb6hfMduL3w9+2Yi6quToE7GAOMXfd
+         UvFybh4IkO3QHg82gqdeSsBu9vTGR5NseIV3776SUZibWF/dGzuP443EqkhHrpa7oVgu
+         7/ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=R2C7F3zzlU+QPhzu9XF5UnJK2sqppWmuGAOu6ts1R9w=;
-        b=G4R3KBNd+IFtBeUVeH/M10xGEj3xxss+voHAR0KYygI7Zt88LeYzuwmBsJlfx1wVW7
-         ryhvPgcp86DlSdc+MkgmU5RNV6ZDdMzyiwR1nemYu2RPt3XryeDCGR6IxEOSuB5D95r1
-         Q6D+7CcNj3XRm5gMcRqfuNVHKd7o92y728kBEeVykcGiMmGwXpCk9ByCTPs6No1/bAVR
-         PBaJn4fCEpb4kQ4MubP0P39k1AoroJh8oIHCsShOWJnyxnUvH1pi6tRLNoplnFDyK99j
-         dQLpj9S4ZweurQCmwAbajEu6aNUfc35dG29A/VHop5A6I7NNgIUIOOW02Q7KFdQO15s/
-         6yGg==
-X-Gm-Message-State: APjAAAXdJwl/Psy1J9AoABtcdIckRGr/M9rKYlDyAsNIdLweeIBJy1Dn
-        qvPYmDOlpco8TN6jmJtb+8+77H+M
-X-Google-Smtp-Source: APXvYqyaeYs0rDegse3R6D+FOUz1B89BOk8vXc+8nXDfbEgvXyjg1qkQEgvxYmVPeodcj3TwyW4rXw==
-X-Received: by 2002:a0c:ac83:: with SMTP id m3mr51240137qvc.85.1556587953055;
-        Mon, 29 Apr 2019 18:32:33 -0700 (PDT)
-Received: from laptop.suse.cz ([179.185.223.166])
-        by smtp.gmail.com with ESMTPSA id v57sm5127019qtc.10.2019.04.29.18.32.30
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=ZynxS8wT5VQN7Zq/7F3IMTMeMTQDk53jffD4iJ3yhmA=;
+        b=A02oRU5gI62h+Ge3O4mjmicSvcW5bSBNS1cb4BAIEMfQcSms3bCmj0gLOy4JGDwwjT
+         46uuYEHWRxxG55ljCbEKQ8wq1CYTFf1ToG708C08k03DLyMtMwbZ61q2iHYHHAudk4N3
+         6lxB+QQUnLxA09Zlos/Gg/YQ0y2yiP4XSlAR05kH+qOHfLXBGgXFqso2qpODnpuAyb+V
+         JqM/kx4/tGq3rxfaupRdwwccPKnMKgVjKxkVwyoAOPDHijscRZEh0yXFSBoa6P8s54Jl
+         +XhxJ6ZP8MAgC6uTEnQhT1QAILPsr2zjvvar0DEVR7IIltrnmhVZvpMkAzDFFKCIqWhm
+         upTg==
+X-Gm-Message-State: APjAAAX2dpGkoW3L6mteuiMjHDTQuANszt+Kw1eqC6igxshcdkKH0BeO
+        mDkFN1lsC38rw4xlz3/zNs796Y/l
+X-Google-Smtp-Source: APXvYqypSXLKdOc4BifZ0GR3NGO16WadNXoen/Z2Ppfkq0lI+/5mMCeZ7XACQUf7JvIXLciz66RKhg==
+X-Received: by 2002:a17:902:2862:: with SMTP id e89mr67760487plb.203.1556588322012;
+        Mon, 29 Apr 2019 18:38:42 -0700 (PDT)
+Received: from [0.0.0.0] (172.96.249.239.16clouds.com. [172.96.249.239])
+        by smtp.gmail.com with ESMTPSA id f66sm2350064pfg.55.2019.04.29.18.38.38
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 29 Apr 2019 18:32:32 -0700 (PDT)
-From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH 2/2] null_blk: Make use of size_to_sectors helper
-Date:   Mon, 29 Apr 2019 22:32:05 -0300
-Message-Id: <20190430013205.1561708-3-marcos.souza.org@gmail.com>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20190430013205.1561708-1-marcos.souza.org@gmail.com>
-References: <20190430013205.1561708-1-marcos.souza.org@gmail.com>
+        Mon, 29 Apr 2019 18:38:40 -0700 (PDT)
+Subject: Re: [PATCH] bcache: fix memleak when error occurred before journal
+ replay
+To:     colyli@suse.de
+Cc:     kent.overstreet@gmail.com, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <1556541059-21234-1-git-send-email-fangguoju@gmail.com>
+From:   guoju fang <fangguoju@gmail.com>
+Message-ID: <cae10f04-9a2c-db48-97ad-0cdd7e88a0b8@gmail.com>
+Date:   Tue, 30 Apr 2019 09:38:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <1556541059-21234-1-git-send-email-fangguoju@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This helper tries to make the code easier to read, and unifies the code
-of returning the number of sectors for a given number of bytes.
+Oh, Shenghui submitted a patch to fix this bug days ago, so please 
+ignore this.
 
-Reviewed-by : Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
----
- No changes from v1.
-
- drivers/block/null_blk_main.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index d7ac09c092f2..05f0bef54296 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -853,7 +853,7 @@ static int null_flush_cache_page(struct nullb *nullb, struct nullb_page *c_page)
- 	dst = kmap_atomic(t_page->page);
- 
- 	for (i = 0; i < PAGE_SECTORS;
--			i += (nullb->dev->blocksize >> SECTOR_SHIFT)) {
-+			i += (size_to_sectors(nullb->dev->blocksize))) {
- 		if (test_bit(i, c_page->bitmap)) {
- 			offset = (i << SECTOR_SHIFT);
- 			memcpy(dst + offset, src + offset,
-@@ -957,7 +957,7 @@ static int copy_to_nullb(struct nullb *nullb, struct page *source,
- 			null_free_sector(nullb, sector, true);
- 
- 		count += temp;
--		sector += temp >> SECTOR_SHIFT;
-+		sector += size_to_sectors(temp);
- 	}
- 	return 0;
- }
-@@ -989,7 +989,7 @@ static int copy_from_nullb(struct nullb *nullb, struct page *dest,
- 		kunmap_atomic(dst);
- 
- 		count += temp;
--		sector += temp >> SECTOR_SHIFT;
-+		sector += size_to_sectors(temp);
- 	}
- 	return 0;
- }
-@@ -1004,7 +1004,7 @@ static void null_handle_discard(struct nullb *nullb, sector_t sector, size_t n)
- 		null_free_sector(nullb, sector, false);
- 		if (null_cache_active(nullb))
- 			null_free_sector(nullb, sector, true);
--		sector += temp >> SECTOR_SHIFT;
-+		sector += size_to_sectors(temp);
- 		n -= temp;
- 	}
- 	spin_unlock_irq(&nullb->lock);
-@@ -1074,7 +1074,7 @@ static int null_handle_rq(struct nullb_cmd *cmd)
- 			spin_unlock_irq(&nullb->lock);
- 			return err;
- 		}
--		sector += len >> SECTOR_SHIFT;
-+		sector += size_to_sectors(len);
- 	}
- 	spin_unlock_irq(&nullb->lock);
- 
-@@ -1109,7 +1109,7 @@ static int null_handle_bio(struct nullb_cmd *cmd)
- 			spin_unlock_irq(&nullb->lock);
- 			return err;
- 		}
--		sector += len >> SECTOR_SHIFT;
-+		sector += size_to_sectors(len);
- 	}
- 	spin_unlock_irq(&nullb->lock);
- 	return 0;
-@@ -1201,7 +1201,7 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
- 		if (dev->queue_mode == NULL_Q_BIO) {
- 			op = bio_op(cmd->bio);
- 			sector = cmd->bio->bi_iter.bi_sector;
--			nr_sectors = cmd->bio->bi_iter.bi_size >> 9;
-+			nr_sectors = size_to_sectors(cmd->bio->bi_iter.bi_size);
- 		} else {
- 			op = req_op(cmd->rq);
- 			sector = blk_rq_pos(cmd->rq);
-@@ -1406,7 +1406,7 @@ static void null_config_discard(struct nullb *nullb)
- 		return;
- 	nullb->q->limits.discard_granularity = nullb->dev->blocksize;
- 	nullb->q->limits.discard_alignment = nullb->dev->blocksize;
--	blk_queue_max_discard_sectors(nullb->q, UINT_MAX >> 9);
-+	blk_queue_max_discard_sectors(nullb->q, size_to_sectors(UINT_MAX));
- 	blk_queue_flag_set(QUEUE_FLAG_DISCARD, nullb->q);
- }
- 
-@@ -1520,7 +1520,7 @@ static int null_gendisk_register(struct nullb *nullb)
- 	if (!disk)
- 		return -ENOMEM;
- 	size = (sector_t)nullb->dev->size * 1024 * 1024ULL;
--	set_capacity(disk, size >> 9);
-+	set_capacity(disk, size_to_sectors(size));
- 
- 	disk->flags |= GENHD_FL_EXT_DEVT | GENHD_FL_SUPPRESS_PARTITION_INFO;
- 	disk->major		= null_major;
--- 
-2.16.4
-
+On 2019/4/29 20:30, Guoju Fang wrote:
+> A list of struct journal_replay is allocated when register cache device
+> and will be freed when journal replay complete. It will cause memory
+> leaks if some error occurred before journal replay.
+>
+> Signed-off-by: Guoju Fang <fangguoju@gmail.com>
+> ---
+>   drivers/md/bcache/super.c | 20 ++++++++++++++------
+>   1 file changed, 14 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index a697a3a..e4289291 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -1782,6 +1782,7 @@ static void run_cache_set(struct cache_set *c)
+>   	struct cache *ca;
+>   	struct closure cl;
+>   	unsigned int i;
+> +	LIST_HEAD(journal);
+>   
+>   	closure_init_stack(&cl);
+>   
+> @@ -1790,7 +1791,6 @@ static void run_cache_set(struct cache_set *c)
+>   	set_gc_sectors(c);
+>   
+>   	if (CACHE_SYNC(&c->sb)) {
+> -		LIST_HEAD(journal);
+>   		struct bkey *k;
+>   		struct jset *j;
+>   
+> @@ -1820,25 +1820,25 @@ static void run_cache_set(struct cache_set *c)
+>   
+>   		err = "bad btree root";
+>   		if (__bch_btree_ptr_invalid(c, k))
+> -			goto err;
+> +			goto free_journal;
+>   
+>   		err = "error reading btree root";
+>   		c->root = bch_btree_node_get(c, NULL, k,
+>   					     j->btree_level,
+>   					     true, NULL);
+>   		if (IS_ERR_OR_NULL(c->root))
+> -			goto err;
+> +			goto free_journal;
+>   
+>   		list_del_init(&c->root->list);
+>   		rw_unlock(true, c->root);
+>   
+>   		err = uuid_read(c, j, &cl);
+>   		if (err)
+> -			goto err;
+> +			goto free_journal;
+>   
+>   		err = "error in recovery";
+>   		if (bch_btree_check(c))
+> -			goto err;
+> +			goto free_journal;
+>   
+>   		bch_journal_mark(c, &journal);
+>   		bch_initial_gc_finish(c);
+> @@ -1854,7 +1854,7 @@ static void run_cache_set(struct cache_set *c)
+>   		err = "error starting allocator thread";
+>   		for_each_cache(ca, c, i)
+>   			if (bch_cache_allocator_start(ca))
+> -				goto err;
+> +				goto free_journal;
+>   
+>   		/*
+>   		 * First place it's safe to allocate: btree_check() and
+> @@ -1938,6 +1938,14 @@ static void run_cache_set(struct cache_set *c)
+>   
+>   	set_bit(CACHE_SET_RUNNING, &c->flags);
+>   	return;
+> +
+> +free_journal:
+> +	while (!list_empty(&journal)) {
+> +		struct journal_replay *jr = list_first_entry(&journal,
+> +			    struct journal_replay, list);
+> +		list_del(&jr->list);
+> +		kfree(jr);
+> +	}
+>   err:
+>   	closure_sync(&cl);
+>   	/* XXX: test this, it's broken */
