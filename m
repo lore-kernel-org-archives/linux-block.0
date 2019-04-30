@@ -2,89 +2,76 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6620C04AA6
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 14:05:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F8BAC43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 14:18:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A02602177B
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 14:05:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D519320652
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 14:18:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CNMgBQRU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727251AbfD3OFe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 10:05:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:46616 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726436AbfD3OFd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 10:05:33 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 7314DAB9D;
-        Tue, 30 Apr 2019 14:05:32 +0000 (UTC)
-Subject: Re: [PATCH] bcache: remove redundant LIST_HEAD(journal) from
- run_cache_set()
-To:     axboe@kernel.dk
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        juha.aatrokoski@aalto.fi, shhuiw@foxmail.com
-References: <20190430140225.21642-1-colyli@suse.de>
-From:   Coly Li <colyli@suse.de>
-Openpgp: preference=signencrypt
-Organization: SUSE Labs
-Message-ID: <0ded62e9-6135-6da1-312d-1ceb6160c93b@suse.de>
-Date:   Tue, 30 Apr 2019 22:05:26 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
+        id S1726388AbfD3OSM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 10:18:12 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:60538 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726053AbfD3OSM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Apr 2019 10:18:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=CqsMVVyOES0C4odcCbtz73DyIJWx76MxEFym4dDPzfc=; b=CNMgBQRU/iVW37e8/PFU8IM1b
+        LgC+BEq9Qi1DHL6NkXZcPW1wazFINWWQr+V/Dt/e9lc8nJxlYUoOzjd3YeQm/dApuvaa5Hjgl0jDV
+        +Z/32RruzQKUeppiPYiF7wo5pFGGOif+hJTM17xq/Z0DUWlTdiJkkX89Hc1LY6Kzxk7G29BCQOn1q
+        hXqgXhNF1XCmpID0+5MmhNVlupkFNa4anBX2yCTcyDvM8awLC42rwzTuxZwehxqAVmsmQVk8gHeD9
+        +18TEXoY3qMZ/Av+TKHWaglGwCeTtxNX/nNfgz+jr1d8ePptWgpwBDPTeRehSUf8anLZMSZDOFstB
+        K/p49i2DQ==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hLTaF-0004Jn-3h; Tue, 30 Apr 2019 14:18:11 +0000
+Date:   Tue, 30 Apr 2019 07:18:10 -0700
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Mark Rutland <mark.rutland@arm.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] io_uring: avoid page allocation warnings
+Message-ID: <20190430141810.GF13796@bombadil.infradead.org>
+References: <20190430132405.8268-1-mark.rutland@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190430140225.21642-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190430132405.8268-1-mark.rutland@arm.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/4/30 10:02 下午, Coly Li wrote:
-> Commit 95f18c9d1310 ("bcache: avoid potential memleak of list of
-> journal_replay(s) in the CACHE_SYNC branch of run_cache_set") forgets
-> to remove the original define of LIST_HEAD(journal), which makes
-> the change no take effect. This patch removes redundant variable
-> LIST_HEAD(journal) from run_cache_set(), to make Shenghui's fix
-> working.
+On Tue, Apr 30, 2019 at 02:24:05PM +0100, Mark Rutland wrote:
+> In io_sqe_buffer_register() we allocate a number of arrays based on the
+> iov_len from the user-provided iov. While we limit iov_len to SZ_1G,
+> we can still attempt to allocate arrays exceeding MAX_ORDER.
 > 
-> Reported-by: Juha Aatrokoski <juha.aatrokoski@aalto.fi>
-> Cc: Shenghui Wang <shhuiw@foxmail.com>
-> Signed-off-by: Coly Li <colyli@suse.de>
-> ---
->  drivers/md/bcache/super.c | 1 -
->  1 file changed, 1 deletion(-)
+> On a 64-bit system with 4KiB pages, for an iov where iov_base = 0x10 and
+> iov_len = SZ_1G, we'll calculate that nr_pages = 262145. When we try to
+> allocate a corresponding array of (16-byte) bio_vecs, requiring 4194320
+> bytes, which is greater than 4MiB. This results in SLUB warning that
+> we're trying to allocate greater than MAX_ORDER, and failing the
+> allocation.
 > 
-> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> index 0ffe9acee9d8..1b63ac876169 100644
-> --- a/drivers/md/bcache/super.c
-> +++ b/drivers/md/bcache/super.c
-> @@ -1800,7 +1800,6 @@ static int run_cache_set(struct cache_set *c)
->  	set_gc_sectors(c);
->  
->  	if (CACHE_SYNC(&c->sb)) {
-> -		LIST_HEAD(journal);
->  		struct bkey *k;
->  		struct jset *j;
->  
+> Avoid this by passing __GFP_NOWARN when allocating arrays for the
+> user-provided iov_len. We'll gracefully handle the failed allocation,
+> returning -ENOMEM to userspace.
 > 
+> We should probably consider lowering the limit below SZ_1G, or reworking
+> the array allocations.
 
-Hi Jens,
-
-Please take this fix for the Linux v5.2 bcache series. It fixes a
-problem from
-[PATCH 18/18] bcache: avoid potential memleak of list of
-journal_replay(s) in the CACHE_SYNC branch of run_cache_set
-which is already in your for-next branch.
-
-Thanks to Juha for cache this bug, and thank you in advance for taking
-care of this.
-
--- 
-
-Coly Li
+I'd suggest that kvmalloc is probably our friend here ... we don't really
+want to return -ENOMEM to userspace for this case, I don't think.
