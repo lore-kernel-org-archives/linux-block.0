@@ -2,128 +2,108 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80758C43219
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 02:15:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E09C43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 02:51:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 532E421655
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 02:15:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D495216FD
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 02:51:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="O+Mxzef/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729837AbfD3CPb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Apr 2019 22:15:31 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:34108 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729803AbfD3CPb (ORCPT
+        id S1729909AbfD3CvB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Apr 2019 22:51:01 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:49744 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729803AbfD3CvB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Apr 2019 22:15:31 -0400
-Received: by mail-pf1-f195.google.com with SMTP id b3so6291386pfd.1;
-        Mon, 29 Apr 2019 19:15:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=z1gwxKNHLSONFsApEGgjYueOD3e9fVGkO6awJTe3BDk=;
-        b=f/1kzO6yz82E4qrKf13LK/MBMMmaaBy9lirq7j/gU+pcXjjjKWlUJEjbMWAi9Nexa/
-         3m+6vCaMxlZjrH/Ak05TvLsVmOT5Z2lh2sUNqFAdSbh5FxvYiRKKKEp6dRG8ioKtyNcE
-         Nv8249Z4S5WWTVoYVv9uLiGOlLuD5KKnhsJwoIJ9iD6r5ztFZRTo+UTN3Otn5xtsjpAj
-         jpZ/uwbwjWDRrc5UcDTfzUGgs4mVC8I7G3Kxn3rvIhaZOAwGceRIO5dy3zlUw9y3sEof
-         r1j2904+K+jDK9qL0zwDZ1j2UXh/B9WsiADTzwZC9PMikhp7dVil3QkwZ/uCCX7/93Dh
-         Vdag==
-X-Gm-Message-State: APjAAAW4X94UZAK/wnOQWJpDLFZJIse7W0CTD2+yDfDFh1YXJjYFNPa1
-        GWjbdmc4pXamm/AbwOVuAWo=
-X-Google-Smtp-Source: APXvYqzQc0gGdGwB8yombCx3fl736uuoo232ZhPZX7KLAteSQGFWiE+YR2KxVusP6evWoyv4WoOyIg==
-X-Received: by 2002:a63:d345:: with SMTP id u5mr13441728pgi.83.1556590529769;
-        Mon, 29 Apr 2019 19:15:29 -0700 (PDT)
-Received: from asus.site ([2601:647:4000:5dd1:a41e:80b4:deb3:fb66])
-        by smtp.gmail.com with ESMTPSA id s7sm11129659pfb.38.2019.04.29.19.15.28
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 29 Apr 2019 19:15:28 -0700 (PDT)
-Subject: Re: [PATCH V9 1/7] blk-mq: grab .q_usage_counter when queuing request
- from plug code path
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        James Smart <james.smart@broadcom.com>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-References: <20190430015229.23141-1-ming.lei@redhat.com>
- <20190430015229.23141-2-ming.lei@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Openpgp: preference=signencrypt
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <447b650c-e264-4545-34a1-b3161a87581d@acm.org>
-Date:   Mon, 29 Apr 2019 19:15:27 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Mon, 29 Apr 2019 22:51:01 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3U2iHwO091128;
+        Tue, 30 Apr 2019 02:50:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=EtJQIydI4TPLP0rJodfKGeaDXbBiYSZ0YPs/KP7B6wE=;
+ b=O+Mxzef/Mq3fzVGDLZPxBN4tKPZ+hw1xsnJJLTZBkEKlD6BgRt2SO1B5Ot4I/cj8fT6j
+ pgHvUaDqCKr6Doi57X03uFaqepjL3DD/iQeFV5Z64FGUfDZpSkbAvzUACAjbYflBDRhH
+ De1XwamOr4NSIpsAGBTZ3gzWtWhMyIjbU6Qy5v/NFQ94sfsZHIT/HBThu7c9lKeU5iVr
+ 0eU6Hd6NJrHgQ0xfgeYvr/XGwdAXpB7Y2aHKNpU+FhGaUq+ijB6po4Zh/OaT3uAHLseZ
+ 3OVEVgVLYfD7Bxk9CutbI4Hv9eKYbtzWpELLT5QSsNeuIzCAfS+/4XIL5U8gcHgAUmxm 4g== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2s5j5txg6a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Apr 2019 02:50:41 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3U2mxaf080729;
+        Tue, 30 Apr 2019 02:50:41 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2s5u50qu10-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Apr 2019 02:50:41 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3U2oav9019485;
+        Tue, 30 Apr 2019 02:50:39 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 29 Apr 2019 19:50:36 -0700
+To:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Hannes Reinecke <hare@suse.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Greg Edwards <gedwards@ddn.com>,
+        linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH 1/2] blkdev.h: Introduce size_to_sectors hlper function
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190430013205.1561708-1-marcos.souza.org@gmail.com>
+        <20190430013205.1561708-2-marcos.souza.org@gmail.com>
+Date:   Mon, 29 Apr 2019 22:50:32 -0400
+In-Reply-To: <20190430013205.1561708-2-marcos.souza.org@gmail.com> (Marcos
+        Paulo de Souza's message of "Mon, 29 Apr 2019 22:32:04 -0300")
+Message-ID: <yq1bm0ow6iv.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20190430015229.23141-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9242 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=578
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1904300017
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9242 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=610 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1904300017
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/29/19 6:52 PM, Ming Lei wrote:
-> Just like aio/io_uring, we need to grab 2 refcount for queuing one
-> request, one is for submission, another is for completion.
-> 
-> If the request isn't queued from plug code path, the refcount grabbed
-> in generic_make_request() serves for submission. In theroy, this
-> refcount should have been released after the sumission(async run queue)
-> is done. blk_freeze_queue() works with blk_sync_queue() together
-> for avoiding race between cleanup queue and IO submission, given async
-> run queue activities are canceled because hctx->run_work is scheduled with
-> the refcount held, so it is fine to not hold the refcount when
-> running the run queue work function for dispatch IO.
-> 
-> However, if request is staggered into plug list, and finally queued
-> from plug code path, the refcount in submission side is actually missed.
-> And we may start to run queue after queue is removed because the queue's
-> kobject refcount isn't guaranteed to be grabbed in flushing plug list
-> context, then kernel oops is triggered, see the following race:
-> 
-> blk_mq_flush_plug_list():
->         blk_mq_sched_insert_requests()
->                 insert requests to sw queue or scheduler queue
->                 blk_mq_run_hw_queue
-> 
-> Because of concurrent run queue, all requests inserted above may be
-> completed before calling the above blk_mq_run_hw_queue. Then queue can
-> be freed during the above blk_mq_run_hw_queue().
-> 
-> Fixes the issue by grab .q_usage_counter before calling
-> blk_mq_sched_insert_requests() in blk_mq_flush_plug_list(). This way is
-> safe because the queue is absolutely alive before inserting request.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Hi Marco,
+
+> +static inline sector_t size_to_sectors(long long size)
+> +{
+> +	return size >> SECTOR_SHIFT;
+> +}
+> +
+
+FWIW, in SCSI we have:
+
+	logical_to_sectors()
+        logical_to_bytes()
+        bytes_to_logical()
+        sectors_to_logical()
+
+I'm not attached to "bytes" in any way but it would be nice to be
+consistent.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
