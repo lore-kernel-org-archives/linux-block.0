@@ -2,76 +2,125 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F8BAC43219
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 14:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D931AC43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 14:20:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D519320652
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 14:18:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DBB420652
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 14:20:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CNMgBQRU"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fc0E0NNj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726388AbfD3OSM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 10:18:12 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:60538 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726053AbfD3OSM (ORCPT
+        id S1727004AbfD3OUr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 10:20:47 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:32904 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726858AbfD3OUq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 10:18:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=CqsMVVyOES0C4odcCbtz73DyIJWx76MxEFym4dDPzfc=; b=CNMgBQRU/iVW37e8/PFU8IM1b
-        LgC+BEq9Qi1DHL6NkXZcPW1wazFINWWQr+V/Dt/e9lc8nJxlYUoOzjd3YeQm/dApuvaa5Hjgl0jDV
-        +Z/32RruzQKUeppiPYiF7wo5pFGGOif+hJTM17xq/Z0DUWlTdiJkkX89Hc1LY6Kzxk7G29BCQOn1q
-        hXqgXhNF1XCmpID0+5MmhNVlupkFNa4anBX2yCTcyDvM8awLC42rwzTuxZwehxqAVmsmQVk8gHeD9
-        +18TEXoY3qMZ/Av+TKHWaglGwCeTtxNX/nNfgz+jr1d8ePptWgpwBDPTeRehSUf8anLZMSZDOFstB
-        K/p49i2DQ==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hLTaF-0004Jn-3h; Tue, 30 Apr 2019 14:18:11 +0000
-Date:   Tue, 30 Apr 2019 07:18:10 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] io_uring: avoid page allocation warnings
-Message-ID: <20190430141810.GF13796@bombadil.infradead.org>
-References: <20190430132405.8268-1-mark.rutland@arm.com>
+        Tue, 30 Apr 2019 10:20:46 -0400
+Received: by mail-io1-f65.google.com with SMTP id u12so12390656iop.0
+        for <linux-block@vger.kernel.org>; Tue, 30 Apr 2019 07:20:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=pGJDbTifmKOXHUXSOgXNr5O3AzGnlOGhobGhD+Vxa/s=;
+        b=fc0E0NNjHm1VrOynn1PfvncvadlC9M6jrHsEN01IjXc7jFd4EakRWg1w2dhTQTxfW0
+         SfQtQBvtgKdOexiXCjui1zSVXAeT3zgb/hxGkrSHbjLPTMfxspotypyIswEgDqa4DUAw
+         KhcZWhDMfop4qNu8bh/7XElmF8PuC9zVqQQkh8K4uWikmz7gaOJ6RsWIF7HpV81+eSbV
+         XsKfi7647gi0t8HZToVlZdN0BU0VaVSTwc1zfARsh4wAA6JicMlBjMdvsienld0xFPyw
+         qSjfXVmg8YTyyscSlkTK3crriTIA0ToGwMUyiAfx5n/2wQFaOUDeOWVxooUvweRcDyVk
+         LgtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pGJDbTifmKOXHUXSOgXNr5O3AzGnlOGhobGhD+Vxa/s=;
+        b=qJwSPAUyZGKJE+1pgQi2aM/O2jgzX88puOp66dOOkgUgUHP3/8MK9TvqMGN3VYFLyL
+         5+rXUQcfPNJ8xsj4PUkykwpRg7ou00vYg/nxzwVWG7n/v/X2iq7GIQx5bYCb7jeUNqaT
+         g5+UKKBUjqstC1O6hHxLrET+iWucOdGbf5LhYjUCLtQ8TGd0N1pQDYrGWgkKftedNmY4
+         b/7tAJ6bovmyDg+pa+1kVA+IalgI+c5tr7JVa2QQGf49mno73TuZS1q+mJ+KUA88Oskl
+         zS/4OZEYniWWgiuFkhXWrN2aSUOAwtVFjygXT2ywZRwuAhnpoBGkOwopYnOZknO8IbtP
+         gfLQ==
+X-Gm-Message-State: APjAAAWua1y3cumxhdqe00OuJ+qxWVdZSVPFaJyHz4BDn+noA0AffyRP
+        DYbtVOHZGkF+rsh/ljtgjG19Rw==
+X-Google-Smtp-Source: APXvYqx8h2B08Z9UhHjfFHDvdvn4FbUMsLsrFFz1DYs4slmy+QXvci+IiMviVShW+rAQ+8J+4bnaEQ==
+X-Received: by 2002:a5d:9d0a:: with SMTP id j10mr10029789ioj.196.1556634045871;
+        Tue, 30 Apr 2019 07:20:45 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id 3sm1735564itk.1.2019.04.30.07.20.44
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 30 Apr 2019 07:20:44 -0700 (PDT)
+Subject: Re: [PATCH] bcache: remove redundant LIST_HEAD(journal) from
+ run_cache_set()
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        juha.aatrokoski@aalto.fi, shhuiw@foxmail.com
+References: <20190430140225.21642-1-colyli@suse.de>
+ <0ded62e9-6135-6da1-312d-1ceb6160c93b@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <54478019-5427-266e-42c2-0d606c6e5ec3@kernel.dk>
+Date:   Tue, 30 Apr 2019 08:20:42 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190430132405.8268-1-mark.rutland@arm.com>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+In-Reply-To: <0ded62e9-6135-6da1-312d-1ceb6160c93b@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 30, 2019 at 02:24:05PM +0100, Mark Rutland wrote:
-> In io_sqe_buffer_register() we allocate a number of arrays based on the
-> iov_len from the user-provided iov. While we limit iov_len to SZ_1G,
-> we can still attempt to allocate arrays exceeding MAX_ORDER.
+On 4/30/19 8:05 AM, Coly Li wrote:
+> On 2019/4/30 10:02 下午, Coly Li wrote:
+>> Commit 95f18c9d1310 ("bcache: avoid potential memleak of list of
+>> journal_replay(s) in the CACHE_SYNC branch of run_cache_set") forgets
+>> to remove the original define of LIST_HEAD(journal), which makes
+>> the change no take effect. This patch removes redundant variable
+>> LIST_HEAD(journal) from run_cache_set(), to make Shenghui's fix
+>> working.
+>>
+>> Reported-by: Juha Aatrokoski <juha.aatrokoski@aalto.fi>
+>> Cc: Shenghui Wang <shhuiw@foxmail.com>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> ---
+>>  drivers/md/bcache/super.c | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+>> index 0ffe9acee9d8..1b63ac876169 100644
+>> --- a/drivers/md/bcache/super.c
+>> +++ b/drivers/md/bcache/super.c
+>> @@ -1800,7 +1800,6 @@ static int run_cache_set(struct cache_set *c)
+>>  	set_gc_sectors(c);
+>>  
+>>  	if (CACHE_SYNC(&c->sb)) {
+>> -		LIST_HEAD(journal);
+>>  		struct bkey *k;
+>>  		struct jset *j;
+>>  
+>>
 > 
-> On a 64-bit system with 4KiB pages, for an iov where iov_base = 0x10 and
-> iov_len = SZ_1G, we'll calculate that nr_pages = 262145. When we try to
-> allocate a corresponding array of (16-byte) bio_vecs, requiring 4194320
-> bytes, which is greater than 4MiB. This results in SLUB warning that
-> we're trying to allocate greater than MAX_ORDER, and failing the
-> allocation.
+> Hi Jens,
 > 
-> Avoid this by passing __GFP_NOWARN when allocating arrays for the
-> user-provided iov_len. We'll gracefully handle the failed allocation,
-> returning -ENOMEM to userspace.
+> Please take this fix for the Linux v5.2 bcache series. It fixes a
+> problem from
+> [PATCH 18/18] bcache: avoid potential memleak of list of
+> journal_replay(s) in the CACHE_SYNC branch of run_cache_set
+> which is already in your for-next branch.
 > 
-> We should probably consider lowering the limit below SZ_1G, or reworking
-> the array allocations.
+> Thanks to Juha for cache this bug, and thank you in advance for taking
+> care of this.
 
-I'd suggest that kvmalloc is probably our friend here ... we don't really
-want to return -ENOMEM to userspace for this case, I don't think.
+Applied, but please add Fixes: lines patches like that, it's not enough
+to simply mention it in the commit message.
+
+-- 
+Jens Axboe
+
