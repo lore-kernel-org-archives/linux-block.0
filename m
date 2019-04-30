@@ -2,79 +2,92 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0B4C46470
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 08:22:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A6A6C43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 09:27:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 94060216FD
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 08:22:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45A8E21670
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 09:27:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OCxU9UKM"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="rmioHu8w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725938AbfD3IWC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 04:22:02 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:59850 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725769AbfD3IWC (ORCPT
+        id S1726603AbfD3J1D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 05:27:03 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:53356 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725938AbfD3J1D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 04:22:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=8DM06XtW1FFvD8grPjtHoQFBokiKn/DiGXyZQZQ/fSA=; b=OCxU9UKMhrzSRxfs1nNcuZD00
-        g2YUxi2+0w8VH36pCz/hU49ND1rAV5JPO3oWb4v0D0w25K33Z3lAmgV4TW6YEbn7b5WhIQocO/9sx
-        4/Z+63HVgMF50vKrZ6Su49hQ6ZnPNuFnE8IVdiCviWHJ0uabylm7wlLn/hnY9ltlMUuAFDA3ZlJdH
-        a60OOP071vHOPRHOoM+YDpMPUvlt1HdAHLHOgzIKZJ4xYni19bFoITocYVAq7ZsNk02DB3XY35Aod
-        D/8VamynNxLHKK3ukLVgwXdfJlu+8WsT37ktzeWt7zSVsvLyYcD1FCMoiy2XIRGvGqToqxrRtPmow
-        Cqr8ffS7Q==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hLO1Z-0007yk-J0; Tue, 30 Apr 2019 08:22:01 +0000
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 504AE29D2D6D6; Tue, 30 Apr 2019 10:21:58 +0200 (CEST)
-Date:   Tue, 30 Apr 2019 10:21:58 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Andrea Parri <andrea.parri@amarulasolutions.com>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/5] bio: fix improper use of smp_mb__before_atomic()
-Message-ID: <20190430082158.GA2677@hirez.programming.kicks-ass.net>
-References: <1556568902-12464-1-git-send-email-andrea.parri@amarulasolutions.com>
- <1556568902-12464-3-git-send-email-andrea.parri@amarulasolutions.com>
+        Tue, 30 Apr 2019 05:27:03 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3U9NkoF001045;
+        Tue, 30 Apr 2019 09:26:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=lRccY/9PTB0SivUe58hPvmQhJIneVtvQmamNLiMyYXo=;
+ b=rmioHu8wwvnnPfKWLqL2H0FfeCaD+l8ZqHxQjz3ts9vY+EgJPuXV9z+DhKYNdqE2CTRN
+ N55ap6zKBVrPikY8f3B1zLLIId8A1YhS5rwZEb1WKaPvHQjPSW9foRiOWxmUXV0LOhHB
+ OWkesZr5zk4lKZ5OHqsdZbWUXAiVOpo9yjH/T1ktX61mZgKN5OZx516GpOe2NDtb7gVp
+ UnkVVJXbVDGQqWCtFkb+qJxC2Ssei/hk6+wwaDsTTAb7BqvZjj0+Yg5eRpx7+HqKWdGw
+ 7t7RTauJPF+dPImPn5QYkeyvM5GsQKHPXllK1Y3d0TT5bqIqdPcg61JezyEvnCOwsk6s zg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2s5j5u02j4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Apr 2019 09:26:37 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3U9Ol3S006872;
+        Tue, 30 Apr 2019 09:26:36 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 2s4ew14swn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Apr 2019 09:26:36 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x3U9QRYh027604;
+        Tue, 30 Apr 2019 09:26:33 GMT
+Received: from kadam (/196.97.65.153)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 30 Apr 2019 02:26:27 -0700
+Date:   Tue, 30 Apr 2019 12:26:19 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     "David S. Miller" <davem@davemloft.net>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Amritha Nambiar <amritha.nambiar@intel.com>,
+        Willem de Bruijn <willemb@google.com>,
+        kernel-janitors@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v2 2/2] io_uring: Potential Oops in io_sq_offload_start()
+Message-ID: <20190430092619.GC2239@kadam>
+References: <20190404104527.GX4038@hirez.programming.kicks-ass.net>
+ <20190408081513.GB15239@kadam>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1556568902-12464-3-git-send-email-andrea.parri@amarulasolutions.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190408081513.GB15239@kadam>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9242 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=846
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1904300062
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9242 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=889 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1904300062
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 29, 2019 at 10:14:58PM +0200, Andrea Parri wrote:
-> This barrier only applies to the read-modify-write operations; in
-> particular, it does not apply to the atomic_set() primitive.
-> 
-> Replace the barrier with an smp_mb().
+The io_uring patches are slated for v5.7 so we should figure out a
+solution for this bug.
 
-> @@ -224,7 +224,7 @@ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
->  {
->  	if (count != 1) {
->  		bio->bi_flags |= (1 << BIO_REFFED);
-> -		smp_mb__before_atomic();
-
-Maybe also add:
-
-		/*
-		 * XXX the comment that explain this barrier goes here
-		 */
-> +		smp_mb();
->  	}
->  	atomic_set(&bio->__bi_cnt, count);
->  }
+regrds,
+dan carpenter
