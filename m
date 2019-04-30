@@ -2,106 +2,115 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BF4FC43219
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 16:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA87C04AA6
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 16:11:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 358E72081C
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 16:04:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFA4A21670
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 16:11:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V17+lfAq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GSbiqm5l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726014AbfD3QEJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 12:04:09 -0400
-Received: from mail-qt1-f171.google.com ([209.85.160.171]:37444 "EHLO
-        mail-qt1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725950AbfD3QEJ (ORCPT
+        id S1725950AbfD3QLJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 12:11:09 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:53504 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725942AbfD3QLI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 12:04:09 -0400
-Received: by mail-qt1-f171.google.com with SMTP id e2so16046199qtb.4
-        for <linux-block@vger.kernel.org>; Tue, 30 Apr 2019 09:04:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=7C/H9ZzSU0qP8UYq2NJoxOTSjxthMtozx8jthqagPTo=;
-        b=V17+lfAqUPk01IFJXUO56hClBUX2HDbxSbQULpTYSKkdi7HyAd33jfH5SIR8cXdcvE
-         hw/F9aMeFlPeuK5f4rBww/6N/Xmuv3823rpt63eVEiC0Qan/UjihZuDkm9RygVdZFQS+
-         uDXcBV7siz7kiet+/qLVaIcLptgJ9iivk9KSHlfQPKEm/K6sK09PpdfaQ642KUtpoLIG
-         Ei/9gzhfAHqdmqH0fjfZyrt7AVGrIzU5C9CHggarLYx36WwDp5F8075K02Wntqlwb84c
-         HpvByXvkJ7w/RAav80V4R5dscpV10nEf8hg1TH2pyWT4QZjAgYqwSCLSFK5QFiXIrs9J
-         nWbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=7C/H9ZzSU0qP8UYq2NJoxOTSjxthMtozx8jthqagPTo=;
-        b=FPs732XmIpGx9KV0xqgtaqIJMgubFJKZOpxkwMXtQfcQg+hVwgniAYkQrH7ZMMsfXu
-         +vwXSseN7Wjru5Axzhu35Zgfh+FEuJzOP+ArC7mWeB++p1Pbx4vt+atmptIalO8tsQaG
-         rzsAhaeDcjEFJ5+rfRuE/e4nubI6G673UgKOSRwcTS2DUOqM40Otti4UsKEpM6Hkz9rm
-         JrnBmtSrfOAoYubjM0PW0V4vnccuoyDwgV3jz/uhNnZa/AQOhit835kESZmwWJYJzSos
-         aisRHKNmhgmZcHOLQUzkzaoPgwF/r0DQ1ExgQUeHPSMfGg7zHH0hmxsumN3fsW6nO5yj
-         ArnQ==
-X-Gm-Message-State: APjAAAWLcHGMj3a3AOETT13emh+9RvZJOsXB2wOlhMz1xJjEVHLz+Fto
-        sRPmkmGMRnBHUIFBmMissZzJNiYagiduEcgh4tRe
-X-Google-Smtp-Source: APXvYqwcvQfk6RKX1YA+CEknGA6KPVffr8HcdjX65JCcNo0SBSztv0+v1lrmNaDd0LojAXwHvRQTc8ngINVBxL3bMxI=
-X-Received: by 2002:a0c:ae17:: with SMTP id y23mr31197725qvc.199.1556640247675;
- Tue, 30 Apr 2019 09:04:07 -0700 (PDT)
+        Tue, 30 Apr 2019 12:11:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=ak1psogB3+UehdV/Lop9XeHTygydQPlIz0taFZzsWAw=; b=GSbiqm5lJCTKPQqQUsRBOFaha
+        XB1qPKdw5zX4Sm6hEGO9a8ZATSclpShxFQtmFM9yjxsk8wV2qHmKLU/jnoQxJIK15xQxS/Y0wNw4J
+        nqZJbK7syb5i8gyeFDyf6DaMH9I7+QUQs5vShjQSh1NOfhzDq10sWDRCz5p0VhwSrWYtH8qGt/SwS
+        WG3u+rtnKRHxszJtoNLWf2sxZCYbTWyJLTY/DGQCgBSJgWGbr0Ev9W15Bu1GaaCfACa+FBED9+qPM
+        u2LP+CWXYpwBBjlwZReUXndvYTEcLk9pL2O3klukb8m21Nshm8UNqO5TNSC9oxblZZSjpEYH3ut2Q
+        FAzMAnTrw==;
+Received: from adsl-173-228-226-134.prtc.net ([173.228.226.134] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hLVLX-0005i5-Ts; Tue, 30 Apr 2019 16:11:08 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH] block: remove the unused blk_queue_dma_pad function
+Date:   Tue, 30 Apr 2019 12:10:30 -0400
+Message-Id: <20190430161030.23150-1-hch@lst.de>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20190425200012.GA6391@redhat.com> <83fda245-849a-70cc-dde0-5c451938ee97@kernel.dk>
- <503ba1f9-ad78-561a-9614-1dcb139439a6@suse.cz> <yq1v9yx2inc.fsf@oracle.com>
- <1556537518.3119.6.camel@HansenPartnership.com> <yq1zho911sg.fsf@oracle.com>
-In-Reply-To: <yq1zho911sg.fsf@oracle.com>
-From:   Jonathan Adams <jwadams@google.com>
-Date:   Tue, 30 Apr 2019 12:03:31 -0400
-Message-ID: <CA+VK+GP2R=6+GQJHX9+d6jnMWgK8i1_H5FiHdeUe3CGZZ5-86g@mail.gmail.com>
-Subject: Re: [Lsf] [LSF/MM] Preliminary agenda ? Anyone ... anyone ? Bueller ?
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Vlastimil Babka <vbabka@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        lsf@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        Jerome Glisse <jglisse@redhat.com>,
-        linux-fsdevel@vger.kernel.org, lsf-pc@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 29, 2019 at 7:36 AM Martin K. Petersen
-<martin.petersen@oracle.com> wrote:
->
->
-> James,
->
-> > Next year, simply expand the blurb to "sponsors, partners and
-> > attendees" to make it more clear ... or better yet separate them so
-> > people can opt out of partner spam and still be on the attendee list.
->
-> We already made a note that we need an "opt-in to be on the attendee
-> list" as part of the registration process next year. That's how other
-> conferences go about it...
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio.c            |  2 +-
+ block/blk-settings.c   | 16 ----------------
+ include/linux/blkdev.h |  1 -
+ 3 files changed, 1 insertion(+), 18 deletions(-)
 
-But there was an explicit checkbox to being on the attendance list in
-the registration form, on the second page:
+diff --git a/block/bio.c b/block/bio.c
+index 029afb121a48..22da218fbcda 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1576,7 +1576,7 @@ static void bio_copy_kern_endio_read(struct bio *bio)
+  *	device. Returns an error pointer in case of error.
+  */
+ struct bio *bio_copy_kern(struct request_queue *q, void *data, unsigned int len,
+-			  gfp_t gfp_mask, int reading)
++			  gfp_t gfp_mask, int reading, struct bio **biop)
+ {
+ 	unsigned long kaddr = (unsigned long)data;
+ 	unsigned long end = (kaddr + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 6375afaedcec..e8889e48b032 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -662,22 +662,6 @@ void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
+ }
+ EXPORT_SYMBOL(disk_stack_limits);
+ 
+-/**
+- * blk_queue_dma_pad - set pad mask
+- * @q:     the request queue for the device
+- * @mask:  pad mask
+- *
+- * Set dma pad mask.
+- *
+- * Appending pad buffer to a request modifies the last entry of a
+- * scatter list such that it includes the pad buffer.
+- **/
+-void blk_queue_dma_pad(struct request_queue *q, unsigned int mask)
+-{
+-	q->dma_pad_mask = mask;
+-}
+-EXPORT_SYMBOL(blk_queue_dma_pad);
+-
+ /**
+  * blk_queue_update_dma_pad - update pad mask
+  * @q:     the request queue for the device
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 99aa98f60b9e..bd3e3f09bfa0 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1069,7 +1069,6 @@ extern int bdev_stack_limits(struct queue_limits *t, struct block_device *bdev,
+ extern void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
+ 			      sector_t offset);
+ extern void blk_queue_stack_limits(struct request_queue *t, struct request_queue *b);
+-extern void blk_queue_dma_pad(struct request_queue *, unsigned int);
+ extern void blk_queue_update_dma_pad(struct request_queue *, unsigned int);
+ extern int blk_queue_dma_drain(struct request_queue *q,
+ 			       dma_drain_needed_fn *dma_drain_needed,
+-- 
+2.20.1
 
-By submitting this registration you consent to The Linux=E2=80=99s
-Foundation=E2=80=99s communication with you with respect to the event or
-services to which this registration pertains.
-* The Linux Foundation Communications ...
-* Sponsor Communications    ...
-* Attendee Directory
-     By checking here, you opt-in to being listed in the event=E2=80=99s
-online attendee directory. Some of your registration data will be made
-available to other event attendees in the directory (name, title,
-company name only)
-
-Why isn't that sufficient?
-
-Cheers,
-- jonathan
