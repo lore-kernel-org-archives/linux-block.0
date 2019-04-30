@@ -6,74 +6,66 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F72C43219
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 22:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 021B0C43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 22:13:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A8BC120835
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 22:12:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6AA220835
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 22:13:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="f2pxPaEw"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="dBInw4E8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726102AbfD3WMR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 18:12:17 -0400
-Received: from mail-pf1-f175.google.com ([209.85.210.175]:36906 "EHLO
-        mail-pf1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726048AbfD3WMR (ORCPT
+        id S1726952AbfD3WNJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 18:13:09 -0400
+Received: from mail-pf1-f181.google.com ([209.85.210.181]:43242 "EHLO
+        mail-pf1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726048AbfD3WNJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 18:12:17 -0400
-Received: by mail-pf1-f175.google.com with SMTP id g3so7752695pfi.4
-        for <linux-block@vger.kernel.org>; Tue, 30 Apr 2019 15:12:16 -0700 (PDT)
+        Tue, 30 Apr 2019 18:13:09 -0400
+Received: by mail-pf1-f181.google.com with SMTP id e67so7733471pfe.10
+        for <linux-block@vger.kernel.org>; Tue, 30 Apr 2019 15:13:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=t1A91VbqK3c3rmC3Vayr6AqXf4GJM9U1CcOpZO0SdRU=;
-        b=f2pxPaEwo1XMipVGAf0ROHaKcROWSBZu1hdWrOpwWIE/5PDwTGLFSvUWyEfZehzCoX
-         GnA8Ch5BM5Bst+5dc3QfzvFyNlnwVrc4ulkeQ959BtW7PXDDmWlIpOoPCC8weoUGDRYX
-         zYInoX9+2APh8P+1rzWbU9YRk6WQ2Io+8iTJe6KlKrYFry5og1VkYN7U303nsFx5xXyc
-         5rAZ+484o+BxJqjyPOM5Hj86JDh5JeBm6WXkWy7vrM44Et71o2uh6NaSlB+dMukh378l
-         578XRYyPRcxPd3ZcGn4dC+dKrOO10063m2D+k9BBpvG4rkXMWmjOqoELT2UwkEsiOFKF
-         Js0A==
+        bh=Lw00I39tMMHoHHOPSgKttYErvt005RuGUQAb9q20a8A=;
+        b=dBInw4E8cbFDrzlWGmF/1GurkiguGnJHVvJPfPh29KECO9EdXYzZV3pER2f+0a1y95
+         UfFkIpIOdG9GP0/c8Iq38b8K/7DgWllRmzYz8JLoH96RpTAiPCknIZP2tmeDkOzA53Ve
+         n6tAgHJ2Rth+Fcu6lp7mJdbYLuo81zinkNJiunwte2OSPmDUO3o0RlVd56e0rv2POsfq
+         ZjmzXznNxqj8TI0d/eEVWZ8Uqmr5k2N7HLT0+tzd6SWyo9t6CZN0q/3B/+SQtEeNS3/l
+         4Fy27H3L1hDqSeUBQ9IK66JbtF7hKgPHODlecucFXFqvEsiOCgNyOOwmXSO+hKLCxH1C
+         /iew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=t1A91VbqK3c3rmC3Vayr6AqXf4GJM9U1CcOpZO0SdRU=;
-        b=DDxxgIYeQaLOxfRX3kUrxDWefVQmqGfQtGXtHHOD9mY44d+LSN/lbUkNt8CPuv3bdj
-         SlY2oavuEY5VD/y7xcNsvH8GVlGwT6YYKPbSBV8Owd50a2grn0UWg3H/+byXccSVxmRR
-         iow7SBVB7P+0OBF7LHh4uqEt9fVzfEhehCs5XSIxOoPLsqaz7jqqVwURhDopcd78Un8x
-         PrDuNMBICvacAM+wI5rcYd0haBrODdOYRKDpHoehpRnMH17EAhz1Ur2LM5mNcoynSxwI
-         9mkNt9/qwKnNgqXJjDQPmXsePczy8P7OhE2qmvQIwAMfhPcmzaq8xzjS9aQ7qjmehVlX
-         tnyQ==
-X-Gm-Message-State: APjAAAUXZNxFK1M1PhgyXIQvCqVSp12CjpglgTIr4iogYx02H0Btld2u
-        YOTRjDXF9FNNaBKxOqHYuH80RQ==
-X-Google-Smtp-Source: APXvYqxAfmnvJ+NJgPRvSHpMMaJ1teBBvFl4KXdpLFc6lO5j7TDU7GYYOdkMrjYJZRQFX9cjNlADww==
-X-Received: by 2002:a62:1c13:: with SMTP id c19mr72524742pfc.11.1556662336230;
-        Tue, 30 Apr 2019 15:12:16 -0700 (PDT)
+        bh=Lw00I39tMMHoHHOPSgKttYErvt005RuGUQAb9q20a8A=;
+        b=t0/MRGhtz1f+vSDS8XWdYCwd70Dx3IRuX1wM67CW6qN2CnSANOiJ4FLBN90+fH5nYN
+         eestL43b14wgyiVqj8Puwj7gidvMYoP+A1o0aPyTh3w/P7JIVR8RmziBt/f7Nl2XfEBI
+         vvH/TgHX7MPELu8LqXI92sSxUVnQM477jIAtNDtH6tdvSE0tnFyT35Ci8+MMwSSrDkjV
+         09YqZn5vVb4NfycLTSiOW7/6AX4Kn4tI5F8yq4nhZLu8WJwrBg0WIbb7be71QixhCyCe
+         LMz02j1ZEvfb80z0T15hnBcfIFB++kbsoBvayEskSlkY/w/+ZGotF/yzg+x8s2MaSKQw
+         u7dw==
+X-Gm-Message-State: APjAAAV8nzWlsLUOeSB6N8rgJviLtaNX/SMGyJZ8sQSSSpJVe7ceS78w
+        D4xF9x2sbqC2nvIuRH/nZBBSlAPxgahV1g==
+X-Google-Smtp-Source: APXvYqzrYier0kGsqRA3yT8uVTjPaLI1XQHf7mMPJQ72LPwa0JkgDtZZlFNHcIzdJd2CJca2KBev+A==
+X-Received: by 2002:a65:654c:: with SMTP id a12mr38403658pgw.101.1556662387884;
+        Tue, 30 Apr 2019 15:13:07 -0700 (PDT)
 Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id h65sm126756079pfd.108.2019.04.30.15.12.13
+        by smtp.gmail.com with ESMTPSA id u7sm39515866pgp.26.2019.04.30.15.13.06
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Apr 2019 15:12:14 -0700 (PDT)
-Subject: Re: add SPDX tags to all block layer files
+        Tue, 30 Apr 2019 15:13:06 -0700 (PDT)
+Subject: Re: [PATCH] block: remove the unused blk_queue_dma_pad function
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Josef Bacik <jbacik@fb.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Fabio Checconi <fabio@gandalf.sssup.it>,
-        Nauman Rafique <nauman@google.com>,
-        Arianna Avanzini <avanzini.arianna@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190430184243.23436-1-hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+References: <20190430175616.26639-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <251a6255-bed2-056d-86c8-918de8d6ca24@kernel.dk>
-Date:   Tue, 30 Apr 2019 16:12:12 -0600
+Message-ID: <7fabf8dc-32cc-df77-23f3-a1acafee55e5@kernel.dk>
+Date:   Tue, 30 Apr 2019 16:13:05 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190430184243.23436-1-hch@lst.de>
+In-Reply-To: <20190430175616.26639-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,16 +73,6 @@ Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
-
-On 4/30/19 12:42 PM, Christoph Hellwig wrote:
-> Hi Jens,
-> 
-> this series adds SPDX tags to all block layer files that are still
-> missing them.  The last patch adds them to files that didn't have
-> any licensing, and I've cced everyone who is mentioned in the
-> Copyright notices for these files to make sure no one has any
-> disagreement with the fact that that they are per default under
-> the kernels GPLv2 license.
 
 Applied, thanks.
 
