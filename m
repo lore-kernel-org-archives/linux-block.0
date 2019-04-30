@@ -2,61 +2,99 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C28AC46470
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 16:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1940C04AA8
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 17:03:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52CD9217D8
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 16:59:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98DA52075E
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 17:03:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725950AbfD3Q75 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 12:59:57 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:57008 "EHLO
-        charlie.dont.surf" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726006AbfD3Q74 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 12:59:56 -0400
-Received: from apples.localdomain (ip-5-186-120-196.cgn.fibianet.dk [5.186.120.196])
-        by charlie.dont.surf (Postfix) with ESMTPSA id 15B5ABF7AF;
-        Tue, 30 Apr 2019 16:59:55 +0000 (UTC)
-From:   Klaus Birkelund Jensen <klaus@birkelund.eu>
-To:     Klaus Birkelund <klaus@birkelund.eu>
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] nvme-pci: fix psdt field for single segment sgls
-Date:   Tue, 30 Apr 2019 18:59:54 +0200
-Message-Id: <20190430165954.7165-1-klaus@birkelund.eu>
-X-Mailer: git-send-email 2.21.0
+        id S1726405AbfD3RDH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 13:03:07 -0400
+Received: from foss.arm.com ([217.140.101.70]:50334 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725930AbfD3RDH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Apr 2019 13:03:07 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 10576374;
+        Tue, 30 Apr 2019 10:03:07 -0700 (PDT)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C3E913F5C1;
+        Tue, 30 Apr 2019 10:03:05 -0700 (PDT)
+Date:   Tue, 30 Apr 2019 18:03:03 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] io_uring: avoid page allocation warnings
+Message-ID: <20190430170302.GD8314@lakrids.cambridge.arm.com>
+References: <20190430132405.8268-1-mark.rutland@arm.com>
+ <20190430141810.GF13796@bombadil.infradead.org>
+ <20190430145938.GA8314@lakrids.cambridge.arm.com>
+ <a1af3017-6572-e828-dc8a-a5c8458e6b5a@kernel.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a1af3017-6572-e828-dc8a-a5c8458e6b5a@kernel.dk>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The shortcut for single segment SGL requests did not set the PSDT field
-to mark the request as using SGLs.
+On Tue, Apr 30, 2019 at 10:21:03AM -0600, Jens Axboe wrote:
+> On 4/30/19 8:59 AM, Mark Rutland wrote:
+> > On Tue, Apr 30, 2019 at 07:18:10AM -0700, Matthew Wilcox wrote:
+> >> On Tue, Apr 30, 2019 at 02:24:05PM +0100, Mark Rutland wrote:
+> >>> In io_sqe_buffer_register() we allocate a number of arrays based on the
+> >>> iov_len from the user-provided iov. While we limit iov_len to SZ_1G,
+> >>> we can still attempt to allocate arrays exceeding MAX_ORDER.
+> >>>
+> >>> On a 64-bit system with 4KiB pages, for an iov where iov_base = 0x10 and
+> >>> iov_len = SZ_1G, we'll calculate that nr_pages = 262145. When we try to
+> >>> allocate a corresponding array of (16-byte) bio_vecs, requiring 4194320
+> >>> bytes, which is greater than 4MiB. This results in SLUB warning that
+> >>> we're trying to allocate greater than MAX_ORDER, and failing the
+> >>> allocation.
+> >>>
+> >>> Avoid this by passing __GFP_NOWARN when allocating arrays for the
+> >>> user-provided iov_len. We'll gracefully handle the failed allocation,
+> >>> returning -ENOMEM to userspace.
+> >>>
+> >>> We should probably consider lowering the limit below SZ_1G, or reworking
+> >>> the array allocations.
+> >>
+> >> I'd suggest that kvmalloc is probably our friend here ... we don't really
+> >> want to return -ENOMEM to userspace for this case, I don't think.
+> > 
+> > Sure. I'll go verify that the uring code doesn't assume this memory is
+> > physically contiguous.
+> > 
+> > I also guess we should be passing GFP_KERNEL_ACCOUNT rateh than a plain
+> > GFP_KERNEL.
+> 
+> kvmalloc() is fine, the io_uring code doesn't care about the layout of
+> the memory, it just uses it as an index.
 
-Fixes: 297910571f08 ("nvme-pci: optimize mapping single segment requests using SGLs")
-Signed-off-by: Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
----
- drivers/nvme/host/pci.c | 1 +
- 1 file changed, 1 insertion(+)
+I've just had a go at that, but when using kvmalloc() with or without
+GFP_KERNEL_ACCOUNT I hit OOM and my system hangs within a few seconds with the
+syzkaller prog below:
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index c1eecde6b853..efc1da56521c 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -830,6 +830,7 @@ static blk_status_t nvme_setup_sgl_simple(struct nvme_dev *dev,
- 		return BLK_STS_RESOURCE;
- 	iod->dma_len = bv->bv_len;
- 
-+	cmnd->flags = NVME_CMD_SGL_METABUF;
- 	cmnd->dptr.sgl.addr = cpu_to_le64(iod->first_dma);
- 	cmnd->dptr.sgl.length = cpu_to_le32(iod->dma_len);
- 	cmnd->dptr.sgl.type = NVME_SGL_FMT_DATA_DESC << 4;
--- 
-2.21.0
+----
+Syzkaller reproducer:
+# {Threaded:false Collide:false Repeat:false RepeatTimes:0 Procs:1 Sandbox: Fault:false FaultCall:-1 FaultNth:0 EnableTun:false EnableNetDev:false EnableNetReset:false EnableCgroups:false EnableBinfmtMisc:false EnableCloseFds:false UseTmpDir:false HandleSegv:false Repro:false Trace:false}
+r0 = io_uring_setup(0x378, &(0x7f00000000c0))
+sendmsg$SEG6_CMD_SET_TUNSRC(0xffffffffffffffff, &(0x7f0000000240)={&(0x7f0000000000)={0x10, 0x0, 0x0, 0x40000000}, 0xc, 0x0, 0x1, 0x0, 0x0, 0x10}, 0x800)
+io_uring_register$IORING_REGISTER_BUFFERS(r0, 0x0, &(0x7f0000000000), 0x1)
+----
 
+... I'm a bit worried that opens up a trivial DoS.
+
+Thoughts?
+
+Thanks,
+Mark.
