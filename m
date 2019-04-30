@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D560BC43219
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 07:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B66D1C46460
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 07:35:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9252121670
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 07:35:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AF7C21670
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 07:35:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K35uN9Zl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N19U9oDa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725996AbfD3Hf2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 03:35:28 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:39561 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726616AbfD3HfK (ORCPT
+        id S1726622AbfD3HfJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 03:35:09 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:45548 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725554AbfD3HfI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 03:35:10 -0400
-Received: by mail-lj1-f196.google.com with SMTP id q10so11798578ljc.6;
-        Tue, 30 Apr 2019 00:35:08 -0700 (PDT)
+        Tue, 30 Apr 2019 03:35:08 -0400
+Received: by mail-lj1-f195.google.com with SMTP id w12so42439ljh.12;
+        Tue, 30 Apr 2019 00:35:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=k4L9J9dAEoQlGCP+x9t5jKWTgnLhmW8dV6Nb+oW0n3A=;
-        b=K35uN9Zlj58R341Z/qXn0mrBFqREe5xLoDm+1zlj+w2BquLt6gB8q/XwH22N58JBgP
-         hezSNnR7CLnbaRE/O1fu7boo6XcudBklxYusfbVTL5Sz2EXhqWG6i3kus6aCN1h0BfEM
-         190dn4ENHuQM7mpZdTZannSUJ8hpxMjzGPTjK+pCrK7hJhmfMiXkgynvKrCfUv8ncamr
-         b/d8tXKPcU+T83vX4CxljWN9Wyvat+U11VCmU2omeNhlb41dVtCcOInBY0DsA+DJdFH1
-         9HVMkaoMwNHiI5LSJQneido3h90OBSfLlasKXJORNcBzZ2xNxiimD9WiBrIJC8iHV5ow
-         V/JQ==
+        bh=mtTeypozSEdVW8H84rjErApUVCz52elY8ixwIbauNlE=;
+        b=N19U9oDaIa0WH54p4wVwJulsqsAi7JJpPotAcBQKUnrnOLXGyWemV6NBT+9ikDwQMr
+         +9ww2vlWtsrIZTrG8M0yXoa8oMIDULAusp8o8tjuuJXTlK2ic4WjZHcE6Eoz5hlHTmh8
+         5MzaXAO7YcIe0z2eIYuY9ZzgqsQKdJoKcQ33p7i0P5bsoI7hxBavjeJzufy2M5NYJ+7Z
+         r7VtfJCu/PWAYEcXg/gld+oXXfSSxc89hXrTNhvRKXYzFP3R5OOFlZw2SMIsbZ/Nh5Zx
+         QUfMz1EZl+OBxJwENe4k7GKa+i4xYu5awaRXN9Nw1TkhxqWUrl8IAlNlb8bLqMNHk7Fn
+         2gow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=k4L9J9dAEoQlGCP+x9t5jKWTgnLhmW8dV6Nb+oW0n3A=;
-        b=JfZzYNty9p4hhZ3LuMhu5gx46qWllalMfabilTGK3b5qjKkdMDBWQHHCHQeBEfc19i
-         +1hCKke0fPx0KwKjH1LMJj/vrGpri7m/RL8uAWnT3Zq3dXUMqDn302zXl38g2poTWs/Y
-         CYsNrQIvATHwTlEuiqJdvUe0dqsh8eLz9YxU+9gsXkhHhECVCMBmifW/rPkp9zkwIKsU
-         UNrhNUzPoaeIbKiGhs6kmkc2N8eAZj29lfXHOQuaE07Y7I7PcEbnYh3JGNPLcKvDkpkD
-         b+k49tXP5xAFl9zSoI5juESeIjgGkNdIy0f4nWX6QG0yHJbsrs/v49VgvXcHtP7PYRa6
-         YqSw==
-X-Gm-Message-State: APjAAAXptwi59yEFCSzkg/Ai3C+GGmPfhnpd4H5pKpxxJJS14oY6aIb4
-        Lv4v9zaZQJVVen8YPJvgG7U=
-X-Google-Smtp-Source: APXvYqxrI3bf3njEPBSGRY9DDunnyCW7fa8B2f49T9zIIbcxhHcvtx3pHieXY9+Ntj5b4rHCdRnD0Q==
-X-Received: by 2002:a2e:8703:: with SMTP id m3mr33795416lji.107.1556609707787;
-        Tue, 30 Apr 2019 00:35:07 -0700 (PDT)
+        bh=mtTeypozSEdVW8H84rjErApUVCz52elY8ixwIbauNlE=;
+        b=d1nwZl/qneIu3EV0DZ5PoM8SLu+PFqIQvn/B05MMkwUNtXTW9PoqMAnMA3uOzjlLs0
+         LTDq1LQj44grN5Cangjksa13T6kwjo3B3Fh5VIntsohtqKJOrcFJ6SwjBbOj7+Y9wXy8
+         8ULKdOb5Hpf5vVYjuDCUwZ99RAq/Rm6YBpANoUhtkLsaobvlDuxTLaUGPOi0kipF1U8J
+         fdimrOswD2y9TEUYyJPBE3/lnrYO+2yny0JY5ueINOf4jyiQ1/x+UPiX0BKVZSnrdFxs
+         aa1900EcU9eWzdhxk1HWuksCZFAu41+f8ecYmEoBSq87PgdJoK4gH7osRHYHKtIRfbwL
+         tH8A==
+X-Gm-Message-State: APjAAAUhf3uArzoTKOMQbpbwCY8Rc+X+dbf4Bnfb8+AkWI832cDgEFNA
+        N/EpbXldP/grQZsZWEHZwG0=
+X-Google-Smtp-Source: APXvYqxlzXiycrEmuePqR2+Qh9TD8x6HKtIy1DSOa8Jhg8qnv5FqJtTZmY2KgpulLigr5KphIx9tGQ==
+X-Received: by 2002:a2e:8e93:: with SMTP id z19mr15920182ljk.159.1556609705372;
+        Tue, 30 Apr 2019 00:35:05 -0700 (PDT)
 Received: from localhost.localdomain ([109.126.133.52])
-        by smtp.gmail.com with ESMTPSA id v23sm2400572ljk.14.2019.04.30.00.35.05
+        by smtp.gmail.com with ESMTPSA id v23sm2400572ljk.14.2019.04.30.00.35.03
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Apr 2019 00:35:07 -0700 (PDT)
+        Tue, 30 Apr 2019 00:35:04 -0700 (PDT)
 From:   "Pavel Begunkov (Silence)" <asml.silence@gmail.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH 6/7] blk-mq: Track num of overslept by hybrid poll rqs
-Date:   Tue, 30 Apr 2019 10:34:18 +0300
-Message-Id: <0096e72ed1e1c94021a33cddeffee36abe78338b.1556609582.git.asml.silence@gmail.com>
+Subject: [PATCH 5/7] blk-mq: Precalculate hybrid polling time
+Date:   Tue, 30 Apr 2019 10:34:17 +0300
+Message-Id: <25f7593a0350e07997fc31d1317218ffeec4f6bf.1556609582.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <cover.1556609582.git.asml.silence@gmail.com>
 References: <cover.1556609582.git.asml.silence@gmail.com>
@@ -74,262 +74,158 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Pavel Begunkov <asml.silence@gmail.com>
 
-To fine-tune adaptive polling sleep time, it's needed to know how
-accurate the current estimate is, which could be done using the ratio of
-missed (i.e., overslept) requests.
-
-The collection of the missed number is performed with an assumption,
-that a request needs to busy poll for some time after wake up to
-complete. And if it was completed by the first poll call, than
-that's a miss.
+Calculation of sleep time for adaptive hybrid polling on per-request
+basis could become time consuming in the future.
+Precalculate it once per statistics gathering round.
 
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- block/blk-core.c       |  4 +-
- block/blk-mq.c         | 94 ++++++++++++++++++++++++++++++------------
- block/blk-stat.c       |  2 +-
- include/linux/blkdev.h |  9 ++++
- 4 files changed, 81 insertions(+), 28 deletions(-)
+ block/blk-core.c       |  5 ++++-
+ block/blk-mq-debugfs.c |  4 ++--
+ block/blk-mq.c         | 39 ++++++++++++++++++++++-----------------
+ include/linux/blkdev.h |  8 +++++++-
+ 4 files changed, 35 insertions(+), 21 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index daadce545e43..88d8ec4268ca 100644
+index a55389ba8779..daadce545e43 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -536,8 +536,10 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+@@ -474,7 +474,7 @@ static void blk_timeout_work(struct work_struct *work)
+ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+ {
+ 	struct request_queue *q;
+-	int ret;
++	int ret, bucket;
+ 
+ 	q = kmem_cache_alloc_node(blk_requestq_cachep,
+ 				gfp_mask | __GFP_ZERO, node_id);
+@@ -536,6 +536,9 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
  	if (blkcg_init_queue(q))
  		goto fail_ref;
  
--	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS; bucket++)
-+	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS; bucket++) {
- 		q->poll_info[bucket].sleep_ns = 0;
-+		atomic_set(&q->poll_info[bucket].nr_misses, 0);
-+	}
- 
++	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS; bucket++)
++		q->poll_info[bucket].sleep_ns = 0;
++
  	return q;
  
+ fail_ref:
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index b62bd4468db3..ab55446cb570 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -44,11 +44,11 @@ static int queue_poll_stat_show(void *data, struct seq_file *m)
+ 
+ 	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS/2; bucket++) {
+ 		seq_printf(m, "read  (%d Bytes): ", 1 << (9+bucket));
+-		print_stat(m, &q->poll_stat[2*bucket]);
++		print_stat(m, &q->poll_info[2*bucket].stat);
+ 		seq_puts(m, "\n");
+ 
+ 		seq_printf(m, "write (%d Bytes): ",  1 << (9+bucket));
+-		print_stat(m, &q->poll_stat[2*bucket+1]);
++		print_stat(m, &q->poll_info[2*bucket+1].stat);
+ 		seq_puts(m, "\n");
+ 	}
+ 	return 0;
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4e54a004e345..ec7cde754c2f 100644
+index cc3f73e4e01c..4e54a004e345 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -528,6 +528,34 @@ void blk_mq_free_request(struct request *rq)
+@@ -3312,14 +3312,32 @@ static void blk_mq_poll_stats_start(struct request_queue *q)
+ 	blk_stat_activate_msecs(q->poll_cb, 100);
  }
- EXPORT_SYMBOL_GPL(blk_mq_free_request);
  
-+static inline void blk_mq_record_stats(struct request *rq, u64 now)
++static void blk_mq_update_poll_info(struct poll_info *pi,
++				    struct blk_rq_stat *stat)
 +{
-+	int bucket = blk_mq_poll_stats_bkt(rq);
++	u64 sleep_ns;
 +
-+	if (bucket >= 0 && !(rq->rq_flags & RQF_MQ_POLLED)) {
-+		struct poll_info *pi;
-+		u64 threshold;
++	if (!stat->nr_samples)
++		sleep_ns = 0;
++	else
++		sleep_ns = (stat->mean + 1) / 2;
 +
-+		pi = &rq->q->poll_info[bucket];
-+		/*
-+		 * Even if the time for hybrid polling predicted well, the
-+		 * completion could oversleep because of a timer's lag. Try
-+		 * to detect and skip accounting for such outliers.
-+		 */
-+		threshold = pi->stat.mean;
-+
-+		/*
-+		 * Ideally, miss count should be close to 0,
-+		 * so should not happen often.
-+		 */
-+		if (blk_rq_io_time(rq, now) < threshold)
-+			atomic_inc(&pi->nr_misses);
-+	}
-+
-+	blk_mq_poll_stats_start(rq->q);
-+	blk_stat_add(rq, now);
++	pi->stat = *stat;
++	pi->sleep_ns = sleep_ns;
 +}
 +
- inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb)
  {
- 	u64 now = 0;
-@@ -574,10 +602,8 @@ static void __blk_mq_complete_request(struct request *rq)
+ 	struct request_queue *q = cb->data;
+ 	int bucket;
  
- 	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
- 
--	if (rq->rq_flags & RQF_STATS) {
--		blk_mq_poll_stats_start(rq->q);
--		blk_stat_add(rq, ktime_get_ns());
--	}
-+	if (rq->rq_flags & RQF_STATS)
-+		blk_mq_record_stats(rq, ktime_get_ns());
- 	/*
- 	 * Most of single queue controllers, there is only one irq vector
- 	 * for handling IO completion, and the only irq's affinity is set
-@@ -3316,14 +3342,25 @@ static void blk_mq_update_poll_info(struct poll_info *pi,
- 				    struct blk_rq_stat *stat)
- {
- 	u64 sleep_ns;
-+	u32 nr_misses, nr_samples;
+ 	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS; bucket++) {
+-		if (cb->stat[bucket].nr_samples)
+-			q->poll_stat[bucket] = cb->stat[bucket];
++		if (cb->stat[bucket].nr_samples) {
++			struct poll_info *pi = &q->poll_info[bucket];
++			struct blk_rq_stat *stat = &cb->stat[bucket];
 +
-+	nr_samples = stat->nr_samples;
-+	nr_misses = atomic_read(&pi->nr_misses);
-+	if (nr_misses > nr_samples)
-+		nr_misses = nr_samples;
- 
--	if (!stat->nr_samples)
-+	if (!nr_samples)
- 		sleep_ns = 0;
- 	else
- 		sleep_ns = (stat->mean + 1) / 2;
- 
-+	/*
-+	 * Use miss ratio here to adjust sleep time
-+	 */
-+
- 	pi->stat = *stat;
- 	pi->sleep_ns = sleep_ns;
-+	atomic_set(&pi->nr_misses, 0);
++			blk_mq_update_poll_info(pi, stat);
++		}
+ 	}
  }
  
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb)
-@@ -3389,10 +3426,6 @@ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
+@@ -3327,7 +3345,6 @@ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
+ 				       struct blk_mq_hw_ctx *hctx,
+ 				       struct request *rq)
+ {
+-	unsigned long ret = 0;
+ 	int bucket;
  
- 	rq->rq_flags |= RQF_MQ_POLL_SLEPT;
+ 	/*
+@@ -3337,23 +3354,11 @@ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
+ 	if (!blk_poll_stats_enable(q))
+ 		return 0;
  
 -	/*
--	 * This will be replaced with the stats tracking code, using
--	 * 'avg_completion_time / 2' as the pre-sleep target.
+-	 * As an optimistic guess, use half of the mean service time
+-	 * for this type of request. We can (and should) make this smarter.
+-	 * For instance, if the completion latencies are tight, we can
+-	 * get closer than just half the mean. This is especially
+-	 * important on devices where the completion latencies are longer
+-	 * than ~10 usec. We do use the stats for the relevant IO size
+-	 * if available which does lead to better estimates.
 -	 */
- 	kt = nsecs;
- 
- 	mode = HRTIMER_MODE_REL;
-@@ -3417,30 +3450,34 @@ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
- }
- 
- static bool blk_mq_poll_hybrid(struct request_queue *q,
--			       struct blk_mq_hw_ctx *hctx, blk_qc_t cookie)
-+			       struct blk_mq_hw_ctx *hctx,
-+			       struct request *rq)
- {
--	struct request *rq;
+ 	bucket = blk_mq_poll_stats_bkt(rq);
+ 	if (bucket < 0)
+-		return ret;
 -
- 	if (q->poll_nsec == BLK_MQ_POLL_CLASSIC)
- 		return false;
+-	if (q->poll_stat[bucket].nr_samples)
+-		ret = (q->poll_stat[bucket].mean + 1) / 2;
++		return 0;
  
--	if (!blk_qc_t_is_internal(cookie))
--		rq = blk_mq_tag_to_rq(hctx->tags, blk_qc_t_to_tag(cookie));
--	else {
--		rq = blk_mq_tag_to_rq(hctx->sched_tags, blk_qc_t_to_tag(cookie));
--		/*
--		 * With scheduling, if the request has completed, we'll
--		 * get a NULL return here, as we clear the sched tag when
--		 * that happens. The request still remains valid, like always,
--		 * so we should be safe with just the NULL check.
--		 */
--		if (!rq)
--			return false;
--	}
-+	/*
-+	 * With scheduling, if the request has completed, we'll
-+	 * get a NULL request here, as we clear the sched tag when
-+	 * that happens. The request still remains valid, like always,
-+	 * so we should be safe with just the NULL check.
-+	 */
-+	if (!rq)
-+		return false;
- 
- 	return blk_mq_poll_hybrid_sleep(q, hctx, rq);
+-	return ret;
++	return q->poll_info[bucket].sleep_ns;
  }
  
-+static inline struct request *qc_t_to_request(struct blk_mq_hw_ctx *hctx,
-+		blk_qc_t cookie)
-+{
-+	struct blk_mq_tags *tags;
-+
-+	tags = blk_qc_t_is_internal(cookie) ? hctx->sched_tags : hctx->tags;
-+
-+	return blk_mq_tag_to_rq(tags, blk_qc_t_to_tag(cookie));
-+}
-+
- /**
-  * blk_poll - poll for IO completions
-  * @q:  the queue
-@@ -3456,6 +3493,7 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
- int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- {
- 	struct blk_mq_hw_ctx *hctx;
-+	struct request *rq;
- 	long state;
- 
- 	if (!blk_qc_t_valid(cookie) ||
-@@ -3466,6 +3504,7 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- 		blk_flush_plug_list(current->plug, false);
- 
- 	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
-+	rq = qc_t_to_request(hctx, cookie);
- 
- 	/*
- 	 * If we sleep, have the caller restart the poll loop to reset
-@@ -3474,7 +3513,7 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- 	 * the IO isn't complete, we'll get called again and will go
- 	 * straight to the busy poll loop.
- 	 */
--	if (blk_mq_poll_hybrid(q, hctx, cookie))
-+	if (blk_mq_poll_hybrid(q, hctx, rq))
- 		return 1;
- 
- 	hctx->poll_considered++;
-@@ -3486,6 +3525,9 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- 		hctx->poll_invoked++;
- 
- 		ret = q->mq_ops->poll(hctx);
-+		if (rq)
-+			rq->rq_flags |= RQF_MQ_POLLED;
-+
- 		if (ret > 0) {
- 			hctx->poll_success++;
- 			__set_current_state(TASK_RUNNING);
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index e1915a4e41b9..33b7b9c35791 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -94,7 +94,7 @@ void blk_stat_add(struct request *rq, u64 now)
- 	int bucket;
- 	u64 value;
- 
--	value = (now >= rq->io_start_time_ns) ? now - rq->io_start_time_ns : 0;
-+	value = blk_rq_io_time(rq, now);
- 
- 	blk_throtl_stat_add(rq, value);
- 
+ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 40c77935fd61..36f17ed1376a 100644
+index 317ab30d2904..40c77935fd61 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -109,6 +109,9 @@ typedef __u32 __bitwise req_flags_t;
- #define RQF_MQ_POLL_SLEPT	((__force req_flags_t)(1 << 20))
- /* ->timeout has been called, don't expire again */
- #define RQF_TIMED_OUT		((__force req_flags_t)(1 << 21))
-+/* Request has been polled at least once */
-+#define RQF_MQ_POLLED		((__force req_flags_t)(1 << 22))
-+
+@@ -385,6 +385,12 @@ static inline int blkdev_reset_zones_ioctl(struct block_device *bdev,
  
- /* flags that prevent us from merging requests: */
- #define RQF_NOMERGE_FLAGS \
-@@ -389,6 +392,7 @@ struct poll_info
- {
- 	struct blk_rq_stat	stat;
- 	u64			sleep_ns;
-+	atomic_t		nr_misses;
- };
- 
- struct request_queue {
-@@ -924,6 +928,11 @@ static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
- }
  #endif /* CONFIG_BLK_DEV_ZONED */
  
-+static inline u64 blk_rq_io_time(struct request *rq, u64 now)
++struct poll_info
 +{
-+	return (now >= rq->io_start_time_ns) ? now - rq->io_start_time_ns : 0;
-+}
++	struct blk_rq_stat	stat;
++	u64			sleep_ns;
++};
 +
- /*
-  * Some commands like WRITE SAME have a payload or data transfer size which
-  * is different from the size of the request.  Any driver that supports such
+ struct request_queue {
+ 	/*
+ 	 * Together with queue_head for cacheline sharing
+@@ -477,7 +483,7 @@ struct request_queue {
+ 	int			poll_nsec;
+ 
+ 	struct blk_stat_callback	*poll_cb;
+-	struct blk_rq_stat	poll_stat[BLK_MQ_POLL_STATS_BKTS];
++	struct poll_info	poll_info[BLK_MQ_POLL_STATS_BKTS];
+ 
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
 -- 
 2.21.0
 
