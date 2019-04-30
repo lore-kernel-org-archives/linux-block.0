@@ -2,134 +2,104 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 021FAC04AA6
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 01:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA8EC43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 01:32:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C60AF21670
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 01:16:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC914216FD
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 01:32:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="l5ZBMWVP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AcAc0cUM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729715AbfD3BQP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Apr 2019 21:16:15 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:65012 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728997AbfD3BQP (ORCPT
+        id S1729626AbfD3Bc0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Apr 2019 21:32:26 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:44882 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729238AbfD3BcZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Apr 2019 21:16:15 -0400
+        Mon, 29 Apr 2019 21:32:25 -0400
+Received: by mail-qk1-f193.google.com with SMTP id d14so3067953qkl.11
+        for <linux-block@vger.kernel.org>; Mon, 29 Apr 2019 18:32:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1556586974; x=1588122974;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=kZJmUUu3KOr0i1JHdMOfq6JZUSh1OG/XY75e7KDiEcU=;
-  b=l5ZBMWVPPrO/GE1ajOWD/sdQr1LemuGhCQcNJhbJTtBIW75IaromR+OR
-   r8LGT0zRwBbvugymruZ7AxFe4qTnt7dsDRMNmY2EF1Nwj5qo6TJc7rrGF
-   upecGBJyOhxp8rJaLTB0gHIdArXyLowCjVS87tBZoF6fWgdkaOc/sGPfj
-   g=;
-X-IronPort-AV: E=Sophos;i="5.60,411,1549929600"; 
-   d="scan'208";a="671782175"
-Received: from sea3-co-svc-lb6-vlan3.sea.amazon.com (HELO email-inbound-relay-2b-3714e498.us-west-2.amazon.com) ([10.47.22.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 30 Apr 2019 01:16:11 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2b-3714e498.us-west-2.amazon.com (8.14.7/8.14.7) with ESMTP id x3U1GBFj113482
-        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=FAIL);
-        Tue, 30 Apr 2019 01:16:11 GMT
-Received: from EX13D10UWB002.ant.amazon.com (10.43.161.130) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.249) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 30 Apr 2019 01:16:11 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (10.43.161.207) by
- EX13D10UWB002.ant.amazon.com (10.43.161.130) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 30 Apr 2019 01:16:10 +0000
-Received: from u480fcf3d32ea57e0427f.ant.amazon.com (10.60.244.90) by
- mail-relay.amazon.com (10.43.161.249) with Microsoft SMTP Server id
- 15.0.1367.3 via Frontend Transport; Tue, 30 Apr 2019 01:16:10 +0000
-From:   Munehisa Kamata <kamatam@amazon.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC:     Munehisa Kamata <kamatam@amazon.com>,
-        <linux-block@vger.kernel.org>,
-        "Ratna Manoj Bolla" <manoj.br@gmail.com>, <nbd@other.debian.org>,
-        <stable@vger.kernel.org>, David Woodhouse <dwmw@amazon.com>
-Subject: [PATCH] nbd: replace kill_bdev() with __invalidate_device() again
-Date:   Mon, 29 Apr 2019 18:15:41 -0700
-Message-ID: <1556586941-21818-1-git-send-email-kamatam@amazon.com>
-X-Mailer: git-send-email 2.7.4
-MIME-Version: 1.0
-Content-Type: text/plain
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=0EPmsUn+n5eO3EHREMBcK3XY5nU5nQ6kG/M5UEjZCNE=;
+        b=AcAc0cUMn7Uq2UFhLN9Yo2svwdGxe8AbMEm6NKvy66xdSzN96NeCK0xDAsuaET8I09
+         c8FVYIxa8qCerMM0SQpvsG+D2jIrXA6MAvzVKOsmfJtP148RAswFCo7/GRulCYi3Gya+
+         o99Qvdb5l7GuPrPHuwR8IeoWHt1rOB2pb/pZxl0CKhvXbZDOJYDl0piJs2u0+W46WvOP
+         XQ0rq1bSyFFcMD9Wr70Hf5/RXWaU2mo4HWN4MjTZ0q1XPlR+1MxzT6EPANArudoQ4hWH
+         7rpyx+5ke8ZL7lWfqzJcmJ19XiABJQqrJgK2KLweMFvfad5hQ4qLjANNR6p+yaJ+9aMr
+         DD4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=0EPmsUn+n5eO3EHREMBcK3XY5nU5nQ6kG/M5UEjZCNE=;
+        b=oE2BSRFoN1YwdDH5txywtGpNlsAZK17hooB60a2L+xvVlhx+wNQqKBM+IBYFv3Pou9
+         pC/FRQdt8BhaBLLolEy0T28aNRLbLN1z1yKYrjWruEEpGCsBVwpFLIXIsAOO1BnKmhdl
+         jihdnu/lIQ9s3EVCJw7wvP+vW38Eh/6jQoUD/+zvWEvMYawpR3UjGjo6LmSu52ESYxuk
+         wIxJPbeQstybWlD2uSJfZ2vEzDNvcnGWI+idpbiXo4h/U2Y8qOjzmsXQP7N2e6YEV/tP
+         mBnVfVFajMUFNDW1FaETIkjP6+FaLmt8W6LcK3kcXSluvgsNihXRCzT4MLeZPZvopKDq
+         INiw==
+X-Gm-Message-State: APjAAAUOwcCY/K1nn7zP6fB9/WH/6bs3AMrD+4wOaDJNthlUpJYchAV3
+        zERDVEZTP7FYFyei3hLWvDmjcPS1
+X-Google-Smtp-Source: APXvYqy/1o6jlShyyUlI3kvxKvUWTKKHoPlI25dkDLli35BFL5kUJ5dnRGfvwq36hiVMWDfx4buPeA==
+X-Received: by 2002:a37:aacc:: with SMTP id t195mr24582366qke.202.1556587944343;
+        Mon, 29 Apr 2019 18:32:24 -0700 (PDT)
+Received: from laptop.suse.cz ([179.185.223.166])
+        by smtp.gmail.com with ESMTPSA id v57sm5127019qtc.10.2019.04.29.18.32.21
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 29 Apr 2019 18:32:23 -0700 (PDT)
+From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+To:     linux-block@vger.kernel.org
+Cc:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+Subject: [PATCH 0/2] Introduce size_to_sectors helper in blkdev.h
+Date:   Mon, 29 Apr 2019 22:32:03 -0300
+Message-Id: <20190430013205.1561708-1-marcos.souza.org@gmail.com>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit abbbdf12497d ("replace kill_bdev() with __invalidate_device()")
-once did this, but 29eaadc03649 ("nbd: stop using the bdev everywhere")
-resurrected kill_bdev() and it has been there since then. So buffer_head
-mappings still get killed on a server disconnection, and we can still
-hit the BUG_ON on a filesystem on the top of the nbd device.
+My previous submission was an RFC, but I got a reviewed-by from Chaitanya, so
+I removed the RFc tag.
 
-  EXT4-fs (nbd0): mounted filesystem with ordered data mode. Opts: (null)
-  block nbd0: Receive control failed (result -32)
-  block nbd0: shutting down sockets
-  print_req_error: I/O error, dev nbd0, sector 66264 flags 3000
-  EXT4-fs warning (device nbd0): htree_dirblock_to_tree:979: inode #2: lblock 0: comm ls: error -5 reading directory block
-  print_req_error: I/O error, dev nbd0, sector 2264 flags 3000
-  EXT4-fs error (device nbd0): __ext4_get_inode_loc:4690: inode #2: block 283: comm ls: unable to read itable block
-  EXT4-fs error (device nbd0) in ext4_reserve_inode_write:5894: IO failure
-  ------------[ cut here ]------------
-  kernel BUG at fs/buffer.c:3057!
-  invalid opcode: 0000 [#1] SMP PTI
-  CPU: 7 PID: 40045 Comm: jbd2/nbd0-8 Not tainted 5.1.0-rc3+ #4
-  Hardware name: Amazon EC2 m5.12xlarge/, BIOS 1.0 10/16/2017
-  RIP: 0010:submit_bh_wbc+0x18b/0x190
-  ...
-  Call Trace:
-   jbd2_write_superblock+0xf1/0x230 [jbd2]
-   ? account_entity_enqueue+0xc5/0xf0
-   jbd2_journal_update_sb_log_tail+0x94/0xe0 [jbd2]
-   jbd2_journal_commit_transaction+0x12f/0x1d20 [jbd2]
-   ? __switch_to_asm+0x40/0x70
-   ...
-   ? lock_timer_base+0x67/0x80
-   kjournald2+0x121/0x360 [jbd2]
-   ? remove_wait_queue+0x60/0x60
-   kthread+0xf8/0x130
-   ? commit_timeout+0x10/0x10 [jbd2]
-   ? kthread_bind+0x10/0x10
-   ret_from_fork+0x35/0x40
+Changes from v1:
+Reworked the documentation of size_to_sectors by removing a sentence that was
+explaining the size -> sectors math, which wasn't necessary given the
+description prior to the example.
 
-With __invalidate_device(), I no longer hit the BUG_ON with sync or
-unmount on the disconnected device.
+Let me know if you have more suggestions to this code.
 
-Fixes: 29eaadc03649 ("nbd: stop using the bdev everywhere")
-Cc: linux-block@vger.kernel.org
-Cc: Ratna Manoj Bolla <manoj.br@gmail.com>
-Cc: nbd@other.debian.org
-Cc: stable@vger.kernel.org
-Cc: David Woodhouse <dwmw@amazon.com>
-Signed-off-by: Munehisa Kamata <kamatam@amazon.com>
+Here is the cover letter of the RFC sent prior to this patchset:
 
-CR: https://code.amazon.com/reviews/CR-7629288
----
- drivers/block/nbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+While reading code of drivers/block, I was curious about the set_capacity
+argument, always shifting the value by 9, and so I took me a while to realize
+this is done on purpose: the capacity is the number of sectors of 512 bytes
+related to the storage space.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 90ba9f4..6d6eedd 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1217,7 +1217,7 @@ static void nbd_clear_sock_ioctl(struct nbd_device *nbd,
- 				 struct block_device *bdev)
- {
- 	sock_shutdown(nbd);
--	kill_bdev(bdev);
-+	__invalidate_device(bdev, true);
- 	nbd_bdev_reset(bdev);
- 	if (test_and_clear_bit(NBD_HAS_CONFIG_REF,
- 			       &nbd->config->runtime_flags))
+Rather the shifting by 9, there are other places where the value if shifted by
+SECTOR_SHIFT, which is more readable.
+This patch aims to reduce these differences by adding a new function called
+size_to_sectors, adding a proper comment explaining why this is needed.
+
+null_blk was changed to use this new function.
+
+Thanks,
+Marco
+
+Marcos Paulo de Souza (2):
+  blkdev.h: Introduce size_to_sectors hlper function
+  null_blk: Make use of size_to_sectors helper
+
+ drivers/block/null_blk_main.c | 18 +++++++++---------
+ include/linux/blkdev.h        | 17 +++++++++++++++++
+ 2 files changed, 26 insertions(+), 9 deletions(-)
+
 -- 
-2.7.4
+2.16.4
 
