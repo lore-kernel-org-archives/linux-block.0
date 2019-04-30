@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 246B6C43219
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 15:27:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A65C43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 15:27:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1F312147A
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 15:27:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 163ED21707
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 15:27:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KB7oSCUh"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="s3sUe3aU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725995AbfD3P1T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 11:27:19 -0400
-Received: from mail-io1-f50.google.com ([209.85.166.50]:40437 "EHLO
-        mail-io1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725930AbfD3P1T (ORCPT
+        id S1725976AbfD3P1c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 11:27:32 -0400
+Received: from mail-io1-f42.google.com ([209.85.166.42]:33714 "EHLO
+        mail-io1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725930AbfD3P1c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 11:27:19 -0400
-Received: by mail-io1-f50.google.com with SMTP id m9so6185075iok.7
-        for <linux-block@vger.kernel.org>; Tue, 30 Apr 2019 08:27:18 -0700 (PDT)
+        Tue, 30 Apr 2019 11:27:32 -0400
+Received: by mail-io1-f42.google.com with SMTP id u12so12610130iop.0
+        for <linux-block@vger.kernel.org>; Tue, 30 Apr 2019 08:27:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ML6TAWz0Xc6iDLbt62Pin6KVbCz+ta0B9Pv1H1i4wB4=;
-        b=KB7oSCUhUQfv6pLmfVRXmJPhxM0gNjRo4Q+2AyYFd3VUCAVVjRXaPxvF5pvZRLi8A0
-         g0MeNdja3YTcZB+MrzzWszKmCmlyzsoyeUzkRP9wJ/ehgIHpPnKJHHfLDcf2KAu2mQmh
-         fURuMFB8jpzozkNaZ09yTL+b0sdfq3azA0cftiXFAiZVbJizIciW5i0UsDDzvlkSFBNz
-         GzExfcGd3gB0X08eu/w4BOkMAkA2l0Gz6EuzfnIFDrMdPl6BazW1OoN17plID8fNVawO
-         A8M9EM62xiIbxum8QTusrrfj24LPgIJWiQntpUpRNd0SyrSS1h1b1PTK1gTRXbaW7uGI
-         CgKw==
+        bh=AozbW9bCHEY0I4T33gKXh5v6hfCjcSv3G9eLyzyu4HM=;
+        b=s3sUe3aUmlFxzQhT3frfu/viBoLOVdT/qjXybgep46hfnHZrZ0h1tJ5skoN3VSn3pm
+         UKmisldS7vKwD9VuVb7pXIvvWcavPKIMKDnEk5jxl9GvacIKX5Qcn6hqu9vjuv++atDI
+         HrPiThyrsfOugdmIrE5lodPNmDiM63R2f0VegSVs+nJOrfbQWLfIh+q9U0FMjAVvI4Kn
+         yFAOdGqpC+RjMqYwqmTkaQXED+QAeQQUgK2ud1Jq6lHW9EdXf9AeNnOR7ga3snL2Pp7W
+         QX1+h7UZ3I2WiS3RRAmFJpwAtZ6p2R/SdOvCA75NygsiGqOdhdHJpKNScD9hO2piDg7V
+         Ehiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ML6TAWz0Xc6iDLbt62Pin6KVbCz+ta0B9Pv1H1i4wB4=;
-        b=rx24R0hHxUlFJjjknEWrjPldKRxR5DIkl7iFSqqYczzgQAvmkFBv4KGdPDAgsLhyhh
-         PlnhwjOFztytBG71aTXqSW9yp/gxIRH0oH7Xt0keIlfZcHNuKAK1vMJkW8WMbS+SCOnF
-         j8lT1QDGmChgjiONLsy/JhGCNRrUHNxoYC+PQeG/Y1vapK5xXiSTRbJtOk+XFWyZMmMB
-         Ni5ZSsOYGaFdO9lKQTpo1IO/qlWgva84mkYBaQWK7Vdi9Os+Ih3qTmGHsamXnptqs6eV
-         HIgWeHqnzaBOJGx2v61sKjAry0RuHIMlzYylaATDhOYuBn8hjDTpoPFzwogjcyX3IlwF
-         rWuw==
-X-Gm-Message-State: APjAAAWKC5jBjl1UUBbQX7YybYxDApZmuCJNSiP8Eut4ZHhUs2VWtcno
-        8yZlR98UlGB4jg0zgLAFo/v+eCxOTrSRDA==
-X-Google-Smtp-Source: APXvYqxTjKfGDHnktaChiJ8g+KwwvNKjH6Q50Dj0hpXLsljyKGogFioylG5VhCNepuPHRzBj+U7ppw==
-X-Received: by 2002:a6b:4102:: with SMTP id n2mr5322565ioa.256.1556638037567;
-        Tue, 30 Apr 2019 08:27:17 -0700 (PDT)
+        bh=AozbW9bCHEY0I4T33gKXh5v6hfCjcSv3G9eLyzyu4HM=;
+        b=kXZmWixB2zXyLMSsBhr8TKogYXKd5V53d7drJtT5YrIk9iysQDbQGeI1YJMgV2cRTp
+         QyMpitqNzM3hQeErQoks4Dxt6vfxfHzb8kt7bw1iBZYr/a5rgn+lkijw9hrfsL6MnuG+
+         H79k2VgqmSR6L0F2RkPIfiiBdaOsXyCQWOd9vV5MlprY70sS4qYS+xgebrmbCd6fRAHY
+         mCT0nz2PF5ZyCzDMkF9lXXPhYvkqhW5VHOIh36ZihL+2k58sxxP10wVClly1vFnKYzOU
+         MBy4qYiSjiMiuEps4BQc2eMb/H7X7U/ecXULnYrXxVqYceSBnOhkY6l49+iC/9BEtIis
+         t/3Q==
+X-Gm-Message-State: APjAAAVEmkfhzaLLVCzT1qprXFE185JcZKpp7Vp4/EVqN49VtnmCP0FC
+        rU/WoA9kGfa46iRU/TA6i/Vm3g==
+X-Google-Smtp-Source: APXvYqxlpwIsrApMV8ea5Rbkrs63s/eHAjm2ZXKIT2jpDYI4EjU6/KuzpuUfeJPRqaHSIH+Gsr1nSg==
+X-Received: by 2002:a6b:fe01:: with SMTP id x1mr22745182ioh.4.1556638051360;
+        Tue, 30 Apr 2019 08:27:31 -0700 (PDT)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id 1sm1689381ity.9.2019.04.30.08.27.16
+        by smtp.gmail.com with ESMTPSA id r142sm1672537itb.20.2019.04.30.08.27.30
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Apr 2019 08:27:16 -0700 (PDT)
-Subject: Re: bio_add_pc_page cleanups
+        Tue, 30 Apr 2019 08:27:30 -0700 (PDT)
+Subject: Re: simplify bio_for_each_segment_all
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20190425070435.3478-1-hch@lst.de>
+Cc:     Matthew Wilcox <willy@infradead.org>, linux-block@vger.kernel.org,
+        linux-bcache@vger.kernel.org
+References: <20190425070300.3388-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6e715830-8ed1-8825-97e7-c1b9ac8252f5@kernel.dk>
-Date:   Tue, 30 Apr 2019 09:27:15 -0600
+Message-ID: <5a2f15d5-84cd-55d5-d580-a65b6601fe70@kernel.dk>
+Date:   Tue, 30 Apr 2019 09:27:28 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190425070435.3478-1-hch@lst.de>
+In-Reply-To: <20190425070300.3388-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,12 +75,13 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/25/19 1:04 AM, Christoph Hellwig wrote:
+On 4/25/19 1:02 AM, Christoph Hellwig wrote:
 > Hi Jens,
 > 
-> please take a look at these trivial bio_add_pc_page cleanups.
+> this series simplifies bio_for_each_segment_all a bit, as suggested
+> by willy.
 
-LGTM, applied.
+Applied, thanks.
 
 -- 
 Jens Axboe
