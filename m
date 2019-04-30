@@ -2,111 +2,111 @@ Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3032CC43219
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 10:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82AEFC43219
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 11:57:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F2DF121670
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 10:52:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZoSzjyAF"
+	by mail.kernel.org (Postfix) with ESMTP id 5929221707
+	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 11:57:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727512AbfD3Kwi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 06:52:38 -0400
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:34110 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727253AbfD3Kwi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 06:52:38 -0400
-Received: by mail-qk1-f195.google.com with SMTP id n68so7836653qka.1;
-        Tue, 30 Apr 2019 03:52:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=LnKYy8jFj+JVpVc0C/UzgZXSpL4E0hdFTQaCn24mwco=;
-        b=ZoSzjyAFUIkT/IJEHAragzsBdlhhXZzJTUJVioDNkVtECy/vvUL0m8oBhzUu+irnqG
-         OkN4BD3T9QdnGO7JhpIvWx3ufxUQST4hhDUljQiTj5W9n7aM+a1ZaQx35XSwQneiwz9R
-         ZfwuvPcaSOEcH9oMkTtq2YbB/0hWzmP4qAlKhF/2HhOqniJRShrkgJboNt0yK+0vks48
-         /lNukNAOpB241V+d0DDTcM5aQBXRfvAEhWgnET/BS4JvN9iodjsmHIUeMD0G9fzbPJPe
-         ddROflj3IUdU+gmVAYmnEsg6sfmsePB1ZPudkwyMJvJQojxZpIOuKbYdozVTLoCqlae5
-         5LxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=LnKYy8jFj+JVpVc0C/UzgZXSpL4E0hdFTQaCn24mwco=;
-        b=iPwAt18yxPHA9pA3RfCyeIvsrbhNfV7zUAJ47XwNVAM5CyxEsjVNFWswzGJZFz/rXW
-         pjtwog6Fj+yKcW2yOTDlm5lj/o1TqVvG1uPOBVDOne1Wn4G8EfGyVeP1PEQtOjvIZF0T
-         6oNSuxhO4fkZmiBMF5oENyG/TSg/uMATdNV9cM+UMekENMZ8taXaoB7Jhz/ZFC8s8sw6
-         /bqURkwgCqM/bpZ/fwlsfWB3EzUBLEla6+p1UDuFOB3PcVQwszzY26FpUQzU1d9GsC1s
-         aQGjWl8v3ue1K/YYhIKyNhwIJHj2LCinw8vPJlUnlhZzFoD5O6db4v5xAqOYAGsseuiH
-         Hvbg==
-X-Gm-Message-State: APjAAAWzjpHd41ZVkAFbVuLgyjZCwDcH2waWobXUbT2+xEhvNgvq7P6N
-        lOlTRY6IW8JjAnLcDiVR2H0=
-X-Google-Smtp-Source: APXvYqyEp/ZdUavjs8KgOwRCEG3lYrIV4mo1aOsdTDyV2iNrHd2FUdrlCSxBq31I546BoDKGayR3PQ==
-X-Received: by 2002:a37:2c06:: with SMTP id s6mr48810567qkh.142.1556621557170;
-        Tue, 30 Apr 2019 03:52:37 -0700 (PDT)
-Received: from laptop (189.26.185.89.dynamic.adsl.gvt.net.br. [189.26.185.89])
-        by smtp.gmail.com with ESMTPSA id w58sm19627363qtw.93.2019.04.30.03.52.32
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 30 Apr 2019 03:52:35 -0700 (PDT)
-Date:   Tue, 30 Apr 2019 07:52:15 -0300
-From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Hannes Reinecke <hare@suse.com>,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Greg Edwards <gedwards@ddn.com>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/2] blkdev.h: Introduce size_to_sectors hlper function
-Message-ID: <20190430105212.GA1642767@laptop>
-References: <20190430013205.1561708-1-marcos.souza.org@gmail.com>
- <20190430013205.1561708-2-marcos.souza.org@gmail.com>
- <yq1bm0ow6iv.fsf@oracle.com>
+        id S1727452AbfD3L51 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Apr 2019 07:57:27 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45570 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729043AbfD3LsC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Apr 2019 07:48:02 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 8D038ADF7;
+        Tue, 30 Apr 2019 11:48:01 +0000 (UTC)
+Subject: Re: [PATCH] block: use static bio_set for bio_split() calls
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Ming Lei <ming.lei@gmail.com>, neilb@suse.com,
+        linux-nvme@lists.infradead.org,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart van Assche <bvanassche@acm.org>
+References: <20190418140632.60606-1-hare@suse.de>
+ <20190418143429.GA19175@ming.t460p>
+ <98d8549a-2663-b404-e38a-6f55dfb575bf@grimberg.me>
+ <20190424221422.GA21351@ming.t460p> <20190425004106.GA22683@ming.t460p>
+ <c6a54cea-f2ce-3344-efb1-ba8f20bf9509@suse.de>
+ <20190425153627.GA9825@ming.t460p>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <b884020e-ad18-199f-8377-89e3e42ae84c@suse.de>
+Date:   Tue, 30 Apr 2019 13:48:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq1bm0ow6iv.fsf@oracle.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190425153627.GA9825@ming.t460p>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 29, 2019 at 10:50:32PM -0400, Martin K. Petersen wrote:
+On 4/25/19 5:36 PM, Ming Lei wrote:
+> On Thu, Apr 25, 2019 at 04:32:42PM +0200, Hannes Reinecke wrote:
+>> On 4/25/19 2:41 AM, Ming Lei wrote:
+>>> On Thu, Apr 25, 2019 at 06:14:22AM +0800, Ming Lei wrote:
+>>>> On Wed, Apr 24, 2019 at 10:20:46AM -0700, Sagi Grimberg wrote:
+>>>>>
+>>>>>> per-queue bioset is used originally for avoiding deadlock, are you
+>>>>>> sure the static bioset is safe?
+>>>>>
+>>>>> Can you explain this? I didn't find any indication of that in the change
+>>>>> log history...
+>>>>>
+>>>>> Originally introduced by Kent:
+>>>>
+>>>> bio split can be run from stacking drivers, for example, MD over NVMe,
+>>>> if the global reserved mempool is consumed by MD bio splitting, then
+>>>> no any progress can be made when splitting on bio submitted to NVMe.
+>>>>
+>>>> Kent may have more details...
+>>>
+>>> I guess it might be fine to use one shared global bio_set for all
+>>> lowest underlying queues, could be all queues except for loop, dm, md
+>>> , drbd, bcache, ...
+>>>
+>> But wasn't the overall idea of stacking drivers that we propagate the queue
+>> limits up to the uppermost drivers, so that we have to do a split only at
+>> the upper layers?
 > 
-> Hi Marco,
+> For example, LVM over RAID, the limits of LVM queue is figured out and fixed
+> during creating LVM. However, new device may be added to the RAID. Then the
+> underlying queue's limit may not be propagated to LVM's queue's limit.
 > 
-> > +static inline sector_t size_to_sectors(long long size)
-> > +{
-> > +	return size >> SECTOR_SHIFT;
-> > +}
-> > +
+> And we did discuss the topic of 'block: dm: restack queue_limits'
+> before, looks not see any progress made.
 > 
-> FWIW, in SCSI we have:
+> Also loop doesn't consider stack limits at all.
 > 
-> 	logical_to_sectors()
->         logical_to_bytes()
->         bytes_to_logical()
->         sectors_to_logical()
+>> Furthermore, it's not every bio which needs to be split, only those which
+>> straddle some device limitations.
+>> The only ones not being able to propagate the queue limits is MD, and that
+>> is already using a private bio_set here.
 > 
-> I'm not attached to "bytes" in any way but it would be nice to be
-> consistent.
+> If DM and the lowest queue share one same bio_set(mem_pool), it isn't
+> enough for MD to use private bio_set.
 > 
+Ah, right. I've reviewed the patches implementing the per-queue biosets, 
+and indeed we'll need to use them.
+But meanwhile I've found another way of circumventing this issue, so 
+this patch can be dropped.
 
-Thanks for the suggestion. I will send a new version using "bytes_to_sectors"
-instead.
+Cheers,
 
-> -- 
-> Martin K. Petersen	Oracle Linux Engineering
-
+Hannes
 -- 
-Thanks,
-Marcos
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
