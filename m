@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 591E6C43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9580EC43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:33:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2904E21743
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:33:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6429D20866
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:33:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eNC26ITG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SIKNhdIu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726005AbfEAEda (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 00:33:30 -0400
+        id S1725776AbfEAEdd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 00:33:33 -0400
 Received: from esa4.hgst.iphmx.com ([216.71.154.42]:63464 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725776AbfEAEda (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 00:33:30 -0400
+        with ESMTP id S1726014AbfEAEdd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 00:33:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1556685211; x=1588221211;
+  t=1556685214; x=1588221214;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ZPie3xCE0DP4N8ZJOm6oXLeSI2TDSs0yR7ULxbyJoSE=;
-  b=eNC26ITGO7MPb1K7Tv4gii3rxiHZUflyPCkfIsvXCFIi+gQkkR/aP4Oe
-   ZH7TN7xX0kVui/SxzBIxOkgdoRyH+STCBLvRaYtAa/m9A+Xf87EsIZ4++
-   NuIqxR4zGF4z+XmSE0El/mt4TKSEnIC6XMlXPPynZ7dzsiLCza5p8QpqE
-   P69mhdt4e2ovRTcCsosWD9Mxc9AsnIbmVVdmP4wpUbVRDO5OX9dZQhze4
-   qKGSkBwgjJVoZIFekgsGKocDNter0QkylO0JevMG/dvCxEEMV1JOAK23Q
-   Pam1P92UPGpRK26qSTU6sQWIsoxMVUgIXlbxN6sdtvi+w1Hus1UmbMetN
-   A==;
+  bh=HFiyCWDxmB3njrOTkqlK+KXLrC9HqciLiQ062ymPrDY=;
+  b=SIKNhdIu1DaGl3qq3q8HLGMkrqgTvS0mZxnRRRKVW6RkqjmyX0rI/fzD
+   eoVxe1d26Ab0g37+fQ2NgvM+kdTJacvvBE8BpdONcLMnT4uQlfNmRdfdg
+   LudLP+P0JE/Yln0iy1kJ3zPBUz+34KdSVD217pleEIzYSQIOMNw49OZyL
+   ARsff7lc/Rl+iYLwJwDb/PiQy06rAWrZNIzxwyLPjILFbEaN3XXDmIDWW
+   08yvNakWXyFSebiZghvZ6nL986PqkzJliQqxOYZAYth/FT90G4o8aVP7d
+   SgL18El+fJ2TeVNF4HJn3/AJvCHBlVVQAwY3EhmOVAK11VVM86Dtqa4Xp
+   Q==;
 X-IronPort-AV: E=Sophos;i="5.60,416,1549900800"; 
-   d="scan'208";a="107229725"
+   d="scan'208";a="107229727"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 01 May 2019 12:33:31 +0800
-IronPort-SDR: QeO+g/BJceKeyrCfXUiUlUNlfSBZ/jqeXM8pY/e3hyPKdKy+16JURkQ2CXmiKhj7z4R0vbyRKC
- VvOnoL/FTWCgmZ0gth8ZwFyvrWGXiarlxQY58JnbkOOLgl4ZBI6/yXS3FTRxs3zvUUgqsrCa+l
- UcKtsr9Mw68Kh3XeOLSpzEbipbcK7owEZVbm1nAyRuFw48DIlQyaT2lv7iDZ9OJSlPpjJxo3vM
- XRnLLxdg8IZD53fovubJcHz2rdvdV84nLkhjVGF4Wvh/6p80+oZrmeCJOebw8iCJ9evUSw33Sq
- dL2Lny0sXRZ5h+UvUOjow9gd
+  by ob1.hgst.iphmx.com with ESMTP; 01 May 2019 12:33:33 +0800
+IronPort-SDR: vZ7F3Jns2o7zRZWuQ+NnvOfaYD0tMyReqkNPrGvMjPNywjqfKb/OioUNIgGwSF5L9gkwcGbbHF
+ sAfX+U6vxdlxK5+A4toxdEGd13IKzmeYLZwUurpPyHa5DsCLcUj/rxzu6z6ZU73QRo+u61r4ys
+ kFdDSDQdAX4kEPMmCXuFja/DdgtGtSZxT8lOcgg2VAuUOfwjpL4nABZA8VBq4jH6FR8aSWx/iQ
+ 2MXxCgX27iUDOctE6PkZSVWfrFi4RMguAgFi8JygLBjM4AV4R8vY7EHigkbIltre4Bqfrht369
+ JVFQNQrBdc3C4TGJ3PJInqa3
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 30 Apr 2019 21:11:59 -0700
-IronPort-SDR: nGC4DRzTMXI/X0KcVPHRiCIIq6mMI98KkX2HkemfQqiP7LDZ+8EkVJjt5b8UVsEP0IkfHB1MVg
- 75FCZijr62G6wSQc0qpmsTfQObd+IvFLLOylUXMUVgyx1oAAkKmM0oeV+DR0XTARAqKc0o/1ci
- GbwVq0gEMBY4y6sud6HGLAxXrIWnT/S2QDC4odC3pevAQutR7nDoo7hDYWhlOs9mD+FmabMPyy
- oBbePkIvxCXI6XSlZK7CqjR7AxPtrLFLuZANpkwilsPilTqmWFLNeKGOFHz5vMcuCw1hDuZUXa
- YqE=
+  by uls-op-cesaep02.wdc.com with ESMTP; 30 Apr 2019 21:12:02 -0700
+IronPort-SDR: L1qEvqDKZAM7EOX/dI3s+FoPP044ZSthlSq3dMc4buFXsqGFK+JM+OmW3n4sOpDqdjfWgxEjll
+ aHumtCVHx+zLdlMaYT4JLXDcPQ3GBpMfkZE0lF2nu3hK7MCGtVGx+A1XzImBas5kJmKuTov3d1
+ 6OicO9X/thjkmSiUBHjyDxNBrgoDHEsO0cx5eNpB0R99KXY71fxEKRitlvgqCQuhbqPB5Wk3Ft
+ NGEk3CvhdkBw7z9ENsI+LX0rXo7+WfN9XtC2aUYs9817Y66328pP+EDQpoWM/JYhdvca3gANEe
+ e50=
 Received: from cmercuryqemu.hgst.com ([10.202.65.32])
-  by uls-op-cesaip01.wdc.com with ESMTP; 30 Apr 2019 21:33:31 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 30 Apr 2019 21:33:33 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [RFC PATCH blktrace-tools 03/10] act-mask: add blktrace extension to act_mask
-Date:   Tue, 30 Apr 2019 21:33:10 -0700
-Message-Id: <20190501043317.5507-4-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH blktrace-tools 04/10] blktrace.c: add support for extensions
+Date:   Tue, 30 Apr 2019 21:33:11 -0700
+Message-Id: <20190501043317.5507-5-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190501043317.5507-1-chaitanya.kulkarni@wdc.com>
 References: <20190501043317.5507-1-chaitanya.kulkarni@wdc.com>
@@ -68,125 +68,195 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds the support for blktrace action mask to accommodate
-more operations like write-zeroes and zone reset etc.
+This patch adds support for blktrace tool to use the blktrace extension.
+Here we also add the support for priority tracking and using priority
+mask from the command line just like action mask.
 
-Also, we add support to use the priority mask in the existing
-infrastructure. We also update the existing helpers to manage
-action mask and add similar helpers for priority mask.
+Here we also increase the size of the various bufferes.
+We add three new command line options so that user can specify whethere
+to track priority and priority mask just like actiom mask.
+In order to keep the backward compaibility we by default we turn off
+the priority tracking.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- act_mask.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- blktrace.h |  6 ++++++
- 2 files changed, 62 insertions(+), 4 deletions(-)
+ blktrace.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 80 insertions(+), 5 deletions(-)
 
-diff --git a/act_mask.c b/act_mask.c
-index 8f1b8d7..09bda08 100644
---- a/act_mask.c
-+++ b/act_mask.c
-@@ -1,7 +1,15 @@
- #include <strings.h>
+diff --git a/blktrace.c b/blktrace.c
+index d0d271f..e5105f5 100644
+--- a/blktrace.c
++++ b/blktrace.c
+@@ -57,10 +57,17 @@
+  * You may want to increase this even more, if you are logging at a high
+  * rate and see skipped/missed events
+  */
++#ifdef CONFIG_BLKTRACE_EXT
++#define BUF_SIZE		(1024 * 1024)
++#define BUF_NR			(4)
++
++#define FILE_VBUF_SIZE		(256 * 1024)
++#else
+ #define BUF_SIZE		(512 * 1024)
+ #define BUF_NR			(4)
+ 
+ #define FILE_VBUF_SIZE		(128 * 1024)
++#endif /* CONFIG_BLKTRACE_EXT */
+ 
+ #define DEBUGFS_TYPE		(0x64626720)
+ #define TRACE_NET_PORT		(8462)
+@@ -279,7 +286,15 @@ static int max_cpus;
+ static int ncpus;
+ static cpu_set_t *online_cpus;
+ static int pagesize;
 +
 +#ifdef CONFIG_BLKTRACE_EXT
-+#include <stdint.h>
++static uint64_t act_mask = -1ULL;
++/* by default don't trace priority */
++static uint32_t blktrace_prio_mask = 0;
++int btrace_track_prio;
++#else
+ static int act_mask = ~0U;
 +#endif /* CONFIG_BLKTRACE_EXT */
- #include "blktrace.h"
+ static int kill_running_trace;
+ static int stop_watch;
+ static int piped_output;
+@@ -329,7 +344,11 @@ static int *cl_fds;
+ static int (*handle_pfds)(struct tracer *, int, int);
+ static int (*handle_list)(struct tracer_devpath_head *, struct list_head *);
  
- #define DECLARE_MASK_MAP(mask)          { BLK_TC_##mask, #mask, "BLK_TC_"#mask }
 +#ifdef CONFIG_BLKTRACE_EXT
-+#define DECLARE_PRIO_CLASS_MASK_MAP(mask) \
-+	{ (1 << IOPRIO_CLASS_##mask), #mask, "IOPRIO_CLASS_"#mask }
++#define S_OPTS	"d:a:A:r:o:kw:vVb:n:D:lh:p:sI:Px:X:"
++#else
+ #define S_OPTS	"d:a:A:r:o:kw:vVb:n:D:lh:p:sI:"
 +#endif /* CONFIG_BLKTRACE_EXT */
- #define COMPARE_MASK_MAP(mmp, str)                                      \
-         (!strcasecmp((mmp)->short_form, (str)) ||                      \
-          !strcasecmp((mmp)->long_form, (str)))
-@@ -29,20 +37,64 @@ static struct mask_map mask_maps[] = {
- 	DECLARE_MASK_MAP(DISCARD),
- 	DECLARE_MASK_MAP(DRV_DATA),
- 	DECLARE_MASK_MAP(FUA),
-+#ifdef CONFIG_BLKTRACE_EXT
-+	DECLARE_MASK_MAP(WRITE_ZEROES),
-+	DECLARE_MASK_MAP(ZONE_RESET),
-+#endif /* CONFIG_BLKTRACE_EXT */
- };
+ static struct option l_opts[] = {
+ 	{
+ 		.name = "dev",
+@@ -427,6 +446,24 @@ static struct option l_opts[] = {
+ 		.flag = NULL,
+ 		.val = 'p'
+ 	},
++	{
++		.name = "track-priority",
++		.has_arg = no_argument,
++		.flag = NULL,
++		.val = 'P'
++	},
++	{
++		.name = "prio-mask",
++		.has_arg = required_argument,
++		.flag = NULL,
++		.val = 'x'
++	},
++	{
++		.name = "prio-set-mask",
++		.has_arg = required_argument,
++		.flag = NULL,
++		.val = 'X'
++	},
+ 	{
+ 		.name = "no-sendfile",
+ 		.has_arg = no_argument,
+@@ -453,6 +490,9 @@ static char usage_str[] = "\n\n" \
+         "[ -p <port number>   | --port=<port number>]\n" \
+         "[ -s                 | --no-sendfile]\n" \
+         "[ -I <devs file>     | --input-devs=<devs file>]\n" \
++        "[ -P                 | --track-priority ]\n" \
++        "[ -x <ioprio field>  | --prio-mask=<ioprio field> ]\n" \
++        "[ -X <ioprio mask>   | --set-mask=<ioprio mask> ]\n" \
+         "[ -v <version>       | --version]\n" \
+         "[ -V <version>       | --version]\n" \
  
--int find_mask_map(char *string)
-+#ifdef CONFIG_BLKTRACE_EXT
-+
-+/**
-+ * I/O Priority Map mask based on ${KERNEL_SRC_DIR}/include/linux/ioprio.h.
-+ */
-+static struct mask_map prio_map[] = {
-+	DECLARE_PRIO_CLASS_MASK_MAP(NONE),
-+	DECLARE_PRIO_CLASS_MASK_MAP(RT),
-+	DECLARE_PRIO_CLASS_MASK_MAP(BE),
-+	DECLARE_PRIO_CLASS_MASK_MAP(IDLE),
-+};
-+
-+/**
-+ * I/O Priority Map mask search for valid ioprio string value.
-+ */
-+int find_prio_mask_map(char *string)
- {
- 	unsigned int i;
+@@ -468,6 +508,9 @@ static char usage_str[] = "\n\n" \
+ 	"\t-l Run in network listen mode (blktrace server)\n" \
+ 	"\t-h Run in network client mode, connecting to the given host\n" \
+ 	"\t-p Network port to use (default 8462)\n" \
++	"\t-P Enable tracking priorites.\n" \
++	"\t-a Only priority specified actions.\n" \
++	"\t-A Give priority mask as a single value.\n" \
+ 	"\t-s Make the network client NOT use sendfile() to transfer data\n" \
+ 	"\t-I Add devices found in <devs file>\n" \
+ 	"\t-v Print program version info\n" \
+@@ -633,11 +676,11 @@ static int lock_on_cpu(int cpu)
+ 	CPU_ZERO_S(size, cpu_mask);
+ 	CPU_SET_S(cpu, size, cpu_mask);
+ 	if (sched_setaffinity(0, size, cpu_mask) < 0) {
+-		CPU_FREE(cpu_mask);		
++		CPU_FREE(cpu_mask);
+ 		return errno;
+ 	}
  
--	for (i = 0; i < sizeof(mask_maps)/sizeof(mask_maps[0]); i++)
--		if (COMPARE_MASK_MAP(&mask_maps[i], string))
--			return mask_maps[i].mask;
-+	for (i = 0; i < sizeof(prio_maps)/sizeof(prio_maps[0]); i++)
-+		if (COMPARE_MASK_MAP(&prio_map[i], string))
-+			return prio_map[i].mask;
- 
- 	return -1;
+-	CPU_FREE(cpu_mask);		
++	CPU_FREE(cpu_mask);
+ 	return 0;
  }
  
-+/**
-+ * I/O Priority Map mask search for valid ioprio mask.
-+ */
-+bool valid_prio_opt(uint32_t x)
-+{
-+	return (x & 0xFFFFFFF0) ? false : true;
-+}
-+
-+uint64_t valid_act_opt(uint64_t x)
-+{
-+	return (1 <= x) && (x < (1ULL << BLK_TC_SHIFT));
-+}
-+#else
- int valid_act_opt(int x)
- {
- 	return (1 <= x) && (x < (1 << BLK_TC_SHIFT));
- }
-+#endif /* CONFIG_BLKTRACE_EXT */
-+
-+int find_mask_map(char *string)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < sizeof(mask_maps)/sizeof(mask_maps[0]); i++)
-+		if (COMPARE_MASK_MAP(&mask_maps[i], string))
-+			return mask_maps[i].mask;
-+
-+	return -1;
-+}
-diff --git a/blktrace.h b/blktrace.h
-index 17f9f8d..c860bf9 100644
---- a/blktrace.h
-+++ b/blktrace.h
-@@ -181,7 +181,13 @@ extern void set_all_format_specs(char *);
- extern int add_format_spec(char *);
- extern void process_fmt(char *, struct per_cpu_info *, struct blk_io_trace *,
- 			unsigned long long, int, unsigned char *);
+@@ -1080,7 +1123,9 @@ static int setup_buts(void)
+ 		buts.buf_size = buf_size;
+ 		buts.buf_nr = buf_nr;
+ 		buts.act_mask = act_mask;
+-
 +#ifdef CONFIG_BLKTRACE_EXT
-+extern uint64_t valid_act_opt(uint64_t); /* adjusted act mask for extension */
-+extern bool valid_prio_opt(uint32_t x);  /* validate priority mask */
-+int find_prio_mask_map(char *string);    /* find prio mask from user input */
-+#else
- extern int valid_act_opt(int);
++		buts.prio_mask = btrace_track_prio ? blktrace_prio_mask : 0;
 +#endif /* CONFIG_BLKTRACE_EXT */
- extern int find_mask_map(char *);
- extern char *find_process_name(pid_t);
+ 		if (ioctl(dpp->fd, BLKTRACESETUP, &buts) >= 0) {
+ 			dpp->ncpus = max_cpus;
+ 			dpp->buts_name = strdup(buts.name);
+@@ -2104,7 +2149,7 @@ static int handle_args(int argc, char *argv[])
+ {
+ 	int c, i;
+ 	struct statfs st;
+-	int act_mask_tmp = 0;
++	unsigned int act_mask_tmp = 0;
+ 
+ 	while ((c = getopt_long(argc, argv, S_OPTS, l_opts, NULL)) >= 0) {
+ 		switch (c) {
+@@ -2211,6 +2256,29 @@ static int handle_args(int argc, char *argv[])
+ 		case 'p':
+ 			net_port = atoi(optarg);
+ 			break;
++#ifdef CONFIG_BLKTRACE_EXT
++		case 'P': /* enable priority tracking */
++			btrace_track_prio = 1;
++			break;
++		case 'x': /* priority mask values in string */
++			i = find_prio_mask_map(optarg);
++			if (i < 0) {
++				fprintf(stderr,"Invalid prio mask %s\n",
++						optarg);
++				return 1;
++			}
++			blktrace_prio_mask |= i;
++			break;
++		case 'X': /* priority mask values in hex */
++			if ((sscanf(optarg, "%x", &i) != 1) ||
++					!valid_prio_opt(i)) {
++				fprintf(stderr, "Invalid prio mask %s/0x%x\n",
++						optarg, i);
++				return 1;
++			}
++			blktrace_prio_mask = i;
++			break;
++#endif /* CONFIG_BLKTRACE_EXT */
+ 		case 's':
+ 			net_use_sendfile = 0;
+ 			break;
+@@ -2243,7 +2311,14 @@ static int handle_args(int argc, char *argv[])
+ 
+ 	if (act_mask_tmp != 0)
+ 		act_mask = act_mask_tmp;
+-
++#ifdef CONFIG_BLKTRACE_EXT
++	/*
++	 * When track-priority is on and user didn't specify prio_mask then
++	 * trace all the classes.
++	 */
++	if (btrace_track_prio && !blktrace_prio_mask)
++		blktrace_prio_mask = TRACE_ALL_IOPRIO;
++#endif /* CONFIG_BLKTRACE_EXT */
+ 	if (net_mode == Net_client && net_setup_addr())
+ 		return 1;
  
 -- 
 2.19.1
