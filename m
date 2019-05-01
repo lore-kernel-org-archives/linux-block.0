@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A7CCC43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B117C43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:29:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0B8FC20866
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:29:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 170C320866
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:29:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="gxKBSXzX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AIejgRFe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726144AbfEAE3e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 00:29:34 -0400
+        id S1726126AbfEAE3h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 00:29:37 -0400
 Received: from esa2.hgst.iphmx.com ([68.232.143.124]:27525 "EHLO
         esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726138AbfEAE3e (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 00:29:34 -0400
+        with ESMTP id S1726022AbfEAE3h (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 00:29:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1556685056; x=1588221056;
+  t=1556685061; x=1588221061;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=LhJYIZ3SYC/hqcvf5LDzCKrgZc+X0IY4SLeeHcwgZFE=;
-  b=gxKBSXzXhHhCQPot1wNItNjmbR8LBZQ0jB3ULPY+IBCzMKDf/38gwwC9
-   cAKte+5CWhP2VkD9Umdv+FTN4Bl0hsln1mM8SVe9rVGxSQtJiFpGjLgba
-   6SlllZRMORzdx3SSQFRR0o/NE1BUTzKjCS7jt+jXOtHvrARumg/9kUyly
-   q78R9v7wpDPRqZ75M+P9POmvoJw9YGAy/jXS66TbRVUWwuVaYQK4em1lm
-   SSkFkkdvJ9NMaizElcsGBVvLDBzJDr1EaYJfyIxn3bbpyte9HWmgrs8kx
-   zhvJWg7eiLWVPVp2gL3E9ec+bjMPUMpjOvMjDltyajMZGm81rfwmem3EG
+  bh=wkb1CJ1VII7+Njrh32D+O8w2t5E/FaDUJHERlVXbyJM=;
+  b=AIejgRFe13W0ERgS9JuhKyz8KvVsCc20XvHzcqh8iLTPcED6jEOFFB2c
+   2bU3EjqhNCVzFDs+732qMY4zLKJI52HW/a70GbEu3EPKAHWj/bEPNYZ1D
+   BIUHGQ8aayyA5mJsVMBw67iyAe/mm4MDK7WeXD/JsVdGnGSFKZtduibVj
+   XV9F69L+9zdQWryaWzzkQtA00Ba5cLVwV7lHYuQKsTfKJZYw913qxE8Mh
+   55oI8o12F65AMLOAzj42axy8d/mGwmbDZzHZCoujo/QkchmQcLfBDPt07
+   TudDXclgB6o0NEpIgOug0v03tkaGOvWsKE3c9KNt0n058ulU4psZeDSDb
    A==;
 X-IronPort-AV: E=Sophos;i="5.60,416,1549900800"; 
-   d="scan'208";a="206432300"
+   d="scan'208";a="206432303"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 01 May 2019 12:30:56 +0800
-IronPort-SDR: H6gI+ve//mPQwWcaNw8NLyZA7svo3h0S61sVWbPo7+M2mAkgCdk0oSYnQQNjxp2cmwG5rbQULk
- YxThPJde4UO3meH02+4Pozg8vI+ijtLr+dwykrf9XPVkqF0Chy/tYWCDftz0HCWC+ceaH8vY7D
- ipF0XWZCEzMEUdsGNAU6ai2uy4GEiIolRVnKHDd1e/CgSslQCpGd6EAwdmsDWUs03wBSqYgptK
- 26Pnz8GY45FbPO79EmAj08htCcM2YSpsw08UvO7KmEKrw8O/xhor6Ni0kzc81QR+GsdG8VbER9
- yJ9Z0h9BIMG0Xuz4zz5eXZUT
+  by ob1.hgst.iphmx.com with ESMTP; 01 May 2019 12:31:01 +0800
+IronPort-SDR: BIaEILFZsXTxe7yz9vMgpquEWOBbcj+ov4hqtvmNcOM4QBfWwgwk+xVdJJbfG4GsRdSZZG4z5A
+ U5V6vFzbNwB1qosWxb3a1ylumnPh0dFhBfeBHL+JZnlT+ZC0LidwsapLSIXcvCX0aZJQ9r4ktC
+ TjLBAs7T52zIxRJBZq9AweQBnxmlZ4n19zWyhwmGEb77nMRep6wIkUU5yIUhDy2QTuS4QIDo5/
+ ybbV8a7PAxyZp6pO5xqYu6ki5pJNBQ3owh10hYLirO6yYbh0SbbVelJSUZnZ/JwIWGqE53WMY8
+ lged9xIo1SGeE1R7hd7AMkBr
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 30 Apr 2019 21:08:02 -0700
-IronPort-SDR: VpVO5KUNzqacnmrwqJVZlzauAcg+YHOZcjp8egcLsipUF6vTD8zPQLWnB/xHQItTaRWic0ZtO+
- m42E/qSCyX9DUZyi5se8+0yqaq9INXgiSUsqpbo9pZBY2sXVZMznD3h7+dVq5smA40SfBxWX3E
- tm8Q7wfQ1pEwu+XrCuFLllt1/GKaE7Y/il7/iQky/kdK0ooLix/53QXeMKLlBo4ODZnz6W6+6r
- n/U0NG/MnuYE40BVQoIMqWNXmBeVcKZRL5vAq6gP92fmd+n9QysI6CvOTkmIBjcamk9YYZ1tP9
- Hqo=
+  by uls-op-cesaep02.wdc.com with ESMTP; 30 Apr 2019 21:08:06 -0700
+IronPort-SDR: v5ch9qDX7CXP2Lu3OKrQiUSnGp3LnIkETjJ4NAabwngPMCTcfVBx2L68D0gfZ53sXbG7aJlV+7
+ SkQiNac7WXBDx2B+mau+w4PDUmgRUKvTYsKCkX7cY57H+jxvO8tMjyWSZ2na90GmIxRSBI+rPw
+ A8TT+xnIw6zHWdRFoj6PEllS50iidZWLwmIQZUx1GBHppaMhOErEaAoQUMjiik+V5jlUS63NsE
+ rZwKWPA9ZlN0+9j03xsrncvWLkyiH0tzV7OJJEPAwVtW1VVrQ50fti+8z19NtRZuNzeYGDo18D
+ nIg=
 Received: from cmercuryqemu.hgst.com ([10.202.65.32])
-  by uls-op-cesaip01.wdc.com with ESMTP; 30 Apr 2019 21:29:34 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 30 Apr 2019 21:29:37 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [RFC PATCH 16/18] mm: set bio iopriority field
-Date:   Tue, 30 Apr 2019 21:28:29 -0700
-Message-Id: <20190501042831.5313-17-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 17/18] null_blk: add write-zeroes flag to nullb_device
+Date:   Tue, 30 Apr 2019 21:28:30 -0700
+Message-Id: <20190501042831.5313-18-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190501042831.5313-1-chaitanya.kulkarni@wdc.com>
 References: <20190501042831.5313-1-chaitanya.kulkarni@wdc.com>
@@ -68,31 +68,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This patch adds a new write-zeroes flag just like discard under
+struct null_blk to enable REQ_OP_WRITE_ZEROES operation on the null_blk.
+
+This is needed for testing the blktrace extension with different
+priorities on write-zeroes operation.
+
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- mm/page_io.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/block/null_blk.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/mm/page_io.c b/mm/page_io.c
-index 2e8019d0e048..950cc002f60a 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -24,6 +24,7 @@
- #include <linux/blkdev.h>
- #include <linux/uio.h>
- #include <linux/sched/task.h>
-+#include <linux/ioprio.h>
- #include <asm/pgtable.h>
+diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
+index 34b22d6523ba..ecd1e45f6eb9 100644
+--- a/drivers/block/null_blk.h
++++ b/drivers/block/null_blk.h
+@@ -63,6 +63,7 @@ struct nullb_device {
+ 	bool power; /* power on/off the device */
+ 	bool memory_backed; /* if data is stored in memory */
+ 	bool discard; /* if support discard */
++	bool write_zeroes; /* if support write_zeroes */
+ 	bool zoned; /* if device is zoned */
+ };
  
- static struct bio *get_swap_bio(gfp_t gfp_flags,
-@@ -40,6 +41,7 @@ static struct bio *get_swap_bio(gfp_t gfp_flags,
- 		bio_set_dev(bio, bdev);
- 		bio->bi_iter.bi_sector <<= PAGE_SHIFT - 9;
- 		bio->bi_end_io = end_io;
-+		bio_set_prio(bio, get_current_ioprio());
- 
- 		for (i = 0; i < nr; i++)
- 			bio_add_page(bio, page + i, PAGE_SIZE, 0);
 -- 
 2.19.1
 
