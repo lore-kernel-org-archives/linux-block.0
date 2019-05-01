@@ -1,266 +1,226 @@
-Return-Path: <SRS0=2amJ=TA=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC141C04AA8
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 23:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A89C43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:28:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B7C5217D4
-	for <linux-block@archiver.kernel.org>; Tue, 30 Apr 2019 23:31:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E754A20866
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:28:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="DxOHSarE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="CouY4Tew"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726086AbfD3Xa7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Apr 2019 19:30:59 -0400
-Received: from mailgw2.fjfi.cvut.cz ([147.32.9.131]:59488 "EHLO
-        mailgw2.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726412AbfD3Xa6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Apr 2019 19:30:58 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mailgw2.fjfi.cvut.cz (Postfix) with ESMTP id 059E8A022D;
-        Wed,  1 May 2019 01:21:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1556666471; i=@fjfi.cvut.cz;
-        bh=jpNFd3cEl9rt88T8uD0VgyCxWvsA+VMlhWgH2FK84n0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=DxOHSarED2aSd6G7DXLOetKundFejVe23sOot7aUTTfUcDlWZr4GaRN4LPu/FVIXk
-         o58OXxC677Uy+TMxVGYNViQJ4YJKfwCs7l+/5zHIaZXHPCJY3ZEcJHSqwOFk4DhY+J
-         Nc0xtgpzgtS4IWErZdhdSQEtgP8S8DPlo6obBYOw=
-X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
-Received: from mailgw2.fjfi.cvut.cz ([127.0.0.1])
-        by localhost (mailgw2.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id CEJRMcjzKhjy; Wed,  1 May 2019 01:21:00 +0200 (CEST)
-Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mailgw2.fjfi.cvut.cz (Postfix) with ESMTPS id BB2FCA02B0;
-        Wed,  1 May 2019 01:20:59 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw2.fjfi.cvut.cz BB2FCA02B0
-Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 7541A6004E; Wed,  1 May 2019 01:20:59 +0200 (CEST)
-From:   David Kozub <zub@linux.fjfi.cvut.cz>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Scott Bauer <sbauer@plzdonthack.me>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: [PATCH 2/3] block: sed-opal: ioctl for writing to shadow mbr
-Date:   Wed,  1 May 2019 01:20:58 +0200
-Message-Id: <1556666459-17948-3-git-send-email-zub@linux.fjfi.cvut.cz>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1556666459-17948-1-git-send-email-zub@linux.fjfi.cvut.cz>
-References: <1556666459-17948-1-git-send-email-zub@linux.fjfi.cvut.cz>
+        id S1725958AbfEAE2h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 00:28:37 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:9392 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725799AbfEAE2h (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 00:28:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1556684916; x=1588220916;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Y742O/olkIVywR1rgp+/Rsv5/sGxk3Ux2khTb42p6uo=;
+  b=CouY4TewAETKphKNbsBz/DYaMmog9ctRKT+rMkqeF8pCF1+svMY5oL8j
+   FAc7npw8cP+m+EjP55WgfOFRivJ7V42TG2nKFlORYlSVoAFfiSikuliWo
+   Gw1g2EhoXokTDDcWfeTH4jMrcRqmE9pM4jyqWV75q+CrYl9fbzstUGCFY
+   DQJdsfaG/8JzOYSOSg+N7qwRsOOw03/duMj6v1yt1z5HP9HVaydbhfmCD
+   926Bz4kQilxN23s/+5+C661nHYm6Rc1+T9j+1YtbTgbJba4aJWrCpzhMv
+   PS/MyWyhuvSyuL0ykO+mJYChyBtUm+ngP4WgG3nzUB8aVS3+HqK1la/R/
+   A==;
+X-IronPort-AV: E=Sophos;i="5.60,416,1549900800"; 
+   d="scan'208";a="108436740"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 01 May 2019 12:28:36 +0800
+IronPort-SDR: 4OFAe8/sC9fFoFKkFUvQoWwHJMagZqcDBErUoBM6G+mRa0sKg6JicxenoRFT5TOaxgEVx1hpHZ
+ WchVeHMoD9GKKB9nJg0oIwts72eTRRXgCMcAwEuw9x3HoJflNXGRlnWIzHTzRX05DVuM06mGj+
+ cka8gytWnFYFkUOnNsM7XhozNpHrLEtSp7ZKFGs8cl54gk+i2vW4+wOxT+E7PNP4vtEgLOK/nk
+ 1jTy0f0NF0btFGXKgVNux1H238M5Dg9BZZJoyrIcIoLC/u1GsHE0tDd30pJSzM0UktXIqcY0VK
+ 5ZWRzGgG4Zd4/tmBNZpbQWEf
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP; 30 Apr 2019 21:07:04 -0700
+IronPort-SDR: /0FhCGuvdJgYfNhcOJCsey9xe1Uf/kKO6vS0M2aqLgVt+EDkk/ayhcT3FQ7CPJnptT3pNA+1ms
+ AHVoCAEs2xgkXAc0ciZFky+SVWEEW0i1B2tmfqceuf4i5X3w/sUPVkI6q54mBtKQ9UtNbgt3zr
+ G5cSWCRJ71HvelbcHNY4H3JixsP2tlU5aHw4vdpR/WxynSu/DHh0u1hqoNS5vQRkBePo3vtEHg
+ 61wqjkZ8XB0//3w0Ni6aE6Lf97NzCnBg+qbEmfWBVnCCmpJ3pUCIkngkXg39KygtcWZQ1FiVro
+ 7Vc=
+Received: from cmercuryqemu.hgst.com ([10.202.65.32])
+  by uls-op-cesaip01.wdc.com with ESMTP; 30 Apr 2019 21:28:36 -0700
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 00/18] blktrace: add blktrace extension support
+Date:   Tue, 30 Apr 2019 21:28:13 -0700
+Message-Id: <20190501042831.5313-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.19.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Hi,
 
-Allow modification of the shadow mbr. If the shadow mbr is not marked as
-done, this data will be presented read only as the device content. Only
-after marking the shadow mbr as done and unlocking a locking range the
-actual content is accessible.
+This patch series adds support to track more request based flags and 
+different request fields to the blktrace infrastructure.
 
-Co-authored-by: David Kozub <zub@linux.fjfi.cvut.cz>
-Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
-Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
-Reviewed-by: Jon Derrick <jonathan.derrick@intel.com>
----
- block/sed-opal.c              | 94 ++++++++++++++++++++++++++++++++++-
- include/linux/sed-opal.h      |  1 +
- include/uapi/linux/sed-opal.h |  8 +++
- 3 files changed, 101 insertions(+), 2 deletions(-)
+In this series, we increase the action and action mask field and add 
+priority and priority mask field to existing infrastructure.
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index f1eb9c18e335..5acb873e9037 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -34,6 +34,9 @@
- #define IO_BUFFER_LENGTH 2048
- #define MAX_TOKS 64
- 
-+/* Number of bytes needed by cmd_finalize. */
-+#define CMD_FINALIZE_BYTES_NEEDED 7
-+
- struct opal_step {
- 	int (*fn)(struct opal_dev *dev, void *data);
- 	void *data;
-@@ -531,12 +534,17 @@ static int opal_discovery0_step(struct opal_dev *dev)
- 	return execute_step(dev, &discovery0_step, 0);
- }
- 
-+static size_t remaining_size(struct opal_dev *cmd)
-+{
-+	return IO_BUFFER_LENGTH - cmd->pos;
-+}
-+
- static bool can_add(int *err, struct opal_dev *cmd, size_t len)
- {
- 	if (*err)
- 		return false;
- 
--	if (len > IO_BUFFER_LENGTH || cmd->pos > IO_BUFFER_LENGTH - len) {
-+	if (remaining_size(cmd) < len) {
- 		pr_debug("Error adding %zu bytes: end of buffer.\n", len);
- 		*err = -ERANGE;
- 		return false;
-@@ -682,7 +690,11 @@ static int cmd_finalize(struct opal_dev *cmd, u32 hsn, u32 tsn)
- 	struct opal_header *hdr;
- 	int err = 0;
- 
--	/* close the parameter list opened from cmd_start */
-+	/*
-+	 * Close the parameter list opened from cmd_start.
-+	 * The number of bytes added must be equal to
-+	 * CMD_FINALIZE_BYTES_NEEDED.
-+	 */
- 	add_token_u8(&err, cmd, OPAL_ENDLIST);
- 
- 	add_token_u8(&err, cmd, OPAL_ENDOFDATA);
-@@ -1533,6 +1545,58 @@ static int set_mbr_enable_disable(struct opal_dev *dev, void *data)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
-+static int write_shadow_mbr(struct opal_dev *dev, void *data)
-+{
-+	struct opal_shadow_mbr *shadow = data;
-+	const u8 __user *src;
-+	u8 *dst;
-+	size_t off = 0;
-+	u64 len;
-+	int err = 0;
-+
-+	/* do the actual transmission(s) */
-+	src = (u8 __user *)(uintptr_t)shadow->data;
-+	while (off < shadow->size) {
-+		err = cmd_start(dev, opaluid[OPAL_MBR], opalmethod[OPAL_SET]);
-+		add_token_u8(&err, dev, OPAL_STARTNAME);
-+		add_token_u8(&err, dev, OPAL_WHERE);
-+		add_token_u64(&err, dev, shadow->offset + off);
-+		add_token_u8(&err, dev, OPAL_ENDNAME);
-+
-+		add_token_u8(&err, dev, OPAL_STARTNAME);
-+		add_token_u8(&err, dev, OPAL_VALUES);
-+
-+		/*
-+		 * The bytestring header is either 1 or 2 bytes, so assume 2.
-+		 * There also needs to be enough space to accommodate the
-+		 * trailing OPAL_ENDNAME (1 byte) and tokens added by
-+		 * cmd_finalize.
-+		 */
-+		len = min(remaining_size(dev) - (2+1+CMD_FINALIZE_BYTES_NEEDED),
-+			  (size_t)(shadow->size - off));
-+		pr_debug("MBR: write bytes %zu+%llu/%llu\n",
-+			 off, len, shadow->size);
-+
-+		dst = add_bytestring_header(&err, dev, len);
-+		if (!dst)
-+			break;
-+		if (copy_from_user(dst, src + off, len))
-+			err = -EFAULT;
-+		dev->pos += len;
-+
-+		add_token_u8(&err, dev, OPAL_ENDNAME);
-+		if (err)
-+			break;
-+
-+		err = finalize_and_send(dev, parse_and_check_status);
-+		if (err)
-+			break;
-+
-+		off += len;
-+	}
-+	return err;
-+}
-+
- static int generic_pw_cmd(u8 *key, size_t key_len, u8 *cpin_uid,
- 			  struct opal_dev *dev)
- {
-@@ -2010,6 +2074,29 @@ static int opal_set_mbr_done(struct opal_dev *dev,
- 	return ret;
- }
- 
-+static int opal_write_shadow_mbr(struct opal_dev *dev,
-+				 struct opal_shadow_mbr *info)
-+{
-+	const struct opal_step mbr_steps[] = {
-+		{ start_admin1LSP_opal_session, &info->key },
-+		{ write_shadow_mbr, info },
-+		{ end_opal_session, }
-+	};
-+	int ret;
-+
-+	if (info->size == 0)
-+		return 0;
-+
-+	if (!access_ok((void __user *)(uintptr_t)info->data, info->size))
-+		return -EFAULT;
-+
-+	mutex_lock(&dev->dev_lock);
-+	setup_opal_dev(dev);
-+	ret = execute_steps(dev, mbr_steps, ARRAY_SIZE(mbr_steps));
-+	mutex_unlock(&dev->dev_lock);
-+	return ret;
-+}
-+
- static int opal_save(struct opal_dev *dev, struct opal_lock_unlock *lk_unlk)
- {
- 	struct opal_suspend_data *suspend;
-@@ -2326,6 +2413,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 	case IOC_OPAL_MBR_DONE:
- 		ret = opal_set_mbr_done(dev, p);
- 		break;
-+	case IOC_OPAL_WRITE_SHADOW_MBR:
-+		ret = opal_write_shadow_mbr(dev, p);
-+		break;
- 	case IOC_OPAL_ERASE_LR:
- 		ret = opal_erase_locking_range(dev, p);
- 		break;
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index 42b2ce5da7b3..fb5bf6138a98 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -48,6 +48,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
- 	case IOC_OPAL_ERASE_LR:
- 	case IOC_OPAL_SECURE_ERASE_LR:
- 	case IOC_OPAL_MBR_DONE:
-+	case IOC_OPAL_WRITE_SHADOW_MBR:
- 		return true;
- 	}
- 	return false;
-diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-index 81dd0e8886a1..9c83785f0a2a 100644
---- a/include/uapi/linux/sed-opal.h
-+++ b/include/uapi/linux/sed-opal.h
-@@ -115,6 +115,13 @@ struct opal_mbr_done {
- 	__u8 __align[7];
- };
- 
-+struct opal_shadow_mbr {
-+	struct opal_key key;
-+	const __u64 data;
-+	__u64 offset;
-+	__u64 size;
-+};
-+
- #define IOC_OPAL_SAVE		    _IOW('p', 220, struct opal_lock_unlock)
- #define IOC_OPAL_LOCK_UNLOCK	    _IOW('p', 221, struct opal_lock_unlock)
- #define IOC_OPAL_TAKE_OWNERSHIP	    _IOW('p', 222, struct opal_key)
-@@ -128,5 +135,6 @@ struct opal_mbr_done {
- #define IOC_OPAL_ERASE_LR           _IOW('p', 230, struct opal_session_info)
- #define IOC_OPAL_SECURE_ERASE_LR    _IOW('p', 231, struct opal_session_info)
- #define IOC_OPAL_MBR_DONE           _IOW('p', 232, struct opal_mbr_done)
-+#define IOC_OPAL_WRITE_SHADOW_MBR   _IOW('p', 233, struct opal_shadow_mbr)
- 
- #endif /* _UAPI_SED_OPAL_H */
+The userland tools part of the patch-series is followed by this
+one, here is the reference:-
+Chaitanya Kulkarni (10):
+        blktrace.h: add blktrace extension to the header
+        blktrace_api.h: update blktrace API header
+        act-mask: add blktrace extension to act_mask
+        blktrace.c: add support for extensions
+        blkparse.c: add support for extensions
+        blkparse-fmt.c: add extension support
+        iowatcher/blkparse: add extension definitions
+        blkiomon: add extension support
+        blkrawverify: add extension support
+        blktrace-tools: add extension support
+
+
+Following is the detailed overview of how this patch-series is
+organized:-
+
+1. The first few patches focus on adding block trace extension:-
+
+  blktrace: increase the size of action mask
+  blktrace: add more definitions for BLK_TC_ACT
+  blktrace: update trace to track more actions
+  kernel/trace: add KConfig to enable blktrace_ext
+
+2. Next set of patches adds support to track request based priority and
+allows the user to configure request priority maks just like action
+mask:-
+
+  blktrace: add iopriority mask
+  blktrace: add iopriority mask
+  blktrace: allow user to track iopriority
+  blktrace: add sysfs ioprio mask
+  blktrace: add debug support for extension
+
+3. Following patches just set the bio priority so that blktrace will not
+report wrong priority while tracing bios:-
+
+  block: set ioprio for write-zeroes, discard etc 
+  block: set ioprio for zone-reset
+  block: set ioprio for flush bio 
+  drivers: set bio iopriority field
+  fs: set bio iopriority field
+  power/swap: set bio iopriority field
+  mm: set bio iopriority field
+
+  Ideally, the above patches for drivers and fs category should be sent
+  separately to the respective subsystem for the RFC review purpose I
+  kept it all in the one patch.
+  
+
+4. Last two patches add support for null_blk driver to specify
+module parameter for discard and write-zeroes operations which
+makes testing easier:-
+
+  null_blk: add write-zeroes flag to nullb_device
+  null_blk: add module param discard/write-zeroes
+
+P.S. I've not added linux-btrace mailing list as I'm having trouble
+subscribing to it. 
+
+RFC is little light on the detail but would like to start the discussion
+about how should we add extensions to the block trace
+infrastructure to track more request operations and priorities.
+
+Regards,
+Chaitanya
+
+
+Chaitanya Kulkarni (18):
+  blktrace: increase the size of action mask
+  blktrace: add more definitions for BLK_TC_ACT
+  blktrace: update trace to track more actions
+  kernel/trace: add KConfig to enable blktrace_ext
+  blktrace: add iopriority mask
+  blktrace: add iopriority mask
+  blktrace: allow user to track iopriority
+  blktrace: add sysfs ioprio mask
+  blktrace: add debug support for extension
+  block: set ioprio for write-zeroes, discard etc
+  block: set ioprio for zone-reset
+  block: set ioprio for flush bio
+  drivers: set bio iopriority field
+  fs: set bio iopriority field
+  power/swap: set bio iopriority field
+  mm: set bio iopriority field
+  null_blk: add write-zeroes flag to nullb_device
+  null_blk: add module param discard/write-zeroes
+
+ block/blk-flush.c                   |   2 +
+ block/blk-lib.c                     |   6 +
+ block/blk-zoned.c                   |   2 +
+ drivers/block/drbd/drbd_actlog.c    |   2 +
+ drivers/block/drbd/drbd_bitmap.c    |   3 +
+ drivers/block/null_blk.h            |   1 +
+ drivers/block/null_blk_main.c       |  37 +++-
+ drivers/block/xen-blkback/blkback.c |   3 +
+ drivers/block/zram/zram_drv.c       |   2 +
+ drivers/lightnvm/pblk-read.c        |   2 +
+ drivers/lightnvm/pblk-write.c       |   1 +
+ drivers/md/bcache/journal.c         |   2 +
+ drivers/md/bcache/super.c           |   2 +
+ drivers/md/dm-bufio.c               |   2 +
+ drivers/md/dm-cache-target.c        |   1 +
+ drivers/md/dm-io.c                  |   2 +
+ drivers/md/dm-log-writes.c          |   5 +
+ drivers/md/dm-thin.c                |   1 +
+ drivers/md/dm-writecache.c          |   2 +
+ drivers/md/dm-zoned-metadata.c      |   4 +
+ drivers/md/md.c                     |   4 +
+ drivers/md/raid5-cache.c            |   4 +
+ drivers/md/raid5-ppl.c              |   3 +
+ drivers/nvme/target/io-cmd-bdev.c   |   7 +
+ drivers/staging/erofs/internal.h    |   3 +
+ drivers/target/target_core_iblock.c |   3 +
+ fs/btrfs/disk-io.c                  |   2 +
+ fs/btrfs/extent_io.c                |   3 +
+ fs/btrfs/raid56.c                   |   6 +
+ fs/btrfs/scrub.c                    |   2 +
+ fs/btrfs/volumes.c                  |   3 +
+ fs/buffer.c                         |   2 +
+ fs/crypto/bio.c                     |   3 +
+ fs/direct-io.c                      |   2 +
+ fs/ext4/page-io.c                   |   2 +
+ fs/ext4/readpage.c                  |   1 +
+ fs/f2fs/data.c                      |   3 +
+ fs/f2fs/segment.c                   |   1 +
+ fs/gfs2/lops.c                      |   2 +
+ fs/gfs2/meta_io.c                   |   2 +
+ fs/gfs2/ops_fstype.c                |   2 +
+ fs/hfsplus/wrapper.c                |   2 +
+ fs/iomap.c                          |   2 +
+ fs/jfs/jfs_logmgr.c                 |   3 +
+ fs/jfs/jfs_metapage.c               |   3 +
+ fs/mpage.c                          |   1 +
+ fs/nfs/blocklayout/blocklayout.c    |   2 +
+ fs/nilfs2/segbuf.c                  |   2 +
+ fs/ocfs2/cluster/heartbeat.c        |   2 +
+ fs/xfs/xfs_aops.c                   |   3 +
+ fs/xfs/xfs_buf.c                    |   2 +
+ include/linux/blktrace_api.h        |  13 +-
+ include/uapi/linux/blktrace_api.h   |  65 ++++--
+ kernel/power/swap.c                 |   2 +
+ kernel/trace/Kconfig                |  36 ++++
+ kernel/trace/blktrace.c             | 323 +++++++++++++++++++++++++++-
+ mm/page_io.c                        |   2 +
+ 57 files changed, 579 insertions(+), 26 deletions(-)
+
 -- 
-2.20.1
+2.19.1
 
