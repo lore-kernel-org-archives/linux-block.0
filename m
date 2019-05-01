@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68ACFC43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:29:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52ED3C43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:29:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 23C5D20866
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:29:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FA9020866
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 04:29:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qb9CmjKE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BG4e3SBB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725958AbfEAE3Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 00:29:25 -0400
+        id S1726004AbfEAE32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 00:29:28 -0400
 Received: from esa2.hgst.iphmx.com ([68.232.143.124]:27525 "EHLO
         esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726133AbfEAE3Z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 00:29:25 -0400
+        with ESMTP id S1726126AbfEAE32 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 00:29:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1556685043; x=1588221043;
+  t=1556685047; x=1588221047;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WAhIBBFdtnX/wls0/8YUbNzebo2/Z//tDR+nqmLo/eI=;
-  b=qb9CmjKEAatp9MCEmD2L0whQK8ZjDKq9nsfZuutDcL7C7ugbMDj5x1Z0
-   cplUPUv2+wiBgTLOq+wPtuRydbZUOwyKZmMIeZY/y5j9iyOhCw9Vlmh1n
-   uoH8VE6sggjgESx+XaLSa4HmHaE0jfC973UWx/qh5b4qQY34cR4gYe2cI
-   tjrv2lC94MOrjnmxN/8TpKMa06bz4ek6ZpF5LteDY+k9j9q1GS3MKFnfr
-   EMz5Sp1kuNSuJlSHCB6m7AlOv1KUtlKhZ/MwlIYoBWoi2/jjqlJlvh2GE
-   x+TanwMy9eIS9eIF2CQMoQY19fKvk3av/XdZaSvXj5/wYuI0/msLsdiC7
+  bh=EcKGZsgWLZJw3wBrBVYuLduuVl2jOu7lCXLBJ4Wrl/A=;
+  b=BG4e3SBBQVB+s3SVz/Nlh/gi4Ini2cJOXJSrde0o7bCXJqc0Suyro0hV
+   Rpni/YkR71bgRUQGvLbY8H+EJOi1C2ssnAj/xAfLtzlWFWCVIM0DD/JKC
+   4+peu9yP84RlkZPwu23b032Ul/FQz0g54c+6cKYeNcb5M6PuuUw5ZgKBO
+   TBwE/0uUf++AWuStSBXWIOo4GvcJKVLbSBayZvn+WI8C3vEl3UU2s/3NR
+   7ZDQ07u2EkNbfs+QP90Q6RTLA/Dq6X5jee6KSGx9sbUn2H7elrbH6EFEx
+   2Sh7eFE8Fi+TL5ds7jFv4hXT/dBrB4riDRh8WRy6xcLjHzkwwHEEeEcED
    g==;
 X-IronPort-AV: E=Sophos;i="5.60,416,1549900800"; 
-   d="scan'208";a="206432289"
+   d="scan'208";a="206432290"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 01 May 2019 12:30:43 +0800
-IronPort-SDR: g6kSqOQ8TQlskyI94aSaGpmba42gz+rFnGoziyzc1lsSXQF1Hnk9IERIYBDCDj2kqFpLHVTdUR
- R9R99NlFvPDtOuN4dVlZcYzMAipojALKWpWoASetARGyDtPEJaePUImvPvvTUwkEEMJq+mk3qY
- REN065qI/695EWWwQ6tSGInohC/4JpCgIU4m2ZFA1Ql5Pomim5gt26W8Xxyw4dYwJY9qAmc4uo
- cxNPFcNYZxKB79PyO1VYuX70A4VWKWZocH0hQ8FRcCyDDh7kWa0kaiT2lrGpit3rq4Oo0riwzT
- l0PeScHCeqoH/tSma0jDZhHt
+  by ob1.hgst.iphmx.com with ESMTP; 01 May 2019 12:30:47 +0800
+IronPort-SDR: hxmDLNYFiY3FnAPhzy0KBbchkg2Lf9ztpppyXzMQ6dJD7QfcJOhrW1Xkh0wqlVdjnOMtZRCHF+
+ vnQrL1K9CVMyCZ35nVNDUh9P3KAU2KlRug+z9QhIJtU1Uar9XfqSd2JHLcT4oApAn82GsUt63c
+ jhZl2k0ISM7leXiqtHpwrvzdlupqkiMKw0eQOMPTjV+yIEaUe1un2Z1T5Ym9pnzUAOlX/rbr4f
+ spGiIkRjhLvtxy0cvJ8hq8bvPumH9II4jiAl0I/gDutsPJZNMhUUx/4MO/ahH8okD+LSHFQbq9
+ 1+uzAtrximU/geH7JgdLrG1s
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 30 Apr 2019 21:07:53 -0700
-IronPort-SDR: 56fC8OFxO5USzI5WPXUqXDJ27ZVIJgMc+i9941b/+cwnlytWndnSHYHcgR/dP/QLxDqH1BptX/
- CFcRghe1/q7mjhhB90biaEmaY6hbfsGDil/AFAjcK1YNTEUo8QDiCAaZU6zrOKFN4XHdcrVa7W
- 0cIAYGtWRm+ysijQOW9Q/tA7OGPv1Dfh+ehkcwugUMG85c9/UOB6VlXtjCZCqky4+6B1+qvjw1
- Xqpt6LSIQnR65w3m+Sv122jBzu+DcGFOJ5PisQYm9BMFAsMqXa+0cQDIErKJpi/UEToqUNrWxY
- D7g=
+  by uls-op-cesaep02.wdc.com with ESMTP; 30 Apr 2019 21:07:56 -0700
+IronPort-SDR: PYaY8OwWBgQXoinb6D1myr4ucy4c0SX/SIsu6mPulBYHUpzWBmO7zsGkMY5UZS3qrI9QSt9add
+ RgMsyJvrgxWiq01D9uJguOef2kP/NSil32e+PNglvvHXGP+fTKDi6qxahM0I1mz1UBL4OL73uJ
+ YyQg2tTR16M4AomLZ0FvMhjjgZSTSw86JtXYuguZilL2HzJQ/3CkagqLlRjORk4Bdtg6nDI+dZ
+ PiGyL6L9U7IkkkgznuxSWGqQBOQGEziOX4/P6JxtswC9bHemrueEFeLauuHVBq/dhUEIy9mIUF
+ TKY=
 Received: from cmercuryqemu.hgst.com ([10.202.65.32])
-  by uls-op-cesaip01.wdc.com with ESMTP; 30 Apr 2019 21:29:25 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 30 Apr 2019 21:29:28 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [RFC PATCH 13/18] drivers: set bio iopriority field
-Date:   Tue, 30 Apr 2019 21:28:26 -0700
-Message-Id: <20190501042831.5313-14-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 14/18] fs: set bio iopriority field
+Date:   Tue, 30 Apr 2019 21:28:27 -0700
+Message-Id: <20190501042831.5313-15-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190501042831.5313-1-chaitanya.kulkarni@wdc.com>
 References: <20190501042831.5313-1-chaitanya.kulkarni@wdc.com>
@@ -70,551 +70,590 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- drivers/block/drbd/drbd_actlog.c    | 2 ++
- drivers/block/drbd/drbd_bitmap.c    | 3 +++
- drivers/block/xen-blkback/blkback.c | 3 +++
- drivers/block/zram/zram_drv.c       | 2 ++
- drivers/lightnvm/pblk-read.c        | 2 ++
- drivers/lightnvm/pblk-write.c       | 1 +
- drivers/md/bcache/journal.c         | 2 ++
- drivers/md/bcache/super.c           | 2 ++
- drivers/md/dm-bufio.c               | 2 ++
- drivers/md/dm-cache-target.c        | 1 +
- drivers/md/dm-io.c                  | 2 ++
- drivers/md/dm-log-writes.c          | 5 +++++
- drivers/md/dm-thin.c                | 1 +
- drivers/md/dm-writecache.c          | 2 ++
- drivers/md/dm-zoned-metadata.c      | 4 ++++
- drivers/md/md.c                     | 4 ++++
- drivers/md/raid5-cache.c            | 4 ++++
- drivers/md/raid5-ppl.c              | 3 +++
- drivers/nvme/target/io-cmd-bdev.c   | 7 +++++++
- drivers/staging/erofs/internal.h    | 3 +++
- drivers/target/target_core_iblock.c | 3 +++
- 21 files changed, 58 insertions(+)
+ fs/btrfs/disk-io.c               | 2 ++
+ fs/btrfs/extent_io.c             | 3 +++
+ fs/btrfs/raid56.c                | 6 ++++++
+ fs/btrfs/scrub.c                 | 2 ++
+ fs/btrfs/volumes.c               | 3 +++
+ fs/buffer.c                      | 2 ++
+ fs/crypto/bio.c                  | 3 +++
+ fs/direct-io.c                   | 2 ++
+ fs/ext4/page-io.c                | 2 ++
+ fs/ext4/readpage.c               | 1 +
+ fs/f2fs/data.c                   | 3 +++
+ fs/f2fs/segment.c                | 1 +
+ fs/gfs2/lops.c                   | 2 ++
+ fs/gfs2/meta_io.c                | 2 ++
+ fs/gfs2/ops_fstype.c             | 2 ++
+ fs/hfsplus/wrapper.c             | 2 ++
+ fs/iomap.c                       | 2 ++
+ fs/jfs/jfs_logmgr.c              | 3 +++
+ fs/jfs/jfs_metapage.c            | 3 +++
+ fs/mpage.c                       | 1 +
+ fs/nfs/blocklayout/blocklayout.c | 2 ++
+ fs/nilfs2/segbuf.c               | 2 ++
+ fs/ocfs2/cluster/heartbeat.c     | 2 ++
+ fs/xfs/xfs_aops.c                | 3 +++
+ fs/xfs/xfs_buf.c                 | 2 ++
+ 25 files changed, 58 insertions(+)
 
-diff --git a/drivers/block/drbd/drbd_actlog.c b/drivers/block/drbd/drbd_actlog.c
-index 5f0eaee8c8a7..67235633c172 100644
---- a/drivers/block/drbd/drbd_actlog.c
-+++ b/drivers/block/drbd/drbd_actlog.c
-@@ -27,6 +27,7 @@
+diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
+index 6fe9197f6ee4..28e147b78b25 100644
+--- a/fs/btrfs/disk-io.c
++++ b/fs/btrfs/disk-io.c
+@@ -19,6 +19,7 @@
  #include <linux/crc32c.h>
- #include <linux/drbd.h>
- #include <linux/drbd_limits.h>
+ #include <linux/sched/mm.h>
+ #include <asm/unaligned.h>
 +#include <linux/ioprio.h>
- #include "drbd_int.h"
+ #include "ctree.h"
+ #include "disk-io.h"
+ #include "transaction.h"
+@@ -3603,6 +3604,7 @@ static void write_dev_flush(struct btrfs_device *device)
+ 	bio_reset(bio);
+ 	bio->bi_end_io = btrfs_end_empty_barrier;
+ 	bio_set_dev(bio, device->bdev);
++	bio_set_prio(bio, get_current_ioprio());
+ 	bio->bi_opf = REQ_OP_WRITE | REQ_SYNC | REQ_PREFLUSH;
+ 	init_completion(&device->flush_wait);
+ 	bio->bi_private = &device->flush_wait;
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index ca8b8e785cf3..b0689a8aade0 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -13,6 +13,7 @@
+ #include <linux/pagevec.h>
+ #include <linux/prefetch.h>
+ #include <linux/cleancache.h>
++#include <linux/ioprio.h>
+ #include "extent_io.h"
+ #include "extent_map.h"
+ #include "ctree.h"
+@@ -160,6 +161,7 @@ static int __must_check submit_one_bio(struct bio *bio, int mirror_num,
+ 	start = page_offset(bv.bv_page) + bv.bv_offset;
  
+ 	bio->bi_private = NULL;
++	bio_set_prio(bio, get_current_ioprio());
  
-@@ -159,6 +160,7 @@ static int _drbd_md_sync_page_io(struct drbd_device *device,
- 	bio->bi_private = device;
- 	bio->bi_end_io = drbd_md_endio;
+ 	if (tree->ops)
+ 		ret = tree->ops->submit_bio_hook(tree->private_data, bio,
+@@ -2043,6 +2045,7 @@ int repair_io_failure(struct btrfs_fs_info *fs_info, u64 ino, u64 start,
+ 	bio_set_dev(bio, dev->bdev);
+ 	bio->bi_opf = REQ_OP_WRITE | REQ_SYNC;
+ 	bio_add_page(bio, page, length, pg_offset);
++	bio_set_prio(bio, get_current_ioprio());
+ 
+ 	if (btrfsic_submit_bio_wait(bio)) {
+ 		/* try to remap that extent elsewhere? */
+diff --git a/fs/btrfs/raid56.c b/fs/btrfs/raid56.c
+index 67a6f7d47402..77211e45b11c 100644
+--- a/fs/btrfs/raid56.c
++++ b/fs/btrfs/raid56.c
+@@ -13,6 +13,7 @@
+ #include <linux/list_sort.h>
+ #include <linux/raid/xor.h>
+ #include <linux/mm.h>
++#include <linux/ioprio.h>
+ #include "ctree.h"
+ #include "disk-io.h"
+ #include "volumes.h"
+@@ -1324,6 +1325,7 @@ static noinline void finish_rmw(struct btrfs_raid_bio *rbio)
+ 		bio->bi_private = rbio;
+ 		bio->bi_end_io = raid_write_end_io;
+ 		bio->bi_opf = REQ_OP_WRITE;
++		bio_set_prio(bio, get_current_ioprio());
+ 
+ 		submit_bio(bio);
+ 	}
+@@ -1567,6 +1569,7 @@ static int raid56_rmw_stripe(struct btrfs_raid_bio *rbio)
+ 		bio->bi_private = rbio;
+ 		bio->bi_end_io = raid_rmw_end_io;
+ 		bio->bi_opf = REQ_OP_READ;
++		bio_set_prio(bio, get_current_ioprio());
+ 
+ 		btrfs_bio_wq_end_io(rbio->fs_info, bio, BTRFS_WQ_ENDIO_RAID56);
+ 
+@@ -2114,6 +2117,7 @@ static int __raid56_parity_recover(struct btrfs_raid_bio *rbio)
+ 		bio->bi_private = rbio;
+ 		bio->bi_end_io = raid_recover_end_io;
+ 		bio->bi_opf = REQ_OP_READ;
++		bio_set_prio(bio, get_current_ioprio());
+ 
+ 		btrfs_bio_wq_end_io(rbio->fs_info, bio, BTRFS_WQ_ENDIO_RAID56);
+ 
+@@ -2487,6 +2491,7 @@ static noinline void finish_parity_scrub(struct btrfs_raid_bio *rbio,
+ 		bio->bi_private = rbio;
+ 		bio->bi_end_io = raid_write_end_io;
+ 		bio->bi_opf = REQ_OP_WRITE;
++		bio_set_prio(bio, get_current_ioprio());
+ 
+ 		submit_bio(bio);
+ 	}
+@@ -2669,6 +2674,7 @@ static void raid56_parity_scrub_stripe(struct btrfs_raid_bio *rbio)
+ 		bio->bi_private = rbio;
+ 		bio->bi_end_io = raid56_parity_scrub_end_io;
+ 		bio->bi_opf = REQ_OP_READ;
++		bio_set_prio(bio, get_current_ioprio());
+ 
+ 		btrfs_bio_wq_end_io(rbio->fs_info, bio, BTRFS_WQ_ENDIO_RAID56);
+ 
+diff --git a/fs/btrfs/scrub.c b/fs/btrfs/scrub.c
+index a99588536c79..b0be49a6a87a 100644
+--- a/fs/btrfs/scrub.c
++++ b/fs/btrfs/scrub.c
+@@ -1485,6 +1485,7 @@ static void scrub_recheck_block(struct btrfs_fs_info *fs_info,
+ 		WARN_ON(!page->page);
+ 		bio = btrfs_io_bio_alloc(1);
+ 		bio_set_dev(bio, page->dev->bdev);
++		bio_set_prio(bio, get_current_ioprio());
+ 
+ 		bio_add_page(bio, page->page, PAGE_SIZE, 0);
+ 		bio->bi_iter.bi_sector = page->physical >> 9;
+@@ -2058,6 +2059,7 @@ static int scrub_add_page_to_rd_bio(struct scrub_ctx *sctx,
+ 		bio->bi_private = sbio;
+ 		bio->bi_end_io = scrub_bio_end_io;
+ 		bio_set_dev(bio, sbio->dev->bdev);
++		bio_set_prio(bio, get_current_ioprio());
+ 		bio->bi_iter.bi_sector = sbio->physical >> 9;
+ 		bio->bi_opf = REQ_OP_READ;
+ 		sbio->status = 0;
+diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
+index db934ceae9c1..ea95c719aa11 100644
+--- a/fs/btrfs/volumes.c
++++ b/fs/btrfs/volumes.c
+@@ -14,6 +14,7 @@
+ #include <linux/semaphore.h>
+ #include <linux/uuid.h>
+ #include <linux/list_sort.h>
++#include <linux/ioprio.h>
+ #include "ctree.h"
+ #include "extent_map.h"
+ #include "disk-io.h"
+@@ -641,6 +642,7 @@ static noinline void run_scheduled_bios(struct btrfs_device *device)
+ 			sync_pending = 0;
+ 		}
+ 
++		bio_set_prio(cur, get_current_ioprio());
+ 		btrfsic_submit_bio(cur);
+ 		num_run++;
+ 		batch_run++;
+@@ -6499,6 +6501,7 @@ static void submit_stripe_bio(struct btrfs_bio *bbio, struct bio *bio,
+ 	struct btrfs_fs_info *fs_info = bbio->fs_info;
+ 
+ 	bio->bi_private = bbio;
++	bio_set_prio(bio, get_current_ioprio());
+ 	btrfs_io_bio(bio)->stripe_index = dev_nr;
+ 	bio->bi_end_io = btrfs_end_bio;
+ 	bio->bi_iter.bi_sector = physical >> 9;
+diff --git a/fs/buffer.c b/fs/buffer.c
+index ce357602f471..a172f032b739 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -44,6 +44,7 @@
+ #include <linux/mpage.h>
+ #include <linux/bit_spinlock.h>
+ #include <linux/pagevec.h>
++#include <linux/ioprio.h>
+ #include <linux/sched/mm.h>
+ #include <trace/events/block.h>
+ 
+@@ -3089,6 +3090,7 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+ 	if (buffer_prio(bh))
+ 		op_flags |= REQ_PRIO;
  	bio_set_op_attrs(bio, op, op_flags);
 +	bio_set_prio(bio, get_current_ioprio());
  
- 	if (op != REQ_OP_WRITE && device->state.disk == D_DISKLESS && device->ldev == NULL)
- 		/* special case, drbd_md_read() during drbd_adm_attach(): no get_ldev */
-diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
-index 11a85b740327..e7cb027488c7 100644
---- a/drivers/block/drbd/drbd_bitmap.c
-+++ b/drivers/block/drbd/drbd_bitmap.c
-@@ -30,6 +30,7 @@
- #include <linux/drbd.h>
- #include <linux/slab.h>
- #include <linux/highmem.h>
+ 	if (wbc) {
+ 		wbc_init_bio(wbc, bio);
+diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
+index 5759bcd018cd..75b2284e03cb 100644
+--- a/fs/crypto/bio.c
++++ b/fs/crypto/bio.c
+@@ -24,6 +24,7 @@
+ #include <linux/module.h>
+ #include <linux/bio.h>
+ #include <linux/namei.h>
 +#include <linux/ioprio.h>
+ #include "fscrypt_private.h"
  
- #include "drbd_int.h"
- 
-@@ -1028,6 +1029,8 @@ static void bm_page_io_async(struct drbd_bm_aio_ctx *ctx, int page_nr) __must_ho
- 	bio->bi_private = ctx;
- 	bio->bi_end_io = drbd_bm_endio;
- 	bio_set_op_attrs(bio, op, 0);
-+	bio_set_prio(bio, get_current_ioprio());
+ static void __fscrypt_decrypt_bio(struct bio *bio, bool done)
+@@ -139,6 +140,8 @@ int fscrypt_zeroout_range(const struct inode *inode, pgoff_t lblk,
+ 			err = -EIO;
+ 			goto errout;
+ 		}
 +
- 
- 	if (drbd_insert_fault(device, (op == REQ_OP_WRITE) ? DRBD_FAULT_MD_WR : DRBD_FAULT_MD_RD)) {
- 		bio_io_error(bio);
-diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-index fd1e19f1a49f..41294944267d 100644
---- a/drivers/block/xen-blkback/blkback.c
-+++ b/drivers/block/xen-blkback/blkback.c
-@@ -42,6 +42,7 @@
- #include <linux/delay.h>
- #include <linux/freezer.h>
- #include <linux/bitmap.h>
++		bio_set_prio(bio, get_current_ioprio());
+ 		err = submit_bio_wait(bio);
+ 		if (err == 0 && bio->bi_status)
+ 			err = -EIO;
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index 9bb015bc4a83..744e5ca35def 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -37,6 +37,7 @@
+ #include <linux/uio.h>
+ #include <linux/atomic.h>
+ #include <linux/prefetch.h>
 +#include <linux/ioprio.h>
  
- #include <xen/events.h>
- #include <xen/page.h>
-@@ -1375,6 +1376,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
- 			bio->bi_end_io  = end_block_io_op;
- 			bio->bi_iter.bi_sector  = preq.sector_number;
- 			bio_set_op_attrs(bio, operation, operation_flags);
+ /*
+  * How many user pages to map in one call to get_user_pages().  This determines
+@@ -440,6 +441,7 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
+ 	bio_set_dev(bio, bdev);
+ 	bio->bi_iter.bi_sector = first_sector;
+ 	bio_set_op_attrs(bio, dio->op, dio->op_flags);
++	bio_set_prio(bio, get_current_ioprio());
+ 	if (dio->is_async)
+ 		bio->bi_end_io = dio_bio_end_aio;
+ 	else
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index 3e9298e6a705..7c9857c276aa 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -25,6 +25,7 @@
+ #include <linux/slab.h>
+ #include <linux/mm.h>
+ #include <linux/backing-dev.h>
++#include <linux/ioprio.h>
+ 
+ #include "ext4_jbd2.h"
+ #include "xattr.h"
+@@ -382,6 +383,7 @@ static int io_submit_init_bio(struct ext4_io_submit *io,
+ 	io->io_bio = bio;
+ 	io->io_next_block = bh->b_blocknr;
+ 	wbc_init_bio(io->io_wbc, bio);
++	bio_set_prio(bio, get_current_ioprio());
+ 	return 0;
+ }
+ 
+diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+index 3adadf461825..243ca2a33171 100644
+--- a/fs/ext4/readpage.c
++++ b/fs/ext4/readpage.c
+@@ -261,6 +261,7 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 			bio->bi_private = ctx;
+ 			bio_set_op_attrs(bio, REQ_OP_READ,
+ 						is_readahead ? REQ_RAHEAD : 0);
 +			bio_set_prio(bio, get_current_ioprio());
  		}
  
- 		preq.sector_number += seg[i].nsec;
-@@ -1393,6 +1395,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
- 		bio->bi_private = pending_req;
- 		bio->bi_end_io  = end_block_io_op;
- 		bio_set_op_attrs(bio, operation, operation_flags);
-+		bio_set_prio(bio, get_current_ioprio());
- 	}
- 
- 	atomic_set(&pending_req->pendcnt, nbio);
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 399cad7daae7..1a4e3b0e98ad 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -33,6 +33,7 @@
- #include <linux/sysfs.h>
- #include <linux/debugfs.h>
- #include <linux/cpuhotplug.h>
-+#include <linux/ioprio.h>
- 
- #include "zram_drv.h"
- 
-@@ -596,6 +597,7 @@ static int read_from_bdev_async(struct zram *zram, struct bio_vec *bvec,
- 
- 	bio->bi_iter.bi_sector = entry * (PAGE_SIZE >> 9);
- 	bio_set_dev(bio, zram->bdev);
-+	bio_set_prio(bio, get_current_ioprio());
- 	if (!bio_add_page(bio, bvec->bv_page, bvec->bv_len, bvec->bv_offset)) {
- 		bio_put(bio);
- 		return -EIO;
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 0b7d5fb4548d..2b866744545e 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -16,6 +16,7 @@
-  * pblk-read.c - pblk's read path
-  */
- 
-+#include <linux/ioprio.h>
- #include "pblk.h"
- 
- /*
-@@ -336,6 +337,7 @@ static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
- 
- 	new_bio->bi_iter.bi_sector = 0; /* internal bio */
- 	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
-+	bio_set_prio(bio, get_current_ioprio());
- 
- 	rqd->bio = new_bio;
- 	rqd->nr_ppas = nr_holes;
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 6593deab52da..3fdbbff40fde 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -628,6 +628,7 @@ static int pblk_submit_write(struct pblk *pblk, int *secs_left)
- 
- 	bio->bi_iter.bi_sector = 0; /* internal bio */
- 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-+	bio_set_prio(bio, get_current_ioprio());
- 
- 	rqd = pblk_alloc_rqd(pblk, PBLK_WRITE);
- 	rqd->bio = bio;
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index b2fd412715b1..8fda51134919 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -10,6 +10,7 @@
- #include "debug.h"
- #include "extents.h"
- 
-+#include <linux/ioprio.h>
- #include <trace/events/bcache.h>
- 
- /*
-@@ -445,6 +446,7 @@ static void journal_discard_work(struct work_struct *work)
- 	struct journal_device *ja =
- 		container_of(work, struct journal_device, discard_work);
- 
-+	bio_set_prio(&ja->discard_bio, get_current_ioprio());
- 	submit_bio(&ja->discard_bio);
- }
- 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a697a3a923cd..336208a8d05e 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -24,6 +24,7 @@
- #include <linux/random.h>
- #include <linux/reboot.h>
- #include <linux/sysfs.h>
-+#include <linux/ioprio.h>
- 
- unsigned int bch_cutoff_writeback;
- unsigned int bch_cutoff_writeback_sync;
-@@ -210,6 +211,7 @@ static void __write_super(struct cache_sb *sb, struct bio *bio)
- 	bio->bi_iter.bi_sector	= SB_SECTOR;
- 	bio->bi_iter.bi_size	= SB_SIZE;
- 	bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC|REQ_META);
-+	bio_set_prio(bio, get_current_ioprio());
- 	bch_bio_map(bio, NULL);
- 
- 	out->offset		= cpu_to_le64(sb->offset);
-diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
-index 1ecef76225a1..2e9b4fb3b2c9 100644
---- a/drivers/md/dm-bufio.c
-+++ b/drivers/md/dm-bufio.c
+ 		length = first_hole << blkbits;
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 9727944139f2..c0050a6e0723 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
 @@ -18,6 +18,7 @@
- #include <linux/module.h>
- #include <linux/rbtree.h>
- #include <linux/stacktrace.h>
-+#include <linux/ioprio.h>
- 
- #define DM_MSG_PREFIX "bufio"
- 
-@@ -591,6 +592,7 @@ static void use_bio(struct dm_buffer *b, int rw, sector_t sector,
- 	bio_set_op_attrs(bio, rw, 0);
- 	bio->bi_end_io = bio_complete;
- 	bio->bi_private = b;
-+	bio_set_prio(bio, get_current_ioprio());
- 
- 	ptr = (char *)b->data + offset;
- 	len = n_sectors << SECTOR_SHIFT;
-diff --git a/drivers/md/dm-cache-target.c b/drivers/md/dm-cache-target.c
-index d249cf8ac277..d09bd8e2db36 100644
---- a/drivers/md/dm-cache-target.c
-+++ b/drivers/md/dm-cache-target.c
-@@ -938,6 +938,7 @@ static void remap_to_origin_and_cache(struct cache *cache, struct bio *bio,
- 	 * all code that might use per_bio_data (since clone doesn't have it)
- 	 */
- 	__remap_to_origin_clear_discard(cache, origin_bio, oblock, false);
-+	bio_set_prio(bio, get_current_ioprio());
- 	submit_bio(origin_bio);
- 
- 	remap_to_cache(cache, bio, cblock);
-diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
-index 81ffc59d05c9..5964be4a4a2a 100644
---- a/drivers/md/dm-io.c
-+++ b/drivers/md/dm-io.c
-@@ -16,6 +16,7 @@
- #include <linux/sched.h>
- #include <linux/slab.h>
- #include <linux/dm-io.h>
-+#include <linux/ioprio.h>
- 
- #define DM_MSG_PREFIX "io"
- 
-@@ -350,6 +351,7 @@ static void do_region(int op, int op_flags, unsigned region,
- 		bio_set_dev(bio, where->bdev);
- 		bio->bi_end_io = endio;
- 		bio_set_op_attrs(bio, op, op_flags);
-+		bio_set_prio(bio, get_current_ioprio());
- 		store_io_and_region_in_bio(bio, io, region);
- 
- 		if (op == REQ_OP_DISCARD || op == REQ_OP_WRITE_ZEROES) {
-diff --git a/drivers/md/dm-log-writes.c b/drivers/md/dm-log-writes.c
-index 9ea2b0291f20..d06e70f4dbf6 100644
---- a/drivers/md/dm-log-writes.c
-+++ b/drivers/md/dm-log-writes.c
-@@ -15,6 +15,7 @@
- #include <linux/kthread.h>
- #include <linux/freezer.h>
  #include <linux/uio.h>
+ #include <linux/cleancache.h>
+ #include <linux/sched/signal.h>
 +#include <linux/ioprio.h>
  
- #define DM_MSG_PREFIX "log-writes"
+ #include "f2fs.h"
+ #include "node.h"
+@@ -276,6 +277,7 @@ static struct bio *__bio_alloc(struct f2fs_sb_info *sbi, block_t blk_addr,
+ 	if (wbc)
+ 		wbc_init_bio(wbc, bio);
  
-@@ -218,6 +219,7 @@ static int write_metadata(struct log_writes_c *lc, void *entry,
- 	bio->bi_end_io = log_end_io;
- 	bio->bi_private = lc;
- 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
 +	bio_set_prio(bio, get_current_ioprio());
- 
- 	page = alloc_page(GFP_KERNEL);
- 	if (!page) {
-@@ -277,6 +279,7 @@ static int write_inline_data(struct log_writes_c *lc, void *entry,
- 		bio->bi_end_io = log_end_io;
- 		bio->bi_private = lc;
- 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-+		bio_set_prio(bio, get_current_ioprio());
- 
- 		for (i = 0; i < bio_pages; i++) {
- 			pg_datalen = min_t(int, datalen, PAGE_SIZE);
-@@ -364,6 +367,7 @@ static int log_one_block(struct log_writes_c *lc,
- 	bio->bi_end_io = log_end_io;
- 	bio->bi_private = lc;
- 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-+	bio_set_prio(bio, get_current_ioprio());
- 
- 	for (i = 0; i < block->vec_cnt; i++) {
- 		/*
-@@ -386,6 +390,7 @@ static int log_one_block(struct log_writes_c *lc,
- 			bio->bi_end_io = log_end_io;
- 			bio->bi_private = lc;
- 			bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-+			bio_set_prio(bio, get_current_ioprio());
- 
- 			ret = bio_add_page(bio, block->vecs[i].bv_page,
- 					   block->vecs[i].bv_len, 0);
-diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-index fcd887703f95..fab5a7b20ffd 100644
---- a/drivers/md/dm-thin.c
-+++ b/drivers/md/dm-thin.c
-@@ -1180,6 +1180,7 @@ static void process_prepared_discard_passdown_pt1(struct dm_thin_new_mapping *m)
- 	}
- 
- 	discard_parent = bio_alloc(GFP_NOIO, 1);
-+	bio_set_prio(discard_parent, get_current_ioprio());
- 	if (!discard_parent) {
- 		DMWARN("%s: unable to allocate top level discard bio for passdown. Skipping passdown.",
- 		       dm_device_name(tc->pool->pool_md));
-diff --git a/drivers/md/dm-writecache.c b/drivers/md/dm-writecache.c
-index f7822875589e..bc7fad54cbec 100644
---- a/drivers/md/dm-writecache.c
-+++ b/drivers/md/dm-writecache.c
-@@ -15,6 +15,7 @@
- #include <linux/dax.h>
- #include <linux/pfn_t.h>
- #include <linux/libnvdimm.h>
-+#include <linux/ioprio.h>
- 
- #define DM_MSG_PREFIX "writecache"
- 
-@@ -1480,6 +1481,7 @@ static void __writecache_writeback_pmem(struct dm_writecache *wc, struct writeba
- 		wb->wc = wc;
- 		wb->bio.bi_end_io = writecache_writeback_endio;
- 		bio_set_dev(&wb->bio, wc->dev->bdev);
-+		bio_set_prio(bio, get_current_ioprio());
- 		wb->bio.bi_iter.bi_sector = read_original_sector(wc, e);
- 		wb->page_offset = PAGE_SIZE;
- 		if (max_pages <= WB_LIST_INLINE ||
-diff --git a/drivers/md/dm-zoned-metadata.c b/drivers/md/dm-zoned-metadata.c
-index fa68336560c3..a57556e58808 100644
---- a/drivers/md/dm-zoned-metadata.c
-+++ b/drivers/md/dm-zoned-metadata.c
-@@ -7,6 +7,7 @@
- #include "dm-zoned.h"
- 
- #include <linux/module.h>
-+#include <linux/ioprio.h>
- #include <linux/crc32.h>
- 
- #define	DM_MSG_PREFIX		"zoned metadata"
-@@ -439,6 +440,7 @@ static struct dmz_mblock *dmz_get_mblock_slow(struct dmz_metadata *zmd,
- 	bio->bi_end_io = dmz_mblock_bio_end_io;
- 	bio_set_op_attrs(bio, REQ_OP_READ, REQ_META | REQ_PRIO);
- 	bio_add_page(bio, mblk->page, DMZ_BLOCK_SIZE, 0);
-+	bio_set_prio(bio, get_current_ioprio());
- 	submit_bio(bio);
- 
- 	return mblk;
-@@ -589,6 +591,7 @@ static void dmz_write_mblock(struct dmz_metadata *zmd, struct dmz_mblock *mblk,
- 	bio->bi_end_io = dmz_mblock_bio_end_io;
- 	bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_META | REQ_PRIO);
- 	bio_add_page(bio, mblk->page, DMZ_BLOCK_SIZE, 0);
-+	bio_set_prio(bio, get_current_ioprio());
- 	submit_bio(bio);
+ 	return bio;
  }
  
-@@ -609,6 +612,7 @@ static int dmz_rdwr_block(struct dmz_metadata *zmd, int op, sector_t block,
- 	bio_set_dev(bio, zmd->dev->bdev);
- 	bio_set_op_attrs(bio, op, REQ_SYNC | REQ_META | REQ_PRIO);
- 	bio_add_page(bio, page, DMZ_BLOCK_SIZE, 0);
+@@ -569,6 +571,7 @@ static struct bio *f2fs_grab_read_bio(struct inode *inode, block_t blkaddr,
+ 	f2fs_target_device(sbi, blkaddr, bio);
+ 	bio->bi_end_io = f2fs_read_end_io;
+ 	bio_set_op_attrs(bio, REQ_OP_READ, op_flag);
++	bio_set_prio(bio, get_current_ioprio());
+ 
+ 	if (f2fs_encrypted_file(inode))
+ 		post_read_steps |= 1 << STEP_DECRYPT;
+diff --git a/fs/f2fs/segment.c b/fs/f2fs/segment.c
+index aa7fe79b62b2..d1b67ff8ce66 100644
+--- a/fs/f2fs/segment.c
++++ b/fs/f2fs/segment.c
+@@ -567,6 +567,7 @@ static int __submit_flush_wait(struct f2fs_sb_info *sbi,
+ 
+ 	bio->bi_opf = REQ_OP_WRITE | REQ_SYNC | REQ_PREFLUSH;
+ 	bio_set_dev(bio, bdev);
 +	bio_set_prio(bio, get_current_ioprio());
  	ret = submit_bio_wait(bio);
  	bio_put(bio);
  
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 45ffa23fa85d..def94bdc2a48 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -446,6 +446,7 @@ static void submit_flushes(struct work_struct *ws)
- 			bi->bi_private = rdev;
- 			bio_set_dev(bi, rdev->bdev);
- 			bi->bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
-+			bio_set_prio(bi, get_current_ioprio());
- 			atomic_inc(&mddev->flush_pending);
- 			submit_bio(bi);
- 			rcu_read_lock();
-@@ -822,6 +823,8 @@ void md_super_write(struct mddev *mddev, struct md_rdev *rdev,
- 	    !test_bit(LastDev, &rdev->flags))
- 		ff = MD_FAILFAST;
- 	bio->bi_opf = REQ_OP_WRITE | REQ_SYNC | REQ_PREFLUSH | REQ_FUA | ff;
-+	bio_set_prio(bio, get_current_ioprio());
-+
- 
- 	atomic_inc(&mddev->pending_writes);
- 	submit_bio(bio);
-@@ -856,6 +859,7 @@ int sync_page_io(struct md_rdev *rdev, sector_t sector, int size,
- 	else
- 		bio->bi_iter.bi_sector = sector + rdev->data_offset;
- 	bio_add_page(bio, page, size, 0);
-+	bio_set_prio(bio, get_current_ioprio());
- 
- 	submit_bio_wait(bio);
- 
-diff --git a/drivers/md/raid5-cache.c b/drivers/md/raid5-cache.c
-index cbbe6b6535be..7efbb910b133 100644
---- a/drivers/md/raid5-cache.c
-+++ b/drivers/md/raid5-cache.c
-@@ -656,6 +656,8 @@ static void r5l_do_submit_io(struct r5l_log *log, struct r5l_io_unit *io)
- 			io->split_bio->bi_opf |= REQ_PREFLUSH;
- 		if (io->has_fua)
- 			io->split_bio->bi_opf |= REQ_FUA;
-+
-+		bio_set_prio(io->split_bio, get_current_ioprio());
- 		submit_bio(io->split_bio);
- 	}
- 
-@@ -663,6 +665,7 @@ static void r5l_do_submit_io(struct r5l_log *log, struct r5l_io_unit *io)
- 		io->current_bio->bi_opf |= REQ_PREFLUSH;
- 	if (io->has_fua)
- 		io->current_bio->bi_opf |= REQ_FUA;
-+	bio_set_prio(io->current_bio, get_current_ioprio());
- 	submit_bio(io->current_bio);
- }
- 
-@@ -1315,6 +1318,7 @@ void r5l_flush_stripe_to_raid(struct r5l_log *log)
- 		return;
- 	bio_reset(&log->flush_bio);
- 	bio_set_dev(&log->flush_bio, log->rdev->bdev);
-+	bio_set_prio(&log->flush_bio, get_current_ioprio());
- 	log->flush_bio.bi_end_io = r5l_log_flush_endio;
- 	log->flush_bio.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
- 	submit_bio(&log->flush_bio);
-diff --git a/drivers/md/raid5-ppl.c b/drivers/md/raid5-ppl.c
-index 17e9e7d51097..badfdad742db 100644
---- a/drivers/md/raid5-ppl.c
-+++ b/drivers/md/raid5-ppl.c
-@@ -18,6 +18,7 @@
- #include <linux/crc32c.h>
- #include <linux/async_tx.h>
- #include <linux/raid/md_p.h>
+diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
+index 8722c60b11fe..fd9752209be6 100644
+--- a/fs/gfs2/lops.c
++++ b/fs/gfs2/lops.c
+@@ -17,6 +17,7 @@
+ #include <linux/bio.h>
+ #include <linux/fs.h>
+ #include <linux/list_sort.h>
 +#include <linux/ioprio.h>
- #include "md.h"
- #include "raid5.h"
- #include "raid5-log.h"
-@@ -511,6 +512,7 @@ static void ppl_submit_iounit(struct ppl_io_unit *io)
- 			bio_copy_dev(bio, prev);
- 			bio->bi_iter.bi_sector = bio_end_sector(prev);
- 			bio_add_page(bio, sh->ppl_page, PAGE_SIZE, 0);
-+			bio_set_prio(bio, get_current_ioprio());
  
- 			bio_chain(bio, prev);
- 			ppl_submit_iounit_bio(io, prev);
-@@ -647,6 +649,7 @@ static void ppl_do_flush(struct ppl_io_unit *io)
- 
- 			bio = bio_alloc_bioset(GFP_NOIO, 0, &ppl_conf->flush_bs);
- 			bio_set_dev(bio, bdev);
-+			bio_set_prio(bio, get_current_ioprio());
- 			bio->bi_private = io;
- 			bio->bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
- 			bio->bi_end_io = ppl_flush_endio;
-diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index 3efc52f9c309..c4feb8e12d26 100644
---- a/drivers/nvme/target/io-cmd-bdev.c
-+++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -6,6 +6,7 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- #include <linux/blkdev.h>
- #include <linux/module.h>
-+#include <linux/ioprio.h>
- #include "nvmet.h"
- 
- int nvmet_bdev_ns_enable(struct nvmet_ns *ns)
-@@ -142,6 +143,7 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
- 	bio->bi_private = req;
- 	bio->bi_end_io = nvmet_bio_done;
- 	bio_set_op_attrs(bio, op, op_flags);
-+	bio_set_prio(bio, get_current_ioprio());
- 
- 	for_each_sg(req->sg, sg, req->sg_cnt, i) {
- 		while (bio_add_page(bio, sg_page(sg), sg->length, sg->offset)
-@@ -149,9 +151,11 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
- 			struct bio *prev = bio;
- 
- 			bio = bio_alloc(GFP_KERNEL, min(sg_cnt, BIO_MAX_PAGES));
-+			bio_set_prio(bio, get_current_ioprio());
- 			bio_set_dev(bio, req->ns->bdev);
- 			bio->bi_iter.bi_sector = sector;
- 			bio_set_op_attrs(bio, op, op_flags);
-+			bio_set_prio(bio, get_current_ioprio());
- 
- 			bio_chain(bio, prev);
- 			submit_bio(prev);
-@@ -170,6 +174,7 @@ static void nvmet_bdev_execute_flush(struct nvmet_req *req)
- 
- 	bio_init(bio, req->inline_bvec, ARRAY_SIZE(req->inline_bvec));
- 	bio_set_dev(bio, req->ns->bdev);
-+	bio_set_prio(bio, get_current_ioprio());
- 	bio->bi_private = req;
- 	bio->bi_end_io = nvmet_bio_done;
- 	bio->bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
-@@ -226,6 +231,7 @@ static void nvmet_bdev_execute_discard(struct nvmet_req *req)
- 			bio->bi_status = BLK_STS_IOERR;
- 			bio_endio(bio);
- 		} else {
-+			bio_set_prio(bio, get_current_ioprio());
- 			submit_bio(bio);
- 		}
- 	} else {
-@@ -266,6 +272,7 @@ static void nvmet_bdev_execute_write_zeroes(struct nvmet_req *req)
- 	if (bio) {
- 		bio->bi_private = req;
- 		bio->bi_end_io = nvmet_bio_done;
-+		bio_set_prio(bio, get_current_ioprio());
- 		submit_bio(bio);
- 	} else {
- 		nvmet_req_complete(req, errno_to_nvme_status(req, ret));
-diff --git a/drivers/staging/erofs/internal.h b/drivers/staging/erofs/internal.h
-index e3bfde00c7d2..6df239a5856b 100644
---- a/drivers/staging/erofs/internal.h
-+++ b/drivers/staging/erofs/internal.h
-@@ -22,6 +22,7 @@
- #include <linux/cleancache.h>
- #include <linux/slab.h>
- #include <linux/vmalloc.h>
-+#include <linux/ioprio.h>
- #include "erofs_fs.h"
- 
- /* redefine pr_fmt "erofs: " */
-@@ -482,12 +483,14 @@ erofs_grab_bio(struct super_block *sb,
- 	bio->bi_end_io = endio;
+ #include "dir.h"
+ #include "gfs2.h"
+@@ -272,6 +273,7 @@ static struct bio *gfs2_log_alloc_bio(struct gfs2_sbd *sdp, u64 blkno,
  	bio_set_dev(bio, sb->s_bdev);
- 	bio->bi_iter.bi_sector = (sector_t)blkaddr << LOG_SECTORS_PER_BLOCK;
+ 	bio->bi_end_io = end_io;
+ 	bio->bi_private = sdp;
 +	bio_set_prio(bio, get_current_ioprio());
+ 
  	return bio;
  }
+diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
+index 3201342404a7..9502b808c78c 100644
+--- a/fs/gfs2/meta_io.c
++++ b/fs/gfs2/meta_io.c
+@@ -19,6 +19,7 @@
+ #include <linux/delay.h>
+ #include <linux/bio.h>
+ #include <linux/gfs2_ondisk.h>
++#include <linux/ioprio.h>
  
- static inline void __submit_bio(struct bio *bio, unsigned op, unsigned op_flags)
- {
- 	bio_set_op_attrs(bio, op, op_flags);
+ #include "gfs2.h"
+ #include "incore.h"
+@@ -234,6 +235,7 @@ static void gfs2_submit_bhs(int op, int op_flags, struct buffer_head *bhs[],
+ 		}
+ 		bio->bi_end_io = gfs2_meta_read_endio;
+ 		bio_set_op_attrs(bio, op, op_flags);
++		bio_set_prio(bio, get_current_ioprio());
+ 		submit_bio(bio);
+ 	}
+ }
+diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
+index b041cb8ae383..a7aa38456f31 100644
+--- a/fs/gfs2/ops_fstype.c
++++ b/fs/gfs2/ops_fstype.c
+@@ -24,6 +24,7 @@
+ #include <linux/lockdep.h>
+ #include <linux/module.h>
+ #include <linux/backing-dev.h>
++#include <linux/ioprio.h>
+ 
+ #include "gfs2.h"
+ #include "incore.h"
+@@ -248,6 +249,7 @@ static int gfs2_read_super(struct gfs2_sbd *sdp, sector_t sector, int silent)
+ 	bio->bi_end_io = end_bio_io_page;
+ 	bio->bi_private = page;
+ 	bio_set_op_attrs(bio, REQ_OP_READ, REQ_META);
 +	bio_set_prio(bio, get_current_ioprio());
  	submit_bio(bio);
- }
- 
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index b5ed9c377060..0db3fb9f339a 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -37,6 +37,7 @@
- #include <linux/module.h>
- #include <scsi/scsi_proto.h>
+ 	wait_on_page_locked(page);
+ 	bio_put(bio);
+diff --git a/fs/hfsplus/wrapper.c b/fs/hfsplus/wrapper.c
+index 08c1580bdf7a..b04eae16cf53 100644
+--- a/fs/hfsplus/wrapper.c
++++ b/fs/hfsplus/wrapper.c
+@@ -14,6 +14,7 @@
+ #include <linux/cdrom.h>
+ #include <linux/genhd.h>
  #include <asm/unaligned.h>
 +#include <linux/ioprio.h>
  
- #include <target/target_core_base.h>
- #include <target/target_core_backend.h>
-@@ -341,6 +342,7 @@ iblock_get_bio(struct se_cmd *cmd, sector_t lba, u32 sg_num, int op,
- 	bio->bi_end_io = &iblock_bio_done;
- 	bio->bi_iter.bi_sector = lba;
+ #include "hfsplus_fs.h"
+ #include "hfsplus_raw.h"
+@@ -68,6 +69,7 @@ int hfsplus_submit_bio(struct super_block *sb, sector_t sector,
+ 	bio->bi_iter.bi_sector = sector;
+ 	bio_set_dev(bio, sb->s_bdev);
  	bio_set_op_attrs(bio, op, op_flags);
 +	bio_set_prio(bio, get_current_ioprio());
  
+ 	if (op != WRITE && data)
+ 		*data = (u8 *)buf + offset;
+diff --git a/fs/iomap.c b/fs/iomap.c
+index abdd18e404f8..47ca9a4fe427 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -30,6 +30,7 @@
+ #include <linux/task_io_accounting_ops.h>
+ #include <linux/dax.h>
+ #include <linux/sched/signal.h>
++#include <linux/ioprio.h>
+ 
+ #include "internal.h"
+ 
+@@ -1618,6 +1619,7 @@ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
+ 	get_page(page);
+ 	__bio_add_page(bio, page, len, 0);
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, flags);
++	bio_set_prio(bio, get_current_ioprio());
+ 	iomap_dio_submit_bio(dio, iomap, bio);
+ }
+ 
+diff --git a/fs/jfs/jfs_logmgr.c b/fs/jfs/jfs_logmgr.c
+index 6b68df395892..2311868160a2 100644
+--- a/fs/jfs/jfs_logmgr.c
++++ b/fs/jfs/jfs_logmgr.c
+@@ -72,6 +72,7 @@
+ #include <linux/mutex.h>
+ #include <linux/seq_file.h>
+ #include <linux/slab.h>
++#include <linux/ioprio.h>
+ #include "jfs_incore.h"
+ #include "jfs_filsys.h"
+ #include "jfs_metapage.h"
+@@ -1996,6 +1997,7 @@ static int lbmRead(struct jfs_log * log, int pn, struct lbuf ** bpp)
+ 
+ 	bio->bi_iter.bi_sector = bp->l_blkno << (log->l2bsize - 9);
+ 	bio_set_dev(bio, log->bdev);
++	bio_set_prio(bio, get_current_ioprio());
+ 
+ 	bio_add_page(bio, bp->l_page, LOGPSIZE, bp->l_offset);
+ 	BUG_ON(bio->bi_iter.bi_size != LOGPSIZE);
+@@ -2140,6 +2142,7 @@ static void lbmStartIO(struct lbuf * bp)
+ 	bio = bio_alloc(GFP_NOFS, 1);
+ 	bio->bi_iter.bi_sector = bp->l_blkno << (log->l2bsize - 9);
+ 	bio_set_dev(bio, log->bdev);
++	bio_set_prio(bio, get_current_ioprio());
+ 
+ 	bio_add_page(bio, bp->l_page, LOGPSIZE, bp->l_offset);
+ 	BUG_ON(bio->bi_iter.bi_size != LOGPSIZE);
+diff --git a/fs/jfs/jfs_metapage.c b/fs/jfs/jfs_metapage.c
+index fa2c6824c7f2..021841273a25 100644
+--- a/fs/jfs/jfs_metapage.c
++++ b/fs/jfs/jfs_metapage.c
+@@ -26,6 +26,7 @@
+ #include <linux/buffer_head.h>
+ #include <linux/mempool.h>
+ #include <linux/seq_file.h>
++#include <linux/ioprio.h>
+ #include "jfs_incore.h"
+ #include "jfs_superblock.h"
+ #include "jfs_filsys.h"
+@@ -435,6 +436,7 @@ static int metapage_writepage(struct page *page, struct writeback_control *wbc)
+ 		bio->bi_end_io = metapage_write_end_io;
+ 		bio->bi_private = page;
+ 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
++		bio_set_prio(bio, get_current_ioprio());
+ 
+ 		/* Don't call bio_add_page yet, we may add to this vec */
+ 		bio_offset = offset;
+@@ -516,6 +518,7 @@ static int metapage_readpage(struct file *fp, struct page *page)
+ 			bio->bi_end_io = metapage_read_end_io;
+ 			bio->bi_private = page;
+ 			bio_set_op_attrs(bio, REQ_OP_READ, 0);
++			bio_set_prio(bio, get_current_ioprio());
+ 			len = xlen << inode->i_blkbits;
+ 			offset = block_offset << inode->i_blkbits;
+ 			if (bio_add_page(bio, page, len, offset) < len)
+diff --git a/fs/mpage.c b/fs/mpage.c
+index 3f19da75178b..766be568395a 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -87,6 +87,7 @@ mpage_alloc(struct block_device *bdev,
+ 	if (bio) {
+ 		bio_set_dev(bio, bdev);
+ 		bio->bi_iter.bi_sector = first_sector;
++		bio_set_prio(bio, get_current_ioprio());
+ 	}
  	return bio;
  }
-@@ -395,6 +397,7 @@ iblock_execute_sync_cache(struct se_cmd *cmd)
- 	bio->bi_end_io = iblock_end_io_flush;
- 	bio_set_dev(bio, ib_dev->ibd_bd);
- 	bio->bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
+diff --git a/fs/nfs/blocklayout/blocklayout.c b/fs/nfs/blocklayout/blocklayout.c
+index 690221747b47..ccec9bfad963 100644
+--- a/fs/nfs/blocklayout/blocklayout.c
++++ b/fs/nfs/blocklayout/blocklayout.c
+@@ -37,6 +37,7 @@
+ #include <linux/bio.h>		/* struct bio */
+ #include <linux/prefetch.h>
+ #include <linux/pagevec.h>
++#include <linux/ioprio.h>
+ 
+ #include "../pnfs.h"
+ #include "../nfs4session.h"
+@@ -133,6 +134,7 @@ bl_alloc_init_bio(int npg, struct block_device *bdev, sector_t disk_sector,
+ 		bio_set_dev(bio, bdev);
+ 		bio->bi_end_io = end_io;
+ 		bio->bi_private = par;
++		bio_set_prio(bio, get_current_ioprio());
+ 	}
+ 	return bio;
+ }
+diff --git a/fs/nilfs2/segbuf.c b/fs/nilfs2/segbuf.c
+index 20c479b5e41b..8632bbb1c620 100644
+--- a/fs/nilfs2/segbuf.c
++++ b/fs/nilfs2/segbuf.c
+@@ -13,6 +13,7 @@
+ #include <linux/crc32.h>
+ #include <linux/backing-dev.h>
+ #include <linux/slab.h>
++#include <linux/ioprio.h>
+ #include "page.h"
+ #include "segbuf.h"
+ 
+@@ -394,6 +395,7 @@ static struct bio *nilfs_alloc_seg_bio(struct the_nilfs *nilfs, sector_t start,
+ 		bio_set_dev(bio, nilfs->ns_bdev);
+ 		bio->bi_iter.bi_sector =
+ 			start << (nilfs->ns_blocksize_bits - 9);
++		bio_set_prio(bio, get_current_ioprio());
+ 	}
+ 	return bio;
+ }
+diff --git a/fs/ocfs2/cluster/heartbeat.c b/fs/ocfs2/cluster/heartbeat.c
+index f3c20b279eb2..38b6a8799613 100644
+--- a/fs/ocfs2/cluster/heartbeat.c
++++ b/fs/ocfs2/cluster/heartbeat.c
+@@ -37,6 +37,7 @@
+ #include <linux/slab.h>
+ #include <linux/bitmap.h>
+ #include <linux/ktime.h>
++#include <linux/ioprio.h>
+ #include "heartbeat.h"
+ #include "tcp.h"
+ #include "nodemanager.h"
+@@ -557,6 +558,7 @@ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
+ 	bio->bi_private = wc;
+ 	bio->bi_end_io = o2hb_bio_end_io;
+ 	bio_set_op_attrs(bio, op, op_flags);
 +	bio_set_prio(bio, get_current_ioprio());
- 	if (!immed)
- 		bio->bi_private = cmd;
- 	submit_bio(bio);
+ 
+ 	vec_start = (cs << bits) % PAGE_SIZE;
+ 	while(cs < max_slots) {
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 3619e9e8d359..30a27c386ff0 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -22,6 +22,7 @@
+ #include "xfs_bmap_btree.h"
+ #include "xfs_reflink.h"
+ #include <linux/writeback.h>
++#include <linux/ioprio.h>
+ 
+ /*
+  * structure owned by writepages passed to individual writepage calls
+@@ -597,6 +598,7 @@ xfs_alloc_ioend(
+ 	INIT_WORK(&ioend->io_work, xfs_end_io);
+ 	ioend->io_append_trans = NULL;
+ 	ioend->io_bio = bio;
++	bio_set_prio(bio, get_current_ioprio());
+ 	return ioend;
+ }
+ 
+@@ -620,6 +622,7 @@ xfs_chain_bio(
+ 	bio_set_dev(new, bdev);
+ 	new->bi_iter.bi_sector = sector;
+ 	bio_chain(ioend->io_bio, new);
++	bio_set_prio(new, get_current_ioprio());
+ 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
+ 	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
+ 	ioend->io_bio->bi_write_hint = ioend->io_inode->i_write_hint;
+diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+index 548344e25128..2a91b4414e84 100644
+--- a/fs/xfs/xfs_buf.c
++++ b/fs/xfs/xfs_buf.c
+@@ -21,6 +21,7 @@
+ #include <linux/migrate.h>
+ #include <linux/backing-dev.h>
+ #include <linux/freezer.h>
++#include <linux/ioprio.h>
+ 
+ #include "xfs_format.h"
+ #include "xfs_log_format.h"
+@@ -1381,6 +1382,7 @@ xfs_buf_ioapply_map(
+ 	bio->bi_end_io = xfs_buf_bio_end_io;
+ 	bio->bi_private = bp;
+ 	bio_set_op_attrs(bio, op, op_flags);
++	bio_set_prio(bio, get_current_ioprio());
+ 
+ 	for (; size && nr_pages; nr_pages--, page_index++) {
+ 		int	rbytes, nbytes = PAGE_SIZE - offset;
 -- 
 2.19.1
 
