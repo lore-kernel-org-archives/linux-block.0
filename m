@@ -2,195 +2,154 @@ Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96FB8C43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 16:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 343C5C04AA8
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 18:00:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 53809208C3
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 16:04:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0518E20866
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 18:00:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="BdkEZs7R"
+	dkim=pass (2048-bit key) header.d=gpiccoli-net.20150623.gappssmtp.com header.i=@gpiccoli-net.20150623.gappssmtp.com header.b="E4AVFO2v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726575AbfEAQEP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 12:04:15 -0400
-Received: from mail-yw1-f66.google.com ([209.85.161.66]:46466 "EHLO
-        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726574AbfEAQEP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 12:04:15 -0400
-Received: by mail-yw1-f66.google.com with SMTP id v15so8607981ywe.13
-        for <linux-block@vger.kernel.org>; Wed, 01 May 2019 09:04:15 -0700 (PDT)
+        id S1726101AbfEASAd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 14:00:33 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:37389 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726079AbfEASAd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 14:00:33 -0400
+Received: by mail-qk1-f193.google.com with SMTP id c1so10636868qkk.4
+        for <linux-block@vger.kernel.org>; Wed, 01 May 2019 11:00:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=1Oj/WUcyRxxUcW0wQUN0R2C4uN0F34nk4YQGosewwOg=;
-        b=BdkEZs7R9mCWaAV5rBhA8u99jrS9gEQiKTjz0Zj1In6Cju0zLJgRM3vQhw3x9nmrDp
-         OPF7T4OHLWDfgJGtlRWWb+9yvuq+eIGRxSiWL2farEW77wj6nbqT4vyndP+TWOpgpDAM
-         6uG2fyjSqWnORy589WJ0vIIwiuUPY2ZmDbl2rhPT/Fp77Uck2rZMi9NxpiV+nXeTw+IY
-         ON2PnuV3TtnYpHh/ZE4kRWcEHf3Jhb9PuyVpF/j0bP59SEFEiOYfR7jXx6D/JAYiNKZm
-         ZEz8jJ4WFH57UusBfmsWoPjN6WrKtmghfCj+0NL/BLnjS4Ug0Bi57Zsnu0bw75iYUUdn
-         84wQ==
+        d=gpiccoli-net.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=CWXi406PkzhQU+9UdGnKsnrqZujCyJ2gUC4Pfr8A1+A=;
+        b=E4AVFO2viQI2seeFtKG1a35npNQJLByb3QSKM8xTCmV6rZIkU5talTQdbFHD6L+Ai5
+         iMI79fe569b+GbG13w4ZC5bPyeiihS/5TfpSVdAgqzxvqaCs57CiHcv9AHjdCRNqZ/er
+         6QMCNNa0wu9tDMC58k+KcmVEDl8PR6S643gnzDSxFvAQK4bt85r9gTnJvsQ5tTIGFC2k
+         1C0T91MmVccS09qbJ85qJaGUrMaS1NYs7GvIhhF/6KxCOIcDpXeN4M2KYkdu+hWBGck1
+         4AI1EYyGFjHBtaMuLdooJ0Tj8CBjnYtbJXowAH+lBhgVh/iUE5YXgXDGoVcmVT8v4eyM
+         s/Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=1Oj/WUcyRxxUcW0wQUN0R2C4uN0F34nk4YQGosewwOg=;
-        b=LkObt1fOwJSwx3h1wfgBw7+5FV9ziFNQbbOgTvElMH32wRKHX9Be8YTmPtuik/YUDx
-         AaxtaPtWmpXj/aSyBerpucXfD+w2ISWTM+TdpVxahkF3h9ui2Hl/Q3QPAnJBl/kLbrTG
-         8SaR6FUWmga52eiKDTrk6UauP2nU+uUxhT2uspk9/Kew4K4R/vKumVCns2l4Unv74Fo7
-         4Ql4B7zls5jUE+F67fKR7BA3blSIrZZ7BgEeOlofKcA6OnCcpcO5mPOAgJoLuXI/MFvw
-         AgSKi9zwhwZSn9JqZNGB6RptlD6j5Nu4+a7Xeg6cbb9C4+SqZrEtYTX4CwqWSZMSblq7
-         0Stg==
-X-Gm-Message-State: APjAAAWwVa7v6acGiRHOkbcRuiovodM6Njtnc2LRkcyZdhI8GPLgFdKJ
-        0t62bkbVpYhyC9sq3jygvLg4+w==
-X-Google-Smtp-Source: APXvYqzLJcvVHjGO71OtCFkCMb5emrvUXe19bjprN9+oSr4lBh10lOeD81kNGXnPy4yXO3Ux10gsOw==
-X-Received: by 2002:a5b:80f:: with SMTP id x15mr8202602ybp.140.1556726654484;
-        Wed, 01 May 2019 09:04:14 -0700 (PDT)
-Received: from ziepe.ca (adsl-173-228-226-134.prtc.net. [173.228.226.134])
-        by smtp.gmail.com with ESMTPSA id 78sm12489565ywr.65.2019.05.01.09.04.11
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 01 May 2019 09:04:12 -0700 (PDT)
-Received: from jgg by jggl.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1hLriM-00045B-0C; Wed, 01 May 2019 13:04:10 -0300
-Date:   Wed, 1 May 2019 13:04:09 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Tal Gilboa <talgi@mellanox.com>
-Cc:     linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Yishai Hadas <yishaih@mellanox.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Tariq Toukan <tariqt@mellanox.com>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        Idan Burstein <idanb@mellanox.com>,
-        Yamin Friedman <yaminf@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
-Subject: Re: [PATCH rdma-for-next 0/9] drivers/infiniband: Introduce rdma_dim
-Message-ID: <20190501160409.GA15547@ziepe.ca>
-References: <1556721879-35987-1-git-send-email-talgi@mellanox.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=CWXi406PkzhQU+9UdGnKsnrqZujCyJ2gUC4Pfr8A1+A=;
+        b=MylqUAeuDwwR7Ua3lhu92hxqUSQWIfIisp4rfpNfXcJP/0hYubB2AWU0K/LKxE4l+s
+         Bc3uOyADILKTi0J2iDxSPUruNN5cd9n5n95rvyuhWcrhCWOpEUrwOayvFMXdz7UDON0V
+         oEl7C6QtJSaLeyWhDDQzfaJdasl08RTOOXsAUuEWJlR3z/TX6U8sLqDYCE3QvCgFyIy7
+         s90mcciZDZwlAhRvHXoOuqG6Jgo7iBAKVLbd2WxMlJIA3sHspVj8s00uT/1k6X2mOX2a
+         t5W9Vf6pmzKT4u4qoHlWrlVsdAkYVjPiAVcgaSVuQdsEsPF209szJEps2XMqEMxeY9Dq
+         dh9g==
+X-Gm-Message-State: APjAAAWwmIvjMj/ScQsHNFSMHST0gNwZ4auakFgkheYkCEkq3uLSkXnh
+        a1ngrQKf+UOcFEdAKsFhtZWWZA==
+X-Google-Smtp-Source: APXvYqyn3p7e1upCndsBMr8ZFBhc/gsxsqCbhHFN9BQhmLMJLdEn0d6o/DPEjXHUjE4fsWOCYqsLxQ==
+X-Received: by 2002:ae9:ec07:: with SMTP id h7mr718472qkg.7.1556733632633;
+        Wed, 01 May 2019 11:00:32 -0700 (PDT)
+Received: from [192.168.1.10] (201-13-157-136.dial-up.telesp.net.br. [201.13.157.136])
+        by smtp.gmail.com with ESMTPSA id s68sm8337799qkb.16.2019.05.01.11.00.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 01 May 2019 11:00:31 -0700 (PDT)
+Subject: Re: [RFC] [PATCH V2 0/1] Introduce emergency raid0 stop for mounted
+ arrays
+To:     Song Liu <liu.song.a23@gmail.com>
+Cc:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>, axboe@kernel.dk,
+        linux-raid <linux-raid@vger.kernel.org>,
+        Jay Vosburgh <jay.vosburgh@canonical.com>, kernel@gpiccoli.net,
+        NeilBrown <neilb@suse.com>, dm-devel@redhat.com,
+        Linux-Fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org, gavin.guo@canonical.com
+References: <20190418220448.7219-1-gpiccoli@canonical.com>
+ <CAPhsuW4k5zz2pJBPL60VzjTcj6NTnhBh-RjvWASLcOxAk+yDEw@mail.gmail.com>
+ <b39b96ea-2540-a407-2232-1af91e3e6658@canonical.com>
+ <CAPhsuW65EW8JgjE8zknPQPXYcmDhX9LEhTKGb0KHywqKuZkUcA@mail.gmail.com>
+From:   "Guilherme G. Piccoli" <kernel@gpiccoli.net>
+Message-ID: <2823f928-d0b6-9049-73ab-b2ce0ef5da83@gpiccoli.net>
+Date:   Wed, 1 May 2019 15:00:27 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1556721879-35987-1-git-send-email-talgi@mellanox.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <CAPhsuW65EW8JgjE8zknPQPXYcmDhX9LEhTKGb0KHywqKuZkUcA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 01, 2019 at 05:44:30PM +0300, Tal Gilboa wrote:
-> net_dim.h lib exposes an implementation of the DIM algorithm for dynamically-tuned interrupt
-> moderation for networking interfaces.
+ > On 5/1/19 12:33 PM, Song Liu wrote:
+>> [...]
+>> Indeed, fsync returns -1 in this case.
+>> Interestingly, when I do a "dd if=<some_file> of=<raid0_mount>" and try
+>> to "sync -f <some_file>" and "sync", it succeeds and the file is
+>> written, although corrupted.
 > 
-> We want a similar functionality for RDMA. The main motivation is to benefit from maximized
-> completion rate and reduced interrupt overhead that DIM may provide.
+> I guess this is some issue with sync command, but I haven't got time
+> to look into it. How about running dd with oflag=sync or oflag=direct?
 > 
-> Current DIM implementation prioritizes reducing interrupt overhead over latency. Also, in
-> order to reduce DIM's own overhead, the algorithm might take take some time to identify it
-> needs to change profiles. For these reasons we got to the understanding that a slightly
-> modified algorithm is needed. Early tests with current implementation show it doesn't react
-> fast and sharply enough in order to satisfy the RDMA CQ needs.
-> 
-> I would like to suggest an implementation for RDMA DIM. The idea is to expose the new
-> functionality without the risk of breaking Net DIM behavior for netdev. Below are main
-> similarities and differences between the two implementations and general guidelines for the
-> suggested solution.
-> 
-> Performance improvement (ConnectX-5 100GbE, x86) running FIO benchmark over
-> NVMf between two equal end-hosts with 56 cores across a Mellanox switch
-> using null_blk device:
-> 
-> READS without DIM:
-> blk size | BW       | IOPS | 99th percentile latency  | 99.99th latency
-> 512B     | 3.8GiB/s | 7.7M | 1401  usec               | 2442  usec
-> 4k       | 7.0GiB/s | 1.8M | 4817  usec               | 6587  usec
-> 64k      | 10.7GiB/s| 175k | 9896  usec               | 10028 usec
-> 
-> IO WRITES without DIM:
-> blk size | BW       | IOPS | 99th percentile latency  | 99.99th latency
-> 512B     | 3.6GiB/s | 7.5M | 1434  usec               | 2474  usec
-> 4k       | 6.3GiB/s | 1.6M | 938   usec               | 1221  usec
-> 64k      | 10.7GiB/s| 175k | 8979  usec               | 12780 usec
-> 
-> IO READS with DIM:
-> blk size | BW       | IOPS | 99th percentile latency  | 99.99th latency
-> 512B     | 4GiB/s   | 8.2M | 816    usec              | 889   usec
-> 4k       | 10.1GiB/s| 2.65M| 3359   usec              | 5080  usec
-> 64k      | 10.7GiB/s| 175k | 9896   usec              | 10028 usec
-> 
-> IO WRITES with DIM:
-> blk size | BW       | IOPS  | 99th percentile latency | 99.99th latency
-> 512B     | 3.9GiB/s | 8.1M  | 799   usec              | 922   usec
-> 4k       | 9.6GiB/s | 2.5M  | 717   usec              | 1004  usec
-> 64k      | 10.7GiB/s| 176k  | 8586  usec              | 12256 usec
-> 
-> Common logic, main DIM procedure:
-> - Calculate current stats from a given sample
-> - Compare current stats vs. previous iteration stats
-> - Make a decision -> choose a new profile
-> 
-> Differences:
-> - Different parameters for moving between profiles
-> - Different moderation values and number of profiles
-> - Different sampled data
-> 
-> Suggested solution:
-> - Common logic will be declared in include/linux/dim.h and implemented in lib/dim/dim.c
-> - Net DIM (existing) logic will be declared in include/linux/net_dim.h and implemented in
->   lib/dim/net_dim.c, which will use the common logic from dim.h
-> - RDMA DIM logic will be declared in /include/linux/rdma_dim.h and implemented in
->   lib/dim/rdma_dim.c.
->   This new implementation will expose modified versions of profiles, dim_step() and dim_decision()
-> 
-> Pros for this solution are:
-> - Zero impact on existing net_dim implementation and usage
-> - Relatively more code reuse (compared to two separate solutions)
-> - Readiness for future implementations
->  
-> Tal Gilboa (6):
->   linux/dim: Move logic to dim.h
->   linux/dim: Remove "net" prefix from internal DIM members
->   linux/dim: Rename externally exposed macros
->   linux/dim: Rename net_dim_sample() to net_dim_create_sample()
->   linux/dim: Rename externally used net_dim members
->   linux/dim: Move implementation to .c files
-> 
-> Yamin Friedman (3):
->   linux/dim: Add completions count to dim_sample
->   linux/dim: Implement rdma_dim
->   drivers/infiniband: Use rdma_dim in infiniband driver
-> 
->  MAINTAINERS                                        |   3 +
->  drivers/infiniband/core/cq.c                       |  79 ++++-
->  drivers/infiniband/hw/mlx4/qp.c                    |   2 +-
->  drivers/infiniband/hw/mlx5/qp.c                    |   2 +-
->  drivers/net/ethernet/broadcom/bcmsysport.c         |  20 +-
->  drivers/net/ethernet/broadcom/bcmsysport.h         |   2 +-
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c          |  13 +-
->  drivers/net/ethernet/broadcom/bnxt/bnxt.h          |   2 +-
->  drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c  |   4 +-
->  drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c      |   7 +-
->  drivers/net/ethernet/broadcom/genet/bcmgenet.c     |  18 +-
->  drivers/net/ethernet/broadcom/genet/bcmgenet.h     |   2 +-
->  drivers/net/ethernet/mellanox/mlx5/core/en.h       |   8 +-
->  drivers/net/ethernet/mellanox/mlx5/core/en_dim.c   |  12 +-
->  .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |   4 +-
->  drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |  22 +-
->  drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c  |  12 +-
 
-A lot of this is touching netdev, why wasn't netdev cc'd?
+Hi Song, could be some problem with sync command; using either 
+'oflag=direct' or 'oflag=sync' fails the dd command instantly when a 
+member is removed.
 
-Who is supposed to merge this? 
 
-I think you need to take two steps and have netdev merge the above
-part and then send the single patch to RDMA for the last part, I don't
-really want to take so much netdev code here.
+>> Do you think this behavior is correct? In other devices, like a pure
+>> SCSI disk or NVMe, the 'dd' write fails.
+>> Also, what about the status of the raid0 array in mdadm - it shows as
+>> "clean" even after the member is removed, should we change that?
+> 
+> I guess this is because the kernel hasn't detect the array is gone? In
+> that case, I think reducing the latency would be useful for some use
+> cases.
+> 
 
-The maintainers file should also have some indication which tree
-patches for lib/dim/* this should go through..
+Exactly! This is the main concern here, mdadm cannot stop the array 
+since it's mounted, and there's no filesystem API to quickly shutdown 
+the filesystem, hence it keeps "alive" for too long after the failure.
 
-Jason
+For instance, if we have a raid0 with 2 members and remove the 1st, it 
+fails much quicker than if we remove the 2nd; the filesystem will 
+"realize" the device is flaw quickly if we remove the 1st member, and 
+goes to RO mode. Specially, xfs seems even faster than ext4 in noticing 
+the failure.
+
+Do you have any suggestion on how could we reduce this latency? And how 
+about the status exhibited by mdadm, shall it move from 'clean' to 
+something more meaningful in the failure case?
+
+Thanks again,
+
+
+Guilherme
+
+> Thanks,
+> Song
+> 
+>>
+>>
+>>> Also, could you please highlight changes from V1 (if more than
+>>> just rebase)?
+>>
+>> No changes other than rebase. Worth mentioning here that a kernel bot
+>> (and Julia Lawall) found an issue in my patch; I forgot a
+>> "mutex_lock(&mddev->open_mutex);" in line 6053, which caused the first
+>> caveat (hung mdadm and persistent device in /dev). Thanks for pointing
+>> this silly mistake from me! in case this patch gets some traction, I'll
+>> re-submit with that fixed.
+>>
+>> Cheers,
+>>
+>>
+>> Guilherme
+>>
+>> [0] https://marc.info/?l=linux-block&m=155666385707413
+>>
+>>>
+>>> Thanks,
+>>> Song
+>>>
