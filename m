@@ -2,115 +2,74 @@ Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCB9C43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 07:24:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 722C2C43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 09:16:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24B0521743
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 07:24:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="aiqQ8uG+"
+	by mail.kernel.org (Postfix) with ESMTP id 35BE620835
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 09:16:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725776AbfEAHY6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 03:24:58 -0400
-Received: from smtpbgbr2.qq.com ([54.207.22.56]:59674 "EHLO smtpbgbr2.qq.com"
+        id S1726074AbfEAJQy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 05:16:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40346 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726124AbfEAHY6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 May 2019 03:24:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-        s=s201512; t=1556695482;
-        bh=5OYycxbwytoGNlsaJHsNXYpwDWjxGCcdM8AS1gUFazM=;
-        h=From:To:Subject:Date:Message-Id:MIME-Version;
-        b=aiqQ8uG+WNV/0xesQxRnqGu9YYCOWwPUWVqK1+DibDqEuchRsw8KROuqqNOIzbzA8
-         uYNDVCdgNxOLsswm7xdlawl4tjSFRcl5BWHSA1m3tMP3fUEd6H2g4voxLbhUaBomXY
-         k3FgP2QVLRINPZbLoxOI/SQTDj81XADitnb4Z4fE=
-X-QQ-mid: esmtp7t1556695480tox338gz4
-Received: from localhost.localdomain (unknown [61.48.57.6])
-        by esmtp4.qq.com (ESMTP) with 
-        id ; Wed, 01 May 2019 15:24:31 +0800 (CST)
-X-QQ-SSF: 01000000000000F0FH3000000000000
-X-QQ-FEAT: wEhDafM0Yc9uu8tyfM1rs+CFPVVrQlgWGMwpH1exmA6DNb1aBj9yruVSyiDwv
-        HUzY2sEecLEEc0Tc9eOu5UFloLajb2qYKmlQB7KTkEPiQkcDuCGhd+irVhE9JOwaFaUUqPi
-        onnZYmNOc0BB2bA++XTkx/cm7RYkZVavTZrFmQcoBKYaolBgME8Eb0U7v7yz70VivX1ARxv
-        54hprnjiBT9kwi2yTF7xngFWIIrVV1FwY62Vxekq3K/s7qbLhr9RdMObuE9Lh0a+nIVOpPV
-        Q3ceP/1btYSc+H9nHyk15S7t4Y9bddd75kfA==
-X-QQ-GoodBg: 0
-From:   Shenghui Wang <shhuiw@foxmail.com>
-To:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     jmoyer@redhat.com
-Subject: [PATCH] io_uring: use cpu_online() to check p->sq_thread_cpu instead of cpu_possible()
-Date:   Wed,  1 May 2019 15:24:30 +0800
-Message-Id: <20190501072430.6674-1-shhuiw@foxmail.com>
-X-Mailer: git-send-email 2.20.1
+        id S1726052AbfEAJQy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 May 2019 05:16:54 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0A6903082134;
+        Wed,  1 May 2019 09:16:54 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 10E8766614;
+        Wed,  1 May 2019 09:16:48 +0000 (UTC)
+Date:   Wed, 1 May 2019 17:16:41 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/2] block/iov_iter: fix two issues related with
+ BIO_NO_PAGE_REF
+Message-ID: <20190501091639.GA14820@ming.t460p>
+References: <20190426104521.30602-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtp:foxmail.com:bgforeign:bgforeign4
-X-QQ-Bgrelay: 1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190426104521.30602-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Wed, 01 May 2019 09:16:54 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This issue is found by running liburing/test/io_uring_setup test.
+On Fri, Apr 26, 2019 at 06:45:19PM +0800, Ming Lei wrote:
+> Hi,
+> 
+> Fix two issues related with BIO_NO_PAGE_REF, both are introduced
+> recently in for-5.2/block.
+> 
+> Ming Lei (2):
+>   block: fix handling for BIO_NO_PAGE_REF
+>   iov_iter: fix iov_iter_type
+> 
+>  fs/block_dev.c      | 3 ++-
+>  include/linux/uio.h | 2 +-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> -- 
+> 2.9.5
+> 
 
-When test run, the testcase "attempt to bind to invalid cpu" would not
-pass with messages like:
-   io_uring_setup(1, 0xbfc2f7c8), \
-flags: IORING_SETUP_SQPOLL|IORING_SETUP_SQ_AFF, \
-resv: 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000, \
-sq_thread_cpu: 2
-   expected -1, got 3
-   FAIL
+Hi Jens,
 
-On my system, there is:
-   CPU(s) possible : 0-3
-   CPU(s) online   : 0-1
-   CPU(s) offline  : 2-3
-   CPU(s) present  : 0-1
+The two page leak issues are quite serious, given whole system memory
+can be consumed up easily in some dio tests.
 
-The sq_thread_cpu 2 is offline on my system, so the bind should fail.
-But cpu_possible() will pass the check. We shouldn't be able to bind
-to an offline cpu. Use cpu_online() to do the check.
+Could you consider to merge them if you are fine?
 
-After the change, the testcase run as expected: EINVAL will be returned
-for cpu offlined.
-
-Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
----
- fs/io_uring.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 0e9fb2cb1984..aa3d39860a1c 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2241,7 +2241,7 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
- 	ctx->sqo_mm = current->mm;
- 
- 	ret = -EINVAL;
--	if (!cpu_possible(p->sq_thread_cpu))
-+	if (!cpu_online(p->sq_thread_cpu))
- 		goto err;
- 
- 	if (ctx->flags & IORING_SETUP_SQPOLL) {
-@@ -2258,7 +2258,7 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
- 
- 			cpu = array_index_nospec(p->sq_thread_cpu, NR_CPUS);
- 			ret = -EINVAL;
--			if (!cpu_possible(p->sq_thread_cpu))
-+			if (!cpu_online(p->sq_thread_cpu))
- 				goto err;
- 
- 			ctx->sqo_thread = kthread_create_on_cpu(io_sq_thread,
--- 
-2.20.1
-
-
-
+Thanks,
+Ming
