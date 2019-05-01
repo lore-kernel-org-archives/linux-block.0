@@ -2,100 +2,115 @@ Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB39C43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 06:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCB9C43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 07:24:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE50320651
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 06:43:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24B0521743
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 07:24:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="aiqQ8uG+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726243AbfEAGnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 02:43:17 -0400
-Received: from mx2.suse.de ([195.135.220.15]:53460 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725776AbfEAGnR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 May 2019 02:43:17 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 3C802AF01;
-        Wed,  1 May 2019 06:43:15 +0000 (UTC)
-Subject: Re: [PATCH] bcache: remove redundant LIST_HEAD(journal) from
- run_cache_set()
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        juha.aatrokoski@aalto.fi, shhuiw@foxmail.com
-References: <20190430140225.21642-1-colyli@suse.de>
- <0ded62e9-6135-6da1-312d-1ceb6160c93b@suse.de>
- <54478019-5427-266e-42c2-0d606c6e5ec3@kernel.dk>
-From:   Coly Li <colyli@suse.de>
-Openpgp: preference=signencrypt
-Organization: SUSE Labs
-Message-ID: <b9036b88-9bd9-a96b-a7ed-96bd45708267@suse.de>
-Date:   Wed, 1 May 2019 14:43:07 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
+        id S1725776AbfEAHY6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 03:24:58 -0400
+Received: from smtpbgbr2.qq.com ([54.207.22.56]:59674 "EHLO smtpbgbr2.qq.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726124AbfEAHY6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 May 2019 03:24:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+        s=s201512; t=1556695482;
+        bh=5OYycxbwytoGNlsaJHsNXYpwDWjxGCcdM8AS1gUFazM=;
+        h=From:To:Subject:Date:Message-Id:MIME-Version;
+        b=aiqQ8uG+WNV/0xesQxRnqGu9YYCOWwPUWVqK1+DibDqEuchRsw8KROuqqNOIzbzA8
+         uYNDVCdgNxOLsswm7xdlawl4tjSFRcl5BWHSA1m3tMP3fUEd6H2g4voxLbhUaBomXY
+         k3FgP2QVLRINPZbLoxOI/SQTDj81XADitnb4Z4fE=
+X-QQ-mid: esmtp7t1556695480tox338gz4
+Received: from localhost.localdomain (unknown [61.48.57.6])
+        by esmtp4.qq.com (ESMTP) with 
+        id ; Wed, 01 May 2019 15:24:31 +0800 (CST)
+X-QQ-SSF: 01000000000000F0FH3000000000000
+X-QQ-FEAT: wEhDafM0Yc9uu8tyfM1rs+CFPVVrQlgWGMwpH1exmA6DNb1aBj9yruVSyiDwv
+        HUzY2sEecLEEc0Tc9eOu5UFloLajb2qYKmlQB7KTkEPiQkcDuCGhd+irVhE9JOwaFaUUqPi
+        onnZYmNOc0BB2bA++XTkx/cm7RYkZVavTZrFmQcoBKYaolBgME8Eb0U7v7yz70VivX1ARxv
+        54hprnjiBT9kwi2yTF7xngFWIIrVV1FwY62Vxekq3K/s7qbLhr9RdMObuE9Lh0a+nIVOpPV
+        Q3ceP/1btYSc+H9nHyk15S7t4Y9bddd75kfA==
+X-QQ-GoodBg: 0
+From:   Shenghui Wang <shhuiw@foxmail.com>
+To:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     jmoyer@redhat.com
+Subject: [PATCH] io_uring: use cpu_online() to check p->sq_thread_cpu instead of cpu_possible()
+Date:   Wed,  1 May 2019 15:24:30 +0800
+Message-Id: <20190501072430.6674-1-shhuiw@foxmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <54478019-5427-266e-42c2-0d606c6e5ec3@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtp:foxmail.com:bgforeign:bgforeign4
+X-QQ-Bgrelay: 1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/4/30 10:20 下午, Jens Axboe wrote:
-> On 4/30/19 8:05 AM, Coly Li wrote:
->> On 2019/4/30 10:02 下午, Coly Li wrote:
->>> Commit 95f18c9d1310 ("bcache: avoid potential memleak of list of
->>> journal_replay(s) in the CACHE_SYNC branch of run_cache_set") forgets
->>> to remove the original define of LIST_HEAD(journal), which makes
->>> the change no take effect. This patch removes redundant variable
->>> LIST_HEAD(journal) from run_cache_set(), to make Shenghui's fix
->>> working.
->>>
->>> Reported-by: Juha Aatrokoski <juha.aatrokoski@aalto.fi>
->>> Cc: Shenghui Wang <shhuiw@foxmail.com>
->>> Signed-off-by: Coly Li <colyli@suse.de>
->>> ---
->>>  drivers/md/bcache/super.c | 1 -
->>>  1 file changed, 1 deletion(-)
->>>
->>> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
->>> index 0ffe9acee9d8..1b63ac876169 100644
->>> --- a/drivers/md/bcache/super.c
->>> +++ b/drivers/md/bcache/super.c
->>> @@ -1800,7 +1800,6 @@ static int run_cache_set(struct cache_set *c)
->>>  	set_gc_sectors(c);
->>>  
->>>  	if (CACHE_SYNC(&c->sb)) {
->>> -		LIST_HEAD(journal);
->>>  		struct bkey *k;
->>>  		struct jset *j;
->>>  
->>>
->>
->> Hi Jens,
->>
->> Please take this fix for the Linux v5.2 bcache series. It fixes a
->> problem from
->> [PATCH 18/18] bcache: avoid potential memleak of list of
->> journal_replay(s) in the CACHE_SYNC branch of run_cache_set
->> which is already in your for-next branch.
->>
->> Thanks to Juha for cache this bug, and thank you in advance for taking
->> care of this.
-> 
-> Applied, but please add Fixes: lines patches like that, it's not enough
-> to simply mention it in the commit message.
-> 
+This issue is found by running liburing/test/io_uring_setup test.
 
-I just re-send a V2 patch with adding the Fixes: line, thanks for taking
-care of this.
+When test run, the testcase "attempt to bind to invalid cpu" would not
+pass with messages like:
+   io_uring_setup(1, 0xbfc2f7c8), \
+flags: IORING_SETUP_SQPOLL|IORING_SETUP_SQ_AFF, \
+resv: 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000, \
+sq_thread_cpu: 2
+   expected -1, got 3
+   FAIL
 
+On my system, there is:
+   CPU(s) possible : 0-3
+   CPU(s) online   : 0-1
+   CPU(s) offline  : 2-3
+   CPU(s) present  : 0-1
+
+The sq_thread_cpu 2 is offline on my system, so the bind should fail.
+But cpu_possible() will pass the check. We shouldn't be able to bind
+to an offline cpu. Use cpu_online() to do the check.
+
+After the change, the testcase run as expected: EINVAL will be returned
+for cpu offlined.
+
+Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
+---
+ fs/io_uring.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 0e9fb2cb1984..aa3d39860a1c 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2241,7 +2241,7 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
+ 	ctx->sqo_mm = current->mm;
+ 
+ 	ret = -EINVAL;
+-	if (!cpu_possible(p->sq_thread_cpu))
++	if (!cpu_online(p->sq_thread_cpu))
+ 		goto err;
+ 
+ 	if (ctx->flags & IORING_SETUP_SQPOLL) {
+@@ -2258,7 +2258,7 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
+ 
+ 			cpu = array_index_nospec(p->sq_thread_cpu, NR_CPUS);
+ 			ret = -EINVAL;
+-			if (!cpu_possible(p->sq_thread_cpu))
++			if (!cpu_online(p->sq_thread_cpu))
+ 				goto err;
+ 
+ 			ctx->sqo_thread = kthread_create_on_cpu(io_sq_thread,
 -- 
+2.20.1
 
-Coly Li
+
+
