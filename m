@@ -2,73 +2,80 @@ Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A90C43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:48:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0CD9C43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:56:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7245D2089E
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:48:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B1322085A
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:56:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726478AbfEAPse (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 11:48:34 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:33303 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726465AbfEAPse (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 11:48:34 -0400
-Received: by mail-pl1-f195.google.com with SMTP id y3so7512938plp.0
-        for <linux-block@vger.kernel.org>; Wed, 01 May 2019 08:48:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=97aP0Etzlazb0dzzNxQLRd8FHBoDH6Ttx040iXulh3w=;
-        b=cQSVFD+rVXs/x3GzGSRC0HsTwDEh2pu1ttlQcqYLTvLV1UVximPvSBfUM7l0nwXcFH
-         DswB9hmIGs0hHUwfOGE8qEOJHrqUI7ELILDbuAaOnRIhWtuoUvWRNjiKEz8RvIzPgWcX
-         Hqzo4REBZNNkzrRpHvkX2NOmxd1KfIPb9/t7mqg5GsFSjcZ7cvq4MfifA1BYjvMtUz68
-         u4hlowlak7qm14OEcAgBf2dbNZshUZcLZGnStM1Ifiin4PJiYEYXAXAxVnXUzY7Y75o+
-         1g76P/oFnns2kAH6ZzEGowc+267CMp5/vAN2eDxY2MQ/0WEkvgThpAENPaBFTitPvbRs
-         j7Sg==
-X-Gm-Message-State: APjAAAX3z0GBkpDW8uhwYGvoJI675A97zGTI6NsLGB6Vf05HZTNPGzgr
-        hHoh+8kIWz2ydk5pkJI/spTndy5+
-X-Google-Smtp-Source: APXvYqwpr1iHuL50FW7P3AF4gEUf1GqKdR/COu7XWPM287qykxrJsgaBjS22Zq3uUi9HLZdB2MagLg==
-X-Received: by 2002:a17:902:b08c:: with SMTP id p12mr21013887plr.214.1556725713658;
-        Wed, 01 May 2019 08:48:33 -0700 (PDT)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id l2sm46192420pgl.2.2019.05.01.08.48.32
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 01 May 2019 08:48:32 -0700 (PDT)
-Message-ID: <1556725711.19047.10.camel@acm.org>
-Subject: Re: [RFC PATCH 01/18] blktrace: increase the size of action mask
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Date:   Wed, 01 May 2019 08:48:31 -0700
-In-Reply-To: <20190501042831.5313-2-chaitanya.kulkarni@wdc.com>
-References: <20190501042831.5313-1-chaitanya.kulkarni@wdc.com>
-         <20190501042831.5313-2-chaitanya.kulkarni@wdc.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1726513AbfEAPz4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 11:55:56 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:33082 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726452AbfEAPz4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 May 2019 11:55:56 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9ECD1A78;
+        Wed,  1 May 2019 08:55:55 -0700 (PDT)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5F2FD3F719;
+        Wed,  1 May 2019 08:55:54 -0700 (PDT)
+Date:   Wed, 1 May 2019 16:55:51 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] io_uring: avoid page allocation warnings
+Message-ID: <20190501155551.GF11740@lakrids.cambridge.arm.com>
+References: <20190430132405.8268-1-mark.rutland@arm.com>
+ <20190430141810.GF13796@bombadil.infradead.org>
+ <20190430145938.GA8314@lakrids.cambridge.arm.com>
+ <a1af3017-6572-e828-dc8a-a5c8458e6b5a@kernel.dk>
+ <20190430170302.GD8314@lakrids.cambridge.arm.com>
+ <0bd395a0-e0d3-16a5-e29f-557e97782a48@kernel.dk>
+ <20190501103026.GA11740@lakrids.cambridge.arm.com>
+ <710a3048-ccab-260d-d8b7-1d51ff6d589d@kernel.dk>
+ <20190501150921.GE11740@lakrids.cambridge.arm.com>
+ <88fee953-ea3e-b9c0-650c-60faea07dd04@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <88fee953-ea3e-b9c0-650c-60faea07dd04@kernel.dk>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2019-04-30 at 21:28 -0700, Chaitanya Kulkarni wrote:
-+AD4 -+ACM-define BLKTRACESETUP32 +AF8-IOWR(0x12, 115, struct compat+AF8-blk+AF8-user+AF8-trace+AF8-setup)
-+AD4 +-
-+AD4 +-/+ACo XXX: temp work around for RFC +ACo-/
-+AD4 +-+ACM-define BLKTRACESETUP32 +AF8-IOWR(0x13, 115, struct compat+AF8-blk+AF8-user+AF8-trace+AF8-setup)
+On Wed, May 01, 2019 at 09:29:25AM -0600, Jens Axboe wrote:
+> On 5/1/19 9:09 AM, Mark Rutland wrote:
+> > I've manually minimized that to C below. AFAICT, that hits a leak, which
+> > is what's triggering the OOM after the program is run a number of times
+> > with the previously posted kvmalloc patch.
+> > 
+> > Per /proc/meminfo, that memory isn't accounted anywhere.
+> > 
+> >> Patch looks fine to me. Note
+> >> that buffer registration is under the protection of RLIMIT_MEMLOCK.
+> >> That's usually very limited for non-root, as root you can of course
+> >> consume as much as you want and OOM the system.
+> > 
+> > Sure.
+> > 
+> > As above, it looks like there's a leak, regardless.
+> 
+> The leak is that we're not releasing imu->bvec in case of error. I fixed
+> a missing kfree -> kvfree as well in your patch, with this rolled up
+> version it works for me.
 
-This change breaks user space so this change is not acceptable. I think you
-want to introduce a new ioctl instead of modifying an existing ioctl.
-Additionally, have you considered to split the blktrace+AF8-api.h header file
-into two header files: one with kernel-internal definitions and a second one
-with definitions that are shared with user space (include/uapi/...)?
+That works for me too.
+
+I'll fold that into v2, and send that out momentarily.
 
 Thanks,
-
-Bart.
+Mark.
