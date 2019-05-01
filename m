@@ -6,29 +6,29 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A875C43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 14:45:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EBD0C43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 14:45:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA70E208C3
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 14:45:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 620D4208C3
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 14:45:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727075AbfEAOpA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 10:45:00 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:40129 "EHLO
+        id S1727089AbfEAOpW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 10:45:22 -0400
+Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:40074 "EHLO
         mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727024AbfEAOo7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 10:44:59 -0400
+        with ESMTP id S1727051AbfEAOoz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 10:44:55 -0400
 Received: from Internal Mail-Server by MTLPINE2 (envelope-from talgi@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 1 May 2019 17:44:53 +0300
+        with ESMTPS (AES256-SHA encrypted); 1 May 2019 17:44:51 +0300
 Received: from gen-l-vrt-692.mtl.labs.mlnx (gen-l-vrt-692.mtl.labs.mlnx [10.141.69.20])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x41Eirqf019853;
-        Wed, 1 May 2019 17:44:53 +0300
+        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x41EipEY019840;
+        Wed, 1 May 2019 17:44:51 +0300
 Received: from gen-l-vrt-692.mtl.labs.mlnx (localhost [127.0.0.1])
-        by gen-l-vrt-692.mtl.labs.mlnx (8.14.7/8.14.7) with ESMTP id x41Eirwt036052;
-        Wed, 1 May 2019 17:44:53 +0300
+        by gen-l-vrt-692.mtl.labs.mlnx (8.14.7/8.14.7) with ESMTP id x41EipQa036044;
+        Wed, 1 May 2019 17:44:51 +0300
 Received: (from talgi@localhost)
-        by gen-l-vrt-692.mtl.labs.mlnx (8.14.7/8.14.7/Submit) id x41Eir40036051;
-        Wed, 1 May 2019 17:44:53 +0300
+        by gen-l-vrt-692.mtl.labs.mlnx (8.14.7/8.14.7/Submit) id x41EipeW036043;
+        Wed, 1 May 2019 17:44:51 +0300
 From:   Tal Gilboa <talgi@mellanox.com>
 To:     linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org
@@ -42,9 +42,9 @@ Cc:     Yishai Hadas <yishaih@mellanox.com>,
         Idan Burstein <idanb@mellanox.com>,
         Yamin Friedman <yaminf@mellanox.com>,
         Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH rdma-for-next 7/9] linux/dim: Add completions count to dim_sample
-Date:   Wed,  1 May 2019 17:44:37 +0300
-Message-Id: <1556721879-35987-8-git-send-email-talgi@mellanox.com>
+Subject: [PATCH rdma-for-next 3/9] linux/dim: Rename externally exposed macros
+Date:   Wed,  1 May 2019 17:44:33 +0300
+Message-Id: <1556721879-35987-4-git-send-email-talgi@mellanox.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1556721879-35987-1-git-send-email-talgi@mellanox.com>
 References: <1556721879-35987-1-git-send-email-talgi@mellanox.com>
@@ -53,186 +53,234 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yamin Friedman <yaminf@mellanox.com>
+Renamed macros in use by external drivers.
 
-Added a measurement of completions per/msec to allow for completion based
-dim algorithms.
-
-Signed-off-by: Yamin Friedman <yaminf@mellanox.com>
-Reviewed-by: Max Gurtovoy <maxg@mellanox.com>
 Signed-off-by: Tal Gilboa <talgi@mellanox.com>
 ---
- drivers/net/ethernet/broadcom/bcmsysport.c        |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c         |  1 +
- drivers/net/ethernet/broadcom/genet/bcmgenet.c    |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c |  6 ++++--
- include/linux/dim.h                               |  8 +++++++-
- lib/dim/dim.c                                     | 13 ++++++++++++-
- lib/dim/net_dim.c                                 |  2 +-
- 7 files changed, 27 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/broadcom/bcmsysport.c        |  4 ++--
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c         |  2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c     |  2 +-
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c    |  4 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/en_dim.c  |  2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 10 +++++-----
+ include/linux/dim.h                               | 12 ++++++------
+ include/linux/net_dim.h                           | 18 +++++++++---------
+ 8 files changed, 27 insertions(+), 27 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
-index b2c5b1a..fc21432 100644
+index bc3ac36..480089f 100644
 --- a/drivers/net/ethernet/broadcom/bcmsysport.c
 +++ b/drivers/net/ethernet/broadcom/bcmsysport.c
-@@ -1029,7 +1029,7 @@ static int bcm_sysport_poll(struct napi_struct *napi, int budget)
+@@ -1108,7 +1108,7 @@ static void bcm_sysport_dim_work(struct work_struct *work)
+ 			net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
  
- 	if (priv->dim.use_dim) {
- 		dim_create_sample(priv->dim.event_ctr, priv->dim.packets,
--				  priv->dim.bytes, &dim_sample);
-+				  priv->dim.bytes, 0, &dim_sample);
- 		net_dim(&priv->dim.dim, dim_sample);
- 	}
+ 	bcm_sysport_set_rx_coalesce(priv, cur_profile.usec, cur_profile.pkts);
+-	dim->state = NET_DIM_START_MEASURE;
++	dim->state = DIM_START_MEASURE;
+ }
  
+ /* RX and misc interrupt routine */
+@@ -1460,7 +1460,7 @@ static void bcm_sysport_init_dim(struct bcm_sysport_priv *priv,
+ 	struct bcm_sysport_net_dim *dim = &priv->dim;
+ 
+ 	INIT_WORK(&dim->dim.work, cb);
+-	dim->dim.mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
++	dim->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
+ 	dim->event_ctr = 0;
+ 	dim->packets = 0;
+ 	dim->bytes = 0;
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 9e62e3f..91607ef 100644
+index 4c586ba..21db503 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -2130,6 +2130,7 @@ static int bnxt_poll(struct napi_struct *napi, int budget)
- 		dim_create_sample(cpr->event_ctr,
- 				  cpr->rx_packets,
- 				  cpr->rx_bytes,
-+				  0,
- 				  &dim_sample);
- 		net_dim(&cpr->dim, dim_sample);
+@@ -7703,7 +7703,7 @@ static void bnxt_enable_napi(struct bnxt *bp)
+ 
+ 		if (bp->bnapi[i]->rx_ring) {
+ 			INIT_WORK(&cpr->dim.work, bnxt_dim_work);
+-			cpr->dim.mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
++			cpr->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
+ 		}
+ 		napi_enable(&bp->bnapi[i]->napi);
  	}
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c
+index afa97c8..16a4588 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c
+@@ -28,5 +28,5 @@ void bnxt_dim_work(struct work_struct *work)
+ 	cpr->rx_ring_coal.coal_bufs = cur_moder.pkts;
+ 
+ 	bnxt_hwrm_set_ring_coal(bnapi->bp, bnapi);
+-	dim->state = NET_DIM_START_MEASURE;
++	dim->state = DIM_START_MEASURE;
+ }
 diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 68d96e3..aca82ef 100644
+index 983245c..eee48da 100644
 --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
 +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -1910,7 +1910,7 @@ static int bcmgenet_rx_poll(struct napi_struct *napi, int budget)
+@@ -1928,7 +1928,7 @@ static void bcmgenet_dim_work(struct work_struct *work)
+ 			net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
  
- 	if (ring->dim.use_dim) {
- 		dim_create_sample(ring->dim.event_ctr, ring->dim.packets,
--				  ring->dim.bytes, &dim_sample);
-+				  ring->dim.bytes, 0, &dim_sample);
- 		net_dim(&ring->dim.dim, dim_sample);
+ 	bcmgenet_set_rx_coalesce(ring, cur_profile.usec, cur_profile.pkts);
+-	dim->state = NET_DIM_START_MEASURE;
++	dim->state = DIM_START_MEASURE;
+ }
+ 
+ /* Assign skb to RX DMA descriptor. */
+@@ -2085,7 +2085,7 @@ static void bcmgenet_init_dim(struct bcmgenet_rx_ring *ring,
+ 	struct bcmgenet_net_dim *dim = &ring->dim;
+ 
+ 	INIT_WORK(&dim->dim.work, cb);
+-	dim->dim.mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
++	dim->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
+ 	dim->event_ctr = 0;
+ 	dim->packets = 0;
+ 	dim->bytes = 0;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c b/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c
+index d67adf7..a80303a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c
+@@ -38,7 +38,7 @@
+ 			struct mlx5_core_dev *mdev, struct mlx5_core_cq *mcq)
+ {
+ 	mlx5_core_modify_cq_moderation(mdev, mcq, moder.usec, moder.pkts);
+-	dim->state = NET_DIM_START_MEASURE;
++	dim->state = DIM_START_MEASURE;
+ }
+ 
+ void mlx5e_rx_dim_work(struct work_struct *work)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index b5fdbd3..589ecef 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -681,11 +681,11 @@ static int mlx5e_alloc_rq(struct mlx5e_channel *c,
+ 
+ 	switch (params->rx_cq_moderation.cq_period_mode) {
+ 	case MLX5_CQ_PERIOD_MODE_START_FROM_CQE:
+-		rq->dim.mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_CQE;
++		rq->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_CQE;
+ 		break;
+ 	case MLX5_CQ_PERIOD_MODE_START_FROM_EQE:
+ 	default:
+-		rq->dim.mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
++		rq->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
  	}
  
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-index 4324747..ab68d7d 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-@@ -53,7 +53,8 @@ static void mlx5e_handle_tx_dim(struct mlx5e_txqsq *sq)
- 	if (unlikely(!test_bit(MLX5E_SQ_STATE_AM, &sq->state)))
- 		return;
+ 	rq->page_cache.head = 0;
+@@ -2238,7 +2238,7 @@ static void mlx5e_build_ico_cq_param(struct mlx5e_priv *priv,
  
--	dim_create_sample(sq->cq.event_ctr, stats->packets, stats->bytes, &dim_sample);
-+	dim_create_sample(sq->cq.event_ctr, stats->packets, stats->bytes, 0,
-+			  &dim_sample);
- 	net_dim(&sq->dim, dim_sample);
+ 	mlx5e_build_common_cq_param(priv, param);
+ 
+-	param->cq_period_mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
++	param->cq_period_mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
  }
  
-@@ -65,7 +66,8 @@ static void mlx5e_handle_rx_dim(struct mlx5e_rq *rq)
- 	if (unlikely(!test_bit(MLX5E_RQ_STATE_AM, &rq->state)))
- 		return;
- 
--	dim_create_sample(rq->cq.event_ctr, stats->packets, stats->bytes, &dim_sample);
-+	dim_create_sample(rq->cq.event_ctr, stats->packets, stats->bytes, 0,
-+			  &dim_sample);
- 	net_dim(&rq->dim, dim_sample);
+ static void mlx5e_build_icosq_param(struct mlx5e_priv *priv,
+@@ -4485,8 +4485,8 @@ static struct net_dim_cq_moder mlx5e_get_def_rx_moderation(u8 cq_period_mode)
+ static u8 mlx5_to_net_dim_cq_period_mode(u8 cq_period_mode)
+ {
+ 	return cq_period_mode == MLX5_CQ_PERIOD_MODE_START_FROM_CQE ?
+-		NET_DIM_CQ_PERIOD_MODE_START_FROM_CQE :
+-		NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
++		DIM_CQ_PERIOD_MODE_START_FROM_CQE :
++		DIM_CQ_PERIOD_MODE_START_FROM_EQE;
  }
  
+ void mlx5e_set_tx_cq_mode_params(struct mlx5e_params *params, u8 cq_period_mode)
 diff --git a/include/linux/dim.h b/include/linux/dim.h
-index ffaea87..2bc4c40 100644
+index e5e3d0cf..67b80e9 100644
 --- a/include/linux/dim.h
 +++ b/include/linux/dim.h
-@@ -44,6 +44,7 @@
- struct dim_cq_moder {
- 	u16 usec;
- 	u16 pkts;
-+	u16 comps;
- 	u8 cq_period_mode;
+@@ -74,15 +74,15 @@ struct net_dim { /* Dynamic Interrupt Moderation */
  };
  
-@@ -52,18 +53,22 @@ struct dim_sample {
- 	u32     pkt_ctr;
- 	u32     byte_ctr;
- 	u16     event_ctr;
-+	u32     comp_ctr;
+ enum {
+-	NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE = 0x0,
+-	NET_DIM_CQ_PERIOD_MODE_START_FROM_CQE = 0x1,
+-	NET_DIM_CQ_PERIOD_NUM_MODES
++	DIM_CQ_PERIOD_MODE_START_FROM_EQE = 0x0,
++	DIM_CQ_PERIOD_MODE_START_FROM_CQE = 0x1,
++	DIM_CQ_PERIOD_NUM_MODES
  };
  
- struct dim_stats {
- 	int ppms; /* packets per msec */
- 	int bpms; /* bytes per msec */
- 	int epms; /* events per msec */
-+	int cpms; /* completions per msec */
-+	int cpe_ratio; /* ratio of completions to events */
+ enum {
+-	NET_DIM_START_MEASURE,
+-	NET_DIM_MEASURE_IN_PROGRESS,
+-	NET_DIM_APPLY_NEW_PROFILE,
++	DIM_START_MEASURE,
++	DIM_MEASURE_IN_PROGRESS,
++	DIM_APPLY_NEW_PROFILE,
  };
  
- struct dim { /* Dynamic Interrupt Moderation */
- 	u8                                      state;
- 	struct dim_stats                        prev_stats;
- 	struct dim_sample                       start_sample;
-+	struct dim_sample                       measuring_sample;
- 	struct work_struct                      work;
- 	u8                                      profile_ix;
- 	u8                                      mode;
-@@ -112,7 +117,8 @@ enum {
- 
- void dim_park_tired(struct dim *dim);
- 
--void dim_create_sample(u16 event_ctr, u64 packets, u64 bytes, struct dim_sample *s);
-+void dim_create_sample(u16 event_ctr, u64 packets, u64 bytes, u64 comps,
-+		       struct dim_sample *s);
- 
- void dim_calc_stats(struct dim_sample *start, struct dim_sample *end,
- 		    struct dim_stats *curr_stats);
-diff --git a/lib/dim/dim.c b/lib/dim/dim.c
-index 93e1ddd..4f25c0f 100644
---- a/lib/dim/dim.c
-+++ b/lib/dim/dim.c
-@@ -54,12 +54,14 @@ void dim_park_tired(struct dim *dim)
+ enum {
+diff --git a/include/linux/net_dim.h b/include/linux/net_dim.h
+index 3d9a2ff..d90f96f 100644
+--- a/include/linux/net_dim.h
++++ b/include/linux/net_dim.h
+@@ -78,13 +78,13 @@
  }
- EXPORT_SYMBOL(dim_park_tired);
  
--void dim_create_sample(u16 event_ctr, u64 packets, u64 bytes, struct dim_sample *s)
-+void dim_create_sample(u16 event_ctr, u64 packets, u64 bytes, u64 comps,
-+		       struct dim_sample *s)
+ static const struct net_dim_cq_moder
+-rx_profile[NET_DIM_CQ_PERIOD_NUM_MODES][NET_DIM_PARAMS_NUM_PROFILES] = {
++rx_profile[DIM_CQ_PERIOD_NUM_MODES][NET_DIM_PARAMS_NUM_PROFILES] = {
+ 	NET_DIM_RX_EQE_PROFILES,
+ 	NET_DIM_RX_CQE_PROFILES,
+ };
+ 
+ static const struct net_dim_cq_moder
+-tx_profile[NET_DIM_CQ_PERIOD_NUM_MODES][NET_DIM_PARAMS_NUM_PROFILES] = {
++tx_profile[DIM_CQ_PERIOD_NUM_MODES][NET_DIM_PARAMS_NUM_PROFILES] = {
+ 	NET_DIM_TX_EQE_PROFILES,
+ 	NET_DIM_TX_CQE_PROFILES,
+ };
+@@ -101,7 +101,7 @@
+ static inline struct net_dim_cq_moder
+ net_dim_get_def_rx_moderation(u8 cq_period_mode)
  {
- 	s->time	     = ktime_get();
- 	s->pkt_ctr   = packets;
- 	s->byte_ctr  = bytes;
- 	s->event_ctr = event_ctr;
-+	s->comp_ctr  = comps;
- }
- EXPORT_SYMBOL(dim_create_sample);
+-	u8 profile_ix = cq_period_mode == NET_DIM_CQ_PERIOD_MODE_START_FROM_CQE ?
++	u8 profile_ix = cq_period_mode == DIM_CQ_PERIOD_MODE_START_FROM_CQE ?
+ 			NET_DIM_DEF_PROFILE_CQE : NET_DIM_DEF_PROFILE_EQE;
  
-@@ -71,6 +73,8 @@ void dim_calc_stats(struct dim_sample *start, struct dim_sample *end,
- 	u32 npkts = BIT_GAP(BITS_PER_TYPE(u32), end->pkt_ctr, start->pkt_ctr);
- 	u32 nbytes = BIT_GAP(BITS_PER_TYPE(u32), end->byte_ctr,
- 			     start->byte_ctr);
-+	u32 ncomps = BIT_GAP(BITS_PER_TYPE(u32), end->comp_ctr,
-+			     start->comp_ctr);
+ 	return net_dim_get_rx_moderation(cq_period_mode, profile_ix);
+@@ -119,7 +119,7 @@
+ static inline struct net_dim_cq_moder
+ net_dim_get_def_tx_moderation(u8 cq_period_mode)
+ {
+-	u8 profile_ix = cq_period_mode == NET_DIM_CQ_PERIOD_MODE_START_FROM_CQE ?
++	u8 profile_ix = cq_period_mode == DIM_CQ_PERIOD_MODE_START_FROM_CQE ?
+ 			NET_DIM_DEF_PROFILE_CQE : NET_DIM_DEF_PROFILE_EQE;
  
- 	if (!delta_us)
- 		return;
-@@ -79,5 +83,12 @@ void dim_calc_stats(struct dim_sample *start, struct dim_sample *end,
- 	curr_stats->bpms = DIV_ROUND_UP(nbytes * USEC_PER_MSEC, delta_us);
- 	curr_stats->epms = DIV_ROUND_UP(DIM_NEVENTS * USEC_PER_MSEC,
- 					delta_us);
-+	curr_stats->cpms = DIV_ROUND_UP(ncomps * USEC_PER_MSEC, delta_us);
-+	if (curr_stats->epms != 0)
-+		curr_stats->cpe_ratio =
-+				(curr_stats->cpms * 100) / curr_stats->epms;
-+	else
-+		curr_stats->cpe_ratio = 0;
-+
- }
- EXPORT_SYMBOL(dim_calc_stats);
-diff --git a/lib/dim/net_dim.c b/lib/dim/net_dim.c
-index 05d259e..67a8f82 100644
---- a/lib/dim/net_dim.c
-+++ b/lib/dim/net_dim.c
-@@ -181,7 +181,7 @@ void net_dim(struct dim *dim, struct dim_sample end_sample)
+ 	return net_dim_get_tx_moderation(cq_period_mode, profile_ix);
+@@ -246,7 +246,7 @@ static inline void net_dim(struct net_dim *dim,
+ 	u16 nevents;
+ 
+ 	switch (dim->state) {
+-	case NET_DIM_MEASURE_IN_PROGRESS:
++	case DIM_MEASURE_IN_PROGRESS:
+ 		nevents = BIT_GAP(BITS_PER_TYPE(u16),
+ 				  end_sample.event_ctr,
+ 				  dim->start_sample.event_ctr);
+@@ -254,17 +254,17 @@ static inline void net_dim(struct net_dim *dim,
+ 			break;
+ 		dim_calc_stats(&dim->start_sample, &end_sample, &curr_stats);
+ 		if (net_dim_decision(&curr_stats, dim)) {
+-			dim->state = NET_DIM_APPLY_NEW_PROFILE;
++			dim->state = DIM_APPLY_NEW_PROFILE;
+ 			schedule_work(&dim->work);
+ 			break;
+ 		}
  		/* fall through */
- 	case DIM_START_MEASURE:
- 		dim_create_sample(end_sample.event_ctr, end_sample.pkt_ctr,
--				  end_sample.byte_ctr, &dim->start_sample);
-+				  end_sample.byte_ctr, 0, &dim->start_sample);
- 		dim->state = DIM_MEASURE_IN_PROGRESS;
+-	case NET_DIM_START_MEASURE:
++	case DIM_START_MEASURE:
+ 		net_dim_sample(end_sample.event_ctr, end_sample.pkt_ctr, end_sample.byte_ctr,
+ 			       &dim->start_sample);
+-		dim->state = NET_DIM_MEASURE_IN_PROGRESS;
++		dim->state = DIM_MEASURE_IN_PROGRESS;
  		break;
- 	case DIM_APPLY_NEW_PROFILE:
+-	case NET_DIM_APPLY_NEW_PROFILE:
++	case DIM_APPLY_NEW_PROFILE:
+ 		break;
+ 	}
+ }
 -- 
 1.8.3.1
 
