@@ -2,149 +2,60 @@ Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7FBDC46460
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:34:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B79C04AA8
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:41:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88E7521734
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:34:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LJOCQpTu"
+	by mail.kernel.org (Postfix) with ESMTP id 7D14B21670
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:41:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726602AbfEAPeK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 11:34:10 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:45255 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726579AbfEAPeK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 11:34:10 -0400
-Received: by mail-qt1-f194.google.com with SMTP id b3so20315222qtc.12;
-        Wed, 01 May 2019 08:34:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=N7BVof8zcWOlmgfoNNTzY2OrKwZHtJkNJJ/tVCOczZQ=;
-        b=LJOCQpTuAOMonbbFd+HFYKhAdfAuYbz/YN7leE+vqtSDSU77hZTmtUm3kYo7OdSMgM
-         bH+Uv1E5hNu61ylGEuBOy/k+G8bWfbgx1x4bt1RyzeeGPtU4wtJFqhNrbXKVLmh94P5W
-         H3JUZA9DgRHA5jzjjyiyGIQ0AqNMI6bzImj/vOm9YVV4oR/FGuBfYGCrY5ue21OVzIdv
-         oBsJuDbw1wtIi+98ifSfhjY4bQJVSklHmKuSmnCSGb3iwN/kbnqBhhGyP68b00fF+kuh
-         9J7hQkjNfqRKZOp//X4aLOdG0KSktlZqMG5xgHHuyoM6+AgFw6h7NDcSqZqnr21zte0i
-         lb6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=N7BVof8zcWOlmgfoNNTzY2OrKwZHtJkNJJ/tVCOczZQ=;
-        b=h/hTBNedrkrOUCYqYHNM3Hz5ikRud9Y+DDk9KA3nMGtuk0I72PxcfSox2YUZa/5B6a
-         TIAxMHHCc27k+1JWAKABlAlEVBVc1qNN9CNHwvtdO4Pd520Dss19xU5PcugQWLqwEY53
-         zWyIeyvFthmVU9JSOACAwQ0wd0LkykfHn53VJtAeZuS/mDnYIWszJNhcrMturReP1Z54
-         Ofh/l3hhyvVBEqblpPl5XC/HMUtfu1PA044wJVUE2JGkjPQCrtVg3dH5IvVJjUrql8cn
-         mGpoSlkYbz/qQFyLr2V/3K7b+uPFu+n1wVtXPwQUzq+jiDJ/rc23QoXyZBk1mcTIoyGE
-         Q/dw==
-X-Gm-Message-State: APjAAAVvSGkRn8x3AoslH4uKx+46P4aO/6Ul0habDp9qpxwuBQCZcrni
-        C8aurwo4OEVDnI1mapL2N4kLUw96fo04gJGHxYQAd6f/
-X-Google-Smtp-Source: APXvYqzROLS7CvGrZASPPcvG/dxihfU9bAmIpDLNRjhMKwZG33h79JY5/Yot97nB/NsbR3Hm3m6NGf/lJdTltx6q0ic=
-X-Received: by 2002:ac8:25b8:: with SMTP id e53mr24425025qte.194.1556724849335;
- Wed, 01 May 2019 08:34:09 -0700 (PDT)
+        id S1726627AbfEAPk7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 11:40:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55116 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726599AbfEAPk7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 May 2019 11:40:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 005FB8666E;
+        Wed,  1 May 2019 15:40:59 +0000 (UTC)
+Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4ED56629BF;
+        Wed,  1 May 2019 15:40:58 +0000 (UTC)
+From:   Jeff Moyer <jmoyer@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Shenghui Wang <shhuiw@foxmail.com>, viro@zeniv.linux.org.uk,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] io_uring: use cpu_online() to check p->sq_thread_cpu instead of cpu_possible()
+References: <20190501072430.6674-1-shhuiw@foxmail.com>
+        <x49wojaxuaa.fsf@segfault.boston.devel.redhat.com>
+        <cd55b1e4-9395-a8b7-707e-ceed9d6c0c15@kernel.dk>
+        <x49o94mxn1w.fsf@segfault.boston.devel.redhat.com>
+        <bcf4aa58-ec09-3d73-89f8-fdfdc3ea2896@kernel.dk>
+X-PGP-KeyID: 1F78E1B4
+X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
+Date:   Wed, 01 May 2019 11:40:57 -0400
+In-Reply-To: <bcf4aa58-ec09-3d73-89f8-fdfdc3ea2896@kernel.dk> (Jens Axboe's
+        message of "Wed, 1 May 2019 08:39:05 -0600")
+Message-ID: <x49tvee89o6.fsf@segfault.boston.devel.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20190418220448.7219-1-gpiccoli@canonical.com> <CAPhsuW4k5zz2pJBPL60VzjTcj6NTnhBh-RjvWASLcOxAk+yDEw@mail.gmail.com>
- <b39b96ea-2540-a407-2232-1af91e3e6658@canonical.com>
-In-Reply-To: <b39b96ea-2540-a407-2232-1af91e3e6658@canonical.com>
-From:   Song Liu <liu.song.a23@gmail.com>
-Date:   Wed, 1 May 2019 08:33:58 -0700
-Message-ID: <CAPhsuW65EW8JgjE8zknPQPXYcmDhX9LEhTKGb0KHywqKuZkUcA@mail.gmail.com>
-Subject: Re: [RFC] [PATCH V2 0/1] Introduce emergency raid0 stop for mounted arrays
-To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Cc:     axboe@kernel.dk, linux-raid <linux-raid@vger.kernel.org>,
-        Jay Vosburgh <jay.vosburgh@canonical.com>, kernel@gpiccoli.net,
-        NeilBrown <neilb@suse.com>, dm-devel@redhat.com,
-        Linux-Fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org, gavin.guo@canonical.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Wed, 01 May 2019 15:40:59 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 30, 2019 at 3:41 PM Guilherme G. Piccoli
-<gpiccoli@canonical.com> wrote:
->
-> > On 19/04/2019 14:08, Song Liu wrote:
-> > [...]
-> > I read through the discussion in V1, and I would agree with Neil that
-> > current behavior is reasonable.
-> >
-> > For the following example:
-> >
-> > fd = open("file", "w");
-> > write(fd, buf, size);
-> > ret = fsync(fd);
-> >
-> > If "size" is big enough, the write is not expected to be atomic for
-> > md or other drives. If we remove the underlining block device
-> > after write() and before fsync(), the file could get corrupted. This
-> > is the same for md or NVMe/SCSI drives.
-> >
-> > The application need to check "ret" from fsync(), the data is safe
-> > only when fsync() returns 0.
-> >
-> > Does this make sense?
-> >
->
-> Hi Song, thanks for your quick response, and sorry for my delay.
-> I've noticed after v4.18 kernel started to crash when we remove one
-> raid0 member while writing, so I was investigating this
-> before perform your test (in fact, found 2 issues [0]), hence my delay.
->
-> Your test does make sense; in fact I've tested your scenario with the
-> following code (with the patches from [0]):
-> https://pastebin.ubuntu.com/p/cyqpDqpM7x/
->
-> Indeed, fsync returns -1 in this case.
-> Interestingly, when I do a "dd if=<some_file> of=<raid0_mount>" and try
-> to "sync -f <some_file>" and "sync", it succeeds and the file is
-> written, although corrupted.
+Jens Axboe <axboe@kernel.dk> writes:
 
-I guess this is some issue with sync command, but I haven't got time
-to look into it. How about running dd with oflag=sync or oflag=direct?
+> Agree, I've cleaned it up, it was a bit of a mess.
 
->
-> Do you think this behavior is correct? In other devices, like a pure
-> SCSI disk or NVMe, the 'dd' write fails.
-> Also, what about the status of the raid0 array in mdadm - it shows as
-> "clean" even after the member is removed, should we change that?
+LGTM, thanks!
 
-I guess this is because the kernel hasn't detect the array is gone? In
-that case, I think reducing the latency would be useful for some use
-cases.
-
-Thanks,
-Song
-
->
->
-> > Also, could you please highlight changes from V1 (if more than
-> > just rebase)?
->
-> No changes other than rebase. Worth mentioning here that a kernel bot
-> (and Julia Lawall) found an issue in my patch; I forgot a
-> "mutex_lock(&mddev->open_mutex);" in line 6053, which caused the first
-> caveat (hung mdadm and persistent device in /dev). Thanks for pointing
-> this silly mistake from me! in case this patch gets some traction, I'll
-> re-submit with that fixed.
->
-> Cheers,
->
->
-> Guilherme
->
-> [0] https://marc.info/?l=linux-block&m=155666385707413
->
-> >
-> > Thanks,
-> > Song
-> >
+-Jeff
