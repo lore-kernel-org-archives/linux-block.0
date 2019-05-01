@@ -2,108 +2,69 @@ Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E93C43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 11:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F1FC43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 12:31:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9BD5C21670
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 11:56:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1134A21670
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 12:31:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W2C2Y2q0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726382AbfEAL4b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 07:56:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45674 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726040AbfEAL4b (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 May 2019 07:56:31 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 05281308AA11;
-        Wed,  1 May 2019 11:56:31 +0000 (UTC)
-Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D4DD53;
-        Wed,  1 May 2019 11:56:30 +0000 (UTC)
-From:   Jeff Moyer <jmoyer@redhat.com>
-To:     axboe@kernel.dk, Shenghui Wang <shhuiw@foxmail.com>
-Cc:     viro@zeniv.linux.org.uk, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] io_uring: use cpu_online() to check p->sq_thread_cpu instead of cpu_possible()
-References: <20190501072430.6674-1-shhuiw@foxmail.com>
-X-PGP-KeyID: 1F78E1B4
-X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date:   Wed, 01 May 2019 07:56:29 -0400
-In-Reply-To: <20190501072430.6674-1-shhuiw@foxmail.com> (Shenghui Wang's
-        message of "Wed, 1 May 2019 15:24:30 +0800")
-Message-ID: <x49wojaxuaa.fsf@segfault.boston.devel.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S1726388AbfEAMbF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 08:31:05 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:47406 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726382AbfEAMbF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 08:31:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=xGAes7InMneADD9D0ysHSzJVmOpHAxF/Pt3N0Surabk=; b=W2C2Y2q034vHDrIbssKXmYBAN
+        7UpnYkLaohZMXMc+6VBuXvK0qhRsmXDmbEBsuMyzExyIj4VEzagQIiJP9T42d4Zl9wE6JSvDFWXFp
+        y1QS6TYPTmsQ+ssCs7xguNnqn0jrcbT2I+6LDStCdR8aEhFYT7/p3f0zOwJaEBjtnMa4y5U+Nnq+9
+        GjXZvwVq4ONGC3QVx9b1GJgXgndULJBuEZVr2XqrmqqN3dQEVnXLvVkDET9r1P7lH1KP2ZV5JTNAr
+        iT1llWBwlboe+YBJD59SGlMTVlmKNmje+8I1qc9EKadfINnqeLJm34bj4m8hPE0EWoJ7sHumKHipX
+        YwcBwBQgA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hLoO8-0005wW-Nw; Wed, 01 May 2019 12:31:04 +0000
+Date:   Wed, 1 May 2019 05:31:04 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [RFC PATCH 02/18] blktrace: add more definitions for BLK_TC_ACT
+Message-ID: <20190501123104.GA17987@infradead.org>
+References: <20190501042831.5313-1-chaitanya.kulkarni@wdc.com>
+ <20190501042831.5313-3-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 01 May 2019 11:56:31 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190501042831.5313-3-chaitanya.kulkarni@wdc.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Shenghui Wang <shhuiw@foxmail.com> writes:
+On Tue, Apr 30, 2019 at 09:28:15PM -0700, Chaitanya Kulkarni wrote:
+> @@ -104,7 +120,12 @@ struct blk_io_trace {
+>  	__u64 time;		/* in nanoseconds */
+>  	__u64 sector;		/* disk offset */
+>  	__u32 bytes;		/* transfer length */
+> +
+> +#ifdef CONFIG_BLKTRACE_EXT
+> +	__u64 action;		/* what happened */
+> +#else
+>  	__u32 action;		/* what happened */
+> +#endif /* CONFIG_BLKTRACE_EXT */
 
-> This issue is found by running liburing/test/io_uring_setup test.
->
-> When test run, the testcase "attempt to bind to invalid cpu" would not
-> pass with messages like:
->    io_uring_setup(1, 0xbfc2f7c8), \
-> flags: IORING_SETUP_SQPOLL|IORING_SETUP_SQ_AFF, \
-> resv: 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000, \
-> sq_thread_cpu: 2
->    expected -1, got 3
->    FAIL
->
-> On my system, there is:
->    CPU(s) possible : 0-3
->    CPU(s) online   : 0-1
->    CPU(s) offline  : 2-3
->    CPU(s) present  : 0-1
->
-> The sq_thread_cpu 2 is offline on my system, so the bind should fail.
-> But cpu_possible() will pass the check. We shouldn't be able to bind
-> to an offline cpu. Use cpu_online() to do the check.
->
-> After the change, the testcase run as expected: EINVAL will be returned
-> for cpu offlined.
->
-> Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
-> ---
->  fs/io_uring.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index 0e9fb2cb1984..aa3d39860a1c 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-> @@ -2241,7 +2241,7 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
->  	ctx->sqo_mm = current->mm;
->  
->  	ret = -EINVAL;
-> -	if (!cpu_possible(p->sq_thread_cpu))
-> +	if (!cpu_online(p->sq_thread_cpu))
->  		goto err;
->  
->  	if (ctx->flags & IORING_SETUP_SQPOLL) {
-> @@ -2258,7 +2258,7 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
->  
->  			cpu = array_index_nospec(p->sq_thread_cpu, NR_CPUS);
->  			ret = -EINVAL;
-> -			if (!cpu_possible(p->sq_thread_cpu))
-> +			if (!cpu_online(p->sq_thread_cpu))
->  				goto err;
->  
->  			ctx->sqo_thread = kthread_create_on_cpu(io_sq_thread,
-
-Hmm.  Why are we doing this check twice?  Oh... Jens, I think you
-braino'd commit 917257daa0fea.  Have a look.  You probably wanted to get
-rid of the first check for cpu_possible.
-
--Jeff
+You can't use CONFIG_ symbols in UAPI headers, as userspace
+applications won't set it.  You also can't ever change the layout of an
+existing structure in UAPI headers in not backward compatible way.
