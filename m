@@ -2,74 +2,162 @@ Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 722C2C43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 09:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E02C43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 10:30:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35BE620835
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 09:16:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F1AA21670
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 10:30:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726074AbfEAJQy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 05:16:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40346 "EHLO mx1.redhat.com"
+        id S1726074AbfEAKae (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 06:30:34 -0400
+Received: from foss.arm.com ([217.140.101.70]:57668 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726052AbfEAJQy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 May 2019 05:16:54 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0A6903082134;
-        Wed,  1 May 2019 09:16:54 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 10E8766614;
-        Wed,  1 May 2019 09:16:48 +0000 (UTC)
-Date:   Wed, 1 May 2019 17:16:41 +0800
-From:   Ming Lei <ming.lei@redhat.com>
+        id S1725959AbfEAKae (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 May 2019 06:30:34 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 788C9A78;
+        Wed,  1 May 2019 03:30:33 -0700 (PDT)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 37B9A3F719;
+        Wed,  1 May 2019 03:30:32 -0700 (PDT)
+Date:   Wed, 1 May 2019 11:30:26 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/2] block/iov_iter: fix two issues related with
- BIO_NO_PAGE_REF
-Message-ID: <20190501091639.GA14820@ming.t460p>
-References: <20190426104521.30602-1-ming.lei@redhat.com>
+Cc:     Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] io_uring: avoid page allocation warnings
+Message-ID: <20190501103026.GA11740@lakrids.cambridge.arm.com>
+References: <20190430132405.8268-1-mark.rutland@arm.com>
+ <20190430141810.GF13796@bombadil.infradead.org>
+ <20190430145938.GA8314@lakrids.cambridge.arm.com>
+ <a1af3017-6572-e828-dc8a-a5c8458e6b5a@kernel.dk>
+ <20190430170302.GD8314@lakrids.cambridge.arm.com>
+ <0bd395a0-e0d3-16a5-e29f-557e97782a48@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190426104521.30602-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Wed, 01 May 2019 09:16:54 +0000 (UTC)
+In-Reply-To: <0bd395a0-e0d3-16a5-e29f-557e97782a48@kernel.dk>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 26, 2019 at 06:45:19PM +0800, Ming Lei wrote:
-> Hi,
+On Tue, Apr 30, 2019 at 12:11:59PM -0600, Jens Axboe wrote:
+> On 4/30/19 11:03 AM, Mark Rutland wrote:
+> > On Tue, Apr 30, 2019 at 10:21:03AM -0600, Jens Axboe wrote:
+> >> On 4/30/19 8:59 AM, Mark Rutland wrote:
+> >>> On Tue, Apr 30, 2019 at 07:18:10AM -0700, Matthew Wilcox wrote:
+> >>>> On Tue, Apr 30, 2019 at 02:24:05PM +0100, Mark Rutland wrote:
+> >>>>> In io_sqe_buffer_register() we allocate a number of arrays based on the
+> >>>>> iov_len from the user-provided iov. While we limit iov_len to SZ_1G,
+> >>>>> we can still attempt to allocate arrays exceeding MAX_ORDER.
+> >>>>>
+> >>>>> On a 64-bit system with 4KiB pages, for an iov where iov_base = 0x10 and
+> >>>>> iov_len = SZ_1G, we'll calculate that nr_pages = 262145. When we try to
+> >>>>> allocate a corresponding array of (16-byte) bio_vecs, requiring 4194320
+> >>>>> bytes, which is greater than 4MiB. This results in SLUB warning that
+> >>>>> we're trying to allocate greater than MAX_ORDER, and failing the
+> >>>>> allocation.
+> >>>>>
+> >>>>> Avoid this by passing __GFP_NOWARN when allocating arrays for the
+> >>>>> user-provided iov_len. We'll gracefully handle the failed allocation,
+> >>>>> returning -ENOMEM to userspace.
+> >>>>>
+> >>>>> We should probably consider lowering the limit below SZ_1G, or reworking
+> >>>>> the array allocations.
+> >>>>
+> >>>> I'd suggest that kvmalloc is probably our friend here ... we don't really
+> >>>> want to return -ENOMEM to userspace for this case, I don't think.
+> >>>
+> >>> Sure. I'll go verify that the uring code doesn't assume this memory is
+> >>> physically contiguous.
+> >>>
+> >>> I also guess we should be passing GFP_KERNEL_ACCOUNT rateh than a plain
+> >>> GFP_KERNEL.
+> >>
+> >> kvmalloc() is fine, the io_uring code doesn't care about the layout of
+> >> the memory, it just uses it as an index.
+> > 
+> > I've just had a go at that, but when using kvmalloc() with or without
+> > GFP_KERNEL_ACCOUNT I hit OOM and my system hangs within a few seconds with the
+> > syzkaller prog below:
+> > 
+> > ----
+> > Syzkaller reproducer:
+> > # {Threaded:false Collide:false Repeat:false RepeatTimes:0 Procs:1 Sandbox: Fault:false FaultCall:-1 FaultNth:0 EnableTun:false EnableNetDev:false EnableNetReset:false EnableCgroups:false EnableBinfmtMisc:false EnableCloseFds:false UseTmpDir:false HandleSegv:false Repro:false Trace:false}
+> > r0 = io_uring_setup(0x378, &(0x7f00000000c0))
+> > sendmsg$SEG6_CMD_SET_TUNSRC(0xffffffffffffffff, &(0x7f0000000240)={&(0x7f0000000000)={0x10, 0x0, 0x0, 0x40000000}, 0xc, 0x0, 0x1, 0x0, 0x0, 0x10}, 0x800)
+> > io_uring_register$IORING_REGISTER_BUFFERS(r0, 0x0, &(0x7f0000000000), 0x1)
+> > ----
+> > 
+> > ... I'm a bit worried that opens up a trivial DoS.
+> > 
+> > Thoughts?
 > 
-> Fix two issues related with BIO_NO_PAGE_REF, both are introduced
-> recently in for-5.2/block.
-> 
-> Ming Lei (2):
->   block: fix handling for BIO_NO_PAGE_REF
->   iov_iter: fix iov_iter_type
-> 
->  fs/block_dev.c      | 3 ++-
->  include/linux/uio.h | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> -- 
-> 2.9.5
-> 
+> Can you post the patch you used?
 
-Hi Jens,
+Diff below.
 
-The two page leak issues are quite serious, given whole system memory
-can be consumed up easily in some dio tests.
+Mark.
 
-Could you consider to merge them if you are fine?
+---->8----
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 578b5494f9e5..c6dad90fab14 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2364,7 +2364,7 @@ static int io_sqe_buffer_unregister(struct io_ring_ctx *ctx)
+ 
+ 		if (ctx->account_mem)
+ 			io_unaccount_mem(ctx->user, imu->nr_bvecs);
+-		kfree(imu->bvec);
++		kvfree(imu->bvec);
+ 		imu->nr_bvecs = 0;
+ 	}
+ 
+@@ -2456,9 +2456,9 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
+ 		if (!pages || nr_pages > got_pages) {
+ 			kfree(vmas);
+ 			kfree(pages);
+-			pages = kmalloc_array(nr_pages, sizeof(struct page *),
++			pages = kvmalloc_array(nr_pages, sizeof(struct page *),
+ 						GFP_KERNEL);
+-			vmas = kmalloc_array(nr_pages,
++			vmas = kvmalloc_array(nr_pages,
+ 					sizeof(struct vm_area_struct *),
+ 					GFP_KERNEL);
+ 			if (!pages || !vmas) {
+@@ -2470,7 +2470,7 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
+ 			got_pages = nr_pages;
+ 		}
+ 
+-		imu->bvec = kmalloc_array(nr_pages, sizeof(struct bio_vec),
++		imu->bvec = kvmalloc_array(nr_pages, sizeof(struct bio_vec),
+ 						GFP_KERNEL);
+ 		ret = -ENOMEM;
+ 		if (!imu->bvec) {
+@@ -2531,12 +2531,12 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
+ 
+ 		ctx->nr_user_bufs++;
+ 	}
+-	kfree(pages);
+-	kfree(vmas);
++	kvfree(pages);
++	kvfree(vmas);
+ 	return 0;
+ err:
+-	kfree(pages);
+-	kfree(vmas);
++	kvfree(pages);
++	kvfree(vmas);
+ 	io_sqe_buffer_unregister(ctx);
+ 	return ret;
+ }
+-- 
+2.11.0
 
-Thanks,
-Ming
