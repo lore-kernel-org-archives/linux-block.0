@@ -3,59 +3,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B79C04AA8
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:41:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A90C43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:48:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D14B21670
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:41:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7245D2089E
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:48:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726627AbfEAPk7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 11:40:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55116 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726599AbfEAPk7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 May 2019 11:40:59 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 005FB8666E;
-        Wed,  1 May 2019 15:40:59 +0000 (UTC)
-Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4ED56629BF;
-        Wed,  1 May 2019 15:40:58 +0000 (UTC)
-From:   Jeff Moyer <jmoyer@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Shenghui Wang <shhuiw@foxmail.com>, viro@zeniv.linux.org.uk,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] io_uring: use cpu_online() to check p->sq_thread_cpu instead of cpu_possible()
-References: <20190501072430.6674-1-shhuiw@foxmail.com>
-        <x49wojaxuaa.fsf@segfault.boston.devel.redhat.com>
-        <cd55b1e4-9395-a8b7-707e-ceed9d6c0c15@kernel.dk>
-        <x49o94mxn1w.fsf@segfault.boston.devel.redhat.com>
-        <bcf4aa58-ec09-3d73-89f8-fdfdc3ea2896@kernel.dk>
-X-PGP-KeyID: 1F78E1B4
-X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date:   Wed, 01 May 2019 11:40:57 -0400
-In-Reply-To: <bcf4aa58-ec09-3d73-89f8-fdfdc3ea2896@kernel.dk> (Jens Axboe's
-        message of "Wed, 1 May 2019 08:39:05 -0600")
-Message-ID: <x49tvee89o6.fsf@segfault.boston.devel.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Wed, 01 May 2019 15:40:59 +0000 (UTC)
+        id S1726478AbfEAPse (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 11:48:34 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:33303 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726465AbfEAPse (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 11:48:34 -0400
+Received: by mail-pl1-f195.google.com with SMTP id y3so7512938plp.0
+        for <linux-block@vger.kernel.org>; Wed, 01 May 2019 08:48:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=97aP0Etzlazb0dzzNxQLRd8FHBoDH6Ttx040iXulh3w=;
+        b=cQSVFD+rVXs/x3GzGSRC0HsTwDEh2pu1ttlQcqYLTvLV1UVximPvSBfUM7l0nwXcFH
+         DswB9hmIGs0hHUwfOGE8qEOJHrqUI7ELILDbuAaOnRIhWtuoUvWRNjiKEz8RvIzPgWcX
+         Hqzo4REBZNNkzrRpHvkX2NOmxd1KfIPb9/t7mqg5GsFSjcZ7cvq4MfifA1BYjvMtUz68
+         u4hlowlak7qm14OEcAgBf2dbNZshUZcLZGnStM1Ifiin4PJiYEYXAXAxVnXUzY7Y75o+
+         1g76P/oFnns2kAH6ZzEGowc+267CMp5/vAN2eDxY2MQ/0WEkvgThpAENPaBFTitPvbRs
+         j7Sg==
+X-Gm-Message-State: APjAAAX3z0GBkpDW8uhwYGvoJI675A97zGTI6NsLGB6Vf05HZTNPGzgr
+        hHoh+8kIWz2ydk5pkJI/spTndy5+
+X-Google-Smtp-Source: APXvYqwpr1iHuL50FW7P3AF4gEUf1GqKdR/COu7XWPM287qykxrJsgaBjS22Zq3uUi9HLZdB2MagLg==
+X-Received: by 2002:a17:902:b08c:: with SMTP id p12mr21013887plr.214.1556725713658;
+        Wed, 01 May 2019 08:48:33 -0700 (PDT)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id l2sm46192420pgl.2.2019.05.01.08.48.32
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 01 May 2019 08:48:32 -0700 (PDT)
+Message-ID: <1556725711.19047.10.camel@acm.org>
+Subject: Re: [RFC PATCH 01/18] blktrace: increase the size of action mask
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org
+Date:   Wed, 01 May 2019 08:48:31 -0700
+In-Reply-To: <20190501042831.5313-2-chaitanya.kulkarni@wdc.com>
+References: <20190501042831.5313-1-chaitanya.kulkarni@wdc.com>
+         <20190501042831.5313-2-chaitanya.kulkarni@wdc.com>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens Axboe <axboe@kernel.dk> writes:
+On Tue, 2019-04-30 at 21:28 -0700, Chaitanya Kulkarni wrote:
++AD4 -+ACM-define BLKTRACESETUP32 +AF8-IOWR(0x12, 115, struct compat+AF8-blk+AF8-user+AF8-trace+AF8-setup)
++AD4 +-
++AD4 +-/+ACo XXX: temp work around for RFC +ACo-/
++AD4 +-+ACM-define BLKTRACESETUP32 +AF8-IOWR(0x13, 115, struct compat+AF8-blk+AF8-user+AF8-trace+AF8-setup)
 
-> Agree, I've cleaned it up, it was a bit of a mess.
+This change breaks user space so this change is not acceptable. I think you
+want to introduce a new ioctl instead of modifying an existing ioctl.
+Additionally, have you considered to split the blktrace+AF8-api.h header file
+into two header files: one with kernel-internal definitions and a second one
+with definitions that are shared with user space (include/uapi/...)?
 
-LGTM, thanks!
+Thanks,
 
--Jeff
+Bart.
