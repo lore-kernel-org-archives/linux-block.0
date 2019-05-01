@@ -2,178 +2,155 @@ Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E28EC43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 14:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4F2BC43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:09:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E281A208C3
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 14:45:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB46221670
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 15:09:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727027AbfEAOpX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 10:45:23 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:40072 "EHLO
-        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727054AbfEAOoz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 10:44:55 -0400
-Received: from Internal Mail-Server by MTLPINE2 (envelope-from talgi@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 1 May 2019 17:44:52 +0300
-Received: from gen-l-vrt-692.mtl.labs.mlnx (gen-l-vrt-692.mtl.labs.mlnx [10.141.69.20])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x41EiqNR019843;
-        Wed, 1 May 2019 17:44:52 +0300
-Received: from gen-l-vrt-692.mtl.labs.mlnx (localhost [127.0.0.1])
-        by gen-l-vrt-692.mtl.labs.mlnx (8.14.7/8.14.7) with ESMTP id x41EipUF036046;
-        Wed, 1 May 2019 17:44:52 +0300
-Received: (from talgi@localhost)
-        by gen-l-vrt-692.mtl.labs.mlnx (8.14.7/8.14.7/Submit) id x41EipXr036045;
-        Wed, 1 May 2019 17:44:51 +0300
-From:   Tal Gilboa <talgi@mellanox.com>
-To:     linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-Cc:     Yishai Hadas <yishaih@mellanox.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Doug Ledford <dledford@redhat.com>,
-        Tariq Toukan <tariqt@mellanox.com>,
-        Tal Gilboa <talgi@mellanox.com>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        Idan Burstein <idanb@mellanox.com>,
-        Yamin Friedman <yaminf@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH rdma-for-next 4/9] linux/dim: Rename net_dim_sample() to net_dim_create_sample()
-Date:   Wed,  1 May 2019 17:44:34 +0300
-Message-Id: <1556721879-35987-5-git-send-email-talgi@mellanox.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1556721879-35987-1-git-send-email-talgi@mellanox.com>
-References: <1556721879-35987-1-git-send-email-talgi@mellanox.com>
+        id S1726645AbfEAPJ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 11:09:26 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60714 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726515AbfEAPJZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 May 2019 11:09:25 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 38D97A78;
+        Wed,  1 May 2019 08:09:25 -0700 (PDT)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E9B6F3F719;
+        Wed,  1 May 2019 08:09:23 -0700 (PDT)
+Date:   Wed, 1 May 2019 16:09:21 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] io_uring: avoid page allocation warnings
+Message-ID: <20190501150921.GE11740@lakrids.cambridge.arm.com>
+References: <20190430132405.8268-1-mark.rutland@arm.com>
+ <20190430141810.GF13796@bombadil.infradead.org>
+ <20190430145938.GA8314@lakrids.cambridge.arm.com>
+ <a1af3017-6572-e828-dc8a-a5c8458e6b5a@kernel.dk>
+ <20190430170302.GD8314@lakrids.cambridge.arm.com>
+ <0bd395a0-e0d3-16a5-e29f-557e97782a48@kernel.dk>
+ <20190501103026.GA11740@lakrids.cambridge.arm.com>
+ <710a3048-ccab-260d-d8b7-1d51ff6d589d@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <710a3048-ccab-260d-d8b7-1d51ff6d589d@kernel.dk>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to avoid confusion between the function and the similarly
-named struct.
-In preparation for removing the 'net' prefix from dim members.
+On Wed, May 01, 2019 at 06:41:43AM -0600, Jens Axboe wrote:
+> On 5/1/19 4:30 AM, Mark Rutland wrote:
+> > On Tue, Apr 30, 2019 at 12:11:59PM -0600, Jens Axboe wrote:
+> >> On 4/30/19 11:03 AM, Mark Rutland wrote:
+> >>> I've just had a go at that, but when using kvmalloc() with or without
+> >>> GFP_KERNEL_ACCOUNT I hit OOM and my system hangs within a few seconds with the
+> >>> syzkaller prog below:
+> >>>
+> >>> ----
+> >>> Syzkaller reproducer:
+> >>> # {Threaded:false Collide:false Repeat:false RepeatTimes:0 Procs:1 Sandbox: Fault:false FaultCall:-1 FaultNth:0 EnableTun:false EnableNetDev:false EnableNetReset:false EnableCgroups:false EnableBinfmtMisc:false EnableCloseFds:false UseTmpDir:false HandleSegv:false Repro:false Trace:false}
+> >>> r0 = io_uring_setup(0x378, &(0x7f00000000c0))
+> >>> sendmsg$SEG6_CMD_SET_TUNSRC(0xffffffffffffffff, &(0x7f0000000240)={&(0x7f0000000000)={0x10, 0x0, 0x0, 0x40000000}, 0xc, 0x0, 0x1, 0x0, 0x0, 0x10}, 0x800)
+> >>> io_uring_register$IORING_REGISTER_BUFFERS(r0, 0x0, &(0x7f0000000000), 0x1)
+> >>> ----
+> >>>
+> >>> ... I'm a bit worried that opens up a trivial DoS.
+> >>>
+> >>> Thoughts?
+> >>
+> >> Can you post the patch you used?
+> > 
+> > Diff below.
+> 
+> And the reproducer, that was never posted.
 
-Signed-off-by: Tal Gilboa <talgi@mellanox.com>
----
- drivers/net/ethernet/broadcom/bcmsysport.c        | 4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt.c         | 8 ++++----
- drivers/net/ethernet/broadcom/genet/bcmgenet.c    | 4 ++--
- drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c | 6 ++----
- include/linux/dim.h                               | 8 ++++----
- include/linux/net_dim.h                           | 4 ++--
- 6 files changed, 16 insertions(+), 18 deletions(-)
+It was; the "Syzakller reproducer" above is the reproducer I used with
+syz-repro.
 
-diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
-index 480089f..7a41ec7 100644
---- a/drivers/net/ethernet/broadcom/bcmsysport.c
-+++ b/drivers/net/ethernet/broadcom/bcmsysport.c
-@@ -1028,8 +1028,8 @@ static int bcm_sysport_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	if (priv->dim.use_dim) {
--		net_dim_sample(priv->dim.event_ctr, priv->dim.packets,
--			       priv->dim.bytes, &dim_sample);
-+		net_dim_create_sample(priv->dim.event_ctr, priv->dim.packets,
-+				      priv->dim.bytes, &dim_sample);
- 		net_dim(&priv->dim.dim, dim_sample);
- 	}
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 21db503..1528620 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -2127,10 +2127,10 @@ static int bnxt_poll(struct napi_struct *napi, int budget)
- 	if (bp->flags & BNXT_FLAG_DIM) {
- 		struct net_dim_sample dim_sample;
- 
--		net_dim_sample(cpr->event_ctr,
--			       cpr->rx_packets,
--			       cpr->rx_bytes,
--			       &dim_sample);
-+		net_dim_create_sample(cpr->event_ctr,
-+				      cpr->rx_packets,
-+				      cpr->rx_bytes,
-+				      &dim_sample);
- 		net_dim(&cpr->dim, dim_sample);
- 	}
- 	mmiowb();
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index eee48da..8ab2d67 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -1909,8 +1909,8 @@ static int bcmgenet_rx_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	if (ring->dim.use_dim) {
--		net_dim_sample(ring->dim.event_ctr, ring->dim.packets,
--			       ring->dim.bytes, &dim_sample);
-+		net_dim_create_sample(ring->dim.event_ctr, ring->dim.packets,
-+				      ring->dim.bytes, &dim_sample);
- 		net_dim(&ring->dim.dim, dim_sample);
- 	}
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-index b4af5e1..6dd8202 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-@@ -53,8 +53,7 @@ static void mlx5e_handle_tx_dim(struct mlx5e_txqsq *sq)
- 	if (unlikely(!test_bit(MLX5E_SQ_STATE_AM, &sq->state)))
- 		return;
- 
--	net_dim_sample(sq->cq.event_ctr, stats->packets, stats->bytes,
--		       &dim_sample);
-+	net_dim_create_sample(sq->cq.event_ctr, stats->packets, stats->bytes, &dim_sample);
- 	net_dim(&sq->dim, dim_sample);
- }
- 
-@@ -66,8 +65,7 @@ static void mlx5e_handle_rx_dim(struct mlx5e_rq *rq)
- 	if (unlikely(!test_bit(MLX5E_RQ_STATE_AM, &rq->state)))
- 		return;
- 
--	net_dim_sample(rq->cq.event_ctr, stats->packets, stats->bytes,
--		       &dim_sample);
-+	net_dim_create_sample(rq->cq.event_ctr, stats->packets, stats->bytes, &dim_sample);
- 	net_dim(&rq->dim, dim_sample);
- }
- 
-diff --git a/include/linux/dim.h b/include/linux/dim.h
-index 67b80e9..2413021 100644
---- a/include/linux/dim.h
-+++ b/include/linux/dim.h
-@@ -149,10 +149,10 @@ static inline void dim_park_tired(struct net_dim *dim)
- 	dim->tune_state   = DIM_PARKING_TIRED;
- }
- 
--static inline void net_dim_sample(u16 event_ctr,
--				  u64 packets,
--				  u64 bytes,
--				  struct net_dim_sample *s)
-+static inline void net_dim_create_sample(u16 event_ctr,
-+					 u64 packets,
-+					 u64 bytes,
-+					 struct net_dim_sample *s)
- {
- 	s->time	     = ktime_get();
- 	s->pkt_ctr   = packets;
-diff --git a/include/linux/net_dim.h b/include/linux/net_dim.h
-index d90f96f..93c4e21 100644
---- a/include/linux/net_dim.h
-+++ b/include/linux/net_dim.h
-@@ -260,8 +260,8 @@ static inline void net_dim(struct net_dim *dim,
- 		}
- 		/* fall through */
- 	case DIM_START_MEASURE:
--		net_dim_sample(end_sample.event_ctr, end_sample.pkt_ctr, end_sample.byte_ctr,
--			       &dim->start_sample);
-+		net_dim_create_sample(end_sample.event_ctr, end_sample.pkt_ctr,
-+				      end_sample.byte_ctr, &dim->start_sample);
- 		dim->state = DIM_MEASURE_IN_PROGRESS;
- 		break;
- 	case DIM_APPLY_NEW_PROFILE:
--- 
-1.8.3.1
+I've manually minimized that to C below. AFAICT, that hits a leak, which
+is what's triggering the OOM after the program is run a number of times
+with the previously posted kvmalloc patch.
 
+Per /proc/meminfo, that memory isn't accounted anywhere.
+
+> Patch looks fine to me. Note
+> that buffer registration is under the protection of RLIMIT_MEMLOCK.
+> That's usually very limited for non-root, as root you can of course
+> consume as much as you want and OOM the system.
+
+Sure.
+
+As above, it looks like there's a leak, regardless.
+
+Thanks,
+Mark.
+
+---->8----
+#include <stdint.h>
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <linux/uio.h>
+
+// NOTE: arm64 syscall numbers
+#ifndef __NR_io_uring_register
+#define __NR_io_uring_register 427
+#endif
+#ifndef __NR_io_uring_setup
+#define __NR_io_uring_setup 425
+#endif
+
+#define __IORING_REGISTER_BUFFERS         0
+	
+struct __io_sqring_offsets {
+	uint32_t head;
+	uint32_t tail;
+	uint32_t ring_mask;
+	uint32_t ring_entries;
+	uint32_t flags;
+	uint32_t dropped;
+	uint32_t array;
+	uint32_t resv1;
+	uint64_t resv2;
+};
+
+struct __io_uring_params {
+	uint32_t sq_entries;
+	uint32_t cq_entries;
+	uint32_t flags;
+	uint32_t sq_thread_cpu;
+	uint32_t sq_thread_idle;
+	uint32_t resv[5];
+	struct __io_sqring_offsets sq_off;
+	struct __io_sqring_offsets cq_off;
+
+};
+
+static struct __io_uring_params params; 
+
+static struct iovec iov = {
+	.iov_base = (void *)0x10,
+	.iov_len  = 1024 * 1024 * 1024,
+};
+
+int main(void)
+{
+	int fd;
+
+	fd = syscall(__NR_io_uring_setup, 0x1, &params);
+	syscall(__NR_io_uring_register, fd, __IORING_REGISTER_BUFFERS, &iov, 1);
+
+	return 0;
+}
