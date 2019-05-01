@@ -2,33 +2,33 @@ Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EBD0C43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 14:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC87C04AA8
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 14:45:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 620D4208C3
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 14:45:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1295A208C3
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 14:45:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727089AbfEAOpW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 10:45:22 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:40074 "EHLO
+        id S1726730AbfEAOpX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 10:45:23 -0400
+Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:40071 "EHLO
         mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727051AbfEAOoz (ORCPT
+        with ESMTP id S1726978AbfEAOoz (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 10:44:55 -0400
 Received: from Internal Mail-Server by MTLPINE2 (envelope-from talgi@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 1 May 2019 17:44:51 +0300
+        with ESMTPS (AES256-SHA encrypted); 1 May 2019 17:44:50 +0300
 Received: from gen-l-vrt-692.mtl.labs.mlnx (gen-l-vrt-692.mtl.labs.mlnx [10.141.69.20])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x41EipEY019840;
-        Wed, 1 May 2019 17:44:51 +0300
+        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x41Eio47019828;
+        Wed, 1 May 2019 17:44:50 +0300
 Received: from gen-l-vrt-692.mtl.labs.mlnx (localhost [127.0.0.1])
-        by gen-l-vrt-692.mtl.labs.mlnx (8.14.7/8.14.7) with ESMTP id x41EipQa036044;
-        Wed, 1 May 2019 17:44:51 +0300
+        by gen-l-vrt-692.mtl.labs.mlnx (8.14.7/8.14.7) with ESMTP id x41Eioqa036036;
+        Wed, 1 May 2019 17:44:50 +0300
 Received: (from talgi@localhost)
-        by gen-l-vrt-692.mtl.labs.mlnx (8.14.7/8.14.7/Submit) id x41EipeW036043;
-        Wed, 1 May 2019 17:44:51 +0300
+        by gen-l-vrt-692.mtl.labs.mlnx (8.14.7/8.14.7/Submit) id x41Eig0o036035;
+        Wed, 1 May 2019 17:44:42 +0300
 From:   Tal Gilboa <talgi@mellanox.com>
 To:     linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org
@@ -42,245 +42,133 @@ Cc:     Yishai Hadas <yishaih@mellanox.com>,
         Idan Burstein <idanb@mellanox.com>,
         Yamin Friedman <yaminf@mellanox.com>,
         Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH rdma-for-next 3/9] linux/dim: Rename externally exposed macros
-Date:   Wed,  1 May 2019 17:44:33 +0300
-Message-Id: <1556721879-35987-4-git-send-email-talgi@mellanox.com>
+Subject: [PATCH rdma-for-next 0/9] drivers/infiniband: Introduce rdma_dim
+Date:   Wed,  1 May 2019 17:44:30 +0300
+Message-Id: <1556721879-35987-1-git-send-email-talgi@mellanox.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1556721879-35987-1-git-send-email-talgi@mellanox.com>
-References: <1556721879-35987-1-git-send-email-talgi@mellanox.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Renamed macros in use by external drivers.
+net_dim.h lib exposes an implementation of the DIM algorithm for dynamically-tuned interrupt
+moderation for networking interfaces.
 
-Signed-off-by: Tal Gilboa <talgi@mellanox.com>
----
- drivers/net/ethernet/broadcom/bcmsysport.c        |  4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt.c         |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c     |  2 +-
- drivers/net/ethernet/broadcom/genet/bcmgenet.c    |  4 ++--
- drivers/net/ethernet/mellanox/mlx5/core/en_dim.c  |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 10 +++++-----
- include/linux/dim.h                               | 12 ++++++------
- include/linux/net_dim.h                           | 18 +++++++++---------
- 8 files changed, 27 insertions(+), 27 deletions(-)
+We want a similar functionality for RDMA. The main motivation is to benefit from maximized
+completion rate and reduced interrupt overhead that DIM may provide.
 
-diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
-index bc3ac36..480089f 100644
---- a/drivers/net/ethernet/broadcom/bcmsysport.c
-+++ b/drivers/net/ethernet/broadcom/bcmsysport.c
-@@ -1108,7 +1108,7 @@ static void bcm_sysport_dim_work(struct work_struct *work)
- 			net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
+Current DIM implementation prioritizes reducing interrupt overhead over latency. Also, in
+order to reduce DIM's own overhead, the algorithm might take take some time to identify it
+needs to change profiles. For these reasons we got to the understanding that a slightly
+modified algorithm is needed. Early tests with current implementation show it doesn't react
+fast and sharply enough in order to satisfy the RDMA CQ needs.
+
+I would like to suggest an implementation for RDMA DIM. The idea is to expose the new
+functionality without the risk of breaking Net DIM behavior for netdev. Below are main
+similarities and differences between the two implementations and general guidelines for the
+suggested solution.
+
+Performance improvement (ConnectX-5 100GbE, x86) running FIO benchmark over
+NVMf between two equal end-hosts with 56 cores across a Mellanox switch
+using null_blk device:
+
+READS without DIM:
+blk size | BW       | IOPS | 99th percentile latency  | 99.99th latency
+512B     | 3.8GiB/s | 7.7M | 1401  usec               | 2442  usec
+4k       | 7.0GiB/s | 1.8M | 4817  usec               | 6587  usec
+64k      | 10.7GiB/s| 175k | 9896  usec               | 10028 usec
+
+IO WRITES without DIM:
+blk size | BW       | IOPS | 99th percentile latency  | 99.99th latency
+512B     | 3.6GiB/s | 7.5M | 1434  usec               | 2474  usec
+4k       | 6.3GiB/s | 1.6M | 938   usec               | 1221  usec
+64k      | 10.7GiB/s| 175k | 8979  usec               | 12780 usec
+
+IO READS with DIM:
+blk size | BW       | IOPS | 99th percentile latency  | 99.99th latency
+512B     | 4GiB/s   | 8.2M | 816    usec              | 889   usec
+4k       | 10.1GiB/s| 2.65M| 3359   usec              | 5080  usec
+64k      | 10.7GiB/s| 175k | 9896   usec              | 10028 usec
+
+IO WRITES with DIM:
+blk size | BW       | IOPS  | 99th percentile latency | 99.99th latency
+512B     | 3.9GiB/s | 8.1M  | 799   usec              | 922   usec
+4k       | 9.6GiB/s | 2.5M  | 717   usec              | 1004  usec
+64k      | 10.7GiB/s| 176k  | 8586  usec              | 12256 usec
+
+Common logic, main DIM procedure:
+- Calculate current stats from a given sample
+- Compare current stats vs. previous iteration stats
+- Make a decision -> choose a new profile
+
+Differences:
+- Different parameters for moving between profiles
+- Different moderation values and number of profiles
+- Different sampled data
+
+Suggested solution:
+- Common logic will be declared in include/linux/dim.h and implemented in lib/dim/dim.c
+- Net DIM (existing) logic will be declared in include/linux/net_dim.h and implemented in
+  lib/dim/net_dim.c, which will use the common logic from dim.h
+- RDMA DIM logic will be declared in /include/linux/rdma_dim.h and implemented in
+  lib/dim/rdma_dim.c.
+  This new implementation will expose modified versions of profiles, dim_step() and dim_decision()
+
+Pros for this solution are:
+- Zero impact on existing net_dim implementation and usage
+- Relatively more code reuse (compared to two separate solutions)
+- Readiness for future implementations
  
- 	bcm_sysport_set_rx_coalesce(priv, cur_profile.usec, cur_profile.pkts);
--	dim->state = NET_DIM_START_MEASURE;
-+	dim->state = DIM_START_MEASURE;
- }
- 
- /* RX and misc interrupt routine */
-@@ -1460,7 +1460,7 @@ static void bcm_sysport_init_dim(struct bcm_sysport_priv *priv,
- 	struct bcm_sysport_net_dim *dim = &priv->dim;
- 
- 	INIT_WORK(&dim->dim.work, cb);
--	dim->dim.mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+	dim->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
- 	dim->event_ctr = 0;
- 	dim->packets = 0;
- 	dim->bytes = 0;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 4c586ba..21db503 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -7703,7 +7703,7 @@ static void bnxt_enable_napi(struct bnxt *bp)
- 
- 		if (bp->bnapi[i]->rx_ring) {
- 			INIT_WORK(&cpr->dim.work, bnxt_dim_work);
--			cpr->dim.mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+			cpr->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
- 		}
- 		napi_enable(&bp->bnapi[i]->napi);
- 	}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c
-index afa97c8..16a4588 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c
-@@ -28,5 +28,5 @@ void bnxt_dim_work(struct work_struct *work)
- 	cpr->rx_ring_coal.coal_bufs = cur_moder.pkts;
- 
- 	bnxt_hwrm_set_ring_coal(bnapi->bp, bnapi);
--	dim->state = NET_DIM_START_MEASURE;
-+	dim->state = DIM_START_MEASURE;
- }
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 983245c..eee48da 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -1928,7 +1928,7 @@ static void bcmgenet_dim_work(struct work_struct *work)
- 			net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
- 
- 	bcmgenet_set_rx_coalesce(ring, cur_profile.usec, cur_profile.pkts);
--	dim->state = NET_DIM_START_MEASURE;
-+	dim->state = DIM_START_MEASURE;
- }
- 
- /* Assign skb to RX DMA descriptor. */
-@@ -2085,7 +2085,7 @@ static void bcmgenet_init_dim(struct bcmgenet_rx_ring *ring,
- 	struct bcmgenet_net_dim *dim = &ring->dim;
- 
- 	INIT_WORK(&dim->dim.work, cb);
--	dim->dim.mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+	dim->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
- 	dim->event_ctr = 0;
- 	dim->packets = 0;
- 	dim->bytes = 0;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c b/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c
-index d67adf7..a80303a 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c
-@@ -38,7 +38,7 @@
- 			struct mlx5_core_dev *mdev, struct mlx5_core_cq *mcq)
- {
- 	mlx5_core_modify_cq_moderation(mdev, mcq, moder.usec, moder.pkts);
--	dim->state = NET_DIM_START_MEASURE;
-+	dim->state = DIM_START_MEASURE;
- }
- 
- void mlx5e_rx_dim_work(struct work_struct *work)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index b5fdbd3..589ecef 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -681,11 +681,11 @@ static int mlx5e_alloc_rq(struct mlx5e_channel *c,
- 
- 	switch (params->rx_cq_moderation.cq_period_mode) {
- 	case MLX5_CQ_PERIOD_MODE_START_FROM_CQE:
--		rq->dim.mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_CQE;
-+		rq->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_CQE;
- 		break;
- 	case MLX5_CQ_PERIOD_MODE_START_FROM_EQE:
- 	default:
--		rq->dim.mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+		rq->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
- 	}
- 
- 	rq->page_cache.head = 0;
-@@ -2238,7 +2238,7 @@ static void mlx5e_build_ico_cq_param(struct mlx5e_priv *priv,
- 
- 	mlx5e_build_common_cq_param(priv, param);
- 
--	param->cq_period_mode = NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+	param->cq_period_mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
- }
- 
- static void mlx5e_build_icosq_param(struct mlx5e_priv *priv,
-@@ -4485,8 +4485,8 @@ static struct net_dim_cq_moder mlx5e_get_def_rx_moderation(u8 cq_period_mode)
- static u8 mlx5_to_net_dim_cq_period_mode(u8 cq_period_mode)
- {
- 	return cq_period_mode == MLX5_CQ_PERIOD_MODE_START_FROM_CQE ?
--		NET_DIM_CQ_PERIOD_MODE_START_FROM_CQE :
--		NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+		DIM_CQ_PERIOD_MODE_START_FROM_CQE :
-+		DIM_CQ_PERIOD_MODE_START_FROM_EQE;
- }
- 
- void mlx5e_set_tx_cq_mode_params(struct mlx5e_params *params, u8 cq_period_mode)
-diff --git a/include/linux/dim.h b/include/linux/dim.h
-index e5e3d0cf..67b80e9 100644
---- a/include/linux/dim.h
-+++ b/include/linux/dim.h
-@@ -74,15 +74,15 @@ struct net_dim { /* Dynamic Interrupt Moderation */
- };
- 
- enum {
--	NET_DIM_CQ_PERIOD_MODE_START_FROM_EQE = 0x0,
--	NET_DIM_CQ_PERIOD_MODE_START_FROM_CQE = 0x1,
--	NET_DIM_CQ_PERIOD_NUM_MODES
-+	DIM_CQ_PERIOD_MODE_START_FROM_EQE = 0x0,
-+	DIM_CQ_PERIOD_MODE_START_FROM_CQE = 0x1,
-+	DIM_CQ_PERIOD_NUM_MODES
- };
- 
- enum {
--	NET_DIM_START_MEASURE,
--	NET_DIM_MEASURE_IN_PROGRESS,
--	NET_DIM_APPLY_NEW_PROFILE,
-+	DIM_START_MEASURE,
-+	DIM_MEASURE_IN_PROGRESS,
-+	DIM_APPLY_NEW_PROFILE,
- };
- 
- enum {
-diff --git a/include/linux/net_dim.h b/include/linux/net_dim.h
-index 3d9a2ff..d90f96f 100644
---- a/include/linux/net_dim.h
-+++ b/include/linux/net_dim.h
-@@ -78,13 +78,13 @@
- }
- 
- static const struct net_dim_cq_moder
--rx_profile[NET_DIM_CQ_PERIOD_NUM_MODES][NET_DIM_PARAMS_NUM_PROFILES] = {
-+rx_profile[DIM_CQ_PERIOD_NUM_MODES][NET_DIM_PARAMS_NUM_PROFILES] = {
- 	NET_DIM_RX_EQE_PROFILES,
- 	NET_DIM_RX_CQE_PROFILES,
- };
- 
- static const struct net_dim_cq_moder
--tx_profile[NET_DIM_CQ_PERIOD_NUM_MODES][NET_DIM_PARAMS_NUM_PROFILES] = {
-+tx_profile[DIM_CQ_PERIOD_NUM_MODES][NET_DIM_PARAMS_NUM_PROFILES] = {
- 	NET_DIM_TX_EQE_PROFILES,
- 	NET_DIM_TX_CQE_PROFILES,
- };
-@@ -101,7 +101,7 @@
- static inline struct net_dim_cq_moder
- net_dim_get_def_rx_moderation(u8 cq_period_mode)
- {
--	u8 profile_ix = cq_period_mode == NET_DIM_CQ_PERIOD_MODE_START_FROM_CQE ?
-+	u8 profile_ix = cq_period_mode == DIM_CQ_PERIOD_MODE_START_FROM_CQE ?
- 			NET_DIM_DEF_PROFILE_CQE : NET_DIM_DEF_PROFILE_EQE;
- 
- 	return net_dim_get_rx_moderation(cq_period_mode, profile_ix);
-@@ -119,7 +119,7 @@
- static inline struct net_dim_cq_moder
- net_dim_get_def_tx_moderation(u8 cq_period_mode)
- {
--	u8 profile_ix = cq_period_mode == NET_DIM_CQ_PERIOD_MODE_START_FROM_CQE ?
-+	u8 profile_ix = cq_period_mode == DIM_CQ_PERIOD_MODE_START_FROM_CQE ?
- 			NET_DIM_DEF_PROFILE_CQE : NET_DIM_DEF_PROFILE_EQE;
- 
- 	return net_dim_get_tx_moderation(cq_period_mode, profile_ix);
-@@ -246,7 +246,7 @@ static inline void net_dim(struct net_dim *dim,
- 	u16 nevents;
- 
- 	switch (dim->state) {
--	case NET_DIM_MEASURE_IN_PROGRESS:
-+	case DIM_MEASURE_IN_PROGRESS:
- 		nevents = BIT_GAP(BITS_PER_TYPE(u16),
- 				  end_sample.event_ctr,
- 				  dim->start_sample.event_ctr);
-@@ -254,17 +254,17 @@ static inline void net_dim(struct net_dim *dim,
- 			break;
- 		dim_calc_stats(&dim->start_sample, &end_sample, &curr_stats);
- 		if (net_dim_decision(&curr_stats, dim)) {
--			dim->state = NET_DIM_APPLY_NEW_PROFILE;
-+			dim->state = DIM_APPLY_NEW_PROFILE;
- 			schedule_work(&dim->work);
- 			break;
- 		}
- 		/* fall through */
--	case NET_DIM_START_MEASURE:
-+	case DIM_START_MEASURE:
- 		net_dim_sample(end_sample.event_ctr, end_sample.pkt_ctr, end_sample.byte_ctr,
- 			       &dim->start_sample);
--		dim->state = NET_DIM_MEASURE_IN_PROGRESS;
-+		dim->state = DIM_MEASURE_IN_PROGRESS;
- 		break;
--	case NET_DIM_APPLY_NEW_PROFILE:
-+	case DIM_APPLY_NEW_PROFILE:
- 		break;
- 	}
- }
+Tal Gilboa (6):
+  linux/dim: Move logic to dim.h
+  linux/dim: Remove "net" prefix from internal DIM members
+  linux/dim: Rename externally exposed macros
+  linux/dim: Rename net_dim_sample() to net_dim_create_sample()
+  linux/dim: Rename externally used net_dim members
+  linux/dim: Move implementation to .c files
+
+Yamin Friedman (3):
+  linux/dim: Add completions count to dim_sample
+  linux/dim: Implement rdma_dim
+  drivers/infiniband: Use rdma_dim in infiniband driver
+
+ MAINTAINERS                                        |   3 +
+ drivers/infiniband/core/cq.c                       |  79 ++++-
+ drivers/infiniband/hw/mlx4/qp.c                    |   2 +-
+ drivers/infiniband/hw/mlx5/qp.c                    |   2 +-
+ drivers/net/ethernet/broadcom/bcmsysport.c         |  20 +-
+ drivers/net/ethernet/broadcom/bcmsysport.h         |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          |  13 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h          |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c  |   4 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c      |   7 +-
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c     |  18 +-
+ drivers/net/ethernet/broadcom/genet/bcmgenet.h     |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h       |   8 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_dim.c   |  12 +-
+ .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |  22 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c  |  12 +-
+ include/linux/dim.h                                | 126 ++++++++
+ include/linux/irq_poll.h                           |   5 +
+ include/linux/net_dim.h                            | 338 +--------------------
+ include/linux/rdma_dim.h                           |  57 ++++
+ include/rdma/ib_verbs.h                            |  54 +++-
+ lib/Kconfig                                        |   7 +
+ lib/Makefile                                       |   1 +
+ lib/dim/Makefile                                   |  14 +
+ lib/dim/dim.c                                      |  94 ++++++
+ lib/dim/net_dim.c                                  | 191 ++++++++++++
+ lib/dim/rdma_dim.c                                 | 161 ++++++++++
+ lib/irq_poll.c                                     |  15 +-
+ 29 files changed, 872 insertions(+), 403 deletions(-)
+ create mode 100644 include/linux/dim.h
+ create mode 100644 include/linux/rdma_dim.h
+ create mode 100644 lib/dim/Makefile
+ create mode 100644 lib/dim/dim.c
+ create mode 100644 lib/dim/net_dim.c
+ create mode 100644 lib/dim/rdma_dim.c
+
 -- 
 1.8.3.1
 
