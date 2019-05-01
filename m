@@ -2,97 +2,62 @@ Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.3 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CD04C43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 13:40:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B17D5C43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 13:47:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB65821734
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 13:40:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CB9120866
+	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 13:47:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="wgOPwZAY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hzclDxb5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726382AbfEANkW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 09:40:22 -0400
-Received: from mail.stbuehler.de ([5.9.32.208]:35830 "EHLO mail.stbuehler.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726010AbfEANkW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 May 2019 09:40:22 -0400
-Received: from [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6] (unknown [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6])
-        by mail.stbuehler.de (Postfix) with ESMTPSA id AD93BC02E1E;
-        Wed,  1 May 2019 13:40:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=stbuehler.de;
-        s=stbuehler1; t=1556718020;
-        bh=e5p92AxqIQaOpAeZxR0jM3IKHXBVCh83bkoLGhP+Xys=;
-        h=Subject:To:References:From:Date:In-Reply-To:From;
-        b=wgOPwZAYDECjiiNiuG21bj2zVr/9GsU9AfHB5HPVNTtVSXbo3ZELIz88hg266n+42
-         6Ww7uoq6QAlGh+Ja4qclga3wRCw10FA0ZurdXRnJ8XJkgntzhi5qKbokQlfuWSsZ1I
-         DaIQOu5cwIJHRFeFcthLFhFJaCvO2dlM1Um9O0hY=
-Subject: Re: [PATCH v1 1/1] [io_uring] require RWF_HIPRI for iopoll reads and
- writes
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-References: <20190501115223.13296-1-source@stbuehler.de>
- <628e59c6-716f-5af3-c1dc-bf5cb9003105@kernel.dk>
-From:   =?UTF-8?Q?Stefan_B=c3=bchler?= <source@stbuehler.de>
-Message-ID: <3173f400-8efd-ec9a-6821-797a360e0c7c@stbuehler.de>
-Date:   Wed, 1 May 2019 15:40:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726165AbfEANrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 09:47:04 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:33902 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726101AbfEANrE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 09:47:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=hzclDxb5EBcv1GyYB5FBae4H9
+        5I4PSmO2tOGCBhJzQzJoWNpG1bJY3ZoDpt8X799OLnZe8tOMMHHpgkVaxaEv8CGHcgyOizQKy3qaO
+        RS7fJRzMu9b5XmeBdkRoSUo3xrG7WQ+B1N/zo1uWuy692jIhMvRUC+y7z5nyixuM5ifVbsgrWgyly
+        N1D2Av7G+DdvbKQi+vPnnRxYXItpvAQ5jsgXlxuV4/pS4GsVTObPV8ar6m9ZvOweqsrNOnEEoxy/p
+        PJEUFqcHuq4dO/8YU0EI1bQQSN7lC8PeWeQx1D2iZRHgV5E9DKWQYrXkI0JFb8nyMbkvg+VDiI37+
+        bVnRHc8Iw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hLpZU-0006Hp-A2; Wed, 01 May 2019 13:46:52 +0000
+Date:   Wed, 1 May 2019 06:46:52 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Kozub <zub@linux.fjfi.cvut.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Jonathan Derrick <jonathan.derrick@intel.com>,
+        Scott Bauer <sbauer@plzdonthack.me>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Subject: Re: [PATCH 1/3] block: sed-opal: add ioctl for done-mark of shadow
+ mbr
+Message-ID: <20190501134652.GA24132@infradead.org>
+References: <1556666459-17948-1-git-send-email-zub@linux.fjfi.cvut.cz>
+ <1556666459-17948-2-git-send-email-zub@linux.fjfi.cvut.cz>
 MIME-Version: 1.0
-In-Reply-To: <628e59c6-716f-5af3-c1dc-bf5cb9003105@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1556666459-17948-2-git-send-email-zub@linux.fjfi.cvut.cz>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Looks good,
 
-On 01.05.19 14:43, Jens Axboe wrote:
-> On 5/1/19 5:52 AM, Stefan Bühler wrote:
->> This makes the mapping RWF_HIPRI <-> IOCB_HIPRI <-> iopoll more
->> consistent; it also allows supporting iopoll operations without
->> IORING_SETUP_IOPOLL in the future.
-> 
-> I don't want to make this change now. Additionally, it's never
-> going to be possible to support polled IO mixed with non-polled
-> IO on an io_uring instance, as that makes the wait part of IO
-> impossible to support without adding tracking of requests.
-> 
-> As we can never mix them, it doesn't make a lot of sense to
-> request RWF_HIPRI for polled IO.
-
-I'm not just new to memory ordering, I'm also new to kernel internals :)
-
-To me it looks like iopoll is basically a busy-loop interface; it helps
-making things move forward more quickly, while they still might (or
-might not) finish on their own.
-
-And io_do_iopoll simply loops over all requests and runs a single
-iteration for them, or, if there is only one request
-("!poll_multi_file"), it tells it to spin internally.
-
-While there are multiple requests it can't spin in a single request
-anyway, and I don't see why it couldn't also check for completion of
-non-polled requests after looping over the polled requests (whether by
-only checking the CQ tail or actively tracking (why would that be bad?)
-the requests some other way).  This only means that as long there are
-non-polled requests pending it mustn't spin in a single request.
-
-And if there are no polled-requests at all it could use io_cqring_wait.
-
-So I don't see why it would be impossible to mix polled and non-polled
-IO requests.
-
-Any hints what I'm missing here?
-
-(Even if it turns out to be impossible I still think requiring RWF_HIPRI
-would be the right way, but well...)
-
-cheers,
-Stefan
+Reviewed-by: Christoph Hellwig <hch@lst.de>
