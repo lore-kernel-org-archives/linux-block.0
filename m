@@ -2,92 +2,119 @@ Return-Path: <SRS0=ouS0=TC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	T_DKIMWL_WL_HIGH,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BA30C43219
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 16:03:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E23CAC43219
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 17:44:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 87D972075E
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 16:03:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B64BA20675
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 17:44:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="im1U7FIJ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="cqgrzXd2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726321AbfEBQD3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 May 2019 12:03:29 -0400
-Received: from mailgw2.fjfi.cvut.cz ([147.32.9.131]:56862 "EHLO
-        mailgw2.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726197AbfEBQD3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 May 2019 12:03:29 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mailgw2.fjfi.cvut.cz (Postfix) with ESMTP id E6BA9A028C;
-        Thu,  2 May 2019 18:03:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1556813006; i=@fjfi.cvut.cz;
-        bh=2Ze/HvAXhuoo8WdLZh8zGvvHYRFvuAlI1idx06EoKYs=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References;
-        b=im1U7FIJLWrHdHCEcXz6YTIex6F4oGahKzL0yTY/Q4FEsBI2hg8JWui9AX3HjQjIp
-         yMm1ZI8ft3U01gwWNKyBJI1GpTFO2NI+h54UU8AFDZzYFDq9Bm1vopDNoZVZk4JlGo
-         Axo2NJmLnx3/Pk437lKY/iHiQWk2JMmxMBo4WjSA=
-X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
-Received: from mailgw2.fjfi.cvut.cz ([127.0.0.1])
-        by localhost (mailgw2.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id z1d07Ym63AVr; Thu,  2 May 2019 18:03:23 +0200 (CEST)
-Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mailgw2.fjfi.cvut.cz (Postfix) with ESMTPS id 73CFEA0264;
-        Thu,  2 May 2019 18:03:23 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw2.fjfi.cvut.cz 73CFEA0264
-Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 4123A6004D; Thu,  2 May 2019 18:03:23 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by linux.fjfi.cvut.cz (Postfix) with ESMTP id 1A15D6002A;
-        Thu,  2 May 2019 18:03:23 +0200 (CEST)
-Date:   Thu, 2 May 2019 18:03:23 +0200 (CEST)
-From:   David Kozub <zub@linux.fjfi.cvut.cz>
-To:     Scott Bauer <sbauer@plzdonthack.me>
-cc:     Jens Axboe <axboe@kernel.dk>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: Re: [PATCH 0/3] block: sed-opal: add support for shadow MBR done
- flag and write
-In-Reply-To: <20190502123036.GA4657@hacktheplanet>
-Message-ID: <alpine.LRH.2.21.1905021749060.929@linux.fjfi.cvut.cz>
-References: <1556666459-17948-1-git-send-email-zub@linux.fjfi.cvut.cz> <20190502123036.GA4657@hacktheplanet>
-User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
+        id S1726360AbfEBRoP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 May 2019 13:44:15 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:39936 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726350AbfEBRoO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 May 2019 13:44:14 -0400
+Received: by mail-pf1-f194.google.com with SMTP id u17so1478084pfn.7
+        for <linux-block@vger.kernel.org>; Thu, 02 May 2019 10:44:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qaxzxxOXmSYT43huW/8pQz+RgmKXstrPXGFCyBXfTWk=;
+        b=cqgrzXd22XU7oynLzRW6hQwwNgI0uX4uZoJ5Nti7TAvN4spfZmEnvLTyIOli1Cn/A8
+         Xeff5jxuWRF+JWT47q7vsCd2uuXLZ8ZkeE7ECEJLdxbexh1UokS/mQenczvm+HyG8cbv
+         repRb03fjAWAygyiix0+kr0tjv2K6ITVjOrxI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qaxzxxOXmSYT43huW/8pQz+RgmKXstrPXGFCyBXfTWk=;
+        b=QuSIk7AH5n+/6byHZk0Lj+UJr3VEqNhXJg4K6Y6XuBpltz3wZfYKINhoHseqiFgR3P
+         VDe9QDasmGwcjO5AInwxYJV9LTMaeePcLLmIKu2TGy7soKm/VAVuZGvDyzqwiCWq0V62
+         AbPNpH1PJ+C7rWg00QUywWOKBdc5lXKntEmaYCCGHVEIRRhv7InnP1fcS8SdVHdA4inT
+         Uv7r87q4o1lw+8FQw4zSNEmiARj/3TRUHbtrHKcaoGxedjpq5vEE1nOp609iCEd/WIdk
+         O/QjCeSFO1EmdugUzPx0HG+dAAKCtD4vU8i1HckmaT7hac/0HoMndw4vsKtO5gbJicCZ
+         EArg==
+X-Gm-Message-State: APjAAAUwmtC274MpG3uZ+Z2auDa7aMzg8xEwJHcciuaGt+KA2ASmIbwv
+        Sgb4+RtDLBGKNZWVWk/nOAcB3A==
+X-Google-Smtp-Source: APXvYqzrJ6y6SKQc3knz6JDorZCyQr9RqOoaV0+6FdEhc0QwUPEk8j7/6yaSHyOh8xQOkiSESj/0vg==
+X-Received: by 2002:a63:e451:: with SMTP id i17mr5358153pgk.312.1556819054100;
+        Thu, 02 May 2019 10:44:14 -0700 (PDT)
+Received: from evgreen2.mtv.corp.google.com ([2620:15c:202:201:ffda:7716:9afc:1301])
+        by smtp.gmail.com with ESMTPSA id w38sm48319600pgk.90.2019.05.02.10.44.12
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Thu, 02 May 2019 10:44:13 -0700 (PDT)
+From:   Evan Green <evgreen@chromium.org>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Martin K Petersen <martin.petersen@oracle.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Gwendal Grignou <gwendal@chromium.org>,
+        Alexis Savery <asavery@chromium.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Evan Green <evgreen@chromium.org>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v4 0/2] loop: Better discard for block devices
+Date:   Thu,  2 May 2019 10:44:07 -0700
+Message-Id: <20190502174409.74623-1-evgreen@chromium.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2 May 2019, Scott Bauer wrote:
+This series addresses some errors seen when using the loop
+device directly backed by a block device. The first change plumbs
+out the correct error message, and the second change prevents the
+error from occurring in many cases.
 
-> On Wed, May 01, 2019 at 01:20:56AM +0200, David Kozub wrote:
->>
->> Jonas Rabenstein (3):
->>   block: sed-opal: add ioctl for done-mark of shadow mbr
->>   block: sed-opal: ioctl for writing to shadow mbr
->>   block: sed-opal: check size of shadow mbr
->>
->>  block/opal_proto.h            |  16 ++++
->>  block/sed-opal.c              | 160 +++++++++++++++++++++++++++++++++-
->>  include/linux/sed-opal.h      |   2 +
->>  include/uapi/linux/sed-opal.h |  20 +++++
->>  4 files changed, 196 insertions(+), 2 deletions(-)
->>
->
-> I'll review this over the weekend. Is this essentially the same thing
-> we reviewed a month or two ago or are there little differences due to
-> it be split across two different series?
+The errors look like this:
+[   90.880875] print_req_error: I/O error, dev loop5, sector 0
 
-The first patch (block: sed-opal: add ioctl for done-mark of shadow mbr) 
-is a bit different because a new struct and enum were introduced. The rest 
-is pretty much the same. That's also why I kept the reviewd-by tags.
+The errors occur when trying to do a discard or write zeroes operation
+on a loop device backed by a block device that does not support write zeroes.
+Firstly, the error itself is incorrectly reported as I/O error, but is
+actually EOPNOTSUPP. The first patch plumbs out EOPNOTSUPP to properly
+report the error.
 
-Best regards,
-David
+The second patch prevents these errors from occurring by mirroring the
+zeroing capabilities of the underlying block device into the loop device.
+Before this change, discard was always reported as being supported, and
+the loop device simply turns around and does an fallocate operation on the
+backing device. After this change, backing block devices that do support
+zeroing will continue to work as before, and continue to get all the
+benefits of doing that. Backing devices that do not support zeroing will
+fail earlier, avoiding hitting the loop device at all and ultimately
+avoiding this error in the logs.
+
+I can also confirm that this fixes test block/003 in the blktests, when
+running blktests on a loop device backed by a block device.
+
+
+Changes in v4:
+- Mirror blkdev's write_zeroes into loopdev's discard_sectors.
+
+Changes in v3:
+- Updated tags
+- Updated commit description
+
+Changes in v2:
+- Unnested error if statement (Bart)
+
+Evan Green (2):
+  loop: Report EOPNOTSUPP properly
+  loop: Better discard support for block devices
+
+ drivers/block/loop.c | 66 +++++++++++++++++++++++++++++---------------
+ 1 file changed, 44 insertions(+), 22 deletions(-)
+
+-- 
+2.20.1
+
