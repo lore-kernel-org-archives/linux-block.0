@@ -3,121 +3,165 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 833ADC43219
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 03:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63F69C43219
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 08:27:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F62D2081C
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 03:49:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2869A2089E
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 08:27:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZPxLWVQN";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="W93rxw1I"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="IDpnpA8P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726203AbfEBDtz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 23:49:55 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:30010 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726202AbfEBDtz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 23:49:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1556768995; x=1588304995;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=ZMHDQCOpxOsMV2yWF/D0PgLhArRn9gaDQuz8shUXnac=;
-  b=ZPxLWVQNYmuIS4/tbjNrVtuPza+EH9+8UsSsCYabO0nPHj3XQxBdWEd5
-   6qwc+I5HGdrKvfBwixECg99XKxtOAV/kPQHemGcivYSqZcG08K981Y21C
-   1q062s8jKQVj1qFvSU3B7CoM+0V/bb00U9bGMQHxwC5Lq5HhVoRNUfXc1
-   Gz4/+9gD1PIvGRiTT5MNxIgdjy+6UI6F1QKgBAWWvnA4P2+AqWR1mEjK2
-   vhgZMaJOZzW51YGffny2w1XLvOF3SYlVANO9dF3DlP6Skb4PsE7EjG9NC
-   L/0GrajxdTQrGc39afAJbiLQdsdsGTbhxnKW0V7jmO/tjNP5ySFQw9EPs
-   w==;
-X-IronPort-AV: E=Sophos;i="5.60,420,1549900800"; 
-   d="scan'208";a="107317554"
-Received: from mail-co1nam04lp2051.outbound.protection.outlook.com (HELO NAM04-CO1-obe.outbound.protection.outlook.com) ([104.47.45.51])
-  by ob1.hgst.iphmx.com with ESMTP; 02 May 2019 11:49:54 +0800
+        id S1726466AbfEBI1m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 May 2019 04:27:42 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:45008 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726159AbfEBI1k (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 May 2019 04:27:40 -0400
+Received: by mail-ed1-f66.google.com with SMTP id b8so1311670edm.11
+        for <linux-block@vger.kernel.org>; Thu, 02 May 2019 01:27:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=arU1FwxTx3/FaDASJRyg1EwXmom5TcToDrJArlnkCUA=;
- b=W93rxw1IH/Rjmhf7d/U6+pDg4xcID2LSoouBf2iIFIS8hnfEiuAxkyT329vop64epOY1B189DB3y8fkxCcOSuRQczr5j6ladR39hl1UQjf5gaJ0mduplZ92YakgDw/Wg795Oh+kZPb3CFqhm9yq2VIGOaVbTEvmaJdNIRXqNbt4=
-Received: from SN6PR04MB4527.namprd04.prod.outlook.com (52.135.120.25) by
- SN6PR04MB3824.namprd04.prod.outlook.com (52.135.81.33) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1856.10; Thu, 2 May 2019 03:49:53 +0000
-Received: from SN6PR04MB4527.namprd04.prod.outlook.com
- ([fe80::c4f:1604:178c:d974]) by SN6PR04MB4527.namprd04.prod.outlook.com
- ([fe80::c4f:1604:178c:d974%5]) with mapi id 15.20.1835.018; Thu, 2 May 2019
- 03:49:53 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [RFC PATCH 02/18] blktrace: add more definitions for BLK_TC_ACT
-Thread-Topic: [RFC PATCH 02/18] blktrace: add more definitions for BLK_TC_ACT
-Thread-Index: AQHU/9ZflYOKr2HcfEmIiXJzp7+3Bg==
-Date:   Thu, 2 May 2019 03:49:53 +0000
-Message-ID: <SN6PR04MB45274C5A0187537F4DAEDAE086340@SN6PR04MB4527.namprd04.prod.outlook.com>
-References: <20190501042831.5313-1-chaitanya.kulkarni@wdc.com>
- <20190501042831.5313-3-chaitanya.kulkarni@wdc.com>
- <20190501123104.GA17987@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.44.250]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 252aecfc-1786-4b1d-4422-08d6ceb13c6f
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:SN6PR04MB3824;
-x-ms-traffictypediagnostic: SN6PR04MB3824:
-wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <SN6PR04MB38248F0C3B8D2E73846FC67186340@SN6PR04MB3824.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3513;
-x-forefront-prvs: 0025434D2D
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(39860400002)(396003)(136003)(376002)(346002)(78114003)(199004)(189003)(6246003)(81166006)(53936002)(8676002)(91956017)(81156014)(55016002)(71190400001)(229853002)(478600001)(71200400001)(6436002)(25786009)(9686003)(5660300002)(66066001)(66946007)(73956011)(4326008)(52536014)(76116006)(8936002)(68736007)(66476007)(4744005)(186003)(66556008)(2906002)(6916009)(86362001)(102836004)(99286004)(316002)(26005)(33656002)(7696005)(72206003)(7736002)(53546011)(74316002)(76176011)(305945005)(6506007)(256004)(66446008)(64756008)(14454004)(6116002)(3846002)(486006)(476003)(446003);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR04MB3824;H:SN6PR04MB4527.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 9eqaTpCtFgtMSLWl4Qj9oo2Nbth5U+v6PJg99ygniV9yCcMg8HeLH1PRa70OuLdU8rpWRHi7ddORw2rLs+23N327B+HP2w/0T8txqfloWhcP/8KGEb5sd/M8zQxihylQDddy3KkJwP6xOWOzh6RRQZqfO4q1RvA6be+CGtofIIbygdOvQIGWbf33Cv4H1STkTbRfgx4ZFOL8PrYMHRKlTQa1/cJYtN5j8iXFiQ1As9SsnAuSblH8nskhC5u/0u3UttbHtT5FLi9/6oIxH4ReM7Deakgvrgs0aI9RWXOXVsUZ2FiW9UwM803HJKzPPbcYx/Out9/vp6UmTwjedgfSbYlbsuOw6MX13Ci2z4NIpCHx7AZfpdg2XTtobSFpb+bR4i51x83FlGe3W3ThXL3LI2hdtmRkfCaF+omCxq7lYe0=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 252aecfc-1786-4b1d-4422-08d6ceb13c6f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 May 2019 03:49:53.7071
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB3824
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
+         :references;
+        bh=dSmbxNpQUXqOAF+wyYt/oF/nK39mDwCtjQCLrs4dIww=;
+        b=IDpnpA8P7Ng/MqSrVhbClQlwqEs0i4b85XUADMhNeu68gyf5nqHS0qDg9RkZWmczUd
+         SyVal7y8LCFnEUsWcbjJKP8I9PDYNrIwaehuvLbL5+nd/DvvuKJwQcFz5y87LoGi27UL
+         p3xWjvUx+OfBa632s2zu9kRHa3VifCDs/pRqwo5IIEz9sJsE/zt9BQBKXHM8eMjFcDtD
+         mFCNtez71oT5Q6ay8JW118+gRvX7HdzyC6ZMMfKL3LriHyrWDvrx83q0xf1FNUM3+Ki2
+         PGX/WfbPpXQu8lRmuWmKbJsOHlxLNgOpRsvRR0wl8UGHZtnt3c1oZv0ubNrllzWbwstF
+         0cIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:message-id:mime-version:subject:date
+         :in-reply-to:cc:to:references;
+        bh=dSmbxNpQUXqOAF+wyYt/oF/nK39mDwCtjQCLrs4dIww=;
+        b=Jm+aT0VINpRIZG100KNx2V58C8+J8vj928KpXaDIXWJ04Ali48zkiuXPmGr8MMzAhK
+         DyLHjUgdf7dAb7CmVZWrDNBrcTAiei4i0KVPEEEc+1l1g4mlMIWMu4IsX+BNQrIf2ZA8
+         1l/D+O/JwbsawkrPqVSIGgDgYzu9fa8O/aQzwXSf8CzZsTAEsWaeBzWS3cux1/pVtaZS
+         9qHS22b/kuhuoQ6UWe860rdtWueF2PVHTgbFQ6GS5xUzK+QH7A2H+bJpyzso9UwAK/gK
+         /fqIgzYGpBssdYs4WZAViOHJiVEPwupTZoCRTShODOHiA+37xxRbFhk9vmbPuEmLL4pc
+         lu7g==
+X-Gm-Message-State: APjAAAXaRlZDsXyF0EaCo/20Yu/IkRBnAs0eHXz14dGOYPBeMbZHb5Sf
+        CNjNVDG5esjAFTF+k50qW8omTViv4mAsew==
+X-Google-Smtp-Source: APXvYqyXBbFUVmNmNH/NEtD63E0om1IHMQ3xpK0ZWqnKeJ3FfUv8v8pVMHoC7gkhcYUh1GaN4hGLpA==
+X-Received: by 2002:a50:885b:: with SMTP id c27mr1637782edc.155.1556785658429;
+        Thu, 02 May 2019 01:27:38 -0700 (PDT)
+Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
+        by smtp.gmail.com with ESMTPSA id w14sm1038734ejv.58.2019.05.02.01.27.36
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 02 May 2019 01:27:37 -0700 (PDT)
+From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Message-Id: <22C6C23E-BAE8-4AC2-8D6A-FECA10F2F55D@javigon.com>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_00A15516-FDF5-444B-8D42-D909364E2105";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [PATCH] lightnvm: pblk: Introduce hot-cold data separation
+Date:   Thu, 2 May 2019 10:27:36 +0200
+In-Reply-To: <CAJbgVnWTRWZB_Dc7F1cvtgWdYPCbJ_aJJ_mas01m51+8siHvHA@mail.gmail.com>
+Cc:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
+        =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To:     Heiner Litz <hlitz@ucsc.edu>
+References: <20190425052152.6571-1-hlitz@ucsc.edu>
+ <66434cc7-2bac-dd10-6edc-4560e6a0f89f@intel.com>
+ <F305CAB7-F566-40D7-BC91-E88DE821520B@javigon.com>
+ <a1df8967-2169-1c43-c55a-e2144fa53b9a@intel.com>
+ <CAJbgVnWsHQRpEPkd77E6u0hoW5jKQaOGR-3dW9+drGNq_JYpfA@mail.gmail.com>
+ <139AF16B-E69C-4AA5-A9AC-38576BB9BD4B@javigon.com>
+ <CAJbgVnWTRWZB_Dc7F1cvtgWdYPCbJ_aJJ_mas01m51+8siHvHA@mail.gmail.com>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks for looking into this.=0A=
-=0A=
-On 5/1/19 5:31 AM, Christoph Hellwig wrote:=0A=
-> On Tue, Apr 30, 2019 at 09:28:15PM -0700, Chaitanya Kulkarni wrote:=0A=
->> @@ -104,7 +120,12 @@ struct blk_io_trace {=0A=
->>   	__u64 time;		/* in nanoseconds */=0A=
->>   	__u64 sector;		/* disk offset */=0A=
->>   	__u32 bytes;		/* transfer length */=0A=
->> +=0A=
->> +#ifdef CONFIG_BLKTRACE_EXT=0A=
->> +	__u64 action;		/* what happened */=0A=
->> +#else=0A=
->>   	__u32 action;		/* what happened */=0A=
->> +#endif /* CONFIG_BLKTRACE_EXT */=0A=
-> =0A=
-> You can't use CONFIG_ symbols in UAPI headers, as userspace=0A=
-> applications won't set it.  You also can't ever change the layout of an=
-=0A=
-> existing structure in UAPI headers in not backward compatible way.=0A=
-> =0A=
-Jeff has suggested another approach, if everyone is okay with that =0A=
-approach will send out the series with that change.=0A=
-=0A=
-Please let me know if you have more comments.=0A=
+
+--Apple-Mail=_00A15516-FDF5-444B-8D42-D909364E2105
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=us-ascii
+
+> On 1 May 2019, at 22.20, Heiner Litz <hlitz@ucsc.edu> wrote:
+> 
+> Javier, Igor,
+> you are correct. The problem exists if we have a power loss and we
+> have an open gc and an open user line and both contain the same LBA.
+> In that case, I think we need to care about the 4 scenarios:
+> 
+> 1. user_seq_id > gc_seq_id and user_write after gc_write: No issue
+> 2. user_seq_id > gc_seq_id and gc_write > user_write: Cannot happen,
+> open user lines are not gc'ed
+> 3. gc_seq_id > user_seq_id and user_write after gc_write: RACE
+> 4. gc_seq_id > user_seq_id and gc_write after user_write: No issue
+> 
+> To address 3.) we can do the following:
+> Whenever a gc line is opened, determine all open user lines and store
+> them in a field of pblk_line. When choosing a victim for GC, ignore
+> those lines.
+
+What if the following happens:
+  - LBA0 is mapped to line 3
+  - GC kicks in
+  - Open user line 5
+  - Open GC line 6
+  - Choose line 3 for GC
+  - GC LBA0
+  - LBA 0 updated and mapped to line 5
+  - Power loss
+
+In this case, recovering in order will make that the last mapped LBA is
+the one on the GC line. Note that even when the mapping has been
+invalidated, scan recovery does not know this and it will just update
+the L2P as new lines are being recovered.
+
+I think we need to enforce that no use line is open prior a new open GC
+line. This is, when creating a GC line, we wait until the next user line
+is to be allocated, and then we assign first the GC line and then the
+user line. This can be extended for several open user and GC lines. This
+way, the case above (3) cannot occur. In the example above we would
+have:
+
+  - LBA0 is mapped to line 3
+  - GC kicks in
+  - Open GC line 5.        \\ enforced
+  - Open user line 6.      \\ enforced
+  - Choose line 3 for GC
+  - GC LBA0
+  - LBA 0 updated and mapped to line 6
+  - Power loss
+
+Javier
+
+--Apple-Mail=_00A15516-FDF5-444B-8D42-D909364E2105
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlzKqfgACgkQPEYBfS0l
+eOAA0Q//ezKsWCFsw2Iu5FLq8shnnNUTcU46vdOmEmBitktx2RGiqlNlVqCBWW18
+iFRYr9IT13s+PrqETXZ0QFQ6hYVyf+B4YGfhXYkJfNUoOPK5xrm3C4iT/tu+bIHR
+t5w02m5hBRN1v/ZR02LJ+6KfN2rQ6KmDX09QKFtH5Iqf9WQ5VaN/uqmXzY7Vaqa9
+/smZRhgDAHQ7F5idMLnukOkBOhTZaIeBMh7pohRn9CUJ5C5etIh8ohDM59lmpEtX
+st0ynkBkQu0wfoRQzSa3aplIgTxrp0poLxVqa9JEsETsJBH0amxA8YneGSO4MNcQ
+B8nXhZAby801sBsANerturYtR6IDf3WmDUmvVZl/lui53orIML3o/me5oC5sZeBP
+KuNEyCJZMkBpCMbMRPyUeCiykVqIwXAZuVylAdYG0OYifnu4l1hla230RP7zhFwU
+MM1nhK9Njn04pFa7NOZ0m0uS697Dpx9TTqHnNYIrj4tcD4f1GquWlDlOy6wMvT//
+Oy28kT4A46icWT8AU+cIBc6U46Kucf5FqJFHPi44U1i6B5dw5HFuHSQj6Rvztk2+
+l1AXyZzvXflvYrwlG7Kxnlhh8dRJo6HTkS/9gIi06b7CQFgV22Tw4YzxrqDAKK78
+QHgnHIzO1KE2rRaib/W7PHenMfxp8y8SYpVpptlsOSug+ZNMKeg=
+=Rrvw
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_00A15516-FDF5-444B-8D42-D909364E2105--
