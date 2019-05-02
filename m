@@ -2,166 +2,110 @@ Return-Path: <SRS0=ouS0=TC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63F69C43219
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 08:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1135C43219
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 08:45:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2869A2089E
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 08:27:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91D252089E
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 08:45:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="IDpnpA8P"
+	dkim=pass (1024-bit key) header.d=Mellanox.com header.i=@Mellanox.com header.b="XMBZLtjW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726466AbfEBI1m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 May 2019 04:27:42 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:45008 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726159AbfEBI1k (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 May 2019 04:27:40 -0400
-Received: by mail-ed1-f66.google.com with SMTP id b8so1311670edm.11
-        for <linux-block@vger.kernel.org>; Thu, 02 May 2019 01:27:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=dSmbxNpQUXqOAF+wyYt/oF/nK39mDwCtjQCLrs4dIww=;
-        b=IDpnpA8P7Ng/MqSrVhbClQlwqEs0i4b85XUADMhNeu68gyf5nqHS0qDg9RkZWmczUd
-         SyVal7y8LCFnEUsWcbjJKP8I9PDYNrIwaehuvLbL5+nd/DvvuKJwQcFz5y87LoGi27UL
-         p3xWjvUx+OfBa632s2zu9kRHa3VifCDs/pRqwo5IIEz9sJsE/zt9BQBKXHM8eMjFcDtD
-         mFCNtez71oT5Q6ay8JW118+gRvX7HdzyC6ZMMfKL3LriHyrWDvrx83q0xf1FNUM3+Ki2
-         PGX/WfbPpXQu8lRmuWmKbJsOHlxLNgOpRsvRR0wl8UGHZtnt3c1oZv0ubNrllzWbwstF
-         0cIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=dSmbxNpQUXqOAF+wyYt/oF/nK39mDwCtjQCLrs4dIww=;
-        b=Jm+aT0VINpRIZG100KNx2V58C8+J8vj928KpXaDIXWJ04Ali48zkiuXPmGr8MMzAhK
-         DyLHjUgdf7dAb7CmVZWrDNBrcTAiei4i0KVPEEEc+1l1g4mlMIWMu4IsX+BNQrIf2ZA8
-         1l/D+O/JwbsawkrPqVSIGgDgYzu9fa8O/aQzwXSf8CzZsTAEsWaeBzWS3cux1/pVtaZS
-         9qHS22b/kuhuoQ6UWe860rdtWueF2PVHTgbFQ6GS5xUzK+QH7A2H+bJpyzso9UwAK/gK
-         /fqIgzYGpBssdYs4WZAViOHJiVEPwupTZoCRTShODOHiA+37xxRbFhk9vmbPuEmLL4pc
-         lu7g==
-X-Gm-Message-State: APjAAAXaRlZDsXyF0EaCo/20Yu/IkRBnAs0eHXz14dGOYPBeMbZHb5Sf
-        CNjNVDG5esjAFTF+k50qW8omTViv4mAsew==
-X-Google-Smtp-Source: APXvYqyXBbFUVmNmNH/NEtD63E0om1IHMQ3xpK0ZWqnKeJ3FfUv8v8pVMHoC7gkhcYUh1GaN4hGLpA==
-X-Received: by 2002:a50:885b:: with SMTP id c27mr1637782edc.155.1556785658429;
-        Thu, 02 May 2019 01:27:38 -0700 (PDT)
-Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id w14sm1038734ejv.58.2019.05.02.01.27.36
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 May 2019 01:27:37 -0700 (PDT)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <22C6C23E-BAE8-4AC2-8D6A-FECA10F2F55D@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_00A15516-FDF5-444B-8D42-D909364E2105";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH] lightnvm: pblk: Introduce hot-cold data separation
-Date:   Thu, 2 May 2019 10:27:36 +0200
-In-Reply-To: <CAJbgVnWTRWZB_Dc7F1cvtgWdYPCbJ_aJJ_mas01m51+8siHvHA@mail.gmail.com>
-Cc:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
-        =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To:     Heiner Litz <hlitz@ucsc.edu>
-References: <20190425052152.6571-1-hlitz@ucsc.edu>
- <66434cc7-2bac-dd10-6edc-4560e6a0f89f@intel.com>
- <F305CAB7-F566-40D7-BC91-E88DE821520B@javigon.com>
- <a1df8967-2169-1c43-c55a-e2144fa53b9a@intel.com>
- <CAJbgVnWsHQRpEPkd77E6u0hoW5jKQaOGR-3dW9+drGNq_JYpfA@mail.gmail.com>
- <139AF16B-E69C-4AA5-A9AC-38576BB9BD4B@javigon.com>
- <CAJbgVnWTRWZB_Dc7F1cvtgWdYPCbJ_aJJ_mas01m51+8siHvHA@mail.gmail.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        id S1726186AbfEBIpG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 May 2019 04:45:06 -0400
+Received: from mail-eopbgr20068.outbound.protection.outlook.com ([40.107.2.68]:26597
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725951AbfEBIpF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 May 2019 04:45:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=REQElg20qAbYRs2veFouFWQo4EJT+BLD7/xhiQYvHHA=;
+ b=XMBZLtjW7aylmMrCHkUtQGyzoDYiFdgPIsKFpN51tteiSx3E8iJCSD0qeWUV5eK0C8l6yy5FW/tnu5VY+dTnKS948esVUBGMbBcYkAk0EOKcY0cfsbPXhUsyHjeTPj3pzGnG4RsLW7B/OKfP/ytqjg16vTEE6openhbrgHF9kVA=
+Received: from AM6PR05MB5288.eurprd05.prod.outlook.com (20.177.196.225) by
+ AM6PR05MB5505.eurprd05.prod.outlook.com (20.177.188.205) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1835.15; Thu, 2 May 2019 08:45:02 +0000
+Received: from AM6PR05MB5288.eurprd05.prod.outlook.com
+ ([fe80::ac0c:21b7:bdfa:c4e]) by AM6PR05MB5288.eurprd05.prod.outlook.com
+ ([fe80::ac0c:21b7:bdfa:c4e%6]) with mapi id 15.20.1856.008; Thu, 2 May 2019
+ 08:45:02 +0000
+From:   Tal Gilboa <talgi@mellanox.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+CC:     "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Tariq Toukan <tariqt@mellanox.com>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        Idan Burstein <idanb@mellanox.com>,
+        Yamin Friedman <yaminf@mellanox.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH rdma-for-next 0/9] drivers/infiniband: Introduce rdma_dim
+Thread-Topic: [PATCH rdma-for-next 0/9] drivers/infiniband: Introduce rdma_dim
+Thread-Index: AQHVACyKoTvknlLO7kOSxA4Fp6QZcKZWbquAgAEXiQA=
+Date:   Thu, 2 May 2019 08:45:02 +0000
+Message-ID: <a6ca622e-9203-e69c-8d34-22e151529f0a@mellanox.com>
+References: <1556721879-35987-1-git-send-email-talgi@mellanox.com>
+ <20190501160409.GA15547@ziepe.ca>
+In-Reply-To: <20190501160409.GA15547@ziepe.ca>
+Accept-Language: he-IL, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [193.47.165.251]
+x-clientproxiedby: AM0PR01CA0031.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:69::44) To AM6PR05MB5288.eurprd05.prod.outlook.com
+ (2603:10a6:20b:64::33)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=talgi@mellanox.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 12a16f7d-6b8a-4ea9-5ca7-08d6ceda7758
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:AM6PR05MB5505;
+x-ms-traffictypediagnostic: AM6PR05MB5505:
+x-microsoft-antispam-prvs: <AM6PR05MB5505287124D7629262B039FDD2340@AM6PR05MB5505.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 0025434D2D
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(136003)(376002)(366004)(39860400002)(396003)(189003)(199004)(3846002)(86362001)(36756003)(476003)(4744005)(186003)(6116002)(31686004)(31696002)(229853002)(53936002)(8936002)(8676002)(14454004)(81166006)(6512007)(81156014)(6486002)(26005)(6436002)(256004)(66066001)(102836004)(66446008)(54906003)(478600001)(6246003)(5660300002)(25786009)(7736002)(305945005)(53546011)(6506007)(68736007)(486006)(6916009)(71200400001)(71190400001)(99286004)(4326008)(11346002)(64756008)(2616005)(66946007)(76176011)(446003)(66476007)(386003)(52116002)(2906002)(73956011)(316002)(66556008);DIR:OUT;SFP:1101;SCL:1;SRVR:AM6PR05MB5505;H:AM6PR05MB5288.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 89pzj+9oh17BGfaN2OUsHWlnzZ8zT5REdbslC2vSIrK3TXE1Bx7TPTibFpxFsDRgLMgsMCrpN3St/U4Lrdr1+7avgHxNdf7mdQFXGceTqWHKnnPlKnd/7oBKy2jKZDD+QQ2DNZi92/sAjBcO/DyDwjSuSiYD+jQpiHLFg8gfbu3g4JCkUnHXz3FhG2cuHTFW76XvzNrsasr4z2ZPajfxT3VS5nD6+wbUkGEimCZ+52kfSARgGD96kZty0/OoFsT5Vchmw9vM7v3qlzXDU+NrhqMLmkbPw0ZWuSlGk/R+qDG8efY7aDfhH5H9GS/5GinpwNqmi5R7m9lm0qzFKesePnRNrQt8EPy4P0ohF3AwYa0E2AdURfVUsXVD43A039o13BDYSFhK2LP54Ljjuxhop+aGnbeLROoR33IiTETUzcM=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <22854B5815F29D45B77BE94ABAD1FC31@eurprd05.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 12a16f7d-6b8a-4ea9-5ca7-08d6ceda7758
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 May 2019 08:45:02.3348
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR05MB5505
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---Apple-Mail=_00A15516-FDF5-444B-8D42-D909364E2105
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain;
-	charset=us-ascii
-
-> On 1 May 2019, at 22.20, Heiner Litz <hlitz@ucsc.edu> wrote:
-> 
-> Javier, Igor,
-> you are correct. The problem exists if we have a power loss and we
-> have an open gc and an open user line and both contain the same LBA.
-> In that case, I think we need to care about the 4 scenarios:
-> 
-> 1. user_seq_id > gc_seq_id and user_write after gc_write: No issue
-> 2. user_seq_id > gc_seq_id and gc_write > user_write: Cannot happen,
-> open user lines are not gc'ed
-> 3. gc_seq_id > user_seq_id and user_write after gc_write: RACE
-> 4. gc_seq_id > user_seq_id and gc_write after user_write: No issue
-> 
-> To address 3.) we can do the following:
-> Whenever a gc line is opened, determine all open user lines and store
-> them in a field of pblk_line. When choosing a victim for GC, ignore
-> those lines.
-
-What if the following happens:
-  - LBA0 is mapped to line 3
-  - GC kicks in
-  - Open user line 5
-  - Open GC line 6
-  - Choose line 3 for GC
-  - GC LBA0
-  - LBA 0 updated and mapped to line 5
-  - Power loss
-
-In this case, recovering in order will make that the last mapped LBA is
-the one on the GC line. Note that even when the mapping has been
-invalidated, scan recovery does not know this and it will just update
-the L2P as new lines are being recovered.
-
-I think we need to enforce that no use line is open prior a new open GC
-line. This is, when creating a GC line, we wait until the next user line
-is to be allocated, and then we assign first the GC line and then the
-user line. This can be extended for several open user and GC lines. This
-way, the case above (3) cannot occur. In the example above we would
-have:
-
-  - LBA0 is mapped to line 3
-  - GC kicks in
-  - Open GC line 5.        \\ enforced
-  - Open user line 6.      \\ enforced
-  - Choose line 3 for GC
-  - GC LBA0
-  - LBA 0 updated and mapped to line 6
-  - Power loss
-
-Javier
-
---Apple-Mail=_00A15516-FDF5-444B-8D42-D909364E2105
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlzKqfgACgkQPEYBfS0l
-eOAA0Q//ezKsWCFsw2Iu5FLq8shnnNUTcU46vdOmEmBitktx2RGiqlNlVqCBWW18
-iFRYr9IT13s+PrqETXZ0QFQ6hYVyf+B4YGfhXYkJfNUoOPK5xrm3C4iT/tu+bIHR
-t5w02m5hBRN1v/ZR02LJ+6KfN2rQ6KmDX09QKFtH5Iqf9WQ5VaN/uqmXzY7Vaqa9
-/smZRhgDAHQ7F5idMLnukOkBOhTZaIeBMh7pohRn9CUJ5C5etIh8ohDM59lmpEtX
-st0ynkBkQu0wfoRQzSa3aplIgTxrp0poLxVqa9JEsETsJBH0amxA8YneGSO4MNcQ
-B8nXhZAby801sBsANerturYtR6IDf3WmDUmvVZl/lui53orIML3o/me5oC5sZeBP
-KuNEyCJZMkBpCMbMRPyUeCiykVqIwXAZuVylAdYG0OYifnu4l1hla230RP7zhFwU
-MM1nhK9Njn04pFa7NOZ0m0uS697Dpx9TTqHnNYIrj4tcD4f1GquWlDlOy6wMvT//
-Oy28kT4A46icWT8AU+cIBc6U46Kucf5FqJFHPi44U1i6B5dw5HFuHSQj6Rvztk2+
-l1AXyZzvXflvYrwlG7Kxnlhh8dRJo6HTkS/9gIi06b7CQFgV22Tw4YzxrqDAKK78
-QHgnHIzO1KE2rRaib/W7PHenMfxp8y8SYpVpptlsOSug+ZNMKeg=
-=Rrvw
------END PGP SIGNATURE-----
-
---Apple-Mail=_00A15516-FDF5-444B-8D42-D909364E2105--
+T24gNS8xLzIwMTkgNzowNCBQTSwgSmFzb24gR3VudGhvcnBlIHdyb3RlOg0KPiANCj4gQSBsb3Qg
+b2YgdGhpcyBpcyB0b3VjaGluZyBuZXRkZXYsIHdoeSB3YXNuJ3QgbmV0ZGV2IGNjJ2Q/DQo+IA0K
+PiBXaG8gaXMgc3VwcG9zZWQgdG8gbWVyZ2UgdGhpcz8NCj4gDQo+IEkgdGhpbmsgeW91IG5lZWQg
+dG8gdGFrZSB0d28gc3RlcHMgYW5kIGhhdmUgbmV0ZGV2IG1lcmdlIHRoZSBhYm92ZQ0KPiBwYXJ0
+IGFuZCB0aGVuIHNlbmQgdGhlIHNpbmdsZSBwYXRjaCB0byBSRE1BIGZvciB0aGUgbGFzdCBwYXJ0
+LCBJIGRvbid0DQo+IHJlYWxseSB3YW50IHRvIHRha2Ugc28gbXVjaCBuZXRkZXYgY29kZSBoZXJl
+Lg0KDQpPaywgSSdsbCBzdWJtaXQgdGhlIGZpcnN0IDcgcGF0Y2hlcyB0byBuZXRkZXYgYW5kIHRo
+ZSAyIFJETUEgc3BlY2lmaWMgDQpwYXRjaGVzIHdpbGwgYmUgc3VibWl0dGVkIG9uIHRvcCBvZiB0
+aGVtLg0KDQo+IA0KPiBUaGUgbWFpbnRhaW5lcnMgZmlsZSBzaG91bGQgYWxzbyBoYXZlIHNvbWUg
+aW5kaWNhdGlvbiB3aGljaCB0cmVlDQo+IHBhdGNoZXMgZm9yIGxpYi9kaW0vKiB0aGlzIHNob3Vs
+ZCBnbyB0aHJvdWdoLi4NCj4gDQo+IEphc29uDQo+IA0K
