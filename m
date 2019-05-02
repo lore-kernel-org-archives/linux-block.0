@@ -2,82 +2,103 @@ Return-Path: <SRS0=ouS0=TC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7153C04AA8
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 01:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 982EEC43219
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 01:57:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A40B206DF
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 01:52:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 592022054F
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 01:57:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="e1Cdnr7M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vHjRwZ6V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726189AbfEBBwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 21:52:17 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:44398 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726152AbfEBBwR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 21:52:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=xNjOP9gg2QMy4x3ICBZoOoeoO4NbjsoS8XWQ33F0y5I=; b=e1Cdnr7Mt+nZArvTOHcIt/dcH
-        Ie+TXMWhFAYA5HNxT+y63lHRcgthMLNLL/PSs84r2uhvCLp73HMv7fZ+6i58oeYNTdQzpVsYqdBF3
-        nSsIM/r501mqjtAIkshkaSAWXLi3+lfbyh811CpB3RgxxHaVYJa6loRHloXhQ1iJ/dbbmb3AJHj1t
-        pj+KBXXwUGZS7zTl5dGTlNJJTY1q4Id6eY+DUeLIZg2fShSdrsNHDR9dS/jmOXHnDsJZoKQLz3Qn1
-        j4DV7gXZmiWBaXasQ1mnVROZhkNd7/lbqMTeCiyj5EpOonGLtzfwRwoMya+eznp6sO5aOwOgMiYnW
-        PWVOs2XIQ==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hM0tT-0005DI-4W; Thu, 02 May 2019 01:52:15 +0000
-Date:   Wed, 1 May 2019 18:52:14 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Jerome Glisse <jglisse@redhat.com>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [LSF/MM TOPIC] Direct block mapping through fs for device
-Message-ID: <20190502015214.GB8099@bombadil.infradead.org>
-References: <20190426013814.GB3350@redhat.com>
- <20190426062816.GG1454@dread.disaster.area>
- <20190426152044.GB13360@redhat.com>
- <20190427012516.GH1454@dread.disaster.area>
- <20190429132643.GB3036@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190429132643.GB3036@redhat.com>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+        id S1726194AbfEBB5n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 21:57:43 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:36563 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726191AbfEBB5n (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 21:57:43 -0400
+Received: by mail-qt1-f193.google.com with SMTP id c35so788585qtk.3
+        for <linux-block@vger.kernel.org>; Wed, 01 May 2019 18:57:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=quWrNR4eWwFTXTRzoPl4zkE3Mt6EDDpvyYkXqmbNd+4=;
+        b=vHjRwZ6Vc0SpGUcKNCF6tvYyUFZbhrUPtrQa61gfXE15tHPFXJE44I2zYD38PDZcob
+         KEjszwFhhLbSoBlgQVt61OM1U91bdC6j3ltG1aMzEZSwDnaLO01bxPQa2Nu8q3IEBIEN
+         HcNm0tHKtIF9O4zhty689z/Nv8QyxpxercwGxY7iarHERBtV7HmZ4I/eqUIlpduP+AFZ
+         oCaXzajtEHUiAvmq65/4uooVcqq+i4kba5TFH8QiGneinr/rpT5EGCmP5gGpWh/PGjqQ
+         T+8qoVoSHiVmyp66f4b/9NMdCvmPV/gu3EIwic2rTJmv4hpt2pud0KuK7WCww3uZkk0S
+         A0TQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=quWrNR4eWwFTXTRzoPl4zkE3Mt6EDDpvyYkXqmbNd+4=;
+        b=FCDthPBn8I2+Z7k7bQw47mwh3pOjT02M+0TZagTvEzwDfeF/hfT6b8RH1dQbM6G9Kp
+         Ym3Bo75VcZu+HhBa7jUX40xUdl946rE0yiOOgLUuAKY6h+OUr7skxa4h78gvtDfjoPLT
+         45Ygx7Ofq59Cq/pJHZz5tbABnSTnuP1bL/VJByctqNLHmJJXE9KjLzP/s+uplc0JqcBC
+         KdqKXPNMNZV0rZ7gOAdiaQVnmRYFwP0G5+rb6Z/as56SO18r5uf8PpbYCqjFtdj91Na6
+         xa3tdBEu3gufdd7EbV/9ft1SYSj760I3B8cfwYWZcibYEcCj6HhUNFfWg+9E/p1QDarP
+         Wyxw==
+X-Gm-Message-State: APjAAAXTT83nBlLkyf6WrBbtH86DxQPD46gTeCUrqvuO5wNr8Wc+ljSZ
+        FhG4WFrHd/9BU4WI81Sn/BXOk4vEavU=
+X-Google-Smtp-Source: APXvYqy+dEcAVPwdg88VF8Lp6tTT5oBFEBR6FCa34CH2LsbEeuOlSepOingzriXqyCUzjqQxqTcbaQ==
+X-Received: by 2002:ac8:7506:: with SMTP id u6mr1057914qtq.331.1556762262144;
+        Wed, 01 May 2019 18:57:42 -0700 (PDT)
+Received: from localhost.localdomain (189.26.185.89.dynamic.adsl.gvt.net.br. [189.26.185.89])
+        by smtp.gmail.com with ESMTPSA id d55sm9031059qtb.59.2019.05.01.18.57.39
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 01 May 2019 18:57:40 -0700 (PDT)
+From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+To:     linux-block@vger.kernel.org
+Cc:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+Subject: [PATCH v2 0/2] Introduce bytes_to_sectors helper in blkdev.h
+Date:   Wed,  1 May 2019 22:57:26 -0300
+Message-Id: <20190502015728.71468-1-marcos.souza.org@gmail.com>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 29, 2019 at 09:26:45AM -0400, Jerome Glisse wrote:
-> This is a filesystem opt-in feature if a given filesystem do not want
-> to implement it then just do not implement it and it will use page
-> cache. It is not mandatory i am not forcing anyone. The first reasons
-> for those are not filesystem but mmap of device file. But as LSF/MM
-> is up i thought it would be a good time to maybe propose that for file-
-> system too. If you do not want that for your filesystem then just NAK
-> any patch that add that to filesystem you care about.
+Changes from v2:
+Rename size_to_sectors o bytes_to_sectors. (suggested by Martin K. Petersen)
 
-No.  This is stupid, broken, and wrong.  I know we already have
-application-visible differences between filesystems, and every single one
-of those is a bug.  They may be hard bugs to fix, they may be bugs that we
-feel like we can't fix, they may never be fixed.  But they are all bugs.
+Changes from v1:
+Reworked the documentation of size_to_sectors by removing a sentence that was
+explaining the size -> sectors math, which wasn't necessary given the
+description prior to the example. (suggested by Chaitanya Kulkarni)
 
-Applications should be able to work on any Linux filesystem without
-having to care what it is.  Code has a tendency to far outlive its
-authors expectations (and indeed sometimes its authors).  If 'tar' had
-an #ifdef XFS / #elsif EXT4 / #elsif BTRFS / ... #endif, that would be
-awful.
+Let me know if you have more suggestions to this code.
 
-We need the same semantics across all major filesystems.  Anything else
-is us making application developers lives harder than necessary, and
-that's unacceptable.
+Here is the cover letter of the RFC sent prior to this patchset:
+
+While reading code of drivers/block, I was curious about the set_capacity
+argument, always shifting the value by 9, and so I took me a while to realize
+this is done on purpose: the capacity is the number of sectors of 512 bytes
+related to the storage space.
+
+Rather the shifting by 9, there are other places where the value if shifted by
+SECTOR_SHIFT, which is more readable.
+This patch aims to reduce these differences by adding a new function called
+bytes_to_sectors, adding a proper comment explaining why this is needed.
+
+null_blk was changed to use this new function.
+
+Thanks,
+Marco
+
+Marcos Paulo de Souza (2):
+  blkdev.h: Introduce bytes_to_sectors helper function
+  null_blk: Make use of bytes_to_sectors helper
+
+ drivers/block/null_blk_main.c | 18 +++++++++---------
+ include/linux/blkdev.h        | 17 +++++++++++++++++
+ 2 files changed, 26 insertions(+), 9 deletions(-)
+
+-- 
+2.16.4
+
