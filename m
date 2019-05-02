@@ -5,201 +5,131 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56ABBC43219
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 21:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F40C43219
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 21:51:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1DE5A2081C
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 21:29:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94945204FD
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 21:51:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726126AbfEBV3i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 May 2019 17:29:38 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38524 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725995AbfEBV3i (ORCPT
+        id S1726120AbfEBVv4 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 May 2019 17:51:56 -0400
+Received: from mx0b-002e3701.pphosted.com ([148.163.143.35]:34954 "EHLO
+        mx0b-002e3701.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726030AbfEBVv4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 May 2019 17:29:38 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x42LRDka050596
-        for <linux-block@vger.kernel.org>; Thu, 2 May 2019 17:29:36 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2s889d8eu2-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 02 May 2019 17:29:36 -0400
-Received: from localhost
-        by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <brking@linux.vnet.ibm.com>;
-        Thu, 2 May 2019 22:29:35 +0100
-Received: from b01cxnp22035.gho.pok.ibm.com (9.57.198.25)
-        by e12.ny.us.ibm.com (146.89.104.199) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 2 May 2019 22:29:33 +0100
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x42LTW5f30671076
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 May 2019 21:29:32 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 75934124054;
-        Thu,  2 May 2019 21:29:32 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2B3BD124052;
-        Thu,  2 May 2019 21:29:32 +0000 (GMT)
-Received: from oc6034535106.ibm.com (unknown [9.10.86.114])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu,  2 May 2019 21:29:32 +0000 (GMT)
-Subject: Re: [PATCH 0/5] block/target queue/LUN reset support
-To:     Hannes Reinecke <hare@suse.de>,
-        Mike Christie <mchristi@redhat.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        target-devel@vger.kernel.org
-References: <1464162903-14735-1-git-send-email-mchristi@redhat.com>
- <574BDFB7.5000407@suse.de> <574DEC57.7090701@redhat.com>
- <574E7B0D.4080401@suse.de>
-From:   Brian King <brking@linux.vnet.ibm.com>
-Date:   Thu, 2 May 2019 16:29:31 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <574E7B0D.4080401@suse.de>
-Content-Type: text/plain; charset=windows-1252
+        Thu, 2 May 2019 17:51:56 -0400
+Received: from pps.filterd (m0148664.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x42Lp1lN006788;
+        Thu, 2 May 2019 21:51:49 GMT
+Received: from g9t5009.houston.hpe.com (g9t5009.houston.hpe.com [15.241.48.73])
+        by mx0b-002e3701.pphosted.com with ESMTP id 2s84x29x8u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 May 2019 21:51:49 +0000
+Received: from G2W6311.americas.hpqcorp.net (g2w6311.austin.hp.com [16.197.64.53])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by g9t5009.houston.hpe.com (Postfix) with ESMTPS id 0819D65;
+        Thu,  2 May 2019 21:51:48 +0000 (UTC)
+Received: from G4W9334.americas.hpqcorp.net (16.208.32.120) by
+ G2W6311.americas.hpqcorp.net (16.197.64.53) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 2 May 2019 21:51:47 +0000
+Received: from G4W10204.americas.hpqcorp.net (2002:10cf:5210::10cf:5210) by
+ G4W9334.americas.hpqcorp.net (2002:10d0:2078::10d0:2078) with Microsoft SMTP
+ Server (TLS) id 15.0.1367.3; Thu, 2 May 2019 21:51:47 +0000
+Received: from NAM05-BY2-obe.outbound.protection.outlook.com (15.241.52.11) by
+ G4W10204.americas.hpqcorp.net (16.207.82.16) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3 via Frontend Transport; Thu, 2 May 2019 21:51:47 +0000
+Received: from AT5PR8401MB1169.NAMPRD84.PROD.OUTLOOK.COM (10.169.7.147) by
+ AT5PR8401MB1314.NAMPRD84.PROD.OUTLOOK.COM (10.169.9.23) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1856.12; Thu, 2 May 2019 21:51:44 +0000
+Received: from AT5PR8401MB1169.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::2884:44eb:25bf:b376]) by AT5PR8401MB1169.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::2884:44eb:25bf:b376%12]) with mapi id 15.20.1856.012; Thu, 2 May 2019
+ 21:51:44 +0000
+From:   "Elliott, Robert (Servers)" <elliott@hpe.com>
+To:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.com>,
+        "Omar Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Greg Edwards <gedwards@ddn.com>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 1/2] blkdev.h: Introduce size_to_sectors hlper function
+Thread-Topic: [PATCH 1/2] blkdev.h: Introduce size_to_sectors hlper function
+Thread-Index: AQHU/vSYwfJTOAaXv0uIxnt7/osef6ZYYxZg
+Date:   Thu, 2 May 2019 21:51:44 +0000
+Message-ID: <AT5PR8401MB11694BE736D8E344C94C2FFCAB340@AT5PR8401MB1169.NAMPRD84.PROD.OUTLOOK.COM>
+References: <20190430013205.1561708-1-marcos.souza.org@gmail.com>
+ <20190430013205.1561708-2-marcos.souza.org@gmail.com>
+In-Reply-To: <20190430013205.1561708-2-marcos.souza.org@gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19050221-0060-0000-0000-00000337B0B1
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011037; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000285; SDB=6.01197673; UDB=6.00628192; IPR=6.00978529;
- MB=3.00026704; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-02 21:29:35
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050221-0061-0000-0000-0000492E26C5
-Message-Id: <c1040d5e-64fb-2b92-5090-497238e195d1@linux.vnet.ibm.com>
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [15.211.195.7]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 65d69356-7f57-448f-3be9-08d6cf485e0e
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:AT5PR8401MB1314;
+x-ms-traffictypediagnostic: AT5PR8401MB1314:
+x-microsoft-antispam-prvs: <AT5PR8401MB1314FD5C94BDDBF7D30ABC7BAB340@AT5PR8401MB1314.NAMPRD84.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:5516;
+x-forefront-prvs: 0025434D2D
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(39860400002)(396003)(376002)(366004)(13464003)(189003)(199004)(14454004)(478600001)(305945005)(7736002)(229853002)(54906003)(68736007)(7416002)(8936002)(71190400001)(52536014)(5660300002)(11346002)(4744005)(476003)(73956011)(66446008)(64756008)(66556008)(66476007)(66946007)(486006)(76116006)(256004)(71200400001)(26005)(186003)(446003)(74316002)(76176011)(4326008)(53546011)(6116002)(3846002)(53936002)(2906002)(6246003)(99286004)(25786009)(316002)(110136005)(6506007)(102836004)(7696005)(86362001)(33656002)(8676002)(6436002)(81166006)(81156014)(2501003)(9686003)(55016002)(66066001);DIR:OUT;SFP:1102;SCL:1;SRVR:AT5PR8401MB1314;H:AT5PR8401MB1169.NAMPRD84.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: hpe.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: BiKFbIGZiPBIKfWJEFoqkyzKEnpoHRBReIPGQzE8oGD50Eqo7hCxQviUBxnVqjno6toRBdlMyh8FCG7+amnlORv1DTktj4pA91YCKCkSQ4zSzaQNxiABozRSZ66fq8QyvdHmbmgZnB0E+Vte3hCoT9iCjTX3KSdpilOOA9BPDCMmZci6MHLhCuGRLQQ+PatZWDq2sqkpN7wBLUdmnDjeTGkctEbqxENdsSkTgM/9TsNx4oUdKy7eFXrxj/MflKKV2tiCjeT9jhXep6ALwjcyMmUgyBTl4QX/isABC7rYsJyP551+V9qX4whaIe9q9VHgJ4FqdNS3Pvj+QrlscCy8wr2NbIfU8cYGK6oidYyXjP/pEF8MUCs1V40aTbgAr/KIARa4WMjBfEPjXA+0r9WE0B+yF21Uh+QnDi1OJp5WjQ8=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 65d69356-7f57-448f-3be9-08d6cf485e0e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 May 2019 21:51:44.0758
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AT5PR8401MB1314
+X-OriginatorOrg: hpe.com
+X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-02_12:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905020134
+ mlxlogscore=804 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905020136
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/1/16 1:05 AM, Hannes Reinecke wrote:
-> On 05/31/2016 09:56 PM, Mike Christie wrote:
->> On 05/30/2016 01:37 AM, Hannes Reinecke wrote:
->>> On 05/25/2016 09:54 AM, mchristi@redhat.com wrote:
->>>> Currently, for SCSI LUN_RESETs the target layer can only wait 
->>>> on bio/requests it has sent. This normally results in the 
->>>> LUN_RESET timing out on the initiator side and that SCSI error 
->>>> handler escalating to something more disruptive.
->>>> 
->>>> To fix this, the following patches add a block layer helper and
->>>> callout to reset a request queue which the target layer can use
->>>> to force drivers to complete/fail executing requests.
->>>> 
->>>> Patches were made over Jens's block tree's for-next branch.
->>>> 
->>> In general I like the approach, it just looks as if the main aim 
->>> (ie running a LUN RESET concurrent with normal I/O on other 
->>> devices) is not quite reached.
->>> 
->>> The general concept of eh_async_device_reset() is quite nice, and
->>> renaming existing functions for doing so is okay, too.
->>> 
->>> It's just the integration with SCSI EH which is somewhat 
->>> deficient (as outlined in the comment on patch 3). For the async 
->>> device reset to work we'd need to call it _before_ SCSI EH is 
->>> started, ie after the asynchronous command abort failed.
->> 
->> Yes that is my plan.
->> 
->> However, these first patches are only to allow LIO to be able to do
->> resets. I need the same infrastructure for both though.
->> 
->>> 
->>> The easiest way would be to add per-device reset workqueue item,
->>>  which wold be called whenever command abort failed.
->> 
->> If you want to do this without stopping the entire host, you need 
->> the patches like in this set where we stop and flush a queue.
->> 
-> Sure.
+
+
+> -----Original Message-----
+> From: linux-kernel-owner@vger.kernel.org [mailto:linux-kernel-owner@vger.kernel.org] On Behalf Of
+> Marcos Paulo de Souza
+> Sent: Monday, April 29, 2019 8:32 PM
+> Subject: [PATCH 1/2] blkdev.h: Introduce size_to_sectors hlper function
 > 
->>> As it's being per device we'd be getting an implicit 
->>> serialisation, and we could skip the lun reset from EH.
->> 
->> To build on my patches for a new async based scsi eh what we want 
->> to do is:
->> 
->> 0. Add eh_async_target_reset callout which works like async device 
->> reset one. For iscsi this maps to iscsi_eh_session_reset. FC 
->> drivers have something similar in the code paths that call 
->> rc_remote_port_delete and the terminate_rport_io paths. We just 
->> need wrappers.
->> 
-> Actually, I was wondering whether we could layer the new async EH 
-> infrastructure besides the original EH.
+> This function takes an argument to specify the size of a block device,
+> in bytes, and return the number of sectors of 512 bytes.
 > 
-> And the current 'target_reset' is completely wrong. SAM-2 did away 
-> with the TARGET RESET TMF, so it's anyones guess if a target reset
-> is actually _implemented_. What we really need, though, is a new 
-> 'eh_async_transport_reset' function, which would reset the 
-> _transport_. A transport failure is currently main (and I'm even 
-> tempted to say the only) reason why EH is invoked.
-> 
->> 1. scsi_times_out would kick off abort if needed and return 
->> BLK_EH_RESET_TIMEOUT. 2. If abort fails, cancel queued aborts and 
->> call new async device reset callout in these patches. 3. If device 
->> reset fails call new async target reset callout. 4. if target
->> reset fails, let fail the block timeout timer and do the old style
->> scsi eh host reset.
->> 
-> I would suggest to replace 3. and 4. with:
-> 
-> 3. If device reset fails call the new async transport reset callout 
-> 4. If transport reset fails fallback to the original SCSI EH (which 
-> would have abort and device reset callouts unset, so it'll start
-> with a target reset)
-> 
-> That way we keep the existing behaviour (so we don't need to touch 
-> the zillions of SCSI parallel drivers) _and_ will be able to model a
->  reasonably modern error handling.
-> 
->> It is really simple for newer drivers/classes like FC and iSCSI 
->> because they handle the device and target/port level reset clean
->> up already. The difficult (not really difficult but messy) part is 
->> trying to support old and new style EHs in a functions like 
->> scsi_times_out and scsi_abort_command.
->> 
-> And indeed, that's the challenge. But your patchset is a step into 
-> the right direction. I see if I can make progress with it, although 
-> I'm currently busy doing the next release so it might take some 
-> time.
+...
+> +static inline sector_t size_to_sectors(long long size)
+> +{
+> +	return size >> SECTOR_SHIFT;
+> +}
+
+At least one of the users in PATCH 2/2 passes an unsigned value that won't
+fit in a signed argument:
+
+-	blk_queue_max_discard_sectors(nullb->q, UINT_MAX >> 9);
++	blk_queue_max_discard_sectors(nullb->q, size_to_sectors(UINT_MAX));
 
 
-Recently I've been looking at some issues we are seeing in the field with customers
-that have very large storage configurations with lots and lots of SAS drives. We are seeing scenarios
-where drive head failures and other issues are resulting in command aborts that then ultimately fail
-and we then quiesce the HBA in order to do the LUN reset. Since this configuration has
-hundreds of SAS disks under a single HBA, that results in a very noticeable I/O service time
-problem for all the other disks under that HBA due to one misbehaving drive. We've so far
-focused most our efforts on getting other components in the stack to behave differently
-in order to mitigate the issue. However, that doesn't mean we can't do better
-in the kernel. 
 
-The direction this patch set was headed was to implement async LUN reset, something we've
-discussed for years, but never fully implemented.  Is this something anyone else is still
-seeing as an issue for them in other environments? Given that the last attempt at implementing
-this, from what I can tell, happened now three years ago and then stalled, I'm afraid
-I know the answer, but is anyone actively working on anything like this?
-
-Thanks,
-
-Brian
-
-
--- 
-Brian King
-Power Linux I/O
-IBM Linux Technology Center
 
