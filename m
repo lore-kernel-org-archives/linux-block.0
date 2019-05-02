@@ -2,91 +2,92 @@ Return-Path: <SRS0=ouS0=TC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0B1C43219
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 15:12:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BA30C43219
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 16:03:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E740F20675
-	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 15:12:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87D972075E
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 16:03:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="im1U7FIJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726270AbfEBPMY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 May 2019 11:12:24 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:36181 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726203AbfEBPMY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 May 2019 11:12:24 -0400
-Received: by mail-pf1-f196.google.com with SMTP id v80so1284368pfa.3
-        for <linux-block@vger.kernel.org>; Thu, 02 May 2019 08:12:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=7K44ulmmjePBHRKGWYLNm7mDE64js6CsBZjU1Zvb/lQ=;
-        b=V0XWavvgbPtBornepk41V8RBkeQE0zcSDIP6Z0ngofHoFiva7a3mN1qu9Wr1iw7vsv
-         ayb5RGdswHrlA/1ErhN+JXAgFvsVstyy6OGTkIwMgKDQN98FRMvLS7PlLY2WI1OBB1zm
-         tqIcEAxB/EWNw1fK471TJgmdc/bEYWOPn3KRVPpO40qHNPisgatWIpyUhMc2jsqKAQZK
-         t3hgkWZM1fH78ydF+bRGZE7VhN9pfixkcuoOoNYW2RBiVAzsmJ3k2eDqSS5RWIVq29nd
-         +TnxKAEnF17yM+NsahVD75ibxNog5nB9EauOH3yZWwhQav1zn6UTe7b51/w18iJ7yfXv
-         lD7A==
-X-Gm-Message-State: APjAAAW3tJ+ZIe31eFtn3ztPazP6kN8ep+zcJqAvvSgKbgqjUNgm2oxe
-        pawLvaVpitTRgL3UuJn3Psg=
-X-Google-Smtp-Source: APXvYqyWRT78sfcqdS0R6e4Ep8D/2uCC5tbe6lzMr4JyiajnhVp3pEcGWzU5dsKGJt4Fqc8c7Jm6OA==
-X-Received: by 2002:a63:1852:: with SMTP id 18mr4520081pgy.283.1556809943162;
-        Thu, 02 May 2019 08:12:23 -0700 (PDT)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id e1sm54427427pfn.187.2019.05.02.08.12.21
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 02 May 2019 08:12:22 -0700 (PDT)
-Message-ID: <1556809940.12970.8.camel@acm.org>
-Subject: Re: [RFC PATCH 01/18] blktrace: increase the size of action mask
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Date:   Thu, 02 May 2019 08:12:20 -0700
-In-Reply-To: <SN6PR04MB4527BDC294F24B4954AD201786340@SN6PR04MB4527.namprd04.prod.outlook.com>
-References: <20190501042831.5313-1-chaitanya.kulkarni@wdc.com>
-         <20190501042831.5313-2-chaitanya.kulkarni@wdc.com>
-         <1556725711.19047.10.camel@acm.org>
-         <SN6PR04MB4527BDC294F24B4954AD201786340@SN6PR04MB4527.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1726321AbfEBQD3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 May 2019 12:03:29 -0400
+Received: from mailgw2.fjfi.cvut.cz ([147.32.9.131]:56862 "EHLO
+        mailgw2.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726197AbfEBQD3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 May 2019 12:03:29 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by mailgw2.fjfi.cvut.cz (Postfix) with ESMTP id E6BA9A028C;
+        Thu,  2 May 2019 18:03:26 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
+        s=20151024; t=1556813006; i=@fjfi.cvut.cz;
+        bh=2Ze/HvAXhuoo8WdLZh8zGvvHYRFvuAlI1idx06EoKYs=;
+        h=Date:From:To:cc:Subject:In-Reply-To:References;
+        b=im1U7FIJLWrHdHCEcXz6YTIex6F4oGahKzL0yTY/Q4FEsBI2hg8JWui9AX3HjQjIp
+         yMm1ZI8ft3U01gwWNKyBJI1GpTFO2NI+h54UU8AFDZzYFDq9Bm1vopDNoZVZk4JlGo
+         Axo2NJmLnx3/Pk437lKY/iHiQWk2JMmxMBo4WjSA=
+X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
+Received: from mailgw2.fjfi.cvut.cz ([127.0.0.1])
+        by localhost (mailgw2.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
+        with ESMTP id z1d07Ym63AVr; Thu,  2 May 2019 18:03:23 +0200 (CEST)
+Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mailgw2.fjfi.cvut.cz (Postfix) with ESMTPS id 73CFEA0264;
+        Thu,  2 May 2019 18:03:23 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw2.fjfi.cvut.cz 73CFEA0264
+Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
+        id 4123A6004D; Thu,  2 May 2019 18:03:23 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by linux.fjfi.cvut.cz (Postfix) with ESMTP id 1A15D6002A;
+        Thu,  2 May 2019 18:03:23 +0200 (CEST)
+Date:   Thu, 2 May 2019 18:03:23 +0200 (CEST)
+From:   David Kozub <zub@linux.fjfi.cvut.cz>
+To:     Scott Bauer <sbauer@plzdonthack.me>
+cc:     Jens Axboe <axboe@kernel.dk>,
+        Jonathan Derrick <jonathan.derrick@intel.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Subject: Re: [PATCH 0/3] block: sed-opal: add support for shadow MBR done
+ flag and write
+In-Reply-To: <20190502123036.GA4657@hacktheplanet>
+Message-ID: <alpine.LRH.2.21.1905021749060.929@linux.fjfi.cvut.cz>
+References: <1556666459-17948-1-git-send-email-zub@linux.fjfi.cvut.cz> <20190502123036.GA4657@hacktheplanet>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2019-05-02 at 03:43 +-0000, Chaitanya Kulkarni wrote:
-+AD4 On 5/1/19 8:48 AM, Bart Van Assche wrote:
-+AD4 +AD4 On Tue, 2019-04-30 at 21:28 -0700, Chaitanya Kulkarni wrote:
-+AD4 +AD4 +AD4 -+ACM-define BLKTRACESETUP32 +AF8-IOWR(0x12, 115, struct compat+AF8-blk+AF8-user+AF8-trace+AF8-setup)
-+AD4 +AD4 +AD4 +-
-+AD4 +AD4 +AD4 +-/+ACo XXX: temp work around for RFC +ACo-/
-+AD4 +AD4 +AD4 +-+ACM-define BLKTRACESETUP32 +AF8-IOWR(0x13, 115, struct compat+AF8-blk+AF8-user+AF8-trace+AF8-setup)
-+AD4 +AD4 
-+AD4 +AD4 This change breaks user space so this change is not acceptable. I think you
-+AD4 +AD4 want to introduce a new ioctl instead of modifying an existing ioctl.
-+AD4 +AD4 Additionally, have you considered to split the blktrace+AF8-api.h header file
-+AD4 +AD4 into two header files: one with kernel-internal definitions and a second one
-+AD4 +AD4 with definitions that are shared with user space (include/uapi/...)?
-+AD4 
-+AD4 I want to avoid modifying an existing IOCTL, I'll add a new ioctl and 
-+AD4 update the tools to use the extension IOCTL and split the header file 
-+AD4 also. Also I found that user space tools have replicated BLK+AF8-XX+AF8-XXX 
-+AD4 definitions, will be okay to keep all those in one place and include 
-+AD4 those from the appropriate header file ?
+On Thu, 2 May 2019, Scott Bauer wrote:
 
-Hi Chaitanya,
+> On Wed, May 01, 2019 at 01:20:56AM +0200, David Kozub wrote:
+>>
+>> Jonas Rabenstein (3):
+>>   block: sed-opal: add ioctl for done-mark of shadow mbr
+>>   block: sed-opal: ioctl for writing to shadow mbr
+>>   block: sed-opal: check size of shadow mbr
+>>
+>>  block/opal_proto.h            |  16 ++++
+>>  block/sed-opal.c              | 160 +++++++++++++++++++++++++++++++++-
+>>  include/linux/sed-opal.h      |   2 +
+>>  include/uapi/linux/sed-opal.h |  20 +++++
+>>  4 files changed, 196 insertions(+), 2 deletions(-)
+>>
+>
+> I'll review this over the weekend. Is this essentially the same thing
+> we reviewed a month or two ago or are there little differences due to
+> it be split across two different series?
 
-I think all definitions that are relevant for the user space blktrace tool
-should be moved into a header file under include/uapi/linux. I'm not sure
-what the best strategy is to include that header file in the blktrace tool.
-Another project that interfaces with the kernel (rdma-core+ADs see also
-https://github.com/linux-rdma/rdma-core/) periodically copies kernel header
-files into its own source code repository.
+The first patch (block: sed-opal: add ioctl for done-mark of shadow mbr) 
+is a bit different because a new struct and enum were introduced. The rest 
+is pretty much the same. That's also why I kept the reviewd-by tags.
 
-Bart.
+Best regards,
+David
