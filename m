@@ -1,38 +1,48 @@
-Return-Path: <SRS0=aWxv=TB=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=ouS0=TC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E7CC43219
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 23:47:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7153C04AA8
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 01:52:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F0022085A
-	for <linux-block@archiver.kernel.org>; Wed,  1 May 2019 23:47:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A40B206DF
+	for <linux-block@archiver.kernel.org>; Thu,  2 May 2019 01:52:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="e1Cdnr7M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726137AbfEAXrs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 May 2019 19:47:48 -0400
-Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:48149 "EHLO
-        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726133AbfEAXrr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 May 2019 19:47:47 -0400
-Received: from dread.disaster.area (pa49-181-171-240.pa.nsw.optusnet.com.au [49.181.171.240])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 724F343A39D;
-        Thu,  2 May 2019 09:47:42 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92)
-        (envelope-from <david@fromorbit.com>)
-        id 1hLywu-0005T3-OO; Thu, 02 May 2019 09:47:40 +1000
-Date:   Thu, 2 May 2019 09:47:40 +1000
-From:   Dave Chinner <david@fromorbit.com>
+        id S1726189AbfEBBwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 May 2019 21:52:17 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:44398 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726152AbfEBBwR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 May 2019 21:52:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=xNjOP9gg2QMy4x3ICBZoOoeoO4NbjsoS8XWQ33F0y5I=; b=e1Cdnr7Mt+nZArvTOHcIt/dcH
+        Ie+TXMWhFAYA5HNxT+y63lHRcgthMLNLL/PSs84r2uhvCLp73HMv7fZ+6i58oeYNTdQzpVsYqdBF3
+        nSsIM/r501mqjtAIkshkaSAWXLi3+lfbyh811CpB3RgxxHaVYJa6loRHloXhQ1iJ/dbbmb3AJHj1t
+        pj+KBXXwUGZS7zTl5dGTlNJJTY1q4Id6eY+DUeLIZg2fShSdrsNHDR9dS/jmOXHnDsJZoKQLz3Qn1
+        j4DV7gXZmiWBaXasQ1mnVROZhkNd7/lbqMTeCiyj5EpOonGLtzfwRwoMya+eznp6sO5aOwOgMiYnW
+        PWVOs2XIQ==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hM0tT-0005DI-4W; Thu, 02 May 2019 01:52:15 +0000
+Date:   Wed, 1 May 2019 18:52:14 -0700
+From:   Matthew Wilcox <willy@infradead.org>
 To:     Jerome Glisse <jglisse@redhat.com>
-Cc:     lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
+Cc:     Dave Chinner <david@fromorbit.com>,
+        lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Subject: Re: [LSF/MM TOPIC] Direct block mapping through fs for device
-Message-ID: <20190501234740.GN1454@dread.disaster.area>
+Message-ID: <20190502015214.GB8099@bombadil.infradead.org>
 References: <20190426013814.GB3350@redhat.com>
  <20190426062816.GG1454@dread.disaster.area>
  <20190426152044.GB13360@redhat.com>
@@ -42,201 +52,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190429132643.GB3036@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.2 cv=UJetJGXy c=1 sm=1 tr=0 cx=a_idp_d
-        a=LhzQONXuMOhFZtk4TmSJIw==:117 a=LhzQONXuMOhFZtk4TmSJIw==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=E5NmQfObTbMA:10
-        a=7-415B0cAAAA:8 a=SQEkvxGnTnKDDvOy9_cA:9 a=CjuIK1q_8ugA:10
-        a=biEYGPWJfzWAr4FL6Ov7:22
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On Mon, Apr 29, 2019 at 09:26:45AM -0400, Jerome Glisse wrote:
-> On Sat, Apr 27, 2019 at 11:25:16AM +1000, Dave Chinner wrote:
-> > On Fri, Apr 26, 2019 at 11:20:45AM -0400, Jerome Glisse wrote:
-> > > On Fri, Apr 26, 2019 at 04:28:16PM +1000, Dave Chinner wrote:
-> > > > On Thu, Apr 25, 2019 at 09:38:14PM -0400, Jerome Glisse wrote:
-> > > > > I see that they are still empty spot in LSF/MM schedule so i would like to
-> > > > > have a discussion on allowing direct block mapping of file for devices (nic,
-> > > > > gpu, fpga, ...). This is mm, fs and block discussion, thought the mm side
-> > > > > is pretty light ie only adding 2 callback to vm_operations_struct:
-> > > > 
-> > > > The filesystem already has infrastructure for the bits it needs to
-> > > > provide. They are called file layout leases (how many times do I
-> > > > have to keep telling people this!), and what you do with the lease
-> > > > for the LBA range the filesystem maps for you is then something you
-> > > > can negotiate with the underlying block device.
-> > > > 
-> > > > i.e. go look at how xfs_pnfs.c works to hand out block mappings to
-> > > > remote pNFS clients so they can directly access the underlying
-> > > > storage. Basically, anyone wanting to map blocks needs a file layout
-> > > > lease and then to manage the filesystem state over that range via
-> > > > these methods in the struct export_operations:
-> > > > 
-> > > >         int (*get_uuid)(struct super_block *sb, u8 *buf, u32 *len, u64 *offset);
-> > > >         int (*map_blocks)(struct inode *inode, loff_t offset,
-> > > >                           u64 len, struct iomap *iomap,
-> > > >                           bool write, u32 *device_generation);
-> > > >         int (*commit_blocks)(struct inode *inode, struct iomap *iomaps,
-> > > >                              int nr_iomaps, struct iattr *iattr);
-> > > > 
-> > > > Basically, before you read/write data, you map the blocks. if you've
-> > > > written data, then you need to commit the blocks (i.e. tell the fs
-> > > > they've been written to).
-> > > > 
-> > > > The iomap will give you a contiguous LBA range and the block device
-> > > > they belong to, and you can then use that to whatever smart DMA stuff
-> > > > you need to do through the block device directly.
-> > > > 
-> > > > If the filesystem wants the space back (e.g. because truncate) then
-> > > > the lease will be revoked. The client then must finish off it's
-> > > > outstanding operations, commit them and release the lease. To access
-> > > > the file range again, it must renew the lease and remap the file
-> > > > through ->map_blocks....
-> > > 
-> > > Sorry i should have explain why lease do not work. Here are list of
-> > > lease shortcoming AFAIK:
-> > >     - only one process
-> > 
-> > Sorry, what? The lease is taken by a application process that then
-> > hands out the mapping to whatever parts of it - processes, threads,
-> > remote clients, etc - need access. If your application doesn't
-> > have an access co-ordination method, then you're already completely
-> > screwed.
-> 
-> Then i am completely screw :) The thing is that today mmap of a file
-> does not mandate any kind of synchronization between process than
-> mmap files and thus we have a lot of existing applications that are
-> just happy with that programming model and i do not see any reasons
-> to force something new on them.
+> This is a filesystem opt-in feature if a given filesystem do not want
+> to implement it then just do not implement it and it will use page
+> cache. It is not mandatory i am not forcing anyone. The first reasons
+> for those are not filesystem but mmap of device file. But as LSF/MM
+> is up i thought it would be a good time to maybe propose that for file-
+> system too. If you do not want that for your filesystem then just NAK
+> any patch that add that to filesystem you care about.
 
-The whole model is fundamentally broken, and instead of making
-things really fucking complex to try and work around the brokenness
-we should simply /fix the underlying problem/.
+No.  This is stupid, broken, and wrong.  I know we already have
+application-visible differences between filesystems, and every single one
+of those is a bug.  They may be hard bugs to fix, they may be bugs that we
+feel like we can't fix, they may never be fixed.  But they are all bugs.
 
+Applications should be able to work on any Linux filesystem without
+having to care what it is.  Code has a tendency to far outlive its
+authors expectations (and indeed sometimes its authors).  If 'tar' had
+an #ifdef XFS / #elsif EXT4 / #elsif BTRFS / ... #endif, that would be
+awful.
 
-> Here i am only trying an optimization by possibly skipping the page
-> cache intermediary if filesystem and blocks device allows it and can
-> do it (depending on any number of runtime conditions).
-
-And that's where all the problems and demons lie.
-
-> So lease is inherently not compatible with mmap of file by multiple
-> processes. I understand you want to push your access model but the
-> reality is that we have existing applications that just do not fit
-> that model and i do not see any reasons to ask them to change, it
-> is never a successful approach.
-
-That's bullshit.
-
-I'm tired of you saying "we must use mmap" and then ignoring the
-people saying "mmap on files for direct block device access is
-broken - use a layout lease and then /mmap the block device
-directly/".
-
-You don't need to change how the applications work - they just need
-to add a layer of /access arbitration/ to get direct access to the
-block device.
-
-That's the whole point of filesystems - they are an access
-arbitration layer for a block device. That's why people use them
-instead of manging raw block device space themselves. We have
-multiple different applications - some which have nothing to do with
-RDMA, peer-to-peer hardware, etc that want direct access to the
-block device that is managed by a local filesystem. mmap()ing files
-simply doesn't work for them because remote access arbitrartion is a
-set of network protocols, not hardware devices.
-
-We want all these application to be able to work together in a sane
-way. Your insistence that your applications /must/ use mmap to
-directly access block devices, but then /must/ abstract taht direct
-access to the block device by mmap()ing files without any guarantee
-that the file mapping is stable is a horrible, unstable, and largely
-unworkable architecture.
-
-Just because your applications do it now doesn't mean it's the right
-way to do it. The stupid thing about all this is that the change to
-use layout leases and layout mapping requests in the applications is
-actually very minimal (yeah, if you have a layout lease then FIEMAP
-output will actually be stable for the lease range!), and if the
-applications and systems are set up properly then the probability of
-lease revocation is almost non-existent.
-
-You still set up your direct access mapping from the application via
-mmap(), except now it's via mmap() on the block device rather than
-through the file.
-
-This is exactly the same model as the pNFS remote access - the
-remote client is given a block device mapping, and it goes and
-accesses it directly via iscsi, iSER, or whatever RDMA transport the
-block device provides the pNFS client. The local filesystem that
-handed out the layout lease /just doesn't care/ how the application
-interacts with the block device or what it does with the mapping.
-
-And guess what? This works with DAX filesystems and block devices,
-too, without the application even having to be aware it's on DAX
-capable filesystems and hardware.
-
-I'm arguing for a sane, generic method of offloading direct access
-to the block device underneath a filesystem. I'm not trying to
-change the way your applications or you peer-to-peer application
-mappings work. All I want is that these *filesystem bypass*
-storage access methods all use the same access arbitration interface
-with the same semantics, and so applications can be completely
-agnostic as to what filesystem and/or hardware lies underneath them.
-
-> > What's a "device file" and how is that any difference from a normal
-> > kernel file?
-> 
-> Many device driver expose object (for instance all the GPU driver) through
-> their device file and allow userspace to mmap the device file to access
-> those object. At a given offset in the device file you will find a given
-> object and this can be per application or global to all application.
-
-This is irrelevant for how you access the block device underneath
-a local filesystem. The application has to do something to map these
-objects in the "device file" correctly, just like it needs to do
-something to correctly map the storage underneath the filesystem.
-
-> > Please stop trying to invent new and excitingly complex ways to do
-> > direct block access because we ialready have infrastructure we know
-> > works, we already support and is flexible enough to provide exactly
-> > the sort of direct block device access mechainsms that you are
-> > asking for.
-> 
-> I understand you do not like mmap but it has been around long enough
-> that it is extensively use and we have to accept that. There is no
-> changing all the applications that exist out there and that rely on
-> mmap and this is for those applications that such optimization would
-> help.
-
-You're arguing that "mmap() works for me, so it's good enough for
-everyone" but filesystem engineers have known this is not true
-for years. I also really don't buy this "file leases are going to
-fundamentally change how applications work" argument. All it changes
-is what the application mmap()s to get direct access to the
-underlying storage.  It works with any storage hardware and it works
-with both local and remote direct access because it completely
-avoids the need for the filesystem to manage data transfers and/or
-storage hardware.
-
-From the filesystem architecture perspective, we need a clean,
-generic, reliable filesystem bypass mechanism people can build any
-application on top of. File-backed mappings simply do not provide
-the necessary semantics, APIs, guarantees or revocation model
-(SIGBUS != revocation model) that we know are required by various
-existing userspace applications. Your application(s) are not the
-only direct storage access applications people are trying to
-implement, nor are they the only ones we'll have to support. They
-all need to use the same interface and methods - anything else is
-simply going to be an unsupportable, shitty mess.
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+We need the same semantics across all major filesystems.  Anything else
+is us making application developers lives harder than necessary, and
+that's unacceptable.
