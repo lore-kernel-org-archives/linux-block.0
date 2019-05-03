@@ -2,178 +2,144 @@ Return-Path: <SRS0=mx3V=TD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39EEAC43219
-	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 00:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 065E8C43219
+	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 06:50:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 008002070B
-	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 00:06:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kqp3rIPL"
+	by mail.kernel.org (Postfix) with ESMTP id D3A582089E
+	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 06:50:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726120AbfECAGS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 May 2019 20:06:18 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:37797 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726053AbfECAGS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 May 2019 20:06:18 -0400
-Received: by mail-lj1-f195.google.com with SMTP id b12so3806912lji.4
-        for <linux-block@vger.kernel.org>; Thu, 02 May 2019 17:06:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=e7XiQW4yO5S75GOxtPW7qYJgx3vLILexPigP9cVq26Q=;
-        b=kqp3rIPLnKkXsxqKe8m6UOPqXNL1ZiPyj+ow8LjF0BZ0NvuqIKemPw6OChxYP1qO0z
-         vLuG0K8maM37uqvletWnDWnwzEIvgy8We4yqEb28xN4VJr8bSTS1i5jtnnqOaVXkeomF
-         5bqT+7bF9PofJjZaPhysDZ++RkRfKxlK12obI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=e7XiQW4yO5S75GOxtPW7qYJgx3vLILexPigP9cVq26Q=;
-        b=fYHbMgBX53XW2BDbZaEGoTph+XaLgqUBZs/7otmPI9pdMHo8NuAvR4bZNyLYwKVsMu
-         npqGBOdzMKSSrV8j0Q6JwCkKy1qRbnpil/wENjqrJNd50A+WACWtrLgEMao1WP9bCjSZ
-         SIsdH+RPsVlFpq4Ky5+VTSXuBdOdL2ParVPpdG51SK9FF2zkSlIgUpjNnR268Lfsvp7H
-         ZUu/TLAR1CWgfPk9BXqhayaLhbKQc04O4aGwBLZ7yxf/UwjaBb8y/NGkkn5Hh+9hcHm0
-         PIvA0U0Owf6SnWUu2ZbzBAjVujhQxxRm4dcsGnzxNMkFABZDLBLL3Nb3nPRJhCkS8sET
-         fn8w==
-X-Gm-Message-State: APjAAAUQq4FmzqHoO2p41NBKZLn5EvIlag8bpsWBmotQzQ8Xt34ob0jS
-        z0LBhsdEOKs3c9tsyQh04aq+EmfQJA0=
-X-Google-Smtp-Source: APXvYqxZoXrwodGNe2BL+DjjZv4vi08a0hpXbtAScFt5nwq0edFEjy38J4wYLnbDLiiRTsWDXVCOww==
-X-Received: by 2002:a2e:9348:: with SMTP id m8mr3538409ljh.23.1556841975318;
-        Thu, 02 May 2019 17:06:15 -0700 (PDT)
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com. [209.85.208.180])
-        by smtp.gmail.com with ESMTPSA id k15sm78225lje.21.2019.05.02.17.06.13
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 May 2019 17:06:13 -0700 (PDT)
-Received: by mail-lj1-f180.google.com with SMTP id r72so3783307ljb.9
-        for <linux-block@vger.kernel.org>; Thu, 02 May 2019 17:06:13 -0700 (PDT)
-X-Received: by 2002:a2e:8ecd:: with SMTP id e13mr3509475ljl.30.1556841973316;
- Thu, 02 May 2019 17:06:13 -0700 (PDT)
+        id S1727044AbfECGuN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 May 2019 02:50:13 -0400
+Received: from mx2.suse.de ([195.135.220.15]:46238 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726985AbfECGuN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 3 May 2019 02:50:13 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 0CE29ACB1;
+        Fri,  3 May 2019 06:50:11 +0000 (UTC)
+Subject: Re: [PATCH 2/8] block: use bio_release_pages in bio_unmap_user
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+References: <20190502233332.28720-1-hch@lst.de>
+ <20190502233332.28720-3-hch@lst.de>
+From:   Nikolay Borisov <nborisov@suse.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <778d8485-9066-ae3f-68e2-8f2b3fe94ccf@suse.com>
+Date:   Fri, 3 May 2019 09:50:08 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190502174409.74623-1-evgreen@chromium.org> <20190502174409.74623-3-evgreen@chromium.org>
-In-Reply-To: <20190502174409.74623-3-evgreen@chromium.org>
-From:   Evan Green <evgreen@chromium.org>
-Date:   Thu, 2 May 2019 17:05:37 -0700
-X-Gmail-Original-Message-ID: <CAE=gft6ZcMnx15wemA4LraLY=cCGdKQgNtXf2DpABU=m0qd_DA@mail.gmail.com>
-Message-ID: <CAE=gft6ZcMnx15wemA4LraLY=cCGdKQgNtXf2DpABU=m0qd_DA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] loop: Better discard support for block devices
-To:     Jens Axboe <axboe@kernel.dk>,
-        Martin K Petersen <martin.petersen@oracle.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Gwendal Grignou <gwendal@chromium.org>,
-        Alexis Savery <asavery@chromium.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190502233332.28720-3-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 2, 2019 at 10:44 AM Evan Green <evgreen@chromium.org> wrote:
->
-> If the backing device for a loop device is a block device,
-> then mirror the "write zeroes" capabilities of the underlying
-> block device into the loop device. Copy this capability into both
-> max_write_zeroes_sectors and max_discard_sectors of the loop device.
->
-> The reason for this is that REQ_OP_DISCARD on a loop device translates
-> into blkdev_issue_zeroout(), rather than blkdev_issue_discard(). This
-> presents a consistent interface for loop devices (that discarded data
-> is zeroed), regardless of the backing device type of the loop device.
-> There should be no behavior change for loop devices backed by regular
-> files.
->
-> While in there, differentiate between REQ_OP_DISCARD and
-> REQ_OP_WRITE_ZEROES, which are different for block devices,
-> but which the loop device had just been lumping together, since
-> they're largely the same for files.
->
-> This change fixes blktest block/003, and removes an extraneous
-> error print in block/013 when testing on a loop device backed
-> by a block device that does not support discard.
->
-> Signed-off-by: Evan Green <evgreen@chromium.org>
-> ---
->
-> Changes in v4:
-> - Mirror blkdev's write_zeroes into loopdev's discard_sectors.
->
-> Changes in v3:
-> - Updated commit description
->
-> Changes in v2: None
->
->  drivers/block/loop.c | 57 ++++++++++++++++++++++++++++----------------
->  1 file changed, 37 insertions(+), 20 deletions(-)
->
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index bbf21ebeccd3..ca6983a2c975 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -417,19 +417,14 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
->         return ret;
->  }
->
-> -static int lo_discard(struct loop_device *lo, struct request *rq, loff_t pos)
-> +static int lo_discard(struct loop_device *lo, struct request *rq,
-> +               int mode, loff_t pos)
->  {
-> -       /*
-> -        * We use punch hole to reclaim the free space used by the
-> -        * image a.k.a. discard. However we do not support discard if
-> -        * encryption is enabled, because it may give an attacker
-> -        * useful information.
-> -        */
->         struct file *file = lo->lo_backing_file;
-> -       int mode = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
-> +       struct request_queue *q = lo->lo_queue;
->         int ret;
->
-> -       if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
-> +       if (!blk_queue_discard(q)) {
->                 ret = -EOPNOTSUPP;
->                 goto out;
->         }
-> @@ -599,8 +594,13 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
->         case REQ_OP_FLUSH:
->                 return lo_req_flush(lo, rq);
->         case REQ_OP_DISCARD:
-> +               return lo_discard(lo, rq,
-> +                       FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, pos);
-> +
->         case REQ_OP_WRITE_ZEROES:
-> -               return lo_discard(lo, rq, pos);
-> +               return lo_discard(lo, rq,
-> +                       FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE, pos);
-> +
->         case REQ_OP_WRITE:
->                 if (lo->transfer)
->                         return lo_write_transfer(lo, rq, pos);
-> @@ -854,6 +854,21 @@ static void loop_config_discard(struct loop_device *lo)
->         struct file *file = lo->lo_backing_file;
->         struct inode *inode = file->f_mapping->host;
->         struct request_queue *q = lo->lo_queue;
-> +       struct request_queue *backingq;
-> +
-> +       /*
-> +        * If the backing device is a block device, mirror its zeroing
-> +        * capability. REQ_OP_DISCARD translates to a zero-out even when backed
-> +        * by block devices to keep consistent behavior with file-backed loop
-> +        * devices.
-> +        */
-> +       if (S_ISBLK(inode->i_mode)) {
 
-Gwendal pointed out elsewhere that this should be if
-(S_ISBLK(inode->i_mode) && (lo->lo_encrypt_key_size == 0)). I think
-that's correct because like the file-backed device, we want to fail
-discard, forcing the user to manually zero out regions and write out
-the encrypted zeroes. I'll plan to send a v5 soon.
+
+On 3.05.19 г. 2:33 ч., Christoph Hellwig wrote:
+> Use bio_release_pages and bio_set_pages_dirty instead of open coding
+> them.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/bio.c | 22 +++-------------------
+>  1 file changed, 3 insertions(+), 19 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 96ddffa49881..a6862b954350 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1445,24 +1445,6 @@ struct bio *bio_map_user_iov(struct request_queue *q,
+>  	return ERR_PTR(ret);
+>  }
+>  
+> -static void __bio_unmap_user(struct bio *bio)
+> -{
+> -	struct bio_vec *bvec;
+> -	struct bvec_iter_all iter_all;
+> -
+> -	/*
+> -	 * make sure we dirty pages we wrote to
+> -	 */
+> -	bio_for_each_segment_all(bvec, bio, iter_all) {
+> -		if (bio_data_dir(bio) == READ)
+> -			set_page_dirty_lock(bvec->bv_page);
+> -
+> -		put_page(bvec->bv_page);
+> -	}
+> -
+> -	bio_put(bio);
+> -}
+> -
+>  /**
+>   *	bio_unmap_user	-	unmap a bio
+>   *	@bio:		the bio being unmapped
+> @@ -1474,7 +1456,9 @@ static void __bio_unmap_user(struct bio *bio)
+>   */
+>  void bio_unmap_user(struct bio *bio)
+>  {
+> -	__bio_unmap_user(bio);
+> +	bio_set_pages_dirty(bio);
+
+Doesn't this need to be :
+
+if (bio_data_dir(bio) == READ)
+  bio_set_pages_dirty()
+
+> +	bio_release_pages(bio);
+> +	bio_put(bio);
+>  	bio_put(bio);
+>  }
+>  
+> 
