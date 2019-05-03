@@ -2,180 +2,98 @@ Return-Path: <SRS0=mx3V=TD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	T_DKIMWL_WL_HIGH,UNPARSEABLE_RELAY,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EDD9C43219
-	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 11:10:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A2A1C43219
+	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 11:44:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D1E9206C3
-	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 11:10:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67A202075E
+	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 11:44:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RxZCYN0g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727457AbfECLKc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 May 2019 07:10:32 -0400
-Received: from smtp.nue.novell.com ([195.135.221.5]:54684 "EHLO
-        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726396AbfECLKc (ORCPT
-        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Fri, 3 May 2019 07:10:32 -0400
-Received: from [10.160.4.48] (charybdis.suse.de [149.44.162.66])
-        by smtp.nue.novell.com with ESMTP (TLS encrypted); Fri, 03 May 2019 13:10:30 +0200
-Subject: Re: [PATCH 0/5] block/target queue/LUN reset support
-To:     Brian King <brking@linux.vnet.ibm.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Mike Christie <mchristi@redhat.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        target-devel@vger.kernel.org
-References: <1464162903-14735-1-git-send-email-mchristi@redhat.com>
- <574BDFB7.5000407@suse.de> <574DEC57.7090701@redhat.com>
- <574E7B0D.4080401@suse.de>
- <c1040d5e-64fb-2b92-5090-497238e195d1@linux.vnet.ibm.com>
-From:   Hannes Reinecke <hare@suse.com>
-Message-ID: <473ebe36-2464-60a5-e07f-ccbb3082616a@suse.com>
-Date:   Fri, 3 May 2019 13:10:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1727578AbfECLoV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 May 2019 07:44:21 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:42120 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726377AbfECLoV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 May 2019 07:44:21 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x43BdQ35061107;
+        Fri, 3 May 2019 11:43:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=/lUSL6u6dCv+qk16245uxZt1XSGKYM9t/rlDDOHNkoM=;
+ b=RxZCYN0gGG+lQ+eUhZU3ekXqD8QfSg69uur9UTnrN9aU1f9+Ggw+y5LXgk6EOXcU4JCQ
+ 2k83xHsdvNPIs3UiadOfmOuBfxRV3UJLAjac3a9+lnaNMCk+97wpdHWu5FS3/9U774bm
+ zJyd8fDi2tZpEVzaDhsQdezf1YjUyc8DwLDrBQwcXeiQqh3GvhWz1IWvOu6oACsCwYC3
+ bU79La0Rm9+XSLjl2tTglB3nuZ+keGvYxPbPQQLkC04rbKY5k9OG2nqVZbu4eg23+9KW
+ 8kvLfMr1+4HpVBdesZOaOnigRpEUjQUbEhwauuN03U8ZTed3Lu/wFXMh8903i3l1kMcE 6w== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2130.oracle.com with ESMTP id 2s6xhyp62p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 03 May 2019 11:43:55 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x43BgnR4145790;
+        Fri, 3 May 2019 11:43:54 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2s7rtc82w4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 03 May 2019 11:43:54 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x43BhqvR005877;
+        Fri, 3 May 2019 11:43:53 GMT
+Received: from mwanda (/196.104.111.181)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 03 May 2019 04:43:52 -0700
+Date:   Fri, 3 May 2019 14:43:34 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     "David S. Miller" <davem@davemloft.net>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Amritha Nambiar <amritha.nambiar@intel.com>,
+        Willem de Bruijn <willemb@google.com>,
+        kernel-janitors@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v2 2/2] io_uring: Potential Oops in io_sq_offload_start()
+Message-ID: <20190503114334.GA16540@mwanda>
+References: <20190404104527.GX4038@hirez.programming.kicks-ass.net>
+ <20190408081513.GB15239@kadam>
+ <20190430092619.GC2239@kadam>
 MIME-Version: 1.0
-In-Reply-To: <c1040d5e-64fb-2b92-5090-497238e195d1@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190430092619.GC2239@kadam>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9245 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=848
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905030074
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9245 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=894 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905030074
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/2/19 11:29 PM, Brian King wrote:
-> On 6/1/16 1:05 AM, Hannes Reinecke wrote:
->> On 05/31/2016 09:56 PM, Mike Christie wrote:
->>> On 05/30/2016 01:37 AM, Hannes Reinecke wrote:
->>>> On 05/25/2016 09:54 AM, mchristi@redhat.com wrote:
->>>>> Currently, for SCSI LUN_RESETs the target layer can only wait
->>>>> on bio/requests it has sent. This normally results in the
->>>>> LUN_RESET timing out on the initiator side and that SCSI error
->>>>> handler escalating to something more disruptive.
->>>>>
->>>>> To fix this, the following patches add a block layer helper and
->>>>> callout to reset a request queue which the target layer can use
->>>>> to force drivers to complete/fail executing requests.
->>>>>
->>>>> Patches were made over Jens's block tree's for-next branch.
->>>>>
->>>> In general I like the approach, it just looks as if the main aim
->>>> (ie running a LUN RESET concurrent with normal I/O on other
->>>> devices) is not quite reached.
->>>>
->>>> The general concept of eh_async_device_reset() is quite nice, and
->>>> renaming existing functions for doing so is okay, too.
->>>>
->>>> It's just the integration with SCSI EH which is somewhat
->>>> deficient (as outlined in the comment on patch 3). For the async
->>>> device reset to work we'd need to call it _before_ SCSI EH is
->>>> started, ie after the asynchronous command abort failed.
->>>
->>> Yes that is my plan.
->>>
->>> However, these first patches are only to allow LIO to be able to do
->>> resets. I need the same infrastructure for both though.
->>>
->>>>
->>>> The easiest way would be to add per-device reset workqueue item,
->>>>   which wold be called whenever command abort failed.
->>>
->>> If you want to do this without stopping the entire host, you need
->>> the patches like in this set where we stop and flush a queue.
->>>
->> Sure.
->>
->>>> As it's being per device we'd be getting an implicit
->>>> serialisation, and we could skip the lun reset from EH.
->>>
->>> To build on my patches for a new async based scsi eh what we want
->>> to do is:
->>>
->>> 0. Add eh_async_target_reset callout which works like async device
->>> reset one. For iscsi this maps to iscsi_eh_session_reset. FC
->>> drivers have something similar in the code paths that call
->>> rc_remote_port_delete and the terminate_rport_io paths. We just
->>> need wrappers.
->>>
->> Actually, I was wondering whether we could layer the new async EH
->> infrastructure besides the original EH.
->>
->> And the current 'target_reset' is completely wrong. SAM-2 did away
->> with the TARGET RESET TMF, so it's anyones guess if a target reset
->> is actually _implemented_. What we really need, though, is a new
->> 'eh_async_transport_reset' function, which would reset the
->> _transport_. A transport failure is currently main (and I'm even
->> tempted to say the only) reason why EH is invoked.
->>
->>> 1. scsi_times_out would kick off abort if needed and return
->>> BLK_EH_RESET_TIMEOUT. 2. If abort fails, cancel queued aborts and
->>> call new async device reset callout in these patches. 3. If device
->>> reset fails call new async target reset callout. 4. if target
->>> reset fails, let fail the block timeout timer and do the old style
->>> scsi eh host reset.
->>>
->> I would suggest to replace 3. and 4. with:
->>
->> 3. If device reset fails call the new async transport reset callout
->> 4. If transport reset fails fallback to the original SCSI EH (which
->> would have abort and device reset callouts unset, so it'll start
->> with a target reset)
->>
->> That way we keep the existing behaviour (so we don't need to touch
->> the zillions of SCSI parallel drivers) _and_ will be able to model a
->>   reasonably modern error handling.
->>
->>> It is really simple for newer drivers/classes like FC and iSCSI
->>> because they handle the device and target/port level reset clean
->>> up already. The difficult (not really difficult but messy) part is
->>> trying to support old and new style EHs in a functions like
->>> scsi_times_out and scsi_abort_command.
->>>
->> And indeed, that's the challenge. But your patchset is a step into
->> the right direction. I see if I can make progress with it, although
->> I'm currently busy doing the next release so it might take some
->> time.
+On Tue, Apr 30, 2019 at 12:26:19PM +0300, Dan Carpenter wrote:
+> The io_uring patches are slated for v5.7 so we should figure out a
+> solution for this bug.
 > 
-> 
-> Recently I've been looking at some issues we are seeing in the field with customers
-> that have very large storage configurations with lots and lots of SAS drives. We are seeing scenarios
-> where drive head failures and other issues are resulting in command aborts that then ultimately fail
-> and we then quiesce the HBA in order to do the LUN reset. Since this configuration has
-> hundreds of SAS disks under a single HBA, that results in a very noticeable I/O service time
-> problem for all the other disks under that HBA due to one misbehaving drive. We've so far
-> focused most our efforts on getting other components in the stack to behave differently
-> in order to mitigate the issue. However, that doesn't mean we can't do better
-> in the kernel.
-> 
-> The direction this patch set was headed was to implement async LUN reset, something we've
-> discussed for years, but never fully implemented.  Is this something anyone else is still
-> seeing as an issue for them in other environments? Given that the last attempt at implementing
-> this, from what I can tell, happened now three years ago and then stalled, I'm afraid
-> I know the answer, but is anyone actively working on anything like this?
-> 
-Not on async LUN Reset, no.
-But I'm working on a patchset to update/fix SCSI EH yet again, by 
-dropping the 'scmd' argument for the various SCSI EH callbacks, and use 
-the respective object (eg SCSI device for device reset, SCSI Host for 
-host reset etc) as arguments instead.
-This gets rid of quite some complexity in the callbacks, and allows us 
-to finally handle out-of-band resets via ioctl properly.
 
-Once that is done we could be doing async (or, rather, parallel) LUN 
-Resets, as each of the reset is in principle independent, and we're not 
-bound to individual SCSI commands anymore.
+Never mind.  We merged a different fix.  975554b03edd
+("io_uring: fix SQPOLL cpu validation").
 
-I really need to polish off my patchset ...
+regards,
+dan carpenter
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		               zSeries & Storage
-hare@suse.com			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
