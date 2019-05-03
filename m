@@ -2,103 +2,146 @@ Return-Path: <SRS0=mx3V=TD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04C3EC43219
-	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 14:48:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E6BC43219
+	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 15:04:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CAAF82087F
-	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 14:48:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="FAILa7Aa"
+	by mail.kernel.org (Postfix) with ESMTP id 3F47E2087F
+	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 15:04:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726377AbfECOsT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 May 2019 10:48:19 -0400
-Received: from mail-io1-f44.google.com ([209.85.166.44]:45796 "EHLO
-        mail-io1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726267AbfECOsT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 May 2019 10:48:19 -0400
-Received: by mail-io1-f44.google.com with SMTP id e8so5375014ioe.12
-        for <linux-block@vger.kernel.org>; Fri, 03 May 2019 07:48:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=w8E+9xVXk9AOi8IVdyeI0M13iSyFi+ASRIxz8PRpjb4=;
-        b=FAILa7Aa4l3ku/s6j3lSeGLKGMLVcvZRvZZTRNMWSdUCnds8EGyMBS7Bllab+UiSFT
-         CGXyCZQahMAV9ypkogBPP+P1CrF+Q8BIZ1CDHtOma0cnFPNk0LyIzVx9C57pqJSmHwjZ
-         /7dOBYU5+Blfpx48s0QoNjQnJqAT3kCfGkWSiIyEtxO8Od4P9ZBt1KxiOibRed71f4+b
-         0+9dDAIfWiHc/s2F9uBIlyL8Y4GXBhOJZHEpDcM0I2I3gDslsRRkui+7s90/kJqhJz+N
-         qpTPTsQ+IjhV593EeUFcn6+WhfTve5z5MuR364xD+9qkSZT8Hd7NStWeJbV+jobcXj6d
-         4xrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=w8E+9xVXk9AOi8IVdyeI0M13iSyFi+ASRIxz8PRpjb4=;
-        b=g6e9DMBIRelh8n0mcNXvqQ0SjPWBHYVQIif+lsB13uMJrSnapzuyAx8PIyOf3TLusx
-         xdIvhF5FWmRdbhZw7ZkvqulKAxMlE1q2YN18K0+fyLYXcG/dEHXUM66AatSJDOt3N+Zy
-         Oq+50CVYrilWuWJCDQaeXbVHmjCPEIhLPF1SUKPT+oyZfgImRZGAwHlpq/BIWjeVk1LR
-         f6fQhS75DrjsLMvhhMkRvkxAvecKU2CMaH9kXrTaO6LcQpx8+ze4ayxI9fvu7TDxwx2B
-         E4ZqRDH9lE3taFf8wn/X1AW+5S2wfumQWi2m4U9RUa0MGk1zKAl5FatcvVZvA3wWfU18
-         PQFQ==
-X-Gm-Message-State: APjAAAVK4LVPylIVhCFbFkKvBTvadIJZroOeDXtkIlOM6X6V7SRWOkmT
-        7iE8Wjk8GoG280B3QSfXheOPQg/H6hClcg==
-X-Google-Smtp-Source: APXvYqy4/Llc5gn6WfsodhlR6aaQVNfckI/oDQJ5Rwx3GdK6asbMFVG+IIPPWd9JvEnfJBTrTYFrhA==
-X-Received: by 2002:a05:6602:20cc:: with SMTP id 12mr5874666ioz.6.1556894898766;
-        Fri, 03 May 2019 07:48:18 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id y203sm1150673itb.22.2019.05.03.07.48.17
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 03 May 2019 07:48:17 -0700 (PDT)
-Subject: Re: io_uring: REQ_F_PREPPED race condition with punting to workers
-To:     =?UTF-8?Q?Stefan_B=c3=bchler?= <source@stbuehler.de>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <bdc72cc4-ee7b-db12-baee-47e8f06d30e7@stbuehler.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <3900c9a9-41a2-31cb-3a7b-e93251505b15@kernel.dk>
-Date:   Fri, 3 May 2019 08:48:16 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1727586AbfECPEi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 May 2019 11:04:38 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:19873 "EHLO
+        SMTP03.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727398AbfECPEi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 May 2019 11:04:38 -0400
+X-IronPort-AV: E=Sophos;i="5.60,426,1549929600"; 
+   d="scan'208";a="85072069"
+From:   Roger Pau Monne <roger.pau@citrix.com>
+To:     <linux-kernel@vger.kernel.org>
+CC:     Roger Pau Monne <roger.pau@citrix.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, <xen-devel@lists.xenproject.org>,
+        <linux-block@vger.kernel.org>, <stable@vger.kernel.org>
+Subject: [PATCH] xen-blkfront: switch kcalloc to kvcalloc for large array allocation
+Date:   Fri, 3 May 2019 17:04:01 +0200
+Message-ID: <20190503150401.15904-1-roger.pau@citrix.com>
+X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 MIME-Version: 1.0
-In-Reply-To: <bdc72cc4-ee7b-db12-baee-47e8f06d30e7@stbuehler.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/3/19 4:22 AM, Stefan Bühler wrote:
-> Hi,
-> 
-> if the initial operation returns EAGAIN (and REQ_F_NOWAIT) is not set,
-> io_submit_sqe copies the SQE for processing in a worker.
-> 
-> The worker will then read from the SQE copy to determine (some)
-> parameters for operations, but not all of those parameters will be
-> validated again, as the initial operation sets REQ_F_PREPPED.
-> 
-> So between the initial operation and the memcpy is a race in which the
-> application could change the SQE: for example it could change from
-> IORING_OP_FSYNC to IORING_OP_READV, which would result in broken kiocb
-> data afaict.
-> 
-> The only way around that I can see right now is copying the SQE in
-> io_submit_sqe (moving the call to io_cqring_add_event to io_submit_sqe
-> should simplify this afaict): does that sound acceptable?
+There's no reason to request physically contiguous memory for those
+allocations.
 
-I'd be inclined to just fold the prep into the regular handling. The
-only prep routine that does any significant work is the read/write one,
-and if we're punting to async anyway, it's not a huge hit.
+Reported-by: Ian Jackson <ian.jackson@citrix.com>
+Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
+---
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc: Juergen Gross <jgross@suse.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: xen-devel@lists.xenproject.org
+Cc: linux-block@vger.kernel.org
+Cc: stable@vger.kernel.org
+---
+ drivers/block/xen-blkfront.c | 38 ++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
 
-If we do that, then we can get rid of the PREPPED flag and the separate
-need to call io_prep_xxx() for the command type.
-
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index d43a5677ccbc..a74d03913822 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -1310,11 +1310,11 @@ static void blkif_free_ring(struct blkfront_ring_info *rinfo)
+ 		}
+ 
+ free_shadow:
+-		kfree(rinfo->shadow[i].grants_used);
++		kvfree(rinfo->shadow[i].grants_used);
+ 		rinfo->shadow[i].grants_used = NULL;
+-		kfree(rinfo->shadow[i].indirect_grants);
++		kvfree(rinfo->shadow[i].indirect_grants);
+ 		rinfo->shadow[i].indirect_grants = NULL;
+-		kfree(rinfo->shadow[i].sg);
++		kvfree(rinfo->shadow[i].sg);
+ 		rinfo->shadow[i].sg = NULL;
+ 	}
+ 
+@@ -1353,7 +1353,7 @@ static void blkif_free(struct blkfront_info *info, int suspend)
+ 	for (i = 0; i < info->nr_rings; i++)
+ 		blkif_free_ring(&info->rinfo[i]);
+ 
+-	kfree(info->rinfo);
++	kvfree(info->rinfo);
+ 	info->rinfo = NULL;
+ 	info->nr_rings = 0;
+ }
+@@ -1914,9 +1914,9 @@ static int negotiate_mq(struct blkfront_info *info)
+ 	if (!info->nr_rings)
+ 		info->nr_rings = 1;
+ 
+-	info->rinfo = kcalloc(info->nr_rings,
+-			      sizeof(struct blkfront_ring_info),
+-			      GFP_KERNEL);
++	info->rinfo = kvcalloc(info->nr_rings,
++			       sizeof(struct blkfront_ring_info),
++			       GFP_KERNEL);
+ 	if (!info->rinfo) {
+ 		xenbus_dev_fatal(info->xbdev, -ENOMEM, "allocating ring_info structure");
+ 		info->nr_rings = 0;
+@@ -2232,17 +2232,17 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo)
+ 
+ 	for (i = 0; i < BLK_RING_SIZE(info); i++) {
+ 		rinfo->shadow[i].grants_used =
+-			kcalloc(grants,
+-				sizeof(rinfo->shadow[i].grants_used[0]),
+-				GFP_NOIO);
+-		rinfo->shadow[i].sg = kcalloc(psegs,
+-					      sizeof(rinfo->shadow[i].sg[0]),
+-					      GFP_NOIO);
++			kvcalloc(grants,
++				 sizeof(rinfo->shadow[i].grants_used[0]),
++				 GFP_NOIO);
++		rinfo->shadow[i].sg = kvcalloc(psegs,
++					       sizeof(rinfo->shadow[i].sg[0]),
++					       GFP_NOIO);
+ 		if (info->max_indirect_segments)
+ 			rinfo->shadow[i].indirect_grants =
+-				kcalloc(INDIRECT_GREFS(grants),
+-					sizeof(rinfo->shadow[i].indirect_grants[0]),
+-					GFP_NOIO);
++				kvcalloc(INDIRECT_GREFS(grants),
++					 sizeof(rinfo->shadow[i].indirect_grants[0]),
++					 GFP_NOIO);
+ 		if ((rinfo->shadow[i].grants_used == NULL) ||
+ 			(rinfo->shadow[i].sg == NULL) ||
+ 		     (info->max_indirect_segments &&
+@@ -2256,11 +2256,11 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo)
+ 
+ out_of_memory:
+ 	for (i = 0; i < BLK_RING_SIZE(info); i++) {
+-		kfree(rinfo->shadow[i].grants_used);
++		kvfree(rinfo->shadow[i].grants_used);
+ 		rinfo->shadow[i].grants_used = NULL;
+-		kfree(rinfo->shadow[i].sg);
++		kvfree(rinfo->shadow[i].sg);
+ 		rinfo->shadow[i].sg = NULL;
+-		kfree(rinfo->shadow[i].indirect_grants);
++		kvfree(rinfo->shadow[i].indirect_grants);
+ 		rinfo->shadow[i].indirect_grants = NULL;
+ 	}
+ 	if (!list_empty(&rinfo->indirect_pages)) {
 -- 
-Jens Axboe
+2.17.2 (Apple Git-113)
 
