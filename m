@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC77C04AA9
-	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 18:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 513AEC43219
+	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 18:38:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D4A82084B
-	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 18:38:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24CC12084B
+	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 18:38:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="FEEmpF/u"
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="Nbwf3XKw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727381AbfEDSif (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 May 2019 14:38:35 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:35058 "EHLO
+        id S1727457AbfEDSin (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 4 May 2019 14:38:43 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:44152 "EHLO
         mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727148AbfEDSie (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 May 2019 14:38:34 -0400
-Received: by mail-lj1-f196.google.com with SMTP id z26so3037156ljj.2
-        for <linux-block@vger.kernel.org>; Sat, 04 May 2019 11:38:32 -0700 (PDT)
+        with ESMTP id S1727388AbfEDSik (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 4 May 2019 14:38:40 -0400
+Received: by mail-lj1-f196.google.com with SMTP id c6so2433137lji.11
+        for <linux-block@vger.kernel.org>; Sat, 04 May 2019 11:38:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=L1RXqMd3oM130PbV6/2cqI1sCTRLP7lSwTZjKdujSbk=;
-        b=FEEmpF/uTHtOxKNBHDa9xmhPxLUFRXtpFHeLfT8aZS8IA+WE7hA5EQolSTMGYOzZ8i
-         KXXsasRzJ30hky/IR69UYrMDyfOAeqgGJYK1f4wfCSYLiQH7fptaqtRQFZdUUxSIxjOh
-         SLet2L2RNpVWNDAIk820Q2nAwJCa4yUTZAFu698u1hHVLyRiFEcT1mUNffPngEnNE/4w
-         /i+ZmqoeO6zHEeTySUNx+9A/OKTYt0HyMShYo7dfLWS/SQlOqpReKNhYjxHQLVz2gIyR
-         ghabmVcWp+0lKgSEBBD6Dvzkd08VkN6jkpLqRtL25SG0NEw+jIOjCaegImJQy1AkL4wp
-         x3rQ==
+        bh=5O6MLyuJzTZCFkCSq5yloQt0fdGoVw3zgENohA8hO08=;
+        b=Nbwf3XKwBmJoTj14dk59ALfYH+iU3xwyWgEGC+X7Ci+hsaGlkaVIlZgpOcGhqqR8xe
+         C+fkUeJAEeOWFsrtujSTwNLkxdcZOdeffxyPNAtHHdTGfsudMB7xVpkaiacGaaaUP/ZO
+         f2/jpfMkyv/FjymZbTk3WMj96GfndLQGfKeGP+8Ke5sWPPlEYOW6JpGouslht/hImfm+
+         NExUJyFd7A06vSvOQ9YbxDUUfwzSYNTTnCsRebIZG3/xrqbT6sjH3rgDUNwMHdVCJwUT
+         bMDyeudN8TEfx5hebgcy+N1SgFwBIYoGSkneT/D5YnwyXW59mPDdfAtn5eMEt0pwU+Cz
+         SU1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=L1RXqMd3oM130PbV6/2cqI1sCTRLP7lSwTZjKdujSbk=;
-        b=rQrHvUJl4sNzbGkwywEqP5lC2XuB8mCmvmjNyXp+PrBbklBZhs+pEG8fVqZAI7uzAU
-         e1nTAyyrGI8i0JoW/ZTBTXEowqT1crDtODyn576PghGTlv/uNQCPkcBQ6oZ3sk7bfQDC
-         jplwfBZCOxg8Id8gIKeI1i5ORfCeQ/2yeeAAPa3he37qXxHjjJjIqYRcZYOInlAK/9CN
-         GEfQtFH3XMh8CbzAd5/T+06FVQWGRg8fz3qAg/p8NMKdB7eJpFHAI/gikOm7HeGTBVIZ
-         c0IrYgmD+WHhvD0HaWqfDmyp/BmZOINuSVYEqw9JJAXNHUiAeCPy+sxwc/B6Qopr7OdJ
-         msxw==
-X-Gm-Message-State: APjAAAXg7IULwYuDUETBVnyduqu8Le+/ejBLJTyFfVxVQi19APawO8h0
-        bFntVzyo0hnRNOHV4ckdTN8gig==
-X-Google-Smtp-Source: APXvYqzAGtz1e6NHcfOW3QFIjfUSjblMN7qBzMhZVPiuh13K/e16wvS3V99lAsgGVs7f7829hjXZHQ==
-X-Received: by 2002:a2e:7308:: with SMTP id o8mr8295216ljc.171.1556995112270;
-        Sat, 04 May 2019 11:38:32 -0700 (PDT)
+        bh=5O6MLyuJzTZCFkCSq5yloQt0fdGoVw3zgENohA8hO08=;
+        b=ZdlrM0mUcXyKGrh7+LHvb4UCY03qwY/GBg9n8TSP1RzY+czvmKdQwL4t9zO1B2580Q
+         uFE3lkgNtK6hPAdtcXFxImfF0m1T6lq24/k5Q74iPqMTYIytvF/JIK3lev27sTX8xUEJ
+         luQHxLhu082mtv83XcQJ7lffuCPj2a+4Y09Xgexri0IYFBsbfdSDU728rxJOrKkQq7SS
+         dD72wbbGBCCbY91yxMQVYV1dCL9YDsS4qHj7itcyWqwA+cZaJiB6gJB55ZvJp7rwKgbB
+         ppIWRojKHuxJFH5mYgfqbj0d/yVq1aJVltU+XMkX+snyOlQjMvHwwxObeL4eAPfxwWKA
+         ev1g==
+X-Gm-Message-State: APjAAAXIhpWJFCMWL3lnmIz1e7Uyh/QOJtBezOlHHF6QIgT3eVUR5YFj
+        W7qVUIigsjL00oalDOKR3sOWuQ==
+X-Google-Smtp-Source: APXvYqxulArf5fnY87m4TK4QnGXQiIo3lPF8Za4+XQ+vQ2loWp9Fgs21Ekh3wK6iNhdRM9+5SJP50A==
+X-Received: by 2002:a2e:97c1:: with SMTP id m1mr2669190ljj.59.1556995118365;
+        Sat, 04 May 2019 11:38:38 -0700 (PDT)
 Received: from skyninja.webspeed.dk (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
-        by smtp.gmail.com with ESMTPSA id q21sm1050260lfa.84.2019.05.04.11.38.31
+        by smtp.gmail.com with ESMTPSA id q21sm1050260lfa.84.2019.05.04.11.38.37
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 04 May 2019 11:38:31 -0700 (PDT)
+        Sat, 04 May 2019 11:38:37 -0700 (PDT)
 From:   =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To:     axboe@fb.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Igor Konopko <igor.j.konopko@intel.com>,
+        Marcin Dziegielewski <marcin.dziegielewski@intel.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 06/26] lightnvm: pblk: fix race during put line
-Date:   Sat,  4 May 2019 20:37:51 +0200
-Message-Id: <20190504183811.18725-7-mb@lightnvm.io>
+Subject: [GIT PULL 13/26] lightnvm: prevent race condition on pblk remove
+Date:   Sat,  4 May 2019 20:37:58 +0200
+Message-Id: <20190504183811.18725-14-mb@lightnvm.io>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190504183811.18725-1-mb@lightnvm.io>
 References: <20190504183811.18725-1-mb@lightnvm.io>
@@ -73,56 +73,41 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Igor Konopko <igor.j.konopko@intel.com>
+From: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
 
-In the pblk_put_line_back function, a race condition with
-__pblk_map_invalidate can make a line not part of any lists.
+When we trigger nvm target remove during device hot unplug, there is
+a probability to hit a general protection fault. This is caused by use
+of nvm_dev thay may be freed from another (hot unplug) thread
+(in the nvm_unregister function).
 
-Fix gc_list by resetting it to null fixes the above issue.
+Introduce lock in nvme_ioctl_dev_remove function to prevent this
+situation.
 
-Fixes: a4bd217 ("lightnvm: physical block device (pblk) target")
-Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
 Reviewed-by: Javier González <javier@javigon.com>
-Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/lightnvm/pblk-gc.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ drivers/lightnvm/core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index ea9f392a395e..e23b1923b773 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -64,19 +64,23 @@ static void pblk_put_line_back(struct pblk *pblk, struct pblk_line *line)
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct list_head *move_list;
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index c01f83b8fbaf..e2abe88a139c 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -1340,11 +1340,13 @@ static long nvm_ioctl_dev_remove(struct file *file, void __user *arg)
+ 		return -EINVAL;
+ 	}
  
-+	spin_lock(&l_mg->gc_lock);
- 	spin_lock(&line->lock);
- 	WARN_ON(line->state != PBLK_LINESTATE_GC);
- 	line->state = PBLK_LINESTATE_CLOSED;
- 	trace_pblk_line_state(pblk_disk_name(pblk), line->id,
- 					line->state);
-+
-+	/* We need to reset gc_group in order to ensure that
-+	 * pblk_line_gc_list will return proper move_list
-+	 * since right now current line is not on any of the
-+	 * gc lists.
-+	 */
-+	line->gc_group = PBLK_LINEGC_NONE;
- 	move_list = pblk_line_gc_list(pblk, line);
- 	spin_unlock(&line->lock);
--
--	if (move_list) {
--		spin_lock(&l_mg->gc_lock);
--		list_add_tail(&line->list, move_list);
--		spin_unlock(&l_mg->gc_lock);
--	}
-+	list_add_tail(&line->list, move_list);
-+	spin_unlock(&l_mg->gc_lock);
++	down_read(&nvm_lock);
+ 	list_for_each_entry(dev, &nvm_devices, devices) {
+ 		ret = nvm_remove_tgt(dev, &remove);
+ 		if (!ret)
+ 			break;
+ 	}
++	up_read(&nvm_lock);
+ 
+ 	return ret;
  }
- 
- static void pblk_gc_line_ws(struct work_struct *work)
 -- 
 2.19.1
 
