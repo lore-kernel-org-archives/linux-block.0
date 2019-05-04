@@ -1,103 +1,150 @@
-Return-Path: <SRS0=mx3V=TD=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=jajD=TE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B15AFC43219
-	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 20:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43EF4C46470
+	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 01:15:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 378F12075C
-	for <linux-block@archiver.kernel.org>; Fri,  3 May 2019 20:32:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="WwfGGluI"
+	by mail.kernel.org (Postfix) with ESMTP id 1F7B62082C
+	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 01:15:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726997AbfECUc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 May 2019 16:32:27 -0400
-Received: from mailgw2.fjfi.cvut.cz ([147.32.9.131]:45470 "EHLO
-        mailgw2.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726042AbfECUc1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 May 2019 16:32:27 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mailgw2.fjfi.cvut.cz (Postfix) with ESMTP id C8394A02D9;
-        Fri,  3 May 2019 22:32:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1556915544; i=@fjfi.cvut.cz;
-        bh=BJ8xtY5tE1UsjBZM+tJhGnLlyY1AyDM3NR5t6Yvpe8s=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References;
-        b=WwfGGluIBoqF6EAlVj5RHVGBy1aOQRCr4fBkBf5GCso+7mSB5/gxSuy7DIxCIS0Ti
-         ouqp/SbK1ZV4sbt3dz5EDJEGpMykfLc/Vhj6bwFUXH9ArTGaLs7tEaEZyqAb54MPcy
-         mW9DOyG+FqXKbPJicBnrG1fUdFPPQveWTFejQaWc=
-X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
-Received: from mailgw2.fjfi.cvut.cz ([127.0.0.1])
-        by localhost (mailgw2.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id L4VnO6i2tLtK; Fri,  3 May 2019 22:32:21 +0200 (CEST)
-Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mailgw2.fjfi.cvut.cz (Postfix) with ESMTPS id 1CEDDA02D3;
-        Fri,  3 May 2019 22:32:20 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw2.fjfi.cvut.cz 1CEDDA02D3
-Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id D8D9B6004D; Fri,  3 May 2019 22:32:19 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by linux.fjfi.cvut.cz (Postfix) with ESMTP id C57C36002A;
-        Fri,  3 May 2019 22:32:19 +0200 (CEST)
-Date:   Fri, 3 May 2019 22:32:19 +0200 (CEST)
-From:   David Kozub <zub@linux.fjfi.cvut.cz>
-To:     Christoph Hellwig <hch@infradead.org>,
-        Scott Bauer <sbauer@plzdonthack.me>
-cc:     Jens Axboe <axboe@kernel.dk>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: Re: [PATCH 0/3] block: sed-opal: add support for shadow MBR done
- flag and write
-In-Reply-To: <20190501134917.GC24132@infradead.org>
-Message-ID: <alpine.LRH.2.21.1905032058110.30331@linux.fjfi.cvut.cz>
-References: <1556666459-17948-1-git-send-email-zub@linux.fjfi.cvut.cz> <20190501134917.GC24132@infradead.org>
-User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
+        id S1726059AbfEDBPU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 May 2019 21:15:20 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:40675 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726042AbfEDBPT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 May 2019 21:15:19 -0400
+Received: by mail-pl1-f195.google.com with SMTP id b3so3502536plr.7;
+        Fri, 03 May 2019 18:15:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language;
+        bh=a9IXq1ExE3LjBqi16WuQaXq/l5pxcNR9gCGN3rok/Ak=;
+        b=drPha09l8ornjRRh0t2yyNmeujW4bqTPr/yR/vaozRTGRrZNggPswNG2Nw6RZU6H6R
+         XpRWEBkWxZJsHFSAQlC42u96nUn376pwCSoNtcuzRgA8lHbx8GsCNwYVJ8eFilnfwm92
+         roEPrA6Zojn4ubjxnPw79wnGsgE2RGLY4vXQRiJy5DNTcMDF2XzZK1UKhHM5h07jd68D
+         Xcoy7kiXM685BnrHDP9b6K1s6Qnc01FJTMVLdybL7hO4G4tjOSE3eliCr4OUBsLEWPtV
+         wV3umo+OHO3sbmtdiG7VuY57Bcv2QWL9T7HV6Q0Ra/XQJzsZUsHnx20A1QbC55BpxnV3
+         /HPw==
+X-Gm-Message-State: APjAAAWnmupasYdVwBqy1MPemjztT6vIbcGw8xedXn+anQjygtJzDNv+
+        +lJSF6F3QjuFTdOdSlIuB8yTyZ5T
+X-Google-Smtp-Source: APXvYqzLQm/VwjCjeibtxTsonIuvUl/wEsrh5GUCvnUSEzJDjjrpwxojlgclByE7lybGUbrravG1WQ==
+X-Received: by 2002:a17:902:7287:: with SMTP id d7mr14937211pll.186.1556932518486;
+        Fri, 03 May 2019 18:15:18 -0700 (PDT)
+Received: from asus.site ([2601:647:4000:5dd1:a41e:80b4:deb3:fb66])
+        by smtp.gmail.com with ESMTPSA id h30sm8830268pgi.38.2019.05.03.18.15.16
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Fri, 03 May 2019 18:15:17 -0700 (PDT)
+Subject: Re: blkdev_get deadlock
+To:     Evan Green <evgreen@chromium.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>
+References: <CAE=gft4irmMAapAj3O0hWr53PnyRUmcX2AJB+p_PqCJHT0rvNg@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Openpgp: preference=signencrypt
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <ca507480-0b06-5e4d-ebe6-464302d3af92@acm.org>
+Date:   Fri, 3 May 2019 18:15:15 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+In-Reply-To: <CAE=gft4irmMAapAj3O0hWr53PnyRUmcX2AJB+p_PqCJHT0rvNg@mail.gmail.com>
+Content-Type: multipart/mixed;
+ boundary="------------78929E0BE3A126298D42A8E9"
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 1 May 2019, Christoph Hellwig wrote:
+This is a multi-part message in MIME format.
+--------------78929E0BE3A126298D42A8E9
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
->> I successfully tested toggling the MBR done flag and writing the shadow MBR
->> using some tools I hacked together[4] with a Samsung SSD 850 EVO drive.
->
-> Can you submit the tool to util-linux so that we get it into distros?
+On 5/3/19 10:47 AM, Evan Green wrote:
+> Hey blockies,
+  ^^^^^^^^^^^^
 
-There is already Scott's sed-opal-temp[1] and a fork by Jonas that adds 
-support for older version of these new IOCTLs[2]. There was already some 
-discussion of getting that to util-linux.[3]
+That's the weirdest greeting I have encountered so far on the
+linux-block mailing list.
 
-While I like my hack, sed-opal-temp can do much more (my tool supports 
-just the few things I actually use). But there are two things which 
-sed-opal-temp currently lacks which my hack has:
+> I'm seeing a hung task in the kernel, and I wanted to share it in case
+> it's a known issue. I'm still trying to wrap my head around the stacks
+> myself. This is our Chrome OS 4.19 kernel, which is admittedly not
+> 100% vanilla mainline master, but we try to keep it pretty close.
+> 
+> I can reproduce this reliably within our chrome OS installer, where
+> it's trying to dd from my system disk (NVMe) to a loop device backed
+> by a removable UFS card (4kb sectors) in a USB dongle.
 
-* It can use a PBKDF2 hash (salted by disk serial number) of the password
-   rather than the password directly. This makes it compatible with sedutil
-   and I think it's also better practice (as firmware can contain many
-   surprises).
+Although this is not the only possible cause such hangs are often caused
+by a block driver or SCSI LLD not completing a request. A list of
+pending requests can be obtained e.g. by running the attached script.
 
-* It contains a 'PBA' (pre-boot authorization) tool. A tool intended to be
-   run from shadow mbr that asks for a password and uses it to unlock all
-   disks and set shadow mbr done flag, so after restart the computer boots
-   into the real OS.
+Bart.
 
-@Scott: What are your plans with sed-opal-temp? If you want I can update 
-Jonas' patches to the adapted IOCTLs. What are your thoughts on PW hashing 
-and a PBA tool?
+--------------78929E0BE3A126298D42A8E9
+Content-Type: text/plain; charset=UTF-8;
+ name="list-pending-block-requests"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="list-pending-block-requests"
 
-Best regards,
-David
-
-[1] https://github.com/ScottyBauer/sed-opal-temp
-[2] https://github.com/ghostav/sed-opal-temp
-[3] https://lkml.org/lkml/2019/2/4/736
+IyEvYmluL2Jhc2gKCnNob3dfc3RhdGUoKSB7CiAgICBsb2NhbCBhIGRldj0kMQoKICAgIGZv
+ciBhIGluIGRldmljZS9zdGF0ZSBxdWV1ZS9zY2hlZHVsZXI7IGRvCglbIC1lICIkZGV2LyRh
+IiBdICYmIGdyZXAgLWFIIC4gIiRkZXYvJGEiCiAgICBkb25lCn0KCmlmIFsgLWUgL3N5cy9r
+ZXJuZWwvZGVidWcvYmxvY2sgXTsgdGhlbgogICAgZGV2cz0oJChjZCAvc3lzL2tlcm5lbC9k
+ZWJ1Zy9ibG9jayAmJiBlY2hvIC4vKikpCmVsc2UKICAgIGRldnM9KCQoY2QgL3N5cy9jbGFz
+cy9ibG9jayAmJiBlY2hvIC4vKikpCmZpCgpjZCAvc3lzL2NsYXNzL2Jsb2NrIHx8IGV4aXQg
+JD8KZm9yIGRldiBpbiAiJHtkZXZzW0BdfSI7IGRvCiAgICBkZXY9IiR7ZGV2Iy4vfSIKICAg
+IGVjaG8gIiRkZXYiCiAgICBwZW5kaW5nPTAKICAgIGlmIFsgLWUgIiRkZXYvbXEiIF07IHRo
+ZW4KCWZvciBmIGluICIkZGV2Ii9tcS8qL3twZW5kaW5nLCovcnFfbGlzdH07IGRvCgkgICAg
+WyAtZSAiJGYiIF0gfHwgY29udGludWUKCSAgICBpZiB7IHJlYWQgLXIgbGluZTEgJiYgcmVh
+ZCAtciBsaW5lMjsgfSA8IiRmIjsgdGhlbgoJCWVjaG8gIiRmIgoJCWVjaG8gIiRsaW5lMSAk
+bGluZTIiID4vZGV2L251bGwKCQloZWFkIC1uIDkgIiRmIgoJCSgocGVuZGluZysrKSkKCSAg
+ICBmaQoJZG9uZQogICAgZmkKICAgICgKCWJ1c3k9MAoJY2QgL3N5cy9rZXJuZWwvZGVidWcv
+YmxvY2sgPiYvZGV2L251bGwgJiYKCSAgICB7IGdyZXAgLWFIIC4gJGRldi9yZXF1ZXVlX2xp
+c3Q7IHRydWU7IH0gJiYKCSAgICBmb3IgZCBpbiAiJGRldiIvbXEvaGN0eCogIiRkZXYiL2hj
+dHgqOyBkbwoJCVsgISAtZCAiJGQiIF0gJiYgY29udGludWUKCQl7IFsgISAtZSAiJGQvdGFn
+cyIgXSB8fAoJCSAgICAgIGdyZXAgLXEgJ15idXN5PTAkJyAiJGQvdGFncyI7IH0gJiYKCQkg
+ICAgeyBbICEgLWUgIiRkL3NjaGVkX3RhZ3MiIF0gfHwKCQkJICBbICIkKDwiJGQvc2NoZWRf
+dGFncyIpIiA9ICIiIF0gfHwKCQkJICBncmVwIC1xICdeYnVzeT0wJCcgIiRkL3NjaGVkX3Rh
+Z3MiOyB9ICYmIGNvbnRpbnVlCgkJKChidXN5KyspKQoJICAgICAgICBmb3IgZiBpbiAiJGQi
+L3thY3RpdmUsYnVzeSxkaXNwYXRjaCxmbGFncyxyZXF1ZXVlX2xpc3Qsc2NoZWRfdGFncyxz
+dGF0ZSx0YWdzKixjcHUqL3JxX2xpc3Qsc2NoZWQvKnJxc307IGRvCgkJICAgIFsgLWUgIiRm
+IiBdICYmIGdyZXAgLWFIIC4gIiRmIgoJCWRvbmUKCSAgICBkb25lCglleGl0ICRidXN5CiAg
+ICApCiAgICBwZW5kaW5nPSQoKHBlbmRpbmcrJD8pKQogICAgaWYgWyAiJHBlbmRpbmciIC1n
+dCAwIF07IHRoZW4KCSgKCSAgICBjZCAvc3lzL2tlcm5lbC9kZWJ1Zy9ibG9jayA+Ji9kZXYv
+bnVsbCAmJgoJCWlmIFsgLWUgIiRkZXYvbXEvc3RhdGUiIF07IHRoZW4KCQkgICAgZ3JlcCAt
+YUggLiAiJGRldi9tcS9zdGF0ZSIKCQllbHNlCgkJICAgIGdyZXAgLWFIIC4gIiRkZXYvc3Rh
+dGUiCgkJZmkKCSkKCXNob3dfc3RhdGUgIiRkZXYiCiAgICBmaQpkb25lCg==
+--------------78929E0BE3A126298D42A8E9--
