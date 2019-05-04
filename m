@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 630CAC43219
-	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 18:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95C46C43219
+	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 18:40:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 358EF2084A
-	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 18:40:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A6EE2084A
+	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 18:40:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="eirepp7r"
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="APmfL13e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727415AbfEDSii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 May 2019 14:38:38 -0400
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:40544 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727368AbfEDSih (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 May 2019 14:38:37 -0400
-Received: by mail-lf1-f65.google.com with SMTP id o16so6513277lfl.7
-        for <linux-block@vger.kernel.org>; Sat, 04 May 2019 11:38:35 -0700 (PDT)
+        id S1727413AbfEDSkV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 4 May 2019 14:40:21 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:39103 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727367AbfEDSig (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 4 May 2019 14:38:36 -0400
+Received: by mail-lj1-f194.google.com with SMTP id q10so7855442ljc.6
+        for <linux-block@vger.kernel.org>; Sat, 04 May 2019 11:38:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=0lUEIM6HxDnO0WA4JO+7E8AtWBSweRsdO5Jk/5jbRNk=;
-        b=eirepp7rCDa4s4xp9B9alMSTJW8zT3BZDnviazcRBoQtnmPVWmbHWx/MKyMKZfzniH
-         lCbbp14h3V5zZ6/pxwX3qaUxuybRn+rsSGzH5s7azheoJNHuA+bKeSHXPMjt0QY0qUgd
-         z3DSyplKba5KP3lYnBIJNJCe3mFH/VozvNOa58iHAkppdDhZvaaaK62tN3n8WTkXunrg
-         NOfTB7TbeClqosR8YYRn/Ih3zeMsGJIU0YF+aCgzfMm5RwCsNHesir599y05Ojpyk/ft
-         s8O++kiMtbe6vSo5WuvLmjIgQ/Xfk+z6+IqMzcgu9tV8L1H9TQCJIoe9vEaxbqzgBpFP
-         EM0g==
+        bh=gj/yuGQs2NzUkZmqPY17o2QhTDN0kFaU7SFZqHnYJbI=;
+        b=APmfL13e6+WIsIRju2Lorrwk8f++NLt92PVKF0smDJQlmVOCBxYtsUuMNoZi+tmrsl
+         KwWHIx4oiG7mbBVhLV6oNx4TNOD3majLdjDO8MbTkAYweT5x2ZGt0c/wWHJEJDz5+xN3
+         CZ7WD0Y7UVxxOlPso2UxB5TkE84g2zt6qY6PgdGWuIEWdWfUQsed1aAWP04rU4Cz4uVh
+         WyTscCDhm4kf90uBTP3XLY4leeXXsxNAhf6tpDiwVV4DuS8C02d6QeqIFT0vORyJuSoq
+         2JN1+HBuNFJjKMo5sdWT3B7Xls8MVrUK71k5i9SIFu8kc+SH92pFgD6Id70HjXT53+q0
+         93rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=0lUEIM6HxDnO0WA4JO+7E8AtWBSweRsdO5Jk/5jbRNk=;
-        b=joLaNhnhfleHp1dQB+vC+FQ7HCm0pSp44h6SaTziyG/jSD8MaPliwYBdhRKQM+2aof
-         KQcysK8GXXpeZ+Bxb3xPbYFn3rpPzcIrpIQk5hx2RM7FISEPE0Gm32TId2ylOc/rfe+3
-         M5NC8znrNvvlvT0B2ys7TdiwWbUWTT3PhWtPWdZ0WOSMr2Ze7SIvXKgzufBbmed93ZH+
-         hZ1majxY09GmM8jkIz6/8/77hKLsfD/quaTj1PJTldefeZyEZE61GtsGIQqZNzVu0V3Z
-         3CttMDH3QqCwhnl287LDZSbW5dGaDAeUczJ/A6J6tHUG6oLgEBncXer2qX/puatlGRrR
-         qbUQ==
-X-Gm-Message-State: APjAAAVZaZglb+Q0pctIzgHr8DmbbzrL2vQUZhSVZv1w4H/yPacRD+9V
-        ho5ynPq+xVzt76KtJ+Zf7k77xw==
-X-Google-Smtp-Source: APXvYqwbJccRkqhPgXwF38teXbsvsMsVyU3UOO3SbQBiPhc3j3Gja4qxPs2Eg02/ToEQp9jf90JfZg==
-X-Received: by 2002:a19:4811:: with SMTP id v17mr8039906lfa.10.1556995114808;
-        Sat, 04 May 2019 11:38:34 -0700 (PDT)
+        bh=gj/yuGQs2NzUkZmqPY17o2QhTDN0kFaU7SFZqHnYJbI=;
+        b=Y5zu5J6v6K6p1/0b60Wvco8oUxnERIUuUq1F5g+WP5mJlM+IyF4n03SFrxgG3vpF5d
+         47O7Mik3ozsEdBkaJkl4Qn5z+lxDjCdDXFdPkQbZ1g1K2Wj095cXr1U9R2ECBVc1ZtEe
+         oGuCj8xfqe5fYr3a9jAg5dsi2Dsz5OcVB11ug0wRoTgGzvo6I5ig6CT4wR97QF5kN3I1
+         0nk4pD+806nxlI8Zp3xVVjNLyfUXjVJHWBCNvsPJLxU3n69NEJSy0KOOAPBEHlG7BNym
+         xliCGvAsddR8Mm9FzxnBivfCaXcfXgPgwbGepYPwmvCdRlAx3qQjI1yZJNYnaHt3Fn1m
+         9UeQ==
+X-Gm-Message-State: APjAAAUcY5Dn/XXdbEEWWeF3LAIWIqzh9zgLvU6CmOAid7cVRMUxPbRr
+        LvxrH1qmgST0MYpX82wUEAxZXA==
+X-Google-Smtp-Source: APXvYqybQkhDG2YODQje628BeV8Kwa8iZFZQs3CgscGeqrjhmj+Y/zwVrctXxkoZIYbabK+HfWCIiA==
+X-Received: by 2002:a2e:9ac8:: with SMTP id p8mr7976733ljj.79.1556995113962;
+        Sat, 04 May 2019 11:38:33 -0700 (PDT)
 Received: from skyninja.webspeed.dk (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
-        by smtp.gmail.com with ESMTPSA id q21sm1050260lfa.84.2019.05.04.11.38.34
+        by smtp.gmail.com with ESMTPSA id q21sm1050260lfa.84.2019.05.04.11.38.33
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 04 May 2019 11:38:34 -0700 (PDT)
+        Sat, 04 May 2019 11:38:33 -0700 (PDT)
 From:   =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To:     axboe@fb.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Igor Konopko <igor.j.konopko@intel.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 09/26] lightnvm: pblk: set proper read status in bio
-Date:   Sat,  4 May 2019 20:37:54 +0200
-Message-Id: <20190504183811.18725-10-mb@lightnvm.io>
+Subject: [GIT PULL 08/26] lightnvm: pblk: cleanly fail when there is not enough memory
+Date:   Sat,  4 May 2019 20:37:53 +0200
+Message-Id: <20190504183811.18725-9-mb@lightnvm.io>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190504183811.18725-1-mb@lightnvm.io>
 References: <20190504183811.18725-1-mb@lightnvm.io>
@@ -74,58 +74,50 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Igor Konopko <igor.j.konopko@intel.com>
 
-Currently in case of read errors, bi_status is not set properly which
-leads to returning inproper data to layers above. This patch fix that
-by setting proper status in case of read errors.
+L2P table can be huge in many cases, since it typically requires 1GB
+of DRAM for 1TB of drive. When there is not enough memory available,
+OOM killer turns on and kills random processes, which can be very
+annoying for users.
 
-Also remove unnecessary warn_once(), which does not make sense
-in that place, since user bio is not used for interation with drive
-and thus bi_status will not be set here.
+This patch changes the flag for L2P table allocation on order to handle
+this situation in more user friendly way.
+
+GFP_KERNEL and __GPF_HIGHMEM are default flags used in parameterless
+vmalloc() calls, so they are also keeped in that patch. Additionally
+__GFP_NOWARN flag is added in order to hide very long dmesg warn in
+case of the allocation failures. The most important flag introduced
+in that patch is __GFP_RETRY_MAYFAIL, which would cause allocator
+to try use free memory and if not available to drop caches, but not
+to run OOM killer.
 
 Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-Reviewed-by: Javier González <javier@javigon.com>
 Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Reviewed-by: Javier González <javier@javigon.com>
 Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/lightnvm/pblk-read.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ drivers/lightnvm/pblk-init.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index b8eb6bdb983b..7b7a04a80d67 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -175,11 +175,10 @@ static void pblk_read_check_rand(struct pblk *pblk, struct nvm_rq *rqd,
- 	WARN_ONCE(j != rqd->nr_ppas, "pblk: corrupted random request\n");
- }
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 81e8ed4d31ea..e0df3de1ce83 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -164,9 +164,14 @@ static int pblk_l2p_init(struct pblk *pblk, bool factory_init)
+ 	int ret = 0;
  
--static void pblk_end_user_read(struct bio *bio)
-+static void pblk_end_user_read(struct bio *bio, int error)
- {
--#ifdef CONFIG_NVM_PBLK_DEBUG
--	WARN_ONCE(bio->bi_status, "pblk: corrupted read bio\n");
--#endif
-+	if (error && error != NVM_RSP_WARN_HIGHECC)
-+		bio_io_error(bio);
- 	bio_endio(bio);
- }
+ 	map_size = pblk_trans_map_size(pblk);
+-	pblk->trans_map = vmalloc(map_size);
+-	if (!pblk->trans_map)
++	pblk->trans_map = __vmalloc(map_size, GFP_KERNEL | __GFP_NOWARN
++					| __GFP_RETRY_MAYFAIL | __GFP_HIGHMEM,
++					PAGE_KERNEL);
++	if (!pblk->trans_map) {
++		pblk_err(pblk, "failed to allocate L2P (need %zu of memory)\n",
++				map_size);
+ 		return -ENOMEM;
++	}
  
-@@ -219,7 +218,7 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
- 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
- 	struct bio *bio = (struct bio *)r_ctx->private;
- 
--	pblk_end_user_read(bio);
-+	pblk_end_user_read(bio, rqd->error);
- 	__pblk_end_io_read(pblk, rqd, true);
- }
- 
-@@ -298,7 +297,7 @@ static void pblk_end_partial_read(struct nvm_rq *rqd)
- 	rqd->bio = NULL;
- 	rqd->nr_ppas = nr_secs;
- 
--	bio_endio(bio);
-+	pblk_end_user_read(bio, rqd->error);
- 	__pblk_end_io_read(pblk, rqd, false);
- }
+ 	pblk_ppa_set_empty(&ppa);
  
 -- 
 2.19.1
