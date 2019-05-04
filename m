@@ -3,63 +3,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A7BC43219
-	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 12:33:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 954A6C43219
+	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 12:35:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 92F8020644
-	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 12:33:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 699E120644
+	for <linux-block@archiver.kernel.org>; Sat,  4 May 2019 12:35:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726230AbfEDMdL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 May 2019 08:33:11 -0400
-Received: from mx2.suse.de ([195.135.220.15]:32952 "EHLO mx1.suse.de"
+        id S1726214AbfEDMfM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 4 May 2019 08:35:12 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33182 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725981AbfEDMdK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 4 May 2019 08:33:10 -0400
+        id S1725981AbfEDMfM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 4 May 2019 08:35:12 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id E45FEAD26;
-        Sat,  4 May 2019 12:33:09 +0000 (UTC)
-Date:   Sat, 4 May 2019 14:33:09 +0200
+        by mx1.suse.de (Postfix) with ESMTP id 1B44DAAD0;
+        Sat,  4 May 2019 12:35:11 +0000 (UTC)
+Date:   Sat, 4 May 2019 14:35:09 +0200
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
 Subject: Re: [PATCH 4/8] iomap: use bio_release_pages in iomap_dio_bio_end_io
-Message-ID: <20190504123309.GC5329@x250>
+Message-ID: <20190504123509.GD5329@x250>
 References: <20190502233332.28720-1-hch@lst.de>
  <20190502233332.28720-5-hch@lst.de>
+ <20190504123309.GC5329@x250>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190502233332.28720-5-hch@lst.de>
+In-Reply-To: <20190504123309.GC5329@x250>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 02, 2019 at 07:33:28PM -0400, Christoph Hellwig wrote:
-> @@ -1588,13 +1588,7 @@ static void iomap_dio_bio_end_io(struct bio *bio)
->  	if (should_dirty) {
->  		bio_check_pages_dirty(bio);
->  	} else {
-> -		if (!bio_flagged(bio, BIO_NO_PAGE_REF)) {
-> -			struct bvec_iter_all iter_all;
-> -			struct bio_vec *bvec;
-> -
-> -			bio_for_each_segment_all(bvec, bio, iter_all)
-> -				put_page(bvec->bv_page);
-> -		}
-> +		bio_release_pages(bio);
+On Sat, May 04, 2019 at 02:33:09PM +0200, Johannes Thumshirn wrote:
+> 
+> Shouldn't this rather be:
+> 
+> 		if (!bio_flagged(bio, BIO_NO_PAGE_REF)) 
+> 			bio_release_pages(bio);
 
-Shouldn't this rather be:
+OK I apparently can't remember between 3 emails, sorry
 
-		if (!bio_flagged(bio, BIO_NO_PAGE_REF)) 
-			bio_release_pages(bio);
-		
+
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+
 -- 
 Johannes Thumshirn                            SUSE Labs Filesystems
 jthumshirn@suse.de                                +49 911 74053 689
