@@ -2,120 +2,173 @@ Return-Path: <SRS0=gQfC=TF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED34C04AAA
-	for <linux-block@archiver.kernel.org>; Sun,  5 May 2019 01:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B5AC004C9
+	for <linux-block@archiver.kernel.org>; Sun,  5 May 2019 08:41:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 160E820651
-	for <linux-block@archiver.kernel.org>; Sun,  5 May 2019 01:10:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 689FB208C0
+	for <linux-block@archiver.kernel.org>; Sun,  5 May 2019 08:41:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726310AbfEEBKd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 May 2019 21:10:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36022 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726278AbfEEBKc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 4 May 2019 21:10:32 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726846AbfEEIlN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 May 2019 04:41:13 -0400
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:41073 "EHLO mx1.molgen.mpg.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725873AbfEEIlN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 5 May 2019 04:41:13 -0400
+Received: from [192.168.0.2] (ip5f5bd373.dynamic.kabel-deutschland.de [95.91.211.115])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3A231CA1F5;
-        Sun,  5 May 2019 01:10:32 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B03C60C18;
-        Sun,  5 May 2019 01:10:23 +0000 (UTC)
-Date:   Sun, 5 May 2019 09:10:18 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chuck Lever <chuck.lever@oracle.com>, netdev@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH V4 0/3] scsi: core: avoid big pre-allocation for sg list
-Message-ID: <20190505011017.GD655@ming.t460p>
-References: <20190428073932.9898-1-ming.lei@redhat.com>
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id E1D46604E3678;
+        Sun,  5 May 2019 10:41:09 +0200 (CEST)
+Subject: Re: failed to set xfermode (err_mask=0x40): READ LOG DMA EXT failed,
+ trying PIO
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
+Cc:     linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+References: <f7cef1cf-69d0-82e7-7902-fee56c19577a@molgen.mpg.de>
+Message-ID: <89898e39-787c-ad82-26bf-cd03ce16a75c@molgen.mpg.de>
+Date:   Sun, 5 May 2019 10:41:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190428073932.9898-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Sun, 05 May 2019 01:10:32 +0000 (UTC)
+In-Reply-To: <f7cef1cf-69d0-82e7-7902-fee56c19577a@molgen.mpg.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Apr 28, 2019 at 03:39:29PM +0800, Ming Lei wrote:
-> Hi,
-> 
-> Since supporting to blk-mq, big pre-allocation for sg list is introduced,
-> this way is very unfriendly wrt. memory consumption.
-> 
-> There were Red Hat internal reports that some scsi_debug based tests
-> can't be run any more because of too big pre-allocation.
-> 
-> Also lpfc users commplained that 1GB+ ram is pre-allocatd for single
-> HBA.
-> 
-> sg_alloc_table_chained() is improved to support variant size of 1st
-> pre-allocated SGL in the 1st patch as suggested by Christoph.
-> 
-> The other two patches try to address this issue by allocating sg list runtime,
-> meantime pre-allocating one or two inline sg entries for small IO. This
-> ways follows NVMe's approach wrt. sg list allocation.
-> 
-> V4:
-> 	- add parameter to sg_alloc_table_chained()/sg_free_table_chained()
-> 	directly, and update current callers
-> 
-> V3:
-> 	- improve sg_alloc_table_chained() to accept variant size of
-> 	the 1st pre-allocated SGL
-> 	- applies the improved sg API to address the big pre-allocation
-> 	issue
-> 
-> V2:
-> 	- move inline sg table initializetion into one helper
-> 	- introduce new helper for getting inline sg
-> 	- comment log fix
-> 
-> 
-> Ming Lei (3):
->   lib/sg_pool.c: improve APIs for allocating sg pool
->   scsi: core: avoid to pre-allocate big chunk for protection meta data
->   scsi: core: avoid to pre-allocate big chunk for sg list
-> 
->  drivers/nvme/host/fc.c            |  7 ++++---
->  drivers/nvme/host/rdma.c          |  7 ++++---
->  drivers/nvme/target/loop.c        |  4 ++--
->  drivers/scsi/scsi_lib.c           | 31 ++++++++++++++++++++++---------
->  include/linux/scatterlist.h       | 11 +++++++----
->  lib/scatterlist.c                 | 36 +++++++++++++++++++++++-------------
->  lib/sg_pool.c                     | 37 +++++++++++++++++++++++++++----------
->  net/sunrpc/xprtrdma/svc_rdma_rw.c |  5 +++--
->  8 files changed, 92 insertions(+), 46 deletions(-)
-> 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Ewan D. Milne <emilne@redhat.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Sagi Grimberg <sagi@grimberg.me>
-> Cc: Chuck Lever <chuck.lever@oracle.com>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-nvme@lists.infradead.org
-
-Hi Martin,
-
-Could you consider to merge this patchset to 5.2 if you are fine?
+Dear Linux folks,
 
 
-Thanks,
-Ming
+On 01.05.19 11:34, Paul Menzel wrote:
+
+> On an MSI B350M MORTAR (MS-7A37) with all firmwares, and the AHCI SSD 
+> Crucial MX500, *sometimes* boot and resume are delayed by four to five 
+> seconds, and the log contains the message *failed to set xfermode*.
+> 
+>> [    0.474150] ata9: SATA link up 6.0 Gbps (SStatus 133 SControl 0)
+>> [    0.474267] microcode: Microcode Update Driver: v2.2.
+>> [    0.474294] AVX2 version of gcm_enc/dec engaged.
+>> [    0.474295] AES CTR mode by8 optimization enabled
+>> [    0.474304] ata9.00: supports DRM functions and may not be fully accessible
+>> [    0.474368] ata9.00: ATA-10: CT1000MX500SSD4, M3CR020, max UDMA/133
+>> [    0.474370] ata9.00: 1953525168 sectors, multi 1: LBA48 NCQ (depth 32), AA
+>> [    0.474569] ata9.00: READ LOG DMA EXT failed, trying PIO
+>> [    0.474571] ata9.00: failed to get Identify Device Data, Emask 0x40
+>> [    0.474572] ata9.00: ATA Identify Device Log not supported
+>> [    0.474573] ata9.00: Security Log not supported
+>> [    0.474576] ata9.00: failed to set xfermode (err_mask=0x40)
+>> [    0.493193] sched_clock: Marking stable (504159603, -10991650)->(615393192, -122225239)
+>> [    0.493768] registered taskstats version 1
+>> [    0.493770] Loading compiled-in X.509 certificates
+>> [    0.497894] Loaded X.509 cert 'Build time autogenerated kernel key: 4682756457c0b7b167f0b726943cf53ade93bd78'
+>> [    0.497984] zswap: loaded using pool lzo/zbud
+>> [    0.498237] kmemleak: Kernel memory leak detector initialized
+>> [    0.498243] kmemleak: Automatic memory scanning thread started
+>> [    0.506469] Key type big_key registered
+>> [    0.508864]   Magic number: 11:580:189
+>> [    0.508914] acpi device:48: hash matches
+>> [    0.508922] acpi device:1b: hash matches
+>> [    0.509017] rtc_cmos 00:02: setting system clock to 2019-03-29T17:09:41 UTC (1553879381)
+>> [    0.509485] After kernel_init_freeable
+>> [    1.364358] tsc: Refined TSC clocksource calibration: 3499.982 MHz
+>> [    1.364370] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x32734013f67, max_idle_ns: 440795323134 ns
+>> [    1.364419] clocksource: Switched to clocksource tsc
+>> [    5.593141] ata9: SATA link up 6.0 Gbps (SStatus 133 SControl 0)
+>> [    5.593270] ata9.00: supports DRM functions and may not be fully accessible
+>> [    5.594006] ata9.00: supports DRM functions and may not be fully accessible
+>> [    5.594600] ata9.00: configured for UDMA/133
+>> [    5.595893] scsi 8:0:0:0: Direct-Access     ATA      CT1000MX500SSD4  020  PQ: 0 ANSI: 5
+>> [    5.596611] sd 8:0:0:0: [sda] 1953525168 512-byte logical blocks: (1.00 TB/932 GiB)
+>> [    5.596613] sd 8:0:0:0: [sda] 4096-byte physical blocks
+>> [    5.596626] sd 8:0:0:0: [sda] Write Protect is off
+>> [    5.596629] sd 8:0:0:0: [sda] Mode Sense: 00 3a 00 00
+>> [    5.596650] sd 8:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+>> [    5.596837] sd 8:0:0:0: Attached scsi generic sg0 type 0
+>> [    5.597329]  sda: sda1 sda2 sda3
+>> [    5.599079] sd 8:0:0:0: [sda] Attached SCSI disk
+> 
+> This happens with all Linux kernel versions – tested since 4.14. 
+> Searching for this error on the Web, several people seem to be affected 
+> with different boards and drives [1].
+> 
+> In a lot of those reports, I also see the message *Security Log not 
+> supported*.
+> 
+> Do you have an idea, why this is only happening sometimes? Is it likely 
+> a drive firmware issue? As it affects several vendors, can Linux work 
+> around this problem (if it can be pinpointed)?
+
+The first error seems to be `READ LOG DMA EXT failed, trying PIO`. The 
+code looks like below [2].
+
+> retry:
+>         ata_tf_init(dev, &tf);
+>         if (dev->dma_mode && ata_id_has_read_log_dma_ext(dev->id) &&
+>             !(dev->horkage & ATA_HORKAGE_NO_DMA_LOG)) {
+>                 tf.command = ATA_CMD_READ_LOG_DMA_EXT;
+>                 tf.protocol = ATA_PROT_DMA;
+>                 dma = true;
+>         } else {
+>                 tf.command = ATA_CMD_READ_LOG_EXT;
+>                 tf.protocol = ATA_PROT_PIO;
+>                 dma = false;
+>         }
+>         tf.lbal = log;
+>         tf.lbam = page;
+>         tf.nsect = sectors;
+>         tf.hob_nsect = sectors >> 8;
+>         tf.flags |= ATA_TFLAG_ISADDR | ATA_TFLAG_LBA48 | ATA_TFLAG_DEVICE;
+> 
+>         err_mask = ata_exec_internal(dev, &tf, NULL, DMA_FROM_DEVICE,
+>                                      buf, sectors * ATA_SECT_SIZE, 0);
+> 
+>         if (err_mask && dma) {
+>                 dev->horkage |= ATA_HORKAGE_NO_DMA_LOG;
+>                 ata_dev_warn(dev, "READ LOG DMA EXT failed, trying PIO\n");
+>                 goto retry;
+>         }
+> 
+>         DPRINTK("EXIT, err_mask=%x\n", err_mask);
+>         return err_mask;
+
+So when trying PIO, that also seems to fail, and the error mask 0x40 is 
+propagated up.
+
+> enum ata_completion_errors {
+>         AC_ERR_DEV              = (1 << 0), /* device reported error */
+>         AC_ERR_HSM              = (1 << 1), /* host state machine violation */
+>         AC_ERR_TIMEOUT          = (1 << 2), /* timeout */
+>         AC_ERR_MEDIA            = (1 << 3), /* media error */
+>         AC_ERR_ATA_BUS          = (1 << 4), /* ATA bus error */
+>         AC_ERR_HOST_BUS         = (1 << 5), /* host bus error */
+>         AC_ERR_SYSTEM           = (1 << 6), /* system error */
+>         AC_ERR_INVALID          = (1 << 7), /* invalid argument */
+>         AC_ERR_OTHER            = (1 << 8), /* unknown */
+>         AC_ERR_NODEV_HINT       = (1 << 9), /* polling device detection hint */
+>         AC_ERR_NCQ              = (1 << 10), /* marker for offending NCQ qc */
+> };
+
+So 0x40 is AC_ERR_HOST_BUS, right? Any idea, what might cause this?
+
+Would it be helpful to enable the debug messages?
+
+     #undef ATA_DEBUG                /* debugging output */
+
+
+Kind regards,
+
+Paul
+
+
+> [1]: https://bugzilla.kernel.org/show_bug.cgi?id=195895[2]: 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/ata/libata-core.c?id=1daa0449d287a109b93c4516914eddeff4baff65#n2075
+[3]: 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/linux/libata.h?id=1daa0449d287a109b93c4516914eddeff4baff65#n508
