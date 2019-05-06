@@ -2,123 +2,180 @@ Return-Path: <SRS0=Wczi=TG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	T_DKIMWL_WL_MED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B3CAC04AAD
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 21:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A22CCC04A6B
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 22:42:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C6CB2082F
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 21:07:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6045D2082F
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 22:42:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAHDSRCO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wCfDCpO4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726444AbfEFVH3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 May 2019 17:07:29 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:38662 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726322AbfEFVH3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 17:07:29 -0400
-Received: by mail-qk1-f194.google.com with SMTP id a64so3003797qkg.5;
-        Mon, 06 May 2019 14:07:28 -0700 (PDT)
+        id S1726598AbfEFWmW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 May 2019 18:42:22 -0400
+Received: from mail-qt1-f202.google.com ([209.85.160.202]:37618 "EHLO
+        mail-qt1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726340AbfEFWmW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 18:42:22 -0400
+Received: by mail-qt1-f202.google.com with SMTP id s46so6539873qtj.4
+        for <linux-block@vger.kernel.org>; Mon, 06 May 2019 15:42:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4ndijvnNkt+c4ltTY2hyx/k7eCwa3nQG1K0KFz8eGCo=;
-        b=JAHDSRCO6ityOJT6r/V3YG3CEWoALP5vVAl7YUsywrn7yNhxz3yPvabEMNsFojl17Z
-         oYHQxvRY/w+V+OWH0hXUXcjrd+xNQvMif+q9dp/4rml5lzR9CwvnrhlecvAfqBp8HLpu
-         RT7rQIf54ftUCcF41NCXUe+bKM4rpU3c+WV1vUAeSdwnsdh8NVLhrox1T1zRLujcsEiC
-         zkqh1aBtlHmwR8/DMXYtU1SPEQP0kPvfNB2KPMT/NGsDh1exofQ+Wd9pYUaUn9CadJVe
-         36k7EGEE6XE3w9OSafxCIqgo0zZLLl3zxS0gYAoqA2/ClGduUhcn3ep4GcZnaH2nk4Js
-         LZOg==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=HDQgsnfMdYj2HzAh+6ZKVkk4GAFoPt2zIEZOsu0qMIU=;
+        b=wCfDCpO4iwQ8hM3pS4WghaopX9OaZw7S2s2pTYHSwTSzHwuGPvStk8RQDoVx+YV2pc
+         qgnKeomPe77Vcy3FFjVYTRmifdcB60+Gc7J3PFHQ4aUvu2T4jdlGwFp+jOvzqXYCVaXc
+         YSnHMYF9+4ykKg28N41l/erKi55iAyZMcJUFZZSGFDo8Yfhk1ozwmcEk2PCJuH9bb9fS
+         V65i43xZSrYa3zgcaLYvWwQnmiQRf+n6iv03QdS3oMjU4xQ+Z+KMpQ7zxEFlSqAP63qf
+         Yp3HvJ5nzXdFxshzoOiykpBvSe/FQ6DOSGUTmrWEAY5r9a+KPWYuW/TuL0CZesVvnhAg
+         Om+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4ndijvnNkt+c4ltTY2hyx/k7eCwa3nQG1K0KFz8eGCo=;
-        b=UdF0Ujcf7AZB/UEtTdwgLD9qcBjzRvdA4XgR+sfRYkAChpdUz2eu0LVIq6RbMM9ngS
-         z+NrDudHTv1zRYX9gOiJCqQ8+G1HmykAX5ypQX1Nv31sR94cPn2rUzkCcWC883+OPzLK
-         zUFLKEUyAGhwlf7FI4M6YqWBXDOGIDYc/pSy+dQarzj2vU3W3lpo/KgcgjGiWS5V5wvb
-         pPSdwIKaj5i+dCoudFVeGJr6STIzXv1BTvnieZ3PVOI/+UD5baYvJ+7bLyq+ZXOekSOQ
-         l+nF9UjH1mBDCHG6Je4znSyDZKUZYtO/U1lNwleVKOtMruPRx8WEtkPHtJpgvSUpxMy9
-         k8Fw==
-X-Gm-Message-State: APjAAAWWPKhKKio8LgqjQ6k98neokg0gAiuF0R7UcOWjSdmLgiaAqIr8
-        Y4I6DA8jg+5SP05Dn/kjuvwHXJZQg+Kx4TBkgbs=
-X-Google-Smtp-Source: APXvYqy0cewLmOJ/voV9XvczblnnlIzNNvgjOehbgCWnmm79W69Rbb0K6eoBkS/uoxVXEVkLB/YMPNpGYFmWMBlj73o=
-X-Received: by 2002:a05:620a:1423:: with SMTP id k3mr20774846qkj.120.1557176847994;
- Mon, 06 May 2019 14:07:27 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190430223722.20845-1-gpiccoli@canonical.com>
- <20190430223722.20845-2-gpiccoli@canonical.com> <CAPhsuW4SeUhNOJJkEf9wcLjbbc9qX0=C8zqbyCtC7Q8fdL91hw@mail.gmail.com>
- <c8721ba3-5d38-7906-5049-e2b16e967ecf@canonical.com>
-In-Reply-To: <c8721ba3-5d38-7906-5049-e2b16e967ecf@canonical.com>
-From:   Song Liu <liu.song.a23@gmail.com>
-Date:   Mon, 6 May 2019 17:07:16 -0400
-Message-ID: <CAPhsuW6ahmkUhCgns=9WHPXSvYefB0Gmr1oB7gdZiD86sKyHFg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] md/raid0: Do not bypass blocking queue entered for
- raid0 bios
-To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Cc:     linux-block@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>, dm-devel@redhat.com,
-        axboe@kernel.dk, Gavin Guo <gavin.guo@canonical.com>,
-        Jay Vosburgh <jay.vosburgh@canonical.com>, kernel@gpiccoli.net,
-        Ming Lei <ming.lei@redhat.com>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        stable@vger.kernel.org
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=HDQgsnfMdYj2HzAh+6ZKVkk4GAFoPt2zIEZOsu0qMIU=;
+        b=H0qg602cuK5v1hgxotx9QJiMft5nrT6Hkwv/Qj1VSUz2hKID9y2seABYZRngEvcFmM
+         KVDkB+tLBJ4waafZJYqozliHdMbruw3xiFKB3XBDtHCJBonson2YbxSUbMCFnaEkPPQW
+         WIdwkGv3Ml6APNo7G69lYnPEFcLL3096Wzh0aeCCE5vHXl6uw5R7jcRDxiYuRhQNF0Lh
+         Df2tq/DhDs+cokR62DZzLvetcjgR2cpGcSnmeRMV+kC/1t6w79D4UEkvdEwppQyo3tij
+         4KH9TVfqNA/FsUm5sYgIP4OMtp+gJtgtrdw71SHOIe1OtpWXEw+4H3vJZDt4fhFOWHIE
+         1AvA==
+X-Gm-Message-State: APjAAAWv9h+Pt21RiUd66VWnqguJobnok6K/R3bjZEW3/LIp2tsJyy69
+        aYZshbuRBO/bPq1kiR4RpuEgQkELCu7ltlE9XZHBqTpEVkmis3qWkBqEKVkMoUlwt1SYUfEv1Z/
+        YBKPZiFJp+mItSM3XGBPxs4v2iwFZdNV2kZCrEqZhw/190EoCG6earsyV+tymsPIniGW6
+X-Google-Smtp-Source: APXvYqxwA5++xM6gxezRNh+erunt1hddnW/QI/qj9Iu7UOgd0D8UkctzXLxKtJg+FWmw0YdKUWa/J4QBF1w=
+X-Received: by 2002:a0c:b50d:: with SMTP id d13mr22650815qve.222.1557182541362;
+ Mon, 06 May 2019 15:42:21 -0700 (PDT)
+Date:   Mon,  6 May 2019 15:35:40 -0700
+Message-Id: <20190506223544.195371-1-satyat@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.21.0.1020.gf2820cf01a-goog
+Subject: [RFC PATCH 0/4] Inline Encryption Support
+From:   Satya Tangirala <satyat@google.com>
+To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     Parshuram Raju Thombare <pthombar@cadence.com>,
+        Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Satya Tangirala <satyat@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 6, 2019 at 2:48 PM Guilherme G. Piccoli
-<gpiccoli@canonical.com> wrote:
->
-> On 06/05/2019 13:50, Song Liu wrote:
-> > [...]
-> > IIUC, we need this for all raid types. Is it possible to fix that in md.c so
-> > all types get the fix?
-> >
-> > Thanks,
-> > Song
-> >
->
-> Hi Song, thanks again for reviewing my code and provide input, much
-> appreciated!
->
-> I understand this could in theory affects all the RAID levels, but in
-> practice I don't think it'll happen. RAID0 is the only "blind" mode of
-> RAID, in the sense it's the only one that doesn't care at all with
-> failures. In fact, this was the origin of my other thread [0], regarding
-> the change of raid0's behavior in error cases..because it currently does
-> not care with members being removed and rely only in filesystem failures
-> (after submitting many BIOs to the removed device).
->
-> That said, in this change I've only took care of raid0, since in my
-> understanding the other levels won't submit BIOs to dead devices; we can
-> experiment that to see if it's true.
+This patch series adds support for Inline Encryption to the block layer,
+fscrypt and f2fs.
 
-Could you please run a quick test with raid5? I am wondering whether
-some race condition could get us into similar crash. If we cannot easily
-trigger the bug, we can process with this version.
+Inline Encryption hardware allows software to specify an encryption context
+(an encryption key, crypto algorithm, data unit num, data unit size, etc.)
+along with a data transfer request to a storage device, and the inline
+encryption hardware will use that context to en/decrypt the data. The
+inline encryption hardware is part of the storage device, and it
+conceptually sits on the data path between system memory and the storage
+device. Inline Encryption hardware has become increasingly common, and we
+want to support it in the kernel.
 
-Thanks,
-Song
+Inline Encryption hardware implementations often function around the
+concept of a limited number of "keyslots", which can hold an encryption
+context each. The storage device can be directed to en/decrypt any
+particular request with the encryption context stored in any particular
+keyslot.
 
->
-> But I'd be happy to change all other levels also if you think it's
-> appropriate (or a simple generic change to md.c if it is enough). Do you
-> think we could go ahead with this change, and further improve that (to
-> cover all raid cases if necessary)?
->
-> Cheers,
->
->
-> Guilherme
->
->
->
-> [0] https://marc.info/?l=linux-raid&m=155562509905735
+Patch 1 introduces a Keyslot Manager to efficiently manage keyslots.
+The keyslot manager also functions as the interface that upper layers will
+use to program keys into inline encryption hardware. For more information
+on the Keyslot Manager, refer to documentation found in
+block/keyslot-manager.c and linux/keyslot-manager.h.
+
+We also want to be able to make use of inline encryption hardware with
+layered devices like device mapper. To this end, Patch 1 also introduces
+blk-crypto. Blk-crypto delegates crypto operations to inline encryption
+hardware when available, and also contains a software fallback to the
+kernel crypto API. Given that blk-crypto works as a software fallback,
+we are considering removing file content en/decryption from fscrypt and
+simply using blk-crypto in a future patch. For more details on blk-crypto,
+refer to Documentation/block/blk-crypto.txt.
+
+Patch 2 adds support for inline encryption into the UFS driver according
+to the JEDEC UFS HCI v2.1 specification. Inline encryption support for
+other drivers (like eMMC) may be added in the same way - the device driver
+should set up a Keyslot Manager in the device's request_queue (refer to
+the UFS crypto additions in ufshcd-crypto.c for an example).
+
+Patches 3 and 4 add support to fscrypt and f2fs, so that we have
+a complete stack that can make use of inline encryption.
+
+There have been a few patch sets addressing Inline Encryption Support in
+the past. Briefly, this patch set differs from those as follows:
+
+1) https://lkml.org/lkml/2018/10/17/1022
+"crypto: qce: ice: Add support for Inline Crypto Engine"
+is specific to certain hardware, while our patch set's Inline
+Encryption support for UFS is implemented according to the JEDEC UFS
+specification.
+
+2) https://lkml.org/lkml/2018/5/28/1187
+"scsi: ufs: UFS Host Controller crypto changes" registers inline
+encryption support as a kernel crypto algorithm. Our patch set views
+inline encryption as being fundamentally different from a generic crypto
+provider (in that inline encryption is tied to a device), and so does
+not use the kernel crypto API to represent inline encryption hardware.
+
+3) https://lkml.org/lkml/2018/12/11/190
+"scsi: ufs: add real time/inline crypto support to UFS HCD" requires
+the device mapper to work - our patch does not.
+
+Satya Tangirala (4):
+  block: Block Layer changes for Inline Encryption Support
+  scsi: ufs: UFS driver v2.1 crypto support
+  fscrypt: wire up fscrypt to use blk-crypto
+  f2fs: Wire up f2fs to use inline encryption via fscrypt
+
+ Documentation/block/blk-crypto.txt | 185 ++++++++++
+ block/Kconfig                      |  16 +
+ block/Makefile                     |   3 +
+ block/bio.c                        |  45 +++
+ block/blk-core.c                   |  14 +-
+ block/blk-crypto.c                 | 572 +++++++++++++++++++++++++++++
+ block/blk-merge.c                  |  87 ++++-
+ block/bounce.c                     |   1 +
+ block/keyslot-manager.c            | 314 ++++++++++++++++
+ drivers/scsi/ufs/Kconfig           |  10 +
+ drivers/scsi/ufs/Makefile          |   1 +
+ drivers/scsi/ufs/ufshcd-crypto.c   | 449 ++++++++++++++++++++++
+ drivers/scsi/ufs/ufshcd-crypto.h   |  92 +++++
+ drivers/scsi/ufs/ufshcd.c          |  85 ++++-
+ drivers/scsi/ufs/ufshcd.h          |  23 ++
+ drivers/scsi/ufs/ufshci.h          |  67 +++-
+ fs/crypto/Kconfig                  |   7 +
+ fs/crypto/bio.c                    | 156 ++++++--
+ fs/crypto/crypto.c                 |   9 +
+ fs/crypto/fscrypt_private.h        |  10 +
+ fs/crypto/keyinfo.c                |  69 ++--
+ fs/crypto/policy.c                 |  10 +
+ fs/f2fs/data.c                     |  69 +++-
+ fs/f2fs/super.c                    |   1 +
+ include/linux/bio.h                | 166 +++++++++
+ include/linux/blk-crypto.h         |  40 ++
+ include/linux/blk_types.h          |  49 +++
+ include/linux/blkdev.h             |   9 +
+ include/linux/fscrypt.h            |  58 +++
+ include/linux/keyslot-manager.h    | 131 +++++++
+ include/uapi/linux/fs.h            |  12 +-
+ 31 files changed, 2701 insertions(+), 59 deletions(-)
+ create mode 100644 Documentation/block/blk-crypto.txt
+ create mode 100644 block/blk-crypto.c
+ create mode 100644 block/keyslot-manager.c
+ create mode 100644 drivers/scsi/ufs/ufshcd-crypto.c
+ create mode 100644 drivers/scsi/ufs/ufshcd-crypto.h
+ create mode 100644 include/linux/blk-crypto.h
+ create mode 100644 include/linux/keyslot-manager.h
+
+-- 
+2.21.0.1020.gf2820cf01a-goog
+
