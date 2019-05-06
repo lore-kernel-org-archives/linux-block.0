@@ -2,144 +2,87 @@ Return-Path: <SRS0=Wczi=TG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 078D6C04A6B
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 23:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC48CC04A6B
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 23:51:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA9A4206BF
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 23:24:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77154206A3
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 23:51:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Exs8fXD4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DMPJxH7b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726437AbfEFXYA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 May 2019 19:24:00 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:45703 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726037AbfEFXYA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 19:24:00 -0400
-Received: by mail-lf1-f66.google.com with SMTP id n22so2844287lfe.12
-        for <linux-block@vger.kernel.org>; Mon, 06 May 2019 16:23:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yxOxaQdaJ/OqsDlgu3Co/ZHHyfNtTpij4NOpIoNjyRo=;
-        b=Exs8fXD4Jqa/FITqHIxIUYPuAtzNVtgBVyTdjoEYK/C8LQnLfUHNjL3Od+0J+L6P0c
-         N+/6dW1+q48z7LtvGFaxnpe91QwUY8nthDfjWBNfLFQSKjF889lnd06ghTMSPLhOr+VC
-         m8DPHaZQQSeEj6ylMVYnE7sh7dJfeISdUsbmndUQ2Nl07PWNfgg5/5WixNjodesS3BLY
-         4j+ER9uozNTwOyG3WM27MCbgu3sZcpV1SCYAkTf4JoA/f8zsIrmhRveYpxFLZO/RpmCC
-         Q6Do37JCOXHX4a/EmveQpgOr4ivz+oehjBZqB5znjr0ke6GWiMpSVnFn+oOV9V+23jYR
-         G2ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yxOxaQdaJ/OqsDlgu3Co/ZHHyfNtTpij4NOpIoNjyRo=;
-        b=Q7MZ6UqmC7U4Urh00NA65PklO29VZLQVGEsrzJvHGk5RllFBtNtzweDfuYyqtOZbAv
-         jGsOyacmtoKFfDLbm3CVC0ZX01oJGWF1SmFzqVMeaJ2sqIdEWcSyntZOSdoRmSFAMQma
-         EogFJcihhUzE6exbACCTTP2t+yE4Jo8KPlkrdESdwpEaJnQjYUGbv2PkQbcpS4gOyJhH
-         jgyrKVzmS/o6aChoI1L1SHwUm32ZKQVzj/Hg+c4xfyYg3BXjCjCSOQF3NLEVCSMu1iz0
-         KSFkovn79G74D+2QlLlOy2DrApN3DT71w/03PqwaRVrypPt4OxkWXBH0q9MtA9BFe3p4
-         fnVg==
-X-Gm-Message-State: APjAAAWzaXZC52ngGKZHGk4hbelCsq+o1nCtbl34h3L2vdT2NZ4mFz9Y
-        XvmzkEaSJIJpH/laoP5mv0IhezHGwgLZWW0qHUw=
-X-Google-Smtp-Source: APXvYqy3+wc9LwHke83ghsu/ky296EBG64QMHx0omQCuy5+hPsx48g3IEd8bVfQqFsUbGJGxcMfGi49/fMmUesxJn0o=
-X-Received: by 2002:a19:750e:: with SMTP id y14mr3757298lfe.110.1557185037775;
- Mon, 06 May 2019 16:23:57 -0700 (PDT)
+        id S1726423AbfEFXvf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 May 2019 19:51:35 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:60310 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726236AbfEFXvf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 19:51:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=kzyE3K2VQXItgkqYG9TxWXHWWGuAWAvs7pEj1TfD8vs=; b=DMPJxH7bd+fSd8vsJbjZ8inlPr
+        vHeZDDoAa2R9B6uWjavy5V6LPegPiMTAGtUDAeF5dYmlz6WEW1+il+iI5NsqT3ttgRYpqDjLNe3yn
+        YGTulM+OROXxf8oVKvyzcBYleH8Jhf9xdChafHpEkH0VeZGsVehX8mXnGvlWJB8ZpU5G0VKCq1JTP
+        5uVeDy8lua7ws9dtVDfqav/KmgZP0W8xCH6I5BWgI2OeHiLZCoyZbEluCe4i1N1pSUMnLEuZo2g9C
+        NiMOUDoTIrP0u25baq7B7DaKDk5tNGlT8pWjWdosZZFm72Tij6GNz/aLS4ks59JahVPiti6FY5ho6
+        vdvR+MSw==;
+Received: from static-50-53-52-16.bvtn.or.frontiernet.net ([50.53.52.16] helo=midway.dunlab)
+        by merlin.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hNnOE-0001rX-RK; Mon, 06 May 2019 23:51:23 +0000
+Subject: Re: [RFC PATCH 2/4] scsi: ufs: UFS driver v2.1 crypto support
+To:     Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Cc:     Parshuram Raju Thombare <pthombar@cadence.com>,
+        Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>
+References: <20190506223544.195371-1-satyat@google.com>
+ <20190506223544.195371-3-satyat@google.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <9ca9b288-4fc1-030a-3898-8ec632113c44@infradead.org>
+Date:   Mon, 6 May 2019 16:51:20 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190505150611.15776-1-minwoo.im.dev@gmail.com>
- <20190505150611.15776-2-minwoo.im.dev@gmail.com> <SN6PR04MB45274C423AA7C3CC3DBB5ED586300@SN6PR04MB4527.namprd04.prod.outlook.com>
- <a66b775f-9a5f-fefc-ae29-c86678e66463@gmail.com> <SN6PR04MB45272BEB18B3ADD95DCB42AE86300@SN6PR04MB4527.namprd04.prod.outlook.com>
- <cfa4d48d-ce13-0ace-cf5c-a3d0d1f4cca7@gmail.com> <SN6PR04MB4527FAD8076A5A5610F6B66786300@SN6PR04MB4527.namprd04.prod.outlook.com>
- <c86fe09e-9964-123a-bc17-e9b9e6a80856@gmail.com> <SN6PR04MB45273CEE5FE1DDF38677980F86300@SN6PR04MB4527.namprd04.prod.outlook.com>
-In-Reply-To: <SN6PR04MB45273CEE5FE1DDF38677980F86300@SN6PR04MB4527.namprd04.prod.outlook.com>
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-Date:   Tue, 7 May 2019 08:23:45 +0900
-Message-ID: <CAA7jztfU+AdUHp5xo8ssjgvXiBFBXJt0PyQTNA8VQU-T-SpKQA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] nvme: 002: fix nvmet pass data with loop
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     Omar Sandoval <osandov@osandov.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Keith Busch <keith.busch@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190506223544.195371-3-satyat@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> >> I wasn't clear enough.
-> >>
-> >> It doesn't check for the return value for now. What needs to happen is :-
-> >>
-> >> 1. Get rid of the variable strings which are not part of the discovery
-> >>       log page entries such as Generation counter.
-> >> 2. Validate each log page entry content.
-> >
-> > Question again here.
-> > Do you mean that log page entry contents validation should be in bash
-> > level instead of *.out comparison?
->
-> It has *out level comparison.
+On 5/6/19 3:35 PM, Satya Tangirala wrote:
+> diff --git a/drivers/scsi/ufs/Kconfig b/drivers/scsi/ufs/Kconfig
+> index 6db37cf306b0..c14f445a2522 100644
+> --- a/drivers/scsi/ufs/Kconfig
+> +++ b/drivers/scsi/ufs/Kconfig
+> @@ -135,3 +135,13 @@ config SCSI_UFS_BSG
+>  
+>  	  Select this if you need a bsg device node for your UFS controller.
+>  	  If unsure, say N.
+> +
+> +config SCSI_UFS_CRYPTO
+> +	bool "UFS Crypto Engine Support"
+> +	depends on SCSI_UFSHCD && BLK_KEYSLOT_MANAGER
+> +	help
+> +	Enable Crypto Engine Support in UFS.
+> +	Enabling this makes it possible for the kernel to use the crypto
+> +	capabilities of the UFS device (if present) to perform crypto
+> +	operations on data being transferred into/out of the device.
 
-I'm not sure I have got what you really meant.  Please correct me if I'm wrong
-here ;)
+	                        (maybe:)     to/from the device.
+> +
 
-First of all, removal of variable values in the result of the
-discovery get log page
-looks great to me also.  Maybe those variable values are able to be replaced
-a fixed value like port does (replace port value via sed command to X).
+Help text should be indented with 1 tab + 2 spaces, please.
 
-But, it also depends on the outout of the nvme-cli, not return value.
-Anyway, let's discuss about it with Keith also because he discussed it with me
-few weeks ago,I think.
-
-> >
-> >> 3. Check the return value.
-> >
-> > nvme-cli is currently returning value like:
-> >     > 0 :   failed with nvme status code (but the actual value may not be
-> > the same with status)
-> >     == 0 : done successfully
-> >     < 0 :   failed with -errno
-> >
-> > But, ( > 0) case may be removed from nvme-cli soon due to [1] discuss.
-> > Anyway, if nvme-cli is going to return 0 for both cases: success, error
-> > with nvme status, then test case is going to be hard to check the error
-> > status by a return value.
->
-> This should not happen as it will break existing scripts which are
-> written on the top the nvme-cli in past few years.
-
-Agreed.  But, please refer the following comment below ;)
-
->
->    It should be with output string parsing which
-> > would be great if it's going to be commonized.
-> >
-> No, we cannot rely on the output string as this problem is a good example.
->
-> I'm not sure returning == 0 for error case is a good idea. Checking
-> return value prevents us from writing unstable testcases which are bases
-> on the text output and allow us to modify tools as specification moves
-> forward.
-
-Please refer a discussion on https://github.com/linux-nvme/nvme-cli/pull/489
-Keith and I had a discussion about the return value of the program itself.
-The nvme status value is composed of 16 bits value, by the way, the actual
-return value of the program is in 8bits(signed) which means it's not
-able to carry
-the actual nvme status value out of the program.
-
-If you have any idea about it, Please let me know.  By the way, I really do
-agree with what you mentioned about the return value.  If it's possible,
-I would like to too :)
-
->
-> > [1] https://github.com/linux-nvme/nvme-cli/pull/492
-> >
->
+-- 
+~Randy
