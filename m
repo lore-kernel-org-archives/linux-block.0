@@ -2,242 +2,158 @@ Return-Path: <SRS0=Wczi=TG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,T_DKIMWL_WL_MED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70A92C04A6B
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 22:42:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E109DC04A6B
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 23:01:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 34DA72082F
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 22:42:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C58F8205ED
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 23:01:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S1yBDfff"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="VpjxRJdz";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="NZbrJM7Q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726691AbfEFWmm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 May 2019 18:42:42 -0400
-Received: from mail-pl1-f201.google.com ([209.85.214.201]:54461 "EHLO
-        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726481AbfEFWmm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 18:42:42 -0400
-Received: by mail-pl1-f201.google.com with SMTP id x2so7976846plr.21
-        for <linux-block@vger.kernel.org>; Mon, 06 May 2019 15:42:41 -0700 (PDT)
+        id S1726145AbfEFXBG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 May 2019 19:01:06 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:21066 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726063AbfEFXBG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 19:01:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1557183666; x=1588719666;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=UavILbRUOStU2sEdzEAEID1TYYoCmdY3B45C8Sz7hK8=;
+  b=VpjxRJdz4PG06dYAHcW7Q4+Ph/23PyKDOizOa3Xad0kqH/CvelBN5qOC
+   Zf73sPRkBVCpC7j3evcIQaV+fXG4AJCyX1buftU02gRu/8ocduAl/IMlr
+   iO3ei2Vu8ShSY/52ibGxhaJWdPJtUZ8RIoJ/qrFbkwyyF8Lew8tYYfrVv
+   rtu9azXtsA8BZ2KeaDNDQB4Skho1kt5/hHwZFTyOKd5b1ymdnR4ntpQYW
+   ouNW7VsBWkKksuJDqBh/IdnviZHvcC/LjXVUEQUwia/nUfUTvYQM7hdMK
+   axPe3Sqt4J8tJwfLjN8d2A6nfBCS54v1V4VMPIDxdcfw8aAoEHzAYbVyo
+   g==;
+X-IronPort-AV: E=Sophos;i="5.60,439,1549900800"; 
+   d="scan'208";a="108861121"
+Received: from mail-bl2nam02lp2054.outbound.protection.outlook.com (HELO NAM02-BL2-obe.outbound.protection.outlook.com) ([104.47.38.54])
+  by ob1.hgst.iphmx.com with ESMTP; 07 May 2019 07:01:05 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=ipw+LMcfEDjJ+AA2+yx8vQdoGWoNvZJDgj4O5eaPy48=;
-        b=S1yBDfff9buckZcEiJxBRkUjcgtNAPoOHcbr4h6qmmtAE4OvAYHwqGl2iQ2ZcVPVMU
-         yB6fv5QZb/10blblZIwslNDvVNcCnd8ezvGn+vUIORUwfkwxodIfHSA/+OJ7k2NUUiwP
-         a8hfoNb8PTz08RasQK//dfPx7MEwRaT2yqg5cVJcxcdFPJMsc+xe9H4Ef3K0EPMLet4n
-         O70bba9261xVQ8cJo4kUpKBkrrz3+n1EGZDx+oHc3V9WMjfyCaGMExQN/YTd2Yz3O9Sy
-         wTNQ1276oIS2dJ/YURK6XMEy0d8KCAIUuiUSKQ9OGTlDYk1KpCCYgh3H4A7pypx1o8BD
-         xcCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=ipw+LMcfEDjJ+AA2+yx8vQdoGWoNvZJDgj4O5eaPy48=;
-        b=qm2rJIyxtuZxrCLvFyPno+CrLexqjInB6h4yIkbXqyHbLJNKmyayEA/UWhMETpgM26
-         H7yd1sn3TaqZyAO3WgREQic1AyhTfavklrF9ZV+8HlDKo9dKOOgfemlGL91TaoxjemN4
-         44w/43lAlrJZZxx6CzwifEWcBsiPNtSzLjXPZXDMIuZ1YnrILcY16d38mJ1JyX7qvUuJ
-         3GVAkgDePcZz8y3VaEQJVjJPuMavA9ZwIDQ2VSdE5Jx38vRqPmIBrJRPGya/kphZOf7j
-         hpF5XXKB9ffbrKOohlXm05BeUOpmccUMR4OeqEx+qeom/iSA2bP2O5sT2WIkk5Hxg8Bl
-         Vqdw==
-X-Gm-Message-State: APjAAAWu6/j26glX95+4Wo6Axyo+kdPZfXyBdGXM04sXCiZE67QTIbRN
-        +KFb4gR0qBrU14dlQEOI2gfhz1d4wT5Pikkfy80+raaG1UxvYTdLXPPYG+S4TNMinttRbDnrOp5
-        BdN81au2YQaOetuFJP9xyk0iPVjHmciMVwKTEKdr542BlrLpH2j6AuVz/4Ve17b8FVgKj
-X-Google-Smtp-Source: APXvYqxIH+MnjuhsHaj8L0248uwqZ8fzbJ1KTD7utVUEd0u/SAgCR7YoMJxT1E67epSkPA6O4rcT88ZCZ5Y=
-X-Received: by 2002:a63:d615:: with SMTP id q21mr16154733pgg.401.1557182561147;
- Mon, 06 May 2019 15:42:41 -0700 (PDT)
-Date:   Mon,  6 May 2019 15:35:44 -0700
-In-Reply-To: <20190506223544.195371-1-satyat@google.com>
-Message-Id: <20190506223544.195371-5-satyat@google.com>
-Mime-Version: 1.0
-References: <20190506223544.195371-1-satyat@google.com>
-X-Mailer: git-send-email 2.21.0.1020.gf2820cf01a-goog
-Subject: [RFC PATCH 4/4] f2fs: Wire up f2fs to use inline encryption via fscrypt
-From:   Satya Tangirala <satyat@google.com>
-To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     Parshuram Raju Thombare <pthombar@cadence.com>,
-        Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Satya Tangirala <satyat@google.com>
-Content-Type: text/plain; charset="UTF-8"
+ d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bcKayQ/1kN7djSQcqfwX297rQ2XI2e4ZqC5iQQkMP7Y=;
+ b=NZbrJM7QO/bH5woxHsmZPMDnYB5y6o2FSwEKLzwx8drbE1TlbS19FYB6t0BesdGLvghsjwOxSX/pRsmFUPyWdIDymY9Ot27gX7+3ZvqlSbv44LdAnLlL0UohaXOXrcodQchJ6dEjdlN4zA9Wgg6UV9rZc3Qdqd41Rv8V1bx9IAc=
+Received: from SN6PR04MB4527.namprd04.prod.outlook.com (52.135.120.25) by
+ SN6PR04MB4893.namprd04.prod.outlook.com (52.135.114.74) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1856.11; Mon, 6 May 2019 23:01:03 +0000
+Received: from SN6PR04MB4527.namprd04.prod.outlook.com
+ ([fe80::c4f:1604:178c:d974]) by SN6PR04MB4527.namprd04.prod.outlook.com
+ ([fe80::c4f:1604:178c:d974%5]) with mapi id 15.20.1856.012; Mon, 6 May 2019
+ 23:01:03 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Minwoo Im <minwoo.im.dev@gmail.com>,
+        Omar Sandoval <osandov@osandov.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: Re: [PATCH 1/3] nvme: 002: fix nvmet pass data with loop
+Thread-Topic: [PATCH 1/3] nvme: 002: fix nvmet pass data with loop
+Thread-Index: AQHVA1Q6zH4CttIufkWRxlafayMhPw==
+Date:   Mon, 6 May 2019 23:01:03 +0000
+Message-ID: <SN6PR04MB45273CEE5FE1DDF38677980F86300@SN6PR04MB4527.namprd04.prod.outlook.com>
+References: <20190505150611.15776-1-minwoo.im.dev@gmail.com>
+ <20190505150611.15776-2-minwoo.im.dev@gmail.com>
+ <SN6PR04MB45274C423AA7C3CC3DBB5ED586300@SN6PR04MB4527.namprd04.prod.outlook.com>
+ <a66b775f-9a5f-fefc-ae29-c86678e66463@gmail.com>
+ <SN6PR04MB45272BEB18B3ADD95DCB42AE86300@SN6PR04MB4527.namprd04.prod.outlook.com>
+ <cfa4d48d-ce13-0ace-cf5c-a3d0d1f4cca7@gmail.com>
+ <SN6PR04MB4527FAD8076A5A5610F6B66786300@SN6PR04MB4527.namprd04.prod.outlook.com>
+ <c86fe09e-9964-123a-bc17-e9b9e6a80856@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.45.63]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5baed53b-c548-4bcc-d76d-08d6d276b6df
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:SN6PR04MB4893;
+x-ms-traffictypediagnostic: SN6PR04MB4893:
+x-ms-exchange-purlcount: 1
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <SN6PR04MB4893FCDC8369ABB301C9EBD586300@SN6PR04MB4893.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 0029F17A3F
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(396003)(376002)(39860400002)(346002)(366004)(52314003)(189003)(199004)(99286004)(2906002)(4326008)(25786009)(71200400001)(55016002)(71190400001)(256004)(14444005)(7696005)(52536014)(3846002)(229853002)(53936002)(9686003)(5660300002)(966005)(6306002)(316002)(6116002)(33656002)(6246003)(53546011)(6506007)(186003)(102836004)(26005)(72206003)(86362001)(478600001)(76176011)(66946007)(73956011)(486006)(91956017)(66476007)(476003)(76116006)(64756008)(66556008)(66446008)(14454004)(446003)(7736002)(8676002)(305945005)(68736007)(66066001)(110136005)(6436002)(81156014)(81166006)(54906003)(74316002)(8936002);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR04MB4893;H:SN6PR04MB4527.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: awnvgO2dTOnuW6Ytzkc5KyjtbgCKOmD11jSOQ0B52cuXr4IUHBkrXrZhGnY7pgcT50dKp9KAN9/JHB5MMklBIK3kFiZxxv4HiEA/0C62rG0iGc2bYDBVLvF4NixtDxSwaxnNti2PFALetLbtS8qZ+WmKocSKy2pTA2qMOPCgYvln33UcHL/Q2HORQ/994E0QrhvJQRlFrMy2HkbFUUiYQbCwB0PYca132Iqvd169/XfSbNdSQs/m8/SJCnD+MSxOn9pHtc27CIhtXV+UAJbL0FfpXiZSqzIE4AL7MB3RpSOGMjpbgxWJ4AzI0RerD+wNSYSK2bdgn858h6ldXku+vOPyc+AGHvWGV/yD6z0vE035vK6q22toAmibroq+mav2uiZhLDguYKTW155RLq+Xlx1Ij1IZO3GTPZaCFq8d7iA=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5baed53b-c548-4bcc-d76d-08d6d276b6df
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2019 23:01:03.4369
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4893
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Satya Tangirala <satyat@google.com>
----
- fs/f2fs/data.c  | 69 ++++++++++++++++++++++++++++++++++++++++++++++---
- fs/f2fs/super.c |  1 +
- 2 files changed, 67 insertions(+), 3 deletions(-)
-
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index 9727944139f2..7ac6768a52a5 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -279,9 +279,18 @@ static struct bio *__bio_alloc(struct f2fs_sb_info *sbi, block_t blk_addr,
- 	return bio;
- }
- 
-+static inline u64 hw_crypt_dun(struct inode *inode, struct page *page)
-+{
-+	return (((u64)inode->i_ino) << 32) | (page->index & 0xFFFFFFFF);
-+}
-+
- static inline void __submit_bio(struct f2fs_sb_info *sbi,
- 				struct bio *bio, enum page_type type)
- {
-+	struct page *page;
-+	struct inode *inode;
-+	int err = 0;
-+
- 	if (!is_read_io(bio_op(bio))) {
- 		unsigned int start;
- 
-@@ -323,7 +332,21 @@ static inline void __submit_bio(struct f2fs_sb_info *sbi,
- 		trace_f2fs_submit_read_bio(sbi->sb, type, bio);
- 	else
- 		trace_f2fs_submit_write_bio(sbi->sb, type, bio);
--	submit_bio(bio);
-+
-+	if (bio_has_data(bio)) {
-+		page = bio_page(bio);
-+		if (page && page->mapping && page->mapping->host) {
-+			inode = page->mapping->host;
-+			err = fscrypt_set_bio_crypt_ctx(inode, bio,
-+						hw_crypt_dun(inode, page));
-+		}
-+	}
-+	if (err) {
-+		bio->bi_status = BLK_STS_IOERR;
-+		bio_endio(bio);
-+	} else {
-+		submit_bio(bio);
-+	}
- }
- 
- static void __submit_merged_bio(struct f2fs_bio_info *io)
-@@ -484,6 +507,9 @@ void f2fs_submit_page_write(struct f2fs_io_info *fio)
- 	enum page_type btype = PAGE_TYPE_OF_BIO(fio->type);
- 	struct f2fs_bio_info *io = sbi->write_io[btype] + fio->temp;
- 	struct page *bio_page;
-+	struct inode *fio_inode, *bio_inode;
-+	struct page *first_page;
-+	u64 next_dun = 0;
- 
- 	f2fs_bug_on(sbi, is_read_io(fio->op));
- 
-@@ -512,10 +538,29 @@ void f2fs_submit_page_write(struct f2fs_io_info *fio)
- 
- 	inc_page_count(sbi, WB_DATA_TYPE(bio_page));
- 
-+	fio_inode = fio->page->mapping->host;
-+	bio_inode = NULL;
-+	first_page = NULL;
-+	next_dun = 0;
-+	if (io->bio) {
-+		first_page = bio_page(io->bio);
-+		if (first_page->mapping) {
-+			bio_inode = first_page->mapping->host;
-+			if (fscrypt_inode_is_hw_encrypted(bio_inode)) {
-+				next_dun =
-+					hw_crypt_dun(bio_inode, first_page) +
-+				    (io->bio->bi_iter.bi_size >> PAGE_SHIFT);
-+			}
-+		}
-+	}
- 	if (io->bio && (io->last_block_in_bio != fio->new_blkaddr - 1 ||
- 	    (io->fio.op != fio->op || io->fio.op_flags != fio->op_flags) ||
--			!__same_bdev(sbi, fio->new_blkaddr, io->bio)))
-+			!__same_bdev(sbi, fio->new_blkaddr, io->bio) ||
-+			!fscrypt_inode_crypt_mergeable(bio_inode, fio_inode) ||
-+			(fscrypt_inode_is_hw_encrypted(bio_inode) &&
-+			 next_dun != hw_crypt_dun(fio_inode, fio->page))))
- 		__submit_merged_bio(io);
-+
- alloc_new:
- 	if (io->bio == NULL) {
- 		if ((fio->type == DATA || fio->type == NODE) &&
-@@ -570,7 +615,7 @@ static struct bio *f2fs_grab_read_bio(struct inode *inode, block_t blkaddr,
- 	bio->bi_end_io = f2fs_read_end_io;
- 	bio_set_op_attrs(bio, REQ_OP_READ, op_flag);
- 
--	if (f2fs_encrypted_file(inode))
-+	if (f2fs_encrypted_file(inode) && !fscrypt_inode_is_hw_encrypted(inode))
- 		post_read_steps |= 1 << STEP_DECRYPT;
- 	if (post_read_steps) {
- 		ctx = mempool_alloc(bio_post_read_ctx_pool, GFP_NOFS);
-@@ -1525,6 +1570,7 @@ static int f2fs_mpage_readpages(struct address_space *mapping,
- 	sector_t last_block_in_file;
- 	sector_t block_nr;
- 	struct f2fs_map_blocks map;
-+	u64 next_dun = 0;
- 
- 	map.m_pblk = 0;
- 	map.m_lblk = 0;
-@@ -1606,6 +1652,13 @@ static int f2fs_mpage_readpages(struct address_space *mapping,
- 			__submit_bio(F2FS_I_SB(inode), bio, DATA);
- 			bio = NULL;
- 		}
-+
-+		if (bio && fscrypt_inode_is_hw_encrypted(inode) &&
-+		    next_dun != hw_crypt_dun(inode, page)) {
-+			__submit_bio(F2FS_I_SB(inode), bio, DATA);
-+			bio = NULL;
-+		}
-+
- 		if (bio == NULL) {
- 			bio = f2fs_grab_read_bio(inode, block_nr, nr_pages,
- 					is_readahead ? REQ_RAHEAD : 0);
-@@ -1624,6 +1677,9 @@ static int f2fs_mpage_readpages(struct address_space *mapping,
- 		if (bio_add_page(bio, page, blocksize, 0) < blocksize)
- 			goto submit_and_realloc;
- 
-+		if (fscrypt_inode_is_hw_encrypted(inode))
-+			next_dun = hw_crypt_dun(inode, page) + 1;
-+
- 		inc_page_count(F2FS_I_SB(inode), F2FS_RD_DATA);
- 		ClearPageError(page);
- 		last_block_in_bio = block_nr;
-@@ -2591,12 +2647,19 @@ static void f2fs_dio_submit_bio(struct bio *bio, struct inode *inode,
- {
- 	struct f2fs_private_dio *dio;
- 	bool write = (bio_op(bio) == REQ_OP_WRITE);
-+	u64 data_unit_num = (((u64)inode->i_ino) << 32) |
-+			    ((file_offset >> PAGE_SHIFT) & 0xFFFFFFFF);
- 
- 	dio = f2fs_kzalloc(F2FS_I_SB(inode),
- 			sizeof(struct f2fs_private_dio), GFP_NOFS);
- 	if (!dio)
- 		goto out;
- 
-+	if (fscrypt_set_bio_crypt_ctx(inode, bio, data_unit_num) != 0) {
-+		kvfree(dio);
-+		goto out;
-+	}
-+
- 	dio->inode = inode;
- 	dio->orig_end_io = bio->bi_end_io;
- 	dio->orig_private = bio->bi_private;
-diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
-index f2aaa2cc6b3e..e98c85d42e8d 100644
---- a/fs/f2fs/super.c
-+++ b/fs/f2fs/super.c
-@@ -2225,6 +2225,7 @@ static const struct fscrypt_operations f2fs_cryptops = {
- 	.dummy_context	= f2fs_dummy_context,
- 	.empty_dir	= f2fs_empty_dir,
- 	.max_namelen	= F2FS_NAME_LEN,
-+	.hw_crypt_supp	= true,
- };
- #endif
- 
--- 
-2.21.0.1020.gf2820cf01a-goog
-
+On 05/06/2019 01:13 PM, Minwoo Im wrote:=0A=
+>> I wasn't clear enough.=0A=
+>>=0A=
+>> It doesn't check for the return value for now. What needs to happen is :=
+-=0A=
+>>=0A=
+>> 1. Get rid of the variable strings which are not part of the discovery=
+=0A=
+>>       log page entries such as Generation counter.=0A=
+>> 2. Validate each log page entry content.=0A=
+>=0A=
+> Question again here.=0A=
+> Do you mean that log page entry contents validation should be in bash=0A=
+> level instead of *.out comparison?=0A=
+=0A=
+It has *out level comparison.=0A=
+>=0A=
+>> 3. Check the return value.=0A=
+>=0A=
+> nvme-cli is currently returning value like:=0A=
+>     > 0 :   failed with nvme status code (but the actual value may not be=
+=0A=
+> the same with status)=0A=
+>     =3D=3D 0 : done successfully=0A=
+>     < 0 :   failed with -errno=0A=
+>=0A=
+> But, ( > 0) case may be removed from nvme-cli soon due to [1] discuss.=0A=
+> Anyway, if nvme-cli is going to return 0 for both cases: success, error=
+=0A=
+> with nvme status, then test case is going to be hard to check the error=
+=0A=
+> status by a return value.=0A=
+=0A=
+This should not happen as it will break existing scripts which are =0A=
+written on the top the nvme-cli in past few years.=0A=
+=0A=
+   It should be with output string parsing which=0A=
+> would be great if it's going to be commonized.=0A=
+>=0A=
+No, we cannot rely on the output string as this problem is a good example.=
+=0A=
+=0A=
+I'm not sure returning =3D=3D 0 for error case is a good idea. Checking =0A=
+return value prevents us from writing unstable testcases which are bases =
+=0A=
+on the text output and allow us to modify tools as specification moves =0A=
+forward.=0A=
+=0A=
+> [1] https://github.com/linux-nvme/nvme-cli/pull/492=0A=
+>=0A=
+=0A=
