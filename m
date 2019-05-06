@@ -2,136 +2,172 @@ Return-Path: <SRS0=Wczi=TG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D93CC04A6B
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 16:46:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97419C04AAB
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 16:51:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D649320C01
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 16:46:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B90A20B7C
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 16:51:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="kZm2v8jx";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="k4HHp9dV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZ7HXSIs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726327AbfEFQqp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 May 2019 12:46:45 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:36971 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726287AbfEFQqo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 12:46:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1557161205; x=1588697205;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=y2OjkSeqmFkP0aomMl7IKfPQKqCQF5bziomLCBfPotU=;
-  b=kZm2v8jxzqRBEqZwjxIpLLlY659OSTbgHiL0LSRWnOJZKEC9ge06J0hU
-   9uToA2/EwqNb+D/+SLc0BH6hk2sKZmbvsZi+KRbxCzFAjNC90xkWka9+w
-   UNwzrboFrh0HZsCMbdAf+jPMdQrs8m3HE/p5pXEtcsyycVlfJprmt94Qp
-   YTqYyQpJqK4Np1lLg8gIYik6ry0cG3Ya0Wj/gQuJhasYP/ikHZZWQab/m
-   o0j3d/jTOv+KHAU5/jDocmzw7tQwZ26bmVOvPMQvabP3wx68ZHLbIYVt8
-   PjNFejcxd6xvwCtTf9a3WrH+Q0f+CbnEinDO7R0yqjIr5uMVmlWrTTLqQ
-   A==;
-X-IronPort-AV: E=Sophos;i="5.60,438,1549900800"; 
-   d="scan'208";a="108836057"
-Received: from mail-sn1nam04lp2055.outbound.protection.outlook.com (HELO NAM04-SN1-obe.outbound.protection.outlook.com) ([104.47.44.55])
-  by ob1.hgst.iphmx.com with ESMTP; 07 May 2019 00:46:45 +0800
+        id S1726503AbfEFQvH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 May 2019 12:51:07 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:42556 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725883AbfEFQvH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 12:51:07 -0400
+Received: by mail-qt1-f194.google.com with SMTP id p20so15483578qtc.9;
+        Mon, 06 May 2019 09:51:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y2OjkSeqmFkP0aomMl7IKfPQKqCQF5bziomLCBfPotU=;
- b=k4HHp9dVX5qt8wMN4/u9q0dv9eSGP6tKcUB3fmqi/jnHurs2UkS6kTq8vtRnxKTCMT2HQdmb/IsqJrs84E83ORnpBfBBYLDj30dfu3Bydxy7egQaB7qWmY9nWJC+QqFWqH4IoejHJ0SstKaVdNudG4KHnOHJB3Uj7y00NWuz35c=
-Received: from SN6PR04MB4527.namprd04.prod.outlook.com (52.135.120.25) by
- SN6PR04MB5182.namprd04.prod.outlook.com (20.177.254.77) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1856.15; Mon, 6 May 2019 16:46:42 +0000
-Received: from SN6PR04MB4527.namprd04.prod.outlook.com
- ([fe80::c4f:1604:178c:d974]) by SN6PR04MB4527.namprd04.prod.outlook.com
- ([fe80::c4f:1604:178c:d974%5]) with mapi id 15.20.1856.012; Mon, 6 May 2019
- 16:46:42 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Minwoo Im <minwoo.im.dev@gmail.com>,
-        Omar Sandoval <osandov@osandov.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH 1/3] nvme: 002: fix nvmet pass data with loop
-Thread-Topic: [PATCH 1/3] nvme: 002: fix nvmet pass data with loop
-Thread-Index: AQHVA1Q6zH4CttIufkWRxlafayMhPw==
-Date:   Mon, 6 May 2019 16:46:42 +0000
-Message-ID: <SN6PR04MB45272BEB18B3ADD95DCB42AE86300@SN6PR04MB4527.namprd04.prod.outlook.com>
-References: <20190505150611.15776-1-minwoo.im.dev@gmail.com>
- <20190505150611.15776-2-minwoo.im.dev@gmail.com>
- <SN6PR04MB45274C423AA7C3CC3DBB5ED586300@SN6PR04MB4527.namprd04.prod.outlook.com>
- <a66b775f-9a5f-fefc-ae29-c86678e66463@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.45.63]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 996a3b8e-29c1-40fc-d391-08d6d2426af2
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:SN6PR04MB5182;
-x-ms-traffictypediagnostic: SN6PR04MB5182:
-wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <SN6PR04MB51823FEAA3F7BFF1CB8CA51386300@SN6PR04MB5182.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0029F17A3F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(396003)(346002)(366004)(376002)(136003)(199004)(189003)(54906003)(102836004)(53546011)(72206003)(6506007)(110136005)(316002)(73956011)(76116006)(66946007)(91956017)(33656002)(9686003)(66556008)(64756008)(66446008)(4744005)(66476007)(26005)(186003)(25786009)(6436002)(14454004)(53936002)(256004)(66066001)(4326008)(2906002)(229853002)(5660300002)(7696005)(76176011)(55016002)(52536014)(6246003)(6116002)(3846002)(478600001)(8676002)(74316002)(8936002)(86362001)(446003)(99286004)(71200400001)(71190400001)(305945005)(81166006)(7736002)(476003)(81156014)(68736007)(486006);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR04MB5182;H:SN6PR04MB4527.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: t/ckC+/u6lLXR6oBjKM4DYvSF+M1ajBx5KV6nPBzkA28oeqJOxO6olMcqzzRGQhWCHdRLMLruLrW5/hHqPngUz58SJ05wsiEd7ZYfEuSAHTf0PiyqCb2u/7mJo5OkF4euBIumSmYSo6WAtey2WZpoMfIWituon3/2K/CQhSAkYCXnYY3XFlin+kAm15EYPZvZQgHdu1YHP8siGFbaCgoDoTURx9+P2CSFvzdDElwdI75M6cVQ0UdwRnSvK1dE2v7Uv3SXgd55FmKQshTK3ObyUd7uyVzj9LOvpobmF/Xa279rRSN4AQN+kP2iZgkPfVjVvySa5U76ZDOLLbfz3rMJHWubaAfLt8mJ4UeTf9U+uzRp4wi8K2BWbTidgXxfRyoalnLBc7+kAWZYnW16oEVgC03SEjXkvyl/bgjH9pnsEQ=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GIhzL1cw5MneYYR1EQW+ThAGljCkXhVHNDwUfQXFyo4=;
+        b=XZ7HXSIsNo69QtJ5jHpPZ75ljYTcPnDgKDPz21kmeaw/B1JTzvLN+1Qbsdnl3sD+4b
+         Yxs3e4OrpuJ0UShp8mQHhiHj3Q0dt2qwenr5zTaJHwu5qA1Y2lgjq4QNmbshYqjymvsw
+         r3KxsMK+QQAdj1e4UIuiWyhenendNOyvrGwMlQbJzOAZn9RimZFNGAprD3d+FbDAhp+2
+         kF9V/S25ORFhxQa9oEK68cJgfPT6wcGGB3qdM9grCSAwMs+CoG6tD+ScMSp0NtMzhPXG
+         GgXBbYG3zwiHFNIlq9GucbIBi8cvklL3abzbD/VSl9jtkQt+zIDuRUtrLKOCm+oGfd3E
+         MqfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GIhzL1cw5MneYYR1EQW+ThAGljCkXhVHNDwUfQXFyo4=;
+        b=lvqkQYcLKWn5iQSKvEu8Cqi6RQ4ulMzDtug1rT8XD6Qw2Yh1MIMow5sj+ziI2bnWSf
+         ZmJs8ADPYyQufLvuPPmYtF/67BRETN+Wc2nHFfsbTpdAtm8m/FehwZpLciRxOeBJ7RNH
+         q5N+Qp0b8Uj86fOD2nnoCARGMk6W7XkDUOD26BkawZXR6pSCvrJVuq2PSr4ktNOeWdCA
+         /MQFOlbl/3IQQXBYsMZHboZZ7FgaQLt+8CGD/n8XUdosAtBqagUpGjTza6Lz0VdmkhGp
+         OPSb0ChhBnJ6udQpXjkHdeR03yJ/A+fLIy30Ud5k+wJ2MGFpjwSW5440sWCUtgpXpvo/
+         hCiA==
+X-Gm-Message-State: APjAAAXuDSJpRUu/Y3SPLk5B49HCk/GvtOscx5KmReCq6wiLm8Y6ZC4R
+        43QhQAbDluHrVod4JV7Qsp4hqcc8V2ice2lb624=
+X-Google-Smtp-Source: APXvYqx/8sLYz9E3hw9/ZbdNldT9fuk82NXH6iaLHuikdyjkBZl+mwGqSoe187gvHcvsSa01UUHveUJ/BoKZjBmgjNo=
+X-Received: by 2002:a0c:ba99:: with SMTP id x25mr22156674qvf.212.1557161466306;
+ Mon, 06 May 2019 09:51:06 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 996a3b8e-29c1-40fc-d391-08d6d2426af2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2019 16:46:42.2436
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB5182
+References: <20190430223722.20845-1-gpiccoli@canonical.com> <20190430223722.20845-2-gpiccoli@canonical.com>
+In-Reply-To: <20190430223722.20845-2-gpiccoli@canonical.com>
+From:   Song Liu <liu.song.a23@gmail.com>
+Date:   Mon, 6 May 2019 12:50:55 -0400
+Message-ID: <CAPhsuW4SeUhNOJJkEf9wcLjbbc9qX0=C8zqbyCtC7Q8fdL91hw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] md/raid0: Do not bypass blocking queue entered for
+ raid0 bios
+To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
+Cc:     linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>, dm-devel@redhat.com,
+        axboe@kernel.dk, Gavin Guo <gavin.guo@canonical.com>,
+        Jay Vosburgh <jay.vosburgh@canonical.com>, kernel@gpiccoli.net,
+        Ming Lei <ming.lei@redhat.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05/06/2019 09:38 AM, Minwoo Im wrote:=0A=
-> On 5/7/19 1:25 AM, Chaitanya Kulkarni wrote:=0A=
->> We need to get rid of the string comparison here.=0A=
-> Chaitanya,=0A=
->=0A=
-> Do you mean that test case bash script should check the result of output=
-=0A=
-> and return some error value instead of zero instead of *.out comparison ?=
-=0A=
->=0A=
-> Thanks,=0A=
->=0A=
-=0A=
-We need to get rid the string comparison as much as we can e.g.=0A=
-in following output the nvme-cli output should not be compared=0A=
-but the return value itself.=0A=
-=0A=
--Discovery Log Number of Records 1, Generation counter 1=0A=
-+Discovery Log Number of Records 1, Generation counter 2=0A=
-=3D=3D=3D=3D=3DDiscovery Log Entry 0=3D=3D=3D=3D=3D=3D=0A=
-trtype: loop=0A=
-adrfam: pci=0A=
-subtype: nvme subsystem=0A=
--treq: not specified=0A=
-+treq: not specified, sq flow control disable supported=0A=
-portid: X=0A=
-trsvcid:=0A=
-subnqn: blktests-subsystem-1=0A=
-=0A=
-Reason :- we cannot rely on the output as it tends to change=0A=
-with development which triggers fixes in blktests, unless=0A=
-testcase is focused on entirely on examining the output of=0A=
-the tool.=0A=
-=0A=
-=0A=
+On Tue, Apr 30, 2019 at 6:38 PM Guilherme G. Piccoli
+<gpiccoli@canonical.com> wrote:
+>
+> Commit cd4a4ae4683d ("block: don't use blocking queue entered for
+> recursive bio submits") introduced the flag BIO_QUEUE_ENTERED in order
+> split bios bypass the blocking queue entering routine and use the live
+> non-blocking version. It was a result of an extensive discussion in
+> a linux-block thread[0], and the purpose of this change was to prevent
+> a hung task waiting on a reference to drop.
+>
+> Happens that md raid0 split bios all the time, and more important,
+> it changes their underlying device to the raid member. After the change
+> introduced by this flag's usage, we experience various crashes if a raid0
+> member is removed during a large write. This happens because the bio
+> reaches the live queue entering function when the queue of the raid0
+> member is dying.
+>
+> A simple reproducer of this behavior is presented below:
+> a) Build kernel v5.1-rc7 with CONFIG_BLK_DEV_THROTTLING=y.
+>
+> b) Create a raid0 md array with 2 NVMe devices as members, and mount it
+> with an ext4 filesystem.
+>
+> c) Run the following oneliner (supposing the raid0 is mounted in /mnt):
+> (dd of=/mnt/tmp if=/dev/zero bs=1M count=999 &); sleep 0.3;
+> echo 1 > /sys/block/nvme0n1/device/device/remove
+> (whereas nvme0n1 is the 2nd array member)
+>
+> This will trigger the following warning/oops:
+>
+> ------------[ cut here ]------------
+> no blkg associated for bio on block-device: nvme0n1
+> WARNING: CPU: 9 PID: 184 at ./include/linux/blk-cgroup.h:785
+> generic_make_request_checks+0x4dd/0x690
+> [...]
+> BUG: unable to handle kernel NULL pointer dereference at 0000000000000155
+> PGD 0 P4D 0
+> Oops: 0000 [#1] SMP PTI
+> RIP: 0010:blk_throtl_bio+0x45/0x970
+> [...]
+> Call Trace:
+>  generic_make_request_checks+0x1bf/0x690
+>  generic_make_request+0x64/0x3f0
+>  raid0_make_request+0x184/0x620 [raid0]
+>  ? raid0_make_request+0x184/0x620 [raid0]
+>  ? blk_queue_split+0x384/0x6d0
+>  md_handle_request+0x126/0x1a0
+>  md_make_request+0x7b/0x180
+>  generic_make_request+0x19e/0x3f0
+>  submit_bio+0x73/0x140
+> [...]
+>
+> This patch changes raid0 driver to fallback to the "old" blocking queue
+> entering procedure, by clearing the BIO_QUEUE_ENTERED from raid0 bios.
+> This prevents the crashes and restores the regular behavior of raid0
+> arrays when a member is removed during a large write.
+>
+> [0] https://marc.info/?l=linux-block&m=152638475806811
+>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> Cc: stable@vger.kernel.org # v4.18
+> Fixes: cd4a4ae4683d ("block: don't use blocking queue entered for recursive bio submits")
+> Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
+
+IIUC, we need this for all raid types. Is it possible to fix that in md.c so
+all types get the fix?
+
+Thanks,
+Song
+
+> ---
+>  drivers/md/raid0.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
+> index f3fb5bb8c82a..d5bdc79e0835 100644
+> --- a/drivers/md/raid0.c
+> +++ b/drivers/md/raid0.c
+> @@ -547,6 +547,7 @@ static void raid0_handle_discard(struct mddev *mddev, struct bio *bio)
+>                         trace_block_bio_remap(bdev_get_queue(rdev->bdev),
+>                                 discard_bio, disk_devt(mddev->gendisk),
+>                                 bio->bi_iter.bi_sector);
+> +               bio_clear_flag(bio, BIO_QUEUE_ENTERED);
+>                 generic_make_request(discard_bio);
+>         }
+>         bio_endio(bio);
+> @@ -602,6 +603,7 @@ static bool raid0_make_request(struct mddev *mddev, struct bio *bio)
+>                                 disk_devt(mddev->gendisk), bio_sector);
+>         mddev_check_writesame(mddev, bio);
+>         mddev_check_write_zeroes(mddev, bio);
+> +       bio_clear_flag(bio, BIO_QUEUE_ENTERED);
+>         generic_make_request(bio);
+>         return true;
+>  }
+> --
+> 2.21.0
+>
