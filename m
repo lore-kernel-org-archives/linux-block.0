@@ -1,163 +1,253 @@
-Return-Path: <SRS0=gQfC=TF=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Wczi=TG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF14C04AAB
-	for <linux-block@archiver.kernel.org>; Sun,  5 May 2019 22:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4A0C04AAC
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 05:16:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 51294205C9
-	for <linux-block@archiver.kernel.org>; Sun,  5 May 2019 22:23:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8785A2087F
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 05:16:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="H/Yd9o43"
+	dkim=pass (2048-bit key) header.d=ucsc.edu header.i=@ucsc.edu header.b="O/PZC2uA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727325AbfEEWXc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 May 2019 18:23:32 -0400
-Received: from mout.gmx.net ([212.227.17.21]:57731 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726905AbfEEWXc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 5 May 2019 18:23:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1557095009;
-        bh=0to9aQztkzngPNOMzshiFNlFaZiT59rL6T6hAiU2bZI=;
-        h=X-UI-Sender-Class:Date:From:To:Subject;
-        b=H/Yd9o43WYU/q0jDfpt5+ijb9eg5X3yvB2rbW8TVBSCwZi/hSpjqBSXh8V3N4y8fK
-         uMEFrnaiVneqrFRAa2LlClkajiKVPnUdbbpVwPC1VyzoJgyxW7tGK/rDGeSww6A8SM
-         w3qa3qITxnYV5MQ9QTME6gT9uBADYzC3Af4mk32g=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from ls3530.dellerweb.de ([92.116.187.88]) by mail.gmx.com (mrgmx102
- [212.227.17.168]) with ESMTPSA (Nemesis) id 0LqW8j-1gsUi13ozR-00e5uF; Mon, 06
- May 2019 00:23:29 +0200
-Date:   Mon, 6 May 2019 00:23:27 +0200
-From:   Helge Deller <deller@gmx.de>
-To:     Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] drbd: Rename LEVEL to VLI_LEVEL to avoid name clash
-Message-ID: <20190505222327.GA32268@ls3530.dellerweb.de>
+        id S1725830AbfEFFQ1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 May 2019 01:16:27 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:37016 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725828AbfEFFQ1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 01:16:27 -0400
+Received: by mail-wr1-f65.google.com with SMTP id a12so5371940wrn.4
+        for <linux-block@vger.kernel.org>; Sun, 05 May 2019 22:16:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ucsc.edu; s=ucsc-google-2018;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=jCh6x+ORi5EWv/IlypawahbbvpnK5RHTjISz62KuNKg=;
+        b=O/PZC2uANw4749yGxquasq82LLBwHsDNYDcytpi8MLvw8XUUWK3lDggrfpWl+FsV8S
+         dNE8ALd6B+SRamBl6n6yaRzROVtPN6QRl7VO46g0bAmW+VBC7rBQ6TGbgOrLifoEBOiN
+         aRSWUOFgTXgqNsYEjgN+golZVOJBQmJY+/EvLNRTdOIfdxsYsmyv8XvdoZW/WNTlRKn8
+         mLs8j003f2pqKvF8mfTL/Ra55S8bp9iLinYFxkxzCN5htz+REXwUZ2wmhrmf3KQzzYO5
+         QNLo+eJRbPgU/clyxPb03HGxYzpQRmMb8ZuKCJPVjj9/Hme17ypQ7+IEuu6ZlidXCIu+
+         yNng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=jCh6x+ORi5EWv/IlypawahbbvpnK5RHTjISz62KuNKg=;
+        b=baT0MQGZfCn2rXZDCNluiHpIE4mTYU3/lNPaowzrCPAmxinmMprarBZ6ODVX9L0VHu
+         n8umBmaBgJwr4XqsPgFxgIpKt8q9M2yYtp3xRfUK9yURNjiGOfVaOMIxtHQnAo+1QZzI
+         RiA5tzkVgIKEOW5L/3ZzCahe6g+6weMri6/JjvP0MmE0HX1s1XiFxO1MSmP1n1wGmRM3
+         3g7aIJuoEmLwEcEm5e3jO1jUXLt4EoeErD4M0EVSFcGHUCOgRBPZPDiwLOSs/9YMPDMC
+         vmPdZroDIl8yuABuAupnQtxTBcgEEVeUnPIOmJ87jzwWKP1pur76NID4LWl0IyTbMNnR
+         z1EA==
+X-Gm-Message-State: APjAAAVbQl9PEXSBQJSA87F/4/Svda1nsmtsEqJZHP6cDqKX/gb6Rx6q
+        gn9vFXiJXM7Fpq8IAHLL6wc8m2jSB+ugMnFezpgZjA==
+X-Google-Smtp-Source: APXvYqyNBjTLPxpA6Ti+erKMILGxw3zCHWCnIs8szraaRWWeF0H22yGhvqPUwRnLS1VQrUjg0jMvJ6T198uU1y8ou64=
+X-Received: by 2002:adf:f9c5:: with SMTP id w5mr91669wrr.26.1557119784614;
+ Sun, 05 May 2019 22:16:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
+References: <20190425052152.6571-1-hlitz@ucsc.edu> <66434cc7-2bac-dd10-6edc-4560e6a0f89f@intel.com>
+ <F305CAB7-F566-40D7-BC91-E88DE821520B@javigon.com> <a1df8967-2169-1c43-c55a-e2144fa53b9a@intel.com>
+ <CAJbgVnWsHQRpEPkd77E6u0hoW5jKQaOGR-3dW9+drGNq_JYpfA@mail.gmail.com>
+ <139AF16B-E69C-4AA5-A9AC-38576BB9BD4B@javigon.com> <CAJbgVnWTRWZB_Dc7F1cvtgWdYPCbJ_aJJ_mas01m51+8siHvHA@mail.gmail.com>
+ <b7c03f26-90bb-ffd6-e744-6daf3bbe348d@intel.com>
+In-Reply-To: <b7c03f26-90bb-ffd6-e744-6daf3bbe348d@intel.com>
+From:   Heiner Litz <hlitz@ucsc.edu>
+Date:   Sun, 5 May 2019 22:16:13 -0700
+Message-ID: <CAJbgVnU3-ed42CBtPv7SWdtA=__bNcSPhiXwobuVKek2-BFBig@mail.gmail.com>
+Subject: Re: [PATCH] lightnvm: pblk: Introduce hot-cold data separation
+To:     Igor Konopko <igor.j.konopko@intel.com>
+Cc:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Provags-ID: V03:K1:UjfJ4usowKn/6EYdHyPsJ9a4AFua2i4rNp/24cGOEtp8M1nChUG
- WXmQXWJgYhK4GzkSqdanbOkJqxa4+mr49LW517/ufiCvTJSsmJvcZNy/92FtvjnLZCSNYyK
- bNSEeVbuPWIUlI/cYQ0SN66HDUmZw2YdgCfkA5GcJAoysv+nSNSUxGM+TkmRYhXvMcEBucD
- Wb46SPqW602Os9WrhI8+g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:F9j4RhW32lM=:/6xtdpiXI3/sGIoeZ0GNx0
- /1zbs9ZLxX2gz8XPgzDrG0Bq7VxklD0EQW91Wi7QMe0MdB/uJnchupKf30FIftv3YoStqFHtS
- Iu35BmM0vIePIHcyctkpmV1ww1INO/utLjs8/kxJ60rUKnjbLmmBzSfRcFW/WbjKqp/nyfhjI
- MKB2z116ya5+8rskTdhgv/sjlCxyyPUCog1s1iu4mngladLwCClMaZg8dzV7/2r/k4lF8Wb4L
- xZJFWdZYlQ3+C38hE4d5mPZa3cH8wc9LZWWlNWZpa/cpkSKoeR5ahYK6zanxXMHelVxRRwcWq
- r73cDw0gxjc0A53TLpnvvajHJjb5awMSTsb09myoyhNCl5zYawQXvvygndCl/HD+u+jfistsm
- Eb2rnunXPvsjftC4McU9HhzHbYCctaRG/N1XA46v+wvae7P2zsyVjWNrDpvMm3DpQAw9V95LE
- 5WESkNHXAkqVlM3/zS40eSxeOaxwpbLGE7d80XLkwpcplivlIZRhQhv33DmzAZ4loLb72es8c
- 24UN7pPupER2Bg79y2g3+23I92LFYNOK2DpHVluhRP+/0JqTCm1+A6/63mcVPJCa/wtOmRBQw
- Ax9+zTzc4uQmlDRvmM9I4tylFEIjfWJLsoxZBsi4QWOeQxSoZzeMV1I3Wu+0mUojhGjO/mqYy
- J1GvlaUHbM+nvehHRNDTUiim9DN9IAynMgsLirFlafAwIgFiB1pfQnWAF9SB1OB1OxjQBv2Fv
- LDAsQcSIX41/zOoA44EHI7GADseNXQB3iSuNTgIZTrBzmwYy5Bfs4Tk2m1jl4ePqvDlPk8A8l
- CU3bYnHPNsatNuFDo3ZYkMRgNIbP5ldCRmPWrz02lbAdycXQKc3ld8GMl6N/SWf9E7VOjRXDX
- o1wQoiyuxDFpFY6c9prq47ldkyn36g/4/WLLinmSXeW9+HizSvIe4O1bn0yRij
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Using a generic word like LEVEL is bad idea - it can easily clash with ano=
-ther
-LEVEL defined somewhere else.
-In this case, it clashed with the LEVEL defined in arch/parisc/include/asm=
-/assembly.h
-when the header file got included via jump_level.h.
+Igor, Javier,
 
-This patch replaces the LEVEL defined in drbd_vli.h by VLI_LEVEL.
-Another patch renames the LEVEL defined in arch/parisc/include/asm/assembl=
-y.h.
+both of you are right. Here is what I came up with after some more thinking=
+.
 
-Reported-by: kbuild test robot <lkp@intel.com>
-Signed-off-by: Helge Deller <deller@gmx.de>
+We can avoid the races in 2. and 3. with the following two invariants:
+I1: If we have a GC line with seq_id X, only garbage collect from
+lines older than X (this addresses 2.)
+I2: Guarantee that the open GC line always has a smaller seq_id than
+all open user lines (this addresses 3)
 
-diff --git a/drivers/block/drbd/drbd_vli.h b/drivers/block/drbd/drbd_vli.h
-index 8cb1532a3816..d7ced8626035 100644
-=2D-- a/drivers/block/drbd/drbd_vli.h
-+++ b/drivers/block/drbd/drbd_vli.h
-@@ -121,22 +121,22 @@ prefix    data bits                                 =
-   max val  N=BA data bits
-  1             16              32                              64
- */
+We can enforce I2 by adding a minor seq_id. The major sequence id is
+only incremented when allocating a user line. Whenever a GC line is
+allocated we read the current major seq_id (open user line) and
+increment the minor seq_id. This allows us to order all GC lines
+before the open user line during recovery.
 
--/* LEVEL: (total bits, prefix bits, prefix value),
-+/* VLI_LEVEL: (total bits, prefix bits, prefix value),
-  * sorted ascending by number of total bits.
-  * The rest of the code table is calculated at compiletime from this. */
+Problem with this approach:
+Consider the following example: There exist user lines U0, U1, U2
+(where 0,1,2 are seq_ids) and a non-empty GC5 line (with seq_id 5). If
+we now do only sequential writes all user lines will be overwritten
+without GC being required. As a result, data will now reside on U6,
+U7, U8. If we now need to GC we cannot because of I1.
+Solution: We cannot fast-forward the GC line's seq_id because it
+contains old data, so pad the GC line with zeros, close it and open a
+new GC9 line.
 
- /* fibonacci data 1, 1, ... */
- #define VLI_L_1_1() do { \
--	LEVEL( 2, 1, 0x00); \
--	LEVEL( 3, 2, 0x01); \
--	LEVEL( 5, 3, 0x03); \
--	LEVEL( 7, 4, 0x07); \
--	LEVEL(10, 5, 0x0f); \
--	LEVEL(14, 6, 0x1f); \
--	LEVEL(21, 8, 0x3f); \
--	LEVEL(29, 8, 0x7f); \
--	LEVEL(42, 8, 0xbf); \
--	LEVEL(64, 8, 0xff); \
-+	VLI_LEVEL( 2, 1, 0x00); \
-+	VLI_LEVEL( 3, 2, 0x01); \
-+	VLI_LEVEL( 5, 3, 0x03); \
-+	VLI_LEVEL( 7, 4, 0x07); \
-+	VLI_LEVEL(10, 5, 0x0f); \
-+	VLI_LEVEL(14, 6, 0x1f); \
-+	VLI_LEVEL(21, 8, 0x3f); \
-+	VLI_LEVEL(29, 8, 0x7f); \
-+	VLI_LEVEL(42, 8, 0xbf); \
-+	VLI_LEVEL(64, 8, 0xff); \
- 	} while (0)
+Generality:
+This approach extends to schemes that use e.g. hot, warm, cold open
+lines (adding a minor_minor_seq_id)
 
- /* finds a suitable level to decode the least significant part of in.
-@@ -147,7 +147,7 @@ static inline int vli_decode_bits(u64 *out, const u64 =
-in)
- {
- 	u64 adj =3D 1;
+Heiner
 
--#define LEVEL(t,b,v)					\
-+#define VLI_LEVEL(t,b,v)				\
- 	do {						\
- 		if ((in & ((1 << b) -1)) =3D=3D v) {	\
- 			*out =3D ((in & ((~0ULL) >> (64-t))) >> b) + adj;	\
-@@ -160,7 +160,7 @@ static inline int vli_decode_bits(u64 *out, const u64 =
-in)
 
- 	/* NOT REACHED, if VLI_LEVELS code table is defined properly */
- 	BUG();
--#undef LEVEL
-+#undef VLI_LEVEL
- }
-
- /* return number of code bits needed,
-@@ -173,7 +173,7 @@ static inline int __vli_encode_bits(u64 *out, const u6=
-4 in)
- 	if (in =3D=3D 0)
- 		return -EINVAL;
-
--#define LEVEL(t,b,v) do {		\
-+#define VLI_LEVEL(t,b,v) do {		\
- 		max +=3D 1ULL << (t - b);	\
- 		if (in <=3D max) {	\
- 			if (out)	\
-@@ -186,7 +186,7 @@ static inline int __vli_encode_bits(u64 *out, const u6=
-4 in)
- 	VLI_L_1_1();
-
- 	return -EOVERFLOW;
--#undef LEVEL
-+#undef VLI_LEVEL
- }
-
- #undef VLI_L_1_1
+On Thu, May 2, 2019 at 2:08 AM Igor Konopko <igor.j.konopko@intel.com> wrot=
+e:
+>
+>
+>
+> On 01.05.2019 22:20, Heiner Litz wrote:
+> > Javier, Igor,
+> > you are correct. The problem exists if we have a power loss and we
+> > have an open gc and an open user line and both contain the same LBA.
+> > In that case, I think we need to care about the 4 scenarios:
+> >
+> > 1. user_seq_id > gc_seq_id and user_write after gc_write: No issue
+> > 2. user_seq_id > gc_seq_id and gc_write > user_write: Cannot happen,
+> > open user lines are not gc'ed
+>
+> Maybe it would be just a theoretical scenario, but I'm not seeing any
+> reason why this cannot happen in pblk implementation:
+> Let assume that user line X+1 is opened when GC line X is already open
+> and the user line is closed when GC line X is still in use. Then GC
+> quickly choose user line X+1 as a GC victim and we are hitting 2nd case.
+>
+> > 3. gc_seq_id > user_seq_id and user_write after gc_write: RACE
+> > 4. gc_seq_id > user_seq_id and gc_write after user_write: No issue
+> >
+> > To address 3.) we can do the following:
+> > Whenever a gc line is opened, determine all open user lines and store
+> > them in a field of pblk_line. When choosing a victim for GC, ignore
+> > those lines.
+>
+> Your solution sounds right, but I would extend this based on my previous
+> comment to 2nd case by sth like: during opening new user data also add
+> this line ID to this "blacklist" for the GC selection.
+>
+> Igor
+>
+> >
+> > Let me know if that sounds good and I will send a v2
+> > Heiner
+> >
+> > On Tue, Apr 30, 2019 at 11:19 PM Javier Gonz=C3=A1lez <javier@javigon.c=
+om> wrote:
+> >>
+> >>> On 26 Apr 2019, at 18.23, Heiner Litz <hlitz@ucsc.edu> wrote:
+> >>>
+> >>> Nice catch Igor, I hadn't thought of that.
+> >>>
+> >>> Nevertheless, here is what I think: In the absence of a flush we don'=
+t
+> >>> need to enforce ordering so we don't care about recovering the older
+> >>> gc'ed write. If we completed a flush after the user write, we should
+> >>> have already invalidated the gc mapping and hence will not recover it=
+.
+> >>> Let me know if I am missing something.
+> >>
+> >> I think that this problem is orthogonal to a flush on the user path. F=
+or example
+> >>
+> >>     - Write to LBA0 + completion to host
+> >>     - [=E2=80=A6]
+> >>     - GC LBA0
+> >>     - Write to LBA0 + completion to host
+> >>     - fsync() + completion
+> >>     - Power Failure
+> >>
+> >> When we power up and do recovery in the current implementation, you
+> >> might get the old LBA0 mapped correctly in the L2P table.
+> >>
+> >> If we enforce ID ordering for GC lines this problem goes away as we ca=
+n
+> >> continue ordering lines based on ID and then recovering sequentially.
+> >>
+> >> Thoughts?
+> >>
+> >> Thanks,
+> >> Javier
+> >>
+> >>>
+> >>> On Fri, Apr 26, 2019 at 6:46 AM Igor Konopko <igor.j.konopko@intel.co=
+m> wrote:
+> >>>> On 26.04.2019 12:04, Javier Gonz=C3=A1lez wrote:
+> >>>>>> On 26 Apr 2019, at 11.11, Igor Konopko <igor.j.konopko@intel.com> =
+wrote:
+> >>>>>>
+> >>>>>> On 25.04.2019 07:21, Heiner Litz wrote:
+> >>>>>>> Introduce the capability to manage multiple open lines. Maintain =
+one line
+> >>>>>>> for user writes (hot) and a second line for gc writes (cold). As =
+user and
+> >>>>>>> gc writes still utilize a shared ring buffer, in rare cases a mul=
+ti-sector
+> >>>>>>> write will contain both gc and user data. This is acceptable, as =
+on a
+> >>>>>>> tested SSD with minimum write size of 64KB, less than 1% of all w=
+rites
+> >>>>>>> contain both hot and cold sectors.
+> >>>>>>
+> >>>>>> Hi Heiner
+> >>>>>>
+> >>>>>> Generally I really like this changes, I was thinking about sth sim=
+ilar since a while, so it is very good to see that patch.
+> >>>>>>
+> >>>>>> I have a one question related to this patch, since it is not very =
+clear for me - how you ensure the data integrity in following scenarios:
+> >>>>>> -we have open line X for user data and line Y for GC
+> >>>>>> -GC writes LBA=3DN to line Y
+> >>>>>> -user writes LBA=3DN to line X
+> >>>>>> -we have power failure when both line X and Y were not written com=
+pletely
+> >>>>>> -during pblk creation we are executing OOB metadata recovery
+> >>>>>> And here is the question, how we distinguish whether LBA=3DN from =
+line Y or LBA=3DN from line X is the valid one?
+> >>>>>> Line X and Y might have seq_id either descending or ascending - th=
+is would create two possible scenarios too.
+> >>>>>>
+> >>>>>> Thanks
+> >>>>>> Igor
+> >>>>>
+> >>>>> You are right, I think this is possible in the current implementati=
+on.
+> >>>>>
+> >>>>> We need an extra constrain so that we only GC lines above the GC li=
+ne
+> >>>>> ID. This way, when we order lines on recovery, we can guarantee
+> >>>>> consistency. This means potentially that we would need several open
+> >>>>> lines for GC to avoid padding in case this constrain forces to choo=
+se a
+> >>>>> line with an ID higher than the GC line ID.
+> >>>>>
+> >>>>> What do you think?
+> >>>>
+> >>>> I'm not sure yet about your approach, I need to think and analyze th=
+is a
+> >>>> little more.
+> >>>>
+> >>>> I also believe that probably we need to ensure that current user dat=
+a
+> >>>> line seq_id is always above the current GC line seq_id or sth like t=
+hat.
+> >>>> We cannot also then GC any data from the lines which are still open,=
+ but
+> >>>> I believe that this is a case even right now.
+> >>>>
+> >>>>> Thanks,
+> >>>>> Javier
