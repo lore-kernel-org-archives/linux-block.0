@@ -4,117 +4,121 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D954FC04AAD
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 20:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B3CAC04AAD
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 21:07:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A77102082F
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 20:56:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C6CB2082F
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 21:07:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VeXkqm4J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAHDSRCO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726400AbfEFU4s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 May 2019 16:56:48 -0400
-Received: from mail-qt1-f176.google.com ([209.85.160.176]:37885 "EHLO
-        mail-qt1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725994AbfEFU4s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 16:56:48 -0400
-Received: by mail-qt1-f176.google.com with SMTP id o7so4586134qtp.4;
-        Mon, 06 May 2019 13:56:47 -0700 (PDT)
+        id S1726444AbfEFVH3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 May 2019 17:07:29 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:38662 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726322AbfEFVH3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 17:07:29 -0400
+Received: by mail-qk1-f194.google.com with SMTP id a64so3003797qkg.5;
+        Mon, 06 May 2019 14:07:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-transfer-encoding:content-language;
-        bh=C96Vqs3gtl8LDEgx+SsgtfimIPC6dR8eqMiB195vWGg=;
-        b=VeXkqm4JPWzQJd6+IZBeOf/nIgtQhud4XEf8CPeC8xsHh9hSko7nE8z4fPQqg2hhKC
-         0o7MkdgwoxWgqUwUliMnavJYs7oUv2ctJB0i2St9yJ8clnvRYtfz1/x6DI5r8jO26kCE
-         lX/OBCCTBl6/JHrx81v+6hkyKzRXKvVwJ6ed4Wv7bP/3eC1mKSQb8NOWFulByyP415ea
-         KUoPk2DOKd86DhqPj6wzBgHnKjOI3Y8pzz0OOJfVKj0IoNowMsT4lkUxZ0Vf28d0G1a8
-         r8BEXiSUFPiueQRDRP5nM2I+nUiXY3a3LesC8mj/TpfAaZnVtq9biUpi+SPnM3jCOoSf
-         pkvg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4ndijvnNkt+c4ltTY2hyx/k7eCwa3nQG1K0KFz8eGCo=;
+        b=JAHDSRCO6ityOJT6r/V3YG3CEWoALP5vVAl7YUsywrn7yNhxz3yPvabEMNsFojl17Z
+         oYHQxvRY/w+V+OWH0hXUXcjrd+xNQvMif+q9dp/4rml5lzR9CwvnrhlecvAfqBp8HLpu
+         RT7rQIf54ftUCcF41NCXUe+bKM4rpU3c+WV1vUAeSdwnsdh8NVLhrox1T1zRLujcsEiC
+         zkqh1aBtlHmwR8/DMXYtU1SPEQP0kPvfNB2KPMT/NGsDh1exofQ+Wd9pYUaUn9CadJVe
+         36k7EGEE6XE3w9OSafxCIqgo0zZLLl3zxS0gYAoqA2/ClGduUhcn3ep4GcZnaH2nk4Js
+         LZOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-transfer-encoding:content-language;
-        bh=C96Vqs3gtl8LDEgx+SsgtfimIPC6dR8eqMiB195vWGg=;
-        b=OgiuR1cWnuxIYlS70HN1C+6cxvSPSbzpd79p4RFgxU4WxyBLvnaYpbhi54bqSCH6K+
-         y/At7Opvi1aNmdKd4ARxMkLRXh/TNkosw3yvtuiqH8nWc4ge7fJtJztFYP/he+Fk8vNS
-         fLeullvEIjsvZy7veeyxjXQjKO4oKsxAqWu4ImXDFmgPml1OuExeKnw2kiSGOK2eC/wD
-         qJEdJy25Pwgz8BQ5a1KrVztWDCgBiPrBpHC6OZvHS4Ld48nv+bHTV++hL4ulz+4zBlnj
-         f3BQDUIGeyDmR2YPRQvNXX8JWze1eJTP0aTTtbDMV6c5d9VqhNiLhZtwESkJ6TzY2rV2
-         iMRg==
-X-Gm-Message-State: APjAAAUkcHU7CUFXwA3KZ/9mOLbcZqUrI3pbQvFEe1TFD52V3mMt8oI3
-        XCBMoiwc2X8MZewZ8t4VUpI=
-X-Google-Smtp-Source: APXvYqywGEcKDN6MyEFM4+Ge1nJ8GO2xmYNgB0yAr81p7mBM0Nce8pf0Glf/YRTYn2mwuT4839y2YA==
-X-Received: by 2002:ac8:8ad:: with SMTP id v42mr22657570qth.337.1557176207128;
-        Mon, 06 May 2019 13:56:47 -0700 (PDT)
-Received: from localhost.localdomain ([163.114.130.128])
-        by smtp.gmail.com with ESMTPSA id w184sm2568790qkc.48.2019.05.06.13.56.45
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 06 May 2019 13:56:45 -0700 (PDT)
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        lczerner@redhat.com
-From:   Ric Wheeler <ricwheeler@gmail.com>
-Subject: Testing devices for discard support properly
-Message-ID: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
-Date:   Mon, 6 May 2019 16:56:44 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4ndijvnNkt+c4ltTY2hyx/k7eCwa3nQG1K0KFz8eGCo=;
+        b=UdF0Ujcf7AZB/UEtTdwgLD9qcBjzRvdA4XgR+sfRYkAChpdUz2eu0LVIq6RbMM9ngS
+         z+NrDudHTv1zRYX9gOiJCqQ8+G1HmykAX5ypQX1Nv31sR94cPn2rUzkCcWC883+OPzLK
+         zUFLKEUyAGhwlf7FI4M6YqWBXDOGIDYc/pSy+dQarzj2vU3W3lpo/KgcgjGiWS5V5wvb
+         pPSdwIKaj5i+dCoudFVeGJr6STIzXv1BTvnieZ3PVOI/+UD5baYvJ+7bLyq+ZXOekSOQ
+         l+nF9UjH1mBDCHG6Je4znSyDZKUZYtO/U1lNwleVKOtMruPRx8WEtkPHtJpgvSUpxMy9
+         k8Fw==
+X-Gm-Message-State: APjAAAWWPKhKKio8LgqjQ6k98neokg0gAiuF0R7UcOWjSdmLgiaAqIr8
+        Y4I6DA8jg+5SP05Dn/kjuvwHXJZQg+Kx4TBkgbs=
+X-Google-Smtp-Source: APXvYqy0cewLmOJ/voV9XvczblnnlIzNNvgjOehbgCWnmm79W69Rbb0K6eoBkS/uoxVXEVkLB/YMPNpGYFmWMBlj73o=
+X-Received: by 2002:a05:620a:1423:: with SMTP id k3mr20774846qkj.120.1557176847994;
+ Mon, 06 May 2019 14:07:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <20190430223722.20845-1-gpiccoli@canonical.com>
+ <20190430223722.20845-2-gpiccoli@canonical.com> <CAPhsuW4SeUhNOJJkEf9wcLjbbc9qX0=C8zqbyCtC7Q8fdL91hw@mail.gmail.com>
+ <c8721ba3-5d38-7906-5049-e2b16e967ecf@canonical.com>
+In-Reply-To: <c8721ba3-5d38-7906-5049-e2b16e967ecf@canonical.com>
+From:   Song Liu <liu.song.a23@gmail.com>
+Date:   Mon, 6 May 2019 17:07:16 -0400
+Message-ID: <CAPhsuW6ahmkUhCgns=9WHPXSvYefB0Gmr1oB7gdZiD86sKyHFg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] md/raid0: Do not bypass blocking queue entered for
+ raid0 bios
+To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
+Cc:     linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>, dm-devel@redhat.com,
+        axboe@kernel.dk, Gavin Guo <gavin.guo@canonical.com>,
+        Jay Vosburgh <jay.vosburgh@canonical.com>, kernel@gpiccoli.net,
+        Ming Lei <ming.lei@redhat.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, May 6, 2019 at 2:48 PM Guilherme G. Piccoli
+<gpiccoli@canonical.com> wrote:
+>
+> On 06/05/2019 13:50, Song Liu wrote:
+> > [...]
+> > IIUC, we need this for all raid types. Is it possible to fix that in md.c so
+> > all types get the fix?
+> >
+> > Thanks,
+> > Song
+> >
+>
+> Hi Song, thanks again for reviewing my code and provide input, much
+> appreciated!
+>
+> I understand this could in theory affects all the RAID levels, but in
+> practice I don't think it'll happen. RAID0 is the only "blind" mode of
+> RAID, in the sense it's the only one that doesn't care at all with
+> failures. In fact, this was the origin of my other thread [0], regarding
+> the change of raid0's behavior in error cases..because it currently does
+> not care with members being removed and rely only in filesystem failures
+> (after submitting many BIOs to the removed device).
+>
+> That said, in this change I've only took care of raid0, since in my
+> understanding the other levels won't submit BIOs to dead devices; we can
+> experiment that to see if it's true.
 
-(repost without the html spam, sorry!)
+Could you please run a quick test with raid5? I am wondering whether
+some race condition could get us into similar crash. If we cannot easily
+trigger the bug, we can process with this version.
 
-Last week at LSF/MM, I suggested we can provide a tool or test suite to 
-test discard performance.
+Thanks,
+Song
 
-Put in the most positive light, it will be useful for drive vendors to 
-use to qualify their offerings before sending them out to the world. For 
-customers that care, they can use the same set of tests to help during 
-selection to weed out any real issues.
-
-Also, community users can run the same tools of course and share the 
-results.
-
-Down to the questions part:
-
-Â * Do we just need to figure out a workload to feed our existing tools 
-like blkdiscard and fio?
-
-* What workloads are key?
-
-Thoughts about what I would start getting timings for:
-
-* Whole device discard at the block level both for a device that has 
-been completely written and for one that had already been trimmed
-
-* Discard performance at the block level for 4k discards for a device 
-that has been completely written and again the same test for a device 
-that has been completely discarded.
-
-* Same test for large discards - say at a megabyte and/or gigabyte size?
-
-* Same test done at the device optimal discard chunk size and alignment
-
-Should the discard pattern be done with a random pattern? Or just 
-sequential?
-
-I think the above would give us a solid base, thoughts or comments?
-
-Thanks!
-
-Ric
-
-
-
-
+>
+> But I'd be happy to change all other levels also if you think it's
+> appropriate (or a simple generic change to md.c if it is enough). Do you
+> think we could go ahead with this change, and further improve that (to
+> cover all raid cases if necessary)?
+>
+> Cheers,
+>
+>
+> Guilherme
+>
+>
+>
+> [0] https://marc.info/?l=linux-raid&m=155562509905735
