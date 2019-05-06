@@ -2,117 +2,89 @@ Return-Path: <SRS0=Wczi=TG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_DKIMWL_WL_HIGH,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F35D2C04A6B
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 15:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E370C04A6B
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 16:20:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4785204FD
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 15:47:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1557157649;
-	bh=nwyVa1WiWiFrr5ce+XDtvyCdgI+uY2z1UGxbv/W60YM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=OQdyUGhXj1iK6Kj8Ca9TWgRBz0/8+mCbGHXDOvUxWFx1Q0C9QtnsZNrAKUY9dY8Bd
-	 xMfq3ogC/w6eFN2O/BkgN9itA0/h2QsnUlzNhCrEr3f7+HXwxLpUjNDJi/zbfvfZVQ
-	 w9ygek71TpuCqOgCzIDv0vE5V2p1YTdEMNfWLTYw=
+	by mail.kernel.org (Postfix) with ESMTP id E4B702087F
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 16:20:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="0Ccrcuuw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726321AbfEFPr3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 May 2019 11:47:29 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:44666 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725994AbfEFPr3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 11:47:29 -0400
-Received: by mail-qk1-f194.google.com with SMTP id w25so2045503qkj.11;
-        Mon, 06 May 2019 08:47:28 -0700 (PDT)
+        id S1726175AbfEFQUu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 May 2019 12:20:50 -0400
+Received: from mail-it1-f171.google.com ([209.85.166.171]:35959 "EHLO
+        mail-it1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726063AbfEFQUu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 12:20:50 -0400
+Received: by mail-it1-f171.google.com with SMTP id o190so3693211itc.1
+        for <linux-block@vger.kernel.org>; Mon, 06 May 2019 09:20:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=E/XjEjFJHTNXNUvCeIBTVGrT6CD0tFJQfkjcnYeMhDY=;
-        b=WFo86atePse5UmQK+FdjsQtdOQVjO6JrWLd1xYEi2IMozqnr1cQ3J6vuxd3K5gctkU
-         XsHuazRLDKDlGNx+rMgrPMRCPJ6oBDmOOlutFuDcLwMPw4scj7kpqzMv7cl6hg35vWEY
-         5Jo6jnIk5CH1m9lNzIXjTixLiTU77ECI7aUU/JbALWp0cMUgMEwkMgZ7hD3uN9i6ImhW
-         2a3f1jij5WKh6ZVyp1ZYKiNoBS3PgNo3b11OoMZftLmzMwIrn3ULeWrJwifkleo4h6d6
-         bKGMiQvOOvCNzRjOGOOP6O5nxYth83P/miVp9QGwck0+wEWuGrwwA1wlrLAfhekoHQTn
-         pYyg==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=BuGEc0vp73+CwK2wSYl6CczFb1TBM5nZdYcbz+gryjc=;
+        b=0CcrcuuwYR5OzKH6JXGj6/m3G2KYeHcBAed3WoSESbTKWyuqornMti4ZH+2+UMiz9w
+         pj7MUQXrNbOTlVzojPKYqisqLCEedwcM7oC0JyRDYDwP/n0IyBOtiVpcyl5YKvRAZ0St
+         WWxkx540B+W0QI14Wfmr5jXaREV66pJeD+p369M3BOIbyQp3Rpa0LpuceAaxgJfiKuD0
+         5+H2zH4PRdWy/qdKy9GjoxJQ7PTE1+PFqALzPAIKWHCt8hVnlHXfDxQkwRa/1SqxMm+S
+         kCBmKQTmhWwhsbCYyblo4Vtv3ol4q6P/R7ohseyLCsABF77VMWhTYo0zA4q//eClsRcG
+         Y4Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=E/XjEjFJHTNXNUvCeIBTVGrT6CD0tFJQfkjcnYeMhDY=;
-        b=NTNWAM4SS7AOFuCA0Kiu3c+b8LmjB+xLCrDGUkba+mYj5LDMBfA9GhBRQCuLy3TuH4
-         jCVgt7gjD7QS1cDdm2zmsoNUFzIK1LNgN8i1rZSzswEK4NWUCAb36sGYGmopXgtFSfO9
-         ikD6c4W9gVejNPrfKHGR1cCnCmHnmzHvlNeYOPEq7GOlL1YbZNvn2nMCV0+SUcXvG/6v
-         DSoFpBYZpRbj2hnlpCR9RhUVchEkDlZ8C1AfVIJsVSum89XBoYNFJRj+Wyq1N5AhIVyQ
-         EgFBVIC1YudFsjxGm/UQX2D94YjSwE+ViJtcROsW4RoH4DFR4rJBmBJ7/H2xYC+4RaTb
-         98Ug==
-X-Gm-Message-State: APjAAAWTFqphWOk4BKHRdouGRrmAfFyNou0+amEv8C1obHttu3S6c0Hj
-        nk5EMp6Mhyx+loATAA3xtXs=
-X-Google-Smtp-Source: APXvYqyGWKd+xSOSpvNfUpsvwC4L227cvwkKiLHI1zuDfWsdmprNrmz8KfFvHgA6pkY4TuPO96A4Rg==
-X-Received: by 2002:a37:de16:: with SMTP id h22mr19541559qkj.306.1557157647429;
-        Mon, 06 May 2019 08:47:27 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::3:34f3])
-        by smtp.gmail.com with ESMTPSA id i23sm8328331qtc.18.2019.05.06.08.47.26
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=BuGEc0vp73+CwK2wSYl6CczFb1TBM5nZdYcbz+gryjc=;
+        b=KmVW2m8Gjs8+aq0FWFF/6XnL0HTSjsPhSmJt6gZi9Ky22RXMy1s2m9x8m7QpqagZp0
+         Y9J6z3LU9v6m3J9kh3N5QQz/rnCNEBy+zV98Y16RM39QJh1rmGAO3xi7k/su2LEeG/Ht
+         poTTR9MxKXJF1oWn1P7svbMFy0+97XaNA3aDboNqNyymHcH2XG7c40pSl7NSvgc1Q0aV
+         IGXN7InIZtdXFvl1NFP4Ou33pqd45ffH284d/iFJxwjLa6jSD0RVLyEyBr++i9myz29a
+         ijfjiOx0Wqxp/TLdh+/vHVPicfCgAGaeWvjprr0V0gwCfsFq+diE4uQatCFnjCv0qvu7
+         IG1A==
+X-Gm-Message-State: APjAAAXHal7FiFUVRnY4euetv6H5jvFJS/froCGwN0izoFX3YglmzOqK
+        dL1aZ0XdRsUHFN5JCkZHK4vFLQ==
+X-Google-Smtp-Source: APXvYqxuP5CUFLnijUuK0/cyd6x2CzTcjJSjxfwQOE3eW5rTIEZGVI6gjnUdGx6HRA7ZBcwKZWUoNA==
+X-Received: by 2002:a02:52c9:: with SMTP id d192mr19531902jab.53.1557159649143;
+        Mon, 06 May 2019 09:20:49 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id f1sm1831326ioc.45.2019.05.06.09.20.46
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 06 May 2019 08:47:26 -0700 (PDT)
-Date:   Mon, 6 May 2019 08:47:25 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@infradead.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Martin KaFai Lau <kafai@fb.com>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, netdev@vger.kernel.org,
-        bpf@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v2 08/79] docs: cgroup-v1: convert docs to ReST and
- rename to *.rst
-Message-ID: <20190506154725.GS374014@devbig004.ftw2.facebook.com>
-References: <cover.1555938375.git.mchehab+samsung@kernel.org>
- <c6e79690c038fc6bbf9265a065c1f861d6e156fa.1555938375.git.mchehab+samsung@kernel.org>
+        Mon, 06 May 2019 09:20:47 -0700 (PDT)
+Subject: Re: [GIT PULL 00/26] lightnvm updates for 5.2
+To:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190504183811.18725-1-mb@lightnvm.io>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <db614650-6edd-9055-c8a1-5303c0447b70@kernel.dk>
+Date:   Mon, 6 May 2019 10:20:46 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c6e79690c038fc6bbf9265a065c1f861d6e156fa.1555938375.git.mchehab+samsung@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190504183811.18725-1-mb@lightnvm.io>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 22, 2019 at 10:26:57AM -0300, Mauro Carvalho Chehab wrote:
-> Convert the cgroup-v1 files to ReST format, in order to
-> allow a later addition to the admin-guide.
+On 5/4/19 12:37 PM, Matias Bjørling wrote:
+> Hi Jens,
 > 
-> The conversion is actually:
->   - add blank lines and identation in order to identify paragraphs;
->   - fix tables markups;
->   - add some lists markups;
->   - mark literal blocks;
->   - adjust title markups.
-> 
-> At its new index.rst, let's add a :orphan: while this is not linked to
-> the main index.rst file, in order to avoid build warnings.
-> 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+> Can you please pick up the following patches for the 5.2 window if
+> it is too late.
 
-Acked-by: Tejun Heo <tj@kernel.org>
-
-Please feel free to route with other patches in the series.
-
-Thanks.
+It's very late. Even if I had applied this the second it came in, it
+would not even have made linux-next before the merge window opens...
+I'll queue this up for later in the merge window merging, but generally
+I need to have bigger series a week before final. This generally means
+around -rc6 time.
 
 -- 
-tejun
+Jens Axboe
+
