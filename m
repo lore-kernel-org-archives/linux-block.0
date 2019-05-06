@@ -2,172 +2,113 @@ Return-Path: <SRS0=Wczi=TG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97419C04AAB
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 16:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF62C04A6B
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 16:54:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B90A20B7C
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 16:51:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EB7E2087F
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 16:54:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZ7HXSIs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VVtEISd8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726503AbfEFQvH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 May 2019 12:51:07 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:42556 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725883AbfEFQvH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 12:51:07 -0400
-Received: by mail-qt1-f194.google.com with SMTP id p20so15483578qtc.9;
-        Mon, 06 May 2019 09:51:06 -0700 (PDT)
+        id S1726413AbfEFQyS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 May 2019 12:54:18 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:36845 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726503AbfEFQyP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 12:54:15 -0400
+Received: by mail-pl1-f196.google.com with SMTP id cb4so2735827plb.3
+        for <linux-block@vger.kernel.org>; Mon, 06 May 2019 09:54:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GIhzL1cw5MneYYR1EQW+ThAGljCkXhVHNDwUfQXFyo4=;
-        b=XZ7HXSIsNo69QtJ5jHpPZ75ljYTcPnDgKDPz21kmeaw/B1JTzvLN+1Qbsdnl3sD+4b
-         Yxs3e4OrpuJ0UShp8mQHhiHj3Q0dt2qwenr5zTaJHwu5qA1Y2lgjq4QNmbshYqjymvsw
-         r3KxsMK+QQAdj1e4UIuiWyhenendNOyvrGwMlQbJzOAZn9RimZFNGAprD3d+FbDAhp+2
-         kF9V/S25ORFhxQa9oEK68cJgfPT6wcGGB3qdM9grCSAwMs+CoG6tD+ScMSp0NtMzhPXG
-         GgXBbYG3zwiHFNIlq9GucbIBi8cvklL3abzbD/VSl9jtkQt+zIDuRUtrLKOCm+oGfd3E
-         MqfQ==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=KCEwrmU0WXfK4atvqThwEnw4yweGWf/NWKBCEgr7l14=;
+        b=VVtEISd8kVc5rlPdF+mZWA81XMq/W5DTFtorR+2CvKU2ht/SZDDP3k4/GtF/5co+5x
+         ouCRIr9lGEYjmCi07bW+9pvG78SfTtVuJPk5ee3d1mz9ejfdnULNyWLTcIyFkHNfxKe6
+         6TxLTh9qM/Pun6UIaHvmFrJNL4MprtMFrepis1FkWY1K9FAleDp4XCpFGLcIOFWL/rfC
+         R3kHoHZ+ANqoXcezYatpah2FE8pZ5hT0aZPcy0NZ1dYnDYgH3lME2AGLJF/SUaSM4Klu
+         e6p0FcFzCV56yLydglu1xcN2paKOXU1jdIqb2rRKBNTJHK/HFUa9enW1EGzHP3zSs1pF
+         7LnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GIhzL1cw5MneYYR1EQW+ThAGljCkXhVHNDwUfQXFyo4=;
-        b=lvqkQYcLKWn5iQSKvEu8Cqi6RQ4ulMzDtug1rT8XD6Qw2Yh1MIMow5sj+ziI2bnWSf
-         ZmJs8ADPYyQufLvuPPmYtF/67BRETN+Wc2nHFfsbTpdAtm8m/FehwZpLciRxOeBJ7RNH
-         q5N+Qp0b8Uj86fOD2nnoCARGMk6W7XkDUOD26BkawZXR6pSCvrJVuq2PSr4ktNOeWdCA
-         /MQFOlbl/3IQQXBYsMZHboZZ7FgaQLt+8CGD/n8XUdosAtBqagUpGjTza6Lz0VdmkhGp
-         OPSb0ChhBnJ6udQpXjkHdeR03yJ/A+fLIy30Ud5k+wJ2MGFpjwSW5440sWCUtgpXpvo/
-         hCiA==
-X-Gm-Message-State: APjAAAXuDSJpRUu/Y3SPLk5B49HCk/GvtOscx5KmReCq6wiLm8Y6ZC4R
-        43QhQAbDluHrVod4JV7Qsp4hqcc8V2ice2lb624=
-X-Google-Smtp-Source: APXvYqx/8sLYz9E3hw9/ZbdNldT9fuk82NXH6iaLHuikdyjkBZl+mwGqSoe187gvHcvsSa01UUHveUJ/BoKZjBmgjNo=
-X-Received: by 2002:a0c:ba99:: with SMTP id x25mr22156674qvf.212.1557161466306;
- Mon, 06 May 2019 09:51:06 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=KCEwrmU0WXfK4atvqThwEnw4yweGWf/NWKBCEgr7l14=;
+        b=pQknImQXqCCe871iswBeoKHGibsIzrsrq09j8rGIfq06j9nKNWI6vPj05skIV65/AL
+         etgKPOnJsrJfsw6YzdNwJ6sbU0ZWXETz7hemiPWEtkGHRFdU+RsvQ68IAbfSmuYONkRK
+         4gCreWHos/PU0A7dP4iiw4F6c8COxZyFKQ1rbtoMK7HHtXnkL3NQoKXLATLcv/1FfbAK
+         t7/DgI/6BTJP0my7CW3fn0fbZhl/2O8bT4JlT/RPfxPP7brsdRsQOQnz/FuEfP8zFo5y
+         N+g+ox+kYCZHr8lHH026Sde84prfZG6Z4gIAN0+xknweC38q7r1chikoSIWsVeD1hcXi
+         7SAw==
+X-Gm-Message-State: APjAAAVlp+9hC3/+jJ7fN13Azztj1QuN4mQIUcHadQtG56Ld8fqgYRkI
+        Ajbywbe4OlzqPOWZy9AQV08=
+X-Google-Smtp-Source: APXvYqyOcTkcFfVsQy6lsNiOQwe/uSzxHEEc66MzeSc7kTFyzoO3k2eaJ/pE95fgn4pIQpzSEzzpIA==
+X-Received: by 2002:a17:902:9a46:: with SMTP id x6mr33034506plv.71.1557161654227;
+        Mon, 06 May 2019 09:54:14 -0700 (PDT)
+Received: from [192.168.0.6] ([123.213.206.190])
+        by smtp.gmail.com with ESMTPSA id c19sm13731453pgi.42.2019.05.06.09.54.11
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 06 May 2019 09:54:13 -0700 (PDT)
+Subject: Re: [PATCH 1/3] nvme: 002: fix nvmet pass data with loop
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Omar Sandoval <osandov@osandov.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+References: <20190505150611.15776-1-minwoo.im.dev@gmail.com>
+ <20190505150611.15776-2-minwoo.im.dev@gmail.com>
+ <SN6PR04MB45274C423AA7C3CC3DBB5ED586300@SN6PR04MB4527.namprd04.prod.outlook.com>
+ <a66b775f-9a5f-fefc-ae29-c86678e66463@gmail.com>
+ <SN6PR04MB45272BEB18B3ADD95DCB42AE86300@SN6PR04MB4527.namprd04.prod.outlook.com>
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+Message-ID: <cfa4d48d-ce13-0ace-cf5c-a3d0d1f4cca7@gmail.com>
+Date:   Tue, 7 May 2019 01:54:09 +0900
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190430223722.20845-1-gpiccoli@canonical.com> <20190430223722.20845-2-gpiccoli@canonical.com>
-In-Reply-To: <20190430223722.20845-2-gpiccoli@canonical.com>
-From:   Song Liu <liu.song.a23@gmail.com>
-Date:   Mon, 6 May 2019 12:50:55 -0400
-Message-ID: <CAPhsuW4SeUhNOJJkEf9wcLjbbc9qX0=C8zqbyCtC7Q8fdL91hw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] md/raid0: Do not bypass blocking queue entered for
- raid0 bios
-To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Cc:     linux-block@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>, dm-devel@redhat.com,
-        axboe@kernel.dk, Gavin Guo <gavin.guo@canonical.com>,
-        Jay Vosburgh <jay.vosburgh@canonical.com>, kernel@gpiccoli.net,
-        Ming Lei <ming.lei@redhat.com>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <SN6PR04MB45272BEB18B3ADD95DCB42AE86300@SN6PR04MB4527.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 30, 2019 at 6:38 PM Guilherme G. Piccoli
-<gpiccoli@canonical.com> wrote:
->
-> Commit cd4a4ae4683d ("block: don't use blocking queue entered for
-> recursive bio submits") introduced the flag BIO_QUEUE_ENTERED in order
-> split bios bypass the blocking queue entering routine and use the live
-> non-blocking version. It was a result of an extensive discussion in
-> a linux-block thread[0], and the purpose of this change was to prevent
-> a hung task waiting on a reference to drop.
->
-> Happens that md raid0 split bios all the time, and more important,
-> it changes their underlying device to the raid member. After the change
-> introduced by this flag's usage, we experience various crashes if a raid0
-> member is removed during a large write. This happens because the bio
-> reaches the live queue entering function when the queue of the raid0
-> member is dying.
->
-> A simple reproducer of this behavior is presented below:
-> a) Build kernel v5.1-rc7 with CONFIG_BLK_DEV_THROTTLING=y.
->
-> b) Create a raid0 md array with 2 NVMe devices as members, and mount it
-> with an ext4 filesystem.
->
-> c) Run the following oneliner (supposing the raid0 is mounted in /mnt):
-> (dd of=/mnt/tmp if=/dev/zero bs=1M count=999 &); sleep 0.3;
-> echo 1 > /sys/block/nvme0n1/device/device/remove
-> (whereas nvme0n1 is the 2nd array member)
->
-> This will trigger the following warning/oops:
->
-> ------------[ cut here ]------------
-> no blkg associated for bio on block-device: nvme0n1
-> WARNING: CPU: 9 PID: 184 at ./include/linux/blk-cgroup.h:785
-> generic_make_request_checks+0x4dd/0x690
-> [...]
-> BUG: unable to handle kernel NULL pointer dereference at 0000000000000155
-> PGD 0 P4D 0
-> Oops: 0000 [#1] SMP PTI
-> RIP: 0010:blk_throtl_bio+0x45/0x970
-> [...]
-> Call Trace:
->  generic_make_request_checks+0x1bf/0x690
->  generic_make_request+0x64/0x3f0
->  raid0_make_request+0x184/0x620 [raid0]
->  ? raid0_make_request+0x184/0x620 [raid0]
->  ? blk_queue_split+0x384/0x6d0
->  md_handle_request+0x126/0x1a0
->  md_make_request+0x7b/0x180
->  generic_make_request+0x19e/0x3f0
->  submit_bio+0x73/0x140
-> [...]
->
-> This patch changes raid0 driver to fallback to the "old" blocking queue
-> entering procedure, by clearing the BIO_QUEUE_ENTERED from raid0 bios.
-> This prevents the crashes and restores the regular behavior of raid0
-> arrays when a member is removed during a large write.
->
-> [0] https://marc.info/?l=linux-block&m=152638475806811
->
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> Cc: stable@vger.kernel.org # v4.18
-> Fixes: cd4a4ae4683d ("block: don't use blocking queue entered for recursive bio submits")
-> Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
+> We need to get rid the string comparison as much as we can e.g.
+> in following output the nvme-cli output should not be compared
+> but the return value itself.
+> 
+> -Discovery Log Number of Records 1, Generation counter 1
+> +Discovery Log Number of Records 1, Generation counter 2
+> =====Discovery Log Entry 0======
+> trtype: loop
+> adrfam: pci
+> subtype: nvme subsystem
+> -treq: not specified
+> +treq: not specified, sq flow control disable supported
+> portid: X
+> trsvcid:
+> subnqn: blktests-subsystem-1
+> 
+> Reason :- we cannot rely on the output as it tends to change
+> with development which triggers fixes in blktests, unless
+> testcase is focused on entirely on examining the output of
+> the tool.
 
-IIUC, we need this for all raid types. Is it possible to fix that in md.c so
-all types get the fix?
+Totally agree with you.  nvme-cli is going to keep updated and output 
+format might be changed which may cause test failure in blktests.
 
-Thanks,
-Song
+If Johannes who wrote these tests agrees to not check output result from 
+nvme-cli, I'll get rid of them.
 
-> ---
->  drivers/md/raid0.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-> index f3fb5bb8c82a..d5bdc79e0835 100644
-> --- a/drivers/md/raid0.c
-> +++ b/drivers/md/raid0.c
-> @@ -547,6 +547,7 @@ static void raid0_handle_discard(struct mddev *mddev, struct bio *bio)
->                         trace_block_bio_remap(bdev_get_queue(rdev->bdev),
->                                 discard_bio, disk_devt(mddev->gendisk),
->                                 bio->bi_iter.bi_sector);
-> +               bio_clear_flag(bio, BIO_QUEUE_ENTERED);
->                 generic_make_request(discard_bio);
->         }
->         bio_endio(bio);
-> @@ -602,6 +603,7 @@ static bool raid0_make_request(struct mddev *mddev, struct bio *bio)
->                                 disk_devt(mddev->gendisk), bio_sector);
->         mddev_check_writesame(mddev, bio);
->         mddev_check_write_zeroes(mddev, bio);
-> +       bio_clear_flag(bio, BIO_QUEUE_ENTERED);
->         generic_make_request(bio);
->         return true;
->  }
-> --
-> 2.21.0
->
+By the way, Checking the return value of a program like nvme-cli might 
+not be enough to figure out what happened because this test looks like 
+wanted to check the output of discover get log page is exactly the same 
+with what it wanted to be in case data size is greater than 4K.
