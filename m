@@ -2,91 +2,196 @@ Return-Path: <SRS0=Wczi=TG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C75CC04AAC
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 08:11:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B93C04AAA
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 08:22:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 697E320B7C
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 08:11:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D572B20830
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 08:22:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726085AbfEFILW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 May 2019 04:11:22 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57362 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725836AbfEFILW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 6 May 2019 04:11:22 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id DB53EAED7;
-        Mon,  6 May 2019 08:11:20 +0000 (UTC)
-Subject: Re: [PATCH] xen-blkfront: switch kcalloc to kvcalloc for large array
- allocation
-To:     Roger Pau Monne <roger.pau@citrix.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, stable@vger.kernel.org
-References: <20190503150401.15904-1-roger.pau@citrix.com>
-From:   Juergen Gross <jgross@suse.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jgross@suse.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <f4b944e8-6678-a921-e2b2-aaeb00c0d5e1@suse.com>
-Date:   Mon, 6 May 2019 10:11:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726447AbfEFIUH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 May 2019 04:20:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50776 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726412AbfEFIUG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 May 2019 04:20:06 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 496C387630;
+        Mon,  6 May 2019 08:20:06 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A98082D1AB;
+        Mon,  6 May 2019 08:19:59 +0000 (UTC)
+Date:   Mon, 6 May 2019 16:19:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 8/8] block: never take page references for ITER_BVEC
+Message-ID: <20190506081952.GA24702@ming.t460p>
+References: <20190502233332.28720-1-hch@lst.de>
+ <20190502233332.28720-9-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20190503150401.15904-1-roger.pau@citrix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190502233332.28720-9-hch@lst.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Mon, 06 May 2019 08:20:06 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 03/05/2019 17:04, Roger Pau Monne wrote:
-> There's no reason to request physically contiguous memory for those
-> allocations.
+On Thu, May 02, 2019 at 07:33:32PM -0400, Christoph Hellwig wrote:
+> If we pass pages through an iov_iter we always already have a reference
+> in the caller.  Thus remove the ITER_BVEC_FLAG_NO_REF and don't take
+> reference to pages by default for bvec backed iov_iters.
 > 
-> Reported-by: Ian Jackson <ian.jackson@citrix.com>
-> Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/bio.c          | 14 +-------------
+>  drivers/block/loop.c | 16 ++++------------
+>  fs/io_uring.c        |  3 ---
+>  include/linux/uio.h  |  8 --------
+>  4 files changed, 5 insertions(+), 36 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 3938e179a530..e999d530d863 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -846,15 +846,6 @@ int bio_add_page(struct bio *bio, struct page *page,
+>  }
+>  EXPORT_SYMBOL(bio_add_page);
+>  
+> -static void bio_get_pages(struct bio *bio)
+> -{
+> -	struct bvec_iter_all iter_all;
+> -	struct bio_vec *bvec;
+> -
+> -	bio_for_each_segment_all(bvec, bio, iter_all)
+> -		get_page(bvec->bv_page);
+> -}
+> -
+>  void bio_release_pages(struct bio *bio)
+>  {
+>  	struct bvec_iter_all iter_all;
+> @@ -967,11 +958,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>  			ret = __bio_iov_iter_get_pages(bio, iter);
+>  	} while (!ret && iov_iter_count(iter) && !bio_full(bio));
+>  
+> -	if (iov_iter_bvec_no_ref(iter))
+> +	if (is_bvec)
+>  		bio_set_flag(bio, BIO_NO_PAGE_REF);
+> -	else if (is_bvec)
+> -		bio_get_pages(bio);
+> -
+>  	return bio->bi_vcnt ? 0 : ret;
+>  }
+>  
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 102d79575895..c20710e617c2 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -264,20 +264,12 @@ lo_do_transfer(struct loop_device *lo, int cmd,
+>  	return ret;
+>  }
+>  
+> -static inline void loop_iov_iter_bvec(struct iov_iter *i,
+> -		unsigned int direction, const struct bio_vec *bvec,
+> -		unsigned long nr_segs, size_t count)
+> -{
+> -	iov_iter_bvec(i, direction, bvec, nr_segs, count);
+> -	i->type |= ITER_BVEC_FLAG_NO_REF;
+> -}
+> -
+>  static int lo_write_bvec(struct file *file, struct bio_vec *bvec, loff_t *ppos)
+>  {
+>  	struct iov_iter i;
+>  	ssize_t bw;
+>  
+> -	loop_iov_iter_bvec(&i, WRITE, bvec, 1, bvec->bv_len);
+> +	iov_iter_bvec(&i, WRITE, bvec, 1, bvec->bv_len);
+>  
+>  	file_start_write(file);
+>  	bw = vfs_iter_write(file, &i, ppos, 0);
+> @@ -355,7 +347,7 @@ static int lo_read_simple(struct loop_device *lo, struct request *rq,
+>  	ssize_t len;
+>  
+>  	rq_for_each_segment(bvec, rq, iter) {
+> -		loop_iov_iter_bvec(&i, READ, &bvec, 1, bvec.bv_len);
+> +		iov_iter_bvec(&i, READ, &bvec, 1, bvec.bv_len);
+>  		len = vfs_iter_read(lo->lo_backing_file, &i, &pos, 0);
+>  		if (len < 0)
+>  			return len;
+> @@ -396,7 +388,7 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
+>  		b.bv_offset = 0;
+>  		b.bv_len = bvec.bv_len;
+>  
+> -		loop_iov_iter_bvec(&i, READ, &b, 1, b.bv_len);
+> +		iov_iter_bvec(&i, READ, &b, 1, b.bv_len);
+>  		len = vfs_iter_read(lo->lo_backing_file, &i, &pos, 0);
+>  		if (len < 0) {
+>  			ret = len;
+> @@ -563,7 +555,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+>  	}
+>  	atomic_set(&cmd->ref, 2);
+>  
+> -	loop_iov_iter_bvec(&iter, rw, bvec, nr_bvec, blk_rq_bytes(rq));
+> +	iov_iter_bvec(&iter, rw, bvec, nr_bvec, blk_rq_bytes(rq));
+>  	iter.iov_offset = offset;
+>  
+>  	cmd->iocb.ki_pos = pos;
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index f65f85d89217..f7eb63a5b3db 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -853,9 +853,6 @@ static int io_import_fixed(struct io_ring_ctx *ctx, int rw,
+>  	iov_iter_bvec(iter, rw, imu->bvec, imu->nr_bvecs, offset + len);
+>  	if (offset)
+>  		iov_iter_advance(iter, offset);
+> -
+> -	/* don't drop a reference to these pages */
+> -	iter->type |= ITER_BVEC_FLAG_NO_REF;
+>  	return 0;
+>  }
+>  
+> diff --git a/include/linux/uio.h b/include/linux/uio.h
+> index f184af1999a8..bace8fd40d0c 100644
+> --- a/include/linux/uio.h
+> +++ b/include/linux/uio.h
+> @@ -23,9 +23,6 @@ struct kvec {
+>  };
+>  
+>  enum iter_type {
+> -	/* set if ITER_BVEC doesn't hold a bv_page ref */
+> -	ITER_BVEC_FLAG_NO_REF = 2,
+> -
+>  	/* iter types */
+>  	ITER_IOVEC = 4,
+>  	ITER_KVEC = 8,
+> @@ -93,11 +90,6 @@ static inline unsigned char iov_iter_rw(const struct iov_iter *i)
+>  	return i->type & (READ | WRITE);
+>  }
+>  
+> -static inline bool iov_iter_bvec_no_ref(const struct iov_iter *i)
+> -{
+> -	return (i->type & ITER_BVEC_FLAG_NO_REF) != 0;
+> -}
+> -
+>  /*
+>   * Total number of bytes covered by an iovec.
+>   *
 
-Reviewed-by: Juergen Gross <jgross@suse.com>
+I remember that this way is the initial version of Jens' patch, however
+kernel bug is triggered:
 
+https://lore.kernel.org/linux-block/20190226034613.GA676@sol.localdomain/
 
-Juergen
+Or maybe I miss some recent changes, could you explain it a bit?
+
+Thanks,
+Ming
