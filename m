@@ -2,127 +2,141 @@ Return-Path: <SRS0=Wczi=TG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1EF9C04AAB
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 18:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12966C04AAD
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 18:48:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 76F112082F
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 18:30:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dNSKDUXF"
+	by mail.kernel.org (Postfix) with ESMTP id DC8F920675
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 18:48:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726566AbfEFSaX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 May 2019 14:30:23 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:35673 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726560AbfEFSaW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 14:30:22 -0400
-Received: by mail-pl1-f196.google.com with SMTP id w24so6794599plp.2
-        for <linux-block@vger.kernel.org>; Mon, 06 May 2019 11:30:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=h4fAKuH/byVNhylCS+A6U39gO11PXacps3u7CzHGthA=;
-        b=dNSKDUXF2oZSIiYLphUbNUQDSbjx83YCVELTwCDErbC7zdeU0NBLzprYH4IWfSBwRc
-         58wL4Yzryf+zRobhFJ//WBRL7i0WJ+HTgQZbdJk50dWzazix94IbKZyQbCvBjp7yQ+jB
-         ueO4NgyjTDCmL1u4yaMpujTc3Wqy63pV8WkNw=
+        id S1726435AbfEFSsL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 May 2019 14:48:11 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:49156 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726365AbfEFSsK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 14:48:10 -0400
+Received: from mail-qt1-f197.google.com ([209.85.160.197])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <gpiccoli@canonical.com>)
+        id 1hNiem-0007H5-Ee
+        for linux-block@vger.kernel.org; Mon, 06 May 2019 18:48:08 +0000
+Received: by mail-qt1-f197.google.com with SMTP id z34so16325919qtz.14
+        for <linux-block@vger.kernel.org>; Mon, 06 May 2019 11:48:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=h4fAKuH/byVNhylCS+A6U39gO11PXacps3u7CzHGthA=;
-        b=fyShq4iqEtaW5OGy9VZbwfOoQUzdtSWETEstAyokzm7UD2gaVxVIS2nivW3CJ060Kv
-         iev2sqTPIBvOJ+bn7PFyYkMAM+4enhDUNseriSvnjwa6bHXGd9ZOdt8oQT5Usd9T+HLJ
-         hb3cb4h8anPAHiz4tA4Amudwt7YZMSYOREthlZv5HnbEi93ON1SVX2kkXspIefFyvAGo
-         yUnxwOaTgfz7JEkuNVo7yvmXgv1023Ba4/bXQ75A6Q1UsZXBML4pSY+xH/Cc5K/kKSF2
-         03B1tOVUQqOPdRxW9avn0tEd6dChzQgQQWKb3V7BSFH4uS7TY1DnsKWFiV8y3ul3v0TQ
-         CjWA==
-X-Gm-Message-State: APjAAAWmj1DqexgCudCrg3U/KZLohxZofpB6oyUgUzknn3oMgD4qv4oC
-        j9A2cJJfPHgEG09is715tbOy/g==
-X-Google-Smtp-Source: APXvYqxZOm72vl0eWsFna1xWIPu80i8z2lHBi28o1Kv41r+YVXTalThuFqrYphk6KLaVhUsaytlrGA==
-X-Received: by 2002:a17:902:12f:: with SMTP id 44mr34438223plb.193.1557167421854;
-        Mon, 06 May 2019 11:30:21 -0700 (PDT)
-Received: from evgreen2.mtv.corp.google.com ([2620:15c:202:201:ffda:7716:9afc:1301])
-        by smtp.gmail.com with ESMTPSA id o81sm18858033pfa.156.2019.05.06.11.30.20
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 06 May 2019 11:30:21 -0700 (PDT)
-From:   Evan Green <evgreen@chromium.org>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Martin K Petersen <martin.petersen@oracle.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Gwendal Grignou <gwendal@chromium.org>,
-        Alexis Savery <asavery@chromium.org>,
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=bC2THTg10tW16ub7PNyNptaheYbyDqPTCbofTdADo6U=;
+        b=MyfnSUYYEkoYWZP9P+ViDkQa4k9ZarNruhnVq9ujDREzYd+vJ1AlARcJZFW8tpVWjd
+         IlU5X01GE8GYyn97hotgOeoJ97QO4gSt1A4EWo8jIJmULIXNUbaqwqIqOG9J9ev2KAXv
+         FCK72Z/MK44COrOBBXQu/6cApZbHufZqyUkYYu49PGMigdKh+l773A3Lyw5Qf7NmJX/E
+         1i9qCpY7M7EocpEbaX1EuHGUbUE0ZNZEQ1cUdLtzW5o/Q0+7HlMSHqhc38MzKT9OHjvX
+         K57m1lCW51yCe5EB3LwxogSEjE0S2hWn8gxebx4o4ZAL0SS5liNMBCuw1nC8mePrqPHC
+         zBkw==
+X-Gm-Message-State: APjAAAXu0HBCQiPhwNVTFeX8Me3Y3VOsWczAVYMGpLY5V5bB2iS0yoJv
+        3AtT/wSP1pqnwLLe0k3RJaPRuuWea/NUYq0xEPzudpddPFQmAIu4vHrWGCD5+yvlvOEkjoSjhac
+        A7HC2YKCpAg6ZqjtGofFaPMqTMkPT5L+S0NhulhW6
+X-Received: by 2002:ac8:1c39:: with SMTP id a54mr20851829qtk.344.1557168487498;
+        Mon, 06 May 2019 11:48:07 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwli31XV/EPuqTTwm6MSINbZHcbpJYoivTjqAbSmdTKZRc/DelL2WjDxPfeSm6BWH7j+Norfw==
+X-Received: by 2002:ac8:1c39:: with SMTP id a54mr20851815qtk.344.1557168487296;
+        Mon, 06 May 2019 11:48:07 -0700 (PDT)
+Received: from [192.168.0.239] ([177.183.163.179])
+        by smtp.gmail.com with ESMTPSA id j123sm6316420qkf.23.2019.05.06.11.48.02
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 06 May 2019 11:48:06 -0700 (PDT)
+Subject: Re: [PATCH 2/2] md/raid0: Do not bypass blocking queue entered for
+ raid0 bios
+To:     Song Liu <liu.song.a23@gmail.com>
+Cc:     linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>, dm-devel@redhat.com,
+        axboe@kernel.dk, Gavin Guo <gavin.guo@canonical.com>,
+        Jay Vosburgh <jay.vosburgh@canonical.com>, kernel@gpiccoli.net,
         Ming Lei <ming.lei@redhat.com>,
-        Evan Green <evgreen@chromium.org>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v5 1/2] loop: Report EOPNOTSUPP properly
-Date:   Mon,  6 May 2019 11:27:35 -0700
-Message-Id: <20190506182736.21064-2-evgreen@chromium.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190506182736.21064-1-evgreen@chromium.org>
-References: <20190506182736.21064-1-evgreen@chromium.org>
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        stable@vger.kernel.org
+References: <20190430223722.20845-1-gpiccoli@canonical.com>
+ <20190430223722.20845-2-gpiccoli@canonical.com>
+ <CAPhsuW4SeUhNOJJkEf9wcLjbbc9qX0=C8zqbyCtC7Q8fdL91hw@mail.gmail.com>
+From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
+ mQENBFpVBxcBCADPNKmu2iNKLepiv8+Ssx7+fVR8lrL7cvakMNFPXsXk+f0Bgq9NazNKWJIn
+ Qxpa1iEWTZcLS8ikjatHMECJJqWlt2YcjU5MGbH1mZh+bT3RxrJRhxONz5e5YILyNp7jX+Vh
+ 30rhj3J0vdrlIhPS8/bAt5tvTb3ceWEic9mWZMsosPavsKVcLIO6iZFlzXVu2WJ9cov8eQM/
+ irIgzvmFEcRyiQ4K+XUhuA0ccGwgvoJv4/GWVPJFHfMX9+dat0Ev8HQEbN/mko/bUS4Wprdv
+ 7HR5tP9efSLucnsVzay0O6niZ61e5c97oUa9bdqHyApkCnGgKCpg7OZqLMM9Y3EcdMIJABEB
+ AAG0LUd1aWxoZXJtZSBHLiBQaWNjb2xpIDxncGljY29saUBjYW5vbmljYWwuY29tPokBNwQT
+ AQgAIQUCWmClvQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRDOR5EF9K/7Gza3B/9d
+ 5yczvEwvlh6ksYq+juyuElLvNwMFuyMPsvMfP38UslU8S3lf+ETukN1S8XVdeq9yscwtsRW/
+ 4YoUwHinJGRovqy8gFlm3SAtjfdqysgJqUJwBmOtcsHkmvFXJmPPGVoH9rMCUr9s6VDPox8f
+ q2W5M7XE9YpsfchS/0fMn+DenhQpV3W6pbLtuDvH/81GKrhxO8whSEkByZbbc+mqRhUSTdN3
+ iMpRL0sULKPVYbVMbQEAnfJJ1LDkPqlTikAgt3peP7AaSpGs1e3pFzSEEW1VD2jIUmmDku0D
+ LmTHRl4t9KpbU/H2/OPZkrm7809QovJGRAxjLLPcYOAP7DUeltveuQENBFpVBxcBCADbxD6J
+ aNw/KgiSsbx5Sv8nNqO1ObTjhDR1wJw+02Bar9DGuFvx5/qs3ArSZkl8qX0X9Vhptk8rYnkn
+ pfcrtPBYLoux8zmrGPA5vRgK2ItvSc0WN31YR/6nqnMfeC4CumFa/yLl26uzHJa5RYYQ47jg
+ kZPehpc7IqEQ5IKy6cCKjgAkuvM1rDP1kWQ9noVhTUFr2SYVTT/WBHqUWorjhu57/OREo+Tl
+ nxI1KrnmW0DbF52tYoHLt85dK10HQrV35OEFXuz0QPSNrYJT0CZHpUprkUxrupDgkM+2F5LI
+ bIcaIQ4uDMWRyHpDbczQtmTke0x41AeIND3GUc+PQ4hWGp9XABEBAAGJAR8EGAEIAAkFAlpV
+ BxcCGwwACgkQzkeRBfSv+xv1wwgAj39/45O3eHN5pK0XMyiRF4ihH9p1+8JVfBoSQw7AJ6oU
+ 1Hoa+sZnlag/l2GTjC8dfEGNoZd3aRxqfkTrpu2TcfT6jIAsxGjnu+fUCoRNZzmjvRziw3T8
+ egSPz+GbNXrTXB8g/nc9mqHPPprOiVHDSK8aGoBqkQAPZDjUtRwVx112wtaQwArT2+bDbb/Y
+ Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
+ kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
+ X18zwLgdiQ==
+Message-ID: <c8721ba3-5d38-7906-5049-e2b16e967ecf@canonical.com>
+Date:   Mon, 6 May 2019 15:48:01 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <CAPhsuW4SeUhNOJJkEf9wcLjbbc9qX0=C8zqbyCtC7Q8fdL91hw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Properly plumb out EOPNOTSUPP from loop driver operations, which may
-get returned when for instance a discard operation is attempted but not
-supported by the underlying block device. Before this change, everything
-was reported in the log as an I/O error, which is scary and not
-helpful in debugging.
+On 06/05/2019 13:50, Song Liu wrote:
+> [...] 
+> IIUC, we need this for all raid types. Is it possible to fix that in md.c so
+> all types get the fix?
+> 
+> Thanks,
+> Song
+> 
 
-Signed-off-by: Evan Green <evgreen@chromium.org>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
----
+Hi Song, thanks again for reviewing my code and provide input, much
+appreciated!
 
-Changes in v5: None
-Changes in v4: None
-Changes in v3:
-- Updated tags
+I understand this could in theory affects all the RAID levels, but in
+practice I don't think it'll happen. RAID0 is the only "blind" mode of
+RAID, in the sense it's the only one that doesn't care at all with
+failures. In fact, this was the origin of my other thread [0], regarding
+the change of raid0's behavior in error cases..because it currently does
+not care with members being removed and rely only in filesystem failures
+(after submitting many BIOs to the removed device).
 
-Changes in v2:
-- Unnested error if statement (Bart)
+That said, in this change I've only took care of raid0, since in my
+understanding the other levels won't submit BIOs to dead devices; we can
+experiment that to see if it's true.
 
- drivers/block/loop.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+But I'd be happy to change all other levels also if you think it's
+appropriate (or a simple generic change to md.c if it is enough). Do you
+think we could go ahead with this change, and further improve that (to
+cover all raid cases if necessary)?
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index bf1c61cab8eb..bbf21ebeccd3 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -458,7 +458,9 @@ static void lo_complete_rq(struct request *rq)
- 
- 	if (!cmd->use_aio || cmd->ret < 0 || cmd->ret == blk_rq_bytes(rq) ||
- 	    req_op(rq) != REQ_OP_READ) {
--		if (cmd->ret < 0)
-+		if (cmd->ret == -EOPNOTSUPP)
-+			ret = BLK_STS_NOTSUPP;
-+		else if (cmd->ret < 0)
- 			ret = BLK_STS_IOERR;
- 		goto end_io;
- 	}
-@@ -1892,7 +1894,10 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
-  failed:
- 	/* complete non-aio request */
- 	if (!cmd->use_aio || ret) {
--		cmd->ret = ret ? -EIO : 0;
-+		if (ret == -EOPNOTSUPP)
-+			cmd->ret = ret;
-+		else
-+			cmd->ret = ret ? -EIO : 0;
- 		blk_mq_complete_request(rq);
- 	}
- }
--- 
-2.20.1
+Cheers,
 
+
+Guilherme
+
+
+
+[0] https://marc.info/?l=linux-raid&m=155562509905735
