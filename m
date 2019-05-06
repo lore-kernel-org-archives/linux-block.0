@@ -2,109 +2,117 @@ Return-Path: <SRS0=Wczi=TG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	T_DKIMWL_WL_HIGH,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_DKIMWL_WL_HIGH,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9AC8C04A6B
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 15:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F35D2C04A6B
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 15:47:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BD2A1205ED
-	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 15:32:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DclcB8tB"
+	by mail.kernel.org (Postfix) with ESMTP id C4785204FD
+	for <linux-block@archiver.kernel.org>; Mon,  6 May 2019 15:47:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1557157649;
+	bh=nwyVa1WiWiFrr5ce+XDtvyCdgI+uY2z1UGxbv/W60YM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=OQdyUGhXj1iK6Kj8Ca9TWgRBz0/8+mCbGHXDOvUxWFx1Q0C9QtnsZNrAKUY9dY8Bd
+	 xMfq3ogC/w6eFN2O/BkgN9itA0/h2QsnUlzNhCrEr3f7+HXwxLpUjNDJi/zbfvfZVQ
+	 w9ygek71TpuCqOgCzIDv0vE5V2p1YTdEMNfWLTYw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726516AbfEFPcS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 May 2019 11:32:18 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:36169 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726509AbfEFPcS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 11:32:18 -0400
-Received: by mail-lj1-f194.google.com with SMTP id y8so11245831ljd.3
-        for <linux-block@vger.kernel.org>; Mon, 06 May 2019 08:32:17 -0700 (PDT)
+        id S1726321AbfEFPr3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 May 2019 11:47:29 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:44666 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725994AbfEFPr3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 May 2019 11:47:29 -0400
+Received: by mail-qk1-f194.google.com with SMTP id w25so2045503qkj.11;
+        Mon, 06 May 2019 08:47:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EhC7MbDWhdXqVGNsnx/nM6qv+8XRBf3nIJVwF+Zb68E=;
-        b=DclcB8tBLwBNnEm2Y6G2rmljpZK5waw9Q9n0wedeq+7SejBp2LiBVTomNRZmhsRyAf
-         k8HF5G5r87WIYlwu4mky6vY2DRJL4W1noWtMCoSH8hcDmiNy/XnR4mk+dddgE2mKFXuC
-         TmxMIPPYdgCKLrBr7RzURj0Ysfvkapvfx14sg=
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=E/XjEjFJHTNXNUvCeIBTVGrT6CD0tFJQfkjcnYeMhDY=;
+        b=WFo86atePse5UmQK+FdjsQtdOQVjO6JrWLd1xYEi2IMozqnr1cQ3J6vuxd3K5gctkU
+         XsHuazRLDKDlGNx+rMgrPMRCPJ6oBDmOOlutFuDcLwMPw4scj7kpqzMv7cl6hg35vWEY
+         5Jo6jnIk5CH1m9lNzIXjTixLiTU77ECI7aUU/JbALWp0cMUgMEwkMgZ7hD3uN9i6ImhW
+         2a3f1jij5WKh6ZVyp1ZYKiNoBS3PgNo3b11OoMZftLmzMwIrn3ULeWrJwifkleo4h6d6
+         bKGMiQvOOvCNzRjOGOOP6O5nxYth83P/miVp9QGwck0+wEWuGrwwA1wlrLAfhekoHQTn
+         pYyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EhC7MbDWhdXqVGNsnx/nM6qv+8XRBf3nIJVwF+Zb68E=;
-        b=d9rPEmtH1OHGr3l4r+zi+HEVuXANzmXPvcUpw2RxkoBBUS75oA9mKAPTcBs9ekQyAX
-         s2JsweEgqLBL3lxM0qn6tssKTcnhpeQySd6DeNsOlK5HpUtvK3R95RGy4KhMFR/XJ1rM
-         4jZ1bNn8tSRb1g25jC631kX7XGWWfrKuopplv3gnya3RFR5kSU1wIrQEfb3kFoww4GcA
-         H9nlAJccUn9rvcVGBVaWFQaZgXR9xj4T0+wo5ODHGgc7wvRUoEWbR7zUD77Y+DAsOxFt
-         uAVLHksYAb1flwWj+2dQolveGHgGiUyKh9r1wgr95hyaHTrQa1TmqfboAwzi7We5k9Fa
-         I+mA==
-X-Gm-Message-State: APjAAAVB/mRxSpkDKJ6TM5lQGqq8UCwa8Cpu8zxpgkwFTw98LJ85S+G9
-        OEcbneB6DJ6YVPUILKrQP9MpUDGiWD8=
-X-Google-Smtp-Source: APXvYqzqpMC+2Uki6BNLfKB7T2jjW9JOH/+PD8bzJwetEH+4jkIHMI0yXR+V4YbmFY8M/buuD0sYDw==
-X-Received: by 2002:a2e:9999:: with SMTP id w25mr1248578lji.121.1557156736372;
-        Mon, 06 May 2019 08:32:16 -0700 (PDT)
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com. [209.85.167.41])
-        by smtp.gmail.com with ESMTPSA id u26sm2064271lje.56.2019.05.06.08.32.15
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 06 May 2019 08:32:15 -0700 (PDT)
-Received: by mail-lf1-f41.google.com with SMTP id n134so7647200lfn.11
-        for <linux-block@vger.kernel.org>; Mon, 06 May 2019 08:32:15 -0700 (PDT)
-X-Received: by 2002:a19:1dc3:: with SMTP id d186mr12709717lfd.101.1557156734917;
- Mon, 06 May 2019 08:32:14 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=E/XjEjFJHTNXNUvCeIBTVGrT6CD0tFJQfkjcnYeMhDY=;
+        b=NTNWAM4SS7AOFuCA0Kiu3c+b8LmjB+xLCrDGUkba+mYj5LDMBfA9GhBRQCuLy3TuH4
+         jCVgt7gjD7QS1cDdm2zmsoNUFzIK1LNgN8i1rZSzswEK4NWUCAb36sGYGmopXgtFSfO9
+         ikD6c4W9gVejNPrfKHGR1cCnCmHnmzHvlNeYOPEq7GOlL1YbZNvn2nMCV0+SUcXvG/6v
+         DSoFpBYZpRbj2hnlpCR9RhUVchEkDlZ8C1AfVIJsVSum89XBoYNFJRj+Wyq1N5AhIVyQ
+         EgFBVIC1YudFsjxGm/UQX2D94YjSwE+ViJtcROsW4RoH4DFR4rJBmBJ7/H2xYC+4RaTb
+         98Ug==
+X-Gm-Message-State: APjAAAWTFqphWOk4BKHRdouGRrmAfFyNou0+amEv8C1obHttu3S6c0Hj
+        nk5EMp6Mhyx+loATAA3xtXs=
+X-Google-Smtp-Source: APXvYqyGWKd+xSOSpvNfUpsvwC4L227cvwkKiLHI1zuDfWsdmprNrmz8KfFvHgA6pkY4TuPO96A4Rg==
+X-Received: by 2002:a37:de16:: with SMTP id h22mr19541559qkj.306.1557157647429;
+        Mon, 06 May 2019 08:47:27 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::3:34f3])
+        by smtp.gmail.com with ESMTPSA id i23sm8328331qtc.18.2019.05.06.08.47.26
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 06 May 2019 08:47:26 -0700 (PDT)
+Date:   Mon, 6 May 2019 08:47:25 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v2 08/79] docs: cgroup-v1: convert docs to ReST and
+ rename to *.rst
+Message-ID: <20190506154725.GS374014@devbig004.ftw2.facebook.com>
+References: <cover.1555938375.git.mchehab+samsung@kernel.org>
+ <c6e79690c038fc6bbf9265a065c1f861d6e156fa.1555938375.git.mchehab+samsung@kernel.org>
 MIME-Version: 1.0
-References: <CAE=gft4irmMAapAj3O0hWr53PnyRUmcX2AJB+p_PqCJHT0rvNg@mail.gmail.com>
- <ca507480-0b06-5e4d-ebe6-464302d3af92@acm.org>
-In-Reply-To: <ca507480-0b06-5e4d-ebe6-464302d3af92@acm.org>
-From:   Evan Green <evgreen@chromium.org>
-Date:   Mon, 6 May 2019 08:31:37 -0700
-X-Gmail-Original-Message-ID: <CAE=gft58X0o+_=J81F1F8F5_N58mK+Nqs1zrsmtPC8JDj_Z1LA@mail.gmail.com>
-Message-ID: <CAE=gft58X0o+_=J81F1F8F5_N58mK+Nqs1zrsmtPC8JDj_Z1LA@mail.gmail.com>
-Subject: Re: blkdev_get deadlock
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c6e79690c038fc6bbf9265a065c1f861d6e156fa.1555938375.git.mchehab+samsung@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 3, 2019 at 6:15 PM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 5/3/19 10:47 AM, Evan Green wrote:
-> > Hey blockies,
->   ^^^^^^^^^^^^
->
-> That's the weirdest greeting I have encountered so far on the
-> linux-block mailing list.
+On Mon, Apr 22, 2019 at 10:26:57AM -0300, Mauro Carvalho Chehab wrote:
+> Convert the cgroup-v1 files to ReST format, in order to
+> allow a later addition to the admin-guide.
+> 
+> The conversion is actually:
+>   - add blank lines and identation in order to identify paragraphs;
+>   - fix tables markups;
+>   - add some lists markups;
+>   - mark literal blocks;
+>   - adjust title markups.
+> 
+> At its new index.rst, let's add a :orphan: while this is not linked to
+> the main index.rst file, in order to avoid build warnings.
+> 
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
 
-Heh, achievement unlocked.
+Acked-by: Tejun Heo <tj@kernel.org>
 
->
-> > I'm seeing a hung task in the kernel, and I wanted to share it in case
-> > it's a known issue. I'm still trying to wrap my head around the stacks
-> > myself. This is our Chrome OS 4.19 kernel, which is admittedly not
-> > 100% vanilla mainline master, but we try to keep it pretty close.
-> >
-> > I can reproduce this reliably within our chrome OS installer, where
-> > it's trying to dd from my system disk (NVMe) to a loop device backed
-> > by a removable UFS card (4kb sectors) in a USB dongle.
->
-> Although this is not the only possible cause such hangs are often caused
-> by a block driver or SCSI LLD not completing a request. A list of
-> pending requests can be obtained e.g. by running the attached script.
+Please feel free to route with other patches in the series.
 
-Thanks for the script. I'll try a few different combinations of dd
-involving the UFS card to see if I can at least remove the system disk
-from the equation. Hopefully the system will still be responsive
-enough to run the script if I keep it in the right place and maybe
-pre-warm it up. I also might try an older kernel, since if it's a
-misbehaving block device as you suggest then all kernel versions
-should lock up.
+Thanks.
 
->
-> Bart.
+-- 
+tejun
