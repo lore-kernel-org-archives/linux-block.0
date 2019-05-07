@@ -2,143 +2,96 @@ Return-Path: <SRS0=61bd=TH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=unavailable
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82527C004C9
-	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 09:40:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80345C004C9
+	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 10:23:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5F79D204FD
-	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 09:40:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D9EB206A3
+	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 10:23:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K/JigDTO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727018AbfEGJkV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 May 2019 05:40:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33380 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726268AbfEGJkV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 May 2019 05:40:21 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id EF46C3082E4D;
-        Tue,  7 May 2019 09:40:20 +0000 (UTC)
-Received: from work (unknown [10.40.205.118])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 36D1760BEC;
-        Tue,  7 May 2019 09:40:19 +0000 (UTC)
-Date:   Tue, 7 May 2019 11:40:15 +0200
-From:   Lukas Czerner <lczerner@redhat.com>
-To:     Jan Tulak <jtulak@redhat.com>
-Cc:     Ric Wheeler <ricwheeler@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Nikolay Borisov <nborisov@suse.com>
-Subject: Re: Testing devices for discard support properly
-Message-ID: <20190507094015.hb76w3rjzx7shxjp@work>
-References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
- <20190507071021.wtm25mxx2as6babr@work>
- <CACj3i71HdW0ys_YujGFJkobMmZAZtEPo7B2tgZjEY8oP_T9T6g@mail.gmail.com>
+        id S1726520AbfEGKXF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 May 2019 06:23:05 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:38921 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726340AbfEGKXF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 May 2019 06:23:05 -0400
+Received: by mail-pf1-f195.google.com with SMTP id z26so8426350pfg.6
+        for <linux-block@vger.kernel.org>; Tue, 07 May 2019 03:23:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=sr8Pz03FlEmfvEi/csUsOrKUnpi3Nc1BLYoKmGePRQM=;
+        b=K/JigDTOgHv5pDz57smlET+A3p50bnG59DEBHDpEHK9VOs0eNt+nvvkdIvOecZ6gXa
+         0sJphsF16IXtn+Edi+dxIIRbVhojafQhkNi8YG49cgRJsLduQyIUJyyy6YOjX3YcXUtF
+         Li6RbPxv0mQDMG3cbL8udc2QIdrutxBWmv/0+6q9QqySZED/4BRAwcp7XKsyBunKJjZi
+         Fs5L+Jj+ppsnaHvrYs0NyL4T8ke0+svcfb0YzHdFLBiYugMVhqoQZfgZ4DY2DOeVp/cJ
+         nFDg5ioFQIrRNF9ELlrTPikAnR1nUgizcBE9EOe3pLGJRxy998F07S9e2clj4E3WJyzw
+         IaHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=sr8Pz03FlEmfvEi/csUsOrKUnpi3Nc1BLYoKmGePRQM=;
+        b=OI53gw+6VjFYmQ7OaK72LwJpUEYTmrXpE/2dqas7vd2XtNIDcasl5fcjO6fkxIlcn4
+         JgcvCDeokZg2HzUncqX5cw/ZsC/RLoBjKHRXNDwbW072RszG/BcNLYfyGCwDW35upzcS
+         PASY+W1e7fYhnBvLY3NmdHB8HNS2I/48fOLNfX64/+JhfDLCoea3AN9ta1i3ybSG/9Kg
+         HYA5wTR4XF1ZY3zizpEpEKZJqBHQgpMlJrF93ZPy85HmZ9wO3X13q2Gf4LRv45WH5ebJ
+         dLzQ6cu2xbPCLYKDu8jnCcjRIu8g6zWzVCp0GQlySFREhcBHIsgf+G2fzzwKlk6bAxlY
+         j81g==
+X-Gm-Message-State: APjAAAXwgaOhcOHvDrowK/Ta8ktxTkE7tUVU1s76yBuEv9AaZkpAF+JJ
+        IgDmoiyfeApCSgSZcXulIOY=
+X-Google-Smtp-Source: APXvYqx+MgsFKuY6OrZ0SX15hfRQNeGA4XSvHi/LQExTr7sYlDP1dZwnLzwQnpIth3DJPk5nkRwdIw==
+X-Received: by 2002:a62:69c2:: with SMTP id e185mr40105392pfc.119.1557224584744;
+        Tue, 07 May 2019 03:23:04 -0700 (PDT)
+Received: from [192.168.0.6] ([123.213.206.190])
+        by smtp.gmail.com with ESMTPSA id i129sm16548715pfc.163.2019.05.07.03.23.01
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 07 May 2019 03:23:03 -0700 (PDT)
+Subject: Re: [PATCH 1/3] nvme: 002: fix nvmet pass data with loop
+To:     Johannes Thumshirn <jthumshirn@suse.de>
+Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Omar Sandoval <osandov@osandov.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <20190505150611.15776-1-minwoo.im.dev@gmail.com>
+ <20190505150611.15776-2-minwoo.im.dev@gmail.com>
+ <SN6PR04MB45274C423AA7C3CC3DBB5ED586300@SN6PR04MB4527.namprd04.prod.outlook.com>
+ <a66b775f-9a5f-fefc-ae29-c86678e66463@gmail.com>
+ <SN6PR04MB45272BEB18B3ADD95DCB42AE86300@SN6PR04MB4527.namprd04.prod.outlook.com>
+ <cfa4d48d-ce13-0ace-cf5c-a3d0d1f4cca7@gmail.com> <20190507062034.GA3748@x250>
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+Message-ID: <e118dbb7-51a5-d013-8c85-391452846411@gmail.com>
+Date:   Tue, 7 May 2019 19:23:00 +0900
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACj3i71HdW0ys_YujGFJkobMmZAZtEPo7B2tgZjEY8oP_T9T6g@mail.gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 07 May 2019 09:40:21 +0000 (UTC)
+In-Reply-To: <20190507062034.GA3748@x250>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 07, 2019 at 10:48:55AM +0200, Jan Tulak wrote:
-> On Tue, May 7, 2019 at 9:10 AM Lukas Czerner <lczerner@redhat.com> wrote:
-> >
-> > On Mon, May 06, 2019 at 04:56:44PM -0400, Ric Wheeler wrote:
-> > >
-> ...
-> > >
-> > > * Whole device discard at the block level both for a device that has been
-> > > completely written and for one that had already been trimmed
-> >
-> > Yes, usefull. Also note that a long time ago when I've done the testing
-> > I noticed that after a discard request, especially after whole device
-> > discard, the read/write IO performance went down significanly for some
-> > drives. I am sure things have changed, but I think it would be
-> > interesting to see how does it behave now.
-> >
-> > >
-> > > * Discard performance at the block level for 4k discards for a device that
-> > > has been completely written and again the same test for a device that has
-> > > been completely discarded.
-> > >
-> > > * Same test for large discards - say at a megabyte and/or gigabyte size?
-> >
-> > From my testing (again it was long time ago and things probably changed
-> > since then) most of the drives I've seen had largely the same or similar
-> > timing for discard request regardless of the size (hence, the conclusion
-> > was the bigger the request the better). A small variation I did see
-> > could have been explained by kernel implementation and discard_max_bytes
-> > limitations as well.
-> >
-> > >
-> > > * Same test done at the device optimal discard chunk size and alignment
-> > >
-> > > Should the discard pattern be done with a random pattern? Or just
-> > > sequential?
-> >
-> > I think that all of the above will be interesting. However there are two
-> > sides of it. One is just pure discard performance to figure out what
-> > could be the expectations and the other will be "real" workload
-> > performance. Since from my experience discard can have an impact on
-> > drive IO performance beyond of what's obvious, testing mixed workload
-> > (IO + discard) is going to be very important as well. And that's where
-> > fio workloads can come in (I actually do not know if fio already
-> > supports this or not).
-> >
+On 5/7/19 3:20 PM, Johannes Thumshirn wrote:
+> On Tue, May 07, 2019 at 01:54:09AM +0900, Minwoo Im wrote:
+>> If Johannes who wrote these tests agrees to not check output result from
+>> nvme-cli, I'll get rid of them.
 > 
-> And:
+> Yes agreed. In the beginning I though of validating the nvme-cli output but
+> this would grow more and more filters, which makes it impractical.
 > 
-> On Tue, May 7, 2019 at 10:22 AM Nikolay Borisov <nborisov@suse.com> wrote:
-> > I have some vague recollection this was brought up before but how sure
-> > are we that when a discard request is sent down to disk and a response
-> > is returned the actual data has indeed been discarded. What about NCQ
-> > effects i.e "instant completion" while doing work in the background. Or
-> > ignoring the discard request altogether?
-> 
-> 
-> As Nikolay writes in the other thread, I too have a feeling that there
-> have been a discard-related discussion at LSF/MM before. And if I
-> remember, there were hints that the drives (sometimes) do asynchronous
-> trim after returning a success. Which would explain the similar time
-> for all sizes and IO drop after trim.
 
-Yes, that was definitely the case  in the past. It's also why we've
-seen IO performance drop after a big (whole device) discard as the
-device was busy in the background.
+Cool, then I think I can update the pass condition of this testcase in 
+other way.  Once Chaitanya gives his comment on this, I'll prepare it.
 
-However Nikolay does have a point. IIRC device is free to ignore discard
-requests, I do not think there is any reliable way to actually tell that
-the data was really discarded. I can even imagine a situation that the
-device is not going to do anything unless it's pass some threshold of
-free blocks for wear leveling. If that's the case our tests are not
-going to be very useful unless they do stress such corner cases. But
-that's just my speculation, so someone with a better knowledge of what
-vendors are doing might tell us if it's something to worry about or not.
-
-> 
-> So, I think that the mixed workload (IO + discard) is a pretty
-> important part of the whole topic and a pure discard test doesn't
-> really tell us anything, at least for some drives.
-
-I think both are important especially since mixed IO tests are going to
-be highly workload specific.
-
--Lukas
-
-> 
-> Jan
-> 
-> 
-> 
-> -- 
-> Jan Tulak
+Thanks,
