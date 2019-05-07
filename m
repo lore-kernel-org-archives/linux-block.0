@@ -2,141 +2,113 @@ Return-Path: <SRS0=61bd=TH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93390C004C9
-	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 21:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8746C004C9
+	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 22:04:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A92F205C9
-	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 21:51:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 814B0206A3
+	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 22:04:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728468AbfEGVvr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 May 2019 17:51:47 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:53190 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728465AbfEGVvr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 May 2019 17:51:47 -0400
-Received: from mail-qk1-f199.google.com ([209.85.222.199])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <gpiccoli@canonical.com>)
-        id 1hO801-0007QZ-Bs
-        for linux-block@vger.kernel.org; Tue, 07 May 2019 21:51:45 +0000
-Received: by mail-qk1-f199.google.com with SMTP id x23so19729310qka.19
-        for <linux-block@vger.kernel.org>; Tue, 07 May 2019 14:51:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=ABxz2zyv5bmpxAzqyzrtcoqu224yUlyjNfm0bz0RUYo=;
-        b=Hnknu/u0AE1Ck+DbNQgXgl1MBY6zvVCO2dcEdvMgbhIgqty5MNPrRZFNhNfeZCSzdC
-         RsA9nT6FIALva5S0hktc5qqL2ZgXqIhBv5rJnZ0S5XrUeSSjnhqTDhqTgPZndVR9hk0C
-         OwhmwzadYRigirtaHYRhSKqW0yUmYU/COVapFphri6OFOQZ503XwLDpbcneg9v3rbepE
-         fWiIQY6ubPF429UroT5rKEf+fM29GPlSVKeluDHq/Lj3sn2oowIS2Doxt0j7EIIM4xl4
-         pScgpZZJkJudEToWbEOh46voFMGue3LfSfDiJTgCQn1fEOeMqipLtGnzJJVhFfyLhpvA
-         8vnA==
-X-Gm-Message-State: APjAAAUR6Tn0OaqqqmCFrQ+dWi9AKoPtxPhFDcphnxSgXL055/gCULnd
-        VQCGOa/9CSX3Bgi5xYYD+fHKvWrVTD3ubk8zPn3VVW5/kVCx1Aq4dEWaeS8qXZ4/hedUBFnfB3L
-        ZrtqE/iF2XtD9qzvwaN7WDgBgW6IAJsHOA4D374cC
-X-Received: by 2002:ac8:8c4:: with SMTP id y4mr568113qth.334.1557265904500;
-        Tue, 07 May 2019 14:51:44 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxqmyA8mbiqIMGA6UVYNcKNbJyCt+/9kos8Zg0GnTOlwY7lwTrsVbbrcPB3iSk/BlNaK4k9rQ==
-X-Received: by 2002:ac8:8c4:: with SMTP id y4mr568099qth.334.1557265904325;
-        Tue, 07 May 2019 14:51:44 -0700 (PDT)
-Received: from [192.168.1.205] (201-92-248-20.dsl.telesp.net.br. [201.92.248.20])
-        by smtp.gmail.com with ESMTPSA id d41sm2961824qta.22.2019.05.07.14.51.39
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 07 May 2019 14:51:43 -0700 (PDT)
-Subject: Re: [PATCH 2/2] md/raid0: Do not bypass blocking queue entered for
- raid0 bios
-To:     Song Liu <liu.song.a23@gmail.com>
-Cc:     linux-block@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>, dm-devel@redhat.com,
-        axboe@kernel.dk, Gavin Guo <gavin.guo@canonical.com>,
-        Jay Vosburgh <jay.vosburgh@canonical.com>, kernel@gpiccoli.net,
-        Ming Lei <ming.lei@redhat.com>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        stable@vger.kernel.org
-References: <20190430223722.20845-1-gpiccoli@canonical.com>
- <20190430223722.20845-2-gpiccoli@canonical.com>
- <CAPhsuW4SeUhNOJJkEf9wcLjbbc9qX0=C8zqbyCtC7Q8fdL91hw@mail.gmail.com>
- <c8721ba3-5d38-7906-5049-e2b16e967ecf@canonical.com>
- <CAPhsuW6ahmkUhCgns=9WHPXSvYefB0Gmr1oB7gdZiD86sKyHFg@mail.gmail.com>
-From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
- mQENBFpVBxcBCADPNKmu2iNKLepiv8+Ssx7+fVR8lrL7cvakMNFPXsXk+f0Bgq9NazNKWJIn
- Qxpa1iEWTZcLS8ikjatHMECJJqWlt2YcjU5MGbH1mZh+bT3RxrJRhxONz5e5YILyNp7jX+Vh
- 30rhj3J0vdrlIhPS8/bAt5tvTb3ceWEic9mWZMsosPavsKVcLIO6iZFlzXVu2WJ9cov8eQM/
- irIgzvmFEcRyiQ4K+XUhuA0ccGwgvoJv4/GWVPJFHfMX9+dat0Ev8HQEbN/mko/bUS4Wprdv
- 7HR5tP9efSLucnsVzay0O6niZ61e5c97oUa9bdqHyApkCnGgKCpg7OZqLMM9Y3EcdMIJABEB
- AAG0LUd1aWxoZXJtZSBHLiBQaWNjb2xpIDxncGljY29saUBjYW5vbmljYWwuY29tPokBNwQT
- AQgAIQUCWmClvQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRDOR5EF9K/7Gza3B/9d
- 5yczvEwvlh6ksYq+juyuElLvNwMFuyMPsvMfP38UslU8S3lf+ETukN1S8XVdeq9yscwtsRW/
- 4YoUwHinJGRovqy8gFlm3SAtjfdqysgJqUJwBmOtcsHkmvFXJmPPGVoH9rMCUr9s6VDPox8f
- q2W5M7XE9YpsfchS/0fMn+DenhQpV3W6pbLtuDvH/81GKrhxO8whSEkByZbbc+mqRhUSTdN3
- iMpRL0sULKPVYbVMbQEAnfJJ1LDkPqlTikAgt3peP7AaSpGs1e3pFzSEEW1VD2jIUmmDku0D
- LmTHRl4t9KpbU/H2/OPZkrm7809QovJGRAxjLLPcYOAP7DUeltveuQENBFpVBxcBCADbxD6J
- aNw/KgiSsbx5Sv8nNqO1ObTjhDR1wJw+02Bar9DGuFvx5/qs3ArSZkl8qX0X9Vhptk8rYnkn
- pfcrtPBYLoux8zmrGPA5vRgK2ItvSc0WN31YR/6nqnMfeC4CumFa/yLl26uzHJa5RYYQ47jg
- kZPehpc7IqEQ5IKy6cCKjgAkuvM1rDP1kWQ9noVhTUFr2SYVTT/WBHqUWorjhu57/OREo+Tl
- nxI1KrnmW0DbF52tYoHLt85dK10HQrV35OEFXuz0QPSNrYJT0CZHpUprkUxrupDgkM+2F5LI
- bIcaIQ4uDMWRyHpDbczQtmTke0x41AeIND3GUc+PQ4hWGp9XABEBAAGJAR8EGAEIAAkFAlpV
- BxcCGwwACgkQzkeRBfSv+xv1wwgAj39/45O3eHN5pK0XMyiRF4ihH9p1+8JVfBoSQw7AJ6oU
- 1Hoa+sZnlag/l2GTjC8dfEGNoZd3aRxqfkTrpu2TcfT6jIAsxGjnu+fUCoRNZzmjvRziw3T8
- egSPz+GbNXrTXB8g/nc9mqHPPprOiVHDSK8aGoBqkQAPZDjUtRwVx112wtaQwArT2+bDbb/Y
- Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
- kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
- X18zwLgdiQ==
-Message-ID: <21d2ab66-4295-6b69-ef85-d798f3406fbd@canonical.com>
-Date:   Tue, 7 May 2019 18:51:36 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726091AbfEGWEy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 May 2019 18:04:54 -0400
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:51602 "EHLO
+        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725843AbfEGWEy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 7 May 2019 18:04:54 -0400
+Received: from dread.disaster.area (pa49-181-171-240.pa.nsw.optusnet.com.au [49.181.171.240])
+        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 0A508105F850;
+        Wed,  8 May 2019 08:04:51 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92)
+        (envelope-from <david@fromorbit.com>)
+        id 1hO8Cg-0004uQ-1H; Wed, 08 May 2019 08:04:50 +1000
+Date:   Wed, 8 May 2019 08:04:50 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Ric Wheeler <ricwheeler@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        lczerner@redhat.com
+Subject: Re: Testing devices for discard support properly
+Message-ID: <20190507220449.GP1454@dread.disaster.area>
+References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAPhsuW6ahmkUhCgns=9WHPXSvYefB0Gmr1oB7gdZiD86sKyHFg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0 cx=a_idp_d
+        a=LhzQONXuMOhFZtk4TmSJIw==:117 a=LhzQONXuMOhFZtk4TmSJIw==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=E5NmQfObTbMA:10
+        a=7-415B0cAAAA:8 a=cBRT43P-7hDb3wOkE_MA:9 a=7Zwj6sZBwVKJAoWSPKxL6X1jA+E=:19
+        a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 06/05/2019 18:07, Song Liu wrote:
->> [...]
->> I understand this could in theory affects all the RAID levels, but in
->> practice I don't think it'll happen. RAID0 is the only "blind" mode of
->> RAID, in the sense it's the only one that doesn't care at all with
->> failures. In fact, this was the origin of my other thread [0], regarding
->> the change of raid0's behavior in error cases..because it currently does
->> not care with members being removed and rely only in filesystem failures
->> (after submitting many BIOs to the removed device).
->>
->> That said, in this change I've only took care of raid0, since in my
->> understanding the other levels won't submit BIOs to dead devices; we can
->> experiment that to see if it's true.
+On Mon, May 06, 2019 at 04:56:44PM -0400, Ric Wheeler wrote:
 > 
-> Could you please run a quick test with raid5? I am wondering whether
-> some race condition could get us into similar crash. If we cannot easily
-> trigger the bug, we can process with this version.
+> (repost without the html spam, sorry!)
 > 
-> Thanks,
-> Song
+> Last week at LSF/MM, I suggested we can provide a tool or test suite to test
+> discard performance.
+> 
+> Put in the most positive light, it will be useful for drive vendors to use
+> to qualify their offerings before sending them out to the world. For
+> customers that care, they can use the same set of tests to help during
+> selection to weed out any real issues.
+> 
+> Also, community users can run the same tools of course and share the
+> results.
 
-Hi Song, I've tested both RAID5 (with 3 disks, removing one at a time),
-and also RAID 1 (2 disks, also removing one at a time); no issues
-observed in kernel 5.1. We can see one interesting message in kernel
-log: "super_written gets error=10", which corresponds to md detecting
-the error (bi_status == BLK_STS_IOERROR) and instantly failing the
-write, making FS read-only.
+My big question here is this:
 
-So, I think really the issue happens only in RAID0, which writes
-"blindly" to its components.
-Let me know your thoughts - thanks again for your input!
+- is "discard" even relevant for future devices?
+
+i.e. before we start saying "we want discard to not suck", perhaps
+we should list all the specific uses we ahve for discard, what we
+expect to occur, and whether we have better interfaces than
+"discard" to acheive that thing.
+
+Indeed, we have fallocate() on block devices now, which means we
+have a well defined block device space management API for clearing
+and removing allocated block device space. i.e.:
+
+	FALLOC_FL_ZERO_RANGE: Future reads from the range must
+	return zero and future writes to the range must not return
+	ENOSPC. (i.e. must remain allocated space, can physically
+	write zeros to acheive this)
+
+	FALLOC_FL_PUNCH_HOLE: Free the backing store and guarantee
+	future reads from the range return zeroes. Future writes to
+	the range may return ENOSPC. This operation fails if the
+	underlying device cannot do this operation without
+	physically writing zeroes.
+
+	FALLOC_FL_PUNCH_HOLE | FALLOC_FL_NO_HIDE_STALE: run a
+	discard on the range and provide no guarantees about the
+	result. It may or may not do anything, and a subsequent read
+	could return anything at all.
+
+IMO, trying to "optimise discard" is completely the wrong direction
+to take. We should be getting rid of "discard" and it's interfaces
+operations - deprecate the ioctls, fix all other kernel callers of
+blkdev_issue_discard() to call blkdev_fallocate() and ensure that
+drive vendors understand that they need to make FALLOC_FL_ZERO_RANGE
+and FALLOC_FL_PUNCH_HOLE work, and that FALLOC_FL_PUNCH_HOLE |
+FALLOC_FL_NO_HIDE_STALE is deprecated (like discard) and will be
+going away.
+
+So, can we just deprecate blkdev_issue_discard and all the
+interfaces that lead to it as a first step?
 
 Cheers,
 
-
-Guilherme
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
