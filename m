@@ -2,169 +2,141 @@ Return-Path: <SRS0=61bd=TH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F78DC04AAD
-	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 21:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93390C004C9
+	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 21:51:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB15420656
-	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 21:24:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="QlKzHquR";
-	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="dccgKoHv"
+	by mail.kernel.org (Postfix) with ESMTP id 6A92F205C9
+	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 21:51:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728596AbfEGVYy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 May 2019 17:24:54 -0400
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:58776 "EHLO
-        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726811AbfEGVYy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 May 2019 17:24:54 -0400
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x47LE1hS020331;
-        Tue, 7 May 2019 14:24:48 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=facebook;
- bh=TvhHgmWOGiILa2VtWTss5ZvNvIruRwKzymE5dljvDpk=;
- b=QlKzHquR/0iHo7caVacFmycoM4foAGKrWSNYaxMmFBf7R94XyYSZLHKTQi/l6IX8C6BL
- r1ULtMZroR+mGisenRpk6QJBg5BZy/cFuNs/YZt75Ezn2XZk24eWSj4IFoMxRLb1qMWy
- oTxOZoi1onPfgz8VMN/6HTrHE5+KCgSgK1o= 
-Received: from mail.thefacebook.com (mailout.thefacebook.com [199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2sbca39edu-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Tue, 07 May 2019 14:24:48 -0700
-Received: from ash-exopmbx101.TheFacebook.com (2620:10d:c0a8:82::b) by
- prn-hub01.TheFacebook.com (2620:10d:c081:35::125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.1713.5; Tue, 7 May 2019 14:24:43 -0700
-Received: from ash-exhub103.TheFacebook.com (2620:10d:c0a8:82::c) by
- ash-exopmbx101.TheFacebook.com (2620:10d:c0a8:82::b) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 7 May 2019 14:24:42 -0700
-Received: from NAM03-DM3-obe.outbound.protection.outlook.com (100.104.31.183)
- by o365-in.thefacebook.com (100.104.35.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Tue, 7 May 2019 14:24:42 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
- s=selector1-fb-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TvhHgmWOGiILa2VtWTss5ZvNvIruRwKzymE5dljvDpk=;
- b=dccgKoHv4jGB3J8wrFg93MmPIDRTAMs7NlJ271Ztw4vFtUrhVNcfIY4IubJG939aENtHaUXuOKpjqfvovVzfhYrOnu8d7eKCNUrCO5Jrbl9GXy8SPN14hoVb8o4qKzFgL2qjedLFH9QrTjSIlznwry5k54WdLtIJs4xb2ZHxayU=
-Received: from DM5PR15MB1290.namprd15.prod.outlook.com (10.173.212.17) by
- DM5PR15MB1177.namprd15.prod.outlook.com (10.173.209.7) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1856.12; Tue, 7 May 2019 21:24:41 +0000
-Received: from DM5PR15MB1290.namprd15.prod.outlook.com
- ([fe80::6182:329:231e:af13]) by DM5PR15MB1290.namprd15.prod.outlook.com
- ([fe80::6182:329:231e:af13%5]) with mapi id 15.20.1856.012; Tue, 7 May 2019
- 21:24:41 +0000
-From:   Chris Mason <clm@fb.com>
-To:     Bryan Gurney <bgurney@redhat.com>
-CC:     Ric Wheeler <ricwheeler@gmail.com>,
-        Lukas Czerner <lczerner@redhat.com>,
-        Jan Tulak <jtulak@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Nikolay Borisov <nborisov@suse.com>,
-        "Dennis Zhou" <dennisz@fb.com>
-Subject: Re: Testing devices for discard support properly
-Thread-Topic: Testing devices for discard support properly
-Thread-Index: AQHVBE5Bi2ef6/xelUuGGE5bSnXuBqZfP0GAgAAbioCAAA5XgIAANwSAgAAsXICAAAJ3gIAASgcAgAAU4QA=
-Date:   Tue, 7 May 2019 21:24:41 +0000
-Message-ID: <31794121-DEDA-4269-8B72-50EB4D0BCABE@fb.com>
-References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
- <20190507071021.wtm25mxx2as6babr@work>
- <CACj3i71HdW0ys_YujGFJkobMmZAZtEPo7B2tgZjEY8oP_T9T6g@mail.gmail.com>
- <20190507094015.hb76w3rjzx7shxjp@work>
- <09953ba7-e4f2-36e9-33b7-0ddbbb848257@gmail.com>
- <CAHhmqcT_yabMDY+dZoBAUA28f6tkPe0uH+xtRUS51gvv4p2vuQ@mail.gmail.com>
- <5a02e30d-cb46-a2ab-554f-b8ef4807bd97@gmail.com>
- <CAHhmqcQw69S3Fn=Nej7MezCOZ3_ZNi64p+PFLSV+b91e1gTjZA@mail.gmail.com>
-In-Reply-To: <CAHhmqcQw69S3Fn=Nej7MezCOZ3_ZNi64p+PFLSV+b91e1gTjZA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: MailMate (1.12.4r5594)
-x-clientproxiedby: HK2PR06CA0010.apcprd06.prod.outlook.com
- (2603:1096:202:2e::22) To DM5PR15MB1290.namprd15.prod.outlook.com
- (2603:10b6:3:b8::17)
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [2620:10d:c094:180::1:589a]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8d3bf3d6-0083-49b6-0d1f-08d6d3326aab
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);SRVR:DM5PR15MB1177;
-x-ms-traffictypediagnostic: DM5PR15MB1177:
-x-microsoft-antispam-prvs: <DM5PR15MB1177658DD176240614691672D3310@DM5PR15MB1177.namprd15.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0030839EEE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(396003)(376002)(366004)(346002)(136003)(189003)(199004)(66476007)(64756008)(66556008)(73956011)(66446008)(186003)(102836004)(6116002)(386003)(53546011)(6506007)(81166006)(8676002)(81156014)(76176011)(8936002)(86362001)(33656002)(316002)(52116002)(99286004)(54906003)(476003)(446003)(11346002)(66946007)(305945005)(2906002)(7736002)(6436002)(68736007)(36756003)(6512007)(83716004)(71190400001)(71200400001)(2616005)(486006)(5660300002)(82746002)(53936002)(478600001)(46003)(6916009)(6246003)(229853002)(14454004)(50226002)(25786009)(256004)(6486002)(4326008)(14444005);DIR:OUT;SFP:1102;SCL:1;SRVR:DM5PR15MB1177;H:DM5PR15MB1290.namprd15.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: fb.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 0I14ExgcMw9MR5KNfpekf81uTfm4yx+QdvHYI/y0guqkLZKmpFn7F1PmbFZgdXmUMA+ugovIJHZnNcuSnKoEuMpYl21XxeC8ppbubLqaTenH2YzrhkGFjAUe28XzxCFrE+4YvqdvcpDFO1rE2CLGZtptWt4Xxu8RlOAy17mpgAl1sohtMmPy2b99g5ebNY0ylHL0uWHu76BXR+s85kwWYWwwUhtWY2YeTDip2iiPluewwmwuBVH/I/91yLfIvFTkXLnnatAFX6khH0O/kFlEIGqQRwj5Hf/2le6nKeEp1FVaqkBD1FBtoeed2TZhUV8cc9O5sxov1aK/mWYi8JWkkyYF+giE80pgUzJk9Z68nfvXRAlv4kTZJ/+ovULLwIQRZ79CSZypBvW358II5JLivbOJ/9wYZp0+C5RP/K09/3Q=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1728468AbfEGVvr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 May 2019 17:51:47 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:53190 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728465AbfEGVvr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 May 2019 17:51:47 -0400
+Received: from mail-qk1-f199.google.com ([209.85.222.199])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <gpiccoli@canonical.com>)
+        id 1hO801-0007QZ-Bs
+        for linux-block@vger.kernel.org; Tue, 07 May 2019 21:51:45 +0000
+Received: by mail-qk1-f199.google.com with SMTP id x23so19729310qka.19
+        for <linux-block@vger.kernel.org>; Tue, 07 May 2019 14:51:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=ABxz2zyv5bmpxAzqyzrtcoqu224yUlyjNfm0bz0RUYo=;
+        b=Hnknu/u0AE1Ck+DbNQgXgl1MBY6zvVCO2dcEdvMgbhIgqty5MNPrRZFNhNfeZCSzdC
+         RsA9nT6FIALva5S0hktc5qqL2ZgXqIhBv5rJnZ0S5XrUeSSjnhqTDhqTgPZndVR9hk0C
+         OwhmwzadYRigirtaHYRhSKqW0yUmYU/COVapFphri6OFOQZ503XwLDpbcneg9v3rbepE
+         fWiIQY6ubPF429UroT5rKEf+fM29GPlSVKeluDHq/Lj3sn2oowIS2Doxt0j7EIIM4xl4
+         pScgpZZJkJudEToWbEOh46voFMGue3LfSfDiJTgCQn1fEOeMqipLtGnzJJVhFfyLhpvA
+         8vnA==
+X-Gm-Message-State: APjAAAUR6Tn0OaqqqmCFrQ+dWi9AKoPtxPhFDcphnxSgXL055/gCULnd
+        VQCGOa/9CSX3Bgi5xYYD+fHKvWrVTD3ubk8zPn3VVW5/kVCx1Aq4dEWaeS8qXZ4/hedUBFnfB3L
+        ZrtqE/iF2XtD9qzvwaN7WDgBgW6IAJsHOA4D374cC
+X-Received: by 2002:ac8:8c4:: with SMTP id y4mr568113qth.334.1557265904500;
+        Tue, 07 May 2019 14:51:44 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxqmyA8mbiqIMGA6UVYNcKNbJyCt+/9kos8Zg0GnTOlwY7lwTrsVbbrcPB3iSk/BlNaK4k9rQ==
+X-Received: by 2002:ac8:8c4:: with SMTP id y4mr568099qth.334.1557265904325;
+        Tue, 07 May 2019 14:51:44 -0700 (PDT)
+Received: from [192.168.1.205] (201-92-248-20.dsl.telesp.net.br. [201.92.248.20])
+        by smtp.gmail.com with ESMTPSA id d41sm2961824qta.22.2019.05.07.14.51.39
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 07 May 2019 14:51:43 -0700 (PDT)
+Subject: Re: [PATCH 2/2] md/raid0: Do not bypass blocking queue entered for
+ raid0 bios
+To:     Song Liu <liu.song.a23@gmail.com>
+Cc:     linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>, dm-devel@redhat.com,
+        axboe@kernel.dk, Gavin Guo <gavin.guo@canonical.com>,
+        Jay Vosburgh <jay.vosburgh@canonical.com>, kernel@gpiccoli.net,
+        Ming Lei <ming.lei@redhat.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        stable@vger.kernel.org
+References: <20190430223722.20845-1-gpiccoli@canonical.com>
+ <20190430223722.20845-2-gpiccoli@canonical.com>
+ <CAPhsuW4SeUhNOJJkEf9wcLjbbc9qX0=C8zqbyCtC7Q8fdL91hw@mail.gmail.com>
+ <c8721ba3-5d38-7906-5049-e2b16e967ecf@canonical.com>
+ <CAPhsuW6ahmkUhCgns=9WHPXSvYefB0Gmr1oB7gdZiD86sKyHFg@mail.gmail.com>
+From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
+ mQENBFpVBxcBCADPNKmu2iNKLepiv8+Ssx7+fVR8lrL7cvakMNFPXsXk+f0Bgq9NazNKWJIn
+ Qxpa1iEWTZcLS8ikjatHMECJJqWlt2YcjU5MGbH1mZh+bT3RxrJRhxONz5e5YILyNp7jX+Vh
+ 30rhj3J0vdrlIhPS8/bAt5tvTb3ceWEic9mWZMsosPavsKVcLIO6iZFlzXVu2WJ9cov8eQM/
+ irIgzvmFEcRyiQ4K+XUhuA0ccGwgvoJv4/GWVPJFHfMX9+dat0Ev8HQEbN/mko/bUS4Wprdv
+ 7HR5tP9efSLucnsVzay0O6niZ61e5c97oUa9bdqHyApkCnGgKCpg7OZqLMM9Y3EcdMIJABEB
+ AAG0LUd1aWxoZXJtZSBHLiBQaWNjb2xpIDxncGljY29saUBjYW5vbmljYWwuY29tPokBNwQT
+ AQgAIQUCWmClvQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRDOR5EF9K/7Gza3B/9d
+ 5yczvEwvlh6ksYq+juyuElLvNwMFuyMPsvMfP38UslU8S3lf+ETukN1S8XVdeq9yscwtsRW/
+ 4YoUwHinJGRovqy8gFlm3SAtjfdqysgJqUJwBmOtcsHkmvFXJmPPGVoH9rMCUr9s6VDPox8f
+ q2W5M7XE9YpsfchS/0fMn+DenhQpV3W6pbLtuDvH/81GKrhxO8whSEkByZbbc+mqRhUSTdN3
+ iMpRL0sULKPVYbVMbQEAnfJJ1LDkPqlTikAgt3peP7AaSpGs1e3pFzSEEW1VD2jIUmmDku0D
+ LmTHRl4t9KpbU/H2/OPZkrm7809QovJGRAxjLLPcYOAP7DUeltveuQENBFpVBxcBCADbxD6J
+ aNw/KgiSsbx5Sv8nNqO1ObTjhDR1wJw+02Bar9DGuFvx5/qs3ArSZkl8qX0X9Vhptk8rYnkn
+ pfcrtPBYLoux8zmrGPA5vRgK2ItvSc0WN31YR/6nqnMfeC4CumFa/yLl26uzHJa5RYYQ47jg
+ kZPehpc7IqEQ5IKy6cCKjgAkuvM1rDP1kWQ9noVhTUFr2SYVTT/WBHqUWorjhu57/OREo+Tl
+ nxI1KrnmW0DbF52tYoHLt85dK10HQrV35OEFXuz0QPSNrYJT0CZHpUprkUxrupDgkM+2F5LI
+ bIcaIQ4uDMWRyHpDbczQtmTke0x41AeIND3GUc+PQ4hWGp9XABEBAAGJAR8EGAEIAAkFAlpV
+ BxcCGwwACgkQzkeRBfSv+xv1wwgAj39/45O3eHN5pK0XMyiRF4ihH9p1+8JVfBoSQw7AJ6oU
+ 1Hoa+sZnlag/l2GTjC8dfEGNoZd3aRxqfkTrpu2TcfT6jIAsxGjnu+fUCoRNZzmjvRziw3T8
+ egSPz+GbNXrTXB8g/nc9mqHPPprOiVHDSK8aGoBqkQAPZDjUtRwVx112wtaQwArT2+bDbb/Y
+ Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
+ kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
+ X18zwLgdiQ==
+Message-ID: <21d2ab66-4295-6b69-ef85-d798f3406fbd@canonical.com>
+Date:   Tue, 7 May 2019 18:51:36 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8d3bf3d6-0083-49b6-0d1f-08d6d3326aab
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2019 21:24:41.5107
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR15MB1177
-X-OriginatorOrg: fb.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-07_12:,,
- signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-FB-Internal: Safe
+In-Reply-To: <CAPhsuW6ahmkUhCgns=9WHPXSvYefB0Gmr1oB7gdZiD86sKyHFg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gNyBNYXkgMjAxOSwgYXQgMTY6MDksIEJyeWFuIEd1cm5leSB3cm90ZToNCg0KPiBJIGZvdW5k
-IGFuIGV4YW1wbGUgaW4gbXkgdHJhY2Ugb2YgdGhlICJ0d28gYmFuZHMgb2YgbGF0ZW5jeSIgYmVo
-YXZpb3IuDQo+IENvbnNpZGVyIHRoZXNlIHRocmVlIHNlZ21lbnRzIG9mIHRyYWNlIGRhdGEgZHVy
-aW5nIHRoZSB3cml0ZXM6DQo+DQoNClsgLi4uIF0NCg0KPiBUaGVyZSdzIGFuIGF2ZXJhZ2UgbGF0
-ZW5jeSBvZiAxNCBtaWxsaXNlY29uZHMgZm9yIHRoZXNlIDEyOCBraWxvYnl0ZQ0KPiB3cml0ZXMu
-ICBBdCAwLjIxODI4ODc5NCBzZWNvbmRzLCB3ZSBjYW4gc2VlIGEgc3VkZGVuIGFwcGVhcmFuY2Ug
-b2YgMS43DQo+IG1pbGxpc2Vjb25kIGxhdGVuY3kgdGltZXMsIG11Y2ggbG93ZXIgdGhhbiB0aGUg
-YXZlcmFnZS4NCj4NCj4gVGhlbiB3ZSBzZWUgYW4gYWx0ZXJuYXRpb24gb2YgMS43IG1pbGxpc2Vj
-b25kIGNvbXBsZXRpb25zIGFuZCAxNA0KPiBtaWxsaXNlY29uZCBjb21wbGV0aW9ucywgd2l0aCB0
-aGVzZSB0d28gImxhdGVuY3kgZ3JvdXBzIiBpbmNyZWFzaW5nLA0KPiB1cCB0byBhYm91dCAxNCBt
-aWxsaXNlY29uZHMgYW5kIDI1IG1pbGxpc2Vjb25kcyBhdCAwLjI0MTI4NzE4NyBzZWNvbmRzDQo+
-IGludG8gdGhlIHRyYWNlLg0KPg0KPiBBdCAwLjMxNzM1MTg4OCBzZWNvbmRzLCB3ZSBzZWUgdGhl
-IHBhdHRlcm4gc3RhcnQgYWdhaW4sIHdpdGggYSBzdWRkZW4NCj4gYXBwZWFyYW5jZSBvZiAxLjg5
-IG1pbGxpc2Vjb25kIGxhdGVuY3kgd3JpdGUgY29tcGxldGlvbnMsIGFtb25nIDE0LjcNCj4gbWls
-bGlzZWNvbmQgbGF0ZW5jeSB3cml0ZSBjb21wbGV0aW9ucy4NCj4NCj4gSWYgeW91IGdyYXBoIGl0
-LCBpdCBsb29rcyBsaWtlIGEgInRyaWFuZ2xlIHdhdmUiIHB1bHNlLCB3aXRoIGENCj4gZHVyYXRp
-b24gb2YgYWJvdXQgMjMgbWlsbGlzZWNvbmRzLCB0aGF0IHJlcGVhdHMgYWZ0ZXIgYWJvdXQgMTAw
-DQo+IG1pbGxpc2Vjb25kcy4gIEluIGEgd2F5LCBpdCdzIGxpa2UgYSAiaGVhcnRiZWF0Ii4gIFRo
-aXMgd291bGRuJ3QgYmUgYXMNCj4gZWFzeSB0byBkZXRlY3Qgd2l0aCBhIHNpbXBsZSAiYXZlcmFn
-ZSIgb3IgInBlcmNlbnRpbGUiIHJlYWRpbmcuDQo+DQo+IFRoaXMgd2FzIGR1cmluZyBhIHNpbXBs
-ZSBzZXF1ZW50aWFsIHdyaXRlIGF0IGEgcXVldWUgZGVwdGggb2YgMzIsIGJ1dA0KPiB3aGF0IGhh
-cHBlbnMgd2l0aCBhIHdyaXRlIGFmdGVyIGEgZGlzY2FyZCBpbiB0aGUgc2FtZSByZWdpb24gb2YN
-Cj4gc2VjdG9ycz8gIFRoaXMgYmVoYXZpb3IgY291bGQgY2hhbmdlLCBkZXBlbmRpbmcgb24gZGlm
-ZmVyZW50IGRyaXZlDQo+IG1vZGVscywgYW5kL29yIGRyaXZlIGNvbnRyb2xsZXIgYWxnb3JpdGht
-cy4NCj4NCg0KSSB0aGluayB0aGVzZSBhcmUgYWxsIHJlYWxseSBpbnRlcmVzdGluZywgYW5kIGRl
-ZmluaXRlbHkgc3VwcG9ydCB0aGUgDQppZGVhIG9mIGEgc2VyaWVzIG9mIHRlc3RzIHdlIGRvIHRv
-IG1ha2Ugc3VyZSBhIGRyaXZlIGltcGxlbWVudHMgZGlzY2FyZCANCmluIHRoZSBnZW5lcmFsIHdh
-eXMgdGhhdCB3ZSBleHBlY3QuDQoNCkJ1dCB3aXRoIHRoYXQgc2FpZCwgSSB0aGluayBhIG1vcmUg
-aW1wb3J0YW50IGRpc2N1c3Npb24gYXMgZmlsZXN5c3RlbSANCmRldmVsb3BlcnMgaXMgaG93IHdl
-IHByb3RlY3QgdGhlIHJlc3Qgb2YgdGhlIGZpbGVzeXN0ZW0gZnJvbSBoaWdoIA0KbGF0ZW5jaWVz
-IGNhdXNlZCBieSBkaXNjYXJkcy4gIEZvciByZWFkcyBhbmQgd3JpdGVzLCB3ZSd2ZSBiZWVuIGRv
-aW5nIA0KdGhpcyBmb3IgYSBsb25nIHRpbWUuICBJTyBzY2hlZHVsZXJzIGhhdmUgYWxsIGtpbmRz
-IG9mIGNoZWNrcyBhbmQgDQpiYWxhbmNlcyBmb3IgUkVRX01FVEEgb3IgUkVRX1NZTkMsIGFuZCB3
-ZSB0aHJvdHRsZSBkaXJ0eSBwYWdlcyBhbmQgDQpyZWFkYWhlYWQgYW5kIGRhbmNlIGFyb3VuZCBy
-ZXF1ZXN0IGJhdGNoaW5nIGV0YyBldGMuDQoNCkJ1dCBmb3IgZGlzY2FyZHMsIHdlIGp1c3Qgb3Bl
-biB0aGUgZmxvb2RnYXRlcyBhbmQgaG9wZSBpdCB3b3JrcyBvdXQuICBBdCANCnNvbWUgcG9pbnQg
-d2UncmUgZ29pbmcgdG8gaGF2ZSB0byBmaWd1cmUgb3V0IGhvdyB0byBxdWV1ZSBhbmQgdGhyb3R0
-bGUgDQpkaXNjYXJkcyBhcyB3ZWxsIGFzIHdlIGRvIHJlYWRzL3dyaXRlcy4gIFRoYXQncyBraW5k
-IG9mIHRyaWNreSBiZWNhdXNlIA0KdGhlIEZTIG5lZWRzIHRvIGNvb3JkaW5hdGUgd2hlbiB3ZSdy
-ZSBhbGxvd2VkIHRvIGRpc2NhcmQgc29tZXRoaW5nIGFuZCANCm5lZWRzIHRvIGtub3cgd2hlbiB0
-aGUgZGlzY2FyZCBpcyBkb25lLCBhbmQgd2UgYWxsIGhhdmUgZGlmZmVyZW50IA0Kc2NoZW1lcyBm
-b3Iga2VlcGluZyB0cmFjay4NCg0KLWNocmlzDQo=
+On 06/05/2019 18:07, Song Liu wrote:
+>> [...]
+>> I understand this could in theory affects all the RAID levels, but in
+>> practice I don't think it'll happen. RAID0 is the only "blind" mode of
+>> RAID, in the sense it's the only one that doesn't care at all with
+>> failures. In fact, this was the origin of my other thread [0], regarding
+>> the change of raid0's behavior in error cases..because it currently does
+>> not care with members being removed and rely only in filesystem failures
+>> (after submitting many BIOs to the removed device).
+>>
+>> That said, in this change I've only took care of raid0, since in my
+>> understanding the other levels won't submit BIOs to dead devices; we can
+>> experiment that to see if it's true.
+> 
+> Could you please run a quick test with raid5? I am wondering whether
+> some race condition could get us into similar crash. If we cannot easily
+> trigger the bug, we can process with this version.
+> 
+> Thanks,
+> Song
+
+Hi Song, I've tested both RAID5 (with 3 disks, removing one at a time),
+and also RAID 1 (2 disks, also removing one at a time); no issues
+observed in kernel 5.1. We can see one interesting message in kernel
+log: "super_written gets error=10", which corresponds to md detecting
+the error (bi_status == BLK_STS_IOERROR) and instantly failing the
+write, making FS read-only.
+
+So, I think really the issue happens only in RAID0, which writes
+"blindly" to its components.
+Let me know your thoughts - thanks again for your input!
+
+Cheers,
+
+
+Guilherme
