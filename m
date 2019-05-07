@@ -2,220 +2,85 @@ Return-Path: <SRS0=61bd=TH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C51C04AAD
-	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 12:57:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC6EC004C9
+	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 14:39:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 97C56205ED
-	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 12:57:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99AD120825
+	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 14:39:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RINy+PEY"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="c9xaZQpp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726581AbfEGM5N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 May 2019 08:57:13 -0400
-Received: from mail-qt1-f182.google.com ([209.85.160.182]:41560 "EHLO
-        mail-qt1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726000AbfEGM5N (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 May 2019 08:57:13 -0400
-Received: by mail-qt1-f182.google.com with SMTP id c13so18818592qtn.8;
-        Tue, 07 May 2019 05:57:12 -0700 (PDT)
+        id S1726526AbfEGOj2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 May 2019 10:39:28 -0400
+Received: from mail-it1-f196.google.com ([209.85.166.196]:33585 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726444AbfEGOj1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 May 2019 10:39:27 -0400
+Received: by mail-it1-f196.google.com with SMTP id u16so12426349itc.0
+        for <linux-block@vger.kernel.org>; Tue, 07 May 2019 07:39:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=hYe3aJ9hX77v/3irsRXMzIWEx2j595RXPSkwBIf7F18=;
-        b=RINy+PEYl5RijAggnLDKS54T9pas+ufxa4dqSjkrp13dEbf5nlsRfBTiG2Hd2BIIk2
-         xjcFHg8miKoLsYqbNmYddbsvbP/rDzy9QVaWQ3IrwTf2CZ65tRo9khWiK+k5Yiw4SPWt
-         ziYOXQyyKdtaRx+sIWMJT/azWOI++YYOt37eMGgH1I8s9ftx7TU3pIi207osGO5QvyEZ
-         +ZDczfJ8VLz5eho3SVCNV4vmv4LRqPB38FuMBz2zfq4cfYob0dqIc/YA5KbLfaNwclie
-         s/ikrlnnXTNv9zdLT2Wv2q5BSefRyLZX4Hnj5a6YaktJbbeTB+RMDd/Wask+jFXS99Vd
-         OwxQ==
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=x5Fko6HiVlIQb9DPGKSesbmDeWCk7V4xMBBezPIzv2w=;
+        b=c9xaZQppx2kwi7qudO45vxsctBfhFq1s7gI7Cr26MHHrFweV6K3R84PtPDt0lbvzip
+         VaibCXIQJRVOpisKNce24y0PfSLNIrLNcZTkRT7/4BWG57FNzPCEUvMj4l8FZaUefklz
+         SoOknEU0E9toKyOCFHceMWxaM1OCHQnfuBGuz3P5ja2UpsTILSKXmxXMfGN1v44JzRz6
+         +OlWIKwirkY/58WyNZZMgeB0xH0Q4aPj7DWmga0koGTCW0zXQaEymagG1UmMg8UBPsdH
+         C6LZd5mKarcNWe2hurlOBMPhKAJora90xVH4qZg86sVqMmnbEgnK35XWbjQ4x0btSRKo
+         cn8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=hYe3aJ9hX77v/3irsRXMzIWEx2j595RXPSkwBIf7F18=;
-        b=fE83Th97XAEu9DyysHPV0oZLhqCsfgYYAaJ7JU58lcnimtUjBjYHWR8vH7GXUFSAgW
-         OxfPoGP9+/hDZpf7EyMR9B0ChJNIZVFe2NbSZs9FRhe7hPq3xDNPnMSHSe2fNJtJ5NfE
-         IdRJS19t51E71/oEqA1cppM2RE0izD/OzKF5if09QHj9tsu9OOXgdNNYizQctzL0k+ON
-         UAAOx6YPC6qdgGSrrAbiYXUNYQX2z8mrU2cQc/PrcOwH64zPca4nXGcAmZWcsFBzR+Po
-         XEDNwHvOh4Bn/wOMlBRl8cU10bMKvUZi4w53t0HxBQecYEMXIwfUjNRjjT5jdGiFS6I6
-         M8YQ==
-X-Gm-Message-State: APjAAAV4YP77W+FW7r+YyKvCzFN4dLBJf3QXTuRzcn1dlM+6qC01AzVO
-        PHVAi6iGoJURCkn7KKaVrpg=
-X-Google-Smtp-Source: APXvYqyUipHEaFB+5oUMvWmIUPyvzku/UuBXyLVLiz9ezIwF8Z8IDWc4VCXE+uzFeaHtkUSrSUX0qQ==
-X-Received: by 2002:aed:3a0a:: with SMTP id n10mr6784140qte.145.1557233831560;
-        Tue, 07 May 2019 05:57:11 -0700 (PDT)
-Received: from localhost.localdomain ([163.114.130.128])
-        by smtp.gmail.com with ESMTPSA id k190sm6910039qkd.28.2019.05.07.05.57.09
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 07 May 2019 05:57:10 -0700 (PDT)
-Subject: Re: Testing devices for discard support properly
-To:     Lukas Czerner <lczerner@redhat.com>, Jan Tulak <jtulak@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Nikolay Borisov <nborisov@suse.com>
-References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
- <20190507071021.wtm25mxx2as6babr@work>
- <CACj3i71HdW0ys_YujGFJkobMmZAZtEPo7B2tgZjEY8oP_T9T6g@mail.gmail.com>
- <20190507094015.hb76w3rjzx7shxjp@work>
-From:   Ric Wheeler <ricwheeler@gmail.com>
-Message-ID: <09953ba7-e4f2-36e9-33b7-0ddbbb848257@gmail.com>
-Date:   Tue, 7 May 2019 08:57:09 -0400
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=x5Fko6HiVlIQb9DPGKSesbmDeWCk7V4xMBBezPIzv2w=;
+        b=O/2Y5TQ4u0nI0FN9BLUvksavPI+F+SUe7G3kyTmhpcAv3Kj9CWaEsMcVYu1X7msXtl
+         7Q4l9WFacuLs3O5MtUXjy5KrSSNi71UU2bRmoxEDILDHY1QqJWejQK8RzqylIh8T3C3w
+         KWsGL0Zg00ZVoEdhj5Nw8w79Vc5gTl1qciqypEcynyS3hV1QLQU8H/CmlIJbIQYcRUbj
+         CzQo4rFy2tTYe1vMvUd/o9sa7jUEHbzxmaAryBcK6uL+XzMMIyMxFrKE1yEa+d8BUZjP
+         u3T1Hsp8/3NKFqCj8nxW+EFs9pc+gpNUwG6UCzMa8wBQGF3IJng/rg8ri5ORj8jyJZDd
+         svEQ==
+X-Gm-Message-State: APjAAAVhyMLSbzhNArJMWeKYOPKJ3+baWuCwyk2jvMSSgPcQeNUobMyh
+        bYc5cnFhg0m1VnkaS9/Imyyl+MlLV0rsYQ==
+X-Google-Smtp-Source: APXvYqydMjtVkfkKR9Z1eT5733D7O3teSuCYC6AB3FTnwg6K1IrAOWr9Cz17ADnpMBl+T39W+jaHvA==
+X-Received: by 2002:a24:2901:: with SMTP id p1mr13789510itp.54.1557239966503;
+        Tue, 07 May 2019 07:39:26 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id o199sm6372115ito.25.2019.05.07.07.39.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 07 May 2019 07:39:25 -0700 (PDT)
+Subject: Re: [PATCH] block: fix mismerge in bvec_advance
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org
+References: <20190507065335.8138-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <9663e019-694d-0557-0454-0c9fa7ddf69c@kernel.dk>
+Date:   Tue, 7 May 2019 08:39:24 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190507094015.hb76w3rjzx7shxjp@work>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190507065335.8138-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 5/7/19 12:53 AM, Christoph Hellwig wrote:
+> When Jens merged my commit to only allow contiguous page structs in a
+> bio_vec with Ming's 5.1 fix to ensue the bvec length didn't overflow
+> we failed to keep the removal of the expensive nth_page calls.  This
+> commits adds them back as intended.
 
-On 5/7/19 5:40 AM, Lukas Czerner wrote:
-> On Tue, May 07, 2019 at 10:48:55AM +0200, Jan Tulak wrote:
->> On Tue, May 7, 2019 at 9:10 AM Lukas Czerner <lczerner@redhat.com> wrote:
->>> On Mon, May 06, 2019 at 04:56:44PM -0400, Ric Wheeler wrote:
->> ...
->>>> * Whole device discard at the block level both for a device that has been
->>>> completely written and for one that had already been trimmed
->>> Yes, usefull. Also note that a long time ago when I've done the testing
->>> I noticed that after a discard request, especially after whole device
->>> discard, the read/write IO performance went down significanly for some
->>> drives. I am sure things have changed, but I think it would be
->>> interesting to see how does it behave now.
+Thanks applied, that's my mistake.
 
+-- 
+Jens Axboe
 
-My understanding of how drives (not just SSD's but they are the main 
-target here) can handle a discard can vary a lot, including:
-
-* just ignore it for any reason and not return a failure - it is just a 
-hint by spec.
-
-* update metadata to mark that region as unused and then defer any real 
-work to later (like doing wear level stuff, pre-erase for writes, etc). 
-This can have a post-discard impact. I think of this kind of like 
-updating page table entries for virtual memory - low cost update now, 
-all real work deferred.
-
-* do everything as part of the command - this can be relatively slow, 
-most of the cost of a write I would guess (i.e., go in and over-write 
-the region with zeros or just do the erase of the flash block under the 
-region).
-
-Your earlier work supports the need to test IO performance after doing 
-the trims/discards - we might want to test it right away, then see if 
-waiting 10 minutes, 30 minutes, etc helps?
-
->>>
->>>> * Discard performance at the block level for 4k discards for a device that
->>>> has been completely written and again the same test for a device that has
->>>> been completely discarded.
->>>>
->>>> * Same test for large discards - say at a megabyte and/or gigabyte size?
->>>  From my testing (again it was long time ago and things probably changed
->>> since then) most of the drives I've seen had largely the same or similar
->>> timing for discard request regardless of the size (hence, the conclusion
->>> was the bigger the request the better). A small variation I did see
->>> could have been explained by kernel implementation and discard_max_bytes
->>> limitations as well.
->>>
->>>> * Same test done at the device optimal discard chunk size and alignment
->>>>
->>>> Should the discard pattern be done with a random pattern? Or just
->>>> sequential?
->>> I think that all of the above will be interesting. However there are two
->>> sides of it. One is just pure discard performance to figure out what
->>> could be the expectations and the other will be "real" workload
->>> performance. Since from my experience discard can have an impact on
->>> drive IO performance beyond of what's obvious, testing mixed workload
->>> (IO + discard) is going to be very important as well. And that's where
->>> fio workloads can come in (I actually do not know if fio already
->>> supports this or not).
->>>
-
-Really good points. I think it is probably best to test just at the 
-block device level to eliminate any possible file system interactions 
-here.  The lessons learned though might help file systems handle things 
-more effectively?
-
->> And:
->>
->> On Tue, May 7, 2019 at 10:22 AM Nikolay Borisov <nborisov@suse.com> wrote:
->>> I have some vague recollection this was brought up before but how sure
->>> are we that when a discard request is sent down to disk and a response
->>> is returned the actual data has indeed been discarded. What about NCQ
->>> effects i.e "instant completion" while doing work in the background. Or
->>> ignoring the discard request altogether?
->>
->> As Nikolay writes in the other thread, I too have a feeling that there
->> have been a discard-related discussion at LSF/MM before. And if I
->> remember, there were hints that the drives (sometimes) do asynchronous
->> trim after returning a success. Which would explain the similar time
->> for all sizes and IO drop after trim.
-> Yes, that was definitely the case  in the past. It's also why we've
-> seen IO performance drop after a big (whole device) discard as the
-> device was busy in the background.
-
-For SATA specifically, there was a time when the ATA discard command was 
-not queued so we had to drain all other pending requests, do the 
-discard, and then resume. This was painfully slow then (not clear that 
-this was related to the performance impact you saw - it would be an 
-impact I think for the next few dozen commands?).
-
-The T13 people (and most drives I hope) fixed this years back to be a 
-queued command so we don't have that same concern now I think.
-
->
-> However Nikolay does have a point. IIRC device is free to ignore discard
-> requests, I do not think there is any reliable way to actually tell that
-> the data was really discarded. I can even imagine a situation that the
-> device is not going to do anything unless it's pass some threshold of
-> free blocks for wear leveling. If that's the case our tests are not
-> going to be very useful unless they do stress such corner cases. But
-> that's just my speculation, so someone with a better knowledge of what
-> vendors are doing might tell us if it's something to worry about or not.
-
-
-The way I think of it is our "nirvana" state for discard would be:
-
-* all drives have very low cost discard commands with minimal 
-post-discard performance impact on the normal workload which would let 
-us issue the in-band discards (-o discard mount option)
-
-* drives might still (and should be expected to) ignore some of these 
-commands so freed and "discarded" space might still not be really discarded.
-
-* we will still need to run a periodic (once a day? a week?) fstrim to 
-give the drive a chance to clean up anything even when using "mount -o 
-discard". Of course, the fstrim size is bigger I expect than the size 
-from inband discard so testing larger sizes will be important.
-
-Does this make sense?
-
-Ric
-
-
->
->> So, I think that the mixed workload (IO + discard) is a pretty
->> important part of the whole topic and a pure discard test doesn't
->> really tell us anything, at least for some drives.
-> I think both are important especially since mixed IO tests are going to
-> be highly workload specific.
->
-> -Lukas
->
->> Jan
->>
->>
->>
->> -- 
->> Jan Tulak
