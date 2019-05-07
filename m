@@ -2,106 +2,143 @@ Return-Path: <SRS0=61bd=TH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4737FC04AAD
-	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 08:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CBB6C04AAD
+	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 08:21:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E70321019
-	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 08:03:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="L0ED9O/W"
+	by mail.kernel.org (Postfix) with ESMTP id 34AC4204FD
+	for <linux-block@archiver.kernel.org>; Tue,  7 May 2019 08:21:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726457AbfEGIDk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 May 2019 04:03:40 -0400
-Received: from smtpbg202.qq.com ([184.105.206.29]:51592 "EHLO smtpbg202.qq.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726085AbfEGIDk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 May 2019 04:03:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-        s=s201512; t=1557216206;
-        bh=5P86jqYLNxP7dBuvAXYQSd5hJWVKbDW1Nl9wv7F3f5Y=;
-        h=From:To:Subject:Date:Message-Id:MIME-Version;
-        b=L0ED9O/W4kRBcDWqnxuqlsFYefDV2+BqmAymu6r/OEIh6N3+s+QzjgfkQPDmrX2pw
-         9S3UTFyKeT9utn5WVC2eUrPmqPNj41gS251LfpqjO8lKBZi5D7T2HqfuIelquO7jE+
-         lyqQnCDjN6b18TGRx9Oy7NlXebX6HWyQscaBFgqw=
-X-QQ-mid: esmtp3t1557216203thb6qlv8u
-Received: from localhost.localdomain (unknown [61.48.57.6])
-        by esmtp4.qq.com (ESMTP) with 
-        id ; Tue, 07 May 2019 16:03:19 +0800 (CST)
-X-QQ-SSF: 010000000000000000K000000000000
-X-QQ-FEAT: Tubeh+4qKFQuhaM4CkrsCM2V17OW744SvA8N0shiMcH+du0k7nBl0vzn/znDH
-        VND3SgV0WDAXPnh7PQyRfSDZrjTJQKFtTA6QG4zsTxVI39cYGSLd/mkz0v6scexO4uVPeON
-        ODXsVekzfw4Ut01yQKA7J71BXNSFgAs25Pir2zqiGa0SIJCMxARFaUU6EikSfbBcx/JkoFA
-        6r/Aq5juO01mVUeNRDnyRFKQnUiqE8SpeHCIbh5DCDnDlC7VdWRsYZuXTSrIZCvVbuMEF+a
-        UsqjHEADS/Jcod8Jxwhac35M206hse8PSp7g==
-X-QQ-GoodBg: 0
-From:   Shenghui Wang <shhuiw@foxmail.com>
-To:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     jmoyer@redhat.com
-Subject: [PATCH] io_uring: use cpu_online() to check p->sq_thread_cpu instead of cpu_possible()
-Date:   Tue,  7 May 2019 16:03:19 +0800
-Message-Id: <20190507080319.2045-1-shhuiw@foxmail.com>
-X-Mailer: git-send-email 2.20.1
+        id S1726562AbfEGIVz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 May 2019 04:21:55 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37550 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726197AbfEGIVz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 7 May 2019 04:21:55 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 49711AE52;
+        Tue,  7 May 2019 08:21:53 +0000 (UTC)
+Subject: Re: Testing devices for discard support properly
+To:     Ric Wheeler <ricwheeler@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        lczerner@redhat.com
+References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
+From:   Nikolay Borisov <nborisov@suse.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <53ed750b-0b92-510b-495d-384de49967b2@suse.com>
+Date:   Tue, 7 May 2019 11:21:52 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtp:foxmail.com:bgforeign:bgforeign2
-X-QQ-Bgrelay: 1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This issue is found by running liburing/test/io_uring_setup test.
-
-When test run, the testcase "attempt to bind to invalid cpu" would not
-pass with messages like:
-   io_uring_setup(1, 0xbfc2f7c8), \
-flags: IORING_SETUP_SQPOLL|IORING_SETUP_SQ_AFF, \
-resv: 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000, \
-sq_thread_cpu: 2
-   expected -1, got 3
-   FAIL
-
-On my system, there is:
-   CPU(s) possible : 0-3
-   CPU(s) online   : 0-1
-   CPU(s) offline  : 2-3
-   CPU(s) present  : 0-1
-
-The sq_thread_cpu 2 is offline on my system, so the bind should fail.
-But cpu_possible() will pass the check. We shouldn't be able to bind
-to an offline cpu. Use cpu_online() to do the check.
-
-After the change, the testcase run as expected: EINVAL will be returned
-for cpu offlined.
-
-Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
----
- fs/io_uring.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index d91cbd53d3ca..718d7b873f4a 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2472,7 +2472,7 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
- 							nr_cpu_ids);
- 
- 			ret = -EINVAL;
--			if (!cpu_possible(cpu))
-+			if (!cpu_online(cpu))
- 				goto err;
- 
- 			ctx->sqo_thread = kthread_create_on_cpu(io_sq_thread,
--- 
-2.20.1
 
 
+On 6.05.19 г. 23:56 ч., Ric Wheeler wrote:
+> 
+> (repost without the html spam, sorry!)
+> 
+> Last week at LSF/MM, I suggested we can provide a tool or test suite to
+> test discard performance.
+> 
+> Put in the most positive light, it will be useful for drive vendors to
+> use to qualify their offerings before sending them out to the world. For
+> customers that care, they can use the same set of tests to help during
+> selection to weed out any real issues.
+> 
+> Also, community users can run the same tools of course and share the
+> results.
+> 
+> Down to the questions part:
+> 
+> Â * Do we just need to figure out a workload to feed our existing tools
+> like blkdiscard and fio?
+> 
+> * What workloads are key?
+> 
+> Thoughts about what I would start getting timings for:
+> 
+> * Whole device discard at the block level both for a device that has
+> been completely written and for one that had already been trimmed
+> 
+> * Discard performance at the block level for 4k discards for a device
+> that has been completely written and again the same test for a device
+> that has been completely discarded.
+> 
+> * Same test for large discards - say at a megabyte and/or gigabyte size?
+> 
+> * Same test done at the device optimal discard chunk size and alignment
+> 
+> Should the discard pattern be done with a random pattern? Or just
+> sequential?
+> 
+> I think the above would give us a solid base, thoughts or comments?
 
+I have some vague recollection this was brought up before but how sure
+are we that when a discard request is sent down to disk and a response
+is returned the actual data has indeed been discarded. What about NCQ
+effects i.e "instant completion" while doing work in the background. Or
+ignoring the discard request altogether?
+
+> 
+> Thanks!
+> 
+> Ric
+> 
+> 
+> 
+> 
