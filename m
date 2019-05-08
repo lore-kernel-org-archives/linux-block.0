@@ -2,124 +2,72 @@ Return-Path: <SRS0=FTzM=TI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F2CFC04AAE
-	for <linux-block@archiver.kernel.org>; Wed,  8 May 2019 21:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4823EC04A6B
+	for <linux-block@archiver.kernel.org>; Wed,  8 May 2019 22:02:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DEC7520989
-	for <linux-block@archiver.kernel.org>; Wed,  8 May 2019 21:58:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DBD52173B
+	for <linux-block@archiver.kernel.org>; Wed,  8 May 2019 22:02:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728575AbfEHV6h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 May 2019 17:58:37 -0400
-Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:42200 "EHLO
-        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726837AbfEHV6h (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 8 May 2019 17:58:37 -0400
-Received: from dread.disaster.area (pa49-181-171-240.pa.nsw.optusnet.com.au [49.181.171.240])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id F37BBC927;
-        Thu,  9 May 2019 07:58:32 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92)
-        (envelope-from <david@fromorbit.com>)
-        id 1hOUa8-0005Mv-Ex; Thu, 09 May 2019 07:58:32 +1000
-Date:   Thu, 9 May 2019 07:58:32 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Ric Wheeler <ricwheeler@gmail.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        lczerner@redhat.com
-Subject: Re: Testing devices for discard support properly
-Message-ID: <20190508215832.GR1454@dread.disaster.area>
-References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
- <20190507220449.GP1454@dread.disaster.area>
- <a409b3d1-960b-84a4-1b8d-1822c305ea18@gmail.com>
- <20190508011407.GQ1454@dread.disaster.area>
- <13b63de0-18bc-eb24-63b4-3c69c6a007b3@gmail.com>
- <yq1a7fwlvzb.fsf@oracle.com>
- <0a16285c-545a-e94a-c733-bcc3d4556557@gmail.com>
+        id S1728648AbfEHWCL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 May 2019 18:02:11 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:53933 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726837AbfEHWCL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 May 2019 18:02:11 -0400
+Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
+        by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+        (Exim 4.76)
+        (envelope-from <colin.king@canonical.com>)
+        id 1hOUdc-0007yV-Eg; Wed, 08 May 2019 22:02:08 +0000
+From:   Colin King <colin.king@canonical.com>
+To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] nbd: add null check on dev_list to avoid potential null pointer dereference
+Date:   Wed,  8 May 2019 23:02:08 +0100
+Message-Id: <20190508220208.26146-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0a16285c-545a-e94a-c733-bcc3d4556557@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0 cx=a_idp_d
-        a=LhzQONXuMOhFZtk4TmSJIw==:117 a=LhzQONXuMOhFZtk4TmSJIw==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=E5NmQfObTbMA:10
-        a=7-415B0cAAAA:8 a=P-JoTcFpvW-QmwlPBo0A:9 a=Hlrat0HlZ4lAMFzh:21
-        a=eYFAa6E9YxbT3pTG:21 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 08, 2019 at 01:09:03PM -0400, Ric Wheeler wrote:
-> 
-> On 5/8/19 1:03 PM, Martin K. Petersen wrote:
-> > Ric,
-> > 
-> > > That all makes sense, but I think it is orthogonal in large part to
-> > > the need to get a good way to measure performance.
-> > There are two parts to the performance puzzle:
-> > 
-> >   1. How does mixing discards/zeroouts with regular reads and writes
-> >      affect system performance?
-> > 
-> >   2. How does issuing discards affect the tail latency of the device for
-> >      a given workload? Is it worth it?
-> > 
-> > Providing tooling for (1) is feasible whereas (2) is highly
-> > workload-specific. So unless we can make the cost of (1) negligible,
-> > we'll have to defer (2) to the user.
-> 
-> Agree, but I think that there is also a base level performance question -
-> how does the discard/zero perform by itself.
-> 
-> Specifically, we have had to punt the discard of a whole block device before
-> mkfs (back at RH) since it tripped up a significant number of devices.
-> Similar pain for small discards (say one fs page) - is it too slow to do?
+From: Colin Ian King <colin.king@canonical.com>
 
-Small discards are already skipped is the device indicates it has
-a minumum discard granularity. This is another reason why the "-o
-discard" mount option isn't sufficient by itself and fstrim is still
-required - filesystems often only free small isolated chunks of
-space at a time and hence never may send discards to the device.
+The call to nla_nest_start_noflag can return a null pointer and currently
+this is not being checked and this can lead to a null pointer dereference
+when the null pointer dev_list is passed to function nla_nest_end. Fix
+this by adding in a null pointer check.
 
-> > > For SCSI, I think the "WRITE_SAME" command *might* do discard
-> > > internally or just might end up re-writing large regions of slow,
-> > > spinning drives so I think it is less interesting.
-> > WRITE SAME has an UNMAP flag that tells the device to deallocate, if
-> > possible. The results are deterministic (unlike the UNMAP command).
+Addresses-Coverity: ("Dereference null return value")
+Fixes: 47d902b90a32 ("nbd: add a status netlink command")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/block/nbd.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-That's kinda what I'm getting at here - we need to define the
-behaviour the OS provides users, and then ensure that the behaviour
-is standardised correctly so that devices behave correctly. i.e.  we
-want devices to support WRITE_SAME w/ UNMAP flag well (because
-that's an exact representation of FALLOC_FL_PUNCH_HOLE
-requirements), and don't really care about the UNMAP command.
-
-> > WRITE SAME also has an ANCHOR flag which provides a use case we
-> > currently don't have fallocate plumbing for: Allocating blocks without
-> > caring about their contents. I.e. the blocks described by the I/O are
-> > locked down to prevent ENOSPC for future writes.
-
-So WRITE_SAME (0) with an ANCHOR flag does not return zeroes on
-subsequent reads? i.e. it is effectively
-fallocate(FALLOC_FL_NO_HIDE_STALE) preallocation semantics?
-
-For many use cases cases we actually want zeroed space to be
-guaranteed so we don't expose stale data from previous device use
-into the new user's visibility - can that be done with WRITE_SAME
-and the ANCHOR flag?
-
-Cheers,
-
-Dave.
-
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 053958a8a2ba..ed263963e778 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -2117,6 +2117,10 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
+ 	}
+ 
+ 	dev_list = nla_nest_start_noflag(reply, NBD_ATTR_DEVICE_LIST);
++	if (!dev_list) {
++		nlmsg_free(reply);
++		goto out;
++	}
+ 	if (index == -1) {
+ 		ret = idr_for_each(&nbd_index_idr, &status_cb, reply);
+ 		if (ret) {
 -- 
-Dave Chinner
-david@fromorbit.com
+2.20.1
+
