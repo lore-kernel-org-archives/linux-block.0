@@ -2,89 +2,119 @@ Return-Path: <SRS0=FTzM=TI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	T_DKIMWL_WL_HIGH,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E5E5C04AAD
-	for <linux-block@archiver.kernel.org>; Wed,  8 May 2019 16:53:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D51D0C04AAD
+	for <linux-block@archiver.kernel.org>; Wed,  8 May 2019 17:03:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6209B216F4
-	for <linux-block@archiver.kernel.org>; Wed,  8 May 2019 16:53:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7A41216F4
+	for <linux-block@archiver.kernel.org>; Wed,  8 May 2019 17:03:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="C6DLbwjm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728351AbfEHQxE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 May 2019 12:53:04 -0400
-Received: from smtp.hosts.co.uk ([85.233.160.19]:46444 "EHLO smtp.hosts.co.uk"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728044AbfEHQxE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 8 May 2019 12:53:04 -0400
-Received: from [81.155.195.4] (helo=[192.168.1.118])
-        by smtp.hosts.co.uk with esmtpa (Exim)
-        (envelope-from <antlists@youngman.org.uk>)
-        id 1hOPoT-0001Zo-3p; Wed, 08 May 2019 17:53:01 +0100
-Subject: Re: [PATCH 2/2] md/raid0: Do not bypass blocking queue entered for
- raid0 bios
-To:     "Guilherme G. Piccoli" <guilherme@gpiccoli.net>,
-        Song Liu <liu.song.a23@gmail.com>
-References: <20190430223722.20845-1-gpiccoli@canonical.com>
- <20190430223722.20845-2-gpiccoli@canonical.com>
- <CAPhsuW4SeUhNOJJkEf9wcLjbbc9qX0=C8zqbyCtC7Q8fdL91hw@mail.gmail.com>
- <c8721ba3-5d38-7906-5049-e2b16e967ecf@canonical.com>
- <CAPhsuW6ahmkUhCgns=9WHPXSvYefB0Gmr1oB7gdZiD86sKyHFg@mail.gmail.com>
- <5CD2A172.4010302@youngman.org.uk>
- <0ad36b2f-ec36-6930-b587-da0526613567@gpiccoli.net>
-Cc:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
+        id S1729103AbfEHRDe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 May 2019 13:03:34 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:59794 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729091AbfEHRDe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 May 2019 13:03:34 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x48Gxcdn159546;
+        Wed, 8 May 2019 17:03:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=3dR3HIapXIda6o/q4jvxD+ZqWb3OHNWGzphNYlBXXVQ=;
+ b=C6DLbwjmI5YKLWNPfeFbcJK8WXPGESVkGJbtBb+JKu4/FWlDQhHJ5BPVnnW1Epgh+ysP
+ GsTV/ifFuq/LTcYeQIzJ0+W8rvZ7Zn4kyjVtWEnTExxW38hVtMRiz9fA12FpGKEQz6+d
+ W0ZYmfHaKTeSVUJBtOF9IhY4/cVblc0+d0t5HywRBycZUsOkD45oluWr4RtbpqKKU+Ky
+ gp7KWCQuK3dBx2GKbriMRcxZ4grxlSWqvZISzcqtpxoS4OwPsPOds0heGbsJB0joq5Gt
+ qzE2pAU2YIxrTR0yzs4esKHBkHbDTmrATX/7l7c3V1sdemi7DNeabjQkh3YlrOTjNH4w Cw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 2s94b65grm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 May 2019 17:03:25 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x48H3M3X051585;
+        Wed, 8 May 2019 17:03:25 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2s94ag849p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 May 2019 17:03:24 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x48H3N3t008082;
+        Wed, 8 May 2019 17:03:23 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 08 May 2019 10:03:23 -0700
+To:     Ric Wheeler <ricwheeler@gmail.com>
+Cc:     Dave Chinner <david@fromorbit.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>, dm-devel@redhat.com,
-        axboe@kernel.dk, Gavin Guo <gavin.guo@canonical.com>,
-        Jay Vosburgh <jay.vosburgh@canonical.com>, kernel@gpiccoli.net,
-        Ming Lei <ming.lei@redhat.com>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        stable@vger.kernel.org
-From:   Wols Lists <antlists@youngman.org.uk>
-Message-ID: <5CD3096B.4030302@youngman.org.uk>
-Date:   Wed, 8 May 2019 17:52:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
- Thunderbird/38.7.0
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        lczerner@redhat.com
+Subject: Re: Testing devices for discard support properly
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
+        <20190507220449.GP1454@dread.disaster.area>
+        <a409b3d1-960b-84a4-1b8d-1822c305ea18@gmail.com>
+        <20190508011407.GQ1454@dread.disaster.area>
+        <13b63de0-18bc-eb24-63b4-3c69c6a007b3@gmail.com>
+Date:   Wed, 08 May 2019 13:03:20 -0400
+In-Reply-To: <13b63de0-18bc-eb24-63b4-3c69c6a007b3@gmail.com> (Ric Wheeler's
+        message of "Wed, 8 May 2019 11:05:35 -0400")
+Message-ID: <yq1a7fwlvzb.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <0ad36b2f-ec36-6930-b587-da0526613567@gpiccoli.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9251 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=590
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905080104
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9251 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=661 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905080104
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 08/05/19 15:52, Guilherme G. Piccoli wrote:
-> Hi, I understand your concern. But all other raid levels contains
-> failure-event mechanisms. For example, in all my tests with raid5 or
-> raid1, it first complained the device was removed, then it failed in
-> super_written() when no other available device was present.
-> On the other hand, raid0 does "blind-writes": it just selects the device
-> in which that bio should be written (given the stripe math) and change
-> the bio's device, sending it back via generic_make_request(). It's
-> dummy, but not in a bad way, but rather for performance reasons. It has
-> no "intelligence" for failures, as all other raid levels.
-> 
-> That said, we could fix md.c for all raid levels, but I personally think
-> it's a bazooka shot, only raid0 shows consistently this issue.
-> 
-The academic in me says we should push that error handling into
-generic_make_request() or some raid function in md.c that deals with
-those problems. Sounds like there's a fair bit of duplicate
-functionality that could be re-factored out.
->>
->> Academic purity versus engineering practicality :-)
-> 
-> Heheh you have good points here! Thanks for the input =)
-> Cheers,
-> 
-Doesn't help when there's not an architect to design an overall "grand
-scheme", but my usual way of working is to design top down academically,
-and then ask myself "what do I need" before implementing bottom-up.
-Hopefully with a load of documentation saying "I haven't done this
-because I don't need it, but this is where it goes".
 
-Cheers,
-Wol
+Ric,
 
+> That all makes sense, but I think it is orthogonal in large part to
+> the need to get a good way to measure performance.
+
+There are two parts to the performance puzzle:
+
+ 1. How does mixing discards/zeroouts with regular reads and writes
+    affect system performance?
+
+ 2. How does issuing discards affect the tail latency of the device for
+    a given workload? Is it worth it?
+
+Providing tooling for (1) is feasible whereas (2) is highly
+workload-specific. So unless we can make the cost of (1) negligible,
+we'll have to defer (2) to the user.
+
+> For SCSI, I think the "WRITE_SAME" command *might* do discard
+> internally or just might end up re-writing large regions of slow,
+> spinning drives so I think it is less interesting.
+
+WRITE SAME has an UNMAP flag that tells the device to deallocate, if
+possible. The results are deterministic (unlike the UNMAP command).
+
+WRITE SAME also has an ANCHOR flag which provides a use case we
+currently don't have fallocate plumbing for: Allocating blocks without
+caring about their contents. I.e. the blocks described by the I/O are
+locked down to prevent ENOSPC for future writes.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
