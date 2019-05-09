@@ -2,256 +2,205 @@ Return-Path: <SRS0=bR5W=TJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6923EC04AB1
-	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 16:15:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33DA7C04AB1
+	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 16:17:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 27BD821783
-	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 16:15:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED1192177E
+	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 16:17:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="aRUvNRxe";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="G1CTAamN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ieGyfZwD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726694AbfEIQPG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 May 2019 12:15:06 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:30398 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726631AbfEIQPG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 May 2019 12:15:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1557418507; x=1588954507;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=Avai2N2HSV70DD22u4XXfC2qb00F0NkaQr+r7L19E7c=;
-  b=aRUvNRxer4o8bADAq7NK5wuK6IPuJ5v45TmFGt9GSymrNM/6yaXCf0vK
-   ceag1BaQOHN2grlcetMs84qtCkJp1D9zfxCfGe+7J7veLVbFi+r7gfUEi
-   pexrv0R3QoDAb9jMnSEknISRGwh2vFKR2Z2H152jeJOD7iQmcuteeFNvA
-   HRxgM3DrZ59T9Y0fmYpt/nUU1kgi0d70fMK9YqJb65e37e5516cY7vfGO
-   WwZW9f/SSmOfOkY8mire3CjuLm1gG/QsPCL+ZXiaFCnjiWNyclvRG5pvp
-   YE+RvtGLwN3SFT323jtuWF+5GLLyNZ7B5U2pIkd0zBxfR9hj9FpX22twJ
-   g==;
-X-IronPort-AV: E=Sophos;i="5.60,450,1549900800"; 
-   d="scan'208";a="112849883"
-Received: from mail-sn1nam01lp2051.outbound.protection.outlook.com (HELO NAM01-SN1-obe.outbound.protection.outlook.com) ([104.47.32.51])
-  by ob1.hgst.iphmx.com with ESMTP; 10 May 2019 00:15:06 +0800
+        id S1726666AbfEIQRS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 May 2019 12:17:18 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:43444 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726659AbfEIQRS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 May 2019 12:17:18 -0400
+Received: by mail-pl1-f194.google.com with SMTP id n8so1377310plp.10;
+        Thu, 09 May 2019 09:17:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Pwjejvgrhcehh0KN1cee17ynSWC0GYKGO3Z4QeHTUms=;
- b=G1CTAamNredwUC70uqA2uL2He9r5/2VbtFhLPjI5AlZqrvWj4XXqqqwDV4dVvfjaFumW/X8NmwTsxI5Cz3MSk2jvDkQVNIrbPj0RcxppXMD+6yqSQMl+u5VG3dDkVzF8cCRWahmqPm3B0cEqvrtrwdY0cHp7I5wo2VFvaml4NNk=
-Received: from SN6PR04MB4527.namprd04.prod.outlook.com (52.135.120.25) by
- SN6PR04MB3806.namprd04.prod.outlook.com (52.135.81.27) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1878.22; Thu, 9 May 2019 16:15:02 +0000
-Received: from SN6PR04MB4527.namprd04.prod.outlook.com
- ([fe80::c4f:1604:178c:d974]) by SN6PR04MB4527.namprd04.prod.outlook.com
- ([fe80::c4f:1604:178c:d974%5]) with mapi id 15.20.1856.012; Thu, 9 May 2019
- 16:15:02 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Evan Green <evgreen@chromium.org>, Jens Axboe <axboe@kernel.dk>,
-        Martin K Petersen <martin.petersen@oracle.com>
-CC:     Bart Van Assche <bvanassche@acm.org>,
-        Gwendal Grignou <gwendal@chromium.org>,
-        Alexis Savery <asavery@chromium.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 2/2] loop: Better discard support for block devices
-Thread-Topic: [PATCH v5 2/2] loop: Better discard support for block devices
-Thread-Index: AQHVBDnQte6MG5PpIUSpV+iVZADCQg==
-Date:   Thu, 9 May 2019 16:15:02 +0000
-Message-ID: <SN6PR04MB45272BA1AE5D477892A08AE486330@SN6PR04MB4527.namprd04.prod.outlook.com>
-References: <20190506182736.21064-1-evgreen@chromium.org>
- <20190506182736.21064-3-evgreen@chromium.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.45.63]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a5af0fbd-2d72-4d5e-dfdc-08d6d4997df9
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:SN6PR04MB3806;
-x-ms-traffictypediagnostic: SN6PR04MB3806:
-wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <SN6PR04MB3806BD7B7E2B1EC3881A495D86330@SN6PR04MB3806.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:138;
-x-forefront-prvs: 003245E729
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(136003)(376002)(346002)(39860400002)(396003)(189003)(199004)(81156014)(99286004)(8676002)(86362001)(81166006)(476003)(8936002)(486006)(6506007)(73956011)(66946007)(76116006)(6246003)(54906003)(91956017)(110136005)(66446008)(4326008)(66556008)(66476007)(71200400001)(71190400001)(64756008)(102836004)(53546011)(186003)(305945005)(74316002)(76176011)(446003)(66066001)(26005)(7696005)(229853002)(316002)(9686003)(55016002)(52536014)(3846002)(6116002)(14454004)(6436002)(25786009)(68736007)(33656002)(7736002)(53936002)(5660300002)(72206003)(478600001)(14444005)(256004)(2906002);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR04MB3806;H:SN6PR04MB4527.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: MuIT2s0eyB27sr+2OCbhXzS8wjgW962Tw0KhCmNTW9idW+XsD9k66+1h6akVDIkikPS6u0j2WfUIvOjKPYdf3IdH3GQkb4cqp1Y9KCu2jTkcvrmrHMwROh2GFEjtgvsdlWvhVuZMDzKWERmhuZjDsOuo8+cXv/Q7iL4yyt66CVIhJIdjc2adgWUy0mhuicaSwel1fFB3KszCNmDcuxjW7mJvedB37UwbjKnL5TATxcy2vN7n0zVDgYx4E/kOr5PIqb/EgeNf77zuJMYHCcdO46a1XnDUd/+MLGFecqduI3R4659nTjfVocjz5wZDoD7sL3+ift/m9C0eJ6gelS5NltgQSZ8DmDqXe9tpcHcKVJyNKb6W3mwS6TZvGoDER+JmGRamzV69nbZc2/PQq1E0t4i3+acIk8KrmkClH3AERRs=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=byWQCXFwY/t6+xfz32wOXskADCw7WiV3cs637zD3Tqo=;
+        b=ieGyfZwDI9WXPSQ7xjGG6StHXBrpDA/flLG3edzNrHEbgjIUQXUD+jZCy97FU4GAI3
+         lZfb+kF3BhPKsLTHhoZwISN2kKfRuwB8SXCdBlLchspTlwpNksamahPkZ/90SdY/8yDb
+         iM8SJVuhmH9Ha+RNX3ObrxIZHf6K/MKcGB66Q27v0c3T3xIcAeetTqBA3m95op7Rpxlv
+         x9ZtJCltX04bxvGM2uXADlZHOw/YXmIsq3SCivMCuqVYNCBdHVViT16DMM52otbXOrR0
+         lxURiePQ5G/6iPNKFI+XXvlW064cPYS2ifGOXzqZLvoFLgjzboOy3yeJ6TjmsBkT88jx
+         f5iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=byWQCXFwY/t6+xfz32wOXskADCw7WiV3cs637zD3Tqo=;
+        b=sW+9gYMV6aFTZWzeTgjXEwfSwE92mslau9L9fhB2TtoIioE2yFjBZu9N13nUfKRe3b
+         HG7SN+8e6fEsaPayN39MBv6fjEA2wnuPLmbI4hYtKBSlTQaguXn1P96DBracrU3TmD5l
+         dPvHjT559dLvQdIzxu3M7topg5/74t6yczpBjdANd5EUTOA2VHMuaGeUZVTcPHH08nN7
+         dOAAaGfW+VSFL3j6U/J03UWd86zMoJQis6f12gE804FUNMpbsPOvGKWElaoxTfTagt3I
+         9Oqcej3FLQ3jtU9xqPGS/GvvzlopgKFQVvJ4buutd8hl+iL9YYfX5enM1EvTMEB95/hS
+         tpDA==
+X-Gm-Message-State: APjAAAXzRRTWdE6YP7wcem7iZcibJHRNkTw137LOld2zIrDPb3XgFNa5
+        ZG3ezZSrfZCdGzwki41iIFE=
+X-Google-Smtp-Source: APXvYqyPbyLKKwFiqGuSMAB3XKR/WRVhIBm/LGFWhkoDGiMZJ2NvRennSkfteOhozSd6mAJFIG5wBw==
+X-Received: by 2002:a17:902:2aa6:: with SMTP id j35mr6275191plb.236.1557418637241;
+        Thu, 09 May 2019 09:17:17 -0700 (PDT)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id n188sm3757947pfn.64.2019.05.09.09.17.15
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 09 May 2019 09:17:15 -0700 (PDT)
+Date:   Thu, 9 May 2019 09:17:14 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: use-after-free in bfq_idle_slice_timer()
+Message-ID: <20190509161714.GA24493@roeck-us.net>
+References: <20190508195047.GA28280@roeck-us.net>
+ <CFD68161-8AE4-48A1-9884-B8B4A93A50EB@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5af0fbd-2d72-4d5e-dfdc-08d6d4997df9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 May 2019 16:15:02.7095
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB3806
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CFD68161-8AE4-48A1-9884-B8B4A93A50EB@linaro.org>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good to me.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-=0A=
-On 05/06/2019 11:30 AM, Evan Green wrote:=0A=
-> If the backing device for a loop device is a block device,=0A=
-> then mirror the "write zeroes" capabilities of the underlying=0A=
-> block device into the loop device. Copy this capability into both=0A=
-> max_write_zeroes_sectors and max_discard_sectors of the loop device.=0A=
->=0A=
-> The reason for this is that REQ_OP_DISCARD on a loop device translates=0A=
-> into blkdev_issue_zeroout(), rather than blkdev_issue_discard(). This=0A=
-> presents a consistent interface for loop devices (that discarded data=0A=
-> is zeroed), regardless of the backing device type of the loop device.=0A=
-> There should be no behavior change for loop devices backed by regular=0A=
-> files.=0A=
->=0A=
-> While in there, differentiate between REQ_OP_DISCARD and=0A=
-> REQ_OP_WRITE_ZEROES, which are different for block devices,=0A=
-> but which the loop device had just been lumping together, since=0A=
-> they're largely the same for files.=0A=
->=0A=
-> This change fixes blktest block/003, and removes an extraneous=0A=
-> error print in block/013 when testing on a loop device backed=0A=
-> by a block device that does not support discard.=0A=
->=0A=
-> Signed-off-by: Evan Green <evgreen@chromium.org>=0A=
-> ---=0A=
->=0A=
-> Changes in v5:=0A=
-> - Don't mirror discard if lo_encrypt_key_size is non-zero (Gwendal)=0A=
->=0A=
-> Changes in v4:=0A=
-> - Mirror blkdev's write_zeroes into loopdev's discard_sectors.=0A=
->=0A=
-> Changes in v3:=0A=
-> - Updated commit description=0A=
->=0A=
-> Changes in v2: None=0A=
->=0A=
->   drivers/block/loop.c | 57 ++++++++++++++++++++++++++++----------------=
-=0A=
->   1 file changed, 37 insertions(+), 20 deletions(-)=0A=
->=0A=
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c=0A=
-> index bbf21ebeccd3..a147210ed009 100644=0A=
-> --- a/drivers/block/loop.c=0A=
-> +++ b/drivers/block/loop.c=0A=
-> @@ -417,19 +417,14 @@ static int lo_read_transfer(struct loop_device *lo,=
- struct request *rq,=0A=
->   	return ret;=0A=
->   }=0A=
->=0A=
-> -static int lo_discard(struct loop_device *lo, struct request *rq, loff_t=
- pos)=0A=
-> +static int lo_discard(struct loop_device *lo, struct request *rq,=0A=
-> +		int mode, loff_t pos)=0A=
->   {=0A=
-> -	/*=0A=
-> -	 * We use punch hole to reclaim the free space used by the=0A=
-> -	 * image a.k.a. discard. However we do not support discard if=0A=
-> -	 * encryption is enabled, because it may give an attacker=0A=
-> -	 * useful information.=0A=
-> -	 */=0A=
->   	struct file *file =3D lo->lo_backing_file;=0A=
-> -	int mode =3D FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;=0A=
-> +	struct request_queue *q =3D lo->lo_queue;=0A=
->   	int ret;=0A=
->=0A=
-> -	if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {=0A=
-> +	if (!blk_queue_discard(q)) {=0A=
->   		ret =3D -EOPNOTSUPP;=0A=
->   		goto out;=0A=
->   	}=0A=
-> @@ -599,8 +594,13 @@ static int do_req_filebacked(struct loop_device *lo,=
- struct request *rq)=0A=
->   	case REQ_OP_FLUSH:=0A=
->   		return lo_req_flush(lo, rq);=0A=
->   	case REQ_OP_DISCARD:=0A=
-> +		return lo_discard(lo, rq,=0A=
-> +			FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, pos);=0A=
-> +=0A=
->   	case REQ_OP_WRITE_ZEROES:=0A=
-> -		return lo_discard(lo, rq, pos);=0A=
-> +		return lo_discard(lo, rq,=0A=
-> +			FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE, pos);=0A=
-> +=0A=
->   	case REQ_OP_WRITE:=0A=
->   		if (lo->transfer)=0A=
->   			return lo_write_transfer(lo, rq, pos);=0A=
-> @@ -854,6 +854,21 @@ static void loop_config_discard(struct loop_device *=
-lo)=0A=
->   	struct file *file =3D lo->lo_backing_file;=0A=
->   	struct inode *inode =3D file->f_mapping->host;=0A=
->   	struct request_queue *q =3D lo->lo_queue;=0A=
-> +	struct request_queue *backingq;=0A=
-> +=0A=
-> +	/*=0A=
-> +	 * If the backing device is a block device, mirror its zeroing=0A=
-> +	 * capability. REQ_OP_DISCARD translates to a zero-out even when backed=
-=0A=
-> +	 * by block devices to keep consistent behavior with file-backed loop=
-=0A=
-> +	 * devices.=0A=
-> +	 */=0A=
-> +	if (S_ISBLK(inode->i_mode) && !lo->lo_encrypt_key_size) {=0A=
-> +		backingq =3D bdev_get_queue(inode->i_bdev);=0A=
-> +		blk_queue_max_discard_sectors(q,=0A=
-> +			backingq->limits.max_write_zeroes_sectors);=0A=
-> +=0A=
-> +		blk_queue_max_write_zeroes_sectors(q,=0A=
-> +			backingq->limits.max_write_zeroes_sectors);=0A=
->=0A=
->   	/*=0A=
->   	 * We use punch hole to reclaim the free space used by the=0A=
-> @@ -861,22 +876,24 @@ static void loop_config_discard(struct loop_device =
-*lo)=0A=
->   	 * encryption is enabled, because it may give an attacker=0A=
->   	 * useful information.=0A=
->   	 */=0A=
-> -	if ((!file->f_op->fallocate) ||=0A=
-> -	    lo->lo_encrypt_key_size) {=0A=
-> +	} else if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {=0A=
->   		q->limits.discard_granularity =3D 0;=0A=
->   		q->limits.discard_alignment =3D 0;=0A=
->   		blk_queue_max_discard_sectors(q, 0);=0A=
->   		blk_queue_max_write_zeroes_sectors(q, 0);=0A=
-> -		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);=0A=
-> -		return;=0A=
-> -	}=0A=
->=0A=
-> -	q->limits.discard_granularity =3D inode->i_sb->s_blocksize;=0A=
-> -	q->limits.discard_alignment =3D 0;=0A=
-> +	} else {=0A=
-> +		q->limits.discard_granularity =3D inode->i_sb->s_blocksize;=0A=
-> +		q->limits.discard_alignment =3D 0;=0A=
-> +=0A=
-> +		blk_queue_max_discard_sectors(q, UINT_MAX >> 9);=0A=
-> +		blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);=0A=
-> +	}=0A=
->=0A=
-> -	blk_queue_max_discard_sectors(q, UINT_MAX >> 9);=0A=
-> -	blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);=0A=
-> -	blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);=0A=
-> +	if (q->limits.max_write_zeroes_sectors)=0A=
-> +		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);=0A=
-> +	else=0A=
-> +		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);=0A=
->   }=0A=
->=0A=
->   static void loop_unprepare_queue(struct loop_device *lo)=0A=
->=0A=
-=0A=
+Hi Paolo,
+
+On Thu, May 09, 2019 at 05:14:57PM +0200, Paolo Valente wrote:
+> I couldn't find any explanation.  Would you be willing to apply a
+> patch that adds runtime checks in bfq?  It'd take me a few days to
+> prepare it.
+> 
+
+Sure, we can do that.
+
+Thanks,
+Guenter
+
+> Thanks,
+> Paolo
+> 
+> > Il giorno 8 mag 2019, alle ore 21:50, Guenter Roeck <linux@roeck-us.net> ha scritto:
+> > 
+> > Hi,
+> > 
+> > we have seen the attached use-after-free in bfq_idle_slice_timer()
+> > while running reboot tests. The code in these tests includes all
+> > bfq patches up to and including commit eed47d19d936 ("block, bfq:
+> > fix use after free in bfq_bfqq_expire").
+> > 
+> > gdb points to the dereference of struct bfq_queue *bfqq in
+> > bfq_bfqq_budget_timeout(). My suspicion is that the cleanup path
+> > in bfq_put_queue() may not clear bfqd->in_service_queue, but I don't
+> > understand the code well enough to be sure.
+> > 
+> > Any thoughts / comments ?
+> > 
+> > Thanks,
+> > Guenter
+> > 
+> > ---
+> > [   25.307269] ==================================================================
+> > [   25.314555] BUG: KASAN: use-after-free in bfq_idle_slice_timer+0x88/0x1d4
+> > [   25.321359] Read of size 8 at addr fffffff089360440 by task swapper/0/0
+> > [   25.327975] 
+> > [   25.329487] CPU: 0 PID: 0 Comm: swapper/0 Tainted: G S                4.19.38 #37
+> > [   25.336974] Hardware name: <...> rev2 board (DT)
+> > [   25.342378] Call trace:
+> > [   25.344844]  dump_backtrace+0x0/0x358
+> > [   25.348521]  show_stack+0x20/0x2c
+> > [   25.351849]  dump_stack+0x130/0x19c
+> > [   25.355353]  print_address_description+0x74/0x250
+> > [   25.360068]  kasan_report+0x27c/0x2a0
+> > [   25.363742]  __asan_report_load8_noabort+0x2c/0x38
+> > [   25.368546]  bfq_idle_slice_timer+0x88/0x1d4
+> > [   25.372829]  __hrtimer_run_queues+0x794/0xa34
+> > [   25.377197]  hrtimer_interrupt+0x278/0x600
+> > [   25.381310]  arch_timer_handler_phys+0x5c/0x6c
+> > [   25.385767]  handle_percpu_devid_irq+0x2e4/0x754
+> > [   25.390399]  __handle_domain_irq+0xd4/0x158
+> > [   25.394593]  gic_handle_irq+0x208/0x260
+> > [   25.398437]  el1_irq+0xb0/0x128
+> > [   25.401591]  arch_cpu_idle+0x20c/0x548
+> > [   25.405352]  do_idle+0x184/0x4dc
+> > [   25.408590]  cpu_startup_entry+0x24/0x28
+> > [   25.412526]  rest_init+0x114/0x148
+> > [   25.415939]  start_kernel+0x4c8/0x5c4
+> > [   25.419605] 
+> > [   25.421105] Allocated by task 1430:
+> > [   25.424606]  kasan_kmalloc+0xe0/0x1ac
+> > [   25.428279]  kasan_slab_alloc+0x14/0x1c
+> > [   25.432127]  kmem_cache_alloc+0x178/0x278
+> > [   25.436149]  bfq_get_queue+0x160/0x650
+> > [   25.439911]  bfq_get_bfqq_handle_split+0xcc/0x2fc
+> > [   25.444627]  bfq_init_rq+0x254/0x18c0
+> > [   25.448301]  bfq_insert_requests+0x5d0/0x1048
+> > [   25.452669]  blk_mq_sched_insert_requests+0x130/0x204
+> > [   25.457734]  blk_mq_flush_plug_list+0x844/0x91c
+> > [   25.462278]  blk_flush_plug_list+0x3e4/0x778
+> > [   25.466559]  blk_finish_plug+0x54/0x78
+> > [   25.470322]  read_pages+0x294/0x2f0
+> > [   25.473824]  __do_page_cache_readahead+0x1a4/0x354
+> > [   25.478628]  filemap_fault+0x8ec/0xbb4
+> > [   25.482389]  ext4_filemap_fault+0x84/0xa4
+> > [   25.486409]  __do_fault+0x128/0x338
+> > [   25.489909]  handle_mm_fault+0x1de0/0x2588
+> > [   25.494017]  do_page_fault+0x464/0x8d8
+> > [   25.497777]  do_translation_fault+0x6c/0x88
+> > [   25.501969]  do_mem_abort+0xd8/0x2d0
+> > [   25.505554]  do_el0_ia_bp_hardening+0x13c/0x1a8
+> > [   25.510094]  el0_ia+0x18/0x1c
+> > [   25.513065] 
+> > [   25.514562] Freed by task 1430:
+> > [   25.517715]  __kasan_slab_free+0x13c/0x21c
+> > [   25.521821]  kasan_slab_free+0x10/0x1c
+> > [   25.525582]  kmem_cache_free+0x7c/0x5f8
+> > [   25.529429]  bfq_put_queue+0x19c/0x2e4
+> > [   25.533191]  bfq_exit_icq_bfqq+0x108/0x228
+> > [   25.537299]  bfq_exit_icq+0x20/0x38
+> > [   25.540798]  ioc_exit_icq+0xe4/0x16c
+> > [   25.544384]  put_io_context_active+0x174/0x234
+> > [   25.548836]  exit_io_context+0x84/0x94
+> > [   25.552599]  do_exit+0x13b4/0x18e4
+> > [   25.556013]  do_group_exit+0x1cc/0x204
+> > [   25.559775]  __wake_up_parent+0x0/0x5c
+> > [   25.563537]  __se_sys_exit_group+0x0/0x24
+> > [   25.567558]  el0_svc_common+0x124/0x1ec
+> > [   25.571407]  el0_svc_compat_handler+0x84/0xb0
+> > [   25.575774]  el0_svc_compat+0x8/0x18
+> > [   25.579351] 
+> > [   25.580854] The buggy address belongs to the object at fffffff089360338
+> > [   25.580854]  which belongs to the cache bfq_queue of size 464
+> > [   25.587350] cros-ec-spi spi2.0: SPI transfer timed out
+> > [   25.593209] The buggy address is located 264 bytes inside of
+> > [   25.593209]  464-byte region [fffffff089360338, fffffff089360508)
+> > [   25.593216] The buggy address belongs to the page:
+> > [   25.593234] page:ffffffbfc224d800 count:1 mapcount:0 mapping:fffffff09916d880 index:0xfffffff089360cc8
+> > [   25.598388] cros-ec-spi spi2.0: spi transfer failed: -110
+> > [   25.610092]  compound_mapcount: 0
+> > [   25.610109] flags: 0x4000000000008100(slab|head)
+> > [   25.610133] raw: 4000000000008100 ffffffbfc14c1908 fffffff0991668a0 fffffff09916d880
+> > [   25.615021] cros-ec-spi spi2.0: Command xfer error (err:-110)
+> > [   25.624225] raw: fffffff089360cc8 000000000014000d 00000001ffffffff 0000000000000000
+> > [   25.624233] page dumped because: kasan: bad access detected
+> > [   25.624237] 
+> > [   25.624243] Memory state around the buggy address:
+> > [   25.624257]  fffffff089360300: fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb fb
+> > [   25.624271]  fffffff089360380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> > [   25.630223] cros-ec-i2c-tunnel 11012000.spi:ec@0:i2c-tunnel: Error transferring EC i2c message -110
+> > [   25.632977] >fffffff089360400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> > [   25.632985]                                            ^
+> > [   25.632997]  fffffff089360480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> > [   25.633010]  fffffff089360500: fb fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> > [   25.633016] ==================================================================
+> > 
+> 
