@@ -2,83 +2,72 @@ Return-Path: <SRS0=bR5W=TJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18405C04AB1
-	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 17:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4528FC04AB1
+	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 19:00:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE40820675
-	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 17:27:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A2C22177B
+	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 19:00:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pP5wTag8"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="g2DLIktk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726682AbfEIR1e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 May 2019 13:27:34 -0400
-Received: from mail-qt1-f176.google.com ([209.85.160.176]:40086 "EHLO
-        mail-qt1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726632AbfEIR1d (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 May 2019 13:27:33 -0400
-Received: by mail-qt1-f176.google.com with SMTP id k24so2681445qtq.7;
-        Thu, 09 May 2019 10:27:33 -0700 (PDT)
+        id S1727147AbfEITAR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 May 2019 15:00:17 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:34318 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728607AbfEISvr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 May 2019 14:51:47 -0400
+Received: by mail-pl1-f193.google.com with SMTP id w7so1583146plz.1
+        for <linux-block@vger.kernel.org>; Thu, 09 May 2019 11:51:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=z1iz9vEs0b7fqPsRaIuhZp4UuJFqEjrvwJvAU/xFaT8=;
-        b=pP5wTag8CufNIUOJvk18Dimi2Xzw5nyCairIxRvmSrPbZrsk0/kEZZwOJH66hqc+h8
-         q2YDSDji3508wVMI7QPuNQC5y1+5LToCoL2BjU21ZBV3A58un/yeE9+qqpbZ099+p3ux
-         uIkqzaWNU5mec9eJuNPnhBQ9rKjG+LrFtJQFDHgQUFnK/7+o0kybQqevAHqi1nnJarat
-         XAmuHA+TVvDfcARXL2+uInzrBbT5s+x+BWp+NxWLxu/j7hQpY2Y4Y5opPpmW1UC+1+cU
-         79LwNOuwaPB83pfOTweqinH8jAsOpTUpYGtenfH0qewBb2n8fhFTYNq7MYa0NB2p6nN0
-         9ODg==
+        bh=O93f2LTd2RzZTjDNtYVogNWJjgQuNQaMHMBdRk2XAMI=;
+        b=g2DLIktkwFYrdi+KqiW8wno2niWEuEz8GfglRim1rE8cbtgGbtBQupL5sebGfvLE7h
+         6b37b+AaGf/1ib6vWx+wG+CB+AePlbXciD4ucibaevAaBC0123+99tsSLap6DrIrrQz2
+         I0r+yOkbqFte6nQ9h8MeZf4NMaCFTzP6OW0YsHtEM2hDAImzEBFrmrOAoLaHtuOEshnS
+         GftadQV0XOARxAk6n18pbZxFFv+qnw1vuu0reNm5T6u1hLL8bFEB8sfeAJ2P6n1QfQur
+         K8SFX9UWr+Cq7i9U/T/O0AO9m3dYJ6QbxLn/1cKSV1S0IjXAMzehxEa1pyHBN2ETdVM4
+         oxYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=z1iz9vEs0b7fqPsRaIuhZp4UuJFqEjrvwJvAU/xFaT8=;
-        b=cdC8I3n6NFQDXrM3NVaXC598QpbDW4JAz3fWOSX1K6C9jSGqM+LyemiIb3Bj0XIAS7
-         r7MXG+cf7ORHZKdfKt1DflJ0LbZ18AlV+H3Z5vmaVNPm0KJ9K07VLeNFzjGAjtEBNqe8
-         rsmJfrtGEy6Rx7AaFndx5X4jMcpVsmIUIZJUOqSzmLVoyyTh9mTxaOcm+Q6RsTjv/zql
-         n+s7KZ5cBKUhHbIjjDRqX3epLI1WLXFVUo/2/ba++y3OHIxqI7ppWLAJVH5TXe+YCntI
-         E4waRkJqH17T5uwQeCB8m6MRoNx/FY41buHboH1L6yRr6PID1APOZk+xVmPPKCd4gTbH
-         1fng==
-X-Gm-Message-State: APjAAAVAJweALvuVAtOaZ7aURnV3nHvk5rAm7/GYRhID0vgpjOdgY1dU
-        Hey3PJhcDZl9l7EJ08wf4Yc=
-X-Google-Smtp-Source: APXvYqyo0qa/exVlpFP2E22le8plC2k2XMdg4g1KzqUal8QPo4Xfjw3Pc2j/ZlvCSRJPF4SwVEW14Q==
-X-Received: by 2002:a0c:b352:: with SMTP id a18mr4665220qvf.139.1557422852376;
-        Thu, 09 May 2019 10:27:32 -0700 (PDT)
-Received: from localhost.localdomain ([163.114.130.128])
-        by smtp.gmail.com with ESMTPSA id f129sm1304174qkj.47.2019.05.09.10.27.31
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 09 May 2019 10:27:31 -0700 (PDT)
-Subject: Re: Testing devices for discard support properly
-To:     Bryan Gurney <bgurney@redhat.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        =?UTF-8?B?THVrw6HFoSBDemVybmVy?= <lczerner@redhat.com>
-References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
- <20190507220449.GP1454@dread.disaster.area>
- <a409b3d1-960b-84a4-1b8d-1822c305ea18@gmail.com>
- <20190508011407.GQ1454@dread.disaster.area>
- <13b63de0-18bc-eb24-63b4-3c69c6a007b3@gmail.com> <yq1a7fwlvzb.fsf@oracle.com>
- <0a16285c-545a-e94a-c733-bcc3d4556557@gmail.com> <yq15zqkluyl.fsf@oracle.com>
- <99144ff8-4f2c-487d-a366-6294f87beb58@gmail.com>
- <CAHhmqcS19DUptiUeQ7q3pPCiZ6QcAXYxQwaX5nQ1FM38trzWtQ@mail.gmail.com>
-From:   Ric Wheeler <ricwheeler@gmail.com>
-Message-ID: <ac188221-5d17-bf30-99f1-6a8d152a2f83@gmail.com>
-Date:   Thu, 9 May 2019 13:27:30 -0400
+        bh=O93f2LTd2RzZTjDNtYVogNWJjgQuNQaMHMBdRk2XAMI=;
+        b=LNwnnA4Dj24RHzKpgQSm9qYwoUx7o6OZYeU0ovHJO6iM1rB4niESWJTQgDXgShJhVY
+         Os8gnkw6xIWjrgaaszjiJeeYZ9CM1gNfSApqMlEM+v8XvdwjvgcuY7Be1AIW7DRtF5RK
+         Ddvm5r0zo4UX8ruMmS1iPa8GI3UgmaZkQacvvE+TBm38twvoOusV+NkkBBkj51Zv5P9Q
+         vHV4fGlQPg3WIJwbFhvHMR3QmwiKWqlOFewAawzZf5uxTkva0z9mE26bJQegErAW+X4w
+         Tg6HoGNui5qMc5r2LI5m0Dl5XdcEINhcP1EBo60o2LhsFb3WiKnsGg1Vm8PzykpKsXox
+         SPcw==
+X-Gm-Message-State: APjAAAUySCulTcgMHBEJDs3xNLB8/vvZfdDDrzimRd9q+vW7G9RiQseH
+        CnPHVakLJ7nC2zWVlfQicWM5AUvWi89jGA==
+X-Google-Smtp-Source: APXvYqywmwB6HuzE2uC+tqtwoAs9ogvKbiqbYzImsjvrazcIA77IW9F+tn9D/Maq9YUEPpx20VSqWg==
+X-Received: by 2002:a17:902:8e8b:: with SMTP id bg11mr7441759plb.281.1557427906548;
+        Thu, 09 May 2019 11:51:46 -0700 (PDT)
+Received: from ?IPv6:2600:380:7612:320a:c991:fbc8:e3a6:409f? ([2600:380:7612:320a:c991:fbc8:e3a6:409f])
+        by smtp.gmail.com with ESMTPSA id r138sm7040292pfr.2.2019.05.09.11.51.44
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 09 May 2019 11:51:45 -0700 (PDT)
+Subject: Re: [PATCH] brd: add cond_resched to brd_free_pages
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     linux-block@vger.kernel.org
+References: <alpine.LRH.2.02.1905091252300.19234@file01.intranet.prod.int.rdu2.redhat.com>
+ <64c82900-aa9b-9093-82cb-30f179eda803@kernel.dk>
+ <alpine.LRH.2.02.1905091448260.6131@file01.intranet.prod.int.rdu2.redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <1578b998-40c4-52de-938f-8ef9e04cbf6d@kernel.dk>
+Date:   Thu, 9 May 2019 12:51:43 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CAHhmqcS19DUptiUeQ7q3pPCiZ6QcAXYxQwaX5nQ1FM38trzWtQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <alpine.LRH.2.02.1905091448260.6131@file01.intranet.prod.int.rdu2.redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -86,54 +75,25 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 5/9/19 12:02 PM, Bryan Gurney wrote:
-> On Wed, May 8, 2019 at 2:12 PM Ric Wheeler <ricwheeler@gmail.com> wrote:
->>
->> (stripped out the html junk, resending)
->>
->> On 5/8/19 1:25 PM, Martin K. Petersen wrote:
->>>>> WRITE SAME also has an ANCHOR flag which provides a use case we
->>>>> currently don't have fallocate plumbing for: Allocating blocks without
->>>>> caring about their contents. I.e. the blocks described by the I/O are
->>>>> locked down to prevent ENOSPC for future writes.
->>>> Thanks for that detail! Sounds like ANCHOR in this case exposes
->>>> whatever data is there (similar I suppose to normal block device
->>>> behavior without discard for unused space)? Seems like it would be
->>>> useful for virtually provisioned devices (enterprise arrays or
->>>> something like dm-thin targets) more than normal SSD's?
->>> It is typically used to pin down important areas to ensure one doesn't
->>> get ENOSPC when writing journal or metadata. However, these are
->>> typically the areas that we deliberately zero to ensure predictable
->>> results. So I think the only case where anchoring makes much sense is on
->>> devices that do zero detection and thus wouldn't actually provision N
->>> blocks full of zeroes.
->>
->> This behavior at the block layer might also be interesting for something
->> like the VDO device (compression/dedup make it near impossible to
->> predict how much space is really there since it is content specific).
->> Might be useful as a way to hint to VDO about how to give users a
->> promise of "at least this much" space? If the content is good for
->> compression or dedup, you would get more, but never see less.
->>
+On 5/9/19 12:50 PM, Mikulas Patocka wrote:
 > 
-> In the case of VDO, writing zeroed blocks will not consume space, due
-> to the zero block elimination in VDO.  However, that also means that
-> it won't "reserve" space, either.  The WRITE SAME command with the
-> ANCHOR flag is SCSI, so it won't apply to a bio-based device.
 > 
-> Space savings also results in a write of N blocks having a fair chance
-> of the end result ultimately using "less than N" blocks, depending on
-> how much space savings can be achieved.  Likewise, a discard of N
-> blocks has a chance of reclaiming "less than N" blocks.
+> On Thu, 9 May 2019, Jens Axboe wrote:
 > 
+>> On 5/9/19 10:54 AM, Mikulas Patocka wrote:
+>>> The loop that frees all the pages can take unbounded amount of time, so
+>>> add cond_resched() to it.
+>>
+>> Looks fine to me, would be nice with a comment on why the cond_resched()
+>> is needed though.
+>>
+>> -- 
+>> Jens Axboe
+> 
+> OK - here I added the comment.
 
-Are there other API's that let you allocate a minimum set of physical 
-blocks to a VDO device?
+Great thanks, applied.
 
-Thanks!
-
-Ric
-
+-- 
+Jens Axboe
 
