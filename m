@@ -2,114 +2,111 @@ Return-Path: <SRS0=bR5W=TJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49384C04AB1
-	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 20:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3035BC04AB1
+	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 20:35:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F2C021744
-	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 20:26:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="JBSSNJBp"
+	by mail.kernel.org (Postfix) with ESMTP id 0CB7E21744
+	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 20:35:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726775AbfEIU0a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 May 2019 16:26:30 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34862 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726710AbfEIU0a (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 May 2019 16:26:30 -0400
-Received: by mail-wr1-f65.google.com with SMTP id w12so4815256wrp.2
-        for <linux-block@vger.kernel.org>; Thu, 09 May 2019 13:26:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amarulasolutions.com; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=ihBJ0/fdU1eA6yYjvazr1eutl37ifhuKRklwOcMnkG4=;
-        b=JBSSNJBpVQGLa6UlUwTKhug32nXe/y/VfWJV5O8/qVYhD6bzhR9ILlMSFrdIUsmbMT
-         18o1C8UyKoh8Fyiz9lTbA48JBLHBD+1SxUxpnc7ZzbLY5WUptPYQaGiZlUeWubgoXBTS
-         Qmd47R7IZjPI0APcYUKvXBXuhBFoRak6OnIig=
+        id S1726858AbfEIUfP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 May 2019 16:35:15 -0400
+Received: from mail-wm1-f45.google.com ([209.85.128.45]:53841 "EHLO
+        mail-wm1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726715AbfEIUfP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 May 2019 16:35:15 -0400
+Received: by mail-wm1-f45.google.com with SMTP id 198so4847013wme.3
+        for <linux-block@vger.kernel.org>; Thu, 09 May 2019 13:35:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ihBJ0/fdU1eA6yYjvazr1eutl37ifhuKRklwOcMnkG4=;
-        b=h1hx6W1v6qu0MkhwjDcFved16p52wWGglOoKFy4Q38yRbJ0NKoO8VI3Lw9BT/UgDoX
-         vQK2Ka4pNOHDygSrWN8GPOCX3BSDPjnlYDryPZYSGCnymGdLfNjSZqW+nqc3qhFIQu7A
-         bErdGNp+huRLHUOOpm5gymVphQ1DSeXlx5a0M82Jx/qlS4ZQ/ar/qLZzASwt58UudpWd
-         Az5AwLKUIjv+KPmn9cv3HJspEkWTt3nZRFiDbPAwxQ7liNnSJbS+mD5mFJgK3iRzW/Pv
-         W+HAzx59M01liTP/bL3qMATkTcWr04QzaaKP14HKkbOpY9Y59ck2mk1ZuncEkfkqEA2h
-         YxKg==
-X-Gm-Message-State: APjAAAWoh1IINDR8JIpIsDrArdi1YVffUaTDOHqFlXBSv2MLiHLbMt2+
-        d8yIbOKKTu/Iu1A3mfiwVYTubA==
-X-Google-Smtp-Source: APXvYqy6uFPw6IdKOJvIDUCpd1ArMz5Sd0jJngShWfRsvJpepaKAdopsDMNvgXF2cU0zWXhohOPxyg==
-X-Received: by 2002:adf:fe49:: with SMTP id m9mr4396113wrs.73.1557433588348;
-        Thu, 09 May 2019 13:26:28 -0700 (PDT)
-Received: from andrea ([91.252.228.170])
-        by smtp.gmail.com with ESMTPSA id n15sm3822470wrp.58.2019.05.09.13.26.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 09 May 2019 13:26:27 -0700 (PDT)
-Date:   Thu, 9 May 2019 22:26:19 +0200
-From:   Andrea Parri <andrea.parri@amarulasolutions.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
-        linux-block@vger.kernel.org,
-        "Paul E. McKenney" <paulmck@linux.ibm.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH 3/5] sbitmap: fix improper use of smp_mb__before_atomic()
-Message-ID: <20190509202619.GA4201@andrea>
-References: <1556568902-12464-1-git-send-email-andrea.parri@amarulasolutions.com>
- <1556568902-12464-4-git-send-email-andrea.parri@amarulasolutions.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1XxNLfsOlS9TWKruUM9gZzOAp9GfMo3RUAmDT1iHWS4=;
+        b=lh7ljratkVDwBjhFWGtfa9XhAZTqMkg7oK2dxNTWwlYQ55pM1y3Z5YAt4jIx19Kvh7
+         JgQMzXbmPgY96CdGkK5hXGEx9fqMqlQSy4i1HYqn2pRhUGglghdQ9jbLAhDHKCRT7rnk
+         0P1XU70ZnKuHKICXaV+4HjWC5TYlKAfP4llEaHBFCpCXwOHiAamUPWu1VqLajMrcTMbp
+         2/1uKyc9FC/Sa0n7SvXywH5lgmfSRgxMksoCciOxwyvp2bvpuIgawCcTrpg9VaoGUlim
+         rudWWcpQ/32OWngTr7rwAPTtC2G57FWedrWLzA3SDc1VUCQUilLjWeOSwUn6PTaHFyTC
+         o/+Q==
+X-Gm-Message-State: APjAAAVzP6/PIlR8bI0RzS2v85SMWQ6kNNdqTN4Sq+0WcmRyXdij3tUu
+        //8OcRmGBHkkt8oe4+CdPlJvVxPBj/Vw39rGAeT8zg==
+X-Google-Smtp-Source: APXvYqxisDimr1yZmuN7y8ZouAhalqPsf8pMGAku+yx3K1IdrQE3B3mZL2GjJZ7/DpbO/cP3oBD8IFDKVHRh609Kx9s=
+X-Received: by 2002:a1c:81cc:: with SMTP id c195mr4241724wmd.61.1557434113690;
+ Thu, 09 May 2019 13:35:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1556568902-12464-4-git-send-email-andrea.parri@amarulasolutions.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
+ <20190507220449.GP1454@dread.disaster.area> <a409b3d1-960b-84a4-1b8d-1822c305ea18@gmail.com>
+ <20190508011407.GQ1454@dread.disaster.area> <13b63de0-18bc-eb24-63b4-3c69c6a007b3@gmail.com>
+ <yq1a7fwlvzb.fsf@oracle.com> <0a16285c-545a-e94a-c733-bcc3d4556557@gmail.com>
+ <yq15zqkluyl.fsf@oracle.com> <99144ff8-4f2c-487d-a366-6294f87beb58@gmail.com>
+ <CAHhmqcS19DUptiUeQ7q3pPCiZ6QcAXYxQwaX5nQ1FM38trzWtQ@mail.gmail.com> <ac188221-5d17-bf30-99f1-6a8d152a2f83@gmail.com>
+In-Reply-To: <ac188221-5d17-bf30-99f1-6a8d152a2f83@gmail.com>
+From:   Bryan Gurney <bgurney@redhat.com>
+Date:   Thu, 9 May 2019 16:35:02 -0400
+Message-ID: <CAHhmqcR2=i8SNtaWsA9KHbFGOi6MPjsc0W7DD6=XmpUOFrK0YA@mail.gmail.com>
+Subject: Re: Testing devices for discard support properly
+To:     Ric Wheeler <ricwheeler@gmail.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        =?UTF-8?B?THVrw6HFoSBDemVybmVy?= <lczerner@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 29, 2019 at 10:14:59PM +0200, Andrea Parri wrote:
-> This barrier only applies to the read-modify-write operations; in
-> particular, it does not apply to the atomic_set() primitive.
-> 
-> Replace the barrier with an smp_mb().
-> 
-> Fixes: 6c0ca7ae292ad ("sbitmap: fix wakeup hang after sbq resize")
-> Cc: stable@vger.kernel.org
-> Reported-by: "Paul E. McKenney" <paulmck@linux.ibm.com>
-> Reported-by: Peter Zijlstra <peterz@infradead.org>
-> Signed-off-by: Andrea Parri <andrea.parri@amarulasolutions.com>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Omar Sandoval <osandov@fb.com>
-> Cc: linux-block@vger.kernel.org
+On Thu, May 9, 2019 at 1:27 PM Ric Wheeler <ricwheeler@gmail.com> wrote:
+>
+>
+>
+> On 5/9/19 12:02 PM, Bryan Gurney wrote:
+> > On Wed, May 8, 2019 at 2:12 PM Ric Wheeler <ricwheeler@gmail.com> wrote:
+> >>
+> >> (stripped out the html junk, resending)
+> >>
+> >> On 5/8/19 1:25 PM, Martin K. Petersen wrote:
+> >>>>> WRITE SAME also has an ANCHOR flag which provides a use case we
+> >>>>> currently don't have fallocate plumbing for: Allocating blocks without
+> >>>>> caring about their contents. I.e. the blocks described by the I/O are
+> >>>>> locked down to prevent ENOSPC for future writes.
+> >>>> Thanks for that detail! Sounds like ANCHOR in this case exposes
+> >>>> whatever data is there (similar I suppose to normal block device
+> >>>> behavior without discard for unused space)? Seems like it would be
+> >>>> useful for virtually provisioned devices (enterprise arrays or
+> >>>> something like dm-thin targets) more than normal SSD's?
+> >>> It is typically used to pin down important areas to ensure one doesn't
+> >>> get ENOSPC when writing journal or metadata. However, these are
+> >>> typically the areas that we deliberately zero to ensure predictable
+> >>> results. So I think the only case where anchoring makes much sense is on
+> >>> devices that do zero detection and thus wouldn't actually provision N
+> >>> blocks full of zeroes.
+> >>
+> >> This behavior at the block layer might also be interesting for something
+> >> like the VDO device (compression/dedup make it near impossible to
+> >> predict how much space is really there since it is content specific).
+> >> Might be useful as a way to hint to VDO about how to give users a
+> >> promise of "at least this much" space? If the content is good for
+> >> compression or dedup, you would get more, but never see less.
+> >>
+> >
+> > In the case of VDO, writing zeroed blocks will not consume space, due
+> > to the zero block elimination in VDO.  However, that also means that
+> > it won't "reserve" space, either.  The WRITE SAME command with the
+> > ANCHOR flag is SCSI, so it won't apply to a bio-based device.
+> >
+> > Space savings also results in a write of N blocks having a fair chance
+> > of the end result ultimately using "less than N" blocks, depending on
+> > how much space savings can be achieved.  Likewise, a discard of N
+> > blocks has a chance of reclaiming "less than N" blocks.
+> >
+>
+> Are there other API's that let you allocate a minimum set of physical
+> blocks to a VDO device?
+>
 
-Jens, Omar: any suggestions to move this patch forward?
-
-Thanx,
-  Andrea
-
-
-> ---
->  lib/sbitmap.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index 155fe38756ecf..4a7fc4915dfc6 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -435,7 +435,7 @@ static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
->  		 * to ensure that the batch size is updated before the wait
->  		 * counts.
->  		 */
-> -		smp_mb__before_atomic();
-> +		smp_mb();
->  		for (i = 0; i < SBQ_WAIT_QUEUES; i++)
->  			atomic_set(&sbq->ws[i].wait_cnt, 1);
->  	}
-> -- 
-> 2.7.4
-> 
+As far as I know: no, not currently.
