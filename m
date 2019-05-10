@@ -2,69 +2,132 @@ Return-Path: <SRS0=2qaK=TK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E38DC04A6B
-	for <linux-block@archiver.kernel.org>; Fri, 10 May 2019 17:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A7EC04A6B
+	for <linux-block@archiver.kernel.org>; Fri, 10 May 2019 18:03:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38BAD2084E
-	for <linux-block@archiver.kernel.org>; Fri, 10 May 2019 17:02:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hU+E15uc"
+	by mail.kernel.org (Postfix) with ESMTP id 46AFD2175B
+	for <linux-block@archiver.kernel.org>; Fri, 10 May 2019 18:03:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727820AbfEJRCv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 May 2019 13:02:51 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:56950 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727796AbfEJRCu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 May 2019 13:02:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=IziTW291S7TLrX5c1nQ0BR6rD/rA9YRqzUixUHiWrsw=; b=hU+E15ucag7QN44PBHizLVV+U
-        YXBduJaryBgxzFbdCxi9XhgPyJRVvEzVMQ/L5/jwaE4UEAkz6dSTizK6H0XZ9BbixaAny2raeA0PM
-        GZYiMpAozs0jHE1ySlNQIY5IG9iXJwSy9pKxHAJt+HnwZLcQMvSbogXQfrPr9LJSsj1ZSbpCzIhUU
-        yXlcyUMdz1fK5kA9fkEB2DIbEofpBepyZE1ld9ii5xkEKJ4mzvbRujLu74uneoNe0SJGdG4GRhCpX
-        Mr0/e16oFwaTFLjYwBe4LBu+3c2VCErCTZxx3WbSij1Vo7+HWzZaAT7zHUz0EXtqOOb47KJ2SrKwB
-        7t+EeHnRw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hP8v3-00075G-R8; Fri, 10 May 2019 17:02:49 +0000
-Date:   Fri, 10 May 2019 10:02:49 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, prakash.v@samsung.com,
-        anshul@samsung.com
-Subject: Re: [PATCH v5 0/7] Extend write-hint framework, and add write-hint
- for Ext4 journal
-Message-ID: <20190510170249.GA26907@infradead.org>
-References: <CGME20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61@epcas2p1.samsung.com>
- <1556191202-3245-1-git-send-email-joshi.k@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1556191202-3245-1-git-send-email-joshi.k@samsung.com>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+        id S1727959AbfEJSDX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 May 2019 14:03:23 -0400
+Received: from mx.ewheeler.net ([66.155.3.69]:53094 "EHLO mx.ewheeler.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727709AbfEJSDX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 May 2019 14:03:23 -0400
+X-Greylist: delayed 389 seconds by postgrey-1.27 at vger.kernel.org; Fri, 10 May 2019 14:03:22 EDT
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id 6279AA0692;
+        Fri, 10 May 2019 17:56:53 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id KZQof3t99O87; Fri, 10 May 2019 17:56:52 +0000 (UTC)
+Received: from el7-dev.ewi (unknown [209.180.175.76])
+        (using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx.ewheeler.net (Postfix) with ESMTPSA id 359B3A067D;
+        Fri, 10 May 2019 17:56:52 +0000 (UTC)
+From:   Eric Wheeler <stable@lists.ewheeler.net>
+To:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org (open list:BFQ I/O SCHEDULER),
+        linux-kernel@vger.kernel.org (open list)
+Cc:     Eric Wheeler <bfq@linux.ewheeler.net>, stable@vger.kernel.org
+Subject: [PATCH] bfq: backport: update internal depth state when queue depth changes
+Date:   Fri, 10 May 2019 10:56:32 -0700
+Message-Id: <1557510992-18506-1-git-send-email-stable@lists.ewheeler.net>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I think this fundamentally goes in the wrong direction.  We explicitly
-designed the block layer infrastructure around life time hints and
-not the not fish not flesh streams interface, which causes all kinds
-of problems.
+From: Jens Axboe <axboe@kernel.dk>
 
-Including the one this model causes on at least some SSDs where you
-now statically allocate resources to a stream that is now not globally
-available.  All for the little log with very short date lifetime that
-any half decent hot/cold partitioning algorithm in the SSD should be
-able to detect.
+commit 77f1e0a52d26242b6c2dba019f6ebebfb9ff701e upstream
+
+A previous commit moved the shallow depth and BFQ depth map calculations
+to be done at init time, moving it outside of the hotter IO path. This
+potentially causes hangs if the users changes the depth of the scheduler
+map, by writing to the 'nr_requests' sysfs file for that device.
+
+Add a blk-mq-sched hook that allows blk-mq to inform the scheduler if
+the depth changes, so that the scheduler can update its internal state.
+
+Signed-off-by: Eric Wheeler <bfq@linux.ewheeler.net>
+Tested-by: Kai Krakow <kai@kaishome.de>
+Reported-by: Paolo Valente <paolo.valente@linaro.org>
+Fixes: f0635b8a416e ("bfq: calculate shallow depths at init time")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Cc: stable@vger.kernel.org
+---
+ block/bfq-iosched.c      | 8 +++++++-
+ block/blk-mq.c           | 2 ++
+ include/linux/elevator.h | 1 +
+ 3 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 653100f..0f7cdbc 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5223,7 +5223,7 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+ 	return min_shallow;
+ }
+ 
+-static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
++static void bfq_depth_updated(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+ 	struct blk_mq_tags *tags = hctx->sched_tags;
+@@ -5231,6 +5231,11 @@ static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
+ 
+ 	min_shallow = bfq_update_depths(bfqd, &tags->bitmap_tags);
+ 	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, min_shallow);
++}
++
++static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
++{
++	bfq_depth_updated(hctx);
+ 	return 0;
+ }
+ 
+@@ -5653,6 +5658,7 @@ static ssize_t bfq_low_latency_store(struct elevator_queue *e,
+ 		.requests_merged	= bfq_requests_merged,
+ 		.request_merged		= bfq_request_merged,
+ 		.has_work		= bfq_has_work,
++		.depth_updated		= bfq_depth_updated,
+ 		.init_hctx		= bfq_init_hctx,
+ 		.init_sched		= bfq_init_queue,
+ 		.exit_sched		= bfq_exit_queue,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e3c39ea..7a57368 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2878,6 +2878,8 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 		}
+ 		if (ret)
+ 			break;
++		if (q->elevator && q->elevator->type->ops.mq.depth_updated)
++			q->elevator->type->ops.mq.depth_updated(hctx);
+ 	}
+ 
+ 	if (!ret)
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index a02deea..a2bf4a6 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -99,6 +99,7 @@ struct elevator_mq_ops {
+ 	void (*exit_sched)(struct elevator_queue *);
+ 	int (*init_hctx)(struct blk_mq_hw_ctx *, unsigned int);
+ 	void (*exit_hctx)(struct blk_mq_hw_ctx *, unsigned int);
++	void (*depth_updated)(struct blk_mq_hw_ctx *);
+ 
+ 	bool (*allow_merge)(struct request_queue *, struct request *, struct bio *);
+ 	bool (*bio_merge)(struct blk_mq_hw_ctx *, struct bio *);
+-- 
+1.8.3.1
+
