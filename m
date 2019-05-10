@@ -1,112 +1,89 @@
-Return-Path: <SRS0=bR5W=TJ=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=2qaK=TK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3035BC04AB1
-	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 20:35:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EDB5C04AB3
+	for <linux-block@archiver.kernel.org>; Fri, 10 May 2019 03:40:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0CB7E21744
-	for <linux-block@archiver.kernel.org>; Thu,  9 May 2019 20:35:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F072A2184C
+	for <linux-block@archiver.kernel.org>; Fri, 10 May 2019 03:40:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726858AbfEIUfP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 May 2019 16:35:15 -0400
-Received: from mail-wm1-f45.google.com ([209.85.128.45]:53841 "EHLO
-        mail-wm1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726715AbfEIUfP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 May 2019 16:35:15 -0400
-Received: by mail-wm1-f45.google.com with SMTP id 198so4847013wme.3
-        for <linux-block@vger.kernel.org>; Thu, 09 May 2019 13:35:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1XxNLfsOlS9TWKruUM9gZzOAp9GfMo3RUAmDT1iHWS4=;
-        b=lh7ljratkVDwBjhFWGtfa9XhAZTqMkg7oK2dxNTWwlYQ55pM1y3Z5YAt4jIx19Kvh7
-         JgQMzXbmPgY96CdGkK5hXGEx9fqMqlQSy4i1HYqn2pRhUGglghdQ9jbLAhDHKCRT7rnk
-         0P1XU70ZnKuHKICXaV+4HjWC5TYlKAfP4llEaHBFCpCXwOHiAamUPWu1VqLajMrcTMbp
-         2/1uKyc9FC/Sa0n7SvXywH5lgmfSRgxMksoCciOxwyvp2bvpuIgawCcTrpg9VaoGUlim
-         rudWWcpQ/32OWngTr7rwAPTtC2G57FWedrWLzA3SDc1VUCQUilLjWeOSwUn6PTaHFyTC
-         o/+Q==
-X-Gm-Message-State: APjAAAVzP6/PIlR8bI0RzS2v85SMWQ6kNNdqTN4Sq+0WcmRyXdij3tUu
-        //8OcRmGBHkkt8oe4+CdPlJvVxPBj/Vw39rGAeT8zg==
-X-Google-Smtp-Source: APXvYqxisDimr1yZmuN7y8ZouAhalqPsf8pMGAku+yx3K1IdrQE3B3mZL2GjJZ7/DpbO/cP3oBD8IFDKVHRh609Kx9s=
-X-Received: by 2002:a1c:81cc:: with SMTP id c195mr4241724wmd.61.1557434113690;
- Thu, 09 May 2019 13:35:13 -0700 (PDT)
+        id S1726907AbfEJDkO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 May 2019 23:40:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34044 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726882AbfEJDkN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 May 2019 23:40:13 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D6E863004156;
+        Fri, 10 May 2019 03:40:13 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C05621001E74;
+        Fri, 10 May 2019 03:40:06 +0000 (UTC)
+Date:   Fri, 10 May 2019 11:40:02 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Andrea Parri <andrea.parri@amarulasolutions.com>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/5] bio: fix improper use of smp_mb__before_atomic()
+Message-ID: <20190510034001.GB27944@ming.t460p>
+References: <1556568902-12464-1-git-send-email-andrea.parri@amarulasolutions.com>
+ <1556568902-12464-3-git-send-email-andrea.parri@amarulasolutions.com>
 MIME-Version: 1.0
-References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
- <20190507220449.GP1454@dread.disaster.area> <a409b3d1-960b-84a4-1b8d-1822c305ea18@gmail.com>
- <20190508011407.GQ1454@dread.disaster.area> <13b63de0-18bc-eb24-63b4-3c69c6a007b3@gmail.com>
- <yq1a7fwlvzb.fsf@oracle.com> <0a16285c-545a-e94a-c733-bcc3d4556557@gmail.com>
- <yq15zqkluyl.fsf@oracle.com> <99144ff8-4f2c-487d-a366-6294f87beb58@gmail.com>
- <CAHhmqcS19DUptiUeQ7q3pPCiZ6QcAXYxQwaX5nQ1FM38trzWtQ@mail.gmail.com> <ac188221-5d17-bf30-99f1-6a8d152a2f83@gmail.com>
-In-Reply-To: <ac188221-5d17-bf30-99f1-6a8d152a2f83@gmail.com>
-From:   Bryan Gurney <bgurney@redhat.com>
-Date:   Thu, 9 May 2019 16:35:02 -0400
-Message-ID: <CAHhmqcR2=i8SNtaWsA9KHbFGOi6MPjsc0W7DD6=XmpUOFrK0YA@mail.gmail.com>
-Subject: Re: Testing devices for discard support properly
-To:     Ric Wheeler <ricwheeler@gmail.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        =?UTF-8?B?THVrw6HFoSBDemVybmVy?= <lczerner@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1556568902-12464-3-git-send-email-andrea.parri@amarulasolutions.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Fri, 10 May 2019 03:40:13 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 9, 2019 at 1:27 PM Ric Wheeler <ricwheeler@gmail.com> wrote:
->
->
->
-> On 5/9/19 12:02 PM, Bryan Gurney wrote:
-> > On Wed, May 8, 2019 at 2:12 PM Ric Wheeler <ricwheeler@gmail.com> wrote:
-> >>
-> >> (stripped out the html junk, resending)
-> >>
-> >> On 5/8/19 1:25 PM, Martin K. Petersen wrote:
-> >>>>> WRITE SAME also has an ANCHOR flag which provides a use case we
-> >>>>> currently don't have fallocate plumbing for: Allocating blocks without
-> >>>>> caring about their contents. I.e. the blocks described by the I/O are
-> >>>>> locked down to prevent ENOSPC for future writes.
-> >>>> Thanks for that detail! Sounds like ANCHOR in this case exposes
-> >>>> whatever data is there (similar I suppose to normal block device
-> >>>> behavior without discard for unused space)? Seems like it would be
-> >>>> useful for virtually provisioned devices (enterprise arrays or
-> >>>> something like dm-thin targets) more than normal SSD's?
-> >>> It is typically used to pin down important areas to ensure one doesn't
-> >>> get ENOSPC when writing journal or metadata. However, these are
-> >>> typically the areas that we deliberately zero to ensure predictable
-> >>> results. So I think the only case where anchoring makes much sense is on
-> >>> devices that do zero detection and thus wouldn't actually provision N
-> >>> blocks full of zeroes.
-> >>
-> >> This behavior at the block layer might also be interesting for something
-> >> like the VDO device (compression/dedup make it near impossible to
-> >> predict how much space is really there since it is content specific).
-> >> Might be useful as a way to hint to VDO about how to give users a
-> >> promise of "at least this much" space? If the content is good for
-> >> compression or dedup, you would get more, but never see less.
-> >>
-> >
-> > In the case of VDO, writing zeroed blocks will not consume space, due
-> > to the zero block elimination in VDO.  However, that also means that
-> > it won't "reserve" space, either.  The WRITE SAME command with the
-> > ANCHOR flag is SCSI, so it won't apply to a bio-based device.
-> >
-> > Space savings also results in a write of N blocks having a fair chance
-> > of the end result ultimately using "less than N" blocks, depending on
-> > how much space savings can be achieved.  Likewise, a discard of N
-> > blocks has a chance of reclaiming "less than N" blocks.
-> >
->
-> Are there other API's that let you allocate a minimum set of physical
-> blocks to a VDO device?
->
+On Mon, Apr 29, 2019 at 10:14:58PM +0200, Andrea Parri wrote:
+> This barrier only applies to the read-modify-write operations; in
+> particular, it does not apply to the atomic_set() primitive.
+> 
+> Replace the barrier with an smp_mb().
+> 
+> Fixes: dac56212e8127 ("bio: skip atomic inc/dec of ->bi_cnt for most use cases")
+> Cc: stable@vger.kernel.org
+> Reported-by: "Paul E. McKenney" <paulmck@linux.ibm.com>
+> Reported-by: Peter Zijlstra <peterz@infradead.org>
+> Signed-off-by: Andrea Parri <andrea.parri@amarulasolutions.com>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: linux-block@vger.kernel.org
+> ---
+>  include/linux/bio.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index e584673c18814..5becbafb84e8a 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -224,7 +224,7 @@ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
+>  {
+>  	if (count != 1) {
+>  		bio->bi_flags |= (1 << BIO_REFFED);
+> -		smp_mb__before_atomic();
+> +		smp_mb();
+>  	}
+>  	atomic_set(&bio->__bi_cnt, count);
+>  }
+> -- 
+> 2.7.4
+> 
 
-As far as I know: no, not currently.
+Looks fine,
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming
