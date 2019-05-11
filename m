@@ -2,117 +2,121 @@ Return-Path: <SRS0=UHms=TL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.4 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDB6DC04AB1
-	for <linux-block@archiver.kernel.org>; Sat, 11 May 2019 15:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42BEC04AB1
+	for <linux-block@archiver.kernel.org>; Sat, 11 May 2019 16:26:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B7F892184B
-	for <linux-block@archiver.kernel.org>; Sat, 11 May 2019 15:37:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D36B20989
+	for <linux-block@archiver.kernel.org>; Sat, 11 May 2019 16:26:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=stbuehler.de header.i=@stbuehler.de header.b="ZjuYN/44"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728604AbfEKPhG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 May 2019 11:37:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58386 "EHLO mx1.redhat.com"
+        id S1726783AbfEKQ06 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 May 2019 12:26:58 -0400
+Received: from mail.stbuehler.de ([5.9.32.208]:52820 "EHLO mail.stbuehler.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728599AbfEKPhG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 May 2019 11:37:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A64424E92B;
-        Sat, 11 May 2019 15:37:06 +0000 (UTC)
-Received: from localhost.redhat.com (ovpn-12-30.pek2.redhat.com [10.72.12.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2871F67C99;
-        Sat, 11 May 2019 15:37:04 +0000 (UTC)
-From:   Xiao Liang <xiliang@redhat.com>
-To:     linux-block@vger.kernel.org, osandov@fb.com
-Cc:     xiliang@redhat.com
-Subject: [PATCH blktests v2] block/005,008: do exit if fio did not finish within timeout
-Date:   Sat, 11 May 2019 23:36:51 +0800
-Message-Id: <20190511153651.4119-1-xiliang@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Sat, 11 May 2019 15:37:06 +0000 (UTC)
+        id S1726482AbfEKQ06 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 11 May 2019 12:26:58 -0400
+Received: from [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6] (unknown [IPv6:2a02:8070:a29c:5000:823f:5dff:fe0f:b5b6])
+        by mail.stbuehler.de (Postfix) with ESMTPSA id 6A55DC02FF2;
+        Sat, 11 May 2019 16:26:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=stbuehler.de;
+        s=stbuehler1; t=1557592014;
+        bh=/2ZxlW7aDDfy0xvGK0ueGLfxt5kcabacHzvoULV0rjU=;
+        h=Subject:From:To:References:Date:In-Reply-To:From;
+        b=ZjuYN/44wkI+Hle09CQImdeO9pDg3bKjvNke1007vdYO3czOgacv7FpErC+6DvkM2
+         WZDCxaJ+ouQsZfFBSOAcZx/B2mi8bnHA9N4KjzieIowxo3VUJj24QcB6UqJcVq4ZSR
+         RvCz+WT57JR2ewnMfm6r9ACQ5Y0bKbIGyXAECiqA=
+Subject: Re: io_uring: closing / release
+From:   =?UTF-8?Q?Stefan_B=c3=bchler?= <source@stbuehler.de>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <366484f9-cc5b-e477-6cc5-6c65f21afdcb@stbuehler.de>
+ <37071226-375a-07a6-d3d3-21323145de71@kernel.dk>
+ <87f76da1-5525-086e-7a9c-3bdb2ad12188@stbuehler.de>
+Openpgp: preference=signencrypt
+Message-ID: <e57a384b-fa46-7caa-3800-bcc9bc6ced90@stbuehler.de>
+Date:   Sat, 11 May 2019 18:26:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <87f76da1-5525-086e-7a9c-3bdb2ad12188@stbuehler.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In some bad situation, fio needs taking over several hours to complete
-random read operations with specified size. The test may skip out in such
-cases and does not block other cases run.
+Hi,
 
-With this patch, the case will be ended within $TIMEOUT(if set) or 900s.
-block/005 => nvme1n1 (switch schedulers while doing IO)      [failed]
-    runtime      ...  1800.477s
-    read iops    ...
-    --- tests/block/005.out	2019-03-31 14:29:39.905449312 +0000
-    +++ /home/ec2-user/blktests/results/nvme1n1/block/005.out.bad	2019-05-07 04:10:16.026681842 +0000
-    @@ -1,2 +1,4 @@
-     Running block/005
-    +fio did not finish after 900 seconds which probably caused by
-    +lower disk performance
-     Test complete
+On 27.04.19 23:07, Stefan Bühler wrote:
+> Hi,
+> 
+> On 23.04.19 22:31, Jens Axboe wrote:
+>> On 4/23/19 1:06 PM, Stefan Bühler wrote:
+>>> I have one other question: is there any way to cancel an IO read/write
+>>> operation? I don't think closing io_uring has any effect, what about
+>>> closing the files I'm reading/writing?  (Adding cancelation to kiocb
+>>> sounds like a non-trivial task; and I don't think it already supports it.)
+>>
+>> There is no way to do that. If you look at existing aio, nobody supports
+>> that either. Hence io_uring doesn't export any sort of cancellation outside
+>> of the poll case where we can handle it internally to io_uring.
+>>
+>> If you look at storage, then generally IO doesn't wait around in the stack,
+>> it's issued. Most hardware only supports queue abort like cancellation,
+>> which isn't useful at all.
+>>
+>> So I don't think that will ever happen.
+>>
+>>> So cleanup in general seems hard to me: do I have to wait for all
+>>> read/write operations to complete so I can safely free all buffers
+>>> before I close the event loop?
+>>
+>> The ring exit waits for IO to complete already.
+> 
+> I now understand at least how that part is working;
+> io_ring_ctx_wait_and_kill calls wait_for_completion(&ctx->ctx_done),
+> which only completes after all references are gone; each pending job
+> keeps a reference.
+> 
+> But wait_for_completion is not interruptible; so if there are "stuck"
+> jobs even root can't kill the task (afaict) anymore.
+> 
+> Once e.g. readv is working on pipes/sockets (I have some local patches
+> here for that), you can easily end up in a situation where a
+> socketpair() or a pipe() is still alive, but the read will never finish
+> (I can trigger this problem with an explicit close(uring_fd), not sure
+> how to observe this on process exit).
+> 
+> For a socketpair() even both ends could be kept alive by never ending
+> read jobs.
+> 
+> Using wait_for_completion seems like a really bad idea to me; this is a
+> problem for io_uring_register too.
 
-Reviewed-by: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Signed-off-by: Xiao Liang <xiliang@redhat.com>
----
- tests/block/005 | 9 +++++++++
- tests/block/008 | 9 +++++++++
- 2 files changed, 18 insertions(+)
+As far as I know this is not a problem yet in 5.1 as reads on pipes and
+sockets are still blocking the submission, and SQPOLL is only for
+CAP_SYS_ADMIN.
 
-diff --git a/tests/block/005 b/tests/block/005
-index 8ab6791..de8ddaf 100755
---- a/tests/block/005
-+++ b/tests/block/005
-@@ -31,10 +31,19 @@ test_device() {
- 	_run_fio_rand_io --filename="$TEST_DEV" --size="$size" &
- 
- 	# while job is running, switch between schedulers
-+	# fio test may take too long time to complete read/write in special size in some bad 
-+	# situations. Set a timeout here which does not block overall test.
-+	start_time=$(date +%s)
-+	timeout=${TIMEOUT:=900}
- 	while kill -0 $! 2>/dev/null; do
- 		idx=$((RANDOM % ${#scheds[@]}))
- 		_test_dev_queue_set scheduler "${scheds[$idx]}"
- 		sleep .2
-+		end_time=$(date +%s)
-+		if (( end_time - start_time > timeout )); then
-+			echo "fio did not finish after $timeout seconds!"
-+			break
-+		fi
- 	done
- 
- 	FIO_PERF_FIELDS=("read iops")
-diff --git a/tests/block/008 b/tests/block/008
-index 4a88056..d215136 100755
---- a/tests/block/008
-+++ b/tests/block/008
-@@ -45,6 +45,10 @@ test_device() {
- 	done
- 
- 	# while job is running, hotplug CPUs
-+	# fio test may take too long time to complete read/write in special size in some bad 
-+	# situations. Set a timeout here which does not block overall test.
-+	start_time=$(date +%s)
-+	timeout=${TIMEOUT:=900}
- 	while sleep .2; kill -0 $! 2> /dev/null; do
- 		if (( offlining && ${#offline_cpus[@]} == max_offline )); then
- 			offlining=0
-@@ -65,6 +69,11 @@ test_device() {
- 			unset offline_cpus["$idx"]
- 			offline_cpus=("${offline_cpus[@]}")
- 		fi
-+		end_time=$(date +%s)
-+		if (( end_time - start_time > timeout )); then
-+			echo "fio did not finish after $timeout seconds!"
-+			break
-+		fi
- 	done
- 
- 	FIO_PERF_FIELDS=("read iops")
--- 
-2.17.2
+But once my "punt to workers if file doesn't support async" patch (or
+something similar) goes in, this will become a real problem.
 
+My current trigger looks like this: create socketpair(), submit read
+from both ends (using the same iovec... who cares), wait for the workers
+to pick up the reads, munmap everything and exit.
+
+The kernel will then cleanup the files: but the sockets are still in use
+by io_uring, and it will only close the io_uring context, which will
+then get stuck in io_ring_ctx_wait_and_kill.
+
+In my qemu test environment "nobody" can leak 16 contexts before hitting
+some resource limits.
+
+cheers,
+Stefan
