@@ -2,82 +2,139 @@ Return-Path: <SRS0=TF98=TN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35611C04AA7
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 16:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D11CC04AA7
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 18:20:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07C84208CA
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 16:55:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cbVunv1N"
+	by mail.kernel.org (Postfix) with ESMTP id E0ACF2085A
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 18:20:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730679AbfEMQzU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 May 2019 12:55:20 -0400
-Received: from mail-pl1-f177.google.com ([209.85.214.177]:35443 "EHLO
-        mail-pl1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727774AbfEMQzT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 May 2019 12:55:19 -0400
-Received: by mail-pl1-f177.google.com with SMTP id g5so6772696plt.2
-        for <linux-block@vger.kernel.org>; Mon, 13 May 2019 09:55:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=w1WPg5IFBg1nbfNIGkaz5hGNB1drBDudctIx7vYPDlM=;
-        b=cbVunv1NJle9cSlyULwQtLo3ZHSvrrOHtSDxbHTWhlNyd+7b3zpYgTh0Oj4BZYnVo0
-         /m2VoHQJbyRFszGrOJ+Wzrham1q5Nmx68U19BnES5Vg2ygOrsVCjWcRwamIugviygTng
-         zxnlxgMfr41GuyVaZ4lPZkZNLe6ZuJqC779gyIJXvsh885nzpDmw8JQUgg7A+3hiNMhe
-         mBPBhZkccpGQKT6ePk4rBYdH2EE5SsHUmfT7cfr10kBxgohd1SIq7RxORVQhCvl7Uz+W
-         9gClUddLmqR+wx7SSvzcbUrHI0SuyM8Q29P5Jyss6d+YbVzJ+assIHyGdX44Lsjys4tL
-         nv9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=w1WPg5IFBg1nbfNIGkaz5hGNB1drBDudctIx7vYPDlM=;
-        b=XjYJ4tv1rnP30DotY8Zuxls5gaWmwkDGjUy0KYlHjBOZDHZH9OIzDs0IIvGehr//GM
-         6HswdX5j6UFv8zBLAFdinIXsCIng2nH2KaKovtYUGMKLeVKFWiLy5qfTX7flz6q5kZHU
-         T7mURYcQYeSodWhTkwxsdGl1zOMMvOtNDo3dkUqH4wvlStys0fsV8RGqy5Wp2HxxFCT6
-         mYBYkVA0NCITiYRgW00O46VTSW0iKCatHEB/FmXMvHbuzOVjCzBsE9RDRfQD4s+zDlMP
-         4ppZ5fQfNpytUOOYx1Xc1J/QhUobW0MM9xtOlDl+SnoodLTfm8hIy8rRkcpW3HV9rU8Y
-         1wsQ==
-X-Gm-Message-State: APjAAAVtuEnbT9GksM9Wj6DwrvuFO0pgBbqJD8fk0PcMzK4+i1qGvPqk
-        yPptP0L4rxSefIY0XQ6jzdoQXarVtZQ=
-X-Google-Smtp-Source: APXvYqxwJCuaPhlw5qE3PcdsXxNYSwr640B7X8t0WF++WMZ25A02xrO89fkEtwRavTsGpPhni37d6g==
-X-Received: by 2002:a17:902:2beb:: with SMTP id l98mr30159498plb.290.1557766518629;
-        Mon, 13 May 2019 09:55:18 -0700 (PDT)
-Received: from localhost ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id j12sm17130740pff.148.2019.05.13.09.55.17
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 13 May 2019 09:55:17 -0700 (PDT)
-Date:   Tue, 14 May 2019 01:55:15 +0900
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] block: Move tag field position in struct request
-Message-ID: <20190513165514.GA7792@minwooim-desktop>
-References: <20190428074803.19484-1-minwoo.im.dev@gmail.com>
+        id S1726465AbfEMSUl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 May 2019 14:20:41 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49986 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726409AbfEMSUl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 May 2019 14:20:41 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 56AC2AD85;
+        Mon, 13 May 2019 18:20:39 +0000 (UTC)
+From:   Roman Penyaev <rpenyaev@suse.de>
+Cc:     Roman Penyaev <rpenyaev@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: [PATCH 1/1] io_uring: fix infinite wait in khread_park() on io_finish_async()
+Date:   Mon, 13 May 2019 20:20:28 +0200
+Message-Id: <20190513182028.29912-1-rpenyaev@suse.de>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190428074803.19484-1-minwoo.im.dev@gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19-04-28 16:48:03, Minwoo Im wrote:
-> __data_len and __sector are internal fields which should not be accessed
-> directly in driver-level like the comment above it. But, tag field can
-> be accessed by driver level directly so that we need to make the comment
-> right by moving it to some other place.
-> 
-> Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
+This fixes couple of races which lead to infinite wait of park completion
+with the following backtraces:
 
-Ping here :)
+  [20801.303319] Call Trace:
+  [20801.303321]  ? __schedule+0x284/0x650
+  [20801.303323]  schedule+0x33/0xc0
+  [20801.303324]  schedule_timeout+0x1bc/0x210
+  [20801.303326]  ? schedule+0x3d/0xc0
+  [20801.303327]  ? schedule_timeout+0x1bc/0x210
+  [20801.303329]  ? preempt_count_add+0x79/0xb0
+  [20801.303330]  wait_for_completion+0xa5/0x120
+  [20801.303331]  ? wake_up_q+0x70/0x70
+  [20801.303333]  kthread_park+0x48/0x80
+  [20801.303335]  io_finish_async+0x2c/0x70
+  [20801.303336]  io_ring_ctx_wait_and_kill+0x95/0x180
+  [20801.303338]  io_uring_release+0x1c/0x20
+  [20801.303339]  __fput+0xad/0x210
+  [20801.303341]  task_work_run+0x8f/0xb0
+  [20801.303342]  exit_to_usermode_loop+0xa0/0xb0
+  [20801.303343]  do_syscall_64+0xe0/0x100
+  [20801.303349]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+  [20801.303380] Call Trace:
+  [20801.303383]  ? __schedule+0x284/0x650
+  [20801.303384]  schedule+0x33/0xc0
+  [20801.303386]  io_sq_thread+0x38a/0x410
+  [20801.303388]  ? __switch_to_asm+0x40/0x70
+  [20801.303390]  ? wait_woken+0x80/0x80
+  [20801.303392]  ? _raw_spin_lock_irqsave+0x17/0x40
+  [20801.303394]  ? io_submit_sqes+0x120/0x120
+  [20801.303395]  kthread+0x112/0x130
+  [20801.303396]  ? kthread_create_on_node+0x60/0x60
+  [20801.303398]  ret_from_fork+0x35/0x40
+
+ o kthread_park() waits for park completion, so io_sq_thread() loop
+   should check kthread_should_park() along with khread_should_stop(),
+   otherwise if kthread_park() is called before prepare_to_wait()
+   the following schedule() never returns.
+
+ o if the flag ctx->sqo_stop is observed by the io_sq_thread() loop
+   it is quite possible, that kthread_should_park() check and the
+   following kthread_parkme() is never called, because kthread_park()
+   has not been yet called, but few moments later is is called and
+   waits there for park completion, which never happens, because
+   kthread has already exited.
+
+It seems that parking here is not needed at all (thread is parked and
+then stopped and never unparked), so here in this patch I simply rely
+on kthread_should_stop() check and then exit the thread.
+
+Signed-off-by: Roman Penyaev <rpenyaev@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+---
+ fs/io_uring.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 452e35357865..449c652bb334 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -231,7 +231,6 @@ struct io_ring_ctx {
+ 	struct task_struct	*sqo_thread;	/* if using sq thread polling */
+ 	struct mm_struct	*sqo_mm;
+ 	wait_queue_head_t	sqo_wait;
+-	unsigned		sqo_stop;
+ 
+ 	struct {
+ 		/* CQ ring */
+@@ -2028,7 +2027,7 @@ static int io_sq_thread(void *data)
+ 	set_fs(USER_DS);
+ 
+ 	timeout = inflight = 0;
+-	while (!kthread_should_stop() && !ctx->sqo_stop) {
++	while (!kthread_should_stop()) {
+ 		bool all_fixed, mm_fault = false;
+ 		int i;
+ 
+@@ -2140,9 +2139,6 @@ static int io_sq_thread(void *data)
+ 		mmput(cur_mm);
+ 	}
+ 
+-	if (kthread_should_park())
+-		kthread_parkme();
+-
+ 	return 0;
+ }
+ 
+@@ -2273,9 +2269,6 @@ static int io_sqe_files_unregister(struct io_ring_ctx *ctx)
+ static void io_sq_thread_stop(struct io_ring_ctx *ctx)
+ {
+ 	if (ctx->sqo_thread) {
+-		ctx->sqo_stop = 1;
+-		mb();
+-		kthread_park(ctx->sqo_thread);
+ 		kthread_stop(ctx->sqo_thread);
+ 		ctx->sqo_thread = NULL;
+ 	}
+-- 
+2.21.0
+
