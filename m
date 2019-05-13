@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B482C04AB1
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 06:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38A37C04AB1
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 06:38:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1C5F20C01
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 06:38:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0935520879
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 06:38:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ks/uMgVq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KfLz2sXk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbfEMGim (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 May 2019 02:38:42 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:35916 "EHLO
+        id S1726665AbfEMGio (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 May 2019 02:38:44 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:35928 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726181AbfEMGim (ORCPT
+        with ESMTP id S1726181AbfEMGio (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 May 2019 02:38:42 -0400
+        Mon, 13 May 2019 02:38:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=t2AjLqABC45wSdrAkopJwcvSBbfdj3Das0bmI8NjADY=; b=ks/uMgVq8sXmLRJnpiFw7S2Hot
-        7vTpWzH6fDJgrabsgCkY5bnZZIpbe7ypwGUm8v+BCcXOwI6lul4xm4BcXZV9Pwitkz9RtsaX9ehBK
-        B4YlcmphNrCQaCOJvahtYhfDG8y2GlxAq1HTrwK7wiIRy7Bq05Va8ZQYXSqqUFDG24YND96qcGEea
-        LaK3BB7OE7Ob9vn5e+AMGEICNGmWLCjZQtOxGvxeykClWSQqN5ymxCJAfMIeGHeO7FaeTHZIaXT25
-        ObffJAROB7220Uxl95iZBWclsSTf1mgQ6YjYj881C8CX3NCgR/eEqFiQmg/kZRz+oLSNLwqJvodUv
-        NCtIg8XQ==;
+        bh=JYcI1bUNGBU7rewciqlqoMO5I6zpZ7Ylv2vDWiNdhj8=; b=KfLz2sXkpJI0/mu+pfU/zidEJ0
+        9tb52KAs3lhOsFupXwN96F1WLMfY9NIMP+CHtv28V3O47eOVDKqDw3wwYZfMVNWdbGQ2lDEJlEQaR
+        EFf1Tojgous+c/+nkgKPdVmU97Q+8Auzo8eMG8logEDDOWXaDaG50dIaGeBeoPHAQ3kFWHWmdmNW9
+        g9RZSVt8vU0bzckc1QfI2EU17KTYmIJib2XgWeu77w3w7o8+KeSAZ4upWxCjiyApZwbGvoZ90G+RP
+        wUv3X3P3k7mfdQtb83Vi5r3ElxAzmy5EXcKjWZCK1+SsALbb/qGuxDcmMIwb+iSQl1Y80yYFAyVTK
+        TK0ycs2w==;
 Received: from 089144210233.atnat0019.highway.a1.net ([89.144.210.233] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hQ4bf-0007OM-Nr; Mon, 13 May 2019 06:38:40 +0000
+        id 1hQ4bi-0007OW-B0; Mon, 13 May 2019 06:38:42 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@fb.com
 Cc:     ming.lei@redhat.com, Matias Bjorling <mb@lightnvm.io>,
         linux-block@vger.kernel.org
-Subject: [PATCH 01/10] block: don't decrement nr_phys_segments for physically contigous segments
-Date:   Mon, 13 May 2019 08:37:45 +0200
-Message-Id: <20190513063754.1520-2-hch@lst.de>
+Subject: [PATCH 02/10] block: force an unlimited segment size on queues with a virt boundary
+Date:   Mon, 13 May 2019 08:37:46 +0200
+Message-Id: <20190513063754.1520-3-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190513063754.1520-1-hch@lst.de>
 References: <20190513063754.1520-1-hch@lst.de>
@@ -54,82 +54,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently ll_merge_requests_fn, unlike all other merge functions,
-reduces nr_phys_segments by one if the last segment of the previous,
-and the first segment of the next segement are contigous.  While this
-seems like a nice solution to avoid building smaller than possible
-requests it causes a mismatch between the segments actually present
-in the request and those iterated over by the bvec iterators, including
-__rq_for_each_bio.  This could cause overwrites of too small kmalloc
-allocations in any driver using ranged discard, or also mistrigger
-the single segment optimization in the nvme-pci driver.
-
-We could possibly work around this by making the bvec iterators take
-the front and back segment size into account, but that would require
-moving them from the bio to the bio_iter and spreading this mess
-over all users of bvecs.  Or we could simply remove this optimization
-under the assumption that most users already build good enough bvecs,
-and that the bio merge patch never cared about this optimization
-either.  The latter is what this patch does.
+We currently fail to update the front/back segment size in the bio when
+deciding to allow an otherwise gappy segement to a device with a
+virt boundary.  The reason why this did not cause problems is that
+devices with a virt boundary fundamentally don't use segments as we
+know it and thus don't care.  Make that assumption formal by forcing
+an unlimited segement size in this case.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-merge.c | 23 +----------------------
- 1 file changed, 1 insertion(+), 22 deletions(-)
+ block/blk-settings.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 21e87a714a73..80a5a0facb87 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -358,7 +358,6 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	unsigned front_seg_size;
- 	struct bio *fbio, *bbio;
- 	struct bvec_iter iter;
--	bool new_bio = false;
- 
- 	if (!bio)
- 		return 0;
-@@ -379,31 +378,12 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	nr_phys_segs = 0;
- 	for_each_bio(bio) {
- 		bio_for_each_bvec(bv, bio, iter) {
--			if (new_bio) {
--				if (seg_size + bv.bv_len
--				    > queue_max_segment_size(q))
--					goto new_segment;
--				if (!biovec_phys_mergeable(q, &bvprv, &bv))
--					goto new_segment;
--
--				seg_size += bv.bv_len;
--
--				if (nr_phys_segs == 1 && seg_size >
--						front_seg_size)
--					front_seg_size = seg_size;
--
--				continue;
--			}
--new_segment:
- 			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
- 					&front_seg_size, NULL, UINT_MAX);
--			new_bio = false;
- 		}
- 		bbio = bio;
--		if (likely(bio->bi_iter.bi_size)) {
-+		if (likely(bio->bi_iter.bi_size))
- 			bvprv = bv;
--			new_bio = true;
--		}
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 3facc41476be..2ae348c101a0 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -310,6 +310,9 @@ void blk_queue_max_segment_size(struct request_queue *q, unsigned int max_size)
+ 		       __func__, max_size);
  	}
  
- 	fbio->bi_seg_front_size = front_seg_size;
-@@ -725,7 +705,6 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
- 			req->bio->bi_seg_front_size = seg_size;
- 		if (next->nr_phys_segments == 1)
- 			next->biotail->bi_seg_back_size = seg_size;
--		total_phys_segments--;
- 	}
++	/* see blk_queue_virt_boundary() for the explanation */
++	WARN_ON_ONCE(q->limits.virt_boundary_mask);
++
+ 	q->limits.max_segment_size = max_size;
+ }
+ EXPORT_SYMBOL(blk_queue_max_segment_size);
+@@ -742,6 +745,14 @@ EXPORT_SYMBOL(blk_queue_segment_boundary);
+ void blk_queue_virt_boundary(struct request_queue *q, unsigned long mask)
+ {
+ 	q->limits.virt_boundary_mask = mask;
++
++	/*
++	 * Devices that require a virtual boundary do not support scatter/gather
++	 * I/O natively, but instead require a descriptor list entry for each
++	 * page (which might not be idential to the Linux PAGE_SIZE).  Because
++	 * of that they are not limited by our notion of "segment size".
++	 */
++	q->limits.max_segment_size = UINT_MAX;
+ }
+ EXPORT_SYMBOL(blk_queue_virt_boundary);
  
- 	if (total_phys_segments > queue_max_segments(q))
 -- 
 2.20.1
 
