@@ -2,58 +2,81 @@ Return-Path: <SRS0=TF98=TN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2AE7C04AA7
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 18:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76133C04AA7
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 18:52:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7EBCF208C3
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 18:25:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 426422085A
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 18:52:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="tGkLm+m4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726666AbfEMSZh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 May 2019 14:25:37 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50626 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725928AbfEMSZh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 May 2019 14:25:37 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id ABD7BADD5;
-        Mon, 13 May 2019 18:25:35 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 13 May 2019 20:25:35 +0200
-From:   Roman Penyaev <rpenyaev@suse.de>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+        id S1728665AbfEMSwT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 May 2019 14:52:19 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:46848 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728693AbfEMSwT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 May 2019 14:52:19 -0400
+Received: by mail-io1-f65.google.com with SMTP id q21so7695331iog.13
+        for <linux-block@vger.kernel.org>; Mon, 13 May 2019 11:52:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=kVTZGJqN7tVEH3YwojEmRicKcOtbpEmUQp8jWTo9LUE=;
+        b=tGkLm+m42H68P4jTw9uOiQ/CLwMhkqowe64lrjUDOMJsecGhUqZ+jS+4aMZ3RzCf/r
+         vycZNPtXiew3mSs24ZUSSNNxn+lRtrbg6ec5Q2G3shw5b0wnIxq2+O9TRs8RJ+MpoG6G
+         43HQOMWExXr10JPDxTMPHYyzeMM3xyK1Gaer3fn2/QK+Vc3bdjqo6Gb5B9E70Oo4xRXs
+         LlQA8uozT6GRkv6972b07hV8Rnspqy4xT+dhaJT57YaAwno1loD7snmimoZGX+m+Xfqh
+         9vRDMe4ZAN/LdsStQl1RF9koMB6zRz9QSvDLA25eSqHTtc+UHBsDampRfJS3iCxlsIt7
+         prjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kVTZGJqN7tVEH3YwojEmRicKcOtbpEmUQp8jWTo9LUE=;
+        b=WWj5G/qjMyfWThKjUMVe9NX32Ce/sF267/luvZSStj7dOGdl/GYGnqG2+ExkN5xATu
+         QRR7/mbNUm6O963PpBjgqVicYRi0nGtmVca8lTVwCfOz/PkrtVTxS8Oy/T/K8kwDtWlM
+         Ius+4yFFn4SBy9Dht1uEf2VenkUx/8KE3rLnetDwCFUZrjciAURlZjlIeo5IvbQwdRNq
+         18vpodXLNYgG/vp9/zh6V0HOnYKRJRx7Cz9sKgGCEcqEGxKR8NhFYcLuMooiUXnr3F9y
+         y4IsM8LsCYlXNyqjfSFE4L3CES8kg2RmOop0DSpsOnApHcp7EvkdOUVQmPwAwcSW8oP6
+         SSJg==
+X-Gm-Message-State: APjAAAXR26D4UZPKWDFVvJ2RmrQ4jHSS7YLyu8o9E31s58mfgSXjomDh
+        NW9ZpbnGoAa03lL927m19UrMTeKNLpXC7Q==
+X-Google-Smtp-Source: APXvYqzUPk+aiwslClUa/KdoeImzhYv5nhCzPbEzsK0R3qsbdaGXaO6jQTEL2NjhuNhOH7mN/Wv00Q==
+X-Received: by 2002:a5d:9284:: with SMTP id s4mr11957090iom.146.1557773538342;
+        Mon, 13 May 2019 11:52:18 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id 83sm141384ite.27.2019.05.13.11.52.17
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 13 May 2019 11:52:17 -0700 (PDT)
 Subject: Re: [PATCH 1/1] io_uring: fix infinite wait in khread_park() on
  io_finish_async()
-In-Reply-To: <20190513182028.29912-1-rpenyaev@suse.de>
+To:     Roman Penyaev <rpenyaev@suse.de>
+Cc:     linux-block@vger.kernel.org
 References: <20190513182028.29912-1-rpenyaev@suse.de>
-Message-ID: <f3aa208b4fbbd3d1afa8a486ce078b3b@suse.de>
-X-Sender: rpenyaev@suse.de
-User-Agent: Roundcube Webmail
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bcf3f935-e2c0-6bcf-92fb-760583ff5500@kernel.dk>
+Date:   Mon, 13 May 2019 12:52:16 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190513182028.29912-1-rpenyaev@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
-
-I forgot to mention that dead lock is quite well reproduced
-if app is killed, when no IO is performed (i.e. polling thread
-is scheduled out).
-
---
-Roman
-
-
-On 2019-05-13 20:20, Roman Penyaev wrote:
-> This fixes couple of races which lead to infinite wait of park 
-> completion
+On 5/13/19 12:20 PM, Roman Penyaev wrote:
+> This fixes couple of races which lead to infinite wait of park completion
 > with the following backtraces:
 > 
 >   [20801.303319] Call Trace:
@@ -102,54 +125,18 @@ On 2019-05-13 20:20, Roman Penyaev wrote:
 > It seems that parking here is not needed at all (thread is parked and
 > then stopped and never unparked), so here in this patch I simply rely
 > on kthread_should_stop() check and then exit the thread.
-> 
-> Signed-off-by: Roman Penyaev <rpenyaev@suse.de>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: linux-block@vger.kernel.org
-> ---
->  fs/io_uring.c | 9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
-> 
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index 452e35357865..449c652bb334 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-> @@ -231,7 +231,6 @@ struct io_ring_ctx {
->  	struct task_struct	*sqo_thread;	/* if using sq thread polling */
->  	struct mm_struct	*sqo_mm;
->  	wait_queue_head_t	sqo_wait;
-> -	unsigned		sqo_stop;
-> 
->  	struct {
->  		/* CQ ring */
-> @@ -2028,7 +2027,7 @@ static int io_sq_thread(void *data)
->  	set_fs(USER_DS);
-> 
->  	timeout = inflight = 0;
-> -	while (!kthread_should_stop() && !ctx->sqo_stop) {
-> +	while (!kthread_should_stop()) {
->  		bool all_fixed, mm_fault = false;
->  		int i;
-> 
-> @@ -2140,9 +2139,6 @@ static int io_sq_thread(void *data)
->  		mmput(cur_mm);
->  	}
-> 
-> -	if (kthread_should_park())
-> -		kthread_parkme();
-> -
->  	return 0;
->  }
-> 
-> @@ -2273,9 +2269,6 @@ static int io_sqe_files_unregister(struct
-> io_ring_ctx *ctx)
->  static void io_sq_thread_stop(struct io_ring_ctx *ctx)
->  {
->  	if (ctx->sqo_thread) {
-> -		ctx->sqo_stop = 1;
-> -		mb();
-> -		kthread_park(ctx->sqo_thread);
->  		kthread_stop(ctx->sqo_thread);
->  		ctx->sqo_thread = NULL;
->  	}
+
+The park is a bit of a work-around, without it we get warning spews on
+shutdown with SQPOLL set and affinity set to a single CPU.
+
+Also see:
+
+commit 06058632464845abb1af91521122fd04dd3daaec
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Sat Apr 13 09:26:03 2019 -0600
+
+    io_uring: park SQPOLL thread if it's percpu
+
+-- 
+Jens Axboe
 
