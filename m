@@ -2,136 +2,124 @@ Return-Path: <SRS0=TF98=TN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65512C04AA7
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 22:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AEB8C04AA7
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 23:06:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3259F206A3
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 22:12:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="QUhu2ETd"
+	by mail.kernel.org (Postfix) with ESMTP id 221602147A
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 23:06:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726349AbfEMWMj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 May 2019 18:12:39 -0400
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:53296 "EHLO
-        mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726295AbfEMWMj (ORCPT
+        id S1726327AbfEMXGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 May 2019 19:06:51 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:43843 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726233AbfEMXGv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 May 2019 18:12:39 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id 78F2BA2B2E;
-        Tue, 14 May 2019 00:12:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1557785556; i=@fjfi.cvut.cz;
-        bh=g9S36xbdW948QIK3JgulE0p3qRSyqlSp+JKJwveRQq8=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References;
-        b=QUhu2ETduwZWvfEErEJRovsjYZwIvZQOJT6bN6t+F/jcATlBDvig3vfcDVm5J+GO9
-         XLi1faC1MBp73LB9oi9Wv5pBcUK1G8Qvwr1eXmrXtbtV5TORWNH7xgEGmbEVt9czNU
-         Qd2bulSbzbXNF8iGNn+lOkwX67rDadZTbYSQEntQ=
-X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
-Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
-        by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id W_wKxaUaIzZh; Tue, 14 May 2019 00:12:34 +0200 (CEST)
-Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 20EFFA2B1E;
-        Tue, 14 May 2019 00:12:34 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 20EFFA2B1E
-Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 675B36004D; Tue, 14 May 2019 00:12:33 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by linux.fjfi.cvut.cz (Postfix) with ESMTP id 546F16002A;
-        Tue, 14 May 2019 00:12:33 +0200 (CEST)
-Date:   Tue, 14 May 2019 00:12:33 +0200 (CEST)
-From:   David Kozub <zub@linux.fjfi.cvut.cz>
-To:     Scott Bauer <sbauer@plzdonthack.me>
-cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: Re: [PATCH 0/3] block: sed-opal: add support for shadow MBR done
- flag and write
-In-Reply-To: <20190505144330.GB1030@hacktheplanet>
-Message-ID: <alpine.LRH.2.21.1905132354150.6401@linux.fjfi.cvut.cz>
-References: <1556666459-17948-1-git-send-email-zub@linux.fjfi.cvut.cz> <20190501134917.GC24132@infradead.org> <alpine.LRH.2.21.1905032058110.30331@linux.fjfi.cvut.cz> <20190505144330.GB1030@hacktheplanet>
-User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
+        Mon, 13 May 2019 19:06:51 -0400
+Received: from callcc.thunk.org (rrcs-67-53-55-100.west.biz.rr.com [67.53.55.100])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x4DN6hUY006602
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 May 2019 19:06:45 -0400
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id 14F3A420024; Mon, 13 May 2019 19:06:43 -0400 (EDT)
+Date:   Mon, 13 May 2019 19:06:43 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, ksummit-discuss@lists.linuxfoundation.org
+Subject: Maintainer's / Kernel Summit 2019 planning kick-off
+Message-ID: <20190513230643.GA4347@mit.edu>
+Reply-To: tytso@mit.edu
+Mail-Followup-To: tytso@mit.edu, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        ksummit-discuss@lists.linuxfoundation.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 5 May 2019, Scott Bauer wrote:
+[ Feel free to forward this to other Linux kernel mailing lists as
+  appropriate -- Ted ]
 
-> On Fri, May 03, 2019 at 10:32:19PM +0200, David Kozub wrote:
->> On Wed, 1 May 2019, Christoph Hellwig wrote:
->>
->>>> I successfully tested toggling the MBR done flag and writing the shadow MBR
->>>> using some tools I hacked together[4] with a Samsung SSD 850 EVO drive.
->>>
->>> Can you submit the tool to util-linux so that we get it into distros?
->>
->> There is already Scott's sed-opal-temp[1] and a fork by Jonas that adds
->> support for older version of these new IOCTLs[2]. There was already some
->> discussion of getting that to util-linux.[3]
->>
->> While I like my hack, sed-opal-temp can do much more (my tool supports just
->> the few things I actually use). But there are two things which sed-opal-temp
->> currently lacks which my hack has:
->>
->> * It can use a PBKDF2 hash (salted by disk serial number) of the password
->>   rather than the password directly. This makes it compatible with sedutil
->>   and I think it's also better practice (as firmware can contain many
->>   surprises).
->>
->> * It contains a 'PBA' (pre-boot authorization) tool. A tool intended to be
->>   run from shadow mbr that asks for a password and uses it to unlock all
->>   disks and set shadow mbr done flag, so after restart the computer boots
->>   into the real OS.
->>
->> @Scott: What are your plans with sed-opal-temp? If you want I can update
->> Jonas' patches to the adapted IOCTLs. What are your thoughts on PW hashing
->> and a PBA tool?
->
-> I will accept any and all patches to sed opal tooling, I am not picky. I will
-> also give up maintainership of it is someone else feels they can (rightfully
-> so) do a better job.
->
-> Jon sent me a patch for the tool that will deal with writing to the shadow MBR,
-> so once we know these patches are going in i'll pull that patch into the tool.
->
-> Then I guess that leaves PBKDF2 which I don't think will be too hard to pull in.
+This year, the Maintainer's and Kernel Summit will be at the Corinthia
+Hotel in Lisbon, Portugal, September 9th -- 12th.  The Kernel Summit
+will be held as a track during the Linux Plumbers Conference
+September 9th -- 11th.  The Maintainer's Summit will be held
+afterwards, on September 12th.
 
-After (if) these patches are accepted, I can create a patch that adds it 
-to sed-opal-temp.
+As in previous years, the "Maintainer's Summit" is an invite-only,
+half-day event, where the primary focus will be process issues around
+Linux Kernel Development.  It will be limited to 30 invitees and a
+handful of sponsored attendees.  This makes it smaller than the first
+few kernel summits (which were limited to around 50 attendees).
 
-> With regard to your PBA tool, is that actually being run post-uefi/pre-linux?
-> IE are we writing your tool into the SMBR and that's what is being run on bootup?
+The "Kernel Summit" is organized as a track which is run in parallel
+with the other tracks at the Linux Plumber's Conference (LPC), and is
+open to all registered attendees of LPC.
 
-It's actually nothing fancy: It's just a linux program that asks for a 
-password and then uses it to unlock all block devices. It's intended to be 
-run from an initramfs. So the idea is you build a kernel + initramfs with 
-the tool so that the tool it started and after the tool returns, initramfs 
-does a reboot. This could be replaced just by a shell script, though then 
-you'd have to pass the password from the shell script to e.g. 
-sed-opal-temp.
+Linus has a generated a list of 18 people to use as a core list.  The
+program committee will pick at least ten people from that list, and
+then use the rest of Linus's list as a starting point of people to be
+considered.  People who suggest topics that should be discussed on the
+Maintainer's summit will also be added to the list for consideration.
+To make topic suggestions for the Maintainer's Summit, please send
+e-mail to the ksummit-discuss@lists.linuxfoundation.org list with a
+subject prefix of [MAINTAINERS SUMMIT].
 
-But I think it covers the simple scenario: booting from a locked drive 
-with just one locking range. Possibly with other locked drives connected 
-that also have one locking range and use the same password (when using pwd 
-hash at least the Opal key is not the same).
+The other job of the program committee will be to organize the program
+for the Kernel Summit.  The goal of the Kernel Summit track will be to
+provide a forum to discuss specific technical issues that would be
+easier to resolve in person than over e-mail.  The program committee
+will also consider "information sharing" topics if they are clearly of
+interest to the wider development community (i.e., advanced training
+in topics that would be useful to kernel developers).
 
-> Jon, if you think it's a good idea can you ask David if Revanth or you wants
-> to take over the tooling? Or if anyone else here wants to own it then let me know.
+To suggest a topic for the Kernel Summit, please do two things.
+First, please tag your e-mail with [TECH TOPIC].  As before, please
+use a separate e-mail for each topic, and send the topic suggestions
+to the ksummit-discuss list.
 
-I got invoved in this just to scratch an itch so I would not be a good 
-candidate.
+Secondly, please create a topic at the Linux Plumbers Conference
+proposal submission site and target it to the Kernel Summit track.
+For your convenience you can use:
 
-Best regards,
-David
+	http://bit.ly/lpc19-submit
+
+Please do both steps.  I'll try to notice if someone forgets one or
+the other, but your chances of making your proposal gets the necessary
+attention and consideration by submiting both to the mailing list and
+the web site.
+
+People who submit topic suggestions before May 31st and which are
+accepted, will be given a free admission to the Linux Plumbers
+Conference.
+
+We will reserving roughly half of the Kernel Summit slots for
+last-minute discussions that will be scheduled during the week of
+Plumber's, in an "unconference style".  This allows ideas that come up
+in hallway discussions, and in the LPC miniconferences, to be given
+scheduled, dedicated times for discussion.
+
+If you were not subscribed on to the kernel-discuss mailing list from
+last year (or if you had removed yourself after the kernel summit),
+you can subscribe to the discuss list using mailman:
+
+   https://lists.linuxfoundation.org/mailman/listinfo/ksummit-discuss
+
+The program committee this year is composed of the following people:
+
+Greg Kroah-Hartman
+Jens Axboe
+Jon Corbet
+Ted Ts'o
+Thomas Gleixner
