@@ -2,120 +2,119 @@ Return-Path: <SRS0=TF98=TN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF6E8C04AB1
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 06:39:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF7D2C04AB1
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 07:03:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91F1420879
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 06:39:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8936220B7C
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 07:03:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="juiuYSTY"
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="O+pqQVhZ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="u0ZrxH9q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727331AbfEMGjF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 May 2019 02:39:05 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:36024 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726181AbfEMGjE (ORCPT
+        id S1726179AbfEMHDq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 May 2019 03:03:46 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:46871 "EHLO
+        out4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725980AbfEMHDp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 May 2019 02:39:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
-        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=s2kx0Pwv+YVLjI/MK8lN/4670dthhnWmC1mj+5QFMpI=; b=juiuYSTYzaodImoFl0E72V53fL
-        fo9G7cyJLnDmT0fIPYCZfYbdFC0egYVV3WHp5wAeA1N49Xv3s6jYcGd42pkr9Swh8Hb+StTykCrOz
-        Qiju0+d+u8SalxkW9Qnwy2Bt3k3PKqsnryThWTUCk6qJtBY/Kzjzw3CpoJ0Z/usawmseZCHjAbnKt
-        qBEc69OfqxdNS6nCeTCykYQp2ZZD02oGHrKNs8MpGGgwLHNSGjIo1pBFqoXf+X0unC7vKf03GwJQN
-        /XCHcRRnvolbFpVUkw34FIWoDv1UY/xsQdjmHodwhgX9CNf2yHdOIqeFh6J8EJin6cORTB7Dm9aP1
-        WVwRQSPw==;
-Received: from 089144210233.atnat0019.highway.a1.net ([89.144.210.233] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hQ4c3-0007Rj-3v; Mon, 13 May 2019 06:39:03 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@fb.com
-Cc:     ming.lei@redhat.com, Matias Bjorling <mb@lightnvm.io>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 10/10] block: mark blk_rq_bio_prep as inline
-Date:   Mon, 13 May 2019 08:37:54 +0200
-Message-Id: <20190513063754.1520-11-hch@lst.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190513063754.1520-1-hch@lst.de>
-References: <20190513063754.1520-1-hch@lst.de>
+        Mon, 13 May 2019 03:03:45 -0400
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
+        by mailout.nyi.internal (Postfix) with ESMTP id 4120221540;
+        Mon, 13 May 2019 03:03:42 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Mon, 13 May 2019 03:03:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm3; bh=EUprfd4oTQRMt24J3KzcRvPKyEC
+        6+T0VwqaT8sTkVCE=; b=O+pqQVhZvmV60GYSMSAkdPunsYnKVKX9Ef6sOa/m7bH
+        FFjRERT88Z92kd/CJrXq8YU/aCGRL21/I9HEr2GkxCk0PEc4Ny9HxEyvAuJZdZDq
+        68lKzzGRnJ5YeR3QvBLtWW0zmfESSVIVSgTtziPOAgoeuhlO5prPkrTVNmjI5FwL
+        2ahAmU4T5HiRg+LFlZYRBCu6Cq5BHsfdhIciVjMpCB1b02DKxzBzv4v9fXs0xc12
+        7lsqCgDQjLIYZNaU2gZb9bJ65T7P1SG8ySOB4ZstvBWSMa+vxPc7uuWVqsd+D6uY
+        9LTr3nurXg/+zqGxvCOevMb/LonFmNFrzcnL12NhWdA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=EUprfd
+        4oTQRMt24J3KzcRvPKyEC6+T0VwqaT8sTkVCE=; b=u0ZrxH9qkt4z4EjTNRDODL
+        Nw2XJzCfLQi0IbMnaeIfXHSd3+q2eXRR8fjSxBNCphRPb+8Jds4FBA9wOg4WQlvx
+        8fo530OWzq4Ir3lIh0CULIadj2ukGJ7Rka/aBFe4Uk/ovIBZ7BVmEVJ1zfmYDsiL
+        DWYh9i+r38cQQlndCZcYIwD0h4DQK7idZXVSRGMMmyDclKfZU7ruQEsAqEC+PJAp
+        I/wqeDo5OlnuN5LUMTqpNk2zWy3XmTQY65xf51DqpGQDMt6gKNWN2tlicffqH9oE
+        RAv8q+Rj2RXbEVr3pKYhNccroYFZBtlrRNw/wRkOnLaaDUToOcPz+JsL9z0qxZLQ
+        ==
+X-ME-Sender: <xms:zRbZXLzqJ6SRUcN14pdUw-yHesimMyunYQR1B4kiUAgaH0CTtkh8rg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduuddrleefgdduuddvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffukfhfgggtuggjfgesthdtredttdervdenucfhrhhomhepifhrvghg
+    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecukfhppeekfedrkeeirdekledrud
+    dtjeenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhmnecu
+    vehluhhsthgvrhfuihiivgeptd
+X-ME-Proxy: <xmx:zRbZXHjPWNDPxewBJDvxqj-z39TJJ0IrAuJ9-uS8rR_bmqXcW4asfQ>
+    <xmx:zRbZXAUTgZTMszS4BYXjbSlITbDwcxoLDNJ1CilQb-2sXy2YHnQfzQ>
+    <xmx:zRbZXJ2gph_4YGi1uevcIR1MChzLcwTYod5gsE_apHM288U8OipE3w>
+    <xmx:zhbZXLgJN03WNlHmVvMlA9YX97qzWTX5D3Qkj5UxPOtI2rXMAx_vnA>
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        by mail.messagingengine.com (Postfix) with ESMTPA id D03EF80060;
+        Mon, 13 May 2019 03:03:40 -0400 (EDT)
+Date:   Mon, 13 May 2019 09:03:37 +0200
+From:   Greg KH <greg@kroah.com>
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     Eric Wheeler <stable@lists.ewheeler.net>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "open list:BFQ I/O SCHEDULER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Eric Wheeler <bfq@linux.ewheeler.net>, stable@vger.kernel.org
+Subject: Re: [PATCH] bfq: backport: update internal depth state when queue
+ depth changes
+Message-ID: <20190513070337.GB26553@kroah.com>
+References: <1557510992-18506-1-git-send-email-stable@lists.ewheeler.net>
+ <20190510201855.GB14410@sasha-vm>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190510201855.GB14410@sasha-vm>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This function just has a few trivial assignments, has two callers with
-one of them being in the fastpath.
+On Fri, May 10, 2019 at 04:18:55PM -0400, Sasha Levin wrote:
+> On Fri, May 10, 2019 at 10:56:32AM -0700, Eric Wheeler wrote:
+> > From: Jens Axboe <axboe@kernel.dk>
+> > 
+> > commit 77f1e0a52d26242b6c2dba019f6ebebfb9ff701e upstream
+> > 
+> > A previous commit moved the shallow depth and BFQ depth map calculations
+> > to be done at init time, moving it outside of the hotter IO path. This
+> > potentially causes hangs if the users changes the depth of the scheduler
+> > map, by writing to the 'nr_requests' sysfs file for that device.
+> > 
+> > Add a blk-mq-sched hook that allows blk-mq to inform the scheduler if
+> > the depth changes, so that the scheduler can update its internal state.
+> > 
+> > Signed-off-by: Eric Wheeler <bfq@linux.ewheeler.net>
+> > Tested-by: Kai Krakow <kai@kaishome.de>
+> > Reported-by: Paolo Valente <paolo.valente@linaro.org>
+> > Fixes: f0635b8a416e ("bfq: calculate shallow depths at init time")
+> > Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> > Cc: stable@vger.kernel.org
+> 
+> I wasn't clear on what was backported here, so I've queued the upstream
+> version on 4.19 and 4.14, it doesn't seem to be relevant to older
+> branches.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 11 -----------
- block/blk.h      | 13 ++++++++++++-
- 2 files changed, 12 insertions(+), 12 deletions(-)
+I only see this added to the 5.0 and 4.19 queues, did you forget to push
+the 4.14 update?
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c894c9887dca..9405388ac658 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1473,17 +1473,6 @@ bool blk_update_request(struct request *req, blk_status_t error,
- }
- EXPORT_SYMBOL_GPL(blk_update_request);
- 
--void blk_rq_bio_prep(struct request *rq, struct bio *bio, unsigned int nr_segs)
--{
--	rq->nr_phys_segments = nr_segs;
--	rq->__data_len = bio->bi_iter.bi_size;
--	rq->bio = rq->biotail = bio;
--	rq->ioprio = bio_prio(bio);
--
--	if (bio->bi_disk)
--		rq->rq_disk = bio->bi_disk;
--}
--
- #if ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
- /**
-  * rq_flush_dcache_pages - Helper function to flush all pages in a request
-diff --git a/block/blk.h b/block/blk.h
-index 5352cdb876a6..cbb0995ed17e 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -51,7 +51,6 @@ struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
- void blk_free_flush_queue(struct blk_flush_queue *q);
- 
- void blk_exit_queue(struct request_queue *q);
--void blk_rq_bio_prep(struct request *rq, struct bio *bio, unsigned int nr_segs);
- void blk_freeze_queue(struct request_queue *q);
- 
- static inline void blk_queue_enter_live(struct request_queue *q)
-@@ -100,6 +99,18 @@ static inline bool bvec_gap_to_prev(struct request_queue *q,
- 	return __bvec_gap_to_prev(q, bprv, offset);
- }
- 
-+static inline void blk_rq_bio_prep(struct request *rq, struct bio *bio,
-+		unsigned int nr_segs)
-+{
-+	rq->nr_phys_segments = nr_segs;
-+	rq->__data_len = bio->bi_iter.bi_size;
-+	rq->bio = rq->biotail = bio;
-+	rq->ioprio = bio_prio(bio);
-+
-+	if (bio->bi_disk)
-+		rq->rq_disk = bio->bi_disk;
-+}
-+
- #ifdef CONFIG_BLK_DEV_INTEGRITY
- void blk_flush_integrity(void);
- bool __bio_integrity_endio(struct bio *);
--- 
-2.20.1
+thanks,
 
+greg k-h
