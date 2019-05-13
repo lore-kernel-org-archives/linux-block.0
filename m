@@ -2,119 +2,96 @@ Return-Path: <SRS0=TF98=TN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF7D2C04AB1
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 07:03:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F89C04AB1
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 07:34:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8936220B7C
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 07:03:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D400F208C3
+	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 07:34:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="O+pqQVhZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="u0ZrxH9q"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="bpG6DOfM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726179AbfEMHDq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 May 2019 03:03:46 -0400
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:46871 "EHLO
-        out4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725980AbfEMHDp (ORCPT
+        id S1727760AbfEMHeH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 May 2019 03:34:07 -0400
+Received: from mailout3.samsung.com ([203.254.224.33]:35660 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727440AbfEMHeH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 May 2019 03:03:45 -0400
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailout.nyi.internal (Postfix) with ESMTP id 4120221540;
-        Mon, 13 May 2019 03:03:42 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Mon, 13 May 2019 03:03:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm3; bh=EUprfd4oTQRMt24J3KzcRvPKyEC
-        6+T0VwqaT8sTkVCE=; b=O+pqQVhZvmV60GYSMSAkdPunsYnKVKX9Ef6sOa/m7bH
-        FFjRERT88Z92kd/CJrXq8YU/aCGRL21/I9HEr2GkxCk0PEc4Ny9HxEyvAuJZdZDq
-        68lKzzGRnJ5YeR3QvBLtWW0zmfESSVIVSgTtziPOAgoeuhlO5prPkrTVNmjI5FwL
-        2ahAmU4T5HiRg+LFlZYRBCu6Cq5BHsfdhIciVjMpCB1b02DKxzBzv4v9fXs0xc12
-        7lsqCgDQjLIYZNaU2gZb9bJ65T7P1SG8ySOB4ZstvBWSMa+vxPc7uuWVqsd+D6uY
-        9LTr3nurXg/+zqGxvCOevMb/LonFmNFrzcnL12NhWdA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=EUprfd
-        4oTQRMt24J3KzcRvPKyEC6+T0VwqaT8sTkVCE=; b=u0ZrxH9qkt4z4EjTNRDODL
-        Nw2XJzCfLQi0IbMnaeIfXHSd3+q2eXRR8fjSxBNCphRPb+8Jds4FBA9wOg4WQlvx
-        8fo530OWzq4Ir3lIh0CULIadj2ukGJ7Rka/aBFe4Uk/ovIBZ7BVmEVJ1zfmYDsiL
-        DWYh9i+r38cQQlndCZcYIwD0h4DQK7idZXVSRGMMmyDclKfZU7ruQEsAqEC+PJAp
-        I/wqeDo5OlnuN5LUMTqpNk2zWy3XmTQY65xf51DqpGQDMt6gKNWN2tlicffqH9oE
-        RAv8q+Rj2RXbEVr3pKYhNccroYFZBtlrRNw/wRkOnLaaDUToOcPz+JsL9z0qxZLQ
-        ==
-X-ME-Sender: <xms:zRbZXLzqJ6SRUcN14pdUw-yHesimMyunYQR1B4kiUAgaH0CTtkh8rg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduuddrleefgdduuddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtuggjfgesthdtredttdervdenucfhrhhomhepifhrvghg
-    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecukfhppeekfedrkeeirdekledrud
-    dtjeenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhmnecu
-    vehluhhsthgvrhfuihiivgeptd
-X-ME-Proxy: <xmx:zRbZXHjPWNDPxewBJDvxqj-z39TJJ0IrAuJ9-uS8rR_bmqXcW4asfQ>
-    <xmx:zRbZXAUTgZTMszS4BYXjbSlITbDwcxoLDNJ1CilQb-2sXy2YHnQfzQ>
-    <xmx:zRbZXJ2gph_4YGi1uevcIR1MChzLcwTYod5gsE_apHM288U8OipE3w>
-    <xmx:zhbZXLgJN03WNlHmVvMlA9YX97qzWTX5D3Qkj5UxPOtI2rXMAx_vnA>
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        by mail.messagingengine.com (Postfix) with ESMTPA id D03EF80060;
-        Mon, 13 May 2019 03:03:40 -0400 (EDT)
-Date:   Mon, 13 May 2019 09:03:37 +0200
-From:   Greg KH <greg@kroah.com>
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     Eric Wheeler <stable@lists.ewheeler.net>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "open list:BFQ I/O SCHEDULER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Eric Wheeler <bfq@linux.ewheeler.net>, stable@vger.kernel.org
-Subject: Re: [PATCH] bfq: backport: update internal depth state when queue
- depth changes
-Message-ID: <20190513070337.GB26553@kroah.com>
-References: <1557510992-18506-1-git-send-email-stable@lists.ewheeler.net>
- <20190510201855.GB14410@sasha-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190510201855.GB14410@sasha-vm>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+        Mon, 13 May 2019 03:34:07 -0400
+Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190513073403epoutp0382354c9a0d50f1f7c961c28a6c7394c9~eLcSrTgDf3127831278epoutp031
+        for <linux-block@vger.kernel.org>; Mon, 13 May 2019 07:34:03 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190513073403epoutp0382354c9a0d50f1f7c961c28a6c7394c9~eLcSrTgDf3127831278epoutp031
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1557732843;
+        bh=kQz0DogA4qraBOcJHvSDzZ0YSMMfavN8vJ/KCEb+dUE=;
+        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+        b=bpG6DOfMlZ4KVUpUCWWqSbSDMaDbhqS644iM5neFKpu6wztjMNvUm+R4cC7YH0Lz3
+         yWHI4jP+xYyO24XwlXLsN0tUOneM0Y1aznx/psdVbLN3AfeTwEFec5W9dhwdROWYku
+         vPoOLl8HPkSO+xzeksa4AClBrWcJ8keMXkhdwGPs=
+Received: from epsmges2p4.samsung.com (unknown [182.195.40.186]) by
+        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
+        20190513073401epcas2p297beb0696eae2dbdd4a33549845e0064~eLcQjbz0B1285212852epcas2p2e;
+        Mon, 13 May 2019 07:34:01 +0000 (GMT)
+X-AuditID: b6c32a48-689ff7000000106f-30-5cd91de87f95
+Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
+        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
+        2B.0C.04207.8ED19DC5; Mon, 13 May 2019 16:34:00 +0900 (KST)
+Mime-Version: 1.0
+Subject: Re: [PATCH 05/10] block: initialize the write priority in
+ blk_rq_bio_prep
+Reply-To: minwoo.im@samsung.com
+From:   Minwoo Im <minwoo.im@samsung.com>
+To:     Christoph Hellwig <hch@lst.de>, "axboe@fb.com" <axboe@fb.com>,
+        Minwoo Im <minwoo.im@samsung.com>
+CC:     "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        Matias Bjorling <mb@lightnvm.io>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+In-Reply-To: <20190513063754.1520-6-hch@lst.de>
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20190513073400epcms2p6669154b6e63b88e58a34996dec71205a@epcms2p6>
+Date:   Mon, 13 May 2019 16:34:00 +0900
+X-CMS-MailID: 20190513073400epcms2p6669154b6e63b88e58a34996dec71205a
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0gUYRSG+XbGcbQmxnWrk5FtExEZq7vmblNkRUZMaCVdIETaBp3Wrb21
+        s9oFoq2tNrbITIRQSyHR0rIwyyVLZL1UdI8UNZR+ZJm3kqLsYrXj2OXfw8s57/ud8x0SU+YS
+        UaTZ5hKcNt7CEOH4zaYFek3frM507eebkeyv260Ee6mqRcHe6VrIXqxrxtlAvkfBvnnQiK0k
+        uDzPcCh3om0UcfWdboJ739BGcKdqKxH3sSY6lUizLMsS+EzBqRZsGfZMs82UyCRvMiYZ9Qat
+        TqNbwi5m1DbeKiQyq1NSNWvMluArGHUOb8kOSqm8KDJxy5c57dkuQZ1lF12JjODItDh0Okes
+        yFvFbJspNsNuXarTauP1wcrtlqwbd8sIRwva62v+jrtRjg+RJNAJ4H4V4UPhpJL2Izh5oRuX
+        dIqOgDF/pA+FkZH0ZmhsPUVIspKeDaP9WlleAMP1D0MkJuj54C7oH+9U0TvgXYdKcsToMwge
+        fvFgUg3QFJz19uIyz4S6ihtI4jA6DvoCuaGyPhU6q4b+8vvWEiSzCo72PJrwiYBXX+uR/HqA
+        nuHlMh6E2ousFAv0EQQdg1cmWuPg0NuR8ViKXgcfhisVEuP0PPiZXzRhuRpa330aj8WCE9YN
+        FWOSJxYc8eqtONl+LjR34XLFFDjeNBb6Zyj/+dcKmefCSCAw4TgDKp4PEDJzkPv0WYi84yIE
+        Xx+VEqeRuvDfmgv/Cy78F1yKsEo0TXCIVpMgxjsS/v/XGjR+jDGcHzU+TgkgmkTMZMr/uiNd
+        GcLniPusAQQkxqiotDlBicrk9+0XnHajM9siiAGkD86fh0VNzbAHT9vmMur08QaDdome1Rvi
+        WWY6VTOpM11Jm3iXsEsQHILzT5+CDItyo5Lqb1UbryY9bT+3qstQPNht+JnfTlX8wD2LbimK
+        k19683xh3g2Okq27m6tNPdULX5zdqTt8zOxq8PRHdKd5MWOZQRN6YG/BtW33168s4O61lZcH
+        nmhUT7yXB0Yqy6ii69wWTin2RqfO+rBCXBtdNTY5adDS8nhP32iT9dhBvtzM4GIWr4vBnCL/
+        G75vtouiAwAA
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20190513063855epcas5p33ef8c4c0a0055bd0b66eadc859796f0f
+References: <20190513063754.1520-6-hch@lst.de>
+        <20190513063754.1520-1-hch@lst.de>
+        <CGME20190513063855epcas5p33ef8c4c0a0055bd0b66eadc859796f0f@epcms2p6>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 10, 2019 at 04:18:55PM -0400, Sasha Levin wrote:
-> On Fri, May 10, 2019 at 10:56:32AM -0700, Eric Wheeler wrote:
-> > From: Jens Axboe <axboe@kernel.dk>
-> > 
-> > commit 77f1e0a52d26242b6c2dba019f6ebebfb9ff701e upstream
-> > 
-> > A previous commit moved the shallow depth and BFQ depth map calculations
-> > to be done at init time, moving it outside of the hotter IO path. This
-> > potentially causes hangs if the users changes the depth of the scheduler
-> > map, by writing to the 'nr_requests' sysfs file for that device.
-> > 
-> > Add a blk-mq-sched hook that allows blk-mq to inform the scheduler if
-> > the depth changes, so that the scheduler can update its internal state.
-> > 
-> > Signed-off-by: Eric Wheeler <bfq@linux.ewheeler.net>
-> > Tested-by: Kai Krakow <kai@kaishome.de>
-> > Reported-by: Paolo Valente <paolo.valente@linaro.org>
-> > Fixes: f0635b8a416e ("bfq: calculate shallow depths at init time")
-> > Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> > Cc: stable@vger.kernel.org
-> 
-> I wasn't clear on what was backported here, so I've queued the upstream
-> version on 4.19 and 4.14, it doesn't seem to be relevant to older
-> branches.
-
-I only see this added to the 5.0 and 4.19 queues, did you forget to push
-the 4.14 update?
-
-thanks,
-
-greg k-h
+> The priority fiel also make sense for passthrough requests, so
+                           ^^^^
+                       `s/fiel/field`
+I think it's trivial so that it can be done with merging.
