@@ -1,125 +1,109 @@
-Return-Path: <SRS0=TF98=TN=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Dkg2=TO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AEB8C04AA7
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 23:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1C2C04AA7
+	for <linux-block@archiver.kernel.org>; Tue, 14 May 2019 02:07:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 221602147A
-	for <linux-block@archiver.kernel.org>; Mon, 13 May 2019 23:06:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC217208CA
+	for <linux-block@archiver.kernel.org>; Tue, 14 May 2019 02:06:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NTJ9LWVQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726327AbfEMXGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 May 2019 19:06:51 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:43843 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726233AbfEMXGv (ORCPT
+        id S1726547AbfENCG7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 May 2019 22:06:59 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:57238 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726327AbfENCG7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 May 2019 19:06:51 -0400
-Received: from callcc.thunk.org (rrcs-67-53-55-100.west.biz.rr.com [67.53.55.100])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x4DN6hUY006602
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 May 2019 19:06:45 -0400
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id 14F3A420024; Mon, 13 May 2019 19:06:43 -0400 (EDT)
-Date:   Mon, 13 May 2019 19:06:43 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, ksummit-discuss@lists.linuxfoundation.org
-Subject: Maintainer's / Kernel Summit 2019 planning kick-off
-Message-ID: <20190513230643.GA4347@mit.edu>
-Reply-To: tytso@mit.edu
-Mail-Followup-To: tytso@mit.edu, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        ksummit-discuss@lists.linuxfoundation.org
+        Mon, 13 May 2019 22:06:59 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4E245Vk163757;
+        Tue, 14 May 2019 02:06:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=eBHxKNkRR5Ce1ucgVDEmtR8ENRjTgp/1bnfgKwmBg2Y=;
+ b=NTJ9LWVQ6Kn7nMkCJU9mdk4aIXr4+qCp7wdj48YUSGlSO4vTz6WKQpGwtykL2KJsmC/x
+ PRuHKi2bLR5mPjPqnvp8amsZ5qyRI5cS6vEQtnneQqqQINGVm9zdgm7vhZvnH3VHuTjs
+ Ra0a4P5fz0QdmfxK0ebLMZsxGJeotUVryl3UwbKRJQcAi1Mi2CsEOK9WmXx3LnucoQRz
+ W27p5pBK5CpJ6zYCfzJhAvR9FpCNfth2PcyxYLtwCKfmHJZ4DFr5AntSoDsHhlWxQs5i
+ Oo0phlnpLRcW80H7QIEPNNHKAfqJgk33P30G1DS+xDsc5i8CQLz3oAwj5t1ldB15YoED gw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2sdq1qana9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 02:06:22 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4E25Gc3042362;
+        Tue, 14 May 2019 02:06:21 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2sdmeatf9k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 02:06:21 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4E26GEF006926;
+        Tue, 14 May 2019 02:06:17 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 13 May 2019 19:06:16 -0700
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chuck Lever <chuck.lever@oracle.com>, netdev@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: [PATCH V4 0/3] scsi: core: avoid big pre-allocation for sg list
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190428073932.9898-1-ming.lei@redhat.com>
+Date:   Mon, 13 May 2019 22:06:13 -0400
+In-Reply-To: <20190428073932.9898-1-ming.lei@redhat.com> (Ming Lei's message
+        of "Sun, 28 Apr 2019 15:39:29 +0800")
+Message-ID: <yq1a7fpg57u.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905140013
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905140013
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[ Feel free to forward this to other Linux kernel mailing lists as
-  appropriate -- Ted ]
 
-This year, the Maintainer's and Kernel Summit will be at the Corinthia
-Hotel in Lisbon, Portugal, September 9th -- 12th.  The Kernel Summit
-will be held as a track during the Linux Plumbers Conference
-September 9th -- 11th.  The Maintainer's Summit will be held
-afterwards, on September 12th.
+Ming,
 
-As in previous years, the "Maintainer's Summit" is an invite-only,
-half-day event, where the primary focus will be process issues around
-Linux Kernel Development.  It will be limited to 30 invitees and a
-handful of sponsored attendees.  This makes it smaller than the first
-few kernel summits (which were limited to around 50 attendees).
+> Since supporting to blk-mq, big pre-allocation for sg list is
+> introduced, this way is very unfriendly wrt. memory consumption.
 
-The "Kernel Summit" is organized as a track which is run in parallel
-with the other tracks at the Linux Plumber's Conference (LPC), and is
-open to all registered attendees of LPC.
+Applied to 5.3/scsi-queue with some clarifications to the commit
+descriptions.
 
-Linus has a generated a list of 18 people to use as a core list.  The
-program committee will pick at least ten people from that list, and
-then use the rest of Linus's list as a starting point of people to be
-considered.  People who suggest topics that should be discussed on the
-Maintainer's summit will also be added to the list for consideration.
-To make topic suggestions for the Maintainer's Summit, please send
-e-mail to the ksummit-discuss@lists.linuxfoundation.org list with a
-subject prefix of [MAINTAINERS SUMMIT].
+I am not entirely sold on 1 for the inline protection SGL size. NVMe
+over PCIe is pretty constrained thanks to the metadata pointer whereas
+SCSI DIX uses a real SGL for the PI. Consequently, straddling a page is
+not that uncommon for large, sequential I/Os.
 
-The other job of the program committee will be to organize the program
-for the Kernel Summit.  The goal of the Kernel Summit track will be to
-provide a forum to discuss specific technical issues that would be
-easier to resolve in person than over e-mail.  The program committee
-will also consider "information sharing" topics if they are clearly of
-interest to the wider development community (i.e., advanced training
-in topics that would be useful to kernel developers).
+But let's try it out. If performance suffers substantially, we may want
+to bump it to 2.
 
-To suggest a topic for the Kernel Summit, please do two things.
-First, please tag your e-mail with [TECH TOPIC].  As before, please
-use a separate e-mail for each topic, and send the topic suggestions
-to the ksummit-discuss list.
-
-Secondly, please create a topic at the Linux Plumbers Conference
-proposal submission site and target it to the Kernel Summit track.
-For your convenience you can use:
-
-	http://bit.ly/lpc19-submit
-
-Please do both steps.  I'll try to notice if someone forgets one or
-the other, but your chances of making your proposal gets the necessary
-attention and consideration by submiting both to the mailing list and
-the web site.
-
-People who submit topic suggestions before May 31st and which are
-accepted, will be given a free admission to the Linux Plumbers
-Conference.
-
-We will reserving roughly half of the Kernel Summit slots for
-last-minute discussions that will be scheduled during the week of
-Plumber's, in an "unconference style".  This allows ideas that come up
-in hallway discussions, and in the LPC miniconferences, to be given
-scheduled, dedicated times for discussion.
-
-If you were not subscribed on to the kernel-discuss mailing list from
-last year (or if you had removed yourself after the kernel summit),
-you can subscribe to the discuss list using mailman:
-
-   https://lists.linuxfoundation.org/mailman/listinfo/ksummit-discuss
-
-The program committee this year is composed of the following people:
-
-Greg Kroah-Hartman
-Jens Axboe
-Jon Corbet
-Ted Ts'o
-Thomas Gleixner
+-- 
+Martin K. Petersen	Oracle Linux Engineering
