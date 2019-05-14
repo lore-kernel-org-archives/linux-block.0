@@ -2,181 +2,204 @@ Return-Path: <SRS0=Dkg2=TO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B3FC04AB4
-	for <linux-block@archiver.kernel.org>; Tue, 14 May 2019 09:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2DE7C04AB4
+	for <linux-block@archiver.kernel.org>; Tue, 14 May 2019 09:17:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE6FA20879
-	for <linux-block@archiver.kernel.org>; Tue, 14 May 2019 09:06:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B561204FD
+	for <linux-block@archiver.kernel.org>; Tue, 14 May 2019 09:17:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726130AbfENJGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 May 2019 05:06:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44806 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725916AbfENJGB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 May 2019 05:06:01 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BFD8DD964B;
-        Tue, 14 May 2019 09:05:56 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-31.pek2.redhat.com [10.72.8.31])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AAB5610842A1;
-        Tue, 14 May 2019 09:05:50 +0000 (UTC)
-Date:   Tue, 14 May 2019 17:05:45 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@fb.com, Matias Bjorling <mb@lightnvm.io>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 01/10] block: don't decrement nr_phys_segments for
- physically contigous segments
-Message-ID: <20190514090544.GC20468@ming.t460p>
-References: <20190513063754.1520-1-hch@lst.de>
- <20190513063754.1520-2-hch@lst.de>
- <20190513094544.GA30381@ming.t460p>
- <20190513120344.GA22993@lst.de>
- <20190514043642.GB10824@ming.t460p>
- <20190514051441.GA6294@lst.de>
+        id S1726130AbfENJRV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 May 2019 05:17:21 -0400
+Received: from mx2.suse.de ([195.135.220.15]:51906 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726058AbfENJRV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 May 2019 05:17:21 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id D28A2AF01;
+        Tue, 14 May 2019 09:17:19 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="HlL+5n6rz5pIUxbD"
-Content-Disposition: inline
-In-Reply-To: <20190514051441.GA6294@lst.de>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 14 May 2019 09:06:01 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 14 May 2019 11:17:19 +0200
+From:   Roman Penyaev <rpenyaev@suse.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/1] io_uring: fix infinite wait in khread_park() on
+ io_finish_async()
+In-Reply-To: <bcf3f935-e2c0-6bcf-92fb-760583ff5500@kernel.dk>
+References: <20190513182028.29912-1-rpenyaev@suse.de>
+ <bcf3f935-e2c0-6bcf-92fb-760583ff5500@kernel.dk>
+Message-ID: <18e65f75e5a3972bec42d830ac397501@suse.de>
+X-Sender: rpenyaev@suse.de
+User-Agent: Roundcube Webmail
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---HlL+5n6rz5pIUxbD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Tue, May 14, 2019 at 07:14:41AM +0200, Christoph Hellwig wrote:
-> On Tue, May 14, 2019 at 12:36:43PM +0800, Ming Lei wrote:
-> > > > Some workloads need this optimization, please see 729204ef49ec00b
-> > > > ("block: relax check on sg gap"):
-> > > 
-> > > And we still allow to merge the segments with this patch.  The only
-> > > difference is that these merges do get accounted as extra segments.
-> > 
-> > It is easy for .nr_phys_segments to reach the max segment limit by this
-> > way, then no new bio can be merged any more.
+On 2019-05-13 20:52, Jens Axboe wrote:
+> On 5/13/19 12:20 PM, Roman Penyaev wrote:
+>> This fixes couple of races which lead to infinite wait of park 
+>> completion
+>> with the following backtraces:
+>> 
+>>   [20801.303319] Call Trace:
+>>   [20801.303321]  ? __schedule+0x284/0x650
+>>   [20801.303323]  schedule+0x33/0xc0
+>>   [20801.303324]  schedule_timeout+0x1bc/0x210
+>>   [20801.303326]  ? schedule+0x3d/0xc0
+>>   [20801.303327]  ? schedule_timeout+0x1bc/0x210
+>>   [20801.303329]  ? preempt_count_add+0x79/0xb0
+>>   [20801.303330]  wait_for_completion+0xa5/0x120
+>>   [20801.303331]  ? wake_up_q+0x70/0x70
+>>   [20801.303333]  kthread_park+0x48/0x80
+>>   [20801.303335]  io_finish_async+0x2c/0x70
+>>   [20801.303336]  io_ring_ctx_wait_and_kill+0x95/0x180
+>>   [20801.303338]  io_uring_release+0x1c/0x20
+>>   [20801.303339]  __fput+0xad/0x210
+>>   [20801.303341]  task_work_run+0x8f/0xb0
+>>   [20801.303342]  exit_to_usermode_loop+0xa0/0xb0
+>>   [20801.303343]  do_syscall_64+0xe0/0x100
+>>   [20801.303349]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>> 
+>>   [20801.303380] Call Trace:
+>>   [20801.303383]  ? __schedule+0x284/0x650
+>>   [20801.303384]  schedule+0x33/0xc0
+>>   [20801.303386]  io_sq_thread+0x38a/0x410
+>>   [20801.303388]  ? __switch_to_asm+0x40/0x70
+>>   [20801.303390]  ? wait_woken+0x80/0x80
+>>   [20801.303392]  ? _raw_spin_lock_irqsave+0x17/0x40
+>>   [20801.303394]  ? io_submit_sqes+0x120/0x120
+>>   [20801.303395]  kthread+0x112/0x130
+>>   [20801.303396]  ? kthread_create_on_node+0x60/0x60
+>>   [20801.303398]  ret_from_fork+0x35/0x40
+>> 
+>>  o kthread_park() waits for park completion, so io_sq_thread() loop
+>>    should check kthread_should_park() along with khread_should_stop(),
+>>    otherwise if kthread_park() is called before prepare_to_wait()
+>>    the following schedule() never returns.
+>> 
+>>  o if the flag ctx->sqo_stop is observed by the io_sq_thread() loop
+>>    it is quite possible, that kthread_should_park() check and the
+>>    following kthread_parkme() is never called, because kthread_park()
+>>    has not been yet called, but few moments later is is called and
+>>    waits there for park completion, which never happens, because
+>>    kthread has already exited.
+>> 
+>> It seems that parking here is not needed at all (thread is parked and
+>> then stopped and never unparked), so here in this patch I simply rely
+>> on kthread_should_stop() check and then exit the thread.
 > 
-> As said in my other mail we only decremented it for request merges
-> in the non-gap case before and no one complained.
-
-However we still may make it better, for example, the attached patch can
-save 10~20% time when running 'mkfs.ntfs -s 512 /dev/vda', lots of small
-request(63KB) can be merged to big IO(1MB).
-
+> The park is a bit of a work-around, without it we get warning spews on
+> shutdown with SQPOLL set and affinity set to a single CPU.
 > 
-> > We don't consider segment merge between two bios in ll_new_hw_segment(),
-> > in my mkfs test over virtio-blk, request size can be increased to ~1M(several
-> > segments) from 63k(126 bios/segments) easily if the segment merge between
-> > two bios is considered.
+> Also see:
 > 
-> With the gap devices we have unlimited segment size, see my next patch
-> to actually enforce that.  Which is much more efficient than using
-
-But this patch does effect on non-gap device, and actually most of
-device are non-gap type.
-
-> multiple segments.  Also instead of hacking up the merge path even more
-> we can fix the block device buffered I/O path to submit large I/Os
-> instead of relying on merging like we do in the direct I/O code and every
-> major file system.  I have that on my plate as a todo list item.
+> commit 06058632464845abb1af91521122fd04dd3daaec
+> Author: Jens Axboe <axboe@kernel.dk>
+> Date:   Sat Apr 13 09:26:03 2019 -0600
 > 
-> > > We do that in a couple of places.  For one the nvme single segment
-> > > optimization that triggered this bug.  Also for range discard support
-> > > in nvme and virtio.  Then we have loop that  iterate the segments, but
-> > > doesn't use the nr_phys_segments count, and plenty of others that
-> > > iterate over pages at the moment but should be iterating bvecs,
-> > > e.g. ubd or aoe.
-> > 
-> > Seems discard segment doesn't consider bios merge for nvme and virtio,
-> > so it should be fine in this way. Will take a close look at nvme/virtio
-> > discard segment merge later.
-> 
-> I found the bio case by looking at doing the proper accounting in the
-> bio merge path and hitting KASAN warning due to the range kmalloc.
-> So that issue is real as well.
+>     io_uring: park SQPOLL thread if it's percpu
 
-I guess the following patch may fix it:
+I see.  Do you think it makes sense to fix this is kthread?  With 
+something
+as the following:
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index f1d90cd3dc47..a913110de389 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -175,7 +175,7 @@ static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
- 
- static int virtblk_setup_discard_write_zeroes(struct request *req, bool unmap)
- {
--	unsigned short segments = blk_rq_nr_discard_segments(req);
-+	unsigned short segments = 0;
- 	unsigned short n = 0;
- 	struct virtio_blk_discard_write_zeroes *range;
- 	struct bio *bio;
-@@ -184,6 +184,9 @@ static int virtblk_setup_discard_write_zeroes(struct request *req, bool unmap)
- 	if (unmap)
- 		flags |= VIRTIO_BLK_WRITE_ZEROES_FLAG_UNMAP;
- 
-+	__rq_for_each_bio(bio, req)
-+		segments++;
+diff --git a/kernel/kthread.c b/kernel/kthread.c
+index be4e8795561a..191f8be5c9e0 100644
+--- a/kernel/kthread.c
++++ b/kernel/kthread.c
+@@ -472,6 +472,10 @@ void kthread_unpark(struct task_struct *k)
+  {
+         struct kthread *kthread = to_kthread(k);
+
++       if (!__kthread_should_park(k))
++               /* Nop if thread was never parked */
++               break;
 +
- 	range = kmalloc_array(segments, sizeof(*range), GFP_ATOMIC);
- 	if (!range)
- 		return -ENOMEM;
 
 
-Thanks,
-Ming
 
---HlL+5n6rz5pIUxbD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="0001-block-merge-bios-segment.patch"
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 21e87a714a73..af122efeb28d 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -622,6 +622,8 @@ static inline int ll_new_hw_segment(struct request_queue *q,
- 				    struct bio *bio)
- {
- 	int nr_phys_segs = bio_phys_segments(q, bio);
-+	unsigned int seg_size =
-+		req->biotail->bi_seg_back_size + bio->bi_seg_front_size;
- 
- 	if (req->nr_phys_segments + nr_phys_segs > queue_max_segments(q))
- 		goto no_merge;
-@@ -629,11 +631,15 @@ static inline int ll_new_hw_segment(struct request_queue *q,
- 	if (blk_integrity_merge_bio(q, req, bio) == false)
- 		goto no_merge;
- 
--	/*
--	 * This will form the start of a new hw segment.  Bump both
--	 * counters.
--	 */
--	req->nr_phys_segments += nr_phys_segs;
-+	if (blk_phys_contig_segment(q, req->biotail, bio)) {
-+		if (nr_phys_segs)
-+			req->nr_phys_segments += nr_phys_segs - 1;
-+		if (nr_phys_segs == 1)
-+			bio->bi_seg_back_size = seg_size;
-+		if (req->nr_phys_segments == 1)
-+			req->bio->bi_seg_front_size = seg_size;
-+	} else
-+		req->nr_phys_segments += nr_phys_segs;
- 	return 1;
- 
- no_merge:
--- 
-2.20.1
+Nevertheless, the other way is to fix io_uring: we quit loop by
+only kthread_should_park() check (kthread_park() is synchronous,
+so kthread_should_stop() is never observed), and we abandon
+->sqo_stop flag, because it is racy. At the end we always parkme(),
+because we've exited the loop by park flag.
 
 
---HlL+5n6rz5pIUxbD--
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 452e35357865..9401ac1bbd46 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -231,7 +231,6 @@ struct io_ring_ctx {
+         struct task_struct      *sqo_thread;    /* if using sq thread 
+polling */
+         struct mm_struct        *sqo_mm;
+         wait_queue_head_t       sqo_wait;
+-       unsigned                sqo_stop;
+
+         struct {
+                 /* CQ ring */
+@@ -2028,7 +2027,7 @@ static int io_sq_thread(void *data)
+         set_fs(USER_DS);
+
+         timeout = inflight = 0;
+-       while (!kthread_should_stop() && !ctx->sqo_stop) {
++       while (!kthread_should_park()) {
+                 bool all_fixed, mm_fault = false;
+                 int i;
+
+@@ -2090,7 +2089,7 @@ static int io_sq_thread(void *data)
+                         smp_mb();
+
+                         if (!io_get_sqring(ctx, &sqes[0])) {
+-                               if (kthread_should_stop()) {
++                               if (kthread_should_park()) {
+                                         finish_wait(&ctx->sqo_wait, 
+&wait);
+                                         break;
+                                 }
+@@ -2140,8 +2139,7 @@ static int io_sq_thread(void *data)
+                 mmput(cur_mm);
+         }
+
+-       if (kthread_should_park())
+-               kthread_parkme();
++       kthread_parkme();
+
+         return 0;
+  }
+@@ -2273,8 +2271,11 @@ static int io_sqe_files_unregister(struct 
+io_ring_ctx *ctx)
+  static void io_sq_thread_stop(struct io_ring_ctx *ctx)
+  {
+         if (ctx->sqo_thread) {
+-               ctx->sqo_stop = 1;
+-               mb();
++               /*
++                * The park is a bit of a work-around, without it we get
++                * warning spews on shutdown with SQPOLL set and 
+affinity
++                * set to a single CPU.
++                */
+                 kthread_park(ctx->sqo_thread);
+                 kthread_stop(ctx->sqo_thread);
+                 ctx->sqo_thread = NULL;
+
+
+Makes sense?
+
+
+--
+Roman
+
+
+
+
+
