@@ -2,108 +2,85 @@ Return-Path: <SRS0=Ir13=TP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9494CC04AB4
-	for <linux-block@archiver.kernel.org>; Wed, 15 May 2019 00:39:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94401C04AB4
+	for <linux-block@archiver.kernel.org>; Wed, 15 May 2019 03:03:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 48E5020843
-	for <linux-block@archiver.kernel.org>; Wed, 15 May 2019 00:39:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ucsc.edu header.i=@ucsc.edu header.b="hmkVWGZb"
+	by mail.kernel.org (Postfix) with ESMTP id 6C5232084A
+	for <linux-block@archiver.kernel.org>; Wed, 15 May 2019 03:03:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726195AbfEOAj5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 May 2019 20:39:57 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:38454 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726190AbfEOAj5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 May 2019 20:39:57 -0400
-Received: by mail-pg1-f196.google.com with SMTP id j26so405609pgl.5
-        for <linux-block@vger.kernel.org>; Tue, 14 May 2019 17:39:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ucsc.edu; s=ucsc-google-2018;
-        h=from:to:cc:subject:date:message-id;
-        bh=aBmiAOmZcdYY0O365EiKabnGd5fG0JCgLUx8je4V9gc=;
-        b=hmkVWGZbVyVVrQmfIO/zA/A5PprcEYZo9Fgh2bNu/OxBdej3W4auhEAANb9btrTC3z
-         6WnUnSvpBLIArEZcgVTJOdv5AvWyxa5RbFtgGMjZNP7BYe38q1j7z3E2vtv72P3is6Ej
-         Y8zLMqyZwp9gpLW3cYA/2fv3s+h6aYy08zeAk5vQmOtmh3OC7VyCeyUEscFXQx6r2jlI
-         GycW9Jf+mzGfJXNLVPZC4M3ySs8k/XPhjas7X8U2XXwaClcmq+AfNNGVpO5Lgu14GqXx
-         bPpgxnqG2/P2hygAyd2Qy6hoAvO2UqN9bqm7tv05qd9DlkfC+87qXWIn8mlo73vKzXlp
-         T3Vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=aBmiAOmZcdYY0O365EiKabnGd5fG0JCgLUx8je4V9gc=;
-        b=sYcV/6IS7I7pwliT0Qc1iDPaP7lp98m4JbGW9YasiVdL/UrCwua2nYjO3P6z7CYqwb
-         79SHA4vjBV4GY2+OHUXS1nOBgZpkAlK1U9GQTqBFGM3O01F8HdD7gvSB4walK9QTG1Vi
-         L9CfizS+a14Pm22Bm2ZW87NbmRlONUEZ4wq1xzyFN5Ya385hognN8EIRZ2ZSAo3iditw
-         SPuLG4dsyu7drmvKKQpT5IuL4JuqPHgNZYEK4BE9GDIL56mS5aCb7NjE64sJRKgDsUKG
-         5WQ56/fqWGPQRrIJEgl1+NL5Msb/qDqbWmiPU/0ODFgxlrenAMSMoDXRicKEoFlbEsHs
-         lU7Q==
-X-Gm-Message-State: APjAAAUeqoRJwymMguNTMVHTyh7yy96T6rbVDOaAJk87RNR3dYBR+WV/
-        68D1ULs17o7dlogJN8CJiGSG0Q==
-X-Google-Smtp-Source: APXvYqzhrP+LtYZUGswHP9CMkZx92NYmqyOYiODyiaeHyjNWAUphjgsfhiKzXRO4XISxvyvjJdlDjA==
-X-Received: by 2002:a63:7054:: with SMTP id a20mr27458699pgn.354.1557880796429;
-        Tue, 14 May 2019 17:39:56 -0700 (PDT)
-Received: from bohr1.soe.ucsc.edu (bohr1.soe.ucsc.edu. [128.114.52.184])
-        by smtp.gmail.com with ESMTPSA id c142sm370727pfb.171.2019.05.14.17.39.55
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 14 May 2019 17:39:55 -0700 (PDT)
-From:   Heiner Litz <hlitz@ucsc.edu>
-To:     mb@lightnvm.io
-Cc:     javier@javigon.com, hans.holmberg@cnexlabs.com,
-        igor.j.konopko@intel.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Heiner Litz <hlitz@ucsc.edu>
-Subject: [PATCH] lightnvm: pblk: Fix freeing merged pages
-Date:   Tue, 14 May 2019 17:39:52 -0700
-Message-Id: <20190515003952.12541-1-hlitz@ucsc.edu>
-X-Mailer: git-send-email 2.17.1
+        id S1726218AbfEODDW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 May 2019 23:03:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43412 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726201AbfEODDW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 May 2019 23:03:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C54D9300181C;
+        Wed, 15 May 2019 03:03:21 +0000 (UTC)
+Received: from localhost (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 27CEA5D9C0;
+        Wed, 15 May 2019 03:03:15 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 0/3] block: queue exit cleanup
+Date:   Wed, 15 May 2019 11:03:07 +0800
+Message-Id: <20190515030310.20393-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 15 May 2019 03:03:22 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bio_add_pc_page() may merge pages when a bio is padded due to a flush.
-Fix iteration over the bio to free the correct pages in case of a merge.
+Hi,
 
-Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
----
- drivers/lightnvm/pblk-core.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+For fixing queue lock switching back related issue, commit 498f6650aec8
+("block: Fix a race between the cgroup code and request queue initialization")
+moves what blk_exit_queue() does into blk_cleanup_queue(). Turns out
+it requires to protect generic_make_request_checks with blk_queue_enter,
+then we have to hold the queue usage counter before
+generic_make_request_checks(). This way makes generic_make_request()
+code quite complicated and not easy to maintain.
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 773537804319..88d61b27a9ab 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -323,14 +323,16 @@ void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int type)
- void pblk_bio_free_pages(struct pblk *pblk, struct bio *bio, int off,
- 			 int nr_pages)
- {
--	struct bio_vec bv;
--	int i;
--
--	WARN_ON(off + nr_pages != bio->bi_vcnt);
--
--	for (i = off; i < nr_pages + off; i++) {
--		bv = bio->bi_io_vec[i];
--		mempool_free(bv.bv_page, &pblk->page_bio_pool);
-+	struct bio_vec *bv;
-+	struct page *page;
-+	int i,e, nbv = 0;
-+
-+	for (i = 0; i < bio->bi_vcnt; i++) {
-+		bv = &bio->bi_io_vec[i];
-+		page = bv->bv_page;
-+		for (e = 0; e < bv->bv_len; e += PBLK_EXPOSED_PAGE_SIZE, nbv++)
-+			if (nbv >= off)
-+				mempool_free(page++, &pblk->page_bio_pool);
- 	}
- }
- 
+After killing legacy request IO path, there isn't driver private queue
+lock story, then no such issue addressed by 498f6650aec8 any more.
+
+So revert the following commits and clean up related code much. 
+
+	498f6650aec8 block: Fix a race between the cgroup code and request queue initialization
+	37f9579f4c31 blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash
+	cd4a4ae4683d block: don't use blocking queue entered for recursive bio submits
+	24ecc3585348 block: Ensure that a request queue is dissociated from the cgroup controller
+
+Ming Lei (3):
+  block: move blk_exit_queue into __blk_release_queue
+  block: don't protect generic_make_request_checks with blk_queue_enter
+  block: rename BIO_QUEUE_ENTERED as BIO_SPLITTED
+
+ block/blk-core.c           | 74 ++++----------------------------------
+ block/blk-merge.c          | 10 +-----
+ block/blk-sysfs.c          | 47 ++++++++++++++++--------
+ block/blk.h                |  1 -
+ include/linux/blk-cgroup.h |  4 +--
+ include/linux/blk_types.h  |  2 +-
+ 6 files changed, 42 insertions(+), 96 deletions(-)
+
+Cc: Josef Bacik <josef@toxicpanda.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bvanassche@acm.org>
+
 -- 
-2.17.1
+2.20.1
 
