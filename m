@@ -2,164 +2,254 @@ Return-Path: <SRS0=mde3=TQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CD9C04AAF
-	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 14:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C4FCC04E84
+	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 14:32:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 558F12082E
-	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 14:20:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C53352087B
+	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 14:32:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="M/IL1OOE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kw/dPt/T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726696AbfEPOUq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 May 2019 10:20:46 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:37629 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726687AbfEPOUq (ORCPT
+        id S1727302AbfEPOcP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 May 2019 10:32:15 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:39354 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726943AbfEPOcK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 May 2019 10:20:46 -0400
-Received: by mail-io1-f67.google.com with SMTP id u2so2726583ioc.4
-        for <linux-block@vger.kernel.org>; Thu, 16 May 2019 07:20:45 -0700 (PDT)
+        Thu, 16 May 2019 10:32:10 -0400
+Received: by mail-qt1-f195.google.com with SMTP id y42so4125911qtk.6
+        for <linux-block@vger.kernel.org>; Thu, 16 May 2019 07:32:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=65FBkP4Y7bckhSsvcaAkNDTvG4xiHDf43YBBqGOSIMY=;
-        b=M/IL1OOEagxAPTuCLzK94p2qu9EtZMhLI92+WN9zVu0vdBh9ClIO7Hbvn8TKQkBOs/
-         8TbQ3+77MygBWc7APwMgD8ow9b6xNN19WgVPYj1E8AdZvcJcPaE7of2vYOokwKoshU2Z
-         dMFmxgz2cZII90jiXBb4fSQ5Qzfxu2vHqjpujXyshN4alRaRop0itKxNvaADObfHE+lO
-         5XVIlhwCIBTBbc8Lz410xSHcAlSaOqtj/i4eL5jduQ06jNHA1qbrfbo7IQW0VJ2jVR7w
-         duenwIULJ/DpIMtnGEqXHE2cbjgoNJJe/q1IVWVBQoRMXldGLMpRwYgYCnBGy9hPUKNz
-         6Lcw==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=X8Zn0Ao5+NlF3rVXz5zRXX+lJ34YqVoy4hz0BMVmeC0=;
+        b=kw/dPt/T0pFLManSsIA+MRgz7dLyswMCxpBoBK6RYP9TvbnG5+dEWXmlhahmnMy8pf
+         oal8VfF2Cj877boI8J/Oz53sQ+abDDRqZT5AjZbdS9HwIox56NEeuv1PqGU/Q/nzyir9
+         Lf/0HccQm8QbtwuvqF449FcOkCxlzy4bMfwaP3/q9D1pFARDKTFdhQoIcDih9Ke6OpmC
+         km2WPwv2B3AqKW945SIS+TJkDnstb3cnixDMCRKsyQwvcMngSQTkmhmTmn7EBl/annym
+         Ycoml7ZPSyl6pl1K3+uZs+mxroTzsxOL6MjPSpRPHjjcwM03pT8BAtivSAyXFt8oI5ns
+         Fbag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=65FBkP4Y7bckhSsvcaAkNDTvG4xiHDf43YBBqGOSIMY=;
-        b=A49MP+eWoSXWpaXM4H4T9ZdwnqZmGmOG6FzJ8MtMfBRCGwolMd4uDvxaUV5VsWIGnT
-         MMf+AVc6Xz8gBVyEKS0XUtSHLnGfWpiHdJvfclLrRS7Cw+Z6wLJ/bmYRANiOpM2X3AsU
-         SUQV668jXHZQXgiDX0Tkzk4b7ly0O2gEoeNPNb6ck7/iOAj+KaQ2gspUi8q8IjD0vgn7
-         75+sgYRd2lzWH+t9Dmi7BfQuMiZKqcdHQgy6IhFe6TJLRHezX3XbpKr/JscXTY7Ert/C
-         lOs/7S4jJNmTcR7E1cy6CAZasmnn0IjCRGb2LNq7MdYhpGbX4H1squv0OABq6m63hm3V
-         WwKA==
-X-Gm-Message-State: APjAAAUTXw/eZtH5NmSB+DNjDQtaD6VOrYPZHaV4/OiRoOR+2zKryRsW
-        dIooOJrymjBegb5sJtVGbOFJsqQuKhuGtA==
-X-Google-Smtp-Source: APXvYqyafi6KrwgQeV5MDkjjAsl2F/zg5c4L8+fRY6MXPLhRlMRh7Fuj1vt3KlWV79ge5OZHDtCs2w==
-X-Received: by 2002:a6b:5814:: with SMTP id m20mr27663068iob.293.1558016445078;
-        Thu, 16 May 2019 07:20:45 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id t133sm1789672iod.84.2019.05.16.07.20.43
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=X8Zn0Ao5+NlF3rVXz5zRXX+lJ34YqVoy4hz0BMVmeC0=;
+        b=fLxGp5wdAGI/mOEFxVFXtb1xbQ3FIQq7QTH7CNSki1ADWeqmkq8zae/WTmIdoWBWsb
+         NWGhnxqg84yumxEvDlOnY10lT64xWUI9nuIOMmYU266gtfOXfNgKau8abW21biF1JPen
+         yg0KNA9H7uX84lcCMGzhLh/WPFAusBFw/tzgf3IboZvLEn9WcCqreUiaF5JW3niLz1SA
+         /b2BtJfBsl5vdkQJnS3xqSbapZbP024/22EgE6CxpZD80sYcE91b7Xqqpxg7h0zZuyNV
+         GsgiLfbbEURXVI+gMOrIUzh1pzgawzcVooCwMuZlDHfw589hmt5bzrUXjPZbK1krdN5C
+         9LQg==
+X-Gm-Message-State: APjAAAUFtn/5pF8LS7jk7p180MU0TcmZXtsMPZUCZAcDwLRhstphyRlB
+        7lGX9DxKty2WmqbrgSUWRaw=
+X-Google-Smtp-Source: APXvYqwqbyY/Biluv92FiPwVOXOXCbK63r67F7rPvK2jDDYHhUK5972NbxA1J46u+agIWydR7P4rjQ==
+X-Received: by 2002:a0c:b64c:: with SMTP id q12mr40943352qvf.50.1558017129220;
+        Thu, 16 May 2019 07:32:09 -0700 (PDT)
+Received: from localhost (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id y13sm4119292qtc.21.2019.05.16.07.32.07
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 16 May 2019 07:20:44 -0700 (PDT)
-Subject: Re: [PATCH v2 1/1] io_uring: fix infinite wait in khread_park() on
- io_finish_async()
-To:     Roman Penyaev <rpenyaev@suse.de>
-Cc:     linux-block@vger.kernel.org
-References: <20190516085357.30801-1-rpenyaev@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a708c3f0-0a23-d83a-aef1-740ccf5c6c1c@kernel.dk>
-Date:   Thu, 16 May 2019 08:20:43 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Thu, 16 May 2019 07:32:07 -0700 (PDT)
+Date:   Thu, 16 May 2019 10:32:07 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Bryan Gurney <bgurney@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Colin Ian King <colin.king@canonical.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Helen Koike <helen.koike@collabora.com>,
+        Huaisheng Ye <yehs1@lenovo.com>,
+        Martin Wilck <mwilck@suse.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Nikos Tsironis <ntsironis@arrikto.com>,
+        Peng Wang <rocking@whu.edu.cn>,
+        Sheetal Singala <2396sheetal@gmail.com>,
+        YueHaibing <yuehaibing@huawei.com>, Yufen Yu <yuyufen@huawei.com>
+Subject: [git pull v2] device mapper changes for 5.2
+Message-ID: <20190516143206.GA16368@lobo>
+References: <20190513185948.GA26710@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190516085357.30801-1-rpenyaev@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190513185948.GA26710@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/16/19 2:53 AM, Roman Penyaev wrote:
-> This fixes couple of races which lead to infinite wait of park completion
-> with the following backtraces:
-> 
->   [20801.303319] Call Trace:
->   [20801.303321]  ? __schedule+0x284/0x650
->   [20801.303323]  schedule+0x33/0xc0
->   [20801.303324]  schedule_timeout+0x1bc/0x210
->   [20801.303326]  ? schedule+0x3d/0xc0
->   [20801.303327]  ? schedule_timeout+0x1bc/0x210
->   [20801.303329]  ? preempt_count_add+0x79/0xb0
->   [20801.303330]  wait_for_completion+0xa5/0x120
->   [20801.303331]  ? wake_up_q+0x70/0x70
->   [20801.303333]  kthread_park+0x48/0x80
->   [20801.303335]  io_finish_async+0x2c/0x70
->   [20801.303336]  io_ring_ctx_wait_and_kill+0x95/0x180
->   [20801.303338]  io_uring_release+0x1c/0x20
->   [20801.303339]  __fput+0xad/0x210
->   [20801.303341]  task_work_run+0x8f/0xb0
->   [20801.303342]  exit_to_usermode_loop+0xa0/0xb0
->   [20801.303343]  do_syscall_64+0xe0/0x100
->   [20801.303349]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> 
->   [20801.303380] Call Trace:
->   [20801.303383]  ? __schedule+0x284/0x650
->   [20801.303384]  schedule+0x33/0xc0
->   [20801.303386]  io_sq_thread+0x38a/0x410
->   [20801.303388]  ? __switch_to_asm+0x40/0x70
->   [20801.303390]  ? wait_woken+0x80/0x80
->   [20801.303392]  ? _raw_spin_lock_irqsave+0x17/0x40
->   [20801.303394]  ? io_submit_sqes+0x120/0x120
->   [20801.303395]  kthread+0x112/0x130
->   [20801.303396]  ? kthread_create_on_node+0x60/0x60
->   [20801.303398]  ret_from_fork+0x35/0x40
-> 
->  o kthread_park() waits for park completion, so io_sq_thread() loop
->    should check kthread_should_park() along with khread_should_stop(),
->    otherwise if kthread_park() is called before prepare_to_wait()
->    the following schedule() never returns:
-> 
->    CPU#0                    CPU#1
-> 
->    io_sq_thread_stop():     io_sq_thread():
-> 
->                                while(!kthread_should_stop() && !ctx->sqo_stop) {
-> 
->       ctx->sqo_stop = 1;
->       kthread_park()
-> 
-> 	                            prepare_to_wait();
->                                     if (kthread_should_stop() {
-> 				    }
->                                     schedule();   <<< nobody checks park flag,
-> 				                  <<< so schedule and never return
-> 
->  o if the flag ctx->sqo_stop is observed by the io_sq_thread() loop
->    it is quite possible, that kthread_should_park() check and the
->    following kthread_parkme() is never called, because kthread_park()
->    has not been yet called, but few moments later is is called and
->    waits there for park completion, which never happens, because
->    kthread has already exited:
-> 
->    CPU#0                    CPU#1
-> 
->    io_sq_thread_stop():     io_sq_thread():
-> 
->       ctx->sqo_stop = 1;
->                                while(!kthread_should_stop() && !ctx->sqo_stop) {
->                                    <<< observe sqo_stop and exit the loop
-> 			       }
-> 
-> 			       if (kthread_should_park())
-> 			           kthread_parkme();  <<< never called, since was
-> 					              <<< never parked
-> 
->       kthread_park()           <<< waits forever for park completion
-> 
-> In the current patch we quit the loop by only kthread_should_park()
-> check (kthread_park() is synchronous, so kthread_should_stop() is
-> never observed), and we abandon ->sqo_stop flag, since it is racy.
-> At the end of the io_sq_thread() we unconditionally call parmke(),
-> since we've exited the loop by the park flag.
+Hi Linus,
 
-Thanks Roman, looks (and tests) good. Applied.
+Seems you haven't pulled my 'for-5.2/dm-changes' tag from earlier this
+week so I've added 4 additional simple commits to this v2 pull.
 
--- 
-Jens Axboe
+(Last commit being trivial janitor patch but I'm being hen-pecked about
+it by the author on LKML so figured I'd include it while getting you the
+3 additional substantive fixes).
 
+The following changes since commit dc4060a5dc2557e6b5aa813bf5b73677299d62d2:
+
+  Linux 5.1-rc5 (2019-04-14 15:17:41 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.2/dm-changes-v2
+
+for you to fetch changes up to 8454fca4f53bbe5e0a71613192674c8ce5c52318:
+
+  dm: fix a couple brace coding style issues (2019-05-16 10:09:21 -0400)
+
+Please pull, thanks!
+Mike
+
+----------------------------------------------------------------
+- Improve DM snapshot target's scalability by using finer grained
+  locking.  Requires some list_bl interface improvements.
+
+- Add ability for DM integrity to use a bitmap mode, that tracks regions
+  where data and metadata are out of sync, instead of using a journal.
+
+- Improve DM thin provisioning target to not write metadata changes to
+  disk if the thin-pool and associated thin devices are merely
+  activated but not used.  This avoids metadata corruption due to
+  concurrent activation of thin devices across different OS instances
+  (e.g. split brain scenarios, which ultimately would be avoided if
+  proper device filters were used -- but not having proper filtering has
+  proven a very common configuration mistake)
+
+- Fix missing call to path selector type->end_io in DM multipath.  This
+  fixes reported performance problems due to inaccurate path selector IO
+  accounting causing an imbalance of IO (e.g. avoiding issuing IO to
+  particular path due to it seemingly being heavily used).
+
+- Fix bug in DM cache metadata's loading of its discard bitset that
+  could lead to all cache blocks being discarded if the very first cache
+  block was discarded (thankfully in practice the first cache block is
+  generally in use; be it FS superblock, partition table, disk label,
+  etc).
+
+- Add testing-only DM dust target which simulates a device that has
+  failing sectors and/or read failures.
+
+- Fix a DM init error path reference count hang that caused boot hangs
+  if user supplied malformed input on kernel commandline.
+
+- Fix a couple issues with DM crypt target's logging being overly
+  verbose or lacking context.
+
+- Various other small fixes to DM init, DM multipath, DM zoned, and DM
+  crypt.
+
+----------------------------------------------------------------
+Bryan Gurney (1):
+      dm: add dust target
+
+Christoph Hellwig (1):
+      dm crypt: fix endianness annotations around org_sector_of_dmreq
+
+Colin Ian King (1):
+      dm dust: remove redundant unsigned comparison to less than zero
+
+Damien Le Moal (1):
+      dm zoned: Fix zone report handling
+
+Dan Carpenter (1):
+      dm zoned: Silence a static checker warning
+
+Helen Koike (2):
+      dm init: fix max devices/targets checks
+      dm ioctl: fix hang in early create error condition
+
+Huaisheng Ye (3):
+      dm writecache: remove needless dereferences in __writecache_writeback_pmem()
+      dm writecache: add unlikely for returned value of rb_next/prev
+      dm writecache: remove unused member page_offset in writeback_struct
+
+Martin Wilck (1):
+      dm mpath: always free attached_handler_name in parse_path()
+
+Mike Snitzer (5):
+      dm space map common: zero entire ll_disk
+      dm thin metadata: check __commit_transaction()'s return
+      dm thin metadata: add wrappers for managing write locking of metadata
+      dm thin metadata: do not write metadata if no changes occurred
+      dm integrity: whitespace, coding style and dead code cleanup
+
+Mikulas Patocka (13):
+      dm delay: fix a crash when invalid device is specified
+      dm writecache: avoid unnecessary lookups in writecache_find_entry()
+      dm integrity: correctly calculate the size of metadata area
+      dm integrity: don't check null pointer before kvfree and vfree
+      dm integrity: don't report unused options
+      dm integrity: update documentation
+      dm integrity: introduce rw_journal_sectors()
+      dm ingerity: pass size to dm_integrity_alloc_page_list()
+      dm integrity: allow large ranges to be described
+      dm integrity: introduce a function add_new_range_and_wait()
+      dm integrity: add a bitmap mode
+      dm integrity: handle machine reboot in bitmap mode
+      dm integrity: implement synchronous mode for reboot handling
+
+Milan Broz (2):
+      dm crypt: move detailed message into debug level
+      dm crypt: print device name in integrity error message
+
+Nikos Tsironis (7):
+      dm cache metadata: Fix loading discard bitset
+      list: Don't use WRITE_ONCE() in hlist_add_behind()
+      list_bl: Add hlist_bl_add_before/behind helpers
+      dm snapshot: Don't sleep holding the snapshot lock
+      dm snapshot: Replace mutex with rw semaphore
+      dm snapshot: Make exception tables scalable
+      dm snapshot: Use fine-grained locking scheme
+
+Peng Wang (1):
+      dm: only initialize md->dax_dev if CONFIG_DAX_DRIVER is enabled
+
+Sheetal Singala (1):
+      dm: fix a couple brace coding style issues
+
+YueHaibing (1):
+      dm dust: Make dm_dust_init and dm_dust_exit static
+
+Yufen Yu (1):
+      dm mpath: fix missing call of path selector type->end_io
+
+ Documentation/device-mapper/dm-dust.txt          | 272 +++++++++
+ Documentation/device-mapper/dm-integrity.txt     |  32 +-
+ drivers/md/Kconfig                               |   9 +
+ drivers/md/Makefile                              |   1 +
+ drivers/md/dm-cache-metadata.c                   |   9 +-
+ drivers/md/dm-crypt.c                            |  26 +-
+ drivers/md/dm-delay.c                            |   3 +-
+ drivers/md/dm-dust.c                             | 515 ++++++++++++++++
+ drivers/md/dm-exception-store.h                  |   3 +-
+ drivers/md/dm-init.c                             |   8 +-
+ drivers/md/dm-integrity.c                        | 717 ++++++++++++++++++++---
+ drivers/md/dm-ioctl.c                            |   6 +-
+ drivers/md/dm-mpath.c                            |  19 +-
+ drivers/md/dm-rq.c                               |   8 +-
+ drivers/md/dm-snap.c                             | 359 ++++++++----
+ drivers/md/dm-target.c                           |   3 +-
+ drivers/md/dm-thin-metadata.c                    | 139 +++--
+ drivers/md/dm-writecache.c                       |  29 +-
+ drivers/md/dm-zoned-metadata.c                   |   5 +
+ drivers/md/dm-zoned-target.c                     |   3 +-
+ drivers/md/dm.c                                  |  12 +-
+ drivers/md/persistent-data/dm-space-map-common.c |   2 +
+ include/linux/device-mapper.h                    |   3 +-
+ include/linux/list.h                             |   2 +-
+ include/linux/list_bl.h                          |  26 +
+ 25 files changed, 1915 insertions(+), 296 deletions(-)
+ create mode 100644 Documentation/device-mapper/dm-dust.txt
+ create mode 100644 drivers/md/dm-dust.c
