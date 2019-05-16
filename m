@@ -2,127 +2,108 @@ Return-Path: <SRS0=mde3=TQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F705C04AAF
-	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 20:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81852C04AAF
+	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 23:05:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 14A5020818
-	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 20:44:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="0eDh7fH3"
+	by mail.kernel.org (Postfix) with ESMTP id 5310020818
+	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 23:05:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1558047902;
+	bh=YBVVu0V+X1TbeXgS5CGFpdhpwfmyR0/cEgHVpu17tMQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=v0wmUAvHdELzf/EgR+n39uCfdl8O2QbKHIXDTvPFz5qvYzxVYg1X84RKeJCwjHxT5
+	 EdQ3Mvi6o7bghy328f6ht7Cv+HU+RmMabQ0D+0ef1MIQadY+4TY5PcAicVP1ajy76R
+	 gm9938WxJ6vRrWv4I65V/SipCiZyaXFLruyOdYwM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726706AbfEPUoL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 May 2019 16:44:11 -0400
-Received: from mail-it1-f195.google.com ([209.85.166.195]:37392 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726449AbfEPUoL (ORCPT
+        id S1726692AbfEPXFB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 May 2019 19:05:01 -0400
+Received: from mail-lj1-f177.google.com ([209.85.208.177]:47038 "EHLO
+        mail-lj1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726461AbfEPXFB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 May 2019 16:44:11 -0400
-Received: by mail-it1-f195.google.com with SMTP id m140so8535168itg.2
-        for <linux-block@vger.kernel.org>; Thu, 16 May 2019 13:44:10 -0700 (PDT)
+        Thu, 16 May 2019 19:05:01 -0400
+Received: by mail-lj1-f177.google.com with SMTP id h21so4544097ljk.13
+        for <linux-block@vger.kernel.org>; Thu, 16 May 2019 16:04:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ykHQl86Sla8ocODEf66DBTS2PNkL7EqHjixhDXTbtic=;
-        b=0eDh7fH38tOZZ+ZnXWWTkLdWOyB7tWVpMnp2/i8ljjn5lueCBuAVctI+HgF5vwZaHZ
-         dIDfIRYnu7jFOCXNNA/liKJuIK75dCfCcxGCLdXVZfcvYMHq/Y8ZneTajn4CuIFcpkvA
-         5i4B1U+LRATPkVSkUQQQvUWZpzFuO1+ViX/HBwxx2ENwkU+JZkLN+OnRAmArjr02bgAD
-         UJyCZOfF5qhd7lAwy9cLdfhWNddhkZ9CKqminL2A7Vq8gvKI1PveezPZuwlj1L+rs0an
-         Uie00ao/a0cg004z3AgSpbMbOItmTcG/M4RJBtUXOB+BYhSAPBOS94JxzzPr0RWVMI7F
-         cncg==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=C6gmjJd7N5Nv8q9iz96Jdb1ylTkw3RMOCbKRe/2+VB8=;
+        b=dxgqfs9fq2wqHK+mmo4PR9pjY/d1/hIFkR4vuEe2dGD68H7Lxiz4SeW18TGqrOEdQY
+         ozZMj6Mlzb+cL2/EPgw9SpdZwXLyvMNijkm1AHy+m5NfiR/bY42dju8qX4mXfGxMHzEE
+         DGd2CEi2T8RpC8XD5CJWIJUJqLtCmdrM2F6WQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ykHQl86Sla8ocODEf66DBTS2PNkL7EqHjixhDXTbtic=;
-        b=CRaaS1/vFDp7s0ZOLpSdEkCKeQtmJ+naGHef/Om75LXXBdQloSHitOpI2lyNmxW+G1
-         DQvck2NnJ7A6A2ZQV/uZaAga7j+4+3GosxZ6jzZqyBTsWkrVxr48iOCcYYgyWtxNKy87
-         WFlQ1vasIiyexyJFTDiydbGfGWl8OlX99oviBqSdR5xgyOZIEqj9/fSxxe3qaCH7hHrt
-         AE39dguGXB93zL1viQ9D6xLBEppek5djYike7iwXGP+j4ZfR5OkBBPoynzOKn/wMj2Tz
-         slxBkdwLYTYZYFQNldZ+7LXKYyL9sQ62XlbdjqPN+cxpljp8c7QtkANELn3CrPRCvbw4
-         a1Qg==
-X-Gm-Message-State: APjAAAX3mrkvOB1BepINV0qr4KvTIx5AQSZPiHFrjI+Pv9G+322Prbz0
-        U84WS3cu20mPhH9vgGvxDYBFsszdnEWMgQ==
-X-Google-Smtp-Source: APXvYqz4ErTr5zT74uGCRaNfjtC4dXGpUB+D9qFPTpmXRJCltn5+DjhhCl82VOJqwooUhYUZ/gq3Tg==
-X-Received: by 2002:a02:b89:: with SMTP id 131mr35138323jad.58.1558039449694;
-        Thu, 16 May 2019 13:44:09 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id l13sm2013423iti.6.2019.05.16.13.44.08
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=C6gmjJd7N5Nv8q9iz96Jdb1ylTkw3RMOCbKRe/2+VB8=;
+        b=HeI98u+80y7XSjjhCKbX1ElOEpmDSCUzquVDY8AA4pcUQzASs8OAz6kFwlbMRfYEUB
+         okVs56tjBljMOgn9M63e2dceO/YjXXwKiieTc64OU1i+jmQ34NDEqebz7U5KguFSTMhW
+         6iitEln6qFnbQnTL/jvvolkXHP8PseEc7RQpyzXS+OXgpKA8xfxyoI7a4oU3Phd2ZXs2
+         k8Rl0Az1/QcJS+I78VNTb9AzKa5w+96iLX4Jgvg1Fdsu0RyjmHPIBWOizmNvXc1Q40sZ
+         o7AH3WUMVeR0ZxEMzyphHs9EMSnnylUrHzSIVFKtq3QWJ/ZUZQIIEvSAK8MFfP7ZHDHy
+         CFuQ==
+X-Gm-Message-State: APjAAAXPSjMm/AyuCRic7PPvGjljpCbLWXK65Ppy+I5+b82uW+yFMdVj
+        lPRM0EtlDRdcowsMpz/hfai65hNR25U=
+X-Google-Smtp-Source: APXvYqyAjMUJt5A94Z0Kiq+jrTY3G+KVmMPiw/yWaO5HrT9r0+FPTtbGRfalJZc7w8Dpz8l9zOnQuw==
+X-Received: by 2002:a2e:2b16:: with SMTP id q22mr26378764lje.20.1558047898617;
+        Thu, 16 May 2019 16:04:58 -0700 (PDT)
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com. [209.85.208.181])
+        by smtp.gmail.com with ESMTPSA id d16sm1181219lfi.75.2019.05.16.16.04.58
+        for <linux-block@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 16 May 2019 13:44:08 -0700 (PDT)
-Subject: Re: [PATCH] loop: Don't change loop device under exclusive opener
-To:     Jan Kara <jack@suse.cz>
-Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        linux-block@vger.kernel.org
-References: <20190516140127.23272-1-jack@suse.cz>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <50edd0fa-9cfa-38e1-8870-0fbc5c618522@kernel.dk>
-Date:   Thu, 16 May 2019 14:44:07 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Thu, 16 May 2019 16:04:58 -0700 (PDT)
+Received: by mail-lj1-f181.google.com with SMTP id h19so4607393ljj.4
+        for <linux-block@vger.kernel.org>; Thu, 16 May 2019 16:04:58 -0700 (PDT)
+X-Received: by 2002:a2e:9b0c:: with SMTP id u12mr3767139lji.189.1558047564003;
+ Thu, 16 May 2019 15:59:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190516140127.23272-1-jack@suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190513185948.GA26710@redhat.com> <20190516143206.GA16368@lobo>
+In-Reply-To: <20190516143206.GA16368@lobo>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu, 16 May 2019 15:59:08 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whepZ=ht0h-+XaQzag5eAVQtofDW_gUknwu+d+Cnh+yQw@mail.gmail.com>
+Message-ID: <CAHk-=whepZ=ht0h-+XaQzag5eAVQtofDW_gUknwu+d+Cnh+yQw@mail.gmail.com>
+Subject: Re: [git pull v2] device mapper changes for 5.2
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     dm-devel@redhat.com, linux-block <linux-block@vger.kernel.org>,
+        Alasdair G Kergon <agk@redhat.com>,
+        Bryan Gurney <bgurney@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Colin Ian King <colin.king@canonical.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Helen Koike <helen.koike@collabora.com>,
+        Huaisheng Ye <yehs1@lenovo.com>,
+        Martin Wilck <mwilck@suse.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Nikos Tsironis <ntsironis@arrikto.com>,
+        Peng Wang <rocking@whu.edu.cn>,
+        Sheetal Singala <2396sheetal@gmail.com>,
+        YueHaibing <yuehaibing@huawei.com>, Yufen Yu <yuyufen@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/16/19 8:01 AM, Jan Kara wrote:
-> Loop module allows calling LOOP_SET_FD while there are other openers of
-> the loop device. Even exclusive ones. This can lead to weird
-> consequences such as kernel deadlocks like:
-> 
-> mount_bdev()				lo_ioctl()
->   udf_fill_super()
->     udf_load_vrs()
->       sb_set_blocksize() - sets desired block size B
->       udf_tread()
->         sb_bread()
->           __bread_gfp(bdev, block, B)
-> 					  loop_set_fd()
-> 					    set_blocksize()
->             - now __getblk_slow() indefinitely loops because B != bdev
->               block size
-> 
-> Fix the problem by disallowing LOOP_SET_FD ioctl when there are
-> exclusive openers of a loop device.
-> 
-> [Deliberately chosen not to CC stable as a user with priviledges to
-> trigger this race has other means of taking the system down and this
-> has a potential of breaking some weird userspace setup]
-> 
-> Reported-and-tested-by: syzbot+10007d66ca02b08f0e60@syzkaller.appspotmail.com
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
->  drivers/block/loop.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
-> 
-> Hi Jens!
-> 
-> What do you think about this patch? It fixes the problem but it also
-> changes user visible behavior so there are chances it breaks some
-> existing setup (although I have hard time coming up with a realistic
-> scenario where it would matter).
+On Thu, May 16, 2019 at 7:32 AM Mike Snitzer <snitzer@redhat.com> wrote:
+>
+> Seems you haven't pulled my 'for-5.2/dm-changes' tag from earlier this
+> week so I've added 4 additional simple commits to this v2 pull.
 
-I also have a hard time thinking about valid cases where this would be a
-problem. I think, in the end, that fixing the issue is more important
-than a potentially hypothetical use case.
+Hmm. Strange. I see your email from three days ago now that you
+mention it, but I don't recall having ever seen it before.
 
-> Alternatively we could change getblk() code handle changing block
-> size. That would fix the particular issue syzkaller found as well but
-> I'm not sure what else is broken when block device changes while fs
-> driver is working with it.
+I must have fat-fingered it when it came in, and it was marked as
+"read" without having ever been seen. Possibly because I was traveling
+for my daughter's graduation, and being on mobile.
 
-I think your solution here is saner.
+Anyway, good that you re-sent, updates and all. Now pulled
 
--- 
-Jens Axboe
-
+                  Linus
