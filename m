@@ -6,109 +6,98 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24BE5C04AAF
-	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 12:33:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDEF0C04AAF
+	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 12:51:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F247220848
-	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 12:33:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A73C2087B
+	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 12:51:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727230AbfEPMdY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 May 2019 08:33:24 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47090 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726717AbfEPMdY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 May 2019 08:33:24 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 46D69AD57;
-        Thu, 16 May 2019 12:33:23 +0000 (UTC)
-Subject: Re: Block device naming
-To:     Alibek Amaev <alibek.a@gmail.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-References: <CA+TYKz1o=uOn0m3tPGqmNZtw7mGdZ7_BGX0C0RH9f3wnFDpO6Q@mail.gmail.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <e81e675e-e084-197a-fc13-101985bde590@suse.de>
-Date:   Thu, 16 May 2019 14:33:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+        id S1726723AbfEPMvK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 May 2019 08:51:10 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:49334 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726503AbfEPMvK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 May 2019 08:51:10 -0400
+Received: from fsav101.sakura.ne.jp (fsav101.sakura.ne.jp [27.133.134.228])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id x4GComBb001967;
+        Thu, 16 May 2019 21:50:48 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav101.sakura.ne.jp (F-Secure/fsigk_smtp/530/fsav101.sakura.ne.jp);
+ Thu, 16 May 2019 21:50:48 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/530/fsav101.sakura.ne.jp)
+Received: from [192.168.1.8] (softbank126012062002.bbtec.net [126.12.62.2])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id x4GComi8001962
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NO);
+        Thu, 16 May 2019 21:50:48 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: INFO: task hung in __get_super
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        syzbot <syzbot+10007d66ca02b08f0e60@syzkaller.appspotmail.com>,
+        dvyukov@google.com, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        linux-block@vger.kernel.org
+References: <0000000000002cd22305879b22c4@google.com>
+ <201905150102.x4F12b6o009249@www262.sakura.ne.jp>
+ <20190515102133.GA16193@quack2.suse.cz>
+ <024bba2a-4d2f-1861-bfd9-819511bdf6eb@i-love.sakura.ne.jp>
+ <20190515130730.GA9526@quack2.suse.cz>
+ <20190516114817.GD13274@quack2.suse.cz>
+ <ca1e5916-73ee-6fc4-1d78-428691f7fc64@i-love.sakura.ne.jp>
+ <20190516123201.GG13274@quack2.suse.cz>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <e9ffd00a-809c-9eca-45b4-31449a64032e@i-love.sakura.ne.jp>
+Date:   Thu, 16 May 2019 21:50:51 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CA+TYKz1o=uOn0m3tPGqmNZtw7mGdZ7_BGX0C0RH9f3wnFDpO6Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190516123201.GG13274@quack2.suse.cz>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/16/19 2:26 PM, Alibek Amaev wrote:
-> Hi!
+On 2019/05/16 21:32, Jan Kara wrote:
+> On Thu 16-05-19 21:17:14, Tetsuo Handa wrote:
+>> On 2019/05/16 20:48, Jan Kara wrote:
+>>> OK, so non-racy fix was a bit more involved and I've ended up just
+>>> upgrading the file reference to an exclusive one in loop_set_fd() instead
+>>> of trying to hand-craft some locking solution. The result is attached and
+>>> it passes blktests.
+>>
+>> blkdev_get() has corresponding blkdev_put().
+>> bdgrab() does not have corresponding bdput() ?
 > 
-> I want to address the following problem:
-> On the system with hot-attached new storage volume, such as FC-switch
-> update configuration for connected FC-HBA on servers, linux kernel
-> reorder block devices and change names of block devices. Becouse
-> scsi-id, wwn-id and other is a symbol links to block device names than
-> on change block device name change path to device.
-> This causes the server to stop working.
-> 
-> For example, on server present ZFS pool with attached device by scsi-id
-> # zpool status
->    pool: pool
->   state: ONLINE
->    scan: scrub repaired 0 in 1h39m with 0 errors on Sun Oct  8 02:03:34 2017
-> config:
-> 
->      NAME                                      STATE     READ WRITE CKSUM
->      pool                                      ONLINE       0     0     0
->        scsi-3600144f0c7a5bc61000058d3b96d001d  ONLINE       0     0     0
-> 
-> Before export new block device from storage to hba, scsi-id have next
-> path to device:
-> /dev/disk/by-id/scsi-3600144f0c7a5bc61000058d3b96d001d -> ../../sdd
-> 
-> When added new block device by FC-switch, FC-HBA kernel change block
-> device names:
-> /dev/disk/by-id/scsi-3600144f0c7a5bc61000058d3b96d001d -> ../../sdf
-> 
-> and ZFS can't access to device until reboot (partprobe, zpool online
-> -e pool scsi-3600144f0c7a5bc61000058d3b96d001d - may help or may not
-> help)
-> 
-Hmm. That really is curious; typically existing devices will not be 
-reassigned. Especially not if they are in use by something.
-And the FC layer is going into quite some lengths to prevent this from 
-happening.
-So this really looks more like an issue with how exactly this 'adding 
-new block device' step was done.
+> Yes, and that's hidden inside blkdev_put() (or failing blkdev_get()). Don't
+> get me started on calling conventions of these functions... I've wasted half
+> an hour trying to figure out where I'm leaking inode references in my patch
+> ;).
 
-> Is there any way to fix or change this behavior of the kernel?
-> 
-As I said, this typically does not happen.
-It would need closer examination to figure out what really happened.
+Ah, found tricky comment. Please apply the patch. Thank you.
 
-> It may be more reasonable to immediately assign an unique persistent
-> identifier of device and linking other identifiers with it?
-> 
-Which is what we try ...
-
-> Also I think this is not specific problem of ZFS. And can occur with other
-> file system modules.Moreover, I had previously encountered a similar
-> problem - NetAPP
-> storage attached to servers by FC and export multiple LUN - suddenly
-> decided to change the order of LUNs and Ext4 on servers is switch to
-> readonly mode because driver detect changes of magic number in
-> superblocks of partitions.
-> 
-Suddently changing the order of LUNs is _not_ what is supposed to 
-happen. This really sounds more like an issue with NetApp.
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                              +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
+/**
+ * blkdev_get - open a block device
+ * @bdev: block_device to open
+ * @mode: FMODE_* mask
+ * @holder: exclusive holder identifier
+ *
+ * Open @bdev with @mode.  If @mode includes %FMODE_EXCL, @bdev is
+ * open with exclusive access.  Specifying %FMODE_EXCL with %NULL
+ * @holder is invalid.  Exclusive opens may nest for the same @holder.
+ *
+ * On success, the reference count of @bdev is unchanged.  On failure,
+ * @bdev is put.
+ *
+ * CONTEXT:
+ * Might sleep.
+ *
+ * RETURNS:
+ * 0 on success, -errno on failure.
+ */
