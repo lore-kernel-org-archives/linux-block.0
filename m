@@ -2,102 +2,91 @@ Return-Path: <SRS0=mde3=TQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDEF0C04AAF
-	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 12:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 950A6C04AAF
+	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 13:17:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A73C2087B
-	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 12:51:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71D1920818
+	for <linux-block@archiver.kernel.org>; Thu, 16 May 2019 13:17:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726723AbfEPMvK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 May 2019 08:51:10 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:49334 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726503AbfEPMvK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 May 2019 08:51:10 -0400
-Received: from fsav101.sakura.ne.jp (fsav101.sakura.ne.jp [27.133.134.228])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id x4GComBb001967;
-        Thu, 16 May 2019 21:50:48 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav101.sakura.ne.jp (F-Secure/fsigk_smtp/530/fsav101.sakura.ne.jp);
- Thu, 16 May 2019 21:50:48 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/530/fsav101.sakura.ne.jp)
-Received: from [192.168.1.8] (softbank126012062002.bbtec.net [126.12.62.2])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id x4GComi8001962
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NO);
-        Thu, 16 May 2019 21:50:48 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: INFO: task hung in __get_super
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        syzbot <syzbot+10007d66ca02b08f0e60@syzkaller.appspotmail.com>,
-        dvyukov@google.com, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        linux-block@vger.kernel.org
-References: <0000000000002cd22305879b22c4@google.com>
- <201905150102.x4F12b6o009249@www262.sakura.ne.jp>
- <20190515102133.GA16193@quack2.suse.cz>
- <024bba2a-4d2f-1861-bfd9-819511bdf6eb@i-love.sakura.ne.jp>
- <20190515130730.GA9526@quack2.suse.cz>
- <20190516114817.GD13274@quack2.suse.cz>
- <ca1e5916-73ee-6fc4-1d78-428691f7fc64@i-love.sakura.ne.jp>
- <20190516123201.GG13274@quack2.suse.cz>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <e9ffd00a-809c-9eca-45b4-31449a64032e@i-love.sakura.ne.jp>
-Date:   Thu, 16 May 2019 21:50:51 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1727427AbfEPNRN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 May 2019 09:17:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40138 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727350AbfEPNRN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 May 2019 09:17:13 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 73299882F2;
+        Thu, 16 May 2019 13:17:13 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3AF425D6A9;
+        Thu, 16 May 2019 13:17:08 +0000 (UTC)
+Date:   Thu, 16 May 2019 21:17:04 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@fb.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/4] block: don't decrement nr_phys_segments for
+ physically contigous segments
+Message-ID: <20190516131703.GA26943@ming.t460p>
+References: <20190516084058.20678-1-hch@lst.de>
+ <20190516084058.20678-2-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20190516123201.GG13274@quack2.suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190516084058.20678-2-hch@lst.de>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Thu, 16 May 2019 13:17:13 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/05/16 21:32, Jan Kara wrote:
-> On Thu 16-05-19 21:17:14, Tetsuo Handa wrote:
->> On 2019/05/16 20:48, Jan Kara wrote:
->>> OK, so non-racy fix was a bit more involved and I've ended up just
->>> upgrading the file reference to an exclusive one in loop_set_fd() instead
->>> of trying to hand-craft some locking solution. The result is attached and
->>> it passes blktests.
->>
->> blkdev_get() has corresponding blkdev_put().
->> bdgrab() does not have corresponding bdput() ?
+Hi Christoph,
+
+On Thu, May 16, 2019 at 10:40:55AM +0200, Christoph Hellwig wrote:
+> Currently ll_merge_requests_fn, unlike all other merge functions,
+> reduces nr_phys_segments by one if the last segment of the previous,
+> and the first segment of the next segement are contigous.  While this
+> seems like a nice solution to avoid building smaller than possible
+> requests it causes a mismatch between the segments actually present
+> in the request and those iterated over by the bvec iterators, including
+> __rq_for_each_bio.  This could cause overwrites of too small kmalloc
+> allocations in any driver using ranged discard, or also mistrigger
+> the single segment optimization in the nvme-pci driver.
 > 
-> Yes, and that's hidden inside blkdev_put() (or failing blkdev_get()). Don't
-> get me started on calling conventions of these functions... I've wasted half
-> an hour trying to figure out where I'm leaking inode references in my patch
-> ;).
+> We could possibly work around this by making the bvec iterators take
+> the front and back segment size into account, but that would require
+> moving them from the bio to the bio_iter and spreading this mess
+> over all users of bvecs.  Or we could simply remove this optimization
+> under the assumption that most users already build good enough bvecs,
+> and that the bio merge patch never cared about this optimization
+> either.  The latter is what this patch does.
+> 
+> Fixes: b35ba01ea697 ("nvme: support ranged discard requests")
+> Fixes: 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support")
 
-Ah, found tricky comment. Please apply the patch. Thank you.
+ll_merge_requests_fn() is only called from attempt_merge() in case
+that ELEVATOR_BACK_MERGE is returned from blk_try_req_merge(). However,
+for discard merge of both virtio_blk and nvme, ELEVATOR_DISCARD_MERGE is
+always returned from blk_try_req_merge() in attempt_merge(), so looks
+ll_merge_requests_fn() shouldn't be called for virtio_blk/nvme's discard
+request. Just wondering if you may explain a bit how the change on
+ll_merge_requests_fn() in this patch makes a difference on the above
+two commits?
 
-/**
- * blkdev_get - open a block device
- * @bdev: block_device to open
- * @mode: FMODE_* mask
- * @holder: exclusive holder identifier
- *
- * Open @bdev with @mode.  If @mode includes %FMODE_EXCL, @bdev is
- * open with exclusive access.  Specifying %FMODE_EXCL with %NULL
- * @holder is invalid.  Exclusive opens may nest for the same @holder.
- *
- * On success, the reference count of @bdev is unchanged.  On failure,
- * @bdev is put.
- *
- * CONTEXT:
- * Might sleep.
- *
- * RETURNS:
- * 0 on success, -errno on failure.
- */
+> Fixes: 297910571f08 ("nvme-pci: optimize mapping single segment requests using SGLs")
+
+I guess it should be dff824b2aadb ("nvme-pci: optimize mapping of small
+single segment requests").
+
+Yes, this patch helps for this case, cause blk_rq_nr_phys_segments() may be 1
+but there are two bios which share same segment.
+
+Thanks,
+Ming
