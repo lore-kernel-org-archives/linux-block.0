@@ -2,102 +2,98 @@ Return-Path: <SRS0=xX0B=TR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9097BC04AB4
-	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 22:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1162C04AB4
+	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 23:02:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C9062087E
-	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 22:59:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="P/9e6bjo"
+	by mail.kernel.org (Postfix) with ESMTP id AD0022087E
+	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 23:02:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726853AbfEQW7u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 May 2019 18:59:50 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:43349 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726519AbfEQW7u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 May 2019 18:59:50 -0400
-Received: by mail-pg1-f193.google.com with SMTP id t22so3945758pgi.10
-        for <linux-block@vger.kernel.org>; Fri, 17 May 2019 15:59:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=tug9Q9th898cY2omkiw7RTZyUw2WfPSXBZQ/FeXbAkQ=;
-        b=P/9e6bjo8XAXrsrhceXhy1vMAWDMoJZvh0+VVomH8QiSlrxWj5aKukK/r4GQwxPScU
-         91rCXDtK+XUh6a1f0WCMFc4mqy6TqQES0dPwWcwYRX1R0OuswZT8vkrN1Ls8XsyZWk+a
-         0c/uo4hCwxGBfT8C+LUr90jq9DYRVKxiR9+JrdR5k6gNuQe+nBR+pI6w/pssqY66AF2m
-         kNFbV+Nc6qKDgd+Xb/WhOeWQECNeMleNE7G3x2DftJ9e9hw4ZAjpxEJ5FFUW9I91v/vU
-         yqw6Q85JLu96eLX0ZkwtL70As140+R8GlCNEFDf9v54t4LmjGcFHKH+0aHz3gcgQIRCr
-         VNMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tug9Q9th898cY2omkiw7RTZyUw2WfPSXBZQ/FeXbAkQ=;
-        b=DZ53z5+J43/C8gGVGhP3oTBCTqbKIA5IZOuaZliJYxhZuyfFcRqr3BdCB5IdDzNsz/
-         P3WGlee/0VXrJ0iOMv4sn+hpJu4tGcmPN1BDB3y3Ud3fm2udVW7sBBOcjrmCA9k5CNXZ
-         lNppkFUFz89dtvf2Ze5DmDo/AyrV1y8/3Bs3QAkeR4Njlc6DXuA9Nvx9tIKd5Rssn45k
-         bOADWpOTLozt9/pOnMkVPcyG05AJcdshh7q2hOYiioUaUuxoZNXaXEN84mAo1+LsfEmi
-         sFXZLE/NKBTSDD2XVNhk7kllBtD/+njS98/NcqFhQjEVq1OIIsh+KFOuDvWXwdG/UPqG
-         dS+Q==
-X-Gm-Message-State: APjAAAXdtUOe5/dJNqnewYli+PB28mkQ7XPwt8CYvYaHKJNwqKBQgFEd
-        OskKssT+1mbyDX/bU6i2k+6RnIiNDGrKWg==
-X-Google-Smtp-Source: APXvYqy8iHrZkCavlke8rQpzQn5yluUHlir/Gv0jbaU44MC2q70NK8Q9AZVp0wcuECl1ZxT6WDHf5A==
-X-Received: by 2002:a63:754b:: with SMTP id f11mr59810851pgn.32.1558133989966;
-        Fri, 17 May 2019 15:59:49 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id v66sm22027626pfa.38.2019.05.17.15.59.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 17 May 2019 15:59:48 -0700 (PDT)
-Subject: Re: [PATCH] block: bio: use struct_size() in kmalloc()
-From:   Jens Axboe <axboe@kernel.dk>
-To:     xiaolinkui <xiaolinkui@kylinos.cn>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1558084350-25632-1-git-send-email-xiaolinkui@kylinos.cn>
- <e46a73e2-b04d-371b-f199-e789dbdbd9fc@kernel.dk>
-Message-ID: <d83390a9-33be-3d76-3e23-b97f0a05b72f@kernel.dk>
-Date:   Fri, 17 May 2019 16:59:47 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726893AbfEQXCU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 May 2019 19:02:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:2917 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726519AbfEQXCU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 May 2019 19:02:20 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BED5A308429D;
+        Fri, 17 May 2019 23:02:19 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 521C85C8B9;
+        Fri, 17 May 2019 23:02:14 +0000 (UTC)
+Date:   Sat, 18 May 2019 07:02:09 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@fb.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/4] block: don't decrement nr_phys_segments for
+ physically contigous segments
+Message-ID: <20190517230208.GB22236@ming.t460p>
+References: <20190516084058.20678-1-hch@lst.de>
+ <20190516084058.20678-2-hch@lst.de>
+ <20190516131703.GA26943@ming.t460p>
 MIME-Version: 1.0
-In-Reply-To: <e46a73e2-b04d-371b-f199-e789dbdbd9fc@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190516131703.GA26943@ming.t460p>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Fri, 17 May 2019 23:02:19 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/17/19 3:17 PM, Jens Axboe wrote:
-> On 5/17/19 3:12 AM, xiaolinkui wrote:
->> One of the more common cases of allocation size calculations is finding
->> the size of a structure that has a zero-sized array at the end, along
->> with memory for some number of elements for that array. For example:
->>
->> struct foo {
->>     int stuff;
->>     struct boo entry[];
->> };
->>
->> instance = kmalloc(sizeof(struct foo) + count * sizeof(struct boo), GFP_KERNEL);
->>
->> Instead of leaving these open-coded and prone to type mistakes, we can
->> now use the new struct_size() helper:
->>
->> instance = kmalloc(struct_size(instance, entry, count), GFP_KERNEL);
+On Thu, May 16, 2019 at 09:17:04PM +0800, Ming Lei wrote:
+> Hi Christoph,
 > 
-> Applied, thanks.
+> On Thu, May 16, 2019 at 10:40:55AM +0200, Christoph Hellwig wrote:
+> > Currently ll_merge_requests_fn, unlike all other merge functions,
+> > reduces nr_phys_segments by one if the last segment of the previous,
+> > and the first segment of the next segement are contigous.  While this
+> > seems like a nice solution to avoid building smaller than possible
+> > requests it causes a mismatch between the segments actually present
+> > in the request and those iterated over by the bvec iterators, including
+> > __rq_for_each_bio.  This could cause overwrites of too small kmalloc
+> > allocations in any driver using ranged discard, or also mistrigger
+> > the single segment optimization in the nvme-pci driver.
+> > 
+> > We could possibly work around this by making the bvec iterators take
+> > the front and back segment size into account, but that would require
+> > moving them from the bio to the bio_iter and spreading this mess
+> > over all users of bvecs.  Or we could simply remove this optimization
+> > under the assumption that most users already build good enough bvecs,
+> > and that the bio merge patch never cared about this optimization
+> > either.  The latter is what this patch does.
+> > 
+> > Fixes: b35ba01ea697 ("nvme: support ranged discard requests")
+> > Fixes: 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support")
+> 
+> ll_merge_requests_fn() is only called from attempt_merge() in case
+> that ELEVATOR_BACK_MERGE is returned from blk_try_req_merge(). However,
+> for discard merge of both virtio_blk and nvme, ELEVATOR_DISCARD_MERGE is
+> always returned from blk_try_req_merge() in attempt_merge(), so looks
+> ll_merge_requests_fn() shouldn't be called for virtio_blk/nvme's discard
+> request. Just wondering if you may explain a bit how the change on
+> ll_merge_requests_fn() in this patch makes a difference on the above
+> two commits?
+> 
+> > Fixes: 297910571f08 ("nvme-pci: optimize mapping single segment requests using SGLs")
+> 
+> I guess it should be dff824b2aadb ("nvme-pci: optimize mapping of small
+> single segment requests").
+> 
+> Yes, this patch helps for this case, cause blk_rq_nr_phys_segments() may be 1
+> but there are two bios which share same segment.
 
-I take that back, you obviously didn't even compile this patch. Never
-send untested crap, without explicitly saying so.
+BTW, I just sent a single-line nvme-pci fix on this issue, which may be more
+suitable to serve as v5.2 fix:
 
--- 
-Jens Axboe
+http://lists.infradead.org/pipermail/linux-nvme/2019-May/024283.html
 
+Thanks,
+Ming
