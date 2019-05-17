@@ -2,165 +2,158 @@ Return-Path: <SRS0=xX0B=TR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15151C46470
-	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 03:33:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACAF1C04E84
+	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 05:32:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D75D52084A
-	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 03:33:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E8C52089E
+	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 05:32:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RL0qFDEM"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="AdUEU8ky"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727655AbfEQDd5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 May 2019 23:33:57 -0400
-Received: from mail-it1-f194.google.com ([209.85.166.194]:55963 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725929AbfEQDd5 (ORCPT
+        id S1727879AbfEQFcL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 May 2019 01:32:11 -0400
+Received: from mailout4.samsung.com ([203.254.224.34]:22040 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727838AbfEQFcL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 May 2019 23:33:57 -0400
-Received: by mail-it1-f194.google.com with SMTP id q132so9691840itc.5;
-        Thu, 16 May 2019 20:33:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Zlc1Z5RAkaS+PLi8IjlRp7vUkQUrPkJAKFClneQV0+4=;
-        b=RL0qFDEMyN6iaevXm0sqvWWVZ7MEgondFX77P7G9i30niJ4a6ygBthzOQVm2COtdbm
-         /lQ5bVfNdwMnO1oQHUR+msGw93+09086TMi9uvLI+WHB+njNlStrOh+N3bWjMoL/GKR+
-         z2P+JD4HUeLrSBc3J5uYKc1bRqpW2lpa3iuYv7K6FKSMinPkVUCJqoGfKS5JvNB0aLKQ
-         BoL/MlLGB9+2uC703qsVLYOgNDJMA5eopf2nTc3/ZPQlBQgA0pqsm6kejSYJ7Gast4f8
-         FXk/k+1BaiXSmLGRjKdGGPARlBUwVJcCo+I9MDyaFXIzCC7jZMWlGMmwBA/caWju5lVh
-         yRLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Zlc1Z5RAkaS+PLi8IjlRp7vUkQUrPkJAKFClneQV0+4=;
-        b=jCaQHh7NTjNMDF7f1DVCbypY4SiSM53I6dAe/I9iHncWz2LIP+lAUkcm0v3ijkMYVL
-         7jx/aFLcmBFPzpfOuVlIGkaDyHKEvTOn/vlZnIRfiJgQ6CxL951V6hBs9Jn0/LsBxb1J
-         RR5AX1nub+wvjBJKvNc2SFKp9vNQS1Q/hq0HGDx7PRntNHtZj2VQxMUlbp8ub1ugv61T
-         3tBEvml/XQb43v58LTRuC+aseMg6+ghvmqgaGeXcz3lfaWJz78RwRCvqM6XZIMbl1CCq
-         DNlmD2ZtPIdhHtG97VPg77GUyEpm1OSJQzDS9ydULf9wcwaUvInEtZg0L6dQiI5i6XiD
-         JlFg==
-X-Gm-Message-State: APjAAAV7h/gSeDCZmdXPLuJT0KiFobalKff0QQNWiTZdCj4qqh1BYRDe
-        5drJXOw2uU2E5lcmboyDaOY1+17Ly+W0gMFdGA4=
-X-Google-Smtp-Source: APXvYqzs0Bz8wmwYtNqOt4wvUGYHLM1ecN3L9b4rqTzExniCfH4inr5Kc4YZRlmrKsHhoVkGKXa5dQ82PQcOjVYPBfw=
-X-Received: by 2002:a24:f983:: with SMTP id l125mr16700177ith.62.1558064036522;
- Thu, 16 May 2019 20:33:56 -0700 (PDT)
+        Fri, 17 May 2019 01:32:11 -0400
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20190517053207epoutp04dfbc756035a865554986de2ce3be7d10~fYW9jqfw22294922949epoutp04G
+        for <linux-block@vger.kernel.org>; Fri, 17 May 2019 05:32:07 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20190517053207epoutp04dfbc756035a865554986de2ce3be7d10~fYW9jqfw22294922949epoutp04G
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1558071127;
+        bh=QoTb4J0MrDDwjXI5H0Us5qd6vRZEw/A2DnYVdFwNDKs=;
+        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+        b=AdUEU8kyiPppfK8EiOpBmjPqi8cBeSx0mXpu7jy6Bn3kD3wRG2LdivADeGg5yp3cp
+         0J09ysVXCuc9RQYhIauxTmu29imNiWpL7SNKRzP+Fq9JCqDAmZojkBjtlGIx0Tg15c
+         c9IS3WPk2Wp7VBU0OisVxeQ14iOu5qsaQcbMPsow=
+Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20190517053206epcas5p4b2e9229062957ac7436e187f43b9036d~fYW9AI5Bn2456024560epcas5p4s;
+        Fri, 17 May 2019 05:32:06 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        7B.D8.04066.6574EDC5; Fri, 17 May 2019 14:32:06 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20190517053206epcas5p275a94194a8e60c0ec38c9f8ad7424570~fYW8tLZYv2772627726epcas5p2-;
+        Fri, 17 May 2019 05:32:06 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20190517053206epsmtrp268ab76a813e98e2764488c436d7cc3f0~fYW8sdtQd1717817178epsmtrp2v;
+        Fri, 17 May 2019 05:32:06 +0000 (GMT)
+X-AuditID: b6c32a4a-973ff70000000fe2-77-5cde47560a17
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        81.63.03662.6574EDC5; Fri, 17 May 2019 14:32:06 +0900 (KST)
+Received: from JOSHIK01 (unknown [107.111.93.135]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20190517053204epsmtip298269f87eb140783bb081bc4f965491c~fYW7U4EYQ2086620866epsmtip2j;
+        Fri, 17 May 2019 05:32:04 +0000 (GMT)
+From:   "kanchan" <joshi.k@samsung.com>
+To:     "'Christoph Hellwig'" <hch@infradead.org>
+Cc:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-ext4@vger.kernel.org>, <prakash.v@samsung.com>,
+        <anshul@samsung.com>
+In-Reply-To: <20190510170249.GA26907@infradead.org>
+Subject: RE: [PATCH v5 0/7] Extend write-hint framework, and add write-hint
+ for Ext4 journal
+Date:   Fri, 17 May 2019 11:01:55 +0530
+Message-ID: <00fb01d50c71$dd358e50$97a0aaf0$@samsung.com>
 MIME-Version: 1.0
-References: <20190430223722.20845-1-gpiccoli@canonical.com>
-In-Reply-To: <20190430223722.20845-1-gpiccoli@canonical.com>
-From:   Eric Ren <renzhengeek@gmail.com>
-Date:   Fri, 17 May 2019 11:33:45 +0800
-Message-ID: <CAKM4Aez=eC96uyqJa+=Aom2M2eQnknQW_uY4v9NMVpROSiuKSg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] block: Fix a NULL pointer dereference in generic_make_request()
-To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Cc:     linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-        dm-devel@redhat.com, axboe@kernel.dk, gavin.guo@canonical.com,
-        jay.vosburgh@canonical.com, kernel@gpiccoli.net,
-        Bart Van Assche <bvanassche@acm.org>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AQJoSeMIlXjPMuci1lQDnd0IsY+e8wLu+qiYAUGsmF+lJrwgsA==
+Content-Language: en-us
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrOKsWRmVeSWpSXmKPExsWy7bCmlm6Y+70Yg8nHZS1+T5/CanF6wiIm
+        i723tC1mzrvDZrFn70kWi8u75rBZzF/2lN3iypRFzA4cHptXaHlsXlLv0bdlFaPH501yASxR
+        XDYpqTmZZalF+nYJXBmXD25kLZgtWHH8xQbmBsa5fF2MnBwSAiYSV349ZAaxhQR2M0pcW6sM
+        YX9ilNj/172LkQvI/sYo8X/tJrYuRg6whj1rYyDiexklFt37yALhPGeUODnlGTtIN5uAqsS9
+        H71sILaIgK7E2YUvGEFsZoGrjBIXNoeC2JwCxhJvlj4D2ywsECfRcHcCWC8LUO/TjnZWEJtX
+        wFLiz81JTBC2oMTJmU9YIObIS2x/O4cZ4gMFid2fjrKCHCci4CSxckUuRIm4xMujR9hBbpMQ
+        eM0m8WfTGhaIeheJyUuusEPYwhKvjm+BsqUkPr/bywZhF0v8unOUGaK5g1HiesNMqGZ7iYt7
+        /jKBLGMW0JRYv0sfYhmfRO/vJ0yQAOKV6GgTgqhWlLg36SkrhC0u8XDGEijbQ+Lh282MExgV
+        ZyH5bBaSz2YheWEWwrIFjCyrGCVTC4pz01OLTQuM8lLL9YoTc4tL89L1kvNzNzGCk4+W1w7G
+        Zed8DjEKcDAq8fAK+NyNEWJNLCuuzD3EKMHBrCTCu+H97Rgh3pTEyqrUovz4otKc1OJDjNIc
+        LErivJNYr8YICaQnlqRmp6YWpBbBZJk4OKUaGHsUg/cuzhA3cT5ize57oPVrbt+qZ8ukNXPF
+        4htk4/hyipyzlRJ0l4rHdC6sdptRwXbn4YdN336vO/Z30V+W2sTyzRLLNC/+sf4Xpm8aE/1l
+        +ZVwNa1Uo0kXW1XsPp77FTtJYcGpJ1y+vGzXpJ/dvq8yp3P2l986uz/unCp8+sPLnMexjdsW
+        /ldiKc5INNRiLipOBABRZoWPOgMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupmkeLIzCtJLcpLzFFi42LZdlhJXjfM/V6MwZZPHBa/p09htTg9YRGT
+        xd5b2hYz591hs9iz9ySLxeVdc9gs5i97ym5xZcoiZgcOj80rtDw2L6n36NuyitHj8ya5AJYo
+        LpuU1JzMstQifbsErozLBzeyFswWrDj+YgNzA+Ncvi5GDg4JAROJPWtjuhi5OIQEdjNK7Fy+
+        kq2LkRMoLi7RfO0HO4QtLLHy33N2iKKnjBJHN0wCK2ITUJW496MXzBYR0JU4u/AFI0gRs8Bd
+        Rom3M5Yxwo3tX/UerIpTwFjizdJnzCC2sECMxPrJC8HiLECTnna0s4LYvAKWEn9uTmKCsAUl
+        Ts58wgJyKrOAnkTbRkaQMLOAvMT2t3OYIa5TkNj96SgrSImIgJPEyhW5ECXiEi+PHmGfwCg8
+        C8mgWQiDZiEZNAtJxwJGllWMkqkFxbnpucWGBUZ5qeV6xYm5xaV56XrJ+bmbGMFRpKW1g/HE
+        ifhDjAIcjEo8vDs878YIsSaWFVfmHmKU4GBWEuHd8P52jBBvSmJlVWpRfnxRaU5q8SFGaQ4W
+        JXFe+fxjkUIC6YklqdmpqQWpRTBZJg5OqQbGtSvPLP/z/omR9ddeRvfu0w+PfZjBnCjFePmI
+        jOy9FvdSs4uffx69fXBt9MyJPXr1heeyt/4ttfuzrti6OexOkqbs9CUf/hZwVpkov/qx513o
+        6ZK8pzqTtP26G69duvT8WMvyL6sefy7I+NjMZ7/i8Yk614sftLn5ckW57t0RDNm/Jmbi87jv
+        05VYijMSDbWYi4oTAciFmlieAgAA
+X-CMS-MailID: 20190517053206epcas5p275a94194a8e60c0ec38c9f8ad7424570
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61
+References: <CGME20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61@epcas2p1.samsung.com>
+        <1556191202-3245-1-git-send-email-joshi.k@samsung.com>
+        <20190510170249.GA26907@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Hi Christoph, 
 
-On Wed, 1 May 2019 at 06:38, Guilherme G. Piccoli
-<gpiccoli@canonical.com> wrote:
->
-> Commit 37f9579f4c31 ("blk-mq: Avoid that submitting a bio concurrently
-> with device removal triggers a crash") introduced a NULL pointer
-> dereference in generic_make_request(). The patch sets q to NULL and
-> enter_succeeded to false; right after, there's an 'if (enter_succeeded)'
-> which is not taken, and then the 'else' will dereference q in
-> blk_queue_dying(q).
->
-> This patch just moves the 'q = NULL' to a point in which it won't trigger
-> the oops, although the semantics of this NULLification remains untouched.
->
-> A simple test case/reproducer is as follows:
-> a) Build kernel v5.1-rc7 with CONFIG_BLK_CGROUP=n.
->
-> b) Create a raid0 md array with 2 NVMe devices as members, and mount it
-> with an ext4 filesystem.
->
-> c) Run the following oneliner (supposing the raid0 is mounted in /mnt):
-> (dd of=/mnt/tmp if=/dev/zero bs=1M count=999 &); sleep 0.3;
-> echo 1 > /sys/block/nvme0n1/device/device/remove
-> (whereas nvme0n1 is the 2nd array member)
->
-> This will trigger the following oops:
->
-> BUG: unable to handle kernel NULL pointer dereference at 0000000000000078
-> PGD 0 P4D 0
-> Oops: 0000 [#1] SMP PTI
-> RIP: 0010:generic_make_request+0x32b/0x400
-> Call Trace:
->  submit_bio+0x73/0x140
->  ext4_io_submit+0x4d/0x60
->  ext4_writepages+0x626/0xe90
->  do_writepages+0x4b/0xe0
-> [...]
->
-> This patch has no functional changes and preserves the md/raid0 behavior
-> when a member is removed before kernel v4.17.
->
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: stable@vger.kernel.org # v4.17
-> Fixes: 37f9579f4c31 ("blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash")
-> Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
+> Including the one this model causes on at least some SSDs where you now
+statically allocate resources to a stream that is now not globally
+available.  
 
-Thanks for the bugfix. I also had a panic having very similar
-calltrace below as this one,
-when using devicemapper in container scenario and deleting many thin
-snapshots by dmsetup
-remove_all -f, meanwhile executing lvm command like vgs.
+Sorry but can you please elaborate the issue? I do not get what is being
+statically allocated which was globally available earlier.
+If you are referring to nvme driver,  available streams at subsystem level
+are being reflected for all namespaces. This is same as earlier. 
+There is no attempt to explicitly allocate (using dir-receive) or reserve
+streams for any namespace.  
+Streams will continue to get allocated/released implicitly as and when
+writes (with stream id) arrive.
 
-After applied this one, my testing doesn't crash kernel any more for
-one week.  Could the block
-developers please give more feedback/priority on this one?
+> All for the little log with very short date lifetime that any half decent
+hot/cold partitioning algorithm in the SSD should be able to detect.
 
-My panic trace:
-```
-50515.136279] BUG: unable to handle kernel NULL pointer dereference at
-00000000000003b8
-[50515.144704] PGD 0 P4D 0
-[50515.147576] Oops: 0000 [#1] SMP PTI
-[50515.151403] CPU: 24 PID: 45287 Comm: vgs Kdump: loaded Not tainted
-4.19.24-9.x86_64#1
-[50515.169295] RIP: 0010:generic_make_request+0x24/0x350
-[50515.174684] Code: e9 e1 45 42 00 90 0f 1f 44 00 00 55 48 89 e5 41
-55 41 54 53 48 89 fb 48 83 e4 f0 48 83 ec 20 48 8b 47 08 f6 47 15 08
-8b 77 10 <4c> 8b a0 b8 03 00 00 0f 84 82 00 00 00 49 8b 84 24 50 07 00
-00 a8
-[50515.194303] RSP: 0018:ffffa90862373a10 EFLAGS: 00010246
-[50515.199869] RAX: 0000000000000000 RBX: ffff99d7338b7800 RCX: 0000000000000000
-[50515.207347] RDX: ffff99d51d89c380 RSI: 0000000000000000 RDI: ffff99d7338b7800
-[50515.214828] RBP: ffffa90862373a48 R08: 0000000000000000 R09: ffff99a840007300
-[50515.222305] R10: ffffa90862373b88 R11: 0000000000000000 R12: ffff99d833592200
-[50515.229782] R13: ffffa90862373b58 R14: 0000000000000001 R15: 0000000000000000
-[50515.237264] FS:  00007fc36b322880(0000) GS:ffff99d83f000000(0000)
-knlGS:0000000000000000
-[50515.245944] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[50515.252036] CR2: 00000000000003b8 CR3: 0000005c53ed0001 CR4: 00000000003626a0
-[50515.259519] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[50515.266996] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[50515.274473] Call Trace:
-[50515.277264]  ? bio_add_page+0x42/0x50
-[50515.281267]  submit_bio+0x6e/0x130
-[50515.285013]  new_read+0xa2/0xf0 [dm_bufio]
-[50515.289454]  dm_bm_read_lock+0x21/0x70 [dm_persistent_data]
-[50515.295369]  ro_step+0x31/0x60 [dm_persistent_data]
-[50515.300589]  dm_btree_find_key+0xb0/0x180 [dm_persistent_data]
-[50515.306765]  dm_thin_get_highest_mapped_block+0x75/0x90 [dm_thin_pool]
-[50515.313639]  thin_status+0x145/0x290 [dm_thin_pool]
-...
-```
-Regards,
-Eric
+With streams, hot/cold segregation is happening at the time of placement
+itself, without algorithm; that is a clear win over algorithms which take
+time/computation to be able to do the same.
+And infrastructure update (write-hint-to-stream-id conversion in
+block-layer,  in-kernel hints etc.) seems to be required anyway for streams
+to extend its reach beyond nvme and user-space hints.
+  
+Thanks,
+
+-----Original Message-----
+From: Christoph Hellwig [mailto:hch@infradead.org] 
+Sent: Friday, May 10, 2019 10:33 PM
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: linux-kernel@vger.kernel.org; linux-block@vger.kernel.org;
+linux-nvme@lists.infradead.org; linux-fsdevel@vger.kernel.org;
+linux-ext4@vger.kernel.org; prakash.v@samsung.com; anshul@samsung.com
+Subject: Re: [PATCH v5 0/7] Extend write-hint framework, and add write-hint
+for Ext4 journal
+
+I think this fundamentally goes in the wrong direction.  We explicitly
+designed the block layer infrastructure around life time hints and not the
+not fish not flesh streams interface, which causes all kinds of problems.
+
+Including the one this model causes on at least some SSDs where you now
+statically allocate resources to a stream that is now not globally
+available.  All for the little log with very short date lifetime that any
+half decent hot/cold partitioning algorithm in the SSD should be able to
+detect.
+
