@@ -2,158 +2,204 @@ Return-Path: <SRS0=xX0B=TR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACAF1C04E84
-	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 05:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F366C04AB4
+	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 09:14:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E8C52089E
-	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 05:32:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="AdUEU8ky"
+	by mail.kernel.org (Postfix) with ESMTP id 1A33420818
+	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 09:14:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727879AbfEQFcL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 May 2019 01:32:11 -0400
-Received: from mailout4.samsung.com ([203.254.224.34]:22040 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727838AbfEQFcL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 May 2019 01:32:11 -0400
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20190517053207epoutp04dfbc756035a865554986de2ce3be7d10~fYW9jqfw22294922949epoutp04G
-        for <linux-block@vger.kernel.org>; Fri, 17 May 2019 05:32:07 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20190517053207epoutp04dfbc756035a865554986de2ce3be7d10~fYW9jqfw22294922949epoutp04G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1558071127;
-        bh=QoTb4J0MrDDwjXI5H0Us5qd6vRZEw/A2DnYVdFwNDKs=;
-        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-        b=AdUEU8kyiPppfK8EiOpBmjPqi8cBeSx0mXpu7jy6Bn3kD3wRG2LdivADeGg5yp3cp
-         0J09ysVXCuc9RQYhIauxTmu29imNiWpL7SNKRzP+Fq9JCqDAmZojkBjtlGIx0Tg15c
-         c9IS3WPk2Wp7VBU0OisVxeQ14iOu5qsaQcbMPsow=
-Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20190517053206epcas5p4b2e9229062957ac7436e187f43b9036d~fYW9AI5Bn2456024560epcas5p4s;
-        Fri, 17 May 2019 05:32:06 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        7B.D8.04066.6574EDC5; Fri, 17 May 2019 14:32:06 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20190517053206epcas5p275a94194a8e60c0ec38c9f8ad7424570~fYW8tLZYv2772627726epcas5p2-;
-        Fri, 17 May 2019 05:32:06 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20190517053206epsmtrp268ab76a813e98e2764488c436d7cc3f0~fYW8sdtQd1717817178epsmtrp2v;
-        Fri, 17 May 2019 05:32:06 +0000 (GMT)
-X-AuditID: b6c32a4a-973ff70000000fe2-77-5cde47560a17
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        81.63.03662.6574EDC5; Fri, 17 May 2019 14:32:06 +0900 (KST)
-Received: from JOSHIK01 (unknown [107.111.93.135]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20190517053204epsmtip298269f87eb140783bb081bc4f965491c~fYW7U4EYQ2086620866epsmtip2j;
-        Fri, 17 May 2019 05:32:04 +0000 (GMT)
-From:   "kanchan" <joshi.k@samsung.com>
-To:     "'Christoph Hellwig'" <hch@infradead.org>
-Cc:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-ext4@vger.kernel.org>, <prakash.v@samsung.com>,
-        <anshul@samsung.com>
-In-Reply-To: <20190510170249.GA26907@infradead.org>
-Subject: RE: [PATCH v5 0/7] Extend write-hint framework, and add write-hint
- for Ext4 journal
-Date:   Fri, 17 May 2019 11:01:55 +0530
-Message-ID: <00fb01d50c71$dd358e50$97a0aaf0$@samsung.com>
+        id S1728135AbfEQJOl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 May 2019 05:14:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54238 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727825AbfEQJOl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 May 2019 05:14:41 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 25579307D925;
+        Fri, 17 May 2019 09:14:40 +0000 (UTC)
+Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B739A348F4;
+        Fri, 17 May 2019 09:14:36 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        John Garry <john.garry@huawei.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH] blk-mq: Wait for for hctx inflight requests on CPU unplug
+Date:   Fri, 17 May 2019 17:14:24 +0800
+Message-Id: <20190517091424.19751-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQJoSeMIlXjPMuci1lQDnd0IsY+e8wLu+qiYAUGsmF+lJrwgsA==
-Content-Language: en-us
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrOKsWRmVeSWpSXmKPExsWy7bCmlm6Y+70Yg8nHZS1+T5/CanF6wiIm
-        i723tC1mzrvDZrFn70kWi8u75rBZzF/2lN3iypRFzA4cHptXaHlsXlLv0bdlFaPH501yASxR
-        XDYpqTmZZalF+nYJXBmXD25kLZgtWHH8xQbmBsa5fF2MnBwSAiYSV349ZAaxhQR2M0pcW6sM
-        YX9ilNj/172LkQvI/sYo8X/tJrYuRg6whj1rYyDiexklFt37yALhPGeUODnlGTtIN5uAqsS9
-        H71sILaIgK7E2YUvGEFsZoGrjBIXNoeC2JwCxhJvlj4D2ywsECfRcHcCWC8LUO/TjnZWEJtX
-        wFLiz81JTBC2oMTJmU9YIObIS2x/O4cZ4gMFid2fjrKCHCci4CSxckUuRIm4xMujR9hBbpMQ
-        eM0m8WfTGhaIeheJyUuusEPYwhKvjm+BsqUkPr/bywZhF0v8unOUGaK5g1HiesNMqGZ7iYt7
-        /jKBLGMW0JRYv0sfYhmfRO/vJ0yQAOKV6GgTgqhWlLg36SkrhC0u8XDGEijbQ+Lh282MExgV
-        ZyH5bBaSz2YheWEWwrIFjCyrGCVTC4pz01OLTQuM8lLL9YoTc4tL89L1kvNzNzGCk4+W1w7G
-        Zed8DjEKcDAq8fAK+NyNEWJNLCuuzD3EKMHBrCTCu+H97Rgh3pTEyqrUovz4otKc1OJDjNIc
-        LErivJNYr8YICaQnlqRmp6YWpBbBZJk4OKUaGHsUg/cuzhA3cT5ize57oPVrbt+qZ8ukNXPF
-        4htk4/hyipyzlRJ0l4rHdC6sdptRwXbn4YdN336vO/Z30V+W2sTyzRLLNC/+sf4Xpm8aE/1l
-        +ZVwNa1Uo0kXW1XsPp77FTtJYcGpJ1y+vGzXpJ/dvq8yp3P2l986uz/unCp8+sPLnMexjdsW
-        /ldiKc5INNRiLipOBABRZoWPOgMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupmkeLIzCtJLcpLzFFi42LZdlhJXjfM/V6MwZZPHBa/p09htTg9YRGT
-        xd5b2hYz591hs9iz9ySLxeVdc9gs5i97ym5xZcoiZgcOj80rtDw2L6n36NuyitHj8ya5AJYo
-        LpuU1JzMstQifbsErozLBzeyFswWrDj+YgNzA+Ncvi5GDg4JAROJPWtjuhi5OIQEdjNK7Fy+
-        kq2LkRMoLi7RfO0HO4QtLLHy33N2iKKnjBJHN0wCK2ITUJW496MXzBYR0JU4u/AFI0gRs8Bd
-        Rom3M5Yxwo3tX/UerIpTwFjizdJnzCC2sECMxPrJC8HiLECTnna0s4LYvAKWEn9uTmKCsAUl
-        Ts58wgJyKrOAnkTbRkaQMLOAvMT2t3OYIa5TkNj96SgrSImIgJPEyhW5ECXiEi+PHmGfwCg8
-        C8mgWQiDZiEZNAtJxwJGllWMkqkFxbnpucWGBUZ5qeV6xYm5xaV56XrJ+bmbGMFRpKW1g/HE
-        ifhDjAIcjEo8vDs878YIsSaWFVfmHmKU4GBWEuHd8P52jBBvSmJlVWpRfnxRaU5q8SFGaQ4W
-        JXFe+fxjkUIC6YklqdmpqQWpRTBZJg5OqQbGtSvPLP/z/omR9ddeRvfu0w+PfZjBnCjFePmI
-        jOy9FvdSs4uffx69fXBt9MyJPXr1heeyt/4ttfuzrti6OexOkqbs9CUf/hZwVpkov/qx513o
-        6ZK8pzqTtP26G69duvT8WMvyL6sefy7I+NjMZ7/i8Yk614sftLn5ckW57t0RDNm/Jmbi87jv
-        05VYijMSDbWYi4oTAciFmlieAgAA
-X-CMS-MailID: 20190517053206epcas5p275a94194a8e60c0ec38c9f8ad7424570
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-X-CMS-RootMailID: 20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61
-References: <CGME20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61@epcas2p1.samsung.com>
-        <1556191202-3245-1-git-send-email-joshi.k@samsung.com>
-        <20190510170249.GA26907@infradead.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Fri, 17 May 2019 09:14:40 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph, 
+Managed interrupts can not migrate affinity when their CPUs are offline.
+If the CPU is allowed to shutdown before they're returned, commands
+dispatched to managed queues won't be able to complete through their
+irq handlers.
 
-> Including the one this model causes on at least some SSDs where you now
-statically allocate resources to a stream that is now not globally
-available.  
+Wait in cpu hotplug handler until all inflight requests on the tags
+are completed or timeout. Wait once for each tags, so we can save time
+in case of shared tags.
 
-Sorry but can you please elaborate the issue? I do not get what is being
-statically allocated which was globally available earlier.
-If you are referring to nvme driver,  available streams at subsystem level
-are being reflected for all namespaces. This is same as earlier. 
-There is no attempt to explicitly allocate (using dir-receive) or reserve
-streams for any namespace.  
-Streams will continue to get allocated/released implicitly as and when
-writes (with stream id) arrive.
+Based on the following patch from Keith, and use simple delay-spin
+instead.
 
-> All for the little log with very short date lifetime that any half decent
-hot/cold partitioning algorithm in the SSD should be able to detect.
+https://lore.kernel.org/linux-block/20190405215920.27085-1-keith.busch@intel.com/
 
-With streams, hot/cold segregation is happening at the time of placement
-itself, without algorithm; that is a clear win over algorithms which take
-time/computation to be able to do the same.
-And infrastructure update (write-hint-to-stream-id conversion in
-block-layer,  in-kernel hints etc.) seems to be required anyway for streams
-to extend its reach beyond nvme and user-space hints.
-  
-Thanks,
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: John Garry <john.garry@huawei.com>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-tag.c |  2 +-
+ block/blk-mq-tag.h |  5 ++++
+ block/blk-mq.c     | 65 +++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 70 insertions(+), 2 deletions(-)
 
------Original Message-----
-From: Christoph Hellwig [mailto:hch@infradead.org] 
-Sent: Friday, May 10, 2019 10:33 PM
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: linux-kernel@vger.kernel.org; linux-block@vger.kernel.org;
-linux-nvme@lists.infradead.org; linux-fsdevel@vger.kernel.org;
-linux-ext4@vger.kernel.org; prakash.v@samsung.com; anshul@samsung.com
-Subject: Re: [PATCH v5 0/7] Extend write-hint framework, and add write-hint
-for Ext4 journal
-
-I think this fundamentally goes in the wrong direction.  We explicitly
-designed the block layer infrastructure around life time hints and not the
-not fish not flesh streams interface, which causes all kinds of problems.
-
-Including the one this model causes on at least some SSDs where you now
-statically allocate resources to a stream that is now not globally
-available.  All for the little log with very short date lifetime that any
-half decent hot/cold partitioning algorithm in the SSD should be able to
-detect.
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 7513c8eaabee..b24334f99c5d 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -332,7 +332,7 @@ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
+  *		true to continue iterating tags, false to stop.
+  * @priv:	Will be passed as second argument to @fn.
+  */
+-static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
++void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
+ 		busy_tag_iter_fn *fn, void *priv)
+ {
+ 	if (tags->nr_reserved_tags)
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index 61deab0b5a5a..f8de50485b42 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -19,6 +19,9 @@ struct blk_mq_tags {
+ 	struct request **rqs;
+ 	struct request **static_rqs;
+ 	struct list_head page_list;
++
++	#define BLK_MQ_TAGS_DRAINED           0
++	unsigned long flags;
+ };
+ 
+ 
+@@ -35,6 +38,8 @@ extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
+ extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
+ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 		void *priv);
++void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
++		busy_tag_iter_fn *fn, void *priv);
+ 
+ static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
+ 						 struct blk_mq_hw_ctx *hctx)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 08a6248d8536..d1d1b1a9628f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2214,6 +2214,60 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 	return -ENOMEM;
+ }
+ 
++static int blk_mq_hctx_notify_prepare(unsigned int cpu, struct hlist_node *node)
++{
++	struct blk_mq_hw_ctx	*hctx;
++	struct blk_mq_tags	*tags;
++
++	hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
++	tags = hctx->tags;
++
++	if (tags)
++		clear_bit(BLK_MQ_TAGS_DRAINED, &tags->flags);
++
++	return 0;
++}
++
++static bool blk_mq_count_inflight_rq(struct request *rq, void *data,
++				     bool reserved)
++{
++	if (blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT)
++		(*(unsigned long *)data)++;
++
++	return true;
++}
++
++static unsigned blk_mq_tags_inflight_rqs(struct blk_mq_tags *tags)
++{
++	unsigned long cnt = 0;
++
++	blk_mq_all_tag_busy_iter(tags, blk_mq_count_inflight_rq, &cnt);
++
++	return cnt;
++}
++
++static void blk_mq_drain_inflight_rqs(struct blk_mq_tags *tags, int dead_cpu)
++{
++	unsigned long msecs_left = 1000 * 5;
++
++	if (!tags)
++		return;
++
++	if (test_and_set_bit(BLK_MQ_TAGS_DRAINED, &tags->flags))
++		return;
++
++	while (msecs_left > 0) {
++		if (!blk_mq_tags_inflight_rqs(tags))
++			break;
++		msleep(5);
++		msecs_left -= 5;
++	}
++
++	if (msecs_left > 0)
++		printk(KERN_WARNING "requests not completed from dead "
++				"CPU %d\n", dead_cpu);
++}
++
+ /*
+  * 'cpu' is going away. splice any existing rq_list entries from this
+  * software queue to the hw queue dispatch list, and ensure that it
+@@ -2245,6 +2299,14 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+ 	spin_unlock(&hctx->lock);
+ 
+ 	blk_mq_run_hw_queue(hctx, true);
++
++	/*
++	 * Interrupt for this queue will be shutdown, so wait until all
++	 * requests from this hw queue is done or timeout.
++	 */
++	if (cpumask_first_and(hctx->cpumask, cpu_online_mask) >= nr_cpu_ids)
++		blk_mq_drain_inflight_rqs(hctx->tags, cpu);
++
+ 	return 0;
+ }
+ 
+@@ -3540,7 +3602,8 @@ EXPORT_SYMBOL(blk_mq_rq_cpu);
+ 
+ static int __init blk_mq_init(void)
+ {
+-	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
++	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead",
++				blk_mq_hctx_notify_prepare,
+ 				blk_mq_hctx_notify_dead);
+ 	return 0;
+ }
+-- 
+2.20.1
 
