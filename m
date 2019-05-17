@@ -2,524 +2,161 @@ Return-Path: <SRS0=xX0B=TR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0AF4C04E84
-	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 21:41:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C19AC04E87
+	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 22:04:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D0D0206A3
-	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 21:41:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0D5B2133D
+	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 22:04:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="zQZQh0ki"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HDB4Ujrn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727785AbfEQVln (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 May 2019 17:41:43 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:45020 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727698AbfEQVlm (ORCPT
+        id S1729164AbfEQWEr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 May 2019 18:04:47 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:53856 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726726AbfEQWEr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 May 2019 17:41:42 -0400
-Received: by mail-pl1-f193.google.com with SMTP id c5so3895281pll.11
-        for <linux-block@vger.kernel.org>; Fri, 17 May 2019 14:41:42 -0700 (PDT)
+        Fri, 17 May 2019 18:04:47 -0400
+Received: by mail-wm1-f66.google.com with SMTP id 198so8195420wme.3;
+        Fri, 17 May 2019 15:04:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=203ULvcqchdXRyFRjwUMpCGtfQTE/xI1Zq4IJe/er60=;
-        b=zQZQh0kiidK3+1zSHzTXqZeZGy7G+LcPsIDMEPSDNeBIJapW1OYVOrv2zMZ+xWZY75
-         sBrPaoWGYhrpZ0iQ8loUkQblRAHT9Rm1zEA+KqCFo2fQGpLo4+nZUk7gm0Bzo1OjuNNe
-         kDqRYTEU5TX+5yvYTa1TZvT3Rhi+OkemVlLSWG4RYINC2bgGktEEldNWW9/ORnrXg4Do
-         2eeeqfuNGxtHWcUHTBEmvXCk2K3D7RyJ30/bshIaKxnGnLb0wsTE8JvXh83cVFSKM7F+
-         cs8qzzybq61O73wpxCAnshmVqgwclL2k4w2HDRwNnd0SkIEQ5YYIwwmafauu+tWTRWGw
-         0ksw==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=a8zrpRD4WQSC0bql+5SNwotLtSqhpQ2N+iyeA6G7890=;
+        b=HDB4UjrnDkFOLde1idgGEA15LrxWSQOLEFVapsFCSGkZHfaTIO+ePjpK1Dyai31w2t
+         OhweGJ+Fz620r7eOkdMQ5Ba4dd9UHwvIJuvKL7wTlTVzt4F8Ax452WIUiC4YxffMn9bp
+         qwg+EuVf8hQN+4v608beAmrvjH2++A5Lsa+ZCJCj/dV43E2YJUWTni0a0jb5HpLB4khp
+         mB/Fv/y+6Hur+nY1SBYJb6PUc5r6Ylyj2eDEo5mt3VHl0/m2Fop/jJ1QyuT95S2Q8nXU
+         6PZFHDY5q6SHmjImQfzkuNLGhLEn7866OFh6+/nu9crUxN98aYGEyONuYfEznX6N+KNG
+         9uqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=203ULvcqchdXRyFRjwUMpCGtfQTE/xI1Zq4IJe/er60=;
-        b=EOTJpcHHOnFYqAeDChMOEgPuQowB3mK+x0oFa7KuBH3mq/gp2nFkgCPP7DSuYAkio3
-         2bKEWkcmxmJf95pweiEEnyuHoV7ztfvEJzd9BbTCox/LUImdqFSJ+P0VTPcM7IpR4gnO
-         dpBcF1Oi7JdikPm/sl/Fa8/dM/fMNlqwS6u38gxcn8JUcfhjmQ4qJe1xLKqLBKNTQdZc
-         KgsRKF6FxY7XIxz81OAQRCP0kUcvoSnD6Mb8uY8oOCHecCpZAar9Ns0n48RGYI37VhpX
-         pR+wWB4hcb4fuySAP6rHkUhGBXNbtGga9fiNU2HJVDQruGX0FMyB8gimYJZfRNtqxy7r
-         nLZQ==
-X-Gm-Message-State: APjAAAUfk08EN0Z+4K28M2Jb4QLR67rdMvhCRLostesRce6VUjQn6KmO
-        Go8tzuWCwiDm3WZjy8NkKUpcjA==
-X-Google-Smtp-Source: APXvYqxDKwBocKF0kHsI0v5Qd+lcW+QNKcn+4JoUvDlJBO0No4eQvS0wNQszTTzpBb8RW6z2P0BWhw==
-X-Received: by 2002:a17:902:2a07:: with SMTP id i7mr61366174plb.125.1558129301540;
-        Fri, 17 May 2019 14:41:41 -0700 (PDT)
-Received: from x1.localdomain (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id z125sm15885331pfb.75.2019.05.17.14.41.39
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 17 May 2019 14:41:40 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     viro@zeniv.linux.org.uk, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/3] io_uring: add support for sqe links
-Date:   Fri, 17 May 2019 15:41:31 -0600
-Message-Id: <20190517214131.5925-4-axboe@kernel.dk>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190517214131.5925-1-axboe@kernel.dk>
-References: <20190517214131.5925-1-axboe@kernel.dk>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=a8zrpRD4WQSC0bql+5SNwotLtSqhpQ2N+iyeA6G7890=;
+        b=lg0AOl+y5tUvNwr2+JYZweAIMRwyv68bydcXiy87EpchQb9uLp75HFACPZBWuuRkPY
+         Z7bmJxu6AlpCy6Kz2ZD2vNf7f120fiKS6KS/T8YOpKPMq8QLOCe/1BVwxwGXdpt9cj//
+         1tunVbx9bVPN1ChYxB/kkV+91WoGCajOVjzcRmm2MWujOK7AnTS8SZsjCZB7nPadaT4X
+         +1BC9QD4kgLlBq/qfzWLdIK8+JXTVQD7udYZU5nu78zZmE1cjQ4GWe3K9pU7lgJvU5oA
+         +wC6UtvKPrrSlpW/P+lL192QIBVN95jG/NsQGqrWybQBPVlgi/PKeXD2hi+/xc2Kf5k0
+         QE2Q==
+X-Gm-Message-State: APjAAAVg690UFFOdLNEdtyGOYDon+R8mQAv+tSWRto2zcgyxj8Q1tb3Z
+        puQzqVWOpuiHQd2ay9EFWHFOHljVhF8/8NMXHko=
+X-Google-Smtp-Source: APXvYqzMrlVr79ILYiRFlMzmeGQnHyZo1wggiaGD9IG6AjeSL/odbeC8KCwqd1p9PccWL5zlVpiCHCfy++wHhd8kj7I=
+X-Received: by 2002:a1c:760f:: with SMTP id r15mr20146659wmc.134.1558130684743;
+ Fri, 17 May 2019 15:04:44 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190430223722.20845-1-gpiccoli@canonical.com>
+In-Reply-To: <20190430223722.20845-1-gpiccoli@canonical.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Sat, 18 May 2019 06:04:32 +0800
+Message-ID: <CACVXFVNsOoJqipwivoCbH1jNs_5b0g9E6HWhh6kXYTzetALzQQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] block: Fix a NULL pointer dereference in generic_make_request()
+To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT" 
+        <linux-raid@vger.kernel.org>,
+        "open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Gavin Guo <gavin.guo@canonical.com>,
+        Jay Vosburgh <jay.vosburgh@canonical.com>, kernel@gpiccoli.net,
+        Bart Van Assche <bvanassche@acm.org>,
+        stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With SQE links, we can create chains of dependent SQEs. One example
-would be queueing an SQE that's a read from one file descriptor, with
-the linked SQE being a write to another with the same set of buffers.
+On Wed, May 1, 2019 at 6:38 AM Guilherme G. Piccoli
+<gpiccoli@canonical.com> wrote:
+>
+> Commit 37f9579f4c31 ("blk-mq: Avoid that submitting a bio concurrently
+> with device removal triggers a crash") introduced a NULL pointer
+> dereference in generic_make_request(). The patch sets q to NULL and
+> enter_succeeded to false; right after, there's an 'if (enter_succeeded)'
+> which is not taken, and then the 'else' will dereference q in
+> blk_queue_dying(q).
+>
+> This patch just moves the 'q = NULL' to a point in which it won't trigger
+> the oops, although the semantics of this NULLification remains untouched.
+>
+> A simple test case/reproducer is as follows:
+> a) Build kernel v5.1-rc7 with CONFIG_BLK_CGROUP=n.
+>
+> b) Create a raid0 md array with 2 NVMe devices as members, and mount it
+> with an ext4 filesystem.
+>
+> c) Run the following oneliner (supposing the raid0 is mounted in /mnt):
+> (dd of=/mnt/tmp if=/dev/zero bs=1M count=999 &); sleep 0.3;
+> echo 1 > /sys/block/nvme0n1/device/device/remove
+> (whereas nvme0n1 is the 2nd array member)
+>
+> This will trigger the following oops:
+>
+> BUG: unable to handle kernel NULL pointer dereference at 0000000000000078
+> PGD 0 P4D 0
+> Oops: 0000 [#1] SMP PTI
+> RIP: 0010:generic_make_request+0x32b/0x400
+> Call Trace:
+>  submit_bio+0x73/0x140
+>  ext4_io_submit+0x4d/0x60
+>  ext4_writepages+0x626/0xe90
+>  do_writepages+0x4b/0xe0
+> [...]
+>
+> This patch has no functional changes and preserves the md/raid0 behavior
+> when a member is removed before kernel v4.17.
+>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: stable@vger.kernel.org # v4.17
+> Fixes: 37f9579f4c31 ("blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash")
 
-An SQE link will not stall the pipeline, it'll just ensure that
-dependent SQEs aren't issued before the previous link has completed.
+BTW, the legacy IO request path is removed since 5.0, the above fault
+commit can be
+removed as done by the following patches:
 
-Any error at submission or completion time will break the chain of SQEs.
-For completions, this also includes short reads or writes, as the next
-SQE could depend on the previous one being fully completed.
+https://lore.kernel.org/linux-block/20190515030310.20393-1-ming.lei@redhat.com/T/#t
 
-Any SQE in a chain that gets canceled due to any of the above errors,
-will get an CQE fill with -ECANCELED as the error value.
+> Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
+> ---
+>  block/blk-core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index a55389ba8779..e21856a7f3fa 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1076,7 +1076,6 @@ blk_qc_t generic_make_request(struct bio *bio)
+>                                 flags = BLK_MQ_REQ_NOWAIT;
+>                         if (blk_queue_enter(q, flags) < 0) {
+>                                 enter_succeeded = false;
+> -                               q = NULL;
+>                         }
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/io_uring.c                 | 211 +++++++++++++++++++++++++++-------
- include/uapi/linux/io_uring.h |   1 +
- 2 files changed, 172 insertions(+), 40 deletions(-)
+Please remove '{}'.
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 3e7f08094a85..b45313ed8337 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -322,6 +322,7 @@ struct io_kiocb {
- 
- 	struct io_ring_ctx	*ctx;
- 	struct list_head	list;
-+	struct list_head	link_list;
- 	unsigned int		flags;
- 	refcount_t		refs;
- #define REQ_F_NOWAIT		1	/* must not punt to workers */
-@@ -330,8 +331,10 @@ struct io_kiocb {
- #define REQ_F_SEQ_PREV		8	/* sequential with previous */
- #define REQ_F_IO_DRAIN		16	/* drain existing IO first */
- #define REQ_F_IO_DRAINED	32	/* drain done */
-+#define REQ_F_LINK		64	/* linked sqes */
-+#define REQ_F_FAIL_LINK		128	/* fail rest of links */
- 	u64			user_data;
--	u32			error;	/* iopoll result from callback */
-+	u32			result;
- 	u32			sequence;
- 
- 	struct work_struct	work;
-@@ -583,6 +586,7 @@ static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
- 	req->flags = 0;
- 	/* one is dropped after submission, the other at completion */
- 	refcount_set(&req->refs, 2);
-+	req->result = 0;
- 	return req;
- out:
- 	io_ring_drop_ctx_refs(ctx, 1);
-@@ -598,7 +602,7 @@ static void io_free_req_many(struct io_ring_ctx *ctx, void **reqs, int *nr)
- 	}
- }
- 
--static void io_free_req(struct io_kiocb *req)
-+static void __io_free_req(struct io_kiocb *req)
- {
- 	if (req->file && !(req->flags & REQ_F_FIXED_FILE))
- 		fput(req->file);
-@@ -606,6 +610,56 @@ static void io_free_req(struct io_kiocb *req)
- 	kmem_cache_free(req_cachep, req);
- }
- 
-+static void io_req_link_next(struct io_kiocb *req)
-+{
-+	struct io_kiocb *nxt;
-+
-+	nxt = list_first_entry_or_null(&req->link_list, struct io_kiocb, list);
-+	list_del(&nxt->list);
-+	if (!list_empty(&req->link_list)) {
-+		INIT_LIST_HEAD(&nxt->link_list);
-+		list_splice(&req->link_list, &nxt->link_list);
-+		nxt->flags |= REQ_F_LINK;
-+	}
-+
-+	INIT_WORK(&nxt->work, io_sq_wq_submit_work);
-+	queue_work(req->ctx->sqo_wq, &nxt->work);
-+}
-+
-+/*
-+ * Called if REQ_F_LINK is set, and we fail the head request
-+ */
-+static void io_fail_links(struct io_kiocb *req)
-+{
-+	struct io_kiocb *link;
-+
-+	while (!list_empty(&req->link_list)) {
-+		link = list_first_entry(&req->link_list, struct io_kiocb, list);
-+		list_del(&link->list);
-+
-+		io_cqring_add_event(req->ctx, link->user_data, -ECANCELED);
-+		__io_free_req(link);
-+	}
-+}
-+
-+static void io_free_req(struct io_kiocb *req)
-+{
-+	/*
-+	 * If LINK is set, we have dependent requests in this chain. If we
-+	 * didn't fail this request, queue the first one up, moving any other
-+	 * dependencies to the next request. In case of failure, fail the rest
-+	 * of the chain.
-+	 */
-+	if (req->flags & REQ_F_LINK) {
-+		if (req->flags & REQ_F_FAIL_LINK)
-+			io_fail_links(req);
-+		else
-+			io_req_link_next(req);
-+	}
-+
-+	__io_free_req(req);
-+}
-+
- static void io_put_req(struct io_kiocb *req)
- {
- 	if (refcount_dec_and_test(&req->refs))
-@@ -627,7 +681,7 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
- 		req = list_first_entry(done, struct io_kiocb, list);
- 		list_del(&req->list);
- 
--		io_cqring_fill_event(ctx, req->user_data, req->error);
-+		io_cqring_fill_event(ctx, req->user_data, req->result);
- 		(*nr_events)++;
- 
- 		if (refcount_dec_and_test(&req->refs)) {
-@@ -636,7 +690,8 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
- 			 * completions for those, only batch free for fixed
- 			 * file.
- 			 */
--			if (req->flags & REQ_F_FIXED_FILE) {
-+			if ((req->flags & (REQ_F_FIXED_FILE|REQ_F_LINK)) ==
-+			    REQ_F_FIXED_FILE) {
- 				reqs[to_free++] = req;
- 				if (to_free == ARRAY_SIZE(reqs))
- 					io_free_req_many(ctx, reqs, &to_free);
-@@ -775,6 +830,8 @@ static void io_complete_rw(struct kiocb *kiocb, long res, long res2)
- 
- 	kiocb_end_write(kiocb);
- 
-+	if ((req->flags & REQ_F_LINK) && res != req->result)
-+		req->flags |= REQ_F_FAIL_LINK;
- 	io_cqring_add_event(req->ctx, req->user_data, res);
- 	io_put_req(req);
- }
-@@ -785,7 +842,9 @@ static void io_complete_rw_iopoll(struct kiocb *kiocb, long res, long res2)
- 
- 	kiocb_end_write(kiocb);
- 
--	req->error = res;
-+	if ((req->flags & REQ_F_LINK) && res != req->result)
-+		req->flags |= REQ_F_FAIL_LINK;
-+	req->result = res;
- 	if (res != -EAGAIN)
- 		req->flags |= REQ_F_IOPOLL_COMPLETED;
- }
-@@ -928,7 +987,6 @@ static int io_prep_rw(struct io_kiocb *req, const struct sqe_submit *s,
- 		    !kiocb->ki_filp->f_op->iopoll)
- 			return -EOPNOTSUPP;
- 
--		req->error = 0;
- 		kiocb->ki_flags |= IOCB_HIPRI;
- 		kiocb->ki_complete = io_complete_rw_iopoll;
- 	} else {
-@@ -1106,6 +1164,9 @@ static int io_read(struct io_kiocb *req, const struct sqe_submit *s,
- 		return ret;
- 
- 	read_size = ret;
-+	if (req->flags & REQ_F_LINK)
-+		req->result = read_size;
-+
- 	iov_count = iov_iter_count(&iter);
- 	ret = rw_verify_area(READ, file, &kiocb->ki_pos, iov_count);
- 	if (!ret) {
-@@ -1163,6 +1224,9 @@ static int io_write(struct io_kiocb *req, const struct sqe_submit *s,
- 	if (ret < 0)
- 		return ret;
- 
-+	if (req->flags & REQ_F_LINK)
-+		req->result = ret;
-+
- 	iov_count = iov_iter_count(&iter);
- 
- 	ret = -EAGAIN;
-@@ -1266,6 +1330,8 @@ static int io_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 				end > 0 ? end : LLONG_MAX,
- 				fsync_flags & IORING_FSYNC_DATASYNC);
- 
-+	if (ret < 0)
-+		req->flags |= REQ_F_FAIL_LINK;
- 	io_cqring_add_event(req->ctx, sqe->user_data, ret);
- 	io_put_req(req);
- 	return 0;
-@@ -1310,6 +1376,8 @@ static int io_sync_file_range(struct io_kiocb *req,
- 
- 	ret = sync_file_range(req->rw.ki_filp, sqe_off, sqe_len, flags);
- 
-+	if (ret < 0)
-+		req->flags |= REQ_F_FAIL_LINK;
- 	io_cqring_add_event(req->ctx, sqe->user_data, ret);
- 	io_put_req(req);
- 	return 0;
-@@ -1337,6 +1405,8 @@ static int io_sendmsg(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 		ret = __sys_sendmsg_sock(sock, msg, flags);
- 	}
- 
-+	if (ret < 0)
-+		req->flags |= REQ_F_FAIL_LINK;
- 	io_cqring_add_event(req->ctx, sqe->user_data, ret);
- 	io_put_req(req);
- 	return 0;
-@@ -1367,6 +1437,8 @@ static int io_recvmsg(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 		ret = __sys_recvmsg_sock(sock, msg, flags);
- 	}
- 
-+	if (ret < 0)
-+		req->flags |= REQ_F_FAIL_LINK;
- 	io_cqring_add_event(req->ctx, sqe->user_data, ret);
- 	io_put_req(req);
- 	return 0;
-@@ -1622,9 +1694,10 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
- {
- 	int ret, opcode;
- 
-+	req->user_data = READ_ONCE(s->sqe->user_data);
-+
- 	if (unlikely(s->index >= ctx->sq_entries))
- 		return -EINVAL;
--	req->user_data = READ_ONCE(s->sqe->user_data);
- 
- 	opcode = READ_ONCE(s->sqe->opcode);
- 	switch (opcode) {
-@@ -1674,7 +1747,7 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
- 		return ret;
- 
- 	if (ctx->flags & IORING_SETUP_IOPOLL) {
--		if (req->error == -EAGAIN)
-+		if (req->result == -EAGAIN)
- 			return -EAGAIN;
- 
- 		/* workqueue context doesn't hold uring_lock, grab it now */
-@@ -1900,31 +1973,11 @@ static int io_req_set_file(struct io_ring_ctx *ctx, const struct sqe_submit *s,
- 	return 0;
- }
- 
--static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
--			 struct io_submit_state *state)
-+static int io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
-+			struct sqe_submit *s)
- {
--	struct io_kiocb *req;
- 	int ret;
- 
--	/* enforce forwards compatibility on users */
--	if (unlikely(s->sqe->flags & ~(IOSQE_FIXED_FILE | IOSQE_IO_DRAIN)))
--		return -EINVAL;
--
--	req = io_get_req(ctx, state);
--	if (unlikely(!req))
--		return -EAGAIN;
--
--	ret = io_req_set_file(ctx, s, state, req);
--	if (unlikely(ret))
--		goto out;
--
--	ret = io_req_defer(ctx, req, s->sqe);
--	if (ret) {
--		if (ret == -EIOCBQUEUED)
--			ret = 0;
--		return ret;
--	}
--
- 	ret = __io_submit_sqe(ctx, req, s, true);
- 	if (ret == -EAGAIN && !(req->flags & REQ_F_NOWAIT)) {
- 		struct io_uring_sqe *sqe_copy;
-@@ -1947,20 +2000,82 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
- 
- 			/*
- 			 * Queued up for async execution, worker will release
--			 * submit reference when the iocb is actually
--			 * submitted.
-+			 * submit reference when the iocb is actually submitted.
- 			 */
- 			return 0;
- 		}
- 	}
- 
--out:
- 	/* drop submission reference */
- 	io_put_req(req);
- 
- 	/* and drop final reference, if we failed */
--	if (ret)
-+	if (ret) {
-+		io_cqring_add_event(ctx, req->user_data, ret);
-+		if (req->flags & REQ_F_LINK)
-+			req->flags |= REQ_F_FAIL_LINK;
- 		io_put_req(req);
-+	}
-+
-+	return ret;
-+}
-+
-+#define SQE_VALID_FLAGS	(IOSQE_FIXED_FILE|IOSQE_IO_DRAIN|IOSQE_IO_LINK)
-+
-+static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
-+			 struct io_submit_state *state, struct io_kiocb **link)
-+{
-+	struct io_uring_sqe *sqe_copy;
-+	struct io_kiocb *req;
-+	int ret;
-+
-+	/* enforce forwards compatibility on users */
-+	if (unlikely(s->sqe->flags & ~SQE_VALID_FLAGS))
-+		return -EINVAL;
-+
-+	req = io_get_req(ctx, state);
-+	if (unlikely(!req))
-+		return -EAGAIN;
-+
-+	ret = io_req_set_file(ctx, s, state, req);
-+	if (unlikely(ret)) {
-+		io_free_req(req);
-+		return ret;
-+	}
-+
-+	ret = io_req_defer(ctx, req, s->sqe);
-+	if (ret) {
-+		if (ret == -EIOCBQUEUED)
-+			ret = 0;
-+		return ret;
-+	}
-+
-+	/*
-+	 * If we already have a head request, queue this one for async
-+	 * submittal once the head completes. If we don't have a head but
-+	 * IOSQE_IO_LINK is set in the sqe, start a new head. This one will be
-+	 * submitted sync once the chain is complete. If none of those
-+	 * conditions are true (normal request), then just queue it.
-+	 */
-+	if (*link) {
-+		struct io_kiocb *prev = *link;
-+
-+		sqe_copy = kmemdup(s->sqe, sizeof(*sqe_copy), GFP_KERNEL);
-+		if (!sqe_copy)
-+			return -EAGAIN;
-+
-+		s->sqe = sqe_copy;
-+		memcpy(&req->submit, s, sizeof(*s));
-+		list_add_tail(&req->list, &prev->link_list);
-+	} else if (s->sqe->flags & IOSQE_IO_LINK) {
-+		req->flags |= REQ_F_LINK;
-+
-+		memcpy(&req->submit, s, sizeof(*s));
-+		INIT_LIST_HEAD(&req->link_list);
-+		*link = req;
-+	} else {
-+		ret = io_queue_sqe(ctx, req, s);
-+	}
- 
- 	return ret;
- }
-@@ -2047,6 +2162,8 @@ static int io_submit_sqes(struct io_ring_ctx *ctx, struct sqe_submit *sqes,
- 			  unsigned int nr, bool has_user, bool mm_fault)
- {
- 	struct io_submit_state state, *statep = NULL;
-+	struct io_kiocb *link = NULL;
-+	bool prev_was_link = false;
- 	int ret, i, submitted = 0;
- 
- 	if (nr > IO_PLUG_THRESHOLD) {
-@@ -2055,22 +2172,28 @@ static int io_submit_sqes(struct io_ring_ctx *ctx, struct sqe_submit *sqes,
- 	}
- 
- 	for (i = 0; i < nr; i++) {
-+		if (!prev_was_link && link) {
-+			io_queue_sqe(ctx, link, &link->submit);
-+			link = NULL;
-+		}
-+		prev_was_link = (sqes[i].sqe->flags & IOSQE_IO_LINK) != 0;
-+
- 		if (unlikely(mm_fault)) {
- 			ret = -EFAULT;
- 		} else {
- 			sqes[i].has_user = has_user;
- 			sqes[i].needs_lock = true;
- 			sqes[i].needs_fixed_file = true;
--			ret = io_submit_sqe(ctx, &sqes[i], statep);
-+			ret = io_submit_sqe(ctx, &sqes[i], statep, &link);
- 		}
- 		if (!ret) {
- 			submitted++;
- 			continue;
- 		}
--
--		io_cqring_add_event(ctx, sqes[i].sqe->user_data, ret);
- 	}
- 
-+	if (link)
-+		io_queue_sqe(ctx, link, &link->submit);
- 	if (statep)
- 		io_submit_state_end(&state);
- 
-@@ -2211,6 +2334,8 @@ static int io_sq_thread(void *data)
- static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit)
- {
- 	struct io_submit_state state, *statep = NULL;
-+	struct io_kiocb *link = NULL;
-+	bool prev_was_link = false;
- 	int i, submit = 0;
- 
- 	if (to_submit > IO_PLUG_THRESHOLD) {
-@@ -2225,17 +2350,23 @@ static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit)
- 		if (!io_get_sqring(ctx, &s))
- 			break;
- 
-+		if (!prev_was_link && link) {
-+			io_queue_sqe(ctx, link, &link->submit);
-+			link = NULL;
-+		}
-+		prev_was_link = (s.sqe->flags & IOSQE_IO_LINK) != 0;
-+
- 		s.has_user = true;
- 		s.needs_lock = false;
- 		s.needs_fixed_file = false;
- 		submit++;
- 
--		ret = io_submit_sqe(ctx, &s, statep);
--		if (ret)
--			io_cqring_add_event(ctx, s.sqe->user_data, ret);
-+		ret = io_submit_sqe(ctx, &s, statep, &link);
- 	}
- 	io_commit_sqring(ctx);
- 
-+	if (link)
-+		io_queue_sqe(ctx, link, &link->submit);
- 	if (statep)
- 		io_submit_state_end(statep);
- 
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index c5ea202684e3..1e1652f25cc1 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -41,6 +41,7 @@ struct io_uring_sqe {
-  */
- #define IOSQE_FIXED_FILE	(1U << 0)	/* use fixed fileset */
- #define IOSQE_IO_DRAIN		(1U << 1)	/* issue after inflight IO */
-+#define IOSQE_IO_LINK		(1U << 2)	/* links next sqe */
- 
- /*
-  * io_uring_setup() flags
--- 
-2.17.1
+>                 }
+>
+> @@ -1108,6 +1107,7 @@ blk_qc_t generic_make_request(struct bio *bio)
+>                                 bio_wouldblock_error(bio);
+>                         else
+>                                 bio_io_error(bio);
+> +                       q = NULL;
+>                 }
+>                 bio = bio_list_pop(&bio_list_on_stack[0]);
+>         } while (bio);
+> --
+> 2.21.0
+>
 
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming Lei
