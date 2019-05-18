@@ -1,99 +1,176 @@
-Return-Path: <SRS0=xX0B=TR=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=7xe9=TS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1162C04AB4
-	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 23:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8CEC46470
+	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 00:47:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD0022087E
-	for <linux-block@archiver.kernel.org>; Fri, 17 May 2019 23:02:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 407FD218A5
+	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 00:47:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1558140475;
+	bh=wcJMmid3eNX1fzqE7KShQj339cvq5JIkzCDTKY+6qnQ=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=aYJwpTM1kPFYrjAQ7IG/AX/I6XispCOiMJwpo/PCoueLh21xhJvMF8kSvWSfURDHO
+	 Fxh9FCfT7zIi2bv/vcL4QgbXeuwAgRIScIs1ZgH8GioZlOXZoD6GpeCxZB83gbSyx7
+	 PNCO6zVNqhGFEqReQM6Wl2ZUp28/Il13JHrhB1dY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726893AbfEQXCU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 May 2019 19:02:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:2917 "EHLO mx1.redhat.com"
+        id S1726894AbfERAry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 May 2019 20:47:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33992 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726519AbfEQXCU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 May 2019 19:02:20 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726881AbfERAry (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 May 2019 20:47:54 -0400
+Received: from localhost (unknown [104.132.1.68])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BED5A308429D;
-        Fri, 17 May 2019 23:02:19 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 521C85C8B9;
-        Fri, 17 May 2019 23:02:14 +0000 (UTC)
-Date:   Sat, 18 May 2019 07:02:09 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@fb.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/4] block: don't decrement nr_phys_segments for
- physically contigous segments
-Message-ID: <20190517230208.GB22236@ming.t460p>
-References: <20190516084058.20678-1-hch@lst.de>
- <20190516084058.20678-2-hch@lst.de>
- <20190516131703.GA26943@ming.t460p>
+        by mail.kernel.org (Postfix) with ESMTPSA id 47DA721883;
+        Sat, 18 May 2019 00:47:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1558140473;
+        bh=wcJMmid3eNX1fzqE7KShQj339cvq5JIkzCDTKY+6qnQ=;
+        h=From:To:Cc:Subject:Date:From;
+        b=lLvPLBZDUqi9n30KQHvC+B/mdzOF1Y5E0ax4t8Cu08ZULeWcxxATpwO7pB8BB55/9
+         FsB2b1Hjo1kC5w47jpPiqFtz+zJ3zJC2xE0sVxZbLKmCIsRW5t2wkwkQcFeSCycBje
+         AhjCZOZ0fjeCPVI+PSkJ8d2nQuzArr8fiL1/HAUw=
+From:   Jaegeuk Kim <jaegeuk@kernel.org>
+To:     linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net
+Cc:     Jaegeuk Kim <jaegeuk@kernel.org>, stable@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH] loop: avoid EAGAIN, if offset or block_size are changed
+Date:   Fri, 17 May 2019 17:47:51 -0700
+Message-Id: <20190518004751.18962-1-jaegeuk@kernel.org>
+X-Mailer: git-send-email 2.19.0.605.g01d371f741-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190516131703.GA26943@ming.t460p>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Fri, 17 May 2019 23:02:19 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 16, 2019 at 09:17:04PM +0800, Ming Lei wrote:
-> Hi Christoph,
-> 
-> On Thu, May 16, 2019 at 10:40:55AM +0200, Christoph Hellwig wrote:
-> > Currently ll_merge_requests_fn, unlike all other merge functions,
-> > reduces nr_phys_segments by one if the last segment of the previous,
-> > and the first segment of the next segement are contigous.  While this
-> > seems like a nice solution to avoid building smaller than possible
-> > requests it causes a mismatch between the segments actually present
-> > in the request and those iterated over by the bvec iterators, including
-> > __rq_for_each_bio.  This could cause overwrites of too small kmalloc
-> > allocations in any driver using ranged discard, or also mistrigger
-> > the single segment optimization in the nvme-pci driver.
-> > 
-> > We could possibly work around this by making the bvec iterators take
-> > the front and back segment size into account, but that would require
-> > moving them from the bio to the bio_iter and spreading this mess
-> > over all users of bvecs.  Or we could simply remove this optimization
-> > under the assumption that most users already build good enough bvecs,
-> > and that the bio merge patch never cared about this optimization
-> > either.  The latter is what this patch does.
-> > 
-> > Fixes: b35ba01ea697 ("nvme: support ranged discard requests")
-> > Fixes: 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support")
-> 
-> ll_merge_requests_fn() is only called from attempt_merge() in case
-> that ELEVATOR_BACK_MERGE is returned from blk_try_req_merge(). However,
-> for discard merge of both virtio_blk and nvme, ELEVATOR_DISCARD_MERGE is
-> always returned from blk_try_req_merge() in attempt_merge(), so looks
-> ll_merge_requests_fn() shouldn't be called for virtio_blk/nvme's discard
-> request. Just wondering if you may explain a bit how the change on
-> ll_merge_requests_fn() in this patch makes a difference on the above
-> two commits?
-> 
-> > Fixes: 297910571f08 ("nvme-pci: optimize mapping single segment requests using SGLs")
-> 
-> I guess it should be dff824b2aadb ("nvme-pci: optimize mapping of small
-> single segment requests").
-> 
-> Yes, this patch helps for this case, cause blk_rq_nr_phys_segments() may be 1
-> but there are two bios which share same segment.
+This patch tries to avoid EAGAIN due to nrpages!=0 that was originally trying
+to drop stale pages resulting in wrong data access.
 
-BTW, I just sent a single-line nvme-pci fix on this issue, which may be more
-suitable to serve as v5.2 fix:
+Report: https://bugs.chromium.org/p/chromium/issues/detail?id=938958#c38
 
-http://lists.infradead.org/pipermail/linux-nvme/2019-May/024283.html
+Cc: <stable@vger.kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: Bart Van Assche <bvanassche@acm.org>
+Fixes: 5db470e229e2 ("loop: drop caches if offset or block_size are changed")
+Reported-by: Gwendal Grignou <gwendal@chromium.org>
+Reported-by: grygorii tertychnyi <gtertych@cisco.com>
+Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+---
+ drivers/block/loop.c | 44 +++++++++++++++++---------------------------
+ 1 file changed, 17 insertions(+), 27 deletions(-)
 
-Thanks,
-Ming
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 102d79575895..7c7d2d9c47d0 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1212,6 +1212,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	kuid_t uid = current_uid();
+ 	struct block_device *bdev;
+ 	bool partscan = false;
++	bool drop_caches = false;
+ 
+ 	err = mutex_lock_killable(&loop_ctl_mutex);
+ 	if (err)
+@@ -1232,10 +1233,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	}
+ 
+ 	if (lo->lo_offset != info->lo_offset ||
+-	    lo->lo_sizelimit != info->lo_sizelimit) {
+-		sync_blockdev(lo->lo_device);
+-		kill_bdev(lo->lo_device);
+-	}
++	    lo->lo_sizelimit != info->lo_sizelimit)
++		drop_caches = true;
+ 
+ 	/* I/O need to be drained during transfer transition */
+ 	blk_mq_freeze_queue(lo->lo_queue);
+@@ -1265,14 +1264,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 
+ 	if (lo->lo_offset != info->lo_offset ||
+ 	    lo->lo_sizelimit != info->lo_sizelimit) {
+-		/* kill_bdev should have truncated all the pages */
+-		if (lo->lo_device->bd_inode->i_mapping->nrpages) {
+-			err = -EAGAIN;
+-			pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
+-				__func__, lo->lo_number, lo->lo_file_name,
+-				lo->lo_device->bd_inode->i_mapping->nrpages);
+-			goto out_unfreeze;
+-		}
+ 		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
+ 			err = -EFBIG;
+ 			goto out_unfreeze;
+@@ -1317,6 +1308,12 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		bdev = lo->lo_device;
+ 		partscan = true;
+ 	}
++
++	/* truncate stale pages cached by previous operations */
++	if (!err && drop_caches) {
++		sync_blockdev(lo->lo_device);
++		kill_bdev(lo->lo_device);
++	}
+ out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
+ 	if (partscan)
+@@ -1498,6 +1495,7 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+ 
+ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+ {
++	bool drop_caches = false;
+ 	int err = 0;
+ 
+ 	if (lo->lo_state != Lo_bound)
+@@ -1506,23 +1504,10 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+ 	if (arg < 512 || arg > PAGE_SIZE || !is_power_of_2(arg))
+ 		return -EINVAL;
+ 
+-	if (lo->lo_queue->limits.logical_block_size != arg) {
+-		sync_blockdev(lo->lo_device);
+-		kill_bdev(lo->lo_device);
+-	}
++	if (lo->lo_queue->limits.logical_block_size != arg)
++		drop_caches = true;
+ 
+ 	blk_mq_freeze_queue(lo->lo_queue);
+-
+-	/* kill_bdev should have truncated all the pages */
+-	if (lo->lo_queue->limits.logical_block_size != arg &&
+-			lo->lo_device->bd_inode->i_mapping->nrpages) {
+-		err = -EAGAIN;
+-		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
+-			__func__, lo->lo_number, lo->lo_file_name,
+-			lo->lo_device->bd_inode->i_mapping->nrpages);
+-		goto out_unfreeze;
+-	}
+-
+ 	blk_queue_logical_block_size(lo->lo_queue, arg);
+ 	blk_queue_physical_block_size(lo->lo_queue, arg);
+ 	blk_queue_io_min(lo->lo_queue, arg);
+@@ -1530,6 +1515,11 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+ out_unfreeze:
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
+ 
++	/* truncate stale pages cached by previous operations */
++	if (drop_caches) {
++		sync_blockdev(lo->lo_device);
++		kill_bdev(lo->lo_device);
++	}
+ 	return err;
+ }
+ 
+-- 
+2.19.0.605.g01d371f741-goog
+
