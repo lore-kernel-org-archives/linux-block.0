@@ -2,83 +2,201 @@ Return-Path: <SRS0=7xe9=TS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D675BC04AAF
-	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 09:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 484FCC072A4
+	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 18:40:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8F89520B7C
-	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 09:33:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20BDB2087E
+	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 18:40:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eSQvHrjj"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nlp7cHJt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726808AbfERJdP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 May 2019 05:33:15 -0400
-Received: from mail-wr1-f43.google.com ([209.85.221.43]:33788 "EHLO
-        mail-wr1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725268AbfERJdP (ORCPT
+        id S1729522AbfERSkA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 May 2019 14:40:00 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41006 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728531AbfERSkA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 May 2019 05:33:15 -0400
-Received: by mail-wr1-f43.google.com with SMTP id d9so9515655wrx.0;
-        Sat, 18 May 2019 02:33:14 -0700 (PDT)
+        Sat, 18 May 2019 14:40:00 -0400
+Received: by mail-wr1-f68.google.com with SMTP id g12so10014995wro.8
+        for <linux-block@vger.kernel.org>; Sat, 18 May 2019 11:39:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=bSU0pmO8NA8IzEC9ClUfFdwoeSvR32FualisGvPyxwY=;
-        b=eSQvHrjj8bgcs7NAMEXZKljlMX2NlZ7hTAXzlzOCOfq0WLDaWOStrbxZpAQciau4AH
-         Hofq5HQyPf9QMkyYZusn5wsxs2P6xkyknZsxcNF4V8wGNfXW1Fv1l4oc5pI+zIzXYqqm
-         E34VmXXhgwqks4cRA4dBqDQtt6O8lTOrFBgl305nxWFoSOIuQE+8sVa3W67vu/cGYMrd
-         GnhHlDwCWJqc6B6HGh0srmV8XQa/6UYUC5bsM4qp+fdggKGIGSC97NoqJ0hlGp4cE/wQ
-         Oh32/n2Mk52aWDGkAYEBq8gIfnDYplIhaEFKXP4oCNhfpc87gG+vzXDImC+J0HzgYUjK
-         zafg==
+        d=linaro.org; s=google;
+        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
+         :references;
+        bh=ouEAfY4fVdVHhS9xR65IP6Zu3YZKMcX1yK26/K9YRUY=;
+        b=nlp7cHJt2SjtBL+lyV4uwEHDsEea6nRrWx5BU9r3PG8LieJX1ROiQDyxQpLG1WdGm/
+         2TrUP8Z6n6D2ouN6A/3sw7WZysGcv73ll6ZTXI8RyL+ntXWvd5wHWzQ0o6aS92tqPJju
+         C1rGQW9JCxQuhs7CQOqrLPbJWm4aEiqDd41KQhAWZirqNKSNz9MAlQOMB68cUxn0UUTe
+         KIP/emPF1QPcyA/CLxVNJXMr1X2h46CgI12jfOyhBlI++DQErsG3wj3NPXfXWYj9glIE
+         wEEPycLptPZkBPIoyZqcaurC/U5Ltp6ZOOnPhW8BvqdYLnVBza6XzYvD+pPkgWf02k+g
+         eK+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=bSU0pmO8NA8IzEC9ClUfFdwoeSvR32FualisGvPyxwY=;
-        b=AuXLEe5O/jxU1e4XrkOi/GQguvDnj/pnyfwjS2i3f5C6WwUchBVqDk8U6bdnElEL03
-         S3YGZ+7Ng46Adz2s5U8hXSAUZbk0gLDUrM0pmQHc1L7yQR207hSJkiLMSA5n1TEJHVe+
-         tMx8FfOjBtlCQs8dQwpjjPJAKCZnGPydSM9fnA3wa7nVhVh7Yshmcm/CcFrsSIviClpZ
-         jdzm02SinBrg9TjKyiAOLerHuD7/uDVDDDN38iSL1FcjIr11plB+G5D+rC9V0ezvLZzI
-         O4cAmdbwYRvR1X5XDi+cdgOtsxEH36SyOTmekEgTBCffqlRp2rEJMM07AWags1wfeKuG
-         qnzw==
-X-Gm-Message-State: APjAAAXLac18tHsj72F8+3o2fFc79NlmB49Tg0e68XNOG4txBxBqRgG8
-        NrXB+eeI/8HoXrdEPzFBtI/gmpw=
-X-Google-Smtp-Source: APXvYqyG77S+GaIqcr0esZDANRjcdxjNUbmsW01PA5DFxPgZt9QopjaMTJIO+gfqGT08yIHVTX5wew==
-X-Received: by 2002:a5d:4cc4:: with SMTP id c4mr26086276wrt.164.1558171994104;
-        Sat, 18 May 2019 02:33:14 -0700 (PDT)
-Received: from avx2 ([46.53.249.58])
-        by smtp.gmail.com with ESMTPSA id j206sm12851622wma.47.2019.05.18.02.33.12
+        h=x-gm-message-state:from:message-id:mime-version:subject:date
+         :in-reply-to:cc:to:references;
+        bh=ouEAfY4fVdVHhS9xR65IP6Zu3YZKMcX1yK26/K9YRUY=;
+        b=NXCAhxk8MMcKl5C+7zvpbeX2d7vvqyj1H2byBlP7I/bR4+OHohhVRPyaJCMJKVoZhp
+         Qpw/kpjM6KreSGcjcySYrDuI+dKftpzsgWPf3nkHODjwdFhHdBGRsqyFMQc0mW5uqBgn
+         m6xPwAGlGwAFQ1s65t7iZUB3ituKi7uxcOJ40keYMtKtJgobTXxg2/ou77CGfBRvopIq
+         4Zr0/jJU1XSYmuS5ffAVgmBNZPZrcKOLGuivdPB52aLdQDAj2RB73nzqjZLMMS5Q6+86
+         asiPFKpp4sVyqOmIu2FK+wk8KWWrz6yi9bl1nb7eW0E8Vf+XV9ZRbW/Qe363fMnYHK4f
+         o+FA==
+X-Gm-Message-State: APjAAAW+hXKbvlKGtLn6j2VZAqS81BFmiye5II6QmNXkyCmNPJ3fnagk
+        22/PGDgAuKqgjEMGjmIQnf8uGA==
+X-Google-Smtp-Source: APXvYqzVK8BV5Of9EvEM1INCvl8U4K12CuUulfyj9lY9OcHKvXPf2OwHmZNC0FvObtMXpR/7vHW8IA==
+X-Received: by 2002:a5d:5701:: with SMTP id a1mr40449129wrv.52.1558204797886;
+        Sat, 18 May 2019 11:39:57 -0700 (PDT)
+Received: from [192.168.0.104] (146-241-112-39.dyn.eolo.it. [146.241.112.39])
+        by smtp.gmail.com with ESMTPSA id m206sm16520509wmf.21.2019.05.18.11.39.55
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 18 May 2019 02:33:13 -0700 (PDT)
-Date:   Sat, 18 May 2019 12:33:11 +0300
-From:   Alexey Dobriyan <adobriyan@gmail.com>
-To:     axboe@kernel.dk, ming.lei@redhat.com, osandov@fb.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Setting up default iosched in 5.0+
-Message-ID: <20190518093310.GA3123@avx2>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Sat, 18 May 2019 11:39:56 -0700 (PDT)
+From:   Paolo Valente <paolo.valente@linaro.org>
+Message-Id: <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_2AB4EAF8-8BC4-47A0-9500-56DE63C63E62";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+Date:   Sat, 18 May 2019 20:39:54 +0200
+In-Reply-To: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk, jack@suse.cz,
+        jmoyer@redhat.com, tytso@mit.edu, amakhalov@vmware.com,
+        anishs@vmware.com, srivatsab@vmware.com
+To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-5.0 deleted three io schedulers and more importantly CONFIG_DEFAULT_IOSCHED
-option:
 
-	commit f382fb0bcef4c37dc049e9f6963e3baf204d815c
-	block: remove legacy IO schedulers
+--Apple-Mail=_2AB4EAF8-8BC4-47A0-9500-56DE63C63E62
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-After figuring out that I silently became "noop" customer enabling just
-BFQ didn't work: "noop" is still being selected by default.
+I've addressed these issues in my last batch of improvements for BFQ, =
+which landed in the upcoming 5.2. If you give it a try, and still see =
+the problem, then I'll be glad to reproduce it, and hopefully fix it for =
+you.
 
-There is an "elevator=" command line option but it does nothing.
+Thanks,
+Paolo
 
-Are users supposed to add stuff to init scripts now?
+> Il giorno 18 mag 2019, alle ore 00:16, Srivatsa S. Bhat =
+<srivatsa@csail.mit.edu> ha scritto:
+>=20
+>=20
+> Hi,
+>=20
+> One of my colleagues noticed upto 10x - 30x drop in I/O throughput
+> running the following command, with the CFQ I/O scheduler:
+>=20
+> dd if=3D/dev/zero of=3D/root/test.img bs=3D512 count=3D10000 =
+oflags=3Ddsync
+>=20
+> Throughput with CFQ: 60 KB/s
+> Throughput with noop or deadline: 1.5 MB/s - 2 MB/s
+>=20
+> I spent some time looking into it and found that this is caused by the
+> undesirable interaction between 4 different components:
+>=20
+> - blkio cgroup controller enabled
+> - ext4 with the jbd2 kthread running in the root blkio cgroup
+> - dd running on ext4, in any other blkio cgroup than that of jbd2
+> - CFQ I/O scheduler with defaults for slice_idle and group_idle
+>=20
+>=20
+> When docker is enabled, systemd creates a blkio cgroup called
+> system.slice to run system services (and docker) under it, and a
+> separate blkio cgroup called user.slice for user processes. So, when
+> dd is invoked, it runs under user.slice.
+>=20
+> The dd command above includes the dsync flag, which performs an
+> fdatasync after every write to the output file. Since dd is writing to
+> a file on ext4, jbd2 will be active, committing transactions
+> corresponding to those fdatasync requests from dd. (In other words, dd
+> depends on jdb2, in order to make forward progress). But jdb2 being a
+> kernel thread, runs in the root blkio cgroup, as opposed to dd, which
+> runs under user.slice.
+>=20
+> Now, if the I/O scheduler in use for the underlying block device is
+> CFQ, then its inter-queue/inter-group idling takes effect (via the
+> slice_idle and group_idle parameters, both of which default to 8ms).
+> Therefore, everytime CFQ switches between processing requests from dd
+> vs jbd2, this 8ms idle time is injected, which slows down the overall
+> throughput tremendously!
+>=20
+> To verify this theory, I tried various experiments, and in all cases,
+> the 4 pre-conditions mentioned above were necessary to reproduce this
+> performance drop. For example, if I used an XFS filesystem (which
+> doesn't use a separate kthread like jbd2 for journaling), or if I =
+dd'ed
+> directly to a block device, I couldn't reproduce the performance
+> issue. Similarly, running dd in the root blkio cgroup (where jbd2
+> runs) also gets full performance; as does using the noop or deadline
+> I/O schedulers; or even CFQ itself, with slice_idle and group_idle set
+> to zero.
+>=20
+> These results were reproduced on a Linux VM (kernel v4.19) on ESXi,
+> both with virtualized storage as well as with disk pass-through,
+> backed by a rotational hard disk in both cases. The same problem was
+> also seen with the BFQ I/O scheduler in kernel v5.1.
+>=20
+> Searching for any earlier discussions of this problem, I found an old
+> thread on LKML that encountered this behavior [1], as well as a docker
+> github issue [2] with similar symptoms (mentioned later in the
+> thread).
+>=20
+> So, I'm curious to know if this is a well-understood problem and if
+> anybody has any thoughts on how to fix it.
+>=20
+> Thank you very much!
+>=20
+>=20
+> [1]. https://lkml.org/lkml/2015/11/19/359
+>=20
+> [2]. https://github.com/moby/moby/issues/21485
+>     https://github.com/moby/moby/issues/21485#issuecomment-222941103
+>=20
+> Regards,
+> Srivatsa
+
+
+--Apple-Mail=_2AB4EAF8-8BC4-47A0-9500-56DE63C63E62
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAlzgUXoACgkQOAkCLQGo
+9oPNXw//edQtNFa1ZbM3WUODyCQi7cKAIh4ducAKO16wY4cr3eaXmlDO++GEBBos
+cPdrh1eqQUs6ARuLbmwyLSCZpm3dyJFuK6RBqWYAPdM8vExd4cl6xAHzCK271grv
+2+HvBk5p9/fR+TZoKKz/fv6gJG1qBW6/sdVwLGY7pb6J9iTYjRO6t2faRhc6LXFE
+LrsLOwF4OzYYhYbbU1tvTu34VxDycloASVdaYUQsqA9B3C5NO1VeMVhoPRFXL6fK
+8ZOiXkpOZLaqldXk6sctyg7yWFmzjUFS/PfnG3ZBSOGWYhA0T7aIEzOddQy39Ckx
+iEFl6DCCsUrzCw7kWZRjitVeDZp1itdANtNmqBBwcv/ccW1ag4Hryt08F9LSNKp/
+P4JDKOLezZ39VQyLoOnYVT/HeCQjx1uQpmilE3lU6+KFEjq61lD5y072Wz8Nw8AE
+qVjwv7Z2FPAROe8JGVpHn6YMvFzrl79nKa+ji9BlQWm1JVvgDcHoZGdVyuaznNyV
+NXOpSbi2BnsQvyfhNYwSc9/Jkopfbx/3fMkTK7LnLLSiPo1snzC2bMdICJPWtsYx
+Vqd4II1J1ZcvSmllZ7lOHpAi3JsPbuemcx0fvA8CXdBST0ZgEuaJLzb2MM5+X8uP
+SJwBn7Vy3TlM6kio9mtr4W3x2341l/FmpxnHWDZiCFsS6A/EQ6c=
+=FzRW
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_2AB4EAF8-8BC4-47A0-9500-56DE63C63E62--
