@@ -2,54 +2,57 @@ Return-Path: <SRS0=7xe9=TS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8CEC46470
-	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 00:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B70C04E87
+	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 00:53:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 407FD218A5
-	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 00:47:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49BD6218A2
+	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 00:53:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558140475;
-	bh=wcJMmid3eNX1fzqE7KShQj339cvq5JIkzCDTKY+6qnQ=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=aYJwpTM1kPFYrjAQ7IG/AX/I6XispCOiMJwpo/PCoueLh21xhJvMF8kSvWSfURDHO
-	 Fxh9FCfT7zIi2bv/vcL4QgbXeuwAgRIScIs1ZgH8GioZlOXZoD6GpeCxZB83gbSyx7
-	 PNCO6zVNqhGFEqReQM6Wl2ZUp28/Il13JHrhB1dY=
+	s=default; t=1558140788;
+	bh=66iQAXpgOcprZCr8CiOqoxBvjn/OVWnQ1zBgY9TaV+E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=xknX2MW9tWpIllxx7gN5JW66adluS0CkAk90E4MoU5nfaG8Po2tKI2krjjPK6Y+rK
+	 GE/gSHswzZbMOEYdWzt3N/MNdcMu166g1OAhJOFq5RW54AhakXNFcIwVcZhSV0KKaz
+	 vw5QFX5AxpUQClLwr5INj4zeSVtyu0iNfvpB+uIE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726894AbfERAry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 May 2019 20:47:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33992 "EHLO mail.kernel.org"
+        id S1726774AbfERAxH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 May 2019 20:53:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37462 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726881AbfERAry (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 May 2019 20:47:54 -0400
+        id S1726200AbfERAxH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 May 2019 20:53:07 -0400
 Received: from localhost (unknown [104.132.1.68])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 47DA721883;
-        Sat, 18 May 2019 00:47:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4764C20848;
+        Sat, 18 May 2019 00:53:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558140473;
-        bh=wcJMmid3eNX1fzqE7KShQj339cvq5JIkzCDTKY+6qnQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=lLvPLBZDUqi9n30KQHvC+B/mdzOF1Y5E0ax4t8Cu08ZULeWcxxATpwO7pB8BB55/9
-         FsB2b1Hjo1kC5w47jpPiqFtz+zJ3zJC2xE0sVxZbLKmCIsRW5t2wkwkQcFeSCycBje
-         AhjCZOZ0fjeCPVI+PSkJ8d2nQuzArr8fiL1/HAUw=
+        s=default; t=1558140785;
+        bh=66iQAXpgOcprZCr8CiOqoxBvjn/OVWnQ1zBgY9TaV+E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=OXxweGuLs1atpXSvvpx9TysllOW6kS4Rq9gj3QnFCAaqCfxgPNYHVDFlbLmQKuQmd
+         3/+efhufGSfnFwam8ZVNq6KBq/7cw5gUVXITBhfBzkV2q23fZ9X9Y6GDbbOW31Q2Ch
+         d2cCLQSFLJvJYh2G2FvySqW12IbKsc51CDSkUxfw=
+Date:   Fri, 17 May 2019 17:53:04 -0700
 From:   Jaegeuk Kim <jaegeuk@kernel.org>
 To:     linux-kernel@vger.kernel.org,
         linux-f2fs-devel@lists.sourceforge.net
-Cc:     Jaegeuk Kim <jaegeuk@kernel.org>, stable@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH] loop: avoid EAGAIN, if offset or block_size are changed
-Date:   Fri, 17 May 2019 17:47:51 -0700
-Message-Id: <20190518004751.18962-1-jaegeuk@kernel.org>
-X-Mailer: git-send-email 2.19.0.605.g01d371f741-goog
+Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v2] loop: avoid EAGAIN, if offset or block_size are
+ changed
+Message-ID: <20190518005304.GA19446@jaegeuk-macbookpro.roam.corp.google.com>
+References: <20190518004751.18962-1-jaegeuk@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190518004751.18962-1-jaegeuk@kernel.org>
+User-Agent: Mutt/1.8.2 (2017-04-18)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -69,11 +72,14 @@ Reported-by: Gwendal Grignou <gwendal@chromium.org>
 Reported-by: grygorii tertychnyi <gtertych@cisco.com>
 Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
 ---
- drivers/block/loop.c | 44 +++++++++++++++++---------------------------
- 1 file changed, 17 insertions(+), 27 deletions(-)
+v2 from v1:
+ - remove obsolete jump
+
+ drivers/block/loop.c | 45 +++++++++++++++++---------------------------
+ 1 file changed, 17 insertions(+), 28 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 102d79575895..7c7d2d9c47d0 100644
+index 102d79575895..42994de2dd12 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
 @@ -1212,6 +1212,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
@@ -133,7 +139,7 @@ index 102d79575895..7c7d2d9c47d0 100644
  	int err = 0;
  
  	if (lo->lo_state != Lo_bound)
-@@ -1506,23 +1504,10 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+@@ -1506,30 +1504,21 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
  	if (arg < 512 || arg > PAGE_SIZE || !is_power_of_2(arg))
  		return -EINVAL;
  
@@ -159,8 +165,8 @@ index 102d79575895..7c7d2d9c47d0 100644
  	blk_queue_logical_block_size(lo->lo_queue, arg);
  	blk_queue_physical_block_size(lo->lo_queue, arg);
  	blk_queue_io_min(lo->lo_queue, arg);
-@@ -1530,6 +1515,11 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
- out_unfreeze:
+ 	loop_update_dio(lo);
+-out_unfreeze:
  	blk_mq_unfreeze_queue(lo->lo_queue);
  
 +	/* truncate stale pages cached by previous operations */
