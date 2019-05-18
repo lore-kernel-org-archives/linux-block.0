@@ -2,201 +2,107 @@ Return-Path: <SRS0=7xe9=TS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 484FCC072A4
-	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 18:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D03B3C072A4
+	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 19:29:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20BDB2087E
-	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 18:40:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nlp7cHJt"
+	by mail.kernel.org (Postfix) with ESMTP id B4C682087E
+	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 19:29:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729522AbfERSkA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 May 2019 14:40:00 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:41006 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728531AbfERSkA (ORCPT
+        id S1729824AbfERT3s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 May 2019 15:29:48 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:52260 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729206AbfERT3s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 May 2019 14:40:00 -0400
-Received: by mail-wr1-f68.google.com with SMTP id g12so10014995wro.8
-        for <linux-block@vger.kernel.org>; Sat, 18 May 2019 11:39:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=ouEAfY4fVdVHhS9xR65IP6Zu3YZKMcX1yK26/K9YRUY=;
-        b=nlp7cHJt2SjtBL+lyV4uwEHDsEea6nRrWx5BU9r3PG8LieJX1ROiQDyxQpLG1WdGm/
-         2TrUP8Z6n6D2ouN6A/3sw7WZysGcv73ll6ZTXI8RyL+ntXWvd5wHWzQ0o6aS92tqPJju
-         C1rGQW9JCxQuhs7CQOqrLPbJWm4aEiqDd41KQhAWZirqNKSNz9MAlQOMB68cUxn0UUTe
-         KIP/emPF1QPcyA/CLxVNJXMr1X2h46CgI12jfOyhBlI++DQErsG3wj3NPXfXWYj9glIE
-         wEEPycLptPZkBPIoyZqcaurC/U5Ltp6ZOOnPhW8BvqdYLnVBza6XzYvD+pPkgWf02k+g
-         eK+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=ouEAfY4fVdVHhS9xR65IP6Zu3YZKMcX1yK26/K9YRUY=;
-        b=NXCAhxk8MMcKl5C+7zvpbeX2d7vvqyj1H2byBlP7I/bR4+OHohhVRPyaJCMJKVoZhp
-         Qpw/kpjM6KreSGcjcySYrDuI+dKftpzsgWPf3nkHODjwdFhHdBGRsqyFMQc0mW5uqBgn
-         m6xPwAGlGwAFQ1s65t7iZUB3ituKi7uxcOJ40keYMtKtJgobTXxg2/ou77CGfBRvopIq
-         4Zr0/jJU1XSYmuS5ffAVgmBNZPZrcKOLGuivdPB52aLdQDAj2RB73nzqjZLMMS5Q6+86
-         asiPFKpp4sVyqOmIu2FK+wk8KWWrz6yi9bl1nb7eW0E8Vf+XV9ZRbW/Qe363fMnYHK4f
-         o+FA==
-X-Gm-Message-State: APjAAAW+hXKbvlKGtLn6j2VZAqS81BFmiye5II6QmNXkyCmNPJ3fnagk
-        22/PGDgAuKqgjEMGjmIQnf8uGA==
-X-Google-Smtp-Source: APXvYqzVK8BV5Of9EvEM1INCvl8U4K12CuUulfyj9lY9OcHKvXPf2OwHmZNC0FvObtMXpR/7vHW8IA==
-X-Received: by 2002:a5d:5701:: with SMTP id a1mr40449129wrv.52.1558204797886;
-        Sat, 18 May 2019 11:39:57 -0700 (PDT)
-Received: from [192.168.0.104] (146-241-112-39.dyn.eolo.it. [146.241.112.39])
-        by smtp.gmail.com with ESMTPSA id m206sm16520509wmf.21.2019.05.18.11.39.55
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 18 May 2019 11:39:56 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-Message-Id: <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_2AB4EAF8-8BC4-47A0-9500-56DE63C63E62";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-Date:   Sat, 18 May 2019 20:39:54 +0200
-In-Reply-To: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
-Cc:     linux-fsdevel@vger.kernel.org,
+        Sat, 18 May 2019 15:29:48 -0400
+Received: from callcc.thunk.org ([66.31.38.53])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x4IJT0Gx030129
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 18 May 2019 15:29:01 -0400
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id 5DC5E420027; Sat, 18 May 2019 15:28:47 -0400 (EDT)
+Date:   Sat, 18 May 2019 15:28:47 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>,
+        linux-fsdevel@vger.kernel.org,
         linux-block <linux-block@vger.kernel.org>,
         linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org, axboe@kernel.dk, jack@suse.cz,
-        jmoyer@redhat.com, tytso@mit.edu, amakhalov@vmware.com,
-        anishs@vmware.com, srivatsab@vmware.com
-To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+        jmoyer@redhat.com, amakhalov@vmware.com, anishs@vmware.com,
+        srivatsab@vmware.com
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+Message-ID: <20190518192847.GB14277@mit.edu>
+Mail-Followup-To: Theodore Ts'o <tytso@mit.edu>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>,
+        linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk, jack@suse.cz,
+        jmoyer@redhat.com, amakhalov@vmware.com, anishs@vmware.com,
+        srivatsab@vmware.com
 References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
-X-Mailer: Apple Mail (2.3445.104.8)
+ <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Sat, May 18, 2019 at 08:39:54PM +0200, Paolo Valente wrote:
+> I've addressed these issues in my last batch of improvements for
+> BFQ, which landed in the upcoming 5.2. If you give it a try, and
+> still see the problem, then I'll be glad to reproduce it, and
+> hopefully fix it for you.
 
---Apple-Mail=_2AB4EAF8-8BC4-47A0-9500-56DE63C63E62
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+Hi Paolo, I'm curious if you could give a quick summary about what you
+changed in BFQ?
 
-I've addressed these issues in my last batch of improvements for BFQ, =
-which landed in the upcoming 5.2. If you give it a try, and still see =
-the problem, then I'll be glad to reproduce it, and hopefully fix it for =
-you.
+I was considering adding support so that if userspace calls fsync(2)
+or fdatasync(2), to attach the process's CSS to the transaction, and
+then charge all of the journal metadata writes the process's CSS.  If
+there are multiple fsync's batched into the transaction, the first
+process which forced the early transaction commit would get charged
+the entire journal write.  OTOH, journal writes are sequential I/O, so
+the amount of disk time for writing the journal is going to be
+relatively small, and especially, the fact that work from other
+cgroups is going to be minimal, especially if hadn't issued an
+fsync().
 
-Thanks,
-Paolo
+In the case where you have three cgroups all issuing fsync(2) and they
+all landed in the same jbd2 transaction thanks to commit batching, in
+the ideal world we would split up the disk time usage equally across
+those three cgroups.  But it's probably not worth doing that...
 
-> Il giorno 18 mag 2019, alle ore 00:16, Srivatsa S. Bhat =
-<srivatsa@csail.mit.edu> ha scritto:
->=20
->=20
-> Hi,
->=20
-> One of my colleagues noticed upto 10x - 30x drop in I/O throughput
-> running the following command, with the CFQ I/O scheduler:
->=20
-> dd if=3D/dev/zero of=3D/root/test.img bs=3D512 count=3D10000 =
-oflags=3Ddsync
->=20
-> Throughput with CFQ: 60 KB/s
-> Throughput with noop or deadline: 1.5 MB/s - 2 MB/s
->=20
-> I spent some time looking into it and found that this is caused by the
-> undesirable interaction between 4 different components:
->=20
-> - blkio cgroup controller enabled
-> - ext4 with the jbd2 kthread running in the root blkio cgroup
-> - dd running on ext4, in any other blkio cgroup than that of jbd2
-> - CFQ I/O scheduler with defaults for slice_idle and group_idle
->=20
->=20
-> When docker is enabled, systemd creates a blkio cgroup called
-> system.slice to run system services (and docker) under it, and a
-> separate blkio cgroup called user.slice for user processes. So, when
-> dd is invoked, it runs under user.slice.
->=20
-> The dd command above includes the dsync flag, which performs an
-> fdatasync after every write to the output file. Since dd is writing to
-> a file on ext4, jbd2 will be active, committing transactions
-> corresponding to those fdatasync requests from dd. (In other words, dd
-> depends on jdb2, in order to make forward progress). But jdb2 being a
-> kernel thread, runs in the root blkio cgroup, as opposed to dd, which
-> runs under user.slice.
->=20
-> Now, if the I/O scheduler in use for the underlying block device is
-> CFQ, then its inter-queue/inter-group idling takes effect (via the
-> slice_idle and group_idle parameters, both of which default to 8ms).
-> Therefore, everytime CFQ switches between processing requests from dd
-> vs jbd2, this 8ms idle time is injected, which slows down the overall
-> throughput tremendously!
->=20
-> To verify this theory, I tried various experiments, and in all cases,
-> the 4 pre-conditions mentioned above were necessary to reproduce this
-> performance drop. For example, if I used an XFS filesystem (which
-> doesn't use a separate kthread like jbd2 for journaling), or if I =
-dd'ed
-> directly to a block device, I couldn't reproduce the performance
-> issue. Similarly, running dd in the root blkio cgroup (where jbd2
-> runs) also gets full performance; as does using the noop or deadline
-> I/O schedulers; or even CFQ itself, with slice_idle and group_idle set
-> to zero.
->=20
-> These results were reproduced on a Linux VM (kernel v4.19) on ESXi,
-> both with virtualized storage as well as with disk pass-through,
-> backed by a rotational hard disk in both cases. The same problem was
-> also seen with the BFQ I/O scheduler in kernel v5.1.
->=20
-> Searching for any earlier discussions of this problem, I found an old
-> thread on LKML that encountered this behavior [1], as well as a docker
-> github issue [2] with similar symptoms (mentioned later in the
-> thread).
->=20
-> So, I'm curious to know if this is a well-understood problem and if
-> anybody has any thoughts on how to fix it.
->=20
-> Thank you very much!
->=20
->=20
-> [1]. https://lkml.org/lkml/2015/11/19/359
->=20
-> [2]. https://github.com/moby/moby/issues/21485
->     https://github.com/moby/moby/issues/21485#issuecomment-222941103
->=20
-> Regards,
-> Srivatsa
+That being said, we probably do need some BFQ support, since in the
+case where we have multiple processes doing buffered writes w/o fsync,
+we do charnge the data=ordered writeback to each block cgroup.  Worse,
+the commit can't complete until the all of the data integrity
+writebacks have completed.  And if there are N cgroups with dirty
+inodes, and slice_idle set to 8ms, there is going to be 8*N ms worth
+of idle time tacked onto the commit time.
 
+If we charge the journal I/O to the cgroup, and there's only one
+process doing the 
 
---Apple-Mail=_2AB4EAF8-8BC4-47A0-9500-56DE63C63E62
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
+   dd if=/dev/zero of=/root/test.img bs=512 count=10000 oflags=dsync
 
------BEGIN PGP SIGNATURE-----
+then we don't need to worry about this failure mode, since both the
+journal I/O and the data writeback will be hitting the same cgroup.
+But that's arguably an artificial use case, and much more commonly
+there will be multiple cgroups all trying to at least some file system
+I/O.
 
-iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAlzgUXoACgkQOAkCLQGo
-9oPNXw//edQtNFa1ZbM3WUODyCQi7cKAIh4ducAKO16wY4cr3eaXmlDO++GEBBos
-cPdrh1eqQUs6ARuLbmwyLSCZpm3dyJFuK6RBqWYAPdM8vExd4cl6xAHzCK271grv
-2+HvBk5p9/fR+TZoKKz/fv6gJG1qBW6/sdVwLGY7pb6J9iTYjRO6t2faRhc6LXFE
-LrsLOwF4OzYYhYbbU1tvTu34VxDycloASVdaYUQsqA9B3C5NO1VeMVhoPRFXL6fK
-8ZOiXkpOZLaqldXk6sctyg7yWFmzjUFS/PfnG3ZBSOGWYhA0T7aIEzOddQy39Ckx
-iEFl6DCCsUrzCw7kWZRjitVeDZp1itdANtNmqBBwcv/ccW1ag4Hryt08F9LSNKp/
-P4JDKOLezZ39VQyLoOnYVT/HeCQjx1uQpmilE3lU6+KFEjq61lD5y072Wz8Nw8AE
-qVjwv7Z2FPAROe8JGVpHn6YMvFzrl79nKa+ji9BlQWm1JVvgDcHoZGdVyuaznNyV
-NXOpSbi2BnsQvyfhNYwSc9/Jkopfbx/3fMkTK7LnLLSiPo1snzC2bMdICJPWtsYx
-Vqd4II1J1ZcvSmllZ7lOHpAi3JsPbuemcx0fvA8CXdBST0ZgEuaJLzb2MM5+X8uP
-SJwBn7Vy3TlM6kio9mtr4W3x2341l/FmpxnHWDZiCFsS6A/EQ6c=
-=FzRW
------END PGP SIGNATURE-----
-
---Apple-Mail=_2AB4EAF8-8BC4-47A0-9500-56DE63C63E62--
+						- Ted
