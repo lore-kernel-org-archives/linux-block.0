@@ -1,161 +1,104 @@
-Return-Path: <SRS0=7xe9=TS=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=zuir=TU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 076BAC04E87
-	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 20:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA8FC46460
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 02:43:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB63B20833
-	for <linux-block@archiver.kernel.org>; Sat, 18 May 2019 20:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 817B42082E
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 02:43:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mLbts5Y3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729396AbfERUux (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 May 2019 16:50:53 -0400
-Received: from outgoing-stata.csail.mit.edu ([128.30.2.210]:48063 "EHLO
-        outgoing-stata.csail.mit.edu" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725446AbfERUux (ORCPT
+        id S1729655AbfETCn4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 May 2019 22:43:56 -0400
+Received: from mail-it1-f196.google.com ([209.85.166.196]:52159 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727371AbfETCn4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 May 2019 16:50:53 -0400
-Received: from c-73-193-85-113.hsd1.wa.comcast.net ([73.193.85.113] helo=srivatsab-a01.vmware.com)
-        by outgoing-stata.csail.mit.edu with esmtpsa (TLS1.2:RSA_AES_128_CBC_SHA1:128)
-        (Exim 4.82)
-        (envelope-from <srivatsa@csail.mit.edu>)
-        id 1hS6I2-000S32-KG; Sat, 18 May 2019 16:50:46 -0400
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk, jack@suse.cz,
-        jmoyer@redhat.com, tytso@mit.edu, amakhalov@vmware.com,
-        anishs@vmware.com, srivatsab@vmware.com
-References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
- <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
-From:   "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-Message-ID: <46c6a4be-f567-3621-2e16-0e341762b828@csail.mit.edu>
-Date:   Sat, 18 May 2019 13:50:42 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
+        Sun, 19 May 2019 22:43:56 -0400
+Received: by mail-it1-f196.google.com with SMTP id m3so16752251itl.1;
+        Sun, 19 May 2019 19:43:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8Oz/YZayaErdzdzhKp0fyhCZgzFhmaZCIFKkjQCJwlc=;
+        b=mLbts5Y3adqCCNOiBTBvLEF/D/VgYwgALLSOeLQSx8p8FyDSSJWEO5SOBOpdUY4oHF
+         pzTft49wWnlzo+V9/gMcK5j2VXwSRb0rS8aUzseZ8l/T8DJHgeMM2V/vRZUQLEClutO5
+         0OhAXfagAk0ZlFMd0dw+zbEz3VRRwMyRGe1P3MyprNgqbHdKpzzulM0mM4jaELXnGuVn
+         v6f2fZ8DkIpVTNRIMZh/QYtxQB1fTHcgjCO3yDpDikXbR4Q4exHekEFITwHqpaATKgBR
+         W75JUllIhs+tKXuZbtG82RRlMuGN1zOwwrlZKqIVx6z3uAIY/crrVSnd2mRtKe1+RW/t
+         LNHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8Oz/YZayaErdzdzhKp0fyhCZgzFhmaZCIFKkjQCJwlc=;
+        b=T7J5mqs+jvH6LSeGdeMEEaihrrByeR9dUT8gwvJo/c8ESwqOfNWKnEuZ0/sOEwpi9h
+         k6r8gg8Z+h4RVRnk3IrCkhubFAY+MZsgnJQDC734nzZ4ugTLHHHTQFeAGdqtvBwCQeNT
+         Jpo/a2lADv90rH6mDmBJ6p0gGdS1C2Wq9MluoHDzPEDMvq0/NmDqAtZwNdB7MYDqPK4q
+         Lmxo2G8e4seo/0p7Zr1bQ7+tbQYVYoh/OWdJekhdrd+X/PZenJvMh6g2dRHzJP1H5h8u
+         R2darQhnkvZniqmZ0AcRLn5nZ6py+g4jRXGZNL9GeWO/biK0RzZBEOuw+FCjRYQB8SoS
+         dSpQ==
+X-Gm-Message-State: APjAAAU6Nw2quuFlYn6d8HbUVVR9xTLzzgDwjNR5kmEXakKfsmWrCKia
+        +jaQH8MCPcEbEEs9tw9Yleq97cE2uF1nNwAh3MQ=
+X-Google-Smtp-Source: APXvYqwX83EyMWnhZTroZgn/yFXpCshf1utCd63Zo5lr+tdPYblxILai87WFk5neVpwdrOXIgQWX0a0ubNLlqRZAiYQ=
+X-Received: by 2002:a24:f983:: with SMTP id l125mr28527609ith.62.1558320235895;
+ Sun, 19 May 2019 19:43:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190430223722.20845-1-gpiccoli@canonical.com>
+ <CAKM4Aez=eC96uyqJa+=Aom2M2eQnknQW_uY4v9NMVpROSiuKSg@mail.gmail.com> <CALJn8nME9NQGsSqLXHQPEizFfKUzxozfYy-2510MHyMPHRzhfw@mail.gmail.com>
+In-Reply-To: <CALJn8nME9NQGsSqLXHQPEizFfKUzxozfYy-2510MHyMPHRzhfw@mail.gmail.com>
+From:   Eric Ren <renzhengeek@gmail.com>
+Date:   Mon, 20 May 2019 10:43:44 +0800
+Message-ID: <CAKM4AeyJs8KUB3vi=GPDnb-yjED2oFYvn7O=CPNi3Er3orAbfg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] block: Fix a NULL pointer dereference in generic_make_request()
+To:     "Guilherme G. Piccoli" <kernel@gpiccoli.net>
+Cc:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
+        linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>, dm-devel@redhat.com,
+        axboe@kernel.dk, Gavin Guo <gavin.guo@canonical.com>,
+        Jay Vosburgh <jay.vosburgh@canonical.com>,
+        Bart Van Assche <bvanassche@acm.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/18/19 11:39 AM, Paolo Valente wrote:
-> I've addressed these issues in my last batch of improvements for BFQ,
-> which landed in the upcoming 5.2. If you give it a try, and still see
-> the problem, then I'll be glad to reproduce it, and hopefully fix it
-> for you.
+Hi,
+
+On Sat, 18 May 2019 at 00:17, Guilherme G. Piccoli <kernel@gpiccoli.net> wrote:
 >
+> On Fri, May 17, 2019 at 12:33 AM Eric Ren <renzhengeek@gmail.com> wrote:
+> >
+> > Hello,
+> > [...]
+> > Thanks for the bugfix. I also had a panic having very similar
+> > calltrace below as this one,
+> > when using devicemapper in container scenario and deleting many thin
+> > snapshots by dmsetup
+> > remove_all -f, meanwhile executing lvm command like vgs.
+> >
+> > After applied this one, my testing doesn't crash kernel any more for
+> > one week.  Could the block
+> > developers please give more feedback/priority on this one?
+> >
+>
+> Thanks Eric, for the testing! I think you could send your Tested-by[0]
+> tag, which could be added
+> in the patch before merge. It's good to know the patch helped somebody
+> and your testing improves
+> confidence in the change.
 
-Hi Paolo,
+Please consider Ming's comments and send patch v2, then feel free to add:
+Tested-by: Eric Ren <renzhengeek@gmail.com>
 
-Thank you for looking into this!
-
-I just tried current mainline at commit 72cf0b07, but unfortunately
-didn't see any improvement:
-
-dd if=/dev/zero of=/root/test.img bs=512 count=10000 oflag=dsync
-
-With mq-deadline, I get:
-
-5120000 bytes (5.1 MB, 4.9 MiB) copied, 3.90981 s, 1.3 MB/s
-
-With bfq, I get:
-5120000 bytes (5.1 MB, 4.9 MiB) copied, 84.8216 s, 60.4 kB/s
-
-Please let me know if any more info about my setup might be helpful.
-
-Thank you!
-
-Regards,
-Srivatsa
-VMware Photon OS
-
-> 
->> Il giorno 18 mag 2019, alle ore 00:16, Srivatsa S. Bhat <srivatsa@csail.mit.edu> ha scritto:
->>
->>
->> Hi,
->>
->> One of my colleagues noticed upto 10x - 30x drop in I/O throughput
->> running the following command, with the CFQ I/O scheduler:
->>
->> dd if=/dev/zero of=/root/test.img bs=512 count=10000 oflags=dsync
->>
->> Throughput with CFQ: 60 KB/s
->> Throughput with noop or deadline: 1.5 MB/s - 2 MB/s
->>
->> I spent some time looking into it and found that this is caused by the
->> undesirable interaction between 4 different components:
->>
->> - blkio cgroup controller enabled
->> - ext4 with the jbd2 kthread running in the root blkio cgroup
->> - dd running on ext4, in any other blkio cgroup than that of jbd2
->> - CFQ I/O scheduler with defaults for slice_idle and group_idle
->>
->>
->> When docker is enabled, systemd creates a blkio cgroup called
->> system.slice to run system services (and docker) under it, and a
->> separate blkio cgroup called user.slice for user processes. So, when
->> dd is invoked, it runs under user.slice.
->>
->> The dd command above includes the dsync flag, which performs an
->> fdatasync after every write to the output file. Since dd is writing to
->> a file on ext4, jbd2 will be active, committing transactions
->> corresponding to those fdatasync requests from dd. (In other words, dd
->> depends on jdb2, in order to make forward progress). But jdb2 being a
->> kernel thread, runs in the root blkio cgroup, as opposed to dd, which
->> runs under user.slice.
->>
->> Now, if the I/O scheduler in use for the underlying block device is
->> CFQ, then its inter-queue/inter-group idling takes effect (via the
->> slice_idle and group_idle parameters, both of which default to 8ms).
->> Therefore, everytime CFQ switches between processing requests from dd
->> vs jbd2, this 8ms idle time is injected, which slows down the overall
->> throughput tremendously!
->>
->> To verify this theory, I tried various experiments, and in all cases,
->> the 4 pre-conditions mentioned above were necessary to reproduce this
->> performance drop. For example, if I used an XFS filesystem (which
->> doesn't use a separate kthread like jbd2 for journaling), or if I dd'ed
->> directly to a block device, I couldn't reproduce the performance
->> issue. Similarly, running dd in the root blkio cgroup (where jbd2
->> runs) also gets full performance; as does using the noop or deadline
->> I/O schedulers; or even CFQ itself, with slice_idle and group_idle set
->> to zero.
->>
->> These results were reproduced on a Linux VM (kernel v4.19) on ESXi,
->> both with virtualized storage as well as with disk pass-through,
->> backed by a rotational hard disk in both cases. The same problem was
->> also seen with the BFQ I/O scheduler in kernel v5.1.
->>
->> Searching for any earlier discussions of this problem, I found an old
->> thread on LKML that encountered this behavior [1], as well as a docker
->> github issue [2] with similar symptoms (mentioned later in the
->> thread).
->>
->> So, I'm curious to know if this is a well-understood problem and if
->> anybody has any thoughts on how to fix it.
->>
->> Thank you very much!
->>
->>
->> [1]. https://lkml.org/lkml/2015/11/19/359
->>
->> [2]. https://github.com/moby/moby/issues/21485
->>     https://github.com/moby/moby/issues/21485#issuecomment-222941103
->>
->> Regards,
->> Srivatsa
-> 
-
+Thanks!
+Eric
