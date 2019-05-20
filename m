@@ -2,77 +2,98 @@ Return-Path: <SRS0=zuir=TU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E987C04AAC
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 14:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F310C04AAC
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 16:24:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 422AD20657
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 14:27:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65B4A21726
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 16:24:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IE9rXBhT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gK+bmVnN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390167AbfETO1U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 May 2019 10:27:20 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:39610 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390076AbfETO1U (ORCPT
+        id S2389351AbfETQYD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 May 2019 12:24:03 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:39050 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388110AbfETQYD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 May 2019 10:27:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=HpHK7d9UhVQk6/UDLmcKvRAr3yC+xCmCY5CGJZTfZXc=; b=IE9rXBhT2+Fpt4GF81TIhGa6B
-        0MoKbpt/Tjeg51MoV5X92xaKdt0bW0lt7c5X/6IPmOfPW5Dmvs6+cn0SaqWCFlEwFxydUxXiwGlmj
-        LKwnQho5efQK+HlMK3H2tG9B5ZFk6qWK4XUHvo2X9ItQdfpNC/JeibKdeUEc4exAMtd0s9GggiXg/
-        /n24bPO+ZxK+61XDPkHgUOs8GFk0d3SINW9VZL4aaAOUe5VRp2TorL6CkZucByg/Jgp7XgUAfO2cw
-        Sn5FpgonxEAzLbW/umHa+jfOrVedJikTx9SPKX1sHHeg7vsgYwlEq0N1d8SQFFBT0j/yivx9dpwiG
-        dwPcptiiQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hSjG3-0006Ti-Lt; Mon, 20 May 2019 14:27:19 +0000
-Date:   Mon, 20 May 2019 07:27:19 -0700
-From:   'Christoph Hellwig' <hch@infradead.org>
-To:     kanchan <joshi.k@samsung.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, prakash.v@samsung.com,
-        anshul@samsung.com,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v5 0/7] Extend write-hint framework, and add write-hint
- for Ext4 journal
-Message-ID: <20190520142719.GA15705@infradead.org>
-References: <CGME20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61@epcas2p1.samsung.com>
- <1556191202-3245-1-git-send-email-joshi.k@samsung.com>
- <20190510170249.GA26907@infradead.org>
- <00fb01d50c71$dd358e50$97a0aaf0$@samsung.com>
+        Mon, 20 May 2019 12:24:03 -0400
+Received: by mail-qt1-f196.google.com with SMTP id y42so16997048qtk.6;
+        Mon, 20 May 2019 09:24:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=obgbXUzx159p0zANaGXFw4iYxkmhzkfPzdDi+/mATw8=;
+        b=gK+bmVnNn35WVy6sMvDlFpTZPT4ZtL3Kr9fkxPXfqz5mwIxvAu/xa6TrnUvux32sTj
+         shBmfx81gBWEEbr5sCJ1SGN1329FKEliHW8a9enVAVgQNtknPUVdZ+9si/oWqE4zQKXN
+         9x66dJ/PK0mBb14dlzPWZCNO1GzZJ6hCmzfiTJ/XanJ2RMIcaK2G3hrQpMPANMHIK2Mr
+         bfgI4kB+D6NZWiHvIsIt8AbUAN28RksCuXXc94Tk2BwHhxg39zfBSZb18MFHGzW/2JIY
+         hYKVy/f/LfLz+5WJTVC/LyXPPXNZC0CpFa6yI/qQ+73nJa8lWMOrNvvcbRPFHhAIZDsH
+         FU8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=obgbXUzx159p0zANaGXFw4iYxkmhzkfPzdDi+/mATw8=;
+        b=r2S90ZAkmwfaICGeXpvN805N0BVQVgT0zn+m2VvNk2HsEYdfl1xr8eqLe3SGuSo/Fy
+         lCbc2GxZUCF3pc30FwpNuGU/jZyN/EgtJtyg4aUrySpR+V/BTYSEfxksBo/K//SvfDyb
+         2B/r+2xXAn8E4kZukFNvBm144hqFSbcY3vxHh+a98+6SHlbr+9cSHsR6JMTAi3Re9Ub/
+         aZ4R/nFSC5jqGQO39x6aNjei611ZsMdM4hm5h0/4q0DrHfS5wHzJR4CcxEo/cX2SUowA
+         aKsVGg2G2TsyvIUcJFTRxGkwtINn3Lj0VDT5WKiGJ0lDZy3WWdtoduBQfS8l69ITxeG0
+         ZcQw==
+X-Gm-Message-State: APjAAAUzx7ElxjDoYZYSkgNfzuigTpetYM+PatW4lGNVBUBAJydlTcWm
+        DAH9CCNsG9pbmkhghVFHyg6MCy4no33ZQx3Yor02EA==
+X-Google-Smtp-Source: APXvYqw0oneV9XVd0KN/ZeYH934enYZ4zh5DGGCv0lqiArz37KKJgvFEx7PjOKMjepBijHamtLkNo16lp9OK/nxTtWQ=
+X-Received: by 2002:a0c:d4ee:: with SMTP id y43mr61214357qvh.26.1558369442514;
+ Mon, 20 May 2019 09:24:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00fb01d50c71$dd358e50$97a0aaf0$@samsung.com>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20190430223722.20845-1-gpiccoli@canonical.com>
+ <20190430223722.20845-2-gpiccoli@canonical.com> <CAPhsuW4SeUhNOJJkEf9wcLjbbc9qX0=C8zqbyCtC7Q8fdL91hw@mail.gmail.com>
+ <c8721ba3-5d38-7906-5049-e2b16e967ecf@canonical.com> <CAPhsuW6ahmkUhCgns=9WHPXSvYefB0Gmr1oB7gdZiD86sKyHFg@mail.gmail.com>
+ <5CD2A172.4010302@youngman.org.uk> <0ad36b2f-ec36-6930-b587-da0526613567@gpiccoli.net>
+ <5CD3096B.4030302@youngman.org.uk> <CALJn8nOTCcOtFJ1SzZAuJxNuxzf2Tq7Yw34h1E5XE-mbn5CUbg@mail.gmail.com>
+In-Reply-To: <CALJn8nOTCcOtFJ1SzZAuJxNuxzf2Tq7Yw34h1E5XE-mbn5CUbg@mail.gmail.com>
+From:   Song Liu <liu.song.a23@gmail.com>
+Date:   Mon, 20 May 2019 09:23:50 -0700
+Message-ID: <CAPhsuW7AwsWiHiqaW55paqtiCLvt3U9C+sQ50fbBr1v=czATyg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] md/raid0: Do not bypass blocking queue entered for
+ raid0 bios
+To:     "Guilherme G. Piccoli" <kernel@gpiccoli.net>
+Cc:     Wols Lists <antlists@youngman.org.uk>, axboe@kernel.dk,
+        "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
+        linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>, dm-devel@redhat.com,
+        Gavin Guo <gavin.guo@canonical.com>,
+        Jay Vosburgh <jay.vosburgh@canonical.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 17, 2019 at 11:01:55AM +0530, kanchan wrote:
-> Sorry but can you please elaborate the issue? I do not get what is being
-> statically allocated which was globally available earlier.
-> If you are referring to nvme driver,  available streams at subsystem level
-> are being reflected for all namespaces. This is same as earlier. 
-> There is no attempt to explicitly allocate (using dir-receive) or reserve
-> streams for any namespace.  
-> Streams will continue to get allocated/released implicitly as and when
-> writes (with stream id) arrive.
+On Fri, May 17, 2019 at 9:19 AM Guilherme G. Piccoli
+<kernel@gpiccoli.net> wrote:
+>
+> Jens / Song, any news in this one?
+>
+> I think would be good to have this raid0 fix rather sooner than later
+> if possible - it's easy
+> to reproduce the crash.
+>
+> Thanks,
+>
+>
+> Guilherme
 
-We have made a concious decision that we do not want to expose streams
-as an awkward not fish not flesh interface, but instead life time hints.
+I will process it. It was delayed due to the merge window.
 
-I see no reason to change from and burden the whole streams complexity
-on other in-kernel callers.
+Thanks,
+Song
