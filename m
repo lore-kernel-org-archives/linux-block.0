@@ -2,171 +2,137 @@ Return-Path: <SRS0=zuir=TU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94CFBC04AAC
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 22:12:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F30C04AAC
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 22:45:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6FCEA21479
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 22:12:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35E452173C
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 22:45:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725978AbfETWMF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 May 2019 18:12:05 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:55338 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725776AbfETWME (ORCPT
+        id S1727018AbfETWpz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 May 2019 18:45:55 -0400
+Received: from outgoing-stata.csail.mit.edu ([128.30.2.210]:53113 "EHLO
+        outgoing-stata.csail.mit.edu" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726107AbfETWpz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 May 2019 18:12:04 -0400
-Received: from mail-qt1-f200.google.com ([209.85.160.200])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <gpiccoli@canonical.com>)
-        id 1hSqTP-0005r7-PU
-        for linux-block@vger.kernel.org; Mon, 20 May 2019 22:09:36 +0000
-Received: by mail-qt1-f200.google.com with SMTP id g14so15472427qta.12
-        for <linux-block@vger.kernel.org>; Mon, 20 May 2019 15:09:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=/Kb9dwGb7EDZjWXcJgCYvh+scyOCXdmQMfxa74lNg9A=;
-        b=EDPG3FEaK3ETGI8U9OvXOTmAS9/9QraMY88IBNv3yA0rwbT9sU0vT8eilnx9ewMMLG
-         FL8AHsL1mLnSCpBuEvYsggFZzxEsEbdU0b1gh/5ZlhzE+p3N1GGbz9RA1r+TVpEGhEiG
-         Hg8XwhB4u69V9c1QJhRZE1M2/510hJYFqOu2C1iKKv69Vzo4HRkktdH8gCs+o5grDhiw
-         6kOXVqyiqQiD7i2VCRMDMDR28wGsSOItRDG9YUYNrCE8h7kgIV4F6eTamdnCrlAYSS0P
-         Ea3cqGsqTIyFb4M/AU9D8ZsRayNBj5/yLMmeiYTX3YpiRfwOJenr1wfXjIPB/xQsbr/H
-         KANw==
-X-Gm-Message-State: APjAAAXAORL1Okhfe/2tTyodzUR0VoXoP5Mkcp7lXU6qjB7tBmPLrtl9
-        2Ti5hQ4YUPOK4iOcEJwnY781+NrN3r+ntQ+gYUY32wavurrJA79PGsG1mB648vzH9nsTSsCdTyR
-        IsB95xlaRP3VC241W+fOz781CYwJ8HZpfgzar2llw
-X-Received: by 2002:a37:8502:: with SMTP id h2mr17302674qkd.281.1558390174407;
-        Mon, 20 May 2019 15:09:34 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzRIY8VAy8Nou+AqtITvyvN0y8SyGXWRHpV5X/2071IU5iR1yqSJwUbYPM++Dqa379vjgPjQQ==
-X-Received: by 2002:a37:8502:: with SMTP id h2mr17302655qkd.281.1558390174135;
-        Mon, 20 May 2019 15:09:34 -0700 (PDT)
-Received: from localhost ([152.250.107.7])
-        by smtp.gmail.com with ESMTPSA id j10sm8277639qth.8.2019.05.20.15.09.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 15:09:33 -0700 (PDT)
-From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-To:     linux-block@vger.kernel.org, linux-raid@vger.kernel.org
-Cc:     dm-devel@redhat.com, axboe@kernel.dk, gavin.guo@canonical.com,
-        jay.vosburgh@canonical.com, gpiccoli@canonical.com,
-        kernel@gpiccoli.net, Ming Lei <ming.lei@redhat.com>,
-        Song Liu <liu.song.a23@gmail.com>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        stable@vger.kernel.org
-Subject: [PATCH V2 2/2] md/raid0: Do not bypass blocking queue entered for raid0 bios
-Date:   Mon, 20 May 2019 19:09:11 -0300
-Message-Id: <20190520220911.25192-2-gpiccoli@canonical.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190520220911.25192-1-gpiccoli@canonical.com>
-References: <20190520220911.25192-1-gpiccoli@canonical.com>
+        Mon, 20 May 2019 18:45:55 -0400
+Received: from [4.30.142.84] (helo=srivatsab-a01.vmware.com)
+        by outgoing-stata.csail.mit.edu with esmtpsa (TLS1.2:RSA_AES_128_CBC_SHA1:128)
+        (Exim 4.82)
+        (envelope-from <srivatsa@csail.mit.edu>)
+        id 1hSr2T-000DNC-Gj; Mon, 20 May 2019 18:45:49 -0400
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        jmoyer@redhat.com, tytso@mit.edu, amakhalov@vmware.com,
+        anishs@vmware.com, srivatsab@vmware.com
+References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
+ <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
+ <46c6a4be-f567-3621-2e16-0e341762b828@csail.mit.edu>
+ <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
+From:   "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+Message-ID: <238e14ff-68d1-3b21-a291-28de4f2d77af@csail.mit.edu>
+Date:   Mon, 20 May 2019 15:45:46 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:60.0)
+ Gecko/20100101 Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit cd4a4ae4683d ("block: don't use blocking queue entered for
-recursive bio submits") introduced the flag BIO_QUEUE_ENTERED in order
-split bios bypass the blocking queue entering routine and use the live
-non-blocking version. It was a result of an extensive discussion in
-a linux-block thread[0], and the purpose of this change was to prevent
-a hung task waiting on a reference to drop.
+On 5/20/19 3:19 AM, Paolo Valente wrote:
+> 
+> 
+>> Il giorno 18 mag 2019, alle ore 22:50, Srivatsa S. Bhat <srivatsa@csail.mit.edu> ha scritto:
+>>
+>> On 5/18/19 11:39 AM, Paolo Valente wrote:
+>>> I've addressed these issues in my last batch of improvements for BFQ,
+>>> which landed in the upcoming 5.2. If you give it a try, and still see
+>>> the problem, then I'll be glad to reproduce it, and hopefully fix it
+>>> for you.
+>>>
+>>
+>> Hi Paolo,
+>>
+>> Thank you for looking into this!
+>>
+>> I just tried current mainline at commit 72cf0b07, but unfortunately
+>> didn't see any improvement:
+>>
+>> dd if=/dev/zero of=/root/test.img bs=512 count=10000 oflag=dsync
+>>
+>> With mq-deadline, I get:
+>>
+>> 5120000 bytes (5.1 MB, 4.9 MiB) copied, 3.90981 s, 1.3 MB/s
+>>
+>> With bfq, I get:
+>> 5120000 bytes (5.1 MB, 4.9 MiB) copied, 84.8216 s, 60.4 kB/s
+>>
+> 
+> Hi Srivatsa,
+> thanks for reproducing this on mainline.  I seem to have reproduced a
+> bonsai-tree version of this issue.  Before digging into the block
+> trace, I'd like to ask you for some feedback.
+> 
+> First, in my test, the total throughput of the disk happens to be
+> about 20 times as high as that enjoyed by dd, regardless of the I/O
+> scheduler.  I guess this massive overhead is normal with dsync, but
+> I'd like know whether it is about the same on your side.  This will
+> help me understand whether I'll actually be analyzing about the same
+> problem as yours.
+> 
 
-Happens that md raid0 split bios all the time, and more important,
-it changes their underlying device to the raid member. After the change
-introduced by this flag's usage, we experience various crashes if a raid0
-member is removed during a large write. This happens because the bio
-reaches the live queue entering function when the queue of the raid0
-member is dying.
+Do you mean to say the throughput obtained by dd'ing directly to the
+block device (bypassing the filesystem)? That does give me a 20x
+speedup with bs=512, but much more with a bigger block size (achieving
+a max throughput of about 110 MB/s).
 
-A simple reproducer of this behavior is presented below:
-a) Build kernel v5.2-rc1 with CONFIG_BLK_DEV_THROTTLING=y.
+dd if=/dev/zero of=/dev/sdc bs=512 count=10000 conv=fsync
+10000+0 records in
+10000+0 records out
+5120000 bytes (5.1 MB, 4.9 MiB) copied, 0.15257 s, 33.6 MB/s
 
-b) Create a raid0 md array with 2 NVMe devices as members, and mount it
-with an ext4 filesystem.
+dd if=/dev/zero of=/dev/sdc bs=4k count=10000 conv=fsync
+10000+0 records in
+10000+0 records out
+40960000 bytes (41 MB, 39 MiB) copied, 0.395081 s, 104 MB/s
 
-c) Run the following oneliner (supposing the raid0 is mounted in /mnt):
-(dd of=/mnt/tmp if=/dev/zero bs=1M count=999 &); sleep 0.3;
-echo 1 > /sys/block/nvme0n1/device/device/remove
-(whereas nvme0n1 is the 2nd array member)
+I'm testing this on a Toshiba MG03ACA1 (1TB) hard disk.
 
-This will trigger the following warning/oops:
+> Second, the commands I used follow.  Do they implement your test case
+> correctly?
+> 
+> [root@localhost tmp]# mkdir /sys/fs/cgroup/blkio/testgrp
+> [root@localhost tmp]# echo $BASHPID > /sys/fs/cgroup/blkio/testgrp/cgroup.procs
+> [root@localhost tmp]# cat /sys/block/sda/queue/scheduler
+> [mq-deadline] bfq none
+> [root@localhost tmp]# dd if=/dev/zero of=/root/test.img bs=512 count=10000 oflag=dsync
+> 10000+0 record dentro
+> 10000+0 record fuori
+> 5120000 bytes (5,1 MB, 4,9 MiB) copied, 14,6892 s, 349 kB/s
+> [root@localhost tmp]# echo bfq > /sys/block/sda/queue/scheduler
+> [root@localhost tmp]# dd if=/dev/zero of=/root/test.img bs=512 count=10000 oflag=dsync
+> 10000+0 record dentro
+> 10000+0 record fuori
+> 5120000 bytes (5,1 MB, 4,9 MiB) copied, 20,1953 s, 254 kB/s
+> 
 
-------------[ cut here ]------------
-no blkg associated for bio on block-device: nvme0n1
-WARNING: CPU: 9 PID: 184 at ./include/linux/blk-cgroup.h:785
-generic_make_request_checks+0x4dd/0x690
-[...]
-BUG: unable to handle kernel NULL pointer dereference at 0000000000000155
-PGD 0 P4D 0
-Oops: 0000 [#1] SMP PTI
-RIP: 0010:blk_throtl_bio+0x45/0x970
-[...]
-Call Trace:
- generic_make_request_checks+0x1bf/0x690
- generic_make_request+0x64/0x3f0
- raid0_make_request+0x184/0x620 [raid0]
- ? raid0_make_request+0x184/0x620 [raid0]
- ? blk_queue_split+0x384/0x6d0
- md_handle_request+0x126/0x1a0
- md_make_request+0x7b/0x180
- generic_make_request+0x19e/0x3f0
- submit_bio+0x73/0x140
-[...]
+Yes, this is indeed the testcase, although I see a much bigger
+drop in performance with bfq, compared to the results from
+your setup.
 
-This patch changes raid0 driver to fallback to the "old" blocking queue
-entering procedure, by clearing the BIO_QUEUE_ENTERED from raid0 bios.
-This prevents the crashes and restores the regular behavior of raid0
-arrays when a member is removed during a large write.
-
-[0] https://marc.info/?l=linux-block&m=152638475806811
-
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Song Liu <liu.song.a23@gmail.com>
-Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: stable@vger.kernel.org # v4.18
-Fixes: cd4a4ae4683d ("block: don't use blocking queue entered for recursive bio submits")
-Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
----
-
-No changes from V1, only rebased to v5.2-rc1.
-Also, notice that if [1] gets merged before this patch, the
-BIO_QUEUE_ENTERED flag will change to BIO_SPLITTED, so the (easy) conflict
-will need to be worked.
-
-[1] https://lore.kernel.org/linux-block/20190515030310.20393-4-ming.lei@redhat.com/
-
- drivers/md/raid0.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-index f3fb5bb8c82a..d5bdc79e0835 100644
---- a/drivers/md/raid0.c
-+++ b/drivers/md/raid0.c
-@@ -547,6 +547,7 @@ static void raid0_handle_discard(struct mddev *mddev, struct bio *bio)
- 			trace_block_bio_remap(bdev_get_queue(rdev->bdev),
- 				discard_bio, disk_devt(mddev->gendisk),
- 				bio->bi_iter.bi_sector);
-+		bio_clear_flag(bio, BIO_QUEUE_ENTERED);
- 		generic_make_request(discard_bio);
- 	}
- 	bio_endio(bio);
-@@ -602,6 +603,7 @@ static bool raid0_make_request(struct mddev *mddev, struct bio *bio)
- 				disk_devt(mddev->gendisk), bio_sector);
- 	mddev_check_writesame(mddev, bio);
- 	mddev_check_write_zeroes(mddev, bio);
-+	bio_clear_flag(bio, BIO_QUEUE_ENTERED);
- 	generic_make_request(bio);
- 	return true;
- }
--- 
-2.21.0
-
+Regards,
+Srivatsa
