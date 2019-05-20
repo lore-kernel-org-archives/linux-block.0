@@ -2,189 +2,64 @@ Return-Path: <SRS0=zuir=TU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3701FC04AAC
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 10:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DFAAC04AAC
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 11:12:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F33202081C
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 10:46:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yx3Oh9sd"
+	by mail.kernel.org (Postfix) with ESMTP id ED6F720675
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 11:12:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731780AbfETKqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 May 2019 06:46:10 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:52541 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731755AbfETKqE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 May 2019 06:46:04 -0400
-Received: by mail-wm1-f67.google.com with SMTP id y3so12770758wmm.2
-        for <linux-block@vger.kernel.org>; Mon, 20 May 2019 03:46:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=FNQffb8QL8IgGta8QHGMIkJOjNxQ6yOoFcpL2RGNOxo=;
-        b=Yx3Oh9sdjhtxkjy2qUZOvGLEh/omRfY9Mkk8SZgdDDixIStb27nmcn3B7LNLkywYKf
-         JSJs2y09yTFai60dfvSU6bs3U2Y+HZSEgZwWN6UlzEZ1wASRtjIcHxGBtD4y6tsAuqVS
-         3ujdLIe/3srn1f0SjS94N6OmFmNXyQjA8jYYAeTVbdE87jeskYdVzPBwTuGiV5VXMofg
-         Qcc4TKaT9Wtzyo5PNWXoXjNZN8OY3QNXt/d/SPjmZQCZVqxth/sR5PvwpcgaROR92mOk
-         Z6Us/2nTa0Du6iMydUy7SM5zXTl+W32h+hkN9oHJisAKE0vA0TrVU7YYUAkZEQA//CVY
-         df6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=FNQffb8QL8IgGta8QHGMIkJOjNxQ6yOoFcpL2RGNOxo=;
-        b=pf8smtU3ZNiwi39rdkhv5TTY/+7KcZitI+5FrAj5jTqXBTYSpT0AAcNmpRBepih668
-         S2g2udSUBg69W8QVMgTKiWx/m1vSnngShBXwBUTu0ktGknRllo7SP627F9p1oyIyCjgC
-         Ndy37HPsDxrceQyawbAQLI+d3VEosamipgkTNeo4QzyDmaX6a7k5lpiFFzCJF9xBJN2G
-         nkPrUSCw+9/uw6+U9YStDL4TYSFfSMHZTzuAq6kwLXJ2TRuCZmOuwoUrrim1iAKvLzqU
-         HpwrM3/wDOaWga0W6+JY5keWq30LeKqbgMeOiIw6TA/hG+PQdlw+k+hu3IoyGZNajVaZ
-         YrGw==
-X-Gm-Message-State: APjAAAWa4ItxpttsZQgsZcswwnZrkP0pOTTboiMuINsyll5L6Y/Q8tX6
-        EJ64ACRAtLwtbO4AJ3CyjZiLjA==
-X-Google-Smtp-Source: APXvYqwf9Bs8lTKBrSvqq/FNc2Kp0ccnjoaTSSxl7jXQW63EXQ+RaXppUqT7Z5tC+EpLaW9/edIhpA==
-X-Received: by 2002:a1c:385:: with SMTP id 127mr11200126wmd.109.1558349161708;
-        Mon, 20 May 2019 03:46:01 -0700 (PDT)
-Received: from [192.168.0.100] ([88.147.73.106])
-        by smtp.gmail.com with ESMTPSA id x187sm18555952wmb.33.2019.05.20.03.45.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 03:46:00 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-Message-Id: <1C0A2FC8-620C-4AFE-A921-35EDAC377BD4@linaro.org>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_695B9A4F-9A68-4C92-B622-6C792D193B9F";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-Date:   Mon, 20 May 2019 12:45:58 +0200
-In-Reply-To: <20190520091558.GC2172@quack2.suse.cz>
-Cc:     Theodore Ts'o <tytso@mit.edu>,
-        "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>,
-        linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk, jmoyer@redhat.com,
-        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com
-To:     Jan Kara <jack@suse.cz>
-References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
- <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
- <20190518192847.GB14277@mit.edu> <20190520091558.GC2172@quack2.suse.cz>
-X-Mailer: Apple Mail (2.3445.104.8)
+        id S1732301AbfETLMD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 May 2019 07:12:03 -0400
+Received: from verein.lst.de ([213.95.11.211]:51559 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730634AbfETLMD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 May 2019 07:12:03 -0400
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id ED9F268B20; Mon, 20 May 2019 13:11:41 +0200 (CEST)
+Date:   Mon, 20 May 2019 13:11:41 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@fb.com,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/4] block: don't decrement nr_phys_segments for
+ physically contigous segments
+Message-ID: <20190520111141.GA5137@lst.de>
+References: <20190516084058.20678-1-hch@lst.de> <20190516084058.20678-2-hch@lst.de> <20190516131703.GA26943@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190516131703.GA26943@ming.t460p>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, May 16, 2019 at 09:17:04PM +0800, Ming Lei wrote:
+> ll_merge_requests_fn() is only called from attempt_merge() in case
+> that ELEVATOR_BACK_MERGE is returned from blk_try_req_merge(). However,
+> for discard merge of both virtio_blk and nvme, ELEVATOR_DISCARD_MERGE is
+> always returned from blk_try_req_merge() in attempt_merge(), so looks
+> ll_merge_requests_fn() shouldn't be called for virtio_blk/nvme's discard
+> request. Just wondering if you may explain a bit how the change on
+> ll_merge_requests_fn() in this patch makes a difference on the above
+> two commits?
 
---Apple-Mail=_695B9A4F-9A68-4C92-B622-6C792D193B9F
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain;
-	charset=us-ascii
+Good question.  I've seen virtio overwriting its range, but I think
+this might have been been with a series to actually decrement
+nr_phys_segments for all cases where we can merge the tail and front
+bvecs.  So mainline probably doesn't see it unless someone calls
+blk_recalc_rq_segments due to a partial completion or when using
+dm-multipath.  Thinking of it at least the latter seems like a real
+possibily, although a rather unlikely use case.
 
-
-
-> Il giorno 20 mag 2019, alle ore 11:15, Jan Kara <jack@suse.cz> ha scritto:
+> > Fixes: 297910571f08 ("nvme-pci: optimize mapping single segment requests using SGLs")
 > 
-> On Sat 18-05-19 15:28:47, Theodore Ts'o wrote:
->> On Sat, May 18, 2019 at 08:39:54PM +0200, Paolo Valente wrote:
->>> I've addressed these issues in my last batch of improvements for
->>> BFQ, which landed in the upcoming 5.2. If you give it a try, and
->>> still see the problem, then I'll be glad to reproduce it, and
->>> hopefully fix it for you.
->> 
->> Hi Paolo, I'm curious if you could give a quick summary about what you
->> changed in BFQ?
->> 
->> I was considering adding support so that if userspace calls fsync(2)
->> or fdatasync(2), to attach the process's CSS to the transaction, and
->> then charge all of the journal metadata writes the process's CSS.  If
->> there are multiple fsync's batched into the transaction, the first
->> process which forced the early transaction commit would get charged
->> the entire journal write.  OTOH, journal writes are sequential I/O, so
->> the amount of disk time for writing the journal is going to be
->> relatively small, and especially, the fact that work from other
->> cgroups is going to be minimal, especially if hadn't issued an
->> fsync().
-> 
-> But this makes priority-inversion problems with ext4 journal worse, doesn't
-> it? If we submit journal commit in blkio cgroup of some random process, it
-> may get throttled which then effectively blocks the whole filesystem. Or do
-> you want to implement a more complex back-pressure mechanism where you'd
-> just account to different blkio cgroup during journal commit and then
-> throttle as different point where you are not blocking other tasks from
-> progress?
-> 
->> In the case where you have three cgroups all issuing fsync(2) and they
->> all landed in the same jbd2 transaction thanks to commit batching, in
->> the ideal world we would split up the disk time usage equally across
->> those three cgroups.  But it's probably not worth doing that...
->> 
->> That being said, we probably do need some BFQ support, since in the
->> case where we have multiple processes doing buffered writes w/o fsync,
->> we do charnge the data=ordered writeback to each block cgroup. Worse,
->> the commit can't complete until the all of the data integrity
->> writebacks have completed.  And if there are N cgroups with dirty
->> inodes, and slice_idle set to 8ms, there is going to be 8*N ms worth
->> of idle time tacked onto the commit time.
-> 
-> Yeah. At least in some cases, we know there won't be any more IO from a
-> particular cgroup in the near future (e.g. transaction commit completing,
-> or when the layers above IO scheduler already know which IO they are going
-> to submit next) and in that case idling is just a waste of time.
+> I guess it should be dff824b2aadb ("nvme-pci: optimize mapping of small
+> single segment requests").
 
-Yep.  Issues like this are targeted exactly by the improvement I
-mentioned in my previous reply.
-
-> But so far
-> I haven't decided how should look a reasonably clean interface for this
-> that isn't specific to a particular IO scheduler implementation.
-> 
-
-That's an interesting point.  So far, I've assumed that nobody would
-have told anything to BFQ.  But if you guys think that such a
-communication may be acceptable at some degree, then I'd be glad to
-try to come up with some solution.  For instance: some hook that any
-I/O scheduler may export if meaningful.
-
-Thanks,
-Paolo
-
-> 								Honza
-> --
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
-
-
---Apple-Mail=_695B9A4F-9A68-4C92-B622-6C792D193B9F
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAlzihWYACgkQOAkCLQGo
-9oPXOA//SHPnVMxI3rHezSW0oYnbHoHp+FGr9dlhy3tQXGYXlhkAVnAO5z8rFFiF
-l3i0Rm84B/BLL/v/a2NMj50boLqfrjMA7YhUscj+uoGyQgmA8LZGfMv9RmSQt2mf
-6KZfuJL4UdDkbjagKpWOaRjuOnvrP1L2psg0rbngdSil8ZS/D60FbWL6f8NmDSmz
-tb/s/ZS8YM4b58Qp6rtoMLwQVfj6vT+4QJib4C/YNbo9wY8+JULuuJRllRYqATsL
-cxOJFGwfL5fvcvQ/agaqp4lorVBLrMMMNEi9NpH6AFcQ8ALAZ2jEzKANOmrP8f43
-cQpuLhsOVBAZuWQpmAYwX5au9VUaGTZsrhqYPEeMWY23Q0LHmJt8k4FoEF4wZRnt
-F7pVokpmMlwjcgw0+OzFm+OngQHdXFxbFwY8boWtmSXdSiZiZ61nbTfAnYNlp+/W
-Of0RlXgzZTMH5gqRLaFjZamQUIE5oWTtIvCPC9cF4CE2+tyQVHbla7Azgo/JvFRw
-LEbg21BDrSUxUfJukpaYrjtZ+LIyuFG3R+Wn3HN1qVAmUW+T3imrTN9U+xXft3c1
-mkp8LwHND/8tnCGOsxYZXpEK4SmPykGOPpJS8Zjc+XWcr70HYXw8xMcajb0Fsl9p
-y9BLh0rZNMYmI58YAucv5thw+MbdtdoKCWh2R+Oebh7Il2+0kLM=
-=xSol
------END PGP SIGNATURE-----
-
---Apple-Mail=_695B9A4F-9A68-4C92-B622-6C792D193B9F--
+Indeed.
