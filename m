@@ -2,103 +2,105 @@ Return-Path: <SRS0=zuir=TU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA8FC46460
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 02:43:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82010C04E87
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 09:16:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 817B42082E
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 02:43:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mLbts5Y3"
+	by mail.kernel.org (Postfix) with ESMTP id 61F8B20675
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 09:16:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729655AbfETCn4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 May 2019 22:43:56 -0400
-Received: from mail-it1-f196.google.com ([209.85.166.196]:52159 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727371AbfETCn4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 May 2019 22:43:56 -0400
-Received: by mail-it1-f196.google.com with SMTP id m3so16752251itl.1;
-        Sun, 19 May 2019 19:43:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8Oz/YZayaErdzdzhKp0fyhCZgzFhmaZCIFKkjQCJwlc=;
-        b=mLbts5Y3adqCCNOiBTBvLEF/D/VgYwgALLSOeLQSx8p8FyDSSJWEO5SOBOpdUY4oHF
-         pzTft49wWnlzo+V9/gMcK5j2VXwSRb0rS8aUzseZ8l/T8DJHgeMM2V/vRZUQLEClutO5
-         0OhAXfagAk0ZlFMd0dw+zbEz3VRRwMyRGe1P3MyprNgqbHdKpzzulM0mM4jaELXnGuVn
-         v6f2fZ8DkIpVTNRIMZh/QYtxQB1fTHcgjCO3yDpDikXbR4Q4exHekEFITwHqpaATKgBR
-         W75JUllIhs+tKXuZbtG82RRlMuGN1zOwwrlZKqIVx6z3uAIY/crrVSnd2mRtKe1+RW/t
-         LNHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8Oz/YZayaErdzdzhKp0fyhCZgzFhmaZCIFKkjQCJwlc=;
-        b=T7J5mqs+jvH6LSeGdeMEEaihrrByeR9dUT8gwvJo/c8ESwqOfNWKnEuZ0/sOEwpi9h
-         k6r8gg8Z+h4RVRnk3IrCkhubFAY+MZsgnJQDC734nzZ4ugTLHHHTQFeAGdqtvBwCQeNT
-         Jpo/a2lADv90rH6mDmBJ6p0gGdS1C2Wq9MluoHDzPEDMvq0/NmDqAtZwNdB7MYDqPK4q
-         Lmxo2G8e4seo/0p7Zr1bQ7+tbQYVYoh/OWdJekhdrd+X/PZenJvMh6g2dRHzJP1H5h8u
-         R2darQhnkvZniqmZ0AcRLn5nZ6py+g4jRXGZNL9GeWO/biK0RzZBEOuw+FCjRYQB8SoS
-         dSpQ==
-X-Gm-Message-State: APjAAAU6Nw2quuFlYn6d8HbUVVR9xTLzzgDwjNR5kmEXakKfsmWrCKia
-        +jaQH8MCPcEbEEs9tw9Yleq97cE2uF1nNwAh3MQ=
-X-Google-Smtp-Source: APXvYqwX83EyMWnhZTroZgn/yFXpCshf1utCd63Zo5lr+tdPYblxILai87WFk5neVpwdrOXIgQWX0a0ubNLlqRZAiYQ=
-X-Received: by 2002:a24:f983:: with SMTP id l125mr28527609ith.62.1558320235895;
- Sun, 19 May 2019 19:43:55 -0700 (PDT)
+        id S1731722AbfETJQC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 May 2019 05:16:02 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37692 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730677AbfETJQC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 May 2019 05:16:02 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id BE23FAE4B;
+        Mon, 20 May 2019 09:15:59 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id F16311E3C5F; Mon, 20 May 2019 11:15:58 +0200 (CEST)
+Date:   Mon, 20 May 2019 11:15:58 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Theodore Ts'o <tytso@mit.edu>
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>,
+        linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk, jack@suse.cz,
+        jmoyer@redhat.com, amakhalov@vmware.com, anishs@vmware.com,
+        srivatsab@vmware.com
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+Message-ID: <20190520091558.GC2172@quack2.suse.cz>
+References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
+ <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
+ <20190518192847.GB14277@mit.edu>
 MIME-Version: 1.0
-References: <20190430223722.20845-1-gpiccoli@canonical.com>
- <CAKM4Aez=eC96uyqJa+=Aom2M2eQnknQW_uY4v9NMVpROSiuKSg@mail.gmail.com> <CALJn8nME9NQGsSqLXHQPEizFfKUzxozfYy-2510MHyMPHRzhfw@mail.gmail.com>
-In-Reply-To: <CALJn8nME9NQGsSqLXHQPEizFfKUzxozfYy-2510MHyMPHRzhfw@mail.gmail.com>
-From:   Eric Ren <renzhengeek@gmail.com>
-Date:   Mon, 20 May 2019 10:43:44 +0800
-Message-ID: <CAKM4AeyJs8KUB3vi=GPDnb-yjED2oFYvn7O=CPNi3Er3orAbfg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] block: Fix a NULL pointer dereference in generic_make_request()
-To:     "Guilherme G. Piccoli" <kernel@gpiccoli.net>
-Cc:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
-        linux-block@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>, dm-devel@redhat.com,
-        axboe@kernel.dk, Gavin Guo <gavin.guo@canonical.com>,
-        Jay Vosburgh <jay.vosburgh@canonical.com>,
-        Bart Van Assche <bvanassche@acm.org>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190518192847.GB14277@mit.edu>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Sat 18-05-19 15:28:47, Theodore Ts'o wrote:
+> On Sat, May 18, 2019 at 08:39:54PM +0200, Paolo Valente wrote:
+> > I've addressed these issues in my last batch of improvements for
+> > BFQ, which landed in the upcoming 5.2. If you give it a try, and
+> > still see the problem, then I'll be glad to reproduce it, and
+> > hopefully fix it for you.
+> 
+> Hi Paolo, I'm curious if you could give a quick summary about what you
+> changed in BFQ?
+> 
+> I was considering adding support so that if userspace calls fsync(2)
+> or fdatasync(2), to attach the process's CSS to the transaction, and
+> then charge all of the journal metadata writes the process's CSS.  If
+> there are multiple fsync's batched into the transaction, the first
+> process which forced the early transaction commit would get charged
+> the entire journal write.  OTOH, journal writes are sequential I/O, so
+> the amount of disk time for writing the journal is going to be
+> relatively small, and especially, the fact that work from other
+> cgroups is going to be minimal, especially if hadn't issued an
+> fsync().
 
-On Sat, 18 May 2019 at 00:17, Guilherme G. Piccoli <kernel@gpiccoli.net> wrote:
->
-> On Fri, May 17, 2019 at 12:33 AM Eric Ren <renzhengeek@gmail.com> wrote:
-> >
-> > Hello,
-> > [...]
-> > Thanks for the bugfix. I also had a panic having very similar
-> > calltrace below as this one,
-> > when using devicemapper in container scenario and deleting many thin
-> > snapshots by dmsetup
-> > remove_all -f, meanwhile executing lvm command like vgs.
-> >
-> > After applied this one, my testing doesn't crash kernel any more for
-> > one week.  Could the block
-> > developers please give more feedback/priority on this one?
-> >
->
-> Thanks Eric, for the testing! I think you could send your Tested-by[0]
-> tag, which could be added
-> in the patch before merge. It's good to know the patch helped somebody
-> and your testing improves
-> confidence in the change.
+But this makes priority-inversion problems with ext4 journal worse, doesn't
+it? If we submit journal commit in blkio cgroup of some random process, it
+may get throttled which then effectively blocks the whole filesystem. Or do
+you want to implement a more complex back-pressure mechanism where you'd
+just account to different blkio cgroup during journal commit and then
+throttle as different point where you are not blocking other tasks from
+progress?
 
-Please consider Ming's comments and send patch v2, then feel free to add:
-Tested-by: Eric Ren <renzhengeek@gmail.com>
+> In the case where you have three cgroups all issuing fsync(2) and they
+> all landed in the same jbd2 transaction thanks to commit batching, in
+> the ideal world we would split up the disk time usage equally across
+> those three cgroups.  But it's probably not worth doing that...
+> 
+> That being said, we probably do need some BFQ support, since in the
+> case where we have multiple processes doing buffered writes w/o fsync,
+> we do charnge the data=ordered writeback to each block cgroup.  Worse,
+> the commit can't complete until the all of the data integrity
+> writebacks have completed.  And if there are N cgroups with dirty
+> inodes, and slice_idle set to 8ms, there is going to be 8*N ms worth
+> of idle time tacked onto the commit time.
 
-Thanks!
-Eric
+Yeah. At least in some cases, we know there won't be any more IO from a
+particular cgroup in the near future (e.g. transaction commit completing,
+or when the layers above IO scheduler already know which IO they are going
+to submit next) and in that case idling is just a waste of time. But so far
+I haven't decided how should look a reasonably clean interface for this
+that isn't specific to a particular IO scheduler implementation.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
