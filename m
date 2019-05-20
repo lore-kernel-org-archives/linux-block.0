@@ -2,106 +2,77 @@ Return-Path: <SRS0=zuir=TU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BEA0C04AAC
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 14:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E987C04AAC
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 14:27:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE50820657
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 14:27:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 422AD20657
+	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 14:27:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IE9rXBhT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388944AbfETO1G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 May 2019 10:27:06 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50120 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387745AbfETO1G (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 May 2019 10:27:06 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id F29F7AF0F;
-        Mon, 20 May 2019 14:27:04 +0000 (UTC)
-Subject: Re: [PATCH] block: improve print_req_error
-To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-References: <20190520141359.30027-1-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <ca7034ed-eeaf-bc0f-4c19-3b52f2051d1d@suse.de>
-Date:   Mon, 20 May 2019 16:27:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S2390167AbfETO1U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 May 2019 10:27:20 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:39610 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390076AbfETO1U (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 May 2019 10:27:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=HpHK7d9UhVQk6/UDLmcKvRAr3yC+xCmCY5CGJZTfZXc=; b=IE9rXBhT2+Fpt4GF81TIhGa6B
+        0MoKbpt/Tjeg51MoV5X92xaKdt0bW0lt7c5X/6IPmOfPW5Dmvs6+cn0SaqWCFlEwFxydUxXiwGlmj
+        LKwnQho5efQK+HlMK3H2tG9B5ZFk6qWK4XUHvo2X9ItQdfpNC/JeibKdeUEc4exAMtd0s9GggiXg/
+        /n24bPO+ZxK+61XDPkHgUOs8GFk0d3SINW9VZL4aaAOUe5VRp2TorL6CkZucByg/Jgp7XgUAfO2cw
+        Sn5FpgonxEAzLbW/umHa+jfOrVedJikTx9SPKX1sHHeg7vsgYwlEq0N1d8SQFFBT0j/yivx9dpwiG
+        dwPcptiiQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hSjG3-0006Ti-Lt; Mon, 20 May 2019 14:27:19 +0000
+Date:   Mon, 20 May 2019 07:27:19 -0700
+From:   'Christoph Hellwig' <hch@infradead.org>
+To:     kanchan <joshi.k@samsung.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, prakash.v@samsung.com,
+        anshul@samsung.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v5 0/7] Extend write-hint framework, and add write-hint
+ for Ext4 journal
+Message-ID: <20190520142719.GA15705@infradead.org>
+References: <CGME20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61@epcas2p1.samsung.com>
+ <1556191202-3245-1-git-send-email-joshi.k@samsung.com>
+ <20190510170249.GA26907@infradead.org>
+ <00fb01d50c71$dd358e50$97a0aaf0$@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <20190520141359.30027-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <00fb01d50c71$dd358e50$97a0aaf0$@samsung.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/20/19 4:13 PM, Christoph Hellwig wrote:
-> Print the calling function instead of print_req_error as a prefix, and
-> print the operation and op_flags separately instrad of the whole field.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   block/blk-core.c | 16 +++++++++-------
->   1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 419d600e6637..b1f7e244340e 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -167,18 +167,20 @@ int blk_status_to_errno(blk_status_t status)
->   }
->   EXPORT_SYMBOL_GPL(blk_status_to_errno);
->   
-> -static void print_req_error(struct request *req, blk_status_t status)
-> +static void print_req_error(struct request *req, blk_status_t status,
-> +		const char *caller)
->   {
->   	int idx = (__force int)status;
->   
->   	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
->   		return;
->   
-> -	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu flags %x\n",
-> -				__func__, blk_errors[idx].name,
-> -				req->rq_disk ?  req->rq_disk->disk_name : "?",
-> -				(unsigned long long)blk_rq_pos(req),
-> -				req->cmd_flags);
-> +	printk_ratelimited(KERN_ERR
-> +		"%s: %s error, dev %s, sector %llu op 0x%x flags 0x%x\n",
-> +		caller, blk_errors[idx].name,
-> +		req->rq_disk ?  req->rq_disk->disk_name : "?",
-> +		blk_rq_pos(req), req_op(req),
-> +		req->cmd_flags & ~REQ_OP_MASK);
->   }
->   
->   static void req_bio_endio(struct request *rq, struct bio *bio,
-> @@ -1418,7 +1420,7 @@ bool blk_update_request(struct request *req, blk_status_t error,
->   
->   	if (unlikely(error && !blk_rq_is_passthrough(req) &&
->   		     !(req->rq_flags & RQF_QUIET)))
-> -		print_req_error(req, error);
-> +		print_req_error(req, error, __func__);
->   
->   	blk_account_io_completion(req, nr_bytes);
->   
-> 
-Weell ... where's the point of the __func__ argument if there is only 
-one place where it's called from?
+On Fri, May 17, 2019 at 11:01:55AM +0530, kanchan wrote:
+> Sorry but can you please elaborate the issue? I do not get what is being
+> statically allocated which was globally available earlier.
+> If you are referring to nvme driver,  available streams at subsystem level
+> are being reflected for all namespaces. This is same as earlier. 
+> There is no attempt to explicitly allocate (using dir-receive) or reserve
+> streams for any namespace.  
+> Streams will continue to get allocated/released implicitly as and when
+> writes (with stream id) arrive.
 
-Can't we just drop it completely?
+We have made a concious decision that we do not want to expose streams
+as an awkward not fish not flesh interface, but instead life time hints.
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
+I see no reason to change from and burden the whole streams complexity
+on other in-kernel callers.
