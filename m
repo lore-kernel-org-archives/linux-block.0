@@ -2,178 +2,107 @@ Return-Path: <SRS0=jUAw=TV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40009C18E7C
-	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 20:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2A64C072B5
+	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 22:52:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 080B22182B
-	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 20:47:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="tZN9fEbR"
+	by mail.kernel.org (Postfix) with ESMTP id 9C8472173E
+	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 22:52:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727754AbfEUUqx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 May 2019 16:46:53 -0400
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:55980 "EHLO
-        mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726766AbfEUUqx (ORCPT
+        id S1726271AbfEUWwT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 May 2019 18:52:19 -0400
+Received: from outgoing-stata.csail.mit.edu ([128.30.2.210]:41586 "EHLO
+        outgoing-stata.csail.mit.edu" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726218AbfEUWwS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 May 2019 16:46:53 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id C3155A019D;
-        Tue, 21 May 2019 22:46:49 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1558471609; i=@fjfi.cvut.cz;
-        bh=Ewz4Cx3eumLyMlBi7bHCQ+lT3KA4ioOvPuDlLh675V4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=tZN9fEbR4cB/Ggixtd4CmV+OlmJgjU3qfVAhPtBw48HLfbFErLmZOa0i2S64u4s+E
-         PwGhOk2d+h2Drw/ExQGtgqFy9RptW3jWOw1YCPsAJ3/0lf4+GyRZnQLxgzRLDv20pm
-         MoCuwGatIyooKRP0fwTa2LH62GCD2RoTA8AlmC8s=
-X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
-Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
-        by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id uzcayCuTh4R9; Tue, 21 May 2019 22:46:47 +0200 (CEST)
-Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 85783A018E;
-        Tue, 21 May 2019 22:46:47 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 85783A018E
-Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 557CE6004E; Tue, 21 May 2019 22:46:47 +0200 (CEST)
-From:   David Kozub <zub@linux.fjfi.cvut.cz>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Scott Bauer <sbauer@plzdonthack.me>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: [PATCH v2 3/3] block: sed-opal: check size of shadow mbr
-Date:   Tue, 21 May 2019 22:46:46 +0200
-Message-Id: <1558471606-25139-4-git-send-email-zub@linux.fjfi.cvut.cz>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1558471606-25139-1-git-send-email-zub@linux.fjfi.cvut.cz>
-References: <1558471606-25139-1-git-send-email-zub@linux.fjfi.cvut.cz>
+        Tue, 21 May 2019 18:52:18 -0400
+Received: from [4.30.142.84] (helo=srivatsab-a01.vmware.com)
+        by outgoing-stata.csail.mit.edu with esmtpsa (TLS1.2:RSA_AES_128_CBC_SHA1:128)
+        (Exim 4.82)
+        (envelope-from <srivatsa@csail.mit.edu>)
+        id 1hTDbq-0003mv-2S; Tue, 21 May 2019 18:52:13 -0400
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        jmoyer@redhat.com, Theodore Ts'o <tytso@mit.edu>,
+        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com
+References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
+ <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
+ <46c6a4be-f567-3621-2e16-0e341762b828@csail.mit.edu>
+ <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
+ <A0DFE635-EFEC-4670-AD70-5D813E170BEE@linaro.org>
+ <5B6570A2-541A-4CF8-98E0-979EA6E3717D@linaro.org>
+ <2CB39B34-21EE-4A95-A073-8633CF2D187C@linaro.org>
+ <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
+From:   "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+Message-ID: <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
+Date:   Tue, 21 May 2019 15:51:46 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:60.0)
+ Gecko/20100101 Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+[ Resending this mail with a dropbox link to the traces (instead
+of a file attachment), since it didn't go through the last time. ]
 
-Check whether the shadow mbr does fit in the provided space on the
-target. Also a proper firmware should handle this case and return an
-error we may prevent problems or even damage with crappy firmwares.
+On 5/21/19 10:38 AM, Paolo Valente wrote:
+> 
+>> So, instead of only sending me a trace, could you please:
+>> 1) apply this new patch on top of the one I attached in my previous email
+>> 2) repeat your test and report results
+> 
+> One last thing (I swear!): as you can see from my script, I tested the
+> case low_latency=0 so far.  So please, for the moment, do your test
+> with low_latency=0.  You find the whole path to this parameter in,
+> e.g., my script.
+> 
+No problem! :) Thank you for sharing patches for me to test!
 
-Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
-Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
-Reviewed-by: Jon Derrick <jonathan.derrick@intel.com>
----
- block/opal_proto.h | 16 ++++++++++++++++
- block/sed-opal.c   | 39 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 55 insertions(+)
+I have good news :) Your patch improves the throughput significantly
+when low_latency = 0.
 
-diff --git a/block/opal_proto.h b/block/opal_proto.h
-index d9a05ad02eb5..466ec7be16ef 100644
---- a/block/opal_proto.h
-+++ b/block/opal_proto.h
-@@ -98,6 +98,7 @@ enum opal_uid {
- 	OPAL_ENTERPRISE_BANDMASTER0_UID,
- 	OPAL_ENTERPRISE_ERASEMASTER_UID,
- 	/* tables */
-+	OPAL_TABLE_TABLE,
- 	OPAL_LOCKINGRANGE_GLOBAL,
- 	OPAL_LOCKINGRANGE_ACE_RDLOCKED,
- 	OPAL_LOCKINGRANGE_ACE_WRLOCKED,
-@@ -152,6 +153,21 @@ enum opal_token {
- 	OPAL_STARTCOLUMN = 0x03,
- 	OPAL_ENDCOLUMN = 0x04,
- 	OPAL_VALUES = 0x01,
-+	/* table table */
-+	OPAL_TABLE_UID = 0x00,
-+	OPAL_TABLE_NAME = 0x01,
-+	OPAL_TABLE_COMMON = 0x02,
-+	OPAL_TABLE_TEMPLATE = 0x03,
-+	OPAL_TABLE_KIND = 0x04,
-+	OPAL_TABLE_COLUMN = 0x05,
-+	OPAL_TABLE_COLUMNS = 0x06,
-+	OPAL_TABLE_ROWS = 0x07,
-+	OPAL_TABLE_ROWS_FREE = 0x08,
-+	OPAL_TABLE_ROW_BYTES = 0x09,
-+	OPAL_TABLE_LASTID = 0x0A,
-+	OPAL_TABLE_MIN = 0x0B,
-+	OPAL_TABLE_MAX = 0x0C,
-+
- 	/* authority table */
- 	OPAL_PIN = 0x03,
- 	/* locking tokens */
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index c13ac0ebd5e0..87300918eae2 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -130,6 +130,8 @@ static const u8 opaluid[][OPAL_UID_LENGTH] = {
- 
- 	/* tables */
- 
-+	[OPAL_TABLE_TABLE]
-+		{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01 },
- 	[OPAL_LOCKINGRANGE_GLOBAL] =
- 		{ 0x00, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0x01 },
- 	[OPAL_LOCKINGRANGE_ACE_RDLOCKED] =
-@@ -1131,6 +1133,29 @@ static int generic_get_column(struct opal_dev *dev, const u8 *table,
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
-+/*
-+ * see TCG SAS 5.3.2.3 for a description of the available columns
-+ *
-+ * the result is provided in dev->resp->tok[4]
-+ */
-+static int generic_get_table_info(struct opal_dev *dev, enum opal_uid table,
-+				  u64 column)
-+{
-+	u8 uid[OPAL_UID_LENGTH];
-+	const unsigned int half = OPAL_UID_LENGTH/2;
-+
-+	/* sed-opal UIDs can be split in two halves:
-+	 *  first:  actual table index
-+	 *  second: relative index in the table
-+	 * so we have to get the first half of the OPAL_TABLE_TABLE and use the
-+	 * first part of the target table as relative index into that table
-+	 */
-+	memcpy(uid, opaluid[OPAL_TABLE_TABLE], half);
-+	memcpy(uid+half, opaluid[table], half);
-+
-+	return generic_get_column(dev, uid, column);
-+}
-+
- static int gen_key(struct opal_dev *dev, void *data)
- {
- 	u8 uid[OPAL_UID_LENGTH];
-@@ -1546,6 +1571,20 @@ static int write_shadow_mbr(struct opal_dev *dev, void *data)
- 	u64 len;
- 	int err = 0;
- 
-+	/* do we fit in the available shadow mbr space? */
-+	err = generic_get_table_info(dev, OPAL_MBR, OPAL_TABLE_ROWS);
-+	if (err) {
-+		pr_debug("MBR: could not get shadow size\n");
-+		return err;
-+	}
-+
-+	len = response_get_u64(&dev->parsed, 4);
-+	if (shadow->size > len || shadow->offset > len - shadow->size) {
-+		pr_debug("MBR: does not fit in shadow (%llu vs. %llu)\n",
-+			 shadow->offset + shadow->size, len);
-+		return -ENOSPC;
-+	}
-+
- 	/* do the actual transmission(s) */
- 	src = (u8 __user *)(uintptr_t)shadow->data;
- 	while (off < shadow->size) {
--- 
-2.20.1
+Without any patch:
 
+dd if=/dev/zero of=/root/test.img bs=512 count=10000 oflag=dsync
+10000+0 records in
+10000+0 records out
+5120000 bytes (5.1 MB, 4.9 MiB) copied, 58.0915 s, 88.1 kB/s
+
+
+With both patches applied:
+
+dd if=/dev/zero of=/root/test0.img bs=512 count=10000 oflag=dsync
+10000+0 records in
+10000+0 records out
+5120000 bytes (5.1 MB, 4.9 MiB) copied, 3.87487 s, 1.3 MB/s
+
+The performance is still not as good as mq-deadline (which achieves
+1.6 MB/s), but this is a huge improvement for BFQ nonetheless!
+
+A tarball with the trace output from the 2 scenarios you requested,
+one with only the debug patch applied (trace-bfq-add-logs-and-BUG_ONs),
+and another with both patches applied (trace-bfq-boost-injection) is
+available here:
+
+https://www.dropbox.com/s/pdf07vi7afido7e/bfq-traces.tar.gz?dl=0
+
+Thank you!
+ 
+Regards,
+Srivatsa
+VMware Photon OS
