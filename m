@@ -2,256 +2,84 @@ Return-Path: <SRS0=jUAw=TV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BECCC04AAF
-	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 06:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE0B8C04AAF
+	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 07:01:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 476BB2173C
-	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 06:23:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B316D20863
+	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 07:01:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VwHbUzfo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XbNqSHOz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727919AbfEUGXK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 May 2019 02:23:10 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:35327 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727910AbfEUGXK (ORCPT
+        id S1726247AbfEUHBy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 May 2019 03:01:54 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:38174 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725809AbfEUHBx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 May 2019 02:23:10 -0400
-Received: by mail-wr1-f68.google.com with SMTP id m3so4114847wrv.2
-        for <linux-block@vger.kernel.org>; Mon, 20 May 2019 23:23:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=/X0F6+Y1M8EwDKgr5lTkilasanWcGGf9Uo6k3RZbCKw=;
-        b=VwHbUzfo4DJkvfdMV4YIu2Nde66nwtQg6g+dyzYEjTSgSz+mJMekwN6PPBO31+2KVT
-         BOtGp0P4zSllC9qMbrug9bRvbAlttCTL/pnfI/7z13XGmZ5WJP7HfZE0PS309aeRJoKe
-         d1KZ2ZMzVWt9FzdlYLpPgbivOKkriJmWQn8ALfj+GrGda3nKrsbqrnScXDtV7ZU62Cu/
-         Zh3erY3LVaRf5+wDGkaovAcVPlRXCAN58YGxSHFG0xoDHuikpz3zqYWSCy/layAC29YF
-         o+A1jfGJTv7BSQXDR87PD5fDirURdbeNBtvvqlGY+VrgCDJ9esO6VoAZG1LcW/a8kWJn
-         ozIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=/X0F6+Y1M8EwDKgr5lTkilasanWcGGf9Uo6k3RZbCKw=;
-        b=mn958tjJ9GM/Y2YcGzCRlZkcJwdIFQWUBp+UnWdMHwlGTjOqbiiBLzS0+/0xc6Mm/i
-         /emxknSpO8wBBsF71xqSnT6mZR5Q+x45HWpEKdRCBy7BYk4y0+QPZTpIEihHwHlOA8AS
-         udag4o/aXrPqNq1BGN0xXUHKxHGCrEYQcyk64LSHBnAu49KYJgMmFa0yH04zHyVwqYnZ
-         RxtGMbkEbhQQWSAPf73BdS++YMgHfbxh7JTQzQ4oimHUm3ZV4PvEFYOh5KECcBiXv9tT
-         KKoSsiE6a45c8eMGzmp8pEAN7+lKQdl0Na1MCF9WNqQibPzR98VoSWQvro4uZ/K13Pq1
-         8nJQ==
-X-Gm-Message-State: APjAAAWg8Bk94cG8arUH9jGkCM9KRRXM66ay572AsmcsmThuHZp6fr+6
-        yjFqwCPAgeiJ5ZFdpEHhvjcQsA==
-X-Google-Smtp-Source: APXvYqxpsV5aiVbr4ZuDEsq9JrXf6GX4gu3XpLbruwNnAOR15W2RwibXjMCak6RDzuHCjNhI+KaCFg==
-X-Received: by 2002:a5d:6cae:: with SMTP id a14mr33366716wra.214.1558419788392;
-        Mon, 20 May 2019 23:23:08 -0700 (PDT)
-Received: from [192.168.0.101] ([88.147.35.136])
-        by smtp.gmail.com with ESMTPSA id z1sm5734685wrl.91.2019.05.20.23.23.06
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 23:23:07 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-Message-Id: <6EB6C9D2-E774-48FA-AC95-BC98D97645D0@linaro.org>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_8AD55980-F0C1-42FC-843D-9D3AFDD1A996";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-Date:   Tue, 21 May 2019 08:23:05 +0200
-In-Reply-To: <238e14ff-68d1-3b21-a291-28de4f2d77af@csail.mit.edu>
-Cc:     linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        jmoyer@redhat.com, Theodore Ts'o <tytso@mit.edu>,
-        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com
-To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
- <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
- <46c6a4be-f567-3621-2e16-0e341762b828@csail.mit.edu>
- <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
- <238e14ff-68d1-3b21-a291-28de4f2d77af@csail.mit.edu>
-X-Mailer: Apple Mail (2.3445.104.8)
+        Tue, 21 May 2019 03:01:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=J2lVMwinnJaO+FSFRgN1PO1owzfBQbj/1ji8dOD42Sg=; b=XbNqSHOzLOcH6+K9gAmSMs5K/
+        TWDuziBScq/cljhnlcnH5eezjwGjqjcwD8D0jDww/pMSKNMW08dFJbQXit9qXWcidI0C99SqWGujk
+        jRo5Dyb7geO7+n335IL7M2ZwVKGWAxefFBZvvS+W0V8pSr1cmr2/1Mv7C3w4Z4s9ydlbrAfXLDqBH
+        TtpYvx9rL/AeZjAcs4Wefzdf9H1wzYrqTaSUsNPk5tSpx4mE/hCWbiv1hZJSm6g5ABCdSO6P2TNQ1
+        Hjm0q314Pjcm1m5aeeoBbW4ZxCmlofu7/HP2xla7gcj+gWWLdIu0pmLxS3B8bjRGgMR00cnH4rfh1
+        gIHVTli1Q==;
+Received: from 089144206147.atnat0015.highway.bob.at ([89.144.206.147] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hSymR-0000Y6-59; Tue, 21 May 2019 07:01:51 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@fb.com
+Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org
+Subject: fix nr_phys_segments vs iterators accounting v3
+Date:   Tue, 21 May 2019 09:01:39 +0200
+Message-Id: <20190521070143.22631-1-hch@lst.de>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi all,
 
---Apple-Mail=_8AD55980-F0C1-42FC-843D-9D3AFDD1A996
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+we have had a problem for a while where the number of segments that
+the bvec iterators will iterate over don't match the value in
+req->nr_phys_segments, causing problems for anyone looking at
+nr_phys_segments and iterating over bvec directly instead of using
+blk_rq_map_sg.  The first patch in this series fixes this by
+making sure nr_phys_segments matches the actual number of segments.
+Drivers using blk_rq_map_sg will still get the lower number returned
+from function eventually, but the fact that we don't reduce the
+value earlier will not allow some merges that we might otherwise
+allow.
 
+With that in place I also noticed that we do not properly account
+segements sizes on devices with a virt_boundary, but it turns out that
+segment sizes fundamentally don't make sense for such devices, as their
+"segment" is a fixed size "device page", and not a variable sized
+scatter/gather elements as in the block layer, so we make that fact
+formal.
 
+Once all that is sorted out it is pretty clear that there is no
+good reason to have the front/back segement accounting to start
+with.
 
-> Il giorno 21 mag 2019, alle ore 00:45, Srivatsa S. Bhat =
-<srivatsa@csail.mit.edu> ha scritto:
->=20
-> On 5/20/19 3:19 AM, Paolo Valente wrote:
->>=20
->>=20
->>> Il giorno 18 mag 2019, alle ore 22:50, Srivatsa S. Bhat =
-<srivatsa@csail.mit.edu> ha scritto:
->>>=20
->>> On 5/18/19 11:39 AM, Paolo Valente wrote:
->>>> I've addressed these issues in my last batch of improvements for =
-BFQ,
->>>> which landed in the upcoming 5.2. If you give it a try, and still =
-see
->>>> the problem, then I'll be glad to reproduce it, and hopefully fix =
-it
->>>> for you.
->>>>=20
->>>=20
->>> Hi Paolo,
->>>=20
->>> Thank you for looking into this!
->>>=20
->>> I just tried current mainline at commit 72cf0b07, but unfortunately
->>> didn't see any improvement:
->>>=20
->>> dd if=3D/dev/zero of=3D/root/test.img bs=3D512 count=3D10000 =
-oflag=3Ddsync
->>>=20
->>> With mq-deadline, I get:
->>>=20
->>> 5120000 bytes (5.1 MB, 4.9 MiB) copied, 3.90981 s, 1.3 MB/s
->>>=20
->>> With bfq, I get:
->>> 5120000 bytes (5.1 MB, 4.9 MiB) copied, 84.8216 s, 60.4 kB/s
->>>=20
->>=20
->> Hi Srivatsa,
->> thanks for reproducing this on mainline.  I seem to have reproduced a
->> bonsai-tree version of this issue.  Before digging into the block
->> trace, I'd like to ask you for some feedback.
->>=20
->> First, in my test, the total throughput of the disk happens to be
->> about 20 times as high as that enjoyed by dd, regardless of the I/O
->> scheduler.  I guess this massive overhead is normal with dsync, but
->> I'd like know whether it is about the same on your side.  This will
->> help me understand whether I'll actually be analyzing about the same
->> problem as yours.
->>=20
->=20
-> Do you mean to say the throughput obtained by dd'ing directly to the
-> block device (bypassing the filesystem)?
+Changes since v2:
+  - fix some fixes tags
 
-No no, I mean simply what follows.
+Changes since v1:
+  - update a commit log
+  - add fixes tags
+  - drop the follow on patches not suitable for 5.2
 
-1) in one terminal:
-[root@localhost tmp]# dd if=3D/dev/zero of=3D/root/test.img bs=3D512 =
-count=3D10000 oflag=3Ddsync
-10000+0 record dentro
-10000+0 record fuori
-5120000 bytes (5,1 MB, 4,9 MiB) copied, 14,6892 s, 349 kB/s
-
-2) In a second terminal, while the dd is in progress in the first
-terminal:
-$ iostat -tmd /dev/sda 3
-Linux 5.1.0+ (localhost.localdomain) 	20/05/2019 	_x86_64_	=
-(2 CPU)
-
-...
-20/05/2019 11:40:17
-Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
-sda            2288,00         0,00         9,77          0         29
-
-20/05/2019 11:40:20
-Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
-sda            2325,33         0,00         9,93          0         29
-
-20/05/2019 11:40:23
-Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
-sda            2351,33         0,00        10,05          0         30
-...
-
-As you can see, the overall throughput (~10 MB/s) is more than 20
-times as high as the dd throughput (~350 KB/s).  But the dd is the
-only source of I/O.
-
-Do you also see such a huge difference?
-
-Thanks,
-Paolo
-
-> That does give me a 20x
-> speedup with bs=3D512, but much more with a bigger block size =
-(achieving
-> a max throughput of about 110 MB/s).
->=20
-> dd if=3D/dev/zero of=3D/dev/sdc bs=3D512 count=3D10000 conv=3Dfsync
-> 10000+0 records in
-> 10000+0 records out
-> 5120000 bytes (5.1 MB, 4.9 MiB) copied, 0.15257 s, 33.6 MB/s
->=20
-> dd if=3D/dev/zero of=3D/dev/sdc bs=3D4k count=3D10000 conv=3Dfsync
-> 10000+0 records in
-> 10000+0 records out
-> 40960000 bytes (41 MB, 39 MiB) copied, 0.395081 s, 104 MB/s
->=20
-> I'm testing this on a Toshiba MG03ACA1 (1TB) hard disk.
->=20
->> Second, the commands I used follow.  Do they implement your test case
->> correctly?
->>=20
->> [root@localhost tmp]# mkdir /sys/fs/cgroup/blkio/testgrp
->> [root@localhost tmp]# echo $BASHPID > =
-/sys/fs/cgroup/blkio/testgrp/cgroup.procs
->> [root@localhost tmp]# cat /sys/block/sda/queue/scheduler
->> [mq-deadline] bfq none
->> [root@localhost tmp]# dd if=3D/dev/zero of=3D/root/test.img bs=3D512 =
-count=3D10000 oflag=3Ddsync
->> 10000+0 record dentro
->> 10000+0 record fuori
->> 5120000 bytes (5,1 MB, 4,9 MiB) copied, 14,6892 s, 349 kB/s
->> [root@localhost tmp]# echo bfq > /sys/block/sda/queue/scheduler
->> [root@localhost tmp]# dd if=3D/dev/zero of=3D/root/test.img bs=3D512 =
-count=3D10000 oflag=3Ddsync
->> 10000+0 record dentro
->> 10000+0 record fuori
->> 5120000 bytes (5,1 MB, 4,9 MiB) copied, 20,1953 s, 254 kB/s
->>=20
->=20
-> Yes, this is indeed the testcase, although I see a much bigger
-> drop in performance with bfq, compared to the results from
-> your setup.
->=20
-> Regards,
-> Srivatsa
-
-
---Apple-Mail=_8AD55980-F0C1-42FC-843D-9D3AFDD1A996
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAlzjmUkACgkQOAkCLQGo
-9oO3FQ/+Jv+JpkDN4rqwR/5YS99ksO/DlU7NJ61C7pK03vuGrei46Qei6u0MSATN
-aB8HTp39V50NsnqyWHUdYN2eX8TsK3SXXfYLr1JLh69f/tzcGmtG1+nWab5eBope
-8CKi6bREmxs4VPFrsiwflWspuOHxr0cSfTKjVG7vi+IAILRiAep3vcHbfp26Qehx
-Z8RCNQhaAgMX15XWl7SnAPOvispB8OkXyZxtKA4VgzZ4mA6IxcBeioW78U9bAUaQ
-zFD+Wmplj5U2yWo5MbBYmiRFeYlaLNdgZjAZlpdt/dYlxPuNSJ6oMNCu5QwlBU1G
-b01D84AlHyNC/9RQAMf4+WIuFG8OhekGoswddB3B8xgKQp20beD1D4lUuTl6V0Bt
-7WAAUT5G8wrzOFjbcnZcOqUEOh7Z2nEj7hstYnp3l35Ou20BJttg7D4G9qmnGnvI
-zp49gutGftl1ElB/WT1BavkgIfd8WA7TUs1c4FGKnEC13MtjjGNPsuW6rWjFlLn+
-XUlSgKys/O+sEKyeK7jmune5WTXoqxIe9cQg/qi8alFU/qfqAZXsPYrRNVkYDBgd
-oLflkGK75Qfwkrkz02kLQ9aHTS5hv+XwXDfDQwmkaH/5ZpUDGNYo+4SJgbWbQwr7
-TtVg+9h5g50wQRd8pNRnaQRemEBrSrNYyIOR6l+6PaP0h8MVaJ0=
-=6wO1
------END PGP SIGNATURE-----
-
---Apple-Mail=_8AD55980-F0C1-42FC-843D-9D3AFDD1A996--
