@@ -1,138 +1,101 @@
-Return-Path: <SRS0=zuir=TU=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=jUAw=TV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F30C04AAC
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 22:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A796FC04AAC
+	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 01:04:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35E452173C
-	for <linux-block@archiver.kernel.org>; Mon, 20 May 2019 22:45:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83CFB2171F
+	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 01:04:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727018AbfETWpz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 May 2019 18:45:55 -0400
-Received: from outgoing-stata.csail.mit.edu ([128.30.2.210]:53113 "EHLO
-        outgoing-stata.csail.mit.edu" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726107AbfETWpz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 May 2019 18:45:55 -0400
-Received: from [4.30.142.84] (helo=srivatsab-a01.vmware.com)
-        by outgoing-stata.csail.mit.edu with esmtpsa (TLS1.2:RSA_AES_128_CBC_SHA1:128)
-        (Exim 4.82)
-        (envelope-from <srivatsa@csail.mit.edu>)
-        id 1hSr2T-000DNC-Gj; Mon, 20 May 2019 18:45:49 -0400
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        jmoyer@redhat.com, tytso@mit.edu, amakhalov@vmware.com,
-        anishs@vmware.com, srivatsab@vmware.com
-References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
- <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
- <46c6a4be-f567-3621-2e16-0e341762b828@csail.mit.edu>
- <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
-From:   "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-Message-ID: <238e14ff-68d1-3b21-a291-28de4f2d77af@csail.mit.edu>
-Date:   Mon, 20 May 2019 15:45:46 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
+        id S1727078AbfEUBEo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 May 2019 21:04:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53990 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727047AbfEUBEo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 May 2019 21:04:44 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 37B1E3082AC3;
+        Tue, 21 May 2019 01:04:44 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D693600C6;
+        Tue, 21 May 2019 01:04:39 +0000 (UTC)
+Date:   Tue, 21 May 2019 09:04:35 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@fb.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/4] block: don't decrement nr_phys_segments for
+ physically contigous segments
+Message-ID: <20190521010434.GA14268@ming.t460p>
+References: <20190516084058.20678-1-hch@lst.de>
+ <20190516084058.20678-2-hch@lst.de>
+ <20190516131703.GA26943@ming.t460p>
+ <20190520111141.GA5137@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190520111141.GA5137@lst.de>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 21 May 2019 01:04:44 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/20/19 3:19 AM, Paolo Valente wrote:
+On Mon, May 20, 2019 at 01:11:41PM +0200, Christoph Hellwig wrote:
+> On Thu, May 16, 2019 at 09:17:04PM +0800, Ming Lei wrote:
+> > ll_merge_requests_fn() is only called from attempt_merge() in case
+> > that ELEVATOR_BACK_MERGE is returned from blk_try_req_merge(). However,
+> > for discard merge of both virtio_blk and nvme, ELEVATOR_DISCARD_MERGE is
+> > always returned from blk_try_req_merge() in attempt_merge(), so looks
+> > ll_merge_requests_fn() shouldn't be called for virtio_blk/nvme's discard
+> > request. Just wondering if you may explain a bit how the change on
+> > ll_merge_requests_fn() in this patch makes a difference on the above
+> > two commits?
 > 
-> 
->> Il giorno 18 mag 2019, alle ore 22:50, Srivatsa S. Bhat <srivatsa@csail.mit.edu> ha scritto:
->>
->> On 5/18/19 11:39 AM, Paolo Valente wrote:
->>> I've addressed these issues in my last batch of improvements for BFQ,
->>> which landed in the upcoming 5.2. If you give it a try, and still see
->>> the problem, then I'll be glad to reproduce it, and hopefully fix it
->>> for you.
->>>
->>
->> Hi Paolo,
->>
->> Thank you for looking into this!
->>
->> I just tried current mainline at commit 72cf0b07, but unfortunately
->> didn't see any improvement:
->>
->> dd if=/dev/zero of=/root/test.img bs=512 count=10000 oflag=dsync
->>
->> With mq-deadline, I get:
->>
->> 5120000 bytes (5.1 MB, 4.9 MiB) copied, 3.90981 s, 1.3 MB/s
->>
->> With bfq, I get:
->> 5120000 bytes (5.1 MB, 4.9 MiB) copied, 84.8216 s, 60.4 kB/s
->>
-> 
-> Hi Srivatsa,
-> thanks for reproducing this on mainline.  I seem to have reproduced a
-> bonsai-tree version of this issue.  Before digging into the block
-> trace, I'd like to ask you for some feedback.
-> 
-> First, in my test, the total throughput of the disk happens to be
-> about 20 times as high as that enjoyed by dd, regardless of the I/O
-> scheduler.  I guess this massive overhead is normal with dsync, but
-> I'd like know whether it is about the same on your side.  This will
-> help me understand whether I'll actually be analyzing about the same
-> problem as yours.
-> 
+> Good question.  I've seen virtio overwriting its range, but I think
+> this might have been been with a series to actually decrement
+> nr_phys_segments for all cases where we can merge the tail and front
+> bvecs.  So mainline probably doesn't see it unless someone calls
+> blk_recalc_rq_segments due to a partial completion or when using
+> dm-multipath.  Thinking of it at least the latter seems like a real
+> possibily, although a rather unlikely use case.
 
-Do you mean to say the throughput obtained by dd'ing directly to the
-block device (bypassing the filesystem)? That does give me a 20x
-speedup with bs=512, but much more with a bigger block size (achieving
-a max throughput of about 110 MB/s).
+This patch shouldn't effect discard IO in case of partial completion too
+cause blk_recalc_rq_segments() always return 0 for discard IO w/wo this
+patch.
 
-dd if=/dev/zero of=/dev/sdc bs=512 count=10000 conv=fsync
-10000+0 records in
-10000+0 records out
-5120000 bytes (5.1 MB, 4.9 MiB) copied, 0.15257 s, 33.6 MB/s
+However looks this way is wrong, the following patch may help for this
+case:
 
-dd if=/dev/zero of=/dev/sdc bs=4k count=10000 conv=fsync
-10000+0 records in
-10000+0 records out
-40960000 bytes (41 MB, 39 MiB) copied, 0.395081 s, 104 MB/s
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1aafeb923e7b..302667887ea1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1109,7 +1109,12 @@ static inline unsigned short blk_rq_nr_phys_segments(struct request *rq)
+  */
+ static inline unsigned short blk_rq_nr_discard_segments(struct request *rq)
+ {
+-	return max_t(unsigned short, rq->nr_phys_segments, 1);
++	struct bio *bio;
++	unsigned shart segs = 0;
++
++	__rq_for_each_bio(bio, rq)
++		segs++;
++	return segs;
+ }
+ 
+ extern int blk_rq_map_sg(struct request_queue *, struct request *, struct scatterlist *);
 
-I'm testing this on a Toshiba MG03ACA1 (1TB) hard disk.
+Or re-calculate the segment number in this way for multi-range discard IO in
+__blk_recalc_rq_segments().
 
-> Second, the commands I used follow.  Do they implement your test case
-> correctly?
-> 
-> [root@localhost tmp]# mkdir /sys/fs/cgroup/blkio/testgrp
-> [root@localhost tmp]# echo $BASHPID > /sys/fs/cgroup/blkio/testgrp/cgroup.procs
-> [root@localhost tmp]# cat /sys/block/sda/queue/scheduler
-> [mq-deadline] bfq none
-> [root@localhost tmp]# dd if=/dev/zero of=/root/test.img bs=512 count=10000 oflag=dsync
-> 10000+0 record dentro
-> 10000+0 record fuori
-> 5120000 bytes (5,1 MB, 4,9 MiB) copied, 14,6892 s, 349 kB/s
-> [root@localhost tmp]# echo bfq > /sys/block/sda/queue/scheduler
-> [root@localhost tmp]# dd if=/dev/zero of=/root/test.img bs=512 count=10000 oflag=dsync
-> 10000+0 record dentro
-> 10000+0 record fuori
-> 5120000 bytes (5,1 MB, 4,9 MiB) copied, 20,1953 s, 254 kB/s
-> 
-
-Yes, this is indeed the testcase, although I see a much bigger
-drop in performance with bfq, compared to the results from
-your setup.
-
-Regards,
-Srivatsa
+Thanks,
+Ming
