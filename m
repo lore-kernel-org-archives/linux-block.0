@@ -2,170 +2,125 @@ Return-Path: <SRS0=jUAw=TV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E67EEC04AAF
-	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 07:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A624C04AAF
+	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 07:40:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B975821019
-	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 07:38:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 683F621019
+	for <linux-block@archiver.kernel.org>; Tue, 21 May 2019 07:40:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726766AbfEUHi4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 May 2019 03:38:56 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:36519 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726741AbfEUHi4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 May 2019 03:38:56 -0400
-Received: from mail-wr1-f71.google.com ([209.85.221.71])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <andrea.righi@canonical.com>)
-        id 1hSzMM-0004o7-4n
-        for linux-block@vger.kernel.org; Tue, 21 May 2019 07:38:54 +0000
-Received: by mail-wr1-f71.google.com with SMTP id r7so7694588wrn.8
-        for <linux-block@vger.kernel.org>; Tue, 21 May 2019 00:38:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=PD3gnvomtD5VhdkV7Q4c3V/xyYHglmxFg3mfhMbpkIs=;
-        b=tEJuz7fNPemjlfgk5yWI4FhWArH0azMDR6kOhIkvZ0Z2/aU1HnWLRlKk5x3Y3b89dm
-         /2ngPOpyng6nr5JzWGM+/fLKSqH+kldlkuXQUsuF2tGdZLEtELHbuuz+Em4p5hMe5ixY
-         zutgib73S9nzLCLPNuBqbsgI8LyDPOa1jeQpE4o9eAKRdWj3VfVaOJCXaoCKoPmnYI/j
-         wXK3t3L3wxTE+bQx5kK8iZEIOlASpMndyHJ5fefNjBJbHA8ryRCMsnJ+jIf8ZgexWvk0
-         4rjqrOq6T50Inw7DNGq4Lum/r7tsjlNr9KLIgM0SL+SiCrLreqqNUFaBLR8auzwMNZMB
-         Fe+A==
-X-Gm-Message-State: APjAAAVsNTzcjFkWHvjgINZlTjvDQcrv30DB0k9FWAeZf8XTyBuD1g5D
-        F8fznWsTO5aQYzrFohrnYqlmfUgOoLgp5hCrliVWZs0qQfyYfAW6qEES52d3/t1bJ3qfCfscF25
-        /DShxPdDdDkoDbnw9e+wmtJ12YdH6eEiPWLsoFJaI
-X-Received: by 2002:a1c:23d2:: with SMTP id j201mr2189815wmj.139.1558424333854;
-        Tue, 21 May 2019 00:38:53 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwmsb8RKYyDOM0lxwOMDTTxlykFnx0YegvtoEzcpA1XoYR24SX3p81b1TVlQrtMAdKIJPWHpA==
-X-Received: by 2002:a1c:23d2:: with SMTP id j201mr2189806wmj.139.1558424333602;
-        Tue, 21 May 2019 00:38:53 -0700 (PDT)
-Received: from localhost (host157-126-dynamic.32-79-r.retail.telecomitalia.it. [79.32.126.157])
-        by smtp.gmail.com with ESMTPSA id 34sm35567853wre.32.2019.05.21.00.38.52
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 21 May 2019 00:38:52 -0700 (PDT)
-Date:   Tue, 21 May 2019 09:38:51 +0200
-From:   Andrea Righi <andrea.righi@canonical.com>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Theodore Ts'o <tytso@mit.edu>,
-        "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>,
-        linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        jmoyer@redhat.com, amakhalov@vmware.com, anishs@vmware.com,
-        srivatsab@vmware.com, Josef Bacik <josef@toxicpanda.com>,
-        Tejun Heo <tj@kernel.org>
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-Message-ID: <20190521073851.GA15262@xps-13>
-References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
- <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
- <20190518192847.GB14277@mit.edu>
- <98612748-8454-43E8-9915-BAEBA19A6FD7@linaro.org>
+        id S1726227AbfEUHko (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 May 2019 03:40:44 -0400
+Received: from verein.lst.de ([213.95.11.211]:58012 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726193AbfEUHko (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 May 2019 03:40:44 -0400
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id 3A8C168B05; Tue, 21 May 2019 09:40:20 +0200 (CEST)
+Date:   Tue, 21 May 2019 09:40:19 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        John Garry <john.garry@huawei.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] blk-mq: Wait for for hctx inflight requests on CPU
+ unplug
+Message-ID: <20190521074019.GA31265@lst.de>
+References: <20190517091424.19751-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <98612748-8454-43E8-9915-BAEBA19A6FD7@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190517091424.19751-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 20, 2019 at 12:38:32PM +0200, Paolo Valente wrote:
-...
-> > I was considering adding support so that if userspace calls fsync(2)
-> > or fdatasync(2), to attach the process's CSS to the transaction, and
-> > then charge all of the journal metadata writes the process's CSS.  If
-> > there are multiple fsync's batched into the transaction, the first
-> > process which forced the early transaction commit would get charged
-> > the entire journal write.  OTOH, journal writes are sequential I/O, so
-> > the amount of disk time for writing the journal is going to be
-> > relatively small, and especially, the fact that work from other
-> > cgroups is going to be minimal, especially if hadn't issued an
-> > fsync().
-> > 
-> 
-> Yeah, that's a longstanding and difficult instance of the general
-> too-short-blanket problem.  Jan has already highlighted one of the
-> main issues in his reply.  I'll add a design issue (from my point of
-> view): I'd find a little odd that explicit sync transactions have an
-> owner to charge, while generic buffered writes have not.
-> 
-> I think Andrea Righi addressed related issues in his recent patch
-> proposal [1], so I've CCed him too.
-> 
-> [1] https://lkml.org/lkml/2019/3/9/220
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 7513c8eaabee..b24334f99c5d 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -332,7 +332,7 @@ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
+>   *		true to continue iterating tags, false to stop.
+>   * @priv:	Will be passed as second argument to @fn.
+>   */
+> -static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
+> +void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
+>  		busy_tag_iter_fn *fn, void *priv)
 
-If journal metadata writes are submitted using a process's CSS, the
-commit may be throttled and that can also throttle indirectly other
-"high-priority" blkio cgroups, so I think that logic alone isn't enough.
+How about moving blk_mq_tags_inflight_rqs to blk-mq-tag.c instead?
 
-We have discussed this priorty-inversion problem with Josef and Tejun
-(adding both of them in cc), the idea that seemed most reasonable was to
-temporarily boost the priority of blkio cgroups when there are multiple
-sync(2) waiters in the system.
+> +	#define BLK_MQ_TAGS_DRAINED           0
 
-More exactly, when I/O is going to be throttled for a specific blkio
-cgroup, if there's any other blkio cgroup waiting for writeback I/O,
-no throttling is applied (this logic can be refined by saving a list of
-blkio sync(2) waiters and taking the highest I/O rate among them).
+Please don't indent #defines.
 
-In addition to that Tejun mentioned that he would like to see a better
-sync(2) isolation done at the fs namespace level. This last part still
-needs to be defined and addressed.
+>  
+> +static int blk_mq_hctx_notify_prepare(unsigned int cpu, struct hlist_node *node)
+> +{
+> +	struct blk_mq_hw_ctx	*hctx;
+> +	struct blk_mq_tags	*tags;
+> +
+> +	tags = hctx->tags;
+> +
+> +	if (tags)
+> +		clear_bit(BLK_MQ_TAGS_DRAINED, &tags->flags);
+> +
+> +	return 0;
 
-However, even the simple logic above "no throttling if there's any other
-sync(2) waiter" can already prevent big system lockups (see for example
-the simple test case that I suggested here https://lkml.org/lkml/2019/),
-so I think having this change alone would be a nice improvement already:
+I'd write this as:
 
- https://lkml.org/lkml/2019/3/9/220
+{
+	struct blk_mq_hw_ctx	*hctx = 
+		hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
 
-Thanks,
--Andrea
+	if (hctx->tags)
+		clear_bit(BLK_MQ_TAGS_DRAINED, &hctx->tags->flags);
+	return 0;
+}
 
-> 
-> > In the case where you have three cgroups all issuing fsync(2) and they
-> > all landed in the same jbd2 transaction thanks to commit batching, in
-> > the ideal world we would split up the disk time usage equally across
-> > those three cgroups.  But it's probably not worth doing that...
-> > 
-> > That being said, we probably do need some BFQ support, since in the
-> > case where we have multiple processes doing buffered writes w/o fsync,
-> > we do charnge the data=ordered writeback to each block cgroup.  Worse,
-> > the commit can't complete until the all of the data integrity
-> > writebacks have completed.  And if there are N cgroups with dirty
-> > inodes, and slice_idle set to 8ms, there is going to be 8*N ms worth
-> > of idle time tacked onto the commit time.
-> > 
-> 
-> Jan already wrote part of what I wanted to reply here, so I'll
-> continue from his reply.
-> 
-> Thanks,
-> Paolo
-> 
-> > If we charge the journal I/O to the cgroup, and there's only one
-> > process doing the
-> > 
-> >   dd if=/dev/zero of=/root/test.img bs=512 count=10000 oflags=dsync
-> > 
-> > then we don't need to worry about this failure mode, since both the
-> > journal I/O and the data writeback will be hitting the same cgroup.
-> > But that's arguably an artificial use case, and much more commonly
-> > there will be multiple cgroups all trying to at least some file system
-> > I/O.
-> > 
-> > 						- Ted
-> 
+> +static void blk_mq_drain_inflight_rqs(struct blk_mq_tags *tags, int dead_cpu)
+> +{
+> +	unsigned long msecs_left = 1000 * 5;
+> +
+> +	if (!tags)
+> +		return;
+> +
+> +	if (test_and_set_bit(BLK_MQ_TAGS_DRAINED, &tags->flags))
+> +		return;
+> +
+> +	while (msecs_left > 0) {
+> +		if (!blk_mq_tags_inflight_rqs(tags))
+> +			break;
+> +		msleep(5);
+> +		msecs_left -= 5;
+> +	}
+> +
+> +	if (msecs_left > 0)
+> +		printk(KERN_WARNING "requests not completed from dead "
+> +				"CPU %d\n", dead_cpu);
+> +}
 
+Isn't this condition inverted?  If we break out early msecs_left will
+be larger than 0 and we are fine.
 
+Why not:
+
+	for (attempts = 0; attempts < 1000; attempts++) {
+		if (!blk_mq_tags_inflight_rqs(tags))
+			return;
+	}
+
+	...
+
+But more importantly I'm not sure we can just give up that easily.
+Shouldn't we at lest wait the same timeout we otherwise have for
+requests, and if the command isn't finished in time kick off error
+handling?
