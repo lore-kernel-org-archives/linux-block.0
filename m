@@ -2,83 +2,337 @@ Return-Path: <SRS0=6LXE=TW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 701FCC46460
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 20:33:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B270BC282DD
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 21:12:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 337082173C
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 20:33:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558557190;
-	bh=rxXoUM+jrWzLARo7p0qsj0QyHP/xt/UnSxert5sNGsw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=NCZ9ghh/8muKGw8YRsyN9NBRepdzVFzkp18CNxPYwVkwQ6UzaJtewqo1DMMmZ2yB/
-	 xcQrMJlcmIaV1zYEi1megZvpjV/mk1WXGjV7v/yJj3NpLWxo5bHyyicZz/8EfuzvF7
-	 yytalS4lY7uTjKytOdKjxUxnQWf6/BYF0Qf4yAmA=
+	by mail.kernel.org (Postfix) with ESMTP id 4D6182054F
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 21:12:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CpcVdY8g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728761AbfEVUdJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 May 2019 16:33:09 -0400
-Received: from mga18.intel.com ([134.134.136.126]:16565 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727984AbfEVUdJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 May 2019 16:33:09 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 May 2019 13:33:08 -0700
-X-ExtLoop1: 1
-Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
-  by orsmga002.jf.intel.com with ESMTP; 22 May 2019 13:33:08 -0700
-Date:   Wed, 22 May 2019 14:28:05 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH 0/2] Reset timeout for paused hardware
-Message-ID: <20190522202805.GA5781@localhost.localdomain>
-References: <20190522174812.5597-1-keith.busch@intel.com>
- <721e059e-ed88-734c-fea2-3637e6d31f4c@acm.org>
+        id S1729770AbfEVVMS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 May 2019 17:12:18 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:37943 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729720AbfEVVMR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 May 2019 17:12:17 -0400
+Received: by mail-lj1-f194.google.com with SMTP id 14so3438640ljj.5;
+        Wed, 22 May 2019 14:12:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=g1JDwv6DsF/R2W3Hhi+fRQf2Wpp35+okn4+cO0Bor4E=;
+        b=CpcVdY8gtYjb6P8gpIw0BmeeElTuj0Hhd7ZWfUbFtQh6nRggZpzCg8VDfzZfdDbGKY
+         pj41HkhH1UzqHQwstKCkJiCUarMb7jxu8gbPsQRq9hKkEYRzWjn/JBRFreTnFZkSbazt
+         l32yq9PFS20Iiy1PnyXBEOibLcc3ziZylXznA7vkFRSwovtHxHXybxTCb0WKYlGW9/qo
+         tOyxS/ZKwn9pQsAgz9nRGGy72rxrq9xE4TerGZ/lyYtyTzNlKPXOgpIoGs/8+3nsrI2Q
+         g5/ZupjYXqOrGyks2oIxgd5O7Kl24Wuh4EEVH9G1jRFGug+dsbOCHL2uOdSOVCUeXaZf
+         Q8JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=g1JDwv6DsF/R2W3Hhi+fRQf2Wpp35+okn4+cO0Bor4E=;
+        b=EouD06qbCr0xioBKodrIhEVYrM5JMr4HJJ5UYvNofyHNEFm8AgUJQ5IOYuvXgyzEkh
+         R1h4gLLPrqjCg+KDROLvnjwhW7Ql5cGWd5Uw4gn4n5ZzMJIczs9ms0VmrV6OOgd20bcN
+         ZMFmKBZr6zA8IlXSuexnms2rcAtFiDDEIP8p2t2+DtM4bqVjgPQAihIFocHxeoslaxdM
+         1lsvSWOH/MZEcISFnLpKtoz2duPnjV3FRAi3Ok+sSzUlc7g0739fwa8hCMvDTGYjvDcQ
+         fYeVjlpLw/qRnjQA8b2v/wjKdwMweIKMV2wHoAcZdSXZ4ZvWpFpv3HuybxHBaxjfQ9S8
+         Zu4Q==
+X-Gm-Message-State: APjAAAXlos3lv7Hs4jvcvQGJA7iRx0tnMFAZbfZ9qDgv++MOtWssMKv+
+        O4N/pY9yldd6WSf93onZWQU=
+X-Google-Smtp-Source: APXvYqxHtRvDgngbiW+UmX4FEmTGxfk64Oa5UkQ+bxX8hf5+g9A0o8XZGm9SJRHhtch1fwU7a324Zw==
+X-Received: by 2002:a2e:5515:: with SMTP id j21mr20462954ljb.198.1558559534455;
+        Wed, 22 May 2019 14:12:14 -0700 (PDT)
+Received: from elitebook.lan (ip-194-187-74-233.konfederacka.maverick.com.pl. [194.187.74.233])
+        by smtp.googlemail.com with ESMTPSA id h2sm5670744lfm.17.2019.05.22.14.12.13
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Wed, 22 May 2019 14:12:13 -0700 (PDT)
+Subject: Re: ARM router NAT performance affected by random/unrelated commits
+To:     Russell King - ARM Linux admin <linux@armlinux.org.uk>
+Cc:     Network Development <netdev@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, John Crispin <john@phrozen.org>,
+        Jonas Gorski <jonas.gorski@gmail.com>,
+        Jo-Philipp Wich <jo@mein.io>
+References: <9a9ba4c9-3cb7-eb64-4aac-d43b59224442@gmail.com>
+ <20190521104512.2r67fydrgniwqaja@shell.armlinux.org.uk>
+ <de262f71-748f-d242-f1d4-ea10188a0438@gmail.com>
+ <20190522121730.fhswxkw4gbflkhei@shell.armlinux.org.uk>
+From:   =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
+Message-ID: <d0d67f85-01e9-037a-3a18-6282a8bfce5c@gmail.com>
+Date:   Wed, 22 May 2019 23:12:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <721e059e-ed88-734c-fea2-3637e6d31f4c@acm.org>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+In-Reply-To: <20190522121730.fhswxkw4gbflkhei@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 22, 2019 at 10:20:45PM +0200, Bart Van Assche wrote:
-> On 5/22/19 7:48 PM, Keith Busch wrote:
-> > Hardware may temporarily stop processing commands that have
-> > been dispatched to it while activating new firmware. Some target
-> > implementation's paused state time exceeds the default request expiry,
-> > so any request dispatched before the driver could quiesce for the
-> > hardware's paused state will time out, and handling this may interrupt
-> > the firmware activation.
-> > 
-> > This two-part series provides a way for drivers to reset dispatched
-> > requests' timeout deadline, then uses this new mechanism from the nvme
-> > driver's fw activation work.
+On 22.05.2019 14:17, Russell King - ARM Linux admin wrote:
+> On Wed, May 22, 2019 at 01:51:01PM +0200, Rafał Miłecki wrote:
+>> On 21.05.2019 12:45, Russell King - ARM Linux admin wrote:> On Tue, May 21, 2019 at 12:28:48PM +0200, Rafał Miłecki wrote:
+>>>> I work on home routers based on Broadcom's Northstar SoCs. Those devices
+>>>> have ARM Cortex-A9 and most of them are dual-core.
+>>>>
+>>>> As for home routers, my main concern is network performance. That CPU
+>>>> isn't powerful enough to handle gigabit traffic so all kind of
+>>>> optimizations do matter. I noticed some unexpected changes in NAT
+>>>> performance when switching between kernels.
+>>>>
+>>>> My hardware is BCM47094 SoC (dual core ARM) with integrated network
+>>>> controller and external BCM53012 switch.
+>>>
+>>> Guessing, I'd say it's to do with the placement of code wrt cachelines.
+>>> You could try aligning some of the cache flushing code to a cache line
+>>> and see what effect that has.
+>>
+>> Is System.map a good place to check for functions code alignment?
+>>
+>> With Linux 4.19 + OpenWrt mtd patches I have:
+>> (...)
+>> c010ea94 t v7_dma_inv_range
+>> c010eae0 t v7_dma_clean_range
+>> (...)
+>> c02ca3d0 T blk_mq_update_nr_hw_queues
+>> c02ca69c T blk_mq_alloc_tag_set
+>> c02ca94c T blk_mq_release
+>> c02ca9b4 T blk_mq_free_queue
+>> c02caa88 T blk_mq_update_nr_requests
+>> c02cab50 T blk_mq_unique_tag
+>> (...)
+>>
+>> After cherry-picking 9316a9ed6895 ("blk-mq: provide helper for setting
+>> up an SQ queue and tag set"):
+>> (...)
+>> c010ea94 t v7_dma_inv_range
+>> c010eae0 t v7_dma_clean_range
+>> (...)
+>> c02ca3d0 T blk_mq_update_nr_hw_queues
+>> c02ca69c T blk_mq_alloc_tag_set
+>> c02ca94c T blk_mq_init_sq_queue <-- NEW
+>> c02ca9c0 T blk_mq_release <-- Different address of this & all below
+>> c02caa28 T blk_mq_free_queue
+>> c02caafc T blk_mq_update_nr_requests
+>> c02cabc4 T blk_mq_unique_tag
+>> (...)
+>>
+>> As you can see blk_mq_init_sq_queue has appeared in the System.map and
+>> it affected addresses of ~30000 symbols. I can believe some frequently
+>> used symbols got luckily aligned and that improved overall performance.
+>>
+>> Interestingly v7_dma_inv_range() and v7_dma_clean_range() were not
+>> relocated.
+>>
+>> *****
+>>
+>> I followed Russell's suggestion and added .align 5 to cache-v7.S (see
+>> two attached diffs).
+>>
+>> 1) v4.19 + OpenWrt mtd patches
+>>> egrep -B 1 -A 1 "v7_dma_(inv|clean)_range" System.map
+>> c010ea58 T v7_flush_kern_dcache_area
+>> c010ea94 t v7_dma_inv_range
+>> c010eae0 t v7_dma_clean_range
+>> c010eb18 T b15_dma_flush_range
+>>
+>> 2) v4.19 + OpenWrt mtd patches + two .align 5 in cache-v7.S
+>> c010ea6c T v7_flush_kern_dcache_area
+>> c010eac0 t v7_dma_inv_range
+>> c010eb20 t v7_dma_clean_range
+>> c010eb58 T b15_dma_flush_range
+>> (actually 15 symbols above v7_dma_inv_range were replaced)
+>>
+>> This method seems to be somehow working (at least affects addresses in
+>> System.map).
+>>
+>> *****
+>>
+>> I run 2 tests for each combination of changes. Each test consisted of
+>> 10 sequences of: 30 seconds iperf session + reboot.
+>>
+>>
+>>> git reset --hard v4.19
+>>> git am OpenWrt-mtd-chages.patch
+>> Test #1: 738 Mb/s
+>> Test #2: 737 Mb/s
+>>
+>>> git reset --hard v4.19
+>>> git am OpenWrt-mtd-chages.patch
+>> patch -p1 < v7_dma_clean_range-align.diff
+>> Test #1: 746 Mb/s
+>> Test #2: 747 Mb/s
+>>
+>>> git reset --hard v4.19
+>>> git am OpenWrt-mtd-chages.patch
+>>> patch -p1 < v7_dma_inv_range-align.diff
+>> Test #1: 745 Mb/s
+>> Test #2: 746 Mb/s
+>>
+>>> git reset --hard v4.19
+>>> git am OpenWrt-mtd-chages.patch
+>>> patch -p1 < v7_dma_clean_range-align.diff
+>>> patch -p1 < v7_dma_inv_range-align.diff
+>> Test #1: 762 Mb/s
+>> Test #2: 761 Mb/s
+>>
+>> As you can see I got a quite nice performance improvement after aligning
+>> both: v7_dma_clean_range() and v7_dma_inv_range().
 > 
-> Hi Keith,
+> This is an improvement of about 3.3%.
 > 
-> Is it essential to modify the block layer to implement this behavior
-> change? Would it be possible to implement this behavior change by
-> modifying the NVMe driver only, e.g. by modifying the nvme_timeout()
-> function and by making that function return BLK_EH_RESET_TIMER while new
-> firmware is being activated?
+>> It still wasn't as good as with 9316a9ed6895 cherry-picked but pretty
+>> close.
+>>
+>>
+>>> git reset --hard v4.19
+>>> git am OpenWrt-mtd-chages.patch
+>>> git cherry-pick -x 9316a9ed6895
+>> Test #1: 770 Mb/s
+>> Test #2: 766 Mb/s
+>>
+>>> git reset --hard v4.19
+>>> git am OpenWrt-mtd-chages.patch
+>>> git cherry-pick -x 9316a9ed6895
+>>> patch -p1 < v7_dma_clean_range-align.diff
+>> Test #1: 756 Mb/s
+>> Test #2: 759 Mb/s
+>>
+>>> git reset --hard v4.19
+>>> git am OpenWrt-mtd-chages.patch
+>>> git cherry-pick -x 9316a9ed6895
+>>> patch -p1 < v7_dma_inv_range-align.diff
+>> Test #1: 758 Mb/s
+>> Test #2: 759 Mb/s
+>>
+>>> git reset --hard v4.19
+>>> git am OpenWrt-mtd-chages.patch
+>>> git cherry-pick -x 9316a9ed6895
+>>> patch -p1 < v7_dma_clean_range-align.diff
+>>> patch -p1 < v7_dma_inv_range-align.diff
+>> Test #1: 767 Mb/s
+>> Test #2: 763 Mb/s
+>>
+>> Now you can see how unpredictable it is. If I cherry-pick 9316a9ed6895
+>> and do an extra alignment of v7_dma_clean_range() and v7_dma_inv_range()
+>> that extra alignment can actually *hurt* NAT performance.
+> 
+> You have a maximum variance of 4Mb/s in your tests which is around
+> 0.5%, and this shows a reduction of 3Mb/s, or 0.4%.
+> 
+> If we look at it a different way:
+> - Without the alignment patches, there is a difference of 4% in
+>    performance depending on whether 9316a9ed6895 is applied.
+> - With the alignment patches, there is a difference of 0.4% in
+>    performance depending on whether 9316a9ed6895 is applied.
+> 
+> How can this not be beneficial?
 
-Good question.
+Aligning v7_dma_clean_range() and v7_dma_inv_range() is definitely
+beneficial! I'm sorry I wasn't clear enough.
 
-We can't just do this from nvme_timeout(), though. That introduces races
-between timeout_work and fw_act_work if that fw work clears the
-condition that timeout needs to observe to return RESET_TIMER.
+I redid testing of 2 most important setups with few more iterations.
 
-Even if we avoid that race, the rq->deadline needs to be adjusted to
-the current time after the h/w unpause because the time accumulated while
-h/w halted itself should not be counted against the request.
+ > git reset --hard v4.19
+ > git am OpenWrt-mtd-chages.patch
+ > git cherry-pick -x 9316a9ed6895
+[  3]  0.0-30.0 sec  2.71 GBytes   776 Mbits/sec
+[  3]  0.0-30.0 sec  2.71 GBytes   775 Mbits/sec
+[  3]  0.0-30.0 sec  2.70 GBytes   774 Mbits/sec
+[  3]  0.0-30.0 sec  2.70 GBytes   774 Mbits/sec
+[  3]  0.0-30.0 sec  2.70 GBytes   773 Mbits/sec
+[  3]  0.0-30.0 sec  2.70 GBytes   773 Mbits/sec
+[  3]  0.0-30.0 sec  2.70 GBytes   773 Mbits/sec
+[  3]  0.0-30.0 sec  2.69 GBytes   771 Mbits/sec
+[  3]  0.0-30.0 sec  2.69 GBytes   771 Mbits/sec
+[  3]  0.0-30.0 sec  2.69 GBytes   771 Mbits/sec
+[  3]  0.0-30.0 sec  2.69 GBytes   771 Mbits/sec
+[  3]  0.0-30.0 sec  2.69 GBytes   770 Mbits/sec
+[  3]  0.0-30.0 sec  2.69 GBytes   770 Mbits/sec
+[  3]  0.0-30.0 sec  2.69 GBytes   770 Mbits/sec
+[  3]  0.0-30.0 sec  2.69 GBytes   770 Mbits/sec
+[  3]  0.0-30.0 sec  2.69 GBytes   769 Mbits/sec
+[  3]  0.0-30.0 sec  2.69 GBytes   769 Mbits/sec
+[  3]  0.0-30.0 sec  2.68 GBytes   768 Mbits/sec
+[  3]  0.0-30.0 sec  2.68 GBytes   768 Mbits/sec
+[  3]  0.0-30.0 sec  2.68 GBytes   767 Mbits/sec
+[  3]  0.0-30.0 sec  2.68 GBytes   767 Mbits/sec
+[  3]  0.0-30.0 sec  2.68 GBytes   767 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   765 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   765 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   764 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   763 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   763 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   762 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   760 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   760 Mbits/sec
+Average: 769 Mb/s (+4,10%)
+Previous results: 773 Mb/s, 770 Mb/s, 766 Mb/s
+
+ > git reset --hard v4.19
+ > git am OpenWrt-mtd-chages.patch
+ > patch -p1 < v7_dma_clean_range-align.diff
+ > patch -p1 < v7_dma_inv_range-align.diff
+[  3]  0.0-30.0 sec  2.69 GBytes   769 Mbits/sec
+[  3]  0.0-30.0 sec  2.69 GBytes   769 Mbits/sec
+[  3]  0.0-30.0 sec  2.68 GBytes   767 Mbits/sec
+[  3]  0.0-30.0 sec  2.68 GBytes   766 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   766 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   765 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   765 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   765 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   764 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   763 Mbits/sec
+[  3]  0.0-30.0 sec  2.67 GBytes   763 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   762 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   762 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   762 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   762 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   761 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   761 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   760 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   760 Mbits/sec
+[  3]  0.0-30.0 sec  2.66 GBytes   760 Mbits/sec
+[  3]  0.0-30.0 sec  2.65 GBytes   760 Mbits/sec
+[  3]  0.0-30.0 sec  2.65 GBytes   759 Mbits/sec
+[  3]  0.0-30.0 sec  2.65 GBytes   759 Mbits/sec
+[  3]  0.0-30.0 sec  2.65 GBytes   758 Mbits/sec
+[  3]  0.0-30.0 sec  2.65 GBytes   758 Mbits/sec
+[  3]  0.0-30.0 sec  2.65 GBytes   757 Mbits/sec
+[  3]  0.0-30.0 sec  2.65 GBytes   757 Mbits/sec
+[  3]  0.0-30.0 sec  2.65 GBytes   757 Mbits/sec
+[  3]  0.0-30.0 sec  2.64 GBytes   757 Mbits/sec
+[  3]  0.0-30.0 sec  2.64 GBytes   756 Mbits/sec
+Average: 762 Mb/s (+3,16%)
+Previous results: 767 Mb/s, 763 Mb/s
+
+So let me explain why I keep researching on this. There are two reasons:
+
+1) Realignment done by cherry-picking 9316a9ed6895 was providing a
+*marginally* better performance than aligning v7_dma_clean_range() and
+v7_dma_inv_range(). It's a *very* minimal difference but I can't stop
+thinking I can still do better.
+
+2) Cherry-picking 9316a9ed6895 doesn't change v7_dma_clean_range or
+v7_dma_inv_range addresses at all. Yet it still improves NAT
+performance. That makes me believe there are more functions that (if
+properly aligned) can bump NAT performance.
+I hope that aligning all:
+* v7_dma_clean_range
+* v7_dma_inv_range
+* [some unrevealed functions]
+could result in even better NAT performance.
