@@ -2,206 +2,192 @@ Return-Path: <SRS0=6LXE=TW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA6DC072B5
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 01:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDFB6C16A69
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 08:05:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7BAA4217D9
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 01:56:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8987320675
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 08:05:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nWl3XtfG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727424AbfEVB4o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 May 2019 21:56:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41766 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726466AbfEVB4o (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 May 2019 21:56:44 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B7D7183F3D;
-        Wed, 22 May 2019 01:56:36 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B141F60C78;
-        Wed, 22 May 2019 01:56:26 +0000 (UTC)
-Date:   Wed, 22 May 2019 09:56:21 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        Kashyap Desai <kashyap.desai@broadcom.com>
-Subject: Re: [PATCH] blk-mq: Wait for for hctx inflight requests on CPU unplug
-Message-ID: <20190522015620.GA11959@ming.t460p>
-References: <20190517091424.19751-1-ming.lei@redhat.com>
- <6e1d3b66-aaed-4f6f-da34-92a633ff4b44@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6e1d3b66-aaed-4f6f-da34-92a633ff4b44@huawei.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 22 May 2019 01:56:43 +0000 (UTC)
+        id S1728755AbfEVIFw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 May 2019 04:05:52 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:44260 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726358AbfEVIFw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 May 2019 04:05:52 -0400
+Received: by mail-wr1-f67.google.com with SMTP id w13so1122549wru.11
+        for <linux-block@vger.kernel.org>; Wed, 22 May 2019 01:05:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
+         :references;
+        bh=5IBIrmvVf6ccQNtdeu2yWc9LBHhhxGRdGfBVh0+028w=;
+        b=nWl3XtfGIqveSLzPdyEuAYRuA8O7EYCM0ZtEgQ98DXJsA2zQzynY9G9rSYeseu7ci5
+         5KOe7ue5VJv9/oJvslVlbwxovozJmUJVdfdiAwatZRNHOLWB605HT9Bht1bQhsJFoZ0h
+         O8Ew1carVKdmMVmYPwgVk523ad6Oonl8yVKfoZj1tw1DeQRbFyLA1HoOYSfd/eKsgKzQ
+         7RWbiLmAIak6Lu72/j5jH1NFhinktak81lGqNLQYBCAZxVHvcKAU457C1n52KVEAOBGV
+         B+iC9uipo0uWSS+ouPP7hYuVIetP/gSu/agvrI0QXpzU1JYl9nLLdXzXZEJDmP0Av+gV
+         LGFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:message-id:mime-version:subject:date
+         :in-reply-to:cc:to:references;
+        bh=5IBIrmvVf6ccQNtdeu2yWc9LBHhhxGRdGfBVh0+028w=;
+        b=LcxAdnQOeDtc1Y0AD/Xq7bcWYDL8ezl9EggcYBiqvqCnXa6y87RA4oaO/BLBOMHsdc
+         1CNvGKGLNGOXrg3F0alZVmOk2yuZyHSUPoYMcMC3Tv6YEzXbDCW4c42ev74w7sAO/GIM
+         FrOfJRujqtHH5N9DzX8G8zzMi8LAytYEE/e6qPZh177j8MwmQWY3LZ/NIfVWLIiLjpuW
+         LzLO/rt6vO2c6K3foldfmTVt/P8ByyzB12nlw00lE+i764JEHx6/1iKYPqlU++Oi8/Wu
+         lDrok/BAXEd0J2Gd6WUYnQbcLMqap9oZ3AybxgnZUZctwuUwcP/J3JKWLl/t7qVuDYia
+         VQXA==
+X-Gm-Message-State: APjAAAX5Mv+tdvfouhn4CVub0Ng7e67ug79LiO2WaVyUDYmI0l4PTGg+
+        qXf9F0rCifZr6gKeK4vCNNSdcQ==
+X-Google-Smtp-Source: APXvYqyp3cwbjBT2OIymk4j5HSd2Mnu+CvGqClw/DIwkORgLNVvAuawEHWU5ZpivC/01GynCrEiJXQ==
+X-Received: by 2002:adf:f9c3:: with SMTP id w3mr6562625wrr.271.1558512349291;
+        Wed, 22 May 2019 01:05:49 -0700 (PDT)
+Received: from [192.168.0.100] (88-147-40-42.dyn.eolo.it. [88.147.40.42])
+        by smtp.gmail.com with ESMTPSA id 34sm42104331wre.32.2019.05.22.01.05.47
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 22 May 2019 01:05:48 -0700 (PDT)
+From:   Paolo Valente <paolo.valente@linaro.org>
+Message-Id: <F5E29C98-6CC4-43B8-994D-0B5354EECBF3@linaro.org>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_D125924D-1FFE-4DC1-9485-B31EC5A3E5A7";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+Date:   Wed, 22 May 2019 10:05:46 +0200
+In-Reply-To: <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        jmoyer@redhat.com, Theodore Ts'o <tytso@mit.edu>,
+        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com
+To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
+ <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
+ <46c6a4be-f567-3621-2e16-0e341762b828@csail.mit.edu>
+ <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
+ <A0DFE635-EFEC-4670-AD70-5D813E170BEE@linaro.org>
+ <5B6570A2-541A-4CF8-98E0-979EA6E3717D@linaro.org>
+ <2CB39B34-21EE-4A95-A073-8633CF2D187C@linaro.org>
+ <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
+ <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi John,
 
-On Tue, May 21, 2019 at 02:50:06PM +0100, John Garry wrote:
-> On 17/05/2019 10:14, Ming Lei wrote:
-> > Managed interrupts can not migrate affinity when their CPUs are offline.
-> > If the CPU is allowed to shutdown before they're returned, commands
-> > dispatched to managed queues won't be able to complete through their
-> > irq handlers.
-> > 
-> > Wait in cpu hotplug handler until all inflight requests on the tags
-> > are completed or timeout. Wait once for each tags, so we can save time
-> > in case of shared tags.
-> > 
-> > Based on the following patch from Keith, and use simple delay-spin
-> > instead.
-> > 
-> > https://lore.kernel.org/linux-block/20190405215920.27085-1-keith.busch@intel.com/
-> > 
-> > Cc: Christoph Hellwig <hch@lst.de>
-> > Cc: Bart Van Assche <bvanassche@acm.org>
-> > Cc: Hannes Reinecke <hare@suse.com>
-> > Cc: John Garry <john.garry@huawei.com>
-> > Cc: Keith Busch <keith.busch@intel.com>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/blk-mq-tag.c |  2 +-
-> >  block/blk-mq-tag.h |  5 ++++
-> >  block/blk-mq.c     | 65 +++++++++++++++++++++++++++++++++++++++++++++-
-> >  3 files changed, 70 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> > index 7513c8eaabee..b24334f99c5d 100644
-> > --- a/block/blk-mq-tag.c
-> > +++ b/block/blk-mq-tag.c
-> > @@ -332,7 +332,7 @@ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
-> >   *		true to continue iterating tags, false to stop.
-> >   * @priv:	Will be passed as second argument to @fn.
-> >   */
-> > -static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
-> > +void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
-> >  		busy_tag_iter_fn *fn, void *priv)
-> >  {
-> >  	if (tags->nr_reserved_tags)
-> > diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-> > index 61deab0b5a5a..f8de50485b42 100644
-> > --- a/block/blk-mq-tag.h
-> > +++ b/block/blk-mq-tag.h
-> > @@ -19,6 +19,9 @@ struct blk_mq_tags {
-> >  	struct request **rqs;
-> >  	struct request **static_rqs;
-> >  	struct list_head page_list;
-> > +
-> > +	#define BLK_MQ_TAGS_DRAINED           0
-> > +	unsigned long flags;
-> >  };
-> > 
-> > 
-> > @@ -35,6 +38,8 @@ extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
-> >  extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
-> >  void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
-> >  		void *priv);
-> > +void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
-> > +		busy_tag_iter_fn *fn, void *priv);
-> > 
-> >  static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
-> >  						 struct blk_mq_hw_ctx *hctx)
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 08a6248d8536..d1d1b1a9628f 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -2214,6 +2214,60 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
-> >  	return -ENOMEM;
-> >  }
-> > 
-> > +static int blk_mq_hctx_notify_prepare(unsigned int cpu, struct hlist_node *node)
-> > +{
-> > +	struct blk_mq_hw_ctx	*hctx;
-> > +	struct blk_mq_tags	*tags;
-> > +
-> > +	hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
-> > +	tags = hctx->tags;
-> > +
-> > +	if (tags)
-> > +		clear_bit(BLK_MQ_TAGS_DRAINED, &tags->flags);
-> > +
-> 
-> Hi Ming,
-> 
-> Thanks for the effort here.
-> 
-> I would like to make an assertion on a related topic, which I hope you can
-> comment on:
-> 
-> For this drain mechanism to work, the blk_mq_hw_ctx’s (and related cpu
-> masks) for a request queue are required to match the hw queues used in the
-> LLDD (if using managed interrupts).
-> 
-> In others words, a SCSI LLDD needs to expose all hw queues for this to work.
-> 
-> The reason I say this is because if the LLDD does not expose the hw queues
-> and manages them internally - as some SCSI LLDDs do - yet uses managed
-> interrupts to spread the hw queue MSI vectors across all CPUs, then we still
-> only have a single blk_mq_hw_ctx per rq with a cpumask covering all cpus,
-> which is not what we would want.
+--Apple-Mail=_D125924D-1FFE-4DC1-9485-B31EC5A3E5A7
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-Good catch!
 
-This drain mechanism won't address the issue for these SCSI LLDDs in which:
 
-	1) blk_mq_hw_ctx serves as submission hw queue
+> Il giorno 22 mag 2019, alle ore 00:51, Srivatsa S. Bhat =
+<srivatsa@csail.mit.edu> ha scritto:
+>=20
+> [ Resending this mail with a dropbox link to the traces (instead
+> of a file attachment), since it didn't go through the last time. ]
+>=20
+> On 5/21/19 10:38 AM, Paolo Valente wrote:
+>>=20
+>>> So, instead of only sending me a trace, could you please:
+>>> 1) apply this new patch on top of the one I attached in my previous =
+email
+>>> 2) repeat your test and report results
+>>=20
+>> One last thing (I swear!): as you can see from my script, I tested =
+the
+>> case low_latency=3D0 so far.  So please, for the moment, do your test
+>> with low_latency=3D0.  You find the whole path to this parameter in,
+>> e.g., my script.
+>>=20
+> No problem! :) Thank you for sharing patches for me to test!
+>=20
+> I have good news :) Your patch improves the throughput significantly
+> when low_latency =3D 0.
+>=20
+> Without any patch:
+>=20
+> dd if=3D/dev/zero of=3D/root/test.img bs=3D512 count=3D10000 =
+oflag=3Ddsync
+> 10000+0 records in
+> 10000+0 records out
+> 5120000 bytes (5.1 MB, 4.9 MiB) copied, 58.0915 s, 88.1 kB/s
+>=20
+>=20
+> With both patches applied:
+>=20
+> dd if=3D/dev/zero of=3D/root/test0.img bs=3D512 count=3D10000 =
+oflag=3Ddsync
+> 10000+0 records in
+> 10000+0 records out
+> 5120000 bytes (5.1 MB, 4.9 MiB) copied, 3.87487 s, 1.3 MB/s
+>=20
+> The performance is still not as good as mq-deadline (which achieves
+> 1.6 MB/s), but this is a huge improvement for BFQ nonetheless!
+>=20
+> A tarball with the trace output from the 2 scenarios you requested,
+> one with only the debug patch applied =
+(trace-bfq-add-logs-and-BUG_ONs),
+> and another with both patches applied (trace-bfq-boost-injection) is
+> available here:
+>=20
+> https://www.dropbox.com/s/pdf07vi7afido7e/bfq-traces.tar.gz?dl=3D0
+>=20
 
-	2) one private reply queue serves as completion queue, for which one
-	MSI vector with cpumask is setup via pci_alloc_irq_vectors_affinity(PCI_IRQ_AFFINITY).
+Hi Srivatsa,
+I've seen the bugzilla you've created.  I'm a little confused on how
+to better proceed.  Shall we move this discussion to the bugzilla, or
+should we continue this discussion here, where it has started, and
+then update the bugzilla?
 
-What we should only drain is the completion queue if all its mapped
-CPUs are offline.
+Let me know,
+Paolo
 
-Looks you suggest to expose all completion(reply) queues as 'struct blk_mq_hw_ctx',
-which may involve in another more hard problem: how to split the single
-hostwide tags into each reply queue. I'd rather not work towards that
-direction because:
+> Thank you!
+>=20
+> Regards,
+> Srivatsa
+> VMware Photon OS
 
-1) it is very hard to partition global resources into several parts,
-especially it is hard to make every part happy.
 
-2) sbitmap is smart/efficient enough for this global allocation
+--Apple-Mail=_D125924D-1FFE-4DC1-9485-B31EC5A3E5A7
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
 
-3) no obvious improvement is obtained from the resource partition, according
-to previous experiment result done by Kashyap.
+-----BEGIN PGP SIGNATURE-----
 
-I think we could implement the drain mechanism in the following way:
+iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAlzlAtoACgkQOAkCLQGo
+9oMOew//baPEoy03FXyfpwRm+aDYCXZracwMcV8EWCYLxsc9h+OSDu7YSL3VY+ld
+2SyrH2br9GjVHPnM218Moh1g2pTGr9C2BtEzWT72DnGFmZqEYFOS3+KJ6D4FEK/l
+6qOtaYyYZDABc5D+wW1B+wouBFeDFH/V4QWpIgyAjKPHi+rTeerEFNzNmsx2SngT
+mn+AG8kUfecpNhThxEEJxPZN0Edso3t6vet2vsJ7FEmpxD+AW4V6h5oxRBMMlzks
+JeDs0/gvOV0wiRSAwlmQSecNSssSLLSeouHlLu3+ara3YxdNstDjBd7ODXiabUdX
+4NPn9U5baJ8XsC4s6ukMOm1Bc7Q97ZFS4cM5b9FoqTYgWuwL32vbHFPffe/0Ld2g
+hJcXoI7HmDyGvH4jAvlSQ4hDDkuLRjf0450Y75onK8uq/g6r0VhGXgntHl+ghMvI
+ykkrXo8cPp9Ii4MiOAbH4FaVj1/1yinJdiIbR7bCdj3kODB8wzLunSAB3GDVTqYr
+qqFfl6MYNxJi6mUpERhdFa8JsohkU9f/PK+hYh4HYjZNveV1YcSJfcuoCu2t1/yA
+04KNr+WG1JFQrrXe+iqXtu5EMD/K6QlH9iBXabq8V/JJ1TR/X3WXo2iPRhDfpKc7
++kRGBjEtU+WJvdECyd4AfTpVuKBK8tUewLIBr7WchCBggJ/4sFg=
+=q2Kr
+-----END PGP SIGNATURE-----
 
-1) if 'struct blk_mq_hw_ctx' serves as completion queue, use the
-approach in the patch
-
-2) otherwise:
-- introduce one callbcack of .prep_queue_dead(hctx, down_cpu) to
-'struct blk_mq_ops'
-
-- call .prep_queue_dead from blk_mq_hctx_notify_dead() 
-
-3) inside .prep_queue_dead():
-- the driver checks if all mapped CPU on the completion queue is offline
-- if yes, wait for in-flight requests originated from all CPUs mapped to
-this completion queue, and it can be implemented as one block layer API
-
-Any comments on the above approach?
-
-Thanks,
-Ming
+--Apple-Mail=_D125924D-1FFE-4DC1-9485-B31EC5A3E5A7--
