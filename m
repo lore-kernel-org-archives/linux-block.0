@@ -2,219 +2,236 @@ Return-Path: <SRS0=6LXE=TW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E12EC18E7D
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 09:13:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58FCDC18E7D
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 09:47:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A531217D7
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 09:13:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V8o6Ep+Q"
+	by mail.kernel.org (Postfix) with ESMTP id 2CB9E217D9
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 09:47:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728527AbfEVJM7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 May 2019 05:12:59 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39438 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728536AbfEVJM7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 May 2019 05:12:59 -0400
-Received: by mail-wr1-f67.google.com with SMTP id w8so1390755wrl.6
-        for <linux-block@vger.kernel.org>; Wed, 22 May 2019 02:12:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=rE8Wct0UxfEhY9tt7Rg+uVL4FI68TDcokTaqF5xHzQs=;
-        b=V8o6Ep+QR0eP6MpPvEQrnJLjZBxuAuNyjG5P+obSCbdPfNcV7GlxKOxPXZH723EgHx
-         gu3AHnqiE3fBRkTPcZMXbtxsTd1d+9OjAunY8+oWoqySlXfukrGZBl7A42oRbvdXO3lQ
-         lrEj5NXoCJhA0R94mQrV1ESLTZkoc2Cv/xIiF4bNW7M+L6Mf/pOoCFsF5TPe9JajpWqp
-         uFjj3rKSwQ1RerocltqB1Cexxr0KdDiPkdpx3BpAdGq6FPXdTyKRwI5Z4iF6k684XFVa
-         0cSE0F/CM0+zIs+jPxRmYYUgkeIKiiMNpm3QVgVHAZaGd28fK5Sa6QyYnSmvjJhe1aaV
-         gOHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=rE8Wct0UxfEhY9tt7Rg+uVL4FI68TDcokTaqF5xHzQs=;
-        b=ey6HDaXPp7yvI+sXoOy9/9+X/fP67JZLmGUe1U3TGXB0X+RsLlzvfkmXO5QGwgJ+HI
-         tTp3A1UQzxmDUuwHxHrJS0JM0BQR9lHmA9+4S0aMzLqZBUcTbsSD8nBPZcrZhywy3aMM
-         TVBzfYIen0Fakltf0yGoHODuiF4ctqGcbstwyeDkWPPdF94z2dfpazvay8TH7yLjug9p
-         Thw1r2npeTzNivyotuO53FIQEhl7JIxDaOzSOxsIOv+rcNT7PllF+b664a4BO6Bzu9j0
-         btnzVxk00v/AAJt0vNQs/8O5i/gbhQ/rwQaWXyo0t0QZYrehcrFGfEyX+onNg9VrE06G
-         n9Kw==
-X-Gm-Message-State: APjAAAVLhDEd/1Pz67pbqT/kCqPwzWjg7E6B4G66MfrS2VZS87OSnelr
-        RjLoLxIP/zzjIZWvMvMqGOlVZg==
-X-Google-Smtp-Source: APXvYqwvtxGG8jH6YwkZapBXJ/fgPv1poDp8G6YLsqJwnzUuyhinC6N/0tUvGOku1MTZYsEkVHp6yw==
-X-Received: by 2002:adf:f208:: with SMTP id p8mr33137611wro.160.1558516377240;
-        Wed, 22 May 2019 02:12:57 -0700 (PDT)
-Received: from [192.168.0.100] (88-147-40-42.dyn.eolo.it. [88.147.40.42])
-        by smtp.gmail.com with ESMTPSA id w3sm11277147wrv.25.2019.05.22.02.12.55
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 22 May 2019 02:12:56 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-Message-Id: <9E95BE27-2167-430F-9C7F-6D4A0E255FF3@linaro.org>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_4DC1C4F9-FFD5-4309-8346-630474A6C16C";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-Date:   Wed, 22 May 2019 11:12:55 +0200
-In-Reply-To: <f4b11315-144c-c67d-5143-50b5be950ede@csail.mit.edu>
-Cc:     linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        jmoyer@redhat.com, Theodore Ts'o <tytso@mit.edu>,
-        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com
-To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
- <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
- <46c6a4be-f567-3621-2e16-0e341762b828@csail.mit.edu>
- <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
- <A0DFE635-EFEC-4670-AD70-5D813E170BEE@linaro.org>
- <5B6570A2-541A-4CF8-98E0-979EA6E3717D@linaro.org>
- <2CB39B34-21EE-4A95-A073-8633CF2D187C@linaro.org>
- <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
- <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
- <F5E29C98-6CC4-43B8-994D-0B5354EECBF3@linaro.org>
- <f4b11315-144c-c67d-5143-50b5be950ede@csail.mit.edu>
-X-Mailer: Apple Mail (2.3445.104.8)
+        id S1728438AbfEVJrw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 May 2019 05:47:52 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54096 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728406AbfEVJrw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 May 2019 05:47:52 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 54D8DAF10;
+        Wed, 22 May 2019 09:47:50 +0000 (UTC)
+Subject: Re: [PATCH] blk-mq: Wait for for hctx inflight requests on CPU unplug
+To:     John Garry <john.garry@huawei.com>, Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        chenxiang <chenxiang66@hisilicon.com>
+References: <20190517091424.19751-1-ming.lei@redhat.com>
+ <6e1d3b66-aaed-4f6f-da34-92a633ff4b44@huawei.com>
+ <20190522015620.GA11959@ming.t460p>
+ <ce014369-4bf2-55fe-3c0f-3a46d3a016dc@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <1deeda32-eac2-9056-f17b-3a643e671374@suse.de>
+Date:   Wed, 22 May 2019 11:47:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <ce014369-4bf2-55fe-3c0f-3a46d3a016dc@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 5/22/19 11:06 AM, John Garry wrote:
+>>>>
+>>>> +static int blk_mq_hctx_notify_prepare(unsigned int cpu, struct 
+>>>> hlist_node *node)
+>>>> +{
+>>>> +    struct blk_mq_hw_ctx    *hctx;
+>>>> +    struct blk_mq_tags    *tags;
+>>>> +
+>>>> +    hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
+>>>> +    tags = hctx->tags;
+>>>> +
+>>>> +    if (tags)
+>>>> +        clear_bit(BLK_MQ_TAGS_DRAINED, &tags->flags);
+>>>> +
+>>>
+>>> Hi Ming,
+>>>
+>>> Thanks for the effort here.
+>>>
+>>> I would like to make an assertion on a related topic, which I hope 
+>>> you can
+>>> comment on:
+>>>
+>>> For this drain mechanism to work, the blk_mq_hw_ctx’s (and related cpu
+>>> masks) for a request queue are required to match the hw queues used 
+>>> in the
+>>> LLDD (if using managed interrupts).
+>>>
+>>> In others words, a SCSI LLDD needs to expose all hw queues for this 
+>>> to work.
+>>>
+More importantly, the SCSI LLDD needs to be _able_ to expose one hw 
+queue per CPU.
+Which cannot be taken for granted; especially in larger machines it's 
+relatively easy to have more CPUs than MSI-X vectores...
 
---Apple-Mail=_4DC1C4F9-FFD5-4309-8346-630474A6C16C
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+>>> The reason I say this is because if the LLDD does not expose the hw 
+>>> queues
+>>> and manages them internally - as some SCSI LLDDs do - yet uses managed
+>>> interrupts to spread the hw queue MSI vectors across all CPUs, then 
+>>> we still
+>>> only have a single blk_mq_hw_ctx per rq with a cpumask covering all 
+>>> cpus,
+>>> which is not what we would want.
+>>
+> 
+> Hi Ming,
+> 
+>> Good catch!
+>>
+>> This drain mechanism won't address the issue for these SCSI LLDDs in 
+>> which:
+>>
+>>     1) blk_mq_hw_ctx serves as submission hw queue
+>>
+>>     2) one private reply queue serves as completion queue, for which one
+>>     MSI vector with cpumask is setup via 
+>> pci_alloc_irq_vectors_affinity(PCI_IRQ_AFFINITY).
+>>
+>> What we should only drain is the completion queue if all its mapped
+>> CPUs are offline.
+>>
+Hmm. That's a very unusual setup. Typically it's the other way round; 
+SCSI LLDDs have several completion queues (as these are mapped to MSI-X 
+vectors), but only one submission queue.
+(Classical examples are mptsas, megaraid_sas, aacraid, and hpsa)
 
+But I still do think we need to handle this case; the HBA might not 
+expose enough MSI-X vectors/hw queues for us to map to all CPUs.
+In which case we'd be running into the same situation.
 
+And I do think we _need_ to drain the associated completion queue as 
+soon as _any_ CPU in that set it plugged; otherwise we can't ensure that 
+any interrupt for pending I/O will _not_ arrive at the dead CPU.
 
-> Il giorno 22 mag 2019, alle ore 11:02, Srivatsa S. Bhat =
-<srivatsa@csail.mit.edu> ha scritto:
->=20
-> On 5/22/19 1:05 AM, Paolo Valente wrote:
->>=20
->>=20
->>> Il giorno 22 mag 2019, alle ore 00:51, Srivatsa S. Bhat =
-<srivatsa@csail.mit.edu> ha scritto:
->>>=20
->>> [ Resending this mail with a dropbox link to the traces (instead
->>> of a file attachment), since it didn't go through the last time. ]
->>>=20
->>> On 5/21/19 10:38 AM, Paolo Valente wrote:
->>>>=20
->>>>> So, instead of only sending me a trace, could you please:
->>>>> 1) apply this new patch on top of the one I attached in my =
-previous email
->>>>> 2) repeat your test and report results
->>>>=20
->>>> One last thing (I swear!): as you can see from my script, I tested =
-the
->>>> case low_latency=3D0 so far.  So please, for the moment, do your =
-test
->>>> with low_latency=3D0.  You find the whole path to this parameter =
-in,
->>>> e.g., my script.
->>>>=20
->>> No problem! :) Thank you for sharing patches for me to test!
->>>=20
->>> I have good news :) Your patch improves the throughput significantly
->>> when low_latency =3D 0.
->>>=20
->>> Without any patch:
->>>=20
->>> dd if=3D/dev/zero of=3D/root/test.img bs=3D512 count=3D10000 =
-oflag=3Ddsync
->>> 10000+0 records in
->>> 10000+0 records out
->>> 5120000 bytes (5.1 MB, 4.9 MiB) copied, 58.0915 s, 88.1 kB/s
->>>=20
->>>=20
->>> With both patches applied:
->>>=20
->>> dd if=3D/dev/zero of=3D/root/test0.img bs=3D512 count=3D10000 =
-oflag=3Ddsync
->>> 10000+0 records in
->>> 10000+0 records out
->>> 5120000 bytes (5.1 MB, 4.9 MiB) copied, 3.87487 s, 1.3 MB/s
->>>=20
->>> The performance is still not as good as mq-deadline (which achieves
->>> 1.6 MB/s), but this is a huge improvement for BFQ nonetheless!
->>>=20
->>> A tarball with the trace output from the 2 scenarios you requested,
->>> one with only the debug patch applied =
-(trace-bfq-add-logs-and-BUG_ONs),
->>> and another with both patches applied (trace-bfq-boost-injection) is
->>> available here:
->>>=20
->>> https://www.dropbox.com/s/pdf07vi7afido7e/bfq-traces.tar.gz?dl=3D0
->>>=20
->>=20
->> Hi Srivatsa,
->> I've seen the bugzilla you've created.  I'm a little confused on how
->> to better proceed.  Shall we move this discussion to the bugzilla, or
->> should we continue this discussion here, where it has started, and
->> then update the bugzilla?
->>=20
->=20
-> Let's continue here on LKML itself.
+And yes, this would amount to quiesce the HBA completely if only one 
+queue is exposed. But there's no way around this; the alternative would 
+be to code a fallback patch in each driver to catch missing completions.
+Which would actually be an interface change, requiring each vendor / 
+maintainer to change their driver. Not very nice.
 
-Just done :)
+>> Looks you suggest to expose all completion(reply) queues as 'struct 
+>> blk_mq_hw_ctx',
+>> which may involve in another more hard problem:  how to split the single
+>> hostwide tags into each reply queue.
+> 
+> Yes, and this is what I expecting to hear Re. hostwide tags.
+> 
+But this case is handled already; things like lpfc and qla2xxx have been 
+converted to this model (exposing all hw queues, and use a host-wide 
+tagmap).
 
-> The only reason I created the
-> bugzilla entry is to attach the tarball of the traces, assuming
-> that it would allow me to upload a 20 MB file (since email attachment
-> didn't work). But bugzilla's file restriction is much smaller than
-> that, so it didn't work out either, and I resorted to using dropbox.
-> So we don't need the bugzilla entry anymore; I might as well close it
-> to avoid confusion.
->=20
+So from that side there is not really an issue.
 
-No no, don't close it: it can reach people that don't use LKML.  We
-just have to remember to report back at the end of this.  BTW, I also
-think that the bug is incorrectly filed against 5.1, while all these
-tests and results concern 5.2-rcX.
+I even provided patchset to convert megaraid_sas (cf 'megaraid_sas: 
+enable blk-mq for fusion'); you might want to have a look there to see 
+how it can be done.
 
-Thanks,
-Paolo
+> I'd rather not work towards that
+>> direction because:
+>>
+>> 1) it is very hard to partition global resources into several parts,
+>> especially it is hard to make every part happy.
+>>
+>> 2) sbitmap is smart/efficient enough for this global allocation
+>>
+>> 3) no obvious improvement is obtained from the resource partition, 
+>> according
+>> to previous experiment result done by Kashyap.
+> 
+> I'd like to also do the test.
+> 
+> However I would need to forward port the patchset, which no longer 
+> cleanly applies (I was referring to this 
+> https://lore.kernel.org/linux-block/20180205152035.15016-1-ming.lei@redhat.com/). 
+> Any help with that would be appreciated.
+> 
+If you would post it on the mailing list (or send it to me) I can have a 
+look. Converting SAS is on my list of things to do, anyway.
 
-> Regards,
-> Srivatsa
-> VMware Photon OS
+>>
+>> I think we could implement the drain mechanism in the following way:
+>>
+>> 1) if 'struct blk_mq_hw_ctx' serves as completion queue, use the
+>> approach in the patch
+> 
+> Maybe the gain of exposing multiple queues+managed interrupts outweighs 
+> the loss in the LLDD of having to generate this unique tag with sbitmap; 
+> I know that we did not use sbitmap ever in the LLDD for generating the 
+> tag when testing previously. However I'm still not too hopeful.
+> 
+Thing is, the tag _is_ already generated by the time the command is 
+passed to the LLDD. So there is no overhead; you just need to establish 
+a 1:1 mapping between SCSI cmds from the midlayer and your internal 
+commands.
 
+Which is where the problem starts: if you have to use the same command 
+pool for internal commands you have to set some tags aside to avoid a 
+clash with the tags generated from the block layer.
+That's easily done, but if you do that quiescing is getting harder, as 
+then the block layer wouldn't know about these internal commands.
+This is what I'm trying to address with my patchset to use private tags 
+in SCSI, as then the block layer maintains all tags, and is able to 
+figure out if the queue really is quiesced.
+(And I really need to post my patchset).
 
---Apple-Mail=_4DC1C4F9-FFD5-4309-8346-630474A6C16C
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
+>>
+>> 2) otherwise:
+>> - introduce one callbcack of .prep_queue_dead(hctx, down_cpu) to
+>> 'struct blk_mq_ops'
+> 
+> This would not be allowed to block, right?
+> 
+>>
+>> - call .prep_queue_dead from blk_mq_hctx_notify_dead()
+>>
+>> 3) inside .prep_queue_dead():
+>> - the driver checks if all mapped CPU on the completion queue is offline
+>> - if yes, wait for in-flight requests originated from all CPUs mapped to
+>> this completion queue, and it can be implemented as one block layer API
+> 
+> That could work. However I think that someone may ask why the LLDD just 
+> doesn't register for the CPU hotplug event itself (which I would really 
+> rather avoid), instead of being relayed the info from the block layer.
+> 
+Again; what would you do if not all CPUs from a pool are gone?
+You still might be getting interrupts for non-associated interrupts, and 
+quite some drivers are unhappy under these circumstances.
+Hence I guess it'll be better to quiesce the queue as soon as _any_ CPU 
+from the pool is gone.
 
------BEGIN PGP SIGNATURE-----
+Plus we could be doing this from the block layer without any callbacks 
+from the driver...
 
-iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAlzlEpcACgkQOAkCLQGo
-9oPdEw//WxVy6NXqpJ3PDhtxBUM+Q1PcVKlaTaCBteRnbxyptYxJJuedsDp9j1O1
-yU2XB75LNHy4NFLIVAqvdtSbmGpSl16XgFEq3t4/f5dGd066RhiV8f4APnQuqXHm
-MlwYjL6BdqYzP7MUCA7xBM0eNztJmHMpisG/ox1fpk4/YrJm0N9y0LHSxazPOaao
-dsRUqa97+tT3znMqFgTwGkfsYUZcuKc+nyQuZaFUwwKww8SqJYVTSXtcE+BIsngu
-tyw52Ty26br/9An4BXGXiDOXzB45s+AsvpJK+kntxB9BqSLnvCTNAWqPSJyvoHgn
-8DJvTjqHk53JsGuEs0kie3mGVB7VbDQ2ljRYhbYx11pVYKSxvS0ykmMKMd64Vyyb
-/VbB7q8t3cfpCU1YPsWUPjeiZIBkQNqlYsdhA1AclUMMEAo5k7nVZEG1tlvZrL9t
-D4sY5nOxd5shFqEb5wwxlMvmoLh7VP3bkxfuDetg/fKBT5HvsNcYrgX7EgumrM7j
-O+5KsvvhH/JbAXg70sicLqBZZGeXWf9s7lPO3JdVkoTXy2VaaQuFGocTN2tzMYhx
-5058wdhCYh8wnEJ3L+13JQv/P88WNiYkCzMJglsp7MKOFGWv7gzcyARTqkuhjm4h
-x5nNzFvvG6VWQi1LIWCMEthAWWoo+F2QDvHi71g890jQLrE0Ibg=
-=EX0B
------END PGP SIGNATURE-----
+Cheers,
 
---Apple-Mail=_4DC1C4F9-FFD5-4309-8346-630474A6C16C--
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
