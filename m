@@ -2,69 +2,57 @@ Return-Path: <SRS0=6LXE=TW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD1FC282CE
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 16:00:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F04C282DD
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 16:34:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 23BCD21479
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 16:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558540832;
-	bh=GmqD7AtA6ErScDiQ8O0QMe/qkGJxSpeJh0USFVx656I=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=c+Etjk1GlI2gEe+uDXeHCEaH1Tms45zehyvFx12nUfNTSid/Zj3CjNfHE/FmaTUjk
-	 fPfqjWcOdPyKaTSIhB7wllEMCeSWriKLxYYIYN0XT7EW7hQbcwop6mfXBduccKyciA
-	 4/5IVgsWNuW5JpYgZd7zRYNShW1KJ1REOu72hcMY=
+	by mail.kernel.org (Postfix) with ESMTP id F249D2081C
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 16:34:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Nz5EWsqu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729683AbfEVQAa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 May 2019 12:00:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45750 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729430AbfEVQA3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 May 2019 12:00:29 -0400
-Subject: Re: [git pull] device mapper fix for 5.2-rc2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558540829;
-        bh=GmqD7AtA6ErScDiQ8O0QMe/qkGJxSpeJh0USFVx656I=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=Lr4RJmJ60x9N8lH5XAK7kVdn2nO7mwfGYzJn9C4kekCw3eBDU2zGbx7dKApnVgB4Y
-         ymFbKnuxADQ0Ik7rP7WQ8H3DjybTs2h7/fSjdIK9L8EMN6K5BjBzq0tsp3BDWRw43V
-         NmEQNbm4GDxeVS/fyYhQI/aJJHaTN5nyxekgEbhE=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20190521233844.GA31426@redhat.com>
-References: <20190521233844.GA31426@redhat.com>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20190521233844.GA31426@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
- tags/for-5.2/dm-fix-1
-X-PR-Tracked-Commit-Id: 51b86f9a8d1c4bb4e3862ee4b4c5f46072f7520d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 86f9e56d08852961a1b9e062d59b71491d8c793a
-Message-Id: <155854082943.3461.2423715519320359357.pr-tracker-bot@kernel.org>
-Date:   Wed, 22 May 2019 16:00:29 +0000
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Michael Lass <bevan@bi-co.net>
+        id S1730119AbfEVQeG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 May 2019 12:34:06 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:40176 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728527AbfEVQeG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 May 2019 12:34:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=XAl6XStfwn9ykHM+UMfrM7hmTarBLo+XcSj1ABpfYiY=; b=Nz5EWsqumDwGY/radcevcHEjO
+        f/fyXL7GxouaJwIvI2j/gwTdQMiVik5ZtdWUHCSso4nZOwBrh4V5pU8rLaNs36LiEfwMfvZSQ8X8U
+        LQWGxsC7JOwQiMcBb8PBrvxjxa+Y32UA+x7YUmr2HfQC3XLq/K+DnVdbdHWPAD+/5zdN6Ib00SEy7
+        KrGyN/8NqLjqNTm2njntZ7y7KG8KN7WVrm8VpJ5FbwI+4coh+f71J+OOoLOUgH8rAzm+KpyV5Cyew
+        wj/VpUOgXJ1tQOsfFK36Uyg4ROKXF3bD7GypkcdeoRKRiWodB7tq0KLwcJLM9aL3ew/fu1/1SahMI
+        xZnOiJfrg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hTUBp-0007Ev-8B; Wed, 22 May 2019 16:34:05 +0000
+Date:   Wed, 22 May 2019 09:34:05 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        viro@zeniv.linux.org.uk
+Subject: Re: [PATCHSET 0/3] io_uring: support for linked SQEs
+Message-ID: <20190522163405.GA27743@infradead.org>
+References: <20190517214131.5925-1-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190517214131.5925-1-axboe@kernel.dk>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Tue, 21 May 2019 19:38:45 -0400:
-
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.2/dm-fix-1
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/86f9e56d08852961a1b9e062d59b71491d8c793a
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+This just apparead in your for-linus tree.  I don't think queueing
+up unreviewed features after -rc1 is acceptable..
