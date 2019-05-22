@@ -2,212 +2,316 @@ Return-Path: <SRS0=6LXE=TW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55737C18E7D
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 10:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7227CC282CE
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 11:51:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2AC66217D4
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 10:54:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36718217F9
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 11:51:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Oru7bhxH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pCIXG2ap"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729365AbfEVKyO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 May 2019 06:54:14 -0400
-Received: from mail-wm1-f42.google.com ([209.85.128.42]:51100 "EHLO
-        mail-wm1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729308AbfEVKyO (ORCPT
+        id S1728450AbfEVLvI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 May 2019 07:51:08 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:32803 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727464AbfEVLvH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 May 2019 06:54:14 -0400
-Received: by mail-wm1-f42.google.com with SMTP id f204so1738069wme.0
-        for <linux-block@vger.kernel.org>; Wed, 22 May 2019 03:54:12 -0700 (PDT)
+        Wed, 22 May 2019 07:51:07 -0400
+Received: by mail-lf1-f65.google.com with SMTP id x132so1476226lfd.0;
+        Wed, 22 May 2019 04:51:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=CNhkQEJls3nT3iMkh1/CUssdVTSurGv5Rigbx0wo7U4=;
-        b=Oru7bhxHELgGgoBi4ETh1p8HocPNWexprBV9cag2KIgoyMzmaiNQwjb/C9rBPs3ZAI
-         1P+sgXAq+LJ7ARtyNTI4NCxWWJc6H0XdbdS3gzpWGbzWqv2mLRxF3XBKnfPksvNy4bmf
-         Z2N4R5yg3IW6OCechLbsRxdHCdJwHtT86JuAGc5439Udl1VwIBq11R8j6O3p7r2AEC/L
-         y1v3u8BSe0ElkJjp4CXNQJbH5m1IP5ENonLLsP0JZ/gAU5M5ED3KOUsrtv1TabKpJpZO
-         8pKF7hu2w25OO7PxveAEep+kbBQOfRiYMA7x6Nz3poDzw9PJimXfPoy8tpcYkqHNm+8K
-         Mrtg==
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language;
+        bh=0ynUYONVcMiVbkrkcaIw584jgiD0pTwFWZg9Gin77bo=;
+        b=pCIXG2apP2eP17dxL3Fcc9s1Po4HcUjSyZOLarAaiah2CRKo092uOOzwoS8W+89Yoq
+         91OoZsgbqvKnGDCfmKFV150MeQygCfkDdxUH8Cti/NmOUmJwLO+zWIZTzZ2azXlcKUkw
+         yUwbmGmQkb5/YooUExPckSyPQG1+05oBe4i5+wfRTO584laJEGpbOy224XB+cxOqpxuz
+         ytlY1hevwI1YzM+s9v+C9I3e/zs1gvAj5dF0e1fYZ9+lrddjjPvIq1oQHnI6cYTp+7nI
+         aLmR45Is1Rt9j2qEz2hVcZIPKuKVrGDHn8Ap3EeOWK49nBg9kTmNDMmKCsqCNf5FB9pU
+         RL7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=CNhkQEJls3nT3iMkh1/CUssdVTSurGv5Rigbx0wo7U4=;
-        b=pXO4gk5UUpE4W7CKZeGZ2snGqADGjA9afw+VNS15QQTB1B9IWPmxT9uQmw6++1SkJN
-         s2gg6Jr8AxKWbRA3Po3xN0f0J7xEjPujtY5rP2A/GfkJ8czYr9MgIb+qNveSxL2x6YE5
-         +08mUrvIRdZVfwkT5VfdToWDYiXEdIizzLOJg6BtGVGuUMPvTiGjgRm3Uz7034m7pEDh
-         90QcTyO8ioGCieHhquH/ZT7+OgXqsYoAm40ho+713pDQlBLoGguJdmSwXy9sggQdH2tf
-         U+oJl1of5aOFv9PtJ6jJxadmqfQXMKtQvt+7sAXkdo37ZSMw9g9XPgs2U0Km5UkqdJQi
-         eFbA==
-X-Gm-Message-State: APjAAAVfw9eQ2Mlo/Re7yPKK0vGJWyN5e0CfCM6Ize8oAyaKLVWiLRjl
-        uIa6hfibqSWM1aaROXw8q4njzw==
-X-Google-Smtp-Source: APXvYqxxWhUiT/XYL68wetT0/Xm1tLz2ltHVCg3kd/rCLbdKFVY5j4a0s9Q2rPyucIGz4zDbxnBm5Q==
-X-Received: by 2002:a7b:c458:: with SMTP id l24mr6858233wmi.53.1558522451312;
-        Wed, 22 May 2019 03:54:11 -0700 (PDT)
-Received: from [192.168.0.100] (88-147-40-42.dyn.eolo.it. [88.147.40.42])
-        by smtp.gmail.com with ESMTPSA id w9sm5480053wmg.7.2019.05.22.03.54.09
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 22 May 2019 03:54:10 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-Message-Id: <CA8A23E2-6F22-4444-9A20-E052A94CAA9B@linaro.org>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_53A52072-8428-4910-8FA8-7AAC6D010D2E";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-Date:   Wed, 22 May 2019 12:54:07 +0200
-In-Reply-To: <01d55216-5718-767a-e1e6-aadc67b632f4@csail.mit.edu>
-Cc:     linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        jmoyer@redhat.com, Theodore Ts'o <tytso@mit.edu>,
-        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com
-To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
- <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
- <46c6a4be-f567-3621-2e16-0e341762b828@csail.mit.edu>
- <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
- <A0DFE635-EFEC-4670-AD70-5D813E170BEE@linaro.org>
- <5B6570A2-541A-4CF8-98E0-979EA6E3717D@linaro.org>
- <2CB39B34-21EE-4A95-A073-8633CF2D187C@linaro.org>
- <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
- <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
- <F5E29C98-6CC4-43B8-994D-0B5354EECBF3@linaro.org>
- <686D6469-9DE7-4738-B92A-002144C3E63E@linaro.org>
- <01d55216-5718-767a-e1e6-aadc67b632f4@csail.mit.edu>
-X-Mailer: Apple Mail (2.3445.104.8)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language;
+        bh=0ynUYONVcMiVbkrkcaIw584jgiD0pTwFWZg9Gin77bo=;
+        b=VKnWv7PrNYFTbCDLkXnNKJIohRMuSmbVJd+gVGekE1LkUm2HelUtQjhQ4wJBxqJSP6
+         U/Ogps9nMtgSrtFoE5CCVORAoRAgav67SbSsPS2MgPR54qxljYFVNYuhnXycnAPlDX+Z
+         SAPU2XsJKi146385VGwjfZc2Imesh2oElZlf9aSuMH9Ii6Uyar+JQUyi6tmLscJ+4U5P
+         1NBBk8dTJuG9tf3kotZ7CCUcZGRMUwuV009B95XiHKbatS+NEzz2oEHX1Ag71ADE3Crm
+         zaMxuoeosAENyriG6lVoHmNT+kEBUhZ8Lm4vNU1IFbDsmoffBJXKuhYs0QT+/m9FhPHo
+         7s+Q==
+X-Gm-Message-State: APjAAAV/92+ZyC5mf+sY6GnCEetOrXDxpyfBmPJ9mzJMTWfukt3+DCJV
+        biCZbHl/3UbgaZR00s9l/Pw=
+X-Google-Smtp-Source: APXvYqy2S4Tw15COferEzBGg+gYLtPOE26SWc436EPB7s/SfCOmOTSDqz+ruUjxlnOAUBK2I43Jfnw==
+X-Received: by 2002:a19:7d05:: with SMTP id y5mr9179157lfc.40.1558525864270;
+        Wed, 22 May 2019 04:51:04 -0700 (PDT)
+Received: from elitebook.lan (ip-194-187-74-233.konfederacka.maverick.com.pl. [194.187.74.233])
+        by smtp.googlemail.com with ESMTPSA id h10sm6193902ljm.9.2019.05.22.04.51.02
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Wed, 22 May 2019 04:51:03 -0700 (PDT)
+Subject: Re: ARM router NAT performance affected by random/unrelated commits
+To:     Russell King - ARM Linux admin <linux@armlinux.org.uk>
+Cc:     Network Development <netdev@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, John Crispin <john@phrozen.org>,
+        Jonas Gorski <jonas.gorski@gmail.com>,
+        Jo-Philipp Wich <jo@mein.io>, Felix Fietkau <nbd@nbd.name>
+References: <9a9ba4c9-3cb7-eb64-4aac-d43b59224442@gmail.com>
+ <20190521104512.2r67fydrgniwqaja@shell.armlinux.org.uk>
+From:   =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
+Message-ID: <de262f71-748f-d242-f1d4-ea10188a0438@gmail.com>
+Date:   Wed, 22 May 2019 13:51:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.2
+MIME-Version: 1.0
+In-Reply-To: <20190521104512.2r67fydrgniwqaja@shell.armlinux.org.uk>
+Content-Type: multipart/mixed;
+ boundary="------------1DD6FAD97BC7F1875FD92211"
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This is a multi-part message in MIME format.
+--------------1DD6FAD97BC7F1875FD92211
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---Apple-Mail=_53A52072-8428-4910-8FA8-7AAC6D010D2E
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+On 21.05.2019 12:45, Russell King - ARM Linux admin wrote:> On Tue, May 21, 2019 at 12:28:48PM +0200, Rafał Miłecki wrote:
+ >> I work on home routers based on Broadcom's Northstar SoCs. Those devices
+ >> have ARM Cortex-A9 and most of them are dual-core.
+ >>
+ >> As for home routers, my main concern is network performance. That CPU
+ >> isn't powerful enough to handle gigabit traffic so all kind of
+ >> optimizations do matter. I noticed some unexpected changes in NAT
+ >> performance when switching between kernels.
+ >>
+ >> My hardware is BCM47094 SoC (dual core ARM) with integrated network
+ >> controller and external BCM53012 switch.
+ >
+ > Guessing, I'd say it's to do with the placement of code wrt cachelines.
+ > You could try aligning some of the cache flushing code to a cache line
+ > and see what effect that has.
 
+Is System.map a good place to check for functions code alignment?
 
+With Linux 4.19 + OpenWrt mtd patches I have:
+(...)
+c010ea94 t v7_dma_inv_range
+c010eae0 t v7_dma_clean_range
+(...)
+c02ca3d0 T blk_mq_update_nr_hw_queues
+c02ca69c T blk_mq_alloc_tag_set
+c02ca94c T blk_mq_release
+c02ca9b4 T blk_mq_free_queue
+c02caa88 T blk_mq_update_nr_requests
+c02cab50 T blk_mq_unique_tag
+(...)
 
-> Il giorno 22 mag 2019, alle ore 12:01, Srivatsa S. Bhat =
-<srivatsa@csail.mit.edu> ha scritto:
->=20
-> On 5/22/19 2:09 AM, Paolo Valente wrote:
->>=20
->> First, thank you very much for testing my patches, and, above all, =
-for
->> sharing those huge traces!
->>=20
->> According to the your traces, the residual 20% lower throughput that =
-you
->> record is due to the fact that the BFQ injection mechanism takes a =
-few
->> hundredths of seconds to stabilize, at the beginning of the workload.
->> During that setup time, the throughput is equal to the dreadful =
-~60-90 KB/s
->> that you see without this new patch.  After that time, there
->> seems to be no loss according to the trace.
->>=20
->> The problem is that a loss lasting only a few hundredths of seconds =
-is
->> however not negligible for a write workload that lasts only 3-4
->> seconds.  Could you please try writing a larger file?
->>=20
->=20
-> I tried running dd for longer (about 100 seconds), but still saw =
-around
-> 1.4 MB/s throughput with BFQ, and between 1.5 MB/s - 1.6 MB/s with
-> mq-deadline and noop.
+After cherry-picking 9316a9ed6895 ("blk-mq: provide helper for setting
+up an SQ queue and tag set"):
+(...)
+c010ea94 t v7_dma_inv_range
+c010eae0 t v7_dma_clean_range
+(...)
+c02ca3d0 T blk_mq_update_nr_hw_queues
+c02ca69c T blk_mq_alloc_tag_set
+c02ca94c T blk_mq_init_sq_queue <-- NEW
+c02ca9c0 T blk_mq_release <-- Different address of this & all below
+c02caa28 T blk_mq_free_queue
+c02caafc T blk_mq_update_nr_requests
+c02cabc4 T blk_mq_unique_tag
+(...)
 
-Ok, then now the cause is the periodic reset of the mechanism.
+As you can see blk_mq_init_sq_queue has appeared in the System.map and
+it affected addresses of ~30000 symbols. I can believe some frequently
+used symbols got luckily aligned and that improved overall performance.
 
-It would be super easy to fill this gap, by just gearing the mechanism
-toward a very aggressive injection.  The problem is maintaining
-control.  As you can imagine from the performance gap between CFQ (or
-BFQ with malfunctioning injection) and BFQ with this fix, it is very
-hard to succeed in maximizing the throughput while at the same time
-preserving control on per-group I/O.
+Interestingly v7_dma_inv_range() and v7_dma_clean_range() were not
+relocated.
 
-On the bright side, you might be interested in one of the benefits
-that BFQ gives in return for this ~10% loss of throughput, in a
-scenario that may be important for you (according to affiliation you
-report): from ~500% to ~1000% higher throughput when you have to serve
-the I/O of multiple VMs, and to guarantee at least no starvation to
-any VM [1].  The same holds with multiple clients or containers, and
-in general with any set of entities that may compete for storage.
+*****
 
-[1] =
-https://www.linaro.org/blog/io-bandwidth-management-for-production-quality=
--services/
+I followed Russell's suggestion and added .align 5 to cache-v7.S (see
+two attached diffs).
 
-> But I'm not too worried about that difference.
->=20
->> In addition, I wanted to ask you whether you measured BFQ throughput
->> with traces disabled.  This may make a difference.
->>=20
->=20
-> The above result (1.4 MB/s) was obtained with traces disabled.
->=20
->> After trying writing a larger file, you can try with low_latency on.
->> On my side, it causes results to become a little unstable across
->> repetitions (which is expected).
->>=20
-> With low_latency on, I get between 60 KB/s - 100 KB/s.
->=20
+1) v4.19 + OpenWrt mtd patches
+ > egrep -B 1 -A 1 "v7_dma_(inv|clean)_range" System.map
+c010ea58 T v7_flush_kern_dcache_area
+c010ea94 t v7_dma_inv_range
+c010eae0 t v7_dma_clean_range
+c010eb18 T b15_dma_flush_range
 
-Gosh, full regression.  Fortunately, it is simply meaningless to use
-low_latency in a scenario where the goal is to guarantee per-group
-bandwidths.  Low-latency heuristics, to reach their (low-latency)
-goals, modify the I/O schedule compared to the best schedule for
-honoring group weights and boosting throughput.  So, as recommended in
-BFQ documentation, just switch low_latency off if you want to control
-I/O with groups.  It may still make sense to leave low_latency on
-in some specific case, which I don't want to bother you about.
+2) v4.19 + OpenWrt mtd patches + two .align 5 in cache-v7.S
+c010ea6c T v7_flush_kern_dcache_area
+c010eac0 t v7_dma_inv_range
+c010eb20 t v7_dma_clean_range
+c010eb58 T b15_dma_flush_range
+(actually 15 symbols above v7_dma_inv_range were replaced)
 
-However, I feel bad with such a low throughput :)  Would you be so
-kind to provide me with a trace?
+This method seems to be somehow working (at least affects addresses in
+System.map).
 
-Thanks,
-Paolo
+*****
 
-> Regards,
-> Srivatsa
-> VMware Photon OS
+I run 2 tests for each combination of changes. Each test consisted of
+10 sequences of: 30 seconds iperf session + reboot.
 
 
---Apple-Mail=_53A52072-8428-4910-8FA8-7AAC6D010D2E
+ > git reset --hard v4.19
+ > git am OpenWrt-mtd-chages.patch
+Test #1: 738 Mb/s
+Test #2: 737 Mb/s
+
+ > git reset --hard v4.19
+ > git am OpenWrt-mtd-chages.patch
+patch -p1 < v7_dma_clean_range-align.diff
+Test #1: 746 Mb/s
+Test #2: 747 Mb/s
+
+ > git reset --hard v4.19
+ > git am OpenWrt-mtd-chages.patch
+ > patch -p1 < v7_dma_inv_range-align.diff
+Test #1: 745 Mb/s
+Test #2: 746 Mb/s
+
+ > git reset --hard v4.19
+ > git am OpenWrt-mtd-chages.patch
+ > patch -p1 < v7_dma_clean_range-align.diff
+ > patch -p1 < v7_dma_inv_range-align.diff
+Test #1: 762 Mb/s
+Test #2: 761 Mb/s
+
+As you can see I got a quite nice performance improvement after aligning
+both: v7_dma_clean_range() and v7_dma_inv_range().
+
+It still wasn't as good as with 9316a9ed6895 cherry-picked but pretty
+close.
+
+
+ > git reset --hard v4.19
+ > git am OpenWrt-mtd-chages.patch
+ > git cherry-pick -x 9316a9ed6895
+Test #1: 770 Mb/s
+Test #2: 766 Mb/s
+
+ > git reset --hard v4.19
+ > git am OpenWrt-mtd-chages.patch
+ > git cherry-pick -x 9316a9ed6895
+ > patch -p1 < v7_dma_clean_range-align.diff
+Test #1: 756 Mb/s
+Test #2: 759 Mb/s
+
+ > git reset --hard v4.19
+ > git am OpenWrt-mtd-chages.patch
+ > git cherry-pick -x 9316a9ed6895
+ > patch -p1 < v7_dma_inv_range-align.diff
+Test #1: 758 Mb/s
+Test #2: 759 Mb/s
+
+ > git reset --hard v4.19
+ > git am OpenWrt-mtd-chages.patch
+ > git cherry-pick -x 9316a9ed6895
+ > patch -p1 < v7_dma_clean_range-align.diff
+ > patch -p1 < v7_dma_inv_range-align.diff
+Test #1: 767 Mb/s
+Test #2: 763 Mb/s
+
+Now you can see how unpredictable it is. If I cherry-pick 9316a9ed6895
+and do an extra alignment of v7_dma_clean_range() and v7_dma_inv_range()
+that extra alignment can actually *hurt* NAT performance.
+
+My guess is that:
+1) 9316a9ed6895 provides alignment of some very important function(s)
+2) DMA alignments on top ^^ provide some gain but also break some align
+
+*****
+
+SUMMARY
+
+It seems that for Linux 4.19 + my .config I can get a very lucky &
+optimal alignment of functions by cherry-picking 9316a9ed6895.
+
+I thought of checking functions reported by the "perf" tool with CPU
+usage of 2%+.
+
+All following functions keep their original address with 9316a9ed6895:
+__irqentry_text_end
+arch_cpu_idle
+l2c210_clean_range
+l2c210_inv_range
+v7_dma_clean_range
+v7_dma_inv_range
+
+Remaining 3 functions got reallocated:
+-c03e5038 t __netif_receive_skb_core
++c03e50b0 t __netif_receive_skb_core
+-c03c8b1c t bcma_host_soc_read32
++c03c8b94 t bcma_host_soc_read32
+-c0475620 T fib_table_lookup
++c0475698 T fib_table_lookup
+
+I tried aligning all 3 above functions using:
+__attribute__((aligned(32)))
+and got 756 Mb/s. It's better but still not ~770 Mb/s.
+
+Is there any easy way of identifying which of function alignments got
+such a big impact on NAT performance? I'd like to get those functions
+explicitly aligned using assembler/__attribute__/something.
+
+What I'm also afraid are false positives. I may end up aligning some
+unrelated function that just happens to align other ones. Just like
+cherry-picking 9316a9ed6895 having side-effects and not really fixing
+anything explicitly.
+
+--------------1DD6FAD97BC7F1875FD92211
+Content-Type: text/x-patch;
+ name="v7_dma_clean_range-align.diff"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
+ filename="v7_dma_clean_range-align.diff"
 
------BEGIN PGP SIGNATURE-----
+diff --git a/arch/arm/mm/cache-v7.S b/arch/arm/mm/cache-v7.S
+index 215df435bfb9..c60046cd34aa 100644
+--- a/arch/arm/mm/cache-v7.S
++++ b/arch/arm/mm/cache-v7.S
+@@ -373,6 +373,8 @@ v7_dma_inv_range:
+ 	ret	lr
+ ENDPROC(v7_dma_inv_range)
+ 
++	.align	5
++
+ /*
+  *	v7_dma_clean_range(start,end)
+  *	- start   - virtual start address of region
 
-iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAlzlKk8ACgkQOAkCLQGo
-9oM6/A//WCuWEiR1JltuM5aklvJR+eYW/8xLJ3rbu8+0GrZIuuF1iPSXcB9p5yBP
-Wv3z5VUoumSlsb9aQlq6M0TPc5htnj00mIIuKaOAXZOhLNjTCvIEaSm1K8CtAW2B
-03MrWYTQw50jvR6OxpKtU0SKcMQQLPweiJPdTjy4tWUGgYoswDXFg+en8HNgSLv4
-sNGJQ8NrBQHU13P2WBm/j0ikPdKUfrM5yt6SdP7fDiYxemuMCecvUHMQOqhS7bua
-bgzZ9Y0DJfNtkELmGxsrNgTehctLCc7AEaViSzQVZxLs+FPa7pFIv30D8Nt8Hx3b
-e9x2zS/LXryo/Nx5NFgeMCISd1FbU2+eVqNmJhnjdCzDFiMUEM4GaQ7MbDNKZ1sO
-6ud0S49AOKvX4AXp5W+lufgRhQIw6OmIopPcXmzhUI3NZ9AqK430a5PwMjaUMn67
-PL9RYaLBU3p/POExsr5beMhc7Z6yGPtWF/tTFZuzQx0j3SXNoLjolpHLc3T0R/06
-eC8iUx+IUhkcOKrlmq2p1cLHpqzCVX8wPa/2xxcDveg5MiKo/U8dxQ5xmGEa8sSs
-nuZKPU7SJKeXae0UtOB3H74NIJU0joKCKhRherD7zYiJdx9RwSAv40Vbbhnq1DBo
-XI57SYyx53LQmwIKLdHXOgE0EKCnxBzPxZIK3CQIuSR8bzYRe8o=
-=WeX3
------END PGP SIGNATURE-----
+--------------1DD6FAD97BC7F1875FD92211
+Content-Type: text/x-patch;
+ name="v7_dma_inv_range-align.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="v7_dma_inv_range-align.diff"
 
---Apple-Mail=_53A52072-8428-4910-8FA8-7AAC6D010D2E--
+diff --git a/arch/arm/mm/cache-v7.S b/arch/arm/mm/cache-v7.S
+index 215df435bfb9..0c3999f219ab 100644
+--- a/arch/arm/mm/cache-v7.S
++++ b/arch/arm/mm/cache-v7.S
+@@ -340,6 +340,8 @@ ENTRY(v7_flush_kern_dcache_area)
+ 	ret	lr
+ ENDPROC(v7_flush_kern_dcache_area)
+ 
++	.align	5
++
+ /*
+  *	v7_dma_inv_range(start,end)
+  *
+
+--------------1DD6FAD97BC7F1875FD92211--
