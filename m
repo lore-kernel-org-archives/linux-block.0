@@ -2,118 +2,301 @@ Return-Path: <SRS0=6LXE=TW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D45DC282DC
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 17:53:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F61C282CE
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 19:21:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E970220879
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 17:53:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 114E22186A
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 19:21:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1558552905;
+	bh=/x4OjuKTJbdwFJUuUeo6m7mPKGoWuj9Z7ADizqsKEPo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=LJjwUjzLZ9XsQ+LXsoeaw8bE9WYqtqLohhYFFFOgG5O0HJ9iUznBNzDGRVm4W0ciF
+	 Osp/zpOxe1496l1x1Q1eR64mR/2bTm+CjRgLCHiY0we5pSEzWGG5xYtOOQLakuU87Z
+	 NRfE0uu8eRygCpzWcTBgM4jbpY/O8BTesvGC6sKI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728533AbfEVRxR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 May 2019 13:53:17 -0400
-Received: from mga07.intel.com ([134.134.136.100]:57850 "EHLO mga07.intel.com"
+        id S1730043AbfEVTVo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 May 2019 15:21:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42304 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728450AbfEVRxR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 May 2019 13:53:17 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 May 2019 10:53:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,500,1549958400"; 
-   d="scan'208";a="174471736"
-Received: from unknown (HELO localhost.lm.intel.com) ([10.232.112.69])
-  by fmsmga002.fm.intel.com with ESMTP; 22 May 2019 10:53:15 -0700
-From:   Keith Busch <keith.busch@intel.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>, Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 2/2] nvme: reset request timeouts during fw activation
-Date:   Wed, 22 May 2019 11:48:12 -0600
-Message-Id: <20190522174812.5597-3-keith.busch@intel.com>
-X-Mailer: git-send-email 2.13.6
-In-Reply-To: <20190522174812.5597-1-keith.busch@intel.com>
-References: <20190522174812.5597-1-keith.busch@intel.com>
+        id S1730039AbfEVTVn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 May 2019 15:21:43 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 988E5217D4;
+        Wed, 22 May 2019 19:21:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1558552901;
+        bh=/x4OjuKTJbdwFJUuUeo6m7mPKGoWuj9Z7ADizqsKEPo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=u4TtBG08ujhYHR2Vo6K00pfm5FYn7FRyWE+myLGS5U3gcVn8cx61GJMhI93of2zBV
+         x99MyGv1L3Nb5ZRuyUfMpotIoVWCQ1WKCBkad95jCCBnncZM7T0DDbR/RcPtuFJ5WV
+         9+3RYoZGPYVI3DL1wat4ZnWh2IsbxC50di1E+S+c=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.1 019/375] blk-mq: split blk_mq_alloc_and_init_hctx into two parts
+Date:   Wed, 22 May 2019 15:15:19 -0400
+Message-Id: <20190522192115.22666-19-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190522192115.22666-1-sashal@kernel.org>
+References: <20190522192115.22666-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The nvme controller may pause command processing during firmware
-activation. The driver will quiesce queues during this time, but commands
-dispatched prior to the notification will not be processed until the
-hardware completes this activation.
+From: Ming Lei <ming.lei@redhat.com>
 
-We do not want those requests to time out while the hardware is in
-this paused state as we don't expect those commands to complete during
-this time, and that handling will interfere with the firmware activation
-process.
+[ Upstream commit 7c6c5b7c9186e3fb5b10afb8e5f710ae661144c6 ]
 
-In addition to quiescing the queues, halt timeout detection during the
-paused state and reset the dispatched request deadlines when the hardware
-exists that state. This action applies to IO and admin queues.
+Split blk_mq_alloc_and_init_hctx into two parts, and one is
+blk_mq_alloc_hctx() for allocating all hctx resources, another
+is blk_mq_init_hctx() for initializing hctx, which serves as
+counter-part of blk_mq_exit_hctx().
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
+Cc: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-scsi@vger.kernel.org
+Cc: Martin K . Petersen <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Tested-by: James Smart <james.smart@broadcom.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/nvme/host/core.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ block/blk-mq.c | 139 ++++++++++++++++++++++++++-----------------------
+ 1 file changed, 75 insertions(+), 64 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 1b7c2afd84cb..37a9a66ada22 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -89,6 +89,7 @@ static dev_t nvme_chr_devt;
- static struct class *nvme_class;
- static struct class *nvme_subsys_class;
- 
-+static void nvme_reset_queues(struct nvme_ctrl *ctrl);
- static int nvme_revalidate_disk(struct gendisk *disk);
- static void nvme_put_subsystem(struct nvme_subsystem *subsys);
- static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
-@@ -3605,6 +3606,11 @@ static void nvme_fw_act_work(struct work_struct *work)
- 				msecs_to_jiffies(admin_timeout * 1000);
- 
- 	nvme_stop_queues(ctrl);
-+	nvme_sync_queues(ctrl);
-+
-+	blk_mq_quiesce_queue(ctrl->admin_q);
-+	blk_sync_queue(ctrl->admin_q);
-+
- 	while (nvme_ctrl_pp_status(ctrl)) {
- 		if (time_after(jiffies, fw_act_timeout)) {
- 			dev_warn(ctrl->device,
-@@ -3618,7 +3624,12 @@ static void nvme_fw_act_work(struct work_struct *work)
- 	if (ctrl->state != NVME_CTRL_LIVE)
- 		return;
- 
-+	blk_mq_reset_rqs(ctrl->admin_q);
-+	blk_mq_unquiesce_queue(ctrl->admin_q);
-+
-+	nvme_reset_queues(ctrl);
- 	nvme_start_queues(ctrl);
-+
- 	/* read FW slot information to clear the AER */
- 	nvme_get_fw_slot_info(ctrl);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index fc60ed7e940ea..24e3ae3bd710e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2289,15 +2289,65 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+ 	}
  }
-@@ -3901,6 +3912,15 @@ void nvme_start_queues(struct nvme_ctrl *ctrl)
- }
- EXPORT_SYMBOL_GPL(nvme_start_queues);
  
-+static void nvme_reset_queues(struct nvme_ctrl *ctrl)
++static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
 +{
-+	struct nvme_ns *ns;
++	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
 +
-+	down_read(&ctrl->namespaces_rwsem);
-+	list_for_each_entry(ns, &ctrl->namespaces, list)
-+		blk_mq_reset_rqs(ns->queue);
-+	up_read(&ctrl->namespaces_rwsem);
++	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, srcu),
++			   __alignof__(struct blk_mq_hw_ctx)) !=
++		     sizeof(struct blk_mq_hw_ctx));
++
++	if (tag_set->flags & BLK_MQ_F_BLOCKING)
++		hw_ctx_size += sizeof(struct srcu_struct);
++
++	return hw_ctx_size;
 +}
- 
- void nvme_sync_queues(struct nvme_ctrl *ctrl)
++
+ static int blk_mq_init_hctx(struct request_queue *q,
+ 		struct blk_mq_tag_set *set,
+ 		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
  {
+-	int node;
++	hctx->queue_num = hctx_idx;
++
++	cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
++
++	hctx->tags = set->tags[hctx_idx];
++
++	if (set->ops->init_hctx &&
++	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
++		goto unregister_cpu_notifier;
+ 
+-	node = hctx->numa_node;
++	if (blk_mq_init_request(set, hctx->fq->flush_rq, hctx_idx,
++				hctx->numa_node))
++		goto exit_hctx;
++	return 0;
++
++ exit_hctx:
++	if (set->ops->exit_hctx)
++		set->ops->exit_hctx(hctx, hctx_idx);
++ unregister_cpu_notifier:
++	blk_mq_remove_cpuhp(hctx);
++	return -1;
++}
++
++static struct blk_mq_hw_ctx *
++blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
++		int node)
++{
++	struct blk_mq_hw_ctx *hctx;
++	gfp_t gfp = GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY;
++
++	hctx = kzalloc_node(blk_mq_hw_ctx_size(set), gfp, node);
++	if (!hctx)
++		goto fail_alloc_hctx;
++
++	if (!zalloc_cpumask_var_node(&hctx->cpumask, gfp, node))
++		goto free_hctx;
++
++	atomic_set(&hctx->nr_active, 0);
+ 	if (node == NUMA_NO_NODE)
+-		node = hctx->numa_node = set->numa_node;
++		node = set->numa_node;
++	hctx->numa_node = node;
+ 
+ 	INIT_DELAYED_WORK(&hctx->run_work, blk_mq_run_work_fn);
+ 	spin_lock_init(&hctx->lock);
+@@ -2305,58 +2355,45 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	hctx->queue = q;
+ 	hctx->flags = set->flags & ~BLK_MQ_F_TAG_SHARED;
+ 
+-	cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
+-
+-	hctx->tags = set->tags[hctx_idx];
+-
+ 	/*
+ 	 * Allocate space for all possible cpus to avoid allocation at
+ 	 * runtime
+ 	 */
+ 	hctx->ctxs = kmalloc_array_node(nr_cpu_ids, sizeof(void *),
+-			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY, node);
++			gfp, node);
+ 	if (!hctx->ctxs)
+-		goto unregister_cpu_notifier;
++		goto free_cpumask;
+ 
+ 	if (sbitmap_init_node(&hctx->ctx_map, nr_cpu_ids, ilog2(8),
+-				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY, node))
++				gfp, node))
+ 		goto free_ctxs;
+-
+ 	hctx->nr_ctx = 0;
+ 
+ 	spin_lock_init(&hctx->dispatch_wait_lock);
+ 	init_waitqueue_func_entry(&hctx->dispatch_wait, blk_mq_dispatch_wake);
+ 	INIT_LIST_HEAD(&hctx->dispatch_wait.entry);
+ 
+-	if (set->ops->init_hctx &&
+-	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
+-		goto free_bitmap;
+-
+ 	hctx->fq = blk_alloc_flush_queue(q, hctx->numa_node, set->cmd_size,
+-			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY);
++			gfp);
+ 	if (!hctx->fq)
+-		goto exit_hctx;
+-
+-	if (blk_mq_init_request(set, hctx->fq->flush_rq, hctx_idx, node))
+-		goto free_fq;
++		goto free_bitmap;
+ 
+ 	if (hctx->flags & BLK_MQ_F_BLOCKING)
+ 		init_srcu_struct(hctx->srcu);
++	blk_mq_hctx_kobj_init(hctx);
+ 
+-	return 0;
++	return hctx;
+ 
+- free_fq:
+-	blk_free_flush_queue(hctx->fq);
+- exit_hctx:
+-	if (set->ops->exit_hctx)
+-		set->ops->exit_hctx(hctx, hctx_idx);
+  free_bitmap:
+ 	sbitmap_free(&hctx->ctx_map);
+  free_ctxs:
+ 	kfree(hctx->ctxs);
+- unregister_cpu_notifier:
+-	blk_mq_remove_cpuhp(hctx);
+-	return -1;
++ free_cpumask:
++	free_cpumask_var(hctx->cpumask);
++ free_hctx:
++	kfree(hctx);
++ fail_alloc_hctx:
++	return NULL;
+ }
+ 
+ static void blk_mq_init_cpu_queues(struct request_queue *q,
+@@ -2700,51 +2737,25 @@ struct request_queue *blk_mq_init_sq_queue(struct blk_mq_tag_set *set,
+ }
+ EXPORT_SYMBOL(blk_mq_init_sq_queue);
+ 
+-static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
+-{
+-	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
+-
+-	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, srcu),
+-			   __alignof__(struct blk_mq_hw_ctx)) !=
+-		     sizeof(struct blk_mq_hw_ctx));
+-
+-	if (tag_set->flags & BLK_MQ_F_BLOCKING)
+-		hw_ctx_size += sizeof(struct srcu_struct);
+-
+-	return hw_ctx_size;
+-}
+-
+ static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
+ 		struct blk_mq_tag_set *set, struct request_queue *q,
+ 		int hctx_idx, int node)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 
+-	hctx = kzalloc_node(blk_mq_hw_ctx_size(set),
+-			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
+-			node);
++	hctx = blk_mq_alloc_hctx(q, set, node);
+ 	if (!hctx)
+-		return NULL;
+-
+-	if (!zalloc_cpumask_var_node(&hctx->cpumask,
+-				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
+-				node)) {
+-		kfree(hctx);
+-		return NULL;
+-	}
+-
+-	atomic_set(&hctx->nr_active, 0);
+-	hctx->numa_node = node;
+-	hctx->queue_num = hctx_idx;
++		goto fail;
+ 
+-	if (blk_mq_init_hctx(q, set, hctx, hctx_idx)) {
+-		free_cpumask_var(hctx->cpumask);
+-		kfree(hctx);
+-		return NULL;
+-	}
+-	blk_mq_hctx_kobj_init(hctx);
++	if (blk_mq_init_hctx(q, set, hctx, hctx_idx))
++		goto free_hctx;
+ 
+ 	return hctx;
++
++ free_hctx:
++	kobject_put(&hctx->kobj);
++ fail:
++	return NULL;
+ }
+ 
+ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
 -- 
-2.14.4
+2.20.1
 
