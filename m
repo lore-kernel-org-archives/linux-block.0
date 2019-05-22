@@ -2,77 +2,188 @@ Return-Path: <SRS0=6LXE=TW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D74C46470
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 12:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49082C282CE
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 12:30:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 818AC21841
-	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 12:29:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hv+PrGcy"
+	by mail.kernel.org (Postfix) with ESMTP id 23616217F9
+	for <linux-block@archiver.kernel.org>; Wed, 22 May 2019 12:30:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728761AbfEVM3F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 May 2019 08:29:05 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:60146 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728468AbfEVM3F (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 May 2019 08:29:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=nxaaWX0j8rFdFCm/Kf6KfpdTfcr9NsWGTpWvZ3FHBhY=; b=hv+PrGcylD/RhViTAbwni3aq1
-        xe+7U3VaHnwsgGlkvd6kOaP3tj0cLVstCL+jvUkotoawj7TvJkprlo8xC8sdmbgZZz/5CGp9TayKo
-        +38KKYlYkz7v0fEugB/tLaHxcEA5tOnG/Jo9XASNI3pUW4nlcqjHm5tfRib9ZKMX0bHss9nMvyfyZ
-        xETV4B2pzSyFYFzRc3IY7//hjt/rI0yWMhUnlFB3F4rH1rlPBgE9yai1f1GavQKEaz2jeQmOpDARB
-        wr0tmLu1YVa50sjtikBE4l9nW0qFp0d6fdWq2KLZmKuSU2IGdpPtVDpygUOvJQxPlaDLHvK1iD0WC
-        U1I0r1KYg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hTQMg-0002qe-3G; Wed, 22 May 2019 12:29:02 +0000
-Date:   Wed, 22 May 2019 05:29:01 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc:     ulf.hansson@linaro.org, wsa+renesas@sang-engineering.com,
-        linux-mmc@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v3 3/3] mmc: renesas_sdhi: use multiple segments if
- possible
-Message-ID: <20190522122901.GA4583@infradead.org>
-References: <1558520319-16452-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
- <1558520319-16452-4-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+        id S1729018AbfEVMau (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 May 2019 08:30:50 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:8230 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728744AbfEVMau (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 May 2019 08:30:50 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 436B4B160C86D6305229;
+        Wed, 22 May 2019 20:30:48 +0800 (CST)
+Received: from [127.0.0.1] (10.202.227.238) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Wed, 22 May 2019
+ 20:30:38 +0800
+Subject: Re: [PATCH] blk-mq: Wait for for hctx inflight requests on CPU unplug
+To:     Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
+References: <20190517091424.19751-1-ming.lei@redhat.com>
+ <6e1d3b66-aaed-4f6f-da34-92a633ff4b44@huawei.com>
+ <20190522015620.GA11959@ming.t460p>
+ <ce014369-4bf2-55fe-3c0f-3a46d3a016dc@huawei.com>
+ <1deeda32-eac2-9056-f17b-3a643e671374@suse.de>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        "Christoph Hellwig" <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        chenxiang <chenxiang66@hisilicon.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <11bb0171-d5a2-1faa-6fd6-6204b5a56cfc@huawei.com>
+Date:   Wed, 22 May 2019 13:30:31 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1558520319-16452-4-git-send-email-yoshihiro.shimoda.uh@renesas.com>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <1deeda32-eac2-9056-f17b-3a643e671374@suse.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.238]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 22, 2019 at 07:18:39PM +0900, Yoshihiro Shimoda wrote:
-> In IOMMU environment, since it's possible to merge scatter gather
-> buffers of memory requests to one iova, this patch changes the max_segs
-> value when init_card of mmc_host timing to improve the transfer
-> performance on renesas_sdhi_internal_dmac.
+>
+> But I still do think we need to handle this case; the HBA might not
+> expose enough MSI-X vectors/hw queues for us to map to all CPUs.
+> In which case we'd be running into the same situation.
+>
+> And I do think we _need_ to drain the associated completion queue as
+> soon as _any_ CPU in that set it plugged; otherwise we can't ensure that
+> any interrupt for pending I/O will _not_ arrive at the dead CPU.
 
-Well, you can't merge everything with an IOMMU.  For one not every
-IOMMU can merge multiple scatterlist segments, second even it can merge
-segements the segments need to be aligned to the IOMMU page size.  And
-then of course we might have an upper limit on the total mapping.
+Really? I did not think that it was possible for this to happen.
 
-> +	if (host->pdata->max_segs < SDHI_MAX_SEGS_IN_IOMMU &&
-> +	    host->pdev->dev.iommu_group &&
-> +	    (mmc_card_mmc(card) || mmc_card_sd(card)))
-> +		host->mmc->max_segs = SDHI_MAX_SEGS_IN_IOMMU;
+>
+> And yes, this would amount to quiesce the HBA completely if only one
+> queue is exposed. But there's no way around this; the alternative would
+> be to code a fallback patch in each driver to catch missing completions.
+> Which would actually be an interface change, requiring each vendor /
+> maintainer to change their driver. Not very nice.
+>
+>>> Looks you suggest to expose all completion(reply) queues as 'struct
+>>> blk_mq_hw_ctx',
+>>> which may involve in another more hard problem:  how to split the single
+>>> hostwide tags into each reply queue.
+>>
+>> Yes, and this is what I expecting to hear Re. hostwide tags.
+>>
+> But this case is handled already; things like lpfc and qla2xxx have been
+> converted to this model (exposing all hw queues, and use a host-wide
+> tagmap).
+>
+> So from that side there is not really an issue.
+>
+> I even provided patchset to convert megaraid_sas (cf 'megaraid_sas:
+> enable blk-mq for fusion'); you might want to have a look there to see
+> how it can be done.
 
-This is way to magic.  We'll need a proper DMA layer API to expose
-this information, and preferably a block layer helper to increase
-max_segs instead of hacking that up in the driver.
+ok, I'll have a search.
+
+>
+>> I'd rather not work towards that
+>>> direction because:
+>>>
+>>> 1) it is very hard to partition global resources into several parts,
+>>> especially it is hard to make every part happy.
+>>>
+>>> 2) sbitmap is smart/efficient enough for this global allocation
+>>>
+>>> 3) no obvious improvement is obtained from the resource partition,
+>>> according
+>>> to previous experiment result done by Kashyap.
+>>
+>> I'd like to also do the test.
+>>
+>> However I would need to forward port the patchset, which no longer
+>> cleanly applies (I was referring to this
+>> https://lore.kernel.org/linux-block/20180205152035.15016-1-ming.lei@redhat.com/).
+>> Any help with that would be appreciated.
+>>
+> If you would post it on the mailing list (or send it to me) I can have a
+> look. Converting SAS is on my list of things to do, anyway.
+>
+
+ok
+
+>>>
+>>> I think we could implement the drain mechanism in the following way:
+>>>
+>>> 1) if 'struct blk_mq_hw_ctx' serves as completion queue, use the
+>>> approach in the patch
+>>
+>> Maybe the gain of exposing multiple queues+managed interrupts
+>> outweighs the loss in the LLDD of having to generate this unique tag
+>> with sbitmap; I know that we did not use sbitmap ever in the LLDD for
+>> generating the tag when testing previously. However I'm still not too
+>> hopeful.
+>>
+> Thing is, the tag _is_ already generated by the time the command is
+> passed to the LLDD. So there is no overhead; you just need to establish
+> a 1:1 mapping between SCSI cmds from the midlayer and your internal
+> commands.
+>
+> Which is where the problem starts: if you have to use the same command
+> pool for internal commands you have to set some tags aside to avoid a
+> clash with the tags generated from the block layer.
+> That's easily done, but if you do that quiescing is getting harder, as
+> then the block layer wouldn't know about these internal commands.
+> This is what I'm trying to address with my patchset to use private tags
+> in SCSI, as then the block layer maintains all tags, and is able to
+> figure out if the queue really is quiesced.
+> (And I really need to post my patchset).
+
+Ack
+
+>
+>>>
+>>> 2) otherwise:
+>>> - introduce one callbcack of .prep_queue_dead(hctx, down_cpu) to
+>>> 'struct blk_mq_ops'
+>>
+>> This would not be allowed to block, right?
+>>
+>>>
+>>> - call .prep_queue_dead from blk_mq_hctx_notify_dead()
+>>>
+>>> 3) inside .prep_queue_dead():
+>>> - the driver checks if all mapped CPU on the completion queue is offline
+>>> - if yes, wait for in-flight requests originated from all CPUs mapped to
+>>> this completion queue, and it can be implemented as one block layer API
+>>
+>> That could work. However I think that someone may ask why the LLDD
+>> just doesn't register for the CPU hotplug event itself (which I would
+>> really rather avoid), instead of being relayed the info from the block
+>> layer.
+>>
+> Again; what would you do if not all CPUs from a pool are gone?
+> You still might be getting interrupts for non-associated interrupts, and
+> quite some drivers are unhappy under these circumstances.
+> Hence I guess it'll be better to quiesce the queue as soon as _any_ CPU
+> from the pool is gone.
+>
+> Plus we could be doing this from the block layer without any callbacks
+> from the driver...
+>
+> Cheers,
+>
+> Hannes
+
+Thanks,
+John
+
+
+
