@@ -2,245 +2,181 @@ Return-Path: <SRS0=5kok=TX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F34D8C282CE
-	for <linux-block@archiver.kernel.org>; Thu, 23 May 2019 02:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C31DC282CE
+	for <linux-block@archiver.kernel.org>; Thu, 23 May 2019 02:30:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B40A12173C
-	for <linux-block@archiver.kernel.org>; Thu, 23 May 2019 02:00:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B5CE20881
+	for <linux-block@archiver.kernel.org>; Thu, 23 May 2019 02:30:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728352AbfEWCAd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 May 2019 22:00:33 -0400
-Received: from smtpproxy19.qq.com ([184.105.206.84]:46454 "EHLO
-        smtpproxy19.qq.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727691AbfEWCAd (ORCPT
+        id S1728734AbfEWCa1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 May 2019 22:30:27 -0400
+Received: from outgoing-stata.csail.mit.edu ([128.30.2.210]:36078 "EHLO
+        outgoing-stata.csail.mit.edu" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728022AbfEWCa1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 May 2019 22:00:33 -0400
-X-QQ-mid: bizesmtp7t1558576828tg86gbhzk
-Received: from localhost.localdomain (unknown [218.76.23.26])
-        by esmtp4.qq.com (ESMTP) with 
-        id ; Thu, 23 May 2019 10:00:24 +0800 (CST)
-X-QQ-SSF: 01400000000000Q0VN60
-X-QQ-FEAT: mJep2VbaKxYl4BTctPrS0KuqaCYlz6IBikPeLA10ZNOR9dkK291Vl/WrmUe5N
-        1IH5Aezz7ge5osLvO/xaOJfWyzgJZVYU1QT9IPE+SeenVBjbrZvuwAO9sd+mDviv7/NA57i
-        NbsfRH0+/dwb8cBM6a6BnC49sJeEd+fKDvJeyo4FEP/jqk3+K4768iSzI0HFiaY4u2bYWZk
-        wllvoP5tuy4q18M25as2yYzgr+2zcujmW25oHrhhsV61k3YheVbvTPJWThOjAyOt+DRBVKL
-        WDmPguFAU5boaz3zibJmlC6C5NfZeC7Lvq0klZONtJYSUIla+0CZa35CYl0Bf49iJ5NV4rl
-        qmlcso8
-X-QQ-GoodBg: 2
-From:   Jackie Liu <liuyun01@kylinos.cn>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, Jackie Liu <liuyun01@kylinos.cn>
-Subject: [PATCH 3/3] io_uring: adjust the code logic when an error occurs
-Date:   Thu, 23 May 2019 09:59:47 +0800
-Message-Id: <1558576787-18310-3-git-send-email-liuyun01@kylinos.cn>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1558576787-18310-1-git-send-email-liuyun01@kylinos.cn>
-References: <1558576787-18310-1-git-send-email-liuyun01@kylinos.cn>
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign1
-X-QQ-Bgrelay: 1
+        Wed, 22 May 2019 22:30:27 -0400
+Received: from [4.30.142.84] (helo=srivatsab-a01.vmware.com)
+        by outgoing-stata.csail.mit.edu with esmtpsa (TLS1.2:RSA_AES_128_CBC_SHA1:128)
+        (Exim 4.82)
+        (envelope-from <srivatsa@csail.mit.edu>)
+        id 1hTdUn-000CNl-Vx; Wed, 22 May 2019 22:30:18 -0400
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        jmoyer@redhat.com, Theodore Ts'o <tytso@mit.edu>,
+        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com
+References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
+ <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
+ <46c6a4be-f567-3621-2e16-0e341762b828@csail.mit.edu>
+ <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
+ <A0DFE635-EFEC-4670-AD70-5D813E170BEE@linaro.org>
+ <5B6570A2-541A-4CF8-98E0-979EA6E3717D@linaro.org>
+ <2CB39B34-21EE-4A95-A073-8633CF2D187C@linaro.org>
+ <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
+ <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
+ <F5E29C98-6CC4-43B8-994D-0B5354EECBF3@linaro.org>
+ <686D6469-9DE7-4738-B92A-002144C3E63E@linaro.org>
+ <01d55216-5718-767a-e1e6-aadc67b632f4@csail.mit.edu>
+ <CA8A23E2-6F22-4444-9A20-E052A94CAA9B@linaro.org>
+From:   "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+Message-ID: <cc148388-3c82-d7c0-f9ff-8c31bb5dc77d@csail.mit.edu>
+Date:   Wed, 22 May 2019 19:30:14 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:60.0)
+ Gecko/20100101 Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <CA8A23E2-6F22-4444-9A20-E052A94CAA9B@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We can quickly reclaim memory and resources immediately
-when error happened, without having to go through longer logic.
+On 5/22/19 3:54 AM, Paolo Valente wrote:
+> 
+> 
+>> Il giorno 22 mag 2019, alle ore 12:01, Srivatsa S. Bhat <srivatsa@csail.mit.edu> ha scritto:
+>>
+>> On 5/22/19 2:09 AM, Paolo Valente wrote:
+>>>
+>>> First, thank you very much for testing my patches, and, above all, for
+>>> sharing those huge traces!
+>>>
+>>> According to the your traces, the residual 20% lower throughput that you
+>>> record is due to the fact that the BFQ injection mechanism takes a few
+>>> hundredths of seconds to stabilize, at the beginning of the workload.
+>>> During that setup time, the throughput is equal to the dreadful ~60-90 KB/s
+>>> that you see without this new patch.  After that time, there
+>>> seems to be no loss according to the trace.
+>>>
+>>> The problem is that a loss lasting only a few hundredths of seconds is
+>>> however not negligible for a write workload that lasts only 3-4
+>>> seconds.  Could you please try writing a larger file?
+>>>
+>>
+>> I tried running dd for longer (about 100 seconds), but still saw around
+>> 1.4 MB/s throughput with BFQ, and between 1.5 MB/s - 1.6 MB/s with
+>> mq-deadline and noop.
+> 
+> Ok, then now the cause is the periodic reset of the mechanism.
+> 
+> It would be super easy to fill this gap, by just gearing the mechanism
+> toward a very aggressive injection.  The problem is maintaining
+> control.  As you can imagine from the performance gap between CFQ (or
+> BFQ with malfunctioning injection) and BFQ with this fix, it is very
+> hard to succeed in maximizing the throughput while at the same time
+> preserving control on per-group I/O.
+> 
 
-In case of create uring, there is no data generated at this
-time, no need to reap events and polling data, it's more
-efficient to directly recycle the memory.
+Ah, I see. Just to make sure that this fix doesn't overly optimize for
+total throughput (because of the testcase we've been using) and end up
+causing regressions in per-group I/O control, I ran a test with
+multiple simultaneous dd instances, each writing to a different
+portion of the filesystem (well separated, to induce seeks), and each
+dd task bound to its own blkio cgroup. I saw similar results with and
+without this patch, and the throughput was equally distributed among
+all the dd tasks.
 
-In addition, it will make the code easy to understand.
+> On the bright side, you might be interested in one of the benefits
+> that BFQ gives in return for this ~10% loss of throughput, in a
+> scenario that may be important for you (according to affiliation you
+> report): from ~500% to ~1000% higher throughput when you have to serve
+> the I/O of multiple VMs, and to guarantee at least no starvation to
+> any VM [1].  The same holds with multiple clients or containers, and
+> in general with any set of entities that may compete for storage.
+> 
+> [1] https://www.linaro.org/blog/io-bandwidth-management-for-production-quality-services/
+> 
 
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
----
- fs/io_uring.c | 96 +++++++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 63 insertions(+), 33 deletions(-)
+Great article! :) Thank you for sharing it!
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 3bbd202..035d729 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -361,6 +361,7 @@ struct io_submit_state {
- };
- 
- static void io_sq_wq_submit_work(struct work_struct *work);
-+static void io_free_scq_urings(struct io_ring_ctx *ctx);
- 
- static struct kmem_cache *req_cachep;
- 
-@@ -417,6 +418,12 @@ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
- 	return ctx;
- }
- 
-+static void io_ring_ctx_free(struct io_ring_ctx *ctx)
-+{
-+	percpu_ref_exit(&ctx->refs);
-+	kfree(ctx);
-+}
-+
- static inline bool io_sequence_defer(struct io_ring_ctx *ctx,
- 				     struct io_kiocb *req)
- {
-@@ -2254,16 +2261,20 @@ static void io_sq_thread_stop(struct io_ring_ctx *ctx)
- 	}
- }
- 
--static void io_finish_async(struct io_ring_ctx *ctx)
-+static void io_sq_wq_destroy(struct io_ring_ctx *ctx)
- {
--	io_sq_thread_stop(ctx);
--
- 	if (ctx->sqo_wq) {
- 		destroy_workqueue(ctx->sqo_wq);
- 		ctx->sqo_wq = NULL;
- 	}
- }
- 
-+static void io_finish_async(struct io_ring_ctx *ctx)
-+{
-+	io_sq_thread_stop(ctx);
-+	io_sq_wq_destroy(ctx);
-+}
-+
- #if defined(CONFIG_UNIX)
- static void io_destruct_skb(struct sk_buff *skb)
- {
-@@ -2483,6 +2494,18 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
- 	return ret;
- }
- 
-+static void io_sq_offload_end(struct io_ring_ctx *ctx)
-+{
-+	io_sq_thread_stop(ctx);
-+
-+	if (ctx->sqo_mm) {
-+		mmdrop(ctx->sqo_mm);
-+		ctx->sqo_mm = NULL;
-+	}
-+
-+	io_sq_wq_destroy(ctx);
-+}
-+
- static void io_unaccount_mem(struct user_struct *user, unsigned long nr_pages)
- {
- 	atomic_long_sub(nr_pages, &user->locked_vm);
-@@ -2765,33 +2788,6 @@ static int io_eventfd_unregister(struct io_ring_ctx *ctx)
- 	return -ENXIO;
- }
- 
--static void io_ring_ctx_free(struct io_ring_ctx *ctx)
--{
--	io_finish_async(ctx);
--	if (ctx->sqo_mm)
--		mmdrop(ctx->sqo_mm);
--
--	io_sqe_buffer_unregister(ctx);
--	io_sqe_files_unregister(ctx);
--	io_eventfd_unregister(ctx);
--
--#if defined(CONFIG_UNIX)
--	if (ctx->ring_sock)
--		sock_release(ctx->ring_sock);
--#endif
--
--	io_mem_free(ctx->sq_ring);
--	io_mem_free(ctx->sq_sqes);
--	io_mem_free(ctx->cq_ring);
--
--	percpu_ref_exit(&ctx->refs);
--	if (ctx->account_mem)
--		io_unaccount_mem(ctx->user,
--				ring_pages(ctx->sq_entries, ctx->cq_entries));
--	free_uid(ctx->user);
--	kfree(ctx);
--}
--
- static __poll_t io_uring_poll(struct file *file, poll_table *wait)
- {
- 	struct io_ring_ctx *ctx = file->private_data;
-@@ -2825,9 +2821,27 @@ static void io_ring_ctx_wait_and_kill(struct io_ring_ctx *ctx)
- 	percpu_ref_kill(&ctx->refs);
- 	mutex_unlock(&ctx->uring_lock);
- 
-+	/* poll all events and reap */
- 	io_poll_remove_all(ctx);
- 	io_iopoll_reap_events(ctx);
- 	wait_for_completion(&ctx->ctx_done);
-+
-+	io_sq_offload_end(ctx);
-+
-+	/* unregister fixed buffer and files */
-+	io_sqe_buffer_unregister(ctx);
-+	io_sqe_files_unregister(ctx);
-+	io_eventfd_unregister(ctx);
-+
-+#if defined(CONFIG_UNIX)
-+	if (ctx->ring_sock)
-+		sock_release(ctx->ring_sock);
-+#endif
-+	io_free_scq_urings(ctx);
-+	if (ctx->account_mem)
-+		io_unaccount_mem(ctx->user,
-+				 ring_pages(ctx->sq_entries, ctx->cq_entries));
-+	free_uid(ctx->user);
- 	io_ring_ctx_free(ctx);
- }
- 
-@@ -2994,6 +3008,13 @@ static int io_allocate_scq_urings(struct io_ring_ctx *ctx,
- 	return ret;
- }
- 
-+static void io_free_scq_urings(struct io_ring_ctx *ctx)
-+{
-+	io_mem_free(ctx->sq_ring);
-+	io_mem_free(ctx->sq_sqes);
-+	io_mem_free(ctx->cq_ring);
-+}
-+
- /*
-  * Allocate an anonymous fd, this is what constitutes the application
-  * visible backing of an io_uring instance. The application mmaps this
-@@ -3083,11 +3104,11 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p)
- 
- 	ret = io_allocate_scq_urings(ctx, p);
- 	if (ret)
--		goto err;
-+		goto err_scq;
- 
- 	ret = io_sq_offload_start(ctx, p);
- 	if (ret)
--		goto err;
-+		goto err_off;
- 
- 	ret = io_uring_get_fd(ctx);
- 	if (ret < 0)
-@@ -3110,8 +3131,17 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p)
- 	p->cq_off.overflow = offsetof(struct io_cq_ring, overflow);
- 	p->cq_off.cqes = offsetof(struct io_cq_ring, cqes);
- 	return ret;
-+
- err:
--	io_ring_ctx_wait_and_kill(ctx);
-+	io_sq_offload_end(ctx);
-+err_off:
-+	io_free_scq_urings(ctx);
-+err_scq:
-+	free_uid(user);
-+	if (account_mem)
-+		io_unaccount_mem(user, ring_pages(p->sq_entries,
-+							p->cq_entries));
-+	io_ring_ctx_free(ctx);
- 	return ret;
- }
- 
--- 
-2.7.4
+>> But I'm not too worried about that difference.
+>>
+>>> In addition, I wanted to ask you whether you measured BFQ throughput
+>>> with traces disabled.  This may make a difference.
+>>>
+>>
+>> The above result (1.4 MB/s) was obtained with traces disabled.
+>>
+>>> After trying writing a larger file, you can try with low_latency on.
+>>> On my side, it causes results to become a little unstable across
+>>> repetitions (which is expected).
+>>>
+>> With low_latency on, I get between 60 KB/s - 100 KB/s.
+>>
+> 
+> Gosh, full regression.  Fortunately, it is simply meaningless to use
+> low_latency in a scenario where the goal is to guarantee per-group
+> bandwidths.  Low-latency heuristics, to reach their (low-latency)
+> goals, modify the I/O schedule compared to the best schedule for
+> honoring group weights and boosting throughput.  So, as recommended in
+> BFQ documentation, just switch low_latency off if you want to control
+> I/O with groups.  It may still make sense to leave low_latency on
+> in some specific case, which I don't want to bother you about.
+> 
 
+My main concern here is about Linux's I/O performance out-of-the-box,
+i.e., with all default settings, which are:
 
+- cgroups and blkio enabled (systemd default)
+- blkio non-root cgroups in use (this is the implicit systemd behavior
+  if docker is installed; i.e., it runs tasks under user.slice)
+- I/O scheduler with blkio group sched support: bfq
+- bfq default configuration: low_latency = 1
 
+If this yields a throughput that is 10x-30x slower than what is
+achievable, I think we should either fix the code (if possible) or
+change the defaults such that they don't lead to this performance
+collapse (perhaps default low_latency to 0 if bfq group scheduling
+is in use?)
+
+> However, I feel bad with such a low throughput :)  Would you be so
+> kind to provide me with a trace?
+> 
+Certainly! Short runs of dd resulted in a lot of variation in the
+throughput (between 60 KB/s - 1 MB/s), so I increased dd's runtime
+to get repeatable numbers (~70 KB/s). As a result, the trace file
+(trace-bfq-boost-injection-low-latency-71KBps) is quite large, and
+is available here:
+
+https://www.dropbox.com/s/svqfbv0idcg17pn/bfq-traces.tar.gz?dl=0
+
+Also, I'm very happy to run additional tests or experiments to help
+track down this issue. So, please don't hesitate to let me know if
+you'd like me to try anything else or get you additional traces etc. :)
+
+Thank you!
+
+Regards,
+Srivatsa
+VMware Photon OS
