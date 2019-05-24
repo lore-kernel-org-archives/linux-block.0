@@ -7,82 +7,84 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1333C072B5
-	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 13:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3D6C072B5
+	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 13:09:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7FE9921773
-	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 13:07:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7080720868
+	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 13:09:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="y7nfCg4b"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="EYXxJ25S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403797AbfEXNHq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 May 2019 09:07:46 -0400
-Received: from mail-vk1-f194.google.com ([209.85.221.194]:33684 "EHLO
-        mail-vk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391440AbfEXNHp (ORCPT
+        id S2391408AbfEXNJB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 May 2019 09:09:01 -0400
+Received: from mail-vk1-f193.google.com ([209.85.221.193]:46904 "EHLO
+        mail-vk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391124AbfEXNJB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 May 2019 09:07:45 -0400
-Received: by mail-vk1-f194.google.com with SMTP id v69so2115011vke.0
-        for <linux-block@vger.kernel.org>; Fri, 24 May 2019 06:07:45 -0700 (PDT)
+        Fri, 24 May 2019 09:09:01 -0400
+Received: by mail-vk1-f193.google.com with SMTP id g194so2095299vke.13
+        for <linux-block@vger.kernel.org>; Fri, 24 May 2019 06:09:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=jdBUUMv99kj0cqC35xVQ0vJ+lTbAYnC4lk5/+dSwqX8=;
-        b=y7nfCg4b4hWh5cXtClN2G9IlPfZtmsJ3lCmnJcQFhJJFfR7Duny76GHmGWVmLX7JkN
-         4BQJt1/DlmVVHNx6yxD8f1v1vebpwhOW/ZIYNZ2RvPKxui5ELigztwF3+awy6EBQw7wE
-         m3Y2E5XpbLeF2AxgqwDhp4aX77GeAAP51wkhJr9AxhH+GkIXWwNH8VLVQGaBoN8GvqUp
-         A8Sh1fZjhD6lSYCc2m9pwMqc/p7T2nlHT50o9OXZ1RUVaIxCKjYUX676pmynjMX0a5ue
-         bReHsYh0ssps55JEZQvYZbYbEun8Ea/68G3H264PjF491twDM4RQQrC4Rib1pUZoFXKT
-         CZ7A==
+        bh=1NFK9aapiSHvsfIUj35JfqUMZ2Y7KkhyrVEtoE1rNlo=;
+        b=EYXxJ25SpuP4HuvEOLSk+zi+mVPSGhOX25UDQE/sUtZJKdvkLF44+bWtW1eWv9AX6+
+         /pKQzpJ/ypcCzYcgtZcr7B44gBnyZFJDbYJnpzKHyFra6gwrZ8KSSrmUHBtB1+9TxFPS
+         EGwMSJHMVfrBBvWbQzV/sH7BnQXaZqevzNOBAeBOsno0bv22fGAlf5FWntZzalS1VaAI
+         ZoPzw2wsj0lnH7LEjts6kFv2LbuozDQLeclYFZIdYVaSHmtbgBQ98HAHq1x05qhuahsE
+         Plt7dW56m9PAhslYjZ4hGEtZcUo7cpLNyehcLl1VvBT103zfKklMSuPHhSONGeWcDAt3
+         yw5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=jdBUUMv99kj0cqC35xVQ0vJ+lTbAYnC4lk5/+dSwqX8=;
-        b=ZumWD2gbzDVVh0em0XXKhyeFBCSvzS74Km6EmflWMjAY7kUMFDUbr59t0BNqqEHL4J
-         AiB7ACQ4kX8sCUotiJU5wf8AY8Crv+RmBwGjoerngeT+LzmClMHX51SouRpEHhE8BoU0
-         lun8zUpuUnzVEMLCGuj1KLxP5IaFL/yxoXlof1f5tiOTgAGj+96rAfGLKqRlYO3G+yMY
-         8ujdS4Hr+ERCgDLov0MdbTSkybjQwn0TUsUJv/jW32RL9NQZFR7xwJ14tLInmeYQvCnx
-         4bGMpX3SX/4vmsN9ZRk8LA8g6+1ew+KctZnkhVspekfbhMJ3NR+R2XfqhGAOkJRs6qv+
-         Tpgw==
-X-Gm-Message-State: APjAAAWXgCqSToiIk0oqpyDT1xcl7AyIH5Hj9By2mHfqauQjMtecLOrA
-        dapOaBRBlb96fL/CNWhTEShBlg==
-X-Google-Smtp-Source: APXvYqwvZqoB7HcLldyB5hnboWptllAQCHpm5/Temh8iNOZUGFHOn/N74uzD1wlGnZSad8s+yXbosA==
-X-Received: by 2002:a1f:8d0b:: with SMTP id p11mr4674585vkd.31.1558703264670;
-        Fri, 24 May 2019 06:07:44 -0700 (PDT)
+        bh=1NFK9aapiSHvsfIUj35JfqUMZ2Y7KkhyrVEtoE1rNlo=;
+        b=ZYFJfPCgBI2KgDpdPUt17ciy4NkBFZCdx/4PbYvaN2WMqPGsfTE3HIfuJvHHsOGD6R
+         HcMSBKeT0jP/JTgQqGpAaeuSPX5DKu6Yih4C0Q2pZu+i0hWuwnrH6AlLljdbahy6vOLB
+         zTtvb268c3oVJDk6nG1UP0PAM/wZxSEY9El4MMOwNG0hgDVPILsvxUBtRmwRkUxUBx/W
+         tyrqY2rQbPfNZEf2135Rveo5r4vSJoETLivHiruEfsQZBVVJdzFqg7Pa2l735ExbozcG
+         yPe5LL4vJXyTgBgW7B4NT5F26NdRqhRdmcGxPx2cVn1ZbKQzVn8gwRKHcQbB5skdlfWh
+         YWWw==
+X-Gm-Message-State: APjAAAV4IDai3PN6HL7FXoomwBR2fmh0PYnOp41O/rtpXwgfdxE4IdJC
+        k9kJFp/Flq3w7VUzdWJrjdIqIQ==
+X-Google-Smtp-Source: APXvYqwSNSRIsSEWFVwlmbvUZtMXOmCI7hQZGA8lIGGGG7uY/2hEEqrVZAFNsLcsasTdlDybTnGHdg==
+X-Received: by 2002:a1f:9d07:: with SMTP id g7mr4795657vke.40.1558703340487;
+        Fri, 24 May 2019 06:09:00 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::e914])
-        by smtp.gmail.com with ESMTPSA id v14sm815351vkd.4.2019.05.24.06.07.43
+        by smtp.gmail.com with ESMTPSA id 143sm1127525vkj.44.2019.05.24.06.08.59
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 24 May 2019 06:07:43 -0700 (PDT)
-Date:   Fri, 24 May 2019 09:07:42 -0400
+        Fri, 24 May 2019 06:08:59 -0700 (PDT)
+Date:   Fri, 24 May 2019 09:08:58 -0400
 From:   Josef Bacik <josef@toxicpanda.com>
 To:     Yao Liu <yotta.liu@ucloud.cn>
 Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, nbd@other.debian.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] nbd: fix connection timed out error after
- reconnecting to server
-Message-ID: <20190524130740.zfypc2j3q5e3gryr@MacBook-Pro-91.local.dhcp.thefacebook.com>
+Subject: Re: [PATCH 2/3] nbd: notify userland even if nbd has already
+ disconnected
+Message-ID: <20190524130856.zod5agp7hk74pcnr@MacBook-Pro-91.local.dhcp.thefacebook.com>
 References: <1558691036-16281-1-git-send-email-yotta.liu@ucloud.cn>
+ <1558691036-16281-2-git-send-email-yotta.liu@ucloud.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1558691036-16281-1-git-send-email-yotta.liu@ucloud.cn>
+In-Reply-To: <1558691036-16281-2-git-send-email-yotta.liu@ucloud.cn>
 User-Agent: NeoMutt/20180716
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 24, 2019 at 05:43:54PM +0800, Yao Liu wrote:
-> Some I/O requests that have been sent succussfully but have not yet been
-> replied won't be resubmitted after reconnecting because of server restart,
-> so we add a list to track them.
+On Fri, May 24, 2019 at 05:43:55PM +0800, Yao Liu wrote:
+> Some nbd client implementations have a userland's daemon, so we should
+> inform client daemon to clean up and exit.
 > 
 > Signed-off-by: Yao Liu <yotta.liu@ucloud.cn>
 
-Nack, this is what the timeout stuff is supposed to handle.  The commands will
-timeout and we'll resubmit them if we have alive sockets.  Thanks,
+Except the nbd_disconnected() check is for the case that the client told us
+specifically to disconnect, so we don't want to send the notification to
+re-connect because we've already been told we want to tear everything down.
+Nack to this as well.  Thanks,
 
 Josef
