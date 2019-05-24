@@ -2,162 +2,183 @@ Return-Path: <SRS0=cawq=TY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C868C072B5
-	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 15:38:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A9C5C072B5
+	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 16:50:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5805020815
-	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 15:38:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3BE9E2070D
+	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 16:50:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XdghJBTL"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="o3BgbtBg";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="H03/lwor"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389583AbfEXPip (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 May 2019 11:38:45 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:35297 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389303AbfEXPip (ORCPT
+        id S2391113AbfEXQuS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 May 2019 12:50:18 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:2353 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390346AbfEXQuS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 May 2019 11:38:45 -0400
-Received: by mail-wr1-f67.google.com with SMTP id m3so10491520wrv.2
-        for <linux-block@vger.kernel.org>; Fri, 24 May 2019 08:38:44 -0700 (PDT)
+        Fri, 24 May 2019 12:50:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1558716618; x=1590252618;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=2GTwkBALN+hOHtFafj0H0sbztItQxFHmgqPF3/MhXD0=;
+  b=o3BgbtBgLq08RjRYc104y3KWwM19GnppA6b72PkEo6t+BHgwxRaic5Rl
+   CLT1DPKnJYgvG7J6SM4lSJ/q4z3NgkiCANNxWcDIx2NS9NyaBVbPgiktO
+   pXPBESWXTzObx0Dbq0UCF0rcFBJmfsIdh3OMo4J2C1tsApzNtdlBbGm8d
+   cI015apMu+9BkBo0xsanM85xjt7PL6HvIFz7MVRd7hpr/OXigJ+uvrPjx
+   jiZQN0ntv2b0CYPEVpAzXly+KT1cC/Qm8kzbUgdUA5ZKReS0w7SJT1VMS
+   nrVriztHy/S32maAP2o/y1CoNFllOFCWJqCwW8orojn6n8g9qzWhsFTOV
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.60,507,1549900800"; 
+   d="scan'208";a="110727358"
+Received: from mail-sn1nam01lp2057.outbound.protection.outlook.com (HELO NAM01-SN1-obe.outbound.protection.outlook.com) ([104.47.32.57])
+  by ob1.hgst.iphmx.com with ESMTP; 25 May 2019 00:50:17 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=LCRvF9gM85JPE15pYJ7c4cPg5dNsC9rQxww9nzJape0=;
-        b=XdghJBTLyt4zmZ7Y6wBqB+3fvWWVap7fNS9E5Eqkt/MmCkS4RY/CAVGzrbga7I1yYi
-         pAB7n0GMWYWZffDt3Mcu9ehaT/w2utnnycDx1UCPOzKRhlgqp+IFsbABPAwtqfAmdAdw
-         o0ypragsz+J3nmEmwRLF+kMwPPn3Dj5RPXamVOA3n+PTCFXTJ5EFuGFJbm/ydTi0k/M9
-         eJ4doEznLwZ/qi+JB8VYrXcDwCYvi/Vl7V1jjX7m3aNFZcyeFgAXJb7M7a4k4jjTka4u
-         QPatXtsLtTNDyaETrfiiQ/14W1YXLNcyzb2154nHB5z682hcWxUnQ+w+tQt98XQvX9Bx
-         jypw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=LCRvF9gM85JPE15pYJ7c4cPg5dNsC9rQxww9nzJape0=;
-        b=OaXjuFCkSzgLUoc57pPQOwUKn8XE7GvWesDe1TEiNIyCi+j+2YW82PH0+5X1esZEDm
-         rQwT8Zv3kRL+Tv5YoLZ3MzqDbEkXDLUnJ7u7FMk4jyBAq9EjQnuV7eMtbiUISv8Iqd3X
-         9UCVPttYYhtxkaTj27EvDqBS0H97yGuLNXoINjNa0Zc4O/+2tQZQYAEXpMvdK1Kocx82
-         J1c7cQjsVS4HAqEShj+WsDPkIssM2zc7YMLfCJS9hdtoHHUkzk5LR/YxA2aAaOhnjZxg
-         srXWr4x2JD759UxvcrEHEOJSaqjKKzpvquO+61b2vKKD35c0nn774KDdseUBa1E/b/oL
-         hGBg==
-X-Gm-Message-State: APjAAAXpaLH9lZimojkltag3NXB8Uck6Zw9HUQd9SEfBgXKh2rDWqzGT
-        Ai0//NmSabzqqndXvaDYANqaew==
-X-Google-Smtp-Source: APXvYqwDgsVjTHY1U9BHRlsj6D6zyid/eypOWh/exqSgUoM1xmlBBdxUK0W0fRZpKnwCGGFCdeVweg==
-X-Received: by 2002:a5d:54c2:: with SMTP id x2mr2791432wrv.214.1558712323937;
-        Fri, 24 May 2019 08:38:43 -0700 (PDT)
-Received: from [192.168.0.104] (84-33-69-73.dyn.eolo.it. [84.33.69.73])
-        by smtp.gmail.com with ESMTPSA id v13sm2721074wmj.46.2019.05.24.08.38.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 24 May 2019 08:38:43 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-Message-Id: <262EE1CC-7473-4D4C-B108-734ACED1623C@linaro.org>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_41048615-DE5F-4A8E-B59D-183EE385D00E";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: Setting up default iosched in 5.0+
-Date:   Fri, 24 May 2019 17:38:41 +0200
-In-Reply-To: <x49ftp329lt.fsf@segfault.boston.devel.redhat.com>
-Cc:     Alexey Dobriyan <adobriyan@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To:     Jeff Moyer <jmoyer@redhat.com>
-References: <20190518093310.GA3123@avx2>
- <x49ftp329lt.fsf@segfault.boston.devel.redhat.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aM+/qoiRYyBINy4kAh1SIj4Iv+JITY1M/79gFLDdJvw=;
+ b=H03/lworPl5r6HO8VtLav/NVjMT9YDXJ+7a0sNmDkEtcPngDsFYM/aKZAVgRgsnqOqSwrZ711o+25esiVrZUTHKlvAP0Q4/Vkvdzhnc6EUQPLc3l5tRDo4TX2NFMPHY3hNxqFqzBcjmAxynTa/47t0YTKLmyQTkT4HR2rHcAXHA=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
+ BYAPR04MB6117.namprd04.prod.outlook.com (20.178.234.153) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1900.18; Fri, 24 May 2019 16:50:15 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::ad42:af4b:a53b:80f5]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::ad42:af4b:a53b:80f5%4]) with mapi id 15.20.1922.013; Fri, 24 May 2019
+ 16:50:15 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     John Pittman <jpittman@redhat.com>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "djeffery@redhat.com" <djeffery@redhat.com>
+Subject: Re: [PATCH] block: print offending values when cloned rq limits are
+ exceeded
+Thread-Topic: [PATCH] block: print offending values when cloned rq limits are
+ exceeded
+Thread-Index: AQHVEbFzUNDIy+caP02hj5K05Bz0IQ==
+Date:   Fri, 24 May 2019 16:50:14 +0000
+Message-ID: <BYAPR04MB5749C6907333D8869917774186020@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20190523214939.30277-1-jpittman@redhat.com>
+ <BYAPR04MB5749B68BB9E3BD3B19F006D986020@BYAPR04MB5749.namprd04.prod.outlook.com>
+ <CA+RJvhyLihk0tgSG5nAVMGNgBQTPnOCv==A886L_ca3q1aqMPQ@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [24.19.218.179]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 104db053-6326-4db1-4a6e-08d6e067e541
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB6117;
+x-ms-traffictypediagnostic: BYAPR04MB6117:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <BYAPR04MB611790D36195F9E7723DD7FD86020@BYAPR04MB6117.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1247;
+x-forefront-prvs: 0047BC5ADE
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(39860400002)(366004)(346002)(136003)(376002)(199004)(189003)(74316002)(86362001)(66066001)(7696005)(446003)(476003)(99286004)(81156014)(14444005)(53546011)(486006)(76176011)(8676002)(256004)(68736007)(26005)(53936002)(54906003)(9686003)(6246003)(81166006)(55016002)(6436002)(33656002)(4326008)(72206003)(14454004)(229853002)(25786009)(8936002)(5660300002)(478600001)(66556008)(305945005)(66476007)(76116006)(73956011)(6506007)(6916009)(52536014)(66946007)(102836004)(2906002)(7736002)(71200400001)(71190400001)(64756008)(66446008)(3846002)(6116002)(186003)(316002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB6117;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: mBuzVnl8m4GxgC29ULLcGp3c+vqKAWExtnFu+6PP7Oj6H4aFmP4Rk93GabZSlEXbKAofKxE+gfI/lo3XQEsG3827OrVbxBa5pJxaRDmjnlRz2bPAB7s4NMqP67/AvLevIcDRtEv8a33qKVfpBSnEYZTnkTRYCtCQuhbllIkRkxlcLFh5M44I5qmGwaTQ3Ine/wHqPp2d4qlGcvwR/JFE7x9VPk4WjvwZi12xnIvXR4AoTRCFVyN8pdEi4Ep5tgm0uJRBq1DNmrxdNa4DTrI1hGTdv2EDn/w/5UVDE7flBo0ol7VfpQlzfn4Exw3HbZv4+IyWE2B1nmEX/Tuy1r/WZc9jjMpG2rUzHoeFoupDin0p/h7e2sPvq4Aqamq/PsqQv4GZth6qsY2+XBARcgXLA/Hn19eJp+7vONH8mh53ELA=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 104db053-6326-4db1-4a6e-08d6e067e541
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 May 2019 16:50:15.0119
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB6117
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---Apple-Mail=_41048615-DE5F-4A8E-B59D-183EE385D00E
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
-
-
-
-> Il giorno 24 mag 2019, alle ore 16:46, Jeff Moyer <jmoyer@redhat.com> =
-ha scritto:
->=20
-> Hi, Alexey,
->=20
-> Alexey Dobriyan <adobriyan@gmail.com> writes:
->=20
->> 5.0 deleted three io schedulers and more importantly =
-CONFIG_DEFAULT_IOSCHED
->> option:
->>=20
->> 	commit f382fb0bcef4c37dc049e9f6963e3baf204d815c
->> 	block: remove legacy IO schedulers
->>=20
->> After figuring out that I silently became "noop" customer enabling =
-just
->> BFQ didn't work: "noop" is still being selected by default.
->>=20
->> There is an "elevator=3D" command line option but it does nothing.
->>=20
->> Are users supposed to add stuff to init scripts now?
->=20
-> A global parameter was never a good idea, because systems often have
-> different types of storage installed which benefit from different I/O
-> schedulers.  The goal is for the default to just work.
->=20
-
-Just for completeness, the current default is the worst possible
-choice on all systems with a speed below 500 KIOPS, which includes
-practically all personal systems ;) But this is a different story ...
-
-Thanks,
-Paolo
-
-> If you feel that the defaults don't work for you, then udev rules are
-> the way to go.
->=20
-> If you also feel that you really do want to set the default for all
-> devices, then you can use the following udev rule to emulate the old
-> elevator=3D kernel command line parameter:
->=20
-> =
-https://github.com/lnykryn/systemd-rhel/blob/rhel-8.0.0/rules/40-elevator.=
-rules
->=20
-> Cheers,
-> Jeff
-
-
---Apple-Mail=_41048615-DE5F-4A8E-B59D-183EE385D00E
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAlzoEAEACgkQOAkCLQGo
-9oN6qg/+NnwtZyPAdAGGfdoBrdQpYEKaZKAbkuGx7UGFPfLttBVZOmW5E2AWNDZp
-3pr1Pxw0qCPf9kIDe54ZfeR+bh/YApfq6bco3ZibbjSy0L0qzKryE3JpcQ1CQcjp
-EklD4QyT85qbMVKkODbpLxr6CjzT05dZXADYbRzdBqdhmWazh88yn8frlsT0PAYA
-oE2hClXLf0grZCg41eD1bCQCZWCLRe3qPj75nI95J2HSbhp+43DoakCN7qnhjfDI
-CYe7GWcx989ofktVxPO0YDTQSDoiNVk+8EFWVVy2zgzwzrtqcQI07jkCQd3KHRI0
-Ygo1UHxTi0d5361oFoRIcX/cbtXsSbvK7xohiQHaChAyNSjD9GGocxGBwWoX1ljb
-ElzWEKN0MCoNakEIR5y94beTip/CrVMzaxaRIl698WZ/tLJI4Dh6R1Tlxkd+NJ+X
-h+BWu4/NuKxHQZvRVkltNxI8pDmF0rWzw49+f60yEcecJJzx4Wf6RGWcmj/CKjws
-7jieWgT/G7V6p5PYY3MzrVe8fbSTu5OvSXGvgslNaWs256P0cc+0IKVxBwb+rzz0
-b36Tji2LPwv3ElwF5r46INCJhGrX/EggwPMWDrVy7cyUyd9g035ryzJ1xmIGae8G
-9FoqHS+ha/jzcLI216OHUbp+oJ8rojKrlBUH+MlQbgfbGShr1M8=
-=Punj
------END PGP SIGNATURE-----
-
---Apple-Mail=_41048615-DE5F-4A8E-B59D-183EE385D00E--
+Let's leave it to Jens.=0A=
+=0A=
+On 5/24/19 5:19 AM, John Pittman wrote:=0A=
+> Thanks Chaitanya for the review.  I was not sure what Jens would think=0A=
+> about the checkpatch warning, so I left it as it was so he could=0A=
+> decide.  I tried to model the value output after that old 'bio too=0A=
+> big' error.  Thanks again.=0A=
+> =0A=
+> On Thu, May 23, 2019 at 9:17 PM Chaitanya Kulkarni=0A=
+> <Chaitanya.Kulkarni@wdc.com> wrote:=0A=
+>>=0A=
+>> I think it will be useful to print the information along with the error.=
+=0A=
+>>=0A=
+>> Do we want to address the checkpatch warnings ?=0A=
+>>=0A=
+>> WARNING: Prefer [subsystem eg: netdev]_err([subsystem]dev, ... then=0A=
+>> dev_err(dev, ... then pr_err(...  to printk(KERN_ERR ...=0A=
+>> #20: FILE: block/blk-core.c:1202:=0A=
+>> +               printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",=
+=0A=
+>>=0A=
+>> WARNING: Prefer [subsystem eg: netdev]_err([subsystem]dev, ... then=0A=
+>> dev_err(dev, ... then pr_err(...  to printk(KERN_ERR ...=0A=
+>> #31: FILE: block/blk-core.c:1216:=0A=
+>> +               printk(KERN_ERR "%s: over max segments limit. (%hu > %hu=
+)\n",=0A=
+>>=0A=
+>> In either case,=0A=
+>>=0A=
+>> Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com> .=0A=
+>>=0A=
+>> On 5/23/19 2:49 PM, John Pittman wrote:=0A=
+>>> While troubleshooting issues where cloned request limits have been=0A=
+>>> exceeded, it is often beneficial to know the actual values that=0A=
+>>> have been breached.  Print these values, assisting in ease of=0A=
+>>> identification of root cause of the breach.=0A=
+>>>=0A=
+>>> Signed-off-by: John Pittman <jpittman@redhat.com>=0A=
+>>> ---=0A=
+>>>    block/blk-core.c | 7 +++++--=0A=
+>>>    1 file changed, 5 insertions(+), 2 deletions(-)=0A=
+>>>=0A=
+>>> diff --git a/block/blk-core.c b/block/blk-core.c=0A=
+>>> index 419d600e6637..af62150bb1ba 100644=0A=
+>>> --- a/block/blk-core.c=0A=
+>>> +++ b/block/blk-core.c=0A=
+>>> @@ -1199,7 +1199,9 @@ static int blk_cloned_rq_check_limits(struct requ=
+est_queue *q,=0A=
+>>>                                      struct request *rq)=0A=
+>>>    {=0A=
+>>>        if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, req_op(rq)=
+)) {=0A=
+>>> -             printk(KERN_ERR "%s: over max size limit.\n", __func__);=
+=0A=
+>>> +             printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",=
+=0A=
+>>> +                     __func__, blk_rq_sectors(rq),=0A=
+>>> +                     blk_queue_get_max_sectors(q, req_op(rq)));=0A=
+>>>                return -EIO;=0A=
+>>>        }=0A=
+>>>=0A=
+>>> @@ -1211,7 +1213,8 @@ static int blk_cloned_rq_check_limits(struct requ=
+est_queue *q,=0A=
+>>>         */=0A=
+>>>        blk_recalc_rq_segments(rq);=0A=
+>>>        if (rq->nr_phys_segments > queue_max_segments(q)) {=0A=
+>>> -             printk(KERN_ERR "%s: over max segments limit.\n", __func_=
+_);=0A=
+>>> +             printk(KERN_ERR "%s: over max segments limit. (%hu > %hu)=
+\n",=0A=
+>>> +                     __func__, rq->nr_phys_segments, queue_max_segment=
+s(q));=0A=
+>>>                return -EIO;=0A=
+>>>        }=0A=
+>>>=0A=
+>>>=0A=
+>>=0A=
+> =0A=
+=0A=
