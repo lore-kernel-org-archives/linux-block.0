@@ -2,115 +2,160 @@ Return-Path: <SRS0=cawq=TY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 905D4C072B5
-	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 18:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5ACAC282E1
+	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 22:19:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5134A21848
-	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 18:25:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B71820862
+	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 22:19:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EilJ+NyI"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Nnkv01YP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726581AbfEXSZh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 May 2019 14:25:37 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52471 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726071AbfEXSZh (ORCPT
+        id S2404258AbfEXWTO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 May 2019 18:19:14 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:36046 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404176AbfEXWTO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 May 2019 14:25:37 -0400
-Received: by mail-wm1-f68.google.com with SMTP id y3so10326334wmm.2;
-        Fri, 24 May 2019 11:25:35 -0700 (PDT)
+        Fri, 24 May 2019 18:19:14 -0400
+Received: by mail-pg1-f193.google.com with SMTP id a3so5765965pgb.3
+        for <linux-block@vger.kernel.org>; Fri, 24 May 2019 15:19:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=uJ+VGq1vbaaeAJrHBIkzRJvOH5+OfhWi163jL1Ew+9E=;
-        b=EilJ+NyIwMui1YXmYNwyHPdjvszha9reG3CiapmuyGYBzhUtrPKNEpU2t7QGD9nq5/
-         QRmAwjPEE/ITKTBd7O9YtT0Pl7A/+1CfWWlmyyUlQfQchTNUGIKCHM9EbnSXavP/JmyU
-         6uZDexXet3ML4LOfMlAzD7Xg4SKjxl15Bjlnh/ELX2IHIS4LryoA0qro5oS6bqbEyUco
-         sz6rBT5fHHdO2eZW8zSAJZNiCaHnhb22bklI1wF2q7us1w7NiEyYq2y3TexuehaLIbt6
-         V+8+zNcUyWQrB1FPaZSYSwV9+rD0koIr9cSc7kVizIS0J3ZoU8MrX32jK4Ph1B2r+yeJ
-         WJvA==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=z1aqfTZqf/AvwG/+lJF8nCA6z42cn8Osx+rYDn0FGI8=;
+        b=Nnkv01YPqgqMK+yjWzV/uea4mAauZVynLg5+qU6PriWLCj1vMabRrVEJ+rblxKTR45
+         5wz0HIH6eIAKpc7prUvVOP59htdqE8Bo1IpK7xr5txUh20s/q3klOThJ5OpPFu6AlMso
+         Ia6DFsARloJ2lSXM/vVjfMOPqZV82GDlneH7ZlYEzIcN5ISiZ7xhQfV8/QgrjaBIPTbg
+         fuTMOZtZoH6UMos9lJGFqq1R3z2JcU3WUrdXVXEkNx6S+eTGrii5ReXALLMWVI4PM1iP
+         3K4vUxtAL7sOSQm8sbYuP4SvVGszawldBJYAniJV1Ac9D1RVzqbngTYdL2sCqXN4Sb3I
+         W3mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=uJ+VGq1vbaaeAJrHBIkzRJvOH5+OfhWi163jL1Ew+9E=;
-        b=QMJEYkBO3g85g1vPP9VLN5w0t1HquSgnh0PXKQ7q3c4Mz6IY05/3S4XISJUb4ruDz3
-         vp4YtLVXTOhUA56sodAb9iy6hFAJi+W8wYTSRwv6XTbtvOa5IZRQM6D5TvQQAaXaYkzN
-         9lm1jt6D263FKORZAkEGVl0USBVmORu2HQ4Dt1je+senvdu3K2ukTsUd/L24y2o0coff
-         z2sLlKxzmtuA36oeF39TOo/1t3hZ1ks7VLE8uh0g1uaQt4r/RoM2thUiaA7ngqI+jep6
-         6nJ4CY3IzFWuo3qQT8/FWdu6tCix8Urrl9UBGpu89/E8kMnjw02hKuHT2Y+jGrs5QNLe
-         zCew==
-X-Gm-Message-State: APjAAAXbE2xzeTdemm6n+OixuRwmRWujcQLhrlxfYqT6IC3HihqgzS74
-        r6neVT+GfEmTjuTDGxYZWQ==
-X-Google-Smtp-Source: APXvYqzWIPhAoLe8BnB4nilKaC7gvhOWPTFfvesV7R2V/Fe7j3s2Mc1rYyuAf80aBL4pzVy0Kikahw==
-X-Received: by 2002:a7b:c8c1:: with SMTP id f1mr953080wml.164.1558722335009;
-        Fri, 24 May 2019 11:25:35 -0700 (PDT)
-Received: from avx2 ([46.53.250.220])
-        by smtp.gmail.com with ESMTPSA id 67sm4726241wmd.38.2019.05.24.11.25.33
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=z1aqfTZqf/AvwG/+lJF8nCA6z42cn8Osx+rYDn0FGI8=;
+        b=ot4khEkCxEsMIyUIgIl1LW2uyFpGhFp9yuHlihDMBKKHs+CLdo+6XwzaYkE7ZJY1dv
+         PDyGYEaX7m+7x5B0tptUEW8xa0zPr0pd42C/RlLxH9vyzqWRhcPfUUVKEFFmOiU6fvD0
+         7dL42UXtM+EHom9bVsiPrdYJJAyON0tcphuuCDG6BrO8EDJd+eeQFp+LBdA7GN7QIeZR
+         //FJSW6syw3pSmJT7I5oMsCIEeEaS7YXEv5eyrYzDxk/XBPAc0ceL62iwphrUcxGEnvZ
+         2LaGrLlD9xPPvX2UeIYcPL7NcIlWJfS5qPDzMze7g3y+tXwZjWGwX15Kfs0AXgZOp5CY
+         c49A==
+X-Gm-Message-State: APjAAAWJPeBFfTGkzxfxv8NY3DLrfYq5+DnUEScD8UIqj3KXCne5oWb3
+        88hsGL3oDkdcAdhdjiYuKz2aA+7eInseWA==
+X-Google-Smtp-Source: APXvYqxuD8KxKq/XOW7pqKtjvCXxia2V20LaknnTB/FQYCJtyVrVISdEVeEZ7CIeO34c7Ama/PV+hg==
+X-Received: by 2002:a17:90a:a00a:: with SMTP id q10mr12488535pjp.102.1558736353414;
+        Fri, 24 May 2019 15:19:13 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
+        by smtp.gmail.com with ESMTPSA id g8sm4464273pfk.83.2019.05.24.15.19.11
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 24 May 2019 11:25:34 -0700 (PDT)
-Date:   Fri, 24 May 2019 21:25:30 +0300
-From:   Alexey Dobriyan <adobriyan@gmail.com>
-To:     Jeff Moyer <jmoyer@redhat.com>
-Cc:     axboe@kernel.dk, ming.lei@redhat.com, osandov@fb.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Setting up default iosched in 5.0+
-Message-ID: <20190524182530.GA2658@avx2>
-References: <20190518093310.GA3123@avx2>
- <x49ftp329lt.fsf@segfault.boston.devel.redhat.com>
+        Fri, 24 May 2019 15:19:12 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.2-rc2
+Message-ID: <75a2e13c-1e40-6e36-393c-97383eb945f3@kernel.dk>
+Date:   Fri, 24 May 2019 16:19:10 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <x49ftp329lt.fsf@segfault.boston.devel.redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 24, 2019 at 10:46:54AM -0400, Jeff Moyer wrote:
-> Hi, Alexey,
-> 
-> Alexey Dobriyan <adobriyan@gmail.com> writes:
-> 
-> > 5.0 deleted three io schedulers and more importantly CONFIG_DEFAULT_IOSCHED
-> > option:
-> >
-> > 	commit f382fb0bcef4c37dc049e9f6963e3baf204d815c
-> > 	block: remove legacy IO schedulers
-> >
-> > After figuring out that I silently became "noop" customer enabling just
-> > BFQ didn't work: "noop" is still being selected by default.
-> >
-> > There is an "elevator=" command line option but it does nothing.
-> >
-> > Are users supposed to add stuff to init scripts now?
-> 
-> A global parameter was never a good idea, because systems often have
-> different types of storage installed which benefit from different I/O
-> schedulers.  The goal is for the default to just work.
+Hi Linus,
 
-Kernel can by default complain about "noop" for HDD disks and setup
-"noop" for SSD. And then let admins customise it further.
+Here are a set of fixes that should go into this release. This pull
+request contains:
 
-> If you feel that the defaults don't work for you, then udev rules are
-> the way to go.
-> 
-> If you also feel that you really do want to set the default for all
-> devices, then you can use the following udev rule to emulate the old
-> elevator= kernel command line parameter:
-> 
-> https://github.com/lnykryn/systemd-rhel/blob/rhel-8.0.0/rules/40-elevator.rules
+- NVMe pull request from Keith, with fixes from a few folks.
 
-The following udev rules seem to work, thanks:
+- bio and sbitmap before atomic barrier fixes (Andrea)
 
-	$ cat /etc/udev/rules.d/01-iosched.rules
-	SUBSYSTEM=="block", ACTION=="add", KERNEL=="sda", ATTR{queue/scheduler}="bfq"
-	SUBSYSTEM=="block", ACTION=="add", KERNEL=="sdb", ATTR{queue/scheduler}="bfq"
+- Hang fix for blk-mq freeze and unfreeze (Bob)
+
+- Single segment count regression fix (Christoph)
+
+- AoE now has a new maintainer
+
+- tools/io_uring/ Makefile fix, and sync with liburing (me)
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20190524
+
+
+----------------------------------------------------------------
+Andrea Parri (2):
+      bio: fix improper use of smp_mb__before_atomic()
+      sbitmap: fix improper use of smp_mb__before_atomic()
+
+Bob Liu (1):
+      blk-mq: fix hang caused by freeze/unfreeze sequence
+
+Christoph Hellwig (8):
+      nvme: fix srcu locking on error return in nvme_get_ns_from_disk
+      nvme: remove the ifdef around nvme_nvm_ioctl
+      nvme: merge nvme_ns_ioctl into nvme_ioctl
+      nvme: release namespace SRCU protection before performing controller ioctls
+      block: don't decrement nr_phys_segments for physically contigous segments
+      block: force an unlimited segment size on queues with a virt boundary
+      block: remove the segment size check in bio_will_gap
+      block: remove the bi_seg_{front,back}_size fields in struct bio
+
+Ed Cashin (1):
+      aoe: list new maintainer for aoe driver
+
+Jens Axboe (3):
+      tools/io_uring: fix Makefile for pthread library link
+      tools/io_uring: sync with liburing
+      Merge branch 'nvme-5.2-rc2' of git://git.infradead.org/nvme into for-linus
+
+Keith Busch (7):
+      nvme-pci: Fix controller freeze wait disabling
+      nvme-pci: Don't disable on timeout in reset state
+      nvme-pci: Unblock reset_work on IO failure
+      nvme-pci: Sync queues on reset
+      nvme: Fix known effects
+      nvme: update MAINTAINERS
+      nvme-pci: use blk-mq mapping for unmanaged irqs
+
+Laine Walker-Avina (1):
+      nvme: copy MTFA field from identify controller
+
+Yufen Yu (1):
+      nvme: fix memory leak for power latency tolerance
+
+ MAINTAINERS                  |   4 +-
+ block/blk-core.c             |   3 +-
+ block/blk-merge.c            | 134 +++++--------------------------------------
+ block/blk-mq.c               |  19 +++---
+ block/blk-settings.c         |  11 ++++
+ drivers/nvme/host/core.c     |  89 +++++++++++++++++++---------
+ drivers/nvme/host/nvme.h     |   1 +
+ drivers/nvme/host/pci.c      |  27 ++++-----
+ include/linux/bio.h          |   2 +-
+ include/linux/blk_types.h    |   7 ---
+ include/linux/blkdev.h       |   7 ++-
+ lib/sbitmap.c                |   2 +-
+ tools/io_uring/Makefile      |   2 +-
+ tools/io_uring/io_uring-cp.c |  21 +++++--
+ tools/io_uring/liburing.h    |  64 +++++++++++++++++----
+ tools/io_uring/queue.c       |  36 +++++-------
+ tools/io_uring/setup.c       |  10 +++-
+ tools/io_uring/syscall.c     |  48 ++++++++++------
+ 18 files changed, 241 insertions(+), 246 deletions(-)
+
+-- 
+Jens Axboe
+
