@@ -2,79 +2,93 @@ Return-Path: <SRS0=ocky=TZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0123C282CE
-	for <linux-block@archiver.kernel.org>; Sat, 25 May 2019 12:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C38C282CE
+	for <linux-block@archiver.kernel.org>; Sat, 25 May 2019 12:37:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C21932168B
-	for <linux-block@archiver.kernel.org>; Sat, 25 May 2019 12:29:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E093A20863
+	for <linux-block@archiver.kernel.org>; Sat, 25 May 2019 12:37:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ng7dcnqm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726817AbfEYM3o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 May 2019 08:29:44 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:54680 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726808AbfEYM3n (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 May 2019 08:29:43 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id E5E25F651719228DE6B0;
-        Sat, 25 May 2019 20:29:37 +0800 (CST)
-Received: from localhost (10.177.31.96) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Sat, 25 May 2019
- 20:29:27 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     <viro@zeniv.linux.org.uk>, <axboe@kernel.dk>
-CC:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH -next] io_uring: remove set but not used variable 'ret'
-Date:   Sat, 25 May 2019 20:29:04 +0800
-Message-ID: <20190525122904.12792-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+        id S1726808AbfEYMhS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 May 2019 08:37:18 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:42274 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726672AbfEYMhS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 25 May 2019 08:37:18 -0400
+Received: by mail-pf1-f193.google.com with SMTP id r22so4045897pfh.9
+        for <linux-block@vger.kernel.org>; Sat, 25 May 2019 05:37:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=D9WKL44IZrCsHLcC8RuyO2OF6TnrExBu2BCbGDIrgZk=;
+        b=ng7dcnqmA0ESY2Yoq9I7Y39MlfmfoH8r8LAYOT7OGjDKTwneqoaq8lCQQBt8Qd5TRy
+         YkC3r66eHvXACQeWb/rRwyA4f0ADc/iX67KTMJf9o4j2f+9WfthfqVyAsjeaxCJWMeja
+         S9iZoSGhXe6eYs2IMbgooFlOjOfyA4BjAtbQ/BUEduO/a0Q8nMR2JnWTlYIzbmp6PExt
+         OXFg/0GCJ0y1tRUY21zlI/guQMq0m+dKM6x2YmqZgKzUnsDFQxSjZKRnLD4xlVb1olZv
+         OZwT9+Uoz6Rp3Ufu5RZzYAOSRkyfrd3P6qdycFXlSJD3L4R07Zl0od1JNzH9BEsHU8IR
+         45qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=D9WKL44IZrCsHLcC8RuyO2OF6TnrExBu2BCbGDIrgZk=;
+        b=Ol88tC7tnfcsqA0sCOSmbEPpU/OzzVPRGgWfVuX2IMMLU3d3OuRm9F0jLJeGZQMh3z
+         vHc++NsOS8zDZkieb9UMA2xsTUhFeSyslzO/aWs5PwkwPlXRAiisrww6OfxFvHs3B9jQ
+         CAP+ouQtfVdqScl860bS18OWZe5lBezccpnLZ8RY+tjlp/yab6agB6YYVKCpB/QXy3ub
+         nHGqCjLcsALnzYafkgYK+yNYTlGdaca4YTDMPt12tnnPO5Y5IZwgkEbuTiDrUJSQEOtt
+         +yHl0pG5T68jbEQLXYVbdy6wiU/ftsRWshn7x90gEPM/3dYgX/3woidRo8/lo3P4bULQ
+         By3A==
+X-Gm-Message-State: APjAAAWNY3Sb6kIZZiS0i7QCFCdLrkENiDAyoPNr9GqqPhwbyK3qFQ+I
+        bxSPXOwWMi5sXr9xvROpCUEtsA==
+X-Google-Smtp-Source: APXvYqxVO8E5kQApQ6DvJXNKhwzv8WBr5YEqQmsAeYIxURe178NvpamPYVI21o9ANwFU1BAOTQ4kfQ==
+X-Received: by 2002:a62:36c1:: with SMTP id d184mr99425303pfa.49.1558787837277;
+        Sat, 25 May 2019 05:37:17 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
+        by smtp.gmail.com with ESMTPSA id e66sm6878673pfe.50.2019.05.25.05.37.14
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 25 May 2019 05:37:15 -0700 (PDT)
+Subject: Re: [PATCH liburing 0/2] pkg-config support
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     linux-block@vger.kernel.org,
+        Aarushi Mehta <mehta.aaru20@gmail.com>,
+        Julia Suvorova <jusual@mail.ru>
+References: <20190525085830.31577-1-stefanha@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <39f03e48-086b-533f-b233-a722d55437c6@kernel.dk>
+Date:   Sat, 25 May 2019 06:37:13 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.177.31.96]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20190525085830.31577-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fixes gcc '-Wunused-but-set-variable' warning:
+On 5/25/19 2:58 AM, Stefan Hajnoczi wrote:
+> Patch 1 adds pkg-config support so that applications are not required to
+> hardcode compiler flags that may change depending on the distro.
+> 
+> Patch 2 moves installation paths to ./configure so they are adjustable from the
+> command-line and do not require modifying the makefile.  This is necessary so
+> Fedora x86_64 can set libdir to /usr/lib64.
+> 
+> I have tested this by building Aarushi Mehta's QEMU io_uring support
+> using pkg-config on a Fedora x86_64 host.
 
-fs/io_uring.c: In function io_ring_submit:
-fs/io_uring.c:2279:7: warning: variable ret set but not used [-Wunused-but-set-variable]
+Applied, thanks.
 
-It's not used since commit f3fafe4103bd ("io_uring: add support for sqe links")
-
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- fs/io_uring.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 8ef9d8d3c88b..e2bbd227ab2a 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2276,7 +2276,6 @@ static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit)
- 
- 	for (i = 0; i < to_submit; i++) {
- 		struct sqe_submit s;
--		int ret;
- 
- 		if (!io_get_sqring(ctx, &s))
- 			break;
-@@ -2292,7 +2291,7 @@ static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit)
- 		s.needs_fixed_file = false;
- 		submit++;
- 
--		ret = io_submit_sqe(ctx, &s, statep, &link);
-+		io_submit_sqe(ctx, &s, statep, &link);
- 	}
- 	io_commit_sqring(ctx);
- 
 -- 
-2.17.1
-
+Jens Axboe
 
