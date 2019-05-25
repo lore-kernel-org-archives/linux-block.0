@@ -1,68 +1,71 @@
-Return-Path: <SRS0=cawq=TY=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=ocky=TZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AFDC282E1
-	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 23:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 859C2C282CE
+	for <linux-block@archiver.kernel.org>; Sat, 25 May 2019 05:12:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 194312184E
-	for <linux-block@archiver.kernel.org>; Fri, 24 May 2019 23:15:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558739728;
-	bh=tEzl916REZjAttWPWMAk742VBCxnkwwDzEiAXSnNY9s=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=M5zJX3XTkyB8851cuUOl40aUZPfmbgmLZxuZWo3mw+RTB36/Xx8+l3bHsJDy4Xi9X
-	 kw40uM2S30aVx67TDBmQ+sb13ASVg7ksB4B6W/8FWQAfSSflXxyv3/CV5wuwhbWdzq
-	 JCQ6IBZdvvJZv8FkkqheVO1aXPHbhEe8EtzV2JiY=
+	by mail.kernel.org (Postfix) with ESMTP id 4C7D92075E
+	for <linux-block@archiver.kernel.org>; Sat, 25 May 2019 05:12:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726267AbfEXXP1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 May 2019 19:15:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36720 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726146AbfEXXP0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 May 2019 19:15:26 -0400
-Subject: Re: [GIT PULL] Block fixes for 5.2-rc2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558739726;
-        bh=tEzl916REZjAttWPWMAk742VBCxnkwwDzEiAXSnNY9s=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=KIr9WnCbRe8eVJI5jTUqUzqj/ql7GWm4CWFvQ63yKgLhw4FmdtG4dm52PZPXbu5rE
-         HvRRI2qA0KvGheRiO+NQfQB85FNzAipNpWEQWH5ZRDhGFOlrte7QFD2rqZgnavhPxO
-         3FF/XkKMWtA+CvoyMccXNZCFQ+CSBNzGnRYYQ1Bk=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <75a2e13c-1e40-6e36-393c-97383eb945f3@kernel.dk>
-References: <75a2e13c-1e40-6e36-393c-97383eb945f3@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <75a2e13c-1e40-6e36-393c-97383eb945f3@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
- tags/for-linus-20190524
-X-PR-Tracked-Commit-Id: 096c7a6d90082586ff265d99e8e4a052dee3a403
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 7fbc78e3155a0c464bd832efc07fb3c2355fe9bd
-Message-Id: <155873972642.4676.15031588508911217261.pr-tracker-bot@kernel.org>
-Date:   Fri, 24 May 2019 23:15:26 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S1725926AbfEYFMn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 May 2019 01:12:43 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:46972 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725878AbfEYFMn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 25 May 2019 01:12:43 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 930944A59D84710E374A;
+        Sat, 25 May 2019 13:12:38 +0800 (CST)
+Received: from [127.0.0.1] (10.177.31.14) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Sat, 25 May 2019
+ 13:12:35 +0800
+Subject: Re: [PATCH 0/2] fixes for block stats
+From:   Hou Tao <houtao1@huawei.com>
+To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC:     <osandov@fb.com>, <ming.lei@redhat.com>
+References: <20190521075904.135060-1-houtao1@huawei.com>
+Message-ID: <e2ba6719-e2f8-1bfb-c5b5-7a4396df60ec@huawei.com>
+Date:   Sat, 25 May 2019 13:12:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190521075904.135060-1-houtao1@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.177.31.14]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 24 May 2019 16:19:10 -0600:
+ping ?
 
-> git://git.kernel.dk/linux-block.git tags/for-linus-20190524
+On 2019/5/21 15:59, Hou Tao wrote:
+> The first patch fixes the problem that there is no sample in
+> /sys/kernel/debug/block/nvmeXn1/poll_stat and hybrid poll may
+> don't work as expected. The second patch tries to ensure
+> the latency accounting for block stats will work normally
+> even when iostat is disabled.
+> 
+> Comments are wecome.
+> 
+> Regard,
+> Tao
+> 
+> Hou Tao (2):
+>   block: make rq sector size accessible for block stats
+>   block: also check RQF_STATS in blk_mq_need_time_stamp()
+> 
+>  block/blk-mq.c         | 17 ++++++++---------
+>  block/blk-throttle.c   |  3 ++-
+>  include/linux/blkdev.h | 15 ++++++++++++---
+>  3 files changed, 22 insertions(+), 13 deletions(-)
+> 
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/7fbc78e3155a0c464bd832efc07fb3c2355fe9bd
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
