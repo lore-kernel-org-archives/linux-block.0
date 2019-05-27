@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E13F2C04AB3
-	for <linux-block@archiver.kernel.org>; Mon, 27 May 2019 15:03:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21334C04AB3
+	for <linux-block@archiver.kernel.org>; Mon, 27 May 2019 15:03:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C12152182B
-	for <linux-block@archiver.kernel.org>; Mon, 27 May 2019 15:03:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2DFC2182B
+	for <linux-block@archiver.kernel.org>; Mon, 27 May 2019 15:03:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725991AbfE0PDA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 May 2019 11:03:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43886 "EHLO mx1.redhat.com"
+        id S1726884AbfE0PDG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 May 2019 11:03:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38168 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726704AbfE0PC5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 May 2019 11:02:57 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S1726704AbfE0PDG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 May 2019 11:03:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 291C23001A63;
-        Mon, 27 May 2019 15:02:57 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 44B88307D85B;
+        Mon, 27 May 2019 15:03:05 +0000 (UTC)
 Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA00679805;
-        Mon, 27 May 2019 15:02:53 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 68AA27D5A4;
+        Mon, 27 May 2019 15:02:59 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>,
         "Martin K . Petersen" <martin.petersen@oracle.com>
@@ -40,83 +40,161 @@ Cc:     linux-block@vger.kernel.org,
         Kashyap Desai <kashyap.desai@broadcom.com>,
         Sathya Prakash <sathya.prakash@broadcom.com>,
         Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 3/5] scsi: core: implement callback of .complete_queue_affinity
-Date:   Mon, 27 May 2019 23:02:05 +0800
-Message-Id: <20190527150207.11372-4-ming.lei@redhat.com>
+Subject: [PATCH V2 4/5] scsi: implement .complete_queue_affinity
+Date:   Mon, 27 May 2019 23:02:06 +0800
+Message-Id: <20190527150207.11372-5-ming.lei@redhat.com>
 In-Reply-To: <20190527150207.11372-1-ming.lei@redhat.com>
 References: <20190527150207.11372-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Mon, 27 May 2019 15:02:57 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 27 May 2019 15:03:05 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implement scsi core's callback of .complete_queue_affinity for
-supporting to drain in-flight requests in case that SCSI HBA
-supports multiple completion queue.
+Implement .complete_queue_affinity callback for all in-tree drivers
+which support private completion queues.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/scsi_lib.c  | 14 ++++++++++++++
- include/scsi/scsi_host.h | 10 ++++++++++
- 2 files changed, 24 insertions(+)
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c    | 11 +++++++++++
+ drivers/scsi/hpsa.c                       | 12 ++++++++++++
+ drivers/scsi/megaraid/megaraid_sas_base.c | 10 ++++++++++
+ drivers/scsi/mpt3sas/mpt3sas_scsih.c      | 11 +++++++++++
+ 4 files changed, 44 insertions(+)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 65d0a10c76ad..ac57dc98a8c0 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1750,6 +1750,19 @@ static int scsi_map_queues(struct blk_mq_tag_set *set)
- 	return blk_mq_map_queues(&set->map[HCTX_TYPE_DEFAULT]);
+diff --git a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
+index 49620c2411df..799ee15c8786 100644
+--- a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
++++ b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
+@@ -2896,6 +2896,16 @@ static void debugfs_snapshot_restore_v3_hw(struct hisi_hba *hisi_hba)
+ 	clear_bit(HISI_SAS_REJECT_CMD_BIT, &hisi_hba->flags);
  }
  
 +static const struct cpumask *
-+scsi_complete_queue_affinity(struct blk_mq_hw_ctx *hctx, int cpu)
++hisi_sas_complete_queue_affinity(struct Scsi_Host *sh, int cpu)
 +{
-+	struct request_queue *q = hctx->queue;
-+	struct scsi_device *sdev = q->queuedata;
-+	struct Scsi_Host *shost = sdev->host;
++	struct hisi_hba *hisi_hba = shost_priv(sh);
++	unsigned reply_queue = hisi_hba->reply_map[cpu];
 +
-+	if (shost->hostt->complete_queue_affinity)
-+		return shost->hostt->complete_queue_affinity(shost, cpu);
-+
-+	return NULL;
++	return pci_irq_get_affinity(hisi_hba->pci_dev,
++			reply_queue + BASE_VECTORS_V3_HW);
 +}
 +
- void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
- {
- 	struct device *dev = shost->dma_dev;
-@@ -1802,6 +1815,7 @@ static const struct blk_mq_ops scsi_mq_ops = {
- 	.initialize_rq_fn = scsi_initialize_rq,
- 	.busy		= scsi_mq_lld_busy,
- 	.map_queues	= scsi_map_queues,
-+	.complete_queue_affinity = scsi_complete_queue_affinity,
+ static struct scsi_host_template sht_v3_hw = {
+ 	.name			= DRV_NAME,
+ 	.module			= THIS_MODULE,
+@@ -2917,6 +2927,7 @@ static struct scsi_host_template sht_v3_hw = {
+ 	.shost_attrs		= host_attrs_v3_hw,
+ 	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,
+ 	.host_reset             = hisi_sas_host_reset,
++	.complete_queue_affinity = hisi_sas_complete_queue_affinity,
  };
  
- struct request_queue *scsi_mq_alloc_queue(struct scsi_device *sdev)
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index a5fcdad4a03e..65ccac1429a1 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -268,6 +268,16 @@ struct scsi_host_template {
- 	 */
- 	int (* map_queues)(struct Scsi_Host *shost);
+ static const struct hisi_sas_hw hisi_sas_v3_hw = {
+diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
+index 72f9edb86752..87d37f945c76 100644
+--- a/drivers/scsi/hpsa.c
++++ b/drivers/scsi/hpsa.c
+@@ -271,6 +271,8 @@ static void hpsa_free_cmd_pool(struct ctlr_info *h);
+ #define VPD_PAGE (1 << 8)
+ #define HPSA_SIMPLE_ERROR_BITS 0x03
  
-+	/*
-+	 * This functions lets the driver expose complete queue's cpu
-+	 * affinity to the block layer. @cpu is used for retrieving
-+	 * the mapped completion queue.
-+	 *
-+	 * Status: OPTIONAL
-+	 */
-+	const struct cpumask * (* complete_queue_affinity)(struct Scsi_Host *,
-+							   int cpu);
++static const struct cpumask *hpsa_complete_queue_affinity(
++		struct Scsi_Host *, int);
+ static int hpsa_scsi_queue_command(struct Scsi_Host *h, struct scsi_cmnd *cmd);
+ static void hpsa_scan_start(struct Scsi_Host *);
+ static int hpsa_scan_finished(struct Scsi_Host *sh,
+@@ -962,6 +964,7 @@ static struct scsi_host_template hpsa_driver_template = {
+ 	.name			= HPSA,
+ 	.proc_name		= HPSA,
+ 	.queuecommand		= hpsa_scsi_queue_command,
++	.complete_queue_affinity = hpsa_complete_queue_affinity,
+ 	.scan_start		= hpsa_scan_start,
+ 	.scan_finished		= hpsa_scan_finished,
+ 	.change_queue_depth	= hpsa_change_queue_depth,
+@@ -4824,6 +4827,15 @@ static int hpsa_scsi_ioaccel_direct_map(struct ctlr_info *h,
+ 		cmd->cmnd, cmd->cmd_len, dev->scsi3addr, dev);
+ }
+ 
++static const struct cpumask *
++hpsa_complete_queue_affinity(struct Scsi_Host *sh, int cpu)
++{
++	struct ctlr_info *h = shost_to_hba(sh);
++	unsigned reply_queue = h->reply_map[cpu];
 +
- 	/*
- 	 * This function determines the BIOS parameters for a given
- 	 * harddisk.  These tend to be numbers that are made up by
++	return pci_irq_get_affinity(h->pdev, reply_queue);
++}
++
+ /*
+  * Set encryption parameters for the ioaccel2 request
+  */
+diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
+index 3dd1df472dc6..59b71e8f98a8 100644
+--- a/drivers/scsi/megaraid/megaraid_sas_base.c
++++ b/drivers/scsi/megaraid/megaraid_sas_base.c
+@@ -3165,6 +3165,15 @@ megasas_fw_cmds_outstanding_show(struct device *cdev,
+ 	return snprintf(buf, PAGE_SIZE, "%d\n", atomic_read(&instance->fw_outstanding));
+ }
+ 
++static const struct cpumask *
++megasas_complete_queue_affinity(struct Scsi_Host *sh, int cpu)
++{
++	struct megasas_instance *instance = (struct megasas_instance *)sh->hostdata;
++	unsigned reply_queue = instance->reply_map[cpu];
++
++	return pci_irq_get_affinity(instance->pdev, reply_queue);
++}
++
+ static DEVICE_ATTR(fw_crash_buffer, S_IRUGO | S_IWUSR,
+ 	megasas_fw_crash_buffer_show, megasas_fw_crash_buffer_store);
+ static DEVICE_ATTR(fw_crash_buffer_size, S_IRUGO,
+@@ -3208,6 +3217,7 @@ static struct scsi_host_template megasas_template = {
+ 	.bios_param = megasas_bios_param,
+ 	.change_queue_depth = scsi_change_queue_depth,
+ 	.no_write_same = 1,
++	.complete_queue_affinity        = megasas_complete_queue_affinity,
+ };
+ 
+ /**
+diff --git a/drivers/scsi/mpt3sas/mpt3sas_scsih.c b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
+index 1ccfbc7eebe0..2db1d6fc4bda 100644
+--- a/drivers/scsi/mpt3sas/mpt3sas_scsih.c
++++ b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
+@@ -10161,6 +10161,15 @@ scsih_scan_finished(struct Scsi_Host *shost, unsigned long time)
+ 	return 1;
+ }
+ 
++static const struct cpumask *
++mpt3sas_complete_queue_affinity(struct Scsi_Host *sh, int cpu)
++{
++	struct MPT3SAS_ADAPTER *ioc = shost_priv(sh);
++	unsigned reply_queue = ioc->cpu_msix_table[cpu];
++
++       return pci_irq_get_affinity(ioc->pdev, reply_queue);
++}
++
+ /* shost template for SAS 2.0 HBA devices */
+ static struct scsi_host_template mpt2sas_driver_template = {
+ 	.module				= THIS_MODULE,
+@@ -10189,6 +10198,7 @@ static struct scsi_host_template mpt2sas_driver_template = {
+ 	.sdev_attrs			= mpt3sas_dev_attrs,
+ 	.track_queue_depth		= 1,
+ 	.cmd_size			= sizeof(struct scsiio_tracker),
++	.complete_queue_affinity        = mpt3sas_complete_queue_affinity,
+ };
+ 
+ /* raid transport support for SAS 2.0 HBA devices */
+@@ -10227,6 +10237,7 @@ static struct scsi_host_template mpt3sas_driver_template = {
+ 	.sdev_attrs			= mpt3sas_dev_attrs,
+ 	.track_queue_depth		= 1,
+ 	.cmd_size			= sizeof(struct scsiio_tracker),
++	.complete_queue_affinity        = mpt3sas_complete_queue_affinity,
+ };
+ 
+ /* raid transport support for SAS 3.0 HBA devices */
 -- 
 2.20.1
 
