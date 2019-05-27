@@ -1,4 +1,4 @@
-Return-Path: <SRS0=4mJT=T2=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=U0+/=T3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,113 +6,112 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74086C282E3
-	for <linux-block@archiver.kernel.org>; Sun, 26 May 2019 21:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EACB8C07542
+	for <linux-block@archiver.kernel.org>; Mon, 27 May 2019 05:46:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D6FB2075C
-	for <linux-block@archiver.kernel.org>; Sun, 26 May 2019 21:49:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C288F2075B
+	for <linux-block@archiver.kernel.org>; Mon, 27 May 2019 05:46:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726133AbfEZVtd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 May 2019 17:49:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40166 "EHLO mx1.redhat.com"
+        id S1725822AbfE0FqL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 May 2019 01:46:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45724 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726106AbfEZVtd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 May 2019 17:49:33 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S1725774AbfE0FqL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 May 2019 01:46:11 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B9D8430821A1;
-        Sun, 26 May 2019 21:49:32 +0000 (UTC)
-Received: from rh2.redhat.com (ovpn-120-84.rdu2.redhat.com [10.10.120.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 245205C5B0;
-        Sun, 26 May 2019 21:49:32 +0000 (UTC)
-From:   Mike Christie <mchristi@redhat.com>
-To:     josef@toxicpanda.com, linux-block@vger.kernel.org
-Cc:     Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 1/1] nbd: add netlink reconfigure resize support
-Date:   Sun, 26 May 2019 16:49:18 -0500
-Message-Id: <20190526214918.9495-1-mchristi@redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id 22F1330820C9;
+        Mon, 27 May 2019 05:46:11 +0000 (UTC)
+Received: from rhel3.localdomain (ovpn-12-147.pek2.redhat.com [10.72.12.147])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 30B5560C9B;
+        Mon, 27 May 2019 05:46:07 +0000 (UTC)
+From:   xiubli@redhat.com
+To:     josef@toxicpanda.com, axboe@kernel.dk, nbd@other.debian.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        atumball@redhat.com, Xiubo Li <xiubli@redhat.com>
+Subject: [PATCH] nbd: fix crash when the blksize is zero
+Date:   Mon, 27 May 2019 13:44:38 +0800
+Message-Id: <20190527054438.13548-1-xiubli@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Sun, 26 May 2019 21:49:32 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Mon, 27 May 2019 05:46:11 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If the device is setup with ioctl we can resize the device after the
-initial setup, but if the device is setup with netlink we cannot use the
-resize related ioctls and there is no netlink reconfigure size ATTR
-handling code.
+From: Xiubo Li <xiubli@redhat.com>
 
-This patch adds netlink reconfigure resize support to match the ioctl
-interface.
+This will allow the blksize to be set zero and then use 1024 as
+default.
 
-Signed-off-by: Mike Christie <mchristi@redhat.com>
+Signed-off-by: Xiubo Li <xiubli@redhat.com>
 ---
-
-V2:
-- Merge reconfig and connect resize related code to helper and avoid
-multiple nbd_size_set calls.
-
- drivers/block/nbd.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+ drivers/block/nbd.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 053958a8a2ba..d75b67c12392 100644
+index 053958a..4c1de1c 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1674,6 +1674,21 @@ nbd_device_policy[NBD_DEVICE_ATTR_MAX + 1] = {
- 	[NBD_DEVICE_CONNECTED]		=	{ .type = NLA_U8 },
- };
+@@ -135,6 +135,8 @@ struct nbd_cmd {
  
-+static void nbd_genl_set_size(struct genl_info *info, struct nbd_device *nbd)
+ #define NBD_MAGIC 0x68797548
+ 
++#define NBD_DEF_BLKSIZE 1024
++
+ static unsigned int nbds_max = 16;
+ static int max_part = 16;
+ static struct workqueue_struct *recv_workqueue;
+@@ -1237,6 +1239,14 @@ static void nbd_clear_sock_ioctl(struct nbd_device *nbd,
+ 		nbd_config_put(nbd);
+ }
+ 
++static bool nbd_is_valid_blksize(unsigned long blksize)
 +{
-+	struct nbd_config *config = nbd->config;
-+	u64 bsize = config->blksize;
-+	u64 bytes = config->bytesize;
-+
-+	if (info->attrs[NBD_ATTR_SIZE_BYTES])
-+		bytes = nla_get_u64(info->attrs[NBD_ATTR_SIZE_BYTES]);
-+
-+	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES])
-+		bsize = nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
-+
-+	nbd_size_set(nbd, bsize, div64_u64(bytes, bsize));
++	if (!blksize || !is_power_of_2(blksize) || blksize < 512 ||
++		blksize > PAGE_SIZE)
++		return false;
++	return true;
 +}
 +
- static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct nbd_device *nbd = NULL;
-@@ -1761,16 +1776,8 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 	refcount_set(&nbd->config_refs, 1);
- 	set_bit(NBD_BOUND, &config->runtime_flags);
- 
--	if (info->attrs[NBD_ATTR_SIZE_BYTES]) {
--		u64 bytes = nla_get_u64(info->attrs[NBD_ATTR_SIZE_BYTES]);
--		nbd_size_set(nbd, config->blksize,
--			     div64_u64(bytes, config->blksize));
--	}
--	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]) {
--		u64 bsize =
--			nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
--		nbd_size_set(nbd, bsize, div64_u64(config->bytesize, bsize));
--	}
-+	nbd_genl_set_size(info, nbd);
-+
- 	if (info->attrs[NBD_ATTR_TIMEOUT]) {
- 		u64 timeout = nla_get_u64(info->attrs[NBD_ATTR_TIMEOUT]);
- 		nbd->tag_set.timeout = timeout * HZ;
-@@ -1939,6 +1946,8 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 		goto out;
+ /* Must be called with config_lock held */
+ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+ 		       unsigned int cmd, unsigned long arg)
+@@ -1252,8 +1262,9 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+ 	case NBD_SET_SOCK:
+ 		return nbd_add_socket(nbd, arg, false);
+ 	case NBD_SET_BLKSIZE:
+-		if (!arg || !is_power_of_2(arg) || arg < 512 ||
+-		    arg > PAGE_SIZE)
++		if (!arg)
++			arg = NBD_DEF_BLKSIZE;
++		if (!nbd_is_valid_blksize(arg))
+ 			return -EINVAL;
+ 		nbd_size_set(nbd, arg,
+ 			     div_s64(config->bytesize, arg));
+@@ -1333,7 +1344,7 @@ static struct nbd_config *nbd_alloc_config(void)
+ 	atomic_set(&config->recv_threads, 0);
+ 	init_waitqueue_head(&config->recv_wq);
+ 	init_waitqueue_head(&config->conn_wait);
+-	config->blksize = 1024;
++	config->blksize = NBD_DEF_BLKSIZE;
+ 	atomic_set(&config->live_connections, 0);
+ 	try_module_get(THIS_MODULE);
+ 	return config;
+@@ -1769,6 +1780,10 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+ 	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]) {
+ 		u64 bsize =
+ 			nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
++		if (!bsize)
++			bsize = NBD_DEF_BLKSIZE;
++		if (!nbd_is_valid_blksize(bsize))
++			return -EINVAL;
+ 		nbd_size_set(nbd, bsize, div64_u64(config->bytesize, bsize));
  	}
- 
-+	nbd_genl_set_size(info, nbd);
-+
  	if (info->attrs[NBD_ATTR_TIMEOUT]) {
- 		u64 timeout = nla_get_u64(info->attrs[NBD_ATTR_TIMEOUT]);
- 		nbd->tag_set.timeout = timeout * HZ;
 -- 
-2.21.0
+1.8.3.1
 
