@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21334C04AB3
-	for <linux-block@archiver.kernel.org>; Mon, 27 May 2019 15:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28B55C04AB3
+	for <linux-block@archiver.kernel.org>; Mon, 27 May 2019 15:03:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F2DFC2182B
-	for <linux-block@archiver.kernel.org>; Mon, 27 May 2019 15:03:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2F5C2182B
+	for <linux-block@archiver.kernel.org>; Mon, 27 May 2019 15:03:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726884AbfE0PDG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 May 2019 11:03:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38168 "EHLO mx1.redhat.com"
+        id S1726910AbfE0PDN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 May 2019 11:03:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52818 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726704AbfE0PDG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 May 2019 11:03:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S1726704AbfE0PDN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 May 2019 11:03:13 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 44B88307D85B;
-        Mon, 27 May 2019 15:03:05 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id D2BD53091D67;
+        Mon, 27 May 2019 15:03:12 +0000 (UTC)
 Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 68AA27D5A4;
-        Mon, 27 May 2019 15:02:59 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 173511017E39;
+        Mon, 27 May 2019 15:03:07 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>,
         "Martin K . Petersen" <martin.petersen@oracle.com>
@@ -40,161 +40,209 @@ Cc:     linux-block@vger.kernel.org,
         Kashyap Desai <kashyap.desai@broadcom.com>,
         Sathya Prakash <sathya.prakash@broadcom.com>,
         Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 4/5] scsi: implement .complete_queue_affinity
-Date:   Mon, 27 May 2019 23:02:06 +0800
-Message-Id: <20190527150207.11372-5-ming.lei@redhat.com>
+Subject: [PATCH V2 5/5] blk-mq: Wait for for hctx inflight requests on CPU unplug
+Date:   Mon, 27 May 2019 23:02:07 +0800
+Message-Id: <20190527150207.11372-6-ming.lei@redhat.com>
 In-Reply-To: <20190527150207.11372-1-ming.lei@redhat.com>
 References: <20190527150207.11372-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 27 May 2019 15:03:05 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 27 May 2019 15:03:13 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implement .complete_queue_affinity callback for all in-tree drivers
-which support private completion queues.
+Managed interrupts can not migrate affinity when their CPUs are offline.
+If the CPU is allowed to shutdown before they're returned, commands
+dispatched to managed queues won't be able to complete through their
+irq handlers.
+
+Wait in cpu hotplug handler until all inflight requests on the tags
+are completed or timeout. Wait once for each tags, so we can save time
+in case of shared tags.
+
+Based on the following patch from Keith, and use simple delay-spin
+instead.
+
+https://lore.kernel.org/linux-block/20190405215920.27085-1-keith.busch@intel.com/
+
+Some SCSI devices may have single blk_mq hw queue and multiple private
+completion queues, and wait until all requests on the private completion
+queue are completed.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/hisi_sas/hisi_sas_v3_hw.c    | 11 +++++++++++
- drivers/scsi/hpsa.c                       | 12 ++++++++++++
- drivers/scsi/megaraid/megaraid_sas_base.c | 10 ++++++++++
- drivers/scsi/mpt3sas/mpt3sas_scsih.c      | 11 +++++++++++
- 4 files changed, 44 insertions(+)
+ block/blk-mq-tag.c |  2 +-
+ block/blk-mq-tag.h |  5 +++
+ block/blk-mq.c     | 94 ++++++++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 93 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-index 49620c2411df..799ee15c8786 100644
---- a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-+++ b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-@@ -2896,6 +2896,16 @@ static void debugfs_snapshot_restore_v3_hw(struct hisi_hba *hisi_hba)
- 	clear_bit(HISI_SAS_REJECT_CMD_BIT, &hisi_hba->flags);
- }
- 
-+static const struct cpumask *
-+hisi_sas_complete_queue_affinity(struct Scsi_Host *sh, int cpu)
-+{
-+	struct hisi_hba *hisi_hba = shost_priv(sh);
-+	unsigned reply_queue = hisi_hba->reply_map[cpu];
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 7513c8eaabee..b24334f99c5d 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -332,7 +332,7 @@ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
+  *		true to continue iterating tags, false to stop.
+  * @priv:	Will be passed as second argument to @fn.
+  */
+-static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
++void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
+ 		busy_tag_iter_fn *fn, void *priv)
+ {
+ 	if (tags->nr_reserved_tags)
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index 61deab0b5a5a..9ce7606a87f0 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -19,6 +19,9 @@ struct blk_mq_tags {
+ 	struct request **rqs;
+ 	struct request **static_rqs;
+ 	struct list_head page_list;
 +
-+	return pci_irq_get_affinity(hisi_hba->pci_dev,
-+			reply_queue + BASE_VECTORS_V3_HW);
-+}
-+
- static struct scsi_host_template sht_v3_hw = {
- 	.name			= DRV_NAME,
- 	.module			= THIS_MODULE,
-@@ -2917,6 +2927,7 @@ static struct scsi_host_template sht_v3_hw = {
- 	.shost_attrs		= host_attrs_v3_hw,
- 	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,
- 	.host_reset             = hisi_sas_host_reset,
-+	.complete_queue_affinity = hisi_sas_complete_queue_affinity,
++#define BLK_MQ_TAGS_DRAINED           0
++	unsigned long flags;
  };
  
- static const struct hisi_sas_hw hisi_sas_v3_hw = {
-diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
-index 72f9edb86752..87d37f945c76 100644
---- a/drivers/scsi/hpsa.c
-+++ b/drivers/scsi/hpsa.c
-@@ -271,6 +271,8 @@ static void hpsa_free_cmd_pool(struct ctlr_info *h);
- #define VPD_PAGE (1 << 8)
- #define HPSA_SIMPLE_ERROR_BITS 0x03
  
-+static const struct cpumask *hpsa_complete_queue_affinity(
-+		struct Scsi_Host *, int);
- static int hpsa_scsi_queue_command(struct Scsi_Host *h, struct scsi_cmnd *cmd);
- static void hpsa_scan_start(struct Scsi_Host *);
- static int hpsa_scan_finished(struct Scsi_Host *sh,
-@@ -962,6 +964,7 @@ static struct scsi_host_template hpsa_driver_template = {
- 	.name			= HPSA,
- 	.proc_name		= HPSA,
- 	.queuecommand		= hpsa_scsi_queue_command,
-+	.complete_queue_affinity = hpsa_complete_queue_affinity,
- 	.scan_start		= hpsa_scan_start,
- 	.scan_finished		= hpsa_scan_finished,
- 	.change_queue_depth	= hpsa_change_queue_depth,
-@@ -4824,6 +4827,15 @@ static int hpsa_scsi_ioaccel_direct_map(struct ctlr_info *h,
- 		cmd->cmnd, cmd->cmd_len, dev->scsi3addr, dev);
+@@ -35,6 +38,8 @@ extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
+ extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
+ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 		void *priv);
++void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
++		busy_tag_iter_fn *fn, void *priv);
+ 
+ static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
+ 						 struct blk_mq_hw_ctx *hctx)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 32b8ad3d341b..ab1fbfd48374 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2215,6 +2215,65 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 	return -ENOMEM;
  }
  
-+static const struct cpumask *
-+hpsa_complete_queue_affinity(struct Scsi_Host *sh, int cpu)
++static int blk_mq_hctx_notify_prepare(unsigned int cpu, struct hlist_node *node)
 +{
-+	struct ctlr_info *h = shost_to_hba(sh);
-+	unsigned reply_queue = h->reply_map[cpu];
++	struct blk_mq_hw_ctx	*hctx =
++		hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
 +
-+	return pci_irq_get_affinity(h->pdev, reply_queue);
++	if (hctx->tags)
++		clear_bit(BLK_MQ_TAGS_DRAINED, &hctx->tags->flags);
++
++	return 0;
++}
++
++struct blk_mq_inflight_rq_data {
++	unsigned cnt;
++	const struct cpumask *cpumask;
++};
++
++static bool blk_mq_count_inflight_rq(struct request *rq, void *data,
++				     bool reserved)
++{
++	struct blk_mq_inflight_rq_data *count = data;
++
++	if ((blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT) &&
++			cpumask_test_cpu(blk_mq_rq_cpu(rq), count->cpumask))
++		count->cnt++;
++
++	return true;
++}
++
++unsigned blk_mq_tags_inflight_rqs(struct blk_mq_tags *tags,
++		const struct cpumask *completion_cpus)
++{
++	struct blk_mq_inflight_rq_data data = {
++		.cnt = 0,
++		.cpumask = completion_cpus,
++	};
++
++	blk_mq_all_tag_busy_iter(tags, blk_mq_count_inflight_rq, &data);
++
++	return data.cnt;
++}
++
++static void blk_mq_drain_inflight_rqs(struct blk_mq_tags *tags,
++		const struct cpumask *completion_cpus)
++{
++	if (!tags)
++		return;
++
++	/* Can't apply the optimization in case of private completion queues */
++	if (completion_cpus == cpu_all_mask &&
++			test_and_set_bit(BLK_MQ_TAGS_DRAINED, &tags->flags))
++		return;
++
++	while (1) {
++		if (!blk_mq_tags_inflight_rqs(tags, completion_cpus))
++			break;
++		msleep(5);
++	}
 +}
 +
  /*
-  * Set encryption parameters for the ioaccel2 request
-  */
-diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
-index 3dd1df472dc6..59b71e8f98a8 100644
---- a/drivers/scsi/megaraid/megaraid_sas_base.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_base.c
-@@ -3165,6 +3165,15 @@ megasas_fw_cmds_outstanding_show(struct device *cdev,
- 	return snprintf(buf, PAGE_SIZE, "%d\n", atomic_read(&instance->fw_outstanding));
+  * 'cpu' is going away. splice any existing rq_list entries from this
+  * software queue to the hw queue dispatch list, and ensure that it
+@@ -2226,6 +2285,8 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+ 	struct blk_mq_ctx *ctx;
+ 	LIST_HEAD(tmp);
+ 	enum hctx_type type;
++	struct request_queue *q;
++	const struct cpumask *cpumask = NULL, *completion_cpus;
+ 
+ 	hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
+ 	ctx = __blk_mq_get_ctx(hctx->queue, cpu);
+@@ -2238,14 +2299,32 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+ 	}
+ 	spin_unlock(&ctx->lock);
+ 
+-	if (list_empty(&tmp))
+-		return 0;
++	if (!list_empty(&tmp)) {
++		spin_lock(&hctx->lock);
++		list_splice_tail_init(&tmp, &hctx->dispatch);
++		spin_unlock(&hctx->lock);
+ 
+-	spin_lock(&hctx->lock);
+-	list_splice_tail_init(&tmp, &hctx->dispatch);
+-	spin_unlock(&hctx->lock);
++		blk_mq_run_hw_queue(hctx, true);
++	}
++
++	/*
++	 * Interrupt for the current completion queue will be shutdown, so
++	 * wait until all requests on this queue are completed.
++	 */
++	q = hctx->queue;
++	if (q->mq_ops->complete_queue_affinity)
++		cpumask = q->mq_ops->complete_queue_affinity(hctx, cpu);
++
++	if (!cpumask) {
++		cpumask = hctx->cpumask;
++		completion_cpus = cpu_all_mask;
++	} else {
++		completion_cpus = cpumask;
++	}
++
++	if (cpumask_first_and(cpumask, cpu_online_mask) >= nr_cpu_ids)
++		blk_mq_drain_inflight_rqs(hctx->tags, completion_cpus);
+ 
+-	blk_mq_run_hw_queue(hctx, true);
+ 	return 0;
  }
  
-+static const struct cpumask *
-+megasas_complete_queue_affinity(struct Scsi_Host *sh, int cpu)
-+{
-+	struct megasas_instance *instance = (struct megasas_instance *)sh->hostdata;
-+	unsigned reply_queue = instance->reply_map[cpu];
-+
-+	return pci_irq_get_affinity(instance->pdev, reply_queue);
-+}
-+
- static DEVICE_ATTR(fw_crash_buffer, S_IRUGO | S_IWUSR,
- 	megasas_fw_crash_buffer_show, megasas_fw_crash_buffer_store);
- static DEVICE_ATTR(fw_crash_buffer_size, S_IRUGO,
-@@ -3208,6 +3217,7 @@ static struct scsi_host_template megasas_template = {
- 	.bios_param = megasas_bios_param,
- 	.change_queue_depth = scsi_change_queue_depth,
- 	.no_write_same = 1,
-+	.complete_queue_affinity        = megasas_complete_queue_affinity,
- };
+@@ -3541,7 +3620,8 @@ EXPORT_SYMBOL(blk_mq_rq_cpu);
  
- /**
-diff --git a/drivers/scsi/mpt3sas/mpt3sas_scsih.c b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-index 1ccfbc7eebe0..2db1d6fc4bda 100644
---- a/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-+++ b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-@@ -10161,6 +10161,15 @@ scsih_scan_finished(struct Scsi_Host *shost, unsigned long time)
- 	return 1;
+ static int __init blk_mq_init(void)
+ {
+-	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
++	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead",
++				blk_mq_hctx_notify_prepare,
+ 				blk_mq_hctx_notify_dead);
+ 	return 0;
  }
- 
-+static const struct cpumask *
-+mpt3sas_complete_queue_affinity(struct Scsi_Host *sh, int cpu)
-+{
-+	struct MPT3SAS_ADAPTER *ioc = shost_priv(sh);
-+	unsigned reply_queue = ioc->cpu_msix_table[cpu];
-+
-+       return pci_irq_get_affinity(ioc->pdev, reply_queue);
-+}
-+
- /* shost template for SAS 2.0 HBA devices */
- static struct scsi_host_template mpt2sas_driver_template = {
- 	.module				= THIS_MODULE,
-@@ -10189,6 +10198,7 @@ static struct scsi_host_template mpt2sas_driver_template = {
- 	.sdev_attrs			= mpt3sas_dev_attrs,
- 	.track_queue_depth		= 1,
- 	.cmd_size			= sizeof(struct scsiio_tracker),
-+	.complete_queue_affinity        = mpt3sas_complete_queue_affinity,
- };
- 
- /* raid transport support for SAS 2.0 HBA devices */
-@@ -10227,6 +10237,7 @@ static struct scsi_host_template mpt3sas_driver_template = {
- 	.sdev_attrs			= mpt3sas_dev_attrs,
- 	.track_queue_depth		= 1,
- 	.cmd_size			= sizeof(struct scsiio_tracker),
-+	.complete_queue_affinity        = mpt3sas_complete_queue_affinity,
- };
- 
- /* raid transport support for SAS 3.0 HBA devices */
 -- 
 2.20.1
 
