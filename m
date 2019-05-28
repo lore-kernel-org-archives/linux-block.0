@@ -2,121 +2,96 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.7 required=3.0 tests=DATE_IN_PAST_12_24,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 699ACC28CC0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 10:10:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0E3C28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 10:32:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4877C21670
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 10:10:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F328D2070D
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 10:32:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726097AbfE2KKw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 06:10:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49708 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725874AbfE2KKw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 06:10:52 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1B6B4C074EF2;
-        Wed, 29 May 2019 10:10:47 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B5066A96F;
-        Wed, 29 May 2019 10:10:33 +0000 (UTC)
-Date:   Wed, 29 May 2019 18:10:29 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-scsi@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH V2 5/5] blk-mq: Wait for for hctx inflight requests on
- CPU unplug
-Message-ID: <20190529101028.GA15496@ming.t460p>
-References: <20190527150207.11372-1-ming.lei@redhat.com>
- <20190527150207.11372-6-ming.lei@redhat.com>
- <45daceb4-fb88-a835-8cc6-cd4c4d7cf42d@huawei.com>
- <20190529022852.GA21398@ming.t460p>
- <20190529024200.GC21398@ming.t460p>
- <5bc07fd5-9d2b-bf9c-eb77-b8cebadb9150@huawei.com>
+        id S1725894AbfE2Kcl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 06:32:41 -0400
+Received: from m97179.mail.qiye.163.com ([220.181.97.179]:6940 "EHLO
+        m97179.mail.qiye.163.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725874AbfE2Kcl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 06:32:41 -0400
+Received: from localhost (unknown [120.132.1.243])
+        by m97179.mail.qiye.163.com (Hmail) with ESMTPA id 1966BE01AC1;
+        Wed, 29 May 2019 18:32:33 +0800 (CST)
+Date:   Wed, 29 May 2019 04:05:54 +0800
+From:   Yao Liu <yotta.liu@ucloud.cn>
+To:     Mike Christie <mchristi@redhat.com>
+Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] nbd: notify userland even if nbd has already
+ disconnected
+Message-ID: <20190528200554.GA21633@192-168-150-246.7~>
+References: <1558691036-16281-1-git-send-email-yotta.liu@ucloud.cn>
+ <1558691036-16281-2-git-send-email-yotta.liu@ucloud.cn>
+ <20190524130856.zod5agp7hk74pcnr@MacBook-Pro-91.local.dhcp.thefacebook.com>
+ <20190527182323.GB20702@192-168-150-246.7~>
+ <5CED6385.3000802@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5bc07fd5-9d2b-bf9c-eb77-b8cebadb9150@huawei.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Wed, 29 May 2019 10:10:52 +0000 (UTC)
+In-Reply-To: <5CED6385.3000802@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-HM-Spam-Status: e1kIGBQJHllBWUtVQ01JQkJCQ05NT0xJS0pOWVdZKFlBSUI3V1ktWUFJV1
+        kJDhceCFlBWTU0KTY6NyQpLjc#WQY+
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Nxw6USo*Vjg0OiI9KgoSPyhD
+        OBNPCzhVSlVKTk5CSklOQk5ISUtIVTMWGhIXVQIUDw8aVRcSDjsOGBcUDh9VGBVFWVdZEgtZQVlK
+        SUtVSkhJVUpVSU9IWVdZCAFZQUhOTk83Bg++
+X-HM-Tid: 0a6b03260a5320bdkuqy1966be01ac1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 29, 2019 at 10:42:00AM +0100, John Garry wrote:
-> On 29/05/2019 03:42, Ming Lei wrote:
-> > On Wed, May 29, 2019 at 10:28:52AM +0800, Ming Lei wrote:
-> > > On Tue, May 28, 2019 at 05:50:40PM +0100, John Garry wrote:
-> > > > On 27/05/2019 16:02, Ming Lei wrote:
-> > > > > Managed interrupts can not migrate affinity when their CPUs are offline.
-> > > > > If the CPU is allowed to shutdown before they're returned, commands
-> > > > > dispatched to managed queues won't be able to complete through their
-> > > > > irq handlers.
-> > > > > 
-> > > > > Wait in cpu hotplug handler until all inflight requests on the tags
-> > > > > are completed or timeout. Wait once for each tags, so we can save time
-> > > > > in case of shared tags.
-> > > > > 
-> > > > > Based on the following patch from Keith, and use simple delay-spin
-> > > > > instead.
-> > > > > 
-> > > > > https://lore.kernel.org/linux-block/20190405215920.27085-1-keith.busch@intel.com/
-> > > > > 
-> > > > > Some SCSI devices may have single blk_mq hw queue and multiple private
-> > > > > completion queues, and wait until all requests on the private completion
-> > > > > queue are completed.
-> > > > 
-> > > > Hi Ming,
-> > > > 
-> > > > I'm a bit concerned that this approach won't work due to ordering: it seems
-> > > > that the IRQ would be shutdown prior to the CPU dead notification for the
-> > > 
-> > > Managed IRQ shutdown is run in irq_migrate_all_off_this_cpu(), which is
-> > > called in the callback of takedown_cpu(). And the CPU dead notification
-> > > is always sent after that CPU becomes offline, see cpuhp_invoke_callback().
+On Tue, May 28, 2019 at 11:36:21AM -0500, Mike Christie wrote:
+> On 05/27/2019 01:23 PM, Yao Liu wrote:
+> > On Fri, May 24, 2019 at 09:08:58AM -0400, Josef Bacik wrote:
+> >> On Fri, May 24, 2019 at 05:43:55PM +0800, Yao Liu wrote:
+> >>> Some nbd client implementations have a userland's daemon, so we should
+> >>> inform client daemon to clean up and exit.
+> >>>
+> >>> Signed-off-by: Yao Liu <yotta.liu@ucloud.cn>
+> >>
+> >> Except the nbd_disconnected() check is for the case that the client told us
+> >> specifically to disconnect, so we don't want to send the notification to
+> >> re-connect because we've already been told we want to tear everything down.
+> >> Nack to this as well.  Thanks,
+> >>
+> >> Josef
+> >>
 > > 
-> > Hammm, looks we both say same thing.
-> > 
-> > Yeah, it is too late to drain requests in the cpu hotplug DEAD handler,
-> > maybe we can try to move managed IRQ shutdown after sending the dead
-> > notification.
+> > But in userland, client daemon process and process which send disconnect
+> > command are not same process, so they are not clear to each other, so
+> > client daemon expect driver inform it to exit.
+> > In addition, client daemon will get nbd status with nbd_genl_status interface
+> > after it get notified and it should not re-connect if status connected == 0
 > > 
 > 
-> Even if the IRQ is shutdown later, all CPUs would still be dead, so none
-> available to receive the interrupt or do the work for draining the queue.
+> When using the netlink interface you get the NBD_CMD_LINK_DEAD first
+> then the configs_refs goes to zero right?
 > 
-> > I need to think of it further.
+> nbd_disconnect_and_put -> sock_shutdown -> nbd_mark_nsock_dead
 > 
-> It would seem that we just need to be informed of CPU offlining earlier, and
-> plug the drain in there.
+> then later we do the final nbd_config_put?
+> 
+> Maybe it would be best to add a new netlink event to signal what has
+> happened, because the above nl and stat algorithm seems like a pain. The
+> NBD_CMD_LINK_DEAD will be sent, then userspace has to possibly poll the
+> status to check if this was caused due to nbd_genl_disconnect instead of
+> a downed link due to something like a command timeout, because the
+> refcount may not be down when userspace gets the NL event.
+> 
+> Or, I guess the admin/tool process could just send a msg to the daemon
+> process to tell it to do the netlink disconnect request.
+> 
 
-Yes, looks blk-mq has to be notified before unplugging CPU for this
-issue.
-
-And we should be careful to handle the multiple reply queue case, given the queue
-shouldn't be stopped or quieseced because other reply queues are still active.
-
-The new CPUHP state for blk-mq should be invoked after the to-be-offline
-CPU is quiesced and before it becomes offline.
-
-Thanks,
-Ming
+Adding a new netlink event sames good.
