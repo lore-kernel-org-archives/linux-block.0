@@ -4,32 +4,31 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F84C04AB6
-	for <linux-block@archiver.kernel.org>; Tue, 28 May 2019 14:25:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37DB7C04AB6
+	for <linux-block@archiver.kernel.org>; Tue, 28 May 2019 14:25:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A834C21530
-	for <linux-block@archiver.kernel.org>; Tue, 28 May 2019 14:25:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DD592075B
+	for <linux-block@archiver.kernel.org>; Tue, 28 May 2019 14:25:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727467AbfE1OZI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 May 2019 10:25:08 -0400
-Received: from albert.telenet-ops.be ([195.130.137.90]:39124 "EHLO
-        albert.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727605AbfE1OYo (ORCPT
+        id S1727630AbfE1OYn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 May 2019 10:24:43 -0400
+Received: from laurent.telenet-ops.be ([195.130.137.89]:60152 "EHLO
+        laurent.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727174AbfE1OYn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 May 2019 10:24:44 -0400
+        Tue, 28 May 2019 10:24:43 -0400
 Received: from ramsan ([84.194.111.163])
-        by albert.telenet-ops.be with bizsmtp
-        id HqQS2000E3XaVaC06qQSub; Tue, 28 May 2019 16:24:41 +0200
+        by laurent.telenet-ops.be with bizsmtp
+        id HqQS200073XaVaC01qQSAk; Tue, 28 May 2019 16:24:41 +0200
 Received: from rox.of.borg ([192.168.97.57])
         by ramsan with esmtp (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1hVd1e-00058P-7H; Tue, 28 May 2019 16:24:26 +0200
+        id 1hVd1e-00058G-2v; Tue, 28 May 2019 16:24:26 +0200
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1hVd1e-00057Z-4f; Tue, 28 May 2019 16:24:26 +0200
+        id 1hVd1e-00057O-1L; Tue, 28 May 2019 16:24:26 +0200
 From:   Geert Uytterhoeven <geert@linux-m68k.org>
 To:     Igor Konopko <igor.j.konopko@intel.com>,
         David Howells <dhowells@redhat.com>,
@@ -50,9 +49,9 @@ Cc:     linux-block@vger.kernel.org, netdev@vger.kernel.org,
         linux-afs@lists.infradead.org, alsa-devel@alsa-project.org,
         linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH 5/5] [RFC] devlink: Fix uninitialized error code in devlink_fmsg_prepare_skb()
-Date:   Tue, 28 May 2019 16:24:24 +0200
-Message-Id: <20190528142424.19626-6-geert@linux-m68k.org>
+Subject: [PATCH 1/5] lightnvm: Fix uninitialized pointer in nvm_remove_tgt()
+Date:   Tue, 28 May 2019 16:24:20 +0200
+Message-Id: <20190528142424.19626-2-geert@linux-m68k.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190528142424.19626-1-geert@linux-m68k.org>
 References: <20190528142424.19626-1-geert@linux-m68k.org>
@@ -66,37 +65,35 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 With gcc 4.1:
 
-    net/core/devlink.c: In function ‘devlink_fmsg_prepare_skb’:
-    net/core/devlink.c:4325: warning: ‘err’ may be used uninitialized in this function
+    drivers/lightnvm/core.c: In function ‘nvm_remove_tgt’:
+    drivers/lightnvm/core.c:510: warning: ‘t’ is used uninitialized in this function
 
-Indeed, if the list has less than *start entries, an uninitialized error
-code will be returned.
+Indeed, if no NVM devices have been registered, t will be an
+uninitialized pointer, and may be dereferenced later.  A call to
+nvm_remove_tgt() can be triggered from userspace by issuing the
+NVM_DEV_REMOVE ioctl on the lightnvm control device.
 
-Fix this by preinitializing err to zero.
+Fix this by preinitializing t to NULL.
 
-Fixes: 1db64e8733f65381 ("devlink: Add devlink formatted message (fmsg) API")
+Fixes: 843f2edbdde085b4 ("lightnvm: do not remove instance under global lock")
 Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 ---
-I don't know if this can really happen, and if this is the right fix.
-Perhaps err should be initialized to some valid error code instead?
----
- net/core/devlink.c | 2 +-
+ drivers/lightnvm/core.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/core/devlink.c b/net/core/devlink.c
-index d43bc52b8840d76b..91377e4eae9a43c1 100644
---- a/net/core/devlink.c
-+++ b/net/core/devlink.c
-@@ -4321,8 +4321,8 @@ devlink_fmsg_prepare_skb(struct devlink_fmsg *fmsg, struct sk_buff *skb,
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 0df7454832efe082..aa017f48eb8c588c 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -492,7 +492,7 @@ static void __nvm_remove_target(struct nvm_target *t, bool graceful)
+  */
+ static int nvm_remove_tgt(struct nvm_ioctl_remove *remove)
  {
- 	struct devlink_fmsg_item *item;
- 	struct nlattr *fmsg_nlattr;
-+	int err = 0;
- 	int i = 0;
--	int err;
+-	struct nvm_target *t;
++	struct nvm_target *t = NULL;
+ 	struct nvm_dev *dev;
  
- 	fmsg_nlattr = nla_nest_start_noflag(skb, DEVLINK_ATTR_FMSG);
- 	if (!fmsg_nlattr)
+ 	down_read(&nvm_lock);
 -- 
 2.17.1
 
