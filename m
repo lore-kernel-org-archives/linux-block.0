@@ -2,115 +2,126 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.7 required=3.0 tests=DATE_IN_PAST_12_24,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 919BDC28CC2
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 09:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2939FC28CC1
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 09:38:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 74EEB2054F
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 09:10:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CC1B2070D
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 09:38:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726012AbfE2JJ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 05:09:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42732 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725874AbfE2JJ6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 05:09:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C769A7E426;
-        Wed, 29 May 2019 09:09:48 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BC50B6608B;
-        Wed, 29 May 2019 09:09:45 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20190528235810.GA5776@kroah.com>
-References: <20190528235810.GA5776@kroah.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk>
-To:     Greg KH <gregkh@linuxfoundation.org>, casey@schaufler-ca.com
-Cc:     dhowells@redhat.com, viro@zeniv.linux.org.uk, raven@themaw.net,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC][PATCH 0/7] Mount, FS, Block and Keyrings notifications
+        id S1725874AbfE2JiJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 05:38:09 -0400
+Received: from m9783.mail.qiye.163.com ([220.181.97.83]:2787 "EHLO
+        m9783.mail.qiye.163.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725861AbfE2JiJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 05:38:09 -0400
+X-Greylist: delayed 398 seconds by postgrey-1.27 at vger.kernel.org; Wed, 29 May 2019 05:38:06 EDT
+Received: from localhost (unknown [120.132.1.243])
+        by m9783.mail.qiye.163.com (Hmail) with ESMTPA id A1BD9C1A9B;
+        Wed, 29 May 2019 17:31:24 +0800 (CST)
+Date:   Wed, 29 May 2019 03:04:46 +0800
+From:   Yao Liu <yotta.liu@ucloud.cn>
+To:     Josef Bacik <josef@toxicpanda.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        nbd <nbd@other.debian.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/3] nbd: fix connection timed out error after
+ reconnecting to server
+Message-ID: <20190528190446.GA21513@192-168-150-246.7~>
+References: <1558691036-16281-1-git-send-email-yotta.liu@ucloud.cn>
+ <20190524130740.zfypc2j3q5e3gryr@MacBook-Pro-91.local.dhcp.thefacebook.com>
+ <20190527180743.GA20702@192-168-150-246.7~>
+ <20190528165758.zxfrv6fum4vwcv4e@MacBook-Pro-91.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <31750.1559120984.1@warthog.procyon.org.uk>
-Date:   Wed, 29 May 2019 10:09:44 +0100
-Message-ID: <31751.1559120984@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 29 May 2019 09:09:57 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190528165758.zxfrv6fum4vwcv4e@MacBook-Pro-91.local>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-HM-Spam-Status: e1kIGBQJHllBWUtVQ01OQkJCQ0xMT05JQ05ZV1koWUFJQjdXWS1ZQUlXWQ
+        kOFx4IWUFZNTQpNjo3JCkuNz5ZBg++
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6NAw6Hzo4Ezg3USJLOikVPU09
+        OggaCRlVSlVKTk5CSklJSUNPQ05IVTMWGhIXVQIUDw8aVRcSDjsOGBcUDh9VGBVFWVdZEgtZQVlK
+        SUtVSkhJVUpVSU9IWVdZCAFZQU5OSU43Bg++
+X-HM-Tid: 0a6b02ee10a32085kuqya1bd9c1a9b
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Greg KH <gregkh@linuxfoundation.org> wrote:
-
-> >  (3) Letting users see events they shouldn't be able to see.
+On Tue, May 28, 2019 at 12:57:59PM -0400, Josef Bacik wrote:
+> On Tue, May 28, 2019 at 02:07:43AM +0800, Yao Liu wrote:
+> > On Fri, May 24, 2019 at 09:07:42AM -0400, Josef Bacik wrote:
+> > > On Fri, May 24, 2019 at 05:43:54PM +0800, Yao Liu wrote:
+> > > > Some I/O requests that have been sent succussfully but have not yet been
+> > > > replied won't be resubmitted after reconnecting because of server restart,
+> > > > so we add a list to track them.
+> > > > 
+> > > > Signed-off-by: Yao Liu <yotta.liu@ucloud.cn>
+> > > 
+> > > Nack, this is what the timeout stuff is supposed to handle.  The commands will
+> > > timeout and we'll resubmit them if we have alive sockets.  Thanks,
+> > > 
+> > > Josef
+> > > 
+> > 
+> > On the one hand, if num_connections == 1 and the only sock has dead,
+> > then we do nbd_genl_reconfigure to reconnect within dead_conn_timeout,
+> > nbd_xmit_timeout will not resubmit commands that have been sent
+> > succussfully but have not yet been replied. The log is as follows:
+> >  
+> > [270551.108746] block nbd0: Receive control failed (result -104)
+> > [270551.108747] block nbd0: Send control failed (result -32)
+> > [270551.108750] block nbd0: Request send failed, requeueing
+> > [270551.116207] block nbd0: Attempted send on invalid socket
+> > [270556.119584] block nbd0: reconnected socket
+> > [270581.161751] block nbd0: Connection timed out
+> > [270581.165038] block nbd0: shutting down sockets
+> > [270581.165041] print_req_error: I/O error, dev nbd0, sector 5123224 flags 8801
+> > [270581.165149] print_req_error: I/O error, dev nbd0, sector 5123232 flags 8801
+> > [270581.165580] block nbd0: Connection timed out
+> > [270581.165587] print_req_error: I/O error, dev nbd0, sector 844680 flags 8801
+> > [270581.166184] print_req_error: I/O error, dev nbd0, sector 5123240 flags 8801
+> > [270581.166554] block nbd0: Connection timed out
+> > [270581.166576] print_req_error: I/O error, dev nbd0, sector 844688 flags 8801
+> > [270581.167124] print_req_error: I/O error, dev nbd0, sector 5123248 flags 8801
+> > [270581.167590] block nbd0: Connection timed out
+> > [270581.167597] print_req_error: I/O error, dev nbd0, sector 844696 flags 8801
+> > [270581.168021] print_req_error: I/O error, dev nbd0, sector 5123256 flags 8801
+> > [270581.168487] block nbd0: Connection timed out
+> > [270581.168493] print_req_error: I/O error, dev nbd0, sector 844704 flags 8801
+> > [270581.170183] print_req_error: I/O error, dev nbd0, sector 5123264 flags 8801
+> > [270581.170540] block nbd0: Connection timed out
+> > [270581.173333] block nbd0: Connection timed out
+> > [270581.173728] block nbd0: Connection timed out
+> > [270581.174135] block nbd0: Connection timed out
+> >  
+> > On the other hand, if we wait nbd_xmit_timeout to handle resubmission,
+> > the I/O requests will have a big delay. For example, if timeout time is 30s,
+> > and from sock dead to nbd_genl_reconfigure returned OK we only spend
+> > 2s, the I/O requests will still be handled by nbd_xmit_timeout after 30s.
 > 
-> How are you handling namespaces then?  Are they determined by the
-> namespace of the process that opened the original device handle, or the
-> namespace that made the new syscall for the events to "start flowing"?
+> We have to wait for the full timeout anyway to know that the socket went down,
+> so it'll be re-submitted right away and then we'll wait on the new connection.
+> 
+> Now we could definitely have requests that were submitted well after the first
+> thing that failed, so their timeout would be longer than simply retrying them,
+> but we have no idea of knowing which ones timed out and which ones didn't.  This
+> way lies pain, because we have to matchup tags with handles.  This is why we
+> rely on the generic timeout infrastructure, so everything is handled correctly
+> without ending up with duplicate submissions/replies.  Thanks,
+> 
+> Josef
+> 
 
-So far I haven't had to deal directly with namespaces.
-
-mount_notify() requires you to have access to the mountpoint you want to watch
-- and the entire tree rooted there is in one namespace, so your event sources
-are restricted to that namespace.  Further, mount objects don't themselves
-have any other namespaces, not even a user_ns.
-
-sb_notify() requires you to have access to the superblock you want to watch.
-superblocks aren't directly namespaced as a class, though individual
-superblocks may participate in particular namespaces (ipc, net, etc.).  I'm
-thinking some of these should be marked unwatchable (all pseudo superblocks,
-kernfs-class, proc, for example).
-
-Superblocks, however, do each have a user_ns - but you were allowed to access
-the superblock by pathwalk, so you must have some access to the user_ns - I
-think.
-
-KEYCTL_NOTIFY requires you to have View access on the key you're watching.
-Currently, keys have no real namespace restrictions, though I have patches to
-include a namespace tag in the lookup criteria.
-
-block_notify() doesn't require any direct access since you're watching a
-global queue and there is no blockdev namespacing.  LSMs are given the option
-to filter events, though.  The thought here is that if you can access dmesg,
-you should be able to watch for blockdev events.
-
-
-Actually, thinking further on this, restricting access to events is trickier
-than I thought and than perhaps Casey was suggesting.
-
-Say you're watching a mount object and someone in a different user_ns
-namespace or with a different security label mounts on it.  What governs
-whether you are allowed to see the event?
-
-You're watching the object for changes - and it *has* changed.  Further, you
-might be able to see the result of this change by other means (/proc/mounts,
-for instance).
-
-Should you be denied the event based on the security model?
-
-On the other hand, if you're watching a tree of mount objects, it could be
-argued that you should be denied access to events on any mount object you
-can't reach by pathwalk.
-
-On the third hand, if you can see it in /proc/mounts or by fsinfo(), you
-should get an event for it.
-
-
-> How are you handling namespaces then?
-
-So to go back to the original question.  At the moment they haven't impinged
-directly and I haven't had to deal with them directly.  There are indirect
-namespace restrictions that I get for free just due to pathwalk, for instance.
-
-David
+But as I mentioned before, if num_connections == 1, nbd_xmit_timeout won't re-submit
+commands and I/O error will occur. Should we change the condition
+		if (config->num_connections > 1)
+to
+		if (config->num_connections >= 1)
+?
