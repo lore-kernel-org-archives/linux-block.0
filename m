@@ -2,123 +2,86 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D1FC28CC0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 11:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B16C28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 12:25:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20B1F2081C
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 11:50:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9ED5821019
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 12:25:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GRSXKhF5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726780AbfE2LuK convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 07:50:10 -0400
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:44004 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726101AbfE2LuK (ORCPT
+        id S1726628AbfE2MZN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 08:25:13 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:45407 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725936AbfE2MZM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 07:50:10 -0400
-Received: by mail-qk1-f195.google.com with SMTP id m14so1184149qka.10;
-        Wed, 29 May 2019 04:50:09 -0700 (PDT)
+        Wed, 29 May 2019 08:25:12 -0400
+Received: by mail-pf1-f193.google.com with SMTP id s11so1512660pfm.12
+        for <linux-block@vger.kernel.org>; Wed, 29 May 2019 05:25:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=wV5GW+wNmFmQBPj3TgKe7/OIT+MA0KFJOxyQzNc+M+U=;
+        b=GRSXKhF5vslMGQUWp0fUQDsgXLlCWLwv3OqZNVf4y8QsY5R3Cez3BPqbz1Kaqxic1J
+         BkGxDkmlOFnuWy1KPC9MX2t7kI+t1uHgRwGFcgZYRCjU8rDUPPgdMkhRhTBxUYcWjKGW
+         jYm7WojpSn7u5NpkAmbNz5y1PRoBNBHkFgnw/XBVGMoFOWcA5LqR0dQTiJxsWSD+bw9J
+         hTlWD7Hp4lHObAJlRzXs14PebjLLRtLwb2qloR3BhjUNQIizqGb9rkxwYyHP7KG3Sm+O
+         aOZrufvPUTAFgk5b8/mQqGzuCUAGUPjoUxAHPoyzlkv4E8ZjqoX+LYm8XOHfGNfJIHec
+         OhCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=XHkHtWbVB+TvovZz7oPuGTHVIANZlI/EFu3bjVNoQjY=;
-        b=lTsaY64nMnxiHD7pa9HeT5GE8YW0R8qppT6CDAvpNN2yyka/Gw4Z4VGVRix3sw0JJP
-         IxNhHbE2aDTZx2X3fX2IKikOV+FLgmoja6aCH6fsaRw9yo/GB3245QClm8qM/h3V/Gyz
-         wPQtO8AM/4aKa6WUGYBeEBGaNj3V3j65B8I1py2tjJsxZCnUgy0vYDEsKhPUTj7F7FPr
-         slXtsG1Q6SN2qYzbj8bpVjfUnB4Yo+SpgdULwY+90vYFLtM7FmqU13JW/VyK2xmEWHwA
-         EqGuYr2roFx5F0n/QzjiheaKTie0nTTu0XFx7eTqM689cdsgL5Q1ONjb6gsSDP04anTo
-         XiOg==
-X-Gm-Message-State: APjAAAWKj/iVdbBXWye7ZRwXxwoXcLd6rH8KccmIgIoYcQWRWZAY7tMb
-        Oscfzgn9zwmDj2Cwxs/pAAs+NEY0pSo7FYc37zM=
-X-Google-Smtp-Source: APXvYqwIv+NsvZQNU3e96RUtDw8gxMBWuYuQiiajDZ8QFDNiZsSZdie+JkLoe/OtQ843s/6drkk2QB+tL4D41jq4Vho=
-X-Received: by 2002:a37:bb85:: with SMTP id l127mr27919584qkf.285.1559130609026;
- Wed, 29 May 2019 04:50:09 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wV5GW+wNmFmQBPj3TgKe7/OIT+MA0KFJOxyQzNc+M+U=;
+        b=OVa8TERnsZ8I2EQJ5hLLbhVZdciooF6ZRfZDlS/ziV5FwnoW+PyhEoj9PWDbo5Kab/
+         oCUZsxnD0G2KXCHEf7O3z0Rps7LXXoe7dgKfuEszMFASt6Ncu6O3Buef9wbv/qOblmt3
+         ddisxc5dv4o+Oo9oxoBvgW4rKAuKaJ/IYKMzZo7XN1rgFyOegl9yj0ZZ7C7DH7iNR3LF
+         ySOAoKMhPgoPTQblRxscg+2THlMvQPe9IDfSyq4EiDpdOj95N8mE1359Wja+podcjqrx
+         rKxblB/EsW0ZFigXi1BNZWfrWa2tR/pdpsYN/gwT5yptYCv0v9AR0X0wPFkZDQrlzoK2
+         oJ1w==
+X-Gm-Message-State: APjAAAXbT0dcxRMFn5HaEqamS2E/xFmqtsamxfnxZLCdQvH7WqSNmg6K
+        MulmbirQ1P7/xmmFL3ZBx2TOaCm+oxBLGw==
+X-Google-Smtp-Source: APXvYqywo+rKxpNyhEmgVwGhXZfljePVQaAsy0Ry1wC/rK/m6ky6i5fB4oqIJKQ7fGJfZ2+2Q7zx6w==
+X-Received: by 2002:a65:528b:: with SMTP id y11mr137200696pgp.341.1559132712261;
+        Wed, 29 May 2019 05:25:12 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
+        by smtp.gmail.com with ESMTPSA id i22sm17596272pfa.127.2019.05.29.05.25.09
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 29 May 2019 05:25:10 -0700 (PDT)
+Subject: Re: [PATCH 0/3] block: queue exit cleanup
+To:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <20190515030310.20393-1-ming.lei@redhat.com>
+ <20190529065201.GA3728@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <fac85b3e-7c8c-5e85-63a9-e4198690a092@kernel.dk>
+Date:   Wed, 29 May 2019 06:25:09 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190528142424.19626-1-geert@linux-m68k.org> <20190528142424.19626-3-geert@linux-m68k.org>
-In-Reply-To: <20190528142424.19626-3-geert@linux-m68k.org>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Wed, 29 May 2019 13:49:52 +0200
-Message-ID: <CAK8P3a1wTED5Aet_9AjY9VFFrutkV2xK6C13vroTLd0vpcoo9w@mail.gmail.com>
-Subject: Re: [PATCH 2/5] rxrpc: Fix uninitialized error code in rxrpc_send_data_packet()
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     Igor Konopko <igor.j.konopko@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        "Mohit P . Tahiliani" <tahiliani@nitk.edu.in>,
-        Takashi Sakamoto <o-takashi@sakamocchi.jp>,
-        Eran Ben Elisha <eranbe@mellanox.com>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jamal Hadi Salim <jhs@mojatatu.com>,
-        Cong Wang <xiyou.wangcong@gmail.com>,
-        Clemens Ladisch <clemens@ladisch.de>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, Joe Perches <joe@perches.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Networking <netdev@vger.kernel.org>,
-        linux-afs@lists.infradead.org,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20190529065201.GA3728@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 28, 2019 at 4:24 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
->
-> With gcc 4.1:
->
->     net/rxrpc/output.c: In function ‘rxrpc_send_data_packet’:
->     net/rxrpc/output.c:338: warning: ‘ret’ may be used uninitialized in this function
->
-> Indeed, if the first jump to the send_fragmentable label is made, and
-> the address family is not handled in the switch() statement, ret will be
-> used uninitialized.
->
-> Fix this by initializing err to zero before the jump, like is already
-> done for the jump to the done label.
->
-> Fixes: 5a924b8951f835b5 ("rxrpc: Don't store the rxrpc header in the Tx queue sk_buffs")
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> ---
-> While this is not a real false-positive, I believe it cannot cause harm
-> in practice, as AF_RXRPC cannot be used with other transport families
-> than IPv4 and IPv6.
+On 5/29/19 12:52 AM, Christoph Hellwig wrote:
+> Jens, do you plan to pick this up (at last patches 1 and 2)?  It
+> fixes a NULL pointer deref and a md raid issue.
 
-This looks like a variant of the infamous bug
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=18501
+Agree, applied 1-2.
 
-What I don't understand is why clang fails to warn about it with
--Wsometimes-uninitialized.
-(cc clang-built-linux mailing list).
+-- 
+Jens Axboe
 
-      Arnd
-
->  net/rxrpc/output.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-> index 004c762c2e8d063c..1473d774d67100c5 100644
-> --- a/net/rxrpc/output.c
-> +++ b/net/rxrpc/output.c
-> @@ -403,8 +403,10 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, struct sk_buff *skb,
->
->         /* send the packet with the don't fragment bit set if we currently
->          * think it's small enough */
-> -       if (iov[1].iov_len >= call->peer->maxdata)
-> +       if (iov[1].iov_len >= call->peer->maxdata) {
-> +               ret = 0;
->                 goto send_fragmentable;
-> +       }
->
->         down_read(&conn->params.local->defrag_sem);
->
