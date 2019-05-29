@@ -4,62 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A62AC28CC0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 20:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8592C28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 20:29:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A3282414F
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 20:29:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A5232414F
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 20:29:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bhLSoBtL"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ortJPsL2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726540AbfE2U3y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 16:29:54 -0400
-Received: from mail-it1-f194.google.com ([209.85.166.194]:34940 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726173AbfE2U3y (ORCPT
+        id S1726599AbfE2U36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 16:29:58 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:34779 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726121AbfE2U35 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 16:29:54 -0400
-Received: by mail-it1-f194.google.com with SMTP id u186so5792906ith.0
-        for <linux-block@vger.kernel.org>; Wed, 29 May 2019 13:29:53 -0700 (PDT)
+        Wed, 29 May 2019 16:29:57 -0400
+Received: by mail-io1-f65.google.com with SMTP id k8so3075471iot.1
+        for <linux-block@vger.kernel.org>; Wed, 29 May 2019 13:29:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=02YGgvtDIhMKSVtZXrYkbxNSPMNTLcY7/zpAzC74d0A=;
-        b=bhLSoBtLJt7Pa4l6Kzn82na0fLnsSVniB/CdFdf3vPaF4sLNsfFz/SVglaxz1F8Q7R
-         DrvHRAOZaBru6WJW5KD4lWYciZdUa267CgYzE8LWA/1V7mY5N5r4K4v2GdfIoU5HokDy
-         L2i5lVymSOlaUO8jvGaOi5fOVuFXxBa/DaN3uPJPHhat9pCyOZZVMDglVtuewERPQ2nT
-         TFpJcYMNI+dMtrh33X6e2U5pH4nSIIvvGogiOojbFcYf1zx2RddPI+bFHTqImDrv/FNl
-         YHNhkArkwYuDdU5wC5+t5OGOV2ggr2X6BuvnQ4QdTuERv8qqvzeS81jUDCymql1VGhgL
-         ivKA==
+        bh=FiMMbeOgt7UGFUO506JoMeT/q2pB3Wh15xaT7cNRhrY=;
+        b=ortJPsL2Mads5bRbW+6qzN00oD76LmXstSHqf1g23dA9W9gvk2D7xHEBeB9LTL6NE+
+         MJYyR++oAf64dOcgkKFcZyN+b2Txn3BD9ZJb7QpnruSWx7C4byGOtA3u0kiwrfGuc16a
+         QJEfiC5s2AXEvnlCKmjzK6/T4y1sVMKvtMMnBppC8LPupsXlprvfmift7WqXspFw2TM+
+         hkU1xvWUr1UllVwarI29m9ShVAHeOPQnrG6EE6HJBY9w+TaW+zOqqd3LS3pizaLBlTVj
+         7tVtxuKET4ZK6RCGmmZDvPO253EvX2iN/8HK1hDqc0OEiQEcMTZzeSWpWrgz1390WJzJ
+         LA8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=02YGgvtDIhMKSVtZXrYkbxNSPMNTLcY7/zpAzC74d0A=;
-        b=AJsC0UofTDLJfwAen2Ih8c5p202xSp/GI9y4pvcGlg6pptIY+e2zIFW8M/fgs9aIzJ
-         UIp/RJ1LBPPO/WiGs4Hrqf8zpyB25hogwvI+jV3fRXa6+aT5FARF+Xh8NGEN34JT0Eum
-         v/h4N0jESzUrjuHAoQWDKgBrZLlhFbV/Rm+Vhx9rJwCQBIUCo4aErH7wZ0ov+94WkSbo
-         wYi+CHQJCT3TXxLC1Y/8o4szS1yighUkIs9/OsX00xhm1P9Q4EUq8N755bY3eJ6aSWKJ
-         Yxa4a1lSX7Kh7SBOLk2/KQw03tqTRS2JdH7fph/tgYBzK2OYTy0OZRJn8/Bbkazj4maH
-         D6fQ==
-X-Gm-Message-State: APjAAAWCc3sH9fChLLhbCW5t41Yakrg2Q6E7tHJXB3+2bHpO/qz+VzlT
-        MTBkIrBeFO1AQPIJMRQ+wIYqYw==
-X-Google-Smtp-Source: APXvYqyRnr7BB6nNjVOOZFHqoHxADY5/TfidED28JiJNZq0niROaw0Rq7RL7mPIkSBUlGrsQN9j+TA==
-X-Received: by 2002:a24:f644:: with SMTP id u65mr120757ith.51.1559161793237;
-        Wed, 29 May 2019 13:29:53 -0700 (PDT)
+        bh=FiMMbeOgt7UGFUO506JoMeT/q2pB3Wh15xaT7cNRhrY=;
+        b=g/4fxvtkvKJGj6pXqbyNUJI3N3h03+wo+6Zf0CK2++3skQ3SKeIGodWndA2o9jPtRF
+         bc1iApmwtSYwf3gsVZo6Pdj8724tt45o2YGrzByatgA5EC6BAXIWbXfLt1FLH6TEPcpy
+         Db3ZuoV6Ij9FrCz1trySaDPUrKC7ngSrmh0P3gMs2Pp6252viZdzIk0dhdbVDddibeTs
+         HckdgQGGxyKCIBW/10KADnqE5jGNK9HEuIljPMvQ5dvUm37uS3vMw9O0Vg8t3Ceh0qVP
+         IBVfSQlOpt3/by3neY6bs5oJzfMmLtYZ+JWqc/PaGscSpxxTYFuwBRlj7bHJm4cuKWDK
+         9SLw==
+X-Gm-Message-State: APjAAAXBsxSd1En901YfQRI5RfCRooH0D/iCq6vmBcXYvWxe2hapc/G4
+        3sX2iHz+jgo3bwRuWe3UEMGk0g==
+X-Google-Smtp-Source: APXvYqwenv0XOpGGgEiwsRSz0NEY3b+gMzjyRyCkXl7hDoG+KaXqk9EpxPVkKcLJ2Zs6dy0eT+o4JA==
+X-Received: by 2002:a6b:5106:: with SMTP id f6mr8762554iob.15.1559161796690;
+        Wed, 29 May 2019 13:29:56 -0700 (PDT)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id k76sm179105ita.6.2019.05.29.13.29.51
+        by smtp.gmail.com with ESMTPSA id k76sm179105ita.6.2019.05.29.13.29.54
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 29 May 2019 13:29:52 -0700 (PDT)
+        Wed, 29 May 2019 13:29:55 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/3] uio: make import_iovec()/compat_import_iovec() return bytes on success
-Date:   Wed, 29 May 2019 14:29:46 -0600
-Message-Id: <20190529202948.20833-2-axboe@kernel.dk>
+Subject: [PATCH 3/3] io_uring: add support for sqe links
+Date:   Wed, 29 May 2019 14:29:48 -0600
+Message-Id: <20190529202948.20833-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190529202948.20833-1-axboe@kernel.dk>
 References: <20190529202948.20833-1-axboe@kernel.dk>
@@ -68,259 +68,475 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently these functions return < 0 on error, and 0 for success.
-Change that so that we return < 0 on error, but number of bytes
-for success.
+With SQE links, we can create chains of dependent SQEs. One example
+would be queueing an SQE that's a read from one file descriptor, with
+the linked SQE being a write to another with the same set of buffers.
 
-Some callers already treat the return value that way, others need a
-slight tweak.
+An SQE link will not stall the pipeline, it'll just ensure that
+dependent SQEs aren't issued before the previous link has completed.
+
+Any error at submission or completion time will break the chain of SQEs.
+For completions, this also includes short reads or writes, as the next
+SQE could depend on the previous one being fully completed.
+
+Any SQE in a chain that gets canceled due to any of the above errors,
+will get an CQE fill with -ECANCELED as the error value.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/aio.c            |  9 +++++----
- fs/io_uring.c       | 16 ++++++++--------
- fs/splice.c         |  8 ++++----
- include/linux/uio.h |  4 ++--
- lib/iov_iter.c      | 15 ++++++++-------
- net/compat.c        |  3 ++-
- net/socket.c        |  3 ++-
- 7 files changed, 31 insertions(+), 27 deletions(-)
+ fs/io_uring.c                 | 239 +++++++++++++++++++++++++++-------
+ include/uapi/linux/io_uring.h |   1 +
+ 2 files changed, 192 insertions(+), 48 deletions(-)
 
-diff --git a/fs/aio.c b/fs/aio.c
-index 3490d1fa0e16..41824c710b36 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1479,8 +1479,9 @@ static int aio_prep_rw(struct kiocb *req, const struct iocb *iocb)
- 	return 0;
- }
- 
--static int aio_setup_rw(int rw, const struct iocb *iocb, struct iovec **iovec,
--		bool vectored, bool compat, struct iov_iter *iter)
-+static ssize_t aio_setup_rw(int rw, const struct iocb *iocb,
-+		struct iovec **iovec, bool vectored, bool compat,
-+		struct iov_iter *iter)
- {
- 	void __user *buf = (void __user *)(uintptr_t)iocb->aio_buf;
- 	size_t len = iocb->aio_nbytes;
-@@ -1537,7 +1538,7 @@ static int aio_read(struct kiocb *req, const struct iocb *iocb,
- 		return -EINVAL;
- 
- 	ret = aio_setup_rw(READ, iocb, &iovec, vectored, compat, &iter);
--	if (ret)
-+	if (ret < 0)
- 		return ret;
- 	ret = rw_verify_area(READ, file, &req->ki_pos, iov_iter_count(&iter));
- 	if (!ret)
-@@ -1565,7 +1566,7 @@ static int aio_write(struct kiocb *req, const struct iocb *iocb,
- 		return -EINVAL;
- 
- 	ret = aio_setup_rw(WRITE, iocb, &iovec, vectored, compat, &iter);
--	if (ret)
-+	if (ret < 0)
- 		return ret;
- 	ret = rw_verify_area(WRITE, file, &req->ki_pos, iov_iter_count(&iter));
- 	if (!ret) {
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 0fbb486a320e..23e08c10f486 100644
+index 92debd8be535..df803a73849b 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -1003,9 +1003,9 @@ static int io_import_fixed(struct io_ring_ctx *ctx, int rw,
+@@ -322,6 +322,7 @@ struct io_kiocb {
+ 
+ 	struct io_ring_ctx	*ctx;
+ 	struct list_head	list;
++	struct list_head	link_list;
+ 	unsigned int		flags;
+ 	refcount_t		refs;
+ #define REQ_F_NOWAIT		1	/* must not punt to workers */
+@@ -330,8 +331,10 @@ struct io_kiocb {
+ #define REQ_F_SEQ_PREV		8	/* sequential with previous */
+ #define REQ_F_IO_DRAIN		16	/* drain existing IO first */
+ #define REQ_F_IO_DRAINED	32	/* drain done */
++#define REQ_F_LINK		64	/* linked sqes */
++#define REQ_F_FAIL_LINK		128	/* fail rest of links */
+ 	u64			user_data;
+-	u32			error;	/* iopoll result from callback */
++	u32			result;
+ 	u32			sequence;
+ 
+ 	struct work_struct	work;
+@@ -583,6 +586,7 @@ static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
+ 	req->flags = 0;
+ 	/* one is dropped after submission, the other at completion */
+ 	refcount_set(&req->refs, 2);
++	req->result = 0;
+ 	return req;
+ out:
+ 	io_ring_drop_ctx_refs(ctx, 1);
+@@ -598,7 +602,7 @@ static void io_free_req_many(struct io_ring_ctx *ctx, void **reqs, int *nr)
+ 	}
+ }
+ 
+-static void io_free_req(struct io_kiocb *req)
++static void __io_free_req(struct io_kiocb *req)
+ {
+ 	if (req->file && !(req->flags & REQ_F_FIXED_FILE))
+ 		fput(req->file);
+@@ -606,6 +610,63 @@ static void io_free_req(struct io_kiocb *req)
+ 	kmem_cache_free(req_cachep, req);
+ }
+ 
++static void io_req_link_next(struct io_kiocb *req)
++{
++	struct io_kiocb *nxt;
++
++	/*
++	 * The list should never be empty when we are called here. But could
++	 * potentially happen if the chain is messed up, check to be on the
++	 * safe side.
++	 */
++	nxt = list_first_entry_or_null(&req->link_list, struct io_kiocb, list);
++	if (nxt) {
++		list_del(&nxt->list);
++		if (!list_empty(&req->link_list)) {
++			INIT_LIST_HEAD(&nxt->link_list);
++			list_splice(&req->link_list, &nxt->link_list);
++			nxt->flags |= REQ_F_LINK;
++		}
++
++		INIT_WORK(&nxt->work, io_sq_wq_submit_work);
++		queue_work(req->ctx->sqo_wq, &nxt->work);
++	}
++}
++
++/*
++ * Called if REQ_F_LINK is set, and we fail the head request
++ */
++static void io_fail_links(struct io_kiocb *req)
++{
++	struct io_kiocb *link;
++
++	while (!list_empty(&req->link_list)) {
++		link = list_first_entry(&req->link_list, struct io_kiocb, list);
++		list_del(&link->list);
++
++		io_cqring_add_event(req->ctx, link->user_data, -ECANCELED);
++		__io_free_req(link);
++	}
++}
++
++static void io_free_req(struct io_kiocb *req)
++{
++	/*
++	 * If LINK is set, we have dependent requests in this chain. If we
++	 * didn't fail this request, queue the first one up, moving any other
++	 * dependencies to the next request. In case of failure, fail the rest
++	 * of the chain.
++	 */
++	if (req->flags & REQ_F_LINK) {
++		if (req->flags & REQ_F_FAIL_LINK)
++			io_fail_links(req);
++		else
++			io_req_link_next(req);
++	}
++
++	__io_free_req(req);
++}
++
+ static void io_put_req(struct io_kiocb *req)
+ {
+ 	if (refcount_dec_and_test(&req->refs))
+@@ -627,16 +688,17 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
+ 		req = list_first_entry(done, struct io_kiocb, list);
+ 		list_del(&req->list);
+ 
+-		io_cqring_fill_event(ctx, req->user_data, req->error);
++		io_cqring_fill_event(ctx, req->user_data, req->result);
+ 		(*nr_events)++;
+ 
+ 		if (refcount_dec_and_test(&req->refs)) {
+ 			/* If we're not using fixed files, we have to pair the
+ 			 * completion part with the file put. Use regular
+ 			 * completions for those, only batch free for fixed
+-			 * file.
++			 * file and non-linked commands.
+ 			 */
+-			if (req->flags & REQ_F_FIXED_FILE) {
++			if ((req->flags & (REQ_F_FIXED_FILE|REQ_F_LINK)) ==
++			    REQ_F_FIXED_FILE) {
+ 				reqs[to_free++] = req;
+ 				if (to_free == ARRAY_SIZE(reqs))
+ 					io_free_req_many(ctx, reqs, &to_free);
+@@ -775,6 +837,8 @@ static void io_complete_rw(struct kiocb *kiocb, long res, long res2)
+ 
+ 	kiocb_end_write(kiocb);
+ 
++	if ((req->flags & REQ_F_LINK) && res != req->result)
++		req->flags |= REQ_F_FAIL_LINK;
+ 	io_cqring_add_event(req->ctx, req->user_data, res);
+ 	io_put_req(req);
+ }
+@@ -785,7 +849,9 @@ static void io_complete_rw_iopoll(struct kiocb *kiocb, long res, long res2)
+ 
+ 	kiocb_end_write(kiocb);
+ 
+-	req->error = res;
++	if ((req->flags & REQ_F_LINK) && res != req->result)
++		req->flags |= REQ_F_FAIL_LINK;
++	req->result = res;
+ 	if (res != -EAGAIN)
+ 		req->flags |= REQ_F_IOPOLL_COMPLETED;
+ }
+@@ -928,7 +994,6 @@ static int io_prep_rw(struct io_kiocb *req, const struct sqe_submit *s,
+ 		    !kiocb->ki_filp->f_op->iopoll)
+ 			return -EOPNOTSUPP;
+ 
+-		req->error = 0;
+ 		kiocb->ki_flags |= IOCB_HIPRI;
+ 		kiocb->ki_complete = io_complete_rw_iopoll;
+ 	} else {
+@@ -1106,6 +1171,9 @@ static int io_read(struct io_kiocb *req, const struct sqe_submit *s,
+ 		return ret;
+ 
+ 	read_size = ret;
++	if (req->flags & REQ_F_LINK)
++		req->result = read_size;
++
+ 	iov_count = iov_iter_count(&iter);
+ 	ret = rw_verify_area(READ, file, &kiocb->ki_pos, iov_count);
+ 	if (!ret) {
+@@ -1163,6 +1231,9 @@ static int io_write(struct io_kiocb *req, const struct sqe_submit *s,
+ 	if (ret < 0)
+ 		return ret;
+ 
++	if (req->flags & REQ_F_LINK)
++		req->result = ret;
++
+ 	iov_count = iov_iter_count(&iter);
+ 
+ 	ret = -EAGAIN;
+@@ -1266,6 +1337,8 @@ static int io_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 				end > 0 ? end : LLONG_MAX,
+ 				fsync_flags & IORING_FSYNC_DATASYNC);
+ 
++	if (ret < 0)
++		req->flags |= REQ_F_FAIL_LINK;
+ 	io_cqring_add_event(req->ctx, sqe->user_data, ret);
+ 	io_put_req(req);
+ 	return 0;
+@@ -1310,6 +1383,8 @@ static int io_sync_file_range(struct io_kiocb *req,
+ 
+ 	ret = sync_file_range(req->rw.ki_filp, sqe_off, sqe_len, flags);
+ 
++	if (ret < 0)
++		req->flags |= REQ_F_FAIL_LINK;
+ 	io_cqring_add_event(req->ctx, sqe->user_data, ret);
+ 	io_put_req(req);
+ 	return 0;
+@@ -1562,9 +1637,10 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ {
+ 	int ret, opcode;
+ 
++	req->user_data = READ_ONCE(s->sqe->user_data);
++
+ 	if (unlikely(s->index >= ctx->sq_entries))
+ 		return -EINVAL;
+-	req->user_data = READ_ONCE(s->sqe->user_data);
+ 
+ 	opcode = READ_ONCE(s->sqe->opcode);
+ 	switch (opcode) {
+@@ -1608,7 +1684,7 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 		return ret;
+ 
+ 	if (ctx->flags & IORING_SETUP_IOPOLL) {
+-		if (req->error == -EAGAIN)
++		if (req->result == -EAGAIN)
+ 			return -EAGAIN;
+ 
+ 		/* workqueue context doesn't hold uring_lock, grab it now */
+@@ -1834,31 +1910,11 @@ static int io_req_set_file(struct io_ring_ctx *ctx, const struct sqe_submit *s,
  	return 0;
  }
  
--static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
--			   const struct sqe_submit *s, struct iovec **iovec,
--			   struct iov_iter *iter)
-+static ssize_t io_import_iovec(struct io_ring_ctx *ctx, int rw,
-+			       const struct sqe_submit *s, struct iovec **iovec,
-+			       struct iov_iter *iter)
+-static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+-			 struct io_submit_state *state)
++static int io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
++			struct sqe_submit *s)
  {
- 	const struct io_uring_sqe *sqe = s->sqe;
- 	void __user *buf = u64_to_user_ptr(READ_ONCE(sqe->addr));
-@@ -1023,7 +1023,7 @@ static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
- 	opcode = READ_ONCE(sqe->opcode);
- 	if (opcode == IORING_OP_READ_FIXED ||
- 	    opcode == IORING_OP_WRITE_FIXED) {
--		int ret = io_import_fixed(ctx, rw, sqe, iter);
-+		ssize_t ret = io_import_fixed(ctx, rw, sqe, iter);
- 		*iovec = NULL;
- 		return ret;
+-	struct io_kiocb *req;
+ 	int ret;
+ 
+-	/* enforce forwards compatibility on users */
+-	if (unlikely(s->sqe->flags & ~(IOSQE_FIXED_FILE | IOSQE_IO_DRAIN)))
+-		return -EINVAL;
+-
+-	req = io_get_req(ctx, state);
+-	if (unlikely(!req))
+-		return -EAGAIN;
+-
+-	ret = io_req_set_file(ctx, s, state, req);
+-	if (unlikely(ret))
+-		goto out;
+-
+-	ret = io_req_defer(ctx, req, s->sqe);
+-	if (ret) {
+-		if (ret == -EIOCBQUEUED)
+-			ret = 0;
+-		return ret;
+-	}
+-
+ 	ret = __io_submit_sqe(ctx, req, s, true);
+ 	if (ret == -EAGAIN && !(req->flags & REQ_F_NOWAIT)) {
+ 		struct io_uring_sqe *sqe_copy;
+@@ -1881,24 +1937,91 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+ 
+ 			/*
+ 			 * Queued up for async execution, worker will release
+-			 * submit reference when the iocb is actually
+-			 * submitted.
++			 * submit reference when the iocb is actually submitted.
+ 			 */
+ 			return 0;
+ 		}
  	}
-@@ -1089,7 +1089,7 @@ static int io_read(struct io_kiocb *req, const struct sqe_submit *s,
- 	struct iov_iter iter;
- 	struct file *file;
- 	size_t iov_count;
--	int ret;
-+	ssize_t ret;
  
- 	ret = io_prep_rw(req, s, force_nonblock);
- 	if (ret)
-@@ -1102,7 +1102,7 @@ static int io_read(struct io_kiocb *req, const struct sqe_submit *s,
- 		return -EINVAL;
+-out:
+ 	/* drop submission reference */
+ 	io_put_req(req);
  
- 	ret = io_import_iovec(req->ctx, READ, s, &iovec, &iter);
+ 	/* and drop final reference, if we failed */
 -	if (ret)
-+	if (ret < 0)
- 		return ret;
++	if (ret) {
++		io_cqring_add_event(ctx, req->user_data, ret);
++		if (req->flags & REQ_F_LINK)
++			req->flags |= REQ_F_FAIL_LINK;
+ 		io_put_req(req);
++	}
  
- 	iov_count = iov_iter_count(&iter);
-@@ -1136,7 +1136,7 @@ static int io_write(struct io_kiocb *req, const struct sqe_submit *s,
- 	struct iov_iter iter;
- 	struct file *file;
- 	size_t iov_count;
--	int ret;
-+	ssize_t ret;
+ 	return ret;
+ }
  
- 	ret = io_prep_rw(req, s, force_nonblock);
- 	if (ret)
-@@ -1149,7 +1149,7 @@ static int io_write(struct io_kiocb *req, const struct sqe_submit *s,
- 		return -EINVAL;
- 
- 	ret = io_import_iovec(req->ctx, WRITE, s, &iovec, &iter);
--	if (ret)
-+	if (ret < 0)
- 		return ret;
- 
- 	iov_count = iov_iter_count(&iter);
-diff --git a/fs/splice.c b/fs/splice.c
-index 14cb602d9a2f..98412721f056 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -1356,7 +1356,7 @@ SYSCALL_DEFINE4(vmsplice, int, fd, const struct iovec __user *, uiov,
- 	struct iovec iovstack[UIO_FASTIOV];
- 	struct iovec *iov = iovstack;
- 	struct iov_iter iter;
--	long error;
-+	ssize_t error;
- 	struct fd f;
- 	int type;
- 
-@@ -1367,7 +1367,7 @@ SYSCALL_DEFINE4(vmsplice, int, fd, const struct iovec __user *, uiov,
- 
- 	error = import_iovec(type, uiov, nr_segs,
- 			     ARRAY_SIZE(iovstack), &iov, &iter);
--	if (!error) {
-+	if (error >= 0) {
- 		error = do_vmsplice(f.file, &iter, flags);
- 		kfree(iov);
- 	}
-@@ -1382,7 +1382,7 @@ COMPAT_SYSCALL_DEFINE4(vmsplice, int, fd, const struct compat_iovec __user *, io
- 	struct iovec iovstack[UIO_FASTIOV];
- 	struct iovec *iov = iovstack;
- 	struct iov_iter iter;
--	long error;
-+	ssize_t error;
- 	struct fd f;
- 	int type;
- 
-@@ -1393,7 +1393,7 @@ COMPAT_SYSCALL_DEFINE4(vmsplice, int, fd, const struct compat_iovec __user *, io
- 
- 	error = compat_import_iovec(type, iov32, nr_segs,
- 			     ARRAY_SIZE(iovstack), &iov, &iter);
--	if (!error) {
-+	if (error >= 0) {
- 		error = do_vmsplice(f.file, &iter, flags);
- 		kfree(iov);
- 	}
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 2d0131ad4604..a61ceb6575ab 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -279,13 +279,13 @@ bool csum_and_copy_from_iter_full(void *addr, size_t bytes, __wsum *csum, struct
- size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
- 		struct iov_iter *i);
- 
--int import_iovec(int type, const struct iovec __user * uvector,
-+ssize_t import_iovec(int type, const struct iovec __user * uvector,
- 		 unsigned nr_segs, unsigned fast_segs,
- 		 struct iovec **iov, struct iov_iter *i);
- 
- #ifdef CONFIG_COMPAT
- struct compat_iovec;
--int compat_import_iovec(int type, const struct compat_iovec __user * uvector,
-+ssize_t compat_import_iovec(int type, const struct compat_iovec __user * uvector,
- 		 unsigned nr_segs, unsigned fast_segs,
- 		 struct iovec **iov, struct iov_iter *i);
- #endif
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index f99c41d4eb54..f1e0569b4539 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1634,9 +1634,9 @@ EXPORT_SYMBOL(dup_iter);
-  * on-stack array was used or not (and regardless of whether this function
-  * returns an error or not).
-  *
-- * Return: 0 on success or negative error code on error.
-+ * Return: Negative error code on error, bytes imported on success
++#define SQE_VALID_FLAGS	(IOSQE_FIXED_FILE|IOSQE_IO_DRAIN|IOSQE_IO_LINK)
++
++static void io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
++			  struct io_submit_state *state, struct io_kiocb **link)
++{
++	struct io_uring_sqe *sqe_copy;
++	struct io_kiocb *req = NULL;
++	int ret;
++
++	/* enforce forwards compatibility on users */
++	if (unlikely(s->sqe->flags & ~SQE_VALID_FLAGS)) {
++		ret = -EINVAL;
++		goto err;
++	}
++
++	req = io_get_req(ctx, state);
++	if (unlikely(!req)) {
++		ret = -EAGAIN;
++		goto err;
++	}
++
++	ret = io_req_set_file(ctx, s, state, req);
++	if (unlikely(ret))
++		goto err;
++
++	ret = io_req_defer(ctx, req, s->sqe);
++	if (ret && ret != -EIOCBQUEUED)
++		goto err;
++
++	/*
++	 * If we already have a head request, queue this one for async
++	 * submittal once the head completes. If we don't have a head but
++	 * IOSQE_IO_LINK is set in the sqe, start a new head. This one will be
++	 * submitted sync once the chain is complete. If none of those
++	 * conditions are true (normal request), then just queue it.
++	 */
++	if (*link) {
++		struct io_kiocb *prev = *link;
++
++		sqe_copy = kmemdup(s->sqe, sizeof(*sqe_copy), GFP_KERNEL);
++		if (!sqe_copy) {
++			ret = -EAGAIN;
++			goto err;
++		}
++
++		s->sqe = sqe_copy;
++		memcpy(&req->submit, s, sizeof(*s));
++		list_add_tail(&req->list, &prev->link_list);
++	} else if (s->sqe->flags & IOSQE_IO_LINK) {
++		req->flags |= REQ_F_LINK;
++
++		memcpy(&req->submit, s, sizeof(*s));
++		INIT_LIST_HEAD(&req->link_list);
++		*link = req;
++	} else {
++		io_queue_sqe(ctx, req, s);
++	}
++
++	return;
++err:
++	io_cqring_add_event(ctx, s->sqe->user_data, ret);
++	if (req)
++		io_free_req(req);
++}
++
+ /*
+  * Batched submission is done, ensure local IO is flushed out.
   */
--int import_iovec(int type, const struct iovec __user * uvector,
-+ssize_t import_iovec(int type, const struct iovec __user * uvector,
- 		 unsigned nr_segs, unsigned fast_segs,
- 		 struct iovec **iov, struct iov_iter *i)
+@@ -1981,7 +2104,9 @@ static int io_submit_sqes(struct io_ring_ctx *ctx, struct sqe_submit *sqes,
+ 			  unsigned int nr, bool has_user, bool mm_fault)
  {
-@@ -1652,16 +1652,17 @@ int import_iovec(int type, const struct iovec __user * uvector,
+ 	struct io_submit_state state, *statep = NULL;
+-	int ret, i, submitted = 0;
++	struct io_kiocb *link = NULL;
++	bool prev_was_link = false;
++	int i, submitted = 0;
+ 
+ 	if (nr > IO_PLUG_THRESHOLD) {
+ 		io_submit_state_start(&state, ctx, nr);
+@@ -1989,22 +2114,30 @@ static int io_submit_sqes(struct io_ring_ctx *ctx, struct sqe_submit *sqes,
  	}
- 	iov_iter_init(i, type, p, nr_segs, n);
- 	*iov = p == *iov ? NULL : p;
--	return 0;
-+	return n;
- }
- EXPORT_SYMBOL(import_iovec);
  
- #ifdef CONFIG_COMPAT
- #include <linux/compat.h>
+ 	for (i = 0; i < nr; i++) {
++		/*
++		 * If previous wasn't linked and we have a linked command,
++		 * that's the end of the chain. Submit the previous link.
++		 */
++		if (!prev_was_link && link) {
++			io_queue_sqe(ctx, link, &link->submit);
++			link = NULL;
++		}
++		prev_was_link = (sqes[i].sqe->flags & IOSQE_IO_LINK) != 0;
++
+ 		if (unlikely(mm_fault)) {
+-			ret = -EFAULT;
++			io_cqring_add_event(ctx, sqes[i].sqe->user_data,
++						-EFAULT);
+ 		} else {
+ 			sqes[i].has_user = has_user;
+ 			sqes[i].needs_lock = true;
+ 			sqes[i].needs_fixed_file = true;
+-			ret = io_submit_sqe(ctx, &sqes[i], statep);
+-		}
+-		if (!ret) {
++			io_submit_sqe(ctx, &sqes[i], statep, &link);
+ 			submitted++;
+-			continue;
+ 		}
+-
+-		io_cqring_add_event(ctx, sqes[i].sqe->user_data, ret);
+ 	}
  
--int compat_import_iovec(int type, const struct compat_iovec __user * uvector,
--		 unsigned nr_segs, unsigned fast_segs,
--		 struct iovec **iov, struct iov_iter *i)
-+ssize_t compat_import_iovec(int type,
-+		const struct compat_iovec __user * uvector,
-+		unsigned nr_segs, unsigned fast_segs,
-+		struct iovec **iov, struct iov_iter *i)
++	if (link)
++		io_queue_sqe(ctx, link, &link->submit);
+ 	if (statep)
+ 		io_submit_state_end(&state);
+ 
+@@ -2145,6 +2278,8 @@ static int io_sq_thread(void *data)
+ static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit)
  {
- 	ssize_t n;
- 	struct iovec *p;
-@@ -1675,7 +1676,7 @@ int compat_import_iovec(int type, const struct compat_iovec __user * uvector,
+ 	struct io_submit_state state, *statep = NULL;
++	struct io_kiocb *link = NULL;
++	bool prev_was_link = false;
+ 	int i, submit = 0;
+ 
+ 	if (to_submit > IO_PLUG_THRESHOLD) {
+@@ -2154,22 +2289,30 @@ static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit)
+ 
+ 	for (i = 0; i < to_submit; i++) {
+ 		struct sqe_submit s;
+-		int ret;
+ 
+ 		if (!io_get_sqring(ctx, &s))
+ 			break;
+ 
++		/*
++		 * If previous wasn't linked and we have a linked command,
++		 * that's the end of the chain. Submit the previous link.
++		 */
++		if (!prev_was_link && link) {
++			io_queue_sqe(ctx, link, &link->submit);
++			link = NULL;
++		}
++		prev_was_link = (s.sqe->flags & IOSQE_IO_LINK) != 0;
++
+ 		s.has_user = true;
+ 		s.needs_lock = false;
+ 		s.needs_fixed_file = false;
+ 		submit++;
+-
+-		ret = io_submit_sqe(ctx, &s, statep);
+-		if (ret)
+-			io_cqring_add_event(ctx, s.sqe->user_data, ret);
++		io_submit_sqe(ctx, &s, statep, &link);
  	}
- 	iov_iter_init(i, type, p, nr_segs, n);
- 	*iov = p == *iov ? NULL : p;
--	return 0;
-+	return n;
- }
- #endif
+ 	io_commit_sqring(ctx);
  
-diff --git a/net/compat.c b/net/compat.c
-index 3f9ce609397f..0f7ded26059e 100644
---- a/net/compat.c
-+++ b/net/compat.c
-@@ -80,9 +80,10 @@ int get_compat_msghdr(struct msghdr *kmsg,
++	if (link)
++		io_queue_sqe(ctx, link, &link->submit);
+ 	if (statep)
+ 		io_submit_state_end(statep);
  
- 	kmsg->msg_iocb = NULL;
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index a0c460025036..10b7c45f6d57 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -40,6 +40,7 @@ struct io_uring_sqe {
+  */
+ #define IOSQE_FIXED_FILE	(1U << 0)	/* use fixed fileset */
+ #define IOSQE_IO_DRAIN		(1U << 1)	/* issue after inflight IO */
++#define IOSQE_IO_LINK		(1U << 2)	/* links next sqe */
  
--	return compat_import_iovec(save_addr ? READ : WRITE,
-+	err = compat_import_iovec(save_addr ? READ : WRITE,
- 				   compat_ptr(msg.msg_iov), msg.msg_iovlen,
- 				   UIO_FASTIOV, iov, &kmsg->msg_iter);
-+	return err < 0 ? err : 0;
- }
- 
- /* Bleech... */
-diff --git a/net/socket.c b/net/socket.c
-index 72372dc5dd70..bffec466b4f1 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -2208,9 +2208,10 @@ static int copy_msghdr_from_user(struct msghdr *kmsg,
- 
- 	kmsg->msg_iocb = NULL;
- 
--	return import_iovec(save_addr ? READ : WRITE,
-+	err = import_iovec(save_addr ? READ : WRITE,
- 			    msg.msg_iov, msg.msg_iovlen,
- 			    UIO_FASTIOV, iov, &kmsg->msg_iter);
-+	return err < 0 ? err : 0;
- }
- 
- static int ___sys_sendmsg(struct socket *sock, struct user_msghdr __user *msg,
+ /*
+  * io_uring_setup() flags
 -- 
 2.17.1
 
