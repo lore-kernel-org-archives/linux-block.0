@@ -2,90 +2,141 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,T_DKIMWL_WL_MED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E30B4C28CC0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 13:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CBBBC28CC2
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 14:16:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD9D122CD0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 13:50:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3256B239B7
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 14:16:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="Gv0ccnGU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PRVorFm2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726863AbfE2NuX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 09:50:23 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:43143 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726702AbfE2NuX (ORCPT
+        id S1726843AbfE2OQi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 10:16:38 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:44795 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726806AbfE2OQi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 09:50:23 -0400
-Received: by mail-qt1-f195.google.com with SMTP id z24so2581196qtj.10
-        for <linux-block@vger.kernel.org>; Wed, 29 May 2019 06:50:22 -0700 (PDT)
+        Wed, 29 May 2019 10:16:38 -0400
+Received: by mail-ot1-f66.google.com with SMTP id g18so2147416otj.11
+        for <linux-block@vger.kernel.org>; Wed, 29 May 2019 07:16:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=YZ+pg8aR5qtYQVgChplcfMUX8pIrRvMgQQ9ehzYO2NY=;
-        b=Gv0ccnGUxwVA4CTo/MYZhnLEFa+NMtfNA1dXp7D65wkDSPkL7/+ggsF0C/UDeGkJGC
-         gVMx9cP8UCjFB82NPeXC1HyYatRf7zEYiMfEd90UB8H6ubBRiYwnOVjyjfxrmFB64EJS
-         459UY3oBceABLZ7+b1T19Ucuh58Xu2owPXLhWWP6WrdovjznYkXFl/EKJKNXoPu/OYeV
-         6PjCnVolGMPeGhOdaTq/q1Yyfy+stN9uS68Ti3umLmlPH/SeYdHT+3J09kv+fqDOcipY
-         REDPY83if8k2P3r22QjZc0VBnbYLOIdhe5OWvzlpzcqPMuBR/WYmypooktiqqy3WDP9o
-         7wFA==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LPIxbFckpmqavIl60mnhGb6C8rcrkiaOP2OfEidBo5E=;
+        b=PRVorFm2Okq9hP5kqFH4ZiGr/E/Zu5eJY3MGXXFHxfdpmEdO3GutJJMHvfi09HYlYk
+         SnDTz9Jq0D6SvbjJsXUxw5SPAGf64dGBdkqzG7gBAtOGooyMlAvl8mmczoLi90evYR0A
+         PoHHqSU1LxoqR2wdSfJkTL18f/IZSr+Mc0D+armTgiJNv2KbxIbIGzPnKannBmXr5ZoL
+         onXscwCND5pzd7qsQ+4DRiaG4VALoZaDIZlGVD+Au9+DrLehAtdeFUdLTVj+n3sjvpTd
+         19cYxGogHm6iK4AXItVQ8hkyokyg4Cjwng+d2g0cb8MTYxZRlHB62qmC+BHhUJPQbJyg
+         MxTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=YZ+pg8aR5qtYQVgChplcfMUX8pIrRvMgQQ9ehzYO2NY=;
-        b=Pu79e4KcTbhqN2J/EikkvZ/LkjVFe6ZzmcB3qYWOxlyE1+n38fsCiDK3bhk0ad6uNG
-         rfgr8dg4xxQ/+dj7xwUa9BHw6ypkdlbqFKYUgnr5JKvKhsb76NVRFvQ8Kwr81bCbqM7H
-         PmxH+62F8w6rB5nECrf2jsBP/d2wcPcteBLVjhXIfMzcSAGwldWHVhTXtS9WnuYijeMH
-         EhyqgTY4qBxPgX5YPOLS2dkJR1BRAbO6v92GvCJnpQHg23uAg7+58liJ62AiFR6lJiDx
-         kL4elWZyrg96AeLHAV1Ir/hc13TxsyNIXCj0sGh+QCP9k3xcEQU8a1sjUvkDaHOoP4oB
-         NdAw==
-X-Gm-Message-State: APjAAAU+2AcWtvXQCmQ/2JlIIMWiRc8YnBMekFTEr/bNfuQxp9XPbzdu
-        jsuGswOeJ4lOj5cLI/KbU6symA==
-X-Google-Smtp-Source: APXvYqwEtNwAR1RkkEX4AEuf9rsrRVXIcPejqHjeKH7c+7L9tPPaz3vt4LvVFSsUtK81/8sbDa/Pfw==
-X-Received: by 2002:a0c:d13a:: with SMTP id a55mr58174644qvh.111.1559137821888;
-        Wed, 29 May 2019 06:50:21 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::d8f])
-        by smtp.gmail.com with ESMTPSA id n26sm739941qtn.36.2019.05.29.06.50.20
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 29 May 2019 06:50:20 -0700 (PDT)
-Date:   Wed, 29 May 2019 09:50:19 -0400
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     xiubli@redhat.com
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, nbd@other.debian.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        atumball@redhat.com
-Subject: Re: [PATCH] nbd: fix crash when the blksize is zero
-Message-ID: <20190529135018.6vbhxkuyppctqtco@MacBook-Pro-91.local>
-References: <20190527054438.13548-1-xiubli@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LPIxbFckpmqavIl60mnhGb6C8rcrkiaOP2OfEidBo5E=;
+        b=NF0RWxXZzQvZDaRR3MCkDBsZnPp4u/c7T5nL+6M6tewPeUEh0IZcIYRVNjSccBavlI
+         vmxQl/kCJOnxsUe4yWjUZHi/OuewrjdvKJpBCbvWDCgEQyPopUsM4BVh+4Deqei+cAIL
+         Zaqm5oxFAYJixMHgkYvnrc3+o8Tc37rSEesP1wtrnqZbB+Y0s17VDKdTq5UHunLqz55+
+         DOR8lh26/kqLNdzEJP+KBKD/Bwk7qhj0yt9JEjYSOZYlHJu3+/fM8+JK6rgwxDyUZ/r5
+         a4ZaRjPONsOsnSWNEz5neTvRfUxMvG596155gMAbo+2VoVIcUjacRLQwB5/wPGsHLAbB
+         y7FQ==
+X-Gm-Message-State: APjAAAX9UQbQhPd33UFBXQ8jWtLvil4Pxm5Rh35XoFnW1Y0+EnhUu9aC
+        bhDDgL0v32Wnuj7a+jfCLXsuuQi9907ig57boofBvQ==
+X-Google-Smtp-Source: APXvYqwFTJrhrhEsjfOGtxnb29he2Fqyf9z7Tcu+GzobGgP0NfT3JF16fdsQq+/5jwCnLYlKlqDC3v5fUc8xIPyeFeo=
+X-Received: by 2002:a9d:7f8b:: with SMTP id t11mr37188otp.110.1559139396903;
+ Wed, 29 May 2019 07:16:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190527054438.13548-1-xiubli@redhat.com>
-User-Agent: NeoMutt/20180716
+References: <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk>
+ <155905934373.7587.10824503964531598726.stgit@warthog.procyon.org.uk>
+ <CAG48ez2o1egR13FDd3=CgdXP_MbBsZM4SX=+aqvR6eheWddhFg@mail.gmail.com> <24577.1559134719@warthog.procyon.org.uk>
+In-Reply-To: <24577.1559134719@warthog.procyon.org.uk>
+From:   Jann Horn <jannh@google.com>
+Date:   Wed, 29 May 2019 16:16:10 +0200
+Message-ID: <CAG48ez0Ugv=cfj-v6DaYma0HgyiBjpykSkCr7mCAcMx13LEncg@mail.gmail.com>
+Subject: Re: [PATCH 4/7] vfs: Add superblock notifications
+To:     David Howells <dhowells@redhat.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>, raven@themaw.net,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 27, 2019 at 01:44:38PM +0800, xiubli@redhat.com wrote:
-> From: Xiubo Li <xiubli@redhat.com>
-> 
-> This will allow the blksize to be set zero and then use 1024 as
-> default.
-> 
-> Signed-off-by: Xiubo Li <xiubli@redhat.com>
+On Wed, May 29, 2019 at 2:58 PM David Howells <dhowells@redhat.com> wrote:
+> Jann Horn <jannh@google.com> wrote:
+> > It might make sense to require that the path points to the root inode
+> > of the superblock? That way you wouldn't be able to do this on a bind
+> > mount that exposes part of a shared filesystem to a container.
+>
+> Why prevent that?  It doesn't prevent the container denizen from watching a
+> bind mount that exposes the root of a shared filesystem into a container.
 
-Hmm sorry I missed this somehow
+Well, yes, but if you expose the root of the shared filesystem to the
+container, the container is probably meant to have a higher level of
+access than if only a bind mount is exposed? But I don't know.
 
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+> It probably makes sense to permit the LSM to rule on whether a watch may be
+> emplaced, however.
 
-Thanks,
+We should have some sort of reasonable policy outside of LSM code
+though - the kernel should still be secure even if no LSMs are built
+into it.
 
-Josef
+> > > +                       }
+> > > +               }
+> > > +               up_write(&s->s_umount);
+> > > +               if (ret < 0)
+> > > +                       kfree(watch);
+> > > +       } else if (s->s_watchers) {
+> >
+> > This should probably have something like a READ_ONCE() for clarity?
+>
+> Note that I think I'll rearrange this to:
+>
+>         } else {
+>                 ret = -EBADSLT;
+>                 if (s->s_watchers) {
+>                         down_write(&s->s_umount);
+>                         ret = remove_watch_from_object(s->s_watchers, wqueue,
+>                                                        s->s_unique_id, false);
+>                         up_write(&s->s_umount);
+>                 }
+>         }
+>
+> I'm not sure READ_ONCE() is necessary, since s_watchers can only be
+> instantiated once and the watch list then persists until the superblock is
+> deactivated.  Furthermore, by the time deactivate_locked_super() is called, we
+> can't be calling sb_notify() on it as it's become inaccessible.
+>
+> So if we see s->s_watchers as non-NULL, we should not see anything different
+> inside the lock.  In fact, I should be able to rewrite the above to:
+>
+>         } else {
+>                 ret = -EBADSLT;
+>                 wlist = s->s_watchers;
+>                 if (wlist) {
+>                         down_write(&s->s_umount);
+>                         ret = remove_watch_from_object(wlist, wqueue,
+>                                                        s->s_unique_id, false);
+>                         up_write(&s->s_umount);
+>                 }
+>         }
+
+I'm extremely twitchy when it comes to code like this because AFAIK
+gcc at least used to sometimes turn code that read a value from memory
+and then used it multiple times into something with multiple memory
+reads, leading to critical security vulnerabilities; see e.g. slide 36
+of <https://www.blackhat.com/docs/us-16/materials/us-16-Wilhelm-Xenpwn-Breaking-Paravirtualized-Devices.pdf>.
+I am not aware of any spec that requires the compiler to only perform
+one read from the memory location in code like this.
