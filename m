@@ -3,88 +3,123 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5086C04AB3
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 08:09:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4819C04AB3
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 08:13:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B9A6520B7C
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 08:09:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDF2221019
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 08:13:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726697AbfE2IJm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 04:09:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37236 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726687AbfE2IJm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 04:09:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AE34A3087958;
-        Wed, 29 May 2019 08:09:41 +0000 (UTC)
-Received: from rhel3.localdomain (ovpn-12-18.pek2.redhat.com [10.72.12.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A22C36148C;
-        Wed, 29 May 2019 08:09:38 +0000 (UTC)
-From:   xiubli@redhat.com
-To:     josef@toxicpanda.com, axboe@kernel.dk, nbd@other.debian.org
-Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, atumball@redhat.com,
-        Xiubo Li <xiubli@redhat.com>
-Subject: [RFC PATCH] nbd: set the default nbds_max to 0
-Date:   Wed, 29 May 2019 16:08:36 +0800
-Message-Id: <20190529080836.13031-1-xiubli@redhat.com>
+        id S1726515AbfE2INB convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 04:13:01 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:41614 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbfE2INB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 04:13:01 -0400
+Received: by mail-lj1-f196.google.com with SMTP id q16so1494672ljj.8;
+        Wed, 29 May 2019 01:12:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=a0don3TTA7MOPbrbjinj58BbWNizus2TjnpcpEnZ6h0=;
+        b=YydndqMa2LgSRtqs2BJ95rhwZbCBiP6jaMAdwNku5DJDbGeJfbxQQAxu1yUBvuQ7ow
+         Ll/MGmFxN645qG93kNAx3juWILfc/+Ljw4hgHrYn8PM16kdE/hvVBP8k0+l1D4HJGOiP
+         DA8oTPGS26Nlty4IRuaG9Mn+fr9U51f8tdjPsJX3b1XAttosGOPnMnlZYHCSO2mempXC
+         qG1TVI+r82hkI/CYGlSxVsb7cqdsBprWYu3VpY2xLgd0rZIdueWvqUF9QfZj2Dx4sCQ8
+         0lNZjAx09O57abcOy5f2FlpSHyy5RrJb10Wph9lJhs9mXHq4l4Rtec5k4zpOf378PsWQ
+         ZuiA==
+X-Gm-Message-State: APjAAAVjBdmCWt3SSYC7M693xjFdlNmxhqVjW949QN0UmvuMJErBvshY
+        gOlnzEGqejADTdL/ummqt9tDnRczFO5dMDCUSbQ=
+X-Google-Smtp-Source: APXvYqz+i9F0zk6NyMyWBavDhJq5T11k3LBK2MrgZ55YQ542TgvrWEs81N68J92wCzTKGRLDj79yXuvelmq9XTmatnU=
+X-Received: by 2002:a05:651c:150:: with SMTP id c16mr67589499ljd.65.1559117578478;
+ Wed, 29 May 2019 01:12:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Wed, 29 May 2019 08:09:42 +0000 (UTC)
+References: <20190528142424.19626-1-geert@linux-m68k.org> <20190528142424.19626-2-geert@linux-m68k.org>
+ <4b666e32-04b6-228a-691d-0745fa48a57f@lightnvm.io>
+In-Reply-To: <4b666e32-04b6-228a-691d-0745fa48a57f@lightnvm.io>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Wed, 29 May 2019 10:12:45 +0200
+Message-ID: <CAMuHMdVtM9NWSXbWE=XKOt3fiQdjWaDvLiYdXbbri-buDn7jpg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] lightnvm: Fix uninitialized pointer in nvm_remove_tgt()
+To:     =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
+Cc:     Igor Konopko <igor.j.konopko@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        "Mohit P . Tahiliani" <tahiliani@nitk.edu.in>,
+        Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+        Eran Ben Elisha <eranbe@mellanox.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jamal Hadi Salim <jhs@mojatatu.com>,
+        Cong Wang <xiyou.wangcong@gmail.com>,
+        Clemens Ladisch <clemens@ladisch.de>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, Joe Perches <joe@perches.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        linux-block@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        linux-afs@lists.infradead.org,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xiubo Li <xiubli@redhat.com>
+Hi Matias,
 
-There is one problem that when trying to check the nbd device
-NBD_CMD_STATUS and at the same time insert the nbd.ko module,
-we can randomly get some of the 16 /dev/nbd{0~15} are connected,
-but they are not. This is because that the udev service in user
-space will try to open /dev/nbd{0~15} devices to do some sanity
-check when they are added in "__init nbd_init()" and then close
-it asynchronousely.
+On Wed, May 29, 2019 at 10:08 AM Matias Bjørling <mb@lightnvm.io> wrote:
+> On 5/28/19 4:24 PM, Geert Uytterhoeven wrote:
+> > With gcc 4.1:
+> >
+> >      drivers/lightnvm/core.c: In function ‘nvm_remove_tgt’:
+> >      drivers/lightnvm/core.c:510: warning: ‘t’ is used uninitialized in this function
+> >
+> > Indeed, if no NVM devices have been registered, t will be an
+> > uninitialized pointer, and may be dereferenced later.  A call to
+> > nvm_remove_tgt() can be triggered from userspace by issuing the
+> > NVM_DEV_REMOVE ioctl on the lightnvm control device.
+> >
+> > Fix this by preinitializing t to NULL.
+> >
+> > Fixes: 843f2edbdde085b4 ("lightnvm: do not remove instance under global lock")
+> > Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> > ---
+> >   drivers/lightnvm/core.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+> > index 0df7454832efe082..aa017f48eb8c588c 100644
+> > --- a/drivers/lightnvm/core.c
+> > +++ b/drivers/lightnvm/core.c
+> > @@ -492,7 +492,7 @@ static void __nvm_remove_target(struct nvm_target *t, bool graceful)
+> >    */
+> >   static int nvm_remove_tgt(struct nvm_ioctl_remove *remove)
+> >   {
+> > -     struct nvm_target *t;
+> > +     struct nvm_target *t = NULL;
+> >       struct nvm_dev *dev;
+> >
+> >       down_read(&nvm_lock);
+> >
+>
+> Thanks Geert. Would you like me to carry the patch?
 
-Signed-off-by: Xiubo Li <xiubli@redhat.com>
----
+Yes please. Thanks!
 
-Not sure whether this patch make sense here, coz this issue can be
-avoided by setting the "nbds_max=0" when inserting the nbd.ko modules.
+Gr{oetje,eeting}s,
 
+                        Geert
 
-
- drivers/block/nbd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 4c1de1c..98be6ca 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -137,7 +137,7 @@ struct nbd_cmd {
- 
- #define NBD_DEF_BLKSIZE 1024
- 
--static unsigned int nbds_max = 16;
-+static unsigned int nbds_max;
- static int max_part = 16;
- static struct workqueue_struct *recv_workqueue;
- static int part_shift;
-@@ -2310,6 +2310,6 @@ static void __exit nbd_cleanup(void)
- MODULE_LICENSE("GPL");
- 
- module_param(nbds_max, int, 0444);
--MODULE_PARM_DESC(nbds_max, "number of network block devices to initialize (default: 16)");
-+MODULE_PARM_DESC(nbds_max, "number of network block devices to initialize (default: 0)");
- module_param(max_part, int, 0444);
- MODULE_PARM_DESC(max_part, "number of partitions per device (default: 16)");
 -- 
-1.8.3.1
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
