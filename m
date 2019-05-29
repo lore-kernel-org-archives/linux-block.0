@@ -2,96 +2,80 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=DATE_IN_PAST_12_24,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0E3C28CC0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 10:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78729C28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 10:55:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F328D2070D
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 10:32:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E7CC208CB
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 10:55:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725894AbfE2Kcl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 06:32:41 -0400
-Received: from m97179.mail.qiye.163.com ([220.181.97.179]:6940 "EHLO
-        m97179.mail.qiye.163.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725874AbfE2Kcl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 06:32:41 -0400
-Received: from localhost (unknown [120.132.1.243])
-        by m97179.mail.qiye.163.com (Hmail) with ESMTPA id 1966BE01AC1;
-        Wed, 29 May 2019 18:32:33 +0800 (CST)
-Date:   Wed, 29 May 2019 04:05:54 +0800
-From:   Yao Liu <yotta.liu@ucloud.cn>
-To:     Mike Christie <mchristi@redhat.com>
-Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] nbd: notify userland even if nbd has already
- disconnected
-Message-ID: <20190528200554.GA21633@192-168-150-246.7~>
-References: <1558691036-16281-1-git-send-email-yotta.liu@ucloud.cn>
- <1558691036-16281-2-git-send-email-yotta.liu@ucloud.cn>
- <20190524130856.zod5agp7hk74pcnr@MacBook-Pro-91.local.dhcp.thefacebook.com>
- <20190527182323.GB20702@192-168-150-246.7~>
- <5CED6385.3000802@redhat.com>
+        id S1725914AbfE2KzQ convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 06:55:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34742 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725894AbfE2KzQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 06:55:16 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 92A5430B2443;
+        Wed, 29 May 2019 10:55:15 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B4BC2F2A0;
+        Wed, 29 May 2019 10:55:11 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAG48ez2rRh2_Kq_EGJs5k-ZBNffGs_Q=vkQdinorBgo58tbGpg@mail.gmail.com>
+References: <CAG48ez2rRh2_Kq_EGJs5k-ZBNffGs_Q=vkQdinorBgo58tbGpg@mail.gmail.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk> <155905933492.7587.6968545866041839538.stgit@warthog.procyon.org.uk>
+To:     Jann Horn <jannh@google.com>
+Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        raven@themaw.net, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 3/7] vfs: Add a mount-notification facility
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5CED6385.3000802@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-HM-Spam-Status: e1kIGBQJHllBWUtVQ01JQkJCQ05NT0xJS0pOWVdZKFlBSUI3V1ktWUFJV1
-        kJDhceCFlBWTU0KTY6NyQpLjc#WQY+
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Nxw6USo*Vjg0OiI9KgoSPyhD
-        OBNPCzhVSlVKTk5CSklOQk5ISUtIVTMWGhIXVQIUDw8aVRcSDjsOGBcUDh9VGBVFWVdZEgtZQVlK
-        SUtVSkhJVUpVSU9IWVdZCAFZQUhOTk83Bg++
-X-HM-Tid: 0a6b03260a5320bdkuqy1966be01ac1
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <13969.1559127310.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8BIT
+Date:   Wed, 29 May 2019 11:55:10 +0100
+Message-ID: <13970.1559127310@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 29 May 2019 10:55:15 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 28, 2019 at 11:36:21AM -0500, Mike Christie wrote:
-> On 05/27/2019 01:23 PM, Yao Liu wrote:
-> > On Fri, May 24, 2019 at 09:08:58AM -0400, Josef Bacik wrote:
-> >> On Fri, May 24, 2019 at 05:43:55PM +0800, Yao Liu wrote:
-> >>> Some nbd client implementations have a userland's daemon, so we should
-> >>> inform client daemon to clean up and exit.
-> >>>
-> >>> Signed-off-by: Yao Liu <yotta.liu@ucloud.cn>
-> >>
-> >> Except the nbd_disconnected() check is for the case that the client told us
-> >> specifically to disconnect, so we don't want to send the notification to
-> >> re-connect because we've already been told we want to tear everything down.
-> >> Nack to this as well.  Thanks,
-> >>
-> >> Josef
-> >>
-> > 
-> > But in userland, client daemon process and process which send disconnect
-> > command are not same process, so they are not clear to each other, so
-> > client daemon expect driver inform it to exit.
-> > In addition, client daemon will get nbd status with nbd_genl_status interface
-> > after it get notified and it should not re-connect if status connected == 0
-> > 
-> 
-> When using the netlink interface you get the NBD_CMD_LINK_DEAD first
-> then the configs_refs goes to zero right?
-> 
-> nbd_disconnect_and_put -> sock_shutdown -> nbd_mark_nsock_dead
-> 
-> then later we do the final nbd_config_put?
-> 
-> Maybe it would be best to add a new netlink event to signal what has
-> happened, because the above nl and stat algorithm seems like a pain. The
-> NBD_CMD_LINK_DEAD will be sent, then userspace has to possibly poll the
-> status to check if this was caused due to nbd_genl_disconnect instead of
-> a downed link due to something like a command timeout, because the
-> refcount may not be down when userspace gets the NL event.
-> 
-> Or, I guess the admin/tool process could just send a msg to the daemon
-> process to tell it to do the netlink disconnect request.
-> 
+Jann Horn <jannh@google.com> wrote:
 
-Adding a new netlink event sames good.
+> > +                       /* Global root? */
+> > +                       if (mnt != parent) {
+> > +                               cursor.dentry = READ_ONCE(mnt->mnt_mountpoint);
+> > +                               mnt = parent;
+> > +                               cursor.mnt = &mnt->mnt;
+> > +                               continue;
+> > +                       }
+> > +                       break;
+> 
+> (nit: this would look clearer if you inverted the condition and wrote
+> it as "if (mnt == parent) break;", then you also wouldn't need that
+> "continue" or the braces)
+
+It does look better with the logic inverted, but you *do* still need the
+continue.  After the if-statement, there is:
+
+	cursor.dentry = cursor.dentry->d_parent;
+
+which we need to skip.  It might make sense to move that into an
+else-statement from an aesthetic point of view.
+
+David
