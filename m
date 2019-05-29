@@ -2,306 +2,179 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9248C28CC2
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 17:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D797C28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 17:46:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8396523FD5
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 17:37:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B26423FF8
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 17:46:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aE73SB/R"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="QII37T1Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725917AbfE2Rho (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 13:37:44 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:52044 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726033AbfE2Rho (ORCPT
+        id S1727090AbfE2Rqb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 13:46:31 -0400
+Received: from sonic303-8.consmr.mail.bf2.yahoo.com ([74.6.131.47]:40103 "EHLO
+        sonic303-8.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726875AbfE2Rqb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 13:37:44 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4THSx1c014020;
-        Wed, 29 May 2019 17:37:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2018-07-02; bh=8AVfKr/gATg+03UGlOTOyR2BRCMT7VwSn3nR5jJ9Wyk=;
- b=aE73SB/RkfAAF9flO6PLqdp1J1y+gQcO3BtDHbD/eJTnDObqOv9u+Yaeu10avpX/nLHj
- KbgNEUg9W51uhHGt+ZvVApO5r5euX+MZ8drrkX4o3kbkHqHvx0nOGn2G/4CU4JGCsk+S
- wiQ4lGWkiDW9YJ2rLRub5WVU0B2obO5YH8eCXaLlYIDvYEC1uKBpZk1fM3N1kgnZgXMU
- +quzqVcaQYZLOixDPM3m56xAaUZEpNWQJy0+DymhJLVul75lGo7L0xoGxhHDulQJxFnB
- EehvT7uupYeEM2ADN88JlglHNAQlb++OBkdFuHtJe1LJJYPDHpgpPTPa65TKrRt/o3Ga eA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2130.oracle.com with ESMTP id 2spu7dkpnk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 May 2019 17:37:15 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4THYNfM096594;
-        Wed, 29 May 2019 17:35:15 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2sqh73up71-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 May 2019 17:35:14 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4THZEvD028197;
-        Wed, 29 May 2019 17:35:14 GMT
-Received: from ca-mkp.ca.oracle.com (/10.156.108.201)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 29 May 2019 10:35:13 -0700
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-To:     linux-block@vger.kernel.org
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        stable@vger.kernel.org, Jeremy Cline <jeremy@jcline.org>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Oleksii Kurochko <olkuroch@cisco.com>
-Subject: [PATCH] block: Fix read-only block device setting after revalidate
-Date:   Wed, 29 May 2019 13:35:12 -0400
-Message-Id: <20190529173512.9587-1-martin.petersen@oracle.com>
-X-Mailer: git-send-email 2.21.0
+        Wed, 29 May 2019 13:46:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1559151989; bh=CbTHMjH+ST+XZigj3rLVDQnXul1VH3bCZnpgyA114MY=; h=Subject:To:Cc:References:From:Date:In-Reply-To:From:Subject; b=QII37T1ZObtAVd8ttqra1vIxwLasAcJBJ5ma2pBpn/gWHzZPOrZpV+GDQXwdjt6tLs9N6jTXpLXKfEi1qKsqoc6tnK10TAom5AB4ysQEaV/Cc0ftHzZ6EHCg/38kwRLly+uuXpitKlxNa1KiUMAOEJsDxPdmA4jP9NCesBkAXoV8/+DFhDJKkcbuDMYPrE1BXUd7WjNa+YWHhW3d3k6obatB3B6RiBi1S2ekpVcergzMNZQENaLaBBEhYwf+EyS4DXi0OYZU/irLmDUYO5iX8/bSYgJS2VywwKmvC4iaOpGurkowe57wQ4a3DCW6IVzRttk/Ms47S0OubtvHBS1pzw==
+X-YMail-OSG: Q2edbnMVM1nLWyT5kl2or1wKa7meZJQTF_.kj5teyboAvJoCEOlVHAZa4MoOp0P
+ gi0uZAqwya30MhZmvJksN0fy1HyQuJtF2tMklDKir50ajN573m8UCIv8aDJfeEBgx8yczB_NLhQa
+ ppMDfGmI2l9Bp_V6qvGtMCeR8kGhe.UMbtphUmTKiKBq2H5eXQ.ijU2EdHJQyk8l52wLhqKsmQf7
+ 3y7P_qc5DGi4tAR0HBhZLHFH5cGEtxfeW3CPRfD7_nxJmiv8kGmuPixWnmiD.6CEErJiQ92Yfc9j
+ jTAlgZu_aU6cSzr_DeWMYdVWm7pV7TWzWTR6BVvT40M.AR_lHODFeLkRaXse_Dk3i4WcUO96HhAA
+ K1.hgRWY0vkMQrLAw6Uf4oBmb4Dfh6PfQ_m3IXQtkSlPEaxFSdboSBqkvVlDD8LnMgDWj6yOW5qW
+ MDMUDqvSdytafWcpwkBvVSHlatRIj8s2OEu9mmypITfxv78fCvMOMi7isrHOaJBkACOb0__aEp8.
+ PDon7A08WUPOlpgw3hSSiQThTA1oqdshNZ4OeUfqLQN.4LQd9nfGgPL2yWYyHzb9YYy4h2iTjyNp
+ W0FN2peTkSNFgUrn.xhXc1yH5uSZlQDJ_sYBIAKRatPnMNUERN48KhII7.8iUhx3COZQhuT3w_nS
+ xXYd1kEXEcKDeMKb3tDTILGQ9dequD3rpMPQrcHvMIQqZsjFMf2VwjIidtX0jJxWAMsdtzIH8jE2
+ d3WtsC0JchmLTC7yd.OgJ4BGdvZygeN2lMi6gF__UpcKPWzH84RMtpxa1SYwje2wmHtCCGIEXrFP
+ sOMa8_4KvQosZGH2D4rhEr2TRjeDwhUqCJp46zTEu9e2Qj0JEDQHuGojaRFB1cdl2aDt91fougGu
+ Fvr7s7q3IizFMLEJ8pFSyqeD5wu6Zkyo7.resXCXhfEn0KYsGbr3c23tHVVD1iL0THukM2RAxXw2
+ uAYu2gddhcZNWpk4idR24JB.jlGcpgibnFMn3HSjdJ0YfUV5Xel8RAp8X4Ps9OhvwJL9uGTydtkI
+ h_jKsNHYqN1rXcYqwAsj9x0eFBlOhtVcrId6PyXBps9dWX9u6k6YrOKky6rslqaI3t3Sb1klzPi_
+ NYh7kgx3_K3SrGIJt2j3aVfCevB0Omhe584m0ruXaYRK1fo9nV_4_aC93LbecPZZLAQ1HaTO3E5q
+ Kk1Z2TcmuwYGrJiJRlVNENMqeQ5oKxQm3QsH1cDYjXyt_FftVlpUhyF9iPtSa9YMyWdfSBent0H5
+ hitHjPoES8mPwWntKf_ARZzC3zHg-
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic303.consmr.mail.bf2.yahoo.com with HTTP; Wed, 29 May 2019 17:46:29 +0000
+Received: from c-73-223-4-185.hsd1.ca.comcast.net (EHLO [192.168.0.103]) ([73.223.4.185])
+          by smtp422.mail.bf1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID 14a0212f313aaa80beda292114a9fd96;
+          Wed, 29 May 2019 17:46:25 +0000 (UTC)
+Subject: Re: [PATCH 3/7] vfs: Add a mount-notification facility
+To:     Andy Lutomirski <luto@amacapital.net>
+Cc:     David Howells <dhowells@redhat.com>, Jann Horn <jannh@google.com>,
+        Al Viro <viro@zeniv.linux.org.uk>, raven@themaw.net,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        casey@schaufler-ca.com
+References: <CAG48ez2rRh2_Kq_EGJs5k-ZBNffGs_Q=vkQdinorBgo58tbGpg@mail.gmail.com>
+ <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk>
+ <155905933492.7587.6968545866041839538.stgit@warthog.procyon.org.uk>
+ <14347.1559127657@warthog.procyon.org.uk>
+ <312a138c-e5b2-4bfb-b50b-40c82c55773f@schaufler-ca.com>
+ <4552118F-BE9B-4905-BF0F-A53DC13D5A82@amacapital.net>
+From:   Casey Schaufler <casey@schaufler-ca.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=casey@schaufler-ca.com; keydata=
+ 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
+ abzjfg==
+Message-ID: <058f227c-71ab-a6f4-00bf-b8782b3b2956@schaufler-ca.com>
+Date:   Wed, 29 May 2019 10:46:23 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9272 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905290114
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9272 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905290114
+In-Reply-To: <4552118F-BE9B-4905-BF0F-A53DC13D5A82@amacapital.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 20bd1d026aac ("scsi: sd: Keep disk read-only when re-reading
-partition") addressed a long-standing problem with user read-only
-policy being overridden as a result of a device-initiated revalidate.
-The commit has since been reverted due to a regression that left some
-USB devices read-only indefinitely.
+On 5/29/2019 10:13 AM, Andy Lutomirski wrote:
+>
+>> On May 29, 2019, at 8:53 AM, Casey Schaufler <casey@schaufler-ca.com> =
+wrote:
+>>
+>>> On 5/29/2019 4:00 AM, David Howells wrote:
+>>> Jann Horn <jannh@google.com> wrote:
+>>>
+>>>>> +void post_mount_notification(struct mount *changed,
+>>>>> +                            struct mount_notification *notify)
+>>>>> +{
+>>>>> +       const struct cred *cred =3D current_cred();
+>>>> This current_cred() looks bogus to me. Can't mount topology changes
+>>>> come from all sorts of places? For example, umount_mnt() from
+>>>> umount_tree() from dissolve_on_fput() from __fput(), which could
+>>>> happen pretty much anywhere depending on where the last reference ge=
+ts
+>>>> dropped?
+>>> IIRC, that's what Casey argued is the right thing to do from a securi=
+ty PoV.
+>>> Casey?
+>> You need to identify the credential of the subject that triggered
+>> the event. If it isn't current_cred(), the cred needs to be passed
+>> in to post_mount_notification(), or derived by some other means.
+> Taking a step back, why do we care who triggered the event?  It seems t=
+o me that we should care whether the event happened and whether the *rece=
+iver* is permitted to know that.
 
-To fix the underlying problems with revalidate we need to keep track
-of hardware state and user policy separately. Every time the state is
-changed, either via a hardware event or the BLKROSET ioctl, the
-per-partition read-only state is updated based on the combination of
-device state and policy. The resulting active state is stored in a
-separate hd_struct flag to avoid introducing additional lookups in the
-I/O hot path.
+There are two filesystems, "dot" and "dash". I am not allowed
+to communicate with Fred on the system, and all precautions have
+been taken to ensure I cannot. Fred asks for notifications on
+all mount activity. I perform actions that result in notifications
+on "dot" and "dash". Fred receives notifications and interprets
+them using Morse code. This is not OK. If Wilma, who *is* allowed
+to communicate with Fred, does the same actions, he should be
+allowed to get the messages via Morse.
 
-The gendisk has been updated to reflect the current hardware state set
-by the device driver. This is done to allow returning the device to
-the hardware state once the user clears the BLKROSET flag.
+The event is information. The information is generated as a
+result of my or Wilma's action. Fred is passive in this access.
+Fred is not "reading" the event. The event is being written to
+Fred. My process is the subject, and Fred's the object.
 
-For partitions, the existing hd_struct 'policy' flag is split into
-two:
+Other security modelers may disagree. The models they produce
+are going to be *very* complicated and will introduce agents and
+intermediate objects to justify Fred's reception of an event as
+a read operation.
 
- - 'read_only' indicates the currently active read-only state of a
-   whole disk device or partition.
+> (And receiver means whoever subscribed, presumably, not whoever called =
+read() or mmap().)
 
- - 'ro_policy' indicates the whether the user has administratively set
-   the whole disk or partition read-only via the BLKROSET ioctl.
+The receiver is the process that gets the event. There may
+be more than one receiver, and the receivers may have different
+credentials. Each needs to be checked separately.
 
-The resulting semantics are as follows:
+Isn't this starting to sound like the discussions on kdbus?
+I'm not sure if that deserves a :) or a :( but probably one of the two.
 
- - If BLKROSET is used to set a whole-disk device read-only, any
-   partitions will end up in a read-only state until the user
-   explicitly clears the flag.
-
- - If BLKROSET sets a given partition read-only, that partition will
-   remain read-only even if the underlying storage stack initiates a
-   revalidate. However, the BLKRRPART ioctl will cause the partition
-   table to be dropped and any user policy on partitions will be lost.
-
- - If BLKROSET has not been set, both the whole disk device and any
-   partitions will reflect the current write-protect state of the
-   underlying device.
-
-Cc: <stable@vger.kernel.org>
-Cc: Jeremy Cline <jeremy@jcline.org>
-Cc: Ewan D. Milne <emilne@redhat.com>
-Reported-by: Oleksii Kurochko <olkuroch@cisco.com>
-Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=201221
-Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
----
- block/blk-core.c          |  2 +-
- block/genhd.c             | 69 +++++++++++++++++++++++++++++----------
- block/partition-generic.c |  4 +--
- include/linux/genhd.h     | 10 +++---
- 4 files changed, 61 insertions(+), 24 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 4673ebe42255..932f179a9095 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -792,7 +792,7 @@ static inline bool bio_check_ro(struct bio *bio, struct hd_struct *part)
- {
- 	const int op = bio_op(bio);
- 
--	if (part->policy && op_is_write(op)) {
-+	if (part->read_only && op_is_write(op)) {
- 		char b[BDEVNAME_SIZE];
- 
- 		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
-diff --git a/block/genhd.c b/block/genhd.c
-index 703267865f14..75138cf5540d 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1539,38 +1539,73 @@ static void set_disk_ro_uevent(struct gendisk *gd, int ro)
- 	kobject_uevent_env(&disk_to_dev(gd)->kobj, KOBJ_CHANGE, envp);
- }
- 
--void set_device_ro(struct block_device *bdev, int flag)
--{
--	bdev->bd_part->policy = flag;
--}
--
--EXPORT_SYMBOL(set_device_ro);
--
--void set_disk_ro(struct gendisk *disk, int flag)
-+/**
-+ * update_part_ro_state - iterate over partitions to update read-only state
-+ * @disk:	The disk device
-+ *
-+ * This function updates the read-only state for all partitions on a
-+ * given disk device. This is required every time a hardware event
-+ * signals that the device write-protect state has changed. It is also
-+ * necessary when the user sets or clears the read-only flag on the
-+ * whole-disk device.
-+ */
-+static void update_part_ro_state(struct gendisk *disk)
- {
- 	struct disk_part_iter piter;
- 	struct hd_struct *part;
- 
--	if (disk->part0.policy != flag) {
--		set_disk_ro_uevent(disk, flag);
--		disk->part0.policy = flag;
--	}
--
--	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY);
-+	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY_PART0);
- 	while ((part = disk_part_iter_next(&piter)))
--		part->policy = flag;
-+		if (disk->read_only || disk->part0.ro_policy || part->ro_policy)
-+			part->read_only = true;
-+		else
-+			part->read_only = false;
- 	disk_part_iter_exit(&piter);
- }
- 
-+/**
-+ * set_device_ro - set a block device read-only
-+ * @bdev:	The block device (whole disk or partition)
-+ * @state:	true or false
-+ *
-+ * This function is used to specify the read-only policy for a
-+ * block_device (whole disk or partition). set_device_ro() is called
-+ * by the BLKROSET ioctl.
-+ */
-+void set_device_ro(struct block_device *bdev, bool state)
-+{
-+	bdev->bd_part->read_only = bdev->bd_part->ro_policy = state;
-+	if (bdev->bd_part->partno == 0)
-+		update_part_ro_state(bdev->bd_disk);
-+}
-+EXPORT_SYMBOL(set_device_ro);
-+
-+/**
-+ * set_disk_ro - set a gendisk read-only
-+ * @disk:	The disk device
-+ * @state:	true or false
-+ *
-+ * This function is used to indicate whether a given disk device
-+ * should have its read-only flag set. set_disk_ro() is typically used
-+ * by device drivers to indicate whether the underlying physical
-+ * device is write-protected.
-+ */
-+void set_disk_ro(struct gendisk *disk, bool state)
-+{
-+	if (disk->read_only == state)
-+		return;
-+	set_disk_ro_uevent(disk, state);
-+	disk->read_only = state;
-+	update_part_ro_state(disk);
-+}
- EXPORT_SYMBOL(set_disk_ro);
- 
- int bdev_read_only(struct block_device *bdev)
- {
- 	if (!bdev)
- 		return 0;
--	return bdev->bd_part->policy;
-+	return bdev->bd_part->read_only;
- }
--
- EXPORT_SYMBOL(bdev_read_only);
- 
- int invalidate_partition(struct gendisk *disk, int partno)
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 8e596a8dff32..8c55b90c918d 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -98,7 +98,7 @@ static ssize_t part_ro_show(struct device *dev,
- 			    struct device_attribute *attr, char *buf)
- {
- 	struct hd_struct *p = dev_to_part(dev);
--	return sprintf(buf, "%d\n", p->policy ? 1 : 0);
-+	return sprintf(buf, "%u\n", p->read_only ? 1 : 0);
- }
- 
- static ssize_t part_alignment_offset_show(struct device *dev,
-@@ -338,7 +338,7 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
- 		queue_limit_discard_alignment(&disk->queue->limits, start);
- 	p->nr_sects = len;
- 	p->partno = partno;
--	p->policy = get_disk_ro(disk);
-+	p->read_only = get_disk_ro(disk);
- 
- 	if (info) {
- 		struct partition_meta_info *pinfo = alloc_part_info(disk);
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 06c0fd594097..3ebd94f520cc 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -118,7 +118,8 @@ struct hd_struct {
- 	unsigned int discard_alignment;
- 	struct device __dev;
- 	struct kobject *holder_dir;
--	int policy, partno;
-+	bool read_only, ro_policy;
-+	int partno;
- 	struct partition_meta_info *info;
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- 	int make_it_fail;
-@@ -183,6 +184,7 @@ struct gendisk {
- 
- 	char disk_name[DISK_NAME_LEN];	/* name of major driver */
- 	char *(*devnode)(struct gendisk *gd, umode_t *mode);
-+	bool read_only;			/* device read-only state */
- 
- 	unsigned int events;		/* supported events */
- 	unsigned int async_events;	/* async events, subset of all */
-@@ -431,12 +433,12 @@ extern void del_gendisk(struct gendisk *gp);
- extern struct gendisk *get_gendisk(dev_t dev, int *partno);
- extern struct block_device *bdget_disk(struct gendisk *disk, int partno);
- 
--extern void set_device_ro(struct block_device *bdev, int flag);
--extern void set_disk_ro(struct gendisk *disk, int flag);
-+extern void set_device_ro(struct block_device *bdev, bool state);
-+extern void set_disk_ro(struct gendisk *disk, bool state);
- 
- static inline int get_disk_ro(struct gendisk *disk)
- {
--	return disk->part0.policy;
-+	return disk->part0.read_only;
- }
- 
- extern void disk_block_events(struct gendisk *disk);
--- 
-2.21.0
 
