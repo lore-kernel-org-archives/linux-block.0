@@ -2,66 +2,43 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE612C04AB3
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 06:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D41EC04AB3
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 06:52:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B700D21670
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 06:46:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46BBA208CB
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 06:52:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726076AbfE2Gpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 02:45:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48986 "EHLO mx1.redhat.com"
+        id S1725894AbfE2Gw0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 02:52:26 -0400
+Received: from verein.lst.de ([213.95.11.211]:52424 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725882AbfE2Gpu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 02:45:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6D48EC057E3C;
-        Wed, 29 May 2019 06:45:50 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 23DCA5D9E1;
-        Wed, 29 May 2019 06:45:46 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAOQ4uxjC1M7jwjd9zSaSa6UW2dbEjc+ZbFSo7j9F1YHAQxQ8LQ@mail.gmail.com>
-References: <CAOQ4uxjC1M7jwjd9zSaSa6UW2dbEjc+ZbFSo7j9F1YHAQxQ8LQ@mail.gmail.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk>
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-        Ian Kent <raven@themaw.net>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        keyrings@vger.kernel.org,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>
-Subject: Re: [RFC][PATCH 0/7] Mount, FS, Block and Keyrings notifications
+        id S1725882AbfE2Gw0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 02:52:26 -0400
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id C437C68AFE; Wed, 29 May 2019 08:52:01 +0200 (CEST)
+Date:   Wed, 29 May 2019 08:52:01 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Josef Bacik <josef@toxicpanda.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH 0/3] block: queue exit cleanup
+Message-ID: <20190529065201.GA3728@lst.de>
+References: <20190515030310.20393-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <22970.1559112346.1@warthog.procyon.org.uk>
-Date:   Wed, 29 May 2019 07:45:46 +0100
-Message-ID: <22971.1559112346@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Wed, 29 May 2019 06:45:50 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190515030310.20393-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Amir Goldstein <amir73il@gmail.com> wrote:
-
-> I am interested to know how you envision filesystem notifications would
-> look with this interface.
-
-What sort of events are you thinking of by "filesystem notifications"?  You
-mean things like file changes?
-
-David
+Jens, do you plan to pick this up (at last patches 1 and 2)?  It
+fixes a NULL pointer deref and a md raid issue.
