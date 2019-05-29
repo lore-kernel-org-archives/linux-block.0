@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B02C28CC0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 22:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F8FC28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 22:08:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A9AEF2075B
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 22:07:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B75132425E
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 22:08:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OSC1wzE3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nhk9evoh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726225AbfE2WHs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 18:07:48 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:32888 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726018AbfE2WHs (ORCPT
+        id S1726240AbfE2WID (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 18:08:03 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:34481 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726018AbfE2WID (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 18:07:48 -0400
-Received: by mail-qk1-f193.google.com with SMTP id p18so2600553qkk.0
-        for <linux-block@vger.kernel.org>; Wed, 29 May 2019 15:07:47 -0700 (PDT)
+        Wed, 29 May 2019 18:08:03 -0400
+Received: by mail-qk1-f196.google.com with SMTP id t64so2592550qkh.1
+        for <linux-block@vger.kernel.org>; Wed, 29 May 2019 15:08:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Qrus7QZ35WA+MxFTB0AjMZCycakXn4RQRxL/2BhJBT8=;
-        b=OSC1wzE3v04f0GsI20XJ0iK9qjMrYbreifGSlhGSi5DCvqwBda4vi+Ayuxg9bsBQm8
-         MHVyXm4hm8wf2enutb3FLSehlcDuqSJPpF5v2NcK9Ht3HYh3j1ZtYK626q/HFH4evkda
-         KNbrpiAmEWgOqTgu8XQTs1UCV1fJD/YauTwu0+rzHgN/D0fuST1pglRTiDQHmU108mzg
-         VMqWxeEJJbP5Sa+Ul8gmGNk7pxzRPY/ijXVGWj75suu9R1QYQh6U5vMOn0OS2W3SZAVV
-         jl9PsapQ0xcaZRD0siI0fCU88c63kPBxiw1eRT/tX6BgCczi11ws0vSox2bALgExv82S
-         MX6Q==
+        bh=aqKCk9D+PwGPh+KwbMyo42xi4G79ccnKSg24YFNeUPw=;
+        b=nhk9evohDvYqB1SYRqonC7WyVS5E3/RyeRJcZ+DlG+XM7AnH4LXcmdWVRZLDif55TA
+         tNpNGHZO4czslW5nPcyQKWugk7VDdSekFcFn0Z1JAh9nQBHY+18ZuandmSN1KRymspxH
+         ZAVvq6pRnfog1UTL1CQ3uF/HYUhREkVcbuv8jDpv5W09qpLW//CPbTz5wnsBgKjEWJvi
+         kQRJZVWH9P/yQqctn7CJTtErz/Nil3MvRd6mFrZJxY4RThvUq6i2sKxFfbNc9lEU2auW
+         +CMxpXcPqLWXeucOE/HahhjynYXkSkRQuUjXJsjLQ3hQs+3wulHb2gULas9WhRMeH51W
+         D/jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Qrus7QZ35WA+MxFTB0AjMZCycakXn4RQRxL/2BhJBT8=;
-        b=QFWGPJkIZXbUa3lPSlC9+l9uo36D8cvodNT2VWEsj00JdWFIxbS3Lp2otTk4wZWPpU
-         srcWdMNqp9EskK2+JfUZ+DjDSMEj/CTDrKthCT3ucwewgZr/4hOB3/xaQOVwNWrG61sQ
-         PLOjQfGel9PNd8ZlGlcJZkQLO/sTzgU0vZoSF/ljYKlsBM0+i0tZKu8Ks8spF4agkMkt
-         24FHWQTB9RA78QG2pmDWWjkPFZH9rMNNDDzUorEnxEZ9ozXArsHBvC6fYiAzkEH6ArWf
-         ctqrslPM/Id6tCrpT6Rf/vuBUG2UY0QBmCPRvECJ9M11c7C/lxMdczG2XdlL3U9Mmv/2
-         ikrg==
-X-Gm-Message-State: APjAAAXDvCB7G19IhthhzlcFsMns8SpZIccBrvdTzijjTHyWmna9TOj1
-        U+PVnt8fbpWvmQPpItjdycMFM5xk
-X-Google-Smtp-Source: APXvYqxKYtNDe5qiu9clmCeX989A0zXbECRRt1+QSgQcavvQTgNGU1iAtiZcrvEI6PUHS/F3aGJxeQ==
-X-Received: by 2002:a37:9b01:: with SMTP id d1mr173529qke.46.1559167666202;
-        Wed, 29 May 2019 15:07:46 -0700 (PDT)
+        bh=aqKCk9D+PwGPh+KwbMyo42xi4G79ccnKSg24YFNeUPw=;
+        b=tkpw+NjW3ed1LZtoZp6MOcPObKRT54G1+4ZhR0Gl+1g3UKFYfoAKXj6waRL+M6Ugky
+         koIeVzKJInx6Pnlsj5lZ+rvf34h3YTqrZDzDIN3avpUT1JxbejVzzya8afenNa28o0XB
+         RKkaUBkuGW7DH46UegDeuo19mHxLb/Ic+DQKo4dPNruO1jhYGp5Q9Pok3d89LlMv0ijB
+         HNRC+q3h79DYlJ3jz7ZUjyiBpaPMtqgcnbGDx8rSjD2bUpD6ilnOW4TBHD1D7+USCKUs
+         83kfoJ97OL7dXgXm9jHwcbIdAMeu1WOJKZ6LCsHSoFYWzUVCsNKeY4xQxhqr1R6uQnNn
+         4KUQ==
+X-Gm-Message-State: APjAAAXg5BTie3EXrtNmN3l+biMaCjR3AFfks1Vzz/x46zzc/INtlzqQ
+        6XGwmmA7DmemJ2xxJMG/czmI18y4
+X-Google-Smtp-Source: APXvYqywTHPtkD8DOjV/uuIo8fGstEL5l5C+iDgz9ldgMDTB5kfZo3/foe0N4cdcbpmPc5Kuv5A/Ug==
+X-Received: by 2002:a05:620a:16b4:: with SMTP id s20mr183415qkj.34.1559167681299;
+        Wed, 29 May 2019 15:08:01 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:500::3:60e4])
-        by smtp.gmail.com with ESMTPSA id w48sm380095qtb.91.2019.05.29.15.07.45
+        by smtp.gmail.com with ESMTPSA id c18sm333003qkl.78.2019.05.29.15.08.00
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 29 May 2019 15:07:45 -0700 (PDT)
+        Wed, 29 May 2019 15:08:00 -0700 (PDT)
 From:   Jes Sorensen <jes.sorensen@gmail.com>
 X-Google-Original-From: Jes Sorensen <Jes.Sorensen@gmail.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, jbacik@toxicpanda.com, kernel-team@fb.com
-Subject: [PATCH 2/5] block: keep track of per-device io sizes in stats
-Date:   Wed, 29 May 2019 18:07:27 -0400
-Message-Id: <20190529220730.28014-3-Jes.Sorensen@gmail.com>
+Subject: [PATCH 3/5] Use blk-stat infrastructure to collect per queue device stats
+Date:   Wed, 29 May 2019 18:07:28 -0400
+Message-Id: <20190529220730.28014-4-Jes.Sorensen@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190529220730.28014-1-Jes.Sorensen@gmail.com>
 References: <20190529220730.28014-1-Jes.Sorensen@gmail.com>
@@ -73,154 +73,206 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Josef Bacik <josef@toxicpanda.com>
+From: Jes Sorensen <jsorensen@fb.com>
 
-In order to track things like bw we need to know the number of bytes
-done per device.  Add a io_bytes field to the struct request and
-populate this at start time.  Add a field to the blk_rq_stat to hold
-this information so that consumers of the blk_rq_stat stuff can use it.
+Put request bytes into 8 buckets of requests, for read, write, and
+discard.
 
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+Enable stats by writing 1 to /sys/block/<dev>/queue/histstat, disable
+by writing 0.
+
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
 ---
- block/blk-iolatency.c     |  2 +-
- block/blk-mq.c            |  4 +---
- block/blk-stat.c          | 14 ++++++++------
- block/blk-stat.h          |  2 +-
- block/blk-throttle.c      |  3 ++-
- include/linux/blk_types.h |  1 +
- include/linux/blkdev.h    |  5 ++---
- 7 files changed, 16 insertions(+), 15 deletions(-)
+ block/blk-mq.c         | 52 ++++++++++++++++++++++++++++++++++++++++++
+ block/blk-stat.h       |  1 +
+ block/blk-sysfs.c      | 40 ++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h |  7 ++++++
+ 4 files changed, 100 insertions(+)
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index d22e61bced86..51cb82c07912 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -219,7 +219,7 @@ static inline void latency_stat_record_time(struct iolatency_grp *iolat,
- 			stat->ps.missed++;
- 		stat->ps.total++;
- 	} else
--		blk_rq_stat_add(&stat->rqs, req_time);
-+		blk_rq_stat_add(&stat->rqs, req_time, 0);
- 	put_cpu_ptr(stat);
- }
- 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ce0f5f4ede70..8a59bc0410a6 100644
+index 8a59bc0410a6..942ef6e1ed86 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -679,9 +679,7 @@ void blk_mq_start_request(struct request *rq)
- 
- 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
- 		rq->io_start_time_ns = ktime_get_ns();
--#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
--		rq->throtl_size = blk_rq_sectors(rq);
--#endif
-+		rq->io_bytes = blk_rq_bytes(rq);
- 		rq->rq_flags |= RQF_STATS;
- 		rq_qos_issue(q, rq);
- 	}
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index 1529f22044bd..0c6942f8b141 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -22,7 +22,7 @@ void blk_rq_stat_init(struct blk_rq_stat *stat)
- {
- 	stat->min = -1ULL;
- 	stat->max = stat->nr_samples = stat->mean = 0;
--	stat->time = 0;
-+	stat->size = stat->time = 0;
+@@ -59,6 +59,52 @@ static int blk_mq_poll_stats_bkt(const struct request *rq)
+ 	return bucket;
  }
  
- /* src is a per-cpu stat, mean isn't initialized */
-@@ -38,13 +38,15 @@ void blk_rq_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
- 				dst->nr_samples + src->nr_samples);
++/*
++ * 8 buckets for each of read, write, and discard
++ */
++static int blk_dev_stats_bkt(const struct request *rq)
++{
++	int grp, bucket;
++
++	grp = op_stat_group(req_op(rq));
++
++	bucket = grp + 3*(ilog2(rq->io_bytes) - 9);
++
++	if (bucket < 0)
++		return -1;
++	else if (bucket >= BLK_DEV_STATS_BKTS)
++		return grp + BLK_DEV_STATS_BKTS - 3;
++
++	return bucket;
++}
++
++/*
++ * Copy out the stats to their official location
++ */
++static void blk_dev_stats_cb(struct blk_stat_callback *cb)
++{
++	struct request_queue *q = cb->data;
++	int bucket;
++
++	for (bucket = 0; bucket < BLK_DEV_STATS_BKTS; bucket++) {
++		if (cb->stat[bucket].nr_samples) {
++			q->dev_stat[bucket].size +=
++				cb->stat[bucket].size;
++			q->dev_stat[bucket].nr_samples +=
++				cb->stat[bucket].nr_samples;
++		}
++	}
++
++	if (!blk_stat_is_active(cb))
++		blk_stat_activate_msecs(cb, 100);
++}
++
++void blk_dev_stats_free(struct request_queue *q)
++{
++	blk_stat_remove_callback(q, q->dev_cb);
++	blk_stat_free_callback(q->dev_cb);
++}
++
+ /*
+  * Check if any of the ctx, dispatch list or elevator
+  * have pending work in this hardware queue.
+@@ -2881,6 +2927,12 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	if (!q->nr_hw_queues)
+ 		goto err_hctxs;
  
- 	dst->nr_samples += src->nr_samples;
-+	dst->size += src->size;
- }
++	q->dev_cb = blk_stat_alloc_callback(blk_dev_stats_cb,
++					    blk_dev_stats_bkt,
++					    BLK_DEV_STATS_BKTS, q);
++	if (!q->dev_cb)
++		goto err_hctxs;
++
+ 	INIT_WORK(&q->timeout_work, blk_mq_timeout_work);
+ 	blk_queue_rq_timeout(q, set->timeout ? set->timeout : 30 * HZ);
  
--void blk_rq_stat_add(struct blk_rq_stat *stat, u64 value)
-+void blk_rq_stat_add(struct blk_rq_stat *stat, u64 time, u64 size)
- {
--	stat->min = min(stat->min, value);
--	stat->max = max(stat->max, value);
--	stat->time += value;
-+	stat->min = min(stat->min, time);
-+	stat->max = max(stat->max, time);
-+	stat->time += time;
-+	stat->size += size;
- 	stat->nr_samples++;
- }
- 
-@@ -70,7 +72,7 @@ void blk_stat_add(struct request *rq, u64 now)
- 			continue;
- 
- 		stat = &get_cpu_ptr(cb->cpu_stat)[bucket];
--		blk_rq_stat_add(stat, value);
-+		blk_rq_stat_add(stat, value, rq->io_bytes);
- 		put_cpu_ptr(cb->cpu_stat);
- 	}
- 	rcu_read_unlock();
 diff --git a/block/blk-stat.h b/block/blk-stat.h
-index 17b47a86eefb..ea893c4a9af1 100644
+index ea893c4a9af1..7f0c8b737a9d 100644
 --- a/block/blk-stat.h
 +++ b/block/blk-stat.h
-@@ -164,7 +164,7 @@ static inline void blk_stat_activate_msecs(struct blk_stat_callback *cb,
- 	mod_timer(&cb->timer, jiffies + msecs_to_jiffies(msecs));
- }
- 
--void blk_rq_stat_add(struct blk_rq_stat *, u64);
-+void blk_rq_stat_add(struct blk_rq_stat *, u64, u64);
+@@ -168,4 +168,5 @@ void blk_rq_stat_add(struct blk_rq_stat *, u64, u64);
  void blk_rq_stat_sum(struct blk_rq_stat *, struct blk_rq_stat *);
  void blk_rq_stat_init(struct blk_rq_stat *);
  
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 1b97a73d2fb1..b07e5feda553 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2248,8 +2248,9 @@ void blk_throtl_stat_add(struct request *rq, u64 time_ns)
- {
- 	struct request_queue *q = rq->q;
- 	struct throtl_data *td = q->td;
-+	sector_t size = rq->io_bytes >> SECTOR_SHIFT;
- 
--	throtl_track_latency(td, rq->throtl_size, req_op(rq), time_ns >> 10);
-+	throtl_track_latency(td, size, req_op(rq), time_ns >> 10);
++void blk_dev_stats_free(struct request_queue *q);
+ #endif
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index a16a02c52a85..81566432828d 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -530,6 +530,37 @@ static ssize_t queue_dax_show(struct request_queue *q, char *page)
+ 	return queue_var_show(blk_queue_dax(q), page);
  }
  
- void blk_throtl_bio_endio(struct bio *bio)
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 6406430c517a..b85b27eb52b4 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -443,6 +443,7 @@ struct blk_rq_stat {
- 	u64 max;
- 	u32 nr_samples;
- 	u64 time;
-+	u64 size;
++static ssize_t queue_histstat_show(struct request_queue *q, char *page)
++{
++	return queue_var_show(test_bit(QUEUE_FLAG_HISTSTATS,
++				       &q->queue_flags), page);
++}
++
++static ssize_t queue_histstat_store(struct request_queue *q, const char *page,
++				    size_t size)
++{
++	unsigned long histstat_on;
++	ssize_t ret;
++
++	ret = queue_var_store(&histstat_on, page, size);
++	if (ret < 0)
++		return ret;
++
++	if (histstat_on) {
++		if (!blk_queue_flag_test_and_set(QUEUE_FLAG_HISTSTATS, q))
++			blk_stat_add_callback(q, q->dev_cb);
++		if (!blk_stat_is_active(q->dev_cb))
++			blk_stat_activate_msecs(q->dev_cb, 100);
++	} else {
++		if (test_bit(QUEUE_FLAG_HISTSTATS, &q->queue_flags)) {
++			blk_stat_remove_callback(q, q->dev_cb);
++			blk_queue_flag_clear(QUEUE_FLAG_HISTSTATS, q);
++		}
++	}
++
++	return ret;
++}
++
+ static struct queue_sysfs_entry queue_requests_entry = {
+ 	.attr = {.name = "nr_requests", .mode = 0644 },
+ 	.show = queue_requests_show,
+@@ -728,6 +759,12 @@ static struct queue_sysfs_entry throtl_sample_time_entry = {
+ };
+ #endif
+ 
++static struct queue_sysfs_entry queue_histstat_entry = {
++	.attr = {.name = "histstat", .mode = 0644 },
++	.show = queue_histstat_show,
++	.store = queue_histstat_store,
++};
++
+ static struct attribute *queue_attrs[] = {
+ 	&queue_requests_entry.attr,
+ 	&queue_ra_entry.attr,
+@@ -767,6 +804,7 @@ static struct attribute *queue_attrs[] = {
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ 	&throtl_sample_time_entry.attr,
+ #endif
++	&queue_histstat_entry.attr,
+ 	NULL,
  };
  
- #endif /* __LINUX_BLK_TYPES_H */
+@@ -856,6 +894,8 @@ static void __blk_release_queue(struct work_struct *work)
+ {
+ 	struct request_queue *q = container_of(work, typeof(*q), release_work);
+ 
++	blk_dev_stats_free(q);
++
+ 	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags))
+ 		blk_stat_remove_callback(q, q->poll_cb);
+ 	blk_stat_free_callback(q->poll_cb);
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 592669bcc536..2716f239b56d 100644
+index 2716f239b56d..ed57518a15fb 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -198,13 +198,12 @@ struct request {
- 	u64 start_time_ns;
- 	/* Time that I/O was submitted to the device. */
- 	u64 io_start_time_ns;
-+	/* Bytes submitted to the device. */
-+	unsigned int io_bytes;
+@@ -53,6 +53,9 @@ struct blk_stat_callback;
+ /* Doing classic polling */
+ #define BLK_MQ_POLL_CLASSIC -1
  
- #ifdef CONFIG_BLK_WBT
- 	unsigned short wbt_flags;
- #endif
--#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
--	unsigned short throtl_size;
--#endif
++/* Must be consistent with blk_part_stats_bkt() */
++#define BLK_DEV_STATS_BKTS (3 * 8)
++
+ /*
+  * Maximum number of blkcg policies allowed to be registered concurrently.
+  * Defined here to simplify include dependency.
+@@ -478,6 +481,9 @@ struct request_queue {
+ 	struct blk_stat_callback	*poll_cb;
+ 	struct blk_rq_stat	poll_stat[BLK_MQ_POLL_STATS_BKTS];
  
- 	/*
- 	 * Number of scatter-gather DMA addr+len pairs after
++	struct blk_stat_callback	*dev_cb;
++	struct blk_rq_stat	dev_stat[BLK_DEV_STATS_BKTS];
++
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+ 
+@@ -605,6 +611,7 @@ struct request_queue {
+ #define QUEUE_FLAG_SCSI_PASSTHROUGH 23	/* queue supports SCSI commands */
+ #define QUEUE_FLAG_QUIESCED	24	/* queue has been quiesced */
+ #define QUEUE_FLAG_PCI_P2PDMA	25	/* device supports PCI p2p requests */
++#define QUEUE_FLAG_HISTSTATS	26	/* Hist stats enabled if set */
+ 
+ #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP))
 -- 
 2.17.1
 
