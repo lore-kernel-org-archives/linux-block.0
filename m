@@ -2,119 +2,174 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A419DC28CC2
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 09:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2118DC28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 10:06:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 82A782070D
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 09:42:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDDAD21881
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 10:06:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=sakamocchi.jp header.i=@sakamocchi.jp header.b="mn/7Y1LZ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XISi7eb0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725894AbfE2JmM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 05:42:12 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:39698 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725956AbfE2JmM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 05:42:12 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 4D7B3487BFBF343E4681;
-        Wed, 29 May 2019 17:42:10 +0800 (CST)
-Received: from [127.0.0.1] (10.202.227.238) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Wed, 29 May 2019
- 17:42:08 +0800
-From:   John Garry <john.garry@huawei.com>
-Subject: Re: [PATCH V2 5/5] blk-mq: Wait for for hctx inflight requests on CPU
- unplug
-To:     Ming Lei <ming.lei@redhat.com>
-References: <20190527150207.11372-1-ming.lei@redhat.com>
- <20190527150207.11372-6-ming.lei@redhat.com>
- <45daceb4-fb88-a835-8cc6-cd4c4d7cf42d@huawei.com>
- <20190529022852.GA21398@ming.t460p> <20190529024200.GC21398@ming.t460p>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        <linux-block@vger.kernel.org>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        <linux-scsi@vger.kernel.org>,
-        "Bart Van Assche" <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        "Sathya Prakash" <sathya.prakash@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>
-Message-ID: <5bc07fd5-9d2b-bf9c-eb77-b8cebadb9150@huawei.com>
-Date:   Wed, 29 May 2019 10:42:00 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1725990AbfE2KGO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 06:06:14 -0400
+Received: from new3-smtp.messagingengine.com ([66.111.4.229]:60151 "EHLO
+        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725956AbfE2KGN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 06:06:13 -0400
+X-Greylist: delayed 510 seconds by postgrey-1.27 at vger.kernel.org; Wed, 29 May 2019 06:06:12 EDT
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailnew.nyi.internal (Postfix) with ESMTP id A37261B2A;
+        Wed, 29 May 2019 05:57:41 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Wed, 29 May 2019 05:57:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sakamocchi.jp;
+         h=date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:content-transfer-encoding:in-reply-to; s=fm1; bh=U
+        v/IO1lpsMhYefZCZE7IzUSu7PAH6TRG1LbnuRgviM4=; b=mn/7Y1LZeF5WEZX9C
+        kyxZtrcWF3ULGfrAWaVTCu5SVtlugVE3VqZmjWKq6xRLw16HfohMo8gWCyfoiTDU
+        8ddDr3hcah8IDP6Hys4o8IC2EdotB5aWhP8EraoIMIJh7rSxM+BKMMZLl9NkVZnK
+        u8d8d3Tq/d+bMYPb6BDrLZqiB9tpWxyCpNDdk+W8+YDBdrWfUs98RZG9TU53K7Dz
+        JzBTbjFIf3kdd64Cj3KvVjOeVIk0m+zXZwZfm3VO+qvQIqvJ5VIncx8ff7FI9cB1
+        yNg71nTx/SLC0V1NRLStXOGxLLLNq2SftFdwZcoJwvxVzm0f9yJ9xJHcvbMQXOqS
+        f9JWA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:content-type
+        :date:from:in-reply-to:message-id:mime-version:references
+        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; bh=Uv/IO1lpsMhYefZCZE7IzUSu7PAH6TRG1LbnuRgvi
+        M4=; b=XISi7eb0l5udJyx94Grx8xbNBu9uDmTspw9Ab8MZI6lurhPep2RI+RxCG
+        ZQTte0gx97SzC5lbqL/OsmzePdtwqlKhCnCKwx+J0wQH/g8awSkdq4a1owukWtLA
+        pSl7na4swI9Jn5vGwVD9JNDTU+FqQo7zHiwOYrXVPzhmvKU0bhF2leedTKJqnsWJ
+        ZtZ3NyH7sqtqulHulH6p8cFT/inzGk9BoRibxUJQCqYn7HfABDtSJ4wgJtcE93Dn
+        ubSwIKAl5IYPjRHsfy/9y3A9uQnHlGjBxilfoFBwIobYLPZxf0MeJIy/dpZ66Cd6
+        VespO6do/dcNZaF/vdhqkw+ACdFLw==
+X-ME-Sender: <xms:k1fuXLxZbQcc-ANNiTUK7UBI2sL_vR5WZupSdrUc2A253Dtx8L_3pw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduuddruddvjedgvdefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffukfhfgggtugfgjggfsehtkeertddtreejnecuhfhrohhmpefvrghk
+    rghshhhiucfurghkrghmohhtohcuoehoqdhtrghkrghshhhisehsrghkrghmohgttghhih
+    drjhhpqeenucfkphepudegrdefrdejhedrudekudenucfrrghrrghmpehmrghilhhfrhho
+    mhepohdqthgrkhgrshhhihesshgrkhgrmhhotggthhhirdhjphenucevlhhushhtvghruf
+    hiiigvpedt
+X-ME-Proxy: <xmx:k1fuXDqJLSpSTXkTZTciZs27YxisYeoGB6fGIVbV6inmjPgmkZdzug>
+    <xmx:k1fuXDzlPHfLKSKrwsKOVVoZfcm6NUzgWaAMmPe5QrZQEgSnVBAz3g>
+    <xmx:k1fuXCurnFtFsjwzcDFGDUTFxiwmFbRMHUebTfAZecsGB5BQqUsLjQ>
+    <xmx:lVfuXHp1xBd2evfpTHfjZBexRzt3oLWMlb8KBbQqAvRZxYLnnEZERg>
+Received: from workstation (ae075181.dynamic.ppp.asahi-net.or.jp [14.3.75.181])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 59261380084;
+        Wed, 29 May 2019 05:57:34 -0400 (EDT)
+Date:   Wed, 29 May 2019 18:57:31 +0900
+From:   Takashi Sakamoto <o-takashi@sakamocchi.jp>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Igor Konopko <igor.j.konopko@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        "Mohit P . Tahiliani" <tahiliani@nitk.edu.in>,
+        Eran Ben Elisha <eranbe@mellanox.com>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jamal Hadi Salim <jhs@mojatatu.com>,
+        Cong Wang <xiyou.wangcong@gmail.com>,
+        Clemens Ladisch <clemens@ladisch.de>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, Joe Perches <joe@perches.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-afs@lists.infradead.org, alsa-devel@alsa-project.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/5] ALSA: fireface: Use ULL suffixes for 64-bit constants
+Message-ID: <20190529095730.GA7089@workstation>
+Mail-Followup-To: Geert Uytterhoeven <geert@linux-m68k.org>,
+        Igor Konopko <igor.j.konopko@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        "Mohit P . Tahiliani" <tahiliani@nitk.edu.in>,
+        Eran Ben Elisha <eranbe@mellanox.com>,
+        Matias Bjorling <mb@lightnvm.io>, Jiri Pirko <jiri@mellanox.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jamal Hadi Salim <jhs@mojatatu.com>,
+        Cong Wang <xiyou.wangcong@gmail.com>,
+        Clemens Ladisch <clemens@ladisch.de>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+        Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-afs@lists.infradead.org, alsa-devel@alsa-project.org,
+        linux-kernel@vger.kernel.org
+References: <20190528142424.19626-1-geert@linux-m68k.org>
+ <20190528142424.19626-5-geert@linux-m68k.org>
 MIME-Version: 1.0
-In-Reply-To: <20190529024200.GC21398@ming.t460p>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.238]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190528142424.19626-5-geert@linux-m68k.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 29/05/2019 03:42, Ming Lei wrote:
-> On Wed, May 29, 2019 at 10:28:52AM +0800, Ming Lei wrote:
->> On Tue, May 28, 2019 at 05:50:40PM +0100, John Garry wrote:
->>> On 27/05/2019 16:02, Ming Lei wrote:
->>>> Managed interrupts can not migrate affinity when their CPUs are offline.
->>>> If the CPU is allowed to shutdown before they're returned, commands
->>>> dispatched to managed queues won't be able to complete through their
->>>> irq handlers.
->>>>
->>>> Wait in cpu hotplug handler until all inflight requests on the tags
->>>> are completed or timeout. Wait once for each tags, so we can save time
->>>> in case of shared tags.
->>>>
->>>> Based on the following patch from Keith, and use simple delay-spin
->>>> instead.
->>>>
->>>> https://lore.kernel.org/linux-block/20190405215920.27085-1-keith.busch@intel.com/
->>>>
->>>> Some SCSI devices may have single blk_mq hw queue and multiple private
->>>> completion queues, and wait until all requests on the private completion
->>>> queue are completed.
->>>
->>> Hi Ming,
->>>
->>> I'm a bit concerned that this approach won't work due to ordering: it seems
->>> that the IRQ would be shutdown prior to the CPU dead notification for the
->>
->> Managed IRQ shutdown is run in irq_migrate_all_off_this_cpu(), which is
->> called in the callback of takedown_cpu(). And the CPU dead notification
->> is always sent after that CPU becomes offline, see cpuhp_invoke_callback().
->
-> Hammm, looks we both say same thing.
->
-> Yeah, it is too late to drain requests in the cpu hotplug DEAD handler,
-> maybe we can try to move managed IRQ shutdown after sending the dead
-> notification.
->
+Hi,
 
-Even if the IRQ is shutdown later, all CPUs would still be dead, so none 
-available to receive the interrupt or do the work for draining the queue.
+On Tue, May 28, 2019 at 04:24:23PM +0200, Geert Uytterhoeven wrote:
+> With gcc 4.1:
+> 
+>     sound/firewire/fireface/ff-protocol-latter.c: In function ‘latter_switch_fetching_mode’:
+>     sound/firewire/fireface/ff-protocol-latter.c:97: warning: integer constant is too large for ‘long’ type
+>     sound/firewire/fireface/ff-protocol-latter.c: In function ‘latter_begin_session’:
+>     sound/firewire/fireface/ff-protocol-latter.c:170: warning: integer constant is too large for ‘long’ type
+>     sound/firewire/fireface/ff-protocol-latter.c:197: warning: integer constant is too large for ‘long’ type
+>     sound/firewire/fireface/ff-protocol-latter.c:205: warning: integer constant is too large for ‘long’ type
+>     sound/firewire/fireface/ff-protocol-latter.c: In function ‘latter_finish_session’:
+>     sound/firewire/fireface/ff-protocol-latter.c:214: warning: integer constant is too large for ‘long’ type
+> 
+> Fix this by adding the missing "ULL" suffixes.
+> Add the same suffix to the last constant, to maintain consistency.
+> 
+> Fixes: fd1cc9de64c2ca6c ("ALSA: fireface: add support for Fireface UCX")
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> ---
+>  sound/firewire/fireface/ff-protocol-latter.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
-> I need to think of it further.
+Thanks for your care.
 
-It would seem that we just need to be informed of CPU offlining earlier, 
-and plug the drain in there.
+Reviewed-by: Takashi Sakamoto <o-takashi@sakamocchi.jp>
 
->
-
-Cheers,
-John
-
-> Thanks,
-> Ming
->
-> .
->
+> diff --git a/sound/firewire/fireface/ff-protocol-latter.c b/sound/firewire/fireface/ff-protocol-latter.c
+> index c8236ff89b7fb9de..b30d02d359b1d21b 100644
+> --- a/sound/firewire/fireface/ff-protocol-latter.c
+> +++ b/sound/firewire/fireface/ff-protocol-latter.c
+> @@ -9,11 +9,11 @@
+>  
+>  #include "ff.h"
+>  
+> -#define LATTER_STF		0xffff00000004
+> -#define LATTER_ISOC_CHANNELS	0xffff00000008
+> -#define LATTER_ISOC_START	0xffff0000000c
+> -#define LATTER_FETCH_MODE	0xffff00000010
+> -#define LATTER_SYNC_STATUS	0x0000801c0000
+> +#define LATTER_STF		0xffff00000004ULL
+> +#define LATTER_ISOC_CHANNELS	0xffff00000008ULL
+> +#define LATTER_ISOC_START	0xffff0000000cULL
+> +#define LATTER_FETCH_MODE	0xffff00000010ULL
+> +#define LATTER_SYNC_STATUS	0x0000801c0000ULL
+>  
+>  static int parse_clock_bits(u32 data, unsigned int *rate,
+>  			    enum snd_ff_clock_src *src)
+> -- 
+> 2.17.1
+> 
 
 
+Regards
+
+Takashi Sakamoto
