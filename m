@@ -2,142 +2,103 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 080B1C28CC1
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 20:16:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C512C28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 20:16:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DBEF024135
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 20:16:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E2DD24137
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 20:16:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N1xhA7lV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726224AbfE2UQK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 16:16:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42908 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726024AbfE2UQK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 16:16:10 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 51FC08831F;
-        Wed, 29 May 2019 20:16:10 +0000 (UTC)
-Received: from rh2.redhat.com (ovpn-122-41.rdu2.redhat.com [10.10.122.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C44321972C;
-        Wed, 29 May 2019 20:16:09 +0000 (UTC)
-From:   Mike Christie <mchristi@redhat.com>
-To:     josef@toxicpanda.com, linux-block@vger.kernel.org
-Cc:     Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 2/2] nbd: add netlink reconfigure resize support v3
-Date:   Wed, 29 May 2019 15:16:06 -0500
-Message-Id: <20190529201606.14903-3-mchristi@redhat.com>
-In-Reply-To: <20190529201606.14903-1-mchristi@redhat.com>
-References: <20190529201606.14903-1-mchristi@redhat.com>
+        id S1726240AbfE2UQi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 16:16:38 -0400
+Received: from mail-ua1-f66.google.com ([209.85.222.66]:32852 "EHLO
+        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725990AbfE2UQi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 16:16:38 -0400
+Received: by mail-ua1-f66.google.com with SMTP id 49so1591519uas.0
+        for <linux-block@vger.kernel.org>; Wed, 29 May 2019 13:16:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:subject:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+aRuvNSkCgdb6HzBJ/us4CqIpKYSiZLXJN5gZFlmZwo=;
+        b=N1xhA7lVCa3B9QR9918GjulK7Rng4D8KsYm9isZViw4mMJHc8uy7CS2LJBxZJLlLSP
+         ML5NLeSJEjsqW0IlCZByJJ6xa636bCcpWtEEU0JUR4+CZYZKRl369DQIUbvH/KqlI59x
+         WMXAZUiQJc8kyEdVlLfv7NrbZ44LnGcZO7yaxoRgsnWx11Tpo9QQglKj2aHi7fk310a8
+         Vq95C6GVXJWN7LCpTuswY+r1vs63Ivs8TTdLlqVQxb/3H9Hd29rXKn6QwECB4BGYA9xk
+         BzGBP+nqw+aS1e5DOqYO4kl42nrGQq4KziyN+lMUcbqPGz7Uuxlw1mSp9Ye7EF3xpeKf
+         hmQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+aRuvNSkCgdb6HzBJ/us4CqIpKYSiZLXJN5gZFlmZwo=;
+        b=EqDwHIGNXVJSE92gIADPa4pkFfjtV0IbO4tYFXnn/V/ZLLer/CXaDaJBzJg3v0cZco
+         abvVSQfqOUVljBAmiRXQa3QQ/Rc4t7U1JvNlhgbV/COs0u2xgcNTA6LufB6e4iODlmWn
+         9KnuCK2Nz3mz/VnA1xmi3ldSinUScfnDV5rpxkKYeaGg246H3tPv4JvKfef0xS57/HMI
+         2/DxReb9vA/uKcKFb9Cs32HAGg4Tt7BtNBvaFOzrhzkjJEjAuJDm01u20uRNQbEz5qqL
+         JONxd5S9HXFIx/7bgzdEAZZQHhJHiK44BgQcxX2iwWTUS1qfpAvzUJg7TlJ7JlzN+22s
+         3sHg==
+X-Gm-Message-State: APjAAAUteqrfn1/9ufDnvr5fmlqenxN7/2R7EFuk59YW0TDDyw8hVtNt
+        1J84BmZWBpS+JY71r7j6G2A=
+X-Google-Smtp-Source: APXvYqyNi40922woo/Qm6sqMU3M/oUHqfnREYNe0uSYKZzeoYrCwA9SQuck0CHFMi3Q91uQrrhwuhg==
+X-Received: by 2002:ab0:3109:: with SMTP id e9mr2752463ual.66.1559160997052;
+        Wed, 29 May 2019 13:16:37 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c0a3:10e0::26d7? ([2620:10d:c091:500::3:60e4])
+        by smtp.gmail.com with ESMTPSA id m10sm190133vke.46.2019.05.29.13.16.35
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Wed, 29 May 2019 13:16:36 -0700 (PDT)
+From:   Jes Sorensen <jes.sorensen@gmail.com>
+X-Google-Original-From: Jes Sorensen <Jes.Sorensen@gmail.com>
+Subject: Re: [PATCH 0/1] blk-mq error handling memory leak
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Kernel Team <kernel-team@fb.com>
+References: <20190419203544.11725-1-Jes.Sorensen@gmail.com>
+Message-ID: <922c7482-817e-48cb-42ec-3e0dcaa8fc9e@gmail.com>
+Date:   Wed, 29 May 2019 16:16:35 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 29 May 2019 20:16:10 +0000 (UTC)
+In-Reply-To: <20190419203544.11725-1-Jes.Sorensen@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If the device is setup with ioctl we can resize the device after the
-initial setup, but if the device is setup with netlink we cannot use the
-resize related ioctls and there is no netlink reconfigure size ATTR
-handling code.
+On 4/19/19 4:35 PM, Jes Sorensen wrote:
+> From: Jes Sorensen <jsorensen@fb.com>
+> 
+> Hi,
+> 
+> Digging through this, I don't see the callback data getting freed in
+> case of errors in blk_mq_init_allocated_queue() unless I am missing
+> some obscure path that cleans it up later?
 
-This patch adds netlink reconfigure resize support to match the ioctl
-interface.
+Ping!
 
-Signed-off-by: Mike Christie <mchristi@redhat.com>
----
+Any reason not to apply this?
 
-V3;
-- If the device size or block size has not changed do not call
-nbd_size_set.
+Thanks,
+Jes
 
-V2:
-- Merge reconfig and connect resize related code to helper and avoid
-multiple nbd_size_set calls.
-
- drivers/block/nbd.c | 48 ++++++++++++++++++++++++++++++---------------
- 1 file changed, 32 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 236253fbf455..9486555e6391 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1685,6 +1685,30 @@ nbd_device_policy[NBD_DEVICE_ATTR_MAX + 1] = {
- 	[NBD_DEVICE_CONNECTED]		=	{ .type = NLA_U8 },
- };
- 
-+static int nbd_genl_size_set(struct genl_info *info, struct nbd_device *nbd)
-+{
-+	struct nbd_config *config = nbd->config;
-+	u64 bsize = config->blksize;
-+	u64 bytes = config->bytesize;
-+
-+	if (info->attrs[NBD_ATTR_SIZE_BYTES])
-+		bytes = nla_get_u64(info->attrs[NBD_ATTR_SIZE_BYTES]);
-+
-+	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]) {
-+		bsize = nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
-+		if (!bsize)
-+			bsize = NBD_DEF_BLKSIZE;
-+		if (!nbd_is_valid_blksize(bsize)) {
-+			printk(KERN_ERR "Invalid block size %llu\n", bsize);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	if (bytes != config->bytesize || bsize != config->blksize)
-+		nbd_size_set(nbd, bsize, div64_u64(bytes, bsize));
-+	return 0;
-+}
-+
- static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct nbd_device *nbd = NULL;
-@@ -1772,22 +1796,10 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 	refcount_set(&nbd->config_refs, 1);
- 	set_bit(NBD_BOUND, &config->runtime_flags);
- 
--	if (info->attrs[NBD_ATTR_SIZE_BYTES]) {
--		u64 bytes = nla_get_u64(info->attrs[NBD_ATTR_SIZE_BYTES]);
--		nbd_size_set(nbd, config->blksize,
--			     div64_u64(bytes, config->blksize));
--	}
--	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]) {
--		u64 bsize =
--			nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
--		if (!bsize)
--			bsize = NBD_DEF_BLKSIZE;
--		if (!nbd_is_valid_blksize(bsize)) {
--			ret = -EINVAL;
--			goto out;
--		}
--		nbd_size_set(nbd, bsize, div64_u64(config->bytesize, bsize));
--	}
-+	ret = nbd_genl_size_set(info, nbd);
-+	if (ret)
-+		goto out;
-+
- 	if (info->attrs[NBD_ATTR_TIMEOUT]) {
- 		u64 timeout = nla_get_u64(info->attrs[NBD_ATTR_TIMEOUT]);
- 		nbd->tag_set.timeout = timeout * HZ;
-@@ -1956,6 +1968,10 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 		goto out;
- 	}
- 
-+	ret = nbd_genl_size_set(info, nbd);
-+	if (ret)
-+		goto out;
-+
- 	if (info->attrs[NBD_ATTR_TIMEOUT]) {
- 		u64 timeout = nla_get_u64(info->attrs[NBD_ATTR_TIMEOUT]);
- 		nbd->tag_set.timeout = timeout * HZ;
--- 
-2.21.0
+> Cheers,
+> Jes
+> 
+> Jes Sorensen (1):
+>   blk-mq: Fix memory leak in error handling
+> 
+>  block/blk-mq.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
 
