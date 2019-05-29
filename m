@@ -3,143 +3,126 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CEDFC28CC0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 16:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93435C28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 16:10:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D8E723CE4
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 16:06:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7110423D12
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 16:10:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726699AbfE2QGt convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 12:06:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54926 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726118AbfE2QGt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 12:06:49 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id F077C30BC572;
-        Wed, 29 May 2019 16:06:44 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E295A7941C;
-        Wed, 29 May 2019 16:06:40 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20190528231218.GA28384@kroah.com>
-References: <20190528231218.GA28384@kroah.com> <20190528162603.GA24097@kroah.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk> <155905931502.7587.11705449537368497489.stgit@warthog.procyon.org.uk> <4031.1559064620@warthog.procyon.org.uk>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     dhowells@redhat.com, viro@zeniv.linux.org.uk, raven@themaw.net,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/7] General notification queue with user mmap()'able ring buffer
+        id S1726498AbfE2QK6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 12:10:58 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:17625 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726062AbfE2QK6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 12:10:58 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 67780B8DF9748E704AEA;
+        Thu, 30 May 2019 00:10:53 +0800 (CST)
+Received: from [127.0.0.1] (10.202.227.238) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Thu, 30 May 2019
+ 00:10:48 +0800
+Subject: Re: [PATCH V2 5/5] blk-mq: Wait for for hctx inflight requests on CPU
+ unplug
+To:     Ming Lei <tom.leiming@gmail.com>, Ming Lei <ming.lei@redhat.com>
+References: <20190527150207.11372-1-ming.lei@redhat.com>
+ <20190527150207.11372-6-ming.lei@redhat.com>
+ <45daceb4-fb88-a835-8cc6-cd4c4d7cf42d@huawei.com>
+ <20190529022852.GA21398@ming.t460p> <20190529024200.GC21398@ming.t460p>
+ <5bc07fd5-9d2b-bf9c-eb77-b8cebadb9150@huawei.com>
+ <20190529101028.GA15496@ming.t460p>
+ <CACVXFVODeFDPHxWkdnY5CZoOJ0did4mi_ap-aXk0oo+Cp05aUQ@mail.gmail.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Hannes Reinecke" <hare@suse.com>,
+        Keith Busch <keith.busch@intel.com>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Don Brace <don.brace@microsemi.com>,
+        "Kashyap Desai" <kashyap.desai@broadcom.com>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <94964048-b867-8610-71ea-0275651f8b77@huawei.com>
+Date:   Wed, 29 May 2019 17:10:38 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <31935.1559146000.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: 8BIT
-Date:   Wed, 29 May 2019 17:06:40 +0100
-Message-ID: <31936.1559146000@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Wed, 29 May 2019 16:06:48 +0000 (UTC)
+In-Reply-To: <CACVXFVODeFDPHxWkdnY5CZoOJ0did4mi_ap-aXk0oo+Cp05aUQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.238]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Greg KH <gregkh@linuxfoundation.org> wrote:
 
-> > kref_put() could potentially add an unnecessary extra stack frame and would
-> > seem to be best avoided, though an optimising compiler ought to be able to
-> > inline if it can.
-> 
-> If kref_put() is on your fast path, you have worse problems (kfree isn't
-> fast, right?)
-> 
-> Anyway, it's an inline function, how can it add an extra stack frame?
+>>
+>> And we should be careful to handle the multiple reply queue case, given the queue
+>> shouldn't be stopped or quieseced because other reply queues are still active.
+>>
+>> The new CPUHP state for blk-mq should be invoked after the to-be-offline
+>> CPU is quiesced and before it becomes offline.
+>
+> Hi John,
+>
 
-The call to the function pointer.  Hopefully the compiler will optimise that
-away for an inlineable function.
+Hi Ming,
 
-> > Are you now on the convert all refcounts to krefs path?
-> 
-> "now"?  Remember, I wrote kref all those years ago,
+> Thinking of this issue further, so far, one doable solution is to
+> expose reply queues
+> as blk-mq hw queues, as done by the following patchset:
+>
+> https://lore.kernel.org/linux-block/20180205152035.15016-1-ming.lei@redhat.com/
 
-Yes - and I thought it wasn't a good idea at the time.  But this is the first
-time you've mentioned it to me, let alone pushed to change to it, that I
-recall.
+I thought that this patchset had fundamental issues, in terms of working 
+for all types of hosts. FYI, I did the backport of latest hisi_sas_v3 to 
+v4.15 with this patchset (as you may have noticed in my git send 
+mistake), but we have not got to test it yet.
 
-> everyone should use
-> it.  It saves us having to audit the same pattern over and over again.
-> And, even nicer, it uses a refcount now, and as you are trying to
-> reference count an object, it is exactly what this was written for.
-> 
-> So yes, I do think it should be used here, unless it is deemed to not
-> fit the pattern/usage model.
+On a related topic, we did test exposing reply queues as blk-mq hw 
+queues and generating the host-wide tag internally in the LLDD with 
+sbitmap, and unfortunately we were experiencing a significant 
+performance hit, like 2300K -> 1800K IOPs for 4K read.
 
-kref_put() enforces a very specific destructor signature.  I know of places
-where that doesn't work because the destructor takes more than one argument
-(granted that this is not the case here).  So why does kref_put() exist at
-all?  Why not kref_dec_and_test()?
+We need to test this further. I don't understand why we get such a big hit.
 
-Why doesn't refcount_t get merged into kref, or vice versa?  Having both would
-seem redundant.
+>
+> In which global host-wide tags are shared for all blk-mq hw queues.
+>
+> Also we can remove all the reply_map stuff in drivers, then solve the problem of
+> draining in-flight requests during unplugging CPU in a generic approach.
 
-Mind you, I've been gradually reverting atomic_t-to-refcount_t conversions
-because it seems I'm not allowed refcount_inc/dec_return() and I want to get
-at the point refcount for tracing purposes.
+So you're saying that removing this reply queue stuff can make the 
+solution to the problem more generic, but do you have an idea of the 
+overall solution?
 
-> > > > +module_exit(watch_queue_exit);
-> > > 
-> > > module_misc_device()?
-> > 
-> > 	warthog>git grep module_misc_device -- Documentation/
-> > 	warthog1>
-> 
-> Do I have to document all helper macros?
+>
+> Last time, it was reported that the patchset causes performance regression,
+> which is actually caused by duplicated io accounting in
+> blk_mq_queue_tag_busy_iter(),
+> which should be fixed easily.
+>
+> What do you think of this approach?
 
-If you add an API, documenting it is your privilege ;-)  It's an important
-test of the API - if you can't describe it, it's probably wrong.
+It would still be good to have a forward port of this patchset for 
+testing, if we're serious about it. Or at least this bug you mention fixed.
 
-Now I will grant that you didn't add that function...
+thanks again,
+John
 
-> Anyway, it saves you boilerplate code, but if built in, it's at the module
-> init level, not the fs init level, like you are asking for here.  So that
-> might not work, it's your call.
+>
+> Thanks,
+> Ming Lei
+>
+> .
+>
 
-Actually, I probably shouldn't have a module exit function.  It can't be a
-module as it's called by core code.  I'll switch to builtin_misc_device().
 
-> And how does the tracing and perf ring buffers do this without needing
-> volatile?  Why not use the same type of interface they provide, as it's
-> always good to share code that has already had all of the nasty corner
-> cases worked out.
-
-I've no idea how trace does it - or even where - or even if.  As far as I can
-see, grepping for mmap in kernel/trace/*, there's no mmap support.
-
-Reading Documentation/trace/ring-buffer-design.txt the trace subsystem has
-some sort of transient page fifo which is a lot more complicated than what I
-want and doesn't look like it'll be mmap'able.
-
-Looking at the perf ring buffer, there appears to be a missing barrier in
-perf_aux_output_end():
-
-	rb->user_page->aux_head = rb->aux_head;
-
-should be:
-
-	smp_store_release(&rb->user_page->aux_head, rb->aux_head);
-
-It should also be using smp_load_acquire().  See
-Documentation/core-api/circular-buffers.rst
-
-And a (partial) patch has been proposed: https://lkml.org/lkml/2018/5/10/249
-
-David
