@@ -2,49 +2,49 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3BAEC28CC0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 11:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D1FC28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 11:50:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A27BB2081C
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 11:39:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20B1F2081C
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 11:50:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726702AbfE2LjY convert rfc822-to-8bit (ORCPT
+        id S1726780AbfE2LuK convert rfc822-to-8bit (ORCPT
         <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 07:39:24 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:42493 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726256AbfE2LjY (ORCPT
+        Wed, 29 May 2019 07:50:10 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:44004 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726101AbfE2LuK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 07:39:24 -0400
-Received: by mail-qt1-f194.google.com with SMTP id s15so2039640qtk.9;
-        Wed, 29 May 2019 04:39:23 -0700 (PDT)
+        Wed, 29 May 2019 07:50:10 -0400
+Received: by mail-qk1-f195.google.com with SMTP id m14so1184149qka.10;
+        Wed, 29 May 2019 04:50:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=9E0nYfWPs7a74TGtkChwlvLkwZ7IjxPSqPdyj4RozG4=;
-        b=n26CHIk0NmWec02CC2UJ6i3wzRBHUn5ezO0tG03QsrOvuXQdIUA4KAjnDIWClphj/Q
-         Pjkcji9kBdzzT4tznmGCx4bjzJJMjEyrtu3G6MgdbWevwJaNL2uePHx4C19V6jTEMLCF
-         ZveNdZ1naTCrav2uUXT1X9siMhuUKRUp8wbDz+SNV/eb+eUB0wsLUNlAKdEt8Lme3iJN
-         OyrdWCVz3m/VSp/R6mtGn5O8GHCEM/587Ge9/BeqEQtQMjY9G7ztwOJtgAioi7+g8Z06
-         5KNvoo8JjSePzcaglPn11sUfSEXp4AoYuOJALtgg7r5STPkNzB2HnsFjJxtrBNfdhS5+
-         HR3A==
-X-Gm-Message-State: APjAAAVz18j43/zAYFqxbVBC60xmTbSH6QJCrZ8B0TPzCraG7NERxXOq
-        tnU9FU1VljjyW4cpM3bxf2SWf4D3lPh5xlYRkE0=
-X-Google-Smtp-Source: APXvYqz0EPhnldcISbzSfPUtTKsPXrltcC2TURmwXZayJpn/3MgULMOLoAS863/SSr+U9BaN4sQZRsVuLkMYuNUzw/c=
-X-Received: by 2002:ac8:2433:: with SMTP id c48mr87599176qtc.18.1559129962985;
- Wed, 29 May 2019 04:39:22 -0700 (PDT)
+        bh=XHkHtWbVB+TvovZz7oPuGTHVIANZlI/EFu3bjVNoQjY=;
+        b=lTsaY64nMnxiHD7pa9HeT5GE8YW0R8qppT6CDAvpNN2yyka/Gw4Z4VGVRix3sw0JJP
+         IxNhHbE2aDTZx2X3fX2IKikOV+FLgmoja6aCH6fsaRw9yo/GB3245QClm8qM/h3V/Gyz
+         wPQtO8AM/4aKa6WUGYBeEBGaNj3V3j65B8I1py2tjJsxZCnUgy0vYDEsKhPUTj7F7FPr
+         slXtsG1Q6SN2qYzbj8bpVjfUnB4Yo+SpgdULwY+90vYFLtM7FmqU13JW/VyK2xmEWHwA
+         EqGuYr2roFx5F0n/QzjiheaKTie0nTTu0XFx7eTqM689cdsgL5Q1ONjb6gsSDP04anTo
+         XiOg==
+X-Gm-Message-State: APjAAAWKj/iVdbBXWye7ZRwXxwoXcLd6rH8KccmIgIoYcQWRWZAY7tMb
+        Oscfzgn9zwmDj2Cwxs/pAAs+NEY0pSo7FYc37zM=
+X-Google-Smtp-Source: APXvYqwIv+NsvZQNU3e96RUtDw8gxMBWuYuQiiajDZ8QFDNiZsSZdie+JkLoe/OtQ843s/6drkk2QB+tL4D41jq4Vho=
+X-Received: by 2002:a37:bb85:: with SMTP id l127mr27919584qkf.285.1559130609026;
+ Wed, 29 May 2019 04:50:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190528142424.19626-1-geert@linux-m68k.org> <20190528142424.19626-4-geert@linux-m68k.org>
-In-Reply-To: <20190528142424.19626-4-geert@linux-m68k.org>
+References: <20190528142424.19626-1-geert@linux-m68k.org> <20190528142424.19626-3-geert@linux-m68k.org>
+In-Reply-To: <20190528142424.19626-3-geert@linux-m68k.org>
 From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Wed, 29 May 2019 13:39:06 +0200
-Message-ID: <CAK8P3a3yPBOfw+GhTXGXZzr3wdz1yA3kKZGqqWYnW6+TzXm_PQ@mail.gmail.com>
-Subject: Re: [PATCH 3/5] net: sched: pie: Use ULL suffix for 64-bit constant
+Date:   Wed, 29 May 2019 13:49:52 +0200
+Message-ID: <CAK8P3a1wTED5Aet_9AjY9VFFrutkV2xK6C13vroTLd0vpcoo9w@mail.gmail.com>
+Subject: Re: [PATCH 2/5] rxrpc: Fix uninitialized error code in rxrpc_send_data_packet()
 To:     Geert Uytterhoeven <geert@linux-m68k.org>
 Cc:     Igor Konopko <igor.j.konopko@intel.com>,
         David Howells <dhowells@redhat.com>,
@@ -64,7 +64,8 @@ Cc:     Igor Konopko <igor.j.konopko@intel.com>,
         Networking <netdev@vger.kernel.org>,
         linux-afs@lists.infradead.org,
         ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
 Sender: linux-block-owner@vger.kernel.org
@@ -74,35 +75,50 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On Tue, May 28, 2019 at 4:24 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
 >
-> With gcc 4.1, when compiling for a 32-bit platform:
+> With gcc 4.1:
 >
->     net/sched/sch_pie.c: In function ‘drop_early’:
->     net/sched/sch_pie.c:116: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c:138: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c:144: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c:147: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c: In function ‘pie_qdisc_enqueue’:
->     net/sched/sch_pie.c:173: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c: In function ‘calculate_probability’:
->     net/sched/sch_pie.c:371: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c:372: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c:377: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c:382: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c:397: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c:398: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c:399: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c:407: warning: integer constant is too large for ‘long’ type
->     net/sched/sch_pie.c:414: warning: integer constant is too large for ‘long’ type
+>     net/rxrpc/output.c: In function ‘rxrpc_send_data_packet’:
+>     net/rxrpc/output.c:338: warning: ‘ret’ may be used uninitialized in this function
 >
-> Fix this by adding the missing "ULL" suffix.
+> Indeed, if the first jump to the send_fragmentable label is made, and
+> the address family is not handled in the switch() statement, ret will be
+> used uninitialized.
 >
-> Fixes: 3f7ae5f3dc5295ac ("net: sched: pie: add more cases to auto-tune alpha and beta")
+> Fix this by initializing err to zero before the jump, like is already
+> done for the jump to the done label.
+>
+> Fixes: 5a924b8951f835b5 ("rxrpc: Don't store the rxrpc header in the Tx queue sk_buffs")
 > Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> ---
+> While this is not a real false-positive, I believe it cannot cause harm
+> in practice, as AF_RXRPC cannot be used with other transport families
+> than IPv4 and IPv6.
 
-I created patches for all instances of this issue at some point in the past,
-but did not send those as we raised the minimum compiler version to one
-that handles this in the expected way without a warning.
+This looks like a variant of the infamous bug
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=18501
 
-Maybe you can just ignore these as well?
+What I don't understand is why clang fails to warn about it with
+-Wsometimes-uninitialized.
+(cc clang-built-linux mailing list).
 
       Arnd
+
+>  net/rxrpc/output.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
+> index 004c762c2e8d063c..1473d774d67100c5 100644
+> --- a/net/rxrpc/output.c
+> +++ b/net/rxrpc/output.c
+> @@ -403,8 +403,10 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, struct sk_buff *skb,
+>
+>         /* send the packet with the don't fragment bit set if we currently
+>          * think it's small enough */
+> -       if (iov[1].iov_len >= call->peer->maxdata)
+> +       if (iov[1].iov_len >= call->peer->maxdata) {
+> +               ret = 0;
+>                 goto send_fragmentable;
+> +       }
+>
+>         down_read(&conn->params.local->defrag_sem);
+>
