@@ -3,37 +3,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C974C28CC2
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 11:01:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E27C28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 11:16:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA700208CB
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 11:01:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 419A82070D
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 11:16:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726016AbfE2LBC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 07:01:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54048 "EHLO mx1.redhat.com"
+        id S1726830AbfE2LQa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 07:16:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45834 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725914AbfE2LBB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 07:01:01 -0400
+        id S1726787AbfE2LQa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 07:16:30 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9B7E181109;
-        Wed, 29 May 2019 11:01:01 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0C786300CA98;
+        Wed, 29 May 2019 11:16:30 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 894035D704;
-        Wed, 29 May 2019 11:00:58 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4D7B55D756;
+        Wed, 29 May 2019 11:16:28 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
 From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAG48ez2rRh2_Kq_EGJs5k-ZBNffGs_Q=vkQdinorBgo58tbGpg@mail.gmail.com>
-References: <CAG48ez2rRh2_Kq_EGJs5k-ZBNffGs_Q=vkQdinorBgo58tbGpg@mail.gmail.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk> <155905933492.7587.6968545866041839538.stgit@warthog.procyon.org.uk>
-To:     Jann Horn <jannh@google.com>, casey@schaufler-ca.com
+In-Reply-To: <CAG48ez2SAKbPeChAf06GMazMPPThFM+OR00abRZafAP7v+ptKw@mail.gmail.com>
+References: <CAG48ez2SAKbPeChAf06GMazMPPThFM+OR00abRZafAP7v+ptKw@mail.gmail.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk> <155905933492.7587.6968545866041839538.stgit@warthog.procyon.org.uk> <CAG48ez2rRh2_Kq_EGJs5k-ZBNffGs_Q=vkQdinorBgo58tbGpg@mail.gmail.com> <10418.1559084686@warthog.procyon.org.uk>
+To:     Jann Horn <jannh@google.com>
 Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
         raven@themaw.net, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         Linux API <linux-api@vger.kernel.org>,
@@ -43,11 +43,11 @@ Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
 Subject: Re: [PATCH 3/7] vfs: Add a mount-notification facility
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <14346.1559127657.1@warthog.procyon.org.uk>
-Date:   Wed, 29 May 2019 12:00:57 +0100
-Message-ID: <14347.1559127657@warthog.procyon.org.uk>
+Content-ID: <15838.1559128587.1@warthog.procyon.org.uk>
+Date:   Wed, 29 May 2019 12:16:27 +0100
+Message-ID: <15839.1559128587@warthog.procyon.org.uk>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 29 May 2019 11:01:01 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Wed, 29 May 2019 11:16:30 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -55,23 +55,15 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Jann Horn <jannh@google.com> wrote:
 
-> > +void post_mount_notification(struct mount *changed,
-> > +                            struct mount_notification *notify)
-> > +{
-> > +       const struct cred *cred = current_cred();
-> 
-> This current_cred() looks bogus to me. Can't mount topology changes
-> come from all sorts of places? For example, umount_mnt() from
-> umount_tree() from dissolve_on_fput() from __fput(), which could
-> happen pretty much anywhere depending on where the last reference gets
-> dropped?
+> I don't really know. I guess it depends on how it's being used? If
+> someone decides to e.g. make a file browser that installs watches for
+> a bunch of mountpoints for some fancy sidebar showing the device
+> mounts on the system, or something like that, that probably shouldn't
+> inhibit unmounting... I don't know if that's a realistic use case.
 
-IIRC, that's what Casey argued is the right thing to do from a security PoV.
-Casey?
-
-Maybe I should pass in NULL creds in the case that an event is being generated
-because an object is being destroyed due to the last usage[*] being removed.
-
- [*] Usage, not ref - Superblocks are a bit weird in their accounting.
+In such a use case, I would envision the browser putting a watch on "/".  A
+watch sees all events in the subtree rooted at that point and you must apply a
+filter that filters them out if you're not interested (filter on
+WATCH_INFO_IN_SUBTREE using info_filter and info_mask).
 
 David
