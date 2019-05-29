@@ -2,151 +2,115 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFC9C28CC0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 09:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 919BDC28CC2
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 09:10:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8DA4721019
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 09:00:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="3fWsyPPG"
+	by mail.kernel.org (Postfix) with ESMTP id 74EEB2054F
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 09:10:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726024AbfE2JA5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 05:00:57 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:59798 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726012AbfE2JA4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 05:00:56 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4T8rpkS122261;
-        Wed, 29 May 2019 09:00:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2018-07-02;
- bh=qzKOCogXcL/6jHjtuPxzkF+o1nWPqgvVV75aCmit2Mo=;
- b=3fWsyPPGEuQqBALF2YoE47zD2FwXrUlNRE88fJt3jc1XPsRGM6Sj0C/BTdR6DIdTF4cc
- DaTgZVCwoNE+3lDufADHy8k6H6lKzwm4CYAi2KeCHe/aksuLAHOZ9d723MMQSFbe42Cf
- Hf0LSttFvPU9wvSNWBrXG2hB4X68qijvxGQts/2QTqi2830h/G1TrifutXvTk66WDxiF
- 1kvuOt7iKt5j/pSOlKFlvdN07/8KS9e7uYiXarFFs6dPSIRPx+A8kbC06gqUqQyI6Ubt
- F4dYHD6fjQmh4tYnJxPhCt0dPHzvHwWM5viS99HKdeouygUzDloAZc4oHmzKYAETaLTl xA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2spw4tgbjc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 May 2019 09:00:54 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4T8xLD9025013;
-        Wed, 29 May 2019 09:00:54 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2ss1fnb9fu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 May 2019 09:00:53 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4T90rCm002216;
-        Wed, 29 May 2019 09:00:53 GMT
-Received: from localhost.localdomain (/101.95.182.98)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 29 May 2019 02:00:52 -0700
-From:   Bob Liu <bob.liu@oracle.com>
-To:     linux-block@vger.kernel.org
-Cc:     osandov@fb.com, Bob Liu <bob.liu@oracle.com>
-Subject: [PATCH blktests] block: add queue freeze/unfreeze sequence test
-Date:   Wed, 29 May 2019 17:00:27 +0800
-Message-Id: <20190529090027.25224-1-bob.liu@oracle.com>
-X-Mailer: git-send-email 2.9.5
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9271 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905290060
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9271 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905290060
+        id S1726012AbfE2JJ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 05:09:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42732 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725874AbfE2JJ6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 05:09:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C769A7E426;
+        Wed, 29 May 2019 09:09:48 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BC50B6608B;
+        Wed, 29 May 2019 09:09:45 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20190528235810.GA5776@kroah.com>
+References: <20190528235810.GA5776@kroah.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk>
+To:     Greg KH <gregkh@linuxfoundation.org>, casey@schaufler-ca.com
+Cc:     dhowells@redhat.com, viro@zeniv.linux.org.uk, raven@themaw.net,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC][PATCH 0/7] Mount, FS, Block and Keyrings notifications
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <31750.1559120984.1@warthog.procyon.org.uk>
+Date:   Wed, 29 May 2019 10:09:44 +0100
+Message-ID: <31751.1559120984@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 29 May 2019 09:09:57 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reproduce the hang fixed by
-7996a8b5511a ("blk-mq: fix hang caused by freeze/unfreeze sequence").
+Greg KH <gregkh@linuxfoundation.org> wrote:
 
-Signed-off-by: Bob Liu <bob.liu@oracle.com>
----
- tests/block/022 | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
- create mode 100755 tests/block/022
+> >  (3) Letting users see events they shouldn't be able to see.
+> 
+> How are you handling namespaces then?  Are they determined by the
+> namespace of the process that opened the original device handle, or the
+> namespace that made the new syscall for the events to "start flowing"?
 
-diff --git a/tests/block/022 b/tests/block/022
-new file mode 100755
-index 0000000..e3ac197
---- /dev/null
-+++ b/tests/block/022
-@@ -0,0 +1,59 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2019 Bob Liu <bob.liu@oracle.com>
-+#
-+# Test hang caused by freeze/unfreeze sequence. Regression
-+# test for 7996a8b5511a ("blk-mq: fix hang caused by freeze/unfreeze sequence").
-+
-+. tests/block/rc
-+. common/null_blk
-+
-+DESCRIPTION="Test hang caused by freeze/unfreeze sequence"
-+TIMED=1
-+
-+requires() {
-+	_have_null_blk && _have_module_param null_blk shared_tags
-+}
-+
-+hotplug_test() {
-+	while :
-+	do
-+		echo 1 > /sys/kernel/config/nullb/"$1"/power
-+		echo 0 > /sys/kernel/config/nullb/"$1"/power
-+	done
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+	: "${TIMEOUT:=30}"
-+
-+	if ! _init_null_blk shared_tags=1 nr_devices=0 queue_mode=2; then
-+		return 1
-+	fi
-+
-+	mkdir -p /sys/kernel/config/nullb/0
-+	mkdir -p /sys/kernel/config/nullb/1
-+	hotplug_test 0 &
-+	pid0=$!
-+	hotplug_test 1 &
-+	pid1=$!
-+
-+	#bind process to two different CPU
-+	taskset -p 1 $pid0 >/dev/null
-+	taskset -p 2 $pid1 >/dev/null
-+
-+	sleep "$TIMEOUT"
-+	{
-+		kill -9 $pid0
-+		wait $pid0
-+		kill -9 $pid1
-+		wait $pid1
-+	} 2>/dev/null
-+
-+	rmdir /sys/kernel/config/nullb/1
-+	rmdir /sys/kernel/config/nullb/0
-+
-+	_exit_null_blk
-+	echo "Test complete"
-+}
-+
--- 
-2.9.5
+So far I haven't had to deal directly with namespaces.
 
+mount_notify() requires you to have access to the mountpoint you want to watch
+- and the entire tree rooted there is in one namespace, so your event sources
+are restricted to that namespace.  Further, mount objects don't themselves
+have any other namespaces, not even a user_ns.
+
+sb_notify() requires you to have access to the superblock you want to watch.
+superblocks aren't directly namespaced as a class, though individual
+superblocks may participate in particular namespaces (ipc, net, etc.).  I'm
+thinking some of these should be marked unwatchable (all pseudo superblocks,
+kernfs-class, proc, for example).
+
+Superblocks, however, do each have a user_ns - but you were allowed to access
+the superblock by pathwalk, so you must have some access to the user_ns - I
+think.
+
+KEYCTL_NOTIFY requires you to have View access on the key you're watching.
+Currently, keys have no real namespace restrictions, though I have patches to
+include a namespace tag in the lookup criteria.
+
+block_notify() doesn't require any direct access since you're watching a
+global queue and there is no blockdev namespacing.  LSMs are given the option
+to filter events, though.  The thought here is that if you can access dmesg,
+you should be able to watch for blockdev events.
+
+
+Actually, thinking further on this, restricting access to events is trickier
+than I thought and than perhaps Casey was suggesting.
+
+Say you're watching a mount object and someone in a different user_ns
+namespace or with a different security label mounts on it.  What governs
+whether you are allowed to see the event?
+
+You're watching the object for changes - and it *has* changed.  Further, you
+might be able to see the result of this change by other means (/proc/mounts,
+for instance).
+
+Should you be denied the event based on the security model?
+
+On the other hand, if you're watching a tree of mount objects, it could be
+argued that you should be denied access to events on any mount object you
+can't reach by pathwalk.
+
+On the third hand, if you can see it in /proc/mounts or by fsinfo(), you
+should get an event for it.
+
+
+> How are you handling namespaces then?
+
+So to go back to the original question.  At the moment they haven't impinged
+directly and I haven't had to deal with them directly.  There are indirect
+namespace restrictions that I get for free just due to pathwalk, for instance.
+
+David
