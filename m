@@ -2,103 +2,140 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B436C28CC0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 22:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A613DC28CC0
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 23:10:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5DA622075B
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 22:08:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BLopjJep"
+	by mail.kernel.org (Postfix) with ESMTP id 7EAD124307
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 23:10:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1559171403;
+	bh=RYgrpGQlV6JhNVFewZg8lfQgvdy68HtrQSwL8rOWAVc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=z3Td15EX9DVOCoTHMMJtwUbQz0iT1evXq8CyZ+LAzv3TEQ+OfiAOqsMxoD+nSuxQD
+	 TtIJAg0vE+bIqeNmw47TKPb5pseC3mmFOXMUOQ9bRtF/9vi4gVgQKNB8dxkSsDzZH4
+	 jRVgAOB+42sTThD4+w10qJqbwHzK9rUR7LJFIHvc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726320AbfE2WIQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 18:08:16 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:37354 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726018AbfE2WIP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 18:08:15 -0400
-Received: by mail-qk1-f194.google.com with SMTP id d15so2577723qkl.4
-        for <linux-block@vger.kernel.org>; Wed, 29 May 2019 15:08:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=wFWpnyMCBI2HjRfy30XMpOktsDUJvxC/m3/fJSrrM7I=;
-        b=BLopjJepJi1pOenVA7BqGBZdJ1GCRJFIvPY5dMmZy8eG9ge8Nbs+/veQTyhkk28PDK
-         2UQaJez1pNtAZaEXS4VtbPGjqet8+SdlbFcUg1RAVaiHjKdJ0BpgvQtkxT1VxtXqUp6x
-         fvB1Srcoj6Q8GCPyuOOi2e73nxSzmCX8wI35Qdx7tk1tUhmr8kbAGEWHaiOaE5x2lqc/
-         Vst9Akr7u5bD9BxDu84zV5qImFdwqw+kK2rSNKOWfXAsel5Z37LVK10yL9XeLMgrBr6Z
-         tPvpYDFDmbJJJENWNWdLjSYqC0mQggQibR8gnMnOScMG7sEEJXl5rpxtdI6D3NXb6sz8
-         2Bug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=wFWpnyMCBI2HjRfy30XMpOktsDUJvxC/m3/fJSrrM7I=;
-        b=ZOQP/epm5NN7oeXImoKtKi/u3jui24RgwH2iibOIL1Uc0aQiJ3fDuqxYqsn9vuDJTe
-         WZOf0lwGUPOI6KzPhEEc85gsy9XV6peX/4iFtTZVRVKaNNlSy/75KjhauLMYYRdyRcNq
-         dsTInYncqGnrGcBhEfIx/Rj8BsmL4yIXqLR+dr3DCqGBO9Vmxruum6jrAo7fXyfoYkAt
-         ZknVkh6NM5jEq/UgnqdUJ+pfObZFYEyJ/uh+pszzAWtGWPOoVEUJdge8kT+PHhjQlxEj
-         DYJizx99I3nsT0DvBw8/cg1L9nu6lvZBgVwTDDhBrjo5Qp47BHY9xxoyZSBuK+fePyYY
-         hr8Q==
-X-Gm-Message-State: APjAAAXN34Wz0IIxtnPmubZzWqHnO9dKZPsAbXuGoLu1oc5Ahs3CbWPR
-        1JQ1suFVY+36EV2YHhG6quxQpWDX
-X-Google-Smtp-Source: APXvYqzXbVPBHRm4bTBJhcQUvTsmCSd513P7iACjnBz+d6zcFVn6kNbLUgYgShrL4BB/6Q50WQvjiA==
-X-Received: by 2002:ae9:c106:: with SMTP id z6mr150192qki.65.1559167694354;
-        Wed, 29 May 2019 15:08:14 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::3:60e4])
-        by smtp.gmail.com with ESMTPSA id x7sm458268qth.37.2019.05.29.15.08.13
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 29 May 2019 15:08:13 -0700 (PDT)
-From:   Jes Sorensen <jes.sorensen@gmail.com>
-X-Google-Original-From: Jes Sorensen <Jes.Sorensen@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, jbacik@toxicpanda.com, kernel-team@fb.com
-Subject: [PATCH 5/5] Expand block stats to export number of of requests per bucket
-Date:   Wed, 29 May 2019 18:07:30 -0400
-Message-Id: <20190529220730.28014-6-Jes.Sorensen@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190529220730.28014-1-Jes.Sorensen@gmail.com>
-References: <20190529220730.28014-1-Jes.Sorensen@gmail.com>
+        id S1726520AbfE2XJ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 19:09:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33854 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726411AbfE2XJ4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 19:09:56 -0400
+Received: from localhost (unknown [207.225.69.115])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 247012431F;
+        Wed, 29 May 2019 23:09:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559171395;
+        bh=RYgrpGQlV6JhNVFewZg8lfQgvdy68HtrQSwL8rOWAVc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=vcn5pbNeMnyZtaY1Dky6rkxgROL4EN3gp+VJHTsLmtdV8lXVVCMY6PxcElXWfeVdm
+         GDbcBiViw66eGS7+ROANo46uH4/K5+D5UqUAz8o2Y0fGnvRRRP33XAiFMGfedITQfR
+         3uouPh+qo2WDtYIkx6bhGj6rXy+RyVJi2DmKYZV0=
+Date:   Wed, 29 May 2019 16:09:54 -0700
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     viro@zeniv.linux.org.uk, raven@themaw.net,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/7] General notification queue with user mmap()'able
+ ring buffer
+Message-ID: <20190529230954.GA3164@kroah.com>
+References: <20190528231218.GA28384@kroah.com>
+ <20190528162603.GA24097@kroah.com>
+ <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk>
+ <155905931502.7587.11705449537368497489.stgit@warthog.procyon.org.uk>
+ <4031.1559064620@warthog.procyon.org.uk>
+ <31936.1559146000@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <31936.1559146000@warthog.procyon.org.uk>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jes Sorensen <jsorensen@fb.com>
+On Wed, May 29, 2019 at 05:06:40PM +0100, David Howells wrote:
+> Greg KH <gregkh@linuxfoundation.org> wrote:
+> 
+> > > kref_put() could potentially add an unnecessary extra stack frame and would
+> > > seem to be best avoided, though an optimising compiler ought to be able to
+> > > inline if it can.
+> > 
+> > If kref_put() is on your fast path, you have worse problems (kfree isn't
+> > fast, right?)
+> > 
+> > Anyway, it's an inline function, how can it add an extra stack frame?
+> 
+> The call to the function pointer.  Hopefully the compiler will optimise that
+> away for an inlineable function.
 
-Signed-off-by: Jes Sorensen <jsorensen@fb.com>
----
- block/blk-sysfs.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+The function pointer only gets called for the last "put", and then kfree
+will be called so you should not have to worry about speed/stack frames
+at that point in time.
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 63fdda5e6ccb..0dd4a3825a92 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -543,6 +543,14 @@ static ssize_t queue_stat_show(struct request_queue *q, char *p)
- 				       q->dev_stat[i + 3 * bkt].size);
- 		}
- 		off += sprintf(p + off, "\n");
-+
-+		off += sprintf(p + off, "%s reqs: ", name[i]);
-+		for (bkt = 0; bkt < (BLK_DEV_STATS_BKTS / 3); bkt++) {
-+			off += sprintf(p + off, "%u ",
-+				       q->dev_stat[i + 3 * bkt].nr_samples);
-+		}
-+
-+		off += sprintf(p + off, "\n");
- 	}
- 	return off;
- }
--- 
-2.17.1
+> > > Are you now on the convert all refcounts to krefs path?
+> > 
+> > "now"?  Remember, I wrote kref all those years ago,
+> 
+> Yes - and I thought it wasn't a good idea at the time.  But this is the first
+> time you've mentioned it to me, let alone pushed to change to it, that I
+> recall.
 
+I bring up using a kref any time I see a usage that could use it as it
+makes it easier for people to understand and "know" you are doing your
+reference counting for your object "correctly".  It's an abstraction
+that is used to make it easier for us developers to understand.
+Otherwise you have to hand-roll the same logic here.  Yes, refcounts
+have made it easier to do it in your own (which was their goal), but you
+still don't have to do it "on your own".
+
+Anyway, I'll not push the issue here, if you want to stick to a
+refcount_t, that's enough for now.  We can worry about changing this
+later after you have debugged all the corner conditions :)
+
+> > everyone should use
+> > it.  It saves us having to audit the same pattern over and over again.
+> > And, even nicer, it uses a refcount now, and as you are trying to
+> > reference count an object, it is exactly what this was written for.
+> > 
+> > So yes, I do think it should be used here, unless it is deemed to not
+> > fit the pattern/usage model.
+> 
+> kref_put() enforces a very specific destructor signature.  I know of places
+> where that doesn't work because the destructor takes more than one argument
+> (granted that this is not the case here).  So why does kref_put() exist at
+> all?  Why not kref_dec_and_test()?
+
+The destructor only takes one object pointer as you are finally freeing
+that object.  What more do you need/want to "know" at that point in
+time?
+
+What would kref_dec_and_test() be needed for?
+
+> Why doesn't refcount_t get merged into kref, or vice versa?  Having both would
+> seem redundant.
+
+kref uses refcount_t and provides a different functionality on top of
+it.  Not all uses of a refcount in the kernel is for object lifecycle
+reference counting, as you know :)
+
+> Mind you, I've been gradually reverting atomic_t-to-refcount_t conversions
+> because it seems I'm not allowed refcount_inc/dec_return() and I want to get
+> at the point refcount for tracing purposes.
+
+That's not good, we should address that independently as you are loosing
+functionality/protection when doing that.
+
+thanks,
+
+greg k-h
