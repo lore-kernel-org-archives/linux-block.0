@@ -2,86 +2,119 @@ Return-Path: <SRS0=nCGH=T5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B16C28CC0
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 12:25:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B6BC28CC2
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 12:58:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9ED5821019
-	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 12:25:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GRSXKhF5"
+	by mail.kernel.org (Postfix) with ESMTP id 76493208CB
+	for <linux-block@archiver.kernel.org>; Wed, 29 May 2019 12:58:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726628AbfE2MZN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 08:25:13 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:45407 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725936AbfE2MZM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 08:25:12 -0400
-Received: by mail-pf1-f193.google.com with SMTP id s11so1512660pfm.12
-        for <linux-block@vger.kernel.org>; Wed, 29 May 2019 05:25:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=wV5GW+wNmFmQBPj3TgKe7/OIT+MA0KFJOxyQzNc+M+U=;
-        b=GRSXKhF5vslMGQUWp0fUQDsgXLlCWLwv3OqZNVf4y8QsY5R3Cez3BPqbz1Kaqxic1J
-         BkGxDkmlOFnuWy1KPC9MX2t7kI+t1uHgRwGFcgZYRCjU8rDUPPgdMkhRhTBxUYcWjKGW
-         jYm7WojpSn7u5NpkAmbNz5y1PRoBNBHkFgnw/XBVGMoFOWcA5LqR0dQTiJxsWSD+bw9J
-         hTlWD7Hp4lHObAJlRzXs14PebjLLRtLwb2qloR3BhjUNQIizqGb9rkxwYyHP7KG3Sm+O
-         aOZrufvPUTAFgk5b8/mQqGzuCUAGUPjoUxAHPoyzlkv4E8ZjqoX+LYm8XOHfGNfJIHec
-         OhCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wV5GW+wNmFmQBPj3TgKe7/OIT+MA0KFJOxyQzNc+M+U=;
-        b=OVa8TERnsZ8I2EQJ5hLLbhVZdciooF6ZRfZDlS/ziV5FwnoW+PyhEoj9PWDbo5Kab/
-         oCUZsxnD0G2KXCHEf7O3z0Rps7LXXoe7dgKfuEszMFASt6Ncu6O3Buef9wbv/qOblmt3
-         ddisxc5dv4o+Oo9oxoBvgW4rKAuKaJ/IYKMzZo7XN1rgFyOegl9yj0ZZ7C7DH7iNR3LF
-         ySOAoKMhPgoPTQblRxscg+2THlMvQPe9IDfSyq4EiDpdOj95N8mE1359Wja+podcjqrx
-         rKxblB/EsW0ZFigXi1BNZWfrWa2tR/pdpsYN/gwT5yptYCv0v9AR0X0wPFkZDQrlzoK2
-         oJ1w==
-X-Gm-Message-State: APjAAAXbT0dcxRMFn5HaEqamS2E/xFmqtsamxfnxZLCdQvH7WqSNmg6K
-        MulmbirQ1P7/xmmFL3ZBx2TOaCm+oxBLGw==
-X-Google-Smtp-Source: APXvYqywo+rKxpNyhEmgVwGhXZfljePVQaAsy0Ry1wC/rK/m6ky6i5fB4oqIJKQ7fGJfZ2+2Q7zx6w==
-X-Received: by 2002:a65:528b:: with SMTP id y11mr137200696pgp.341.1559132712261;
-        Wed, 29 May 2019 05:25:12 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id i22sm17596272pfa.127.2019.05.29.05.25.09
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 29 May 2019 05:25:10 -0700 (PDT)
-Subject: Re: [PATCH 0/3] block: queue exit cleanup
-To:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <20190515030310.20393-1-ming.lei@redhat.com>
- <20190529065201.GA3728@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fac85b3e-7c8c-5e85-63a9-e4198690a092@kernel.dk>
-Date:   Wed, 29 May 2019 06:25:09 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726613AbfE2M6s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 May 2019 08:58:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40474 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726104AbfE2M6s (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 08:58:48 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D63E9C07188B;
+        Wed, 29 May 2019 12:58:42 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0CA8C5D9D6;
+        Wed, 29 May 2019 12:58:39 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAG48ez2o1egR13FDd3=CgdXP_MbBsZM4SX=+aqvR6eheWddhFg@mail.gmail.com>
+References: <CAG48ez2o1egR13FDd3=CgdXP_MbBsZM4SX=+aqvR6eheWddhFg@mail.gmail.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk> <155905934373.7587.10824503964531598726.stgit@warthog.procyon.org.uk>
+To:     Jann Horn <jannh@google.com>
+Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        raven@themaw.net, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 4/7] vfs: Add superblock notifications
 MIME-Version: 1.0
-In-Reply-To: <20190529065201.GA3728@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <24576.1559134719.1@warthog.procyon.org.uk>
+Date:   Wed, 29 May 2019 13:58:39 +0100
+Message-ID: <24577.1559134719@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Wed, 29 May 2019 12:58:48 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/29/19 12:52 AM, Christoph Hellwig wrote:
-> Jens, do you plan to pick this up (at last patches 1 and 2)?  It
-> fixes a NULL pointer deref and a md raid issue.
+Jann Horn <jannh@google.com> wrote:
 
-Agree, applied 1-2.
+> It might make sense to require that the path points to the root inode
+> of the superblock? That way you wouldn't be able to do this on a bind
+> mount that exposes part of a shared filesystem to a container.
 
--- 
-Jens Axboe
+Why prevent that?  It doesn't prevent the container denizen from watching a
+bind mount that exposes the root of a shared filesystem into a container.
 
+It probably makes sense to permit the LSM to rule on whether a watch may be
+emplaced, however.
+
+> > +                       ret = add_watch_to_object(watch, s->s_watchers);
+> > +                       if (ret == 0) {
+> > +                               spin_lock(&sb_lock);
+> > +                               s->s_count++;
+> > +                               spin_unlock(&sb_lock);
+> 
+> Why do watches hold references on the superblock they're watching?
+
+Fair point.  It was necessary at one point, but I don't think it is now.  I'll
+see if I can remove it.  Note that it doesn't stop a superblock from being
+unmounted and destroyed.
+
+> > +                       }
+> > +               }
+> > +               up_write(&s->s_umount);
+> > +               if (ret < 0)
+> > +                       kfree(watch);
+> > +       } else if (s->s_watchers) {
+> 
+> This should probably have something like a READ_ONCE() for clarity?
+
+Note that I think I'll rearrange this to:
+
+	} else {
+		ret = -EBADSLT;
+		if (s->s_watchers) {
+			down_write(&s->s_umount);
+			ret = remove_watch_from_object(s->s_watchers, wqueue,
+						       s->s_unique_id, false);
+			up_write(&s->s_umount);
+		}
+	}
+
+I'm not sure READ_ONCE() is necessary, since s_watchers can only be
+instantiated once and the watch list then persists until the superblock is
+deactivated.  Furthermore, by the time deactivate_locked_super() is called, we
+can't be calling sb_notify() on it as it's become inaccessible.
+
+So if we see s->s_watchers as non-NULL, we should not see anything different
+inside the lock.  In fact, I should be able to rewrite the above to:
+
+	} else {
+		ret = -EBADSLT;
+		wlist = s->s_watchers;
+		if (wlist) {
+			down_write(&s->s_umount);
+			ret = remove_watch_from_object(wlist, wqueue,
+						       s->s_unique_id, false);
+			up_write(&s->s_umount);
+		}
+	}
+
+David
