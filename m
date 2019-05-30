@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 480A5C072B1
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 04:14:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BBB8C28CC0
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 04:36:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 226C9251F7
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 04:14:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C655257FB
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 04:36:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559189661;
-	bh=Ysv2PzbbJsEvju4N7o/L7/38TGdOq5lM4hxD3RTj5H8=;
+	s=default; t=1559190973;
+	bh=YbQkvgE0bIn5q8xDKH9ta8yAnvS0lPi4rnC4B/s7Su8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ZI4Qco4T8QiZyMoucOjTGcUExii8smbNLHANGSSkX/ByfseTGxOYIIOQzt9faBXk9
-	 Ia4TLPLmlpJ75NThvBKvDowa4r1mOJ5Et/tmn2ZEIH9O2GrjaCHVj90I2+P8kAN4fD
-	 6IYMy7H+JkOqjG4hdvp15MAxecFhzwvXMyJGhl6I=
+	b=eIiEbMOji3C9H+VTBHawkaZkxUZ1+EaLhYuK/++z62pqYXI0chRspVcwTY3OiMJk3
+	 7qNUgXY/AsKP/AcEt/rsIt5QsPU/8aRweZuROMloj0NDAVLmKG/XPNFS7J4NbXJAtE
+	 kUcNPzVHlo0BBSU0Wx95q3WZEqilnZrJnya4wwtk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727210AbfE3EOQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 00:14:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41588 "EHLO mail.kernel.org"
+        id S2388504AbfE3EgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 00:36:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57192 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730625AbfE3DQN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 23:16:13 -0400
+        id S1729322AbfE3DNC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 23:13:02 -0400
 Received: from localhost (ip67-88-213-2.z213-88-67.customer.algx.net [67.88.213.2])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 40C952449A;
-        Thu, 30 May 2019 03:16:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9CFB1244EF;
+        Thu, 30 May 2019 03:13:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559186173;
-        bh=Ysv2PzbbJsEvju4N7o/L7/38TGdOq5lM4hxD3RTj5H8=;
+        s=default; t=1559185981;
+        bh=YbQkvgE0bIn5q8xDKH9ta8yAnvS0lPi4rnC4B/s7Su8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rvejg9RO7moRctGMcQYeeZcLa5fXJFvypeeaB43YUaNhGjPuovQaSixdaViVjlfQs
-         VWvOCpgADorGG+pA+0I4AFR72s4qSVWR1B9jAemgY/MsrKE2/4MOWxxE9kNjWDL/ie
-         pAe0nnYxEtfc709B5xFdx6q8QHRrUI+53PYi1HWY=
+        b=NwNGo48+kUd6B+0s4e4rfuy0jpR1vlTNfaQm0mpiASXIQf3E0UpqtC5xaajXvCNTW
+         nLjpbknbdRqzT3Q65gNaCfv8imS5sxgEYHmm8FnR2gjcyLOgg1W+AIQxeU2Es2ozF7
+         QuTK9VZBK+x4JVsBZ62heu/Ls2eaz5iGa9Le0Kfk=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -46,12 +46,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrea Parri <andrea.parri@amarulasolutions.com>,
         Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org
-Subject: [PATCH 4.19 006/276] bio: fix improper use of smp_mb__before_atomic()
-Date:   Wed, 29 May 2019 20:02:44 -0700
-Message-Id: <20190530030523.764119003@linuxfoundation.org>
+Subject: [PATCH 5.0 005/346] bio: fix improper use of smp_mb__before_atomic()
+Date:   Wed, 29 May 2019 20:01:18 -0700
+Message-Id: <20190530030540.714953042@linuxfoundation.org>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190530030523.133519668@linuxfoundation.org>
-References: <20190530030523.133519668@linuxfoundation.org>
+In-Reply-To: <20190530030540.363386121@linuxfoundation.org>
+References: <20190530030540.363386121@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -90,7 +90,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/include/linux/bio.h
 +++ b/include/linux/bio.h
-@@ -257,7 +257,7 @@ static inline void bio_cnt_set(struct bi
+@@ -211,7 +211,7 @@ static inline void bio_cnt_set(struct bi
  {
  	if (count != 1) {
  		bio->bi_flags |= (1 << BIO_REFFED);
