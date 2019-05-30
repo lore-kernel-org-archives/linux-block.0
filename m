@@ -2,121 +2,179 @@ Return-Path: <SRS0=WD2t=T6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C57C28CC0
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 09:28:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1753C28CC0
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 09:31:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0AACD254E4
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 09:28:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QtLbf2Hm"
+	by mail.kernel.org (Postfix) with ESMTP id D1FC1255B3
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 09:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726985AbfE3J2B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 05:28:01 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:38462 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726382AbfE3J2B (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 May 2019 05:28:01 -0400
-Received: by mail-wr1-f66.google.com with SMTP id d18so3705997wrs.5;
-        Thu, 30 May 2019 02:28:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=V9uS1keBW3VpEfdw8YbBt35z4e82IzpdzTkrruky1E8=;
-        b=QtLbf2HmeJA14Jf1AcY7WgDdWbr0B/C84z9/ERtg1Ea1H9PTS7kqNhnGKZY+dPDjPC
-         KbeOi8QpjT2t0+jlvl05Jq58LCsRl6NXwYmKRMqm8AAsQqi/VENdBGl0EZJ2mpl1nHRR
-         QibgPIATXT/RCX7UeeCr5m7mPYg+ih/oV9mwM1UXYkokeIoQCqhLRSlhCDQ87MxU4r6v
-         HtRYiITzXvN1mLjGpneqU5cAIEVRoxDLlvtFFHlIY0iDXjG3QP00tVAKZUf93GH+HQ5n
-         iOKumKG/s83Lb1HPwNeapI2hCHj1xk/HotATLvhC7rJbvJTD/ajL9rfERTfhO0OPqSsr
-         m8ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=V9uS1keBW3VpEfdw8YbBt35z4e82IzpdzTkrruky1E8=;
-        b=VAuPRknRfwLoPuavE7DF9XI97OhYOa0Ep41HUoOkO5NeddUyBVw/SQRZmps0lBzP7d
-         P/LdzhUE1+aXHyV1b1vpJJwiS6kuJ6VdqklsWmQ1/POxM/9u28NbzkuSMu6gBMev6jT0
-         M+b+LZVM6XJJuy648f/AWNKy5Xwg/Cd2Co4nLJJteXxK34Nth7IIee2H4OsLXuLYFiF/
-         srPEwA55/7xlJ3goDQtSSn6vwfxAMw8bbsjctNCzXlIX6aMGhFkxBuj3eIUlKVZ1WtfC
-         BYd81E7zKRdhgAI6SI35bR89aaA/Ke2kmyM0Oup69zL8BR6g2bpttXAa98cNNXVw61AW
-         yf7A==
-X-Gm-Message-State: APjAAAUipeuswXVT2C6y3XyKHNr0IjTO+P/4fVahDO7W0XoRkAH6Mp4g
-        oMat//FNHXi5LckzBQxNn24=
-X-Google-Smtp-Source: APXvYqwAYe7240hTlEiIsSSbTkHNnMmocCkj0k5gjshu065TwpUUnlDOU/rPhN+bZXP3GcvjnesCAQ==
-X-Received: by 2002:adf:fd09:: with SMTP id e9mr1920656wrr.292.1559208479457;
-        Thu, 30 May 2019 02:27:59 -0700 (PDT)
-Received: from localhost.localdomain ([109.126.142.5])
-        by smtp.gmail.com with ESMTPSA id u25sm147605wmc.3.2019.05.30.02.27.57
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 30 May 2019 02:27:58 -0700 (PDT)
-From:   "Pavel Begunkov (Silence)" <asml.silence@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     osandov@fb.com, ming.lei@redhat.com, Hou Tao <houtao1@huawei.com>,
-        Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH v2 1/1] blk-mq: Fix disabled hybrid polling
-Date:   Thu, 30 May 2019 12:27:08 +0300
-Message-Id: <71c31759a882e00f156a8434caed7064ec93d3da.1559208134.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.21.0
+        id S1727243AbfE3Jbr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 05:31:47 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:37460 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727184AbfE3Jbr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 May 2019 05:31:47 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 772CC68A40282727208A;
+        Thu, 30 May 2019 17:31:44 +0800 (CST)
+Received: from [127.0.0.1] (10.202.227.238) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Thu, 30 May 2019
+ 17:31:42 +0800
+Subject: Re: [PATCH V2 5/5] blk-mq: Wait for for hctx inflight requests on CPU
+ unplug
+To:     Ming Lei <ming.lei@redhat.com>
+References: <20190527150207.11372-1-ming.lei@redhat.com>
+ <20190527150207.11372-6-ming.lei@redhat.com>
+ <45daceb4-fb88-a835-8cc6-cd4c4d7cf42d@huawei.com>
+ <20190529022852.GA21398@ming.t460p> <20190529024200.GC21398@ming.t460p>
+ <5bc07fd5-9d2b-bf9c-eb77-b8cebadb9150@huawei.com>
+ <20190529101028.GA15496@ming.t460p>
+ <CACVXFVODeFDPHxWkdnY5CZoOJ0did4mi_ap-aXk0oo+Cp05aUQ@mail.gmail.com>
+ <94964048-b867-8610-71ea-0275651f8b77@huawei.com>
+ <20190530022810.GA16730@ming.t460p>
+CC:     Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Hannes Reinecke" <hare@suse.com>,
+        Keith Busch <keith.busch@intel.com>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Don Brace <don.brace@microsemi.com>,
+        "Kashyap Desai" <kashyap.desai@broadcom.com>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <0b5945a5-54d8-4d4a-2058-aadd8a4117b6@huawei.com>
+Date:   Thu, 30 May 2019 10:31:34 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190530022810.GA16730@ming.t460p>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.238]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Pavel Begunkov <asml.silence@gmail.com>
+Hi Ming,
 
-Commit 4bc6339a583cec650b05 ("block: move blk_stat_add() to
-__blk_mq_end_request()") moved blk_stat_add() to reuse ktime_get_ns(),
-so now it's called after blk_update_request(), which zeroes
-rq->__data_len. Without length, blk_stat_add() can't calculate stat
-bucket and returns error, effectively disabling hybrid polling.
+>>
+>>> Thinking of this issue further, so far, one doable solution is to
+>>> expose reply queues
+>>> as blk-mq hw queues, as done by the following patchset:
+>>>
+>>> https://lore.kernel.org/linux-block/20180205152035.15016-1-ming.lei@redhat.com/
+>>
+>> I thought that this patchset had fundamental issues, in terms of working for
+>> all types of hosts. FYI, I did the backport of latest hisi_sas_v3 to v4.15
+>
+> Could you explain it a bit about the fundamental issues for all types of
+> host?
+>
 
-v2: Hybrid polling needs pure io time for precision, but according to
-the feedback from Omar Sandoval other components require end-to-end
-time. So, it can't be reused, and should be sampled twice insted.
+*As I understand*, splitting the tagset has issues with dual-mode HBAs - 
+as in supporting NVMe and SCSI, as some HBAs do.
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- block/blk-mq.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+> It is just for hosts with multiple reply queues, such as hisi_sas v3,
+> megaraid_sas, mpt3sas and hpsa.
+>
+>> with this patchset (as you may have noticed in my git send mistake), but we
+>> have not got to test it yet.
+>>
+>> On a related topic, we did test exposing reply queues as blk-mq hw queues
+>> and generating the host-wide tag internally in the LLDD with sbitmap, and
+>> unfortunately we were experiencing a significant performance hit, like 2300K
+>> -> 1800K IOPs for 4K read.
+>>
+>> We need to test this further. I don't understand why we get such a big hit.
+>
+> The performance regression shouldn't have been introduced in theory, and it is
+> because blk_mq_queue_tag_busy_iter() iterates over the same duplicated tags multiple
+> times, which can be fixed easily.
+>
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 32b8ad3d341b..907799282d57 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -537,11 +537,6 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
- 	if (blk_mq_need_time_stamp(rq))
- 		now = ktime_get_ns();
- 
--	if (rq->rq_flags & RQF_STATS) {
--		blk_mq_poll_stats_start(rq->q);
--		blk_stat_add(rq, now);
--	}
--
- 	if (rq->internal_tag != -1)
- 		blk_mq_sched_completed_request(rq, now);
- 
-@@ -580,6 +575,11 @@ static void __blk_mq_complete_request(struct request *rq)
- 	int cpu;
- 
- 	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
-+
-+	if (rq->rq_flags & RQF_STATS) {
-+		blk_mq_poll_stats_start(rq->q);
-+		blk_stat_add(rq, ktime_get_ns());
-+	}
- 	/*
- 	 * Most of single queue controllers, there is only one irq vector
- 	 * for handling IO completion, and the only irq's affinity is set
--- 
-2.21.0
+We are testing further, and I will tentatively say that we're getting 
+better results (than previously) after fixing something in the LLDD. TBC.
+
+>>
+>>>
+>>> In which global host-wide tags are shared for all blk-mq hw queues.
+>>>
+>>> Also we can remove all the reply_map stuff in drivers, then solve the problem of
+>>> draining in-flight requests during unplugging CPU in a generic approach.
+>>
+>> So you're saying that removing this reply queue stuff can make the solution
+>> to the problem more generic, but do you have an idea of the overall
+>> solution?
+>
+> 1) convert reply queue into blk-mq hw queue first
+>
+> 2) then all drivers are in same position wrt. handling requests vs.
+> unplugging CPU (shutdown managed IRQ)
+>
+> The current handling in blk_mq_hctx_notify_dead() is actually wrong,
+
+Yeah, the comment reads that it's going away, but it's actually gone.
+
+> at that time, all CPUs on the hctx are dead, blk_mq_run_hw_queue()
+> still dispatches requests on driver's hw queue, and driver is invisible
+> to DEAD CPUs mapped to this hctx, and finally interrupt for these
+> requests on the hctx are lost.
+>
+> Frankly speaking, the above 2nd problem is still hard to solve.
+>
+> 1) take_cpu_down() shutdown managed IRQ first, then run teardown callback
+> for states in [CPUHP_AP_ONLINE, CPUHP_AP_OFFLINE) on the to-be-offline
+> CPU
+>
+> 2) However, all runnable tasks are removed from the CPU in the teardown
+> callback for CPUHP_AP_SCHED_STARTING, which is run after managed IRQs
+> are shutdown. That said it is hard to avoid new request queued to
+> the hctx with all DEAD CPUs.
+>
+> 3) we don't support to freeze queue for specific hctx yet, or that way
+> may not be accepted because of extra cost in fast path
+>
+> 4) once request is allocated, it should be submitted to driver no matter
+> if CPU hotplug happens or not. Or free it and re-allocate new request
+> on proper sw/hw queue?
+>
+>>
+>>>
+>>> Last time, it was reported that the patchset causes performance regression,
+>>> which is actually caused by duplicated io accounting in
+>>> blk_mq_queue_tag_busy_iter(),
+>>> which should be fixed easily.
+>>>
+>>> What do you think of this approach?
+>>
+>> It would still be good to have a forward port of this patchset for testing,
+>> if we're serious about it. Or at least this bug you mention fixed.
+>
+> I plan to make this patchset workable on 5.2-rc for your test first.
+>
+
+ok, thanks. I assume that we're still open to not adding support for 
+global tags in blk-mq, but rather the LLDD generating the unique tag 
+with sbitmap.
+
+Cheers,
+John
+
+>
+> Thanks,
+> Ming
+>
+> .
+>
+
 
