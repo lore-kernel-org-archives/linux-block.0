@@ -2,112 +2,259 @@ Return-Path: <SRS0=WD2t=T6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA3CC28CC0
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 09:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9739BC28CC0
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 10:46:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D724A256C0
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 09:50:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6638E257A0
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 10:46:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="LCpbGaIP"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZHcoAoPW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727418AbfE3Juw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 05:50:52 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34803 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727171AbfE3Juw (ORCPT
+        id S1726787AbfE3KqD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 06:46:03 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42469 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726450AbfE3KqD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 May 2019 05:50:52 -0400
-Received: by mail-wm1-f66.google.com with SMTP id e19so5667282wme.1
-        for <linux-block@vger.kernel.org>; Thu, 30 May 2019 02:50:50 -0700 (PDT)
+        Thu, 30 May 2019 06:46:03 -0400
+Received: by mail-wr1-f65.google.com with SMTP id l2so3867660wrb.9
+        for <linux-block@vger.kernel.org>; Thu, 30 May 2019 03:46:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amarulasolutions.com; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=iSdK26IrmOEc/B9VC/Q0XsQRMEkKcuvxsa2POFBAfWg=;
-        b=LCpbGaIPpV5r99H6iR6FLlmoZ3ctc0Wo0tAaXSBSHw6z4REiqnyT7PkFbOzd+UPe5l
-         sK0Z4FkJ1KPKDQ/Wssfmzm5JrLnfiFJaVvCUvp7coOL1SGorMfV3kiLVeRVzWKiJzycw
-         lGaUA5D/+pAfiiopfPIWvDalUZjZWblLTfOZg=
+        d=linaro.org; s=google;
+        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
+         :references;
+        bh=C4BgjhOQ5WaS5BA3N176Rm/rfCh1eKw3G7OX1NDf330=;
+        b=ZHcoAoPWP49Y2hs6v2CQOh3DuFecDqeF+g/Ha0Cx5554RiqUdqSjrUzEZQVawME5Cc
+         t+JWaCh6cNprvD3GC4CZfFFbIwJWiKzfGohC55oV4K0Na9RhHK/LLTzKj4xnTd5f2Gaq
+         0JUpqCX5DrLWJ666CabaEEq9HV3pSETTY2fM1u0f59YmtuRGzeuPmEfX7Ul8rAQX3yhS
+         Ph0H9Zx+IcE06NJeEbMaQwmxzJHsWPOOfQIj1iyCpkACP5B3j6lRRXABD3PpiTQiaHgC
+         vFDLvU0hiN5zArHGDOJyjx8412ViMLTh/x389UmROZNRRzaqxLyusdnuWtLi2exM6T65
+         4m9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=iSdK26IrmOEc/B9VC/Q0XsQRMEkKcuvxsa2POFBAfWg=;
-        b=SmItrxsGXrqAHvnnRWDSPVsBIIYtCSZt8uFOzmvIL38QXIy9qx5zNJMALaBdU+sBSw
-         RatLoGFyHIj0P/mRngnkfOobct3d0Ld/OP0pY+hpBFWkwNZiOUrKiH6jgkzRDXafusE9
-         ZEmAEtZiHVIy6cztYlQ3oc6djK7lQ4+mavIPfGkj6xeQDTR7eQBP7eV/SD6XvbUF8k5r
-         YoFu+cvBvO6TMDS+pJSiGsKmYwIl5RUSJtETOFPNFa47+F+IsmZngY8O3jdeOi14dZFq
-         Bp07ScX2HEAxico/iYYaSzWC6MAQJAz8wDavLrJQhCPa2GnBF8uYtSZpouYg2BobXIoW
-         7OFg==
-X-Gm-Message-State: APjAAAWhdLRG1gIB21EYJQDETE9ObZxDx1o4TbqjLVZq57xD+pd+MtoY
-        g6Zd665lEi9JwyiBFiwcceg3Qw==
-X-Google-Smtp-Source: APXvYqw3JemapasX1/My3YJlram8J8fq6dLm3PSfYNtI5KnSufTCDzzS1B4NA4dYJrfzNDS+QjZaeA==
-X-Received: by 2002:a1c:ca01:: with SMTP id a1mr1700893wmg.30.1559209849831;
-        Thu, 30 May 2019 02:50:49 -0700 (PDT)
-Received: from andrea (86.100.broadband17.iol.cz. [109.80.100.86])
-        by smtp.gmail.com with ESMTPSA id x68sm2239214wmf.13.2019.05.30.02.50.48
+        h=x-gm-message-state:from:message-id:mime-version:subject:date
+         :in-reply-to:cc:to:references;
+        bh=C4BgjhOQ5WaS5BA3N176Rm/rfCh1eKw3G7OX1NDf330=;
+        b=ckp0a0KYvjR9adJLWQmg619KDNb8a3+Zp5SNFbGiQ+4/anaN8bxq5PHT69IoO5qsri
+         WZsH8k1auqxNkS4ia2IR1ziOVopqe9dTdZu7SgjGIEOK3FVBbj8fmtUU43T4qd+g5s22
+         Jk4YWCXPYd8Ws6RBjuEnUgq+UabE5xiFDMsV3CtdL19D0LUJ4EqCEOydCbfS2Nni4GCP
+         3O8egRpoFldo30czVTi2EuFaYM8fvgHB8dcs2Il3DGHNG10Qe6QbTuBUSSf7sIQxUg8S
+         01f2fpqs3WFSLQXm0cBNSvACPK8Rfwk9275kvyGc9SAwi0wTfRspP7TF5fKIumXEp9me
+         zaUg==
+X-Gm-Message-State: APjAAAV1pmFT0g5RGMPJdT0rUBHoHdhCQSiqheSbLpAHDXX51ZaMu9gu
+        phCOvKEBHw57c5FM52XYTR4mLw==
+X-Google-Smtp-Source: APXvYqw1PXKaN2XzfkxrvWWIUxCH2bCO0CxsjAS2wAGmjr/lS4zV9Vzp6V0DJRzdzI6FdoPQh7Bf9w==
+X-Received: by 2002:adf:e408:: with SMTP id g8mr2145454wrm.143.1559213160542;
+        Thu, 30 May 2019 03:46:00 -0700 (PDT)
+Received: from [192.168.0.101] (84-33-71-35.dyn.eolo.it. [84.33.71.35])
+        by smtp.gmail.com with ESMTPSA id j123sm3875449wmb.32.2019.05.30.03.45.58
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 30 May 2019 02:50:48 -0700 (PDT)
-Date:   Thu, 30 May 2019 11:50:39 +0200
-From:   Andrea Parri <andrea.parri@amarulasolutions.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     David Howells <dhowells@redhat.com>, viro@zeniv.linux.org.uk,
-        raven@themaw.net, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-block@vger.kernel.org,
-        keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Will Deacon <will.deacon@arm.com>,
-        "Paul E. McKenney" <paulmck@linux.ibm.com>,
-        Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 1/7] General notification queue with user mmap()'able
- ring buffer
-Message-ID: <20190530095039.GA5137@andrea>
-References: <20190528231218.GA28384@kroah.com>
- <20190528162603.GA24097@kroah.com>
- <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk>
- <155905931502.7587.11705449537368497489.stgit@warthog.procyon.org.uk>
- <4031.1559064620@warthog.procyon.org.uk>
- <31936.1559146000@warthog.procyon.org.uk>
- <20190529231112.GB3164@kroah.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190529231112.GB3164@kroah.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        Thu, 30 May 2019 03:45:59 -0700 (PDT)
+From:   Paolo Valente <paolo.valente@linaro.org>
+Message-Id: <7B74A790-BD98-412B-ADAB-3B513FB1944E@linaro.org>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_D5FC080D-8BC9-40E2-AD6D-43794CA895EE";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+Date:   Thu, 30 May 2019 12:45:57 +0200
+In-Reply-To: <0d6e3c02-1952-2177-02d7-10ebeb133940@csail.mit.edu>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Jeff Moyer <jmoyer@redhat.com>, Theodore Ts'o <tytso@mit.edu>,
+        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
+ <46c6a4be-f567-3621-2e16-0e341762b828@csail.mit.edu>
+ <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
+ <A0DFE635-EFEC-4670-AD70-5D813E170BEE@linaro.org>
+ <5B6570A2-541A-4CF8-98E0-979EA6E3717D@linaro.org>
+ <2CB39B34-21EE-4A95-A073-8633CF2D187C@linaro.org>
+ <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
+ <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
+ <F5E29C98-6CC4-43B8-994D-0B5354EECBF3@linaro.org>
+ <686D6469-9DE7-4738-B92A-002144C3E63E@linaro.org>
+ <01d55216-5718-767a-e1e6-aadc67b632f4@csail.mit.edu>
+ <CA8A23E2-6F22-4444-9A20-E052A94CAA9B@linaro.org>
+ <cc148388-3c82-d7c0-f9ff-8c31bb5dc77d@csail.mit.edu>
+ <6FE0A98F-1E3D-4EF6-8B38-2C85741924A4@linaro.org>
+ <2A58C239-EF3F-422B-8D87-E7A3B500C57C@linaro.org>
+ <a04368ba-f1d5-8f2c-1279-a685a137d024@csail.mit.edu>
+ <E270AD92-943E-4529-8158-AB480D6D9DF8@linaro.org>
+ <5b71028c-72f0-73dd-0cd5-f28ff298a0a3@csail.mit.edu>
+ <FFA44D26-75FF-4A8E-A331-495349BE5FFC@linaro.org>
+ <0d6e3c02-1952-2177-02d7-10ebeb133940@csail.mit.edu>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > Looking at the perf ring buffer, there appears to be a missing barrier in
-> > perf_aux_output_end():
-> > 
-> > 	rb->user_page->aux_head = rb->aux_head;
-> > 
-> > should be:
-> > 
-> > 	smp_store_release(&rb->user_page->aux_head, rb->aux_head);
-> > 
-> > It should also be using smp_load_acquire().  See
-> > Documentation/core-api/circular-buffers.rst
-> > 
-> > And a (partial) patch has been proposed: https://lkml.org/lkml/2018/5/10/249
-> 
-> So, if that's all that needs to be fixed, can you use the same
-> buffer/code if that patch is merged?
 
-That's about one year old...: let me add the usual suspects in Cc:  ;-)
-since I'm not sure what the plan was (or if I'm missing something) ...
+--Apple-Mail=_D5FC080D-8BC9-40E2-AD6D-43794CA895EE
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-Speaking of ring buffer implementations (and relatively "old" patches),
-here's another quite interesting:
 
-  https://lkml.kernel.org/r/20181211034032.32338-1-yuleixzhang@tencent.com
 
-Thanks,
-  Andrea
+> Il giorno 30 mag 2019, alle ore 10:29, Srivatsa S. Bhat =
+<srivatsa@csail.mit.edu> ha scritto:
+>=20
+> On 5/29/19 12:41 AM, Paolo Valente wrote:
+>>=20
+>>=20
+>>> Il giorno 29 mag 2019, alle ore 03:09, Srivatsa S. Bhat =
+<srivatsa@csail.mit.edu> ha scritto:
+>>>=20
+>>> On 5/23/19 11:51 PM, Paolo Valente wrote:
+>>>>=20
+>>>>> Il giorno 24 mag 2019, alle ore 01:43, Srivatsa S. Bhat =
+<srivatsa@csail.mit.edu> ha scritto:
+>>>>>=20
+>>>>> When trying to run multiple dd tasks simultaneously, I get the =
+kernel
+>>>>> panic shown below (mainline is fine, without these patches).
+>>>>>=20
+>>>>=20
+>>>> Could you please provide me somehow with a list =
+*(bfq_serv_to_charge+0x21) ?
+>>>>=20
+>>>=20
+>>> Hi Paolo,
+>>>=20
+>>> Sorry for the delay! Here you go:
+>>>=20
+>>> (gdb) list *(bfq_serv_to_charge+0x21)
+>>> 0xffffffff814bad91 is in bfq_serv_to_charge =
+(./include/linux/blkdev.h:919).
+>>> 914
+>>> 915	extern unsigned int blk_rq_err_bytes(const struct request *rq);
+>>> 916
+>>> 917	static inline unsigned int blk_rq_sectors(const struct request =
+*rq)
+>>> 918	{
+>>> 919		return blk_rq_bytes(rq) >> SECTOR_SHIFT;
+>>> 920	}
+>>> 921
+>>> 922	static inline unsigned int blk_rq_cur_sectors(const struct =
+request *rq)
+>>> 923	{
+>>> (gdb)
+>>>=20
+>>>=20
+>>> For some reason, I've not been able to reproduce this issue after
+>>> reporting it here. (Perhaps I got lucky when I hit the kernel panic
+>>> a bunch of times last week).
+>>>=20
+>>> I'll test with your fix applied and see how it goes.
+>>>=20
+>>=20
+>> Great!  the offending line above gives me hope that my fix is =
+correct.
+>> If no more failures occur, then I'm eager (and a little worried ...)
+>> to see how it goes with throughput :)
+>>=20
+>=20
+> Your fix held up well under my testing :)
+>=20
+
+Great!
+
+> As for throughput, with low_latency =3D 1, I get around 1.4 MB/s with
+> bfq (vs 1.6 MB/s with mq-deadline). This is a huge improvement
+> compared to what it was before (70 KB/s).
+>=20
+
+That's beautiful news!
+
+So, now we have the best of the two worlds: maximum throughput and
+total control on I/O (including minimum latency for interactive and
+soft real-time applications).  Besides, no manual configuration
+needed.  Of course, this holds unless/until you find other flaws ... ;)
+
+> With tracing on, the throughput is a bit lower (as expected I guess),
+> about 1 MB/s, and the corresponding trace file
+> (trace-waker-detection-1MBps) is available at:
+>=20
+> https://www.dropbox.com/s/3roycp1zwk372zo/bfq-traces.tar.gz?dl=3D0
+>=20
+
+Thank you for the new trace.  I've analyzed it carefully, and, as I
+imagined, this residual 12% throughput loss is due to a couple of
+heuristics that occasionally get something wrong.  Most likely, ~12%
+is the worst-case loss, and if one repeats the tests, the loss may be
+much lower in some runs.
+
+I think it is very hard to eliminate this fluctuation while keeping
+full I/O control.  But, who knows, I might have some lucky idea in the
+future.
+
+At any rate, since you pointed out that you are interested in
+out-of-the-box performance, let me complete the context: in case
+low_latency is left set, one gets, in return for this 12% loss,
+a) at least 1000% higher responsiveness, e.g., 1000% lower start-up
+times of applications under load [1];
+b) 500-1000% higher throughput in multi-client server workloads, as I
+already pointed out [2].
+
+I'm going to prepare complete patches.  In addition, if ok for you,
+I'll report these results on the bug you created.  Then I guess we can
+close it.
+
+[1] https://algo.ing.unimo.it/people/paolo/disk_sched/results.php
+[2] =
+https://www.linaro.org/blog/io-bandwidth-management-for-production-quality=
+-services/
+
+> Thank you so much for your tireless efforts in fixing this issue!
+>=20
+
+I did enjoy working on this with you: your test case and your support
+enabled me to make important improvements.  So, thank you very much
+for your collaboration so far,
+Paolo
+
+
+> Regards,
+> Srivatsa
+> VMware Photon OS
+
+
+--Apple-Mail=_D5FC080D-8BC9-40E2-AD6D-43794CA895EE
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAlzvtGUACgkQOAkCLQGo
+9oNVJw//fwlcfMSVaKx721kD5B4qn6aWHMN4d2RzIDbrJh88OKMa9IDy70+NPqXq
+dEDMwLetb/KsF3Ox2dEaWt+NTwIW9/AzzdIZSwuwMvuZVR606rmQhqcBfW5uhQuF
+WKozLzC5VPIJLowgpYmWSQ+q283Ufsl4R/dGyaXBwYx8qRFarjsKQe+v+ozzzM+8
+m8c0nf5K17nwsMVLAk7HizOAUosP+kHkNILsgXV9gu2RpPc1LE3SYHF5ujfnR8lh
+3t4PJdH7r1gi4vRcyqVZvW9i15bhgUgQNlJARvgA9EeV5ekQQbY6a/ywds3z8CTV
+fSlCJt9xsqqz7cxf4BQUiBud2UTv1NoVCMTYwDJ4AK4r9hffMpy1iyhMyhx9Q8WE
++jOpntWPeMyU8RCnV87pKo3ELzIlMpucCxTvlRAoZBmEltuQn/DvUGv0N0YizeIF
+s99H14r4yrNKsQSzna6qyE+FAs+QpUHpXV44IHVZzhyXesxqPtaju/LisYCIilNs
+GAVcHW9JIv68KdAMq3t5EX/XXfn/v9/3/8vY1UrhGafcJu9JkJW0Z5UyjzRctRC0
+3UmIgpEWz9+mAjPuIboYbmL1uHaUcfxNUwqr38/rEv2rMm0zzd3ipHzzJCIS09NX
+OjDXhgG+zqvWE7H8OC7Sqxg8ZUKpKPkhJRi8m0MrZsl7GYaM9Ok=
+=sgcb
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_D5FC080D-8BC9-40E2-AD6D-43794CA895EE--
