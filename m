@@ -2,197 +2,103 @@ Return-Path: <SRS0=WD2t=T6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22ED5C072B1
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 04:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCBFFC46470
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 04:14:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E55DC25177
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 04:11:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hgCnqefD"
+	by mail.kernel.org (Postfix) with ESMTP id 9BF98251EB
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 04:14:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1559189656;
+	bh=nI/XTBVuAqM8axkiFf/VzEf3Bc+uambo+F/BfG6LJJ8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=lba8nzuCtB4UhylQOrLylbu2eAKgJ0d95a21NRVyeKH95C1ToMMAJ+Rx0cVUjxi1+
+	 AutQe9b/zqBsfFQxgG+9JQugduRwYbqHBJykaPnPLDBs/DnP7gjw5ixU71p4O5Avsp
+	 UNOIHw7nDuVcaJATyROXncagsHChFZWs10ZUXaq8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726820AbfE3ELf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 00:11:35 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36824 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726945AbfE3ELa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 May 2019 00:11:30 -0400
-Received: by mail-wr1-f66.google.com with SMTP id n4so100954wrs.3;
-        Wed, 29 May 2019 21:11:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=h0T/MeUzCgmPrR3gk4K6fixpQQCnUhC4n3eE1p0lqFk=;
-        b=hgCnqefDl/JBYEu4+rVNRoDQ7aPZCmlANqR5qlyPz6/nnL28KsHj+EQ+oreogGLjsr
-         49zHHIs20aSdki49ikhvYEphqoaOKPHLxpS9QT0x0sDy0AvEZtAvUljqKxeG3GfnCQJO
-         F0L0iaJYn6wWdW0OO7FgacQQZqgyTbfa5CRutqF0vO71aLqR2nvafmfuSLco9oiO7lLa
-         xbdQhurZPhGnsa8IHWRD/fta8zBPRQfx6bHq9Nxs2/E2qmEf36Mtab55petXEO/xJsle
-         QUp/GiiZ8KyeuZFDLjw7eEjCFRXgNrDOKf6bAS7eMAY5GLtOdkGssTqQZVUlotsPCTfQ
-         axQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=h0T/MeUzCgmPrR3gk4K6fixpQQCnUhC4n3eE1p0lqFk=;
-        b=feiRG1ykqG5Ity79nFKQI7VVAlIw+NVUeAoSFlTwz89YVFDFyPzVjNU5atcHaR9RSO
-         OvKqy7bV/G4fXfh0KzKMy65Hacp0hIkkXii/ZLdMYTmPm7KBc2u2//oU8idXycQ8ZMwa
-         1FRjCc7u06+EA8WZCqjfmdHeA+7/5xHeHYrcXYJhP2AljobUZlAC0XUgImGCO2t86ZER
-         LaHbY4lITCBGM5Xz6MV4S5pPgLZb9Aa2nwkeTEI3c+3CKm5ySBLi+9NtgmQm4p5K6aNb
-         iKBS/j8JPBH4Hn7CKP+PHfds8o5E1AGcVqzfvPUBnjmShHsrj+c3pM0v4pjqorAQg2PU
-         mEKA==
-X-Gm-Message-State: APjAAAVvBs9or7N9T8tcpksD907OSPdmbKkpcpTq4ykQbfaG8dBSSbJx
-        YdGWANzPE/z2MoVwYz1Nq5zt2WbONNk9g0dd3AI=
-X-Google-Smtp-Source: APXvYqygV+uOyMtAemWnhhiWiShh7/TIAUUBWaiU/a5IN+a5xO/PuxK6M2Z/CWDO1fezb5B4lXERYXzMhvkF61hJhQ8=
-X-Received: by 2002:adf:fbc2:: with SMTP id d2mr947614wrs.334.1559189488864;
- Wed, 29 May 2019 21:11:28 -0700 (PDT)
+        id S1726935AbfE3EOK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 00:14:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41614 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730628AbfE3DQO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 May 2019 23:16:14 -0400
+Received: from localhost (ip67-88-213-2.z213-88-67.customer.algx.net [67.88.213.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D1EE22458C;
+        Thu, 30 May 2019 03:16:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559186173;
+        bh=nI/XTBVuAqM8axkiFf/VzEf3Bc+uambo+F/BfG6LJJ8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=DX6gHY10iCkuSwf0n2bw1Rf2XE48MVQOehV+NSaEgAJGS4Ns+bHYcr7pq7oW9v9Na
+         GC2WMOq1fuN59VdQeYI0YoRBmmzTsLGzLLrWwc7x+lmoxUCSj9jpSJTMjLjg8uSTAm
+         wIwUaCnmCufAbLciI+zdnun59RQ71zf7PhHieutw=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, "Paul E. McKenney" <paulmck@linux.ibm.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrea Parri <andrea.parri@amarulasolutions.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: [PATCH 4.19 007/276] sbitmap: fix improper use of smp_mb__before_atomic()
+Date:   Wed, 29 May 2019 20:02:45 -0700
+Message-Id: <20190530030523.903699362@linuxfoundation.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190530030523.133519668@linuxfoundation.org>
+References: <20190530030523.133519668@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-References: <20190527150207.11372-1-ming.lei@redhat.com> <20190527150207.11372-6-ming.lei@redhat.com>
- <45daceb4-fb88-a835-8cc6-cd4c4d7cf42d@huawei.com> <20190529022852.GA21398@ming.t460p>
- <20190529024200.GC21398@ming.t460p> <5bc07fd5-9d2b-bf9c-eb77-b8cebadb9150@huawei.com>
- <20190529101028.GA15496@ming.t460p> <CACVXFVODeFDPHxWkdnY5CZoOJ0did4mi_ap-aXk0oo+Cp05aUQ@mail.gmail.com>
- <94964048-b867-8610-71ea-0275651f8b77@huawei.com> <20190530022810.GA16730@ming.t460p>
-In-Reply-To: <20190530022810.GA16730@ming.t460p>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Thu, 30 May 2019 12:11:17 +0800
-Message-ID: <CACVXFVN729SgFQGUgmu1iN7P6Mv5+puE78STz8hj9J5bS828Ng@mail.gmail.com>
-Subject: Re: [PATCH V2 5/5] blk-mq: Wait for for hctx inflight requests on CPU unplug
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 30, 2019 at 10:28 AM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Wed, May 29, 2019 at 05:10:38PM +0100, John Garry wrote:
-> >
-> > > >
-> > > > And we should be careful to handle the multiple reply queue case, given the queue
-> > > > shouldn't be stopped or quieseced because other reply queues are still active.
-> > > >
-> > > > The new CPUHP state for blk-mq should be invoked after the to-be-offline
-> > > > CPU is quiesced and before it becomes offline.
-> > >
-> > > Hi John,
-> > >
-> >
-> > Hi Ming,
-> >
-> > > Thinking of this issue further, so far, one doable solution is to
-> > > expose reply queues
-> > > as blk-mq hw queues, as done by the following patchset:
-> > >
-> > > https://lore.kernel.org/linux-block/20180205152035.15016-1-ming.lei@redhat.com/
-> >
-> > I thought that this patchset had fundamental issues, in terms of working for
-> > all types of hosts. FYI, I did the backport of latest hisi_sas_v3 to v4.15
->
-> Could you explain it a bit about the fundamental issues for all types of
-> host?
->
-> It is just for hosts with multiple reply queues, such as hisi_sas v3,
-> megaraid_sas, mpt3sas and hpsa.
->
-> > with this patchset (as you may have noticed in my git send mistake), but we
-> > have not got to test it yet.
-> >
-> > On a related topic, we did test exposing reply queues as blk-mq hw queues
-> > and generating the host-wide tag internally in the LLDD with sbitmap, and
-> > unfortunately we were experiencing a significant performance hit, like 2300K
-> > -> 1800K IOPs for 4K read.
-> >
-> > We need to test this further. I don't understand why we get such a big hit.
->
-> The performance regression shouldn't have been introduced in theory, and it is
-> because blk_mq_queue_tag_busy_iter() iterates over the same duplicated tags multiple
-> times, which can be fixed easily.
->
-> >
-> > >
-> > > In which global host-wide tags are shared for all blk-mq hw queues.
-> > >
-> > > Also we can remove all the reply_map stuff in drivers, then solve the problem of
-> > > draining in-flight requests during unplugging CPU in a generic approach.
-> >
-> > So you're saying that removing this reply queue stuff can make the solution
-> > to the problem more generic, but do you have an idea of the overall
-> > solution?
->
-> 1) convert reply queue into blk-mq hw queue first
->
-> 2) then all drivers are in same position wrt. handling requests vs.
-> unplugging CPU (shutdown managed IRQ)
->
-> The current handling in blk_mq_hctx_notify_dead() is actually wrong,
-> at that time, all CPUs on the hctx are dead, blk_mq_run_hw_queue()
-> still dispatches requests on driver's hw queue, and driver is invisible
-> to DEAD CPUs mapped to this hctx, and finally interrupt for these
-> requests on the hctx are lost.
->
-> Frankly speaking, the above 2nd problem is still hard to solve.
->
-> 1) take_cpu_down() shutdown managed IRQ first, then run teardown callback
-> for states in [CPUHP_AP_ONLINE, CPUHP_AP_OFFLINE) on the to-be-offline
-> CPU
->
-> 2) However, all runnable tasks are removed from the CPU in the teardown
-> callback for CPUHP_AP_SCHED_STARTING, which is run after managed IRQs
-> are shutdown. That said it is hard to avoid new request queued to
-> the hctx with all DEAD CPUs.
->
-> 3) we don't support to freeze queue for specific hctx yet, or that way
-> may not be accepted because of extra cost in fast path
->
-> 4) once request is allocated, it should be submitted to driver no matter
-> if CPU hotplug happens or not. Or free it and re-allocate new request
-> on proper sw/hw queue?
+From: Andrea Parri <andrea.parri@amarulasolutions.com>
 
-That looks doable, we may steal bios from the old in-queue request, then
-re-submit them via generic_make_request(), and finally free the old request,
-but RQF_DONTPREP has to be addressed via one new callback.
+commit a0934fd2b1208458e55fc4b48f55889809fce666 upstream.
 
-So follows the overall solution for waiting request vs. CPU hotplug,
-which is done
-in two stages:
+This barrier only applies to the read-modify-write operations; in
+particular, it does not apply to the atomic_set() primitive.
 
-1) in the teardown callback of new  CPUHP state of CPUHP_BLK_MQ_PREP,
-which is run before CPUHP_AP_ONLINE_IDLE,  at that time the CPU & managed
-IRQ is still alive:
+Replace the barrier with an smp_mb().
 
-- stopped the hctx
-- wait in-flight requests from this hctx until all are completed
+Fixes: 6c0ca7ae292ad ("sbitmap: fix wakeup hang after sbq resize")
+Cc: stable@vger.kernel.org
+Reported-by: "Paul E. McKenney" <paulmck@linux.ibm.com>
+Reported-by: Peter Zijlstra <peterz@infradead.org>
+Signed-off-by: Andrea Parri <andrea.parri@amarulasolutions.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org
+Cc: "Paul E. McKenney" <paulmck@linux.ibm.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-2) in the teardown callback of CPUHP_BLK_MQ_DEAD, which is run
-after the CPU is dead
+---
+ lib/sbitmap.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- dequeue request queued in sw queue or scheduler queue from this hctx
-- steal bios from the dequeued request, and re-submit them via
-generic_make_request()
-- free the dequeued request, and need to free driver resource via new
-callback for
-RQF_DONTPREP, looks only SCSI needs it.
-- restart this hctx
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -356,7 +356,7 @@ static void sbitmap_queue_update_wake_ba
+ 		 * to ensure that the batch size is updated before the wait
+ 		 * counts.
+ 		 */
+-		smp_mb__before_atomic();
++		smp_mb();
+ 		for (i = 0; i < SBQ_WAIT_QUEUES; i++)
+ 			atomic_set(&sbq->ws[i].wait_cnt, 1);
+ 	}
 
 
-Thanks,
-Ming Lei
