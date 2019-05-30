@@ -2,102 +2,102 @@ Return-Path: <SRS0=WD2t=T6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 034AEC28CC2
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 04:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63CD5C28CC0
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 07:53:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D173326049
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 04:59:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559192349;
-	bh=5HFNcEidiS625lqjNdCy7zgxF5XscqP3STPmvUdBR2o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=L+lNZDV62eNRTljq8+N27CsyM340Ci9m5az7prIone0V3RgdhOx+8vOiCA8Uo4bD9
-	 wHlAfiz1QjroD+uCr+pjU6E6zyVlRjSRbGsa94QEJlq1w/8fH98PUNEvBoccEzOKnP
-	 xO58ufyQpQ7rNoNF+9/Ajf45Ngxe2y2Ub1by69FU=
+	by mail.kernel.org (Postfix) with ESMTP id 3DBCE25763
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 07:53:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727728AbfE3DJn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 May 2019 23:09:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44662 "EHLO mail.kernel.org"
+        id S1726118AbfE3Hx6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 03:53:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51672 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727721AbfE3DJn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 May 2019 23:09:43 -0400
-Received: from localhost (ip67-88-213-2.z213-88-67.customer.algx.net [67.88.213.2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726027AbfE3Hx6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 May 2019 03:53:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 908D82447A;
-        Thu, 30 May 2019 03:09:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559185782;
-        bh=5HFNcEidiS625lqjNdCy7zgxF5XscqP3STPmvUdBR2o=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BghmTt6JjHA1mVdalHzbGxD9GLa+1QuKPsLV9qGnIxBz1BqNQ94irMWhmfeaDKKK1
-         X1zEQx5WXmjA9+LFSpVgZmeCLYrKhYouoJQM+rScFP9aeC5ZosN4QK1CUC8fCzdONQ
-         TI7AIz5RBKVK1wFWHim+nwld3RFqptBIn5XCps2g=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, "Paul E. McKenney" <paulmck@linux.ibm.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrea Parri <andrea.parri@amarulasolutions.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 5.1 006/405] bio: fix improper use of smp_mb__before_atomic()
-Date:   Wed, 29 May 2019 20:00:04 -0700
-Message-Id: <20190530030540.693129039@linuxfoundation.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190530030540.291644921@linuxfoundation.org>
-References: <20190530030540.291644921@linuxfoundation.org>
-User-Agent: quilt/0.66
+        by mx1.redhat.com (Postfix) with ESMTPS id 07D0730001DD;
+        Thu, 30 May 2019 07:53:58 +0000 (UTC)
+Received: from rhel3.localdomain (ovpn-12-96.pek2.redhat.com [10.72.12.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 378E75DD74;
+        Thu, 30 May 2019 07:53:52 +0000 (UTC)
+From:   xiubli@redhat.com
+To:     josef@toxicpanda.com, axboe@kernel.dk, nbd@other.debian.org
+Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, atumball@redhat.com,
+        Xiubo Li <xiubli@redhat.com>
+Subject: [PATCH] nbd: no need to check all the connections one by one if all are dead
+Date:   Thu, 30 May 2019 15:53:25 +0800
+Message-Id: <20190530075325.123109-1-xiubli@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 30 May 2019 07:53:58 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Andrea Parri <andrea.parri@amarulasolutions.com>
+From: Xiubo Li <xiubli@redhat.com>
 
-commit f381c6a4bd0ae0fde2d6340f1b9bb0f58d915de6 upstream.
+If all connections are dead the live_connections should be already
+set to 0. And set the nsock->fallback to -1 again if all connections
+are dead.
 
-This barrier only applies to the read-modify-write operations; in
-particular, it does not apply to the atomic_set() primitive.
-
-Replace the barrier with an smp_mb().
-
-Fixes: dac56212e8127 ("bio: skip atomic inc/dec of ->bi_cnt for most use cases")
-Cc: stable@vger.kernel.org
-Reported-by: "Paul E. McKenney" <paulmck@linux.ibm.com>
-Reported-by: Peter Zijlstra <peterz@infradead.org>
-Signed-off-by: Andrea Parri <andrea.parri@amarulasolutions.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org
-Cc: "Paul E. McKenney" <paulmck@linux.ibm.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
+Signed-off-by: Xiubo Li <xiubli@redhat.com>
 ---
- include/linux/bio.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/nbd.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -224,7 +224,7 @@ static inline void bio_cnt_set(struct bi
- {
- 	if (count != 1) {
- 		bio->bi_flags |= (1 << BIO_REFFED);
--		smp_mb__before_atomic();
-+		smp_mb();
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 98be6ca..6da42aa 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -783,13 +783,16 @@ static int find_fallback(struct nbd_device *nbd, int index)
+ 		return new_index;
  	}
- 	atomic_set(&bio->__bi_cnt, count);
+ 
++	if (atomic_read(&config->live_connections) <= 0) {
++		dev_err_ratelimited(disk_to_dev(nbd->disk),
++				    "Dead connection, failed to find a fallback\n");
++		goto out;
++	}
++
+ 	if (fallback >= 0 && fallback < config->num_connections &&
+-	    !config->socks[fallback]->dead)
++		!config->socks[fallback]->dead) {
+ 		return fallback;
+-
+-	if (nsock->fallback_index < 0 ||
+-	    nsock->fallback_index >= config->num_connections ||
+-	    config->socks[nsock->fallback_index]->dead) {
++	} else {
+ 		int i;
+ 		for (i = 0; i < config->num_connections; i++) {
+ 			if (i == index)
+@@ -799,14 +802,10 @@ static int find_fallback(struct nbd_device *nbd, int index)
+ 				break;
+ 			}
+ 		}
+-		nsock->fallback_index = new_index;
+-		if (new_index < 0) {
+-			dev_err_ratelimited(disk_to_dev(nbd->disk),
+-					    "Dead connection, failed to find a fallback\n");
+-			return new_index;
+-		}
+ 	}
+-	new_index = nsock->fallback_index;
++
++out:
++	nsock->fallback_index = new_index;
+ 	return new_index;
  }
-
+ 
+-- 
+1.8.3.1
 
