@@ -2,134 +2,142 @@ Return-Path: <SRS0=WD2t=T6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4816AC28CC0
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 08:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C2CC28CC0
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 08:39:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 26A9A25117
-	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 08:33:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9C71251F9
+	for <linux-block@archiver.kernel.org>; Thu, 30 May 2019 08:39:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726446AbfE3Idu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 04:33:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48970 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726439AbfE3Idu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 May 2019 04:33:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 16F02307D988;
-        Thu, 30 May 2019 08:33:50 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-12-133.pek2.redhat.com [10.72.12.133])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ABE025DD74;
-        Thu, 30 May 2019 08:33:46 +0000 (UTC)
-Subject: Re: [PATCH blktests] block: add queue freeze/unfreeze sequence test
-To:     Bob Liu <bob.liu@oracle.com>, linux-block@vger.kernel.org
-Cc:     osandov@fb.com
-References: <20190529090027.25224-1-bob.liu@oracle.com>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Message-ID: <4804a370-c710-7434-ce02-8f5447b7e1f5@redhat.com>
-Date:   Thu, 30 May 2019 16:33:39 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726798AbfE3IjH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 04:39:07 -0400
+Received: from outgoing-stata.csail.mit.edu ([128.30.2.210]:56549 "EHLO
+        outgoing-stata.csail.mit.edu" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726439AbfE3IjG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 May 2019 04:39:06 -0400
+Received: from c-73-193-85-113.hsd1.wa.comcast.net ([73.193.85.113] helo=srivatsab-a01.vmware.com)
+        by outgoing-stata.csail.mit.edu with esmtpsa (TLS1.2:RSA_AES_128_CBC_SHA1:128)
+        (Exim 4.82)
+        (envelope-from <srivatsa@csail.mit.edu>)
+        id 1hWGaT-000Qui-MV; Thu, 30 May 2019 04:39:01 -0400
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+From:   "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        jmoyer@redhat.com, Theodore Ts'o <tytso@mit.edu>,
+        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com
+References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
+ <1812E450-14EF-4D5A-8F31-668499E13652@linaro.org>
+ <46c6a4be-f567-3621-2e16-0e341762b828@csail.mit.edu>
+ <07D11833-8285-49C2-943D-E4C1D23E8859@linaro.org>
+ <A0DFE635-EFEC-4670-AD70-5D813E170BEE@linaro.org>
+ <5B6570A2-541A-4CF8-98E0-979EA6E3717D@linaro.org>
+ <2CB39B34-21EE-4A95-A073-8633CF2D187C@linaro.org>
+ <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
+ <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
+ <F5E29C98-6CC4-43B8-994D-0B5354EECBF3@linaro.org>
+ <686D6469-9DE7-4738-B92A-002144C3E63E@linaro.org>
+ <01d55216-5718-767a-e1e6-aadc67b632f4@csail.mit.edu>
+ <CA8A23E2-6F22-4444-9A20-E052A94CAA9B@linaro.org>
+ <cc148388-3c82-d7c0-f9ff-8c31bb5dc77d@csail.mit.edu>
+ <a0096333-55c0-eb30-87fc-d63b5e285b99@csail.mit.edu>
+Message-ID: <c2a6f85b-389a-7c0a-4a5d-f1312d6831cd@csail.mit.edu>
+Date:   Thu, 30 May 2019 01:38:59 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190529090027.25224-1-bob.liu@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <a0096333-55c0-eb30-87fc-d63b5e285b99@csail.mit.edu>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Thu, 30 May 2019 08:33:50 +0000 (UTC)
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-You should add the 022.out file
+On 5/23/19 4:32 PM, Srivatsa S. Bhat wrote:
+> On 5/22/19 7:30 PM, Srivatsa S. Bhat wrote:
+>> On 5/22/19 3:54 AM, Paolo Valente wrote:
+>>>
+>>>
+>>>> Il giorno 22 mag 2019, alle ore 12:01, Srivatsa S. Bhat <srivatsa@csail.mit.edu> ha scritto:
+>>>>
+>>>> On 5/22/19 2:09 AM, Paolo Valente wrote:
+>>>>>
+>>>>> First, thank you very much for testing my patches, and, above all, for
+>>>>> sharing those huge traces!
+>>>>>
+>>>>> According to the your traces, the residual 20% lower throughput that you
+>>>>> record is due to the fact that the BFQ injection mechanism takes a few
+>>>>> hundredths of seconds to stabilize, at the beginning of the workload.
+>>>>> During that setup time, the throughput is equal to the dreadful ~60-90 KB/s
+>>>>> that you see without this new patch.  After that time, there
+>>>>> seems to be no loss according to the trace.
+>>>>>
+>>>>> The problem is that a loss lasting only a few hundredths of seconds is
+>>>>> however not negligible for a write workload that lasts only 3-4
+>>>>> seconds.  Could you please try writing a larger file?
+>>>>>
+>>>>
+>>>> I tried running dd for longer (about 100 seconds), but still saw around
+>>>> 1.4 MB/s throughput with BFQ, and between 1.5 MB/s - 1.6 MB/s with
+>>>> mq-deadline and noop.
+>>>
+>>> Ok, then now the cause is the periodic reset of the mechanism.
+>>>
+>>> It would be super easy to fill this gap, by just gearing the mechanism
+>>> toward a very aggressive injection.  The problem is maintaining
+>>> control.  As you can imagine from the performance gap between CFQ (or
+>>> BFQ with malfunctioning injection) and BFQ with this fix, it is very
+>>> hard to succeed in maximizing the throughput while at the same time
+>>> preserving control on per-group I/O.
+>>>
+>>
+>> Ah, I see. Just to make sure that this fix doesn't overly optimize for
+>> total throughput (because of the testcase we've been using) and end up
+>> causing regressions in per-group I/O control, I ran a test with
+>> multiple simultaneous dd instances, each writing to a different
+>> portion of the filesystem (well separated, to induce seeks), and each
+>> dd task bound to its own blkio cgroup. I saw similar results with and
+>> without this patch, and the throughput was equally distributed among
+>> all the dd tasks.
+>>
+> Actually, it turns out that I ran the dd tasks directly on the block
+> device for this experiment, and not on top of ext4. I'll redo this on
+> ext4 and report back soon.
+> 
 
-diff --git a/tests/block/022.out b/tests/block/022.out
-new file mode 100644
-index 0000000..14d43cb
---- /dev/null
-+++ b/tests/block/022.out
-@@ -0,0 +1,2 @@
-+Running block/022
-+Test complete
+With all your patches applied (including waker detection for the low
+latency case), I ran four simultaneous dd instances, each writing to a
+different ext4 partition, and each dd task bound to its own blkio
+cgroup.  The throughput continued to be well distributed among the dd
+tasks, as shown below (I increased dd's block size from 512B to 8KB
+for these experiments to get double-digit throughput numbers, so as to
+make comparisons easier).
 
-On 5/29/19 5:00 PM, Bob Liu wrote:
-> Reproduce the hang fixed by
-> 7996a8b5511a ("blk-mq: fix hang caused by freeze/unfreeze sequence").
->
-> Signed-off-by: Bob Liu <bob.liu@oracle.com>
-> ---
->   tests/block/022 | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 59 insertions(+)
->   create mode 100755 tests/block/022
->
-> diff --git a/tests/block/022 b/tests/block/022
-> new file mode 100755
-> index 0000000..e3ac197
-> --- /dev/null
-> +++ b/tests/block/022
-> @@ -0,0 +1,59 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2019 Bob Liu <bob.liu@oracle.com>
-> +#
-> +# Test hang caused by freeze/unfreeze sequence. Regression
-> +# test for 7996a8b5511a ("blk-mq: fix hang caused by freeze/unfreeze sequence").
-> +
-> +. tests/block/rc
-> +. common/null_blk
-> +
-> +DESCRIPTION="Test hang caused by freeze/unfreeze sequence"
-> +TIMED=1
-> +
-> +requires() {
-> +	_have_null_blk && _have_module_param null_blk shared_tags
-> +}
-> +
-> +hotplug_test() {
-> +	while :
-> +	do
-> +		echo 1 > /sys/kernel/config/nullb/"$1"/power
-> +		echo 0 > /sys/kernel/config/nullb/"$1"/power
-> +	done
-> +}
-> +
-> +test() {
-> +	echo "Running ${TEST_NAME}"
-> +	: "${TIMEOUT:=30}"
-> +
-> +	if ! _init_null_blk shared_tags=1 nr_devices=0 queue_mode=2; then
-> +		return 1
-> +	fi
-> +
-> +	mkdir -p /sys/kernel/config/nullb/0
-> +	mkdir -p /sys/kernel/config/nullb/1
-> +	hotplug_test 0 &
-> +	pid0=$!
-> +	hotplug_test 1 &
-> +	pid1=$!
-> +
-> +	#bind process to two different CPU
-> +	taskset -p 1 $pid0 >/dev/null
-> +	taskset -p 2 $pid1 >/dev/null
-> +
-> +	sleep "$TIMEOUT"
-> +	{
-> +		kill -9 $pid0
-> +		wait $pid0
-> +		kill -9 $pid1
-> +		wait $pid1
-> +	} 2>/dev/null
-> +
-> +	rmdir /sys/kernel/config/nullb/1
-> +	rmdir /sys/kernel/config/nullb/0
-> +
-> +	_exit_null_blk
-> +	echo "Test complete"
-> +}
-> +
+bfq with low_latency = 1:
+
+819200000 bytes (819 MB, 781 MiB) copied, 16452.6 s, 49.8 kB/s
+819200000 bytes (819 MB, 781 MiB) copied, 17139.6 s, 47.8 kB/s
+819200000 bytes (819 MB, 781 MiB) copied, 17251.7 s, 47.5 kB/s
+819200000 bytes (819 MB, 781 MiB) copied, 17384 s, 47.1 kB/s
+
+bfq with low_latency = 0:
+
+819200000 bytes (819 MB, 781 MiB) copied, 16257.9 s, 50.4 kB/s
+819200000 bytes (819 MB, 781 MiB) copied, 17204.5 s, 47.6 kB/s
+819200000 bytes (819 MB, 781 MiB) copied, 17220.6 s, 47.6 kB/s
+819200000 bytes (819 MB, 781 MiB) copied, 17348.1 s, 47.2 kB/s
+ 
+Regards,
+Srivatsa
+VMware Photon OS
