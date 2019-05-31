@@ -6,49 +6,50 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B37C28CC0
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA130C28CC0
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A8D225972
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADBC025972
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726442AbfEaABE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 20:01:04 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:44460 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726372AbfEaABE (ORCPT
+        id S1726454AbfEaABG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 20:01:06 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:38374 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726372AbfEaABG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 May 2019 20:01:04 -0400
-Received: by mail-pf1-f193.google.com with SMTP id c9so1708786pfc.11
-        for <linux-block@vger.kernel.org>; Thu, 30 May 2019 17:01:04 -0700 (PDT)
+        Thu, 30 May 2019 20:01:06 -0400
+Received: by mail-pf1-f194.google.com with SMTP id a186so4269021pfa.5
+        for <linux-block@vger.kernel.org>; Thu, 30 May 2019 17:01:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jCjDZsVjBZxQ6kJ1PIfBWI62jvhoKBpe4unwu7E80yo=;
-        b=Y2Xw2KCy3sIZhVzpY0etmj10DEjqDoYQV28Gb9KxZ9Fxl1k7MBzXA5b35d1oQd9JUP
-         GPEazAXRRsVjMGjPtX0n6/ERCK5ydrwlfp7Dt+HQu+CDy1ecEnJH7DI0YRZMMaxyGs22
-         lmuNtc+JhjIgU8maoVsLcB+5fWImUsrLp5trlFnLyWq2MSky7IqnHhD+T+5ViA6l0vQk
-         ELMcuQvJGeChqz8H8EXD3nq9EzO838RXyzvvla5kucC2ifa0sOdv6KCcXvYSQdUYY/Cu
-         K79G2cZkiAqp+ClTTKExE/mXz2j3STWWWAsnKzVTbEzCkOdEgTT9/OMcsMM5gBRHmv1c
-         60wg==
-X-Gm-Message-State: APjAAAVf7qqvlu7c+wL78Xl84KlFllK1lrsTVDn6ORir4MQ/moAQrfI9
-        L00bGvQ4EEUpFFaMpRGElYdaWfFj
-X-Google-Smtp-Source: APXvYqypPqkIifh5Nnyud85OTTvr6YED5ixndi2nofSS9t2KUye9yha0UH9QYbRattOnSn5Dtjzj6w==
-X-Received: by 2002:a63:4c54:: with SMTP id m20mr6058764pgl.316.1559260863956;
-        Thu, 30 May 2019 17:01:03 -0700 (PDT)
+        bh=At7y9tpwmuqLFmWd0buLD3cE9YvDJstXP4wHxMpj1ao=;
+        b=Nv2WBQaiFnpIv5sYSereVKbm07nsEsi7jNsaH63mVTLjqrnnv6C5NQGTY933uCMJK0
+         3bUPl19D/FJNOgH2LIM2Xsvmj+Pw7pATm2CLv3TUca5DBpLDfLDFeiedaFWPLxhetQYq
+         cG4lubc3YW3mGtz4vpAbrzS28B76mHlxf5e4t1zLiYjcZuXz8R9TeByinW3xD32J7agA
+         C8S85hCJ8/B3Ks5czYqI8WJBTFcoT91cUeAEZmSnFLcRubhKe+YzNlr7qqOPbZUsNM3E
+         7dqAJNmmamZDwJm4P4qbnGLeqlehETpW3yIpI+xQF9T0yMvg1HWwiu4jvFydghdPYPWu
+         G0gQ==
+X-Gm-Message-State: APjAAAU0NX0OCLy4oFrt6NcZYrHUCiURxYnX5+zYAZIMu+VyaMNFI7d8
+        UzzIQAskABnnFkFCRUKoUNg=
+X-Google-Smtp-Source: APXvYqwqGCsyn+rOX+gcg08qR8hZUPzDr/P0mIpY+psDE1wDY5umGIWeOQYwqX1deLiuIex2UOS3kg==
+X-Received: by 2002:a65:664b:: with SMTP id z11mr2966555pgv.263.1559260865124;
+        Thu, 30 May 2019 17:01:05 -0700 (PDT)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
         by smtp.gmail.com with ESMTPSA id g8sm3539851pjp.17.2019.05.30.17.01.03
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 30 May 2019 17:01:03 -0700 (PDT)
+        Thu, 30 May 2019 17:01:04 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Kees Cook <keescook@chromium.org>
-Subject: [PATCH 3/8] block: Fix throtl_pending_timer_fn() kernel-doc header
-Date:   Thu, 30 May 2019 17:00:48 -0700
-Message-Id: <20190531000053.64053-4-bvanassche@acm.org>
+        Hannes Reinecke <hare@suse.com>,
+        Keith Busch <keith.busch@intel.com>
+Subject: [PATCH 4/8] block: Fix blk_mq_*_map_queues() kernel-doc headers
+Date:   Thu, 30 May 2019 17:00:49 -0700
+Message-Id: <20190531000053.64053-5-bvanassche@acm.org>
 X-Mailer: git-send-email 2.20.GIT
 In-Reply-To: <20190531000053.64053-1-bvanassche@acm.org>
 References: <20190531000053.64053-1-bvanassche@acm.org>
@@ -59,29 +60,63 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit e99e88a9d2b0 renamed a function argument without updating the
-corresponding kernel-doc header. Update the kernel-doc header.
+This patch avoids that the kernel-doc script complains about these
+function headers when building with W=1.
 
-Cc: Kees Cook <keescook@chromium.org>
-Fixes: e99e88a9d2b0 ("treewide: setup_timer() -> timer_setup()") # v4.15.
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Keith Busch <keith.busch@intel.com>
+Fixes: ed76e329d74a ("blk-mq: abstract out queue map") # v5.0.
+Fixes: e42b3867de4b ("blk-mq-rdma: pass in queue map to blk_mq_rdma_map_queues") # v5.0.
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-throttle.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq-pci.c    | 2 +-
+ block/blk-mq-rdma.c   | 4 ++--
+ block/blk-mq-virtio.c | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 1b97a73d2fb1..9ea7c0ecad10 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1220,7 +1220,7 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- 	struct throtl_grp *this_tg);
+diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
+index ad4545a2a98b..b595a94c4d16 100644
+--- a/block/blk-mq-pci.c
++++ b/block/blk-mq-pci.c
+@@ -13,7 +13,7 @@
+ 
  /**
-  * throtl_pending_timer_fn - timer function for service_queue->pending_timer
-- * @arg: the throtl_service_queue being serviced
-+ * @t: the pending_timer member of the throtl_service_queue being serviced
+  * blk_mq_pci_map_queues - provide a default queue mapping for PCI device
+- * @set:	tagset to provide the mapping for
++ * @qmap:	CPU to hardware queue map.
+  * @pdev:	PCI device associated with @set.
+  * @offset:	Offset to use for the pci irq vector
   *
-  * This timer is armed when a child throtl_grp with active bio's become
-  * pending and queued on the service_queue's pending_tree and expires when
+diff --git a/block/blk-mq-rdma.c b/block/blk-mq-rdma.c
+index cc921e6ba709..14f968e58b8f 100644
+--- a/block/blk-mq-rdma.c
++++ b/block/blk-mq-rdma.c
+@@ -8,8 +8,8 @@
+ 
+ /**
+  * blk_mq_rdma_map_queues - provide a default queue mapping for rdma device
+- * @set:	tagset to provide the mapping for
+- * @dev:	rdma device associated with @set.
++ * @map:	CPU to hardware queue map.
++ * @dev:	rdma device to provide a mapping for.
+  * @first_vec:	first interrupt vectors to use for queues (usually 0)
+  *
+  * This function assumes the rdma device @dev has at least as many available
+diff --git a/block/blk-mq-virtio.c b/block/blk-mq-virtio.c
+index 75a52c18a8f6..488341628256 100644
+--- a/block/blk-mq-virtio.c
++++ b/block/blk-mq-virtio.c
+@@ -11,8 +11,8 @@
+ 
+ /**
+  * blk_mq_virtio_map_queues - provide a default queue mapping for virtio device
+- * @set:	tagset to provide the mapping for
+- * @vdev:	virtio device associated with @set.
++ * @qmap:	CPU to hardware queue map.
++ * @vdev:	virtio device to provide a mapping for.
+  * @first_vec:	first interrupt vectors to use for queues (usually 0)
+  *
+  * This function assumes the virtio device @vdev has at least as many available
 -- 
 2.22.0.rc1
 
