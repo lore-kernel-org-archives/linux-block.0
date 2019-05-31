@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 703EAC04AB6
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF59BC04AB6
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:42:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 44E20264A0
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:40:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3475204FD
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:42:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726875AbfEaGkV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 May 2019 02:40:21 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60652 "EHLO mx1.suse.de"
+        id S1726688AbfEaGmW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 May 2019 02:42:22 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60860 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726386AbfEaGkV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 May 2019 02:40:21 -0400
+        id S1726158AbfEaGmW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 May 2019 02:42:22 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id A6CB2AF98;
-        Fri, 31 May 2019 06:40:19 +0000 (UTC)
-Subject: Re: [PATCH 6/9] scsi: hpsa: convert private reply queue to blk-mq hw
- queue
+        by mx1.suse.de (Postfix) with ESMTP id DAB80AFAB;
+        Fri, 31 May 2019 06:42:19 +0000 (UTC)
+Subject: Re: [PATCH 7/9] scsi: hisi_sas_v3: convert private reply queue to
+ blk-mq hw queue
 To:     Ming Lei <tom.leiming@gmail.com>
 Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block <linux-block@vger.kernel.org>,
@@ -38,9 +38,9 @@ Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Sathya Prakash <sathya.prakash@broadcom.com>,
         Christoph Hellwig <hch@lst.de>
 References: <20190531022801.10003-1-ming.lei@redhat.com>
- <20190531022801.10003-7-ming.lei@redhat.com>
- <d489e4e8-e625-4c68-4ab8-9b70e5989cc8@suse.de>
- <CACVXFVMFVqD3797qfe8K5bZnwv7fSqP7oz3AMyQLKWKH8Z89FA@mail.gmail.com>
+ <20190531022801.10003-8-ming.lei@redhat.com>
+ <1afb4353-6703-a3f0-ca6c-d0b2bd754a56@suse.de>
+ <CACVXFVMG8gkw8E0pmWBJC0tBH9D-WVjY2FnL2gsxDja3ryfbng@mail.gmail.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -86,12 +86,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <72604eb8-ce6e-3455-016e-d21044bbaf8f@suse.de>
-Date:   Fri, 31 May 2019 08:40:16 +0200
+Message-ID: <1c5bd151-d4ac-aa40-25ed-cbb63d704c35@suse.de>
+Date:   Fri, 31 May 2019 08:42:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CACVXFVMFVqD3797qfe8K5bZnwv7fSqP7oz3AMyQLKWKH8Z89FA@mail.gmail.com>
+In-Reply-To: <CACVXFVMG8gkw8E0pmWBJC0tBH9D-WVjY2FnL2gsxDja3ryfbng@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -100,8 +100,8 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/31/19 8:30 AM, Ming Lei wrote:
-> On Fri, May 31, 2019 at 2:15 PM Hannes Reinecke <hare@suse.de> wrote:
+On 5/31/19 8:34 AM, Ming Lei wrote:
+> On Fri, May 31, 2019 at 2:21 PM Hannes Reinecke <hare@suse.de> wrote:
 >>
 >> On 5/31/19 4:27 AM, Ming Lei wrote:
 >>> SCSI's reply qeueue is very similar with blk-mq's hw queue, both
@@ -116,64 +116,208 @@ On 5/31/19 8:30 AM, Ming Lei wrote:
 >>>
 >>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 >>> ---
->>>  drivers/scsi/hpsa.c | 49 ++++++++++++++++++---------------------------
->>>  1 file changed, 19 insertions(+), 30 deletions(-)
+>>>  drivers/scsi/hisi_sas/hisi_sas.h       |  2 +-
+>>>  drivers/scsi/hisi_sas/hisi_sas_main.c  | 36 ++++++++++----------
+>>>  drivers/scsi/hisi_sas/hisi_sas_v3_hw.c | 46 +++++++++-----------------
+>>>  3 files changed, 36 insertions(+), 48 deletions(-)
 >>>
->> There had been requests to make the internal interrupt mapping optional;
->> but I guess we first should
-> 
-> For HPSA, either managed IRQ is used or single MSI-X vector is allocated,
-> I am pretty sure that both cases are covered in this patch, so not sure what the
-> 'optional' means.
-> 
->>> diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
->>> index 1bef1da273c2..c7136f9f0ce1 100644
->>> --- a/drivers/scsi/hpsa.c
->>> +++ b/drivers/scsi/hpsa.c
->>> @@ -51,6 +51,7 @@
->>>  #include <linux/jiffies.h>
->>>  #include <linux/percpu-defs.h>
->>>  #include <linux/percpu.h>
+>>> diff --git a/drivers/scsi/hisi_sas/hisi_sas.h b/drivers/scsi/hisi_sas/hisi_sas.h
+>>> index fc87994b5d73..3d48848dbde7 100644
+>>> --- a/drivers/scsi/hisi_sas/hisi_sas.h
+>>> +++ b/drivers/scsi/hisi_sas/hisi_sas.h
+>>> @@ -26,6 +26,7 @@
+>>>  #include <linux/platform_device.h>
+>>>  #include <linux/property.h>
+>>>  #include <linux/regmap.h>
 >>> +#include <linux/blk-mq-pci.h>
->>>  #include <asm/unaligned.h>
->>>  #include <asm/div64.h>
->>>  #include "hpsa_cmd.h"
->>> @@ -902,6 +903,18 @@ static ssize_t host_show_legacy_board(struct device *dev,
->>>       return snprintf(buf, 20, "%d\n", h->legacy_board ? 1 : 0);
+>>>  #include <scsi/sas_ata.h>
+>>>  #include <scsi/libsas.h>
+>>>
+>>> @@ -378,7 +379,6 @@ struct hisi_hba {
+>>>       u32 intr_coal_count;    /* Interrupt count to coalesce */
+>>>
+>>>       int cq_nvecs;
+>>> -     unsigned int *reply_map;
+>>>
+>>>       /* debugfs memories */
+>>>       u32 *debugfs_global_reg;
+>>> diff --git a/drivers/scsi/hisi_sas/hisi_sas_main.c b/drivers/scsi/hisi_sas/hisi_sas_main.c
+>>> index 8a7feb8ed8d6..a1c1f30b9fdb 100644
+>>> --- a/drivers/scsi/hisi_sas/hisi_sas_main.c
+>>> +++ b/drivers/scsi/hisi_sas/hisi_sas_main.c
+>>> @@ -441,6 +441,19 @@ static int hisi_sas_dif_dma_map(struct hisi_hba *hisi_hba,
+>>>       return rc;
 >>>  }
 >>>
->>> +static int hpsa_map_queues(struct Scsi_Host *shost)
+>>> +static struct scsi_cmnd *sas_task_to_scsi_cmd(struct sas_task *task)
 >>> +{
->>> +     struct ctlr_info *h = shost_to_hba(shost);
+>>> +     if (!task->uldd_task)
+>>> +             return NULL;
+>>> +
+>>> +     if (dev_is_sata(task->dev)) {
+>>> +             struct ata_queued_cmd *qc = task->uldd_task;
+>>> +             return qc->scsicmd;
+>>> +     } else {
+>>> +             return task->uldd_task;
+>>> +     }
+>>> +}
+>>> +
+>>>  static int hisi_sas_task_prep(struct sas_task *task,
+>>>                             struct hisi_sas_dq **dq_pointer,
+>>>                             bool is_tmf, struct hisi_sas_tmf_task *tmf,
+>>> @@ -459,6 +472,7 @@ static int hisi_sas_task_prep(struct sas_task *task,
+>>>       struct hisi_sas_dq *dq;
+>>>       unsigned long flags;
+>>>       int wr_q_index;
+>>> +     struct scsi_cmnd *scsi_cmnd;
+>>>
+>>>       if (DEV_IS_GONE(sas_dev)) {
+>>>               if (sas_dev)
+>>> @@ -471,9 +485,10 @@ static int hisi_sas_task_prep(struct sas_task *task,
+>>>               return -ECOMM;
+>>>       }
+>>>
+>>> -     if (hisi_hba->reply_map) {
+>>> -             int cpu = raw_smp_processor_id();
+>>> -             unsigned int dq_index = hisi_hba->reply_map[cpu];
+>>> +     scsi_cmnd = sas_task_to_scsi_cmd(task);
+>>> +     if (hisi_hba->shost->hostt->host_tagset) {
+>>> +             unsigned int dq_index = scsi_cmnd_hctx_index(
+>>> +                             hisi_hba->shost, scsi_cmnd);
+>>>
+>>>               *dq_pointer = dq = &hisi_hba->dq[dq_index];
+>>>       } else {
+>>> @@ -503,21 +518,8 @@ static int hisi_sas_task_prep(struct sas_task *task,
+>>>
+>>>       if (hisi_hba->hw->slot_index_alloc)
+>>>               rc = hisi_hba->hw->slot_index_alloc(hisi_hba, device);
+>>> -     else {
+>>> -             struct scsi_cmnd *scsi_cmnd = NULL;
+>>> -
+>>> -             if (task->uldd_task) {
+>>> -                     struct ata_queued_cmd *qc;
+>>> -
+>>> -                     if (dev_is_sata(device)) {
+>>> -                             qc = task->uldd_task;
+>>> -                             scsi_cmnd = qc->scsicmd;
+>>> -                     } else {
+>>> -                             scsi_cmnd = task->uldd_task;
+>>> -                     }
+>>> -             }
+>>> +     else
+>>>               rc  = hisi_sas_slot_index_alloc(hisi_hba, scsi_cmnd);
+>>> -     }
+>>>       if (rc < 0)
+>>>               goto err_out_dif_dma_unmap;
+>>>
+>>> diff --git a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
+>>> index 49620c2411df..063e50e5b30c 100644
+>>> --- a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
+>>> +++ b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
+>>> @@ -2344,30 +2344,6 @@ static irqreturn_t cq_interrupt_v3_hw(int irq_no, void *p)
+>>>       return IRQ_HANDLED;
+>>>  }
+>>>
+>>> -static void setup_reply_map_v3_hw(struct hisi_hba *hisi_hba, int nvecs)
+>>> -{
+>>> -     const struct cpumask *mask;
+>>> -     int queue, cpu;
+>>> -
+>>> -     for (queue = 0; queue < nvecs; queue++) {
+>>> -             struct hisi_sas_cq *cq = &hisi_hba->cq[queue];
+>>> -
+>>> -             mask = pci_irq_get_affinity(hisi_hba->pci_dev, queue +
+>>> -                                         BASE_VECTORS_V3_HW);
+>>> -             if (!mask)
+>>> -                     goto fallback;
+>>> -             cq->pci_irq_mask = mask;
+>>> -             for_each_cpu(cpu, mask)
+>>> -                     hisi_hba->reply_map[cpu] = queue;
+>>> -     }
+>>> -     return;
+>>> -
+>>> -fallback:
+>>> -     for_each_possible_cpu(cpu)
+>>> -             hisi_hba->reply_map[cpu] = cpu % hisi_hba->queue_count;
+>>> -     /* Don't clean all CQ masks */
+>>> -}
+>>> -
+>>>  static int interrupt_init_v3_hw(struct hisi_hba *hisi_hba)
+>>>  {
+>>>       struct device *dev = hisi_hba->dev;
+>>> @@ -2383,11 +2359,6 @@ static int interrupt_init_v3_hw(struct hisi_hba *hisi_hba)
+>>>
+>>>               min_msi = MIN_AFFINE_VECTORS_V3_HW;
+>>>
+>>> -             hisi_hba->reply_map = devm_kcalloc(dev, nr_cpu_ids,
+>>> -                                                sizeof(unsigned int),
+>>> -                                                GFP_KERNEL);
+>>> -             if (!hisi_hba->reply_map)
+>>> -                     return -ENOMEM;
+>>>               vectors = pci_alloc_irq_vectors_affinity(hisi_hba->pci_dev,
+>>>                                                        min_msi, max_msi,
+>>>                                                        PCI_IRQ_MSI |
+>>> @@ -2395,7 +2366,6 @@ static int interrupt_init_v3_hw(struct hisi_hba *hisi_hba)
+>>>                                                        &desc);
+>>>               if (vectors < 0)
+>>>                       return -ENOENT;
+>>> -             setup_reply_map_v3_hw(hisi_hba, vectors - BASE_VECTORS_V3_HW);
+>>>       } else {
+>>>               min_msi = max_msi;
+>>>               vectors = pci_alloc_irq_vectors(hisi_hba->pci_dev, min_msi,
+>>> @@ -2896,6 +2866,18 @@ static void debugfs_snapshot_restore_v3_hw(struct hisi_hba *hisi_hba)
+>>>       clear_bit(HISI_SAS_REJECT_CMD_BIT, &hisi_hba->flags);
+>>>  }
+>>>
+>>> +static int hisi_sas_map_queues(struct Scsi_Host *shost)
+>>> +{
+>>> +     struct hisi_hba *hisi_hba = shost_priv(shost);
 >>> +     struct blk_mq_queue_map *qmap = &shost->tag_set.map[HCTX_TYPE_DEFAULT];
 >>> +
->>> +     /* Switch to cpu mapping in case that managed IRQ isn't used */
->>> +     if (shost->nr_hw_queues > 1)
->>> +             return blk_mq_pci_map_queues(qmap, h->pdev, 0);
+>>> +     if (auto_affine_msi_experimental)
+>>> +             return blk_mq_pci_map_queues(qmap, hisi_hba->pci_dev,
+>>> +                             BASE_VECTORS_V3_HW);
 >>> +     else
 >>> +             return blk_mq_map_queues(qmap);
 >>> +}
 >>> +
->>>  static DEVICE_ATTR_RO(raid_level);
->>>  static DEVICE_ATTR_RO(lunid);
->>>  static DEVICE_ATTR_RO(unique_id);
->> This helper is pretty much shared between all converted drivers.
->> Shouldn't we have a common function here?
->> Something like
+>>>  static struct scsi_host_template sht_v3_hw = {
+>>>       .name                   = DRV_NAME,
+>>>       .module                 = THIS_MODULE,
 >>
->> scsi_mq_host_tag_map(struct Scsi_Host *shost, int offset)?
+>> As mentioned, we should be using a common function here.
+>>
+>>> @@ -2906,6 +2888,8 @@ static struct scsi_host_template sht_v3_hw = {
+>>>       .scan_start             = hisi_sas_scan_start,
+>>>       .change_queue_depth     = sas_change_queue_depth,
+>>>       .bios_param             = sas_bios_param,
+>>> +     .map_queues             = hisi_sas_map_queues,
+>>> +     .host_tagset            = 1,
+>>>       .this_id                = -1,
+>>>       .sg_tablesize           = HISI_SAS_SGE_PAGE_CNT,
+>>>       .sg_prot_tablesize      = HISI_SAS_SGE_PAGE_CNT,
+>>> @@ -3092,6 +3076,8 @@ hisi_sas_v3_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>>>       if (hisi_sas_debugfs_enable)
+>>>               hisi_sas_debugfs_init(hisi_hba);
+>>>
+>>> +     shost->nr_hw_queues = hisi_hba->cq_nvecs;
+>>> +
+>>>       rc = scsi_add_host(shost, dev);
+>>>       if (rc)
+>>>               goto err_out_ha;
+>>>
+>> Well, I'd rather see the v3 hardware converted to 'real' blk-mq first;
+>> the hardware itself is pretty much multiqueue already, so we should be
+>> better off converting it to blk-mq.
 > 
-> I am not sure if the common helper is helpful much, since the
-> condition for using
-> cpu map or pci map still depends on driver private state, we still
-> have to define
-> each driver's .map_queues too.
+> From John Garry's input, the tags is still hostwide, then not sure how to
+> partition the hostwide tags into each hw queue's tags. That can be quite
+> hard to do if the queue depth isn't big enough.
 > 
-> Also PCI device pointer has to be provided.
-> 
-Hmm. Okay, so let's keep it this way.
-
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Shouldn't be much of an issue; the conversion to blk-mq would still be
+using a host-wide tag map.
+Problem is more the 'v2' hardware, which has some pretty dodgy hardware
+limitations. But I'll be looking into it and will be posting a patch.
 
 Cheers,
 
