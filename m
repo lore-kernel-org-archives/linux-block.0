@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C0E0C28CC0
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 02:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC3CC28CC0
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 02:28:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F9F525F06
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 02:28:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6118225F06
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 02:28:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726701AbfEaC2o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 22:28:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34920 "EHLO mx1.redhat.com"
+        id S1726418AbfEaC2v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 22:28:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41446 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726372AbfEaC2o (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 May 2019 22:28:44 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1726372AbfEaC2u (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 May 2019 22:28:50 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 23144308338F;
-        Fri, 31 May 2019 02:28:44 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5A6F583F44;
+        Fri, 31 May 2019 02:28:50 +0000 (UTC)
 Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BCD8C6A96C;
-        Fri, 31 May 2019 02:28:40 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 99B5A88B1E;
+        Fri, 31 May 2019 02:28:46 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-scsi@vger.kernel.org,
@@ -38,56 +38,63 @@ Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
         Kashyap Desai <kashyap.desai@broadcom.com>,
         Sathya Prakash <sathya.prakash@broadcom.com>,
         Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/9] scsi_debug: support host tagset
-Date:   Fri, 31 May 2019 10:27:56 +0800
-Message-Id: <20190531022801.10003-5-ming.lei@redhat.com>
+Subject: [PATCH 5/9] scsi: introduce scsi_cmnd_hctx_index()
+Date:   Fri, 31 May 2019 10:27:57 +0800
+Message-Id: <20190531022801.10003-6-ming.lei@redhat.com>
 In-Reply-To: <20190531022801.10003-1-ming.lei@redhat.com>
 References: <20190531022801.10003-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Fri, 31 May 2019 02:28:44 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Fri, 31 May 2019 02:28:50 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The 'host_tagset' can be set on scsi_debug device for testing
-shared hostwide tags on multiple blk-mq hw queue.
+For drivers which enable .host_tagset, introduce scsi_cmnd_hctx_index
+to retrieve current reply queue index. If valid scsi command is provided,
+blk-mq's hw queue's index is returned, otherwise return the queue
+mapped from current CPU.
+
+Prepare for converting device's privete reply queue to blk-mq hw queue.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/scsi_debug.c | 3 +++
- 1 file changed, 3 insertions(+)
+ include/scsi/scsi_cmnd.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index d323523f5f9d..8cf3f6c3f4f9 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -665,6 +665,7 @@ static bool have_dif_prot;
- static bool write_since_sync;
- static bool sdebug_statistics = DEF_STATISTICS;
- static bool sdebug_wp;
-+static bool sdebug_host_tagset = false;
+diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
+index 76ed5e4acd38..23f611a6a9f2 100644
+--- a/include/scsi/scsi_cmnd.h
++++ b/include/scsi/scsi_cmnd.h
+@@ -9,6 +9,7 @@
+ #include <linux/types.h>
+ #include <linux/timer.h>
+ #include <linux/scatterlist.h>
++#include <scsi/scsi_host.h>
+ #include <scsi/scsi_device.h>
+ #include <scsi/scsi_request.h>
  
- static unsigned int sdebug_store_sectors;
- static sector_t sdebug_capacity;	/* in sectors */
-@@ -4468,6 +4469,7 @@ module_param_named(vpd_use_hostno, sdebug_vpd_use_hostno, int,
- module_param_named(wp, sdebug_wp, bool, S_IRUGO | S_IWUSR);
- module_param_named(write_same_length, sdebug_write_same_length, int,
- 		   S_IRUGO | S_IWUSR);
-+module_param_named(host_tagset, sdebug_host_tagset, bool, S_IRUGO | S_IWUSR);
+@@ -332,4 +333,18 @@ static inline unsigned scsi_transfer_length(struct scsi_cmnd *scmd)
+ 	return xfer_len;
+ }
  
- MODULE_AUTHOR("Eric Youngdale + Douglas Gilbert");
- MODULE_DESCRIPTION("SCSI debug adapter driver");
-@@ -5779,6 +5781,7 @@ static int sdebug_driver_probe(struct device *dev)
- 	sdbg_host = to_sdebug_host(dev);
- 
- 	sdebug_driver_template.can_queue = sdebug_max_queue;
-+	sdebug_driver_template.host_tagset = sdebug_host_tagset;
- 	if (!sdebug_clustering)
- 		sdebug_driver_template.dma_boundary = PAGE_SIZE - 1;
- 
++/* only for drivers which enable .host_tagset */
++static inline unsigned scsi_cmnd_hctx_index(struct Scsi_Host *sh,
++		struct scsi_cmnd *scmd)
++{
++	if (unlikely(!scmd || !scmd->request || !scmd->request->mq_hctx)) {
++		struct blk_mq_queue_map *qmap =
++			&sh->tag_set.map[HCTX_TYPE_DEFAULT];
++
++		return qmap->mq_map[raw_smp_processor_id()];
++	}
++
++	return scmd->request->mq_hctx->queue_num;
++}
++
+ #endif /* _SCSI_SCSI_CMND_H */
 -- 
 2.20.1
 
