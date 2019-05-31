@@ -2,107 +2,90 @@ Return-Path: <SRS0=RDeE=T7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6ACEC04AB6
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 10:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7AEFC28CC3
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 11:15:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 935EE2678A
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 10:35:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E0AE2681E
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 11:15:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TZRqiz+e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726952AbfEaKfS convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 May 2019 06:35:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36128 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726002AbfEaKfS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 May 2019 06:35:18 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1845730C1B98;
-        Fri, 31 May 2019 10:34:56 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 586D5600C7;
-        Fri, 31 May 2019 10:34:45 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20190528142424.19626-3-geert@linux-m68k.org>
-References: <20190528142424.19626-3-geert@linux-m68k.org> <20190528142424.19626-1-geert@linux-m68k.org>
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     dhowells@redhat.com, Igor Konopko <igor.j.konopko@intel.com>,
-        "Mohit P . Tahiliani" <tahiliani@nitk.edu.in>,
-        Takashi Sakamoto <o-takashi@sakamocchi.jp>,
-        Eran Ben Elisha <eranbe@mellanox.com>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jamal Hadi Salim <jhs@mojatatu.com>,
-        Cong Wang <xiyou.wangcong@gmail.com>,
-        Clemens Ladisch <clemens@ladisch.de>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, Joe Perches <joe@perches.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        linux-afs@lists.infradead.org, alsa-devel@alsa-project.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] rxrpc: Fix uninitialized error code in rxrpc_send_data_packet()
+        id S1726724AbfEaLPD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 May 2019 07:15:03 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:42694 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726240AbfEaLPC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 May 2019 07:15:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=0bzCcEeHXEwR7c+WQ7EMhHPHTFa6pRbMCfQNYRgGQ50=; b=TZRqiz+eB19FKOviEbwMF50eL
+        tkVinge7hG7nufh2+jXjJimy3MX8tBcxRj3YQ//UpQYvtJgMfKOhWXOXbYLoPoseaA8GM16AkT9se
+        Jngp47DXJ0z8Aw/MuS1HRC8U73Vd1LivUdfY5v/tC0ZNDKoBOdj6+6VODUmz8iT2gJDy2a+4tpMBx
+        VO+5A3Gl8tI5ZU5dfFyOOeE7KYOq4wxlJF67H2SjwQSOphmha3VHx2Fo9JYu9EsuOvlTOySnke9tM
+        z2Nkt7Oukx13QfyTJ/CxJdaCY4q6AKkM/OC82uZli8h02Sua/xANMZ4b54zPgJGxij2HRdkFUR5Ql
+        hCLOaznLw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hWfUl-0002gF-9Z; Fri, 31 May 2019 11:14:47 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id BA181201D5AB1; Fri, 31 May 2019 13:14:45 +0200 (CEST)
+Date:   Fri, 31 May 2019 13:14:45 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jann Horn <jannh@google.com>, Greg KH <gregkh@linuxfoundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>, raven@themaw.net,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>
+Subject: Re: [PATCH 1/7] General notification queue with user mmap()'able
+ ring buffer
+Message-ID: <20190531111445.GO2677@hirez.programming.kicks-ass.net>
+References: <CAG48ez0R-R3Xs+3Xg9T9qcV3Xv6r4pnx1Z2y=Ltx7RGOayte_w@mail.gmail.com>
+ <20190528162603.GA24097@kroah.com>
+ <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk>
+ <155905931502.7587.11705449537368497489.stgit@warthog.procyon.org.uk>
+ <4031.1559064620@warthog.procyon.org.uk>
+ <20190528231218.GA28384@kroah.com>
+ <31936.1559146000@warthog.procyon.org.uk>
+ <16193.1559163763@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Date:   Fri, 31 May 2019 11:34:44 +0100
-Message-ID: <15499.1559298884@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Fri, 31 May 2019 10:35:17 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <16193.1559163763@warthog.procyon.org.uk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, May 29, 2019 at 10:02:43PM +0100, David Howells wrote:
+> Jann Horn <jannh@google.com> wrote:
+> 
+> > Does this mean that refcount_read() isn't sufficient for what you want
+> > to do with tracing (because for some reason you actually need to know
+> > the values atomically at the time of increment/decrement)?
+> 
+> Correct.  There's a gap and if an interrupt or something occurs, it's
+> sufficiently big for the refcount trace to go weird.
+> 
+> I've seen it in afs/rxrpc where the incoming network packets that are part of
+> the rxrpc call flow disrupt the refcounts noted in trace lines.
 
-Hi Geert,
+Can you re-iterate the exact problem? I konw we talked about this in the
+past, but I seem to have misplaced those memories :/
 
-Here's my take on the patch.
-
-David
----
-rxrpc: Fix uninitialized error code in rxrpc_send_data_packet()    
-    
-With gcc 4.1:
-
-    net/rxrpc/output.c: In function ‘rxrpc_send_data_packet’:
-    net/rxrpc/output.c:338: warning: ‘ret’ may be used uninitialized in this function
-
-Indeed, if the first jump to the send_fragmentable label is made, and
-the address family is not handled in the switch() statement, ret will be
-used uninitialized.
-
-Fix this by BUG()'ing as is done in other places in rxrpc where internal
-support for future address families will need adding.  It should not be
-possible to reach this normally as the address families are checked
-up-front.
-
-Fixes: 5a924b8951f835b5 ("rxrpc: Don't store the rxrpc header in the Tx queue sk_buffs")
-Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Signed-off-by: David Howells <dhowells@redhat.com>
----
-diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 004c762c2e8d..6f2b4fb4b0aa 100644
---- a/net/rxrpc/output.c
-+++ b/net/rxrpc/output.c
-@@ -523,6 +523,9 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, struct sk_buff *skb,
- 		}
- 		break;
- #endif
-+
-+	default:
-+		BUG();
- 	}
- 
- 	if (ret < 0)
+FWIW I agree that kref is useless fluff, but I've long ago given up on
+that fight.
