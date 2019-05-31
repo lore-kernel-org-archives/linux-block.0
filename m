@@ -2,224 +2,131 @@ Return-Path: <SRS0=RDeE=T7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61ECDC28CC0
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 01:59:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3AEC28CC0
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 02:00:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30ED926008
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 01:59:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EABC2600A
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 02:00:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YyJDgJsA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YCEUedZs";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="FbavtRz6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbfEaB7S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 21:59:18 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:19081 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726540AbfEaB7S (ORCPT
+        id S1726535AbfEaCAS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 22:00:18 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:35876 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726408AbfEaCAS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 May 2019 21:59:18 -0400
+        Thu, 30 May 2019 22:00:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1559267958; x=1590803958;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7+v6Hriunm8Fd9nXJ1gCGxP92bdszOqe2KswdIsWdcA=;
-  b=YyJDgJsAy1JgUWW4pbV7dDerVMHyWv9V+I4Odm/zdmy8RqlUEpQuNxf8
-   OsNiIUh8hNk5GP0LIV4xuUD4Hv+PVHoAVin5c9u0tBXEpCkrPoYt2h0He
-   v3EHuI9/mRC0L8J/wcdoVeov9R8sjXuncK4q8T+H058KUA3DFSl0mCxyZ
-   M3XVAE0A2G2DfMWoR56BUDMjHD9S9PILfvo8aNCW9iNO3cTlxiwjeH6pV
-   pRYae6zdc6jLxIMHL5518yoEeAnQU7oBJfjqZV1cP4ZGaykwcvn1LyQru
-   OnZappxvwwJtNID5ZUubBVer6pYddbM4A5fxGv7q6bYLRBtAOwyE6vLDy
+  t=1559268019; x=1590804019;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=hAgpeqpmpmE11tLZizBJKXlfMptMRzijhrChPXzHN04=;
+  b=YCEUedZs5qAb/Ygb34sm9jhiNcur2e477v8ygGe9c7KdXyOIp44kdl6k
+   NPRaTXlkHnHeyzSWKi5qS1Z2GSB4vfEZAZofOPQQF5XxotE+zAy31Gkau
+   w7BPRczGGMKOR1n6JaIDo+GmYsj9ZJlabV63MP4BF+1IMRpFt9nbTUH/x
+   VhOrvjNmtlfDBTZ9DuavCOiHoFLgzwUCg/NdTyTel0SRX3D4PdRQFY4g9
+   i5c3TlqExwSVnqFunsjXgmTAoAwZyovMqHFZG8YWW8NMJzL72Uq1r5ZmV
+   QJoDMaLCngjt+7lcNePLWq1rW+5bBChTXUv76xhMM9cRpqZnuk5DaQP7U
    w==;
 X-IronPort-AV: E=Sophos;i="5.60,533,1549900800"; 
-   d="scan'208";a="111145554"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 31 May 2019 09:59:18 +0800
-IronPort-SDR: BMhXKz56nO6+BZh03RjzRBLBgsHa4g0tso3xr0wZJpLNu6R4S2Xup/uZZlnqa3yQE5qiH6N5iC
- 4AZmVDB7phAiJTj0R3y1bXMHiqRXPA6vvh/o9K2KUTkiT3hO0rEfw5L1BjBe4AgSY0n91EVC8U
- yw2Ew0rgbVwjUSQT/sT9A+Lw6SaF9p6PfYmu4DSQ64j6Lo2DeO7cmKBUrDH8n2VRiB8J0IRwjx
- pix3PfWwwATpaXQWWL2mua3hy1FFM5MwMbRnkYMMJ0g839l2GiCR4lgkvBC8ajr6pXafM9mFGu
- 6rc0ixsJctGolBxu0TYB1TMj
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 30 May 2019 18:36:47 -0700
-IronPort-SDR: 3NzPdq8n66ceQGiUaIIoBUOa9KJdhtjCUsDKsNmV2y6ZhYOlrbaNiDvjUFeouhJSJAaA4OoGTN
- M9opnoQrV0KQfTDkxBhgdpx3xBWUtxerX6sPb57E+3gbXvpQfLrbXOvS2XJnhFcnWKVYMbq8BO
- NwQBYbvQ2drNazqVro1Xt2rxSPTu3nlU1nlf4RfmvRao3XYFPUAJCD8MV+vjUquqn4ewwRods9
- 9hM14rzrSNTrDrslU2gmaMhM6GIips7j1fEt3qgt+1ADawF0R6bRg+PjWhVKSVoJYstcBPkTR/
- 7dw=
-Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.166])
-  by uls-op-cesaip01.wdc.com with ESMTP; 30 May 2019 18:59:16 -0700
-From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>
-Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Masato Suzuki <masato.suzuki@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Omar Sandoval <osandov@osandov.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH blktests v2 2/2] zbd/007: Add zone mapping test for logical devices
-Date:   Fri, 31 May 2019 10:59:13 +0900
-Message-Id: <20190531015913.5560-3-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190531015913.5560-1-shinichiro.kawasaki@wdc.com>
-References: <20190531015913.5560-1-shinichiro.kawasaki@wdc.com>
+   d="scan'208";a="114412580"
+Received: from mail-bn3nam01lp2054.outbound.protection.outlook.com (HELO NAM01-BN3-obe.outbound.protection.outlook.com) ([104.47.33.54])
+  by ob1.hgst.iphmx.com with ESMTP; 31 May 2019 10:00:18 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p992UdGXt6ChPRg6BaJ3fFWYiZANH4lLmpWpmKvqsq8=;
+ b=FbavtRz6Kp6jzJjhy7OJE1fY2jaEjgNMtJ3aFzdflUMzwRL6+NAHfa8S3bibCHo4lSuPzDjdPt0z2PRw73g7JfgM9au0SxXT7NqnqO42lw8YrhIoh38dfoJaANiK6x7LtpZvAvJO0FVCADPtzCLxyjxg075XxpzcBWHxMsoiAxM=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
+ BYAPR04MB5909.namprd04.prod.outlook.com (20.179.59.157) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1943.17; Fri, 31 May 2019 02:00:16 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::ad42:af4b:a53b:80f5]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::ad42:af4b:a53b:80f5%4]) with mapi id 15.20.1943.016; Fri, 31 May 2019
+ 02:00:16 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 1/8] block/partitions/ldm: Convert a kernel-doc header
+ into a non-kernel-doc header
+Thread-Topic: [PATCH 1/8] block/partitions/ldm: Convert a kernel-doc header
+ into a non-kernel-doc header
+Thread-Index: AQHVF0P1Dqu+L2cF7kuXXyeGtnuvgA==
+Date:   Fri, 31 May 2019 02:00:15 +0000
+Message-ID: <BYAPR04MB57495E48D0CBE8A885B5863886190@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20190531000053.64053-1-bvanassche@acm.org>
+ <20190531000053.64053-2-bvanassche@acm.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.44.171]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4dab7e47-a0bc-41d2-1949-08d6e56bb9c2
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5909;
+x-ms-traffictypediagnostic: BYAPR04MB5909:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <BYAPR04MB59093D30A389C617BBE1C7D286190@BYAPR04MB5909.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:989;
+x-forefront-prvs: 00540983E2
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(346002)(376002)(136003)(396003)(39860400002)(199004)(189003)(71190400001)(8936002)(6246003)(71200400001)(4326008)(72206003)(25786009)(7696005)(66946007)(316002)(33656002)(478600001)(73956011)(54906003)(14454004)(76116006)(64756008)(66556008)(66476007)(66446008)(102836004)(68736007)(53546011)(186003)(76176011)(110136005)(26005)(99286004)(6506007)(446003)(256004)(14444005)(2906002)(66066001)(486006)(476003)(229853002)(305945005)(4744005)(6436002)(52536014)(81166006)(5660300002)(81156014)(8676002)(7736002)(55016002)(86362001)(9686003)(53936002)(74316002)(6116002)(3846002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5909;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: YHczbN08uEVBIo6yz+5ovZ6pkQOPQ06+ZX+vHm/nO5P0Ag9GnadguBjTprbJo5o27A726t5MNMfprMobCttjPnMsksjLp7ArX6ZeepnRP5psfx0RWv6lSIguE+XPJ44Ocxe+bSX6pq1ZEuMEj0ClUoBLyapP4jYu7/K8ygRdMimD8Wjzk2cTs5ulVwjPD73szmxzQOiJaPNcczlc7TRVTW4b8Oi0AqSTqJpMnP2hCGVQGNq6hcKoCudPLJG6nHQlNAxoD4IXKB01iDSNK/2Nz/EKDnnPz3jm1DpkO7cXA4D6OyGXvxdKej/XI9t3t+aAqgE42huh28WW8JyrsuYDBSDxQ+8ikbsIN+k9Qoh3YztW/0hVVhAE1mzobLqepoSN6+U4+hhvV/2nrMdi68A9PK5425erW8W5iHFQdvANDVk=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4dab7e47-a0bc-41d2-1949-08d6e56bb9c2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2019 02:00:15.9221
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5909
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add the test case to check zones sector mapping of logical devices. This
-test case requires that such a logical device be specified in TEST_DEVS
-in config. The test is skipped for devices that are identified as not
-logically created.
-
-To test that the zone mapping is correct, select a few sequential write
-required zones of the logical device and move the write pointers of
-these zones through the container device of the logical device, using
-the physical sector mapping of the zones. The write pointers position of
-the selected zones is then checked through a zone report of the logical
-device using the logical sector mapping of the zones. The test reports a
-success if the position of the zone write pointers relative to the zone
-start sector must be identical for both the logical and physical
-locations of the zones.
-
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- tests/zbd/007     | 110 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/zbd/007.out |   2 +
- 2 files changed, 112 insertions(+)
- create mode 100755 tests/zbd/007
- create mode 100644 tests/zbd/007.out
-
-diff --git a/tests/zbd/007 b/tests/zbd/007
-new file mode 100755
-index 0000000..b4dcbd8
---- /dev/null
-+++ b/tests/zbd/007
-@@ -0,0 +1,110 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2019 Western Digital Corporation or its affiliates.
-+#
-+# Test zones are mapped correctly between a logical device and its container
-+# device. Move write pointers of sequential write required zones on the
-+# container devices, and confirm same write pointer positions of zones on the
-+# logical devices.
-+
-+. tests/zbd/rc
-+
-+DESCRIPTION="zone mapping between logical and container devices"
-+CAN_BE_ZONED=1
-+QUICK=1
-+
-+requires() {
-+	_have_program dmsetup
-+}
-+
-+device_requires() {
-+	_test_dev_is_logical
-+}
-+
-+# Select test target zones. Pick up the first sequential required zones. If
-+# available, add one or two more sequential required zones. One is at the last
-+# end of TEST_DEV. The other is in middle between the first and the last zones.
-+select_zones() {
-+	local -i zone_idx
-+	local -a zones
-+
-+	zone_idx=$(_find_first_sequential_zone) || return $?
-+	zones=( "${zone_idx}" )
-+	if zone_idx=$(_find_last_sequential_zone); then
-+		zones+=( "${zone_idx}" )
-+		if zone_idx=$(_find_sequential_zone_in_middle \
-+				      "${zones[0]}" "${zones[1]}"); then
-+			zones+=( "${zone_idx}" )
-+		fi
-+	fi
-+	echo "${zones[@]}"
-+}
-+
-+test_device() {
-+	local -i bs
-+	local -a test_z # test target zones
-+	local -a test_z_start
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	# Get physical block size to meet zoned block device I/O requirement
-+	_get_sysfs_variable "${TEST_DEV}" || return $?
-+	bs=${SYSFS_VARS[SV_PHYS_BLK_SIZE]}
-+	_put_sysfs_variable
-+
-+	# Get test target zones
-+	_get_blkzone_report "${TEST_DEV}" || return $?
-+	read -r -a test_z < <(select_zones)
-+	for ((i = 0; i < ${#test_z[@]}; i++)); do
-+		test_z_start+=("${ZONE_STARTS[test_z[i]]}")
-+	done
-+	echo "${test_z[*]}" >> "$FULL"
-+	echo "${test_z_start[*]}" >> "$FULL"
-+	_put_blkzone_report
-+	if ((!${#test_z[@]})); then
-+		echo "Test target zones not available on ${TEST_DEV}"
-+		return 1
-+	fi
-+
-+	# Reset and move write pointers of the container device
-+	for ((i=0; i < ${#test_z[@]}; i++)); do
-+		local -a arr
-+
-+		read -r -a arr < <(_get_dev_container_and_sector \
-+					   "${test_z_start[i]}")
-+		container_dev="${arr[0]}"
-+		container_start="${arr[1]}"
-+
-+		echo "${container_dev}" "${container_start}" >> "$FULL"
-+
-+		if ! blkzone reset -o "${container_start}" -c 1 \
-+		     "${container_dev}"; then
-+			echo "Reset zone failed"
-+			return 1
-+		fi
-+
-+		if ! dd if=/dev/zero of="${container_dev}" bs="${bs}" \
-+		     count=$((4096 * (i + 1) / bs)) oflag=direct \
-+		     seek=$((container_start * 512 / bs)) \
-+		     >> "$FULL" 2>&1 ; then
-+			echo "dd failed"
-+		fi
-+
-+		# Wait for partition table re-read event settles
-+		udevadm settle
-+	done
-+
-+	# Check write pointer positions on the logical device
-+	_get_blkzone_report "${TEST_DEV}" || return $?
-+	for ((i=0; i < ${#test_z[@]}; i++)); do
-+		if ((ZONE_WPTRS[test_z[i]] != 8 * (i + 1))); then
-+			echo "Unexpected write pointer position"
-+			echo -n "zone=${i}, wp=${ZONE_WPTRS[i]}, "
-+			echo "dev=${TEST_DEV}"
-+		fi
-+		echo "${ZONE_WPTRS[${test_z[i]}]}" >> "$FULL"
-+	done
-+	_put_blkzone_report
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/zbd/007.out b/tests/zbd/007.out
-new file mode 100644
-index 0000000..28a1395
---- /dev/null
-+++ b/tests/zbd/007.out
-@@ -0,0 +1,2 @@
-+Running zbd/007
-+Test complete
--- 
-2.21.0
-
+Looks good.=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chiatanya.kulkarni@wdc.com>=0A=
+=0A=
+On 5/30/19 5:01 PM, Bart Van Assche wrote:=0A=
+> This patch avoids that the kernel-doc tool warns about this function=0A=
+> header when building with W=3D1.=0A=
+> =0A=
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>=0A=
+> ---=0A=
+>   block/partitions/ldm.c | 2 +-=0A=
+>   1 file changed, 1 insertion(+), 1 deletion(-)=0A=
+> =0A=
+> diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c=0A=
+> index 6db573f33219..fe5d970e2e60 100644=0A=
+> --- a/block/partitions/ldm.c=0A=
+> +++ b/block/partitions/ldm.c=0A=
+> @@ -19,7 +19,7 @@=0A=
+>   #include "check.h"=0A=
+>   #include "msdos.h"=0A=
+>   =0A=
+> -/**=0A=
+> +/*=0A=
+>    * ldm_debug/info/error/crit - Output an error message=0A=
+>    * @f:    A printf format string containing the message=0A=
+>    * @...:  Variables to substitute into @f=0A=
+> =0A=
+=0A=
