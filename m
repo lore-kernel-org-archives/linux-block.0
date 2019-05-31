@@ -2,107 +2,116 @@ Return-Path: <SRS0=RDeE=T7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A8CBC28CC0
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 02:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBBE7C28CC0
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 02:28:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0361526138
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 02:08:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Zsx7RFa/"
+	by mail.kernel.org (Postfix) with ESMTP id 95C9F25F06
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 02:28:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726408AbfEaCIH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 22:08:07 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:37367 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726372AbfEaCIH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 May 2019 22:08:07 -0400
-Received: by mail-pf1-f194.google.com with SMTP id a23so5157096pff.4
-        for <linux-block@vger.kernel.org>; Thu, 30 May 2019 19:08:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=y+DNeDpkPOV3XZSv/aRGg+x+WrYKXS0/CjHakrrpa+g=;
-        b=Zsx7RFa/zuYiRgvfdopk5pQ+rX3QFQcidDgv8x/HgwPIJLQMwHDEtIb8JK4o3LnKIM
-         QYhGxNRc6lkwv6FIDulnKq+TR0YHQm/Oz2U+fIGKA75V9TMFqWX7Edxm3FiH2MFQjVAa
-         iQK8T712yTGXqVVdnEL5MXbXwV2IZDQd85cps=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=y+DNeDpkPOV3XZSv/aRGg+x+WrYKXS0/CjHakrrpa+g=;
-        b=DipR7GnKUQaZvFU3xUsA4lFVqLr3m85jVCsufL+f9PZfbNaeBta5ZL/HpwNUZ4X5+I
-         XDdh7CzYlGfSmlifo38Z3GG8FhC+SjVx2HCdnJ3y3vFt+3XStMOmYSYJANPTS5oS9vCR
-         Q/elmFz+pmvUfNOoPAVDm+ZKSe+k7pgYmOYq/yMQwzHzewNEvIWdul+gsgOhpuJGdTCh
-         F29Yh9Btc+XKBCO6P4IUM9v4MJtlEIYbBa8rTra/5uGsmJ6sFnAkaLzI9+Kiy6fSm1p3
-         HNkntiBDvLS+w0tXwgo6nVsOhswMt/DTjuEQrGptglZzXlsmYW55LnpTQcx8hHepnM2f
-         VFJg==
-X-Gm-Message-State: APjAAAWPkIlOokfv/Mmm3P0cRn+uSFEcuSjHMiGP1PaOy7NyC+AzI5N9
-        32Po4LamzNJrmAYiLgi3cZtb4w==
-X-Google-Smtp-Source: APXvYqy7W2dtC5iqtHH9w87bShUtFtQNlcsFca5GWghv0z/G58RZZzjAJFWyKkHCnHiMkPFLs+beQg==
-X-Received: by 2002:a63:470e:: with SMTP id u14mr6370193pga.135.1559268486529;
-        Thu, 30 May 2019 19:08:06 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id j8sm4101223pfi.148.2019.05.30.19.08.05
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 30 May 2019 19:08:05 -0700 (PDT)
-Date:   Thu, 30 May 2019 19:08:04 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 3/8] block: Fix throtl_pending_timer_fn() kernel-doc
- header
-Message-ID: <201905301908.D4CD6A81F7@keescook>
-References: <20190531000053.64053-1-bvanassche@acm.org>
- <20190531000053.64053-4-bvanassche@acm.org>
+        id S1726649AbfEaC20 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 22:28:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48842 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726372AbfEaC2Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 May 2019 22:28:25 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1296E3082A49;
+        Fri, 31 May 2019 02:28:25 +0000 (UTC)
+Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 19D777E322;
+        Fri, 31 May 2019 02:28:18 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        John Garry <john.garry@huawei.com>,
+        Don Brace <don.brace@microsemi.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/9] blk-mq/scsi: convert private reply queue into blk_mq hw queue
+Date:   Fri, 31 May 2019 10:27:52 +0800
+Message-Id: <20190531022801.10003-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190531000053.64053-4-bvanassche@acm.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Fri, 31 May 2019 02:28:25 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 30, 2019 at 05:00:48PM -0700, Bart Van Assche wrote:
-> Commit e99e88a9d2b0 renamed a function argument without updating the
-> corresponding kernel-doc header. Update the kernel-doc header.
-> 
-> Cc: Kees Cook <keescook@chromium.org>
-> Fixes: e99e88a9d2b0 ("treewide: setup_timer() -> timer_setup()") # v4.15.
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Hi,
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+The 1st patch introduces support hostwide tags for multiple hw queues
+via the simplest approach to share single 'struct blk_mq_tags' instance
+among all hw queues. In theory, this way won't cause any performance drop.
+Even small IOPS improvement can be observed on random IO on
+null_blk/scsi_debug.
 
--Kees
+By applying the hostwide tags for MQ, we can convert some SCSI driver's
+private reply queue into generic blk-mq hw queue, then at least two
+improvement can be obtained:
 
-> ---
->  block/blk-throttle.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 1b97a73d2fb1..9ea7c0ecad10 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -1220,7 +1220,7 @@ static bool throtl_can_upgrade(struct throtl_data *td,
->  	struct throtl_grp *this_tg);
->  /**
->   * throtl_pending_timer_fn - timer function for service_queue->pending_timer
-> - * @arg: the throtl_service_queue being serviced
-> + * @t: the pending_timer member of the throtl_service_queue being serviced
->   *
->   * This timer is armed when a child throtl_grp with active bio's become
->   * pending and queued on the service_queue's pending_tree and expires when
-> -- 
-> 2.22.0.rc1
-> 
+1) the private reply queue maping can be removed from drivers, since the
+mapping has been implemented as generic API in blk-mq core
+
+2) it helps to solve the generic managed IRQ race[1] during CPU hotplug
+in generic way, otherwise we have to re-invent new way to address the
+same issue for these drivers using private reply queue.
+
+
+[1] https://lore.kernel.org/linux-block/20190527150207.11372-1-ming.lei@redhat.com/T/#m6d95e2218bdd712ffda8f6451a0bb73eb2a651af
+
+Any comment and test feedback are appreciated.
+
+Thanks,
+Ming
+
+Hannes Reinecke (1):
+  scsi: Add template flag 'host_tagset'
+
+Ming Lei (8):
+  blk-mq: allow hw queues to share hostwide tags
+  block: null_blk: introduce module parameter of 'g_host_tags'
+  scsi_debug: support host tagset
+  scsi: introduce scsi_cmnd_hctx_index()
+  scsi: hpsa: convert private reply queue to blk-mq hw queue
+  scsi: hisi_sas_v3: convert private reply queue to blk-mq hw queue
+  scsi: megaraid: convert private reply queue to blk-mq hw queue
+  scsi: mp3sas: convert private reply queue to blk-mq hw queue
+
+ block/blk-mq-debugfs.c                      |  1 +
+ block/blk-mq-sched.c                        |  8 +++
+ block/blk-mq-tag.c                          |  6 ++
+ block/blk-mq.c                              | 14 ++++
+ block/elevator.c                            |  5 +-
+ drivers/block/null_blk_main.c               |  6 ++
+ drivers/scsi/hisi_sas/hisi_sas.h            |  2 +-
+ drivers/scsi/hisi_sas/hisi_sas_main.c       | 36 +++++-----
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c      | 46 +++++--------
+ drivers/scsi/hpsa.c                         | 49 ++++++--------
+ drivers/scsi/megaraid/megaraid_sas_base.c   | 50 +++++---------
+ drivers/scsi/megaraid/megaraid_sas_fusion.c |  4 +-
+ drivers/scsi/mpt3sas/mpt3sas_base.c         | 74 ++++-----------------
+ drivers/scsi/mpt3sas/mpt3sas_base.h         |  3 +-
+ drivers/scsi/mpt3sas/mpt3sas_scsih.c        | 17 +++++
+ drivers/scsi/scsi_debug.c                   |  3 +
+ drivers/scsi/scsi_lib.c                     |  2 +
+ include/linux/blk-mq.h                      |  1 +
+ include/scsi/scsi_cmnd.h                    | 15 +++++
+ include/scsi/scsi_host.h                    |  3 +
+ 20 files changed, 168 insertions(+), 177 deletions(-)
 
 -- 
-Kees Cook
+2.20.1
+
