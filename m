@@ -2,55 +2,67 @@ Return-Path: <SRS0=RDeE=T7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A2EC28CC0
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF49C28CC0
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 01:59:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F5E825972
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9069B2600A
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 01:59:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="MzD++9bQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726548AbfEaABK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 20:01:10 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:43201 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726372AbfEaABK (ORCPT
+        id S1726543AbfEaB7Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 21:59:16 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:19074 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726372AbfEaB7Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 May 2019 20:01:10 -0400
-Received: by mail-pf1-f196.google.com with SMTP id c6so4961786pfa.10
-        for <linux-block@vger.kernel.org>; Thu, 30 May 2019 17:01:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=4xWeZvctfD9fE8Y0f4Sc6Wt0Ue8JDElg+hHaYI60+tA=;
-        b=rw36F+KNXMH3QbhqJNk66JATCdOlprJD9apvPyiCRHDLbMS6H/tFotHeXLr0FGL4rC
-         33G4pLLMcxs5g3ynP0EmxfruJRqcbikzSigcVstVdDBIFTMgvU+djdfo4iOUAieHFAYc
-         USdCLcq93LEAqkdIXXb+owRvZqO5AbJkaTKFfTxkJHiqheOcLlWaYuCoKJYDU+Mv1CbE
-         o6w7lQ5YMkzeuSvLCxYNRNALiVRWxhk9ROI0ztwMGNg/xFVHaZ9/HzFdln5Kzz51J6IQ
-         iWtjUJeLnOfleu29wmoUi6LSIhkrK/dmCBJUWkI46uKC6grSPJw1uwHTM4KWd1+f/gqS
-         Vhgg==
-X-Gm-Message-State: APjAAAUkEZaqSWrkqRu+hqEwfwsOr70golq+4UwbKC/4keCeqS665L2D
-        XbUUtpIQfRaOldsUhs2xUokFATZY
-X-Google-Smtp-Source: APXvYqzZGXrrWNG8b4NWSlV0Om8EDB879zyV6UM0Cf/0W8hx1caIQFLaqU74SPxN4fXDeBdzLjKt/A==
-X-Received: by 2002:a62:2805:: with SMTP id o5mr6330238pfo.256.1559260869779;
-        Thu, 30 May 2019 17:01:09 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id g8sm3539851pjp.17.2019.05.30.17.01.09
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 30 May 2019 17:01:09 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 8/8] blk-mq: Document the blk_mq_hw_queue_to_node() arguments
-Date:   Thu, 30 May 2019 17:00:53 -0700
-Message-Id: <20190531000053.64053-9-bvanassche@acm.org>
-X-Mailer: git-send-email 2.20.GIT
-In-Reply-To: <20190531000053.64053-1-bvanassche@acm.org>
-References: <20190531000053.64053-1-bvanassche@acm.org>
+        Thu, 30 May 2019 21:59:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1559267956; x=1590803956;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=caXR27Perknm5d3QFDsnYvbVhC1Cr/FM6uFGdBvEOfw=;
+  b=MzD++9bQit/rNqR5C/rRY6qDlwX23/rdywboBFIdUuNc091l3yUv9Asw
+   HK9U8h9KfvzUxEzcUsrnX3kWBOxf84kjIiiLnzPA3STWR7eN4dF1BxoYJ
+   A6WOP3qduQ6GwyOi4SI4aWlfCps/9vvwtz+eu8HoBMR/KOFdtdYsXYQqb
+   kfnwwKq6IkSLKbqSFJxWNu/fSDg7mmmS/URYj5ea9eoUwuWWejHbQrZiV
+   K20AsUKnpHsnIOgyf4x7qL2zV+6mXqQHI2RotsiZkcvnXAX0VLUkB0m8b
+   ztBr4azZ1CLiU/9HZnqd7ZvHMzLTZIL5dwVRW9qZuPetDNF/Dm1Em/pGv
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.60,533,1549900800"; 
+   d="scan'208";a="111145549"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 31 May 2019 09:59:15 +0800
+IronPort-SDR: 0zfszn0l/8gDvYLAshReLG9yg85KHyrCkNklS9LrNch6GqEfnZZRzXGXid+MVlLtOLc5d4WY3j
+ 3H6BdkvKaqu1z29yB/FgKqO7MMzr285ULV5kEQU9hsOdlQqplPDspSi8IXSqytkVMiIBl0Dy6F
+ 5ur6ETxLwxU0n6jv5B1CCLKdvHsFvMjrSTdziAqEw3yFkXFpD/5BpfoAQz96lzLexA2ug8prQ2
+ ZJXjAV8vFjYzimvJvDMAnxqoKXq0G/+BqRClc7bPymtpC00P3OQpdoTTalUh4jeX0phlJlyQCU
+ eYX5mrXXjePHGmeVYQ5p49iN
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP; 30 May 2019 18:36:44 -0700
+IronPort-SDR: snFo6R99hi6WOibX3frCkzHFLwq9/vBY/okHt9pRQ4mM7PXdBZsG0ZLOe0LW9jDyWjB0dk5RhT
+ Ku9eUjXszCR1OZsSsfdn08ZOKmMmo/IfISybSqtmogFMKDvoj0uCC3oVVPessGIqnKiTA0+l18
+ +4m5peDKJlK2FfM3zdfNnolPxnnEvET176zHwrS49ku6IfXiIvote5+yqRfh69ObK7lKJcQMrB
+ LP5FTZK76Kq0asw9hojU7EZWML8rtjFhvC8m/GYdJMCIYapRbI6ZvxA9zyDUeEuVIrm9cJfJ6R
+ DhU=
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.166])
+  by uls-op-cesaip01.wdc.com with ESMTP; 30 May 2019 18:59:14 -0700
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>
+Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Masato Suzuki <masato.suzuki@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Omar Sandoval <osandov@osandov.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Subject: [PATCH blktests v2 0/2] Test zone mapping of logical devices
+Date:   Fri, 31 May 2019 10:59:11 +0900
+Message-Id: <20190531015913.5560-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -58,30 +70,26 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Document the meaning of the blk_mq_hw_queue_to_node() arguments.
+Add a test case to zbd group to check that zones sector mapping correctness for
+zoned block devices that are not an entire full device (null_block device or
+physical device). These logical devices are for now partition devices or
+device-mapper devices (dm-linear or dm-flakey).
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-mq-cpumap.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Changes from v1:
+* Reflected Chaitanya's review comments on the list
+* Separated helper functions in zbd/rc into a preparation patch
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index 0afa4dc48365..f945621a0e8f 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -60,7 +60,11 @@ int blk_mq_map_queues(struct blk_mq_queue_map *qmap)
- }
- EXPORT_SYMBOL_GPL(blk_mq_map_queues);
- 
--/*
-+/**
-+ * blk_mq_hw_queue_to_node - Look up the memory node for a hardware queue index
-+ * @qmap: CPU to hardware queue map.
-+ * @index: hardware queue index.
-+ *
-  * We have no quick way of doing reverse lookups. This is only used at
-  * queue init time, so runtime isn't important.
-  */
+Shin'ichiro Kawasaki (2):
+  zbd/rc: Introduce helper functions for zone mapping test
+  zbd/007: Add zone mapping test for logical devices
+
+ tests/zbd/007     | 110 ++++++++++++++++++++++++++++++++++++++
+ tests/zbd/007.out |   2 +
+ tests/zbd/rc      | 133 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 245 insertions(+)
+ create mode 100755 tests/zbd/007
+ create mode 100644 tests/zbd/007.out
+
 -- 
-2.22.0.rc1
+2.21.0
 
