@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C75BC28CC3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D1CC28CC2
 	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 562432597B
+	by mail.kernel.org (Postfix) with ESMTP id 8368025972
 	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726408AbfEaABD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 20:01:03 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:41515 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726128AbfEaABD (ORCPT
+        id S1726128AbfEaABE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 20:01:04 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:37517 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726372AbfEaABD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 30 May 2019 20:01:03 -0400
-Received: by mail-pf1-f193.google.com with SMTP id q17so4968316pfq.8
-        for <linux-block@vger.kernel.org>; Thu, 30 May 2019 17:01:02 -0700 (PDT)
+Received: by mail-pl1-f195.google.com with SMTP id e7so2729674pln.4
+        for <linux-block@vger.kernel.org>; Thu, 30 May 2019 17:01:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=r19IWQwRW84cjiSL7CP+zx4l2sEwisSbCZliomBxBIE=;
-        b=hal526OrlKpthD2Cf+V//0Ur/C1dw8qxf5nsbV44nYnXuSJmCrmf5Sdz/Fam6YKxPi
-         RCgub9H4tV3RCOYDWAsBojP/SVfPUjl2EfGyfLAErDqpgcU8F3CdFxrqRORxV9+gB656
-         y3BA/87LuzgOdEsAqoi7J4AzbVGbOo5ubTjPf+xoPNVUMg90dwSZpA8uqzCpEOttIEtf
-         vEo/mGAxCUfre3g6zMSerTeJ0HfO3Ha4mbr1RAl1V4QBHAjuS4j0Nk1M8XB1RPIigEJ9
-         fbbtBQGcYktTxEDxQvVXtpS02ShapGjRZFYc1yP5KiosSvxVSSUKJ7tfdfpGu9OVhXgx
-         /q+A==
-X-Gm-Message-State: APjAAAUc9txGIk9sjTlx9mQjJDQWnEEsLdcYQCx2b8BIqlLmx8Z99mbh
-        miRcoEHOh3pIWRSX+vZhkU8=
-X-Google-Smtp-Source: APXvYqx0iVzruuloMbRtmi6b3iiBzOwyQmrOcOdHHs1I6S3Hc6lB49pzUBMiwFgkcRjjDwf1+13IEw==
-X-Received: by 2002:a63:484f:: with SMTP id x15mr3201600pgk.162.1559260862202;
-        Thu, 30 May 2019 17:01:02 -0700 (PDT)
+        bh=a3M4CAL5+YI0RIrBs3HShKXlvw263WQkN/Gvkpmg3h4=;
+        b=h7lT3Hj3Krq8tYSo0MhBya65aLbLIPlF0CVfpaRxOcLdceNl7d/HTTc39cNPP7buB6
+         sfuZoQ33MJpSapX9OuJd3vKG5wJ6Jz8r0UskTr7R/bhtP9c3lHfZb+FpJRsqpxqsQ2Fu
+         zTt5Uo6I859+fy97BbibP3Zjkx0viEyq5/DVedWGwblcAOF7CZ6xG3kxztLu6BzvtUPK
+         e/MKj4wMrE7eAk3p/vsGzVQNrY2owHMbFh6kJiDsTjPm4B1JpY3uI/8hyBj5KcE2OuME
+         5Yg7n1zQVojUsikb/GRRR5UnLAOqYC/JiqLIQaa/SjWQBCSu2aBcpV8Y73B41F1s/oAC
+         EVww==
+X-Gm-Message-State: APjAAAUyHk2yeNA+ggPIuI8OP6MUiOFnhR0lh3fy//JaMEV5ic9Pa0/V
+        j+bFotl/1BYi/vpINiCV5MI=
+X-Google-Smtp-Source: APXvYqw+BoAjeruYMepu+bHBwPkV4sNLsG4LMZNbhknOxQfbgPstg/Lw9pO24EJ7yKZ2NnIeQrsQJw==
+X-Received: by 2002:a17:902:9a08:: with SMTP id v8mr6293573plp.105.1559260863004;
+        Thu, 30 May 2019 17:01:03 -0700 (PDT)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id g8sm3539851pjp.17.2019.05.30.17.01.01
+        by smtp.gmail.com with ESMTPSA id g8sm3539851pjp.17.2019.05.30.17.01.02
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 30 May 2019 17:01:01 -0700 (PDT)
+        Thu, 30 May 2019 17:01:02 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 1/8] block/partitions/ldm: Convert a kernel-doc header into a non-kernel-doc header
-Date:   Thu, 30 May 2019 17:00:46 -0700
-Message-Id: <20190531000053.64053-2-bvanassche@acm.org>
+Subject: [PATCH 2/8] block: Convert blk_invalidate_devt() header into a non-kernel-doc header
+Date:   Thu, 30 May 2019 17:00:47 -0700
+Message-Id: <20190531000053.64053-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.20.GIT
 In-Reply-To: <20190531000053.64053-1-bvanassche@acm.org>
 References: <20190531000053.64053-1-bvanassche@acm.org>
@@ -63,22 +63,24 @@ header when building with W=1.
 
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/partitions/ldm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/genhd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
-index 6db573f33219..fe5d970e2e60 100644
---- a/block/partitions/ldm.c
-+++ b/block/partitions/ldm.c
-@@ -19,7 +19,7 @@
- #include "check.h"
- #include "msdos.h"
+diff --git a/block/genhd.c b/block/genhd.c
+index ad6826628e79..24654e1d83e6 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -532,8 +532,8 @@ void blk_free_devt(dev_t devt)
+ 	}
+ }
  
 -/**
+- *	We invalidate devt by assigning NULL pointer for devt in idr.
 +/*
-  * ldm_debug/info/error/crit - Output an error message
-  * @f:    A printf format string containing the message
-  * @...:  Variables to substitute into @f
++ * We invalidate devt by assigning NULL pointer for devt in idr.
+  */
+ void blk_invalidate_devt(dev_t devt)
+ {
 -- 
 2.22.0.rc1
 
