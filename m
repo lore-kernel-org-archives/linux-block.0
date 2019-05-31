@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C2EC28CC0
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B0FFC28CC0
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2AC562597B
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D61F525972
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 00:01:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726498AbfEaABH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 May 2019 20:01:07 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:44745 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726372AbfEaABH (ORCPT
+        id S1726543AbfEaABJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 May 2019 20:01:09 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:43197 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726509AbfEaABJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 May 2019 20:01:07 -0400
-Received: by mail-pl1-f196.google.com with SMTP id c5so3196675pll.11
-        for <linux-block@vger.kernel.org>; Thu, 30 May 2019 17:01:07 -0700 (PDT)
+        Thu, 30 May 2019 20:01:09 -0400
+Received: by mail-pf1-f193.google.com with SMTP id c6so4961752pfa.10
+        for <linux-block@vger.kernel.org>; Thu, 30 May 2019 17:01:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=pIGx/kPzD1UuzqJRC374QGxG0VTa+UTXUWjNfmuqFB8=;
-        b=LfhiSaGyEBmYVmzybqb/fcm3sZI7xTt1pZ1aoZiCoOwZrORluoa+KngAkWa6s5LbgA
-         oi4i8dujh4IYI2yWHu8jBPKVnn8DgPj58cbhioJ9wVmMyVy7S4/VjeZXIAaTbONfDQAu
-         bnlIJFQ5BBOhFY7n5zoLW9Gbcas3ncPONuQwNWuZhxmQuCfmlaAPXM1JO+kr8EOui/Xt
-         /WpQ9stCifmCcYYgK6pjP2lKk/54LRP2ctT7P4HZyPreQtd8iPZHKRrJheGrdvTmUm5y
-         5PAUXHAwqiVHPBBgv607WluY0+iE6q6Y3ezpFyzm7T0ycxGcZHiOAI1CfnV+RRKn6kGj
-         4XhA==
-X-Gm-Message-State: APjAAAXzxhmfbO0BA4YiZGLIEdYrFMBONQ+cfDfGa97qFlaajmZQvQvw
-        Icf2DrfYs6kSP4UD615mQFE=
-X-Google-Smtp-Source: APXvYqxn3RER5XFmroyAtKs4ghp4IpcGz15IqC8sqxP80rrFQpfOs04n9i4BDxkamCp5jd+G95zdKg==
-X-Received: by 2002:a17:902:b10f:: with SMTP id q15mr6207254plr.257.1559260866611;
-        Thu, 30 May 2019 17:01:06 -0700 (PDT)
+        bh=1vnHNVRtozPlGQFkNwwR5rrWtpp3cok6C77kqj9k9mU=;
+        b=dKsidzGJStRygborY2eqMIfYdoOCYu0kWxHdO/gLcAFw2AWDG452t25u6J5T00JM02
+         558i8opIPx87Xut4s2+SmfgBJWx4x7QGCojHU2pZm3qtlI2+8X0xWAOm1CwSaReIZB39
+         IY/DjbI+IWZ7hg2jnSDmlxxq3M1WHfrOKn4NkYvmyc3IWvSIEtjdeqOFSuDVbNPCRBwK
+         S1srkWQnomu7hKj597azBszArYJWc4IkZ8eek5FXei3Zx+DQWT2o+cVvvDXRdROoVtFg
+         VXUr8AuFFEaMEGdGXwbBhErBy7L5al9qp+PC7lerPAB0S69C0Fi+pAfw85ARyZYts37k
+         ibrQ==
+X-Gm-Message-State: APjAAAUNe0rH0GtN2RGHauJ9gLFaGKstrOiA/w0Y0H03Q8PDqddMo6bZ
+        XvX9STYMdSP0eDiIkHiT/fs=
+X-Google-Smtp-Source: APXvYqwATFxGAZxvTtQZ3gaBz0FlHFXLlKN/6ssRruYDeoVY0rXWGXy14fnx4rPeOujrcGfvKpLJOg==
+X-Received: by 2002:a17:90a:192:: with SMTP id 18mr5982444pjc.107.1559260868174;
+        Thu, 30 May 2019 17:01:08 -0700 (PDT)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id g8sm3539851pjp.17.2019.05.30.17.01.05
+        by smtp.gmail.com with ESMTPSA id g8sm3539851pjp.17.2019.05.30.17.01.06
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 30 May 2019 17:01:05 -0700 (PDT)
+        Thu, 30 May 2019 17:01:06 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 5/8] block: Fix rq_qos_wait() kernel-doc header
-Date:   Thu, 30 May 2019 17:00:50 -0700
-Message-Id: <20190531000053.64053-6-bvanassche@acm.org>
+Subject: [PATCH 6/8] block: Fix bsg_setup_queue() kernel-doc header
+Date:   Thu, 30 May 2019 17:00:51 -0700
+Message-Id: <20190531000053.64053-7-bvanassche@acm.org>
 X-Mailer: git-send-email 2.20.GIT
 In-Reply-To: <20190531000053.64053-1-bvanassche@acm.org>
 References: <20190531000053.64053-1-bvanassche@acm.org>
@@ -58,32 +58,26 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add documentation for the @rqw argument and change " - " into ": ".
+Document all bsg_setup_queue() arguments as required.
 
-Fixes: 84f603246db9 ("block: add rq_qos_wait to rq_qos") # v5.0-rc1~52^2~140.
+Fixes: aae3b069d5ce ("bsg: pass in desired timeout handler") # v5.0.
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-rq-qos.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ block/bsg-lib.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 3f55b56f24bc..659ccb8b693f 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -209,9 +209,10 @@ static int rq_qos_wake_function(struct wait_queue_entry *curr,
- 
- /**
-  * rq_qos_wait - throttle on a rqw if we need to
-- * @private_data - caller provided specific data
-- * @acquire_inflight_cb - inc the rqw->inflight counter if we can
-- * @cleanup_cb - the callback to cleanup in case we race with a waker
-+ * @rqw: rqw to throttle on
-+ * @private_data: caller provided specific data
-+ * @acquire_inflight_cb: inc the rqw->inflight counter if we can
-+ * @cleanup_cb: the callback to cleanup in case we race with a waker
-  *
-  * This provides a uniform place for the rq_qos users to do their throttling.
-  * Since you can end up with a lot of things sleeping at once, this manages the
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index b898a1cdf872..785dd58947f1 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -354,6 +354,7 @@ static const struct blk_mq_ops bsg_mq_ops = {
+  * @dev: device to attach bsg device to
+  * @name: device to give bsg device
+  * @job_fn: bsg job handler
++ * @timeout: timeout handler function pointer
+  * @dd_job_size: size of LLD data needed for each job
+  */
+ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
 -- 
 2.22.0.rc1
 
