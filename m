@@ -2,47 +2,40 @@ Return-Path: <SRS0=RDeE=T7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B23C04AB6
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 13:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C6DC04AB6
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 14:20:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1D3E226961
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 13:26:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oMieT2ho"
+	by mail.kernel.org (Postfix) with ESMTP id 0AA7926A54
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 14:20:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbfEaN0r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 May 2019 09:26:47 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:60612 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726485AbfEaN0q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 May 2019 09:26:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=8n09TENg//rbgbzsGXRPd289l+d2UZWCH+fGg2NaHa4=; b=oMieT2howrG7WS9bOvNKdCmiR
-        jX6TmxtTHoTJ6p19NQ7BG0HE7FY04HsI5/nyRw+Aq42dtfLxVH85f/Oo1wrKHZiXHSYILXb6bYx6K
-        yhA1rgynmCx8lfqGcZssXNV6HHnn7atgrynyvL/+8MltoPvEPtws/8cz6hOIaknzrE3S4stP3RQCA
-        +MPBd2PAi7l2iU3fhSRgYTaCLKkRqUgtXi6eiRPa1g0WJHp8m2WPOXwF9+0/y9HLU+804TTCeG+yR
-        KtRFcgaXX9U1NowGmovnO8AyDivrrgn/IpW9UKTGwPivpjuRU9V2uX1aDiIUIutXoeABwDttquviR
-        2s09w9mqg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hWhY5-0007pO-9M; Fri, 31 May 2019 13:26:21 +0000
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 158FF201822CC; Fri, 31 May 2019 15:26:20 +0200 (CEST)
-Date:   Fri, 31 May 2019 15:26:20 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jann Horn <jannh@google.com>, Greg KH <gregkh@linuxfoundation.org>,
+        id S1726652AbfEaOUT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 May 2019 10:20:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47652 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726037AbfEaOUT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 May 2019 10:20:19 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id DD64BB5C01;
+        Fri, 31 May 2019 14:20:18 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2128E7C5AD;
+        Fri, 31 May 2019 14:20:12 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20190531132620.GC2606@hirez.programming.kicks-ass.net>
+References: <20190531132620.GC2606@hirez.programming.kicks-ass.net> <20190531111445.GO2677@hirez.programming.kicks-ass.net> <CAG48ez0R-R3Xs+3Xg9T9qcV3Xv6r4pnx1Z2y=Ltx7RGOayte_w@mail.gmail.com> <20190528162603.GA24097@kroah.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk> <155905931502.7587.11705449537368497489.stgit@warthog.procyon.org.uk> <4031.1559064620@warthog.procyon.org.uk> <20190528231218.GA28384@kroah.com> <31936.1559146000@warthog.procyon.org.uk> <16193.1559163763@warthog.procyon.org.uk> <21942.1559304135@warthog.procyon.org.uk>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     dhowells@redhat.com, Jann Horn <jannh@google.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
         Al Viro <viro@zeniv.linux.org.uk>, raven@themaw.net,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         Linux API <linux-api@vger.kernel.org>,
@@ -51,88 +44,83 @@ Cc:     Jann Horn <jannh@google.com>, Greg KH <gregkh@linuxfoundation.org>,
         kernel list <linux-kernel@vger.kernel.org>,
         Kees Cook <keescook@chromium.org>,
         Kernel Hardening <kernel-hardening@lists.openwall.com>
-Subject: Re: [PATCH 1/7] General notification queue with user mmap()'able
- ring buffer
-Message-ID: <20190531132620.GC2606@hirez.programming.kicks-ass.net>
-References: <20190531111445.GO2677@hirez.programming.kicks-ass.net>
- <CAG48ez0R-R3Xs+3Xg9T9qcV3Xv6r4pnx1Z2y=Ltx7RGOayte_w@mail.gmail.com>
- <20190528162603.GA24097@kroah.com>
- <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk>
- <155905931502.7587.11705449537368497489.stgit@warthog.procyon.org.uk>
- <4031.1559064620@warthog.procyon.org.uk>
- <20190528231218.GA28384@kroah.com>
- <31936.1559146000@warthog.procyon.org.uk>
- <16193.1559163763@warthog.procyon.org.uk>
- <21942.1559304135@warthog.procyon.org.uk>
+Subject: Re: [PATCH 1/7] General notification queue with user mmap()'able ring buffer
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <21942.1559304135@warthog.procyon.org.uk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <605.1559312411.1@warthog.procyon.org.uk>
+Date:   Fri, 31 May 2019 15:20:12 +0100
+Message-ID: <606.1559312412@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Fri, 31 May 2019 14:20:19 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 31, 2019 at 01:02:15PM +0100, David Howells wrote:
-> Peter Zijlstra <peterz@infradead.org> wrote:
-> 
-> > Can you re-iterate the exact problem? I konw we talked about this in the
-> > past, but I seem to have misplaced those memories :/
-> 
-> Take this for example:
-> 
-> 	void afs_put_call(struct afs_call *call)
-> 	{
-> 		struct afs_net *net = call->net;
-> 		int n = atomic_dec_return(&call->usage);
-> 		int o = atomic_read(&net->nr_outstanding_calls);
-> 
-> 		trace_afs_call(call, afs_call_trace_put, n + 1, o,
-> 			       __builtin_return_address(0));
-> 
-> 		ASSERTCMP(n, >=, 0);
-> 		if (n == 0) {
-> 			...
-> 		}
-> 	}
-> 
-> I am printing the usage count in the afs_call tracepoint so that I can use it
-> to debug refcount bugs.  If I do it like this:
-> 
-> 	void afs_put_call(struct afs_call *call)
-> 	{
-> 		int n = refcount_read(&call->usage);
-> 		int o = atomic_read(&net->nr_outstanding_calls);
-> 
-> 		trace_afs_call(call, afs_call_trace_put, n, o,
-> 			       __builtin_return_address(0));
-> 
-> 		if (refcount_dec_and_test(&call->usage)) {
-> 			...
-> 		}
-> 	}
-> 
-> then there's a temporal gap between the usage count being read and the actual
-> atomic decrement in which another CPU can alter the count.  This can be
-> exacerbated by an interrupt occurring, a softirq occurring or someone enabling
-> the tracepoint.
-> 
-> I can't do the tracepoint after the decrement if refcount_dec_and_test()
-> returns false unless I save all the values from the object that I might need
-> as the object could be destroyed any time from that point on.
+Peter Zijlstra <peterz@infradead.org> wrote:
 
-Is it not the responsibility of the task that affects the 1->0
-transition to actually free the memory?
+> Is it not the responsibility of the task that affects the 1->0
+> transition to actually free the memory?
+> 
+> That is, I'm expecting the '...' in both cases above the include the
+> actual freeing of the object. If this is not the case, then @usage is
+> not a reference count.
 
-That is, I'm expecting the '...' in both cases above the include the
-actual freeing of the object. If this is not the case, then @usage is
-not a reference count.
+Yes.  The '...' does the freeing.  It seemed unnecessary to include the code
+ellipsised there since it's not the point of the discussion, but if you want
+the full function:
 
-(and it has already been established that refcount_t doesn't work for
-usage count scenarios)
+	void afs_put_call(struct afs_call *call)
+	{
+		struct afs_net *net = call->net;
+		int n = atomic_dec_return(&call->usage);
+		int o = atomic_read(&net->nr_outstanding_calls);
 
-Aside from that, is the problem that refcount_dec_and_test() returns a
-boolean (true - last put, false - not last) instead of the refcount
-value? This does indeed make it hard to print the exact count value for
-the event.
+		trace_afs_call(call, afs_call_trace_put, n + 1, o,
+			       __builtin_return_address(0));
+
+		ASSERTCMP(n, >=, 0);
+		if (n == 0) {
+			ASSERT(!work_pending(&call->async_work));
+			ASSERT(call->type->name != NULL);
+
+			if (call->rxcall) {
+				rxrpc_kernel_end_call(net->socket, call->rxcall);
+				call->rxcall = NULL;
+			}
+			if (call->type->destructor)
+				call->type->destructor(call);
+
+			afs_put_server(call->net, call->server);
+			afs_put_cb_interest(call->net, call->cbi);
+			afs_put_addrlist(call->alist);
+			kfree(call->request);
+
+			trace_afs_call(call, afs_call_trace_free, 0, o,
+				       __builtin_return_address(0));
+			kfree(call);
+
+			o = atomic_dec_return(&net->nr_outstanding_calls);
+			if (o == 0)
+				wake_up_var(&net->nr_outstanding_calls);
+		}
+	}
+
+You can see the kfree(call) in there.
+Peter Zijlstra <peterz@infradead.org> wrote:
+
+> (and it has already been established that refcount_t doesn't work for
+> usage count scenarios)
+
+?
+
+Does that mean struct kref doesn't either?
+
+> Aside from that, is the problem that refcount_dec_and_test() returns a
+> boolean (true - last put, false - not last) instead of the refcount
+> value? This does indeed make it hard to print the exact count value for
+> the event.
+
+That is the problem, yes - well, one of them: refcount_inc() doesn't either.
+
+David
