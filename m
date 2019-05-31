@@ -6,23 +6,23 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5096FC04AB6
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8463C04AB6
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:09:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F9DA26431
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:08:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A576526431
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:09:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726719AbfEaGI6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 May 2019 02:08:58 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56992 "EHLO mx1.suse.de"
+        id S1726275AbfEaGJW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 May 2019 02:09:22 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57070 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726275AbfEaGI6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 May 2019 02:08:58 -0400
+        id S1725955AbfEaGJV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 May 2019 02:09:21 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 4257BAF51;
-        Fri, 31 May 2019 06:08:56 +0000 (UTC)
-Subject: Re: [PATCH 3/9] scsi: Add template flag 'host_tagset'
+        by mx1.suse.de (Postfix) with ESMTP id D49DCAF8E;
+        Fri, 31 May 2019 06:09:19 +0000 (UTC)
+Subject: Re: [PATCH 4/9] scsi_debug: support host tagset
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>
@@ -35,7 +35,7 @@ Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
         Sathya Prakash <sathya.prakash@broadcom.com>,
         Christoph Hellwig <hch@lst.de>
 References: <20190531022801.10003-1-ming.lei@redhat.com>
- <20190531022801.10003-4-ming.lei@redhat.com>
+ <20190531022801.10003-5-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -81,12 +81,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <84b943e3-5e75-aa48-a6bc-065247e488cd@suse.de>
-Date:   Fri, 31 May 2019 08:08:55 +0200
+Message-ID: <6691ab8a-cfb1-7d78-a25a-2e09b9a5be76@suse.de>
+Date:   Fri, 31 May 2019 08:09:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190531022801.10003-4-ming.lei@redhat.com>
+In-Reply-To: <20190531022801.10003-5-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -96,22 +96,14 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 5/31/19 4:27 AM, Ming Lei wrote:
-> From: Hannes Reinecke <hare@suse.com>
-> 
-> Add a host template flag 'host_tagset' so hostwide tagset can be
-> shared on multiple reply queues after the SCSI device's reply queue
-> is converted to blk-mq hw queue.
+> The 'host_tagset' can be set on scsi_debug device for testing
+> shared hostwide tags on multiple blk-mq hw queue.
 > 
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  drivers/scsi/scsi_lib.c  | 2 ++
->  include/scsi/scsi_host.h | 3 +++
->  2 files changed, 5 insertions(+)
+>  drivers/scsi/scsi_debug.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-(Do I need to review my own patch?)
-
-Anyway.
-
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
