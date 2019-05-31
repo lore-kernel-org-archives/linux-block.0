@@ -2,108 +2,93 @@ Return-Path: <SRS0=RDeE=T7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,UNPARSEABLE_RELAY,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCD93C04AB6
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 14:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44996C28CC3
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 14:55:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91BE426AD5
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 14:44:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cLRCeCwZ"
+	by mail.kernel.org (Postfix) with ESMTP id 2884C26B1B
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 14:55:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726485AbfEaOo6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 May 2019 10:44:58 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:51032 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726518AbfEaOo5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 May 2019 10:44:57 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4VEiI7M135718;
-        Fri, 31 May 2019 14:44:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : in-reply-to :
- references : mime-version : content-type : content-transfer-encoding :
- subject : to : cc : from : message-id; s=corp-2018-07-02;
- bh=2Om5stwDArQ6nGqOb7I9JAkeWMfEhcwW5B4qI7FOiB0=;
- b=cLRCeCwZnlsUocnqR6QzeNTw/ws6EKRiVDGt5QG90Hn/e4KTVGWKirkrucWPvBhFQUvU
- v2Ar9cbIhR0DQteupVsa3sD9gytEUUrem5p0dvpG45c/auWqrWM9jKusfY4jekJ93mPM
- yVU3FV1gKzN4vsWQan5e9Vgx85Gd9wQA6aQQlL84DNBFSEHv9Ld/W9P34Psv3faIHBkz
- tvhl6unPvXR/vg/aPQKcZbYPdRJzzyIWTasj6fIVTo6MESGnsA1rnkdLj49ZQAll+Tj8
- yHdJnQAdKrCaso0uk8lLbIvcYujnVdOybEm18+d0Ml+IVaKBURzuOhPzyk/5UHMOzLjp 7w== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2130.oracle.com with ESMTP id 2spu7dxyqt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 31 May 2019 14:44:48 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4VEiTu6146225;
-        Fri, 31 May 2019 14:44:47 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2su61fgc4n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 31 May 2019 14:44:47 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4VEiitL032333;
-        Fri, 31 May 2019 14:44:44 GMT
-Received: from galaxy-s9.lan (/209.6.36.129)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 31 May 2019 07:44:43 -0700
-Date:   Fri, 31 May 2019 10:44:39 -0400
-User-Agent: K-9 Mail for Android
-In-Reply-To: <ba37b50c-c0ac-5af4-441b-a2d4eda81255@suse.com>
-References: <20190503150401.15904-1-roger.pau@citrix.com> <f4b944e8-6678-a921-e2b2-aaeb00c0d5e1@suse.com> <ba37b50c-c0ac-5af4-441b-a2d4eda81255@suse.com>
+        id S1726787AbfEaOzN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 May 2019 10:55:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40650 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726531AbfEaOzM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 May 2019 10:55:12 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 47CAFC0AD2B7;
+        Fri, 31 May 2019 14:55:12 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 44FF41001E6F;
+        Fri, 31 May 2019 14:55:09 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20190529231112.GB3164@kroah.com>
+References: <20190529231112.GB3164@kroah.com> <20190528231218.GA28384@kroah.com> <20190528162603.GA24097@kroah.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk> <155905931502.7587.11705449537368497489.stgit@warthog.procyon.org.uk> <4031.1559064620@warthog.procyon.org.uk> <31936.1559146000@warthog.procyon.org.uk>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     dhowells@redhat.com, viro@zeniv.linux.org.uk, raven@themaw.net,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/7] General notification queue with user mmap()'able ring buffer
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Xen-devel] [PATCH] xen-blkfront: switch kcalloc to kvcalloc for large array allocation
-To:     Juergen Gross <jgross@suse.com>,
-        Roger Pau Monne <roger.pau@citrix.com>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-CC:     Stefano Stabellini <sstabellini@kernel.org>,
-        stable@vger.kernel.org, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>
-From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Message-ID: <63D28830-5450-41F5-AC6E-3D5FDE1F80B7@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9273 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905310093
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9273 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905310093
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3762.1559314508.1@warthog.procyon.org.uk>
+Date:   Fri, 31 May 2019 15:55:08 +0100
+Message-ID: <3763.1559314508@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Fri, 31 May 2019 14:55:12 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On May 31, 2019 10:41:16 AM EDT, Juergen Gross <jgross@suse=2Ecom> wrote:
->On 06/05/2019 10:11, Juergen Gross wrote:
->> On 03/05/2019 17:04, Roger Pau Monne wrote:
->>> There's no reason to request physically contiguous memory for those
->>> allocations=2E
->>>
->>> Reported-by: Ian Jackson <ian=2Ejackson@citrix=2Ecom>
->>> Signed-off-by: Roger Pau Monn=C3=A9 <roger=2Epau@citrix=2Ecom>
->>=20
->> Reviewed-by: Juergen Gross <jgross@suse=2Ecom>
->
->Jens, are you going to tkae this patch or should I carry it through the
->Xen tree?
+Greg KH <gregkh@linuxfoundation.org> wrote:
 
-Usually I ended up picking them (and then asking Jens to git pull into his=
- branch) but if you want to handle them that would be much easier!
+> So, if that's all that needs to be fixed, can you use the same
+> buffer/code if that patch is merged?
 
-(And if so, please add Acked-by on them from me)=2E
->
->
->Juergen
+I really don't know.  The perf code is complex, partially in hardware drivers
+and is tricky to understand - though a chunk of that is the "aux" buffer part;
+PeterZ used words like "special" and "magic" and the comments in the code talk
+about the hardware writing into the buffer.
 
+__perf_output_begin() does not appear to be SMP safe.  It uses local_cmpxchg()
+and local_add() which on x86 lack the LOCK prefix.
+
+stracing the perf command on my test machine, it calls perf_event_open(2) four
+times and mmap's each fd it gets back.  I'm guessing that each one maps a
+separate buffer for each CPU.
+
+So to use watch_queue based on perf's buffering, you would have to have a
+(2^N)+1 pages-sized buffer for each CPU.  So that would be a minimum of 64K of
+unswappable memory for my desktop machine, say).  Multiply that by each
+process that wants to listen for events...
+
+What I'm aiming for is something that has a single buffer used by all CPUs for
+each instance of /dev/watch_queue opened and I'd also like to avoid having to
+allocate the metadata page and the aux buffer to save space.  This is locked
+memory and cannot be swapped.
+
+Also, perf has to leave a gap in the ring because it uses CIRC_SPACE(), though
+that's a minor detail that I guess can't be fixed now.
+
+I'm also slightly concerned that __perf_output_begin() doesn't check if
+rb->user->tail has got ahead of rb->user->head or that it's lagging too far
+behind.  I doubt it's a serious problem for the kernel since it won't write
+outside of the buffer, but userspace might screw up.  I think the worst that
+will happen is that userspace will get confused.
+
+One thing I would like is to waive the 2^N size requirement.  I understand
+*why* we do that, but I wonder how expensive DIV instructions are for
+relatively small divisors.
+
+David
