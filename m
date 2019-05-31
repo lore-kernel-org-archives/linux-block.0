@@ -2,91 +2,112 @@ Return-Path: <SRS0=RDeE=T7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E10C3C04AB6
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 11:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79156C28CC2
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 12:02:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B75CB26877
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 11:55:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A33B260E2
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 12:02:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726826AbfEaLzL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 May 2019 07:55:11 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:51371 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726386AbfEaLzL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 May 2019 07:55:11 -0400
-Received: from orion.localdomain ([77.7.63.28]) by mrelayeu.kundenserver.de
- (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1MPosX-1hB0Ov0nZL-00MqI5; Fri, 31 May 2019 13:54:58 +0200
-From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
-To:     linux-kernel@vger.kernel.org
-Cc:     axboe@kernel.dk, herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH 1/3] mod_devicetable: helper macro for declaring oftree module device table
-Date:   Fri, 31 May 2019 13:54:48 +0200
-Message-Id: <1559303690-8108-2-git-send-email-info@metux.net>
-X-Mailer: git-send-email 1.9.1
-In-Reply-To: <1559303690-8108-1-git-send-email-info@metux.net>
-References: <1559303690-8108-1-git-send-email-info@metux.net>
-X-Provags-ID: V03:K1:V288v4ALIWuWNg9HRg79E6LpE7dzHj4EBz4l93oqRsKCBr/QUSy
- I0NLW8gl8Nb+SO5o3chDtqIXJOYGcC8EpFMX8bDouP9ej7aBQ6g9TdBGvF7GdSHRTdr/mZV
- 3qlXzmS7Tb/VFQC9St3koLYPmiYTsyDDMy/FCQNqMQdpj1zyJhcu4iMW+n8Dtgkuw2UwQFN
- Cl6mS9uOxWsnw5E5SMeFw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:bINdRz6o6vM=:1m4uF5uYooJCKxCZ+OV6Du
- /Qbc6OffjQZj1+BTQ2yZecPNqHNmYaG/tN2zvllwRvuY/7tOiEfF3FIBK05HdEe39GlyWuqyY
- s9p0mT+LlKd1goyBxz5SaUXm0AAyzieQ2bYwluLqb8wkKz5Z1UOEbCzlFa3mKwLN/D6Q5jQgo
- aswyh6GSxJH3YZkgHFQ7X0ZQoztCTR2UnY5zMM4oIzZsBH6CeZy8Ym5bNKqa4A+bYOkNJGpaT
- MQWxKWn2dYbDv4WnvVD2iRFCL1u2WjmJ5RZ5lEhcuTR9XNHIVJ61XWMMa4BBc3sMJaPNxx0ti
- AvOSD2b3IrqhOEUjWXGHrJnxoBQcrd2zKUSjopULhHpTMU+WSOwdi9Lqa1BAG0ypskfZ0TzuI
- uuhTviDsgefclU4Aa8lW/9Zvl/9dVDnNYDv8muOVDNn6TPGcL5XpmAEXkw5ir60wo3TrxVzEg
- 4IrUNvHLk/GDn8kuycQIW5tYW6O2QSd5qKDzM4oJeqjTuDvGncxF7oXkLAiTrNjt+I9+faOq2
- nxRlCV9DLkqaEX3dix9eL1Tlx+P87GeQoVoq7f6zpB2mXOqF6dPdGLvOag1Yck0tc+vK/6GnF
- w33ZjcDKLtQt8daMOUa98K6RQ5SgwnjmwlbzQD90cxUmGQYJ49tOIFIqj70udQ5eVayj72Aka
- PS6g8fcffAqTtk3BSFt/1sFgE4ITlUExgjnLs1HEnZVkmQUu629B/bGEvp2BSll9wILdvIcZX
- eTZR0/N4YV365T7B7R3O2kDI1DUXP47gkzHDyw==
+        id S1726331AbfEaMCb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 May 2019 08:02:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34542 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726330AbfEaMCa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 May 2019 08:02:30 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id AD5363001789;
+        Fri, 31 May 2019 12:02:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1F522176B4;
+        Fri, 31 May 2019 12:02:17 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20190531111445.GO2677@hirez.programming.kicks-ass.net>
+References: <20190531111445.GO2677@hirez.programming.kicks-ass.net> <CAG48ez0R-R3Xs+3Xg9T9qcV3Xv6r4pnx1Z2y=Ltx7RGOayte_w@mail.gmail.com> <20190528162603.GA24097@kroah.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk> <155905931502.7587.11705449537368497489.stgit@warthog.procyon.org.uk> <4031.1559064620@warthog.procyon.org.uk> <20190528231218.GA28384@kroah.com> <31936.1559146000@warthog.procyon.org.uk> <16193.1559163763@warthog.procyon.org.uk>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     dhowells@redhat.com, Jann Horn <jannh@google.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>, raven@themaw.net,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>
+Subject: Re: [PATCH 1/7] General notification queue with user mmap()'able ring buffer
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <21941.1559304135.1@warthog.procyon.org.uk>
+Date:   Fri, 31 May 2019 13:02:15 +0100
+Message-ID: <21942.1559304135@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Fri, 31 May 2019 12:02:30 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Little helper macro that declares an oftree module device table,
-if CONFIG_OF is enabled. Otherwise it's just noop. Helpful for
-reducing the number of #ifdef's.
+Peter Zijlstra <peterz@infradead.org> wrote:
 
-Instead of:
-    MODULE_DEVICE_TABLE(of, foo)
-now use:
-    MODULE_OF_TABLE(foo)
+> Can you re-iterate the exact problem? I konw we talked about this in the
+> past, but I seem to have misplaced those memories :/
 
-Signed-off-by: Enrico Weigelt <info@metux.net>
----
- include/linux/mod_devicetable.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Take this for example:
 
-diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-index 448621c..0551b53 100644
---- a/include/linux/mod_devicetable.h
-+++ b/include/linux/mod_devicetable.h
-@@ -245,6 +245,15 @@ struct of_device_id {
- 	const void *data;
- };
- 
-+/*
-+ * macro for adding the of module device table only if CONFIG_OF enabled
-+ */
-+#ifdef CONFIG_OF
-+#define MODULE_OF_TABLE(name)	MODULE_DEVICE_TABLE(of,name)
-+#else
-+#define MODULE_OF_TABLE(name)
-+#endif /* CONFIG_OF */
-+
- /* VIO */
- struct vio_device_id {
- 	char type[32];
--- 
-1.9.1
+	void afs_put_call(struct afs_call *call)
+	{
+		struct afs_net *net = call->net;
+		int n = atomic_dec_return(&call->usage);
+		int o = atomic_read(&net->nr_outstanding_calls);
 
+		trace_afs_call(call, afs_call_trace_put, n + 1, o,
+			       __builtin_return_address(0));
+
+		ASSERTCMP(n, >=, 0);
+		if (n == 0) {
+			...
+		}
+	}
+
+I am printing the usage count in the afs_call tracepoint so that I can use it
+to debug refcount bugs.  If I do it like this:
+
+	void afs_put_call(struct afs_call *call)
+	{
+		int n = refcount_read(&call->usage);
+		int o = atomic_read(&net->nr_outstanding_calls);
+
+		trace_afs_call(call, afs_call_trace_put, n, o,
+			       __builtin_return_address(0));
+
+		if (refcount_dec_and_test(&call->usage)) {
+			...
+		}
+	}
+
+then there's a temporal gap between the usage count being read and the actual
+atomic decrement in which another CPU can alter the count.  This can be
+exacerbated by an interrupt occurring, a softirq occurring or someone enabling
+the tracepoint.
+
+I can't do the tracepoint after the decrement if refcount_dec_and_test()
+returns false unless I save all the values from the object that I might need
+as the object could be destroyed any time from that point on.  In this
+particular case, that's just call->debug_id, but it could be other things in
+other cases.
+
+Note that I also can't touch the afs_net object in that situation either, and
+the outstanding calls count that I record will potentially be out of date -
+but there's not a lot I can do about that.
+
+David
