@@ -6,23 +6,24 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF81C28CC3
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:07:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 365EEC04AB6
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:08:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 670642642C
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:07:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 134FD2642C
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:08:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726617AbfEaGHx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 May 2019 02:07:53 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56844 "EHLO mx1.suse.de"
+        id S1726649AbfEaGIL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 May 2019 02:08:11 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56924 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726275AbfEaGHx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 May 2019 02:07:53 -0400
+        id S1726635AbfEaGIL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 May 2019 02:08:11 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id E6A04AF51;
-        Fri, 31 May 2019 06:07:50 +0000 (UTC)
-Subject: Re: [PATCH 1/9] blk-mq: allow hw queues to share hostwide tags
+        by mx1.suse.de (Postfix) with ESMTP id 5A085AF8E;
+        Fri, 31 May 2019 06:08:09 +0000 (UTC)
+Subject: Re: [PATCH 2/9] block: null_blk: introduce module parameter of
+ 'g_host_tags'
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>
@@ -35,7 +36,7 @@ Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
         Sathya Prakash <sathya.prakash@broadcom.com>,
         Christoph Hellwig <hch@lst.de>
 References: <20190531022801.10003-1-ming.lei@redhat.com>
- <20190531022801.10003-2-ming.lei@redhat.com>
+ <20190531022801.10003-3-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -81,12 +82,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <27661b1e-4046-9aae-fa2c-230cdf59fa94@suse.de>
-Date:   Fri, 31 May 2019 08:07:49 +0200
+Message-ID: <0edb5a52-dd17-7cca-0d73-e95e348f7f3f@suse.de>
+Date:   Fri, 31 May 2019 08:08:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190531022801.10003-2-ming.lei@redhat.com>
+In-Reply-To: <20190531022801.10003-3-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -96,41 +97,24 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 5/31/19 4:27 AM, Ming Lei wrote:
-> Some SCSI HBAs(such as HPSA, megaraid, mpt3sas, hisi_sas_v3 ..) support
-> multiple reply queues with single hostwide tags, and the reply queue
-> is used for delievery & complete request, and one MSI-X vector is
-> assigned to each reply queue.
+> Introduces parameter of 'g_host_tags' for testing hostwide tags.
 > 
-> Now drivers have switched to use pci_alloc_irq_vectors(PCI_IRQ_AFFINITY)
-> for automatic affinity assignment. Given there is only single blk-mq hw
-> queue, these drivers have to setup private reply queue mapping for
-> figuring out which reply queue is selected for delivery request, and
-> the queue mapping is based on managed IRQ affinity, and it is generic,
-> should have been done inside blk-mq.
+> Not observe performance drop in the following test:
 > 
-> Based on the following Hannes's patch, introduce BLK_MQ_F_HOST_TAGS for
-> converting reply queue into blk-mq hw queue.
+> 1) no 'host_tags', hw queue depth is 16, and 1 hw queue
+> modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 host_tags=0 submit_queues=1 hw_queue_depth=16
 > 
-> 	https://marc.info/?l=linux-block&m=149132580511346&w=2
+> 2) 'host_tags', global hw queue depth is 16, and 8 hw queues
+> modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 host_tags=1 submit_queues=8 hw_queue_depth=16
 > 
-> Once driver sets BLK_MQ_F_HOST_TAGS, the hostwide tags & request pool is
-> shared among all blk-mq hw queues.
+> 3) fio test command:
 > 
-> The following patches will map driver's reply queue into blk-mq hw queue
-> by applying BLK_MQ_F_HOST_TAGS.
-> 
-> Compared with the current implementation by single hw queue, performance
-> shouldn't be affected by this patch in theory.
+> fio --bs=4k --ioengine=libaio --iodepth=16 --filename=/dev/nullb0:/dev/nullb1:/dev/nullb2:/dev/nullb3 --direct=1 --runtime=30 --numjobs=16 --rw=randread --name=test --group_reporting --gtod_reduce=1
 > 
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  block/blk-mq-debugfs.c |  1 +
->  block/blk-mq-sched.c   |  8 ++++++++
->  block/blk-mq-tag.c     |  6 ++++++
->  block/blk-mq.c         | 14 ++++++++++++++
->  block/elevator.c       |  5 +++--
->  include/linux/blk-mq.h |  1 +
->  6 files changed, 33 insertions(+), 2 deletions(-)
+>  drivers/block/null_blk_main.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
