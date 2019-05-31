@@ -6,23 +6,23 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8463C04AB6
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD4AC04AB6
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:10:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A576526431
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:09:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 37F2F26434
+	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 06:10:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726275AbfEaGJW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 May 2019 02:09:22 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57070 "EHLO mx1.suse.de"
+        id S1726331AbfEaGKu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 May 2019 02:10:50 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57232 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725955AbfEaGJV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 May 2019 02:09:21 -0400
+        id S1725955AbfEaGKu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 May 2019 02:10:50 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id D49DCAF8E;
-        Fri, 31 May 2019 06:09:19 +0000 (UTC)
-Subject: Re: [PATCH 4/9] scsi_debug: support host tagset
+        by mx1.suse.de (Postfix) with ESMTP id 50CACAF51;
+        Fri, 31 May 2019 06:10:48 +0000 (UTC)
+Subject: Re: [PATCH 5/9] scsi: introduce scsi_cmnd_hctx_index()
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>
@@ -35,7 +35,7 @@ Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
         Sathya Prakash <sathya.prakash@broadcom.com>,
         Christoph Hellwig <hch@lst.de>
 References: <20190531022801.10003-1-ming.lei@redhat.com>
- <20190531022801.10003-5-ming.lei@redhat.com>
+ <20190531022801.10003-6-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -81,12 +81,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <6691ab8a-cfb1-7d78-a25a-2e09b9a5be76@suse.de>
-Date:   Fri, 31 May 2019 08:09:19 +0200
+Message-ID: <8e38efe6-d627-9d63-4fca-252e1839ec23@suse.de>
+Date:   Fri, 31 May 2019 08:10:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190531022801.10003-5-ming.lei@redhat.com>
+In-Reply-To: <20190531022801.10003-6-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -96,14 +96,22 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 5/31/19 4:27 AM, Ming Lei wrote:
-> The 'host_tagset' can be set on scsi_debug device for testing
-> shared hostwide tags on multiple blk-mq hw queue.
+> For drivers which enable .host_tagset, introduce scsi_cmnd_hctx_index
+> to retrieve current reply queue index. If valid scsi command is provided,
+> blk-mq's hw queue's index is returned, otherwise return the queue
+> mapped from current CPU.
 > 
+> Prepare for converting device's privete reply queue to blk-mq hw queue.
+> 
+                                  ^private
+
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  drivers/scsi/scsi_debug.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  include/scsi/scsi_cmnd.h | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
 > 
+Otherwise:
+
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
