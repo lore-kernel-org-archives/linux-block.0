@@ -1,114 +1,101 @@
-Return-Path: <SRS0=RDeE=T7=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=CsIW=UA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D00C04AB6
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 19:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D46C28CC1
+	for <linux-block@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30C6B26995
-	for <linux-block@archiver.kernel.org>; Fri, 31 May 2019 19:08:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A2D12771C
+	for <linux-block@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727012AbfEaTIu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 May 2019 15:08:50 -0400
-Received: from gateway31.websitewelcome.com ([192.185.144.96]:47375 "EHLO
-        gateway31.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726807AbfEaTIu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 May 2019 15:08:50 -0400
-X-Greylist: delayed 1253 seconds by postgrey-1.27 at vger.kernel.org; Fri, 31 May 2019 15:08:50 EDT
-Received: from cm12.websitewelcome.com (cm12.websitewelcome.com [100.42.49.8])
-        by gateway31.websitewelcome.com (Postfix) with ESMTP id 6D74C41430
-        for <linux-block@vger.kernel.org>; Fri, 31 May 2019 13:47:56 -0500 (CDT)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id WmZIhJD3tiQerWmZIhtFMH; Fri, 31 May 2019 13:47:56 -0500
-X-Authority-Reason: nr=8
-Received: from [189.250.123.250] (port=50534 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.91)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1hWmZH-0034R7-BG; Fri, 31 May 2019 13:47:55 -0500
-Date:   Fri, 31 May 2019 13:47:54 -0500
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] block: genhd: Use struct_size() helper
-Message-ID: <20190531184754.GA26040@embeddedor>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 189.250.123.250
-X-Source-L: No
-X-Exim-ID: 1hWmZH-0034R7-BG
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [189.250.123.250]:50534
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 2
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+        id S1726143AbfFANx3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 Jun 2019 09:53:29 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:58567 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725965AbfFANx3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Jun 2019 09:53:29 -0400
+Received: from orion.localdomain ([95.114.112.19]) by mrelayeu.kundenserver.de
+ (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MIbzB-1hLIkZ45gL-00EggC; Sat, 01 Jun 2019 15:53:07 +0200
+From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
+To:     linux-kernel@vger.kernel.org
+Cc:     vireshk@kernel.org, b.zolnierkie@samsung.com, axboe@kernel.dk,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 2/4] drivers: block: xsysace: use MODULE_DECLARE_OF_TABLE() and of_match_ptr()
+Date:   Sat,  1 Jun 2019 15:52:57 +0200
+Message-Id: <1559397179-5833-3-git-send-email-info@metux.net>
+X-Mailer: git-send-email 1.9.1
+In-Reply-To: <1559397179-5833-1-git-send-email-info@metux.net>
+References: <1559397179-5833-1-git-send-email-info@metux.net>
+X-Provags-ID: V03:K1:Qws35knXlKzgk+L1gebf0oiijncZZPU9G9DE2m8RHGqmAPjbRcA
+ Mhq4EwWUM8vDnhRs6XarGCNQPHg6hZyZ7kcJCkdTNrgJRZ+rUXDDMCTmXZAUMQvrMAsgDgD
+ Xmbr8eVRjoviX/kCBksWZDgdHED/Yc0cP1wq0ZUPTixMb6eH0QV0J4twNfGrYthAysMDTSH
+ Q1fTYPAaZFaorgEw5bxZg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:uuKrLSRJacE=:/7Ki9GCY77ZmN88TKQhAtt
+ OlRRVthFBqWQJJtOLa9CHRGORp/PxILNq7x+jDsxD45M8HWtb/EHWkwRBECt/k/BVvhQB5goE
+ QaXRsWqDMr87XXz9NMqtt4zM8niABNYY7txVkcDvy0mOiAuxHj3Po1z7tfkIs2z8xdVjh0d8z
+ hfkAFxOsXD219fiMLJuzP+9NCvaL9wjfroU2bZmjZKG//NDuOiQWAWvpXoA4s5IQMrR2dtuJ3
+ BVV0Tx6h0v3z6NFymIUK9RwqswD5U+Y1/GzaVMauszPTIk+NS2j1HrgPZBF0S5ezaeJQp8YX2
+ IFMnzIeUurxUOBLq/q6/MH73k4RQuBzAYd8hxhufWNtkMC5yTW4hq1MX726KwH4PHq5INhjXt
+ VBF2h8KzhM4SuGzjz5ZwTPSFOFLXskBZTZkDzA5Jzt5xT852IPa9r8DKlKdvj4VMwG6+eN8hw
+ qTGp2H9U8MpJn9Npz8bwvcpWGo1t/smXEeZNgwFLHokhPt5VYFX7ltnCsEQcz+h/SjORPwV2a
+ FgVCwG9YFxN10hD4m/09MX5d559OsSE+oAIVgjuv3l3TDcEsH7LS/8pjGCYdTNxzat83zhV7M
+ 7pMxKeEScVm2NMwNXd/r9/RAdwG96EmbzZjp5oVugHypMTiX/k8plpmwCLlgWloCsS56fQii+
+ 0202TEScVy8oHaWwDy7EzHwmg9Oh9S27R00vzngmJiyx9Z3/Qs3ExQSo7L9DFf7lJSdPHyHmE
+ uuvuuvmgtJoiRLxpOUMqcCPdlnLmZsbKVel1qw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make use of the struct_size() helper instead of an open-coded version
-in order to avoid any potential type mistakes, in particular in the
-context in which this code is being used.
+Using MODULE_DECLARE_OF_TABLE() and of_match_ptr() macros to get
+rid of some #ifdef CONFIG_OF and thus make the code a bit slimmer.
 
-So, replace the following form:
-
-sizeof(*new_ptbl) + target * sizeof(new_ptbl->part[0])
-
-with:
-
-struct_size(new_ptbl, part, target)
-
-Also, notice that variable size is unnecessary, hence it is removed.
-
-This code was detected with the help of Coccinelle.
-
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
 ---
- block/genhd.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/block/xsysace.c | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index ad6826628e79..c674d9090f40 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1281,7 +1281,6 @@ int disk_expand_part_tbl(struct gendisk *disk, int partno)
- 	struct disk_part_tbl *new_ptbl;
- 	int len = old_ptbl ? old_ptbl->len : 0;
- 	int i, target;
--	size_t size;
+diff --git a/drivers/block/xsysace.c b/drivers/block/xsysace.c
+index 464c9092..d8e5dd7 100644
+--- a/drivers/block/xsysace.c
++++ b/drivers/block/xsysace.c
+@@ -1219,26 +1219,18 @@ static int ace_remove(struct platform_device *dev)
+ 	return 0;
+ }
  
- 	/*
- 	 * check for int overflow, since we can get here from blkpg_ioctl()
-@@ -1298,8 +1297,8 @@ int disk_expand_part_tbl(struct gendisk *disk, int partno)
- 	if (target <= len)
- 		return 0;
+-#if defined(CONFIG_OF)
+-/* Match table for of_platform binding */
+-static const struct of_device_id ace_of_match[] = {
++MODULE_DECLARE_OF_TABLE(ace_of_match,
+ 	{ .compatible = "xlnx,opb-sysace-1.00.b", },
+ 	{ .compatible = "xlnx,opb-sysace-1.00.c", },
+ 	{ .compatible = "xlnx,xps-sysace-1.00.a", },
+-	{ .compatible = "xlnx,sysace", },
+-	{},
+-};
+-MODULE_DEVICE_TABLE(of, ace_of_match);
+-#else /* CONFIG_OF */
+-#define ace_of_match NULL
+-#endif /* CONFIG_OF */
++	{ .compatible = "xlnx,sysace", });
  
--	size = sizeof(*new_ptbl) + target * sizeof(new_ptbl->part[0]);
--	new_ptbl = kzalloc_node(size, GFP_KERNEL, disk->node_id);
-+	new_ptbl = kzalloc_node(struct_size(new_ptbl, part, target), GFP_KERNEL,
-+				disk->node_id);
- 	if (!new_ptbl)
- 		return -ENOMEM;
+ static struct platform_driver ace_platform_driver = {
+ 	.probe = ace_probe,
+ 	.remove = ace_remove,
+ 	.driver = {
+ 		.name = "xsysace",
+-		.of_match_table = ace_of_match,
++		.of_match_table = of_match_ptr(ace_of_match),
+ 	},
+ };
  
 -- 
-2.21.0
+1.9.1
 
