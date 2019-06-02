@@ -2,172 +2,206 @@ Return-Path: <SRS0=BT6h=UB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CDFC282DC
-	for <linux-block@archiver.kernel.org>; Sun,  2 Jun 2019 17:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8018BC282DC
+	for <linux-block@archiver.kernel.org>; Sun,  2 Jun 2019 23:43:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A4A527980
-	for <linux-block@archiver.kernel.org>; Sun,  2 Jun 2019 17:07:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DDF727A34
+	for <linux-block@archiver.kernel.org>; Sun,  2 Jun 2019 23:43:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oZL0csIG";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="eTQfsFrr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726270AbfFBRHz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Jun 2019 13:07:55 -0400
-Received: from smtp.infotech.no ([82.134.31.41]:42000 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726170AbfFBRHz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 2 Jun 2019 13:07:55 -0400
-X-Greylist: delayed 345 seconds by postgrey-1.27 at vger.kernel.org; Sun, 02 Jun 2019 13:07:53 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id EB8CF20423F;
-        Sun,  2 Jun 2019 19:02:06 +0200 (CEST)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id XETDBFeBHOJw; Sun,  2 Jun 2019 19:01:59 +0200 (CEST)
-Received: from [172.20.1.42] (96-80-82-153-static.hfc.comcastbusiness.net [96.80.82.153])
-        by smtp.infotech.no (Postfix) with ESMTPA id 8312C204155;
-        Sun,  2 Jun 2019 19:01:56 +0200 (CEST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH 4/9] scsi_debug: support host tagset
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        John Garry <john.garry@huawei.com>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20190531022801.10003-1-ming.lei@redhat.com>
- <20190531022801.10003-5-ming.lei@redhat.com>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <9a43b5ff-f9a6-f0a2-bb9a-4686b7741cbf@interlog.com>
-Date:   Sun, 2 Jun 2019 13:01:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726616AbfFBXnv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Jun 2019 19:43:51 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:31159 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726305AbfFBXnv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Jun 2019 19:43:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1559519061; x=1591055061;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=RfYji+B18oW8P7M4M6oGhR8sPvs/SVTLe5KoHJ5prTU=;
+  b=oZL0csIGVLW5VwpF9B/UoZabDekd15SaXCkCkQ+bjKDxDH+TDxPagoZO
+   WL5T0Rc0fi5yv2eC+CNxoS0DLmL0AOTWJeXc7PJn8SuYv9i3NEDSoZj2n
+   rO1ppJwzx+Trj/DOU1KH09kFew92vTCi04CrddbqT4fNR2oUqKW9KTNS3
+   D4KJI5Yu9lJ07Zy1uu2FO3HTlm3NSM9/M1qSmL7hL7N3BLHWFjn36PNfI
+   F1dqh6yDO3+3KTygnFVTkASsSJgPaYbUmQeMfOVZceos/upZXS7UeHEXk
+   V7lUURTH+2pbqyjXS5LBjEtODZqKAXe1aX/F7GOmfERAMh6XllpsCxVtc
+   A==;
+X-IronPort-AV: E=Sophos;i="5.60,544,1549900800"; 
+   d="scan'208";a="209207668"
+Received: from mail-by2nam01lp2052.outbound.protection.outlook.com (HELO NAM01-BY2-obe.outbound.protection.outlook.com) ([104.47.34.52])
+  by ob1.hgst.iphmx.com with ESMTP; 03 Jun 2019 07:44:20 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qGZvOqXysFiRL/WCcmJC5s2XvoD5cQiAxuIG6Efi4Ig=;
+ b=eTQfsFrrNrxOuW+oSY6rg7tAxZ0F576dVw72XJkDW3YqO7HAkkCox7ykbOleWj8HTDL/D+a7aQrqhGeRIQ/YPK6tuP+XeicDJxCe6CwDlZ3Yuzgg+tp5FbRPjYrJk2e6nZGzAPpuZdBBcPa+nRazW5kVVAO7LRvnPmonueeIkWA=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
+ BYAPR04MB5110.namprd04.prod.outlook.com (52.135.235.32) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1943.16; Sun, 2 Jun 2019 23:43:47 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::ad42:af4b:a53b:80f5]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::ad42:af4b:a53b:80f5%4]) with mapi id 15.20.1943.018; Sun, 2 Jun 2019
+ 23:43:46 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Bob Liu <bob.liu@oracle.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "hare@suse.com" <hare@suse.com>, "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "bart.vanassche@wdc.com" <bart.vanassche@wdc.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [PATCH] block: null_blk: fix race condition for null_del_dev
+Thread-Topic: [PATCH] block: null_blk: fix race condition for null_del_dev
+Thread-Index: AQHVF3cUt12bBtQmMUufFactkaZk8w==
+Date:   Sun, 2 Jun 2019 23:43:46 +0000
+Message-ID: <BYAPR04MB57498234FD33E381E665B066861B0@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20190531060545.10235-1-bob.liu@oracle.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.44.250]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a8b0a7ca-c414-40aa-7d1a-08d6e7b427da
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5110;
+x-ms-traffictypediagnostic: BYAPR04MB5110:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <BYAPR04MB5110E0E146EA3913D448A123861B0@BYAPR04MB5110.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2331;
+x-forefront-prvs: 005671E15D
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(366004)(136003)(39860400002)(376002)(346002)(199004)(189003)(7696005)(305945005)(102836004)(99286004)(8676002)(7736002)(66066001)(446003)(71200400001)(71190400001)(26005)(476003)(81156014)(81166006)(6506007)(229853002)(86362001)(110136005)(52536014)(54906003)(478600001)(68736007)(14454004)(2501003)(74316002)(8936002)(72206003)(76176011)(53546011)(486006)(66946007)(66476007)(76116006)(73956011)(186003)(64756008)(66446008)(66556008)(256004)(14444005)(25786009)(55016002)(6436002)(6246003)(9686003)(2906002)(53936002)(4326008)(6116002)(5660300002)(316002)(3846002)(33656002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5110;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: AHgAu/FzGkGZkABpyPIjpTnPvjMoNyMFddZoCm17+AgqWHnVeUFGYfOTnEXRri3Ejqa5Gngsbyn/EXVLBZN3s9HOoSlkCGIRfg+lqpgW4vrOuOtHWZTNfBR6cv1UomyfIfby+AKgpzSZr7jJBsB1IIavxq6QMO7zEVcxhgem1Ly7zbw82urB5AS8tNmolLO2TqvKhsD+K7yZ+SCKnIRmOnRCnyuShTv1FcQuzTFLSE+SivEdDUWF308hJ6xbmL0jBLN8BS8mI0krtbf9Ou14C2bSClYFQbXBLY2putrpMy/sjrYQ24NBBvKg6uLtVYmIeCWHlhahmI963gGSv8/YrI23b71w42+lMxCTNofYB4UY4PO79FDchtN/fgBwEQbuLj3QiKlOI9nvYtk9g1O0P3HHD+pxkb1EyUS7hJxWW/4=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20190531022801.10003-5-ming.lei@redhat.com>
-Content-Type: multipart/mixed;
- boundary="------------E37CB4B85A913D07A9A197E2"
-Content-Language: en-CA
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8b0a7ca-c414-40aa-7d1a-08d6e7b427da
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jun 2019 23:43:46.5905
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5110
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------E37CB4B85A913D07A9A197E2
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-On 2019-05-30 10:27 p.m., Ming Lei wrote:
-> The 'host_tagset' can be set on scsi_debug device for testing
-> shared hostwide tags on multiple blk-mq hw queue.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-
-Hi,
-Attached are my suggestions to clean up this patch a bit. It basically
-   - drops the unneeded initialization (pointed out in another review)
-   - places new module_param_named() in alphabetical order
-   - adds MODULE_PARM_DESC() for 'modinfo scsi_debug' online help
-
-Doug Gilbert
-
-> ---
->   drivers/scsi/scsi_debug.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-> index d323523f5f9d..8cf3f6c3f4f9 100644
-> --- a/drivers/scsi/scsi_debug.c
-> +++ b/drivers/scsi/scsi_debug.c
-> @@ -665,6 +665,7 @@ static bool have_dif_prot;
->   static bool write_since_sync;
->   static bool sdebug_statistics = DEF_STATISTICS;
->   static bool sdebug_wp;
-> +static bool sdebug_host_tagset = false;
->   
->   static unsigned int sdebug_store_sectors;
->   static sector_t sdebug_capacity;	/* in sectors */
-> @@ -4468,6 +4469,7 @@ module_param_named(vpd_use_hostno, sdebug_vpd_use_hostno, int,
->   module_param_named(wp, sdebug_wp, bool, S_IRUGO | S_IWUSR);
->   module_param_named(write_same_length, sdebug_write_same_length, int,
->   		   S_IRUGO | S_IWUSR);
-> +module_param_named(host_tagset, sdebug_host_tagset, bool, S_IRUGO | S_IWUSR);
->   
->   MODULE_AUTHOR("Eric Youngdale + Douglas Gilbert");
->   MODULE_DESCRIPTION("SCSI debug adapter driver");
-> @@ -5779,6 +5781,7 @@ static int sdebug_driver_probe(struct device *dev)
->   	sdbg_host = to_sdebug_host(dev);
->   
->   	sdebug_driver_template.can_queue = sdebug_max_queue;
-> +	sdebug_driver_template.host_tagset = sdebug_host_tagset;
->   	if (!sdebug_clustering)
->   		sdebug_driver_template.dma_boundary = PAGE_SIZE - 1;
->   
-> 
-
-
---------------E37CB4B85A913D07A9A197E2
-Content-Type: text/x-patch;
- name="0002-sg-convert-to-blk_mq-hw-queue-Ming-Lei.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="0002-sg-convert-to-blk_mq-hw-queue-Ming-Lei.patch"
-
-From bb14859f821ade9e3a0ee5f187e66a419d310ec0 Mon Sep 17 00:00:00 2001
-From: Douglas Gilbert <dgilbert@interlog.com>
-Date: Sat, 1 Jun 2019 18:07:51 -0400
-Subject: [PATCH 2/2] sg: convert to blk_mq hw queue; Ming Lei
-
-Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
----
- drivers/scsi/scsi_debug.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index e27f4df24021..a880ac4d13f8 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -669,6 +669,7 @@ static bool sdebug_clustering;
- static bool sdebug_host_lock = DEF_HOST_LOCK;
- static bool sdebug_strict = DEF_STRICT;
- static bool sdebug_any_injecting_opt;
-+static bool sdebug_host_tagset;
- static bool sdebug_verbose;
- static bool have_dif_prot;
- static bool write_since_sync;
-@@ -4515,6 +4516,7 @@ module_param_named(every_nth, sdebug_every_nth, int, S_IRUGO | S_IWUSR);
- module_param_named(fake_rw, sdebug_fake_rw, int, S_IRUGO | S_IWUSR);
- module_param_named(guard, sdebug_guard, uint, S_IRUGO);
- module_param_named(host_lock, sdebug_host_lock, bool, S_IRUGO | S_IWUSR);
-+module_param_named(host_tagset, sdebug_host_tagset, bool, 0644);
- module_param_string(inq_vendor, sdebug_inq_vendor_id,
- 		    sizeof(sdebug_inq_vendor_id), S_IRUGO|S_IWUSR);
- module_param_string(inq_product, sdebug_inq_product_id,
-@@ -4575,6 +4577,7 @@ MODULE_PARM_DESC(every_nth, "timeout every nth command(def=0)");
- MODULE_PARM_DESC(fake_rw, "fake reads/writes instead of copying (def=0)");
- MODULE_PARM_DESC(guard, "protection checksum: 0=crc, 1=ip (def=0)");
- MODULE_PARM_DESC(host_lock, "host_lock is ignored (def=0)");
-+MODULE_PARM_DESC(host_tagset, "host_tagset for multiple hw queues (def=0)");
- MODULE_PARM_DESC(inq_vendor, "SCSI INQUIRY vendor string (def=\"Linux\")");
- MODULE_PARM_DESC(inq_product, "SCSI INQUIRY product string (def=\"scsi_debug\")");
- MODULE_PARM_DESC(inq_rev, "SCSI INQUIRY revision string (def=\""
-@@ -5866,6 +5869,7 @@ static int sdebug_driver_probe(struct device *dev)
- 	sdbg_host = to_sdebug_host(dev);
- 
- 	sdebug_driver_template.can_queue = sdebug_max_queue;
-+	sdebug_driver_template.host_tagset = sdebug_host_tagset;
- 	if (!sdebug_clustering)
- 		sdebug_driver_template.dma_boundary = PAGE_SIZE - 1;
- 
--- 
-2.17.1
-
-
---------------E37CB4B85A913D07A9A197E2--
+Thanks for your patch Bob.=0A=
+=0A=
+Looks good to me.=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+=0A=
+On 5/30/19 11:07 PM, Bob Liu wrote:=0A=
+> Dulicate call of null_del_dev() will trigger null pointer error like belo=
+w.=0A=
+> The reason is a race condition between nullb_device_power_store() and=0A=
+> nullb_group_drop_item().=0A=
+>=0A=
+>  CPU#0                         CPU#1=0A=
+>  ----------------              -----------------=0A=
+>  do_rmdir()=0A=
+>   >configfs_rmdir()=0A=
+>    >client_drop_item()=0A=
+>     >nullb_group_drop_item()=0A=
+>                                nullb_device_power_store()=0A=
+> 				>null_del_dev()=0A=
+>=0A=
+>      >test_and_clear_bit(NULLB_DEV_FL_UP=0A=
+>       >null_del_dev()=0A=
+>       ^^^^^=0A=
+>       Duplicated null_dev_dev() triger null pointer error=0A=
+>=0A=
+> 				>clear_bit(NULLB_DEV_FL_UP=0A=
+>=0A=
+> The fix could be keep the sequnce of clear NULLB_DEV_FL_UP and null_del_d=
+ev().=0A=
+>=0A=
+> [  698.613600] BUG: unable to handle kernel NULL pointer dereference at 0=
+000000000000018=0A=
+> [  698.613608] #PF error: [normal kernel read fault]=0A=
+> [  698.613611] PGD 0 P4D 0=0A=
+> [  698.613619] Oops: 0000 [#1] SMP PTI=0A=
+> [  698.613627] CPU: 3 PID: 6382 Comm: rmdir Not tainted 5.0.0+ #35=0A=
+> [  698.613631] Hardware name: LENOVO 20LJS2EV08/20LJS2EV08, BIOS R0SET33W=
+ (1.17 ) 07/18/2018=0A=
+> [  698.613644] RIP: 0010:null_del_dev+0xc/0x110 [null_blk]=0A=
+> [  698.613649] Code: 00 00 00 5b 41 5c 41 5d 41 5e 41 5f 5d c3 0f 0b eb 9=
+7 e8 47 bb 2a e8 0f 1f 80 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 54 53 <=
+8b> 77 18 48 89 fb 4c 8b 27 48 c7 c7 40 57 1e c1 e8 bf c7 cb e8 48=0A=
+> [  698.613654] RSP: 0018:ffffb887888bfde0 EFLAGS: 00010286=0A=
+> [  698.613659] RAX: 0000000000000000 RBX: ffff9d436d92bc00 RCX: ffff9d43a=
+9184681=0A=
+> [  698.613663] RDX: ffffffffc11e5c30 RSI: 0000000068be6540 RDI: 000000000=
+0000000=0A=
+> [  698.613667] RBP: ffffb887888bfdf0 R08: 0000000000000001 R09: 000000000=
+0000000=0A=
+> [  698.613671] R10: ffffb887888bfdd8 R11: 0000000000000f16 R12: ffff9d436=
+d92bc08=0A=
+> [  698.613675] R13: ffff9d436d94e630 R14: ffffffffc11e5088 R15: ffffffffc=
+11e5000=0A=
+> [  698.613680] FS:  00007faa68be6540(0000) GS:ffff9d43d14c0000(0000) knlG=
+S:0000000000000000=0A=
+> [  698.613685] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033=0A=
+> [  698.613689] CR2: 0000000000000018 CR3: 000000042f70c002 CR4: 000000000=
+03606e0=0A=
+> [  698.613693] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
+0000000=0A=
+> [  698.613697] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000=
+0000400=0A=
+> [  698.613700] Call Trace:=0A=
+> [  698.613712]  nullb_group_drop_item+0x50/0x70 [null_blk]=0A=
+> [  698.613722]  client_drop_item+0x29/0x40=0A=
+> [  698.613728]  configfs_rmdir+0x1ed/0x300=0A=
+> [  698.613738]  vfs_rmdir+0xb2/0x130=0A=
+> [  698.613743]  do_rmdir+0x1c7/0x1e0=0A=
+> [  698.613750]  __x64_sys_rmdir+0x17/0x20=0A=
+> [  698.613759]  do_syscall_64+0x5a/0x110=0A=
+> [  698.613768]  entry_SYSCALL_64_after_hwframe+0x44/0xa9=0A=
+>=0A=
+> Signed-off-by: Bob Liu <bob.liu@oracle.com>=0A=
+> ---=0A=
+>  drivers/block/null_blk_main.c | 11 ++++++-----=0A=
+>  1 file changed, 6 insertions(+), 5 deletions(-)=0A=
+>=0A=
+> diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.=
+c=0A=
+> index 62c9654..99dd0ab 100644=0A=
+> --- a/drivers/block/null_blk_main.c=0A=
+> +++ b/drivers/block/null_blk_main.c=0A=
+> @@ -326,11 +326,12 @@ static ssize_t nullb_device_power_store(struct conf=
+ig_item *item,=0A=
+>  		set_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);=0A=
+>  		dev->power =3D newp;=0A=
+>  	} else if (dev->power && !newp) {=0A=
+> -		mutex_lock(&lock);=0A=
+> -		dev->power =3D newp;=0A=
+> -		null_del_dev(dev->nullb);=0A=
+> -		mutex_unlock(&lock);=0A=
+> -		clear_bit(NULLB_DEV_FL_UP, &dev->flags);=0A=
+> +		if (test_and_clear_bit(NULLB_DEV_FL_UP, &dev->flags)) {=0A=
+> +			mutex_lock(&lock);=0A=
+> +			dev->power =3D newp;=0A=
+> +			null_del_dev(dev->nullb);=0A=
+> +			mutex_unlock(&lock);=0A=
+> +		}=0A=
+>  		clear_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);=0A=
+>  	}=0A=
+>  =0A=
+=0A=
+=0A=
