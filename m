@@ -2,142 +2,142 @@ Return-Path: <SRS0=BT6h=UB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89195C282DC
-	for <linux-block@archiver.kernel.org>; Sun,  2 Jun 2019 07:48:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16739C282DC
+	for <linux-block@archiver.kernel.org>; Sun,  2 Jun 2019 11:21:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5FD9D27849
-	for <linux-block@archiver.kernel.org>; Sun,  2 Jun 2019 07:48:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD9B4278F8
+	for <linux-block@archiver.kernel.org>; Sun,  2 Jun 2019 11:21:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g57zPOz6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725925AbfFBHs0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Jun 2019 03:48:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55562 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725875AbfFBHs0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 2 Jun 2019 03:48:26 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8C1D05AFF8;
-        Sun,  2 Jun 2019 07:48:25 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A4EC196F6;
-        Sun,  2 Jun 2019 07:48:08 +0000 (UTC)
-Date:   Sun, 2 Jun 2019 15:48:00 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Kashyap Desai <kashyap.desai@broadcom.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        John Garry <john.garry@huawei.com>,
-        Don Brace <don.brace@microsemi.com>,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 8/9] scsi: megaraid: convert private reply queue to
- blk-mq hw queue
-Message-ID: <20190602074757.GA31572@ming.t460p>
-References: <20190531022801.10003-1-ming.lei@redhat.com>
- <20190531022801.10003-9-ming.lei@redhat.com>
- <7819e1a523b9e8227e3a9d188ee1e083@mail.gmail.com>
- <20190602064202.GA2731@ming.t460p>
+        id S1726360AbfFBLV3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Jun 2019 07:21:29 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:43597 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726168AbfFBLV2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Jun 2019 07:21:28 -0400
+Received: by mail-pg1-f193.google.com with SMTP id f25so6598476pgv.10;
+        Sun, 02 Jun 2019 04:21:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SWsv2Kj8e8VQJPMoaBE0n56CZDHc2v93YdRGa+NaSWg=;
+        b=g57zPOz6tqBG3iAyMqRWgubMS3ZJ6Mjukgv6HGwbUeYtP5jZl4fbAmVCOCB20kqA9m
+         xAF61M3/D+xB3b3Y7L00uNKk/sng7kiL4svmH2bkip8NulIuc0R527PgaimCqgMU6Zfo
+         hdf5jInCexVgT1ln2/amJnqtZDGesXDLgGKHsmYErQxz7Cn6vxY8jYxO9+/E2je7I9Er
+         Viuc21BIkFcvTyKw7rNsgF1iVLS7hdwlXfGSAqEQUpQMq1za5MBAD2bVpOw3FrCoBl8r
+         YRolUSTKOEja8AgkEI5PU735OC0T4zW8uUe7DAqx5ClovfoFfMJ9GSrlAS3AhCy3vFRq
+         d8pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SWsv2Kj8e8VQJPMoaBE0n56CZDHc2v93YdRGa+NaSWg=;
+        b=pWfR7dTNZuvWlnYJaaiVY99LhhpPRaWE4Oa7Fy4HNHg4ROul9ZZPGsbvArZbdI7I6l
+         50xJEYNEbreVMrr3m35AUyw62GjgsPaqngBHmH32J+66CeoACDyu24a0mVytoyVO38OG
+         MrpaQtjUbTJbsqDvh4evf1fn/1AzWY+bmWc1iwa/yzgcEKXmM+gKAPgUkzFrS2uNTO+X
+         ff2434t2hLaoROVgBnYO9qpaZq9ASDc/IprsMEf+dpxhobLY1ylkv+SZLUmhy0XpgVU6
+         kBDXFEyjGzVwnxKyFC07X3LUr0O58xnDCEH6aXXicS6a/3BFudyB9PASkxpublJpfGlC
+         Zz8Q==
+X-Gm-Message-State: APjAAAUv3+XgPnMl7rEGhvyShiZb1iNKFkLAFDeyksebRTfSU11cOqlg
+        NzVYatHwVXHc6R015DtMjDind6Fzd4M=
+X-Google-Smtp-Source: APXvYqwLtjM5bP8bTikgdx9VMuu6O5K9dZWqTrMAp75dRnbnELaIF0yQjFL3IYBDm2u14WQjKyLrQw==
+X-Received: by 2002:a17:90a:778b:: with SMTP id v11mr22751443pjk.132.1559474487885;
+        Sun, 02 Jun 2019 04:21:27 -0700 (PDT)
+Received: from localhost.localdomain ([123.213.206.190])
+        by smtp.gmail.com with ESMTPSA id h7sm16816872pfo.108.2019.06.02.04.21.25
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 02 Jun 2019 04:21:27 -0700 (PDT)
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Minwoo Im <minwoo.im@samsung.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+Subject: [PATCH] genirq/affinity: remove unused arg when building aff mask
+Date:   Sun,  2 Jun 2019 20:21:17 +0900
+Message-Id: <20190602112117.31839-1-minwoo.im.dev@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190602064202.GA2731@ming.t460p>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Sun, 02 Jun 2019 07:48:26 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jun 02, 2019 at 02:42:02PM +0800, Ming Lei wrote:
-> Hi Kashyap,
-> 
-> Thanks for your test.
-> 
-> On Sun, Jun 02, 2019 at 03:11:26AM +0530, Kashyap Desai wrote:
-> > > SCSI's reply qeueue is very similar with blk-mq's hw queue, both
-> > assigned by
-> > > IRQ vector, so map te private reply queue into blk-mq's hw queue via
-> > > .host_tagset.
-> > >
-> > > Then the private reply mapping can be removed.
-> > >
-> > > Another benefit is that the request/irq lost issue may be solved in
-> > generic
-> > > approach because managed IRQ may be shutdown during CPU hotplug.
-> > 
-> > Ming,
-> > 
-> > I quickly tested this patch series on MegaRaid Aero controller. Without
-> > this patch I can get 3.0M IOPS, but once I apply this patch I see only
-> > 1.2M IOPS (40% Performance drop)
-> > HBA supports 5089 can_queue.
-> > 
-> > <perf top> output without  patch -
-> > 
-> >     3.39%  [megaraid_sas]  [k] complete_cmd_fusion
-> >      3.36%  [kernel]        [k] scsi_queue_rq
-> >      3.26%  [kernel]        [k] entry_SYSCALL_64
-> >      2.57%  [kernel]        [k] syscall_return_via_sysret
-> >      1.95%  [megaraid_sas]  [k] megasas_build_and_issue_cmd_fusion
-> >      1.88%  [kernel]        [k] _raw_spin_lock_irqsave
-> >      1.79%  [kernel]        [k] gup_pmd_range
-> >      1.73%  [kernel]        [k] _raw_spin_lock
-> >      1.68%  [kernel]        [k] __sched_text_start
-> >      1.19%  [kernel]        [k] irq_entries_start
-> >      1.13%  [kernel]        [k] scsi_dec_host_busy
-> >      1.08%  [kernel]        [k] aio_complete
-> >      1.07%  [kernel]        [k] read_tsc
-> >      1.01%  [kernel]        [k] blk_mq_get_request
-> >      0.93%  [kernel]        [k] __update_load_avg_cfs_rq
-> >      0.92%  [kernel]        [k] aio_read_events
-> >      0.91%  [kernel]        [k] lookup_ioctx
-> >      0.91%  fio             [.] fio_gettime
-> >      0.87%  [kernel]        [k] set_next_entity
-> >      0.87%  [megaraid_sas]  [k] megasas_build_ldio_fusion
-> > 
-> > <perf top> output with  patch -
-> > 
-> >     11.30%  [kernel]       [k] native_queued_spin_lock_slowpath
-> 
-> I guess there must be one global lock required in megaraid submission path,
-> could you run 'perf record -g -a' to see which lock is and what the stack
-> trace is?
+When building affinity masks, the struct irq_affinity *affd is not
+needed because irq_create_affinity_masks() has already given a cursored
+current vector after pre_vectors via "curvec".
 
-Meantime please try the following patch and see if difference can be made.
+This patch removes unused argument for irq_build_affinity_masks() and
+__irq_build_affinity_masks().  No functions changes are included.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 49d73d979cb3..d2abec3b0f60 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -589,7 +589,7 @@ static void __blk_mq_complete_request(struct request *rq)
- 	 * So complete IO reqeust in softirq context in case of single queue
- 	 * for not degrading IO performance by irqsoff latency.
- 	 */
--	if (q->nr_hw_queues == 1) {
-+	if (q->nr_hw_queues == 1 || (rq->mq_hctx->flags & BLK_MQ_F_HOST_TAGS)) {
- 		__blk_complete_request(rq);
- 		return;
- 	}
-@@ -1977,7 +1977,8 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		/* bypass scheduler for flush rq */
- 		blk_insert_flush(rq);
- 		blk_mq_run_hw_queue(data.hctx, true);
--	} else if (plug && (q->nr_hw_queues == 1 || q->mq_ops->commit_rqs)) {
-+	} else if (plug && (q->nr_hw_queues == 1 || q->mq_ops->commit_rqs ||
-+				(data.hctx->flags & BLK_MQ_F_HOST_TAGS))) {
- 		/*
- 		 * Use plugging if we have a ->commit_rqs() hook as well, as
- 		 * we know the driver uses bd->last in a smart fashion.
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org
+Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
+---
+ kernel/irq/affinity.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-thanks,
-Ming
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index f18cd5aa33e8..4352b08ae48d 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -94,8 +94,7 @@ static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
+ 	return nodes;
+ }
+ 
+-static int __irq_build_affinity_masks(const struct irq_affinity *affd,
+-				      unsigned int startvec,
++static int __irq_build_affinity_masks(unsigned int startvec,
+ 				      unsigned int numvecs,
+ 				      unsigned int firstvec,
+ 				      cpumask_var_t *node_to_cpumask,
+@@ -171,8 +170,7 @@ static int __irq_build_affinity_masks(const struct irq_affinity *affd,
+  *	1) spread present CPU on these vectors
+  *	2) spread other possible CPUs on these vectors
+  */
+-static int irq_build_affinity_masks(const struct irq_affinity *affd,
+-				    unsigned int startvec, unsigned int numvecs,
++static int irq_build_affinity_masks(unsigned int startvec, unsigned int numvecs,
+ 				    unsigned int firstvec,
+ 				    struct irq_affinity_desc *masks)
+ {
+@@ -197,7 +195,7 @@ static int irq_build_affinity_masks(const struct irq_affinity *affd,
+ 	build_node_to_cpumask(node_to_cpumask);
+ 
+ 	/* Spread on present CPUs starting from affd->pre_vectors */
+-	nr_present = __irq_build_affinity_masks(affd, curvec, numvecs,
++	nr_present = __irq_build_affinity_masks(curvec, numvecs,
+ 						firstvec, node_to_cpumask,
+ 						cpu_present_mask, nmsk, masks);
+ 
+@@ -212,7 +210,7 @@ static int irq_build_affinity_masks(const struct irq_affinity *affd,
+ 	else
+ 		curvec = firstvec + nr_present;
+ 	cpumask_andnot(npresmsk, cpu_possible_mask, cpu_present_mask);
+-	nr_others = __irq_build_affinity_masks(affd, curvec, numvecs,
++	nr_others = __irq_build_affinity_masks(curvec, numvecs,
+ 					       firstvec, node_to_cpumask,
+ 					       npresmsk, nmsk, masks);
+ 	put_online_cpus();
+@@ -295,7 +293,7 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
+ 		unsigned int this_vecs = affd->set_size[i];
+ 		int ret;
+ 
+-		ret = irq_build_affinity_masks(affd, curvec, this_vecs,
++		ret = irq_build_affinity_masks(curvec, this_vecs,
+ 					       curvec, masks);
+ 		if (ret) {
+ 			kfree(masks);
+-- 
+2.21.0
+
