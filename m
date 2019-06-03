@@ -2,92 +2,88 @@ Return-Path: <SRS0=uYlv=UC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4EEC04AB5
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 14:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FE7C04AB5
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 16:30:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5CA127A3F
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 14:55:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E407023D26
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 16:30:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728988AbfFCOzK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jun 2019 10:55:10 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:42605 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728722AbfFCOzK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jun 2019 10:55:10 -0400
-Received: by mail-pf1-f193.google.com with SMTP id q10so545811pff.9
-        for <linux-block@vger.kernel.org>; Mon, 03 Jun 2019 07:55:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eZRqowIuJ/mwTtMwz49+ETVSEY7q2s/YkdqSrPsKNBg=;
-        b=nro8ZntAySGM4qCr6loXibqu9DVL2J3BDXaOLlcV7wlO5qlxp727UQ3gDvuB7+Nntg
-         Rh6Bec8attHSqqVt6rEYhaTvTVDsY+CgkLSG6e9e2EDC+baXhI4fmuH2unq3WYYdTxAv
-         pv1GQa3LthZkLSTZI1xbBaq5c5ty74B0B2NDCl5RJ3zmhEsJJnLPWrU/sIiC8W8fqw/3
-         OUYBSKuW2/oI72GLlz/k1gHs1h/4Q5JzMak+ZlEVN2z5/6nkcA5M0C5AVxFGryDsu4Q6
-         3ZS8byz8MpE1RRPraC429ZuJc8gRrSWfeA5mq97wqy9KR0Q7hW8VW4mDadM/TNxkVP+X
-         Tyzw==
-X-Gm-Message-State: APjAAAWBuuX3LYgJ9euZVEQMWWbbwekR+sSQYLr1sCUPrHaiZEkUnz9H
-        ILH/syGtPvrXJ588OVCZxLs=
-X-Google-Smtp-Source: APXvYqwvRvxqNXLqMW9gWlvU2t+l/YXPVdar2V1nuOJmnOVzKQAdevIa96+F3QPoJb31TOdLZFdGKA==
-X-Received: by 2002:a17:90a:730b:: with SMTP id m11mr30100850pjk.89.1559573709396;
-        Mon, 03 Jun 2019 07:55:09 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id t15sm15125957pjb.6.2019.06.03.07.55.08
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 03 Jun 2019 07:55:08 -0700 (PDT)
-Subject: Re: [PATCH] block :blk-sysfs: fix refcount imbalance on the error
- path
-To:     Lin Yi <teroincn@163.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, liujian6@iie.ac.cn, csong@cs.ucr.edu,
-        zhiyunq@cs.ucr.edu, yiqiuping@gmail.com
-References: <20190603074653.GA12767@163.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <786ba0b5-708d-dfcd-29cf-ccf20386f949@acm.org>
-Date:   Mon, 3 Jun 2019 07:55:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1728306AbfFCQam (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jun 2019 12:30:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38008 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728228AbfFCQam (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Jun 2019 12:30:42 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7579081E05;
+        Mon,  3 Jun 2019 16:30:31 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E09DC5D9C6;
+        Mon,  3 Jun 2019 16:30:26 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <c95dd6cd-5530-6b70-68f6-4038edd72352@schaufler-ca.com>
+References: <c95dd6cd-5530-6b70-68f6-4038edd72352@schaufler-ca.com> <CAG48ez2rRh2_Kq_EGJs5k-ZBNffGs_Q=vkQdinorBgo58tbGpg@mail.gmail.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk> <155905933492.7587.6968545866041839538.stgit@warthog.procyon.org.uk> <14347.1559127657@warthog.procyon.org.uk> <312a138c-e5b2-4bfb-b50b-40c82c55773f@schaufler-ca.com> <CAG48ez2KMrTBFzO9p8GvduXruz+FNLPyhc2YivHePsgViEoT1g@mail.gmail.com>
+To:     Casey Schaufler <casey@schaufler-ca.com>
+Cc:     dhowells@redhat.com, Jann Horn <jannh@google.com>,
+        Al Viro <viro@zeniv.linux.org.uk>, raven@themaw.net,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Andy Lutomirski <luto@kernel.org>
+Subject: Re: [PATCH 3/7] vfs: Add a mount-notification facility
 MIME-Version: 1.0
-In-Reply-To: <20190603074653.GA12767@163.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <19413.1559579426.1@warthog.procyon.org.uk>
+Date:   Mon, 03 Jun 2019 17:30:26 +0100
+Message-ID: <19414.1559579426@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Mon, 03 Jun 2019 16:30:41 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/3/19 12:46 AM, Lin Yi wrote:
-> kobject_add takes a refcount to the object dev->kobj, but forget to
-> release it on the error path, lead to a memory leak.
+Casey Schaufler <casey@schaufler-ca.com> wrote:
+
+> >> should be used. Someone or something caused the event. It can
+> >> be important who it was.
+> > The kernel's normal security model means that you should be able to
+> > e.g. accept FDs that random processes send you and perform
+> > read()/write() calls on them without acting as a subject in any
+> > security checks; let alone close().
 > 
-> Signed-off-by: Lin Yi <teroincn@163.com>
-> ---
->   block/blk-sysfs.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 75b5281..539b7cb 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -971,6 +971,7 @@ int blk_register_queue(struct gendisk *disk)
->   	ret = kobject_add(&q->kobj, kobject_get(&dev->kobj), "%s", "queue");
->   	if (ret < 0) {
->   		blk_trace_remove_sysfs(dev);
-> +		kobject_put(&dev->kobj);
->   		goto unlock;
->   	}
+> Passed file descriptors are an anomaly in the security model
+> that (in this developer's opinion) should have never been
+> included. More than one of the "B" level UNIX systems disabled
+> them outright. 
 
-Have you reviewed the other kobject_add() calls in the block layer? Are 
-there more such calls that need to be fixed?
+Considering further on this, I think the only way to implement what you're
+suggesting is to add a field to struct file to record the last fputter's creds
+as the procedure of fputting is offloaded to a workqueue.
 
-Additionally, please add "Fixes:" and "Cc: stable" tags.
+Note that's last fputter, not the last closer, as we don't track the number of
+open fds linked to a file struct.
 
-Thanks,
+In the case of AF_UNIX sockets that contain in-the-process-of-being-passed fds
+at the time of closure, this is further complicated by the socket fput being
+achieved in the work item - thereby adding layers of indirection.
 
-Bart.
+It might be possible to replace f_cred rather than adding a new field, but
+that might get used somewhere after that point.
+
+Note also that fsnotify_close() doesn't appear to use the last fputter's path
+since it's not available if called from deferred fput.
+
+David
