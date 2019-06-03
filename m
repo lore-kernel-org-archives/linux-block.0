@@ -2,181 +2,117 @@ Return-Path: <SRS0=uYlv=UC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 239E5C04AB5
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 13:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3792C04AB5
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 14:25:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 00B8C27FA3
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 13:00:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C264B25BC4
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 14:25:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1559571930;
+	bh=+QIzxGsUhsEKFyL0nxTNvsmWYp4/6as/1NSx0KwKtRs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ro5kFMQ2mmh9BDVCCOczIgchvu0g79DOrG0OQhjTuvE7W44zzAlyX5k58TWYcuMeD
+	 3RS1KFjrhIrZEnoaEWDwK3A7TFFQf+kvyzRjpASyXxqSifmi0Mo8FZqXKSSS429WN0
+	 yNI6d+NTWBXDp8tWI+QyyIonzA+QDPvV/8Aua8/c=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727832AbfFCNAk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jun 2019 09:00:40 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:18073 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726336AbfFCNAk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Jun 2019 09:00:40 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 2AD577D0576AE24DE89D;
-        Mon,  3 Jun 2019 21:00:35 +0800 (CST)
-Received: from [127.0.0.1] (10.202.227.238) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Mon, 3 Jun 2019
- 21:00:29 +0800
-Subject: Re: [PATCH 7/9] scsi: hisi_sas_v3: convert private reply queue to
- blk-mq hw queue
-To:     Ming Lei <ming.lei@redhat.com>
-References: <20190531022801.10003-1-ming.lei@redhat.com>
- <20190531022801.10003-8-ming.lei@redhat.com>
- <1afb4353-6703-a3f0-ca6c-d0b2bd754a56@suse.de>
- <CACVXFVMG8gkw8E0pmWBJC0tBH9D-WVjY2FnL2gsxDja3ryfbng@mail.gmail.com>
- <c11faee4-fc38-9636-59b4-bc5c0d94ffbf@huawei.com>
- <20190603110054.GG11812@ming.t460p>
-CC:     Ming Lei <tom.leiming@gmail.com>, Hannes Reinecke <hare@suse.de>,
-        "Jens Axboe" <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        "Linux SCSI List" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        "Sathya Prakash" <sathya.prakash@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <f1a66b3a-5549-b69d-79fa-7d89b5627a15@huawei.com>
-Date:   Mon, 3 Jun 2019 14:00:19 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1729038AbfFCOZa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jun 2019 10:25:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60296 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727650AbfFCOZ3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Jun 2019 10:25:29 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8A9C6276D9;
+        Mon,  3 Jun 2019 14:25:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559571929;
+        bh=+QIzxGsUhsEKFyL0nxTNvsmWYp4/6as/1NSx0KwKtRs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Qt9tpqH8wWIrAtw957J/FmI0t+O5nivCFBeQS6FjFK/uFeVdPPzzuhhaC8kqKjT2U
+         K1Cg3UTV0bBA1o9IaLIoIHzJwDIZO+tNvGQgnq1AzpSoX5Dnkh1/svgHv6naOcJkVk
+         9xrRPkFS5XM+p48ob2rhQcyfFn7zh84HoSlKIv+0=
+Date:   Mon, 3 Jun 2019 16:25:26 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: [PATCH v2] block: aoe: no need to check return value of
+ debugfs_create functions
+Message-ID: <20190603142526.GA17169@kroah.com>
+References: <20190122152151.16139-5-gregkh@linuxfoundation.org>
 MIME-Version: 1.0
-In-Reply-To: <20190603110054.GG11812@ming.t460p>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.238]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190122152151.16139-5-gregkh@linuxfoundation.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 03/06/2019 12:00, Ming Lei wrote:
-> On Fri, May 31, 2019 at 12:38:10PM +0100, John Garry wrote:
->>
->>>>> -fallback:
->>>>> -     for_each_possible_cpu(cpu)
->>>>> -             hisi_hba->reply_map[cpu] = cpu % hisi_hba->queue_count;
->>>>> -     /* Don't clean all CQ masks */
->>>>> -}
->>>>> -
->>>>>  static int interrupt_init_v3_hw(struct hisi_hba *hisi_hba)
->>>>>  {
->>>>>       struct device *dev = hisi_hba->dev;
->>>>> @@ -2383,11 +2359,6 @@ static int interrupt_init_v3_hw(struct hisi_hba *hisi_hba)
->>>>>
->>>>>               min_msi = MIN_AFFINE_VECTORS_V3_HW;
->>>>>
->>>>> -             hisi_hba->reply_map = devm_kcalloc(dev, nr_cpu_ids,
->>>>> -                                                sizeof(unsigned int),
->>>>> -                                                GFP_KERNEL);
->>>>> -             if (!hisi_hba->reply_map)
->>>>> -                     return -ENOMEM;
->>>>>               vectors = pci_alloc_irq_vectors_affinity(hisi_hba->pci_dev,
->>>>>                                                        min_msi, max_msi,
->>>>>                                                        PCI_IRQ_MSI |
->>>>> @@ -2395,7 +2366,6 @@ static int interrupt_init_v3_hw(struct hisi_hba *hisi_hba)
->>>>>                                                        &desc);
->>>>>               if (vectors < 0)
->>>>>                       return -ENOENT;
->>>>> -             setup_reply_map_v3_hw(hisi_hba, vectors - BASE_VECTORS_V3_HW);
->>>>>       } else {
->>>>>               min_msi = max_msi;
->>>>>               vectors = pci_alloc_irq_vectors(hisi_hba->pci_dev, min_msi,
->>>>> @@ -2896,6 +2866,18 @@ static void debugfs_snapshot_restore_v3_hw(struct hisi_hba *hisi_hba)
->>>>>       clear_bit(HISI_SAS_REJECT_CMD_BIT, &hisi_hba->flags);
->>>>>  }
->>>>>
->>>>> +static int hisi_sas_map_queues(struct Scsi_Host *shost)
->>>>> +{
->>>>> +     struct hisi_hba *hisi_hba = shost_priv(shost);
->>>>> +     struct blk_mq_queue_map *qmap = &shost->tag_set.map[HCTX_TYPE_DEFAULT];
->>>>> +
->>>>> +     if (auto_affine_msi_experimental)
->>>>> +             return blk_mq_pci_map_queues(qmap, hisi_hba->pci_dev,
->>>>> +                             BASE_VECTORS_V3_HW);
->>>>> +     else
->>>>> +             return blk_mq_map_queues(qmap);
->>
->> I don't think that the mapping which blk_mq_map_queues() creates are not
->> want we want. I'm guessing that we still would like a mapping similar to
->> what blk_mq_pci_map_queues() produces, which is an even spread, putting
->> adjacent CPUs on the same queue.
->>
->> For my system with 96 cpus and 16 queues, blk_mq_map_queues() would map
->> queue 0 to cpu 0, 16, 32, 48 ..., queue 1 to cpu 1, 17, 33 and so on.
->
+When calling debugfs functions, there is no need to ever check the
+return value.  The function can work or not, but the code logic should
+never do something different based on this.
 
-Hi Ming,
+Cc: "Ed L. Cashin" <ed.cashin@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: Omar Sandoval <osandov@osandov.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+v2: fix uninitialized entry issue found by Omar Sandoval
 
-> blk_mq_map_queues() is the default or fallback mapping in case that managed
-> irq isn't used. If the mapping isn't good enough, we still can improve it
-> in future, then any driver applying it can got improved.
->
+ drivers/block/aoe/aoeblk.c | 16 ++--------------
+ 1 file changed, 2 insertions(+), 14 deletions(-)
 
-That's the right attitude. However, as I see, we can only know the 
-mapping when we know the interrupt affinity or some other mapping 
-restriction or rule etc, which we don't know in this case.
-
-For now, personally I would rather if we only expose multiple queues for 
-when auto_affine_msi_experimental is set. I fear that we may make a 
-performance regression for !auto_affine_msi_experimental with this 
-patch. We would need to test.
-
-Hopefully we can drop !auto_affine_msi_experimental support when CPU 
-hotplug issue is resolved.
-
->>
->>>>> +}
->>>>> +
->>>>>  static struct scsi_host_template sht_v3_hw = {
->>>>>       .name                   = DRV_NAME,
->>>>>       .module                 = THIS_MODULE,
->>>>
->>>> As mentioned, we should be using a common function here.
->>>>
->>>>> @@ -2906,6 +2888,8 @@ static struct scsi_host_template sht_v3_hw = {
->>>>>       .scan_start             = hisi_sas_scan_start,
->>>>>       .change_queue_depth     = sas_change_queue_depth,
->>>>>       .bios_param             = sas_bios_param,
->>>>> +     .map_queues             = hisi_sas_map_queues,
->>>>> +     .host_tagset            = 1,
->>>>>       .this_id                = -1,
->>>>>       .sg_tablesize           = HISI_SAS_SGE_PAGE_CNT,
->>>>>       .sg_prot_tablesize      = HISI_SAS_SGE_PAGE_CNT,
->>>>> @@ -3092,6 +3076,8 @@ hisi_sas_v3_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->>>>>       if (hisi_sas_debugfs_enable)
->>>>>               hisi_sas_debugfs_init(hisi_hba);
->>>>>
->>>>> +     shost->nr_hw_queues = hisi_hba->cq_nvecs;
->>
->> There's an ordering issue here, which can be fixed without too much trouble.
->>
->> Value hisi_hba->cq_nvecs is not set until after this point, in
->> hisi_sas_v3_probe()->hw->hw_init->hisi_sas_v3_init()->interrupt_init_v3_hw()
->>
->>
->> Please see revised patch, below.
->
-> Good catch, will integrate it in V2.
->
-
-Thanks!
-
-> Thanks,
-> Ming
->
-> .
->
-
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index e2c6aae2d636..bd19f8af950b 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -196,7 +196,6 @@ static const struct file_operations aoe_debugfs_fops = {
+ static void
+ aoedisk_add_debugfs(struct aoedev *d)
+ {
+-	struct dentry *entry;
+ 	char *p;
+ 
+ 	if (aoe_debugfs_dir == NULL)
+@@ -207,15 +206,8 @@ aoedisk_add_debugfs(struct aoedev *d)
+ 	else
+ 		p++;
+ 	BUG_ON(*p == '\0');
+-	entry = debugfs_create_file(p, 0444, aoe_debugfs_dir, d,
+-				    &aoe_debugfs_fops);
+-	if (IS_ERR_OR_NULL(entry)) {
+-		pr_info("aoe: cannot create debugfs file for %s\n",
+-			d->gd->disk_name);
+-		return;
+-	}
+-	BUG_ON(d->debugfs);
+-	d->debugfs = entry;
++	d->debugfs = debugfs_create_file(p, 0444, aoe_debugfs_dir, d,
++					 &aoe_debugfs_fops);
+ }
+ void
+ aoedisk_rm_debugfs(struct aoedev *d)
+@@ -472,10 +464,6 @@ aoeblk_init(void)
+ 	if (buf_pool_cache == NULL)
+ 		return -ENOMEM;
+ 	aoe_debugfs_dir = debugfs_create_dir("aoe", NULL);
+-	if (IS_ERR_OR_NULL(aoe_debugfs_dir)) {
+-		pr_info("aoe: cannot create debugfs directory\n");
+-		aoe_debugfs_dir = NULL;
+-	}
+ 	return 0;
+ }
+ 
+-- 
+2.21.0
 
