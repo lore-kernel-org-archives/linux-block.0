@@ -2,194 +2,160 @@ Return-Path: <SRS0=uYlv=UC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84582C04AB5
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 20:01:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F865C04AB5
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 21:43:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3FECA26DC7
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 20:01:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42C1F25E44
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 21:43:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UNULN3rt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QxTvQ5J6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726157AbfFCUB3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jun 2019 16:01:29 -0400
-Received: from mail-qt1-f180.google.com ([209.85.160.180]:46920 "EHLO
-        mail-qt1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726057AbfFCUB3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jun 2019 16:01:29 -0400
-Received: by mail-qt1-f180.google.com with SMTP id z19so10942520qtz.13;
-        Mon, 03 Jun 2019 13:01:28 -0700 (PDT)
+        id S1726373AbfFCVnq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jun 2019 17:43:46 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:37716 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726055AbfFCVnq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jun 2019 17:43:46 -0400
+Received: by mail-pf1-f193.google.com with SMTP id a23so11368376pff.4;
+        Mon, 03 Jun 2019 14:43:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ILvqKIDYjCxpgvxSit+XD9upXbgaLs7jZQpNNmN0CxQ=;
-        b=UNULN3rtXJXcbUTgupNaj5V1fFWSy3czIsK194k0yNRU9ol6q4gGpSKok9cpORmfUT
-         WuSEUWmFF5pRMVuZwSfp+qNftgiM0eaqxEJqdqumBf0fCZgaoGbd4OE1/paTJl9aGFbH
-         oZRBG4MapPyeE6F52asfuFg/JubfndXr9FMBdW8q2ZvaskwXPmiYn0r2MsmCSJKBIvh7
-         1qyGjH3FcgY0NtNa+T31QFP73fvpyiBY1OFjSV6l1Ba9VsfkkduE/5CZC8ssA4KccuU4
-         Fp6+7uL97TlUOOJGw1euGrCBRbn5rl9fOZ7KFAsBKi2NgJ6nsNzdjYytOVcc7y8Ojsdb
-         3sNg==
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=YQ9KOEQkrUrE3BH10zdSnyauWIlgxvI2MCvsKO92OqM=;
+        b=QxTvQ5J6FQS96wGuPSX0j5luE25HmxVJsQtcbv4b2I8gAMurDCfy3uGgLVxe+iLNwO
+         48Z4uXHPz+TdTDxjdUPuxDIkPSB1sC0Aux/g5/ARDUx13CrswG31y+Drwik4csFLuQCf
+         KYtNjxR/13Sm9u2QRbVUl09oC5iryUJQMXew7KGAVDVbgXEQ2wayqky88Z2YvMfUDDlE
+         M04F0B92b5mEjrg5cwLqzVE5zIKSHy+cQI/7ZjcAj0a0G8yA93ego6yM3P/Z8/Jp8g/S
+         PqIeLesmFCbCfNoLShgO7pksrOB+9JrLlXGAKxuYj39c7a6Ozsv4wjiJmdsP2T9rsq+3
+         He+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ILvqKIDYjCxpgvxSit+XD9upXbgaLs7jZQpNNmN0CxQ=;
-        b=BpDPfTQGGNxPFB2goR4Ga7IgNPf6iRmDShIvzQmgaMx5CPB8wIyGr/fb7Z7yhhlXZj
-         S+fz+i2OLKdhMQMW82g8Zo/IPSzYcQFXBb6JZKzKxWxivi4gFiFfCHofImasHtI9OQtG
-         1GHxFxHdzkptuLWe8vT+kzK+ENHOOgdLve5LsGyO9JGmLmeX0lJSWkezyj8BVgyyjFOE
-         z56wD8pKJo4+KrutXvn3D6DA7ogW2hnL7/cmWRtZLNWuAJhvPcvU4HGaredcLimVjECE
-         DQlrVTouHMzXVas5VglA4dl1dBAQXl1u6S+NRn7ljegl9HmduFSLIRoS0W5YdpvubJze
-         STXg==
-X-Gm-Message-State: APjAAAU7Yx6xlTsS60Cb17wzCDMa8pxzlm7pRML24+FrdQcKA8jaizlx
-        oxST9UBfCf7EytsgWU0suDs=
-X-Google-Smtp-Source: APXvYqwexNv5DEE4kk1/zdn1iKoFyrU9uwHTZXhBDi3xqD7WU1kcLMxjAXn6lbqxh8ZzvRf7VzT+RQ==
-X-Received: by 2002:ac8:2906:: with SMTP id y6mr4628190qty.138.1559592087503;
-        Mon, 03 Jun 2019 13:01:27 -0700 (PDT)
-Received: from localhost.localdomain ([163.114.130.128])
-        by smtp.gmail.com with ESMTPSA id z12sm678711qkf.20.2019.06.03.13.01.25
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 03 Jun 2019 13:01:26 -0700 (PDT)
-Subject: Re: Testing devices for discard support properly
-To:     Chris Mason <clm@fb.com>, Bryan Gurney <bgurney@redhat.com>
-Cc:     Lukas Czerner <lczerner@redhat.com>, Jan Tulak <jtulak@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Nikolay Borisov <nborisov@suse.com>,
-        Dennis Zhou <dennisz@fb.com>
-References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
- <20190507071021.wtm25mxx2as6babr@work>
- <CACj3i71HdW0ys_YujGFJkobMmZAZtEPo7B2tgZjEY8oP_T9T6g@mail.gmail.com>
- <20190507094015.hb76w3rjzx7shxjp@work>
- <09953ba7-e4f2-36e9-33b7-0ddbbb848257@gmail.com>
- <CAHhmqcT_yabMDY+dZoBAUA28f6tkPe0uH+xtRUS51gvv4p2vuQ@mail.gmail.com>
- <5a02e30d-cb46-a2ab-554f-b8ef4807bd97@gmail.com>
- <CAHhmqcQw69S3Fn=Nej7MezCOZ3_ZNi64p+PFLSV+b91e1gTjZA@mail.gmail.com>
- <31794121-DEDA-4269-8B72-50EB4D0BCABE@fb.com>
-From:   Ric Wheeler <ricwheeler@gmail.com>
-Message-ID: <73f96019-dd58-07ca-ecaf-42519025ed6d@gmail.com>
-Date:   Mon, 3 Jun 2019 16:01:24 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=YQ9KOEQkrUrE3BH10zdSnyauWIlgxvI2MCvsKO92OqM=;
+        b=rXl14edp87/Dq2cVxnHJbThVvHmOQgMlPoquuGeifgU8H8b6yk391LReN86O6chMkd
+         9mcrqCx0RtKzpF9FQD6YXXZAFXmcDY48GF3gjQliI7zY+8o0tlBih+MFzAumvwd5BSod
+         KmoVijNLuNJOAe+grFGejtje8sOSt0oH6m58ifbSfDIj/s8LSN7HhnzDb9VJ24YlOGo1
+         32ZuxeHFVmpX3uZ8HVQ1WsuJ71T6Yte4tUZ3tuSm9pp5qa/OOQUfsb6ToHYxzHRHLXOK
+         N0Bzd5UzQxeKWyP9M3PoiGmhgE0j4cYTqyO03HZ0mr7FjGwogbbGTd7sRE+RQcL9mRy8
+         cnlg==
+X-Gm-Message-State: APjAAAUzmtgyL7Wu4FOz4GMHJpZpNoHvU2eZhQkIUF/UA5zOo1PsEIhh
+        nkF/VUleAjxk3+fNEME5EOtnPJUc
+X-Google-Smtp-Source: APXvYqyJ9A9knaCRAQg0tTXkPDokVjBHleDqoD0QQ8nkArGFOrUrEd3i93/pb7zdr6VuPwNBWQt2NQ==
+X-Received: by 2002:a63:591d:: with SMTP id n29mr30397960pgb.75.1559594665229;
+        Mon, 03 Jun 2019 13:44:25 -0700 (PDT)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id z18sm15738390pfa.101.2019.06.03.13.44.23
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 03 Jun 2019 13:44:23 -0700 (PDT)
+Date:   Mon, 3 Jun 2019 13:44:22 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH V4 3/3] scsi: core: avoid to pre-allocate big chunk for
+ sg list
+Message-ID: <20190603204422.GA7240@roeck-us.net>
+References: <20190428073932.9898-1-ming.lei@redhat.com>
+ <20190428073932.9898-4-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <31794121-DEDA-4269-8B72-50EB4D0BCABE@fb.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190428073932.9898-4-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 5/7/19 5:24 PM, Chris Mason wrote:
-> On 7 May 2019, at 16:09, Bryan Gurney wrote:
+On Sun, Apr 28, 2019 at 03:39:32PM +0800, Ming Lei wrote:
+> Now scsi_mq_setup_tags() pre-allocates a big buffer for IO sg list,
+> and the buffer size is scsi_mq_sgl_size() which depends on smaller
+> value between shost->sg_tablesize and SG_CHUNK_SIZE.
 > 
->> I found an example in my trace of the "two bands of latency" behavior.
->> Consider these three segments of trace data during the writes:
->>
+> Modern HBA's DMA is often capable of deadling with very big segment
+> number, so scsi_mq_sgl_size() is often big. Suppose the max sg number
+> of SG_CHUNK_SIZE is taken, scsi_mq_sgl_size() will be 4KB.
 > 
-> [ ... ]
+> Then if one HBA has lots of queues, and each hw queue's depth is
+> high, pre-allocation for sg list can consume huge memory.
+> For example of lpfc, nr_hw_queues can be 70, each queue's depth
+> can be 3781, so the pre-allocation for data sg list is 70*3781*2k
+> =517MB for single HBA.
 > 
->> There's an average latency of 14 milliseconds for these 128 kilobyte
->> writes.  At 0.218288794 seconds, we can see a sudden appearance of 1.7
->> millisecond latency times, much lower than the average.
->>
->> Then we see an alternation of 1.7 millisecond completions and 14
->> millisecond completions, with these two "latency groups" increasing,
->> up to about 14 milliseconds and 25 milliseconds at 0.241287187 seconds
->> into the trace.
->>
->> At 0.317351888 seconds, we see the pattern start again, with a sudden
->> appearance of 1.89 millisecond latency write completions, among 14.7
->> millisecond latency write completions.
->>
->> If you graph it, it looks like a "triangle wave" pulse, with a
->> duration of about 23 milliseconds, that repeats after about 100
->> milliseconds.  In a way, it's like a "heartbeat".  This wouldn't be as
->> easy to detect with a simple "average" or "percentile" reading.
->>
->> This was during a simple sequential write at a queue depth of 32, but
->> what happens with a write after a discard in the same region of
->> sectors?  This behavior could change, depending on different drive
->> models, and/or drive controller algorithms.
->>
+> There is Red Hat internal report that scsi_debug based tests can't
+> be run any more since legacy io path is killed because too big
+> pre-allocation.
 > 
-> I think these are all really interesting, and definitely support the
-> idea of a series of tests we do to make sure a drive implements discard
-> in the general ways that we expect.
+> So switch to runtime allocation for sg list, meantime pre-allocate 2
+> inline sg entries. This way has been applied to NVMe PCI for a while,
+> so it should be fine for SCSI too. Also runtime sg entries allocation
+> has verified and run always in the original legacy io path.
 > 
-> But with that said, I think a more important discussion as filesystem
-> developers is how we protect the rest of the filesystem from high
-> latencies caused by discards.  For reads and writes, we've been doing
-> this for a long time.  IO schedulers have all kinds of checks and
-> balances for REQ_META or REQ_SYNC, and we throttle dirty pages and
-> readahead and dance around request batching etc etc.
-> 
-> But for discards, we just open the floodgates and hope it works out.  At
-> some point we're going to have to figure out how to queue and throttle
-> discards as well as we do reads/writes.  That's kind of tricky because
-> the FS needs to coordinate when we're allowed to discard something and
-> needs to know when the discard is done, and we all have different
-> schemes for keeping track.
-> 
-> -chris
+> Not see performance effect in my big BS test on scsi_debug.
 > 
 
-Trying to summarize my thoughts here after weeks of other stuff.
+This patch causes a variety of boot failures in -next. Typical failure
+pattern is scsi hangs or failure to find a root file system. For example,
+on alpha, trying to boot from usb:
 
-We really have two (intertwined) questions:
+scsi 0:0:0:0: Direct-Access     QEMU     QEMU HARDDISK    2.5+ PQ: 0 ANSI: 5
+sd 0:0:0:0: Power-on or device reset occurred
+sd 0:0:0:0: [sda] 20480 512-byte logical blocks: (10.5 MB/10.0 MiB)
+sd 0:0:0:0: [sda] Write Protect is off
+sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+sd 0:0:0:0: [sda] Attached SCSI disk
+usb 1-1: reset full-speed USB device number 2 using ohci-pci
+sd 0:0:0:0: [sda] tag#0 UNKNOWN(0x2003) Result: hostbyte=0x07 driverbyte=0x00
+sd 0:0:0:0: [sda] tag#0 CDB: opcode=0x28 28 00 00 00 00 58 00 00 42 00
+print_req_error: I/O error, dev sda, sector 88 flags 80000
+EXT4-fs error (device sda): __ext4_get_inode_loc:4703: inode #2: block 44: comm
+swapper: unable to read itable block
+EXT4-fs (sda): get root inode failed
+EXT4-fs (sda): mount failed
+VFS: Cannot open root device "sda" or unknown-block(8,0): error -5
 
-* does issuing a discard on a device do anything useful - restore 
-flagging performance, enhance the life space of the device, etc?
+Similar problems are seen with other architectures.
+Reverting the patch fixes the problem. Bisect log attached.
 
-* what is the performance impact of doing a discard & does it vary based 
-on the size of the region? (Can we use it to discard a whole device, do 
-it for small discards, etc)
+Guenter
 
-To answer the first question, we need a test that can verify that 
-without discards (mount with nodiscard), we see a decline in 
-performance. For example, multiple overwrites of the entire surface of 
-the device (2 -3 full device writes) to make sure all of the spare 
-capacity has been consumed, run the target workload we want to measure, 
-then do discards of the whole space and run that same target workload.
-
-If the discard does something useful, we should see better performance 
-in that second test run.
-
-If discard does not do anything useful, we are "done" with that device - 
-no real need to measure performance of a useless mechanism. (Punting on 
-the device longevity stuff here, seems like that should be left to the 
-hardware vendors).
-
-To answer the second question, we need to measure the performance of the 
-discard implementation.
-
-We still have to work to get any device into a well known state - do 
-multiple, full device writes without discards. 2-3 passes should do it.
-
-Then run our specific discard test workload - measure the performance of 
-large discards (cap the size by the max permitted by the device) and 
-small, single page discards. Important to capture min/max/average times 
-of the discard. I think it would be best to do this on the block device 
-to avoid any file system layer performance impact of deleting 
-files/tweaking extents/etc.
-
-Probably easiest to do separate tests for interesting discard sizes 
-(each time, doing the full device writes to get back to a known state 
-ahead of the test).
-
-This is not meant to be a comprehensive tests/validation, but I think 
-that doing the above would be a way to get a good sense of the 
-effectiveness and performance of the device mechanism.
-
-Make sense? Did I leave something out?
-
-Ric
+---
+# bad: [ae3cad8f39ccf8d31775d9737488bccf0e44d370] Add linux-next specific files for 20190603
+# good: [f2c7c76c5d0a443053e94adb9f0918fa2fb85c3a] Linux 5.2-rc3
+git bisect start 'HEAD' 'v5.2-rc3'
+# good: [8ff6f4c6e067a9d3f3bbacf02c4ea5eb81fe2c6a] Merge remote-tracking branch 'crypto/master'
+git bisect good 8ff6f4c6e067a9d3f3bbacf02c4ea5eb81fe2c6a
+# good: [6c93755861ce6a6dd904df9cdae9f08671132dbe] Merge remote-tracking branch 'iommu/next'
+git bisect good 6c93755861ce6a6dd904df9cdae9f08671132dbe
+# good: [1a567956cb3be5754d94ce9380a2151e57e204a7] Merge remote-tracking branch 'cgroup/for-next'
+git bisect good 1a567956cb3be5754d94ce9380a2151e57e204a7
+# bad: [a6878ca73cf30b83efbdfb1ecc443d7cfb2d8193] Merge remote-tracking branch 'rtc/rtc-next'
+git bisect bad a6878ca73cf30b83efbdfb1ecc443d7cfb2d8193
+# bad: [25e7f57cf9f86076704b543628a0f02d3d733726] Merge remote-tracking branch 'gpio/for-next'
+git bisect bad 25e7f57cf9f86076704b543628a0f02d3d733726
+# bad: [28e85db94534c92fa00d787264e3ea1843d1dc42] scsi: lpfc: Fix nvmet handling of received ABTS for unmapped frames
+git bisect bad 28e85db94534c92fa00d787264e3ea1843d1dc42
+# bad: [cf9eddf616bb03387e597629142b0be34111e8d0] scsi: hpsa: check for tag collision
+git bisect bad cf9eddf616bb03387e597629142b0be34111e8d0
+# good: [4e74166c52a836f05d4bd8270835703908b34d3e] scsi: libsas: switch sas_ata.[ch] to SPDX tags
+git bisect good 4e74166c52a836f05d4bd8270835703908b34d3e
+# good: [f186090846c29fd9760917fb3d01f095c39262e0] scsi: lib/sg_pool.c: improve APIs for allocating sg pool
+git bisect good f186090846c29fd9760917fb3d01f095c39262e0
+# bad: [12b6b55806928690359bb21de3a19199412289fd] scsi: sd: Inline sd_probe_part2()
+git bisect bad 12b6b55806928690359bb21de3a19199412289fd
+# bad: [c3288dd8c2328a74cb2157dff18d13f6a75cedd2] scsi: core: avoid pre-allocating big SGL for data
+git bisect bad c3288dd8c2328a74cb2157dff18d13f6a75cedd2
+# good: [0f0e744eae6c8af361d227d3a2286973351e5a2a] scsi: core: avoid pre-allocating big SGL for protection information
+git bisect good 0f0e744eae6c8af361d227d3a2286973351e5a2a
+# first bad commit: [c3288dd8c2328a74cb2157dff18d13f6a75cedd2] scsi: core: avoid pre-allocating big SGL for data
