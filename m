@@ -2,177 +2,120 @@ Return-Path: <SRS0=uYlv=UC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A292C04AB5
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 17:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B21D6C04AB5
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 19:47:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A2A8270F1
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 17:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A42C2688B
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 19:47:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1559591278;
+	bh=UHS3vAn9gcxNatUpjBZBWn6UbzI8sRu/Li7nRsom9Y4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=sSsfhCCxrBwGj9m3IEfI7cNMYaqk2C1mGtHVPOzsmA7yt1pPDwxcfVM09Sya4n2/2
+	 +yyNMH/eJpH6IUYQxVZez8CSExMtCtQqK3RM6WEKcE61mLvdrsJYH1i6/BIiqcazeh
+	 EdlmDnAq00rryQAfxMv4GigvWbPrqNVh91eaafI4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726663AbfFCRu6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jun 2019 13:50:58 -0400
-Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:7372 "HELO
-        bsf02.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1726708AbfFCRu5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jun 2019 13:50:57 -0400
-X-ASG-Debug-ID: 1559582378-0e410856621d6970001-Cu09wu
-Received: from BJEXMBX012.didichuxing.com (bjexmbx012.didichuxing.com [172.20.2.191]) by bsf02.didichuxing.com with ESMTP id bQFo5yPVVShGxBFW; Tue, 04 Jun 2019 01:19:38 +0800 (CST)
-X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
-Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
- (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1263.5; Tue, 4 Jun
- 2019 01:19:37 +0800
-Date:   Tue, 4 Jun 2019 01:19:36 +0800
-From:   Weiping Zhang <zhangweiping@didiglobal.com>
-To:     <axboe@kernel.dk>, <tj@kernel.org>, <hch@lst.de>,
-        <bvanassche@acm.org>
-CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
-Subject: [RFC PATCH 0/2] blkcg: add support weighted round robin tagset map
-Message-ID: <cover.1559579964.git.zhangweiping@didiglobal.com>
-X-ASG-Orig-Subj: [RFC PATCH 0/2] blkcg: add support weighted round robin tagset map
-Mail-Followup-To: axboe@kernel.dk, tj@kernel.org, hch@lst.de,
-        bvanassche@acm.org, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org
+        id S1726097AbfFCTr5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jun 2019 15:47:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55722 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726033AbfFCTr5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Jun 2019 15:47:57 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3D5CD207E0;
+        Mon,  3 Jun 2019 19:47:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559591276;
+        bh=UHS3vAn9gcxNatUpjBZBWn6UbzI8sRu/Li7nRsom9Y4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NislMX4pk4qs8vBeegy2l+CW7QZ6TgWWL14ziVlWIYbHxkV6/UOvrUCIwrAopRo4K
+         tjJHUUJXoLKxfdwlyqVzMDOQk4USkosBMgRFWWwdXIWI3zSxIsWoN9ZTDDykeeXzzw
+         YXrJ3F6zmpBSe0Muf3rC5xMWSuGG0KjLEbCjk7ok=
+Date:   Mon, 3 Jun 2019 21:47:54 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Justin Sanders <justin@coraid.com>, linux-kernel@vger.kernel.org
+Cc:     "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: [PATCH v3] block: aoe: no need to check return value of
+ debugfs_create functions
+Message-ID: <20190603194754.GB21877@kroah.com>
+References: <20190122152151.16139-5-gregkh@linuxfoundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Originating-IP: [172.22.50.20]
-X-ClientProxiedBy: BJEXCAS03.didichuxing.com (172.20.36.245) To
- BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: bjexmbx012.didichuxing.com[172.20.2.191]
-X-Barracuda-Start-Time: 1559582378
-X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 3114
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0003 1.0000 -2.0191
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.72199
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
+In-Reply-To: <20190122152151.16139-5-gregkh@linuxfoundation.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+When calling debugfs functions, there is no need to ever check the
+return value.  The function can work or not, but the code logic should
+never do something different based on this.
 
-Hi, 
+Cc: "Ed L. Cashin" <ed.cashin@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: Omar Sandoval <osandov@osandov.com>
+Cc: Justin Sanders <justin@coraid.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+v3: Justin is now the maintainer of this driver, properly send it to
+    him.
+v2: fix uninitialized entry issue found by Omar Sandoval
 
-This patchset try to add new tagset map for WRR(weighted round robin),
-like what nvme spec dose.
+ drivers/block/aoe/aoeblk.c | 16 ++--------------
+ 1 file changed, 2 insertions(+), 14 deletions(-)
 
-The first patch add three new HCTX_TYPE_WRR_LOW/MEDIUM/HIGH, and
-a attribute blkio.wrr to enable different blkcg use different tag map.
-If the hardware queue support different priority, the driver can
-map high priority hardware queue to HCTX_TYPE_WRR_HIGH.
-
-For high io priority block cgroup, we should change its blio.wrr to high,
-echo "major:minor high" > blkio.wrr, that its io can be servied more
-quickly. This is useful for different containers share same nvme device,
-for important containers use high prioriity hw queue, others use medium
-or low priority hw queue.
-
-The second patch, add a WRR for null_blk to simulate what nvme does,
-we add a new irqmode=3 to enable NULL_IRQ_WRR, a kernel thread
-will processing all haredware queue's io in WRR fasion.
-
-A simpel test result:
-
-we add 32 hw queue in total:
-defaut: 8
-read: 0
-poll: 0
-wrr_low: 8
-wrr_medium: 8
-wrr_high: 8
-
-insmod drivers/block/null_blk.ko irqmode=3 \
-	submit_queues=32 submit_queues_wrr_high=8 \
-	submit_queues_wrr_medium=8 submit_queues_wrr_low=8
-fio --bs=4k --ioengine=libaio --iodepth=16 --filename=/dev/nullb0 --direct=1 --runtime=60 --numjobs=16 --rw=randread --name=test$1 --group_reporting --gtod_reduce=1
-
-check hardware context type:
-cat /sys/kernel/debug/block/nullb0/hctx*/type
-
-default
-wrr_low
-wrr_low
-wrr_low
-wrr_low
-wrr_low
-wrr_low
-wrr_medium
-wrr_medium
-wrr_medium
-wrr_medium
-default
-wrr_medium
-wrr_medium
-wrr_medium
-wrr_medium
-wrr_high
-wrr_high
-wrr_high
-wrr_high
-wrr_high
-wrr_high
-default
-wrr_high
-wrr_high
-default
-default
-default
-default
-default
-wrr_low
-wrr_low
-
-
-1. run 3 fio in default hw queue
-fio1: 130K
-fio2: 130K
-fio3: 130K
-
-2. use different hw queue
-mkdir /sys/fs/cgroup/blkio/{low,medium, high}
-echo "251:0 high" > /sys/fs/cgroup/blkio/high/blkio.wrr
-echo "251:0 medium" > /sys/fs/cgroup/blkio/medium/blkio.wrr
-echo "251:0 low" > /sys/fs/cgroup/blkio/low/blkio.wrr
-
-echo `pidof fio1` > /sys/fs/cgroup/blkio/high/cgroup.procs
-echo `pidof fio2` > /sys/fs/cgroup/blkio/medium/cgroup.procs
-echo `pidof fio3` > /sys/fs/cgroup/blkio/low/cgroup.procs
-
-fio1: 260K
-fio2: 160K
-fio3: 60K
-
-we dispatch 8(high), 4(medium), 1(low) ios at time, to simulate
-weighted round robin policy.
-
-Weiping Zhang (2):
-  block: add weighted round robin for blkcgroup
-  null_blk: add support weighted round robin submition queue
-
- block/blk-cgroup.c            |  88 +++++++++++++
- block/blk-mq-debugfs.c        |   3 +
- block/blk-mq-sched.c          |   6 +-
- block/blk-mq-tag.c            |   4 +-
- block/blk-mq-tag.h            |   2 +-
- block/blk-mq.c                |  12 +-
- block/blk-mq.h                |  17 ++-
- block/blk.h                   |   2 +-
- drivers/block/null_blk.h      |   7 +
- drivers/block/null_blk_main.c | 294 ++++++++++++++++++++++++++++++++++++++++--
- include/linux/blk-cgroup.h    |   2 +
- include/linux/blk-mq.h        |  12 ++
- 12 files changed, 426 insertions(+), 23 deletions(-)
-
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index e2c6aae2d636..bd19f8af950b 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -196,7 +196,6 @@ static const struct file_operations aoe_debugfs_fops = {
+ static void
+ aoedisk_add_debugfs(struct aoedev *d)
+ {
+-	struct dentry *entry;
+ 	char *p;
+ 
+ 	if (aoe_debugfs_dir == NULL)
+@@ -207,15 +206,8 @@ aoedisk_add_debugfs(struct aoedev *d)
+ 	else
+ 		p++;
+ 	BUG_ON(*p == '\0');
+-	entry = debugfs_create_file(p, 0444, aoe_debugfs_dir, d,
+-				    &aoe_debugfs_fops);
+-	if (IS_ERR_OR_NULL(entry)) {
+-		pr_info("aoe: cannot create debugfs file for %s\n",
+-			d->gd->disk_name);
+-		return;
+-	}
+-	BUG_ON(d->debugfs);
+-	d->debugfs = entry;
++	d->debugfs = debugfs_create_file(p, 0444, aoe_debugfs_dir, d,
++					 &aoe_debugfs_fops);
+ }
+ void
+ aoedisk_rm_debugfs(struct aoedev *d)
+@@ -472,10 +464,6 @@ aoeblk_init(void)
+ 	if (buf_pool_cache == NULL)
+ 		return -ENOMEM;
+ 	aoe_debugfs_dir = debugfs_create_dir("aoe", NULL);
+-	if (IS_ERR_OR_NULL(aoe_debugfs_dir)) {
+-		pr_info("aoe: cannot create debugfs directory\n");
+-		aoe_debugfs_dir = NULL;
+-	}
+ 	return 0;
+ }
+ 
 -- 
-2.14.1
+2.21.0
 
