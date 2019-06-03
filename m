@@ -1,207 +1,279 @@
-Return-Path: <SRS0=BT6h=UB=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=uYlv=UC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8018BC282DC
-	for <linux-block@archiver.kernel.org>; Sun,  2 Jun 2019 23:43:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A512C04AB6
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 03:56:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3DDF727A34
-	for <linux-block@archiver.kernel.org>; Sun,  2 Jun 2019 23:43:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oZL0csIG";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="eTQfsFrr"
+	by mail.kernel.org (Postfix) with ESMTP id 2702027B24
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 03:56:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726616AbfFBXnv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Jun 2019 19:43:51 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:31159 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726305AbfFBXnv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Jun 2019 19:43:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1559519061; x=1591055061;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=RfYji+B18oW8P7M4M6oGhR8sPvs/SVTLe5KoHJ5prTU=;
-  b=oZL0csIGVLW5VwpF9B/UoZabDekd15SaXCkCkQ+bjKDxDH+TDxPagoZO
-   WL5T0Rc0fi5yv2eC+CNxoS0DLmL0AOTWJeXc7PJn8SuYv9i3NEDSoZj2n
-   rO1ppJwzx+Trj/DOU1KH09kFew92vTCi04CrddbqT4fNR2oUqKW9KTNS3
-   D4KJI5Yu9lJ07Zy1uu2FO3HTlm3NSM9/M1qSmL7hL7N3BLHWFjn36PNfI
-   F1dqh6yDO3+3KTygnFVTkASsSJgPaYbUmQeMfOVZceos/upZXS7UeHEXk
-   V7lUURTH+2pbqyjXS5LBjEtODZqKAXe1aX/F7GOmfERAMh6XllpsCxVtc
-   A==;
-X-IronPort-AV: E=Sophos;i="5.60,544,1549900800"; 
-   d="scan'208";a="209207668"
-Received: from mail-by2nam01lp2052.outbound.protection.outlook.com (HELO NAM01-BY2-obe.outbound.protection.outlook.com) ([104.47.34.52])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Jun 2019 07:44:20 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qGZvOqXysFiRL/WCcmJC5s2XvoD5cQiAxuIG6Efi4Ig=;
- b=eTQfsFrrNrxOuW+oSY6rg7tAxZ0F576dVw72XJkDW3YqO7HAkkCox7ykbOleWj8HTDL/D+a7aQrqhGeRIQ/YPK6tuP+XeicDJxCe6CwDlZ3Yuzgg+tp5FbRPjYrJk2e6nZGzAPpuZdBBcPa+nRazW5kVVAO7LRvnPmonueeIkWA=
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
- BYAPR04MB5110.namprd04.prod.outlook.com (52.135.235.32) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1943.16; Sun, 2 Jun 2019 23:43:47 +0000
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::ad42:af4b:a53b:80f5]) by BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::ad42:af4b:a53b:80f5%4]) with mapi id 15.20.1943.018; Sun, 2 Jun 2019
- 23:43:46 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Bob Liu <bob.liu@oracle.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "hare@suse.com" <hare@suse.com>, "hch@lst.de" <hch@lst.de>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "bart.vanassche@wdc.com" <bart.vanassche@wdc.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-Subject: Re: [PATCH] block: null_blk: fix race condition for null_del_dev
-Thread-Topic: [PATCH] block: null_blk: fix race condition for null_del_dev
-Thread-Index: AQHVF3cUt12bBtQmMUufFactkaZk8w==
-Date:   Sun, 2 Jun 2019 23:43:46 +0000
-Message-ID: <BYAPR04MB57498234FD33E381E665B066861B0@BYAPR04MB5749.namprd04.prod.outlook.com>
-References: <20190531060545.10235-1-bob.liu@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.44.250]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a8b0a7ca-c414-40aa-7d1a-08d6e7b427da
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5110;
-x-ms-traffictypediagnostic: BYAPR04MB5110:
-wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <BYAPR04MB5110E0E146EA3913D448A123861B0@BYAPR04MB5110.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2331;
-x-forefront-prvs: 005671E15D
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(366004)(136003)(39860400002)(376002)(346002)(199004)(189003)(7696005)(305945005)(102836004)(99286004)(8676002)(7736002)(66066001)(446003)(71200400001)(71190400001)(26005)(476003)(81156014)(81166006)(6506007)(229853002)(86362001)(110136005)(52536014)(54906003)(478600001)(68736007)(14454004)(2501003)(74316002)(8936002)(72206003)(76176011)(53546011)(486006)(66946007)(66476007)(76116006)(73956011)(186003)(64756008)(66446008)(66556008)(256004)(14444005)(25786009)(55016002)(6436002)(6246003)(9686003)(2906002)(53936002)(4326008)(6116002)(5660300002)(316002)(3846002)(33656002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5110;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: AHgAu/FzGkGZkABpyPIjpTnPvjMoNyMFddZoCm17+AgqWHnVeUFGYfOTnEXRri3Ejqa5Gngsbyn/EXVLBZN3s9HOoSlkCGIRfg+lqpgW4vrOuOtHWZTNfBR6cv1UomyfIfby+AKgpzSZr7jJBsB1IIavxq6QMO7zEVcxhgem1Ly7zbw82urB5AS8tNmolLO2TqvKhsD+K7yZ+SCKnIRmOnRCnyuShTv1FcQuzTFLSE+SivEdDUWF308hJ6xbmL0jBLN8BS8mI0krtbf9Ou14C2bSClYFQbXBLY2putrpMy/sjrYQ24NBBvKg6uLtVYmIeCWHlhahmI963gGSv8/YrI23b71w42+lMxCTNofYB4UY4PO79FDchtN/fgBwEQbuLj3QiKlOI9nvYtk9g1O0P3HHD+pxkb1EyUS7hJxWW/4=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726716AbfFCD40 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Jun 2019 23:56:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39828 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726636AbfFCD40 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 2 Jun 2019 23:56:26 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7FF0930842CE;
+        Mon,  3 Jun 2019 03:56:24 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5252110027CA;
+        Mon,  3 Jun 2019 03:56:11 +0000 (UTC)
+Date:   Mon, 3 Jun 2019 11:56:07 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Kashyap Desai <kashyap.desai@broadcom.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        John Garry <john.garry@huawei.com>,
+        Don Brace <don.brace@microsemi.com>,
+        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 8/9] scsi: megaraid: convert private reply queue to
+ blk-mq hw queue
+Message-ID: <20190603035605.GB13684@ming.t460p>
+References: <20190531022801.10003-1-ming.lei@redhat.com>
+ <20190531022801.10003-9-ming.lei@redhat.com>
+ <7819e1a523b9e8227e3a9d188ee1e083@mail.gmail.com>
+ <20190602064202.GA2731@ming.t460p>
+ <20190602074757.GA31572@ming.t460p>
+ <020a7707a31803d65dd94cc0928a425a@mail.gmail.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a8b0a7ca-c414-40aa-7d1a-08d6e7b427da
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jun 2019 23:43:46.5905
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5110
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <020a7707a31803d65dd94cc0928a425a@mail.gmail.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Mon, 03 Jun 2019 03:56:25 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks for your patch Bob.=0A=
-=0A=
-Looks good to me.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-=0A=
-On 5/30/19 11:07 PM, Bob Liu wrote:=0A=
-> Dulicate call of null_del_dev() will trigger null pointer error like belo=
-w.=0A=
-> The reason is a race condition between nullb_device_power_store() and=0A=
-> nullb_group_drop_item().=0A=
->=0A=
->  CPU#0                         CPU#1=0A=
->  ----------------              -----------------=0A=
->  do_rmdir()=0A=
->   >configfs_rmdir()=0A=
->    >client_drop_item()=0A=
->     >nullb_group_drop_item()=0A=
->                                nullb_device_power_store()=0A=
-> 				>null_del_dev()=0A=
->=0A=
->      >test_and_clear_bit(NULLB_DEV_FL_UP=0A=
->       >null_del_dev()=0A=
->       ^^^^^=0A=
->       Duplicated null_dev_dev() triger null pointer error=0A=
->=0A=
-> 				>clear_bit(NULLB_DEV_FL_UP=0A=
->=0A=
-> The fix could be keep the sequnce of clear NULLB_DEV_FL_UP and null_del_d=
-ev().=0A=
->=0A=
-> [  698.613600] BUG: unable to handle kernel NULL pointer dereference at 0=
-000000000000018=0A=
-> [  698.613608] #PF error: [normal kernel read fault]=0A=
-> [  698.613611] PGD 0 P4D 0=0A=
-> [  698.613619] Oops: 0000 [#1] SMP PTI=0A=
-> [  698.613627] CPU: 3 PID: 6382 Comm: rmdir Not tainted 5.0.0+ #35=0A=
-> [  698.613631] Hardware name: LENOVO 20LJS2EV08/20LJS2EV08, BIOS R0SET33W=
- (1.17 ) 07/18/2018=0A=
-> [  698.613644] RIP: 0010:null_del_dev+0xc/0x110 [null_blk]=0A=
-> [  698.613649] Code: 00 00 00 5b 41 5c 41 5d 41 5e 41 5f 5d c3 0f 0b eb 9=
-7 e8 47 bb 2a e8 0f 1f 80 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 54 53 <=
-8b> 77 18 48 89 fb 4c 8b 27 48 c7 c7 40 57 1e c1 e8 bf c7 cb e8 48=0A=
-> [  698.613654] RSP: 0018:ffffb887888bfde0 EFLAGS: 00010286=0A=
-> [  698.613659] RAX: 0000000000000000 RBX: ffff9d436d92bc00 RCX: ffff9d43a=
-9184681=0A=
-> [  698.613663] RDX: ffffffffc11e5c30 RSI: 0000000068be6540 RDI: 000000000=
-0000000=0A=
-> [  698.613667] RBP: ffffb887888bfdf0 R08: 0000000000000001 R09: 000000000=
-0000000=0A=
-> [  698.613671] R10: ffffb887888bfdd8 R11: 0000000000000f16 R12: ffff9d436=
-d92bc08=0A=
-> [  698.613675] R13: ffff9d436d94e630 R14: ffffffffc11e5088 R15: ffffffffc=
-11e5000=0A=
-> [  698.613680] FS:  00007faa68be6540(0000) GS:ffff9d43d14c0000(0000) knlG=
-S:0000000000000000=0A=
-> [  698.613685] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033=0A=
-> [  698.613689] CR2: 0000000000000018 CR3: 000000042f70c002 CR4: 000000000=
-03606e0=0A=
-> [  698.613693] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
-0000000=0A=
-> [  698.613697] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000=
-0000400=0A=
-> [  698.613700] Call Trace:=0A=
-> [  698.613712]  nullb_group_drop_item+0x50/0x70 [null_blk]=0A=
-> [  698.613722]  client_drop_item+0x29/0x40=0A=
-> [  698.613728]  configfs_rmdir+0x1ed/0x300=0A=
-> [  698.613738]  vfs_rmdir+0xb2/0x130=0A=
-> [  698.613743]  do_rmdir+0x1c7/0x1e0=0A=
-> [  698.613750]  __x64_sys_rmdir+0x17/0x20=0A=
-> [  698.613759]  do_syscall_64+0x5a/0x110=0A=
-> [  698.613768]  entry_SYSCALL_64_after_hwframe+0x44/0xa9=0A=
->=0A=
-> Signed-off-by: Bob Liu <bob.liu@oracle.com>=0A=
-> ---=0A=
->  drivers/block/null_blk_main.c | 11 ++++++-----=0A=
->  1 file changed, 6 insertions(+), 5 deletions(-)=0A=
->=0A=
-> diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.=
-c=0A=
-> index 62c9654..99dd0ab 100644=0A=
-> --- a/drivers/block/null_blk_main.c=0A=
-> +++ b/drivers/block/null_blk_main.c=0A=
-> @@ -326,11 +326,12 @@ static ssize_t nullb_device_power_store(struct conf=
-ig_item *item,=0A=
->  		set_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);=0A=
->  		dev->power =3D newp;=0A=
->  	} else if (dev->power && !newp) {=0A=
-> -		mutex_lock(&lock);=0A=
-> -		dev->power =3D newp;=0A=
-> -		null_del_dev(dev->nullb);=0A=
-> -		mutex_unlock(&lock);=0A=
-> -		clear_bit(NULLB_DEV_FL_UP, &dev->flags);=0A=
-> +		if (test_and_clear_bit(NULLB_DEV_FL_UP, &dev->flags)) {=0A=
-> +			mutex_lock(&lock);=0A=
-> +			dev->power =3D newp;=0A=
-> +			null_del_dev(dev->nullb);=0A=
-> +			mutex_unlock(&lock);=0A=
-> +		}=0A=
->  		clear_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);=0A=
->  	}=0A=
->  =0A=
-=0A=
-=0A=
+Hi Kashyap,
+
+Thanks for collecting the log.
+
+On Sun, Jun 02, 2019 at 10:04:01PM +0530, Kashyap Desai wrote:
+> > Meantime please try the following patch and see if difference can be
+> made.
+> >
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c index
+> > 49d73d979cb3..d2abec3b0f60 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -589,7 +589,7 @@ static void __blk_mq_complete_request(struct
+> > request *rq)
+> >  	 * So complete IO reqeust in softirq context in case of single
+> queue
+> >  	 * for not degrading IO performance by irqsoff latency.
+> >  	 */
+> > -	if (q->nr_hw_queues == 1) {
+> > +	if (q->nr_hw_queues == 1 || (rq->mq_hctx->flags &
+> > BLK_MQ_F_HOST_TAGS))
+> > +{
+> >  		__blk_complete_request(rq);
+> >  		return;
+> >  	}
+> > @@ -1977,7 +1977,8 @@ static blk_qc_t blk_mq_make_request(struct
+> > request_queue *q, struct bio *bio)
+> >  		/* bypass scheduler for flush rq */
+> >  		blk_insert_flush(rq);
+> >  		blk_mq_run_hw_queue(data.hctx, true);
+> > -	} else if (plug && (q->nr_hw_queues == 1 || q->mq_ops-
+> > >commit_rqs)) {
+> > +	} else if (plug && (q->nr_hw_queues == 1 || q->mq_ops->commit_rqs
+> > ||
+> > +				(data.hctx->flags & BLK_MQ_F_HOST_TAGS)))
+> > {
+> >  		/*
+> >  		 * Use plugging if we have a ->commit_rqs() hook as well,
+> as
+> >  		 * we know the driver uses bd->last in a smart fashion.
+> 
+> Ming -
+> 
+> I tried above patch and no improvement in performance.
+> 
+> Below is perf record data - lock contention is while getting the tag
+> (blk_mq_get_tag )
+> 
+> 6.67%     6.67%  fio              [kernel.vmlinux]  [k]
+> native_queued_spin_lock_slowpath
+>    - 6.66% io_submit
+>       - 6.66% entry_SYSCALL_64
+>          - do_syscall_64
+>             - 6.66% __x64_sys_io_submit
+>                - 6.66% io_submit_one
+>                   - 6.66% aio_read
+>                      - 6.66% generic_file_read_iter
+>                         - 6.66% blkdev_direct_IO
+>                            - 6.65% submit_bio
+>                               - generic_make_request
+>                                  - 6.65% blk_mq_make_request
+>                                     - 6.65% blk_mq_get_request
+>                                        - 6.65% blk_mq_get_tag
+>                                           - 6.58%
+> prepare_to_wait_exclusive
+>                                              - 6.57%
+> _raw_spin_lock_irqsave
+> 
+> queued_spin_lock_slowpath
+
+Please drop the patch in my last email, and apply the following patch
+and see if we can make a difference:
+
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 3d6780504dcb..69d6bffcc8ff 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -627,6 +627,9 @@ static int hctx_active_show(void *data, struct seq_file *m)
+ {
+ 	struct blk_mq_hw_ctx *hctx = data;
+ 
++	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
++		hctx = blk_mq_master_hctx(hctx);
++
+ 	seq_printf(m, "%d\n", atomic_read(&hctx->nr_active));
+ 	return 0;
+ }
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 309ec5079f3f..58ef83a34fda 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -30,6 +30,9 @@ bool blk_mq_has_free_tags(struct blk_mq_tags *tags)
+  */
+ bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ {
++	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
++		hctx = blk_mq_master_hctx(hctx);
++
+ 	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+ 	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+ 		atomic_inc(&hctx->tags->active_queues);
+@@ -55,6 +58,9 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct blk_mq_tags *tags = hctx->tags;
+ 
++	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
++		hctx = blk_mq_master_hctx(hctx);
++
+ 	if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+ 		return;
+ 
+@@ -74,6 +80,10 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 
+ 	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_SHARED))
+ 		return true;
++
++	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
++		hctx = blk_mq_master_hctx(hctx);
++
+ 	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+ 		return true;
+ 
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index 61deab0b5a5a..84e9b46ffc78 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -36,11 +36,22 @@ extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
+ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 		void *priv);
+ 
++static inline struct blk_mq_hw_ctx *blk_mq_master_hctx(
++		struct blk_mq_hw_ctx *hctx)
++{
++	return hctx->queue->queue_hw_ctx[0];
++}
++
++
+ static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
+ 						 struct blk_mq_hw_ctx *hctx)
+ {
+ 	if (!hctx)
+ 		return &bt->ws[0];
++
++	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
++		hctx = blk_mq_master_hctx(hctx);
++
+ 	return sbq_wait_ptr(bt, &hctx->wait_index);
+ }
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 49d73d979cb3..4196ed3b0085 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -303,7 +303,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	} else {
+ 		if (data->hctx->flags & BLK_MQ_F_TAG_SHARED) {
+ 			rq_flags = RQF_MQ_INFLIGHT;
+-			atomic_inc(&data->hctx->nr_active);
++			blk_mq_inc_nr_active(data->hctx);
+ 		}
+ 		rq->tag = tag;
+ 		rq->internal_tag = -1;
+@@ -517,7 +517,7 @@ void blk_mq_free_request(struct request *rq)
+ 
+ 	ctx->rq_completed[rq_is_sync(rq)]++;
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT)
+-		atomic_dec(&hctx->nr_active);
++		blk_mq_dec_nr_active(hctx);
+ 
+ 	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
+ 		laptop_io_completion(q->backing_dev_info);
+@@ -1064,7 +1064,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
+ 	if (rq->tag >= 0) {
+ 		if (shared) {
+ 			rq->rq_flags |= RQF_MQ_INFLIGHT;
+-			atomic_inc(&data.hctx->nr_active);
++			blk_mq_inc_nr_active(data.hctx);
+ 		}
+ 		data.hctx->tags->rqs[rq->tag] = rq;
+ 	}
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 633a5a77ee8b..f1279b8c2289 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -193,6 +193,20 @@ unsigned int blk_mq_in_flight(struct request_queue *q, struct hd_struct *part);
+ void blk_mq_in_flight_rw(struct request_queue *q, struct hd_struct *part,
+ 			 unsigned int inflight[2]);
+ 
++static inline void blk_mq_inc_nr_active(struct blk_mq_hw_ctx *hctx)
++{
++	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
++		hctx = blk_mq_master_hctx(hctx);
++	atomic_inc(&hctx->nr_active);
++}
++
++static inline void blk_mq_dec_nr_active(struct blk_mq_hw_ctx *hctx)
++{
++	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
++		hctx = blk_mq_master_hctx(hctx);
++	atomic_dec(&hctx->nr_active);
++}
++
+ static inline void blk_mq_put_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+@@ -218,7 +232,7 @@ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+ 
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
+ 		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
+-		atomic_dec(&hctx->nr_active);
++		blk_mq_dec_nr_active(hctx);
+ 	}
+ }
+ 
+Thanks,
+Ming
