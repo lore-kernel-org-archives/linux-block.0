@@ -2,120 +2,194 @@ Return-Path: <SRS0=uYlv=UC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_MUTT
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B21D6C04AB5
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 19:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84582C04AB5
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 20:01:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A42C2688B
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 19:47:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559591278;
-	bh=UHS3vAn9gcxNatUpjBZBWn6UbzI8sRu/Li7nRsom9Y4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=sSsfhCCxrBwGj9m3IEfI7cNMYaqk2C1mGtHVPOzsmA7yt1pPDwxcfVM09Sya4n2/2
-	 +yyNMH/eJpH6IUYQxVZez8CSExMtCtQqK3RM6WEKcE61mLvdrsJYH1i6/BIiqcazeh
-	 EdlmDnAq00rryQAfxMv4GigvWbPrqNVh91eaafI4=
+	by mail.kernel.org (Postfix) with ESMTP id 3FECA26DC7
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jun 2019 20:01:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UNULN3rt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726097AbfFCTr5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jun 2019 15:47:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55722 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726033AbfFCTr5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Jun 2019 15:47:57 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3D5CD207E0;
-        Mon,  3 Jun 2019 19:47:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559591276;
-        bh=UHS3vAn9gcxNatUpjBZBWn6UbzI8sRu/Li7nRsom9Y4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NislMX4pk4qs8vBeegy2l+CW7QZ6TgWWL14ziVlWIYbHxkV6/UOvrUCIwrAopRo4K
-         tjJHUUJXoLKxfdwlyqVzMDOQk4USkosBMgRFWWwdXIWI3zSxIsWoN9ZTDDykeeXzzw
-         YXrJ3F6zmpBSe0Muf3rC5xMWSuGG0KjLEbCjk7ok=
-Date:   Mon, 3 Jun 2019 21:47:54 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Justin Sanders <justin@coraid.com>, linux-kernel@vger.kernel.org
-Cc:     "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: [PATCH v3] block: aoe: no need to check return value of
- debugfs_create functions
-Message-ID: <20190603194754.GB21877@kroah.com>
-References: <20190122152151.16139-5-gregkh@linuxfoundation.org>
+        id S1726157AbfFCUB3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jun 2019 16:01:29 -0400
+Received: from mail-qt1-f180.google.com ([209.85.160.180]:46920 "EHLO
+        mail-qt1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726057AbfFCUB3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jun 2019 16:01:29 -0400
+Received: by mail-qt1-f180.google.com with SMTP id z19so10942520qtz.13;
+        Mon, 03 Jun 2019 13:01:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ILvqKIDYjCxpgvxSit+XD9upXbgaLs7jZQpNNmN0CxQ=;
+        b=UNULN3rtXJXcbUTgupNaj5V1fFWSy3czIsK194k0yNRU9ol6q4gGpSKok9cpORmfUT
+         WuSEUWmFF5pRMVuZwSfp+qNftgiM0eaqxEJqdqumBf0fCZgaoGbd4OE1/paTJl9aGFbH
+         oZRBG4MapPyeE6F52asfuFg/JubfndXr9FMBdW8q2ZvaskwXPmiYn0r2MsmCSJKBIvh7
+         1qyGjH3FcgY0NtNa+T31QFP73fvpyiBY1OFjSV6l1Ba9VsfkkduE/5CZC8ssA4KccuU4
+         Fp6+7uL97TlUOOJGw1euGrCBRbn5rl9fOZ7KFAsBKi2NgJ6nsNzdjYytOVcc7y8Ojsdb
+         3sNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ILvqKIDYjCxpgvxSit+XD9upXbgaLs7jZQpNNmN0CxQ=;
+        b=BpDPfTQGGNxPFB2goR4Ga7IgNPf6iRmDShIvzQmgaMx5CPB8wIyGr/fb7Z7yhhlXZj
+         S+fz+i2OLKdhMQMW82g8Zo/IPSzYcQFXBb6JZKzKxWxivi4gFiFfCHofImasHtI9OQtG
+         1GHxFxHdzkptuLWe8vT+kzK+ENHOOgdLve5LsGyO9JGmLmeX0lJSWkezyj8BVgyyjFOE
+         z56wD8pKJo4+KrutXvn3D6DA7ogW2hnL7/cmWRtZLNWuAJhvPcvU4HGaredcLimVjECE
+         DQlrVTouHMzXVas5VglA4dl1dBAQXl1u6S+NRn7ljegl9HmduFSLIRoS0W5YdpvubJze
+         STXg==
+X-Gm-Message-State: APjAAAU7Yx6xlTsS60Cb17wzCDMa8pxzlm7pRML24+FrdQcKA8jaizlx
+        oxST9UBfCf7EytsgWU0suDs=
+X-Google-Smtp-Source: APXvYqwexNv5DEE4kk1/zdn1iKoFyrU9uwHTZXhBDi3xqD7WU1kcLMxjAXn6lbqxh8ZzvRf7VzT+RQ==
+X-Received: by 2002:ac8:2906:: with SMTP id y6mr4628190qty.138.1559592087503;
+        Mon, 03 Jun 2019 13:01:27 -0700 (PDT)
+Received: from localhost.localdomain ([163.114.130.128])
+        by smtp.gmail.com with ESMTPSA id z12sm678711qkf.20.2019.06.03.13.01.25
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Mon, 03 Jun 2019 13:01:26 -0700 (PDT)
+Subject: Re: Testing devices for discard support properly
+To:     Chris Mason <clm@fb.com>, Bryan Gurney <bgurney@redhat.com>
+Cc:     Lukas Czerner <lczerner@redhat.com>, Jan Tulak <jtulak@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Nikolay Borisov <nborisov@suse.com>,
+        Dennis Zhou <dennisz@fb.com>
+References: <4a484c50-ef29-2db9-d581-557c2ea8f494@gmail.com>
+ <20190507071021.wtm25mxx2as6babr@work>
+ <CACj3i71HdW0ys_YujGFJkobMmZAZtEPo7B2tgZjEY8oP_T9T6g@mail.gmail.com>
+ <20190507094015.hb76w3rjzx7shxjp@work>
+ <09953ba7-e4f2-36e9-33b7-0ddbbb848257@gmail.com>
+ <CAHhmqcT_yabMDY+dZoBAUA28f6tkPe0uH+xtRUS51gvv4p2vuQ@mail.gmail.com>
+ <5a02e30d-cb46-a2ab-554f-b8ef4807bd97@gmail.com>
+ <CAHhmqcQw69S3Fn=Nej7MezCOZ3_ZNi64p+PFLSV+b91e1gTjZA@mail.gmail.com>
+ <31794121-DEDA-4269-8B72-50EB4D0BCABE@fb.com>
+From:   Ric Wheeler <ricwheeler@gmail.com>
+Message-ID: <73f96019-dd58-07ca-ecaf-42519025ed6d@gmail.com>
+Date:   Mon, 3 Jun 2019 16:01:24 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190122152151.16139-5-gregkh@linuxfoundation.org>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+In-Reply-To: <31794121-DEDA-4269-8B72-50EB4D0BCABE@fb.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When calling debugfs functions, there is no need to ever check the
-return value.  The function can work or not, but the code logic should
-never do something different based on this.
 
-Cc: "Ed L. Cashin" <ed.cashin@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Cc: Omar Sandoval <osandov@osandov.com>
-Cc: Justin Sanders <justin@coraid.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
-v3: Justin is now the maintainer of this driver, properly send it to
-    him.
-v2: fix uninitialized entry issue found by Omar Sandoval
 
- drivers/block/aoe/aoeblk.c | 16 ++--------------
- 1 file changed, 2 insertions(+), 14 deletions(-)
+On 5/7/19 5:24 PM, Chris Mason wrote:
+> On 7 May 2019, at 16:09, Bryan Gurney wrote:
+> 
+>> I found an example in my trace of the "two bands of latency" behavior.
+>> Consider these three segments of trace data during the writes:
+>>
+> 
+> [ ... ]
+> 
+>> There's an average latency of 14 milliseconds for these 128 kilobyte
+>> writes.  At 0.218288794 seconds, we can see a sudden appearance of 1.7
+>> millisecond latency times, much lower than the average.
+>>
+>> Then we see an alternation of 1.7 millisecond completions and 14
+>> millisecond completions, with these two "latency groups" increasing,
+>> up to about 14 milliseconds and 25 milliseconds at 0.241287187 seconds
+>> into the trace.
+>>
+>> At 0.317351888 seconds, we see the pattern start again, with a sudden
+>> appearance of 1.89 millisecond latency write completions, among 14.7
+>> millisecond latency write completions.
+>>
+>> If you graph it, it looks like a "triangle wave" pulse, with a
+>> duration of about 23 milliseconds, that repeats after about 100
+>> milliseconds.  In a way, it's like a "heartbeat".  This wouldn't be as
+>> easy to detect with a simple "average" or "percentile" reading.
+>>
+>> This was during a simple sequential write at a queue depth of 32, but
+>> what happens with a write after a discard in the same region of
+>> sectors?  This behavior could change, depending on different drive
+>> models, and/or drive controller algorithms.
+>>
+> 
+> I think these are all really interesting, and definitely support the
+> idea of a series of tests we do to make sure a drive implements discard
+> in the general ways that we expect.
+> 
+> But with that said, I think a more important discussion as filesystem
+> developers is how we protect the rest of the filesystem from high
+> latencies caused by discards.  For reads and writes, we've been doing
+> this for a long time.  IO schedulers have all kinds of checks and
+> balances for REQ_META or REQ_SYNC, and we throttle dirty pages and
+> readahead and dance around request batching etc etc.
+> 
+> But for discards, we just open the floodgates and hope it works out.  At
+> some point we're going to have to figure out how to queue and throttle
+> discards as well as we do reads/writes.  That's kind of tricky because
+> the FS needs to coordinate when we're allowed to discard something and
+> needs to know when the discard is done, and we all have different
+> schemes for keeping track.
+> 
+> -chris
+> 
 
-diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
-index e2c6aae2d636..bd19f8af950b 100644
---- a/drivers/block/aoe/aoeblk.c
-+++ b/drivers/block/aoe/aoeblk.c
-@@ -196,7 +196,6 @@ static const struct file_operations aoe_debugfs_fops = {
- static void
- aoedisk_add_debugfs(struct aoedev *d)
- {
--	struct dentry *entry;
- 	char *p;
- 
- 	if (aoe_debugfs_dir == NULL)
-@@ -207,15 +206,8 @@ aoedisk_add_debugfs(struct aoedev *d)
- 	else
- 		p++;
- 	BUG_ON(*p == '\0');
--	entry = debugfs_create_file(p, 0444, aoe_debugfs_dir, d,
--				    &aoe_debugfs_fops);
--	if (IS_ERR_OR_NULL(entry)) {
--		pr_info("aoe: cannot create debugfs file for %s\n",
--			d->gd->disk_name);
--		return;
--	}
--	BUG_ON(d->debugfs);
--	d->debugfs = entry;
-+	d->debugfs = debugfs_create_file(p, 0444, aoe_debugfs_dir, d,
-+					 &aoe_debugfs_fops);
- }
- void
- aoedisk_rm_debugfs(struct aoedev *d)
-@@ -472,10 +464,6 @@ aoeblk_init(void)
- 	if (buf_pool_cache == NULL)
- 		return -ENOMEM;
- 	aoe_debugfs_dir = debugfs_create_dir("aoe", NULL);
--	if (IS_ERR_OR_NULL(aoe_debugfs_dir)) {
--		pr_info("aoe: cannot create debugfs directory\n");
--		aoe_debugfs_dir = NULL;
--	}
- 	return 0;
- }
- 
--- 
-2.21.0
+Trying to summarize my thoughts here after weeks of other stuff.
 
+We really have two (intertwined) questions:
+
+* does issuing a discard on a device do anything useful - restore 
+flagging performance, enhance the life space of the device, etc?
+
+* what is the performance impact of doing a discard & does it vary based 
+on the size of the region? (Can we use it to discard a whole device, do 
+it for small discards, etc)
+
+To answer the first question, we need a test that can verify that 
+without discards (mount with nodiscard), we see a decline in 
+performance. For example, multiple overwrites of the entire surface of 
+the device (2 -3 full device writes) to make sure all of the spare 
+capacity has been consumed, run the target workload we want to measure, 
+then do discards of the whole space and run that same target workload.
+
+If the discard does something useful, we should see better performance 
+in that second test run.
+
+If discard does not do anything useful, we are "done" with that device - 
+no real need to measure performance of a useless mechanism. (Punting on 
+the device longevity stuff here, seems like that should be left to the 
+hardware vendors).
+
+To answer the second question, we need to measure the performance of the 
+discard implementation.
+
+We still have to work to get any device into a well known state - do 
+multiple, full device writes without discards. 2-3 passes should do it.
+
+Then run our specific discard test workload - measure the performance of 
+large discards (cap the size by the max permitted by the device) and 
+small, single page discards. Important to capture min/max/average times 
+of the discard. I think it would be best to do this on the block device 
+to avoid any file system layer performance impact of deleting 
+files/tweaking extents/etc.
+
+Probably easiest to do separate tests for interesting discard sizes 
+(each time, doing the full device writes to get back to a known state 
+ahead of the test).
+
+This is not meant to be a comprehensive tests/validation, but I think 
+that doing the above would be a way to get a good sense of the 
+effectiveness and performance of the device mechanism.
+
+Make sense? Did I leave something out?
+
+Ric
