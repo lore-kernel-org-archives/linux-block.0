@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE97C282CE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 682D0C282CE
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:17:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C849920843
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:17:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E9232084B
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:17:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728082AbfFDPRV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jun 2019 11:17:21 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39656 "EHLO mx1.suse.de"
+        id S1728084AbfFDPRY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jun 2019 11:17:24 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39686 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728079AbfFDPRV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Jun 2019 11:17:21 -0400
+        id S1728079AbfFDPRY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Jun 2019 11:17:24 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 1279CACF5;
-        Tue,  4 Jun 2019 15:17:20 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 80AB7AE03;
+        Tue,  4 Jun 2019 15:17:23 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 14/15] bcache: shrink btree node cache after bch_btree_check()
-Date:   Tue,  4 Jun 2019 23:16:23 +0800
-Message-Id: <20190604151624.105150-15-colyli@suse.de>
+Subject: [PATCH 15/15] bcache: improve error message in bch_cached_dev_run()
+Date:   Tue,  4 Jun 2019 23:16:24 +0800
+Message-Id: <20190604151624.105150-16-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190604151624.105150-1-colyli@suse.de>
 References: <20190604151624.105150-1-colyli@suse.de>
@@ -36,56 +36,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When cache set starts, bch_btree_check() will check all bkeys on cache
-device by calculating the checksum. This operation will consume a huge
-number of system memory if there are a lot of data cached. Since bcache
-uses its own mca cache to maintain all its read-in btree nodes, and only
-releases the cache space when system memory manage code starts to shrink
-caches. There is will be a delay between bch_btree_check() returns and
-the bcache shrink code gets called, so following memory allocatiion
-might fail after bch_btree_check() finished. The most frequent one is
-failure of creating allocator kernel thread.
-
-This patch tries to proactively call bcache mca shrinker routine to
-release around 25% cache memory, to help following memory allocation
-to success. 'Around 25% cache memory' means when mca shrnker tries to
-release cache memory, it might have to skip some busy memory objects,
-so the result might be a few less than the expected amount.
+This patch adds more error message in bch_cached_dev_run() to indicate
+the exact reason why an error value is returned. Please notice when
+printing out the "is running already" message, pr_info() is used here,
+because in this case also -EBUSY is returned, the bcache device can
+continue to attach to the cache devince and run, so it won't be an
+error level message in kernel message.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/super.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ drivers/md/bcache/super.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index cf5673af3143..4a6406b53de1 100644
+index 4a6406b53de1..026e2df358c3 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
-@@ -1866,6 +1866,24 @@ static int run_cache_set(struct cache_set *c)
- 		if (bch_btree_check(c))
- 			goto err;
+@@ -926,13 +926,18 @@ int bch_cached_dev_run(struct cached_dev *dc)
+ 		NULL,
+ 	};
  
-+		/*
-+		 * bch_btree_check() may occupy too much system memory which
-+		 * will fail memory allocation operations in the following
-+		 * routines before kernel triggers memory shrinker call backs.
-+		 * Shrinking 25% mca cache memory proactively here to avoid
-+		 * potential memory allocation failure.
-+		 */
-+		if (!c->shrinker_disabled) {
-+			struct shrink_control sc;
-+
-+			sc.gfp_mask = GFP_KERNEL;
-+			sc.nr_to_scan =
-+				c->shrink.count_objects(&c->shrink, &sc) / 4;
-+			pr_debug("try to shrink %lu (25%%) cached btree node",
-+				 sc.nr_to_scan);
-+			c->shrink.scan_objects(&c->shrink, &sc);
-+		}
-+
- 		bch_journal_mark(c, &journal);
- 		bch_initial_gc_finish(c);
- 		pr_debug("btree_check() done");
+-	if (dc->io_disable)
++	if (dc->io_disable) {
++		pr_err("I/O disabled on cached dev %s",
++		       dc->backing_dev_name);
+ 		return -EIO;
++	}
+ 
+ 	if (atomic_xchg(&dc->running, 1)) {
+ 		kfree(env[1]);
+ 		kfree(env[2]);
+ 		kfree(buf);
++		pr_info("cached dev %s is running already",
++		       dc->backing_dev_name);
+ 		return -EBUSY;
+ 	}
+ 
+@@ -961,7 +966,7 @@ int bch_cached_dev_run(struct cached_dev *dc)
+ 	if (sysfs_create_link(&d->kobj, &disk_to_dev(d->disk)->kobj, "dev") ||
+ 	    sysfs_create_link(&disk_to_dev(d->disk)->kobj,
+ 			      &d->kobj, "bcache")) {
+-		pr_debug("error creating sysfs link");
++		pr_err("Couldn't create bcache dev <-> disk sysfs symlinks");
+ 		return -ENOMEM;
+ 	}
+ 
 -- 
 2.16.4
 
