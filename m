@@ -2,86 +2,94 @@ Return-Path: <SRS0=GlWt=UD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07C87C282CE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 20:39:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90406C28CC6
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 20:57:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2316207E0
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 20:39:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69E512075B
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 20:57:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1559681865;
+	bh=ihQrR3672ZM/DzWjZDVj/EkCVxnHXupxxQEbDR/4vAg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=zgq4skBd1YitS33wZ2G6/Rq3P0Be+HRPbb05Jsm299jxFHyOZ0TsE0NXfY0uepKuk
+	 qeUX2hm8uoxkyIPjMj5IKcH/UQY10R7Y7MhqpY/XWUz3Nuo6mcmfabFermcBOXtQCf
+	 7200R4nPzhA0LLzSuplpvFmSEqauLZOxZYY0tBIY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726464AbfFDUjt convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jun 2019 16:39:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60664 "EHLO mx1.redhat.com"
+        id S1726352AbfFDU5o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jun 2019 16:57:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44204 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726033AbfFDUjt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Jun 2019 16:39:49 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726416AbfFDU5n (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Jun 2019 16:57:43 -0400
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 946E83001461;
-        Tue,  4 Jun 2019 20:39:43 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3D0C619C69;
-        Tue,  4 Jun 2019 20:39:39 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CALCETrWzDR=Ap8NQ5-YrVhXCEBgr+hwpjw9fBn0m2NkZzZ7XLQ@mail.gmail.com>
-References: <CALCETrWzDR=Ap8NQ5-YrVhXCEBgr+hwpjw9fBn0m2NkZzZ7XLQ@mail.gmail.com> <155966609977.17449.5624614375035334363.stgit@warthog.procyon.org.uk>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        by mail.kernel.org (Postfix) with ESMTPSA id AC8A4208C3
+        for <linux-block@vger.kernel.org>; Tue,  4 Jun 2019 20:57:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559681862;
+        bh=ihQrR3672ZM/DzWjZDVj/EkCVxnHXupxxQEbDR/4vAg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=I4PRguwk4bMuMypdm5AOXXn53k/m+L5N9pyKwSfTNHLewnh8M65uGMG7NNR3Ebc8l
+         rsRnH3DUUzV1SO4+TidtsVDH9S4H4Orx7UfDX0ta38L+l5LFNUqPzgkVOGyqiElmZe
+         nHeIlBvnyw6Sot3eJ4IIqxcrsiVBsK6rjKdIv0AM=
+Received: by mail-wm1-f42.google.com with SMTP id v19so128757wmj.5
+        for <linux-block@vger.kernel.org>; Tue, 04 Jun 2019 13:57:42 -0700 (PDT)
+X-Gm-Message-State: APjAAAUATRQsY3g0+ndYnY8QCwDCw33HOCZxoyzFhVC1Vf5GR2Sslqeb
+        C4R90atroUmNdBp1l7bM44tdrILhDvGk9rvYwSjddQ==
+X-Google-Smtp-Source: APXvYqzjigMmzQseLoEe4mdRuIyW/gpGOaqBUS3DaksOo5KC4LVSwBy+ViDmwuhEPpoWAnb6UhQhHp6vTImgw+QurWo=
+X-Received: by 2002:a7b:c450:: with SMTP id l16mr19833827wmi.0.1559681861171;
+ Tue, 04 Jun 2019 13:57:41 -0700 (PDT)
+MIME-Version: 1.0
+References: <155966609977.17449.5624614375035334363.stgit@warthog.procyon.org.uk>
+ <CALCETrWzDR=Ap8NQ5-YrVhXCEBgr+hwpjw9fBn0m2NkZzZ7XLQ@mail.gmail.com> <1207.1559680778@warthog.procyon.org.uk>
+In-Reply-To: <1207.1559680778@warthog.procyon.org.uk>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Tue, 4 Jun 2019 13:57:30 -0700
+X-Gmail-Original-Message-ID: <CALCETrXmjpSvVj_GROhgouNtbzLm5U9B4b364wycMaqApqDVNA@mail.gmail.com>
+Message-ID: <CALCETrXmjpSvVj_GROhgouNtbzLm5U9B4b364wycMaqApqDVNA@mail.gmail.com>
+Subject: Re: [RFC][PATCH 0/8] Mount, FS, Block and Keyrings notifications [ver #2]
+To:     David Howells <dhowells@redhat.com>
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         Casey Schaufler <casey@schaufler-ca.com>, raven@themaw.net,
         Linux FS Devel <linux-fsdevel@vger.kernel.org>,
         Linux API <linux-api@vger.kernel.org>,
         linux-block@vger.kernel.org, keyrings@vger.kernel.org,
         LSM List <linux-security-module@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC][PATCH 0/8] Mount, FS, Block and Keyrings notifications [ver #2]
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1206.1559680778.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: 8BIT
-Date:   Tue, 04 Jun 2019 21:39:38 +0100
-Message-ID: <1207.1559680778@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Tue, 04 Jun 2019 20:39:48 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Andy Lutomirski <luto@kernel.org> wrote:
+On Tue, Jun 4, 2019 at 1:39 PM David Howells <dhowells@redhat.com> wrote:
+>
+> Andy Lutomirski <luto@kernel.org> wrote:
+>
+> > > Here's a set of patches to add a general variable-length notification queue
+> > > concept and to add sources of events for:
+> >
+> > I asked before and didn't see a response, so I'll ask again.  Why are you
+> > paying any attention at all to the creds that generate an event?
+>
+> Casey responded to you.  It's one of his requirements.
+>
 
-> > Here's a set of patches to add a general variable-length notification queue
-> > concept and to add sources of events for:
-> 
-> I asked before and didn't see a response, so I'll ask again.  Why are you
-> paying any attention at all to the creds that generate an event?
+It being a "requirement" doesn't make it okay.
 
-Casey responded to you.  It's one of his requirements.
+> However, the LSMs (or at least SELinux) ignore f_cred and use current_cred()
+> when checking permissions.  See selinux_revalidate_file_permission() for
+> example - it uses current_cred() not file->f_cred to re-evaluate the perms,
+> and the fd might be shared between a number of processes with different creds.
 
-I'm not sure of the need, and I particularly don't like trying to make
-indirect destruction events (mount destruction keyed on fput, for instance)
-carry the creds of the triggerer.  Indeed, the trigger can come from all sorts
-of places - including af_unix queue destruction, someone poking around in
-procfs, a variety of processes fputting simultaneously.  Only one of them can
-win, and the LSM needs to handle *all* the possibilities.
+That's a bug.  It's arguably a rather severe bug.  If I ever get
+around to writing the patch I keep thinking of that will warn if we
+use creds from invalid contexts, it will warn.
 
-However, the LSMs (or at least SELinux) ignore f_cred and use current_cred()
-when checking permissions.  See selinux_revalidate_file_permission() for
-example - it uses current_cred() not file->f_cred to re-evaluate the perms,
-and the fd might be shared between a number of processes with different creds.
-
-> This seems like the wrong approach.  If an LSM wants to prevent covert
-> communication from, say, mount actions, then it shouldn't allow the
-> watch to be set up in the first place.
-
-Yeah, I can agree to that.  Casey?
-
-David
+Let's please not repeat this.
