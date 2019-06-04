@@ -3,50 +3,39 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF3CDC46460
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 07:35:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F730C282CE
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 07:35:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C022F24BCA
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 07:35:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E48D249F4
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 07:35:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727157AbfFDHfc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jun 2019 03:35:32 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:37947 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727146AbfFDHfc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jun 2019 03:35:32 -0400
-Received: by mail-lf1-f68.google.com with SMTP id b11so15654308lfa.5;
-        Tue, 04 Jun 2019 00:35:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ObbNbZR/72D98Vc550uzYyGenM0+DWmngeVzeXEi0ZM=;
-        b=ib0Xu1g61kKt4saR39X37LXuWJON+tfn85aLur4B3MXKxOJKsfGcIrueka9ap5bITB
-         GZoaEwnWIFosuMgHN8xJ84pTa1Na4qwF5dIz7HuW1rrERMosDX86L2l8Fh60r2plgffi
-         wygnHVaoMDJdhDTRBf8gJG/cvFPWof0X0UXRFoQAa+4To8SVIiWJPznjo7/KP/ruXsku
-         zWpiEzqudMm+yTj4usuJcPEfEEh4oqWP2FQ7wSx0x0mmb+5SLE5TDO+r2CQgAIxECjqT
-         nvdoPLYYOB4vNCVIsAb67gsneD5g5ExuqyzTCFOlEG4UbJB0UdS8u+UZsAtiga1lSjMJ
-         o1KA==
-X-Gm-Message-State: APjAAAVEY6okXx8ui8koZ53gOQ05I/nYLdNNnd3RVjefPUInN16wUlQR
-        hNh8DkJbnCcnDZ5xJ575U/aVjDYqHYMjWqjN1mQ=
-X-Google-Smtp-Source: APXvYqzZy7bAsh6aATIcduZ/ydlM1aKS4jqm+mf9GX84nUleah+LyhiDwD0TYIniqNJly32Ees0tY+eMT6LcuMOqD9Q=
-X-Received: by 2002:a19:c142:: with SMTP id r63mr17039438lff.49.1559633729962;
- Tue, 04 Jun 2019 00:35:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190528142424.19626-1-geert@linux-m68k.org> <20190528142424.19626-3-geert@linux-m68k.org>
- <15499.1559298884@warthog.procyon.org.uk> <CAMuHMdX57DKCMpLXdtZPE-w0esUNVv9-SwYjmT5=m+u9ryAiHQ@mail.gmail.com>
- <9306.1559633653@warthog.procyon.org.uk>
-In-Reply-To: <9306.1559633653@warthog.procyon.org.uk>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Tue, 4 Jun 2019 09:35:16 +0200
-Message-ID: <CAMuHMdXOikfh56DAHGpNUoRefbhYSbh=VK3J8EzZCXVLqZtEVw@mail.gmail.com>
-Subject: Re: [PATCH] rxrpc: Fix uninitialized error code in rxrpc_send_data_packet()
-To:     David Howells <dhowells@redhat.com>
-Cc:     Igor Konopko <igor.j.konopko@intel.com>,
+        id S1727192AbfFDHfw convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jun 2019 03:35:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46106 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726862AbfFDHea (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Jun 2019 03:34:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 451FB135BB;
+        Tue,  4 Jun 2019 07:34:28 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F2EE317D94;
+        Tue,  4 Jun 2019 07:34:13 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAMuHMdX57DKCMpLXdtZPE-w0esUNVv9-SwYjmT5=m+u9ryAiHQ@mail.gmail.com>
+References: <CAMuHMdX57DKCMpLXdtZPE-w0esUNVv9-SwYjmT5=m+u9ryAiHQ@mail.gmail.com> <20190528142424.19626-1-geert@linux-m68k.org> <20190528142424.19626-3-geert@linux-m68k.org> <15499.1559298884@warthog.procyon.org.uk>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     dhowells@redhat.com, Igor Konopko <igor.j.konopko@intel.com>,
         "Mohit P . Tahiliani" <tahiliani@nitk.edu.in>,
         Takashi Sakamoto <o-takashi@sakamocchi.jp>,
         Eran Ben Elisha <eranbe@mellanox.com>,
@@ -64,31 +53,25 @@ Cc:     Igor Konopko <igor.j.konopko@intel.com>,
         linux-afs@lists.infradead.org,
         ALSA Development Mailing List <alsa-devel@alsa-project.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH] rxrpc: Fix uninitialized error code in rxrpc_send_data_packet()
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <9305.1559633653.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8BIT
+Date:   Tue, 04 Jun 2019 08:34:13 +0100
+Message-ID: <9306.1559633653@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 04 Jun 2019 07:34:30 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi David,
+Geert Uytterhoeven <geert@linux-m68k.org> wrote:
 
-On Tue, Jun 4, 2019 at 9:34 AM David Howells <dhowells@redhat.com> wrote:
-> Geert Uytterhoeven <geert@linux-m68k.org> wrote:
->
-> > I'm not such a big fan of BUG(), so I'd go for ret = -EAFNOSUPPORT, but given
-> > rxrpc is already full of BUG() calls, I guess it is an acceptable solution.
->
-> Okay.  Are you okay with this going through net-next?
+> I'm not such a big fan of BUG(), so I'd go for ret = -EAFNOSUPPORT, but given
+> rxrpc is already full of BUG() calls, I guess it is an acceptable solution.
 
-Yes, I am.
+Okay.  Are you okay with this going through net-next?
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+David
