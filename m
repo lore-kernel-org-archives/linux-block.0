@@ -2,102 +2,92 @@ Return-Path: <SRS0=GlWt=UD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBD67C282CE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C385C28CC6
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:53:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A619420717
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:43:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="M998QStZ"
+	by mail.kernel.org (Postfix) with ESMTP id 011262084A
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:53:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728104AbfFDPnb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jun 2019 11:43:31 -0400
-Received: from mail-pg1-f181.google.com ([209.85.215.181]:44963 "EHLO
-        mail-pg1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728020AbfFDPnb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jun 2019 11:43:31 -0400
-Received: by mail-pg1-f181.google.com with SMTP id n2so10575282pgp.11
-        for <linux-block@vger.kernel.org>; Tue, 04 Jun 2019 08:43:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=1tqQUYkCiTPuRzyCy9UBEdirWqMAznB0ETrGx/j7ot8=;
-        b=M998QStZ8hrJ2FjhCVVSwN4KLJOgz73IXrSf06GwSHt2Kcyb8QwopbYLocRJJn8Qna
-         9aoKrKIr+IW0SGQkkLodklP545PgTzJxSr+KqJok3jhl9FZyPtLFpnVr6oTSg/Iy1IFv
-         DCfmBZzmwGb70dSfOxZ04RZQfecnq1skXX2/fjkv/J1WTJQWZCTSGkmY9LtQJoGBvyD2
-         KB4YUr/Y3kg1wVLYNmcI9f16MnhS9TzjSFehLMAdTUsFM836NLGXci80US8XQ1yxMzbQ
-         tOeOd8a2kGtBHuMrCKEyQIIpNZ659MrOaooDKXkFMJgyeOgq1Nj6DxUSmWmY7LnW6aXi
-         q73Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1tqQUYkCiTPuRzyCy9UBEdirWqMAznB0ETrGx/j7ot8=;
-        b=Q7Va/+8dOJIhE1x4A2XJHfJhADZxrixdXsLpVtB4M4g4VRpPKzC/7PVjOOyqQl+Maa
-         L2tsxMWCPtAtrzwHQtiggoaaSIGtHA/LT0fqJP/sBQnRfAkP7FqcF/x7P9jsE6rAuA9v
-         qNOg6TOMyJVXNTWBzHF3zFUJK+Wk9o3UOeYhOWsWFdlS6hoCJOIHOx8tpuBcZU3ihehb
-         2/90UH33nDh0iGWxs0WDkp9lpOAcZmVyOFmvLn0F5neIzJPwMYktlgzSnuYKk2iACNmt
-         HYuVH0TgBVFalPs96I6wrzwL65FwbmiCxKI91tovKKjN8SaI+8zdQ6Uam7G64MBtAXKg
-         VQFg==
-X-Gm-Message-State: APjAAAVUFCCI/rMVs2cHgIiAFHsUY5wCoCqvDehvJO72ic5zB5IGu59g
-        KhJNU51hg04CQMCdDBcBF6vKiw==
-X-Google-Smtp-Source: APXvYqw+0N0zrwtySyXMlKkP0zfzYI5m7MA0xh3RMk9nK5rSOHW7riQreacg0ndGgXI3TCzaBMFfRA==
-X-Received: by 2002:a62:63c6:: with SMTP id x189mr26994829pfb.31.1559663011107;
-        Tue, 04 Jun 2019 08:43:31 -0700 (PDT)
-Received: from [192.168.1.158] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id r64sm25606402pfr.58.2019.06.04.08.43.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Jun 2019 08:43:30 -0700 (PDT)
-Subject: Re: [PATCH][next] blktrace: remove redundant assignment to ret
-To:     Colin King <colin.king@canonical.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190604142744.15330-1-colin.king@canonical.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f834f32d-ab6e-c429-1a3e-13512583ee08@kernel.dk>
-Date:   Tue, 4 Jun 2019 09:43:28 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1728158AbfFDPxk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jun 2019 11:53:40 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60944 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728030AbfFDPxk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Jun 2019 11:53:40 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id AAFB3AE8A;
+        Tue,  4 Jun 2019 15:53:38 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        stable@vger.kernel.org
+Subject: [PATCH 16/18] bcache: only set BCACHE_DEV_WB_RUNNING when cached device attached
+Date:   Tue,  4 Jun 2019 23:53:28 +0800
+Message-Id: <20190604155330.107927-1-colyli@suse.de>
+X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20190604151624.105150-1-colyli@suse.de>
+References: <20190604151624.105150-1-colyli@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20190604142744.15330-1-colin.king@canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/4/19 8:27 AM, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> Variable ret is being assigned a value that is never read, hence
-> the assignment is redundant and can be removed.
+When people set a writeback percent via sysfs file,
+  /sys/block/bcache<N>/bcache/writeback_percent
+current code directly sets BCACHE_DEV_WB_RUNNING to dc->disk.flags
+and schedules kworker dc->writeback_rate_update.
 
-This doesn't look correct to me, here's the full code:
+If there is no cache set attached to, the writebac kernel thread is
+not running indeed, running dc->writeback_rate_update does not make
+sense and may cause NULL pointer deference when reference cache set
+pointer inside update_writeback_rate().
 
-	ret = -ENOENT;
+This patch checks whether the cache set point (dc->disk.c) is NULL in
+sysfs interface handler, and only set BCACHE_DEV_WB_RUNNING and
+schedule dc->writeback_rate_update when dc->disk.c is not NULL (it
+means the cache device is attached to a cache set).
 
-	dir = debugfs_lookup(buts->name, blk_debugfs_root);
-	if (!dir)
-		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
-	if (!dir)
-		goto err;
-	[...]
-err:
-	[...]
-	return ret;
+This problem might be introduced from initial bcache commit, but
+commit 3fd47bfe55b0 ("bcache: stop dc->writeback_rate_update properly")
+changes part of the orignal code piece, so I add 'Fixes: 3fd47bfe55b0'
+to indicate from which commit this patch can be applied.
 
-The main issue here, to me, looks like we're not dealing with ERR_PTR
-returns from debugfs_create_dir(), just checking for NULL.
+Fixes: 3fd47bfe55b0 ("bcache: stop dc->writeback_rate_update properly")
+Reported-by: Bjørn Forsman <bjorn.forsman@gmail.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: stable@vger.kernel.org
+---
+ drivers/md/bcache/sysfs.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index 129031663cc8..eb678e43ac00 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -430,8 +430,13 @@ STORE(bch_cached_dev)
+ 			bch_writeback_queue(dc);
+ 	}
+ 
++	/*
++	 * Only set BCACHE_DEV_WB_RUNNING when cached device attached to
++	 * a cache set, otherwise it doesn't make sense.
++	 */
+ 	if (attr == &sysfs_writeback_percent)
+-		if (!test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
++		if ((dc->disk.c != NULL) &&
++		    (!test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags)))
+ 			schedule_delayed_work(&dc->writeback_rate_update,
+ 				      dc->writeback_rate_update_seconds * HZ);
+ 
 -- 
-Jens Axboe
+2.16.4
 
