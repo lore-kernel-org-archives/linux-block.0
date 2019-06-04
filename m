@@ -6,125 +6,130 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D686C282CE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 08:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A631C28CC6
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 12:33:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A23124BEC
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 08:51:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E44B2231F
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 12:33:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727027AbfFDIvI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jun 2019 04:51:08 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:58818 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726637AbfFDIvI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Jun 2019 04:51:08 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 5FA1FB9A7CF393333ABD;
-        Tue,  4 Jun 2019 16:50:19 +0800 (CST)
-Received: from [127.0.0.1] (10.202.227.238) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Tue, 4 Jun 2019
- 16:50:12 +0800
-Subject: Re: [PATCH 0/9] blk-mq/scsi: convert private reply queue into blk_mq
- hw queue
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-References: <20190531022801.10003-1-ming.lei@redhat.com>
-CC:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        "Sathya Prakash" <sathya.prakash@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>,
-        chenxiang <chenxiang66@hisilicon.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <d1c786d8-d3a9-551b-52fb-fe6f7805e50e@huawei.com>
-Date:   Tue, 4 Jun 2019 09:49:54 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1727655AbfFDMdS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jun 2019 08:33:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38278 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727403AbfFDMdS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Jun 2019 08:33:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A7E3B8E3C6;
+        Tue,  4 Jun 2019 12:33:12 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D87DB648D6;
+        Tue,  4 Jun 2019 12:33:06 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAOQ4uxjLzURf8c1UH_xCJKkuD2es8i-=P-ZNM=t3aFcZLMwXEg@mail.gmail.com>
+References: <CAOQ4uxjLzURf8c1UH_xCJKkuD2es8i-=P-ZNM=t3aFcZLMwXEg@mail.gmail.com> <155905930702.7587.7100265859075976147.stgit@warthog.procyon.org.uk> <CAOQ4uxjC1M7jwjd9zSaSa6UW2dbEjc+ZbFSo7j9F1YHAQxQ8LQ@mail.gmail.com> <20190529142504.GC32147@quack2.suse.cz>
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     dhowells@redhat.com, Jan Kara <jack@suse.cz>,
+        Al Viro <viro@zeniv.linux.org.uk>, Ian Kent <raven@themaw.net>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-api@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        keyrings@vger.kernel.org,
+        LSM List <linux-security-module@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC][PATCH 0/7] Mount, FS, Block and Keyrings notifications
 MIME-Version: 1.0
-In-Reply-To: <20190531022801.10003-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.238]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <16166.1559651581.1@warthog.procyon.org.uk>
+Date:   Tue, 04 Jun 2019 13:33:01 +0100
+Message-ID: <16167.1559651581@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Tue, 04 Jun 2019 12:33:17 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 31/05/2019 03:27, Ming Lei wrote:
-> Hi,
->
-> The 1st patch introduces support hostwide tags for multiple hw queues
-> via the simplest approach to share single 'struct blk_mq_tags' instance
-> among all hw queues. In theory, this way won't cause any performance drop.
-> Even small IOPS improvement can be observed on random IO on
-> null_blk/scsi_debug.
->
-> By applying the hostwide tags for MQ, we can convert some SCSI driver's
-> private reply queue into generic blk-mq hw queue, then at least two
-> improvement can be obtained:
->
-> 1) the private reply queue maping can be removed from drivers, since the
-> mapping has been implemented as generic API in blk-mq core
->
-> 2) it helps to solve the generic managed IRQ race[1] during CPU hotplug
-> in generic way, otherwise we have to re-invent new way to address the
-> same issue for these drivers using private reply queue.
->
->
-> [1] https://lore.kernel.org/linux-block/20190527150207.11372-1-ming.lei@redhat.com/T/#m6d95e2218bdd712ffda8f6451a0bb73eb2a651af
->
-> Any comment and test feedback are appreciated.
->
-> Thanks,
-> Ming
->
+Amir Goldstein <amir73il@gmail.com> wrote:
 
-Hi Ming,
-
-I think that we'll wait for a v2 to test this, since you gave some 
-updated patch for the megaraid performance testing.
-
-Thanks,
-John
-
-> Hannes Reinecke (1):
->   scsi: Add template flag 'host_tagset'
+> Well I am sure that ring buffer for fanotify events would be useful, so
+> seeing that David is proposing a generic notification mechanism, I wanted
+> to know how that mechanism could best share infrastructure with fsnotify.
 >
-> Ming Lei (8):
->   blk-mq: allow hw queues to share hostwide tags
->   block: null_blk: introduce module parameter of 'g_host_tags'
->   scsi_debug: support host tagset
->   scsi: introduce scsi_cmnd_hctx_index()
->   scsi: hpsa: convert private reply queue to blk-mq hw queue
->   scsi: hisi_sas_v3: convert private reply queue to blk-mq hw queue
->   scsi: megaraid: convert private reply queue to blk-mq hw queue
->   scsi: mp3sas: convert private reply queue to blk-mq hw queue
+> But apart from that I foresee the questions from users about why the
+> mount notification API and filesystem events API do not have better
+> integration.
 >
->  block/blk-mq-debugfs.c                      |  1 +
->  block/blk-mq-sched.c                        |  8 +++
->  block/blk-mq-tag.c                          |  6 ++
->  block/blk-mq.c                              | 14 ++++
->  block/elevator.c                            |  5 +-
->  drivers/block/null_blk_main.c               |  6 ++
->  drivers/scsi/hisi_sas/hisi_sas.h            |  2 +-
->  drivers/scsi/hisi_sas/hisi_sas_main.c       | 36 +++++-----
->  drivers/scsi/hisi_sas/hisi_sas_v3_hw.c      | 46 +++++--------
->  drivers/scsi/hpsa.c                         | 49 ++++++--------
->  drivers/scsi/megaraid/megaraid_sas_base.c   | 50 +++++---------
->  drivers/scsi/megaraid/megaraid_sas_fusion.c |  4 +-
->  drivers/scsi/mpt3sas/mpt3sas_base.c         | 74 ++++-----------------
->  drivers/scsi/mpt3sas/mpt3sas_base.h         |  3 +-
->  drivers/scsi/mpt3sas/mpt3sas_scsih.c        | 17 +++++
->  drivers/scsi/scsi_debug.c                   |  3 +
->  drivers/scsi/scsi_lib.c                     |  2 +
->  include/linux/blk-mq.h                      |  1 +
->  include/scsi/scsi_cmnd.h                    | 15 +++++
->  include/scsi/scsi_host.h                    |  3 +
->  20 files changed, 168 insertions(+), 177 deletions(-)
->
+> The way I see it, the notification queue can serve several classes
+> of notifications and fsnotify could be one of those classes
+> (at least FAN_CLASS_NOTIF fits nicely to the model).
 
+It could be done; the main thing that concerns me is that the buffer is of
+limited capacity.
 
+However, I could take this:
+
+	struct fanotify_event_metadata {
+		__u32 event_len;
+		__u8 vers;
+		__u8 reserved;
+		__u16 metadata_len;
+		__aligned_u64 mask;
+		__s32 fd;
+		__s32 pid;
+	};
+
+and map it to:
+
+	struct fanotify_notification {
+		struct watch_notification watch; /* WATCH_TYPE_FANOTIFY */
+		__aligned_u64	mask;
+		__u16		metadata_len;
+		__u8		vers;
+		__u8		reserved;
+		__u32		reserved2;
+		__s32		fd;
+		__s32		pid;
+	};
+
+and some of the watch::info bit could be used:
+
+	n->watch.info & WATCH_INFO_OVERRUN	watch queue overran
+	n->watch.info & WATCH_INFO_LENGTH	event_len
+	n->watch.info & WATCH_INFO_RECURSIVE	FAN_EVENT_ON_CHILD
+	n->watch.info & WATCH_INFO_FLAG_0	FAN_*_PERM
+	n->watch.info & WATCH_INFO_FLAG_1	FAN_Q_OVERFLOW
+	n->watch.info & WATCH_INFO_FLAG_2	FAN_ON_DIR
+	n->subtype				ffs(n->mask)
+
+Ideally, I'd dispense with metadata_len, vers, reserved* and set the version
+when setting the watch.
+
+	fanotify_watch(int watchfd, unsigned int flags, u64 *mask,
+		       int dirfd, const char *pathname, unsigned int at_flags);
+
+We might also want to extend the watch_filter to allow you to, say, filter on
+the first __u64 after the watch member so that you could filter on specific
+events:
+
+	struct watch_notification_type_filter {
+		__u32	type;
+		__u32	info_filter;
+		__u32	info_mask;
+		__u32	subtype_filter[8];
+		__u64	payload_mask[1];
+		__u64	payload_set[1];
+	};
+
+So, in this case, it would require:
+
+	n->mask & wf->payload_mask[0] == wf->payload_set[0]
+
+to be true to record the message.
+
+David
