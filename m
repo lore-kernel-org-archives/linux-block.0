@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D042AC282CE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 547FAC282CE
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:17:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A9E2020843
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:17:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 349ED20843
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 15:17:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727979AbfFDPRI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jun 2019 11:17:08 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39412 "EHLO mx1.suse.de"
+        id S1727907AbfFDPRL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jun 2019 11:17:11 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39442 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728076AbfFDPRI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Jun 2019 11:17:08 -0400
+        id S1727974AbfFDPRL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Jun 2019 11:17:11 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 4CDC7ACF5;
-        Tue,  4 Jun 2019 15:17:07 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 58E42AE03;
+        Tue,  4 Jun 2019 15:17:10 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 10/15] bcache: check CACHE_SET_IO_DISABLE in allocator code
-Date:   Tue,  4 Jun 2019 23:16:19 +0800
-Message-Id: <20190604151624.105150-11-colyli@suse.de>
+Subject: [PATCH 11/15] bcache: check CACHE_SET_IO_DISABLE bit in bch_journal()
+Date:   Tue,  4 Jun 2019 23:16:20 +0800
+Message-Id: <20190604151624.105150-12-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190604151624.105150-1-colyli@suse.de>
 References: <20190604151624.105150-1-colyli@suse.de>
@@ -36,49 +36,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If CACHE_SET_IO_DISABLE of a cache set flag is set by too many I/O
-errors, currently allocator routines can still continue allocate
-space which may introduce inconsistent metadata state.
+When too many I/O errors happen on cache set and CACHE_SET_IO_DISABLE
+bit is set, bch_journal() may continue to work because the journaling
+bkey might be still in write set yet. The caller of bch_journal() may
+believe the journal still work but the truth is in-memory journal write
+set won't be written into cache device any more. This behavior may
+introduce potential inconsistent metadata status.
 
-This patch checkes CACHE_SET_IO_DISABLE bit in following allocator
-routines,
-- bch_bucket_alloc()
-- __bch_bucket_alloc_set()
-Once CACHE_SET_IO_DISABLE is set on cache set, the allocator routines
-may reject allocation request earlier to avoid potential inconsistent
-metadata.
+This patch checks CACHE_SET_IO_DISABLE bit at the head of bch_journal(),
+if the bit is set, bch_journal() returns NULL immediately to notice
+caller to know journal does not work.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/alloc.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/md/bcache/journal.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index f8986effcb50..6f776823b9ba 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -393,6 +393,11 @@ long bch_bucket_alloc(struct cache *ca, unsigned int reserve, bool wait)
- 	struct bucket *b;
- 	long r;
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index 12dae9348147..d4b9817f2237 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -811,6 +811,10 @@ atomic_t *bch_journal(struct cache_set *c,
+ 	struct journal_write *w;
+ 	atomic_t *ret;
  
-+
-+	/* No allocation if CACHE_SET_IO_DISABLE bit is set */
-+	if (unlikely(test_bit(CACHE_SET_IO_DISABLE, &ca->set->flags)))
-+		return -1;
-+
- 	/* fastpath */
- 	if (fifo_pop(&ca->free[RESERVE_NONE], r) ||
- 	    fifo_pop(&ca->free[reserve], r))
-@@ -484,6 +489,10 @@ int __bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
- {
- 	int i;
- 
-+	/* No allocation if CACHE_SET_IO_DISABLE bit is set */
++	/* No journaling if CACHE_SET_IO_DISABLE set already */
 +	if (unlikely(test_bit(CACHE_SET_IO_DISABLE, &c->flags)))
-+		return -1;
++		return NULL;
 +
- 	lockdep_assert_held(&c->bucket_lock);
- 	BUG_ON(!n || n > c->caches_loaded || n > MAX_CACHES_PER_SET);
+ 	if (!CACHE_SYNC(&c->sb))
+ 		return NULL;
  
 -- 
 2.16.4
