@@ -2,89 +2,138 @@ Return-Path: <SRS0=GlWt=UD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FB2C282CE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 04:05:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5387BC282CE
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 04:10:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B81C924BB1
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 04:05:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="JVqJMNXN"
+	by mail.kernel.org (Postfix) with ESMTP id 2E3C624C71
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 04:10:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726078AbfFDEFU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jun 2019 00:05:20 -0400
-Received: from m12-12.163.com ([220.181.12.12]:59240 "EHLO m12-12.163.com"
+        id S1725933AbfFDEKe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jun 2019 00:10:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50728 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725267AbfFDEFT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Jun 2019 00:05:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=Date:From:Subject:Message-ID:MIME-Version; bh=YUBZD
-        ynJLMXXGVegIZqIC35/ur/rTnXatkDZueWxJpM=; b=JVqJMNXN37g+ZKH/0uDSh
-        pqPsj/aj5cOKMgRfwGvbeFyhQAraT5CbUZCjuYM0ty3z/hNgP+7+3qBt5IMCrudq
-        XcP9nbbmzYi1QRnD0t9YB5RlqvPmY9r3S6sGvTXEhGglxfXEYCsrxUXUm3++1JeS
-        gImMfiAxwoTsUv6gD2McDk=
-Received: from tero-machine (unknown [124.16.85.241])
-        by smtp8 (Coremail) with SMTP id DMCowAA35cn07fVccX0RAA--.4692S3;
-        Tue, 04 Jun 2019 12:05:09 +0800 (CST)
-Date:   Tue, 4 Jun 2019 12:05:08 +0800
-From:   Lin Yi <teroincn@163.com>
-To:     bvanassche@acm.org, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, liujian6@iie.ac.cn, csong@cs.ucr.edu,
-        zhiyunq@cs.ucr.edu, yiqiuping@gmail.com, teroincn@163.com
-Subject: [PATCH 2/2] block :blk-mq-sysfs :fix kobj refcount imbalance on err
- return path
-Message-ID: <249f0ba61c63520ef1608503c3be16daebf5a30f.1559620437.git.teroincn@163.com>
-References: <cover.1559620437.git.teroincn@163.com>
+        id S1725267AbfFDEKe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Jun 2019 00:10:34 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C71DE307D914;
+        Tue,  4 Jun 2019 04:10:33 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8BB716014C;
+        Tue,  4 Jun 2019 04:10:09 +0000 (UTC)
+Date:   Tue, 4 Jun 2019 12:10:00 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH V4 3/3] scsi: core: avoid to pre-allocate big chunk for
+ sg list
+Message-ID: <20190604040946.GA27224@ming.t460p>
+References: <20190428073932.9898-1-ming.lei@redhat.com>
+ <20190428073932.9898-4-ming.lei@redhat.com>
+ <20190603204422.GA7240@roeck-us.net>
+ <20190604010002.GA24432@ming.t460p>
+ <cdf94e43-79a7-078e-676d-dfc736eec286@roeck-us.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1559620437.git.teroincn@163.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-CM-TRANSID: DMCowAA35cn07fVccX0RAA--.4692S3
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKrW3WF1xur4xuFW5CF17Jrb_yoWfAFg_GF
-        ykCFW8urn8Cr1akw1jkayIvF1rtw4xJFWxCFW3tr9rJr1kJFn8ArW3Xr1UZrs8WF4xua15
-        Cr1DJ3s5Ar109jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU838n5UUUUU==
-X-Originating-IP: [124.16.85.241]
-X-CM-SenderInfo: 5whu0xxqfqqiywtou0bp/1tbiwATJElXllSPh5gABsf
+In-Reply-To: <cdf94e43-79a7-078e-676d-dfc736eec286@roeck-us.net>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 04 Jun 2019 04:10:33 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-kobject_add takes a refcount to the object dev->kobj, but forget to
-release it before return, lead to a memory leak.
+On Mon, Jun 03, 2019 at 08:49:10PM -0700, Guenter Roeck wrote:
+> On 6/3/19 6:00 PM, Ming Lei wrote:
+> > On Mon, Jun 03, 2019 at 01:44:22PM -0700, Guenter Roeck wrote:
+> > > On Sun, Apr 28, 2019 at 03:39:32PM +0800, Ming Lei wrote:
+> > > > Now scsi_mq_setup_tags() pre-allocates a big buffer for IO sg list,
+> > > > and the buffer size is scsi_mq_sgl_size() which depends on smaller
+> > > > value between shost->sg_tablesize and SG_CHUNK_SIZE.
+> > > > 
+> > > > Modern HBA's DMA is often capable of deadling with very big segment
+> > > > number, so scsi_mq_sgl_size() is often big. Suppose the max sg number
+> > > > of SG_CHUNK_SIZE is taken, scsi_mq_sgl_size() will be 4KB.
+> > > > 
+> > > > Then if one HBA has lots of queues, and each hw queue's depth is
+> > > > high, pre-allocation for sg list can consume huge memory.
+> > > > For example of lpfc, nr_hw_queues can be 70, each queue's depth
+> > > > can be 3781, so the pre-allocation for data sg list is 70*3781*2k
+> > > > =517MB for single HBA.
+> > > > 
+> > > > There is Red Hat internal report that scsi_debug based tests can't
+> > > > be run any more since legacy io path is killed because too big
+> > > > pre-allocation.
+> > > > 
+> > > > So switch to runtime allocation for sg list, meantime pre-allocate 2
+> > > > inline sg entries. This way has been applied to NVMe PCI for a while,
+> > > > so it should be fine for SCSI too. Also runtime sg entries allocation
+> > > > has verified and run always in the original legacy io path.
+> > > > 
+> > > > Not see performance effect in my big BS test on scsi_debug.
+> > > > 
+> > > 
+> > > This patch causes a variety of boot failures in -next. Typical failure
+> > > pattern is scsi hangs or failure to find a root file system. For example,
+> > > on alpha, trying to boot from usb:
+> > 
+> > I guess it is because alpha doesn't support sg chaining, and
+> > CONFIG_ARCH_NO_SG_CHAIN is enabled. ARCHs not supporting sg chaining
+> > can only be arm, alpha and parisc.
+> > 
+> 
+> I don't think it is that simple. I do see the problem on x86 (32 and 64 bit)
+> sparc, ppc, and m68k as well, and possibly others (I didn't check all because
+> -next is in terrible shape right now). Error log is always a bit different
+> but similar.
+> 
+> On sparc:
+> 
+> scsi host0: Data transfer overflow.
+> scsi host0: cur_residue[0] tot_residue[-181604017] len[8192]
+> scsi host0: DMA length is zero!
+> scsi host0: cur adr[f000f000] len[00000000]
+> scsi host0: Data transfer overflow.
+> scsi host0: cur_residue[0] tot_residue[-181604017] len[8192]
+> scsi host0: DMA length is zero!
+> 
+> On ppc:
+> 
+> scsi host0: DMA length is zero!
+> scsi host0: cur adr[0fd21000] len[00000000]
+> scsi host0: Aborting command [(ptrval):28]
+> scsi host0: Current command [(ptrval):28]
+> scsi host0:  Active command [(ptrval):28]
+> 
+> On x86, x86_64 (after reverting a different crash-causing patch):
+> 
+> [   20.226809] scsi host0: DMA length is zero!
+> [   20.227459] scsi host0: cur adr[00000000] len[00000000]
+> [   50.588814] scsi host0: Aborting command [(____ptrval____):28]
+> [   50.589210] scsi host0: Current command [(____ptrval____):28]
+> [   50.589447] scsi host0:  Active command [(____ptrval____):28]
+> [   50.589674] scsi host0: Dumping command log
 
-Signed-off-by: Lin Yi <teroincn@163.com>
-Fixes: 7bd1d5edd016 ("Merge branch 'x86-urgent-for-linus' of
-git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip")
-Cc: stable@vger.kernel.org
----
- block/blk-mq-sysfs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+OK, I did see one boot crash issue on x86_64 with -next, so could
+you share us that patch which needs to be reverted? Meantime, please
+provide me your steps for reproducing this issue? (rootfs image, kernel
+config, qemu command)
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index d6e1a9b..7499a47 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -323,8 +323,10 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 	lockdep_assert_held(&q->sysfs_lock);
- 
- 	ret = kobject_add(q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
--	if (ret < 0)
-+	if (ret < 0) {
-+		kobject_put(&dev->kobj);
- 		goto out;
-+	}
- 
- 	kobject_uevent(q->mq_kobj, KOBJ_ADD);
- 
--- 
-1.9.1
+BTW, the patch has been tested in RH QE lab, so far not see such reports
+yet.
 
-
+Thanks,
+Ming
