@@ -2,154 +2,150 @@ Return-Path: <SRS0=GlWt=UD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,UNPARSEABLE_RELAY
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B94BC28CC3
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 13:13:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C20D5C282CE
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 13:37:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35C2D24339
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 13:13:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="tMY4MB83"
+	by mail.kernel.org (Postfix) with ESMTP id 96A6924B41
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 13:37:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727297AbfFDNNJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jun 2019 09:13:09 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:57964 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727080AbfFDNNJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jun 2019 09:13:09 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x54CxFtg005609;
-        Tue, 4 Jun 2019 13:12:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=wq/I1lDUdqyswTmvwMQhbHj7yed6g+meHvVlc0w8kQ0=;
- b=tMY4MB83IEVkOY3Dd4j/rNUzykDrR5SSq9WJEb5DewctGkAcoa68dsoBT141qFUMn6sL
- M3861kLL0pdk5CAsXfEaWsCcOieqx4uFon0EVPKleKpCS5HnwMi/N1QJLyCaD18dUYo6
- KTcBwUQahTeM2CnjJAfBymSLkWd7UmqiST3PTAf6DTAC3KN66wEijK1OGj6v47HTLRrX
- aZzygpGKFnkDxuyslejY6E2UGp61p+2ySZIsJHe24bxvA64kJTyxkt2BUL9khclw49Ig
- tlIydIKo/iydTrzZQCK3+11VO4+WwtaDtXzEAQ+TRE68xfiJTQBU7HcH3Tq+ip2kJRFL 9Q== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 2suj0qcv0x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Jun 2019 13:12:56 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x54DCtVx191922;
-        Tue, 4 Jun 2019 13:12:56 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2swngkb7ks-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Jun 2019 13:12:56 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x54DCp45016426;
-        Tue, 4 Jun 2019 13:12:51 GMT
-Received: from bostrovs-us.us.oracle.com (/10.152.32.65)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 04 Jun 2019 06:12:51 -0700
-Subject: Re: [Xen-devel] [PATCH] xen-blkfront: switch kcalloc to kvcalloc for
- large array allocation
-To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Roger Pau Monne <roger.pau@citrix.com>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Stefano Stabellini <sstabellini@kernel.org>,
-        stable@vger.kernel.org, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-References: <20190503150401.15904-1-roger.pau@citrix.com>
- <f4b944e8-6678-a921-e2b2-aaeb00c0d5e1@suse.com>
- <ba37b50c-c0ac-5af4-441b-a2d4eda81255@suse.com>
- <63D28830-5450-41F5-AC6E-3D5FDE1F80B7@oracle.com>
-From:   Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=boris.ostrovsky@oracle.com; prefer-encrypt=mutual; keydata=
- mQINBFH8CgsBEAC0KiOi9siOvlXatK2xX99e/J3OvApoYWjieVQ9232Eb7GzCWrItCzP8FUV
- PQg8rMsSd0OzIvvjbEAvaWLlbs8wa3MtVLysHY/DfqRK9Zvr/RgrsYC6ukOB7igy2PGqZd+M
- MDnSmVzik0sPvB6xPV7QyFsykEgpnHbvdZAUy/vyys8xgT0PVYR5hyvhyf6VIfGuvqIsvJw5
- C8+P71CHI+U/IhsKrLrsiYHpAhQkw+Zvyeml6XSi5w4LXDbF+3oholKYCkPwxmGdK8MUIdkM
- d7iYdKqiP4W6FKQou/lC3jvOceGupEoDV9botSWEIIlKdtm6C4GfL45RD8V4B9iy24JHPlom
- woVWc0xBZboQguhauQqrBFooHO3roEeM1pxXjLUbDtH4t3SAI3gt4dpSyT3EvzhyNQVVIxj2
- FXnIChrYxR6S0ijSqUKO0cAduenhBrpYbz9qFcB/GyxD+ZWY7OgQKHUZMWapx5bHGQ8bUZz2
- SfjZwK+GETGhfkvNMf6zXbZkDq4kKB/ywaKvVPodS1Poa44+B9sxbUp1jMfFtlOJ3AYB0WDS
- Op3d7F2ry20CIf1Ifh0nIxkQPkTX7aX5rI92oZeu5u038dHUu/dO2EcuCjl1eDMGm5PLHDSP
- 0QUw5xzk1Y8MG1JQ56PtqReO33inBXG63yTIikJmUXFTw6lLJwARAQABtDNCb3JpcyBPc3Ry
- b3Zza3kgKFdvcmspIDxib3Jpcy5vc3Ryb3Zza3lAb3JhY2xlLmNvbT6JAjgEEwECACIFAlH8
- CgsCGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEIredpCGysGyasEP/j5xApopUf4g
- 9Fl3UxZuBx+oduuw3JHqgbGZ2siA3EA4bKwtKq8eT7ekpApn4c0HA8TWTDtgZtLSV5IdH+9z
- JimBDrhLkDI3Zsx2CafL4pMJvpUavhc5mEU8myp4dWCuIylHiWG65agvUeFZYK4P33fGqoaS
- VGx3tsQIAr7MsQxilMfRiTEoYH0WWthhE0YVQzV6kx4wj4yLGYPPBtFqnrapKKC8yFTpgjaK
- jImqWhU9CSUAXdNEs/oKVR1XlkDpMCFDl88vKAuJwugnixjbPFTVPyoC7+4Bm/FnL3iwlJVE
- qIGQRspt09r+datFzPqSbp5Fo/9m4JSvgtPp2X2+gIGgLPWp2ft1NXHHVWP19sPgEsEJXSr9
- tskM8ScxEkqAUuDs6+x/ISX8wa5Pvmo65drN+JWA8EqKOHQG6LUsUdJolFM2i4Z0k40BnFU/
- kjTARjrXW94LwokVy4x+ZYgImrnKWeKac6fMfMwH2aKpCQLlVxdO4qvJkv92SzZz4538az1T
- m+3ekJAimou89cXwXHCFb5WqJcyjDfdQF857vTn1z4qu7udYCuuV/4xDEhslUq1+GcNDjAhB
- nNYPzD+SvhWEsrjuXv+fDONdJtmLUpKs4Jtak3smGGhZsqpcNv8nQzUGDQZjuCSmDqW8vn2o
- hWwveNeRTkxh+2x1Qb3GT46uuQINBFH8CgsBEADGC/yx5ctcLQlB9hbq7KNqCDyZNoYu1HAB
- Hal3MuxPfoGKObEktawQPQaSTB5vNlDxKihezLnlT/PKjcXC2R1OjSDinlu5XNGc6mnky03q
- yymUPyiMtWhBBftezTRxWRslPaFWlg/h/Y1iDuOcklhpr7K1h1jRPCrf1yIoxbIpDbffnuyz
- kuto4AahRvBU4Js4sU7f/btU+h+e0AcLVzIhTVPIz7PM+Gk2LNzZ3/on4dnEc/qd+ZZFlOQ4
- KDN/hPqlwA/YJsKzAPX51L6Vv344pqTm6Z0f9M7YALB/11FO2nBB7zw7HAUYqJeHutCwxm7i
- BDNt0g9fhviNcJzagqJ1R7aPjtjBoYvKkbwNu5sWDpQ4idnsnck4YT6ctzN4I+6lfkU8zMzC
- gM2R4qqUXmxFIS4Bee+gnJi0Pc3KcBYBZsDK44FtM//5Cp9DrxRQOh19kNHBlxkmEb8kL/pw
- XIDcEq8MXzPBbxwHKJ3QRWRe5jPNpf8HCjnZz0XyJV0/4M1JvOua7IZftOttQ6KnM4m6WNIZ
- 2ydg7dBhDa6iv1oKdL7wdp/rCulVWn8R7+3cRK95SnWiJ0qKDlMbIN8oGMhHdin8cSRYdmHK
- kTnvSGJNlkis5a+048o0C6jI3LozQYD/W9wq7MvgChgVQw1iEOB4u/3FXDEGulRVko6xCBU4
- SQARAQABiQIfBBgBAgAJBQJR/AoLAhsMAAoJEIredpCGysGyfvMQAIywR6jTqix6/fL0Ip8G
- jpt3uk//QNxGJE3ZkUNLX6N786vnEJvc1beCu6EwqD1ezG9fJKMl7F3SEgpYaiKEcHfoKGdh
- 30B3Hsq44vOoxR6zxw2B/giADjhmWTP5tWQ9548N4VhIZMYQMQCkdqaueSL+8asp8tBNP+TJ
- PAIIANYvJaD8xA7sYUXGTzOXDh2THWSvmEWWmzok8er/u6ZKdS1YmZkUy8cfzrll/9hiGCTj
- u3qcaOM6i/m4hqtvsI1cOORMVwjJF4+IkC5ZBoeRs/xW5zIBdSUoC8L+OCyj5JETWTt40+lu
- qoqAF/AEGsNZTrwHJYu9rbHH260C0KYCNqmxDdcROUqIzJdzDKOrDmebkEVnxVeLJBIhYZUd
- t3Iq9hdjpU50TA6sQ3mZxzBdfRgg+vaj2DsJqI5Xla9QGKD+xNT6v14cZuIMZzO7w0DoojM4
- ByrabFsOQxGvE0w9Dch2BDSI2Xyk1zjPKxG1VNBQVx3flH37QDWpL2zlJikW29Ws86PHdthh
- Fm5PY8YtX576DchSP6qJC57/eAAe/9ztZdVAdesQwGb9hZHJc75B+VNm4xrh/PJO6c1THqdQ
- 19WVJ+7rDx3PhVncGlbAOiiiE3NOFPJ1OQYxPKtpBUukAlOTnkKE6QcA4zckFepUkfmBV1wM
- Jg6OxFYd01z+a+oL
-Message-ID: <e53e7f98-fdca-b71a-6ea8-3895ce169fd8@oracle.com>
-Date:   Tue, 4 Jun 2019 09:11:49 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1727423AbfFDNho (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jun 2019 09:37:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:6188 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727161AbfFDNho (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Jun 2019 09:37:44 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D8CB43003E5F;
+        Tue,  4 Jun 2019 13:37:28 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2370D1001DD2;
+        Tue,  4 Jun 2019 13:37:14 +0000 (UTC)
+Date:   Tue, 4 Jun 2019 21:37:10 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Ming Lei <tom.leiming@gmail.com>, Hannes Reinecke <hare@suse.de>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Don Brace <don.brace@microsemi.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 7/9] scsi: hisi_sas_v3: convert private reply queue to
+ blk-mq hw queue
+Message-ID: <20190604133709.GB17248@ming.t460p>
+References: <20190531022801.10003-1-ming.lei@redhat.com>
+ <20190531022801.10003-8-ming.lei@redhat.com>
+ <1afb4353-6703-a3f0-ca6c-d0b2bd754a56@suse.de>
+ <CACVXFVMG8gkw8E0pmWBJC0tBH9D-WVjY2FnL2gsxDja3ryfbng@mail.gmail.com>
+ <c11faee4-fc38-9636-59b4-bc5c0d94ffbf@huawei.com>
+ <20190603110054.GG11812@ming.t460p>
+ <f1a66b3a-5549-b69d-79fa-7d89b5627a15@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <63D28830-5450-41F5-AC6E-3D5FDE1F80B7@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9277 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906040090
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9277 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906040089
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f1a66b3a-5549-b69d-79fa-7d89b5627a15@huawei.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Tue, 04 Jun 2019 13:37:44 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/31/19 10:44 AM, Konrad Rzeszutek Wilk wrote:
-> On May 31, 2019 10:41:16 AM EDT, Juergen Gross <jgross@suse.com> wrote:
->> On 06/05/2019 10:11, Juergen Gross wrote:
->>> On 03/05/2019 17:04, Roger Pau Monne wrote:
->>>> There's no reason to request physically contiguous memory for those
->>>> allocations.
->>>>
->>>> Reported-by: Ian Jackson <ian.jackson@citrix.com>
->>>> Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
->>> Reviewed-by: Juergen Gross <jgross@suse.com>
->> Jens, are you going to tkae this patch or should I carry it through the
->> Xen tree?
-> Usually I ended up picking them (and then asking Jens to git pull into his branch) but if you want to handle them that would be much easier!
->
-> (And if so, please add Acked-by on them from me).
+On Mon, Jun 03, 2019 at 02:00:19PM +0100, John Garry wrote:
+> On 03/06/2019 12:00, Ming Lei wrote:
+> > On Fri, May 31, 2019 at 12:38:10PM +0100, John Garry wrote:
+> > > 
+> > > > > > -fallback:
+> > > > > > -     for_each_possible_cpu(cpu)
+> > > > > > -             hisi_hba->reply_map[cpu] = cpu % hisi_hba->queue_count;
+> > > > > > -     /* Don't clean all CQ masks */
+> > > > > > -}
+> > > > > > -
+> > > > > >  static int interrupt_init_v3_hw(struct hisi_hba *hisi_hba)
+> > > > > >  {
+> > > > > >       struct device *dev = hisi_hba->dev;
+> > > > > > @@ -2383,11 +2359,6 @@ static int interrupt_init_v3_hw(struct hisi_hba *hisi_hba)
+> > > > > > 
+> > > > > >               min_msi = MIN_AFFINE_VECTORS_V3_HW;
+> > > > > > 
+> > > > > > -             hisi_hba->reply_map = devm_kcalloc(dev, nr_cpu_ids,
+> > > > > > -                                                sizeof(unsigned int),
+> > > > > > -                                                GFP_KERNEL);
+> > > > > > -             if (!hisi_hba->reply_map)
+> > > > > > -                     return -ENOMEM;
+> > > > > >               vectors = pci_alloc_irq_vectors_affinity(hisi_hba->pci_dev,
+> > > > > >                                                        min_msi, max_msi,
+> > > > > >                                                        PCI_IRQ_MSI |
+> > > > > > @@ -2395,7 +2366,6 @@ static int interrupt_init_v3_hw(struct hisi_hba *hisi_hba)
+> > > > > >                                                        &desc);
+> > > > > >               if (vectors < 0)
+> > > > > >                       return -ENOENT;
+> > > > > > -             setup_reply_map_v3_hw(hisi_hba, vectors - BASE_VECTORS_V3_HW);
+> > > > > >       } else {
+> > > > > >               min_msi = max_msi;
+> > > > > >               vectors = pci_alloc_irq_vectors(hisi_hba->pci_dev, min_msi,
+> > > > > > @@ -2896,6 +2866,18 @@ static void debugfs_snapshot_restore_v3_hw(struct hisi_hba *hisi_hba)
+> > > > > >       clear_bit(HISI_SAS_REJECT_CMD_BIT, &hisi_hba->flags);
+> > > > > >  }
+> > > > > > 
+> > > > > > +static int hisi_sas_map_queues(struct Scsi_Host *shost)
+> > > > > > +{
+> > > > > > +     struct hisi_hba *hisi_hba = shost_priv(shost);
+> > > > > > +     struct blk_mq_queue_map *qmap = &shost->tag_set.map[HCTX_TYPE_DEFAULT];
+> > > > > > +
+> > > > > > +     if (auto_affine_msi_experimental)
+> > > > > > +             return blk_mq_pci_map_queues(qmap, hisi_hba->pci_dev,
+> > > > > > +                             BASE_VECTORS_V3_HW);
+> > > > > > +     else
+> > > > > > +             return blk_mq_map_queues(qmap);
+> > > 
+> > > I don't think that the mapping which blk_mq_map_queues() creates are not
+> > > want we want. I'm guessing that we still would like a mapping similar to
+> > > what blk_mq_pci_map_queues() produces, which is an even spread, putting
+> > > adjacent CPUs on the same queue.
+> > > 
+> > > For my system with 96 cpus and 16 queues, blk_mq_map_queues() would map
+> > > queue 0 to cpu 0, 16, 32, 48 ..., queue 1 to cpu 1, 17, 33 and so on.
+> > 
+> 
+> Hi Ming,
+> 
+> > blk_mq_map_queues() is the default or fallback mapping in case that managed
+> > irq isn't used. If the mapping isn't good enough, we still can improve it
+> > in future, then any driver applying it can got improved.
+> > 
+> 
+> That's the right attitude. However, as I see, we can only know the mapping
+> when we know the interrupt affinity or some other mapping restriction or
+> rule etc, which we don't know in this case.
+> 
+> For now, personally I would rather if we only expose multiple queues for
+> when auto_affine_msi_experimental is set. I fear that we may make a
+> performance regression for !auto_affine_msi_experimental with this patch. We
+> would need to test.
+
+I suggest to use the blk-mq generic helper.
+
+The default queue mapping of blk_mq_map_queues() has been used for a
+while, so far so good, such as, very similar way is applied on
+megaraid_sas and mpt3sas, see _base_assign_reply_queues() and
+megasas_setup_reply_map().
+
+If performance drop is caused, just report it out, we could fix it.
+Or even you can write a new .map_queues method just for hisi_sas v3.
 
 
-Applied to for-linus-5.2b
-
--boris
+Thanks,
+Ming
