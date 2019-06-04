@@ -2,236 +2,277 @@ Return-Path: <SRS0=GlWt=UD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD160C282CE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 22:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2BAAC282CE
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 22:12:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75FF5206BB
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 22:03:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E9CD206B8
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 22:12:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="nTT+jq/I"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UzHZV1Uo";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="F0kF7rsZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726573AbfFDWDU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jun 2019 18:03:20 -0400
-Received: from sonic316-13.consmr.mail.gq1.yahoo.com ([98.137.69.37]:41054
-        "EHLO sonic316-13.consmr.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726399AbfFDWDT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Jun 2019 18:03:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1559685798; bh=it87Li8X1fzF6GnnpwKo6n6EaGmfjJ8Zx/rKpthubcA=; h=Subject:To:Cc:References:From:Date:In-Reply-To:From:Subject; b=nTT+jq/IkCSW8jSPuC7/EK2CCafFikNs7Nxw1eVCJ+35tu+RUoNf6sJppH8Cxcu9guKIcRsIi0BtfAMXkrqFVQIGBJex3tF/eMZQMYum1gvFy0BYx8GyRUuyz+BgwTYUaEbDYK58eqU2pDA/BzIh05WojCGemt+NzYK1EIFC57/sFMXq2VNcXkzOntfSkPXzDmaogCyAp3UVWg+RFhKUvPiC6/w/nAQYxNxZdw/V64cR9FjHMexZbbZDEAnC9m/Kq6/g6JqD9Q9Z7t6t2Krzy6bXolNfEX4oMfnpI6gRKiMWsHEWcRmrX0/PHVhfgeWwGvmrk0uQr/GaG1baRZ6/Dw==
-X-YMail-OSG: HV0Z7VcVM1me.wz6aCLBtkVrXZPA34GAH._hP_ysc0btY5aY.ICZx0YRJneQSFz
- 2_..lJdN.bMR_HPncp8WGB.hDsTj_baStuZAmvgjmnxS990UtjdGvrvYfr4sAWRE1qEmhbNixDGM
- 9p2YGaXpFdSpo0OU2QKXc39qeb7SUgd2qXPIRI1uFPuzz1qk3rlQbY8BZYwAmt2o5FO2JINwaUZv
- H3zICJvqi7U.TNDHJxp6jcTRTRp5PQmGKcIEySX6_Vm2ImwnozvwaD7q.BIoTDbaGYgbFipVYEW2
- cp.BQz4Md3_XtXwDuMybaMPP591sV.bTvN.B9Pw.2wKzAbMC5SRL6fCO_bUbek7kDIAXMHt1FNZx
- zsc2iRI6UibC8ahPEAhVSeJVWPkR_FOY9kRVXvGCctfAITwrtY_u27t4.OCtxTx0DLaXNQFGGOB0
- E9P6p8F5Iei6vgqbIruTro.KBL1pJp4Q4c8qztomPgSfuzycXYjyThSMDEpRfbcONGaOuZGRGvhs
- s.kDM8yFBGwmC3wjaUFqUTIxUU7HuWkyXPK.iNstgEByce_TXzZRitnhP8x2AonyhWKFAbgjd_5g
- wqZzTEjqWplglZwLJXjGTyqLudmVDKON3cEJCQ6RTxbsuCweXnYdaoY.vOthd8ajNyyIp5tmB9HJ
- J8kzuClvOPvJbAPuejISlhCTDNppq4qKddF4ZZX3PtvqrIaSNuxRNPhgulGOdHVbbKFoZmLlzdCC
- cwVZ7vr0p7opz9sMEc4IzmG4JXkNRBE_F6POrEsGgO0hDJvHiL8LBhZmyboUfoRvLdXTDVuf3x95
- VpOzOElFvyM8jsIY2vvMdt5dXSk_JPiJG5dE.NrEh07ZnqqIdH_x4aLpbdjemn8IL52g5RwXXe49
- le0eJ.Kb9.XPXRg6WGwvRKcibf3p2Ghzef.jDRHCGtsk0CAiD6usMzguLVHdOwXBBMc4U85J_1qG
- _ZMzXpznr_1sdQcrJ0MqUlOwSDl7E.2aGTL5MIuDi9BPdtkwgCVyrujndwLwovXJ8aAYeQl_Pcrz
- 7xUCB8kLgHQPyA0N7g1oGsxLcrJp2fqI4e3mon_pop8RBkZv.x.H2O7l74wv8acwppXTLNMz_jqy
- 02.6ZisMlRLmOUY8yPAXLOLnvEmbajtyRQcQgD1iLs9gNICjrFcSCyFsvQjWLxj3yQ__jIyIA0eu
- 1MR0Str0aPbFZrspZqk.PnIKlARtm_dharD6lUxJPvhQMYTqiG9jUjp5YhTdyJEwWXM6IcG21_WW
- 4oVxGZgzfqg--
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic316.consmr.mail.gq1.yahoo.com with HTTP; Tue, 4 Jun 2019 22:03:18 +0000
-Received: from c-73-223-4-185.hsd1.ca.comcast.net (EHLO [192.168.0.103]) ([73.223.4.185])
-          by smtp413.mail.gq1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID f9df356a2f48fa04da5bc0865b0d3777;
-          Tue, 04 Jun 2019 22:03:14 +0000 (UTC)
-Subject: Re: [RFC][PATCH 0/8] Mount, FS, Block and Keyrings notifications [ver
- #2]
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>, raven@themaw.net,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
-        LSM List <linux-security-module@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, casey@schaufler-ca.com
-References: <155966609977.17449.5624614375035334363.stgit@warthog.procyon.org.uk>
- <CALCETrWzDR=Ap8NQ5-YrVhXCEBgr+hwpjw9fBn0m2NkZzZ7XLQ@mail.gmail.com>
- <50c2ea19-6ae8-1f42-97ef-ba5c95e40475@schaufler-ca.com>
- <CALCETrWFBA8H0RiZPikLtEi8xg-cqJLtQgnU2CGTuwByrHN7Dw@mail.gmail.com>
-From:   Casey Schaufler <casey@schaufler-ca.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=casey@schaufler-ca.com; keydata=
- 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
- abzjfg==
-Message-ID: <7645e662-8053-aeb4-ec79-57aa0bab4932@schaufler-ca.com>
-Date:   Tue, 4 Jun 2019 15:03:12 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <CALCETrWFBA8H0RiZPikLtEi8xg-cqJLtQgnU2CGTuwByrHN7Dw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        id S1726312AbfFDWMq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jun 2019 18:12:46 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:15542 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726269AbfFDWMp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jun 2019 18:12:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1559686365; x=1591222365;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=BlDzo4KGSm9vT7kJBJO+lct9IGpkTt9bZXzKCF/elag=;
+  b=UzHZV1UokbTcjR67X++BZYRTXHvt3tY8NvyHOLlF7U/XMpX61kZ8oH/c
+   nzZUagWw4gD6I5OL6kv61wvXNKdq+fppUJt3uDA+ozYW65QInrWEnZc1S
+   0mClzLSJGhebmq7DL6QejHDFgxJtElMA7XMwZpeTHEhGVMrXgcJcGB+ul
+   HQez1xONBSTKTfMiFMP7K/GN+M4bM1ds6U+WcN2wWm5a9TcltYK29oZO5
+   jcLGFK7T7kglOlxo0KUfqkTUaJ/crE5SNwy8rZh3yi79Sj3lHJd+4k8Rd
+   oIaJ09+W+QQrtzuT4wj8NJ25kNhIXRHpfVSXlpFNQDgmdR3YUCnxaRwJM
+   g==;
+X-IronPort-AV: E=Sophos;i="5.60,550,1549900800"; 
+   d="scan'208";a="216091733"
+Received: from mail-dm3nam03lp2056.outbound.protection.outlook.com (HELO NAM03-DM3-obe.outbound.protection.outlook.com) ([104.47.41.56])
+  by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2019 06:12:44 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EIc/JldhmPhw9mOSzdbYTn3MjbQUWZN/pn6a97Egk6M=;
+ b=F0kF7rsZyMjn1qy2k1ySx5md1PihfBBexDUbSvMIFU1t6ZirwgP1ZvJ5tsiIS97MRcfpkonDmJF3gvqFTq2vep7QDdVTDng0ZJNvziQYi+g0yJ+wqFbcVmc9u2z78oWMf8xRx05NLmQ+SM7LQ8Msba4yGoox0f02eN+mdgqD4oU=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
+ BYAPR04MB5781.namprd04.prod.outlook.com (20.179.58.91) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1965.12; Tue, 4 Jun 2019 22:12:43 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::ad42:af4b:a53b:80f5]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::ad42:af4b:a53b:80f5%4]) with mapi id 15.20.1943.023; Tue, 4 Jun 2019
+ 22:12:43 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Omar Sandoval <osandov@fb.com>
+CC:     Masato Suzuki <masato.suzuki@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Omar Sandoval <osandov@osandov.com>
+Subject: Re: [PATCH blktests v2 1/2] zbd/rc: Introduce helper functions for
+ zone mapping test
+Thread-Topic: [PATCH blktests v2 1/2] zbd/rc: Introduce helper functions for
+ zone mapping test
+Thread-Index: AQHVF1R1LrUXzCLh3UCof19djoJckg==
+Date:   Tue, 4 Jun 2019 22:12:43 +0000
+Message-ID: <BYAPR04MB574920AE60FA0AEC27FEF40486150@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20190531015913.5560-1-shinichiro.kawasaki@wdc.com>
+ <20190531015913.5560-2-shinichiro.kawasaki@wdc.com>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [2605:e000:3e45:f500:f446:fe8c:7ab2:8d71]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 92f33a64-7026-49fc-4751-08d6e939c435
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5781;
+x-ms-traffictypediagnostic: BYAPR04MB5781:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <BYAPR04MB5781E61F2C503FE130796DBD86150@BYAPR04MB5781.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:466;
+x-forefront-prvs: 0058ABBBC7
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(366004)(396003)(376002)(346002)(39860400002)(189003)(199004)(2906002)(33656002)(14454004)(46003)(478600001)(72206003)(2501003)(68736007)(52536014)(446003)(6116002)(186003)(66556008)(6246003)(476003)(7736002)(64756008)(8676002)(486006)(76116006)(66476007)(66446008)(81166006)(81156014)(73956011)(74316002)(305945005)(66946007)(4326008)(25786009)(6436002)(7696005)(76176011)(5660300002)(229853002)(256004)(71190400001)(99286004)(71200400001)(9686003)(53546011)(55016002)(6506007)(53936002)(316002)(54906003)(102836004)(14444005)(8936002)(86362001)(110136005);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5781;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 9AiZBgdrytjT6dXdCuJ6Wfx+lAFuzUhMpo/c1rzhhZTDBE2nY4hiLk+valgz8tJjJ92H1/8T3y6DZFV2UL4okO2Ca3HijCOleksVMNxOZ3dPMJ2KAAZcDQ3Mb/vPgjaaPdpu4LETg5mjZQig5rcG7Aj+NT7mdql8raIttoDPI2f1dyAG4mL1XYSZSzi2alqEAMSYK3H59fSWqxD8ZadrD1vRZK7DQLpspmNsE4kqKrvnPvsjpdPAyAQ/lyrORUKNbVSdRXyHbUf/1dZwKDJPHFP9BeQvKHPXEcprgeMNIb5Q9gHj5eBzBtrT4VpPN+vnmFEJWi9xYTqicftaU0wNCeIIP8kyIBKMqs6Jlcwj2OMdF40DzId+vHjYSXmjCS+r/PnmfjgvhQu+rnw9yZjl5VLs94Sqq1V6+4cDidr8kHw=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92f33a64-7026-49fc-4751-08d6e939c435
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2019 22:12:43.2688
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5781
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/4/2019 2:05 PM, Andy Lutomirski wrote:
-> On Tue, Jun 4, 2019 at 1:31 PM Casey Schaufler <casey@schaufler-ca.com>=
- wrote:
->> n 6/4/2019 10:43 AM, Andy Lutomirski wrote:
->>> On Tue, Jun 4, 2019 at 9:35 AM David Howells <dhowells@redhat.com> wr=
-ote:
->>>> Hi Al,
->>>>
->>>> Here's a set of patches to add a general variable-length notificatio=
-n queue
->>>> concept and to add sources of events for:
->>> I asked before and didn't see a response, so I'll ask again.  Why are=
-
->>> you paying any attention at all to the creds that generate an event?
->>> It seems like the resulting security model will be vary hard to
->>> understand and probably buggy.  Can't you define a sensible model in
->>> which only the listener creds matter?
->> We've spent the last 18 months reeling from the implications
->> of what can happen when one process has the ability to snoop
->> on another. Introducing yet another mechanism that is trivial
->> to exploit is a very bad idea.
-> If you're talking about Spectre, etc, this is IMO entirely irrelevant.
-
-We're seeing significant interest in using obscure mechanisms
-in system exploits. Mechanisms will be exploited.
-
-> Among other things, setting these watches can and should require some
-> degree of privilege.
-
-Requiring privilege would address the concerns for most
-situations, although I don't see that it would help for
-SELinux. SELinux does not generally put much credence in
-what others consider "privilege".
-
-Extreme care would probably be required for namespaces, too.
-
->
->> I will try to explain the problem once again. If process A
->> sends a signal (writes information) to process B the kernel
->> checks that either process A has the same UID as process B
->> or that process A has privilege to override that policy.
->> Process B is passive in this access control decision, while
->> process A is active.
-> Are you stating what you see to be a requirement?
-
-Basic subject/object access control is the core of
-the Linux security model. Yes, there are exceptions,
-but mostly they're historical in origin.
-
-
->> Process A must have write access
->> (defined by some policy) to process B's event buffer.
-> No, stop right here.
-
-Listening ...
-
->   Process B is monitoring some aspect of the
-> system.
-
-Process B is not "monitoring". At some point in the past it
-has registered a request for information should an event occur.
-It is currently passive.
-
-> Process A is doing something.
-
-Yes. It is active.'
-
-> Process B should need
-> permission to monitor whatever it's monitoring,
-
-OK, I'm good with that. But the only time you
-can tell that is when the event is registered,
-and at that time you can't tell who might be causing
-the event. (Or can you?)
-
-> and process A should
-> have permission to do whatever it's doing.
-
-So there needs to be some connection between what B
-can request events for and what events A can cause.
-Then you can deny B's requests because of A.
-
->   I don't think it makes
-> sense to try to ascribe an identity to the actor doing some action to
-> decide to omit it from the watch -- this has all kinds of correctness
-> issues.
-
-It works for signals and UDP, but in general I get the concern.
-
-> If you're writing a policy and you don't like letting process B spy on
-> processes doing various things, then disallow that type of spying.
-
-That gets you into a situation where you can't do the legitimate
-monitoring you want to do just because there's the off chance you
-might see something you shouldn't. "I hate security! It's confusing,
-and always gets in the way!"
-
->> To
->> implement such a policy requires A's credential,
-> You may not design a new mechanism that looks at the credential in a
-> context where looking at a credential is invalid unless you have some
-> very strong justification for why all of the known reasons that it's a
-> bad idea don't apply to what you're doing.
-
-Point. But you also don't get to ignore basic security policy
-just because someone's spiffy lazy memory free cache hashing
-tree (or similar mechanism) throws away references to important
-information while it's still needed.
-
-> So, without a much stronger justification, NAK.
-
-I try to be reasonable. Really. All I want is something
-with a security model that can be explained coherently=20
-within the context of the basic Linux security model.
-There are enough variations as it is.
-
-
+Overall it looks good to me, couple of nits, can be ignored for now.=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+=0A=
+On 5/30/19 6:59 PM, Shin'ichiro Kawasaki wrote:=0A=
+> As a preparation for the zone mapping test case, add several helper=0A=
+> functions. _find_last_sequential_zone() and=0A=
+> _find_sequential_zone_in_middle() help to select test target zones.=0A=
+> _test_dev_is_logical() checks TEST_DEV is the valid test target.=0A=
+> _test_dev_has_dm_map() helps to check that the dm target is linear or=0A=
+> flakey. _get_dev_container_and_sector() helps to get the container device=
+=0A=
+> and sector mappings.=0A=
+> ---=0A=
+>  tests/zbd/rc | 133 +++++++++++++++++++++++++++++++++++++++++++++++++++=
+=0A=
+>  1 file changed, 133 insertions(+)=0A=
+>=0A=
+> diff --git a/tests/zbd/rc b/tests/zbd/rc=0A=
+> index 5f04c84..792b83d 100644=0A=
+> --- a/tests/zbd/rc=0A=
+> +++ b/tests/zbd/rc=0A=
+> @@ -193,6 +193,42 @@ _find_first_sequential_zone() {=0A=
+>  	return 1=0A=
+>  }=0A=
+>  =0A=
+> +_find_last_sequential_zone() {=0A=
+> +	for ((idx =3D REPORTED_COUNT - 1; idx > 0; idx--)); do=0A=
+> +		if ((ZONE_TYPES[idx] =3D=3D ZONE_TYPE_SEQ_WRITE_REQUIRED)); then=0A=
+> +			echo "${idx}"=0A=
+> +			return 0=0A=
+> +		fi=0A=
+> +	done=0A=
+> +=0A=
+> +	echo "-1"=0A=
+> +	return 1=0A=
+> +}=0A=
+> +=0A=
+> +# Try to find a sequential required zone between given two zone indices=
+=0A=
+> +_find_sequential_zone_in_middle() {=0A=
+> +	local -i s=3D${1}=0A=
+> +	local -i e=3D${2}=0A=
+nit:- do we need to validate the s and e before we use ?=0A=
+> +	local -i idx=3D$(((s + e) / 2))=0A=
+> +	local -i i=3D1=0A=
+> +=0A=
+nit:- Is there a reason for while ? we can also get away with for loop=0A=
+right ?=0A=
+> +	while ((idx !=3D s && idx !=3D e)); do=0A=
+> +		if ((ZONE_TYPES[idx] =3D=3D ZONE_TYPE_SEQ_WRITE_REQUIRED)); then=0A=
+> +			echo "${idx}"=0A=
+> +			return 0=0A=
+> +		fi=0A=
+> +		if ((i%2 =3D=3D 0)); then=0A=
+> +			$((idx +=3D i))=0A=
+> +		else=0A=
+> +			$((idx -=3D i))=0A=
+> +		fi=0A=
+> +		$((i++))=0A=
+> +	done=0A=
+> +=0A=
+> +	echo "-1"=0A=
+> +	return 1=0A=
+> +}=0A=
+> +=0A=
+>  # Search zones and find two contiguous sequential required zones.=0A=
+>  # Return index of the first zone of the found two zones.=0A=
+>  # Call _get_blkzone_report() beforehand.=0A=
+> @@ -210,3 +246,100 @@ _find_two_contiguous_seq_zones() {=0A=
+>  	echo "Contiguous sequential write required zones not found"=0A=
+>  	return 1=0A=
+>  }=0A=
+> +=0A=
+> +_test_dev_is_dm() {=0A=
+> +	if [[ ! -r "${TEST_DEV_SYSFS}/dm/name" ]]; then=0A=
+> +		SKIP_REASON=3D"$TEST_DEV is not device-mapper"=0A=
+> +		return 1=0A=
+> +	fi=0A=
+> +	return 0=0A=
+> +}=0A=
+> +=0A=
+> +_test_dev_is_logical() {=0A=
+> +	if ! _test_dev_is_partition && ! _test_dev_is_dm; then=0A=
+> +		SKIP_REASON=3D"$TEST_DEV is not a logical device"=0A=
+> +		return 1=0A=
+> +	fi=0A=
+> +	return 0=0A=
+> +}=0A=
+> +=0A=
+> +_test_dev_has_dm_map() {=0A=
+> +	local target_type=3D${1}=0A=
+> +	local dm_name=0A=
+> +=0A=
+> +	dm_name=3D$(<"${TEST_DEV_SYSFS}/dm/name")=0A=
+> +	if ! dmsetup status "${dm_name}" | grep -qe "${target_type}"; then=0A=
+> +		SKIP_REASON=3D"$TEST_DEV does not have ${target_type} map"=0A=
+> +		return 1=0A=
+> +	fi=0A=
+> +	if dmsetup status "${dm_name}" | grep -v "${target_type}"; then=0A=
+> +		SKIP_REASON=3D"$TEST_DEV has map other than ${target_type}"=0A=
+> +		return 1=0A=
+> +	fi=0A=
+> +	return 0=0A=
+> +}=0A=
+> +=0A=
+> +# Get device file path from the device ID "major:minor".=0A=
+> +_get_dev_path_by_id() {=0A=
+> +	for d in /sys/block/*; do=0A=
+> +		if [[ ! -r "${d}/dev" ]]; then=0A=
+> +			continue=0A=
+> +		fi=0A=
+> +		if [[ "${1}" =3D=3D "$(<"${d}/dev")" ]]; then=0A=
+> +			echo "/dev/${d##*/}"=0A=
+> +			return 0=0A=
+> +		fi=0A=
+> +	done=0A=
+> +	return 1=0A=
+> +}=0A=
+> +=0A=
+> +# Given sector of TEST_DEV, return the device which contain the sector a=
+nd=0A=
+> +# corresponding sector of the container device.=0A=
+> +_get_dev_container_and_sector() {=0A=
+> +	local -i sector=3D${1}=0A=
+> +	local cont_dev=0A=
+> +	local -i offset=0A=
+> +	local -a tbl_line=0A=
+> +=0A=
+> +	if _test_dev_is_partition; then=0A=
+> +		offset=3D$(<"${TEST_DEV_PART_SYSFS}/start")=0A=
+> +		cont_dev=3D$(_get_dev_path_by_id "$(<"${TEST_DEV_SYSFS}/dev")")=0A=
+> +		echo "${cont_dev}" "$((offset + sector))"=0A=
+> +		return 0=0A=
+> +	fi=0A=
+> +=0A=
+> +	if ! _test_dev_is_dm; then=0A=
+> +		echo "${TEST_DEV} is not a logical device"=0A=
+> +		return 1=0A=
+> +	fi=0A=
+> +	if ! _test_dev_has_dm_map linear &&=0A=
+> +			! _test_dev_has_dm_map flakey; then=0A=
+> +		echo -n "dm mapping test other than linear/flakey is"=0A=
+> +		echo "not implemented"=0A=
+> +		return 1=0A=
+> +	fi=0A=
+> +=0A=
+> +	# Parse dm table lines for dm-linear or dm-flakey target=0A=
+> +	while read -r -a tbl_line; do=0A=
+> +		local -i map_start=3D${tbl_line[0]}=0A=
+> +		local -i map_end=3D$((tbl_line[0] + tbl_line[1]))=0A=
+> +=0A=
+> +		if ((sector < map_start)) || (((map_end) <=3D sector)); then=0A=
+> +			continue=0A=
+> +		fi=0A=
+> +=0A=
+> +		offset=3D${tbl_line[4]}=0A=
+> +		if ! cont_dev=3D$(_get_dev_path_by_id "${tbl_line[3]}"); then=0A=
+> +			echo -n "Cannot access to container device: "=0A=
+> +			echo "${tbl_line[3]}"=0A=
+> +			return 1=0A=
+> +		fi=0A=
+> +=0A=
+> +		echo "${cont_dev}" "$((offset + sector - map_start))"=0A=
+> +		return 0=0A=
+> +=0A=
+> +	done < <(dmsetup table "$(<"${TEST_DEV_SYSFS}/dm/name")")=0A=
+> +=0A=
+> +	echo -n "Cannot find container device of ${TEST_DEV}"=0A=
+> +	return 1=0A=
+> +}=0A=
+=0A=
+=0A=
