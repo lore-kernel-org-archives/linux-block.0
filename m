@@ -2,148 +2,103 @@ Return-Path: <SRS0=Ij7C=UE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	T_DKIMWL_WL_HIGH,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 704BDC46460
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CDEC28D18
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 20:22:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D6532083E
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:28:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559762931;
-	bh=da4vdqyz2Yme7cA4V1MHlD7iuvel2OX6wiT4hesZ8Gs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=apF+Of2JCpdaj4pYnTo9DLCZHxfwnjSALQb1Tf/BEOMyOJwlttFigcUsLTYvFCIZF
-	 J8jfPdEI9S4/aOrm0PCJ+VW3l2EWdT3nwPCcM7ws9er8VAE2JBZ1hIzOxX8kIqpPD9
-	 BcYMEHWLwhMmkjLNDK6k/Y+dLObPVE9b5kb3OHrE=
+	by mail.kernel.org (Postfix) with ESMTP id 8BC4320872
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 20:22:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jn33M/OL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726568AbfFET2q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 15:28:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38852 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726280AbfFET2q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Jun 2019 15:28:46 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9CF99206BB;
-        Wed,  5 Jun 2019 19:28:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559762925;
-        bh=da4vdqyz2Yme7cA4V1MHlD7iuvel2OX6wiT4hesZ8Gs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BnCNWFWZc6WFQpPgq8oWAUJhMFZQWWwmZwy5J37GOO0asHCDGGNyy2OZaScErfCAd
-         +Kpnw5dKlic3ZZPGfuxQ6El1DlNkO5k3ONonLuBknkpHtA+P3W4J7CYNSqJB2Gch3z
-         DBBQPGMWJnTImFLSHJRIibNQIF4Q9Wobgc/MPfow=
-Date:   Wed, 5 Jun 2019 21:28:42 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Stephen Smalley <sds@tycho.nsa.gov>
-Cc:     Andy Lutomirski <luto@amacapital.net>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>, raven@themaw.net,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
-        LSM List <linux-security-module@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC][PATCH 0/8] Mount, FS, Block and Keyrings notifications
- [ver #2]
-Message-ID: <20190605192842.GA9590@kroah.com>
-References: <50c2ea19-6ae8-1f42-97ef-ba5c95e40475@schaufler-ca.com>
- <155966609977.17449.5624614375035334363.stgit@warthog.procyon.org.uk>
- <CALCETrWzDR=Ap8NQ5-YrVhXCEBgr+hwpjw9fBn0m2NkZzZ7XLQ@mail.gmail.com>
- <20192.1559724094@warthog.procyon.org.uk>
- <e4c19d1b-9827-5949-ecb8-6c3cb4648f58@schaufler-ca.com>
- <CALCETrVSBwHEm-1pgBXxth07PZ0XF6FD+7E25=WbiS7jxUe83A@mail.gmail.com>
- <9a9406ba-eda4-e3ec-2100-9f7cf1d5c130@schaufler-ca.com>
- <15CBE0B8-2797-433B-B9D7-B059FD1B9266@amacapital.net>
- <5dae2a59-1b91-7b35-7578-481d03c677bc@tycho.nsa.gov>
+        id S1726555AbfFEUWj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 16:22:39 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:38430 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726501AbfFEUWi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 16:22:38 -0400
+Received: by mail-qk1-f194.google.com with SMTP id a27so65310qkk.5
+        for <linux-block@vger.kernel.org>; Wed, 05 Jun 2019 13:22:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=hdVKMo8506TgrZK1PYQwv5IIzq/3ub7YoF/TJnHz4iQ=;
+        b=jn33M/OLPMrHDhWB/oB3uBW6KyUZwZ3dHbeuh1XlGJHpj6dwZhMsOO5OOrjM6STAk4
+         qROquiS6fMH0HrsaHJQe7IWfco1/3CwVA1Gz+FGmFpUONVqiEw31nfTAMmDzWlOeuUEZ
+         mk6d5RDBk04fmPauqpzDR3UBYRMhcvzlsYSc74mHKl9XePav6wRDF+ORoRV2fKHFG/sb
+         cUQUGUyyBaCwXiDs4NT1HvJhutfWYLBEeCwb+RHe4UP0YFMmyv3lmlZz7HJMeHb2peh0
+         c0KHydFemqtXhwO8HH1TOYZIPA8HQnsiNT2WYwoU7yhfgAcf8QGzWgN4SKzBFML0mJnJ
+         tpyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=hdVKMo8506TgrZK1PYQwv5IIzq/3ub7YoF/TJnHz4iQ=;
+        b=dLuZynbkwbRqzkGJtsJ4nggyc+OrzqSc/Y7DNBwXxzvZP+ui30g3AoSrqHUni6y677
+         AVLwbm+Gq5Bmecoqa8WjK85OcaoyxdBFSdBNkubxxdaPh0iIT9vZa4P7432bQsBdTuYa
+         Zv6tuK+TNZ1nGzC3DqUyY3SDLSHsxnZzC+edP9W5dj+QkMtfolgcXZi9cjQo95CiJ/a3
+         v5PB1GfcUrjaaELqt1cOhX5UnbA42mhXD28qRz4/RuzTroLIKBIrpsc2/gIXhHyWYud/
+         KaKHonzeqOk6JX6+WU08mbYvhraKsb5FAJ66FISnXxn0RCXaGP4qhrbQAwGjEZfIcOrG
+         sSxQ==
+X-Gm-Message-State: APjAAAW0bHHIW+2iWNtDg5EyZGrXwnYqCH6y/Se51oPDpl/pSiqZv6WK
+        HjpETtq3WgWYCLrqs00XwltH9Q==
+X-Google-Smtp-Source: APXvYqzsyiPSTmn82JkgPtH+Z1+lnK81jan/CvvnzRGGA4oYrI2ETBGBe6mNB1mjYk7SLXHnNDomow==
+X-Received: by 2002:a37:6312:: with SMTP id x18mr35736460qkb.300.1559766157655;
+        Wed, 05 Jun 2019 13:22:37 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
+        by smtp.gmail.com with ESMTPSA id v9sm884883qti.60.2019.06.05.13.22.36
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 05 Jun 2019 13:22:36 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1hYcQd-0002uk-Vd; Wed, 05 Jun 2019 17:22:35 -0300
+Date:   Wed, 5 Jun 2019 17:22:35 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Sebastian Ott <sebott@linux.ibm.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Oliver Neukum <oneukum@suse.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        megaraidlinux.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
+        linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 08/13] IB/iser: set virt_boundary_mask in the scsi host
+Message-ID: <20190605202235.GC3273@ziepe.ca>
+References: <20190605190836.32354-1-hch@lst.de>
+ <20190605190836.32354-9-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5dae2a59-1b91-7b35-7578-481d03c677bc@tycho.nsa.gov>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+In-Reply-To: <20190605190836.32354-9-hch@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 05, 2019 at 02:25:33PM -0400, Stephen Smalley wrote:
-> On 6/5/19 1:47 PM, Andy Lutomirski wrote:
-> > 
-> > > On Jun 5, 2019, at 10:01 AM, Casey Schaufler <casey@schaufler-ca.com> wrote:
-> > > 
-> > > > On 6/5/2019 9:04 AM, Andy Lutomirski wrote:
-> > > > > On Wed, Jun 5, 2019 at 7:51 AM Casey Schaufler <casey@schaufler-ca.com> wrote:
-> > > > > > On 6/5/2019 1:41 AM, David Howells wrote:
-> > > > > > Casey Schaufler <casey@schaufler-ca.com> wrote:
-> > > > > > 
-> > > > > > > I will try to explain the problem once again. If process A
-> > > > > > > sends a signal (writes information) to process B the kernel
-> > > > > > > checks that either process A has the same UID as process B
-> > > > > > > or that process A has privilege to override that policy.
-> > > > > > > Process B is passive in this access control decision, while
-> > > > > > > process A is active. In the event delivery case, process A
-> > > > > > > does something (e.g. modifies a keyring) that generates an
-> > > > > > > event, which is then sent to process B's event buffer.
-> > > > > > I think this might be the core sticking point here.  It looks like two
-> > > > > > different situations:
-> > > > > > 
-> > > > > > (1) A explicitly sends event to B (eg. signalling, sendmsg, etc.)
-> > > > > > 
-> > > > > > (2) A implicitly and unknowingly sends event to B as a side effect of some
-> > > > > >      other action (eg. B has a watch for the event A did).
-> > > > > > 
-> > > > > > The LSM treats them as the same: that is B must have MAC authorisation to send
-> > > > > > a message to A.
-> > > > > YES!
-> > > > > 
-> > > > > Threat is about what you can do, not what you intend to do.
-> > > > > 
-> > > > > And it would be really great if you put some thought into what
-> > > > > a rational model would be for UID based controls, too.
-> > > > > 
-> > > > > > But there are problems with not sending the event:
-> > > > > > 
-> > > > > > (1) B's internal state is then corrupt (or, at least, unknowingly invalid).
-> > > > > Then B is a badly written program.
-> > > > Either I'm misunderstanding you or I strongly disagree.
-> > > 
-> > > A program needs to be aware of the conditions under
-> > > which it gets event, *including the possibility that
-> > > it may not get an event that it's not allowed*. Do you
-> > > regularly write programs that go into corrupt states
-> > > if an open() fails? Or where read() returns less than
-> > > the amount of data you ask for?
-> > 
-> > I do not regularly write programs that handle read() omitting data in the middle of a TCP stream.  I also don’t write programs that wait for processes to die and need to handle the case where a child is dead, waitid() can see it, but SIGCHLD wasn’t sent because “security”.
-> > 
-> > > 
-> > > >   If B has
-> > > > authority to detect a certain action, and A has authority to perform
-> > > > that action, then refusing to notify B because B is somehow missing
-> > > > some special authorization to be notified by A is nuts.
-> > > 
-> > > You are hand-waving the notion of authority. You are assuming
-> > > that if A can read X and B can read X that A can write B.
-> > 
-> > No, read it again please. I’m assuming that if A can *write* X and B can read X then A can send information to B.
-> 
-> I guess the questions here are:
-> 
-> 1) How do we handle recursive notification support, since we can't check
-> that B can read everything below a given directory easily?  Perhaps we can
-> argue that if I have watch permission to / then that implies visibility to
-> everything below it but that is rather broad.
+On Wed, Jun 05, 2019 at 09:08:31PM +0200, Christoph Hellwig wrote:
+> This ensures all proper DMA layer handling is taken care of by the
+> SCSI midlayer.
 
-How do you handle fanotify today which I think can do this?
+Maybe not entirely related to this series, but it looks like the SCSI
+layer is changing the device global dma_set_max_seg_size() - at least
+in RDMA the dma device is being shared between many users, so we
+really don't want SCSI to make this value smaller.
 
-thanks,
+Can we do something about this?
 
-greg k-h
+Wondering about other values too, and the interaction with the new
+combining stuff in umem.c
+
+Thanks,
+Jason
