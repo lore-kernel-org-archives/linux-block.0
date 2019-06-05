@@ -3,92 +3,185 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 809B9C28CC5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 20:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A04E4C28CC5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 21:06:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5401E2067C
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 20:56:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 710052075C
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 21:06:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726543AbfFEU4O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 16:56:14 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:42825 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726477AbfFEU4O (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 16:56:14 -0400
-Received: from [192.168.1.110] ([77.2.1.21]) by mrelayeu.kundenserver.de
- (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1Mi2Bb-1gvSdm3T97-00e4xP; Wed, 05 Jun 2019 22:55:55 +0200
-Subject: Re: [PATCH] block: Drop unlikely before IS_ERR(_OR_NULL)
-To:     Joe Perches <joe@perches.com>,
-        Kefeng Wang <wangkefeng.wang@huawei.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Pravin B Shelar <pshelar@ovn.org>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        "David S. Miller" <davem@davemloft.net>
-References: <20190605142428.84784-1-wangkefeng.wang@huawei.com>
- <20190605142428.84784-4-wangkefeng.wang@huawei.com>
- <8221bc17-b0bb-da6f-4343-3e73467252d5@metux.net>
- <44c945bf0573842fe9b2db89407e40c88fcc7eb4.camel@perches.com>
-From:   "Enrico Weigelt, metux IT consult" <lkml@metux.net>
-Organization: metux IT consult
-Message-ID: <ecd9df60-f4e2-108d-43ae-fbdf5721471e@metux.net>
-Date:   Wed, 5 Jun 2019 20:55:48 +0000
-User-Agent: Mozilla/5.0 (X11; Linux i686; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726555AbfFEVGS convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 17:06:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35222 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726528AbfFEVGS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Jun 2019 17:06:18 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 062F9C1EB1FB;
+        Wed,  5 Jun 2019 21:06:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D9356838D;
+        Wed,  5 Jun 2019 21:06:04 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <f19dcdb4-f934-34c2-f625-95c2c928d576@schaufler-ca.com>
+References: <f19dcdb4-f934-34c2-f625-95c2c928d576@schaufler-ca.com> <e4c19d1b-9827-5949-ecb8-6c3cb4648f58@schaufler-ca.com> <50c2ea19-6ae8-1f42-97ef-ba5c95e40475@schaufler-ca.com> <155966609977.17449.5624614375035334363.stgit@warthog.procyon.org.uk> <CALCETrWzDR=Ap8NQ5-YrVhXCEBgr+hwpjw9fBn0m2NkZzZ7XLQ@mail.gmail.com> <20192.1559724094@warthog.procyon.org.uk> <18357.1559753807@warthog.procyon.org.uk>
+To:     Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>
+Cc:     dhowells@redhat.com, Andy Lutomirski <luto@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>, raven@themaw.net,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        LSM List <linux-security-module@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: Rational model for UID based controls
 MIME-Version: 1.0
-In-Reply-To: <44c945bf0573842fe9b2db89407e40c88fcc7eb4.camel@perches.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:OpvBXb21v9xeH3z9JI5aCc/P+EN+TrdONa8z2f/P3LsFhfCDDpo
- eMl0KdkjQqe+gWvbfkvHdlgt/ljGPl/u6T/bbgxOe/pBTJPfczz1YV9iw+BQFYH9tRQte/F
- XPUt0tNhWh6CQ8qYM086YNCYfhfx4+z1euF9Z4oPUTWgpYeTM2ojHjfjWGvsKeZXT58bbYz
- 1GPLexop3kE/7mHRopbrA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:iwK6QWV4If4=:r3jvpSCN+4Ob0dg+Pbdn1A
- x4zuU4mUhTjSR3HY9p7IfXeoWZqpMwlH86MD1BS4whiI7zEy9hi8po186dQAtjbujp441uKol
- O7jKVHOwrBaFPuVAn+5DHMFS63YmsqxQHGpYiBR3rSh9FWXOvTQkCTRYMBKjQk1ABqiYcM+1H
- MPsaOlTVYAxWp5GmYulzhvxfUcQb+uTQw5SEd1BckGQfwjcPNqwiJmjhJSmHCflJIV1uevNLi
- +2RSQj0mpoiMDc7rztarOA4DWPbcazKvHWDbnLnP8rfd/tezmU5/Pge04sRmoWXPaMm6fEIIj
- bIkCf9sRNw+6yswO+QmDp8wT7m59aL3kNbgukPeYgZ3WzXNW9qHWPLVYvIFlSstuUKtgH6UL3
- xRRqYRY11S2+w2sCOp5MevLCJljJJWJYWW5plQd2uvI4rkwaKr3wxt7BjxWVH8tDzog6u05HG
- 6yB+7AZe7a4QHfWT8LlBfKHmZiRrm2idTFUTkUorOPXA6gAkBNPyM7VrLR0Efv6tHiAkIcnP8
- ND/Tfu9XzH1R4YyZ/9EWfp/Axwp1OOsnTX/vSIK/AnLe4TsdDNF/wkZ35jghundG5IoQhV0op
- 6OpOVx3/+5sYzyGgWUt4Um9Hrr1Y1mo7yX6qnfWRDY8pl93fTY/WDuFCgibrRl/B+lvRrq2bJ
- Jj+Udsrs4VcU1jQlYtapkCkMsYyl7uxNTysCnK67LzEJhG1d/NDqG40m05Cwpiu/0UoyJfJQX
- P3gYO5eXgU7pejcuir0sIoN8SqPjcDZHJnxEE/2JUlJZ3Eurir8gKUdTubA=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <5392.1559768763.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8BIT
+Date:   Wed, 05 Jun 2019 22:06:03 +0100
+Message-ID: <5393.1559768763@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Wed, 05 Jun 2019 21:06:18 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05.06.19 18:32, Joe Perches wrote:
+Casey Schaufler <casey@schaufler-ca.com> wrote:
 
-> Likely change all of these too:
+> Right. You're mixing the kind of things that can generate events,
+> and that makes having a single policy difficult.
+
+Whilst that's true, the notifications are clearly marked as to type, so it
+should be possible to select different policies for different notification
+types.
+
+Question for you: what does the LSM *actually* need?  There are a bunch of
+things available, some of which may be the same thing:
+
+ (1) The creds of the process that created a watch_queue (ie. opened
+     /dev/watch_queue).
+
+ (2) The creds of the process that set a watch (ie. called sb_notify,
+     KEYCTL_NOTIFY, ...);
+
+ (3) The creds of the process that tripped the event (which might be the
+     system).
+
+ (4) The security attributes of the object on which the watch was set (uid,
+     gid, mode, labels).
+
+ (5) The security attributes of the object on which the event was tripped.
+
+ (6) The security attributes of all the objects between the object in (5) and
+     the object in (4), assuming we work from (5) towards (4) if the two
+     aren't coincident (WATCH_INFO_RECURSIVE).
+
+At the moment, when post_one_notification() wants to write a notification into
+a queue, it calls security_post_notification() to ask if it should be allowed
+to do so.  This is passed (1) and (3) above plus the notification record.
+
+The only problem I really have is that for a destruction message you want to
+get the creds of who did the last put on an object and caused it to be
+destroyed - I think everything else probably gets the right creds, even if
+they aren't even in the same namespaces (mount propagation, yuck).
+
+However, that one is a biggie because close()/exit() must propagate it to
+deferred-fput, which must propagate it to af_unix-cleanup, and thence back to
+deferred-fput and thence to implicit unmount (dissolve_on_fput()[*]).
+
+[*] Though it should be noted that if this happens, the subtree cannot be
+    attached to the root of a namespace.
+
+> > In any case, that's what I was referring to when I said I might need to call
+> > inode_permission().  But UIDs don't exist for all filesystems, for example,
+> > and there are no UIDs on superblocks, mount objects or hardware events.
 > 
-> $ git grep -P '\blikely.*IS_ERR'
-> drivers/net/vxlan.c:    if (likely(!IS_ERR(rt))) {
-> fs/ntfs/lcnalloc.c:     if (likely(page && !IS_ERR(page))) {
-> fs/ntfs/mft.c:  if (likely(!IS_ERR(page))) {
-> fs/ntfs/mft.c:  if (likely(!IS_ERR(m)))
-> fs/ntfs/mft.c:          if (likely(!IS_ERR(m))) {
-> fs/ntfs/mft.c:          if (likely(!IS_ERR(rl2)))
-> fs/ntfs/namei.c:                if (likely(!IS_ERR(dent_inode))) {
-> fs/ntfs/runlist.c:      if (likely(!IS_ERR(old_rl)))
-> net/openvswitch/datapath.c:             if (likely(!IS_ERR(reply))) {
-> net/socket.c:   if (likely(!IS_ERR(newfile))) {
+> If you open() or stat() a file on those filesystems the UID
+> used in the access control comes from somewhere. Setting a watch
+> on things with UIDs should use the access mode on the file,
+> just like any other filesystem operation.
 
-Good point, thx.
+Another question for you: Do I need to let the LSM pass judgement on a watch
+that a process is trying to set?  I think I probably do.  This would require
+separate hooks for different object types:
 
-Added that to my cocci script, which I've just sent to lkml.
+	int security_watch_key(struct watch *watch, struct key *key);
+	int security_watch_sb(struct watch *watch, struct path *path);
+	int security_watch_mount(struct watch *watch, struct path *path);
+	int security_watch_devices(struct watch *watch);
+
+so that the LSM can see the object the watch is being placed on (the last has
+a global queue, so there is no object).  
+
+Further, do I need to put a "void *security" pointer in struct watch and
+indicate to the LSM the object bring watched?  The watch could then be passed
+to security_post_notification() instead of the watch queue creds (which I
+could then dispense with).
+
+	security_post_notification(const struct watch *watch,
+				   const struct cred *trigger_cred,
+				   struct watch_notification *n);
 
 
---mtx
+Also, should I let the LSM audit/edit the filter set by
+IOC_WATCH_QUEUE_SET_FILTER?  Userspace can't retrieve the filter, so the LSM
+could edit it to exclude certain things.  That might be a bit too complicated,
+though.
 
--- 
-Enrico Weigelt, metux IT consult
-Free software and Linux embedded engineering
-info@metux.net -- +49-151-27565287
+> Things like superblocks are sticker because we don't generally
+> think of them as objects. If you can do statfs(), you should be
+> able to set a watch on the filesystem metadata.
+> 
+> How would you specify a watch for a hardware event? If you say
+> you have to open /dev/mumble to sent a watch for mumbles, you're
+> good there, too.
+
+That's not how that works at the moment.  There's a global watch list for
+device events.  I've repurposed it to carry any device's events - so it will
+carry blockdev events (I/O errors only at the moment) and usb events
+(add/remove device, add/remove bus, reset device at the moment).
+
+> > Now, I could see that you ignore UIDs on things like keys and
+> > hardware-triggered events, but how does this interact with things like mount
+> > watches that see directories that have UIDs?
+> >
+> > Are you advocating making it such that process B can only see events
+> > triggered by process A if they have the same UID, for example?
+> 
+> It's always seemed arbitrary to me that you can't open your process up to
+> get signals from other users. What about putting mode bits on your ring
+> buffer? By default you could only accept your own events, but you could do a
+> rb_chmod(0222) and let all events through.
+
+Ummm...  This mechanism is pretty much about events generated by others.
+Depend on what you mean by 'you' and 'your own events', it might be considered
+that you would know what events you were directly causing and wouldn't need a
+notification system for it.
+
+> Subject to LSM addition restrictions, of course. That would require the cred
+> of the process that triggered the event or a system cred for "hardware"
+> events.  If you don't like mode bits you could use an ACL for fine
+> granularity or a single "let'em all in" bit for coarse.
+
+I'm not entirely sure how an ACL would help.  If someone creates a watch
+queue, sets an ACL with only a "let everything in" ACE, we're back to the
+situation we're in now.
+
+As I understand it, the issue you have is stopping them getting events that
+they're willing to accept that you think they shouldn't be allowed.
+
+> I'm not against access, I'm against uncontrolled access in conflict with
+> basic system policy.
+
+David
