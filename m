@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9CF4C28CC5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58733C28CC5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 951D620717
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31F602089E
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hZ8MIFGc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iP43xkcu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726752AbfFETJb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 15:09:31 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:48690 "EHLO
+        id S1726965AbfFETJn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 15:09:43 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:50122 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726637AbfFETJa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:09:30 -0400
+        with ESMTP id S1726631AbfFETJm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:09:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=AE7g989qIO1VkopksP3RSlALL0SU6gZzEPZFVDK3h6g=; b=hZ8MIFGcrOz/Vqrtdj0cEeO+RW
-        rlhkacZFkVFvFSik93oBnuuJJgxSt8Jxs8Gg6t0gJfCcf3N4IRga5hDuyw47FRdJa9H5Y3XI5A+By
-        uaB29+VcBqDZ/AGq7+o1Coz5x8V7ulIklnzC3zym3Hz6r0A4QAknVC1294KixPRfw3MLPfGGsYNjZ
-        wdSoljVPRL7SS/KfFTZmrI8NBIosnNsY9SwI1J5Y3m6u5/vGvU8RNZ/zoR1BJhRtyu1SaxhJ98HWY
-        hF/o8M5J8UFSjCHu0Q770Bchg1OLtXK22vwknekIgTSpieGddGwb3wOWFuBMeXY47TwSdRLFm2zuf
-        2nHKjAOg==;
+        bh=EgU5lGgALUASevuDqm6D+3fpiqvPjFDOViczDZXWl1A=; b=iP43xkcuQju+K/iAv4LV7OsM5c
+        zGaqdnFk4lE0l2DNYnd3Gw99DBrcivQgCGaBxRk3mFqk+mSe9guYc3DA6lvc3xuEKCeEYDpX9uL2y
+        cDTHiUeL18KagEuzHu2dQNbKpgdnj1GtrCkCy61hJ5Oqus5hCQkFISo7CZLi2nFhy+0uSc5oUlYuL
+        lpMVEq35Z3kkSw4luioz18tbqjCQkw/JJ3/qXhwoC315K/YhbOXovm9T0ogudlWAHcbu5WlyUdEG/
+        vdx8IBUq9q7A54kDix0/Ic+5PKKl8hCdqbDsvGgZLPeVAF7RfMVVmAOfQ8BcX3nABXpNTiUn3086/
+        6RMNGzeA==;
 Received: from 089144193064.atnat0002.highway.a1.net ([89.144.193.64] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hYbHh-0005zB-51; Wed, 05 Jun 2019 19:09:17 +0000
+        id 1hYbHO-0005XN-7d; Wed, 05 Jun 2019 19:08:59 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Sebastian Ott <sebott@linux.ibm.com>,
@@ -50,9 +50,9 @@ Cc:     Sebastian Ott <sebott@linux.ibm.com>,
         megaraidlinux.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
         linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
         usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
-Subject: [PATCH 10/13] megaraid_sas: set virt_boundary_mask in the scsi host
-Date:   Wed,  5 Jun 2019 21:08:33 +0200
-Message-Id: <20190605190836.32354-11-hch@lst.de>
+Subject: [PATCH 05/13] scsi: add a host / host template field for the virt boundary
+Date:   Wed,  5 Jun 2019 21:08:28 +0200
+Message-Id: <20190605190836.32354-6-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190605190836.32354-1-hch@lst.de>
 References: <20190605190836.32354-1-hch@lst.de>
@@ -64,116 +64,66 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This ensures all proper DMA layer handling is taken care of by the
-SCSI midlayer.  Note that the effect is global, as the IOMMU merging
-is based off a paramters in struct device.  We could still turn if off
-if no PCIe devices are present, but I don't know how to find that out.
-
-Also remove the bogus nomerges flag, merges do take the virt_boundary
-into account.
+This allows drivers setting it up easily instead of branching out to
+block layer calls in slave_alloc, and ensures the upgraded
+max_segment_size setting gets picked up by the DMA layer.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/scsi/megaraid/megaraid_sas_base.c   | 46 +++++----------------
- drivers/scsi/megaraid/megaraid_sas_fusion.c |  7 ++++
- 2 files changed, 18 insertions(+), 35 deletions(-)
+ drivers/scsi/hosts.c     | 3 +++
+ drivers/scsi/scsi_lib.c  | 3 ++-
+ include/scsi/scsi_host.h | 3 +++
+ 3 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
-index 3dd1df472dc6..20b3b3f8bc16 100644
---- a/drivers/scsi/megaraid/megaraid_sas_base.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_base.c
-@@ -1870,39 +1870,6 @@ void megasas_set_dynamic_target_properties(struct scsi_device *sdev,
- 	}
- }
+diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+index ff0d8c6a8d0c..55522b7162d3 100644
+--- a/drivers/scsi/hosts.c
++++ b/drivers/scsi/hosts.c
+@@ -462,6 +462,9 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
+ 	else
+ 		shost->dma_boundary = 0xffffffff;
  
--/*
-- * megasas_set_nvme_device_properties -
-- * set nomerges=2
-- * set virtual page boundary = 4K (current mr_nvme_pg_size is 4K).
-- * set maximum io transfer = MDTS of NVME device provided by MR firmware.
-- *
-- * MR firmware provides value in KB. Caller of this function converts
-- * kb into bytes.
-- *
-- * e.a MDTS=5 means 2^5 * nvme page size. (In case of 4K page size,
-- * MR firmware provides value 128 as (32 * 4K) = 128K.
-- *
-- * @sdev:				scsi device
-- * @max_io_size:				maximum io transfer size
-- *
-- */
--static inline void
--megasas_set_nvme_device_properties(struct scsi_device *sdev, u32 max_io_size)
--{
--	struct megasas_instance *instance;
--	u32 mr_nvme_pg_size;
--
--	instance = (struct megasas_instance *)sdev->host->hostdata;
--	mr_nvme_pg_size = max_t(u32, instance->nvme_page_size,
--				MR_DEFAULT_NVME_PAGE_SIZE);
--
--	blk_queue_max_hw_sectors(sdev->request_queue, (max_io_size / 512));
--
--	blk_queue_flag_set(QUEUE_FLAG_NOMERGES, sdev->request_queue);
--	blk_queue_virt_boundary(sdev->request_queue, mr_nvme_pg_size - 1);
--}
--
--
- /*
-  * megasas_set_static_target_properties -
-  * Device property set by driver are static and it is not required to be
-@@ -1961,8 +1928,10 @@ static void megasas_set_static_target_properties(struct scsi_device *sdev,
- 		max_io_size_kb = le32_to_cpu(instance->tgt_prop->max_io_size_kb);
- 	}
- 
--	if (instance->nvme_page_size && max_io_size_kb)
--		megasas_set_nvme_device_properties(sdev, (max_io_size_kb << 10));
-+	if (instance->nvme_page_size && max_io_size_kb) {
-+		blk_queue_max_hw_sectors(sdev->request_queue,
-+				(max_io_size_kb << 10) / 512);
-+	}
- 
- 	scsi_change_queue_depth(sdev, device_qd);
- 
-@@ -6258,6 +6227,7 @@ static int megasas_start_aen(struct megasas_instance *instance)
- static int megasas_io_attach(struct megasas_instance *instance)
- {
- 	struct Scsi_Host *host = instance->host;
-+	u32 nvme_page_size = instance->nvme_page_size;
- 
- 	/*
- 	 * Export parameters required by SCSI mid-layer
-@@ -6298,6 +6268,12 @@ static int megasas_io_attach(struct megasas_instance *instance)
- 	host->max_lun = MEGASAS_MAX_LUN;
- 	host->max_cmd_len = 16;
- 
-+	if (nvme_page_size) {
-+		if (nvme_page_size > MR_DEFAULT_NVME_PAGE_SIZE)
-+			nvme_page_size = MR_DEFAULT_NVME_PAGE_SIZE;
-+		host->virt_boundary_mask = nvme_page_size - 1;
-+	}
++	if (sht->virt_boundary_mask)
++		shost->virt_boundary_mask = sht->virt_boundary_mask;
 +
+ 	device_initialize(&shost->shost_gendev);
+ 	dev_set_name(&shost->shost_gendev, "host%d", shost->host_no);
+ 	shost->shost_gendev.bus = &scsi_bus_type;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 65d0a10c76ad..d333bb6b1c59 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1775,7 +1775,8 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+ 	dma_set_seg_boundary(dev, shost->dma_boundary);
+ 
+ 	blk_queue_max_segment_size(q, shost->max_segment_size);
+-	dma_set_max_seg_size(dev, shost->max_segment_size);
++	blk_queue_virt_boundary(q, shost->virt_boundary_mask);
++	dma_set_max_seg_size(dev, queue_max_segment_size(q));
+ 
  	/*
- 	 * Notify the mid-layer about the new controller
+ 	 * Set a reasonable default alignment:  The larger of 32-byte (dword),
+diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+index a5fcdad4a03e..cc139dbd71e5 100644
+--- a/include/scsi/scsi_host.h
++++ b/include/scsi/scsi_host.h
+@@ -369,6 +369,8 @@ struct scsi_host_template {
  	 */
-diff --git a/drivers/scsi/megaraid/megaraid_sas_fusion.c b/drivers/scsi/megaraid/megaraid_sas_fusion.c
-index 4dfa0685a86c..a9ff3a648e7b 100644
---- a/drivers/scsi/megaraid/megaraid_sas_fusion.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_fusion.c
-@@ -1935,6 +1935,13 @@ megasas_is_prp_possible(struct megasas_instance *instance,
- 			build_prp = true;
- 	}
+ 	unsigned long dma_boundary;
  
-+/*
-+ * XXX: All the code following should go away.  The block layer guarantees
-+ * merging according to the virt boundary.  And while we might have had some
-+ * issues with that in the past we fixed them, and any new bug should be fixed
-+ * in the core code as well.
-+ */
++	unsigned long virt_boundary_mask;
 +
- /*
-  * Below code detects gaps/holes in IO data buffers.
-  * What does holes/gaps mean?
+ 	/*
+ 	 * This specifies "machine infinity" for host templates which don't
+ 	 * limit the transfer size.  Note this limit represents an absolute
+@@ -587,6 +589,7 @@ struct Scsi_Host {
+ 	unsigned int max_sectors;
+ 	unsigned int max_segment_size;
+ 	unsigned long dma_boundary;
++	unsigned long virt_boundary_mask;
+ 	/*
+ 	 * In scsi-mq mode, the number of hardware queues supported by the LLD.
+ 	 *
 -- 
 2.20.1
 
