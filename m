@@ -2,126 +2,200 @@ Return-Path: <SRS0=Ij7C=UE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,T_DKIMWL_WL_MED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F2C8C28CC6
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 22:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5A63C28CC5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 23:28:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 80BF2212F5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 22:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 634672083E
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 23:28:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UjUsYqhM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726537AbfFEWvM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 18:51:12 -0400
-Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:41057 "EHLO
-        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726532AbfFEWvM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Jun 2019 18:51:12 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0TTWbVmc_1559775068;
-Received: from JosephdeMacBook-Pro.local(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0TTWbVmc_1559775068)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 06 Jun 2019 06:51:09 +0800
-Subject: Re: [bug report][stable] xfstests:generic/538 failed on xfs
-To:     Brian Foster <bfoster@redhat.com>,
-        gregkh <gregkh@linuxfoundation.org>
-Cc:     Alvin Zheng <Alvin@linux.alibaba.com>,
-        "darrick.wong" <darrick.wong@oracle.com>, axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        caspar <caspar@linux.alibaba.com>
-References: <f9a7b0c4-178a-4a7c-8ac6-aec79b06b810.Alvin@linux.alibaba.com>
- <20190605124227.GC17558@kroah.com> <20190605135756.GA15671@bfoster>
-From:   Joseph Qi <joseph.qi@linux.alibaba.com>
-Message-ID: <d644a3a9-f05e-ccde-967b-2e9e9b8cb66a@linux.alibaba.com>
-Date:   Thu, 6 Jun 2019 06:51:07 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190605135756.GA15671@bfoster>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1726597AbfFEX2l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 19:28:41 -0400
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:38281 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726541AbfFEX2l (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 19:28:41 -0400
+Received: by mail-pf1-f202.google.com with SMTP id l4so421857pff.5
+        for <linux-block@vger.kernel.org>; Wed, 05 Jun 2019 16:28:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=gRO0aIkjYMBsNBc7+DIoU7JX9NOgY+kGQd5/xewYXlk=;
+        b=UjUsYqhMfjCSgtwICU9RcqL+xxeWNLvzgYi4TAJ5I4+IMVG8sbSlWkpZQSp+j4nuQq
+         97fA9gvCpbvVs5BjpH/06h+5CHQfsMA0GeR3A9KlwdxUpYZFJVu6I3oKcNzlXEuRPpwh
+         HQYx91WCnQG84EuhE0DYB9w5B3XQlJ1mN4lKjtPqmOF1IXGgoq06Z6vYhwctzUT6GNcz
+         NL71raZfKYlyZ/oTRi6rtLIOLmWxdVntpcjynPpC8JZRh0QJ+MQpzecIaSF8TamuwwJX
+         Ss8ZvCG8BLDIfrxxjZ8LYkSt5b90qIAHMKhVUYm5Nlyo1YBeMiXm1L3zPtKfBJMUwuk6
+         sNNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=gRO0aIkjYMBsNBc7+DIoU7JX9NOgY+kGQd5/xewYXlk=;
+        b=Il/3aEg7WxHUUprVk/+c8uPK7V5OxqTrahF03FXEIYBIR/EUDlfhzkyOaGyM4S6qUK
+         2PsBG3wEdZjudlCz19BRw0G6R5oINePMEpxN1vDUZM/ItqTasEPGqtHGYEAD33jktCJW
+         eaHPDl1PxrHWyWSu2CKpZDXoQlLUahFemMSLaRun1N/vFCKxBehmSE3QUuwakn8il+5Y
+         8vSqsTq/4DIzn72T4XyO9XDEdUgFFt0hTvwyJVxAgzXyIOlrJlpRbuAqtQbz//D53iYl
+         kEP9XVpbpfu6awvZtUFBHUq852xuy/x/18jaUCC0kwcjb2IVxsLmKxwVrROl8CLLrpql
+         EqFQ==
+X-Gm-Message-State: APjAAAXebjJIOvvUktrgXvRCqcBysgzVvPuS4n6BXD+YOkkTGrBHlAhz
+        cfujA9tUJxWCQYXkQgynGB47d1o2TmJ7gtE2rLbxxLHHN5Vd1NotkUe46EgUtVe/EcHexhi4q+o
+        mee7Q+4vvTutozeqdG4PqtE90HVQE0NPjAzSulj03j+Iv+paxHyK1N5ZmXileGpErMaCF
+X-Google-Smtp-Source: APXvYqzXuluP1xJXv83KQJmBTl6O5tQhTtSaDuikoPQNfY1VHAjaLmhSxTETZknHp6ujJjRDlasl8HLD5Ew=
+X-Received: by 2002:a63:1663:: with SMTP id 35mr363300pgw.253.1559777320468;
+ Wed, 05 Jun 2019 16:28:40 -0700 (PDT)
+Date:   Wed,  5 Jun 2019 16:28:29 -0700
+Message-Id: <20190605232837.31545-1-satyat@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.22.0.rc1.311.g5d7573a151-goog
+Subject: [RFC PATCH v2 0/8] Inline Encryption Support
+From:   Satya Tangirala <satyat@google.com>
+To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net
+Cc:     Parshuram Raju Thombare <pthombar@cadence.com>,
+        Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Satya Tangirala <satyat@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This patch series adds support for Inline Encryption to the block layer,
+UFS, fscrypt and f2fs.
 
+Inline Encryption hardware allows software to specify an encryption context
+(an encryption key, crypto algorithm, data unit num, data unit size, etc.)
+along with a data transfer request to a storage device, and the inline
+encryption hardware will use that context to en/decrypt the data. The
+inline encryption hardware is part of the storage device, and it
+conceptually sits on the data path between system memory and the storage
+device. Inline Encryption hardware has become increasingly common, and we
+want to support it in the kernel.
 
-On 19/6/5 21:57, Brian Foster wrote:
-> On Wed, Jun 05, 2019 at 02:42:27PM +0200, gregkh wrote:
->> On Wed, Jun 05, 2019 at 08:21:44PM +0800, Alvin Zheng wrote:
->>> Hi,
->>>   I was using kernel v4.19.48 and found that it cannot pass the generic/538 on xfs. The error output is as follows:
->>
->> Has 4.19 ever been able to pass that test?  If not, I wouldn't worry
->> about it :)
->>
-> 
-> FWIW, the fstests commit references the following kernel patches for
-> fixes in XFS and ext4:
-> 
->   xfs: serialize unaligned dio writes against all other dio writes
->   ext4: fix data corruption caused by unaligned direct AIO
+Inline Encryption hardware implementations often function around the
+concept of a limited number of "keyslots", which can hold an encryption
+context each. The storage device can be directed to en/decrypt any
+particular request with the encryption context stored in any particular
+keyslot.
 
-IIUC, the corresponding ext4 fix is:
-ext4: fix data corruption caused by overlapping unaligned and aligned IO
-It was backported in 4.19.45.
+Patch 1 introduces a Keyslot Manager to efficiently manage keyslots.
+The keyslot manager also functions as the interface that blk-crypto
+(introduced in Path 3), will use to program keys into inline encryption
+hardware. For more information on the Keyslot Manager, refer to
+documentation found in block/keyslot-manager.c and linux/keyslot-manager.h.
 
-Thanks,
-Joseph
+Patch 2 introduces struct bio_crypt_ctx, and a ptr to one in struct bio,
+which allows struct bio to represent an encryption context that can be
+passed down the storage stack from the filesystem layer to the storage
+driver.
 
-> 
-> It looks like both of those patches landed in 5.1.
-> 
-> Brian
-> 
->>>
->>>   FSTYP         -- xfs (non-debug)
->>>   PLATFORM      -- Linux/x86_64 alinux2-6 4.19.48
->>>   MKFS_OPTIONS  -- -f -bsize=4096 /dev/vdc
->>>   MOUNT_OPTIONS -- /dev/vdc /mnt/testarea/scra
->>>   generic/538 0s ... - output mismatch (see /root/usr/local/src/xfstests/results//generic/538.out.bad)
->>>       --- tests/generic/538.out   2019-05-27 13:57:06.505666465 +0800
->>>       +++ /root/usr/local/src/xfstests/results//generic/538.out.bad       2019-06-05 16:43:14.702002326 +0800
->>>       @@ -1,2 +1,10 @@
->>>        QA output created by 538
->>>       +Data verification fails
->>>       +Find corruption
->>>       +00000000  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->>>       +*
->>>       +00000200  5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a  ZZZZZZZZZZZZZZZZ
->>>       +00002000
->>>       ...
->>>       (Run 'diff -u /root/usr/local/src/xfstests/tests/generic/538.out /root/usr/local/src/xfstests/results//generic/538.out.bad'  to see the entire diff)
->>>   Ran: generic/538
->>>   Failures: generic/538
->>>   Failed 1 of 1 tests
->>>   
->>> I also found that the latest kernel (v5.2.0-rc2) of upstream can pass the generic/538 test. Therefore, I bisected and found the first good commit is 3110fc79606. This commit adds the hardware queue into the sort function. Besides, the sort function returns a negative value when the offset and queue (software and hardware) of two I/O requests are same. I think the second part of the change make senses. The kernel should not change the relative position of two I/O requests when their offset and queue are same. So I made the following changes and merged it into the kernel 4.19.48. After the modification, we can pass the generic/538 test on xfs. The same case can be passed on ext4, since ext4 has corresponding fix 0db24122bd7f ("ext4: fix data corruption caused by overlapping unaligned and aligned IO"). Though I think xfs should be responsible for this issue, the block layer code below is also problematic. Any ideas?
->>>
->>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>> index 4e563ee..a7309cd 100644
->>> --- a/block/blk-mq.c
->>> +++ b/block/blk-mq.c
->>> @@ -1610,7 +1610,7 @@ static int plug_ctx_cmp(void *priv, struct list_head *a, struct list_head *b)
->>>
->>>         return !(rqa->mq_ctx < rqb->mq_ctx ||
->>>                  (rqa->mq_ctx == rqb->mq_ctx &&
->>> -                 blk_rq_pos(rqa) < blk_rq_pos(rqb)));
->>> +                 blk_rq_pos(rqa) <= blk_rq_pos(rqb)));
->>>  }
->>>
->>>  void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
->>
->> I would not like to take a patch that is not upstream, but rather take
->> the original commit.
->>
->> Can 3110fc79606f ("blk-mq: improve plug list sorting") on its own
->> resolve this issue for 4.19.y?
->>
->> thanks,
->>
->> greg k-h
+Patch 3 introduces blk-crypto. Blk-crypto delegates crypto operations to
+inline encryption hardware when available, and also contains a software
+fallback to the kernel crypto API. Blk-crypto also makes it possible for
+layered devices like device mapper to make use of inline encryption
+hardware. Given that blk-crypto works as a software fallback, we are
+considering removing file content en/decryption from fscrypt and simply
+using blk-crypto in a future patch. For more details on blk-crypto, refer
+to Documentation/block/blk-crypto.txt.
+
+Patches 4-6 add support for inline encryption into the UFS driver according
+to the JEDEC UFS HCI v2.1 specification. Inline encryption support for
+other drivers (like eMMC) may be added in the same way - the device driver
+should set up a Keyslot Manager in the device's request_queue (refer to
+the UFS crypto additions in ufshcd-crypto.c and ufshcd.c for an example).
+
+Patches 7 and 8 add support to fscrypt and f2fs, so that we have
+a complete stack that can make use of inline encryption.
+
+There have been a few patch sets addressing Inline Encryption Support in
+the past. Briefly, this patch set differs from those as follows:
+
+1) "crypto: qce: ice: Add support for Inline Crypto Engine"
+is specific to certain hardware, while our patch set's Inline
+Encryption support for UFS is implemented according to the JEDEC UFS
+specification.
+
+2) "scsi: ufs: UFS Host Controller crypto changes" registers inline
+encryption support as a kernel crypto algorithm. Our patch views inline
+encryption as being fundamentally different from a generic crypto
+provider (in that inline encryption is tied to a device), and so does
+not use the kernel crypto API to represent inline encryption hardware.
+
+3) "scsi: ufs: add real time/inline crypto support to UFS HCD" requires
+the device mapper to work - our patch does not.
+
+Changes v1 => v2:
+ - Block layer and UFS changes are split into 3 patches each.
+ - We now only have a ptr to a struct bio_crypt_ctx in struct bio, instead
+   of the struct itself.
+ - struct bio_crypt_ctx no longer has flags.
+ - blk-crypto now correctly handles the case when it fails to init
+   (because of insufficient memory), but kernel continues to boot.
+ - ufshcd-crypto now works on big endian cpus.
+ - Many cleanups.
+
+Satya Tangirala (8):
+  block: Keyslot Manager for Inline Encryption
+  block: Add encryption context to struct bio
+  block: blk-crypto for Inline Encryption
+  scsi: ufs: UFS driver v2.1 spec crypto additions
+  scsi: ufs: UFS crypto API
+  scsi: ufs: Add inline encryption support to UFS
+  fscrypt: wire up fscrypt to use blk-crypto
+  f2fs: Wire up f2fs to use inline encryption via fscrypt
+
+ Documentation/block/blk-crypto.txt | 185 ++++++++++
+ block/Kconfig                      |   8 +
+ block/Makefile                     |   2 +
+ block/bio.c                        |  17 +-
+ block/blk-core.c                   |  11 +-
+ block/blk-crypt-ctx.c              |  90 +++++
+ block/blk-crypto.c                 | 557 +++++++++++++++++++++++++++++
+ block/blk-merge.c                  |  34 +-
+ block/bounce.c                     |   9 +-
+ block/keyslot-manager.c            | 315 ++++++++++++++++
+ drivers/md/dm.c                    |  15 +-
+ drivers/scsi/ufs/Kconfig           |  10 +
+ drivers/scsi/ufs/Makefile          |   1 +
+ drivers/scsi/ufs/ufshcd-crypto.c   | 438 +++++++++++++++++++++++
+ drivers/scsi/ufs/ufshcd-crypto.h   |  69 ++++
+ drivers/scsi/ufs/ufshcd.c          |  84 ++++-
+ drivers/scsi/ufs/ufshcd.h          |  23 ++
+ drivers/scsi/ufs/ufshci.h          |  67 +++-
+ fs/crypto/Kconfig                  |   7 +
+ fs/crypto/bio.c                    | 159 ++++++--
+ fs/crypto/crypto.c                 |   9 +
+ fs/crypto/fscrypt_private.h        |  10 +
+ fs/crypto/keyinfo.c                |  69 ++--
+ fs/crypto/policy.c                 |  10 +
+ fs/f2fs/data.c                     |  77 +++-
+ fs/f2fs/super.c                    |   1 +
+ include/linux/bio.h                | 180 ++++++++++
+ include/linux/blk-crypto.h         |  40 +++
+ include/linux/blk_types.h          |  39 ++
+ include/linux/blkdev.h             |   9 +
+ include/linux/fscrypt.h            |  64 ++++
+ include/linux/keyslot-manager.h    | 116 ++++++
+ include/uapi/linux/fs.h            |  12 +-
+ 33 files changed, 2668 insertions(+), 69 deletions(-)
+ create mode 100644 Documentation/block/blk-crypto.txt
+ create mode 100644 block/blk-crypt-ctx.c
+ create mode 100644 block/blk-crypto.c
+ create mode 100644 block/keyslot-manager.c
+ create mode 100644 drivers/scsi/ufs/ufshcd-crypto.c
+ create mode 100644 drivers/scsi/ufs/ufshcd-crypto.h
+ create mode 100644 include/linux/blk-crypto.h
+ create mode 100644 include/linux/keyslot-manager.h
+
+-- 
+2.22.0.rc1.311.g5d7573a151-goog
+
