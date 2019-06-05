@@ -2,103 +2,93 @@ Return-Path: <SRS0=Ij7C=UE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CDEC28D18
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 20:22:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 809B9C28CC5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 20:56:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8BC4320872
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 20:22:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jn33M/OL"
+	by mail.kernel.org (Postfix) with ESMTP id 5401E2067C
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 20:56:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726555AbfFEUWj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 16:22:39 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:38430 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726501AbfFEUWi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 16:22:38 -0400
-Received: by mail-qk1-f194.google.com with SMTP id a27so65310qkk.5
-        for <linux-block@vger.kernel.org>; Wed, 05 Jun 2019 13:22:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=hdVKMo8506TgrZK1PYQwv5IIzq/3ub7YoF/TJnHz4iQ=;
-        b=jn33M/OLPMrHDhWB/oB3uBW6KyUZwZ3dHbeuh1XlGJHpj6dwZhMsOO5OOrjM6STAk4
-         qROquiS6fMH0HrsaHJQe7IWfco1/3CwVA1Gz+FGmFpUONVqiEw31nfTAMmDzWlOeuUEZ
-         mk6d5RDBk04fmPauqpzDR3UBYRMhcvzlsYSc74mHKl9XePav6wRDF+ORoRV2fKHFG/sb
-         cUQUGUyyBaCwXiDs4NT1HvJhutfWYLBEeCwb+RHe4UP0YFMmyv3lmlZz7HJMeHb2peh0
-         c0KHydFemqtXhwO8HH1TOYZIPA8HQnsiNT2WYwoU7yhfgAcf8QGzWgN4SKzBFML0mJnJ
-         tpyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=hdVKMo8506TgrZK1PYQwv5IIzq/3ub7YoF/TJnHz4iQ=;
-        b=dLuZynbkwbRqzkGJtsJ4nggyc+OrzqSc/Y7DNBwXxzvZP+ui30g3AoSrqHUni6y677
-         AVLwbm+Gq5Bmecoqa8WjK85OcaoyxdBFSdBNkubxxdaPh0iIT9vZa4P7432bQsBdTuYa
-         Zv6tuK+TNZ1nGzC3DqUyY3SDLSHsxnZzC+edP9W5dj+QkMtfolgcXZi9cjQo95CiJ/a3
-         v5PB1GfcUrjaaELqt1cOhX5UnbA42mhXD28qRz4/RuzTroLIKBIrpsc2/gIXhHyWYud/
-         KaKHonzeqOk6JX6+WU08mbYvhraKsb5FAJ66FISnXxn0RCXaGP4qhrbQAwGjEZfIcOrG
-         sSxQ==
-X-Gm-Message-State: APjAAAW0bHHIW+2iWNtDg5EyZGrXwnYqCH6y/Se51oPDpl/pSiqZv6WK
-        HjpETtq3WgWYCLrqs00XwltH9Q==
-X-Google-Smtp-Source: APXvYqzsyiPSTmn82JkgPtH+Z1+lnK81jan/CvvnzRGGA4oYrI2ETBGBe6mNB1mjYk7SLXHnNDomow==
-X-Received: by 2002:a37:6312:: with SMTP id x18mr35736460qkb.300.1559766157655;
-        Wed, 05 Jun 2019 13:22:37 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id v9sm884883qti.60.2019.06.05.13.22.36
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 05 Jun 2019 13:22:36 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1hYcQd-0002uk-Vd; Wed, 05 Jun 2019 17:22:35 -0300
-Date:   Wed, 5 Jun 2019 17:22:35 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Sebastian Ott <sebott@linux.ibm.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Oliver Neukum <oneukum@suse.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        megaraidlinux.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
-        linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/13] IB/iser: set virt_boundary_mask in the scsi host
-Message-ID: <20190605202235.GC3273@ziepe.ca>
-References: <20190605190836.32354-1-hch@lst.de>
- <20190605190836.32354-9-hch@lst.de>
+        id S1726543AbfFEU4O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 16:56:14 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:42825 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726477AbfFEU4O (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 16:56:14 -0400
+Received: from [192.168.1.110] ([77.2.1.21]) by mrelayeu.kundenserver.de
+ (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1Mi2Bb-1gvSdm3T97-00e4xP; Wed, 05 Jun 2019 22:55:55 +0200
+Subject: Re: [PATCH] block: Drop unlikely before IS_ERR(_OR_NULL)
+To:     Joe Perches <joe@perches.com>,
+        Kefeng Wang <wangkefeng.wang@huawei.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Pravin B Shelar <pshelar@ovn.org>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        "David S. Miller" <davem@davemloft.net>
+References: <20190605142428.84784-1-wangkefeng.wang@huawei.com>
+ <20190605142428.84784-4-wangkefeng.wang@huawei.com>
+ <8221bc17-b0bb-da6f-4343-3e73467252d5@metux.net>
+ <44c945bf0573842fe9b2db89407e40c88fcc7eb4.camel@perches.com>
+From:   "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Organization: metux IT consult
+Message-ID: <ecd9df60-f4e2-108d-43ae-fbdf5721471e@metux.net>
+Date:   Wed, 5 Jun 2019 20:55:48 +0000
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190605190836.32354-9-hch@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <44c945bf0573842fe9b2db89407e40c88fcc7eb4.camel@perches.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:OpvBXb21v9xeH3z9JI5aCc/P+EN+TrdONa8z2f/P3LsFhfCDDpo
+ eMl0KdkjQqe+gWvbfkvHdlgt/ljGPl/u6T/bbgxOe/pBTJPfczz1YV9iw+BQFYH9tRQte/F
+ XPUt0tNhWh6CQ8qYM086YNCYfhfx4+z1euF9Z4oPUTWgpYeTM2ojHjfjWGvsKeZXT58bbYz
+ 1GPLexop3kE/7mHRopbrA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:iwK6QWV4If4=:r3jvpSCN+4Ob0dg+Pbdn1A
+ x4zuU4mUhTjSR3HY9p7IfXeoWZqpMwlH86MD1BS4whiI7zEy9hi8po186dQAtjbujp441uKol
+ O7jKVHOwrBaFPuVAn+5DHMFS63YmsqxQHGpYiBR3rSh9FWXOvTQkCTRYMBKjQk1ABqiYcM+1H
+ MPsaOlTVYAxWp5GmYulzhvxfUcQb+uTQw5SEd1BckGQfwjcPNqwiJmjhJSmHCflJIV1uevNLi
+ +2RSQj0mpoiMDc7rztarOA4DWPbcazKvHWDbnLnP8rfd/tezmU5/Pge04sRmoWXPaMm6fEIIj
+ bIkCf9sRNw+6yswO+QmDp8wT7m59aL3kNbgukPeYgZ3WzXNW9qHWPLVYvIFlSstuUKtgH6UL3
+ xRRqYRY11S2+w2sCOp5MevLCJljJJWJYWW5plQd2uvI4rkwaKr3wxt7BjxWVH8tDzog6u05HG
+ 6yB+7AZe7a4QHfWT8LlBfKHmZiRrm2idTFUTkUorOPXA6gAkBNPyM7VrLR0Efv6tHiAkIcnP8
+ ND/Tfu9XzH1R4YyZ/9EWfp/Axwp1OOsnTX/vSIK/AnLe4TsdDNF/wkZ35jghundG5IoQhV0op
+ 6OpOVx3/+5sYzyGgWUt4Um9Hrr1Y1mo7yX6qnfWRDY8pl93fTY/WDuFCgibrRl/B+lvRrq2bJ
+ Jj+Udsrs4VcU1jQlYtapkCkMsYyl7uxNTysCnK67LzEJhG1d/NDqG40m05Cwpiu/0UoyJfJQX
+ P3gYO5eXgU7pejcuir0sIoN8SqPjcDZHJnxEE/2JUlJZ3Eurir8gKUdTubA=
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 05, 2019 at 09:08:31PM +0200, Christoph Hellwig wrote:
-> This ensures all proper DMA layer handling is taken care of by the
-> SCSI midlayer.
+On 05.06.19 18:32, Joe Perches wrote:
 
-Maybe not entirely related to this series, but it looks like the SCSI
-layer is changing the device global dma_set_max_seg_size() - at least
-in RDMA the dma device is being shared between many users, so we
-really don't want SCSI to make this value smaller.
+> Likely change all of these too:
+> 
+> $ git grep -P '\blikely.*IS_ERR'
+> drivers/net/vxlan.c:    if (likely(!IS_ERR(rt))) {
+> fs/ntfs/lcnalloc.c:     if (likely(page && !IS_ERR(page))) {
+> fs/ntfs/mft.c:  if (likely(!IS_ERR(page))) {
+> fs/ntfs/mft.c:  if (likely(!IS_ERR(m)))
+> fs/ntfs/mft.c:          if (likely(!IS_ERR(m))) {
+> fs/ntfs/mft.c:          if (likely(!IS_ERR(rl2)))
+> fs/ntfs/namei.c:                if (likely(!IS_ERR(dent_inode))) {
+> fs/ntfs/runlist.c:      if (likely(!IS_ERR(old_rl)))
+> net/openvswitch/datapath.c:             if (likely(!IS_ERR(reply))) {
+> net/socket.c:   if (likely(!IS_ERR(newfile))) {
 
-Can we do something about this?
+Good point, thx.
 
-Wondering about other values too, and the interaction with the new
-combining stuff in umem.c
+Added that to my cocci script, which I've just sent to lkml.
 
-Thanks,
-Jason
+
+--mtx
+
+-- 
+Enrico Weigelt, metux IT consult
+Free software and Linux embedded engineering
+info@metux.net -- +49-151-27565287
