@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC8DC28CC5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DBAAC28CC5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C75920717
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 37F1B20717
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W7YRuVdb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="e/LRwE9r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726792AbfFETJF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 15:09:05 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:45636 "EHLO
+        id S1726828AbfFETJS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 15:09:18 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:47180 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726791AbfFETJF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:09:05 -0400
+        with ESMTP id S1726752AbfFETJS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:09:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=mMOG10avCayPSFkRYQ6YVcJcMwUlFe5SMMCCEccPUfo=; b=W7YRuVdbazKsMEw8dyvRjXv4Ly
-        xl6+S4k0JUCRHVbPmWWd7w/RU0QH5qCUlMd9gNjIdFrFb4u9jRR5WZm9os9UMnoDsaOFX20pNfKDq
-        wKkB1lpAkuT6foBwoq0/yzk5fqv8oDMahY8GoIL8xJh2W6YD0dLeMN2PJMmk0n49w6RTd2QYtVKOZ
-        UkDCIOQjnk6wLJPpD5lULo4r/LCOoK3P6JnUx5axF7Srpj0cWaq8A9tVEMp70mfCF8NIC6HB3PV+L
-        ucuf4RN0DI9i+Opumq7WADBGGy8kEMLR8USCrTsZOKQZQqWSMkIrd1sA882xvpc+pGeeTBcBqT2Xi
-        7NqcKgPw==;
+        bh=Ft2pGuvl7lOdipsW5yXOzcXLvsOnET6aGSo+dOUOkYE=; b=e/LRwE9rAPGwNv/3w25xvDQ/yU
+        XrfQV4bNSr3EZ2VqzRz6SXbHPy/59Kbccl4U5FVoa7eEfXV2RfR+PoG7rmjg36NtRLsSbNmnvSNJj
+        lDzKzhbP36+QwCDxfau3aYGvhYwi/QRkBnAWzpyGjQ6t3cNAEnRBdirghH92UHb+nBo59MPcCA6BF
+        NJLHNNfzljpAK8SsVLk5O3dSaSK1K9h7Lay+DsxZLpRpq1rPKoFj6RdBxdvOBotGUSzsqV9ADYYPv
+        KfAqNXWyVRTh4D6wftFOSQF9qA+5SyiNWpmZcn30FaT4mc+8P8mFr8rZ4r1vaPW3R9iusGdJdXRMG
+        +07J9XIA==;
 Received: from 089144193064.atnat0002.highway.a1.net ([89.144.193.64] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hYbHK-0005QW-0o; Wed, 05 Jun 2019 19:08:55 +0000
+        id 1hYbHW-0005ir-71; Wed, 05 Jun 2019 19:09:07 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Sebastian Ott <sebott@linux.ibm.com>,
@@ -50,9 +50,9 @@ Cc:     Sebastian Ott <sebott@linux.ibm.com>,
         megaraidlinux.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
         linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
         usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
-Subject: [PATCH 04/13] mmc: also set max_segment_size in the device
-Date:   Wed,  5 Jun 2019 21:08:27 +0200
-Message-Id: <20190605190836.32354-5-hch@lst.de>
+Subject: [PATCH 07/13] storvsc: set virt_boundary_mask in the scsi host template
+Date:   Wed,  5 Jun 2019 21:08:30 +0200
+Message-Id: <20190605190836.32354-8-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190605190836.32354-1-hch@lst.de>
 References: <20190605190836.32354-1-hch@lst.de>
@@ -64,27 +64,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we only set the max_segment_size on the queue an IOMMU merge might
-create bigger segments again, so limit the IOMMU merges as well.
+This ensures all proper DMA layer handling is taken care of by the
+SCSI midlayer.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/mmc/core/queue.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/scsi/storvsc_drv.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index b5b9c6142f08..92900a095796 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -377,6 +377,8 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
- 	blk_queue_max_segment_size(mq->queue,
- 			round_down(host->max_seg_size, block_size));
+diff --git a/drivers/scsi/storvsc_drv.c b/drivers/scsi/storvsc_drv.c
+index 8472de1007ff..e61051c026f6 100644
+--- a/drivers/scsi/storvsc_drv.c
++++ b/drivers/scsi/storvsc_drv.c
+@@ -1434,9 +1434,6 @@ static int storvsc_device_configure(struct scsi_device *sdevice)
+ {
+ 	blk_queue_rq_timeout(sdevice->request_queue, (storvsc_timeout * HZ));
  
-+	dma_set_max_seg_size(mmc_dev(host), queue_max_segment_size(mq->queue));
-+
- 	INIT_WORK(&mq->recovery_work, mmc_mq_recovery_handler);
- 	INIT_WORK(&mq->complete_work, mmc_blk_mq_complete_work);
+-	/* Ensure there are no gaps in presented sgls */
+-	blk_queue_virt_boundary(sdevice->request_queue, PAGE_SIZE - 1);
+-
+ 	sdevice->no_write_same = 1;
  
+ 	/*
+@@ -1709,6 +1706,8 @@ static struct scsi_host_template scsi_driver = {
+ 	.this_id =		-1,
+ 	/* Make sure we dont get a sg segment crosses a page boundary */
+ 	.dma_boundary =		PAGE_SIZE-1,
++	/* Ensure there are no gaps in presented sgls */
++	.virt_boundary_mask =	PAGE_SIZE-1,
+ 	.no_write_same =	1,
+ 	.track_queue_depth =	1,
+ };
 -- 
 2.20.1
 
