@@ -4,38 +4,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD3EC28D18
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17FB4C28CC5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8F29B20717
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA48320717
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="p6L9DWWU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ELWyStyy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726626AbfFETJM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 15:09:12 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:45138 "EHLO
+        id S1725950AbfFETJ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 15:09:26 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:48110 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726752AbfFETJA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:09:00 -0400
+        with ESMTP id S1726752AbfFETJZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:09:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=Q4TbxoiujTGLtL40me7CIHzcsjwa9bU5PcQWV6JWtc8=; b=p6L9DWWUBAdWW1rd75RHaZf5Wz
-        o1NB2vy0nvkTLGgx7Z3C0KGh5vDV2+h92cf5+rr1usphixujK/BMgqurLiMDj0iPqoj8XM/VF0YP9
-        ansQmzszjOCrsFuBG3rTIcs/QaCDWLlSIqiG3JPxDFBLvMNsipRo1c5UuIgbkGkVW6H/ObN5vk/Bw
-        TA3dkCZj+vuslbH+gTS8hZxozDYskw1GB4c57p8jEYzq4+OVoD4f+fi58JtjMlgW/2sc+TsRi7Km8
-        GX3hTEIAzoW+55WlEay40s0EE1Llf4e8FJIa2Zt6CepJt6QxzjWhdhfvn6550UCGQyQAds8sVXiN0
-        Z48CP2ag==;
+        bh=BZynmndmGYCWQ7WGzgFBa5UwSeviNORnIHKuHoOiZgI=; b=ELWyStyyodCbtc4qhQmbuCcIUN
+        wh3ZVf2OSIPH0gIf3fMg4Ip6F+Vhfu90uqR70s8bj/9BGX6DPZeiU0kJFMwseFvv+QO8NX6t4fb1Y
+        Q5t146rOhFqQjVGS3COL970Km1QpopnQQKGxs+6L9Ls5jmvRVxU6fGplwYaOpgqhHDPPJrYjMdGaE
+        3xmDfTxvxQtn2GSJAP1paKNtiv8PryOAYKjfbl3LEKeKC0PpF90Ar2Ppja/QLcnBO3M5lnoqHePTa
+        IsTDSONs9p756x0mWrUEVNNvCHEVOMNY+HggY5gDgfV2AyIQL62W9B/8bcmvEZLwSi6w5G7ZJh4Z8
+        3WRs4LLw==;
 Received: from 089144193064.atnat0002.highway.a1.net ([89.144.193.64] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hYbHG-0005KB-0r; Wed, 05 Jun 2019 19:08:50 +0000
+        id 1hYbHd-0005ug-Su; Wed, 05 Jun 2019 19:09:14 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Sebastian Ott <sebott@linux.ibm.com>,
@@ -50,9 +50,9 @@ Cc:     Sebastian Ott <sebott@linux.ibm.com>,
         megaraidlinux.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
         linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
         usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
-Subject: [PATCH 03/13] mtip32xx: also set max_segment_size in the device
-Date:   Wed,  5 Jun 2019 21:08:26 +0200
-Message-Id: <20190605190836.32354-4-hch@lst.de>
+Subject: [PATCH 09/13] IB/srp: set virt_boundary_mask in the scsi host
+Date:   Wed,  5 Jun 2019 21:08:32 +0200
+Message-Id: <20190605190836.32354-10-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190605190836.32354-1-hch@lst.de>
 References: <20190605190836.32354-1-hch@lst.de>
@@ -64,26 +64,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we only set the max_segment_size on the queue an IOMMU merge might
-create bigger segments again, so limit the IOMMU merges as well.
+This ensures all proper DMA layer handling is taken care of by the
+SCSI midlayer.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/infiniband/ulp/srp/ib_srp.c | 18 +++---------------
+ 1 file changed, 3 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index bacfdac7161c..a14b09ab3a41 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -3676,6 +3676,7 @@ static int mtip_block_initialize(struct driver_data *dd)
- 	blk_queue_physical_block_size(dd->queue, 4096);
- 	blk_queue_max_hw_sectors(dd->queue, 0xffff);
- 	blk_queue_max_segment_size(dd->queue, 0x400000);
-+	dma_set_max_seg_size(&dd->pdev->dev, 0x400000);
- 	blk_queue_io_min(dd->queue, 4096);
+diff --git a/drivers/infiniband/ulp/srp/ib_srp.c b/drivers/infiniband/ulp/srp/ib_srp.c
+index be9ddcad8f28..944fe8eee1ea 100644
+--- a/drivers/infiniband/ulp/srp/ib_srp.c
++++ b/drivers/infiniband/ulp/srp/ib_srp.c
+@@ -3061,20 +3061,6 @@ static int srp_target_alloc(struct scsi_target *starget)
+ 	return 0;
+ }
  
- 	/* Set the capacity of the device in 512 byte sectors. */
+-static int srp_slave_alloc(struct scsi_device *sdev)
+-{
+-	struct Scsi_Host *shost = sdev->host;
+-	struct srp_target_port *target = host_to_target(shost);
+-	struct srp_device *srp_dev = target->srp_host->srp_dev;
+-	struct ib_device *ibdev = srp_dev->dev;
+-
+-	if (!(ibdev->attrs.device_cap_flags & IB_DEVICE_SG_GAPS_REG))
+-		blk_queue_virt_boundary(sdev->request_queue,
+-					~srp_dev->mr_page_mask);
+-
+-	return 0;
+-}
+-
+ static int srp_slave_configure(struct scsi_device *sdev)
+ {
+ 	struct Scsi_Host *shost = sdev->host;
+@@ -3277,7 +3263,6 @@ static struct scsi_host_template srp_template = {
+ 	.name				= "InfiniBand SRP initiator",
+ 	.proc_name			= DRV_NAME,
+ 	.target_alloc			= srp_target_alloc,
+-	.slave_alloc			= srp_slave_alloc,
+ 	.slave_configure		= srp_slave_configure,
+ 	.info				= srp_target_info,
+ 	.queuecommand			= srp_queuecommand,
+@@ -3812,6 +3797,9 @@ static ssize_t srp_create_target(struct device *dev,
+ 	target_host->max_cmd_len = sizeof ((struct srp_cmd *) (void *) 0L)->cdb;
+ 	target_host->max_segment_size = ib_dma_max_seg_size(ibdev);
+ 
++	if (!(ibdev->attrs.device_cap_flags & IB_DEVICE_SG_GAPS_REG))
++		target_host->virt_boundary_mask = ~srp_dev->mr_page_mask;
++
+ 	target = host_to_target(target_host);
+ 
+ 	target->net		= kobj_ns_grab_current(KOBJ_NS_TYPE_NET);
 -- 
 2.20.1
 
