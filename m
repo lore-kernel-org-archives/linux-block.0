@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6E71C46470
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A71C28CC5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:10:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B597B20B1F
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:10:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29FFB208CB
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:10:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PtFwz/8o"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="M/uUYRR8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727012AbfFETJq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 15:09:46 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:50448 "EHLO
+        id S1727049AbfFETKD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 15:10:03 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:52610 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726631AbfFETJp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:09:45 -0400
+        with ESMTP id S1726593AbfFETKD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:10:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=eFJweHzSpLpiZ2x1/tGLuA1P3AGVwoc6WM7qjfxVfqw=; b=PtFwz/8oRRY6msCt/J+NIzc7jL
-        KBTxzch1pLxKacNvnqKxg7CTNpIQvCd/e9l/vgyz91GPB/hOqqCnM9etxNoPPnw4yAGzcr1umOP1d
-        g6r4QyvCMfVlLHYupSJFPPxnhDRBeVDP/2DUlN19O2SoudtCOGAqISF019+t85LyPXlALTX/vHSLz
-        KFPhRdCpnNx39OfVgAfXIKA0hMnWT1klLQviKNjqNiXkoALr55fVQ4ppxIEN16CX4X8w54itG1IDJ
-        vVHeKUkp0xTRc1nohARWA7jYty4LnjM/IuXA2FocoD45TEHVr5bQ2+86YAq9p6hRimkhYLEj55RtG
-        R5ssmYhA==;
+        bh=E/iOQT4M1fyenwDbyi+jqJusuZ1NUczgmpSGXIQ2f+0=; b=M/uUYRR8pgDnnzzz4z4TbrU+9D
+        GPsjq2ZKOcMVS1H8gsKcilta+otGh2XS3aUQd1ajUwasAh52+CrohDwRcmv5YXxwti+HJMhZTmjgj
+        XntimabGSGg6z2wQJnWXnrymQbeHuKn5y2J+cyhPjdDYoBWVg+VuDFQA7JpL75+hU1i6vxttofkCE
+        vwzndjdfQuiK3u7gXhRYVjJ1n6IgY/AJIBzsqY+2OFxomE6nc7y4rMA4ssWz0lwAPY5aND9gIDfsc
+        x+JU83gIZQ+sj0n8Hw8/fU1x1+jABSSj2CQkJReliwpQmnoRoPIlFDeSjIz20A14i1edYfTctRpi3
+        JIatSf2Q==;
 Received: from 089144193064.atnat0002.highway.a1.net ([89.144.193.64] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hYbHS-0005cs-FI; Wed, 05 Jun 2019 19:09:03 +0000
+        id 1hYbHk-00063E-KD; Wed, 05 Jun 2019 19:09:21 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Sebastian Ott <sebott@linux.ibm.com>,
@@ -50,9 +50,9 @@ Cc:     Sebastian Ott <sebott@linux.ibm.com>,
         megaraidlinux.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
         linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
         usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
-Subject: [PATCH 06/13] ufshcd: set max_segment_size in the scsi host template
-Date:   Wed,  5 Jun 2019 21:08:29 +0200
-Message-Id: <20190605190836.32354-7-hch@lst.de>
+Subject: [PATCH 11/13] mpt3sas: set virt_boundary_mask in the scsi host
+Date:   Wed,  5 Jun 2019 21:08:34 +0200
+Message-Id: <20190605190836.32354-12-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190605190836.32354-1-hch@lst.de>
 References: <20190605190836.32354-1-hch@lst.de>
@@ -64,35 +64,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We need to also mirror the value to the device to ensure IOMMU merging
-doesn't undo it, and the SCSI host level parameter will ensure that.
+This ensures all proper DMA layer handling is taken care of by the
+SCSI midlayer.  Note that the effect is global, as the IOMMU merging
+is based off a paramters in struct device.  We could still turn if off
+if no PCIe devices are present, but I don't know how to find that out.
+
+Also remove the bogus nomerges flag, merges do take the virt_boundary
+into account.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/scsi/ufs/ufshcd.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/scsi/mpt3sas/mpt3sas_scsih.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
-index 8c1c551f2b42..4e524ade489e 100644
---- a/drivers/scsi/ufs/ufshcd.c
-+++ b/drivers/scsi/ufs/ufshcd.c
-@@ -4586,8 +4586,6 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
- 	struct request_queue *q = sdev->request_queue;
+diff --git a/drivers/scsi/mpt3sas/mpt3sas_scsih.c b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
+index 1ccfbc7eebe0..03a0df2a3379 100644
+--- a/drivers/scsi/mpt3sas/mpt3sas_scsih.c
++++ b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
+@@ -2361,14 +2361,6 @@ scsih_slave_configure(struct scsi_device *sdev)
+ 		pcie_device_put(pcie_device);
+ 		spin_unlock_irqrestore(&ioc->pcie_device_lock, flags);
+ 		scsih_change_queue_depth(sdev, qdepth);
+-		/* Enable QUEUE_FLAG_NOMERGES flag, so that IOs won't be
+-		 ** merged and can eliminate holes created during merging
+-		 ** operation.
+-		 **/
+-		blk_queue_flag_set(QUEUE_FLAG_NOMERGES,
+-				sdev->request_queue);
+-		blk_queue_virt_boundary(sdev->request_queue,
+-				ioc->page_size - 1);
+ 		return 0;
+ 	}
  
- 	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
--	blk_queue_max_segment_size(q, PRDT_DATA_BYTE_COUNT_MAX);
--
- 	return 0;
- }
+@@ -10472,6 +10464,9 @@ _scsih_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	shost->transportt = mpt3sas_transport_template;
+ 	shost->unique_id = ioc->id;
  
-@@ -6990,6 +6988,7 @@ static struct scsi_host_template ufshcd_driver_template = {
- 	.sg_tablesize		= SG_ALL,
- 	.cmd_per_lun		= UFSHCD_CMD_PER_LUN,
- 	.can_queue		= UFSHCD_CAN_QUEUE,
-+	.max_segment_size	= PRDT_DATA_BYTE_COUNT_MAX,
- 	.max_host_blocked	= 1,
- 	.track_queue_depth	= 1,
- 	.sdev_groups		= ufshcd_driver_groups,
++	/* XXX: only strictly needed if NVMe devices are attached */
++	shost->virt_boundary_mask = ioc->page_size - 1;
++
+ 	if (ioc->is_mcpu_endpoint) {
+ 		/* mCPU MPI support 64K max IO */
+ 		shost->max_sectors = 128;
 -- 
 2.20.1
 
