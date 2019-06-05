@@ -4,38 +4,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF86C28CC5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC8DC28CC5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C86720717
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:08:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C75920717
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:09:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W0COMIoN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W7YRuVdb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726512AbfFETIy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 15:08:54 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:44440 "EHLO
+        id S1726792AbfFETJF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 15:09:05 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:45636 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726461AbfFETIy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:08:54 -0400
+        with ESMTP id S1726791AbfFETJF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:09:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=2ex9Z2d7jbc5bnEXbMR2ptptCi3L56lPOpUN37M2uJs=; b=W0COMIoNl6a4jD0EeZ9GxwcAzE
-        kGjAz0/uc4Yl0BkxnZ3awiHAA0zMlOywp/SgN4c05/W4ytpafDOMsF4VMqDBbgaJjrzMliLTiB0SH
-        rY1LipvtRvSYmQhq64DFd1mGIbBshLikmieNysNbAIanhWhF+gxblbkQ4M/C78dt9P6viv0SVtimo
-        o+N1OPF62BmZjkopD3TQjJQemjIZjoLNhksAHsedYsBKWsCuks/ywUtGB4EXax4+OVvzu38hDdAi9
-        xFsjdBhcI7I0eIeVJC9HrGH4KLi7FOShQIlqLHmbxeYldvNmN4TF5UZpI5EcdhXmoUv5DC/XMj5gf
-        TgL4v39Q==;
+        bh=mMOG10avCayPSFkRYQ6YVcJcMwUlFe5SMMCCEccPUfo=; b=W7YRuVdbazKsMEw8dyvRjXv4Ly
+        xl6+S4k0JUCRHVbPmWWd7w/RU0QH5qCUlMd9gNjIdFrFb4u9jRR5WZm9os9UMnoDsaOFX20pNfKDq
+        wKkB1lpAkuT6foBwoq0/yzk5fqv8oDMahY8GoIL8xJh2W6YD0dLeMN2PJMmk0n49w6RTd2QYtVKOZ
+        UkDCIOQjnk6wLJPpD5lULo4r/LCOoK3P6JnUx5axF7Srpj0cWaq8A9tVEMp70mfCF8NIC6HB3PV+L
+        ucuf4RN0DI9i+Opumq7WADBGGy8kEMLR8USCrTsZOKQZQqWSMkIrd1sA882xvpc+pGeeTBcBqT2Xi
+        7NqcKgPw==;
 Received: from 089144193064.atnat0002.highway.a1.net ([89.144.193.64] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hYbH8-0005D5-E5; Wed, 05 Jun 2019 19:08:42 +0000
+        id 1hYbHK-0005QW-0o; Wed, 05 Jun 2019 19:08:55 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Sebastian Ott <sebott@linux.ibm.com>,
@@ -50,9 +50,9 @@ Cc:     Sebastian Ott <sebott@linux.ibm.com>,
         megaraidlinux.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
         linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
         usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
-Subject: [PATCH 01/13] nvme-pci: don't limit DMA segement size
-Date:   Wed,  5 Jun 2019 21:08:24 +0200
-Message-Id: <20190605190836.32354-2-hch@lst.de>
+Subject: [PATCH 04/13] mmc: also set max_segment_size in the device
+Date:   Wed,  5 Jun 2019 21:08:27 +0200
+Message-Id: <20190605190836.32354-5-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190605190836.32354-1-hch@lst.de>
 References: <20190605190836.32354-1-hch@lst.de>
@@ -64,36 +64,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-NVMe uses PRPs (or optionally unlimited SGLs) for data transfers and
-has no specific limit for a single DMA segement.  Limiting the size
-will cause problems because the block layer assumes PRP-ish devices
-using a virt boundary mask don't have a segment limit.  And while this
-is true, we also really need to tell the DMA mapping layer about it,
-otherwise dma-debug will trip over it.
+If we only set the max_segment_size on the queue an IOMMU merge might
+create bigger segments again, so limit the IOMMU merges as well.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reported-by: Sebastian Ott <sebott@linux.ibm.com>
 ---
- drivers/nvme/host/pci.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/mmc/core/queue.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index f562154551ce..524d6bd6d095 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2513,6 +2513,12 @@ static void nvme_reset_work(struct work_struct *work)
- 	 */
- 	dev->ctrl.max_hw_sectors = NVME_MAX_KB_SZ << 1;
- 	dev->ctrl.max_segments = NVME_MAX_SEGS;
-+
-+	/*
-+	 * Don't limit the IOMMU merged segment size.
-+	 */
-+	dma_set_max_seg_size(dev->dev, 0xffffffff);
-+
- 	mutex_unlock(&dev->shutdown_lock);
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index b5b9c6142f08..92900a095796 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -377,6 +377,8 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
+ 	blk_queue_max_segment_size(mq->queue,
+ 			round_down(host->max_seg_size, block_size));
  
- 	/*
++	dma_set_max_seg_size(mmc_dev(host), queue_max_segment_size(mq->queue));
++
+ 	INIT_WORK(&mq->recovery_work, mmc_mq_recovery_handler);
+ 	INIT_WORK(&mq->complete_work, mmc_blk_mq_complete_work);
+ 
 -- 
 2.20.1
 
