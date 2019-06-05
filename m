@@ -2,45 +2,89 @@ Return-Path: <SRS0=Ij7C=UE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 675A1C282DE
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 10:09:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 864EAC28CC5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 12:21:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 48304206B8
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 10:09:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65821206BA
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 12:21:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727372AbfFEKJ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 06:09:56 -0400
-Received: from verein.lst.de ([213.95.11.211]:41928 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727348AbfFEKJ4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Jun 2019 06:09:56 -0400
-Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 69D4368B20; Wed,  5 Jun 2019 12:09:29 +0200 (CEST)
-Date:   Wed, 5 Jun 2019 12:09:28 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Sebastian Ott <sebott@linux.ibm.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: too large sg segments with commit 09324d32d2a08
-Message-ID: <20190605100928.GA9828@lst.de>
-References: <alpine.LFD.2.21.1906051057200.2118@schleppi>
+        id S1727676AbfFEMVv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 08:21:51 -0400
+Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:33101 "EHLO
+        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727273AbfFEMVv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Jun 2019 08:21:51 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01422;MF=alvin@linux.alibaba.com;NM=1;PH=DW;RN=7;SR=0;TI=W4_5548646_DEFAULT_0AB10131_1559737222163_o7001c128s;
+Received: from WS-web (Alvin@linux.alibaba.com[W4_5548646_DEFAULT_0AB10131_1559737222163_o7001c128s]) by e01e01419.eu6 at Wed, 05 Jun 2019 20:21:44 +0800
+Date:   Wed, 05 Jun 2019 20:21:44 +0800
+From:   "Alvin Zheng" <Alvin@linux.alibaba.com>
+To:     "darrick.wong" <darrick.wong@oracle.com>,
+        "axboe" <axboe@kernel.dk>, "gregkh" <gregkh@linuxfoundation.org>,
+        "linux-block" <linux-block@vger.kernel.org>,
+        "linux-xfs" <linux-xfs@vger.kernel.org>
+Cc:     "caspar" <caspar@linux.alibaba.com>,
+        "joseph.qi" <joseph.qi@linux.alibaba.com>
+Reply-To: "Alvin Zheng" <Alvin@linux.alibaba.com>
+Message-ID: <f9a7b0c4-178a-4a7c-8ac6-aec79b06b810.Alvin@linux.alibaba.com>
+Subject: =?UTF-8?B?W2J1ZyByZXBvcnRdW3N0YWJsZV0geGZzdGVzdHM6Z2VuZXJpYy81MzggZmFpbGVkIG9uIHhm?=
+  =?UTF-8?B?cw==?=
+X-Mailer: [Alimail-Mailagent][W4_5548646][DEFAULT][Chrome]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LFD.2.21.1906051057200.2118@schleppi>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+x-aliyun-mail-creator: W4_5548646_DEFAULT_M2ITW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzc0LjAuMzcyOS4xNjkgU2FmYXJpLzUzNy4zNg==3L
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The problem is that we don't communicate the block level max_segment
-size to the iommu, and the commit really is just the messenger.
-
-I'll cook up a series to fix this as papering over it in every driver
-does not seem sustainable.
+SGksCiAgSSB3YXMgdXNpbmcga2VybmVsIHY0LjE5LjQ4IGFuZCBmb3VuZCB0aGF0IGl0IGNhbm5v
+dCBwYXNzIHRoZSBnZW5lcmljLzUzOCBvbiB4ZnMuIFRoZSBlcnJvciBvdXRwdXQgaXMgYXMgZm9s
+bG93czoKCiAgRlNUWVAgICAgICAgICAtLSB4ZnMgKG5vbi1kZWJ1ZykKICBQTEFURk9STSAgICAg
+IC0tIExpbnV4L3g4Nl82NCBhbGludXgyLTYgNC4xOS40OAogIE1LRlNfT1BUSU9OUyAgLS0gLWYg
+LWJzaXplPTQwOTYgL2Rldi92ZGMKICBNT1VOVF9PUFRJT05TIC0tIC9kZXYvdmRjIC9tbnQvdGVz
+dGFyZWEvc2NyYQogIGdlbmVyaWMvNTM4IDBzIC4uLiAtIG91dHB1dCBtaXNtYXRjaCAoc2VlIC9y
+b290L3Vzci9sb2NhbC9zcmMveGZzdGVzdHMvcmVzdWx0cy8vZ2VuZXJpYy81Mzgub3V0LmJhZCkK
+ICAgICAgLS0tIHRlc3RzL2dlbmVyaWMvNTM4Lm91dCAgIDIwMTktMDUtMjcgMTM6NTc6MDYuNTA1
+NjY2NDY1ICswODAwCiAgICAgICsrKyAvcm9vdC91c3IvbG9jYWwvc3JjL3hmc3Rlc3RzL3Jlc3Vs
+dHMvL2dlbmVyaWMvNTM4Lm91dC5iYWQgICAgICAgMjAxOS0wNi0wNSAxNjo0MzoxNC43MDIwMDIz
+MjYgKzA4MDAKICAgICAgQEAgLTEsMiArMSwxMCBAQAogICAgICAgUUEgb3V0cHV0IGNyZWF0ZWQg
+YnkgNTM4CiAgICAgICtEYXRhIHZlcmlmaWNhdGlvbiBmYWlscwogICAgICArRmluZCBjb3JydXB0
+aW9uCiAgICAgICswMDAwMDAwMCAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAg
+MDAgMDAgMDAgMDAgIC4uLi4uLi4uLi4uLi4uLi4KICAgICAgKyoKICAgICAgKzAwMDAwMjAwICA1
+YSA1YSA1YSA1YSA1YSA1YSA1YSA1YSA1YSA1YSA1YSA1YSA1YSA1YSA1YSA1YSAgWlpaWlpaWlpa
+WlpaWlpaWgogICAgICArMDAwMDIwMDAKICAgICAgLi4uCiAgICAgIChSdW4gJ2RpZmYgLXUgL3Jv
+b3QvdXNyL2xvY2FsL3NyYy94ZnN0ZXN0cy90ZXN0cy9nZW5lcmljLzUzOC5vdXQgL3Jvb3QvdXNy
+L2xvY2FsL3NyYy94ZnN0ZXN0cy9yZXN1bHRzLy9nZW5lcmljLzUzOC5vdXQuYmFkJyAgdG8gc2Vl
+IHRoZSBlbnRpcmUgZGlmZikKICBSYW46IGdlbmVyaWMvNTM4CiAgRmFpbHVyZXM6IGdlbmVyaWMv
+NTM4CiAgRmFpbGVkIDEgb2YgMSB0ZXN0cwogIApJIGFsc28gZm91bmQgdGhhdCB0aGUgbGF0ZXN0
+IGtlcm5lbCAodjUuMi4wLXJjMikgb2YgdXBzdHJlYW0gY2FuIHBhc3MgdGhlIGdlbmVyaWMvNTM4
+IHRlc3QuIFRoZXJlZm9yZSwgSSBiaXNlY3RlZCBhbmQgZm91bmQgdGhlIGZpcnN0IGdvb2QgY29t
+bWl0IGlzIDMxMTBmYzc5NjA2LiBUaGlzIGNvbW1pdCBhZGRzIHRoZSBoYXJkd2FyZSBxdWV1ZSBp
+bnRvIHRoZSBzb3J0IGZ1bmN0aW9uLiBCZXNpZGVzLCB0aGUgc29ydCBmdW5jdGlvbiByZXR1cm5z
+IGEgbmVnYXRpdmUgdmFsdWUgd2hlbiB0aGUgb2Zmc2V0IGFuZCBxdWV1ZSAoc29mdHdhcmUgYW5k
+IGhhcmR3YXJlKSBvZiB0d28gSS9PIHJlcXVlc3RzIGFyZSBzYW1lLiBJIHRoaW5rIHRoZSBzZWNv
+bmQgcGFydCBvZiB0aGUgY2hhbmdlIG1ha2Ugc2Vuc2VzLiBUaGUga2VybmVsIHNob3VsZCBub3Qg
+Y2hhbmdlIHRoZSByZWxhdGl2ZSBwb3NpdGlvbiBvZiB0d28gSS9PIHJlcXVlc3RzIHdoZW4gdGhl
+aXIgb2Zmc2V0IGFuZCBxdWV1ZSBhcmUgc2FtZS4gU28gSSBtYWRlIHRoZSBmb2xsb3dpbmcgY2hh
+bmdlcyBhbmQgbWVyZ2VkIGl0IGludG8gdGhlIGtlcm5lbCA0LjE5LjQ4LiBBZnRlciB0aGUgbW9k
+aWZpY2F0aW9uLCB3ZSBjYW4gcGFzcyB0aGUgZ2VuZXJpYy81MzggdGVzdCBvbiB4ZnMuIFRoZSBz
+YW1lIGNhc2UgY2FuIGJlIHBhc3NlZCBvbiBleHQ0LCBzaW5jZSBleHQ0IGhhcyBjb3JyZXNwb25k
+aW5nIGZpeCAwZGIyNDEyMmJkN2YgKCJleHQ0OiBmaXggZGF0YSBjb3JydXB0aW9uIGNhdXNlZCBi
+eSBvdmVybGFwcGluZyB1bmFsaWduZWQgYW5kIGFsaWduZWQgSU8iKS4gVGhvdWdoIEkgdGhpbmsg
+eGZzIHNob3VsZCBiZSByZXNwb25zaWJsZSBmb3IgdGhpcyBpc3N1ZSwgdGhlIGJsb2NrIGxheWVy
+IGNvZGUgYmVsb3cgaXMgYWxzbyBwcm9ibGVtYXRpYy4gQW55IGlkZWFzPwoKZGlmZiAtLWdpdCBh
+L2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMKaW5kZXggNGU1NjNlZS4uYTczMDljZCAx
+MDA2NDQKLS0tIGEvYmxvY2svYmxrLW1xLmMKKysrIGIvYmxvY2svYmxrLW1xLmMKQEAgLTE2MTAs
+NyArMTYxMCw3IEBAIHN0YXRpYyBpbnQgcGx1Z19jdHhfY21wKHZvaWQgKnByaXYsIHN0cnVjdCBs
+aXN0X2hlYWQgKmEsIHN0cnVjdCBsaXN0X2hlYWQgKmIpCgogICAgICAgIHJldHVybiAhKHJxYS0+
+bXFfY3R4IDwgcnFiLT5tcV9jdHggfHwKICAgICAgICAgICAgICAgICAocnFhLT5tcV9jdHggPT0g
+cnFiLT5tcV9jdHggJiYKLSAgICAgICAgICAgICAgICAgYmxrX3JxX3BvcyhycWEpIDwgYmxrX3Jx
+X3BvcyhycWIpKSk7CisgICAgICAgICAgICAgICAgIGJsa19ycV9wb3MocnFhKSA8PSBibGtfcnFf
+cG9zKHJxYikpKTsKIH0KCiB2b2lkIGJsa19tcV9mbHVzaF9wbHVnX2xpc3Qoc3RydWN0IGJsa19w
+bHVnICpwbHVnLCBib29sIGZyb21fc2NoZWR1bGUpCgpCZXN0IHJlZ2FyZHMsCkFsdmlu
