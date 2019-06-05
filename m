@@ -2,107 +2,118 @@ Return-Path: <SRS0=Ij7C=UE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DC4EC28CC5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 13:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B603C28CC5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 13:58:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5CA8A20693
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 13:57:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C3CF2086A
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 13:58:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728052AbfFEN5t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 09:57:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58340 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727904AbfFEN5t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Jun 2019 09:57:49 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x55DlXIT134053
-        for <linux-block@vger.kernel.org>; Wed, 5 Jun 2019 09:57:48 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2sxemyh8b1-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 05 Jun 2019 09:57:47 -0400
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <sebott@linux.ibm.com>;
-        Wed, 5 Jun 2019 14:57:46 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 5 Jun 2019 14:57:43 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x55DvgnK60358766
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 5 Jun 2019 13:57:42 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 39AADA405B;
-        Wed,  5 Jun 2019 13:57:42 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EEA1FA4054;
-        Wed,  5 Jun 2019 13:57:41 +0000 (GMT)
-Received: from dyn-9-152-212-90.boeblingen.de.ibm.com (unknown [9.152.212.90])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed,  5 Jun 2019 13:57:41 +0000 (GMT)
-Date:   Wed, 5 Jun 2019 15:57:41 +0200 (CEST)
-From:   Sebastian Ott <sebott@linux.ibm.com>
-X-X-Sender: sebott@schleppi
-To:     Christoph Hellwig <hch@lst.de>
-cc:     Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: too large sg segments with commit 09324d32d2a08
-In-Reply-To: <20190605133002.GA13368@lst.de>
-References: <alpine.LFD.2.21.1906051057200.2118@schleppi> <20190605100928.GA9828@lst.de> <20190605133002.GA13368@lst.de>
-User-Agent: Alpine 2.21 (LFD 202 2017-01-01)
-Organization: =?ISO-8859-15?Q?=22IBM_Deutschland_Research_&_Development_GmbH?=
- =?ISO-8859-15?Q?_=2F_Vorsitzende_des_Aufsichtsrats=3A_Matthias?=
- =?ISO-8859-15?Q?_Hartmann_Gesch=E4ftsf=FChrung=3A_Dirk_Wittkopp?=
- =?ISO-8859-15?Q?_Sitz_der_Gesellschaft=3A_B=F6blingen_=2F_Reg?=
- =?ISO-8859-15?Q?istergericht=3A_Amtsgericht_Stuttgart=2C_HRB_2432?=
- =?ISO-8859-15?Q?94=22?=
+        id S1728033AbfFEN6O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 09:58:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36258 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727992AbfFEN6O (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Jun 2019 09:58:14 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 86654C05168F;
+        Wed,  5 Jun 2019 13:58:06 +0000 (UTC)
+Received: from bfoster (dhcp-41-2.bos.redhat.com [10.18.41.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 320F25D9CD;
+        Wed,  5 Jun 2019 13:58:01 +0000 (UTC)
+Date:   Wed, 5 Jun 2019 09:57:59 -0400
+From:   Brian Foster <bfoster@redhat.com>
+To:     gregkh <gregkh@linuxfoundation.org>
+Cc:     Alvin Zheng <Alvin@linux.alibaba.com>,
+        "darrick.wong" <darrick.wong@oracle.com>, axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        caspar <caspar@linux.alibaba.com>,
+        "joseph.qi" <joseph.qi@linux.alibaba.com>
+Subject: Re: [bug report][stable] xfstests:generic/538 failed on xfs
+Message-ID: <20190605135756.GA15671@bfoster>
+References: <f9a7b0c4-178a-4a7c-8ac6-aec79b06b810.Alvin@linux.alibaba.com>
+ <20190605124227.GC17558@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-TM-AS-GCONF: 00
-x-cbid: 19060513-0028-0000-0000-000003765F67
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19060513-0029-0000-0000-000024363B7C
-Message-Id: <alpine.LFD.2.21.1906051557060.2118@schleppi>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-05_08:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=873 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906050088
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190605124227.GC17558@kroah.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Wed, 05 Jun 2019 13:58:13 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 5 Jun 2019, Christoph Hellwig wrote:
-> Actually, it looks like something completely general isn't
-> easily doable, not without some major dma API work.  Here is what
-> should fix nvme, but a few other drivers will need fixes as well:
+On Wed, Jun 05, 2019 at 02:42:27PM +0200, gregkh wrote:
+> On Wed, Jun 05, 2019 at 08:21:44PM +0800, Alvin Zheng wrote:
+> > Hi,
+> >   I was using kernel v4.19.48 and found that it cannot pass the generic/538 on xfs. The error output is as follows:
 > 
-> ---
-> From 745541130409bc837a3416300f529b16eded8513 Mon Sep 17 00:00:00 2001
-> From: Christoph Hellwig <hch@lst.de>
-> Date: Wed, 5 Jun 2019 14:55:26 +0200
-> Subject: nvme-pci: don't limit DMA segement size
+> Has 4.19 ever been able to pass that test?  If not, I wouldn't worry
+> about it :)
 > 
-> NVMe uses PRPs (or optionally unlimited SGLs) for data transfers and
-> has no specific limit for a single DMA segement.  Limiting the size
-> will cause problems because the block layer assumes PRP-ish devices
-> using a virt boundary mask don't have a segment limit.  And while this
-> is true, we also really need to tell the DMA mapping layer about it,
-> otherwise dma-debug will trip over it.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reported-by: Sebastian Ott <sebott@linux.ibm.com>
 
-Works for me. Thanks!
+FWIW, the fstests commit references the following kernel patches for
+fixes in XFS and ext4:
 
+  xfs: serialize unaligned dio writes against all other dio writes
+  ext4: fix data corruption caused by unaligned direct AIO
+
+It looks like both of those patches landed in 5.1.
+
+Brian
+
+> > 
+> >   FSTYP         -- xfs (non-debug)
+> >   PLATFORM      -- Linux/x86_64 alinux2-6 4.19.48
+> >   MKFS_OPTIONS  -- -f -bsize=4096 /dev/vdc
+> >   MOUNT_OPTIONS -- /dev/vdc /mnt/testarea/scra
+> >   generic/538 0s ... - output mismatch (see /root/usr/local/src/xfstests/results//generic/538.out.bad)
+> >       --- tests/generic/538.out   2019-05-27 13:57:06.505666465 +0800
+> >       +++ /root/usr/local/src/xfstests/results//generic/538.out.bad       2019-06-05 16:43:14.702002326 +0800
+> >       @@ -1,2 +1,10 @@
+> >        QA output created by 538
+> >       +Data verification fails
+> >       +Find corruption
+> >       +00000000  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+> >       +*
+> >       +00000200  5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a 5a  ZZZZZZZZZZZZZZZZ
+> >       +00002000
+> >       ...
+> >       (Run 'diff -u /root/usr/local/src/xfstests/tests/generic/538.out /root/usr/local/src/xfstests/results//generic/538.out.bad'  to see the entire diff)
+> >   Ran: generic/538
+> >   Failures: generic/538
+> >   Failed 1 of 1 tests
+> >   
+> > I also found that the latest kernel (v5.2.0-rc2) of upstream can pass the generic/538 test. Therefore, I bisected and found the first good commit is 3110fc79606. This commit adds the hardware queue into the sort function. Besides, the sort function returns a negative value when the offset and queue (software and hardware) of two I/O requests are same. I think the second part of the change make senses. The kernel should not change the relative position of two I/O requests when their offset and queue are same. So I made the following changes and merged it into the kernel 4.19.48. After the modification, we can pass the generic/538 test on xfs. The same case can be passed on ext4, since ext4 has corresponding fix 0db24122bd7f ("ext4: fix data corruption caused by overlapping unaligned and aligned IO"). Though I think xfs should be responsible for this issue, the block layer code below is also problematic. Any ideas?
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 4e563ee..a7309cd 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -1610,7 +1610,7 @@ static int plug_ctx_cmp(void *priv, struct list_head *a, struct list_head *b)
+> > 
+> >         return !(rqa->mq_ctx < rqb->mq_ctx ||
+> >                  (rqa->mq_ctx == rqb->mq_ctx &&
+> > -                 blk_rq_pos(rqa) < blk_rq_pos(rqb)));
+> > +                 blk_rq_pos(rqa) <= blk_rq_pos(rqb)));
+> >  }
+> > 
+> >  void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+> 
+> I would not like to take a patch that is not upstream, but rather take
+> the original commit.
+> 
+> Can 3110fc79606f ("blk-mq: improve plug list sorting") on its own
+> resolve this issue for 4.19.y?
+> 
+> thanks,
+> 
+> greg k-h
