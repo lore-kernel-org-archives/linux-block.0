@@ -2,111 +2,120 @@ Return-Path: <SRS0=Ij7C=UE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96DE5C282DE
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 07:27:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B0E6C282DE
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 08:41:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7AC6B20866
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 07:27:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F3BF20866
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 08:41:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726595AbfFEH1u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 03:27:50 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41208 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726477AbfFEH1t (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Jun 2019 03:27:49 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id BB593AE9F;
-        Wed,  5 Jun 2019 07:27:48 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 6/6] bcache: add reclaimed_journal_buckets to struct cache_set
-Date:   Wed,  5 Jun 2019 15:27:18 +0800
-Message-Id: <20190605072718.121379-7-colyli@suse.de>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20190605072718.121379-1-colyli@suse.de>
-References: <20190605072718.121379-1-colyli@suse.de>
+        id S1726776AbfFEIlo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 04:41:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33614 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726636AbfFEIlo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Jun 2019 04:41:44 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0AB11B9AD5;
+        Wed,  5 Jun 2019 08:41:39 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BEF6160576;
+        Wed,  5 Jun 2019 08:41:35 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <50c2ea19-6ae8-1f42-97ef-ba5c95e40475@schaufler-ca.com>
+References: <50c2ea19-6ae8-1f42-97ef-ba5c95e40475@schaufler-ca.com> <155966609977.17449.5624614375035334363.stgit@warthog.procyon.org.uk> <CALCETrWzDR=Ap8NQ5-YrVhXCEBgr+hwpjw9fBn0m2NkZzZ7XLQ@mail.gmail.com>
+To:     Casey Schaufler <casey@schaufler-ca.com>
+Cc:     dhowells@redhat.com, Andy Lutomirski <luto@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>, raven@themaw.net,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        LSM List <linux-security-module@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC][PATCH 0/8] Mount, FS, Block and Keyrings notifications [ver #2]
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <20191.1559724094.1@warthog.procyon.org.uk>
+Date:   Wed, 05 Jun 2019 09:41:34 +0100
+Message-ID: <20192.1559724094@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Wed, 05 Jun 2019 08:41:44 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now we have counters for how many times jouranl is reclaimed, how many
-times cached dirty btree nodes are flushed, but we don't know how many
-jouranl buckets are really reclaimed.
+Casey Schaufler <casey@schaufler-ca.com> wrote:
 
-This patch adds reclaimed_journal_buckets into struct cache_set, this
-is an increasing only counter, to tell how many journal buckets are
-reclaimed since cache set runs. From all these three counters (reclaim,
-reclaimed_journal_buckets, flush_write), we can have idea how well
-current journal space reclaim code works.
+> I will try to explain the problem once again. If process A
+> sends a signal (writes information) to process B the kernel
+> checks that either process A has the same UID as process B
+> or that process A has privilege to override that policy.
+> Process B is passive in this access control decision, while
+> process A is active. In the event delivery case, process A
+> does something (e.g. modifies a keyring) that generates an
+> event, which is then sent to process B's event buffer.
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/bcache.h  | 1 +
- drivers/md/bcache/journal.c | 1 +
- drivers/md/bcache/sysfs.c   | 5 +++++
- 3 files changed, 7 insertions(+)
+I think this might be the core sticking point here.  It looks like two
+different situations:
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 35396248a7d5..013e35a9e317 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -705,6 +705,7 @@ struct cache_set {
- 	atomic_long_t		writeback_keys_failed;
- 
- 	atomic_long_t		reclaim;
-+	atomic_long_t		reclaimed_journal_buckets;
- 	atomic_long_t		flush_write;
- 
- 	enum			{
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index 4a7cc1bf8e3a..39580692339c 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -614,6 +614,7 @@ static void journal_reclaim(struct cache_set *c)
- 		k->ptr[n++] = MAKE_PTR(0,
- 				  bucket_to_sector(c, ca->sb.d[ja->cur_idx]),
- 				  ca->sb.nr_this_dev);
-+		atomic_long_inc(&c->reclaimed_journal_buckets);
- 	}
- 
- 	if (n) {
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 80ead1a205b9..2ec1f2a90f4a 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -80,6 +80,7 @@ read_attribute(bset_tree_stats);
- read_attribute(state);
- read_attribute(cache_read_races);
- read_attribute(reclaim);
-+read_attribute(reclaimed_journal_buckets);
- read_attribute(flush_write);
- read_attribute(writeback_keys_done);
- read_attribute(writeback_keys_failed);
-@@ -691,6 +692,9 @@ SHOW(__bch_cache_set)
- 	sysfs_print(reclaim,
- 		    atomic_long_read(&c->reclaim));
- 
-+	sysfs_print(reclaimed_journal_buckets,
-+		    atomic_long_read(&c->reclaimed_journal_buckets));
-+
- 	sysfs_print(flush_write,
- 		    atomic_long_read(&c->flush_write));
- 
-@@ -909,6 +913,7 @@ static struct attribute *bch_cache_set_internal_files[] = {
- 	&sysfs_bset_tree_stats,
- 	&sysfs_cache_read_races,
- 	&sysfs_reclaim,
-+	&sysfs_reclaimed_journal_buckets,
- 	&sysfs_flush_write,
- 	&sysfs_writeback_keys_done,
- 	&sysfs_writeback_keys_failed,
--- 
-2.16.4
+ (1) A explicitly sends event to B (eg. signalling, sendmsg, etc.)
 
+ (2) A implicitly and unknowingly sends event to B as a side effect of some
+     other action (eg. B has a watch for the event A did).
+
+The LSM treats them as the same: that is B must have MAC authorisation to send
+a message to A.
+
+But there are problems with not sending the event:
+
+ (1) B's internal state is then corrupt (or, at least, unknowingly invalid).
+
+ (2) B can potentially figure out that the event happened by other means.
+
+
+I've implemented four event sources so far:
+
+ (1) Keys/keyrings.  You can only get events on a key you have View permission
+     on and the other process has to have write access to it, so I think this
+     is good enough.
+
+ (2) Block layer.  Currently this will only get you hardware error events,
+     which is probably safe.  I'm not sure you can manipulate those without
+     permission to directly access the device files.
+
+ (3) Superblock.  This is trickier since it can see events that can be
+     manufactured (R/W <-> R/O remounting, EDQUOT) as well as events that
+     can't without hardware control (EIO, network link loss, RF kill).
+
+ (4) Mount topology.  This is the trickiest since it allows you to see events
+     beyond the point at which you placed your watch (in essence, you place a
+     subtree watch).
+
+     The question is what permission checking should I do?  Ideally, I'd
+     emulate a pathwalk between the watchpoint and the eventing object to see
+     if the owner of the watchpoint could reach it.
+
+     I'd need to do a reverse walk, calling inode_permission(MAY_NOT_BLOCK)
+     for each directory between the eventing object and the watchpoint to see
+     if one rejects it - but some filesystems have a permission check that
+     can't be called in this state.
+
+     It would also be necessary to do this separately for each watchpoint in
+     the parental chain.
+
+     Further, each permissions check would generate an audit event and could
+     generate FAN_ACCESS and/or FAN_ACCESS_PERM fanotify events - which could
+     be a problem if fanotify is also trying to post those events to the same
+     watch queue.
+
+David
