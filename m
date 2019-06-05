@@ -1,273 +1,338 @@
-Return-Path: <SRS0=GlWt=UD=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Ij7C=UE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDFAEC282CE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 22:14:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16470C282CE
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 01:27:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE7B4206B8
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jun 2019 22:14:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZYFpoitP";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="C83bBD6m"
+	by mail.kernel.org (Postfix) with ESMTP id D4DB8206DF
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 01:27:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726305AbfFDWOC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jun 2019 18:14:02 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:31306 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726269AbfFDWOC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jun 2019 18:14:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1559686441; x=1591222441;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=qWjUUAVaUsRUHJSNMBVzVtWaXO62pls4kMkZlVYHijI=;
-  b=ZYFpoitPUCxXLt/GU0J2ETggV3ShQR6hQMaY3oJePU8Jmxn7eYc7KqzL
-   QxJy9XU0pw/FWc0z7fcseOIyGYov4xdPAMt0NRtq4jfhMJgayxuwgblkM
-   /5HfNJM3xRn39i78VztjhAuIfJUqDx4igIlp629DA5kKNs+vCwWmf2tiY
-   4PLnIvScfctd3vshdoPg+PAk0JKAd19UDKRU4pxB/EhaM/9418CoEQKFf
-   IoalKQQsKsfuFov4ko4eg4EEb0jXXj2VJaLz+XvwN5iNnkaNwthxvQjHt
-   3+z0dFWeWzkO60I1Um4ZSBQ396OJMIKQisEnCP2nDoHcvzX20S2RdlTco
-   g==;
-X-IronPort-AV: E=Sophos;i="5.60,550,1549900800"; 
-   d="scan'208";a="111079032"
-Received: from mail-bn3nam01lp2058.outbound.protection.outlook.com (HELO NAM01-BN3-obe.outbound.protection.outlook.com) ([104.47.33.58])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2019 06:14:01 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O5edGAi/lfau/Ey9erjV8MGjxQ4QjTHKlGctF6x53do=;
- b=C83bBD6mkTCkg9Av7uZFMBxrHA/d3dDm3PHElXUNoLznxnWPhxoZDJEWUX2GQL7mFIWqT2vf5AhhlI72RKJxaFcYQoDbhctu8f/dhmfmxNkgWVNpCfIMqFvUzLUBJCxsfzYi7t80hy4C+G6Rlt1OWsqW7Gz0cMoI5htvr2Yg7Us=
-Received: from DM6PR04MB5754.namprd04.prod.outlook.com (20.179.52.22) by
- DM6PR04MB5258.namprd04.prod.outlook.com (20.178.25.91) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1943.22; Tue, 4 Jun 2019 22:13:57 +0000
-Received: from DM6PR04MB5754.namprd04.prod.outlook.com
- ([fe80::749c:e0fc:238:5c6d]) by DM6PR04MB5754.namprd04.prod.outlook.com
- ([fe80::749c:e0fc:238:5c6d%4]) with mapi id 15.20.1943.018; Tue, 4 Jun 2019
- 22:13:57 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Omar Sandoval <osandov@fb.com>
-CC:     Masato Suzuki <masato.suzuki@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Omar Sandoval <osandov@osandov.com>
-Subject: Re: [PATCH blktests v2 2/2] zbd/007: Add zone mapping test for
- logical devices
-Thread-Topic: [PATCH blktests v2 2/2] zbd/007: Add zone mapping test for
- logical devices
-Thread-Index: AQHVF1R2/ItucHf4ik2yybemy7xgNA==
-Date:   Tue, 4 Jun 2019 22:13:57 +0000
-Message-ID: <DM6PR04MB57543AF8E11E706E0A457D1386150@DM6PR04MB5754.namprd04.prod.outlook.com>
-References: <20190531015913.5560-1-shinichiro.kawasaki@wdc.com>
- <20190531015913.5560-3-shinichiro.kawasaki@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [2605:e000:3e45:f500:f446:fe8c:7ab2:8d71]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: cefd02c0-3063-40f5-664f-08d6e939f07b
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM6PR04MB5258;
-x-ms-traffictypediagnostic: DM6PR04MB5258:
-wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <DM6PR04MB5258B8B2B655C8346CF9CD6186150@DM6PR04MB5258.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3631;
-x-forefront-prvs: 0058ABBBC7
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(376002)(136003)(39860400002)(396003)(366004)(189003)(199004)(66556008)(102836004)(25786009)(33656002)(81156014)(6436002)(52536014)(6506007)(8676002)(53546011)(66446008)(76116006)(55016002)(53936002)(186003)(8936002)(5660300002)(229853002)(9686003)(68736007)(64756008)(6246003)(66476007)(14444005)(71200400001)(71190400001)(2501003)(4326008)(316002)(91956017)(6116002)(66946007)(73956011)(256004)(2906002)(446003)(81166006)(99286004)(7696005)(76176011)(46003)(476003)(305945005)(486006)(74316002)(86362001)(14454004)(7736002)(72206003)(110136005)(54906003)(478600001);DIR:OUT;SFP:1102;SCL:1;SRVR:DM6PR04MB5258;H:DM6PR04MB5754.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Nqpxg3yuO9L0fkYFzVG2vkI35sq0WFTfTYQ0OWD4MFOR/5gKp3KnUmCS6CQRUmttMVroGUXilaFj1n7/s0/cJ3IdMO2QrcyQIKGCwHsutd2F9AC4ZJdzymE1CvIq1HUzp2HC8VAavIGwqQwmPwm6Qij/gtDJg6UQsjlJ18YCUA26XrTIlW+GviwwVf1HabJn+JhWizhSK1OeDeqv8iaBzki5azDUVN034SVrCoMEyxXB8lhuZkMeQtKR4aBHwF5PQBymulFvRVo12+4QOScLAQCy1KBRQ9ufhVAFZ8+xcyDb88+PK/xSchgUlQdjFF8YzxlMezaqyhn2C+PC0qSFioWCdJXvj4S5labEqNwFVzpB4CZ/IYsmbyrOB92z2AFcInSIZxEAQaUSDSCKdfEY7YrF6l3Bd7lo5W1yNypMj7g=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726537AbfFEB1r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jun 2019 21:27:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44826 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726179AbfFEB1r (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Jun 2019 21:27:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 46047307CDF0;
+        Wed,  5 Jun 2019 01:27:46 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-90.pek2.redhat.com [10.72.12.90])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 977085C207;
+        Wed,  5 Jun 2019 01:27:34 +0000 (UTC)
+Subject: Re: [PATCH] block: free sched's request pool in blk_cleanup_queue
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        kernel test robot <rong.a.chen@intel.com>
+References: <20190604130802.17076-1-ming.lei@redhat.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Message-ID: <ffae2084-3a2a-5e46-5809-ff9d8bc3741e@redhat.com>
+Date:   Wed, 5 Jun 2019 09:27:27 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cefd02c0-3063-40f5-664f-08d6e939f07b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2019 22:13:57.4311
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB5258
+In-Reply-To: <20190604130802.17076-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Wed, 05 Jun 2019 01:27:46 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good to me.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-On 5/30/19 6:59 PM, Shin'ichiro Kawasaki wrote:=0A=
-> Add the test case to check zones sector mapping of logical devices. This=
-=0A=
-> test case requires that such a logical device be specified in TEST_DEVS=
-=0A=
-> in config. The test is skipped for devices that are identified as not=0A=
-> logically created.=0A=
->=0A=
-> To test that the zone mapping is correct, select a few sequential write=
-=0A=
-> required zones of the logical device and move the write pointers of=0A=
-> these zones through the container device of the logical device, using=0A=
-> the physical sector mapping of the zones. The write pointers position of=
-=0A=
-> the selected zones is then checked through a zone report of the logical=
-=0A=
-> device using the logical sector mapping of the zones. The test reports a=
-=0A=
-> success if the position of the zone write pointers relative to the zone=
-=0A=
-> start sector must be identical for both the logical and physical=0A=
-> locations of the zones.=0A=
->=0A=
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>=0A=
-> ---=0A=
->  tests/zbd/007     | 110 ++++++++++++++++++++++++++++++++++++++++++++++=
-=0A=
->  tests/zbd/007.out |   2 +=0A=
->  2 files changed, 112 insertions(+)=0A=
->  create mode 100755 tests/zbd/007=0A=
->  create mode 100644 tests/zbd/007.out=0A=
->=0A=
-> diff --git a/tests/zbd/007 b/tests/zbd/007=0A=
-> new file mode 100755=0A=
-> index 0000000..b4dcbd8=0A=
-> --- /dev/null=0A=
-> +++ b/tests/zbd/007=0A=
-> @@ -0,0 +1,110 @@=0A=
-> +#!/bin/bash=0A=
-> +# SPDX-License-Identifier: GPL-3.0+=0A=
-> +# Copyright (C) 2019 Western Digital Corporation or its affiliates.=0A=
-> +#=0A=
-> +# Test zones are mapped correctly between a logical device and its conta=
-iner=0A=
-> +# device. Move write pointers of sequential write required zones on the=
-=0A=
-> +# container devices, and confirm same write pointer positions of zones o=
-n the=0A=
-> +# logical devices.=0A=
-> +=0A=
-> +. tests/zbd/rc=0A=
-> +=0A=
-> +DESCRIPTION=3D"zone mapping between logical and container devices"=0A=
-> +CAN_BE_ZONED=3D1=0A=
-> +QUICK=3D1=0A=
-> +=0A=
-> +requires() {=0A=
-> +	_have_program dmsetup=0A=
-> +}=0A=
-> +=0A=
-> +device_requires() {=0A=
-> +	_test_dev_is_logical=0A=
-> +}=0A=
-> +=0A=
-> +# Select test target zones. Pick up the first sequential required zones.=
- If=0A=
-> +# available, add one or two more sequential required zones. One is at th=
-e last=0A=
-> +# end of TEST_DEV. The other is in middle between the first and the last=
- zones.=0A=
-> +select_zones() {=0A=
-> +	local -i zone_idx=0A=
-> +	local -a zones=0A=
-> +=0A=
-> +	zone_idx=3D$(_find_first_sequential_zone) || return $?=0A=
-> +	zones=3D( "${zone_idx}" )=0A=
-> +	if zone_idx=3D$(_find_last_sequential_zone); then=0A=
-> +		zones+=3D( "${zone_idx}" )=0A=
-> +		if zone_idx=3D$(_find_sequential_zone_in_middle \=0A=
-> +				      "${zones[0]}" "${zones[1]}"); then=0A=
-> +			zones+=3D( "${zone_idx}" )=0A=
-> +		fi=0A=
-> +	fi=0A=
-> +	echo "${zones[@]}"=0A=
-> +}=0A=
-> +=0A=
-> +test_device() {=0A=
-> +	local -i bs=0A=
-> +	local -a test_z # test target zones=0A=
-> +	local -a test_z_start=0A=
-> +=0A=
-> +	echo "Running ${TEST_NAME}"=0A=
-> +=0A=
-> +	# Get physical block size to meet zoned block device I/O requirement=0A=
-> +	_get_sysfs_variable "${TEST_DEV}" || return $?=0A=
-> +	bs=3D${SYSFS_VARS[SV_PHYS_BLK_SIZE]}=0A=
-> +	_put_sysfs_variable=0A=
-> +=0A=
-> +	# Get test target zones=0A=
-> +	_get_blkzone_report "${TEST_DEV}" || return $?=0A=
-> +	read -r -a test_z < <(select_zones)=0A=
-> +	for ((i =3D 0; i < ${#test_z[@]}; i++)); do=0A=
-> +		test_z_start+=3D("${ZONE_STARTS[test_z[i]]}")=0A=
-> +	done=0A=
-> +	echo "${test_z[*]}" >> "$FULL"=0A=
-> +	echo "${test_z_start[*]}" >> "$FULL"=0A=
-> +	_put_blkzone_report=0A=
-> +	if ((!${#test_z[@]})); then=0A=
-> +		echo "Test target zones not available on ${TEST_DEV}"=0A=
-> +		return 1=0A=
-> +	fi=0A=
-> +=0A=
-> +	# Reset and move write pointers of the container device=0A=
-> +	for ((i=3D0; i < ${#test_z[@]}; i++)); do=0A=
-> +		local -a arr=0A=
-> +=0A=
-> +		read -r -a arr < <(_get_dev_container_and_sector \=0A=
-> +					   "${test_z_start[i]}")=0A=
-> +		container_dev=3D"${arr[0]}"=0A=
-> +		container_start=3D"${arr[1]}"=0A=
-> +=0A=
-> +		echo "${container_dev}" "${container_start}" >> "$FULL"=0A=
-> +=0A=
-> +		if ! blkzone reset -o "${container_start}" -c 1 \=0A=
-> +		     "${container_dev}"; then=0A=
-> +			echo "Reset zone failed"=0A=
-> +			return 1=0A=
-> +		fi=0A=
-> +=0A=
-> +		if ! dd if=3D/dev/zero of=3D"${container_dev}" bs=3D"${bs}" \=0A=
-> +		     count=3D$((4096 * (i + 1) / bs)) oflag=3Ddirect \=0A=
-> +		     seek=3D$((container_start * 512 / bs)) \=0A=
-> +		     >> "$FULL" 2>&1 ; then=0A=
-> +			echo "dd failed"=0A=
-> +		fi=0A=
-> +=0A=
-> +		# Wait for partition table re-read event settles=0A=
-> +		udevadm settle=0A=
-> +	done=0A=
-> +=0A=
-> +	# Check write pointer positions on the logical device=0A=
-> +	_get_blkzone_report "${TEST_DEV}" || return $?=0A=
-> +	for ((i=3D0; i < ${#test_z[@]}; i++)); do=0A=
-> +		if ((ZONE_WPTRS[test_z[i]] !=3D 8 * (i + 1))); then=0A=
-> +			echo "Unexpected write pointer position"=0A=
-> +			echo -n "zone=3D${i}, wp=3D${ZONE_WPTRS[i]}, "=0A=
-> +			echo "dev=3D${TEST_DEV}"=0A=
-> +		fi=0A=
-> +		echo "${ZONE_WPTRS[${test_z[i]}]}" >> "$FULL"=0A=
-> +	done=0A=
-> +	_put_blkzone_report=0A=
-> +=0A=
-> +	echo "Test complete"=0A=
-> +}=0A=
-> diff --git a/tests/zbd/007.out b/tests/zbd/007.out=0A=
-> new file mode 100644=0A=
-> index 0000000..28a1395=0A=
-> --- /dev/null=0A=
-> +++ b/tests/zbd/007.out=0A=
-> @@ -0,0 +1,2 @@=0A=
-> +Running zbd/007=0A=
-> +Test complete=0A=
-=0A=
-=0A=
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
+
+This patch fixed bellow issue which triggered by blktests block/006, thanks.
+
+Kernel 5.2.0-rc3 on an x86_64
+
+[  567.066143] run blktests block/006 at 2019-06-05 03:18:04
+[  567.089457] null: module loaded
+[  593.937235] BUG: unable to handle page fault for address: 
+ffffffffc0738110
+[  593.938442] #PF: supervisor read access in kernel mode
+[  593.939230] #PF: error_code(0x0000) - not-present page
+[  593.940011] PGD 11760f067 P4D 11760f067 PUD 117611067 PMD 12b61f067 PTE 0
+[  593.941048] Oops: 0000 [#1] SMP PTI
+[  593.941607] CPU: 0 PID: 1106 Comm: kworker/0:0 Not tainted 5.2.0-rc3 #1
+[  593.942607] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+[  593.943511] Workqueue: events __blk_release_queue
+[  593.944240] RIP: 0010:blk_mq_free_rqs+0x21/0xd0
+[  593.944930] Code: c6 e8 83 f0 ff ff eb 9f 90 0f 1f 44 00 00 41 56 41 
+55 41 54 55 48 89 f5 53 48 83 be 90 00 00 00 00 74 56 48 8b 47 38 49 89 
+fd <48> 83 78 50 00 74 48 8b 06 85 c0 74 42 41 89 d6 31 db 48 8b 85 98
+[  593.947773] RSP: 0018:ffffa21300e7fde8 EFLAGS: 00010286
+[  593.948562] RAX: ffffffffc07380c0 RBX: 0000000000000000 RCX: 
+0000000000002ab8
+[  593.949737] RDX: 0000000000000000 RSI: ffff9296971089c0 RDI: 
+ffff9296975fb438
+[  593.950811] RBP: ffff9296971089c0 R08: 000000000002f0e0 R09: 
+ffffffffb6427890
+[  593.951878] R10: ffffd41084a3fd80 R11: 0000000000000001 R12: 
+ffff9296a91e58b0
+[  593.952947] R13: ffff9296975fb438 R14: ffff9296ab5b2600 R15: 
+ffff9296a91e6080
+[  593.954011] FS:  0000000000000000(0000) GS:ffff9296bba00000(0000) 
+knlGS:0000000000000000
+[  593.955252] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  593.956147] CR2: ffffffffc0738110 CR3: 000000011760a003 CR4: 
+00000000003606f0
+[  593.957249] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
+0000000000000000
+[  593.958354] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
+0000000000000400
+[  593.959452] Call Trace:
+[  593.959877]  blk_mq_sched_tags_teardown+0x40/0x70
+[  593.960628]  blk_mq_exit_sched+0x88/0xa0
+[  593.961246]  elevator_exit+0x30/0x50
+[  593.961817]  __blk_release_queue+0x5c/0x100
+[  593.962497]  process_one_work+0x1a1/0x3a0
+[  593.963138]  worker_thread+0x30/0x380
+[  593.963714]  ? pwq_unbound_release_workfn+0xd0/0xd0
+[  593.964479]  kthread+0x112/0x130
+[  593.964992]  ? __kthread_parkme+0x70/0x70
+[  593.965641]  ret_from_fork+0x35/0x40
+[  593.966215] Modules linked in: sunrpc snd_hda_codec_generic 
+ledtrig_audio snd_hda_intel snd_hda_codec nfit snd_hda_core libnvdimm 
+snd_hwdep snd_seq crct10dif_pclmul snd_seq_device crc32_pclmul snd_pcm 
+ghash_clmulni_intel snd_timer snd pcspkr joydev virtio_balloon i2c_piix4 
+soundcore ip_tables xfs libcrc32c qxl drm_kms_helper ata_generic 
+syscopyarea sysfillrect sysimgblt fb_sys_fops ttm drm ata_piix libata 
+virtio_net net_failover crc32c_intel serio_raw virtio_blk virtio_console 
+failover dm_mirror dm_region_hash dm_log dm_mod [last unloaded: null_blk]
+[  593.973735] CR2: ffffffffc0738110
+[  593.974270] ---[ end trace 782d8ae6cfec57e7 ]---
+[  593.974983] RIP: 0010:blk_mq_free_rqs+0x21/0xd0
+[  593.975691] Code: c6 e8 83 f0 ff ff eb 9f 90 0f 1f 44 00 00 41 56 41 
+55 41 54 55 48 89 f5 53 48 83 be 90 00 00 00 00 74 56 48 8b 47 38 49 89 
+fd <48> 83 78 50 00 74 48 8b 06 85 c0 74 42 41 89 d6 31 db 48 8b 85 98
+[  593.978548] RSP: 0018:ffffa21300e7fde8 EFLAGS: 00010286
+[  593.979466] RAX: ffffffffc07380c0 RBX: 0000000000000000 RCX: 
+0000000000002ab8
+[  593.980578] RDX: 0000000000000000 RSI: ffff9296971089c0 RDI: 
+ffff9296975fb438
+[  593.981677] RBP: ffff9296971089c0 R08: 000000000002f0e0 R09: 
+ffffffffb6427890
+[  593.982780] R10: ffffd41084a3fd80 R11: 0000000000000001 R12: 
+ffff9296a91e58b0
+[  593.983883] R13: ffff9296975fb438 R14: ffff9296ab5b2600 R15: 
+ffff9296a91e6080
+[  593.984982] FS:  0000000000000000(0000) GS:ffff9296bba00000(0000) 
+knlGS:0000000000000000
+[  593.986239] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  593.987138] CR2: ffffffffc0738110 CR3: 000000011760a003 CR4: 
+00000000003606f0
+[  593.988241] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
+0000000000000000
+[  593.989344] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
+0000000000000400
+[  593.990447] Kernel panic - not syncing: Fatal exception
+[  593.992292] Kernel Offset: 0x35000000 from 0xffffffff81000000 
+(relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[  593.994147] ---[ end Kernel panic - not syncing: Fatal exception ]---
+
+On 6/4/19 9:08 PM, Ming Lei wrote:
+> In theory, IO scheduler belongs to request queue, and the request pool
+> of sched tags belongs to the request queue too.
+>
+> However, the current tags allocation interfaces are re-used for both
+> driver tags and sched tags, and driver tags is definitely host wide,
+> and doesn't belong to any request queue, same with its request pool.
+> So we need tagset instance for freeing request of sched tags.
+>
+> Meantime, blk_mq_free_tag_set() often follows blk_cleanup_queue() in case
+> of non-BLK_MQ_F_TAG_SHARED, this way requires that request pool of sched
+> tags to be freed before calling blk_mq_free_tag_set().
+>
+> Commit 47cdee29ef9d94e ("block: move blk_exit_queue into __blk_release_queue")
+> moves blk_exit_queue into __blk_release_queue for simplying the fast
+> path in generic_make_request(), then causes oops during freeing requests
+> of sched tags in __blk_release_queue().
+>
+> Fix the above issue by move freeing request pool of sched tags into
+> blk_cleanup_queue(), this way is safe becasue queue has been frozen and no any
+> in-queue requests at that time. Freeing sched tags has to be kept in queue's
+> release handler becasue there might be un-completed dispatch activity
+> which might refer to sched tags.
+>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Fixes: 47cdee29ef9d94e485eb08f962c74943023a5271 ("block: move blk_exit_queue into __blk_release_queue")
+> Reported-by: kernel test robot <rong.a.chen@intel.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-core.c     | 13 +++++++++++++
+>   block/blk-mq-sched.c | 30 +++++++++++++++++++++++++++---
+>   block/blk-mq-sched.h |  1 +
+>   block/blk-sysfs.c    |  2 +-
+>   block/blk.h          | 10 +++++++++-
+>   block/elevator.c     |  2 +-
+>   6 files changed, 52 insertions(+), 6 deletions(-)
+>
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index ee1b35fe8572..8340f69670d8 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -320,6 +320,19 @@ void blk_cleanup_queue(struct request_queue *q)
+>   	if (queue_is_mq(q))
+>   		blk_mq_exit_queue(q);
+>   
+> +	/*
+> +	 * In theory, request pool of sched_tags belongs to request queue.
+> +	 * However, the current implementation requires tag_set for freeing
+> +	 * requests, so free the pool now.
+> +	 *
+> +	 * Queue has become frozen, there can't be any in-queue requests, so
+> +	 * it is safe to free requests now.
+> +	 */
+> +	mutex_lock(&q->sysfs_lock);
+> +	if (q->elevator)
+> +		blk_mq_sched_free_requests(q);
+> +	mutex_unlock(&q->sysfs_lock);
+> +
+>   	percpu_ref_exit(&q->q_usage_counter);
+>   
+>   	/* @q is and will stay empty, shutdown and put */
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 74c6bb871f7e..500cb04901cc 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -475,14 +475,18 @@ static int blk_mq_sched_alloc_tags(struct request_queue *q,
+>   	return ret;
+>   }
+>   
+> +/* called in queue's release handler, tagset has gone away */
+>   static void blk_mq_sched_tags_teardown(struct request_queue *q)
+>   {
+> -	struct blk_mq_tag_set *set = q->tag_set;
+>   	struct blk_mq_hw_ctx *hctx;
+>   	int i;
+>   
+> -	queue_for_each_hw_ctx(q, hctx, i)
+> -		blk_mq_sched_free_tags(set, hctx, i);
+> +	queue_for_each_hw_ctx(q, hctx, i) {
+> +		if (hctx->sched_tags) {
+> +			blk_mq_free_rq_map(hctx->sched_tags);
+> +			hctx->sched_tags = NULL;
+> +		}
+> +	}
+>   }
+>   
+>   int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+> @@ -523,6 +527,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+>   			ret = e->ops.init_hctx(hctx, i);
+>   			if (ret) {
+>   				eq = q->elevator;
+> +				blk_mq_sched_free_requests(q);
+>   				blk_mq_exit_sched(q, eq);
+>   				kobject_put(&eq->kobj);
+>   				return ret;
+> @@ -534,11 +539,30 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+>   	return 0;
+>   
+>   err:
+> +	blk_mq_sched_free_requests(q);
+>   	blk_mq_sched_tags_teardown(q);
+>   	q->elevator = NULL;
+>   	return ret;
+>   }
+>   
+> +/*
+> + * called in either blk_queue_cleanup or elevator_switch, tagset
+> + * is required for freeing requests
+> + */
+> +void blk_mq_sched_free_requests(struct request_queue *q)
+> +{
+> +	struct blk_mq_hw_ctx *hctx;
+> +	int i;
+> +
+> +	lockdep_assert_held(&q->sysfs_lock);
+> +	WARN_ON(!q->elevator);
+> +
+> +	queue_for_each_hw_ctx(q, hctx, i) {
+> +		if (hctx->sched_tags)
+> +			blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i);
+> +	}
+> +}
+> +
+>   void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+>   {
+>   	struct blk_mq_hw_ctx *hctx;
+> diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+> index c7bdb52367ac..3cf92cbbd8ac 100644
+> --- a/block/blk-mq-sched.h
+> +++ b/block/blk-mq-sched.h
+> @@ -28,6 +28,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx);
+>   
+>   int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e);
+>   void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e);
+> +void blk_mq_sched_free_requests(struct request_queue *q);
+>   
+>   static inline bool
+>   blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 75b5281cc577..977c659dcd18 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -850,7 +850,7 @@ static void blk_exit_queue(struct request_queue *q)
+>   	 */
+>   	if (q->elevator) {
+>   		ioc_clear_queue(q);
+> -		elevator_exit(q, q->elevator);
+> +		__elevator_exit(q, q->elevator);
+>   		q->elevator = NULL;
+>   	}
+>   
+> diff --git a/block/blk.h b/block/blk.h
+> index 91b3581b7c7a..7814aa207153 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -6,6 +6,7 @@
+>   #include <linux/blk-mq.h>
+>   #include <xen/xen.h>
+>   #include "blk-mq.h"
+> +#include "blk-mq-sched.h"
+>   
+>   /* Max future timer expiry for timeouts */
+>   #define BLK_MAX_TIMEOUT		(5 * HZ)
+> @@ -176,10 +177,17 @@ void blk_insert_flush(struct request *rq);
+>   int elevator_init_mq(struct request_queue *q);
+>   int elevator_switch_mq(struct request_queue *q,
+>   			      struct elevator_type *new_e);
+> -void elevator_exit(struct request_queue *, struct elevator_queue *);
+> +void __elevator_exit(struct request_queue *, struct elevator_queue *);
+>   int elv_register_queue(struct request_queue *q);
+>   void elv_unregister_queue(struct request_queue *q);
+>   
+> +static inline void elevator_exit(struct request_queue *q,
+> +		struct elevator_queue *e)
+> +{
+> +	blk_mq_sched_free_requests(q);
+> +	__elevator_exit(q, e);
+> +}
+> +
+>   struct hd_struct *__disk_get_part(struct gendisk *disk, int partno);
+>   
+>   #ifdef CONFIG_FAIL_IO_TIMEOUT
+> diff --git a/block/elevator.c b/block/elevator.c
+> index ec55d5fc0b3e..2f17d66d0e61 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -178,7 +178,7 @@ static void elevator_release(struct kobject *kobj)
+>   	kfree(e);
+>   }
+>   
+> -void elevator_exit(struct request_queue *q, struct elevator_queue *e)
+> +void __elevator_exit(struct request_queue *q, struct elevator_queue *e)
+>   {
+>   	mutex_lock(&e->sysfs_lock);
+>   	if (e->type->ops.exit_sched)
