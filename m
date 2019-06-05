@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B318C28CC5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:10:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9367C28CC6
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:10:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 027952075C
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:10:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A74B32075C
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 19:10:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mGRP1yv+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="h9hxrx3y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbfFETJh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 15:09:37 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:49434 "EHLO
+        id S1726633AbfFETKT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 15:10:19 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:54030 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726965AbfFETJg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:09:36 -0400
+        with ESMTP id S1726537AbfFETKT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 15:10:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=3bkukSS82+wj1sa4UwaAnaEsPot66Pp1IhVKWWk3PRs=; b=mGRP1yv+6nhs3018nR7FDir6MR
-        yW2KpUdkVXd8h8RkJdDj1tuGagsIAIvpd1VsALfxZ1DkT4wTVouzt7qhx+73meALgT70AlcO5xLHj
-        mTIETncl9oUJn/qpMemeFTJGAcf9Mk/DdNXarbduY3tsrC0BpsrAU63i+ieaDTF+frDi5rUDG95zO
-        q4mlexgv5VIHBxFBUrE5p3dVpmNhgD6qhgXTrM1ZvvIMuwKpIxJce+GwGO3FW3tBca0H74QS1jVrx
-        GVv4fTGrwEQe7jPzVrmoe1J027ZfC4xFWFkAjvSMCJmU9Ie+smQqtLl9B8rKE+HvIybF29GTgGbqf
-        aKajtGeQ==;
+        bh=rAru/g/esClPI2WAaX3PUnaPhvPum8MkxndH0C4U79k=; b=h9hxrx3ykj4KhmvSEPus00VJa6
+        wvVDeIH1Qmut2HOHh/RUxiNzSd7gwfRDYSTkLIyqZpUjAbtS5mq55akT0u2mxUTK2z8cSjd/b54dM
+        8aoShnW2SqajrE0K8QIVYm2+5j17/DSdIwU3B2iaI+1dOtzkF/E438wsnCRgFlD5sFaqU603aIb5u
+        kVWlr+kPIav7QdEej0kJJO6MTlHZQ/6JvBpLs2oeS3bw37SVpNNCNhOIsWeEgnoh0cjM2mzGF3iyr
+        QBZD9DNwuko7J2FmoHon7WLxIokgm/Hd8Zkv1CPk1/CwxtBoRMdASJIL8Rlts4b10DQOlSqyKq3fi
+        L1gaY8ew==;
 Received: from 089144193064.atnat0002.highway.a1.net ([89.144.193.64] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hYbHs-0006Cv-4J; Wed, 05 Jun 2019 19:09:28 +0000
+        id 1hYbHa-0005od-3i; Wed, 05 Jun 2019 19:09:10 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Sebastian Ott <sebott@linux.ibm.com>,
@@ -50,9 +50,9 @@ Cc:     Sebastian Ott <sebott@linux.ibm.com>,
         megaraidlinux.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
         linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
         usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
-Subject: [PATCH 13/13] uas: set virt_boundary_mask in the scsi host
-Date:   Wed,  5 Jun 2019 21:08:36 +0200
-Message-Id: <20190605190836.32354-14-hch@lst.de>
+Subject: [PATCH 08/13] IB/iser: set virt_boundary_mask in the scsi host
+Date:   Wed,  5 Jun 2019 21:08:31 +0200
+Message-Id: <20190605190836.32354-9-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190605190836.32354-1-hch@lst.de>
 References: <20190605190836.32354-1-hch@lst.de>
@@ -69,66 +69,83 @@ SCSI midlayer.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/usb/storage/uas.c | 36 ++++++++++++++++--------------------
- 1 file changed, 16 insertions(+), 20 deletions(-)
+ drivers/infiniband/ulp/iser/iscsi_iser.c | 35 +++++-------------------
+ 1 file changed, 7 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/usb/storage/uas.c b/drivers/usb/storage/uas.c
-index 047c5922618f..d20919e7bbf4 100644
---- a/drivers/usb/storage/uas.c
-+++ b/drivers/usb/storage/uas.c
-@@ -789,29 +789,9 @@ static int uas_slave_alloc(struct scsi_device *sdev)
- {
- 	struct uas_dev_info *devinfo =
- 		(struct uas_dev_info *)sdev->host->hostdata;
--	int maxp;
+diff --git a/drivers/infiniband/ulp/iser/iscsi_iser.c b/drivers/infiniband/ulp/iser/iscsi_iser.c
+index 9c185a8dabd3..841b66397a57 100644
+--- a/drivers/infiniband/ulp/iser/iscsi_iser.c
++++ b/drivers/infiniband/ulp/iser/iscsi_iser.c
+@@ -613,6 +613,7 @@ iscsi_iser_session_create(struct iscsi_endpoint *ep,
+ 	struct Scsi_Host *shost;
+ 	struct iser_conn *iser_conn = NULL;
+ 	struct ib_conn *ib_conn;
++	struct ib_device *ib_dev;
+ 	u32 max_fr_sectors;
  
- 	sdev->hostdata = devinfo;
+ 	shost = iscsi_host_alloc(&iscsi_iser_sht, 0, 0);
+@@ -643,16 +644,19 @@ iscsi_iser_session_create(struct iscsi_endpoint *ep,
+ 		}
  
--	/*
--	 * We have two requirements here. We must satisfy the requirements
--	 * of the physical HC and the demands of the protocol, as we
--	 * definitely want no additional memory allocation in this path
--	 * ruling out using bounce buffers.
--	 *
--	 * For a transmission on USB to continue we must never send
--	 * a package that is smaller than maxpacket. Hence the length of each
--         * scatterlist element except the last must be divisible by the
--         * Bulk maxpacket value.
--	 * If the HC does not ensure that through SG,
--	 * the upper layer must do that. We must assume nothing
--	 * about the capabilities off the HC, so we use the most
--	 * pessimistic requirement.
--	 */
--
--	maxp = usb_maxpacket(devinfo->udev, devinfo->data_in_pipe, 0);
--	blk_queue_virt_boundary(sdev->request_queue, maxp - 1);
--
- 	/*
- 	 * The protocol has no requirements on alignment in the strict sense.
- 	 * Controllers may or may not have alignment restrictions.
-@@ -1004,6 +984,22 @@ static int uas_probe(struct usb_interface *intf, const struct usb_device_id *id)
- 	 */
- 	shost->can_queue = devinfo->qdepth - 2;
+ 		ib_conn = &iser_conn->ib_conn;
++		ib_dev = ib_conn->device->ib_device;
+ 		if (ib_conn->pi_support) {
+-			u32 sig_caps = ib_conn->device->ib_device->attrs.sig_prot_cap;
++			u32 sig_caps = ib_dev->attrs.sig_prot_cap;
  
-+	/*
-+	 * We have two requirements here. We must satisfy the requirements of
-+	 * the physical HC and the demands of the protocol, as we definitely
-+	 * want no additional memory allocation in this path ruling out using
-+	 * bounce buffers.
-+	 *
-+	 * For a transmission on USB to continue we must never send a package
-+	 * that is smaller than maxpacket.  Hence the length of each scatterlist
-+	 * element except the last must be divisible by the Bulk maxpacket
-+	 * value.  If the HC does not ensure that through SG, the upper layer
-+	 * must do that.  We must assume nothing about the capabilities off the
-+	 * HC, so we use the most pessimistic requirement.
-+	 */
-+	shost->virt_boundary_mask =
-+		usb_maxpacket(udev, devinfo->data_in_pipe, 0) - 1;
+ 			scsi_host_set_prot(shost, iser_dif_prot_caps(sig_caps));
+ 			scsi_host_set_guard(shost, SHOST_DIX_GUARD_IP |
+ 						   SHOST_DIX_GUARD_CRC);
+ 		}
+ 
+-		if (iscsi_host_add(shost,
+-				   ib_conn->device->ib_device->dev.parent)) {
++		if (!(ib_dev->attrs.device_cap_flags & IB_DEVICE_SG_GAPS_REG))
++			shost->virt_boundary_mask = ~MASK_4K;
 +
- 	usb_set_intfdata(intf, shost);
- 	result = scsi_add_host(shost, &intf->dev);
- 	if (result)
++		if (iscsi_host_add(shost, ib_dev->dev.parent)) {
+ 			mutex_unlock(&iser_conn->state_mutex);
+ 			goto free_host;
+ 		}
+@@ -958,30 +962,6 @@ static umode_t iser_attr_is_visible(int param_type, int param)
+ 	return 0;
+ }
+ 
+-static int iscsi_iser_slave_alloc(struct scsi_device *sdev)
+-{
+-	struct iscsi_session *session;
+-	struct iser_conn *iser_conn;
+-	struct ib_device *ib_dev;
+-
+-	mutex_lock(&unbind_iser_conn_mutex);
+-
+-	session = starget_to_session(scsi_target(sdev))->dd_data;
+-	iser_conn = session->leadconn->dd_data;
+-	if (!iser_conn) {
+-		mutex_unlock(&unbind_iser_conn_mutex);
+-		return -ENOTCONN;
+-	}
+-	ib_dev = iser_conn->ib_conn.device->ib_device;
+-
+-	if (!(ib_dev->attrs.device_cap_flags & IB_DEVICE_SG_GAPS_REG))
+-		blk_queue_virt_boundary(sdev->request_queue, ~MASK_4K);
+-
+-	mutex_unlock(&unbind_iser_conn_mutex);
+-
+-	return 0;
+-}
+-
+ static struct scsi_host_template iscsi_iser_sht = {
+ 	.module                 = THIS_MODULE,
+ 	.name                   = "iSCSI Initiator over iSER",
+@@ -994,7 +974,6 @@ static struct scsi_host_template iscsi_iser_sht = {
+ 	.eh_device_reset_handler= iscsi_eh_device_reset,
+ 	.eh_target_reset_handler = iscsi_eh_recover_target,
+ 	.target_alloc		= iscsi_target_alloc,
+-	.slave_alloc            = iscsi_iser_slave_alloc,
+ 	.proc_name              = "iscsi_iser",
+ 	.this_id                = -1,
+ 	.track_queue_depth	= 1,
 -- 
 2.20.1
 
