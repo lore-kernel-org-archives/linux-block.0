@@ -2,116 +2,182 @@ Return-Path: <SRS0=ECsc=UF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC5AC28CC6
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 03:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C681C28D19
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 06:02:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E61382089E
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 03:14:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D546320673
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 06:02:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726568AbfFFDOL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 23:14:11 -0400
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:39481 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726474AbfFFDOL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Jun 2019 23:14:11 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R991e4;CH=green;DM=||false|;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04391;MF=alvin@linux.alibaba.com;NM=1;PH=DW;RN=7;SR=0;TI=W4_5548646_DEFAULT_0AC264C7_1559790743861_o7001c3593;
-Received: from WS-web (Alvin@linux.alibaba.com[W4_5548646_DEFAULT_0AC264C7_1559790743861_o7001c3593]) by e01e07425.eu6 at Thu, 06 Jun 2019 11:13:57 +0800
-Date:   Thu, 06 Jun 2019 11:13:57 +0800
-From:   "Alvin Zheng" <Alvin@linux.alibaba.com>
-To:     "gregkh" <gregkh@linuxfoundation.org>
-Cc:     "darrick.wong" <darrick.wong@oracle.com>,
-        "axboe" <axboe@kernel.dk>,
-        "linux-block" <linux-block@vger.kernel.org>,
-        "linux-xfs" <linux-xfs@vger.kernel.org>,
-        "caspar" <caspar@linux.alibaba.com>,
-        "joseph.qi" <joseph.qi@linux.alibaba.com>
-Reply-To: "Alvin Zheng" <Alvin@linux.alibaba.com>
-Message-ID: <885213d6-d14d-4639-9c6b-78ee2c644f95.Alvin@linux.alibaba.com>
-Subject: =?UTF-8?B?UmU6IFtidWcgcmVwb3J0XVtzdGFibGVdIHhmc3Rlc3RzOmdlbmVyaWMvNTM4IGZhaWxlZCBv?=
-  =?UTF-8?B?biB4ZnM=?=
-X-Mailer: [Alimail-Mailagent][W4_5548646][DEFAULT][Chrome]
+        id S1726581AbfFFGCL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jun 2019 02:02:11 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37370 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725267AbfFFGCK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Jun 2019 02:02:10 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 4EB62AF80;
+        Thu,  6 Jun 2019 06:02:08 +0000 (UTC)
+Subject: Re: [PATCH 10/13] megaraid_sas: set virt_boundary_mask in the scsi
+ host
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Sebastian Ott <sebott@linux.ibm.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Oliver Neukum <oneukum@suse.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        megaraidlinux.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
+        linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
+References: <20190605190836.32354-1-hch@lst.de>
+ <20190605190836.32354-11-hch@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+ azzYF4VRJsdl+d0MCaSy8mUh
+Message-ID: <345c3931-0940-7d59-ebc6-fa1ea56c60ac@suse.de>
+Date:   Thu, 6 Jun 2019 08:02:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <f9a7b0c4-178a-4a7c-8ac6-aec79b06b810.Alvin@linux.alibaba.com>,<20190605124227.GC17558@kroah.com>
-x-aliyun-mail-creator: W4_5548646_DEFAULT_M2ITW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzc0LjAuMzcyOS4xNjkgU2FmYXJpLzUzNy4zNg==3L
-In-Reply-To: <20190605124227.GC17558@kroah.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+In-Reply-To: <20190605190836.32354-11-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-VGhlIHhmcyBwYXRjaCAoeGZzOiBzZXJpYWxpemUgdW5hbGlnbmVkIGRpbyB3cml0ZXMgYWdhaW5z
-dCBhbGwgb3RoZXIgZGlvIHdyaXRlcykgZG9lcyBmaXggdGhlIGRhdGEgY29ycnVwdGlvbiBidWcg
-b2Yga2VybmVsIDQuMTkgb24geGZzLgpBcyBmb3IgMzExMGZjNzk2MDZmICgiYmxrLW1xOiBpbXBy
-b3ZlIHBsdWcgbGlzdCBzb3J0aW5nIiksIGl0IGhhcHBlbnMgdG8gZml4IHRoZSBsb2dpYyBlcnJv
-ciBvZiB0aGUgc29ydCBmdW5jdGlvbiBpbiB0aGUgYmxvY2sgbGF5ZXIgYW5kIGl0IGlzIGJhc2Vk
-IG9uIHRoZSBtdWx0aXBsZSBtYXBzIG9mIHRoZSBibGstbXEgd2hpY2ggd2FzIGludHJvZHVjZWQg
-aW4gdjUuMC4gVGhlcmVmb3JlLCBiYWNrcG9ydGluZyB0aGlzIGNvbW1pdCB3aWxsIGludHJvZHVj
-ZSBhIGxvdCBvZiByZWxldmFudCBjb2RlLiAKClJlZ2FyZHMsCkFsdmluCgotLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KRnJv
-bTpncmVna2ggPGdyZWdraEBsaW51eGZvdW5kYXRpb24ub3JnPgpTZW5kIFRpbWU6MjAxOeW5tDbm
-nIg15pelKOaYn+acn+S4iSkgMjA6NDIKVG86QWx2aW4gWmhlbmcgPEFsdmluQGxpbnV4LmFsaWJh
-YmEuY29tPgpDYzpkYXJyaWNrLndvbmcgPGRhcnJpY2sud29uZ0BvcmFjbGUuY29tPjsgYXhib2Ug
-PGF4Ym9lQGtlcm5lbC5kaz47IGxpbnV4LWJsb2NrIDxsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5v
-cmc+OyBsaW51eC14ZnMgPGxpbnV4LXhmc0B2Z2VyLmtlcm5lbC5vcmc+OyBjYXNwYXIgPGNhc3Bh
-ckBsaW51eC5hbGliYWJhLmNvbT47IGpvc2VwaC5xaSA8am9zZXBoLnFpQGxpbnV4LmFsaWJhYmEu
-Y29tPgpTdWJqZWN0OlJlOiBbYnVnIHJlcG9ydF1bc3RhYmxlXSB4ZnN0ZXN0czpnZW5lcmljLzUz
-OCBmYWlsZWQgb24geGZzCgoKT24gV2VkLCBKdW4gMDUsIDIwMTkgYXQgMDg6MjE6NDRQTSArMDgw
-MCwgQWx2aW4gWmhlbmcgd3JvdGU6Cj4gSGksCj4gICBJIHdhcyB1c2luZyBrZXJuZWwgdjQuMTku
-NDggYW5kIGZvdW5kIHRoYXQgaXQgY2Fubm90IHBhc3MgdGhlIGdlbmVyaWMvNTM4IG9uIHhmcy4g
-VGhlIGVycm9yIG91dHB1dCBpcyBhcyBmb2xsb3dzOgoKSGFzIDQuMTkgZXZlciBiZWVuIGFibGUg
-dG8gcGFzcyB0aGF0IHRlc3Q/ICBJZiBub3QsIEkgd291bGRuJ3Qgd29ycnkKYWJvdXQgaXQgOikK
-Cj4gCj4gICBGU1RZUCAgICAgICAgIC0tIHhmcyAobm9uLWRlYnVnKQo+ICAgUExBVEZPUk0gICAg
-ICAtLSBMaW51eC94ODZfNjQgYWxpbnV4Mi02IDQuMTkuNDgKPiAgIE1LRlNfT1BUSU9OUyAgLS0g
-LWYgLWJzaXplPTQwOTYgL2Rldi92ZGMKPiAgIE1PVU5UX09QVElPTlMgLS0gL2Rldi92ZGMgL21u
-dC90ZXN0YXJlYS9zY3JhCj4gICBnZW5lcmljLzUzOCAwcyAuLi4gLSBvdXRwdXQgbWlzbWF0Y2gg
-KHNlZSAvcm9vdC91c3IvbG9jYWwvc3JjL3hmc3Rlc3RzL3Jlc3VsdHMvL2dlbmVyaWMvNTM4Lm91
-dC5iYWQpCj4gICAgICAgLS0tIHRlc3RzL2dlbmVyaWMvNTM4Lm91dCAgIDIwMTktMDUtMjcgMTM6
-NTc6MDYuNTA1NjY2NDY1ICswODAwCj4gICAgICAgKysrIC9yb290L3Vzci9sb2NhbC9zcmMveGZz
-dGVzdHMvcmVzdWx0cy8vZ2VuZXJpYy81Mzgub3V0LmJhZCAgICAgICAyMDE5LTA2LTA1IDE2OjQz
-OjE0LjcwMjAwMjMyNiArMDgwMAo+ICAgICAgIEBAIC0xLDIgKzEsMTAgQEAKPiAgICAgICAgUUEg
-b3V0cHV0IGNyZWF0ZWQgYnkgNTM4Cj4gICAgICAgK0RhdGEgdmVyaWZpY2F0aW9uIGZhaWxzCj4g
-ICAgICAgK0ZpbmQgY29ycnVwdGlvbgo+ICAgICAgICswMDAwMDAwMCAgMDAgMDAgMDAgMDAgMDAg
-MDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIC4uLi4uLi4uLi4uLi4uLi4KPiAgICAg
-ICArKgo+ICAgICAgICswMDAwMDIwMCAgNWEgNWEgNWEgNWEgNWEgNWEgNWEgNWEgNWEgNWEgNWEg
-NWEgNWEgNWEgNWEgNWEgIFpaWlpaWlpaWlpaWlpaWloKPiAgICAgICArMDAwMDIwMDAKPiAgICAg
-ICAuLi4KPiAgICAgICAoUnVuICdkaWZmIC11IC9yb290L3Vzci9sb2NhbC9zcmMveGZzdGVzdHMv
-dGVzdHMvZ2VuZXJpYy81Mzgub3V0IC9yb290L3Vzci9sb2NhbC9zcmMveGZzdGVzdHMvcmVzdWx0
-cy8vZ2VuZXJpYy81Mzgub3V0LmJhZCcgIHRvIHNlZSB0aGUgZW50aXJlIGRpZmYpCj4gICBSYW46
-IGdlbmVyaWMvNTM4Cj4gICBGYWlsdXJlczogZ2VuZXJpYy81MzgKPiAgIEZhaWxlZCAxIG9mIDEg
-dGVzdHMKPiAgIAo+IEkgYWxzbyBmb3VuZCB0aGF0IHRoZSBsYXRlc3Qga2VybmVsICh2NS4yLjAt
-cmMyKSBvZiB1cHN0cmVhbSBjYW4gcGFzcyB0aGUgZ2VuZXJpYy81MzggdGVzdC4gVGhlcmVmb3Jl
-LCBJIGJpc2VjdGVkIGFuZCBmb3VuZCB0aGUgZmlyc3QgZ29vZCBjb21taXQgaXMgMzExMGZjNzk2
-MDYuIFRoaXMgY29tbWl0IGFkZHMgdGhlIGhhcmR3YXJlIHF1ZXVlIGludG8gdGhlIHNvcnQgZnVu
-Y3Rpb24uIEJlc2lkZXMsIHRoZSBzb3J0IGZ1bmN0aW9uIHJldHVybnMgYSBuZWdhdGl2ZSB2YWx1
-ZSB3aGVuIHRoZSBvZmZzZXQgYW5kIHF1ZXVlIChzb2Z0d2FyZSBhbmQgaGFyZHdhcmUpIG9mIHR3
-byBJL08gcmVxdWVzdHMgYXJlIHNhbWUuIEkgdGhpbmsgdGhlIHNlY29uZCBwYXJ0IG9mIHRoZSBj
-aGFuZ2UgbWFrZSBzZW5zZXMuIFRoZSBrZXJuZWwgc2hvdWxkIG5vdCBjaGFuZ2UgdGhlIHJlbGF0
-aXZlIHBvc2l0aW9uIG9mIHR3byBJL08gcmVxdWVzdHMgd2hlbiB0aGVpciBvZmZzZXQgYW5kIHF1
-ZXVlIGFyZSBzYW1lLiBTbyBJIG1hZGUgdGhlIGZvbGxvd2luZyBjaGFuZ2VzIGFuZCBtZXJnZWQg
-aXQgaW50byB0aGUga2VybmVsIDQuMTkuNDguIEFmdGVyIHRoZSBtb2RpZmljYXRpb24sIHdlIGNh
-biBwYXNzIHRoZSBnZW5lcmljLzUzOCB0ZXN0IG9uIHhmcy4gVGhlIHNhbWUgY2FzZSBjYW4gYmUg
-cGFzc2VkIG9uIGV4dDQsIHNpbmNlIGV4dDQgaGFzIGNvcnJlc3BvbmRpbmcgZml4IDBkYjI0MTIy
-YmQ3ZiAoImV4dDQ6IGZpeCBkYXRhIGNvcnJ1cHRpb24gY2F1c2VkIGJ5IG92ZXJsYXBwaW5nIHVu
-YWxpZ25lZCBhbmQgYWxpZ25lZCBJTyIpLiBUaG91Z2ggSSB0aGluayB4ZnMgc2hvdWxkIGJlIHJl
-c3BvbnNpYmxlIGZvciB0aGlzIGlzc3VlLCB0aGUgYmxvY2sgbGF5ZXIgY29kZSBiZWxvdyBpcyBh
-bHNvIHByb2JsZW1hdGljLiBBbnkgaWRlYXM/Cj4gCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1t
-cS5jIGIvYmxvY2svYmxrLW1xLmMKPiBpbmRleCA0ZTU2M2VlLi5hNzMwOWNkIDEwMDY0NAo+IC0t
-LSBhL2Jsb2NrL2Jsay1tcS5jCj4gKysrIGIvYmxvY2svYmxrLW1xLmMKPiBAQCAtMTYxMCw3ICsx
-NjEwLDcgQEAgc3RhdGljIGludCBwbHVnX2N0eF9jbXAodm9pZCAqcHJpdiwgc3RydWN0IGxpc3Rf
-aGVhZCAqYSwgc3RydWN0IGxpc3RfaGVhZCAqYikKPiAKPiAgICAgICAgIHJldHVybiAhKHJxYS0+
-bXFfY3R4IDwgcnFiLT5tcV9jdHggfHwKPiAgICAgICAgICAgICAgICAgIChycWEtPm1xX2N0eCA9
-PSBycWItPm1xX2N0eCAmJgo+IC0gICAgICAgICAgICAgICAgIGJsa19ycV9wb3MocnFhKSA8IGJs
-a19ycV9wb3MocnFiKSkpOwo+ICsgICAgICAgICAgICAgICAgIGJsa19ycV9wb3MocnFhKSA8PSBi
-bGtfcnFfcG9zKHJxYikpKTsKPiAgfQo+IAo+ICB2b2lkIGJsa19tcV9mbHVzaF9wbHVnX2xpc3Qo
-c3RydWN0IGJsa19wbHVnICpwbHVnLCBib29sIGZyb21fc2NoZWR1bGUpCgpJIHdvdWxkIG5vdCBs
-aWtlIHRvIHRha2UgYSBwYXRjaCB0aGF0IGlzIG5vdCB1cHN0cmVhbSwgYnV0IHJhdGhlciB0YWtl
-CnRoZSBvcmlnaW5hbCBjb21taXQuCgpDYW4gMzExMGZjNzk2MDZmICgiYmxrLW1xOiBpbXByb3Zl
-IHBsdWcgbGlzdCBzb3J0aW5nIikgb24gaXRzIG93bgpyZXNvbHZlIHRoaXMgaXNzdWUgZm9yIDQu
-MTkueT8KCnRoYW5rcywKCmdyZWcgay1o
+On 6/5/19 9:08 PM, Christoph Hellwig wrote:
+> This ensures all proper DMA layer handling is taken care of by the
+> SCSI midlayer.  Note that the effect is global, as the IOMMU merging
+> is based off a paramters in struct device.  We could still turn if off
+> if no PCIe devices are present, but I don't know how to find that out.
+> 
+> Also remove the bogus nomerges flag, merges do take the virt_boundary
+> into account.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/scsi/megaraid/megaraid_sas_base.c   | 46 +++++----------------
+>  drivers/scsi/megaraid/megaraid_sas_fusion.c |  7 ++++
+>  2 files changed, 18 insertions(+), 35 deletions(-)
+> 
+> diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
+> index 3dd1df472dc6..20b3b3f8bc16 100644
+> --- a/drivers/scsi/megaraid/megaraid_sas_base.c
+> +++ b/drivers/scsi/megaraid/megaraid_sas_base.c
+> @@ -1870,39 +1870,6 @@ void megasas_set_dynamic_target_properties(struct scsi_device *sdev,
+>  	}
+>  }
+>  
+> -/*
+> - * megasas_set_nvme_device_properties -
+> - * set nomerges=2
+> - * set virtual page boundary = 4K (current mr_nvme_pg_size is 4K).
+> - * set maximum io transfer = MDTS of NVME device provided by MR firmware.
+> - *
+> - * MR firmware provides value in KB. Caller of this function converts
+> - * kb into bytes.
+> - *
+> - * e.a MDTS=5 means 2^5 * nvme page size. (In case of 4K page size,
+> - * MR firmware provides value 128 as (32 * 4K) = 128K.
+> - *
+> - * @sdev:				scsi device
+> - * @max_io_size:				maximum io transfer size
+> - *
+> - */
+> -static inline void
+> -megasas_set_nvme_device_properties(struct scsi_device *sdev, u32 max_io_size)
+> -{
+> -	struct megasas_instance *instance;
+> -	u32 mr_nvme_pg_size;
+> -
+> -	instance = (struct megasas_instance *)sdev->host->hostdata;
+> -	mr_nvme_pg_size = max_t(u32, instance->nvme_page_size,
+> -				MR_DEFAULT_NVME_PAGE_SIZE);
+> -
+> -	blk_queue_max_hw_sectors(sdev->request_queue, (max_io_size / 512));
+> -
+> -	blk_queue_flag_set(QUEUE_FLAG_NOMERGES, sdev->request_queue);
+> -	blk_queue_virt_boundary(sdev->request_queue, mr_nvme_pg_size - 1);
+> -}
+> -
+> -
+>  /*
+>   * megasas_set_static_target_properties -
+>   * Device property set by driver are static and it is not required to be
+> @@ -1961,8 +1928,10 @@ static void megasas_set_static_target_properties(struct scsi_device *sdev,
+>  		max_io_size_kb = le32_to_cpu(instance->tgt_prop->max_io_size_kb);
+>  	}
+>  
+> -	if (instance->nvme_page_size && max_io_size_kb)
+> -		megasas_set_nvme_device_properties(sdev, (max_io_size_kb << 10));
+> +	if (instance->nvme_page_size && max_io_size_kb) {
+> +		blk_queue_max_hw_sectors(sdev->request_queue,
+> +				(max_io_size_kb << 10) / 512);
+> +	}
+>  
+>  	scsi_change_queue_depth(sdev, device_qd);
+>  
+What happened to the NOMERGES queue flag?
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
