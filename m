@@ -3,281 +3,462 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D141C04AB5
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 09:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2490AC28D1D
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 09:43:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6BE7E20693
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 09:43:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED71620872
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 09:43:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727968AbfFFJnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jun 2019 05:43:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32768 "EHLO mx1.redhat.com"
+        id S1728211AbfFFJni (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jun 2019 05:43:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58846 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727883AbfFFJnS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 Jun 2019 05:43:18 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S1727539AbfFFJni (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Jun 2019 05:43:38 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3D069307C941;
-        Thu,  6 Jun 2019 09:43:17 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id AC8C18830E;
+        Thu,  6 Jun 2019 09:43:37 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 69D78679F1;
-        Thu,  6 Jun 2019 09:43:15 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 927322DE86;
+        Thu,  6 Jun 2019 09:43:34 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
  Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
  Kingdom.
  Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 08/10] block: Add block layer notifications [ver #3]
+Subject: [PATCH 10/10] Add sample notification program [ver #3]
 From:   David Howells <dhowells@redhat.com>
 To:     viro@zeniv.linux.org.uk
 Cc:     dhowells@redhat.com, raven@themaw.net,
         linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
         linux-block@vger.kernel.org, keyrings@vger.kernel.org,
         linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Thu, 06 Jun 2019 10:43:14 +0100
-Message-ID: <155981419467.17513.4571857983219270447.stgit@warthog.procyon.org.uk>
+Date:   Thu, 06 Jun 2019 10:43:33 +0100
+Message-ID: <155981421379.17513.13158528501056454772.stgit@warthog.procyon.org.uk>
 In-Reply-To: <155981411940.17513.7137844619951358374.stgit@warthog.procyon.org.uk>
 References: <155981411940.17513.7137844619951358374.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/unknown-version
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Thu, 06 Jun 2019 09:43:17 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Thu, 06 Jun 2019 09:43:37 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a block layer notification mechanism whereby notifications about
-block-layer events such as I/O errors, can be reported to a monitoring
-process asynchronously.
+This needs to be linked with -lkeyutils.
 
-Firstly, an event queue needs to be created:
+It is run like:
 
-	fd = open("/dev/event_queue", O_RDWR);
-	ioctl(fd, IOC_WATCH_QUEUE_SET_SIZE, page_size << n);
+	./watch_test
 
-then a notification can be set up to report block notifications via that
-queue:
+and watches "/" for mount changes and the current session keyring for key
+changes:
 
-	struct watch_notification_filter filter = {
-		.nr_filters = 1,
-		.filters = {
-			[0] = {
-				.type = WATCH_TYPE_BLOCK_NOTIFY,
-				.subtype_filter[0] = UINT_MAX;
-			},
-		},
-	};
-	ioctl(fd, IOC_WATCH_QUEUE_SET_FILTER, &filter);
-	device_notify(fd, 12);
+	# keyctl add user a a @s
+	1035096409
+	# keyctl unlink 1035096409 @s
+	# mount -t tmpfs none /mnt/nfsv3tcp/
+	# umount /mnt/nfsv3tcp
 
-After that, records will be placed into the queue when, for example, errors
-occur on a block device.  Records are of the following format:
+producing:
 
-	struct block_notification {
-		struct watch_notification watch;
-		__u64	dev;
-		__u64	sector;
-	} *n;
+	# ./watch_test
+	ptrs h=4 t=2 m=20003
+	NOTIFY[00000004-00000002] ty=0003 sy=0002 i=01000010
+	KEY 2ffc2e5d change=2[linked] aux=1035096409
+	ptrs h=6 t=4 m=20003
+	NOTIFY[00000006-00000004] ty=0003 sy=0003 i=01000010
+	KEY 2ffc2e5d change=3[unlinked] aux=1035096409
+	ptrs h=8 t=6 m=20003
+	NOTIFY[00000008-00000006] ty=0001 sy=0000 i=02000010
+	MOUNT 00000013 change=0[new_mount] aux=168
+	ptrs h=a t=8 m=20003
+	NOTIFY[0000000a-00000008] ty=0001 sy=0001 i=02000010
+	MOUNT 00000013 change=1[unmount] aux=168
 
-Where:
+Other events may be produced, such as with a failing disk:
 
-	n->watch.type will be WATCH_TYPE_BLOCK_NOTIFY
+	ptrs h=5 t=2 m=6000004
+	NOTIFY[00000005-00000002] ty=0004 sy=0006 i=04000018
+	BLOCK 00800050 e=6[critical medium] s=5be8
 
-	n->watch.subtype will be the type of notification, such as
-	NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM.
+This corresponds to:
 
-	n->watch.info & WATCH_INFO_LENGTH will indicate the length of the
-	record.
+	print_req_error: critical medium error, dev sdf, sector 23528 flags 0
 
-	n->watch.info & WATCH_INFO_ID will be the second argument to
-	device_notify(), shifted.
-
-	n->dev will be the device numbers munged together.
-
-	n->sector will indicate the affected sector (if appropriate for the
-	event).
-
-Note that it is permissible for event records to be of variable length -
-or, at least, the length may be dependent on the subtype.
+in dmesg.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- Documentation/watch_queue.rst    |   10 +++++++++-
- block/Kconfig                    |    9 +++++++++
- block/blk-core.c                 |   29 +++++++++++++++++++++++++++++
- include/linux/blkdev.h           |   15 +++++++++++++++
- include/uapi/linux/watch_queue.h |   27 +++++++++++++++++++++++++++
- 5 files changed, 89 insertions(+), 1 deletion(-)
+ samples/Kconfig                  |    6 +
+ samples/Makefile                 |    1 
+ samples/watch_queue/Makefile     |    9 +
+ samples/watch_queue/watch_test.c |  310 ++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 326 insertions(+)
+ create mode 100644 samples/watch_queue/Makefile
+ create mode 100644 samples/watch_queue/watch_test.c
 
-diff --git a/Documentation/watch_queue.rst b/Documentation/watch_queue.rst
-index e4b8233d5aa8..c2954e191989 100644
---- a/Documentation/watch_queue.rst
-+++ b/Documentation/watch_queue.rst
-@@ -11,7 +11,9 @@ receive notifications from the kernel.  This can be used in conjunction with::
+diff --git a/samples/Kconfig b/samples/Kconfig
+index 0561a94f6fdb..a2b7a7babee5 100644
+--- a/samples/Kconfig
++++ b/samples/Kconfig
+@@ -160,4 +160,10 @@ config SAMPLE_VFS
+ 	  as mount API and statx().  Note that this is restricted to the x86
+ 	  arch whilst it accesses system calls that aren't yet in all arches.
  
-   * Superblock event notifications
- 
--  * General device event notifications
-+  * General device event notifications, including::
-+
-+    * Block layer event notifications
- 
- 
- The notifications buffers can be enabled by:
-@@ -336,6 +338,12 @@ Any particular buffer can be fed from multiple sources.  Sources include:
- 
-     See Documentation/security/keys/core.rst for more information.
- 
-+  * WATCH_TYPE_BLOCK_NOTIFY
-+
-+    Notifications of this type indicate block layer events, such as I/O errors
-+    or temporary link loss.  Watchpoints of this type are set on the global
-+    device watch list.
-+
- 
- Event Filtering
- ===============
-diff --git a/block/Kconfig b/block/Kconfig
-index 1b220101a9cb..4ff4a56ba9f9 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -163,6 +163,15 @@ config BLK_SED_OPAL
- 	Enabling this option enables users to setup/unlock/lock
- 	Locking ranges for SED devices using the Opal protocol.
- 
-+config BLK_NOTIFICATIONS
-+	bool "Block layer event notifications"
-+	select DEVICE_NOTIFICATIONS
++config SAMPLE_WATCH_QUEUE
++	bool "Build example /dev/watch_queue notification consumer"
 +	help
-+	  This option provides support for getting block layer event
-+	  notifications.  This makes use of the /dev/watch_queue misc device to
-+	  handle the notification buffer and provides the device_notify() system
-+	  call to enable/disable watches.
++	  Build example userspace program to use the new mount_notify(),
++	  sb_notify() syscalls and the KEYCTL_WATCH_KEY keyctl() function.
 +
- menu "Partition Types"
- 
- source "block/partitions/Kconfig"
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 419d600e6637..edad86172d47 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -144,6 +144,22 @@ static const struct {
- 	[BLK_STS_IOERR]		= { -EIO,	"I/O" },
- };
- 
-+#ifdef CONFIG_BLK_NOTIFICATIONS
-+static const
-+enum block_notification_type blk_notifications[ARRAY_SIZE(blk_errors)] = {
-+	[BLK_STS_TIMEOUT]	= NOTIFY_BLOCK_ERROR_TIMEOUT,
-+	[BLK_STS_NOSPC]		= NOTIFY_BLOCK_ERROR_NO_SPACE,
-+	[BLK_STS_TRANSPORT]	= NOTIFY_BLOCK_ERROR_RECOVERABLE_TRANSPORT,
-+	[BLK_STS_TARGET]	= NOTIFY_BLOCK_ERROR_CRITICAL_TARGET,
-+	[BLK_STS_NEXUS]		= NOTIFY_BLOCK_ERROR_CRITICAL_NEXUS,
-+	[BLK_STS_MEDIUM]	= NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM,
-+	[BLK_STS_PROTECTION]	= NOTIFY_BLOCK_ERROR_PROTECTION,
-+	[BLK_STS_RESOURCE]	= NOTIFY_BLOCK_ERROR_KERNEL_RESOURCE,
-+	[BLK_STS_DEV_RESOURCE]	= NOTIFY_BLOCK_ERROR_DEVICE_RESOURCE,
-+	[BLK_STS_IOERR]		= NOTIFY_BLOCK_ERROR_IO,
-+};
+ endif # SAMPLES
+diff --git a/samples/Makefile b/samples/Makefile
+index debf8925f06f..ed3b8bab6e9b 100644
+--- a/samples/Makefile
++++ b/samples/Makefile
+@@ -20,3 +20,4 @@ obj-$(CONFIG_SAMPLE_TRACE_PRINTK)	+= trace_printk/
+ obj-$(CONFIG_VIDEO_PCI_SKELETON)	+= v4l/
+ obj-y					+= vfio-mdev/
+ subdir-$(CONFIG_SAMPLE_VFS)		+= vfs
++subdir-$(CONFIG_SAMPLE_WATCH_QUEUE)	+= watch_queue
+diff --git a/samples/watch_queue/Makefile b/samples/watch_queue/Makefile
+new file mode 100644
+index 000000000000..42b694430d0f
+--- /dev/null
++++ b/samples/watch_queue/Makefile
+@@ -0,0 +1,9 @@
++# List of programs to build
++hostprogs-y := watch_test
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
++HOSTCFLAGS_watch_test.o += -I$(objtree)/usr/include
++
++HOSTLOADLIBES_watch_test += -lkeyutils
+diff --git a/samples/watch_queue/watch_test.c b/samples/watch_queue/watch_test.c
+new file mode 100644
+index 000000000000..893a5380f792
+--- /dev/null
++++ b/samples/watch_queue/watch_test.c
+@@ -0,0 +1,310 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Use /dev/watch_queue to watch for notifications.
++ *
++ * Copyright (C) 2019 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
++
++#include <stdbool.h>
++#include <stdarg.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <signal.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <dirent.h>
++#include <errno.h>
++#include <sys/wait.h>
++#include <sys/ioctl.h>
++#include <sys/mman.h>
++#include <poll.h>
++#include <limits.h>
++#include <linux/watch_queue.h>
++#include <linux/unistd.h>
++#include <linux/keyctl.h>
++
++#ifndef __NR_mount_notify
++#define __NR_mount_notify -1
++#endif
++#ifndef __NR_sb_notify
++#define __NR_sb_notify -1
++#endif
++#ifndef __NR_device_notify
++#define __NR_device_notify -1
++#endif
++#ifndef KEYCTL_WATCH_KEY
++#define KEYCTL_WATCH_KEY -1
 +#endif
 +
- blk_status_t errno_to_blk_status(int errno)
- {
- 	int i;
-@@ -179,6 +195,19 @@ static void print_req_error(struct request *req, blk_status_t status)
- 				req->rq_disk ?  req->rq_disk->disk_name : "?",
- 				(unsigned long long)blk_rq_pos(req),
- 				req->cmd_flags);
++#define BUF_SIZE 4
 +
-+#ifdef CONFIG_BLK_NOTIFICATIONS
-+	if (blk_notifications[idx]) {
-+		struct block_notification n = {
-+			.watch.type	= WATCH_TYPE_BLOCK_NOTIFY,
-+			.watch.subtype	= blk_notifications[idx],
-+			.watch.info	= sizeof(n),
-+			.dev		= req->rq_disk ? disk_devt(req->rq_disk) : 0,
-+			.sector		= blk_rq_pos(req),
-+		};
-+		post_block_notification(&n);
++static const char *key_subtypes[256] = {
++	[NOTIFY_KEY_INSTANTIATED]	= "instantiated",
++	[NOTIFY_KEY_UPDATED]		= "updated",
++	[NOTIFY_KEY_LINKED]		= "linked",
++	[NOTIFY_KEY_UNLINKED]		= "unlinked",
++	[NOTIFY_KEY_CLEARED]		= "cleared",
++	[NOTIFY_KEY_REVOKED]		= "revoked",
++	[NOTIFY_KEY_INVALIDATED]	= "invalidated",
++	[NOTIFY_KEY_SETATTR]		= "setattr",
++};
++
++static void saw_key_change(struct watch_notification *n)
++{
++	struct key_notification *k = (struct key_notification *)n;
++	unsigned int len = n->info & WATCH_INFO_LENGTH;
++
++	if (len != sizeof(struct key_notification))
++		return;
++
++	printf("KEY %08x change=%u[%s] aux=%u\n",
++	       k->key_id, n->subtype, key_subtypes[n->subtype], k->aux);
++}
++
++static const char *mount_subtypes[256] = {
++	[NOTIFY_MOUNT_NEW_MOUNT]	= "new_mount",
++	[NOTIFY_MOUNT_UNMOUNT]		= "unmount",
++	[NOTIFY_MOUNT_EXPIRY]		= "expiry",
++	[NOTIFY_MOUNT_READONLY]		= "readonly",
++	[NOTIFY_MOUNT_SETATTR]		= "setattr",
++	[NOTIFY_MOUNT_MOVE_FROM]	= "move_from",
++	[NOTIFY_MOUNT_MOVE_TO]		= "move_to",
++};
++
++static long keyctl_watch_key(int key, int watch_fd, int watch_id)
++{
++	return syscall(__NR_keyctl, KEYCTL_WATCH_KEY, key, watch_fd, watch_id);
++}
++
++static void saw_mount_change(struct watch_notification *n)
++{
++	struct mount_notification *m = (struct mount_notification *)n;
++	unsigned int len = n->info & WATCH_INFO_LENGTH;
++
++	if (len != sizeof(struct mount_notification))
++		return;
++
++	printf("MOUNT %08x change=%u[%s] aux=%u\n",
++	       m->triggered_on, n->subtype, mount_subtypes[n->subtype], m->changed_mount);
++}
++
++static const char *super_subtypes[256] = {
++	[NOTIFY_SUPERBLOCK_READONLY]	= "readonly",
++	[NOTIFY_SUPERBLOCK_ERROR]	= "error",
++	[NOTIFY_SUPERBLOCK_EDQUOT]	= "edquot",
++	[NOTIFY_SUPERBLOCK_NETWORK]	= "network",
++};
++
++static void saw_super_change(struct watch_notification *n)
++{
++	struct superblock_notification *s = (struct superblock_notification *)n;
++	unsigned int len = n->info & WATCH_INFO_LENGTH;
++
++	if (len < sizeof(struct superblock_notification))
++		return;
++
++	printf("SUPER %08llx change=%u[%s]\n",
++	       s->sb_id, n->subtype, super_subtypes[n->subtype]);
++}
++
++static const char *block_subtypes[256] = {
++	[NOTIFY_BLOCK_ERROR_TIMEOUT]			= "timeout",
++	[NOTIFY_BLOCK_ERROR_NO_SPACE]			= "critical space allocation",
++	[NOTIFY_BLOCK_ERROR_RECOVERABLE_TRANSPORT]	= "recoverable transport",
++	[NOTIFY_BLOCK_ERROR_CRITICAL_TARGET]		= "critical target",
++	[NOTIFY_BLOCK_ERROR_CRITICAL_NEXUS]		= "critical nexus",
++	[NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM]		= "critical medium",
++	[NOTIFY_BLOCK_ERROR_PROTECTION]			= "protection",
++	[NOTIFY_BLOCK_ERROR_KERNEL_RESOURCE]		= "kernel resource",
++	[NOTIFY_BLOCK_ERROR_DEVICE_RESOURCE]		= "device resource",
++	[NOTIFY_BLOCK_ERROR_IO]				= "I/O",
++};
++
++static void saw_block_change(struct watch_notification *n)
++{
++	struct block_notification *b = (struct block_notification *)n;
++	unsigned int len = n->info & WATCH_INFO_LENGTH;
++
++	if (len < sizeof(struct block_notification))
++		return;
++
++	printf("BLOCK %08llx e=%u[%s] s=%llx\n",
++	       (unsigned long long)b->dev,
++	       n->subtype, block_subtypes[n->subtype],
++	       (unsigned long long)b->sector);
++}
++
++static const char *usb_subtypes[256] = {
++	[NOTIFY_USB_DEVICE_ADD]		= "dev-add",
++	[NOTIFY_USB_DEVICE_REMOVE]	= "dev-remove",
++	[NOTIFY_USB_BUS_ADD]		= "bus-add",
++	[NOTIFY_USB_BUS_REMOVE]		= "bus-remove",
++	[NOTIFY_USB_DEVICE_RESET]	= "dev-reset",
++	[NOTIFY_USB_DEVICE_ERROR]	= "dev-error",
++};
++
++static void saw_usb_event(struct watch_notification *n)
++{
++	struct usb_notification *u = (struct usb_notification *)n;
++	unsigned int len = n->info & WATCH_INFO_LENGTH;
++
++	if (len < sizeof(struct usb_notification))
++		return;
++
++	printf("USB %*.*s %s e=%x r=%x\n",
++	       u->name_len, u->name_len, u->name,
++	       usb_subtypes[n->subtype],
++	       u->error, u->reserved);
++}
++
++/*
++ * Consume and display events.
++ */
++static int consumer(int fd, struct watch_queue_buffer *buf)
++{
++	struct watch_notification *n;
++	struct pollfd p[1];
++	unsigned int head, tail, mask = buf->meta.mask;
++
++	for (;;) {
++		p[0].fd = fd;
++		p[0].events = POLLIN | POLLERR;
++		p[0].revents = 0;
++
++		if (poll(p, 1, -1) == -1) {
++			perror("poll");
++			break;
++		}
++
++		printf("ptrs h=%x t=%x m=%x\n",
++		       buf->meta.head, buf->meta.tail, buf->meta.mask);
++
++		while (head = buf->meta.head,
++		       tail = buf->meta.tail,
++		       tail != head
++		       ) {
++			asm ("lfence" : : : "memory" );
++			n = &buf->slots[tail & mask];
++			printf("NOTIFY[%08x-%08x] ty=%04x sy=%04x i=%08x\n",
++			       head, tail, n->type, n->subtype, n->info);
++			if ((n->info & WATCH_INFO_LENGTH) == 0)
++				goto out;
++
++			switch (n->type) {
++			case WATCH_TYPE_META:
++				if (n->subtype == WATCH_META_REMOVAL_NOTIFICATION)
++					printf("REMOVAL of watchpoint %08x\n",
++					       n->info & WATCH_INFO_ID);
++				break;
++			case WATCH_TYPE_MOUNT_NOTIFY:
++				saw_mount_change(n);
++				break;
++			case WATCH_TYPE_SB_NOTIFY:
++				saw_super_change(n);
++				break;
++			case WATCH_TYPE_KEY_NOTIFY:
++				saw_key_change(n);
++				break;
++			case WATCH_TYPE_BLOCK_NOTIFY:
++				saw_block_change(n);
++				break;
++			case WATCH_TYPE_USB_NOTIFY:
++				saw_usb_event(n);
++				break;
++			}
++
++			tail += (n->info & WATCH_INFO_LENGTH) >> WATCH_LENGTH_SHIFT;
++			asm("mfence" ::: "memory");
++			buf->meta.tail = tail;
++		}
 +	}
-+#endif
- }
- 
- static void req_bio_endio(struct request *rq, struct bio *bio,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1aafeb923e7b..8b8e235f47c9 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -43,6 +43,7 @@ struct pr_ops;
- struct rq_qos;
- struct blk_queue_stats;
- struct blk_stat_callback;
-+struct block_notification;
- 
- #define BLKDEV_MIN_RQ	4
- #define BLKDEV_MAX_RQ	128	/* Default maximum */
-@@ -1744,6 +1745,20 @@ static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
- }
- #endif /* CONFIG_BLK_DEV_ZONED */
- 
-+#ifdef CONFIG_BLK_NOTIFICATIONS
-+static inline void post_block_notification(struct block_notification *n)
-+{
-+	u64 id = 0; /* Might want to allow dev# here. */
 +
-+	post_device_notification(&n->watch, id);
++out:
++	return 0;
 +}
-+#else
-+static inline void post_block_notification(struct block_notification *n)
-+{
-+}
-+#endif
 +
-+
- #else /* CONFIG_BLOCK */
- 
- struct block_device;
-diff --git a/include/uapi/linux/watch_queue.h b/include/uapi/linux/watch_queue.h
-index aeffcfd7a742..22e3326b83a6 100644
---- a/include/uapi/linux/watch_queue.h
-+++ b/include/uapi/linux/watch_queue.h
-@@ -155,4 +155,31 @@ struct superblock_error_notification {
- 	__u32	error_cookie;
- };
- 
-+/*
-+ * Type of block layer notification.
-+ */
-+enum block_notification_type {
-+	NOTIFY_BLOCK_ERROR_TIMEOUT		= 1, /* Timeout error */
-+	NOTIFY_BLOCK_ERROR_NO_SPACE		= 2, /* Critical space allocation error */
-+	NOTIFY_BLOCK_ERROR_RECOVERABLE_TRANSPORT = 3, /* Recoverable transport error */
-+	NOTIFY_BLOCK_ERROR_CRITICAL_TARGET	= 4, /* Critical target error */
-+	NOTIFY_BLOCK_ERROR_CRITICAL_NEXUS	= 5, /* Critical nexus error */
-+	NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM	= 6, /* Critical medium error */
-+	NOTIFY_BLOCK_ERROR_PROTECTION		= 7, /* Protection error */
-+	NOTIFY_BLOCK_ERROR_KERNEL_RESOURCE	= 8, /* Kernel resource error */
-+	NOTIFY_BLOCK_ERROR_DEVICE_RESOURCE	= 9, /* Device resource error */
-+	NOTIFY_BLOCK_ERROR_IO			= 10, /* Other I/O error */
++static struct watch_notification_filter filter = {
++	.nr_filters	= 5,
++	.__reserved	= 0,
++	.filters = {
++		[0] = {
++			.type			= WATCH_TYPE_MOUNT_NOTIFY,
++			// Reject move-from notifications
++			.subtype_filter[0]	= UINT_MAX & ~(1 << NOTIFY_MOUNT_MOVE_FROM),
++		},
++		[1]	= {
++			.type			= WATCH_TYPE_SB_NOTIFY,
++			// Only accept notification of changes to R/O state
++			.subtype_filter[0]	= (1 << NOTIFY_SUPERBLOCK_READONLY),
++			// Only accept notifications of change-to-R/O
++			.info_mask		= WATCH_INFO_FLAG_0,
++			.info_filter		= WATCH_INFO_FLAG_0,
++		},
++		[2]	= {
++			.type			= WATCH_TYPE_KEY_NOTIFY,
++			.subtype_filter[0]	= UINT_MAX,
++		},
++		[3]	= {
++			.type			= WATCH_TYPE_BLOCK_NOTIFY,
++			.subtype_filter[0]	= UINT_MAX,
++		},
++		[4]	= {
++			.type			= WATCH_TYPE_USB_NOTIFY,
++			.subtype_filter[0]	= UINT_MAX,
++		},
++	},
 +};
 +
-+/*
-+ * Block layer notification record.
-+ * - watch.type = WATCH_TYPE_BLOCK_NOTIFY
-+ * - watch.subtype = enum block_notification_type
-+ */
-+struct block_notification {
-+	struct watch_notification watch; /* WATCH_TYPE_BLOCK_NOTIFY */
-+	__u64	dev;			/* Device number */
-+	__u64	sector;			/* Affected sector */
-+};
++int main(int argc, char **argv)
++{
++	struct watch_queue_buffer *buf;
++	size_t page_size;
++	int fd;
 +
- #endif /* _UAPI_LINUX_WATCH_QUEUE_H */
++	fd = open("/dev/watch_queue", O_RDWR);
++	if (fd == -1) {
++		perror("/dev/watch_queue");
++		exit(1);
++	}
++
++	if (ioctl(fd, IOC_WATCH_QUEUE_SET_SIZE, BUF_SIZE) == -1) {
++		perror("/dev/watch_queue(size)");
++		exit(1);
++	}
++
++	if (ioctl(fd, IOC_WATCH_QUEUE_SET_FILTER, &filter) == -1) {
++		perror("/dev/watch_queue(filter)");
++		exit(1);
++	}
++
++	page_size = sysconf(_SC_PAGESIZE);
++	buf = mmap(NULL, BUF_SIZE * page_size, PROT_READ | PROT_WRITE,
++		   MAP_SHARED, fd, 0);
++	if (buf == MAP_FAILED) {
++		perror("mmap");
++		exit(1);
++	}
++
++	if (keyctl_watch_key(KEY_SPEC_SESSION_KEYRING, fd, 0x01) == -1) {
++		perror("keyctl");
++		exit(1);
++	}
++
++	if (syscall(__NR_mount_notify, AT_FDCWD, "/", 0, fd, 0x02) == -1) {
++		perror("mount_notify");
++		exit(1);
++	}
++
++	if (syscall(__NR_sb_notify, AT_FDCWD, "/mnt", 0, fd, 0x03) == -1) {
++		perror("sb_notify");
++		exit(1);
++	}
++
++	if (syscall(__NR_device_notify, fd, 0x04) == -1) {
++		perror("device_notify");
++		exit(1);
++	}
++
++	return consumer(fd, buf);
++}
 
