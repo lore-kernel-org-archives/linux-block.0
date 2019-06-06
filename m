@@ -2,379 +2,371 @@ Return-Path: <SRS0=ECsc=UF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH autolearn=ham
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D731CC04AB5
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 11:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A71B6C04AB5
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 12:32:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9723F207E0
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 11:58:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75E9020872
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 12:32:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Xew1BIY/"
+	dkim=pass (2048-bit key) header.d=tycho.nsa.gov header.i=@tycho.nsa.gov header.b="cGm1Ubzp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728029AbfFFL6x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jun 2019 07:58:53 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:33917 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727589AbfFFL6w (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jun 2019 07:58:52 -0400
-Received: by mail-pf1-f194.google.com with SMTP id c85so1386463pfc.1
-        for <linux-block@vger.kernel.org>; Thu, 06 Jun 2019 04:58:52 -0700 (PDT)
+        id S1727503AbfFFMcx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jun 2019 08:32:53 -0400
+Received: from ucol19pa14.eemsg.mail.mil ([214.24.24.87]:8578 "EHLO
+        ucol19pa14.eemsg.mail.mil" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727200AbfFFMcx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jun 2019 08:32:53 -0400
+X-EEMSG-check-017: 712922440|UCOL19PA14_EEMSG_MP12.csd.disa.mil
+X-IronPort-AV: E=Sophos;i="5.63,559,1557187200"; 
+   d="scan'208";a="712922440"
+Received: from emsm-gh1-uea10.ncsc.mil ([214.29.60.2])
+  by ucol19pa14.eemsg.mail.mil with ESMTP/TLS/DHE-RSA-AES256-SHA256; 06 Jun 2019 12:32:33 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NzwoRC5gKL8eyZgW+isHhbR7yP8S9NSbd80KIYWUksk=;
-        b=Xew1BIY/zwHvtBhI/AS7uwq3eEBwUBTNM5AcyI9aIEnXlFaog8EEDT9P1ugw6jcLeA
-         KDYYQ+tYMKmvCgQNCDXs5Qr57MtfMyEc2P0iCbPUMceQ63KWscUHcJpxujKbzjR573H/
-         e8ABuycSoTPnp9ZaWT9PCCKJ4D4K7cGKSlldY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NzwoRC5gKL8eyZgW+isHhbR7yP8S9NSbd80KIYWUksk=;
-        b=McCCjPISFp+WRccjKTwHAXsATISb5P8XwaXEEwPN6y/t1NCceATi7wnVcRtjBWq0G4
-         Aq9XGnLPd2LDFqShl32Hy/3vSmv/r1Of8uc/ad2rAp7TYrS1Q00VWM7KhEu63PRr+2HC
-         LATq2UxotpcLh0cm4V68DfCdaSnr328LCBk1vVqK86JboTnL5+YAUIvTnx2tu71rhgsr
-         MHH4HIYkC4GoAVCK+UMidt2G+hr2bkuC5u3ygDndm/rF2H0uA4d31DcFkiElqlERAg4x
-         7lukSM3NCK5Kg7riMZ2NYIGF5auHdX1IHfvjTEi8akuXVj+vSZX/q7lCrowq7HKhAu01
-         mG3Q==
-X-Gm-Message-State: APjAAAVHeg54a78ZbBq7Jn4zYQW9gVHRy2RIMeq/wVBoyeoRwqk4N0yq
-        2ULomgIxngYnJfPfTqbSR9+fswlNSNVujtmP/a/QmvfRa10=
-X-Google-Smtp-Source: APXvYqxyxTySzwpqu0BE7tSY6/2rF2e6OzwGQw7VBTPFLzDs6mi0jWo18FbEmYZuIFTwiHAWVDGFvp1zvf2FXAa1BmI=
-X-Received: by 2002:a17:90a:2ec5:: with SMTP id h5mr50069724pjs.93.1559822331728;
- Thu, 06 Jun 2019 04:58:51 -0700 (PDT)
+  d=tycho.nsa.gov; i=@tycho.nsa.gov; q=dns/txt;
+  s=tycho.nsa.gov; t=1559824354; x=1591360354;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=dHD02qUEn9l4gW8o1GuRfUenIeZceFNfpLCJZMeFyG8=;
+  b=cGm1UbzpMZVgpBjy0PmiXnQ/V2N7hsa7l4T/f3tDGRgaJJuJMG5fHuDi
+   4JciaQn5nl80GPuNLsSuVyg7ROorMdOZl/cdfFSmvlSVWBe/4qOUoWKbf
+   RpQuA1NTtLBuAZjdsCtw2M0I75YmBufuApmaQ5tRDga7i8UpFqOGlG2ou
+   PJQUmVFUKLAiTntYuwi6wwbTtiloEdEEQpSF+UeBiGZ5382cVDkm7eD9R
+   jpOLal/LYKKV1W6PntztPHSNTZWr0G80GCbKrvHkCuTkBdwvUxeF27FkY
+   X8brtYJDUopYL5EFUYRUqDWjw/WKf5Wcy4NfdkqvqcyUEBI7jNCw7vsgs
+   A==;
+X-IronPort-AV: E=Sophos;i="5.63,559,1557187200"; 
+   d="scan'208";a="24461124"
+IronPort-PHdr: =?us-ascii?q?9a23=3AuFX0Ah9CYkZ1bf9uRHKM819IXTAuvvDOBiVQ1K?=
+ =?us-ascii?q?B+1e8RIJqq85mqBkHD//Il1AaPAdyCrasY16GL6ujJYi8p2d65qncMcZhBBV?=
+ =?us-ascii?q?cuqP49uEgeOvODElDxN/XwbiY3T4xoXV5h+GynYwAOQJ6tL1LdrWev4jEMBx?=
+ =?us-ascii?q?7xKRR6JvjvGo7Vks+7y/2+94fcbglVmTaxe65+IRq5oAnetsQanJZpJ7osxB?=
+ =?us-ascii?q?fOvnZGYfldy3lyJVKUkRb858Ow84Bm/i9Npf8v9NNOXLvjcaggQrNWEDopM2?=
+ =?us-ascii?q?Yu5M32rhbDVheA5mEdUmoNjBVFBRXO4QzgUZfwtiv6sfd92DWfMMbrQ704RS?=
+ =?us-ascii?q?iu4qF2QxLzliwJKyA2/33WisxojaJUvhShpwBkw4XJZI2ZLedycr/Bcd8fQ2?=
+ =?us-ascii?q?dOUNxRVyhcCY2iaYUBAfcKMeJBo4Tzo1YCqB2zDhSuCuzy0D9FnmL407M00+?=
+ =?us-ascii?q?ohEg/I0gIvEN0Mv3vIo9v4L7sSXOKvwaXU0TnOYfFb1DHg44bIaBAhpvSMUK?=
+ =?us-ascii?q?ptf8rN10YvDwPFgUuWqYf4Ij2V0/4Cs2yf7+V+VeOklmkqqxpsrTi03coslo?=
+ =?us-ascii?q?nIiZ4VylDD7yl5xp01KseiRE50Zt6kDoJduieHPIV4RcMiRntnuCc8yrAeup?=
+ =?us-ascii?q?60YjIKyJI5yB7bcfCHdJKI4h3lWe2MIjl4nGpodK+wihu960StyvDwWtOq3F?=
+ =?us-ascii?q?tFsCZJiMTAu3YQ3BLJ8MeHUOFy/kK51DaK0ADc9/9LLFgvlareN54h2rkwlo?=
+ =?us-ascii?q?cPsUjbHi/5hkH2jKiOe0U44Oeo8eXnYqj9ppOGK491ih3xMqQpmsClB+Q3Lh?=
+ =?us-ascii?q?MOUHSB9eS51b3j+VX1QLRMjvIojqnUqI3WKMsUq6KjAwJZz5wv5wiwAju4yt?=
+ =?us-ascii?q?gUgGELLFdfdxKGi4jpNUvOIPf9DfqnmFSjjSxryuvaPrzhHprNLn/DnK3nfb?=
+ =?us-ascii?q?Zm8UFQ0gUzzddB555MELEOPOrzWlPttNzfFhI2Lgy0w+HpCdpj0oMeXXmPD7?=
+ =?us-ascii?q?SDMKzMrFCI5vggI/WWaIAJvzb9LuAv5+Tygn8hhV8dYa6p0IMJaHC5BPRmJF?=
+ =?us-ascii?q?6UYHvyjdcHEGcKoBAyTOjriF2ETD5SaGy+X6Um5jE0Eo6mEITDTJi3gLOdxC?=
+ =?us-ascii?q?e7AoFWZmdeB1CDC3fnaYqEW/QMaC+JJs9hkzoEVaWuSo8v0hGuqQn6xKd9Ie?=
+ =?us-ascii?q?rI+y0YspTj2MJy5+3JmhE47SZ0ANiF02GRU2F0mXsFSCMs06Bkv0N8ykyO0b?=
+ =?us-ascii?q?NkjPxYD9NT+v1JUgMkOp7G1uB1F8r9VhjdcdeOTVasWs+mDi0pTtIt398OZF?=
+ =?us-ascii?q?5wG9GjjhDFwiqrDKYZl6GQBJMv6a/cwXfxKNhny3rc16kukUMmQs1ROm2inK?=
+ =?us-ascii?q?J/8BLTB4HRmUWDi6mqbbgc3DLK9Gqb12qBpl9YXxB2UajeQXAfZlXZrdHj6U?=
+ =?us-ascii?q?LMVbOuD6ooMhdZw86YNqRKcsHpjUlBRPr7PNTeYmSxm3q/BBqRyLOMd5fldH?=
+ =?us-ascii?q?sD3CrDDEgJiB4T/XmYOggkHCuhoHzRDCZoFV3xZ0Pg6+5+qGm0TkUs1QGFc1?=
+ =?us-ascii?q?Vh16ap+h4SnfGcT/IT3rQZuCYusjl7Bk6939PNBtqeqApuYr9cbck+4FhZz2?=
+ =?us-ascii?q?LZsRJyPpi6I6BlnF4efBx9v1ny2BVvFoVAjc8qoWsuzApzL6KYzVxAeyqD0p?=
+ =?us-ascii?q?D0Pb3YNmry8Quxa67ZxF7eysya+qQR5/QirVXsogWpGlAl83V93Nlfy2Gc6Y?=
+ =?us-ascii?q?nSDAoOTZLxVV469xtkqLDaeCk95oXU1XJ3MaSvrD/C1MwmBPE/xhajYdhfKq?=
+ =?us-ascii?q?WEGxH2E8EAAMiuMuMqkUCzbh0YJOBS6LI0P8S+evuC2a6rOvtgnT2/gWRc/o?=
+ =?us-ascii?q?9yzl+M9zB9Su7U35cJ2vSY3gyaWDfhiFeurNv6mZ5LZT4MBGqz0yvkC5BLZq?=
+ =?us-ascii?q?10Y4kLDX2iI8qtxtVxn5TtQWJX9Ea/B1Ma38+kYR6Sb1373Q1N2kUbuH+nlj?=
+ =?us-ascii?q?WizzxyjT4pqrGS3DLBw+v8bhoLIG1LS3d4jVfqP4e0i8oWXE+ybwgmjBGl/1?=
+ =?us-ascii?q?r1x7BHpKRjKGneWV9IcDLrL2FmSaawrqCNY9NL6J8xtCVXV+O8YUqERbLnvx?=
+ =?us-ascii?q?Qa1CbjTCNiw2UXfi+rtt3ZmAN3jGaGZCJ/rH3GdMV03j/F6dDcTOIX1T0DEm?=
+ =?us-ascii?q?0wlzjNAXCuMt+o45OQlpHeoqa5TW3nS54AXzPsyNa7qCaj5WBsSSa6lvS3l8?=
+ =?us-ascii?q?yvRRM2ygfnxtJqUmPOtx+6bY71gffpedl7d1VlUQevo/FxHZtzx85p38Ad?=
+X-IPAS-Result: =?us-ascii?q?A2CEBAC5Bflc/wHyM5BlHAEBAQQBAQcEAQGBZYFnKmpRA?=
+ =?us-ascii?q?TIohBSSPIEBAQEBAQEBBoEQJYlRjyKBZwkBAQEBAQEBAQEtBwECAQGEQAKCY?=
+ =?us-ascii?q?yM4EwEDAQEBBAEBAQEDAQFsHAyCOikBgmYBAQEBAgEjBBE6BQIFCwsOCgICJ?=
+ =?us-ascii?q?gICVwYBDAgBAYJTDD8BgXYFDw+maX4zgk+CeIMhgUaBDCiLWxd4gQeBEScMg?=
+ =?us-ascii?q?UpnLj6CYQQYgSwDAYMhglgEizFMiAWHK40CagmCEIIbhCiMdAYbgiOKe4F2h?=
+ =?us-ascii?q?3SNCgSBKYVpkSwhgVgrCAIYCCEPO4JtCIISF4hhhVsjAzGBBQEBjCqCUQEB?=
+Received: from tarius.tycho.ncsc.mil ([144.51.242.1])
+  by EMSM-GH1-UEA10.NCSC.MIL with ESMTP; 06 Jun 2019 12:32:30 +0000
+Received: from moss-pluto.infosec.tycho.ncsc.mil (moss-pluto [192.168.25.131])
+        by tarius.tycho.ncsc.mil (8.14.4/8.14.4) with ESMTP id x56CWTLU004553;
+        Thu, 6 Jun 2019 08:32:29 -0400
+Subject: Re: [RFC][PATCH 00/10] Mount, FS, Block and Keyrings notifications
+ [ver #3]
+To:     David Howells <dhowells@redhat.com>, viro@zeniv.linux.org.uk
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        linux-usb@vger.kernel.org, raven@themaw.net,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paul Moore <paul@paul-moore.com>
+References: <155981411940.17513.7137844619951358374.stgit@warthog.procyon.org.uk>
+From:   Stephen Smalley <sds@tycho.nsa.gov>
+Message-ID: <b91710d8-cd2d-6b93-8619-130b9d15983d@tycho.nsa.gov>
+Date:   Thu, 6 Jun 2019 08:32:29 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190531022801.10003-1-ming.lei@redhat.com> <20190531022801.10003-10-ming.lei@redhat.com>
-In-Reply-To: <20190531022801.10003-10-ming.lei@redhat.com>
-From:   Sreekanth Reddy <sreekanth.reddy@broadcom.com>
-Date:   Thu, 6 Jun 2019 17:28:40 +0530
-Message-ID: <CAK=zhgqY0ZTbg1wyHDr9EPn=G63upo+Do-Sm5L-AJrsCkJTynQ@mail.gmail.com>
-Subject: Re: [PATCH 9/9] scsi: mp3sas: convert private reply queue to blk-mq
- hw queue
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        John Garry <john.garry@huawei.com>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <155981411940.17513.7137844619951358374.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ming - We have one outstanding series posted for mpt3sas driver. Your next
-revision may need rebase considering below update -
+On 6/6/19 5:41 AM, David Howells wrote:
+> 
+> Hi Al,
+> 
+> Here's a set of patches to add a general variable-length notification queue
+> concept and to add sources of events for:
+> 
+>   (1) Mount topology events, such as mounting, unmounting, mount expiry,
+>       mount reconfiguration.
+> 
+>   (2) Superblock events, such as R/W<->R/O changes, quota overrun and I/O
+>       errors (not complete yet).
+> 
+>   (3) Key/keyring events, such as creating, linking and removal of keys.
+> 
+>   (4) General device events (single common queue) including:
+> 
+>       - Block layer events, such as device errors
+> 
+>       - USB subsystem events, such as device/bus attach/remove, device
+>         reset, device errors.
+> 
+> One of the reasons for this is so that we can remove the issue of processes
+> having to repeatedly and regularly scan /proc/mounts, which has proven to
+> be a system performance problem.  To further aid this, the fsinfo() syscall
+> on which this patch series depends, provides a way to access superblock and
+> mount information in binary form without the need to parse /proc/mounts.
+> 
+> 
+> LSM support is included, but controversial:
+> 
+>   (1) The creds of the process that did the fput() that reduced the refcount
+>       to zero are cached in the file struct.
+> 
+>   (2) __fput() overrides the current creds with the creds from (1) whilst
+>       doing the cleanup, thereby making sure that the creds seen by the
+>       destruction notification generated by mntput() appears to come from
+>       the last fputter.
+> 
+>   (3) security_post_notification() is called for each queue that we might
+>       want to post a notification into, thereby allowing the LSM to prevent
+>       covert communications.
+> 
+>   (?) Do I need to add security_set_watch(), say, to rule on whether a watch
+>       may be set in the first place?  I might need to add a variant per
+>       watch-type.
+> 
+>   (?) Do I really need to keep track of the process creds in which an
+>       implicit object destruction happened?  For example, imagine you create
+>       an fd with fsopen()/fsmount().  It is marked to dissolve the mount it
+>       refers to on close unless move_mount() clears that flag.  Now, imagine
+>       someone looking at that fd through procfs at the same time as you exit
+>       due to an error.  The LSM sees the destruction notification come from
+>       the looker if they happen to do their fput() after yours.
 
-https://marc.info/?l=linux-scsi&m=155930490520681&w=2
 
-Thanks & Regards,
-Sreekanth
+I'm not in favor of this approach. Can we check permission to the object 
+being watched when a watch is set (read-like access), make sure every 
+access that can trigger a notification requires a (write-like) 
+permission to the accessed object, and make sure there is some sane way 
+to control the relationship between the accessed object and the watched 
+object (write-like)?  For cases where we have no object per se or at 
+least no security structure/label associated with it, we may have to 
+fall back to a coarse-grained "Can the watcher get this kind of 
+notification in general?".
 
-On Fri, May 31, 2019 at 7:59 AM Ming Lei <ming.lei@redhat.com> wrote:
->
-> SCSI's reply qeueue is very similar with blk-mq's hw queue, both
-> assigned by IRQ vector, so map te private reply queue into blk-mq's hw
-> queue via .host_tagset.
->
-> Then the private reply mapping can be removed.
->
-> Another benefit is that the request/irq lost issue may be solved in
-> generic approach because managed IRQ may be shutdown during CPU
-> hotplug.
->
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> 
+> 
+> Design decisions:
+> 
+>   (1) A misc chardev is used to create and open a ring buffer:
+> 
+> 	fd = open("/dev/watch_queue", O_RDWR);
+> 
+>       which is then configured and mmap'd into userspace:
+> 
+> 	ioctl(fd, IOC_WATCH_QUEUE_SET_SIZE, BUF_SIZE);
+> 	ioctl(fd, IOC_WATCH_QUEUE_SET_FILTER, &filter);
+> 	buf = mmap(NULL, BUF_SIZE * page_size, PROT_READ | PROT_WRITE,
+> 		   MAP_SHARED, fd, 0);
+> 
+>       The fd cannot be read or written (though there is a facility to use
+>       write to inject records for debugging) and userspace just pulls data
+>       directly out of the buffer.
+> 
+>   (2) The ring index pointers are stored inside the ring and are thus
+>       accessible to userspace.  Userspace should only update the tail
+>       pointer and never the head pointer or risk breaking the buffer.  The
+>       kernel checks that the pointers appear valid before trying to use
+>       them.  A 'skip' record is maintained around the pointers.
+> 
+>   (3) poll() can be used to wait for data to appear in the buffer.
+> 
+>   (4) Records in the buffer are binary, typed and have a length so that they
+>       can be of varying size.
+> 
+>       This means that multiple heterogeneous sources can share a common
+>       buffer.  Tags may be specified when a watchpoint is created to help
+>       distinguish the sources.
+> 
+>   (5) The queue is reusable as there are 16 million types available, of
+>       which I've used 4, so there is scope for others to be used.
+> 
+>   (6) Records are filterable as types have up to 256 subtypes that can be
+>       individually filtered.  Other filtration is also available.
+> 
+>   (7) Each time the buffer is opened, a new buffer is created - this means
+>       that there's no interference between watchers.
+> 
+>   (8) When recording a notification, the kernel will not sleep, but will
+>       rather mark a queue as overrun if there's insufficient space, thereby
+>       avoiding userspace causing the kernel to hang.
+> 
+>   (9) The 'watchpoint' should be specific where possible, meaning that you
+>       specify the object that you want to watch.
+> 
+> (10) The buffer is created and then watchpoints are attached to it, using
+>       one of:
+> 
+> 	keyctl_watch_key(KEY_SPEC_SESSION_KEYRING, fd, 0x01);
+> 	mount_notify(AT_FDCWD, "/", 0, fd, 0x02);
+> 	sb_notify(AT_FDCWD, "/mnt", 0, fd, 0x03);
+> 
+>       where in all three cases, fd indicates the queue and the number after
+>       is a tag between 0 and 255.
+> 
+> (11) The watch must be removed if either the watch buffer is destroyed or
+>       the watched object is destroyed.
+> 
+> 
+> Things I want to avoid:
+> 
+>   (1) Introducing features that make the core VFS dependent on the network
+>       stack or networking namespaces (ie. usage of netlink).
+> 
+>   (2) Dumping all this stuff into dmesg and having a daemon that sits there
+>       parsing the output and distributing it as this then puts the
+>       responsibility for security into userspace and makes handling
+>       namespaces tricky.  Further, dmesg might not exist or might be
+>       inaccessible inside a container.
+> 
+>   (3) Letting users see events they shouldn't be able to see.
+> 
+> 
+> Further things that could be considered:
+> 
+>   (1) Adding a keyctl call to allow a watch on a keyring to be extended to
+>       "children" of that keyring, such that the watch is removed from the
+>       child if it is unlinked from the keyring.
+> 
+>   (2) Adding global superblock event queue.
+> 
+>   (3) Propagating watches to child superblock over automounts.
+> 
+> 
+> The patches can be found here also:
+> 
+> 	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=notifications
+> 
+> Changes:
+> 
+>   v3: I've added a USB notification source and reformulated the block
+>       notification source so that there's now a common watch list, for which
+>       the system call is now device_notify().
+> 
+>       I've assigned a pair of unused ioctl numbers in the 'W' series to the
+>       ioctls added by this series.
+> 
+>       I've also added a description of the kernel API to the documentation.
+> 
+>   v2: I've fixed various issues raised by Jann Horn and GregKH and moved to
+>       krefs for refcounting.  I've added some security features to try and
+>       give Casey Schaufler the LSM control he wants.
+> 
+> David
 > ---
->  drivers/scsi/mpt3sas/mpt3sas_base.c  | 74 +++++-----------------------
->  drivers/scsi/mpt3sas/mpt3sas_base.h  |  3 +-
->  drivers/scsi/mpt3sas/mpt3sas_scsih.c | 17 +++++++
->  3 files changed, 31 insertions(+), 63 deletions(-)
->
-> diff --git a/drivers/scsi/mpt3sas/mpt3sas_base.c b/drivers/scsi/mpt3sas/mpt3sas_base.c
-> index 8aacbd1e7db2..2b207d2925b4 100644
-> --- a/drivers/scsi/mpt3sas/mpt3sas_base.c
-> +++ b/drivers/scsi/mpt3sas/mpt3sas_base.c
-> @@ -2855,8 +2855,7 @@ _base_request_irq(struct MPT3SAS_ADAPTER *ioc, u8 index)
->  static void
->  _base_assign_reply_queues(struct MPT3SAS_ADAPTER *ioc)
->  {
-> -       unsigned int cpu, nr_cpus, nr_msix, index = 0;
-> -       struct adapter_reply_queue *reply_q;
-> +       unsigned int nr_cpus, nr_msix;
->
->         if (!_base_is_controller_msix_enabled(ioc))
->                 return;
-> @@ -2866,50 +2865,9 @@ _base_assign_reply_queues(struct MPT3SAS_ADAPTER *ioc)
->                 return;
->         }
->
-> -       memset(ioc->cpu_msix_table, 0, ioc->cpu_msix_table_sz);
-> -
->         nr_cpus = num_online_cpus();
->         nr_msix = ioc->reply_queue_count = min(ioc->reply_queue_count,
->                                                ioc->facts.MaxMSIxVectors);
-> -       if (!nr_msix)
-> -               return;
-> -
-> -       if (smp_affinity_enable) {
-> -               list_for_each_entry(reply_q, &ioc->reply_queue_list, list) {
-> -                       const cpumask_t *mask = pci_irq_get_affinity(ioc->pdev,
-> -                                                       reply_q->msix_index);
-> -                       if (!mask) {
-> -                               ioc_warn(ioc, "no affinity for msi %x\n",
-> -                                        reply_q->msix_index);
-> -                               continue;
-> -                       }
-> -
-> -                       for_each_cpu_and(cpu, mask, cpu_online_mask) {
-> -                               if (cpu >= ioc->cpu_msix_table_sz)
-> -                                       break;
-> -                               ioc->cpu_msix_table[cpu] = reply_q->msix_index;
-> -                       }
-> -               }
-> -               return;
-> -       }
-> -       cpu = cpumask_first(cpu_online_mask);
-> -
-> -       list_for_each_entry(reply_q, &ioc->reply_queue_list, list) {
-> -
-> -               unsigned int i, group = nr_cpus / nr_msix;
-> -
-> -               if (cpu >= nr_cpus)
-> -                       break;
-> -
-> -               if (index < nr_cpus % nr_msix)
-> -                       group++;
-> -
-> -               for (i = 0 ; i < group ; i++) {
-> -                       ioc->cpu_msix_table[cpu] = reply_q->msix_index;
-> -                       cpu = cpumask_next(cpu, cpu_online_mask);
-> -               }
-> -               index++;
-> -       }
->  }
->
->  /**
-> @@ -2924,6 +2882,7 @@ _base_disable_msix(struct MPT3SAS_ADAPTER *ioc)
->                 return;
->         pci_disable_msix(ioc->pdev);
->         ioc->msix_enable = 0;
-> +       ioc->smp_affinity_enable = 0;
->  }
->
->  /**
-> @@ -2980,6 +2939,9 @@ _base_enable_msix(struct MPT3SAS_ADAPTER *ioc)
->                 goto try_ioapic;
->         }
->
-> +       if (irq_flags & PCI_IRQ_AFFINITY)
-> +               ioc->smp_affinity_enable = 1;
-> +
->         ioc->msix_enable = 1;
->         ioc->reply_queue_count = r;
->         for (i = 0; i < ioc->reply_queue_count; i++) {
-> @@ -3266,7 +3228,7 @@ mpt3sas_base_get_reply_virt_addr(struct MPT3SAS_ADAPTER *ioc, u32 phys_addr)
->  }
->
->  static inline u8
-> -_base_get_msix_index(struct MPT3SAS_ADAPTER *ioc)
-> +_base_get_msix_index(struct MPT3SAS_ADAPTER *ioc, struct scsi_cmnd *scmd)
->  {
->         /* Enables reply_queue load balancing */
->         if (ioc->msix_load_balance)
-> @@ -3274,7 +3236,7 @@ _base_get_msix_index(struct MPT3SAS_ADAPTER *ioc)
->                     base_mod64(atomic64_add_return(1,
->                     &ioc->total_io_cnt), ioc->reply_queue_count) : 0;
->
-> -       return ioc->cpu_msix_table[raw_smp_processor_id()];
-> +       return scsi_cmnd_hctx_index(ioc->shost, scmd);
->  }
->
->  /**
-> @@ -3325,7 +3287,7 @@ mpt3sas_base_get_smid_scsiio(struct MPT3SAS_ADAPTER *ioc, u8 cb_idx,
->
->         smid = tag + 1;
->         request->cb_idx = cb_idx;
-> -       request->msix_io = _base_get_msix_index(ioc);
-> +       request->msix_io = _base_get_msix_index(ioc, scmd);
->         request->smid = smid;
->         INIT_LIST_HEAD(&request->chain_list);
->         return smid;
-> @@ -3498,7 +3460,7 @@ _base_put_smid_mpi_ep_scsi_io(struct MPT3SAS_ADAPTER *ioc, u16 smid, u16 handle)
->         _base_clone_mpi_to_sys_mem(mpi_req_iomem, (void *)mfp,
->                                         ioc->request_sz);
->         descriptor.SCSIIO.RequestFlags = MPI2_REQ_DESCRIPT_FLAGS_SCSI_IO;
-> -       descriptor.SCSIIO.MSIxIndex =  _base_get_msix_index(ioc);
-> +       descriptor.SCSIIO.MSIxIndex =  _base_get_msix_index(ioc, NULL);
->         descriptor.SCSIIO.SMID = cpu_to_le16(smid);
->         descriptor.SCSIIO.DevHandle = cpu_to_le16(handle);
->         descriptor.SCSIIO.LMID = 0;
-> @@ -3520,7 +3482,7 @@ _base_put_smid_scsi_io(struct MPT3SAS_ADAPTER *ioc, u16 smid, u16 handle)
->
->
->         descriptor.SCSIIO.RequestFlags = MPI2_REQ_DESCRIPT_FLAGS_SCSI_IO;
-> -       descriptor.SCSIIO.MSIxIndex =  _base_get_msix_index(ioc);
-> +       descriptor.SCSIIO.MSIxIndex =  _base_get_msix_index(ioc, NULL);
->         descriptor.SCSIIO.SMID = cpu_to_le16(smid);
->         descriptor.SCSIIO.DevHandle = cpu_to_le16(handle);
->         descriptor.SCSIIO.LMID = 0;
-> @@ -3543,7 +3505,7 @@ mpt3sas_base_put_smid_fast_path(struct MPT3SAS_ADAPTER *ioc, u16 smid,
->
->         descriptor.SCSIIO.RequestFlags =
->             MPI25_REQ_DESCRIPT_FLAGS_FAST_PATH_SCSI_IO;
-> -       descriptor.SCSIIO.MSIxIndex = _base_get_msix_index(ioc);
-> +       descriptor.SCSIIO.MSIxIndex = _base_get_msix_index(ioc, NULL);
->         descriptor.SCSIIO.SMID = cpu_to_le16(smid);
->         descriptor.SCSIIO.DevHandle = cpu_to_le16(handle);
->         descriptor.SCSIIO.LMID = 0;
-> @@ -3607,7 +3569,7 @@ mpt3sas_base_put_smid_nvme_encap(struct MPT3SAS_ADAPTER *ioc, u16 smid)
->
->         descriptor.Default.RequestFlags =
->                 MPI26_REQ_DESCRIPT_FLAGS_PCIE_ENCAPSULATED;
-> -       descriptor.Default.MSIxIndex =  _base_get_msix_index(ioc);
-> +       descriptor.Default.MSIxIndex =  _base_get_msix_index(ioc, NULL);
->         descriptor.Default.SMID = cpu_to_le16(smid);
->         descriptor.Default.LMID = 0;
->         descriptor.Default.DescriptorTypeDependent = 0;
-> @@ -3639,7 +3601,7 @@ mpt3sas_base_put_smid_default(struct MPT3SAS_ADAPTER *ioc, u16 smid)
->         }
->         request = (u64 *)&descriptor;
->         descriptor.Default.RequestFlags = MPI2_REQ_DESCRIPT_FLAGS_DEFAULT_TYPE;
-> -       descriptor.Default.MSIxIndex =  _base_get_msix_index(ioc);
-> +       descriptor.Default.MSIxIndex =  _base_get_msix_index(ioc, NULL);
->         descriptor.Default.SMID = cpu_to_le16(smid);
->         descriptor.Default.LMID = 0;
->         descriptor.Default.DescriptorTypeDependent = 0;
-> @@ -6524,19 +6486,11 @@ mpt3sas_base_attach(struct MPT3SAS_ADAPTER *ioc)
->
->         dinitprintk(ioc, ioc_info(ioc, "%s\n", __func__));
->
-> -       /* setup cpu_msix_table */
->         ioc->cpu_count = num_online_cpus();
->         for_each_online_cpu(cpu_id)
->                 last_cpu_id = cpu_id;
->         ioc->cpu_msix_table_sz = last_cpu_id + 1;
-> -       ioc->cpu_msix_table = kzalloc(ioc->cpu_msix_table_sz, GFP_KERNEL);
->         ioc->reply_queue_count = 1;
-> -       if (!ioc->cpu_msix_table) {
-> -               dfailprintk(ioc,
-> -                           ioc_info(ioc, "allocation for cpu_msix_table failed!!!\n"));
-> -               r = -ENOMEM;
-> -               goto out_free_resources;
-> -       }
->
->         if (ioc->is_warpdrive) {
->                 ioc->reply_post_host_index = kcalloc(ioc->cpu_msix_table_sz,
-> @@ -6748,7 +6702,6 @@ mpt3sas_base_attach(struct MPT3SAS_ADAPTER *ioc)
->         mpt3sas_base_free_resources(ioc);
->         _base_release_memory_pools(ioc);
->         pci_set_drvdata(ioc->pdev, NULL);
-> -       kfree(ioc->cpu_msix_table);
->         if (ioc->is_warpdrive)
->                 kfree(ioc->reply_post_host_index);
->         kfree(ioc->pd_handles);
-> @@ -6789,7 +6742,6 @@ mpt3sas_base_detach(struct MPT3SAS_ADAPTER *ioc)
->         _base_release_memory_pools(ioc);
->         mpt3sas_free_enclosure_list(ioc);
->         pci_set_drvdata(ioc->pdev, NULL);
-> -       kfree(ioc->cpu_msix_table);
->         if (ioc->is_warpdrive)
->                 kfree(ioc->reply_post_host_index);
->         kfree(ioc->pd_handles);
-> diff --git a/drivers/scsi/mpt3sas/mpt3sas_base.h b/drivers/scsi/mpt3sas/mpt3sas_base.h
-> index 480219f0efc5..4d441e031025 100644
-> --- a/drivers/scsi/mpt3sas/mpt3sas_base.h
-> +++ b/drivers/scsi/mpt3sas/mpt3sas_base.h
-> @@ -1022,7 +1022,6 @@ typedef void (*MPT3SAS_FLUSH_RUNNING_CMDS)(struct MPT3SAS_ADAPTER *ioc);
->   * @start_scan_failed: means port enable failed, return's the ioc_status
->   * @msix_enable: flag indicating msix is enabled
->   * @msix_vector_count: number msix vectors
-> - * @cpu_msix_table: table for mapping cpus to msix index
->   * @cpu_msix_table_sz: table size
->   * @total_io_cnt: Gives total IO count, used to load balance the interrupts
->   * @msix_load_balance: Enables load balancing of interrupts across
-> @@ -1183,6 +1182,7 @@ struct MPT3SAS_ADAPTER {
->         u16             broadcast_aen_pending;
->         u8              shost_recovery;
->         u8              got_task_abort_from_ioctl;
-> +       u8              smp_affinity_enable;
->
->         struct mutex    reset_in_progress_mutex;
->         spinlock_t      ioc_reset_in_progress_lock;
-> @@ -1199,7 +1199,6 @@ struct MPT3SAS_ADAPTER {
->
->         u8              msix_enable;
->         u16             msix_vector_count;
-> -       u8              *cpu_msix_table;
->         u16             cpu_msix_table_sz;
->         resource_size_t __iomem **reply_post_host_index;
->         u32             ioc_reset_count;
-> diff --git a/drivers/scsi/mpt3sas/mpt3sas_scsih.c b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-> index 1ccfbc7eebe0..59c1f9e694a0 100644
-> --- a/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-> +++ b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-> @@ -55,6 +55,7 @@
->  #include <linux/interrupt.h>
->  #include <linux/aer.h>
->  #include <linux/raid_class.h>
-> +#include <linux/blk-mq-pci.h>
->  #include <asm/unaligned.h>
->
->  #include "mpt3sas_base.h"
-> @@ -10161,6 +10162,17 @@ scsih_scan_finished(struct Scsi_Host *shost, unsigned long time)
->         return 1;
->  }
->
-> +static int mpt3sas_map_queues(struct Scsi_Host *shost)
-> +{
-> +       struct MPT3SAS_ADAPTER *ioc = shost_priv(shost);
-> +       struct blk_mq_queue_map *qmap = &shost->tag_set.map[HCTX_TYPE_DEFAULT];
-> +
-> +       if (ioc->smp_affinity_enable)
-> +               return blk_mq_pci_map_queues(qmap, ioc->pdev, 0);
-> +       else
-> +               return blk_mq_map_queues(qmap);
-> +}
-> +
->  /* shost template for SAS 2.0 HBA devices */
->  static struct scsi_host_template mpt2sas_driver_template = {
->         .module                         = THIS_MODULE,
-> @@ -10189,6 +10201,8 @@ static struct scsi_host_template mpt2sas_driver_template = {
->         .sdev_attrs                     = mpt3sas_dev_attrs,
->         .track_queue_depth              = 1,
->         .cmd_size                       = sizeof(struct scsiio_tracker),
-> +       .host_tagset                    = 1,
-> +       .map_queues                     = mpt3sas_map_queues,
->  };
->
->  /* raid transport support for SAS 2.0 HBA devices */
-> @@ -10227,6 +10241,8 @@ static struct scsi_host_template mpt3sas_driver_template = {
->         .sdev_attrs                     = mpt3sas_dev_attrs,
->         .track_queue_depth              = 1,
->         .cmd_size                       = sizeof(struct scsiio_tracker),
-> +       .host_tagset                    = 1,
-> +       .map_queues                     = mpt3sas_map_queues,
->  };
->
->  /* raid transport support for SAS 3.0 HBA devices */
-> @@ -10538,6 +10554,7 @@ _scsih_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->         } else
->                 ioc->hide_drives = 0;
->
-> +       shost->nr_hw_queues = ioc->reply_queue_count;
->         rv = scsi_add_host(shost, &pdev->dev);
->         if (rv) {
->                 ioc_err(ioc, "failure at %s:%d/%s()!\n",
-> --
-> 2.20.1
->
+> David Howells (10):
+>        security: Override creds in __fput() with last fputter's creds
+>        General notification queue with user mmap()'able ring buffer
+>        keys: Add a notification facility
+>        vfs: Add a mount-notification facility
+>        vfs: Add superblock notifications
+>        fsinfo: Export superblock notification counter
+>        Add a general, global device notification watch list
+>        block: Add block layer notifications
+>        usb: Add USB subsystem notifications
+>        Add sample notification program
+> 
+> 
+>   Documentation/ioctl/ioctl-number.txt   |    1
+>   Documentation/security/keys/core.rst   |   58 ++
+>   Documentation/watch_queue.rst          |  492 ++++++++++++++++++
+>   arch/x86/entry/syscalls/syscall_32.tbl |    3
+>   arch/x86/entry/syscalls/syscall_64.tbl |    3
+>   block/Kconfig                          |    9
+>   block/blk-core.c                       |   29 +
+>   drivers/base/Kconfig                   |    9
+>   drivers/base/Makefile                  |    1
+>   drivers/base/notify.c                  |   82 +++
+>   drivers/misc/Kconfig                   |   13
+>   drivers/misc/Makefile                  |    1
+>   drivers/misc/watch_queue.c             |  889 ++++++++++++++++++++++++++++++++
+>   drivers/usb/core/Kconfig               |   10
+>   drivers/usb/core/devio.c               |   55 ++
+>   drivers/usb/core/hub.c                 |    3
+>   fs/Kconfig                             |   21 +
+>   fs/Makefile                            |    1
+>   fs/file_table.c                        |   12
+>   fs/fsinfo.c                            |   12
+>   fs/mount.h                             |   33 +
+>   fs/mount_notify.c                      |  180 ++++++
+>   fs/namespace.c                         |    9
+>   fs/super.c                             |  116 ++++
+>   include/linux/blkdev.h                 |   15 +
+>   include/linux/dcache.h                 |    1
+>   include/linux/device.h                 |    7
+>   include/linux/fs.h                     |   79 +++
+>   include/linux/key.h                    |    4
+>   include/linux/lsm_hooks.h              |   15 +
+>   include/linux/security.h               |   14 +
+>   include/linux/syscalls.h               |    5
+>   include/linux/usb.h                    |   19 +
+>   include/linux/watch_queue.h            |   87 +++
+>   include/uapi/linux/fsinfo.h            |   10
+>   include/uapi/linux/keyctl.h            |    1
+>   include/uapi/linux/watch_queue.h       |  213 ++++++++
+>   kernel/sys_ni.c                        |    7
+>   mm/interval_tree.c                     |    2
+>   mm/memory.c                            |    1
+>   samples/Kconfig                        |    6
+>   samples/Makefile                       |    1
+>   samples/vfs/test-fsinfo.c              |   13
+>   samples/watch_queue/Makefile           |    9
+>   samples/watch_queue/watch_test.c       |  310 +++++++++++
+>   security/keys/Kconfig                  |   10
+>   security/keys/compat.c                 |    2
+>   security/keys/gc.c                     |    5
+>   security/keys/internal.h               |   30 +
+>   security/keys/key.c                    |   37 +
+>   security/keys/keyctl.c                 |   88 +++
+>   security/keys/keyring.c                |   17 -
+>   security/keys/request_key.c            |    4
+>   security/security.c                    |    9
+>   54 files changed, 3025 insertions(+), 38 deletions(-)
+>   create mode 100644 Documentation/watch_queue.rst
+>   create mode 100644 drivers/base/notify.c
+>   create mode 100644 drivers/misc/watch_queue.c
+>   create mode 100644 fs/mount_notify.c
+>   create mode 100644 include/linux/watch_queue.h
+>   create mode 100644 include/uapi/linux/watch_queue.h
+>   create mode 100644 samples/watch_queue/Makefile
+>   create mode 100644 samples/watch_queue/watch_test.c
+> 
+
