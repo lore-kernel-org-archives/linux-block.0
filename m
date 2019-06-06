@@ -2,307 +2,158 @@ Return-Path: <SRS0=ECsc=UF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,T_DKIMWL_WL_HIGH autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AFD5C04AB5
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 17:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB2EFC28EB3
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 18:33:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C08802089E
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 17:27:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C172420872
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 18:33:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=tycho.nsa.gov header.i=@tycho.nsa.gov header.b="Eq/JZxU/"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="d0lCSS61"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730055AbfFFR1m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jun 2019 13:27:42 -0400
-Received: from upbd19pa10.eemsg.mail.mil ([214.24.27.85]:31399 "EHLO
-        upbd19pa10.eemsg.mail.mil" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728795AbfFFR1l (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jun 2019 13:27:41 -0400
-X-Greylist: delayed 653 seconds by postgrey-1.27 at vger.kernel.org; Thu, 06 Jun 2019 13:27:37 EDT
-X-EEMSG-check-017: 230639275|UPBD19PA10_EEMSG_MP10.csd.disa.mil
-Received: from emsm-gh1-uea11.ncsc.mil ([214.29.60.3])
-  by upbd19pa10.eemsg.mail.mil with ESMTP/TLS/DHE-RSA-AES256-SHA256; 06 Jun 2019 17:16:41 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tycho.nsa.gov; i=@tycho.nsa.gov; q=dns/txt;
-  s=tycho.nsa.gov; t=1559841401; x=1591377401;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=IqCMcIgF6Z/D0YOg9kRlQDInwlPNM0gC3vhPg/4/dB8=;
-  b=Eq/JZxU/WtXBU+fgeoBSrl+e50v6dDSLEYqSst6jPQLtypvHYjJY/KS5
-   g5sFGpX0EDWpPtPIWIs6nRDbXf3ia+508jrYoCZGzrTGGIb1n5PMSxjap
-   EVxFlK03BHa5rvj9KevdAnm+PfAlN4WnafuUUbmuqANWnBVcdpKcpm7kg
-   pFBwwAwTpIv3NnzYes7UNtG+aKQmB9zGxrdRUEc1C2USs0nYHujg2FaUC
-   DN/35CjG3M+tn7/M+ps6HcpgCz6g+Fq9n1qil7Zg1JJxFI0P9YeY8pQnu
-   61cZVKEceoIBw21u4rcnd/3PXWzBV9smNgNzc4b/jl58vxaPN1Q0R0J2o
-   A==;
-X-IronPort-AV: E=Sophos;i="5.63,560,1557187200"; 
-   d="scan'208";a="28656036"
-IronPort-PHdr: =?us-ascii?q?9a23=3AQTQHihFSCiGJbzUjNwE9O51GYnF86YWxBRYc79?=
- =?us-ascii?q?8ds5kLTJ76ocu9bnLW6fgltlLVR4KTs6sC17OP9fm8BSdZuM/JmUtBWaQEbw?=
- =?us-ascii?q?UCh8QSkl5oK+++Imq/EsTXaTcnFt9JTl5v8iLzG0FUHMHjew+a+SXqvnYdFR?=
- =?us-ascii?q?rlKAV6OPn+FJLMgMSrzeCy/IDYbxlViDanbr5+MQi6oR/MusQZjoZuJbs9xg?=
- =?us-ascii?q?bUrnBVZ+lY2GRkKE6JkR3h/Mmw5plj8ypRu/Il6cFNVLjxcro7Q7JFEjkoKn?=
- =?us-ascii?q?g568L3uxbNSwuP/WYcXX4NkhVUGQjF7Qr1UYn3vyDnq+dywiiaPcnxTbApRT?=
- =?us-ascii?q?Sv6rpgRRH0hCsbMTMy7XragdJsgq1FvB2hpgR/w4/Kb4GTKPp+Zb7WcdcDSW?=
- =?us-ascii?q?ZcQspdSylND4WyYIsVC+oKIPhWoY/zqVATqReyHAehCefqxjJOm3T437A10/?=
- =?us-ascii?q?45HA/bwgIgEdIAvnfaotr7O6gdU/y6wqbTwDXfbP5bwyvx5JTGfx0jp/yHQL?=
- =?us-ascii?q?J+cdDWyUkqDw7Lk0mQppL9PzOVyOsNtXWQ4fdlVe21j24nrx9+oziyzcorkY?=
- =?us-ascii?q?nGm5kVx0vY9SR53Ik1Jdq4RFR9Yd6/CpRcrS6aN4xoQs47RWxjpSg0yroDuZ?=
- =?us-ascii?q?GhfSgKzowqxx3BZPyddYiH/BbjWPyWITdii3Jofq+0iRWq8UW41+HxWca53E?=
- =?us-ascii?q?xKoyZYiNXAqH8A2wLJ5sSaTPZ2412v1iyV1w/J7+FJOUU0la3GJJE/2rMwjZ?=
- =?us-ascii?q?8TsVjbHi/xhUX2kLeadkU69eis7OTqeqnmqYWGN491lwH+Kb4imtC/AOskMg?=
- =?us-ascii?q?gOWHKX+eKg27344UL1WrBKjvwykqXBsZDaI9oUprKhDgNI3Ysu5AyzAje73N?=
- =?us-ascii?q?gCg3UKI0xJdAiag4TxPlHBOvH4DfOxg1S2lzdrwujLPqb8DZXWNXXDjLfgcq?=
- =?us-ascii?q?p9605b0gYzy8tf6IhOBrEOJ/LzRFf9tMbEAR8hLwy03+HnBc1h2YwEQmKAHK?=
- =?us-ascii?q?+YPbjJsVCU5uIgOfSMZIERuDnjMfgp/uLhgmUjlVABeqmp2IMdaGqkEfR+P0?=
- =?us-ascii?q?WZfX3sj88cHmcKuQo/QvLliFmGUT5IfHuyRbwz6Sw7CI28EYfPXJyigLuE3C?=
- =?us-ascii?q?2jBJ1ZenhGCkyQEXfvb4iERfYMaDiVIsJ6kz0LS76hS44/1R20sA/6yrxnLv?=
- =?us-ascii?q?fb+yECspLjztd16/fOlREx7TZ0FdiS03mRT2FomWMFXzA23LphrkxyyVeD0b?=
- =?us-ascii?q?N1g/hZFdxV+vNIXQk6NZnBz+x8Ft/9QB7BftaOSFagWNmmBisxTt0pyd8Uf0?=
- =?us-ascii?q?l9A8mijgzE3yeyB78VlrqLBIE7867FwnjxPN1yxm3Y1KkukVYmWNFDNW64ia?=
- =?us-ascii?q?5l8QjcGYrJn1+el6aweqQWxDTN+3ubzWqSoEFYVxZ9Ub/fUnABeETWq8/05l?=
- =?us-ascii?q?/CT7CwDLQoKAVAxdSEKqRUdt3jlU9GS+v7ONTCf2KxnH+9BRKJxrOKcYrrdH?=
- =?us-ascii?q?wR3CvGCEcZjQ8T42iJNQwlCye/rGLREiZuGUjsY0zy6+l+rm20TksuwwGNdU?=
- =?us-ascii?q?1h2KK/+gQJivyEV/MTwrUEtT8lqzV1Gla9wt3XB8OaqAp5faVRes094FhZ2m?=
- =?us-ascii?q?LDrQB9PYKvL7pkhlEAdwR7pUTu1w94Co9Yi8glsGsqzBZuKaKfyF5BczKY3Z?=
- =?us-ascii?q?btOrzYM2X95xSva6nK1VHdy9uW5KgP5+oiq1n5vwGmCFAi83N53NlRyXec4Y?=
- =?us-ascii?q?/KDAUKW5LrTkk37wR6p63dYiQl5IPby31tMbO1sj/E1NIpH/Aoygivf9hBKq?=
- =?us-ascii?q?OIDgzyHNMAB8ioNuMqn0KlbhUePOBd7KQ0Jd+pd+Oa2K63O+ZthDamjWVB4I?=
- =?us-ascii?q?Bg3UOA7jF8RfDU0JYY2fGY3xeHVjflgFektcD4hJ1EZTUMEWek1yjkC5BeZr?=
- =?us-ascii?q?docYYIF2iuOcu3yct6h5L3XH5Y7lGjDUsc2MC1YRqSc0D93QpI2EQToHynnz?=
- =?us-ascii?q?a4zjNtnzEqsKWfxirOzPrmdBccJG5LS3dtjU32LYi3kd8aRk6oYBYtlBe/4k?=
- =?us-ascii?q?b63adbrrxlL2bPWUdIYzT2L2Z6X6uorLWCfspP5YgwsSpNTeS8ZUmWSrv6ox?=
- =?us-ascii?q?sdySPsAXFSyyw8dzGv6d3FmElRgXmQPT5Ip3rQZM90yA2XsNfVXvNA9iENRC?=
- =?us-ascii?q?Blhz3aHB23Np+i+tDC09/vu/6/WyqBUYJedS3whdeMtCyk6GluGjWlkvyzk8?=
- =?us-ascii?q?GhGg8/h3zVzd5vAB7UoQ78b4+j7KGzNeZqbwE8H1Pnw9ZrEYF51I0rjdcf3m?=
- =?us-ascii?q?ZM1cbdxmYOjWqmaYYT4qn5dndYAGdQktM=3D?=
-X-IPAS-Result: =?us-ascii?q?A2AzAwCcSflc/wHyM5BlHAEBAQQBAQcEAQGBZYFnKmpRA?=
- =?us-ascii?q?TIohBSSck0BAQEBAQaBNYlRjyKBZwkBAQEBAQEBAQErCQECAQGEQAKCYyM4E?=
- =?us-ascii?q?wEDAQEBBAEBAQEDAQFsHAyCOikBgmcBAgMjDwEFLwsFAhAJAhgCAiYCAlcGA?=
- =?us-ascii?q?QwGAgEBglMMPwGBdhQPi1CbaoExhDIBgRSDIYFABoEMKItbF3iBB4E4gj0uP?=
- =?us-ascii?q?oJIgWSDIoJYBIsxnH5qCYIQghuEKIx0BhuCI4p7iWqNDocSkSwhgVgrCAIYC?=
- =?us-ascii?q?CEPgycSAYIIF4ECAQ6HUIVbIwMwAQEBgQMBAY52AQE?=
-Received: from tarius.tycho.ncsc.mil ([144.51.242.1])
-  by emsm-gh1-uea11.NCSC.MIL with ESMTP; 06 Jun 2019 17:16:39 +0000
-Received: from moss-pluto.infosec.tycho.ncsc.mil (moss-pluto [192.168.25.131])
-        by tarius.tycho.ncsc.mil (8.14.4/8.14.4) with ESMTP id x56HGaTA005569;
-        Thu, 6 Jun 2019 13:16:37 -0400
+        id S1728200AbfFFSdo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jun 2019 14:33:44 -0400
+Received: from sonic310-27.consmr.mail.gq1.yahoo.com ([98.137.69.153]:33721
+        "EHLO sonic310-27.consmr.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728048AbfFFSdi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Jun 2019 14:33:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1559846016; bh=//Lmm2RswPvHcXzfIS6/2qqspsSA2gk2MDuzhJdNvu0=; h=Subject:To:Cc:References:From:Date:In-Reply-To:From:Subject; b=d0lCSS61UlLOwhZYJ4nmyj+DHMtObAB7cbe5zjXut/EoDilqcFiKZAf8qlf6ghlDZRRVpfAiqVftfvN34VUu9mjEOMX+WL8xGug7ypj1xEnQdO3MeQfv3Bjs412NCN9n0x/mXyr4uGSoPxabF7Tn5CnDLh6fFuOSEIySlI0BG2d2sjufNKlI2TRN5rFtOjhD126uq+TTlVJ2lCpqWJa8F1v+zNKjj4wq1pltv2MuRalNCsMQnAJ70dh0GqofoMqMUTEzv27X1YtHflECHnv0IGm4bQuGOCqMlbWNBEXhbZkZzArenDRQvsp0Lz5BOvfcMBeIJbI6xItggpApjRKIfg==
+X-YMail-OSG: tdMH.8EVM1kZvbncE7bbS_U1wY3adjPY3VJYKWpFgufVJC_M074XZlNLatVVlPy
+ hBUcaEEjmzlO0JkiV4IWSofg5F.2z7Mf67mBYpkhj.boE3akBaXg.ObrzZTljKS5xrLoEufAtWfo
+ IZUFgbIjxBzsNC3Y3qgJgFom4S8Z0cnZ_YGjqd_uugkW3aQBG0Ao4uY5cqaTsA8ASVyaDxpD2laR
+ r3e0jW_bUaWn48ZSS4OkuVmSQvJRruG_ETVdQXkyXEooG_Z6k6uAJGvGDQgzIv5AgJsQ0b0SxzrK
+ Ont74XXHXuqeDClQLjJLlb.LYc0GrbB2zXNz3eYOklSvQbNu3z0UaQE.lBhdn7wiwhtOIdpDQ1es
+ Km5RDq.PSlbtldVaN.ddLSdRA5hxmJyfs2q05l5.SrZQK1YNQhTg_NAsXstGL9BBeSnofdudXhXN
+ zz6vmLuk3GdTzRCfXbaY1.dSGYUnCbg2mvD4WECq5cMc1BHdmdFD0LO4h5s7uDCM_5qHhBeqr8on
+ if5YPOiUs8Tw.6LrjCS0f48XyI2oV.nvNUY4NtVDXWQjwAwhqAWN9bEUS6zzwleTygSz8U1jzZvT
+ R.at2SkpcvM7.tiZtdT1MOoS0BESaiikiVSiwpcneEwChy9bPJ.W7KbZ07W8fhBLGQh11ji2rcSj
+ 1lO42bdDa5nyRmyzRiJcJgShhCATND5Y9qQcI09ZUYHFfi4eRJhPUGx4iHTimisNdBmx9qMTmWAY
+ IJ7y__b.dpzsZv2gEZjPqm3C7UmBRzXPNFLHkOMdWQczscOLGzAcaWR3qgJ73CMEFMUCK80v1pEg
+ LeTPm9T6064jbgoUfEhwa6xO7W.8fTbIIq_WOmQXSoGjLA6WLHdtUyZvgisNe1DcaTD5Io3cFZrA
+ r9WjJM_2Enwr94Sn130fb0K3CGp3kxjee0D_bL7sZe5SeabKjshY8Oi0NsHyU7rnunHLjRvuYvzl
+ jscl5MPU7G287NAWbPgPvJEu5VA8cguO0TTcXzYQsmU6RuitJslrcfhtz.f0WABcOKA0UrwE36f3
+ EgJDeAECkvX7sGSbuS8IDTLcN5voceVECP_fROjh4pw6ojD5CZnunHEPzHIea3W32dcrZMGf.GXq
+ hqhF2McaU9lfkFsbLbFrNh03yvmeEusyBW6Pe.LAkqEr0D89T0uuo5fK1dLDignM1jDsP7ig6u9M
+ vl9Zvv0DTVKMR_xIqhPl1WEc0zc6IVs.fTIXPSEG9j3WG_i6jqlVuvUssS9A52Ihx3gwaGEfAiQT
+ COw_Yo6dNcm93.e6RHgOsAbcHlOS_BQY8oP0f1g--
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic310.consmr.mail.gq1.yahoo.com with HTTP; Thu, 6 Jun 2019 18:33:36 +0000
+Received: from c-73-223-4-185.hsd1.ca.comcast.net (EHLO [192.168.0.103]) ([73.223.4.185])
+          by smtp419.mail.gq1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID d0231c58126abcca9733f86c1ec00ae8;
+          Thu, 06 Jun 2019 18:33:36 +0000 (UTC)
 Subject: Re: [RFC][PATCH 00/10] Mount, FS, Block and Keyrings notifications
  [ver #3]
-To:     Casey Schaufler <casey@schaufler-ca.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     viro@zeniv.linux.org.uk,
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Stephen Smalley <sds@tycho.nsa.gov>,
+        David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-usb@vger.kernel.org, raven@themaw.net,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        USB list <linux-usb@vger.kernel.org>, raven@themaw.net,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
         linux-block@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paul Moore <paul@paul-moore.com>
+        LSM List <linux-security-module@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paul Moore <paul@paul-moore.com>, casey@schaufler-ca.com
 References: <b91710d8-cd2d-6b93-8619-130b9d15983d@tycho.nsa.gov>
  <155981411940.17513.7137844619951358374.stgit@warthog.procyon.org.uk>
  <3813.1559827003@warthog.procyon.org.uk>
  <8382af23-548c-f162-0e82-11e308049735@tycho.nsa.gov>
  <0eb007c5-b4a0-9384-d915-37b0e5a158bf@schaufler-ca.com>
-From:   Stephen Smalley <sds@tycho.nsa.gov>
-Message-ID: <c82052e5-ca11-67b5-965e-8f828081f31c@tycho.nsa.gov>
-Date:   Thu, 6 Jun 2019 13:16:36 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ <CALCETrWn_C8oReKXGMXiJDOGoYWMs+jg2DWa5ZipKAceyXkx5w@mail.gmail.com>
+From:   Casey Schaufler <casey@schaufler-ca.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=casey@schaufler-ca.com; keydata=
+ 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
+ abzjfg==
+Message-ID: <7afe1a85-bf19-b5b4-fdf3-69d9be475dab@schaufler-ca.com>
+Date:   Thu, 6 Jun 2019 11:33:36 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <0eb007c5-b4a0-9384-d915-37b0e5a158bf@schaufler-ca.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CALCETrWn_C8oReKXGMXiJDOGoYWMs+jg2DWa5ZipKAceyXkx5w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/6/19 12:43 PM, Casey Schaufler wrote:
-> On 6/6/2019 7:05 AM, Stephen Smalley wrote:
->> On 6/6/19 9:16 AM, David Howells wrote:
->>> Stephen Smalley <sds@tycho.nsa.gov> wrote:
->>>
->>> This might be easier to discuss if you can reply to:
->>>
->>>      https://lore.kernel.org/lkml/5393.1559768763@warthog.procyon.org.uk/
->>>
->>> which is on the ver #2 posting of this patchset.
+On 6/6/2019 10:11 AM, Andy Lutomirski wrote:
+> On Thu, Jun 6, 2019 at 9:43 AM Casey Schaufler <casey@schaufler-ca.com>=
+ wrote:
+>> ...
+>> I don't agree. That is, I don't believe it is sufficient.
+>> There is no guarantee that being able to set a watch on an
+>> object implies that every process that can trigger the event
+>> can send it to you.
 >>
->> Sorry for being late to the party.  Not sure whether you're asking me to respond only there or both there and here to your comments below.  I'll start here but can revisit if it's a problem.
->>>
->>>>> LSM support is included, but controversial:
->>>>>
->>>>>     (1) The creds of the process that did the fput() that reduced the refcount
->>>>>         to zero are cached in the file struct.
->>>>>
->>>>>     (2) __fput() overrides the current creds with the creds from (1) whilst
->>>>>         doing the cleanup, thereby making sure that the creds seen by the
->>>>>         destruction notification generated by mntput() appears to come from
->>>>>         the last fputter.
->>>>>
->>>>>     (3) security_post_notification() is called for each queue that we might
->>>>>         want to post a notification into, thereby allowing the LSM to prevent
->>>>>         covert communications.
->>>>>
->>>>>     (?) Do I need to add security_set_watch(), say, to rule on whether a watch
->>>>>         may be set in the first place?  I might need to add a variant per
->>>>>         watch-type.
->>>>>
->>>>>     (?) Do I really need to keep track of the process creds in which an
->>>>>         implicit object destruction happened?  For example, imagine you create
->>>>>         an fd with fsopen()/fsmount().  It is marked to dissolve the mount it
->>>>>         refers to on close unless move_mount() clears that flag.  Now, imagine
->>>>>         someone looking at that fd through procfs at the same time as you exit
->>>>>         due to an error.  The LSM sees the destruction notification come from
->>>>>         the looker if they happen to do their fput() after yours.
->>>>
->>>>
->>>> I'm not in favor of this approach.
->>>
->>> Which bit?  The last point?  Keeping track of the process creds after an
->>> implicit object destruction.
+>>         Watcher has Smack label W
+>>         Triggerer has Smack label T
+>>         Watched object has Smack label O
 >>
->> (1), (2), (3), and the last point.
+>>         Relevant Smack rules are
 >>
->>>> Can we check permission to the object being watched when a watch is set
->>>> (read-like access),
->>>
->>> Yes, and I need to do that.  I think it's likely to require an extra hook for
->>> each entry point added because the objects are different:
->>>
->>>      int security_watch_key(struct watch *watch, struct key *key);
->>>      int security_watch_sb(struct watch *watch, struct path *path);
->>>      int security_watch_mount(struct watch *watch, struct path *path);
->>>      int security_watch_devices(struct watch *watch);
->>>
->>>> make sure every access that can trigger a notification requires a
->>>> (write-like) permission to the accessed object,
->>>
->>> "write-like permssion" for whom?  The triggerer or the watcher?
+>>         W O rw
+>>         T O rw
 >>
->> The former, i.e. the process that performed the operation that triggered the notification.  Think of it as a write from the process to the accessed object, which triggers a notification (another write) on some related object (the watched object), which is then read by the watcher.
-> 
-> We agree that the process that performed the operation that triggered
-> the notification is the initial subject. Smack will treat the process
-> with the watch set (in particular, its ring buffer) as the object
-> being written to. SELinux, with its finer grained controls, will
-> involve other things as noted above. There are other place where we
-> see this, notably IP packet delivery.
-> 
-> The implication is that the information about the triggering
-> process needs to be available throughout.
-> 
->>
->>> There are various 'classes' of events:
->>>
->>>    (1) System events (eg. hardware I/O errors, automount points expiring).
->>>
->>>    (2) Direct events (eg. automounts, manual mounts, EDQUOT, key linkage).
->>>
->>>    (3) Indirect events (eg. exit/close doing the last fput and causing an
->>>        unmount).
->>>
->>> Class (1) are uncaused by a process, so I use init_cred for them.  One could
->>> argue that the automount point expiry should perhaps take place under the
->>> creds of whoever triggered it in the first place, but we need to be careful
->>> about long-term cred pinning.
->>
->> This seems equivalent to just checking whether the watcher is allowed to get that kind of event, no other cred truly needed.
->>
->>> Class (2) the causing process must've had permission to cause them - otherwise
->>> we wouldn't have got the event.
->>
->> So we've already done a check on the causing process, and we're going to check whether the watcher can set the watch. We just need to establish the connection between the accessed object and the watched object in some manner.
-> 
-> I don't agree. That is, I don't believe it is sufficient.
-> There is no guarantee that being able to set a watch on an
-> object implies that every process that can trigger the event
-> can send it to you.
-> 
-> 	Watcher has Smack label W
-> 	Triggerer has Smack label T
-> 	Watched object has Smack label O
-> 
-> 	Relevant Smack rules are
-> 
-> 	W O rw
-> 	T O rw
-> 
-> The watcher will be able to set the watch,
-> the triggerer will be able to trigger the event,
-> but there is nothing that would allow the watcher
-> to receive the event. This is not a case of watcher
-> reading the watched object, as the event is delivered
-> without any action by watcher.
+>> The watcher will be able to set the watch,
+>> the triggerer will be able to trigger the event,
+>> but there is nothing that would allow the watcher
+>> to receive the event. This is not a case of watcher
+>> reading the watched object, as the event is delivered
+>> without any action by watcher.
+> I think this is an example of a bogus policy that should not be
+> supported by the kernel.
 
-You are allowing arbitrary information flow between T and W above.  Who 
-cares about notifications?
+At this point it's pretty hard for me to care much what
+you think. You don't seem to have any insight into the
+implications of the features you're advocating, or their
+potential consequences.
 
-How is it different from W and T mapping the same file as a shared 
-mapping and communicating by reading and writing the shared memory?  You 
-aren't performing a permission check directly between W and T there.
-
-> 
->>
->>> Class (3) is interesting since it's currently entirely cleanup events and the
->>> process may have the right to do them (close, dup2, exit, but also execve)
->>> whether the LSM thinks it should be able to cause the object to be destroyed
->>> or not.
->>>
->>> It gets more complicated than that, though: multiple processes with different
->>> security attributes can all have fds pointing to a common file object - and
->>> the last one to close carries the can as far as the LSM is concerned.
->>
->> Yes, I'd prefer to avoid that.  You can't write policy that is stable and meaningful that way.  This may fall under a similar situation as class (1) - all we can meaningfully do is check whether the watcher is allowed to see all such events.
-> 
-> Back in the day when we were doing security evaluations
-> the implications of "deleting" an object gave the security
-> evaluators fits. UNIX/Linux files don't get deleted, they
-> simply fall off the filesystem namespace when no one cares
-> about them anymore. The model we used back in the day was
-> that "delete" wasn't an operation that occurs on filesystem
-> objects.
-> 
-> But now you want to do something with security implications
-> when the object disappears. We could say that the event does
-> nothing but signal that the system has removed the watch on
-> your behalf because it is now meaningless. No reason to worry
-> about who dropped the last reference. We don't care about
-> that from a policy viewpoint anyway.
-> 
->>
->>> And yet more complicated when you throw in unix sockets with partially passed
->>> fds still in their queues.  That's what patch 01 is designed to try and cope
->>> with.
->>>
->>>> and make sure there is some sane way to control the relationship between the
->>>> accessed object and the watched object (write-like)?
->>>
->>> This is the trick.  Keys and superblocks have object labels of their own and
->>> don't - for now - propagate their watches.  With these, the watch is on the
->>> object you initially assign it to and it goes no further than that.
->>>
->>> mount_notify() is the interesting case since we want to be able to detect
->>> mount topology change events from within the vfs subtree rooted at the watched
->>> directory without having to manually put a watch on every directory in that
->>> subtree - or even just every mount object. >
->>> Or, maybe, that's what I'll have to do: make it mount_notify() can only apply
->>> to the subtree within its superblock, and the caller must call mount_notify()
->>> for every mount object it wants to monitor.  That would at least ensure that
->>> the caller can, at that point, reach all those mount points.
->>
->> Would that at least make it consistent with fanotify (not that it provides a great example)?
->>
->>>> For cases where we have no object per se or at least no security
->>>> structure/label associated with it, we may have to fall back to a
->>>> coarse-grained "Can the watcher get this kind of notification in general?".
->>>
->>> Agreed - and we should probably have that anyway.
->>>
->>> David
-> 
 
