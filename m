@@ -1,97 +1,117 @@
-Return-Path: <SRS0=Ij7C=UE=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=ECsc=UF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B4CC28CC5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 23:35:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC5AC28CC6
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 03:14:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E59F520866
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jun 2019 23:35:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E61382089E
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 03:14:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726581AbfFEXfR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jun 2019 19:35:17 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:47051 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726502AbfFEXfR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jun 2019 19:35:17 -0400
-Received: by mail-oi1-f193.google.com with SMTP id 203so271769oid.13;
-        Wed, 05 Jun 2019 16:35:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sP5Jo/+KivdI/bxh9Ffstcmb0kFLHw7pjLkPnap8FYc=;
-        b=NTdJRAn38Knw/o6Kpz/DTy4VHA00ps4Mlf+O/OUDpJv2kE7FLxTf21fLcN6f5AhjKs
-         BDNIbngrm+6cwPr8Nj8qT/BFM5rJcHdyWjMiK4Subnv++rms9EXd79hOxs96Qs2cYODF
-         DafQnhciKV5UIQ+q2cznW0yYkXPG+EyEQpaUzBqAnpQbXfZJ0MMiM/3hBRzv1lIeU2jC
-         HsPCa0qF+n060RsHi/nhmZGrdhgZB5AyWEJYS8n/ri+YuRCMphJxNkT6AHJwzl3+34Zi
-         T406AUeC4IolYF+2PeTXMT8PLIjAJN3BmnU7a8AAw+GlUV3HPwGJx2bKSiHvOSs6lwVb
-         H5hQ==
-X-Gm-Message-State: APjAAAVNBtkbAV/O4Kjg4bvytKvVSQCorrMTFnERYs1EOVz8ssw2GehO
-        vXAsOoM0yXXsQWFrttZtyFXCGSCh
-X-Google-Smtp-Source: APXvYqxKdRuZiaGzWrM69Xb9VlwdZWMVuRphCu6AjNPc/fgK/sF4SQPpB4XYM1onfx/CRY0xjH7dIQ==
-X-Received: by 2002:aca:dd08:: with SMTP id u8mr5800529oig.27.1559777716296;
-        Wed, 05 Jun 2019 16:35:16 -0700 (PDT)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id m32sm56535otc.55.2019.06.05.16.35.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 05 Jun 2019 16:35:15 -0700 (PDT)
-Subject: Re: [PATCH 08/13] IB/iser: set virt_boundary_mask in the scsi host
-To:     Jason Gunthorpe <jgg@ziepe.ca>, Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Sebastian Ott <sebott@linux.ibm.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Oliver Neukum <oneukum@suse.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        megaraidlinux.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
-        linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
-References: <20190605190836.32354-1-hch@lst.de>
- <20190605190836.32354-9-hch@lst.de> <20190605202235.GC3273@ziepe.ca>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <b3e46295-4257-86ad-6994-f83b736c8f40@grimberg.me>
-Date:   Wed, 5 Jun 2019 16:35:12 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726568AbfFFDOL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jun 2019 23:14:11 -0400
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:39481 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726474AbfFFDOL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Jun 2019 23:14:11 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R991e4;CH=green;DM=||false|;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04391;MF=alvin@linux.alibaba.com;NM=1;PH=DW;RN=7;SR=0;TI=W4_5548646_DEFAULT_0AC264C7_1559790743861_o7001c3593;
+Received: from WS-web (Alvin@linux.alibaba.com[W4_5548646_DEFAULT_0AC264C7_1559790743861_o7001c3593]) by e01e07425.eu6 at Thu, 06 Jun 2019 11:13:57 +0800
+Date:   Thu, 06 Jun 2019 11:13:57 +0800
+From:   "Alvin Zheng" <Alvin@linux.alibaba.com>
+To:     "gregkh" <gregkh@linuxfoundation.org>
+Cc:     "darrick.wong" <darrick.wong@oracle.com>,
+        "axboe" <axboe@kernel.dk>,
+        "linux-block" <linux-block@vger.kernel.org>,
+        "linux-xfs" <linux-xfs@vger.kernel.org>,
+        "caspar" <caspar@linux.alibaba.com>,
+        "joseph.qi" <joseph.qi@linux.alibaba.com>
+Reply-To: "Alvin Zheng" <Alvin@linux.alibaba.com>
+Message-ID: <885213d6-d14d-4639-9c6b-78ee2c644f95.Alvin@linux.alibaba.com>
+Subject: =?UTF-8?B?UmU6IFtidWcgcmVwb3J0XVtzdGFibGVdIHhmc3Rlc3RzOmdlbmVyaWMvNTM4IGZhaWxlZCBv?=
+  =?UTF-8?B?biB4ZnM=?=
+X-Mailer: [Alimail-Mailagent][W4_5548646][DEFAULT][Chrome]
 MIME-Version: 1.0
-In-Reply-To: <20190605202235.GC3273@ziepe.ca>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <f9a7b0c4-178a-4a7c-8ac6-aec79b06b810.Alvin@linux.alibaba.com>,<20190605124227.GC17558@kroah.com>
+x-aliyun-mail-creator: W4_5548646_DEFAULT_M2ITW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzc0LjAuMzcyOS4xNjkgU2FmYXJpLzUzNy4zNg==3L
+In-Reply-To: <20190605124227.GC17558@kroah.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
->> This ensures all proper DMA layer handling is taken care of by the
->> SCSI midlayer.
-> 
-> Maybe not entirely related to this series, but it looks like the SCSI
-> layer is changing the device global dma_set_max_seg_size() - at least
-> in RDMA the dma device is being shared between many users, so we
-> really don't want SCSI to make this value smaller.
-> 
-> Can we do something about this?
-
-srp seems to do the right thing:
-target_host->max_segment_size = ib_dma_max_seg_size(ibdev);
-
-But iser does not, which means that scsi limits it to:
-BLK_MAX_SEGMENT_SIZE (64k)
-
-I can send a fix to iser.
-
-> Wondering about other values too, and the interaction with the new
-> combining stuff in umem.c
-
-The only other values AFAICT is the dma_boundary that rdma llds don't
-set...
+VGhlIHhmcyBwYXRjaCAoeGZzOiBzZXJpYWxpemUgdW5hbGlnbmVkIGRpbyB3cml0ZXMgYWdhaW5z
+dCBhbGwgb3RoZXIgZGlvIHdyaXRlcykgZG9lcyBmaXggdGhlIGRhdGEgY29ycnVwdGlvbiBidWcg
+b2Yga2VybmVsIDQuMTkgb24geGZzLgpBcyBmb3IgMzExMGZjNzk2MDZmICgiYmxrLW1xOiBpbXBy
+b3ZlIHBsdWcgbGlzdCBzb3J0aW5nIiksIGl0IGhhcHBlbnMgdG8gZml4IHRoZSBsb2dpYyBlcnJv
+ciBvZiB0aGUgc29ydCBmdW5jdGlvbiBpbiB0aGUgYmxvY2sgbGF5ZXIgYW5kIGl0IGlzIGJhc2Vk
+IG9uIHRoZSBtdWx0aXBsZSBtYXBzIG9mIHRoZSBibGstbXEgd2hpY2ggd2FzIGludHJvZHVjZWQg
+aW4gdjUuMC4gVGhlcmVmb3JlLCBiYWNrcG9ydGluZyB0aGlzIGNvbW1pdCB3aWxsIGludHJvZHVj
+ZSBhIGxvdCBvZiByZWxldmFudCBjb2RlLiAKClJlZ2FyZHMsCkFsdmluCgotLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KRnJv
+bTpncmVna2ggPGdyZWdraEBsaW51eGZvdW5kYXRpb24ub3JnPgpTZW5kIFRpbWU6MjAxOeW5tDbm
+nIg15pelKOaYn+acn+S4iSkgMjA6NDIKVG86QWx2aW4gWmhlbmcgPEFsdmluQGxpbnV4LmFsaWJh
+YmEuY29tPgpDYzpkYXJyaWNrLndvbmcgPGRhcnJpY2sud29uZ0BvcmFjbGUuY29tPjsgYXhib2Ug
+PGF4Ym9lQGtlcm5lbC5kaz47IGxpbnV4LWJsb2NrIDxsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5v
+cmc+OyBsaW51eC14ZnMgPGxpbnV4LXhmc0B2Z2VyLmtlcm5lbC5vcmc+OyBjYXNwYXIgPGNhc3Bh
+ckBsaW51eC5hbGliYWJhLmNvbT47IGpvc2VwaC5xaSA8am9zZXBoLnFpQGxpbnV4LmFsaWJhYmEu
+Y29tPgpTdWJqZWN0OlJlOiBbYnVnIHJlcG9ydF1bc3RhYmxlXSB4ZnN0ZXN0czpnZW5lcmljLzUz
+OCBmYWlsZWQgb24geGZzCgoKT24gV2VkLCBKdW4gMDUsIDIwMTkgYXQgMDg6MjE6NDRQTSArMDgw
+MCwgQWx2aW4gWmhlbmcgd3JvdGU6Cj4gSGksCj4gICBJIHdhcyB1c2luZyBrZXJuZWwgdjQuMTku
+NDggYW5kIGZvdW5kIHRoYXQgaXQgY2Fubm90IHBhc3MgdGhlIGdlbmVyaWMvNTM4IG9uIHhmcy4g
+VGhlIGVycm9yIG91dHB1dCBpcyBhcyBmb2xsb3dzOgoKSGFzIDQuMTkgZXZlciBiZWVuIGFibGUg
+dG8gcGFzcyB0aGF0IHRlc3Q/ICBJZiBub3QsIEkgd291bGRuJ3Qgd29ycnkKYWJvdXQgaXQgOikK
+Cj4gCj4gICBGU1RZUCAgICAgICAgIC0tIHhmcyAobm9uLWRlYnVnKQo+ICAgUExBVEZPUk0gICAg
+ICAtLSBMaW51eC94ODZfNjQgYWxpbnV4Mi02IDQuMTkuNDgKPiAgIE1LRlNfT1BUSU9OUyAgLS0g
+LWYgLWJzaXplPTQwOTYgL2Rldi92ZGMKPiAgIE1PVU5UX09QVElPTlMgLS0gL2Rldi92ZGMgL21u
+dC90ZXN0YXJlYS9zY3JhCj4gICBnZW5lcmljLzUzOCAwcyAuLi4gLSBvdXRwdXQgbWlzbWF0Y2gg
+KHNlZSAvcm9vdC91c3IvbG9jYWwvc3JjL3hmc3Rlc3RzL3Jlc3VsdHMvL2dlbmVyaWMvNTM4Lm91
+dC5iYWQpCj4gICAgICAgLS0tIHRlc3RzL2dlbmVyaWMvNTM4Lm91dCAgIDIwMTktMDUtMjcgMTM6
+NTc6MDYuNTA1NjY2NDY1ICswODAwCj4gICAgICAgKysrIC9yb290L3Vzci9sb2NhbC9zcmMveGZz
+dGVzdHMvcmVzdWx0cy8vZ2VuZXJpYy81Mzgub3V0LmJhZCAgICAgICAyMDE5LTA2LTA1IDE2OjQz
+OjE0LjcwMjAwMjMyNiArMDgwMAo+ICAgICAgIEBAIC0xLDIgKzEsMTAgQEAKPiAgICAgICAgUUEg
+b3V0cHV0IGNyZWF0ZWQgYnkgNTM4Cj4gICAgICAgK0RhdGEgdmVyaWZpY2F0aW9uIGZhaWxzCj4g
+ICAgICAgK0ZpbmQgY29ycnVwdGlvbgo+ICAgICAgICswMDAwMDAwMCAgMDAgMDAgMDAgMDAgMDAg
+MDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIC4uLi4uLi4uLi4uLi4uLi4KPiAgICAg
+ICArKgo+ICAgICAgICswMDAwMDIwMCAgNWEgNWEgNWEgNWEgNWEgNWEgNWEgNWEgNWEgNWEgNWEg
+NWEgNWEgNWEgNWEgNWEgIFpaWlpaWlpaWlpaWlpaWloKPiAgICAgICArMDAwMDIwMDAKPiAgICAg
+ICAuLi4KPiAgICAgICAoUnVuICdkaWZmIC11IC9yb290L3Vzci9sb2NhbC9zcmMveGZzdGVzdHMv
+dGVzdHMvZ2VuZXJpYy81Mzgub3V0IC9yb290L3Vzci9sb2NhbC9zcmMveGZzdGVzdHMvcmVzdWx0
+cy8vZ2VuZXJpYy81Mzgub3V0LmJhZCcgIHRvIHNlZSB0aGUgZW50aXJlIGRpZmYpCj4gICBSYW46
+IGdlbmVyaWMvNTM4Cj4gICBGYWlsdXJlczogZ2VuZXJpYy81MzgKPiAgIEZhaWxlZCAxIG9mIDEg
+dGVzdHMKPiAgIAo+IEkgYWxzbyBmb3VuZCB0aGF0IHRoZSBsYXRlc3Qga2VybmVsICh2NS4yLjAt
+cmMyKSBvZiB1cHN0cmVhbSBjYW4gcGFzcyB0aGUgZ2VuZXJpYy81MzggdGVzdC4gVGhlcmVmb3Jl
+LCBJIGJpc2VjdGVkIGFuZCBmb3VuZCB0aGUgZmlyc3QgZ29vZCBjb21taXQgaXMgMzExMGZjNzk2
+MDYuIFRoaXMgY29tbWl0IGFkZHMgdGhlIGhhcmR3YXJlIHF1ZXVlIGludG8gdGhlIHNvcnQgZnVu
+Y3Rpb24uIEJlc2lkZXMsIHRoZSBzb3J0IGZ1bmN0aW9uIHJldHVybnMgYSBuZWdhdGl2ZSB2YWx1
+ZSB3aGVuIHRoZSBvZmZzZXQgYW5kIHF1ZXVlIChzb2Z0d2FyZSBhbmQgaGFyZHdhcmUpIG9mIHR3
+byBJL08gcmVxdWVzdHMgYXJlIHNhbWUuIEkgdGhpbmsgdGhlIHNlY29uZCBwYXJ0IG9mIHRoZSBj
+aGFuZ2UgbWFrZSBzZW5zZXMuIFRoZSBrZXJuZWwgc2hvdWxkIG5vdCBjaGFuZ2UgdGhlIHJlbGF0
+aXZlIHBvc2l0aW9uIG9mIHR3byBJL08gcmVxdWVzdHMgd2hlbiB0aGVpciBvZmZzZXQgYW5kIHF1
+ZXVlIGFyZSBzYW1lLiBTbyBJIG1hZGUgdGhlIGZvbGxvd2luZyBjaGFuZ2VzIGFuZCBtZXJnZWQg
+aXQgaW50byB0aGUga2VybmVsIDQuMTkuNDguIEFmdGVyIHRoZSBtb2RpZmljYXRpb24sIHdlIGNh
+biBwYXNzIHRoZSBnZW5lcmljLzUzOCB0ZXN0IG9uIHhmcy4gVGhlIHNhbWUgY2FzZSBjYW4gYmUg
+cGFzc2VkIG9uIGV4dDQsIHNpbmNlIGV4dDQgaGFzIGNvcnJlc3BvbmRpbmcgZml4IDBkYjI0MTIy
+YmQ3ZiAoImV4dDQ6IGZpeCBkYXRhIGNvcnJ1cHRpb24gY2F1c2VkIGJ5IG92ZXJsYXBwaW5nIHVu
+YWxpZ25lZCBhbmQgYWxpZ25lZCBJTyIpLiBUaG91Z2ggSSB0aGluayB4ZnMgc2hvdWxkIGJlIHJl
+c3BvbnNpYmxlIGZvciB0aGlzIGlzc3VlLCB0aGUgYmxvY2sgbGF5ZXIgY29kZSBiZWxvdyBpcyBh
+bHNvIHByb2JsZW1hdGljLiBBbnkgaWRlYXM/Cj4gCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1t
+cS5jIGIvYmxvY2svYmxrLW1xLmMKPiBpbmRleCA0ZTU2M2VlLi5hNzMwOWNkIDEwMDY0NAo+IC0t
+LSBhL2Jsb2NrL2Jsay1tcS5jCj4gKysrIGIvYmxvY2svYmxrLW1xLmMKPiBAQCAtMTYxMCw3ICsx
+NjEwLDcgQEAgc3RhdGljIGludCBwbHVnX2N0eF9jbXAodm9pZCAqcHJpdiwgc3RydWN0IGxpc3Rf
+aGVhZCAqYSwgc3RydWN0IGxpc3RfaGVhZCAqYikKPiAKPiAgICAgICAgIHJldHVybiAhKHJxYS0+
+bXFfY3R4IDwgcnFiLT5tcV9jdHggfHwKPiAgICAgICAgICAgICAgICAgIChycWEtPm1xX2N0eCA9
+PSBycWItPm1xX2N0eCAmJgo+IC0gICAgICAgICAgICAgICAgIGJsa19ycV9wb3MocnFhKSA8IGJs
+a19ycV9wb3MocnFiKSkpOwo+ICsgICAgICAgICAgICAgICAgIGJsa19ycV9wb3MocnFhKSA8PSBi
+bGtfcnFfcG9zKHJxYikpKTsKPiAgfQo+IAo+ICB2b2lkIGJsa19tcV9mbHVzaF9wbHVnX2xpc3Qo
+c3RydWN0IGJsa19wbHVnICpwbHVnLCBib29sIGZyb21fc2NoZWR1bGUpCgpJIHdvdWxkIG5vdCBs
+aWtlIHRvIHRha2UgYSBwYXRjaCB0aGF0IGlzIG5vdCB1cHN0cmVhbSwgYnV0IHJhdGhlciB0YWtl
+CnRoZSBvcmlnaW5hbCBjb21taXQuCgpDYW4gMzExMGZjNzk2MDZmICgiYmxrLW1xOiBpbXByb3Zl
+IHBsdWcgbGlzdCBzb3J0aW5nIikgb24gaXRzIG93bgpyZXNvbHZlIHRoaXMgaXNzdWUgZm9yIDQu
+MTkueT8KCnRoYW5rcywKCmdyZWcgay1o
