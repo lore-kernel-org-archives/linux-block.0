@@ -2,341 +2,293 @@ Return-Path: <SRS0=ECsc=UF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLACK autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3289C04AB5
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 09:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5453C28EB4
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 10:26:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A8BE320872
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 09:43:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D57420868
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 10:26:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="K7YLziFU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727876AbfFFJne (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jun 2019 05:43:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46620 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727539AbfFFJne (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 Jun 2019 05:43:34 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9104EC04959F;
-        Thu,  6 Jun 2019 09:43:28 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E28D68D2E;
-        Thu,  6 Jun 2019 09:43:23 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
- Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
- Kingdom.
- Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 09/10] usb: Add USB subsystem notifications [ver #3]
-From:   David Howells <dhowells@redhat.com>
-To:     viro@zeniv.linux.org.uk
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-usb@vger.kernel.org, dhowells@redhat.com, raven@themaw.net,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Thu, 06 Jun 2019 10:43:22 +0100
-Message-ID: <155981420247.17513.18371208824032389940.stgit@warthog.procyon.org.uk>
-In-Reply-To: <155981411940.17513.7137844619951358374.stgit@warthog.procyon.org.uk>
-References: <155981411940.17513.7137844619951358374.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/unknown-version
+        id S1728347AbfFFK0i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jun 2019 06:26:38 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:55094 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726952AbfFFK0h (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jun 2019 06:26:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
+        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=+sYPZBeRhiiPR5TRnk5jW3BjnslccP2KlO65GxHb92E=; b=K7YLziFUxdI4VEpmgCeKmJPSIx
+        SmV2eiB6eg2ThrkdcxWsA1EJ8OOD/X5sg3Y4VCEC0Go/8ZSnBC9OP9V34d0itJJjvUNwI6hrabX6L
+        m2A7shwXcZ/4PINojuI0gLH+p9n70AFP6tBHRK0UmS4ECacpHRB02FZNxMQT/ThYqDzyzVUfBk904
+        ySzoeymaP0c1HdAFbWr/TV5iqw1dVEidw0AbTc+cJ+telg8dm0e5cy4+c0zEx5GHXs33+RJdUVVDq
+        r+nNZXAbjXqixI8rBrBQ0y/+0WD008iGuHW2ChF+JEEbE4MStCrdVkPTPeKVe6VIyuTS3EELlJbht
+        OL8JQ9xw==;
+Received: from 089144193064.atnat0002.highway.a1.net ([89.144.193.64] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hYpbQ-0007hZ-Dh; Thu, 06 Jun 2019 10:26:37 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 3/6] blk-cgroup: introduce a new struct blkg_rwstat_sample
+Date:   Thu,  6 Jun 2019 12:26:21 +0200
+Message-Id: <20190606102624.3847-4-hch@lst.de>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190606102624.3847-1-hch@lst.de>
+References: <20190606102624.3847-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Thu, 06 Jun 2019 09:43:33 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a USB subsystem notification mechanism whereby notifications about
-hardware events such as device connection, disconnection, reset and I/O
-errors, can be reported to a monitoring process asynchronously.
+When sampling the blkcg counts we don't need atomics or per-cpu
+variables.  Introduce a new structure just containing plain u64
+counters.
 
-Firstly, an event queue needs to be created:
-
-	fd = open("/dev/event_queue", O_RDWR);
-	ioctl(fd, IOC_WATCH_QUEUE_SET_SIZE, page_size << n);
-
-then a notification can be set up to report USB notifications via that
-queue:
-
-	struct watch_notification_filter filter = {
-		.nr_filters = 1,
-		.filters = {
-			[0] = {
-				.type = WATCH_TYPE_USB_NOTIFY,
-				.subtype_filter[0] = UINT_MAX;
-			},
-		},
-	};
-	ioctl(fd, IOC_WATCH_QUEUE_SET_FILTER, &filter);
-	device_notify(fd, 12);
-
-After that, records will be placed into the queue when events occur on a
-USB device or bus.  Records are of the following format:
-
-	struct usb_notification {
-		struct watch_notification watch;
-		__u32	error;
-		__u32	reserved;
-		__u8	name_len;
-		__u8	name[0];
-	} *n;
-
-Where:
-
-	n->watch.type will be WATCH_TYPE_USB_NOTIFY
-
-	n->watch.subtype will be the type of notification, such as
-	NOTIFY_USB_DEVICE_ADD.
-
-	n->watch.info & WATCH_INFO_LENGTH will indicate the length of the
-	record.
-
-	n->watch.info & WATCH_INFO_ID will be the second argument to
-	device_notify(), shifted.
-
-	n->error and n->reserved are intended to convey information such as
-	error codes, but are currently not used
-
-	n->name_len and n->name convey the USB device name as an
-	unterminated string.  This may be truncated - it is currently
-	limited to a maximum 63 chars.
-
-Note that it is permissible for event records to be of variable length -
-or, at least, the length may be dependent on the subtype.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-cc: linux-usb@vger.kernel.org
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
+ block/bfq-cgroup.c         | 10 ++++------
+ block/blk-cgroup.c         | 39 +++++++++++++++++++-------------------
+ include/linux/blk-cgroup.h | 22 +++++++++++----------
+ 3 files changed, 35 insertions(+), 36 deletions(-)
 
- Documentation/watch_queue.rst    |    9 ++++++
- drivers/usb/core/Kconfig         |   10 +++++++
- drivers/usb/core/devio.c         |   55 ++++++++++++++++++++++++++++++++++++++
- drivers/usb/core/hub.c           |    3 ++
- include/linux/usb.h              |   19 +++++++++++++
- include/uapi/linux/watch_queue.h |   30 ++++++++++++++++++++-
- 6 files changed, 125 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/watch_queue.rst b/Documentation/watch_queue.rst
-index c2954e191989..7ce5d4147fa9 100644
---- a/Documentation/watch_queue.rst
-+++ b/Documentation/watch_queue.rst
-@@ -15,6 +15,8 @@ receive notifications from the kernel.  This can be used in conjunction with::
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 66abc82179f3..624374a99c6e 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -935,7 +935,7 @@ static u64 bfqg_prfill_stat_recursive(struct seq_file *sf,
+ static u64 bfqg_prfill_rwstat_recursive(struct seq_file *sf,
+ 					struct blkg_policy_data *pd, int off)
+ {
+-	struct blkg_rwstat sum;
++	struct blkg_rwstat_sample sum;
  
-     * Block layer event notifications
+ 	blkg_rwstat_recursive_sum(pd_to_blkg(pd), &blkcg_policy_bfq, off, &sum);
+ 	return __blkg_prfill_rwstat(sf, pd, &sum);
+@@ -975,15 +975,13 @@ static int bfqg_print_stat_sectors(struct seq_file *sf, void *v)
+ static u64 bfqg_prfill_sectors_recursive(struct seq_file *sf,
+ 					 struct blkg_policy_data *pd, int off)
+ {
+-	struct blkg_rwstat tmp;
+-	u64 sum;
++	struct blkg_rwstat_sample tmp;
  
-+    * USB subsystem event notifications
-+
+ 	blkg_rwstat_recursive_sum(pd->blkg, NULL,
+ 			offsetof(struct blkcg_gq, stat_bytes), &tmp);
+-	sum = atomic64_read(&tmp.aux_cnt[BLKG_RWSTAT_READ]) +
+-		atomic64_read(&tmp.aux_cnt[BLKG_RWSTAT_WRITE]);
  
- The notifications buffers can be enabled by:
- 
-@@ -344,6 +346,13 @@ Any particular buffer can be fed from multiple sources.  Sources include:
-     or temporary link loss.  Watchpoints of this type are set on the global
-     device watch list.
- 
-+  * WATCH_TYPE_USB_NOTIFY
-+
-+    Notifications of this type indicate USB subsystem events, such as
-+    attachment, removal, reset and I/O errors.  Separate events are generated
-+    for buses and devices.  Watchpoints of this type are set on the global
-+    device watch list.
-+
- 
- Event Filtering
- ===============
-diff --git a/drivers/usb/core/Kconfig b/drivers/usb/core/Kconfig
-index bdb6bd0b63a6..4be88368ab6b 100644
---- a/drivers/usb/core/Kconfig
-+++ b/drivers/usb/core/Kconfig
-@@ -103,3 +103,13 @@ config USB_AUTOSUSPEND_DELAY
- 	  The default value Linux has always had is 2 seconds.  Change
- 	  this value if you want a different delay and cannot modify
- 	  the command line or module parameter.
-+
-+config USB_NOTIFICATIONS
-+	bool "Provide USB hardware event notifications"
-+	depends on USB
-+	select DEVICE_NOTIFICATIONS
-+	help
-+	  This option provides support for getting hardware event notifications
-+	  on USB devices and interfaces.  This makes use of the
-+	  /dev/watch_queue misc device to handle the notification buffer.
-+	  device_notify(2) is used to set/remove watches.
-diff --git a/drivers/usb/core/devio.c b/drivers/usb/core/devio.c
-index fa783531ee88..af7f339c35c5 100644
---- a/drivers/usb/core/devio.c
-+++ b/drivers/usb/core/devio.c
-@@ -41,6 +41,7 @@
- #include <linux/dma-mapping.h>
- #include <asm/byteorder.h>
- #include <linux/moduleparam.h>
-+#include <linux/watch_queue.h>
- 
- #include "usb.h"
- 
-@@ -2633,13 +2634,67 @@ static void usbdev_remove(struct usb_device *udev)
- 	}
+-	return __blkg_prfill_u64(sf, pd, sum >> 9);
++	return __blkg_prfill_u64(sf, pd,
++		(tmp.cnt[BLKG_RWSTAT_READ] + tmp.cnt[BLKG_RWSTAT_WRITE]) >> 9);
  }
  
-+#ifdef CONFIG_USB_NOTIFICATIONS
-+static noinline void post_usb_notification(const char *devname,
-+					   enum usb_notification_type subtype,
-+					   u32 error)
-+{
-+	unsigned int name_len, n_len;
-+	u64 id = 0; /* Might want to put a dev# here. */
-+
-+	struct {
-+		struct usb_notification n;
-+		char more_name[USB_NOTIFICATION_MAX_NAME_LEN -
-+			       (sizeof(struct usb_notification) -
-+				offsetof(struct usb_notification, name))];
-+	} n;
-+
-+	name_len = strlen(devname);
-+	name_len = min_t(size_t, name_len, USB_NOTIFICATION_MAX_NAME_LEN);
-+	n_len = round_up(offsetof(struct usb_notification, name) + name_len,
-+			 sizeof(__u64));
-+
-+	memset(&n, 0, sizeof(n));
-+	memcpy(n.n.name, devname, n_len);
-+
-+	n.n.watch.type		= WATCH_TYPE_USB_NOTIFY;
-+	n.n.watch.subtype	= subtype;
-+	n.n.watch.info		= n_len;
-+	n.n.error		= error;
-+	n.n.name_len		= name_len;
-+
-+	post_device_notification(&n.n.watch, id);
-+}
-+
-+void post_usb_device_notification(const struct usb_device *udev,
-+				  enum usb_notification_type subtype, u32 error)
-+{
-+	post_usb_notification(dev_name(&udev->dev), subtype, error);
-+}
-+
-+void post_usb_bus_notification(const struct usb_bus *ubus,
-+			       enum usb_notification_type subtype, u32 error)
-+{
-+	post_usb_notification(ubus->bus_name, subtype, error);
-+}
-+#endif
-+
- static int usbdev_notify(struct notifier_block *self,
- 			       unsigned long action, void *dev)
+ static int bfqg_print_stat_sectors_recursive(struct seq_file *sf, void *v)
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 7d6bf9b03e24..aad0f5d9a2ea 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -549,7 +549,7 @@ EXPORT_SYMBOL_GPL(__blkg_prfill_u64);
+  * Print @rwstat to @sf for the device assocaited with @pd.
+  */
+ u64 __blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
+-			 const struct blkg_rwstat *rwstat)
++			 const struct blkg_rwstat_sample *rwstat)
  {
- 	switch (action) {
- 	case USB_DEVICE_ADD:
-+		post_usb_device_notification(dev, NOTIFY_USB_DEVICE_ADD, 0);
- 		break;
- 	case USB_DEVICE_REMOVE:
-+		post_usb_device_notification(dev, NOTIFY_USB_DEVICE_REMOVE, 0);
-+		usbdev_remove(dev);
-+		break;
-+	case USB_BUS_ADD:
-+		post_usb_bus_notification(dev, NOTIFY_USB_BUS_ADD, 0);
-+		break;
-+	case USB_BUS_REMOVE:
-+		post_usb_bus_notification(dev, NOTIFY_USB_BUS_REMOVE, 0);
- 		usbdev_remove(dev);
- 		break;
+ 	static const char *rwstr[] = {
+ 		[BLKG_RWSTAT_READ]	= "Read",
+@@ -567,12 +567,12 @@ u64 __blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
+ 
+ 	for (i = 0; i < BLKG_RWSTAT_NR; i++)
+ 		seq_printf(sf, "%s %s %llu\n", dname, rwstr[i],
+-			   (unsigned long long)atomic64_read(&rwstat->aux_cnt[i]));
++			   rwstat->cnt[i]);
+ 
+-	v = atomic64_read(&rwstat->aux_cnt[BLKG_RWSTAT_READ]) +
+-		atomic64_read(&rwstat->aux_cnt[BLKG_RWSTAT_WRITE]) +
+-		atomic64_read(&rwstat->aux_cnt[BLKG_RWSTAT_DISCARD]);
+-	seq_printf(sf, "%s Total %llu\n", dname, (unsigned long long)v);
++	v = rwstat->cnt[BLKG_RWSTAT_READ] +
++		rwstat->cnt[BLKG_RWSTAT_WRITE] +
++		rwstat->cnt[BLKG_RWSTAT_DISCARD];
++	seq_printf(sf, "%s Total %llu\n", dname, v);
+ 	return v;
+ }
+ EXPORT_SYMBOL_GPL(__blkg_prfill_rwstat);
+@@ -602,7 +602,7 @@ EXPORT_SYMBOL_GPL(blkg_prfill_stat);
+ u64 blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
+ 		       int off)
+ {
+-	struct blkg_rwstat rwstat = { };
++	struct blkg_rwstat_sample rwstat = { };
+ 
+ 	blkg_rwstat_read((void *)pd + off, &rwstat);
+ 	return __blkg_prfill_rwstat(sf, pd, &rwstat);
+@@ -612,7 +612,7 @@ EXPORT_SYMBOL_GPL(blkg_prfill_rwstat);
+ static u64 blkg_prfill_rwstat_field(struct seq_file *sf,
+ 				    struct blkg_policy_data *pd, int off)
+ {
+-	struct blkg_rwstat rwstat = { };
++	struct blkg_rwstat_sample rwstat = { };
+ 
+ 	blkg_rwstat_read((void *)pd->blkg + off, &rwstat);
+ 	return __blkg_prfill_rwstat(sf, pd, &rwstat);
+@@ -656,7 +656,7 @@ static u64 blkg_prfill_rwstat_field_recursive(struct seq_file *sf,
+ 					      struct blkg_policy_data *pd,
+ 					      int off)
+ {
+-	struct blkg_rwstat rwstat;
++	struct blkg_rwstat_sample rwstat;
+ 
+ 	blkg_rwstat_recursive_sum(pd->blkg, NULL, off, &rwstat);
+ 	return __blkg_prfill_rwstat(sf, pd, &rwstat);
+@@ -739,7 +739,7 @@ EXPORT_SYMBOL_GPL(blkg_stat_recursive_sum);
+  * @blkg: blkg of interest
+  * @pol: blkcg_policy which contains the blkg_rwstat
+  * @off: offset to the blkg_rwstat in blkg_policy_data or @blkg
+- * @sum: blkg_rwstat structure containing the results
++ * @sum: blkg_rwstat_sample structure containing the results
+  *
+  * Collect the blkg_rwstat specified by @blkg, @pol and @off and all its
+  * online descendants and their aux counts.  The caller must be holding the
+@@ -749,7 +749,7 @@ EXPORT_SYMBOL_GPL(blkg_stat_recursive_sum);
+  * is at @off bytes into @blkg's blkg_policy_data of the policy.
+  */
+ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
+-		int off, struct blkg_rwstat *sum)
++		int off, struct blkg_rwstat_sample *sum)
+ {
+ 	struct blkcg_gq *pos_blkg;
+ 	struct cgroup_subsys_state *pos_css;
+@@ -770,8 +770,7 @@ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
+ 			rwstat = (void *)pos_blkg + off;
+ 
+ 		for (i = 0; i < BLKG_RWSTAT_NR; i++)
+-			atomic64_set(&sum->aux_cnt[i],
+-				blkg_rwstat_read_counter(rwstat, i));
++			sum->cnt[i] = blkg_rwstat_read_counter(rwstat, i);
  	}
-diff --git a/drivers/usb/core/hub.c b/drivers/usb/core/hub.c
-index 2f94568ba385..722013d8142c 100644
---- a/drivers/usb/core/hub.c
-+++ b/drivers/usb/core/hub.c
-@@ -4596,6 +4596,9 @@ hub_port_init(struct usb_hub *hub, struct usb_device *udev, int port1,
- 				(udev->config) ? "reset" : "new", speed,
- 				devnum, driver_name);
+ 	rcu_read_unlock();
+ }
+@@ -939,7 +938,7 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
+ 	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
+ 		const char *dname;
+ 		char *buf;
+-		struct blkg_rwstat rwstat;
++		struct blkg_rwstat_sample rwstat;
+ 		u64 rbytes, wbytes, rios, wios, dbytes, dios;
+ 		size_t size = seq_get_buf(sf, &buf), off = 0;
+ 		int i;
+@@ -961,15 +960,15 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
  
-+	if (udev->config)
-+		post_usb_device_notification(udev, NOTIFY_USB_DEVICE_RESET, 0);
-+
- 	/* Set up TT records, if needed  */
- 	if (hdev->tt) {
- 		udev->tt = hdev->tt;
-diff --git a/include/linux/usb.h b/include/linux/usb.h
-index ae82d9d1112b..12687b55811d 100644
---- a/include/linux/usb.h
-+++ b/include/linux/usb.h
-@@ -2008,6 +2008,25 @@ extern void usb_led_activity(enum usb_led_event ev);
- static inline void usb_led_activity(enum usb_led_event ev) {}
- #endif
+ 		blkg_rwstat_recursive_sum(blkg, NULL,
+ 				offsetof(struct blkcg_gq, stat_bytes), &rwstat);
+-		rbytes = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_READ]);
+-		wbytes = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_WRITE]);
+-		dbytes = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_DISCARD]);
++		rbytes = rwstat.cnt[BLKG_RWSTAT_READ];
++		wbytes = rwstat.cnt[BLKG_RWSTAT_WRITE];
++		dbytes = rwstat.cnt[BLKG_RWSTAT_DISCARD];
  
-+/*
-+ * Notification functions.
-+ */
-+#ifdef CONFIG_USB_NOTIFICATIONS
-+extern void post_usb_device_notification(const struct usb_device *udev,
-+					 enum usb_notification_type subtype,
-+					 u32 error);
-+extern void post_usb_bus_notification(const struct usb_bus *ubus,
-+				      enum usb_notification_type subtype,
-+				      u32 error);
-+#else
-+static inline void post_usb_device_notification(const struct usb_device *udev,
-+						enum usb_notification_type subtype,
-+						u32 error) {}
-+static inline void post_usb_bus_notification(const struct usb_bus *ubus,
-+					     enum usb_notification_type subtype,
-+					     u32 error) {}
-+#endif
-+
- #endif  /* __KERNEL__ */
+ 		blkg_rwstat_recursive_sum(blkg, NULL,
+ 					offsetof(struct blkcg_gq, stat_ios), &rwstat);
+-		rios = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_READ]);
+-		wios = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_WRITE]);
+-		dios = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_DISCARD]);
++		rios = rwstat.cnt[BLKG_RWSTAT_READ];
++		wios = rwstat.cnt[BLKG_RWSTAT_WRITE];
++		dios = rwstat.cnt[BLKG_RWSTAT_DISCARD];
  
- #endif
-diff --git a/include/uapi/linux/watch_queue.h b/include/uapi/linux/watch_queue.h
-index 22e3326b83a6..d596ac5a61e4 100644
---- a/include/uapi/linux/watch_queue.h
-+++ b/include/uapi/linux/watch_queue.h
-@@ -14,7 +14,8 @@ enum watch_notification_type {
- 	WATCH_TYPE_SB_NOTIFY	= 2,	/* Superblock notification */
- 	WATCH_TYPE_KEY_NOTIFY	= 3,	/* Key/keyring change notification */
- 	WATCH_TYPE_BLOCK_NOTIFY	= 4,	/* Block layer notifications */
--#define WATCH_TYPE___NR 5
-+	WATCH_TYPE_USB_NOTIFY	= 5,	/* USB subsystem notifications */
-+#define WATCH_TYPE___NR 6
+ 		spin_unlock_irq(&blkg->q->queue_lock);
+ 
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 3ee858111274..e4a81767e111 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -63,8 +63,7 @@ struct blkcg {
+ 
+ /*
+  * blkg_[rw]stat->aux_cnt is excluded for local stats but included for
+- * recursive.  Used to carry stats of dead children, and, for blkg_rwstat,
+- * to carry result values from read and sum operations.
++ * recursive.  Used to carry stats of dead children.
+  */
+ struct blkg_stat {
+ 	struct percpu_counter		cpu_cnt;
+@@ -76,6 +75,10 @@ struct blkg_rwstat {
+ 	atomic64_t			aux_cnt[BLKG_RWSTAT_NR];
  };
  
- enum watch_meta_notification_subtype {
-@@ -182,4 +183,31 @@ struct block_notification {
- 	__u64	sector;			/* Affected sector */
- };
++struct blkg_rwstat_sample {
++	u64				cnt[BLKG_RWSTAT_NR];
++};
++
+ /*
+  * A blkcg_gq (blkg) is association between a block cgroup (blkcg) and a
+  * request_queue (q).  This is used by blkcg policies which need to track
+@@ -213,7 +216,7 @@ void blkcg_print_blkgs(struct seq_file *sf, struct blkcg *blkcg,
+ 		       bool show_total);
+ u64 __blkg_prfill_u64(struct seq_file *sf, struct blkg_policy_data *pd, u64 v);
+ u64 __blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
+-			 const struct blkg_rwstat *rwstat);
++			 const struct blkg_rwstat_sample *rwstat);
+ u64 blkg_prfill_stat(struct seq_file *sf, struct blkg_policy_data *pd, int off);
+ u64 blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
+ 		       int off);
+@@ -225,7 +228,7 @@ int blkg_print_stat_ios_recursive(struct seq_file *sf, void *v);
+ u64 blkg_stat_recursive_sum(struct blkcg_gq *blkg,
+ 			    struct blkcg_policy *pol, int off);
+ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
+-		int off, struct blkg_rwstat *sum);
++		int off, struct blkg_rwstat_sample *sum);
  
-+/*
-+ * Type of USB layer notification.
-+ */
-+enum usb_notification_type {
-+	NOTIFY_USB_DEVICE_ADD		= 0, /* USB device added */
-+	NOTIFY_USB_DEVICE_REMOVE	= 1, /* USB device removed */
-+	NOTIFY_USB_BUS_ADD		= 2, /* USB bus added */
-+	NOTIFY_USB_BUS_REMOVE		= 3, /* USB bus removed */
-+	NOTIFY_USB_DEVICE_RESET		= 4, /* USB device reset */
-+	NOTIFY_USB_DEVICE_ERROR		= 5, /* USB device error */
-+};
-+
-+/*
-+ * USB subsystem notification record.
-+ * - watch.type = WATCH_TYPE_USB_NOTIFY
-+ * - watch.subtype = enum usb_notification_type
-+ */
-+struct usb_notification {
-+	struct watch_notification watch; /* WATCH_TYPE_USB_NOTIFY */
-+	__u32	error;
-+	__u32	reserved;
-+	__u8	name_len;		/* Length of device name */
-+	__u8	name[0];		/* Device name (padded to __u64, truncated at 63 chars) */
-+};
-+
-+#define USB_NOTIFICATION_MAX_NAME_LEN 63
-+
- #endif /* _UAPI_LINUX_WATCH_QUEUE_H */
+ struct blkg_conf_ctx {
+ 	struct gendisk			*disk;
+@@ -701,13 +704,13 @@ static inline void blkg_rwstat_add(struct blkg_rwstat *rwstat,
+  * Read the current snapshot of @rwstat and return it in the aux counts.
+  */
+ static inline void blkg_rwstat_read(struct blkg_rwstat *rwstat,
+-		struct blkg_rwstat *result)
++		struct blkg_rwstat_sample *result)
+ {
+ 	int i;
+ 
+ 	for (i = 0; i < BLKG_RWSTAT_NR; i++)
+-		atomic64_set(&result->aux_cnt[i],
+-			     percpu_counter_sum_positive(&rwstat->cpu_cnt[i]));
++		result->cnt[i] =
++			percpu_counter_sum_positive(&rwstat->cpu_cnt[i]);
+ }
+ 
+ /**
+@@ -720,11 +723,10 @@ static inline void blkg_rwstat_read(struct blkg_rwstat *rwstat,
+  */
+ static inline uint64_t blkg_rwstat_total(struct blkg_rwstat *rwstat)
+ {
+-	struct blkg_rwstat tmp = { };
++	struct blkg_rwstat_sample tmp = { };
+ 
+ 	blkg_rwstat_read(rwstat, &tmp);
+-	return atomic64_read(&tmp.aux_cnt[BLKG_RWSTAT_READ]) +
+-		atomic64_read(&tmp.aux_cnt[BLKG_RWSTAT_WRITE]);
++	return tmp.cnt[BLKG_RWSTAT_READ] + tmp.cnt[BLKG_RWSTAT_WRITE];
+ }
+ 
+ /**
+-- 
+2.20.1
 
