@@ -2,125 +2,168 @@ Return-Path: <SRS0=ECsc=UF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8604EC04AB5
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 12:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D1BC04AB5
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 13:17:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6075320868
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 12:59:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="MkdX75Ny"
+	by mail.kernel.org (Postfix) with ESMTP id 3BD7920684
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 13:17:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728418AbfFFM7i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jun 2019 08:59:38 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:36105 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728153AbfFFM7h (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jun 2019 08:59:37 -0400
-Received: by mail-qt1-f195.google.com with SMTP id u12so2485845qth.3
-        for <linux-block@vger.kernel.org>; Thu, 06 Jun 2019 05:59:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Pcms2hpiozX31D6cP+b+pcEmPCGLaGYLU1hDb/Ksv08=;
-        b=MkdX75Ny9LXeEDd7M2ULnDHXydpfH/hamtC61IJll/djUvPjzu3CL4xNMlr5cz6Q5w
-         guXxPdUF+9pLJqSbeFYaU0ImdK+8nAij30U0KPUu6/8BURnKFaQs0UmduUvDZSZvS3t9
-         KBmMub0KUG4Vu/RcFYW7BchKnUQlRyD5eB/hRcBQ502FwMXpWw81+Pu+hLi173/AjDI5
-         NP7He53xnoEtj8xoDotmmQb52tCLcvzr3zPzMDREz/bS8CoABsqvoL1RwTYigpnE7jWm
-         Us4tLj2+XhGrNSs+5OFv+xlEHIunotlG5e2WVBNFLJZ98kl/iklZykxEmFHo7iATuPWe
-         rK7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Pcms2hpiozX31D6cP+b+pcEmPCGLaGYLU1hDb/Ksv08=;
-        b=GP1oXjiOvHk2cLRwmgoJDEDcJ+KuIL51lFw+bVvr7lVB0KswaxzArHElP0hgFSzrQ3
-         lvGYj4gEDtI2QR7AaeVka3vy4CqKI3L8LsROVw8aANgRirJW9p7WhvQPvZI/fD2rIbZk
-         ZgzQo6KtEWtWmbgdf9QXN5sKXEO2HIaa+Gir2h8GwIGeUwy1ZxXNt1Kl12kMK+lutHLM
-         lGWZroeSPSJacEzRF/uy/bPhiCSl9g7rrWPMZLDZsICvG9kGLCyAcQMBFaudLemKQYMG
-         3i7YOXM7qDVpHK9oOd+r7gs3/VLhPCWwq4qkFd79PbJl2c2ngjaiQsvfdjD7NdmbYHQY
-         CWlA==
-X-Gm-Message-State: APjAAAUCUYR8pdybSdCjOOrMKw3ptymK6vvuA9iF4ZcQ7xaY3Ye/fALU
-        rqQMOKGJa05y98QknlqntCdUqQ==
-X-Google-Smtp-Source: APXvYqyDJboU1GnyolHbPy9u8JPHRKlv/ujxxO2lQHi1JZVZmAE4fxPsnUgZOrHcZM/zPgtxL88Vqg==
-X-Received: by 2002:ac8:7a87:: with SMTP id x7mr32060230qtr.215.1559825976661;
-        Thu, 06 Jun 2019 05:59:36 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id f67sm934787qtb.68.2019.06.06.05.59.35
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 06 Jun 2019 05:59:35 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1hYrzT-00057B-B5; Thu, 06 Jun 2019 09:59:35 -0300
-Date:   Thu, 6 Jun 2019 09:59:35 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Sebastian Ott <sebott@linux.ibm.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Oliver Neukum <oneukum@suse.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        megaraidlinux.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
-        linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/13] IB/iser: set virt_boundary_mask in the scsi host
-Message-ID: <20190606125935.GA17373@ziepe.ca>
-References: <20190605190836.32354-1-hch@lst.de>
- <20190605190836.32354-9-hch@lst.de>
- <20190605202235.GC3273@ziepe.ca>
- <20190606062441.GB26745@lst.de>
+        id S1727138AbfFFNRA convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jun 2019 09:17:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49902 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726877AbfFFNQ7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Jun 2019 09:16:59 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2AC1F85546;
+        Thu,  6 Jun 2019 13:16:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E50DF108427E;
+        Thu,  6 Jun 2019 13:16:43 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <b91710d8-cd2d-6b93-8619-130b9d15983d@tycho.nsa.gov>
+References: <b91710d8-cd2d-6b93-8619-130b9d15983d@tycho.nsa.gov> <155981411940.17513.7137844619951358374.stgit@warthog.procyon.org.uk>
+To:     Stephen Smalley <sds@tycho.nsa.gov>
+Cc:     dhowells@redhat.com, viro@zeniv.linux.org.uk,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        linux-usb@vger.kernel.org, raven@themaw.net,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paul Moore <paul@paul-moore.com>
+Subject: Re: [RFC][PATCH 00/10] Mount, FS, Block and Keyrings notifications [ver #3]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190606062441.GB26745@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3812.1559827003.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8BIT
+Date:   Thu, 06 Jun 2019 14:16:43 +0100
+Message-ID: <3813.1559827003@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Thu, 06 Jun 2019 13:16:59 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 06, 2019 at 08:24:41AM +0200, Christoph Hellwig wrote:
-> On Wed, Jun 05, 2019 at 05:22:35PM -0300, Jason Gunthorpe wrote:
-> > On Wed, Jun 05, 2019 at 09:08:31PM +0200, Christoph Hellwig wrote:
-> > > This ensures all proper DMA layer handling is taken care of by the
-> > > SCSI midlayer.
-> > 
-> > Maybe not entirely related to this series, but it looks like the SCSI
-> > layer is changing the device global dma_set_max_seg_size() - at least
-> > in RDMA the dma device is being shared between many users, so we
-> > really don't want SCSI to make this value smaller.
-> > 
-> > Can we do something about this?
+Stephen Smalley <sds@tycho.nsa.gov> wrote:
+
+This might be easier to discuss if you can reply to:
+
+	https://lore.kernel.org/lkml/5393.1559768763@warthog.procyon.org.uk/
+
+which is on the ver #2 posting of this patchset.
+
+> > LSM support is included, but controversial:
+> >
+> >   (1) The creds of the process that did the fput() that reduced the refcount
+> >       to zero are cached in the file struct.
+> >
+> >   (2) __fput() overrides the current creds with the creds from (1) whilst
+> >       doing the cleanup, thereby making sure that the creds seen by the
+> >       destruction notification generated by mntput() appears to come from
+> >       the last fputter.
+> >
+> >   (3) security_post_notification() is called for each queue that we might
+> >       want to post a notification into, thereby allowing the LSM to prevent
+> >       covert communications.
+> >
+> >   (?) Do I need to add security_set_watch(), say, to rule on whether a watch
+> >       may be set in the first place?  I might need to add a variant per
+> >       watch-type.
+> >
+> >   (?) Do I really need to keep track of the process creds in which an
+> >       implicit object destruction happened?  For example, imagine you create
+> >       an fd with fsopen()/fsmount().  It is marked to dissolve the mount it
+> >       refers to on close unless move_mount() clears that flag.  Now, imagine
+> >       someone looking at that fd through procfs at the same time as you exit
+> >       due to an error.  The LSM sees the destruction notification come from
+> >       the looker if they happen to do their fput() after yours.
 > 
-> We could do something about it as outlined in my mail - pass the
-> dma_params explicitly to the dma_map_sg call.  But that isn't really
-> suitable for a short term fix and will take a little more time.
+> 
+> I'm not in favor of this approach.
 
-Sounds good to me, having every dma mapping specify its restrictions
-makes a lot more sense than a device global setting, IMHO.
+Which bit?  The last point?  Keeping track of the process creds after an
+implicit object destruction.
 
-In RDMA the restrictions to build a SGL, create a device queue or
-build a MR are all a little different.
+> Can we check permission to the object being watched when a watch is set
+> (read-like access),
 
-ie for MRs alignment of the post-IOMMU DMA address is very important
-for performance as the MR logic can only build device huge pages out
-of properly aligned DMA addresses. While for SGLs we don't care about
-this, instead SGLs usually have the 32 bit per-element length limit in
-the HW that MRs do not.
+Yes, and I need to do that.  I think it's likely to require an extra hook for
+each entry point added because the objects are different:
 
-> Until we've sorted that out the device paramter needs to be set to
-> the smallest value supported.
+	int security_watch_key(struct watch *watch, struct key *key);
+	int security_watch_sb(struct watch *watch, struct path *path);
+	int security_watch_mount(struct watch *watch, struct path *path);
+	int security_watch_devices(struct watch *watch);
 
-smallest? largest? We've been setting it to the largest value the
-device can handle (ie 2G)
+> make sure every access that can trigger a notification requires a
+> (write-like) permission to the accessed object,
 
-Jason
+"write-like permssion" for whom?  The triggerer or the watcher?
+
+There are various 'classes' of events:
+
+ (1) System events (eg. hardware I/O errors, automount points expiring).
+
+ (2) Direct events (eg. automounts, manual mounts, EDQUOT, key linkage).
+
+ (3) Indirect events (eg. exit/close doing the last fput and causing an
+     unmount).
+
+Class (1) are uncaused by a process, so I use init_cred for them.  One could
+argue that the automount point expiry should perhaps take place under the
+creds of whoever triggered it in the first place, but we need to be careful
+about long-term cred pinning.
+
+Class (2) the causing process must've had permission to cause them - otherwise
+we wouldn't have got the event.
+
+Class (3) is interesting since it's currently entirely cleanup events and the
+process may have the right to do them (close, dup2, exit, but also execve)
+whether the LSM thinks it should be able to cause the object to be destroyed
+or not.
+
+It gets more complicated than that, though: multiple processes with different
+security attributes can all have fds pointing to a common file object - and
+the last one to close carries the can as far as the LSM is concerned.
+
+And yet more complicated when you throw in unix sockets with partially passed
+fds still in their queues.  That's what patch 01 is designed to try and cope
+with.
+
+> and make sure there is some sane way to control the relationship between the
+> accessed object and the watched object (write-like)?
+
+This is the trick.  Keys and superblocks have object labels of their own and
+don't - for now - propagate their watches.  With these, the watch is on the
+object you initially assign it to and it goes no further than that.
+
+mount_notify() is the interesting case since we want to be able to detect
+mount topology change events from within the vfs subtree rooted at the watched
+directory without having to manually put a watch on every directory in that
+subtree - or even just every mount object.
+
+Or, maybe, that's what I'll have to do: make it mount_notify() can only apply
+to the subtree within its superblock, and the caller must call mount_notify()
+for every mount object it wants to monitor.  That would at least ensure that
+the caller can, at that point, reach all those mount points.
+
+> For cases where we have no object per se or at least no security
+> structure/label associated with it, we may have to fall back to a
+> coarse-grained "Can the watcher get this kind of notification in general?".
+
+Agreed - and we should probably have that anyway.
+
+David
