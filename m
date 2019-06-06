@@ -4,46 +4,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5453C28EB4
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 10:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7EA2C28EB2
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 10:26:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D57420868
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 10:26:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A27D20883
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jun 2019 10:26:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="K7YLziFU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="o6mcBdTF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728347AbfFFK0i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jun 2019 06:26:38 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:55094 "EHLO
+        id S1728413AbfFFK0r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jun 2019 06:26:47 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:55124 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726952AbfFFK0h (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jun 2019 06:26:37 -0400
+        with ESMTP id S1728380AbfFFK0r (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jun 2019 06:26:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=+sYPZBeRhiiPR5TRnk5jW3BjnslccP2KlO65GxHb92E=; b=K7YLziFUxdI4VEpmgCeKmJPSIx
-        SmV2eiB6eg2ThrkdcxWsA1EJ8OOD/X5sg3Y4VCEC0Go/8ZSnBC9OP9V34d0itJJjvUNwI6hrabX6L
-        m2A7shwXcZ/4PINojuI0gLH+p9n70AFP6tBHRK0UmS4ECacpHRB02FZNxMQT/ThYqDzyzVUfBk904
-        ySzoeymaP0c1HdAFbWr/TV5iqw1dVEidw0AbTc+cJ+telg8dm0e5cy4+c0zEx5GHXs33+RJdUVVDq
-        r+nNZXAbjXqixI8rBrBQ0y/+0WD008iGuHW2ChF+JEEbE4MStCrdVkPTPeKVe6VIyuTS3EELlJbht
-        OL8JQ9xw==;
+        bh=YysQtsiHp3GQiMLWL+ZAbOoDyfj/frTo6TaVBn3dezM=; b=o6mcBdTFiW502Dczi7lClv9XTl
+        BszpMGAx15pQBMk9IUajJmwEi34qmLy0LWe9qkVnhZHE72YzWVC6yj1fU3h9HSLr3MoujsKWey5yQ
+        XeYzhf+yQ9ayD58MW6aKTxNlx+7Vua285ygaI/cxyxoKUw5Q9WKjJuuZDG1FQqoPyJz7DOzI0WtQn
+        eKt2F2wbfHSlMK2i6kIz1E1sjfbYI0QYx49yMWilIhriiCHPWucaL2dkXYuTtaQ1Qco/eteNHYDCx
+        QrEEbyA/nSUvmnE/bGSKawpw/lPClVQVIjFwfBLgILibdXrro9JGaTgSQzeJCwAFHNRLogW9APjBN
+        T7bjUCXw==;
 Received: from 089144193064.atnat0002.highway.a1.net ([89.144.193.64] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hYpbQ-0007hZ-Dh; Thu, 06 Jun 2019 10:26:37 +0000
+        id 1hYpbZ-0007ih-NM; Thu, 06 Jun 2019 10:26:46 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Paolo Valente <paolo.valente@linaro.org>,
         linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 3/6] blk-cgroup: introduce a new struct blkg_rwstat_sample
-Date:   Thu,  6 Jun 2019 12:26:21 +0200
-Message-Id: <20190606102624.3847-4-hch@lst.de>
+Subject: [PATCH 6/6] block: rename CONFIG_DEBUG_BLK_CGROUP to CONFIG_BFQ_CGROUP_DEBUG
+Date:   Thu,  6 Jun 2019 12:26:24 +0200
+Message-Id: <20190606102624.3847-7-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190606102624.3847-1-hch@lst.de>
 References: <20190606102624.3847-1-hch@lst.de>
@@ -55,240 +55,343 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When sampling the blkcg counts we don't need atomics or per-cpu
-variables.  Introduce a new structure just containing plain u64
-counters.
+This option is entirely bfq specific, give it an appropinquate name.
+
+Also make it depend on CONFIG_BFQ_GROUP_IOSCHED in Kconfig, as all
+the functionality already does so anyway.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bfq-cgroup.c         | 10 ++++------
- block/blk-cgroup.c         | 39 +++++++++++++++++++-------------------
- include/linux/blk-cgroup.h | 22 +++++++++++----------
- 3 files changed, 35 insertions(+), 36 deletions(-)
+ Documentation/block/bfq-iosched.txt          | 12 ++++-----
+ Documentation/cgroup-v1/blkio-controller.txt | 12 ++++-----
+ block/Kconfig.iosched                        |  7 +++++
+ block/bfq-cgroup.c                           | 27 ++++++++++----------
+ block/bfq-iosched.c                          |  8 +++---
+ block/bfq-iosched.h                          |  4 +--
+ init/Kconfig                                 |  8 ------
+ 7 files changed, 38 insertions(+), 40 deletions(-)
 
+diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
+index 1a0f2ac02eb6..f02163fabf80 100644
+--- a/Documentation/block/bfq-iosched.txt
++++ b/Documentation/block/bfq-iosched.txt
+@@ -38,13 +38,13 @@ stack). To give an idea of the limits with BFQ, on slow or average
+ CPUs, here are, first, the limits of BFQ for three different CPUs, on,
+ respectively, an average laptop, an old desktop, and a cheap embedded
+ system, in case full hierarchical support is enabled (i.e.,
+-CONFIG_BFQ_GROUP_IOSCHED is set), but CONFIG_DEBUG_BLK_CGROUP is not
++CONFIG_BFQ_GROUP_IOSCHED is set), but CONFIG_BFQ_CGROUP_DEBUG is not
+ set (Section 4-2):
+ - Intel i7-4850HQ: 400 KIOPS
+ - AMD A8-3850: 250 KIOPS
+ - ARM CortexTM-A53 Octa-core: 80 KIOPS
+ 
+-If CONFIG_DEBUG_BLK_CGROUP is set (and of course full hierarchical
++If CONFIG_BFQ_CGROUP_DEBUG is set (and of course full hierarchical
+ support is enabled), then the sustainable throughput with BFQ
+ decreases, because all blkio.bfq* statistics are created and updated
+ (Section 4-2). For BFQ, this leads to the following maximum
+@@ -537,19 +537,19 @@ or io.bfq.weight.
+ 
+ As for cgroups-v1 (blkio controller), the exact set of stat files
+ created, and kept up-to-date by bfq, depends on whether
+-CONFIG_DEBUG_BLK_CGROUP is set. If it is set, then bfq creates all
++CONFIG_BFQ_CGROUP_DEBUG is set. If it is set, then bfq creates all
+ the stat files documented in
+ Documentation/cgroup-v1/blkio-controller.txt. If, instead,
+-CONFIG_DEBUG_BLK_CGROUP is not set, then bfq creates only the files
++CONFIG_BFQ_CGROUP_DEBUG is not set, then bfq creates only the files
+ blkio.bfq.io_service_bytes
+ blkio.bfq.io_service_bytes_recursive
+ blkio.bfq.io_serviced
+ blkio.bfq.io_serviced_recursive
+ 
+-The value of CONFIG_DEBUG_BLK_CGROUP greatly influences the maximum
++The value of CONFIG_BFQ_CGROUP_DEBUG greatly influences the maximum
+ throughput sustainable with bfq, because updating the blkio.bfq.*
+ stats is rather costly, especially for some of the stats enabled by
+-CONFIG_DEBUG_BLK_CGROUP.
++CONFIG_BFQ_CGROUP_DEBUG.
+ 
+ Parameters to set
+ -----------------
+diff --git a/Documentation/cgroup-v1/blkio-controller.txt b/Documentation/cgroup-v1/blkio-controller.txt
+index 673dc34d3f78..47cf84102f88 100644
+--- a/Documentation/cgroup-v1/blkio-controller.txt
++++ b/Documentation/cgroup-v1/blkio-controller.txt
+@@ -126,7 +126,7 @@ Various user visible config options
+ CONFIG_BLK_CGROUP
+ 	- Block IO controller.
+ 
+-CONFIG_DEBUG_BLK_CGROUP
++CONFIG_BFQ_CGROUP_DEBUG
+ 	- Debug help. Right now some additional stats file show up in cgroup
+ 	  if this option is enabled.
+ 
+@@ -246,13 +246,13 @@ Proportional weight policy files
+ 	  write, sync or async.
+ 
+ - blkio.avg_queue_size
+-	- Debugging aid only enabled if CONFIG_DEBUG_BLK_CGROUP=y.
++	- Debugging aid only enabled if CONFIG_BFQ_CGROUP_DEBUG=y.
+ 	  The average queue size for this cgroup over the entire time of this
+ 	  cgroup's existence. Queue size samples are taken each time one of the
+ 	  queues of this cgroup gets a timeslice.
+ 
+ - blkio.group_wait_time
+-	- Debugging aid only enabled if CONFIG_DEBUG_BLK_CGROUP=y.
++	- Debugging aid only enabled if CONFIG_BFQ_CGROUP_DEBUG=y.
+ 	  This is the amount of time the cgroup had to wait since it became busy
+ 	  (i.e., went from 0 to 1 request queued) to get a timeslice for one of
+ 	  its queues. This is different from the io_wait_time which is the
+@@ -263,7 +263,7 @@ Proportional weight policy files
+ 	  got a timeslice and will not include the current delta.
+ 
+ - blkio.empty_time
+-	- Debugging aid only enabled if CONFIG_DEBUG_BLK_CGROUP=y.
++	- Debugging aid only enabled if CONFIG_BFQ_CGROUP_DEBUG=y.
+ 	  This is the amount of time a cgroup spends without any pending
+ 	  requests when not being served, i.e., it does not include any time
+ 	  spent idling for one of the queues of the cgroup. This is in
+@@ -272,7 +272,7 @@ Proportional weight policy files
+ 	  time it had a pending request and will not include the current delta.
+ 
+ - blkio.idle_time
+-	- Debugging aid only enabled if CONFIG_DEBUG_BLK_CGROUP=y.
++	- Debugging aid only enabled if CONFIG_BFQ_CGROUP_DEBUG=y.
+ 	  This is the amount of time spent by the IO scheduler idling for a
+ 	  given cgroup in anticipation of a better request than the existing ones
+ 	  from other queues/cgroups. This is in nanoseconds. If this is read
+@@ -281,7 +281,7 @@ Proportional weight policy files
+ 	  the current delta.
+ 
+ - blkio.dequeue
+-	- Debugging aid only enabled if CONFIG_DEBUG_BLK_CGROUP=y. This
++	- Debugging aid only enabled if CONFIG_BFQ_CGROUP_DEBUG=y. This
+ 	  gives the statistics about how many a times a group was dequeued
+ 	  from service tree of the device. First two fields specify the major
+ 	  and minor number of the device and third field specifies the number
+diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
+index 4626b88b2d5a..7a6b2f29a582 100644
+--- a/block/Kconfig.iosched
++++ b/block/Kconfig.iosched
+@@ -36,6 +36,13 @@ config BFQ_GROUP_IOSCHED
+        Enable hierarchical scheduling in BFQ, using the blkio
+        (cgroups-v1) or io (cgroups-v2) controller.
+ 
++config BFQ_CGROUP_DEBUG
++	bool "BFQ IO controller debugging"
++	depends on BFQ_GROUP_IOSCHED
++	---help---
++	Enable some debugging help. Currently it exports additional stat
++	files in a cgroup which can be useful for debugging.
++
+ endmenu
+ 
+ endif
 diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 66abc82179f3..624374a99c6e 100644
+index d84302445e30..0f6cd688924f 100644
 --- a/block/bfq-cgroup.c
 +++ b/block/bfq-cgroup.c
-@@ -935,7 +935,7 @@ static u64 bfqg_prfill_stat_recursive(struct seq_file *sf,
- static u64 bfqg_prfill_rwstat_recursive(struct seq_file *sf,
- 					struct blkg_policy_data *pd, int off)
+@@ -15,8 +15,7 @@
+ 
+ #include "bfq-iosched.h"
+ 
+-#if defined(CONFIG_BFQ_GROUP_IOSCHED) &&  defined(CONFIG_DEBUG_BLK_CGROUP)
+-
++#ifdef CONFIG_BFQ_CGROUP_DEBUG
+ static int bfq_stat_init(struct bfq_stat *stat, gfp_t gfp)
  {
--	struct blkg_rwstat sum;
-+	struct blkg_rwstat_sample sum;
- 
- 	blkg_rwstat_recursive_sum(pd_to_blkg(pd), &blkcg_policy_bfq, off, &sum);
- 	return __blkg_prfill_rwstat(sf, pd, &sum);
-@@ -975,15 +975,13 @@ static int bfqg_print_stat_sectors(struct seq_file *sf, void *v)
- static u64 bfqg_prfill_sectors_recursive(struct seq_file *sf,
- 					 struct blkg_policy_data *pd, int off)
- {
--	struct blkg_rwstat tmp;
--	u64 sum;
-+	struct blkg_rwstat_sample tmp;
- 
- 	blkg_rwstat_recursive_sum(pd->blkg, NULL,
- 			offsetof(struct blkcg_gq, stat_bytes), &tmp);
--	sum = atomic64_read(&tmp.aux_cnt[BLKG_RWSTAT_READ]) +
--		atomic64_read(&tmp.aux_cnt[BLKG_RWSTAT_WRITE]);
- 
--	return __blkg_prfill_u64(sf, pd, sum >> 9);
-+	return __blkg_prfill_u64(sf, pd,
-+		(tmp.cnt[BLKG_RWSTAT_READ] + tmp.cnt[BLKG_RWSTAT_WRITE]) >> 9);
+ 	int ret;
+@@ -253,7 +252,7 @@ void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
+ 				io_start_time_ns - start_time_ns);
  }
  
- static int bfqg_print_stat_sectors_recursive(struct seq_file *sf, void *v)
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 7d6bf9b03e24..aad0f5d9a2ea 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -549,7 +549,7 @@ EXPORT_SYMBOL_GPL(__blkg_prfill_u64);
-  * Print @rwstat to @sf for the device assocaited with @pd.
-  */
- u64 __blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
--			 const struct blkg_rwstat *rwstat)
-+			 const struct blkg_rwstat_sample *rwstat)
+-#else /* CONFIG_BFQ_GROUP_IOSCHED && CONFIG_DEBUG_BLK_CGROUP */
++#else /* CONFIG_BFQ_CGROUP_DEBUG */
+ 
+ void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
+ 			      unsigned int op) { }
+@@ -267,7 +266,7 @@ void bfqg_stats_update_idle_time(struct bfq_group *bfqg) { }
+ void bfqg_stats_set_start_idle_time(struct bfq_group *bfqg) { }
+ void bfqg_stats_update_avg_queue_size(struct bfq_group *bfqg) { }
+ 
+-#endif /* CONFIG_BFQ_GROUP_IOSCHED && CONFIG_DEBUG_BLK_CGROUP */
++#endif /* CONFIG_BFQ_CGROUP_DEBUG */
+ 
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+ 
+@@ -351,7 +350,7 @@ void bfqg_and_blkg_put(struct bfq_group *bfqg)
+ /* @stats = 0 */
+ static void bfqg_stats_reset(struct bfqg_stats *stats)
  {
- 	static const char *rwstr[] = {
- 		[BLKG_RWSTAT_READ]	= "Read",
-@@ -567,12 +567,12 @@ u64 __blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
+-#ifdef CONFIG_DEBUG_BLK_CGROUP
++#ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	/* queued stats shouldn't be cleared */
+ 	blkg_rwstat_reset(&stats->merged);
+ 	blkg_rwstat_reset(&stats->service_time);
+@@ -372,7 +371,7 @@ static void bfqg_stats_add_aux(struct bfqg_stats *to, struct bfqg_stats *from)
+ 	if (!to || !from)
+ 		return;
  
- 	for (i = 0; i < BLKG_RWSTAT_NR; i++)
- 		seq_printf(sf, "%s %s %llu\n", dname, rwstr[i],
--			   (unsigned long long)atomic64_read(&rwstat->aux_cnt[i]));
-+			   rwstat->cnt[i]);
+-#ifdef CONFIG_DEBUG_BLK_CGROUP
++#ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	/* queued stats shouldn't be cleared */
+ 	blkg_rwstat_add_aux(&to->merged, &from->merged);
+ 	blkg_rwstat_add_aux(&to->service_time, &from->service_time);
+@@ -432,7 +431,7 @@ void bfq_init_entity(struct bfq_entity *entity, struct bfq_group *bfqg)
  
--	v = atomic64_read(&rwstat->aux_cnt[BLKG_RWSTAT_READ]) +
--		atomic64_read(&rwstat->aux_cnt[BLKG_RWSTAT_WRITE]) +
--		atomic64_read(&rwstat->aux_cnt[BLKG_RWSTAT_DISCARD]);
--	seq_printf(sf, "%s Total %llu\n", dname, (unsigned long long)v);
-+	v = rwstat->cnt[BLKG_RWSTAT_READ] +
-+		rwstat->cnt[BLKG_RWSTAT_WRITE] +
-+		rwstat->cnt[BLKG_RWSTAT_DISCARD];
-+	seq_printf(sf, "%s Total %llu\n", dname, v);
- 	return v;
+ static void bfqg_stats_exit(struct bfqg_stats *stats)
+ {
+-#ifdef CONFIG_DEBUG_BLK_CGROUP
++#ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	blkg_rwstat_exit(&stats->merged);
+ 	blkg_rwstat_exit(&stats->service_time);
+ 	blkg_rwstat_exit(&stats->wait_time);
+@@ -449,7 +448,7 @@ static void bfqg_stats_exit(struct bfqg_stats *stats)
+ 
+ static int bfqg_stats_init(struct bfqg_stats *stats, gfp_t gfp)
+ {
+-#ifdef CONFIG_DEBUG_BLK_CGROUP
++#ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	if (blkg_rwstat_init(&stats->merged, gfp) ||
+ 	    blkg_rwstat_init(&stats->service_time, gfp) ||
+ 	    blkg_rwstat_init(&stats->wait_time, gfp) ||
+@@ -986,7 +985,7 @@ static ssize_t bfq_io_set_weight(struct kernfs_open_file *of,
+ 	return ret ?: nbytes;
  }
- EXPORT_SYMBOL_GPL(__blkg_prfill_rwstat);
-@@ -602,7 +602,7 @@ EXPORT_SYMBOL_GPL(blkg_prfill_stat);
- u64 blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
- 		       int off)
- {
--	struct blkg_rwstat rwstat = { };
-+	struct blkg_rwstat_sample rwstat = { };
  
- 	blkg_rwstat_read((void *)pd + off, &rwstat);
- 	return __blkg_prfill_rwstat(sf, pd, &rwstat);
-@@ -612,7 +612,7 @@ EXPORT_SYMBOL_GPL(blkg_prfill_rwstat);
- static u64 blkg_prfill_rwstat_field(struct seq_file *sf,
- 				    struct blkg_policy_data *pd, int off)
+-#ifdef CONFIG_DEBUG_BLK_CGROUP
++#ifdef CONFIG_BFQ_CGROUP_DEBUG
+ static int bfqg_print_stat(struct seq_file *sf, void *v)
  {
--	struct blkg_rwstat rwstat = { };
-+	struct blkg_rwstat_sample rwstat = { };
- 
- 	blkg_rwstat_read((void *)pd->blkg + off, &rwstat);
- 	return __blkg_prfill_rwstat(sf, pd, &rwstat);
-@@ -656,7 +656,7 @@ static u64 blkg_prfill_rwstat_field_recursive(struct seq_file *sf,
- 					      struct blkg_policy_data *pd,
- 					      int off)
- {
--	struct blkg_rwstat rwstat;
-+	struct blkg_rwstat_sample rwstat;
- 
- 	blkg_rwstat_recursive_sum(pd->blkg, NULL, off, &rwstat);
- 	return __blkg_prfill_rwstat(sf, pd, &rwstat);
-@@ -739,7 +739,7 @@ EXPORT_SYMBOL_GPL(blkg_stat_recursive_sum);
-  * @blkg: blkg of interest
-  * @pol: blkcg_policy which contains the blkg_rwstat
-  * @off: offset to the blkg_rwstat in blkg_policy_data or @blkg
-- * @sum: blkg_rwstat structure containing the results
-+ * @sum: blkg_rwstat_sample structure containing the results
-  *
-  * Collect the blkg_rwstat specified by @blkg, @pol and @off and all its
-  * online descendants and their aux counts.  The caller must be holding the
-@@ -749,7 +749,7 @@ EXPORT_SYMBOL_GPL(blkg_stat_recursive_sum);
-  * is at @off bytes into @blkg's blkg_policy_data of the policy.
-  */
- void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
--		int off, struct blkg_rwstat *sum)
-+		int off, struct blkg_rwstat_sample *sum)
- {
- 	struct blkcg_gq *pos_blkg;
- 	struct cgroup_subsys_state *pos_css;
-@@ -770,8 +770,7 @@ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
- 			rwstat = (void *)pos_blkg + off;
- 
- 		for (i = 0; i < BLKG_RWSTAT_NR; i++)
--			atomic64_set(&sum->aux_cnt[i],
--				blkg_rwstat_read_counter(rwstat, i));
-+			sum->cnt[i] = blkg_rwstat_read_counter(rwstat, i);
- 	}
- 	rcu_read_unlock();
+ 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), blkg_prfill_stat,
+@@ -1109,7 +1108,7 @@ static int bfqg_print_avg_queue_size(struct seq_file *sf, void *v)
+ 			  0, false);
+ 	return 0;
  }
-@@ -939,7 +938,7 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
- 	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
- 		const char *dname;
- 		char *buf;
--		struct blkg_rwstat rwstat;
-+		struct blkg_rwstat_sample rwstat;
- 		u64 rbytes, wbytes, rios, wios, dbytes, dios;
- 		size_t size = seq_get_buf(sf, &buf), off = 0;
- 		int i;
-@@ -961,15 +960,15 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
+-#endif /* CONFIG_DEBUG_BLK_CGROUP */
++#endif /* CONFIG_BFQ_CGROUP_DEBUG */
  
- 		blkg_rwstat_recursive_sum(blkg, NULL,
- 				offsetof(struct blkcg_gq, stat_bytes), &rwstat);
--		rbytes = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_READ]);
--		wbytes = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_WRITE]);
--		dbytes = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_DISCARD]);
-+		rbytes = rwstat.cnt[BLKG_RWSTAT_READ];
-+		wbytes = rwstat.cnt[BLKG_RWSTAT_WRITE];
-+		dbytes = rwstat.cnt[BLKG_RWSTAT_DISCARD];
+ struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node)
+ {
+@@ -1157,7 +1156,7 @@ struct cftype bfq_blkcg_legacy_files[] = {
+ 		.private = (unsigned long)&blkcg_policy_bfq,
+ 		.seq_show = blkg_print_stat_ios,
+ 	},
+-#ifdef CONFIG_DEBUG_BLK_CGROUP
++#ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	{
+ 		.name = "bfq.time",
+ 		.private = offsetof(struct bfq_group, stats.time),
+@@ -1187,7 +1186,7 @@ struct cftype bfq_blkcg_legacy_files[] = {
+ 		.private = offsetof(struct bfq_group, stats.queued),
+ 		.seq_show = bfqg_print_rwstat,
+ 	},
+-#endif /* CONFIG_DEBUG_BLK_CGROUP */
++#endif /* CONFIG_BFQ_CGROUP_DEBUG */
  
- 		blkg_rwstat_recursive_sum(blkg, NULL,
- 					offsetof(struct blkcg_gq, stat_ios), &rwstat);
--		rios = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_READ]);
--		wios = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_WRITE]);
--		dios = atomic64_read(&rwstat.aux_cnt[BLKG_RWSTAT_DISCARD]);
-+		rios = rwstat.cnt[BLKG_RWSTAT_READ];
-+		wios = rwstat.cnt[BLKG_RWSTAT_WRITE];
-+		dios = rwstat.cnt[BLKG_RWSTAT_DISCARD];
- 
- 		spin_unlock_irq(&blkg->q->queue_lock);
- 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 3ee858111274..e4a81767e111 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -63,8 +63,7 @@ struct blkcg {
- 
- /*
-  * blkg_[rw]stat->aux_cnt is excluded for local stats but included for
-- * recursive.  Used to carry stats of dead children, and, for blkg_rwstat,
-- * to carry result values from read and sum operations.
-+ * recursive.  Used to carry stats of dead children.
-  */
- struct blkg_stat {
- 	struct percpu_counter		cpu_cnt;
-@@ -76,6 +75,10 @@ struct blkg_rwstat {
- 	atomic64_t			aux_cnt[BLKG_RWSTAT_NR];
+ 	/* the same statistics which cover the bfqg and its descendants */
+ 	{
+@@ -1200,7 +1199,7 @@ struct cftype bfq_blkcg_legacy_files[] = {
+ 		.private = (unsigned long)&blkcg_policy_bfq,
+ 		.seq_show = blkg_print_stat_ios_recursive,
+ 	},
+-#ifdef CONFIG_DEBUG_BLK_CGROUP
++#ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	{
+ 		.name = "bfq.time_recursive",
+ 		.private = offsetof(struct bfq_group, stats.time),
+@@ -1254,7 +1253,7 @@ struct cftype bfq_blkcg_legacy_files[] = {
+ 		.private = offsetof(struct bfq_group, stats.dequeue),
+ 		.seq_show = bfqg_print_stat,
+ 	},
+-#endif	/* CONFIG_DEBUG_BLK_CGROUP */
++#endif	/* CONFIG_BFQ_CGROUP_DEBUG */
+ 	{ }	/* terminate */
  };
  
-+struct blkg_rwstat_sample {
-+	u64				cnt[BLKG_RWSTAT_NR];
-+};
-+
- /*
-  * A blkcg_gq (blkg) is association between a block cgroup (blkcg) and a
-  * request_queue (q).  This is used by blkcg policies which need to track
-@@ -213,7 +216,7 @@ void blkcg_print_blkgs(struct seq_file *sf, struct blkcg *blkcg,
- 		       bool show_total);
- u64 __blkg_prfill_u64(struct seq_file *sf, struct blkg_policy_data *pd, u64 v);
- u64 __blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
--			 const struct blkg_rwstat *rwstat);
-+			 const struct blkg_rwstat_sample *rwstat);
- u64 blkg_prfill_stat(struct seq_file *sf, struct blkg_policy_data *pd, int off);
- u64 blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
- 		       int off);
-@@ -225,7 +228,7 @@ int blkg_print_stat_ios_recursive(struct seq_file *sf, void *v);
- u64 blkg_stat_recursive_sum(struct blkcg_gq *blkg,
- 			    struct blkcg_policy *pol, int off);
- void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
--		int off, struct blkg_rwstat *sum);
-+		int off, struct blkg_rwstat_sample *sum);
- 
- struct blkg_conf_ctx {
- 	struct gendisk			*disk;
-@@ -701,13 +704,13 @@ static inline void blkg_rwstat_add(struct blkg_rwstat *rwstat,
-  * Read the current snapshot of @rwstat and return it in the aux counts.
-  */
- static inline void blkg_rwstat_read(struct blkg_rwstat *rwstat,
--		struct blkg_rwstat *result)
-+		struct blkg_rwstat_sample *result)
- {
- 	int i;
- 
- 	for (i = 0; i < BLKG_RWSTAT_NR; i++)
--		atomic64_set(&result->aux_cnt[i],
--			     percpu_counter_sum_positive(&rwstat->cpu_cnt[i]));
-+		result->cnt[i] =
-+			percpu_counter_sum_positive(&rwstat->cpu_cnt[i]);
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index f8d430f88d25..e9a587707d67 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -4403,7 +4403,7 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	return rq;
  }
  
- /**
-@@ -720,11 +723,10 @@ static inline void blkg_rwstat_read(struct blkg_rwstat *rwstat,
-  */
- static inline uint64_t blkg_rwstat_total(struct blkg_rwstat *rwstat)
- {
--	struct blkg_rwstat tmp = { };
-+	struct blkg_rwstat_sample tmp = { };
+-#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
++#ifdef CONFIG_BFQ_CGROUP_DEBUG
+ static void bfq_update_dispatch_stats(struct request_queue *q,
+ 				      struct request *rq,
+ 				      struct bfq_queue *in_serv_queue,
+@@ -4453,7 +4453,7 @@ static inline void bfq_update_dispatch_stats(struct request_queue *q,
+ 					     struct request *rq,
+ 					     struct bfq_queue *in_serv_queue,
+ 					     bool idle_timer_disabled) {}
+-#endif
++#endif /* CONFIG_BFQ_CGROUP_DEBUG */
  
- 	blkg_rwstat_read(rwstat, &tmp);
--	return atomic64_read(&tmp.aux_cnt[BLKG_RWSTAT_READ]) +
--		atomic64_read(&tmp.aux_cnt[BLKG_RWSTAT_WRITE]);
-+	return tmp.cnt[BLKG_RWSTAT_READ] + tmp.cnt[BLKG_RWSTAT_WRITE];
+ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ {
+@@ -5007,7 +5007,7 @@ static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
+ 	return idle_timer_disabled;
  }
  
- /**
+-#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
++#ifdef CONFIG_BFQ_CGROUP_DEBUG
+ static void bfq_update_insert_stats(struct request_queue *q,
+ 				    struct bfq_queue *bfqq,
+ 				    bool idle_timer_disabled,
+@@ -5037,7 +5037,7 @@ static inline void bfq_update_insert_stats(struct request_queue *q,
+ 					   struct bfq_queue *bfqq,
+ 					   bool idle_timer_disabled,
+ 					   unsigned int cmd_flags) {}
+-#endif
++#endif /* CONFIG_BFQ_CGROUP_DEBUG */
+ 
+ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 			       bool at_head)
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index aef4fa0046b8..584d3c9ed8ba 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -783,7 +783,7 @@ struct bfq_stat {
+ };
+ 
+ struct bfqg_stats {
+-#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
++#ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	/* number of ios merged */
+ 	struct blkg_rwstat		merged;
+ 	/* total time spent on device in ns, may not be accurate w/ queueing */
+@@ -811,7 +811,7 @@ struct bfqg_stats {
+ 	u64				start_idle_time;
+ 	u64				start_empty_time;
+ 	uint16_t			flags;
+-#endif	/* CONFIG_BFQ_GROUP_IOSCHED && CONFIG_DEBUG_BLK_CGROUP */
++#endif /* CONFIG_BFQ_CGROUP_DEBUG */
+ };
+ 
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+diff --git a/init/Kconfig b/init/Kconfig
+index 36894c9fb420..df9d36ba80e3 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -800,14 +800,6 @@ config BLK_CGROUP
+ 
+ 	See Documentation/cgroup-v1/blkio-controller.txt for more information.
+ 
+-config DEBUG_BLK_CGROUP
+-	bool "IO controller debugging"
+-	depends on BLK_CGROUP
+-	default n
+-	---help---
+-	Enable some debugging help. Currently it exports additional stat
+-	files in a cgroup which can be useful for debugging.
+-
+ config CGROUP_WRITEBACK
+ 	bool
+ 	depends on MEMCG && BLK_CGROUP
 -- 
 2.20.1
 
