@@ -3,30 +3,31 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA6D3C28CC3
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 05:59:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 553A9C28CC3
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 06:02:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89B33208CA
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 05:59:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 349522089E
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 06:02:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726048AbfFGF7l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jun 2019 01:59:41 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41206 "EHLO mx1.suse.de"
+        id S1726010AbfFGGC5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jun 2019 02:02:57 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41940 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726010AbfFGF7l (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Jun 2019 01:59:41 -0400
+        id S1726343AbfFGGC5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 7 Jun 2019 02:02:57 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id C994BAB42;
-        Fri,  7 Jun 2019 05:59:39 +0000 (UTC)
-Subject: Re: [PATCH 2/6] block: remove blk_init_request_from_bio
+        by mx1.suse.de (Postfix) with ESMTP id B0D86AE5E;
+        Fri,  7 Jun 2019 06:02:55 +0000 (UTC)
+Subject: Re: [PATCH 3/6] block: remove the bi_phys_segments field in struct
+ bio
 To:     Christoph Hellwig <hch@lst.de>, axboe@fb.com
 Cc:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org
 References: <20190606102904.4024-1-hch@lst.de>
- <20190606102904.4024-3-hch@lst.de>
+ <20190606102904.4024-4-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -72,12 +73,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <d6031c5f-b8d8-8fa1-ad00-b0e6042875c1@suse.de>
-Date:   Fri, 7 Jun 2019 07:59:39 +0200
+Message-ID: <481003ba-aa95-0d0e-ba1f-ce48f2c61105@suse.de>
+Date:   Fri, 7 Jun 2019 08:02:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190606102904.4024-3-hch@lst.de>
+In-Reply-To: <20190606102904.4024-4-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -87,20 +88,58 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 6/6/19 12:29 PM, Christoph Hellwig wrote:
-> lightnvm should have never used this function, as it is sending
-> passthrough requests, so switch it to blk_rq_append_bio like all the
-> other passthrough request users.  Inline blk_init_request_from_bio into
-> the only remaining caller.
+> We only need the number of segments in the blk-mq submission path.
+> Remove the field from struct bio, and return it from a variant of
+> blk_queue_split instead of that it can passed as an argument to
+> those functions that need the value.
+> 
+> This also means we stop recounting segments except for cloning
+> and partial segments.
+> 
+> To keep the number of arguments in this how path down remove
+> pointless struct request_queue arguments from any of the functions
+> that had it and grew a nr_segs argument.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  block/blk-core.c             | 11 -----------
->  block/blk-mq.c               |  7 ++++++-
->  drivers/nvme/host/lightnvm.c |  2 +-
->  include/linux/blkdev.h       |  1 -
->  4 files changed, 7 insertions(+), 14 deletions(-)
+>  Documentation/block/biodoc.txt |  1 -
+>  block/bfq-iosched.c            |  5 ++-
+>  block/bio.c                    | 15 +------
+>  block/blk-core.c               | 32 +++++++--------
+>  block/blk-map.c                | 10 ++++-
+>  block/blk-merge.c              | 75 ++++++++++++----------------------
+>  block/blk-mq-sched.c           | 26 +++++++-----
+>  block/blk-mq-sched.h           | 10 +++--
+>  block/blk-mq.c                 | 23 ++++++-----
+>  block/blk.h                    | 23 ++++++-----
+>  block/kyber-iosched.c          |  5 ++-
+>  block/mq-deadline.c            |  5 ++-
+>  drivers/md/raid5.c             |  1 -
+>  include/linux/bio.h            |  1 -
+>  include/linux/blk-mq.h         |  2 +-
+>  include/linux/blk_types.h      |  6 ---
+>  include/linux/blkdev.h         |  1 -
+>  include/linux/elevator.h       |  2 +-
+>  18 files changed, 106 insertions(+), 137 deletions(-)
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+In general a very good idea, but:
+
+> @@ -304,6 +301,13 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
+>  		*bio = split;
+>  	}
+>  }
+> +
+> +void blk_queue_split(struct request_queue *q, struct bio **bio)
+> +{
+> +	unsigned int nr_segs;
+> +
+> +	__blk_queue_split(q, bio, &nr_segs);
+> +}
+>  EXPORT_SYMBOL(blk_queue_split);
+>  
+That looks a bit weird, and I guess some or other compiler might
+complain here about nr_segs being unused.
+Can't we modify __blk_queue_split() to accept a NULL argument here?
 
 Cheers,
 
