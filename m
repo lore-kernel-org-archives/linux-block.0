@@ -6,27 +6,28 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC943C28CC3
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 06:04:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 800AFC28CC3
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 06:05:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BCC402089E
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 06:04:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6128D2089E
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 06:05:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726882AbfFGGEe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jun 2019 02:04:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42176 "EHLO mx1.suse.de"
+        id S1726609AbfFGGFA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jun 2019 02:05:00 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42246 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726825AbfFGGEe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Jun 2019 02:04:34 -0400
+        id S1726188AbfFGGFA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 7 Jun 2019 02:05:00 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id DA3C3AC3A;
-        Fri,  7 Jun 2019 06:04:32 +0000 (UTC)
-Subject: Re: [PATCH 5/6] block: untangle the end of blk_bio_segment_split
+        by mx1.suse.de (Postfix) with ESMTP id 8BF22AC3A;
+        Fri,  7 Jun 2019 06:04:58 +0000 (UTC)
+Subject: Re: [PATCH 6/6] block: mark blk_rq_bio_prep as inline
 To:     Christoph Hellwig <hch@lst.de>, axboe@fb.com
-Cc:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org
+Cc:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 References: <20190606102904.4024-1-hch@lst.de>
- <20190606102904.4024-6-hch@lst.de>
+ <20190606102904.4024-7-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -72,12 +73,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <1fc49e04-f0f2-afdb-1dff-82bef893d554@suse.de>
-Date:   Fri, 7 Jun 2019 08:04:32 +0200
+Message-ID: <7ccd32f7-c5ab-0a19-9ddc-795e37a7f2aa@suse.de>
+Date:   Fri, 7 Jun 2019 08:04:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190606102904.4024-6-hch@lst.de>
+In-Reply-To: <20190606102904.4024-7-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -87,14 +88,15 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 6/6/19 12:29 PM, Christoph Hellwig wrote:
-> Now that we don't need to assign the front/back segment sizes, we can
-> duplicating the segs assignment for the split vs no-split case and
-> remove a whole chunk of boilerplate code.
+> This function just has a few trivial assignments, has two callers with
+> one of them being in the fastpath.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 > ---
->  block/blk-merge.c | 14 +++-----------
->  1 file changed, 3 insertions(+), 11 deletions(-)
+>  block/blk-core.c | 11 -----------
+>  block/blk.h      | 13 ++++++++++++-
+>  2 files changed, 12 insertions(+), 12 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
