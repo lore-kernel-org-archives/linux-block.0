@@ -3,237 +3,281 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB13BC468BC
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:19:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D134CC468BC
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:19:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A57C62083D
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:19:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABA68206E0
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:19:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729541AbfFGOSz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jun 2019 10:18:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57548 "EHLO mx1.redhat.com"
+        id S1729617AbfFGOTK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jun 2019 10:19:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46224 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728199AbfFGOSy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Jun 2019 10:18:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1728851AbfFGOTK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 7 Jun 2019 10:19:10 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7574B307D98A;
-        Fri,  7 Jun 2019 14:18:51 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id D2FAD5F793;
+        Fri,  7 Jun 2019 14:19:08 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA4947FEB2;
-        Fri,  7 Jun 2019 14:18:49 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 342E478566;
+        Fri,  7 Jun 2019 14:19:05 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
  Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
  Kingdom.
  Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 09/13] fsinfo: Export superblock notification counter [ver
- #4]
+Subject: [PATCH 11/13] block: Add block layer notifications [ver #4]
 From:   David Howells <dhowells@redhat.com>
 To:     viro@zeniv.linux.org.uk
 Cc:     dhowells@redhat.com, raven@themaw.net,
         linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
         linux-block@vger.kernel.org, keyrings@vger.kernel.org,
         linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Fri, 07 Jun 2019 15:18:49 +0100
-Message-ID: <155991712904.15579.2181300108455141366.stgit@warthog.procyon.org.uk>
+Date:   Fri, 07 Jun 2019 15:19:04 +0100
+Message-ID: <155991714448.15579.1960242962075486353.stgit@warthog.procyon.org.uk>
 In-Reply-To: <155991702981.15579.6007568669839441045.stgit@warthog.procyon.org.uk>
 References: <155991702981.15579.6007568669839441045.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/unknown-version
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Fri, 07 Jun 2019 14:18:53 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Fri, 07 Jun 2019 14:19:09 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide an fsinfo attribute to export the superblock notification counter
-so that it can be polled in the case of a notification buffer overrun.
-This is accessed with:
+Add a block layer notification mechanism whereby notifications about
+block-layer events such as I/O errors, can be reported to a monitoring
+process asynchronously.
 
-	struct fsinfo_params params = {
-		.request = FSINFO_ATTR_SB_NOTIFICATIONS,
+Firstly, an event queue needs to be created:
+
+	fd = open("/dev/event_queue", O_RDWR);
+	ioctl(fd, IOC_WATCH_QUEUE_SET_SIZE, page_size << n);
+
+then a notification can be set up to report block notifications via that
+queue:
+
+	struct watch_notification_filter filter = {
+		.nr_filters = 1,
+		.filters = {
+			[0] = {
+				.type = WATCH_TYPE_BLOCK_NOTIFY,
+				.subtype_filter[0] = UINT_MAX;
+			},
+		},
 	};
+	ioctl(fd, IOC_WATCH_QUEUE_SET_FILTER, &filter);
+	watch_devices(fd, 12);
 
-and returns a structure that looks like:
+After that, records will be placed into the queue when, for example, errors
+occur on a block device.  Records are of the following format:
 
-	struct fsinfo_sb_notifications {
-		__u64	watch_id;
-		__u32	notify_counter;
-		__u32	__reserved[1];
-	};
+	struct block_notification {
+		struct watch_notification watch;
+		__u64	dev;
+		__u64	sector;
+	} *n;
 
-Where watch_id is a number uniquely identifying the superblock in
-notification records and notify_counter is incremented for each
-superblock notification posted.
+Where:
+
+	n->watch.type will be WATCH_TYPE_BLOCK_NOTIFY
+
+	n->watch.subtype will be the type of notification, such as
+	NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM.
+
+	n->watch.info & WATCH_INFO_LENGTH will indicate the length of the
+	record.
+
+	n->watch.info & WATCH_INFO_ID will be the second argument to
+	watch_devices(), shifted.
+
+	n->dev will be the device numbers munged together.
+
+	n->sector will indicate the affected sector (if appropriate for the
+	event).
+
+Note that it is permissible for event records to be of variable length -
+or, at least, the length may be dependent on the subtype.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- fs/fsinfo.c                      |   12 ++++++++++++
- fs/super.c                       |    1 +
- include/linux/fs.h               |    1 +
- include/uapi/linux/fsinfo.h      |   10 ++++++++++
- include/uapi/linux/watch_queue.h |    2 +-
- samples/vfs/test-fsinfo.c        |   13 +++++++++++++
- 6 files changed, 38 insertions(+), 1 deletion(-)
+ Documentation/watch_queue.rst    |   10 +++++++++-
+ block/Kconfig                    |    9 +++++++++
+ block/blk-core.c                 |   29 +++++++++++++++++++++++++++++
+ include/linux/blkdev.h           |   15 +++++++++++++++
+ include/uapi/linux/watch_queue.h |   27 +++++++++++++++++++++++++++
+ 5 files changed, 89 insertions(+), 1 deletion(-)
 
-diff --git a/fs/fsinfo.c b/fs/fsinfo.c
-index 3ec64d3cba08..1456e26d2f7c 100644
---- a/fs/fsinfo.c
-+++ b/fs/fsinfo.c
-@@ -284,6 +284,16 @@ static int fsinfo_generic_param_enum(struct file_system_type *f,
- 	return sizeof(*p);
+diff --git a/Documentation/watch_queue.rst b/Documentation/watch_queue.rst
+index e4b8233d5aa8..c2954e191989 100644
+--- a/Documentation/watch_queue.rst
++++ b/Documentation/watch_queue.rst
+@@ -11,7 +11,9 @@ receive notifications from the kernel.  This can be used in conjunction with::
+ 
+   * Superblock event notifications
+ 
+-  * General device event notifications
++  * General device event notifications, including::
++
++    * Block layer event notifications
+ 
+ 
+ The notifications buffers can be enabled by:
+@@ -336,6 +338,12 @@ Any particular buffer can be fed from multiple sources.  Sources include:
+ 
+     See Documentation/security/keys/core.rst for more information.
+ 
++  * WATCH_TYPE_BLOCK_NOTIFY
++
++    Notifications of this type indicate block layer events, such as I/O errors
++    or temporary link loss.  Watchpoints of this type are set on the global
++    device watch list.
++
+ 
+ Event Filtering
+ ===============
+diff --git a/block/Kconfig b/block/Kconfig
+index 1b220101a9cb..4ff4a56ba9f9 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -163,6 +163,15 @@ config BLK_SED_OPAL
+ 	Enabling this option enables users to setup/unlock/lock
+ 	Locking ranges for SED devices using the Opal protocol.
+ 
++config BLK_NOTIFICATIONS
++	bool "Block layer event notifications"
++	select DEVICE_NOTIFICATIONS
++	help
++	  This option provides support for getting block layer event
++	  notifications.  This makes use of the /dev/watch_queue misc device to
++	  handle the notification buffer and provides the device_notify() system
++	  call to enable/disable watches.
++
+ menu "Partition Types"
+ 
+ source "block/partitions/Kconfig"
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 419d600e6637..edad86172d47 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -144,6 +144,22 @@ static const struct {
+ 	[BLK_STS_IOERR]		= { -EIO,	"I/O" },
+ };
+ 
++#ifdef CONFIG_BLK_NOTIFICATIONS
++static const
++enum block_notification_type blk_notifications[ARRAY_SIZE(blk_errors)] = {
++	[BLK_STS_TIMEOUT]	= NOTIFY_BLOCK_ERROR_TIMEOUT,
++	[BLK_STS_NOSPC]		= NOTIFY_BLOCK_ERROR_NO_SPACE,
++	[BLK_STS_TRANSPORT]	= NOTIFY_BLOCK_ERROR_RECOVERABLE_TRANSPORT,
++	[BLK_STS_TARGET]	= NOTIFY_BLOCK_ERROR_CRITICAL_TARGET,
++	[BLK_STS_NEXUS]		= NOTIFY_BLOCK_ERROR_CRITICAL_NEXUS,
++	[BLK_STS_MEDIUM]	= NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM,
++	[BLK_STS_PROTECTION]	= NOTIFY_BLOCK_ERROR_PROTECTION,
++	[BLK_STS_RESOURCE]	= NOTIFY_BLOCK_ERROR_KERNEL_RESOURCE,
++	[BLK_STS_DEV_RESOURCE]	= NOTIFY_BLOCK_ERROR_DEVICE_RESOURCE,
++	[BLK_STS_IOERR]		= NOTIFY_BLOCK_ERROR_IO,
++};
++#endif
++
+ blk_status_t errno_to_blk_status(int errno)
+ {
+ 	int i;
+@@ -179,6 +195,19 @@ static void print_req_error(struct request *req, blk_status_t status)
+ 				req->rq_disk ?  req->rq_disk->disk_name : "?",
+ 				(unsigned long long)blk_rq_pos(req),
+ 				req->cmd_flags);
++
++#ifdef CONFIG_BLK_NOTIFICATIONS
++	if (blk_notifications[idx]) {
++		struct block_notification n = {
++			.watch.type	= WATCH_TYPE_BLOCK_NOTIFY,
++			.watch.subtype	= blk_notifications[idx],
++			.watch.info	= sizeof(n),
++			.dev		= req->rq_disk ? disk_devt(req->rq_disk) : 0,
++			.sector		= blk_rq_pos(req),
++		};
++		post_block_notification(&n);
++	}
++#endif
  }
  
-+static int fsinfo_generic_sb_notifications(struct path *path,
-+					   struct fsinfo_sb_notifications *p)
+ static void req_bio_endio(struct request *rq, struct bio *bio,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1aafeb923e7b..8b8e235f47c9 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -43,6 +43,7 @@ struct pr_ops;
+ struct rq_qos;
+ struct blk_queue_stats;
+ struct blk_stat_callback;
++struct block_notification;
+ 
+ #define BLKDEV_MIN_RQ	4
+ #define BLKDEV_MAX_RQ	128	/* Default maximum */
+@@ -1744,6 +1745,20 @@ static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
+ }
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ 
++#ifdef CONFIG_BLK_NOTIFICATIONS
++static inline void post_block_notification(struct block_notification *n)
 +{
-+	struct super_block *sb = path->dentry->d_sb;
++	u64 id = 0; /* Might want to allow dev# here. */
 +
-+	p->watch_id		= sb->s_unique_id;
-+	p->notify_counter	= atomic_read(&sb->s_notify_counter);
-+	return sizeof(*p);
++	post_device_notification(&n->watch, id);
 +}
++#else
++static inline void post_block_notification(struct block_notification *n)
++{
++}
++#endif
 +
- static void fsinfo_insert_sb_flag_parameters(struct path *path,
- 					     struct fsinfo_kparams *params)
- {
-@@ -331,6 +341,7 @@ int generic_fsinfo(struct path *path, struct fsinfo_kparams *params)
- 	case _genp(MOUNT_DEVNAME,	mount_devname);
- 	case _genp(MOUNT_CHILDREN,	mount_children);
- 	case _genp(MOUNT_SUBMOUNT,	mount_submount);
-+	case _gen(SB_NOTIFICATIONS,	sb_notifications);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -606,6 +617,7 @@ static const struct fsinfo_attr_info fsinfo_buffer_info[FSINFO_ATTR__NR] = {
- 	FSINFO_STRING_N		(SERVER_NAME,		server_name),
- 	FSINFO_STRUCT_NM	(SERVER_ADDRESS,	server_address),
- 	FSINFO_STRING		(CELL_NAME,		cell_name),
-+	FSINFO_STRUCT		(SB_NOTIFICATIONS,	sb_notifications),
- };
++
+ #else /* CONFIG_BLOCK */
  
- /**
-diff --git a/fs/super.c b/fs/super.c
-index 5bfe409a4fbe..b9bd4a849b69 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1823,6 +1823,7 @@ EXPORT_SYMBOL(thaw_super);
-  */
- void post_sb_notification(struct super_block *s, struct superblock_notification *n)
- {
-+	atomic_inc(&s->s_notify_counter);
- 	post_watch_notification(s->s_watchers, &n->watch, current_cred(),
- 				s->s_unique_id);
- }
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 02ba4bfb9cc3..06e272a25ed7 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1536,6 +1536,7 @@ struct super_block {
- #ifdef CONFIG_SB_NOTIFICATIONS
- 	struct watch_list	*s_watchers;
- #endif
-+	atomic_t		s_notify_counter;
- } __randomize_layout;
- 
- /* Helper functions so that in most cases filesystems will
-diff --git a/include/uapi/linux/fsinfo.h b/include/uapi/linux/fsinfo.h
-index bb38f9c41772..31e9354170c5 100644
---- a/include/uapi/linux/fsinfo.h
-+++ b/include/uapi/linux/fsinfo.h
-@@ -39,6 +39,7 @@ enum fsinfo_attribute {
- 	FSINFO_ATTR_SERVER_NAME		= 21,	/* Name of the Nth server (string) */
- 	FSINFO_ATTR_SERVER_ADDRESS	= 22,	/* Mth address of the Nth server */
- 	FSINFO_ATTR_CELL_NAME		= 23,	/* Cell name (string) */
-+	FSINFO_ATTR_SB_NOTIFICATIONS	= 24,	/* sb_notify() information */
- 	FSINFO_ATTR__NR
- };
- 
-@@ -308,4 +309,13 @@ struct fsinfo_server_address {
- 	struct __kernel_sockaddr_storage address;
+ struct block_device;
+diff --git a/include/uapi/linux/watch_queue.h b/include/uapi/linux/watch_queue.h
+index aeffcfd7a742..22e3326b83a6 100644
+--- a/include/uapi/linux/watch_queue.h
++++ b/include/uapi/linux/watch_queue.h
+@@ -155,4 +155,31 @@ struct superblock_error_notification {
+ 	__u32	error_cookie;
  };
  
 +/*
-+ * Information struct for fsinfo(FSINFO_ATTR_SB_NOTIFICATIONS).
++ * Type of block layer notification.
 + */
-+struct fsinfo_sb_notifications {
-+	__u64		watch_id;	/* Watch ID for superblock. */
-+	__u32		notify_counter;	/* Number of notifications. */
-+	__u32		__reserved[1];
++enum block_notification_type {
++	NOTIFY_BLOCK_ERROR_TIMEOUT		= 1, /* Timeout error */
++	NOTIFY_BLOCK_ERROR_NO_SPACE		= 2, /* Critical space allocation error */
++	NOTIFY_BLOCK_ERROR_RECOVERABLE_TRANSPORT = 3, /* Recoverable transport error */
++	NOTIFY_BLOCK_ERROR_CRITICAL_TARGET	= 4, /* Critical target error */
++	NOTIFY_BLOCK_ERROR_CRITICAL_NEXUS	= 5, /* Critical nexus error */
++	NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM	= 6, /* Critical medium error */
++	NOTIFY_BLOCK_ERROR_PROTECTION		= 7, /* Protection error */
++	NOTIFY_BLOCK_ERROR_KERNEL_RESOURCE	= 8, /* Kernel resource error */
++	NOTIFY_BLOCK_ERROR_DEVICE_RESOURCE	= 9, /* Device resource error */
++	NOTIFY_BLOCK_ERROR_IO			= 10, /* Other I/O error */
 +};
 +
- #endif /* _UAPI_LINUX_FSINFO_H */
-diff --git a/include/uapi/linux/watch_queue.h b/include/uapi/linux/watch_queue.h
-index 66b0da7cf888..aeffcfd7a742 100644
---- a/include/uapi/linux/watch_queue.h
-+++ b/include/uapi/linux/watch_queue.h
-@@ -146,7 +146,7 @@ enum superblock_notification_type {
-  */
- struct superblock_notification {
- 	struct watch_notification watch; /* WATCH_TYPE_SB_NOTIFY */
--	__u64	sb_id;			/* 64-bit superblock ID [fsinfo_ids::f_sb_id] */
-+	__u64	sb_id;		/* 64-bit superblock ID [fsinfo_sb_notifications::watch_id] */
- };
- 
- struct superblock_error_notification {
-diff --git a/samples/vfs/test-fsinfo.c b/samples/vfs/test-fsinfo.c
-index af29da74559e..0f8f9ded0925 100644
---- a/samples/vfs/test-fsinfo.c
-+++ b/samples/vfs/test-fsinfo.c
-@@ -90,6 +90,7 @@ static const struct fsinfo_attr_info fsinfo_buffer_info[FSINFO_ATTR__NR] = {
- 	FSINFO_STRING_N		(SERVER_NAME,		server_name),
- 	FSINFO_STRUCT_NM	(SERVER_ADDRESS,	server_address),
- 	FSINFO_STRING		(CELL_NAME,		cell_name),
-+	FSINFO_STRUCT		(SB_NOTIFICATIONS,	sb_notifications),
- };
- 
- #define FSINFO_NAME(X,Y) [FSINFO_ATTR_##X] = #Y
-@@ -118,6 +119,7 @@ static const char *fsinfo_attr_names[FSINFO_ATTR__NR] = {
- 	FSINFO_NAME		(SERVER_NAME,		server_name),
- 	FSINFO_NAME		(SERVER_ADDRESS,	server_address),
- 	FSINFO_NAME		(CELL_NAME,		cell_name),
-+	FSINFO_NAME		(SB_NOTIFICATIONS,	sb_notifications),
- };
- 
- union reply {
-@@ -133,6 +135,7 @@ union reply {
- 	struct fsinfo_mount_info mount_info;
- 	struct fsinfo_mount_child mount_children[1];
- 	struct fsinfo_server_address srv_addr;
-+	struct fsinfo_sb_notifications sb_notifications;
- };
- 
- static void dump_hex(unsigned int *data, int from, int to)
-@@ -377,6 +380,15 @@ static void dump_attr_MOUNT_CHILDREN(union reply *r, int size)
- 		printf("\t[%u] %8x %8x\n", i++, f->mnt_id, f->notify_counter);
- }
- 
-+static void dump_attr_SB_NOTIFICATIONS(union reply *r, int size)
-+{
-+	struct fsinfo_sb_notifications *f = &r->sb_notifications;
++/*
++ * Block layer notification record.
++ * - watch.type = WATCH_TYPE_BLOCK_NOTIFY
++ * - watch.subtype = enum block_notification_type
++ */
++struct block_notification {
++	struct watch_notification watch; /* WATCH_TYPE_BLOCK_NOTIFY */
++	__u64	dev;			/* Device number */
++	__u64	sector;			/* Affected sector */
++};
 +
-+	printf("\n");
-+	printf("\twatch_id: %llx\n", (unsigned long long)f->watch_id);
-+	printf("\tnotifs  : %llx\n", (unsigned long long)f->notify_counter);
-+}
-+
- /*
-  *
-  */
-@@ -395,6 +407,7 @@ static const dumper_t fsinfo_attr_dumper[FSINFO_ATTR__NR] = {
- 	FSINFO_DUMPER(MOUNT_INFO),
- 	FSINFO_DUMPER(MOUNT_CHILDREN),
- 	FSINFO_DUMPER(SERVER_ADDRESS),
-+	FSINFO_DUMPER(SB_NOTIFICATIONS),
- };
- 
- static void dump_fsinfo(enum fsinfo_attribute attr,
+ #endif /* _UAPI_LINUX_WATCH_QUEUE_H */
 
