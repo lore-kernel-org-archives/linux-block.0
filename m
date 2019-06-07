@@ -4,172 +4,218 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2713C468BD
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C834C2BCA1
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:18:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6AE1206E0
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:17:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66F0A206E0
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:18:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728847AbfFGORl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jun 2019 10:17:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55174 "EHLO mx1.redhat.com"
+        id S1728783AbfFGOSA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jun 2019 10:18:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:63617 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728257AbfFGORl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Jun 2019 10:17:41 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        id S1728719AbfFGOR7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 7 Jun 2019 10:17:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9AA126EB9F;
-        Fri,  7 Jun 2019 14:17:35 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id EE8AE31760FD;
+        Fri,  7 Jun 2019 14:17:53 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E0ED188EE;
-        Fri,  7 Jun 2019 14:17:31 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3B7737FEA9;
+        Fri,  7 Jun 2019 14:17:49 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
  Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
  Kingdom.
  Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 01/13] security: Override creds in __fput() with last
- fputter's creds [ver #4]
+Subject: [PATCH 03/13] security: Add hooks to rule on setting a watch [ver
+ #4]
 From:   David Howells <dhowells@redhat.com>
 To:     viro@zeniv.linux.org.uk
 Cc:     Casey Schaufler <casey@schaufler-ca.com>,
-        Casey Schaufler <casey@schaufler-ca.com>, dhowells@redhat.com,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        linux-security-module@vger.kernel.org, dhowells@redhat.com,
         raven@themaw.net, linux-fsdevel@vger.kernel.org,
         linux-api@vger.kernel.org, linux-block@vger.kernel.org,
         keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Date:   Fri, 07 Jun 2019 15:17:30 +0100
-Message-ID: <155991705018.15579.1610295881980418301.stgit@warthog.procyon.org.uk>
+Date:   Fri, 07 Jun 2019 15:17:48 +0100
+Message-ID: <155991706847.15579.4702772917586301113.stgit@warthog.procyon.org.uk>
 In-Reply-To: <155991702981.15579.6007568669839441045.stgit@warthog.procyon.org.uk>
 References: <155991702981.15579.6007568669839441045.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/unknown-version
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Fri, 07 Jun 2019 14:17:40 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Fri, 07 Jun 2019 14:17:59 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-So that the LSM can see the credentials of the last process to do an fput()
-on a file object when the file object is being dismantled, do the following
-steps:
+Add security hooks that will allow an LSM to rule on whether or not a watch
+may be set.  More than one hook is required as the watches watch different
+types of object.
 
- (1) Cache the current credentials in file->f_fput_cred at the point the
-     file object's reference count reaches zero.
-
- (2) In __fput(), use override_creds() to apply those credentials to the
-     dismantling process.  This is necessary so that if we're dismantling a
-     unix socket that has semi-passed fds still in it, their fputs will
-     pick up the same credentials if they're reduced to zero at that point.
-
-     Note that it's probably not strictly necessary to take an extra ref on
-     the creds here (which override_creds() does).
-
- (3) Destroy the fput creds in file_free_rcu().
-
-This additionally makes the creds available to:
-
-	fsnotify
-	eventpoll
-	file locking
-	->fasync, ->release file ops
-	superblock destruction
-	mountpoint destruction
-
-This allows various notifications about object cleanups/destructions to
-carry appropriate credentials for the LSM to approve/disapprove them based
-on the process that caused them, even if indirectly.
-
-Note that this means that someone looking at /proc/<pid>/fd/<n> may end up
-being inadvertently noted as the subject of a cleanup message if the
-process they're looking at croaks whilst they're looking at it.
-
-Further, kernel services like nfsd and cachefiles may be seen as the
-fputter and may not have a system credential.  In cachefiles's case, it may
-appear that cachefilesd caused the notification.
-
-Suggested-by: Casey Schaufler <casey@schaufler-ca.com>
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Casey Schaufler <casey@schaufler-ca.com>
+cc: Stephen Smalley <sds@tycho.nsa.gov>
+cc: linux-security-module@vger.kernel.org
 ---
 
- fs/file_table.c    |   12 ++++++++++++
- include/linux/fs.h |    1 +
- 2 files changed, 13 insertions(+)
+ include/linux/lsm_hooks.h |   38 ++++++++++++++++++++++++++++++++++++++
+ include/linux/security.h  |   25 +++++++++++++++++++++++++
+ security/security.c       |   23 +++++++++++++++++++++++
+ 3 files changed, 86 insertions(+)
 
-diff --git a/fs/file_table.c b/fs/file_table.c
-index 3f9c1b452c1d..9bf2be45b7f9 100644
---- a/fs/file_table.c
-+++ b/fs/file_table.c
-@@ -46,6 +46,7 @@ static void file_free_rcu(struct rcu_head *head)
- 	struct file *f = container_of(head, struct file, f_u.fu_rcuhead);
+diff --git a/include/linux/lsm_hooks.h b/include/linux/lsm_hooks.h
+index 2474c3f785ca..0543449c0f6e 100644
+--- a/include/linux/lsm_hooks.h
++++ b/include/linux/lsm_hooks.h
+@@ -1420,6 +1420,32 @@
+  *	@ctx is a pointer in which to place the allocated security context.
+  *	@ctxlen points to the place to put the length of @ctx.
+  *
++ * Security hooks for the general notification queue:
++ *
++ * @watch_mount:
++ *	Check to see if a process is allowed to watch for mount topology change
++ *	notifications on a mount subtree.
++ *	@watch: The watch object
++ *	@path: The root of the subtree to watch.
++ *
++ * @watch_sb:
++ *	Check to see if a process is allowed to watch for event notifications
++ *	from a superblock.
++ *	@watch: The watch object
++ *	@sb: The superblock to watch.
++ *
++ * @watch_key:
++ *	Check to see if a process is allowed to watch for event notifications
++ *	from a key or keyring.
++ *	@watch: The watch object
++ *	@key: The key to watch.
++ *
++ * @watch_devices:
++ *	Check to see if a process is allowed to watch for event notifications
++ *	from devices (as a global set).
++ *	@watch: The watch object
++ *
++ *
+  * Security hooks for using the eBPF maps and programs functionalities through
+  * eBPF syscalls.
+  *
+@@ -1698,6 +1724,12 @@ union security_list_options {
+ 	int (*inode_notifysecctx)(struct inode *inode, void *ctx, u32 ctxlen);
+ 	int (*inode_setsecctx)(struct dentry *dentry, void *ctx, u32 ctxlen);
+ 	int (*inode_getsecctx)(struct inode *inode, void **ctx, u32 *ctxlen);
++#ifdef CONFIG_WATCH_QUEUE
++	int (*watch_mount)(struct watch *watch, struct path *path);
++	int (*watch_sb)(struct watch *watch, struct super_block *sb);
++	int (*watch_key)(struct watch *watch, struct key *key);
++	int (*watch_devices)(struct watch *watch);
++#endif /* CONFIG_WATCH_QUEUE */
  
- 	put_cred(f->f_cred);
-+	put_cred(f->f_fput_cred);
- 	kmem_cache_free(filp_cachep, f);
- }
+ #ifdef CONFIG_SECURITY_NETWORK
+ 	int (*unix_stream_connect)(struct sock *sock, struct sock *other,
+@@ -1977,6 +2009,12 @@ struct security_hook_heads {
+ 	struct hlist_head inode_notifysecctx;
+ 	struct hlist_head inode_setsecctx;
+ 	struct hlist_head inode_getsecctx;
++#ifdef CONFIG_WATCH_QUEUE
++	struct hlist_head watch_mount;
++	struct hlist_head watch_sb;
++	struct hlist_head watch_key;
++	struct hlist_head watch_devices;
++#endif /* CONFIG_WATCH_QUEUE */
+ #ifdef CONFIG_SECURITY_NETWORK
+ 	struct hlist_head unix_stream_connect;
+ 	struct hlist_head unix_may_send;
+diff --git a/include/linux/security.h b/include/linux/security.h
+index 23c8b602c0ab..ac3bf6b5f87b 100644
+--- a/include/linux/security.h
++++ b/include/linux/security.h
+@@ -58,6 +58,7 @@ struct fs_context;
+ struct fs_parameter;
+ enum fs_value_type;
+ struct fsinfo_kparams;
++struct watch;
  
-@@ -252,6 +253,7 @@ struct file *alloc_file_clone(struct file *base, int flags,
-  */
- static void __fput(struct file *file)
+ /* Default (no) options for the capable function */
+ #define CAP_OPT_NONE 0x0
+@@ -396,6 +397,12 @@ void security_inode_invalidate_secctx(struct inode *inode);
+ int security_inode_notifysecctx(struct inode *inode, void *ctx, u32 ctxlen);
+ int security_inode_setsecctx(struct dentry *dentry, void *ctx, u32 ctxlen);
+ int security_inode_getsecctx(struct inode *inode, void **ctx, u32 *ctxlen);
++#ifdef CONFIG_WATCH_QUEUE
++int security_watch_mount(struct watch *watch, struct path *path);
++int security_watch_sb(struct watch *watch, struct super_block *sb);
++int security_watch_key(struct watch *watch, struct key *key);
++int security_watch_devices(struct watch *watch);
++#endif /* CONFIG_WATCH_QUEUE */
+ #else /* CONFIG_SECURITY */
+ 
+ static inline int call_lsm_notifier(enum lsm_event event, void *data)
+@@ -1215,6 +1222,24 @@ static inline int security_inode_getsecctx(struct inode *inode, void **ctx, u32
  {
-+	const struct cred *saved_cred;
- 	struct dentry *dentry = file->f_path.dentry;
- 	struct vfsmount *mnt = file->f_path.mnt;
- 	struct inode *inode = file->f_inode;
-@@ -262,6 +264,12 @@ static void __fput(struct file *file)
- 
- 	might_sleep();
- 
-+	/* Set the creds of whoever triggered the last fput for the LSM.  Note
-+	 * that this has to be made available to further fputs, say on fds
-+	 * trapped in a unix socket.
-+	 */
-+	saved_cred = override_creds(file->f_fput_cred);
-+
- 	fsnotify_close(file);
- 	/*
- 	 * The function eventpoll_release() should be the first called
-@@ -293,6 +301,8 @@ static void __fput(struct file *file)
- 	if (unlikely(mode & FMODE_NEED_UNMOUNT))
- 		dissolve_on_fput(mnt);
- 	mntput(mnt);
-+
-+	revert_creds(saved_cred);
- out:
- 	file_free(file);
+ 	return -EOPNOTSUPP;
  }
-@@ -334,6 +344,7 @@ void fput_many(struct file *file, unsigned int refs)
- 	if (atomic_long_sub_and_test(refs, &file->f_count)) {
- 		struct task_struct *task = current;
++#ifdef CONFIG_WATCH_QUEUE
++static inline int security_watch_mount(struct watch *watch, struct path *path)
++{
++	return 0;
++}
++static inline int security_watch_sb(struct watch *watch, struct super_block *sb)
++{
++	return 0;
++}
++static inline int security_watch_key(struct watch *watch, struct key *key)
++{
++	return 0;
++}
++static inline int security_watch_devices(struct watch *watch)
++{
++	return 0;
++}
++#endif /* CONFIG_WATCH_QUEUE */
+ #endif	/* CONFIG_SECURITY */
  
-+		file->f_fput_cred = get_current_cred();
- 		if (likely(!in_interrupt() && !(task->flags & PF_KTHREAD))) {
- 			init_task_work(&file->f_u.fu_rcuhead, ____fput);
- 			if (!task_work_add(task, &file->f_u.fu_rcuhead, true))
-@@ -368,6 +379,7 @@ void __fput_sync(struct file *file)
- 	if (atomic_long_dec_and_test(&file->f_count)) {
- 		struct task_struct *task = current;
- 		BUG_ON(!(task->flags & PF_KTHREAD));
-+		file->f_fput_cred = get_current_cred();
- 		__fput(file);
- 	}
+ #ifdef CONFIG_SECURITY_NETWORK
+diff --git a/security/security.c b/security/security.c
+index 3af886e8fced..ee2f8539a0d5 100644
+--- a/security/security.c
++++ b/security/security.c
+@@ -1929,6 +1929,29 @@ int security_inode_getsecctx(struct inode *inode, void **ctx, u32 *ctxlen)
  }
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index f1c74596cd77..db05738b1951 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -943,6 +943,7 @@ struct file {
- 	loff_t			f_pos;
- 	struct fown_struct	f_owner;
- 	const struct cred	*f_cred;
-+	const struct cred	*f_fput_cred;	/* Who did the last fput() (for LSM) */
- 	struct file_ra_state	f_ra;
+ EXPORT_SYMBOL(security_inode_getsecctx);
  
- 	u64			f_version;
++#ifdef CONFIG_WATCH_QUEUE
++int security_watch_mount(struct watch *watch, struct path *path)
++{
++	return call_int_hook(watch_mount, 0, watch, path);
++}
++
++int security_watch_sb(struct watch *watch, struct super_block *sb)
++{
++	return call_int_hook(watch_sb, 0, watch, sb);
++}
++
++int security_watch_key(struct watch *watch, struct key *key)
++{
++	return call_int_hook(watch_key, 0, watch, key);
++}
++
++int security_watch_devices(struct watch *watch)
++{
++	return call_int_hook(watch_devices, 0, watch);
++}
++
++#endif /* CONFIG_WATCH_QUEUE */
++
+ #ifdef CONFIG_SECURITY_NETWORK
+ 
+ int security_unix_stream_connect(struct sock *sock, struct sock *other, struct sock *newsk)
 
