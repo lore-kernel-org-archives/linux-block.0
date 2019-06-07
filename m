@@ -7,74 +7,72 @@ X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E01E6C2BCA1
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 12:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A02B0C2BCA1
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 12:23:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A11FE20665
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 12:20:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72975208E3
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 12:23:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HaycM+KF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FgrTSQKs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728265AbfFGMUs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jun 2019 08:20:48 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:35472 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727823AbfFGMUs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jun 2019 08:20:48 -0400
-Received: by mail-pf1-f196.google.com with SMTP id d126so1118008pfd.2
-        for <linux-block@vger.kernel.org>; Fri, 07 Jun 2019 05:20:47 -0700 (PDT)
+        id S1728667AbfFGMXl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jun 2019 08:23:41 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:37125 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728378AbfFGMXl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jun 2019 08:23:41 -0400
+Received: by mail-pg1-f195.google.com with SMTP id 20so1103143pgr.4
+        for <linux-block@vger.kernel.org>; Fri, 07 Jun 2019 05:23:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=DbzYyUDp1dRjn3H+usjWi3D9EIfYCLIg8vMo1iKLxOE=;
-        b=HaycM+KFcDgiJlncwoG6tvmJdKtIUsLxOGp+XGhwERHnEV7r6/5OeA4zuQ+LaicjxX
-         74+3x8YRElbdhQvlOl5MnPYSO6VEZep31f3E4F8i/W+mZ07pCGZxgwM0zSwxN2scHNgt
-         6Cc/PoHlV3C3oSJo2dgsrhVaVl3UqQsoYsUqe1pg+Rac6Z1ectJWLCXdLkpgiy7MnXPg
-         6Y9bwhrMwmKOgrBOO+PDICKiYonIKuT8FL/pGTm06GFpSsuAaxIE7FpnA0viitWM1wTX
-         ynijZKKhplrBQFSwlkIh4uVFxdM8NstswmO9GTfD+rTdrwgJXUDfsB6ZT7cHQ0nmQ+6/
-         FOWQ==
+        bh=lJGsfmZwNViYi6AeKllcvkiG3cGcirkMED1J/QPJA4Y=;
+        b=FgrTSQKsesJV5MveJ2Rqho/60Hl/2fRCQ9KmAN651oJ9yzrxTtrp067JP+Sbh8DC7U
+         FC7AclQM9oQFW66WEDFi2uf6k8iOFWHWVZSxul0ZaivYOL6waryPXhlc6Wl5Ss4k8tdt
+         ++BLX2dZNhgXHjx6KZOiBNsMQl/G7pcLVmkFUINrNYkD8fEpVcheNh5gcCfrTt8gaGW0
+         EJ+VnF1oR4oIcSERoq8tRE608IkqowDRF/R4GVaf1HTIfnqvVtkd3UZOnGyOYkxDed5c
+         jqGVBmCBNTkVURezOFZyOh5qVLg9L9gGdQaxw+YyIVOGFOBGkTDYRgjFMtKQTxngIfbw
+         VhCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=DbzYyUDp1dRjn3H+usjWi3D9EIfYCLIg8vMo1iKLxOE=;
-        b=hlf9QSQ+Hql+FX/3oUWaeORyNwaX+ItlLhzettxvqcEOmLm6WaZH6gvNI3/awK/WYU
-         OjfGL3zSTMe3cAqAYzcoa3176ODvLiQcU7gsrTtY+DM3xCLvxj64sEBGNL2sfvU9kMSj
-         fFRIft6vgnhmVizoq326gKut3Ul5PsUUwMRL9K15bDTKUHlf2iOtYS6LlaE/ANf3nBMX
-         T9bV+FvsIV/WJXj8d5lIVTqIPxeoyRh/VAe9gY/g82ZZKmvQGg/va/JhbR3CH/wDaUUt
-         to4LVew2Kr0Ap4ixWcNdV7b2UU8qPmK4HlDqnAhEs7UR879oc1SmzvrKpYUfVWNxZDE3
-         H9Aw==
-X-Gm-Message-State: APjAAAVdV9NMPfyu/NZOFiF8bIAjouX7aN8WgzqX/I7fN3h76A5uQrXa
-        Pu2GETxQdJyNMiggeEhYx2I=
-X-Google-Smtp-Source: APXvYqwxfDjXBYFHlw8cyLanFrOf8MHYFS4SszFUGKoHN/HmwCHALCMrani6Yxhx0suXxf0VdSa9gQ==
-X-Received: by 2002:a62:1b85:: with SMTP id b127mr58620340pfb.165.1559910047337;
-        Fri, 07 Jun 2019 05:20:47 -0700 (PDT)
+        bh=lJGsfmZwNViYi6AeKllcvkiG3cGcirkMED1J/QPJA4Y=;
+        b=od/Iira7h1HptbO5wZXk9ARD4eA1UfycGnXYURHOo9IGYU0qvY4+V/n1VgTlmuIER7
+         V3f6yZa7vk45Bjp+ozrAaFOGoEIAzjt9PeUpyvVdoQXqvaToolHEBWtgSG1I1l49CmJ2
+         Es7/KiN4WYxWXyM9bfwLDRG0ZiXj/WZOelmTSrjzCT1jOPwpivU7w0N3QEivrkA1R95C
+         J2ddKLwHo24p3VRD6ng+HJe70zrLvXRMo1De/MEN10AUAWhdTk7ZuKxPXaFChEO02DGs
+         hiUnWsdH3K7QURbMwMymGfATwEP1FZ/5gQS22RQ3cPt25AIzE7X3UW4wjHn8TYMdEg87
+         /J3Q==
+X-Gm-Message-State: APjAAAUzvCT/zW0Q5M/SD+7Thd1ZFdH0oyF8p477cy1Ft55AKAS2U02Z
+        LZOw50jES1bl3RK53X9IE60=
+X-Google-Smtp-Source: APXvYqwiO8P7jj4EW2rN7JmIY/DyGRLvktO9s8j20zJGLBHkMVnyPl11t9C1hDQC1tdT1afTVXfO0w==
+X-Received: by 2002:a17:90a:2224:: with SMTP id c33mr5128618pje.22.1559910221023;
+        Fri, 07 Jun 2019 05:23:41 -0700 (PDT)
 Received: from localhost ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id j5sm1879261pfa.15.2019.06.07.05.20.46
+        by smtp.gmail.com with ESMTPSA id n1sm1818663pgv.15.2019.06.07.05.23.39
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 07 Jun 2019 05:20:46 -0700 (PDT)
-Date:   Fri, 7 Jun 2019 21:20:43 +0900
+        Fri, 07 Jun 2019 05:23:40 -0700 (PDT)
+Date:   Fri, 7 Jun 2019 21:23:38 +0900
 From:   Minwoo Im <minwoo.im.dev@gmail.com>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     axboe@fb.com, Matias Bjorling <mb@lightnvm.io>,
-        linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: Re: [PATCH 1/6] block: initialize the write priority in
- blk_rq_bio_prep
-Message-ID: <20190607122043.GA1276@minwooim-desktop>
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/6] block: remove blk_init_request_from_bio
+Message-ID: <20190607122338.GB1276@minwooim-desktop>
 References: <20190606102904.4024-1-hch@lst.de>
- <20190606102904.4024-2-hch@lst.de>
+ <20190606102904.4024-3-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190606102904.4024-2-hch@lst.de>
+In-Reply-To: <20190606102904.4024-3-hch@lst.de>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It looks good to me:
+It looks good to me.
 
 Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
