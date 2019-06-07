@@ -2,299 +2,182 @@ Return-Path: <SRS0=19b2=UG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7BCAC2BCA1
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7552FC468BC
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:17:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A39C62083D
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:17:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 596672083D
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 14:17:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729171AbfFGORg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jun 2019 10:17:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58852 "EHLO mx1.redhat.com"
+        id S1729262AbfFGORo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jun 2019 10:17:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45196 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728257AbfFGORf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Jun 2019 10:17:35 -0400
+        id S1729256AbfFGORo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 7 Jun 2019 10:17:44 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E9C7E22389B;
-        Fri,  7 Jun 2019 14:17:24 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4130A30C31BA;
+        Fri,  7 Jun 2019 14:17:43 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-120-173.rdu2.redhat.com [10.10.120.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DC12578566;
-        Fri,  7 Jun 2019 14:17:15 +0000 (UTC)
-Subject: [RFC][PATCH 00/13] Mount, FS,
- Block and Keyrings notifications [ver #4]
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 872D978566;
+        Fri,  7 Jun 2019 14:17:41 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+ Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+ Kingdom.
+ Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH 02/13] uapi: General notification ring definitions [ver #4]
 From:   David Howells <dhowells@redhat.com>
 To:     viro@zeniv.linux.org.uk
-Cc:     linux-usb@vger.kernel.org, linux-security-module@vger.kernel.org,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        dhowells@redhat.com, raven@themaw.net,
+Cc:     dhowells@redhat.com, raven@themaw.net,
         linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
         linux-block@vger.kernel.org, keyrings@vger.kernel.org,
         linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Fri, 07 Jun 2019 15:17:10 +0100
-Message-ID: <155991702981.15579.6007568669839441045.stgit@warthog.procyon.org.uk>
+Date:   Fri, 07 Jun 2019 15:17:40 +0100
+Message-ID: <155991706083.15579.16359443779582362339.stgit@warthog.procyon.org.uk>
+In-Reply-To: <155991702981.15579.6007568669839441045.stgit@warthog.procyon.org.uk>
+References: <155991702981.15579.6007568669839441045.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/unknown-version
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Fri, 07 Jun 2019 14:17:35 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Fri, 07 Jun 2019 14:17:43 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Add UAPI definitions for the general notification ring, including the
+following pieces:
 
-Hi Al,
+ (1) struct watch_notification.
 
-Here's a set of patches to add a general variable-length notification queue
-concept and to add sources of events for:
+     This is the metadata header for each entry in the ring.  It includes a
+     type and subtype that indicate the source of the message
+     (eg. WATCH_TYPE_MOUNT_NOTIFY) and the kind of the message
+     (eg. NOTIFY_MOUNT_NEW_MOUNT).
 
- (1) Mount topology events, such as mounting, unmounting, mount expiry,
-     mount reconfiguration.
+     The header also contains an information field that conveys the
+     following information:
 
- (2) Superblock events, such as R/W<->R/O changes, quota overrun and I/O
-     errors (not complete yet).
+	- WATCH_INFO_LENGTH.  The size of the entry (entries are variable
+          length).
 
- (3) Key/keyring events, such as creating, linking and removal of keys.
+	- WATCH_INFO_OVERRUN.  If preceding messages were lost due to ring
+	  overrun or lack of memory.
 
- (4) General device events (single common queue) including:
+	- WATCH_INFO_ENOMEM.  If preceding messages were lost due to lack
+          of memory.
 
-     - Block layer events, such as device errors
+	- WATCH_INFO_RECURSIVE.  If the event detected was applied to
+          multiple objects (eg. a recursive change to mount attributes).
 
-     - USB subsystem events, such as device/bus attach/remove, device
-       reset, device errors.
+	- WATCH_INFO_IN_SUBTREE.  If the event didn't happen at the watched
+          object, but rather to some related object (eg. a subtree mount
+          watch saw a mount happen somewhere within the subtree).
 
-One of the reasons for this is so that we can remove the issue of processes
-having to repeatedly and regularly scan /proc/mounts, which has proven to
-be a system performance problem.  To further aid this, the fsinfo() syscall
-on which this patch series depends, provides a way to access superblock and
-mount information in binary form without the need to parse /proc/mounts.
+	- WATCH_INFO_TYPE_FLAGS.  Eight flags whose meanings depend on the
+          message type.
 
+	- WATCH_INFO_ID.  The watch ID specified when the watchpoint was
+          set.
 
-LSM support is included, but controversial:
+     All the information in the header can be used in filtering messages at
+     the point of writing into the buffer.
 
- (1) The creds of the process that did the fput() that reduced the refcount
-     to zero are cached in the file struct.
+ (2) struct watch_queue_buffer.
 
- (2) __fput() overrides the current creds with the creds from (1) whilst
-     doing the cleanup, thereby making sure that the creds seen by the
-     destruction notification generated by mntput() appears to come from
-     the last fputter.
+     This describes the layout of the ring.  Note that the first slots in
+     the ring contain a special metadata entry that contains the ring
+     pointers.  The producer in the kernel knows to skip this and it has a
+     proper header (WATCH_TYPE_META, WATCH_META_SKIP_NOTIFICATION) that
+     indicates the size so that the ring consumer can handle it the same as
+     any other record and just skip it.
 
- (3) security_post_notification() is called for each queue that we might
-     want to post a notification into, thereby allowing the LSM to prevent
-     covert communications.
+     Note that this means that ring entries can never be split over the end
+     of the ring, so if an entry would need to be split, a skip record is
+     inserted to wrap the ring first; this is also WATCH_TYPE_META,
+     WATCH_META_SKIP_NOTIFICATION.
 
- (?) Do I need to add security_set_watch(), say, to rule on whether a watch
-     may be set in the first place?  I might need to add a variant per
-     watch-type.
-
- (?) Do I really need to keep track of the process creds in which an
-     implicit object destruction happened?  For example, imagine you create
-     an fd with fsopen()/fsmount().  It is marked to dissolve the mount it
-     refers to on close unless move_mount() clears that flag.  Now, imagine
-     someone looking at that fd through procfs at the same time as you exit
-     due to an error.  The LSM sees the destruction notification come from
-     the looker if they happen to do their fput() after yours.
-
-
-Design decisions:
-
- (1) A misc chardev is used to create and open a ring buffer:
-
-	fd = open("/dev/watch_queue", O_RDWR);
-
-     which is then configured and mmap'd into userspace:
-
-	ioctl(fd, IOC_WATCH_QUEUE_SET_SIZE, BUF_SIZE);
-	ioctl(fd, IOC_WATCH_QUEUE_SET_FILTER, &filter);
-	buf = mmap(NULL, BUF_SIZE * page_size, PROT_READ | PROT_WRITE,
-		   MAP_SHARED, fd, 0);
-
-     The fd cannot be read or written (though there is a facility to use
-     write to inject records for debugging) and userspace just pulls data
-     directly out of the buffer.
-
- (2) The ring index pointers are stored inside the ring and are thus
-     accessible to userspace.  Userspace should only update the tail
-     pointer and never the head pointer or risk breaking the buffer.  The
-     kernel checks that the pointers appear valid before trying to use
-     them.  A 'skip' record is maintained around the pointers.
-
- (3) poll() can be used to wait for data to appear in the buffer.
-
- (4) Records in the buffer are binary, typed and have a length so that they
-     can be of varying size.
-
-     This means that multiple heterogeneous sources can share a common
-     buffer.  Tags may be specified when a watchpoint is created to help
-     distinguish the sources.
-
- (5) The queue is reusable as there are 16 million types available, of
-     which I've used 4, so there is scope for others to be used.
-
- (6) Records are filterable as types have up to 256 subtypes that can be
-     individually filtered.  Other filtration is also available.
-
- (7) Each time the buffer is opened, a new buffer is created - this means
-     that there's no interference between watchers.
-
- (8) When recording a notification, the kernel will not sleep, but will
-     rather mark a queue as overrun if there's insufficient space, thereby
-     avoiding userspace causing the kernel to hang.
-
- (9) The 'watchpoint' should be specific where possible, meaning that you
-     specify the object that you want to watch.
-
-(10) The buffer is created and then watchpoints are attached to it, using
-     one of:
-
-	keyctl_watch_key(KEY_SPEC_SESSION_KEYRING, fd, 0x01);
-	mount_notify(AT_FDCWD, "/", 0, fd, 0x02);
-	sb_notify(AT_FDCWD, "/mnt", 0, fd, 0x03);
-
-     where in all three cases, fd indicates the queue and the number after
-     is a tag between 0 and 255.
-
-(11) The watch must be removed if either the watch buffer is destroyed or
-     the watched object is destroyed.
-
-
-Things I want to avoid:
-
- (1) Introducing features that make the core VFS dependent on the network
-     stack or networking namespaces (ie. usage of netlink).
-
- (2) Dumping all this stuff into dmesg and having a daemon that sits there
-     parsing the output and distributing it as this then puts the
-     responsibility for security into userspace and makes handling
-     namespaces tricky.  Further, dmesg might not exist or might be
-     inaccessible inside a container.
-
- (3) Letting users see events they shouldn't be able to see.
-
-
-Further things that could be considered:
-
- (1) Adding a keyctl call to allow a watch on a keyring to be extended to
-     "children" of that keyring, such that the watch is removed from the
-     child if it is unlinked from the keyring.
-
- (2) Adding global superblock event queue.
-
- (3) Propagating watches to child superblock over automounts.
-
-
-The patches can be found here also:
-
-	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=notifications
-
-Changes:
-
- v4: Split the basic UAPI bits out into their own patch and then split the
-     LSM hooks out into an intermediate patch.  Add LSM hooks for setting
-     watches.
-
-     Rename the *_notify() system calls to watch_*() for consistency.
-
- v3: I've added a USB notification source and reformulated the block
-     notification source so that there's now a common watch list, for which
-     the system call is now device_notify().
-
-     I've assigned a pair of unused ioctl numbers in the 'W' series to the
-     ioctls added by this series.
-
-     I've also added a description of the kernel API to the documentation.
-
- v2: I've fixed various issues raised by Jann Horn and GregKH and moved to
-     krefs for refcounting.  I've added some security features to try and
-     give Casey Schaufler the LSM control he wants.
-
-David
+Signed-off-by: David Howells <dhowells@redhat.com>
 ---
-David Howells (13):
-      security: Override creds in __fput() with last fputter's creds
-      uapi: General notification ring definitions
-      security: Add hooks to rule on setting a watch
-      security: Add a hook for the point of notification insertion
-      General notification queue with user mmap()'able ring buffer
-      keys: Add a notification facility
-      vfs: Add a mount-notification facility
-      vfs: Add superblock notifications
-      fsinfo: Export superblock notification counter
-      Add a general, global device notification watch list
-      block: Add block layer notifications
-      usb: Add USB subsystem notifications
-      Add sample notification program
 
-
- Documentation/ioctl/ioctl-number.txt   |    1 
- Documentation/security/keys/core.rst   |   58 ++
- Documentation/watch_queue.rst          |  492 ++++++++++++++++++
- arch/x86/entry/syscalls/syscall_32.tbl |    3 
- arch/x86/entry/syscalls/syscall_64.tbl |    3 
- block/Kconfig                          |    9 
- block/blk-core.c                       |   29 +
- drivers/base/Kconfig                   |    9 
- drivers/base/Makefile                  |    1 
- drivers/base/watch.c                   |   89 +++
- drivers/misc/Kconfig                   |   13 
- drivers/misc/Makefile                  |    1 
- drivers/misc/watch_queue.c             |  889 ++++++++++++++++++++++++++++++++
- drivers/usb/core/Kconfig               |   10 
- drivers/usb/core/devio.c               |   55 ++
- drivers/usb/core/hub.c                 |    3 
- fs/Kconfig                             |   21 +
- fs/Makefile                            |    1 
- fs/file_table.c                        |   12 
- fs/fsinfo.c                            |   12 
- fs/mount.h                             |   33 +
- fs/mount_notify.c                      |  187 +++++++
- fs/namespace.c                         |    9 
- fs/super.c                             |  122 ++++
- include/linux/blkdev.h                 |   15 +
- include/linux/dcache.h                 |    1 
- include/linux/device.h                 |    7 
- include/linux/fs.h                     |   79 +++
- include/linux/key.h                    |    4 
- include/linux/lsm_hooks.h              |   48 ++
- include/linux/security.h               |   35 +
- include/linux/syscalls.h               |    5 
- include/linux/usb.h                    |   19 +
- include/linux/watch_queue.h            |   87 +++
- include/uapi/linux/fsinfo.h            |   10 
- include/uapi/linux/keyctl.h            |    1 
- include/uapi/linux/watch_queue.h       |  213 ++++++++
- kernel/sys_ni.c                        |    7 
- samples/Kconfig                        |    6 
- samples/Makefile                       |    1 
- samples/vfs/test-fsinfo.c              |   13 
- samples/watch_queue/Makefile           |    9 
- samples/watch_queue/watch_test.c       |  308 +++++++++++
- security/keys/Kconfig                  |   10 
- security/keys/compat.c                 |    2 
- security/keys/gc.c                     |    5 
- security/keys/internal.h               |   30 +
- security/keys/key.c                    |   37 +
- security/keys/keyctl.c                 |   95 +++
- security/keys/keyring.c                |   17 -
- security/keys/request_key.c            |    4 
- security/security.c                    |   29 +
- 52 files changed, 3121 insertions(+), 38 deletions(-)
- create mode 100644 Documentation/watch_queue.rst
- create mode 100644 drivers/base/watch.c
- create mode 100644 drivers/misc/watch_queue.c
- create mode 100644 fs/mount_notify.c
- create mode 100644 include/linux/watch_queue.h
+ include/uapi/linux/watch_queue.h |   63 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
  create mode 100644 include/uapi/linux/watch_queue.h
- create mode 100644 samples/watch_queue/Makefile
- create mode 100644 samples/watch_queue/watch_test.c
+
+diff --git a/include/uapi/linux/watch_queue.h b/include/uapi/linux/watch_queue.h
+new file mode 100644
+index 000000000000..c3a88fa5f62a
+--- /dev/null
++++ b/include/uapi/linux/watch_queue.h
+@@ -0,0 +1,63 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++#ifndef _UAPI_LINUX_WATCH_QUEUE_H
++#define _UAPI_LINUX_WATCH_QUEUE_H
++
++#include <linux/types.h>
++
++enum watch_notification_type {
++	WATCH_TYPE_META		= 0,	/* Special record */
++	WATCH_TYPE_MOUNT_NOTIFY	= 1,	/* Mount notification record */
++	WATCH_TYPE_SB_NOTIFY	= 2,	/* Superblock notification */
++	WATCH_TYPE_KEY_NOTIFY	= 3,	/* Key/keyring change notification */
++	WATCH_TYPE_BLOCK_NOTIFY	= 4,	/* Block layer notifications */
++#define WATCH_TYPE___NR 5
++};
++
++enum watch_meta_notification_subtype {
++	WATCH_META_SKIP_NOTIFICATION	= 0,	/* Just skip this record */
++	WATCH_META_REMOVAL_NOTIFICATION	= 1,	/* Watched object was removed */
++};
++
++/*
++ * Notification record
++ */
++struct watch_notification {
++	__u32			type:24;	/* enum watch_notification_type */
++	__u32			subtype:8;	/* Type-specific subtype (filterable) */
++	__u32			info;
++#define WATCH_INFO_OVERRUN	0x00000001	/* Event(s) lost due to overrun */
++#define WATCH_INFO_ENOMEM	0x00000002	/* Event(s) lost due to ENOMEM */
++#define WATCH_INFO_RECURSIVE	0x00000004	/* Change was recursive */
++#define WATCH_INFO_LENGTH	0x000001f8	/* Length of record / sizeof(watch_notification) */
++#define WATCH_INFO_IN_SUBTREE	0x00000200	/* Change was not at watched root */
++#define WATCH_INFO_TYPE_FLAGS	0x00ff0000	/* Type-specific flags */
++#define WATCH_INFO_FLAG_0	0x00010000
++#define WATCH_INFO_FLAG_1	0x00020000
++#define WATCH_INFO_FLAG_2	0x00040000
++#define WATCH_INFO_FLAG_3	0x00080000
++#define WATCH_INFO_FLAG_4	0x00100000
++#define WATCH_INFO_FLAG_5	0x00200000
++#define WATCH_INFO_FLAG_6	0x00400000
++#define WATCH_INFO_FLAG_7	0x00800000
++#define WATCH_INFO_ID		0xff000000	/* ID of watchpoint */
++#define WATCH_INFO_ID__SHIFT	24
++};
++
++#define WATCH_LENGTH_SHIFT	3
++
++struct watch_queue_buffer {
++	union {
++		/* The first few entries are special, containing the
++		 * ring management variables.
++		 */
++		struct {
++			struct watch_notification watch; /* WATCH_TYPE_META */
++			__u32		head;		/* Ring head index */
++			__u32		tail;		/* Ring tail index */
++			__u32		mask;		/* Ring index mask */
++		} meta;
++		struct watch_notification slots[0];
++	};
++};
++
++#endif /* _UAPI_LINUX_WATCH_QUEUE_H */
 
