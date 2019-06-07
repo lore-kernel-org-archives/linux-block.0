@@ -2,374 +2,167 @@ Return-Path: <SRS0=19b2=UG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E92C28CC3
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 09:45:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D27C468BC
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 12:00:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B259D208C3
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 09:45:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6338E20868
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 12:00:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cZ+tnvrC"
+	dkim=pass (1024-bit key) header.d=renesasgroup.onmicrosoft.com header.i=@renesasgroup.onmicrosoft.com header.b="bstIM1pr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727246AbfFGJpI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jun 2019 05:45:08 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:37191 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726823AbfFGJpH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jun 2019 05:45:07 -0400
-Received: by mail-io1-f68.google.com with SMTP id e5so927858iok.4
-        for <linux-block@vger.kernel.org>; Fri, 07 Jun 2019 02:45:07 -0700 (PDT)
+        id S1728211AbfFGMAa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jun 2019 08:00:30 -0400
+Received: from mail-eopbgr1410100.outbound.protection.outlook.com ([40.107.141.100]:28640
+        "EHLO JPN01-OS2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728198AbfFGMAa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 7 Jun 2019 08:00:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=g83v8094D4mWODrUsadU7i1rBHO1zAwqVkxt10+UJWs=;
-        b=cZ+tnvrCCvhDViv8MaNtI6RhwVKZNuUz1P0VxPFHCv5cI/djeQtkfdwtTYPZ9y3cb0
-         glnMJ5xglNqEPXlop71+7g4rq1TGhCdz77XUd1K6oaCz191YzGIbC++RKfmyBN4laDub
-         sGi32iK6TL0LYTmWb/x83mZwO7sNvGYjElVe0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=g83v8094D4mWODrUsadU7i1rBHO1zAwqVkxt10+UJWs=;
-        b=cX5Rvd4NJt1hVBZiY17xuMf/ojoovyox39XEVLkjOZqVhkev/0mJf5Zwgab5woA6qq
-         ldWZngyKxd7f+W6xjoKbfo1wWMzsrvVIlGBrB2a49XvLdV3HrmJpFHBWyU5B0pdI1ej9
-         nRFDrDJKA1dKwY+VhK8QOhvHAyJo8SYarX1LBYQtwKlsOgSiKbtVJlk5k1uah+dJWhYr
-         NFRAfjjv8ILrY+v56yzHz9HiiXhpHUltxizKShg1fLkyYd6LU/3e00ZtDVu1Ev/O6ZNz
-         SoUhTJWpWDHeD7oEmyR8HPzvAjij6JhhI0NDp7QmHf05c8SrZuyFlnhR00WB4M+WFt7M
-         w4hQ==
-X-Gm-Message-State: APjAAAUE9Kotg9r8HLN9o1sztaLIrmEyZIPZ1KkSXUj3CIb6whSAGV4a
-        gF+JjVAcQMAJTQk4+W2grBE89GA00s/vDXRhAxF3lA==
-X-Google-Smtp-Source: APXvYqy/ZoC4j2RDDElcc5eVOlGiF41xNchXI0MTqIyaBC1DnAhTbnpN2o4x0Gy7CWr4zx2wpbseZbVJ8yuU960Fbms=
-X-Received: by 2002:a6b:691d:: with SMTP id e29mr29149534ioc.96.1559900706576;
- Fri, 07 Jun 2019 02:45:06 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <20190531022801.10003-1-ming.lei@redhat.com> <20190531022801.10003-9-ming.lei@redhat.com>
- <7819e1a523b9e8227e3a9d188ee1e083@mail.gmail.com> <20190602064202.GA2731@ming.t460p>
- <20190602074757.GA31572@ming.t460p> <020a7707a31803d65dd94cc0928a425a@mail.gmail.com>
- <20190603035605.GB13684@ming.t460p> f24109eb867deae8cb262466ecc70b09@mail.gmail.com
-In-Reply-To: f24109eb867deae8cb262466ecc70b09@mail.gmail.com
+ d=renesasgroup.onmicrosoft.com; s=selector2-renesasgroup-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UgJjxGPF3aflVplaDhUW6m+b8snjq6SxM6U2ykK/hVQ=;
+ b=bstIM1prPPMqOpJnT8cije/pktr9LDwHcrK1ltnYQ4Nh72bkX1/zCv+yfxPcukwUX2EMnsVR5eoHNWjfz3LedQfEtmDf/K4CePdq7XB/PIKdkeHDiz6Vo3E8GOJRwLj+fFqQT+4hE4Z8vYV+dgA26CYZDLIaZCmsI8Xmr+mKu4Y=
+Received: from OSAPR01MB3089.jpnprd01.prod.outlook.com (52.134.247.150) by
+ OSAPR01MB3137.jpnprd01.prod.outlook.com (52.134.249.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1965.15; Fri, 7 Jun 2019 12:00:27 +0000
+Received: from OSAPR01MB3089.jpnprd01.prod.outlook.com
+ ([fe80::19ad:b6ce:a287:dc85]) by OSAPR01MB3089.jpnprd01.prod.outlook.com
+ ([fe80::19ad:b6ce:a287:dc85%7]) with mapi id 15.20.1965.011; Fri, 7 Jun 2019
+ 12:00:27 +0000
+From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To:     Christoph Hellwig <hch@lst.de>
+CC:     Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
+Subject: RE: How to resolve an issue in swiotlb environment?
+Thread-Topic: How to resolve an issue in swiotlb environment?
+Thread-Index: AdUZ1Qlk800+Qz0uSuO63mIBeXkktQDUe+5A
+Date:   Fri, 7 Jun 2019 12:00:26 +0000
+Message-ID: <OSAPR01MB3089D50DBDAA6C7D427E72EED8100@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+References: <OSAPR01MB3089B381AF2F687526E63EEAD8140@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+In-Reply-To: <OSAPR01MB3089B381AF2F687526E63EEAD8140@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=yoshihiro.shimoda.uh@renesas.com; 
+x-originating-ip: [118.238.235.108]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e698b241-5829-4c69-47a5-08d6eb3fbae7
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:OSAPR01MB3137;
+x-ms-traffictypediagnostic: OSAPR01MB3137:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <OSAPR01MB3137F53DDDD2265A1BDE5088D8100@OSAPR01MB3137.jpnprd01.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4303;
+x-forefront-prvs: 0061C35778
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(376002)(39860400002)(346002)(396003)(366004)(199004)(189003)(86362001)(64756008)(66446008)(256004)(14444005)(74316002)(3846002)(6116002)(305945005)(54906003)(66556008)(966005)(6306002)(9686003)(99286004)(66476007)(7696005)(76176011)(6436002)(52536014)(6916009)(55016002)(14454004)(76116006)(71190400001)(66946007)(71200400001)(73956011)(5660300002)(478600001)(2906002)(446003)(476003)(11346002)(33656002)(486006)(25786009)(6246003)(53936002)(316002)(102836004)(66066001)(6506007)(8676002)(81166006)(81156014)(186003)(68736007)(26005)(8936002)(4326008)(7736002)(229853002)(6606295002);DIR:OUT;SFP:1102;SCL:1;SRVR:OSAPR01MB3137;H:OSAPR01MB3089.jpnprd01.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: renesas.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: KIpIbwwl02p2uXWAPFK33wsti9umtO6nQPEoDrWcB8SG5cS2zeaWcgB2QkvF42H+07pe2zh8/hpJSzixQfh6gvuF5EQ6b96Iv3stcuDqR/LLsKk5jOx03ZKRKEmH47s8XT3WDU0ZgkbGDcvyRiQf0uKxn8dI2/aKAQp/4fDELTzV5D+f8/Pd+XGD6fkayPfl49m8mwTTK33yrxzpmBGh5CatTcMJJ/4k6IDnPwPYp/dXqC8xGEyxY8G3EAePXYxkE7wiRjxLUxrqicmBFe2DgcpYXTEPasIeD/DKRhfgXudFHf8qm4LAh0LEhA5TNr2HytQYttGNWQy6LtQw0xF+A4azWdVtaIlhJ9l4FuEYF+2bPqK8+AfYpvkb6q7gq//AK9qUkWEBvshiXgn11wi9MBfsoHl5W4iKt5Ur0jPH/9k=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQISV99IJucrELCJ7/TtkhttwnBgjgOGFSeuAhzMczwA7yMTbgJjyv4mAu5i69MBzxVPCaWhc+pggAZsHKA=
-Date:   Fri, 7 Jun 2019 15:15:04 +0530
-Message-ID: <287b092778c749c8b101641f9d48ab44@mail.gmail.com>
-Subject: RE: [PATCH 8/9] scsi: megaraid: convert private reply queue to blk-mq
- hw queue
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        John Garry <john.garry@huawei.com>,
-        Don Brace <don.brace@microsemi.com>,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: renesas.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e698b241-5829-4c69-47a5-08d6eb3fbae7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2019 12:00:26.5753
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yoshihiro.shimoda.uh@renesas.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSAPR01MB3137
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->
-> >
-> > Please drop the patch in my last email, and apply the following patch
-> > and see if we can make a difference:
->
-> Ming,
->
-> I dropped early patch and applied the below patched.  Now, I am getting
-> expected performance (3.0M IOPS).
-> Below patch fix the performance issue.  See perf report after applying
-the
-> same -
->
->      8.52%  [kernel]        [k] sbitmap_any_bit_set
->      4.19%  [kernel]        [k] blk_mq_run_hw_queue
->      3.76%  [megaraid_sas]  [k] complete_cmd_fusion
->      3.24%  [kernel]        [k] scsi_queue_rq
->      2.53%  [megaraid_sas]  [k] megasas_build_ldio_fusion
->      2.34%  [megaraid_sas]  [k] megasas_build_and_issue_cmd_fusion
->      2.18%  [kernel]        [k] entry_SYSCALL_64
->      1.85%  [kernel]        [k] syscall_return_via_sysret
->      1.78%  [kernel]        [k] blk_mq_run_hw_queues
->      1.59%  [kernel]        [k] gup_pmd_range
->      1.49%  [kernel]        [k] _raw_spin_lock_irqsave
->      1.24%  [kernel]        [k] scsi_dec_host_busy
->      1.23%  [kernel]        [k] blk_mq_free_request
->      1.23%  [kernel]        [k] blk_mq_get_request
->      0.96%  [kernel]        [k] __slab_free
->      0.91%  [kernel]        [k] aio_complete
->      0.90%  [kernel]        [k] __sched_text_start
->      0.89%  [megaraid_sas]  [k] megasas_queue_command
->      0.85%  [kernel]        [k] __fget
->      0.84%  [kernel]        [k] scsi_mq_get_budget
->
-> I will do some more testing and update the results.
+Hi Christoph,
 
-Ming, I did testing on AMD Dual Socket server (AMD EPYC 7601 32-Core
-Processor). System has total 128 logical cores.
+I think we should continue to discuss on this email thread instead of the f=
+ixed DMA-API.txt patch [1]
 
-Without patch, performance can go upto 2.8M IOPS. See below perf top
-output.
+[1]
+https://marc.info/?t=3D155989412200001&r=3D1&w=3D2
 
-   7.37%  [megaraid_sas]      [k] complete_cmd_fusion
-   2.51%  [kernel]            [k] copy_user_generic_string
-   2.48%  [kernel]            [k] read_tsc
-   2.10%  fio                 [.] thread_main
-   2.06%  [kernel]            [k] gup_pgd_range
-   1.98%  [kernel]            [k] __get_user_4
-   1.92%  [kernel]            [k] entry_SYSCALL_64
-   1.58%  [kernel]            [k] scsi_queue_rq
-   1.55%  [megaraid_sas]      [k] megasas_queue_command
-   1.52%  [kernel]            [k] irq_entries_start
-   1.43%  fio                 [.] get_io_u
-   1.39%  [kernel]            [k] blkdev_direct_IO
-   1.34%  [kernel]            [k] __audit_syscall_exit
-   1.31%  [megaraid_sas]      [k] megasas_build_and_issue_cmd_fusion
-   1.27%  [kernel]            [k] syscall_slow_exit_work
-   1.23%  [kernel]            [k] io_submit_one
-   1.20%  [kernel]            [k] do_syscall_64
-   1.17%  fio                 [.] td_io_queue
-   1.16%  [kernel]            [k] lookup_ioctx
-   1.14%  [kernel]            [k] kmem_cache_alloc
-   1.10%  [megaraid_sas]      [k] megasas_build_ldio_fusion
-   1.07%  [kernel]            [k] __memset
-   1.06%  [kernel]            [k] __virt_addr_valid
-   0.98%  [kernel]            [k] blk_mq_get_request
-   0.94%  [kernel]            [k] note_interrupt
-   0.91%  [kernel]            [k] __get_user_8
-   0.91%  [kernel]            [k] aio_read_events
-   0.85%  [kernel]            [k] __put_user_4
-   0.78%  fio                 [.] fio_libaio_commit
-   0.74%  [megaraid_sas]      [k] MR_BuildRaidContext
-   0.70%  [kernel]            [k] __x64_sys_io_submit
-   0.69%  fio                 [.] utime_since_now
+> From: Yoshihiro Shimoda, Sent: Monday, June 3, 2019 3:42 PM
+>=20
+> Hi linux-block and iommu mailing lists,
+>=20
+> I have an issue that a USB SSD with xHCI on R-Car H3 causes "swiotlb is f=
+ull" like below.
+>=20
+>     [   36.745286] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 524=
+288 bytes), total 32768 (slots), used 1338 (slots)
+>=20
+> I have investigated this issue by using git bisect, and then I found the =
+following commit:
+>=20
+> ---
+> commit 09324d32d2a0843e66652a087da6f77924358e62
+> Author: Christoph Hellwig <hch@lst.de>
+> Date:   Tue May 21 09:01:41 2019 +0200
+>=20
+>     block: force an unlimited segment size on queues with a virt boundary
+> ---
 
+Thank you for your comment on other email thread [2] like below:
+---
+Turns out it isn't as simple as I thought, as there doesn't seem to
+be an easy way to get to the struct device used for DMA mapping
+from USB drivers.  I'll need to think a bit more how to handle that
+best.
+---
 
-With your patch - Performance can go upto 1.7M IOPS. See below perf top
-output.
+[2]
+https://marc.info/?l=3Dlinux-doc&m=3D155989651620473&w=3D2
 
- 23.01%  [kernel]              [k] sbitmap_any_bit_set
-   6.42%  [kernel]              [k] blk_mq_run_hw_queue
-   4.44%  [megaraid_sas]        [k] complete_cmd_fusion
-   4.23%  [kernel]              [k] blk_mq_run_hw_queues
-   1.80%  [kernel]              [k] read_tsc
-   1.60%  [kernel]              [k] copy_user_generic_string
-   1.33%  fio                   [.] thread_main
-   1.27%  [kernel]              [k] irq_entries_start
-   1.22%  [kernel]              [k] gup_pgd_range
-   1.20%  [kernel]              [k] __get_user_4
-   1.20%  [kernel]              [k] entry_SYSCALL_64
-   1.07%  [kernel]              [k] scsi_queue_rq
-   0.88%  fio                   [.] get_io_u
-   0.87%  [megaraid_sas]        [k] megasas_queue_command
-   0.86%  [kernel]              [k] blkdev_direct_IO
-   0.85%  fio                   [.] td_io_queue
-   0.80%  [kernel]              [k] note_interrupt
-   0.76%  [kernel]              [k] lookup_ioctx
-   0.76%  [kernel]              [k] do_syscall_64
-   0.75%  [megaraid_sas]        [k] megasas_build_and_issue_cmd_fusion
-   0.74%  [megaraid_sas]        [k] megasas_build_ldio_fusion
-   0.72%  [kernel]              [k] kmem_cache_alloc
-   0.71%  [kernel]              [k] __audit_syscall_exit
-   0.67%  [kernel]              [k] __virt_addr_valid
-   0.65%  [kernel]              [k] blk_mq_get_request
-   0.64%  [kernel]              [k] __memset
-   0.62%  [kernel]              [k] syscall_slow_exit_work
-   0.60%  [kernel]              [k] io_submit_one
-   0.59%  [kernel]              [k] ktime_get
-   0.58%  fio                   [.] fio_libaio_commit
-   0.57%  [kernel]              [k] aio_read_events
-   0.54%  [kernel]              [k] __get_user_8
-   0.53%  [kernel]              [k] aio_complete_rw
-   0.51%  [kernel]              [k] kmem_cache_free
+I'm not sure this is a correct way, but the issue disappears if I applied a=
+ patch below
+to USB storage driver. Especially, WARNING happened on blk_queue_max_segmen=
+t_size().
+Maybe we need to expand the argument "struct device *" of blk_queue_virt_bo=
+undary() to
+call dma_max_mapping_size()?
+---
+diff --git a/drivers/usb/storage/scsiglue.c b/drivers/usb/storage/scsiglue.=
+c
+index 59190d8..fa37b39 100644
+--- a/drivers/usb/storage/scsiglue.c
++++ b/drivers/usb/storage/scsiglue.c
+@@ -28,6 +28,7 @@
+  * status of a command.
+  */
+=20
++#include <linux/dma-mapping.h>
+ #include <linux/module.h>
+ #include <linux/mutex.h>
+=20
+@@ -83,6 +84,15 @@ static int slave_alloc (struct scsi_device *sdev)
+ 	maxp =3D usb_maxpacket(us->pusb_dev, us->recv_bulk_pipe, 0);
+ 	blk_queue_virt_boundary(sdev->request_queue, maxp - 1);
+=20
++{
++	struct device *dev =3D us->pusb_dev->bus->controller;
++
++	dev_info(dev, "%s: size =3D %zu\n", __func__, dma_max_mapping_size(dev));
++	blk_queue_max_segment_size(sdev->request_queue,
++				   dma_max_mapping_size(dev));
++}
++
++
+ 	/*
+ 	 * Some host controllers may have alignment requirements.
+ 	 * We'll play it safe by requiring 512-byte alignment always.
+---
 
-With your patch + reducing logical cpu core to 64 (CPU hotplugged),
-performance can go upto 2.2M IOPS. See below perf top output.
+Best regards,
+Yoshihiro Shimoda
 
-   9.56%  [kernel]            [k] sbitmap_any_bit_set
-   4.62%  [megaraid_sas]      [k] complete_cmd_fusion
-   3.02%  [kernel]            [k] blk_mq_run_hw_queue
-   2.15%  [kernel]            [k] copy_user_generic_string
-   2.13%  [kernel]            [k] blk_mq_run_hw_queues
-   2.09%  [kernel]            [k] read_tsc
-   1.66%  [kernel]            [k] __get_user_4
-   1.59%  [kernel]            [k] entry_SYSCALL_64
-   1.57%  [kernel]            [k] gup_pgd_range
-   1.55%  fio                 [.] thread_main
-   1.51%  [kernel]            [k] scsi_queue_rq
-   1.31%  [kernel]            [k] __memset
-   1.21%  [megaraid_sas]      [k] megasas_build_and_issue_cmd_fusion
-   1.16%  [megaraid_sas]      [k] megasas_queue_command
-   1.13%  fio                 [.] get_io_u
-   1.12%  [kernel]            [k] blk_mq_get_request
-   1.07%  [kernel]            [k] blkdev_direct_IO
-   1.06%  [kernel]            [k] __put_user_4
-   1.05%  fio                 [.] td_io_queue
-   1.02%  [kernel]            [k] syscall_slow_exit_work
-   1.00%  [megaraid_sas]      [k] megasas_build_ldio_fusion
-
-
-In summary, Part of the performance drop may be correlated with number of
-hctx created in block layer. I can provide more details and can test
-follow up patch.
-
-Kashyap
-
-
->
-> Kashyap
->
-> >
-> > diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c index
-> > 3d6780504dcb..69d6bffcc8ff 100644
-> > --- a/block/blk-mq-debugfs.c
-> > +++ b/block/blk-mq-debugfs.c
-> > @@ -627,6 +627,9 @@ static int hctx_active_show(void *data, struct
-> > seq_file
-> > *m)  {
-> >  	struct blk_mq_hw_ctx *hctx = data;
-> >
-> > +	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
-> > +		hctx = blk_mq_master_hctx(hctx);
-> > +
-> >  	seq_printf(m, "%d\n", atomic_read(&hctx->nr_active));
-> >  	return 0;
-> >  }
-> > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c index
-> > 309ec5079f3f..58ef83a34fda 100644
-> > --- a/block/blk-mq-tag.c
-> > +++ b/block/blk-mq-tag.c
-> > @@ -30,6 +30,9 @@ bool blk_mq_has_free_tags(struct blk_mq_tags *tags)
-> >   */
-> >  bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)  {
-> > +	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
-> > +		hctx = blk_mq_master_hctx(hctx);
-> > +
-> >  	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
-> >  	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-> >  		atomic_inc(&hctx->tags->active_queues);
-> > @@ -55,6 +58,9 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
-> {
-> >  	struct blk_mq_tags *tags = hctx->tags;
-> >
-> > +	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
-> > +		hctx = blk_mq_master_hctx(hctx);
-> > +
-> >  	if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-> >  		return;
-> >
-> > @@ -74,6 +80,10 @@ static inline bool hctx_may_queue(struct
-> > blk_mq_hw_ctx *hctx,
-> >
-> >  	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_SHARED))
-> >  		return true;
-> > +
-> > +	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
-> > +		hctx = blk_mq_master_hctx(hctx);
-> > +
-> >  	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-> >  		return true;
-> >
-> > diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h index
-> > 61deab0b5a5a..84e9b46ffc78 100644
-> > --- a/block/blk-mq-tag.h
-> > +++ b/block/blk-mq-tag.h
-> > @@ -36,11 +36,22 @@ extern void blk_mq_tag_wakeup_all(struct
-> > blk_mq_tags *tags, bool);  void blk_mq_queue_tag_busy_iter(struct
-> > request_queue *q, busy_iter_fn *fn,
-> >  		void *priv);
-> >
-> > +static inline struct blk_mq_hw_ctx *blk_mq_master_hctx(
-> > +		struct blk_mq_hw_ctx *hctx)
-> > +{
-> > +	return hctx->queue->queue_hw_ctx[0]; }
-> > +
-> > +
-> >  static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue
-*bt,
-> >  						 struct blk_mq_hw_ctx
-*hctx)
-> >  {
-> >  	if (!hctx)
-> >  		return &bt->ws[0];
-> > +
-> > +	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
-> > +		hctx = blk_mq_master_hctx(hctx);
-> > +
-> >  	return sbq_wait_ptr(bt, &hctx->wait_index);  }
-> >
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c index
-> > 49d73d979cb3..4196ed3b0085 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -303,7 +303,7 @@ static struct request *blk_mq_rq_ctx_init(struct
-> > blk_mq_alloc_data *data,
-> >  	} else {
-> >  		if (data->hctx->flags & BLK_MQ_F_TAG_SHARED) {
-> >  			rq_flags = RQF_MQ_INFLIGHT;
-> > -			atomic_inc(&data->hctx->nr_active);
-> > +			blk_mq_inc_nr_active(data->hctx);
-> >  		}
-> >  		rq->tag = tag;
-> >  		rq->internal_tag = -1;
-> > @@ -517,7 +517,7 @@ void blk_mq_free_request(struct request *rq)
-> >
-> >  	ctx->rq_completed[rq_is_sync(rq)]++;
-> >  	if (rq->rq_flags & RQF_MQ_INFLIGHT)
-> > -		atomic_dec(&hctx->nr_active);
-> > +		blk_mq_dec_nr_active(hctx);
-> >
-> >  	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
-> >  		laptop_io_completion(q->backing_dev_info);
-> > @@ -1064,7 +1064,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
-> >  	if (rq->tag >= 0) {
-> >  		if (shared) {
-> >  			rq->rq_flags |= RQF_MQ_INFLIGHT;
-> > -			atomic_inc(&data.hctx->nr_active);
-> > +			blk_mq_inc_nr_active(data.hctx);
-> >  		}
-> >  		data.hctx->tags->rqs[rq->tag] = rq;
-> >  	}
-> > diff --git a/block/blk-mq.h b/block/blk-mq.h index
-> > 633a5a77ee8b..f1279b8c2289 100644
-> > --- a/block/blk-mq.h
-> > +++ b/block/blk-mq.h
-> > @@ -193,6 +193,20 @@ unsigned int blk_mq_in_flight(struct
-> > request_queue *q, struct hd_struct *part);  void
-> > blk_mq_in_flight_rw(struct request_queue *q, struct hd_struct *part,
-> >  			 unsigned int inflight[2]);
-> >
-> > +static inline void blk_mq_inc_nr_active(struct blk_mq_hw_ctx *hctx) {
-> > +	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
-> > +		hctx = blk_mq_master_hctx(hctx);
-> > +	atomic_inc(&hctx->nr_active);
-> > +}
-> > +
-> > +static inline void blk_mq_dec_nr_active(struct blk_mq_hw_ctx *hctx) {
-> > +	if (hctx->flags & BLK_MQ_F_HOST_TAGS)
-> > +		hctx = blk_mq_master_hctx(hctx);
-> > +	atomic_dec(&hctx->nr_active);
-> > +}
-> > +
-> >  static inline void blk_mq_put_dispatch_budget(struct blk_mq_hw_ctx
-> > *hctx) {
-> >  	struct request_queue *q = hctx->queue; @@ -218,7 +232,7 @@ static
-> > inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
-> >
-> >  	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
-> >  		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
-> > -		atomic_dec(&hctx->nr_active);
-> > +		blk_mq_dec_nr_active(hctx);
-> >  	}
-> >  }
-> >
-> > Thanks,
-> > Ming
