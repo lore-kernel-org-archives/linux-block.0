@@ -2,33 +2,31 @@ Return-Path: <SRS0=19b2=UG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE6D3C28CC3
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 05:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA6D3C28CC3
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 05:59:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF11320825
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 05:59:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89B33208CA
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jun 2019 05:59:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725962AbfFGF7C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jun 2019 01:59:02 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41146 "EHLO mx1.suse.de"
+        id S1726048AbfFGF7l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jun 2019 01:59:41 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41206 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725497AbfFGF7B (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Jun 2019 01:59:01 -0400
+        id S1726010AbfFGF7l (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 7 Jun 2019 01:59:41 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id C36EFAC4C;
-        Fri,  7 Jun 2019 05:58:59 +0000 (UTC)
-Subject: Re: [PATCH 1/6] block: initialize the write priority in
- blk_rq_bio_prep
+        by mx1.suse.de (Postfix) with ESMTP id C994BAB42;
+        Fri,  7 Jun 2019 05:59:39 +0000 (UTC)
+Subject: Re: [PATCH 2/6] block: remove blk_init_request_from_bio
 To:     Christoph Hellwig <hch@lst.de>, axboe@fb.com
-Cc:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org
 References: <20190606102904.4024-1-hch@lst.de>
- <20190606102904.4024-2-hch@lst.de>
+ <20190606102904.4024-3-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -74,12 +72,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <d556ffa7-33cb-f3f7-d447-1f1cc5448bee@suse.de>
-Date:   Fri, 7 Jun 2019 07:58:59 +0200
+Message-ID: <d6031c5f-b8d8-8fa1-ad00-b0e6042875c1@suse.de>
+Date:   Fri, 7 Jun 2019 07:59:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190606102904.4024-2-hch@lst.de>
+In-Reply-To: <20190606102904.4024-3-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -88,36 +86,19 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/6/19 12:28 PM, Christoph Hellwig wrote:
-> The priority field also makes sense for passthrough requests, so
-> initialize it in blk_rq_bio_prep.
+On 6/6/19 12:29 PM, Christoph Hellwig wrote:
+> lightnvm should have never used this function, as it is sending
+> passthrough requests, so switch it to blk_rq_append_bio like all the
+> other passthrough request users.  Inline blk_init_request_from_bio into
+> the only remaining caller.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 > ---
->  block/blk-core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index ee1b35fe8572..9b88b1a3eb43 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -680,7 +680,6 @@ void blk_init_request_from_bio(struct request *req, struct bio *bio)
->  		req->cmd_flags |= REQ_FAILFAST_MASK;
->  
->  	req->__sector = bio->bi_iter.bi_sector;
-> -	req->ioprio = bio_prio(bio);
->  	req->write_hint = bio->bi_write_hint;
->  	blk_rq_bio_prep(req->q, req, bio);
->  }
-> @@ -1436,6 +1435,7 @@ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
->  
->  	rq->__data_len = bio->bi_iter.bi_size;
->  	rq->bio = rq->biotail = bio;
-> +	rq->ioprio = bio_prio(bio);
->  
->  	if (bio->bi_disk)
->  		rq->rq_disk = bio->bi_disk;
+>  block/blk-core.c             | 11 -----------
+>  block/blk-mq.c               |  7 ++++++-
+>  drivers/nvme/host/lightnvm.c |  2 +-
+>  include/linux/blkdev.h       |  1 -
+>  4 files changed, 7 insertions(+), 14 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
