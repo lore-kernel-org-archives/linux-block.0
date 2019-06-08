@@ -4,47 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1181DC28CC5
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 11:52:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B00C1C468BC
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 11:54:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5D3E21537
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 11:52:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D83D214AE
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 11:54:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559994760;
-	bh=6ZqSkqUfSiHWlEmWK7T0Wo1G2xB0Sqd74l/iyst+E5c=;
+	s=default; t=1559994846;
+	bh=w5aQZhf7HlqizMDPAz0KOrvr2Obgz/W68H+SknGP92c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=FTHjGC5L7X4d+FV9AHSjpmNUmIgjeRzxT+wHlSsZkDWADearH5I+L46ZWreajT5bo
-	 +F/rO1Uo3cQsOqWtTf4ZiXLWwiZ+98MA4k2OotpduCKacGwq7SiEhYaxiuTxuqv72f
-	 1FuCXYBk8PHkCFLezx+ECy/6ScYfG8Ba5KfZztGE=
+	b=epNNL9UCRUmVOeufRfTRX4tmx5oLXbQS6t115z0lQrMlvpTPkOEW2kxXENFw9qARs
+	 U98fa8X+mck9vxKUf1udUzegrYQ4Br4HzzSMIPtLV0VWOV1PPqVxChiUGZ2aG4YKTF
+	 dVi7C7ZRY62Co7YG4D+FaREF1sHQ2s9MNEMQo8+E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728045AbfFHLwj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Jun 2019 07:52:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59456 "EHLO mail.kernel.org"
+        id S1727166AbfFHLx7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Jun 2019 07:53:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57886 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728291AbfFHLmK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 8 Jun 2019 07:42:10 -0400
+        id S1727665AbfFHLkf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 8 Jun 2019 07:40:35 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1533C214AF;
-        Sat,  8 Jun 2019 11:42:09 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A3E67214AF;
+        Sat,  8 Jun 2019 11:40:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559994129;
-        bh=6ZqSkqUfSiHWlEmWK7T0Wo1G2xB0Sqd74l/iyst+E5c=;
+        s=default; t=1559994035;
+        bh=w5aQZhf7HlqizMDPAz0KOrvr2Obgz/W68H+SknGP92c=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pid24HwReedYkdDfoGWq5bIEpZlS/ecl7jY6IRbQGh6QAsGk3xyrs4i7UkftWqUSJ
-         0oy6j+HofV0BdO09F0CyoJmuGSihzaBbdmYxr6YwV6v1ZocDA4toxiok7oMbxeScjY
-         VN55bZfwy0oVEScN6xaS5f1N8aPtXeyNmxGhIOnI=
+        b=uYPY3tvXWmJU1wxMqhsR/N9KlOam57+wsT9visuTn532JVPyI9Fl1SP1+DIbm3ooV
+         ig6izqBQAfSz9DIn4ssYfEh5X6TDnDAmdg8invI4JwWqefNAAud/bBSJI7wa0BaSgt
+         kSu15+ux1qBuznb07vknmDxgDwyqahwTWw2Xht9E=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jes Sorensen <jsorensen@fb.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.1 60/70] blk-mq: Fix memory leak in error handling
-Date:   Sat,  8 Jun 2019 07:39:39 -0400
-Message-Id: <20190608113950.8033-60-sashal@kernel.org>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.1 29/70] io_uring: Fix __io_uring_register() false success
+Date:   Sat,  8 Jun 2019 07:39:08 -0400
+Message-Id: <20190608113950.8033-29-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190608113950.8033-1-sashal@kernel.org>
 References: <20190608113950.8033-1-sashal@kernel.org>
@@ -57,43 +58,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jes Sorensen <jsorensen@fb.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
 
-[ Upstream commit 41de54c64811bf087c8464fdeb43c6ad8be2686b ]
+[ Upstream commit a278682dad37fd2f8d2f30d8e84e376a856ab472 ]
 
-If blk_mq_init_allocated_queue() fails, make sure to free the poll
-stat callback struct allocated.
+If io_copy_iov() fails, it will break the loop and report success,
+albeit partially completed operation.
 
-Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-mq.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ fs/io_uring.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8a41cc5974fe..95e8005982cd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2844,7 +2844,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 		goto err_exit;
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 30a5687a17b6..69ff94558758 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2505,7 +2505,7 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
  
- 	if (blk_mq_alloc_ctxs(q))
--		goto err_exit;
-+		goto err_poll;
+ 		ret = io_copy_iov(ctx, &iov, arg, i);
+ 		if (ret)
+-			break;
++			goto err;
  
- 	/* init q->mq_kobj and sw queues' kobjects */
- 	blk_mq_sysfs_init(q);
-@@ -2905,6 +2905,9 @@ err_hctxs:
- 	kfree(q->queue_hw_ctx);
- err_sys_init:
- 	blk_mq_sysfs_deinit(q);
-+err_poll:
-+	blk_stat_free_callback(q->poll_cb);
-+	q->poll_cb = NULL;
- err_exit:
- 	q->mq_ops = NULL;
- 	return ERR_PTR(-ENOMEM);
+ 		/*
+ 		 * Don't impose further limits on the size and buffer
 -- 
 2.20.1
 
