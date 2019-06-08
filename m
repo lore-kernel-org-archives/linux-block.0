@@ -7,49 +7,47 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC93FC28CC5
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 11:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1181DC28CC5
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 11:52:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C21AF214D8
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 11:44:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5D3E21537
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 11:52:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559994275;
-	bh=CxrsVp3lY/RrFqzcWFqD5j0zqFx6EsqJH/ix8qLijOo=;
+	s=default; t=1559994760;
+	bh=6ZqSkqUfSiHWlEmWK7T0Wo1G2xB0Sqd74l/iyst+E5c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=e7heo7K4EoVg2cXFVRR48+aaLsTTshWtgcfYGkKM3J2lJjuZXkcUPOU3P1yB/pY9r
-	 QpTkFLKQvtYT8LPgyYdadYCLGvg5PRGR/hoqm0mfyDgJly8dUvFZEMRXGm1IkU7Mms
-	 w4ojvfqRVOScBdgcrJtIYoB0qWeiu5V9xYJccKvs=
+	b=FTHjGC5L7X4d+FV9AHSjpmNUmIgjeRzxT+wHlSsZkDWADearH5I+L46ZWreajT5bo
+	 +F/rO1Uo3cQsOqWtTf4ZiXLWwiZ+98MA4k2OotpduCKacGwq7SiEhYaxiuTxuqv72f
+	 1FuCXYBk8PHkCFLezx+ECy/6ScYfG8Ba5KfZztGE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727758AbfFHLoe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Jun 2019 07:44:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60872 "EHLO mail.kernel.org"
+        id S1728045AbfFHLwj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Jun 2019 07:52:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59456 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728771AbfFHLnb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 8 Jun 2019 07:43:31 -0400
+        id S1728291AbfFHLmK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 8 Jun 2019 07:42:10 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 207EE21707;
-        Sat,  8 Jun 2019 11:43:30 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1533C214AF;
+        Sat,  8 Jun 2019 11:42:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559994210;
-        bh=CxrsVp3lY/RrFqzcWFqD5j0zqFx6EsqJH/ix8qLijOo=;
+        s=default; t=1559994129;
+        bh=6ZqSkqUfSiHWlEmWK7T0Wo1G2xB0Sqd74l/iyst+E5c=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lYPKY6uFh4EsKFM1EXjqTpa9i9JLv6rUl5p1DyokyY1KntJimB5NffFOugGtpUfLm
-         xUy1er5STT+Q8diBA0YrS+rqpQsC1iJUBWiYwXu54PISf4lgDhtfTgy5QCnNYVYFWM
-         BOlyTpKVrb/m/9+8vWk/9pYJUpBVxhwRowXi//WM=
+        b=pid24HwReedYkdDfoGWq5bIEpZlS/ecl7jY6IRbQGh6QAsGk3xyrs4i7UkftWqUSJ
+         0oy6j+HofV0BdO09F0CyoJmuGSihzaBbdmYxr6YwV6v1ZocDA4toxiok7oMbxeScjY
+         VN55bZfwy0oVEScN6xaS5f1N8aPtXeyNmxGhIOnI=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jan Kara <jack@suse.cz>,
-        syzbot+10007d66ca02b08f0e60@syzkaller.appspotmail.com,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 22/49] loop: Don't change loop device under exclusive opener
-Date:   Sat,  8 Jun 2019 07:42:03 -0400
-Message-Id: <20190608114232.8731-22-sashal@kernel.org>
+Cc:     Jes Sorensen <jsorensen@fb.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.1 60/70] blk-mq: Fix memory leak in error handling
+Date:   Sat,  8 Jun 2019 07:39:39 -0400
+Message-Id: <20190608113950.8033-60-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190608114232.8731-1-sashal@kernel.org>
-References: <20190608114232.8731-1-sashal@kernel.org>
+In-Reply-To: <20190608113950.8033-1-sashal@kernel.org>
+References: <20190608113950.8033-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -59,83 +57,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jan Kara <jack@suse.cz>
+From: Jes Sorensen <jsorensen@fb.com>
 
-[ Upstream commit 33ec3e53e7b1869d7851e59e126bdb0fe0bd1982 ]
+[ Upstream commit 41de54c64811bf087c8464fdeb43c6ad8be2686b ]
 
-Loop module allows calling LOOP_SET_FD while there are other openers of
-the loop device. Even exclusive ones. This can lead to weird
-consequences such as kernel deadlocks like:
+If blk_mq_init_allocated_queue() fails, make sure to free the poll
+stat callback struct allocated.
 
-mount_bdev()				lo_ioctl()
-  udf_fill_super()
-    udf_load_vrs()
-      sb_set_blocksize() - sets desired block size B
-      udf_tread()
-        sb_bread()
-          __bread_gfp(bdev, block, B)
-					  loop_set_fd()
-					    set_blocksize()
-            - now __getblk_slow() indefinitely loops because B != bdev
-              block size
-
-Fix the problem by disallowing LOOP_SET_FD ioctl when there are
-exclusive openers of a loop device.
-
-[Deliberately chosen not to CC stable as a user with priviledges to
-trigger this race has other means of taking the system down and this
-has a potential of breaking some weird userspace setup]
-
-Reported-and-tested-by: syzbot+10007d66ca02b08f0e60@syzkaller.appspotmail.com
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/loop.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ block/blk-mq.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f1e63eb7cbca..a443910f5d6f 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -920,9 +920,20 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	if (!file)
- 		goto out;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8a41cc5974fe..95e8005982cd 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2844,7 +2844,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 		goto err_exit;
  
-+	/*
-+	 * If we don't hold exclusive handle for the device, upgrade to it
-+	 * here to avoid changing device under exclusive owner.
-+	 */
-+	if (!(mode & FMODE_EXCL)) {
-+		bdgrab(bdev);
-+		error = blkdev_get(bdev, mode | FMODE_EXCL, loop_set_fd);
-+		if (error)
-+			goto out_putf;
-+	}
-+
- 	error = mutex_lock_killable(&loop_ctl_mutex);
- 	if (error)
--		goto out_putf;
-+		goto out_bdev;
+ 	if (blk_mq_alloc_ctxs(q))
+-		goto err_exit;
++		goto err_poll;
  
- 	error = -EBUSY;
- 	if (lo->lo_state != Lo_unbound)
-@@ -986,10 +997,15 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	mutex_unlock(&loop_ctl_mutex);
- 	if (partscan)
- 		loop_reread_partitions(lo, bdev);
-+	if (!(mode & FMODE_EXCL))
-+		blkdev_put(bdev, mode | FMODE_EXCL);
- 	return 0;
- 
- out_unlock:
- 	mutex_unlock(&loop_ctl_mutex);
-+out_bdev:
-+	if (!(mode & FMODE_EXCL))
-+		blkdev_put(bdev, mode | FMODE_EXCL);
- out_putf:
- 	fput(file);
- out:
+ 	/* init q->mq_kobj and sw queues' kobjects */
+ 	blk_mq_sysfs_init(q);
+@@ -2905,6 +2905,9 @@ err_hctxs:
+ 	kfree(q->queue_hw_ctx);
+ err_sys_init:
+ 	blk_mq_sysfs_deinit(q);
++err_poll:
++	blk_stat_free_callback(q->poll_cb);
++	q->poll_cb = NULL;
+ err_exit:
+ 	q->mq_ops = NULL;
+ 	return ERR_PTR(-ENOMEM);
 -- 
 2.20.1
 
