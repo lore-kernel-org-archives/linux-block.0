@@ -2,171 +2,140 @@ Return-Path: <SRS0=tJY/=UH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BAFC28CC5
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 10:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49032C28CC5
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 11:40:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 68751214AE
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 10:22:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22FD2214AF
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 11:40:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1559994047;
+	bh=5WrzRmktvtoacaifBKzTHnPxqni8nLRu1tw6NXnlKWE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=xk1W46FUNAaX2/rkY8wmA3NvV30aJ966kOK3y9d7wp9MkXxJKqaVbWFQy84t8plS7
+	 2H4zJyNM5lXkqpx+3OheAqPsqObkU1VO7Cg1of7H0uWEYg+nBAfraUW4r3Eg2zfj44
+	 mEwwScAcHPbrov0rNhHesxYt4u6TOe6Ff1zMnEXo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726816AbfFHKWY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Jun 2019 06:22:24 -0400
-Received: from mx2.suse.de ([195.135.220.15]:35864 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726692AbfFHKWX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 8 Jun 2019 06:22:23 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 0773DAEF1;
-        Sat,  8 Jun 2019 10:22:20 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-bcache@vger.kernel.org
-Cc:     Coly Li <colyli@suse.de>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Rolf Fokkens <rolf@rolffokkens.nl>, Nix <nix@esperi.org.uk>,
-        Pierre JUHEN <pierre.juhen@orange.fr>,
+        id S1727849AbfFHLkq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Jun 2019 07:40:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58034 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727837AbfFHLkp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 8 Jun 2019 07:40:45 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 68891214AF;
+        Sat,  8 Jun 2019 11:40:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559994045;
+        bh=5WrzRmktvtoacaifBKzTHnPxqni8nLRu1tw6NXnlKWE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=KoiPA0B6i6DcHDragFgA7nIHoApOcXq+r1PqNfZLR7/G3w2h3np7o8yy9H0N4oSCb
+         Nudyj0j9EEx/8X2Z2CO0V46K3deDZs+Fx5+g06pKhMZgtxk4JT15ysOkOf5YfcVsn0
+         9CkkwJRaAOVryie8wqkDg4TSCHvNiJF/y/WxKsok=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Jan Kara <jack@suse.cz>,
+        syzbot+10007d66ca02b08f0e60@syzkaller.appspotmail.com,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [RFC PATCH] bcache: fix stack corruption by PRECEDING_KEY()
-Date:   Sat,  8 Jun 2019 18:22:04 +0800
-Message-Id: <20190608102204.60126-1-colyli@suse.de>
-X-Mailer: git-send-email 2.16.4
+Subject: [PATCH AUTOSEL 5.1 35/70] loop: Don't change loop device under exclusive opener
+Date:   Sat,  8 Jun 2019 07:39:14 -0400
+Message-Id: <20190608113950.8033-35-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190608113950.8033-1-sashal@kernel.org>
+References: <20190608113950.8033-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Recently people report bcache code compiled with gcc9 is broken, one of
-the buggy behavior I observe is that two adjacent 4KB I/Os should merge
-into one but they don't. Finally it turns out to be a stack corruption
-caused by macro PRECEDING_KEY().
+From: Jan Kara <jack@suse.cz>
 
-See how PRECEDING_KEY() is defined in bset.h,
-437 #define PRECEDING_KEY(_k)                                       \
-438 ({                                                              \
-439         struct bkey *_ret = NULL;                               \
-440                                                                 \
-441         if (KEY_INODE(_k) || KEY_OFFSET(_k)) {                  \
-442                 _ret = &KEY(KEY_INODE(_k), KEY_OFFSET(_k), 0);  \
-443                                                                 \
-444                 if (!_ret->low)                                 \
-445                         _ret->high--;                           \
-446                 _ret->low--;                                    \
-447         }                                                       \
-448                                                                 \
-449         _ret;                                                   \
-450 })
+[ Upstream commit 33ec3e53e7b1869d7851e59e126bdb0fe0bd1982 ]
 
-At line 442, _ret points to address of a on-stack variable combined by
-KEY(), the life range of this on-stack variable is in line 442-446,
-once _ret is returned to bch_btree_insert_key(), the returned address
-points to an invalid stack address and this adress is overwritten in
-the following called bch_btree_iter_init(). Then argument 'search' of
-bch_btree_iter_init() points to some address inside stackframe of
-bch_btree_iter_init(), exact address depends on how the compiler
-allocates stack space. Now the stack is corrupted.
+Loop module allows calling LOOP_SET_FD while there are other openers of
+the loop device. Even exclusive ones. This can lead to weird
+consequences such as kernel deadlocks like:
 
-The fix is to avoid to allocate and return an on-stack variable only
-in range of PRECEDING_KEY(). This patch changes macro PRECEDING_KEY()
-to an inline function, and allocate another on-stack variable from
-function bch_btree_insert_key(), then the allocated memory address
-will be always valid in life range of bch_btree_insert_key().
+mount_bdev()				lo_ioctl()
+  udf_fill_super()
+    udf_load_vrs()
+      sb_set_blocksize() - sets desired block size B
+      udf_tread()
+        sb_bread()
+          __bread_gfp(bdev, block, B)
+					  loop_set_fd()
+					    set_blocksize()
+            - now __getblk_slow() indefinitely loops because B != bdev
+              block size
 
-NOTE: This is only a RFC patch for more people to test. During my
-test I find bcache code does not complain out-of-order bkeys in btree
-node anymore, but the adjacent keys still don't totally merge as
-expected (e.g. they should be merged into one single key). So now I
-still continue to check what needs to be fixed more.
+Fix the problem by disallowing LOOP_SET_FD ioctl when there are
+exclusive openers of a loop device.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Rolf Fokkens <rolf@rolffokkens.nl>
-Cc: Nix <nix@esperi.org.uk>
-Cc: Pierre JUHEN <pierre.juhen@orange.fr>
-Cc: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org
+[Deliberately chosen not to CC stable as a user with priviledges to
+trigger this race has other means of taking the system down and this
+has a potential of breaking some weird userspace setup]
+
+Reported-and-tested-by: syzbot+10007d66ca02b08f0e60@syzkaller.appspotmail.com
+Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/md/bcache/bset.c | 16 +++++++++++++---
- drivers/md/bcache/bset.h | 34 ++++++++++++++++++++--------------
- 2 files changed, 33 insertions(+), 17 deletions(-)
+ drivers/block/loop.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
-index 8f07fa6e1739..9422f3f1c682 100644
---- a/drivers/md/bcache/bset.c
-+++ b/drivers/md/bcache/bset.c
-@@ -887,12 +887,22 @@ unsigned int bch_btree_insert_key(struct btree_keys *b, struct bkey *k,
- 	struct bset *i = bset_tree_last(b)->data;
- 	struct bkey *m, *prev = NULL;
- 	struct btree_iter iter;
-+	struct bkey preceding_key_on_stack = ZERO_KEY;
-+	struct bkey *preceding_key_p = &preceding_key_on_stack;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index bf1c61cab8eb..21349a17f7f5 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -919,9 +919,20 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	if (!file)
+ 		goto out;
  
- 	BUG_ON(b->ops->is_extents && !KEY_SIZE(k));
- 
--	m = bch_btree_iter_init(b, &iter, b->ops->is_extents
--				? PRECEDING_KEY(&START_KEY(k))
--				: PRECEDING_KEY(k));
 +	/*
-+	 * If k has preceding key, preceding_key_p will be set to address
-+	 *  of k's preceding key; otherwise preceding_key_p will be set
-+	 * to NULL inside preceding_key().
++	 * If we don't hold exclusive handle for the device, upgrade to it
++	 * here to avoid changing device under exclusive owner.
 +	 */
-+	if (b->ops->is_extents)
-+		preceding_key(&START_KEY(k), preceding_key_p);
-+	else
-+		preceding_key(k, preceding_key_p);
-+
-+	m = bch_btree_iter_init(b, &iter, preceding_key_p);
- 
- 	if (b->ops->insert_fixup(b, k, &iter, replace_key))
- 		return status;
-diff --git a/drivers/md/bcache/bset.h b/drivers/md/bcache/bset.h
-index bac76aabca6d..6ab165dcb717 100644
---- a/drivers/md/bcache/bset.h
-+++ b/drivers/md/bcache/bset.h
-@@ -434,20 +434,26 @@ static inline bool bch_cut_back(const struct bkey *where, struct bkey *k)
- 	return __bch_cut_back(where, k);
- }
- 
--#define PRECEDING_KEY(_k)					\
--({								\
--	struct bkey *_ret = NULL;				\
--								\
--	if (KEY_INODE(_k) || KEY_OFFSET(_k)) {			\
--		_ret = &KEY(KEY_INODE(_k), KEY_OFFSET(_k), 0);	\
--								\
--		if (!_ret->low)					\
--			_ret->high--;				\
--		_ret->low--;					\
--	}							\
--								\
--	_ret;							\
--})
-+/*
-+ * Pointer preceding_key_p points to a memory object to store preceding
-+ * key of k. If the preceding key does not exist, set preceding_key_p to
-+ * NULL. So the caller of preceding_key() needs to take care of memory
-+ * which preceding_key_p pointed to before calling preceding_key().
-+ * Currently the only caller of preceding_key() is bch_btree_insert_key(),
-+ * and preceding_key_p points to an on-stack variable, so the memory
-+ * release is handled by stackframe itself.
-+ */
-+static inline void preceding_key(struct bkey *k, struct bkey *preceding_key_p)
-+{
-+	if (KEY_INODE(k) || KEY_OFFSET(k)) {
-+		*preceding_key_p = KEY(KEY_INODE(k), KEY_OFFSET(k), 0);
-+		if (!preceding_key_p->low)
-+			preceding_key_p->high--;
-+		preceding_key_p->low--;
-+	} else {
-+		preceding_key_p = NULL;
++	if (!(mode & FMODE_EXCL)) {
++		bdgrab(bdev);
++		error = blkdev_get(bdev, mode | FMODE_EXCL, loop_set_fd);
++		if (error)
++			goto out_putf;
 +	}
-+}
++
+ 	error = mutex_lock_killable(&loop_ctl_mutex);
+ 	if (error)
+-		goto out_putf;
++		goto out_bdev;
  
- static inline bool bch_ptr_invalid(struct btree_keys *b, const struct bkey *k)
- {
+ 	error = -EBUSY;
+ 	if (lo->lo_state != Lo_unbound)
+@@ -985,10 +996,15 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	mutex_unlock(&loop_ctl_mutex);
+ 	if (partscan)
+ 		loop_reread_partitions(lo, bdev);
++	if (!(mode & FMODE_EXCL))
++		blkdev_put(bdev, mode | FMODE_EXCL);
+ 	return 0;
+ 
+ out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
++out_bdev:
++	if (!(mode & FMODE_EXCL))
++		blkdev_put(bdev, mode | FMODE_EXCL);
+ out_putf:
+ 	fput(file);
+ out:
 -- 
-2.16.4
+2.20.1
 
