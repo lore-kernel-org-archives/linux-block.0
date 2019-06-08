@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA39C28CC5
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 08:14:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35659C28CC5
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 08:19:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8625C214AE
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 08:14:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 088C1214AE
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 08:19:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726006AbfFHIO3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Jun 2019 04:14:29 -0400
-Received: from verein.lst.de ([213.95.11.211]:60567 "EHLO newverein.lst.de"
+        id S1725909AbfFHITf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Jun 2019 04:19:35 -0400
+Received: from verein.lst.de ([213.95.11.211]:60583 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725809AbfFHIO3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 8 Jun 2019 04:14:29 -0400
+        id S1725809AbfFHITf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 8 Jun 2019 04:19:35 -0400
 Received: by newverein.lst.de (Postfix, from userid 2407)
-        id B4A7168C7B; Sat,  8 Jun 2019 10:14:00 +0200 (CEST)
-Date:   Sat, 8 Jun 2019 10:14:00 +0200
+        id DED3068C7B; Sat,  8 Jun 2019 10:19:07 +0200 (CEST)
+Date:   Sat, 8 Jun 2019 10:19:07 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Kashyap Desai <kashyap.desai@broadcom.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Oliver Neukum <oneukum@suse.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>,
-        PDL-MPT-FUSIONLINUX <mpt-fusionlinux.pdl@broadcom.com>,
-        linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 10/13] megaraid_sas: set virt_boundary_mask in the scsi
- host
-Message-ID: <20190608081400.GA19573@lst.de>
-References: <20190605190836.32354-1-hch@lst.de> <20190605190836.32354-11-hch@lst.de> <cd713506efb9579d1f69a719d831c28d@mail.gmail.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.com>, Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH 1/2] blk-mq: Remove blk_mq_put_ctx()
+Message-ID: <20190608081907.GB19573@lst.de>
+References: <20190604181736.903-1-bvanassche@acm.org> <20190604181736.903-2-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cd713506efb9579d1f69a719d831c28d@mail.gmail.com>
+In-Reply-To: <20190604181736.903-2-bvanassche@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 06, 2019 at 09:07:27PM +0530, Kashyap Desai wrote:
-> Hi Christoph, Changes for <megaraid_sas> and <mpt3sas> looks good. We want
-> to confirm few sanity before ACK. BTW, what benefit we will see moving
-> virt_boundry setting to SCSI mid layer ? Is it just modular approach OR any
-> functional fix ?
+On Tue, Jun 04, 2019 at 11:17:35AM -0700, Bart Van Assche wrote:
+> No code that occurs between blk_mq_get_ctx() and blk_mq_put_ctx() depends
+> on preemption being disabled for its correctness. Since removing the CPU
+> preemption calls does not measurably affect performance, simplify the
+> blk-mq code by removing the blk_mq_put_ctx() function and also by not
+> disabling preemption in blk_mq_get_ctx().
 
-The big difference is that virt_boundary now also changes the
-max_segment_size, and this ensures that this limit is also communicated
-to the DMA mapping layer.
+I like the idea behinds this, but I think it makes some small issues
+we have in the current code even worse.  As far as I can tell the idea
+behind this call was that we operate on the same blk_mq_ctx for the
+duration of the I/O submission.  Now it should not matter which one,
+that is we don't care if we get preempted, but it should stay the same.
+
+To actually make this work properly we'll need to pass down the
+blk_mq_ctx into the I/O scheduler merge path, which dereference it.
+Note that I also have an outstanding series to pass down an additional
+parameter there (the bi_phys_segments removal) so we'll need to
+coordinate that.
