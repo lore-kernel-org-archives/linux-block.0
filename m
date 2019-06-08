@@ -2,107 +2,81 @@ Return-Path: <SRS0=tJY/=UH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE175C28CC5
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 20:16:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35333C28CC5
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 23:11:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88172214C6
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 20:16:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uOug2p1q"
+	by mail.kernel.org (Postfix) with ESMTP id 02270214C6
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 23:11:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727391AbfFHUQJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Jun 2019 16:16:09 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:46915 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727215AbfFHUQJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 8 Jun 2019 16:16:09 -0400
-Received: by mail-pg1-f194.google.com with SMTP id v9so1202955pgr.13;
-        Sat, 08 Jun 2019 13:16:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=YLlwXriYXWRDWa6HLbM2ROrlGesibqzQ/9uF5Z67oTI=;
-        b=uOug2p1q8b8ToqRGjDQGLomtv0cac2TObRAWxk6HBJ+4oJVfEu1muX75mCezZMdLXg
-         Vle/ZUpPXzGHtdlKSXX3k3RgnQJUjFFCjfoJ33uCDI2XQDgePNy/jarK019y4htN7HkT
-         vzvi/FFaDranTeHdGdmfnmTP52qzwjR/uzfmLOR5l1cvBnSNUphByrCzNIo+WHLXhdVa
-         OnVxEkhlfTpYHHSw0EbVr6L86UobqFpQELoCsKmhAFqXDz0AWIgFzWPOlGcER60CxYTo
-         i9m43LDICNLo3k/ejj04x+xV4RHeTUE4Va53kFNzP2ElRQijJYJVnK6Y/K+bil2eZWIa
-         xAkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=YLlwXriYXWRDWa6HLbM2ROrlGesibqzQ/9uF5Z67oTI=;
-        b=cdyIHN25CCAYrTLfQx+tU54bZ3dePi0+vqgLMZgO4luZMf3ysrzIztgjifzks1LH31
-         emQ3aipa4W37Fm0HIDNimZrvz31M1jdfNGJPiep/sEgk4dnP5UleJ2TBkVHyQOZNoa3K
-         xOXV44Cj76bdrghd7zOgoCa0OpdcUpJkJDGIPVSg0VEcWdouZtOq6lutXhDe9VEg2MTe
-         2qpq8HlwlXZxfScksCUKWoqeRaBDIERZvpLGjpp69cz6A0Mbf7V9DPV536XoJ23gyV1W
-         rgOdcQKsJ2e61+L2Se81VXMhtZotwljHCK+mpoa6G+EUGRO1vTosoorSqA7IvudbyxkS
-         AmOw==
-X-Gm-Message-State: APjAAAW67AtiO9yCVdyMT+l8NpEm1A30dyFRwvqzJb74n/7m/BTlRAly
-        5TUgnf/cYpKmFGeYVA7GgWtK/worLoU=
-X-Google-Smtp-Source: APXvYqzfUZt9gGBQUWLKaBWxLP7Ho4KXquSPkx5l20Qr1x1iBYrQbXydAmPIedpOOZ7aGu8+x45yaQ==
-X-Received: by 2002:a17:90a:c303:: with SMTP id g3mr13064434pjt.58.1560024968206;
-        Sat, 08 Jun 2019 13:16:08 -0700 (PDT)
-Received: from localhost.localdomain ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id s64sm5196863pfb.160.2019.06.08.13.16.05
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 08 Jun 2019 13:16:07 -0700 (PDT)
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Minwoo Im <minwoo.im.dev@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [RESEND PATCH] block: move tag field position in struct request
-Date:   Sun,  9 Jun 2019 05:15:51 +0900
-Message-Id: <20190608201551.4531-1-minwoo.im.dev@gmail.com>
-X-Mailer: git-send-email 2.21.0
+        id S1727486AbfFHXLA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Jun 2019 19:11:00 -0400
+Received: from smtp1.tech.numericable.fr ([82.216.111.37]:49376 "EHLO
+        smtp1.tech.numericable.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726190AbfFHXLA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 8 Jun 2019 19:11:00 -0400
+X-Greylist: delayed 2400 seconds by postgrey-1.27 at vger.kernel.org; Sat, 08 Jun 2019 19:10:59 EDT
+Received: from pierre.juhen (89-156-43-137.rev.numericable.fr [89.156.43.137])
+        by smtp1.tech.numericable.fr (Postfix) with ESMTPS id E478B142E55;
+        Sat,  8 Jun 2019 23:52:15 +0200 (CEST)
+Subject: Re: [RFC PATCH] bcache: fix stack corruption by PRECEDING_KEY()
+To:     Rolf Fokkens <rolf@rolffokkens.nl>, Coly Li <colyli@suse.de>
+Cc:     Kent Overstreet <kent.overstreet@gmail.com>,
+        Nix <nix@esperi.org.uk>, linux-block@vger.kernel.org
+References: <20190608102204.60126-1-colyli@suse.de>
+ <8855017f-729e-9719-236d-e98710702564@rolffokkens.nl>
+From:   Pierre JUHEN <pierre.juhen@orange.fr>
+Message-ID: <3b43c881-f505-3436-7ac7-d711b70b13e2@orange.fr>
+Date:   Sat, 8 Jun 2019 23:52:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <8855017f-729e-9719-236d-e98710702564@rolffokkens.nl>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: fr-FR
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudegkedgudeihecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfpfgfogfftkfevteeunffgpdfqfgfvnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpefrihgvrhhrvgculfgfjffgpfcuoehpihgvrhhrvgdrjhhuhhgvnhesohhrrghnghgvrdhfrheqnecurfgrrhgrmhepmhhouggvpehsmhhtphhouhhtnecuvehluhhsthgvrhfuihiivgeptd
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-__data_len and __sector are internal fields which should not be accessed
-directly in driver-level like the comment above it. But, tag field can
-be accessed by driver level directly so that we need to make the comment
-right by moving it to some other place.
+Hi Coly, Rolf,
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blkdev.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I think Rolf is right, with his second option (*preceding_key_p = ZERO_KEY;)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 592669bcc536..90e6914bea0c 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -137,11 +137,11 @@ struct request {
- 	unsigned int cmd_flags;		/* op and common flags */
- 	req_flags_t rq_flags;
- 
-+	int tag;
- 	int internal_tag;
- 
- 	/* the following two fields are internal, NEVER access directly */
- 	unsigned int __data_len;	/* total data len */
--	int tag;
- 	sector_t __sector;		/* sector cursor */
- 
- 	struct bio *bio;
--- 
-2.21.0
+Regards,
+
+Le 08/06/2019 à 20:50, Rolf Fokkens a écrit :
+> On 6/8/19 12:22 PM, Coly Li wrote:
+>> +static inline void preceding_key(struct bkey *k, struct bkey 
+>> *preceding_key_p)
+>> +{
+>> +    if (KEY_INODE(k) || KEY_OFFSET(k)) {
+>> +        *preceding_key_p = KEY(KEY_INODE(k), KEY_OFFSET(k), 0);
+>> +        if (!preceding_key_p->low)
+>> +            preceding_key_p->high--;
+>> +        preceding_key_p->low--;
+>> +    } else {
+>> +        preceding_key_p = NULL;
+>
+> If I'm correct, the line above has no net effect, it just changes a 
+> local variable (parameter) with no effect elsewhere. So the else part 
+> may be left out, or do you mean this?
+>
+> *preceding_key_p = ZERO_KEY;
+>
+>> +    }
+>> +}
+>>     static inline bool bch_ptr_invalid(struct btree_keys *b, const 
+>> struct bkey *k)
+>>   {
+>
+>
+>
 
