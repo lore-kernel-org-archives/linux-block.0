@@ -2,163 +2,171 @@ Return-Path: <SRS0=tJY/=UH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC248C28CC5
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 08:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BAFC28CC5
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 10:22:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7DD85214AE
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 08:21:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="US5s0eEY"
+	by mail.kernel.org (Postfix) with ESMTP id 68751214AE
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jun 2019 10:22:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725909AbfFHIVD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Jun 2019 04:21:03 -0400
-Received: from mail-yb1-f195.google.com ([209.85.219.195]:39387 "EHLO
-        mail-yb1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725809AbfFHIVC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 8 Jun 2019 04:21:02 -0400
-Received: by mail-yb1-f195.google.com with SMTP id c5so1676705ybk.6
-        for <linux-block@vger.kernel.org>; Sat, 08 Jun 2019 01:21:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=VwS8/bH/uSRQPiysNJnDghi2gLi5GCWncGBEfPFVy6g=;
-        b=US5s0eEYVOWdIPrHViQJ7ltMZVO/zATyFc6iJO1KiUamZO+AudRy9Kg8xmviCgJzox
-         gOyoPJEJ3K+0jTVJ+/KDDFpQ1Z2tDjKHKLSJGn9w7Kf1zdlgyXxEmCKNt4mq/ZbQTzq6
-         ir5jRFfRp1XT2gXvJQ12mVezInj8siKG31WFk+j9tFUPqpE7uqnNJkHb7v9T4RpcsIqz
-         CVLCdJSRMi19pNvwd3+vls1VnUktyzXXpuzKDjKQs6/NTcRe1HzgflFQKsGb+efQ0dP2
-         0cij0KtLhqfou6mtxRMSmHQ7bq4CEmewu+bOeO9BAJlLWPD0zINHirQLk2N1NEcZW0mL
-         +EBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=VwS8/bH/uSRQPiysNJnDghi2gLi5GCWncGBEfPFVy6g=;
-        b=ODnsqYyCxbbn9B8hTDJEZdXJizlUEP07U5+BY7ukvVaQkyKSehrqszl4T4GgjLXvS9
-         SIrEsFn/upNCVnXmDZFBLk39ZNX3LWA2AxgvBztHLguNvk1CO4uf4McThwUdEmj8ecBY
-         hwVa1jHq9QI1ONvlz7ek8j2P6ikRswVR0gCLoatkMLR3U8fQmo0PCpfmxLs0QEHEJhxp
-         QNS0XFEXhLk2HL6gRq65RVknyK2s1RT8XPfL9QC+7ZbHH9G2vCaVZ7oMv8VEyhehlw3K
-         GLUx6cZeDooFFLBit6W3xS9RUhHchocvCiDnBghagS+PWnPq15JfjuRRUkq8aUjAWyjl
-         VG1w==
-X-Gm-Message-State: APjAAAXAr/O9ljOQu2fUYBSAZJyTWHbSF5WAumI3Z7oN84nNL63b+Jaq
-        5ft+LdBIuC395Fpkz1aAlBc+YxNB2LkHvw==
-X-Google-Smtp-Source: APXvYqw5sH4kd3lKSRT9+IVlS/ke0mLLyDzyAuOK2Mz5NBcXl0juEw6JmriJc5mGZ7aE3jcNhc/qvg==
-X-Received: by 2002:a25:df86:: with SMTP id w128mr22116193ybg.214.1559982061130;
-        Sat, 08 Jun 2019 01:21:01 -0700 (PDT)
-Received: from [172.20.10.3] (mobile-166-172-58-221.mycingular.net. [166.172.58.221])
-        by smtp.gmail.com with ESMTPSA id i131sm1308287ywi.70.2019.06.08.01.20.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 08 Jun 2019 01:21:00 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.2-rc4
-Message-ID: <4f801c9b-4ab6-9a11-536c-ff509df8aa56@kernel.dk>
-Date:   Sat, 8 Jun 2019 02:20:57 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1726816AbfFHKWY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Jun 2019 06:22:24 -0400
+Received: from mx2.suse.de ([195.135.220.15]:35864 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726692AbfFHKWX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 8 Jun 2019 06:22:23 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 0773DAEF1;
+        Sat,  8 Jun 2019 10:22:20 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-bcache@vger.kernel.org
+Cc:     Coly Li <colyli@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Rolf Fokkens <rolf@rolffokkens.nl>, Nix <nix@esperi.org.uk>,
+        Pierre JUHEN <pierre.juhen@orange.fr>,
+        linux-block@vger.kernel.org
+Subject: [RFC PATCH] bcache: fix stack corruption by PRECEDING_KEY()
+Date:   Sat,  8 Jun 2019 18:22:04 +0800
+Message-Id: <20190608102204.60126-1-colyli@suse.de>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Recently people report bcache code compiled with gcc9 is broken, one of
+the buggy behavior I observe is that two adjacent 4KB I/Os should merge
+into one but they don't. Finally it turns out to be a stack corruption
+caused by macro PRECEDING_KEY().
 
-Set of fixes that should go into this release. This pull request
-contains:
+See how PRECEDING_KEY() is defined in bset.h,
+437 #define PRECEDING_KEY(_k)                                       \
+438 ({                                                              \
+439         struct bkey *_ret = NULL;                               \
+440                                                                 \
+441         if (KEY_INODE(_k) || KEY_OFFSET(_k)) {                  \
+442                 _ret = &KEY(KEY_INODE(_k), KEY_OFFSET(_k), 0);  \
+443                                                                 \
+444                 if (!_ret->low)                                 \
+445                         _ret->high--;                           \
+446                 _ret->low--;                                    \
+447         }                                                       \
+448                                                                 \
+449         _ret;                                                   \
+450 })
 
-- Allow symlink from the bfq.weight cgroup parameter to the general
-  weight (Angelo)
+At line 442, _ret points to address of a on-stack variable combined by
+KEY(), the life range of this on-stack variable is in line 442-446,
+once _ret is returned to bch_btree_insert_key(), the returned address
+points to an invalid stack address and this adress is overwritten in
+the following called bch_btree_iter_init(). Then argument 'search' of
+bch_btree_iter_init() points to some address inside stackframe of
+bch_btree_iter_init(), exact address depends on how the compiler
+allocates stack space. Now the stack is corrupted.
 
-- Damien is new skd maintainer (Bart)
+The fix is to avoid to allocate and return an on-stack variable only
+in range of PRECEDING_KEY(). This patch changes macro PRECEDING_KEY()
+to an inline function, and allocate another on-stack variable from
+function bch_btree_insert_key(), then the allocated memory address
+will be always valid in life range of bch_btree_insert_key().
 
-- NVMe pull request from Sagi, with a few small fixes.
+NOTE: This is only a RFC patch for more people to test. During my
+test I find bcache code does not complain out-of-order bkeys in btree
+node anymore, but the adjacent keys still don't totally merge as
+expected (e.g. they should be merged into one single key). So now I
+still continue to check what needs to be fixed more.
 
-- Ensure we set DMA segment size properly, dma-debug is now tripping on
-  these (Christoph)
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Rolf Fokkens <rolf@rolffokkens.nl>
+Cc: Nix <nix@esperi.org.uk>
+Cc: Pierre JUHEN <pierre.juhen@orange.fr>
+Cc: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+---
+ drivers/md/bcache/bset.c | 16 +++++++++++++---
+ drivers/md/bcache/bset.h | 34 ++++++++++++++++++++--------------
+ 2 files changed, 33 insertions(+), 17 deletions(-)
 
-- Remove useless debugfs_create() return check (Greg)
-
-- Remove redundant unlikely() check on IS_ERR() (Kefeng)
-
-- Fixup request freeing on exit (Ming)
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20190608
-
-
-----------------------------------------------------------------
-Angelo Ruocco (2):
-      cgroup: let a symlink too be created with a cftype file
-      block, bfq: add weight symlink to the bfq.weight cgroup parameter
-
-Bart Van Assche (1):
-      MAINTAINERS: Hand over skd maintainership
-
-Christoph Hellwig (4):
-      nvme-pci: don't limit DMA segement size
-      rsxx: don't call dma_set_max_seg_size
-      mtip32xx: also set max_segment_size in the device
-      mmc: also set max_segment_size in the device
-
-Greg Kroah-Hartman (1):
-      block: aoe: no need to check return value of debugfs_create functions
-
-Jaesoo Lee (1):
-      nvme: Fix u32 overflow in the number of namespace list calculation
-
-Jens Axboe (1):
-      Merge branch 'nvme-5.2-rc-next' of git://git.infradead.org/nvme into for-linus
-
-Kefeng Wang (1):
-      block: Drop unlikely before IS_ERR(_OR_NULL)
-
-Max Gurtovoy (1):
-      nvme-rdma: use dynamic dma mapping per command
-
-Ming Lei (1):
-      block: free sched's request pool in blk_cleanup_queue
-
-Minwoo Im (1):
-      nvmet: fix data_len to 0 for bdev-backed write_zeroes
-
-Sagi Grimberg (2):
-      nvme-rdma: fix queue mapping when queue count is limited
-      nvme-tcp: fix queue mapping when queue count is limited
-
- MAINTAINERS                       |   2 +-
- block/bfq-cgroup.c                |   6 +-
- block/blk-cgroup.c                |   2 +-
- block/blk-core.c                  |  13 ++++
- block/blk-mq-sched.c              |  30 +++++++-
- block/blk-mq-sched.h              |   1 +
- block/blk-sysfs.c                 |   2 +-
- block/blk.h                       |  10 ++-
- block/elevator.c                  |   2 +-
- drivers/block/aoe/aoeblk.c        |  16 +---
- drivers/block/mtip32xx/mtip32xx.c |   1 +
- drivers/block/rsxx/core.c         |   1 -
- drivers/mmc/core/queue.c          |   2 +
- drivers/nvme/host/core.c          |   3 +-
- drivers/nvme/host/pci.c           |   6 ++
- drivers/nvme/host/rdma.c          | 152 ++++++++++++++++++++++++--------------
- drivers/nvme/host/tcp.c           |  57 ++++++++++++--
- drivers/nvme/target/io-cmd-bdev.c |   1 +
- include/linux/cgroup-defs.h       |   3 +
- kernel/cgroup/cgroup.c            |  33 ++++++++-
- 20 files changed, 251 insertions(+), 92 deletions(-)
-
+diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
+index 8f07fa6e1739..9422f3f1c682 100644
+--- a/drivers/md/bcache/bset.c
++++ b/drivers/md/bcache/bset.c
+@@ -887,12 +887,22 @@ unsigned int bch_btree_insert_key(struct btree_keys *b, struct bkey *k,
+ 	struct bset *i = bset_tree_last(b)->data;
+ 	struct bkey *m, *prev = NULL;
+ 	struct btree_iter iter;
++	struct bkey preceding_key_on_stack = ZERO_KEY;
++	struct bkey *preceding_key_p = &preceding_key_on_stack;
+ 
+ 	BUG_ON(b->ops->is_extents && !KEY_SIZE(k));
+ 
+-	m = bch_btree_iter_init(b, &iter, b->ops->is_extents
+-				? PRECEDING_KEY(&START_KEY(k))
+-				: PRECEDING_KEY(k));
++	/*
++	 * If k has preceding key, preceding_key_p will be set to address
++	 *  of k's preceding key; otherwise preceding_key_p will be set
++	 * to NULL inside preceding_key().
++	 */
++	if (b->ops->is_extents)
++		preceding_key(&START_KEY(k), preceding_key_p);
++	else
++		preceding_key(k, preceding_key_p);
++
++	m = bch_btree_iter_init(b, &iter, preceding_key_p);
+ 
+ 	if (b->ops->insert_fixup(b, k, &iter, replace_key))
+ 		return status;
+diff --git a/drivers/md/bcache/bset.h b/drivers/md/bcache/bset.h
+index bac76aabca6d..6ab165dcb717 100644
+--- a/drivers/md/bcache/bset.h
++++ b/drivers/md/bcache/bset.h
+@@ -434,20 +434,26 @@ static inline bool bch_cut_back(const struct bkey *where, struct bkey *k)
+ 	return __bch_cut_back(where, k);
+ }
+ 
+-#define PRECEDING_KEY(_k)					\
+-({								\
+-	struct bkey *_ret = NULL;				\
+-								\
+-	if (KEY_INODE(_k) || KEY_OFFSET(_k)) {			\
+-		_ret = &KEY(KEY_INODE(_k), KEY_OFFSET(_k), 0);	\
+-								\
+-		if (!_ret->low)					\
+-			_ret->high--;				\
+-		_ret->low--;					\
+-	}							\
+-								\
+-	_ret;							\
+-})
++/*
++ * Pointer preceding_key_p points to a memory object to store preceding
++ * key of k. If the preceding key does not exist, set preceding_key_p to
++ * NULL. So the caller of preceding_key() needs to take care of memory
++ * which preceding_key_p pointed to before calling preceding_key().
++ * Currently the only caller of preceding_key() is bch_btree_insert_key(),
++ * and preceding_key_p points to an on-stack variable, so the memory
++ * release is handled by stackframe itself.
++ */
++static inline void preceding_key(struct bkey *k, struct bkey *preceding_key_p)
++{
++	if (KEY_INODE(k) || KEY_OFFSET(k)) {
++		*preceding_key_p = KEY(KEY_INODE(k), KEY_OFFSET(k), 0);
++		if (!preceding_key_p->low)
++			preceding_key_p->high--;
++		preceding_key_p->low--;
++	} else {
++		preceding_key_p = NULL;
++	}
++}
+ 
+ static inline bool bch_ptr_invalid(struct btree_keys *b, const struct bkey *k)
+ {
 -- 
-Jens Axboe
+2.16.4
 
