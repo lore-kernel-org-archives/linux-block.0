@@ -2,102 +2,113 @@ Return-Path: <SRS0=xEhu=UI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,T_DKIMWL_WL_HIGH,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 687EDC28EBD
-	for <linux-block@archiver.kernel.org>; Sun,  9 Jun 2019 16:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E75C28EBD
+	for <linux-block@archiver.kernel.org>; Sun,  9 Jun 2019 17:55:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F6BE20843
-	for <linux-block@archiver.kernel.org>; Sun,  9 Jun 2019 16:59:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560099550;
-	bh=NRvK615v25GoOdRPL360NWzr60LSRHxx997j8H+H/mo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=XK8I6nzaXjZyp6R5qcMKJryPBdExw2RMDxi+Bq1zJrWAqypslsrwEdjRW3OSS9x/w
-	 vezhf1swoBSP+ks3aP954FqXQY7gx7gJuV03f7W/jatK+Qtzs1pZTBwUpAxEGjBg6u
-	 eZ3c8rxB8JJVl+Eyde/nUyRkXQ2nUBmp7AiMoMas=
+	by mail.kernel.org (Postfix) with ESMTP id 14898206BA
+	for <linux-block@archiver.kernel.org>; Sun,  9 Jun 2019 17:55:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387614AbfFIQ7H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Jun 2019 12:59:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34736 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732775AbfFIQ7H (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 9 Jun 2019 12:59:07 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 14804206C3;
-        Sun,  9 Jun 2019 16:59:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560099546;
-        bh=NRvK615v25GoOdRPL360NWzr60LSRHxx997j8H+H/mo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KRHxLhAvXIUOIxJ+/leHOGmXSxQOdvS+lpPIPlphjzGgH1IGoFgyUCUQJR7uR+5jT
-         mfAsRAqc1j8vGqGOniWPb03Of9QT3gD1fvf1+a9+Lw1fa6JE76y3lYEJYGA+9+pWSn
-         wxPdTa5vc3W0SFOBTzhSFxTl+C9VYNz0LbUydbvY=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, "Paul E. McKenney" <paulmck@linux.ibm.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrea Parri <andrea.parri@amarulasolutions.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 4.4 078/241] bio: fix improper use of smp_mb__before_atomic()
-Date:   Sun,  9 Jun 2019 18:40:20 +0200
-Message-Id: <20190609164150.022547203@linuxfoundation.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190609164147.729157653@linuxfoundation.org>
-References: <20190609164147.729157653@linuxfoundation.org>
-User-Agent: quilt/0.66
+        id S1728868AbfFIRwb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Jun 2019 13:52:31 -0400
+Received: from smtp1.tech.numericable.fr ([82.216.111.37]:43868 "EHLO
+        smtp1.tech.numericable.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728678AbfFIRwb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Jun 2019 13:52:31 -0400
+Received: from pierre.juhen (89-156-43-137.rev.numericable.fr [89.156.43.137])
+        by smtp1.tech.numericable.fr (Postfix) with ESMTPS id 4CE07143A7D;
+        Sun,  9 Jun 2019 19:52:28 +0200 (CEST)
+Subject: Re: [PATCH V2] bcache: fix stack corruption by PRECEDING_KEY()
+To:     Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
+        Rolf Fokkens <rolf@rolffokkens.nl>
+Cc:     linux-block@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Nix <nix@esperi.org.uk>
+References: <20190609152400.18887-1-colyli@suse.de>
+ <58eef1e0-b5d7-a3f7-8d59-4ef5117ce5fe@suse.de>
+From:   Pierre JUHEN <pierre.juhen@orange.fr>
+Message-ID: <2968c6b5-9f14-73ff-0571-5d9710a023d0@orange.fr>
+Date:   Sun, 9 Jun 2019 19:52:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <58eef1e0-b5d7-a3f7-8d59-4ef5117ce5fe@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: fr-FR
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudehtddguddulecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfpfgfogfftkfevteeunffgpdfqfgfvnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpefrihgvrhhrvgculfgfjffgpfcuoehpihgvrhhrvgdrjhhuhhgvnhesohhrrghnghgvrdhfrheqnecurfgrrhgrmhepmhhouggvpehsmhhtphhouhhtnecuvehluhhsthgvrhfuihiivgeptd
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Andrea Parri <andrea.parri@amarulasolutions.com>
+I tested a patched  bcache module. OK for me.
 
-commit f381c6a4bd0ae0fde2d6340f1b9bb0f58d915de6 upstream.
-
-This barrier only applies to the read-modify-write operations; in
-particular, it does not apply to the atomic_set() primitive.
-
-Replace the barrier with an smp_mb().
-
-Fixes: dac56212e8127 ("bio: skip atomic inc/dec of ->bi_cnt for most use cases")
-Cc: stable@vger.kernel.org
-Reported-by: "Paul E. McKenney" <paulmck@linux.ibm.com>
-Reported-by: Peter Zijlstra <peterz@infradead.org>
-Signed-off-by: Andrea Parri <andrea.parri@amarulasolutions.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org
-Cc: "Paul E. McKenney" <paulmck@linux.ibm.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
----
- include/linux/bio.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -290,7 +290,7 @@ static inline void bio_cnt_set(struct bi
- {
- 	if (count != 1) {
- 		bio->bi_flags |= (1 << BIO_REFFED);
--		smp_mb__before_atomic();
-+		smp_mb();
- 	}
- 	atomic_set(&bio->__bi_cnt, count);
- }
-
+Le 09/06/2019 à 17:28, Coly Li a écrit :
+> On 2019/6/9 11:24 下午, Coly Li wrote:
+>> Recently people report bcache code compiled with gcc9 is broken, one of
+>> the buggy behavior I observe is that two adjacent 4KB I/Os should merge
+>> into one but they don't. Finally it turns out to be a stack corruption
+>> caused by macro PRECEDING_KEY().
+>>
+>> See how PRECEDING_KEY() is defined in bset.h,
+>> 437 #define PRECEDING_KEY(_k)                                       \
+>> 438 ({                                                              \
+>> 439         struct bkey *_ret = NULL;                               \
+>> 440                                                                 \
+>> 441         if (KEY_INODE(_k) || KEY_OFFSET(_k)) {                  \
+>> 442                 _ret = &KEY(KEY_INODE(_k), KEY_OFFSET(_k), 0);  \
+>> 443                                                                 \
+>> 444                 if (!_ret->low)                                 \
+>> 445                         _ret->high--;                           \
+>> 446                 _ret->low--;                                    \
+>> 447         }                                                       \
+>> 448                                                                 \
+>> 449         _ret;                                                   \
+>> 450 })
+>>
+>> At line 442, _ret points to address of a on-stack variable combined by
+>> KEY(), the life range of this on-stack variable is in line 442-446,
+>> once _ret is returned to bch_btree_insert_key(), the returned address
+>> points to an invalid stack address and this address is overwritten in
+>> the following called bch_btree_iter_init(). Then argument 'search' of
+>> bch_btree_iter_init() points to some address inside stackframe of
+>> bch_btree_iter_init(), exact address depends on how the compiler
+>> allocates stack space. Now the stack is corrupted.
+>>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> Reviewed-by: Rolf Fokkens <rolf@rolffokkens.nl>
+>> Reviewed-by: Pierre JUHEN <pierre.juhen@orange.fr>
+> Hi Rolf and Pierre,
+>
+> Oops, I am a little bit too hurry, just realize you don't offer
+> Reviewed-by: yet.
+>
+> Could you like to offer a Reviewed-by: to this patch, then I may submit
+> to Jens in this run ASAP.
+>
+> Many thanks of your code review and help !
+>
+> Coly Li
+>
+>
+>> Tested-by: Shenghui Wang <shhuiw@foxmail.com>
+>> Cc: Kent Overstreet <kent.overstreet@gmail.com>
+>> Cc: Nix <nix@esperi.org.uk>
+>> ---
+>> Changlog:
+>> V2: Fix a pointer assignment problem in preceding_key(), which is
+>>      pointed by Rolf Fokkens and Pierre JUHEN.
+>> V1: Initial RFC patch for review and comment.
+>>
+>>   drivers/md/bcache/bset.c | 16 +++++++++++++---
+>>   drivers/md/bcache/bset.h | 34 ++++++++++++++++++++--------------
+>>   2 files changed, 33 insertions(+), 17 deletions(-)
+> [snipped]
+>
 
