@@ -2,121 +2,218 @@ Return-Path: <SRS0=HnxX=UJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A40FDC468C1
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 04:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B30A7C468C1
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 07:00:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 880BB207E0
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 04:18:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F39020859
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 07:00:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=rolffokkens-nl.20150623.gappssmtp.com header.i=@rolffokkens-nl.20150623.gappssmtp.com header.b="Zz4dLKxU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728309AbfFJESr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jun 2019 00:18:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39144 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726070AbfFJESq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jun 2019 00:18:46 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 912D781DF5;
-        Mon, 10 Jun 2019 04:18:46 +0000 (UTC)
-Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 631DB5B685;
-        Mon, 10 Jun 2019 04:18:42 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH V2 2/2] block: fix page leak in case of merging to same page
-Date:   Mon, 10 Jun 2019 12:18:19 +0800
-Message-Id: <20190610041819.11575-3-ming.lei@redhat.com>
-In-Reply-To: <20190610041819.11575-1-ming.lei@redhat.com>
-References: <20190610041819.11575-1-ming.lei@redhat.com>
+        id S2387581AbfFJHAO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jun 2019 03:00:14 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:35008 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387582AbfFJHAO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Jun 2019 03:00:14 -0400
+Received: by mail-ed1-f65.google.com with SMTP id p26so8950689edr.2
+        for <linux-block@vger.kernel.org>; Mon, 10 Jun 2019 00:00:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rolffokkens-nl.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=LQhehqtq8fMuRJzB7DLeP42zs/UG9SufevuxSkGPf3w=;
+        b=Zz4dLKxUknwsuAFDbmnmdCN3YE5BO5/jWlUsdoW48ZSiSMkaJsScsu8Um+zOedh7bS
+         IuT9eQtdWWJYHIW3vZgGy2ndH1JVQT3aw0uK3u1m+vmNaOKERr2uf3zARl7h6SRotPqJ
+         jG2ajrYcU+xdMPDizpHm6xGlPcrHTd+vVPtCmsPpx8TJlQJYSmCZqdUoRqVpnzqFxD+M
+         CyDYN3n6HbvKmoiS3oljI9CudBXlUAKxt3novoFrK1iP3d52hQ4uFZyrwNxcQTGcirmw
+         7HKVzCnkKe/LGZe46xCf5x+yThgXJcGvAVRYh1Z/aBe/dXhRgWkXvoxBYo9k4lOr49hh
+         HPWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=LQhehqtq8fMuRJzB7DLeP42zs/UG9SufevuxSkGPf3w=;
+        b=SsWKaY0YKcxW88EESz+CroVYcd3P5A4rSa1/DchicylrPKOvRpEp51beXBaZuicHGb
+         2ZhWdp/11lwHrYebuannA5xJ/au5dsyKLortVOBSjN2rsWpFbYlnyiBYvP5seBlsgrPG
+         snybG2vIP0YREqGHPkC6WxM6t8aSqkAe9nAxDLnKl/VXyPOJqHMXnMzpkEVgEepoPr5V
+         R/WTMuHgS9WfZoYvUeJlnzwe7+P1Y8ULQ5OoLxNLObqpe55GAWNtNb0mK2pz4v6Fwiyb
+         B0biFnOKheLS/RKolm5YFb4Sr524f0dZ2TEZksNGmecvjpekey+Wb0x6RJQVA2BRljJ8
+         rJHA==
+X-Gm-Message-State: APjAAAUqESy+ZfGuggjprjRuBg+Ct5SoIuXlQvGzoAdiYtTiLf2vXqMW
+        yTRWShfBTuLF0G5j3BI/7J2JRQ==
+X-Google-Smtp-Source: APXvYqwEVu3ZmXHTAWdaVGvy8kjqnWLmJHIzAqzuQylhoQ0scVA26tk/UyyFy0QhQua5J5actB6m8A==
+X-Received: by 2002:a17:906:770c:: with SMTP id q12mr19381097ejm.185.1560150011357;
+        Mon, 10 Jun 2019 00:00:11 -0700 (PDT)
+Received: from home07.rolf-en-monique.lan (94-212-138-219.cable.dynamic.v4.ziggo.nl. [94.212.138.219])
+        by smtp.gmail.com with ESMTPSA id g2sm1671030eja.23.2019.06.10.00.00.10
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Mon, 10 Jun 2019 00:00:10 -0700 (PDT)
+Subject: Re: [PATCH V2] bcache: fix stack corruption by PRECEDING_KEY()
+From:   Rolf Fokkens <rolf@rolffokkens.nl>
+To:     Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Nix <nix@esperi.org.uk>
+References: <20190609152400.18887-1-colyli@suse.de>
+ <a6150834-d7a6-986e-7a99-b9fb17d84a8d@rolffokkens.nl>
+Message-ID: <0ecfba65-f978-c9a3-080a-c9445cf1adf0@rolffokkens.nl>
+Date:   Mon, 10 Jun 2019 09:00:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <a6150834-d7a6-986e-7a99-b9fb17d84a8d@rolffokkens.nl>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Mon, 10 Jun 2019 04:18:46 +0000 (UTC)
+Content-Language: nl-NL
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Different iovec may use one same page, then 'pages' array filled
-by iov_iter_get_pages() may get reference of the same page several
-times. If some elements in 'pages' can be merged to same page in
-one bvec by bio_add_page(), bio_release_pages() only drops the
-page's reference once.
+Did some testing, and I should not have underestimated the gcc 
+optimizer. The inline function seems like a fine alternative for the macro.
 
-This way causes page leak reported by David Gibson.
-
-This issue can be triggered since 576ed913 ("block: use bio_add_page in
-bio_iov_iter_get_pages").
-
-Fixes the issue by putting the page's ref if it is merged to same page.
-
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: linux-xfs@vger.kernel.org
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: Christoph Hellwig <hch@infradead.org>
-Link: https://lkml.org/lkml/2019/4/23/64
-Fixes: 576ed913 ("block: use bio_add_page in bio_iov_iter_get_pages")
-Reported-by: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c         | 12 ++++++++++--
- include/linux/bio.h |  1 +
- 2 files changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 39e3b931dc3b..07a15abc3d11 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -652,6 +652,9 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
- 			return false;
- 		if (pfn_to_page(PFN_DOWN(vec_end_addr)) + 1 != page)
- 			return false;
-+	/* drop page ref if the page has been added and user asks to do that */
-+	} else if (flags & BVEC_MERGE_PUT_SAME_PAGE) {
-+		put_page(page);
- 	}
- 
- 	WARN_ON_ONCE((flags & BVEC_MERGE_TO_SAME_PAGE) &&
-@@ -924,8 +927,13 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 		struct page *page = pages[i];
- 
- 		len = min_t(size_t, PAGE_SIZE - offset, left);
--		if (WARN_ON_ONCE(bio_add_page(bio, page, len, offset) != len))
--			return -EINVAL;
-+
-+		if (!__bio_try_merge_page(bio, page, len, offset,
-+					BVEC_MERGE_PUT_SAME_PAGE)) {
-+			if (WARN_ON_ONCE(bio_add_page(bio, page, len, offset)
-+						!= len))
-+				return -EINVAL;
-+		}
- 		offset = 0;
- 	}
- 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 48a95bca1703..dec6cf683d8e 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -422,6 +422,7 @@ void bio_chain(struct bio *, struct bio *);
- enum bvec_merge_flags {
- 	BVEC_MERGE_DEFAULT,
- 	BVEC_MERGE_TO_SAME_PAGE = BIT(0),
-+	BVEC_MERGE_PUT_SAME_PAGE = BIT(1),
- };
- 
- extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
--- 
-2.20.1
+On 6/9/19 8:28 PM, Rolf Fokkens wrote:
+> I haven't tested the fix (yet), but just looking at the code I'm 
+> perfectly fine with the proposed replacement of the macro 
+> PRECEDING_KEY by the preceding_key function.
+>
+> I have some minor concerns about the efficiency of the amount of 
+> indirections, but the gcc optimizer may take care of this. This is for 
+> later concern anyway.
+>
+> On 6/9/19 5:24 PM, Coly Li wrote:
+>> Recently people report bcache code compiled with gcc9 is broken, one of
+>> the buggy behavior I observe is that two adjacent 4KB I/Os should merge
+>> into one but they don't. Finally it turns out to be a stack corruption
+>> caused by macro PRECEDING_KEY().
+>>
+>> See how PRECEDING_KEY() is defined in bset.h,
+>> 437 #define PRECEDING_KEY(_k)                                       \
+>> 438 ({ \
+>> 439         struct bkey *_ret = NULL;                               \
+>> 440                                                                 \
+>> 441         if (KEY_INODE(_k) || KEY_OFFSET(_k)) {                  \
+>> 442                 _ret = &KEY(KEY_INODE(_k), KEY_OFFSET(_k), 0);  \
+>> 443                                                                 \
+>> 444                 if (!_ret->low)                                 \
+>> 445 _ret->high--;                           \
+>> 446 _ret->low--;                                    \
+>> 447 }                                                       \
+>> 448                                                                 \
+>> 449 _ret;                                                   \
+>> 450 })
+>>
+>> At line 442, _ret points to address of a on-stack variable combined by
+>> KEY(), the life range of this on-stack variable is in line 442-446,
+>> once _ret is returned to bch_btree_insert_key(), the returned address
+>> points to an invalid stack address and this address is overwritten in
+>> the following called bch_btree_iter_init(). Then argument 'search' of
+>> bch_btree_iter_init() points to some address inside stackframe of
+>> bch_btree_iter_init(), exact address depends on how the compiler
+>> allocates stack space. Now the stack is corrupted.
+>>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> Reviewed-by: Rolf Fokkens <rolf@rolffokkens.nl>
+>> Reviewed-by: Pierre JUHEN <pierre.juhen@orange.fr>
+>> Tested-by: Shenghui Wang <shhuiw@foxmail.com>
+>> Cc: Kent Overstreet <kent.overstreet@gmail.com>
+>> Cc: Nix <nix@esperi.org.uk>
+>> ---
+>> Changlog:
+>> V2: Fix a pointer assignment problem in preceding_key(), which is
+>>      pointed by Rolf Fokkens and Pierre JUHEN.
+>> V1: Initial RFC patch for review and comment.
+>>
+>>   drivers/md/bcache/bset.c | 16 +++++++++++++---
+>>   drivers/md/bcache/bset.h | 34 ++++++++++++++++++++--------------
+>>   2 files changed, 33 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
+>> index 8f07fa6e1739..268f1b685084 100644
+>> --- a/drivers/md/bcache/bset.c
+>> +++ b/drivers/md/bcache/bset.c
+>> @@ -887,12 +887,22 @@ unsigned int bch_btree_insert_key(struct 
+>> btree_keys *b, struct bkey *k,
+>>       struct bset *i = bset_tree_last(b)->data;
+>>       struct bkey *m, *prev = NULL;
+>>       struct btree_iter iter;
+>> +    struct bkey preceding_key_on_stack = ZERO_KEY;
+>> +    struct bkey *preceding_key_p = &preceding_key_on_stack;
+>>         BUG_ON(b->ops->is_extents && !KEY_SIZE(k));
+>>   -    m = bch_btree_iter_init(b, &iter, b->ops->is_extents
+>> -                ? PRECEDING_KEY(&START_KEY(k))
+>> -                : PRECEDING_KEY(k));
+>> +    /*
+>> +     * If k has preceding key, preceding_key_p will be set to address
+>> +     *  of k's preceding key; otherwise preceding_key_p will be set
+>> +     * to NULL inside preceding_key().
+>> +     */
+>> +    if (b->ops->is_extents)
+>> +        preceding_key(&START_KEY(k), &preceding_key_p);
+>> +    else
+>> +        preceding_key(k, &preceding_key_p);
+>> +
+>> +    m = bch_btree_iter_init(b, &iter, preceding_key_p);
+>>         if (b->ops->insert_fixup(b, k, &iter, replace_key))
+>>           return status;
+>> diff --git a/drivers/md/bcache/bset.h b/drivers/md/bcache/bset.h
+>> index bac76aabca6d..c71365e7c1fa 100644
+>> --- a/drivers/md/bcache/bset.h
+>> +++ b/drivers/md/bcache/bset.h
+>> @@ -434,20 +434,26 @@ static inline bool bch_cut_back(const struct 
+>> bkey *where, struct bkey *k)
+>>       return __bch_cut_back(where, k);
+>>   }
+>>   -#define PRECEDING_KEY(_k)                    \
+>> -({                                \
+>> -    struct bkey *_ret = NULL;                \
+>> -                                \
+>> -    if (KEY_INODE(_k) || KEY_OFFSET(_k)) {            \
+>> -        _ret = &KEY(KEY_INODE(_k), KEY_OFFSET(_k), 0);    \
+>> -                                \
+>> -        if (!_ret->low)                    \
+>> -            _ret->high--;                \
+>> -        _ret->low--;                    \
+>> -    }                            \
+>> -                                \
+>> -    _ret;                            \
+>> -})
+>> +/*
+>> + * Pointer '*preceding_key_p' points to a memory object to store 
+>> preceding
+>> + * key of k. If the preceding key does not exist, set 
+>> '*preceding_key_p' to
+>> + * NULL. So the caller of preceding_key() needs to take care of memory
+>> + * which '*preceding_key_p' pointed to before calling preceding_key().
+>> + * Currently the only caller of preceding_key() is 
+>> bch_btree_insert_key(),
+>> + * and it points to an on-stack variable, so the memory release is 
+>> handled
+>> + * by stackframe itself.
+>> + */
+>> +static inline void preceding_key(struct bkey *k, struct bkey 
+>> **preceding_key_p)
+>> +{
+>> +    if (KEY_INODE(k) || KEY_OFFSET(k)) {
+>> +        (**preceding_key_p) = KEY(KEY_INODE(k), KEY_OFFSET(k), 0);
+>> +        if (!(*preceding_key_p)->low)
+>> +            (*preceding_key_p)->high--;
+>> +        (*preceding_key_p)->low--;
+>> +    } else {
+>> +        (*preceding_key_p) = NULL;
+>> +    }
+>> +}
+>>     static inline bool bch_ptr_invalid(struct btree_keys *b, const 
+>> struct bkey *k)
+>>   {
+>
+>
 
