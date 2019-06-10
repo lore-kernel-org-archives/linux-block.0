@@ -1,154 +1,136 @@
-Return-Path: <SRS0=xEhu=UI=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=HnxX=UJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8DA8C28EBD
-	for <linux-block@archiver.kernel.org>; Sun,  9 Jun 2019 22:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D85C468BD
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 03:40:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85197206BB
-	for <linux-block@archiver.kernel.org>; Sun,  9 Jun 2019 22:17:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BD5220862
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 03:40:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZVacXVDw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729304AbfFIWRw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Jun 2019 18:17:52 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37098 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729265AbfFIWRv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 9 Jun 2019 18:17:51 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id E50EAADD2;
-        Sun,  9 Jun 2019 22:17:49 +0000 (UTC)
-Subject: Re: [PATCH 3/6] block: remove the bi_phys_segments field in struct
- bio
-To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        axboe@fb.com
-Cc:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org
-References: <20190606102904.4024-1-hch@lst.de>
- <20190606102904.4024-4-hch@lst.de>
- <481003ba-aa95-0d0e-ba1f-ce48f2c61105@suse.de>
-From:   Nikolay Borisov <nborisov@suse.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <64b6f47b-73c9-d877-7f1e-1d27cd9141c6@suse.com>
-Date:   Mon, 10 Jun 2019 01:17:48 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S2387483AbfFJDkc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Jun 2019 23:40:32 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:34141 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387420AbfFJDkc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Jun 2019 23:40:32 -0400
+Received: by mail-wm1-f67.google.com with SMTP id w9so8051590wmd.1;
+        Sun, 09 Jun 2019 20:40:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qFsgkDd1cYm63QEc69PHNhgRq7z2h6ZGeN9RjYR8A6E=;
+        b=ZVacXVDwqq0AfKYMAtgYew+uknY0wX3cUNqUebZIrAGhK6w0JmPLW0vu4d0WnhPFGE
+         QIBWVeaXivOQ/XPKUMNyGI/L3nDwD/slndtSJ8cdqz7fGDRqb5O7k1mRaOwCGmPG51dp
+         7NEjGwsGvH76n8Wr1MNDEXy+gnFEKkFiQv3j3ByimM4zdIozd/T5VWjbsMuYoTNn9Tno
+         wq+kc3VlCRnzH4HECo89J8Z7Jf7pEm7Vlt9fFTMm9XMAGBHITKI4PrcYkVcTz/RXX3aw
+         tPgWr17VPpbnwuhtBXfh5N/VsufAQzubH7RVqBMXKpV7Mzsq8FzzY2Vh7W66z2JVlqZW
+         whpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qFsgkDd1cYm63QEc69PHNhgRq7z2h6ZGeN9RjYR8A6E=;
+        b=RP185lAGbRzfF8ImYgsGXHnVvwfqFZ8ba4XJXbmkUqJX+FyuAgdkk6NtA165RiWXcD
+         ermxakO4TJuLBsI54x/Ne/KqLDYjG2ZGNuaGI9l6hPooel8EVoyWm+W+mikOiTrVIzri
+         GFtydHauolP5/ktDj4yzmMqzbnuPYmTJNLIZxkIRnRikAhoUBc6cqQDVHggEO/4aW4bb
+         IUjTMHWIq0LZ6wQhnIOQVSvxNxqAENnuWtiuy+WKwaUCfXD666oBYd9R21seGwSKF5Ai
+         d0GsLgaJ/UyBlqV8HJnh6qAih6xUT522Dj+GPwJW43Izwsu0i0R3swpkHWnibJ5svDbQ
+         CFIw==
+X-Gm-Message-State: APjAAAWDsL2zMMPaIju9S+wKbQco6CqOkNQEhVw21bW5r+2rBI10yDyo
+        eY+FSxAoIHbAw9dL0WC/oswLXpyfxni5LxBETNI=
+X-Google-Smtp-Source: APXvYqxFgqnU2Jv0WjPX+YyBML8E8oXl5/fGsZTM+7MyiNvWesA1FtzazN/dZb3lfK6kJgVRguRrw5Jl7pUTkWqNGtQ=
+X-Received: by 2002:a1c:8049:: with SMTP id b70mr11400834wmd.33.1560138029926;
+ Sun, 09 Jun 2019 20:40:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <481003ba-aa95-0d0e-ba1f-ce48f2c61105@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190608164853.10938-1-ming.lei@redhat.com> <20190608164853.10938-3-ming.lei@redhat.com>
+In-Reply-To: <20190608164853.10938-3-ming.lei@redhat.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Mon, 10 Jun 2019 11:40:18 +0800
+Message-ID: <CACVXFVMt1APzg-4vma+Jw-c5=pJhbYFRETjjw0PkeX_1hw--Qw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] block: fix page leak in case of merging to same page
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Sun, Jun 9, 2019 at 12:50 AM Ming Lei <ming.lei@redhat.com> wrote:
+>
+> Different iovec may use one same page, then 'pages' array filled
+> by iov_iter_get_pages() may get reference of the same page several
+> times. If some page in 'pages' can be merged to same page in one bvec
+> by bio_add_page(), bio_release_pages() only drops the page's reference
+> once.
+>
+> This way causes page leak reported by David Gibson.
+>
+> This issue can be triggered since 576ed913 ("block: use bio_add_page in
+> bio_iov_iter_get_pages").
+>
+> Fixes the issue by put the page's ref if it is merged to same page.
+>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: "Darrick J. Wong" <darrick.wong@oracle.com>
+> Cc: linux-xfs@vger.kernel.org
+> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Link: https://lkml.org/lkml/2019/4/23/64
+> Fixes: 576ed913 ("block: use bio_add_page in bio_iov_iter_get_pages")
+> Reported-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/bio.c         | 14 ++++++++++++--
+>  include/linux/bio.h |  1 +
+>  2 files changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/bio.c b/block/bio.c
+> index 39e3b931dc3b..5f7b46360c36 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -657,6 +657,10 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
+>         WARN_ON_ONCE((flags & BVEC_MERGE_TO_SAME_PAGE) &&
+>                         (len + off) > PAGE_SIZE);
+>
+> +       if ((flags & BVEC_MERGE_PUT_SAME_PAGE) &&
+> +                       (flags & BVEC_MERGE_TO_SAME_PAGE))
+> +               put_page(page);
+> +
+>         return true;
+>  }
+>
+> @@ -924,8 +928,14 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>                 struct page *page = pages[i];
+>
+>                 len = min_t(size_t, PAGE_SIZE - offset, left);
+> -               if (WARN_ON_ONCE(bio_add_page(bio, page, len, offset) != len))
+> -                       return -EINVAL;
+> +
+> +               if (!__bio_try_merge_page(bio, page, len, offset,
+> +                                       BVEC_MERGE_PUT_SAME_PAGE |
+> +                                       BVEC_MERGE_TO_SAME_PAGE)) {
+
+oops, it is wrong to pass  BVEC_MERGE_TO_SAME_PAGE here, which
+should disable multi-page merge.
+
+Please ignore this patchset, and will fix it in V2.
 
 
-On 7.06.19 г. 9:02 ч., Hannes Reinecke wrote:
-> On 6/6/19 12:29 PM, Christoph Hellwig wrote:
->> We only need the number of segments in the blk-mq submission path.
->> Remove the field from struct bio, and return it from a variant of
->> blk_queue_split instead of that it can passed as an argument to
->> those functions that need the value.
->>
->> This also means we stop recounting segments except for cloning
->> and partial segments.
->>
->> To keep the number of arguments in this how path down remove
->> pointless struct request_queue arguments from any of the functions
->> that had it and grew a nr_segs argument.
->>
->> Signed-off-by: Christoph Hellwig <hch@lst.de>
->> ---
->>  Documentation/block/biodoc.txt |  1 -
->>  block/bfq-iosched.c            |  5 ++-
->>  block/bio.c                    | 15 +------
->>  block/blk-core.c               | 32 +++++++--------
->>  block/blk-map.c                | 10 ++++-
->>  block/blk-merge.c              | 75 ++++++++++++----------------------
->>  block/blk-mq-sched.c           | 26 +++++++-----
->>  block/blk-mq-sched.h           | 10 +++--
->>  block/blk-mq.c                 | 23 ++++++-----
->>  block/blk.h                    | 23 ++++++-----
->>  block/kyber-iosched.c          |  5 ++-
->>  block/mq-deadline.c            |  5 ++-
->>  drivers/md/raid5.c             |  1 -
->>  include/linux/bio.h            |  1 -
->>  include/linux/blk-mq.h         |  2 +-
->>  include/linux/blk_types.h      |  6 ---
->>  include/linux/blkdev.h         |  1 -
->>  include/linux/elevator.h       |  2 +-
->>  18 files changed, 106 insertions(+), 137 deletions(-)
->>
-> In general a very good idea, but:
-> 
->> @@ -304,6 +301,13 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
->>  		*bio = split;
->>  	}
->>  }
->> +
->> +void blk_queue_split(struct request_queue *q, struct bio **bio)
->> +{
->> +	unsigned int nr_segs;
->> +
->> +	__blk_queue_split(q, bio, &nr_segs);
->> +}
->>  EXPORT_SYMBOL(blk_queue_split);
->>  
-> That looks a bit weird, and I guess some or other compiler might
-> complain here about nr_segs being unused.
-> Can't we modify __blk_queue_split() to accept a NULL argument here?
-
-How about __maybe_unused so the compiler doesn't complain?
-
-> 
-> Cheers,
-> 
-> Hannes
-> 
+Thanks,
+Ming Lei
