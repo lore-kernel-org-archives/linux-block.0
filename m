@@ -2,308 +2,203 @@ Return-Path: <SRS0=HnxX=UJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F2CC28CC7
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 13:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5456C31E40
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 14:49:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 512F92085A
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 13:34:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEC2A206C3
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 14:49:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ky1rHmad"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qajtvbdu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389997AbfFJNeu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jun 2019 09:34:50 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:36386 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389508AbfFJNeu (ORCPT
+        id S2390261AbfFJOty (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jun 2019 10:49:54 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51943 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389123AbfFJOty (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jun 2019 09:34:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=VeeFjzU/Z5v0KCw2NR3QMTVCB2dDbxUhNN9wYfHMq5Q=; b=Ky1rHmadlQYh5xR36N1XASmE3
-        8sBUO800RN5BnoG8XeJeEWgwGz2uqyqp7kBhL2d4waHxOW+LAT4UrQPgaIrKGRK+fd1yhoLmLDv8i
-        rRWzo7z+Kl2H6YA4WZQE/Un02Yo7RVjdUVQpeI0QyImsy4zcwnYOmZw0myvt+WWOYfb6SSEwKX4QF
-        lDqalPyDuQOnLKhje8sgillgDijR0Zg/gyYRVDHtLE49sBEjr1vENyEPKBKs85xvIYiZ6q/sScgn7
-        3TZbLVtphGhg2dksWTH5bixBqopA5duoF/RlhmlKxY7lxpMsTm778XCd3sVTNm8tmuidb+LQRUGhT
-        qPZiy+zAw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1haKRi-0007bM-J7; Mon, 10 Jun 2019 13:34:46 +0000
-Date:   Mon, 10 Jun 2019 06:34:46 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        David Gibson <david@gibson.dropbear.id.au>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH V2 0/2] block: fix page leak by merging to same page
-Message-ID: <20190610133446.GA28712@infradead.org>
-References: <20190610041819.11575-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190610041819.11575-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+        Mon, 10 Jun 2019 10:49:54 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 207so3879434wma.1
+        for <linux-block@vger.kernel.org>; Mon, 10 Jun 2019 07:49:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
+         :references;
+        bh=A7S7JGBmczEndtH1SNqeQ60kQQeVijqVO1oEOrAhBj8=;
+        b=Qajtvbdu6Z48mSZ+DUChAPH2GJgRbbUyKgTpz48ReiLthzr/iQBGG2Kae0piQqCocR
+         +T6/y0+H1z6cM3OtT1jikQPo2rNFRFBRzIYrvxF5NZ30E11KOJMMIWTNA8JcGXDh1iGD
+         0C4S3dr2abohL8uZXQ3oMaF4+qe9FVZyMm3d1nwrFYaIT1PAIeyBEBR1qVWWBNPIZYj7
+         SeEltAtVbnuKiE0Ai5SSK2okiCnrRZUr8hfigMcz+xfX/tjX4nZfSO10wuY9QodobjhK
+         d9oz+m01TW17blJYUaX2R6jf620UrfGZuqNu31jrJPa09c1gvo0IBNBG+DeNSsikzDXA
+         TS9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:message-id:mime-version:subject:date
+         :in-reply-to:cc:to:references;
+        bh=A7S7JGBmczEndtH1SNqeQ60kQQeVijqVO1oEOrAhBj8=;
+        b=P3QpUDn/199x1gLs6/cPgCUTNcFXBACTb6AZ93oTIM/LYWaBQ9iWgTGlWblchtA1Zl
+         d2dFBgcQ7ghwo4vEujQT1bIG0p/EMCkeVR3qZsdagnh60OcavSOrhaPhl4hVjhc8uFnD
+         olQ/pu9RJUwRrasHE7Hd7lrpKLg+Tt+/rkBn8Sq0Kx/JD14XU/6NKr4FIunN10li/YFO
+         Hv78p0nwiZtv/WEfizm2zCIbq9mIfGWy0lx5oGgRq/rEdTfF+XbLmgziaej+OfYiD00D
+         PajmeORO9MK2K5F7b0osaf3LoHeVaI3/U01nRY22e/zu4LwZ9DP0zQzBqbhgvSY/x9GN
+         yIxg==
+X-Gm-Message-State: APjAAAWjGVE4+z0bJAr3xlNNwoSWtsr4EyX0hcoJN6DgN497/Rln46Au
+        JVWaGBWGoQhLj5eADznmSNTAmg==
+X-Google-Smtp-Source: APXvYqyBgTcjseBsTC/DmZarQ24ImGDj6jH9LhZtCWFFqDGKHe287EJVBuQnRKcDFLboNh6LgcZf2A==
+X-Received: by 2002:a1c:bbc1:: with SMTP id l184mr13596761wmf.111.1560178191181;
+        Mon, 10 Jun 2019 07:49:51 -0700 (PDT)
+Received: from [192.168.0.103] (146-241-69-56.dyn.eolo.it. [146.241.69.56])
+        by smtp.gmail.com with ESMTPSA id t7sm10418020wrn.52.2019.06.10.07.49.49
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 10 Jun 2019 07:49:50 -0700 (PDT)
+From:   Paolo Valente <paolo.valente@linaro.org>
+Message-Id: <90A8C242-E45A-4D6E-8797-598893F86393@linaro.org>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_83BA77E0-46A0-4C23-87D2-E77D3CE3F0D6";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [GIT PULL] Block fixes for 5.2-rc4
+Date:   Mon, 10 Jun 2019 16:49:47 +0200
+In-Reply-To: <ebfb27a3-23e2-3ad5-a6b3-5f8262fb9ecb@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Fam Zheng <fam@euphon.net>
+To:     Jens Axboe <axboe@kernel.dk>
+References: <4f801c9b-4ab6-9a11-536c-ff509df8aa56@kernel.dk>
+ <CAHk-=whXfPjCtc5+471x83WApJxvxzvSfdzj_9hrdkj-iamA=g@mail.gmail.com>
+ <52daccae-3228-13a1-c609-157ab7e30564@kernel.dk>
+ <CAHk-=whca9riMqYn6WoQpuq9ehQ5KfBvBb4iVZ314JSfvcgy9Q@mail.gmail.com>
+ <ebfb27a3-23e2-3ad5-a6b3-5f8262fb9ecb@kernel.dk>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I don't really like the magic enum types.  I'd rather go back to my
-initial idea to turn the same_page argument into an output parameter,
-so that the callers can act upon it.  Untested patch below:
+
+--Apple-Mail=_83BA77E0-46A0-4C23-87D2-E77D3CE3F0D6
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
 
-diff --git a/block/bio.c b/block/bio.c
-index 683cbb40f051..d4999ef3b1fb 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -636,7 +636,7 @@ EXPORT_SYMBOL(bio_clone_fast);
- 
- static inline bool page_is_mergeable(const struct bio_vec *bv,
- 		struct page *page, unsigned int len, unsigned int off,
--		bool same_page)
-+		bool *same_page)
- {
- 	phys_addr_t vec_end_addr = page_to_phys(bv->bv_page) +
- 		bv->bv_offset + bv->bv_len - 1;
-@@ -647,26 +647,17 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
- 	if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
- 		return false;
- 
--	if ((vec_end_addr & PAGE_MASK) != page_addr) {
--		if (same_page)
--			return false;
--		if (pfn_to_page(PFN_DOWN(vec_end_addr)) + 1 != page)
--			return false;
--	}
--
--	WARN_ON_ONCE(same_page && (len + off) > PAGE_SIZE);
--
-+	*same_page = ((vec_end_addr & PAGE_MASK) == page_addr);
-+	if (!*same_page && pfn_to_page(PFN_DOWN(vec_end_addr)) + 1 != page)
-+		return false;
- 	return true;
- }
- 
--/*
-- * Check if the @page can be added to the current segment(@bv), and make
-- * sure to call it only if page_is_mergeable(@bv, @page) is true
-- */
--static bool can_add_page_to_seg(struct request_queue *q,
--		struct bio_vec *bv, struct page *page, unsigned len,
--		unsigned offset)
-+static bool bio_try_merge_pc_page(struct request_queue *q, struct bio *bio,
-+		struct page *page, unsigned len, unsigned offset,
-+		bool *same_page)
- {
-+	struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
- 	unsigned long mask = queue_segment_boundary(q);
- 	phys_addr_t addr1 = page_to_phys(bv->bv_page) + bv->bv_offset;
- 	phys_addr_t addr2 = page_to_phys(page) + offset + len - 1;
-@@ -677,7 +668,13 @@ static bool can_add_page_to_seg(struct request_queue *q,
- 	if (bv->bv_len + len > queue_max_segment_size(q))
- 		return false;
- 
--	return true;
-+	/*
-+	 * If the queue doesn't support SG gaps and adding this
-+	 * offset would create a gap, disallow it.
-+	 */
-+	if (bvec_gap_to_prev(q, bv, offset))
-+		return false;
-+	return __bio_try_merge_page(bio, page, len, offset, same_page);
- }
- 
- /**
-@@ -701,6 +698,7 @@ static int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
- 		bool put_same_page)
- {
- 	struct bio_vec *bvec;
-+	bool same_page = false;
- 
- 	/*
- 	 * cloned bio must not modify vec list
-@@ -711,29 +709,11 @@ static int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
- 	if (((bio->bi_iter.bi_size + len) >> 9) > queue_max_hw_sectors(q))
- 		return 0;
- 
--	if (bio->bi_vcnt > 0) {
--		bvec = &bio->bi_io_vec[bio->bi_vcnt - 1];
--
--		if (page == bvec->bv_page &&
--		    offset == bvec->bv_offset + bvec->bv_len) {
--			if (put_same_page)
--				put_page(page);
--			bvec->bv_len += len;
--			goto done;
--		}
--
--		/*
--		 * If the queue doesn't support SG gaps and adding this
--		 * offset would create a gap, disallow it.
--		 */
--		if (bvec_gap_to_prev(q, bvec, offset))
--			return 0;
--
--		if (page_is_mergeable(bvec, page, len, offset, false) &&
--		    can_add_page_to_seg(q, bvec, page, len, offset)) {
--			bvec->bv_len += len;
--			goto done;
--		}
-+	if (bio->bi_vcnt > 0 &&
-+	    bio_try_merge_pc_page(q, bio, page, len, offset, &same_page)) {
-+		if (put_same_page && same_page)
-+			put_page(page);
-+		goto done;
- 	}
- 
- 	if (bio_full(bio))
-@@ -747,8 +727,8 @@ static int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
- 	bvec->bv_len = len;
- 	bvec->bv_offset = offset;
- 	bio->bi_vcnt++;
-- done:
- 	bio->bi_iter.bi_size += len;
-+ done:
- 	bio->bi_phys_segments = bio->bi_vcnt;
- 	bio_set_flag(bio, BIO_SEG_VALID);
- 	return len;
-@@ -767,8 +747,7 @@ EXPORT_SYMBOL(bio_add_pc_page);
-  * @page: start page to add
-  * @len: length of the data to add
-  * @off: offset of the data relative to @page
-- * @same_page: if %true only merge if the new data is in the same physical
-- *		page as the last segment of the bio.
-+ * @same_page: return if the segment has been merged inside the same page
-  *
-  * Try to add the data at @page + @off to the last bvec of @bio.  This is a
-  * a useful optimisation for file systems with a block size smaller than the
-@@ -779,7 +758,7 @@ EXPORT_SYMBOL(bio_add_pc_page);
-  * Return %true on success or %false on failure.
-  */
- bool __bio_try_merge_page(struct bio *bio, struct page *page,
--		unsigned int len, unsigned int off, bool same_page)
-+		unsigned int len, unsigned int off, bool *same_page)
- {
- 	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
- 		return false;
-@@ -837,7 +816,9 @@ EXPORT_SYMBOL_GPL(__bio_add_page);
- int bio_add_page(struct bio *bio, struct page *page,
- 		 unsigned int len, unsigned int offset)
- {
--	if (!__bio_try_merge_page(bio, page, len, offset, false)) {
-+	bool same_page = false;
-+
-+	if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
- 		if (bio_full(bio))
- 			return 0;
- 		__bio_add_page(bio, page, len, offset);
-@@ -900,6 +881,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
- 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
- 	struct page **pages = (struct page **)bv;
-+	bool same_page = false;
- 	ssize_t size, left;
- 	unsigned len, i;
- 	size_t offset;
-@@ -920,8 +902,15 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 		struct page *page = pages[i];
- 
- 		len = min_t(size_t, PAGE_SIZE - offset, left);
--		if (WARN_ON_ONCE(bio_add_page(bio, page, len, offset) != len))
--			return -EINVAL;
-+
-+		if (__bio_try_merge_page(bio, page, len, offset, &same_page)) {
-+			if (same_page)
-+				put_page(page);
-+		} else {
-+			if (WARN_ON_ONCE(bio_full(bio)))
-+                                return -EINVAL;
-+			__bio_add_page(bio, page, len, offset);
-+		}
- 		offset = 0;
- 	}
- 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 23ef63fd1669..12654c2e78f8 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -287,7 +287,7 @@ iomap_readpage_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
- 	struct iomap_readpage_ctx *ctx = data;
- 	struct page *page = ctx->cur_page;
- 	struct iomap_page *iop = iomap_page_create(inode, page);
--	bool is_contig = false;
-+	bool same_page = false, is_contig = false;
- 	loff_t orig_pos = pos;
- 	unsigned poff, plen;
- 	sector_t sector;
-@@ -315,10 +315,14 @@ iomap_readpage_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
- 	 * Try to merge into a previous segment if we can.
- 	 */
- 	sector = iomap_sector(iomap, pos);
--	if (ctx->bio && bio_end_sector(ctx->bio) == sector) {
--		if (__bio_try_merge_page(ctx->bio, page, plen, poff, true))
--			goto done;
-+	if (ctx->bio && bio_end_sector(ctx->bio) == sector)
- 		is_contig = true;
-+
-+	if (is_contig &&
-+	    __bio_try_merge_page(ctx->bio, page, plen, poff, &same_page)) {
-+		if (!same_page && iop)
-+			atomic_inc(&iop->read_count);
-+		goto done;
- 	}
- 
- 	/*
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index a6f0f4761a37..8da5e6637771 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -758,6 +758,7 @@ xfs_add_to_ioend(
- 	struct block_device	*bdev = xfs_find_bdev_for_inode(inode);
- 	unsigned		len = i_blocksize(inode);
- 	unsigned		poff = offset & (PAGE_SIZE - 1);
-+	bool			merged, same_page = false;
- 	sector_t		sector;
- 
- 	sector = xfs_fsb_to_db(ip, wpc->imap.br_startblock) +
-@@ -774,9 +775,13 @@ xfs_add_to_ioend(
- 				wpc->imap.br_state, offset, bdev, sector);
- 	}
- 
--	if (!__bio_try_merge_page(wpc->ioend->io_bio, page, len, poff, true)) {
--		if (iop)
--			atomic_inc(&iop->write_count);
-+	merged = __bio_try_merge_page(wpc->ioend->io_bio, page, len, poff,
-+			&same_page);
-+
-+	if (iop && !same_page)
-+		atomic_inc(&iop->write_count);
-+
-+	if (!merged) {
- 		if (bio_full(wpc->ioend->io_bio))
- 			xfs_chain_bio(wpc->ioend, wbc, bdev, sector);
- 		bio_add_page(wpc->ioend->io_bio, page, len, poff);
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index ea73df36529a..3df3b127b394 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -423,7 +423,7 @@ extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
- extern int bio_add_pc_page(struct request_queue *, struct bio *, struct page *,
- 			   unsigned int, unsigned int);
- bool __bio_try_merge_page(struct bio *bio, struct page *page,
--		unsigned int len, unsigned int off, bool same_page);
-+		unsigned int len, unsigned int off, bool *same_page);
- void __bio_add_page(struct bio *bio, struct page *page,
- 		unsigned int len, unsigned int off);
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter);
+
+> Il giorno 10 giu 2019, alle ore 12:15, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 6/9/19 10:06 AM, Linus Torvalds wrote:
+>> On Sat, Jun 8, 2019 at 11:00 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>=20
+>>> FWIW, the concept/idea goes back a few months and was discussed with
+>>> the cgroup folks. But I totally agree that the implementation could
+>>> have been cleaner, especially at this point in time.
+>>>=20
+>>> I'm fine with you reverting those two patches for 5.2 if you want =
+to,
+>>> and the BFQ folks can do this more cleanly for 5.3.
+>>=20
+>> I don't think the code is _broken_, and I don't think the link_name
+>> thing is wrong. So no point in reverting unless we see more issues.
+>>=20
+>> I just wish it had been done differently, both from the patch details
+>> standpoint, but also in making sure the cgroup people were aware (and
+>> maybe they were, but it certainly didn't show up in the commit).
+>>=20
+>> So I think an incremental patch like the attached would make the code
+>> easier to understand (I really do mis-like random boolean flags being
+>> passed around that change behavior in undocumented and non-obvious
+>> ways), but I'd also want to make sure that Tejun & co are all on =
+board
+>> and know about it..
+>>=20
+>> I'm sure this happens a lot, but during the rc series I just end up
+>> *looking* at details like this a lot more, when I see changes outside
+>> of a subsystem directory.
+>>=20
+>> Tejun&co, we're talking about commit 54b7b868e826 ("cgroup: let a
+>> symlink too be created with a cftype file") which didn't have any =
+sign
+>> of you guys being aware of it or having acked it.
+>=20
+> I talked to Tejun about this offline, and he's not a huge fan of the
+> symlink. So let's revert this for now, and Paolo can do this properly
+> for 5.3 instead.
+>=20
+
+Hi all,
+we'd be ok with implementing this the right way, but what's the point
+in spending further hours on a solution not liked by Tejun?  Here's
+what happened so far:
+1) General solution allowing multiple entities to share common files:
+   rejected by Tejun.
+2) Simple replacement bfq.weight -> weight, after the only entity
+   using that name, cfq, has gone: rejected by Jens because it is a
+   disruptive change of the interface.
+3) Symlink, proposed by Johannes: maybe rejected by Tejun.
+
+Tejun, could you please tell us whether you may accept the last
+option?  This option may be associated with deprecating the explicit
+use of bfq.weight (I don't know of anybody who wants to use this
+confusing name).  So, in a few releases we could finally drop this
+bfq.weight and turn the symlink back into an actual interface file.
+
+I'm running out of options, apart from giving up.
+
+Thanks,
+Paolo
+
+> Sorry for the confusion! Please pull the below.
+>=20
+>=20
+>  git://git.kernel.dk/linux-block.git tags/for-linus-20190610
+>=20
+>=20
+> ----------------------------------------------------------------
+> Jens Axboe (1):
+>      cgroup/bfq: revert bfq.weight symlink change
+>=20
+> block/bfq-cgroup.c          |  6 ++----
+> include/linux/cgroup-defs.h |  3 ---
+> kernel/cgroup/cgroup.c      | 33 ++++-----------------------------
+> 3 files changed, 6 insertions(+), 36 deletions(-)
+>=20
+> --
+> Jens Axboe
+
+
+--Apple-Mail=_83BA77E0-46A0-4C23-87D2-E77D3CE3F0D6
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAlz+bgwACgkQOAkCLQGo
+9oN52g/8DZ1uF/vjCae4pLzLw26f3gsNwzBi+xYpfUSLZJh2mv1uOpId21hHqRH2
+uLoev+IzMtMDQBKDtObMMqZg3i2/6fZkDs6g05aJL7r/gdzLY8T73UyHRI5AjlZO
+lKwBP9Rj8v1u5NWA3QS78Q/JnQIO6aXPRRUUBNFk3tWuhe8061cDds9OC28CFxaS
+6tsgHBY6AAQ15bL/i1YXjBUuwPDuGhqUpbIYKD0JuHWJsdB2RWjnwLkJY+ydIhwq
+nwYZavfzYQF/8eZTKK2V/TsvMJXDQYZlB2LVQFzFIq0I4F0rPDS+jLxeZwQn0BIf
+axClFbBr6m8oOzIuhgnYlKRgUJsptoLvLhQorEZjEtfKzZRBekzeWdW5UqJOpGuv
+2r2t6LAyFE/k+K1dHtD6mZoYFV807JY+8uVCp8s4/I9TDxaJOmxI6g44EsHy8ecX
+YV8C1IxKV/Y1bo3D6TrN1fSfJfrFBDTCuDznOEuCKaSV0sqxqYkMP5iYohoa6vjn
+NnILmVdltB1634jwEcRqIA/Kfk4JT3Nt04i4LPXbalcESXzeYzdoMwCCbgrdYwfS
+355I37RIW8rPg1N64XvBUVDt0fvR43/oTqge3hNXWEjR2j7vJY/acbn+AAaf7fWV
+I+gppYWm+emRQ6bCHNJYSJPpT6zPbor6NlWoF6NYfk6szhj3BX4=
+=n7bs
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_83BA77E0-46A0-4C23-87D2-E77D3CE3F0D6--
