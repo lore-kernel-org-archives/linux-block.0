@@ -2,203 +2,133 @@ Return-Path: <SRS0=HnxX=UJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDEACC468C1
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 09:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB74C282DD
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 10:15:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A15FB2082E
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 09:02:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90DFF2085A
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 10:15:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="HES4OQU6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388766AbfFJJCq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jun 2019 05:02:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42932 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388190AbfFJJCq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jun 2019 05:02:46 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AF7D3307D854;
-        Mon, 10 Jun 2019 09:02:31 +0000 (UTC)
-Received: from localhost (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A49647A400;
-        Mon, 10 Jun 2019 09:02:26 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH V3 1/2] block: introduce 'enum bvec_merge_flags' for __bio_try_merge_page
-Date:   Mon, 10 Jun 2019 17:02:14 +0800
-Message-Id: <20190610090215.14412-2-ming.lei@redhat.com>
-In-Reply-To: <20190610090215.14412-1-ming.lei@redhat.com>
-References: <20190610090215.14412-1-ming.lei@redhat.com>
+        id S2388489AbfFJKPl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jun 2019 06:15:41 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:34857 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388734AbfFJKPl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Jun 2019 06:15:41 -0400
+Received: by mail-ot1-f67.google.com with SMTP id j19so7778845otq.2
+        for <linux-block@vger.kernel.org>; Mon, 10 Jun 2019 03:15:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=L/Fpx5ax3FSv1vsl05RpWDU1kFWGRR0oLTZTCT52Dhg=;
+        b=HES4OQU6huVUOA8Ypw9ptPG1nA4Uv6pn+9wG7iiwr56eddgvTzzs3o9ps7OsWmaP14
+         UTn7CHT2bxh23YDWcQQ5iNP86lLzVVowr7xycaDWtMEDPsgm6D90NnQLpU9P/A4O05Yt
+         fJYtzCMhSUhbPaNw/LJVCirw/kDfJE8aGx/f8pwn6ZAlbtIUEJCl3kjglikLJ1uoBGu2
+         Sxj3mBGpoJhvGUMIPPtVChaWR2IZhm3YotXjeSUCkgZdDFVSCCSbJOH6i1WNZeF0vr3E
+         faV0/pf5dStZadFTxuauD1ss2lMlSOqIYqJDc3zTZt69o49fOuLZGgYpdT8AB+JyLVBT
+         z9YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=L/Fpx5ax3FSv1vsl05RpWDU1kFWGRR0oLTZTCT52Dhg=;
+        b=JgEW75DLzjel291MrHxZknZz91H9QBM8vHxEjdCdq5ScwL2v5y/kgCwJzKPnhr5h0+
+         NCwGQPsE/H3Pl9KL6V+8Rhy1pDg58OvQuEfOJt6GSv4P7fRYp5ke/lVOUubRGz+5WQfV
+         c4+I/vezNMTxA9Yat+VgcK1TEx3+euzzJLRZsbAVUdaymqfCTDbBgx2cYneyL1BAKbaJ
+         Uziz9rfSmZFPz887+Rm6WA4H9EvDr4U71e+XGBfeGHzSR/whs5hAm41vEPrlACJ8UBmg
+         VLLm3lIl1GIkog25j43lxZrVIC5DxaaCnw8hf7K17RW6W9uAmCFpNGSikVEmYMDBEI+Z
+         hT7g==
+X-Gm-Message-State: APjAAAVfQStJK/lfV2J2bze/ndHpymOCV1VfBMP1UViVqUxQ+WW5RiSj
+        mkBxWKJqDz65L35wSs5d+it3yduYlkDob1jq
+X-Google-Smtp-Source: APXvYqzefV6s2avYclwY/dRUQ6u5/mzLFwhhu2cqT8UGXIzxrCAhLCkIh+G/dVqv/C5VOJ/tssOSUw==
+X-Received: by 2002:a05:6830:1050:: with SMTP id b16mr13768724otp.228.1560161740167;
+        Mon, 10 Jun 2019 03:15:40 -0700 (PDT)
+Received: from [172.20.10.3] (mobile-107-92-56-198.mycingular.net. [107.92.56.198])
+        by smtp.gmail.com with ESMTPSA id v18sm1091554otn.17.2019.06.10.03.15.31
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 10 Jun 2019 03:15:38 -0700 (PDT)
+Subject: Re: [GIT PULL] Block fixes for 5.2-rc4
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <4f801c9b-4ab6-9a11-536c-ff509df8aa56@kernel.dk>
+ <CAHk-=whXfPjCtc5+471x83WApJxvxzvSfdzj_9hrdkj-iamA=g@mail.gmail.com>
+ <52daccae-3228-13a1-c609-157ab7e30564@kernel.dk>
+ <CAHk-=whca9riMqYn6WoQpuq9ehQ5KfBvBb4iVZ314JSfvcgy9Q@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ebfb27a3-23e2-3ad5-a6b3-5f8262fb9ecb@kernel.dk>
+Date:   Mon, 10 Jun 2019 04:15:27 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 10 Jun 2019 09:02:45 +0000 (UTC)
+In-Reply-To: <CAHk-=whca9riMqYn6WoQpuq9ehQ5KfBvBb4iVZ314JSfvcgy9Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce 'enum bvec_merge_flags' and pass it to __bio_try_merge_page,
-we have to deal with several cases related with page reference when
-merging same page to bio(bvec), such as:
+On 6/9/19 10:06 AM, Linus Torvalds wrote:
+> On Sat, Jun 8, 2019 at 11:00 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> FWIW, the concept/idea goes back a few months and was discussed with
+>> the cgroup folks. But I totally agree that the implementation could
+>> have been cleaner, especially at this point in time.
+>>
+>> I'm fine with you reverting those two patches for 5.2 if you want to,
+>> and the BFQ folks can do this more cleanly for 5.3.
+> 
+> I don't think the code is _broken_, and I don't think the link_name
+> thing is wrong. So no point in reverting unless we see more issues.
+> 
+> I just wish it had been done differently, both from the patch details
+> standpoint, but also in making sure the cgroup people were aware (and
+> maybe they were, but it certainly didn't show up in the commit).
+> 
+> So I think an incremental patch like the attached would make the code
+> easier to understand (I really do mis-like random boolean flags being
+> passed around that change behavior in undocumented and non-obvious
+> ways), but I'd also want to make sure that Tejun & co are all on board
+> and know about it..
+> 
+> I'm sure this happens a lot, but during the rc series I just end up
+> *looking* at details like this a lot more, when I see changes outside
+> of a subsystem directory.
+> 
+> Tejun&co, we're talking about commit 54b7b868e826 ("cgroup: let a
+> symlink too be created with a cftype file") which didn't have any sign
+> of you guys being aware of it or having acked it.
 
-1) only merge to same page without putting reference of the same page,
-such as iomap & xfs
+I talked to Tejun about this offline, and he's not a huge fan of the
+symlink. So let's revert this for now, and Paolo can do this properly
+for 5.3 instead.
 
-2) merge to same page and putting reference of the same page, such as
-__bio_iov_iter_get_pages()
+Sorry for the confusion! Please pull the below.
 
-Cc: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: linux-xfs@vger.kernel.org
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c         | 20 ++++++++++++--------
- fs/iomap.c          |  3 ++-
- fs/xfs/xfs_aops.c   |  3 ++-
- include/linux/bio.h | 14 +++++++++++++-
- 4 files changed, 29 insertions(+), 11 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 683cbb40f051..39e3b931dc3b 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -636,7 +636,7 @@ EXPORT_SYMBOL(bio_clone_fast);
- 
- static inline bool page_is_mergeable(const struct bio_vec *bv,
- 		struct page *page, unsigned int len, unsigned int off,
--		bool same_page)
-+		enum bvec_merge_flags flags)
- {
- 	phys_addr_t vec_end_addr = page_to_phys(bv->bv_page) +
- 		bv->bv_offset + bv->bv_len - 1;
-@@ -648,13 +648,14 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
- 		return false;
- 
- 	if ((vec_end_addr & PAGE_MASK) != page_addr) {
--		if (same_page)
-+		if (flags & BVEC_MERGE_TO_SAME_PAGE)
- 			return false;
- 		if (pfn_to_page(PFN_DOWN(vec_end_addr)) + 1 != page)
- 			return false;
- 	}
- 
--	WARN_ON_ONCE(same_page && (len + off) > PAGE_SIZE);
-+	WARN_ON_ONCE((flags & BVEC_MERGE_TO_SAME_PAGE) &&
-+			(len + off) > PAGE_SIZE);
- 
- 	return true;
- }
-@@ -729,8 +730,9 @@ static int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
- 		if (bvec_gap_to_prev(q, bvec, offset))
- 			return 0;
- 
--		if (page_is_mergeable(bvec, page, len, offset, false) &&
--		    can_add_page_to_seg(q, bvec, page, len, offset)) {
-+		if (page_is_mergeable(bvec, page, len, offset,
-+		    BVEC_MERGE_DEFAULT) && can_add_page_to_seg(q, bvec,
-+		    page, len, offset)) {
- 			bvec->bv_len += len;
- 			goto done;
- 		}
-@@ -779,7 +781,8 @@ EXPORT_SYMBOL(bio_add_pc_page);
-  * Return %true on success or %false on failure.
-  */
- bool __bio_try_merge_page(struct bio *bio, struct page *page,
--		unsigned int len, unsigned int off, bool same_page)
-+		unsigned int len, unsigned int off,
-+		enum bvec_merge_flags flags)
- {
- 	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
- 		return false;
-@@ -787,7 +790,7 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
- 	if (bio->bi_vcnt > 0) {
- 		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
- 
--		if (page_is_mergeable(bv, page, len, off, same_page)) {
-+		if (page_is_mergeable(bv, page, len, off, flags)) {
- 			bv->bv_len += len;
- 			bio->bi_iter.bi_size += len;
- 			return true;
-@@ -837,7 +840,8 @@ EXPORT_SYMBOL_GPL(__bio_add_page);
- int bio_add_page(struct bio *bio, struct page *page,
- 		 unsigned int len, unsigned int offset)
- {
--	if (!__bio_try_merge_page(bio, page, len, offset, false)) {
-+	if (!__bio_try_merge_page(bio, page, len, offset,
-+				  BVEC_MERGE_DEFAULT)) {
- 		if (bio_full(bio))
- 			return 0;
- 		__bio_add_page(bio, page, len, offset);
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 23ef63fd1669..e04652bbf92a 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -316,7 +316,8 @@ iomap_readpage_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
- 	 */
- 	sector = iomap_sector(iomap, pos);
- 	if (ctx->bio && bio_end_sector(ctx->bio) == sector) {
--		if (__bio_try_merge_page(ctx->bio, page, plen, poff, true))
-+		if (__bio_try_merge_page(ctx->bio, page, plen, poff,
-+					 BVEC_MERGE_TO_SAME_PAGE))
- 			goto done;
- 		is_contig = true;
- 	}
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index a6f0f4761a37..7e7385bc3b9e 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -774,7 +774,8 @@ xfs_add_to_ioend(
- 				wpc->imap.br_state, offset, bdev, sector);
- 	}
- 
--	if (!__bio_try_merge_page(wpc->ioend->io_bio, page, len, poff, true)) {
-+	if (!__bio_try_merge_page(wpc->ioend->io_bio, page, len, poff,
-+				BVEC_MERGE_TO_SAME_PAGE)) {
- 		if (iop)
- 			atomic_inc(&iop->write_count);
- 		if (bio_full(wpc->ioend->io_bio))
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 0f23b5682640..ee18895431ba 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -419,11 +419,23 @@ extern void bio_uninit(struct bio *);
- extern void bio_reset(struct bio *);
- void bio_chain(struct bio *, struct bio *);
- 
-+enum bvec_merge_flags {
-+	BVEC_MERGE_DEFAULT,
-+
-+	/*
-+	 * only merge if new page is same with bio's last page, this
-+	 * is exactly the behaviour before introducing multi-page
-+	 * bvec
-+	 */
-+	BVEC_MERGE_TO_SAME_PAGE = BIT(0),
-+};
-+
- extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
- extern int bio_add_pc_page(struct request_queue *, struct bio *, struct page *,
- 			   unsigned int, unsigned int);
- bool __bio_try_merge_page(struct bio *bio, struct page *page,
--		unsigned int len, unsigned int off, bool same_page);
-+		unsigned int len, unsigned int off,
-+		enum bvec_merge_flags flags);
- void __bio_add_page(struct bio *bio, struct page *page,
- 		unsigned int len, unsigned int off);
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter);
+  git://git.kernel.dk/linux-block.git tags/for-linus-20190610
+
+
+----------------------------------------------------------------
+Jens Axboe (1):
+      cgroup/bfq: revert bfq.weight symlink change
+
+ block/bfq-cgroup.c          |  6 ++----
+ include/linux/cgroup-defs.h |  3 ---
+ kernel/cgroup/cgroup.c      | 33 ++++-----------------------------
+ 3 files changed, 6 insertions(+), 36 deletions(-)
+
 -- 
-2.20.1
+Jens Axboe
 
