@@ -2,82 +2,98 @@ Return-Path: <SRS0=HnxX=UJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37FECC43218
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 21:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1531BC4321A
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 22:00:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 00C4B20859
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 21:56:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="N1u0tdk+"
+	by mail.kernel.org (Postfix) with ESMTP id E1DDC20859
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 22:00:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388474AbfFJV4y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jun 2019 17:56:54 -0400
-Received: from mx.aristanetworks.com ([162.210.129.12]:40895 "EHLO
-        smtp.aristanetworks.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388328AbfFJV4y (ORCPT
+        id S1728648AbfFJWAm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jun 2019 18:00:42 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:36206 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728617AbfFJWAm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jun 2019 17:56:54 -0400
-X-Greylist: delayed 420 seconds by postgrey-1.27 at vger.kernel.org; Mon, 10 Jun 2019 17:56:54 EDT
-Received: from smtp.aristanetworks.com (localhost [127.0.0.1])
-        by smtp.aristanetworks.com (Postfix) with ESMTP id E862441C563;
-        Mon, 10 Jun 2019 14:50:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arista.com;
-        s=Arista-A; t=1560203420;
-        bh=SDUUrT3RcmDg9hRVIrJ4rtuNmtlz5wGHFXGKRoT5qvg=;
-        h=Date:To:Subject:From;
-        b=N1u0tdk+5JhKTazLCB5efNPr45odSOjNj7H70c8TZ73yKAHrLZ0aUVHIGkqy+e0tz
-         3Y3jZIKwcbNV6c/cen3xxioAyhL+9OfimaGuFOHwlhyEk+bDInYCzB+YU/s9qGTfFy
-         F/HnyKNjwj1c8YPOa4IDd2VW0oMzq2Z/OYNt5AF3HmGnwuj6JiOukFcKg1rhiKV+pD
-         0je5lz0odpkfS4zVkFh61HdEMCiCzRkVo6W6J2+I35uxSlhA3AckKMGVPmX3rP2Ty6
-         D55Oz+hyIOSMsfQbgp477ClvVmwPYLycv1N9V9W1BrvQAMHK11ze36qbvGS/CLbdT9
-         SdWYukF/LDvEQ==
-Received: from us180.sjc.aristanetworks.com (us180.sjc.aristanetworks.com [172.25.230.4])
-        by smtp.aristanetworks.com (Postfix) with ESMTP id E51B941C562;
-        Mon, 10 Jun 2019 14:50:20 -0700 (PDT)
-Received: by us180.sjc.aristanetworks.com (Postfix, from userid 10189)
-        id 694BA95C1DF4; Mon, 10 Jun 2019 14:49:54 -0700 (PDT)
-Date:   Mon, 10 Jun 2019 14:49:54 -0700
-To:     fruggeri@arista.com, gtertych@cisco.com, gwendal@chromium.org,
-        bvanassche@acm.org, linux-block@vger.kernel.org, axboe@kernel.dk,
-        stable@vger.kernel.org, jaegeuk@kernel.org
-Subject: Re: [PATCH v2] loop: avoid EAGAIN, if offset or block size are
- changed
-User-Agent: Heirloom mailx 12.5 7/5/10
+        Mon, 10 Jun 2019 18:00:42 -0400
+Received: by mail-pf1-f195.google.com with SMTP id r7so179621pfl.3
+        for <linux-block@vger.kernel.org>; Mon, 10 Jun 2019 15:00:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/ZbZOVb75C9+btON0t2eiN7veiKbZqARVe8qrDAfXGQ=;
+        b=A9wMncC5kJmeXEojXgQ3wUW5Bkxgd8N07KpfaD/ygWj5TrXrH7Fy/AUNi0sAEKLasX
+         MA1GvO1hpGgAL9UFV22sNCoSNZ98NxjYUkxfv+nyGjAqoEgM3JqtESlsRrscVhQ6muFZ
+         u6Mw7WKYLzieS1gDIBjrT7SGxEtTIOvyYLg4d2qcW6DUqgLGK7wOMaNzlrzrh9DhiHrY
+         32KC6ipWZQBsqQLZ9ryulU6Jn7hQ2VwkU87rfEXukaHyn5JqV1GuEswmSXg8yN59yDaH
+         GkmTG/zhZltX64gjiEXHacZ9o3gVjzpFsimDmM6GqEsDvixkqT3JIHkfqQzAoBmtqsJJ
+         QZsw==
+X-Gm-Message-State: APjAAAX4GJ3q8qWkClQaKkm5JNqggNfwgpMg9cyllYSR+8rl/DWAJutP
+        YylZJTBJzbRNHN9RNr0frAU=
+X-Google-Smtp-Source: APXvYqz6Z0lMSUUl4YqmRkLHV0IoAxaPjvu7wy6du0WrZ6zhZwkdkpRS1EezVzC2mjHYFHJiv4tr9g==
+X-Received: by 2002:a62:b609:: with SMTP id j9mr61978909pff.145.1560204041290;
+        Mon, 10 Jun 2019 15:00:41 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id v126sm15730592pfb.81.2019.06.10.15.00.39
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Mon, 10 Jun 2019 15:00:40 -0700 (PDT)
+Subject: Re: [PATCH 1/2] blk-mq: Remove blk_mq_put_ctx()
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.com>, Omar Sandoval <osandov@fb.com>
+References: <20190604181736.903-1-bvanassche@acm.org>
+ <20190604181736.903-2-bvanassche@acm.org> <20190608081907.GB19573@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <8b179799-5381-1b47-1793-f1fd39726d49@acm.org>
+Date:   Mon, 10 Jun 2019 15:00:39 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20190608081907.GB19573@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <20190610214954.694BA95C1DF4@us180.sjc.aristanetworks.com>
-From:   fruggeri@arista.com (Francesco Ruggeri)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> This patch tries to avoid EAGAIN due to nrpages!=0 that was originally trying
-> to drop stale pages resulting in wrong data access.
-> Report: https://bugs.chromium.org/p/chromium/issues/detail?id=938958#c38
+On 6/8/19 1:19 AM, Christoph Hellwig wrote:
+> On Tue, Jun 04, 2019 at 11:17:35AM -0700, Bart Van Assche wrote:
+>> No code that occurs between blk_mq_get_ctx() and blk_mq_put_ctx() depends
+>> on preemption being disabled for its correctness. Since removing the CPU
+>> preemption calls does not measurably affect performance, simplify the
+>> blk-mq code by removing the blk_mq_put_ctx() function and also by not
+>> disabling preemption in blk_mq_get_ctx().
 > 
-> Cc: <stable@vger.kernel.org>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: linux-block@vger.kernel.org
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Fixes: 5db470e229e2 ("loop: drop caches if offset or block_size are changed")
-> Reported-by: Gwendal Grignou <gwendal@chromium.org>
-> Reported-by: grygorii tertychnyi <gtertych@cisco.com>
-> Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
-> ---
-> v2 from v1:
->  - remove obsolete jump
+> I like the idea behinds this, but I think it makes some small issues
+> we have in the current code even worse.  As far as I can tell the idea
+> behind this call was that we operate on the same blk_mq_ctx for the
+> duration of the I/O submission.  Now it should not matter which one,
+> that is we don't care if we get preempted, but it should stay the same.
 
-FWIW, after applying this patch to 4.19.47, losetup is not failing any
-more for me.
+Hi Christoph,
+
+Can you clarify this? Isn't the goal of the rq->mq_ctx = data->ctx 
+assignment in blk_mq_rq_ctx_init() to ensure that the same blk_mq_ctx is 
+used during I/O submission? As you know blk_mq_rq_ctx_init() is called 
+immediately after a tag has been allocated.
+
+> To actually make this work properly we'll need to pass down the
+> blk_mq_ctx into the I/O scheduler merge path, which dereference it.
+> Note that I also have an outstanding series to pass down an additional
+> parameter there (the bi_phys_segments removal) so we'll need to
+> coordinate that.
+
+I can wait until Jens has queued your patch series.
 
 Thanks,
-Francesco Ruggeri
 
-
+Bart.
