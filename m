@@ -2,218 +2,316 @@ Return-Path: <SRS0=HnxX=UJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B30A7C468C1
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 07:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7E4C282DD
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 07:31:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F39020859
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 07:00:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10C9E207E0
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 07:31:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=rolffokkens-nl.20150623.gappssmtp.com header.i=@rolffokkens-nl.20150623.gappssmtp.com header.b="Zz4dLKxU"
+	dkim=pass (1024-bit key) header.d=renesasgroup.onmicrosoft.com header.i=@renesasgroup.onmicrosoft.com header.b="BRar77VK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387581AbfFJHAO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jun 2019 03:00:14 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:35008 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387582AbfFJHAO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jun 2019 03:00:14 -0400
-Received: by mail-ed1-f65.google.com with SMTP id p26so8950689edr.2
-        for <linux-block@vger.kernel.org>; Mon, 10 Jun 2019 00:00:12 -0700 (PDT)
+        id S2388114AbfFJHbn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jun 2019 03:31:43 -0400
+Received: from mail-eopbgr1410128.outbound.protection.outlook.com ([40.107.141.128]:44785
+        "EHLO JPN01-OS2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2387967AbfFJHbn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Jun 2019 03:31:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rolffokkens-nl.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=LQhehqtq8fMuRJzB7DLeP42zs/UG9SufevuxSkGPf3w=;
-        b=Zz4dLKxUknwsuAFDbmnmdCN3YE5BO5/jWlUsdoW48ZSiSMkaJsScsu8Um+zOedh7bS
-         IuT9eQtdWWJYHIW3vZgGy2ndH1JVQT3aw0uK3u1m+vmNaOKERr2uf3zARl7h6SRotPqJ
-         jG2ajrYcU+xdMPDizpHm6xGlPcrHTd+vVPtCmsPpx8TJlQJYSmCZqdUoRqVpnzqFxD+M
-         CyDYN3n6HbvKmoiS3oljI9CudBXlUAKxt3novoFrK1iP3d52hQ4uFZyrwNxcQTGcirmw
-         7HKVzCnkKe/LGZe46xCf5x+yThgXJcGvAVRYh1Z/aBe/dXhRgWkXvoxBYo9k4lOr49hh
-         HPWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=LQhehqtq8fMuRJzB7DLeP42zs/UG9SufevuxSkGPf3w=;
-        b=SsWKaY0YKcxW88EESz+CroVYcd3P5A4rSa1/DchicylrPKOvRpEp51beXBaZuicHGb
-         2ZhWdp/11lwHrYebuannA5xJ/au5dsyKLortVOBSjN2rsWpFbYlnyiBYvP5seBlsgrPG
-         snybG2vIP0YREqGHPkC6WxM6t8aSqkAe9nAxDLnKl/VXyPOJqHMXnMzpkEVgEepoPr5V
-         R/WTMuHgS9WfZoYvUeJlnzwe7+P1Y8ULQ5OoLxNLObqpe55GAWNtNb0mK2pz4v6Fwiyb
-         B0biFnOKheLS/RKolm5YFb4Sr524f0dZ2TEZksNGmecvjpekey+Wb0x6RJQVA2BRljJ8
-         rJHA==
-X-Gm-Message-State: APjAAAUqESy+ZfGuggjprjRuBg+Ct5SoIuXlQvGzoAdiYtTiLf2vXqMW
-        yTRWShfBTuLF0G5j3BI/7J2JRQ==
-X-Google-Smtp-Source: APXvYqwEVu3ZmXHTAWdaVGvy8kjqnWLmJHIzAqzuQylhoQ0scVA26tk/UyyFy0QhQua5J5actB6m8A==
-X-Received: by 2002:a17:906:770c:: with SMTP id q12mr19381097ejm.185.1560150011357;
-        Mon, 10 Jun 2019 00:00:11 -0700 (PDT)
-Received: from home07.rolf-en-monique.lan (94-212-138-219.cable.dynamic.v4.ziggo.nl. [94.212.138.219])
-        by smtp.gmail.com with ESMTPSA id g2sm1671030eja.23.2019.06.10.00.00.10
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 10 Jun 2019 00:00:10 -0700 (PDT)
-Subject: Re: [PATCH V2] bcache: fix stack corruption by PRECEDING_KEY()
-From:   Rolf Fokkens <rolf@rolffokkens.nl>
-To:     Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Nix <nix@esperi.org.uk>
-References: <20190609152400.18887-1-colyli@suse.de>
- <a6150834-d7a6-986e-7a99-b9fb17d84a8d@rolffokkens.nl>
-Message-ID: <0ecfba65-f978-c9a3-080a-c9445cf1adf0@rolffokkens.nl>
-Date:   Mon, 10 Jun 2019 09:00:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ d=renesasgroup.onmicrosoft.com; s=selector2-renesasgroup-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rGJt1VTaUTvffEvomtyhnuZs9ShL45sUIb2uOhTpNTs=;
+ b=BRar77VKdFfOZ7koT4DykJ1aaOcVOpk4+ANC/ggq6gZ+NbjkQd61W6eOI19hCoQVUd4MAOKi3L5dcp3eqV283TsoTfKgsMjLqH2VfgXfvwB79wqKvIJzQ1ZKquqL3v+PaIQ+BYe5zhaFkGNZPx/ZKcHBBwk3aUZyRswK2wK9G38=
+Received: from OSBPR01MB2103.jpnprd01.prod.outlook.com (52.134.242.17) by
+ OSBPR01MB4741.jpnprd01.prod.outlook.com (20.179.184.76) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1965.12; Mon, 10 Jun 2019 07:31:34 +0000
+Received: from OSBPR01MB2103.jpnprd01.prod.outlook.com
+ ([fe80::a146:39f0:5df9:11bc]) by OSBPR01MB2103.jpnprd01.prod.outlook.com
+ ([fe80::a146:39f0:5df9:11bc%7]) with mapi id 15.20.1965.017; Mon, 10 Jun 2019
+ 07:31:34 +0000
+From:   Biju Das <biju.das@bp.renesas.com>
+To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Christoph Hellwig <hch@lst.de>
+CC:     Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
+Subject: RE: How to resolve an issue in swiotlb environment?
+Thread-Topic: How to resolve an issue in swiotlb environment?
+Thread-Index: AdUZ1Qlk800+Qz0uSuO63mIBeXkktQDUe+5AAI1coZA=
+Date:   Mon, 10 Jun 2019 07:31:34 +0000
+Message-ID: <OSBPR01MB21038C8C8186797D9EC18489B8130@OSBPR01MB2103.jpnprd01.prod.outlook.com>
+References: <OSAPR01MB3089B381AF2F687526E63EEAD8140@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+ <OSAPR01MB3089D50DBDAA6C7D427E72EED8100@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+In-Reply-To: <OSAPR01MB3089D50DBDAA6C7D427E72EED8100@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=biju.das@bp.renesas.com; 
+x-originating-ip: [193.141.220.21]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1f541200-8109-4679-d021-08d6ed75aa92
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:OSBPR01MB4741;
+x-ms-traffictypediagnostic: OSBPR01MB4741:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <OSBPR01MB4741C7413819C05B152D7B0DB8130@OSBPR01MB4741.jpnprd01.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:369;
+x-forefront-prvs: 0064B3273C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(396003)(346002)(136003)(366004)(39860400002)(53754006)(189003)(199004)(6506007)(102836004)(14454004)(478600001)(64756008)(99286004)(45080400002)(76176011)(2906002)(186003)(66556008)(66476007)(73956011)(66946007)(76116006)(26005)(54906003)(74316002)(316002)(7696005)(7736002)(66446008)(966005)(110136005)(256004)(5024004)(14444005)(305945005)(66066001)(6246003)(486006)(86362001)(229853002)(3846002)(446003)(6436002)(6116002)(71190400001)(71200400001)(44832011)(11346002)(25786009)(4326008)(476003)(8676002)(68736007)(81156014)(6306002)(53936002)(52536014)(33656002)(8936002)(55016002)(81166006)(9686003)(5660300002)(6606295002);DIR:OUT;SFP:1102;SCL:1;SRVR:OSBPR01MB4741;H:OSBPR01MB2103.jpnprd01.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:0;
+received-spf: None (protection.outlook.com: bp.renesas.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: /H0xkQu6fUQPN3Pr8bE5mU0hpmQosctQDfHb/R01EIbW7dE0SVKZY2YHbEcvA/XjTYGJzmmMpAIScHysHkgBe+IPRoKTvUvGK0UupQ5MRtpodto+TR1g/uzDPyV/tDBSu5/YSQHSumKGVwChL4OEZM7nObhtB8jNyr/KiM4ZtWr77PVWSkHlr9Xe6qyo/DGJSPNeixFGpEKpdMZYoqVROkAsYUqP0WNbzrb/xD5IfkXQ2+zsFZ2hT7DS1hidRMx1Q2vag4nfr4eGW4qbqP9meMr3U9XgOjUJ+6U2pZPj+HCoUjoOIeH6+1CFfakjoayyYXAx0R6jZXJp+ETbdh6bQ5jXzDRDyPWgXb0i/yhKym7367advWsMcVjXEFuS7i51XMf1Ty0wAaq2QLAcZelPr3l9I5yGWfBYD98ED+fxKqQ=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <a6150834-d7a6-986e-7a99-b9fb17d84a8d@rolffokkens.nl>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: nl-NL
+X-OriginatorOrg: bp.renesas.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f541200-8109-4679-d021-08d6ed75aa92
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2019 07:31:34.6439
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: biju.das@bp.renesas.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSBPR01MB4741
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Did some testing, and I should not have underestimated the gcc 
-optimizer. The inline function seems like a fine alternative for the macro.
+Hi All,
 
-On 6/9/19 8:28 PM, Rolf Fokkens wrote:
-> I haven't tested the fix (yet), but just looking at the code I'm 
-> perfectly fine with the proposed replacement of the macro 
-> PRECEDING_KEY by the preceding_key function.
->
-> I have some minor concerns about the efficiency of the amount of 
-> indirections, but the gcc optimizer may take care of this. This is for 
-> later concern anyway.
->
-> On 6/9/19 5:24 PM, Coly Li wrote:
->> Recently people report bcache code compiled with gcc9 is broken, one of
->> the buggy behavior I observe is that two adjacent 4KB I/Os should merge
->> into one but they don't. Finally it turns out to be a stack corruption
->> caused by macro PRECEDING_KEY().
->>
->> See how PRECEDING_KEY() is defined in bset.h,
->> 437 #define PRECEDING_KEY(_k)                                       \
->> 438 ({ \
->> 439         struct bkey *_ret = NULL;                               \
->> 440                                                                 \
->> 441         if (KEY_INODE(_k) || KEY_OFFSET(_k)) {                  \
->> 442                 _ret = &KEY(KEY_INODE(_k), KEY_OFFSET(_k), 0);  \
->> 443                                                                 \
->> 444                 if (!_ret->low)                                 \
->> 445 _ret->high--;                           \
->> 446 _ret->low--;                                    \
->> 447 }                                                       \
->> 448                                                                 \
->> 449 _ret;                                                   \
->> 450 })
->>
->> At line 442, _ret points to address of a on-stack variable combined by
->> KEY(), the life range of this on-stack variable is in line 442-446,
->> once _ret is returned to bch_btree_insert_key(), the returned address
->> points to an invalid stack address and this address is overwritten in
->> the following called bch_btree_iter_init(). Then argument 'search' of
->> bch_btree_iter_init() points to some address inside stackframe of
->> bch_btree_iter_init(), exact address depends on how the compiler
->> allocates stack space. Now the stack is corrupted.
->>
->> Signed-off-by: Coly Li <colyli@suse.de>
->> Reviewed-by: Rolf Fokkens <rolf@rolffokkens.nl>
->> Reviewed-by: Pierre JUHEN <pierre.juhen@orange.fr>
->> Tested-by: Shenghui Wang <shhuiw@foxmail.com>
->> Cc: Kent Overstreet <kent.overstreet@gmail.com>
->> Cc: Nix <nix@esperi.org.uk>
->> ---
->> Changlog:
->> V2: Fix a pointer assignment problem in preceding_key(), which is
->>      pointed by Rolf Fokkens and Pierre JUHEN.
->> V1: Initial RFC patch for review and comment.
->>
->>   drivers/md/bcache/bset.c | 16 +++++++++++++---
->>   drivers/md/bcache/bset.h | 34 ++++++++++++++++++++--------------
->>   2 files changed, 33 insertions(+), 17 deletions(-)
->>
->> diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
->> index 8f07fa6e1739..268f1b685084 100644
->> --- a/drivers/md/bcache/bset.c
->> +++ b/drivers/md/bcache/bset.c
->> @@ -887,12 +887,22 @@ unsigned int bch_btree_insert_key(struct 
->> btree_keys *b, struct bkey *k,
->>       struct bset *i = bset_tree_last(b)->data;
->>       struct bkey *m, *prev = NULL;
->>       struct btree_iter iter;
->> +    struct bkey preceding_key_on_stack = ZERO_KEY;
->> +    struct bkey *preceding_key_p = &preceding_key_on_stack;
->>         BUG_ON(b->ops->is_extents && !KEY_SIZE(k));
->>   -    m = bch_btree_iter_init(b, &iter, b->ops->is_extents
->> -                ? PRECEDING_KEY(&START_KEY(k))
->> -                : PRECEDING_KEY(k));
->> +    /*
->> +     * If k has preceding key, preceding_key_p will be set to address
->> +     *  of k's preceding key; otherwise preceding_key_p will be set
->> +     * to NULL inside preceding_key().
->> +     */
->> +    if (b->ops->is_extents)
->> +        preceding_key(&START_KEY(k), &preceding_key_p);
->> +    else
->> +        preceding_key(k, &preceding_key_p);
->> +
->> +    m = bch_btree_iter_init(b, &iter, preceding_key_p);
->>         if (b->ops->insert_fixup(b, k, &iter, replace_key))
->>           return status;
->> diff --git a/drivers/md/bcache/bset.h b/drivers/md/bcache/bset.h
->> index bac76aabca6d..c71365e7c1fa 100644
->> --- a/drivers/md/bcache/bset.h
->> +++ b/drivers/md/bcache/bset.h
->> @@ -434,20 +434,26 @@ static inline bool bch_cut_back(const struct 
->> bkey *where, struct bkey *k)
->>       return __bch_cut_back(where, k);
->>   }
->>   -#define PRECEDING_KEY(_k)                    \
->> -({                                \
->> -    struct bkey *_ret = NULL;                \
->> -                                \
->> -    if (KEY_INODE(_k) || KEY_OFFSET(_k)) {            \
->> -        _ret = &KEY(KEY_INODE(_k), KEY_OFFSET(_k), 0);    \
->> -                                \
->> -        if (!_ret->low)                    \
->> -            _ret->high--;                \
->> -        _ret->low--;                    \
->> -    }                            \
->> -                                \
->> -    _ret;                            \
->> -})
->> +/*
->> + * Pointer '*preceding_key_p' points to a memory object to store 
->> preceding
->> + * key of k. If the preceding key does not exist, set 
->> '*preceding_key_p' to
->> + * NULL. So the caller of preceding_key() needs to take care of memory
->> + * which '*preceding_key_p' pointed to before calling preceding_key().
->> + * Currently the only caller of preceding_key() is 
->> bch_btree_insert_key(),
->> + * and it points to an on-stack variable, so the memory release is 
->> handled
->> + * by stackframe itself.
->> + */
->> +static inline void preceding_key(struct bkey *k, struct bkey 
->> **preceding_key_p)
->> +{
->> +    if (KEY_INODE(k) || KEY_OFFSET(k)) {
->> +        (**preceding_key_p) = KEY(KEY_INODE(k), KEY_OFFSET(k), 0);
->> +        if (!(*preceding_key_p)->low)
->> +            (*preceding_key_p)->high--;
->> +        (*preceding_key_p)->low--;
->> +    } else {
->> +        (*preceding_key_p) = NULL;
->> +    }
->> +}
->>     static inline bool bch_ptr_invalid(struct btree_keys *b, const 
->> struct bkey *k)
->>   {
->
->
+Any update on the below issue. I am seeing similar issue on RZ/G2M board wi=
+th Linux version 5.2.0-rc3.
+
+root@hihope-rz-g2m:~# [   35.414177] usb 2-1: new SuperSpeed Gen 1 USB devi=
+ce number 2 using xhci-hcd
+[   35.449402] usb-storage 2-1:1.0: USB Mass Storage device detected
+[   35.455915] scsi host0: usb-storage 2-1:1.0
+[   36.482585] scsi 0:0:0:0: Direct-Access     SanDisk  Extreme          00=
+01 PQ: 0 ANSI: 6
+[   36.491260] sd 0:0:0:0: [sda] 125045424 512-byte logical blocks: (64.0 G=
+B/59.6 GiB)
+[   36.499823] sd 0:0:0:0: [sda] Write Protect is off
+[   36.505474] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled,=
+ doesn't support DPO or FUA
+[   36.518074]  sda: sda1
+[   36.523163] sd 0:0:0:0: [sda] Attached SCSI disk
+
+root@hihope-rz-g2m:~# mkdir -p /tmp/rmnt/sda1
+root@hihope-rz-g2m:~# mount -t auto /dev/sda1 /tmp/rmnt/sda1
+root@hihope-rz-g2m:~# dd if=3D/dev/urandom of=3D/tmp/sda1-random bs=3D1024 =
+count=3D10240
+10240+0 records in
+10240+0 records out
+10485760 bytes (10 MB, 10 MiB) copied, 0.187696 s, 55.9 MB/s
+root@hihope-rz-g2m:~# cp /tmp/sda1-random /tmp/rmnt/sda1/sda1-random
+root@hihope-rz-g2m:~# [  218.861212] xhci-hcd ee000000.usb: swiotlb buffer =
+is full (sz: 1003520 bytes), total 32768 (slots), used 1088 (slots)
+[  218.871885] xhci-hcd ee000000.usb: overflow 0x000000067430b000+1003520 o=
+f DMA mask ffffffff bus mask 0
+[  218.881233] WARNING: CPU: 0 PID: 258 at kernel/dma/direct.c:43 report_ad=
+dr+0x38/0xa8
+[  218.888974] Modules linked in: renesas_usb3 usb_dmac phy_rcar_gen3_usb3
+[  218.895594] CPU: 0 PID: 258 Comm: usb-storage Not tainted 5.2.0-rc3-0001=
+7-gc80b083-dirty #5
+[  218.903940] Hardware name: HopeRun HiHope RZ/G2M with sub board (DT)
+[  218.910291] pstate: 40000005 (nZcv daif -PAN -UAO)
+[  218.915078] pc : report_addr+0x38/0xa8
+[  218.918821] lr : report_addr+0xa0/0xa8
+[  218.922564] sp : ffff0000125fb970
+[  218.925872] x29: ffff0000125fb970 x28: 0000000000000000
+[  218.931180] x27: 0000000000000000 x26: 000000001f020280
+[  218.936487] x25: ffff8006394a82a8 x24: 0000000000000000
+[  218.941794] x23: 0000000000000001 x22: 0000000000000000
+[  218.947101] x21: 00000000000f5000 x20: ffff000011309000
+[  218.952408] x19: ffff80063a600010 x18: ffffffffffffffff
+[  218.957714] x17: 0000000000000000 x16: 0000000000000000
+[  218.963023] x15: ffff0000113096c8 x14: 4d4420666f203032
+[  218.968331] x13: 35333030312b3030 x12: 3062303334373630
+[  218.973638] x11: 3030303030307830 x10: ffff000011309f20
+[  218.978945] x9 : ffff0000112e3018 x8 : 0000000000000123
+[  218.984252] x7 : 0000000000000005 x6 : ffff80063b578180
+[  218.989559] x5 : ffff80063b578180 x4 : 0000000000000000
+[  218.994865] x3 : ffff80063b57ef10 x2 : eed25f279b69f300
+[  219.000172] x1 : eed25f279b69f300 x0 : 0000000000000000
+[  219.005481] Call trace:
+[  219.007923]  report_addr+0x38/0xa8
+[  219.011321]  dma_direct_map_page+0x148/0x158
+[  219.015586]  dma_direct_map_sg+0x78/0xe0
+[  219.019510]  usb_hcd_map_urb_for_dma+0x2fc/0x468
+[  219.024124]  xhci_map_urb_for_dma+0x54/0x68
+[  219.028303]  usb_hcd_submit_urb+0x88/0x968
+[  219.032394]  usb_submit_urb+0x3b0/0x570
+[  219.036226]  usb_sg_wait+0x98/0x158
+[  219.039711]  usb_stor_bulk_transfer_sglist.part.3+0x94/0x128
+[  219.045366]  usb_stor_bulk_srb+0x48/0x88
+[  219.049283]  usb_stor_Bulk_transport+0x10c/0x390
+[  219.053896]  usb_stor_invoke_transport+0x3c/0x500
+[  219.058595]  usb_stor_transparent_scsi_command+0xc/0x18
+[  219.063816]  usb_stor_control_thread+0x1c4/0x260
+[  219.068431]  kthread+0x124/0x128
+[  219.071660]  ret_from_fork+0x10/0x18
+[  219.075229] ---[ end trace dd9ef2a6b7fef860 ]---
+[  219.080087] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  219.090810] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  219.101510] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  219.112209] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  219.122901] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  219.133591] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  219.144283] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  219.154973] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  219.165674] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  223.861717] swiotlb_tbl_map_single: 67451 callbacks suppressed
+[  223.861721] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  223.878249] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  223.888940] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  223.899630] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  223.910318] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  223.921005] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  223.931695] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  223.942387] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  223.953077] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  223.963765] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  228.865664] swiotlb_tbl_map_single: 70409 callbacks suppressed
+[  228.865668] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  228.882188] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  228.892878] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  228.903567] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  228.914256] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  228.924944] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  228.935636] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  228.946326] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  228.957015] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+[  228.967705] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 1003520 b=
+ytes), total 32768 (slots), used 1088 (slots)
+
+Regards,
+Biju
+
+> Subject: RE: How to resolve an issue in swiotlb environment?
+>=20
+> Hi Christoph,
+>=20
+> I think we should continue to discuss on this email thread instead of the=
+ fixed
+> DMA-API.txt patch [1]
+>=20
+> [1]
+> https://marc.info/?t=3D155989412200001&r=3D1&w=3D2
+>=20
+> > From: Yoshihiro Shimoda, Sent: Monday, June 3, 2019 3:42 PM
+> >
+> > Hi linux-block and iommu mailing lists,
+> >
+> > I have an issue that a USB SSD with xHCI on R-Car H3 causes "swiotlb is=
+ full"
+> like below.
+> >
+> >     [   36.745286] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 5=
+24288
+> bytes), total 32768 (slots), used 1338 (slots)
+> >
+> > I have investigated this issue by using git bisect, and then I found th=
+e
+> following commit:
+> >
+> > ---
+> > commit 09324d32d2a0843e66652a087da6f77924358e62
+> > Author: Christoph Hellwig <hch@lst.de>
+> > Date:   Tue May 21 09:01:41 2019 +0200
+> >
+> >     block: force an unlimited segment size on queues with a virt
+> > boundary
+> > ---
+>=20
+> Thank you for your comment on other email thread [2] like below:
+> ---
+> Turns out it isn't as simple as I thought, as there doesn't seem to be an=
+ easy
+> way to get to the struct device used for DMA mapping from USB drivers.  I=
+'ll
+> need to think a bit more how to handle that best.
+> ---
+>=20
+> [2]
+> https://marc.info/?l=3Dlinux-doc&m=3D155989651620473&w=3D2
+>=20
+> I'm not sure this is a correct way, but the issue disappears if I applied=
+ a patch
+> below to USB storage driver. Especially, WARNING happened on
+> blk_queue_max_segment_size().
+> Maybe we need to expand the argument "struct device *" of
+> blk_queue_virt_boundary() to call dma_max_mapping_size()?
+> ---
+> diff --git a/drivers/usb/storage/scsiglue.c b/drivers/usb/storage/scsiglu=
+e.c
+> index 59190d8..fa37b39 100644
+> --- a/drivers/usb/storage/scsiglue.c
+> +++ b/drivers/usb/storage/scsiglue.c
+> @@ -28,6 +28,7 @@
+>   * status of a command.
+>   */
+>=20
+> +#include <linux/dma-mapping.h>
+>  #include <linux/module.h>
+>  #include <linux/mutex.h>
+>=20
+> @@ -83,6 +84,15 @@ static int slave_alloc (struct scsi_device *sdev)
+>  	maxp =3D usb_maxpacket(us->pusb_dev, us->recv_bulk_pipe, 0);
+>  	blk_queue_virt_boundary(sdev->request_queue, maxp - 1);
+>=20
+> +{
+> +	struct device *dev =3D us->pusb_dev->bus->controller;
+> +
+> +	dev_info(dev, "%s: size =3D %zu\n", __func__,
+> dma_max_mapping_size(dev));
+> +	blk_queue_max_segment_size(sdev->request_queue,
+> +				   dma_max_mapping_size(dev));
+> +}
+> +
+> +
+>  	/*
+>  	 * Some host controllers may have alignment requirements.
+>  	 * We'll play it safe by requiring 512-byte alignment always.
+> ---
+>=20
+> Best regards,
+> Yoshihiro Shimoda
 
