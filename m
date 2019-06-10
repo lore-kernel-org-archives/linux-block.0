@@ -2,133 +2,190 @@ Return-Path: <SRS0=HnxX=UJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB74C282DD
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 10:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B27C468C1
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 11:13:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 90DFF2085A
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 10:15:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4841920862
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 11:13:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="HES4OQU6"
+	dkim=pass (1024-bit key) header.d=renesasgroup.onmicrosoft.com header.i=@renesasgroup.onmicrosoft.com header.b="lP8qKNje"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388489AbfFJKPl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jun 2019 06:15:41 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:34857 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388734AbfFJKPl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jun 2019 06:15:41 -0400
-Received: by mail-ot1-f67.google.com with SMTP id j19so7778845otq.2
-        for <linux-block@vger.kernel.org>; Mon, 10 Jun 2019 03:15:41 -0700 (PDT)
+        id S2389667AbfFJLNN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jun 2019 07:13:13 -0400
+Received: from mail-eopbgr1400093.outbound.protection.outlook.com ([40.107.140.93]:52562
+        "EHLO JPN01-TY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2389001AbfFJLNM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Jun 2019 07:13:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=L/Fpx5ax3FSv1vsl05RpWDU1kFWGRR0oLTZTCT52Dhg=;
-        b=HES4OQU6huVUOA8Ypw9ptPG1nA4Uv6pn+9wG7iiwr56eddgvTzzs3o9ps7OsWmaP14
-         UTn7CHT2bxh23YDWcQQ5iNP86lLzVVowr7xycaDWtMEDPsgm6D90NnQLpU9P/A4O05Yt
-         fJYtzCMhSUhbPaNw/LJVCirw/kDfJE8aGx/f8pwn6ZAlbtIUEJCl3kjglikLJ1uoBGu2
-         Sxj3mBGpoJhvGUMIPPtVChaWR2IZhm3YotXjeSUCkgZdDFVSCCSbJOH6i1WNZeF0vr3E
-         faV0/pf5dStZadFTxuauD1ss2lMlSOqIYqJDc3zTZt69o49fOuLZGgYpdT8AB+JyLVBT
-         z9YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=L/Fpx5ax3FSv1vsl05RpWDU1kFWGRR0oLTZTCT52Dhg=;
-        b=JgEW75DLzjel291MrHxZknZz91H9QBM8vHxEjdCdq5ScwL2v5y/kgCwJzKPnhr5h0+
-         NCwGQPsE/H3Pl9KL6V+8Rhy1pDg58OvQuEfOJt6GSv4P7fRYp5ke/lVOUubRGz+5WQfV
-         c4+I/vezNMTxA9Yat+VgcK1TEx3+euzzJLRZsbAVUdaymqfCTDbBgx2cYneyL1BAKbaJ
-         Uziz9rfSmZFPz887+Rm6WA4H9EvDr4U71e+XGBfeGHzSR/whs5hAm41vEPrlACJ8UBmg
-         VLLm3lIl1GIkog25j43lxZrVIC5DxaaCnw8hf7K17RW6W9uAmCFpNGSikVEmYMDBEI+Z
-         hT7g==
-X-Gm-Message-State: APjAAAVfQStJK/lfV2J2bze/ndHpymOCV1VfBMP1UViVqUxQ+WW5RiSj
-        mkBxWKJqDz65L35wSs5d+it3yduYlkDob1jq
-X-Google-Smtp-Source: APXvYqzefV6s2avYclwY/dRUQ6u5/mzLFwhhu2cqT8UGXIzxrCAhLCkIh+G/dVqv/C5VOJ/tssOSUw==
-X-Received: by 2002:a05:6830:1050:: with SMTP id b16mr13768724otp.228.1560161740167;
-        Mon, 10 Jun 2019 03:15:40 -0700 (PDT)
-Received: from [172.20.10.3] (mobile-107-92-56-198.mycingular.net. [107.92.56.198])
-        by smtp.gmail.com with ESMTPSA id v18sm1091554otn.17.2019.06.10.03.15.31
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 10 Jun 2019 03:15:38 -0700 (PDT)
-Subject: Re: [GIT PULL] Block fixes for 5.2-rc4
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <4f801c9b-4ab6-9a11-536c-ff509df8aa56@kernel.dk>
- <CAHk-=whXfPjCtc5+471x83WApJxvxzvSfdzj_9hrdkj-iamA=g@mail.gmail.com>
- <52daccae-3228-13a1-c609-157ab7e30564@kernel.dk>
- <CAHk-=whca9riMqYn6WoQpuq9ehQ5KfBvBb4iVZ314JSfvcgy9Q@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ebfb27a3-23e2-3ad5-a6b3-5f8262fb9ecb@kernel.dk>
-Date:   Mon, 10 Jun 2019 04:15:27 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ d=renesasgroup.onmicrosoft.com; s=selector2-renesasgroup-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mv1cB6TYVqqrUWnJnAL27fz2RL0totzSyKRsj0PLFMo=;
+ b=lP8qKNjeMfnhKUvehlqDPW1551+49VM/xdJmAEqTSGN4fU7KcmkgeSboeUexpcK/zgO6LC48C4OyYKH6pwZSu5g18vCK4nNaSWNAlEFSsELAh3mO7ZajwPzEldGDY2OnzH2D1+gOWtGS7fBn5Zw+7QPG+CNdbY0b+ujEVYbbWhI=
+Received: from OSAPR01MB3089.jpnprd01.prod.outlook.com (52.134.247.150) by
+ OSAPR01MB3924.jpnprd01.prod.outlook.com (20.178.103.206) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1965.14; Mon, 10 Jun 2019 11:13:08 +0000
+Received: from OSAPR01MB3089.jpnprd01.prod.outlook.com
+ ([fe80::19ad:b6ce:a287:dc85]) by OSAPR01MB3089.jpnprd01.prod.outlook.com
+ ([fe80::19ad:b6ce:a287:dc85%7]) with mapi id 15.20.1965.017; Mon, 10 Jun 2019
+ 11:13:08 +0000
+From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To:     Christoph Hellwig <hch@lst.de>,
+        Alan Stern <stern@rowland.harvard.edu>
+CC:     Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
+Subject: RE: How to resolve an issue in swiotlb environment?
+Thread-Topic: How to resolve an issue in swiotlb environment?
+Thread-Index: AdUZ1Qlk800+Qz0uSuO63mIBeXkktQDUe+5AAJUL5SA=
+Date:   Mon, 10 Jun 2019 11:13:07 +0000
+Message-ID: <OSAPR01MB3089BCA7CF78D6E4D9C83E1BD8130@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+References: <OSAPR01MB3089B381AF2F687526E63EEAD8140@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+ <OSAPR01MB3089D50DBDAA6C7D427E72EED8100@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+In-Reply-To: <OSAPR01MB3089D50DBDAA6C7D427E72EED8100@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=yoshihiro.shimoda.uh@renesas.com; 
+x-originating-ip: [118.238.235.108]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4065dcc2-72a5-405b-85a5-08d6ed949e46
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:OSAPR01MB3924;
+x-ms-traffictypediagnostic: OSAPR01MB3924:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <OSAPR01MB3924B1967F84D0D57C9C01C5D8130@OSAPR01MB3924.jpnprd01.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2399;
+x-forefront-prvs: 0064B3273C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(366004)(39860400002)(376002)(346002)(136003)(189003)(199004)(6306002)(9686003)(186003)(3846002)(6436002)(14444005)(55016002)(305945005)(7736002)(256004)(6116002)(74316002)(2906002)(26005)(229853002)(11346002)(446003)(66066001)(99286004)(7696005)(110136005)(81156014)(102836004)(81166006)(478600001)(54906003)(8936002)(316002)(8676002)(76176011)(6506007)(6246003)(476003)(966005)(486006)(5660300002)(76116006)(33656002)(66446008)(64756008)(2171002)(73956011)(66556008)(66476007)(66946007)(53936002)(14454004)(86362001)(68736007)(52536014)(4326008)(25786009)(71200400001)(71190400001)(6606295002);DIR:OUT;SFP:1102;SCL:1;SRVR:OSAPR01MB3924;H:OSAPR01MB3089.jpnprd01.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: renesas.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: NgAafUU9h7+iTES7NU8K82hVUXph3Ln8Byr3rdskx+lFCEIf7WQogi6Ega2SRgYGZEP5q8wpoWROVyQNQ6gZ7gB//wXWIfZZEBmvWKi0rOa3KMSohJYV0tW4sGsD90Go4aAjLNxY5X1ocz1ENccxJdB2c8UkFFz+8l1w82dhDshV0U9oCS1gtmYWKLsfKoi2jKySRhUjThwZB1XZA/a6LOAep0GKKfniaNwjSGJdgZjoKcZfKIoD/e+vinGyAyzljxYWJ9g6ZxkMG2qwz+fEg885bDyKqel/iLbOOZs8cmw51HAz33yokmi58S35q5PoAhxUP3kI89+TbkSW7/bv041+ngM9rRtkqCxsROKHNFldSY6pUc1ES4mvfZbbArvQOL8zyrbniXlPlywDcFFbtUsz3OVt1mIzYMRIg2I9xdc=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <CAHk-=whca9riMqYn6WoQpuq9ehQ5KfBvBb4iVZ314JSfvcgy9Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: renesas.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4065dcc2-72a5-405b-85a5-08d6ed949e46
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2019 11:13:08.3860
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yoshihiro.shimoda.uh@renesas.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSAPR01MB3924
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/9/19 10:06 AM, Linus Torvalds wrote:
-> On Sat, Jun 8, 2019 at 11:00 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> FWIW, the concept/idea goes back a few months and was discussed with
->> the cgroup folks. But I totally agree that the implementation could
->> have been cleaner, especially at this point in time.
->>
->> I'm fine with you reverting those two patches for 5.2 if you want to,
->> and the BFQ folks can do this more cleanly for 5.3.
-> 
-> I don't think the code is _broken_, and I don't think the link_name
-> thing is wrong. So no point in reverting unless we see more issues.
-> 
-> I just wish it had been done differently, both from the patch details
-> standpoint, but also in making sure the cgroup people were aware (and
-> maybe they were, but it certainly didn't show up in the commit).
-> 
-> So I think an incremental patch like the attached would make the code
-> easier to understand (I really do mis-like random boolean flags being
-> passed around that change behavior in undocumented and non-obvious
-> ways), but I'd also want to make sure that Tejun & co are all on board
-> and know about it..
-> 
-> I'm sure this happens a lot, but during the rc series I just end up
-> *looking* at details like this a lot more, when I see changes outside
-> of a subsystem directory.
-> 
-> Tejun&co, we're talking about commit 54b7b868e826 ("cgroup: let a
-> symlink too be created with a cftype file") which didn't have any sign
-> of you guys being aware of it or having acked it.
+Hi Christoph, Alan,
+(add linux-usb ML on CC.)
 
-I talked to Tejun about this offline, and he's not a huge fan of the
-symlink. So let's revert this for now, and Paolo can do this properly
-for 5.3 instead.
+> From: Yoshihiro Shimoda, Sent: Friday, June 7, 2019 9:00 PM
+>=20
+> Hi Christoph,
+>=20
+> I think we should continue to discuss on this email thread instead of the=
+ fixed DMA-API.txt patch [1]
+>=20
+> [1]
+> https://marc.info/?t=3D155989412200001&r=3D1&w=3D2
+>=20
+> > From: Yoshihiro Shimoda, Sent: Monday, June 3, 2019 3:42 PM
+> >
+> > Hi linux-block and iommu mailing lists,
+> >
+> > I have an issue that a USB SSD with xHCI on R-Car H3 causes "swiotlb is=
+ full" like below.
+> >
+> >     [   36.745286] xhci-hcd ee000000.usb: swiotlb buffer is full (sz: 5=
+24288 bytes), total 32768 (slots), used 1338
+> (slots)
+> >
+> > I have investigated this issue by using git bisect, and then I found th=
+e following commit:
+> >
+> > ---
+> > commit 09324d32d2a0843e66652a087da6f77924358e62
+> > Author: Christoph Hellwig <hch@lst.de>
+> > Date:   Tue May 21 09:01:41 2019 +0200
+> >
+> >     block: force an unlimited segment size on queues with a virt bounda=
+ry
+> > ---
+>=20
+> Thank you for your comment on other email thread [2] like below:
+> ---
+> Turns out it isn't as simple as I thought, as there doesn't seem to
+> be an easy way to get to the struct device used for DMA mapping
+> from USB drivers.  I'll need to think a bit more how to handle that
+> best.
+> ---
+>=20
+> [2]
+> https://marc.info/?l=3Dlinux-doc&m=3D155989651620473&w=3D2
 
-Sorry for the confusion! Please pull the below.
+I have another way to avoid the issue. But it doesn't seem that a good way =
+though...
+According to the commit that adding blk_queue_virt_boundary() [3],
+this is needed for vhci_hcd as a workaround so that if we avoid to call it
+on xhci-hcd driver, the issue disappeared. What do you think?
+JFYI, I pasted a tentative patch in the end of email [4].
 
+---
+[3]
+commit 747668dbc061b3e62bc1982767a3a1f9815fcf0e
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Mon Apr 15 13:19:25 2019 -0400
 
-  git://git.kernel.dk/linux-block.git tags/for-linus-20190610
-
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      cgroup/bfq: revert bfq.weight symlink change
-
- block/bfq-cgroup.c          |  6 ++----
- include/linux/cgroup-defs.h |  3 ---
- kernel/cgroup/cgroup.c      | 33 ++++-----------------------------
- 3 files changed, 6 insertions(+), 36 deletions(-)
-
--- 
-Jens Axboe
+    usb-storage: Set virt_boundary_mask to avoid SG overflows
+---
+[4]
+diff --git a/drivers/usb/storage/scsiglue.c b/drivers/usb/storage/scsiglue.=
+c
+index 59190d8..277c6f7e 100644
+--- a/drivers/usb/storage/scsiglue.c
++++ b/drivers/usb/storage/scsiglue.c
+@@ -30,6 +30,8 @@
+=20
+ #include <linux/module.h>
+ #include <linux/mutex.h>
++#include <linux/usb.h>
++#include <linux/usb/hcd.h>
+=20
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_cmnd.h>
+@@ -65,6 +67,7 @@ static const char* host_info(struct Scsi_Host *host)
+ static int slave_alloc (struct scsi_device *sdev)
+ {
+ 	struct us_data *us =3D host_to_us(sdev->host);
++	struct usb_hcd *hcd =3D bus_to_hcd(us->pusb_dev->bus);
+ 	int maxp;
+=20
+ 	/*
+@@ -80,8 +83,10 @@ static int slave_alloc (struct scsi_device *sdev)
+ 	 * Bulk maxpacket value.  Fortunately this value is always a
+ 	 * power of 2.  Inform the block layer about this requirement.
+ 	 */
+-	maxp =3D usb_maxpacket(us->pusb_dev, us->recv_bulk_pipe, 0);
+-	blk_queue_virt_boundary(sdev->request_queue, maxp - 1);
++	if (!strcmp(hcd->driver->description, "vhci_hcd")) {
++		maxp =3D usb_maxpacket(us->pusb_dev, us->recv_bulk_pipe, 0);
++		blk_queue_virt_boundary(sdev->request_queue, maxp - 1);
++	}
+=20
+ 	/*
+ 	 * Some host controllers may have alignment requirements.
+---
+Best regards,
+Yoshihiro Shimoda
 
