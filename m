@@ -2,104 +2,165 @@ Return-Path: <SRS0=HnxX=UJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,UNPARSEABLE_RELAY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30548C43218
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 22:08:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C022C43218
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 23:36:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0CB112082E
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 22:08:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 487F020820
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 23:36:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="HDhf1Lyv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728745AbfFJWIC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jun 2019 18:08:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50200 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728674AbfFJWIC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jun 2019 18:08:02 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C7E933082E20;
-        Mon, 10 Jun 2019 22:07:59 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-126.rdu2.redhat.com [10.10.120.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 49AEA19C59;
-        Mon, 10 Jun 2019 22:07:47 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <25d88489-9850-f092-205e-0a4fc292f41b@schaufler-ca.com>
-References: <25d88489-9850-f092-205e-0a4fc292f41b@schaufler-ca.com> <155991702981.15579.6007568669839441045.stgit@warthog.procyon.org.uk> <be966d9c-e38d-7a30-8d80-fad5f25ab230@tycho.nsa.gov> <0cf7a49d-85f6-fba9-62ec-a378e0b76adf@schaufler-ca.com> <CALCETrX5O18q2=dUeC=hEtK2=t5KQpGBy9XveHxFw36OqkbNOg@mail.gmail.com> <dac74580-5b48-86e4-8222-cac29a9f541d@schaufler-ca.com> <E0925E1F-E5F2-4457-8704-47B6E64FE3F3@amacapital.net> <4b7d02b2-2434-8a7c-66cc-7dbebc37efbc@schaufler-ca.com> <CALCETrU+PKVbrKQJoXj9x_5y+vTZENMczHqyM_Xb85ca5YDZuA@mail.gmail.com>
-To:     Casey Schaufler <casey@schaufler-ca.com>
-Cc:     dhowells@redhat.com, Andy Lutomirski <luto@kernel.org>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        USB list <linux-usb@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        raven@themaw.net, Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paul Moore <paul@paul-moore.com>
-Subject: Re: [RFC][PATCH 00/13] Mount, FS, Block and Keyrings notifications [ver #4]
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <29009.1560204466.1@warthog.procyon.org.uk>
-Date:   Mon, 10 Jun 2019 23:07:46 +0100
-Message-ID: <29010.1560204466@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Mon, 10 Jun 2019 22:08:02 +0000 (UTC)
+        id S2390688AbfFJXgI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jun 2019 19:36:08 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:41538 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390524AbfFJXgI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Jun 2019 19:36:08 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5ANZHHn157019;
+        Mon, 10 Jun 2019 23:35:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2018-07-02;
+ bh=ntWK+pCt536OibhyKkZTvsoWXYa7hqywIuXD5qrZOVw=;
+ b=HDhf1LyvwT2q07uWLPJhlfX17Y9eEOuQbJXH/RGkebIezj2Iy2Vf0WPx55cSpPNyHyil
+ YlJtyoGRp/VJuI8iHBORSfyXe5hjMoz4fX0YvwVgdjNKapWKLga3R6szNyX3ABaMW+eq
+ WAW3DWL3WxSxDdBG0Kz2HZ2UOBILyQIDAioe3zIl+tACSgUSDaS92jIQEspcreXaC0lg
+ zQ1QL5ruRIbee3ix2Hj67ByqgeV6SVWbqA8C2xST0md9YeYRr630WClJI3uMHeO0I/Ml
+ H4i6MgMrZbjWzsnCDtNmiACGDcFIWxqeZeAE4KVxf9caPItcnyDPFPxwbRzw5TLYAQve FA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2t05nqhqmg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Jun 2019 23:35:42 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5ANYmvq042495;
+        Mon, 10 Jun 2019 23:35:42 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2t1jph4qa0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Jun 2019 23:35:42 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5ANZfcv010048;
+        Mon, 10 Jun 2019 23:35:41 GMT
+Received: from localhost.localdomain (/180.165.90.201)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 10 Jun 2019 16:35:40 -0700
+From:   Bob Liu <bob.liu@oracle.com>
+To:     linux-block@vger.kernel.org
+Cc:     yi.zhang@redhat.com, osandov@fb.com, Bob Liu <bob.liu@oracle.com>
+Subject: [PATCH v2 blktests] block: add freeze/unfreeze sequence test
+Date:   Tue, 11 Jun 2019 07:35:06 +0800
+Message-Id: <20190610233506.23610-1-bob.liu@oracle.com>
+X-Mailer: git-send-email 2.9.5
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9284 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906100159
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9284 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906100159
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Casey Schaufler <casey@schaufler-ca.com> wrote:
+Reproduce the hang fixed by
+7996a8b5511a ("blk-mq: fix hang caused by freeze/unfreeze sequence").
 
-> Process A and process B both open /dev/null.
-> A and B can write and read to their hearts content
-> to/from /dev/null without ever once communicating.
-> The mutual accessibility of /dev/null in no way implies that
-> A and B can communicate. If A can set a watch on /dev/null,
-> and B triggers an event, there still has to be an access
-> check on the delivery of the event because delivering an event
-> to A is not an action on /dev/null, but on A.
+--
+v2:
+- Add 022.out
 
-If a process has the privilege, it appears that fanotify() allows that process
-to see others accessing /dev/null (FAN_ACCESS, FAN_ACCESS_PERM).  There don't
-seem to be any LSM checks there either.
+Signed-off-by: Bob Liu <bob.liu@oracle.com>
+---
+ tests/block/022     | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/022.out |  2 ++
+ 2 files changed, 61 insertions(+)
+ create mode 100755 tests/block/022
+ create mode 100644 tests/block/022.out
 
-On the other hand, the privilege required is CAP_SYS_ADMIN,
+diff --git a/tests/block/022 b/tests/block/022
+new file mode 100755
+index 0000000..e3ac197
+--- /dev/null
++++ b/tests/block/022
+@@ -0,0 +1,59 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2019 Bob Liu <bob.liu@oracle.com>
++#
++# Test hang caused by freeze/unfreeze sequence. Regression
++# test for 7996a8b5511a ("blk-mq: fix hang caused by freeze/unfreeze sequence").
++
++. tests/block/rc
++. common/null_blk
++
++DESCRIPTION="Test hang caused by freeze/unfreeze sequence"
++TIMED=1
++
++requires() {
++	_have_null_blk && _have_module_param null_blk shared_tags
++}
++
++hotplug_test() {
++	while :
++	do
++		echo 1 > /sys/kernel/config/nullb/"$1"/power
++		echo 0 > /sys/kernel/config/nullb/"$1"/power
++	done
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++	: "${TIMEOUT:=30}"
++
++	if ! _init_null_blk shared_tags=1 nr_devices=0 queue_mode=2; then
++		return 1
++	fi
++
++	mkdir -p /sys/kernel/config/nullb/0
++	mkdir -p /sys/kernel/config/nullb/1
++	hotplug_test 0 &
++	pid0=$!
++	hotplug_test 1 &
++	pid1=$!
++
++	#bind process to two different CPU
++	taskset -p 1 $pid0 >/dev/null
++	taskset -p 2 $pid1 >/dev/null
++
++	sleep "$TIMEOUT"
++	{
++		kill -9 $pid0
++		wait $pid0
++		kill -9 $pid1
++		wait $pid1
++	} 2>/dev/null
++
++	rmdir /sys/kernel/config/nullb/1
++	rmdir /sys/kernel/config/nullb/0
++
++	_exit_null_blk
++	echo "Test complete"
++}
++
+diff --git a/tests/block/022.out b/tests/block/022.out
+new file mode 100644
+index 0000000..14d43cb
+--- /dev/null
++++ b/tests/block/022.out
+@@ -0,0 +1,2 @@
++Running block/022
++Test complete
+-- 
+2.9.5
 
-> > The mount tree can't be modified by unprivileged users, unless a
-> > privileged user very carefully configured it as such.
-> 
-> "Unless" means *is* possible. In which case access control is
-> required. I will admit to being less then expert on the extent
-> to which mounts can be done without privilege.
-
-Automounts in network filesystems, for example.
-
-The initial mount of the network filesystem requires local privilege, but then
-mountpoints are managed with remote privilege as granted by things like
-kerberos tickets.  The local kernel has no control.
-
-If you have CONFIG_AFS_FS enabled in your kernel, for example, and you install
-the keyutils package (dnf, rpm, apt, etc.), then you should be able to do:
-
-	mount -t afs none /mnt -o dyn
-	ls /afs/grand.central.org/software/
-
-for example.  That will go through a couple of automount points.  Assuming you
-don't have a kerberos login on those servers, however, you shouldn't be able
-to add new mountpoints.
-
-Someone watching the mount topology can see events when an automount is
-enacted and when it expires, the latter being an event with the system as the
-subject since the expiry is done on a timeout set by the kernel.
-
-David
