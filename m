@@ -3,79 +3,104 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 789E4C4321A
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 18:30:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E070C4321B
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 18:46:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C2B62082E
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 18:30:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA58B20859
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jun 2019 18:46:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728059AbfFJSa5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jun 2019 14:30:57 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:38641 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726214AbfFJSa5 (ORCPT
+        id S2388667AbfFJSq0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jun 2019 14:46:26 -0400
+Received: from iolanthe.rowland.org ([192.131.102.54]:35460 "HELO
+        iolanthe.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S2388069AbfFJSq0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jun 2019 14:30:57 -0400
-Received: by mail-pg1-f194.google.com with SMTP id v11so5474285pgl.5
-        for <linux-block@vger.kernel.org>; Mon, 10 Jun 2019 11:30:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CH9MJuRRaSiq33xeCAVYx9BFes61hGUSqIs6DhLhAZM=;
-        b=kGJykQAprtx1+FAtTiLDa29chZHbHA2tKXYWblNM6VPH0RYrbNelYBM2csuIbGUGQG
-         hTjIsfROcMH8yNIVSZe47/GWgnTmYz5nuilOU8wXbpomdhs/ePiiVcNsEX57SjwoOt1X
-         QGk2WfGIPzfLKYLFec2S7wIOacyV3Id44tzpu6qkdHSM5xZWDZxLg0wnRoxAystcqCvJ
-         M9IxR9KJAkP5Gz3c4PrMgdna9dp26FDfUkJafyV20c6G3s0K6e7OJ9JS3ksCEVRZpASG
-         LNSTGPWMkpP70QhOU26SYUYPRxztsrXmD+J9s3V52AVMSvanNwxXHT186+FfbvPSszcX
-         zu/g==
-X-Gm-Message-State: APjAAAViuz5wapjyIA9A2aK0V3Fyz9qAntQMqBdlOZ1OdXEMGZ1eByRF
-        PBDL8r+J8jz5Qc02n9djU7EYgWb0
-X-Google-Smtp-Source: APXvYqz9yFfPD2ZruSXm8W6BUrGLZmIt3V2txkBBL8IVqFmD5hjL62svM6KejCxH2SQdg54AdiWo9A==
-X-Received: by 2002:a62:3741:: with SMTP id e62mr76456465pfa.213.1560191456299;
-        Mon, 10 Jun 2019 11:30:56 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id r11sm8699398pgs.39.2019.06.10.11.30.55
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 10 Jun 2019 11:30:55 -0700 (PDT)
-Subject: Re: [PATCH 3/6] block: remove the bi_phys_segments field in struct
- bio
-To:     Christoph Hellwig <hch@lst.de>, axboe@fb.com
-Cc:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org
-References: <20190606102904.4024-1-hch@lst.de>
- <20190606102904.4024-4-hch@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <2e6e99e7-3d17-177c-caf8-394a6f6bbd8f@acm.org>
-Date:   Mon, 10 Jun 2019 11:30:54 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        Mon, 10 Jun 2019 14:46:26 -0400
+Received: (qmail 7256 invoked by uid 2102); 10 Jun 2019 14:46:25 -0400
+Received: from localhost (sendmail-bs@127.0.0.1)
+  by localhost with SMTP; 10 Jun 2019 14:46:25 -0400
+Date:   Mon, 10 Jun 2019 14:46:25 -0400 (EDT)
+From:   Alan Stern <stern@rowland.harvard.edu>
+X-X-Sender: stern@iolanthe.rowland.org
+To:     Christoph Hellwig <hch@lst.de>
+cc:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
+Subject: Re: How to resolve an issue in swiotlb environment?
+In-Reply-To: <20190610123222.GA20985@lst.de>
+Message-ID: <Pine.LNX.4.44L0.1906101423200.1560-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-In-Reply-To: <20190606102904.4024-4-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/6/19 3:29 AM, Christoph Hellwig wrote:
-> We only need the number of segments in the blk-mq submission path.
-> Remove the field from struct bio, and return it from a variant of
-> blk_queue_split instead of that it can passed as an argument to
-> those functions that need the value.
-> 
-> This also means we stop recounting segments except for cloning
-> and partial segments.
-> 
-> To keep the number of arguments in this how path down remove
-                                           ^^^
-                                           hot?
+On Mon, 10 Jun 2019, Christoph Hellwig wrote:
 
-I will have a further look at this patch series as soon as I have the time.
+> Hi Yoshihiro,
+> 
+> sorry for not taking care of this earlier, today is a public holiday
+> here and thus I'm not working much over the long weekend.
+> 
+> On Mon, Jun 10, 2019 at 11:13:07AM +0000, Yoshihiro Shimoda wrote:
+> > I have another way to avoid the issue. But it doesn't seem that a good way though...
+> > According to the commit that adding blk_queue_virt_boundary() [3],
+> > this is needed for vhci_hcd as a workaround so that if we avoid to call it
+> > on xhci-hcd driver, the issue disappeared. What do you think?
+> > JFYI, I pasted a tentative patch in the end of email [4].
+> 
+> Oh, I hadn't even look at why USB uses blk_queue_virt_boundary, and it
+> seems like the usage is wrong, as it doesn't follow the same rules as
+> all the others.  I think your patch goes in the right direction,
+> but instead of comparing a hcd name it needs to be keyed of a flag
+> set by the driver (I suspect there is one indicating native SG support,
+> but I can't quickly find it), and we need an alternative solution
+> for drivers that don't see like vhci.  I suspect just limiting the
+> entire transfer size to something that works for a single packet
+> for them would be fine.
 
-Bart.
+Christoph:
+
+In most of the different kinds of USB host controllers, the hardware is
+not capable of assembling a packet out of multiple buffers at arbitrary
+addresses.  As a matter of fact, xHCI is the only kind that _can_ do 
+this.
+
+In some cases, the hardware can assemble packets provided each buffer
+other than the last ends at a page boundary and each buffer other than
+the first starts at a page boundary (Intel would say the buffers are
+"virtually contiguous"), but this is a rather complex rule and we don't
+want to rely on it.  Plus, in other cases the hardware _can't_ do this.
+
+Instead, we want the SG buffers to be set up so that each one (except 
+the last) is an exact multiple of the maximum packet size.  That way, 
+each packet can be assembled from the contents of a single buffer and 
+there's no problem.
+
+The maximum packet size depends on the type of USB connection.  
+Typical values are 1024, 512, or 64.  It's always a power of two and
+it's smaller than 4096.  Therefore we simplify the problem even further
+by requiring that each SG buffer in a scatterlist (except the last one)
+be a multiple of the page size.  (It doesn't need to be aligned on a 
+page boundary, as far as I remember.)
+
+That's why the blk_queue_virt_boundary usage was added to the USB code.  
+Perhaps it's not the right way of doing this; I'm not an expert on the
+inner workings of the block layer.  If you can suggest a better way to
+express our requirement, that would be great.
+
+Alan Stern
+
+PS: There _is_ a flag saying whether an HCD supports SG.  But what it
+means is that the driver can handle an SG list that meets the
+requirement above; it doesn't mean that the driver can reassemble the
+data from an SG list into a series of bounce buffers in order to meet
+the requirement.  We very much want not to do that, especially since
+the block layer should already be capable of doing it for us.
+
