@@ -2,112 +2,106 @@ Return-Path: <SRS0=2dDp=UK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41ED3C31E44
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 22:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91760C31E46
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 23:56:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1E80A2173B
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 22:35:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A662208C2
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 23:56:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=raithlin.onmicrosoft.com header.i=@raithlin.onmicrosoft.com header.b="VsLjOkbA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405845AbfFKWfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jun 2019 18:35:06 -0400
-Received: from outgoing-stata.csail.mit.edu ([128.30.2.210]:35276 "EHLO
-        outgoing-stata.csail.mit.edu" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2405174AbfFKWfG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jun 2019 18:35:06 -0400
-Received: from [4.30.142.84] (helo=srivatsab-a01.vmware.com)
-        by outgoing-stata.csail.mit.edu with esmtpsa (TLS1.2:RSA_AES_128_CBC_SHA1:128)
-        (Exim 4.82)
-        (envelope-from <srivatsa@csail.mit.edu>)
-        id 1hapM2-0004FG-TW; Tue, 11 Jun 2019 18:34:59 -0400
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-From:   "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Moyer <jmoyer@redhat.com>, Theodore Ts'o <tytso@mit.edu>,
-        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>
-References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
- <5B6570A2-541A-4CF8-98E0-979EA6E3717D@linaro.org>
- <2CB39B34-21EE-4A95-A073-8633CF2D187C@linaro.org>
- <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
- <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
- <F5E29C98-6CC4-43B8-994D-0B5354EECBF3@linaro.org>
- <686D6469-9DE7-4738-B92A-002144C3E63E@linaro.org>
- <01d55216-5718-767a-e1e6-aadc67b632f4@csail.mit.edu>
- <CA8A23E2-6F22-4444-9A20-E052A94CAA9B@linaro.org>
- <cc148388-3c82-d7c0-f9ff-8c31bb5dc77d@csail.mit.edu>
- <6FE0A98F-1E3D-4EF6-8B38-2C85741924A4@linaro.org>
- <2A58C239-EF3F-422B-8D87-E7A3B500C57C@linaro.org>
- <a04368ba-f1d5-8f2c-1279-a685a137d024@csail.mit.edu>
- <E270AD92-943E-4529-8158-AB480D6D9DF8@linaro.org>
- <5b71028c-72f0-73dd-0cd5-f28ff298a0a3@csail.mit.edu>
- <FFA44D26-75FF-4A8E-A331-495349BE5FFC@linaro.org>
- <0d6e3c02-1952-2177-02d7-10ebeb133940@csail.mit.edu>
- <7B74A790-BD98-412B-ADAB-3B513FB1944E@linaro.org>
- <6a6f4aa4-fc95-f132-55b2-224ff52bd2d8@csail.mit.edu>
-Message-ID: <7c5e9d11-4a3d-7df4-c1e6-7c95919522ab@csail.mit.edu>
-Date:   Tue, 11 Jun 2019 15:34:48 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <6a6f4aa4-fc95-f132-55b2-224ff52bd2d8@csail.mit.edu>
-Content-Type: text/plain; charset=windows-1252
+        id S2405336AbfFKX4L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jun 2019 19:56:11 -0400
+Received: from mail-eopbgr670097.outbound.protection.outlook.com ([40.107.67.97]:63909
+        "EHLO CAN01-TO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2404808AbfFKX4L (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Jun 2019 19:56:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=raithlin.onmicrosoft.com; s=selector1-raithlin-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PLgT1++JPQi0Nu33GWU22HzN/RiC/hSZKCNg3J2n85c=;
+ b=VsLjOkbAV58pz5Ss65s2n9vGMg5+1/jAJN/UYsz2tGA3NreKD76Z398E2Q1I2AycWXmN01pIxrNIWkXvOhxox28Yox10Snu2IpZfUZ8iTHVEqCxNZ0hxqNv06Q5CSRs9vnR54wnzhZPXm+soQBVPwQuR304G4jWfdLbMpYHeom8=
+Received: from YTOPR0101MB0793.CANPRD01.PROD.OUTLOOK.COM (52.132.44.17) by
+ YTOPR0101MB2250.CANPRD01.PROD.OUTLOOK.COM (52.132.50.145) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1965.14; Tue, 11 Jun 2019 23:56:06 +0000
+Received: from YTOPR0101MB0793.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::3535:ab58:99bd:516]) by YTOPR0101MB0793.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::3535:ab58:99bd:516%7]) with mapi id 15.20.1965.017; Tue, 11 Jun 2019
+ 23:56:06 +0000
+From:   "Stephen  Bates" <sbates@raithlin.com>
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "shhuiw@foxmail.com" <shhuiw@foxmail.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>
+Subject: [PATCH] io_uring: fix SQPOLL cpu check
+Thread-Topic: [PATCH] io_uring: fix SQPOLL cpu check
+Thread-Index: AQHVILE8MKvlFSwx2kqc/AjEamoMkQ==
+Date:   Tue, 11 Jun 2019 23:56:06 +0000
+Message-ID: <5D2859FE-DB39-48F5-BBB5-6EDD3791B6C3@raithlin.com>
+Accept-Language: en-CA, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Microsoft-MacOutlook/10.1a.0.190609
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=sbates@raithlin.com; 
+x-originating-ip: [2001:bb6:a2c:ed58:2ca3:41e6:9240:e71d]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2759eb70-7fcd-4e28-87ee-08d6eec85eb9
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(7021145)(8989299)(4534185)(7022145)(4603075)(4627221)(201702281549075)(8990200)(7048125)(7024125)(7027125)(7023125)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:YTOPR0101MB2250;
+x-ms-traffictypediagnostic: YTOPR0101MB2250:
+x-microsoft-antispam-prvs: <YTOPR0101MB22502C6E370F41EDC4E503BDAAED0@YTOPR0101MB2250.CANPRD01.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 006546F32A
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(376002)(39830400003)(366004)(136003)(396003)(199004)(189003)(68736007)(76116006)(58126008)(486006)(54906003)(6506007)(476003)(6486002)(33656002)(256004)(99286004)(2616005)(2201001)(36756003)(110136005)(2501003)(316002)(102836004)(2906002)(71190400001)(305945005)(86362001)(6512007)(81166006)(81156014)(8676002)(71200400001)(8936002)(14454004)(508600001)(66476007)(66946007)(66556008)(64756008)(91956017)(4744005)(186003)(66446008)(73956011)(25786009)(5660300002)(4326008)(7736002)(53936002)(6116002)(6436002)(46003);DIR:OUT;SFP:1102;SCL:1;SRVR:YTOPR0101MB2250;H:YTOPR0101MB0793.CANPRD01.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: raithlin.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: FUytEI66HLW7guPRGv0aVzJAUnXoyumZ84/l5JRlU5cPVraiBZGOoXnVzVnSePGt/oMTAfYOaFaE6rHFOvpn8pRzKXgrCgvj1a2NhmR4XgkeMME8npqI66Eq2gUIDZUBMM0hnPUBBBQydD/xwRpQEuoYM014Milf88wY+OWYWce5kuMpnEqt08sk+OSizTW/Yt5SZLzkAkvUppfUnRAJiAmYX6ZvvASmnGNiRoida/S5GdfQM94wJ9Fsy9m/NOFtL/Nzp78SsLshzb+dN0kUC2s7XZb++QJuJvLCT1Oh11CyFW6Aw0ifQ0yG/UHVnI06U0EYSfBrcFrj1cKnqh8hC/Atgf8Et50ytdGwEkvDiBIK1SUnFWRAJOvcyyZHg6e1QSyZpcoDOYpQjf47ZN/Q9pzK0E/PoH0BCkeBKf8eyqU=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A3BF8340A20CD74B8B1EC0C365ADD759@CANPRD01.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: raithlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2759eb70-7fcd-4e28-87ee-08d6eec85eb9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2019 23:56:06.8641
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 18519031-7ff4-4cbb-bbcb-c3252d330f4b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sbates@raithlin.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: YTOPR0101MB2250
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/2/19 12:04 AM, Srivatsa S. Bhat wrote:
-> On 5/30/19 3:45 AM, Paolo Valente wrote:
->>
-[...]
->> At any rate, since you pointed out that you are interested in
->> out-of-the-box performance, let me complete the context: in case
->> low_latency is left set, one gets, in return for this 12% loss,
->> a) at least 1000% higher responsiveness, e.g., 1000% lower start-up
->> times of applications under load [1];
->> b) 500-1000% higher throughput in multi-client server workloads, as I
->> already pointed out [2].
->>
-> 
-> I'm very happy that you could solve the problem without having to
-> compromise on any of the performance characteristics/features of BFQ!
-> 
-> 
->> I'm going to prepare complete patches.  In addition, if ok for you,
->> I'll report these results on the bug you created.  Then I guess we can
->> close it.
->>
-> 
-> Sounds great!
->
-
-Hi Paolo,
-
-Hope you are doing great!
-
-I was wondering if you got a chance to post these patches to LKML for
-review and inclusion... (No hurry, of course!)
-
-Also, since your fixes address the performance issues in BFQ, do you
-have any thoughts on whether they can be adapted to CFQ as well, to
-benefit the older stable kernels that still support CFQ?
-
-Thank you!
-
-Regards,
-Srivatsa
-VMware Photon OS
+VGhlIGFycmF5X2luZGV4X25vc3BlYygpIGNoZWNrIGluIGlvX3NxX29mZmxvYWRfc3RhcnQoKSBp
+cyBwZXJmb3JtZWQNCmJlZm9yZSBhbnkgY2hlY2tzIG9uIHAtPnNxX3RocmVhZF9jcHUgYXJlIGRv
+bmUuIFRoaXMgbWVhbnMgY3B1IGlzDQpjbGFtcGVkIGFuZCB0aGVyZWZvcmUgbm8gZXJyb3Igb2Nj
+dXJzIHdoZW4gb3V0LW9mLXJhbmdlIHZhbHVlcyBhcmUNCnBhc3NlZCBpbiBmcm9tIHVzZXJzcGFj
+ZS4gVGhpcyBpcyBpbiB2aW9sYXRpb24gb2YgdGhlIHNwZWNpZmljYXRpb24NCmZvciBpb19yaW5n
+X3NldHVwKCkgYW5kIGNhdXNlcyB0aGUgaW9fcmluZ19zZXR1cCB1bml0IHRlc3QgaW4gbGlidXJp
+bmcNCnRvIHJlZ3Jlc3MuDQoNCkFkZCBhIG5ldyBib3VuZHMgY2hlY2sgb24gc3FfdGhyZWFkX2Nw
+dSBhdCB0aGUgc3RhcnQgb2YNCmlvX3NxX29mZmxvYWRfc3RhcnQoKSBzbyB3ZSBjYW4gZXhpdCB0
+aGUgZnVuY3Rpb24gZWFybHkgd2hlbiBiYWQNCnZhbHVlcyBhcmUgcGFzc2VkIGluLg0KDQpGaXhl
+czogOTc1NTU0YjAzZWRkICgiaW9fdXJpbmc6IGZpeCBTUVBPTEwgY3B1IHZhbGlkYXRpb24iKQ0K
+U2lnbmVkLW9mZi1ieTogU3RlcGhlbiBCYXRlcyA8c2JhdGVzQHJhaXRobGluLmNvbT4NCi0tLQ0K
+IGZzL2lvX3VyaW5nLmMgfCAzICsrKw0KIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKykN
+Cg0KZGlmZiAtLWdpdCBhL2ZzL2lvX3VyaW5nLmMgYi9mcy9pb191cmluZy5jDQppbmRleCAzMGE1
+Njg3Li5lNDU4NDcwIDEwMDY0NA0KLS0tIGEvZnMvaW9fdXJpbmcuYw0KKysrIGIvZnMvaW9fdXJp
+bmcuYw0KQEAgLTIzMTYsNiArMjMxNiw5IEBAIHN0YXRpYyBpbnQgaW9fc3Ffb2ZmbG9hZF9zdGFy
+dChzdHJ1Y3QgaW9fcmluZ19jdHggKmN0eCwNCiB7DQogCWludCByZXQ7DQogDQorCWlmIChwLT5z
+cV90aHJlYWRfY3B1ID49IG5yX2NwdV9pZHMpDQorCQlyZXR1cm4gLUVJTlZBTDsNCisNCiAJaW5p
+dF93YWl0cXVldWVfaGVhZCgmY3R4LT5zcW9fd2FpdCk7DQogCW1tZ3JhYihjdXJyZW50LT5tbSk7
+DQogCWN0eC0+c3FvX21tID0gY3VycmVudC0+bW07DQotLSANCjIuNy40DQoNCg==
