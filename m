@@ -2,131 +2,112 @@ Return-Path: <SRS0=2dDp=UK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63666C31E44
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 22:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41ED3C31E44
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 22:35:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2967F2086D
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 22:10:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ObJ+sjuE"
+	by mail.kernel.org (Postfix) with ESMTP id 1E80A2173B
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 22:35:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436708AbfFKWKU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jun 2019 18:10:20 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:62318 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405693AbfFKWKU (ORCPT
+        id S2405845AbfFKWfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jun 2019 18:35:06 -0400
+Received: from outgoing-stata.csail.mit.edu ([128.30.2.210]:35276 "EHLO
+        outgoing-stata.csail.mit.edu" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2405174AbfFKWfG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jun 2019 18:10:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1560291020; x=1591827020;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=FwNrFS19gZBpiQUVxfbKuN9J31C+dx/u6l8+/JpPrc8=;
-  b=ObJ+sjuEcZ6olVDQchIvNP8Pa2G9z0H5oQQWQgfK6t6vXSXB7cjZbzln
-   dzbppetAnu+wYAKcKdUpW1Q1RM6q2/xC3DQ4tuicXfblqv8y3roxtvjUZ
-   GanEUQK/gPoywYgrb9NvYU++nb6WTxvm39dEDDJ2hCfVQQ/l3npXFxpDS
-   ePKlw3wC+EEBhvD2xFGOvaWy/tI6tY4KJ/RiF6EmrTFMQputK7geaWEIe
-   ZWiL8I31IMRgg+tNYHKeahLsdGc1MuNTlGUG9GwlV8aSDpCt6Qons4EIK
-   kePyZwWxfw1BBcac6/7wN6uhVDdW+NEQyDhuYpDmlt4Z43OkfwEvzhkRp
-   A==;
-X-IronPort-AV: E=Sophos;i="5.63,363,1557158400"; 
-   d="scan'208";a="111591004"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Jun 2019 06:10:20 +0800
-IronPort-SDR: vjBiReD1cZSeTTa2N7TbScKkOE5FhbP6WKXk7l1KAfEYZAZGCxgcvhxlNc1LhQowY+8v5u8oST
- RdAa4N+gkroYpVuwE8GzruvrBK2i9AlGTGAyClxmxgZT89BaLAqVKPE+8ZS1KWfvfWE3gBtD5o
- tsUpTG10QQahpd6xNThLHgcLoz/d86Xy0N7r/luAQ+8BFKOJPzXEuBkRWiItKDudXXSpc/PUka
- wAnK9AC98vMLh7JKZ6UvfzrkTRZ2+wIHDw6XUjqCJ5IyJSSKLBGjWJv1AaVjdGODBSj8J3bzzR
- Tu+6gmSYWODx623sgztx1c31
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP; 11 Jun 2019 15:10:08 -0700
-IronPort-SDR: wR1R8VpOo18iBQBzFSyeOd/51iPIFmwJmRBPldcZz9aPqNh2uRt3Fu2yce+tsq313WuubWidlC
- 2uWaUJs7VRIJ5IkxCMzUGBPEJdWR5iFiGRyiyzH975h/xKE8QCU1m3NS61h2n9TpM6MTKBQuv2
- v1rG5xFj1vmhDWv9+jqzUFUyudCUA2YFty8izzT7V/W5//iEls6rd2jNYl4QZKFgnlqlCHI9qW
- Z82NfaPRslLTt+hJA8uz4LHv9wOuhL+iRLfGnk5TZcrbHLf6fhK72ClckygOO3/jCyPqVaX8OR
- ebw=
-Received: from cmercuryqemu.hgst.com ([10.202.65.32])
-  by uls-op-cesaip01.wdc.com with ESMTP; 11 Jun 2019 15:10:19 -0700
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH] null_blk: remove duplicate check for report zone
-Date:   Tue, 11 Jun 2019 15:10:17 -0700
-Message-Id: <20190611221017.10264-1-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.19.1
+        Tue, 11 Jun 2019 18:35:06 -0400
+Received: from [4.30.142.84] (helo=srivatsab-a01.vmware.com)
+        by outgoing-stata.csail.mit.edu with esmtpsa (TLS1.2:RSA_AES_128_CBC_SHA1:128)
+        (Exim 4.82)
+        (envelope-from <srivatsa@csail.mit.edu>)
+        id 1hapM2-0004FG-TW; Tue, 11 Jun 2019 18:34:59 -0400
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+From:   "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Jeff Moyer <jmoyer@redhat.com>, Theodore Ts'o <tytso@mit.edu>,
+        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
+ <5B6570A2-541A-4CF8-98E0-979EA6E3717D@linaro.org>
+ <2CB39B34-21EE-4A95-A073-8633CF2D187C@linaro.org>
+ <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
+ <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
+ <F5E29C98-6CC4-43B8-994D-0B5354EECBF3@linaro.org>
+ <686D6469-9DE7-4738-B92A-002144C3E63E@linaro.org>
+ <01d55216-5718-767a-e1e6-aadc67b632f4@csail.mit.edu>
+ <CA8A23E2-6F22-4444-9A20-E052A94CAA9B@linaro.org>
+ <cc148388-3c82-d7c0-f9ff-8c31bb5dc77d@csail.mit.edu>
+ <6FE0A98F-1E3D-4EF6-8B38-2C85741924A4@linaro.org>
+ <2A58C239-EF3F-422B-8D87-E7A3B500C57C@linaro.org>
+ <a04368ba-f1d5-8f2c-1279-a685a137d024@csail.mit.edu>
+ <E270AD92-943E-4529-8158-AB480D6D9DF8@linaro.org>
+ <5b71028c-72f0-73dd-0cd5-f28ff298a0a3@csail.mit.edu>
+ <FFA44D26-75FF-4A8E-A331-495349BE5FFC@linaro.org>
+ <0d6e3c02-1952-2177-02d7-10ebeb133940@csail.mit.edu>
+ <7B74A790-BD98-412B-ADAB-3B513FB1944E@linaro.org>
+ <6a6f4aa4-fc95-f132-55b2-224ff52bd2d8@csail.mit.edu>
+Message-ID: <7c5e9d11-4a3d-7df4-c1e6-7c95919522ab@csail.mit.edu>
+Date:   Tue, 11 Jun 2019 15:34:48 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <6a6f4aa4-fc95-f132-55b2-224ff52bd2d8@csail.mit.edu>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch removes the check in the null_blk_zoned for report zone
-command, where it checks for the dev-,>zoned before executing the report
-zone.
+On 6/2/19 12:04 AM, Srivatsa S. Bhat wrote:
+> On 5/30/19 3:45 AM, Paolo Valente wrote:
+>>
+[...]
+>> At any rate, since you pointed out that you are interested in
+>> out-of-the-box performance, let me complete the context: in case
+>> low_latency is left set, one gets, in return for this 12% loss,
+>> a) at least 1000% higher responsiveness, e.g., 1000% lower start-up
+>> times of applications under load [1];
+>> b) 500-1000% higher throughput in multi-client server workloads, as I
+>> already pointed out [2].
+>>
+> 
+> I'm very happy that you could solve the problem without having to
+> compromise on any of the performance characteristics/features of BFQ!
+> 
+> 
+>> I'm going to prepare complete patches.  In addition, if ok for you,
+>> I'll report these results on the bug you created.  Then I guess we can
+>> close it.
+>>
+> 
+> Sounds great!
+>
 
-The null_zone_report() function is a block_device operation callback
-which is initialized in the null_blk_main.c and gets called as a part
-of blkdev for report zone IOCTL (BLKREPORTZONE).
+Hi Paolo,
 
-blkdev_ioctl()
-blkdev_report_zones_ioctl()
-        blkdev_report_zones()
-                blk_report_zones()
-                        disk->fops->report_zones()
-                                nullb_zone_report();
+Hope you are doing great!
 
-The null_zone_report() will never get executed on the non-zoned block
-device, in the non zoned block device blk_queue_is_zoned() will always
-be false which is first check the blkdev_report_zones_ioctl()
-before actual low level driver report zone callback is executed.
+I was wondering if you got a chance to post these patches to LKML for
+review and inclusion... (No hurry, of course!)
 
-Here is the detailed scenario:-
+Also, since your fixes address the performance issues in BFQ, do you
+have any thoughts on whether they can be adapted to CFQ as well, to
+benefit the older stable kernels that still support CFQ?
 
-1. modprobe null_blk
-null_init
-null_alloc_dev
-        dev->zoned = 0 
-null_add_dev
-        dev->zoned == 0
-                so we don't set the q->limits.zoned = BLK_ZONED_HR
+Thank you!
 
-2. blkzone report /dev/nullb0
-
-blkdev_ioctl()
-blkdev_report_zones_ioctl()
-        blk_queue_is_zoned()
-                blk_queue_is_zoned
-                        q->limits.zoned == 0
-                        return false
-        if (!blk_queue_is_zoned(q)) <--- true
-                return -ENOTTY;              
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- drivers/block/null_blk_zoned.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
-index 5d1c261a2cfd..fca0c97ff1aa 100644
---- a/drivers/block/null_blk_zoned.c
-+++ b/drivers/block/null_blk_zoned.c
-@@ -74,10 +74,6 @@ int null_zone_report(struct gendisk *disk, sector_t sector,
- 	struct nullb_device *dev = nullb->dev;
- 	unsigned int zno, nrz = 0;
- 
--	if (!dev->zoned)
--		/* Not a zoned null device */
--		return -EOPNOTSUPP;
--
- 	zno = null_zone_no(dev, sector);
- 	if (zno < dev->nr_zones) {
- 		nrz = min_t(unsigned int, *nr_zones, dev->nr_zones - zno);
--- 
-2.19.1
-
+Regards,
+Srivatsa
+VMware Photon OS
