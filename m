@@ -2,118 +2,131 @@ Return-Path: <SRS0=2dDp=UK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A26ACC31E44
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 21:17:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63666C31E44
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 22:10:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6D5332080A
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 21:17:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560287845;
-	bh=P+mP+Sn3Gp/n6UKGhRT6iCMqsCsU2UKY1pndxRNBWwM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Qcfq4wpGjMFZG17yMsvsZ5fS32xqMGAdiKHN5xb7NRZbK57OLjbSob/u2LgR1zenz
-	 kjMaeDoxj2C/rgPxEbb2U4L05o+qSpg5l3TNijUrLzeTKJpJGaeFJvJLdee38VocUZ
-	 zbun7i2WDg1EuZyfmg2BFYQmEuHeAc1VqrjkUthc=
+	by mail.kernel.org (Postfix) with ESMTP id 2967F2086D
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 22:10:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ObJ+sjuE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406935AbfFKVRZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jun 2019 17:17:25 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:39548 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406712AbfFKVRY (ORCPT
+        id S2436708AbfFKWKU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jun 2019 18:10:20 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:62318 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405693AbfFKWKU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jun 2019 17:17:24 -0400
-Received: by mail-pg1-f196.google.com with SMTP id 196so7658830pgc.6
-        for <linux-block@vger.kernel.org>; Tue, 11 Jun 2019 14:17:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=w7fvtoWTYMGWcS8TbwJ3KQSZw6usnftOHgzrdu0xPRM=;
-        b=Et237YLYWbVwG/ox4ddSiMg8YZJeq/T2bPND6p8D9FLf8464lrRQApesZTyRK44edI
-         TTyWRQO6ucsETj5trnTt4hmaHB4YDOV5tZQIu9D+YoZmN/mGfiBJLO30ex4echZ+j+w8
-         V5Xluk09MWtJeCPDFEzMC1bl96W9GwfMJVbEC7QSF+nSw82ey06fWnJilgHRq+IzPLtA
-         LycGHnHjnRSmKgz4TUSFLHD17FjKomx5+Zss/oUqB4KGaduNCy32ShRNAAg1zCz8E+VR
-         xYB7g456tSqEXpt7OPvqeZ+/wRxF22AEKnlKvRpRgxe5ml6Xm6IDiwarZT3ri9bMRP4X
-         +m2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=w7fvtoWTYMGWcS8TbwJ3KQSZw6usnftOHgzrdu0xPRM=;
-        b=TtzymLokNPaLDJx/tUSHLHoJkM7djGA9VEKdL7mamW8Nl8BopYplItxYx8y33fQtqw
-         z62YRtRFxvxLDCh4Oo/3uo96GWhL4HUicR++NW7ZRIXiUZJx+u+Fd2u0CUOmFkr9eLVc
-         2yA057xhiQuyKI4hz2HSY5/J26GS0sWGmQ2gQ2tozsmJ3bJHJo6zazVuZgo67PIa1ebh
-         qP4LTQ58EgnFaVAj26qA53XSBMVN2G5zEbaqtlOWjQ4dGGEeNnlWgj0ptdmc15lt2GKw
-         f/2fk1E488c1s0LmcpZkFYCCbJaDbQiHXk90IJcv/EhOVyrC/ujRqrcudyJ8edEVy/oI
-         N/wg==
-X-Gm-Message-State: APjAAAVZmIc3MAc3GloHZeV1dlr5SAd5QfHmMT/wOkxrYpuIKrMigLct
-        3StkmN4lYpi5IYtZTKfQm18=
-X-Google-Smtp-Source: APXvYqwMA7xgtUlzampq99Zuhs54Ek/W1wNSyGZ2eyOJJo95M4zv8iBd+BW86+mSphknWQeQnF0Vbg==
-X-Received: by 2002:aa7:8394:: with SMTP id u20mr70880877pfm.252.1560287843831;
-        Tue, 11 Jun 2019 14:17:23 -0700 (PDT)
-Received: from localhost ([163.114.130.128])
-        by smtp.gmail.com with ESMTPSA id r9sm13256110pgv.24.2019.06.11.14.17.22
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Jun 2019 14:17:22 -0700 (PDT)
-Date:   Tue, 11 Jun 2019 14:17:18 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Fam Zheng <fam@euphon.net>
-Subject: Re: [PATCH block/for-5.2-fixes] bfq: use io.weight interface file
- instead of io.bfq.weight
-Message-ID: <20190611211718.GM3341036@devbig004.ftw2.facebook.com>
-References: <4f801c9b-4ab6-9a11-536c-ff509df8aa56@kernel.dk>
- <CAHk-=whXfPjCtc5+471x83WApJxvxzvSfdzj_9hrdkj-iamA=g@mail.gmail.com>
- <52daccae-3228-13a1-c609-157ab7e30564@kernel.dk>
- <CAHk-=whca9riMqYn6WoQpuq9ehQ5KfBvBb4iVZ314JSfvcgy9Q@mail.gmail.com>
- <ebfb27a3-23e2-3ad5-a6b3-5f8262fb9ecb@kernel.dk>
- <90A8C242-E45A-4D6E-8797-598893F86393@linaro.org>
- <20190610154820.GA3341036@devbig004.ftw2.facebook.com>
- <20190611194959.GJ3341036@devbig004.ftw2.facebook.com>
+        Tue, 11 Jun 2019 18:10:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1560291020; x=1591827020;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=FwNrFS19gZBpiQUVxfbKuN9J31C+dx/u6l8+/JpPrc8=;
+  b=ObJ+sjuEcZ6olVDQchIvNP8Pa2G9z0H5oQQWQgfK6t6vXSXB7cjZbzln
+   dzbppetAnu+wYAKcKdUpW1Q1RM6q2/xC3DQ4tuicXfblqv8y3roxtvjUZ
+   GanEUQK/gPoywYgrb9NvYU++nb6WTxvm39dEDDJ2hCfVQQ/l3npXFxpDS
+   ePKlw3wC+EEBhvD2xFGOvaWy/tI6tY4KJ/RiF6EmrTFMQputK7geaWEIe
+   ZWiL8I31IMRgg+tNYHKeahLsdGc1MuNTlGUG9GwlV8aSDpCt6Qons4EIK
+   kePyZwWxfw1BBcac6/7wN6uhVDdW+NEQyDhuYpDmlt4Z43OkfwEvzhkRp
+   A==;
+X-IronPort-AV: E=Sophos;i="5.63,363,1557158400"; 
+   d="scan'208";a="111591004"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Jun 2019 06:10:20 +0800
+IronPort-SDR: vjBiReD1cZSeTTa2N7TbScKkOE5FhbP6WKXk7l1KAfEYZAZGCxgcvhxlNc1LhQowY+8v5u8oST
+ RdAa4N+gkroYpVuwE8GzruvrBK2i9AlGTGAyClxmxgZT89BaLAqVKPE+8ZS1KWfvfWE3gBtD5o
+ tsUpTG10QQahpd6xNThLHgcLoz/d86Xy0N7r/luAQ+8BFKOJPzXEuBkRWiItKDudXXSpc/PUka
+ wAnK9AC98vMLh7JKZ6UvfzrkTRZ2+wIHDw6XUjqCJ5IyJSSKLBGjWJv1AaVjdGODBSj8J3bzzR
+ Tu+6gmSYWODx623sgztx1c31
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP; 11 Jun 2019 15:10:08 -0700
+IronPort-SDR: wR1R8VpOo18iBQBzFSyeOd/51iPIFmwJmRBPldcZz9aPqNh2uRt3Fu2yce+tsq313WuubWidlC
+ 2uWaUJs7VRIJ5IkxCMzUGBPEJdWR5iFiGRyiyzH975h/xKE8QCU1m3NS61h2n9TpM6MTKBQuv2
+ v1rG5xFj1vmhDWv9+jqzUFUyudCUA2YFty8izzT7V/W5//iEls6rd2jNYl4QZKFgnlqlCHI9qW
+ Z82NfaPRslLTt+hJA8uz4LHv9wOuhL+iRLfGnk5TZcrbHLf6fhK72ClckygOO3/jCyPqVaX8OR
+ ebw=
+Received: from cmercuryqemu.hgst.com ([10.202.65.32])
+  by uls-op-cesaip01.wdc.com with ESMTP; 11 Jun 2019 15:10:19 -0700
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH] null_blk: remove duplicate check for report zone
+Date:   Tue, 11 Jun 2019 15:10:17 -0700
+Message-Id: <20190611221017.10264-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190611194959.GJ3341036@devbig004.ftw2.facebook.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 11, 2019 at 12:49:59PM -0700, Tejun Heo wrote:
-> (Description mostly stolen from 19e9da9e86c4 ("block, bfq: add weight
-> symlink to the bfq.weight cgroup parameter")
-> 
-> Many userspace tools and services use the proportional-share policy of
-> the blkio/io cgroups controller. The CFQ I/O scheduler implemented
-> this policy for the legacy block layer. To modify the weight of a
-> group in case CFQ was in charge, the 'weight' parameter of the group
-> must be modified. On the other hand, the BFQ I/O scheduler implements
-> the same policy in blk-mq, but, with BFQ, the parameter to modify has
-> a different name: bfq.weight (forced choice until legacy block was
-> present, because two different policies cannot share a common
-> parameter in cgroups).
+This patch removes the check in the null_blk_zoned for report zone
+command, where it checks for the dev-,>zoned before executing the report
+zone.
 
-Sorry, please don't apply this patch.  The cgroup interface currently
-implemented by bfq doesn't follow the io.weight interface spec.  It's
-different from cfq interface and symlinking to or renaming it won't do
-anybody any good.
+The null_zone_report() function is a block_device operation callback
+which is initialized in the null_blk_main.c and gets called as a part
+of blkdev for report zone IOCTL (BLKREPORTZONE).
 
-For now, the only thing we can do looks like keeping it as-is.
+blkdev_ioctl()
+blkdev_report_zones_ioctl()
+        blkdev_report_zones()
+                blk_report_zones()
+                        disk->fops->report_zones()
+                                nullb_zone_report();
 
-Thanks.
+The null_zone_report() will never get executed on the non-zoned block
+device, in the non zoned block device blk_queue_is_zoned() will always
+be false which is first check the blkdev_report_zones_ioctl()
+before actual low level driver report zone callback is executed.
 
+Here is the detailed scenario:-
+
+1. modprobe null_blk
+null_init
+null_alloc_dev
+        dev->zoned = 0 
+null_add_dev
+        dev->zoned == 0
+                so we don't set the q->limits.zoned = BLK_ZONED_HR
+
+2. blkzone report /dev/nullb0
+
+blkdev_ioctl()
+blkdev_report_zones_ioctl()
+        blk_queue_is_zoned()
+                blk_queue_is_zoned
+                        q->limits.zoned == 0
+                        return false
+        if (!blk_queue_is_zoned(q)) <--- true
+                return -ENOTTY;              
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+---
+ drivers/block/null_blk_zoned.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
+index 5d1c261a2cfd..fca0c97ff1aa 100644
+--- a/drivers/block/null_blk_zoned.c
++++ b/drivers/block/null_blk_zoned.c
+@@ -74,10 +74,6 @@ int null_zone_report(struct gendisk *disk, sector_t sector,
+ 	struct nullb_device *dev = nullb->dev;
+ 	unsigned int zno, nrz = 0;
+ 
+-	if (!dev->zoned)
+-		/* Not a zoned null device */
+-		return -EOPNOTSUPP;
+-
+ 	zno = null_zone_no(dev, sector);
+ 	if (zno < dev->nr_zones) {
+ 		nrz = min_t(unsigned int, *nr_zones, dev->nr_zones - zno);
 -- 
-tejun
+2.19.1
+
