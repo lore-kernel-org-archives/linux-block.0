@@ -2,62 +2,60 @@ Return-Path: <SRS0=2dDp=UK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC662C43218
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 07:45:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E518DC43218
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 07:57:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8B1582145D
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 07:45:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oZ4r4qVb"
+	by mail.kernel.org (Postfix) with ESMTP id C6475208E3
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 07:57:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404313AbfFKHpp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jun 2019 03:45:45 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:55608 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404300AbfFKHpp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jun 2019 03:45:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=WHtxP8N3XgRYBj6YozMGpGmfQA80TnYyR9VzDSZSHEU=; b=oZ4r4qVbVEHvNhm4ZphvxJKif
-        2P1yYEh69pfuFTmJ6OfwKxVtYcpFD0KMnpbS30mTyn+CJIQB/39Hr4UEksEF970wtuvUo9OG1V6cc
-        KLm5FtAD4PHELw6T6xxwb0P2AI7ik5uR2bcl/VLG8aqvTZlXjt7Cp6wVVneR8GUdLU8r3qmcG0Mlw
-        Avv3pFFzhYBeLICHBTIvlakqmjb2QaVh7L+VabEJCp6iU48yc8bUm4y2bMYHHtAlQ0UtU+zM6zl3g
-        yOH/jLso6nbbTX12INTsO9HAeTZ6LgvljxhHNvnCCBbfZN4l78p9PbRTGzaxvsfIS3TMnAjamMG9d
-        4RqdfKWAw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1habTR-0001Z8-CK; Tue, 11 Jun 2019 07:45:41 +0000
-Date:   Tue, 11 Jun 2019 00:45:41 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        id S2404525AbfFKH5Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jun 2019 03:57:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39532 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2403815AbfFKH5Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Jun 2019 03:57:25 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D64A02F8BF5;
+        Tue, 11 Jun 2019 07:57:19 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7CD0B5D721;
+        Tue, 11 Jun 2019 07:57:13 +0000 (UTC)
+Date:   Tue, 11 Jun 2019 15:57:09 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         David Gibson <david@gibson.dropbear.id.au>,
         "Darrick J. Wong" <darrick.wong@oracle.com>,
         linux-xfs@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>
 Subject: Re: [PATCH V2 0/2] block: fix page leak by merging to same page
-Message-ID: <20190611074541.GA31787@infradead.org>
+Message-ID: <20190611075707.GA15921@ming.t460p>
 References: <20190610041819.11575-1-ming.lei@redhat.com>
  <20190610133446.GA28712@infradead.org>
  <20190610150958.GA29607@ming.t460p>
+ <20190611074541.GA31787@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190610150958.GA29607@ming.t460p>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20190611074541.GA31787@infradead.org>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 11 Jun 2019 07:57:25 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Can you please trim your replies?  I've scrolled two patches before
-giving up trying to read your mail.
+On Tue, Jun 11, 2019 at 12:45:41AM -0700, Christoph Hellwig wrote:
+> Can you please trim your replies?  I've scrolled two patches before
+> giving up trying to read your mail.
+
+OK, next time will trim the reply.
+
+Thanks,
+Ming
