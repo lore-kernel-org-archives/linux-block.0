@@ -2,160 +2,118 @@ Return-Path: <SRS0=2dDp=UK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59687C46477
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 20:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A26ACC31E44
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 21:17:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30F472063F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 20:02:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qaVOytcq"
+	by mail.kernel.org (Postfix) with ESMTP id 6D5332080A
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jun 2019 21:17:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560287845;
+	bh=P+mP+Sn3Gp/n6UKGhRT6iCMqsCsU2UKY1pndxRNBWwM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Qcfq4wpGjMFZG17yMsvsZ5fS32xqMGAdiKHN5xb7NRZbK57OLjbSob/u2LgR1zenz
+	 kjMaeDoxj2C/rgPxEbb2U4L05o+qSpg5l3TNijUrLzeTKJpJGaeFJvJLdee38VocUZ
+	 zbun7i2WDg1EuZyfmg2BFYQmEuHeAc1VqrjkUthc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406376AbfFKUC3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jun 2019 16:02:29 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:61749 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406413AbfFKUC3 (ORCPT
+        id S2406935AbfFKVRZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jun 2019 17:17:25 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:39548 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2406712AbfFKVRY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jun 2019 16:02:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1560283350; x=1591819350;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xi7RDZ3LPqv+mzotThtUQvsKQ9oEmzNEqwsBGEsKs/I=;
-  b=qaVOytcqM0PaXvJbohXutVBSwE+KnNQ8/c3m5ffm9xvdZ1DAls1tCzco
-   m8zLSBFPKBjJpYJn+nVX3IV5mv/zIozIHYTqeiscI5/P7Cw+x+R5q3anS
-   WqJq8+gOqjHH0Zm0O7pJZqAbAjWu6DhEzN2jlWfpNJ7Y0BLgPnOh7JCgp
-   zdKOtvZmoxUGt0mVKi3S4mWw5g/cU3zrkD6XLXd0/rmB4dDvzCsJkrY9L
-   c6XT7nrrP2WWN5uUer0fdk3uT0uoDTST+U5Lx0Cj39ox3YQ7PAAgDLRkc
-   11NTU+hrSQrm0SCUyOQDuyYsKRocWgPaiJHof86sMgSTPa/1gT4Psa8QS
-   g==;
-X-IronPort-AV: E=Sophos;i="5.63,362,1557158400"; 
-   d="scan'208";a="115255373"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Jun 2019 04:02:18 +0800
-IronPort-SDR: zhmCi0fNbQi8iMZKfAOe0IleXouN8fmakNnyoFYm9VYp8kHzA8NrkUa2qgFyL+/o2G+47D2q9N
- YSRPFZ+f1DRD5MRgSVXCv9jmQ7WlwenVzvJ3W3fr8vVfPVsTmZHj3Q8IFCQysNJQ8q1hCbXiTR
- os3Na2ufvAkQIPs41nnsLcheLfp9AwljduIpZSMSBPxlfqbNrP1afaSb+P7Npvi3P1eUSdFVXJ
- MZz9SbLLPZPla6qirdSfYbDBqjVqZmOhxBVWScqOWN3hOnzZqCqydBvmbsnbEZQDMdZBpegAoo
- kfIyCqAybeLCnvh6T4rw02Ry
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 11 Jun 2019 12:39:26 -0700
-IronPort-SDR: 0gtUBqb/+z2pzCRKG+6MUymMi83TN7iqOd4q7fff3bIUU1+thJ3WW+0OSEhB/t0kiCVgQdnlSS
- /oNV+7AJauJ+9hM873UggPDe9dQV+ZLv2GEKoerNHQ8T3El/bk5n9bVMfyrV/XUHqxxZi4vIGL
- dtJQn7tITwA8XsKH+Lmn71fwZybTOZcHraGjwZjg+NGh/W5zbTqsxz4Gu0g7i7+wBcagjQQ+q/
- DHihw3a2QpF9fM/h6B9ArGBveeG7YGbvP5PBSS5O83Es7xHDPiDYqopgnSKSB/E4SKKQTJnKIW
- JMw=
-Received: from cmercuryqemu.hgst.com ([10.202.65.32])
-  by uls-op-cesaip02.wdc.com with ESMTP; 11 Jun 2019 13:02:18 -0700
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     hch@lst.de, hare@suse.com,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 2/2] block: add more debug data to print_req_err
-Date:   Tue, 11 Jun 2019 13:02:10 -0700
-Message-Id: <20190611200210.4819-3-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190611200210.4819-1-chaitanya.kulkarni@wdc.com>
-References: <20190611200210.4819-1-chaitanya.kulkarni@wdc.com>
+        Tue, 11 Jun 2019 17:17:24 -0400
+Received: by mail-pg1-f196.google.com with SMTP id 196so7658830pgc.6
+        for <linux-block@vger.kernel.org>; Tue, 11 Jun 2019 14:17:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=w7fvtoWTYMGWcS8TbwJ3KQSZw6usnftOHgzrdu0xPRM=;
+        b=Et237YLYWbVwG/ox4ddSiMg8YZJeq/T2bPND6p8D9FLf8464lrRQApesZTyRK44edI
+         TTyWRQO6ucsETj5trnTt4hmaHB4YDOV5tZQIu9D+YoZmN/mGfiBJLO30ex4echZ+j+w8
+         V5Xluk09MWtJeCPDFEzMC1bl96W9GwfMJVbEC7QSF+nSw82ey06fWnJilgHRq+IzPLtA
+         LycGHnHjnRSmKgz4TUSFLHD17FjKomx5+Zss/oUqB4KGaduNCy32ShRNAAg1zCz8E+VR
+         xYB7g456tSqEXpt7OPvqeZ+/wRxF22AEKnlKvRpRgxe5ml6Xm6IDiwarZT3ri9bMRP4X
+         +m2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=w7fvtoWTYMGWcS8TbwJ3KQSZw6usnftOHgzrdu0xPRM=;
+        b=TtzymLokNPaLDJx/tUSHLHoJkM7djGA9VEKdL7mamW8Nl8BopYplItxYx8y33fQtqw
+         z62YRtRFxvxLDCh4Oo/3uo96GWhL4HUicR++NW7ZRIXiUZJx+u+Fd2u0CUOmFkr9eLVc
+         2yA057xhiQuyKI4hz2HSY5/J26GS0sWGmQ2gQ2tozsmJ3bJHJo6zazVuZgo67PIa1ebh
+         qP4LTQ58EgnFaVAj26qA53XSBMVN2G5zEbaqtlOWjQ4dGGEeNnlWgj0ptdmc15lt2GKw
+         f/2fk1E488c1s0LmcpZkFYCCbJaDbQiHXk90IJcv/EhOVyrC/ujRqrcudyJ8edEVy/oI
+         N/wg==
+X-Gm-Message-State: APjAAAVZmIc3MAc3GloHZeV1dlr5SAd5QfHmMT/wOkxrYpuIKrMigLct
+        3StkmN4lYpi5IYtZTKfQm18=
+X-Google-Smtp-Source: APXvYqwMA7xgtUlzampq99Zuhs54Ek/W1wNSyGZ2eyOJJo95M4zv8iBd+BW86+mSphknWQeQnF0Vbg==
+X-Received: by 2002:aa7:8394:: with SMTP id u20mr70880877pfm.252.1560287843831;
+        Tue, 11 Jun 2019 14:17:23 -0700 (PDT)
+Received: from localhost ([163.114.130.128])
+        by smtp.gmail.com with ESMTPSA id r9sm13256110pgv.24.2019.06.11.14.17.22
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 11 Jun 2019 14:17:22 -0700 (PDT)
+Date:   Tue, 11 Jun 2019 14:17:18 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Fam Zheng <fam@euphon.net>
+Subject: Re: [PATCH block/for-5.2-fixes] bfq: use io.weight interface file
+ instead of io.bfq.weight
+Message-ID: <20190611211718.GM3341036@devbig004.ftw2.facebook.com>
+References: <4f801c9b-4ab6-9a11-536c-ff509df8aa56@kernel.dk>
+ <CAHk-=whXfPjCtc5+471x83WApJxvxzvSfdzj_9hrdkj-iamA=g@mail.gmail.com>
+ <52daccae-3228-13a1-c609-157ab7e30564@kernel.dk>
+ <CAHk-=whca9riMqYn6WoQpuq9ehQ5KfBvBb4iVZ314JSfvcgy9Q@mail.gmail.com>
+ <ebfb27a3-23e2-3ad5-a6b3-5f8262fb9ecb@kernel.dk>
+ <90A8C242-E45A-4D6E-8797-598893F86393@linaro.org>
+ <20190610154820.GA3341036@devbig004.ftw2.facebook.com>
+ <20190611194959.GJ3341036@devbig004.ftw2.facebook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190611194959.GJ3341036@devbig004.ftw2.facebook.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds more debug data on the top of the existing
-print_req_error() where we enhance the print message with the printing
-request operations in string format and other request fields.
+On Tue, Jun 11, 2019 at 12:49:59PM -0700, Tejun Heo wrote:
+> (Description mostly stolen from 19e9da9e86c4 ("block, bfq: add weight
+> symlink to the bfq.weight cgroup parameter")
+> 
+> Many userspace tools and services use the proportional-share policy of
+> the blkio/io cgroups controller. The CFQ I/O scheduler implemented
+> this policy for the legacy block layer. To modify the weight of a
+> group in case CFQ was in charge, the 'weight' parameter of the group
+> must be modified. On the other hand, the BFQ I/O scheduler implements
+> the same policy in blk-mq, but, with BFQ, the parameter to modify has
+> a different name: bfq.weight (forced choice until legacy block was
+> present, because two different policies cannot share a common
+> parameter in cgroups).
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- block/blk-core.c | 57 +++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 54 insertions(+), 3 deletions(-)
+Sorry, please don't apply this patch.  The cgroup interface currently
+implemented by bfq doesn't follow the io.weight interface spec.  It's
+different from cfq interface and symlinking to or renaming it won't do
+anybody any good.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d1a227cfb72e..659e5ea6f6c9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -167,6 +167,54 @@ int blk_status_to_errno(blk_status_t status)
- }
- EXPORT_SYMBOL_GPL(blk_status_to_errno);
- 
-+static inline const char *req_op_str(struct request *req)
-+{
-+       char *ret;
-+
-+       switch (req_op(req)) {
-+       case REQ_OP_READ:
-+               ret = "read";
-+               break;
-+       case REQ_OP_WRITE:
-+               ret = "write";
-+               break;
-+       case REQ_OP_FLUSH:
-+               ret = "flush";
-+               break;
-+       case REQ_OP_DISCARD:
-+               ret = "discard";
-+               break;
-+       case REQ_OP_SECURE_ERASE:
-+               ret = "secure_erase";
-+               break;
-+       case REQ_OP_ZONE_RESET:
-+               ret = "zone_reset";
-+               break;
-+       case REQ_OP_WRITE_SAME:
-+               ret = "write_same";
-+               break;
-+       case REQ_OP_WRITE_ZEROES:
-+               ret = "write_zeroes";
-+               break;
-+       case REQ_OP_SCSI_IN:
-+               ret = "scsi_in";
-+               break;
-+       case REQ_OP_SCSI_OUT:
-+               ret = "scsi_out";
-+               break;
-+       case REQ_OP_DRV_IN:
-+               ret = "drv_in";
-+               break;
-+       case REQ_OP_DRV_OUT:
-+               ret = "drv_out";
-+               break;
-+       default:
-+               ret = "unknown";
-+       }
-+
-+       return ret;
-+}
-+
- static void print_req_error(struct request *req, blk_status_t status,
- 		const char *caller)
- {
-@@ -176,11 +224,14 @@ static void print_req_error(struct request *req, blk_status_t status,
- 		return;
- 
- 	printk_ratelimited(KERN_ERR
--		"%s: %s error, dev %s, sector %llu op 0x%x flags 0x%x\n",
-+		"%s: %s error, dev %s, sector %llu op 0x%x:(%s) flags 0x%x "
-+		"phys_seg %u prio class %u\n",
- 		caller, blk_errors[idx].name,
- 		req->rq_disk ?  req->rq_disk->disk_name : "?",
--		blk_rq_pos(req), req_op(req),
--		req->cmd_flags & ~REQ_OP_MASK);
-+		blk_rq_pos(req), req_op(req), req_op_str(req),
-+		req->cmd_flags & ~REQ_OP_MASK,
-+		req->nr_phys_segments,
-+		IOPRIO_PRIO_CLASS(req->ioprio));
- }
- 
- static void req_bio_endio(struct request *rq, struct bio *bio,
+For now, the only thing we can do looks like keeping it as-is.
+
+Thanks.
+
 -- 
-2.19.1
-
+tejun
