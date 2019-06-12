@@ -2,127 +2,88 @@ Return-Path: <SRS0=leUH=UL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1621AC31E48
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 08:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73ECEC31E49
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 08:55:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E51442086A
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 08:52:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesasgroup.onmicrosoft.com header.i=@renesasgroup.onmicrosoft.com header.b="M7Kk7vsJ"
+	by mail.kernel.org (Postfix) with ESMTP id 5625A20866
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 08:55:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407925AbfFLIw3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jun 2019 04:52:29 -0400
-Received: from mail-eopbgr1400095.outbound.protection.outlook.com ([40.107.140.95]:39712
-        "EHLO JPN01-TY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2407156AbfFLIw3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jun 2019 04:52:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=renesasgroup.onmicrosoft.com; s=selector2-renesasgroup-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RVU3TwliIUydOjf7eBK/rzzSlo+vO4nnsIRH7FR5glg=;
- b=M7Kk7vsJgnrQfog7CheWKVMZJXy9HDzwItO6QtULvXg5tX8hUQrvwFvDhDbbdxbf1q7Ck5Q9je6Ggpw58eG76tBGggQE+YJA5id9uYLjbtWxnwp63nEYWuXPes1V0zwFz35Js0bkGPr3XV98n8InnjskramkmVe3vDH0iCK3VfE=
-Received: from OSAPR01MB3089.jpnprd01.prod.outlook.com (52.134.247.150) by
- OSAPR01MB4020.jpnprd01.prod.outlook.com (20.178.102.83) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1965.14; Wed, 12 Jun 2019 08:52:21 +0000
-Received: from OSAPR01MB3089.jpnprd01.prod.outlook.com
- ([fe80::19ad:b6ce:a287:dc85]) by OSAPR01MB3089.jpnprd01.prod.outlook.com
- ([fe80::19ad:b6ce:a287:dc85%7]) with mapi id 15.20.1965.017; Wed, 12 Jun 2019
- 08:52:21 +0000
-From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To:     Christoph Hellwig <hch@lst.de>,
-        Alan Stern <stern@rowland.harvard.edu>
-CC:     Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
-Subject: RE: How to resolve an issue in swiotlb environment?
-Thread-Topic: How to resolve an issue in swiotlb environment?
-Thread-Index: AdUZ1Qlk800+Qz0uSuO63mIBeXkktQDUe+5AAJUL5SAAA1kYAAANEESAABj9hAAAERZjAAAi6naAAAJz/+A=
-Date:   Wed, 12 Jun 2019 08:52:21 +0000
-Message-ID: <OSAPR01MB3089D154C6DF0237003CE80CD8EC0@OSAPR01MB3089.jpnprd01.prod.outlook.com>
-References: <20190611064158.GA20601@lst.de>
- <Pine.LNX.4.44L0.1906110956510.1535-100000@iolanthe.rowland.org>
- <20190612073059.GA20086@lst.de>
-In-Reply-To: <20190612073059.GA20086@lst.de>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=yoshihiro.shimoda.uh@renesas.com; 
-x-originating-ip: [118.238.235.108]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 67300a03-2f72-4bb6-ad94-08d6ef134889
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:OSAPR01MB4020;
-x-ms-traffictypediagnostic: OSAPR01MB4020:
-x-microsoft-antispam-prvs: <OSAPR01MB4020F8EB0D2011C0BDBBE918D8EC0@OSAPR01MB4020.jpnprd01.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0066D63CE6
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(396003)(136003)(346002)(39850400004)(376002)(199004)(189003)(86362001)(2906002)(33656002)(81156014)(54906003)(110136005)(14454004)(316002)(486006)(8936002)(7736002)(52536014)(25786009)(6436002)(66946007)(74316002)(5660300002)(11346002)(446003)(68736007)(476003)(81166006)(3846002)(6116002)(66446008)(102836004)(66556008)(64756008)(305945005)(186003)(76116006)(53936002)(71200400001)(66476007)(9686003)(66066001)(7696005)(76176011)(478600001)(55016002)(6506007)(71190400001)(73956011)(99286004)(14444005)(4326008)(8676002)(6246003)(229853002)(256004)(2171002)(26005);DIR:OUT;SFP:1102;SCL:1;SRVR:OSAPR01MB4020;H:OSAPR01MB3089.jpnprd01.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: renesas.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: nlsIq6Rvrrb0DfdoeWgYMN9FU9PWqxR/6GV2UdcnxwPv+UQl7s70W1qDb05kU76uuOTG8WJ83DyHCIuuTKyRNIgxtDcl4VOOCV0K+aOXOsar2MXspYV3CE3DWs8Lm8EJq1xfiZrYLZX68VJ5FaiHjtsL15UirI821e/L+Krw1tQgxU3kBEK6NXJjnVJq9pxZ6Q91pYkFnUXtqGsqqmWIGjlpH/RSHxzzjdhzvmhpDnu20jjftf6JS/x0s8tnOPyd2tkPeaSCXdrXCSPOH4aDDGRZBKrDYsy7qDGeie6m0P3kYh1sR1kcuzxIkY4m6frKMdWcQrRNWNAt7O5i1p3SfFgXpjUk4153+snWmSus3kBs6Lb+28zPC+fq9E6sJaUOO4cM0KGWxgcoryUZ3/SajMpMyzEUjiAhG4ev9HOs8R0=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S2437423AbfFLIz0 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jun 2019 04:55:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60220 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2437421AbfFLIzZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jun 2019 04:55:25 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A2ADC30832C8;
+        Wed, 12 Jun 2019 08:55:13 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-109.rdu2.redhat.com [10.10.120.109])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 714AE46;
+        Wed, 12 Jun 2019 08:55:03 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <cf3f4865-b6d7-7303-0212-960439e0c119@tycho.nsa.gov>
+References: <cf3f4865-b6d7-7303-0212-960439e0c119@tycho.nsa.gov> <155991702981.15579.6007568669839441045.stgit@warthog.procyon.org.uk> <be966d9c-e38d-7a30-8d80-fad5f25ab230@tycho.nsa.gov> <0cf7a49d-85f6-fba9-62ec-a378e0b76adf@schaufler-ca.com> <CALCETrX5O18q2=dUeC=hEtK2=t5KQpGBy9XveHxFw36OqkbNOg@mail.gmail.com> <dac74580-5b48-86e4-8222-cac29a9f541d@schaufler-ca.com> <E0925E1F-E5F2-4457-8704-47B6E64FE3F3@amacapital.net> <4b7d02b2-2434-8a7c-66cc-7dbebc37efbc@schaufler-ca.com> <CALCETrU+PKVbrKQJoXj9x_5y+vTZENMczHqyM_Xb85ca5YDZuA@mail.gmail.com> <25d88489-9850-f092-205e-0a4fc292f41b@schaufler-ca.com> <97BA9EB5-4E62-4E3A-BD97-CEC34F16FCFF@amacapital.net>
+To:     Stephen Smalley <sds@tycho.nsa.gov>
+Cc:     dhowells@redhat.com, Andy Lutomirski <luto@amacapital.net>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        USB list <linux-usb@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        raven@themaw.net, Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paul Moore <paul@paul-moore.com>
+Subject: Re: [RFC][PATCH 00/13] Mount, FS, Block and Keyrings notifications [ver #4]
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 67300a03-2f72-4bb6-ad94-08d6ef134889
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2019 08:52:21.7764
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yoshihiro.shimoda.uh@renesas.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSAPR01MB4020
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <12979.1560329702.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8BIT
+Date:   Wed, 12 Jun 2019 09:55:02 +0100
+Message-ID: <12980.1560329702@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 12 Jun 2019 08:55:25 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+Stephen Smalley <sds@tycho.nsa.gov> wrote:
 
-> From: Christoph Hellwig, Sent: Wednesday, June 12, 2019 4:31 PM
->=20
-> First things first:
->=20
-> Yoshihiro, can you try this git branch?  The new bits are just the three
-> patches at the end, but they sit on top of a few patches already sent
-> out to the list, so a branch is probably either:
->=20
->    git://git.infradead.org/users/hch/misc.git scsi-virt-boundary-fixes
+> 2) If notifications can be triggered by read-like operations (as in fanotify,
+> for example), then a "read" can be turned into a "write" flow through a
+> notification.
 
-Thank you for the patches!
-Unfortunately, the three patches could not resolve this issue.
-However, it's a hint to me, and then I found the root cause:
- - slave_configure() in drivers/usb/storage/scsiglue.c calls
-   blk_queue_max_hw_sectors() with 2048 sectors (1 MiB) when USB_SPEED_SUPE=
-R or more.
- -- So that, even if your patches (also I fixed it a little [1]) could not =
-resolve
-    the issue because the max_sectors is overwritten by above code.
+I don't think any of the things can be classed as "read-like" operations.  At
+the moment, there are the following groups:
 
-So, I think we should fix the slave_configure() by using dma_max_mapping_si=
-ze().
-What do you think? If so, I can make such a patch.
+ (1) Addition of objects (eg. key_link, mount).
 
-[1]
-In the "scsi: take the DMA max mapping size into account" patch,
-+       shost->max_sectors =3D min_t(unsigned int, shost->max_sectors,
-+                       dma_max_mapping_size(dev) << SECTOR_SHIFT);
+ (2) Modifications to things (eg. keyctl_write, remount).
 
-it should be:
-+                       dma_max_mapping_size(dev) >> SECTOR_SHIFT);
+ (3) Removal of objects (eg. key_unlink, unmount, fput+FMODE_NEED_UNMOUNT).
 
-But, if we fix the slave_configure(), we don't need this patch, IIUC.
+ (4) I/O or hardware errors (eg. USB device add/remove, EDQUOT, ENOSPC).
 
-Best regards,
-Yoshihiro Shimoda
+I have not currently defined any access events.
 
+I've been looking at the possibility of having epoll generate events this way,
+but that's not as straightforward as I'd hoped and fanotify could potentially
+use it also, but in both those cases, the process is already getting the
+events currently by watching for them using synchronous waiting syscalls.
+Instead this would generate an event to say it had happened.
+
+David
