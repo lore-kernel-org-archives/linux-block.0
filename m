@@ -2,451 +2,684 @@ Return-Path: <SRS0=leUH=UL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB5EDC31E47
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 16:32:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E55AC31E46
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 17:53:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8BF58215EA
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 16:32:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=globallogic.com header.i=@globallogic.com header.b="RUC+EYhp"
+	by mail.kernel.org (Postfix) with ESMTP id 0A4E6217F5
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 17:53:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560361995;
+	bh=HWvduH1TnXwBd5UFqBXJTkz6Oam1BkoX/KTDyqRAPI0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=Jw5Q17Y0OzEC7EthsJlQQRByJW1PwATjPt5bPFVWcS+fmYUxFh9rfkQwjzvULm5nb
+	 n4JFdcHawCRoZOCTZvBwq4pubRo5k3Bu6adfRgJW6D2SywMn0MLrciyhv5yevAeH7m
+	 g6slcy/syfymIrHJTDVfl6k/S3jdORr5VwtEtafM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440276AbfFLQb6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jun 2019 12:31:58 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:35434 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406775AbfFLQb5 (ORCPT
+        id S2388707AbfFLRxN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jun 2019 13:53:13 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:40432 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388532AbfFLRxN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jun 2019 12:31:57 -0400
-Received: by mail-lj1-f196.google.com with SMTP id x25so11072501ljh.2
-        for <linux-block@vger.kernel.org>; Wed, 12 Jun 2019 09:31:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=globallogic.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=HGZCcHNEAujaoQpz7hTvgflL6M87QkjZmmLX2/Xue6Q=;
-        b=RUC+EYhpraNYK/Rlf/N0BEPsjELRPixbnog9GgyvTc++6Ug0xNyEsE2eHaMcUEVDgM
-         +acMFdIzEEgOiWP773/EGircb6ihqaea5gRG8vNyaejkh7Lu2boHJEbSjFNJS8rd2Pmm
-         qzV08oC0SnNpSLHcHYuzNE5FcrLKThcMbut26fiDnH0r+f0XjFlozDHl3y5dCJ13LIGo
-         QWuQJLkIfbGRxuQc48ae2Huyxk+kGChEvj74I/YadPtiUbYDVudqP+MdBm75n6UEQkpv
-         wVTEg7CzA0tIa661hPzkvJA6K/K3QbGDe2P3VBx6XeL4j/2zQF9tKUYbui3NL8kIbA4u
-         KqQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=HGZCcHNEAujaoQpz7hTvgflL6M87QkjZmmLX2/Xue6Q=;
-        b=ZGS6nxkAO2PiOOqtkF3Hlfgc8EFAy5EPmvw/8PBaMi6jTlNhyYhp4nJzP68bxUGjBo
-         1frmnVCI3YlT1QRRuis1djc8Sm1Ax0d62XlT4kiIKOf3ceLLEes6TQ/L6Qb0xk/75UhN
-         nkjS4WslYexmnwE0MiwvCmOnO6pyOMuy9Yx3/zeq0GzMrNKuQiXE+ncLvkLQCQo2tUyk
-         +kE9+2x1bf2DJQpGtlDe+HsyGP7ZsjYo9wt+6l1r3ZBQ65NWWPsIw6hHPkcm26cbyyoW
-         ZMNCaYUXEWaCWuDzngnazYQGXnNtX1FIC0cPX3QOkVbPk2kkFEUkCxgsI9svkpN+8N1o
-         URIQ==
-X-Gm-Message-State: APjAAAWN8Fc6xgK233y7ef4C4zQb6ei2v9B8iaVvJBdvhUJEDi0LQTmE
-        dw1mkLnOHRLH5U71Pimt2mlLMQ==
-X-Google-Smtp-Source: APXvYqylIJwYaB2IbLbaiDOpf7UoxWY9LigMZytt9CrNcVDG0hk9EVsNyJIyC59DZWUEwIBD1AmV/A==
-X-Received: by 2002:a2e:12c8:: with SMTP id 69mr33409068ljs.189.1560357114332;
-        Wed, 12 Jun 2019 09:31:54 -0700 (PDT)
-Received: from virtualhost-PowerEdge-R810.synapse.com ([195.238.92.107])
-        by smtp.gmail.com with ESMTPSA id e26sm54358ljl.33.2019.06.12.09.31.53
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Jun 2019 09:31:53 -0700 (PDT)
-From:   roman.stratiienko@globallogic.com
-To:     linux-kernel@vger.kernel.org, josef@toxicpanda.com,
-        nbd@other.debian.org, A.Bulyshchenko@globallogic.com,
-        linux-block@vger.kernel.org, axboe@kernel.dkn.org
-Cc:     Roman Stratiienko <roman.stratiienko@globallogic.com>
-Subject: [PATCH 2/2] nbd: add support for nbd as root device
-Date:   Wed, 12 Jun 2019 19:31:44 +0300
-Message-Id: <20190612163144.18486-2-roman.stratiienko@globallogic.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190612163144.18486-1-roman.stratiienko@globallogic.com>
-References: <20190612163144.18486-1-roman.stratiienko@globallogic.com>
+        Wed, 12 Jun 2019 13:53:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=Pqdf0/0XS7WCGA89rj7UaHgrduIuFR1xK+sObvyikZM=; b=YV39z6J0/72+L2vvRP+TXx1iKi
+        w8gW/8E5+nEkcc6tEiIuuMtzGVx8ctEuomrS3NaCKCTwQRr3FxMUo795PUaH37nWWD8+382bVT77A
+        6llXzq9ZGXK0vYEN+pRWBc4g/HU6gg8oYTcCemu/e5T1Ic6h7/HgdJ7cYedvZJ+A9aK9i2FMhW5fn
+        +IiAD5h66YbgEMlPkWDFzSAdenYgc8igHluwRI1LiY5if4qsrwzOwP7hkgcIwuHkl1P3tDp6lzVNY
+        C/FjIiFW5Jzhv3cVh6Qhulwbs/2PeFkaS96oRq69xH1B2VqVKrYEqo8VqBm2znFTz7iDT1uztQcIu
+        gdpD2QtA==;
+Received: from 201.86.169.251.dynamic.adsl.gvt.net.br ([201.86.169.251] helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hb7Qt-0002DW-1w; Wed, 12 Jun 2019 17:53:11 +0000
+Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
+        (envelope-from <mchehab@bombadil.infradead.org>)
+        id 1hb7Qq-0001fs-1X; Wed, 12 Jun 2019 14:53:08 -0300
+From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Jens Axboe <axboe@kernel.dk>, Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH v4 04/28] docs: cdrom: convert docs to ReST and rename to *.rst
+Date:   Wed, 12 Jun 2019 14:52:40 -0300
+Message-Id: <af70e8c245924f2cb5a637776790fb0fe5848614.1560361364.git.mchehab+samsung@kernel.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <cover.1560361364.git.mchehab+samsung@kernel.org>
+References: <cover.1560361364.git.mchehab+samsung@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Roman Stratiienko <roman.stratiienko@globallogic.com>
+The stuff there is almost already at ReST format. A
+conversion for them is trivial: just add a missing titles
+and fix some scape codes for them to match ReST syntax.
 
-Adding support to nbd to use it as a root device. This code essentially
-provides a minimal nbd-client implementation within the kernel. It opens
-a socket and makes the negotiation with the server. Afterwards it passes
-the socket to the normal nbd-code to handle the connection.
+While here, rename the cdrom-standard.txt, with was converted
+from LaTeX to ReST on the previous patch, and add it to the
+index file.
 
-The arguments for the server are passed via kernel command line.
-The kernel command line has the format
-'nbdroot=[<SERVER_IP>:]<SERVER_PORT>/<EXPORT_NAME>'.
-SERVER_IP is optional. If it is not available it will use the
-root_server_addr transmitted through DHCP.
+At its new index.rst, let's add a :orphan: while this is not linked to
+the main index.rst file, in order to avoid build warnings.
 
-Based on those arguments, the connection to the server is established
-and is connected to the nbd0 device. The rootdevice therefore is
-root=/dev/nbd0.
-
-Patch was initialy posted by Markus Pargmann <mpa@pengutronix.de>
-and can be found at https://lore.kernel.org/patchwork/patch/532556/
-
-Change-Id: I78f7313918bf31b9dc01a74a42f0f068bede312c
-Signed-off-by: Roman Stratiienko <roman.stratiienko@globallogic.com>
-Reviewed-by: Aleksandr Bulyshchenko <A.Bulyshchenko@globallogic.com>
+Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
 ---
- drivers/block/Kconfig |  19 +++
- drivers/block/nbd.c   | 294 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 313 insertions(+)
+ ...{cdrom-standard.txt => cdrom-standard.rst} |   0
+ Documentation/cdrom/{ide-cd => ide-cd.rst}    | 178 +++++++++---------
+ Documentation/cdrom/index.rst                 |  19 ++
+ ...{packet-writing.txt => packet-writing.rst} |  27 ++-
+ MAINTAINERS                                   |   2 +-
+ drivers/block/Kconfig                         |   2 +-
+ drivers/cdrom/cdrom.c                         |   2 +-
+ drivers/ide/ide-cd.c                          |   2 +-
+ 8 files changed, 131 insertions(+), 101 deletions(-)
+ rename Documentation/cdrom/{cdrom-standard.txt => cdrom-standard.rst} (100%)
+ rename Documentation/cdrom/{ide-cd => ide-cd.rst} (84%)
+ create mode 100644 Documentation/cdrom/index.rst
+ rename Documentation/cdrom/{packet-writing.txt => packet-writing.rst} (91%)
 
+diff --git a/Documentation/cdrom/cdrom-standard.txt b/Documentation/cdrom/cdrom-standard.rst
+similarity index 100%
+rename from Documentation/cdrom/cdrom-standard.txt
+rename to Documentation/cdrom/cdrom-standard.rst
+diff --git a/Documentation/cdrom/ide-cd b/Documentation/cdrom/ide-cd.rst
+similarity index 84%
+rename from Documentation/cdrom/ide-cd
+rename to Documentation/cdrom/ide-cd.rst
+index a5f2a7f1ff46..dadc94ef6b6c 100644
+--- a/Documentation/cdrom/ide-cd
++++ b/Documentation/cdrom/ide-cd.rst
+@@ -1,18 +1,20 @@
+ IDE-CD driver documentation
+-Originally by scott snyder  <snyder@fnald0.fnal.gov> (19 May 1996)
+-Carrying on the torch is: Erik Andersen <andersee@debian.org>
+-New maintainers (19 Oct 1998): Jens Axboe <axboe@image.dk>
++===========================
++
++:Originally by: scott snyder  <snyder@fnald0.fnal.gov> (19 May 1996)
++:Carrying on the torch is: Erik Andersen <andersee@debian.org>
++:New maintainers (19 Oct 1998): Jens Axboe <axboe@image.dk>
+ 
+ 1. Introduction
+ ---------------
+ 
+-The ide-cd driver should work with all ATAPI ver 1.2 to ATAPI 2.6 compliant 
++The ide-cd driver should work with all ATAPI ver 1.2 to ATAPI 2.6 compliant
+ CDROM drives which attach to an IDE interface.  Note that some CDROM vendors
+ (including Mitsumi, Sony, Creative, Aztech, and Goldstar) have made
+ both ATAPI-compliant drives and drives which use a proprietary
+ interface.  If your drive uses one of those proprietary interfaces,
+ this driver will not work with it (but one of the other CDROM drivers
+-probably will).  This driver will not work with `ATAPI' drives which
++probably will).  This driver will not work with `ATAPI` drives which
+ attach to the parallel port.  In addition, there is at least one drive
+ (CyCDROM CR520ie) which attaches to the IDE port but is not ATAPI;
+ this driver will not work with drives like that either (but see the
+@@ -31,7 +33,7 @@ This driver provides the following features:
+    from audio tracks.  The program cdda2wav can be used for this.
+    Note, however, that only some drives actually support this.
+ 
+- - There is now support for CDROM changers which comply with the 
++ - There is now support for CDROM changers which comply with the
+    ATAPI 2.6 draft standard (such as the NEC CDR-251).  This additional
+    functionality includes a function call to query which slot is the
+    currently selected slot, a function call to query which slots contain
+@@ -49,11 +51,11 @@ This driver provides the following features:
+    driver.
+ 
+ 1. Make sure that the ide and ide-cd drivers are compiled into the
+-   kernel you're using.  When configuring the kernel, in the section 
+-   entitled "Floppy, IDE, and other block devices", say either `Y' 
+-   (which will compile the support directly into the kernel) or `M'
++   kernel you're using.  When configuring the kernel, in the section
++   entitled "Floppy, IDE, and other block devices", say either `Y`
++   (which will compile the support directly into the kernel) or `M`
+    (to compile support as a module which can be loaded and unloaded)
+-   to the options: 
++   to the options::
+ 
+       ATA/ATAPI/MFM/RLL support
+       Include IDE/ATAPI CDROM support
+@@ -72,35 +74,35 @@ This driver provides the following features:
+    address and an IRQ number, the standard assignments being
+    0x1f0 and 14 for the primary interface and 0x170 and 15 for the
+    secondary interface.  Each interface can control up to two devices,
+-   where each device can be a hard drive, a CDROM drive, a floppy drive, 
+-   or a tape drive.  The two devices on an interface are called `master'
+-   and `slave'; this is usually selectable via a jumper on the drive.
++   where each device can be a hard drive, a CDROM drive, a floppy drive,
++   or a tape drive.  The two devices on an interface are called `master`
++   and `slave`; this is usually selectable via a jumper on the drive.
+ 
+    Linux names these devices as follows.  The master and slave devices
+-   on the primary IDE interface are called `hda' and `hdb',
++   on the primary IDE interface are called `hda` and `hdb`,
+    respectively.  The drives on the secondary interface are called
+-   `hdc' and `hdd'.  (Interfaces at other locations get other letters
++   `hdc` and `hdd`.  (Interfaces at other locations get other letters
+    in the third position; see Documentation/ide/ide.txt.)
+ 
+    If you want your CDROM drive to be found automatically by the
+    driver, you should make sure your IDE interface uses either the
+    primary or secondary addresses mentioned above.  In addition, if
+    the CDROM drive is the only device on the IDE interface, it should
+-   be jumpered as `master'.  (If for some reason you cannot configure
++   be jumpered as `master`.  (If for some reason you cannot configure
+    your system in this manner, you can probably still use the driver.
+    You may have to pass extra configuration information to the kernel
+    when you boot, however.  See Documentation/ide/ide.txt for more
+    information.)
+ 
+ 4. Boot the system.  If the drive is recognized, you should see a
+-   message which looks like
++   message which looks like::
+ 
+      hdb: NEC CD-ROM DRIVE:260, ATAPI CDROM drive
+ 
+    If you do not see this, see section 5 below.
+ 
+ 5. You may want to create a symbolic link /dev/cdrom pointing to the
+-   actual device.  You can do this with the command
++   actual device.  You can do this with the command::
+ 
+      ln -s  /dev/hdX  /dev/cdrom
+ 
+@@ -108,14 +110,14 @@ This driver provides the following features:
+    drive is installed.
+ 
+ 6. You should be able to see any error messages from the driver with
+-   the `dmesg' command.
++   the `dmesg` command.
+ 
+ 
+ 3. Basic usage
+ --------------
+ 
+-An ISO 9660 CDROM can be mounted by putting the disc in the drive and 
+-typing (as root)
++An ISO 9660 CDROM can be mounted by putting the disc in the drive and
++typing (as root)::
+ 
+   mount -t iso9660 /dev/cdrom /mnt/cdrom
+ 
+@@ -123,7 +125,7 @@ where it is assumed that /dev/cdrom is a link pointing to the actual
+ device (as described in step 5 of the last section) and /mnt/cdrom is
+ an empty directory.  You should now be able to see the contents of the
+ CDROM under the /mnt/cdrom directory.  If you want to eject the CDROM,
+-you must first dismount it with a command like
++you must first dismount it with a command like::
+ 
+   umount /mnt/cdrom
+ 
+@@ -148,7 +150,7 @@ such as cdda2wav.  The only types of drive which I've heard support
+ this are Sony and Toshiba drives.  You will get errors if you try to
+ use this function on a drive which does not support it.
+ 
+-For supported changers, you can use the `cdchange' program (appended to
++For supported changers, you can use the `cdchange` program (appended to
+ the end of this file) to switch between changer slots.  Note that the
+ drive should be unmounted before attempting this.  The program takes
+ two arguments:  the CDROM device, and the slot number to which you wish
+@@ -165,7 +167,7 @@ Documentation/ide/ide.txt for current information about the underlying
+ IDE support code.  Some of these items apply only to earlier versions
+ of the driver, but are mentioned here for completeness.
+ 
+-In most cases, you should probably check with `dmesg' for any errors
++In most cases, you should probably check with `dmesg` for any errors
+ from the driver.
+ 
+ a. Drive is not detected during booting.
+@@ -184,9 +186,9 @@ a. Drive is not detected during booting.
+ 
+    - If the autoprobing is not finding your drive, you can tell the
+      driver to assume that one exists by using a lilo option of the
+-     form `hdX=cdrom', where X is the drive letter corresponding to
+-     where your drive is installed.  Note that if you do this and you 
+-     see a boot message like
++     form `hdX=cdrom`, where X is the drive letter corresponding to
++     where your drive is installed.  Note that if you do this and you
++     see a boot message like::
+ 
+        hdX: ATAPI cdrom (?)
+ 
+@@ -220,7 +222,7 @@ b. Timeout/IRQ errors.
+     probably not making it to the host.
+ 
+   - IRQ problems may also be indicated by the message
+-    `IRQ probe failed (<n>)' while booting.  If <n> is zero, that
++    `IRQ probe failed (<n>)` while booting.  If <n> is zero, that
+     means that the system did not see an interrupt from the drive when
+     it was expecting one (on any feasible IRQ).  If <n> is negative,
+     that means the system saw interrupts on multiple IRQ lines, when
+@@ -240,27 +242,27 @@ b. Timeout/IRQ errors.
+     there are hardware problems with the interrupt setup; they
+     apparently don't use interrupts.
+ 
+-  - If you own a Pioneer DR-A24X, you _will_ get nasty error messages 
++  - If you own a Pioneer DR-A24X, you _will_ get nasty error messages
+     on boot such as "irq timeout: status=0x50 { DriveReady SeekComplete }"
+     The Pioneer DR-A24X CDROM drives are fairly popular these days.
+     Unfortunately, these drives seem to become very confused when we perform
+     the standard Linux ATA disk drive probe. If you own one of these drives,
+-    you can bypass the ATA probing which confuses these CDROM drives, by 
+-    adding `append="hdX=noprobe hdX=cdrom"' to your lilo.conf file and running 
+-    lilo (again where X is the drive letter corresponding to where your drive 
++    you can bypass the ATA probing which confuses these CDROM drives, by
++    adding `append="hdX=noprobe hdX=cdrom"` to your lilo.conf file and running
++    lilo (again where X is the drive letter corresponding to where your drive
+     is installed.)
+-    
++
+ c. System hangups.
+ 
+   - If the system locks up when you try to access the CDROM, the most
+     likely cause is that you have a buggy IDE adapter which doesn't
+     properly handle simultaneous transactions on multiple interfaces.
+     The most notorious of these is the CMD640B chip.  This problem can
+-    be worked around by specifying the `serialize' option when
++    be worked around by specifying the `serialize` option when
+     booting.  Recent kernels should be able to detect the need for
+     this automatically in most cases, but the detection is not
+     foolproof.  See Documentation/ide/ide.txt for more information
+-    about the `serialize' option and the CMD640B.
++    about the `serialize` option and the CMD640B.
+ 
+   - Note that many MS-DOS CDROM drivers will work with such buggy
+     hardware, apparently because they never attempt to overlap CDROM
+@@ -269,14 +271,14 @@ c. System hangups.
+ 
+ d. Can't mount a CDROM.
+ 
+-  - If you get errors from mount, it may help to check `dmesg' to see
++  - If you get errors from mount, it may help to check `dmesg` to see
+     if there are any more specific errors from the driver or from the
+     filesystem.
+ 
+   - Make sure there's a CDROM loaded in the drive, and that's it's an
+     ISO 9660 disc.  You can't mount an audio CD.
+ 
+-  - With the CDROM in the drive and unmounted, try something like
++  - With the CDROM in the drive and unmounted, try something like::
+ 
+       cat /dev/cdrom | od | more
+ 
+@@ -284,9 +286,9 @@ d. Can't mount a CDROM.
+     OK, and the problem is at the filesystem level (i.e., the CDROM is
+     not ISO 9660 or has errors in the filesystem structure).
+ 
+-  - If you see `not a block device' errors, check that the definitions
++  - If you see `not a block device` errors, check that the definitions
+     of the device special files are correct.  They should be as
+-    follows:
++    follows::
+ 
+       brw-rw----   1 root     disk       3,   0 Nov 11 18:48 /dev/hda
+       brw-rw----   1 root     disk       3,  64 Nov 11 18:48 /dev/hdb
+@@ -301,7 +303,7 @@ d. Can't mount a CDROM.
+     If you have a /dev/cdrom symbolic link, check that it is pointing
+     to the correct device file.
+ 
+-    If you hear people talking of the devices `hd1a' and `hd1b', these
++    If you hear people talking of the devices `hd1a` and `hd1b`, these
+     were old names for what are now called hdc and hdd.  Those names
+     should be considered obsolete.
+ 
+@@ -311,8 +313,8 @@ d. Can't mount a CDROM.
+     always give meaningful error messages.
+ 
+ 
+-e. Directory listings are unpredictably truncated, and `dmesg' shows
+-   `buffer botch' error messages from the driver.
++e. Directory listings are unpredictably truncated, and `dmesg` shows
++   `buffer botch` error messages from the driver.
+ 
+   - There was a bug in the version of the driver in 1.2.x kernels
+     which could cause this.  It was fixed in 1.3.0.  If you can't
+@@ -335,34 +337,36 @@ f. Data corruption.
+ 5. cdchange.c
+ -------------
+ 
+-/*
+- * cdchange.c  [-v]  <device>  [<slot>]
+- *
+- * This loads a CDROM from a specified slot in a changer, and displays 
+- * information about the changer status.  The drive should be unmounted before 
+- * using this program.
+- *
+- * Changer information is displayed if either the -v flag is specified
+- * or no slot was specified.
+- *
+- * Based on code originally from Gerhard Zuber <zuber@berlin.snafu.de>.
+- * Changer status information, and rewrite for the new Uniform CDROM driver
+- * interface by Erik Andersen <andersee@debian.org>.
+- */
++::
+ 
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <errno.h>
+-#include <string.h>
+-#include <unistd.h>
+-#include <fcntl.h>
+-#include <sys/ioctl.h>
+-#include <linux/cdrom.h>
++  /*
++   * cdchange.c  [-v]  <device>  [<slot>]
++   *
++   * This loads a CDROM from a specified slot in a changer, and displays
++   * information about the changer status.  The drive should be unmounted before
++   * using this program.
++   *
++   * Changer information is displayed if either the -v flag is specified
++   * or no slot was specified.
++   *
++   * Based on code originally from Gerhard Zuber <zuber@berlin.snafu.de>.
++   * Changer status information, and rewrite for the new Uniform CDROM driver
++   * interface by Erik Andersen <andersee@debian.org>.
++   */
+ 
++  #include <stdio.h>
++  #include <stdlib.h>
++  #include <errno.h>
++  #include <string.h>
++  #include <unistd.h>
++  #include <fcntl.h>
++  #include <sys/ioctl.h>
++  #include <linux/cdrom.h>
+ 
+-int
+-main (int argc, char **argv)
+-{
++
++  int
++  main (int argc, char **argv)
++  {
+ 	char *program;
+ 	char *device;
+ 	int fd;           /* file descriptor for CD-ROM device */
+@@ -382,30 +386,30 @@ main (int argc, char **argv)
+ 		fprintf (stderr, "       Slots are numbered 1 -- n.\n");
+ 		exit (1);
+ 	}
+- 
++
+        if (strcmp (argv[0], "-v") == 0) {
+                 verbose = 1;
+                 ++argv;
+                 --argc;
+         }
+- 
++
+ 	device = argv[0];
+- 
++
+ 	if (argc == 2)
+ 		slot = atoi (argv[1]) - 1;
+ 
+-	/* open device */ 
++	/* open device */
+ 	fd = open(device, O_RDONLY | O_NONBLOCK);
+ 	if (fd < 0) {
+-		fprintf (stderr, "%s: open failed for `%s': %s\n",
++		fprintf (stderr, "%s: open failed for `%s`: %s\n",
+ 			 program, device, strerror (errno));
+ 		exit (1);
+ 	}
+ 
+-	/* Check CD player status */ 
++	/* Check CD player status */
+ 	total_slots_available = ioctl (fd, CDROM_CHANGER_NSLOTS);
+ 	if (total_slots_available <= 1 ) {
+-		fprintf (stderr, "%s: Device `%s' is not an ATAPI "
++		fprintf (stderr, "%s: Device `%s` is not an ATAPI "
+ 			"compliant CD changer.\n", program, device);
+ 		exit (1);
+ 	}
+@@ -418,7 +422,7 @@ main (int argc, char **argv)
+ 			exit (1);
+ 		}
+ 
+-		/* load */ 
++		/* load */
+ 		slot=ioctl (fd, CDROM_SELECT_DISC, slot);
+ 		if (slot<0) {
+ 			fflush(stdout);
+@@ -462,14 +466,14 @@ main (int argc, char **argv)
+ 
+ 		for (x_slot=0; x_slot<total_slots_available; x_slot++) {
+ 			printf ("Slot %2d: ", x_slot+1);
+-             		status = ioctl (fd, CDROM_DRIVE_STATUS, x_slot);
+-             		if (status<0) {
+-             		     perror(" CDROM_DRIVE_STATUS");
+-             		} else switch(status) {
++			status = ioctl (fd, CDROM_DRIVE_STATUS, x_slot);
++			if (status<0) {
++			     perror(" CDROM_DRIVE_STATUS");
++			} else switch(status) {
+ 			case CDS_DISC_OK:
+ 				printf ("Disc present.");
+ 				break;
+-			case CDS_NO_DISC: 
++			case CDS_NO_DISC:
+ 				printf ("Empty slot.");
+ 				break;
+ 			case CDS_TRAY_OPEN:
+@@ -507,11 +511,11 @@ main (int argc, char **argv)
+ 				break;
+ 			}
+ 			}
+-                  	status = ioctl (fd, CDROM_MEDIA_CHANGED, x_slot);
+-                  	if (status<0) {
++			status = ioctl (fd, CDROM_MEDIA_CHANGED, x_slot);
++			if (status<0) {
+ 				perror(" CDROM_MEDIA_CHANGED");
+-                  	}
+-		  	switch (status) {
++			}
++			switch (status) {
+ 			case 1:
+ 				printf ("Changed.\n");
+ 				break;
+@@ -525,10 +529,10 @@ main (int argc, char **argv)
+ 	/* close device */
+ 	status = close (fd);
+ 	if (status != 0) {
+-		fprintf (stderr, "%s: close failed for `%s': %s\n",
++		fprintf (stderr, "%s: close failed for `%s`: %s\n",
+ 			 program, device, strerror (errno));
+ 		exit (1);
+ 	}
+- 
++
+ 	exit (0);
+-}
++  }
+diff --git a/Documentation/cdrom/index.rst b/Documentation/cdrom/index.rst
+new file mode 100644
+index 000000000000..efbd5d111825
+--- /dev/null
++++ b/Documentation/cdrom/index.rst
+@@ -0,0 +1,19 @@
++:orphan:
++
++=====
++cdrom
++=====
++
++.. toctree::
++    :maxdepth: 1
++
++    cdrom-standard
++    ide-cd
++    packet-writing
++
++.. only::  subproject and html
++
++   Indices
++   =======
++
++   * :ref:`genindex`
+diff --git a/Documentation/cdrom/packet-writing.txt b/Documentation/cdrom/packet-writing.rst
+similarity index 91%
+rename from Documentation/cdrom/packet-writing.txt
+rename to Documentation/cdrom/packet-writing.rst
+index 2834170d821e..c5c957195a5a 100644
+--- a/Documentation/cdrom/packet-writing.txt
++++ b/Documentation/cdrom/packet-writing.rst
+@@ -1,3 +1,7 @@
++==============
++Packet writing
++==============
++
+ Getting started quick
+ ---------------------
+ 
+@@ -10,13 +14,16 @@ Getting started quick
+   Download from http://sourceforge.net/projects/linux-udf/
+ 
+ - Grab a new CD-RW disc and format it (assuming CD-RW is hdc, substitute
+-  as appropriate):
++  as appropriate)::
++
+ 	# cdrwtool -d /dev/hdc -q
+ 
+-- Setup your writer
++- Setup your writer::
++
+ 	# pktsetup dev_name /dev/hdc
+ 
+-- Now you can mount /dev/pktcdvd/dev_name and copy files to it. Enjoy!
++- Now you can mount /dev/pktcdvd/dev_name and copy files to it. Enjoy::
++
+ 	# mount /dev/pktcdvd/dev_name /cdrom -t udf -o rw,noatime
+ 
+ 
+@@ -25,11 +32,11 @@ Packet writing for DVD-RW media
+ 
+ DVD-RW discs can be written to much like CD-RW discs if they are in
+ the so called "restricted overwrite" mode. To put a disc in restricted
+-overwrite mode, run:
++overwrite mode, run::
+ 
+ 	# dvd+rw-format /dev/hdc
+ 
+-You can then use the disc the same way you would use a CD-RW disc:
++You can then use the disc the same way you would use a CD-RW disc::
+ 
+ 	# pktsetup dev_name /dev/hdc
+ 	# mount /dev/pktcdvd/dev_name /cdrom -t udf -o rw,noatime
+@@ -41,7 +48,7 @@ Packet writing for DVD+RW media
+ According to the DVD+RW specification, a drive supporting DVD+RW discs
+ shall implement "true random writes with 2KB granularity", which means
+ that it should be possible to put any filesystem with a block size >=
+-2KB on such a disc. For example, it should be possible to do:
++2KB on such a disc. For example, it should be possible to do::
+ 
+ 	# dvd+rw-format /dev/hdc   (only needed if the disc has never
+ 	                            been formatted)
+@@ -54,7 +61,7 @@ follow the specification, but suffer bad performance problems if the
+ writes are not 32KB aligned.
+ 
+ Both problems can be solved by using the pktcdvd driver, which always
+-generates aligned writes.
++generates aligned writes::
+ 
+ 	# dvd+rw-format /dev/hdc
+ 	# pktsetup dev_name /dev/hdc
+@@ -83,7 +90,7 @@ Notes
+ 
+ - Since the pktcdvd driver makes the disc appear as a regular block
+   device with a 2KB block size, you can put any filesystem you like on
+-  the disc. For example, run:
++  the disc. For example, run::
+ 
+ 	# /sbin/mke2fs /dev/pktcdvd/dev_name
+ 
+@@ -97,7 +104,7 @@ Since Linux 2.6.20, the pktcdvd module has a sysfs interface
+ and can be controlled by it. For example the "pktcdvd" tool uses
+ this interface. (see http://tom.ist-im-web.de/download/pktcdvd )
+ 
+-"pktcdvd" works similar to "pktsetup", e.g.:
++"pktcdvd" works similar to "pktsetup", e.g.::
+ 
+ 	# pktcdvd -a dev_name /dev/hdc
+ 	# mkudffs /dev/pktcdvd/dev_name
+@@ -115,7 +122,7 @@ For a description of the sysfs interface look into the file:
+ Using the pktcdvd debugfs interface
+ -----------------------------------
+ 
+-To read pktcdvd device infos in human readable form, do:
++To read pktcdvd device infos in human readable form, do::
+ 
+ 	# cat /sys/kernel/debug/pktcdvd/pktcdvd[0-7]/info
+ 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8bec064bb353..1f73ef8c25f5 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -7644,7 +7644,7 @@ IDE/ATAPI DRIVERS
+ M:	Borislav Petkov <bp@alien8.de>
+ L:	linux-ide@vger.kernel.org
+ S:	Maintained
+-F:	Documentation/cdrom/ide-cd
++F:	Documentation/cdrom/ide-cd.rst
+ F:	drivers/ide/ide-cd*
+ 
+ IDEAPAD LAPTOP EXTRAS DRIVER
 diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 20bb4bfa4be6..e17f2376de60 100644
+index 20bb4bfa4be6..96ec7e0fc1ea 100644
 --- a/drivers/block/Kconfig
 +++ b/drivers/block/Kconfig
-@@ -273,6 +273,25 @@ config BLK_DEV_NBD
+@@ -347,7 +347,7 @@ config CDROM_PKTCDVD
+ 	  is possible.
+ 	  DVD-RW disks must be in restricted overwrite mode.
  
- 	  If unsure, say N.
+-	  See the file <file:Documentation/cdrom/packet-writing.txt>
++	  See the file <file:Documentation/cdrom/packet-writing.rst>
+ 	  for further information on the use of this driver.
  
-+config BLK_DEV_NBDROOT
-+	bool "Early network block device client support"
-+	depends on BLK_DEV_NBD=y
-+	---help---
-+	  Saying yes will enable kernel NBD client support. This allows to
-+	  connect entire disk with multiple partitions before mounting rootfs.
-+
-+	  The arguments for the server are passed via kernel command line.
-+	  The kernel command line has the format
-+	  'nbdroot=[<SERVER_IP>:]<SERVER_PORT>/<EXPORT_NAME>'.
-+	  SERVER_IP is optional. If it is not available it will use the
-+	  root_server_addr transmitted through DHCP.
-+
-+	  Based on those arguments, the connection to the server is established
-+	  and is connected to the nbd0 device. The rootdevice therefore is
-+	  root=/dev/nbd0.
-+
-+	  If unsure, say N.
-+
- config BLK_DEV_SKD
- 	tristate "STEC S1120 Block Driver"
- 	depends on PCI
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 63fcfb38e640..cb5e60419e07 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -46,6 +46,35 @@
- #define CREATE_TRACE_POINTS
- #include <trace/events/nbd.h>
+ 	  To compile this driver as a module, choose M here: the
+diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+index 5d1e0a4a7d84..ac42ae4651ce 100644
+--- a/drivers/cdrom/cdrom.c
++++ b/drivers/cdrom/cdrom.c
+@@ -7,7 +7,7 @@
+    License.  See linux/COPYING for more information.
  
-+#include <net/ipconfig.h>
-+#include <linux/in.h>
-+#include <linux/tcp.h>
-+#include <linux/nfs_fs.h>
-+#include <linux/nfs.h>
-+
-+#define ADDR_NONE cpu_to_be32(INADDR_NONE)
-+
-+static const char nbd_magic[] = "NBDMAGIC";
-+static const u64 nbd_opts_magic = 0x49484156454F5054LL;
-+
-+/* Options used for the kernel driver */
-+#define NBD_OPT_EXPORT_NAME 1
-+
-+#define NBD_DEFAULT_BLOCKSIZE 512 /* bytes */
-+
-+#define NBD_DEFAULT_TIMEOUT 2 /* seconds */
-+
-+#define NBD_MAXPATHLEN  NFS_MAXPATHLEN
-+
-+struct nbdroot {
-+	const char *bdev;
-+	__be32 server_addr;
-+	__be32 server_port;
-+	loff_t block_size;
-+	int timeout;
-+	char server_export[NBD_MAXPATHLEN + 1];
-+};
-+
- static DEFINE_IDR(nbd_index_idr);
- static DEFINE_MUTEX(nbd_index_mutex);
- static int nbd_total_devices = 0;
-@@ -441,6 +470,16 @@ static int sock_xmit(struct socket *sock, int send,
- 	return result;
- }
+    Uniform CD-ROM driver for Linux.
+-   See Documentation/cdrom/cdrom-standard.txt for usage information.
++   See Documentation/cdrom/cdrom-standard.rst for usage information.
  
-+static int sock_xmit_buf(struct socket *sock, int send,
-+			 void *buf, size_t size)
-+{
-+	struct iov_iter iter;
-+	struct kvec iov = {.iov_base = buf, .iov_len = size};
-+
-+	iov_iter_kvec(&iter, WRITE | ITER_KVEC, &iov, 1, size);
-+	return sock_xmit(sock, send, &iter, 0, 0);
-+}
-+
- static int nbd_xmit(struct nbd_device *nbd, int index, int send,
- 		     struct iov_iter *iter, int msg_flags, int *sent)
- {
-@@ -2301,6 +2340,261 @@ static void __exit nbd_cleanup(void)
- 	unregister_blkdev(NBD_MAJOR, "nbd");
- }
- 
-+#ifdef CONFIG_BLK_DEV_NBDROOT
-+
-+struct nbdroot nbdroot_0 = {.bdev = "nbd0",
-+			    .server_export = "",
-+			    .server_addr = ADDR_NONE,
-+			    .timeout = NBD_DEFAULT_TIMEOUT,
-+			    .block_size = NBD_DEFAULT_BLOCKSIZE};
-+
-+static int nbd_connect(struct nbdroot *nbdroot, struct socket **socket)
-+{
-+	struct socket *sock;
-+	struct sockaddr_in sockaddr;
-+	int err;
-+	char val;
-+
-+	err = sock_create_kern(&init_net, AF_INET, SOCK_STREAM,
-+			       IPPROTO_TCP, &sock);
-+	if (err < 0)
-+		return err;
-+
-+	sockaddr.sin_family = AF_INET;
-+	sockaddr.sin_addr.s_addr = nbdroot->server_addr;
-+	sockaddr.sin_port = nbdroot->server_port;
-+
-+	val = 1;
-+	sock->ops->setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, &val,
-+			      sizeof(val));
-+
-+	err = sock->ops->connect(sock, (struct sockaddr *)&sockaddr,
-+				 sizeof(sockaddr), 0);
-+	if (err < 0)
-+		return err;
-+
-+	*socket = sock;
-+
-+	return 0;
-+}
-+
-+static int nbd_connection_negotiate(struct socket *sock, char *export_name,
-+				    size_t *rsize, u16 *nflags)
-+{
-+	char buf[256];
-+	int ret;
-+	u64 magic;
-+	u16 flags;
-+	u32 client_flags;
-+	u32 opt;
-+	u32 name_len;
-+	u64 nbd_size;
-+
-+	ret = sock_xmit_buf(sock, 0, buf, 8);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (strncmp(buf, nbd_magic, 8))
-+		return -EINVAL;
-+
-+	ret = sock_xmit_buf(sock, 0, &magic, sizeof(magic));
-+	if (ret < 0)
-+		return ret;
-+	magic = be64_to_cpu(magic);
-+
-+	if (magic != nbd_opts_magic)
-+		return -EINVAL;
-+
-+	ret = sock_xmit_buf(sock, 0, &flags, sizeof(flags));
-+	if (ret < 0)
-+		return ret;
-+
-+	*nflags = ntohs(flags);
-+
-+	client_flags = 0;
-+
-+	ret = sock_xmit_buf(sock, 1, &client_flags, sizeof(client_flags));
-+	if (ret < 0)
-+		return ret;
-+
-+	magic = cpu_to_be64(nbd_opts_magic);
-+	ret = sock_xmit_buf(sock, 1, &magic, sizeof(magic));
-+	if (ret < 0)
-+		return ret;
-+
-+	opt = htonl(NBD_OPT_EXPORT_NAME);
-+	ret = sock_xmit_buf(sock, 1, &opt, sizeof(opt));
-+	if (ret < 0)
-+		return ret;
-+
-+	name_len = strlen(export_name) + 1;
-+	name_len = htonl(name_len);
-+	ret = sock_xmit_buf(sock, 1, &name_len, sizeof(name_len));
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = sock_xmit_buf(sock, 1, export_name, strlen(export_name) + 1);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = sock_xmit_buf(sock, 0, &nbd_size, sizeof(nbd_size));
-+	if (ret < 0)
-+		return ret;
-+	nbd_size = be64_to_cpu(nbd_size);
-+
-+	ret = sock_xmit_buf(sock, 0, &flags, sizeof(flags));
-+	if (ret < 0)
-+		return ret;
-+	*nflags = ntohs(flags);
-+
-+	ret = sock_xmit_buf(sock, 0, buf, 124);
-+	if (ret < 0)
-+		return ret;
-+
-+	*rsize = nbd_size;
-+
-+	return 0;
-+}
-+
-+static int nbd_bind_connection(struct nbdroot *nbdroot, struct nbd_device *nbd,
-+			       struct socket *sock, size_t rsize, u32 flags)
-+{
-+	int conn, ret;
-+	struct block_device *bdev = blkdev_get_by_dev(disk_devt(nbd->disk),
-+					FMODE_READ | FMODE_WRITE, 0);
-+
-+	if (IS_ERR(bdev)) {
-+		pr_err("nbdroot: blkdev_get_by_dev failed %ld\n",
-+		       PTR_ERR(bdev));
-+		return PTR_ERR(bdev);
-+	}
-+
-+	conn = nbd->config->num_connections;
-+	ret = nbd_add_socket(nbd, sock, false);
-+	if (ret) {
-+		pr_err("nbdroot: add socket failed %d\n", ret);
-+		return ret;
-+	}
-+
-+	mutex_lock(&nbd->config->socks[conn]->tx_lock);
-+
-+	nbd->config->flags = flags;
-+
-+	nbd_size_set(nbd, nbdroot->block_size,
-+		     div_s64(rsize, nbdroot->block_size));
-+
-+	nbd->tag_set.timeout = nbdroot->timeout * HZ;
-+	blk_queue_rq_timeout(nbd->disk->queue, nbdroot->timeout * HZ);
-+
-+	mutex_unlock(&nbd->config->socks[conn]->tx_lock);
-+
-+	ret = nbd_start_device_ioctl(nbd, bdev);
-+	if (ret) {
-+		pr_err("nbdroot: start device ioctl failed %d\n", ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int nbdroot_thread(void *arg)
-+{
-+	struct nbdroot *nbdroot = (struct nbdroot *)arg;
-+	struct socket *sock = 0;
-+	size_t rsize;
-+	u16 nflags;
-+	int ret;
-+	dev_t devt = blk_lookup_devt(nbdroot->bdev, 0);
-+	struct gendisk *disk = get_gendisk(devt, &ret);
-+	struct nbd_device *nbd = (struct nbd_device *)disk->private_data;
-+
-+	ret = nbd_connect(nbdroot, &sock);
-+	if (ret) {
-+		pr_err("nbdroot: connect failed %d\n", ret);
-+		goto err;
-+	}
-+
-+	ret = nbd_connection_negotiate(sock, nbdroot->server_export,
-+				       &rsize, &nflags);
-+	if (ret) {
-+		pr_err("nbdroot: negotiation failed %d\n", ret);
-+		goto err;
-+	}
-+
-+	ret = nbd_bind_connection(nbdroot, nbd, sock, rsize, nflags);
-+	if (ret) {
-+		pr_err("nbdroot: nbd_bind_connection failed %d\n", ret);
-+		goto err;
-+	}
-+	return 0;
-+
-+err:
-+	pr_err("nbdroot: %s init failed, IP: %pI4, port: %i, export: %s\n",
-+	       nbdroot->bdev, &nbdroot->server_addr,
-+	       ntohs(nbdroot->server_port), nbdroot->server_export);
-+
-+	if (sock)
-+		sock_release(sock);
-+
-+	return ret;
-+}
-+
-+static int __init nbdroot_init(void)
-+{
-+	if (nbdroot_0.server_port != 0)
-+		kthread_run(nbdroot_thread, &nbdroot_0, "nbdroot_0");
-+
-+	return 0;
-+}
-+
-+/* We need this in late_initcall_sync to be sure that the network is setup */
-+late_initcall_sync(nbdroot_init);
-+
-+/*
-+ * Parse format "[<SERVER_IP>:]<SERVER_PORT>/<EXPORT_NAME>"
-+ */
-+static int __init nbdroot_setup(char *line)
-+{
-+	struct nbdroot *nbdroot = &nbdroot_0;
-+	char *export;
-+	u16 port;
-+	int ret;
-+	char buf[NBD_MAXPATHLEN + 1];
-+
-+	strlcpy(buf, line, sizeof(buf) - 1);
-+
-+	nbdroot->server_addr = root_nfs_parse_addr(buf);
-+
-+	if (*buf == '\0')
-+		return -EINVAL;
-+
-+	if (nbdroot->server_addr == ADDR_NONE) {
-+		if (root_server_addr == ADDR_NONE) {
-+			pr_err("nbdroot: Failed to find server address\n");
-+			return -EINVAL;
-+		}
-+		nbdroot->server_addr = root_server_addr;
-+	}
-+
-+	export = strchr(buf, '/');
-+	*export = '\0';
-+	++export;
-+
-+	ret = kstrtou16(buf, 10, &port);
-+	if (ret)
-+		return ret;
-+
-+	nbdroot->server_port = htons(port);
-+	strlcpy(nbdroot->server_export, export,
-+		sizeof(nbdroot->server_export) - 1);
-+
-+	return 0;
-+}
-+
-+__setup("nbdroot=", nbdroot_setup);
-+
-+#endif /* CONFIG_BLK_DEV_NBDROOT */
-+
- module_init(nbd_init);
- module_exit(nbd_cleanup);
- 
+    The routines in the file provide a uniform interface between the
+    software that uses CD-ROMs and the various low-level drivers that
+diff --git a/drivers/ide/ide-cd.c b/drivers/ide/ide-cd.c
+index 3b15adc6ce98..9d117936bee1 100644
+--- a/drivers/ide/ide-cd.c
++++ b/drivers/ide/ide-cd.c
+@@ -9,7 +9,7 @@
+  * May be copied or modified under the terms of the GNU General Public
+  * License.  See linux/COPYING for more information.
+  *
+- * See Documentation/cdrom/ide-cd for usage information.
++ * See Documentation/cdrom/ide-cd.rst for usage information.
+  *
+  * Suggestions are welcome. Patches that work are more welcome though. ;-)
+  *
 -- 
-2.17.1
+2.21.0
 
