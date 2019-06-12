@@ -3,100 +3,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E0BC31E44
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 02:56:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3738C31E46
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 06:58:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E93F20673
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 02:56:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABFCC205ED
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 06:58:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406521AbfFLC4z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jun 2019 22:56:55 -0400
-Received: from mail-qk1-f175.google.com ([209.85.222.175]:43266 "EHLO
-        mail-qk1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405061AbfFLC4z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jun 2019 22:56:55 -0400
-Received: by mail-qk1-f175.google.com with SMTP id m14so9067836qka.10
-        for <linux-block@vger.kernel.org>; Tue, 11 Jun 2019 19:56:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Q1Qi48oLh9iihq2LkIgrDslGg/Vx8JGXFp2UzVtaaTY=;
-        b=RMQH4BWHqjq0RC4v9ylnfi17XF0ibDNjTLhUooo+XTisCJ3K4g4WQRfr9liqf4mVRh
-         fEsIuJTP1CkaIzM/qag4OhmpdLJsyB8HuGySKRe9WhZSKae+YMI/XiJ+N8JpHKOtZScv
-         PZPWm6FQZuCDi7eRMAp4d4PBoj/GEmuoXzJ28zLcsZtyKyKvNK+7/LBT8gkNuQGpd7u/
-         UQJPe6A6ou9/MrQAvW6fJJzosw9sck2EeC4SeHKLlLqHBkVjHH/Cg5ATRLX8VyXtbI2R
-         0ybHqQpVMJnrONdRWcb9aZ9Uytygqx76WA1xVLzXsDrMX+HHeShBwO7+QQf/4XtYiGqF
-         2S0A==
-X-Gm-Message-State: APjAAAVtClV+ddomam/8o5ZCOb8oXKtf2yL26zE33DnlnLYXfXAggNLA
-        oSafzYGmJr7UiDNPMKzHkm/LlNjFvWZC5a95EUit2g==
-X-Google-Smtp-Source: APXvYqxctTUcbUUwKEwCDb+kAVsNlcPeMauTITiiVl5q4wHU5Gq3T5KxTJd5OAfYva1ulpddSUg3/ykgbXPYx9uR294=
-X-Received: by 2002:a37:6708:: with SMTP id b8mr61258505qkc.141.1560308214695;
- Tue, 11 Jun 2019 19:56:54 -0700 (PDT)
+        id S2391160AbfFLG6i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jun 2019 02:58:38 -0400
+Received: from mga01.intel.com ([192.55.52.88]:45279 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390376AbfFLG6i (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jun 2019 02:58:38 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Jun 2019 23:58:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,363,1557212400"; 
+   d="scan'208";a="184148897"
+Received: from pipin.fi.intel.com (HELO pipin) ([10.237.72.175])
+  by fmsmga002.fm.intel.com with ESMTP; 11 Jun 2019 23:58:34 -0700
+From:   Felipe Balbi <felipe.balbi@linux.intel.com>
+To:     Alan Stern <stern@rowland.harvard.edu>
+Cc:     Mathias Nyman <mathias.nyman@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Howells <dhowells@redhat.com>, viro@zeniv.linux.org.uk,
+        linux-usb@vger.kernel.org, raven@themaw.net,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 09/10] usb: Add USB subsystem notifications [ver #3]
+In-Reply-To: <Pine.LNX.4.44L0.1906110950440.1535-100000@iolanthe.rowland.org>
+References: <Pine.LNX.4.44L0.1906110950440.1535-100000@iolanthe.rowland.org>
+Date:   Wed, 12 Jun 2019 09:58:33 +0300
+Message-ID: <87h88v1e92.fsf@linux.intel.com>
 MIME-Version: 1.0
-References: <70cda2a3-f246-d45b-f600-1f9d15ba22ff@gmail.com>
- <87eflmpqkb.fsf@notabene.neil.brown.name> <20190222211006.GA10987@redhat.com>
- <7f0aeb7b-fdaa-0625-f785-05c342047550@kernel.dk> <20190222235459.GA11726@redhat.com>
- <CAMeeMh-2ANOr_Sb66EyA_HULkVRudD7fyOZsDbpRpDrshwnR2w@mail.gmail.com>
- <20190223024402.GA12407@redhat.com> <CAMeeMh9qLkTByWJewPR4o844wPkA-g5Hnm7aGjszuPopPAe8vA@mail.gmail.com>
-In-Reply-To: <CAMeeMh9qLkTByWJewPR4o844wPkA-g5Hnm7aGjszuPopPAe8vA@mail.gmail.com>
-From:   John Dorminy <jdorminy@redhat.com>
-Date:   Tue, 11 Jun 2019 22:56:42 -0400
-Message-ID: <CAMeeMh-6KMLgriX_7KT52ynjBMyT9yDWSMKv6YXW+yDpvv0=wA@mail.gmail.com>
-Subject: Re: block: be more careful about status in __bio_chain_endio
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, NeilBrown <neilb@suse.com>,
-        linux-block@vger.kernel.org,
-        device-mapper development <dm-devel@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Having studied the code in question more thoroughly, my first email's
-scenario can't occur, I believe. bio_put() contains a
-atomic_dec_and_test(), which (according to
-Documentation/atomic_t.txt), having a return value, are fully ordered
-and therefore impose a general memory barrier. A general memory
-barrier means that no value set before bio_put() may be observed
-afterwards, if I accurately understand
-Documentation/memory_barriers.txt. Thus, the scenario I imagined, with
-a load from inside __bio_chain_endio() being visible in bi_end_io(),
-cannot occur.
 
-However, the second email's scenario, of a compiler making two stores
-out of a conditional store, is still accurate according to my
-understanding. I continue to believe setting parent->bi_status needs
-to be a WRITE_ONCE() and any reading of parent->bi_status before
-bio_put() needs to be at least a READ_ONCE(). The last thing in that
-email is wrong for the same reason that the first email couldn't
-happen: the bio_put() general barrier means later accesses to the
-field from a single thread will freshly read the field and thereby not
-get an incorrectly cached value.
+Hi,
 
-As a concrete proposal, I believe either of the following work and fix
-the race NeilB described, as well as the compiler (or CPU) race I
-described:
+Alan Stern <stern@rowland.harvard.edu> writes:
 
- -     if (!parent->bi_status)
- -               parent->bi_status = bio->bi_status;
- +     if (bio->bi_status)
- +               WRITE_ONCE(parent->bi_status, bio->bi_status);
+> On Tue, 11 Jun 2019, Felipe Balbi wrote:
+>
+>> >> >> > So for "severe" issues, yes, we should do this, but perhaps not for all
+>> >> >> > of the "normal" things we see when a device is yanked out of the system
+>> >> >> > and the like.
+>> >> >> 
+>> >> >> Then what counts as a "severe" issue?  Anything besides enumeration 
+>> >> >> failure?
+>> >> >
+>> >> > Not that I can think of at the moment, other than the other recently
+>> >> > added KOBJ_CHANGE issue.  I'm sure we have other "hard failure" issues
+>> >> > in the USB stack that people will want exposed over time.
+>> >> 
+>> >> From an XHCI standpoint, Transaction Errors might be one thing. They
+>> >> happen rarely and are a strong indication that the bus itself is
+>> >> bad. Either bad cable, misbehaving PHYs, improper power management, etc.
+>> >
+>> > Don't you also get transaction errors if the user unplugs a device in 
+>> > the middle of a transfer?  That's not the sort of thing we want to sent 
+>> > notifications about.
+>> 
+>> Mathias, do we get Transaction Error if user removes cable during a
+>> transfer? I thought we would just get Port Status Change with CC bit
+>> cleared, no?
+>
+> Even if xHCI doesn't give Transaction Errors when a cable is unplugged 
+> during a transfer, other host controllers do.  Sometimes quite a lot -- 
+> they continue to occur until the kernel polls the parent hub's 
+> interrupt ep and learns that the port is disconnected, which can take 
+> up to 250 ms.
 
---or--
+my comment was specific about XHCI. It even started with "From an XHCI
+standpoint" :-)
 
- -     if (!parent->bi_status)
- -               parent->bi_status = bio->bi_status;
- +     if (!READ_ONCE(parent->bi_status) && bio->bi_status)
- +               WRITE_ONCE(parent->bi_status, bio->bi_status);
-
-I believe the second of these might, but is not guaranteed to,
-preserve the first error observed in a child; I believe if you want to
-definitely save the first error you need an atomic.
+-- 
+balbi
