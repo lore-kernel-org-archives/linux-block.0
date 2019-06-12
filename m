@@ -2,107 +2,110 @@ Return-Path: <SRS0=leUH=UL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA7E7C31E46
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 13:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C7FC31E46
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 13:39:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D58120866
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 13:04:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D08B208CA
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 13:39:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560346772;
+	bh=rvQHIt4GDLlwdBbXUsexskN3ra7CEvqVLZaJHG0Q+FY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=fa4G7cMZFjvessU95ekWzwbG38o1o8bQYiwezKzsnRcJ0ngiP5LepcFy9J5oh2TIG
+	 yau5Dr1KrvvYp34J28jt17me2U+ovnGlkJfl09EHoiF0/1F2BwQvTCHkHe84PfzdMo
+	 k+XQmxh1dqwtMHzDgXaVRyxSoKrXiSj9cyhENsBg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730214AbfFLNEs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jun 2019 09:04:48 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55104 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728322AbfFLNEs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jun 2019 09:04:48 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id D5E70AF8F;
-        Wed, 12 Jun 2019 13:04:46 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 1FBB21E4328; Wed, 12 Jun 2019 15:04:46 +0200 (CEST)
-Date:   Wed, 12 Jun 2019 15:04:46 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Moyer <jmoyer@redhat.com>, Theodore Ts'o <tytso@mit.edu>,
-        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com,
+        id S2408433AbfFLNjb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jun 2019 09:39:31 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:46450 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2407111AbfFLNjb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jun 2019 09:39:31 -0400
+Received: by mail-pf1-f194.google.com with SMTP id 81so9677931pfy.13
+        for <linux-block@vger.kernel.org>; Wed, 12 Jun 2019 06:39:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=q2Ae324CKt2gt5FPiDITS3acqtACPG+wGKF0qDOwCvQ=;
+        b=kNwNQ2W9hQYdzRU+sjZ09+Nx5q6etOLPgOPSWPzJnekCyQtdheWlCUeuzSHedoErWp
+         Ar66X/1qOqHE2rkmqbbXEa8jrq+1hMP7hyxuXLogJEAB4hcbvHs6gjxoVVFkFR1LsDaK
+         vjcYgCf0stnl+QEtn1q56hQ5NRrRmdiqulZHoIeB5uoWg7BQdDHrYkmoecCglZ/vHuHi
+         0jJCJos2fRx+GU05n1rskvFleA4S4FLYlcPAAQwAIJ3mKm5VW31cMZJeAB/JSCZnqTcZ
+         pQKQLhvxAIuOwbd9XFL+tUjInAihgesFfbgd8SLBit7kz2CpCdxz5xjW35unj2N9xj9U
+         7LAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=q2Ae324CKt2gt5FPiDITS3acqtACPG+wGKF0qDOwCvQ=;
+        b=oYazj7Z25hYaZtFIyNbSS6vvQ9quRxT0FZVdpFzHj6MxvK8j7uTgJcjOiQkeLMF/rA
+         jke6/9m65msWoclgHeTrXChmjmmNRbcfq3iaR0DNKaau1X6FQEJjTi6fW3jl/Eg1IfgA
+         J7GManEUdrEYgjabowGMcTpxuomK8IqNurRoFnkDkUUW9jkENatYsEuuz806QgqZmJ9v
+         m/YkKk8/PhCMaDt6uTsmKEyzMppe0t/p8ri8WwqkDu3rZNlM3QlvncGgga2o+DQOfEdR
+         Uf42+gfcWVQWw0w8X3KL2RxSZH/7/PrmI33AKspu8AXtq5J4fWADY/TOhjGFFjWVAS4i
+         epnA==
+X-Gm-Message-State: APjAAAXZjXBb6z60wvA9vR5Mhid1AxPVCGMhGW83piyxMnqWwqgmU9KE
+        HgBUcnA97msy6W+Fyc4ig18=
+X-Google-Smtp-Source: APXvYqz6Ev+sAnu5DHm+qhzh0Z+KkUnSJa62xPMZIYMz4oIH1jzNnQWScdjL6OnbKRljrA8jceqBgQ==
+X-Received: by 2002:a17:90a:af8a:: with SMTP id w10mr33401750pjq.132.1560346770510;
+        Wed, 12 Jun 2019 06:39:30 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::c431])
+        by smtp.gmail.com with ESMTPSA id m14sm6960660pgl.35.2019.06.12.06.39.28
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 12 Jun 2019 06:39:28 -0700 (PDT)
+Date:   Wed, 12 Jun 2019 06:39:26 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
         Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-Message-ID: <20190612130446.GD14578@quack2.suse.cz>
-References: <6FE0A98F-1E3D-4EF6-8B38-2C85741924A4@linaro.org>
- <2A58C239-EF3F-422B-8D87-E7A3B500C57C@linaro.org>
- <a04368ba-f1d5-8f2c-1279-a685a137d024@csail.mit.edu>
- <E270AD92-943E-4529-8158-AB480D6D9DF8@linaro.org>
- <5b71028c-72f0-73dd-0cd5-f28ff298a0a3@csail.mit.edu>
- <FFA44D26-75FF-4A8E-A331-495349BE5FFC@linaro.org>
- <0d6e3c02-1952-2177-02d7-10ebeb133940@csail.mit.edu>
- <7B74A790-BD98-412B-ADAB-3B513FB1944E@linaro.org>
- <6a6f4aa4-fc95-f132-55b2-224ff52bd2d8@csail.mit.edu>
- <7c5e9d11-4a3d-7df4-c1e6-7c95919522ab@csail.mit.edu>
+        Linus Walleij <linus.walleij@linaro.org>,
+        Fam Zheng <fam@euphon.net>
+Subject: Re: [PATCH block/for-5.2-fixes] bfq: use io.weight interface file
+ instead of io.bfq.weight
+Message-ID: <20190612133926.GN3341036@devbig004.ftw2.facebook.com>
+References: <4f801c9b-4ab6-9a11-536c-ff509df8aa56@kernel.dk>
+ <CAHk-=whXfPjCtc5+471x83WApJxvxzvSfdzj_9hrdkj-iamA=g@mail.gmail.com>
+ <52daccae-3228-13a1-c609-157ab7e30564@kernel.dk>
+ <CAHk-=whca9riMqYn6WoQpuq9ehQ5KfBvBb4iVZ314JSfvcgy9Q@mail.gmail.com>
+ <ebfb27a3-23e2-3ad5-a6b3-5f8262fb9ecb@kernel.dk>
+ <90A8C242-E45A-4D6E-8797-598893F86393@linaro.org>
+ <20190610154820.GA3341036@devbig004.ftw2.facebook.com>
+ <20190611194959.GJ3341036@devbig004.ftw2.facebook.com>
+ <20190611211718.GM3341036@devbig004.ftw2.facebook.com>
+ <A1C3E3D8-62E3-4BD3-86B4-59E7E1319EA8@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7c5e9d11-4a3d-7df4-c1e6-7c95919522ab@csail.mit.edu>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <A1C3E3D8-62E3-4BD3-86B4-59E7E1319EA8@linaro.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 11-06-19 15:34:48, Srivatsa S. Bhat wrote:
-> On 6/2/19 12:04 AM, Srivatsa S. Bhat wrote:
-> > On 5/30/19 3:45 AM, Paolo Valente wrote:
-> >>
-> [...]
-> >> At any rate, since you pointed out that you are interested in
-> >> out-of-the-box performance, let me complete the context: in case
-> >> low_latency is left set, one gets, in return for this 12% loss,
-> >> a) at least 1000% higher responsiveness, e.g., 1000% lower start-up
-> >> times of applications under load [1];
-> >> b) 500-1000% higher throughput in multi-client server workloads, as I
-> >> already pointed out [2].
-> >>
-> > 
-> > I'm very happy that you could solve the problem without having to
-> > compromise on any of the performance characteristics/features of BFQ!
-> > 
-> > 
-> >> I'm going to prepare complete patches.  In addition, if ok for you,
-> >> I'll report these results on the bug you created.  Then I guess we can
-> >> close it.
-> >>
-> > 
-> > Sounds great!
-> >
-> 
-> Hi Paolo,
-> 
-> Hope you are doing great!
-> 
-> I was wondering if you got a chance to post these patches to LKML for
-> review and inclusion... (No hurry, of course!)
-> 
-> Also, since your fixes address the performance issues in BFQ, do you
-> have any thoughts on whether they can be adapted to CFQ as well, to
-> benefit the older stable kernels that still support CFQ?
+On Wed, Jun 12, 2019 at 09:32:07AM +0200, Paolo Valente wrote:
+> Could you elaborate a little more on this?
 
-Since CFQ doesn't exist in current upstream kernel anymore, I seriously
-doubt you'll be able to get any performance improvements for it in the
-stable kernels...
+Doesn't seem like you did.
 
-								Honza
+> bfq code for setting up and handling io.weight (more precisely
+> io.bfq.weight) is a copy and paste of cfq code.
+
+Please take a look at the documentations under
+Documentation/cgroup-v1/blk-iocontroller.txt and
+Documentation/admin-guide/cgroup-v2.rst.
+
+Thanks.
 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+tejun
