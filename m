@@ -2,242 +2,98 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DE4C31E49
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:11:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C68C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:13:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC9C1217F5
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:11:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADB7921743
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:13:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560445883;
-	bh=FBWMxYgWxiNu6570dn7YwBKk4jtYzSoOQbyjngxdWio=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=at0TfqYfGFkgCAzAoaLcz0YNNtVapMV1DC1QA19I9u9lHo9W2Ir63q0y86XUwIzGB
-	 tHfA63wt6emc7KGgVSmogti2IowGirQAOQYvNstCkEI5P/hQTbxJvwc5ec0zCK2YUb
-	 K3ejZPOfQaaEjHVMB3wJbuj2t87ZRnpE8Cwslc6o=
+	s=default; t=1560446006;
+	bh=05dXGrGKCXPHaKO0jLEjsx1c8iyxgNPMzxixaWBU1Yw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=NCndDgMwTFXGRYxtQGacpEVlRBCA8N4U98oElDCEeHZwrFN54/x6RUA8EQe2BlKm8
+	 wyb4QaVxMEIi159wLMbyr1PlpCLn4UcLYLIJEhLUSY6rjiT4P5vrbXI7Ai/F54EQav
+	 fdS9vzgQwvJF8O8F38cAaknGYp8AFN+Uyiwen0Qo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729303AbfFMRLV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 13:11:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54244 "EHLO mail.kernel.org"
+        id S2404172AbfFMRN0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 13:13:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58250 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729166AbfFMRLR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 13:11:17 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1728971AbfFLWBE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jun 2019 18:01:04 -0400
+Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4CF022063F;
-        Thu, 13 Jun 2019 17:11:15 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id ECBA920B7C;
+        Wed, 12 Jun 2019 22:01:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560445875;
-        bh=FBWMxYgWxiNu6570dn7YwBKk4jtYzSoOQbyjngxdWio=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=onyQ0TF6UDHFdLqBxVbYoaq8Vmetqt3XjxdkKH0dS0Gl8rOx6CanWFVNqTD5fhlPW
-         CmhHjh0De9XgMRHLmahJfqiLW0NbrhZWZXtRyjPTdqDxYTvTI0JiEhV0DUFGfC4ypv
-         Ebrd89F9zTt1JacElWfJJLosLuVPvJO62FCNDpVc=
-Date:   Thu, 13 Jun 2019 10:11:13 -0700
+        s=default; t=1560376863;
+        bh=05dXGrGKCXPHaKO0jLEjsx1c8iyxgNPMzxixaWBU1Yw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=AboYvTBemsNv4lHkJnmN3fRjqz8XXX+E25fN0bEhWhvgW3f5h7sG/yrdthbOx82sR
+         /G1h5EN0zwuadF0X3NVvEkHnWtKM32g0NNzm11z/m6Ueqv6rzs9EjIr4bs8h+OtXGh
+         e0Va7vDvzGUmYwaHuAvyzAUFX1ez0zDLy1YfKV5Q=
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Parshuram Raju Thombare <pthombar@cadence.com>,
-        Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>
-Subject: Re: [RFC PATCH v2 5/8] scsi: ufs: UFS crypto API
-Message-ID: <20190613171113.GB686@sol.localdomain>
-References: <20190605232837.31545-1-satyat@google.com>
- <20190605232837.31545-6-satyat@google.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     davem@davemloft.net, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        syzbot <syzbot+111cb28d9f583693aefa@syzkaller.appspotmail.com>
+Subject: [PATCH] io_uring: fix memory leak of UNIX domain socket inode
+Date:   Wed, 12 Jun 2019 14:58:43 -0700
+Message-Id: <20190612215843.91294-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.22.0.rc2.383.gf4fbbf30c2-goog
+In-Reply-To: <0000000000005bc340058983fe8e@google.com>
+References: <0000000000005bc340058983fe8e@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190605232837.31545-6-satyat@google.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Satya,
+From: Eric Biggers <ebiggers@google.com>
 
-On Wed, Jun 05, 2019 at 04:28:34PM -0700, Satya Tangirala wrote:
-> Introduce functions to manipulate UFS inline encryption hardware
-> in line with the JEDEC UFSHCI v2.1 specification and to work with the
-> block keyslot manager.
-> 
-> Signed-off-by: Satya Tangirala <satyat@google.com>
-> ---
->  drivers/scsi/ufs/Kconfig         |  10 +
->  drivers/scsi/ufs/Makefile        |   1 +
->  drivers/scsi/ufs/ufshcd-crypto.c | 438 +++++++++++++++++++++++++++++++
->  drivers/scsi/ufs/ufshcd-crypto.h |  69 +++++
->  4 files changed, 518 insertions(+)
->  create mode 100644 drivers/scsi/ufs/ufshcd-crypto.c
->  create mode 100644 drivers/scsi/ufs/ufshcd-crypto.h
-> 
+Opening and closing an io_uring instance leaks a UNIX domain socket
+inode.  This is because the ->file of the io_uring instance's internal
+UNIX domain socket is set to point to the io_uring file, but then
+sock_release() sees the non-NULL ->file and assumes the inode reference
+is held by the file so doesn't call iput().  That's not the case here,
+since the reference is still meant to be held by the socket; the actual
+inode of the io_uring file is different.
 
-There is a build error after this patch because it adds code that uses the
-crypto fields in struct ufs_hba, but those aren't added until the next patch.
+Fix this leak by NULL-ing out ->file before releasing the socket.
 
-It needs to be possible to compile a working kernel after each patch.
-Otherwise it breaks bisection.
+Reported-by: syzbot+111cb28d9f583693aefa@syzkaller.appspotmail.com
+Fixes: 2b188cc1bb85 ("Add io_uring IO interface")
+Cc: <stable@vger.kernel.org> # v5.1+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ fs/io_uring.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-So, perhaps add the fields in this patch instead.
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 0fbb486a320e9..86a2bd7219005 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2777,8 +2777,10 @@ static void io_ring_ctx_free(struct io_ring_ctx *ctx)
+ 	io_eventfd_unregister(ctx);
+ 
+ #if defined(CONFIG_UNIX)
+-	if (ctx->ring_sock)
++	if (ctx->ring_sock) {
++		ctx->ring_sock->file = NULL; /* so that iput() is called */
+ 		sock_release(ctx->ring_sock);
++	}
+ #endif
+ 
+ 	io_mem_free(ctx->sq_ring);
+-- 
+2.22.0.rc2.383.gf4fbbf30c2-goog
 
-> +++ b/drivers/scsi/ufs/ufshcd-crypto.c
-> @@ -0,0 +1,438 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright 2019 Google LLC
-> + */
-> +
-> +#include <crypto/algapi.h>
-> +
-> +#include "ufshcd.h"
-> +#include "ufshcd-crypto.h"
-> +
-> +bool ufshcd_hba_is_crypto_supported(struct ufs_hba *hba)
-> +{
-> +	return hba->crypto_capabilities.reg_val != 0;
-> +}
-> +
-> +bool ufshcd_is_crypto_enabled(struct ufs_hba *hba)
-> +{
-> +	return hba->caps & UFSHCD_CAP_CRYPTO;
-> +}
-> +
-> +static bool ufshcd_cap_idx_valid(struct ufs_hba *hba, unsigned int cap_idx)
-> +{
-> +	return cap_idx < hba->crypto_capabilities.num_crypto_cap;
-> +}
-> +
-> +#define NUM_KEYSLOTS(hba) (hba->crypto_capabilities.config_count + 1)
-> +
-> +bool ufshcd_keyslot_valid(struct ufs_hba *hba, unsigned int slot)
-> +{
-> +	/*
-> +	 * The actual number of configurations supported is (CFGC+1), so slot
-> +	 * numbers range from 0 to config_count inclusive.
-> +	 */
-> +	return slot < NUM_KEYSLOTS(hba);
-> +}
-
-Since ufshcd_hba_is_crypto_supported(), ufshcd_is_crypto_enabled(), and
-ufshcd_keyslot_valid() are one-liners, don't access any private structures, and
-are used outside this file including on the command submission path, how about
-making them inline functions in ufshcd-crypto.h?
-
-> +
-> +static int ufshcd_crypto_alg_find(void *hba_p,
-> +			   enum blk_crypt_mode_num crypt_mode,
-> +			   unsigned int data_unit_size)
-> +{
-
-Now that the concept of "crypto alg IDs" is gone, rename this to
-ufshcd_crypto_cap_find() and rename the crypto_alg_id variables to cap_idx.
-
-This would make it consistent with using cap_idx elsewhere in the code and avoid
-confusion with ufs_crypto_cap_entry::algorithm_id.
-
-> +
-> +static int ufshcd_crypto_keyslot_program(void *hba_p, const u8 *key,
-> +					 enum blk_crypt_mode_num crypt_mode,
-> +					 unsigned int data_unit_size,
-> +					 unsigned int slot)
-> +{
-> +	struct ufs_hba *hba = hba_p;
-> +	int err = 0;
-> +	u8 data_unit_mask;
-> +	union ufs_crypto_cfg_entry cfg;
-> +	union ufs_crypto_cfg_entry *cfg_arr = hba->crypto_cfgs;
-> +	int crypto_alg_id;
-> +
-> +	crypto_alg_id = ufshcd_crypto_alg_find(hba_p, crypt_mode,
-> +					       data_unit_size);
-> +
-> +	if (!ufshcd_is_crypto_enabled(hba) ||
-> +	    !ufshcd_keyslot_valid(hba, slot) ||
-> +	    !ufshcd_cap_idx_valid(hba, crypto_alg_id))
-> +		return -EINVAL;
-> +
-> +	data_unit_mask = get_data_unit_size_mask(data_unit_size);
-> +
-> +	if (!(data_unit_mask &
-> +	      hba->crypto_cap_array[crypto_alg_id].sdus_mask))
-> +		return -EINVAL;
-
-Nit: the 'if' expression with data_unit_mask fits on one line.
-
-> +static int ufshcd_crypto_keyslot_find(void *hba_p,
-> +				      const u8 *key,
-> +				      enum blk_crypt_mode_num crypt_mode,
-> +				      unsigned int data_unit_size)
-> +{
-> +	struct ufs_hba *hba = hba_p;
-> +	int err = 0;
-> +	int slot;
-> +	u8 data_unit_mask;
-> +	union ufs_crypto_cfg_entry cfg;
-> +	union ufs_crypto_cfg_entry *cfg_arr = hba->crypto_cfgs;
-> +	int crypto_alg_id;
-> +
-> +	crypto_alg_id = ufshcd_crypto_alg_find(hba_p, crypt_mode,
-> +					       data_unit_size);
-> +
-> +	if (!ufshcd_is_crypto_enabled(hba) ||
-> +	    !ufshcd_cap_idx_valid(hba, crypto_alg_id))
-> +		return -EINVAL;
-> +
-> +	data_unit_mask = get_data_unit_size_mask(data_unit_size);
-> +
-> +	if (!(data_unit_mask &
-> +	      hba->crypto_cap_array[crypto_alg_id].sdus_mask))
-> +		return -EINVAL;
-
-Same here.
-
-> +	for (slot = 0; slot < NUM_KEYSLOTS(hba); slot++) {
-> +		if ((cfg_arr[slot].config_enable &
-> +		     UFS_CRYPTO_CONFIGURATION_ENABLE) &&
-> +		    data_unit_mask == cfg_arr[slot].data_unit_size &&
-> +		    crypto_alg_id == cfg_arr[slot].crypto_cap_idx &&
-> +		    crypto_memneq(&cfg.crypto_key, cfg_arr[slot].crypto_key,
-> +				  UFS_CRYPTO_KEY_MAX_SIZE) == 0) {
-> +			memzero_explicit(&cfg, sizeof(cfg));
-> +			return slot;
-> +		}
-> +	}
-
-Nit: as I've mentioned before, I think !crypto_memneq() is easier to read than
-'crypto_memneq() == 0'.
-
-> +	hba->crypto_cap_array =
-> +		devm_kcalloc(hba->dev,
-> +			     hba->crypto_capabilities.num_crypto_cap,
-> +			     sizeof(hba->crypto_cap_array[0]),
-> +			     GFP_KERNEL);
-> +	if (!hba->crypto_cap_array) {
-> +		err = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	hba->crypto_cfgs =
-> +		devm_kcalloc(hba->dev,
-> +			     hba->crypto_capabilities.config_count + 1,
-> +			     sizeof(union ufs_crypto_cfg_entry),
-> +			     GFP_KERNEL);
-> +	if (!hba->crypto_cfgs) {
-> +		err = -ENOMEM;
-> +		goto out_cfg_mem;
-> +	}
-
-Nit: use 'sizeof(hba->crypto_cfgs[0])' rather than 'sizeof(union
-ufs_crypto_cfg_entry)', for consistency with the other array allocation.
-
-Thanks,
-
-- Eric
