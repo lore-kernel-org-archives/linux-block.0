@@ -6,184 +6,89 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FBCDC46477
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 09:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A841C31E46
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 09:24:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 00E4F208C2
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 09:20:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D5AE208C2
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 09:24:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407641AbfFLJUO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jun 2019 05:20:14 -0400
-Received: from smtp.nue.novell.com ([195.135.221.5]:49861 "EHLO
-        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406714AbfFLJUO (ORCPT
-        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Wed, 12 Jun 2019 05:20:14 -0400
-Received: from emea4-mta.ukb.novell.com ([10.120.13.87])
-        by smtp.nue.novell.com with ESMTP (TLS encrypted); Wed, 12 Jun 2019 11:20:11 +0200
-Received: from suselix (nwb-a10-snat.microfocus.com [10.120.13.202])
-        by emea4-mta.ukb.novell.com with ESMTP (TLS encrypted); Wed, 12 Jun 2019 07:17:35 +0100
-Date:   Wed, 12 Jun 2019 08:17:32 +0200
-From:   Andreas Herrmann <aherrmann@suse.com>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jonathan Corbet <corbet@lwn.net>, cgroups@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH] blkio-controller.txt: Remove references to CFQ
-Message-ID: <20190612061732.GA3711@suselix>
+        id S1731649AbfFLJYO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jun 2019 05:24:14 -0400
+Received: from foss.arm.com ([217.140.110.172]:48282 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731233AbfFLJYO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jun 2019 05:24:14 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4179B28;
+        Wed, 12 Jun 2019 02:24:13 -0700 (PDT)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E54E3F246;
+        Wed, 12 Jun 2019 02:24:12 -0700 (PDT)
+Date:   Wed, 12 Jun 2019 10:24:04 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Stephen Bates <sbates@raithlin.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "shhuiw@foxmail.com" <shhuiw@foxmail.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH] io_uring: fix SQPOLL cpu check
+Message-ID: <20190612092403.GA38578@lakrids.cambridge.arm.com>
+References: <5D2859FE-DB39-48F5-BBB5-6EDD3791B6C3@raithlin.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <5D2859FE-DB39-48F5-BBB5-6EDD3791B6C3@raithlin.com>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-CFQ is gone. No need anymore to document its "proportional weight time
-based division of disk policy".
+On Tue, Jun 11, 2019 at 11:56:06PM +0000, Stephen  Bates wrote:
+> The array_index_nospec() check in io_sq_offload_start() is performed
+> before any checks on p->sq_thread_cpu are done. This means cpu is
+> clamped and therefore no error occurs when out-of-range values are
+> passed in from userspace. This is in violation of the specification
+> for io_ring_setup() and causes the io_ring_setup unit test in liburing
+> to regress.
+> 
+> Add a new bounds check on sq_thread_cpu at the start of
+> io_sq_offload_start() so we can exit the function early when bad
+> values are passed in.
+> 
+> Fixes: 975554b03edd ("io_uring: fix SQPOLL cpu validation")
+> Signed-off-by: Stephen Bates <sbates@raithlin.com>
 
-Signed-off-by: Andreas Herrmann <aherrmann@suse.com>
----
- Documentation/cgroup-v1/blkio-controller.txt | 96 ++--------------------------
- 1 file changed, 7 insertions(+), 89 deletions(-)
+Aargh. My original patch [1] handled that correctly, and this case was
+explicitly called out in the commit message, which was retained even
+when the patch was "simplified". That's rather disappointing. :/
 
-diff --git a/Documentation/cgroup-v1/blkio-controller.txt b/Documentation/cgroup-v1/blkio-controller.txt
-index 673dc34d3f78..d1a1b7bdd03a 100644
---- a/Documentation/cgroup-v1/blkio-controller.txt
-+++ b/Documentation/cgroup-v1/blkio-controller.txt
-@@ -8,61 +8,13 @@ both at leaf nodes as well as at intermediate nodes in a storage hierarchy.
- Plan is to use the same cgroup based management interface for blkio controller
- and based on user options switch IO policies in the background.
- 
--Currently two IO control policies are implemented. First one is proportional
--weight time based division of disk policy. It is implemented in CFQ. Hence
--this policy takes effect only on leaf nodes when CFQ is being used. The second
--one is throttling policy which can be used to specify upper IO rate limits
--on devices. This policy is implemented in generic block layer and can be
--used on leaf nodes as well as higher level logical devices like device mapper.
-+One IO control policy is throttling policy which can be used to
-+specify upper IO rate limits on devices. This policy is implemented in
-+generic block layer and can be used on leaf nodes as well as higher
-+level logical devices like device mapper.
- 
- HOWTO
- =====
--Proportional Weight division of bandwidth
-------------------------------------------
--You can do a very simple testing of running two dd threads in two different
--cgroups. Here is what you can do.
--
--- Enable Block IO controller
--	CONFIG_BLK_CGROUP=y
--
--- Enable group scheduling in CFQ
--	CONFIG_CFQ_GROUP_IOSCHED=y
--
--- Compile and boot into kernel and mount IO controller (blkio); see
--  cgroups.txt, Why are cgroups needed?.
--
--	mount -t tmpfs cgroup_root /sys/fs/cgroup
--	mkdir /sys/fs/cgroup/blkio
--	mount -t cgroup -o blkio none /sys/fs/cgroup/blkio
--
--- Create two cgroups
--	mkdir -p /sys/fs/cgroup/blkio/test1/ /sys/fs/cgroup/blkio/test2
--
--- Set weights of group test1 and test2
--	echo 1000 > /sys/fs/cgroup/blkio/test1/blkio.weight
--	echo 500 > /sys/fs/cgroup/blkio/test2/blkio.weight
--
--- Create two same size files (say 512MB each) on same disk (file1, file2) and
--  launch two dd threads in different cgroup to read those files.
--
--	sync
--	echo 3 > /proc/sys/vm/drop_caches
--
--	dd if=/mnt/sdb/zerofile1 of=/dev/null &
--	echo $! > /sys/fs/cgroup/blkio/test1/tasks
--	cat /sys/fs/cgroup/blkio/test1/tasks
--
--	dd if=/mnt/sdb/zerofile2 of=/dev/null &
--	echo $! > /sys/fs/cgroup/blkio/test2/tasks
--	cat /sys/fs/cgroup/blkio/test2/tasks
--
--- At macro level, first dd should finish first. To get more precise data, keep
--  on looking at (with the help of script), at blkio.disk_time and
--  blkio.disk_sectors files of both test1 and test2 groups. This will tell how
--  much disk time (in milliseconds), each group got and how many sectors each
--  group dispatched to the disk. We provide fairness in terms of disk time, so
--  ideally io.disk_time of cgroups should be in proportion to the weight.
--
- Throttling/Upper Limit policy
- -----------------------------
- - Enable Block IO controller
-@@ -94,7 +46,7 @@ Throttling/Upper Limit policy
- Hierarchical Cgroups
- ====================
- 
--Both CFQ and throttling implement hierarchy support; however,
-+Throttling implements hierarchy support; however,
- throttling's hierarchy support is enabled iff "sane_behavior" is
- enabled from cgroup side, which currently is a development option and
- not publicly available.
-@@ -107,9 +59,8 @@ If somebody created a hierarchy like as follows.
- 			|
- 		     test3
- 
--CFQ by default and throttling with "sane_behavior" will handle the
--hierarchy correctly.  For details on CFQ hierarchy support, refer to
--Documentation/block/cfq-iosched.txt.  For throttling, all limits apply
-+Throttling with "sane_behavior" will handle the
-+hierarchy correctly. For throttling, all limits apply
- to the whole subtree while all statistics are local to the IOs
- directly generated by tasks in that cgroup.
- 
-@@ -130,10 +81,6 @@ CONFIG_DEBUG_BLK_CGROUP
- 	- Debug help. Right now some additional stats file show up in cgroup
- 	  if this option is enabled.
- 
--CONFIG_CFQ_GROUP_IOSCHED
--	- Enables group scheduling in CFQ. Currently only 1 level of group
--	  creation is allowed.
--
- CONFIG_BLK_DEV_THROTTLING
- 	- Enable block device throttling support in block layer.
- 
-@@ -344,32 +291,3 @@ Common files among various policies
- - blkio.reset_stats
- 	- Writing an int to this file will result in resetting all the stats
- 	  for that cgroup.
--
--CFQ sysfs tunable
--=================
--/sys/block/<disk>/queue/iosched/slice_idle
--------------------------------------------
--On a faster hardware CFQ can be slow, especially with sequential workload.
--This happens because CFQ idles on a single queue and single queue might not
--drive deeper request queue depths to keep the storage busy. In such scenarios
--one can try setting slice_idle=0 and that would switch CFQ to IOPS
--(IO operations per second) mode on NCQ supporting hardware.
--
--That means CFQ will not idle between cfq queues of a cfq group and hence be
--able to driver higher queue depth and achieve better throughput. That also
--means that cfq provides fairness among groups in terms of IOPS and not in
--terms of disk time.
--
--/sys/block/<disk>/queue/iosched/group_idle
--------------------------------------------
--If one disables idling on individual cfq queues and cfq service trees by
--setting slice_idle=0, group_idle kicks in. That means CFQ will still idle
--on the group in an attempt to provide fairness among groups.
--
--By default group_idle is same as slice_idle and does not do anything if
--slice_idle is enabled.
--
--One can experience an overall throughput drop if you have created multiple
--groups and put applications in that group which are not driving enough
--IO to keep disk busy. In that case set group_idle=0, and CFQ will not idle
--on individual groups and throughput should improve.
--- 
-2.13.7
+Thanks,
+Mark.
+
+[1] https://lore.kernel.org/lkml/20190430123451.44227-1-mark.rutland@arm.com/
+
+> ---
+>  fs/io_uring.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index 30a5687..e458470 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -2316,6 +2316,9 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
+>  {
+>  	int ret;
+>  
+> +	if (p->sq_thread_cpu >= nr_cpu_ids)
+> +		return -EINVAL;
+> +
+>  	init_waitqueue_head(&ctx->sqo_wait);
+>  	mmgrab(current->mm);
+>  	ctx->sqo_mm = current->mm;
+> -- 
+> 2.7.4
+> 
