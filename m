@@ -7,61 +7,67 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63386C31E46
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 09:10:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 731B9C31E47
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 09:12:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 34D832063F
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 09:10:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 441C920874
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 09:12:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TJONNl46"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GPCAFWDD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405904AbfFLJKf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jun 2019 05:10:35 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:49358 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405024AbfFLJKf (ORCPT
+        id S2408414AbfFLJMB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jun 2019 05:12:01 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:47302 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405024AbfFLJMB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jun 2019 05:10:35 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C994Zu173485;
-        Wed, 12 Jun 2019 09:10:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+        Wed, 12 Jun 2019 05:12:01 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C99AbP165160;
+        Wed, 12 Jun 2019 09:11:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=Ulh54NFWlYiUsKSjybeAIpal4mKAIsXmJ5eg+TyVy4A=;
- b=TJONNl46jkj2rOEEW8zkcTg/EZkaYU/9Y5Lt9va/kv0hfrSvCJqVm/bvd7+YKcqeN3yh
- ZNteWXn+pvjSFKvwLCEnN5yGmAl38vketTq5/dHrgfsqCzFNZzsxLnDNDQlHkQItSruu
- ClZA/mfy2WehXFn9eLG9ulCp8KEi+1Gt8s5KZc6DmyLpWSaXGtFyD/NSuoFXmnkitiGV
- 3QDUEdRNDs8g8T4Ipb1056vy4kv6wozaqq8/tQ0qeLMnSGBS70SZgpX3zThwXk+fYU01
- cBWon0hUQVhkNsL5WtBoBLbkfaCpuS0+PW6ZGgkXMNpeq030zc6sjxI/7S6hlKm/xSH/ CQ== 
+ bh=+uSOy+FnPz/QCEFMYZ0wfrBGyINBXfQ7AsJ895RF4VM=;
+ b=GPCAFWDDrx9sCVtYFMUH3SKhSYFk0F9z3AqZ48TR2PB7Mt4goZBgL8QrWI128iWa1b2x
+ Xf9ncKXcvZTrzARnkr1BDrbYYqJ6OqxySev/rIkvpVKzsmLcjyAcKvq7EOw2YK6X8KxG
+ N9h0/rj6NqHneW5kKIHtw9lTAuzfFHso0KuEcbi0MOXYQTOt4/QycEgKEy33pDItBI7N
+ KMWfaqxpXjGq4PYFx6oJ5ofK7pIr9MkCC0Ct09Am6bnyHqaLWfv80WdDsMb0fSdJk2nq
+ vUZBpM48ESFlwD8754wPS2GQbFBWd/cyOk+eBHqXudC5R8bhpYXJGT0G193vIhtr7OAa 5Q== 
 Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2t05nqt3bb-1
+        by userp2130.oracle.com with ESMTP id 2t04ett77q-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Jun 2019 09:10:33 +0000
+        Wed, 12 Jun 2019 09:11:38 +0000
 Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C98wv5125228;
-        Wed, 12 Jun 2019 09:10:33 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2t1jphwx6y-1
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C9AsCS129511;
+        Wed, 12 Jun 2019 09:11:37 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2t1jphwxnj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Jun 2019 09:10:33 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5C9AWpF002290;
-        Wed, 12 Jun 2019 09:10:32 GMT
+        Wed, 12 Jun 2019 09:11:37 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5C9BVBG000623;
+        Wed, 12 Jun 2019 09:11:36 GMT
 Received: from [192.168.1.16] (/101.95.182.98)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 12 Jun 2019 02:10:32 -0700
-Subject: Re: [PATCH] null_blk: remove duplicate check for report zone
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-References: <20190611221017.10264-1-chaitanya.kulkarni@wdc.com>
+        with ESMTP ; Wed, 12 Jun 2019 02:11:31 -0700
+Subject: Re: [PATCH] block: null_blk: fix race condition for null_del_dev
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "hare@suse.com" <hare@suse.com>, "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "bart.vanassche@wdc.com" <bart.vanassche@wdc.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+References: <20190531060545.10235-1-bob.liu@oracle.com>
+ <BYAPR04MB57498234FD33E381E665B066861B0@BYAPR04MB5749.namprd04.prod.outlook.com>
 From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <37020dbf-b01d-47a4-1a82-1778b1729890@oracle.com>
-Date:   Wed, 12 Jun 2019 17:10:29 +0800
+Message-ID: <cede28a1-4369-e3a4-b753-f36b3b19a1f8@oracle.com>
+Date:   Wed, 12 Jun 2019 17:11:26 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20190611221017.10264-1-chaitanya.kulkarni@wdc.com>
+In-Reply-To: <BYAPR04MB57498234FD33E381E665B066861B0@BYAPR04MB5749.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,7 +78,7 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 ma
  engine=8.0.1-1810050000 definitions=main-1906120064
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9285 signatures=668687
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1906120064
@@ -81,70 +87,94 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/12/19 6:10 AM, Chaitanya Kulkarni wrote:
-> This patch removes the check in the null_blk_zoned for report zone
-> command, where it checks for the dev-,>zoned before executing the report
-> zone.
-> 
-> The null_zone_report() function is a block_device operation callback
-> which is initialized in the null_blk_main.c and gets called as a part
-> of blkdev for report zone IOCTL (BLKREPORTZONE).
-> 
-> blkdev_ioctl()
-> blkdev_report_zones_ioctl()
->         blkdev_report_zones()
->                 blk_report_zones()
->                         disk->fops->report_zones()
->                                 nullb_zone_report();
-> 
-> The null_zone_report() will never get executed on the non-zoned block
-> device, in the non zoned block device blk_queue_is_zoned() will always
-> be false which is first check the blkdev_report_zones_ioctl()
-> before actual low level driver report zone callback is executed.
-> 
-> Here is the detailed scenario:-
-> 
-> 1. modprobe null_blk
-> null_init
-> null_alloc_dev
->         dev->zoned = 0 
-> null_add_dev
->         dev->zoned == 0
->                 so we don't set the q->limits.zoned = BLK_ZONED_HR
-> 
-> 2. blkzone report /dev/nullb0
-> 
-> blkdev_ioctl()
-> blkdev_report_zones_ioctl()
->         blk_queue_is_zoned()
->                 blk_queue_is_zoned
->                         q->limits.zoned == 0
->                         return false
->         if (!blk_queue_is_zoned(q)) <--- true
->                 return -ENOTTY;              
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Ping.
 
-Looks good to me.
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
-
-> ---
->  drivers/block/null_blk_zoned.c | 4 ----
->  1 file changed, 4 deletions(-)
+On 6/3/19 7:43 AM, Chaitanya Kulkarni wrote:
+> Thanks for your patch Bob.
 > 
-> diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
-> index 5d1c261a2cfd..fca0c97ff1aa 100644
-> --- a/drivers/block/null_blk_zoned.c
-> +++ b/drivers/block/null_blk_zoned.c
-> @@ -74,10 +74,6 @@ int null_zone_report(struct gendisk *disk, sector_t sector,
->  	struct nullb_device *dev = nullb->dev;
->  	unsigned int zno, nrz = 0;
->  
-> -	if (!dev->zoned)
-> -		/* Not a zoned null device */
-> -		return -EOPNOTSUPP;
-> -
->  	zno = null_zone_no(dev, sector);
->  	if (zno < dev->nr_zones) {
->  		nrz = min_t(unsigned int, *nr_zones, dev->nr_zones - zno);
+> Looks good to me.
+> 
+> Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> 
+> On 5/30/19 11:07 PM, Bob Liu wrote:
+>> Dulicate call of null_del_dev() will trigger null pointer error like below.
+>> The reason is a race condition between nullb_device_power_store() and
+>> nullb_group_drop_item().
+>>
+>>  CPU#0                         CPU#1
+>>  ----------------              -----------------
+>>  do_rmdir()
+>>   >configfs_rmdir()
+>>    >client_drop_item()
+>>     >nullb_group_drop_item()
+>>                                nullb_device_power_store()
+>> 				>null_del_dev()
+>>
+>>      >test_and_clear_bit(NULLB_DEV_FL_UP
+>>       >null_del_dev()
+>>       ^^^^^
+>>       Duplicated null_dev_dev() triger null pointer error
+>>
+>> 				>clear_bit(NULLB_DEV_FL_UP
+>>
+>> The fix could be keep the sequnce of clear NULLB_DEV_FL_UP and null_del_dev().
+>>
+>> [  698.613600] BUG: unable to handle kernel NULL pointer dereference at 0000000000000018
+>> [  698.613608] #PF error: [normal kernel read fault]
+>> [  698.613611] PGD 0 P4D 0
+>> [  698.613619] Oops: 0000 [#1] SMP PTI
+>> [  698.613627] CPU: 3 PID: 6382 Comm: rmdir Not tainted 5.0.0+ #35
+>> [  698.613631] Hardware name: LENOVO 20LJS2EV08/20LJS2EV08, BIOS R0SET33W (1.17 ) 07/18/2018
+>> [  698.613644] RIP: 0010:null_del_dev+0xc/0x110 [null_blk]
+>> [  698.613649] Code: 00 00 00 5b 41 5c 41 5d 41 5e 41 5f 5d c3 0f 0b eb 97 e8 47 bb 2a e8 0f 1f 80 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 54 53 <8b> 77 18 48 89 fb 4c 8b 27 48 c7 c7 40 57 1e c1 e8 bf c7 cb e8 48
+>> [  698.613654] RSP: 0018:ffffb887888bfde0 EFLAGS: 00010286
+>> [  698.613659] RAX: 0000000000000000 RBX: ffff9d436d92bc00 RCX: ffff9d43a9184681
+>> [  698.613663] RDX: ffffffffc11e5c30 RSI: 0000000068be6540 RDI: 0000000000000000
+>> [  698.613667] RBP: ffffb887888bfdf0 R08: 0000000000000001 R09: 0000000000000000
+>> [  698.613671] R10: ffffb887888bfdd8 R11: 0000000000000f16 R12: ffff9d436d92bc08
+>> [  698.613675] R13: ffff9d436d94e630 R14: ffffffffc11e5088 R15: ffffffffc11e5000
+>> [  698.613680] FS:  00007faa68be6540(0000) GS:ffff9d43d14c0000(0000) knlGS:0000000000000000
+>> [  698.613685] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> [  698.613689] CR2: 0000000000000018 CR3: 000000042f70c002 CR4: 00000000003606e0
+>> [  698.613693] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>> [  698.613697] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>> [  698.613700] Call Trace:
+>> [  698.613712]  nullb_group_drop_item+0x50/0x70 [null_blk]
+>> [  698.613722]  client_drop_item+0x29/0x40
+>> [  698.613728]  configfs_rmdir+0x1ed/0x300
+>> [  698.613738]  vfs_rmdir+0xb2/0x130
+>> [  698.613743]  do_rmdir+0x1c7/0x1e0
+>> [  698.613750]  __x64_sys_rmdir+0x17/0x20
+>> [  698.613759]  do_syscall_64+0x5a/0x110
+>> [  698.613768]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>>
+>> Signed-off-by: Bob Liu <bob.liu@oracle.com>
+>> ---
+>>  drivers/block/null_blk_main.c | 11 ++++++-----
+>>  1 file changed, 6 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+>> index 62c9654..99dd0ab 100644
+>> --- a/drivers/block/null_blk_main.c
+>> +++ b/drivers/block/null_blk_main.c
+>> @@ -326,11 +326,12 @@ static ssize_t nullb_device_power_store(struct config_item *item,
+>>  		set_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
+>>  		dev->power = newp;
+>>  	} else if (dev->power && !newp) {
+>> -		mutex_lock(&lock);
+>> -		dev->power = newp;
+>> -		null_del_dev(dev->nullb);
+>> -		mutex_unlock(&lock);
+>> -		clear_bit(NULLB_DEV_FL_UP, &dev->flags);
+>> +		if (test_and_clear_bit(NULLB_DEV_FL_UP, &dev->flags)) {
+>> +			mutex_lock(&lock);
+>> +			dev->power = newp;
+>> +			null_del_dev(dev->nullb);
+>> +			mutex_unlock(&lock);
+>> +		}
+>>  		clear_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
+>>  	}
+>>  
+> 
 > 
 
