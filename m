@@ -2,84 +2,73 @@ Return-Path: <SRS0=leUH=UL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3859CC31E46
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 09:53:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B710C31E46
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 10:11:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F97B20896
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 09:53:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5639E2082C
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jun 2019 10:11:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437654AbfFLJxn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jun 2019 05:53:43 -0400
-Received: from smtp.nue.novell.com ([195.135.221.5]:43724 "EHLO
-        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437415AbfFLJxn (ORCPT
-        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Wed, 12 Jun 2019 05:53:43 -0400
-Received: from emea4-mta.ukb.novell.com ([10.120.13.87])
-        by smtp.nue.novell.com with ESMTP (TLS encrypted); Wed, 12 Jun 2019 11:53:41 +0200
-Received: from suselix (nwb-a10-snat.microfocus.com [10.120.13.202])
-        by emea4-mta.ukb.novell.com with ESMTP (TLS encrypted); Wed, 12 Jun 2019 07:50:13 +0100
-Date:   Wed, 12 Jun 2019 08:50:09 +0200
-From:   Andreas Herrmann <aherrmann@suse.com>
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH] block/switching-sched.txt: Update to blk-mq schedulers
-Message-ID: <20190612065009.GA11361@suselix>
+        id S2437971AbfFLKLd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jun 2019 06:11:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48434 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2437611AbfFLKLc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jun 2019 06:11:32 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 90F2C3007406;
+        Wed, 12 Jun 2019 10:11:25 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5278B2CFA7;
+        Wed, 12 Jun 2019 10:11:17 +0000 (UTC)
+Date:   Wed, 12 Jun 2019 18:11:12 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: alternative take on the same page merging leak fix
+Message-ID: <20190612101111.GA16000@ming.t460p>
+References: <20190611151007.13625-1-hch@lst.de>
+ <20190612010922.GA17522@ming.t460p>
+ <20190612074527.GA20491@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190612074527.GA20491@lst.de>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Wed, 12 Jun 2019 10:11:31 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Jun 12, 2019 at 09:45:27AM +0200, Christoph Hellwig wrote:
+> On Wed, Jun 12, 2019 at 09:09:23AM +0800, Ming Lei wrote:
+> > We have to backport the fixes to -stable tree, and downstream need to
+> > ship the fix too.
+> > 
+> > The issue is quite serious because the leak is in IO path and the whole
+> > system ram can be used up easily on some workloads. So I think the fix
+> > should be for 5.2, however, regression risk might be increased by
+> > pulling cleanup & re-factor in now.
+> > 
+> > I really appreciate you may cook a fix-only patch for this issue.
+> > Especially the change in add pc page code isn't necessary for fixing
+> > the issue.
+> 
+> Patches 3 and 4 have no dependencies on 1 and 2, and should have
+> arguably been ordered first in the series.
 
-Remove references to CFQ and legacy block layer which are gone.
-Update example with what's available under blk-mq.
+OK, that is good to make patch 3 &4 into 5.2, I will give a review
+soon.
 
-Signed-off-by: Andreas Herrmann <aherrmann@suse.com>
----
- Documentation/block/switching-sched.txt | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
-
-diff --git a/Documentation/block/switching-sched.txt b/Documentation/block/switching-sched.txt
-index 3b2612e342f1..7977f6fb8b20 100644
---- a/Documentation/block/switching-sched.txt
-+++ b/Documentation/block/switching-sched.txt
-@@ -13,11 +13,9 @@ you can do so by typing:
- 
- # mount none /sys -t sysfs
- 
--As of the Linux 2.6.10 kernel, it is now possible to change the
--IO scheduler for a given block device on the fly (thus making it possible,
--for instance, to set the CFQ scheduler for the system default, but
--set a specific device to use the deadline or noop schedulers - which
--can improve that device's throughput).
-+It is possible to change the IO scheduler for a given block device on
-+the fly to select one of mq-deadline, none, bfq, or kyber schedulers -
-+which can improve that device's throughput.
- 
- To set a specific scheduler, simply do this:
- 
-@@ -30,8 +28,8 @@ The list of defined schedulers can be found by simply doing
- a "cat /sys/block/DEV/queue/scheduler" - the list of valid names
- will be displayed, with the currently selected scheduler in brackets:
- 
--# cat /sys/block/hda/queue/scheduler
--noop deadline [cfq]
--# echo deadline > /sys/block/hda/queue/scheduler
--# cat /sys/block/hda/queue/scheduler
--noop [deadline] cfq
-+# cat /sys/block/sda/queue/scheduler
-+[mq-deadline] kyber bfq none
-+# echo none >/sys/block/sda/queue/scheduler
-+# cat /sys/block/sda/queue/scheduler
-+[none] mq-deadline kyber bfq
--- 
-2.13.7
+Thanks,
+Ming
