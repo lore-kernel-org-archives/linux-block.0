@@ -3,29 +3,29 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B074EC31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:18:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF8EC31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:18:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85E2620B7C
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:18:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2248F2054F
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:18:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732864AbfFMPSA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 11:18:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38986 "EHLO mx1.redhat.com"
+        id S1732454AbfFMPSu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 11:18:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54626 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732169AbfFMNOq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 09:14:46 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S1732144AbfFMNDB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 09:03:01 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4953330C4069;
-        Thu, 13 Jun 2019 13:14:29 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3B21DCA36F;
+        Thu, 13 Jun 2019 13:03:00 +0000 (UTC)
 Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 29392838DB;
-        Thu, 13 Jun 2019 13:14:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D484E541F2;
+        Thu, 13 Jun 2019 13:02:57 +0000 (UTC)
 Subject: Re: [PATCH 2/2] nbd: add support for nbd as root device
 To:     roman.stratiienko@globallogic.com, linux-kernel@vger.kernel.org,
         josef@toxicpanda.com, nbd@other.debian.org,
@@ -33,7 +33,6 @@ To:     roman.stratiienko@globallogic.com, linux-kernel@vger.kernel.org,
         axboe@kernel.dkn.org, "Richard W.M. Jones" <rjones@redhat.com>
 References: <20190612163144.18486-1-roman.stratiienko@globallogic.com>
  <20190612163144.18486-2-roman.stratiienko@globallogic.com>
- <b988f702-f394-6f2e-43ea-61298c0f2b03@redhat.com>
 From:   Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -60,104 +59,76 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <9719bfd9-b8a7-93be-4c72-20c15bd9b0ca@redhat.com>
-Date:   Thu, 13 Jun 2019 08:14:23 -0500
+Message-ID: <b988f702-f394-6f2e-43ea-61298c0f2b03@redhat.com>
+Date:   Thu, 13 Jun 2019 08:02:56 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <b988f702-f394-6f2e-43ea-61298c0f2b03@redhat.com>
+In-Reply-To: <20190612163144.18486-2-roman.stratiienko@globallogic.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="ErDNsdXWDIj6U5hGHisGjUBG8gJFtQVKk"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Thu, 13 Jun 2019 13:14:43 +0000 (UTC)
+ boundary="9Icx9ItsU53ORwiANl09EUUC5IOzpGhUD"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Thu, 13 Jun 2019 13:03:01 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ErDNsdXWDIj6U5hGHisGjUBG8gJFtQVKk
-Content-Type: multipart/mixed; boundary="S2EvyWwzvf46WIVEfIBBFWxpPGsygXebW";
+--9Icx9ItsU53ORwiANl09EUUC5IOzpGhUD
+Content-Type: multipart/mixed; boundary="GcPkFI5vKHhM5L3R0laXCr11kPXSMamS8";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: roman.stratiienko@globallogic.com, linux-kernel@vger.kernel.org,
  josef@toxicpanda.com, nbd@other.debian.org, A.Bulyshchenko@globallogic.com,
  linux-block@vger.kernel.org, axboe@kernel.dkn.org,
  "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <9719bfd9-b8a7-93be-4c72-20c15bd9b0ca@redhat.com>
+Message-ID: <b988f702-f394-6f2e-43ea-61298c0f2b03@redhat.com>
 Subject: Re: [PATCH 2/2] nbd: add support for nbd as root device
 References: <20190612163144.18486-1-roman.stratiienko@globallogic.com>
  <20190612163144.18486-2-roman.stratiienko@globallogic.com>
- <b988f702-f394-6f2e-43ea-61298c0f2b03@redhat.com>
-In-Reply-To: <b988f702-f394-6f2e-43ea-61298c0f2b03@redhat.com>
+In-Reply-To: <20190612163144.18486-2-roman.stratiienko@globallogic.com>
 
---S2EvyWwzvf46WIVEfIBBFWxpPGsygXebW
+--GcPkFI5vKHhM5L3R0laXCr11kPXSMamS8
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 6/13/19 8:02 AM, Eric Blake wrote:
-> On 6/12/19 11:31 AM, roman.stratiienko@globallogic.com wrote:
->> From: Roman Stratiienko <roman.stratiienko@globallogic.com>
->>
->> Adding support to nbd to use it as a root device. This code essentiall=
-y
->> provides a minimal nbd-client implementation within the kernel. It ope=
-ns
->> a socket and makes the negotiation with the server. Afterwards it pass=
-es
->> the socket to the normal nbd-code to handle the connection.
->>
->> The arguments for the server are passed via kernel command line.
->> The kernel command line has the format
->> 'nbdroot=3D[<SERVER_IP>:]<SERVER_PORT>/<EXPORT_NAME>'.
+On 6/12/19 11:31 AM, roman.stratiienko@globallogic.com wrote:
+> From: Roman Stratiienko <roman.stratiienko@globallogic.com>
 >=20
-> Did you intend for nbdroot=3D1234 to connect to port 1234 or to server
-> 1234 port 10809?  Is an export name mandatory even when it is the empty=
+> Adding support to nbd to use it as a root device. This code essentially=
 
-> string, in which case, is the / character mandatory?  Maybe this would
-> be better written as:
+> provides a minimal nbd-client implementation within the kernel. It open=
+s
+> a socket and makes the negotiation with the server. Afterwards it passe=
+s
+> the socket to the normal nbd-code to handle the connection.
 >=20
->  [<SERVER_IP>[:<SERVER_PORT]][/<EXPORT_NAME]
+> The arguments for the server are passed via kernel command line.
+> The kernel command line has the format
+> 'nbdroot=3D[<SERVER_IP>:]<SERVER_PORT>/<EXPORT_NAME>'.
 
-Make that:
+Did you intend for nbdroot=3D1234 to connect to port 1234 or to server
+1234 port 10809?  Is an export name mandatory even when it is the empty
+string, in which case, is the / character mandatory?  Maybe this would
+be better written as:
 
- [[<SERVER_IP>][:<SERVER_PORT>]][/[<EXPORT_NAME>]]
+ [<SERVER_IP>[:<SERVER_PORT]][/<EXPORT_NAME]
 
-as well as a blurb that IPv6 requires use of [] around SERVER_IP to
-avoid ambiguity between IP address and the port designator.  That would
-allow variations such as:
+although that would allow nbdroot=3D using all defaults (will that still
+do the right thing?).
 
-nbdroot=3D1.2.3.4          # port 10809 and export name '' defaulted
-nbdroot=3D1.2.3.4:10809/   # fully explicit, export name ''
-nbdroot=3D:10810/export    # host defaulted by DHCP, rest is explicit
-nbdroot=3D/                # host and port are defaulted, export is ''
-nbdroot=3D[::1]:10810      # IPv6 localhost and port 10810
-nbdroot=3D::1              # IPv6 localhost, default port 10809
+Should we support nbdroot=3DURI, and tie this in to Rich's proposal [1] o=
+n
+standardizing the set of URIs that refer to an NBD export?  It seems
+like you are still limited to a TCP socket (not Unix) with no
+encryption, so this would be equivalent to the URI:
 
-[I'm aware that localhost is probably not going to work based on how
-early this is encountered during the boot; rather, consider ::1 as a
-placeholder for a more realistic IPv6 address]
+nbd://[server[:port]][/export]
 
->=20
-> although that would allow nbdroot=3D using all defaults (will that stil=
-l
-> do the right thing?).
-
-nbdroot=3D                # host from DHCP, port 10809, export ''
-
->=20
-> Should we support nbdroot=3DURI, and tie this in to Rich's proposal [1]=
- on
-> standardizing the set of URIs that refer to an NBD export?  It seems
-> like you are still limited to a TCP socket (not Unix) with no
-> encryption, so this would be equivalent to the URI:
->=20
-> nbd://[server[:port]][/export]
->=20
-> [1] https://lists.debian.org/nbd/2019/06/msg00011.html
->=20
+[1] https://lists.debian.org/nbd/2019/06/msg00011.html
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -165,23 +136,23 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---S2EvyWwzvf46WIVEfIBBFWxpPGsygXebW--
+--GcPkFI5vKHhM5L3R0laXCr11kPXSMamS8--
 
---ErDNsdXWDIj6U5hGHisGjUBG8gJFtQVKk
+--9Icx9ItsU53ORwiANl09EUUC5IOzpGhUD
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0CTC8ACgkQp6FrSiUn
-Q2rVgwf/a4qoPz761KRZj2SZLO9qDdWaN73bDKtRdLi6UHkKF5lhPaFDJR48Ati2
-UKl2pwsbplvO82LGtjHcvfozVcd1CZw8Dp1PnLx/BsROJPjW0gjvWUYLUyTSZmtb
-9id03GupgF4GmGEu6f7fRmFZ83/JJgo/zlzbLwk72eNH6CgzSUcw18QAeDKADbPg
-CeMcNyEvzjtK4cCv3OV7ZAE3o5hvdrwDu/vznghfsRKgwtFv9qYsK0BvQsPvBCcC
-N4KiGIW8vC3xqm8N0CxXz8R5FcZFXo/qsowWYqW09fW9iNwpYRNkFPomp6LyyYYE
-vA/DvL70eT0jbRcZoinfY0Wc4B3QGA==
-=vawe
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0CSYAACgkQp6FrSiUn
+Q2rmfAf8ChmatMRfkJIY+wjmA8EpvunLFeeBfqMUiCnyHNvBwC4gnGLM+bicQbaH
+daIi5U8i80IsZZ3su8d8eaBxBaFF9iy+CoRjczdUZnE1XdkDoJyA+0csp1+LiggC
+0SmwnYAF9o8XRSJrhkg0xeVHwBljDbKsd1bwWzDVD6YDFERJPuGjVPYFM6sX//Qh
+6fj1jDb2Y3jVg/6eiEOOzofmP5aO9aN4IGOWs5LgI7SFrk7r3gg33qlMrNk2e0sH
+9d/D+8fBkuDFaoCGBk/1uBoBcLN9lkzB3MopCSMIilvavvv5+Wb1c84f+TE/0Fnm
+xb7WMLpghXn8h/JLGjX503VhNmx7dw==
+=Uh/K
 -----END PGP SIGNATURE-----
 
---ErDNsdXWDIj6U5hGHisGjUBG8gJFtQVKk--
+--9Icx9ItsU53ORwiANl09EUUC5IOzpGhUD--
