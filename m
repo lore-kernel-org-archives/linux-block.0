@@ -6,98 +6,88 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A34CC31E49
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 728DAC31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:54:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D395820851
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4825020851
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:54:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fXL4Bw5K"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cMqPktH+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731752AbfFMPxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 11:53:46 -0400
-Received: from mail-yb1-f194.google.com ([209.85.219.194]:42028 "EHLO
-        mail-yb1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731592AbfFMI5I (ORCPT
+        id S1731590AbfFMPx7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 11:53:59 -0400
+Received: from mail-yb1-f193.google.com ([209.85.219.193]:40122 "EHLO
+        mail-yb1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731586AbfFMI5F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 04:57:08 -0400
-Received: by mail-yb1-f194.google.com with SMTP id c7so7514949ybs.9
-        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 01:57:07 -0700 (PDT)
+        Thu, 13 Jun 2019 04:57:05 -0400
+Received: by mail-yb1-f193.google.com with SMTP id g62so7519534ybg.7
+        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 01:57:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=5rpwm+WXYqpS5Yt4a3EFiaLIxY1PzE0lEAcH6B/6h0A=;
-        b=fXL4Bw5Kwl/mMKIWGa1cdKDK4KAo0XR2yGRH64ZJ/I1MVExg0wWUUDX3vBHTYZkjOF
-         vYFKvyecLJNLSA/E7m7sTD8zh55AOz/agx/OfhCByMjAe9qffdMIJXqrpeOoxi+v3NkU
-         sXmf687D6xOZ2qyVaV0Av3gvkn68lJwqr/d2PEpnz/YSD7pg1u3UtvyzLDx4Mi3w75OR
-         HJJI+g/bVt6L2m1CG0hBdOwJes2EebjVxjs/giB7QyWUieZGe5ei2HyxPmHI0pV+dWgb
-         1hEim2OLo6wzfu6Jcv47M0Q4ZvWL5BNXddHdsTUs3Eu/hfMQJY2po5LVVP9PbG0vjMfb
-         rW5Q==
+        bh=mMgpu2dxgmVuzhoX6u/zbPwD9CD+MeWOEHICon///9s=;
+        b=cMqPktH+OU7wdZUKzogFKsSP0nfdpoKy/x2Nyqa0OowSpgi0LQfiU/t2K3ZkK2sXN9
+         hTmxXT68Csa91JfbZqASxynZtiQB/skJmaNZG3Id3wouwBNPxb6RH/fbeFQN9sXx/zGy
+         tlRv5Avl5o3AW10g6Bds647VIvt6yECMXehdQYRKYyeIcDJa1Y2AUWX8RIC4xU0qeJfh
+         4nMsD4hlOIwsv0g+mNYAZwGdSaT7q48/WOlwxWlSRf8Ij9lvDysXGcuyt8y0/9KFoqQ2
+         oK35tCRSW7NESTtxlpQAs1BQBxafi4TzEYRsCAtb8SrLFSOvPH0Z54AMrDeGc4FhkDsT
+         afNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=5rpwm+WXYqpS5Yt4a3EFiaLIxY1PzE0lEAcH6B/6h0A=;
-        b=ap5F9+NCY3AwGq7cC0BvMNOw3Rvnk1kdiw0VkjefikFZoFXg84A4KWNplhMlKtJtCD
-         mNkWhpvfKnBXbNLE5WsKpt2qYhVz9ZV5QwlfOMKAo1G+JT9uW58TKblcZQ6mNCf6sEvg
-         Faa5RwZKsdADaA97bEi7OZ2ZyyWXLyXMMTSjINkUZyocd7u65MJP0X6lsc1LxQWuwu+5
-         P25gd7HcNTHXiJ5V9EtaBKYvF6rlfnTihqWGq72F8yAc3D6E1enrGOQ1tz9vaiQ95akU
-         J5UQO4BbZs2+iRP0G9RDcj6LFtsvvgpuh4Kdz/uSMEI83yR4/dTio/xD+n9oy3YsEItT
-         WAqA==
-X-Gm-Message-State: APjAAAXupYi0OCJmscq3rBiddT6/0qJY0NslwmFvRLFZR/GN0hvYD6fl
-        0f8cGt2iFSMMdQkLl8OBAFK4Zw==
-X-Google-Smtp-Source: APXvYqw1zJomCCuCV1QnOnfqSwphH8qY2fZ84XDZGajBAG2kedoKa5gZ+d1vm3seCvUptjeuiel9rQ==
-X-Received: by 2002:a5b:b8b:: with SMTP id l11mr40277348ybq.165.1560416227034;
-        Thu, 13 Jun 2019 01:57:07 -0700 (PDT)
+        bh=mMgpu2dxgmVuzhoX6u/zbPwD9CD+MeWOEHICon///9s=;
+        b=q4CXNzxtypQfRz7UgN4u5pbvTzMyQEQkI+7HrQ+jtEM5fkSR9eJ3ckgFmH7Y5RQZOs
+         LySJmpDwAhQfELYm0YZipvOKXKcScm4Ba/t/3b4HHPJmjWmvqlpCC97Rb4YVzGvtyzcY
+         tNmGBC3DAv9ep+oK4ULMF97tUTrrKJMhiGV3utX7Aiee5LDqFADBtl1msiknl7JX5XOf
+         9gpnRpa9oTPjpT30r82tkXJctDJb6r3UmlOLhskPzlrkFO0GBl3j0WaCnvOblbfawFzc
+         RmaA0vN9im4HgXXo/1+UgGR3RD5G7TDQKN0N3xJDzkgdAu4Hgu0ohQfXlhzQjNDgHTIA
+         l/vw==
+X-Gm-Message-State: APjAAAXQP9Jmfnw8EDsyGVWIRH/4i+Yd58hElW7Cwi8AHrleVTA2Ikxc
+        8PWNjZf+slB9Nb836dzhzV+cAEsAAt3OWAb/
+X-Google-Smtp-Source: APXvYqxf1bzcuSh30dG2NpWNrTKVGR5AGykk1c1mdSjDyFTHKq6k1lN5wergm1LinRG1Sgg2nzmXqQ==
+X-Received: by 2002:a5b:64f:: with SMTP id o15mr34232575ybq.430.1560416224627;
+        Thu, 13 Jun 2019 01:57:04 -0700 (PDT)
 Received: from [172.20.10.3] (mobile-166-172-57-221.mycingular.net. [166.172.57.221])
-        by smtp.gmail.com with ESMTPSA id i199sm607899ywe.89.2019.06.13.01.57.01
+        by smtp.gmail.com with ESMTPSA id n62sm565961ywe.82.2019.06.13.01.57.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 01:57:06 -0700 (PDT)
-Subject: Re: [PATCH] io_uring: fix SQPOLL cpu check
-To:     Stephen Bates <sbates@raithlin.com>,
-        Mark Rutland <mark.rutland@arm.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "shhuiw@foxmail.com" <shhuiw@foxmail.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <5D2859FE-DB39-48F5-BBB5-6EDD3791B6C3@raithlin.com>
- <20190612092403.GA38578@lakrids.cambridge.arm.com>
- <DCE71F95-F72A-414C-8A02-98CC81237F40@raithlin.com>
+        Thu, 13 Jun 2019 01:57:03 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: no need to check return value of debugfs_create
+ functions
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-block@vger.kernel.org
+References: <20190612123019.25112-1-gregkh@linuxfoundation.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b3c9138e-bf3b-0851-a63e-f52f926d5ed8@kernel.dk>
-Date:   Thu, 13 Jun 2019 02:54:45 -0600
+Message-ID: <0974f13e-37cf-6706-e1ae-7facf61c0215@kernel.dk>
+Date:   Thu, 13 Jun 2019 02:54:50 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <DCE71F95-F72A-414C-8A02-98CC81237F40@raithlin.com>
+In-Reply-To: <20190612123019.25112-1-gregkh@linuxfoundation.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/12/19 3:47 AM, Stephen  Bates wrote:
->> Aargh. My original patch [1] handled that correctly, and this case was
->> explicitly called out in the commit message, which was retained even
->> when the patch was "simplified". That's rather disappointing. :/
->    
-> It looks like Jens did a fix for this (44a9bd18a0f06bba
-> " io_uring: fix failure to verify SQ_AFF cpu") which is in the 5.2-rc series
-> but which hasn’t been applied to the stable series yet. I am not sure how
-> I missed that but it makes my patch redundant.
+On 6/12/19 6:30 AM, Greg Kroah-Hartman wrote:
+> When calling debugfs functions, there is no need to ever check the
+> return value.  The function can work or not, but the code logic should
+> never do something different based on this.
 > 
-> Jens, will 44a9bd18a0f06bba be applied to stable kernels?
+> When all of these checks are cleaned up, lots of the functions used in
+> the blk-mq-debugfs code can now return void, as no need to check the
+> return value of them either.
+> 
+> Overall, this ends up cleaning up the code and making it smaller, always
+> a nice win.
 
-Yes, we can get it flagged for stable. Greg, can you pull in the above
-commit for 5.1 stable?
-
+Applied, thanks Greg.
 
 -- 
 Jens Axboe
