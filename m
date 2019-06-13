@@ -2,114 +2,108 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29D03C31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CF09C46477
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:29:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F347020449
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:28:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D6C0820449
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:29:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ECkUStv+";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="c7M+KVMK"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="rLvl6Cbg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731457AbfFMQ2n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 12:28:43 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:41330 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730945AbfFMQ2n (ORCPT
+        id S1730936AbfFMQ3L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 12:29:11 -0400
+Received: from mail-yw1-f43.google.com ([209.85.161.43]:35189 "EHLO
+        mail-yw1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730934AbfFMIf1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 12:28:43 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 0D5E68EE147;
-        Thu, 13 Jun 2019 09:28:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1560443323;
-        bh=bnTJZINKg659sWer2QpR3c5NeLkXTlt8sZRt1buXvPk=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=ECkUStv+npI9x1oyvMYlUKctnPIORbAWAMPFhOP6is+V2N0dN63FeLtDHVGFmXEN9
-         olnXF7NIMaBfyC0lR9pZ5uuKe7/fVu8GYIhaFH5IxI0V4C0qH0rsNexLnTz8aR6g7L
-         bXanZK2NoD9Z5mhlTLsmHbmWOatkkzO48mkWks9U=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id DWyDetGG-Y6c; Thu, 13 Jun 2019 09:28:42 -0700 (PDT)
-Received: from jarvis.lan (unknown [50.35.68.20])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 5F8EA8EE0C7;
-        Thu, 13 Jun 2019 09:28:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1560443322;
-        bh=bnTJZINKg659sWer2QpR3c5NeLkXTlt8sZRt1buXvPk=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=c7M+KVMKOhi/zNVgKex9T2JCLcgRkBWN6q8nLxckxA3LLq79BjndZCUnWrz9y/WQk
-         vti4sGZfC6NwRYlQWLwH3hj03jxQ8rT5v0Hj0sypVWw6RcOQQRZXSG8upMqmBtKosz
-         U0d3IvxaxlsMbUzAJQgIT8K/Kt0g4EjcaLtBfHUs=
-Message-ID: <1560443321.3329.42.camel@HansenPartnership.com>
-Subject: Re: [PATCH 1/8] block: add a helper function to read nr_setcs
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     dgilbert@interlog.com, Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-btrace@vger.kernel.org,
-        kent.overstreet@gmail.com, jaegeuk@kernel.org,
-        damien.lemoal@wdc.com
-Date:   Thu, 13 Jun 2019 09:28:41 -0700
-In-Reply-To: <f8ab9587-309b-79a0-e6fc-f6683176f498@interlog.com>
-References: <20190613145955.4813-1-chaitanya.kulkarni@wdc.com>
-         <20190613145955.4813-2-chaitanya.kulkarni@wdc.com>
-         <9abfc2b8-4496-db7a-fcbb-b52102a67f8e@acm.org>
-         <f8ab9587-309b-79a0-e6fc-f6683176f498@interlog.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
+        Thu, 13 Jun 2019 04:35:27 -0400
+Received: by mail-yw1-f43.google.com with SMTP id k128so8009952ywf.2
+        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 01:35:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=E9Et9thIQKwcveyw5OArkt0ti7mIXwVLr/kLmzsdkuc=;
+        b=rLvl6CbghlvG5MM7cpZKY4fnpuglneY+OyeiqcA2h9T2AQtB+ZCMA40qcUvl7QTklO
+         0NO28FsKG+40kR+1rP/XWJhwcu7aX26UZvpMdkVKLoqqAzSPELOwczCyV87u9JYvmGC3
+         Jzj4SsIXRym1WOEQySid/FsapUXbUht0R1G0bIwwu8xj8Svzn9IGuCSCgK5QsEpFuTCg
+         fmQ8trV0NUouYl1H74oUBrxIube2J4gT0/tTMvhiW2/5VCzmnH5sjfuY7W+Ky0RITtbh
+         PQJa15mSUAW0nzucBMJCFGtAfIO3D9uHPITb6G0cd/CXdJKSxfgvE/V2JnsWinQhFGIa
+         Vi1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=E9Et9thIQKwcveyw5OArkt0ti7mIXwVLr/kLmzsdkuc=;
+        b=osRd2PMDrt9rUin1P5iec0mxx0OZq6Yo8738vhN1hQD1SuPuvwp+XN/3vpswYnDzaz
+         qU0ANDWNb6VvVysOdxTZhp3xg1BmimNhLP7VCq7bgozAGKx2bH4rCOWuRYTMhnLjQBwQ
+         ovoVYaVLJ8fVMNsYhsTDzPRose36yss2tmYdKgaWLYPXR2AA8U7rPz7+AINg4XxkjxuR
+         JOv1T2vGADq2vs9gHz41yvdzf0ImFteio57zjzLnVO3K0ZjjeWnbQ5VOyO83nxllI5Xr
+         nc/KSIrxeJbHon2Xhi3K/+yiwo0pZo/NxCOZ8RWht5p37sMFeDR22LJy4sq6h+Qeg6YO
+         YA/w==
+X-Gm-Message-State: APjAAAUJ4ht5I/zsIG2QxUEHa2OzLVK5G6mCnqkJgUtTXIaD4AsMaqLr
+        Sjv4FO0/2ToWfhDG8slNctSXUsQJMP8hVg==
+X-Google-Smtp-Source: APXvYqzKWYWZyYFEavhU0na+Eo++Q4WovsklPO+JjUhQ0ZLs+VXPJFQJCpYJAas0I4IpJB7Lb+j1hg==
+X-Received: by 2002:a81:b2c3:: with SMTP id q186mr677722ywh.379.1560414926189;
+        Thu, 13 Jun 2019 01:35:26 -0700 (PDT)
+Received: from ?IPv6:2600:380:9e2c:9b66:893e:4845:326b:1174? ([2600:380:9e2c:9b66:893e:4845:326b:1174])
+        by smtp.gmail.com with ESMTPSA id s8sm886073ywl.58.2019.06.13.01.35.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 13 Jun 2019 01:35:25 -0700 (PDT)
+Subject: Re: io_uring: buf_index and registered buffers
+To:     Stephen Bates <sbates@raithlin.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <99E68FD7-430D-4D58-920F-8705D823A4F6@raithlin.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <4510f6eb-9165-f239-7770-65b1596a7e18@kernel.dk>
+Date:   Thu, 13 Jun 2019 02:35:23 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <99E68FD7-430D-4D58-920F-8705D823A4F6@raithlin.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2019-06-13 at 12:07 -0400, Douglas Gilbert wrote:
-> On 2019-06-13 11:31 a.m., Bart Van Assche wrote:
-[...]
-> > Please explain what makes you think that part_nr_sects_read() must
-> > be protected 
-> > by an RCU read lock.
+On 6/11/19 9:11 AM, Stephen  Bates wrote:
+> Hi Jens and Team
 > 
-> Dear reviewer,
-> Please rephrase the above sentence without the accusative tone.
-> Specifically, please do not use the phrase "what makes you think"
-> in this or any other code review. For example: "I believe that..."
-> is more accurate and less provocative.
+> While experimenting with io_uring and liburing I seem to have hit an
+> issue with registered buffers. I can't see a way that either
+> io_uring_register() or liburing can return the buffer indicies
+> associated with registered buffers. In addition, there is no way to
 
-Imputing "tone" to email is something we try to avoid because it never
-ends well, particularly for non-native speakers. Some languages
-(Russian) have no articles and if you take any English phrase and strip
-out all the articles it sounds a lot more aggressive.
+Why would it need to return them? The indices are the index into the
+array you passed in for registration.
 
-> Observation: as a Canadian citizen when crossing the US border I
-> believe contradicting a US border official with the phrase "what
-> makes you think ..." could lead to a rather bad outcome :-)
-> Please make review comments with that in mind.
+> set sqe.buf_index via liburing right now when submitting an IO (it is
+> memset to 0 in liburing.h). The end result is that io_uring IO start
+> to fail when we do them from a set of registered buffers.
 
-Different situation: we aren't profiling reviewers ...
+liburing is missing a lot of helpers right now, I'll happily take
+patches to bring it closer to full feature parity.
 
-> Thanks.
+> I'd be happy to work on a patch for this but could do with confirmation that this a problem and some guidance on a good approach to fixing this in both the system call and the user-space library.
 > 
-> Doug Gilbert
-> 
-> P.S. Do we have any Linux code-of-conduct for reviewers?
+> BTW while liburing tests the creation of multiple registered buffers
+> it never issues IO against them so that would be a hole I'd like to
+> fill too.
 
-It's the same one for all interactions:
+Fio uses them, as does t/io_uring from fio. I've done lots of testing
+with registered buffers, all the performance numbers done were with that
+enabled (unless otherwise noted).
 
-Documentation/process/code-of-conduct-interpretation.rst
+But yes, a test case is always a great idea!
 
-But I would remind everyone that diversity isn't just a
-gender/race/LGBT issue it also means being understanding of the
-potential difficulties non-native speakers have with email in English.
-
-James
+-- 
+Jens Axboe
 
