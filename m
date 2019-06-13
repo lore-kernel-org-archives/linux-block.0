@@ -2,81 +2,87 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 077B9C31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 865FEC31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D145D208CA
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51D8720851
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="n6tXgtU9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731609AbfFMPxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 11:53:39 -0400
-Received: from baptiste.telenet-ops.be ([195.130.132.51]:55950 "EHLO
-        baptiste.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731602AbfFMJAJ (ORCPT
+        id S1729877AbfFMPxk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 11:53:40 -0400
+Received: from mail-yw1-f67.google.com ([209.85.161.67]:35119 "EHLO
+        mail-yw1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731601AbfFMI7z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 05:00:09 -0400
-Received: from ramsan ([84.194.111.163])
-        by baptiste.telenet-ops.be with bizsmtp
-        id Q8zU2000G3XaVaC018zV7m; Thu, 13 Jun 2019 10:59:55 +0200
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan with esmtp (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1hbLZw-0000Wz-Fs; Thu, 13 Jun 2019 10:59:28 +0200
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1hbKBT-0003Vp-Fd; Thu, 13 Jun 2019 09:30:07 +0200
-From:   Geert Uytterhoeven <geert+renesas@glider.be>
-To:     Jim Paris <jim@jtan.com>, Geoff Levand <geoff@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org, linux-block@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH] block/ps3vram: Use %llu to format sector_t after LBDAF removal
-Date:   Thu, 13 Jun 2019 09:30:06 +0200
-Message-Id: <20190613073006.13459-1-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
+        Thu, 13 Jun 2019 04:59:55 -0400
+Received: by mail-yw1-f67.google.com with SMTP id k128so8035100ywf.2
+        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 01:59:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=2+9AWuuxtYq5kDObExhhjKauucpmi9PpKTbQpENwdxw=;
+        b=n6tXgtU9jyCYIoEnopcXb3kvdH3pJPnNaZUgr1h0kYuBqfuVkDfZdhDI0C+M0DShsJ
+         mtpEej7Q7tu2iYouCZdzXTxI9G/6f7S/D8RS8ub9Y5Fyp2eQGzED8xB15X7TvNMjjUTW
+         2WGPWrOH5drqi1Z2nq9jnoeSfhd24IPTN8FDU+Uf4oEDF8jDbTxUAr6k2/pklQYA/cgJ
+         Wo718mB+1Nr1bhMm4baOFs4Ehv107XvmCkzvWQjVfsUwC0xLmmNsTroDwDjM11k8XWe0
+         orlt9dkGJM1m0c/rfBdcQ4mRYIWRKdFar+ydaHnVVN+wHBJVJj+UaZCVtw109orLDmEP
+         MYAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2+9AWuuxtYq5kDObExhhjKauucpmi9PpKTbQpENwdxw=;
+        b=Qhqe66ppHk664tVXT/+Qe+DFSW4+v8qH2TjtHDPqOxmh310k5vy1BPv5oFjLTmxske
+         w4XJE/07G3FV9yKd53+hR8TC+b18I2L4LW1Wq1wsJ8eVSxqGGerChc5k2ItaLLTiqyoD
+         iR79hMgJJ7n4Y0b7Sz0SmKX3xKdRxfZrVNk30TrQXbuy/i8ObyqMb21Zhoo3BxZlK+rU
+         mBWG0a27XRr2vfmviXUs0PmEZF5UnwTTi3Sq9LQvPry4LiPk438Egjqz4wtywSdeBYsK
+         fFJxsuGuNXcGLKCyl+ZfCKU5+SYHPQSuDiKWtIXWxU3DNNTdT/1xi+cA6lBh1TRaTima
+         acBQ==
+X-Gm-Message-State: APjAAAUbCBqRGkd62Y/mpYpfHcEDC0vLO7H2FCKjqZSb4Oo4J7gGFtzk
+        Z3VGlazzk17+S/HgW0hF9Dss8xoGUMBA2zkb
+X-Google-Smtp-Source: APXvYqxCEx653iUhqyan6kGQNPIR/w4+osLNDQGaSLrv8KI2gz87AEfJHMcrWUO3XewvyXWR1KK79g==
+X-Received: by 2002:a81:3494:: with SMTP id b142mr19026909ywa.79.1560416394346;
+        Thu, 13 Jun 2019 01:59:54 -0700 (PDT)
+Received: from [172.20.10.3] (mobile-166-172-57-221.mycingular.net. [166.172.57.221])
+        by smtp.gmail.com with ESMTPSA id l5sm574202ywf.11.2019.06.13.01.59.51
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 13 Jun 2019 01:59:53 -0700 (PDT)
+Subject: Re: [PATCH] block/switching-sched.txt: Update to blk-mq schedulers
+To:     Andreas Herrmann <aherrmann@suse.com>,
+        Jonathan Corbet <corbet@lwn.net>
+Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20190612065009.GA11361@suselix>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a781a669-85ec-6df1-a18d-6d329b2f5ff6@kernel.dk>
+Date:   Thu, 13 Jun 2019 02:59:50 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190612065009.GA11361@suselix>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The removal of CONFIG_LBDAF changed the type of sector_t from "unsigned
-long" to "u64" aka "unsigned long long" on 64-bit platforms, leading to
-a compiler warning regression:
+On 6/12/19 12:50 AM, Andreas Herrmann wrote:
+> 
+> Remove references to CFQ and legacy block layer which are gone.
+> Update example with what's available under blk-mq.
 
-    drivers/block/ps3vram.c: In function ‘ps3vram_probe’:
-    drivers/block/ps3vram.c:770:23: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 4 has type ‘sector_t {aka long long unsigned int}’ [-Wformat=]
+Applied, thanks.
 
-Fix this by using "%llu" instead.
-
-Fixes: 72deb455b5ec619f ("block: remove CONFIG_LBDAF")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- drivers/block/ps3vram.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/ps3vram.c b/drivers/block/ps3vram.c
-index 4c7f51b1eda94727..4628e1a27a2b7133 100644
---- a/drivers/block/ps3vram.c
-+++ b/drivers/block/ps3vram.c
-@@ -767,7 +767,7 @@ static int ps3vram_probe(struct ps3_system_bus_device *dev)
- 	strlcpy(gendisk->disk_name, DEVICE_NAME, sizeof(gendisk->disk_name));
- 	set_capacity(gendisk, priv->size >> 9);
- 
--	dev_info(&dev->core, "%s: Using %lu MiB of GPU memory\n",
-+	dev_info(&dev->core, "%s: Using %llu MiB of GPU memory\n",
- 		 gendisk->disk_name, get_capacity(gendisk) >> 11);
- 
- 	device_add_disk(&dev->core, gendisk, NULL);
 -- 
-2.17.1
+Jens Axboe
 
