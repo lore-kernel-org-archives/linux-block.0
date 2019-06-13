@@ -2,108 +2,101 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C5BC31E49
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E659C31E49
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:00:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B5A720B7C
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:00:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7392320B7C
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:00:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="IIPp6kS1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SvRYAM6V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732873AbfFMPAY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 11:00:24 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:28024 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732868AbfFMPAX (ORCPT
+        id S1732856AbfFMPAV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 11:00:21 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:49828 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732590AbfFMOt6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 11:00:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1560438023; x=1591974023;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DOgy94QccoYOl8BNrpBpMwTFlXUNeTceno4ux0l31BQ=;
-  b=IIPp6kS1rDY+KqzdkI8nAI8s3o6IlnNHGnft6juWeQYJeg0PXAkyYdBI
-   oYt22vr0hD//Fnphqv8pVT0WKgb6MbGOaybQXBO9/U0ZaQK0FJfeGRTv4
-   uFRIRAPlywQUJtJNG7pjpQBw0f4DQAi1H1KCpdrqyUC0z3fMHBbQ/nxYc
-   OKsLc9+V0zaDiIYuRi6Jr3gwFPjOWy2Mu2WNC0zkp6gZmeyw6f9AATPhs
-   5BJwSN73OVqgQfeiDGI+phvFc7a1aggLQ/L4olXa14pgd1Htg556A6iih
-   d85vSEvXBlC3CMqCJIOYGEL+GylSDwmnS9kOmSHIeBMYBfi67noLHN7va
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.63,369,1557158400"; 
-   d="scan'208";a="110477889"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Jun 2019 23:00:23 +0800
-IronPort-SDR: 3ZBSMsUX0zBe91YtOrCB/G5mlw4tbTYHipvQDOFnKy8F++xtPSnZiW0yY/tXBKKO/h131RhtCy
- o6X8HpVoq8af/oBKGX2uHg13zhJ0t/yLKH9km4hdgzqc1C3uYac10oMMLhGMjGou+FtgT3fWfj
- qERXqJh0DUXbuCC56tEQ4hBWorJ3QlbwD4L62pKnOvNNgJxS5KLIp3G7OnTIZYSbVSB6G4/+i9
- yuMfwIbUTTSJkvhHNkN2eiL9anse9lY9utnY0h3Uizd27KjSAttj5J1RYCA0igULT45yG+3V2F
- NbJSybk0Jelwr6MR2XdVLnIc
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 13 Jun 2019 08:00:06 -0700
-IronPort-SDR: pbpA2y6HwE3tNh1R1zJZ30pgpN39RHued4F1JDg3vRN64piaUZfAcH7khujOnx9Mgk5aiSFyGZ
- 4IZCY88eF5mjNj8CYyAuyiX9WSXJw92BTbpZI1UPpNKseJJ7L1ZYzCIQfukozUSCmxUajmbUtE
- qWFfmDyJFdr6v5lDecHIOnvMJU3uHRts7c/F+vaj/Y5riUJ8iQ8wACBy0OCOYyChSkZ/7dV9jB
- QjdQBr+PTQEhMepxFwsSU9sMvxqUQIgLyz5qTMCUysvMK6Nw21IKHhbnVOv37ZniVHtz7AY2Uw
- BqA=
-Received: from cmercuryqemu.hgst.com ([10.202.65.32])
-  by uls-op-cesaip01.wdc.com with ESMTP; 13 Jun 2019 08:00:22 -0700
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-btrace@vger.kernel.org,
-        kent.overstreet@gmail.com, jaegeuk@kernel.org,
-        damien.lemoal@wdc.com,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 4/8] blk-zoned: update blkdev_reset_zones() with helper
-Date:   Thu, 13 Jun 2019 07:59:51 -0700
-Message-Id: <20190613145955.4813-5-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190613145955.4813-1-chaitanya.kulkarni@wdc.com>
-References: <20190613145955.4813-1-chaitanya.kulkarni@wdc.com>
+        Thu, 13 Jun 2019 10:49:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=WMyyxODgsxZ/XkDr48HWA7aTA4P32ySnPu90ZE1usUA=; b=SvRYAM6V25RdXhhsF2XFD/myCy
+        xb90MjFff+RemiPe/zmVRTwQhoIo5cqAF2taZi8MUOejdLT1cBDi4MzIr/OkvNaoWh9WPy78Y9iGa
+        km6RgOwE7MG8qQFY13YKdOYFyn6V6JWac8/2o05TV/mDxP5THfZdU34j/GMH7AaMmOqeVG5aDRGck
+        dbH6tYpypSW4SkNfYadSbfEYCHgblPGISG5mOtez1Wu92EQCQWKUOcaDGfrR2/Ic2uOjlu72PANeR
+        IrYhaIbx5gzo/xLXBtkiC/5kXhTzhv1AERPNvZZ0goFmnYWMrfD555r42SloB+Sv1bvNB2b5jQhg3
+        MQHwsJRQ==;
+Received: from static-50-53-52-16.bvtn.or.frontiernet.net ([50.53.52.16] helo=dragon.dunlab)
+        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hbR35-0004ea-Lj; Thu, 13 Jun 2019 14:49:55 +0000
+Subject: Re: [PATCH 02/13] uapi: General notification ring definitions [ver
+ #4]
+To:     David Howells <dhowells@redhat.com>
+Cc:     "Darrick J. Wong" <darrick.wong@oracle.com>,
+        viro@zeniv.linux.org.uk, raven@themaw.net,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <6b6f5bb0-1426-239b-ac9f-281e31ddcd04@infradead.org>
+ <20190607151228.GA1872258@magnolia>
+ <155991702981.15579.6007568669839441045.stgit@warthog.procyon.org.uk>
+ <155991706083.15579.16359443779582362339.stgit@warthog.procyon.org.uk>
+ <29222.1559922719@warthog.procyon.org.uk>
+ <30226.1560432885@warthog.procyon.org.uk>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <575fa290-961f-8dcd-3b76-4608daa5ee0e@infradead.org>
+Date:   Thu, 13 Jun 2019 07:49:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <30226.1560432885@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch updates the blkdev_reset_zones() with newly introduced
-helper function to read the nr_sects from block device's hd_parts with
-the help of part_nr_sects_read() protected by appropriate locking.
+On 6/13/19 6:34 AM, David Howells wrote:
+> Randy Dunlap <rdunlap@infradead.org> wrote:
+> 
+>> What is the problem with inline functions in UAPI headers?
+> 
+> It makes compiler problems more likely; it increases the potential for name
+> collisions with userspace; it makes for more potential problems if the headers
+> are imported into some other language; and it's not easy to fix a bug in one
+> if userspace uses it, just in case fixing the bug breaks userspace.
+> 
+> Further, in this case, the first of Darrick's functions (calculating the
+> length) is probably reasonable, but the second is not.  It should crank the
+> tail pointer and then use that, but that requires 
+> 
+>>>> Also, weird multiline comment style.
+>>>
+>>> Not really.
+>>
+>> Yes really.
+> 
+> No.  It's not weird.  If anything, the default style is less good for several
+> reasons.  I'm going to deal with this separately as I need to generate some
+> stats first.
+> 
+> David
+> 
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- block/blk-zoned.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+OK, maybe you are objecting to the word "weird."  So the multi-line comment style
+that you used is not the preferred Linux kernel multi-line comment style
+(except in networking code) [Documentation/process/coding-style.rst] that has been
+in effect for 20+ years AFAIK.
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 9faf4488339d..e7f2874b5d37 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -229,7 +229,7 @@ int blkdev_reset_zones(struct block_device *bdev,
- 	if (bdev_read_only(bdev))
- 		return -EPERM;
- 
--	if (!nr_sectors || end_sector > bdev->bd_part->nr_sects)
-+	if (!nr_sectors || end_sector > bdev_nr_sects(bdev))
- 		/* Out of range */
- 		return -EINVAL;
- 
-@@ -239,7 +239,7 @@ int blkdev_reset_zones(struct block_device *bdev,
- 		return -EINVAL;
- 
- 	if ((nr_sectors & (zone_sectors - 1)) &&
--	    end_sector != bdev->bd_part->nr_sects)
-+	    end_sector != bdev_nr_sects(bdev))
- 		return -EINVAL;
- 
- 	blk_start_plug(&plug);
+
 -- 
-2.19.1
-
+~Randy
