@@ -2,108 +2,101 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A66BEC31E49
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 22:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C6FC468B0
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 23:01:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7AC4F21721
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 22:31:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF90521537
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 23:01:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560465074;
-	bh=Vn7R66l4H/9d5vW6KQ8RGrDYdTreBUd+4EAyjbPkEuc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=s4ivs3WYc0MK/Gv5OSKmskWVh4Te+6/CYDIHP3khZqLfFKh5d1SmjfyjWCynq3YPT
-	 zdTC6I4dp1E7qjQPLwuty6lrcuHIVhJ/8BobuYJVkDXvJU+XTBeeojAw4/7YbMIefE
-	 +74IjLVkhm2QO1x45aBGmEHUA8qVGeQGoUJ6wHpY=
+	s=default; t=1560466867;
+	bh=ijAoTvben3xHdJwjFjc2JVq20l3k6CT0SJjNIni16EE=;
+	h=Subject:To:Cc:References:From:Date:In-Reply-To:List-ID:From;
+	b=py96+Jwa2hpARq3mst+rgATY+ZUVczaDRwOhbTp84DDydbZXEDTZKN2OHhxpGxenO
+	 d6WHwP6dHYpQ6IvoNhBAyL4RtKGVNE3orG004iP6or+FJMQcQVPJHISuaAPtkY4YDs
+	 FZzoL/8cX56/PDs9m/HoeYdT+2DMgIC/56GT1ySA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726369AbfFMWau (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 18:30:50 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:40756 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725616AbfFMWat (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 18:30:49 -0400
-Received: by mail-pf1-f196.google.com with SMTP id p184so126533pfp.7;
-        Thu, 13 Jun 2019 15:30:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=U7FQmFFF1Z7fbd/otHz8+BUYJEJIQONwHFEy1+lWias=;
-        b=ou8LjWlocAo0l+AbBD2K8zqOXdHKtUJiuOKET9r4w2rYN8FTmJm9/rkEcRYxxwarXU
-         SEhyPscTnAzXgCFIJWK5iLd9z+cvsmGhefs5JnhaUZGL9BA8PHvNxLll/3vFK914D+aW
-         YGV19T8nfi1N1oex58KP07rbT7j9pfn6UcpSyu47NmD8gMfAXs/OLD0dEbr+6KXZApfn
-         9xJjEGAZFGRBbJsJHRclDWUgaQ8d47vAEY+fTE39qpMdFepfOyy/IMgrMnJnhI7qaIFX
-         xazIFmZect8aSvQjduAHe4T3bW2Cigb1rVqdbJXzALIsWIPv5JtGZVMBqhXqNL8WfmBs
-         zMAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=U7FQmFFF1Z7fbd/otHz8+BUYJEJIQONwHFEy1+lWias=;
-        b=HlZiktsagTB1eqWmovDjAJoxYYvEzXWFwRbBzPA7txh9LohiA+BmWU6BYcfaLSOxDp
-         1IZmCGB/9ytBQZaiIM7kPIYfHKOKfTtbFwevvcacEdShzphUMSXGXrM4/M0oH1xHF0Mx
-         j562ZFTO0TpF+q4cVP1bzkpEqV1gMEZjjuoykJQ64VsFc2D88fa6Xz+B2eL2d8/P1HYs
-         1UbjI983WY9/tvlmhav0t8jXNE3o4HNd1t5Hf2EnG75nZ73PcV7ZR/PH56fl4eMJsyJk
-         n3XQz+HPz9fsSB/A4jWS0mWvC+FDv2vHBpOcQMmbviG+MY0L8vT8OCbYxXCYOqu4ch98
-         kLJA==
-X-Gm-Message-State: APjAAAXPRWg3z2hmT0c6FbucaIuivI0DIst+2l2DocwzjhEJLXvTDW3l
-        LYrio054McDnamMFTnzh1wi+aCYK
-X-Google-Smtp-Source: APXvYqzcZ+KeeCn26qjrgyY2X4mTd17aLheAHsEdaxp8KdwvnigyJg/XaRKDKq9XFJgvCS02qH5ksg==
-X-Received: by 2002:a17:90a:d681:: with SMTP id x1mr7614682pju.13.1560465048467;
-        Thu, 13 Jun 2019 15:30:48 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::2:9d14])
-        by smtp.gmail.com with ESMTPSA id 5sm610910pfh.109.2019.06.13.15.30.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 15:30:47 -0700 (PDT)
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, jbacik@fb.com
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel-team@fb.com, dennis@kernel.org, jack@suse.cz,
-        Tejun Heo <tj@kernel.org>, stable@vger.kernel.org
-Subject: [PATCH 1/5] blk-iolatency: clear use_delay when io.latency is set to zero
-Date:   Thu, 13 Jun 2019 15:30:37 -0700
-Message-Id: <20190613223041.606735-2-tj@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190613223041.606735-1-tj@kernel.org>
-References: <20190613223041.606735-1-tj@kernel.org>
+        id S1727028AbfFMXBH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 19:01:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42192 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726296AbfFMXBH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 19:01:07 -0400
+Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C71622147A;
+        Thu, 13 Jun 2019 23:01:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560466866;
+        bh=ijAoTvben3xHdJwjFjc2JVq20l3k6CT0SJjNIni16EE=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=l7CW3kEbIEfMPyQKq84ka0PeuSuwdqPEd/rBwzyb+r1FqLLqyErPP9Iw42L52TmB5
+         2Uy1rIkSbsHxHYYCWBq3FZuNZTXRsZ2QRyHKWJRpBXggeBKNkX5qMpxYhhmmT5vXeb
+         r3sXe5wfp6Fftm3kLieDRdFmX+o6d0kmUyHdR3fc=
+Subject: Re: How to resolve an issue in swiotlb environment?
+To:     Alan Stern <stern@rowland.harvard.edu>,
+        Christoph Hellwig <hch@lst.de>,
+        Valentina Manea <valentina.manea.m@gmail.com>
+Cc:     Oliver Neukum <oneukum@suse.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        shuah <shuah@kernel.org>
+References: <Pine.LNX.4.44L0.1906131306580.1307-100000@iolanthe.rowland.org>
+From:   shuah <shuah@kernel.org>
+Message-ID: <41caad16-3fa1-413b-0d49-594d48b88de4@kernel.org>
+Date:   Thu, 13 Jun 2019 17:01:05 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <Pine.LNX.4.44L0.1906131306580.1307-100000@iolanthe.rowland.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If use_delay was non-zero when the latency target of a cgroup was set
-to zero, it will stay stuck until io.latency is enabled on the cgroup
-again.  This keeps readahead disabled for the cgroup impacting
-performance negatively.
+On 6/13/19 11:16 AM, Alan Stern wrote:
+> On Thu, 13 Jun 2019, Christoph Hellwig wrote:
+> 
+>> On Wed, Jun 12, 2019 at 10:43:11AM -0400, Alan Stern wrote:
+>>> Would it be okay to rely on the assumption that USB block devices never
+>>> have block size < 512?  (We could even add code to the driver to
+>>> enforce this, although refusing to handle such devices at all might be
+>>> worse than getting an occasional error.)
+>>
+>> sd.c only supports a few specific sector size, and none of them is
+>> < 512 bytes:
+>>
+>> 	if (sector_size != 512 &&
+>> 	    sector_size != 1024 &&
+>> 	    sector_size != 2048 &&
+>> 	    sector_size != 4096) {
+>> 	    	...
+>> 		sdkp->capacity = 0;
+> 
+> Great!  So all we have to do is fix vhci-hcd.  Then we can remove all
+> the virt_boundary_mask stuff from usb-storage and uas entirely.
+> 
+> (I'm assuming wireless USB isn't a genuine issue.  As far as I know, it
+> is pretty much abandoned at this point.)
+> 
+> Valentina and Shua: Adding SG support to vhci-hcd shouldn't be too
+> hard.  It ought to be possible even without changing the network
+> protocol.
+> 
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Cc: Josef Bacik <jbacik@fb.com>
-Fixes: d70675121546 ("block: introduce blk-iolatency io controller")
-Cc: stable@vger.kernel.org # v4.19+
----
- block/blk-iolatency.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I will start taking a look at this. Is there a target release in plan
+to drop virt_boundary_mask stuff?
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index d22e61bced86..17896bb3aaf2 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -778,8 +778,10 @@ static int iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
- 
- 	if (!oldval && val)
- 		return 1;
--	if (oldval && !val)
-+	if (oldval && !val) {
-+		blkcg_clear_delay(blkg);
- 		return -1;
-+	}
- 	return 0;
- }
- 
--- 
-2.17.1
+thanks,
+-- Shuah
 
