@@ -2,93 +2,106 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A9CFC31E4B
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2129BC31E49
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:10:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69B3B207E0
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:05:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF9FC20B7C
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:10:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="H+G9OtYJ"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="GFEWk0im"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732744AbfFMPFe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 11:05:34 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:40858 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732441AbfFMOO0 (ORCPT
+        id S1732322AbfFMPKc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 11:10:32 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:42193 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732313AbfFMNwq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 10:14:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1560435266; x=1591971266;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=1FypgCGtJ65K5XzjTkv2SWzZMurbjJVCpa70W1QwkhQ=;
-  b=H+G9OtYJfnvO9rBvi0EdohDB2htUxknWW4+kIL6Oom/wFCk2ZySfVQQo
-   YJmTQjdk9PirOkBKJ1CXqqWQrm7P5Db0t5kQ+c15XfSH99DcJfUOF64NP
-   8CoASSbw5NCCvqgsBUv5digeIbpOmYx2Gt3/A29etMd1Po7oNn4jsjcCA
-   1zhX1wOOL5dwk/s91NCeb1hSkpG3JecPzPOhaL8ycmx114mdR7ASNtZ9x
-   2YOSEMP1HtYGYUrkZYpGw09CfZzw7lZlSDxwLZd6QPykz8l39E2DFUR95
-   FPS6z2t9aN7uaVykpPGbFk/+vsKGyvQqjA9tohn+pOKUrPmmt5+/2NSwk
-   w==;
-X-IronPort-AV: E=Sophos;i="5.63,369,1557158400"; 
-   d="scan'208";a="111747747"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Jun 2019 22:14:23 +0800
-IronPort-SDR: Uj+vKLqK7hxHyG/4HTYmjD20hZeVNd+No+34zxIaes7Vrvc9jHSVSfscEK0ivhKMxwmv8++wu/
- IcWwNqoxP38P3rTacHZwgJ87Bv8l+TwFN8fNf+H8mWBMA3EtiG5ux1FbfI15Vz1phn84l7jpqR
- vYkAmxWNdx9/mfPA+tLUwRAqXIhUIlZZaCWSDokHLbbsF/7TZ1XYGuq/Q5rU2hn/g3wv3yUbqA
- 9WaLU8TPwlL0qwIsyuyFDB3lhAlmR8GT9sQfELnwA8PZ82ptwx4T+ZSbJnXqZsmr5VcT09kQ3K
- 4V2+nVP8Bq8N0V6lUSQaE9ug
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 13 Jun 2019 07:14:07 -0700
-IronPort-SDR: KfS3paupNszdW/LYObcjvLbRE00WnJqf6mJiagL1KAWKBbn3bzJ/+H1mrLO0fve1MlS1x7PDbm
- ZYU1BjjaB4hxBjgM7Pwb6OYcSGislbmaIeG3g0MZlp2bue71pXru5Fi7Ve0E97U4VEs8P+5TWM
- RidQNv7sNT2RLPBqJ1+gR9pldSsmLDY2f8A9rw/jZh1FRsIunXvBLae7x6VFSeFk4htv3f75ic
- WU3bTUp9K2Idd/getJ+sIcvB2yZLDW+hbkQc4UZltyAG+ERxL47DE7fxZougzap9X+KuUE/U82
- 7r0=
-Received: from cmercuryqemu.hgst.com ([10.202.65.32])
-  by uls-op-cesaip01.wdc.com with ESMTP; 13 Jun 2019 07:14:23 -0700
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH] block: use req_op() to maintain consistency
-Date:   Thu, 13 Jun 2019 07:14:21 -0700
-Message-Id: <20190613141421.2698-1-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.19.1
+        Thu, 13 Jun 2019 09:52:46 -0400
+Received: by mail-qt1-f194.google.com with SMTP id s15so22573987qtk.9
+        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 06:52:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=iBdScbJdiJZd68aym6rhQHLd3tm2EOsfFy62siRg9uo=;
+        b=GFEWk0imhVI/2I2j0NZKrJmyS6v/3bvPCAqzum6N/1Q5sr6yUni2cHwAxZONJbnP01
+         GMKsKVylo1eVgL2f/W9h6hTULk9/sUBYxVAfbA+oETLxNJYkeDLEDf/f9wQ5X1gc4bKI
+         9MLvQ9PmzOHS35R5ynuuFhrpxncsFLKb4qU3eKkn+NTbBFWpzwdEi2WyksuapDegDBoZ
+         iG/BQOK9glPcpl1q8cFd5bjCewVt+gkl8RDvf0ost08/NRfLYgJQrqYpB42lD03peNeo
+         W6RiBCx9pIogytuJqBNTQ/jEs20p9LKXbZBEUd+EPoq3arEESyOtCyfGd8bZjdsv4kfB
+         aVxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=iBdScbJdiJZd68aym6rhQHLd3tm2EOsfFy62siRg9uo=;
+        b=rs4bVzaF7+JCshW+ZX3toEzDDBrIA0a7SnhS5sOMIxzAkP8+BSEe2K2LCnpit8xkre
+         hckEeRqy4pxXUVQ5CzOCsTEA3x+OECovaF+IzFcccEZ4OWawy5L7wZFG9rF4sIMMW4gJ
+         UhTxLzCHAB9/oR8G7hfFKuJ8RPqYfIsHiX3o96XHWuR505HJ6Lq+DStvNPhNZ8/0MvNZ
+         E1g1RKjeb62L8NfsuZK/2KaxMEkPFV6eK3xUcv1NDkZkbDNrBNCs001hmHZbhDO8s/Ux
+         dkPozaMrEpQ1uvQQb5xi1K5CtSqydVnHNaUjrOYX4VcearHw0ZjgaHXAifoIinB+HuaW
+         dHGQ==
+X-Gm-Message-State: APjAAAXLkrox5ioO6P8tdXk419/ybEKhcjs2HgmYe7h9Wn5mKlQdw+zR
+        qdnJ2s2igqnVC0esXiwsjImG9w==
+X-Google-Smtp-Source: APXvYqzJCWd+rW5ZvwqklVd8I6KrtVVFyDv818dOj3NqIB/npUIpX6o3ODd/u8GDJLhKmzgUZ+Qe3g==
+X-Received: by 2002:a0c:af36:: with SMTP id i51mr1935341qvc.128.1560433964768;
+        Thu, 13 Jun 2019 06:52:44 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::9d6b])
+        by smtp.gmail.com with ESMTPSA id e63sm1454584qkd.57.2019.06.13.06.52.43
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 13 Jun 2019 06:52:43 -0700 (PDT)
+Date:   Thu, 13 Jun 2019 09:52:42 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     roman.stratiienko@globallogic.com
+Cc:     linux-kernel@vger.kernel.org, josef@toxicpanda.com,
+        nbd@other.debian.org, A.Bulyshchenko@globallogic.com,
+        linux-block@vger.kernel.org, axboe@kernel.dkn.org
+Subject: Re: [PATCH 2/2] nbd: add support for nbd as root device
+Message-ID: <20190613135241.aghcrrz7rg2au3bw@MacBook-Pro-91.local>
+References: <20190612163144.18486-1-roman.stratiienko@globallogic.com>
+ <20190612163144.18486-2-roman.stratiienko@globallogic.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190612163144.18486-2-roman.stratiienko@globallogic.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a pure code cleanup patch and doesn't change any functionality.
-In block layer to identify the request operation req_op() macro is
-used, so change the open coding the req_op() in the blk-mq-debugfs.c.
+On Wed, Jun 12, 2019 at 07:31:44PM +0300, roman.stratiienko@globallogic.com wrote:
+> From: Roman Stratiienko <roman.stratiienko@globallogic.com>
+> 
+> Adding support to nbd to use it as a root device. This code essentially
+> provides a minimal nbd-client implementation within the kernel. It opens
+> a socket and makes the negotiation with the server. Afterwards it passes
+> the socket to the normal nbd-code to handle the connection.
+> 
+> The arguments for the server are passed via kernel command line.
+> The kernel command line has the format
+> 'nbdroot=[<SERVER_IP>:]<SERVER_PORT>/<EXPORT_NAME>'.
+> SERVER_IP is optional. If it is not available it will use the
+> root_server_addr transmitted through DHCP.
+> 
+> Based on those arguments, the connection to the server is established
+> and is connected to the nbd0 device. The rootdevice therefore is
+> root=/dev/nbd0.
+> 
+> Patch was initialy posted by Markus Pargmann <mpa@pengutronix.de>
+> and can be found at https://lore.kernel.org/patchwork/patch/532556/
+> 
+> Change-Id: I78f7313918bf31b9dc01a74a42f0f068bede312c
+> Signed-off-by: Roman Stratiienko <roman.stratiienko@globallogic.com>
+> Reviewed-by: Aleksandr Bulyshchenko <A.Bulyshchenko@globallogic.com>
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- block/blk-mq-debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Just throw nbd-client in your initramfs.  Every nbd server has it's own
+handshake protocol, embedding one particular servers handshake protocol into the
+kernel isn't the answer here.  Thanks,
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 6aea0ebc3a73..c6c3c4f4128a 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -341,7 +341,7 @@ static const char *blk_mq_rq_state_name(enum mq_rq_state rq_state)
- int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
- {
- 	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
--	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
-+	const unsigned int op = req_op(rq);
- 
- 	seq_printf(m, "%p {.op=", rq);
- 	if (op < ARRAY_SIZE(op_name) && op_name[op])
--- 
-2.19.1
-
+Josef
