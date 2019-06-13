@@ -2,105 +2,81 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8B5C31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 077B9C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F81320851
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mndJg9KW"
+	by mail.kernel.org (Postfix) with ESMTP id D145D208CA
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731671AbfFMPxc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 11:53:32 -0400
-Received: from mail-yw1-f41.google.com ([209.85.161.41]:39564 "EHLO
-        mail-yw1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726490AbfFMJCW (ORCPT
+        id S1731609AbfFMPxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 11:53:39 -0400
+Received: from baptiste.telenet-ops.be ([195.130.132.51]:55950 "EHLO
+        baptiste.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731602AbfFMJAJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 05:02:22 -0400
-Received: by mail-yw1-f41.google.com with SMTP id u134so8036611ywf.6
-        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 02:02:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=PY4MTSAiyfAeqQ1EoK1phEFJQeBQDmlO5b+7DPU23nU=;
-        b=mndJg9KWLChGfxxzS2vb/V8s5kknc/xKZtS5CQpuL1+pAQ0eriRTinWCBCXzwu/nCy
-         GAUW9C8ZvRIeb6XrV4OFvOC1uGCI7ZnxmPraONbTUhqznblH1gF4QKGU0AdI3l2om7Yj
-         vjLI9JqcFFnkOhqQKacQPS2xQzbVIPoTTitBr0M2MLgCMQaN052vxyK7bDpaLkPdxLiI
-         YansDbXptNh5xhiZg4sE/yRLOAE09Zf35/vW1Y/96g+MDdGfk4qgYYn8XoPF8+te6MLq
-         TGJarpu5v3OPPJq66fIvXuBye9g+TsyLzGO2wrb3TH0eGXacL1de9psKSspngX914DmL
-         roJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PY4MTSAiyfAeqQ1EoK1phEFJQeBQDmlO5b+7DPU23nU=;
-        b=Tmqt4R4hD0Hl2+egfVQDKrT1dm/yfKoi2kF7qSCEp5GKMh/ObqYNMONuA2kOuZvhVK
-         z0BhbQbRmdum3Fa8TNo6jPvSXOC5OdqFdWwIqeNcwSp77EMZj/cQbZ3nERMuOodUrjPg
-         gLffMNWq+5R2l/YU1OzbDUVSNFqaIwSqs4oxKMGZO00LcnwKC7VMye3xZgBEhf+kPDF2
-         ysG9sxwxlBmMQOJQz+FddiQld6z4uuprBNgUqPmDkC6SXBF6jsawBLT7En4QiVR331DC
-         n3Kt5fjoKgbaYfdYuFnhr9HnubJcJBdUYzLT0+l7zIMuJNPyLb/EIOkzoMkgGeWWrlRv
-         OxHA==
-X-Gm-Message-State: APjAAAXlJh170XND4YyZpwCKDMuX3EYgfI7d56PWBMZBje0plRbGaQIm
-        /z14TdFZp6h2TJNUPBaFjVOY1w==
-X-Google-Smtp-Source: APXvYqxHP/XueIS81D/+6MZQNXrdu9gB8OCiZ+WsU0DRJhR7X0LMQ+asZdp6O6UY4xVnjE2/v9mMYA==
-X-Received: by 2002:a81:3314:: with SMTP id z20mr28158534ywz.341.1560416541330;
-        Thu, 13 Jun 2019 02:02:21 -0700 (PDT)
-Received: from [172.20.10.3] (mobile-166-172-57-221.mycingular.net. [166.172.57.221])
-        by smtp.gmail.com with ESMTPSA id z6sm621875ywl.50.2019.06.13.02.02.17
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 02:02:20 -0700 (PDT)
-Subject: Re: alternative take on the same page merging leak fix
-To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc:     David Gibson <david@gibson.dropbear.id.au>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
-References: <20190611151007.13625-1-hch@lst.de>
- <20190612010922.GA17522@ming.t460p> <20190612074527.GA20491@lst.de>
- <20190612101111.GA16000@ming.t460p>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5d781312-d28e-5bcc-4294-27facdd4a1e7@kernel.dk>
-Date:   Thu, 13 Jun 2019 03:02:10 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        Thu, 13 Jun 2019 05:00:09 -0400
+Received: from ramsan ([84.194.111.163])
+        by baptiste.telenet-ops.be with bizsmtp
+        id Q8zU2000G3XaVaC018zV7m; Thu, 13 Jun 2019 10:59:55 +0200
+Received: from rox.of.borg ([192.168.97.57])
+        by ramsan with esmtp (Exim 4.90_1)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1hbLZw-0000Wz-Fs; Thu, 13 Jun 2019 10:59:28 +0200
+Received: from geert by rox.of.borg with local (Exim 4.90_1)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1hbKBT-0003Vp-Fd; Thu, 13 Jun 2019 09:30:07 +0200
+From:   Geert Uytterhoeven <geert+renesas@glider.be>
+To:     Jim Paris <jim@jtan.com>, Geoff Levand <geoff@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org, linux-block@vger.kernel.org,
+        Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH] block/ps3vram: Use %llu to format sector_t after LBDAF removal
+Date:   Thu, 13 Jun 2019 09:30:06 +0200
+Message-Id: <20190613073006.13459-1-geert+renesas@glider.be>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20190612101111.GA16000@ming.t460p>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/12/19 4:11 AM, Ming Lei wrote:
-> On Wed, Jun 12, 2019 at 09:45:27AM +0200, Christoph Hellwig wrote:
->> On Wed, Jun 12, 2019 at 09:09:23AM +0800, Ming Lei wrote:
->>> We have to backport the fixes to -stable tree, and downstream need to
->>> ship the fix too.
->>>
->>> The issue is quite serious because the leak is in IO path and the whole
->>> system ram can be used up easily on some workloads. So I think the fix
->>> should be for 5.2, however, regression risk might be increased by
->>> pulling cleanup & re-factor in now.
->>>
->>> I really appreciate you may cook a fix-only patch for this issue.
->>> Especially the change in add pc page code isn't necessary for fixing
->>> the issue.
->>
->> Patches 3 and 4 have no dependencies on 1 and 2, and should have
->> arguably been ordered first in the series.
-> 
-> OK, that is good to make patch 3 &4 into 5.2, I will give a review
-> soon.
+The removal of CONFIG_LBDAF changed the type of sector_t from "unsigned
+long" to "u64" aka "unsigned long long" on 64-bit platforms, leading to
+a compiler warning regression:
 
-I'll echo Mings sentiments here, for the series.
+    drivers/block/ps3vram.c: In function ‘ps3vram_probe’:
+    drivers/block/ps3vram.c:770:23: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 4 has type ‘sector_t {aka long long unsigned int}’ [-Wformat=]
 
+Fix this by using "%llu" instead.
+
+Fixes: 72deb455b5ec619f ("block: remove CONFIG_LBDAF")
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+ drivers/block/ps3vram.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/ps3vram.c b/drivers/block/ps3vram.c
+index 4c7f51b1eda94727..4628e1a27a2b7133 100644
+--- a/drivers/block/ps3vram.c
++++ b/drivers/block/ps3vram.c
+@@ -767,7 +767,7 @@ static int ps3vram_probe(struct ps3_system_bus_device *dev)
+ 	strlcpy(gendisk->disk_name, DEVICE_NAME, sizeof(gendisk->disk_name));
+ 	set_capacity(gendisk, priv->size >> 9);
+ 
+-	dev_info(&dev->core, "%s: Using %lu MiB of GPU memory\n",
++	dev_info(&dev->core, "%s: Using %llu MiB of GPU memory\n",
+ 		 gendisk->disk_name, get_capacity(gendisk) >> 11);
+ 
+ 	device_add_disk(&dev->core, gendisk, NULL);
 -- 
-Jens Axboe
+2.17.1
 
