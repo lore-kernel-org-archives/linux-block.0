@@ -2,132 +2,103 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E348FC31E4A
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:48:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71614C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:54:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BBFF5215EA
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:48:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44C782080A
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:54:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesasgroup.onmicrosoft.com header.i=@renesasgroup.onmicrosoft.com header.b="Og+phJsU"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IbN9MD6U"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726767AbfFMQsB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 12:48:01 -0400
-Received: from mail-eopbgr1410120.outbound.protection.outlook.com ([40.107.141.120]:17865
-        "EHLO JPN01-OS2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730247AbfFMEwK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 00:52:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=renesasgroup.onmicrosoft.com; s=selector2-renesasgroup-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A0KvqaJ072jkO2bkJ8USO9biczqHUVBbvjaN9RjmwVw=;
- b=Og+phJsUg4CrEnoCz2rKqyIMK41Ja+0I3Tl/3dP6Q67O4F5lxjvrR4InGIlBhQ+yewsJHQki4jJ7NMHKt/g40Z2Wc2ljkwEGeOVaDyPFvFaUZ4NErsjhY4dVxe8nhXTTg7x7TBZaKZ1YwdsJ54E4jCz4Xoe44RyVEYwVWK5lOOM=
-Received: from OSAPR01MB3089.jpnprd01.prod.outlook.com (52.134.247.150) by
- OSAPR01MB2995.jpnprd01.prod.outlook.com (52.134.248.16) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.11; Thu, 13 Jun 2019 04:52:05 +0000
-Received: from OSAPR01MB3089.jpnprd01.prod.outlook.com
- ([fe80::19ad:b6ce:a287:dc85]) by OSAPR01MB3089.jpnprd01.prod.outlook.com
- ([fe80::19ad:b6ce:a287:dc85%7]) with mapi id 15.20.1965.017; Thu, 13 Jun 2019
- 04:52:05 +0000
-From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To:     Christoph Hellwig <hch@lst.de>
-CC:     Alan Stern <stern@rowland.harvard.edu>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
-Subject: RE: How to resolve an issue in swiotlb environment?
-Thread-Topic: How to resolve an issue in swiotlb environment?
-Thread-Index: AdUZ1Qlk800+Qz0uSuO63mIBeXkktQDUe+5AAJUL5SAAA1kYAAANEESAABj9hAAAERZjAAAi6naAAAJz/+AABe44AAAkT+Aw
-Date:   Thu, 13 Jun 2019 04:52:04 +0000
-Message-ID: <OSAPR01MB3089ACE26C9C986BB15CF960D8EF0@OSAPR01MB3089.jpnprd01.prod.outlook.com>
-References: <20190611064158.GA20601@lst.de>
- <Pine.LNX.4.44L0.1906110956510.1535-100000@iolanthe.rowland.org>
- <20190612073059.GA20086@lst.de>
- <OSAPR01MB3089D154C6DF0237003CE80CD8EC0@OSAPR01MB3089.jpnprd01.prod.outlook.com>
- <20190612113102.GA24742@lst.de>
-In-Reply-To: <20190612113102.GA24742@lst.de>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=yoshihiro.shimoda.uh@renesas.com; 
-x-originating-ip: [118.238.235.108]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b76f24c3-92f8-4dbb-0a27-08d6efbae22d
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:OSAPR01MB2995;
-x-ms-traffictypediagnostic: OSAPR01MB2995:
-x-microsoft-antispam-prvs: <OSAPR01MB29956F43960EF8EFCC63DF5BD8EF0@OSAPR01MB2995.jpnprd01.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 0067A8BA2A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(39860400002)(376002)(346002)(366004)(136003)(199004)(189003)(7696005)(6116002)(25786009)(33656002)(478600001)(14444005)(9686003)(256004)(6246003)(4326008)(76116006)(476003)(76176011)(11346002)(66446008)(73956011)(66946007)(81156014)(66476007)(66066001)(446003)(66556008)(64756008)(486006)(81166006)(7736002)(3846002)(8936002)(6916009)(8676002)(54906003)(305945005)(53936002)(5660300002)(316002)(68736007)(99286004)(74316002)(71200400001)(55016002)(26005)(14454004)(2906002)(186003)(52536014)(229853002)(6506007)(102836004)(6436002)(71190400001)(86362001);DIR:OUT;SFP:1102;SCL:1;SRVR:OSAPR01MB2995;H:OSAPR01MB3089.jpnprd01.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: renesas.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: yuAVPmOnA7259ti7dDat3UjAmq0/YUtJVYEh1zWPz4sNxuOPqA9xvKsB+4CcWmk4vLEUbXOSG0ZlSjm4A3uEmp4aZg/VbGF0ToAQvbxqw1D/ZALCc+cVIWB0/K/idnnPQSOT0RHAScN7r1p6RlO2OPFkA/a/+kwXoUASOwsXHhEC1Tg2B2VxCFpY7t7/MWOg0C7U6TKn/0CHduM6rCxBpSIyxr1+9YJp3JlWaqMvz8jz1UW0HsML0E4woN4VV87vHlu0mWsRfBBc4odQrYLv7EdZD+7LdFXzuDB751EfNDhSEZG5kkx2zjUyA/ooh8CFMGoHNAI2jbb8nt72uzQEgfxN1cwuuCzK4RITDKSSXX4gQOQPy6gAJerKu7t1ehMiCVxc6wPoxArnh7pyhzN8ffs6wuDvsBfOCo6NyPAja3k=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1728543AbfFMQyg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 12:54:36 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:54494 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730049AbfFMQyf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 12:54:35 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5DGrps7137385;
+        Thu, 13 Jun 2019 16:54:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=2qr3ZS03b7Do2yKuhnLF64PDdLnxqHZgHAUieuykJHo=;
+ b=IbN9MD6Uc+pM4AJaFQvHKcmX/NLzHDwmBJ3HURu2IkSBQGP9xP8mUrbd6glBhlEpGJ75
+ zu2XdO9nNxRIIdi4c/FFBD6myvsGBcWMecCf36nvnYFFxIBbAVcBU+dMnSy8zOmOXFSq
+ 5jogM/f2XkoiSmUjFDHCrrGWyJidD9b++U2TpRmGF0GVjjd6QgGDamoAMxdbCp5xhq+T
+ jW7YZsAjH0FEQDRT1TTt8m7vH94vFT/qsHmdP9ADVRoYqqdePsZkaJpWibqHIIgMrgnI
+ hMvVyvXu7nL1mcwITWoCQ8Na0aKOfeZl9h5Df7V3NZKA5b6+87EaB3W0faJlU6zhqx9g /A== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2t04eu2wv0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Jun 2019 16:54:02 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5DGqs4J158972;
+        Thu, 13 Jun 2019 16:54:01 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2t1jpjnqv0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Jun 2019 16:54:01 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5DGs03L001109;
+        Thu, 13 Jun 2019 16:54:00 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 13 Jun 2019 09:54:00 -0700
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org, hch@lst.de, hare@suse.com
+Subject: Re: [PATCH V2 2/2] block: add more debug data to print_req_err
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190613141629.2893-1-chaitanya.kulkarni@wdc.com>
+        <20190613141629.2893-3-chaitanya.kulkarni@wdc.com>
+        <d369fbbd-0d98-b804-619b-23049ee12398@acm.org>
+Date:   Thu, 13 Jun 2019 12:53:57 -0400
+In-Reply-To: <d369fbbd-0d98-b804-619b-23049ee12398@acm.org> (Bart Van Assche's
+        message of "Thu, 13 Jun 2019 08:17:34 -0700")
+Message-ID: <yq1d0jhtoii.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b76f24c3-92f8-4dbb-0a27-08d6efbae22d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2019 04:52:05.1984
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yoshihiro.shimoda.uh@renesas.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSAPR01MB2995
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9287 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=863
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906130122
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9287 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=907 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906130123
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
 
-> From: Christoph Hellwig, Sent: Wednesday, June 12, 2019 8:31 PM
->=20
-> On Wed, Jun 12, 2019 at 08:52:21AM +0000, Yoshihiro Shimoda wrote:
-> > Hi Christoph,
-> >
-> > > From: Christoph Hellwig, Sent: Wednesday, June 12, 2019 4:31 PM
-> > >
-> > > First things first:
-> > >
-> > > Yoshihiro, can you try this git branch?  The new bits are just the th=
-ree
-> > > patches at the end, but they sit on top of a few patches already sent
-> > > out to the list, so a branch is probably either:
-> > >
-> > >    git://git.infradead.org/users/hch/misc.git scsi-virt-boundary-fixe=
-s
-> >
-> > Thank you for the patches!
-> > Unfortunately, the three patches could not resolve this issue.
-> > However, it's a hint to me, and then I found the root cause:
-> >  - slave_configure() in drivers/usb/storage/scsiglue.c calls
-> >    blk_queue_max_hw_sectors() with 2048 sectors (1 MiB) when USB_SPEED_=
-SUPER or more.
-> >  -- So that, even if your patches (also I fixed it a little [1]) could =
-not resolve
-> >     the issue because the max_sectors is overwritten by above code.
-> >
-> > So, I think we should fix the slave_configure() by using dma_max_mappin=
-g_size().
-> > What do you think? If so, I can make such a patch.
->=20
-> Yes, please do.
+Bart,
 
-Thank you for your comment. I sent a patch to related mailing lists and you=
-.
+> If this patch gets applied there will be three copies in the upstream
+> code that convert a REQ_OP_* constant into a string: one in
+> blk-core.c, one in blk-mq-debugfs.c and one in
+> include/trace/events/f2fs.h. Is it possible to avoid that duplication
+> and have only one function that does the number-to-string conversion?
 
-Best regards,
-Yoshihiro Shimoda
+People often have a hard time correlating SCSI and block error messages
+with tracing output. So in general I'd like to see us not just trying to
+standardize the helper functions, but the actual output.
 
+I.e. I think it would be great to print exactly the same string for both
+error log messages and tracepoints. Since Chaitanya is doing a lot of
+work in this area anyway, that may be worth looking into?
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
