@@ -2,108 +2,120 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF97C31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BB6DC31E4A
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:36:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F2E22175B
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:31:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FBC5206BB
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:36:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727075AbfFMPbu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 11:31:50 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:41503 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727010AbfFMPbt (ORCPT
+        id S1731954AbfFMPgN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 11:36:13 -0400
+Received: from relmlor1.renesas.com ([210.160.252.171]:38042 "EHLO
+        relmlie6.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727431AbfFMKUm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 11:31:49 -0400
-Received: by mail-pl1-f196.google.com with SMTP id s24so8286036plr.8;
-        Thu, 13 Jun 2019 08:31:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Sw+SllUv08twj2EAyMoEep+5QsSUddK0/P8AXJZORSo=;
-        b=hzq079ExytLwC9vLrLEvXTCDpk7cLCp2hMA5+K108avL1yOKx1PskaaBNLJIIe8HHm
-         yobIkivBIPy8wnPxxzNVBuvOIFHX0sFSLtd8JWOe6HqPXLjzSh6O+ueE1gWqAxzXNIHO
-         9ARlcO47D4t8oHP4Bslyc2n9DU9aDqKKKyTdP0Lg2AsPmiY94NgbTJQhGU2h2hx/Ewag
-         BsyPT5lz29AezBVfCTtISO9TDXmqW0YZoU1WuhqmAQgnQA4SHh/QEjPYsVkqRquw2e4a
-         oNzzBmWUGPxbsbK5moxe52TQpSICijDllCZ3eG3MXTYqpFcAlbcIKHdXUYAbArGAMh4n
-         NznQ==
-X-Gm-Message-State: APjAAAUhix+xdxLBAUikust4vTojxcwhQarbfU3SnjmEuiMTQSe63nNU
-        JwrrtWvqSEcQxKTcLtpgL1g=
-X-Google-Smtp-Source: APXvYqw4oamYkUwHgg92Z05hHQ0ZGYDNMbYqfHf5XI4ShcHflr22ojcnpivazqf3vnWipfEjMdywWw==
-X-Received: by 2002:a17:902:2e81:: with SMTP id r1mr88928480plb.0.1560439909030;
-        Thu, 13 Jun 2019 08:31:49 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id 5sm161353pgi.28.2019.06.13.08.31.45
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 08:31:46 -0700 (PDT)
-Subject: Re: [PATCH 1/8] block: add a helper function to read nr_setcs
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-btrace@vger.kernel.org,
-        kent.overstreet@gmail.com, jaegeuk@kernel.org,
-        damien.lemoal@wdc.com
-References: <20190613145955.4813-1-chaitanya.kulkarni@wdc.com>
- <20190613145955.4813-2-chaitanya.kulkarni@wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <9abfc2b8-4496-db7a-fcbb-b52102a67f8e@acm.org>
-Date:   Thu, 13 Jun 2019 08:31:44 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190613145955.4813-2-chaitanya.kulkarni@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Thu, 13 Jun 2019 06:20:42 -0400
+X-IronPort-AV: E=Sophos;i="5.62,369,1554735600"; 
+   d="scan'208";a="18380808"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 13 Jun 2019 19:20:37 +0900
+Received: from localhost.localdomain (unknown [10.166.17.210])
+        by relmlir6.idc.renesas.com (Postfix) with ESMTP id CE64F4274BC5;
+        Thu, 13 Jun 2019 19:20:37 +0900 (JST)
+From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To:     joro@8bytes.org, axboe@kernel.dk, ulf.hansson@linaro.org,
+        wsa+renesas@sang-engineering.com
+Cc:     hch@lst.de, iommu@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: [RFC PATCH v6 3/5] block: add a helper function to merge the segments by an IOMMU
+Date:   Thu, 13 Jun 2019 19:20:13 +0900
+Message-Id: <1560421215-10750-4-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+References: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/13/19 7:59 AM, Chaitanya Kulkarni wrote:
-> This patch introduces helper function to read the number of sectors
-> from struct block_device->bd_part member. For more details Please refer
-> to the comment in the include/linux/genhd.h for part_nr_sects_read().
-> 
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> ---
->   include/linux/blkdev.h | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
-> 
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 592669bcc536..1ae65107182a 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1475,6 +1475,18 @@ static inline void put_dev_sector(Sector p)
->   	put_page(p.v);
->   }
->   
-> +/* Helper function to read the bdev->bd_part->nr_sects */
-> +static inline sector_t bdev_nr_sects(struct block_device *bdev)
-> +{
-> +	sector_t nr_sects;
-> +
-> +	rcu_read_lock();
-> +	nr_sects = part_nr_sects_read(bdev->bd_part);
-> +	rcu_read_unlock();
-> +
-> +	return nr_sects;
-> +}
-> +
->   int kblockd_schedule_work(struct work_struct *work);
->   int kblockd_schedule_work_on(int cpu, struct work_struct *work);
->   int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, unsigned long delay);
-> 
+This patch adds a helper function whether a queue can merge
+the segments by an IOMMU.
 
-Please explain what makes you think that part_nr_sects_read() must be 
-protected by an RCU read lock.
+Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+---
+ block/blk-settings.c   | 28 ++++++++++++++++++++++++++++
+ include/linux/blkdev.h |  2 ++
+ 2 files changed, 30 insertions(+)
 
-Thanks,
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 45f2c52..4e4e13e 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -4,9 +4,11 @@
+  */
+ #include <linux/bio.h>
+ #include <linux/blkdev.h>
++#include <linux/device.h>
+ #include <linux/gcd.h>
+ #include <linux/gfp.h>
+ #include <linux/init.h>
++#include <linux/iommu.h>
+ #include <linux/jiffies.h>
+ #include <linux/kernel.h>
+ #include <linux/lcm.h>
+@@ -831,6 +833,32 @@ void blk_queue_write_cache(struct request_queue *q, bool wc, bool fua)
+ }
+ EXPORT_SYMBOL_GPL(blk_queue_write_cache);
+ 
++/**
++ * blk_queue_can_use_iommu_merging - configure queue for merging segments.
++ * @q:		the request queue for the device
++ * @dev:	the device pointer for dma
++ *
++ * Tell the block layer about the iommu merging of @q.
++ */
++bool blk_queue_can_use_iommu_merging(struct request_queue *q,
++				     struct device *dev)
++{
++	struct iommu_domain *domain;
++
++	/*
++	 * If the device DMA is translated by an IOMMU, we can assume
++	 * the device can merge the segments.
++	 */
++	if (!device_iommu_mapped(dev))
++		return false;
++
++	domain = iommu_get_domain_for_dev(dev);
++	/* No need to update max_segment_size. see blk_queue_virt_boundary() */
++	blk_queue_virt_boundary(q, iommu_get_minimum_page_size(domain) - 1);
++
++	return true;
++}
++
+ static int __init blk_settings_init(void)
+ {
+ 	blk_max_low_pfn = max_low_pfn - 1;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 592669b..4d1f7dc 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1091,6 +1091,8 @@ extern void blk_queue_dma_alignment(struct request_queue *, int);
+ extern void blk_queue_update_dma_alignment(struct request_queue *, int);
+ extern void blk_queue_rq_timeout(struct request_queue *, unsigned int);
+ extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fua);
++extern bool blk_queue_can_use_iommu_merging(struct request_queue *q,
++					    struct device *dev);
+ 
+ /*
+  * Number of physical segments as sent to the device.
+-- 
+2.7.4
 
-Bart.
