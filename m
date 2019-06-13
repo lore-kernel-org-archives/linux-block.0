@@ -2,195 +2,166 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F7CC31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:45:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95209C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:45:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1C0E215EA
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:45:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DF7lFpNI"
+	by mail.kernel.org (Postfix) with ESMTP id 6E05320673
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:45:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560444340;
+	bh=TXtG/kXxwoMwfJBQteqaS2UMIYCH5nRvTGbOqKyX0sI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Ej7IDU3ey/yNu0lYwk5Yo9gijpKpl2vYn+CmYnRZfpmmunpRK05ZGhhXvgmzEjmR/
+	 hzr+2+TpyqIIFQGKvJnHfaPGC6g1e//yUOx1II+XOrizNGn33SDK/ZN1taGzX9Zdgt
+	 WNOrdw6G9UNlZAyER4XLvEIpCcOUtEtMTEcobcjc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730388AbfFMQpM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 12:45:12 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:34912 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730382AbfFMGKo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 02:10:44 -0400
-Received: by mail-wm1-f67.google.com with SMTP id c6so8764146wml.0
-        for <linux-block@vger.kernel.org>; Wed, 12 Jun 2019 23:10:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=nIFKJpfyK2DxoQfFQcfYz4XDj8g98HiIMkXp7eU/vOE=;
-        b=DF7lFpNIZm11PUqgPUscuIW7PKtZToXjoi9lvl3FR1Q9DRGg14WXbYeszl5jLzlSq4
-         nfCCh6z1NER5WcVNsoKKSjsxwj2N5WiROdNkXxo/k0TgUFZQ0e7bSPnPTP1c/rSRBsuK
-         pNRGCUTRwzKUWTzCnKuci7YFqe0wmVdVxQh6CmK8jxO8ELZgc3k5dfH0h3FcRHCtNLiX
-         ycTmN8bo0zmkg19lfL4IR6qrH9K1UtpvGDs3sx0yz7HAek2Dg/nmLT2onm8pLgeYU3wr
-         89jR2q8+e2+5lQu1RCt9wEM2ACvXxTZoG4rxus6i6ykaemPNgDhQGCdYnc1L4MaWJHEJ
-         WmwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=nIFKJpfyK2DxoQfFQcfYz4XDj8g98HiIMkXp7eU/vOE=;
-        b=swVIK4CiDecUlTwRbrI5QjZNu2yXcFqbXe9NmKc2RrqGtkjVz/4v0Ep8/0bSSjl2jI
-         9Bj/GDt1wfbLuNgZL2OE2L6MQuCwHjlZ0kq0NEKVqSMNnjQaXqEwt3O1dWvmw3e8zmuq
-         rL+LIvMBp/z7/1XyGSDBr0J+5Yn/ZtJluMqFvgeVR10ESDA2eRQvKhyBA2qG/Cs2x2eX
-         lSGNYW0p7S83cCrn6qGZlwZUQ7gWs8wTgUPn6GMrvXRJPiMd1MIdQNM9W8wrLsjNtAbC
-         0y012lHFXlVu9VvOvo8fOe9Y0XEZTaDaCTysEXR50W9hvwRBoJaF0QmhWQ2/f7GEo1lY
-         aeKg==
-X-Gm-Message-State: APjAAAW/76+Z+VPl4Cowye7s7M26UPZo/2xuPyL2e2K5OBgIypCL0ZGO
-        T0XkQCkh6oJDUxEAtaxLBIzxjg==
-X-Google-Smtp-Source: APXvYqy+cl8n4hDv1iOEmh12JXvIEAJuVbxqKY/0pT+UyDt/8JbKHMem8Geo16+D7J3h9STcUoQgZA==
-X-Received: by 2002:a7b:c018:: with SMTP id c24mr1933499wmb.37.1560406241185;
-        Wed, 12 Jun 2019 23:10:41 -0700 (PDT)
-Received: from [192.168.0.102] (88-147-71-233.dyn.eolo.it. [88.147.71.233])
-        by smtp.gmail.com with ESMTPSA id w14sm2179319wrt.59.2019.06.12.23.10.39
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Jun 2019 23:10:40 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-Message-Id: <530F0FC2-EBE5-4417-8732-010837C18357@linaro.org>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_517D8028-653A-4641-A322-BAD7B9C9C32F";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH block/for-5.2-fixes] bfq: use io.weight interface file
- instead of io.bfq.weight
-Date:   Thu, 13 Jun 2019 08:10:38 +0200
-In-Reply-To: <20190612133926.GN3341036@devbig004.ftw2.facebook.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
+        id S1732593AbfFMQp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 12:45:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54230 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730370AbfFMGCI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 02:02:08 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2075220896;
+        Thu, 13 Jun 2019 06:02:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560405726;
+        bh=TXtG/kXxwoMwfJBQteqaS2UMIYCH5nRvTGbOqKyX0sI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Ty+bxaddMpURmOU3MOKTA0CE15kFYaX1d8Sgb2tvh2k8dT0S99hDihB3yk78N0LvD
+         yoy5OS4vp5RZT8LV8W4gFaNu+e3uUB7uWy99g429klyYh4Wf3DQDlKx05waunqBA3G
+         QwaSMR5S7z7gfHIBsthY0RR5J/QmUbCKMQrQvMBc=
+Date:   Thu, 13 Jun 2019 08:02:03 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+Cc:     Jan Kara <jack@suse.cz>, Paolo Valente <paolo.valente@linaro.org>,
+        linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jeff Moyer <jmoyer@redhat.com>,
+        Theodore Ts'o <tytso@mit.edu>, amakhalov@vmware.com,
+        anishs@vmware.com, srivatsab@vmware.com,
         Ulf Hansson <ulf.hansson@linaro.org>,
         Linus Walleij <linus.walleij@linaro.org>,
-        Fam Zheng <fam@euphon.net>
-To:     Tejun Heo <tj@kernel.org>
-References: <4f801c9b-4ab6-9a11-536c-ff509df8aa56@kernel.dk>
- <CAHk-=whXfPjCtc5+471x83WApJxvxzvSfdzj_9hrdkj-iamA=g@mail.gmail.com>
- <52daccae-3228-13a1-c609-157ab7e30564@kernel.dk>
- <CAHk-=whca9riMqYn6WoQpuq9ehQ5KfBvBb4iVZ314JSfvcgy9Q@mail.gmail.com>
- <ebfb27a3-23e2-3ad5-a6b3-5f8262fb9ecb@kernel.dk>
- <90A8C242-E45A-4D6E-8797-598893F86393@linaro.org>
- <20190610154820.GA3341036@devbig004.ftw2.facebook.com>
- <20190611194959.GJ3341036@devbig004.ftw2.facebook.com>
- <20190611211718.GM3341036@devbig004.ftw2.facebook.com>
- <A1C3E3D8-62E3-4BD3-86B4-59E7E1319EA8@linaro.org>
- <20190612133926.GN3341036@devbig004.ftw2.facebook.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        Stable <stable@vger.kernel.org>
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+Message-ID: <20190613060203.GA25205@kroah.com>
+References: <a04368ba-f1d5-8f2c-1279-a685a137d024@csail.mit.edu>
+ <E270AD92-943E-4529-8158-AB480D6D9DF8@linaro.org>
+ <5b71028c-72f0-73dd-0cd5-f28ff298a0a3@csail.mit.edu>
+ <FFA44D26-75FF-4A8E-A331-495349BE5FFC@linaro.org>
+ <0d6e3c02-1952-2177-02d7-10ebeb133940@csail.mit.edu>
+ <7B74A790-BD98-412B-ADAB-3B513FB1944E@linaro.org>
+ <6a6f4aa4-fc95-f132-55b2-224ff52bd2d8@csail.mit.edu>
+ <7c5e9d11-4a3d-7df4-c1e6-7c95919522ab@csail.mit.edu>
+ <20190612130446.GD14578@quack2.suse.cz>
+ <dd32ed59-a543-fc76-9a9a-2462f0119270@csail.mit.edu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dd32ed59-a543-fc76-9a9a-2462f0119270@csail.mit.edu>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Jun 12, 2019 at 12:36:53PM -0700, Srivatsa S. Bhat wrote:
+> 
+> [ Adding Greg to CC ]
+> 
+> On 6/12/19 6:04 AM, Jan Kara wrote:
+> > On Tue 11-06-19 15:34:48, Srivatsa S. Bhat wrote:
+> >> On 6/2/19 12:04 AM, Srivatsa S. Bhat wrote:
+> >>> On 5/30/19 3:45 AM, Paolo Valente wrote:
+> >>>>
+> >> [...]
+> >>>> At any rate, since you pointed out that you are interested in
+> >>>> out-of-the-box performance, let me complete the context: in case
+> >>>> low_latency is left set, one gets, in return for this 12% loss,
+> >>>> a) at least 1000% higher responsiveness, e.g., 1000% lower start-up
+> >>>> times of applications under load [1];
+> >>>> b) 500-1000% higher throughput in multi-client server workloads, as I
+> >>>> already pointed out [2].
+> >>>>
+> >>>
+> >>> I'm very happy that you could solve the problem without having to
+> >>> compromise on any of the performance characteristics/features of BFQ!
+> >>>
+> >>>
+> >>>> I'm going to prepare complete patches.  In addition, if ok for you,
+> >>>> I'll report these results on the bug you created.  Then I guess we can
+> >>>> close it.
+> >>>>
+> >>>
+> >>> Sounds great!
+> >>>
+> >>
+> >> Hi Paolo,
+> >>
+> >> Hope you are doing great!
+> >>
+> >> I was wondering if you got a chance to post these patches to LKML for
+> >> review and inclusion... (No hurry, of course!)
+> >>
+> >> Also, since your fixes address the performance issues in BFQ, do you
+> >> have any thoughts on whether they can be adapted to CFQ as well, to
+> >> benefit the older stable kernels that still support CFQ?
+> > 
+> > Since CFQ doesn't exist in current upstream kernel anymore, I seriously
+> > doubt you'll be able to get any performance improvements for it in the
+> > stable kernels...
+> > 
+> 
+> I suspected as much, but that seems unfortunate though. The latest LTS
+> kernel is based on 4.19, which still supports CFQ. It would have been
+> great to have a process to address significant issues on older
+> kernels too.
+> 
+> Greg, do you have any thoughts on this? The context is that both CFQ
+> and BFQ I/O schedulers have issues that cause I/O throughput to suffer
+> upto 10x - 30x on certain workloads and system configurations, as
+> reported in [1].
+> 
+> In this thread, Paolo posted patches to fix BFQ performance on
+> mainline. However CFQ suffers from the same performance collapse, but
+> CFQ was removed from the kernel in v5.0. So obviously the usual stable
+> backporting path won't work here for several reasons:
+> 
+>   1. There won't be a mainline commit to backport from, as CFQ no
+>      longer exists in mainline.
+> 
+>   2. This is not a security/stability fix, and is likely to involve
+>      invasive changes.
+> 
+> I was wondering if there was a way to address the performance issues
+> in CFQ in the older stable kernels (including the latest LTS 4.19),
+> despite the above constraints, since the performance drop is much too
+> significant. I guess not, but thought I'd ask :-)
 
---Apple-Mail=_517D8028-653A-4641-A322-BAD7B9C9C32F
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+If someone cares about something like this, then I strongly just
+recommend they move to the latest kernel version.  There should not be
+anything stoping them from doing that, right?  Nothing "forces" anyone
+to be on the 4.19.y release, especially when it really starts to show
+its age.
 
+Don't ever treat the LTS releases as "the only thing someone can run, so
+we must backport huge things to it!"  Just use 5.1, and then move to 5.2
+when it is out and so on.  That's always the preferred way, you always
+get better support, faster kernels, newer features, better hardware
+support, and most importantly, more bugfixes.
 
+I wrote a whole essay on this thing, but no one ever seems to read it...
 
-> Il giorno 12 giu 2019, alle ore 15:39, Tejun Heo <tj@kernel.org> ha =
-scritto:
->=20
-> On Wed, Jun 12, 2019 at 09:32:07AM +0200, Paolo Valente wrote:
->> Could you elaborate a little more on this?
->=20
-> Doesn't seem like you did.
->=20
->> bfq code for setting up and handling io.weight (more precisely
->> io.bfq.weight) is a copy and paste of cfq code.
->=20
-> Please take a look at the documentations under
-> Documentation/cgroup-v1/blk-iocontroller.txt and
-> Documentation/admin-guide/cgroup-v2.rst.
->=20
+thanks,
 
-I'm sorry, but I don't see what doesn't match between BFQ's and CFQ's
-implementations of the weight parameter.
-
-So, if you agree, let me paste the two snippets for v1 that involve
-weights.  So maybe you can at least tell me 'here' (then I'll try the
-same with v2).
-
-----------------------------------------------------------------------
-
-	mount -t tmpfs cgroup_root /sys/fs/cgroup
-	mkdir /sys/fs/cgroup/blkio
-	mount -t cgroup -o blkio none /sys/fs/cgroup/blkio
-
-- Create two cgroups
-	mkdir -p /sys/fs/cgroup/blkio/test1/ /sys/fs/cgroup/blkio/test2
-
-- Set weights of group test1 and test2
-	echo 1000 > /sys/fs/cgroup/blkio/test1/blkio.weight
-	echo 500 > /sys/fs/cgroup/blkio/test2/blkio.weight
-
--> This is exactly how you set weights with BFQ
-
-----------------------------------------------------------------------
-
-Details of cgroup files
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Proportional weight policy files
---------------------------------
-- blkio.weight
-	- Specifies per cgroup weight. This is default weight of the =
-group
-	  on all the devices until and unless overridden by per device =
-rule.
-	  (See blkio.weight_device).
-	  Currently allowed range of weights is from 10 to 1000.
-
--> This is the exact implementation of the weight parameter in BFQ
-
-BFQ does not implement weight_device, but we are not talking about
-weight_device here.  More precisely, *nothing* implements weight_device
-any longer in cgroups-v1, so the documentation is wrong altogether.
-
-Looking forward to your feedback,
-Paolo
-
-
-
-> Thanks.
->=20
-> --
-> tejun
-
-
---Apple-Mail=_517D8028-653A-4641-A322-BAD7B9C9C32F
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAl0B6N4ACgkQOAkCLQGo
-9oOl9g//UupzRj6giFZAUQHDFrdcqt9Awx9xxl+kGzBIdD9vz8Yb8x3Rd7wQkh3o
-4TKr6D3pn+bRpfpBHoKDtOE/AoY80ADAIwBp7UfEm3hX6cIxC0QcBUR3dh+Uxhjs
-IOpHJub0PTN5gBIn2jBkneI9BLIjzpSzBVroj3ZyR2IJNuPtYDYiPKDKRMeKMOba
-duvUtxSxmLmUnoGOJM55983MAJOiEP66ErrY2Ijb5jr/hs1Mb4c4kwOb/9fAbvFD
-wpjLaW83AglTa9AQAgpNZV0lXGxHlLrLQKKebU4iZuXw96SQUrtHtUN0m1q3RF6U
-REDn4Zg9XI2jp3TYm3GgLaSX0kBDOZ/GCS3nNAkJvzB1Q6AWVzthmzo0TtYsf+1Q
-G3RPWZ+h8zxCA7yK3VorJlr5Tj32PK7JmlCojHvKcPQHyS9VymPlxcmp6p6RuGBA
-glkRDHlFQRqgy9Rcgi0I1I7VJ9q+MxqaL1jOGLNMBrSO45guJR7HAwlucHQCLF7l
-fXeUtxH6FVcgBy9ab3B8N/JT5T4zQJm1GyOA0M7fRVdgmK4ZBXlhnu1hxBKqnBJa
-V1Swq4MMzwg2VLj/jlzW6k++fCeBRAHW477dmOAtfzIRwLhB3oJblv6uzwg/zN/J
-P6JACzPrq8bPwfho6vYrw3DZBsbxkaVakgrV1nJ+eIJdZty1kgg=
-=0CbJ
------END PGP SIGNATURE-----
-
---Apple-Mail=_517D8028-653A-4641-A322-BAD7B9C9C32F--
+greg k-h
