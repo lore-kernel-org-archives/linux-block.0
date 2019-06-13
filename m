@@ -4,69 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 384B6C31E49
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 22:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CB4C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 22:31:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 092B121721
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 22:31:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1520721721
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 22:31:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560465071;
-	bh=n4TBcWceCnhEJTEHhRL/pEG5SXwLENizO5kYs405jXs=;
+	s=default; t=1560465072;
+	bh=sNn2gChWtm1gEikpdVoAOHGSRmTgcbhGlpruzUwqO8I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=WtWfm0pb0u81HkFMr6Qop04WfRhETOeJXksiT2f1eHitmAur3RCfvsVO4Qt7UmDic
-	 iAbh98TkhrFdsvAk5jfDHLmvd/9Y+ExYAHI9hNWzag5ka4sj6tUOBm77Sh6NoxEPwd
-	 A46duvom7Ov9xCwT65ivZx7eCYhsUJVCHpdVGmqU=
+	b=S4DCk5AXipH0MG2awkPwx1eE0FM6SKC6lpuaNiLWSBEDrx1cgZ2A3sZ6fzGfJV6IJ
+	 E9m4JXUzvm5BLR6WZsRWoIQgZBH5IdwR0TzFDp41rKTS8Suvv8oSFYkevakbNvAFYO
+	 5YF74NB4Veo3CY7vM3aElc8xQzSucY6PU6Dd+dcg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727166AbfFMWa4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 18:30:56 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:47091 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725616AbfFMWaz (ORCPT
+        id S1726993AbfFMWax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 18:30:53 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:40763 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725616AbfFMWaw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 18:30:55 -0400
-Received: by mail-pg1-f193.google.com with SMTP id v9so290548pgr.13;
-        Thu, 13 Jun 2019 15:30:54 -0700 (PDT)
+        Thu, 13 Jun 2019 18:30:52 -0400
+Received: by mail-pf1-f196.google.com with SMTP id p184so126627pfp.7;
+        Thu, 13 Jun 2019 15:30:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=ATSPMY1LycdMuuen2+FGO8unSu2r280Z+V2tABkqPms=;
-        b=jd4bLITKkEvMA8EMVkFOd9Ei4BxXWQzDCuwF62Q8ZBCnX0Mk2AgZ6mXhMpphlt5gai
-         9+m+18b0dpK42LncKcfIVTRr+OZXfr6RjfPx78oCyVZpJ0ZuDU6vU38kEnzVHTD/M+Td
-         b+7Qx8HWfW4ETnpyfylVcf/RWC0pTQKEUb25HfUhhntRDuLMzbmfvLKuHhxS5dSSmLnX
-         lpxAicyhV8QJWZ5lQU19bkCDYaxIftr5AJM2U4pitEmiZwd2HRnQrP3559QxCwNF/3UM
-         EeDu1oZRlfb0V4Mk380crYwB2gp6EJV86S1vmrpT0DwW/PvbHGGGN9EF8dFIIp17KpDq
-         IoMw==
+        bh=le87mSroNc/vpZ1PXB7D9b7oXP9bRIOE/1No2nrz140=;
+        b=TcNfVaI7zCKBSfPScGJNIbpJxSZMkEGhfWZEvUL+iAPHzoim0WMMPifT02p1UMxqqJ
+         Nfk7NxYIuorNrCC/+A4aDXTVhvfAMXnicEKOQay0xtQayKkKPxxsg9F6Lolf1x6YMmQD
+         KnGOoP7L6tfcW3x2+i5l31yhe07mc9c1FNaYX6JC/dQ+h+yIXIkaGkxH1q4eAGoQLb69
+         NhhAqkIOn+H1/H0O+SsmXYGSN6to3fdZ/78WCSJkpx3+lHw1p3G39B3EiemW/D7fW4c+
+         UmA885xXs9ZEzMcGGsEiR5PWaoC07HZ63WfPntuz+sXaxrA2oH35tB2PpEbCXAqqbPpD
+         YP+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=ATSPMY1LycdMuuen2+FGO8unSu2r280Z+V2tABkqPms=;
-        b=KTxa2AEtvxL/VtWHYOl2CsDfZ3z91dZrsB3VcE7l6EBV3b37zdnX/boZKnO18EvMUP
-         3nBSbXegO4lC6hoek/MlhYYMRGbrpFm+RuMyHs+vYk/fzHtrqKox5abV42kOVvsJtQ7G
-         TwYIdrAGFAA6Mvlv9Zcg92Vggq+dKMNxK/15vbHxVbUCudGQmpGUmUomuBXyy84/q+KP
-         5ObDnGLC54p4Ms/DglytCZc9uUiIASSQBxl6g5RIj9eWRn8HkTn+UNWjOIyIfPer9wLd
-         Iu6MJzJMI/NklH7GrKY23bOlfFXdoY8Y/RpsjfuY1stfbQ+FzeLU1MtQxxKpRnp25uN7
-         hirA==
-X-Gm-Message-State: APjAAAUa1LqtCj6e/sK77aTZaV5/JztOc0VA3CmWzE8cVgwLlU/mbxH8
-        QFz6XW8fDfDJz1hEGh8XUbbA/F9u
-X-Google-Smtp-Source: APXvYqyK2zbQUJL2C2z9RaburcdsweakiappBQN09wYA5twY4SnBy5L+EqyxVwbbPtSjyAmS/XOxxQ==
-X-Received: by 2002:a63:fc61:: with SMTP id r33mr32782404pgk.294.1560465054306;
-        Thu, 13 Jun 2019 15:30:54 -0700 (PDT)
+        bh=le87mSroNc/vpZ1PXB7D9b7oXP9bRIOE/1No2nrz140=;
+        b=rd8pyvEbdx1ClTjxBEWqC7TvNto7jhNQ2ZhdcUgcNGSleSCKrvotpUpnJcLz+VeQZ9
+         eHJ9UrFarHeBk59T8ivgEeO4JHtnGrSn/bqCO/duevaeBG/HZoPfVtRXD2TKjWhUn/Bz
+         HBtqL2kdwvTy60BV4b7wHGOpX749gaIXAOLHgy6QdVDEC4GsSNyhXYBlopooXs1YlNa5
+         UOCQcYYbuizVx0JHgeE/y2TxoIiVlS3CtlAnY1MRFvWctH1i4hJBjhSPyO58qt7y4QsV
+         vi8Jhygg1VI1ObSukfe+ulTyGQK21tJKqA2uvBodoncicnDASFCjzNuk1Zwx4Z7M0BWb
+         kVNA==
+X-Gm-Message-State: APjAAAWzBXu8ZXlewSvCQVC6ZZ3Ar9wvbfK+qPHnUEg8qeRHohpFEtD+
+        m2PpLOIqm8X4n7kQOSBVUpHBYJhy
+X-Google-Smtp-Source: APXvYqw4UvG2QfxpxlErOC18JBYhV4p5wHAymu+oqJ3TOV56Pu9bzZR+wv9jIIHxuWMpe9E0shGh+w==
+X-Received: by 2002:a63:511b:: with SMTP id f27mr16922684pgb.135.1560465051357;
+        Thu, 13 Jun 2019 15:30:51 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:500::2:9d14])
-        by smtp.gmail.com with ESMTPSA id f3sm740516pjo.31.2019.06.13.15.30.53
+        by smtp.gmail.com with ESMTPSA id g5sm785427pfm.54.2019.06.13.15.30.50
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 15:30:53 -0700 (PDT)
+        Thu, 13 Jun 2019 15:30:50 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk, jbacik@fb.com
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         kernel-team@fb.com, dennis@kernel.org, jack@suse.cz,
-        Tejun Heo <tj@kernel.org>
-Subject: [PATCH 3/5] blkcg: perpcu_ref init/exit should be done from blkg_alloc/free()
-Date:   Thu, 13 Jun 2019 15:30:39 -0700
-Message-Id: <20190613223041.606735-4-tj@kernel.org>
+        Tejun Heo <tj@kernel.org>, stable@vger.kernel.org
+Subject: [PATCH 2/5] blkcg: update blkcg_print_stat() to handle larger outputs
+Date:   Thu, 13 Jun 2019 15:30:38 -0700
+Message-Id: <20190613223041.606735-3-tj@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190613223041.606735-1-tj@kernel.org>
 References: <20190613223041.606735-1-tj@kernel.org>
@@ -75,79 +75,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blkg alloc is performed as a separate step from the rest of blkg
-creation so that GFP_KERNEL allocations can be used when creating
-blkgs from configuration file writes because otherwise user actions
-may fail due to failures of opportunistic GFP_NOWAIT allocations.
-
-While making blkgs use percpu_ref, 7fcf2b033b84 ("blkcg: change blkg
-reference counting to use percpu_ref") incorrectly added unconditional
-opportunistic percpu_ref_init() to blkg_create() breaking this
-guarantee.
-
-This patch moves percpu_ref_init() to blkg_alloc() so makes it use
-@gfp_mask that blkg_alloc() is called with.  Also, percpu_ref_exit()
-is moved to blkg_free() for consistency.
+Depending on the number of devices, blkcg stats can go over the
+default seqfile buf size.  seqfile normally retries with a larger
+buffer but since the ->pd_stat() addition, blkcg_print_stat() doesn't
+tell seqfile that overflow has happened and the output gets printed
+truncated.  Fix it by calling seq_commit() w/ -1 on possible
+overflows.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
-Fixes: 7fcf2b033b84 ("blkcg: change blkg reference counting to use percpu_ref")
-Cc: Dennis Zhou <dennis@kernel.org>
+Fixes: 903d23f0a354 ("blk-cgroup: allow controllers to output their own stats")
+Cc: stable@vger.kernel.org # v4.19+
+Cc: Josef Bacik <jbacik@fb.com>
 ---
- block/blk-cgroup.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ block/blk-cgroup.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index e4715b35d42c..04d286934c5e 100644
+index 1f7127b03490..e4715b35d42c 100644
 --- a/block/blk-cgroup.c
 +++ b/block/blk-cgroup.c
-@@ -79,6 +79,7 @@ static void blkg_free(struct blkcg_gq *blkg)
- 
- 	blkg_rwstat_exit(&blkg->stat_ios);
- 	blkg_rwstat_exit(&blkg->stat_bytes);
-+	percpu_ref_exit(&blkg->refcnt);
- 	kfree(blkg);
- }
- 
-@@ -86,8 +87,6 @@ static void __blkg_release(struct rcu_head *rcu)
- {
- 	struct blkcg_gq *blkg = container_of(rcu, struct blkcg_gq, rcu_head);
- 
--	percpu_ref_exit(&blkg->refcnt);
--
- 	/* release the blkcg and parent blkg refs this blkg has been holding */
- 	css_put(&blkg->blkcg->css);
- 	if (blkg->parent)
-@@ -132,6 +131,9 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
- 	if (!blkg)
- 		return NULL;
- 
-+	if (percpu_ref_init(&blkg->refcnt, blkg_release, 0, gfp_mask))
-+		goto err_free;
-+
- 	if (blkg_rwstat_init(&blkg->stat_bytes, gfp_mask) ||
- 	    blkg_rwstat_init(&blkg->stat_ios, gfp_mask))
- 		goto err_free;
-@@ -244,11 +246,6 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
- 		blkg_get(blkg->parent);
+@@ -1006,8 +1006,12 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
+ 		}
+ next:
+ 		if (has_stats) {
+-			off += scnprintf(buf+off, size-off, "\n");
+-			seq_commit(sf, off);
++			if (off < size - 1) {
++				off += scnprintf(buf+off, size-off, "\n");
++				seq_commit(sf, off);
++			} else {
++				seq_commit(sf, -1);
++			}
+ 		}
  	}
  
--	ret = percpu_ref_init(&blkg->refcnt, blkg_release, 0,
--			      GFP_NOWAIT | __GFP_NOWARN);
--	if (ret)
--		goto err_cancel_ref;
--
- 	/* invoke per-policy init */
- 	for (i = 0; i < BLKCG_MAX_POLS; i++) {
- 		struct blkcg_policy *pol = blkcg_policy[i];
-@@ -281,8 +278,6 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
- 	blkg_put(blkg);
- 	return ERR_PTR(ret);
- 
--err_cancel_ref:
--	percpu_ref_exit(&blkg->refcnt);
- err_put_congested:
- 	wb_congested_put(wb_congested);
- err_put_css:
 -- 
 2.17.1
 
