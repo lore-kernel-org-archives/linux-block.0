@@ -2,104 +2,179 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A93DC31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 20:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD311C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 20:29:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 500BD2133D
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 20:04:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA00B20B7C
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 20:29:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Vf0Co9J1"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="p3LNuEr3";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="j2TK0V3F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729259AbfFMUEQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 16:04:16 -0400
-Received: from mail-io1-f54.google.com ([209.85.166.54]:35702 "EHLO
-        mail-io1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728752AbfFMUEQ (ORCPT
+        id S1729071AbfFMU3g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 16:29:36 -0400
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:47342 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726289AbfFMU3g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 16:04:16 -0400
-Received: by mail-io1-f54.google.com with SMTP id m24so753867ioo.2
-        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 13:04:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=DI3nny5EkaaAj92ROhz8+oF1JyVO+F50iFiYFfny5cg=;
-        b=Vf0Co9J1FWQf/mNg9X22WqwFrqk1bWNDchM2WOC0coX4mVxqvFdL4M7qSSiticNd+/
-         +3h8YyGJXb6Dp9fwIq4WsLEKSNJVZR/j3S/HsXXpkjb7r3yKx1VfkTt2fSEW7Upj2InB
-         vpUy4mSkuPaOLlVxWUk8m4jGlNkrR8m+OQY9c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=DI3nny5EkaaAj92ROhz8+oF1JyVO+F50iFiYFfny5cg=;
-        b=F7m7+qudUh0BPOFzuv3qeNBMrcdiOVWdqqk3PYzlQQw24270u+Ut33HpztVbvaW9ho
-         kjIR/bfe9sM5UWyOR9kVQ1Y0agID2TrKMdJXkmbrnrOBHHM9pCZ7g1Ug26EPBL4sznOv
-         d5VDSeXp2qBzym1atNhN0NLfBTiPinIMGTryOU8S5UlYmDMim8k1/T7X+YUA3bHWUFER
-         SRZRSKoAsSXT9vp1v0iu/WIa9GVNsrOAPYiKYTfUUortGXJ2/k0MT86FQ9aouI1F3eQS
-         xf8b7p7+nSafjyKxtmbkGuX311jcA+f5DlkggsyFPm2b9v+mNCD+zBDiCc2vU2BTZ5eK
-         R+5A==
-X-Gm-Message-State: APjAAAV9QMPf4g0tk7+ej0V7S4zUWjy0SE3OW3JmZLRIQQpyuOu5I3Rb
-        S2z1CSfEWIoKd7Sl2keEPPMYDQTNpFpyBUBMLDyJXQ==
-X-Google-Smtp-Source: APXvYqzt6T4yoFnlQQM4Io9z3VVKv9jXWB1wt4QkxYaqK+pkTNNNf6XRH7RjKzaoumZniM5JtnYN2SZhYMEkCQ+APaM=
-X-Received: by 2002:a5d:9b1a:: with SMTP id y26mr37376851ion.238.1560456255599;
- Thu, 13 Jun 2019 13:04:15 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <20190605190836.32354-1-hch@lst.de> <20190605190836.32354-11-hch@lst.de>
- <cd713506efb9579d1f69a719d831c28d@mail.gmail.com> <20190613084458.GB13221@lst.de>
-In-Reply-To: <20190613084458.GB13221@lst.de>
-MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQNLjZIO2zMn7N+9xPobnDbFSu4o5gI2RJdJAgF+bYgCEzcr9aN60eSw
-Date:   Fri, 14 Jun 2019 01:34:00 +0530
-Message-ID: <d411baa1bdd34f1a1289480d13fe1cef@mail.gmail.com>
-Subject: RE: [PATCH 10/13] megaraid_sas: set virt_boundary_mask in the scsi host
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Sebastian Ott <sebott@linux.ibm.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Oliver Neukum <oneukum@suse.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>,
-        PDL-MPT-FUSIONLINUX <mpt-fusionlinux.pdl@broadcom.com>,
-        linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
+        Thu, 13 Jun 2019 16:29:36 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 2BE828EE147;
+        Thu, 13 Jun 2019 13:29:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1560457775;
+        bh=PtvfUn6JoY87TTiM3T3Oxwmuj7dVRXSDuVgjQPtgM5E=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=p3LNuEr3AFUKnnir7+pX5dXWdcOSMeSIY2H6nmfZPBy44hrwE43oQ8Mxm1lfoaDRx
+         28xxlhc5Wra3b+Ed445H7U3XzYryswAPdlK8Zh5vPjDFLkmzi/WHLDj8hOc3Xitrtl
+         ztv/zL9ArG89jzlGIoNVU7k09Yy/P+Kbv2EtD2YU=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id krxMWJF8F_q3; Thu, 13 Jun 2019 13:29:34 -0700 (PDT)
+Received: from jarvis.lan (unknown [50.35.68.20])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 6D7568EE0C7;
+        Thu, 13 Jun 2019 13:29:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1560457774;
+        bh=PtvfUn6JoY87TTiM3T3Oxwmuj7dVRXSDuVgjQPtgM5E=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=j2TK0V3FCtE/JlvHTcmpDOTZC+rc+DvnhXb/KTuJmB8hl6m4UXmD1eHXngOgsZnqT
+         I2f/00ccyx4am+RrZ/vnadujZzt1DGDoPrfzs09c1Gl6nSuDtH9vEZEv6I1VaD04Pf
+         BqURcrMilg/hdGPH8k3i9WQm1WUF+jPEg+CvFPNk=
+Message-ID: <1560457772.3329.81.camel@HansenPartnership.com>
+Subject: Re: [PATCH 1/8] block: add a helper function to read nr_setcs
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     dgilbert@interlog.com, Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org
+Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-btrace@vger.kernel.org,
+        kent.overstreet@gmail.com, jaegeuk@kernel.org,
+        damien.lemoal@wdc.com
+Date:   Thu, 13 Jun 2019 13:29:32 -0700
+In-Reply-To: <9b7f2892-d8bf-8b95-c782-51b775d175ed@interlog.com>
+References: <20190613145955.4813-1-chaitanya.kulkarni@wdc.com>
+         <20190613145955.4813-2-chaitanya.kulkarni@wdc.com>
+         <9abfc2b8-4496-db7a-fcbb-b52102a67f8e@acm.org>
+         <f8ab9587-309b-79a0-e6fc-f6683176f498@interlog.com>
+         <1560443321.3329.42.camel@HansenPartnership.com>
+         <9b7f2892-d8bf-8b95-c782-51b775d175ed@interlog.com>
 Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->
-> So before I respin this series, can you help with a way to figure out
-for
-> mpt3sas and megaraid if a given controller supports NVMe devices at all,
-so
-> that we don't have to set the virt boundary if not?
+On Thu, 2019-06-13 at 15:26 -0400, Douglas Gilbert wrote:
+> On 2019-06-13 12:28 p.m., James Bottomley wrote:
+> > On Thu, 2019-06-13 at 12:07 -0400, Douglas Gilbert wrote:
+> > > On 2019-06-13 11:31 a.m., Bart Van Assche wrote:
+> > 
+> > [...]
+> > > > Please explain what makes you think that part_nr_sects_read()
+> > > > must
+> > > > be protected
+> > > > by an RCU read lock.
+> > > 
+> > > Dear reviewer,
+> > > Please rephrase the above sentence without the accusative tone.
+> > > Specifically, please do not use the phrase "what makes you think"
+> > > in this or any other code review. For example: "I believe
+> > > that..." is more accurate and less provocative.
+> > 
+> > Imputing "tone" to email is something we try to avoid because it
+> > never ends well, particularly for non-native speakers. Some
+> > languages (Russian) have no articles and if you take any English
+> > phrase and strip out all the articles it sounds a lot more
+> > aggressive.
+> 
+> Like you, I am not a native North American English speaker but I
+> have lived here long enough to realize that "what makes you think
+> ..." is not a pleasantry and it may be fishing for an emotive
+> reaction. It is not the type of expression that professionals would
+> use to make a point in a public forum.
 
+I'm not so sure of that, for instance what makes you think I don't do
+it in my own reviews?
 
-In MegaRaid we have below enum -        VENTURA_SERIES and AERO_SERIES
-supports NVME
+> I'm not talking about articles (e.g. "a" and "the"), I'm talking
+> about pronouns like "you" and "I". I'm not aware of any languages
+> without pronouns. IMO Bart uses expressions with "you" in them too
+> often when he is expressing _his_ opinion to the contrary.
 
-enum MR_ADAPTER_TYPE {
-        MFI_SERIES = 1,
-        THUNDERBOLT_SERIES = 2,
-        INVADER_SERIES = 3,
-        VENTURA_SERIES = 4,
-        AERO_SERIES = 5,
-};
+It's a grammatical tick not an insult and seeing it as such would help
+defuse the situation.  I know this is difficult; my own pet grammatical
+foible is having to contain it when I see "avoid that" in a patch
+subject, but I've managed (so far).
 
-In mpt3sas driver we have below method - If IOC FACT reports NVME Device
-support in Protocol Flags, we can consider it as HBA with NVME drive
-support.
+> > > Observation: as a Canadian citizen when crossing the US border I
+> > > believe contradicting a US border official with the phrase "what
+> > > makes you think ..." could lead to a rather bad outcome :-)
+> > > Please make review comments with that in mind.
+> > 
+> > Different situation: we aren't profiling reviewers ...
+> 
+> Would you have used that expression when addressing a teacher at
+> high school or university? I'm looking for a yardstick of where
+> a reviewer should "pitch" their responses. The way you address
+> someone who has the ability to make your life uncomfortable (e.g.
+> by refusing you entry into their country) may just be such a
+> yardstick.
+> 
+> > > P.S. Do we have any Linux code-of-conduct for reviewers?
+> > 
+> > It's the same one for all interactions:
+> > 
+> > Documentation/process/code-of-conduct-interpretation.rst
+> > 
+> > But I would remind everyone that diversity isn't just a
+> > gender/race/LGBT issue it also means being understanding of the
+> > potential difficulties non-native speakers have with email in
+> > English.
+> 
+> To quote
+>    https://www.contributor-covenant.org/version/1/4/code-of-conduct.h
+> tml
+> to which your above reference indirectly refers:
+> 
+>     It calls for a "harassment-free experience for everyone,
+>     regardless of ... expression ..."
 
-ioc->facts.ProtocolFlags & MPI2_IOCFACTS_PROTOCOL_NVME_DEVICES
+OK, we picked a code of conduct which is Anglo biased and doesn't take
+into account the linguistic diversity of the community; the various
+problems with the current code of conduct are why we have to have the
+interpretation document.
 
-Kashyap
+> So informing someone (not for the first time) that readers of the
+> language in which they are writing, may take offence at their
+> expression is: not showing an "understanding of the potential
+> difficulties non-native speakers have" and thus is harassment?
+> Balance that with the angle of a reviewer trying to intimidate
+> the person presenting the code. Could that also be harassment?
+> In this case I see little evidence of the "potential difficulties"
+> to which you refer.
+
+The problem, as I see it, is that you're assuming malice where I
+wouldn't, even if linguistic issues weren't a potential issue.
+
+> More generally:
+> IMO those who have power speak in a condescending fashion and act
+> unilaterally in the matter of reviewing and applying patches. A
+> select few are allowed to apply patches seemingly without any
+> review and ignore error reports or attempts at public review.
+> It certainly does not look like a system based on merit.
+
+Is there, perhaps, some other deeper underlying issue for which this is
+serving as a proxy?
+
+James
+
