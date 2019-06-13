@@ -2,179 +2,114 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0035C31E4A
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29D03C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:28:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C8CAC21743
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:23:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F347020449
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:28:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Fx7IJ3Rn"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ECkUStv+";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="c7M+KVMK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389105AbfFMQXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 12:23:35 -0400
-Received: from mail-yb1-f196.google.com ([209.85.219.196]:41360 "EHLO
-        mail-yb1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731022AbfFMIhj (ORCPT
+        id S1731457AbfFMQ2n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 12:28:43 -0400
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:41330 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730945AbfFMQ2n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 04:37:39 -0400
-Received: by mail-yb1-f196.google.com with SMTP id d2so7501317ybh.8
-        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 01:37:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xQyhQbksvj61RPrZv6HE/27WZ2p7zM6vRmq6wqbq8Qs=;
-        b=Fx7IJ3Rn6+Ui58vZZjWSalUo87E2IkSKQDLMUtkgAPO4CmSr7POvW2xsqzpKzq5uhF
-         0f7g+rHnj3GBTKOCeRKhjRPPjQ4GVn+bwZdVpu+vrj/dOJr4Jj1ZIkTbJ3YLMTlyMxMN
-         dFMsKo5sE6beFBhyxH44nY5lY9n2acrQ4g7CdoyFqTBJVwOr6pTnEnT5NOllmkVF9RP6
-         IgCU7hIvmaN/Y+hE5quNLy9iXnlQ2onRzC1oZrgFYiPOaJytXxn79iHsne5eQcZMRhvR
-         OnUqbsrKe5fbWBuAfzOebwrdLBXouzVannJlsiiYbLyWJKuNqhB0elmrcQ+PNSaiuFsW
-         y3Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xQyhQbksvj61RPrZv6HE/27WZ2p7zM6vRmq6wqbq8Qs=;
-        b=kSOAEubh26XEtaWz0gIm7y4GxywFbJqHwyZi0CIojkoZmOttCCQkyHHrFcOVno0bc0
-         /1tb8jxl3qvLSxavybin+kRhTLGQdlE6CBbg6HIHm9UMNf1av05O8koNyTUW8WKJZeLB
-         SQ66Z/o7lyDgo+fGMGGbiXYcCcOtFkSDDM9SQ1+vpGy6stLbpPAvqQMWup1G+lYDFbZ5
-         Icnw5qixU+iK1NG3VCN6Zdumn1heCIiDrhwfM6i6olMDVhAZ4LdA8rlSjxR6PxTEEdyy
-         4dnXHGY5Np2vv3VER3/oH95VGsg1fvqF7Fcu+Mc3ADoNu3da0uTPHFmGdRTmRJGYUc05
-         S9Ug==
-X-Gm-Message-State: APjAAAWOeYTvveh/i8Zi0lG7hG0S8e4fbriDkaxj5lQQjPLZB7fxvhKV
-        YEcNFvnMxPbnEb8uK7nzlqJjvQ==
-X-Google-Smtp-Source: APXvYqyCnK2ALhwLtTPvX0AEYshPEqUIKjRxcqh3pgRhqVo+A2spmhGkm2WC+o0o7oMW27T55jkwSw==
-X-Received: by 2002:a25:7413:: with SMTP id p19mr39487999ybc.310.1560415057147;
-        Thu, 13 Jun 2019 01:37:37 -0700 (PDT)
-Received: from ?IPv6:2600:380:9e2c:9b66:68e0:4c59:dc75:6d4b? ([2600:380:9e2c:9b66:68e0:4c59:dc75:6d4b])
-        by smtp.gmail.com with ESMTPSA id r6sm597826ywd.47.2019.06.13.01.37.30
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 01:37:36 -0700 (PDT)
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>,
-        Jan Kara <jack@suse.cz>
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Jeff Moyer <jmoyer@redhat.com>, Theodore Ts'o <tytso@mit.edu>,
-        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Stable <stable@vger.kernel.org>
-References: <6FE0A98F-1E3D-4EF6-8B38-2C85741924A4@linaro.org>
- <2A58C239-EF3F-422B-8D87-E7A3B500C57C@linaro.org>
- <a04368ba-f1d5-8f2c-1279-a685a137d024@csail.mit.edu>
- <E270AD92-943E-4529-8158-AB480D6D9DF8@linaro.org>
- <5b71028c-72f0-73dd-0cd5-f28ff298a0a3@csail.mit.edu>
- <FFA44D26-75FF-4A8E-A331-495349BE5FFC@linaro.org>
- <0d6e3c02-1952-2177-02d7-10ebeb133940@csail.mit.edu>
- <7B74A790-BD98-412B-ADAB-3B513FB1944E@linaro.org>
- <6a6f4aa4-fc95-f132-55b2-224ff52bd2d8@csail.mit.edu>
- <7c5e9d11-4a3d-7df4-c1e6-7c95919522ab@csail.mit.edu>
- <20190612130446.GD14578@quack2.suse.cz>
- <dd32ed59-a543-fc76-9a9a-2462f0119270@csail.mit.edu>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <aca00f05-4d71-7db0-52d6-7aa0932cc5c0@kernel.dk>
-Date:   Thu, 13 Jun 2019 02:37:29 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <dd32ed59-a543-fc76-9a9a-2462f0119270@csail.mit.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        Thu, 13 Jun 2019 12:28:43 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 0D5E68EE147;
+        Thu, 13 Jun 2019 09:28:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1560443323;
+        bh=bnTJZINKg659sWer2QpR3c5NeLkXTlt8sZRt1buXvPk=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=ECkUStv+npI9x1oyvMYlUKctnPIORbAWAMPFhOP6is+V2N0dN63FeLtDHVGFmXEN9
+         olnXF7NIMaBfyC0lR9pZ5uuKe7/fVu8GYIhaFH5IxI0V4C0qH0rsNexLnTz8aR6g7L
+         bXanZK2NoD9Z5mhlTLsmHbmWOatkkzO48mkWks9U=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id DWyDetGG-Y6c; Thu, 13 Jun 2019 09:28:42 -0700 (PDT)
+Received: from jarvis.lan (unknown [50.35.68.20])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 5F8EA8EE0C7;
+        Thu, 13 Jun 2019 09:28:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1560443322;
+        bh=bnTJZINKg659sWer2QpR3c5NeLkXTlt8sZRt1buXvPk=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=c7M+KVMKOhi/zNVgKex9T2JCLcgRkBWN6q8nLxckxA3LLq79BjndZCUnWrz9y/WQk
+         vti4sGZfC6NwRYlQWLwH3hj03jxQ8rT5v0Hj0sypVWw6RcOQQRZXSG8upMqmBtKosz
+         U0d3IvxaxlsMbUzAJQgIT8K/Kt0g4EjcaLtBfHUs=
+Message-ID: <1560443321.3329.42.camel@HansenPartnership.com>
+Subject: Re: [PATCH 1/8] block: add a helper function to read nr_setcs
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     dgilbert@interlog.com, Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org
+Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-btrace@vger.kernel.org,
+        kent.overstreet@gmail.com, jaegeuk@kernel.org,
+        damien.lemoal@wdc.com
+Date:   Thu, 13 Jun 2019 09:28:41 -0700
+In-Reply-To: <f8ab9587-309b-79a0-e6fc-f6683176f498@interlog.com>
+References: <20190613145955.4813-1-chaitanya.kulkarni@wdc.com>
+         <20190613145955.4813-2-chaitanya.kulkarni@wdc.com>
+         <9abfc2b8-4496-db7a-fcbb-b52102a67f8e@acm.org>
+         <f8ab9587-309b-79a0-e6fc-f6683176f498@interlog.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/12/19 1:36 PM, Srivatsa S. Bhat wrote:
+On Thu, 2019-06-13 at 12:07 -0400, Douglas Gilbert wrote:
+> On 2019-06-13 11:31 a.m., Bart Van Assche wrote:
+[...]
+> > Please explain what makes you think that part_nr_sects_read() must
+> > be protected 
+> > by an RCU read lock.
 > 
-> [ Adding Greg to CC ]
-> 
-> On 6/12/19 6:04 AM, Jan Kara wrote:
->> On Tue 11-06-19 15:34:48, Srivatsa S. Bhat wrote:
->>> On 6/2/19 12:04 AM, Srivatsa S. Bhat wrote:
->>>> On 5/30/19 3:45 AM, Paolo Valente wrote:
->>>>>
->>> [...]
->>>>> At any rate, since you pointed out that you are interested in
->>>>> out-of-the-box performance, let me complete the context: in case
->>>>> low_latency is left set, one gets, in return for this 12% loss,
->>>>> a) at least 1000% higher responsiveness, e.g., 1000% lower start-up
->>>>> times of applications under load [1];
->>>>> b) 500-1000% higher throughput in multi-client server workloads, as I
->>>>> already pointed out [2].
->>>>>
->>>>
->>>> I'm very happy that you could solve the problem without having to
->>>> compromise on any of the performance characteristics/features of BFQ!
->>>>
->>>>
->>>>> I'm going to prepare complete patches.  In addition, if ok for you,
->>>>> I'll report these results on the bug you created.  Then I guess we can
->>>>> close it.
->>>>>
->>>>
->>>> Sounds great!
->>>>
->>>
->>> Hi Paolo,
->>>
->>> Hope you are doing great!
->>>
->>> I was wondering if you got a chance to post these patches to LKML for
->>> review and inclusion... (No hurry, of course!)
->>>
->>> Also, since your fixes address the performance issues in BFQ, do you
->>> have any thoughts on whether they can be adapted to CFQ as well, to
->>> benefit the older stable kernels that still support CFQ?
->>
->> Since CFQ doesn't exist in current upstream kernel anymore, I seriously
->> doubt you'll be able to get any performance improvements for it in the
->> stable kernels...
->>
-> 
-> I suspected as much, but that seems unfortunate though. The latest LTS
-> kernel is based on 4.19, which still supports CFQ. It would have been
-> great to have a process to address significant issues on older
-> kernels too.
-> 
-> Greg, do you have any thoughts on this? The context is that both CFQ
-> and BFQ I/O schedulers have issues that cause I/O throughput to suffer
-> upto 10x - 30x on certain workloads and system configurations, as
-> reported in [1].
-> 
-> In this thread, Paolo posted patches to fix BFQ performance on
-> mainline. However CFQ suffers from the same performance collapse, but
-> CFQ was removed from the kernel in v5.0. So obviously the usual stable
-> backporting path won't work here for several reasons:
-> 
->    1. There won't be a mainline commit to backport from, as CFQ no
->       longer exists in mainline.
-> 
->    2. This is not a security/stability fix, and is likely to involve
->       invasive changes.
-> 
-> I was wondering if there was a way to address the performance issues
-> in CFQ in the older stable kernels (including the latest LTS 4.19),
-> despite the above constraints, since the performance drop is much too
-> significant. I guess not, but thought I'd ask :-)
-> 
-> [1]. https://lore.kernel.org/lkml/8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu/
+> Dear reviewer,
+> Please rephrase the above sentence without the accusative tone.
+> Specifically, please do not use the phrase "what makes you think"
+> in this or any other code review. For example: "I believe that..."
+> is more accurate and less provocative.
 
-This issue has always been there. There will be no specific patches made
-for stable for something that doesn't even exist in the newer kernels.
+Imputing "tone" to email is something we try to avoid because it never
+ends well, particularly for non-native speakers. Some languages
+(Russian) have no articles and if you take any English phrase and strip
+out all the articles it sounds a lot more aggressive.
 
--- 
-Jens Axboe
+> Observation: as a Canadian citizen when crossing the US border I
+> believe contradicting a US border official with the phrase "what
+> makes you think ..." could lead to a rather bad outcome :-)
+> Please make review comments with that in mind.
+
+Different situation: we aren't profiling reviewers ...
+
+> Thanks.
+> 
+> Doug Gilbert
+> 
+> P.S. Do we have any Linux code-of-conduct for reviewers?
+
+It's the same one for all interactions:
+
+Documentation/process/code-of-conduct-interpretation.rst
+
+But I would remind everyone that diversity isn't just a
+gender/race/LGBT issue it also means being understanding of the
+potential difficulties non-native speakers have with email in English.
+
+James
 
