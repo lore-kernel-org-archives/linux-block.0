@@ -2,121 +2,161 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9D3DC31E4A
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A82C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:07:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9322B20679
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 712B720866
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:07:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=globallogic.com header.i=@globallogic.com header.b="OhQ1gd9h"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="lAcPRlSb";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="j4h8m5J3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391061AbfFMQFw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 12:05:52 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:33570 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391018AbfFMQFw (ORCPT
+        id S1729496AbfFMQHb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 12:07:31 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:46187 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391364AbfFMQHY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 12:05:52 -0400
-Received: by mail-ed1-f66.google.com with SMTP id i11so3991089edq.0
-        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 09:05:50 -0700 (PDT)
+        Thu, 13 Jun 2019 12:07:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1560442044; x=1591978044;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=GxTOaOO5zyp40W5DUff2fnUgR4Lb3sQ1yiQ7dGCYmTY=;
+  b=lAcPRlSb4QTCeZI/3QFDn8CByh7Wt8joxB0UT0Qvp9xMuOkoQUW613Al
+   HDXvcDW0aC8M/SFb6n567kudgQ8p2+gHsRDESdl4CznevIDGv+cmiCzj/
+   N3Ri+Z/Ca5AAY+mE/KsUp3HIeoZxEiu96GRHCiNd69C2AgHG8MgHFYM5t
+   mwP0/s7M+VE5ccUWgKWHQTk9PvA2+9BWyiJRaEUsQtAMKfC45Up5W8fMx
+   qMS0kdVunBLSpOLCFZNR9BKHPIPb0T+bcN8p50iJSIjSzZZZA94XbvA2P
+   6PHvFvX26iLVJyyLDPjGA8tAmU+EJhrSaaKuwRBHLTOVqBDSgRzb2ctWR
+   g==;
+X-IronPort-AV: E=Sophos;i="5.63,369,1557158400"; 
+   d="scan'208";a="115425751"
+Received: from mail-bn3nam01lp2056.outbound.protection.outlook.com (HELO NAM01-BN3-obe.outbound.protection.outlook.com) ([104.47.33.56])
+  by ob1.hgst.iphmx.com with ESMTP; 14 Jun 2019 00:07:22 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=globallogic.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mLABAOBxUi7apPgtRPROSyumsCPedDiB3eVS3aen4Uc=;
-        b=OhQ1gd9hI7gUmtNiW/OqjsHiQzwW6iZW8IGNtHnPK8zug5HhC3kYfdVVJXheeoRaC6
-         tbmDhYFOS083pJUz6jcfjmqIHLpaa597AhPSvEEAQBLMcwwRZdZ9O7lGn8Jrx1FkCvdA
-         RfoNRWL1Q1taE5K1YXiR/zwm5WR9EoJjDgXouRhoyKnyxhNXGKOCVqG682PKrplC0mP1
-         Qpfiw8SI/tUrfiIzQe/qG1BF+PWPkB7bpYVgOpQ13Zx0Rbd4MCnxbKjoLNKRwofxot0+
-         wUn9KJjxcqacAAr3a+vEKvbp/n79eMo2Fiugl2fTd1aDgFw1RPt3MF66M1s1hvXWy13C
-         7JuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mLABAOBxUi7apPgtRPROSyumsCPedDiB3eVS3aen4Uc=;
-        b=IMS/SezGvSQmyYV+rC4cVF4Yxrp0RLYIr6qgutQVfiNM1lq4GzC7MSquwmall/i5RU
-         HLXKjlL92Hra5aEzeWocrXCplo+f+ue2SiP+hkMHTqSt7GIkUZGzai1rZnO8XB6c3uyX
-         deAhVasVU2MdUPnRvj4nJFfES38qBKmgIcyZys6wCqT0Ki/G4fO0So3760v78NJNRR7X
-         SxwufAgyAlAG87A7Tfk5sYSGpZ1NY7pgnrss0C1PWdQRfDIlKF2iJJ8sD874yZasMk3A
-         Mm+5G17GJ+8IUNOTzLCMY5ZZUmeNYBq0fUY0gRjvJ/qPBrW4Y8k0jZm/VMuyrMldRnvL
-         vEnQ==
-X-Gm-Message-State: APjAAAXDZigXhlhM9gzIUuCTSAGfBKiE/wrd6G+6Vy91zK4vYNE9vyUE
-        /0I9igRiIo5spmHYgi4EQ+zIFLliRVCdQRDrC+eh1g==
-X-Google-Smtp-Source: APXvYqw9eTL1smFdgM5CBMWe55qQwq7Ixm6mxLmSKQlk/U+TTmtbbBQA33hoHb3lK2Sjp3Q8KGTRfudgroyIOzz5krs=
-X-Received: by 2002:a50:9918:: with SMTP id k24mr47972367edb.173.1560441949919;
- Thu, 13 Jun 2019 09:05:49 -0700 (PDT)
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Veg/OnHcoOv3HiS0et4oStCSEN6FTddMYHN8V7ly4oI=;
+ b=j4h8m5J3jeQ7yMRS8dz8e9S1R7iHlCGg86Zze5FoCaBpE8Rexc71zOO0alEXTFtITA4orqhbolsm4+k1vRbMIpcpOkArCHsETl0QqQfu6OvguzU00TbPeFWBC4LELpeky+bV3ILzdGJVDffSP9z94fXwFt3gwT/nw+OJZaNaPvY=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
+ BYAPR04MB5031.namprd04.prod.outlook.com (52.135.235.13) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.11; Thu, 13 Jun 2019 16:07:19 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::fc2b:fcd4:7782:53d6]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::fc2b:fcd4:7782:53d6%7]) with mapi id 15.20.1987.012; Thu, 13 Jun 2019
+ 16:07:19 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     "colyli@suse.de" <colyli@suse.de>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-btrace@vger.kernel.org" <linux-btrace@vger.kernel.org>,
+        "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>,
+        "jaegeuk@kernel.org" <jaegeuk@kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCH 1/8] block: add a helper function to read nr_setcs
+Thread-Topic: [PATCH 1/8] block: add a helper function to read nr_setcs
+Thread-Index: AQHVIfi3BfhkYZDiB0K2HYRp35cL8w==
+Date:   Thu, 13 Jun 2019 16:07:19 +0000
+Message-ID: <BYAPR04MB57498CEB8869ED7B54F08E2286EF0@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20190613145955.4813-1-chaitanya.kulkarni@wdc.com>
+ <20190613145955.4813-2-chaitanya.kulkarni@wdc.com>
+ <9abfc2b8-4496-db7a-fcbb-b52102a67f8e@acm.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.45.63]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a9a8c06d-3fba-435d-c14c-08d6f019362b
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5031;
+x-ms-traffictypediagnostic: BYAPR04MB5031:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <BYAPR04MB503141659D4DD1D268CDD22086EF0@BYAPR04MB5031.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0067A8BA2A
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(136003)(396003)(366004)(39860400002)(376002)(199004)(189003)(6116002)(71200400001)(25786009)(64756008)(476003)(26005)(53546011)(102836004)(54906003)(5660300002)(186003)(110136005)(7736002)(68736007)(6506007)(76176011)(14444005)(7696005)(71190400001)(99286004)(229853002)(316002)(256004)(3846002)(76116006)(66066001)(52536014)(66446008)(72206003)(33656002)(6246003)(14454004)(66556008)(66946007)(81156014)(55016002)(2501003)(4326008)(66476007)(6436002)(73956011)(446003)(8936002)(74316002)(305945005)(53936002)(486006)(81166006)(2906002)(86362001)(8676002)(9686003)(478600001);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5031;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: wHAoWkAIghEq+W02eLn2aDypjR7F+JbJ7FTaz+MjjLyq7tGUvMmigzp8LpsN+1pec0d6VTTTdlLxg5fYxXK6Gcpy8K6KhZvijStSjNXGVrKOTNQnfAoXO80RR6jKp332YD15NGi9IpDTLcAQhA+nIayVqToXyHEF87Mn2Z8Zaj9kj5csnRRhowJaUUmqdBL3RoxtaAYbEMml5v49qogruGxB9WDRvpZltBcKmw4ue89rPHblwvKKHkeZ82GyRHs5cCYLlil9u3qcKRWtHBFMGsVoUf8p2TL8hF+LRMoGQsrAHEVdnElBzjG2ULd8sGFaiKIy3ic42vduryzjW5rLwPvCoZkDOqerSuQp6V+LBEJBfG7XCXvSjHtFY03v4JcCkw9UDU+7Dv6Eshcm5AUircEEoflnmyJIdlw1emGTbaU=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20190612163144.18486-1-roman.stratiienko@globallogic.com>
- <20190612163144.18486-2-roman.stratiienko@globallogic.com>
- <20190613135241.aghcrrz7rg2au3bw@MacBook-Pro-91.local> <CAODwZ7v=RSsmVj5GjcvGn2dn+ejLRBHZ79x-+S9DrX4GoXuVaQ@mail.gmail.com>
- <adc59944-7654-ea38-8dfc-f91361a80987@redhat.com>
-In-Reply-To: <adc59944-7654-ea38-8dfc-f91361a80987@redhat.com>
-From:   Roman Stratiienko <roman.stratiienko@globallogic.com>
-Date:   Thu, 13 Jun 2019 19:05:38 +0300
-Message-ID: <CAODwZ7u+f9vco8h1ZAwwoCefB6kM9gi4L_Mc7muLXYkwHRVc8Q@mail.gmail.com>
-Subject: Re: [PATCH 2/2] nbd: add support for nbd as root device
-To:     Eric Blake <eblake@redhat.com>
-Cc:     Josef Bacik <josef@toxicpanda.com>, linux-kernel@vger.kernel.org,
-        nbd@other.debian.org,
-        Aleksandr Bulyshchenko <A.Bulyshchenko@globallogic.com>,
-        linux-block@vger.kernel.org, axboe@kernel.dkn.org
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9a8c06d-3fba-435d-c14c-08d6f019362b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2019 16:07:19.0851
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5031
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 13, 2019 at 6:14 PM Eric Blake <eblake@redhat.com> wrote:
->
-> On 6/13/19 9:45 AM, Roman Stratiienko wrote:
->
-> >>
-> >> Just throw nbd-client in your initramfs.  Every nbd server has it's own
-> >> handshake protocol, embedding one particular servers handshake protocol into the
-> >> kernel isn't the answer here.  Thanks,
->
-> The handshake protocol is well-specified:
-> https://github.com/NetworkBlockDevice/nbd/blob/cdb0bc57f3faefd7a5562d57ad57cd990781c415/doc/proto.md
->
-> All servers implement various subsets of that document for the handshake.
->
-> > Also, as far as I know mainline nbd-server daemon have only 2
-> > handshake protocols. So called OLD-STYLE and NEW-STYLE. And OLD-STYLE
-> > is no longer supported. So it should not be a problem, or please fix
-> > me if I'm wrong.
->
-> You are correct that oldstyle is no longer recommended. However, the
-> current NBD specification states that newstyle has two different
-> flavors, NBD_OPT_EXPORT_NAME (which you used, but is also old) and
-> NBD_OPT_GO (which is newer, but is more likely to encounter differences
-> where not all servers support it).
->
-> The NBD specification includes a compatibility baseline:
-> https://github.com/NetworkBlockDevice/nbd/blob/cdb0bc57f3faefd7a5562d57ad57cd990781c415/doc/proto.md#compatibility-and-interoperability
->
-> and right now, NBD_OPT_GO (and _not_ NBD_OPT_EXPORT_NAME) is the
-> preferred way forward.  As long as your handshake implementation
-> complies with the baseline documented there, you'll have maximum
-> portability to the largest number of servers that also support the
-> baseline - but not all servers are up to that baseline yet.
->
-> So, this becomes a question of how much are you reinventing baseline
-> portability handshake concerns in the kernel, vs. in initramfs.
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
->
-
-Thank you for the review comments, I will address them in v2.
-
---
-Regards,
-Roman
+On 06/13/2019 08:31 AM, Bart Van Assche wrote:=0A=
+> On 6/13/19 7:59 AM, Chaitanya Kulkarni wrote:=0A=
+>> This patch introduces helper function to read the number of sectors=0A=
+>> from struct block_device->bd_part member. For more details Please refer=
+=0A=
+>> to the comment in the include/linux/genhd.h for part_nr_sects_read().=0A=
+>>=0A=
+>> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+>> ---=0A=
+>>    include/linux/blkdev.h | 12 ++++++++++++=0A=
+>>    1 file changed, 12 insertions(+)=0A=
+>>=0A=
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h=0A=
+>> index 592669bcc536..1ae65107182a 100644=0A=
+>> --- a/include/linux/blkdev.h=0A=
+>> +++ b/include/linux/blkdev.h=0A=
+>> @@ -1475,6 +1475,18 @@ static inline void put_dev_sector(Sector p)=0A=
+>>    	put_page(p.v);=0A=
+>>    }=0A=
+>>=0A=
+>> +/* Helper function to read the bdev->bd_part->nr_sects */=0A=
+>> +static inline sector_t bdev_nr_sects(struct block_device *bdev)=0A=
+>> +{=0A=
+>> +	sector_t nr_sects;=0A=
+>> +=0A=
+>> +	rcu_read_lock();=0A=
+>> +	nr_sects =3D part_nr_sects_read(bdev->bd_part);=0A=
+>> +	rcu_read_unlock();=0A=
+>> +=0A=
+>> +	return nr_sects;=0A=
+>> +}=0A=
+>> +=0A=
+>>    int kblockd_schedule_work(struct work_struct *work);=0A=
+>>    int kblockd_schedule_work_on(int cpu, struct work_struct *work);=0A=
+>>    int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, =
+unsigned long delay);=0A=
+>>=0A=
+>=0A=
+> Please explain what makes you think that part_nr_sects_read() must be=0A=
+> protected by an RCU read lock.=0A=
+=0A=
+Thanks Bart for looking into this, we actually don't need those locking.=0A=
+=0A=
+I'll fix this in the V2.=0A=
+=0A=
+Please let me know if you find any other issues with this series.=0A=
+=0A=
+>=0A=
+> Thanks,=0A=
+>=0A=
+> Bart.=0A=
+>=0A=
+=0A=
