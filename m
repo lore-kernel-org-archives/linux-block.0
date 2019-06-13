@@ -2,113 +2,55 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E7FC31E4A
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D2A7C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:07:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7E97208CA
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:07:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2E1920866
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:07:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391363AbfFMQHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 12:07:22 -0400
-Received: from smtp.infotech.no ([82.134.31.41]:44973 "EHLO smtp.infotech.no"
+        id S1729546AbfFMQHJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 12:07:09 -0400
+Received: from verein.lst.de ([213.95.11.211]:36671 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391210AbfFMQHV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 12:07:21 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id DBAAD204192;
-        Thu, 13 Jun 2019 18:07:18 +0200 (CEST)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id YkRU4Nrtfdcc; Thu, 13 Jun 2019 18:07:12 +0200 (CEST)
-Received: from [192.168.48.23] (host-45-58-224-183.dyn.295.ca [45.58.224.183])
-        by smtp.infotech.no (Postfix) with ESMTPA id 08BC0204163;
-        Thu, 13 Jun 2019 18:07:10 +0200 (CEST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH 1/8] block: add a helper function to read nr_setcs
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-btrace@vger.kernel.org,
-        kent.overstreet@gmail.com, jaegeuk@kernel.org,
-        damien.lemoal@wdc.com
-References: <20190613145955.4813-1-chaitanya.kulkarni@wdc.com>
- <20190613145955.4813-2-chaitanya.kulkarni@wdc.com>
- <9abfc2b8-4496-db7a-fcbb-b52102a67f8e@acm.org>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <f8ab9587-309b-79a0-e6fc-f6683176f498@interlog.com>
-Date:   Thu, 13 Jun 2019 12:07:09 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1731302AbfFMIp3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 04:45:29 -0400
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id DEC0668B05; Thu, 13 Jun 2019 10:44:58 +0200 (CEST)
+Date:   Thu, 13 Jun 2019 10:44:58 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Kashyap Desai <kashyap.desai@broadcom.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Oliver Neukum <oneukum@suse.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>,
+        PDL-MPT-FUSIONLINUX <mpt-fusionlinux.pdl@broadcom.com>,
+        linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 10/13] megaraid_sas: set virt_boundary_mask in the scsi
+ host
+Message-ID: <20190613084458.GB13221@lst.de>
+References: <20190605190836.32354-1-hch@lst.de> <20190605190836.32354-11-hch@lst.de> <cd713506efb9579d1f69a719d831c28d@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <9abfc2b8-4496-db7a-fcbb-b52102a67f8e@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cd713506efb9579d1f69a719d831c28d@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019-06-13 11:31 a.m., Bart Van Assche wrote:
-> On 6/13/19 7:59 AM, Chaitanya Kulkarni wrote:
->> This patch introduces helper function to read the number of sectors
->> from struct block_device->bd_part member. For more details Please refer
->> to the comment in the include/linux/genhd.h for part_nr_sects_read().
->>
->> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
->> ---
->>   include/linux/blkdev.h | 12 ++++++++++++
->>   1 file changed, 12 insertions(+)
->>
->> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->> index 592669bcc536..1ae65107182a 100644
->> --- a/include/linux/blkdev.h
->> +++ b/include/linux/blkdev.h
->> @@ -1475,6 +1475,18 @@ static inline void put_dev_sector(Sector p)
->>       put_page(p.v);
->>   }
->> +/* Helper function to read the bdev->bd_part->nr_sects */
->> +static inline sector_t bdev_nr_sects(struct block_device *bdev)
->> +{
->> +    sector_t nr_sects;
->> +
->> +    rcu_read_lock();
->> +    nr_sects = part_nr_sects_read(bdev->bd_part);
->> +    rcu_read_unlock();
->> +
->> +    return nr_sects;
->> +}
->> +
->>   int kblockd_schedule_work(struct work_struct *work);
->>   int kblockd_schedule_work_on(int cpu, struct work_struct *work);
->>   int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, 
->> unsigned long delay);
->>
-> 
-> Please explain what makes you think that part_nr_sects_read() must be protected 
-> by an RCU read lock.
-
-Dear reviewer,
-Please rephrase the above sentence without the accusative tone.
-Specifically, please do not use the phrase "what makes you think"
-in this or any other code review. For example: "I believe that..."
-is more accurate and less provocative.
-
-
-Observation: as a Canadian citizen when crossing the US border I
-believe contradicting a US border official with the phrase "what
-makes you think ..." could lead to a rather bad outcome :-)
-Please make review comments with that in mind.
-
-Thanks.
-
-Doug Gilbert
-
-P.S. Do we have any Linux code-of-conduct for reviewers?
-
+So before I respin this series, can you help with a way to figure out
+for mpt3sas and megaraid if a given controller supports NVMe devices
+at all, so that we don't have to set the virt boundary if not?
