@@ -2,179 +2,120 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD311C31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 20:29:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA72EC31E4A
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 20:36:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA00B20B7C
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 20:29:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="p3LNuEr3";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="j2TK0V3F"
+	by mail.kernel.org (Postfix) with ESMTP id 8E80A20665
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 20:36:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729071AbfFMU3g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 16:29:36 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:47342 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726289AbfFMU3g (ORCPT
+        id S1727151AbfFMUgF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 16:36:05 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:33682 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726703AbfFMUgE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 16:29:36 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 2BE828EE147;
-        Thu, 13 Jun 2019 13:29:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1560457775;
-        bh=PtvfUn6JoY87TTiM3T3Oxwmuj7dVRXSDuVgjQPtgM5E=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=p3LNuEr3AFUKnnir7+pX5dXWdcOSMeSIY2H6nmfZPBy44hrwE43oQ8Mxm1lfoaDRx
-         28xxlhc5Wra3b+Ed445H7U3XzYryswAPdlK8Zh5vPjDFLkmzi/WHLDj8hOc3Xitrtl
-         ztv/zL9ArG89jzlGIoNVU7k09Yy/P+Kbv2EtD2YU=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id krxMWJF8F_q3; Thu, 13 Jun 2019 13:29:34 -0700 (PDT)
-Received: from jarvis.lan (unknown [50.35.68.20])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 6D7568EE0C7;
-        Thu, 13 Jun 2019 13:29:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1560457774;
-        bh=PtvfUn6JoY87TTiM3T3Oxwmuj7dVRXSDuVgjQPtgM5E=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=j2TK0V3FCtE/JlvHTcmpDOTZC+rc+DvnhXb/KTuJmB8hl6m4UXmD1eHXngOgsZnqT
-         I2f/00ccyx4am+RrZ/vnadujZzt1DGDoPrfzs09c1Gl6nSuDtH9vEZEv6I1VaD04Pf
-         BqURcrMilg/hdGPH8k3i9WQm1WUF+jPEg+CvFPNk=
-Message-ID: <1560457772.3329.81.camel@HansenPartnership.com>
-Subject: Re: [PATCH 1/8] block: add a helper function to read nr_setcs
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     dgilbert@interlog.com, Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-btrace@vger.kernel.org,
-        kent.overstreet@gmail.com, jaegeuk@kernel.org,
-        damien.lemoal@wdc.com
-Date:   Thu, 13 Jun 2019 13:29:32 -0700
-In-Reply-To: <9b7f2892-d8bf-8b95-c782-51b775d175ed@interlog.com>
-References: <20190613145955.4813-1-chaitanya.kulkarni@wdc.com>
-         <20190613145955.4813-2-chaitanya.kulkarni@wdc.com>
-         <9abfc2b8-4496-db7a-fcbb-b52102a67f8e@acm.org>
-         <f8ab9587-309b-79a0-e6fc-f6683176f498@interlog.com>
-         <1560443321.3329.42.camel@HansenPartnership.com>
-         <9b7f2892-d8bf-8b95-c782-51b775d175ed@interlog.com>
+        Thu, 13 Jun 2019 16:36:04 -0400
+Received: by mail-lf1-f67.google.com with SMTP id y17so152729lfe.0;
+        Thu, 13 Jun 2019 13:36:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=z9pT9j7kn/J7EUGyq2uQP5wwtUmztL0xFNDiGg1L3+E=;
+        b=CNThz6qJyzZAseMrCUpQ8JH6LiOLSf1DC1lOoGkVmMO5CIWri3OHBuYo70YLIKgMfN
+         fLOdU+5kfKaoOkoBR0jbRd47LN0sndM0Mn00hpgAmd6XPQpbAmp7xA/lHsbQiblWmgYv
+         Ls2OcWX7KONQkOntahzvzOzQ6Pf8HxclDO14576PNY5ap1nrjX3bHXSfMiKdf70m66Lf
+         GacUElLyZF8yL3+VJ7B8C9dSlonsEEwIUJsRXfHpYWbWEzIRPlrOfp23dErYRsFmiTmE
+         r28GVXuPuVNMvwYVnUnKDPQg5iKBT9d9zPkoVLSLdCLZ9t6CpJKE+pwI635LR/xHQlQd
+         cPIA==
+X-Gm-Message-State: APjAAAXytMawGRjOIbZWN1mpHwWH+/Ze22nMjmH+d7stS103sKnuBUDM
+        nGkyHDYt4uUBbqtk3gksg51Wbg8N1e9MlCAN7wc=
+X-Google-Smtp-Source: APXvYqyOWgizpjNJBHEjXaulJf3xyZqsd/zF8eSxKDl95LQ2jEFxxsiGEU0nnfy+4XAHYrmPxUskeM/VT/LQIlrurTA=
+X-Received: by 2002:ac2:597c:: with SMTP id h28mr7062073lfp.90.1560458162259;
+ Thu, 13 Jun 2019 13:36:02 -0700 (PDT)
+MIME-Version: 1.0
+References: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+ <1560421215-10750-5-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+In-Reply-To: <1560421215-10750-5-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Thu, 13 Jun 2019 22:35:44 +0200
+Message-ID: <CAMuHMdXYqgPRX1WfUTRsKHhnSok5vfnr4AY36=vXoUvAxcNyWQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v6 4/5] mmc: tmio: Use dma_max_mapping_size() instead
+ of a workaround
+To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc:     Joerg Roedel <joro@8bytes.org>, Jens Axboe <axboe@kernel.dk>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Linux IOMMU <iommu@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2019-06-13 at 15:26 -0400, Douglas Gilbert wrote:
-> On 2019-06-13 12:28 p.m., James Bottomley wrote:
-> > On Thu, 2019-06-13 at 12:07 -0400, Douglas Gilbert wrote:
-> > > On 2019-06-13 11:31 a.m., Bart Van Assche wrote:
-> > 
-> > [...]
-> > > > Please explain what makes you think that part_nr_sects_read()
-> > > > must
-> > > > be protected
-> > > > by an RCU read lock.
-> > > 
-> > > Dear reviewer,
-> > > Please rephrase the above sentence without the accusative tone.
-> > > Specifically, please do not use the phrase "what makes you think"
-> > > in this or any other code review. For example: "I believe
-> > > that..." is more accurate and less provocative.
-> > 
-> > Imputing "tone" to email is something we try to avoid because it
-> > never ends well, particularly for non-native speakers. Some
-> > languages (Russian) have no articles and if you take any English
-> > phrase and strip out all the articles it sounds a lot more
-> > aggressive.
-> 
-> Like you, I am not a native North American English speaker but I
-> have lived here long enough to realize that "what makes you think
-> ..." is not a pleasantry and it may be fishing for an emotive
-> reaction. It is not the type of expression that professionals would
-> use to make a point in a public forum.
+Hi Shimoda-san,
 
-I'm not so sure of that, for instance what makes you think I don't do
-it in my own reviews?
+On Thu, Jun 13, 2019 at 5:37 PM Yoshihiro Shimoda
+<yoshihiro.shimoda.uh@renesas.com> wrote:
+> Since the commit 133d624b1cee ("dma: Introduce dma_max_mapping_size()")
+> provides a helper function to get the max mapping size, we can use
+> the function instead of the workaround code for swiotlb.
+>
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 
-> I'm not talking about articles (e.g. "a" and "the"), I'm talking
-> about pronouns like "you" and "I". I'm not aware of any languages
-> without pronouns. IMO Bart uses expressions with "you" in them too
-> often when he is expressing _his_ opinion to the contrary.
+Thanks for your patch!
 
-It's a grammatical tick not an insult and seeing it as such would help
-defuse the situation.  I know this is difficult; my own pet grammatical
-foible is having to contain it when I see "avoid that" in a patch
-subject, but I've managed (so far).
+> --- a/drivers/mmc/host/tmio_mmc_core.c
+> +++ b/drivers/mmc/host/tmio_mmc_core.c
 
-> > > Observation: as a Canadian citizen when crossing the US border I
-> > > believe contradicting a US border official with the phrase "what
-> > > makes you think ..." could lead to a rather bad outcome :-)
-> > > Please make review comments with that in mind.
-> > 
-> > Different situation: we aren't profiling reviewers ...
-> 
-> Would you have used that expression when addressing a teacher at
-> high school or university? I'm looking for a yardstick of where
-> a reviewer should "pitch" their responses. The way you address
-> someone who has the ability to make your life uncomfortable (e.g.
-> by refusing you entry into their country) may just be such a
-> yardstick.
-> 
-> > > P.S. Do we have any Linux code-of-conduct for reviewers?
-> > 
-> > It's the same one for all interactions:
-> > 
-> > Documentation/process/code-of-conduct-interpretation.rst
-> > 
-> > But I would remind everyone that diversity isn't just a
-> > gender/race/LGBT issue it also means being understanding of the
-> > potential difficulties non-native speakers have with email in
-> > English.
-> 
-> To quote
->    https://www.contributor-covenant.org/version/1/4/code-of-conduct.h
-> tml
-> to which your above reference indirectly refers:
-> 
->     It calls for a "harassment-free experience for everyone,
->     regardless of ... expression ..."
+> @@ -1189,19 +1190,9 @@ int tmio_mmc_host_probe(struct tmio_mmc_host *_host)
+>         mmc->max_blk_size = TMIO_MAX_BLK_SIZE;
+>         mmc->max_blk_count = pdata->max_blk_count ? :
+>                 (PAGE_SIZE / mmc->max_blk_size) * mmc->max_segs;
+> -       mmc->max_req_size = mmc->max_blk_size * mmc->max_blk_count;
+> -       /*
+> -        * Since swiotlb has memory size limitation, this will calculate
+> -        * the maximum size locally (because we don't have any APIs for it now)
+> -        * and check the current max_req_size. And then, this will update
+> -        * the max_req_size if needed as a workaround.
+> -        */
+> -       if (swiotlb_max_segment()) {
+> -               unsigned int max_size = (1 << IO_TLB_SHIFT) * IO_TLB_SEGSIZE;
+> -
+> -               if (mmc->max_req_size > max_size)
+> -                       mmc->max_req_size = max_size;
+> -       }
+> +       mmc->max_req_size = min_t(unsigned int,
+> +                                 mmc->max_blk_size * mmc->max_blk_count,
+> +                                 dma_max_mapping_size(&pdev->dev));
+>         mmc->max_seg_size = mmc->max_req_size;
 
-OK, we picked a code of conduct which is Anglo biased and doesn't take
-into account the linguistic diversity of the community; the various
-problems with the current code of conduct are why we have to have the
-interpretation document.
+I'm always triggered by the use of min_t() and other casts:
+mmc->max_blk_size and mmc->max_blk_count are both unsigned int.
+dma_max_mapping_size() returns size_t, which can be 64-bit.
 
-> So informing someone (not for the first time) that readers of the
-> language in which they are writing, may take offence at their
-> expression is: not showing an "understanding of the potential
-> difficulties non-native speakers have" and thus is harassment?
-> Balance that with the angle of a reviewer trying to intimidate
-> the person presenting the code. Could that also be harassment?
-> In this case I see little evidence of the "potential difficulties"
-> to which you refer.
+ 1) Can the multiplication overflow?
+    Probably not, as per commit 2a55c1eac7882232 ("mmc: renesas_sdhi:
+    prevent overflow for max_req_size"), but I thought I'd better ask.
+ 2) In theory, dma_max_mapping_size() can return a number that doesn't
+    fit in 32-bit, and will be truncated (to e.g. 0), leading to max_req_size
+    is zero?
 
-The problem, as I see it, is that you're assuming malice where I
-wouldn't, even if linguistic issues weren't a potential issue.
+Gr{oetje,eeting}s,
 
-> More generally:
-> IMO those who have power speak in a condescending fashion and act
-> unilaterally in the matter of reviewing and applying patches. A
-> select few are allowed to apply patches seemingly without any
-> review and ignore error reports or attempts at public review.
-> It certainly does not look like a system based on merit.
+                        Geert
 
-Is there, perhaps, some other deeper underlying issue for which this is
-serving as a proxy?
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-James
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
