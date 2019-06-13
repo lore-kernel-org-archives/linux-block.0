@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CF09C46477
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:29:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7213C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:29:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D6C0820449
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:29:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FFD321721
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:29:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="rLvl6Cbg"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="D+A6hQDV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730936AbfFMQ3L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 12:29:11 -0400
-Received: from mail-yw1-f43.google.com ([209.85.161.43]:35189 "EHLO
-        mail-yw1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730934AbfFMIf1 (ORCPT
+        id S1730967AbfFMQ3V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 12:29:21 -0400
+Received: from mail-yb1-f196.google.com ([209.85.219.196]:33880 "EHLO
+        mail-yb1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730930AbfFMIfX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 04:35:27 -0400
-Received: by mail-yw1-f43.google.com with SMTP id k128so8009952ywf.2
-        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 01:35:27 -0700 (PDT)
+        Thu, 13 Jun 2019 04:35:23 -0400
+Received: by mail-yb1-f196.google.com with SMTP id x32so7512376ybh.1
+        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 01:35:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=E9Et9thIQKwcveyw5OArkt0ti7mIXwVLr/kLmzsdkuc=;
-        b=rLvl6CbghlvG5MM7cpZKY4fnpuglneY+OyeiqcA2h9T2AQtB+ZCMA40qcUvl7QTklO
-         0NO28FsKG+40kR+1rP/XWJhwcu7aX26UZvpMdkVKLoqqAzSPELOwczCyV87u9JYvmGC3
-         Jzj4SsIXRym1WOEQySid/FsapUXbUht0R1G0bIwwu8xj8Svzn9IGuCSCgK5QsEpFuTCg
-         fmQ8trV0NUouYl1H74oUBrxIube2J4gT0/tTMvhiW2/5VCzmnH5sjfuY7W+Ky0RITtbh
-         PQJa15mSUAW0nzucBMJCFGtAfIO3D9uHPITb6G0cd/CXdJKSxfgvE/V2JnsWinQhFGIa
-         Vi1A==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=BPqoaHNDR3sZCgHnG0+QvBRj7hSSAwLDpGCasb6iY6c=;
+        b=D+A6hQDVvHdY6EGiGZWWAElDBlP0ebInQgsiKbs6FqIIqUX/wdYr/19y7ks9/8gGKc
+         eSeYBktBP9VKjPdGG9GyG/7/g6RdQtrmPXb2/hkRGyem1AACuMR8gDFY/xxrRC0vM8H5
+         JnYMKZbWLCNlNRjh78CNmo61/8mNqbttMXgvvaKSI2FIwmuzxIe3uFoQIXXW9VZaTCrY
+         g3fHJFoBnToS4pORunSextxuLOjjQqHY0ZnxI8x3/VaYFFCcCJznAVzc0y0+0ylJ0QnS
+         qZeYOlG15eCAkY6Eap+PesOCmvoWPXGg6wBnX15Tr9VO/AoxO61pXWeZMJ+CuA/4puBd
+         2UJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=E9Et9thIQKwcveyw5OArkt0ti7mIXwVLr/kLmzsdkuc=;
-        b=osRd2PMDrt9rUin1P5iec0mxx0OZq6Yo8738vhN1hQD1SuPuvwp+XN/3vpswYnDzaz
-         qU0ANDWNb6VvVysOdxTZhp3xg1BmimNhLP7VCq7bgozAGKx2bH4rCOWuRYTMhnLjQBwQ
-         ovoVYaVLJ8fVMNsYhsTDzPRose36yss2tmYdKgaWLYPXR2AA8U7rPz7+AINg4XxkjxuR
-         JOv1T2vGADq2vs9gHz41yvdzf0ImFteio57zjzLnVO3K0ZjjeWnbQ5VOyO83nxllI5Xr
-         nc/KSIrxeJbHon2Xhi3K/+yiwo0pZo/NxCOZ8RWht5p37sMFeDR22LJy4sq6h+Qeg6YO
-         YA/w==
-X-Gm-Message-State: APjAAAUJ4ht5I/zsIG2QxUEHa2OzLVK5G6mCnqkJgUtTXIaD4AsMaqLr
-        Sjv4FO0/2ToWfhDG8slNctSXUsQJMP8hVg==
-X-Google-Smtp-Source: APXvYqzKWYWZyYFEavhU0na+Eo++Q4WovsklPO+JjUhQ0ZLs+VXPJFQJCpYJAas0I4IpJB7Lb+j1hg==
-X-Received: by 2002:a81:b2c3:: with SMTP id q186mr677722ywh.379.1560414926189;
-        Thu, 13 Jun 2019 01:35:26 -0700 (PDT)
+        bh=BPqoaHNDR3sZCgHnG0+QvBRj7hSSAwLDpGCasb6iY6c=;
+        b=ezZKTRfYJaPVyqVuOhVbvExqLWpdL2BvTIUtSKaZp+cwhkB/W9rT+BJqoUBZkCotah
+         nIyXpxpK4PQGVNPgRpOKUOfXKAXFPlR20nOd58e+7nH0A8PwWMNBtNPDsQ/NE69JZ+/a
+         sR3+cgjqFkd6SkuP3qY7vD+NNkGCeWLdxW7SfaBQPHX20VQ+t2r5OsxJsgyCIbJMOkOS
+         YYkJNX6PYXINb3drb9Hd6qn1SGZLME+GuUA4uNvEAOQsSd0qdLegzO1Yz8mr3bCd2pQ2
+         EqmKAQFqShCYzb9CV3Tq5fecWji8PFWpKKwnveVPaw3opVHoZKeLuV34avQWnXn/5dfS
+         QqlA==
+X-Gm-Message-State: APjAAAXPRIuV20g1aNTFfSMpwGWBbnuWabPrf16HvAbIiE696LWAzXiR
+        1F8Zr366H5eyoitbpFIUwOKx6FnC5KSRkQ==
+X-Google-Smtp-Source: APXvYqy3D/obrwzFiQ17ObNknUGRRWjvyfoc6Ug2/bcUDKbkhrj61spDqTCyZNjFsJ0Hl6lALEa9zg==
+X-Received: by 2002:a5b:9d0:: with SMTP id y16mr24818633ybq.520.1560414921963;
+        Thu, 13 Jun 2019 01:35:21 -0700 (PDT)
 Received: from ?IPv6:2600:380:9e2c:9b66:893e:4845:326b:1174? ([2600:380:9e2c:9b66:893e:4845:326b:1174])
-        by smtp.gmail.com with ESMTPSA id s8sm886073ywl.58.2019.06.13.01.35.24
+        by smtp.gmail.com with ESMTPSA id a187sm624084ywh.21.2019.06.13.01.35.19
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 01:35:25 -0700 (PDT)
-Subject: Re: io_uring: buf_index and registered buffers
-To:     Stephen Bates <sbates@raithlin.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <99E68FD7-430D-4D58-920F-8705D823A4F6@raithlin.com>
+        Thu, 13 Jun 2019 01:35:21 -0700 (PDT)
+Subject: Re: [PATCH] block: force select mq-deadline for zoned block devices
+To:     Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
+Cc:     Matias Bjorling <matias.bjorling@wdc.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+References: <20190604072340.12224-1-damien.lemoal@wdc.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4510f6eb-9165-f239-7770-65b1596a7e18@kernel.dk>
-Date:   Thu, 13 Jun 2019 02:35:23 -0600
+Message-ID: <90c1cc58-0069-ce47-9850-4426dfa160a3@kernel.dk>
+Date:   Thu, 13 Jun 2019 02:35:17 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <99E68FD7-430D-4D58-920F-8705D823A4F6@raithlin.com>
+In-Reply-To: <20190604072340.12224-1-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,35 +75,13 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/11/19 9:11 AM, Stephen  Bates wrote:
-> Hi Jens and Team
-> 
-> While experimenting with io_uring and liburing I seem to have hit an
-> issue with registered buffers. I can't see a way that either
-> io_uring_register() or liburing can return the buffer indicies
-> associated with registered buffers. In addition, there is no way to
+On 6/4/19 1:23 AM, Damien Le Moal wrote:
+> In most use cases of zoned block devices (aka SMR disks), the
+> mq-deadline scheduler is mandatory as it implements sequential write
+> command processing guarantees with zone write locking. So make sure that
+> this scheduler is always enabled if CONFIG_BLK_DEV_ZONED is selected.
 
-Why would it need to return them? The indices are the index into the
-array you passed in for registration.
-
-> set sqe.buf_index via liburing right now when submitting an IO (it is
-> memset to 0 in liburing.h). The end result is that io_uring IO start
-> to fail when we do them from a set of registered buffers.
-
-liburing is missing a lot of helpers right now, I'll happily take
-patches to bring it closer to full feature parity.
-
-> I'd be happy to work on a patch for this but could do with confirmation that this a problem and some guidance on a good approach to fixing this in both the system call and the user-space library.
-> 
-> BTW while liburing tests the creation of multiple registered buffers
-> it never issues IO against them so that would be a hole I'd like to
-> fill too.
-
-Fio uses them, as does t/io_uring from fio. I've done lots of testing
-with registered buffers, all the performance numbers done were with that
-enabled (unless otherwise noted).
-
-But yes, a test case is always a great idea!
+Applied, thanks.
 
 -- 
 Jens Axboe
