@@ -6,117 +6,98 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27DA2C31E4A
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A34CC31E49
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F138F20851
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D395820851
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:53:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="USwEzZa7"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fXL4Bw5K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731603AbfFMPxk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 11:53:40 -0400
-Received: from mail-yw1-f68.google.com ([209.85.161.68]:44894 "EHLO
-        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731598AbfFMI7E (ORCPT
+        id S1731752AbfFMPxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 11:53:46 -0400
+Received: from mail-yb1-f194.google.com ([209.85.219.194]:42028 "EHLO
+        mail-yb1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731592AbfFMI5I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 04:59:04 -0400
-Received: by mail-yw1-f68.google.com with SMTP id l79so214200ywe.11
-        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 01:59:03 -0700 (PDT)
+        Thu, 13 Jun 2019 04:57:08 -0400
+Received: by mail-yb1-f194.google.com with SMTP id c7so7514949ybs.9
+        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 01:57:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=Yix4cwozT+jczHu1xP60tXczHRRxoNdAVfibY0mb7XQ=;
-        b=USwEzZa7kdgRRBAgVoUG4Mn/z0skjfSIkvXgLv7sumTg99QxHOsc8HxY9MY1cXPGPV
-         XktRpIYFVhMnzT7cMSAy1fe8pO+L1nG+tXGE+qMtXNOR/Kwpb3eqo8gNNPYmIYL9ecqN
-         yNTjnsa1B0Uyvc7EuEG0XfDWxIo/92+2C9bjpNrcbLqbrk2ImAE75s7CgC1MRBMWUZIh
-         sSlsBfXi8IQEZnbEaSabDoiIZY0xqXf486hkZcZGN2vOGnLc1BNSVWeIePHKky0EuFS/
-         LcoBBYq3LvJxDAP72Cs22Fp06WqQhowgkL+CYAQM9EtVBdagAwLCM/xrWmA+tg6NZT58
-         LVCQ==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5rpwm+WXYqpS5Yt4a3EFiaLIxY1PzE0lEAcH6B/6h0A=;
+        b=fXL4Bw5Kwl/mMKIWGa1cdKDK4KAo0XR2yGRH64ZJ/I1MVExg0wWUUDX3vBHTYZkjOF
+         vYFKvyecLJNLSA/E7m7sTD8zh55AOz/agx/OfhCByMjAe9qffdMIJXqrpeOoxi+v3NkU
+         sXmf687D6xOZ2qyVaV0Av3gvkn68lJwqr/d2PEpnz/YSD7pg1u3UtvyzLDx4Mi3w75OR
+         HJJI+g/bVt6L2m1CG0hBdOwJes2EebjVxjs/giB7QyWUieZGe5ei2HyxPmHI0pV+dWgb
+         1hEim2OLo6wzfu6Jcv47M0Q4ZvWL5BNXddHdsTUs3Eu/hfMQJY2po5LVVP9PbG0vjMfb
+         rW5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Yix4cwozT+jczHu1xP60tXczHRRxoNdAVfibY0mb7XQ=;
-        b=EQ8a5ytuIm6Vx4firZokRKTwiKVaIk8OGBpHBXegUSYmkNKNLpcnuHldFsBsu43z7r
-         jiS6MNwjwDJyVSQxeTt5/4CMFrmhc3MpVeyrKLh+Z9DTuaXmf9Ss2IpHMOkc288gQDze
-         SDGt5C/BtWrT6SofrE3HWQFtJ/wUADt5yG8z9g3VNmhPBUTuX+x61bIxz5vcOWDvTnla
-         XcQKA/x0PwuypJcCDjgQ0GO0DhTUEwhoWgjtP3FmHW6xpgLEySbBG40hqTWGubbWkZKy
-         isXXl2Bx++/vCn+f190qwZwzfiF3TquJM87U9abpdvs0eoEwQIilh5koTesWY51xw7Y0
-         6Lxw==
-X-Gm-Message-State: APjAAAXUKYgPkFTATgGvE5VSDPpaI+ZMEV6656RNdGUuwRr+7s9RDrzi
-        7p06lfT8dOl3IYJZ4+TMnZZZAmXUgK4bjQ4q
-X-Google-Smtp-Source: APXvYqxhCHbtbpafVd8sFhaN8Qp403W5oGeM9dhphP8ruJg8dU7hCZTiTBVC036ErtaHpZnhWwtDpA==
-X-Received: by 2002:a0d:d910:: with SMTP id b16mr3515205ywe.150.1560416342903;
-        Thu, 13 Jun 2019 01:59:02 -0700 (PDT)
+        bh=5rpwm+WXYqpS5Yt4a3EFiaLIxY1PzE0lEAcH6B/6h0A=;
+        b=ap5F9+NCY3AwGq7cC0BvMNOw3Rvnk1kdiw0VkjefikFZoFXg84A4KWNplhMlKtJtCD
+         mNkWhpvfKnBXbNLE5WsKpt2qYhVz9ZV5QwlfOMKAo1G+JT9uW58TKblcZQ6mNCf6sEvg
+         Faa5RwZKsdADaA97bEi7OZ2ZyyWXLyXMMTSjINkUZyocd7u65MJP0X6lsc1LxQWuwu+5
+         P25gd7HcNTHXiJ5V9EtaBKYvF6rlfnTihqWGq72F8yAc3D6E1enrGOQ1tz9vaiQ95akU
+         J5UQO4BbZs2+iRP0G9RDcj6LFtsvvgpuh4Kdz/uSMEI83yR4/dTio/xD+n9oy3YsEItT
+         WAqA==
+X-Gm-Message-State: APjAAAXupYi0OCJmscq3rBiddT6/0qJY0NslwmFvRLFZR/GN0hvYD6fl
+        0f8cGt2iFSMMdQkLl8OBAFK4Zw==
+X-Google-Smtp-Source: APXvYqw1zJomCCuCV1QnOnfqSwphH8qY2fZ84XDZGajBAG2kedoKa5gZ+d1vm3seCvUptjeuiel9rQ==
+X-Received: by 2002:a5b:b8b:: with SMTP id l11mr40277348ybq.165.1560416227034;
+        Thu, 13 Jun 2019 01:57:07 -0700 (PDT)
 Received: from [172.20.10.3] (mobile-166-172-57-221.mycingular.net. [166.172.57.221])
-        by smtp.gmail.com with ESMTPSA id v70sm594527ywc.78.2019.06.13.01.59.00
+        by smtp.gmail.com with ESMTPSA id i199sm607899ywe.89.2019.06.13.01.57.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 01:59:01 -0700 (PDT)
-Subject: Re: [PATCH] null_blk: remove duplicate check for report zone
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-References: <20190611221017.10264-1-chaitanya.kulkarni@wdc.com>
+        Thu, 13 Jun 2019 01:57:06 -0700 (PDT)
+Subject: Re: [PATCH] io_uring: fix SQPOLL cpu check
+To:     Stephen Bates <sbates@raithlin.com>,
+        Mark Rutland <mark.rutland@arm.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "shhuiw@foxmail.com" <shhuiw@foxmail.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <5D2859FE-DB39-48F5-BBB5-6EDD3791B6C3@raithlin.com>
+ <20190612092403.GA38578@lakrids.cambridge.arm.com>
+ <DCE71F95-F72A-414C-8A02-98CC81237F40@raithlin.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5a98a8e6-830f-37ac-d52a-684fcfc9378b@kernel.dk>
-Date:   Thu, 13 Jun 2019 02:58:59 -0600
+Message-ID: <b3c9138e-bf3b-0851-a63e-f52f926d5ed8@kernel.dk>
+Date:   Thu, 13 Jun 2019 02:54:45 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190611221017.10264-1-chaitanya.kulkarni@wdc.com>
+In-Reply-To: <DCE71F95-F72A-414C-8A02-98CC81237F40@raithlin.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/11/19 4:10 PM, Chaitanya Kulkarni wrote:
-> This patch removes the check in the null_blk_zoned for report zone
-> command, where it checks for the dev-,>zoned before executing the report
-> zone.
+On 6/12/19 3:47 AM, Stephen  Bates wrote:
+>> Aargh. My original patch [1] handled that correctly, and this case was
+>> explicitly called out in the commit message, which was retained even
+>> when the patch was "simplified". That's rather disappointing. :/
+>    
+> It looks like Jens did a fix for this (44a9bd18a0f06bba
+> " io_uring: fix failure to verify SQ_AFF cpu") which is in the 5.2-rc series
+> but which hasn’t been applied to the stable series yet. I am not sure how
+> I missed that but it makes my patch redundant.
 > 
-> The null_zone_report() function is a block_device operation callback
-> which is initialized in the null_blk_main.c and gets called as a part
-> of blkdev for report zone IOCTL (BLKREPORTZONE).
-> 
-> blkdev_ioctl()
-> blkdev_report_zones_ioctl()
->          blkdev_report_zones()
->                  blk_report_zones()
->                          disk->fops->report_zones()
->                                  nullb_zone_report();
-> 
-> The null_zone_report() will never get executed on the non-zoned block
-> device, in the non zoned block device blk_queue_is_zoned() will always
-> be false which is first check the blkdev_report_zones_ioctl()
-> before actual low level driver report zone callback is executed.
-> 
-> Here is the detailed scenario:-
-> 
-> 1. modprobe null_blk
-> null_init
-> null_alloc_dev
->          dev->zoned = 0
-> null_add_dev
->          dev->zoned == 0
->                  so we don't set the q->limits.zoned = BLK_ZONED_HR
-> 
-> 2. blkzone report /dev/nullb0
-> 
-> blkdev_ioctl()
-> blkdev_report_zones_ioctl()
->          blk_queue_is_zoned()
->                  blk_queue_is_zoned
->                          q->limits.zoned == 0
->                          return false
->          if (!blk_queue_is_zoned(q)) <--- true
->                  return -ENOTTY;
+> Jens, will 44a9bd18a0f06bba be applied to stable kernels?
 
-Applied, thanks.
+Yes, we can get it flagged for stable. Greg, can you pull in the above
+commit for 5.1 stable?
+
 
 -- 
 Jens Axboe
