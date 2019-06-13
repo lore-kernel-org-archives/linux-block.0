@@ -2,29 +2,29 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=AC_FROM_MANY_DOTS,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CF2C31E45
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F053C31E49
 	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:36:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E9652206BB
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:36:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1813C2082C
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:36:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728272AbfFMPgQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727431AbfFMPgQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 13 Jun 2019 11:36:16 -0400
 Received: from relmlor1.renesas.com ([210.160.252.171]:24190 "EHLO
         relmlie5.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727375AbfFMKUj (ORCPT
+        by vger.kernel.org with ESMTP id S1727388AbfFMKUl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 06:20:39 -0400
+        Thu, 13 Jun 2019 06:20:41 -0400
 X-IronPort-AV: E=Sophos;i="5.62,369,1554735600"; 
-   d="scan'208";a="18589667"
+   d="scan'208";a="18589670"
 Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
   by relmlie5.idc.renesas.com with ESMTP; 13 Jun 2019 19:20:37 +0900
 Received: from localhost.localdomain (unknown [10.166.17.210])
-        by relmlir6.idc.renesas.com (Postfix) with ESMTP id 785384274AAF;
+        by relmlir6.idc.renesas.com (Postfix) with ESMTP id A1AC64274AAF;
         Thu, 13 Jun 2019 19:20:37 +0900 (JST)
 From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 To:     joro@8bytes.org, axboe@kernel.dk, ulf.hansson@linaro.org,
@@ -33,89 +33,52 @@ Cc:     hch@lst.de, iommu@lists.linux-foundation.org,
         linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
         linux-renesas-soc@vger.kernel.org,
         Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Subject: [RFC PATCH v6 0/5] treewide: improve R-Car SDHI performance
-Date:   Thu, 13 Jun 2019 19:20:10 +0900
-Message-Id: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+Subject: [RFC PATCH v6 2/5] block: sort headers on blk-setting.c
+Date:   Thu, 13 Jun 2019 19:20:12 +0900
+Message-Id: <1560421215-10750-3-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+References: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch series is based on iommu.git / next branch.
+This patch sorts the headers in alphabetic order to ease
+the maintenance for this part.
 
-Since SDHI host internal DMAC of the R-Car Gen3 cannot handle two or
-more segments, the performance rate (especially, eMMC HS400 reading)
-is not good. However, if IOMMU is enabled on the DMAC, since IOMMU will
-map multiple scatter gather buffers as one contignous iova, the DMAC can
-handle the iova as well and then the performance rate is possible to
-improve. In fact, I have measured the performance by using bonnie++,
-"Sequential Input - block" rate was improved on r8a7795.
+Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+---
+ block/blk-settings.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-To achieve this, this patch series modifies IOMMU and Block subsystem
-at first. Since I'd like to get any feedback from each subsystem whether
-this way is acceptable for upstream, I submit it to treewide with RFC.
-
-Changes from v5:
- - Almost all patches are new code.
- - [4/5 for MMC] This is a refactor patch so that I don't add any
-   {Tested,Reviewed}-by tags.
- - [5/5 for MMC] Modify MMC subsystem to use bigger segments instead of
-   the renesas_sdhi driver.
- - [5/5 for MMC] Use BLK_MAX_SEGMENTS (128) instead of local value
-   SDHI_MAX_SEGS_IN_IOMMU (512). Even if we use BLK_MAX_SEGMENTS,
-   the performance is still good.
-https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=127511
-
-Changes from v4:
- - [DMA MAPPING] Add a new device_dma_parameters for iova contiguous.
- - [IOMMU] Add a new capable for "merging" segments.
- - [IOMMU] Add a capable ops into the ipmmu-vmsa driver.
- - [MMC] Sort headers in renesas_sdhi_core.c.
- - [MMC] Remove the following codes that made on v3 that can be achieved by
-	 DMA MAPPING and IOMMU subsystem:
- -- Check if R-Car Gen3 IPMMU is used or not on patch 3.
- -- Check if all multiple segment buffers are aligned to PAGE_SIZE on patch 3.
-https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=125593
-
-Changes from v3:
- - Use a helper function device_iommu_mapped on patch 1 and 3.
- - Check if R-Car Gen3 IPMMU is used or not on patch 3.
- - Check if all multiple segment buffers are aligned to PAGE_SIZE on patch 3.
- - Add Reviewed-by Wolfram-san on patch 1 and 2. Note that I also got his
-   Reviewed-by on patch 3, but I changed it from v2. So, I didn't add
-   his Reviewed-by at this time.
-https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=120985
-
-Changes from v2:
- - Add some conditions in the init_card().
- - Add a comment in the init_card().
- - Add definitions for some "MAX_SEGS".
-https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=116729
-
-Changes from v1:
- - Remove adding init_card ops into struct tmio_mmc_dma_ops and
-   tmio_mmc_host and just set init_card on renesas_sdhi_core.c.
- - Revise typos on "mmc: tmio: No memory size limitation if runs on IOMMU".
- - Add Simon-san's Reviewed-by on a tmio patch.
-https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=110485
-
-Yoshihiro Shimoda (5):
-  iommu: add an exported function to get minimum page size for a domain
-  block: sort headers on blk-setting.c
-  block: add a helper function to merge the segments by an IOMMU
-  mmc: tmio: Use dma_max_mapping_size() instead of a workaround
-  mmc: queue: Use bigger segments if IOMMU can merge the segments
-
- block/blk-settings.c             | 40 ++++++++++++++++++++++++++++++++++------
- drivers/iommu/iommu.c            | 18 +++++++++++++++---
- drivers/mmc/core/queue.c         | 33 +++++++++++++++++++++++++++++----
- drivers/mmc/host/tmio_mmc_core.c | 17 ++++-------------
- include/linux/blkdev.h           |  2 ++
- include/linux/iommu.h            |  1 +
- include/linux/mmc/host.h         |  1 +
- 7 files changed, 86 insertions(+), 26 deletions(-)
-
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 2ae348c..45f2c52 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -2,16 +2,16 @@
+ /*
+  * Functions related to setting various queue properties from drivers
+  */
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <linux/init.h>
+ #include <linux/bio.h>
+ #include <linux/blkdev.h>
+-#include <linux/memblock.h>	/* for max_pfn/max_low_pfn */
+ #include <linux/gcd.h>
+-#include <linux/lcm.h>
+-#include <linux/jiffies.h>
+ #include <linux/gfp.h>
++#include <linux/init.h>
++#include <linux/jiffies.h>
++#include <linux/kernel.h>
++#include <linux/lcm.h>
++#include <linux/memblock.h>     /* for max_pfn/max_low_pfn */
++#include <linux/module.h>
+ 
+ #include "blk.h"
+ #include "blk-wbt.h"
 -- 
 2.7.4
 
