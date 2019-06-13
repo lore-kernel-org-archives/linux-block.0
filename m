@@ -2,138 +2,103 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09651C31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 566D1C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:36:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC54E21721
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:26:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3603B21721
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:36:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727846AbfFMT0y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 15:26:54 -0400
-Received: from smtp.infotech.no ([82.134.31.41]:47232 "EHLO smtp.infotech.no"
+        id S1726969AbfFMTgb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 15:36:31 -0400
+Received: from sauhun.de ([88.99.104.3]:44244 "EHLO pokefinder.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725809AbfFMT0y (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 15:26:54 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id 934972041CF;
-        Thu, 13 Jun 2019 21:26:51 +0200 (CEST)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id dp4pDemIbplL; Thu, 13 Jun 2019 21:26:49 +0200 (CEST)
-Received: from [192.168.48.23] (host-45-58-224-183.dyn.295.ca [45.58.224.183])
-        by smtp.infotech.no (Postfix) with ESMTPA id E9B9C20415B;
-        Thu, 13 Jun 2019 21:26:47 +0200 (CEST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH 1/8] block: add a helper function to read nr_setcs
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-btrace@vger.kernel.org,
-        kent.overstreet@gmail.com, jaegeuk@kernel.org,
-        damien.lemoal@wdc.com
-References: <20190613145955.4813-1-chaitanya.kulkarni@wdc.com>
- <20190613145955.4813-2-chaitanya.kulkarni@wdc.com>
- <9abfc2b8-4496-db7a-fcbb-b52102a67f8e@acm.org>
- <f8ab9587-309b-79a0-e6fc-f6683176f498@interlog.com>
- <1560443321.3329.42.camel@HansenPartnership.com>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <9b7f2892-d8bf-8b95-c782-51b775d175ed@interlog.com>
-Date:   Thu, 13 Jun 2019 15:26:44 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1725809AbfFMTgb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 15:36:31 -0400
+Received: from localhost (p5486CF99.dip0.t-ipconnect.de [84.134.207.153])
+        by pokefinder.org (Postfix) with ESMTPSA id 61EBA4A127B;
+        Thu, 13 Jun 2019 21:36:29 +0200 (CEST)
+Date:   Thu, 13 Jun 2019 21:36:28 +0200
+From:   Wolfram Sang <wsa@the-dreams.de>
+To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc:     joro@8bytes.org, axboe@kernel.dk, ulf.hansson@linaro.org,
+        wsa+renesas@sang-engineering.com, hch@lst.de,
+        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [RFC PATCH v6 0/5] treewide: improve R-Car SDHI performance
+Message-ID: <20190613193628.GA6863@kunai>
+References: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 MIME-Version: 1.0
-In-Reply-To: <1560443321.3329.42.camel@HansenPartnership.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="k+w/mQv8wyuph6w0"
+Content-Disposition: inline
+In-Reply-To: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019-06-13 12:28 p.m., James Bottomley wrote:
-> On Thu, 2019-06-13 at 12:07 -0400, Douglas Gilbert wrote:
->> On 2019-06-13 11:31 a.m., Bart Van Assche wrote:
-> [...]
->>> Please explain what makes you think that part_nr_sects_read() must
->>> be protected
->>> by an RCU read lock.
->>
->> Dear reviewer,
->> Please rephrase the above sentence without the accusative tone.
->> Specifically, please do not use the phrase "what makes you think"
->> in this or any other code review. For example: "I believe that..."
->> is more accurate and less provocative.
-> 
-> Imputing "tone" to email is something we try to avoid because it never
-> ends well, particularly for non-native speakers. Some languages
-> (Russian) have no articles and if you take any English phrase and strip
-> out all the articles it sounds a lot more aggressive.
 
-Like you, I am not a native North American English speaker but I
-have lived here long enough to realize that "what makes you think ..."
-is not a pleasantry and it may be fishing for an emotive
-reaction. It is not the type of expression that professionals would
-use to make a point in a public forum.
+--k+w/mQv8wyuph6w0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'm not talking about articles (e.g. "a" and "the"), I'm talking
-about pronouns like "you" and "I". I'm not aware of any languages
-without pronouns. IMO Bart uses expressions with "you" in them too
-often when he is expressing _his_ opinion to the contrary.
+On Thu, Jun 13, 2019 at 07:20:10PM +0900, Yoshihiro Shimoda wrote:
+> This patch series is based on iommu.git / next branch.
+>=20
+> Since SDHI host internal DMAC of the R-Car Gen3 cannot handle two or
+> more segments, the performance rate (especially, eMMC HS400 reading)
+> is not good. However, if IOMMU is enabled on the DMAC, since IOMMU will
+> map multiple scatter gather buffers as one contignous iova, the DMAC can
+> handle the iova as well and then the performance rate is possible to
+> improve. In fact, I have measured the performance by using bonnie++,
+> "Sequential Input - block" rate was improved on r8a7795.
+>=20
+> To achieve this, this patch series modifies IOMMU and Block subsystem
+> at first. Since I'd like to get any feedback from each subsystem whether
+> this way is acceptable for upstream, I submit it to treewide with RFC.
+>=20
+> Changes from v5:
+>  - Almost all patches are new code.
+>  - [4/5 for MMC] This is a refactor patch so that I don't add any
+>    {Tested,Reviewed}-by tags.
+>  - [5/5 for MMC] Modify MMC subsystem to use bigger segments instead of
+>    the renesas_sdhi driver.
+>  - [5/5 for MMC] Use BLK_MAX_SEGMENTS (128) instead of local value
+>    SDHI_MAX_SEGS_IN_IOMMU (512). Even if we use BLK_MAX_SEGMENTS,
+>    the performance is still good.
 
->> Observation: as a Canadian citizen when crossing the US border I
->> believe contradicting a US border official with the phrase "what
->> makes you think ..." could lead to a rather bad outcome :-)
->> Please make review comments with that in mind.
-> 
-> Different situation: we aren't profiling reviewers ...
+Thanks for your hard work, Shimoda-san!
 
-Would you have used that expression when addressing a teacher at
-high school or university? I'm looking for a yardstick of where
-a reviewer should "pitch" their responses. The way you address
-someone who has the ability to make your life uncomfortable (e.g.
-by refusing you entry into their country) may just be such a
-yardstick.
-
->> P.S. Do we have any Linux code-of-conduct for reviewers?
-> 
-> It's the same one for all interactions:
-> 
-> Documentation/process/code-of-conduct-interpretation.rst
-> 
-> But I would remind everyone that diversity isn't just a
-> gender/race/LGBT issue it also means being understanding of the
-> potential difficulties non-native speakers have with email in English.
-
-To quote
-   https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
-to which your above reference indirectly refers:
-
-    It calls for a "harassment-free experience for everyone,
-    regardless of ... expression ..."
-
-So informing someone (not for the first time) that readers of the
-language in which they are writing, may take offence at their
-expression is: not showing an "understanding of the potential
-difficulties non-native speakers have" and thus is harassment?
-Balance that with the angle of a reviewer trying to intimidate
-the person presenting the code. Could that also be harassment?
-In this case I see little evidence of the "potential difficulties"
-to which you refer.
+I may not be the biggest DMA, IOMMU, and block layer expert, but I
+really like how this simplifies the SDHI driver and enhances the MMC
+core. So, I'll add my two cents to the patches although I can't really
+comment on the main functionality.
 
 
-More generally:
-IMO those who have power speak in a condescending fashion and act
-unilaterally in the matter of reviewing and applying patches. A
-select few are allowed to apply patches seemingly without any
-review and ignore error reports or attempts at public review.
-It certainly does not look like a system based on merit.
+--k+w/mQv8wyuph6w0
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Doug Gilbert
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAl0CpbgACgkQFA3kzBSg
+Kbb6fhAAsdfuCLxXS4xDUphPESkF+gt9xfaK1rX85NT4mPOnCRA7AMdH0rzSAboF
+MFBO01ZS1+9P5SOaOuKArFD1rDkk9t41Hp+AEcsyGZMt47QlwvXakNaQeoGVLUuu
+9kex9v8bpMgXjDS9B7CFcbWnLvEjEyysBYBVRMpppo1UwfIwKoQFZAzKJkodXGpE
+i5HOkl+woaQVUDgNnnKEVbAmSmCJ7H8Nb4CvzRk14i5GK2UYUi9ql9B4Fro4tsgM
+dqSlNzb9x/70ajG5EYGv5+E+pA8u3du9hNLzsm7PoFWCUIPa5n74aQC4CpMcjUao
+FqPHfzcT3Mg8fk2K7u6riIaQAO7c/sYJ4quv547+cPTyPoAs290HqRZqH413C9wr
+hQtNlC2g7j+6hgrkzyoesGKl0zpiPdW3TKQ17tDGoCipGKDwQGptKunqWFbDY90h
+UJdgHWAo/kjy+pAGlutoy5bPdEbYYpxgHCgCrOaN0fzV7qKg7N1gfvRCNJSS0U9d
+gNzLc4vE+d3a2jPq90LRNxpBoUgB/iuJBIEhZcTycIMjUBrWQ8ikClrFBMHkLEds
+slSs6vzgUDcqOBSVQUVAif92fBeOUONnGbwOBx/r6x8LFIpG5h3gw0rRr9mF6Ppo
+48Oi8LWLrkZ3ZSjfNyQMaUi4rPwEqULxuhqN7MZIAVUZk3f9L5s=
+=tqtY
+-----END PGP SIGNATURE-----
+
+--k+w/mQv8wyuph6w0--
