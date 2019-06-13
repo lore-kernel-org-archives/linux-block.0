@@ -2,107 +2,138 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6911C31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09651C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:26:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AEC0720896
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:19:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EztMCVPD"
+	by mail.kernel.org (Postfix) with ESMTP id DC54E21721
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:26:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727618AbfFMTTS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 15:19:18 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:48754 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725842AbfFMTTS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 15:19:18 -0400
-X-Greylist: delayed 5688 seconds by postgrey-1.27 at vger.kernel.org; Thu, 13 Jun 2019 15:19:17 EDT
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5DHhgvL054116;
-        Thu, 13 Jun 2019 17:43:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=j84ZJa4X+x5WSx5QJGHY2SflMYwM961qM/LO80WmcPg=;
- b=EztMCVPD0NBZOtvnuD9FgBhXYSoJVTpJ7JlEchc9rGYRkL+CmJ65ucac6fszbb3XVUvq
- 2OimAdIwg50EFJXg1bAlJso1vF7yGQ9Gg4ioxO/UusJr8WLJTUqhXDD8hiOVRkV8PYEY
- dMXfE365EzZu0RHvl13HSWqLXoYbHuVSIVvFRHDdSAGGL+fjJ4rbMJzr/+FNSkZpLW73
- ym0tLFcegKcyVX3emEZXuE/sfUFU1jh0lkaNa7Xi2r9SXupeqZi+JUrYqMSyKv7y22tW
- 1BMa2KYf3RheLhPP9sxsCmERAA8VVeOWmJllb88F2SPLHnKfPo3S8FLSDt0k/2mMNtaB +g== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 2t04ynu1ex-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Jun 2019 17:43:58 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5DHhrXH153828;
-        Thu, 13 Jun 2019 17:43:58 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2t04j0kg1w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Jun 2019 17:43:57 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5DHh2rF004452;
-        Thu, 13 Jun 2019 17:43:02 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 13 Jun 2019 10:43:02 -0700
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        id S1727846AbfFMT0y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 15:26:54 -0400
+Received: from smtp.infotech.no ([82.134.31.41]:47232 "EHLO smtp.infotech.no"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725809AbfFMT0y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 15:26:54 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.infotech.no (Postfix) with ESMTP id 934972041CF;
+        Thu, 13 Jun 2019 21:26:51 +0200 (CEST)
+X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
+Received: from smtp.infotech.no ([127.0.0.1])
+        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id dp4pDemIbplL; Thu, 13 Jun 2019 21:26:49 +0200 (CEST)
+Received: from [192.168.48.23] (host-45-58-224-183.dyn.295.ca [45.58.224.183])
+        by smtp.infotech.no (Postfix) with ESMTPA id E9B9C20415B;
+        Thu, 13 Jun 2019 21:26:47 +0200 (CEST)
+Reply-To: dgilbert@interlog.com
+Subject: Re: [PATCH 1/8] block: add a helper function to read nr_setcs
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Bart Van Assche <bvanassche@acm.org>,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, hch@lst.de, hare@suse.com
-Subject: Re: [PATCH V2 2/2] block: add more debug data to print_req_err
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20190613141629.2893-1-chaitanya.kulkarni@wdc.com>
-        <20190613141629.2893-3-chaitanya.kulkarni@wdc.com>
-        <d369fbbd-0d98-b804-619b-23049ee12398@acm.org>
-        <yq1d0jhtoii.fsf@oracle.com>
-        <be1e3944-4f5a-ca40-1496-614058fd3bb2@acm.org>
-Date:   Thu, 13 Jun 2019 13:43:00 -0400
-In-Reply-To: <be1e3944-4f5a-ca40-1496-614058fd3bb2@acm.org> (Bart Van Assche's
-        message of "Thu, 13 Jun 2019 10:05:12 -0700")
-Message-ID: <yq1tvcts7ob.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+        linux-block@vger.kernel.org
+Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-btrace@vger.kernel.org,
+        kent.overstreet@gmail.com, jaegeuk@kernel.org,
+        damien.lemoal@wdc.com
+References: <20190613145955.4813-1-chaitanya.kulkarni@wdc.com>
+ <20190613145955.4813-2-chaitanya.kulkarni@wdc.com>
+ <9abfc2b8-4496-db7a-fcbb-b52102a67f8e@acm.org>
+ <f8ab9587-309b-79a0-e6fc-f6683176f498@interlog.com>
+ <1560443321.3329.42.camel@HansenPartnership.com>
+From:   Douglas Gilbert <dgilbert@interlog.com>
+Message-ID: <9b7f2892-d8bf-8b95-c782-51b775d175ed@interlog.com>
+Date:   Thu, 13 Jun 2019 15:26:44 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9287 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906130130
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9287 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906130130
+In-Reply-To: <1560443321.3329.42.camel@HansenPartnership.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 2019-06-13 12:28 p.m., James Bottomley wrote:
+> On Thu, 2019-06-13 at 12:07 -0400, Douglas Gilbert wrote:
+>> On 2019-06-13 11:31 a.m., Bart Van Assche wrote:
+> [...]
+>>> Please explain what makes you think that part_nr_sects_read() must
+>>> be protected
+>>> by an RCU read lock.
+>>
+>> Dear reviewer,
+>> Please rephrase the above sentence without the accusative tone.
+>> Specifically, please do not use the phrase "what makes you think"
+>> in this or any other code review. For example: "I believe that..."
+>> is more accurate and less provocative.
+> 
+> Imputing "tone" to email is something we try to avoid because it never
+> ends well, particularly for non-native speakers. Some languages
+> (Russian) have no articles and if you take any English phrase and strip
+> out all the articles it sounds a lot more aggressive.
 
-Bart,
+Like you, I am not a native North American English speaker but I
+have lived here long enough to realize that "what makes you think ..."
+is not a pleasantry and it may be fishing for an emotive
+reaction. It is not the type of expression that professionals would
+use to make a point in a public forum.
 
-> I'm in favor of improving consistency. But are you sure that we can
-> modify the tracing output format without breaking any applications?
+I'm not talking about articles (e.g. "a" and "the"), I'm talking
+about pronouns like "you" and "I". I'm not aware of any languages
+without pronouns. IMO Bart uses expressions with "you" in them too
+often when he is expressing _his_ opinion to the contrary.
 
-Chaitanya is already working on enhancing tracing. I seem to recall
-blktrace being fairly flexible with what it digests.
+>> Observation: as a Canadian citizen when crossing the US border I
+>> believe contradicting a US border official with the phrase "what
+>> makes you think ..." could lead to a rather bad outcome :-)
+>> Please make review comments with that in mind.
+> 
+> Different situation: we aren't profiling reviewers ...
 
-On top of that, we also have the option of changing the error path
-output as opposed to changing the tracing ditto should that be an issue.
+Would you have used that expression when addressing a teacher at
+high school or university? I'm looking for a yardstick of where
+a reviewer should "pitch" their responses. The way you address
+someone who has the ability to make your life uncomfortable (e.g.
+by refusing you entry into their country) may just be such a
+yardstick.
 
-My main point is that there is probably going to be close to a 1:1
-mapping between what you would want to see in an error message and what
-you would want to see in tracing. So it would be good to use the same
-plumbing for both.
+>> P.S. Do we have any Linux code-of-conduct for reviewers?
+> 
+> It's the same one for all interactions:
+> 
+> Documentation/process/code-of-conduct-interpretation.rst
+> 
+> But I would remind everyone that diversity isn't just a
+> gender/race/LGBT issue it also means being understanding of the
+> potential difficulties non-native speakers have with email in English.
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+To quote
+   https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
+to which your above reference indirectly refers:
+
+    It calls for a "harassment-free experience for everyone,
+    regardless of ... expression ..."
+
+So informing someone (not for the first time) that readers of the
+language in which they are writing, may take offence at their
+expression is: not showing an "understanding of the potential
+difficulties non-native speakers have" and thus is harassment?
+Balance that with the angle of a reviewer trying to intimidate
+the person presenting the code. Could that also be harassment?
+In this case I see little evidence of the "potential difficulties"
+to which you refer.
+
+
+More generally:
+IMO those who have power speak in a condescending fashion and act
+unilaterally in the matter of reviewing and applying patches. A
+select few are allowed to apply patches seemingly without any
+review and ignore error reports or attempts at public review.
+It certainly does not look like a system based on merit.
+
+Doug Gilbert
