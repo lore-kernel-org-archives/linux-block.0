@@ -2,35 +2,35 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF8EC31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8DFC31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:20:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2248F2054F
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:18:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D25CC20B7C
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 15:20:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732454AbfFMPSu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 11:18:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54626 "EHLO mx1.redhat.com"
+        id S2388314AbfFMPUC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 11:20:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35126 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732144AbfFMNDB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 09:03:01 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1732116AbfFMM5C (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 08:57:02 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3B21DCA36F;
-        Thu, 13 Jun 2019 13:03:00 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4693530872E2;
+        Thu, 13 Jun 2019 12:56:46 +0000 (UTC)
 Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D484E541F2;
-        Thu, 13 Jun 2019 13:02:57 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1021D10018E0;
+        Thu, 13 Jun 2019 12:56:39 +0000 (UTC)
 Subject: Re: [PATCH 2/2] nbd: add support for nbd as root device
 To:     roman.stratiienko@globallogic.com, linux-kernel@vger.kernel.org,
         josef@toxicpanda.com, nbd@other.debian.org,
         A.Bulyshchenko@globallogic.com, linux-block@vger.kernel.org,
-        axboe@kernel.dkn.org, "Richard W.M. Jones" <rjones@redhat.com>
+        axboe@kernel.dkn.org
 References: <20190612163144.18486-1-roman.stratiienko@globallogic.com>
  <20190612163144.18486-2-roman.stratiienko@globallogic.com>
 From:   Eric Blake <eblake@redhat.com>
@@ -59,38 +59,37 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <b988f702-f394-6f2e-43ea-61298c0f2b03@redhat.com>
-Date:   Thu, 13 Jun 2019 08:02:56 -0500
+Message-ID: <3a15a92f-16d6-cca3-8842-b0866579a95a@redhat.com>
+Date:   Thu, 13 Jun 2019 07:56:38 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
 In-Reply-To: <20190612163144.18486-2-roman.stratiienko@globallogic.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="9Icx9ItsU53ORwiANl09EUUC5IOzpGhUD"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Thu, 13 Jun 2019 13:03:01 +0000 (UTC)
+ boundary="1mFPIR4gUIZspv7ZUjGD9XHyqwoM6f3do"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Thu, 13 Jun 2019 12:57:01 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9Icx9ItsU53ORwiANl09EUUC5IOzpGhUD
-Content-Type: multipart/mixed; boundary="GcPkFI5vKHhM5L3R0laXCr11kPXSMamS8";
+--1mFPIR4gUIZspv7ZUjGD9XHyqwoM6f3do
+Content-Type: multipart/mixed; boundary="sgH4lnP1uGSxVKzPJ1Q9zkQ6LMEiCSRAg";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: roman.stratiienko@globallogic.com, linux-kernel@vger.kernel.org,
  josef@toxicpanda.com, nbd@other.debian.org, A.Bulyshchenko@globallogic.com,
- linux-block@vger.kernel.org, axboe@kernel.dkn.org,
- "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <b988f702-f394-6f2e-43ea-61298c0f2b03@redhat.com>
+ linux-block@vger.kernel.org, axboe@kernel.dkn.org
+Message-ID: <3a15a92f-16d6-cca3-8842-b0866579a95a@redhat.com>
 Subject: Re: [PATCH 2/2] nbd: add support for nbd as root device
 References: <20190612163144.18486-1-roman.stratiienko@globallogic.com>
  <20190612163144.18486-2-roman.stratiienko@globallogic.com>
 In-Reply-To: <20190612163144.18486-2-roman.stratiienko@globallogic.com>
 
---GcPkFI5vKHhM5L3R0laXCr11kPXSMamS8
+--sgH4lnP1uGSxVKzPJ1Q9zkQ6LMEiCSRAg
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -109,26 +108,58 @@ s
 > The arguments for the server are passed via kernel command line.
 > The kernel command line has the format
 > 'nbdroot=3D[<SERVER_IP>:]<SERVER_PORT>/<EXPORT_NAME>'.
+> SERVER_IP is optional. If it is not available it will use the
+> root_server_addr transmitted through DHCP.
+>=20
+> Based on those arguments, the connection to the server is established
+> and is connected to the nbd0 device. The rootdevice therefore is
+> root=3D/dev/nbd0.
+>=20
+> Patch was initialy posted by Markus Pargmann <mpa@pengutronix.de>
+> and can be found at https://lore.kernel.org/patchwork/patch/532556/
+>=20
+> Change-Id: I78f7313918bf31b9dc01a74a42f0f068bede312c
+> Signed-off-by: Roman Stratiienko <roman.stratiienko@globallogic.com>
+> Reviewed-by: Aleksandr Bulyshchenko <A.Bulyshchenko@globallogic.com>
 
-Did you intend for nbdroot=3D1234 to connect to port 1234 or to server
-1234 port 10809?  Is an export name mandatory even when it is the empty
-string, in which case, is the / character mandatory?  Maybe this would
-be better written as:
+> +static int nbd_connection_negotiate(struct socket *sock, char *export_=
+name,
+> +				    size_t *rsize, u16 *nflags)
+> +{
 
- [<SERVER_IP>[:<SERVER_PORT]][/<EXPORT_NAME]
+> +
+> +	ret =3D sock_xmit_buf(sock, 0, &flags, sizeof(flags));
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	*nflags =3D ntohs(flags);
+> +
+> +	client_flags =3D 0;
 
-although that would allow nbdroot=3D using all defaults (will that still
-do the right thing?).
+Why not reply with NBD_FLAG_C_FIXED_NEWSTYLE? Which in turn would be
+necessary...
 
-Should we support nbdroot=3DURI, and tie this in to Rich's proposal [1] o=
-n
-standardizing the set of URIs that refer to an NBD export?  It seems
-like you are still limited to a TCP socket (not Unix) with no
-encryption, so this would be equivalent to the URI:
+> +
+> +	ret =3D sock_xmit_buf(sock, 1, &client_flags, sizeof(client_flags));
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	magic =3D cpu_to_be64(nbd_opts_magic);
+> +	ret =3D sock_xmit_buf(sock, 1, &magic, sizeof(magic));
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	opt =3D htonl(NBD_OPT_EXPORT_NAME);
 
-nbd://[server[:port]][/export]
+Why not use NBD_OPT_GO?  That's a better interface (better error
+recovery, and some servers can even use it to advertise preferred block
+sizing - particularly if a server insists on a 4k minimum block instead
+of 512).
 
-[1] https://lists.debian.org/nbd/2019/06/msg00011.html
+=2E..using NBD_OPT_GO would require checking that the server advertised
+FIXED_NEWSTYLE as well as replying that we intend to rely on it.
+
+Otherwise the idea looks interesting to me.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -136,23 +167,23 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---GcPkFI5vKHhM5L3R0laXCr11kPXSMamS8--
+--sgH4lnP1uGSxVKzPJ1Q9zkQ6LMEiCSRAg--
 
---9Icx9ItsU53ORwiANl09EUUC5IOzpGhUD
+--1mFPIR4gUIZspv7ZUjGD9XHyqwoM6f3do
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0CSYAACgkQp6FrSiUn
-Q2rmfAf8ChmatMRfkJIY+wjmA8EpvunLFeeBfqMUiCnyHNvBwC4gnGLM+bicQbaH
-daIi5U8i80IsZZ3su8d8eaBxBaFF9iy+CoRjczdUZnE1XdkDoJyA+0csp1+LiggC
-0SmwnYAF9o8XRSJrhkg0xeVHwBljDbKsd1bwWzDVD6YDFERJPuGjVPYFM6sX//Qh
-6fj1jDb2Y3jVg/6eiEOOzofmP5aO9aN4IGOWs5LgI7SFrk7r3gg33qlMrNk2e0sH
-9d/D+8fBkuDFaoCGBk/1uBoBcLN9lkzB3MopCSMIilvavvv5+Wb1c84f+TE/0Fnm
-xb7WMLpghXn8h/JLGjX503VhNmx7dw==
-=Uh/K
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0CSAYACgkQp6FrSiUn
+Q2pQVgf/SAkzO/2y16ZWAOWbE/P/FZSQbPMBqGLAz1/Rk5z64pdkETpf4GyxwZt9
+KzaafzGckPzYHp1gsoFP1/QveKPvNOdhldLJHD5LkD1uEM/3d8z8uRypR2u1gsCJ
+EhlIuCpIfoGIMR7hizyZJflpRgwYDBNCyOyN4Y0plN5vZ5cZfMNvI+chKvhuneBX
+ZgxfoorSWCx0F1PDviTrfwIclR2ZciBjEEzrDiP4SAg4N9Sg/RDg66P3rxAnuDPa
+vWSn5xu2ImK2vPbG3vnBQwsCl1E4cDs+SYo28mFAipi5J+NAmVW355fomubmvCwt
+hF75HdVcRncQbmRFlEvU3BIhG4MyEg==
+=WxSM
 -----END PGP SIGNATURE-----
 
---9Icx9ItsU53ORwiANl09EUUC5IOzpGhUD--
+--1mFPIR4gUIZspv7ZUjGD9XHyqwoM6f3do--
