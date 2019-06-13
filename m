@@ -2,98 +2,75 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C68C31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:13:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 348F5C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:16:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ADB7921743
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:13:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560446006;
-	bh=05dXGrGKCXPHaKO0jLEjsx1c8iyxgNPMzxixaWBU1Yw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=NCndDgMwTFXGRYxtQGacpEVlRBCA8N4U98oElDCEeHZwrFN54/x6RUA8EQe2BlKm8
-	 wyb4QaVxMEIi159wLMbyr1PlpCLn4UcLYLIJEhLUSY6rjiT4P5vrbXI7Ai/F54EQav
-	 fdS9vzgQwvJF8O8F38cAaknGYp8AFN+Uyiwen0Qo=
+	by mail.kernel.org (Postfix) with ESMTP id 186C42063F
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:16:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404172AbfFMRN0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 13:13:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58250 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728971AbfFLWBE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jun 2019 18:01:04 -0400
-Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id ECBA920B7C;
-        Wed, 12 Jun 2019 22:01:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560376863;
-        bh=05dXGrGKCXPHaKO0jLEjsx1c8iyxgNPMzxixaWBU1Yw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AboYvTBemsNv4lHkJnmN3fRjqz8XXX+E25fN0bEhWhvgW3f5h7sG/yrdthbOx82sR
-         /G1h5EN0zwuadF0X3NVvEkHnWtKM32g0NNzm11z/m6Ueqv6rzs9EjIr4bs8h+OtXGh
-         e0Va7vDvzGUmYwaHuAvyzAUFX1ez0zDLy1YfKV5Q=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     davem@davemloft.net, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        syzbot <syzbot+111cb28d9f583693aefa@syzkaller.appspotmail.com>
-Subject: [PATCH] io_uring: fix memory leak of UNIX domain socket inode
-Date:   Wed, 12 Jun 2019 14:58:43 -0700
-Message-Id: <20190612215843.91294-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.22.0.rc2.383.gf4fbbf30c2-goog
-In-Reply-To: <0000000000005bc340058983fe8e@google.com>
-References: <0000000000005bc340058983fe8e@google.com>
+        id S1726187AbfFMRQn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 13:16:43 -0400
+Received: from iolanthe.rowland.org ([192.131.102.54]:60582 "HELO
+        iolanthe.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S1727727AbfFMRQd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 13:16:33 -0400
+Received: (qmail 4216 invoked by uid 2102); 13 Jun 2019 13:16:32 -0400
+Received: from localhost (sendmail-bs@127.0.0.1)
+  by localhost with SMTP; 13 Jun 2019 13:16:32 -0400
+Date:   Thu, 13 Jun 2019 13:16:32 -0400 (EDT)
+From:   Alan Stern <stern@rowland.harvard.edu>
+X-X-Sender: stern@iolanthe.rowland.org
+To:     Christoph Hellwig <hch@lst.de>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>
+cc:     Oliver Neukum <oneukum@suse.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
+Subject: Re: How to resolve an issue in swiotlb environment?
+In-Reply-To: <20190613073900.GC12093@lst.de>
+Message-ID: <Pine.LNX.4.44L0.1906131306580.1307-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Thu, 13 Jun 2019, Christoph Hellwig wrote:
 
-Opening and closing an io_uring instance leaks a UNIX domain socket
-inode.  This is because the ->file of the io_uring instance's internal
-UNIX domain socket is set to point to the io_uring file, but then
-sock_release() sees the non-NULL ->file and assumes the inode reference
-is held by the file so doesn't call iput().  That's not the case here,
-since the reference is still meant to be held by the socket; the actual
-inode of the io_uring file is different.
+> On Wed, Jun 12, 2019 at 10:43:11AM -0400, Alan Stern wrote:
+> > Would it be okay to rely on the assumption that USB block devices never 
+> > have block size < 512?  (We could even add code to the driver to 
+> > enforce this, although refusing to handle such devices at all might be 
+> > worse than getting an occasional error.)
+> 
+> sd.c only supports a few specific sector size, and none of them is
+> < 512 bytes:
+> 
+> 	if (sector_size != 512 &&
+> 	    sector_size != 1024 &&
+> 	    sector_size != 2048 &&
+> 	    sector_size != 4096) {
+> 	    	...
+> 		sdkp->capacity = 0;
 
-Fix this leak by NULL-ing out ->file before releasing the socket.
+Great!  So all we have to do is fix vhci-hcd.  Then we can remove all 
+the virt_boundary_mask stuff from usb-storage and uas entirely.
 
-Reported-by: syzbot+111cb28d9f583693aefa@syzkaller.appspotmail.com
-Fixes: 2b188cc1bb85 ("Add io_uring IO interface")
-Cc: <stable@vger.kernel.org> # v5.1+
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- fs/io_uring.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+(I'm assuming wireless USB isn't a genuine issue.  As far as I know, it 
+is pretty much abandoned at this point.)
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 0fbb486a320e9..86a2bd7219005 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2777,8 +2777,10 @@ static void io_ring_ctx_free(struct io_ring_ctx *ctx)
- 	io_eventfd_unregister(ctx);
- 
- #if defined(CONFIG_UNIX)
--	if (ctx->ring_sock)
-+	if (ctx->ring_sock) {
-+		ctx->ring_sock->file = NULL; /* so that iput() is called */
- 		sock_release(ctx->ring_sock);
-+	}
- #endif
- 
- 	io_mem_free(ctx->sq_ring);
--- 
-2.22.0.rc2.383.gf4fbbf30c2-goog
+Valentina and Shua: Adding SG support to vhci-hcd shouldn't be too
+hard.  It ought to be possible even without changing the network
+protocol.
+
+Alan Stern
 
