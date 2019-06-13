@@ -2,87 +2,125 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7213C31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20EC3C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:32:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8FFD321721
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:29:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="D+A6hQDV"
+	by mail.kernel.org (Postfix) with ESMTP id 0241D2173C
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:32:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730967AbfFMQ3V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 12:29:21 -0400
-Received: from mail-yb1-f196.google.com ([209.85.219.196]:33880 "EHLO
-        mail-yb1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730930AbfFMIfX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 04:35:23 -0400
-Received: by mail-yb1-f196.google.com with SMTP id x32so7512376ybh.1
-        for <linux-block@vger.kernel.org>; Thu, 13 Jun 2019 01:35:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=BPqoaHNDR3sZCgHnG0+QvBRj7hSSAwLDpGCasb6iY6c=;
-        b=D+A6hQDVvHdY6EGiGZWWAElDBlP0ebInQgsiKbs6FqIIqUX/wdYr/19y7ks9/8gGKc
-         eSeYBktBP9VKjPdGG9GyG/7/g6RdQtrmPXb2/hkRGyem1AACuMR8gDFY/xxrRC0vM8H5
-         JnYMKZbWLCNlNRjh78CNmo61/8mNqbttMXgvvaKSI2FIwmuzxIe3uFoQIXXW9VZaTCrY
-         g3fHJFoBnToS4pORunSextxuLOjjQqHY0ZnxI8x3/VaYFFCcCJznAVzc0y0+0ylJ0QnS
-         qZeYOlG15eCAkY6Eap+PesOCmvoWPXGg6wBnX15Tr9VO/AoxO61pXWeZMJ+CuA/4puBd
-         2UJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=BPqoaHNDR3sZCgHnG0+QvBRj7hSSAwLDpGCasb6iY6c=;
-        b=ezZKTRfYJaPVyqVuOhVbvExqLWpdL2BvTIUtSKaZp+cwhkB/W9rT+BJqoUBZkCotah
-         nIyXpxpK4PQGVNPgRpOKUOfXKAXFPlR20nOd58e+7nH0A8PwWMNBtNPDsQ/NE69JZ+/a
-         sR3+cgjqFkd6SkuP3qY7vD+NNkGCeWLdxW7SfaBQPHX20VQ+t2r5OsxJsgyCIbJMOkOS
-         YYkJNX6PYXINb3drb9Hd6qn1SGZLME+GuUA4uNvEAOQsSd0qdLegzO1Yz8mr3bCd2pQ2
-         EqmKAQFqShCYzb9CV3Tq5fecWji8PFWpKKwnveVPaw3opVHoZKeLuV34avQWnXn/5dfS
-         QqlA==
-X-Gm-Message-State: APjAAAXPRIuV20g1aNTFfSMpwGWBbnuWabPrf16HvAbIiE696LWAzXiR
-        1F8Zr366H5eyoitbpFIUwOKx6FnC5KSRkQ==
-X-Google-Smtp-Source: APXvYqy3D/obrwzFiQ17ObNknUGRRWjvyfoc6Ug2/bcUDKbkhrj61spDqTCyZNjFsJ0Hl6lALEa9zg==
-X-Received: by 2002:a5b:9d0:: with SMTP id y16mr24818633ybq.520.1560414921963;
-        Thu, 13 Jun 2019 01:35:21 -0700 (PDT)
-Received: from ?IPv6:2600:380:9e2c:9b66:893e:4845:326b:1174? ([2600:380:9e2c:9b66:893e:4845:326b:1174])
-        by smtp.gmail.com with ESMTPSA id a187sm624084ywh.21.2019.06.13.01.35.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 01:35:21 -0700 (PDT)
-Subject: Re: [PATCH] block: force select mq-deadline for zoned block devices
-To:     Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
-Cc:     Matias Bjorling <matias.bjorling@wdc.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-References: <20190604072340.12224-1-damien.lemoal@wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <90c1cc58-0069-ce47-9850-4426dfa160a3@kernel.dk>
-Date:   Thu, 13 Jun 2019 02:35:17 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1730865AbfFMQcA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 12:32:00 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44398 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730862AbfFMIU6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 04:20:58 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id E8C92AD5C;
+        Thu, 13 Jun 2019 08:20:55 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 255091E4328; Thu, 13 Jun 2019 10:20:53 +0200 (CEST)
+Date:   Thu, 13 Jun 2019 10:20:53 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+Cc:     Jan Kara <jack@suse.cz>, Paolo Valente <paolo.valente@linaro.org>,
+        linux-fsdevel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jeff Moyer <jmoyer@redhat.com>,
+        Theodore Ts'o <tytso@mit.edu>, amakhalov@vmware.com,
+        anishs@vmware.com, srivatsab@vmware.com,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Stable <stable@vger.kernel.org>
+Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
+ controller
+Message-ID: <20190613082053.GD26505@quack2.suse.cz>
+References: <a04368ba-f1d5-8f2c-1279-a685a137d024@csail.mit.edu>
+ <E270AD92-943E-4529-8158-AB480D6D9DF8@linaro.org>
+ <5b71028c-72f0-73dd-0cd5-f28ff298a0a3@csail.mit.edu>
+ <FFA44D26-75FF-4A8E-A331-495349BE5FFC@linaro.org>
+ <0d6e3c02-1952-2177-02d7-10ebeb133940@csail.mit.edu>
+ <7B74A790-BD98-412B-ADAB-3B513FB1944E@linaro.org>
+ <6a6f4aa4-fc95-f132-55b2-224ff52bd2d8@csail.mit.edu>
+ <7c5e9d11-4a3d-7df4-c1e6-7c95919522ab@csail.mit.edu>
+ <20190612130446.GD14578@quack2.suse.cz>
+ <dd32ed59-a543-fc76-9a9a-2462f0119270@csail.mit.edu>
 MIME-Version: 1.0
-In-Reply-To: <20190604072340.12224-1-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dd32ed59-a543-fc76-9a9a-2462f0119270@csail.mit.edu>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/4/19 1:23 AM, Damien Le Moal wrote:
-> In most use cases of zoned block devices (aka SMR disks), the
-> mq-deadline scheduler is mandatory as it implements sequential write
-> command processing guarantees with zone write locking. So make sure that
-> this scheduler is always enabled if CONFIG_BLK_DEV_ZONED is selected.
+On Wed 12-06-19 12:36:53, Srivatsa S. Bhat wrote:
+> 
+> [ Adding Greg to CC ]
+> 
+> On 6/12/19 6:04 AM, Jan Kara wrote:
+> > On Tue 11-06-19 15:34:48, Srivatsa S. Bhat wrote:
+> >> On 6/2/19 12:04 AM, Srivatsa S. Bhat wrote:
+> >>> On 5/30/19 3:45 AM, Paolo Valente wrote:
+> >>>>
+> >> [...]
+> >>>> At any rate, since you pointed out that you are interested in
+> >>>> out-of-the-box performance, let me complete the context: in case
+> >>>> low_latency is left set, one gets, in return for this 12% loss,
+> >>>> a) at least 1000% higher responsiveness, e.g., 1000% lower start-up
+> >>>> times of applications under load [1];
+> >>>> b) 500-1000% higher throughput in multi-client server workloads, as I
+> >>>> already pointed out [2].
+> >>>>
+> >>>
+> >>> I'm very happy that you could solve the problem without having to
+> >>> compromise on any of the performance characteristics/features of BFQ!
+> >>>
+> >>>
+> >>>> I'm going to prepare complete patches.  In addition, if ok for you,
+> >>>> I'll report these results on the bug you created.  Then I guess we can
+> >>>> close it.
+> >>>>
+> >>>
+> >>> Sounds great!
+> >>>
+> >>
+> >> Hi Paolo,
+> >>
+> >> Hope you are doing great!
+> >>
+> >> I was wondering if you got a chance to post these patches to LKML for
+> >> review and inclusion... (No hurry, of course!)
+> >>
+> >> Also, since your fixes address the performance issues in BFQ, do you
+> >> have any thoughts on whether they can be adapted to CFQ as well, to
+> >> benefit the older stable kernels that still support CFQ?
+> > 
+> > Since CFQ doesn't exist in current upstream kernel anymore, I seriously
+> > doubt you'll be able to get any performance improvements for it in the
+> > stable kernels...
+> > 
+> 
+> I suspected as much, but that seems unfortunate though. The latest LTS
+> kernel is based on 4.19, which still supports CFQ. It would have been
+> great to have a process to address significant issues on older
+> kernels too.
 
-Applied, thanks.
+Well, you could still tune the performance difference by changing
+slice_idle and group_idle tunables for CFQ (in
+/sys/block/<device>/queue/iosched/).  Changing these to lower values will
+reduce the throughput loss when switching between cgroups at the cost of
+lower accuracy of enforcing configured IO proportions among cgroups.
 
+								Honza
 -- 
-Jens Axboe
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
