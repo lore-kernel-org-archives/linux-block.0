@@ -2,171 +2,126 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAF2C31E4B
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:22:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E2FC31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:35:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 362E72175B
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:22:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560446547;
-	bh=PbtCWYw3+/L5ZSdTrza2PBMyBjK1af03TxKxZn//NJA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=fSZYrrhjq20OgZFWXAoqUt8OxU07lpZVNVrn6PA0HJ2E+ENryCOQ/j/4MpHJkm6pO
-	 VifWTpr19luHR3WJ5kooyGcIikzVar7w4i4GafpxkXW4hr4kB3yPERYoQhNlixMdxo
-	 NM4PAs07hV1iJaep7TgIW0/enDDXBLodOn7OpoZc=
+	by mail.kernel.org (Postfix) with ESMTP id EC45C2190D
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 17:35:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726091AbfFMRW0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 13:22:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59572 "EHLO mail.kernel.org"
+        id S1725884AbfFMRf2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 13:35:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58914 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727552AbfFMRW0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 13:22:26 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1725616AbfFMRf2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 13:35:28 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3CC1120679;
-        Thu, 13 Jun 2019 17:22:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560446545;
-        bh=PbtCWYw3+/L5ZSdTrza2PBMyBjK1af03TxKxZn//NJA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=X02a/0K3/6+STmDdWAWoZEUWQy7LmmshnJFa3prXcJCSlZRlPWg1XFJeETJBfo9XF
-         ZFom9WVDK5jgSJ0lPTG4HWzzt9glRAl5ECidMDs1Cyax5P8RE6Fqc86z0stV+YzfeO
-         MnGyjEu8P25bl0n07U3CuqsbF0bHJ5eYRCm3MqNU=
-Date:   Thu, 13 Jun 2019 10:22:23 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Parshuram Raju Thombare <pthombar@cadence.com>,
-        Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>
-Subject: Re: [RFC PATCH v2 6/8] scsi: ufs: Add inline encryption support to
- UFS
-Message-ID: <20190613172223.GC686@sol.localdomain>
-References: <20190605232837.31545-1-satyat@google.com>
- <20190605232837.31545-7-satyat@google.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id 0AED9C04BE09;
+        Thu, 13 Jun 2019 17:35:28 +0000 (UTC)
+Received: from [10.10.122.154] (ovpn-122-154.rdu2.redhat.com [10.10.122.154])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A4AFA19C67;
+        Thu, 13 Jun 2019 17:35:27 +0000 (UTC)
+Subject: Re: [PATCH 2/2] nbd: add netlink reconfigure resize support v3
+To:     Josef Bacik <josef@toxicpanda.com>
+References: <20190529201606.14903-1-mchristi@redhat.com>
+ <20190529201606.14903-3-mchristi@redhat.com>
+ <20190613170103.pludlfrz2jtkzwij@MacBook-Pro-91.local>
+Cc:     linux-block@vger.kernel.org
+From:   Mike Christie <mchristi@redhat.com>
+Message-ID: <5D02895F.5000205@redhat.com>
+Date:   Thu, 13 Jun 2019 12:35:27 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
+ Thunderbird/38.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190605232837.31545-7-satyat@google.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+In-Reply-To: <20190613170103.pludlfrz2jtkzwij@MacBook-Pro-91.local>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Thu, 13 Jun 2019 17:35:28 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 05, 2019 at 04:28:35PM -0700, Satya Tangirala wrote:
-> +static inline int ufshcd_prepare_lrbp_crypto(struct ufs_hba *hba,
-> +					     struct scsi_cmnd *cmd,
-> +					     struct ufshcd_lrb *lrbp)
-> +{
-> +	int key_slot;
-> +
-> +	if (!bio_crypt_should_process(cmd->request->bio,
-> +					cmd->request->q)) {
-> +		lrbp->crypto_enable = false;
-> +		return 0;
-> +	}
+On 06/13/2019 12:01 PM, Josef Bacik wrote:
+> On Wed, May 29, 2019 at 03:16:06PM -0500, Mike Christie wrote:
+>> If the device is setup with ioctl we can resize the device after the
+>> initial setup, but if the device is setup with netlink we cannot use the
+>> resize related ioctls and there is no netlink reconfigure size ATTR
+>> handling code.
+>>
+>> This patch adds netlink reconfigure resize support to match the ioctl
+>> interface.
+>>
+>> Signed-off-by: Mike Christie <mchristi@redhat.com>
+> 
+> Sorry I missed this too, but I think there's a problem with this actually.
+> 
+>> ---
+>>
+>> V3;
+>> - If the device size or block size has not changed do not call
+>> nbd_size_set.
+>>
+>> V2:
+>> - Merge reconfig and connect resize related code to helper and avoid
+>> multiple nbd_size_set calls.
+>>
+>>  drivers/block/nbd.c | 48 ++++++++++++++++++++++++++++++---------------
+>>  1 file changed, 32 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>> index 236253fbf455..9486555e6391 100644
+>> --- a/drivers/block/nbd.c
+>> +++ b/drivers/block/nbd.c
+>> @@ -1685,6 +1685,30 @@ nbd_device_policy[NBD_DEVICE_ATTR_MAX + 1] = {
+>>  	[NBD_DEVICE_CONNECTED]		=	{ .type = NLA_U8 },
+>>  };
+>>  
+>> +static int nbd_genl_size_set(struct genl_info *info, struct nbd_device *nbd)
+>> +{
+>> +	struct nbd_config *config = nbd->config;
+>> +	u64 bsize = config->blksize;
+>> +	u64 bytes = config->bytesize;
+>> +
+>> +	if (info->attrs[NBD_ATTR_SIZE_BYTES])
+>> +		bytes = nla_get_u64(info->attrs[NBD_ATTR_SIZE_BYTES]);
+>> +
+>> +	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]) {
+>> +		bsize = nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
+>> +		if (!bsize)
+>> +			bsize = NBD_DEF_BLKSIZE;
+>> +		if (!nbd_is_valid_blksize(bsize)) {
+>> +			printk(KERN_ERR "Invalid block size %llu\n", bsize);
+>> +			return -EINVAL;
+>> +		}
+>> +	}
+>> +
+>> +	if (bytes != config->bytesize || bsize != config->blksize)
+>> +		nbd_size_set(nbd, bsize, div64_u64(bytes, bsize));
+> 
+> This part won't actually update the bdev if there already is one because
+> nbd->task_recv is NULL for netlink related devices.  Probably need to fix that
 
-Nit: this 'if' expression fits on one line.
+I'm not sure I understand this part of the comment. For netlink we do:
 
->  static int ufshcd_slave_configure(struct scsi_device *sdev)
->  {
->  	struct request_queue *q = sdev->request_queue;
-> +	struct ufs_hba *hba = shost_priv(sdev->host);
->  
->  	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
->  	blk_queue_max_segment_size(q, PRDT_DATA_BYTE_COUNT_MAX);
->  
-> +	ufshcd_crypto_setup_rq_keyslot_manager(hba, q);
-> +
->  	return 0;
->  }
->  
-> @@ -4598,6 +4660,7 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
->  static void ufshcd_slave_destroy(struct scsi_device *sdev)
->  {
->  	struct ufs_hba *hba;
-> +	struct request_queue *q = sdev->request_queue;
->  
->  	hba = shost_priv(sdev->host);
->  	/* Drop the reference as it won't be needed anymore */
-> @@ -4608,6 +4671,8 @@ static void ufshcd_slave_destroy(struct scsi_device *sdev)
->  		hba->sdev_ufs_device = NULL;
->  		spin_unlock_irqrestore(hba->host->host_lock, flags);
->  	}
-> +
-> +	ufshcd_crypto_destroy_rq_keyslot_manager(q);
->  }
+nbd_genl_connect -> nbd_start_device:
 
-Each scsi_device is still getting its own keyslot manager.  As discussed before,
-this is wrong because the keyslots are per-host controller, not per-device.
+nbd_start_device()
+{
+    .....
+    nbd->task_recv = current;
 
-So the keyslot manager needs to be a property of the ufs_hba instead, and each
-device's request_queue needs to reference that same keyslot manager.
 
-> diff --git a/drivers/scsi/ufs/ufshcd.h b/drivers/scsi/ufs/ufshcd.h
-> index d3b6a6b57a37..283014e0924f 100644
-> --- a/drivers/scsi/ufs/ufshcd.h
-> +++ b/drivers/scsi/ufs/ufshcd.h
-> @@ -167,6 +167,9 @@ struct ufs_pm_lvl_states {
->   * @intr_cmd: Interrupt command (doesn't participate in interrupt aggregation)
->   * @issue_time_stamp: time stamp for debug purposes
->   * @compl_time_stamp: time stamp for statistics
-> + * @crypto_enable: whether or not the request needs inline crypto operations
-> + * @crypto_key_slot: the key slot to use for inline crypto
-> + * @data_unit_num: the data unit number for the first block for inline crypto
->   * @req_abort_skip: skip request abort task flag
->   */
->  struct ufshcd_lrb {
-> @@ -191,6 +194,9 @@ struct ufshcd_lrb {
->  	bool intr_cmd;
->  	ktime_t issue_time_stamp;
->  	ktime_t compl_time_stamp;
-> +	bool crypto_enable;
-> +	u8 crypto_key_slot;
-> +	u64 data_unit_num;
-
-Maybe these fields should be conditional on CONFIG_SCSI_UFS_CRYPTO too?
-
->  
->  	bool req_abort_skip;
->  };
-> @@ -501,6 +507,10 @@ struct ufs_stats {
->   * @is_urgent_bkops_lvl_checked: keeps track if the urgent bkops level for
->   *  device is known or not.
->   * @scsi_block_reqs_cnt: reference counting for scsi block requests
-> + * @crypto_capabilities: Content of crypto capabilities register (0x100)
-> + * @crypto_cap_array: Array of crypto capabilities
-> + * @crypto_cfg_register: Start of the crypto cfg array
-> + * @crypto_cfgs: Array of crypto configurations (i.e. config for each slot)
->   */
->  struct ufs_hba {
->  	void __iomem *mmio_base;
-> @@ -711,6 +721,14 @@ struct ufs_hba {
->  
->  	struct device		bsg_dev;
->  	struct request_queue	*bsg_queue;
-> +
-> +#ifdef CONFIG_SCSI_UFS_CRYPTO
-> +	/* crypto */
-> +	union ufs_crypto_capabilities crypto_capabilities;
-> +	union ufs_crypto_cap_entry *crypto_cap_array;
-> +	u32 crypto_cfg_register;
-> +	union ufs_crypto_cfg_entry *crypto_cfgs;
-> +#endif /* CONFIG_SCSI_UFS_CRYPTO */
->  };
->  
->  /* Returns true if clocks can be gated. Otherwise false */
-> -- 
-> 2.22.0.rc1.311.g5d7573a151-goog
+> to update the bdev unconditionally, and then just see if bdget_disk() returns
+> NULL in nbd_size_update.  Also I hate myself for how many size update functions
+> there are.  Thanks,
+> 
+> Josef
 > 
 
-- Eric
