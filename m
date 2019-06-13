@@ -2,217 +2,132 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0D4C31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E348FC31E4A
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:48:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EC15920673
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:46:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBFF5215EA
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 16:48:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fcMHhd8S"
+	dkim=pass (1024-bit key) header.d=renesasgroup.onmicrosoft.com header.i=@renesasgroup.onmicrosoft.com header.b="Og+phJsU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729132AbfFMQpy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 12:45:54 -0400
-Received: from mail-wr1-f50.google.com ([209.85.221.50]:44642 "EHLO
-        mail-wr1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730324AbfFMFqV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 01:46:21 -0400
-Received: by mail-wr1-f50.google.com with SMTP id r16so124496wrl.11
-        for <linux-block@vger.kernel.org>; Wed, 12 Jun 2019 22:46:18 -0700 (PDT)
+        id S1726767AbfFMQsB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 12:48:01 -0400
+Received: from mail-eopbgr1410120.outbound.protection.outlook.com ([40.107.141.120]:17865
+        "EHLO JPN01-OS2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730247AbfFMEwK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 00:52:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=+KC+G8mdsFHRq3fTO8qSFdNuM/o8bUU5Ws1W0tY9nMQ=;
-        b=fcMHhd8SlQkGpmu4B4nnHAcWQF7KwY2oVV3mNcGcuZAm4mu6blLKC7FPW5p4xwO0k4
-         ElkPvnrtllGvpBASvZHiwuIorqIrmYPY1qDm4otU9sYAlokfFwYlR4PR2pE8qjSxJ2bv
-         Cc+n3yEeKCFqbEXJLo7edU2gB4dYlbZHfUPcT4pMQ8U0cZqodb/v5NPuEnuAp7VrL9N0
-         bZEESFOJmsJ97ksQTSUutEBELnFtWGZo8oAQ+JLQxVoFeSB81OPPH9JWwTl3JqqBruas
-         4CREGmjevp7mkIo8lNxjmg3TZAzNDJaThvyulLFtw+2h+imVMSsk2+eDbUEoGTrUF22T
-         NjIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=+KC+G8mdsFHRq3fTO8qSFdNuM/o8bUU5Ws1W0tY9nMQ=;
-        b=l9Ht3UtM9fYNwMSs2DlWuJ0EATjC1NGT1KPGspStyvKwdySVqo3x3lR9KXL2I5Uzxt
-         AdK3ba1EkRcVyZrl0W4RJvgQiQTOXRyrI8klJwwWgXiDCB3BOLfSIPAww6lAmMyZnN4E
-         iXZ/a9MmJSc3LJ/hOnyRC6P80F2oG3yoQ/VPiKurQnPaRS28sy87cGOeK6Qpgu/Vu9Mn
-         Zs0VK/DTy2c07JKxXDDg3X34mz9Yu/2HAI4r33BTCnOdrSIOLuIZVEtR5/XmhOrd0QuD
-         j/LQgVQ5pZfyFTDKOc9wE/qj4iPAjtmi3MPleOjqRD49F2Ir1J0crFTxO1+SjdgVgtg8
-         vgrw==
-X-Gm-Message-State: APjAAAVVOpbUn2NsdBjaMzBWhaAhendeu12aia7Epc/L7GCcxStiGlhA
-        FBQSzqicugzPveS1un6DcbftDQ==
-X-Google-Smtp-Source: APXvYqw/aYOTu9cU/Ok5QkUUC38n3D+JffJJRYpP42j/6jsR85bV4Vha18mx5IR6w74L0iQ1L9eZ9A==
-X-Received: by 2002:adf:ebc6:: with SMTP id v6mr14275239wrn.222.1560404777633;
-        Wed, 12 Jun 2019 22:46:17 -0700 (PDT)
-Received: from [192.168.0.102] (88-147-71-233.dyn.eolo.it. [88.147.71.233])
-        by smtp.gmail.com with ESMTPSA id z14sm3164273wre.96.2019.06.12.22.46.14
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Jun 2019 22:46:16 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-Message-Id: <43486E4F-2237-4E40-BDFE-07CFCCFFFA25@linaro.org>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_C82715EC-E52D-48BB-975D-458C5D643A93";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-Date:   Thu, 13 Jun 2019 07:46:12 +0200
-In-Reply-To: <7c5e9d11-4a3d-7df4-c1e6-7c95919522ab@csail.mit.edu>
-Cc:     linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Moyer <jmoyer@redhat.com>, Theodore Ts'o <tytso@mit.edu>,
-        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>
-To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
- <5B6570A2-541A-4CF8-98E0-979EA6E3717D@linaro.org>
- <2CB39B34-21EE-4A95-A073-8633CF2D187C@linaro.org>
- <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
- <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
- <F5E29C98-6CC4-43B8-994D-0B5354EECBF3@linaro.org>
- <686D6469-9DE7-4738-B92A-002144C3E63E@linaro.org>
- <01d55216-5718-767a-e1e6-aadc67b632f4@csail.mit.edu>
- <CA8A23E2-6F22-4444-9A20-E052A94CAA9B@linaro.org>
- <cc148388-3c82-d7c0-f9ff-8c31bb5dc77d@csail.mit.edu>
- <6FE0A98F-1E3D-4EF6-8B38-2C85741924A4@linaro.org>
- <2A58C239-EF3F-422B-8D87-E7A3B500C57C@linaro.org>
- <a04368ba-f1d5-8f2c-1279-a685a137d024@csail.mit.edu>
- <E270AD92-943E-4529-8158-AB480D6D9DF8@linaro.org>
- <5b71028c-72f0-73dd-0cd5-f28ff298a0a3@csail.mit.edu>
- <FFA44D26-75FF-4A8E-A331-495349BE5FFC@linaro.org>
- <0d6e3c02-1952-2177-02d7-10ebeb133940@csail.mit.edu>
- <7B74A790-BD98-412B-ADAB-3B513FB1944E@linaro.org>
- <6a6f4aa4-fc95-f132-55b2-224ff52bd2d8@csail.mit.edu>
- <7c5e9d11-4a3d-7df4-c1e6-7c95919522ab@csail.mit.edu>
-X-Mailer: Apple Mail (2.3445.104.8)
+ d=renesasgroup.onmicrosoft.com; s=selector2-renesasgroup-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A0KvqaJ072jkO2bkJ8USO9biczqHUVBbvjaN9RjmwVw=;
+ b=Og+phJsUg4CrEnoCz2rKqyIMK41Ja+0I3Tl/3dP6Q67O4F5lxjvrR4InGIlBhQ+yewsJHQki4jJ7NMHKt/g40Z2Wc2ljkwEGeOVaDyPFvFaUZ4NErsjhY4dVxe8nhXTTg7x7TBZaKZ1YwdsJ54E4jCz4Xoe44RyVEYwVWK5lOOM=
+Received: from OSAPR01MB3089.jpnprd01.prod.outlook.com (52.134.247.150) by
+ OSAPR01MB2995.jpnprd01.prod.outlook.com (52.134.248.16) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.11; Thu, 13 Jun 2019 04:52:05 +0000
+Received: from OSAPR01MB3089.jpnprd01.prod.outlook.com
+ ([fe80::19ad:b6ce:a287:dc85]) by OSAPR01MB3089.jpnprd01.prod.outlook.com
+ ([fe80::19ad:b6ce:a287:dc85%7]) with mapi id 15.20.1965.017; Thu, 13 Jun 2019
+ 04:52:05 +0000
+From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To:     Christoph Hellwig <hch@lst.de>
+CC:     Alan Stern <stern@rowland.harvard.edu>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
+Subject: RE: How to resolve an issue in swiotlb environment?
+Thread-Topic: How to resolve an issue in swiotlb environment?
+Thread-Index: AdUZ1Qlk800+Qz0uSuO63mIBeXkktQDUe+5AAJUL5SAAA1kYAAANEESAABj9hAAAERZjAAAi6naAAAJz/+AABe44AAAkT+Aw
+Date:   Thu, 13 Jun 2019 04:52:04 +0000
+Message-ID: <OSAPR01MB3089ACE26C9C986BB15CF960D8EF0@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+References: <20190611064158.GA20601@lst.de>
+ <Pine.LNX.4.44L0.1906110956510.1535-100000@iolanthe.rowland.org>
+ <20190612073059.GA20086@lst.de>
+ <OSAPR01MB3089D154C6DF0237003CE80CD8EC0@OSAPR01MB3089.jpnprd01.prod.outlook.com>
+ <20190612113102.GA24742@lst.de>
+In-Reply-To: <20190612113102.GA24742@lst.de>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=yoshihiro.shimoda.uh@renesas.com; 
+x-originating-ip: [118.238.235.108]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b76f24c3-92f8-4dbb-0a27-08d6efbae22d
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:OSAPR01MB2995;
+x-ms-traffictypediagnostic: OSAPR01MB2995:
+x-microsoft-antispam-prvs: <OSAPR01MB29956F43960EF8EFCC63DF5BD8EF0@OSAPR01MB2995.jpnprd01.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0067A8BA2A
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(39860400002)(376002)(346002)(366004)(136003)(199004)(189003)(7696005)(6116002)(25786009)(33656002)(478600001)(14444005)(9686003)(256004)(6246003)(4326008)(76116006)(476003)(76176011)(11346002)(66446008)(73956011)(66946007)(81156014)(66476007)(66066001)(446003)(66556008)(64756008)(486006)(81166006)(7736002)(3846002)(8936002)(6916009)(8676002)(54906003)(305945005)(53936002)(5660300002)(316002)(68736007)(99286004)(74316002)(71200400001)(55016002)(26005)(14454004)(2906002)(186003)(52536014)(229853002)(6506007)(102836004)(6436002)(71190400001)(86362001);DIR:OUT;SFP:1102;SCL:1;SRVR:OSAPR01MB2995;H:OSAPR01MB3089.jpnprd01.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: renesas.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: yuAVPmOnA7259ti7dDat3UjAmq0/YUtJVYEh1zWPz4sNxuOPqA9xvKsB+4CcWmk4vLEUbXOSG0ZlSjm4A3uEmp4aZg/VbGF0ToAQvbxqw1D/ZALCc+cVIWB0/K/idnnPQSOT0RHAScN7r1p6RlO2OPFkA/a/+kwXoUASOwsXHhEC1Tg2B2VxCFpY7t7/MWOg0C7U6TKn/0CHduM6rCxBpSIyxr1+9YJp3JlWaqMvz8jz1UW0HsML0E4woN4VV87vHlu0mWsRfBBc4odQrYLv7EdZD+7LdFXzuDB751EfNDhSEZG5kkx2zjUyA/ooh8CFMGoHNAI2jbb8nt72uzQEgfxN1cwuuCzK4RITDKSSXX4gQOQPy6gAJerKu7t1ehMiCVxc6wPoxArnh7pyhzN8ffs6wuDvsBfOCo6NyPAja3k=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: renesas.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b76f24c3-92f8-4dbb-0a27-08d6efbae22d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2019 04:52:05.1984
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yoshihiro.shimoda.uh@renesas.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSAPR01MB2995
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Christoph,
 
---Apple-Mail=_C82715EC-E52D-48BB-975D-458C5D643A93
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
-
-
-
-> Il giorno 12 giu 2019, alle ore 00:34, Srivatsa S. Bhat =
-<srivatsa@csail.mit.edu> ha scritto:
+> From: Christoph Hellwig, Sent: Wednesday, June 12, 2019 8:31 PM
 >=20
-> On 6/2/19 12:04 AM, Srivatsa S. Bhat wrote:
->> On 5/30/19 3:45 AM, Paolo Valente wrote:
->>>=20
-> [...]
->>> At any rate, since you pointed out that you are interested in
->>> out-of-the-box performance, let me complete the context: in case
->>> low_latency is left set, one gets, in return for this 12% loss,
->>> a) at least 1000% higher responsiveness, e.g., 1000% lower start-up
->>> times of applications under load [1];
->>> b) 500-1000% higher throughput in multi-client server workloads, as =
-I
->>> already pointed out [2].
->>>=20
->>=20
->> I'm very happy that you could solve the problem without having to
->> compromise on any of the performance characteristics/features of BFQ!
->>=20
->>=20
->>> I'm going to prepare complete patches.  In addition, if ok for you,
->>> I'll report these results on the bug you created.  Then I guess we =
-can
->>> close it.
->>>=20
->>=20
->> Sounds great!
->>=20
+> On Wed, Jun 12, 2019 at 08:52:21AM +0000, Yoshihiro Shimoda wrote:
+> > Hi Christoph,
+> >
+> > > From: Christoph Hellwig, Sent: Wednesday, June 12, 2019 4:31 PM
+> > >
+> > > First things first:
+> > >
+> > > Yoshihiro, can you try this git branch?  The new bits are just the th=
+ree
+> > > patches at the end, but they sit on top of a few patches already sent
+> > > out to the list, so a branch is probably either:
+> > >
+> > >    git://git.infradead.org/users/hch/misc.git scsi-virt-boundary-fixe=
+s
+> >
+> > Thank you for the patches!
+> > Unfortunately, the three patches could not resolve this issue.
+> > However, it's a hint to me, and then I found the root cause:
+> >  - slave_configure() in drivers/usb/storage/scsiglue.c calls
+> >    blk_queue_max_hw_sectors() with 2048 sectors (1 MiB) when USB_SPEED_=
+SUPER or more.
+> >  -- So that, even if your patches (also I fixed it a little [1]) could =
+not resolve
+> >     the issue because the max_sectors is overwritten by above code.
+> >
+> > So, I think we should fix the slave_configure() by using dma_max_mappin=
+g_size().
+> > What do you think? If so, I can make such a patch.
 >=20
-> Hi Paolo,
->=20
+> Yes, please do.
 
-Hi
+Thank you for your comment. I sent a patch to related mailing lists and you=
+.
 
-> Hope you are doing great!
->=20
+Best regards,
+Yoshihiro Shimoda
 
-Sort of, thanks :)
-
-> I was wondering if you got a chance to post these patches to LKML for
-> review and inclusion... (No hurry, of course!)
->=20
-
-
-I'm having troubles testing these new patches on 5.2-rc4.  As it
-happened with the first release candidates for 5.1, the CPU of my test
-machine (Intel Core i7-2760QM@2.40GHz) is so slowed down that results
-are heavily distorted with every I/O scheduler.
-
-Unfortunately, I'm not competent enough to spot the cause of this
-regression in a feasible amount of time.  I hope it'll go away with
-next release candidates, or I'll test on 5.1.
-
-> Also, since your fixes address the performance issues in BFQ, do you
-> have any thoughts on whether they can be adapted to CFQ as well, to
-> benefit the older stable kernels that still support CFQ?
->=20
-
-I have implanted my fixes on the existing throughput-boosting
-infrastructure of BFQ.  CFQ doesn't have such an infrastructure.
-
-If you need I/O control with older kernels, you may want to check my
-version of BFQ for legacy block, named bfq-sq and available in this
-repo:
-https://github.com/Algodev-github/bfq-mq/
-
-I'm willing to provide you with any information or help if needed.
-
-Thanks,
-Paolo
-
-
-> Thank you!
->=20
-> Regards,
-> Srivatsa
-> VMware Photon OS
-
-
---Apple-Mail=_C82715EC-E52D-48BB-975D-458C5D643A93
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEpYoduex+OneZyvO8OAkCLQGo9oMFAl0B4yQACgkQOAkCLQGo
-9oNOVg/+KTDsN0F9V0g74Et2TxDdqnhABWgQ3HrajfUnRzmLdMR0Tx0C0YUBZM5t
-S3xp4ofC2oP3HItm6gJ+z+Pw/6K+C5k8cd09zRh9W9wkw4dLGXTuotakmMupTpyT
-XTymYIUfHt72H42arlX0dxtoPkhMMRuP7PXKtvbLun4dLiErjGh03Lvs139EQvyJ
-L65pJTeoIaTT7r+MlblZkmaVRpqG/XF8yRzRNg5/pSbkvPhegZsJC7pMMdjwLsK8
-1skizw2Nt1G24RqGSuofRti9lCDPKLSND2t4xBUZ1BWN93f9Nz3Zm8m9ylWiCNGE
-c0G3RpRTknqxbYtkPUr71MJZ63Hl2d5F/02XUkZGkSo7EtOoMKiKCg6VzzIq24JP
-gxL/lMoVO27+JM9DWBUBvdWxkOHtvD1JRAaGX9VWqTi7ksUFDlFHOF83Udyj5HBz
-PJS2TL5dQ+X+l3G7nD3YHJCwSD2+DC1rZPQhj75BGu1CBnGXaEHtEMn3CfmVVQpL
-H0pVqIyF7lnJJu+vEYuea73RfnfSi4FU+MpFFYFCG6fElqUik9X7IzCQRcB6ianK
-vqNbdqMwq9BeFgwm3f09fKzc6JdkBu0YApmPJp9mxeYkvQLJYLxGlyYnUU7ottDL
-4QlYZevYyTv9G+O8HM/l8PuET7+X66xi8Dlj5oGnURXNmRLh64g=
-=PUTU
------END PGP SIGNATURE-----
-
---Apple-Mail=_C82715EC-E52D-48BB-975D-458C5D643A93--
