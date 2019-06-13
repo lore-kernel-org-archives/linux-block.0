@@ -2,130 +2,107 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A1CC31E45
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6911C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:19:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DBA4F2054F
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:13:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEC0720896
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 19:19:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EztMCVPD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726837AbfFMTNO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 15:13:14 -0400
-Received: from outgoing-stata.csail.mit.edu ([128.30.2.210]:36676 "EHLO
-        outgoing-stata.csail.mit.edu" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725842AbfFMTNN (ORCPT
+        id S1727618AbfFMTTS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 15:19:18 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:48754 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725842AbfFMTTS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 15:13:13 -0400
-Received: from [4.30.142.84] (helo=srivatsab-a01.vmware.com)
-        by outgoing-stata.csail.mit.edu with esmtpsa (TLS1.2:RSA_AES_128_CBC_SHA1:128)
-        (Exim 4.82)
-        (envelope-from <srivatsa@csail.mit.edu>)
-        id 1hbV9n-0009Ya-TR; Thu, 13 Jun 2019 15:13:08 -0400
-Subject: Re: CFQ idling kills I/O performance on ext4 with blkio cgroup
- controller
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-fsdevel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-ext4@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Moyer <jmoyer@redhat.com>, Theodore Ts'o <tytso@mit.edu>,
-        amakhalov@vmware.com, anishs@vmware.com, srivatsab@vmware.com,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>
-References: <8d72fcf7-bbb4-2965-1a06-e9fc177a8938@csail.mit.edu>
- <FC24E25F-4578-454D-AE2B-8D8D352478D8@linaro.org>
- <0e3fdf31-70d9-26eb-7b42-2795d4b03722@csail.mit.edu>
- <F5E29C98-6CC4-43B8-994D-0B5354EECBF3@linaro.org>
- <686D6469-9DE7-4738-B92A-002144C3E63E@linaro.org>
- <01d55216-5718-767a-e1e6-aadc67b632f4@csail.mit.edu>
- <CA8A23E2-6F22-4444-9A20-E052A94CAA9B@linaro.org>
- <cc148388-3c82-d7c0-f9ff-8c31bb5dc77d@csail.mit.edu>
- <6FE0A98F-1E3D-4EF6-8B38-2C85741924A4@linaro.org>
- <2A58C239-EF3F-422B-8D87-E7A3B500C57C@linaro.org>
- <a04368ba-f1d5-8f2c-1279-a685a137d024@csail.mit.edu>
- <E270AD92-943E-4529-8158-AB480D6D9DF8@linaro.org>
- <5b71028c-72f0-73dd-0cd5-f28ff298a0a3@csail.mit.edu>
- <FFA44D26-75FF-4A8E-A331-495349BE5FFC@linaro.org>
- <0d6e3c02-1952-2177-02d7-10ebeb133940@csail.mit.edu>
- <7B74A790-BD98-412B-ADAB-3B513FB1944E@linaro.org>
- <6a6f4aa4-fc95-f132-55b2-224ff52bd2d8@csail.mit.edu>
- <7c5e9d11-4a3d-7df4-c1e6-7c95919522ab@csail.mit.edu>
- <43486E4F-2237-4E40-BDFE-07CFCCFFFA25@linaro.org>
-From:   "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-Message-ID: <72856150-d678-42bd-0377-82dbee6513ba@csail.mit.edu>
-Date:   Thu, 13 Jun 2019 12:13:05 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.0
+        Thu, 13 Jun 2019 15:19:18 -0400
+X-Greylist: delayed 5688 seconds by postgrey-1.27 at vger.kernel.org; Thu, 13 Jun 2019 15:19:17 EDT
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5DHhgvL054116;
+        Thu, 13 Jun 2019 17:43:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=j84ZJa4X+x5WSx5QJGHY2SflMYwM961qM/LO80WmcPg=;
+ b=EztMCVPD0NBZOtvnuD9FgBhXYSoJVTpJ7JlEchc9rGYRkL+CmJ65ucac6fszbb3XVUvq
+ 2OimAdIwg50EFJXg1bAlJso1vF7yGQ9Gg4ioxO/UusJr8WLJTUqhXDD8hiOVRkV8PYEY
+ dMXfE365EzZu0RHvl13HSWqLXoYbHuVSIVvFRHDdSAGGL+fjJ4rbMJzr/+FNSkZpLW73
+ ym0tLFcegKcyVX3emEZXuE/sfUFU1jh0lkaNa7Xi2r9SXupeqZi+JUrYqMSyKv7y22tW
+ 1BMa2KYf3RheLhPP9sxsCmERAA8VVeOWmJllb88F2SPLHnKfPo3S8FLSDt0k/2mMNtaB +g== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2t04ynu1ex-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Jun 2019 17:43:58 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5DHhrXH153828;
+        Thu, 13 Jun 2019 17:43:58 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3030.oracle.com with ESMTP id 2t04j0kg1w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Jun 2019 17:43:57 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5DHh2rF004452;
+        Thu, 13 Jun 2019 17:43:02 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 13 Jun 2019 10:43:02 -0700
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org, hch@lst.de, hare@suse.com
+Subject: Re: [PATCH V2 2/2] block: add more debug data to print_req_err
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190613141629.2893-1-chaitanya.kulkarni@wdc.com>
+        <20190613141629.2893-3-chaitanya.kulkarni@wdc.com>
+        <d369fbbd-0d98-b804-619b-23049ee12398@acm.org>
+        <yq1d0jhtoii.fsf@oracle.com>
+        <be1e3944-4f5a-ca40-1496-614058fd3bb2@acm.org>
+Date:   Thu, 13 Jun 2019 13:43:00 -0400
+In-Reply-To: <be1e3944-4f5a-ca40-1496-614058fd3bb2@acm.org> (Bart Van Assche's
+        message of "Thu, 13 Jun 2019 10:05:12 -0700")
+Message-ID: <yq1tvcts7ob.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <43486E4F-2237-4E40-BDFE-07CFCCFFFA25@linaro.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9287 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906130130
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9287 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906130130
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/12/19 10:46 PM, Paolo Valente wrote:
-> 
->> Il giorno 12 giu 2019, alle ore 00:34, Srivatsa S. Bhat <srivatsa@csail.mit.edu> ha scritto:
->>
-[...]
->>
->> Hi Paolo,
->>
-> 
-> Hi
-> 
->> Hope you are doing great!
->>
-> 
-> Sort of, thanks :)
-> 
->> I was wondering if you got a chance to post these patches to LKML for
->> review and inclusion... (No hurry, of course!)
->>
-> 
-> 
-> I'm having troubles testing these new patches on 5.2-rc4.  As it
-> happened with the first release candidates for 5.1, the CPU of my test
-> machine (Intel Core i7-2760QM@2.40GHz) is so slowed down that results
-> are heavily distorted with every I/O scheduler.
-> 
 
-Oh, that's unfortunate!
+Bart,
 
-> Unfortunately, I'm not competent enough to spot the cause of this
-> regression in a feasible amount of time.  I hope it'll go away with
-> next release candidates, or I'll test on 5.1.
-> 
+> I'm in favor of improving consistency. But are you sure that we can
+> modify the tracing output format without breaking any applications?
 
-Sounds good to me!
+Chaitanya is already working on enhancing tracing. I seem to recall
+blktrace being fairly flexible with what it digests.
 
->> Also, since your fixes address the performance issues in BFQ, do you
->> have any thoughts on whether they can be adapted to CFQ as well, to
->> benefit the older stable kernels that still support CFQ?
->>
-> 
-> I have implanted my fixes on the existing throughput-boosting
-> infrastructure of BFQ.  CFQ doesn't have such an infrastructure.
-> 
-> If you need I/O control with older kernels, you may want to check my
-> version of BFQ for legacy block, named bfq-sq and available in this
-> repo:
-> https://github.com/Algodev-github/bfq-mq/
->
+On top of that, we also have the option of changing the error path
+output as opposed to changing the tracing ditto should that be an issue.
 
-Great! Thank you for sharing this!
- 
-> I'm willing to provide you with any information or help if needed.
-> 
-Thank you!
+My main point is that there is probably going to be close to a 1:1
+mapping between what you would want to see in an error message and what
+you would want to see in tracing. So it would be good to use the same
+plumbing for both.
 
-Regards,
-Srivatsa
-VMware Photon OS
+-- 
+Martin K. Petersen	Oracle Linux Engineering
