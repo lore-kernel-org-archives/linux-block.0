@@ -2,101 +2,88 @@ Return-Path: <SRS0=P8f/=UM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C6FC468B0
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 23:01:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E6E9C31E45
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 23:32:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CF90521537
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 23:01:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560466867;
-	bh=ijAoTvben3xHdJwjFjc2JVq20l3k6CT0SJjNIni16EE=;
-	h=Subject:To:Cc:References:From:Date:In-Reply-To:List-ID:From;
-	b=py96+Jwa2hpARq3mst+rgATY+ZUVczaDRwOhbTp84DDydbZXEDTZKN2OHhxpGxenO
-	 d6WHwP6dHYpQ6IvoNhBAyL4RtKGVNE3orG004iP6or+FJMQcQVPJHISuaAPtkY4YDs
-	 FZzoL/8cX56/PDs9m/HoeYdT+2DMgIC/56GT1ySA=
+	by mail.kernel.org (Postfix) with ESMTP id 0884620896
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jun 2019 23:32:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727028AbfFMXBH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 19:01:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42192 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726296AbfFMXBH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 19:01:07 -0400
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C71622147A;
-        Thu, 13 Jun 2019 23:01:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560466866;
-        bh=ijAoTvben3xHdJwjFjc2JVq20l3k6CT0SJjNIni16EE=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=l7CW3kEbIEfMPyQKq84ka0PeuSuwdqPEd/rBwzyb+r1FqLLqyErPP9Iw42L52TmB5
-         2Uy1rIkSbsHxHYYCWBq3FZuNZTXRsZ2QRyHKWJRpBXggeBKNkX5qMpxYhhmmT5vXeb
-         r3sXe5wfp6Fftm3kLieDRdFmX+o6d0kmUyHdR3fc=
-Subject: Re: How to resolve an issue in swiotlb environment?
-To:     Alan Stern <stern@rowland.harvard.edu>,
-        Christoph Hellwig <hch@lst.de>,
-        Valentina Manea <valentina.manea.m@gmail.com>
-Cc:     Oliver Neukum <oneukum@suse.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        shuah <shuah@kernel.org>
-References: <Pine.LNX.4.44L0.1906131306580.1307-100000@iolanthe.rowland.org>
-From:   shuah <shuah@kernel.org>
-Message-ID: <41caad16-3fa1-413b-0d49-594d48b88de4@kernel.org>
-Date:   Thu, 13 Jun 2019 17:01:05 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726519AbfFMXcY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 19:32:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44350 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726265AbfFMXcY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 19:32:24 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5DNC4fM061158;
+        Thu, 13 Jun 2019 19:32:23 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2t3xb2kmr8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Jun 2019 19:32:23 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5DNCwX7030472;
+        Thu, 13 Jun 2019 23:32:22 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma03dal.us.ibm.com with ESMTP id 2t1x6frja6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Jun 2019 23:32:22 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5DNWKSD34931114
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Jun 2019 23:32:20 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C4177BE054;
+        Thu, 13 Jun 2019 23:32:20 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C088ABE058;
+        Thu, 13 Jun 2019 23:32:19 +0000 (GMT)
+Received: from LeoBras.aus.stglabs.ibm.com (unknown [9.18.235.170])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 13 Jun 2019 23:32:19 +0000 (GMT)
+From:   Leonardo Bras <leonardo@linux.ibm.com>
+To:     linux-block@vger.kernel.org
+Cc:     Leonardo Bras <leonardo@linux.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/1] block/cfq : Include check to avoid NULL Pointer
+Date:   Thu, 13 Jun 2019 20:31:58 -0300
+Message-Id: <20190613233159.26687-1-leonardo@linux.ibm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <Pine.LNX.4.44L0.1906131306580.1307-100000@iolanthe.rowland.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-13_14:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=790 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906130176
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/13/19 11:16 AM, Alan Stern wrote:
-> On Thu, 13 Jun 2019, Christoph Hellwig wrote:
-> 
->> On Wed, Jun 12, 2019 at 10:43:11AM -0400, Alan Stern wrote:
->>> Would it be okay to rely on the assumption that USB block devices never
->>> have block size < 512?  (We could even add code to the driver to
->>> enforce this, although refusing to handle such devices at all might be
->>> worse than getting an occasional error.)
->>
->> sd.c only supports a few specific sector size, and none of them is
->> < 512 bytes:
->>
->> 	if (sector_size != 512 &&
->> 	    sector_size != 1024 &&
->> 	    sector_size != 2048 &&
->> 	    sector_size != 4096) {
->> 	    	...
->> 		sdkp->capacity = 0;
-> 
-> Great!  So all we have to do is fix vhci-hcd.  Then we can remove all
-> the virt_boundary_mask stuff from usb-storage and uas entirely.
-> 
-> (I'm assuming wireless USB isn't a genuine issue.  As far as I know, it
-> is pretty much abandoned at this point.)
-> 
-> Valentina and Shua: Adding SG support to vhci-hcd shouldn't be too
-> hard.  It ought to be possible even without changing the network
-> protocol.
-> 
+I believe to have found a NULL pointer dereference on the code, but as
+I am new to this code I would like the opinion of more experienced people.
 
-I will start taking a look at this. Is there a target release in plan
-to drop virt_boundary_mask stuff?
+I am not sure if it is the right procedure to send it here, since this file
+is not on the tree since v4.20. But as it still affects many stable releases,
+I think it's worth the try.
 
-thanks,
--- Shuah
+Please let me know if there is a better procedure on this.
+
+Leonardo Bras (1):
+  block/cfq : Include check to avoid NULL Pointer Dereferencing
+
+ block/cfq-iosched.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+-- 
+2.20.1
 
