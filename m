@@ -4,69 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE2CDC31E49
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 00:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FAD0C31E45
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 00:34:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8560C20B7C
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 00:34:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAA1720B7C
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 00:34:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560472471;
-	bh=caSPBm/EN4PyEOtGGZ4M4RWpB/2SMPB7L6hCEkMm6rA=;
+	s=default; t=1560472474;
+	bh=hJhpeWcfPm2NFKF6RdvkHmNrXlJJRaP6ZHjQS6fFjMo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=x42ve+pngNlRzat9Ggbyr7r55QQzj/2MISNOaXvaaNLMPE7sgqT1aXP9s/IhPzbqg
-	 5+J1dBu4D2tIAPFTFGetoXnIXsw/C2LioGTGVOV5vT3o7tvA2YBtVI1ziBHiyOl/R4
-	 AYVVmYT3EOe/9hEC4MT0OR0qFjpYeXX6l8mg1xFk=
+	b=WzFMNa6GBgdwjM1G5MlRKFqaqr3LjcIEnrKCjKqWoxrz1zqmoZi/H3vmail+9D4o5
+	 Da1ZKcaft1hpS4QBsT4Zfkzj2/AEV9UtdPMdFLrR7lT/qNgccrav1sjFQn1w1Qtzya
+	 nQMkvnJsZ0KUKcqKG3VpdjroALxVMSR627aIbNcY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727290AbfFNAeK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 20:34:10 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:44974 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727131AbfFNAeJ (ORCPT
+        id S1727158AbfFNAeF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 20:34:05 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:44610 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727131AbfFNAeE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 20:34:09 -0400
-Received: by mail-pf1-f196.google.com with SMTP id t16so264917pfe.11;
-        Thu, 13 Jun 2019 17:34:09 -0700 (PDT)
+        Thu, 13 Jun 2019 20:34:04 -0400
+Received: by mail-pg1-f194.google.com with SMTP id n2so447870pgp.11;
+        Thu, 13 Jun 2019 17:34:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=B/Vt9MyMtLSprSkCPoNLLFZLeevCHMFAkIZcFHo/83Q=;
-        b=WGa9hHFfN8Ll9X1LHhox3hfYJAtpD6OaHmCU6iSakFBAGLC1RZ98CS3LdaLN1Gu/ZV
-         /qC3VbKHi+3x/veBLqFb1lP5PTdZox1/Y35aNHuXs4D9nLvOYqf20JrgKbQKKmv19LDG
-         uwt6Y5lBqY7F/JauKo0hvJpvkNyWrC5E/eeb/ja07oTyQivH+bqHzwd/t2UROvrJ1w4m
-         wZAUPXo9RMu7jwtWCNmLOiGpsLmoIDJ0AgG6sXsp4NE6V+UjHDnKup1UasJXYjVt1i6O
-         2tq8Zem87W3mcax7uNdVI8opovS23uYSEcZEOQ0ykOvIs10wn101pW0jey4CQ38uSBfe
-         SEVA==
+        bh=CrY+KbreoYfldBeV5zPNnyWU1ofuXbFZm/3YwXQdBT4=;
+        b=M28Z4fmsM72cbEt5AgFedpHmNIsfMN+JgMEM3X0yRielVNeNhLVVqhbHDQy5vvhIW8
+         HomqwqRy5qKYPssOmd6gLUJcV1tpMloUMMHtqQpnNZ9HJCyb9GadIyM5aw19qc8+ZXCe
+         VrTI/ysbSaww7UZZFLnVj+O9kDCo74ue6x+FeOQ3a2zzaQ5QCzU6Q7NEcwNiGJU5eU7S
+         MvjR9Pm2Iy57CHUFwZsP8nbdAy3SEhPkJqQ9tBveeNYkyhJrrrZjGkiNFcC20oJOp63H
+         4vlxSGB5N2vz5rZrk1HMqzb1MF0LeBnDUNMzWIE4Ijv+IbhX7tb7R3ATCtge81shLEV7
+         /57g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=B/Vt9MyMtLSprSkCPoNLLFZLeevCHMFAkIZcFHo/83Q=;
-        b=s+7TcFPjGJ1AJ7g/kn9GVOXssEl0rjflEs6VkQMbSs0sTDJ7LC5y77G0VOtXyF5MSJ
-         bduCpChJroyL7MNaMPV/GRGdTSmhYyr+y3cfIdpIQ4OxwC19mqF76LVtAa+52daxDQUm
-         Lrk8vOhz7OdIrWjKDhb61HcHSPTKb8vmmrB8hcFAAOSZTMCelap/EJjLa0dAblrp9Mrs
-         /DH8PircjtYXl6Mpe71nPfEu3+O03Iekq+siMwqFV1562sPMLVdB+w6eufTQt2h0kIg+
-         2Yf8UIGRj8gwYhCTr6JUPbrbXuvZjXDG42Yc8QZQ9HLpnWUpUimZn/+j8bpnMsu+Gota
-         OJOQ==
-X-Gm-Message-State: APjAAAWc3GjumuzNYKr0DMbMkmBGkDoMJsWzVgK6DPdem1pLmp3O1K8z
-        cTwFf5qECbn9cSnyZaXXaZDWCa8a
-X-Google-Smtp-Source: APXvYqwat4Xy+uX5U9Ip0i+sQbDbsoUG/H2DmFDer4qV6d8Hy2N1SFMedgp3iW8IOOUKoTip4EwWDw==
-X-Received: by 2002:a17:90b:d8b:: with SMTP id bg11mr8215737pjb.30.1560472448759;
-        Thu, 13 Jun 2019 17:34:08 -0700 (PDT)
+        bh=CrY+KbreoYfldBeV5zPNnyWU1ofuXbFZm/3YwXQdBT4=;
+        b=HxeeRzsPU4EHCQPI8Ko9yxK3o+vVDvJN4DNtfN66WPVjEvhmPHmQaaGXmk9S7HbQRO
+         CCmZm64xfY/0R7C7HjU2SqKDs8FiD1F5NYOSMzx7QVepHDvbja+XThVYtLvlw5gV81YH
+         P99YZNil3jgJzmsGxnYol9ffBZEdKw21f6GfEVopkcXgnFW9cWJhUhXIVf+ydZCahmk7
+         dhh8JhZYm5AtQAq4EhXHw1f4denxqrkizxBv6Rj+g/gqzIl7eqYH5CjsZ0jMKEYJd380
+         nsGgpJj4yL6Ig6RHrXm5+tNxQyQQYy//5+m586ZA3cYsXOiCp8toTlsG9J8ohaXyjxNx
+         hLtQ==
+X-Gm-Message-State: APjAAAUNAsUER7dPBIjPYsd5DoBHsUuOSYCPLDY/DCNiciJwO2VpXyk1
+        vFi3B3/D/5rJ+lFFeA9Bw0k=
+X-Google-Smtp-Source: APXvYqzgYmsCZbDvDBYklA/y0gChrsQ3rmaEl5P4PAB8IaWAOT96tK7DZChQsR04mJWj8K5aU4nwQg==
+X-Received: by 2002:a17:90a:d34f:: with SMTP id i15mr8252804pjx.1.1560472443647;
+        Thu, 13 Jun 2019 17:34:03 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:500::2:9d14])
-        by smtp.gmail.com with ESMTPSA id y22sm870240pfo.39.2019.06.13.17.34.08
+        by smtp.gmail.com with ESMTPSA id l20sm787797pff.102.2019.06.13.17.34.03
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 17:34:08 -0700 (PDT)
+        Thu, 13 Jun 2019 17:34:03 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
         axboe@kernel.dk, jack@suse.cz
 Cc:     linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org, kernel-team@fb.com
-Subject: [PATCH 6/8] Btrfs: only associate the locked page with one async_cow struct
-Date:   Thu, 13 Jun 2019 17:33:48 -0700
-Message-Id: <20190614003350.1178444-7-tj@kernel.org>
+Subject: [PATCH 4/8] Btrfs: stop using btrfs_schedule_bio()
+Date:   Thu, 13 Jun 2019 17:33:46 -0700
+Message-Id: <20190614003350.1178444-5-tj@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190614003350.1178444-1-tj@kernel.org>
 References: <20190614003350.1178444-1-tj@kernel.org>
@@ -77,153 +77,228 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chris Mason <clm@fb.com>
 
-The btrfs writepages function collects a large range of pages flagged
-for delayed allocation, and then sends them down through the COW code
-for processing.  When compression is on, we allocate one async_cow
-structure for every 512K, and then run those pages through the
-compression code for IO submission.
+btrfs_schedule_bio() hands IO off to a helper thread to do the actual
+submit_bio() call.  This has been used to make sure async crc and
+compression helpers don't get stuck on IO submission.  To maintain good
+performance, over time the IO submission threads duplicated some IO
+scheduler characteristics such as high and low priority IOs and they
+also made some ugly assumptions about request allocation batch sizes.
 
-writepages starts all of this off with a single page, locked by
-the original call to extent_write_cache_pages(), and it's important to
-keep track of this page because it has already been through
-clear_page_dirty_for_io().
-
-The btrfs async_cow struct has a pointer to the locked_page, and when
-we're redirtying the page because compression had to fallback to
-uncompressed IO, we use page->index to decide if a given async_cow
-struct really owns that page.
-
-But, this is racey.  If a given delalloc range is broken up into two
-async_cows (cow_A and cow_B), we can end up with something like this:
-
-compress_file_range(cowA)
-submit_compress_extents(cowA)
-submit compressed bios(cowA)
-put_page(locked_page)
-
-				compress_file_range(cowB)
-				...
-
-The end result is that cowA is completed and cleaned up before cowB even
-starts processing.  This means we can free locked_page() and reuse it
-elsewhere.  If we get really lucky, it'll have the same page->index in
-its new home as it did before.
-
-While we're processing cowB, we might decide we need to fall back to
-uncompressed IO, and so compress_file_range() will call
-__set_page_dirty_nobufers() on cowB->locked_page.
-
-Without cgroups in use, this creates as a phantom dirty page, which
-isn't great but isn't the end of the world.  With cgroups in use, we
-might crash in the accounting code because page->mapping->i_wb isn't
-set.
-
-[ 8308.523110] BUG: unable to handle kernel NULL pointer dereference at 00000000000000d0
-[ 8308.531084] IP: percpu_counter_add_batch+0x11/0x70
-[ 8308.538371] PGD 66534e067 P4D 66534e067 PUD 66534f067 PMD 0
-[ 8308.541750] Oops: 0000 [#1] SMP DEBUG_PAGEALLOC
-[ 8308.551948] CPU: 16 PID: 2172 Comm: rm Not tainted
-[ 8308.566883] RIP: 0010:percpu_counter_add_batch+0x11/0x70
-[ 8308.567891] RSP: 0018:ffffc9000a97bbe0 EFLAGS: 00010286
-[ 8308.568986] RAX: 0000000000000005 RBX: 0000000000000090 RCX: 0000000000026115
-[ 8308.570734] RDX: 0000000000000030 RSI: ffffffffffffffff RDI: 0000000000000090
-[ 8308.572543] RBP: 0000000000000000 R08: fffffffffffffff5 R09: 0000000000000000
-[ 8308.573856] R10: 00000000000260c0 R11: ffff881037fc26c0 R12: ffffffffffffffff
-[ 8308.580099] R13: ffff880fe4111548 R14: ffffc9000a97bc90 R15: 0000000000000001
-[ 8308.582520] FS:  00007f5503ced480(0000) GS:ffff880ff7200000(0000) knlGS:0000000000000000
-[ 8308.585440] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 8308.587951] CR2: 00000000000000d0 CR3: 00000001e0459005 CR4: 0000000000360ee0
-[ 8308.590707] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[ 8308.592865] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[ 8308.594469] Call Trace:
-[ 8308.595149]  account_page_cleaned+0x15b/0x1f0
-[ 8308.596340]  __cancel_dirty_page+0x146/0x200
-[ 8308.599395]  truncate_cleanup_page+0x92/0xb0
-[ 8308.600480]  truncate_inode_pages_range+0x202/0x7d0
-[ 8308.617392]  btrfs_evict_inode+0x92/0x5a0
-[ 8308.619108]  evict+0xc1/0x190
-[ 8308.620023]  do_unlinkat+0x176/0x280
-[ 8308.621202]  do_syscall_64+0x63/0x1a0
-[ 8308.623451]  entry_SYSCALL_64_after_hwframe+0x42/0xb7
-
-The fix here is to make asyc_cow->locked_page NULL everywhere but the
-one async_cow struct that's allowed to do things to the locked page.
+All of this cost at least one extra context switch during IO submission,
+and doesn't fit well with the modern blkmq IO stack.  So, this commit stops
+using btrfs_schedule_bio().  We may need to adjust the number of async
+helper threads for crcs and compression, but long term it's a better
+path.
 
 Signed-off-by: Chris Mason <clm@fb.com>
-Fixes: 771ed689d2cd ("Btrfs: Optimize compressed writeback and reads")
 ---
- fs/btrfs/extent_io.c |  2 +-
- fs/btrfs/inode.c     | 25 +++++++++++++++++++++----
- 2 files changed, 22 insertions(+), 5 deletions(-)
+ fs/btrfs/compression.c |  8 +++---
+ fs/btrfs/disk-io.c     |  6 ++---
+ fs/btrfs/inode.c       |  6 ++---
+ fs/btrfs/volumes.c     | 55 +++---------------------------------------
+ fs/btrfs/volumes.h     |  2 +-
+ 5 files changed, 15 insertions(+), 62 deletions(-)
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 13fca7bfc1f2..9f223d7d78c0 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -1838,7 +1838,7 @@ static int __process_pages_contig(struct address_space *mapping,
- 			if (page_ops & PAGE_SET_PRIVATE2)
- 				SetPagePrivate2(pages[i]);
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index 4ec1df369e47..873261b932b8 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -355,7 +355,7 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
+ 				BUG_ON(ret); /* -ENOMEM */
+ 			}
  
--			if (pages[i] == locked_page) {
-+			if (locked_page && pages[i] == locked_page) {
- 				put_page(pages[i]);
- 				pages_locked++;
- 				continue;
+-			ret = btrfs_map_bio(fs_info, bio, 0, 1);
++			ret = btrfs_map_bio(fs_info, bio, 0);
+ 			if (ret) {
+ 				bio->bi_status = ret;
+ 				bio_endio(bio);
+@@ -385,7 +385,7 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
+ 		BUG_ON(ret); /* -ENOMEM */
+ 	}
+ 
+-	ret = btrfs_map_bio(fs_info, bio, 0, 1);
++	ret = btrfs_map_bio(fs_info, bio, 0);
+ 	if (ret) {
+ 		bio->bi_status = ret;
+ 		bio_endio(bio);
+@@ -638,7 +638,7 @@ blk_status_t btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
+ 			sums += DIV_ROUND_UP(comp_bio->bi_iter.bi_size,
+ 					     fs_info->sectorsize);
+ 
+-			ret = btrfs_map_bio(fs_info, comp_bio, mirror_num, 0);
++			ret = btrfs_map_bio(fs_info, comp_bio, mirror_num);
+ 			if (ret) {
+ 				comp_bio->bi_status = ret;
+ 				bio_endio(comp_bio);
+@@ -662,7 +662,7 @@ blk_status_t btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
+ 		BUG_ON(ret); /* -ENOMEM */
+ 	}
+ 
+-	ret = btrfs_map_bio(fs_info, comp_bio, mirror_num, 0);
++	ret = btrfs_map_bio(fs_info, comp_bio, mirror_num);
+ 	if (ret) {
+ 		comp_bio->bi_status = ret;
+ 		bio_endio(comp_bio);
+diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
+index 663efce22d98..b34240406f36 100644
+--- a/fs/btrfs/disk-io.c
++++ b/fs/btrfs/disk-io.c
+@@ -800,7 +800,7 @@ static void run_one_async_done(struct btrfs_work *work)
+ 	}
+ 
+ 	ret = btrfs_map_bio(btrfs_sb(inode->i_sb), async->bio,
+-			async->mirror_num, 1);
++			    async->mirror_num);
+ 	if (ret) {
+ 		async->bio->bi_status = ret;
+ 		bio_endio(async->bio);
+@@ -901,12 +901,12 @@ static blk_status_t btree_submit_bio_hook(struct inode *inode, struct bio *bio,
+ 					  BTRFS_WQ_ENDIO_METADATA);
+ 		if (ret)
+ 			goto out_w_error;
+-		ret = btrfs_map_bio(fs_info, bio, mirror_num, 0);
++		ret = btrfs_map_bio(fs_info, bio, mirror_num);
+ 	} else if (!async) {
+ 		ret = btree_csum_one_bio(bio);
+ 		if (ret)
+ 			goto out_w_error;
+-		ret = btrfs_map_bio(fs_info, bio, mirror_num, 0);
++		ret = btrfs_map_bio(fs_info, bio, mirror_num);
+ 	} else {
+ 		/*
+ 		 * kthread helpers are used to submit writes so that
 diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 91b161fb1521..df5527cc07b9 100644
+index d519c3520e87..91b161fb1521 100644
 --- a/fs/btrfs/inode.c
 +++ b/fs/btrfs/inode.c
-@@ -666,10 +666,12 @@ static noinline void compress_file_range(struct async_chunk *async_chunk,
- 	 * to our extent and set things up for the async work queue to run
- 	 * cow_file_range to do the normal delalloc dance.
- 	 */
--	if (page_offset(async_chunk->locked_page) >= start &&
--	    page_offset(async_chunk->locked_page) <= end)
-+	if (async_chunk->locked_page &&
-+	    (page_offset(async_chunk->locked_page) >= start &&
-+	     page_offset(async_chunk->locked_page)) <= end) {
- 		__set_page_dirty_nobuffers(async_chunk->locked_page);
- 		/* unlocked later on in the async handlers */
-+	}
+@@ -2032,7 +2032,7 @@ static blk_status_t btrfs_submit_bio_hook(struct inode *inode, struct bio *bio,
+ 	}
  
- 	if (redirty)
- 		extent_range_redirty_for_io(inode, start, end);
-@@ -759,7 +761,7 @@ static noinline void submit_compressed_extents(struct async_chunk *async_chunk)
- 						  async_extent->start +
- 						  async_extent->ram_size - 1,
- 						  WB_SYNC_ALL);
--			else if (ret)
-+			else if (ret && async_chunk->locked_page)
- 				unlock_page(async_chunk->locked_page);
- 			kfree(async_extent);
- 			cond_resched();
-@@ -1236,10 +1238,25 @@ static int cow_file_range_async(struct inode *inode, struct page *locked_page,
- 		async_chunk[i].inode = inode;
- 		async_chunk[i].start = start;
- 		async_chunk[i].end = cur_end;
--		async_chunk[i].locked_page = locked_page;
- 		async_chunk[i].write_flags = write_flags;
- 		INIT_LIST_HEAD(&async_chunk[i].extents);
+ mapit:
+-	ret = btrfs_map_bio(fs_info, bio, mirror_num, 0);
++	ret = btrfs_map_bio(fs_info, bio, mirror_num);
  
-+		/*
-+		 * The locked_page comes all the way from writepage and its
-+		 * the original page we were actually given.  As we spread
-+		 * this large delalloc region across multiple async_cow
-+		 * structs, only the first struct needs a pointer to locked_page
-+		 *
-+		 * This way we don't need racey decisions about who is supposed
-+		 * to unlock it.
-+		 */
-+		if (locked_page) {
-+			async_chunk[i].locked_page = locked_page;
-+			locked_page = NULL;
-+		} else {
-+			async_chunk[i].locked_page = NULL;
-+		}
-+
- 		btrfs_init_work(&async_chunk[i].work,
- 				btrfs_delalloc_helper,
- 				async_cow_start, async_cow_submit,
+ out:
+ 	if (ret) {
+@@ -7764,7 +7764,7 @@ static inline blk_status_t submit_dio_repair_bio(struct inode *inode,
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = btrfs_map_bio(fs_info, bio, mirror_num, 0);
++	ret = btrfs_map_bio(fs_info, bio, mirror_num);
+ 
+ 	return ret;
+ }
+@@ -8295,7 +8295,7 @@ static inline blk_status_t btrfs_submit_dio_bio(struct bio *bio,
+ 			goto err;
+ 	}
+ map:
+-	ret = btrfs_map_bio(fs_info, bio, 0, 0);
++	ret = btrfs_map_bio(fs_info, bio, 0);
+ err:
+ 	return ret;
+ }
+diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
+index 1c2a6e4b39da..72326cc23985 100644
+--- a/fs/btrfs/volumes.c
++++ b/fs/btrfs/volumes.c
+@@ -6386,52 +6386,8 @@ static void btrfs_end_bio(struct bio *bio)
+ 	}
+ }
+ 
+-/*
+- * see run_scheduled_bios for a description of why bios are collected for
+- * async submit.
+- *
+- * This will add one bio to the pending list for a device and make sure
+- * the work struct is scheduled.
+- */
+-static noinline void btrfs_schedule_bio(struct btrfs_device *device,
+-					struct bio *bio)
+-{
+-	struct btrfs_fs_info *fs_info = device->fs_info;
+-	int should_queue = 1;
+-	struct btrfs_pending_bios *pending_bios;
+-
+-	/* don't bother with additional async steps for reads, right now */
+-	if (bio_op(bio) == REQ_OP_READ) {
+-		btrfsic_submit_bio(bio);
+-		return;
+-	}
+-
+-	WARN_ON(bio->bi_next);
+-	bio->bi_next = NULL;
+-
+-	spin_lock(&device->io_lock);
+-	if (op_is_sync(bio->bi_opf))
+-		pending_bios = &device->pending_sync_bios;
+-	else
+-		pending_bios = &device->pending_bios;
+-
+-	if (pending_bios->tail)
+-		pending_bios->tail->bi_next = bio;
+-
+-	pending_bios->tail = bio;
+-	if (!pending_bios->head)
+-		pending_bios->head = bio;
+-	if (device->running_pending)
+-		should_queue = 0;
+-
+-	spin_unlock(&device->io_lock);
+-
+-	if (should_queue)
+-		btrfs_queue_work(fs_info->submit_workers, &device->work);
+-}
+-
+ static void submit_stripe_bio(struct btrfs_bio *bbio, struct bio *bio,
+-			      u64 physical, int dev_nr, int async)
++			      u64 physical, int dev_nr)
+ {
+ 	struct btrfs_device *dev = bbio->stripes[dev_nr].dev;
+ 	struct btrfs_fs_info *fs_info = bbio->fs_info;
+@@ -6449,10 +6405,7 @@ static void submit_stripe_bio(struct btrfs_bio *bbio, struct bio *bio,
+ 
+ 	btrfs_bio_counter_inc_noblocked(fs_info);
+ 
+-	if (async)
+-		btrfs_schedule_bio(dev, bio);
+-	else
+-		btrfsic_submit_bio(bio);
++	btrfsic_submit_bio(bio);
+ }
+ 
+ static void bbio_error(struct btrfs_bio *bbio, struct bio *bio, u64 logical)
+@@ -6473,7 +6426,7 @@ static void bbio_error(struct btrfs_bio *bbio, struct bio *bio, u64 logical)
+ }
+ 
+ blk_status_t btrfs_map_bio(struct btrfs_fs_info *fs_info, struct bio *bio,
+-			   int mirror_num, int async_submit)
++			   int mirror_num)
+ {
+ 	struct btrfs_device *dev;
+ 	struct bio *first_bio = bio;
+@@ -6542,7 +6495,7 @@ blk_status_t btrfs_map_bio(struct btrfs_fs_info *fs_info, struct bio *bio,
+ 			bio = first_bio;
+ 
+ 		submit_stripe_bio(bbio, bio, bbio->stripes[dev_nr].physical,
+-				  dev_nr, async_submit);
++				  dev_nr);
+ 	}
+ 	btrfs_bio_counter_dec(fs_info);
+ 	return BLK_STS_OK;
+diff --git a/fs/btrfs/volumes.h b/fs/btrfs/volumes.h
+index b8a0e8d0672d..8c7bd79b234a 100644
+--- a/fs/btrfs/volumes.h
++++ b/fs/btrfs/volumes.h
+@@ -415,7 +415,7 @@ int btrfs_alloc_chunk(struct btrfs_trans_handle *trans, u64 type);
+ void btrfs_mapping_init(struct btrfs_mapping_tree *tree);
+ void btrfs_mapping_tree_free(struct btrfs_mapping_tree *tree);
+ blk_status_t btrfs_map_bio(struct btrfs_fs_info *fs_info, struct bio *bio,
+-			   int mirror_num, int async_submit);
++			   int mirror_num);
+ int btrfs_open_devices(struct btrfs_fs_devices *fs_devices,
+ 		       fmode_t flags, void *holder);
+ struct btrfs_device *btrfs_scan_one_device(const char *path,
 -- 
 2.17.1
 
