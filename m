@@ -6,144 +6,85 @@ X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5995C31E4D
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 17:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C629C31E4E
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 17:28:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8F8B22183E
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 17:09:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F332217F9
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 17:28:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560532162;
-	bh=hRlM/pTJwVJK1sEaTta+EB9st5BQlqr/0Dx0uQ/sEuY=;
+	s=default; t=1560533338;
+	bh=4683ClDaIiLcsvAViN+EPI6B6BEsXS+iRBo2ab4wGwU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=KDF08U1tAOL6Lq1OTJf+1Ynbg8v+X0UpiRPaXQeN69wTqfnROku67nGfXIV8ZmwyC
-	 31ZP6XpOrFDxGTMkVAqltPFWHAOIUR25RDddKrR+E2eVNmxQmbWAIcM+vYJtmZRsxX
-	 nNFrSS8Q89lvUWPdp8SjXahtaDGt84QHHyih44aA=
+	b=NJPTjFALN2sgLlc317MNoLdSxYUNDIynM4HCPNwZhv9LjAFtgkhdQiOGltKKf4TS8
+	 J2dFPNQTHtVgfVOQXzZPYyoVBzJ/Oluxvc385+SARFUmu36uYdc0UiGlIFeWWMYGHL
+	 yjU08qIk0LiRBt5sts0vpUWtTMPzBHHYdlgTlCzs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726274AbfFNRJS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jun 2019 13:09:18 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:45975 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725808AbfFNRJR (ORCPT
+        id S1725868AbfFNR2w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jun 2019 13:28:52 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:42290 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725852AbfFNR2w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jun 2019 13:09:17 -0400
-Received: by mail-qt1-f195.google.com with SMTP id j19so3262528qtr.12;
-        Fri, 14 Jun 2019 10:09:17 -0700 (PDT)
+        Fri, 14 Jun 2019 13:28:52 -0400
+Received: by mail-qt1-f194.google.com with SMTP id s15so3356134qtk.9;
+        Fri, 14 Jun 2019 10:28:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=8wh55Cc5i2Lm0uKQU6Z1K0oTPrUc8lTykFYnyLF1hmI=;
-        b=Xj7snfT/PvWl6aBQDyjdw33T+D2UjBfUv8RjbVPeLJPCahk+HvjxdswjSWDN7oIr3C
-         VQqddC+9kvHVUKM8EGbrAmYUV0+0j4Bi4GJOz0KS7SWEutrJnQ9h6o629P1e7aXgz1hG
-         jYAAyP+qXwhwdMKmCGbXYsK3ptud5FO8peYMj6VfZdpP0x3PEAqns/79Scv8oNPOyINZ
-         IGwWr6UiFZcxLd9zcmVIEH+Ua+3+7Zs7hlkWipuAtIXd7S3PXrI7KzjnzaNiUNOkfiBK
-         JNlEh8bt5d+0/rwI+49lysrhE8rhSD/DxFGxvmsO5e2415dRKMYoTgq0ebMlIrBZ5zt0
-         HK3w==
+        bh=dg+yr2j8TD2tOeWN+mTqClvlcOIVqj1KKksx271TJrk=;
+        b=ssS6y8VmviRvlot/CRTLA7KZx5V0/s+D+0Hre7ySB8N+URNzknGbw4VlsYvDQltOKt
+         BahmS/KfDl8aupY+2UBCfbtStKZZv3IyoX8auZC5qcHSi/h5QAJoSVca2IU2S+P+rlfq
+         /RBhJ/oyAXWgsxnLFeXpQb8aCmzIxpRiEwC35j7vrJhacDhru/lTQGZEd0nQxK+Ggm0r
+         V844cjDWQtntAqSVghm6uxBwITfGUNMGEaFMpTl1UohUnlIlsTDGO2rUJBoUlxbqHgsY
+         lpErarwErjDgQE5K7GBrka9JBWSI945Dk+HceNbUXILc/FfQp16VOyBwqginzLPlybio
+         Ifew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
          :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=8wh55Cc5i2Lm0uKQU6Z1K0oTPrUc8lTykFYnyLF1hmI=;
-        b=arPf1lu+3vdAUw90UiAL970Xgw2fAyeB4bhdKDgfBywaWbEHNPV9dzO2ttjMyMMKU2
-         a9V7LgaNMVYBU1z24HMY/i0TjnRkcx0kp4Zd6CxYgHW36yvmNJ+HnDqA2v/eANzJwHBl
-         bofwFzp2j7h0eiPcuDsMOX3Gzm2+VTrYmE9B4s2Ak8FYOVrERRw4G1hYWoBWdJZVpkvv
-         8UJCmdGZOy8B/vu3HZBcAbhVAs8P0FDh8WDYRYPh5hOge7hyorqZpXVVZBGMUpmOmrch
-         bwecBfNGQuaCoisp+4l1U4+RAiXBg6E02oXemwZoU6btl2ciC1rMI2IOCQSCpoYqB1Xj
-         PJ4w==
-X-Gm-Message-State: APjAAAXeyCUBYwwLySunPxD1xhNVat6sN3Su0mFME+UtMq+e+XCHpXOu
-        mhqCgtmf3Ir9ZL1e0bctKz4=
-X-Google-Smtp-Source: APXvYqzZee60sXrwkCUgGq+ra5aKQV5AK6TR6hJfqiSgAwuo4IfEnuq9VXMpCRgDobBNl5LOD3J3xw==
-X-Received: by 2002:a0c:af16:: with SMTP id i22mr9320471qvc.234.1560532156439;
-        Fri, 14 Jun 2019 10:09:16 -0700 (PDT)
+        bh=dg+yr2j8TD2tOeWN+mTqClvlcOIVqj1KKksx271TJrk=;
+        b=SKb2ix7BQdgvwgVov+NNtS/Sub5iHJ/vvP64sdi8fw18N4vGqu5isxcwfBwx6HhAYL
+         2VIqw3Zxgk19FHHoHidYRTu1WSplS6zIPHNm4Q2ZaBQ9KRGs6V2qSdvViE4OTPG6QHc0
+         vfGFX3c6bhV1mfEY6UnDWEqfrE3Oo9K5u2ZRlRrWp2pvJNmnTXaLY+tLaTp56wQgdGTk
+         SUq+Z7+B4rkddDlus0RSaAmzZRp7HlfyG9dKqcZ8TxLP2zBiScbEBw52YlE3jCcVGqoi
+         Lx0EXeKrTYKohRqFDIGKCWfB4a5o93kwW+sS6djMpLGTi4F1jCW/O8+3edmGqaeUfocC
+         Wy3w==
+X-Gm-Message-State: APjAAAWo4r+1rCyL3d7CBZyqOwv65+4qb5yhtavryIwmxBRtPfe7xOtH
+        5taQCDU1ryPVX62CKfOjqO9iWddv
+X-Google-Smtp-Source: APXvYqy1IPm/izuBobTUYE9Y+ecsxXBEygVaJJtyAYjNbHDQGYsZbcuQzr5UsBw25Zvwbyw/pJDRAA==
+X-Received: by 2002:aed:2fa7:: with SMTP id m36mr55097230qtd.344.1560533329984;
+        Fri, 14 Jun 2019 10:28:49 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::6bab])
-        by smtp.gmail.com with ESMTPSA id g185sm1822986qkf.54.2019.06.14.10.09.15
+        by smtp.gmail.com with ESMTPSA id t197sm1638944qke.2.2019.06.14.10.28.49
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Jun 2019 10:09:15 -0700 (PDT)
-Date:   Fri, 14 Jun 2019 10:09:14 -0700
+        Fri, 14 Jun 2019 10:28:49 -0700 (PDT)
+Date:   Fri, 14 Jun 2019 10:28:47 -0700
 From:   Tejun Heo <tj@kernel.org>
-To:     Alexei Starovoitov <ast@fb.com>
-Cc:     Quentin Monnet <quentin.monnet@netronome.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, Andy Newell <newella@fb.com>,
-        Chris Mason <clm@fb.com>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        Dennis Zhou <dennisz@fb.com>,
-        "lizefan@huawei.com" <lizefan@huawei.com>,
-        "hannes@cmpxchg.org" <hannes@cmpxchg.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Kernel Team <Kernel-team@fb.com>,
-        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-        "ast@kernel.org" <ast@kernel.org>,
-        "daniel@iogearbox.net" <daniel@iogearbox.net>,
-        Martin Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>,
-        Yonghong Song <yhs@fb.com>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>
-Subject: Re: [PATCH 10/10] blkcg: implement BPF_PROG_TYPE_IO_COST
-Message-ID: <20190614170914.GF538958@devbig004.ftw2.facebook.com>
-References: <20190614015620.1587672-1-tj@kernel.org>
- <20190614015620.1587672-11-tj@kernel.org>
- <e4d1df7b-66bb-061a-8ecb-ff1e5be3ab1d@netronome.com>
- <20190614145239.GA538958@devbig004.ftw2.facebook.com>
- <bed0a66a-7aa6-ac36-9182-31a4937257e5@fb.com>
+To:     Andreas Herrmann <aherrmann@suse.com>
+Cc:     Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, cgroups@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] blkio-controller.txt: Remove references to CFQ
+Message-ID: <20190614172847.GH538958@devbig004.ftw2.facebook.com>
+References: <20190612061732.GA3711@suselix>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bed0a66a-7aa6-ac36-9182-31a4937257e5@fb.com>
+In-Reply-To: <20190612061732.GA3711@suselix>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Alexei.
+On Wed, Jun 12, 2019 at 08:17:32AM +0200, Andreas Herrmann wrote:
+> CFQ is gone. No need anymore to document its "proportional weight time
+> based division of disk policy".
 
-On Fri, Jun 14, 2019 at 04:35:35PM +0000, Alexei Starovoitov wrote:
-> the example bpf prog looks flexible enough to allow some degree
-> of experiments. The question is what kind of new algorithms you envision
-> it will do? what other inputs it would need to make a decision?
-> I think it's ok to start with what it does now and extend further
-> when need arises.
-
-I'm not sure right now.  The linear model worked a lot better than I
-originally expected and looks like it can cover most of the current
-use cases.  It could easily be that we just haven't seen enough
-different cases yet.
-
-At one point, quadratic model was on the table in case the linear
-model wasn't good enough.  Also, one area which may need improvements
-could be factoring in r/w mixture into consideration.  Some SSDs'
-performance nose-dive when r/w commands are mixed in certain
-proportions.  Right now, we just deal with that by adjusting global
-performance ratio (vrate) but I can imagine a model which considers
-the issue history in the past X seconds of the cgroup and bumps the
-overall cost according to r/w mixture.
-
-> > * Is block ioctl the right mechanism to attach these programs?
-> 
-> imo ioctl is a bit weird, but since its only one program per block
-> device it's probably ok? Unless you see it being cgroup scoped in
-> the future? Then cgroup-bpf style hooks will be more suitable
-> and allow a chain of programs.
-
-As this is a device property, I think there should only be one program
-per block device.
-
-> > * Are there more parameters that need to be exposed to the programs?
-> > 
-> > * It'd be great to have efficient access to per-blockdev and
-> >    per-blockdev-cgroup-pair storages available to these programs so
-> >    that they can keep track of history.  What'd be the best of way of
-> >    doing that considering the fact that these programs will be called
-> >    per each IO and the overhead can add up quickly?
-> 
-> Martin's socket local storage solved that issue for sockets.
-> Something very similar can work for per-blockdev-per-cgroup.
-
-Cool, that sounds great in case we need to develop this further.  Andy
-had this self-learning model which didn't need any external input and
-could tune itself solely based on device saturation state.  If the
-prog can remember states cheaply, it'd be pretty cool to experiment
-with things like that in bpf.
+BFQ might provide a compat interface.  Let's wait a bit.
 
 Thanks.
 
