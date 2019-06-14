@@ -2,110 +2,86 @@ Return-Path: <SRS0=5Asf=UN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 034F7C31E4B
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 15:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C67F2C31E4B
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 15:14:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB63721537
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 15:09:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560524971;
-	bh=YlnbKY76MU++cPKthpCvz9e6XM7nVGVURhmpeatu9B4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=d7xRvwLO14qrk3pRGVrzNrwJ/rhBEr5IPcu/MIJmMwYA5/Itm9j9UFEb8/q0wUKQc
-	 cCYaTX4VxxLLgtBMMdJjFQ9PyOEXzNsej5nczur7hXRESobUiHiL8K1w4BpDGhA995
-	 fBVvQOjqZnaw3IGdr9QnmEqaWbX8B0P1m8SopPhU=
+	by mail.kernel.org (Postfix) with ESMTP id 9CAB321744
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 15:14:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725868AbfFNPJb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jun 2019 11:09:31 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:46993 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725837AbfFNPJb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jun 2019 11:09:31 -0400
-Received: by mail-pl1-f195.google.com with SMTP id e5so1128901pls.13;
-        Fri, 14 Jun 2019 08:09:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=+I9U1GODgSkyxPAIv5uSBlih1n/pRySECC43JZGkdsQ=;
-        b=iGhc4xzitJMk67sXbQMyBo8eYE8TxhKJEDf+KuuPxlnOLUZFysidCzwr54Kzzy0K2J
-         D+GJRX71MpXYgXx2M6apuBILbtB+nlVv2HxnXhyaQJh8VlGfzYaUAn2jZSunbRUcJP+x
-         iOB3D7jvu5eEN6YbwgH60SuKTejWz4B6PizS20cko5zfs7ZiBvyTkCfK/CSqY5Bns3l8
-         Ro6EsJZk30weiEJY/Uk5TEteCCGXB8XYvuQXqPh/3FoevGvIok7Er3BS5HLnUo9gdnw3
-         FP2pyydyRWD6S3lNwlB6S79WFXpwubyELDGZOmGBXGY7MLSjmvWneimvwEkDnHpcmFWV
-         0G/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=+I9U1GODgSkyxPAIv5uSBlih1n/pRySECC43JZGkdsQ=;
-        b=HyJqtfDS72O5+9b4rUTlWezjRoRGjZcozrgUUZAu/pHK3Ra2m5TzIiRFzDuS26+PtL
-         BrTEV7VCmGA6vZkz0pXKdvVNAv25hJ+TR3tbOs4mLP/wmzmrVQEjBenljYN9TsRRumrC
-         e51XXRACUySdMtCGx+CMvJ3baFsoIv2nGjl3RrKEsxNYfWBrkDkNURBPUJ6YgqHRISny
-         lGSZGSV3l2vNFsKq5bYdRSeykmffCti5Cl1MT5soFduDfrcDLD3bdkXEBwi2GSdZjBha
-         oxF0bnd2MGzqz1jGCdKtf0fJ3r18iudr7oV9NdarQp9dM0Ld0IWQuSJWMS7CYOf3HwVC
-         EdNg==
-X-Gm-Message-State: APjAAAXJQhL/2ux5JThI5KGU1SoHqOQv9PkNNXpkEs48awzC58nuDUEH
-        8F2s0wQiWoe0Q73tZmHsO0Y=
-X-Google-Smtp-Source: APXvYqxzOCKBrFEtUYYWecwehqGBRjbcRqqz2d1PNNKgZEyBo102COqcOPB0Jz3DOPgdv6CXMm9Xlg==
-X-Received: by 2002:a17:902:b70f:: with SMTP id d15mr12366371pls.318.1560524969921;
-        Fri, 14 Jun 2019 08:09:29 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:180::1:b330])
-        by smtp.gmail.com with ESMTPSA id a22sm4039041pfn.173.2019.06.14.08.09.28
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Jun 2019 08:09:28 -0700 (PDT)
-Date:   Fri, 14 Jun 2019 08:09:24 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Cc:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
-        dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org,
+        id S1725985AbfFNPOh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jun 2019 11:14:37 -0400
+Received: from mx2.suse.de ([195.135.220.15]:51726 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725808AbfFNPOh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jun 2019 11:14:37 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 76E96AB42;
+        Fri, 14 Jun 2019 15:14:35 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id AFF59DA8D6; Fri, 14 Jun 2019 17:15:24 +0200 (CEST)
+Date:   Fri, 14 Jun 2019 17:15:24 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
+        axboe@kernel.dk, jack@suse.cz, linux-btrfs@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel-team@fb.com, cgroups@vger.kernel.org, ast@kernel.org,
-        daniel@iogearbox.net, kafai@fb.com, songliubraving@fb.com,
-        yhs@fb.com, bpf@vger.kernel.org, Josef Bacik <jbacik@fb.com>
-Subject: Re: [PATCH 08/10] blkcg: implement blk-ioweight
-Message-ID: <20190614150924.GB538958@devbig004.ftw2.facebook.com>
-References: <20190614015620.1587672-1-tj@kernel.org>
- <20190614015620.1587672-9-tj@kernel.org>
- <87pnngbbti.fsf@toke.dk>
+        kernel-team@fb.com
+Subject: Re: [PATCH 7/8] Btrfs: use REQ_CGROUP_PUNT for worker thread
+ submitted bios
+Message-ID: <20190614151524.GZ3563@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Tejun Heo <tj@kernel.org>,
+        dsterba@suse.com, clm@fb.com, josef@toxicpanda.com, axboe@kernel.dk,
+        jack@suse.cz, linux-btrfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com
+References: <20190614003350.1178444-1-tj@kernel.org>
+ <20190614003350.1178444-8-tj@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87pnngbbti.fsf@toke.dk>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190614003350.1178444-8-tj@kernel.org>
+User-Agent: Mutt/1.5.23.1 (2014-03-12)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Toke.
+On Thu, Jun 13, 2019 at 05:33:49PM -0700, Tejun Heo wrote:
+> @@ -1251,12 +1258,29 @@ static int cow_file_range_async(struct inode *inode, struct page *locked_page,
+>  		 * to unlock it.
+>  		 */
+>  		if (locked_page) {
+> +			/*
+> +			 * Depending on the compressibility, the pages
+> +			 * might or might not go through async.  We want
+> +			 * all of them to be accounted against @wbc once.
+> +			 * Let's do it here before the paths diverge.  wbc
+> +			 * accounting is used only for foreign writeback
+> +			 * detection and doesn't need full accuracy.  Just
+> +			 * account the whole thing against the first page.
+> +			 */
+> +			wbc_account_io(wbc, locked_page, cur_end - start);
+>  			async_chunk[i].locked_page = locked_page;
+>  			locked_page = NULL;
+>  		} else {
+>  			async_chunk[i].locked_page = NULL;
+>  		}
+>  
+> +		if (blkcg_css != blkcg_root_css) {
+> +			css_get(blkcg_css);
 
-On Fri, Jun 14, 2019 at 02:17:45PM +0200, Toke H�iland-J�rgensen wrote:
-> One question: How are equal-weight cgroups scheduled relative to each
-> other? Or requests from different processes within a single cgroup for
-> that matter? FIFO? Round-robin? Something else?
+fs/btrfs/inode.c: In function ‘cow_file_range_async’:
+fs/btrfs/inode.c:1278:4: error: implicit declaration of function ‘css_get’; did you mean ‘css_put’? [-Werror=implicit-function-declaration]
+ 1278 |    css_get(blkcg_css);
+      |    ^~~~~~~
+      |    css_put
 
-Once each cgroup got their hierarchical weight and current vtime for
-the period, they don't talk to each other.  Each is expected to do the
-right thing on their own.  When the period ends, the timer looks at
-how the device is performing, how much each used and so on and then
-make necessary adjustments.  So, there's no direct cross-cgroup
-synchronization.  Each is throttled to their target level
-independently.
-
-Within a single cgroup, the IOs are FIFO.  When an IO has enough vtime
-credit, it just passes through.  When it doesn't, it always waits
-behind any other IOs which are already waiting.
-
-Thanks.
-
--- 
-tejun
+I don't have CONFIG_CGROUPS enabled in the testing kernel so this probably
+needs a wrapper so the ifdef is not in the middle of the function.
