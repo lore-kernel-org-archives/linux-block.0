@@ -4,88 +4,94 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA2ADC31E4B
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 17:46:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE632C31E4B
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 17:56:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 97101217D6
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 17:46:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F67B2183E
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 17:56:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560534415;
-	bh=/1MCtpy3za94LqQjIrUTTEhKO99VLaUdtj0seQkUbtM=;
+	s=default; t=1560535012;
+	bh=u7A2glWdDsI2x2SgfHUUq2LVtrXCaDuJkwVjBKKrUo8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=yrhNmrvqFikg8cwTGNnJhj9s6i40Q3y0fYzTENvoq/pYj1+PH65KQWELL67j091d4
-	 EVaqprbLdlFTq36q18GVzRycWX775nZdVGxssFiYQqtQ6x0sgbs0yvDjRxG/GL4a9Z
-	 rsFFryrmR319QebMQP8D78YMnv3X+nv8wYQtvfIc=
+	b=HT0RCW+mZAPZ7JjluK10HNkecikfWQxrYaCVnGThbjK/JRRpTvUGw+l8EY4NFZf0e
+	 ZRN0klecM5gyw145oMyrs5RQtYsQ9K4PLjxBp3ze0Qs0PDsaRyxShbYJ4onW+cH/ml
+	 DERTJ5tQQGbdugqv1d6a7ov/XJRIZ+Bk98BWy4D4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726319AbfFNRqz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jun 2019 13:46:55 -0400
-Received: from mail-qk1-f177.google.com ([209.85.222.177]:36446 "EHLO
-        mail-qk1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726082AbfFNRqy (ORCPT
+        id S1726798AbfFNR4r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jun 2019 13:56:47 -0400
+Received: from mail-qk1-f172.google.com ([209.85.222.172]:34591 "EHLO
+        mail-qk1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726389AbfFNR4r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jun 2019 13:46:54 -0400
-Received: by mail-qk1-f177.google.com with SMTP id g18so2223000qkl.3;
-        Fri, 14 Jun 2019 10:46:54 -0700 (PDT)
+        Fri, 14 Jun 2019 13:56:47 -0400
+Received: by mail-qk1-f172.google.com with SMTP id t8so2251674qkt.1;
+        Fri, 14 Jun 2019 10:56:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=mfFFn/3fVwiltpoTn5VtkiFL9dQwzzi7uuy6j4r0c2E=;
-        b=tScJNbpFESr1S5qpoA/84AXMVM2fWbLaa+BL6ZNYdX7iYc8t9aTc9v1Z3WzJWWEfsW
-         OQtK1gSJ30WuTDroiA7Esjhe4gvWfS+dx3RwR93rrC6fVHoaJVc2mmSQG27zEeMEXwsa
-         qcaklPQc7Kjb5y08Nmn2YaQbWaW7249tJm8PU8BpVeygOrZrxY40QQUlmZHRl4ov6lD+
-         MVjkh2iiwsGnjJJQNRWbTjrilhumeT4pDnA6hj5gi6O+q8WhE2rRaStMvDORhVPNJj4L
-         SMfF8cI6VZsPqFs2EXNjTtUFAInkzz90CiWwQDq1AAU8/WhF3yokWf3oEMuMsqNUzA+2
-         2XtQ==
+        bh=rr4DhL8mkbmYJTu+prptdDL5l4mcP175r2QLE+Qn8CA=;
+        b=cLJE6Rf50VcaPIRaV80FOsBwRwK4nUuYdTa5x8SSx7ww6xsZtzmNPaHRzNFTqODvt6
+         /hDunowkAFc2MbCFwhosFbE8+tPmvxmQRmpC52XUQF980dU32Z/0oL5rfh3XNrTNYbFv
+         KriO0fhfVsUT+A9lhgqJbmINYpztEe4MklT1Ldi/Vti1KUej1yYg4tDVt3hgO+0jTOpz
+         5Fj80H6LyQIWI99RhAp20XnOEHvpU96YrUa8/k5wkGWwVitKTO6pO/6rPbClA3iQm2IW
+         4fu7vDzS8uvA/oeFzyyU9Ar2Hi+EglXMSWAaTbVT0DVcRnsuLKZdJlnI/97tTg2cJhpu
+         KCAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
          :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=mfFFn/3fVwiltpoTn5VtkiFL9dQwzzi7uuy6j4r0c2E=;
-        b=pcx8NdBGD2bJT15Y/3ftsbcL6t/tfWp7zfZnMSTDLcDPUuX1rF0JWNmhgjO3naiRyO
-         MTFz6PNAb3PGMyZocbmkIIiG64z+/udB30mxcNpRyQ1Gs2SIonkSqXIA+3hU4LsxMVjR
-         flJ1LZQUv1PgzRch1uTP1zwuGd95MuQhLDN6KVXv9lVlTixN9T6Mrdk1G5OwRkbW9ZU9
-         8yHkylgjwPGOF7m5/OmEO5gBUa5lMIEs/vYuYOQDEOrVOW/gE3+OqTdgn5zgiBAaOUrZ
-         LokyMvXfnGxtjvL5O6kIAArbFPjFEvF0ZN4FKd94noAYlRkGWjmE/G3/peCwqoMyiE2X
-         ohLQ==
-X-Gm-Message-State: APjAAAXw3iEgOB0y/KDYNTM7BWmxdYUQxJBfqA6cXJwZ66brTPgMvOnj
-        OqLfoEXp2u490+ufMFZaeVTrYEK6
-X-Google-Smtp-Source: APXvYqyAfVnqkVNXbSHlgJIQRVrQOFKEqmlnGRlAPUUjUK4nAA9X6ax8LBgHs5kJCBg/hhv4iIvVYw==
-X-Received: by 2002:ae9:f107:: with SMTP id k7mr13980314qkg.215.1560534413489;
-        Fri, 14 Jun 2019 10:46:53 -0700 (PDT)
+        bh=rr4DhL8mkbmYJTu+prptdDL5l4mcP175r2QLE+Qn8CA=;
+        b=KebvoWhKRM0aSt+WSLpMLhu2XJ8iQgggI0djTeL6CGayR+zWhhhyArkODirBXA3XT+
+         0JxXHsU2YcUj9WGIQdWyY7nYQblTZWOGFcBTIpimCbdY6t0qE9rPybXrtpZ0rH5vtL9a
+         u1U/sxt2TaaEiEtqgT0s3KfHYo88uWGL3w02Vf0xiZqxa0WcN5rN9fQarnM1LTAcZ5Aa
+         aFn9H4ZYS5lMsQtr8BKdfZ0fojQypcZ2JffWDn9UAXwjajhMqqQ54udpBsBRx75NC7sv
+         IbfOf7/dMEWIicDBwf20AB9nlKYlu6S0fqqRfgKvqNyiI7CEgmrt2ly6yki1HOFOBLy0
+         BgMQ==
+X-Gm-Message-State: APjAAAV0RcvJv174bkSSjwvOcofaEdzzM79TnPw6+k4SeFv04xveZcTf
+        VeaycOzZ0rD6KAEvJT0CZYU=
+X-Google-Smtp-Source: APXvYqyur5VtexgQTx8OWTjFE9G5cpfspjCCJpY9hNeZ4lleSYHrVILXqbnzUXo5x1BF6SWDHMdQ/Q==
+X-Received: by 2002:a37:7646:: with SMTP id r67mr57567827qkc.249.1560535005491;
+        Fri, 14 Jun 2019 10:56:45 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::6bab])
-        by smtp.gmail.com with ESMTPSA id u2sm1971672qtj.97.2019.06.14.10.46.52
+        by smtp.gmail.com with ESMTPSA id t187sm1843362qkh.10.2019.06.14.10.56.44
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Jun 2019 10:46:52 -0700 (PDT)
-Date:   Fri, 14 Jun 2019 10:46:51 -0700
+        Fri, 14 Jun 2019 10:56:44 -0700 (PDT)
+Date:   Fri, 14 Jun 2019 10:56:42 -0700
 From:   Tejun Heo <tj@kernel.org>
-To:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
-        axboe@kernel.dk, jack@suse.cz
-Cc:     linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, kernel-team@fb.com
-Subject: Re: [PATCHSET btrfs/for-next] btrfs: fix cgroup writeback support
-Message-ID: <20190614174651.GI538958@devbig004.ftw2.facebook.com>
-References: <20190614003350.1178444-1-tj@kernel.org>
+To:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
+        dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com, cgroups@vger.kernel.org, ast@kernel.org,
+        daniel@iogearbox.net, kafai@fb.com, songliubraving@fb.com,
+        yhs@fb.com, bpf@vger.kernel.org
+Subject: Re: [PATCHSET block/for-next] IO cost model based work-conserving
+ porportional controller
+Message-ID: <20190614175642.GA657710@devbig004.ftw2.facebook.com>
+References: <20190614015620.1587672-1-tj@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190614003350.1178444-1-tj@kernel.org>
+In-Reply-To: <20190614015620.1587672-1-tj@kernel.org>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Thu, Jun 13, 2019 at 06:56:10PM -0700, Tejun Heo wrote:
+...
+> The patchset is also available in the following git branch.
+> 
+>  git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git review-iow
 
-Added a separate patch to add dummy css_get() and EXPORT's for the
-build failures.  It's in the following branch.  I'll wait for a while
-and send out if nothing else is broken.
+Updated patchset available in the following branch.  Just build fixes
+and cosmetic changes for now.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git review-btrfs-cgroup-updates-v2
+  git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git review-iow-v2
 
 Thanks.
 
