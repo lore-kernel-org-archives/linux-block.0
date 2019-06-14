@@ -4,30 +4,32 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C7D3C31E4B
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 13:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5214C46477
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 13:14:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ED64D208CA
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 13:14:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B75F0208CA
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 13:14:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728112AbfFNNOh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jun 2019 09:14:37 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45606 "EHLO mx1.suse.de"
+        id S1728118AbfFNNOl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jun 2019 09:14:41 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45680 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727766AbfFNNOh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jun 2019 09:14:37 -0400
+        id S1727766AbfFNNOl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jun 2019 09:14:41 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 28ADFAB8C;
-        Fri, 14 Jun 2019 13:14:36 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id B8749AB8C;
+        Fri, 14 Jun 2019 13:14:39 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 08/29] bcache: fix return value error in bch_journal_read()
-Date:   Fri, 14 Jun 2019 21:13:37 +0800
-Message-Id: <20190614131358.2771-9-colyli@suse.de>
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        stable@vger.kernel.org
+Subject: [PATCH 09/29] Revert "bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()"
+Date:   Fri, 14 Jun 2019 21:13:38 +0800
+Message-Id: <20190614131358.2771-10-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190614131358.2771-1-colyli@suse.de>
 References: <20190614131358.2771-1-colyli@suse.de>
@@ -36,40 +38,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When everything is OK in bch_journal_read(), finally the return value
-is returned by,
-	return ret;
-which assumes ret will be 0 here. This assumption is wrong when all
-journal buckets as are full and filled with valid journal entries. In
-such cache the last location referencess read_bucket() sets 'ret' to
-1, which means new jset added into jset list. The jset list is list
-'journal' in caller run_cache_set().
+This reverts commit 6147305c73e4511ca1a975b766b97a779d442567.
 
-Return 1 to run_cache_set() means something wrong and the cache set
-won't start, but indeed everything is OK.
+Although this patch helps the failed bcache device to stop faster when
+too many I/O errors detected on corresponding cached device, setting
+CACHE_SET_IO_DISABLE bit to cache set c->flags was not a good idea. This
+operation will disable all I/Os on cache set, which means other attached
+bcache devices won't work neither.
 
-This patch changes the line at end of bch_journal_read() to directly
-return 0 since everything if verything is good. Then a bogus error
-is fixed.
+Without this patch, the failed bcache device can also be stopped
+eventually if internal I/O accomplished (e.g. writeback). Therefore here
+I revert it.
 
+Fixes: 6147305c73e4 ("bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()")
+Reported-by: Yong Li <mr.liyong@qq.com>
 Signed-off-by: Coly Li <colyli@suse.de>
+Cc: stable@vger.kernel.org
 ---
- drivers/md/bcache/journal.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/md/bcache/super.c | 17 -----------------
+ 1 file changed, 17 deletions(-)
 
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index d75efeaa4baa..7beff8884dd0 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -293,7 +293,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
- 					    struct journal_replay,
- 					    list)->j.seq;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 1b63ac876169..eaaa046fd95d 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1437,8 +1437,6 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
  
--	return ret;
-+	return 0;
- #undef read_bucket
+ bool bch_cached_dev_error(struct cached_dev *dc)
+ {
+-	struct cache_set *c;
+-
+ 	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
+ 		return false;
+ 
+@@ -1449,21 +1447,6 @@ bool bch_cached_dev_error(struct cached_dev *dc)
+ 	pr_err("stop %s: too many IO errors on backing device %s\n",
+ 		dc->disk.disk->disk_name, dc->backing_dev_name);
+ 
+-	/*
+-	 * If the cached device is still attached to a cache set,
+-	 * even dc->io_disable is true and no more I/O requests
+-	 * accepted, cache device internal I/O (writeback scan or
+-	 * garbage collection) may still prevent bcache device from
+-	 * being stopped. So here CACHE_SET_IO_DISABLE should be
+-	 * set to c->flags too, to make the internal I/O to cache
+-	 * device rejected and stopped immediately.
+-	 * If c is NULL, that means the bcache device is not attached
+-	 * to any cache set, then no CACHE_SET_IO_DISABLE bit to set.
+-	 */
+-	c = dc->disk.c;
+-	if (c && test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
+-		pr_info("CACHE_SET_IO_DISABLE already set");
+-
+ 	bcache_device_stop(&dc->disk);
+ 	return true;
  }
- 
 -- 
 2.16.4
 
