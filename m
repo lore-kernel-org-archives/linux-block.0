@@ -2,199 +2,66 @@ Return-Path: <SRS0=5Asf=UN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F575C31E4B
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 01:57:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 498E4C46477
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 05:45:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D8C75204FD
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 01:57:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560477447;
-	bh=YbJIDxUsUU7GEe9ma3NJJSBFN1xgENUeLaq13yjtsd0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=O1Sko8/i70kQS+X0L103frkHhv87FXsZiDhc9jLXrvK9+9sNeOsCZ/4lhWUxb/mgy
-	 wvATL2nU05JKIA75PZ/JCkLawp8j+1Od746PoYAO9calGcTDTHLm95Xq+rFtpUsV65
-	 oTF+Cc01HcbVYruvgvRReH4eC2QISSX7lh8TQxsE=
+	by mail.kernel.org (Postfix) with ESMTP id 2A7DF2133D
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 05:45:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726762AbfFNB4f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 21:56:35 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:34506 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726083AbfFNB4f (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 21:56:35 -0400
-Received: by mail-pg1-f194.google.com with SMTP id p10so585246pgn.1;
-        Thu, 13 Jun 2019 18:56:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=UaPHH8JDcGKak+gHjtRMrmN2MEG5XRu5KmkEzKYucHQ=;
-        b=t5jBUJHoeAqr/+0FT28ieRk7BwOPRcQJIIHyY8hnkwoy4p6BeHZ/XXHF84KtBcs1/K
-         SsHPTWojNUd6CFEUWeTWQlMBzAQpn2kEJYrABsGfmCjkXmj8kgU1WXz//P2RaQvR5zC6
-         B729XnqqKKURM/dl8yGHE5cN0PFM/zAnq8NFPgtM1L7fWi+tRdrnU+RjGSs3OCBN020g
-         dlwGVqMj7EWrRiPJe/EQzDC2nNOofgVgw7q3g9Xh5bUWGUsj0sFrUhiZ6YwflJkVS0Rq
-         GwrMmZGsr0FkTPWg+zQDLESHWd7dg7oht+nA96i83z1rkgCyFinFemJyFz1/P2oeMHpt
-         xTEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=UaPHH8JDcGKak+gHjtRMrmN2MEG5XRu5KmkEzKYucHQ=;
-        b=tFacttHehnC20G64545hh/j0amg/5VieO4yFBKlo1QQFFiqvT/GsZ7ZSYkVFL64o0K
-         c3yHCywzG5W+KmADfGFtp88VdpBOq7I3wlJJ/OnA8sCtsGtgnFdxM9Z6mFnlxVpd56+7
-         4h1XWK9DEWO5pJ5429ETZOq7LZwjkUJSMFqWoggYLCLBUKvZAbI0fFsyi3AhF57P4zBv
-         PLpRN2vO9uT9l5Ojl/TF/xHdVb38m0a9cd2NCJUivi/LAirC0yhg9gmHxW+VwGA9+E2R
-         4so75WrOfMhZbMnFtZ/EdWoqWpthaW6VycFOiwgZUk4FxSkSpnG7YPptHR5wBwESlz/G
-         wLEQ==
-X-Gm-Message-State: APjAAAV4MBaF3GCPHQL0jKd9ef4zuJLvK9hvniYqcSRDmtLiI+u/xB4l
-        2Pe7kasfV65WMKKv1G5vP10=
-X-Google-Smtp-Source: APXvYqwtGOqBXQnQFJmkFlYg+0lgGOoUS3b1muTMxOwt/PF7YKviJETAUCremB5U6OrsBX/7cN5k5w==
-X-Received: by 2002:a63:d07:: with SMTP id c7mr4272088pgl.394.1560477394341;
-        Thu, 13 Jun 2019 18:56:34 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::2:9d14])
-        by smtp.gmail.com with ESMTPSA id k3sm970663pju.27.2019.06.13.18.56.33
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 18:56:33 -0700 (PDT)
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
-        dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel-team@fb.com, cgroups@vger.kernel.org, ast@kernel.org,
-        daniel@iogearbox.net, kafai@fb.com, songliubraving@fb.com,
-        yhs@fb.com, bpf@vger.kernel.org, Tejun Heo <tj@kernel.org>
-Subject: [PATCH 01/10] blkcg: pass @q and @blkcg into blkcg_pol_alloc_pd_fn()
-Date:   Thu, 13 Jun 2019 18:56:11 -0700
-Message-Id: <20190614015620.1587672-2-tj@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190614015620.1587672-1-tj@kernel.org>
-References: <20190614015620.1587672-1-tj@kernel.org>
+        id S1725884AbfFNFpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jun 2019 01:45:43 -0400
+Received: from verein.lst.de ([213.95.11.211]:44066 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725808AbfFNFpn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jun 2019 01:45:43 -0400
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id 9EDEB68B02; Fri, 14 Jun 2019 07:45:14 +0200 (CEST)
+Date:   Fri, 14 Jun 2019 07:45:14 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: alternative take on the same page merging leak fix v2
+Message-ID: <20190614054514.GB6722@lst.de>
+References: <20190613095529.25005-1-hch@lst.de> <00c908ad-ca33-164d-3741-6c67813c1f0d@kernel.dk> <20190614011946.GB14436@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190614011946.GB14436@ming.t460p>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of @node, pass in @q and @blkcg so that the alloc function has
-more context.  This doesn't cause any behavior change and will be used
-by io.weight implementation.
+On Fri, Jun 14, 2019 at 09:19:47AM +0800, Ming Lei wrote:
+> On Thu, Jun 13, 2019 at 04:04:03AM -0600, Jens Axboe wrote:
+> > On 6/13/19 3:55 AM, Christoph Hellwig wrote:
+> > > Hi Jens, hi Ming,
+> > > 
+> > > this is the tested and split version of what I think is the better
+> > > fix for the get_user_pages page leak, as it leaves the intelligence
+> > > in the callers instead of in bio_try_to_merge_page.
+> > > 
+> > > Changes since v1:
+> > >   - drop patches not required for 5.2
+> > >   - added Reviewed-by tags
+> > 
+> > Applied for 5.2, thanks.
+> 
+> Hi Jens & Christoph,
+> 
+> Looks the following change is missed in patch 1, otherwise kernel oops
+> is triggered during kernel booting:
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- block/bfq-cgroup.c         | 5 +++--
- block/blk-cgroup.c         | 6 +++---
- block/blk-iolatency.c      | 6 ++++--
- block/blk-throttle.c       | 6 ++++--
- include/linux/blk-cgroup.h | 3 ++-
- 5 files changed, 16 insertions(+), 10 deletions(-)
+Ok, true, sorry.
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index b3796a40a61a..4193172ad20f 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -425,11 +425,12 @@ static void bfq_cpd_free(struct blkcg_policy_data *cpd)
- 	kfree(cpd_to_bfqgd(cpd));
- }
- 
--static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, int node)
-+static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, struct request_queue *q,
-+					     struct blkcg *blkcg)
- {
- 	struct bfq_group *bfqg;
- 
--	bfqg = kzalloc_node(sizeof(*bfqg), gfp, node);
-+	bfqg = kzalloc_node(sizeof(*bfqg), gfp, q->node);
- 	if (!bfqg)
- 		return NULL;
- 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 238d5d2d0691..30d3a0fbccac 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -174,7 +174,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
- 			continue;
- 
- 		/* alloc per-policy data and attach it to blkg */
--		pd = pol->pd_alloc_fn(gfp_mask, q->node);
-+		pd = pol->pd_alloc_fn(gfp_mask, q, blkcg);
- 		if (!pd)
- 			goto err_free;
- 
-@@ -1405,7 +1405,7 @@ int blkcg_activate_policy(struct request_queue *q,
- 		blk_mq_freeze_queue(q);
- pd_prealloc:
- 	if (!pd_prealloc) {
--		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q->node);
-+		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q, &blkcg_root);
- 		if (!pd_prealloc) {
- 			ret = -ENOMEM;
- 			goto out_bypass_end;
-@@ -1421,7 +1421,7 @@ int blkcg_activate_policy(struct request_queue *q,
- 		if (blkg->pd[pol->plid])
- 			continue;
- 
--		pd = pol->pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN, q->node);
-+		pd = pol->pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN, q, &blkcg_root);
- 		if (!pd)
- 			swap(pd, pd_prealloc);
- 		if (!pd) {
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 17896bb3aaf2..fa47a6485725 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -950,11 +950,13 @@ static size_t iolatency_pd_stat(struct blkg_policy_data *pd, char *buf,
- }
- 
- 
--static struct blkg_policy_data *iolatency_pd_alloc(gfp_t gfp, int node)
-+static struct blkg_policy_data *iolatency_pd_alloc(gfp_t gfp,
-+						   struct request_queue *q,
-+						   struct blkcg *blkcg)
- {
- 	struct iolatency_grp *iolat;
- 
--	iolat = kzalloc_node(sizeof(*iolat), gfp, node);
-+	iolat = kzalloc_node(sizeof(*iolat), gfp, q->node);
- 	if (!iolat)
- 		return NULL;
- 	iolat->stats = __alloc_percpu_gfp(sizeof(struct latency_stat),
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 9ea7c0ecad10..3bb69a17c4b3 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -478,12 +478,14 @@ static void throtl_service_queue_init(struct throtl_service_queue *sq)
- 	timer_setup(&sq->pending_timer, throtl_pending_timer_fn, 0);
- }
- 
--static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
-+static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
-+						struct request_queue *q,
-+						struct blkcg *blkcg)
- {
- 	struct throtl_grp *tg;
- 	int rw;
- 
--	tg = kzalloc_node(sizeof(*tg), gfp, node);
-+	tg = kzalloc_node(sizeof(*tg), gfp, q->node);
- 	if (!tg)
- 		return NULL;
- 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index ffb2f88e87c6..1ed27977f88f 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -151,7 +151,8 @@ typedef struct blkcg_policy_data *(blkcg_pol_alloc_cpd_fn)(gfp_t gfp);
- typedef void (blkcg_pol_init_cpd_fn)(struct blkcg_policy_data *cpd);
- typedef void (blkcg_pol_free_cpd_fn)(struct blkcg_policy_data *cpd);
- typedef void (blkcg_pol_bind_cpd_fn)(struct blkcg_policy_data *cpd);
--typedef struct blkg_policy_data *(blkcg_pol_alloc_pd_fn)(gfp_t gfp, int node);
-+typedef struct blkg_policy_data *(blkcg_pol_alloc_pd_fn)(gfp_t gfp,
-+				struct request_queue *q, struct blkcg *blkcg);
- typedef void (blkcg_pol_init_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_online_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_offline_pd_fn)(struct blkg_policy_data *pd);
--- 
-2.17.1
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
+and you probably want to cook it up for Jens with a proper changelog.
