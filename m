@@ -2,98 +2,85 @@ Return-Path: <SRS0=5Asf=UN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE632C31E4B
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 17:56:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BED0AC31E4E
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 20:14:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F67B2183E
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 17:56:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560535012;
-	bh=u7A2glWdDsI2x2SgfHUUq2LVtrXCaDuJkwVjBKKrUo8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=HT0RCW+mZAPZ7JjluK10HNkecikfWQxrYaCVnGThbjK/JRRpTvUGw+l8EY4NFZf0e
-	 ZRN0klecM5gyw145oMyrs5RQtYsQ9K4PLjxBp3ze0Qs0PDsaRyxShbYJ4onW+cH/ml
-	 DERTJ5tQQGbdugqv1d6a7ov/XJRIZ+Bk98BWy4D4=
+	by mail.kernel.org (Postfix) with ESMTP id 936262133D
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 20:14:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726798AbfFNR4r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jun 2019 13:56:47 -0400
-Received: from mail-qk1-f172.google.com ([209.85.222.172]:34591 "EHLO
-        mail-qk1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726389AbfFNR4r (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jun 2019 13:56:47 -0400
-Received: by mail-qk1-f172.google.com with SMTP id t8so2251674qkt.1;
-        Fri, 14 Jun 2019 10:56:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=rr4DhL8mkbmYJTu+prptdDL5l4mcP175r2QLE+Qn8CA=;
-        b=cLJE6Rf50VcaPIRaV80FOsBwRwK4nUuYdTa5x8SSx7ww6xsZtzmNPaHRzNFTqODvt6
-         /hDunowkAFc2MbCFwhosFbE8+tPmvxmQRmpC52XUQF980dU32Z/0oL5rfh3XNrTNYbFv
-         KriO0fhfVsUT+A9lhgqJbmINYpztEe4MklT1Ldi/Vti1KUej1yYg4tDVt3hgO+0jTOpz
-         5Fj80H6LyQIWI99RhAp20XnOEHvpU96YrUa8/k5wkGWwVitKTO6pO/6rPbClA3iQm2IW
-         4fu7vDzS8uvA/oeFzyyU9Ar2Hi+EglXMSWAaTbVT0DVcRnsuLKZdJlnI/97tTg2cJhpu
-         KCAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=rr4DhL8mkbmYJTu+prptdDL5l4mcP175r2QLE+Qn8CA=;
-        b=KebvoWhKRM0aSt+WSLpMLhu2XJ8iQgggI0djTeL6CGayR+zWhhhyArkODirBXA3XT+
-         0JxXHsU2YcUj9WGIQdWyY7nYQblTZWOGFcBTIpimCbdY6t0qE9rPybXrtpZ0rH5vtL9a
-         u1U/sxt2TaaEiEtqgT0s3KfHYo88uWGL3w02Vf0xiZqxa0WcN5rN9fQarnM1LTAcZ5Aa
-         aFn9H4ZYS5lMsQtr8BKdfZ0fojQypcZ2JffWDn9UAXwjajhMqqQ54udpBsBRx75NC7sv
-         IbfOf7/dMEWIicDBwf20AB9nlKYlu6S0fqqRfgKvqNyiI7CEgmrt2ly6yki1HOFOBLy0
-         BgMQ==
-X-Gm-Message-State: APjAAAV0RcvJv174bkSSjwvOcofaEdzzM79TnPw6+k4SeFv04xveZcTf
-        VeaycOzZ0rD6KAEvJT0CZYU=
-X-Google-Smtp-Source: APXvYqyur5VtexgQTx8OWTjFE9G5cpfspjCCJpY9hNeZ4lleSYHrVILXqbnzUXo5x1BF6SWDHMdQ/Q==
-X-Received: by 2002:a37:7646:: with SMTP id r67mr57567827qkc.249.1560535005491;
-        Fri, 14 Jun 2019 10:56:45 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::6bab])
-        by smtp.gmail.com with ESMTPSA id t187sm1843362qkh.10.2019.06.14.10.56.44
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Jun 2019 10:56:44 -0700 (PDT)
-Date:   Fri, 14 Jun 2019 10:56:42 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
-        dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel-team@fb.com, cgroups@vger.kernel.org, ast@kernel.org,
-        daniel@iogearbox.net, kafai@fb.com, songliubraving@fb.com,
-        yhs@fb.com, bpf@vger.kernel.org
-Subject: Re: [PATCHSET block/for-next] IO cost model based work-conserving
- porportional controller
-Message-ID: <20190614175642.GA657710@devbig004.ftw2.facebook.com>
-References: <20190614015620.1587672-1-tj@kernel.org>
+        id S1725944AbfFNUOE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jun 2019 16:14:04 -0400
+Received: from ms.lwn.net ([45.79.88.28]:53924 "EHLO ms.lwn.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725825AbfFNUOD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jun 2019 16:14:03 -0400
+Received: from lwn.net (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id 2474A128A;
+        Fri, 14 Jun 2019 20:14:02 +0000 (UTC)
+Date:   Fri, 14 Jun 2019 14:14:01 -0600
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v4 05/28] docs: cgroup-v1: convert docs to ReST and
+ rename to *.rst
+Message-ID: <20190614141401.48bfb266@lwn.net>
+In-Reply-To: <c1dd623359f44f05863456b8bceba0d8f3e42f38.1560361364.git.mchehab+samsung@kernel.org>
+References: <cover.1560361364.git.mchehab+samsung@kernel.org>
+        <c1dd623359f44f05863456b8bceba0d8f3e42f38.1560361364.git.mchehab+samsung@kernel.org>
+Organization: LWN.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190614015620.1587672-1-tj@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 13, 2019 at 06:56:10PM -0700, Tejun Heo wrote:
-...
-> The patchset is also available in the following git branch.
+On Wed, 12 Jun 2019 14:52:41 -0300
+Mauro Carvalho Chehab <mchehab+samsung@kernel.org> wrote:
+
+> Convert the cgroup-v1 files to ReST format, in order to
+> allow a later addition to the admin-guide.
 > 
->  git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git review-iow
+> The conversion is actually:
+>   - add blank lines and identation in order to identify paragraphs;
+>   - fix tables markups;
+>   - add some lists markups;
+>   - mark literal blocks;
+>   - adjust title markups.
+> 
+> At its new index.rst, let's add a :orphan: while this is not linked to
+> the main index.rst file, in order to avoid build warnings.
+> 
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+> Acked-by: Tejun Heo <tj@kernel.org>
 
-Updated patchset available in the following branch.  Just build fixes
-and cosmetic changes for now.
+This one, too, has linux-next stuff that keeps it from applying to
+docs-next.  Tejun, would you like to carry it on top of your work?
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git review-iow-v2
+(This means I won't be able to apply #6 either, naturally).
 
-Thanks.
+Thanks,
 
--- 
-tejun
+jon
