@@ -2,94 +2,131 @@ Return-Path: <SRS0=5Asf=UN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71179C31E4C
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 07:27:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7216DC31E4C
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 09:41:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 53ED1206BB
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 07:27:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5513D2082C
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 09:41:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726207AbfFNH1W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jun 2019 03:27:22 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:36783 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726115AbfFNH1W (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jun 2019 03:27:22 -0400
-Received: by mail-lf1-f67.google.com with SMTP id q26so1013506lfc.3;
-        Fri, 14 Jun 2019 00:27:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pdzPCh9Iq6DsZwmNtrM2YKJ68uEFiOmJCFPMQ9QBxhg=;
-        b=IgBS2hKbaMLWy3bidnBSuTTGRDrXEvUkf+CHJKiR3ZDo+aohC6GjUQflWKObfWaBcw
-         M8n3SUHSOrcoOnwHh9iXp7eZYZArhvdAgQsanPK7TpPgWe8keVpBxAeTyiXCdBHs/Tu/
-         v+2qWqhoT4NWEmFcBlV4qhKheqzefhDbi3KXI+cWCgvxp302SFKZYlpC/h3WG5oKt82Y
-         ktOB2pZV4iB1KpCqoU+F3dVutr2ulLWCvL1rD8auvgbGkwAVKuMCY9mmOTGA2Cwa/Ry5
-         IUWYdcrTmCPCWmyXv3vJl8ZIfCk+T0pnYqrg23c/pOSPQ8XAWmijY/nGQSvSjapOK49h
-         MySw==
-X-Gm-Message-State: APjAAAXT19WQ0+xz3dzOxOa8imdlVQO53iTdpp700pyJ5k9pk5sGrHAG
-        GM3GrcaeuaB28M/w8rKC8YZw26dqd49Iu3ko4u8=
-X-Google-Smtp-Source: APXvYqyZPsGGwkPkWixMhMUECj/EG4qRfXowB8lnrcuhtq1khDIasqYBoWJAfAgpDFug4QWIzzNZRN21TX7Vx1y1Gng=
-X-Received: by 2002:ac2:597c:: with SMTP id h28mr8197569lfp.90.1560497239682;
- Fri, 14 Jun 2019 00:27:19 -0700 (PDT)
-MIME-Version: 1.0
+        id S1727038AbfFNJlL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jun 2019 05:41:11 -0400
+Received: from foss.arm.com ([217.140.110.172]:58030 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727028AbfFNJlL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jun 2019 05:41:11 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1A2482B;
+        Fri, 14 Jun 2019 02:41:10 -0700 (PDT)
+Received: from [10.1.197.57] (e110467-lin.cambridge.arm.com [10.1.197.57])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A9ADC3F718;
+        Fri, 14 Jun 2019 02:42:52 -0700 (PDT)
+Subject: Re: [RFC PATCH v6 1/5] iommu: add an exported function to get minimum
+ page size for a domain
+To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        joro@8bytes.org, axboe@kernel.dk, ulf.hansson@linaro.org,
+        wsa+renesas@sang-engineering.com
+Cc:     linux-renesas-soc@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-block@vger.kernel.org, iommu@lists.linux-foundation.org,
+        hch@lst.de
 References: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
- <1560421215-10750-5-git-send-email-yoshihiro.shimoda.uh@renesas.com>
- <CAMuHMdXYqgPRX1WfUTRsKHhnSok5vfnr4AY36=vXoUvAxcNyWQ@mail.gmail.com> <20190614071800.GB8420@lst.de>
-In-Reply-To: <20190614071800.GB8420@lst.de>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Fri, 14 Jun 2019 09:27:06 +0200
-Message-ID: <CAMuHMdXm5RtDUL5Wkyd6aJihu9nykYOhRf7vN6hOtB-OO8CTQQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v6 4/5] mmc: tmio: Use dma_max_mapping_size() instead
- of a workaround
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Joerg Roedel <joro@8bytes.org>, Jens Axboe <axboe@kernel.dk>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Linux IOMMU <iommu@lists.linux-foundation.org>,
-        linux-block@vger.kernel.org,
-        Linux MMC List <linux-mmc@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+ <1560421215-10750-2-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <5e295ec3-39c9-de8a-a649-0aeeb0078ae3@arm.com>
+Date:   Fri, 14 Jun 2019 10:41:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <1560421215-10750-2-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+On 13/06/2019 11:20, Yoshihiro Shimoda wrote:
+> This patch adds an exported function to get minimum page size for
+> a domain. This patch also modifies similar codes on the iommu.c.
 
-On Fri, Jun 14, 2019 at 9:18 AM Christoph Hellwig <hch@lst.de> wrote:
-> On Thu, Jun 13, 2019 at 10:35:44PM +0200, Geert Uytterhoeven wrote:
-> > I'm always triggered by the use of min_t() and other casts:
-> > mmc->max_blk_size and mmc->max_blk_count are both unsigned int.
-> > dma_max_mapping_size() returns size_t, which can be 64-bit.
-> >
-> >  1) Can the multiplication overflow?
-> >     Probably not, as per commit 2a55c1eac7882232 ("mmc: renesas_sdhi:
-> >     prevent overflow for max_req_size"), but I thought I'd better ask.
-> >  2) In theory, dma_max_mapping_size() can return a number that doesn't
-> >     fit in 32-bit, and will be truncated (to e.g. 0), leading to max_req_size
-> >     is zero?
->
-> This really should use a min_t on size_t.  Otherwise the patch looks
-> fine:
+Heh, seeing this gave me a genuine déjà vu moment...
 
-Followed by another min() to make it fit in mmc->max_req_size, which is
-unsigned int.
+...but it turns out I actually *have* reviewed this patch before :)
 
-Gr{oetje,eeting}s,
+https://lore.kernel.org/lkml/05eca601-0264-8141-ceeb-7ef7ad5d5650@arm.com/
 
-                        Geert
+Robin.
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> ---
+>   drivers/iommu/iommu.c | 18 +++++++++++++++---
+>   include/linux/iommu.h |  1 +
+>   2 files changed, 16 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 2a90638..7ed16af 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -280,6 +280,18 @@ iommu_insert_device_resv_regions(struct list_head *dev_resv_regions,
+>   	return ret;
+>   }
+>   
+> +/**
+> + * iommu_get_minimum_page_size - get minimum page size for a domain
+> + * @domain: the domain
+> + *
+> + * Allow iommu driver to get a minimum page size for a domain.
+> + */
+> +unsigned long iommu_get_minimum_page_size(struct iommu_domain *domain)
+> +{
+> +	return 1UL << __ffs(domain->pgsize_bitmap);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_get_minimum_page_size);
+> +
+>   int iommu_get_group_resv_regions(struct iommu_group *group,
+>   				 struct list_head *head)
+>   {
+> @@ -558,7 +570,7 @@ static int iommu_group_create_direct_mappings(struct iommu_group *group,
+>   
+>   	BUG_ON(!domain->pgsize_bitmap);
+>   
+> -	pg_size = 1UL << __ffs(domain->pgsize_bitmap);
+> +	pg_size = iommu_get_minimum_page_size(domain);
+>   	INIT_LIST_HEAD(&mappings);
+>   
+>   	iommu_get_resv_regions(dev, &mappings);
+> @@ -1595,7 +1607,7 @@ int iommu_map(struct iommu_domain *domain, unsigned long iova,
+>   		return -EINVAL;
+>   
+>   	/* find out the minimum page size supported */
+> -	min_pagesz = 1 << __ffs(domain->pgsize_bitmap);
+> +	min_pagesz = iommu_get_minimum_page_size(domain);
+>   
+>   	/*
+>   	 * both the virtual address and the physical one, as well as
+> @@ -1655,7 +1667,7 @@ static size_t __iommu_unmap(struct iommu_domain *domain,
+>   		return 0;
+>   
+>   	/* find out the minimum page size supported */
+> -	min_pagesz = 1 << __ffs(domain->pgsize_bitmap);
+> +	min_pagesz = iommu_get_minimum_page_size(domain);
+>   
+>   	/*
+>   	 * The virtual address, as well as the size of the mapping, must be
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 91af22a..7e53b43 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -366,6 +366,7 @@ extern int iommu_request_dma_domain_for_dev(struct device *dev);
+>   extern struct iommu_resv_region *
+>   iommu_alloc_resv_region(phys_addr_t start, size_t length, int prot,
+>   			enum iommu_resv_type type);
+> +extern unsigned long iommu_get_minimum_page_size(struct iommu_domain *domain);
+>   extern int iommu_get_group_resv_regions(struct iommu_group *group,
+>   					struct list_head *head);
+>   
+> 
