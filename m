@@ -2,66 +2,112 @@ Return-Path: <SRS0=5Asf=UN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DB1C31E4D
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 14:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC2A8C31E4B
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 14:52:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 153CC21721
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 14:44:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91DE621537
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 14:52:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560523970;
+	bh=iaMwC5vxzH51A+db2IQS+SUQpNZS/nq8vyQQFk6NyFY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=umR6kiVp902Ulo1lcdStbStea1Ir6uuLhKWhHiilwdEDtR5wBGr99uiu8tVkT9hh+
+	 rxqPXnT/+jfLENO5Ov5nT2iDWR1W1wTeR9oXVZF6ozgF2MSLxjCYnjoxu2XBdyQgxA
+	 rRsJAraPodfWkvoTv1OnQRhDx6i9BPhsu68A8qjc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728537AbfFNOoy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jun 2019 10:44:54 -0400
-Received: from netrider.rowland.org ([192.131.102.5]:43409 "HELO
-        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1728074AbfFNOoy (ORCPT
+        id S1728488AbfFNOwq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jun 2019 10:52:46 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:41463 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728272AbfFNOwq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jun 2019 10:44:54 -0400
-Received: (qmail 26355 invoked by uid 500); 14 Jun 2019 10:44:53 -0400
-Received: from localhost (sendmail-bs@127.0.0.1)
-  by localhost with SMTP; 14 Jun 2019 10:44:53 -0400
-Date:   Fri, 14 Jun 2019 10:44:53 -0400 (EDT)
-From:   Alan Stern <stern@rowland.harvard.edu>
-X-X-Sender: stern@netrider.rowland.org
-To:     shuah <shuah@kernel.org>
-cc:     Christoph Hellwig <hch@lst.de>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Oliver Neukum <oneukum@suse.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
-Subject: Re: How to resolve an issue in swiotlb environment?
-In-Reply-To: <41caad16-3fa1-413b-0d49-594d48b88de4@kernel.org>
-Message-ID: <Pine.LNX.4.44L0.1906141043530.24571-100000@netrider.rowland.org>
+        Fri, 14 Jun 2019 10:52:46 -0400
+Received: by mail-pl1-f195.google.com with SMTP id s24so1120866plr.8;
+        Fri, 14 Jun 2019 07:52:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=0HRENCM8//S+WGvQP1amFcQvEAKniYiMn7pbWKjyBdY=;
+        b=TyVTGaOw5AtNg2y27QJA4f/taFVIo21wtfv0z2WUTclnFvohafgQjLOdGAtM5sZjXW
+         adxtI18hJyHbxrjCmeTqI5/YcDHRTN18D/p+P3g7LxhBb9i/TZyjFv5ovj/yGzc9KUQA
+         MbczNKRAp+ZOOgSP68Ob/KUtH/hvR53lN3fW4o5r3g0E2lgB3/KxZiKdQN+lhgVbdz5C
+         UT+VL8iM+atG9nsnoEHBJwMm4lJ/iMsWfeLI/K00ZPAV5JToGPU8DtMi885Y5RptlX8k
+         LSahdR7G3TjPGrSvg49LHEn6jf5N8lKBY2/FfkBq0ZysPLQoLvgJCeuCLpz9r+ImsZe9
+         orgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=0HRENCM8//S+WGvQP1amFcQvEAKniYiMn7pbWKjyBdY=;
+        b=YeR4xRiQW7zsFPzxKafQarps5nbTaITtNACzQ6Q4ym7IquI4uku8CGS11HfpMt7qPH
+         EszQdQZ+Ebb2d0uzZh6Ok0PaIhrWnihzYbFfEOfIEWFl6CQ7TgbRBsmFIGPHhTQXMAH2
+         AAYckEgKPYMwJavTRDTkC5bFDuT59VliL5YhaebgGgO73SluK+VJlYbEsQae72H27v88
+         LdJIjZjeGEp8dnQmveUtRT9XlU//5U6UQIYHiLeEd137ajnOls6kFe8h3WSubyC6CLEn
+         E/QrzijDeVsVpyOp/DS8x3/e0Ipe0RhTMZ7P1Ai/eaOfeCtrk9jOU/xkQ0u3M5eWualE
+         jRZQ==
+X-Gm-Message-State: APjAAAVOVK2RlgwVsemhMBWIGJO2nfj3lcEpZ0t891rKjfI4X2x/Lc2E
+        WePWi8I8Ve1Pe4Ya/GOyLtw=
+X-Google-Smtp-Source: APXvYqyFUmlEREi/X57+HY4aEPz63qUPvrk2aqLcRGoJiiT/qF11K4eFgDz2Y3M6c8EbIuSjXZEhcw==
+X-Received: by 2002:a17:902:8f81:: with SMTP id z1mr27307623plo.290.1560523965030;
+        Fri, 14 Jun 2019 07:52:45 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:180::1:b330])
+        by smtp.gmail.com with ESMTPSA id v64sm3706012pfv.172.2019.06.14.07.52.43
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 14 Jun 2019 07:52:44 -0700 (PDT)
+Date:   Fri, 14 Jun 2019 07:52:39 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Quentin Monnet <quentin.monnet@netronome.com>
+Cc:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
+        dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com, cgroups@vger.kernel.org, ast@kernel.org,
+        daniel@iogearbox.net, kafai@fb.com, songliubraving@fb.com,
+        yhs@fb.com, bpf@vger.kernel.org
+Subject: Re: [PATCH 10/10] blkcg: implement BPF_PROG_TYPE_IO_COST
+Message-ID: <20190614145239.GA538958@devbig004.ftw2.facebook.com>
+References: <20190614015620.1587672-1-tj@kernel.org>
+ <20190614015620.1587672-11-tj@kernel.org>
+ <e4d1df7b-66bb-061a-8ecb-ff1e5be3ab1d@netronome.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e4d1df7b-66bb-061a-8ecb-ff1e5be3ab1d@netronome.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 13 Jun 2019, shuah wrote:
+Hello, Quentin.
 
-> > Great!  So all we have to do is fix vhci-hcd.  Then we can remove all
-> > the virt_boundary_mask stuff from usb-storage and uas entirely.
-> > 
-> > (I'm assuming wireless USB isn't a genuine issue.  As far as I know, it
-> > is pretty much abandoned at this point.)
-> > 
-> > Valentina and Shua: Adding SG support to vhci-hcd shouldn't be too
-> > hard.  It ought to be possible even without changing the network
-> > protocol.
-> > 
-> 
-> I will start taking a look at this. Is there a target release in plan
-> to drop virt_boundary_mask stuff?
+On Fri, Jun 14, 2019 at 12:32:09PM +0100, Quentin Monnet wrote:
+> Please make sure to update the documentation and bash
+> completion when adding the new type to bpftool. You
+> probably want something like the diff below.
 
-Not yet.  But since it doesn't do what we want anyway, this should be 
-fixed quickly.
+Thank you so much.  Will incorporate them.  Just in case, while it's
+noted in the head message, I lost the RFC marker while prepping this
+patch.  It isn't yet clear whether we'd really need custom cost
+functions and this patch is included more as a proof of concept.  If
+it turns out that this is beneficial enough, the followings need to be
+answered.
 
-Alan Stern
+* Is block ioctl the right mechanism to attach these programs?
 
+* Are there more parameters that need to be exposed to the programs?
+
+* It'd be great to have efficient access to per-blockdev and
+  per-blockdev-cgroup-pair storages available to these programs so
+  that they can keep track of history.  What'd be the best of way of
+  doing that considering the fact that these programs will be called
+  per each IO and the overhead can add up quickly?
+
+Thanks.
+
+-- 
+tejun
