@@ -2,148 +2,94 @@ Return-Path: <SRS0=5Asf=UN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3519AC31E49
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 00:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62F81C31E45
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 01:20:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0877420B7C
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 00:34:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560472482;
-	bh=XAlloaOV1xZpKZTaxk01s3z5Ddta1c/KBJFc4Qcqv3w=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=qOSPdJ6cb1eErfyFYD05aZpGhxxcS4scwMRSZMqpeIiMSHXR+SEpkf8eWpm0ipqpw
-	 Zq+MfdHX0b0BNHLgSJzv155wdEm58hCihrO3bC0DZOjtxlZ3VVMz/Jb/C098R0Ee9h
-	 KLcDx75etdZIfoXHeasW5UqW35Icws+f5XxdyLAs=
+	by mail.kernel.org (Postfix) with ESMTP id 381D220B7C
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 01:20:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725819AbfFNAdz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jun 2019 20:33:55 -0400
-Received: from mail-pg1-f182.google.com ([209.85.215.182]:36932 "EHLO
-        mail-pg1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725778AbfFNAdy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jun 2019 20:33:54 -0400
-Received: by mail-pg1-f182.google.com with SMTP id 20so465869pgr.4;
-        Thu, 13 Jun 2019 17:33:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=oTlzP5u+wueqk5xdHgpRxhOd00u8gJeBwCjbnHotl3k=;
-        b=BzGNcoFmYi8gLKxOomEtTfMFNIXrqiP0F3yWFy2pIZq6bQXNBZWRXp+YK4O+W6BCr2
-         03Dyfn+G4eBB3Qoewqaj5dXNOGEhd5+/AUaHayk9hntIRt+00rCIjkrtozgqiu4dUT67
-         NXksTOoEBg/0aXehmbLZAvEY8gPuTmfpYZOeXwdZ+W6/stWG/qeXrkP4bwKa17v/HPEE
-         9V8TlTDTfG5rKd2Vn0dcSpmSzCnPNzfTNv9ZSXQFSxQqYOM+tQkOTpS5CANKmgM1daZg
-         LNz0VFzp3brsf7zVNzjCvQulg96AMDLT7OhuNOeL/OvusgvhPe3SUuC3odLuGzHJ91OK
-         HOZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=oTlzP5u+wueqk5xdHgpRxhOd00u8gJeBwCjbnHotl3k=;
-        b=sWaeljdmZ/wx+PkuXrZ845qNKZwXUOs+PtyNPf2GXKVPIdpeu33Y4qee8WRMGXVAEw
-         tWLdLMtytZcSvSwglMvAROF8CA5rCV89wUq4IhGkJ8QlHRpvRpemb68YB2e1+Z4CbYzi
-         N6aqWul8Vgb6XLkR00btt4WLnrw7JK9JqZ/ZqyPtA8/EzcEWh2dBPkrh+/+BPxkQxe5q
-         4Iaz/p9nRjEtlJQVMi50UkjmDzCIdhEed6ECH7l1EW39buBWwQn/iDdi7cyXaT/oowLX
-         nldCy1YA57RXmwwQaOHZ/Mv8hZbc0McdfETvCgDdgQKBxyb67e35X3E3t82tyelVbvmB
-         sDUg==
-X-Gm-Message-State: APjAAAVQ+NBii9uloUaWJUaATdqgcZz0g6qb/no5fYJ6/mPDBm3QRgMO
-        UG/FbEufC3TdRgCvmxyxHRg5xgkw
-X-Google-Smtp-Source: APXvYqwdEJlBHl1J6iniMl+4x+IcJZNUmIQ5tWeT365a3MEshvfmKjso/WA0P3Jq5VOzRc4hZcCN1g==
-X-Received: by 2002:a62:750c:: with SMTP id q12mr75920731pfc.59.1560472433969;
-        Thu, 13 Jun 2019 17:33:53 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::2:9d14])
-        by smtp.gmail.com with ESMTPSA id l1sm894960pgj.67.2019.06.13.17.33.52
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 17:33:53 -0700 (PDT)
-From:   Tejun Heo <tj@kernel.org>
-To:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
-        axboe@kernel.dk, jack@suse.cz
-Cc:     linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, kernel-team@fb.com
-Subject: [PATCHSET btrfs/for-next] btrfs: fix cgroup writeback support
-Date:   Thu, 13 Jun 2019 17:33:42 -0700
-Message-Id: <20190614003350.1178444-1-tj@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        id S1726103AbfFNBUB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jun 2019 21:20:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36428 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725616AbfFNBUB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jun 2019 21:20:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2EC8A3082E4D;
+        Fri, 14 Jun 2019 01:20:01 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A13A6607B2;
+        Fri, 14 Jun 2019 01:19:51 +0000 (UTC)
+Date:   Fri, 14 Jun 2019 09:19:47 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: alternative take on the same page merging leak fix v2
+Message-ID: <20190614011946.GB14436@ming.t460p>
+References: <20190613095529.25005-1-hch@lst.de>
+ <00c908ad-ca33-164d-3741-6c67813c1f0d@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <00c908ad-ca33-164d-3741-6c67813c1f0d@kernel.dk>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Fri, 14 Jun 2019 01:20:01 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Thu, Jun 13, 2019 at 04:04:03AM -0600, Jens Axboe wrote:
+> On 6/13/19 3:55 AM, Christoph Hellwig wrote:
+> > Hi Jens, hi Ming,
+> > 
+> > this is the tested and split version of what I think is the better
+> > fix for the get_user_pages page leak, as it leaves the intelligence
+> > in the callers instead of in bio_try_to_merge_page.
+> > 
+> > Changes since v1:
+> >   - drop patches not required for 5.2
+> >   - added Reviewed-by tags
+> 
+> Applied for 5.2, thanks.
 
-When writeback is executed asynchronously (e.g. for compression), bios
-are bounced to and issued by worker pool shared by all cgroups.  This
-leads to significant priority inversions when cgroup IO control is in
-use - IOs for a low priority cgroup can tie down the workers forcing
-higher priority IOs to wait behind them.
+Hi Jens & Christoph,
 
-This patchset adds an bio punt mechanism to blkcg.  A bio tagged with
-REQ_CGROUP_PUNT flag is bounced to the asynchronous issue context of
-the associated blkcg on bio_submit().  As the bios are issued from
-per-blkcg work items, there's no concern for priority inversions and
-it doesn't require invasive changes to the filesystems.  The mechanism
-should be generally useful for IO control support across different
-filesystems.
+Looks the following change is missed in patch 1, otherwise kernel oops
+is triggered during kernel booting:
 
-btrfs async path is simplified and is updated to use REQ_CGROUP_PUNT
-for submitting asynchronous bios.  It's also updated to always and
-only account the original writeback bios against wbc so that cgroup
-inode writeback ownership arbitration isn't confused by downstream
-bios.
+diff --git a/block/bio.c b/block/bio.c
+index 35b3c568a48f..9ccf07c666f7 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -706,6 +706,8 @@ static int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
+ 		return 0;
+ 
+ 	if (bio->bi_vcnt > 0) {
++		bool same_page;
++
+ 		bvec = &bio->bi_io_vec[bio->bi_vcnt - 1];
+ 
+ 		if (page == bvec->bv_page &&
+@@ -723,7 +725,7 @@ static int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
+ 		if (bvec_gap_to_prev(q, bvec, offset))
+ 			return 0;
+ 
+-		if (page_is_mergeable(bvec, page, len, offset, false) &&
++		if (page_is_mergeable(bvec, page, len, offset, &same_page) &&
+ 		    can_add_page_to_seg(q, bvec, page, len, offset)) {
+ 			bvec->bv_len += len;
+ 			goto done;
 
-This patchset contains the following 8 patches.  The first three are
-my blkcg patches to implement the needed mechanisms.  The latter five
-are Chris Mason's btrfs cleanup and update patches.  Please let me
-know how the patches should be routed.  Given that there currently
-aren't other users, it's likely the easiest to route all through btrfs
-tree.
-
- 0001-blkcg-writeback-Add-wbc-no_wbc_acct.patch
- 0002-blkcg-writeback-Implement-wbc_blkcg_css.patch
- 0003-blkcg-implement-REQ_CGROUP_PUNT.patch
- 0004-Btrfs-stop-using-btrfs_schedule_bio.patch
- 0005-Btrfs-delete-the-entire-async-bio-submission-framewo.patch
- 0006-Btrfs-only-associate-the-locked-page-with-one-async_.patch
- 0007-Btrfs-use-REQ_CGROUP_PUNT-for-worker-thread-submitte.patch
- 0008-Btrfs-extent_write_locked_range-should-attach-inode-.patch
-
-0001-0003 implement wbc->no_wbc_acct, wbc_blkcg_css() and
-REQ_CGROUP_PUNT.
-
-0004-0006 are prep patches to simplify / improve async bio submission.
-
-0007 makes btrfs use REQ_CGROUP_PUNT for async bios.
-
-0008 fixes wbc writeback accounting for IOs issued through
-extent_write_locked_range().
-
-This patchset is also available in the following git branch.
-
- git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git review-btrfs-cgroup-updates
-
-Thanks, diffstat follows.
-
- block/blk-cgroup.c          |   54 +++++++++
- block/blk-core.c            |    3 
- fs/btrfs/compression.c      |   16 +-
- fs/btrfs/compression.h      |    3 
- fs/btrfs/ctree.h            |    1 
- fs/btrfs/disk-io.c          |   25 +---
- fs/btrfs/extent_io.c        |   15 +-
- fs/btrfs/inode.c            |   61 ++++++++--
- fs/btrfs/super.c            |    1 
- fs/btrfs/volumes.c          |  264 --------------------------------------------
- fs/btrfs/volumes.h          |   10 -
- fs/fs-writeback.c           |    2 
- include/linux/backing-dev.h |    1 
- include/linux/blk-cgroup.h  |   16 ++
- include/linux/blk_types.h   |   10 +
- include/linux/writeback.h   |   24 +++-
- 16 files changed, 194 insertions(+), 312 deletions(-)
-
---
-tejun
-
+Thanks,
+Ming
