@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D36A2C31E4B
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 13:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F98C31E4B
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 13:15:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB36220850
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 13:14:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5C9620850
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 13:15:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728134AbfFNNO4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jun 2019 09:14:56 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45858 "EHLO mx1.suse.de"
+        id S1728023AbfFNNO7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jun 2019 09:14:59 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45890 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727766AbfFNNOz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jun 2019 09:14:55 -0400
+        id S1728121AbfFNNO6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jun 2019 09:14:58 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 5AE11AE07;
-        Fri, 14 Jun 2019 13:14:54 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 67485AE1F;
+        Fri, 14 Jun 2019 13:14:57 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 13/29] bcache: remove "XXX:" comment line from run_cache_set()
-Date:   Fri, 14 Jun 2019 21:13:42 +0800
-Message-Id: <20190614131358.2771-14-colyli@suse.de>
+Subject: [PATCH 14/29] bcache: remove unnecessary prefetch() in bset_search_tree()
+Date:   Fri, 14 Jun 2019 21:13:43 +0800
+Message-Id: <20190614131358.2771-15-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190614131358.2771-1-colyli@suse.de>
 References: <20190614131358.2771-1-colyli@suse.de>
@@ -36,29 +36,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In previous bcache patches for Linux v5.2, the failure code path of
-run_cache_set() is tested and fixed. So now the following comment
-line can be removed from run_cache_set(),
-	/* XXX: test this, it's broken */
+In function bset_search_tree(), when p >= t->size, t->tree[0] will be
+prefetched by the following code piece,
+ 974                 unsigned int p = n << 4;
+ 975
+ 976                 p &= ((int) (p - t->size)) >> 31;
+ 977
+ 978                 prefetch(&t->tree[p]);
+
+The purpose of the above code is to avoid a branch instruction, but
+when p >= t->size, prefetch(&t->tree[0]) has no positive performance
+contribution at all. This patch avoids the unncessary prefetch by only
+calling prefetch() when p < t->size.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/super.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/md/bcache/bset.c | 16 ++--------------
+ 1 file changed, 2 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 877113b62b0f..3364b20567eb 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1946,7 +1946,7 @@ static int run_cache_set(struct cache_set *c)
- 	}
+diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
+index 8f07fa6e1739..aa2e4ab0fab9 100644
+--- a/drivers/md/bcache/bset.c
++++ b/drivers/md/bcache/bset.c
+@@ -960,22 +960,10 @@ static struct bset_search_iter bset_search_tree(struct bset_tree *t,
+ 	unsigned int inorder, j, n = 1;
  
- 	closure_sync(&cl);
--	/* XXX: test this, it's broken */
-+
- 	bch_cache_set_error(c, "%s", err);
+ 	do {
+-		/*
+-		 * A bit trick here.
+-		 * If p < t->size, (int)(p - t->size) is a minus value and
+-		 * the most significant bit is set, right shifting 31 bits
+-		 * gets 1. If p >= t->size, the most significant bit is
+-		 * not set, right shifting 31 bits gets 0.
+-		 * So the following 2 lines equals to
+-		 *	if (p >= t->size)
+-		 *		p = 0;
+-		 * but a branch instruction is avoided.
+-		 */
+ 		unsigned int p = n << 4;
  
- 	return -EIO;
+-		p &= ((int) (p - t->size)) >> 31;
+-
+-		prefetch(&t->tree[p]);
++		if (p < t->size)
++			prefetch(&t->tree[p]);
+ 
+ 		j = n;
+ 		f = &t->tree[j];
 -- 
 2.16.4
 
