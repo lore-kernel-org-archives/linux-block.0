@@ -2,66 +2,94 @@ Return-Path: <SRS0=5Asf=UN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4237C46477
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 07:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71179C31E4C
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 07:27:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6B1C2073F
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 07:25:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53ED1206BB
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jun 2019 07:27:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726321AbfFNHZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jun 2019 03:25:29 -0400
-Received: from verein.lst.de ([213.95.11.211]:44770 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726294AbfFNHZ3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jun 2019 03:25:29 -0400
-Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 0A64268B02; Fri, 14 Jun 2019 09:25:00 +0200 (CEST)
-Date:   Fri, 14 Jun 2019 09:24:59 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc:     joro@8bytes.org, axboe@kernel.dk, ulf.hansson@linaro.org,
-        wsa+renesas@sang-engineering.com, hch@lst.de,
-        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [RFC PATCH v6 5/5] mmc: queue: Use bigger segments if IOMMU
- can merge the segments
-Message-ID: <20190614072459.GD8420@lst.de>
-References: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com> <1560421215-10750-6-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+        id S1726207AbfFNH1W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jun 2019 03:27:22 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:36783 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726115AbfFNH1W (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jun 2019 03:27:22 -0400
+Received: by mail-lf1-f67.google.com with SMTP id q26so1013506lfc.3;
+        Fri, 14 Jun 2019 00:27:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pdzPCh9Iq6DsZwmNtrM2YKJ68uEFiOmJCFPMQ9QBxhg=;
+        b=IgBS2hKbaMLWy3bidnBSuTTGRDrXEvUkf+CHJKiR3ZDo+aohC6GjUQflWKObfWaBcw
+         M8n3SUHSOrcoOnwHh9iXp7eZYZArhvdAgQsanPK7TpPgWe8keVpBxAeTyiXCdBHs/Tu/
+         v+2qWqhoT4NWEmFcBlV4qhKheqzefhDbi3KXI+cWCgvxp302SFKZYlpC/h3WG5oKt82Y
+         ktOB2pZV4iB1KpCqoU+F3dVutr2ulLWCvL1rD8auvgbGkwAVKuMCY9mmOTGA2Cwa/Ry5
+         IUWYdcrTmCPCWmyXv3vJl8ZIfCk+T0pnYqrg23c/pOSPQ8XAWmijY/nGQSvSjapOK49h
+         MySw==
+X-Gm-Message-State: APjAAAXT19WQ0+xz3dzOxOa8imdlVQO53iTdpp700pyJ5k9pk5sGrHAG
+        GM3GrcaeuaB28M/w8rKC8YZw26dqd49Iu3ko4u8=
+X-Google-Smtp-Source: APXvYqyZPsGGwkPkWixMhMUECj/EG4qRfXowB8lnrcuhtq1khDIasqYBoWJAfAgpDFug4QWIzzNZRN21TX7Vx1y1Gng=
+X-Received: by 2002:ac2:597c:: with SMTP id h28mr8197569lfp.90.1560497239682;
+ Fri, 14 Jun 2019 00:27:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1560421215-10750-6-git-send-email-yoshihiro.shimoda.uh@renesas.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+ <1560421215-10750-5-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+ <CAMuHMdXYqgPRX1WfUTRsKHhnSok5vfnr4AY36=vXoUvAxcNyWQ@mail.gmail.com> <20190614071800.GB8420@lst.de>
+In-Reply-To: <20190614071800.GB8420@lst.de>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Fri, 14 Jun 2019 09:27:06 +0200
+Message-ID: <CAMuHMdXm5RtDUL5Wkyd6aJihu9nykYOhRf7vN6hOtB-OO8CTQQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v6 4/5] mmc: tmio: Use dma_max_mapping_size() instead
+ of a workaround
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Joerg Roedel <joro@8bytes.org>, Jens Axboe <axboe@kernel.dk>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Linux IOMMU <iommu@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 13, 2019 at 07:20:15PM +0900, Yoshihiro Shimoda wrote:
-> +static unsigned int mmc_get_max_segments(struct mmc_host *host)
-> +{
-> +	return host->can_merge ? BLK_MAX_SEGMENTS : host->max_segs;
-> +}
+Hi Christoph,
 
-Note that BLK_MAX_SEGMENTS is really a little misnamed, it just
-is a BLK_DEFAULT_SEGMENTS.  I think you are better of picking your
-own value here (even if 128 ends up ok) than reusing this somewhat
-confusing constant.
+On Fri, Jun 14, 2019 at 9:18 AM Christoph Hellwig <hch@lst.de> wrote:
+> On Thu, Jun 13, 2019 at 10:35:44PM +0200, Geert Uytterhoeven wrote:
+> > I'm always triggered by the use of min_t() and other casts:
+> > mmc->max_blk_size and mmc->max_blk_count are both unsigned int.
+> > dma_max_mapping_size() returns size_t, which can be 64-bit.
+> >
+> >  1) Can the multiplication overflow?
+> >     Probably not, as per commit 2a55c1eac7882232 ("mmc: renesas_sdhi:
+> >     prevent overflow for max_req_size"), but I thought I'd better ask.
+> >  2) In theory, dma_max_mapping_size() can return a number that doesn't
+> >     fit in 32-bit, and will be truncated (to e.g. 0), leading to max_req_size
+> >     is zero?
+>
+> This really should use a min_t on size_t.  Otherwise the patch looks
+> fine:
 
-> +	/*
-> +	 * Since blk_mq_alloc_tag_set() calls .init_request() of mmc_mq_ops,
-> +	 * the host->can_merge should be set before to get max_segs from
-> +	 * mmc_get_max_segments().
-> +	 */
-> +	if (host->max_segs < BLK_MAX_SEGMENTS &&
-> +	    device_iommu_mapped(mmc_dev(host)))
-> +		host->can_merge = 1;
-> +	else
-> +		host->can_merge = 0;
-> +
+Followed by another min() to make it fit in mmc->max_req_size, which is
+unsigned int.
 
-can_merge seems a little too generic a name to me.  Maybe can_iommu_merge?
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
