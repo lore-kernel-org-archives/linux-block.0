@@ -2,118 +2,106 @@ Return-Path: <SRS0=HzVw=UO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD86C31E50
-	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D838C31E50
+	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:29:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E998B2184D
-	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 532312184D
+	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:29:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560623155;
-	bh=U4MOaqM9uzxnS143DMRuMYJ5CVOzVO0VSTRM6XFTuO4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=slGXfHXFzAp6pl81jC+OtBvgOd49Xl42Rxr6TdrQxk8KBxztCYxRvgpCmEk8sFOSY
-	 FiFUnXOrNHhJ5yrlc9InhYbulwNiM351MEPc6YbzZRtWIj02A+bvE721brReyHis+g
-	 Ruu6qa2iWT9v9UtSMllxis6MJBcU7zCLlaHS2q4s=
+	s=default; t=1560623378;
+	bh=drg1GKt+ib6Bp6LZP0o/5c5PxF6plAd2lkDNtWcgiCQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ryhCxupeIRwUp+bxFlcnYbyMnl6UaQ3Fb6iPQnA0Vw0PHKO9r1Uif7HIRyfzG0WqV
+	 b+6qPLc6UrM5lAUQw7V4MajT0oAOeVnOshqCSh/MGuvsGGeGpQPPNv/+uDOINh1Zud
+	 /5FAPZuSoKh5ThdoC7q3eJGnFDimBsJXUJSBGkow=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726953AbfFOSZI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Jun 2019 14:25:08 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:43916 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725270AbfFOSZH (ORCPT
+        id S1726366AbfFOS3h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Jun 2019 14:29:37 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:45666 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725535AbfFOS3h (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Jun 2019 14:25:07 -0400
-Received: by mail-qt1-f195.google.com with SMTP id z24so6310897qtj.10;
-        Sat, 15 Jun 2019 11:25:07 -0700 (PDT)
+        Sat, 15 Jun 2019 14:29:37 -0400
+Received: by mail-qk1-f193.google.com with SMTP id s22so3795741qkj.12;
+        Sat, 15 Jun 2019 11:29:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=9sm1pVtM6HiDSHPec5dQ2RrXdzESv3uF6n2cxGS4b90=;
-        b=LaQmOARvbblztTTfLS5Ehee5ijSLh4q543RGtynnH4HkuNB7M4uzAhQLD3JXJarPmn
-         JRDk8C6WcBIsYUEngq32//h7IhZto6U5aH3rLMQ6H4GnH067999tO6/YxQS8kysWuc6s
-         gVn3YdJx+RYd4DKUmUaVW1fRxrO0kbSJsFxRSLasWGOb1ptV6thdmM/0gX14C9ptyEFn
-         7FJnGd9lr1jgSpXt024xBXGvqRzWH0uYdv9HpEZU4lvrZf0oKydBQTvcvE0RZjWy6zOB
-         v4glJnAua7DpxyBdwhVD9fm0exxkGt0DEqIpfwagFte8xga4BIgqkcT7PBHU6LuE99/K
-         5jkg==
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=lZWCDkdCZYN5S0+Ul2IxfiRO29wLQTcP6wWsFwWlu8s=;
+        b=PphbEiU9i51xnvtm9V73bQYuo5cIfkeTXUcMOZ155zwXkW9k1v0AszL3HGTB5AYeTT
+         fMmrhBXuFr0sPCV8eoVVlAksctrq0Tp9EfiShBGan9umj+gy1onSVWWyp/YbfNQ8hPO0
+         /YFxWG/bnNyKmMK9S+h8oW63Tm9QU2mlTRob+1FyRqmyB1V5pEABc7CIakDbt8CPe9zk
+         5OthH7bBlGrWW0NoCY261eL7JxLB03tRJCoGI4wGle7j93IpmuJsT+faKyIQzcXuW9CI
+         btceBey/cK2gygHTP53JgjcqvJ2KM9kFr8n+9XEQeuWH9QBQVX9jjMSGKTp/Ed+ovdcz
+         DqIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=9sm1pVtM6HiDSHPec5dQ2RrXdzESv3uF6n2cxGS4b90=;
-        b=llz+ei3au7FArEK8xwr6/VqeTJpG0t31Xwsd1hNkYzyt8N2a4T+IkDRRUI0tNeqqGY
-         sxgHdnrv8iRrfRQYDrwpOQgDvhk+Rrfsaq6Vth4guSeBE/YEe5eEXst8fcf4/2x43k1T
-         CQ4c9rZ6JHeH0t8PC7DyA2M/qL830x0QVZ+wxmNRuaipj80VHdQrKrX71wyxzN0Ji66w
-         GPfZWMlIiz8wJH2RdC4Tu4h2B8VxpyLxSo/uMpNwezfvNMOU2h7dhdZbgFExI/cUtTux
-         Sxyaef2OQ5rc1U8xtbcq9aYdXQcCqIh5ROG6Q7funIocKYwolzrAMZxSsW78ySWqEzn4
-         wabA==
-X-Gm-Message-State: APjAAAXuK/UxOBO+VbqG1HZ+pUer+Tid/iWAHAySt0+YhWQY5tK6J32+
-        wC2OhAQ2Yl0i0qdPsbKMTrM=
-X-Google-Smtp-Source: APXvYqwCG3rONyzLg+di3X49mi3qomyEHccDtC6yZgNxwCjZg1WAD2VALGRr2jdBrcID4Cylu6mjsA==
-X-Received: by 2002:aed:3b25:: with SMTP id p34mr86126011qte.289.1560623106540;
-        Sat, 15 Jun 2019 11:25:06 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=lZWCDkdCZYN5S0+Ul2IxfiRO29wLQTcP6wWsFwWlu8s=;
+        b=YrJsVPB46VnybZ6pvHnHjY6HMrSeX/gus1txUHXOwRyDr2FIamXMCsiuWRn3tu9mOV
+         hbYjika5yo1yBq4+4L53t5P7VlXGjBxdsHn/G3lAxaVpjcGswnWAvN9Ms5M9Kj+H1wSB
+         Z12X0UlNsBt/TCmmm54ish8unSVy7rHsUpv6DKos26iU+jBN+Av82FcyADN5Zu8QvGR9
+         3maBS/rENyGssPvbRg8GnQqz1+rwQAluN/V5baMxClAjeJts37hsxNl7r3oTH6iRpg/p
+         iYm0Qx342UpkqUgJw+fUPoKP3tgdhDQ2jb4dg9zf6eLXtZLpOnb+UBg8R9EwlqUVObHx
+         k+8A==
+X-Gm-Message-State: APjAAAXW54WSp2Z5E1QfMNc3UuA3Y2N29aPwwXYL8WbTvzGuA8C5ub8L
+        eCo6VsjWRJZwHl1zKCXqYyE=
+X-Google-Smtp-Source: APXvYqx5M5Vccns8o0Sb2Ujl3A2MXEaAf0YNJo2yyhXxfxv1/7ALY9MC70OvLseEU3n6ihO/8XZSew==
+X-Received: by 2002:a05:620a:124c:: with SMTP id a12mr82297214qkl.336.1560623376408;
+        Sat, 15 Jun 2019 11:29:36 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::4883])
-        by smtp.gmail.com with ESMTPSA id l3sm3499902qkd.49.2019.06.15.11.25.05
+        by smtp.gmail.com with ESMTPSA id c5sm4004284qkb.41.2019.06.15.11.29.35
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 15 Jun 2019 11:25:06 -0700 (PDT)
+        Sat, 15 Jun 2019 11:29:35 -0700 (PDT)
+Date:   Sat, 15 Jun 2019 11:29:33 -0700
 From:   Tejun Heo <tj@kernel.org>
 To:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
         axboe@kernel.dk, jack@suse.cz
 Cc:     linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, kernel-team@fb.com,
-        Tejun Heo <tj@kernel.org>
-Subject: [PATCH 2/9] blkcg, writeback: Add wbc->no_wbc_acct
-Date:   Sat, 15 Jun 2019 11:24:46 -0700
-Message-Id: <20190615182453.843275-3-tj@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190615182453.843275-1-tj@kernel.org>
+        linux-block@vger.kernel.org, kernel-team@fb.com
+Subject: Re: [PATCH 4/9] blkcg: implement REQ_CGROUP_PUNT
+Message-ID: <20190615182933.GH657710@devbig004.ftw2.facebook.com>
 References: <20190615182453.843275-1-tj@kernel.org>
+ <20190615182453.843275-5-tj@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190615182453.843275-5-tj@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When writeback IOs are bounced through async layers, the IOs should
-only be accounted against the wbc from the original bdi writeback to
-avoid confusing cgroup inode ownership arbitration.  Add
-wbc->no_wbc_acct to allow disabling wbc accounting.  This will be used
-make btfs compression work well with cgroup IO control.
+Hello,
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
----
- fs/fs-writeback.c         | 2 +-
- include/linux/writeback.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+On Sat, Jun 15, 2019 at 11:24:48AM -0700, Tejun Heo wrote:
+> When a shared kthread needs to issue a bio for a cgroup, doing so
+> synchronously can lead to priority inversions as the kthread can be
+> trapped waiting for that cgroup.  This patch implements
+> REQ_CGROUP_PUNT flag which makes submit_bio() punt the actual issuing
+> to a dedicated per-blkcg work item to avoid such priority inversions.
+> 
+> This will be used to fix priority inversions in btrfs compression and
+> should be generally useful as we grow filesystem support for
+> comprehensive IO control.
+> 
+> Signed-off-by: Tejun Heo <tj@kernel.org>
+> Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+> Cc: Chris Mason <clm@fb.com>
 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index c29cff345b1f..667ba07fffcd 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -724,7 +724,7 @@ void wbc_account_io(struct writeback_control *wbc, struct page *page,
- 	 * behind a slow cgroup.  Ultimately, we want pageout() to kick off
- 	 * regular writeback instead of writing things out itself.
- 	 */
--	if (!wbc->wb)
-+	if (!wbc->wb || wbc->no_wbc_acct)
- 		return;
- 
- 	id = mem_cgroup_css_from_page(page)->id;
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index 738a0c24874f..b8f5f000cde4 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -68,6 +68,7 @@ struct writeback_control {
- 	unsigned for_reclaim:1;		/* Invoked from the page allocator */
- 	unsigned range_cyclic:1;	/* range_start is cyclic */
- 	unsigned for_sync:1;		/* sync(2) WB_SYNC_ALL writeback */
-+	unsigned no_wbc_acct:1;		/* skip wbc IO accounting */
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	struct bdi_writeback *wb;	/* wb this writeback is issued under */
- 	struct inode *inode;		/* inode being written out */
+The blkcg patches, especially this one, need Jens's review.  Jens, if
+you're okay with the changes, please let me know how you want them to
+be routed.
+
+Thanks.
+
 -- 
-2.17.1
-
+tejun
