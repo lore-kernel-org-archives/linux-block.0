@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B5CC31E50
-	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 518E4C31E50
+	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0110E2082C
-	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 287DB2082C
+	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560623106;
-	bh=+j7gjDfDeVABc6ytpnn90YMWG49buPCxSSy3Umqj+ms=;
+	s=default; t=1560623115;
+	bh=vWPYZBCODMGwcZhUIzS6KtTrRf0mJvEikwJL96bCByM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=a+Zsnr8XV1LUS3VEO69yy5nMyatAsfnBPQMwZRq9ORLYyordEVlOS7iMiAkt7xCzU
-	 tNu/8zAJ8mAx3D+rhnf22nxKfP5+uLuS7Os6Vfl9GHq9DejB8g8uRQgq+lAWjqf4Bo
-	 god2625pFPpQ/1V2umSTdB37TJ+oFACAhzOD6Igo=
+	b=Wd2kNu5m396FXg0ipaK22jLzCKDqBhAsURvzVqKuxMlkPMRpjTVndyOtx0/HFQBVN
+	 T9Y3V6Ct9EfSLDMUmsk+LY7i5o8YEuRxqcH0z0Ub195Hk8SQribifgCci/xr6FvGog
+	 kd8wSKx/RM2j1syYTWjgsBFz+mlceN/E8GgZnCBA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726857AbfFOSZF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Jun 2019 14:25:05 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:35368 "EHLO
+        id S1727045AbfFOSZM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Jun 2019 14:25:12 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:43922 "EHLO
         mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725270AbfFOSZF (ORCPT
+        with ESMTP id S1725270AbfFOSZK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Jun 2019 14:25:05 -0400
-Received: by mail-qt1-f195.google.com with SMTP id d23so6371988qto.2;
-        Sat, 15 Jun 2019 11:25:04 -0700 (PDT)
+        Sat, 15 Jun 2019 14:25:10 -0400
+Received: by mail-qt1-f195.google.com with SMTP id z24so6310972qtj.10;
+        Sat, 15 Jun 2019 11:25:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=mzP081WUxg14pTor13LXGmwUotvYUmI76qpBJZ7MQmo=;
-        b=ZRmkMz0qIw8nZnwRBWYitdL5G7bqJQ5Krrum9cypCGmsBxLiw9wW4X+EEfk5B0peB4
-         E7XtmP/Sea0vSXcTMwMq6UT1O1U8MgB/Vn00i2tOaqdDXwzOKVxDsKz84lK8plowZ7sK
-         v7jfD2iiXYr87DVUujW+AgDSz2VQWqY7LqPTp6Je4XCdjaKW1vi0G/Ed87L8YTSBEWHB
-         +CzfIcVR2/5YsUZoq/GXQnnzDdtkPznwAqlQG8keNevJIGDsrqvwVqvv6rcSdD+QnwsR
-         ggUpGQBAdBx3RxTiPNetKRjwhklpOmd5a7lDw4jto6vgGHuUXQOFXloeD/43wWCTpTFf
-         gJng==
+        bh=gfbJRWowmbBmL/5PSSu1BU5VBQ2iIkWS/MK9bvMff9Y=;
+        b=FAwf+6hjmWThr/Zo8e7ZPLeQ4Osz81kO6XOn01SydzL9G7yN45Gxq1gV1sDU8bZ8Ps
+         FFMW53WswxVXCIz5ymPH+aojtStDVDFc9U4gzOUzoQm5z7aO4LdqWWx+0rGps4WFCt3i
+         yAC+1YBfKSPmk/Rx0KOBAifiqYR+upzOWcfNjxSo/sUW9yTg5oQ89iEfb0VuH5V3kC5A
+         7dJCt5OfnPvSgkYgK2OHXh79Ftd14ZNMHmmmS1DEhRy6wdKaZepGZ6VA29ZMMDldvE2d
+         4TdTtSY/E3LUI5x/rycNBKJom4cvPWPtrOWTozTAnrOMUd8K9VmOU1ZlzofGVFmBbGp3
+         Wo5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=mzP081WUxg14pTor13LXGmwUotvYUmI76qpBJZ7MQmo=;
-        b=QzzxYU3e1Ef26amDyBd/DURiypHUUkKntTgKll9+6Be1Zqb5vRHE2VQRgSHAfKKFgJ
-         yKTb+TowdoamRyN+64UrIi1bx/hYQI+D7EMAS3jcxnm07IoVs2ndfNn7aRas6p9rmshN
-         L9JEYoxjYFyJNxlg4yOXySHhw6DepBjMEktok6cgMMPGyAy1HB/ChIk/D4ywZD9F3+3e
-         g1Ud8/mn0lfGpHtfJpJrECgMmpBsze+yKMpzxf1Zz4fyNw1EzW/1/jKm9o3szTSwEgwC
-         Z1YF09WdJYsdOf86hMDqPQFZkn0K4wGYmKoBEm8Oozd4FBlIczpX4FjlvQXIc8eqS9eS
-         8euw==
-X-Gm-Message-State: APjAAAXM4fQEyR4EK5/SfbKLsrk8PX5rWEeQvftyEQ8pxptZbxV8h3Fs
-        x9cwyajtJohO2XfXjSC9B+k=
-X-Google-Smtp-Source: APXvYqyGoPk/K9c8GITJnQX6OVVFL5lE9btPsHaCNEMx1NWVv/ObSNXQtn9+ofrPJcVSolw+/a2SJA==
-X-Received: by 2002:a0c:b39e:: with SMTP id t30mr14164013qve.212.1560623103669;
-        Sat, 15 Jun 2019 11:25:03 -0700 (PDT)
+        bh=gfbJRWowmbBmL/5PSSu1BU5VBQ2iIkWS/MK9bvMff9Y=;
+        b=kbKfcA+g/1Ig8z7c9kvktKH8yMXbC8e3RyoT5JTYrOaGM8ERmuyQk9WNIW0BSEaHWT
+         VyOCYYHCgA+iX4nKnaIbMaODdDLkX2EgS+uARsbEa53iaA9j67eu34rhgf46DS6V0mVg
+         RTqfRY9NQgzAQ/8DSWbnDb6cDP8tNHPY6SJs2WG/ALm+HjEXQQWXsk3/gqXCetZEKL54
+         7WKfFEZ9AGH/Wnc8UR8PPZSqEnHMnRmwn0OL86V3DpYNvjsAxBQ3cUdPuD6HVVorT8Bm
+         jwTeyIRCkI4+FxmYSBE5HVDD9lMncJ3MDDNYm3ku2oRLK8wZ06tDcmYfEQUIBarwnem7
+         GRRQ==
+X-Gm-Message-State: APjAAAXqv4fp3AqZ5UkiXJFRFWaeS/jlEhJRxAB8uhI5mrajLiouocoE
+        HKZAKHV8ox9T4mxM66LsGZM=
+X-Google-Smtp-Source: APXvYqzAsjP5XFJMaZa4nNVaYMsFZyf6LFDCRQlhH8zipSL5vUkPHifbL2l8oi8JL4wyS9o7nD81zw==
+X-Received: by 2002:ac8:4705:: with SMTP id f5mr60570826qtp.99.1560623109356;
+        Sat, 15 Jun 2019 11:25:09 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::4883])
-        by smtp.gmail.com with ESMTPSA id u7sm4694764qta.82.2019.06.15.11.25.01
+        by smtp.gmail.com with ESMTPSA id y6sm3413435qki.67.2019.06.15.11.25.08
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 15 Jun 2019 11:25:02 -0700 (PDT)
+        Sat, 15 Jun 2019 11:25:08 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
         axboe@kernel.dk, jack@suse.cz
 Cc:     linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org, kernel-team@fb.com,
         Tejun Heo <tj@kernel.org>
-Subject: [PATCH 1/9] cgroup, blkcg: Prepare some symbols for module and !CONFIG_CGROUP usages
-Date:   Sat, 15 Jun 2019 11:24:45 -0700
-Message-Id: <20190615182453.843275-2-tj@kernel.org>
+Subject: [PATCH 3/9] blkcg, writeback: Implement wbc_blkcg_css()
+Date:   Sat, 15 Jun 2019 11:24:47 -0700
+Message-Id: <20190615182453.843275-4-tj@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190615182453.843275-1-tj@kernel.org>
 References: <20190615182453.843275-1-tj@kernel.org>
@@ -76,70 +76,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-btrfs is going to use css_put() and wbc helpers to improve cgroup
-writeback support.  Add dummy css_get() definition and export wbc
-helpers to prepare for module and !CONFIG_CGROUP builds.
+Add a helper to determine the target blkcg from wbc.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
-Reported-by: kbuild test robot <lkp@intel.com>
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 ---
- block/blk-cgroup.c     | 1 +
- fs/fs-writeback.c      | 3 +++
- include/linux/cgroup.h | 1 +
- 3 files changed, 5 insertions(+)
+ include/linux/writeback.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 617a2b3f7582..07600d3c9520 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -46,6 +46,7 @@ struct blkcg blkcg_root;
- EXPORT_SYMBOL_GPL(blkcg_root);
+diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+index b8f5f000cde4..800ee031e88a 100644
+--- a/include/linux/writeback.h
++++ b/include/linux/writeback.h
+@@ -11,6 +11,7 @@
+ #include <linux/flex_proportions.h>
+ #include <linux/backing-dev-defs.h>
+ #include <linux/blk_types.h>
++#include <linux/blk-cgroup.h>
  
- struct cgroup_subsys_state * const blkcg_root_css = &blkcg_root.css;
-+EXPORT_SYMBOL_GPL(blkcg_root_css);
+ struct bio;
  
- static struct blkcg_policy *blkcg_policy[BLKCG_MAX_POLS];
- 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 36855c1f8daf..c29cff345b1f 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -269,6 +269,7 @@ void __inode_attach_wb(struct inode *inode, struct page *page)
- 	if (unlikely(cmpxchg(&inode->i_wb, NULL, wb)))
- 		wb_put(wb);
+@@ -93,6 +94,16 @@ static inline int wbc_to_write_flags(struct writeback_control *wbc)
+ 	return 0;
  }
-+EXPORT_SYMBOL_GPL(__inode_attach_wb);
  
- /**
-  * locked_inode_to_wb_and_lock_list - determine a locked inode's wb and lock it
-@@ -580,6 +581,7 @@ void wbc_attach_and_unlock_inode(struct writeback_control *wbc,
- 	if (unlikely(wb_dying(wbc->wb)))
- 		inode_switch_wbs(inode, wbc->wb_id);
- }
-+EXPORT_SYMBOL_GPL(wbc_attach_and_unlock_inode);
- 
- /**
-  * wbc_detach_inode - disassociate wbc from inode and perform foreign detection
-@@ -699,6 +701,7 @@ void wbc_detach_inode(struct writeback_control *wbc)
- 	wb_put(wbc->wb);
- 	wbc->wb = NULL;
- }
-+EXPORT_SYMBOL_GPL(wbc_detach_inode);
- 
- /**
-  * wbc_account_io - account IO issued during writeback
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 81f58b4a5418..4cb5d5646986 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -687,6 +687,7 @@ void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
- struct cgroup_subsys_state;
- struct cgroup;
- 
-+static inline void css_get(struct cgroup_subsys_state *css) {}
- static inline void css_put(struct cgroup_subsys_state *css) {}
- static inline int cgroup_attach_task_all(struct task_struct *from,
- 					 struct task_struct *t) { return 0; }
++static inline struct cgroup_subsys_state *
++wbc_blkcg_css(struct writeback_control *wbc)
++{
++#ifdef CONFIG_CGROUP_WRITEBACK
++	if (wbc->wb)
++		return wbc->wb->blkcg_css;
++#endif
++	return blkcg_root_css;
++}
++
+ /*
+  * A wb_domain represents a domain that wb's (bdi_writeback's) belong to
+  * and are measured against each other in.  There always is one global
 -- 
 2.17.1
 
