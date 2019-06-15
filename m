@@ -2,107 +2,152 @@ Return-Path: <SRS0=HzVw=UO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A04C31E52
-	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 16:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FFABC31E50
+	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A39720644
-	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 16:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED9E52082C
+	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560617566;
-	bh=UsK22JUeOOMcfS5ld8YBMJJSkveqxnB6s9i7jkbQthk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ZmHadBE/M5ZUecCo+33L8r2v2jqsnWRvlv3DJHVMLXuhpIRoehTFkJxEXOUFPa6SQ
-	 mxlUYuqRspdWQ62E1DpiFGif3mNk2kz18TxYiTe9r2Uow0Jl1EVQkFoOgzu3PVh+FR
-	 JpyMQ8aP7zAMml72Yq7R11cFUeMCpCIGaI9+BKFg=
+	s=default; t=1560623102;
+	bh=HfQdTGLdoYJVHRDucCDpAJIJPajf8fK95i+WsCWSqQo=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=rcN4r+prRgEwhyk70lyYZKyRWzJWscKczc9uvoFFGEvzChR6b9RGbNrFEo+X7iSPe
+	 93ZqtHZJOKbDJMYYELnFZy/HhYRhM5SZIJLdyZvQp3D3m/zHHOJGjkvQpME0YwCvX7
+	 GwfEUeRJxXe4AzLA3tR1Z/EJs4KEQRPtCyfisgQQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726217AbfFOQvz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Jun 2019 12:51:55 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:33359 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725944AbfFOQvz (ORCPT
+        id S1725944AbfFOSZB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Jun 2019 14:25:01 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:33586 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725270AbfFOSZA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Jun 2019 12:51:55 -0400
-Received: by mail-qt1-f195.google.com with SMTP id x2so6224647qtr.0;
-        Sat, 15 Jun 2019 09:51:55 -0700 (PDT)
+        Sat, 15 Jun 2019 14:25:00 -0400
+Received: by mail-qt1-f194.google.com with SMTP id x2so6388565qtr.0;
+        Sat, 15 Jun 2019 11:25:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=oPwR6up+4VWQ3T9cWYQSGpPmrQDg38fErMyiBrwhRvI=;
+        b=CF7AS0QLYz8GXNUSsfGV7wFlTdL/NCb7tKm9zDrdzArufdZQ7wWrTtFhAAyrXmpVpm
+         P+EB83po2r7c7hJ+T6gm01QNYZP1Q2F3Bf5t8vRhx2e6sRqx9ujXJzbGkUzN23dSYzW2
+         qxSnxJ+tkiXwqQ/uYPyxVbAjZg5vauVJq3a05Wb+bGa+bfFmhzGEaJQgRKp3SXnjpZhn
+         yFbnnB3O5qvB9f0UpHo200UvorEv8Q6mJZtcuBnMxwN5rEbXoinhi40qUzq8V6mvGjr6
+         6vjTS82YCx1oqRBw4eWuVDIktHHGGGQ7EPzCSh01BPn+xHxj4UR5iSL23GSWe5drYcJi
+         R9yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=a4xhiw6iLiAdxawJ0gBqdsCUibLnDDLzmKzkX2M7ao4=;
-        b=JR/JSimc8wJkIyVGtrW8sddXIfoe51hLBfp76OQqLiXdj11v+ornlvGger8tCUHvDf
-         BAzCuAHwv2IojYL+dU6W7gdp7Z6BDFoZaq0dlIwg2Q6y1HK7vJfGi0O++eHTp3CpIUMS
-         g2bXbJOMYH/1pqAxP6xdKG2cjxzJu0y7oNmUMmaFpIkSiPpN/RwcZ5zesrEiDhxZMhZy
-         eSUAVlM8t9Tw69Iux3GpDjqGs5kxZLMANJJ2DkE3MfzJMlqGsORsNZ54ggxuDjQW2jFp
-         /9ToF+h5i4wkYYY0lbRYpC0PffPkjMefXTaY0muJHOX9Y4C3N3PhXLnrF9cjI1jS2/AE
-         oMdQ==
-X-Gm-Message-State: APjAAAUqeRqxWx7F/IzIDW7wdIZbDJ4AvaMS9EHJrLbYiscqMmz3H7zo
-        LxlSmeY9TblWT/51yidhbsk=
-X-Google-Smtp-Source: APXvYqzBaYFiNiMPaxJNo97WoRGxTucecswQCzfAVfZQ0cDMNOlT7per50nEv+L1BMYtPqZ0jchW0g==
-X-Received: by 2002:aed:3535:: with SMTP id a50mr88458459qte.237.1560617514471;
-        Sat, 15 Jun 2019 09:51:54 -0700 (PDT)
-Received: from dennisz-mbp.dhcp.thefacebook.com ([2620:10d:c091:480::3822])
-        by smtp.gmail.com with ESMTPSA id v4sm1288871qtq.15.2019.06.15.09.51.53
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=oPwR6up+4VWQ3T9cWYQSGpPmrQDg38fErMyiBrwhRvI=;
+        b=Hu6DbXQLsb2Jq2ys5GAhhqvgFDbjWlF5v1l0hMMAEiFPhz7DqYdfc9Mpun5oDYy1Fn
+         QVPNSd0ApqwlXIjpbT6l1xmm79rsJ1+iFUkwUe88w6f3szDDn6NAVdFsXM573tmM4Khv
+         5I5SjBOf2fYvRamgxPRNKUpBc4XZNIMp4er/ZK9oOZ3kVpygCnjEisdBybHKfMLjvIDh
+         ll15j8x1Ywfd9+Li/GtPUBX/6GHbF3ljuhU4DKFwxB9NDlhMyUOorPnajjoqguCP2jpu
+         jeUyPc9FhoZxlHbF9fmff0qVPbmkCoPqyTeZ4fkt3nWcYAXRjEBdo2PwAqlm+3cUnz08
+         +40g==
+X-Gm-Message-State: APjAAAVUQxhWuKZaEQP39ls8TtrKgOlyMAU9sYDgX2GwgGbNImNMCzqU
+        tzUgw9lZs8OxP4xrgtTWIdg=
+X-Google-Smtp-Source: APXvYqwI4HIehwRMwlm4ezs+Grdjp8PxAnEo5D0ptx3hhzj66wjWvzJYNlbUe3JQkYl3IWEbLzx6XA==
+X-Received: by 2002:a0c:929b:: with SMTP id b27mr13854026qvb.193.1560623099420;
+        Sat, 15 Jun 2019 11:24:59 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::4883])
+        by smtp.gmail.com with ESMTPSA id s23sm4843521qtj.56.2019.06.15.11.24.57
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 15 Jun 2019 09:51:53 -0700 (PDT)
-Date:   Sat, 15 Jun 2019 12:51:49 -0400
-From:   Dennis Zhou <dennis@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Dennis Zhou <dennis@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] blk-iolatency: only account submitted bios
-Message-ID: <20190615165149.GA96756@dennisz-mbp.dhcp.thefacebook.com>
-References: <20190523201018.49615-1-dennis@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190523201018.49615-1-dennis@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Sat, 15 Jun 2019 11:24:57 -0700 (PDT)
+From:   Tejun Heo <tj@kernel.org>
+To:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
+        axboe@kernel.dk, jack@suse.cz
+Cc:     linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, kernel-team@fb.com
+Subject: [PATCHSET v2 btrfs/for-next] blkcg, btrfs: fix cgroup writeback support
+Date:   Sat, 15 Jun 2019 11:24:44 -0700
+Message-Id: <20190615182453.843275-1-tj@kernel.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+Hello,
 
-On Thu, May 23, 2019 at 04:10:18PM -0400, Dennis Zhou wrote:
-> As is, iolatency recognizes done_bio and cleanup as ending paths. If a
-> request is marked REQ_NOWAIT and fails to get a request, the bio is
-> cleaned up via rq_qos_cleanup() and ended in bio_wouldblock_error().
-> This results in underflowing the inflight counter. Fix this by only
-> accounting bios that were actually submitted.
-> 
-> Signed-off-by: Dennis Zhou <dennis@kernel.org>
-> Cc: Josef Bacik <josef@toxicpanda.com>
-> ---
->  block/blk-iolatency.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-> index 507212d75ee2..58bac44ba78a 100644
-> --- a/block/blk-iolatency.c
-> +++ b/block/blk-iolatency.c
-> @@ -599,6 +599,10 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
->  	if (!blkg || !bio_flagged(bio, BIO_TRACKED))
->  		return;
->  
-> +	/* We didn't actually submit this bio, don't account it. */
-> +	if (bio->bi_status == BLK_STS_AGAIN)
-> +		return;
-> +
->  	iolat = blkg_to_lat(bio->bi_blkg);
->  	if (!iolat)
->  		return;
-> -- 
-> 2.17.1
-> 
+Changes from v1[1]
 
-Can you please take a look at this?
+  * 0001-cgroup-blkcg-Prepare-some-symbols-for-module-and-CON.patch
+    added.  It collects and adds symbol exports and dummy function def
+    to fix module and different config builds.
 
-Thanks,
-Dennis
+When writeback is executed asynchronously (e.g. for compression), bios
+are bounced to and issued by worker pool shared by all cgroups.  This
+leads to significant priority inversions when cgroup IO control is in
+use - IOs for a low priority cgroup can tie down the workers forcing
+higher priority IOs to wait behind them.
+
+This patchset adds an bio punt mechanism to blkcg and updates btrfs to
+issue async IOs through it.  A bio tagged with REQ_CGROUP_PUNT flag is
+bounced to the asynchronous issue context of the associated blkcg on
+bio_submit().  As the bios are issued from per-blkcg work items,
+there's no concern for priority inversions and it doesn't require
+invasive changes to the filesystems.  The mechanism should be
+generally useful for IO control support across different filesystems.
+
+This patchset contains the following 9 patches.  The first three are
+my blkcg patches to implement the needed mechanisms.  The latter five
+are Chris Mason's btrfs cleanup and update patches.  Please let me
+know how the patches should be routed.  Given that there currently
+aren't other users, it's likely the easiest to route all through btrfs
+tree.
+
+ 0001-cgroup-blkcg-Prepare-some-symbols-for-module-and-CON.patch
+ 0002-blkcg-writeback-Add-wbc-no_wbc_acct.patch
+ 0003-blkcg-writeback-Implement-wbc_blkcg_css.patch
+ 0004-blkcg-implement-REQ_CGROUP_PUNT.patch
+ 0005-Btrfs-stop-using-btrfs_schedule_bio.patch
+ 0006-Btrfs-delete-the-entire-async-bio-submission-framewo.patch
+ 0007-Btrfs-only-associate-the-locked-page-with-one-async_.patch
+ 0008-Btrfs-use-REQ_CGROUP_PUNT-for-worker-thread-submitte.patch
+ 0009-Btrfs-extent_write_locked_range-should-attach-inode-.patch
+
+0001-0003 implement wbc->no_wbc_acct, wbc_blkcg_css() and
+REQ_CGROUP_PUNT.
+
+0004-0007 are prep patches to simplify / improve async bio submission.
+
+0008 makes btrfs use REQ_CGROUP_PUNT for async bios.
+
+0009 fixes wbc writeback accounting for IOs issued through
+extent_write_locked_range().
+
+This patchset is also available in the following git branch.
+
+ git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git review-btrfs-cgroup-updates-v2
+
+Thanks, diffstat follows.
+
+ block/blk-cgroup.c          |   54 +++++++++
+ block/blk-core.c            |    3 
+ fs/btrfs/compression.c      |   16 +-
+ fs/btrfs/compression.h      |    3 
+ fs/btrfs/ctree.h            |    1 
+ fs/btrfs/disk-io.c          |   25 +---
+ fs/btrfs/extent_io.c        |   15 +-
+ fs/btrfs/inode.c            |   61 ++++++++--
+ fs/btrfs/super.c            |    1 
+ fs/btrfs/volumes.c          |  264 --------------------------------------------
+ fs/btrfs/volumes.h          |   10 -
+ fs/fs-writeback.c           |    5 
+ include/linux/backing-dev.h |    1 
+ include/linux/blk-cgroup.h  |   16 ++
+ include/linux/blk_types.h   |   10 +
+ include/linux/cgroup.h      |    1 
+ include/linux/writeback.h   |   24 +++-
+ 17 files changed, 198 insertions(+), 312 deletions(-)
+
+--
+tejun
+
+[1] http://lkml.kernel.org/r/20190614003350.1178444-1-tj@kernel.org
+
