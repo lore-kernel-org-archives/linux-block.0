@@ -4,69 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC2DC31E50
-	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C14C31E50
+	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 999852184D
-	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2AEE2184D
+	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 18:25:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560623141;
-	bh=MIPZVzTzG/FZT+EI0PmhGLXk1k+5zKtOwZDl2Q39kWY=;
+	s=default; t=1560623147;
+	bh=uRZZB7Zy4sYQL2IiW9DbgTIPGeEx3rvFFpVwroJYNJI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Y/9watbjOYGtgfw+kOL/uXS9AIJ8EG7jyxO3RJQGoZtc0IYmM88wXGR0iXNP6Ufc7
-	 oszG+UEGhl67zkzH9YghHyzq35mpNmwc4RNQSZrtuaLb2wAmij9okUaSZH8E31KAY6
-	 xD6S8Rb+WpocYStqrjkGn8oR2N4kHWqP/risBF0Y=
+	b=xukIqNImld87sFc4MmFzpzkFpR5TaeWfwB0r2NXiA7L+Sq3bWPLG19Gsdid3ZzsIs
+	 GTVCVkF2BxnYfTsfbd8Odf6KQ8Pt6F2NkWNh5Q0c84OSxXInovZMRfcXVfRoxeWkJa
+	 3CVNRkJsnJM1XSI3XfpoTnRmukyr8hZwV8zOgRVk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727213AbfFOSZ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Jun 2019 14:25:28 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:45763 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727195AbfFOSZ1 (ORCPT
+        id S1727156AbfFOSZV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Jun 2019 14:25:21 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:33632 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727141AbfFOSZU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Jun 2019 14:25:27 -0400
-Received: by mail-qt1-f194.google.com with SMTP id j19so6302553qtr.12;
-        Sat, 15 Jun 2019 11:25:26 -0700 (PDT)
+        Sat, 15 Jun 2019 14:25:20 -0400
+Received: by mail-qt1-f193.google.com with SMTP id x2so6389082qtr.0;
+        Sat, 15 Jun 2019 11:25:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=pLgqiVc8WgttgL57a6zlFC+HBkK0RO6jy2y58MUbUT4=;
-        b=UZBAdIST64h9/L93v+Uv8msKsSVnKhFMSQHg/22JuYK5k3DLY/0ykkOzXlAYktzoyA
-         v6yMG4HP/Cg7E6aVGsWeRShi/BT7SoUaeb7NE1z+nfXwf6iY5Kd3fhuRKn+4W9Dx/CJr
-         ywfu61mF/aCeW0pTFl6k1hnRd+n/kvPPIioJ0R+45ggMDYfN4ykJFUbS5LGrRaIEbp8s
-         97d+QR7U3waeG2YNS8sAwUHXRoZ92E3X8Iwh2J6FUKA9SVOquDLHHow7yeT0gWKps6+h
-         1Rc17No2J6q6G9Q/iXZgyoGNeJoEGHpNYvBda3xjLKF6252KROvKW7ksXAwZbA4Qp8UT
-         51Cg==
+        bh=1X3FWS80K1JJNMQCA2qoi8Ha3uMJZ3PHL5FlErhUkgg=;
+        b=W5jXqn75isWClTobNCs6iOsCmrWOO2OVjTjjKtX/6Di8BIiuclxLmeP11JNsJVWfGj
+         8/Eem3yHPwJOv8rOjpTPTAiN0Y8aKMCVD3/IiRVhR9TkoujW2WHiMM/DdeODhQVXham7
+         cewl5BtiFF/GTRKx44D6E0apIHg5dA+D9CwCONOkNxTSA11zblml+QCf13U2nf94iSNp
+         AtEmHzvfuNzs98Hw0wLaypGDA54YOBmqjTbSJNbiOhUgVkhSudCct2ar5/uIU09R0JyN
+         C8/PZ3DA2VZ2WtlO+Fssl5VN5ETXu26367Qh6WuxLjwtwp33mk8TXQiQctGztqwrwpGK
+         p6JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=pLgqiVc8WgttgL57a6zlFC+HBkK0RO6jy2y58MUbUT4=;
-        b=Mx9S4t1i+3N/jjMbYWjrxTqwNC58MLeOyZNFJNzdUkJIWcPdgL0/sKg7Gb97cUln6c
-         2tJKgSwviYK/tCYoVisfGLS671fqd+Tz0E7cLc5w9L7NWN78ey8OXcyfsXoRUKLUXYQS
-         sHea6uapU/+XL+NTfQKp90HmBcswWjrvAWkIFglWLcL8XNnA2P44Uxvu8q/HFNYdfye6
-         Q7sPdmHzhmb+mmCJ/7ehjSp057829y/NA+PMKJGMVrHcfKi+/sj+1B+NOr62yJVtQmt9
-         jcpwL4LK5v3pouFebMnkRQ+qI98x1mO2QD3WEiZLeGXaY+6OdoREkC/qSdoUuJPozfsk
-         QYnw==
-X-Gm-Message-State: APjAAAWNGvg9XiFZY9TWgfx2Gpe5a5/z8wjJbBM+MEASbiW5Qzagf58C
-        HVwbOG3AtX/cREtPdtdg9L4=
-X-Google-Smtp-Source: APXvYqwNb+FCgzHWpIHkiWYcW19s6mZ0HR17PRI49sbK0dH0AnCBjMzU7HFOWMMcPTe0ecfsAFSaxQ==
-X-Received: by 2002:a0c:fb07:: with SMTP id c7mr14426266qvp.229.1560623125887;
-        Sat, 15 Jun 2019 11:25:25 -0700 (PDT)
+        bh=1X3FWS80K1JJNMQCA2qoi8Ha3uMJZ3PHL5FlErhUkgg=;
+        b=K9/83Mq+5HH1TornZTtB3Mc6iAMMwZSiqrI7RRtOE/AFYp79fVtYvdhn/PdKJLZ9qV
+         2JoL1DtT6oiS7nANr5Xvu0NkqsLktmoVNQX2o7Ri8sLCiv3pJI1Xj+qpU3dbe3cyuy/0
+         yc+mvfzZYYJ8L7bO0GQb+JQWf0/VFGoGXQctyErIqmCaRRufTxD7kxjkcf1RIb/3fskv
+         qs76jyLcaoLfNG3Whs1yuqlAfI3DDD+clz9zapY+dl+M80n+1eY4DafwVcTyz+MVz6sn
+         6F1PLQBD2GIxkvmfo3FrYSgKR6tlaQomBAFtewaoh8dzYydf3sGP4eyjWwK6wrjwmck8
+         9DrQ==
+X-Gm-Message-State: APjAAAV4AOeaY6s3H6YFHGOv3qp29cw68MxY9H8q+hjRdxF2iADBvW/6
+        HJQy2ILBVvKft2jSyfOrq9k=
+X-Google-Smtp-Source: APXvYqwbk1Oa31Z5DL6a2mtq8MwGt/kbQeQGXY5aOtFWYWv/DxcGr0acqLs3Xu9/ppWEO5pAs+lH5w==
+X-Received: by 2002:a0c:b0e4:: with SMTP id p33mr3955600qvc.208.1560623118761;
+        Sat, 15 Jun 2019 11:25:18 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::4883])
-        by smtp.gmail.com with ESMTPSA id j66sm3749897qkf.86.2019.06.15.11.25.24
+        by smtp.gmail.com with ESMTPSA id o185sm3280557qkd.64.2019.06.15.11.25.17
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 15 Jun 2019 11:25:24 -0700 (PDT)
+        Sat, 15 Jun 2019 11:25:18 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
         axboe@kernel.dk, jack@suse.cz
 Cc:     linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org, kernel-team@fb.com
-Subject: [PATCH 8/9] Btrfs: use REQ_CGROUP_PUNT for worker thread submitted bios
-Date:   Sat, 15 Jun 2019 11:24:52 -0700
-Message-Id: <20190615182453.843275-9-tj@kernel.org>
+Subject: [PATCH 6/9] Btrfs: delete the entire async bio submission framework
+Date:   Sat, 15 Jun 2019 11:24:50 -0700
+Message-Id: <20190615182453.843275-7-tj@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190615182453.843275-1-tj@kernel.org>
 References: <20190615182453.843275-1-tj@kernel.org>
@@ -77,189 +77,334 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chris Mason <clm@fb.com>
 
-Async CRCs and compression submit IO through helper threads, which
-means they have IO priority inversions when cgroup IO controllers are
-in use.
-
-This flags all of the writes submitted by btrfs helper threads as
-REQ_CGROUP_PUNT.  submit_bio() will punt these to dedicated per-blkcg
-work items to avoid the priority inversion.
-
-For the compression code, we take a reference on the wbc's blkg css and
-pass it down to the async workers.
-
-For the async crcs, the bio already has the correct css, we just need to
-tell the block layer to use REQ_CGROUP_PUNT.
+Now that we're not using btrfs_schedule_bio() anymore, delete all the
+code that supported it.
 
 Signed-off-by: Chris Mason <clm@fb.com>
-Modified-and-reviewed-by: Tejun Heo <tj@kernel.org>
 Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 ---
- fs/btrfs/compression.c |  8 +++++++-
- fs/btrfs/compression.h |  3 ++-
- fs/btrfs/disk-io.c     |  6 ++++++
- fs/btrfs/extent_io.c   |  3 +++
- fs/btrfs/inode.c       | 30 +++++++++++++++++++++++++++---
- 5 files changed, 45 insertions(+), 5 deletions(-)
+ fs/btrfs/ctree.h   |   1 -
+ fs/btrfs/disk-io.c |  13 +--
+ fs/btrfs/super.c   |   1 -
+ fs/btrfs/volumes.c | 209 ---------------------------------------------
+ fs/btrfs/volumes.h |   8 --
+ 5 files changed, 1 insertion(+), 231 deletions(-)
 
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index 873261b932b8..138479a9576c 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -289,7 +289,8 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
- 				 unsigned long compressed_len,
- 				 struct page **compressed_pages,
- 				 unsigned long nr_pages,
--				 unsigned int write_flags)
-+				 unsigned int write_flags,
-+				 struct cgroup_subsys_state *blkcg_css)
- {
- 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
- 	struct bio *bio = NULL;
-@@ -323,6 +324,11 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
- 	bio->bi_opf = REQ_OP_WRITE | write_flags;
- 	bio->bi_private = cb;
- 	bio->bi_end_io = end_compressed_bio_write;
-+
-+	if (blkcg_css) {
-+		bio->bi_opf |= REQ_CGROUP_PUNT;
-+		bio_associate_blkg_from_css(bio, blkcg_css);
-+	}
- 	refcount_set(&cb->pending_bios, 1);
- 
- 	/* create and submit bios for the compressed pages */
-diff --git a/fs/btrfs/compression.h b/fs/btrfs/compression.h
-index 9976fe0f7526..7cbefab96ecf 100644
---- a/fs/btrfs/compression.h
-+++ b/fs/btrfs/compression.h
-@@ -93,7 +93,8 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
- 				  unsigned long compressed_len,
- 				  struct page **compressed_pages,
- 				  unsigned long nr_pages,
--				  unsigned int write_flags);
-+				  unsigned int write_flags,
-+				  struct cgroup_subsys_state *blkcg_css);
- blk_status_t btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
- 				 int mirror_num, unsigned long bio_flags);
+diff --git a/fs/btrfs/ctree.h b/fs/btrfs/ctree.h
+index b81c331b28fa..2a5ba0f85ed3 100644
+--- a/fs/btrfs/ctree.h
++++ b/fs/btrfs/ctree.h
+@@ -989,7 +989,6 @@ struct btrfs_fs_info {
+ 	struct btrfs_workqueue *endio_meta_write_workers;
+ 	struct btrfs_workqueue *endio_write_workers;
+ 	struct btrfs_workqueue *endio_freespace_worker;
+-	struct btrfs_workqueue *submit_workers;
+ 	struct btrfs_workqueue *caching_workers;
+ 	struct btrfs_workqueue *readahead_workers;
  
 diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index 9dbe4ba3995d..a5ebbf3d0833 100644
+index b34240406f36..9dbe4ba3995d 100644
 --- a/fs/btrfs/disk-io.c
 +++ b/fs/btrfs/disk-io.c
-@@ -799,6 +799,12 @@ static void run_one_async_done(struct btrfs_work *work)
- 		return;
- 	}
+@@ -2028,7 +2028,6 @@ static void btrfs_stop_all_workers(struct btrfs_fs_info *fs_info)
+ 	btrfs_destroy_workqueue(fs_info->rmw_workers);
+ 	btrfs_destroy_workqueue(fs_info->endio_write_workers);
+ 	btrfs_destroy_workqueue(fs_info->endio_freespace_worker);
+-	btrfs_destroy_workqueue(fs_info->submit_workers);
+ 	btrfs_destroy_workqueue(fs_info->delayed_workers);
+ 	btrfs_destroy_workqueue(fs_info->caching_workers);
+ 	btrfs_destroy_workqueue(fs_info->readahead_workers);
+@@ -2194,16 +2193,6 @@ static int btrfs_init_workqueues(struct btrfs_fs_info *fs_info,
+ 	fs_info->caching_workers =
+ 		btrfs_alloc_workqueue(fs_info, "cache", flags, max_active, 0);
  
-+	/*
-+	 * All of the bios that pass through here are from async helpers.
-+	 * Use REQ_CGROUP_PUNT to issue them from the owning cgroup's
-+	 * context.  This changes nothing when cgroups aren't in use.
-+	 */
-+	async->bio->bi_opf |= REQ_CGROUP_PUNT;
- 	ret = btrfs_map_bio(btrfs_sb(inode->i_sb), async->bio,
- 			    async->mirror_num);
- 	if (ret) {
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 9f223d7d78c0..d7b57341ff1a 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -4175,6 +4175,9 @@ int extent_write_locked_range(struct inode *inode, u64 start, u64 end,
- 		.nr_to_write	= nr_pages * 2,
- 		.range_start	= start,
- 		.range_end	= end + 1,
-+		/* we're called from an async helper function */
-+		.punt_to_cgroup	= 1,
-+		.no_wbc_acct	= 1,
- 	};
+-	/*
+-	 * a higher idle thresh on the submit workers makes it much more
+-	 * likely that bios will be send down in a sane order to the
+-	 * devices
+-	 */
+-	fs_info->submit_workers =
+-		btrfs_alloc_workqueue(fs_info, "submit", flags,
+-				      min_t(u64, fs_devices->num_devices,
+-					    max_active), 64);
+-
+ 	fs_info->fixup_workers =
+ 		btrfs_alloc_workqueue(fs_info, "fixup", flags, 1, 0);
  
- 	while (start <= end) {
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index df5527cc07b9..3f9b35bc0455 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -357,6 +357,7 @@ struct async_extent {
- };
+@@ -2246,7 +2235,7 @@ static int btrfs_init_workqueues(struct btrfs_fs_info *fs_info,
+ 					    max_active), 8);
  
- struct async_chunk {
-+	struct cgroup_subsys_state *blkcg_css;
- 	struct inode *inode;
- 	struct page *locked_page;
- 	u64 start;
-@@ -846,7 +847,8 @@ static noinline void submit_compressed_extents(struct async_chunk *async_chunk)
- 				    ins.objectid,
- 				    ins.offset, async_extent->pages,
- 				    async_extent->nr_pages,
--				    async_chunk->write_flags)) {
-+				    async_chunk->write_flags,
-+				    async_chunk->blkcg_css)) {
- 			struct page *p = async_extent->pages[0];
- 			const u64 start = async_extent->start;
- 			const u64 end = start + async_extent->ram_size - 1;
-@@ -1170,6 +1172,8 @@ static noinline void async_cow_free(struct btrfs_work *work)
- 	async_chunk = container_of(work, struct async_chunk, work);
- 	if (async_chunk->inode)
- 		btrfs_add_delayed_iput(async_chunk->inode);
-+	if (async_chunk->blkcg_css)
-+		css_put(async_chunk->blkcg_css);
- 	/*
- 	 * Since the pointer to 'pending' is at the beginning of the array of
- 	 * async_chunk's, freeing it ensures the whole array has been freed.
-@@ -1178,12 +1182,15 @@ static noinline void async_cow_free(struct btrfs_work *work)
- 		kvfree(async_chunk->pending);
+ 	if (!(fs_info->workers && fs_info->delalloc_workers &&
+-	      fs_info->submit_workers && fs_info->flush_workers &&
++	      fs_info->flush_workers &&
+ 	      fs_info->endio_workers && fs_info->endio_meta_workers &&
+ 	      fs_info->endio_meta_write_workers &&
+ 	      fs_info->endio_repair_workers &&
+diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+index 2c66d9ea6a3b..3fb86a7bfdf7 100644
+--- a/fs/btrfs/super.c
++++ b/fs/btrfs/super.c
+@@ -1668,7 +1668,6 @@ static void btrfs_resize_thread_pool(struct btrfs_fs_info *fs_info,
+ 
+ 	btrfs_workqueue_set_max(fs_info->workers, new_pool_size);
+ 	btrfs_workqueue_set_max(fs_info->delalloc_workers, new_pool_size);
+-	btrfs_workqueue_set_max(fs_info->submit_workers, new_pool_size);
+ 	btrfs_workqueue_set_max(fs_info->caching_workers, new_pool_size);
+ 	btrfs_workqueue_set_max(fs_info->endio_workers, new_pool_size);
+ 	btrfs_workqueue_set_max(fs_info->endio_meta_workers, new_pool_size);
+diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
+index 72326cc23985..fc3a16d87869 100644
+--- a/fs/btrfs/volumes.c
++++ b/fs/btrfs/volumes.c
+@@ -509,212 +509,6 @@ btrfs_get_bdev_and_sb(const char *device_path, fmode_t flags, void *holder,
+ 	return ret;
  }
  
--static int cow_file_range_async(struct inode *inode, struct page *locked_page,
-+static int cow_file_range_async(struct inode *inode,
-+				struct writeback_control *wbc,
-+				struct page *locked_page,
- 				u64 start, u64 end, int *page_started,
- 				unsigned long *nr_written,
- 				unsigned int write_flags)
+-static void requeue_list(struct btrfs_pending_bios *pending_bios,
+-			struct bio *head, struct bio *tail)
+-{
+-
+-	struct bio *old_head;
+-
+-	old_head = pending_bios->head;
+-	pending_bios->head = head;
+-	if (pending_bios->tail)
+-		tail->bi_next = old_head;
+-	else
+-		pending_bios->tail = tail;
+-}
+-
+-/*
+- * we try to collect pending bios for a device so we don't get a large
+- * number of procs sending bios down to the same device.  This greatly
+- * improves the schedulers ability to collect and merge the bios.
+- *
+- * But, it also turns into a long list of bios to process and that is sure
+- * to eventually make the worker thread block.  The solution here is to
+- * make some progress and then put this work struct back at the end of
+- * the list if the block device is congested.  This way, multiple devices
+- * can make progress from a single worker thread.
+- */
+-static noinline void run_scheduled_bios(struct btrfs_device *device)
+-{
+-	struct btrfs_fs_info *fs_info = device->fs_info;
+-	struct bio *pending;
+-	struct backing_dev_info *bdi;
+-	struct btrfs_pending_bios *pending_bios;
+-	struct bio *tail;
+-	struct bio *cur;
+-	int again = 0;
+-	unsigned long num_run;
+-	unsigned long batch_run = 0;
+-	unsigned long last_waited = 0;
+-	int force_reg = 0;
+-	int sync_pending = 0;
+-	struct blk_plug plug;
+-
+-	/*
+-	 * this function runs all the bios we've collected for
+-	 * a particular device.  We don't want to wander off to
+-	 * another device without first sending all of these down.
+-	 * So, setup a plug here and finish it off before we return
+-	 */
+-	blk_start_plug(&plug);
+-
+-	bdi = device->bdev->bd_bdi;
+-
+-loop:
+-	spin_lock(&device->io_lock);
+-
+-loop_lock:
+-	num_run = 0;
+-
+-	/* take all the bios off the list at once and process them
+-	 * later on (without the lock held).  But, remember the
+-	 * tail and other pointers so the bios can be properly reinserted
+-	 * into the list if we hit congestion
+-	 */
+-	if (!force_reg && device->pending_sync_bios.head) {
+-		pending_bios = &device->pending_sync_bios;
+-		force_reg = 1;
+-	} else {
+-		pending_bios = &device->pending_bios;
+-		force_reg = 0;
+-	}
+-
+-	pending = pending_bios->head;
+-	tail = pending_bios->tail;
+-	WARN_ON(pending && !tail);
+-
+-	/*
+-	 * if pending was null this time around, no bios need processing
+-	 * at all and we can stop.  Otherwise it'll loop back up again
+-	 * and do an additional check so no bios are missed.
+-	 *
+-	 * device->running_pending is used to synchronize with the
+-	 * schedule_bio code.
+-	 */
+-	if (device->pending_sync_bios.head == NULL &&
+-	    device->pending_bios.head == NULL) {
+-		again = 0;
+-		device->running_pending = 0;
+-	} else {
+-		again = 1;
+-		device->running_pending = 1;
+-	}
+-
+-	pending_bios->head = NULL;
+-	pending_bios->tail = NULL;
+-
+-	spin_unlock(&device->io_lock);
+-
+-	while (pending) {
+-
+-		rmb();
+-		/* we want to work on both lists, but do more bios on the
+-		 * sync list than the regular list
+-		 */
+-		if ((num_run > 32 &&
+-		    pending_bios != &device->pending_sync_bios &&
+-		    device->pending_sync_bios.head) ||
+-		   (num_run > 64 && pending_bios == &device->pending_sync_bios &&
+-		    device->pending_bios.head)) {
+-			spin_lock(&device->io_lock);
+-			requeue_list(pending_bios, pending, tail);
+-			goto loop_lock;
+-		}
+-
+-		cur = pending;
+-		pending = pending->bi_next;
+-		cur->bi_next = NULL;
+-
+-		BUG_ON(atomic_read(&cur->__bi_cnt) == 0);
+-
+-		/*
+-		 * if we're doing the sync list, record that our
+-		 * plug has some sync requests on it
+-		 *
+-		 * If we're doing the regular list and there are
+-		 * sync requests sitting around, unplug before
+-		 * we add more
+-		 */
+-		if (pending_bios == &device->pending_sync_bios) {
+-			sync_pending = 1;
+-		} else if (sync_pending) {
+-			blk_finish_plug(&plug);
+-			blk_start_plug(&plug);
+-			sync_pending = 0;
+-		}
+-
+-		btrfsic_submit_bio(cur);
+-		num_run++;
+-		batch_run++;
+-
+-		cond_resched();
+-
+-		/*
+-		 * we made progress, there is more work to do and the bdi
+-		 * is now congested.  Back off and let other work structs
+-		 * run instead
+-		 */
+-		if (pending && bdi_write_congested(bdi) && batch_run > 8 &&
+-		    fs_info->fs_devices->open_devices > 1) {
+-			struct io_context *ioc;
+-
+-			ioc = current->io_context;
+-
+-			/*
+-			 * the main goal here is that we don't want to
+-			 * block if we're going to be able to submit
+-			 * more requests without blocking.
+-			 *
+-			 * This code does two great things, it pokes into
+-			 * the elevator code from a filesystem _and_
+-			 * it makes assumptions about how batching works.
+-			 */
+-			if (ioc && ioc->nr_batch_requests > 0 &&
+-			    time_before(jiffies, ioc->last_waited + HZ/50UL) &&
+-			    (last_waited == 0 ||
+-			     ioc->last_waited == last_waited)) {
+-				/*
+-				 * we want to go through our batch of
+-				 * requests and stop.  So, we copy out
+-				 * the ioc->last_waited time and test
+-				 * against it before looping
+-				 */
+-				last_waited = ioc->last_waited;
+-				cond_resched();
+-				continue;
+-			}
+-			spin_lock(&device->io_lock);
+-			requeue_list(pending_bios, pending, tail);
+-			device->running_pending = 1;
+-
+-			spin_unlock(&device->io_lock);
+-			btrfs_queue_work(fs_info->submit_workers,
+-					 &device->work);
+-			goto done;
+-		}
+-	}
+-
+-	cond_resched();
+-	if (again)
+-		goto loop;
+-
+-	spin_lock(&device->io_lock);
+-	if (device->pending_bios.head || device->pending_sync_bios.head)
+-		goto loop_lock;
+-	spin_unlock(&device->io_lock);
+-
+-done:
+-	blk_finish_plug(&plug);
+-}
+-
+-static void pending_bios_fn(struct btrfs_work *work)
+-{
+-	struct btrfs_device *device;
+-
+-	device = container_of(work, struct btrfs_device, work);
+-	run_scheduled_bios(device);
+-}
+-
+ static bool device_path_matched(const char *path, struct btrfs_device *device)
  {
- 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
-+	struct cgroup_subsys_state *blkcg_css = wbc_blkcg_css(wbc);
- 	struct async_cow *ctx;
- 	struct async_chunk *async_chunk;
- 	unsigned long nr_pages;
-@@ -1251,12 +1258,29 @@ static int cow_file_range_async(struct inode *inode, struct page *locked_page,
- 		 * to unlock it.
- 		 */
- 		if (locked_page) {
-+			/*
-+			 * Depending on the compressibility, the pages
-+			 * might or might not go through async.  We want
-+			 * all of them to be accounted against @wbc once.
-+			 * Let's do it here before the paths diverge.  wbc
-+			 * accounting is used only for foreign writeback
-+			 * detection and doesn't need full accuracy.  Just
-+			 * account the whole thing against the first page.
-+			 */
-+			wbc_account_io(wbc, locked_page, cur_end - start);
- 			async_chunk[i].locked_page = locked_page;
- 			locked_page = NULL;
- 		} else {
- 			async_chunk[i].locked_page = NULL;
- 		}
+ 	int found;
+@@ -6599,9 +6393,6 @@ struct btrfs_device *btrfs_alloc_device(struct btrfs_fs_info *fs_info,
+ 	else
+ 		generate_random_uuid(dev->uuid);
  
-+		if (blkcg_css != blkcg_root_css) {
-+			css_get(blkcg_css);
-+			async_chunk[i].blkcg_css = blkcg_css;
-+		} else {
-+			async_chunk[i].blkcg_css = NULL;
-+		}
-+
- 		btrfs_init_work(&async_chunk[i].work,
- 				btrfs_delalloc_helper,
- 				async_cow_start, async_cow_submit,
-@@ -1653,7 +1677,7 @@ int btrfs_run_delalloc_range(struct inode *inode, struct page *locked_page,
- 	} else {
- 		set_bit(BTRFS_INODE_HAS_ASYNC_EXTENT,
- 			&BTRFS_I(inode)->runtime_flags);
--		ret = cow_file_range_async(inode, locked_page, start, end,
-+		ret = cow_file_range_async(inode, wbc, locked_page, start, end,
- 					   page_started, nr_written,
- 					   write_flags);
- 	}
+-	btrfs_init_work(&dev->work, btrfs_submit_helper,
+-			pending_bios_fn, NULL, NULL);
+-
+ 	return dev;
+ }
+ 
+diff --git a/fs/btrfs/volumes.h b/fs/btrfs/volumes.h
+index 8c7bd79b234a..231f50dd107d 100644
+--- a/fs/btrfs/volumes.h
++++ b/fs/btrfs/volumes.h
+@@ -18,10 +18,6 @@ extern struct mutex uuid_mutex;
+ #define BTRFS_STRIPE_LEN	SZ_64K
+ 
+ struct buffer_head;
+-struct btrfs_pending_bios {
+-	struct bio *head;
+-	struct bio *tail;
+-};
+ 
+ /*
+  * Use sequence counter to get consistent device stat data on
+@@ -55,10 +51,6 @@ struct btrfs_device {
+ 
+ 	spinlock_t io_lock ____cacheline_aligned;
+ 	int running_pending;
+-	/* regular prio bios */
+-	struct btrfs_pending_bios pending_bios;
+-	/* sync bios */
+-	struct btrfs_pending_bios pending_sync_bios;
+ 
+ 	struct block_device *bdev;
+ 
 -- 
 2.17.1
 
