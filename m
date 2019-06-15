@@ -2,78 +2,86 @@ Return-Path: <SRS0=HzVw=UO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88D65C31E50
-	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 15:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA8DC31E52
+	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 15:57:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E0AA20673
-	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 15:51:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9722C21841
+	for <linux-block@archiver.kernel.org>; Sat, 15 Jun 2019 15:57:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560613862;
-	bh=VwEnFPebzPhfi2mwt6LUlCkM/lpE4dSRxYoSL75kKRk=;
+	s=default; t=1560614271;
+	bh=pt3SyxYCml22bVU9o7vVEjo/cpZQ112WzpGaw/J1g+8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ygdwWux/HezdVJYc8gmqw9FywG0uFSb+zdoIMI1wE2h5+/whlzXP7P66ab/6A9mBJ
-	 Lm97X9A9EcdpbR35rAIUvXAYLgN7rlbAcv0sH8Fp1aPaM6wdE/H6YcOqboCnP3PV09
-	 l+vp61EbxdkZc7by3BytWUuZda8xkWr4fKiSr22A=
+	b=Bz79QhCKAnZWiOxizpQQN6D94TuO87+5T6GQP+vGi+PA5Vt4NdOgNmdXfbqRedOl3
+	 FnHYplZyXRWagWgGqaBEeCcTkoTXtMngPi2g85lifLuuNzFYzj+folLhpLvZz5GLvm
+	 G/soyorvHbVmZejXFFnU9SI5T7t1AaBaAe8Or4j0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726591AbfFOPvB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Jun 2019 11:51:01 -0400
-Received: from mail-qt1-f175.google.com ([209.85.160.175]:45582 "EHLO
-        mail-qt1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726405AbfFOPvB (ORCPT
+        id S1726859AbfFOP5s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Jun 2019 11:57:48 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:33029 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726405AbfFOP5r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Jun 2019 11:51:01 -0400
-Received: by mail-qt1-f175.google.com with SMTP id j19so6024945qtr.12;
-        Sat, 15 Jun 2019 08:51:00 -0700 (PDT)
+        Sat, 15 Jun 2019 11:57:47 -0400
+Received: by mail-qk1-f195.google.com with SMTP id r6so3704108qkc.0;
+        Sat, 15 Jun 2019 08:57:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=FRzed5Hn746STY3Jn1Vo7AmbqOd5utzWg8eosdJW/6k=;
-        b=JpNpW9yyNPMPd3JVLXskBsuaQGQXPcqQEzxepyVxim0aReQclp0mx6GTbHFViCTdjy
-         aekVO97SE9eFL8c0GH+PBYc4L0qm0g9s4ul64DOCJeEgiubQVcbePuPDi2MVE4zFORlh
-         UXA8VuGlFzNmy09xLrjviSIYCKcZE5Z5yUAfcYg303mgaE5vfbWWuV4rO/fnHScnRtq3
-         SP7lMQieg+/hVSLMl6DDMLGfzKFF0Bc36bcu+5voP9bERAi3h5e3wsIuNXtpswhFw/7K
-         kkyPDbAx5gKngVZYfnHTlidETdJHvmyv3mXlLPHRNEN3r4xunT1RSLIe1EhNxWXlgq9E
-         SZdA==
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=V1Xn65jFA9fLzGnZCICEwL6tUShlHAvAc5j9I2/vRW4=;
+        b=csyg6vgm0i4uNhPsUxiT5I9v9LOyUNu0/a9saVtXHrnPe9wqOlbnYU16Udzo53uh/u
+         ntH7pwRtBjuYbe9ZRhTBP3W/jUlEuQnIvB0w7IG3x9Ic2hAnHAbtU0CPHO2gkqHUsvN6
+         cbfvLAcvtmBIdwilZEn2cBDPcUNiKMGQEWZcQt6R+ZKmEM4/Opb3ub+9xk/GktAgEGmR
+         7jDLFDvE5TNOV/yA2grBclF2D5ZeFv5ddWM5MPXh6kBco8WTEXIVO1CcoKFaaCofb2Bt
+         XsIzD6JAPKS4+AxN7vQovTd0s8Zxat1tSWhNEOzrhnY6XwBMzmfPPOwBkM1nY3UjStQW
+         Xtbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=FRzed5Hn746STY3Jn1Vo7AmbqOd5utzWg8eosdJW/6k=;
-        b=Cg3g4AqRVR1S1wBYuBTb0/1U+CEDjlINKxZ7JuKzhFcatRlrk2FYGBz9gsqb9yc3T+
-         Xb/hypRNbnQhE7hoIc8hffzRvcksIsdyo8715MLH3LKq3XuK2issYBC/d3oB1LYHT0T7
-         7LiWmUq6syJ64ll+nyXyJVlLTagkB8qQZm7Ihpy3MklthefxI+i5D2tcSnmOkrt9eyNc
-         cURgaQDBEou6EM7uLLd6LQw1hXdVYGKI/tnCjvI1T37Y12Je9VfZzDqsjF5GIpd8K36s
-         PjoLSj/JY+OYHXts4uEcI7+6JENoyx4m38DDPMisPyQo5Z83iFd4deAPAglTLUKFtql0
-         FnmA==
-X-Gm-Message-State: APjAAAVdzifTjczhLHu2lPOdMZUAaBXg2aimqpbpAp2Of61XKG0HiMaM
-        /Ib8PrlqxgL8agAidNYpM/Y=
-X-Google-Smtp-Source: APXvYqwSd08QU/s59USkejLBKf+YmKKH56HxmDM0ZXlLrhzdKfSCJWF0VhO8fcG438Nk1o55sB/TBA==
-X-Received: by 2002:ac8:2d82:: with SMTP id p2mr9501333qta.130.1560613859979;
-        Sat, 15 Jun 2019 08:50:59 -0700 (PDT)
+         :references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=V1Xn65jFA9fLzGnZCICEwL6tUShlHAvAc5j9I2/vRW4=;
+        b=coLPfFv7f+hAIkS0BM92BaoAp8P/hkPfbPRWJxIKN1boopRzD/uOcp03eoAVY7LbyM
+         2GmfPuLf1G+WTZPlzGIJy862384xRHhYrnPfJ7veYR3wP/u9g9P1UOFsk5fgQkGpF/P2
+         uuPCDa6Rl8WPd1yUB6PhuywUNJ5ReXbAuaeRryFt7nNgzKYW5dnpdN3MD5w5yIhxdjKF
+         XrY6o2X5ndjiPxdUuBEPwJr7b6R1Vc1PGDIOPjgunG9NFwx9VU0sAdOMM1lNg/fF4Rrj
+         1jU2SY6qEg0O3FyHAmuxlFEQjW+fY53Wz8wdd31UyVwBcrRXwuCH48XHqObT66MPNLxV
+         0N9A==
+X-Gm-Message-State: APjAAAWz5eXPQERHfp1ZAG/YL56uRSqQiq7m3Q/MAD+hAx+0Gi5SzHEB
+        KryA2GCForr8pyM2/Gq9D00=
+X-Google-Smtp-Source: APXvYqw7pW50FWwPRrhOjvP+Dt3tlqNNZWVvipaSTxtXb/kfSgJbt5OwlMOikhxcouvwT5smDdGKnA==
+X-Received: by 2002:ae9:f702:: with SMTP id s2mr82033743qkg.28.1560614266380;
+        Sat, 15 Jun 2019 08:57:46 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::673a])
-        by smtp.gmail.com with ESMTPSA id n48sm3833013qtc.90.2019.06.15.08.50.58
+        by smtp.gmail.com with ESMTPSA id g10sm3067097qkk.91.2019.06.15.08.57.45
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 15 Jun 2019 08:50:58 -0700 (PDT)
-Date:   Sat, 15 Jun 2019 08:50:55 -0700
+        Sat, 15 Jun 2019 08:57:45 -0700 (PDT)
+Date:   Sat, 15 Jun 2019 08:57:43 -0700
 From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     jbacik@fb.com, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, kernel-team@fb.com, dennis@kernel.org,
-        jack@suse.cz
-Subject: Re: [PATCHSET block/for-linus] Assorted blkcg fixes
-Message-ID: <20190615155055.GE657710@devbig004.ftw2.facebook.com>
-References: <20190613223041.606735-1-tj@kernel.org>
- <5d5835d3-d0e4-f4cc-19b1-841b4ad46a9a@kernel.dk>
+To:     Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
+        dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com, cgroups@vger.kernel.org, ast@kernel.org,
+        daniel@iogearbox.net, kafai@fb.com, songliubraving@fb.com,
+        yhs@fb.com, bpf@vger.kernel.org, Josef Bacik <jbacik@fb.com>
+Subject: Re: [PATCH 08/10] blkcg: implement blk-ioweight
+Message-ID: <20190615155743.GF657710@devbig004.ftw2.facebook.com>
+References: <20190614015620.1587672-1-tj@kernel.org>
+ <20190614015620.1587672-9-tj@kernel.org>
+ <87pnngbbti.fsf@toke.dk>
+ <20190614150924.GB538958@devbig004.ftw2.facebook.com>
+ <87blyzc2n9.fsf@toke.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <5d5835d3-d0e4-f4cc-19b1-841b4ad46a9a@kernel.dk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87blyzc2n9.fsf@toke.dk>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -82,17 +90,21 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hello,
 
-On Sat, Jun 15, 2019 at 01:40:50AM -0600, Jens Axboe wrote:
-> > Please refer to each patch's description for details.  Patchset is
-> > also available in the following git branch.
-> > 
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git review-blkcg-fixes
-> > 
-> > Thanks.  diffstat follows.
+On Fri, Jun 14, 2019 at 10:50:34PM +0200, Toke Høiland-Jørgensen wrote:
+> > Within a single cgroup, the IOs are FIFO. When an IO has enough vtime
+> > credit, it just passes through. When it doesn't, it always waits
+> > behind any other IOs which are already waiting.
 > 
-> Are you fine with these hitting 5.3?
+> OK. Is there any fundamental reason why requests from individual
+> processes could not be interleaved? Or does it just not give the same
+> benefits in an IO request context as it does for network packets?
 
-Yeah, none of them are very urgent.  5.3 should be fine.
+I don't think there's any fundamental reason we can't.  Currently, it
+just isn't doing anything it doesn't have to do while preserving the
+existing ordering.  One different from networking could be that
+there's more sharing - buffered writes are attributed to the whole
+domain (either system or cgroup) rather than individual tasks, so the
+ownership of IOs gets a bit mushy beyond resource domain level.
 
 Thanks.
 
