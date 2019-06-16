@@ -2,394 +2,87 @@ Return-Path: <SRS0=cIdD=UP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67FA9C31E49
-	for <linux-block@archiver.kernel.org>; Sun, 16 Jun 2019 10:16:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DACBC31E49
+	for <linux-block@archiver.kernel.org>; Sun, 16 Jun 2019 10:23:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3ED39216C8
-	for <linux-block@archiver.kernel.org>; Sun, 16 Jun 2019 10:16:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B92A2147A
+	for <linux-block@archiver.kernel.org>; Sun, 16 Jun 2019 10:23:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="poa9HFE2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726266AbfFPKQA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Jun 2019 06:16:00 -0400
-Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:22995 "HELO
-        bsf01.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1726087AbfFPKQA (ORCPT
+        id S1725861AbfFPKXu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Jun 2019 06:23:50 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:34939 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725766AbfFPKXu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Jun 2019 06:16:00 -0400
-X-ASG-Debug-ID: 1560680158-0e408815c54ee7f0001-Cu09wu
-Received: from BJEXCAS03.didichuxing.com (bogon [172.20.36.245]) by bsf01.didichuxing.com with ESMTP id 4a9xkZurduUrpmdc; Sun, 16 Jun 2019 18:15:58 +0800 (CST)
-X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
-Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
- (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sun, 16 Jun
- 2019 18:15:57 +0800
-Date:   Sun, 16 Jun 2019 18:15:56 +0800
-From:   Weiping Zhang <zhangweiping@didiglobal.com>
-To:     <axboe@kernel.dk>, <tj@kernel.org>, <hch@lst.de>,
-        <bvanassche@acm.org>
-CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
-Subject: [PATCH v2 4/4] nvme: add support weighted round robin queue
-Message-ID: <0b0fa12a337f97a8cc878b58673b3eb619539174.1560679439.git.zhangweiping@didiglobal.com>
-X-ASG-Orig-Subj: [PATCH v2 4/4] nvme: add support weighted round robin queue
-Mail-Followup-To: axboe@kernel.dk, tj@kernel.org, hch@lst.de,
-        bvanassche@acm.org, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org
-References: <cover.1560679439.git.zhangweiping@didiglobal.com>
+        Sun, 16 Jun 2019 06:23:50 -0400
+Received: by mail-io1-f66.google.com with SMTP id m24so15204791ioo.2
+        for <linux-block@vger.kernel.org>; Sun, 16 Jun 2019 03:23:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=s3k6GliP+JsBPn4B1PVzd3Sxp1rH0zTWIZuFXfA1ABk=;
+        b=poa9HFE2cGZO0zSW+ys6g58RcOaeqp/1+BkR8NpiN0MbWycFh+M059PZG7IV/nL6Pr
+         e/STFlM74gxW/HItPnr4KSFCTNw3oymWEFcNhffqgwHcEdg9wblZ28452WYyyP250uON
+         2A+1WGAdIqrRWbcwrVfxbl2wMH57OZfjC/DC576jjA7prn37t2YQCpF9Xk3L/4fL+BF+
+         yQaE+30/yySM2NvEihN7zQnrGghnoTxQ6R8VdapC9qgHpo2T/vr6xmiZgKJtKDW78Uvy
+         sG9qs584Va9SxLcp+vXdBCKzjNQpDEq6eTESajzCrr4sdQXfqUEjFoOnZ7mSpxZBlXtf
+         dFUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=s3k6GliP+JsBPn4B1PVzd3Sxp1rH0zTWIZuFXfA1ABk=;
+        b=BUGT5LgfGtJ9uk09q9B5f4DgvxQQwmHokV+rUdgm09J1lModlIwkOwDpJ2shCwri6Y
+         HKIdd0O4+1o2TVKyJNpgiYlle0Z1iR98LYs5UYx+ezYg3/fgY6wbjdnYZb6CJqw/XIFW
+         xX9fQrOXv9Z1zxpF9FtDULnmL6RHCKyZo5i1+/2yrbmHQXEraNvEshft1XpjjvMaTKEU
+         2NH4SOnwAZtoda/m2iP7lSmgY0ZXhnKpYKVIzzVF2Ut4rW2EBjr9lIOqtSGECWUPttrD
+         gETyfzGWrVQHyy/IN54vw6CC5dishrHhhkEHkrzEhG2TUtztQBKuniCFKSZHIqpLqiuv
+         EOFw==
+X-Gm-Message-State: APjAAAVVjt+UqN568XZ3OX3Vb/bVfwbBA3flXa1W58HFtvZA6CNa1ROq
+        /1T8ob+/NT2d1U6ROtDN49MhkqrGYMEMOOvhUGzw1B9wx187yg==
+X-Google-Smtp-Source: APXvYqwmZfP5SLaB8QLBKO+tmF93APMjYP75jnOs7UaNKBGzRUXc2So+LVluGFgTlA8/ZKyW3S3oAw9m7fuXQH15K4Q=
+X-Received: by 2002:a6b:4101:: with SMTP id n1mr6494638ioa.138.1560680629345;
+ Sun, 16 Jun 2019 03:23:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cover.1560679439.git.zhangweiping@didiglobal.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Originating-IP: [172.22.50.20]
-X-ClientProxiedBy: BJEXCAS03.didichuxing.com (172.20.36.245) To
- BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: bogon[172.20.36.245]
-X-Barracuda-Start-Time: 1560680158
-X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 10633
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.72767
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Sun, 16 Jun 2019 12:23:38 +0200
+Message-ID: <CACT4Y+bgr4aC-DZuLCyhxpcES39mbEgLV_UWakmkOYEBPrOkwg@mail.gmail.com>
+Subject: Re: [PATCH 0/2] bcache: two emergent fixes for Linux v5.2-rc5 (use-after-scope)
+To:     kasan-dev <kasan-dev@googlegroups.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Coly Li <colyli@suse.de>, Rolf Fokkens <rolf@rolffokkens.nl>,
+        Pierre JUHEN <pierre.juhen@orange.fr>,
+        Shenghui Wang <shhuiw@foxmail.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Nix <nix@esperi.org.uk>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Will Deacon <will.deacon@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now nvme support five types hardware queue:
-poll:		if io was marked for poll
-wrr_low:	weighted round robin low
-wrr_medium:	weighted round robin medium
-wrr_high:	weighted round robin high
-read:		for read, if blkcg's wrr is none and is not poll
-defaut:		for write/flush, if blkcg's wrr is none and is not poll
+Hi,
 
-for read, default and poll those submission queue's priority is medium by default;
+This is regarding the subj patch:
+https://bugzilla.kernel.org/show_bug.cgi?id=203573
+https://www.spinics.net/lists/linux-bcache/msg07474.html
+(don't see a way to reply to the patch)
 
-Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
----
- drivers/nvme/host/pci.c   | 195 +++++++++++++++++++++++++++++++++-------------
- include/linux/interrupt.h |   2 +-
- 2 files changed, 144 insertions(+), 53 deletions(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index f562154551ce..ee9f3239f3e7 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -73,16 +73,28 @@ static const struct kernel_param_ops queue_count_ops = {
- 	.get = param_get_int,
- };
- 
--static int write_queues;
--module_param_cb(write_queues, &queue_count_ops, &write_queues, 0644);
--MODULE_PARM_DESC(write_queues,
--	"Number of queues to use for writes. If not set, reads and writes "
-+static int read_queues;
-+module_param_cb(read_queues, &queue_count_ops, &read_queues, 0644);
-+MODULE_PARM_DESC(read_queues,
-+	"Number of queues to use for reads. If not set, reads and writes "
- 	"will share a queue set.");
- 
- static int poll_queues = 0;
- module_param_cb(poll_queues, &queue_count_ops, &poll_queues, 0644);
- MODULE_PARM_DESC(poll_queues, "Number of queues to use for polled IO.");
- 
-+static int wrr_high_queues = 0;
-+module_param_cb(wrr_high_queues, &queue_count_ops, &wrr_high_queues, 0644);
-+MODULE_PARM_DESC(wrr_high_queues, "Number of queues to use for WRR high.");
-+
-+static int wrr_medium_queues = 0;
-+module_param_cb(wrr_medium_queues, &queue_count_ops, &wrr_medium_queues, 0644);
-+MODULE_PARM_DESC(wrr_medium_queues, "Number of queues to use for WRR medium.");
-+
-+static int wrr_low_queues = 0;
-+module_param_cb(wrr_low_queues, &queue_count_ops, &wrr_low_queues, 0644);
-+MODULE_PARM_DESC(wrr_low_queues, "Number of queues to use for WRR low.");
-+
- struct nvme_dev;
- struct nvme_queue;
- 
-@@ -226,9 +238,17 @@ struct nvme_iod {
- 	struct scatterlist *sg;
- };
- 
-+static inline bool nvme_is_enable_wrr(struct nvme_dev *dev)
-+{
-+	return dev->io_queues[HCTX_TYPE_WRR_LOW] +
-+		dev->io_queues[HCTX_TYPE_WRR_MEDIUM] +
-+		dev->io_queues[HCTX_TYPE_WRR_HIGH] > 0;
-+}
-+
- static unsigned int max_io_queues(void)
- {
--	return num_possible_cpus() + write_queues + poll_queues;
-+	return num_possible_cpus() + read_queues + poll_queues +
-+		wrr_high_queues + wrr_medium_queues + wrr_low_queues;
- }
- 
- static unsigned int max_queue_count(void)
-@@ -1156,19 +1176,23 @@ static int adapter_alloc_cq(struct nvme_dev *dev, u16 qid,
- }
- 
- static int adapter_alloc_sq(struct nvme_dev *dev, u16 qid,
--						struct nvme_queue *nvmeq)
-+					struct nvme_queue *nvmeq, int wrr)
- {
- 	struct nvme_ctrl *ctrl = &dev->ctrl;
- 	struct nvme_command c;
- 	int flags = NVME_QUEUE_PHYS_CONTIG;
- 
--	/*
--	 * Some drives have a bug that auto-enables WRRU if MEDIUM isn't
--	 * set. Since URGENT priority is zeroes, it makes all queues
--	 * URGENT.
--	 */
--	if (ctrl->quirks & NVME_QUIRK_MEDIUM_PRIO_SQ)
--		flags |= NVME_SQ_PRIO_MEDIUM;
-+	if (!nvme_is_enable_wrr(dev)) {
-+		/*
-+		 * Some drives have a bug that auto-enables WRRU if MEDIUM isn't
-+		 * set. Since URGENT priority is zeroes, it makes all queues
-+		 * URGENT.
-+		 */
-+		if (ctrl->quirks & NVME_QUIRK_MEDIUM_PRIO_SQ)
-+			flags |= NVME_SQ_PRIO_MEDIUM;
-+	} else {
-+		flags |= wrr;
-+	}
- 
- 	/*
- 	 * Note: we (ab)use the fact that the prp fields survive if no data
-@@ -1534,11 +1558,46 @@ static void nvme_init_queue(struct nvme_queue *nvmeq, u16 qid)
- 	wmb(); /* ensure the first interrupt sees the initialization */
- }
- 
--static int nvme_create_queue(struct nvme_queue *nvmeq, int qid, bool polled)
-+static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
- {
- 	struct nvme_dev *dev = nvmeq->dev;
--	int result;
-+	int start, end, result, wrr;
-+	bool polled = false;
- 	u16 vector = 0;
-+	enum hctx_type type;
-+
-+	/* 0 for admain queue, io queue index >= 1 */
-+	start = 1;
-+	/* get hardware context type base on qid */
-+	for (type = HCTX_TYPE_DEFAULT; type < HCTX_MAX_TYPES; type++) {
-+		end = start + dev->io_queues[type] - 1;
-+		if (qid >= start && qid <= end)
-+			break;
-+		start = end + 1;
-+	}
-+
-+	if (nvme_is_enable_wrr(dev)) {
-+		/* set read,poll,default to medium by default */
-+		switch (type) {
-+		case HCTX_TYPE_POLL:
-+			polled = true;
-+		case HCTX_TYPE_DEFAULT:
-+		case HCTX_TYPE_READ:
-+		case HCTX_TYPE_WRR_MEDIUM:
-+			wrr = NVME_SQ_PRIO_MEDIUM;
-+			break;
-+		case HCTX_TYPE_WRR_LOW:
-+			wrr = NVME_SQ_PRIO_LOW;
-+			break;
-+		case HCTX_TYPE_WRR_HIGH:
-+			wrr = NVME_SQ_PRIO_HIGH;
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+	} else {
-+		wrr = 0;
-+	}
- 
- 	clear_bit(NVMEQ_DELETE_ERROR, &nvmeq->flags);
- 
-@@ -1555,7 +1614,7 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid, bool polled)
- 	if (result)
- 		return result;
- 
--	result = adapter_alloc_sq(dev, qid, nvmeq);
-+	result = adapter_alloc_sq(dev, qid, nvmeq, wrr);
- 	if (result < 0)
- 		return result;
- 	else if (result)
-@@ -1726,7 +1785,7 @@ static int nvme_pci_configure_admin_queue(struct nvme_dev *dev)
- 
- static int nvme_create_io_queues(struct nvme_dev *dev)
- {
--	unsigned i, max, rw_queues;
-+	unsigned i, max;
- 	int ret = 0;
- 
- 	for (i = dev->ctrl.queue_count; i <= dev->max_qid; i++) {
-@@ -1737,17 +1796,9 @@ static int nvme_create_io_queues(struct nvme_dev *dev)
- 	}
- 
- 	max = min(dev->max_qid, dev->ctrl.queue_count - 1);
--	if (max != 1 && dev->io_queues[HCTX_TYPE_POLL]) {
--		rw_queues = dev->io_queues[HCTX_TYPE_DEFAULT] +
--				dev->io_queues[HCTX_TYPE_READ];
--	} else {
--		rw_queues = max;
--	}
- 
- 	for (i = dev->online_queues; i <= max; i++) {
--		bool polled = i > rw_queues;
--
--		ret = nvme_create_queue(&dev->queues[i], i, polled);
-+		ret = nvme_create_queue(&dev->queues[i], i);
- 		if (ret)
- 			break;
- 	}
-@@ -2028,35 +2079,73 @@ static int nvme_setup_host_mem(struct nvme_dev *dev)
- static void nvme_calc_irq_sets(struct irq_affinity *affd, unsigned int nrirqs)
- {
- 	struct nvme_dev *dev = affd->priv;
--	unsigned int nr_read_queues;
-+	unsigned int nr_total, nr, nr_read, nr_default;
-+	unsigned int nr_wrr_high, nr_wrr_medium, nr_wrr_low;
-+	unsigned int nr_sets;
- 
- 	/*
- 	 * If there is no interupt available for queues, ensure that
- 	 * the default queue is set to 1. The affinity set size is
- 	 * also set to one, but the irq core ignores it for this case.
--	 *
--	 * If only one interrupt is available or 'write_queue' == 0, combine
--	 * write and read queues.
--	 *
--	 * If 'write_queues' > 0, ensure it leaves room for at least one read
--	 * queue.
- 	 */
--	if (!nrirqs) {
-+	if (!nrirqs)
- 		nrirqs = 1;
--		nr_read_queues = 0;
--	} else if (nrirqs == 1 || !write_queues) {
--		nr_read_queues = 0;
--	} else if (write_queues >= nrirqs) {
--		nr_read_queues = 1;
--	} else {
--		nr_read_queues = nrirqs - write_queues;
--	}
- 
--	dev->io_queues[HCTX_TYPE_DEFAULT] = nrirqs - nr_read_queues;
--	affd->set_size[HCTX_TYPE_DEFAULT] = nrirqs - nr_read_queues;
--	dev->io_queues[HCTX_TYPE_READ] = nr_read_queues;
--	affd->set_size[HCTX_TYPE_READ] = nr_read_queues;
--	affd->nr_sets = nr_read_queues ? 2 : 1;
-+	nr_total = nrirqs;
-+
-+	nr_read = nr_wrr_high = nr_wrr_medium = nr_wrr_low = 0;
-+
-+	/* set default to 1, add all the rest queue to default at last */
-+	nr = nr_default = 1;
-+	nr_sets = 1;
-+
-+	nr_total -= nr;
-+	if (!nr_total)
-+		goto done;
-+
-+	/* read queues */
-+	nr_sets++;
-+	nr_read = nr = read_queues > nr_total ? nr_total : read_queues;
-+	nr_total -= nr;
-+	if (!nr_total)
-+		goto done;
-+
-+	/* wrr low queues */
-+	nr_sets++;
-+	nr_wrr_low = nr = wrr_low_queues > nr_total ? nr_total : wrr_low_queues;
-+	nr_total -= nr;
-+	if (!nr_total)
-+		goto done;
-+
-+	/* wrr medium queues */
-+	nr_sets++;
-+	nr_wrr_medium = nr = wrr_medium_queues > nr_total ? nr_total : wrr_medium_queues;
-+	nr_total -= nr;
-+	if (!nr_total)
-+		goto done;
-+
-+	/* wrr high queues */
-+	nr_sets++;
-+	nr_wrr_high = nr = wrr_high_queues > nr_total ? nr_total : wrr_high_queues;
-+	nr_total -= nr;
-+	if (!nr_total)
-+		goto done;
-+
-+	/* set all the rest queue to default */
-+	nr_default += nr_total;
-+
-+done:
-+	dev->io_queues[HCTX_TYPE_DEFAULT] = nr_default;
-+	affd->set_size[HCTX_TYPE_DEFAULT] = nr_default;
-+	dev->io_queues[HCTX_TYPE_READ] = nr_read;
-+	affd->set_size[HCTX_TYPE_READ] = nr_read;
-+	dev->io_queues[HCTX_TYPE_WRR_LOW] = nr_wrr_low;
-+	affd->set_size[HCTX_TYPE_WRR_LOW] = nr_wrr_low;
-+	dev->io_queues[HCTX_TYPE_WRR_MEDIUM] = nr_wrr_medium;
-+	affd->set_size[HCTX_TYPE_WRR_MEDIUM] = nr_wrr_medium;
-+	dev->io_queues[HCTX_TYPE_WRR_HIGH] = nr_wrr_high;
-+	affd->set_size[HCTX_TYPE_WRR_HIGH] = nr_wrr_high;
-+	affd->nr_sets = nr_sets;
- }
- 
- static int nvme_setup_irqs(struct nvme_dev *dev, unsigned int nr_io_queues)
-@@ -2171,10 +2260,14 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 		nvme_suspend_io_queues(dev);
- 		goto retry;
- 	}
--	dev_info(dev->ctrl.device, "%d/%d/%d default/read/poll queues\n",
-+	dev_info(dev->ctrl.device, "%d/%d/%d/%d/%d/%d "
-+			"default/read/poll/wrr_low/wrr_medium/wrr_high queues\n",
- 					dev->io_queues[HCTX_TYPE_DEFAULT],
- 					dev->io_queues[HCTX_TYPE_READ],
--					dev->io_queues[HCTX_TYPE_POLL]);
-+					dev->io_queues[HCTX_TYPE_POLL],
-+					dev->io_queues[HCTX_TYPE_WRR_LOW],
-+					dev->io_queues[HCTX_TYPE_WRR_MEDIUM],
-+					dev->io_queues[HCTX_TYPE_WRR_HIGH]);
- 	return 0;
- }
- 
-@@ -2263,9 +2356,7 @@ static int nvme_dev_add(struct nvme_dev *dev)
- 	if (!dev->ctrl.tagset) {
- 		dev->tagset.ops = &nvme_mq_ops;
- 		dev->tagset.nr_hw_queues = dev->online_queues - 1;
--		dev->tagset.nr_maps = 2; /* default + read */
--		if (dev->io_queues[HCTX_TYPE_POLL])
--			dev->tagset.nr_maps++;
-+		dev->tagset.nr_maps = HCTX_MAX_TYPES;
- 		dev->tagset.timeout = NVME_IO_TIMEOUT;
- 		dev->tagset.numa_node = dev_to_node(dev->dev);
- 		dev->tagset.queue_depth =
-diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
-index c7eef32e7739..ea726c2f95cc 100644
---- a/include/linux/interrupt.h
-+++ b/include/linux/interrupt.h
-@@ -259,7 +259,7 @@ struct irq_affinity_notify {
- 	void (*release)(struct kref *ref);
- };
- 
--#define	IRQ_AFFINITY_MAX_SETS  4
-+#define	IRQ_AFFINITY_MAX_SETS  7
- 
- /**
-  * struct irq_affinity - Description for automatic irq affinity assignements
--- 
-2.14.1
-
+This looks like a serious bug that would have been caught by
+use-after-scope mode in KASAN given any coverage of the involved code
+(i.e. any tests that executes the function once) if I am reading this
+correctly.
+But use-after-scope detection was removed in:
+7771bdbbfd3d kasan: remove use after scope bugs detection.
+because it does not catch enough bugs.
+Hard to say if this bug is enough rationale to bring use-after-scope
+back, but it is a data point. FWIW this bug would have been detected
+during patch testing with no debugging required.
