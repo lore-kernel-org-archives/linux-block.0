@@ -2,81 +2,80 @@ Return-Path: <SRS0=14Po=UQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C6EFC31E44
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 06:54:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 112FDC31E53
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 06:54:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D464021855
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 06:54:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE50821855
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 06:54:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726020AbfFQGyB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jun 2019 02:54:01 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50554 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725778AbfFQGyB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jun 2019 02:54:01 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 6C4F9AC5A;
-        Mon, 17 Jun 2019 06:53:59 +0000 (UTC)
-Subject: Re: [PATCH V2 5/7] bcache: update cached_dev_init() with helper
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     linux-bcache@vger.kernel.org, linux-btrace@vger.kernel.org,
-        kent.overstreet@gmail.com, jaegeuk@kernel.org,
-        damien.lemoal@wdc.com
-References: <20190617012832.4311-1-chaitanya.kulkarni@wdc.com>
- <20190617012832.4311-6-chaitanya.kulkarni@wdc.com>
-From:   Coly Li <colyli@suse.de>
-Openpgp: preference=signencrypt
-Organization: SUSE Labs
-Message-ID: <ae48b013-6e5f-1300-557e-1dbe0f4ad31c@suse.de>
-Date:   Mon, 17 Jun 2019 14:53:52 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.1
+        id S1726047AbfFQGyC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jun 2019 02:54:02 -0400
+Received: from verein.lst.de ([213.95.11.211]:32921 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725778AbfFQGyC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Jun 2019 02:54:02 -0400
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id F35F768AA6; Mon, 17 Jun 2019 08:53:31 +0200 (CEST)
+Date:   Mon, 17 Jun 2019 08:53:31 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+        "wsa+renesas@sang-engineering.com" <wsa+renesas@sang-engineering.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-renesas-soc@vger.kernel.org" 
+        <linux-renesas-soc@vger.kernel.org>
+Subject: Re: [RFC PATCH v6 5/5] mmc: queue: Use bigger segments if IOMMU
+ can merge the segments
+Message-ID: <20190617065331.GA5456@lst.de>
+References: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com> <1560421215-10750-6-git-send-email-yoshihiro.shimoda.uh@renesas.com> <20190614072459.GD8420@lst.de> <OSBPR01MB3590FA5DB10D9EF34F551335D8EB0@OSBPR01MB3590.jpnprd01.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20190617012832.4311-6-chaitanya.kulkarni@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <OSBPR01MB3590FA5DB10D9EF34F551335D8EB0@OSBPR01MB3590.jpnprd01.prod.outlook.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/6/17 9:28 上午, Chaitanya Kulkarni wrote:
-> In the bcache when initializing the device we don't actually use any
-> sort of locking when reading the number of sectors from the part. This
-> patch updates the cached_dev_init() with newly introduced helper
-> function to read the nr_sects from block device's hd_parts with the help
-> of part_nr_sects_read().
+On Mon, Jun 17, 2019 at 06:46:33AM +0000, Yoshihiro Shimoda wrote:
+> > can_merge seems a little too generic a name to me.  Maybe can_iommu_merge?
 > 
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> I'll fix the name. Also, only the device_iommu_mapped() condition wiil cause
+> a problem on iommu=pt [1]. So, I'll add another condition here.
 
-Acked-by: Coly Li <colyli@suse.de>
+Instead of adding another condition here I think we need to properly
+abstract it out in the DMA layer.  E.g. have a
 
-Thanks.
+unsigned long dma_get_merge_boundary(struct device *dev)
+{
+	const struct dma_map_ops *ops = get_dma_ops(dev);
 
-Coly Li
+	if (!ops || !ops->get_merge_boundary)
+		return 0; /* can't merge */
+	return ops->get_merge_boundary(dev);
+}
 
-> ---
->  drivers/md/bcache/super.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> index 1b63ac876169..6a29ba89dae1 100644
-> --- a/drivers/md/bcache/super.c
-> +++ b/drivers/md/bcache/super.c
-> @@ -1263,7 +1263,7 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
->  			q->limits.raid_partial_stripes_expensive;
->  
->  	ret = bcache_device_init(&dc->disk, block_size,
-> -			 dc->bdev->bd_part->nr_sects - dc->sb.data_offset);
-> +			 bdev_nr_sects(dc->bdev) - dc->sb.data_offset);
->  	if (ret)
->  		return ret;
->  
-> 
+and then implement the method in dma-iommu.c.
+
+blk_queue_can_use_iommu_merging then comes:
+
+bool blk_queue_enable_iommu_merging(struct request_queue *q,
+		struct device *dev)
+{
+	unsigned long boundary = dma_get_merge_boundary(dev);
+
+	if (!boundary)
+		return false;
+	blk_queue_virt_boundary(q, boundary);
+	return true;
+}
