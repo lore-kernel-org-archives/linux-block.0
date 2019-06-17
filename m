@@ -1,86 +1,132 @@
-Return-Path: <SRS0=cIdD=UP=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=14Po=UQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3663C31E49
-	for <linux-block@archiver.kernel.org>; Sun, 16 Jun 2019 11:53:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2B39C31E50
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 01:28:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A9EE320679
-	for <linux-block@archiver.kernel.org>; Sun, 16 Jun 2019 11:53:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A56042089E
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 01:28:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="odLxXAgJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727044AbfFPLxE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Jun 2019 07:53:04 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48234 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725879AbfFPLxE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Jun 2019 07:53:04 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 08217AEF9;
-        Sun, 16 Jun 2019 11:53:03 +0000 (UTC)
-Subject: Re: [PATCH 0/2] bcache: two emergent fixes for Linux v5.2-rc5
- (use-after-scope)
-To:     Dmitry Vyukov <dvyukov@google.com>
-References: <CACT4Y+bgr4aC-DZuLCyhxpcES39mbEgLV_UWakmkOYEBPrOkwg@mail.gmail.com>
-Cc:     kasan-dev <kasan-dev@googlegroups.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Rolf Fokkens <rolf@rolffokkens.nl>,
-        Pierre JUHEN <pierre.juhen@orange.fr>,
-        Shenghui Wang <shhuiw@foxmail.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Nix <nix@esperi.org.uk>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        Will Deacon <will.deacon@arm.com>
-From:   Coly Li <colyli@suse.de>
-Openpgp: preference=signencrypt
-Organization: SUSE Labs
-Message-ID: <1c976ca8-6ba6-d27a-3fb0-3f77d7dfc523@suse.de>
-Date:   Sun, 16 Jun 2019 19:52:55 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.0
+        id S1727471AbfFQB2l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Jun 2019 21:28:41 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:7477 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727382AbfFQB2k (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 16 Jun 2019 21:28:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1560734920; x=1592270920;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WOSfb54lqjmAhpxKks8qtBjKEWXJ2gQPrUDSicl9Hnk=;
+  b=odLxXAgJaYjAEXRRwyMQ/I9BY2nl6W+bpx2qrf9IwAAceXodZI9Q9iWe
+   mtf8EH8EIF2grSduEBSAhxRTvkjJTKmJ1ntySMBI5LBrhMkKru0bgPMLH
+   KIstJkq4/2y2gGD87bicHQsXhla/Cz6jRYNs4Rq8f/ZszggS2l3n7kodD
+   RjYoJ0MKxY6A2YJdkzLB68F84HZd1HTqdRRqZiCnYPz6PVQw/MArRRXal
+   4r8NHvdeVyawkZMBQ7hmjL2Mbq5ay6IsxNCx1+6THLnCR/C5hJbkIO6Y8
+   aLfA58rL4yWVnzrwYlaXm54wQ2sxE3bbiZhNqNu4MFkwxwg/8Ci7lEIVR
+   A==;
+X-IronPort-AV: E=Sophos;i="5.63,383,1557158400"; 
+   d="scan'208";a="112362939"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 17 Jun 2019 09:28:38 +0800
+IronPort-SDR: QIywSG0ORQ99aTQlVbeJUpsL8JRmU2xUkFm+m/4NI2C89tEtal45HKHxerz7SB9MmlyF4TUAnD
+ 1leOTQtO44x2D40aqQ+H8iijv/s3Ue76ksmZdYiclaObbQBdyo7nGLCV3vgzfzDgifJjpnc9vC
+ QhKEl/SEIrKg0jynJljpsFGq076ZJhpB4XEghl/j/kvt4l7hC4cQvcgrJ2DBg9CpPhrsNRy0/Y
+ dNWaBd4kfia6JgrRQykJAteH0nc8yqw4YXCeq/5O71hWWxuKAZpXqjDQZsUrkle+fvaljwkINd
+ 0OKnSAR8dOU5QXBIUXt90vKd
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP; 16 Jun 2019 18:28:16 -0700
+IronPort-SDR: e9yLg0KsgSb036ZBFYJzKWGhn1ix8M/H5PzEIyUOFfS07QOrE0pWNDucJOXjf30T3hcelF022T
+ 1OmpPhsces+x38eqUg8RuxI8MLfRDgOpCPMUpqMEuBWcx8xhjeerh91ux6CH/8zYyPKOFa3waU
+ kGr+ufS/GjwT23+Oi5RLlLnapCMksd3jpRcRXerdrcl3ZLb8zLsaktaO7Utipgi7qqFtMxUjkk
+ ZfMa5DuHWJDXTcbMkj5uaoSZdsTWocm+sWwp/usRMzZ7Y83ikPZzPtFcS5utABB2c3gDWjZ+Cd
+ /KM=
+Received: from cmercuryqemu.hgst.com ([10.202.65.32])
+  by uls-op-cesaip01.wdc.com with ESMTP; 16 Jun 2019 18:28:39 -0700
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
+        linux-btrace@vger.kernel.org, kent.overstreet@gmail.com,
+        jaegeuk@kernel.org, damien.lemoal@wdc.com,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V2 0/7] block: use right accessor to read nr_setcs
+Date:   Sun, 16 Jun 2019 18:28:25 -0700
+Message-Id: <20190617012832.4311-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-In-Reply-To: <CACT4Y+bgr4aC-DZuLCyhxpcES39mbEgLV_UWakmkOYEBPrOkwg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/6/16 6:23 下午, Dmitry Vyukov wrote:
-> Hi,
-> 
-> This is regarding the subj patch:
-> https://bugzilla.kernel.org/show_bug.cgi?id=203573
-> https://www.spinics.net/lists/linux-bcache/msg07474.html
-> (don't see a way to reply to the patch)
-> 
-> This looks like a serious bug that would have been caught by
-> use-after-scope mode in KASAN given any coverage of the involved code
-> (i.e. any tests that executes the function once) if I am reading this
-> correctly.
-> But use-after-scope detection was removed in:
-> 7771bdbbfd3d kasan: remove use after scope bugs detection.
-> because it does not catch enough bugs.
-> Hard to say if this bug is enough rationale to bring use-after-scope
-> back, but it is a data point. FWIW this bug would have been detected
-> during patch testing with no debugging required.
-> 
+Hi,
 
-Hi Dmitry,
+In the blk-zoned, bcache, f2fs and blktrace implementation
+block device->hd_part->number of sectors field is accessed directly
+without any appropriate locking or accessor function. There is
+an existing accessor function present in the in include/linux/genhd.h
+which should be used to read the bdev->hd_part->nr_sects.
 
-I although thought it should be reported by compiler, but no idea why
-compiler didn't complain.
+From ${KERN_DIR}/include/linux/genhd.h:-
+<snip>
+714 /*
+715  * Any access of part->nr_sects which is not protected by partition
+716  * bd_mutex or gendisk bdev bd_mutex, should be done using this
+717  * accessor function.
+718  *
+719  * Code written along the lines of i_size_read() and i_size_write().
+720  * CONFIG_PREEMPT case optimizes the case of UP kernel with preemption
+721  * on.
+722  */
+723 static inline sector_t part_nr_sects_read(struct hd_struct *part)
+724 {
+<snip>
 
-Anyway, since now I start to enable KASAN in my testing.
+This patch series introduces a helper function on the top of the
+part_nr_sects_read() and removes the all direct accesses to the
+bdev->hd_part->nr_sects for blk-zoned.c.
 
-Thanks.
+This series is based on :-
+
+1. Repo :-
+   git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git.
+2. Branch :- for-next.
+
+Regards,
+Chaitanya
+
+Changes from V1:-
+
+1. Drop the target_pscsi patch. (Bart)
+2. Remove rcu locking which is not needed. (Bart)
+
+Chaitanya Kulkarni (7):
+  block: add a helper function to read nr_setcs
+  blk-zoned: update blkdev_nr_zones() with helper
+  blk-zoned: update blkdev_report_zone() with helper
+  blk-zoned: update blkdev_reset_zones() with helper
+  bcache: update cached_dev_init() with helper
+  f2fs: use helper in init_blkz_info()
+  blktrace: use helper in blk_trace_setup_lba()
+
+ block/blk-zoned.c         | 12 ++++++------
+ drivers/md/bcache/super.c |  2 +-
+ fs/f2fs/super.c           |  2 +-
+ include/linux/blkdev.h    | 10 ++++++++++
+ kernel/trace/blktrace.c   |  2 +-
+ 5 files changed, 19 insertions(+), 9 deletions(-)
 
 -- 
+2.19.1
 
-Coly Li
