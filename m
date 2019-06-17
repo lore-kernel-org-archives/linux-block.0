@@ -2,140 +2,127 @@ Return-Path: <SRS0=14Po=UQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9FB0C31E53
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 07:02:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CDB3C31E44
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 07:32:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C27482147A
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 07:02:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesasgroup.onmicrosoft.com header.i=@renesasgroup.onmicrosoft.com header.b="gbtumdy6"
+	by mail.kernel.org (Postfix) with ESMTP id E449921C38
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 07:32:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725863AbfFQHCv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jun 2019 03:02:51 -0400
-Received: from mail-eopbgr1410119.outbound.protection.outlook.com ([40.107.141.119]:6116
-        "EHLO JPN01-OS2-obe.outbound.protection.outlook.com"
+        id S1725862AbfFQHcm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jun 2019 03:32:42 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33282 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725778AbfFQHCv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jun 2019 03:02:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=renesasgroup.onmicrosoft.com; s=selector2-renesasgroup-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eVHS4yiT2U6go1UBNQaZ+k5VklIwGp5aS1wuP54lQfA=;
- b=gbtumdy6N7BscWpm9/Q6+E4yYH0DlPcDC9Ljroj/VPp+9FHn2GdsGqHO92b+zjnz6X+begYDB6djhfolUVBuvlGc1UdW3hbOGr1LUhg26PnWBf4FQycFQHf63M3fBSn9aab6IkL1WK+I3n4z1JUxjd6Dfq7GGekO5u1rIqEQayU=
-Received: from OSBPR01MB3590.jpnprd01.prod.outlook.com (20.178.97.80) by
- OSBPR01MB3416.jpnprd01.prod.outlook.com (20.178.99.17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.11; Mon, 17 Jun 2019 07:02:47 +0000
-Received: from OSBPR01MB3590.jpnprd01.prod.outlook.com
- ([fe80::b1c2:125c:440d:e240]) by OSBPR01MB3590.jpnprd01.prod.outlook.com
- ([fe80::b1c2:125c:440d:e240%4]) with mapi id 15.20.1987.014; Mon, 17 Jun 2019
- 07:02:47 +0000
-From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To:     Christoph Hellwig <hch@lst.de>
-CC:     "joro@8bytes.org" <joro@8bytes.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-        "wsa+renesas@sang-engineering.com" <wsa+renesas@sang-engineering.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-renesas-soc@vger.kernel.org" 
-        <linux-renesas-soc@vger.kernel.org>
-Subject: RE: [RFC PATCH v6 5/5] mmc: queue: Use bigger segments if IOMMU can
- merge the segments
-Thread-Topic: [RFC PATCH v6 5/5] mmc: queue: Use bigger segments if IOMMU can
- merge the segments
-Thread-Index: AQHVIdGmGPEUTZUzykuLpLo4YRSl9aaawOiAgASqhHCAAAOwgIAAAZyA
-Date:   Mon, 17 Jun 2019 07:02:47 +0000
-Message-ID: <OSBPR01MB3590289F07A53A33296BC9D6D8EB0@OSBPR01MB3590.jpnprd01.prod.outlook.com>
-References: <1560421215-10750-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
- <1560421215-10750-6-git-send-email-yoshihiro.shimoda.uh@renesas.com>
- <20190614072459.GD8420@lst.de>
- <OSBPR01MB3590FA5DB10D9EF34F551335D8EB0@OSBPR01MB3590.jpnprd01.prod.outlook.com>
- <20190617065331.GA5456@lst.de>
-In-Reply-To: <20190617065331.GA5456@lst.de>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=yoshihiro.shimoda.uh@renesas.com; 
-x-originating-ip: [118.238.235.108]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bd3dfd7e-a31b-4ca6-e01f-08d6f2f1ce10
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:OSBPR01MB3416;
-x-ms-traffictypediagnostic: OSBPR01MB3416:
-x-microsoft-antispam-prvs: <OSBPR01MB34160D1EC798A007E26E5A7BD8EB0@OSBPR01MB3416.jpnprd01.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0071BFA85B
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(136003)(376002)(39860400002)(396003)(346002)(199004)(189003)(71190400001)(6916009)(256004)(6506007)(14444005)(99286004)(6246003)(446003)(11346002)(486006)(6116002)(3846002)(229853002)(8676002)(26005)(186003)(5660300002)(4326008)(14454004)(478600001)(7696005)(66446008)(76116006)(8936002)(66476007)(64756008)(86362001)(81166006)(476003)(52536014)(102836004)(81156014)(76176011)(33656002)(305945005)(74316002)(66946007)(66556008)(73956011)(7736002)(66066001)(6436002)(68736007)(54906003)(2906002)(55016002)(53936002)(9686003)(316002)(25786009)(71200400001)(135533001);DIR:OUT;SFP:1102;SCL:1;SRVR:OSBPR01MB3416;H:OSBPR01MB3590.jpnprd01.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: renesas.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: hZEeNn0r82K2/sq1Qepz97jORcVmvfnYVJIDZoD3sAObh1lJf9ZAV0tWQfktnOKJbBApY4g1B0EdRTI6G6BXvXkfIGObWdbRq/qiDvf9fbMmpsCRuL7+kjgJ+bEuqHTjh083K53jMRyEjRtFwGr6AxmSIPXTzuFZIOK5ddNXUPr42ndDfxKNlIVXbQ75AsZDMakfZvOK3zyfInbxqkuLZB7kawhdFE9mrmEBFi9gr0d4jcm3xy92Z1Imkw1pzvSeJIRHY8mHZWmTxDPD6QI/hkCRnXLei09zlKMQXBB+V0eIpAEuO/giTWXgQi0/O1VtWg9k5JfyetBxfJgIyXtQ3Ik5+ozSwTqD3a8HYDgOtDAzhpuEMHb2vUThXu8uM5iMx/amI8Mi6Yldmbn6CjUr5I3IO4X76ZEWRvtlgLCAjdI=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1725837AbfFQHcl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Jun 2019 03:32:41 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id A11D3AFAB;
+        Mon, 17 Jun 2019 07:32:39 +0000 (UTC)
+Subject: Re: block: be more careful about status in __bio_chain_endio
+To:     Christoph Hellwig <hch@infradead.org>,
+        John Dorminy <jdorminy@redhat.com>
+Cc:     Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        NeilBrown <neilb@suse.com>, linux-block@vger.kernel.org,
+        device-mapper development <dm-devel@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <70cda2a3-f246-d45b-f600-1f9d15ba22ff@gmail.com>
+ <87eflmpqkb.fsf@notabene.neil.brown.name> <20190222211006.GA10987@redhat.com>
+ <7f0aeb7b-fdaa-0625-f785-05c342047550@kernel.dk>
+ <20190222235459.GA11726@redhat.com>
+ <CAMeeMh-2ANOr_Sb66EyA_HULkVRudD7fyOZsDbpRpDrshwnR2w@mail.gmail.com>
+ <20190223024402.GA12407@redhat.com>
+ <CAMeeMh9qLkTByWJewPR4o844wPkA-g5Hnm7aGjszuPopPAe8vA@mail.gmail.com>
+ <CAMeeMh-6KMLgriX_7KT52ynjBMyT9yDWSMKv6YXW+yDpvv0=wA@mail.gmail.com>
+ <20190612070110.GA11707@infradead.org>
+From:   Hannes Reinecke <hare@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+ azzYF4VRJsdl+d0MCaSy8mUh
+Message-ID: <b023cf7a-ca86-5516-b441-30bec442dee6@suse.de>
+Date:   Mon, 17 Jun 2019 09:32:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd3dfd7e-a31b-4ca6-e01f-08d6f2f1ce10
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2019 07:02:47.6107
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yoshihiro.shimoda.uh@renesas.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSBPR01MB3416
+In-Reply-To: <20190612070110.GA11707@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+On 6/12/19 9:01 AM, Christoph Hellwig wrote:
+> On Tue, Jun 11, 2019 at 10:56:42PM -0400, John Dorminy wrote:
+>> I believe the second of these might, but is not guaranteed to,
+>> preserve the first error observed in a child; I believe if you want to
+>> definitely save the first error you need an atomic.
+> 
+> Is there any reason not to simply use a cmpxchg?  Yes, it is a
+> relatively expensive operation, but once we are chaining bios we are out
+> of the super hot path anyway.  We do something similar in xfs and iomap
+> already.
+> 
+Agree.
+Thing is, we need to check if the parent status is NULL, _and_ the
+parent status might be modified asynchronously.
+So even a READ_ONCE() wouldn't cut it, as it would tell us that the
+parent status _was_ NULL, not that the parent status _is_ NULL by the
+time we're setting it.
+So cmpxchg() is it.
 
-> From: Christoph Hellwig, Sent: Monday, June 17, 2019 3:54 PM
->=20
-> On Mon, Jun 17, 2019 at 06:46:33AM +0000, Yoshihiro Shimoda wrote:
-> > > can_merge seems a little too generic a name to me.  Maybe can_iommu_m=
-erge?
-> >
-> > I'll fix the name. Also, only the device_iommu_mapped() condition wiil =
-cause
-> > a problem on iommu=3Dpt [1]. So, I'll add another condition here.
->=20
-> Instead of adding another condition here I think we need to properly
-> abstract it out in the DMA layer.  E.g. have a
+Cheers,
 
-Thank you for your comment and sample code! I'll add such functions
-on next patch series.
-
-Best regards,
-Yoshihiro Shimoda
-
-> unsigned long dma_get_merge_boundary(struct device *dev)
-> {
-> 	const struct dma_map_ops *ops =3D get_dma_ops(dev);
->=20
-> 	if (!ops || !ops->get_merge_boundary)
-> 		return 0; /* can't merge */
-> 	return ops->get_merge_boundary(dev);
-> }
->=20
-> and then implement the method in dma-iommu.c.
->=20
-> blk_queue_can_use_iommu_merging then comes:
->=20
-> bool blk_queue_enable_iommu_merging(struct request_queue *q,
-> 		struct device *dev)
-> {
-> 	unsigned long boundary =3D dma_get_merge_boundary(dev);
->=20
-> 	if (!boundary)
-> 		return false;
-> 	blk_queue_virt_boundary(q, boundary);
-> 	return true;
-> }
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
