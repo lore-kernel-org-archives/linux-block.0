@@ -2,43 +2,30 @@ Return-Path: <SRS0=14Po=UQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CDB3C31E44
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 07:32:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C39ABC46477
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 08:41:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E449921C38
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 07:32:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4C3121874
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 08:41:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725862AbfFQHcm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jun 2019 03:32:42 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33282 "EHLO mx1.suse.de"
+        id S1726355AbfFQIlU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jun 2019 04:41:20 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59816 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725837AbfFQHcl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jun 2019 03:32:41 -0400
+        id S1725827AbfFQIlT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Jun 2019 04:41:19 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id A11D3AFAB;
-        Mon, 17 Jun 2019 07:32:39 +0000 (UTC)
-Subject: Re: block: be more careful about status in __bio_chain_endio
-To:     Christoph Hellwig <hch@infradead.org>,
-        John Dorminy <jdorminy@redhat.com>
-Cc:     Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        NeilBrown <neilb@suse.com>, linux-block@vger.kernel.org,
-        device-mapper development <dm-devel@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <70cda2a3-f246-d45b-f600-1f9d15ba22ff@gmail.com>
- <87eflmpqkb.fsf@notabene.neil.brown.name> <20190222211006.GA10987@redhat.com>
- <7f0aeb7b-fdaa-0625-f785-05c342047550@kernel.dk>
- <20190222235459.GA11726@redhat.com>
- <CAMeeMh-2ANOr_Sb66EyA_HULkVRudD7fyOZsDbpRpDrshwnR2w@mail.gmail.com>
- <20190223024402.GA12407@redhat.com>
- <CAMeeMh9qLkTByWJewPR4o844wPkA-g5Hnm7aGjszuPopPAe8vA@mail.gmail.com>
- <CAMeeMh-6KMLgriX_7KT52ynjBMyT9yDWSMKv6YXW+yDpvv0=wA@mail.gmail.com>
- <20190612070110.GA11707@infradead.org>
+        by mx1.suse.de (Postfix) with ESMTP id EFCB8AC44;
+        Mon, 17 Jun 2019 08:41:17 +0000 (UTC)
+Subject: Re: [PATCH] block: use req_op() to maintain consistency
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org
+References: <20190613141421.2698-1-chaitanya.kulkarni@wdc.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -84,12 +71,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <b023cf7a-ca86-5516-b441-30bec442dee6@suse.de>
-Date:   Mon, 17 Jun 2019 09:32:39 +0200
+Message-ID: <e044a105-3efd-c44e-21da-51b2874feb67@suse.de>
+Date:   Mon, 17 Jun 2019 10:41:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190612070110.GA11707@infradead.org>
+In-Reply-To: <20190613141421.2698-1-chaitanya.kulkarni@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -98,24 +85,31 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/12/19 9:01 AM, Christoph Hellwig wrote:
-> On Tue, Jun 11, 2019 at 10:56:42PM -0400, John Dorminy wrote:
->> I believe the second of these might, but is not guaranteed to,
->> preserve the first error observed in a child; I believe if you want to
->> definitely save the first error you need an atomic.
+On 6/13/19 4:14 PM, Chaitanya Kulkarni wrote:
+> This is a pure code cleanup patch and doesn't change any functionality.
+> In block layer to identify the request operation req_op() macro is
+> used, so change the open coding the req_op() in the blk-mq-debugfs.c.
 > 
-> Is there any reason not to simply use a cmpxchg?  Yes, it is a
-> relatively expensive operation, but once we are chaining bios we are out
-> of the super hot path anyway.  We do something similar in xfs and iomap
-> already.
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> ---
+>  block/blk-mq-debugfs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-Agree.
-Thing is, we need to check if the parent status is NULL, _and_ the
-parent status might be modified asynchronously.
-So even a READ_ONCE() wouldn't cut it, as it would tell us that the
-parent status _was_ NULL, not that the parent status _is_ NULL by the
-time we're setting it.
-So cmpxchg() is it.
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index 6aea0ebc3a73..c6c3c4f4128a 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -341,7 +341,7 @@ static const char *blk_mq_rq_state_name(enum mq_rq_state rq_state)
+>  int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
+>  {
+>  	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
+> -	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
+> +	const unsigned int op = req_op(rq);
+>  
+>  	seq_printf(m, "%p {.op=", rq);
+>  	if (op < ARRAY_SIZE(op_name) && op_name[op])
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
 
