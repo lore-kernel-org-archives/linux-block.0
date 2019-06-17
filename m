@@ -2,154 +2,78 @@ Return-Path: <SRS0=14Po=UQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27205C31E44
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 08:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A28C31E44
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 08:45:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E36322080A
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 08:42:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8E4120848
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 08:45:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726920AbfFQIm7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jun 2019 04:42:59 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60160 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725837AbfFQIm7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jun 2019 04:42:59 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 5B400AFAF;
-        Mon, 17 Jun 2019 08:42:57 +0000 (UTC)
-Subject: Re: [PATCH 1/2] block: improve print_req_error
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     hch@lst.de, hare@suse.com
-References: <20190611200210.4819-1-chaitanya.kulkarni@wdc.com>
- <20190611200210.4819-2-chaitanya.kulkarni@wdc.com>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- mQINBE6KyREBEACwRN6XKClPtxPiABx5GW+Yr1snfhjzExxkTYaINHsWHlsLg13kiemsS6o7
- qrc+XP8FmhcnCOts9e2jxZxtmpB652lxRB9jZE40mcSLvYLM7S6aH0WXKn8bOqpqOGJiY2bc
- 6qz6rJuqkOx3YNuUgiAxjuoYauEl8dg4bzex3KGkGRuxzRlC8APjHlwmsr+ETxOLBfUoRNuE
- b4nUtaseMPkNDwM4L9+n9cxpGbdwX0XwKFhlQMbG3rWA3YqQYWj1erKIPpgpfM64hwsdk9zZ
- QO1krgfULH4poPQFpl2+yVeEMXtsSou915jn/51rBelXeLq+cjuK5+B/JZUXPnNDoxOG3j3V
- VSZxkxLJ8RO1YamqZZbVP6jhDQ/bLcAI3EfjVbxhw9KWrh8MxTcmyJPn3QMMEp3wpVX9nSOQ
- tzG72Up/Py67VQe0x8fqmu7R4MmddSbyqgHrab/Nu+ak6g2RRn3QHXAQ7PQUq55BDtj85hd9
- W2iBiROhkZ/R+Q14cJkWhzaThN1sZ1zsfBNW0Im8OVn/J8bQUaS0a/NhpXJWv6J1ttkX3S0c
- QUratRfX4D1viAwNgoS0Joq7xIQD+CfJTax7pPn9rT////hSqJYUoMXkEz5IcO+hptCH1HF3
- qz77aA5njEBQrDRlslUBkCZ5P+QvZgJDy0C3xRGdg6ZVXEXJOQARAQABtCpIYW5uZXMgUmVp
- bmVja2UgKFN1U0UgTGFicykgPGhhcmVAc3VzZS5kZT6JAkEEEwECACsCGwMFCRLMAwAGCwkI
- BwMCBhUIAgkKCwQWAgMBAh4BAheABQJOisquAhkBAAoJEGz4yi9OyKjPOHoQAJLeLvr6JNHx
- GPcHXaJLHQiinz2QP0/wtsT8+hE26dLzxb7hgxLafj9XlAXOG3FhGd+ySlQ5wSbbjdxNjgsq
- FIjqQ88/Lk1NfnqG5aUTPmhEF+PzkPogEV7Pm5Q17ap22VK623MPaltEba+ly6/pGOODbKBH
- ak3gqa7Gro5YCQzNU0QVtMpWyeGF7xQK76DY/atvAtuVPBJHER+RPIF7iv5J3/GFIfdrM+wS
- BubFVDOibgM7UBnpa7aohZ9RgPkzJpzECsbmbttxYaiv8+EOwark4VjvOne8dRaj50qeyJH6
- HLpBXZDJH5ZcYJPMgunghSqghgfuUsd5fHmjFr3hDb5EoqAfgiRMSDom7wLZ9TGtT6viDldv
- hfWaIOD5UhpNYxfNgH6Y102gtMmN4o2P6g3UbZK1diH13s9DA5vI2mO2krGz2c5BOBmcctE5
- iS+JWiCizOqia5Op+B/tUNye/YIXSC4oMR++Fgt30OEafB8twxydMAE3HmY+foawCpGq06yM
- vAguLzvm7f6wAPesDAO9vxRNC5y7JeN4Kytl561ciTICmBR80Pdgs/Obj2DwM6dvHquQbQrU
- Op4XtD3eGUW4qgD99DrMXqCcSXX/uay9kOG+fQBfK39jkPKZEuEV2QdpE4Pry36SUGfohSNq
- xXW+bMc6P+irTT39VWFUJMcSuQINBE6KyREBEACvEJggkGC42huFAqJcOcLqnjK83t4TVwEn
- JRisbY/VdeZIHTGtcGLqsALDzk+bEAcZapguzfp7cySzvuR6Hyq7hKEjEHAZmI/3IDc9nbdh
- EgdCiFatah0XZ/p4vp7KAelYqbv8YF/ORLylAdLh9rzLR6yHFqVaR4WL4pl4kEWwFhNSHLxe
- 55G56/dxBuoj4RrFoX3ynerXfbp4dH2KArPc0NfoamqebuGNfEQmDbtnCGE5zKcR0zvmXsRp
- qU7+caufueZyLwjTU+y5p34U4PlOO2Q7/bdaPEdXfpgvSpWk1o3H36LvkPV/PGGDCLzaNn04
- BdiiiPEHwoIjCXOAcR+4+eqM4TSwVpTn6SNgbHLjAhCwCDyggK+3qEGJph+WNtNU7uFfscSP
- k4jqlxc8P+hn9IqaMWaeX9nBEaiKffR7OKjMdtFFnBRSXiW/kOKuuRdeDjL5gWJjY+IpdafP
- KhjvUFtfSwGdrDUh3SvB5knSixE3qbxbhbNxmqDVzyzMwunFANujyyVizS31DnWC6tKzANkC
- k15CyeFC6sFFu+WpRxvC6fzQTLI5CRGAB6FAxz8Hu5rpNNZHsbYs9Vfr/BJuSUfRI/12eOCL
- IvxRPpmMOlcI4WDW3EDkzqNAXn5Onx/b0rFGFpM4GmSPriEJdBb4M4pSD6fN6Y/Jrng/Bdwk
- SQARAQABiQIlBBgBAgAPBQJOiskRAhsMBQkSzAMAAAoJEGz4yi9OyKjPgEwQAIP/gy/Xqc1q
- OpzfFScswk3CEoZWSqHxn/fZasa4IzkwhTUmukuIvRew+BzwvrTxhHcz9qQ8hX7iDPTZBcUt
- ovWPxz+3XfbGqE+q0JunlIsP4N+K/I10nyoGdoFpMFMfDnAiMUiUatHRf9Wsif/nT6oRiPNJ
- T0EbbeSyIYe+ZOMFfZBVGPqBCbe8YMI+JiZeez8L9JtegxQ6O3EMQ//1eoPJ5mv5lWXLFQfx
- f4rAcKseM8DE6xs1+1AIsSIG6H+EE3tVm+GdCkBaVAZo2VMVapx9k8RMSlW7vlGEQsHtI0FT
- c1XNOCGjaP4ITYUiOpfkh+N0nUZVRTxWnJqVPGZ2Nt7xCk7eoJWTSMWmodFlsKSgfblXVfdM
- 9qoNScM3u0b9iYYuw/ijZ7VtYXFuQdh0XMM/V6zFrLnnhNmg0pnK6hO1LUgZlrxHwLZk5X8F
- uD/0MCbPmsYUMHPuJd5dSLUFTlejVXIbKTSAMd0tDSP5Ms8Ds84z5eHreiy1ijatqRFWFJRp
- ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
- PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <321f98fe-eb76-cdcb-5917-32d27f12d3d6@suse.de>
-Date:   Mon, 17 Jun 2019 10:42:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1725995AbfFQIpG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jun 2019 04:45:06 -0400
+Received: from verein.lst.de ([213.95.11.211]:34464 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725971AbfFQIpG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Jun 2019 04:45:06 -0400
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id 6715C68AFE; Mon, 17 Jun 2019 10:44:33 +0200 (CEST)
+Date:   Mon, 17 Jun 2019 10:44:33 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Kashyap Desai <kashyap.desai@broadcom.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Oliver Neukum <oneukum@suse.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>,
+        PDL-MPT-FUSIONLINUX <mpt-fusionlinux.pdl@broadcom.com>,
+        linux-hyperv@vger.kernel.org, linux-usb@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 10/13] megaraid_sas: set virt_boundary_mask in the scsi
+ host
+Message-ID: <20190617084433.GA7969@lst.de>
+References: <20190605190836.32354-1-hch@lst.de> <20190605190836.32354-11-hch@lst.de> <cd713506efb9579d1f69a719d831c28d@mail.gmail.com> <20190608081400.GA19573@lst.de> <98f6557ae91a7cdfe8069fcf7d788c88@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190611200210.4819-2-chaitanya.kulkarni@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <98f6557ae91a7cdfe8069fcf7d788c88@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/11/19 10:02 PM, Chaitanya Kulkarni wrote:
-> From: Christoph Hellwig <hch@lst.de>
-> 
-> Print the calling function instead of print_req_error as a prefix, and
-> print the operation and op_flags separately instead of the whole field.
-> 
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> ---
->  block/blk-core.c | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index ee1b35fe8572..d1a227cfb72e 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -167,18 +167,20 @@ int blk_status_to_errno(blk_status_t status)
->  }
->  EXPORT_SYMBOL_GPL(blk_status_to_errno);
->  
-> -static void print_req_error(struct request *req, blk_status_t status)
-> +static void print_req_error(struct request *req, blk_status_t status,
-> +		const char *caller)
->  {
->  	int idx = (__force int)status;
->  
->  	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
->  		return;
->  
-> -	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu flags %x\n",
-> -				__func__, blk_errors[idx].name,
-> -				req->rq_disk ?  req->rq_disk->disk_name : "?",
-> -				(unsigned long long)blk_rq_pos(req),
-> -				req->cmd_flags);
-> +	printk_ratelimited(KERN_ERR
-> +		"%s: %s error, dev %s, sector %llu op 0x%x flags 0x%x\n",
-> +		caller, blk_errors[idx].name,
-> +		req->rq_disk ?  req->rq_disk->disk_name : "?",
-> +		blk_rq_pos(req), req_op(req),
-> +		req->cmd_flags & ~REQ_OP_MASK);
->  }
->  
->  static void req_bio_endio(struct request *rq, struct bio *bio,
-> @@ -1360,7 +1362,7 @@ bool blk_update_request(struct request *req, blk_status_t error,
->  
->  	if (unlikely(error && !blk_rq_is_passthrough(req) &&
->  		     !(req->rq_flags & RQF_QUIET)))
-> -		print_req_error(req, error);
-> +		print_req_error(req, error, __func__);
->  
->  	blk_account_io_completion(req, nr_bytes);
->  
-> 
-I did ask this already, but didn't get an answer:
-Why do we have the __func__ argument?
-Can it print anything else than 'blk_update_request' ?
-If so, can't it be dropped?
+On Fri, Jun 14, 2019 at 01:28:47AM +0530, Kashyap Desai wrote:
+> Is there any changes in API  blk_queue_virt_boundary? I could not find
+> relevant code which account for this. Can you help ?
+> Which git repo shall I use for testing ? That way I can confirm, I didn't
+> miss relevant changes.
 
-Cheers,
+Latest mainline plus the series (which is about to get resent).
+blk_queue_virt_boundary now forced an unlimited max_hw_sectors as that
+is how PRP-like schemes work, to work around a block driver merging
+bug.  But we also need to communicate that limit to the DMA layer so
+that we don't set a smaller iommu segment size limitation.
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
+> >From your above explanation, it means (after this patch) max segment size
+> of the MR controller will be set to 4K.
+> Earlier it is possible to receive single SGE of 64K datalength (Since max
+> seg size was 64K), but now the same buffer will reach the driver having 16
+> SGEs (Each SGE will contain 4K length).
+
+No, there is no more limit for the size of the segment at all,
+as for PRPs each PRP is sort of a segment from the hardware perspective.
+We just require the segments to not have gaps, as PRPs don't allow for
+that.
+
+That being said I think these patches are wrong for the case of megaraid
+or mpt having both NVMe and SAS/ATA devices behind a single controller.
+Is that a valid configuration?
