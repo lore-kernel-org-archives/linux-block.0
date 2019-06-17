@@ -2,30 +2,32 @@ Return-Path: <SRS0=14Po=UQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C39ABC46477
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 08:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27205C31E44
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 08:43:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A4C3121874
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 08:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E36322080A
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jun 2019 08:42:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726355AbfFQIlU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jun 2019 04:41:20 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59816 "EHLO mx1.suse.de"
+        id S1726920AbfFQIm7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jun 2019 04:42:59 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60160 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725827AbfFQIlT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jun 2019 04:41:19 -0400
+        id S1725837AbfFQIm7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Jun 2019 04:42:59 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id EFCB8AC44;
-        Mon, 17 Jun 2019 08:41:17 +0000 (UTC)
-Subject: Re: [PATCH] block: use req_op() to maintain consistency
+        by mx1.suse.de (Postfix) with ESMTP id 5B400AFAF;
+        Mon, 17 Jun 2019 08:42:57 +0000 (UTC)
+Subject: Re: [PATCH 1/2] block: improve print_req_error
 To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         linux-block@vger.kernel.org
-References: <20190613141421.2698-1-chaitanya.kulkarni@wdc.com>
+Cc:     hch@lst.de, hare@suse.com
+References: <20190611200210.4819-1-chaitanya.kulkarni@wdc.com>
+ <20190611200210.4819-2-chaitanya.kulkarni@wdc.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -71,12 +73,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <e044a105-3efd-c44e-21da-51b2874feb67@suse.de>
-Date:   Mon, 17 Jun 2019 10:41:17 +0200
+Message-ID: <321f98fe-eb76-cdcb-5917-32d27f12d3d6@suse.de>
+Date:   Mon, 17 Jun 2019 10:42:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190613141421.2698-1-chaitanya.kulkarni@wdc.com>
+In-Reply-To: <20190611200210.4819-2-chaitanya.kulkarni@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -85,31 +87,62 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/13/19 4:14 PM, Chaitanya Kulkarni wrote:
-> This is a pure code cleanup patch and doesn't change any functionality.
-> In block layer to identify the request operation req_op() macro is
-> used, so change the open coding the req_op() in the blk-mq-debugfs.c.
+On 6/11/19 10:02 PM, Chaitanya Kulkarni wrote:
+> From: Christoph Hellwig <hch@lst.de>
+> 
+> Print the calling function instead of print_req_error as a prefix, and
+> print the operation and op_flags separately instead of the whole field.
 > 
 > Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 > ---
->  block/blk-mq-debugfs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  block/blk-core.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
 > 
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index 6aea0ebc3a73..c6c3c4f4128a 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -341,7 +341,7 @@ static const char *blk_mq_rq_state_name(enum mq_rq_state rq_state)
->  int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
->  {
->  	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
-> -	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
-> +	const unsigned int op = req_op(rq);
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index ee1b35fe8572..d1a227cfb72e 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -167,18 +167,20 @@ int blk_status_to_errno(blk_status_t status)
+>  }
+>  EXPORT_SYMBOL_GPL(blk_status_to_errno);
 >  
->  	seq_printf(m, "%p {.op=", rq);
->  	if (op < ARRAY_SIZE(op_name) && op_name[op])
+> -static void print_req_error(struct request *req, blk_status_t status)
+> +static void print_req_error(struct request *req, blk_status_t status,
+> +		const char *caller)
+>  {
+>  	int idx = (__force int)status;
+>  
+>  	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
+>  		return;
+>  
+> -	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu flags %x\n",
+> -				__func__, blk_errors[idx].name,
+> -				req->rq_disk ?  req->rq_disk->disk_name : "?",
+> -				(unsigned long long)blk_rq_pos(req),
+> -				req->cmd_flags);
+> +	printk_ratelimited(KERN_ERR
+> +		"%s: %s error, dev %s, sector %llu op 0x%x flags 0x%x\n",
+> +		caller, blk_errors[idx].name,
+> +		req->rq_disk ?  req->rq_disk->disk_name : "?",
+> +		blk_rq_pos(req), req_op(req),
+> +		req->cmd_flags & ~REQ_OP_MASK);
+>  }
+>  
+>  static void req_bio_endio(struct request *rq, struct bio *bio,
+> @@ -1360,7 +1362,7 @@ bool blk_update_request(struct request *req, blk_status_t error,
+>  
+>  	if (unlikely(error && !blk_rq_is_passthrough(req) &&
+>  		     !(req->rq_flags & RQF_QUIET)))
+> -		print_req_error(req, error);
+> +		print_req_error(req, error, __func__);
+>  
+>  	blk_account_io_completion(req, nr_bytes);
+>  
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+I did ask this already, but didn't get an answer:
+Why do we have the __func__ argument?
+Can it print anything else than 'blk_update_request' ?
+If so, can't it be dropped?
 
 Cheers,
 
