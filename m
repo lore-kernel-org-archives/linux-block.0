@@ -2,103 +2,78 @@ Return-Path: <SRS0=KrPA=UR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F87C31E5B
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 14:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41909C31E5B
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 15:20:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB8FD20B1F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 14:45:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560869122;
-	bh=2FSFEBWYNe5VehAFimM06XWjHfnUX7Si8He8wIaznFs=;
-	h=Date:From:To:Subject:References:In-Reply-To:List-ID:From;
-	b=U7zYCMNSGPbxI5rsndbcz8s9VWY+6ykkDus9qzXj4ZOvHjCWvWhFTaLA4QFyrtMir
-	 Gky+lxP8McCjIGXQYHpGbkloWMadV2HRfBeTRJ7RAYWX5WvKPI+uoxxqWUCBZ7wB18
-	 F1Kpi3pglVxMak0KN1fhXk4u2smzp6Kfi0GFP9R4=
+	by mail.kernel.org (Postfix) with ESMTP id 231B921479
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 15:20:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729079AbfFROpW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jun 2019 10:45:22 -0400
-Received: from mail-pf1-f173.google.com ([209.85.210.173]:37835 "EHLO
-        mail-pf1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728572AbfFROpV (ORCPT
+        id S1729776AbfFRPUs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jun 2019 11:20:48 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:41616 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729395AbfFRPUr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jun 2019 10:45:21 -0400
-Received: by mail-pf1-f173.google.com with SMTP id 19so7804069pfa.4;
-        Tue, 18 Jun 2019 07:45:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=NMnqg5fufjYWb0sSIzXnpqigWMgenHlEvuLuwxRG46k=;
-        b=iLxHc4UIhIvPcrQW4JIdi7HnIoh5OFdQzF8YuPTWZ8B43cT8o2Yxqe4KV1bj1XSZMg
-         MNOZzh+iuUavxLRbi71HCocW6OKcb5zTCfrglG8n8jxG5ZPD9v5UfoMYB11l3A1rHc0n
-         3GLvHrYfiGSTS/VKcs291iR42fPYzfBATJ83TP47ZwHsJhJBNxTMrRi2XLEPd9w3wKdi
-         QQSjf53v/hTwVTJNf1EOP5vhfCD1cRc99PaxStAc4al4J+76YCK2R9/VDQmYEST9JE9Y
-         1CDbo6TZ3g+zrQIVtIh8KNX3wsfP5+yJ9Zss/wdS+g5CtuAFj2WA0Al5d6U/VOXUzLK6
-         P4uQ==
+        Tue, 18 Jun 2019 11:20:47 -0400
+Received: by mail-pl1-f193.google.com with SMTP id m7so2261038pls.8
+        for <linux-block@vger.kernel.org>; Tue, 18 Jun 2019 08:20:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=NMnqg5fufjYWb0sSIzXnpqigWMgenHlEvuLuwxRG46k=;
-        b=Go/agy2pVTfU0qkjpedPtm/J1isUv8jasWT7ntG82lnP0WC4YiG/MV+Q2qbVRAf9ls
-         akuu51OEPBQiIG3iDY8iev7dT1Ojj3dTbqhOwX3fpR95DW5r8vj7LOJztcff8O2Yh0Yt
-         JlyzWm6RraTuXMQc9l2+p+upFOhzYRR4tehhgLfEwNiOivPQLnDxhYg3QDUkImWtmQqN
-         KlDI3+gifhkbm3fKbR3Mth/I+hJ1RQZhZcM0RYx0I1UZ6OwlI7sPKyMUmy7oB4th9qE8
-         G1RC8ZWpOhPWri0xYUahZMNSWPwBPGyx6H+yhB/XDSxNqDx9PT3ENywxndkgjw3tHHiL
-         QKmw==
-X-Gm-Message-State: APjAAAWv5gYKJ8jN96HAg6a4lY+9LZZCzXud76xXP6Y/2KABRtsBEZFL
-        pAlMhPR8Q09/quO4wE/oyqk=
-X-Google-Smtp-Source: APXvYqzIYeLMQNgDRIdCyouue7+qbHrf+jL2uYPgXh4v17+m5Tepc54GRMoO5ApB7u1tpkGQs04mvg==
-X-Received: by 2002:a17:90a:a008:: with SMTP id q8mr5640617pjp.114.1560869120930;
-        Tue, 18 Jun 2019 07:45:20 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::2:5159])
-        by smtp.gmail.com with ESMTPSA id c133sm16558044pfb.111.2019.06.18.07.45.20
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 18 Jun 2019 07:45:20 -0700 (PDT)
-Date:   Tue, 18 Jun 2019 07:45:17 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     dsterba@suse.cz, dsterba@suse.com, clm@fb.com,
-        josef@toxicpanda.com, axboe@kernel.dk, jack@suse.cz,
-        linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, kernel-team@fb.com
-Subject: Re: [PATCHSET v2 btrfs/for-next] blkcg, btrfs: fix cgroup writeback
- support
-Message-ID: <20190618144517.GI657710@devbig004.ftw2.facebook.com>
-References: <20190615182453.843275-1-tj@kernel.org>
- <20190618125442.GL19057@twin.jikos.cz>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MEzwA9ULYhLNwnhoo4N1GwYOwygy/YcbZAbjiEMw310=;
+        b=IOg0XxZkHqyr2tZxsDsA5tkN7HwxZSJMta7Os2nZILRL8AReqA3geTnCrjRv1JDy8Z
+         W5wMnJSRrNL9YPUOHJ9rIHmcS8VLgL2oh5rNjjuzLxj1BQPNjQ/Fd/W/vskss0ldDiws
+         lvdI4cm8GQU4RLrsSzxqoUJJf2Riedobp5bp8JvEIwMpa5jJPyZ2sy58zUeNwh4xFx8Z
+         d5KNv0U+SufAa7nI3K70Elf3kh0XCIsWzeHr1EVDgyrL3FoOGPcsmByyJ/JSdY7P+gm3
+         8cmQGcAPpKITboygDlAPRqSQ1IL+bpdDd7oIil9SrNC6f+W5/mSZjHNSi2nb+FRbVHNC
+         r9Ng==
+X-Gm-Message-State: APjAAAVZjTMXy5xlwAJTskdLYkRDMN75nGdBnpkVm9ohG09yMnPsd4Zo
+        zqQmxYDym16EgM4zKGo4IHI=
+X-Google-Smtp-Source: APXvYqyN62KJRO9j1nlclEwh67rtJRyL4msdbRcN4L1U2jRubzh/kH5mscxJvcKKrcE6gZm5CChD8A==
+X-Received: by 2002:a17:902:2a6b:: with SMTP id i98mr28310649plb.75.1560871246513;
+        Tue, 18 Jun 2019 08:20:46 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id u23sm13901486pfh.84.2019.06.18.08.20.45
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Tue, 18 Jun 2019 08:20:45 -0700 (PDT)
+Subject: Re: [PATCH V3 1/6] block: improve print_req_error
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org
+Cc:     jaegeuk@kernel.org, yuchao0@huawei.com
+References: <20190618054224.25985-1-chaitanya.kulkarni@wdc.com>
+ <20190618054224.25985-2-chaitanya.kulkarni@wdc.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <790e2fcc-d46a-cf8a-874a-da70f8897d2f@acm.org>
+Date:   Tue, 18 Jun 2019 08:20:44 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190618125442.GL19057@twin.jikos.cz>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190618054224.25985-2-chaitanya.kulkarni@wdc.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, David.
+On 6/17/19 10:42 PM, Chaitanya Kulkarni wrote:
+> From: Christoph Hellwig <hch@lst.de>
+> 
+> Print the calling function instead of print_req_error as a prefix, and
+> print the operation and op_flags separately instead of the whole field.
+> 
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-On Tue, Jun 18, 2019 at 02:54:42PM +0200, David Sterba wrote:
-> However, as it's rc5, I'm not at all comfortable to add this patchset to
-> 5.3 queue, the changes seem to be intrusive and redoing bio submission
-> path is something that will affect all workloads. I did quick tests on
-> fstests (without cgruops enabled) and this was fine, but that's the
-> minimum that must work. Wider range of workloads would be needed, I can
-> do that with mmtests, but all of that means that 5.3 is infeasible.
+Is Christoph the original author of this patch? In that case I think 
+Christoph's signed-off-by should occur first and yours second. See also 
+Documentation/process/submitting-patches.rst.
 
-Sure thing.  These aren't urgent in any way.
-
-> So this opens more possibilites regarding the patchset routing. Both
-> parts can go separately through their usual trees.
-
-Yeah, that sounds great too.  Let's wait for Jens's review and decide
-how to route the patches.
-
-Thanks.
-
--- 
-tejun
+Bart.
