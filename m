@@ -2,121 +2,158 @@ Return-Path: <SRS0=KrPA=UR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 954AFC31E5B
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 16:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C86C31E5B
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 16:07:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B3CD20873
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 16:05:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19F8120B1F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 16:07:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="IAn77VBD";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="t0GZETEl"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="NKwmQPYC";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="kqyT6JTr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729308AbfFRQFr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jun 2019 12:05:47 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:44629 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729209AbfFRQFr (ORCPT
+        id S1729507AbfFRQHQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jun 2019 12:07:16 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:2932 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729414AbfFRQHQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jun 2019 12:05:47 -0400
+        Tue, 18 Jun 2019 12:07:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1560873947; x=1592409947;
+  t=1560874074; x=1592410074;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=dop4mvuNv+mjAQqAhlKkMziSyvIlNLtM9vZ+jhyMVp8=;
-  b=IAn77VBDL0CUJmhPrWryjMOANx/0I/MmQ6grMkyw4zDe4T47HvHLzp7J
-   JOQDbTI8LHxTcccWjEEMvozS8ZkG1r0J9jZt7505gVNiTnqnYT2WV5Rwi
-   kjTDzQQtXr9CaLjZADEf3hmlfds/RxurmbtNWaLlZmL5CMZED6HHcFMnw
-   nbhXIkeV+YDRpvoi/lbqnvvS9pgRh/0/o/6Zfr9N/2GaQl1ptEeJXEqOc
-   sPdansPBVQgjXMlF3is3GnTsDZ7RJHe6SjcU9JBBe2U50dIl8tRoHYBnJ
-   ckLpqZ68emjCpX7rRVr25xUUl8hxypiNVUI3NskjzT11ykrqn32YMFPDY
-   Q==;
+  bh=GB0V5B9eeyNW3CPggAobZmdd8A4Ktvy3E+Nm6UsFOhw=;
+  b=NKwmQPYCYBOzY4gMjyLExEPK5g/TWtEzNU5nMKOYJMkdagFUoKsUDt81
+   /MDTfcaWVYKnFNEupMQtT1EPEDwnKdbtVkz4/o9YXC1zEBfAm+RagyptQ
+   b7xksv3hPjd8q2MNsWsgznm8VDb94/f4WZLpVwX8RmMXASR90ErPo6YyD
+   MAxrl3r45tOnaWJbn9dHMLO0J0Qj9mOl02QY9MEaFcEcKlVISNw8qJYoU
+   0d0E0GPBxxQjs/SlqYU+QloTsypiTKDIlh4Sfbp1lj5BG9A19dyLq61mu
+   khdrtDusQEk6LvdhNDfEGIw+HvyN4mbIE849FzgU6Bq8HFds5TZRSDIpp
+   w==;
 X-IronPort-AV: E=Sophos;i="5.63,389,1557158400"; 
-   d="scan'208";a="112116182"
-Received: from mail-dm3nam05lp2059.outbound.protection.outlook.com (HELO NAM05-DM3-obe.outbound.protection.outlook.com) ([104.47.49.59])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Jun 2019 00:05:46 +0800
+   d="scan'208";a="210607995"
+Received: from mail-sn1nam02lp2056.outbound.protection.outlook.com (HELO NAM02-SN1-obe.outbound.protection.outlook.com) ([104.47.36.56])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Jun 2019 00:07:53 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jQw1fgD4MxLhzheZt1haE0yNSC+CQT0IqxQj/3vZ/Zs=;
- b=t0GZETElDJc/4nQZYE1tRunU/CC644MYF23TlwhAT/aJyNxVFW0bFJGLob+jcbwWotWag44lPdMcSp7clXPEPqfVDwaKAvkcuvtSDosN0SCLWr9nTkANLHuEHq5nfCpu4/K/uxF/ViqJQ9ezOnIbinKrKSzRUzvH2qaKFZzclKI=
+ bh=6yPUlYC/BBeCsdpfuvrDNaaalwlLaypFWaDnIHaBYqE=;
+ b=kqyT6JTrZI8Km1MTBJwL7FeO8cS1vetvxoW/x8oWDsBQsBo0cgw2rLico5uFNQMGgq9tVfvTxToqBET0eT/2HsY0fGvV+NFDCwweDvLTC3wwI07K63MD2jSDmrvuBxL61WvicT2Vdtg65NlFFcX/UZ/2OQd5BWu9931C5jp3CM4=
 Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
- BYAPR04MB4693.namprd04.prod.outlook.com (52.135.240.20) with Microsoft SMTP
+ BYAPR04MB5957.namprd04.prod.outlook.com (20.178.232.204) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.11; Tue, 18 Jun 2019 16:05:45 +0000
+ 15.20.1987.11; Tue, 18 Jun 2019 16:07:14 +0000
 Received: from BYAPR04MB5749.namprd04.prod.outlook.com
  ([fe80::fc2b:fcd4:7782:53d6]) by BYAPR04MB5749.namprd04.prod.outlook.com
  ([fe80::fc2b:fcd4:7782:53d6%7]) with mapi id 15.20.1987.012; Tue, 18 Jun 2019
- 16:05:45 +0000
+ 16:07:14 +0000
 From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
+To:     Chao Yu <yuchao0@huawei.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 CC:     "jaegeuk@kernel.org" <jaegeuk@kernel.org>,
-        "yuchao0@huawei.com" <yuchao0@huawei.com>
-Subject: Re: [PATCH V3 3/6] block: use blk_op_str() in blk-mq-debugfs.c
-Thread-Topic: [PATCH V3 3/6] block: use blk_op_str() in blk-mq-debugfs.c
-Thread-Index: AQHVJZiouvHVDcUQSUia9KwHSclqsA==
-Date:   Tue, 18 Jun 2019 16:05:45 +0000
-Message-ID: <BYAPR04MB57491A3C97DEDCED71E6781B86EA0@BYAPR04MB5749.namprd04.prod.outlook.com>
+        "bvanassche@acm.org" <bvanassche@acm.org>
+Subject: Re: [PATCH V3 6/6] f2fs: get rid of duplicate code for in tracing
+Thread-Topic: [PATCH V3 6/6] f2fs: get rid of duplicate code for in tracing
+Thread-Index: AQHVJZiv5E9Yxo9mskyiSqdZhq7lww==
+Date:   Tue, 18 Jun 2019 16:07:14 +0000
+Message-ID: <BYAPR04MB5749838A900EFE89165D699686EA0@BYAPR04MB5749.namprd04.prod.outlook.com>
 References: <20190618054224.25985-1-chaitanya.kulkarni@wdc.com>
- <20190618054224.25985-4-chaitanya.kulkarni@wdc.com>
- <9a254a22-8669-1ac4-87ba-71e9a64ad5c0@acm.org>
+ <20190618054224.25985-7-chaitanya.kulkarni@wdc.com>
+ <088167e2-8744-5176-f282-7015d02482fa@huawei.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 authentication-results: spf=none (sender IP is )
  smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.44.170]
+x-originating-ip: [199.255.44.250]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0d213895-e808-4d50-d65d-08d6f406d26c
+x-ms-office365-filtering-correlation-id: 9dee3fa2-a299-4d81-3986-08d6f4070791
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4693;
-x-ms-traffictypediagnostic: BYAPR04MB4693:
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:BYAPR04MB5957;
+x-ms-traffictypediagnostic: BYAPR04MB5957:
 wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <BYAPR04MB4693E35578D92127F737E26986EA0@BYAPR04MB4693.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:192;
+x-microsoft-antispam-prvs: <BYAPR04MB5957EF9FC72D04CB1BAEE84A86EA0@BYAPR04MB5957.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4714;
 x-forefront-prvs: 007271867D
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(136003)(39860400002)(376002)(346002)(366004)(189003)(199004)(54906003)(478600001)(76176011)(6506007)(71190400001)(8676002)(8936002)(186003)(4326008)(86362001)(486006)(110136005)(81156014)(71200400001)(305945005)(4744005)(476003)(68736007)(25786009)(5660300002)(446003)(52536014)(99286004)(7696005)(6246003)(33656002)(73956011)(72206003)(66946007)(14454004)(53546011)(74316002)(6436002)(2906002)(81166006)(102836004)(53936002)(66066001)(6116002)(2501003)(3846002)(26005)(256004)(7736002)(66476007)(316002)(66446008)(9686003)(55016002)(66556008)(76116006)(229853002)(64756008);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4693;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(396003)(39860400002)(346002)(366004)(376002)(51914003)(199004)(189003)(53546011)(256004)(5660300002)(8936002)(76176011)(52536014)(6436002)(4326008)(55016002)(486006)(186003)(7696005)(68736007)(6116002)(25786009)(73956011)(14454004)(6506007)(478600001)(3846002)(9686003)(74316002)(110136005)(66946007)(66066001)(66476007)(33656002)(71200400001)(76116006)(102836004)(229853002)(2906002)(99286004)(316002)(53936002)(305945005)(72206003)(64756008)(476003)(81166006)(81156014)(446003)(8676002)(71190400001)(66556008)(26005)(86362001)(54906003)(66446008)(6246003)(2501003)(7736002)(26583001);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5957;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: qD+B4O7CJW7WGh4SUQCnITw0SUZ4fBrEexpKnmRrNpYmTyPAD7gacYoi4zAYJFhqrgRloJQZCq2N3OSbOwWr065+qPS39jMmV2GRGQGv8MXssCVu2I9dx3rcWrbjF4mAGPcT4oJ8kLhAd6X5kBVVdTuKFlvkMkjhAsCyzBdCejgSy62ObjBYTIrvq+nXaN8qeZH/E8oX/zrlxJWVQ/5BHvjK0a+RwSZ983YpJ8t0NxcgLpfBnpOumk4Q7nNtbGPz5sJCHojgRTigsoqOxUNRu4meluSniZ4o2LJXwKrOWs5wCHNHr4p7Tz9pBQRjORlwWTIfmHrtSgT7vBAC/FAqU5HoPmnRXHIlxU10tWNABTBLH9BMA6OydyS1HouQI9L0A4wy5Yun+SpoIhrdrW8A1xu7lEoAh2hrcpdvzDwUflU=
+x-microsoft-antispam-message-info: mTXalxaMBhW/Ui9YyGJ7KjujeL8Y5/YvJuMV5hokAkKxpwVEUr5G+QQeAi394lL1uIEBEMTQ32L9YSbUf8ydXlPWc5Bq5YwFAoeDUr4R2Z4Win1dFZ/w9JjVDwEaeQUT452wk1GGlSpnpmO8KlV2QeiLP7k9FxRAHrY5KKd99AmqTesMPAqL7NhaGd4mnta0XRa57RAUftZYJLpAr5aDWCqU2vXYw055Gn81gW68my/tyrpGGws9+2Xp3tvnEby7CLwAfpMJqqFo5x7jwlyK0pWBLR3WXNeNCpIdh+QXRlQ0oFg78xw9tHUO/3MyvzQ/hhqcmbLYl6friraLMN3KAaCTRQDlhcXmHjemwwU/qEnJ9YFB5v2B6LQfFw2PYSk8AMfxJWj+OUyFGHebB5uF0F/l0dofnYPmhMfqAvt+3bs=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d213895-e808-4d50-d65d-08d6f406d26c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2019 16:05:45.5773
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9dee3fa2-a299-4d81-3986-08d6f4070791
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2019 16:07:14.7550
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
 X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4693
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5957
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/18/19 8:28 AM, Bart Van Assche wrote:=0A=
-> On 6/17/19 10:42 PM, Chaitanya Kulkarni wrote:=0A=
->> +	if (strcmp(op_str, "UNKNOWN") =3D=3D 0)=0A=
->>    		seq_printf(m, "%d", op);=0A=
->> +	else=0A=
->> +		seq_printf(m, "%s", op_str);=0A=
-> =0A=
-> My opinion about using strcmp() to check whether or not=0A=
-> req_opf-to-string conversion succeeded is that this is ugly ...=0A=
-> =0A=
-I didn't like that either, but I also don't want callers to repeat the =0A=
-string "UNKNOWN" or any other error string and return NULL from the=0A=
-blk_top_str().=0A=
+Thanks for the comments Chao.=0A=
 =0A=
-Do you have any suggestion or preference ?=0A=
+On 6/18/19 12:19 AM, Chao Yu wrote:=0A=
+> Hi Chaitanya,=0A=
+> =0A=
+> On 2019/6/18 13:42, Chaitanya Kulkarni wrote:=0A=
+>> Now that we have used the blk_op_str(), get rid of show_bio_type() and=
 =0A=
-> Bart.=0A=
+>> show_bio_op() to eliminate the duplicate code.=0A=
+> =0A=
+> I think we can merge 5/6 and 6/6 into one patch.=0A=
+> =0A=
+>>=0A=
+Will do it in a next version.=0A=
+>> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+>> ---=0A=
+>>   include/trace/events/f2fs.h | 14 --------------=0A=
+>>   1 file changed, 14 deletions(-)=0A=
+>>=0A=
+>> diff --git a/include/trace/events/f2fs.h b/include/trace/events/f2fs.h=
+=0A=
+>> index ec4dba5a4c30..a8e4fe053e7c 100644=0A=
+>> --- a/include/trace/events/f2fs.h=0A=
+>> +++ b/include/trace/events/f2fs.h=0A=
+>> @@ -73,20 +73,6 @@ TRACE_DEFINE_ENUM(CP_TRIMMED);=0A=
+>>   			REQ_PREFLUSH | REQ_FUA)=0A=
+>>   #define F2FS_BIO_FLAG_MASK(t)	(t & F2FS_OP_FLAGS)=0A=
+>>   =0A=
+>> -#define show_bio_type(op,op_flags)	show_bio_op(op),		\=0A=
+> =0A=
+> Could you just replace show_bio_op() with blk_op_str()? it's minor though=
+.=0A=
+> =0A=
+Okay, that also can be done. Will replace it in a next version.=0A=
+=0A=
+> Thanks,=0A=
+> =0A=
+>> -						show_bio_op_flags(op_flags)=0A=
+>> -=0A=
+>> -#define show_bio_op(op)							\=0A=
+>> -	__print_symbolic(op,						\=0A=
+>> -		{ REQ_OP_READ,			"READ" },		\=0A=
+>> -		{ REQ_OP_WRITE,			"WRITE" },		\=0A=
+>> -		{ REQ_OP_FLUSH,			"FLUSH" },		\=0A=
+>> -		{ REQ_OP_DISCARD,		"DISCARD" },		\=0A=
+>> -		{ REQ_OP_SECURE_ERASE,		"SECURE_ERASE" },	\=0A=
+>> -		{ REQ_OP_ZONE_RESET,		"ZONE_RESET" },		\=0A=
+>> -		{ REQ_OP_WRITE_SAME,		"WRITE_SAME" },		\=0A=
+>> -		{ REQ_OP_WRITE_ZEROES,		"WRITE_ZEROES" })=0A=
+>> -=0A=
+>>   #define show_bio_op_flags(flags)					\=0A=
+>>   	__print_flags(F2FS_BIO_FLAG_MASK(flags), "|",			\=0A=
+>>   		{ REQ_RAHEAD,		"R" },				\=0A=
+>>=0A=
 > =0A=
 =0A=
