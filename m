@@ -2,59 +2,60 @@ Return-Path: <SRS0=KrPA=UR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCACC31E5B
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 15:28:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 339AAC31E5B
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 15:28:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7572D2085A
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 15:28:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2FF720B1F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 15:28:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560871718;
+	bh=cBZbIGQ+cjyD2YCVRDOXcoe7z6QzrPpzbzN0znS/Ylg=;
+	h=Subject:To:Cc:References:From:Date:In-Reply-To:List-ID:From;
+	b=G3kjhXxt1GGyJ06HwHVvYYAWiJ9iSznqfC7TveZdygRvAyFEDC1eAKSYKw9WMJtzA
+	 QMurvKksHb0JL/rLFFcPhSC78rz82sKary1+WsSI9lKKb0gzDSfK5ul4aypMuDmgQv
+	 nGraaiOsN3rBKlZWvMqznBz6hwMBm/4p5RJwBQHw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728982AbfFRP2d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jun 2019 11:28:33 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:40863 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729247AbfFRP2c (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jun 2019 11:28:32 -0400
-Received: by mail-pg1-f193.google.com with SMTP id w10so3236389pgj.7
-        for <linux-block@vger.kernel.org>; Tue, 18 Jun 2019 08:28:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EVbXG/QSn5LE6BCqRkJMT0aMHbmHeDO2PuDhSJtzl9A=;
-        b=JxQUcxhMj/a5ceFySNJIOMfZCK9XzNUBOlS1Zazu4SABZM/BmtUSQfVsfV6y29fF5p
-         1HPIFb1vD+dFB06gjqvozSyGmMlsuHCIQ4zxotGy1lBJfKcIY6zi7jAERo8kYkWVZJ03
-         MRvhJYHSAXiQD54FsRlhFBDZVbZxylH4bQwKM8UGZmY2iIP4rxTaEQ5bDCB0fTbxKy0F
-         Owo7YnY7CJBQPsh04UlmAHmcsUkSwpFrWIx/7HIEIMRdOiqfUN4y47g7zpoENdH0g/oB
-         qtyiBgd+OyM7VyiDInv7Ixf89V1LsAEa3fxZIVIZlnU4Z6w4qkH8KoWs5SaNOKpTI82i
-         s02w==
-X-Gm-Message-State: APjAAAXf7k2yFFUQAKgP+IKUHv0jEGN5Xyd2dCbqQlTckjIJubv2yhTj
-        e8bKhk5s+oxlDTnpTX+Tcg0=
-X-Google-Smtp-Source: APXvYqwK9pYKWdIV/cy+Fi/ERGiQAKvS5AwO3okJgbXUB/48McS8KcTHbX/Rnr8lCmHXN4cuF1LUzw==
-X-Received: by 2002:a63:161b:: with SMTP id w27mr3184923pgl.338.1560871712112;
-        Tue, 18 Jun 2019 08:28:32 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id 133sm19128477pfa.92.2019.06.18.08.28.30
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 18 Jun 2019 08:28:31 -0700 (PDT)
-Subject: Re: [PATCH V3 3/6] block: use blk_op_str() in blk-mq-debugfs.c
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     jaegeuk@kernel.org, yuchao0@huawei.com
-References: <20190618054224.25985-1-chaitanya.kulkarni@wdc.com>
- <20190618054224.25985-4-chaitanya.kulkarni@wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <9a254a22-8669-1ac4-87ba-71e9a64ad5c0@acm.org>
-Date:   Tue, 18 Jun 2019 08:28:30 -0700
+        id S1729327AbfFRP2h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jun 2019 11:28:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55228 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729247AbfFRP2h (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Jun 2019 11:28:37 -0400
+Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 031B92085A;
+        Tue, 18 Jun 2019 15:28:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560871716;
+        bh=cBZbIGQ+cjyD2YCVRDOXcoe7z6QzrPpzbzN0znS/Ylg=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=1637osodxbXA+dd8NcCz7z4PZoJd2L4ooz5xgXaHLyVoXzk6mzzxCFsnF70fvSYaj
+         rxwiYsehj0Nwqj96sUhbw7/ewZ6peonITYgoV53cZ0Lc/Fz3dnxXt5nuaECF1D648A
+         wRwkpNFXQQ0FTiqYqUEkbxk32ximtj+bSI7AepPk=
+Subject: Re: How to resolve an issue in swiotlb environment?
+To:     Alan Stern <stern@rowland.harvard.edu>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Oliver Neukum <oneukum@suse.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        shuah <shuah@kernel.org>
+References: <Pine.LNX.4.44L0.1906141043530.24571-100000@netrider.rowland.org>
+From:   shuah <shuah@kernel.org>
+Message-ID: <20684ef6-7da7-90ed-4cd6-3bc46202de6d@kernel.org>
+Date:   Tue, 18 Jun 2019 09:28:35 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190618054224.25985-4-chaitanya.kulkarni@wdc.com>
+In-Reply-To: <Pine.LNX.4.44L0.1906141043530.24571-100000@netrider.rowland.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -63,13 +64,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/17/19 10:42 PM, Chaitanya Kulkarni wrote:
-> +	if (strcmp(op_str, "UNKNOWN") == 0)
->   		seq_printf(m, "%d", op);
-> +	else
-> +		seq_printf(m, "%s", op_str);
+On 6/14/19 8:44 AM, Alan Stern wrote:
+> On Thu, 13 Jun 2019, shuah wrote:
+> 
+>>> Great!  So all we have to do is fix vhci-hcd.  Then we can remove all
+>>> the virt_boundary_mask stuff from usb-storage and uas entirely.
+>>>
+>>> (I'm assuming wireless USB isn't a genuine issue.  As far as I know, it
+>>> is pretty much abandoned at this point.)
+>>>
+>>> Valentina and Shua: Adding SG support to vhci-hcd shouldn't be too
+>>> hard.  It ought to be possible even without changing the network
+>>> protocol.
+>>>
+>>
+>> I will start taking a look at this. Is there a target release in plan
+>> to drop virt_boundary_mask stuff?
+> 
+> Not yet.  But since it doesn't do what we want anyway, this should be
+> fixed quickly.
+> 
 
-My opinion about using strcmp() to check whether or not 
-req_opf-to-string conversion succeeded is that this is ugly ...
+Sounds good. I am working on it.
 
-Bart.
+thanks,
+-- Shuah
