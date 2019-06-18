@@ -2,2302 +2,1696 @@ Return-Path: <SRS0=KrPA=UR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B40C31E64
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 21:07:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C554C31E63
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 21:07:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75F4C2084A
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 21:07:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4EF62084A
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 21:07:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560892031;
-	bh=u2JpIRW/55R+MxFRXl+sr56fi9lHiFXiuv0EKpb/0Js=;
+	s=default; t=1560892043;
+	bh=spsSoxlgYCi8m+sn4jEhGU+9aLjbiG0lFwhsI2MJVJQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ZHtAlhvg9RwYg205hO3KhOPUjbJuyMTI9krSPP+HUCBaFo33rV2p+7CXC0Mk7Jgg+
-	 8sgZkPHXC56Ah1xkdxplKD8231GHWvbC/yAdgJetUh2xJcbHbdgxZnHhE+x5+GDELq
-	 2ZjlP4SnY+gZsQkZI+b/M3nt5fyRAvbgVG5cjrUQ=
+	b=0vTOsT459OhiXDLmVYlfDssSRO9Uo3iSgS/u5EomLI7GyqrtiuFR4sraYgQZX6zFG
+	 rnHox4Jfb6/puw06E+ajWUjGd9OMz8KM+3Sztfa6uKitE4A1aXgwZ7ssQ4qzjRS5lK
+	 Yi/l72djFuBx3zfyNhsvNAHt0bwot0X5ToCQAUyg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730811AbfFRVFy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jun 2019 17:05:54 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:34484 "EHLO
+        id S1730820AbfFRVHL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jun 2019 17:07:11 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:34566 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730781AbfFRVFx (ORCPT
+        with ESMTP id S1730796AbfFRVFx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 18 Jun 2019 17:05:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
-        To:From:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=qOr789l/TswLnF4O/npW1sS+KMtfhcPpGSKYaQtwk5w=; b=J5i7SHm6vVcHoArXsm8NRBLJcc
-        ab4LxX+UxUuTFrWtGNzwyqwlnkqdPs8TDqJy9y+hOcgw4KCODqAW6RMcfKjB1pf7Z+3/7/hH5VMvu
-        rXitO6ADl6uCSDckF2g1kKOqpYNuyUzKHAaHOSQUJIzKP14oFqqdqvIuiCKlUGkaK8awiaMsctRAa
-        lRnXzW4lMzMuXmUU0Zuw0FfPCfZmF121fHKnkpb1MuvwORm7k5RwJaIAHZwaY24woyySu8i1elxr0
-        Dgk/txVp5J3/7gBv4DuRohfRolkpw2zxKbHWFMNtclZcjG+SW4pnUKaeO+GzgePs4b7kvfEtuSQiG
-        gQMWPcWw==;
+        bh=ZdODkiJ7RuZEdAKnVQiIwg+vv3Xt5kgb7EbdbJdMTvU=; b=Kt1V8FWy38fATj+QarU+2TY045
+        PwNlS6kvEzfyhFV+oVn8r9Cz5pOq95VYKrYTo7CotTgxnv/PD7jwTZBQKFDwWZqXsGFYw0yDqesO8
+        CUAfvF/hUX/dFJsD5JHHdEqqOVfpSRtv43xflBrnPmiNyN+1kyM0c1QsMdYM2RHsgOFaWylH56rSF
+        YUHx1723IiVHQbmHmTd6SDhs72bbo3gD/HBU6l/vQgjgKYicEyND9GJ6MdzEDgeApnH21I3V8HPTS
+        l/4GxGId4WF3+uzYxpPvVBuSZMiQTlKpZ1LFALa0PQl5xzF/rZeSzvtoxkFkxRlTIi72s+7AATppD
+        +SdjS7LQ==;
 Received: from 177.133.86.196.dynamic.adsl.gvt.net.br ([177.133.86.196] helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hdLIc-0006yf-2W; Tue, 18 Jun 2019 21:05:51 +0000
+        id 1hdLIb-0006yZ-SL; Tue, 18 Jun 2019 21:05:51 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1hdLIZ-0002CK-SU; Tue, 18 Jun 2019 18:05:47 -0300
+        id 1hdLIZ-0002C5-Ph; Tue, 18 Jun 2019 18:05:47 -0300
 From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
 To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
         Mauro Carvalho Chehab <mchehab@infradead.org>,
         linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH v1 09/22] docs: block: convert to ReST
-Date:   Tue, 18 Jun 2019 18:05:33 -0300
-Message-Id: <5c4b92b06ce69f686569e6490034958592d649c9.1560891322.git.mchehab+samsung@kernel.org>
+        Jens Axboe <axboe@kernel.dk>, Jiri Kosina <jikos@kernel.org>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH v1 06/22] docs: blockdev: convert to ReST
+Date:   Tue, 18 Jun 2019 18:05:30 -0300
+Message-Id: <abc9d303f20466a0b32d04157266c27846a3094e.1560891322.git.mchehab+samsung@kernel.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <cover.1560891322.git.mchehab+samsung@kernel.org>
 References: <cover.1560891322.git.mchehab+samsung@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Rename the block documentation files to ReST, add an
+Rename the blockdev documentation files to ReST, add an
 index for them and adjust in order to produce a nice html
 output via the Sphinx build system.
+
+The drbd sub-directory contains some graphs and data flows.
+Add those too to the documentation.
 
 At its new index.rst, let's add a :orphan: while this is not linked to
 the main index.rst file, in order to avoid build warnings.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
 ---
- .../admin-guide/kernel-parameters.txt         |   8 +-
- .../{bfq-iosched.txt => bfq-iosched.rst}      |  66 ++--
- .../block/{biodoc.txt => biodoc.rst}          | 364 +++++++++++-------
- .../block/{biovecs.txt => biovecs.rst}        |  20 +-
- .../block/{capability.txt => capability.rst}  |  17 +-
- ...ne-partition.txt => cmdline-partition.rst} |  13 +-
- ...{data-integrity.txt => data-integrity.rst} |  60 +--
- ...dline-iosched.txt => deadline-iosched.rst} |  21 +-
- Documentation/block/index.rst                 |  25 ++
- .../block/{ioprio.txt => ioprio.rst}          |  95 +++--
- .../{kyber-iosched.txt => kyber-iosched.rst}  |   3 +-
- .../block/{null_blk.txt => null_blk.rst}      |  65 +++-
- Documentation/block/{pr.txt => pr.rst}        |  18 +-
- .../{queue-sysfs.txt => queue-sysfs.rst}      |   7 +-
- .../block/{request.txt => request.rst}        |  47 ++-
- Documentation/block/{stat.txt => stat.rst}    |  13 +-
- ...witching-sched.txt => switching-sched.rst} |  28 +-
- ...ontrol.txt => writeback_cache_control.rst} |  12 +-
- Documentation/blockdev/zram.rst               |   2 +-
- MAINTAINERS                                   |   2 +-
- block/Kconfig                                 |   2 +-
- block/Kconfig.iosched                         |   2 +-
- block/bfq-iosched.c                           |   2 +-
- block/blk-integrity.c                         |   2 +-
- block/ioprio.c                                |   2 +-
- block/mq-deadline.c                           |   2 +-
- block/partitions/cmdline.c                    |   2 +-
- 27 files changed, 550 insertions(+), 350 deletions(-)
- rename Documentation/block/{bfq-iosched.txt => bfq-iosched.rst} (95%)
- rename Documentation/block/{biodoc.txt => biodoc.rst} (83%)
- rename Documentation/block/{biovecs.txt => biovecs.rst} (92%)
- rename Documentation/block/{capability.txt => capability.rst} (40%)
- rename Documentation/block/{cmdline-partition.txt => cmdline-partition.rst} (92%)
- rename Documentation/block/{data-integrity.txt => data-integrity.rst} (91%)
- rename Documentation/block/{deadline-iosched.txt => deadline-iosched.rst} (89%)
- create mode 100644 Documentation/block/index.rst
- rename Documentation/block/{ioprio.txt => ioprio.rst} (75%)
- rename Documentation/block/{kyber-iosched.txt => kyber-iosched.rst} (86%)
- rename Documentation/block/{null_blk.txt => null_blk.rst} (60%)
- rename Documentation/block/{pr.txt => pr.rst} (93%)
- rename Documentation/block/{queue-sysfs.txt => queue-sysfs.rst} (99%)
- rename Documentation/block/{request.txt => request.rst} (59%)
- rename Documentation/block/{stat.txt => stat.rst} (89%)
- rename Documentation/block/{switching-sched.txt => switching-sched.rst} (67%)
- rename Documentation/block/{writeback_cache_control.txt => writeback_cache_control.rst} (94%)
+ .../admin-guide/kernel-parameters.txt         |  18 +-
+ ...structure-v9.txt => data-structure-v9.rst} |   6 +-
+ Documentation/blockdev/drbd/figures.rst       |  28 +++
+ .../blockdev/drbd/{README.txt => index.rst}   |  15 +-
+ .../blockdev/{floppy.txt => floppy.rst}       |  88 ++++----
+ Documentation/blockdev/index.rst              |  16 ++
+ Documentation/blockdev/{nbd.txt => nbd.rst}   |   2 +-
+ .../blockdev/{paride.txt => paride.rst}       | 194 +++++++++--------
+ .../blockdev/{ramdisk.txt => ramdisk.rst}     |  55 ++---
+ Documentation/blockdev/{zram.txt => zram.rst} | 195 ++++++++++++------
+ MAINTAINERS                                   |   8 +-
+ drivers/block/Kconfig                         |   8 +-
+ drivers/block/floppy.c                        |   2 +-
+ drivers/block/zram/Kconfig                    |   6 +-
+ tools/testing/selftests/zram/README           |   2 +-
+ 15 files changed, 398 insertions(+), 245 deletions(-)
+ rename Documentation/blockdev/drbd/{data-structure-v9.txt => data-structure-v9.rst} (94%)
+ create mode 100644 Documentation/blockdev/drbd/figures.rst
+ rename Documentation/blockdev/drbd/{README.txt => index.rst} (55%)
+ rename Documentation/blockdev/{floppy.txt => floppy.rst} (81%)
+ create mode 100644 Documentation/blockdev/index.rst
+ rename Documentation/blockdev/{nbd.txt => nbd.rst} (96%)
+ rename Documentation/blockdev/{paride.txt => paride.rst} (81%)
+ rename Documentation/blockdev/{ramdisk.txt => ramdisk.rst} (84%)
+ rename Documentation/blockdev/{zram.txt => zram.rst} (76%)
 
 diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index a15295e180fe..d11b8a745897 100644
+index 873062810484..20780fbc948d 100644
 --- a/Documentation/admin-guide/kernel-parameters.txt
 +++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -430,7 +430,7 @@
+@@ -1249,7 +1249,7 @@
+ 			See also Documentation/fault-injection/.
  
- 	blkdevparts=	Manual partition parsing of block device(s) for
- 			embedded devices based on command line input.
--			See Documentation/block/cmdline-partition.txt
-+			See Documentation/block/cmdline-partition.rst
+ 	floppy=		[HW]
+-			See Documentation/blockdev/floppy.txt.
++			See Documentation/blockdev/floppy.rst.
  
- 	boot_delay=	Milliseconds to delay each printk during boot.
- 			Values larger than 10 seconds (10000) are changed to
-@@ -1199,9 +1199,9 @@
+ 	force_pal_cache_flush
+ 			[IA-64] Avoid check_sal_cache_flush which may hang on
+@@ -2238,7 +2238,7 @@
+ 	memblock=debug	[KNL] Enable memblock debug messages.
  
- 	elevator=	[IOSCHED]
- 			Format: { "mq-deadline" | "kyber" | "bfq" }
--			See Documentation/block/deadline-iosched.txt,
--			Documentation/block/kyber-iosched.txt and
--			Documentation/block/bfq-iosched.txt for details.
-+			See Documentation/block/deadline-iosched.rst,
-+			Documentation/block/kyber-iosched.rst and
-+			Documentation/block/bfq-iosched.rst for details.
+ 	load_ramdisk=	[RAM] List of ramdisks to load from floppy
+-			See Documentation/blockdev/ramdisk.txt.
++			See Documentation/blockdev/ramdisk.rst.
  
- 	elfcorehdr=[size[KMG]@]offset[KMG] [IA64,PPC,SH,X86,S390]
- 			Specifies physical address of start of kernel core
-diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.rst
-similarity index 95%
-rename from Documentation/block/bfq-iosched.txt
-rename to Documentation/block/bfq-iosched.rst
-index b2265cf6c9c3..3fd9e8029347 100644
---- a/Documentation/block/bfq-iosched.txt
-+++ b/Documentation/block/bfq-iosched.rst
-@@ -1,9 +1,11 @@
-+==========================
- BFQ (Budget Fair Queueing)
- ==========================
+ 	lockd.nlm_grace_period=P  [NFS] Assign grace period.
+ 			Format: <integer>
+@@ -3283,7 +3283,7 @@
  
- BFQ is a proportional-share I/O scheduler, with some extra
- low-latency capabilities. In addition to cgroups support (blkio or io
- controllers), BFQ's main features are:
+ 	pcd.		[PARIDE]
+ 			See header of drivers/block/paride/pcd.c.
+-			See also Documentation/blockdev/paride.txt.
++			See also Documentation/blockdev/paride.rst.
+ 
+ 	pci=option[,option...]	[PCI] various PCI subsystem options.
+ 
+@@ -3527,7 +3527,7 @@
+ 			needed on a platform with proper driver support.
+ 
+ 	pd.		[PARIDE]
+-			See Documentation/blockdev/paride.txt.
++			See Documentation/blockdev/paride.rst.
+ 
+ 	pdcchassis=	[PARISC,HW] Disable/Enable PDC Chassis Status codes at
+ 			boot time.
+@@ -3542,10 +3542,10 @@
+ 			and performance comparison.
+ 
+ 	pf.		[PARIDE]
+-			See Documentation/blockdev/paride.txt.
++			See Documentation/blockdev/paride.rst.
+ 
+ 	pg.		[PARIDE]
+-			See Documentation/blockdev/paride.txt.
++			See Documentation/blockdev/paride.rst.
+ 
+ 	pirq=		[SMP,APIC] Manual mp-table setup
+ 			See Documentation/x86/i386/IO-APIC.rst.
+@@ -3657,7 +3657,7 @@
+ 
+ 	prompt_ramdisk=	[RAM] List of RAM disks to prompt for floppy disk
+ 			before loading.
+-			See Documentation/blockdev/ramdisk.txt.
++			See Documentation/blockdev/ramdisk.rst.
+ 
+ 	psi=		[KNL] Enable or disable pressure stall information
+ 			tracking.
+@@ -3679,7 +3679,7 @@
+ 	pstore.backend=	Specify the name of the pstore backend to use
+ 
+ 	pt.		[PARIDE]
+-			See Documentation/blockdev/paride.txt.
++			See Documentation/blockdev/paride.rst.
+ 
+ 	pti=		[X86_64] Control Page Table Isolation of user and
+ 			kernel address spaces.  Disabling this feature
+@@ -3708,7 +3708,7 @@
+ 			See Documentation/admin-guide/md.rst.
+ 
+ 	ramdisk_size=	[RAM] Sizes of RAM disks in kilobytes
+-			See Documentation/blockdev/ramdisk.txt.
++			See Documentation/blockdev/ramdisk.rst.
+ 
+ 	random.trust_cpu={on,off}
+ 			[KNL] Enable or disable trusting the use of the
+diff --git a/Documentation/blockdev/drbd/data-structure-v9.txt b/Documentation/blockdev/drbd/data-structure-v9.rst
+similarity index 94%
+rename from Documentation/blockdev/drbd/data-structure-v9.txt
+rename to Documentation/blockdev/drbd/data-structure-v9.rst
+index 1e52a0e32624..66036b901644 100644
+--- a/Documentation/blockdev/drbd/data-structure-v9.txt
++++ b/Documentation/blockdev/drbd/data-structure-v9.rst
+@@ -1,3 +1,7 @@
++================================
++kernel data structure for DRBD-9
++================================
 +
- - BFQ guarantees a high system and application responsiveness, and a
-   low latency for time-sensitive applications, such as audio or video
-   players;
-@@ -55,18 +57,18 @@ sustainable throughputs, on the same systems as above:
+ This describes the in kernel data structure for DRBD-9. Starting with
+ Linux v3.14 we are reorganizing DRBD to use this data structure.
  
- BFQ works for multi-queue devices too.
+@@ -10,7 +14,7 @@ device is represented by a block device locally.
  
--The table of contents follow. Impatients can just jump to Section 3.
-+.. The table of contents follow. Impatients can just jump to Section 3.
+ The DRBD objects are interconnected to form a matrix as depicted below; a
+ drbd_peer_device object sits at each intersection between a drbd_device and a
+-drbd_connection:
++drbd_connection::
  
--CONTENTS
-+.. CONTENTS
- 
--1. When may BFQ be useful?
-- 1-1 Personal systems
-- 1-2 Server systems
--2. How does BFQ work?
--3. What are BFQ's tunables and how to properly configure BFQ?
--4. BFQ group scheduling
-- 4-1 Service guarantees provided
-- 4-2 Interface
-+   1. When may BFQ be useful?
-+    1-1 Personal systems
-+    1-2 Server systems
-+   2. How does BFQ work?
-+   3. What are BFQ's tunables and how to properly configure BFQ?
-+   4. BFQ group scheduling
-+    4-1 Service guarantees provided
-+    4-2 Interface
- 
- 1. When may BFQ be useful?
- ==========================
-@@ -77,17 +79,20 @@ BFQ provides the following benefits on personal and server systems.
- --------------------
- 
- Low latency for interactive applications
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
- Regardless of the actual background workload, BFQ guarantees that, for
- interactive tasks, the storage device is virtually as responsive as if
- it was idle. For example, even if one or more of the following
- background workloads are being executed:
+   /--------------+---------------+.....+---------------\
+   |   resource   |    device     |     |    device     |
+diff --git a/Documentation/blockdev/drbd/figures.rst b/Documentation/blockdev/drbd/figures.rst
+new file mode 100644
+index 000000000000..3e3fd4b8a478
+--- /dev/null
++++ b/Documentation/blockdev/drbd/figures.rst
+@@ -0,0 +1,28 @@
++.. The here included files are intended to help understand the implementation
 +
- - one or more large files are being read, written or copied,
- - a tree of source files is being compiled,
- - one or more virtual machines are performing I/O,
- - a software update is in progress,
- - indexing daemons are scanning filesystems and updating their
-   databases,
++Data flows that Relate some functions, and write packets
++========================================================
 +
- starting an application or loading a file from within an application
- takes about the same time as if the storage device was idle. As a
- comparison, with CFQ, NOOP or DEADLINE, and in the same conditions,
-@@ -95,13 +100,14 @@ applications experience high latencies, or even become unresponsive
- until the background workload terminates (also on SSDs).
++.. kernel-figure:: DRBD-8.3-data-packets.svg
++    :alt:   DRBD-8.3-data-packets.svg
++    :align: center
++
++.. kernel-figure:: DRBD-data-packets.svg
++    :alt:   DRBD-data-packets.svg
++    :align: center
++
++
++Sub graphs of DRBD's state transitions
++======================================
++
++.. kernel-figure:: conn-states-8.dot
++    :alt:   conn-states-8.dot
++    :align: center
++
++.. kernel-figure:: disk-states-8.dot
++    :alt:   disk-states-8.dot
++    :align: center
++
++.. kernel-figure:: node-states-8.dot
++    :alt:   node-states-8.dot
++    :align: center
+diff --git a/Documentation/blockdev/drbd/README.txt b/Documentation/blockdev/drbd/index.rst
+similarity index 55%
+rename from Documentation/blockdev/drbd/README.txt
+rename to Documentation/blockdev/drbd/index.rst
+index 627b0a1bf35e..68ecd5c113e9 100644
+--- a/Documentation/blockdev/drbd/README.txt
++++ b/Documentation/blockdev/drbd/index.rst
+@@ -1,4 +1,9 @@
++==========================================
++Distributed Replicated Block Device - DRBD
++==========================================
++
+ Description
++===========
  
- Low latency for soft real-time applications
+   DRBD is a shared-nothing, synchronously replicated block device. It
+   is designed to serve as a building block for high availability
+@@ -7,10 +12,8 @@ Description
+ 
+   Please visit http://www.drbd.org to find out more.
+ 
+-The here included files are intended to help understand the implementation
++.. toctree::
++   :maxdepth: 1
+ 
+-DRBD-8.3-data-packets.svg, DRBD-data-packets.svg  
+-  relates some functions, and write packets.
 -
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- Also soft real-time applications, such as audio and video
- players/streamers, enjoy a low latency and a low drop rate, regardless
- of the background I/O workload. As a consequence, these applications
- do not suffer from almost any glitch due to the background workload.
- 
- Higher speed for code-development tasks
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
- If some additional workload happens to be executed in parallel, then
- BFQ executes the I/O-related components of typical code-development
-@@ -109,6 +115,7 @@ tasks (compilation, checkout, merge, ...) much more quickly than CFQ,
- NOOP or DEADLINE.
- 
- High throughput
-+^^^^^^^^^^^^^^^
- 
- On hard disks, BFQ achieves up to 30% higher throughput than CFQ, and
- up to 150% higher throughput than DEADLINE and NOOP, with all the
-@@ -117,6 +124,7 @@ and with all the workloads on flash-based devices, BFQ achieves,
- instead, about the same throughput as the other schedulers.
- 
- Strong fairness, bandwidth and delay guarantees
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
- BFQ distributes the device throughput, and not just the device time,
- among I/O-bound applications in proportion their weights, with any
-@@ -133,15 +141,15 @@ Most benefits for server systems follow from the same service
- properties as above. In particular, regardless of whether additional,
- possibly heavy workloads are being served, BFQ guarantees:
- 
--. audio and video-streaming with zero or very low jitter and drop
-+* audio and video-streaming with zero or very low jitter and drop
-   rate;
- 
--. fast retrieval of WEB pages and embedded objects;
-+* fast retrieval of WEB pages and embedded objects;
- 
--. real-time recording of data in live-dumping applications (e.g.,
-+* real-time recording of data in live-dumping applications (e.g.,
-   packet logging);
- 
--. responsiveness in local and remote access to a server.
-+* responsiveness in local and remote access to a server.
- 
- 
- 2. How does BFQ work?
-@@ -151,7 +159,7 @@ BFQ is a proportional-share I/O scheduler, whose general structure,
- plus a lot of code, are borrowed from CFQ.
- 
- - Each process doing I/O on a device is associated with a weight and a
--  (bfq_)queue.
-+  `(bfq_)queue`.
- 
- - BFQ grants exclusive access to the device, for a while, to one queue
-   (process) at a time, and implements this service model by
-@@ -540,11 +548,12 @@ created, and kept up-to-date by bfq, depends on whether
- CONFIG_DEBUG_BLK_CGROUP is set. If it is set, then bfq creates all
- the stat files documented in
- Documentation/cgroup-v1/blkio-controller.rst. If, instead,
--CONFIG_DEBUG_BLK_CGROUP is not set, then bfq creates only the files
--blkio.bfq.io_service_bytes
--blkio.bfq.io_service_bytes_recursive
--blkio.bfq.io_serviced
--blkio.bfq.io_serviced_recursive
-+CONFIG_DEBUG_BLK_CGROUP is not set, then bfq creates only the files::
-+
-+  blkio.bfq.io_service_bytes
-+  blkio.bfq.io_service_bytes_recursive
-+  blkio.bfq.io_serviced
-+  blkio.bfq.io_serviced_recursive
- 
- The value of CONFIG_DEBUG_BLK_CGROUP greatly influences the maximum
- throughput sustainable with bfq, because updating the blkio.bfq.*
-@@ -567,17 +576,22 @@ weight of the queues associated with interactive and soft real-time
- applications. Unset this tunable if you need/want to control weights.
- 
- 
--[1] P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
-+[1]
-+    P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
-     Scheduler", Proceedings of the First Workshop on Mobile System
-     Technologies (MST-2015), May 2015.
-+
-     http://algogroup.unimore.it/people/paolo/disk_sched/mst-2015.pdf
- 
--[2] P. Valente and M. Andreolini, "Improving Application
-+[2]
-+    P. Valente and M. Andreolini, "Improving Application
-     Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
-     the 5th Annual International Systems and Storage Conference
-     (SYSTOR '12), June 2012.
-+
-     Slightly extended version:
--    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
--							results.pdf
- 
--[3] https://github.com/Algodev-github/S
-+    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-results.pdf
-+
-+[3]
-+   https://github.com/Algodev-github/S
-diff --git a/Documentation/block/biodoc.txt b/Documentation/block/biodoc.rst
-similarity index 83%
-rename from Documentation/block/biodoc.txt
-rename to Documentation/block/biodoc.rst
-index ac504de0cb93..59bd93bec8fc 100644
---- a/Documentation/block/biodoc.txt
-+++ b/Documentation/block/biodoc.rst
-@@ -1,15 +1,24 @@
--	Notes on the Generic Block Layer Rewrite in Linux 2.5
--	=====================================================
-+=====================================================
-+Notes on the Generic Block Layer Rewrite in Linux 2.5
-+=====================================================
-+
-+.. note::
-+
-+	It seems that there are lot of outdated stuff here. This seems
-+	to be written somewhat as a task list. Yet, eventually, something
-+	here might still be useful.
- 
- Notes Written on Jan 15, 2002:
--	Jens Axboe <jens.axboe@oracle.com>
--	Suparna Bhattacharya <suparna@in.ibm.com>
-+	- Jens Axboe <jens.axboe@oracle.com>
-+	- Suparna Bhattacharya <suparna@in.ibm.com>
- 
- Last Updated May 2, 2002
-+
- September 2003: Updated I/O Scheduler portions
--	Nick Piggin <npiggin@kernel.dk>
-+	- Nick Piggin <npiggin@kernel.dk>
- 
--Introduction:
-+Introduction
-+============
- 
- These are some notes describing some aspects of the 2.5 block layer in the
- context of the bio rewrite. The idea is to bring out some of the key
-@@ -17,11 +26,11 @@ changes and a glimpse of the rationale behind those changes.
- 
- Please mail corrections & suggestions to suparna@in.ibm.com.
- 
--Credits:
-----------
-+Credits
-+=======
- 
- 2.5 bio rewrite:
--	Jens Axboe <jens.axboe@oracle.com>
-+	- Jens Axboe <jens.axboe@oracle.com>
- 
- Many aspects of the generic block layer redesign were driven by and evolved
- over discussions, prior patches and the collective experience of several
-@@ -29,62 +38,63 @@ people. See sections 8 and 9 for a list of some related references.
- 
- The following people helped with review comments and inputs for this
- document:
--	Christoph Hellwig <hch@infradead.org>
--	Arjan van de Ven <arjanv@redhat.com>
--	Randy Dunlap <rdunlap@xenotime.net>
--	Andre Hedrick <andre@linux-ide.org>
-+
-+	- Christoph Hellwig <hch@infradead.org>
-+	- Arjan van de Ven <arjanv@redhat.com>
-+	- Randy Dunlap <rdunlap@xenotime.net>
-+	- Andre Hedrick <andre@linux-ide.org>
- 
- The following people helped with fixes/contributions to the bio patches
- while it was still work-in-progress:
--	David S. Miller <davem@redhat.com>
- 
-+	- David S. Miller <davem@redhat.com>
- 
--Description of Contents:
--------------------------
- 
--1. Scope for tuning of logic to various needs
--  1.1 Tuning based on device or low level driver capabilities
-+.. Description of Contents:
-+
-+   1. Scope for tuning of logic to various needs
-+     1.1 Tuning based on device or low level driver capabilities
- 	- Per-queue parameters
- 	- Highmem I/O support
- 	- I/O scheduler modularization
--  1.2 Tuning based on high level requirements/capabilities
-+     1.2 Tuning based on high level requirements/capabilities
- 	1.2.1 Request Priority/Latency
--  1.3 Direct access/bypass to lower layers for diagnostics and special
--      device operations
-+     1.3 Direct access/bypass to lower layers for diagnostics and special
-+	 device operations
- 	1.3.1 Pre-built commands
--2. New flexible and generic but minimalist i/o structure or descriptor
--   (instead of using buffer heads at the i/o layer)
--  2.1 Requirements/Goals addressed
--  2.2 The bio struct in detail (multi-page io unit)
--  2.3 Changes in the request structure
--3. Using bios
--  3.1 Setup/teardown (allocation, splitting)
--  3.2 Generic bio helper routines
--    3.2.1 Traversing segments and completion units in a request
--    3.2.2 Setting up DMA scatterlists
--    3.2.3 I/O completion
--    3.2.4 Implications for drivers that do not interpret bios (don't handle
-- 	  multiple segments)
--  3.3 I/O submission
--4. The I/O scheduler
--5. Scalability related changes
--  5.1 Granular locking: Removal of io_request_lock
--  5.2 Prepare for transition to 64 bit sector_t
--6. Other Changes/Implications
--  6.1 Partition re-mapping handled by the generic block layer
--7. A few tips on migration of older drivers
--8. A list of prior/related/impacted patches/ideas
--9. Other References/Discussion Threads
-+   2. New flexible and generic but minimalist i/o structure or descriptor
-+      (instead of using buffer heads at the i/o layer)
-+     2.1 Requirements/Goals addressed
-+     2.2 The bio struct in detail (multi-page io unit)
-+     2.3 Changes in the request structure
-+   3. Using bios
-+     3.1 Setup/teardown (allocation, splitting)
-+     3.2 Generic bio helper routines
-+       3.2.1 Traversing segments and completion units in a request
-+       3.2.2 Setting up DMA scatterlists
-+       3.2.3 I/O completion
-+       3.2.4 Implications for drivers that do not interpret bios (don't handle
-+	  multiple segments)
-+     3.3 I/O submission
-+   4. The I/O scheduler
-+   5. Scalability related changes
-+     5.1 Granular locking: Removal of io_request_lock
-+     5.2 Prepare for transition to 64 bit sector_t
-+   6. Other Changes/Implications
-+     6.1 Partition re-mapping handled by the generic block layer
-+   7. A few tips on migration of older drivers
-+   8. A list of prior/related/impacted patches/ideas
-+   9. Other References/Discussion Threads
- 
-----------------------------------------------------------------------------
- 
- Bio Notes
----------
-+=========
- 
- Let us discuss the changes in the context of how some overall goals for the
- block layer are addressed.
- 
- 1. Scope for tuning the generic logic to satisfy various requirements
-+=====================================================================
- 
- The block layer design supports adaptable abstractions to handle common
- processing with the ability to tune the logic to an appropriate extent
-@@ -97,6 +107,7 @@ and application/middleware software designed to take advantage of these
- capabilities.
- 
- 1.1 Tuning based on low level device / driver capabilities
-+----------------------------------------------------------
- 
- Sophisticated devices with large built-in caches, intelligent i/o scheduling
- optimizations, high memory DMA support, etc may find some of the
-@@ -133,12 +144,12 @@ Some new queue property settings:
- 		Sets two variables that limit the size of the request.
- 
- 		- The request queue's max_sectors, which is a soft size in
--		units of 512 byte sectors, and could be dynamically varied
--		by the core kernel.
-+		  units of 512 byte sectors, and could be dynamically varied
-+		  by the core kernel.
- 
- 		- The request queue's max_hw_sectors, which is a hard limit
--		and reflects the maximum size request a driver can handle
--		in units of 512 byte sectors.
-+		  and reflects the maximum size request a driver can handle
-+		  in units of 512 byte sectors.
- 
- 		The default for both max_sectors and max_hw_sectors is
- 		255. The upper limit of max_sectors is 1024.
-@@ -234,6 +245,7 @@ I/O scheduler wrappers are to be used instead of accessing the queue directly.
- See section 4. The I/O scheduler for details.
- 
- 1.2 Tuning Based on High level code capabilities
-+------------------------------------------------
- 
- i. Application capabilities for raw i/o
- 
-@@ -258,9 +270,11 @@ would need an additional mechanism either via open flags or ioctls, or some
- other upper level mechanism to communicate such settings to block.
- 
- 1.2.1 Request Priority/Latency
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
--Todo/Under discussion:
--Arjan's proposed request priority scheme allows higher levels some broad
-+Todo/Under discussion::
-+
-+  Arjan's proposed request priority scheme allows higher levels some broad
-   control (high/med/low) over the priority  of an i/o request vs other pending
-   requests in the queue. For example it allows reads for bringing in an
-   executable page on demand to be given a higher priority over pending write
-@@ -272,7 +286,9 @@ Arjan's proposed request priority scheme allows higher levels some broad
- 
- 
- 1.3 Direct Access to Low level Device/Driver Capabilities (Bypass mode)
--    (e.g Diagnostics, Systems Management)
-+-----------------------------------------------------------------------
-+
-+(e.g Diagnostics, Systems Management)
- 
- There are situations where high-level code needs to have direct access to
- the low level device capabilities or requires the ability to issue commands
-@@ -308,28 +324,32 @@ involved. In the latter case, the driver would modify and manage the
- request->buffer, request->sector and request->nr_sectors or
- request->current_nr_sectors fields itself rather than using the block layer
- end_request or end_that_request_first completion interfaces.
--(See 2.3 or Documentation/block/request.txt for a brief explanation of
-+(See 2.3 or Documentation/block/request.rst for a brief explanation of
- the request structure fields)
- 
--[TBD: end_that_request_last should be usable even in this case;
--Perhaps an end_that_direct_request_first routine could be implemented to make
--handling direct requests easier for such drivers; Also for drivers that
--expect bios, a helper function could be provided for setting up a bio
--corresponding to a data buffer]
-+::
- 
--<JENS: I dont understand the above, why is end_that_request_first() not
--usable? Or _last for that matter. I must be missing something>
--<SUP: What I meant here was that if the request doesn't have a bio, then
-- end_that_request_first doesn't modify nr_sectors or current_nr_sectors,
-- and hence can't be used for advancing request state settings on the
-- completion of partial transfers. The driver has to modify these fields 
-- directly by hand.
-- This is because end_that_request_first only iterates over the bio list,
-- and always returns 0 if there are none associated with the request.
-- _last works OK in this case, and is not a problem, as I mentioned earlier
-->
-+  [TBD: end_that_request_last should be usable even in this case;
-+  Perhaps an end_that_direct_request_first routine could be implemented to make
-+  handling direct requests easier for such drivers; Also for drivers that
-+  expect bios, a helper function could be provided for setting up a bio
-+  corresponding to a data buffer]
-+
-+  <JENS: I dont understand the above, why is end_that_request_first() not
-+  usable? Or _last for that matter. I must be missing something>
-+
-+  <SUP: What I meant here was that if the request doesn't have a bio, then
-+   end_that_request_first doesn't modify nr_sectors or current_nr_sectors,
-+   and hence can't be used for advancing request state settings on the
-+   completion of partial transfers. The driver has to modify these fields
-+   directly by hand.
-+   This is because end_that_request_first only iterates over the bio list,
-+   and always returns 0 if there are none associated with the request.
-+   _last works OK in this case, and is not a problem, as I mentioned earlier
-+  >
- 
- 1.3.1 Pre-built Commands
-+^^^^^^^^^^^^^^^^^^^^^^^^
- 
- A request can be created with a pre-built custom command  to be sent directly
- to the device. The cmd block in the request structure has room for filling
-@@ -360,9 +380,11 @@ Aside:
-   the pre-builder hook can be invoked there.
- 
- 
--2. Flexible and generic but minimalist i/o structure/descriptor.
-+2. Flexible and generic but minimalist i/o structure/descriptor
-+===============================================================
- 
- 2.1 Reason for a new structure and requirements addressed
-+---------------------------------------------------------
- 
- Prior to 2.5, buffer heads were used as the unit of i/o at the generic block
- layer, and the low level request structure was associated with a chain of
-@@ -378,26 +400,26 @@ which were generated for each such chunk.
- The following were some of the goals and expectations considered in the
- redesign of the block i/o data structure in 2.5.
- 
--i.  Should be appropriate as a descriptor for both raw and buffered i/o  -
-+1.  Should be appropriate as a descriptor for both raw and buffered i/o  -
-     avoid cache related fields which are irrelevant in the direct/page i/o path,
-     or filesystem block size alignment restrictions which may not be relevant
-     for raw i/o.
--ii. Ability to represent high-memory buffers (which do not have a virtual
-+2.  Ability to represent high-memory buffers (which do not have a virtual
-     address mapping in kernel address space).
--iii.Ability to represent large i/os w/o unnecessarily breaking them up (i.e
-+3.  Ability to represent large i/os w/o unnecessarily breaking them up (i.e
-     greater than PAGE_SIZE chunks in one shot)
--iv. At the same time, ability to retain independent identity of i/os from
-+4.  At the same time, ability to retain independent identity of i/os from
-     different sources or i/o units requiring individual completion (e.g. for
-     latency reasons)
--v.  Ability to represent an i/o involving multiple physical memory segments
-+5.  Ability to represent an i/o involving multiple physical memory segments
-     (including non-page aligned page fragments, as specified via readv/writev)
-     without unnecessarily breaking it up, if the underlying device is capable of
-     handling it.
--vi. Preferably should be based on a memory descriptor structure that can be
-+6.  Preferably should be based on a memory descriptor structure that can be
-     passed around different types of subsystems or layers, maybe even
-     networking, without duplication or extra copies of data/descriptor fields
-     themselves in the process
--vii.Ability to handle the possibility of splits/merges as the structure passes
-+7.  Ability to handle the possibility of splits/merges as the structure passes
-     through layered drivers (lvm, md, evms), with minimal overhead.
- 
- The solution was to define a new structure (bio)  for the block layer,
-@@ -408,6 +430,7 @@ bh structure for buffered i/o, and in the case of raw/direct i/o kiobufs are
- mapped to bio structures.
- 
- 2.2 The bio struct
-+------------------
- 
- The bio structure uses a vector representation pointing to an array of tuples
- of <page, offset, len> to describe the i/o buffer, and has various other
-@@ -417,34 +440,36 @@ performing the i/o.
- Notice that this representation means that a bio has no virtual address
- mapping at all (unlike buffer heads).
- 
--struct bio_vec {
--       struct page     *bv_page;
--       unsigned short  bv_len;
--       unsigned short  bv_offset;
--};
-+::
- 
--/*
-- * main unit of I/O for the block layer and lower layers (ie drivers)
-- */
--struct bio {
--       struct bio          *bi_next;    /* request queue link */
--       struct block_device *bi_bdev;	/* target device */
--       unsigned long       bi_flags;    /* status, command, etc */
--       unsigned long       bi_opf;       /* low bits: r/w, high: priority */
-+  struct bio_vec {
-+	 struct page     *bv_page;
-+	 unsigned short  bv_len;
-+	 unsigned short  bv_offset;
-+  };
- 
--       unsigned int	bi_vcnt;     /* how may bio_vec's */
--       struct bvec_iter	bi_iter;	/* current index into bio_vec array */
-+  /*
-+   * main unit of I/O for the block layer and lower layers (ie drivers)
-+   */
-+  struct bio {
-+	 struct bio          *bi_next;    /* request queue link */
-+	 struct block_device *bi_bdev;	/* target device */
-+	 unsigned long       bi_flags;    /* status, command, etc */
-+	 unsigned long       bi_opf;       /* low bits: r/w, high: priority */
- 
--       unsigned int	bi_size;     /* total size in bytes */
--       unsigned short 	bi_phys_segments; /* segments after physaddr coalesce*/
--       unsigned short	bi_hw_segments; /* segments after DMA remapping */
--       unsigned int	bi_max;	     /* max bio_vecs we can hold
--                                        used as index into pool */
--       struct bio_vec   *bi_io_vec;  /* the actual vec list */
--       bio_end_io_t	*bi_end_io;  /* bi_end_io (bio) */
--       atomic_t		bi_cnt;	     /* pin count: free when it hits zero */
--       void             *bi_private;
--};
-+	 unsigned int	bi_vcnt;     /* how may bio_vec's */
-+	 struct bvec_iter	bi_iter;	/* current index into bio_vec array */
-+
-+	 unsigned int	bi_size;     /* total size in bytes */
-+	 unsigned short 	bi_phys_segments; /* segments after physaddr coalesce*/
-+	 unsigned short	bi_hw_segments; /* segments after DMA remapping */
-+	 unsigned int	bi_max;	     /* max bio_vecs we can hold
-+					  used as index into pool */
-+	 struct bio_vec   *bi_io_vec;  /* the actual vec list */
-+	 bio_end_io_t	*bi_end_io;  /* bi_end_io (bio) */
-+	 atomic_t		bi_cnt;	     /* pin count: free when it hits zero */
-+	 void             *bi_private;
-+  };
- 
- With this multipage bio design:
- 
-@@ -454,7 +479,7 @@ With this multipage bio design:
- - Splitting of an i/o request across multiple devices (as in the case of
-   lvm or raid) is achieved by cloning the bio (where the clone points to
-   the same bi_io_vec array, but with the index and size accordingly modified)
--- A linked list of bios is used as before for unrelated merges (*) - this
-+- A linked list of bios is used as before for unrelated merges [*]_ - this
-   avoids reallocs and makes independent completions easier to handle.
- - Code that traverses the req list can find all the segments of a bio
-   by using rq_for_each_segment.  This handles the fact that a request
-@@ -463,10 +488,12 @@ With this multipage bio design:
-   field to keep track of the next bio_vec entry to process.
-   (e.g a 1MB bio_vec needs to be handled in max 128kB chunks for IDE)
-   [TBD: Should preferably also have a bi_voffset and bi_vlen to avoid modifying
--   bi_offset an len fields]
-+  bi_offset an len fields]
- 
--(*) unrelated merges -- a request ends up containing two or more bios that
--    didn't originate from the same place.
-+.. [*]
-+
-+	unrelated merges -- a request ends up containing two or more bios that
-+	didn't originate from the same place.
- 
- bi_end_io() i/o callback gets called on i/o completion of the entire bio.
- 
-@@ -484,10 +511,11 @@ which in turn means that only raw I/O uses it (direct i/o may not work
- right now). The intent however is to enable clustering of pages etc to
- become possible. The pagebuf abstraction layer from SGI also uses multi-page
- bios, but that is currently not included in the stock development kernels.
--The same is true of Andrew Morton's work-in-progress multipage bio writeout 
-+The same is true of Andrew Morton's work-in-progress multipage bio writeout
- and readahead patches.
- 
- 2.3 Changes in the Request Structure
-+------------------------------------
- 
- The request structure is the structure that gets passed down to low level
- drivers. The block layer make_request function builds up a request structure,
-@@ -500,11 +528,11 @@ request structure.
- Only some relevant fields (mainly those which changed or may be referred
- to in some of the discussion here) are listed below, not necessarily in
- the order in which they occur in the structure (see include/linux/blkdev.h)
--Refer to Documentation/block/request.txt for details about all the request
-+Refer to Documentation/block/request.rst for details about all the request
- structure fields and a quick reference about the layers which are
--supposed to use or modify those fields.
-+supposed to use or modify those fields::
- 
--struct request {
-+  struct request {
- 	struct list_head queuelist;  /* Not meant to be directly accessed by
- 					the driver.
- 					Used by q->elv_next_request_fn
-@@ -549,11 +577,11 @@ struct request {
- 	.
- 	struct bio *bio, *biotail;  /* bio list instead of bh */
- 	struct request_list *rl;
--}
--	
-+  }
-+
- See the req_ops and req_flag_bits definitions for an explanation of the various
- flags available. Some bits are used by the block layer or i/o scheduler.
--	
-+
- The behaviour of the various sector counts are almost the same as before,
- except that since we have multi-segment bios, current_nr_sectors refers
- to the numbers of sectors in the current segment being processed which could
-@@ -579,8 +607,10 @@ a driver needs to be careful about interoperation with the block layer helper
- functions which the driver uses. (Section 1.3)
- 
- 3. Using bios
+-conn-states-8.dot, disk-states-8.dot, node-states-8.dot
+-  The sub graphs of DRBD's state transitions
++   data-structure-v9
++   figures
+diff --git a/Documentation/blockdev/floppy.txt b/Documentation/blockdev/floppy.rst
+similarity index 81%
+rename from Documentation/blockdev/floppy.txt
+rename to Documentation/blockdev/floppy.rst
+index e2240f5ab64d..4a8f31cf4139 100644
+--- a/Documentation/blockdev/floppy.txt
++++ b/Documentation/blockdev/floppy.rst
+@@ -1,35 +1,37 @@
+-This file describes the floppy driver.
++=============
++Floppy Driver
 +=============
  
- 3.1 Setup/Teardown
-+------------------
+ FAQ list:
+ =========
  
- There are routines for managing the allocation, and reference counting, and
- freeing of bios (bio_alloc, bio_get, bio_put).
-@@ -607,10 +637,13 @@ case of bio, these routines make use of the standard slab allocator.
- The caller of bio_alloc is expected to taken certain steps to avoid
- deadlocks, e.g. avoid trying to allocate more memory from the pool while
- already holding memory obtained from the pool.
--[TBD: This is a potential issue, though a rare possibility
-- in the bounce bio allocation that happens in the current code, since
-- it ends up allocating a second bio from the same pool while
-- holding the original bio ]
+- A FAQ list may be found in the fdutils package (see below), and also
++A FAQ list may be found in the fdutils package (see below), and also
+ at <http://fdutils.linux.lu/faq.html>.
+ 
+ 
+ LILO configuration options (Thinkpad users, read this)
+ ======================================================
+ 
+- The floppy driver is configured using the 'floppy=' option in
++The floppy driver is configured using the 'floppy=' option in
+ lilo. This option can be typed at the boot prompt, or entered in the
+ lilo configuration file.
+ 
+- Example: If your kernel is called linux-2.6.9, type the following line
+-at the lilo boot prompt (if you have a thinkpad):
++Example: If your kernel is called linux-2.6.9, type the following line
++at the lilo boot prompt (if you have a thinkpad)::
+ 
+  linux-2.6.9 floppy=thinkpad
+ 
+ You may also enter the following line in /etc/lilo.conf, in the description
+-of linux-2.6.9:
++of linux-2.6.9::
+ 
+  append = "floppy=thinkpad"
+ 
+- Several floppy related options may be given, example:
++Several floppy related options may be given, example::
+ 
+  linux-2.6.9 floppy=daring floppy=two_fdc
+  append = "floppy=daring floppy=two_fdc"
+ 
+- If you give options both in the lilo config file and on the boot
++If you give options both in the lilo config file and on the boot
+ prompt, the option strings of both places are concatenated, the boot
+ prompt options coming last. That's why there are also options to
+ restore the default behavior.
+@@ -38,21 +40,23 @@ restore the default behavior.
+ Module configuration options
+ ============================
+ 
+- If you use the floppy driver as a module, use the following syntax:
+-modprobe floppy floppy="<options>"
++If you use the floppy driver as a module, use the following syntax::
+ 
+-Example:
+- modprobe floppy floppy="omnibook messages"
++	modprobe floppy floppy="<options>"
+ 
+- If you need certain options enabled every time you load the floppy driver,
+-you can put:
++Example::
+ 
+- options floppy floppy="omnibook messages"
++	modprobe floppy floppy="omnibook messages"
 +
-+::
++If you need certain options enabled every time you load the floppy driver,
++you can put::
 +
-+  [TBD: This is a potential issue, though a rare possibility
-+   in the bounce bio allocation that happens in the current code, since
-+   it ends up allocating a second bio from the same pool while
-+   holding the original bio ]
++	options floppy floppy="omnibook messages"
  
- Memory allocated from the pool should be released back within a limited
- amount of time (in the case of bio, that would be after the i/o is completed).
-@@ -636,14 +669,18 @@ same bio_vec_list). This would typically be used for splitting i/o requests
- in lvm or md.
+ in a configuration file in /etc/modprobe.d/.
  
- 3.2 Generic bio helper Routines
-+-------------------------------
  
- 3.2.1 Traversing segments and completion units in a request
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- The floppy driver related options are:
++The floppy driver related options are:
  
- The macro rq_for_each_segment() should be used for traversing the bios
- in the request list (drivers should avoid directly trying to do it
- themselves). Using these helpers should also make it easier to cope
- with block changes in the future.
+  floppy=asus_pci
+ 	Sets the bit mask to allow only units 0 and 1. (default)
+@@ -70,8 +74,7 @@ in a configuration file in /etc/modprobe.d/.
+ 	Tells the floppy driver that you have only one floppy controller.
+ 	(default)
  
-+::
+- floppy=two_fdc
+- floppy=<address>,two_fdc
++ floppy=two_fdc / floppy=<address>,two_fdc
+ 	Tells the floppy driver that you have two floppy controllers.
+ 	The second floppy controller is assumed to be at <address>.
+ 	This option is not needed if the second controller is at address
+@@ -84,8 +87,7 @@ in a configuration file in /etc/modprobe.d/.
+  floppy=0,thinkpad
+ 	Tells the floppy driver that you don't have a Thinkpad.
+ 
+- floppy=omnibook
+- floppy=nodma
++ floppy=omnibook / floppy=nodma
+ 	Tells the floppy driver not to use Dma for data transfers.
+ 	This is needed on HP Omnibooks, which don't have a workable
+ 	DMA channel for the floppy driver. This option is also useful
+@@ -144,14 +146,16 @@ in a configuration file in /etc/modprobe.d/.
+ 	described in the physical CMOS), or if your BIOS uses
+ 	non-standard CMOS types. The CMOS types are:
+ 
+-		0 - Use the value of the physical CMOS
+-		1 - 5 1/4 DD
+-		2 - 5 1/4 HD
+-		3 - 3 1/2 DD
+-		4 - 3 1/2 HD
+-		5 - 3 1/2 ED
+-		6 - 3 1/2 ED
+-	       16 - unknown or not installed
++	       ==  ==================================
++		0  Use the value of the physical CMOS
++		1  5 1/4 DD
++		2  5 1/4 HD
++		3  3 1/2 DD
++		4  3 1/2 HD
++		5  3 1/2 ED
++		6  3 1/2 ED
++	       16  unknown or not installed
++	       ==  ==================================
+ 
+ 	(Note: there are two valid types for ED drives. This is because 5 was
+ 	initially chosen to represent floppy *tapes*, and 6 for ED drives.
+@@ -162,8 +166,7 @@ in a configuration file in /etc/modprobe.d/.
+ 	Print a warning message when an unexpected interrupt is received.
+ 	(default)
+ 
+- floppy=no_unexpected_interrupts
+- floppy=L40SX
++ floppy=no_unexpected_interrupts / floppy=L40SX
+ 	Don't print a message when an unexpected interrupt is received. This
+ 	is needed on IBM L40SX laptops in certain video modes. (There seems
+ 	to be an interaction between video and floppy. The unexpected
+@@ -199,47 +202,54 @@ in a configuration file in /etc/modprobe.d/.
+ 	Sets the floppy DMA channel to <nr> instead of 2.
+ 
+  floppy=slow
+-	Use PS/2 stepping rate:
+-	 " PS/2 floppies have much slower step rates than regular floppies.
++	Use PS/2 stepping rate::
 +
- 	struct req_iterator iter;
- 	rq_for_each_segment(bio_vec, rq, iter)
- 		/* bio_vec is now current segment */
-@@ -654,6 +691,7 @@ which don't make a distinction between segments and completion units would
- need to be reorganized to support multi-segment bios.
++	   PS/2 floppies have much slower step rates than regular floppies.
+ 	   It's been recommended that take about 1/4 of the default speed
+-	   in some more extreme cases."
++	   in some more extreme cases.
  
- 3.2.2 Setting up DMA scatterlists
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  
- The blk_rq_map_sg() helper routine would be used for setting up scatter
- gather lists from a request, so a driver need not do it on its own.
-@@ -684,6 +722,7 @@ of physical data segments in a request (i.e. the largest sized scatter list
- a driver could handle)
+ Supporting utilities and additional documentation:
+ ==================================================
  
- 3.2.3 I/O completion
-+^^^^^^^^^^^^^^^^^^^^
+- Additional parameters of the floppy driver can be configured at
++Additional parameters of the floppy driver can be configured at
+ runtime. Utilities which do this can be found in the fdutils package.
+ This package also contains a new version of mtools which allows to
+ access high capacity disks (up to 1992K on a high density 3 1/2 disk!).
+ It also contains additional documentation about the floppy driver.
  
- The existing generic block layer helper routines end_request,
- end_that_request_first and end_that_request_last can be used for i/o
-@@ -692,8 +731,10 @@ request can be kicked of) as before. With the introduction of multi-page
- bio support, end_that_request_first requires an additional argument indicating
- the number of sectors completed.
- 
--3.2.4 Implications for drivers that do not interpret bios (don't handle
-- multiple segments)
-+3.2.4 Implications for drivers that do not interpret bios
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ The latest version can be found at fdutils homepage:
 +
-+(don't handle multiple segments)
+  http://fdutils.linux.lu
  
- Drivers that do not interpret bios e.g those which do not handle multiple
- segments and do not support i/o into high memory addresses (require bounce
-@@ -708,15 +749,18 @@ be used if only if the request has come down from block/bio path, not for
- direct access requests which only specify rq->buffer without a valid rq->bio)
- 
- 3.3 I/O Submission
-+------------------
- 
- The routine submit_bio() is used to submit a single io. Higher level i/o
- routines make use of this:
- 
- (a) Buffered i/o:
+ The fdutils releases can be found at:
 +
- The routine submit_bh() invokes submit_bio() on a bio corresponding to the
- bh, allocating the bio if required. ll_rw_block() uses submit_bh() as before.
- 
- (b) Kiobuf i/o (for raw/direct i/o):
+  http://fdutils.linux.lu/download.html
 +
- The ll_rw_kio() routine breaks up the kiobuf into page sized chunks and
- maps the array to one or more multi-page bios, issuing submit_bio() to
- perform the i/o on each of these.
-@@ -739,6 +783,7 @@ Todo/Observation:
- 
- 
- (c) Page i/o:
+  http://www.tux.org/pub/knaff/fdutils/
 +
- Todo/Under discussion:
- 
-  Andrew Morton's multi-page bio patches attempt to issue multi-page
-@@ -754,6 +799,7 @@ Todo/Under discussion:
-  abstraction, but intended to be as lightweight as possible).
- 
- (d) Direct access i/o:
-+
- Direct access requests that do not contain bios would be submitted differently
- as discussed earlier in section 1.3.
- 
-@@ -781,11 +827,13 @@ Aside:
- 
- 
- 4. The I/O scheduler
-+====================
-+
- I/O scheduler, a.k.a. elevator, is implemented in two layers.  Generic dispatch
- queue and specific I/O schedulers.  Unless stated otherwise, elevator is used
- to refer to both parts and I/O scheduler to specific I/O schedulers.
- 
--Block layer implements generic dispatch queue in block/*.c.
-+Block layer implements generic dispatch queue in `block/*.c`.
- The generic dispatch queue is responsible for requeueing, handling non-fs
- requests and all other subtleties.
- 
-@@ -803,8 +851,11 @@ doesn't implement a function, the switch does nothing or some minimal house
- keeping work.
- 
- 4.1. I/O scheduler API
-+----------------------
- 
- The functions an elevator may implement are: (* are mandatory)
-+
-+=============================== ================================================
- elevator_merge_fn		called to query requests for merge with a bio
- 
- elevator_merge_req_fn		called when two requests get merged. the one
-@@ -863,8 +914,11 @@ elevator_deactivate_req_fn	Called when device driver decides to delay
- elevator_init_fn*
- elevator_exit_fn		Allocate and free any elevator specific storage
- 				for a queue.
-+=============================== ================================================
- 
- 4.2 Request flows seen by I/O schedulers
-+----------------------------------------
-+
- All requests seen by I/O schedulers strictly follow one of the following three
- flows.
- 
-@@ -878,9 +932,12 @@ flows.
-  -> put_req_fn
- 
- 4.3 I/O scheduler implementation
-+--------------------------------
-+
- The generic i/o scheduler algorithm attempts to sort/merge/batch requests for
- optimal disk scan and request servicing performance (based on generic
- principles and device capabilities), optimized for:
-+
- i.   improved throughput
- ii.  improved latency
- iii. better utilization of h/w & CPU time
-@@ -934,15 +991,19 @@ Aside:
-   a big request from the broken up pieces coming by.
- 
- 4.4 I/O contexts
-+----------------
-+
- I/O contexts provide a dynamically allocated per process data area. They may
- be used in I/O schedulers, and in the block layer (could be used for IO statis,
--priorities for example). See *io_context in block/ll_rw_blk.c, and as-iosched.c
-+priorities for example). See `*io_context` in block/ll_rw_blk.c, and as-iosched.c
- for an example of usage in an i/o scheduler.
- 
- 
- 5. Scalability related changes
-+==============================
- 
- 5.1 Granular Locking: io_request_lock replaced by a per-queue lock
-+------------------------------------------------------------------
- 
- The global io_request_lock has been removed as of 2.5, to avoid
- the scalability bottleneck it was causing, and has been replaced by more
-@@ -957,20 +1018,23 @@ request_fn execution which it means that lots of older drivers
- should still be SMP safe. Drivers are free to drop the queue
- lock themselves, if required. Drivers that explicitly used the
- io_request_lock for serialization need to be modified accordingly.
--Usually it's as easy as adding a global lock:
-+Usually it's as easy as adding a global lock::
- 
- 	static DEFINE_SPINLOCK(my_driver_lock);
- 
- and passing the address to that lock to blk_init_queue().
- 
- 5.2 64 bit sector numbers (sector_t prepares for 64 bit support)
-+----------------------------------------------------------------
- 
- The sector number used in the bio structure has been changed to sector_t,
- which could be defined as 64 bit in preparation for 64 bit sector support.
- 
- 6. Other Changes/Implications
-+=============================
- 
- 6.1 Partition re-mapping handled by the generic block layer
-+-----------------------------------------------------------
- 
- In 2.5 some of the gendisk/partition related code has been reorganized.
- Now the generic block layer performs partition-remapping early and thus
-@@ -985,6 +1049,7 @@ sent are offset from the beginning of the device.
- 
- 
- 7. A Few Tips on Migration of older drivers
-+===========================================
- 
- Old-style drivers that just use CURRENT and ignores clustered requests,
- may not need much change.  The generic layer will automatically handle
-@@ -1018,12 +1083,12 @@ blk_init_queue time.
- 
- Drivers no longer have to map a {partition, sector offset} into the
- correct absolute location anymore, this is done by the block layer, so
--where a driver received a request ala this before:
-+where a driver received a request ala this before::
- 
- 	rq->rq_dev = mk_kdev(3, 5);	/* /dev/hda5 */
- 	rq->sector = 0;			/* first sector on hda5 */
- 
--  it will now see
-+it will now see::
- 
- 	rq->rq_dev = mk_kdev(3, 0);	/* /dev/hda */
- 	rq->sector = 123128;		/* offset from start of disk */
-@@ -1040,38 +1105,65 @@ a bio into the virtual address space.
- 
- 
- 8. Prior/Related/Impacted patches
-+=================================
- 
- 8.1. Earlier kiobuf patches (sct/axboe/chait/hch/mkp)
-+-----------------------------------------------------
-+
- - orig kiobuf & raw i/o patches (now in 2.4 tree)
- - direct kiobuf based i/o to devices (no intermediate bh's)
- - page i/o using kiobuf
- - kiobuf splitting for lvm (mkp)
- - elevator support for kiobuf request merging (axboe)
-+
- 8.2. Zero-copy networking (Dave Miller)
-+---------------------------------------
-+
- 8.3. SGI XFS - pagebuf patches - use of kiobufs
-+-----------------------------------------------
- 8.4. Multi-page pioent patch for bio (Christoph Hellwig)
-+--------------------------------------------------------
- 8.5. Direct i/o implementation (Andrea Arcangeli) since 2.4.10-pre11
-+--------------------------------------------------------------------
- 8.6. Async i/o implementation patch (Ben LaHaise)
-+-------------------------------------------------
- 8.7. EVMS layering design (IBM EVMS team)
--8.8. Larger page cache size patch (Ben LaHaise) and
--     Large page size (Daniel Phillips)
-+-----------------------------------------
-+8.8. Larger page cache size patch (Ben LaHaise) and Large page size (Daniel Phillips)
-+-------------------------------------------------------------------------------------
-+
-     => larger contiguous physical memory buffers
-+
- 8.9. VM reservations patch (Ben LaHaise)
-+----------------------------------------
- 8.10. Write clustering patches ? (Marcelo/Quintela/Riel ?)
-+----------------------------------------------------------
- 8.11. Block device in page cache patch (Andrea Archangeli) - now in 2.4.10+
--8.12. Multiple block-size transfers for faster raw i/o (Shailabh Nagar,
--      Badari)
-+---------------------------------------------------------------------------
-+8.12. Multiple block-size transfers for faster raw i/o (Shailabh Nagar, Badari)
-+-------------------------------------------------------------------------------
- 8.13  Priority based i/o scheduler - prepatches (Arjan van de Ven)
-+------------------------------------------------------------------
- 8.14  IDE Taskfile i/o patch (Andre Hedrick)
-+--------------------------------------------
- 8.15  Multi-page writeout and readahead patches (Andrew Morton)
-+---------------------------------------------------------------
- 8.16  Direct i/o patches for 2.5 using kvec and bio (Badari Pulavarthy)
-+-----------------------------------------------------------------------
- 
--9. Other References:
-+9. Other References
-+===================
-+
-+9.1 The Splice I/O Model
-+------------------------
-+
-+Larry McVoy (and subsequent discussions on lkml, and Linus' comments - Jan 2001
-+
-+9.2 Discussions about kiobuf and bh design
-+------------------------------------------
-+
-+On lkml between sct, linus, alan et al - Feb-March 2001 (many of the
-+initial thoughts that led to bio were brought up in this discussion thread)
- 
--9.1 The Splice I/O Model - Larry McVoy (and subsequent discussions on lkml,
--and Linus' comments - Jan 2001)
--9.2 Discussions about kiobuf and bh design on lkml between sct, linus, alan
--et al - Feb-March 2001 (many of the initial thoughts that led to bio were
--brought up in this discussion thread)
- 9.3 Discussions on mempool on lkml - Dec 2001.
--
-+----------------------------------------------
-diff --git a/Documentation/block/biovecs.txt b/Documentation/block/biovecs.rst
-similarity index 92%
-rename from Documentation/block/biovecs.txt
-rename to Documentation/block/biovecs.rst
-index ce6eccaf5df7..86fa66c87172 100644
---- a/Documentation/block/biovecs.txt
-+++ b/Documentation/block/biovecs.rst
-@@ -1,6 +1,6 @@
--
--Immutable biovecs and biovec iterators:
--=======================================
-+======================================
-+Immutable biovecs and biovec iterators
-+======================================
- 
- Kent Overstreet <kmo@daterainc.com>
- 
-@@ -121,10 +121,12 @@ Other implications:
- Usage of helpers:
- =================
- 
--* The following helpers whose names have the suffix of "_all" can only be used
--on non-BIO_CLONED bio. They are usually used by filesystem code. Drivers
--shouldn't use them because the bio may have been split before it reached the
--driver.
-+* The following helpers whose names have the suffix of `_all` can only be used
-+  on non-BIO_CLONED bio. They are usually used by filesystem code. Drivers
-+  shouldn't use them because the bio may have been split before it reached the
-+  driver.
-+
-+::
- 
- 	bio_for_each_segment_all()
- 	bio_first_bvec_all()
-@@ -132,13 +134,13 @@ driver.
- 	bio_last_bvec_all()
- 
- * The following helpers iterate over single-page segment. The passed 'struct
--bio_vec' will contain a single-page IO vector during the iteration
-+  bio_vec' will contain a single-page IO vector during the iteration::
- 
- 	bio_for_each_segment()
- 	bio_for_each_segment_all()
- 
- * The following helpers iterate over multi-page bvec. The passed 'struct
--bio_vec' will contain a multi-page IO vector during the iteration
-+  bio_vec' will contain a multi-page IO vector during the iteration::
- 
- 	bio_for_each_bvec()
- 	rq_for_each_bvec()
-diff --git a/Documentation/block/capability.txt b/Documentation/block/capability.rst
-similarity index 40%
-rename from Documentation/block/capability.txt
-rename to Documentation/block/capability.rst
-index 2f1729424ef4..2cf258d64bbe 100644
---- a/Documentation/block/capability.txt
-+++ b/Documentation/block/capability.rst
-@@ -1,15 +1,18 @@
-+===============================
- Generic Block Device Capability
--===============================================================================
-+===============================
-+
- This file documents the sysfs file block/<disk>/capability
- 
- capability is a hex word indicating which capabilities a specific disk
- supports.  For more information on bits not listed here, see
- include/linux/genhd.h
- 
--Capability				Value
---------------------------------------------------------------------------------
--GENHD_FL_MEDIA_CHANGE_NOTIFY		4
--	When this bit is set, the disk supports Asynchronous Notification
--	of media change events.  These events will be broadcast to user
--	space via kernel uevent.
-+GENHD_FL_MEDIA_CHANGE_NOTIFY
-+----------------------------
- 
-+Value: 4
-+
-+When this bit is set, the disk supports Asynchronous Notification
-+of media change events.  These events will be broadcast to user
-+space via kernel uevent.
-diff --git a/Documentation/block/cmdline-partition.txt b/Documentation/block/cmdline-partition.rst
-similarity index 92%
-rename from Documentation/block/cmdline-partition.txt
-rename to Documentation/block/cmdline-partition.rst
-index 760a3f7c3ed4..530bedff548a 100644
---- a/Documentation/block/cmdline-partition.txt
-+++ b/Documentation/block/cmdline-partition.rst
-@@ -1,5 +1,6 @@
-+==============================================
- Embedded device command line partition parsing
--=====================================================================
-+==============================================
- 
- The "blkdevparts" command line option adds support for reading the
- block device partition table from the kernel command line.
-@@ -22,12 +23,15 @@ blkdevparts=<blkdev-def>[;<blkdev-def>]
- <size>
-     partition size, in bytes, such as: 512, 1m, 1G.
-     size may contain an optional suffix of (upper or lower case):
-+
-       K, M, G, T, P, E.
-+
-     "-" is used to denote all remaining space.
- 
- <offset>
-     partition start address, in bytes.
-     offset may contain an optional suffix of (upper or lower case):
-+
-       K, M, G, T, P, E.
- 
- (part-name)
-@@ -36,11 +40,14 @@ blkdevparts=<blkdev-def>[;<blkdev-def>]
-     User space application can access partition by partition name.
- 
- Example:
-+
-     eMMC disk names are "mmcblk0" and "mmcblk0boot0".
- 
--  bootargs:
-+  bootargs::
-+
-     'blkdevparts=mmcblk0:1G(data0),1G(data1),-;mmcblk0boot0:1m(boot),-(kernel)'
- 
--  dmesg:
-+  dmesg::
-+
-     mmcblk0: p1(data0) p2(data1) p3()
-     mmcblk0boot0: p1(boot) p2(kernel)
-diff --git a/Documentation/block/data-integrity.txt b/Documentation/block/data-integrity.rst
-similarity index 91%
-rename from Documentation/block/data-integrity.txt
-rename to Documentation/block/data-integrity.rst
-index 934c44ea0c57..4f2452a95c43 100644
---- a/Documentation/block/data-integrity.txt
-+++ b/Documentation/block/data-integrity.rst
-@@ -1,5 +1,9 @@
------------------------------------------------------------------------
--1. INTRODUCTION
-+﻿==============
-+Data Integrity
-+==============
-+
-+1. Introduction
-+===============
- 
- Modern filesystems feature checksumming of data and metadata to
- protect against data corruption.  However, the detection of the
-@@ -28,8 +32,8 @@ integrity of the I/O and reject it if corruption is detected.  This
- allows not only corruption prevention but also isolation of the point
- of failure.
- 
------------------------------------------------------------------------
--2. THE DATA INTEGRITY EXTENSIONS
-+2. The Data Integrity Extensions
-+================================
- 
- As written, the protocol extensions only protect the path between
- controller and storage device.  However, many controllers actually
-@@ -75,8 +79,8 @@ Extensions.  As these extensions are outside the scope of the protocol
- bodies (T10, T13), Oracle and its partners are trying to standardize
- them within the Storage Networking Industry Association.
- 
------------------------------------------------------------------------
--3. KERNEL CHANGES
-+3. Kernel Changes
-+=================
- 
- The data integrity framework in Linux enables protection information
- to be pinned to I/Os and sent to/received from controllers that
-@@ -123,10 +127,11 @@ access to manipulate the tags from user space.  A passthrough
- interface for this is being worked on.
- 
- 
------------------------------------------------------------------------
--4. BLOCK LAYER IMPLEMENTATION DETAILS
-+4. Block Layer Implementation Details
-+=====================================
- 
--4.1 BIO
-+4.1 Bio
-+-------
- 
- The data integrity patches add a new field to struct bio when
- CONFIG_BLK_DEV_INTEGRITY is enabled.  bio_integrity(bio) returns a
-@@ -145,7 +150,8 @@ attached using bio_integrity_add_page().
- bio_free() will automatically free the bip.
- 
- 
--4.2 BLOCK DEVICE
-+4.2 Block Device
-+----------------
- 
- Because the format of the protection data is tied to the physical
- disk, each block device has been extended with a block integrity
-@@ -163,10 +169,11 @@ and MD linear, RAID0 and RAID1 are currently supported.  RAID4/5/6
- will require extra work due to the application tag.
- 
- 
------------------------------------------------------------------------
--5.0 BLOCK LAYER INTEGRITY API
-+5.0 Block Layer Integrity API
-+=============================
- 
--5.1 NORMAL FILESYSTEM
-+5.1 Normal Filesystem
-+---------------------
- 
-     The normal filesystem is unaware that the underlying block device
-     is capable of sending/receiving integrity metadata.  The IMD will
-@@ -174,25 +181,26 @@ will require extra work due to the application tag.
-     in case of a WRITE.  A READ request will cause the I/O integrity
-     to be verified upon completion.
- 
--    IMD generation and verification can be toggled using the
-+    IMD generation and verification can be toggled using the::
- 
-       /sys/block/<bdev>/integrity/write_generate
- 
--    and
-+    and::
- 
-       /sys/block/<bdev>/integrity/read_verify
- 
-     flags.
- 
- 
--5.2 INTEGRITY-AWARE FILESYSTEM
-+5.2 Integrity-Aware Filesystem
-+------------------------------
- 
-     A filesystem that is integrity-aware can prepare I/Os with IMD
-     attached.  It can also use the application tag space if this is
-     supported by the block device.
- 
- 
--    bool bio_integrity_prep(bio);
-+    `bool bio_integrity_prep(bio);`
- 
-       To generate IMD for WRITE and to set up buffers for READ, the
-       filesystem must call bio_integrity_prep(bio).
-@@ -204,14 +212,15 @@ will require extra work due to the application tag.
-       Complete bio with error if prepare failed for some reson.
- 
- 
--5.3 PASSING EXISTING INTEGRITY METADATA
-+5.3 Passing Existing Integrity Metadata
-+---------------------------------------
- 
-     Filesystems that either generate their own integrity metadata or
-     are capable of transferring IMD from user space can use the
-     following calls:
- 
- 
--    struct bip * bio_integrity_alloc(bio, gfp_mask, nr_pages);
-+    `struct bip * bio_integrity_alloc(bio, gfp_mask, nr_pages);`
- 
-       Allocates the bio integrity payload and hangs it off of the bio.
-       nr_pages indicate how many pages of protection data need to be
-@@ -220,7 +229,7 @@ will require extra work due to the application tag.
-       The integrity payload will be freed at bio_free() time.
- 
- 
--    int bio_integrity_add_page(bio, page, len, offset);
-+    `int bio_integrity_add_page(bio, page, len, offset);`
- 
-       Attaches a page containing integrity metadata to an existing
-       bio.  The bio must have an existing bip,
-@@ -241,21 +250,21 @@ will require extra work due to the application tag.
-       integrity upon completion.
- 
- 
--5.4 REGISTERING A BLOCK DEVICE AS CAPABLE OF EXCHANGING INTEGRITY
--    METADATA
-+5.4 Registering A Block Device As Capable Of Exchanging Integrity Metadata
-+--------------------------------------------------------------------------
- 
-     To enable integrity exchange on a block device the gendisk must be
-     registered as capable:
- 
--    int blk_integrity_register(gendisk, blk_integrity);
-+    `int blk_integrity_register(gendisk, blk_integrity);`
- 
-       The blk_integrity struct is a template and should contain the
--      following:
-+      following::
- 
-         static struct blk_integrity my_profile = {
-             .name                   = "STANDARDSBODY-TYPE-VARIANT-CSUM",
-             .generate_fn            = my_generate_fn,
--       	    .verify_fn              = my_verify_fn,
-+	    .verify_fn              = my_verify_fn,
- 	    .tuple_size             = sizeof(struct my_tuple_size),
- 	    .tag_size               = <tag bytes per hw sector>,
-         };
-@@ -278,4 +287,5 @@ will require extra work due to the application tag.
-       0 depending on the value of the Control Mode Page ATO bit.
- 
- ----------------------------------------------------------------------
-+
- 2007-12-24 Martin K. Petersen <martin.petersen@oracle.com>
-diff --git a/Documentation/block/deadline-iosched.txt b/Documentation/block/deadline-iosched.rst
-similarity index 89%
-rename from Documentation/block/deadline-iosched.txt
-rename to Documentation/block/deadline-iosched.rst
-index 2d82c80322cb..9f5c5a4c370e 100644
---- a/Documentation/block/deadline-iosched.txt
-+++ b/Documentation/block/deadline-iosched.rst
-@@ -1,3 +1,4 @@
-+==============================
- Deadline IO scheduler tunables
- ==============================
- 
-@@ -7,15 +8,13 @@ of interest to power users.
- 
- Selecting IO schedulers
- -----------------------
--Refer to Documentation/block/switching-sched.txt for information on
-+Refer to Documentation/block/switching-sched.rst for information on
- selecting an io scheduler on a per-device basis.
- 
--
--********************************************************************************
--
-+------------------------------------------------------------------------------
- 
- read_expire	(in ms)
-------------
-+-----------------------
- 
- The goal of the deadline io scheduler is to attempt to guarantee a start
- service time for a request. As we focus mainly on read latencies, this is
-@@ -25,15 +24,15 @@ milliseconds.
- 
- 
- write_expire	(in ms)
-------------
-+-----------------------
- 
- Similar to read_expire mentioned above, but for writes.
- 
- 
- fifo_batch	(number of requests)
------------
-+------------------------------------
- 
--Requests are grouped into ``batches'' of a particular data direction (read or
-+Requests are grouped into ``batches`` of a particular data direction (read or
- write) which are serviced in increasing sector order.  To limit extra seeking,
- deadline expiries are only checked between batches.  fifo_batch controls the
- maximum number of requests per batch.
-@@ -45,7 +44,7 @@ generally improves throughput, at the cost of latency variation.
- 
- 
- writes_starved	(number of dispatches)
----------------
-+--------------------------------------
- 
- When we have to move requests from the io scheduler queue to the block
- device dispatch queue, we always give a preference to reads. However, we
-@@ -56,7 +55,7 @@ same criteria as reads.
- 
- 
- front_merges	(bool)
--------------
-+----------------------
- 
- Sometimes it happens that a request enters the io scheduler that is contiguous
- with a request that is already on the queue. Either it fits in the back of that
-@@ -71,5 +70,3 @@ rbtree front sector lookup when the io scheduler merge function is called.
- 
- 
- Nov 11 2002, Jens Axboe <jens.axboe@oracle.com>
--
--
-diff --git a/Documentation/block/index.rst b/Documentation/block/index.rst
+  ftp://metalab.unc.edu/pub/Linux/utils/disk-management/
+ 
+ Reporting problems about the floppy driver
+ ==========================================
+ 
+- If you have a question or a bug report about the floppy driver, mail
++If you have a question or a bug report about the floppy driver, mail
+ me at Alain.Knaff@poboxes.com . If you post to Usenet, preferably use
+ comp.os.linux.hardware. As the volume in these groups is rather high,
+ be sure to include the word "floppy" (or "FLOPPY") in the subject
+ line.  If the reported problem happens when mounting floppy disks, be
+ sure to mention also the type of the filesystem in the subject line.
+ 
+- Be sure to read the FAQ before mailing/posting any bug reports!
++Be sure to read the FAQ before mailing/posting any bug reports!
+ 
+- Alain
++Alain
+ 
+ Changelog
+ =========
+ 
+-10-30-2004 :	Cleanup, updating, add reference to module configuration.
++10-30-2004 :
++		Cleanup, updating, add reference to module configuration.
+ 		James Nelson <james4765@gmail.com>
+ 
+-6-3-2000 :	Original Document
++6-3-2000 :
++		Original Document
+diff --git a/Documentation/blockdev/index.rst b/Documentation/blockdev/index.rst
 new file mode 100644
-index 000000000000..8cd226a0e86e
+index 000000000000..a9af6ed8b4aa
 --- /dev/null
-+++ b/Documentation/block/index.rst
-@@ -0,0 +1,25 @@
++++ b/Documentation/blockdev/index.rst
+@@ -0,0 +1,16 @@
 +:orphan:
 +
-+=====
-+Block
-+=====
++===========================
++The Linux RapidIO Subsystem
++===========================
 +
 +.. toctree::
 +   :maxdepth: 1
 +
-+   bfq-iosched
-+   biodoc
-+   biovecs
-+   capability
-+   cmdline-partition
-+   data-integrity
-+   deadline-iosched
-+   ioprio
-+   kyber-iosched
-+   null_blk
-+   pr
-+   queue-sysfs
-+   request
-+   stat
-+   switching-sched
-+   writeback_cache_control
-diff --git a/Documentation/block/ioprio.txt b/Documentation/block/ioprio.rst
-similarity index 75%
-rename from Documentation/block/ioprio.txt
-rename to Documentation/block/ioprio.rst
-index 8ed8c59380b4..f72b0de65af7 100644
---- a/Documentation/block/ioprio.txt
-+++ b/Documentation/block/ioprio.rst
++   floppy
++   nbd
++   paride
++   ramdisk
++   zram
++
++   drbd/index
+diff --git a/Documentation/blockdev/nbd.txt b/Documentation/blockdev/nbd.rst
+similarity index 96%
+rename from Documentation/blockdev/nbd.txt
+rename to Documentation/blockdev/nbd.rst
+index db242ea2bce8..d78dfe559dcf 100644
+--- a/Documentation/blockdev/nbd.txt
++++ b/Documentation/blockdev/nbd.rst
 @@ -1,3 +1,4 @@
-+===================
- Block io priorities
- ===================
++==================================
+ Network Block Device (TCP version)
+ ==================================
  
-@@ -40,81 +41,81 @@ class data, since it doesn't really apply here.
- Tools
- -----
+@@ -28,4 +29,3 @@ max_part
  
--See below for a sample ionice tool. Usage:
-+See below for a sample ionice tool. Usage::
+ nbds_max
+ 	Number of block devices that should be initialized (default: 16).
+-
+diff --git a/Documentation/blockdev/paride.txt b/Documentation/blockdev/paride.rst
+similarity index 81%
+rename from Documentation/blockdev/paride.txt
+rename to Documentation/blockdev/paride.rst
+index ee6717e3771d..87b4278bf314 100644
+--- a/Documentation/blockdev/paride.txt
++++ b/Documentation/blockdev/paride.rst
+@@ -1,15 +1,17 @@
+-
+-		Linux and parallel port IDE devices
++===================================
++Linux and parallel port IDE devices
++===================================
  
--# ionice -c<class> -n<level> -p<pid>
-+	# ionice -c<class> -n<level> -p<pid>
+ PARIDE v1.03   (c) 1997-8  Grant Guenther <grant@torque.net>
  
- If pid isn't given, the current process is assumed. IO priority settings
- are inherited on fork, so you can use ionice to start the process at a given
--level:
-+level::
+ 1. Introduction
++===============
  
--# ionice -c2 -n0 /bin/ls
-+	# ionice -c2 -n0 /bin/ls
+ Owing to the simplicity and near universality of the parallel port interface
+ to personal computers, many external devices such as portable hard-disk,
+ CD-ROM, LS-120 and tape drives use the parallel port to connect to their
+ host computer.  While some devices (notably scanners) use ad-hoc methods
+-to pass commands and data through the parallel port interface, most 
++to pass commands and data through the parallel port interface, most
+ external devices are actually identical to an internal model, but with
+ a parallel-port adapter chip added in.  Some of the original parallel port
+ adapters were little more than mechanisms for multiplexing a SCSI bus.
+@@ -28,47 +30,50 @@ were to open up a parallel port CD-ROM drive, for instance, one would
+ find a standard ATAPI CD-ROM drive, a power supply, and a single adapter
+ that interconnected a standard PC parallel port cable and a standard
+ IDE cable.  It is usually possible to exchange the CD-ROM device with
+-any other device using the IDE interface. 
++any other device using the IDE interface.
  
- will run ls at the best-effort scheduling class at the highest priority.
--For a running process, you can give the pid instead:
-+For a running process, you can give the pid instead::
+ The document describes the support in Linux for parallel port IDE
+ devices.  It does not cover parallel port SCSI devices, "ditto" tape
+-drives or scanners.  Many different devices are supported by the 
++drives or scanners.  Many different devices are supported by the
+ parallel port IDE subsystem, including:
  
--# ionice -c1 -n2 -p100
-+	# ionice -c1 -n2 -p100
+-	MicroSolutions backpack CD-ROM
+-	MicroSolutions backpack PD/CD
+-	MicroSolutions backpack hard-drives
+-	MicroSolutions backpack 8000t tape drive
+-	SyQuest EZ-135, EZ-230 & SparQ drives
+-	Avatar Shark
+-	Imation Superdisk LS-120
+-	Maxell Superdisk LS-120
+-	FreeCom Power CD 
+-	Hewlett-Packard 5GB and 8GB tape drives
+-	Hewlett-Packard 7100 and 7200 CD-RW drives
++	- MicroSolutions backpack CD-ROM
++	- MicroSolutions backpack PD/CD
++	- MicroSolutions backpack hard-drives
++	- MicroSolutions backpack 8000t tape drive
++	- SyQuest EZ-135, EZ-230 & SparQ drives
++	- Avatar Shark
++	- Imation Superdisk LS-120
++	- Maxell Superdisk LS-120
++	- FreeCom Power CD
++	- Hewlett-Packard 5GB and 8GB tape drives
++	- Hewlett-Packard 7100 and 7200 CD-RW drives
  
- will change pid 100 to run at the realtime scheduling class, at priority 2.
+ as well as most of the clone and no-name products on the market.
  
-----> snip ionice.c tool <---
-+ionice.c tool::
+ To support such a wide range of devices, PARIDE, the parallel port IDE
+ subsystem, is actually structured in three parts.   There is a base
+ paride module which provides a registry and some common methods for
+-accessing the parallel ports.  The second component is a set of 
+-high-level drivers for each of the different types of supported devices: 
++accessing the parallel ports.  The second component is a set of
++high-level drivers for each of the different types of supported devices:
  
--#include <stdio.h>
--#include <stdlib.h>
--#include <errno.h>
--#include <getopt.h>
--#include <unistd.h>
--#include <sys/ptrace.h>
--#include <asm/unistd.h>
-+  #include <stdio.h>
-+  #include <stdlib.h>
-+  #include <errno.h>
-+  #include <getopt.h>
-+  #include <unistd.h>
-+  #include <sys/ptrace.h>
-+  #include <asm/unistd.h>
++	===	=============
+ 	pd	IDE disk
+ 	pcd	ATAPI CD-ROM
+ 	pf	ATAPI disk
+ 	pt	ATAPI tape
+ 	pg	ATAPI generic
++	===	=============
  
--extern int sys_ioprio_set(int, int, int);
--extern int sys_ioprio_get(int, int);
-+  extern int sys_ioprio_set(int, int, int);
-+  extern int sys_ioprio_get(int, int);
+ (Currently, the pg driver is only used with CD-R drives).
  
--#if defined(__i386__)
--#define __NR_ioprio_set		289
--#define __NR_ioprio_get		290
--#elif defined(__ppc__)
--#define __NR_ioprio_set		273
--#define __NR_ioprio_get		274
--#elif defined(__x86_64__)
--#define __NR_ioprio_set		251
--#define __NR_ioprio_get		252
--#elif defined(__ia64__)
--#define __NR_ioprio_set		1274
--#define __NR_ioprio_get		1275
--#else
--#error "Unsupported arch"
--#endif
-+  #if defined(__i386__)
-+  #define __NR_ioprio_set		289
-+  #define __NR_ioprio_get		290
-+  #elif defined(__ppc__)
-+  #define __NR_ioprio_set		273
-+  #define __NR_ioprio_get		274
-+  #elif defined(__x86_64__)
-+  #define __NR_ioprio_set		251
-+  #define __NR_ioprio_get		252
-+  #elif defined(__ia64__)
-+  #define __NR_ioprio_set		1274
-+  #define __NR_ioprio_get		1275
-+  #else
-+  #error "Unsupported arch"
-+  #endif
+ The high-level drivers function according to the relevant standards.
+ The third component of PARIDE is a set of low-level protocol drivers
+ for each of the parallel port IDE adapter chips.  Thanks to the interest
+-and encouragement of Linux users from many parts of the world, 
++and encouragement of Linux users from many parts of the world,
+ support is available for almost all known adapter protocols:
  
--static inline int ioprio_set(int which, int who, int ioprio)
--{
-+  static inline int ioprio_set(int which, int who, int ioprio)
-+  {
- 	return syscall(__NR_ioprio_set, which, who, ioprio);
++	====    ====================================== ====
+         aten    ATEN EH-100                            (HK)
+         bpck    Microsolutions backpack                (US)
+         comm    DataStor (old-type) "commuter" adapter (TW)
+@@ -83,9 +88,11 @@ support is available for almost all known adapter protocols:
+ 	ktti    KT Technology PHd adapter              (SG)
+         on20    OnSpec 90c20                           (US)
+         on26    OnSpec 90c26                           (US)
++	====    ====================================== ====
+ 
+ 
+ 2. Using the PARIDE subsystem
++=============================
+ 
+ While configuring the Linux kernel, you may choose either to build
+ the PARIDE drivers into your kernel, or to build them as modules.
+@@ -94,10 +101,10 @@ In either case, you will need to select "Parallel port IDE device support"
+ as well as at least one of the high-level drivers and at least one
+ of the parallel port communication protocols.  If you do not know
+ what kind of parallel port adapter is used in your drive, you could
+-begin by checking the file names and any text files on your DOS 
++begin by checking the file names and any text files on your DOS
+ installation floppy.  Alternatively, you can look at the markings on
+ the adapter chip itself.  That's usually sufficient to identify the
+-correct device.  
++correct device.
+ 
+ You can actually select all the protocol modules, and allow the PARIDE
+ subsystem to try them all for you.
+@@ -105,8 +112,9 @@ subsystem to try them all for you.
+ For the "brand-name" products listed above, here are the protocol
+ and high-level drivers that you would use:
+ 
++	================	============	======	========
+ 	Manufacturer		Model		Driver	Protocol
+-	
++	================	============	======	========
+ 	MicroSolutions		CD-ROM		pcd	bpck
+ 	MicroSolutions		PD drive	pf	bpck
+ 	MicroSolutions		hard-drive	pd	bpck
+@@ -119,8 +127,10 @@ and high-level drivers that you would use:
+ 	Hewlett-Packard		5GB Tape	pt	epat
+ 	Hewlett-Packard		7200e (CD)	pcd	epat
+ 	Hewlett-Packard		7200e (CD-R)	pg	epat
++	================	============	======	========
+ 
+ 2.1  Configuring built-in drivers
++---------------------------------
+ 
+ We recommend that you get to know how the drivers work and how to
+ configure them as loadable modules, before attempting to compile a
+@@ -143,7 +153,7 @@ protocol identification number and, for some devices, the drive's
+ chain ID.  While your system is booting, a number of messages are
+ displayed on the console.  Like all such messages, they can be
+ reviewed with the 'dmesg' command.  Among those messages will be
+-some lines like:
++some lines like::
+ 
+ 	paride: bpck registered as protocol 0
+ 	paride: epat registered as protocol 1
+@@ -158,10 +168,10 @@ the last two digits of the drive's serial number (but read MicroSolutions'
+ documentation about this).
+ 
+ As an example, let's assume that you have a MicroSolutions PD/CD drive
+-with unit ID number 36 connected to the parallel port at 0x378, a SyQuest 
+-EZ-135 connected to the chained port on the PD/CD drive and also an 
+-Imation Superdisk connected to port 0x278.  You could give the following 
+-options on your boot command:
++with unit ID number 36 connected to the parallel port at 0x378, a SyQuest
++EZ-135 connected to the chained port on the PD/CD drive and also an
++Imation Superdisk connected to port 0x278.  You could give the following
++options on your boot command::
+ 
+ 	pd.drive0=0x378,1 pf.drive0=0x278,1 pf.drive1=0x378,0,36
+ 
+@@ -169,24 +179,27 @@ In the last option, pf.drive1 configures device /dev/pf1, the 0x378
+ is the parallel port base address, the 0 is the protocol registration
+ number and 36 is the chain ID.
+ 
+-Please note:  while PARIDE will work both with and without the 
++Please note:  while PARIDE will work both with and without the
+ PARPORT parallel port sharing system that is included by the
+ "Parallel port support" option, PARPORT must be included and enabled
+ if you want to use chains of devices on the same parallel port.
+ 
+ 2.2  Loading and configuring PARIDE as modules
++----------------------------------------------
+ 
+ It is much faster and simpler to get to understand the PARIDE drivers
+-if you use them as loadable kernel modules.   
++if you use them as loadable kernel modules.
+ 
+-Note 1:  using these drivers with the "kerneld" automatic module loading
+-system is not recommended for beginners, and is not documented here.  
++Note 1:
++	using these drivers with the "kerneld" automatic module loading
++	system is not recommended for beginners, and is not documented here.
+ 
+-Note 2:  if you build PARPORT support as a loadable module, PARIDE must
+-also be built as loadable modules, and PARPORT must be loaded before the
+-PARIDE modules.
++Note 2:
++	if you build PARPORT support as a loadable module, PARIDE must
++	also be built as loadable modules, and PARPORT must be loaded before
++	the PARIDE modules.
+ 
+-To use PARIDE, you must begin by 
++To use PARIDE, you must begin by::
+ 
+ 	insmod paride
+ 
+@@ -195,8 +208,8 @@ among other tasks.
+ 
+ Then, load as many of the protocol modules as you think you might need.
+ As you load each module, it will register the protocols that it supports,
+-and print a log message to your kernel log file and your console. For 
+-example:
++and print a log message to your kernel log file and your console. For
++example::
+ 
+ 	# insmod epat
+ 	paride: epat registered as protocol 0
+@@ -205,22 +218,22 @@ example:
+         paride: k971 registered as protocol 2
+ 
+ Finally, you can load high-level drivers for each kind of device that
+-you have connected.  By default, each driver will autoprobe for a single 
++you have connected.  By default, each driver will autoprobe for a single
+ device, but you can support up to four similar devices by giving their
+ individual co-ordinates when you load the driver.
+ 
+ For example, if you had two no-name CD-ROM drives both using the
+ KingByte KBIC-951A adapter, one on port 0x378 and the other on 0x3bc
+-you could give the following command:
++you could give the following command::
+ 
+ 	# insmod pcd drive0=0x378,1 drive1=0x3bc,1
+ 
+ For most adapters, giving a port address and protocol number is sufficient,
+-but check the source files in linux/drivers/block/paride for more 
++but check the source files in linux/drivers/block/paride for more
+ information.  (Hopefully someone will write some man pages one day !).
+ 
+ As another example, here's what happens when PARPORT is installed, and
+-a SyQuest EZ-135 is attached to port 0x378:
++a SyQuest EZ-135 is attached to port 0x378::
+ 
+ 	# insmod paride
+ 	paride: version 1.0 installed
+@@ -237,46 +250,47 @@ Note that the last line is the output from the generic partition table
+ scanner - in this case it reports that it has found a disk with one partition.
+ 
+ 2.3  Using a PARIDE device
++--------------------------
+ 
+ Once the drivers have been loaded, you can access PARIDE devices in the
+ same way as their traditional counterparts.  You will probably need to
+ create the device "special files".  Here is a simple script that you can
+-cut to a file and execute:
++cut to a file and execute::
+ 
+-#!/bin/bash
+-#
+-# mkd -- a script to create the device special files for the PARIDE subsystem
+-#
+-function mkdev {
+-  mknod $1 $2 $3 $4 ; chmod 0660 $1 ; chown root:disk $1
 -}
-+  }
- 
--static inline int ioprio_get(int which, int who)
--{
-+  static inline int ioprio_get(int which, int who)
-+  {
- 	return syscall(__NR_ioprio_get, which, who);
+-#
+-function pd {
+-  D=$( printf \\$( printf "x%03x" $[ $1 + 97 ] ) )
+-  mkdev pd$D b 45 $[ $1 * 16 ]
+-  for P in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+-  do mkdev pd$D$P b 45 $[ $1 * 16 + $P ]
+-  done
 -}
+-#
+-cd /dev
+-#
+-for u in 0 1 2 3 ; do pd $u ; done
+-for u in 0 1 2 3 ; do mkdev pcd$u b 46 $u ; done 
+-for u in 0 1 2 3 ; do mkdev pf$u  b 47 $u ; done 
+-for u in 0 1 2 3 ; do mkdev pt$u  c 96 $u ; done 
+-for u in 0 1 2 3 ; do mkdev npt$u c 96 $[ $u + 128 ] ; done 
+-for u in 0 1 2 3 ; do mkdev pg$u  c 97 $u ; done 
+-#
+-# end of mkd
++  #!/bin/bash
++  #
++  # mkd -- a script to create the device special files for the PARIDE subsystem
++  #
++  function mkdev {
++    mknod $1 $2 $3 $4 ; chmod 0660 $1 ; chown root:disk $1
 +  }
- 
--enum {
-+  enum {
- 	IOPRIO_CLASS_NONE,
- 	IOPRIO_CLASS_RT,
- 	IOPRIO_CLASS_BE,
- 	IOPRIO_CLASS_IDLE,
--};
-+  };
- 
--enum {
-+  enum {
- 	IOPRIO_WHO_PROCESS = 1,
- 	IOPRIO_WHO_PGRP,
- 	IOPRIO_WHO_USER,
--};
-+  };
- 
--#define IOPRIO_CLASS_SHIFT	13
-+  #define IOPRIO_CLASS_SHIFT	13
- 
--const char *to_prio[] = { "none", "realtime", "best-effort", "idle", };
-+  const char *to_prio[] = { "none", "realtime", "best-effort", "idle", };
- 
--int main(int argc, char *argv[])
--{
-+  int main(int argc, char *argv[])
-+  {
- 	int ioprio = 4, set = 0, ioprio_class = IOPRIO_CLASS_BE;
- 	int c, pid = 0;
- 
-@@ -175,9 +176,7 @@ int main(int argc, char *argv[])
- 	}
- 
- 	return 0;
--}
--
-----> snip ionice.c tool <---
++  #
++  function pd {
++    D=$( printf \\$( printf "x%03x" $[ $1 + 97 ] ) )
++    mkdev pd$D b 45 $[ $1 * 16 ]
++    for P in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
++    do mkdev pd$D$P b 45 $[ $1 * 16 + $P ]
++    done
 +  }
- 
- 
- March 11 2005, Jens Axboe <jens.axboe@oracle.com>
-diff --git a/Documentation/block/kyber-iosched.txt b/Documentation/block/kyber-iosched.rst
-similarity index 86%
-rename from Documentation/block/kyber-iosched.txt
-rename to Documentation/block/kyber-iosched.rst
-index e94feacd7edc..3e164dd0617c 100644
---- a/Documentation/block/kyber-iosched.txt
-+++ b/Documentation/block/kyber-iosched.rst
-@@ -1,5 +1,6 @@
-+============================
- Kyber I/O scheduler tunables
--===========================
-+============================
- 
- The only two tunables for the Kyber scheduler are the target latencies for
- reads and synchronous writes. Kyber will throttle requests in order to meet
-diff --git a/Documentation/block/null_blk.txt b/Documentation/block/null_blk.rst
-similarity index 60%
-rename from Documentation/block/null_blk.txt
-rename to Documentation/block/null_blk.rst
-index 41f0a3d33bbd..31451d80783c 100644
---- a/Documentation/block/null_blk.txt
-+++ b/Documentation/block/null_blk.rst
-@@ -1,33 +1,43 @@
-+========================
- Null block device driver
--================================================================================
-+========================
- 
--I. Overview
-+1. Overview
-+===========
- 
- The null block device (/dev/nullb*) is used for benchmarking the various
- block-layer implementations. It emulates a block device of X gigabytes in size.
- The following instances are possible:
- 
-   Single-queue block-layer
-+
-     - Request-based.
-     - Single submission queue per device.
-     - Implements IO scheduling algorithms (CFQ, Deadline, noop).
-+
-   Multi-queue block-layer
-+
-     - Request-based.
-     - Configurable submission queues per device.
-+
-   No block-layer (Known as bio-based)
-+
-     - Bio-based. IO requests are submitted directly to the device driver.
-     - Directly accepts bio data structure and returns them.
- 
- All of them have a completion queue for each core in the system.
- 
--II. Module parameters applicable for all instances:
-+2. Module parameters applicable for all instances
-+=================================================
- 
- queue_mode=[0-2]: Default: 2-Multi-queue
-   Selects which block-layer the module should instantiate with.
- 
--  0: Bio-based.
--  1: Single-queue.
--  2: Multi-queue.
-+  =  ============
-+  0  Bio-based
-+  1  Single-queue
-+  2  Multi-queue
-+  =  ============
- 
- home_node=[0--nr_nodes]: Default: NUMA_NO_NODE
-   Selects what CPU node the data structures are allocated from.
-@@ -45,12 +55,14 @@ nr_devices=[Number of devices]: Default: 1
- irqmode=[0-2]: Default: 1-Soft-irq
-   The completion mode used for completing IOs to the block-layer.
- 
--  0: None.
--  1: Soft-irq. Uses IPI to complete IOs across CPU nodes. Simulates the overhead
-+  =  ===========================================================================
-+  0  None.
-+  1  Soft-irq. Uses IPI to complete IOs across CPU nodes. Simulates the overhead
-      when IOs are issued from another CPU node than the home the device is
-      connected to.
--  2: Timer: Waits a specific period (completion_nsec) for each IO before
-+  2  Timer: Waits a specific period (completion_nsec) for each IO before
-      completion.
-+  =  ===========================================================================
- 
- completion_nsec=[ns]: Default: 10,000ns
-   Combined with irqmode=2 (timer). The time each completion event must wait.
-@@ -66,30 +78,45 @@ hw_queue_depth=[0..qdepth]: Default: 64
- III: Multi-queue specific parameters
- 
- use_per_node_hctx=[0/1]: Default: 0
--  0: The number of submit queues are set to the value of the submit_queues
-+
-+  =  =====================================================================
-+  0  The number of submit queues are set to the value of the submit_queues
-      parameter.
--  1: The multi-queue block layer is instantiated with a hardware dispatch
-+  1  The multi-queue block layer is instantiated with a hardware dispatch
-      queue for each CPU node in the system.
-+  =  =====================================================================
- 
- no_sched=[0/1]: Default: 0
--  0: nullb* use default blk-mq io scheduler.
--  1: nullb* doesn't use io scheduler.
-+
-+  =  ======================================
-+  0  nullb* use default blk-mq io scheduler
-+  1  nullb* doesn't use io scheduler
-+  =  ======================================
- 
- blocking=[0/1]: Default: 0
--  0: Register as a non-blocking blk-mq driver device.
--  1: Register as a blocking blk-mq driver device, null_blk will set
-+
-+  =  ===============================================================
-+  0  Register as a non-blocking blk-mq driver device.
-+  1  Register as a blocking blk-mq driver device, null_blk will set
-      the BLK_MQ_F_BLOCKING flag, indicating that it sometimes/always
-      needs to block in its ->queue_rq() function.
-+  =  ===============================================================
- 
- shared_tags=[0/1]: Default: 0
--  0: Tag set is not shared.
--  1: Tag set shared between devices for blk-mq. Only makes sense with
-+
-+  =  ================================================================
-+  0  Tag set is not shared.
-+  1  Tag set shared between devices for blk-mq. Only makes sense with
-      nr_devices > 1, otherwise there's no tag set to share.
-+  =  ================================================================
- 
- zoned=[0/1]: Default: 0
--  0: Block device is exposed as a random-access block device.
--  1: Block device is exposed as a host-managed zoned block device. Requires
-+
-+  =  ======================================================================
-+  0  Block device is exposed as a random-access block device.
-+  1  Block device is exposed as a host-managed zoned block device. Requires
-      CONFIG_BLK_DEV_ZONED.
-+  =  ======================================================================
- 
- zone_size=[MB]: Default: 256
-   Per zone size when exposed as a zoned block device. Must be a power of two.
-diff --git a/Documentation/block/pr.txt b/Documentation/block/pr.rst
-similarity index 93%
-rename from Documentation/block/pr.txt
-rename to Documentation/block/pr.rst
-index ac9b8e70e64b..30ea1c2e39eb 100644
---- a/Documentation/block/pr.txt
-+++ b/Documentation/block/pr.rst
-@@ -1,4 +1,4 @@
--
-+===============================================
- Block layer support for Persistent Reservations
- ===============================================
- 
-@@ -23,22 +23,18 @@ The following types of reservations are supported:
- --------------------------------------------------
- 
-  - PR_WRITE_EXCLUSIVE
--
- 	Only the initiator that owns the reservation can write to the
- 	device.  Any initiator can read from the device.
- 
-  - PR_EXCLUSIVE_ACCESS
--
- 	Only the initiator that owns the reservation can access the
- 	device.
- 
-  - PR_WRITE_EXCLUSIVE_REG_ONLY
--
- 	Only initiators with a registered key can write to the device,
- 	Any initiator can read from the device.
- 
-  - PR_EXCLUSIVE_ACCESS_REG_ONLY
--
- 	Only initiators with a registered key can access the device.
- 
-  - PR_WRITE_EXCLUSIVE_ALL_REGS
-@@ -48,21 +44,21 @@ The following types of reservations are supported:
- 	All initiators with a registered key are considered reservation
- 	holders.
- 	Please reference the SPC spec on the meaning of a reservation
--	holder if you want to use this type. 
-+	holder if you want to use this type.
- 
-  - PR_EXCLUSIVE_ACCESS_ALL_REGS
--
- 	Only initiators with a registered key can access the device.
- 	All initiators with a registered key are considered reservation
- 	holders.
- 	Please reference the SPC spec on the meaning of a reservation
--	holder if you want to use this type. 
-+	holder if you want to use this type.
- 
- 
- The following ioctl are supported:
- ----------------------------------
- 
- 1. IOC_PR_REGISTER
-+^^^^^^^^^^^^^^^^^^
- 
- This ioctl command registers a new reservation if the new_key argument
- is non-null.  If no existing reservation exists old_key must be zero,
-@@ -74,6 +70,7 @@ in old_key.
- 
- 
- 2. IOC_PR_RESERVE
-+^^^^^^^^^^^^^^^^^
- 
- This ioctl command reserves the device and thus restricts access for other
- devices based on the type argument.  The key argument must be the existing
-@@ -82,12 +79,14 @@ IOC_PR_REGISTER_IGNORE, IOC_PR_PREEMPT or IOC_PR_PREEMPT_ABORT commands.
- 
- 
- 3. IOC_PR_RELEASE
-+^^^^^^^^^^^^^^^^^
- 
- This ioctl command releases the reservation specified by key and flags
- and thus removes any access restriction implied by it.
- 
- 
- 4. IOC_PR_PREEMPT
-+^^^^^^^^^^^^^^^^^
- 
- This ioctl command releases the existing reservation referred to by
- old_key and replaces it with a new reservation of type for the
-@@ -95,11 +94,13 @@ reservation key new_key.
- 
- 
- 5. IOC_PR_PREEMPT_ABORT
-+^^^^^^^^^^^^^^^^^^^^^^^
- 
- This ioctl command works like IOC_PR_PREEMPT except that it also aborts
- any outstanding command sent over a connection identified by old_key.
- 
- 6. IOC_PR_CLEAR
-+^^^^^^^^^^^^^^^
- 
- This ioctl command unregisters both key and any other reservation key
- registered with the device and drops any existing reservation.
-@@ -111,7 +112,6 @@ Flags
- All the ioctls have a flag field.  Currently only one flag is supported:
- 
-  - PR_FL_IGNORE_KEY
--
- 	Ignore the existing reservation key.  This is commonly supported for
- 	IOC_PR_REGISTER, and some implementation may support the flag for
- 	IOC_PR_RESERVE.
-diff --git a/Documentation/block/queue-sysfs.txt b/Documentation/block/queue-sysfs.rst
-similarity index 99%
-rename from Documentation/block/queue-sysfs.txt
-rename to Documentation/block/queue-sysfs.rst
-index 83b457e24bba..9022249208b5 100644
---- a/Documentation/block/queue-sysfs.txt
-+++ b/Documentation/block/queue-sysfs.rst
-@@ -1,3 +1,4 @@
-+=================
- Queue sysfs files
- =================
- 
-@@ -10,7 +11,7 @@ Files denoted with a RO postfix are readonly and the RW postfix means
- read-write.
- 
- add_random (RW)
------------------
-+---------------
- This file allows to turn off the disk entropy contribution. Default
- value of this file is '1'(on).
- 
-@@ -21,13 +22,13 @@ used by CPU-addressable storage to bypass the pagecache.  It shows '1'
- if true, '0' if not.
- 
- discard_granularity (RO)
-------------------------
-+------------------------
- This shows the size of internal allocation of the device in bytes, if
- reported by the device. A value of '0' means device does not support
- the discard functionality.
- 
- discard_max_hw_bytes (RO)
------------------------
-+-------------------------
- Devices that support discard functionality may have internal limits on
- the number of bytes that can be trimmed or unmapped in a single operation.
- The discard_max_bytes parameter is set by the device driver to the maximum
-diff --git a/Documentation/block/request.txt b/Documentation/block/request.rst
-similarity index 59%
-rename from Documentation/block/request.txt
-rename to Documentation/block/request.rst
-index 754e104ed369..747021e1ffdb 100644
---- a/Documentation/block/request.txt
-+++ b/Documentation/block/request.rst
-@@ -1,26 +1,37 @@
--
-+============================
- struct request documentation
-+============================
- 
- Jens Axboe <jens.axboe@oracle.com> 27/05/02
- 
--1.0
--Index
- 
--2.0 Struct request members classification
-+.. FIXME:
-+   No idea about what does mean - seems just some noise, so comment it
- 
--	2.1 struct request members explanation
-+   1.0
-+   Index
-+
-+   2.0 Struct request members classification
-+
-+       2.1 struct request members explanation
-+
-+   3.0
-+
-+
-+   2.0
- 
--3.0
- 
- 
--2.0
- Short explanation of request members
-+====================================
- 
- Classification flags:
- 
-+	=	====================
- 	D	driver member
- 	B	block layer member
- 	I	I/O scheduler member
-+	=	====================
- 
- Unless an entry contains a D classification, a device driver must not access
- this member. Some members may contain D classifications, but should only be
-@@ -28,14 +39,13 @@ access through certain macros or functions (eg ->flags).
- 
- <linux/blkdev.h>
- 
--2.1
-+=============================== ======= =======================================
- Member				Flag	Comment
--------				----	-------
--
-+=============================== ======= =======================================
- struct list_head queuelist	BI	Organization on various internal
- 					queues
- 
--void *elevator_private		I	I/O scheduler private data
-+``void *elevator_private``	I	I/O scheduler private data
- 
- unsigned char cmd[16]		D	Driver can use this for setting up
- 					a cdb before execution, see
-@@ -71,18 +81,19 @@ unsigned int hard_cur_sectors	B	Used to keep current_nr_sectors sane
- 
- int tag				DB	TCQ tag, if assigned
- 
--void *special			D	Free to be used by driver
-+``void *special``		D	Free to be used by driver
- 
--char *buffer			D	Map of first segment, also see
-+``char *buffer``		D	Map of first segment, also see
- 					section on bouncing SECTION
- 
--struct completion *waiting	D	Can be used by driver to get signalled
-+``struct completion *waiting``	D	Can be used by driver to get signalled
- 					on request completion
- 
--struct bio *bio			DBI	First bio in request
-+``struct bio *bio``		DBI	First bio in request
- 
--struct bio *biotail		DBI	Last bio in request
-+``struct bio *biotail``		DBI	Last bio in request
- 
--struct request_queue *q		DB	Request queue this request belongs to
-+``struct request_queue *q``	DB	Request queue this request belongs to
- 
--struct request_list *rl		B	Request list this request came from
-+``struct request_list *rl``	B	Request list this request came from
-+=============================== ======= =======================================
-diff --git a/Documentation/block/stat.txt b/Documentation/block/stat.rst
-similarity index 89%
-rename from Documentation/block/stat.txt
-rename to Documentation/block/stat.rst
-index 0aace9cc536c..9c07bc22b0bc 100644
---- a/Documentation/block/stat.txt
-+++ b/Documentation/block/stat.rst
-@@ -1,3 +1,4 @@
-+===============================================
- Block layer statistics in /sys/block/<dev>/stat
- ===============================================
- 
-@@ -6,9 +7,12 @@ This file documents the contents of the /sys/block/<dev>/stat file.
- The stat file provides several statistics about the state of block
- device <dev>.
- 
--Q. Why are there multiple statistics in a single file?  Doesn't sysfs
-+Q.
-+   Why are there multiple statistics in a single file?  Doesn't sysfs
-    normally contain a single value per file?
--A. By having a single file, the kernel can guarantee that the statistics
-+
-+A.
-+   By having a single file, the kernel can guarantee that the statistics
-    represent a consistent snapshot of the state of the device.  If the
-    statistics were exported as multiple files containing one statistic
-    each, it would be impossible to guarantee that a set of readings
-@@ -18,8 +22,10 @@ The stat file consists of a single line of text containing 11 decimal
- values separated by whitespace.  The fields are summarized in the
- following table, and described in more detail below.
- 
-+
-+=============== ============= =================================================
- Name            units         description
------            -----         -----------
-+=============== ============= =================================================
- read I/Os       requests      number of read I/Os processed
- read merges     requests      number of read I/Os merged with in-queue I/O
- read sectors    sectors       number of sectors read
-@@ -35,6 +41,7 @@ discard I/Os    requests      number of discard I/Os processed
- discard merges  requests      number of discard I/Os merged with in-queue I/O
- discard sectors sectors       number of sectors discarded
- discard ticks   milliseconds  total wait time for discard requests
-+=============== ============= =================================================
- 
- read I/Os, write I/Os, discard I/0s
- ===================================
-diff --git a/Documentation/block/switching-sched.txt b/Documentation/block/switching-sched.rst
-similarity index 67%
-rename from Documentation/block/switching-sched.txt
-rename to Documentation/block/switching-sched.rst
-index 7977f6fb8b20..42042417380e 100644
---- a/Documentation/block/switching-sched.txt
-+++ b/Documentation/block/switching-sched.rst
-@@ -1,35 +1,39 @@
-+===================
-+Switching Scheduler
-+===================
-+
- To choose IO schedulers at boot time, use the argument 'elevator=deadline'.
- 'noop' and 'cfq' (the default) are also available. IO schedulers are assigned
- globally at boot time only presently.
- 
- Each io queue has a set of io scheduler tunables associated with it. These
- tunables control how the io scheduler works. You can find these entries
--in:
-+in::
- 
--/sys/block/<device>/queue/iosched
-+	/sys/block/<device>/queue/iosched
- 
- assuming that you have sysfs mounted on /sys. If you don't have sysfs mounted,
--you can do so by typing:
-+you can do so by typing::
- 
--# mount none /sys -t sysfs
-+	# mount none /sys -t sysfs
- 
- It is possible to change the IO scheduler for a given block device on
- the fly to select one of mq-deadline, none, bfq, or kyber schedulers -
- which can improve that device's throughput.
- 
--To set a specific scheduler, simply do this:
-+To set a specific scheduler, simply do this::
- 
--echo SCHEDNAME > /sys/block/DEV/queue/scheduler
-+	echo SCHEDNAME > /sys/block/DEV/queue/scheduler
- 
- where SCHEDNAME is the name of a defined IO scheduler, and DEV is the
- device name (hda, hdb, sga, or whatever you happen to have).
- 
- The list of defined schedulers can be found by simply doing
- a "cat /sys/block/DEV/queue/scheduler" - the list of valid names
--will be displayed, with the currently selected scheduler in brackets:
-+will be displayed, with the currently selected scheduler in brackets::
- 
--# cat /sys/block/sda/queue/scheduler
--[mq-deadline] kyber bfq none
--# echo none >/sys/block/sda/queue/scheduler
--# cat /sys/block/sda/queue/scheduler
--[none] mq-deadline kyber bfq
-+  # cat /sys/block/sda/queue/scheduler
-+  [mq-deadline] kyber bfq none
-+  # echo none >/sys/block/sda/queue/scheduler
-+  # cat /sys/block/sda/queue/scheduler
-+  [none] mq-deadline kyber bfq
-diff --git a/Documentation/block/writeback_cache_control.txt b/Documentation/block/writeback_cache_control.rst
-similarity index 94%
-rename from Documentation/block/writeback_cache_control.txt
-rename to Documentation/block/writeback_cache_control.rst
-index 8a6bdada5f6b..2c752c57c14c 100644
---- a/Documentation/block/writeback_cache_control.txt
-+++ b/Documentation/block/writeback_cache_control.rst
-@@ -1,6 +1,6 @@
--
-+==========================================
- Explicit volatile write back cache control
--=====================================
-+==========================================
- 
- Introduction
- ------------
-@@ -31,7 +31,7 @@ the blkdev_issue_flush() helper for a pure cache flush.
- 
- 
- Forced Unit Access
-------------------
++  #
++  cd /dev
++  #
++  for u in 0 1 2 3 ; do pd $u ; done
++  for u in 0 1 2 3 ; do mkdev pcd$u b 46 $u ; done
++  for u in 0 1 2 3 ; do mkdev pf$u  b 47 $u ; done
++  for u in 0 1 2 3 ; do mkdev pt$u  c 96 $u ; done
++  for u in 0 1 2 3 ; do mkdev npt$u c 96 $[ $u + 128 ] ; done
++  for u in 0 1 2 3 ; do mkdev pg$u  c 97 $u ; done
++  #
++  # end of mkd
+ 
+ With the device files and drivers in place, you can access PARIDE devices
+-like any other Linux device.   For example, to mount a CD-ROM in pcd0, use:
++like any other Linux device.   For example, to mount a CD-ROM in pcd0, use::
+ 
+ 	mount /dev/pcd0 /cdrom
+ 
+ If you have a fresh Avatar Shark cartridge, and the drive is pda, you
+-might do something like:
++might do something like::
+ 
+ 	fdisk /dev/pda		-- make a new partition table with
+ 				   partition 1 of type 83
+@@ -289,41 +303,46 @@ might do something like:
+ 
+ Devices like the Imation superdisk work in the same way, except that
+ they do not have a partition table.  For example to make a 120MB
+-floppy that you could share with a DOS system:
++floppy that you could share with a DOS system::
+ 
+ 	mkdosfs /dev/pf0
+ 	mount /dev/pf0 /mnt
+ 
+ 
+ 2.4  The pf driver
 +------------------
  
- The REQ_FUA flag can be OR ed into the r/w flags of a bio submitted from the
- filesystem and will make sure that I/O completion for this request is only
-@@ -62,14 +62,14 @@ flags themselves without any help from the block layer.
+ The pf driver is intended for use with parallel port ATAPI disk
+ devices.  The most common devices in this category are PD drives
+ and LS-120 drives.  Traditionally, media for these devices are not
+ partitioned.  Consequently, the pf driver does not support partitioned
+-media.  This may be changed in a future version of the driver. 
++media.  This may be changed in a future version of the driver.
+ 
+ 2.5  Using the pt driver
++------------------------
+ 
+ The pt driver for parallel port ATAPI tape drives is a minimal driver.
+-It does not yet support many of the standard tape ioctl operations. 
++It does not yet support many of the standard tape ioctl operations.
+ For best performance, a block size of 32KB should be used.  You will
+ probably want to set the parallel port delay to 0, if you can.
+ 
+ 2.6  Using the pg driver
++------------------------
+ 
+ The pg driver can be used in conjunction with the cdrecord program
+ to create CD-ROMs.  Please get cdrecord version 1.6.1 or later
+-from ftp://ftp.fokus.gmd.de/pub/unix/cdrecord/ .  To record CD-R media 
+-your parallel port should ideally be set to EPP mode, and the "port delay" 
+-should be set to 0.  With those settings it is possible to record at 2x 
++from ftp://ftp.fokus.gmd.de/pub/unix/cdrecord/ .  To record CD-R media
++your parallel port should ideally be set to EPP mode, and the "port delay"
++should be set to 0.  With those settings it is possible to record at 2x
+ speed without any buffer underruns.  If you cannot get the driver to work
+ in EPP mode, try to use "bidirectional" or "PS/2" mode and 1x speeds only.
  
  
- Implementation details for request_fn based block drivers
----------------------------------------------------------------
-+---------------------------------------------------------
+ 3. Troubleshooting
++==================
  
- For devices that do not support volatile write caches there is no driver
- support required, the block layer completes empty REQ_PREFLUSH requests before
- entering the driver and strips off the REQ_PREFLUSH and REQ_FUA bits from
- requests that have a payload.  For devices with volatile write caches the
- driver needs to tell the block layer that it supports flushing caches by
--doing:
-+doing::
+ 3.1  Use EPP mode if you can
++----------------------------
  
- 	blk_queue_write_cache(sdkp->disk->queue, true, false);
+ The most common problems that people report with the PARIDE drivers
+ concern the parallel port CMOS settings.  At this time, none of the
+@@ -332,6 +351,7 @@ If you are able to do so, please set your parallel port into EPP mode
+ using your CMOS setup procedure.
  
-@@ -77,7 +77,7 @@ and handle empty REQ_OP_FLUSH requests in its prep_fn/request_fn.  Note that
- REQ_PREFLUSH requests with a payload are automatically turned into a sequence
- of an empty REQ_OP_FLUSH request followed by the actual write by the block
- layer.  For devices that also support the FUA bit the block layer needs
--to be told to pass through the REQ_FUA bit using:
-+to be told to pass through the REQ_FUA bit using::
+ 3.2  Check the port delay
++-------------------------
  
- 	blk_queue_write_cache(sdkp->disk->queue, true, true);
+ Some parallel ports cannot reliably transfer data at full speed.  To
+ offset the errors, the PARIDE protocol modules introduce a "port
+@@ -347,23 +367,25 @@ read the comments at the beginning of the driver source files in
+ linux/drivers/block/paride.
  
-diff --git a/Documentation/blockdev/zram.rst b/Documentation/blockdev/zram.rst
-index 2111231c9c0f..6eccf13219ff 100644
---- a/Documentation/blockdev/zram.rst
+ 3.3  Some drives need a printer reset
++-------------------------------------
+ 
+ There appear to be a number of "noname" external drives on the market
+ that do not always power up correctly.  We have noticed this with some
+ drives based on OnSpec and older Freecom adapters.  In these rare cases,
+ the adapter can often be reinitialised by issuing a "printer reset" on
+-the parallel port.  As the reset operation is potentially disruptive in 
+-multiple device environments, the PARIDE drivers will not do it 
+-automatically.  You can however, force a printer reset by doing:
++the parallel port.  As the reset operation is potentially disruptive in
++multiple device environments, the PARIDE drivers will not do it
++automatically.  You can however, force a printer reset by doing::
+ 
+ 	insmod lp reset=1
+ 	rmmod lp
+ 
+ If you have one of these marginal cases, you should probably build
+ your paride drivers as modules, and arrange to do the printer reset
+-before loading the PARIDE drivers. 
++before loading the PARIDE drivers.
+ 
+ 3.4  Use the verbose option and dmesg if you need help
++------------------------------------------------------
+ 
+ While a lot of testing has gone into these drivers to make them work
+ as smoothly as possible, problems will arise.  If you do have problems,
+@@ -373,7 +395,7 @@ clues, then please make sure that only one drive is hooked to your system,
+ and that either (a) PARPORT is enabled or (b) no other device driver
+ is using your parallel port (check in /proc/ioports).  Then, load the
+ appropriate drivers (you can load several protocol modules if you want)
+-as in:
++as in::
+ 
+ 	# insmod paride
+ 	# insmod epat
+@@ -394,12 +416,14 @@ by e-mail to grant@torque.net, or join the linux-parport mailing list
+ and post your report there.
+ 
+ 3.5  For more information or help
++---------------------------------
+ 
+ You can join the linux-parport mailing list by sending a mail message
+-to 
++to:
++
+ 		linux-parport-request@torque.net
+ 
+-with the single word 
++with the single word::
+ 
+ 		subscribe
+ 
+@@ -412,6 +436,4 @@ have in your mail headers, when sending mail to the list server.
+ You might also find some useful information on the linux-parport
+ web pages (although they are not always up to date) at
+ 
+-	http://web.archive.org/web/*/http://www.torque.net/parport/
+-
+-
++	http://web.archive.org/web/%2E/http://www.torque.net/parport/
+diff --git a/Documentation/blockdev/ramdisk.txt b/Documentation/blockdev/ramdisk.rst
+similarity index 84%
+rename from Documentation/blockdev/ramdisk.txt
+rename to Documentation/blockdev/ramdisk.rst
+index 501e12e0323e..b7c2268f8dec 100644
+--- a/Documentation/blockdev/ramdisk.txt
++++ b/Documentation/blockdev/ramdisk.rst
+@@ -1,7 +1,8 @@
++==========================================
+ Using the RAM disk block device with Linux
+-------------------------------------------
++==========================================
+ 
+-Contents:
++.. Contents:
+ 
+ 	1) Overview
+ 	2) Kernel Command Line Parameters
+@@ -42,7 +43,7 @@ rescue floppy disk.
+ 2a) Kernel Command Line Parameters
+ 
+ 	ramdisk_size=N
+-	==============
++		Size of the ramdisk.
+ 
+ This parameter tells the RAM disk driver to set up RAM disks of N k size.  The
+ default is 4096 (4 MB).
+@@ -50,16 +51,13 @@ default is 4096 (4 MB).
+ 2b) Module parameters
+ 
+ 	rd_nr
+-	=====
+-	/dev/ramX devices created.
++		/dev/ramX devices created.
+ 
+ 	max_part
+-	========
+-	Maximum partition number.
++		Maximum partition number.
+ 
+ 	rd_size
+-	=======
+-	See ramdisk_size.
++		See ramdisk_size.
+ 
+ 3) Using "rdev -r"
+ ------------------
+@@ -71,11 +69,11 @@ to 2 MB (2^11) of where to find the RAM disk (this used to be the size). Bit
+ prompt/wait sequence is to be given before trying to read the RAM disk. Since
+ the RAM disk dynamically grows as data is being written into it, a size field
+ is not required. Bits 11 to 13 are not currently used and may as well be zero.
+-These numbers are no magical secrets, as seen below:
++These numbers are no magical secrets, as seen below::
+ 
+-./arch/x86/kernel/setup.c:#define RAMDISK_IMAGE_START_MASK     0x07FF
+-./arch/x86/kernel/setup.c:#define RAMDISK_PROMPT_FLAG          0x8000
+-./arch/x86/kernel/setup.c:#define RAMDISK_LOAD_FLAG            0x4000
++  ./arch/x86/kernel/setup.c:#define RAMDISK_IMAGE_START_MASK     0x07FF
++  ./arch/x86/kernel/setup.c:#define RAMDISK_PROMPT_FLAG          0x8000
++  ./arch/x86/kernel/setup.c:#define RAMDISK_LOAD_FLAG            0x4000
+ 
+ Consider a typical two floppy disk setup, where you will have the
+ kernel on disk one, and have already put a RAM disk image onto disk #2.
+@@ -92,20 +90,23 @@ sequence so that you have a chance to switch floppy disks.
+ The command line equivalent is: "prompt_ramdisk=1"
+ 
+ Putting that together gives 2^15 + 2^14 + 0 = 49152 for an rdev word.
+-So to create disk one of the set, you would do:
++So to create disk one of the set, you would do::
+ 
+ 	/usr/src/linux# cat arch/x86/boot/zImage > /dev/fd0
+ 	/usr/src/linux# rdev /dev/fd0 /dev/fd0
+ 	/usr/src/linux# rdev -r /dev/fd0 49152
+ 
+-If you make a boot disk that has LILO, then for the above, you would use:
++If you make a boot disk that has LILO, then for the above, you would use::
++
+ 	append = "ramdisk_start=0 load_ramdisk=1 prompt_ramdisk=1"
+-Since the default start = 0 and the default prompt = 1, you could use:
++
++Since the default start = 0 and the default prompt = 1, you could use::
++
+ 	append = "load_ramdisk=1"
+ 
+ 
+ 4) An Example of Creating a Compressed RAM Disk
+-----------------------------------------------
++-----------------------------------------------
+ 
+ To create a RAM disk image, you will need a spare block device to
+ construct it on. This can be the RAM disk device itself, or an
+@@ -120,11 +121,11 @@ a) Decide on the RAM disk size that you want. Say 2 MB for this example.
+    Create it by writing to the RAM disk device. (This step is not currently
+    required, but may be in the future.) It is wise to zero out the
+    area (esp. for disks) so that maximal compression is achieved for
+-   the unused blocks of the image that you are about to create.
++   the unused blocks of the image that you are about to create::
+ 
+ 	dd if=/dev/zero of=/dev/ram0 bs=1k count=2048
+ 
+-b) Make a filesystem on it. Say ext2fs for this example.
++b) Make a filesystem on it. Say ext2fs for this example::
+ 
+ 	mke2fs -vm0 /dev/ram0 2048
+ 
+@@ -133,11 +134,11 @@ c) Mount it, copy the files you want to it (eg: /etc/* /dev/* ...)
+ 
+ d) Compress the contents of the RAM disk. The level of compression
+    will be approximately 50% of the space used by the files. Unused
+-   space on the RAM disk will compress to almost nothing.
++   space on the RAM disk will compress to almost nothing::
+ 
+ 	dd if=/dev/ram0 bs=1k count=2048 | gzip -v9 > /tmp/ram_image.gz
+ 
+-e) Put the kernel onto the floppy
++e) Put the kernel onto the floppy::
+ 
+ 	dd if=zImage of=/dev/fd0 bs=1k
+ 
+@@ -146,13 +147,13 @@ f) Put the RAM disk image onto the floppy, after the kernel. Use an offset
+    (possibly larger) kernel onto the same floppy later without overlapping
+    the RAM disk image. An offset of 400 kB for kernels about 350 kB in
+    size would be reasonable. Make sure offset+size of ram_image.gz is
+-   not larger than the total space on your floppy (usually 1440 kB).
++   not larger than the total space on your floppy (usually 1440 kB)::
+ 
+ 	dd if=/tmp/ram_image.gz of=/dev/fd0 bs=1k seek=400
+ 
+ g) Use "rdev" to set the boot device, RAM disk offset, prompt flag, etc.
+    For prompt_ramdisk=1, load_ramdisk=1, ramdisk_start=400, one would
+-   have 2^15 + 2^14 + 400 = 49552.
++   have 2^15 + 2^14 + 400 = 49552::
+ 
+ 	rdev /dev/fd0 /dev/fd0
+ 	rdev -r /dev/fd0 49552
+@@ -160,15 +161,17 @@ g) Use "rdev" to set the boot device, RAM disk offset, prompt flag, etc.
+ That is it. You now have your boot/root compressed RAM disk floppy. Some
+ users may wish to combine steps (d) and (f) by using a pipe.
+ 
+---------------------------------------------------------------------------
++
+ 						Paul Gortmaker 12/95
+ 
+ Changelog:
+ ----------
+ 
+-10-22-04 :	Updated to reflect changes in command line options, remove
++10-22-04 :
++		Updated to reflect changes in command line options, remove
+ 		obsolete references, general cleanup.
+ 		James Nelson (james4765@gmail.com)
+ 
+ 
+-12-95 :		Original Document
++12-95 :
++		Original Document
+diff --git a/Documentation/blockdev/zram.txt b/Documentation/blockdev/zram.rst
+similarity index 76%
+rename from Documentation/blockdev/zram.txt
+rename to Documentation/blockdev/zram.rst
+index 4df0ce271085..2111231c9c0f 100644
+--- a/Documentation/blockdev/zram.txt
 +++ b/Documentation/blockdev/zram.rst
-@@ -215,7 +215,7 @@ User space is advised to use the following files to read the device statistics.
+@@ -1,7 +1,9 @@
++========================================
+ zram: Compressed RAM based block devices
+-----------------------------------------
++========================================
  
- File /sys/block/zram<id>/stat
+-* Introduction
++Introduction
++============
  
--Represents block layer statistics. Read Documentation/block/stat.txt for
-+Represents block layer statistics. Read Documentation/block/stat.rst for
- details.
+ The zram module creates RAM based block devices named /dev/zram<id>
+ (<id> = 0, 1, ...). Pages written to these disks are compressed and stored
+@@ -12,9 +14,11 @@ use as swap disks, various caches under /var and maybe many more :)
+ Statistics for individual zram devices are exported through sysfs nodes at
+ /sys/block/zram<id>/
  
- File /sys/block/zram<id>/io_stat
+-* Usage
++Usage
++=====
+ 
+ There are several ways to configure and manage zram device(-s):
++
+ a) using zram and zram_control sysfs attributes
+ b) using zramctl utility, provided by util-linux (util-linux@vger.kernel.org).
+ 
+@@ -22,7 +26,7 @@ In this document we will describe only 'manual' zram configuration steps,
+ IOW, zram and zram_control sysfs attributes.
+ 
+ In order to get a better idea about zramctl please consult util-linux
+-documentation, zramctl man-page or `zramctl --help'. Please be informed
++documentation, zramctl man-page or `zramctl --help`. Please be informed
+ that zram maintainers do not develop/maintain util-linux or zramctl, should
+ you have any questions please contact util-linux@vger.kernel.org
+ 
+@@ -30,19 +34,23 @@ Following shows a typical sequence of steps for using zram.
+ 
+ WARNING
+ =======
++
+ For the sake of simplicity we skip error checking parts in most of the
+ examples below. However, it is your sole responsibility to handle errors.
+ 
+ zram sysfs attributes always return negative values in case of errors.
+ The list of possible return codes:
+--EBUSY	-- an attempt to modify an attribute that cannot be changed once
+-the device has been initialised. Please reset device first;
+--ENOMEM	-- zram was not able to allocate enough memory to fulfil your
+-needs;
+--EINVAL	-- invalid input has been provided.
++
++========  =============================================================
++-EBUSY	  an attempt to modify an attribute that cannot be changed once
++	  the device has been initialised. Please reset device first;
++-ENOMEM	  zram was not able to allocate enough memory to fulfil your
++	  needs;
++-EINVAL	  invalid input has been provided.
++========  =============================================================
+ 
+ If you use 'echo', the returned value that is changed by 'echo' utility,
+-and, in general case, something like:
++and, in general case, something like::
+ 
+ 	echo 3 > /sys/block/zram0/max_comp_streams
+ 	if [ $? -ne 0 ];
+@@ -51,7 +59,11 @@ and, in general case, something like:
+ 
+ should suffice.
+ 
+-1) Load Module:
++1) Load Module
++==============
++
++::
++
+ 	modprobe zram num_devices=4
+ 	This creates 4 devices: /dev/zram{0,1,2,3}
+ 
+@@ -59,6 +71,8 @@ num_devices parameter is optional and tells zram how many devices should be
+ pre-created. Default: 1.
+ 
+ 2) Set max number of compression streams
++========================================
++
+ Regardless the value passed to this attribute, ZRAM will always
+ allocate multiple compression streams - one per online CPUs - thus
+ allowing several concurrent compression operations. The number of
+@@ -66,16 +80,20 @@ allocated compression streams goes down when some of the CPUs
+ become offline. There is no single-compression-stream mode anymore,
+ unless you are running a UP system or has only 1 CPU online.
+ 
+-To find out how many streams are currently available:
++To find out how many streams are currently available::
++
+ 	cat /sys/block/zram0/max_comp_streams
+ 
+ 3) Select compression algorithm
++===============================
++
+ Using comp_algorithm device attribute one can see available and
+ currently selected (shown in square brackets) compression algorithms,
+ change selected compression algorithm (once the device is initialised
+ there is no way to change compression algorithm).
+ 
+-Examples:
++Examples::
++
+ 	#show supported compression algorithms
+ 	cat /sys/block/zram0/comp_algorithm
+ 	lzo [lz4]
+@@ -83,20 +101,23 @@ Examples:
+ 	#select lzo compression algorithm
+ 	echo lzo > /sys/block/zram0/comp_algorithm
+ 
+-For the time being, the `comp_algorithm' content does not necessarily
++For the time being, the `comp_algorithm` content does not necessarily
+ show every compression algorithm supported by the kernel. We keep this
+ list primarily to simplify device configuration and one can configure
+ a new device with a compression algorithm that is not listed in
+-`comp_algorithm'. The thing is that, internally, ZRAM uses Crypto API
++`comp_algorithm`. The thing is that, internally, ZRAM uses Crypto API
+ and, if some of the algorithms were built as modules, it's impossible
+ to list all of them using, for instance, /proc/crypto or any other
+ method. This, however, has an advantage of permitting the usage of
+ custom crypto compression modules (implementing S/W or H/W compression).
+ 
+ 4) Set Disksize
++===============
++
+ Set disk size by writing the value to sysfs node 'disksize'.
+ The value can be either in bytes or you can use mem suffixes.
+-Examples:
++Examples::
++
+ 	# Initialize /dev/zram0 with 50MB disksize
+ 	echo $((50*1024*1024)) > /sys/block/zram0/disksize
+ 
+@@ -111,10 +132,13 @@ since we expect a 2:1 compression ratio. Note that zram uses about 0.1% of the
+ size of the disk when not in use so a huge zram is wasteful.
+ 
+ 5) Set memory limit: Optional
++=============================
++
+ Set memory limit by writing the value to sysfs node 'mem_limit'.
+ The value can be either in bytes or you can use mem suffixes.
+ In addition, you could change the value in runtime.
+-Examples:
++Examples::
++
+ 	# limit /dev/zram0 with 50MB memory
+ 	echo $((50*1024*1024)) > /sys/block/zram0/mem_limit
+ 
+@@ -126,7 +150,11 @@ Examples:
+ 	# To disable memory limit
+ 	echo 0 > /sys/block/zram0/mem_limit
+ 
+-6) Activate:
++6) Activate
++===========
++
++::
++
+ 	mkswap /dev/zram0
+ 	swapon /dev/zram0
+ 
+@@ -134,6 +162,7 @@ Examples:
+ 	mount /dev/zram1 /tmp
+ 
+ 7) Add/remove zram devices
++==========================
+ 
+ zram provides a control interface, which enables dynamic (on-demand) device
+ addition and removal.
+@@ -142,37 +171,44 @@ In order to add a new /dev/zramX device, perform read operation on hot_add
+ attribute. This will return either new device's device id (meaning that you
+ can use /dev/zram<id>) or error code.
+ 
+-Example:
++Example::
++
+ 	cat /sys/class/zram-control/hot_add
+ 	1
+ 
+ To remove the existing /dev/zramX device (where X is a device id)
+-execute
++execute::
++
+ 	echo X > /sys/class/zram-control/hot_remove
+ 
+-8) Stats:
++8) Stats
++========
++
+ Per-device statistics are exported as various nodes under /sys/block/zram<id>/
+ 
+ A brief description of exported device attributes. For more details please
+ read Documentation/ABI/testing/sysfs-block-zram.
+ 
++======================  ======  ===============================================
+ Name            	access            description
+-----            	------            -----------
++======================  ======  ===============================================
+ disksize          	RW	show and set the device's disk size
+ initstate         	RO	shows the initialization state of the device
+ reset             	WO	trigger device reset
+-mem_used_max      	WO	reset the `mem_used_max' counter (see later)
+-mem_limit         	WO	specifies the maximum amount of memory ZRAM can use
+-				to store the compressed data
+-writeback_limit   	WO	specifies the maximum amount of write IO zram can
+-				write out to backing device as 4KB unit
++mem_used_max      	WO	reset the `mem_used_max` counter (see later)
++mem_limit         	WO	specifies the maximum amount of memory ZRAM can
++				use to store the compressed data
++writeback_limit   	WO	specifies the maximum amount of write IO zram
++				can write out to backing device as 4KB unit
+ writeback_limit_enable  RW	show and set writeback_limit feature
+-max_comp_streams  	RW	the number of possible concurrent compress operations
++max_comp_streams  	RW	the number of possible concurrent compress
++				operations
+ comp_algorithm    	RW	show and change the compression algorithm
+ compact           	WO	trigger memory compaction
+ debug_stat        	RO	this file is used for zram debugging purposes
+ backing_dev	  	RW	set up backend storage for zram to write out
+ idle		  	WO	mark allocated slot as idle
++======================  ======  ===============================================
+ 
+ 
+ User space is advised to use the following files to read the device statistics.
+@@ -188,23 +224,31 @@ The stat file represents device's I/O statistics not accounted by block
+ layer and, thus, not available in zram<id>/stat file. It consists of a
+ single line of text and contains the following stats separated by
+ whitespace:
+- failed_reads     the number of failed reads
+- failed_writes    the number of failed writes
+- invalid_io       the number of non-page-size-aligned I/O requests
++
++ =============    =============================================================
++ failed_reads     The number of failed reads
++ failed_writes    The number of failed writes
++ invalid_io       The number of non-page-size-aligned I/O requests
+  notify_free      Depending on device usage scenario it may account
++
+                   a) the number of pages freed because of swap slot free
+-                  notifications or b) the number of pages freed because of
+-                  REQ_OP_DISCARD requests sent by bio. The former ones are
+-                  sent to a swap block device when a swap slot is freed,
+-                  which implies that this disk is being used as a swap disk.
++                     notifications
++                  b) the number of pages freed because of
++                     REQ_OP_DISCARD requests sent by bio. The former ones are
++                     sent to a swap block device when a swap slot is freed,
++                     which implies that this disk is being used as a swap disk.
++
+                   The latter ones are sent by filesystem mounted with
+                   discard option, whenever some data blocks are getting
+                   discarded.
++ =============    =============================================================
+ 
+ File /sys/block/zram<id>/mm_stat
+ 
+ The stat file represents device's mm statistics. It consists of a single
+ line of text and contains the following stats separated by whitespace:
++
++ ================ =============================================================
+  orig_data_size   uncompressed size of data stored in this disk.
+ 		  This excludes same-element-filled pages (same_pages) since
+ 		  no memory is allocated for them.
+@@ -223,58 +267,71 @@ line of text and contains the following stats separated by whitespace:
+                   No memory is allocated for such pages.
+  pages_compacted  the number of pages freed during compaction
+  huge_pages	  the number of incompressible pages
++ ================ =============================================================
+ 
+ File /sys/block/zram<id>/bd_stat
+ 
+ The stat file represents device's backing device statistics. It consists of
+ a single line of text and contains the following stats separated by whitespace:
++
++ ============== =============================================================
+  bd_count	size of data written in backing device.
+ 		Unit: 4K bytes
+  bd_reads	the number of reads from backing device
+ 		Unit: 4K bytes
+  bd_writes	the number of writes to backing device
+ 		Unit: 4K bytes
++ ============== =============================================================
++
++9) Deactivate
++=============
++
++::
+ 
+-9) Deactivate:
+ 	swapoff /dev/zram0
+ 	umount /dev/zram1
+ 
+-10) Reset:
+-	Write any positive value to 'reset' sysfs node
+-	echo 1 > /sys/block/zram0/reset
+-	echo 1 > /sys/block/zram1/reset
++10) Reset
++=========
++
++	Write any positive value to 'reset' sysfs node::
++
++		echo 1 > /sys/block/zram0/reset
++		echo 1 > /sys/block/zram1/reset
+ 
+ 	This frees all the memory allocated for the given device and
+ 	resets the disksize to zero. You must set the disksize again
+ 	before reusing the device.
+ 
+-* Optional Feature
++Optional Feature
++================
+ 
+-= writeback
++writeback
++---------
+ 
+ With CONFIG_ZRAM_WRITEBACK, zram can write idle/incompressible page
+ to backing storage rather than keeping it in memory.
+-To use the feature, admin should set up backing device via
++To use the feature, admin should set up backing device via::
+ 
+-	"echo /dev/sda5 > /sys/block/zramX/backing_dev"
++	echo /dev/sda5 > /sys/block/zramX/backing_dev
+ 
+ before disksize setting. It supports only partition at this moment.
+-If admin want to use incompressible page writeback, they could do via
++If admin want to use incompressible page writeback, they could do via::
+ 
+-	"echo huge > /sys/block/zramX/write"
++	echo huge > /sys/block/zramX/write
+ 
+ To use idle page writeback, first, user need to declare zram pages
+-as idle.
++as idle::
+ 
+-	"echo all > /sys/block/zramX/idle"
++	echo all > /sys/block/zramX/idle
+ 
+ From now on, any pages on zram are idle pages. The idle mark
+ will be removed until someone request access of the block.
+ IOW, unless there is access request, those pages are still idle pages.
+ 
+-Admin can request writeback of those idle pages at right timing via
++Admin can request writeback of those idle pages at right timing via::
+ 
+-	"echo idle > /sys/block/zramX/writeback"
++	echo idle > /sys/block/zramX/writeback
+ 
+ With the command, zram writeback idle pages from memory to the storage.
+ 
+@@ -285,7 +342,7 @@ to guarantee storage health for entire product life.
+ To overcome the concern, zram supports "writeback_limit" feature.
+ The "writeback_limit_enable"'s default value is 0 so that it doesn't limit
+ any writeback. IOW, if admin want to apply writeback budget, he should
+-enable writeback_limit_enable via
++enable writeback_limit_enable via::
+ 
+ 	$ echo 1 > /sys/block/zramX/writeback_limit_enable
+ 
+@@ -296,7 +353,7 @@ until admin set the budget via /sys/block/zramX/writeback_limit.
+ assigned via /sys/block/zramX/writeback_limit is meaninless.)
+ 
+ If admin want to limit writeback as per-day 400M, he could do it
+-like below.
++like below::
+ 
+ 	$ MB_SHIFT=20
+ 	$ 4K_SHIFT=12
+@@ -305,16 +362,16 @@ like below.
+ 	$ echo 1 > /sys/block/zram0/writeback_limit_enable
+ 
+ If admin want to allow further write again once the bugdet is exausted,
+-he could do it like below
++he could do it like below::
+ 
+ 	$ echo $((400<<MB_SHIFT>>4K_SHIFT)) > \
+ 		/sys/block/zram0/writeback_limit
+ 
+-If admin want to see remaining writeback budget since he set,
++If admin want to see remaining writeback budget since he set::
+ 
+ 	$ cat /sys/block/zramX/writeback_limit
+ 
+-If admin want to disable writeback limit, he could do
++If admin want to disable writeback limit, he could do::
+ 
+ 	$ echo 0 > /sys/block/zramX/writeback_limit_enable
+ 
+@@ -326,25 +383,35 @@ budget in next setting is user's job.
+ If admin want to measure writeback count in a certain period, he could
+ know it via /sys/block/zram0/bd_stat's 3rd column.
+ 
+-= memory tracking
++memory tracking
++===============
+ 
+ With CONFIG_ZRAM_MEMORY_TRACKING, user can know information of the
+ zram block. It could be useful to catch cold or incompressible
+ pages of the process with*pagemap.
++
+ If you enable the feature, you could see block state via
+-/sys/kernel/debug/zram/zram0/block_state". The output is as follows,
++/sys/kernel/debug/zram/zram0/block_state". The output is as follows::
+ 
+ 	  300    75.033841 .wh.
+ 	  301    63.806904 s...
+ 	  302    63.806919 ..hi
+ 
+-First column is zram's block index.
+-Second column is access time since the system was booted
+-Third column is state of the block.
+-(s: same page
+-w: written page to backing store
+-h: huge page
+-i: idle page)
++First column
++	zram's block index.
++Second column
++	access time since the system was booted
++Third column
++	state of the block:
++
++	s:
++		same page
++	w:
++		written page to backing store
++	h:
++		huge page
++	i:
++		idle page
+ 
+ First line of above example says 300th block is accessed at 75.033841sec
+ and the block's state is huge so it is written back to the backing
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 2f8e1543caff..d850d7f15a38 100644
+index b2254bc8e495..163327d6a856 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -2930,7 +2930,7 @@ M:	Jens Axboe <axboe@kernel.dk>
- L:	linux-block@vger.kernel.org
+@@ -10961,7 +10961,7 @@ M:	Josef Bacik <josef@toxicpanda.com>
  S:	Maintained
- F:	block/bfq-*
--F:	Documentation/block/bfq-iosched.txt
-+F:	Documentation/block/bfq-iosched.rst
+ L:	linux-block@vger.kernel.org
+ L:	nbd@other.debian.org
+-F:	Documentation/blockdev/nbd.txt
++F:	Documentation/blockdev/nbd.rst
+ F:	drivers/block/nbd.c
+ F:	include/trace/events/nbd.h
+ F:	include/uapi/linux/nbd.h
+@@ -11963,7 +11963,7 @@ PARIDE DRIVERS FOR PARALLEL PORT IDE DEVICES
+ M:	Tim Waugh <tim@cyberelk.net>
+ L:	linux-parport@lists.infradead.org (subscribers-only)
+ S:	Maintained
+-F:	Documentation/blockdev/paride.txt
++F:	Documentation/blockdev/paride.rst
+ F:	drivers/block/paride/
  
- BFS FILE SYSTEM
- M:	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>
-diff --git a/block/Kconfig b/block/Kconfig
-index 56cb1695cd87..b16b3e075d31 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -110,7 +110,7 @@ config BLK_CMDLINE_PARSER
- 	which don't otherwise have any standardized method for listing the
- 	partitions on a block device.
+ PARISC ARCHITECTURE
+@@ -13245,7 +13245,7 @@ F:	drivers/net/wireless/ralink/rt2x00/
+ RAMDISK RAM BLOCK DEVICE DRIVER
+ M:	Jens Axboe <axboe@kernel.dk>
+ S:	Maintained
+-F:	Documentation/blockdev/ramdisk.txt
++F:	Documentation/blockdev/ramdisk.rst
+ F:	drivers/block/brd.c
  
--	See Documentation/block/cmdline-partition.txt for more information.
-+	See Documentation/block/cmdline-partition.rst for more information.
+ RANCHU VIRTUAL BOARD FOR MIPS
+@@ -17584,7 +17584,7 @@ R:	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+ L:	linux-kernel@vger.kernel.org
+ S:	Maintained
+ F:	drivers/block/zram/
+-F:	Documentation/blockdev/zram.txt
++F:	Documentation/blockdev/zram.rst
  
- config BLK_WBT
- 	bool "Enable support for block device writeback throttling"
-diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
-index 4626b88b2d5a..eabd4328b228 100644
---- a/block/Kconfig.iosched
-+++ b/block/Kconfig.iosched
-@@ -26,7 +26,7 @@ config IOSCHED_BFQ
- 	regardless of the device parameters and with any workload. It
- 	also guarantees a low latency to interactive and soft
- 	real-time applications.  Details in
--	Documentation/block/bfq-iosched.txt
-+	Documentation/block/bfq-iosched.rst
+ ZS DECSTATION Z85C30 SERIAL DRIVER
+ M:	"Maciej W. Rozycki" <macro@linux-mips.org>
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 96ec7e0fc1ea..c43690b973d8 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -31,7 +31,7 @@ config BLK_DEV_FD
+ 	  If you want to use the floppy disk drive(s) of your PC under Linux,
+ 	  say Y. Information about this driver, especially important for IBM
+ 	  Thinkpad users, is contained in
+-	  <file:Documentation/blockdev/floppy.txt>.
++	  <file:Documentation/blockdev/floppy.rst>.
+ 	  That file also contains the location of the Floppy driver FAQ as
+ 	  well as location of the fdutils package used to configure additional
+ 	  parameters of the driver at run time.
+@@ -96,7 +96,7 @@ config PARIDE
+ 	  your computer's parallel port. Most of them are actually IDE devices
+ 	  using a parallel port IDE adapter. This option enables the PARIDE
+ 	  subsystem which contains drivers for many of these external drives.
+-	  Read <file:Documentation/blockdev/paride.txt> for more information.
++	  Read <file:Documentation/blockdev/paride.rst> for more information.
  
- config BFQ_GROUP_IOSCHED
-        bool "BFQ hierarchical scheduling support"
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index f8d430f88d25..37996013a301 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -17,7 +17,7 @@
-  * low-latency capabilities. BFQ also supports full hierarchical
-  * scheduling through cgroups. Next paragraphs provide an introduction
-  * on BFQ inner workings. Details on BFQ benefits, usage and
-- * limitations can be found in Documentation/block/bfq-iosched.txt.
-+ * limitations can be found in Documentation/block/bfq-iosched.rst.
-  *
-  * BFQ is a proportional-share storage-I/O scheduling algorithm based
-  * on the slice-by-slice service scheme of CFQ. But BFQ assigns
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 825c9c070458..ca39b4624cf8 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -383,7 +383,7 @@ static const struct blk_integrity_profile nop_profile = {
-  * send/receive integrity metadata it must use this function to register
-  * the capability with the block layer. The template is a blk_integrity
-  * struct with values appropriate for the underlying hardware. See
-- * Documentation/block/data-integrity.txt.
-+ * Documentation/block/data-integrity.rst.
-  */
- void blk_integrity_register(struct gendisk *disk, struct blk_integrity *template)
- {
-diff --git a/block/ioprio.c b/block/ioprio.c
-index 2e0559f157c8..77bcab11dce5 100644
---- a/block/ioprio.c
-+++ b/block/ioprio.c
-@@ -17,7 +17,7 @@
-  *
-  * ioprio_set(PRIO_PROCESS, pid, prio);
-  *
-- * See also Documentation/block/ioprio.txt
-+ * See also Documentation/block/ioprio.rst
-  *
-  */
- #include <linux/gfp.h>
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 1876f5712bfd..4fa0ae242880 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -25,7 +25,7 @@
- #include "blk-mq-sched.h"
+ 	  If you have said Y to the "Parallel-port support" configuration
+ 	  option, you may share a single port between your printer and other
+@@ -261,7 +261,7 @@ config BLK_DEV_NBD
+ 	  userland (making server and client physically the same computer,
+ 	  communicating using the loopback network device).
  
- /*
-- * See Documentation/block/deadline-iosched.txt
-+ * See Documentation/block/deadline-iosched.rst
-  */
- static const int read_expire = HZ / 2;  /* max time before a read is submitted. */
- static const int write_expire = 5 * HZ; /* ditto for writes, these limits are SOFT! */
-diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
-index 60fb3df9897c..f1edd5452249 100644
---- a/block/partitions/cmdline.c
-+++ b/block/partitions/cmdline.c
-@@ -11,7 +11,7 @@
-  *
-  * The format for the command line is just like mtdparts.
-  *
-- * For further information, see "Documentation/block/cmdline-partition.txt"
-+ * For further information, see "Documentation/block/cmdline-partition.rst"
-  *
-  */
+-	  Read <file:Documentation/blockdev/nbd.txt> for more information,
++	  Read <file:Documentation/blockdev/nbd.rst> for more information,
+ 	  especially about where to find the server code, which runs in user
+ 	  space and does not need special kernel support.
  
+@@ -303,7 +303,7 @@ config BLK_DEV_RAM
+ 	  during the initial install of Linux.
+ 
+ 	  Note that the kernel command line option "ramdisk=XX" is now obsolete.
+-	  For details, read <file:Documentation/blockdev/ramdisk.txt>.
++	  For details, read <file:Documentation/blockdev/ramdisk.rst>.
+ 
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called brd. An alias "rd" has been defined
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 9fb9b312ab6b..af02ca97dcd6 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -4424,7 +4424,7 @@ static int __init floppy_setup(char *str)
+ 		pr_cont("\n");
+ 	} else
+ 		DPRINT("botched floppy option\n");
+-	DPRINT("Read Documentation/blockdev/floppy.txt\n");
++	DPRINT("Read Documentation/blockdev/floppy.rst\n");
+ 	return 0;
+ }
+ 
+diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
+index 1ffc64770643..e06b99d54816 100644
+--- a/drivers/block/zram/Kconfig
++++ b/drivers/block/zram/Kconfig
+@@ -12,7 +12,7 @@ config ZRAM
+ 	  It has several use cases, for example: /tmp storage, use as swap
+ 	  disks and maybe many more.
+ 
+-	  See Documentation/blockdev/zram.txt for more information.
++	  See Documentation/blockdev/zram.rst for more information.
+ 
+ config ZRAM_WRITEBACK
+        bool "Write back incompressible or idle page to backing device"
+@@ -26,7 +26,7 @@ config ZRAM_WRITEBACK
+ 	 With /sys/block/zramX/{idle,writeback}, application could ask
+ 	 idle page's writeback to the backing device to save in memory.
+ 
+-	 See Documentation/blockdev/zram.txt for more information.
++	 See Documentation/blockdev/zram.rst for more information.
+ 
+ config ZRAM_MEMORY_TRACKING
+ 	bool "Track zRam block status"
+@@ -36,4 +36,4 @@ config ZRAM_MEMORY_TRACKING
+ 	  of zRAM. Admin could see the information via
+ 	  /sys/kernel/debug/zram/zramX/block_state.
+ 
+-	  See Documentation/blockdev/zram.txt for more information.
++	  See Documentation/blockdev/zram.rst for more information.
+diff --git a/tools/testing/selftests/zram/README b/tools/testing/selftests/zram/README
+index 7972cc512408..5fa378391d3b 100644
+--- a/tools/testing/selftests/zram/README
++++ b/tools/testing/selftests/zram/README
+@@ -37,4 +37,4 @@ Commands required for testing:
+  - mkfs/ mkfs.ext4
+ 
+ For more information please refer:
+-kernel-source-tree/Documentation/blockdev/zram.txt
++kernel-source-tree/Documentation/blockdev/zram.rst
 -- 
 2.21.0
 
