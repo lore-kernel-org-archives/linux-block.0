@@ -2,117 +2,129 @@ Return-Path: <SRS0=KrPA=UR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64279C31E5B
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 22:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1922FC31E5B
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 23:09:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F40720873
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 22:37:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E458420873
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 23:09:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730809AbfFRWhJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jun 2019 18:37:09 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:52455 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730792AbfFRWhJ (ORCPT
+        id S1726007AbfFRXJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jun 2019 19:09:30 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:44040 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725913AbfFRXJa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jun 2019 18:37:09 -0400
-Received: by mail-io1-f71.google.com with SMTP id p12so17892608iog.19
-        for <linux-block@vger.kernel.org>; Tue, 18 Jun 2019 15:37:09 -0700 (PDT)
+        Tue, 18 Jun 2019 19:09:30 -0400
+Received: by mail-pg1-f194.google.com with SMTP id n2so8477565pgp.11
+        for <linux-block@vger.kernel.org>; Tue, 18 Jun 2019 16:09:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=5Z9WFP7V56BODtQ5UPOd/al4TrzSmswoyoPkjw+h188=;
-        b=k5La50qZF+YQbfLRLFgnDM7/oj4+mzHSbxrzT8dZhVST5e23kUQ5FLAF6FExQExeVC
-         kVR1wV2spMXLJ4ez7rWTbKfgGSL/MBhoRmx1WpEwdXindkzd+Myatsk1Z0923vLLdeNN
-         c3RGcpIKaE2TS8Pwwx9g3J7nVr7qUTA2hc6pY7iWz0GsBVTJPbuQUz9bbEWwH9fRs/kZ
-         RjUzTG1l+dxFLfQuEDXfytvsO5CZz701V+akFnrXw5H7CmQJ0ycs+HGZ0fnlxFZelDB5
-         /AzafTw8uxMa7EIPnuiwmxa33W19ZvksduLES69qtK4qohcTI6wjJo4KFBGoKl2rRR6j
-         uw/A==
-X-Gm-Message-State: APjAAAXCVBKNHAyqu+enb8cXEBfrqI0uEoQaPXTeLp6PCHnTvtH9NEJc
-        +hwkmc++rkIF69h3Q0JWfG/VwU9CzHdFxmSy4dLvol2lN+U4
-X-Google-Smtp-Source: APXvYqxsUJJOKCWaPTd9Fq0B/2WwT4QJvL7Zcwv/ZJMc1ARDihT7NgaySKG/S93W/iYTgFuMV1PFh2BGWVmLMHvAB1OmeySLqKf+
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1+0rxfcxlZwIeqW8jrMcTilk3njKwpQzURkuH6tHapw=;
+        b=fdYz2v872P4+lq4WvCSsGabiHbBRp2AhiG5F1v/m/908ICYUEFAR4TMfwQaBR4xd/L
+         QW63z60HT6WtLKyLHAdbui5OnRdwVcJ1lEPnDxGCg7PoZggTviIE/UoHqmyAfkr3Yn/I
+         dyW2XfV/ZglAVPCVb8kmKMmeeNK80thH+dl1cxtEWB/LCS03niqpJbD+QEYSEazDhuTo
+         B0DlEtUUTbkr7Y1/4960xUpC6xMZrwh7XdH+D5kS8fe0MvzUGY+tIjIrdvF3i48ST8F1
+         sDXMZga/yIbcGIy8q0a8R+oUIQenzkQwTDAVThcJaw956lCn30xVLf+vHtd5gnYuZN0f
+         AHFw==
+X-Gm-Message-State: APjAAAUYo+872TKm/Mjx+EdQ12e8VQPLie3SDdRdwKynrOaEB3NynSy1
+        IFyDnaOlkqJEGl9ICBdvH2APQ0vsi3M=
+X-Google-Smtp-Source: APXvYqxrUDA8zOlW+dIfm8e9oQuC2my0pPGouhgNyTDD3wOfwVhDJblZwQccbYWc5K9kfQgNt9b+pQ==
+X-Received: by 2002:a63:1a03:: with SMTP id a3mr4657956pga.397.1560899368978;
+        Tue, 18 Jun 2019 16:09:28 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id y23sm19724195pfm.117.2019.06.18.16.09.27
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Tue, 18 Jun 2019 16:09:27 -0700 (PDT)
+Subject: Re: [REGRESSION] commit c2b3c170db610 causes blktests block/002
+ failure
+To:     Theodore Ts'o <tytso@mit.edu>, Omar Sandoval <osandov@fb.com>,
+        Andi Kleen <ak@linux.intel.com>
+Cc:     linux-block@vger.kernel.org
+References: <20190609181423.GA24173@mit.edu>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <e84b29e1-209e-d598-0828-bed5e3b98093@acm.org>
+Date:   Tue, 18 Jun 2019 16:09:26 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:149:: with SMTP id y9mr66822563jao.76.1560897428867;
- Tue, 18 Jun 2019 15:37:08 -0700 (PDT)
-Date:   Tue, 18 Jun 2019 15:37:08 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c75fb7058ba0c0e4@google.com>
-Subject: memory leak in bio_copy_user_iov
-From:   syzbot <syzbot+03e5c8ebd22cc6c3a8cb@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+In-Reply-To: <20190609181423.GA24173@mit.edu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On 6/9/19 11:14 AM, Theodore Ts'o wrote:
+> I recently noticed that block/002 from blktests started failing:
+> 
+> root@kvm-xfstests:~# cd blktests/
+> root@kvm-xfstests:~/blktests# ./check block/002
+> block/002 (remove a device while running blktrace)
+>      runtime  ...
+> [   12.598314] run blktests block/002 at 2019-06-09 13:09:00
+> [   12.621298] scsi host0: scsi_debug: version 0188 [20190125]
+> [   12.621298]   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
+> [   12.625578] scsi 0:0:0:0: Direct-Access     Linux    scsi_debug       0188 PQ: 0 ANSI: 7
+> [   12.627109] sd 0:0:0:0: Power-on or device reset occurred
+> [   12.630322] sd 0:0:0:0: Attached scsi generic sg0 type 0
+> [   12.634693] sd 0:0:0:0: [sda] 16384 512-byte logical blocks: (8.39 MB/8.00 MiB)
+> [   12.638881] sd 0:0:0:0: [sda] Write Protect is off
+> [   12.639464] sd 0:0:0:0: [sda] Mode Sense: 73 00 10 08
+> [   12.646951] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, supports DPO and FUA
+> [   12.658210] sd 0:0:0:0: [sda] Optimal transfer size 524288 bytes
+> [   12.722771] sd 0:0:0:0: [sda] Attached SCSI disk
+> block/002 (remove a device while running blktrace)           [failed]left
+>      runtime  ...  0.945s0: [sda] Synchronizing SCSI cache
+>      --- tests/block/002.out	2019-05-27 13:52:17.000000000 -0400
+>      +++ /root/blktests/results/nodev/block/002.out.bad	2019-06-09 13:09:01.034094065 -0400
+>      @@ -1,2 +1,3 @@
+>       Running block/002
+>      +debugfs directory leaked
+>       Test complete
+> root@kvm-xfstests:~/blktests#
+> 
+> The git bisect log (see attached) pointed at this commit:
+> 
+> commit c2b3c170db610896e4e633cba2135045333811c2 (HEAD, refs/bisect/bad)
+> Author: Andi Kleen <ak@linux.intel.com>
+> Date:   Tue Mar 26 15:18:20 2019 -0700
+> 
+>      perf stat: Revert checks for duration_time
+>      
+>      This reverts e864c5ca145e ("perf stat: Hide internal duration_time
+>      counter") but doing it manually since the code has now moved to a
+>      different file.
+>      
+>      The next patch will properly implement duration_time as a full event, so
+>      no need to hide it anymore.
+>      
+>      Signed-off-by: Andi Kleen <ak@linux.intel.com>
+>      Acked-by: Jiri Olsa <jolsa@kernel.org>
+>      Link: http://lkml.kernel.org/r/20190326221823.11518-2-andi@firstfloor.org
+>      Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+> 
+> Is this a known issue?
 
-syzbot found the following crash on:
+Hi Ted,
 
-HEAD commit:    0011572c Merge branch 'for-5.2-fixes' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15193256a00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cb38d33cd06d8d48
-dashboard link: https://syzkaller.appspot.com/bug?extid=03e5c8ebd22cc6c3a8cb
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13244221a00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=117b2432a00000
+Test block/002 removes a SCSI device by writing into the "delete" sysfs 
+attribute. As one can see in __scsi_remove_device() that triggers a 
+synchronous call of blk_cleanup_queue(). The "debugfs directory leaked" 
+message is reported if the request queue debugfs directory is found 
+after SCSI device deletion has finished. Request queue debugfs directory 
+deletion happens upon the final put of the request queue (see also 
+__blk_release_queue()). I don't think that there is any guarantee that 
+the debugfs directory disappears immediately after SCSI device deletion 
+has finished. In other words, I think that this is a bug in test 
+block/002. Omar, are you the author of that test script?
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+03e5c8ebd22cc6c3a8cb@syzkaller.appspotmail.com
-
-ram
-executing program
-BUG: memory leak
-unreferenced object 0xffff8881204d7800 (size 2048):
-   comm "syz-executor855", pid 6936, jiffies 4294941958 (age 26.780s)
-   hex dump (first 32 bytes):
-     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-     20 00 00 00 02 01 00 00 00 00 00 00 08 00 00 00   ...............
-   backtrace:
-     [<00000000c5e27070>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<00000000c5e27070>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<00000000c5e27070>] slab_alloc mm/slab.c:3326 [inline]
-     [<00000000c5e27070>] __do_kmalloc mm/slab.c:3658 [inline]
-     [<00000000c5e27070>] __kmalloc+0x161/0x2c0 mm/slab.c:3669
-     [<000000004415e750>] kmalloc include/linux/slab.h:552 [inline]
-     [<000000004415e750>] bio_alloc_bioset+0x1b8/0x2c0 block/bio.c:439
-     [<000000002da58d1d>] bio_kmalloc include/linux/bio.h:391 [inline]
-     [<000000002da58d1d>] bio_copy_user_iov+0x113/0x4a0 block/bio.c:1275
-     [<00000000b4b23d95>] __blk_rq_map_user_iov block/blk-map.c:67 [inline]
-     [<00000000b4b23d95>] blk_rq_map_user_iov+0xc6/0x2b0 block/blk-map.c:136
-     [<00000000edad5f7e>] blk_rq_map_user+0x71/0xb0 block/blk-map.c:166
-     [<00000000c94723b5>] sg_start_req drivers/scsi/sg.c:1813 [inline]
-     [<00000000c94723b5>] sg_common_write.isra.0+0x619/0xa10  
-drivers/scsi/sg.c:809
-     [<00000000b11f3605>] sg_write.part.0+0x325/0x570 drivers/scsi/sg.c:709
-     [<00000000aba41953>] sg_write+0x44/0x64 drivers/scsi/sg.c:617
-     [<00000000afecd177>] __vfs_write+0x43/0xa0 fs/read_write.c:494
-     [<00000000de690898>] vfs_write fs/read_write.c:558 [inline]
-     [<00000000de690898>] vfs_write+0xee/0x210 fs/read_write.c:542
-     [<00000000705a35b0>] ksys_write+0x7c/0x130 fs/read_write.c:611
-     [<000000009efb9e6c>] __do_sys_write fs/read_write.c:623 [inline]
-     [<000000009efb9e6c>] __se_sys_write fs/read_write.c:620 [inline]
-     [<000000009efb9e6c>] __x64_sys_write+0x1e/0x30 fs/read_write.c:620
-     [<00000000f9e48771>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<00000000d5cff9fc>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Bart.
