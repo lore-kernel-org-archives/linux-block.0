@@ -2,166 +2,94 @@ Return-Path: <SRS0=KrPA=UR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3375DC31E51
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 11:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2732FC31E51
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 12:53:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12A18208E4
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 11:09:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0377720665
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 12:53:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729507AbfFRLJ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jun 2019 07:09:29 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41364 "EHLO mx1.suse.de"
+        id S1726047AbfFRMx4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jun 2019 08:53:56 -0400
+Received: from mx2.suse.de ([195.135.220.15]:38924 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729458AbfFRLJ3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jun 2019 07:09:29 -0400
+        id S1725913AbfFRMx4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Jun 2019 08:53:56 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 219F8AF84;
-        Tue, 18 Jun 2019 11:09:27 +0000 (UTC)
-Subject: Re: [PATCH 1/2] block: improve print_req_error
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     "hch@lst.de" <hch@lst.de>, "hare@suse.com" <hare@suse.com>
-References: <20190611200210.4819-1-chaitanya.kulkarni@wdc.com>
- <20190611200210.4819-2-chaitanya.kulkarni@wdc.com>
- <321f98fe-eb76-cdcb-5917-32d27f12d3d6@suse.de>
- <BYAPR04MB5749F0648B6E2390E5436AE086EB0@BYAPR04MB5749.namprd04.prod.outlook.com>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <ad48cc31-5cac-6109-92a0-d141689a8e85@suse.de>
-Date:   Tue, 18 Jun 2019 13:09:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        by mx1.suse.de (Postfix) with ESMTP id BC44AAF11;
+        Tue, 18 Jun 2019 12:53:54 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id B2EE9DA871; Tue, 18 Jun 2019 14:54:42 +0200 (CEST)
+Date:   Tue, 18 Jun 2019 14:54:42 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
+        axboe@kernel.dk, jack@suse.cz, linux-btrfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com
+Subject: Re: [PATCHSET v2 btrfs/for-next] blkcg, btrfs: fix cgroup writeback
+ support
+Message-ID: <20190618125442.GL19057@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Tejun Heo <tj@kernel.org>,
+        dsterba@suse.com, clm@fb.com, josef@toxicpanda.com, axboe@kernel.dk,
+        jack@suse.cz, linux-btrfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com
+References: <20190615182453.843275-1-tj@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB5749F0648B6E2390E5436AE086EB0@BYAPR04MB5749.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190615182453.843275-1-tj@kernel.org>
+User-Agent: Mutt/1.5.23.1 (2014-03-12)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/17/19 6:49 PM, Chaitanya Kulkarni wrote:
-> On 06/17/2019 01:43 AM, Hannes Reinecke wrote:
->> On 6/11/19 10:02 PM, Chaitanya Kulkarni wrote:
->>> From: Christoph Hellwig <hch@lst.de>
->>>
->>> Print the calling function instead of print_req_error as a prefix, and
->>> print the operation and op_flags separately instead of the whole field.
->>>
->>> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
->>> ---
->>>   block/blk-core.c | 16 +++++++++-------
->>>   1 file changed, 9 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/block/blk-core.c b/block/blk-core.c
->>> index ee1b35fe8572..d1a227cfb72e 100644
->>> --- a/block/blk-core.c
->>> +++ b/block/blk-core.c
->>> @@ -167,18 +167,20 @@ int blk_status_to_errno(blk_status_t status)
->>>   }
->>>   EXPORT_SYMBOL_GPL(blk_status_to_errno);
->>>
->>> -static void print_req_error(struct request *req, blk_status_t status)
->>> +static void print_req_error(struct request *req, blk_status_t status,
->>> +		const char *caller)
->>>   {
->>>   	int idx = (__force int)status;
->>>
->>>   	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
->>>   		return;
->>>
->>> -	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu flags %x\n",
->>> -				__func__, blk_errors[idx].name,
->>> -				req->rq_disk ?  req->rq_disk->disk_name : "?",
->>> -				(unsigned long long)blk_rq_pos(req),
->>> -				req->cmd_flags);
->>> +	printk_ratelimited(KERN_ERR
->>> +		"%s: %s error, dev %s, sector %llu op 0x%x flags 0x%x\n",
->>> +		caller, blk_errors[idx].name,
->>> +		req->rq_disk ?  req->rq_disk->disk_name : "?",
->>> +		blk_rq_pos(req), req_op(req),
->>> +		req->cmd_flags & ~REQ_OP_MASK);
->>>   }
->>>
->>>   static void req_bio_endio(struct request *rq, struct bio *bio,
->>> @@ -1360,7 +1362,7 @@ bool blk_update_request(struct request *req, blk_status_t error,
->>>
->>>   	if (unlikely(error && !blk_rq_is_passthrough(req) &&
->>>   		     !(req->rq_flags & RQF_QUIET)))
->>> -		print_req_error(req, error);
->>> +		print_req_error(req, error, __func__);
->>>
->>>   	blk_account_io_completion(req, nr_bytes);
->>>
->>>
->> I did ask this already, but didn't get an answer:
->> Why do we have the __func__ argument?
->> Can it print anything else than 'blk_update_request' ?
->> If so, can't it be dropped?
-> Thanks for looking into this. The caller argument I think is useful for 
-> future use if this function gets called from different places.
+On Sat, Jun 15, 2019 at 11:24:44AM -0700, Tejun Heo wrote:
+> Hello,
 > 
-> Are you okay with that ?
+> Changes from v1[1]
 > 
-Yes, I am.
+>   * 0001-cgroup-blkcg-Prepare-some-symbols-for-module-and-CON.patch
+>     added.  It collects and adds symbol exports and dummy function def
+>     to fix module and different config builds.
+> 
+> When writeback is executed asynchronously (e.g. for compression), bios
+> are bounced to and issued by worker pool shared by all cgroups.  This
+> leads to significant priority inversions when cgroup IO control is in
+> use - IOs for a low priority cgroup can tie down the workers forcing
+> higher priority IOs to wait behind them.
+> 
+> This patchset adds an bio punt mechanism to blkcg and updates btrfs to
+> issue async IOs through it.  A bio tagged with REQ_CGROUP_PUNT flag is
+> bounced to the asynchronous issue context of the associated blkcg on
+> bio_submit().  As the bios are issued from per-blkcg work items,
+> there's no concern for priority inversions and it doesn't require
+> invasive changes to the filesystems.  The mechanism should be
+> generally useful for IO control support across different filesystems.
+> 
+> This patchset contains the following 9 patches.  The first three are
+> my blkcg patches to implement the needed mechanisms.  The latter five
+> are Chris Mason's btrfs cleanup and update patches.  Please let me
+> know how the patches should be routed.  Given that there currently
+> aren't other users, it's likely the easiest to route all through btrfs
+> tree.
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+That would be easiest so to avoid synchronization between two trees,
+provided that all non-btrfs commits have acks/reviews.
 
-Cheers,
+However, as it's rc5, I'm not at all comfortable to add this patchset to
+5.3 queue, the changes seem to be intrusive and redoing bio submission
+path is something that will affect all workloads. I did quick tests on
+fstests (without cgruops enabled) and this was fine, but that's the
+minimum that must work. Wider range of workloads would be needed, I can
+do that with mmtests, but all of that means that 5.3 is infeasible.
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
+So this opens more possibilites regarding the patchset routing. Both
+parts can go separately through their usual trees.
