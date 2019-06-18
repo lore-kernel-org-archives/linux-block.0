@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF9AC31E5E
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 07:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 177ACC31E5F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 07:04:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5769320665
+	by mail.kernel.org (Postfix) with ESMTP id E27FB20673
 	for <linux-block@archiver.kernel.org>; Tue, 18 Jun 2019 07:04:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UALdGP9u"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="pPL1/8lx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725829AbfFRHEM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1728817AbfFRHEM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 18 Jun 2019 03:04:12 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:7917 "EHLO
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:7915 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727097AbfFRHEL (ORCPT
+        with ESMTP id S1726023AbfFRHEM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jun 2019 03:04:11 -0400
+        Tue, 18 Jun 2019 03:04:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
   t=1560841452; x=1592377452;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Bgxxsw+aFjGTScDcN8vsmnNC5VW5TuLIHgjRPRtB3ws=;
-  b=UALdGP9uHepDtMzCR9zLETNWBl+A0nWLf/NImbDtkEV8oR+FlERQibno
-   R47DWRhlBgt/2paJMz03bnB4L9/5FJy6fdRJW6vNo22fCEQlvnmT8Q1cG
-   xPIYBg4ifQ2AZ/pouVU7+F9UY7CuR2I5H+ZHjXiwfFiKFQdK4QBUr5lDz
-   f2UMv0dQI2zO4IJlv4FfUO7Fo74gRsTyhUmZyAp6x+kF2pUyjj9KjEESl
-   zOB9F2KDtgqTIhRU8I+h4Q7YFudobVBlQdMSwQWyS5JOA/JKi6DiBbJBd
-   HluWt8ZKvL4OmRDD2mUuUBD60uCUTmH8SNs4Af09oHUr5VUypcJQ2qhK9
-   g==;
+  bh=FTS3xe+OMh34VHu9uCStRTNuxPXwWPijIGYDUqe3v/8=;
+  b=pPL1/8lx090cl7/lY0WZ+86I56/3CIGr9vLM1IxxNsxbGUOvzMnnjsxV
+   eAsD51ihefdHxRgKT00E8FA7x2k4eN7xh/OTp/Q1Z170QPaY7Ywmysd5t
+   ZcviO0m/61AE7jgGGx4w31ZKUcH5f0Oa9iHutRsCuZ15kyDs97PHCjz7m
+   1agejFyOLb4olwPrxXLnkR/PolLdUNnP2bHdchLXAUchbs69obGsQhzJl
+   jpQH5lMz4h557guoTuxUmoNhAJY1FKxgua2xzaufO756kV4YpRJzF+YXu
+   zmeFtso62rn4AFrlawKuqrXZjGhMrYYMcKRITmE2/np6bNwIfQQGEUQHh
+   w==;
 X-IronPort-AV: E=Sophos;i="5.63,388,1557158400"; 
-   d="scan'208";a="115733434"
+   d="scan'208";a="115733438"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2019 13:42:44 +0800
-IronPort-SDR: VJ4Y0mXP9GmuQ05NgiZgQoUdDgfw4OG29oWVhEPKEpOCEvxgsCSyT5qO/Sv1q3wpz0tsZOqW7F
- 1wOQ/4rnVoAgX79TvN9r6W6wazsGSM9wGztJjShloqa5o+hpFUSUINLjRzRUDBs4qnX3JrZ3w2
- v0Tw/stEvq7lEoQVFzHyPlZwrx6WEYbHuB3RTEiC2OsriOKzVD65zLnXDUX/deVF2fwFSTumAa
- 3f7pkWcA1tRRD482/w0dn57XzIri/Pid62xpWgO/COdRdu5C3y7R3jBKU7BxrORuA0weIjSjko
- N1htzbTxXwT6d9NQ/WgTsqPF
+  by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2019 13:42:49 +0800
+IronPort-SDR: C1ZwNWkDo/B3oHW1uZdlvio2rug+9JENC/7Z7EJOm9wHV7SEQOQhz5t27NH9i8z7woZ3g/RkQX
+ eYqgIAXDyn2PIAKZ/nlI8gyGsdx80YysVs+HO7s7kDyvlBIbiVsEa1pffekljVIoiSvX6W4QSx
+ 2DFqmQ0hLYtUtBUUcjfAk8UZfd4dDfmANvnXbbi/6bxFEOys0S9z4DzAf6nvm7F9DVzjXKkda5
+ Us2PtjgNVp7QzShUdQYUPPHmsoPZlUOTmeSTwxn2sIVlR8FNNJTrwbv2lpjjATmOgMGcAPalRB
+ Xhwiy03jpIqP6WF2X9n8hcGb
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 17 Jun 2019 22:42:13 -0700
-IronPort-SDR: bxbWO8GnNFEEE6QeHVKkvsy0/Op5viMOXOCZEaMXB9kCzI4FGkvFg30WVH0318T3iBTsqxf+WX
- zND16Ao+JX7XhwoCpRBh9tz8kwIk87PGub6Ypt/kBTUy4UTaDKd1aLRR3VB71gjVP0CHMrMT2G
- ZZBCPAnEw9LsDyKbn3IP6x/5UQ2XcbvCpAnF9qaNggbnus1Egj+zfwzkSSUQe3L1W48J6W9wlN
- WtRLLcjcUhxSgIJ+ekPd2a0Ohcu7ykK7rmLvcMkkN1FyyKTqZa7fAd4GuTKnsCRcNHTRenLDeI
- +Qo=
+  by uls-op-cesaep02.wdc.com with ESMTP; 17 Jun 2019 22:42:18 -0700
+IronPort-SDR: D3yxs5zEAgofk/QwMdynisRv/sbTqSjiMIkc9RjKEcuNtAFbsQU+ALQMqYs5ogCbU9CnRZun0x
+ 4S95b4muqUQ9uS0FW0+8IG0l9ollPlPpReNNvT5tuHmY22KrvgQoHVxJPMtDZuU7c5V5w+80E3
+ kS0ocELd1ZgqvgKOot90JeA28yiQjL9D3D9dSm+RNt4HLYcYOEUYB3mztjDaYepStKa6t6aUR2
+ KGSGZ02f63KzLXVIRnM9Qx7eTqf9gcvC0c6QWtWUUVA+jvjFr3LtNL2Kl7p3Bufss1ttpf8Fgm
+ OyU=
 Received: from cmercuryqemu.hgst.com ([10.202.65.32])
-  by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2019 22:42:43 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2019 22:42:48 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     jaegeuk@kernel.org, yuchao0@huawei.com, bvanassche@acm.org,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V3 4/6] block: update print_req_error()
-Date:   Mon, 17 Jun 2019 22:42:22 -0700
-Message-Id: <20190618054224.25985-5-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V3 5/6] f2fs: use block layer helper for REQ_OP_XXX
+Date:   Mon, 17 Jun 2019 22:42:23 -0700
+Message-Id: <20190618054224.25985-6-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190618054224.25985-1-chaitanya.kulkarni@wdc.com>
 References: <20190618054224.25985-1-chaitanya.kulkarni@wdc.com>
@@ -70,38 +70,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Improve the print_req_error with additional request fields which are
-helpful for debugging. Use newly introduced blk_op_str() to print the
-REQ_OP_XXX in the string format.
+Adjust the f2fs tracing code to use newly introduced block layer
+function blk_op_str() which converts the REQ_OP_XXX into the string
+XXX.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- block/blk-core.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ include/trace/events/f2fs.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c92b5a16a27a..88a716c3dc56 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -212,11 +212,14 @@ static void print_req_error(struct request *req, blk_status_t status,
- 		return;
- 
- 	printk_ratelimited(KERN_ERR
--		"%s: %s error, dev %s, sector %llu op 0x%x flags 0x%x\n",
-+		"%s: %s error, dev %s, sector %llu op 0x%x:(%s) flags 0x%x "
-+		"phys_seg %u prio class %u\n",
- 		caller, blk_errors[idx].name,
--		req->rq_disk ?  req->rq_disk->disk_name : "?",
--		blk_rq_pos(req), req_op(req),
--		req->cmd_flags & ~REQ_OP_MASK);
-+		req->rq_disk ? req->rq_disk->disk_name : "?",
-+		blk_rq_pos(req), req_op(req), blk_op_str(req_op(req)),
-+		req->cmd_flags & ~REQ_OP_MASK,
-+		req->nr_phys_segments,
-+		IOPRIO_PRIO_CLASS(req->ioprio));
- }
- 
- static void req_bio_endio(struct request *rq, struct bio *bio,
+diff --git a/include/trace/events/f2fs.h b/include/trace/events/f2fs.h
+index 53b96f12300c..ec4dba5a4c30 100644
+--- a/include/trace/events/f2fs.h
++++ b/include/trace/events/f2fs.h
+@@ -1045,7 +1045,8 @@ DECLARE_EVENT_CLASS(f2fs__submit_page_bio,
+ 		(unsigned long)__entry->index,
+ 		(unsigned long long)__entry->old_blkaddr,
+ 		(unsigned long long)__entry->new_blkaddr,
+-		show_bio_type(__entry->op, __entry->op_flags),
++		blk_op_str(__entry->op),
++		show_bio_op_flags(__entry->op_flags),
+ 		show_block_temp(__entry->temp),
+ 		show_block_type(__entry->type))
+ );
+@@ -1097,7 +1098,8 @@ DECLARE_EVENT_CLASS(f2fs__bio,
+ 	TP_printk("dev = (%d,%d)/(%d,%d), rw = %s(%s), %s, sector = %lld, size = %u",
+ 		show_dev(__entry->target),
+ 		show_dev(__entry->dev),
+-		show_bio_type(__entry->op, __entry->op_flags),
++		blk_op_str(__entry->op),
++		show_bio_op_flags(__entry->op_flags),
+ 		show_block_type(__entry->type),
+ 		(unsigned long long)__entry->sector,
+ 		__entry->size)
 -- 
 2.19.1
 
