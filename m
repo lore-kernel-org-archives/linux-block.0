@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DEAFC31E5E
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jun 2019 17:13:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2855CC31E5B
+	for <linux-block@archiver.kernel.org>; Wed, 19 Jun 2019 17:13:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 677DD20657
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jun 2019 17:13:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 021D120657
+	for <linux-block@archiver.kernel.org>; Wed, 19 Jun 2019 17:13:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="lgBd+t9u"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="k5peIfSx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726091AbfFSRNw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Jun 2019 13:13:52 -0400
+        id S1730121AbfFSRNz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Jun 2019 13:13:55 -0400
 Received: from esa3.hgst.iphmx.com ([216.71.153.141]:10796 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730120AbfFSRNw (ORCPT
+        with ESMTP id S1730120AbfFSRNz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Jun 2019 13:13:52 -0400
+        Wed, 19 Jun 2019 13:13:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1560964433; x=1592500433;
+  t=1560964436; x=1592500436;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=mrjiBfA8h8qDNTOQO7p0HkeGNBRUV8HORopCFjU75pY=;
-  b=lgBd+t9usNyoACa9C7sSIQnZBY4Jr/qD6BvG1BxG0WIaX2upLr7WWstS
-   NkeG3qNp249G4C0vhxZ5fMt0rlGZoFH1Y9oc5PGU3/BR8/iPHYSyPbkbI
-   M61jMFbSKXb/jJtqK7VjkhDVoHhrJh/0bymXeQDAGzf8XObgu87Lw8IcL
-   8I6ZZ86hY1S88LN1HEDONL01qJUGI21SH4jT9LMvushGxZ3WO8UGIAf3x
-   eTPvq7gcz9RPk4nzQIw4bKFA56QiD21c7F6hnpqWijbY4kV9JYzkitu3q
-   b+s4YGZ5lVsxG/tgPiGHXEmUfNnn2sOfu9pNvbzb0ew4f1QTdfbG/G/I0
-   Q==;
+  bh=H8J5LM2HZ9hya29SBi1L7Jdn0d5QYTA8HA4pnyfj1Tc=;
+  b=k5peIfSxfzjrrYNQBmpQugzQcy1F9uENgzOBkY3TDmfke7xTmPoFj3iq
+   3WUIK7GUKGN4T60ssPJ8N2H8tTEkYrtXT16+XOQZZ4SfQ5FSjm7X1g8QD
+   6MNDxhCocWiLkcF7J5EuPum9IxTHxEh13gHDyAt69dosbj1daQ5qcwgFM
+   6GDE3A805YovpZK6zZZb1mfD8HfdxZ01aGhs6tYA5pFAn2WnjeMjZ3ppx
+   cIY5y8PLBcrOs+NJw0Oj0ZZwaRydk5L6VjDyB/hFXcqOud44/A51Tf0yH
+   /LYcEUpucfTaf4egL80whnmaOHp8Tt9AXj8hQSpJbOlLnhSukKwQw4qC0
+   g==;
 X-IronPort-AV: E=Sophos;i="5.63,393,1557158400"; 
-   d="scan'208";a="115883801"
+   d="scan'208";a="115883803"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Jun 2019 01:13:53 +0800
-IronPort-SDR: faDUmELcQo74+mT05T9Om93sYNDHrQNVtUvuxiubcRnq5bu9EmXLSri8Z/azptpCwZs3U+rqDb
- Gp8csOdmlijLmPdQ3MSau8+p93yeKrkYidRpUJkxHq1KSpZmfT8MbOW3T80KyVZk+XAUrmrwXx
- j0fd8O4vhlG4Tw3SRxbQ6/o3cXkFIW4uYV2Kg2fW6dWLOFF4j+F2n/q41mBd2PuCuIcUkyRMPB
- KxScKXYn9ABLipwItM3Yeag5ord+J8WVM8l+PLqhDxmFvQ8oYcWfuq38u1URHOcxjXGNdWhJQx
- TwNeOJpkDfAPHcaTBVYu4ZGv
+  by ob1.hgst.iphmx.com with ESMTP; 20 Jun 2019 01:13:55 +0800
+IronPort-SDR: 93XIaITpsnUOoadeBlqKxbDxUlODsx1uQfJfd+boSFCVFOvwbVogIvoK6rSO/FKFHhKEVCJSrq
+ DaMqUC1a4OjSyBLlSxcg9ymp20TXswCw7C6Y+4ixTNHkELCu9xNRQKQbQpwMp69KmuPlM63wNy
+ BrZC481rLFxwaa29JThPmoh/jSN+/GnraxaCHv7512Dc1qbeqtMgGIBLtFSsSQZsHcCEa1XDRG
+ ujrzokYGEvSFk7rZjcIG6G2PnfRJC2VFCUdg3KgLj0u+a64uUs/ZvhUNxtTbfs1ynUDkSC/QDO
+ WOECqkO4XKImNhk4vO1jJ3jv
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP; 19 Jun 2019 10:13:18 -0700
-IronPort-SDR: QJJqovorEo/Vw9i4WQcnLbYMtDfCZpnK7RdzWdJfILBTXo7BuxW81kzHOrKc/2GzEkDcqxvIIi
- oD8NfDHsmss5KNjcfTPs85Qd1QxZ+7VbJ8+eKErQQErPNpT33Z/RX9/bhIcCUG7sQoWjJN8uaj
- CQs7B8hf3iUnsXAw0/S5TQSWXZ80N6Fp/2BMoIPf0P7LOJsOWNcsbWfykSLKUgsWXPaQeZN0qo
- pc0HA/rtfstHLvGDVKgimPUUA/6ThrZlDaaztuXyz9K/4HtS/4YsiFrXfrkkvHJFPUB+USY2Kl
- jdw=
+  by uls-op-cesaep01.wdc.com with ESMTP; 19 Jun 2019 10:13:21 -0700
+IronPort-SDR: 3tETrA0kuJ//P6gZE3SFWrQwnvFw/r4ANdiN/qt2uwRSE5+WuwupzBteup2f/3zGaOarPzEYcJ
+ nM2rj/6m43352/zC75Y6PwqD5+WDbQewtUFcMmu0rhDLi+/0lekfIMAU4srpR2LVdoOfXjDVO8
+ 1VIVGKhLMwzLsJd4ESkOqaL6wWBFq9ydSTyiuQTVHVx8pNZ6yUrn0ZFOZ4p0RNzYbZnGGfIDgT
+ 9Dql8z9ZwsS7FAonROL1C3B3Q3jWbWyIVNmKaA50ReUXJjZP4mZsXFCF5tJ5MBD9NGCtAV52mL
+ TYw=
 Received: from cmercuryqemu.hgst.com ([10.202.65.32])
-  by uls-op-cesaip01.wdc.com with ESMTP; 19 Jun 2019 10:13:52 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 19 Jun 2019 10:13:54 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     jaegeuk@kernel.org, yuchao0@huawei.com, bvanassche@acm.org,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V4 1/5] block: improve print_req_error
-Date:   Wed, 19 Jun 2019 10:12:58 -0700
-Message-Id: <20190619171302.10146-2-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V4 2/5] block: add centralize REQ_OP_XXX to string helper
+Date:   Wed, 19 Jun 2019 10:12:59 -0700
+Message-Id: <20190619171302.10146-3-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190619171302.10146-1-chaitanya.kulkarni@wdc.com>
 References: <20190619171302.10146-1-chaitanya.kulkarni@wdc.com>
@@ -70,57 +70,85 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+In order to centralize the REQ_OP_XXX to string conversion which can be
+used in the block layer and different places in the kernel like f2fs,
+this patch adds a new helper function along with an array similar to the
+one present in the blk-mq-debugfs.c.
 
-Print the calling function instead of print_req_error as a prefix, and
-print the operation and op_flags separately instead of the whole field.
+We keep this helper functionality centralize under blk-core.c instead of
+blk-mq-debugfs.c since blk-core.c is configured using CONFIG_BLOCK and
+it will not be dependent on blk-mq-debugfs.c which is configured using
+CONFIG_BLK_DEBUG_FS.
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Next patch adjusts the code in the blk-mq-debugfs.c with newly
+introduced helper.
+
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- block/blk-core.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ block/blk-core.c       | 36 ++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h |  3 +++
+ 2 files changed, 39 insertions(+)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 8340f69670d8..6753231b529b 100644
+index 6753231b529b..c92b5a16a27a 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -167,18 +167,20 @@ int blk_status_to_errno(blk_status_t status)
+@@ -120,6 +120,42 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
  }
- EXPORT_SYMBOL_GPL(blk_status_to_errno);
+ EXPORT_SYMBOL(blk_rq_init);
  
--static void print_req_error(struct request *req, blk_status_t status)
-+static void print_req_error(struct request *req, blk_status_t status,
-+		const char *caller)
- {
- 	int idx = (__force int)status;
++#define REQ_OP_NAME(name) [REQ_OP_##name] = #name
++static const char *const blk_op_name[] = {
++	REQ_OP_NAME(READ),
++	REQ_OP_NAME(WRITE),
++	REQ_OP_NAME(FLUSH),
++	REQ_OP_NAME(DISCARD),
++	REQ_OP_NAME(SECURE_ERASE),
++	REQ_OP_NAME(ZONE_RESET),
++	REQ_OP_NAME(WRITE_SAME),
++	REQ_OP_NAME(WRITE_ZEROES),
++	REQ_OP_NAME(SCSI_IN),
++	REQ_OP_NAME(SCSI_OUT),
++	REQ_OP_NAME(DRV_IN),
++	REQ_OP_NAME(DRV_OUT),
++};
++#undef REQ_OP_NAME
++
++/**
++ * blk_op_str - Return string XXX in the REQ_OP_XXX.
++ * @op: REQ_OP_XXX.
++ *
++ * Description: Centralize block layer function to convert REQ_OP_XXX into
++ * string format. Useful in the debugging and tracing bio or request. For
++ * invalid REQ_OP_XXX it returns string "UNKNOWN".
++ */
++inline const char *blk_op_str(unsigned int op)
++{
++	const char *op_str = "UNKNOWN";
++
++	if (op < ARRAY_SIZE(blk_op_name) && blk_op_name[op])
++		op_str = blk_op_name[op];
++
++	return op_str;
++}
++EXPORT_SYMBOL_GPL(blk_op_str);
++
+ static const struct {
+ 	int		errno;
+ 	const char	*name;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 592669bcc536..077a77a4a91c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -867,6 +867,9 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
+ extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
+ 				  struct request *, int, rq_end_io_fn *);
  
- 	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
- 		return;
- 
--	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu flags %x\n",
--				__func__, blk_errors[idx].name,
--				req->rq_disk ?  req->rq_disk->disk_name : "?",
--				(unsigned long long)blk_rq_pos(req),
--				req->cmd_flags);
-+	printk_ratelimited(KERN_ERR
-+		"%s: %s error, dev %s, sector %llu op 0x%x flags 0x%x\n",
-+		caller, blk_errors[idx].name,
-+		req->rq_disk ?  req->rq_disk->disk_name : "?",
-+		blk_rq_pos(req), req_op(req),
-+		req->cmd_flags & ~REQ_OP_MASK);
- }
- 
- static void req_bio_endio(struct request *rq, struct bio *bio,
-@@ -1373,7 +1375,7 @@ bool blk_update_request(struct request *req, blk_status_t error,
- 
- 	if (unlikely(error && !blk_rq_is_passthrough(req) &&
- 		     !(req->rq_flags & RQF_QUIET)))
--		print_req_error(req, error);
-+		print_req_error(req, error, __func__);
- 
- 	blk_account_io_completion(req, nr_bytes);
++/* Helper to convert REQ_OP_XXX to its string format XXX */
++extern const char *blk_op_str(unsigned int op);
++
+ int blk_status_to_errno(blk_status_t status);
+ blk_status_t errno_to_blk_status(int errno);
  
 -- 
 2.19.1
