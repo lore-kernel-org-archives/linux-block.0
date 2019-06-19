@@ -2,82 +2,143 @@ Return-Path: <SRS0=VMX8=US=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08941C48BDF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jun 2019 20:11:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 166A5C4646B
+	for <linux-block@archiver.kernel.org>; Wed, 19 Jun 2019 20:23:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D62802147A
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jun 2019 20:11:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5B94214AF
+	for <linux-block@archiver.kernel.org>; Wed, 19 Jun 2019 20:23:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560975099;
-	bh=ufGXvlZ2oTEKufBzdv5TWcAajgtSj8R8w3ocK3xoc6o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=jI20ElD9aV9G/n1Rwpa+lDg/1JJwhPyKgTxtkgpkkd50YyjT3pKzfft/Y2WfS8jxD
-	 NApSFXaNjiTPWpHCb0s7QzDduVr5YV9QDvIvrzER5OHIc2nStZUWwQAKmBCkJnbPCX
-	 rSjZxRUeU/42HqEj4aKX0YHQlPpm/UGJq4t81PTI=
+	s=default; t=1560975807;
+	bh=qgcuW/vpzcqzKWbZjJN8NyIykkFdIDlqS/LyBwbAD84=;
+	h=Subject:To:Cc:References:From:Date:In-Reply-To:List-ID:From;
+	b=FcY4P7RL3mCe+u+qcsj1xgG19DRX6VVLm0QjLEDdmFPbzMOpNTtoE5jEsnlrYVrcP
+	 7uGlmXGThSHfpo5JmniGHiEbRiJ3mg7YA9/Q/FvaThaU2Y68tbtd5zzpoS5nfloMNB
+	 honmDCPBOJLe2IuQixGr5TmqOIh9MPblzqN+PP2E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726230AbfFSULj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Jun 2019 16:11:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58482 "EHLO mail.kernel.org"
+        id S1726230AbfFSUX0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Jun 2019 16:23:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38248 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726175AbfFSULi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Jun 2019 16:11:38 -0400
-Received: from localhost (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726143AbfFSUXZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Jun 2019 16:23:25 -0400
+Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9A2E52084A;
-        Wed, 19 Jun 2019 20:11:37 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id ECD302082C;
+        Wed, 19 Jun 2019 20:23:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560975098;
-        bh=ufGXvlZ2oTEKufBzdv5TWcAajgtSj8R8w3ocK3xoc6o=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=n/P2ytqoa4CHBYW0h3D8zdoeGL6fXEhsCbYD1mjWA0M9en9jRSvjyLvTNAxxmXn8m
-         wegd9U4u1hMoQHEs+mxLfEfCJVonMmLE8zqmKWViZ2GoVdW28j2rqbIaDsCRaWy+dP
-         77Y974gtUinTHbNigAOz4ddSSxCc3iPmW9N5KL2Q=
-Date:   Wed, 19 Jun 2019 16:11:36 -0400
-From:   Sasha Levin <sashal@kernel.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        syzbot+10007d66ca02b08f0e60@syzkaller.appspotmail.com,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 5.1 35/70] loop: Don't change loop device under
- exclusive opener
-Message-ID: <20190619201136.GD2226@sasha-vm>
-References: <20190608113950.8033-1-sashal@kernel.org>
- <20190608113950.8033-35-sashal@kernel.org>
- <20190610090013.GF12765@quack2.suse.cz>
+        s=default; t=1560975804;
+        bh=qgcuW/vpzcqzKWbZjJN8NyIykkFdIDlqS/LyBwbAD84=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=2QUpyZNpIs0fr4yIAAGZpJfOerU3kctEhFAVhrxVIpL2sZNFbbjH9MNecIR3iaS7/
+         1+IVwdlC8UAm6yHU1q1s1CjEktjpPeu7Vqc+H+c8VDh0NHdSwh6YbJaBHnuoam38/T
+         N2Fzf8pKY9U1vht0lC7lKRD3uGiONsQs/7P7/ehA=
+Subject: Re: How to resolve an issue in swiotlb environment?
+To:     Alan Stern <stern@rowland.harvard.edu>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Oliver Neukum <oneukum@suse.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        shuah <shuah@kernel.org>
+References: <Pine.LNX.4.44L0.1906141043530.24571-100000@netrider.rowland.org>
+ <20684ef6-7da7-90ed-4cd6-3bc46202de6d@kernel.org>
+From:   shuah <shuah@kernel.org>
+Message-ID: <7a6450cd-7b68-778d-0124-3c21d4616069@kernel.org>
+Date:   Wed, 19 Jun 2019 14:23:11 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20190610090013.GF12765@quack2.suse.cz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20684ef6-7da7-90ed-4cd6-3bc46202de6d@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 10, 2019 at 11:00:13AM +0200, Jan Kara wrote:
->On Sat 08-06-19 07:39:14, Sasha Levin wrote:
->> From: Jan Kara <jack@suse.cz>
+Hi Alan,
+
+On 6/18/19 9:28 AM, shuah wrote:
+> On 6/14/19 8:44 AM, Alan Stern wrote:
+>> On Thu, 13 Jun 2019, shuah wrote:
 >>
->> [ Upstream commit 33ec3e53e7b1869d7851e59e126bdb0fe0bd1982 ]
->
->Please don't push this to stable kernels because...
+>>>> Great!  So all we have to do is fix vhci-hcd.  Then we can remove all
+>>>> the virt_boundary_mask stuff from usb-storage and uas entirely.
+>>>>
+>>>> (I'm assuming wireless USB isn't a genuine issue.  As far as I know, it
+>>>> is pretty much abandoned at this point.)
+>>>>
+>>>> Valentina and Shua: Adding SG support to vhci-hcd shouldn't be too
+>>>> hard.  It ought to be possible even without changing the network
+>>>> protocol.
+>>>>
+>>>
+>>> I will start taking a look at this. Is there a target release in plan
+>>> to drop virt_boundary_mask stuff?
+>>
+>> Not yet.  But since it doesn't do what we want anyway, this should be
+>> fixed quickly.
+>>
+> 
 
-I've dropped this, but...
+I missed a lot of the thread info. and went looking for it and found the
+following summary of the problem:
 
->> [Deliberately chosen not to CC stable as a user with priviledges to
->> trigger this race has other means of taking the system down and this
->> has a potential of breaking some weird userspace setup]
->
->... of this. Thanks!
+==================
+The issue which prompted the commit this thread is about arose in a
+situation where the block layer set up a scatterlist containing buffer
+sizes something like:
 
-Can't this be triggered by an "innocent" user, rather as part of an
-attack? Why can't this race happen during regular usage?
+	4096 4096 1536 1024
 
---
-Thanks,
-Sasha
+and the maximum packet size was 1024.  The situation was a little
+unusual, because it involved vhci-hcd (a virtual HCD).  This doesn't
+matter much in normal practice because:
+
+	Block devices normally have a block size of 512 bytes or more.
+	Smaller values are very uncommon.  So scatterlist element sizes
+	are always divisible by 512.
+
+	xHCI is the only USB host controller type with a maximum packet
+	size larger than 512, and xHCI hardware can do full
+	scatter-gather so it doesn't care what the buffer sizes are.
+
+So another approach would be to fix vhci-hcd and then trust that the
+problem won't arise again, for the reasons above.  We would be okay so
+long as nobody tried to use a USB-SCSI device with a block size of 256
+bytes or less.
+===================
+
+Out of the summary, the following gives me pause:
+
+"xHCI hardware can do full scatter-gather so it doesn't care what the
+buffer sizes are."
+
+vhci-hcd won't be able to count on hardware being able to do full
+scatter-gather. It has to deal with a variety of hardware with
+varying speeds.
+
+"We would be okay so long as nobody tried to use a USB-SCSI device with
+a block size of 256 bytes or less."
+
+At least a USB Storage device, I test with says 512 block size. Can we
+count on not seeing a device with block size <= 256 bytes?
+
+In any case, I am looking into adding SG support vhci-hci at the moment.
+
+Looks like the following is the repo, I should be working with?
+
+git://git.infradead.org/users/hch/misc.git
+
+thanks,
+-- Shuah
