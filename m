@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 947E8C48BE1
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09912C48BE3
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7298E2070B
+	by mail.kernel.org (Postfix) with ESMTP id DB9C72070B
 	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732374AbfFTQNz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 12:13:55 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:59582 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732225AbfFTQNC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1732223AbfFTQNC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 20 Jun 2019 12:13:02 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:59544 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732211AbfFTQNB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Jun 2019 12:13:01 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzgA-00046X-NP; Thu, 20 Jun 2019 10:13:01 -0600
+        id 1hdzg6-00046S-68; Thu, 20 Jun 2019 10:12:59 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzg5-0005wf-Aj; Thu, 20 Jun 2019 10:12:45 -0600
+        id 1hdzg4-0005wQ-RP; Thu, 20 Jun 2019 10:12:44 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
@@ -38,8 +38,8 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Jason Gunthorpe <jgg@ziepe.ca>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 20 Jun 2019 10:12:28 -0600
-Message-Id: <20190620161240.22738-17-logang@deltatee.com>
+Date:   Thu, 20 Jun 2019 10:12:23 -0600
+Message-Id: <20190620161240.22738-12-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190620161240.22738-1-logang@deltatee.com>
 References: <20190620161240.22738-1-logang@deltatee.com>
@@ -48,7 +48,7 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, axboe@kernel.dk, hch@lst.de, bhelgaas@google.com, dan.j.williams@intel.com, sagi@grimberg.me, kbusch@kernel.org, jgg@ziepe.ca, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [RFC PATCH 16/28] block: Implement mapping dma-direct requests to SGs in blk_rq_map_sg()
+Subject: [RFC PATCH 11/28] block: Create blk_segment_split_ctx
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -56,103 +56,121 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_rq_map_sg() just needs to move the dma_vec into the dma_address
-of the sgl. Callers will need to ensure not to call dma_map_sg()
-for dma-direct requests.
-
-This will likely get less ugly with Christoph's proposed cleanup
-to the DMA API. It will be much simpler if devices are just
-calling a dma_map_bio() and don't have to worry about dma-direct
-requests.
+In order to support dma-direct bios, blk_bio_segment_split() will
+need to operate on both bio_vecs and dma_vecs. In order to do
+this the code inside bio_for_each_bvec() needs to be moved into
+a generic helper. Step one to do this is to put some of the
+variables used inside the loop into a context structure so we
+don't need to pass a dozen variables to this new function.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk-merge.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ block/blk-merge.c | 55 ++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 35 insertions(+), 20 deletions(-)
 
 diff --git a/block/blk-merge.c b/block/blk-merge.c
-index a7a5453987f9..ccd6c44b9f6e 100644
+index 3581c7ac3c1b..414e61a714bf 100644
 --- a/block/blk-merge.c
 +++ b/block/blk-merge.c
-@@ -545,6 +545,69 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- 	return nsegs;
+@@ -201,63 +201,78 @@ static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
+ 			      sectors, max_segs);
  }
  
-+static unsigned blk_dvec_map_sg(struct request_queue *q,
-+		struct dma_vec *dvec, struct scatterlist *sglist,
-+		struct scatterlist **sg)
-+{
-+	unsigned nbytes = dvec->dv_len;
-+	unsigned nsegs = 0, total = 0;
++struct blk_segment_split_ctx {
++	unsigned nsegs;
++	unsigned sectors;
 +
-+	while (nbytes > 0) {
-+		unsigned seg_size;
++	bool prv_valid;
++	struct bio_vec bvprv;
 +
-+		*sg = blk_next_sg(sg, sglist);
++	const unsigned max_sectors;
++	const unsigned max_segs;
++};
 +
-+		seg_size = get_max_segment_size(q, total);
-+		seg_size = min(nbytes, seg_size);
+ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 					 struct bio *bio,
+ 					 struct bio_set *bs,
+ 					 unsigned *segs)
+ {
+-	struct bio_vec bv, bvprv, *bvprvp = NULL;
++	struct bio_vec bv;
+ 	struct bvec_iter iter;
+-	unsigned nsegs = 0, sectors = 0;
+ 	bool do_split = true;
+ 	struct bio *new = NULL;
+-	const unsigned max_sectors = get_max_io_size(q, bio);
+-	const unsigned max_segs = queue_max_segments(q);
 +
-+		(*sg)->dma_address = dvec->dv_addr + total;
-+		sg_dma_len(*sg) = seg_size;
-+
-+		total += seg_size;
-+		nbytes -= seg_size;
-+		nsegs++;
-+	}
-+
-+	return nsegs;
-+}
-+
-+static inline void
-+__blk_segment_dma_map_sg(struct request_queue *q, struct dma_vec *dvec,
-+			 struct scatterlist *sglist, struct dma_vec *dvprv,
-+			 struct scatterlist **sg, int *nsegs)
-+{
-+	int nbytes = dvec->dv_len;
-+
-+	if (*sg) {
-+		if ((*sg)->length + nbytes > queue_max_segment_size(q))
-+			goto new_segment;
-+		if (!dmavec_phys_mergeable(q, dvprv, dvec))
-+			goto new_segment;
-+
-+		(*sg)->length += nbytes;
-+	} else {
-+new_segment:
-+		(*nsegs) += blk_dvec_map_sg(q, dvec, sglist, sg);
-+	}
-+	*dvprv = *dvec;
-+}
-+
-+static int __blk_dma_bios_map_sg(struct request_queue *q, struct bio *bio,
-+				 struct scatterlist *sglist,
-+				 struct scatterlist **sg)
-+{
-+	struct dma_vec dvec, dvprv = {};
-+	struct bvec_iter iter;
-+	int nsegs = 0;
-+
-+	for_each_bio(bio)
-+		bio_for_each_dvec(dvec, bio, iter)
-+			__blk_segment_dma_map_sg(q, &dvec, sglist, &dvprv,
-+						 sg, &nsegs);
-+
-+	return nsegs;
-+}
-+
- /*
-  * map a request to scatterlist, return number of sg entries setup. Caller
-  * must make sure sg can hold rq->nr_phys_segments entries
-@@ -559,6 +622,8 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
- 		nsegs = __blk_bvec_map_sg(rq->special_vec, sglist, &sg);
- 	else if (rq->bio && bio_op(rq->bio) == REQ_OP_WRITE_SAME)
- 		nsegs = __blk_bvec_map_sg(bio_iovec(rq->bio), sglist, &sg);
-+	else if (blk_rq_is_dma_direct(rq))
-+		nsegs = __blk_dma_bios_map_sg(q, rq->bio, sglist, &sg);
- 	else if (rq->bio)
- 		nsegs = __blk_bios_map_sg(q, rq->bio, sglist, &sg);
++	struct blk_segment_split_ctx ctx = {
++		.max_sectors = get_max_io_size(q, bio),
++		.max_segs = queue_max_segments(q),
++	};
  
+ 	bio_for_each_bvec(bv, bio, iter) {
+ 		/*
+ 		 * If the queue doesn't support SG gaps and adding this
+ 		 * offset would create a gap, disallow it.
+ 		 */
+-		if (bvprvp && bvec_gap_to_prev(q, bvprvp, bv.bv_offset))
++		if (ctx.prv_valid && bvec_gap_to_prev(q, &ctx.bvprv,
++						      bv.bv_offset))
+ 			goto split;
+ 
+-		if (sectors + (bv.bv_len >> 9) > max_sectors) {
++		if (ctx.sectors + (bv.bv_len >> 9) > ctx.max_sectors) {
+ 			/*
+ 			 * Consider this a new segment if we're splitting in
+ 			 * the middle of this vector.
+ 			 */
+-			if (nsegs < max_segs &&
+-			    sectors < max_sectors) {
++			if (ctx.nsegs < ctx.max_segs &&
++			    ctx.sectors < ctx.max_sectors) {
+ 				/* split in the middle of bvec */
+-				bv.bv_len = (max_sectors - sectors) << 9;
+-				bvec_split_segs(q, &bv, &nsegs,
+-						&sectors, max_segs);
++				bv.bv_len =
++					(ctx.max_sectors - ctx.sectors) << 9;
++				bvec_split_segs(q, &bv, &ctx.nsegs,
++						&ctx.sectors, ctx.max_segs);
+ 			}
+ 			goto split;
+ 		}
+ 
+-		if (nsegs == max_segs)
++		if (ctx.nsegs == ctx.max_segs)
+ 			goto split;
+ 
+-		bvprv = bv;
+-		bvprvp = &bvprv;
++		ctx.bvprv = bv;
++		ctx.prv_valid = true;
+ 
+ 		if (bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
+-			nsegs++;
+-			sectors += bv.bv_len >> 9;
+-		} else if (bvec_split_segs(q, &bv, &nsegs, &sectors,
+-				max_segs)) {
++			ctx.nsegs++;
++			ctx.sectors += bv.bv_len >> 9;
++		} else if (bvec_split_segs(q, &bv, &ctx.nsegs, &ctx.sectors,
++				ctx.max_segs)) {
+ 			goto split;
+ 		}
+ 	}
+ 
+ 	do_split = false;
+ split:
+-	*segs = nsegs;
++	*segs = ctx.nsegs;
+ 
+ 	if (do_split) {
+-		new = bio_split(bio, sectors, GFP_NOIO, bs);
++		new = bio_split(bio, ctx.sectors, GFP_NOIO, bs);
+ 		if (new)
+ 			bio = new;
+ 	}
 -- 
 2.20.1
 
