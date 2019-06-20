@@ -2,105 +2,131 @@ Return-Path: <SRS0=D4S7=UT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0856C43613
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 07:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 308C1C4646B
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 08:50:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C31342084B
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 07:36:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KcNSSGxz"
+	by mail.kernel.org (Postfix) with ESMTP id 109CA206E0
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 08:50:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730967AbfFTHgr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 03:36:47 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:45910 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730891AbfFTHgr (ORCPT
+        id S1726124AbfFTIun (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 04:50:43 -0400
+Received: from relmlor1.renesas.com ([210.160.252.171]:21012 "EHLO
+        relmlie5.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725925AbfFTIum (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 03:36:47 -0400
-Received: by mail-ed1-f66.google.com with SMTP id a14so3198338edv.12
-        for <linux-block@vger.kernel.org>; Thu, 20 Jun 2019 00:36:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=rDdWAqffTT+oSdiXbKqtbjpzXQIFQC5WZi7REe1Jpzc=;
-        b=KcNSSGxz6j/9c3/UU7EzkVXLQw9IHfAGIei+vpcXLRgZ44F848Gjw8vTiozTuhmJzb
-         B4/Ly0hMdiaMtR8CIKDoo0KChBXSSTJeSztn+0hZpWeBm9OYKd9GQLVYaaRWlo4NpcdN
-         q6IBUhcDB12PNLoSQKL2/6EKWxiiKJ1rybUVqmN7pkl3UPjghMnmOMBVURJ/VzNDMvlc
-         o0C252Hrku5hqxWQtP3wnXREg4907cByetiXowftDk8nDt4FHe2NiinFND33XyOHrK9z
-         kDI72Bj0mYTTmvm7cS4eL+ZDiln7UOpr+aD8WK8inz70jGgqsloeBZsvdaF36+MXuX8J
-         V8IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rDdWAqffTT+oSdiXbKqtbjpzXQIFQC5WZi7REe1Jpzc=;
-        b=L2xZocMyxRr5QQKEhdlLAjTpMtWPtQDMxp1llvJlCksC0yNbIvobwcBew8B03Hvg4g
-         pfae6+41SGdSN30ezAaizb7y/8zPPqyWDBh6QyMSwsGrO5he7y4kG++k4sQPO2RNQ1Oj
-         /MOfRcHg4QSJYQ1RZxYzNW9lnMKoattdqEAlCUWjcM01HWJix7M+J7KfmUeIZCKEQ85z
-         u+hIxy1X3gQkt/+A1hYD5CAyOoR3xvSyxV8zrm2/TqSHuG3nDdZxWV2SMW3RvGvRqoXu
-         gZ+N+t8rRCwKG2t/HqLzRYCWZBz7VRTzKCff3DmmcEW7+8D4kZV8M/IlSZXBkMSQz/GP
-         AfLA==
-X-Gm-Message-State: APjAAAUm0WKbIIlhJ5FkwwW6jGtZNigiasKickU3/fABfWScfUqWReTX
-        dEFhtbHPQ2KGyCK/lG8OcM3E2g==
-X-Google-Smtp-Source: APXvYqxG5E8urhDC9+2T2Bc7xL0pcd3QezOCfgkQo8wMsGgaoB49aehLx/TSw6mOwnP6Ca4xscr16Q==
-X-Received: by 2002:aa7:d30d:: with SMTP id p13mr55603903edq.292.1561016205308;
-        Thu, 20 Jun 2019 00:36:45 -0700 (PDT)
-Received: from [192.168.0.115] (xd520f259.cust.hiper.dk. [213.32.242.89])
-        by smtp.gmail.com with ESMTPSA id e19sm3730317eja.91.2019.06.20.00.36.44
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 20 Jun 2019 00:36:44 -0700 (PDT)
-Subject: Re: [PATCH] [RESEND] floppy: fix harmless clang build warning
-To:     Arnd Bergmann <arnd@arndb.de>, Jiri Kosina <jikos@kernel.org>
-Cc:     Robert Elliott <elliott@hpe.com>, Keith Busch <kbusch@kernel.org>,
-        Hannes Reinecke <hare@suse.de>, Omar Sandoval <osandov@fb.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        Andy Whitcroft <apw@canonical.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190619131959.2055400-1-arnd@arndb.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <649b433f-9a6b-a8a8-65ea-aa15a6296246@kernel.dk>
-Date:   Thu, 20 Jun 2019 01:36:43 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190619131959.2055400-1-arnd@arndb.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Thu, 20 Jun 2019 04:50:42 -0400
+X-IronPort-AV: E=Sophos;i="5.62,396,1554735600"; 
+   d="scan'208";a="19173841"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie5.idc.renesas.com with ESMTP; 20 Jun 2019 17:50:40 +0900
+Received: from localhost.localdomain (unknown [10.166.17.210])
+        by relmlir5.idc.renesas.com (Postfix) with ESMTP id 3B017400C422;
+        Thu, 20 Jun 2019 17:50:40 +0900 (JST)
+From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To:     ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
+        robin.murphy@arm.com, joro@8bytes.org, axboe@kernel.dk
+Cc:     wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: [RFC PATCH v7 0/5] treewide: improve R-Car SDHI performance
+Date:   Thu, 20 Jun 2019 17:50:05 +0900
+Message-Id: <1561020610-953-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/19/19 7:19 AM, Arnd Bergmann wrote:
-> clang warns about unusual code in floppy.c that looks like it
-> was intended to be a bit mask operation, checking for a specific
-> bit in the UDP->cmos variable (FLOPPY1_TYPE expands to '4' on
-> ARM):
-> 
-> drivers/block/floppy.c:3902:17: error: use of logical '&&' with constant operand [-Werror,-Wconstant-logical-operand]
->          if (!UDP->cmos && FLOPPY1_TYPE)
->                         ^  ~~~~~~~~~~~~
-> drivers/block/floppy.c:3902:17: note: use '&' for a bitwise operation
->          if (!UDP->cmos && FLOPPY1_TYPE)
-> 
-> The check here is redundant anyway, if FLOPPY1_TYPE is zero, then
-> assigning it to a zero UDP->cmos field does not change anything,
-> so removing the extra check here has no effect other than shutting
-> up the warning.
-> 
-> On x86, this will no longer read a hardware register, as the
-> FLOPPY1_TYPE macro is not expanded if UDP->cmos is already
-> zero, but the result is the same.
+This patch series is based on iommu.git / next branch.
 
-Applied, thanks.
+Since SDHI host internal DMAC of the R-Car Gen3 cannot handle two or
+more segments, the performance rate (especially, eMMC HS400 reading)
+is not good. However, if IOMMU is enabled on the DMAC, since IOMMU will
+map multiple scatter gather buffers as one contignous iova, the DMAC can
+handle the iova as well and then the performance rate is possible to
+improve. In fact, I have measured the performance by using bonnie++,
+"Sequential Input - block" rate was improved on r8a7795.
+
+To achieve this, this patch series modifies IOMMU and Block subsystem
+at first. Since I'd like to get any feedback from each subsystem whether
+this way is acceptable for upstream, I submit it to treewide with RFC.
+
+Changes from v6:
+ - [1/5 for DMA MAP] A new patch.
+ - [2/5 for IOMMU] A new patch.
+ - [3/5 for BLOCK] Add Reviewed-by.
+ - [4/5 for BLOCK] Use a new DMA MAP API instead of device_iommu_mapped().
+ - [5/5 for MMC] Likewise, and some minor fix.
+ - Remove patch 4/5 of v6 from this v7 patch series.
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=131769
+
+Changes from v5:
+ - Almost all patches are new code.
+ - [4/5 for MMC] This is a refactor patch so that I don't add any
+   {Tested,Reviewed}-by tags.
+ - [5/5 for MMC] Modify MMC subsystem to use bigger segments instead of
+   the renesas_sdhi driver.
+ - [5/5 for MMC] Use BLK_MAX_SEGMENTS (128) instead of local value
+   SDHI_MAX_SEGS_IN_IOMMU (512). Even if we use BLK_MAX_SEGMENTS,
+   the performance is still good.
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=127511
+
+Changes from v4:
+ - [DMA MAPPING] Add a new device_dma_parameters for iova contiguous.
+ - [IOMMU] Add a new capable for "merging" segments.
+ - [IOMMU] Add a capable ops into the ipmmu-vmsa driver.
+ - [MMC] Sort headers in renesas_sdhi_core.c.
+ - [MMC] Remove the following codes that made on v3 that can be achieved by
+	 DMA MAPPING and IOMMU subsystem:
+ -- Check if R-Car Gen3 IPMMU is used or not on patch 3.
+ -- Check if all multiple segment buffers are aligned to PAGE_SIZE on patch 3.
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=125593
+
+Changes from v3:
+ - Use a helper function device_iommu_mapped on patch 1 and 3.
+ - Check if R-Car Gen3 IPMMU is used or not on patch 3.
+ - Check if all multiple segment buffers are aligned to PAGE_SIZE on patch 3.
+ - Add Reviewed-by Wolfram-san on patch 1 and 2. Note that I also got his
+   Reviewed-by on patch 3, but I changed it from v2. So, I didn't add
+   his Reviewed-by at this time.
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=120985
+
+Changes from v2:
+ - Add some conditions in the init_card().
+ - Add a comment in the init_card().
+ - Add definitions for some "MAX_SEGS".
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=116729
+
+Changes from v1:
+ - Remove adding init_card ops into struct tmio_mmc_dma_ops and
+   tmio_mmc_host and just set init_card on renesas_sdhi_core.c.
+ - Revise typos on "mmc: tmio: No memory size limitation if runs on IOMMU".
+ - Add Simon-san's Reviewed-by on a tmio patch.
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=110485
+
+Yoshihiro Shimoda (5):
+  dma: Introduce dma_get_merge_boundary()
+  iommu/dma: Add a new dma_map_ops of get_merge_boundary()
+  block: sort headers on blk-setting.c
+  block: add a helper function to merge the segments
+  mmc: queue: Use bigger segments if DMA MAP layer can merge the
+    segments
+
+ Documentation/DMA-API.txt   |  8 ++++++++
+ block/blk-settings.c        | 34 ++++++++++++++++++++++++++++------
+ drivers/iommu/dma-iommu.c   | 11 +++++++++++
+ drivers/mmc/core/queue.c    | 35 ++++++++++++++++++++++++++++++++---
+ include/linux/blkdev.h      |  2 ++
+ include/linux/dma-mapping.h |  6 ++++++
+ include/linux/mmc/host.h    |  1 +
+ kernel/dma/mapping.c        | 11 +++++++++++
+ 8 files changed, 99 insertions(+), 9 deletions(-)
 
 -- 
-Jens Axboe
+2.7.4
 
