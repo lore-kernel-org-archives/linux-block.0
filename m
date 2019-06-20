@@ -2,93 +2,136 @@ Return-Path: <SRS0=D4S7=UT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74FAFC43613
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:37:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F12C43613
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:12:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A2B220673
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:37:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACAC82070B
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:12:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726940AbfFTPhe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 11:37:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41674 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726798AbfFTPhe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 11:37:34 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 519C0AE46;
-        Thu, 20 Jun 2019 15:37:33 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 12BC11E434F; Thu, 20 Jun 2019 17:37:33 +0200 (CEST)
-Date:   Thu, 20 Jun 2019 17:37:33 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
-        axboe@kernel.dk, jack@suse.cz, linux-btrfs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel-team@fb.com
-Subject: Re: [PATCH 4/9] blkcg: implement REQ_CGROUP_PUNT
-Message-ID: <20190620153733.GM30243@quack2.suse.cz>
-References: <20190615182453.843275-1-tj@kernel.org>
- <20190615182453.843275-5-tj@kernel.org>
+        id S1726620AbfFTQMt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 12:12:49 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:59328 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726530AbfFTQMs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Jun 2019 12:12:48 -0400
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1hdzg6-00046V-6A; Thu, 20 Jun 2019 10:12:47 -0600
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1hdzg5-0005wZ-4g; Thu, 20 Jun 2019 10:12:45 -0600
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Stephen Bates <sbates@raithlin.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Thu, 20 Jun 2019 10:12:26 -0600
+Message-Id: <20190620161240.22738-15-logang@deltatee.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190620161240.22738-1-logang@deltatee.com>
+References: <20190620161240.22738-1-logang@deltatee.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190615182453.843275-5-tj@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, axboe@kernel.dk, hch@lst.de, bhelgaas@google.com, dan.j.williams@intel.com, sagi@grimberg.me, kbusch@kernel.org, jgg@ziepe.ca, sbates@raithlin.com, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [RFC PATCH 14/28] block: Support splitting dma-direct bios
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat 15-06-19 11:24:48, Tejun Heo wrote:
-> When a shared kthread needs to issue a bio for a cgroup, doing so
-> synchronously can lead to priority inversions as the kthread can be
-> trapped waiting for that cgroup.  This patch implements
-> REQ_CGROUP_PUNT flag which makes submit_bio() punt the actual issuing
-> to a dedicated per-blkcg work item to avoid such priority inversions.
-> 
-> This will be used to fix priority inversions in btrfs compression and
-> should be generally useful as we grow filesystem support for
-> comprehensive IO control.
-> 
-> Signed-off-by: Tejun Heo <tj@kernel.org>
-> Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-> Cc: Chris Mason <clm@fb.com>
+If the bio is a dma-direct bio, loop through the dma_vecs instead
+of the bio_vecs when calling vec_should_split().
 
-...
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+---
+ block/blk-merge.c | 45 +++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 37 insertions(+), 8 deletions(-)
 
-> +bool __blkcg_punt_bio_submit(struct bio *bio)
-> +{
-> +	struct blkcg_gq *blkg = bio->bi_blkg;
-> +
-> +	/* consume the flag first */
-> +	bio->bi_opf &= ~REQ_CGROUP_PUNT;
-> +
-> +	/* never bounce for the root cgroup */
-> +	if (!blkg->parent)
-> +		return false;
-> +
-> +	spin_lock_bh(&blkg->async_bio_lock);
-> +	bio_list_add(&blkg->async_bios, bio);
-> +	spin_unlock_bh(&blkg->async_bio_lock);
-> +
-> +	queue_work(blkcg_punt_bio_wq, &blkg->async_bio_work);
-> +	return true;
-> +}
-> +
-
-So does this mean that if there is some inode with lots of dirty data for a
-blkcg that is heavily throttled, that blkcg can occupy a ton of workers all
-being throttled in submit_bio()? Or what is constraining a number of
-workers one blkcg can consume?
-
-								Honza
-
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 32653fca53ce..c4c016f994f6 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -257,14 +257,44 @@ static bool vec_should_split(struct request_queue *q, unsigned offset,
+ 	return false;
+ }
+ 
++static bool bio_should_split(struct request_queue *q, struct bio *bio,
++			     struct blk_segment_split_ctx *ctx)
++{
++	struct bvec_iter iter;
++	struct bio_vec bv;
++	bool ret;
++
++	bio_for_each_bvec(bv, bio, iter) {
++		ret = vec_should_split(q, bv.bv_offset, bv.bv_len, ctx);
++		if (ret)
++			return true;
++	}
++
++	return false;
++}
++
++static bool bio_dma_should_split(struct request_queue *q, struct bio *bio,
++				 struct blk_segment_split_ctx *ctx)
++{
++	struct bvec_iter iter;
++	struct dma_vec dv;
++	bool ret;
++
++	bio_for_each_dvec(dv, bio, iter) {
++		ret = vec_should_split(q, dv.dv_addr, dv.dv_len, ctx);
++		if (ret)
++			return true;
++	}
++
++	return false;
++}
++
+ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 					 struct bio *bio,
+ 					 struct bio_set *bs,
+ 					 unsigned *segs)
+ {
+-	struct bio_vec bv;
+-	struct bvec_iter iter;
+-	bool do_split = false;
++	bool do_split;
+ 	struct bio *new = NULL;
+ 
+ 	struct blk_segment_split_ctx ctx = {
+@@ -272,11 +302,10 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 		.max_segs = queue_max_segments(q),
+ 	};
+ 
+-	bio_for_each_bvec(bv, bio, iter) {
+-		do_split = vec_should_split(q, bv.bv_offset, bv.bv_len, &ctx);
+-		if (do_split)
+-			break;
+-	}
++	if (bio_is_dma_direct(bio))
++		do_split = bio_dma_should_split(q, bio, &ctx);
++	else
++		do_split = bio_should_split(q, bio, &ctx);
+ 
+ 	*segs = ctx.nsegs;
+ 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.20.1
+
