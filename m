@@ -2,110 +2,103 @@ Return-Path: <SRS0=D4S7=UT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54490C48BE4
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9797C48BE3
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:21:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D16F20673
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:04:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lPyOtGtQ"
+	by mail.kernel.org (Postfix) with ESMTP id 9315820675
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:21:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732141AbfFTPEM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 11:04:12 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:44600 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732109AbfFTPEM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 11:04:12 -0400
-Received: by mail-ed1-f65.google.com with SMTP id k8so5132138edr.11;
-        Thu, 20 Jun 2019 08:04:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=O+zl+CamckNzoH1pXa2JT0jH4nRQgR2JBCVTfXPCZss=;
-        b=lPyOtGtQYJlzNXp5FVFU62OFDiKn/AMTDaW0WsDLI5SHaFYFIzLC8A0yxmOD3C5Fiq
-         G/h1U3dgguoctw+VFfZ8/8NK9e9A8MrDfrXahUVx7IbWSsDnoEBqPJjEF27kiyH5WeuA
-         K1bqWy1jfi+Rtu3+hvRXqnNbruFcWWGAFV1bsOvl85jI1Wyhd4YQ1cMwfwgivMq2wIJd
-         dzHiHP3nIfTqxlH0GMd/tCexNgvVEsR6HsS7fXSWEgCQhv1BqHkZ/AmkgVzsTauYcS9k
-         CgRCzlIcL09Xo0yXhkeOOu6upd6qFUMCoKvev8PkCf3/ZettMHb+/g0OHJko7giuc85+
-         OaeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=O+zl+CamckNzoH1pXa2JT0jH4nRQgR2JBCVTfXPCZss=;
-        b=h4lJ+zP5RRnvaYoioJhMo1SY3FzFuN7EpaXLPadhWy2+ecVjx3+4VPkh6OlSWPrz3x
-         kMAugZnCoJ3gDVeUUtEpEBaGluaYBnPzjKFDdae9aoLzMFRC2lNgwgOagVt5UFVjl1wi
-         PxHgB5rscvl6fhBao76esmN+ygqg4rtD+HPfqsmIRMBW7mPcXHrKX3ERdu6d/5/n7Fis
-         BoppIe8sOpPj8gZZFZAkrHxp7zd2me9RE+epu6aQm4rut6T6I0lNyYelU3V1xIxaGzbs
-         erIMPbRQate7SiDauk2e3N3kUe66bnV0OCO9kNjTkXgHPZJeNis7ds42qtOLTlMVQK2t
-         CJ4g==
-X-Gm-Message-State: APjAAAUTS8J5KymPtCLXZ1te3GN8TxsledCKE14FOQuXBF9HuOpRuO36
-        9tV95/hL4/c1BM3mPSRz693WvVzH7qk=
-X-Google-Smtp-Source: APXvYqyNTnTxTvmC9KQ8/1uO8IJJ3qtUl/IOnO1TUG6mtR1we81wkeE3IZn/69GgquOjss1E1w8zNA==
-X-Received: by 2002:a17:906:5cd:: with SMTP id t13mr5878666ejt.275.1561043050497;
-        Thu, 20 Jun 2019 08:04:10 -0700 (PDT)
-Received: from jwang-Latitude-5491.pb.local ([62.217.45.26])
-        by smtp.gmail.com with ESMTPSA id a20sm3855817ejj.21.2019.06.20.08.04.09
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 20 Jun 2019 08:04:09 -0700 (PDT)
-From:   Jack Wang <jinpuwang@gmail.com>
-To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        bvanassche@acm.org, jgg@mellanox.com, dledford@redhat.com,
-        danil.kipnis@cloud.ionos.com, rpenyaev@suse.de,
-        Roman Pen <roman.penyaev@profitbricks.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCH v4 25/25] MAINTAINERS: Add maintainer for IBNBD/IBTRS modules
-Date:   Thu, 20 Jun 2019 17:03:37 +0200
-Message-Id: <20190620150337.7847-26-jinpuwang@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190620150337.7847-1-jinpuwang@gmail.com>
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
+        id S1726680AbfFTPVr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 11:21:47 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39278 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726697AbfFTPVr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Jun 2019 11:21:47 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id B917CAD5D;
+        Thu, 20 Jun 2019 15:21:45 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 643371E434F; Thu, 20 Jun 2019 17:21:45 +0200 (CEST)
+Date:   Thu, 20 Jun 2019 17:21:45 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
+        axboe@kernel.dk, jack@suse.cz, linux-btrfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com
+Subject: Re: [PATCH 2/9] blkcg, writeback: Add wbc->no_wbc_acct
+Message-ID: <20190620152145.GL30243@quack2.suse.cz>
+References: <20190615182453.843275-1-tj@kernel.org>
+ <20190615182453.843275-3-tj@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190615182453.843275-3-tj@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Roman Pen <roman.penyaev@profitbricks.com>
+On Sat 15-06-19 11:24:46, Tejun Heo wrote:
+> When writeback IOs are bounced through async layers, the IOs should
+> only be accounted against the wbc from the original bdi writeback to
+> avoid confusing cgroup inode ownership arbitration.  Add
+> wbc->no_wbc_acct to allow disabling wbc accounting.  This will be used
+> make btfs compression work well with cgroup IO control.
+> 
+> Signed-off-by: Tejun Heo <tj@kernel.org>
+> Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
----
- MAINTAINERS | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+I'm completely ignorant of how btrfs compressed writeback works so don't
+quite understand implications of this. So does this mean that writeback to
+btrfs compressed files won't be able to transition inodes from one memcg to
+another? Or are you trying to say the 'wbc' used from async worker thread
+is actually a dummy one and we would double-account the writeback?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a6954776a37e..0b7fd93f738d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -7590,6 +7590,20 @@ IBM ServeRAID RAID DRIVER
- S:	Orphan
- F:	drivers/scsi/ips.*
- 
-+IBNBD BLOCK DRIVERS
-+M:	IBNBD/IBTRS Storage Team <ibnbd@cloud.ionos.com>
-+L:	linux-block@vger.kernel.org
-+S:	Maintained
-+T:	git git://github.com/profitbricks/ibnbd.git
-+F:	drivers/block/ibnbd/
-+
-+IBTRS TRANSPORT DRIVERS
-+M:	IBNBD/IBTRS Storage Team <ibnbd@cloud.ionos.com>
-+L:	linux-rdma@vger.kernel.org
-+S:	Maintained
-+T:	git git://github.com/profitbricks/ibnbd.git
-+F:	drivers/infiniband/ulp/ibtrs/
-+
- ICH LPC AND GPIO DRIVER
- M:	Peter Tyser <ptyser@xes-inc.com>
- S:	Maintained
+Anyway, AFAICS no_wbc_acct means: "IO done as a result of this wbc will not
+have influence on inode memcg ownership", doesn't it?
+
+								Honza
+> ---
+>  fs/fs-writeback.c         | 2 +-
+>  include/linux/writeback.h | 1 +
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
+> index c29cff345b1f..667ba07fffcd 100644
+> --- a/fs/fs-writeback.c
+> +++ b/fs/fs-writeback.c
+> @@ -724,7 +724,7 @@ void wbc_account_io(struct writeback_control *wbc, struct page *page,
+>  	 * behind a slow cgroup.  Ultimately, we want pageout() to kick off
+>  	 * regular writeback instead of writing things out itself.
+>  	 */
+> -	if (!wbc->wb)
+> +	if (!wbc->wb || wbc->no_wbc_acct)
+>  		return;
+>  
+>  	id = mem_cgroup_css_from_page(page)->id;
+> diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+> index 738a0c24874f..b8f5f000cde4 100644
+> --- a/include/linux/writeback.h
+> +++ b/include/linux/writeback.h
+> @@ -68,6 +68,7 @@ struct writeback_control {
+>  	unsigned for_reclaim:1;		/* Invoked from the page allocator */
+>  	unsigned range_cyclic:1;	/* range_start is cyclic */
+>  	unsigned for_sync:1;		/* sync(2) WB_SYNC_ALL writeback */
+> +	unsigned no_wbc_acct:1;		/* skip wbc IO accounting */
+>  #ifdef CONFIG_CGROUP_WRITEBACK
+>  	struct bdi_writeback *wb;	/* wb this writeback is issued under */
+>  	struct inode *inode;		/* inode being written out */
+> -- 
+> 2.17.1
+> 
 -- 
-2.17.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
