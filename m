@@ -2,143 +2,89 @@ Return-Path: <SRS0=D4S7=UT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A7DBC43613
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6489C43613
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 17:01:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4DB9220656
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:59:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A9552089C
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 17:01:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbfFTQ7w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 12:59:52 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:60494 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726530AbfFTQ7w (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 12:59:52 -0400
-Received: from s01061831bf6ec98c.cg.shawcable.net ([68.147.80.180] helo=[192.168.6.132])
-        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1he0PZ-0004ZF-8g; Thu, 20 Jun 2019 10:59:46 -0600
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190620161240.22738-1-logang@deltatee.com>
- <20190620161240.22738-21-logang@deltatee.com>
- <20190620164909.GC19891@ziepe.ca>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <f9186b2b-7737-965f-2dca-25e40e566e64@deltatee.com>
-Date:   Thu, 20 Jun 2019 10:59:44 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+        id S1726965AbfFTRBn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 13:01:43 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59592 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726530AbfFTRBm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Jun 2019 13:01:42 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 83A00AF58;
+        Thu, 20 Jun 2019 17:01:41 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 359951E434F; Thu, 20 Jun 2019 19:01:41 +0200 (CEST)
+Date:   Thu, 20 Jun 2019 19:01:41 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jan Kara <jack@suse.cz>, dsterba@suse.com, clm@fb.com,
+        josef@toxicpanda.com, axboe@kernel.dk, linux-btrfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com
+Subject: Re: [PATCH 4/9] blkcg: implement REQ_CGROUP_PUNT
+Message-ID: <20190620170141.GO30243@quack2.suse.cz>
+References: <20190615182453.843275-1-tj@kernel.org>
+ <20190615182453.843275-5-tj@kernel.org>
+ <20190620153733.GM30243@quack2.suse.cz>
+ <20190620164229.GK657710@devbig004.ftw2.facebook.com>
 MIME-Version: 1.0
-In-Reply-To: <20190620164909.GC19891@ziepe.ca>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 68.147.80.180
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, hch@lst.de, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 20/28] IB/core: Introduce API for initializing a RW
- ctx from a DMA address
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190620164229.GK657710@devbig004.ftw2.facebook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2019-06-20 10:49 a.m., Jason Gunthorpe wrote:
-> On Thu, Jun 20, 2019 at 10:12:32AM -0600, Logan Gunthorpe wrote:
->> Introduce rdma_rw_ctx_dma_init() and rdma_rw_ctx_dma_destroy() which
->> peform the same operation as rdma_rw_ctx_init() and
->> rdma_rw_ctx_destroy() respectively except they operate on a DMA
->> address and length instead of an SGL.
->>
->> This will be used for struct page-less P2PDMA, but there's also
->> been opinions expressed to migrate away from SGLs and struct
->> pages in the RDMA APIs and this will likely fit with that
->> effort.
->>
->> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
->>  drivers/infiniband/core/rw.c | 74 ++++++++++++++++++++++++++++++------
->>  include/rdma/rw.h            |  6 +++
->>  2 files changed, 69 insertions(+), 11 deletions(-)
->>
->> diff --git a/drivers/infiniband/core/rw.c b/drivers/infiniband/core/rw.c
->> index 32ca8429eaae..cefa6b930bc8 100644
->> +++ b/drivers/infiniband/core/rw.c
->> @@ -319,6 +319,39 @@ int rdma_rw_ctx_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u8 port_num,
->>  }
->>  EXPORT_SYMBOL(rdma_rw_ctx_init);
->>  
->> +/**
->> + * rdma_rw_ctx_dma_init - initialize a RDMA READ/WRITE context from a
->> + *	DMA address instead of SGL
->> + * @ctx:	context to initialize
->> + * @qp:		queue pair to operate on
->> + * @port_num:	port num to which the connection is bound
->> + * @addr:	DMA address to READ/WRITE from/to
->> + * @len:	length of memory to operate on
->> + * @remote_addr:remote address to read/write (relative to @rkey)
->> + * @rkey:	remote key to operate on
->> + * @dir:	%DMA_TO_DEVICE for RDMA WRITE, %DMA_FROM_DEVICE for RDMA READ
->> + *
->> + * Returns the number of WQEs that will be needed on the workqueue if
->> + * successful, or a negative error code.
->> + */
->> +int rdma_rw_ctx_dma_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
->> +		u8 port_num, dma_addr_t addr, u32 len, u64 remote_addr,
->> +		u32 rkey, enum dma_data_direction dir)
+On Thu 20-06-19 09:42:29, Tejun Heo wrote:
+> Hello, Jan.
 > 
-> Why not keep the same basic signature here but replace the scatterlist
-> with the dma vec ?
-
-Could do. At the moment, I had no need for dma_vec in this interface.
-
->> +{
->> +	struct scatterlist sg;
->> +
->> +	sg_dma_address(&sg) = addr;
->> +	sg_dma_len(&sg) = len;
+> On Thu, Jun 20, 2019 at 05:37:33PM +0200, Jan Kara wrote:
+> > > +bool __blkcg_punt_bio_submit(struct bio *bio)
+> > > +{
+> > > +	struct blkcg_gq *blkg = bio->bi_blkg;
+> > > +
+> > > +	/* consume the flag first */
+> > > +	bio->bi_opf &= ~REQ_CGROUP_PUNT;
+> > > +
+> > > +	/* never bounce for the root cgroup */
+> > > +	if (!blkg->parent)
+> > > +		return false;
+> > > +
+> > > +	spin_lock_bh(&blkg->async_bio_lock);
+> > > +	bio_list_add(&blkg->async_bios, bio);
+> > > +	spin_unlock_bh(&blkg->async_bio_lock);
+> > > +
+> > > +	queue_work(blkcg_punt_bio_wq, &blkg->async_bio_work);
+> > > +	return true;
+> > > +}
+> > > +
+> > 
+> > So does this mean that if there is some inode with lots of dirty data for a
+> > blkcg that is heavily throttled, that blkcg can occupy a ton of workers all
+> > being throttled in submit_bio()? Or what is constraining a number of
+> > workers one blkcg can consume?
 > 
-> This needs to fail if the driver is one of the few that require
-> struct page to work..
+> There's only one work item per blkcg-device pair, so the maximum
+> number of kthreads a blkcg can occupy on a filesystem would be one.
+> It's the same scheme as writeback work items.
 
-Yes, right. Currently P2PDMA checks for the use of dma_virt_ops. And
-that probably should also be done here. But is that sufficient? You're
-probably right that it'll take an audit of the RDMA tree to sort that out.
+OK, I've missed the fact that although the work item can get queued while
+it is still running it cannot get executed more than once at a time (which
+is kind of obvious but I got confused). Thanks for explanation!
 
-> Really want I want to do is to have this new 'dma vec' pushed through
-> the RDMA APIs so we know that if a driver is using the dma vec
-> interface it is struct page free.
-
-Yeah, I know you were talking about heading this way during LSF/MM and
-is partly what inspired this series. However, largely, my focus for this
-RFC was the block layer to see this is an acceptable approach -- I just
-kind of hacked RDMA for now.
-
-> This is not so hard to do, as most drivers are already struct page
-> free, but is pretty much blocked on needing some way to go from the
-> block layer SGL world to the dma vec world that does not hurt storage
-> performance.
-
-Maybe I can end up helping with that if it helps push the ideas here
-through. (And assuming people think it's an acceptable approach for the
-block-layer side of things).
-
-Thanks,
-
-Logan
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
