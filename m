@@ -8,53 +8,53 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA157C48BE4
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D4BC48BE4
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:03:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF49C20673
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:03:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEDD320673
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:03:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P+GsP0NK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YFRaoTBu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731980AbfFTPDx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 11:03:53 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:38251 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732010AbfFTPDw (ORCPT
+        id S1732066AbfFTPD4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 11:03:56 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:35448 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732025AbfFTPDz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 11:03:52 -0400
-Received: by mail-ed1-f66.google.com with SMTP id r12so5190510edo.5;
-        Thu, 20 Jun 2019 08:03:51 -0700 (PDT)
+        Thu, 20 Jun 2019 11:03:55 -0400
+Received: by mail-ed1-f65.google.com with SMTP id p26so5214730edr.2;
+        Thu, 20 Jun 2019 08:03:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=aXIBGgM8J5V1UAefTH43RF6bmjkdkJpROH50sTQShLs=;
-        b=P+GsP0NKVuXrSC+zmyIsshDo6YarRrpcsNRTURqgtyl5sSsPNZyZZgJuyoBzA6K6hX
-         d1dvVGEDLo0O/mF5lSYgqldxyWIbyDAx7dykcPZuT/op8krnxw5dGoJP+3KjeW1s6QqN
-         zj+71pom3wPbT4kqyZ/3H7mc7haVJdVabTTpsmbt000s/HE586owysJqJlnGLQwR+qZ7
-         WoPgFcrze6goujwdjXKGsvpkmnBjoihFKdJZW4AueuQSBK1tmrVRm8w916ydIeKXudvL
-         wL2D3Em5toUvmxJs7KDu/6tv+Cp+xWP6kQ5frvZQ7EmvGgAYSLWjbT6ulwm1JTNdlHu0
-         HKVg==
+        bh=P/4+WJUF6wFlj/gINxWkXulMUA1zWaeQmx3yasj0RNI=;
+        b=YFRaoTBu1nBvG8aRoO5sV11peZJlnLnA4VQoPKVqiNtAiskIeZUYfpCMbr2iXFteKt
+         PDPPmut4L3B3QYKrGuCLjRFvvuQsXL1farWnhWvBusTOVRlFyNMImsXfb0EYtqXcIMEx
+         pqBT2Vp68a48ItrrZmJO8ivLJY4LABYT9tdOHYgIv6LEJwKiNIkfMOWjJuP4TvXZkZWS
+         xPaklmRVzAKkJ0xJjsyUjMD70JH/B+FQlq/StYIRo3CHaMzkDWa0+cpswnZNF8r8RtpY
+         LVywdA/KpuduXTipXNejHgKhCacTH/QEYWBuOpOQkozYHBOu4yQz+Ya27iiN2O0g85m+
+         2C5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=aXIBGgM8J5V1UAefTH43RF6bmjkdkJpROH50sTQShLs=;
-        b=fWt6gQCeaUsa1tOJ90pZ/nkcMKev1SbWECWSUPssLgbI1eB/01CBW1dDI9P9qyOiBQ
-         85/yVQx2en3tADtGHkBXLdr/BviFOcMFibzULmATMOvwkGV3R2l8CX6eXROiPZq/pQ87
-         ddR0cCsle/bV89uuIpu/yGKgPYLR46DcJRb53fxjLTbJigvh8vII5VkyaeaMH9c2eqNG
-         BalWweIaJr80WFCwPvCSW85gOvya6/lE5bJVJJ5awWwAHnOCACLa2cGZpAVfH6oiE7tJ
-         ircSDxE9Rr4EXWrcjxvi+c/xMs85ARxNP48Y2naEbbqklxfsPvTrveQYatZWRT+ei9uy
-         hXww==
-X-Gm-Message-State: APjAAAVOzERewj6A9hN6f6PwuKijpH6ACflQp/w50J1zeS8COWW83D2F
-        PjKTW2SQPI6N4TOsUsYC+qwOz89wOPY=
-X-Google-Smtp-Source: APXvYqyKw7fyaKI+FlZsJMjV8FJFzT3vXvC19bbr6vbuHJdFod9AXPucbPJun9HPaJerabmc9oHytg==
-X-Received: by 2002:a50:c9c2:: with SMTP id c2mr101035660edi.183.1561043030904;
-        Thu, 20 Jun 2019 08:03:50 -0700 (PDT)
+        bh=P/4+WJUF6wFlj/gINxWkXulMUA1zWaeQmx3yasj0RNI=;
+        b=GLS6mA3M7aGquR7gFn2WoNw9WDJhc0d4yQeOLmb4aaedoSHeonSXnEdPcsbu6N1iNM
+         hpMqINHCaSEzbjQANuEMcmAzg8FocXdl3e36+0af7XJssOZckrIWCitKOQJWzcho9YGo
+         L5dyZoz6Mu/fvlcQpD3HR5TmjPEH5hFOFJmSLhj6S3cDv4tc0sCa45OQEHXK4Tfm6gYy
+         MP6cyIng0EJ9nPCy2PyRE5eRCVWhkhhyEm2Ydtc3N7uNEvjXi8+K8BiqC0pg3WGM113e
+         aJ9L1oHMCOGYx9GJJFhozmejZUvlDf6/XgsJp+HK9iJOrlUYJtEwEQU3gM6sr1dc1dNk
+         UHpg==
+X-Gm-Message-State: APjAAAWyVSeZHohFDhJXGiotBsnCpOGvT79GLw8A3LJfz0CqwfbN6Ri+
+        EVP2iZK2AN/6C67UvJXKS9vJ3Gd7sug=
+X-Google-Smtp-Source: APXvYqw5ZWmxL0IjWStvi2NnoJhhAfW/5yzmqLWcrCXTczkyw5tr9D8SjNMV/tm3xicR2RXJggGtpw==
+X-Received: by 2002:a17:906:d549:: with SMTP id gk9mr94798483ejb.268.1561043033168;
+        Thu, 20 Jun 2019 08:03:53 -0700 (PDT)
 Received: from jwang-Latitude-5491.pb.local ([62.217.45.26])
-        by smtp.gmail.com with ESMTPSA id a20sm3855817ejj.21.2019.06.20.08.03.49
+        by smtp.gmail.com with ESMTPSA id a20sm3855817ejj.21.2019.06.20.08.03.52
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 20 Jun 2019 08:03:50 -0700 (PDT)
+        Thu, 20 Jun 2019 08:03:52 -0700 (PDT)
 From:   Jack Wang <jinpuwang@gmail.com>
 To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
@@ -62,9 +62,9 @@ Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         danil.kipnis@cloud.ionos.com, rpenyaev@suse.de,
         Roman Pen <roman.penyaev@profitbricks.com>,
         Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCH v4 09/25] ibtrs: server: private header with server structs and functions
-Date:   Thu, 20 Jun 2019 17:03:21 +0200
-Message-Id: <20190620150337.7847-10-jinpuwang@gmail.com>
+Subject: [PATCH v4 11/25] ibtrs: server: statistics functions
+Date:   Thu, 20 Jun 2019 17:03:23 +0200
+Message-Id: <20190620150337.7847-12-jinpuwang@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190620150337.7847-1-jinpuwang@gmail.com>
 References: <20190620150337.7847-1-jinpuwang@gmail.com>
@@ -75,24 +75,23 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Roman Pen <roman.penyaev@profitbricks.com>
 
-This header describes main structs and functions used by ibtrs-server
-module, mainly for accepting IBTRS sessions, creating/destroying
-sysfs entries, accounting statistics on server side.
+This introduces set of functions used on server side to account
+statistics of RDMA data sent/received.
 
 Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 ---
- drivers/infiniband/ulp/ibtrs/ibtrs-srv.h | 170 +++++++++++++++++++++++
- 1 file changed, 170 insertions(+)
- create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv.h
+ .../infiniband/ulp/ibtrs/ibtrs-srv-stats.c    | 103 ++++++++++++++++++
+ 1 file changed, 103 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
 
-diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv.h b/drivers/infiniband/ulp/ibtrs/ibtrs-srv.h
+diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
 new file mode 100644
-index 000000000000..6d3b77541d77
+index 000000000000..47f8d6d2d88d
 --- /dev/null
-+++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv.h
-@@ -0,0 +1,170 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
++++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
+@@ -0,0 +1,103 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * InfiniBand Transport Layer
 + *
@@ -107,7 +106,6 @@ index 000000000000..6d3b77541d77
 + * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
 + * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
 + *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *          Swapnil Ingle <swapnil.ingle@profitbricks.com>
 + *
 + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
 + * Authors: Roman Penyaev <roman.penyaev@profitbricks.com>
@@ -115,153 +113,87 @@ index 000000000000..6d3b77541d77
 + *          Danil Kipnis <danil.kipnis@cloud.ionos.com>
 + */
 +
-+#ifndef IBTRS_SRV_H
-+#define IBTRS_SRV_H
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
 +
-+#include <linux/device.h>
-+#include <linux/refcount.h>
-+#include "ibtrs-pri.h"
++#include "ibtrs-srv.h"
 +
-+/**
-+ * enum ibtrs_srv_state - Server states.
-+ */
-+enum ibtrs_srv_state {
-+	IBTRS_SRV_CONNECTING,
-+	IBTRS_SRV_CONNECTED,
-+	IBTRS_SRV_CLOSING,
-+	IBTRS_SRV_CLOSED,
-+};
-+
-+static inline const char *ibtrs_srv_state_str(enum ibtrs_srv_state state)
++void ibtrs_srv_update_rdma_stats(struct ibtrs_srv_stats *s,
++				 size_t size, int d)
 +{
-+	switch (state) {
-+	case IBTRS_SRV_CONNECTING:
-+		return "IBTRS_SRV_CONNECTING";
-+	case IBTRS_SRV_CONNECTED:
-+		return "IBTRS_SRV_CONNECTED";
-+	case IBTRS_SRV_CLOSING:
-+		return "IBTRS_SRV_CLOSING";
-+	case IBTRS_SRV_CLOSED:
-+		return "IBTRS_SRV_CLOSED";
-+	default:
-+		return "UNKNOWN";
-+	}
++	atomic64_inc(&s->rdma_stats.dir[d].cnt);
++	atomic64_add(size, &s->rdma_stats.dir[d].size_total);
 +}
 +
-+struct ibtrs_stats_wc_comp {
-+	atomic64_t	calls;
-+	atomic64_t	total_wc_cnt;
-+};
++void ibtrs_srv_update_wc_stats(struct ibtrs_srv_stats *s)
++{
++	atomic64_inc(&s->wc_comp.calls);
++	atomic64_inc(&s->wc_comp.total_wc_cnt);
++}
 +
-+struct ibtrs_srv_stats_rdma_stats {
-+	struct {
-+		atomic64_t	cnt;
-+		atomic64_t	size_total;
-+	} dir[2];
-+};
++int ibtrs_srv_reset_rdma_stats(struct ibtrs_srv_stats *stats, bool enable)
++{
++	if (enable) {
++		struct ibtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
 +
-+struct ibtrs_srv_stats {
-+	struct ibtrs_srv_stats_rdma_stats	rdma_stats;
-+	atomic_t				apm_cnt;
-+	struct ibtrs_stats_wc_comp		wc_comp;
-+};
++		memset(r, 0, sizeof(*r));
++		return 0;
++	}
 +
-+struct ibtrs_srv_con {
-+	struct ibtrs_con	c;
-+	atomic_t		wr_cnt;
-+};
++	return -EINVAL;
++}
 +
-+struct ibtrs_srv_op {
-+	struct ibtrs_srv_con		*con;
-+	u32				msg_id;
-+	u8				dir;
-+	struct ibtrs_msg_rdma_read	*rd_msg;
-+	struct ib_rdma_wr		*tx_wr;
-+	struct ib_sge			*tx_sg;
-+};
-+
-+struct ibtrs_srv_mr {
-+	struct ib_mr	*mr;
-+	struct sg_table	sgt;
-+};
-+
-+struct ibtrs_srv_sess {
-+	struct ibtrs_sess	s;
-+	struct ibtrs_srv	*srv;
-+	struct work_struct	close_work;
-+	enum ibtrs_srv_state	state;
-+	spinlock_t		state_lock;
-+	int			cur_cq_vector;
-+	struct ibtrs_srv_op	**ops_ids;
-+	atomic_t		ids_inflight;
-+	wait_queue_head_t	ids_waitq;
-+	struct ibtrs_srv_mr	*mrs;
-+	unsigned int		mrs_num;
-+	dma_addr_t		*dma_addr;
-+	bool			established;
-+	unsigned int		mem_bits;
-+	struct kobject		kobj;
-+	struct kobject		kobj_stats;
-+	struct ibtrs_srv_stats	stats;
-+};
-+
-+struct ibtrs_srv {
-+	struct list_head	paths_list;
-+	int			paths_up;
-+	struct mutex		paths_ev_mutex;
-+	size_t			paths_num;
-+	struct mutex		paths_mutex;
-+	uuid_t			paths_uuid;
-+	refcount_t		refcount;
-+	struct ibtrs_srv_ctx	*ctx;
-+	struct list_head	ctx_list;
-+	void			*priv;
-+	size_t			queue_depth;
-+	struct page		**chunks;
-+	struct device		dev;
-+	u32			dev_ref;
-+	struct kobject		kobj_paths;
-+};
-+
-+struct ibtrs_srv_ctx {
-+	rdma_ev_fn *rdma_ev;
-+	link_ev_fn *link_ev;
-+	struct rdma_cm_id *cm_id_ip;
-+	struct rdma_cm_id *cm_id_ib;
-+	struct mutex srv_mutex;
-+	struct list_head srv_list;
-+};
-+
-+extern struct class *ibtrs_dev_class;
-+
-+/* See ibtrs-log.h */
-+#define TYPES_TO_SESSNAME(obj)						\
-+	LIST(CASE(obj, struct ibtrs_srv_sess *, s.sessname))
-+
-+void ibtrs_srv_queue_close(struct ibtrs_srv_sess *sess);
-+
-+/* ibtrs-srv-stats.c */
-+
-+void ibtrs_srv_update_rdma_stats(struct ibtrs_srv_stats *s, size_t size, int d);
-+void ibtrs_srv_update_wc_stats(struct ibtrs_srv_stats *s);
-+
-+int ibtrs_srv_reset_rdma_stats(struct ibtrs_srv_stats *stats, bool enable);
 +ssize_t ibtrs_srv_stats_rdma_to_str(struct ibtrs_srv_stats *stats,
-+				    char *page, size_t len);
++				    char *page, size_t len)
++{
++	struct ibtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
++	struct ibtrs_srv_sess *sess;
++
++	sess = container_of(stats, typeof(*sess), stats);
++
++	return scnprintf(page, len, "%lld %lld %lld %lld %u\n",
++			 (s64)atomic64_read(&r->dir[READ].cnt),
++			 (s64)atomic64_read(&r->dir[READ].size_total),
++			 (s64)atomic64_read(&r->dir[WRITE].cnt),
++			 (s64)atomic64_read(&r->dir[WRITE].size_total),
++			 atomic_read(&sess->ids_inflight));
++}
++
 +int ibtrs_srv_reset_wc_completion_stats(struct ibtrs_srv_stats *stats,
-+					bool enable);
++					bool enable)
++{
++	if (enable) {
++		memset(&stats->wc_comp, 0, sizeof(stats->wc_comp));
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
 +int ibtrs_srv_stats_wc_completion_to_str(struct ibtrs_srv_stats *stats,
-+					 char *buf, size_t len);
-+int ibtrs_srv_reset_all_stats(struct ibtrs_srv_stats *stats, bool enable);
++					 char *buf, size_t len)
++{
++	return snprintf(buf, len, "%lld %lld\n",
++			(s64)atomic64_read(&stats->wc_comp.total_wc_cnt),
++			(s64)atomic64_read(&stats->wc_comp.calls));
++}
++
 +ssize_t ibtrs_srv_reset_all_help(struct ibtrs_srv_stats *stats,
-+				 char *page, size_t len);
++				 char *page, size_t len)
++{
++	return scnprintf(page, PAGE_SIZE, "echo 1 to reset all statistics\n");
++}
 +
-+/* ibtrs-srv-sysfs.c */
++int ibtrs_srv_reset_all_stats(struct ibtrs_srv_stats *stats, bool enable)
++{
++	if (enable) {
++		ibtrs_srv_reset_wc_completion_stats(stats, enable);
++		ibtrs_srv_reset_rdma_stats(stats, enable);
++		return 0;
++	}
 +
-+int ibtrs_srv_create_sess_files(struct ibtrs_srv_sess *sess);
-+void ibtrs_srv_destroy_sess_files(struct ibtrs_srv_sess *sess);
-+
-+#endif /* IBTRS_SRV_H */
++	return -EINVAL;
++}
 -- 
 2.17.1
 
