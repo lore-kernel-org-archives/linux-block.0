@@ -7,26 +7,26 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D005C43613
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4070C48BE1
 	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F15F92084E
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A46FA2084A
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732420AbfFTQOO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1732209AbfFTQOO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 20 Jun 2019 12:14:14 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:59490 "EHLO ale.deltatee.com"
+Received: from ale.deltatee.com ([207.54.116.67]:59502 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732175AbfFTQM6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 12:12:58 -0400
+        id S1732191AbfFTQM7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Jun 2019 12:12:59 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzgA-00046T-NQ; Thu, 20 Jun 2019 10:12:57 -0600
+        id 1hdzgB-00046O-2S; Thu, 20 Jun 2019 10:12:58 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzg4-0005wT-V5; Thu, 20 Jun 2019 10:12:44 -0600
+        id 1hdzg6-0005x0-6t; Thu, 20 Jun 2019 10:12:46 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
@@ -39,8 +39,8 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Jason Gunthorpe <jgg@ziepe.ca>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 20 Jun 2019 10:12:24 -0600
-Message-Id: <20190620161240.22738-13-logang@deltatee.com>
+Date:   Thu, 20 Jun 2019 10:12:35 -0600
+Message-Id: <20190620161240.22738-24-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190620161240.22738-1-logang@deltatee.com>
 References: <20190620161240.22738-1-logang@deltatee.com>
@@ -49,7 +49,7 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, axboe@kernel.dk, hch@lst.de, bhelgaas@google.com, dan.j.williams@intel.com, sagi@grimberg.me, kbusch@kernel.org, jgg@ziepe.ca, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [RFC PATCH 12/28] block: Create helper for bvec_should_split()
+Subject: [RFC PATCH 23/28] nvme-pci: Remove support for PCI_P2PDMA requests
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -57,129 +57,103 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to support dma-direct bios, blk_bio_segment_split() will
-need to operate on both bio_vecs and dma_vecs. In order to do
-this, the code inside bio_for_each_bvec() is moved into a generic
-helper called bvec_should_split().
+These requests have been superseded by dma-direct requests and are
+therefore no longer needed.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk-merge.c | 86 +++++++++++++++++++++++++----------------------
- 1 file changed, 46 insertions(+), 40 deletions(-)
+ drivers/nvme/host/core.c |  2 --
+ drivers/nvme/host/nvme.h |  3 +--
+ drivers/nvme/host/pci.c  | 27 ++++++++++-----------------
+ 3 files changed, 11 insertions(+), 21 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 414e61a714bf..d9e89c0ad40d 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -212,6 +212,48 @@ struct blk_segment_split_ctx {
- 	const unsigned max_segs;
- };
- 
-+static bool bvec_should_split(struct request_queue *q, struct bio_vec *bv,
-+			      struct blk_segment_split_ctx *ctx)
-+{
-+	/*
-+	 * If the queue doesn't support SG gaps and adding this
-+	 * offset would create a gap, disallow it.
-+	 */
-+	if (ctx->prv_valid && bvec_gap_to_prev(q, &ctx->bvprv, bv->bv_offset))
-+		return true;
-+
-+	if (ctx->sectors + (bv->bv_len >> 9) > ctx->max_sectors) {
-+		/*
-+		 * Consider this a new segment if we're splitting in
-+		 * the middle of this vector.
-+		 */
-+		if (ctx->nsegs < ctx->max_segs &&
-+		    ctx->sectors < ctx->max_sectors) {
-+			/* split in the middle of bvec */
-+			bv->bv_len = (ctx->max_sectors - ctx->sectors) << 9;
-+			bvec_split_segs(q, bv, &ctx->nsegs,
-+					&ctx->sectors, ctx->max_segs);
-+		}
-+		return true;
-+	}
-+
-+	if (ctx->nsegs == ctx->max_segs)
-+		return true;
-+
-+	ctx->bvprv = *bv;
-+	ctx->prv_valid = true;
-+
-+	if (bv->bv_offset + bv->bv_len <= PAGE_SIZE) {
-+		ctx->nsegs++;
-+		ctx->sectors += bv->bv_len >> 9;
-+	} else if (bvec_split_segs(q, bv, &ctx->nsegs, &ctx->sectors,
-+				   ctx->max_segs)) {
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- static struct bio *blk_bio_segment_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
-@@ -219,7 +261,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- {
- 	struct bio_vec bv;
- 	struct bvec_iter iter;
--	bool do_split = true;
-+	bool do_split = false;
- 	struct bio *new = NULL;
- 
- 	struct blk_segment_split_ctx ctx = {
-@@ -228,47 +270,11 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	};
- 
- 	bio_for_each_bvec(bv, bio, iter) {
--		/*
--		 * If the queue doesn't support SG gaps and adding this
--		 * offset would create a gap, disallow it.
--		 */
--		if (ctx.prv_valid && bvec_gap_to_prev(q, &ctx.bvprv,
--						      bv.bv_offset))
--			goto split;
--
--		if (ctx.sectors + (bv.bv_len >> 9) > ctx.max_sectors) {
--			/*
--			 * Consider this a new segment if we're splitting in
--			 * the middle of this vector.
--			 */
--			if (ctx.nsegs < ctx.max_segs &&
--			    ctx.sectors < ctx.max_sectors) {
--				/* split in the middle of bvec */
--				bv.bv_len =
--					(ctx.max_sectors - ctx.sectors) << 9;
--				bvec_split_segs(q, &bv, &ctx.nsegs,
--						&ctx.sectors, ctx.max_segs);
--			}
--			goto split;
--		}
--
--		if (ctx.nsegs == ctx.max_segs)
--			goto split;
--
--		ctx.bvprv = bv;
--		ctx.prv_valid = true;
--
--		if (bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
--			ctx.nsegs++;
--			ctx.sectors += bv.bv_len >> 9;
--		} else if (bvec_split_segs(q, &bv, &ctx.nsegs, &ctx.sectors,
--				ctx.max_segs)) {
--			goto split;
--		}
-+		do_split = bvec_should_split(q, &bv, &ctx);
-+		if (do_split)
-+			break;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 8e876417c44b..63d132c478b4 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -3257,8 +3257,6 @@ static int nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
  	}
  
--	do_split = false;
--split:
- 	*segs = ctx.nsegs;
+ 	blk_queue_flag_set(QUEUE_FLAG_NONROT, ns->queue);
+-	if (ctrl->ops->flags & NVME_F_PCI_P2PDMA)
+-		blk_queue_flag_set(QUEUE_FLAG_PCI_P2PDMA, ns->queue);
+ 	if (ctrl->ops->flags & NVME_F_DMA_DIRECT)
+ 		blk_queue_flag_set(QUEUE_FLAG_DMA_DIRECT, ns->queue);
  
- 	if (do_split) {
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index f1dddc95c6a8..d103cecc14dd 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -361,8 +361,7 @@ struct nvme_ctrl_ops {
+ 	unsigned int flags;
+ #define NVME_F_FABRICS			(1 << 0)
+ #define NVME_F_METADATA_SUPPORTED	(1 << 1)
+-#define NVME_F_PCI_P2PDMA		(1 << 2)
+-#define NVME_F_DMA_DIRECT		(1 << 3)
++#define NVME_F_DMA_DIRECT		(1 << 2)
+ 	int (*reg_read32)(struct nvme_ctrl *ctrl, u32 off, u32 *val);
+ 	int (*reg_write32)(struct nvme_ctrl *ctrl, u32 off, u32 val);
+ 	int (*reg_read64)(struct nvme_ctrl *ctrl, u32 off, u64 *val);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 5957f3a4f261..7f806e76230a 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -564,9 +564,8 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
+ 
+ 	WARN_ON_ONCE(!iod->nents);
+ 
+-	/* P2PDMA requests do not need to be unmapped */
+-	if (!is_pci_p2pdma_page(sg_page(iod->sg)) &&
+-	    !blk_rq_is_dma_direct(req))
++	/* DMA direct requests do not need to be unmapped */
++	if (!blk_rq_is_dma_direct(req))
+ 		dma_unmap_sg(dev->dev, iod->sg, iod->nents, rq_dma_dir(req));
+ 
+ 
+@@ -828,16 +827,14 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+ 	if (blk_rq_nr_phys_segments(req) == 1 && !blk_rq_is_dma_direct(req)) {
+ 		struct bio_vec bv = req_bvec(req);
+ 
+-		if (!is_pci_p2pdma_page(bv.bv_page)) {
+-			if (bv.bv_offset + bv.bv_len <= dev->ctrl.page_size * 2)
+-				return nvme_setup_prp_simple(dev, req,
+-							     &cmnd->rw, &bv);
++		if (bv.bv_offset + bv.bv_len <= dev->ctrl.page_size * 2)
++			return nvme_setup_prp_simple(dev, req,
++						     &cmnd->rw, &bv);
+ 
+-			if (iod->nvmeq->qid &&
+-			    dev->ctrl.sgls & ((1 << 0) | (1 << 1)))
+-				return nvme_setup_sgl_simple(dev, req,
+-							     &cmnd->rw, &bv);
+-		}
++		if (iod->nvmeq->qid &&
++		    dev->ctrl.sgls & ((1 << 0) | (1 << 1)))
++			return nvme_setup_sgl_simple(dev, req,
++						     &cmnd->rw, &bv);
+ 	}
+ 
+ 	iod->dma_len = 0;
+@@ -849,10 +846,7 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+ 	if (!iod->nents)
+ 		goto out;
+ 
+-	if (is_pci_p2pdma_page(sg_page(iod->sg)))
+-		nr_mapped = pci_p2pdma_map_sg(dev->dev, iod->sg, iod->nents,
+-					      rq_dma_dir(req));
+-	else if (blk_rq_is_dma_direct(req))
++	if (blk_rq_is_dma_direct(req))
+ 		nr_mapped = iod->nents;
+ 	else
+ 		nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents,
+@@ -2642,7 +2636,6 @@ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
+ 	.name			= "pcie",
+ 	.module			= THIS_MODULE,
+ 	.flags			= NVME_F_METADATA_SUPPORTED |
+-				  NVME_F_PCI_P2PDMA |
+ 				  NVME_F_DMA_DIRECT,
+ 	.reg_read32		= nvme_pci_reg_read32,
+ 	.reg_write32		= nvme_pci_reg_write32,
 -- 
 2.20.1
 
