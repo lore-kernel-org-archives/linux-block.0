@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F12C43613
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:12:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3237C48BE1
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:12:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ACAC82070B
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:12:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 810612070B
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:12:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbfFTQMt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 12:12:49 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:59328 "EHLO ale.deltatee.com"
+        id S1732033AbfFTQMw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 12:12:52 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:59372 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726530AbfFTQMs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 12:12:48 -0400
+        id S1731733AbfFTQMv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Jun 2019 12:12:51 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzg6-00046V-6A; Thu, 20 Jun 2019 10:12:47 -0600
+        id 1hdzg6-00046O-67; Thu, 20 Jun 2019 10:12:50 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzg5-0005wZ-4g; Thu, 20 Jun 2019 10:12:45 -0600
+        id 1hdzg4-0005wE-FQ; Thu, 20 Jun 2019 10:12:44 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
@@ -38,8 +38,8 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Jason Gunthorpe <jgg@ziepe.ca>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 20 Jun 2019 10:12:26 -0600
-Message-Id: <20190620161240.22738-15-logang@deltatee.com>
+Date:   Thu, 20 Jun 2019 10:12:19 -0600
+Message-Id: <20190620161240.22738-8-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190620161240.22738-1-logang@deltatee.com>
 References: <20190620161240.22738-1-logang@deltatee.com>
@@ -48,7 +48,7 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, axboe@kernel.dk, hch@lst.de, bhelgaas@google.com, dan.j.williams@intel.com, sagi@grimberg.me, kbusch@kernel.org, jgg@ziepe.ca, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [RFC PATCH 14/28] block: Support splitting dma-direct bios
+Subject: [RFC PATCH 07/28] block: Use dma_vec length in bio_cur_bytes() for dma-direct bios
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -56,82 +56,34 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If the bio is a dma-direct bio, loop through the dma_vecs instead
-of the bio_vecs when calling vec_should_split().
+For dma-direct bios, use the dv_len of the current vector
+seeing the bio_vec's are not valid in such a context.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk-merge.c | 45 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 8 deletions(-)
+ include/linux/bio.h | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 32653fca53ce..c4c016f994f6 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -257,14 +257,44 @@ static bool vec_should_split(struct request_queue *q, unsigned offset,
- 	return false;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index e212e5958a75..df7973932525 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -91,10 +91,12 @@ static inline bool bio_mergeable(struct bio *bio)
+ 
+ static inline unsigned int bio_cur_bytes(struct bio *bio)
+ {
+-	if (bio_has_data(bio))
+-		return bio_iovec(bio).bv_len;
+-	else /* dataless requests such as discard */
++	if (!bio_has_data(bio)) /* dataless requests such as discard */
+ 		return bio->bi_iter.bi_size;
++	else if (op_is_dma_direct(bio->bi_opf))
++		return bio_dma_vec(bio).dv_len;
++	else
++		return bio_iovec(bio).bv_len;
  }
  
-+static bool bio_should_split(struct request_queue *q, struct bio *bio,
-+			     struct blk_segment_split_ctx *ctx)
-+{
-+	struct bvec_iter iter;
-+	struct bio_vec bv;
-+	bool ret;
-+
-+	bio_for_each_bvec(bv, bio, iter) {
-+		ret = vec_should_split(q, bv.bv_offset, bv.bv_len, ctx);
-+		if (ret)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+static bool bio_dma_should_split(struct request_queue *q, struct bio *bio,
-+				 struct blk_segment_split_ctx *ctx)
-+{
-+	struct bvec_iter iter;
-+	struct dma_vec dv;
-+	bool ret;
-+
-+	bio_for_each_dvec(dv, bio, iter) {
-+		ret = vec_should_split(q, dv.dv_addr, dv.dv_len, ctx);
-+		if (ret)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- static struct bio *blk_bio_segment_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
- 					 unsigned *segs)
- {
--	struct bio_vec bv;
--	struct bvec_iter iter;
--	bool do_split = false;
-+	bool do_split;
- 	struct bio *new = NULL;
- 
- 	struct blk_segment_split_ctx ctx = {
-@@ -272,11 +302,10 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		.max_segs = queue_max_segments(q),
- 	};
- 
--	bio_for_each_bvec(bv, bio, iter) {
--		do_split = vec_should_split(q, bv.bv_offset, bv.bv_len, &ctx);
--		if (do_split)
--			break;
--	}
-+	if (bio_is_dma_direct(bio))
-+		do_split = bio_dma_should_split(q, bio, &ctx);
-+	else
-+		do_split = bio_should_split(q, bio, &ctx);
- 
- 	*segs = ctx.nsegs;
- 
+ static inline void *bio_data(struct bio *bio)
 -- 
 2.20.1
 
