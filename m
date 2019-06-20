@@ -4,29 +4,28 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E360BC43613
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74EC1C48BE1
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C66FF2084A
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 573B52070B
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732112AbfFTQOs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 12:14:48 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:59414 "EHLO ale.deltatee.com"
+        id S1732256AbfFTQOx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 12:14:53 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:59390 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732077AbfFTQMy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 12:12:54 -0400
+        id S1731927AbfFTQMx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Jun 2019 12:12:53 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzg6-00046Y-69; Thu, 20 Jun 2019 10:12:53 -0600
+        id 1hdzg6-00046I-68; Thu, 20 Jun 2019 10:12:52 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzg5-0005wi-EH; Thu, 20 Jun 2019 10:12:45 -0600
+        id 1hdzg3-0005vw-T4; Thu, 20 Jun 2019 10:12:43 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
@@ -39,8 +38,8 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Jason Gunthorpe <jgg@ziepe.ca>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 20 Jun 2019 10:12:29 -0600
-Message-Id: <20190620161240.22738-18-logang@deltatee.com>
+Date:   Thu, 20 Jun 2019 10:12:13 -0600
+Message-Id: <20190620161240.22738-2-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190620161240.22738-1-logang@deltatee.com>
 References: <20190620161240.22738-1-logang@deltatee.com>
@@ -49,7 +48,7 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, axboe@kernel.dk, hch@lst.de, bhelgaas@google.com, dan.j.williams@intel.com, sagi@grimberg.me, kbusch@kernel.org, jgg@ziepe.ca, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [RFC PATCH 17/28] block: Introduce queue flag to indicate support for dma-direct bios
+Subject: [RFC PATCH 01/28] block: Introduce DMA direct request type
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -57,37 +56,79 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Queues will need to advertise support to accept dma-direct requests.
-
-The existing PCI P2P support which will be replaced by this and thus
-the P2P flag will be dropped in a subsequent patch.
+A DMA direct request allows passing DMA addresses directly through
+the block layer, instead of struct pages. This allows the calling
+layer to take care of the mapping and unmapping and also creates
+a path to doing peer-to-peer transactions without using struct pages.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- include/linux/blkdev.h | 3 +++
- 1 file changed, 3 insertions(+)
+ include/linux/blk_types.h |  9 ++++++++-
+ include/linux/blkdev.h    | 10 ++++++++++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 95202f80676c..f3cabfdb6774 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -322,6 +322,7 @@ enum req_flag_bits {
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+ 
+ 	__REQ_HIPRI,
++	__REQ_DMA_DIRECT,	/* DMA address direct request */
+ 
+ 	/* for driver use */
+ 	__REQ_DRV,
+@@ -345,6 +346,7 @@ enum req_flag_bits {
+ #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+ #define REQ_HIPRI		(1ULL << __REQ_HIPRI)
++#define REQ_DMA_DIRECT		(1ULL << __REQ_DMA_DIRECT)
+ 
+ #define REQ_DRV			(1ULL << __REQ_DRV)
+ #define REQ_SWAP		(1ULL << __REQ_SWAP)
+@@ -353,7 +355,7 @@ enum req_flag_bits {
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+ 
+ #define REQ_NOMERGE_FLAGS \
+-	(REQ_NOMERGE | REQ_PREFLUSH | REQ_FUA)
++	(REQ_NOMERGE | REQ_PREFLUSH | REQ_FUA | REQ_DMA_DIRECT)
+ 
+ enum stat_group {
+ 	STAT_READ,
+@@ -412,6 +414,11 @@ static inline int op_stat_group(unsigned int op)
+ 	return op_is_write(op);
+ }
+ 
++static inline int op_is_dma_direct(unsigned int op)
++{
++	return op & REQ_DMA_DIRECT;
++}
++
+ typedef unsigned int blk_qc_t;
+ #define BLK_QC_T_NONE		-1U
+ #define BLK_QC_T_SHIFT		16
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ce70d5dded5f..a5b856324276 100644
+index 592669bcc536..ce70d5dded5f 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -616,6 +616,7 @@ struct request_queue {
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 23	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED	24	/* queue has been quiesced */
- #define QUEUE_FLAG_PCI_P2PDMA	25	/* device supports PCI p2p requests */
-+#define QUEUE_FLAG_DMA_DIRECT	26	/* device supports dma-addr requests */
+@@ -271,6 +271,16 @@ static inline bool bio_is_passthrough(struct bio *bio)
+ 	return blk_op_is_scsi(op) || blk_op_is_private(op);
+ }
  
- #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP))
-@@ -642,6 +643,8 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
- 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
- #define blk_queue_pci_p2pdma(q)	\
- 	test_bit(QUEUE_FLAG_PCI_P2PDMA, &(q)->queue_flags)
-+#define blk_queue_dma_direct(q)	\
-+	test_bit(QUEUE_FLAG_DMA_DIRECT, &(q)->queue_flags)
- 
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
++static inline bool bio_is_dma_direct(struct bio *bio)
++{
++	return op_is_dma_direct(bio->bi_opf);
++}
++
++static inline bool blk_rq_is_dma_direct(struct request *rq)
++{
++	return op_is_dma_direct(rq->cmd_flags);
++}
++
+ static inline unsigned short req_get_ioprio(struct request *req)
+ {
+ 	return req->ioprio;
 -- 
 2.20.1
 
