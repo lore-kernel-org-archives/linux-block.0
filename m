@@ -7,25 +7,25 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB07C48BE2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC8DAC43613
 	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 08:50:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F25F4206E0
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 08:50:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 962A3206E0
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 08:50:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726539AbfFTIuo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 04:50:44 -0400
-Received: from relmlor1.renesas.com ([210.160.252.171]:20751 "EHLO
-        relmlie6.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725877AbfFTIun (ORCPT
+        id S1731211AbfFTIup (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 04:50:45 -0400
+Received: from relmlor1.renesas.com ([210.160.252.171]:61840 "EHLO
+        relmlie5.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725925AbfFTIuo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 04:50:43 -0400
+        Thu, 20 Jun 2019 04:50:44 -0400
 X-IronPort-AV: E=Sophos;i="5.62,396,1554735600"; 
-   d="scan'208";a="18965897"
+   d="scan'208";a="19173850"
 Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie6.idc.renesas.com with ESMTP; 20 Jun 2019 17:50:40 +0900
+  by relmlie5.idc.renesas.com with ESMTP; 20 Jun 2019 17:50:40 +0900
 Received: from localhost.localdomain (unknown [10.166.17.210])
-        by relmlir5.idc.renesas.com (Postfix) with ESMTP id 536DF40065AA;
+        by relmlir5.idc.renesas.com (Postfix) with ESMTP id CBCB14007522;
         Thu, 20 Jun 2019 17:50:40 +0900 (JST)
 From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 To:     ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
@@ -34,9 +34,9 @@ Cc:     wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
         iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
         linux-renesas-soc@vger.kernel.org,
         Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Subject: [RFC PATCH v7 1/5] dma: Introduce dma_get_merge_boundary()
-Date:   Thu, 20 Jun 2019 17:50:06 +0900
-Message-Id: <1561020610-953-2-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+Subject: [RFC PATCH v7 4/5] block: add a helper function to merge the segments
+Date:   Thu, 20 Jun 2019 17:50:09 +0900
+Message-Id: <1561020610-953-5-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1561020610-953-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 References: <1561020610-953-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
@@ -45,86 +45,68 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds a new DMA API "dma_get_merge_boundary". This function
-returns the DMA merge boundary if the DMA layer can merge the segments.
-This patch also adds the implementation for a new dma_map_ops pointer.
+This patch adds a helper function whether a queue can merge
+the segments by the DMA MAP layer (e.g. via IOMMU).
 
 Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 ---
- Documentation/DMA-API.txt   |  8 ++++++++
- include/linux/dma-mapping.h |  6 ++++++
- kernel/dma/mapping.c        | 11 +++++++++++
- 3 files changed, 25 insertions(+)
+ block/blk-settings.c   | 22 ++++++++++++++++++++++
+ include/linux/blkdev.h |  2 ++
+ 2 files changed, 24 insertions(+)
 
-diff --git a/Documentation/DMA-API.txt b/Documentation/DMA-API.txt
-index 0076150..11a2647 100644
---- a/Documentation/DMA-API.txt
-+++ b/Documentation/DMA-API.txt
-@@ -204,6 +204,14 @@ Returns the maximum size of a mapping for the device. The size parameter
- of the mapping functions like dma_map_single(), dma_map_page() and
- others should not be larger than the returned value.
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 45f2c52..6a78ea0 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -4,6 +4,7 @@
+  */
+ #include <linux/bio.h>
+ #include <linux/blkdev.h>
++#include <linux/dma-mapping.h>
+ #include <linux/gcd.h>
+ #include <linux/gfp.h>
+ #include <linux/init.h>
+@@ -831,6 +832,27 @@ void blk_queue_write_cache(struct request_queue *q, bool wc, bool fua)
+ }
+ EXPORT_SYMBOL_GPL(blk_queue_write_cache);
  
-+::
++/**
++ * blk_queue_can_use_dma_map_merging - configure queue for merging segments.
++ * @q:		the request queue for the device
++ * @dev:	the device pointer for dma
++ *
++ * Tell the block layer about merging the segments by dma map of @q.
++ */
++bool blk_queue_can_use_dma_map_merging(struct request_queue *q,
++				       struct device *dev)
++{
++	unsigned long boundary = dma_get_merge_boundary(dev);
 +
-+	unsigned long
-+	dma_get_merge_boundary(struct device *dev);
++	if (!boundary)
++		return false;
 +
-+Returns the DMA merge boundary. If the device cannot merge any the DMA address
-+segments, the function returns 0.
++	/* No need to update max_segment_size. see blk_queue_virt_boundary() */
++	blk_queue_virt_boundary(q, boundary);
 +
- Part Id - Streaming DMA mappings
- --------------------------------
- 
-diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-index 6309a72..e81e076 100644
---- a/include/linux/dma-mapping.h
-+++ b/include/linux/dma-mapping.h
-@@ -131,6 +131,7 @@ struct dma_map_ops {
- 	int (*dma_supported)(struct device *dev, u64 mask);
- 	u64 (*get_required_mask)(struct device *dev);
- 	size_t (*max_mapping_size)(struct device *dev);
-+	unsigned long (*get_merge_boundary)(struct device *dev);
- };
- 
- #define DMA_MAPPING_ERROR		(~(dma_addr_t)0)
-@@ -467,6 +468,7 @@ int dma_set_mask(struct device *dev, u64 mask);
- int dma_set_coherent_mask(struct device *dev, u64 mask);
- u64 dma_get_required_mask(struct device *dev);
- size_t dma_max_mapping_size(struct device *dev);
-+unsigned long dma_get_merge_boundary(struct device *dev);
- #else /* CONFIG_HAS_DMA */
- static inline dma_addr_t dma_map_page_attrs(struct device *dev,
- 		struct page *page, size_t offset, size_t size,
-@@ -572,6 +574,10 @@ static inline size_t dma_max_mapping_size(struct device *dev)
++	return true;
++}
++
+ static int __init blk_settings_init(void)
  {
- 	return 0;
- }
-+static inline unsigned long dma_get_merge_boundary(struct device *dev)
-+{
-+	return 0;
-+}
- #endif /* CONFIG_HAS_DMA */
+ 	blk_max_low_pfn = max_low_pfn - 1;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 592669b..a7a839d 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1091,6 +1091,8 @@ extern void blk_queue_dma_alignment(struct request_queue *, int);
+ extern void blk_queue_update_dma_alignment(struct request_queue *, int);
+ extern void blk_queue_rq_timeout(struct request_queue *, unsigned int);
+ extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fua);
++extern bool blk_queue_can_use_dma_map_merging(struct request_queue *q,
++					      struct device *dev);
  
- static inline dma_addr_t dma_map_single_attrs(struct device *dev, void *ptr,
-diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-index f7afdad..8e262cf 100644
---- a/kernel/dma/mapping.c
-+++ b/kernel/dma/mapping.c
-@@ -367,3 +367,14 @@ size_t dma_max_mapping_size(struct device *dev)
- 	return size;
- }
- EXPORT_SYMBOL_GPL(dma_max_mapping_size);
-+
-+unsigned long dma_get_merge_boundary(struct device *dev)
-+{
-+	const struct dma_map_ops *ops = get_dma_ops(dev);
-+
-+	if (!ops || !ops->get_merge_boundary)
-+		return 0;	/* can't merge */
-+
-+	return ops->get_merge_boundary(dev);
-+}
-+EXPORT_SYMBOL_GPL(dma_get_merge_boundary);
+ /*
+  * Number of physical segments as sent to the device.
 -- 
 2.7.4
 
