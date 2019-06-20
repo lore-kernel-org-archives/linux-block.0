@@ -2,292 +2,283 @@ Return-Path: <SRS0=D4S7=UT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E10C43613
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 14:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77961C43613
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:03:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D8D682083B
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 14:16:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 386A020673
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 15:03:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5ZViM+Z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NXz6swAc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726740AbfFTOQT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 10:16:19 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:35406 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726686AbfFTOQT (ORCPT
+        id S1726811AbfFTPDn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 11:03:43 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:35412 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726675AbfFTPDn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 10:16:19 -0400
-Received: by mail-pf1-f195.google.com with SMTP id d126so1769181pfd.2;
-        Thu, 20 Jun 2019 07:16:18 -0700 (PDT)
+        Thu, 20 Jun 2019 11:03:43 -0400
+Received: by mail-ed1-f65.google.com with SMTP id p26so5213802edr.2;
+        Thu, 20 Jun 2019 08:03:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=JX8bg31yby0J9Wcl6LtK7Ir+iC18LOMFEP9KmGrcSb4=;
-        b=B5ZViM+Ze0QlX28FY2X8Iypcio5Swec6G71h1/6O7zHXU47Wn/gdLlzzl8m+MWo6h1
-         S2MzeNT9bNRWNJ8jUwDi9B+X+KIZVQPKGQovqzGyjM3/cZv2bJf+u0v4Om3KVehUgtlm
-         qCL+jdA4TCvIySabL2cRZXcZHCInxFRhoyXYKYLjm/mLMBUXN34O6yfF2YyDoToKpb3X
-         F6b8e2tmNskibCU9atvxgbEvbHetNxMTrbxNjmVYq1T6st56fJA/gYlfWVfa0zQZ7tRi
-         8tMoxq1hzQNQBEzUhY5r9eBVFVZ/zxrmeK8PcS6MPeSG+VwWx3DfsQcMfDu6KBHZ6xEs
-         F1cg==
+        h=from:to:cc:subject:date:message-id;
+        bh=yjlrECafP1UAhBZTppwIjsg+5Wc/+pSe/lUTk3WuWE0=;
+        b=NXz6swAcF91kdyhRtEmS7i+1Y4bVvtho+j9udQHCT3zTe77s/YUbg7xM/2IADiK3A8
+         WOeaEcDFMNGftocY/+5Log6slDFCsoJXjk5v+CjNfb5pgiS7UC2xi4J7bqaFWnyXNVRK
+         hlwSC6c8IzKZJ6xnVpCedmfTkcPq7BO/f7AUTcNTHrIDIs+GROSZVgF9WYbyNqlExXDC
+         uVcIaBNGermBsZzwc+1MgAIsKxbUde2g5578rMIcYlofhpHKXcar0BZ9qqKwG+SMOoH3
+         UZ8xmw7oxliIALTNWOt6oU4NO+dx7Oo1x9IwG+X+dm7jood9pghltJAmvz1uPkMpoSP+
+         KRzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=JX8bg31yby0J9Wcl6LtK7Ir+iC18LOMFEP9KmGrcSb4=;
-        b=kSAT9Jhm+0Lzhof636gLQCQ5T0ZClSutWrX0f4bkOo4S71XEXqNSfuuC2wC06AfQyE
-         EwWMa0m8keIU84ZfBRskeZBbPoBz2cB2r8VnogA2+Z5aRQTVcDNR4D28ISHkLmMaBBwA
-         /V5HFdddDaGWQ3bszOA3Dg/wnY38GjOhDFuYGz2y0E/DDI+NTdQNB9NCflZhASesagjZ
-         ISo+JFGj7/uss35qe4RGZwK+wZmJOlcqH3/7btCuSZkCbEVbSlxfxAsA2NPkY0IpaiHQ
-         7dxY9HwkCfepYOYtikMKdm8ICRFlQku69q/qAV3dyeqZzIPPlDzauG2xTfbXlwECxd+5
-         kcgQ==
-X-Gm-Message-State: APjAAAVm9eiuXxwx4ufFo/Ej71yduXys0+a35Yc0GI6+/MbPiJP+y0xw
-        hEz8IYdDMKvCbooP0sNwIpE=
-X-Google-Smtp-Source: APXvYqwFozTTWSzq7lbHiL9Y1OXNIOn1v7INL7+KjCanKhQ4LlwOMk69TcG97nUFXMY8lnSPC29WHQ==
-X-Received: by 2002:a17:90a:26a1:: with SMTP id m30mr3408246pje.59.1561040178055;
-        Thu, 20 Jun 2019 07:16:18 -0700 (PDT)
-Received: from localhost ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id k3sm21434890pgo.81.2019.06.20.07.16.16
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 20 Jun 2019 07:16:17 -0700 (PDT)
-Date:   Thu, 20 Jun 2019 23:16:14 +0900
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     Weiping Zhang <zhangweiping@didiglobal.com>
-Cc:     axboe@kernel.dk, tj@kernel.org, hch@lst.de, bvanassche@acm.org,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-Subject: Re: [PATCH v2 4/4] nvme: add support weighted round robin queue
-Message-ID: <20190620141614.GB12032@minwooim-desktop>
-References: <cover.1560679439.git.zhangweiping@didiglobal.com>
- <0b0fa12a337f97a8cc878b58673b3eb619539174.1560679439.git.zhangweiping@didiglobal.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0b0fa12a337f97a8cc878b58673b3eb619539174.1560679439.git.zhangweiping@didiglobal.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=yjlrECafP1UAhBZTppwIjsg+5Wc/+pSe/lUTk3WuWE0=;
+        b=N0oi4F4z6vKFq+cuTo5TLdFkez+QL1PXQz9k+Jk/uPzb49vEeIJ8XkqUtsyA9nmapq
+         kI1xmcpu5OCeoM/KpHGrO7VgTDEuhiYJdGEGawAjQksll0x+MagB92hew+HxyPsO1/ir
+         ZJJUNSdYEj1Z4YWSX9XG9C/677b7Pt6Fk7BUPvuy9QgBCuuqZKyxXe9cR2m7+zxYrKP1
+         T/YeYYbeFAfydtrdARHitiHc8fBLawErpoH2FwHLycx/fGA+9hXXVwONieHYLQZosAQc
+         ya0nYsIcRM7YyUSaXZC7YXpAgQXKtHADsuwp5hyTCvwK87Po5j2mppMEkC3sGlZAKpT7
+         t6iA==
+X-Gm-Message-State: APjAAAXwnwyyy7cXU6Ig7+ccNU/vpemy3t1D3k56WffTzGhTbpfQX+jx
+        lazG3eqjGdUc5uCwPOWRXS9A3xYM0vU=
+X-Google-Smtp-Source: APXvYqyZEkOmpSy4I4bIHP8T4lBbdQEoqvLpV9SOjeG6xgeqxZbpglFLC+GfeXKYSTHY1ww/5uUqtA==
+X-Received: by 2002:a17:906:eb93:: with SMTP id mh19mr39100484ejb.42.1561043020589;
+        Thu, 20 Jun 2019 08:03:40 -0700 (PDT)
+Received: from jwang-Latitude-5491.pb.local ([62.217.45.26])
+        by smtp.gmail.com with ESMTPSA id a20sm3855817ejj.21.2019.06.20.08.03.39
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 20 Jun 2019 08:03:40 -0700 (PDT)
+From:   Jack Wang <jinpuwang@gmail.com>
+To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
+Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
+        bvanassche@acm.org, jgg@mellanox.com, dledford@redhat.com,
+        danil.kipnis@cloud.ionos.com, rpenyaev@suse.de
+Subject: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block Device (IBNBD)
+Date:   Thu, 20 Jun 2019 17:03:12 +0200
+Message-Id: <20190620150337.7847-1-jinpuwang@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -static int write_queues;
-> -module_param_cb(write_queues, &queue_count_ops, &write_queues, 0644);
-> -MODULE_PARM_DESC(write_queues,
-> -	"Number of queues to use for writes. If not set, reads and writes "
-> +static int read_queues;
-> +module_param_cb(read_queues, &queue_count_ops, &read_queues, 0644);
-> +MODULE_PARM_DESC(read_queues,
-> +	"Number of queues to use for reads. If not set, reads and writes "
->  	"will share a queue set.");
+Hi all,
 
-Before starting my review for this, I'd like to talk about this part
-first.  It would be better if you can split this change from this commit
-into a new one because it just replaced the write_queues with
-read_queues which is directly mapped to HCTX_TYPE_READ.  This change
-might not be critical for the WRR implementation.
+Here is v4 of IBNBD/IBTRS patches, which have minor changes
 
->  
->  static int poll_queues = 0;
->  module_param_cb(poll_queues, &queue_count_ops, &poll_queues, 0644);
->  MODULE_PARM_DESC(poll_queues, "Number of queues to use for polled IO.");
->  
-> +static int wrr_high_queues = 0;
+ Changelog
+ ---------
+v4:
+  o Protocol extended to transport IO priorities
+  o Support for Mellanox ConnectX-4/X-5
+  o Minor sysfs extentions (display access mode on server side)
+  o Bug fixes: cleaning up sysfs folders, race on deallocation of resources
+  o Style fixes
 
-Nitpick here: maybe we don't need to 0-initialize static variables
-explicitly.
+v3:
+  o Sparse fixes:
+     - le32 -> le16 conversion
+     - pcpu and RCU wrong declaration
+     - sysfs: dynamically alloc array of sockaddr structures to reduce
+	   size of a stack frame
 
-> +module_param_cb(wrr_high_queues, &queue_count_ops, &wrr_high_queues, 0644);
-> +MODULE_PARM_DESC(wrr_high_queues, "Number of queues to use for WRR high.");
-> +
-> +static int wrr_medium_queues = 0;
-> +module_param_cb(wrr_medium_queues, &queue_count_ops, &wrr_medium_queues, 0644);
-> +MODULE_PARM_DESC(wrr_medium_queues, "Number of queues to use for WRR medium.");
-> +
-> +static int wrr_low_queues = 0;
-> +module_param_cb(wrr_low_queues, &queue_count_ops, &wrr_low_queues, 0644);
-> +MODULE_PARM_DESC(wrr_low_queues, "Number of queues to use for WRR low.");
-> +
->  struct nvme_dev;
->  struct nvme_queue;
->  
-> @@ -226,9 +238,17 @@ struct nvme_iod {
->  	struct scatterlist *sg;
->  };
->  
-> +static inline bool nvme_is_enable_wrr(struct nvme_dev *dev)
-> +{
-> +	return dev->io_queues[HCTX_TYPE_WRR_LOW] +
-> +		dev->io_queues[HCTX_TYPE_WRR_MEDIUM] +
-> +		dev->io_queues[HCTX_TYPE_WRR_HIGH] > 0;
-> +}
+  o Rename sysfs folder on client and server sides to show source and
+    destination addresses of the connection, i.e.:
+	   .../<session-name>/paths/<src@dst>/
 
-It looks like that it might be confused with AMS(Arbitration Mechanism
-Selected) in CC or CAP?  If it meant how many irqs for the sets were
-allocated, then can we have this function with another name like:
-	nvme_is_wrr_allocated or something indicating the irqsets
+  o Remove external inclusions from Makefiles.
+  * https://lwn.net/Articles/756994/
 
-> +
->  static unsigned int max_io_queues(void)
->  {
-> -	return num_possible_cpus() + write_queues + poll_queues;
-> +	return num_possible_cpus() + read_queues + poll_queues +
-> +		wrr_high_queues + wrr_medium_queues + wrr_low_queues;
->  }
->  
->  static unsigned int max_queue_count(void)
-> @@ -1534,11 +1558,46 @@ static void nvme_init_queue(struct nvme_queue *nvmeq, u16 qid)
->  	wmb(); /* ensure the first interrupt sees the initialization */
->  }
->  
-> -static int nvme_create_queue(struct nvme_queue *nvmeq, int qid, bool polled)
-> +static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
->  {
->  	struct nvme_dev *dev = nvmeq->dev;
-> -	int result;
-> +	int start, end, result, wrr;
-> +	bool polled = false;
->  	u16 vector = 0;
-> +	enum hctx_type type;
-> +
-> +	/* 0 for admain queue, io queue index >= 1 */
-> +	start = 1;
-> +	/* get hardware context type base on qid */
-> +	for (type = HCTX_TYPE_DEFAULT; type < HCTX_MAX_TYPES; type++) {
-> +		end = start + dev->io_queues[type] - 1;
-> +		if (qid >= start && qid <= end)
-> +			break;
-> +		start = end + 1;
-> +	}
-> +
-> +	if (nvme_is_enable_wrr(dev)) {
+v2:
+  o IBNBD:
+     - No legacy request IO mode, only MQ is left.
 
-I think we need to check not only the irqset allocations, but also if the
-device is really supports WRR or not.
+  o IBTRS:
+     - No FMR registration, only FR is left.
 
-> +		/* set read,poll,default to medium by default */
-> +		switch (type) {
-> +		case HCTX_TYPE_POLL:
-> +			polled = true;
+  * https://lwn.net/Articles/755075/
 
-Question: Is poll-queue not avilable to be used in case of !WRR?
+v1:
+  - IBTRS: load-balancing and IO fail-over using multipath features were added.
 
-> +		case HCTX_TYPE_DEFAULT:
-> +		case HCTX_TYPE_READ:
-> +		case HCTX_TYPE_WRR_MEDIUM:
-> +			wrr = NVME_SQ_PRIO_MEDIUM;
+  - Major parts of the code were rewritten, simplified and overall code
+    size was reduced by a quarter.
 
-Also it seems like it could be named like flags because it will show the
-SQ priority.  What do you think?
+  * https://lwn.net/Articles/746342/
 
-> +			break;
-> +		case HCTX_TYPE_WRR_LOW:
-> +			wrr = NVME_SQ_PRIO_LOW;
-> +			break;
-> +		case HCTX_TYPE_WRR_HIGH:
-> +			wrr = NVME_SQ_PRIO_HIGH;
-> +			break;
-> +		default:
-> +			return -EINVAL;
-> +		}
-> +	} else {
-> +		wrr = 0;
+v0:
+  - Initial submission
 
-Would it be different with the following value ?
-	NVME_SQ_PRIO_URGENT     = (0 << 1)
-If it means no WRR, then can it be avoided the value which is already
-defined ?
+  * https://lwn.net/Articles/718181/
 
-> +	}
->  
->  	clear_bit(NVMEQ_DELETE_ERROR, &nvmeq->flags);
->  
 
-> @@ -2028,35 +2079,73 @@ static int nvme_setup_host_mem(struct nvme_dev *dev)
->  static void nvme_calc_irq_sets(struct irq_affinity *affd, unsigned int nrirqs)
->  {
->  	struct nvme_dev *dev = affd->priv;
-> -	unsigned int nr_read_queues;
-> +	unsigned int nr_total, nr, nr_read, nr_default;
-> +	unsigned int nr_wrr_high, nr_wrr_medium, nr_wrr_low;
-> +	unsigned int nr_sets;
->  
->  	/*
->  	 * If there is no interupt available for queues, ensure that
->  	 * the default queue is set to 1. The affinity set size is
->  	 * also set to one, but the irq core ignores it for this case.
-> -	 *
-> -	 * If only one interrupt is available or 'write_queue' == 0, combine
-> -	 * write and read queues.
-> -	 *
-> -	 * If 'write_queues' > 0, ensure it leaves room for at least one read
-> -	 * queue.
->  	 */
-> -	if (!nrirqs) {
-> +	if (!nrirqs)
->  		nrirqs = 1;
-> -		nr_read_queues = 0;
-> -	} else if (nrirqs == 1 || !write_queues) {
-> -		nr_read_queues = 0;
-> -	} else if (write_queues >= nrirqs) {
-> -		nr_read_queues = 1;
-> -	} else {
-> -		nr_read_queues = nrirqs - write_queues;
-> -	}
->  
-> -	dev->io_queues[HCTX_TYPE_DEFAULT] = nrirqs - nr_read_queues;
-> -	affd->set_size[HCTX_TYPE_DEFAULT] = nrirqs - nr_read_queues;
-> -	dev->io_queues[HCTX_TYPE_READ] = nr_read_queues;
-> -	affd->set_size[HCTX_TYPE_READ] = nr_read_queues;
-> -	affd->nr_sets = nr_read_queues ? 2 : 1;
-> +	nr_total = nrirqs;
-> +
-> +	nr_read = nr_wrr_high = nr_wrr_medium = nr_wrr_low = 0;
-> +
-> +	/* set default to 1, add all the rest queue to default at last */
-> +	nr = nr_default = 1;
-> +	nr_sets = 1;
-> +
-> +	nr_total -= nr;
-> +	if (!nr_total)
-> +		goto done;
-> +
-> +	/* read queues */
-> +	nr_sets++;
-> +	nr_read = nr = read_queues > nr_total ? nr_total : read_queues;
-> +	nr_total -= nr;
-> +	if (!nr_total)
-> +		goto done;
-> +
-> +	/* wrr low queues */
-> +	nr_sets++;
-> +	nr_wrr_low = nr = wrr_low_queues > nr_total ? nr_total : wrr_low_queues;
-> +	nr_total -= nr;
-> +	if (!nr_total)
-> +		goto done;
-> +
-> +	/* wrr medium queues */
-> +	nr_sets++;
-> +	nr_wrr_medium = nr = wrr_medium_queues > nr_total ? nr_total : wrr_medium_queues;
+ Introduction
+ -------------
 
-It looks like exceeded 80 chracters here.
+IBTRS (InfiniBand Transport) is a reliable high speed transport library
+which allows for establishing connection between client and server
+machines via RDMA. It is based on RDMA-CM, so expect also to support RoCE
+and iWARP, but we mainly tested in IB environment. It is optimized to
+transfer (read/write) IO blocks in the sense that it follows the BIO 
+semantics of providing the possibility to either write data from a 
+scatter-gather list to the remote side or to request ("read") data
+transfer from the remote side into a given set of buffers.
 
-> +	nr_total -= nr;
-> +	if (!nr_total)
-> +		goto done;
-> +
-> +	/* wrr high queues */
-> +	nr_sets++;
-> +	nr_wrr_high = nr = wrr_high_queues > nr_total ? nr_total : wrr_high_queues;
-> +	nr_wrr_high = nr = wrr_high_queues > nr_total ? nr_total : wrr_high_queues;
+IBTRS is multipath capable and provides I/O fail-over and load-balancing
+functionality, i.e. in IBTRS terminology, an IBTRS path is a set of RDMA
+CMs and particular path is selected according to the load-balancing policy.
+It can be used for other components not bind to IBNBD.
 
-Here also.
 
-If I misunderstood something here, please feel free to let me know.
+IBNBD (InfiniBand Network Block Device) is a pair of kernel modules
+(client and server) that allow for remote access of a block device on
+the server over IBTRS protocol. After being mapped, the remote block
+devices can be accessed on the client side as local block devices.
+Internally IBNBD uses IBTRS as an RDMA transport library.
 
-Thanks,
+
+   - IBNBD/IBTRS is developed in order to map thin provisioned volumes,
+     thus internal protocol is simple.
+   - IBTRS was developed as an independent RDMA transport library, which
+     supports fail-over and load-balancing policies using multipath, thus
+     it can be used for any other IO needs rather than only for block
+     device.
+   - IBNBD/IBTRS is fast.
+     Old comparison results:
+     https://www.spinics.net/lists/linux-rdma/msg48799.html
+     New comparison results: see performance measurements section below.
+
+Key features of IBTRS transport library and IBNBD block device:
+
+o High throughput and low latency due to:
+   - Only two RDMA messages per IO.
+   - IMM InfiniBand messages on responses to reduce round trip latency.
+   - Simplified memory management: memory allocation happens once on
+     server side when IBTRS session is established.
+
+o IO fail-over and load-balancing by using multipath.  According to
+  our test loads additional path brings ~20% of bandwidth.  
+
+o Simple configuration of IBNBD:
+   - Server side is completely passive: volumes do not need to be
+     explicitly exported.
+   - Only IB port GID and device path needed on client side to map
+     a block device.
+   - A device is remapped automatically i.e. after storage reboot.
+
+Commits for kernel can be found here:
+   https://github.com/ionos-enterprise/ibnbd/tree/linux-5.2-rc3--ibnbd-v4
+The out-of-tree modules are here:
+   https://github.com/ionos-enterprise/ibnbd
+
+Vault 2017 presentation:
+  https://events.static.linuxfound.org/sites/events/files/slides/IBNBD-Vault-2017.pdf
+
+ Performance measurements
+ ------------------------
+
+o IBNBD and NVMEoRDMA
+
+  Performance results for the v5.2-rc3 kernel
+  link: https://github.com/ionos-enterprise/ibnbd/tree/develop/performance/v4-v5.2-rc3
+
+Roman Pen (25):
+  sysfs: export sysfs_remove_file_self()
+  ibtrs: public interface header to establish RDMA connections
+  ibtrs: private headers with IBTRS protocol structs and helpers
+  ibtrs: core: lib functions shared between client and server modules
+  ibtrs: client: private header with client structs and functions
+  ibtrs: client: main functionality
+  ibtrs: client: statistics functions
+  ibtrs: client: sysfs interface functions
+  ibtrs: server: private header with server structs and functions
+  ibtrs: server: main functionality
+  ibtrs: server: statistics functions
+  ibtrs: server: sysfs interface functions
+  ibtrs: include client and server modules into kernel compilation
+  ibtrs: a bit of documentation
+  ibnbd: private headers with IBNBD protocol structs and helpers
+  ibnbd: client: private header with client structs and functions
+  ibnbd: client: main functionality
+  ibnbd: client: sysfs interface functions
+  ibnbd: server: private header with server structs and functions
+  ibnbd: server: main functionality
+  ibnbd: server: functionality for IO submission to file or block dev
+  ibnbd: server: sysfs interface functions
+  ibnbd: include client and server modules into kernel compilation
+  ibnbd: a bit of documentation
+  MAINTAINERS: Add maintainer for IBNBD/IBTRS modules
+
+ MAINTAINERS                                   |   14 +
+ drivers/block/Kconfig                         |    2 +
+ drivers/block/Makefile                        |    1 +
+ drivers/block/ibnbd/Kconfig                   |   24 +
+ drivers/block/ibnbd/Makefile                  |   13 +
+ drivers/block/ibnbd/README                    |  315 ++
+ drivers/block/ibnbd/ibnbd-clt-sysfs.c         |  691 ++++
+ drivers/block/ibnbd/ibnbd-clt.c               | 1832 +++++++++++
+ drivers/block/ibnbd/ibnbd-clt.h               |  166 +
+ drivers/block/ibnbd/ibnbd-log.h               |   59 +
+ drivers/block/ibnbd/ibnbd-proto.h             |  378 +++
+ drivers/block/ibnbd/ibnbd-srv-dev.c           |  408 +++
+ drivers/block/ibnbd/ibnbd-srv-dev.h           |  143 +
+ drivers/block/ibnbd/ibnbd-srv-sysfs.c         |  270 ++
+ drivers/block/ibnbd/ibnbd-srv.c               |  945 ++++++
+ drivers/block/ibnbd/ibnbd-srv.h               |   94 +
+ drivers/infiniband/Kconfig                    |    1 +
+ drivers/infiniband/ulp/Makefile               |    1 +
+ drivers/infiniband/ulp/ibtrs/Kconfig          |   22 +
+ drivers/infiniband/ulp/ibtrs/Makefile         |   15 +
+ drivers/infiniband/ulp/ibtrs/README           |  385 +++
+ .../infiniband/ulp/ibtrs/ibtrs-clt-stats.c    |  447 +++
+ .../infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c    |  514 +++
+ drivers/infiniband/ulp/ibtrs/ibtrs-clt.c      | 2844 +++++++++++++++++
+ drivers/infiniband/ulp/ibtrs/ibtrs-clt.h      |  308 ++
+ drivers/infiniband/ulp/ibtrs/ibtrs-log.h      |   84 +
+ drivers/infiniband/ulp/ibtrs/ibtrs-pri.h      |  463 +++
+ .../infiniband/ulp/ibtrs/ibtrs-srv-stats.c    |  103 +
+ .../infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c    |  303 ++
+ drivers/infiniband/ulp/ibtrs/ibtrs-srv.c      | 1998 ++++++++++++
+ drivers/infiniband/ulp/ibtrs/ibtrs-srv.h      |  170 +
+ drivers/infiniband/ulp/ibtrs/ibtrs.c          |  610 ++++
+ drivers/infiniband/ulp/ibtrs/ibtrs.h          |  318 ++
+ fs/sysfs/file.c                               |    1 +
+ 34 files changed, 13942 insertions(+)
+ create mode 100644 drivers/block/ibnbd/Kconfig
+ create mode 100644 drivers/block/ibnbd/Makefile
+ create mode 100644 drivers/block/ibnbd/README
+ create mode 100644 drivers/block/ibnbd/ibnbd-clt-sysfs.c
+ create mode 100644 drivers/block/ibnbd/ibnbd-clt.c
+ create mode 100644 drivers/block/ibnbd/ibnbd-clt.h
+ create mode 100644 drivers/block/ibnbd/ibnbd-log.h
+ create mode 100644 drivers/block/ibnbd/ibnbd-proto.h
+ create mode 100644 drivers/block/ibnbd/ibnbd-srv-dev.c
+ create mode 100644 drivers/block/ibnbd/ibnbd-srv-dev.h
+ create mode 100644 drivers/block/ibnbd/ibnbd-srv-sysfs.c
+ create mode 100644 drivers/block/ibnbd/ibnbd-srv.c
+ create mode 100644 drivers/block/ibnbd/ibnbd-srv.h
+ create mode 100644 drivers/infiniband/ulp/ibtrs/Kconfig
+ create mode 100644 drivers/infiniband/ulp/ibtrs/Makefile
+ create mode 100644 drivers/infiniband/ulp/ibtrs/README
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-clt-stats.c
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-clt.c
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-clt.h
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-log.h
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-pri.h
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv.c
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv.h
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs.c
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs.h
+
+-- 
+2.17.1
+
