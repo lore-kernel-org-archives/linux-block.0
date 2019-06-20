@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BA9BC43613
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 18:31:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8D80C43613
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 18:31:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 596DF20665
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 18:31:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6A7420665
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 18:31:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="T6qqjBc2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="d3+OplwC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726166AbfFTSbY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 14:31:24 -0400
+        id S1726509AbfFTSb2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 14:31:28 -0400
 Received: from esa1.hgst.iphmx.com ([68.232.141.245]:35454 "EHLO
         esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726707AbfFTR7s (ORCPT
+        with ESMTP id S1726405AbfFTR7n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 13:59:48 -0400
+        Thu, 20 Jun 2019 13:59:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1561053587; x=1592589587;
+  t=1561053583; x=1592589583;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=UIxmCrioBaC0pFlPN4Qnln/402T9GIjVBNu2yOteD8U=;
-  b=T6qqjBc2vM6tfJlve9XT74CeG/j/9pY6dQEGMOPvA4TQ8aOk4e1Ul/3t
-   NBNZnC83ywsBy8si+fYJwQB2iYezN5122w8R7AWzL7cuPYpdKSOxki66s
-   hh3U1wZAO3Ak6vD07smM4q5vHZfU/ScrpwLHgcFtLtXzMxbkYq7WQxDp1
-   JKTae0Z3o4LUq8LVYXiuMKOR6IFl/WTgZXAsKnRtMGNFMfI/zhDxP8/hq
-   uuxlnNp1F0EcndR50oeLUJALSxVZNiId0HbGroAmYV7fPtAcRETQlH770
-   CcVP9oCooq64w2JvFf0/u0F5TSPfVimsUs4ssxXMJANgTXRKTnrYjfM6Y
-   A==;
+  bh=tkfuDcjVsH4cbJnqt6hs3NIgWxeSUr2uI5ZruO+U66k=;
+  b=d3+OplwCcp1mUVOLt8OO5rgih7wXtT4803R17EPoD9dQ2Z3NLbK79Z5Z
+   NFc48Qu/oP8Ybki3IuiYDwLZncxvLt3zLBEkl1OIZEdzNqxcb2luqqoPc
+   H9Yq5r6MFXCEZ/Waa0B/euUmXB9l4qtVjyDVBs16sII7uOIRmUDR8lCgd
+   gvANCOpNZTYF29QI3viDJPO2GTE2LoQ91LkB2C4pn30SikaFieL5xygO4
+   kuwwEmPAb70kSoMAMjS46X9QZ8N/Fnr8FF+/lDg0XGj8SazCy3jdKz2Xa
+   aDWl4a1FjlqLAxFKsYFr7ZoYF/evXKzmGEh4OCZLH8ec6X2gX50MJpvRU
+   w==;
 X-IronPort-AV: E=Sophos;i="5.63,397,1557158400"; 
-   d="scan'208";a="217443489"
+   d="scan'208";a="217443483"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Jun 2019 01:59:47 +0800
-IronPort-SDR: nSPF8C5eUWn4pXk3tCcmwGgh08LactMcH0T0rE5SgBF/E7m2auJkz/iWq0g1OAZjtzUGoWIibo
- V3p8oOd1WkqMI7tKz/21nPeNW4CKRpeidsDmjwyvBQyhi8MJ5pHomzPcGr7N/78nhcqAp6B6sH
- EaZ2xUI5ZnvA7P1V2ZFcAs5WwUq+8Bf17N/n/KwoT0dZomCTFme19iTyk1puC9jGBxxfbPq3VA
- IdQkRV6Q8wBexNlbpRr0El10q5W3IDWlTzmdrOQg03U9O54IUKNnvCU9V3yuVMunFAa4aahFZS
- LBE+cSLlL2LxXU3U0b1yDBUd
+  by ob1.hgst.iphmx.com with ESMTP; 21 Jun 2019 01:59:43 +0800
+IronPort-SDR: ZoiLFoQ1pFYKIpQCvJZ0aFAq1G4rw4fK3KLGKtRJgNVGXck2mMyQl55t/9qFOAd8WF2UjoWU7F
+ bEfuJCUuemrlrqhcvDbXb4o/TqCZgMmUmFiW8pauFfhyQtEtp6aqvQoWNqxDSDMSYJdR55KG/O
+ 4tdaunFXwGABZxRB1EO00ZWyZEjPYEFsX8/5mwZbAb5SvZSNb7ktR5JdsigTRBJolv8BY5XuLW
+ fgHPoHG8D1UXkRFu49LCxmFO2fuAZ1D3Cc9jMkcpS52Qm0XpcGV6INvRinkluRJoW7LSixhpb4
+ QkLE2V9uZ/babzdoUkclXtEN
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP; 20 Jun 2019 10:59:06 -0700
-IronPort-SDR: x0m3rKhsDcOTIcfjBX2a/YGS6Hpmirl8MY5ikoMbHaJA27SSfyyj1+CR6kxIWfQl5EKKdQWJJ2
- GdIl+duoKwXIijzVZq0qrYvPZK2lxKL2Y++DF3o5URmJFL43uTUXGPD5a2UQq81cq8Z4PZpj6q
- zQfHvZFbtHlflh0WVOPFXKDz17f4r5BZE1SDM55U/A7j0TriwBrzWp39kuVfUo8DNpBE8rEzZZ
- gvV0g3cWBA/OWsUU+Dhz3XUE67rdtljbfTlKxxn4eHH5QTUmE7mnXUPTDK1y5YhAXu1agLwWoD
- Qcg=
+  by uls-op-cesaep01.wdc.com with ESMTP; 20 Jun 2019 10:59:02 -0700
+IronPort-SDR: zgsjiC+jNLq1dOi6AKdwpoIw3ZLFaOSxD9AqhttKGLTEKTxF1XINcU+Njd0zR4o10VmiZSN7zs
+ mI4rWAB5ucQ5nTAZLQ1u9w4yLO69Ym58IGgNvFRIHI3uOGLNl4X+F6JQDjnK2dztNSFjrqJeUe
+ aWenooipaYQhalSSYtGt8jxrm6vEQiCeq8gDHgKtviI1o95MuLtOSj+KfXoMJ/iKp0bKL7nhoG
+ 3H5l8RB29XmanSMrT9PZvD6os9WqzVnpZl4pdfZ6ebeKgkaBcawzf4sZj9WV4BjjnORSDECiqC
+ CkI=
 Received: from cmercuryqemu.hgst.com ([10.202.65.32])
-  by uls-op-cesaip01.wdc.com with ESMTP; 20 Jun 2019 10:59:47 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 20 Jun 2019 10:59:43 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V5 3/5] block: use blk_op_str() in blk-mq-debugfs.c
-Date:   Thu, 20 Jun 2019 10:59:17 -0700
-Message-Id: <20190620175919.3273-4-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V5 2/5] block: add centralize REQ_OP_XXX to string helper
+Date:   Thu, 20 Jun 2019 10:59:16 -0700
+Message-Id: <20190620175919.3273-3-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190620175919.3273-1-chaitanya.kulkarni@wdc.com>
 References: <20190620175919.3273-1-chaitanya.kulkarni@wdc.com>
@@ -69,63 +69,87 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that we've a helper function blk_op_str() to convert the
-REQ_OP_XXX to string XXX, adjust the code to use that. Get rid of
-the duplicate array op_name which is now present in the blk-core.c
-which we renamed it to "blk_op_name" and open coding in the
-blk-mq-debugfs.c.
+In order to centralize the REQ_OP_XXX to string conversion which can be
+used in the block layer and different places in the kernel like f2fs,
+this patch adds a new helper function along with an array similar to the
+one present in the blk-mq-debugfs.c.
+
+We keep this helper functionality centralize under blk-core.c instead of
+blk-mq-debugfs.c since blk-core.c is configured using CONFIG_BLOCK and
+it will not be dependent on blk-mq-debugfs.c which is configured using
+CONFIG_BLK_DEBUG_FS.
+
+Next patch adjusts the code in the blk-mq-debugfs.c with newly
+introduced helper.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- block/blk-mq-debugfs.c | 24 ++++--------------------
- 1 file changed, 4 insertions(+), 20 deletions(-)
+ block/blk-core.c       | 36 ++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h |  3 +++
+ 2 files changed, 39 insertions(+)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index a8376cc06a39..748164f4e8b1 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -261,23 +261,6 @@ static int hctx_flags_show(void *data, struct seq_file *m)
- 	return 0;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 77623cdf2e5a..190aba04da3e 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -120,6 +120,42 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
  }
+ EXPORT_SYMBOL(blk_rq_init);
  
--#define REQ_OP_NAME(name) [REQ_OP_##name] = #name
--static const char *const op_name[] = {
--	REQ_OP_NAME(READ),
--	REQ_OP_NAME(WRITE),
--	REQ_OP_NAME(FLUSH),
--	REQ_OP_NAME(DISCARD),
--	REQ_OP_NAME(SECURE_ERASE),
--	REQ_OP_NAME(ZONE_RESET),
--	REQ_OP_NAME(WRITE_SAME),
--	REQ_OP_NAME(WRITE_ZEROES),
--	REQ_OP_NAME(SCSI_IN),
--	REQ_OP_NAME(SCSI_OUT),
--	REQ_OP_NAME(DRV_IN),
--	REQ_OP_NAME(DRV_OUT),
--};
--#undef REQ_OP_NAME
--
- #define CMD_FLAG_NAME(name) [__REQ_##name] = #name
- static const char *const cmd_flag_name[] = {
- 	CMD_FLAG_NAME(FAILFAST_DEV),
-@@ -342,12 +325,13 @@ int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
- {
- 	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
- 	const unsigned int op = req_op(rq);
-+	const char *op_str = blk_op_str(op);
++#define REQ_OP_NAME(name) [REQ_OP_##name] = #name
++static const char *const blk_op_name[] = {
++	REQ_OP_NAME(READ),
++	REQ_OP_NAME(WRITE),
++	REQ_OP_NAME(FLUSH),
++	REQ_OP_NAME(DISCARD),
++	REQ_OP_NAME(SECURE_ERASE),
++	REQ_OP_NAME(ZONE_RESET),
++	REQ_OP_NAME(WRITE_SAME),
++	REQ_OP_NAME(WRITE_ZEROES),
++	REQ_OP_NAME(SCSI_IN),
++	REQ_OP_NAME(SCSI_OUT),
++	REQ_OP_NAME(DRV_IN),
++	REQ_OP_NAME(DRV_OUT),
++};
++#undef REQ_OP_NAME
++
++/**
++ * blk_op_str - Return string XXX in the REQ_OP_XXX.
++ * @op: REQ_OP_XXX.
++ *
++ * Description: Centralize block layer function to convert REQ_OP_XXX into
++ * string format. Useful in the debugging and tracing bio or request. For
++ * invalid REQ_OP_XXX it returns string "UNKNOWN".
++ */
++inline const char *blk_op_str(unsigned int op)
++{
++	const char *op_str = "UNKNOWN";
++
++	if (op < ARRAY_SIZE(blk_op_name) && blk_op_name[op])
++		op_str = blk_op_name[op];
++
++	return op_str;
++}
++EXPORT_SYMBOL_GPL(blk_op_str);
++
+ static const struct {
+ 	int		errno;
+ 	const char	*name;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ad49a775c54f..7d52c18b6fe2 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -867,6 +867,9 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
+ extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
+ 				  struct request *, int, rq_end_io_fn *);
  
- 	seq_printf(m, "%p {.op=", rq);
--	if (op < ARRAY_SIZE(op_name) && op_name[op])
--		seq_printf(m, "%s", op_name[op]);
--	else
-+	if (strcmp(op_str, "UNKNOWN") == 0)
- 		seq_printf(m, "%u", op);
-+	else
-+		seq_printf(m, "%s", op_str);
- 	seq_puts(m, ", .cmd_flags=");
- 	blk_flags_show(m, rq->cmd_flags & ~REQ_OP_MASK, cmd_flag_name,
- 		       ARRAY_SIZE(cmd_flag_name));
++/* Helper to convert REQ_OP_XXX to its string format XXX */
++extern const char *blk_op_str(unsigned int op);
++
+ int blk_status_to_errno(blk_status_t status);
+ blk_status_t errno_to_blk_status(int errno);
+ 
 -- 
 2.19.1
 
