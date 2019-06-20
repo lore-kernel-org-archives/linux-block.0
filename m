@@ -2,118 +2,163 @@ Return-Path: <SRS0=D4S7=UT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C63B0C43613
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03153C43613
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:49:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E7A22084E
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:42:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1561048958;
-	bh=zCmrEJj/5YbT7k1NdU6eqr1+CknKTQwhJf0kK5Gd8tQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=pRsAOsO449/6Xv6SVel0D/SJPSAo1+39NJNNMCWRykTFgn9nQrEK6m+XyJfIhV4Tr
-	 +J5M4GVFPe/Oxguz1ld7C5fQdkIDupPyVOojX7K+TMfBrPcduzWruFknW7ZbkxTzex
-	 rVHMNckdXXCD1Pe2WCecl2CjBN6iJz7KlTbJZ0Gk=
+	by mail.kernel.org (Postfix) with ESMTP id D084E2083B
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:49:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="aJC5IbH0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726832AbfFTQmd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 12:42:33 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:42634 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726686AbfFTQmd (ORCPT
+        id S1726930AbfFTQtL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 12:49:11 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:40836 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726832AbfFTQtL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 12:42:33 -0400
-Received: by mail-pf1-f193.google.com with SMTP id q10so1974446pff.9;
-        Thu, 20 Jun 2019 09:42:33 -0700 (PDT)
+        Thu, 20 Jun 2019 12:49:11 -0400
+Received: by mail-qk1-f195.google.com with SMTP id c70so2378971qkg.7
+        for <linux-block@vger.kernel.org>; Thu, 20 Jun 2019 09:49:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=bqZIqiC2yYn/o+bV0ZJOLIzThjXkYn2uG9o9ZjJa6hk=;
-        b=aJXjIKNZrOuVv0daHxeRKl26YhxSc7OxATe5g5agihcDutsVoV8QnJ+dWHiIwzAqCl
-         pE3HVL5RjrWIZ65jZwG7ltBKSmTmkK6K2/Xo2kFkAyDDgTnggrNWOIISIuq+gbgn3ZhE
-         TzCcMB28dJ8/yPURo0HTYeZGCtDEvpXaHVy/wsVQIX4D1+y7DXNiq7rWv7UezTTztVFF
-         ox2doav/9GzUNq10RwePuy778KcpEt1dS9tx0TntQAeO5b4OhUkUJNte1QYUqFi7iZpT
-         Q90SNo8xa+f69+YZunlcowN/DQxZLoqaTE8KgQiJiwxAFO8hbAGbKmTLK0E+Ldg2mW2j
-         xb5w==
+        bh=829lbkNVKVvO4IPRXGAwDfDwkNN3afdAsnYF+a2YEsM=;
+        b=aJC5IbH09VqJ5L3x0Q2P/vdyGVj04jt+mOrx8MojMr34HRL9FTmxFEg2TQhHifyDZQ
+         zJGpxBPdLE71kW8SpPaYQSQWCVmyOhq1uOAmmKBIEN1rx7yhd1GioZ2gCS8hKvWMwuGs
+         Ec0/B4GH/O+G+7ljUgQ5LlaF/Bjjq3TqiBOS0/qgjrWpIrW2VurIj26fyeXJYmhMhTCo
+         cMW7nwDNhlIjYLXWE1Eg9qDAte24DnQqGNVoJKhyKGoLtKGNEVDUKEx/5jgAMHSIBGBO
+         8PMOE7Csa87nMhCTnW03D69d9h7ValFpBP7C4i9r5HRnKMQV1y5wzzjsye3BHTyIMbA9
+         DqIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=bqZIqiC2yYn/o+bV0ZJOLIzThjXkYn2uG9o9ZjJa6hk=;
-        b=Gn3ufQbMmS9lyKecpgnpUgae0K1WJ60+qta2hBq/bzxR64Q2JKjF0k7cgS9KZ0jKcd
-         whaSHj/ZzvsNfShat1WTEOcI+1BeiPfm7NqqcTA/ZxX3NJb4VZuSRaKlsy4z+mqgHzp5
-         jvHX38mpUEFSMdUd6YGHPfUupSDzPv/BZlVLxqE8+Bx4OT7mRUyjiSkY7FEuFJr8Tt4S
-         u4+ZIK+G6l3DVejoc2j/P94EI99eFbGLt3DdVLcxJzXdrAbyRGIm3IsRej0XHwPLmKD/
-         ksC4YI2pj7CW/0EEDThegT9SZhlKf6WZ5eCKW3egxqY18pvrwI21zanIXLEWzT4upw9Y
-         cJrg==
-X-Gm-Message-State: APjAAAU8tqwbUnho48umq1IQGJVPhzoxRcF69EU+nqEdeBhAYCDmR9an
-        kVDuuNd5L1HVWpcwhxL6Flw=
-X-Google-Smtp-Source: APXvYqx072QE6ne/M+YjuzM0WPDx/elSTOitdaIoOS9wonauvSK6+p09K5VLrDBRVcopCvc7fjOCow==
-X-Received: by 2002:a17:90a:bc0c:: with SMTP id w12mr496330pjr.111.1561048952289;
-        Thu, 20 Jun 2019 09:42:32 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::3:8402])
-        by smtp.gmail.com with ESMTPSA id y16sm2426pff.89.2019.06.20.09.42.31
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 20 Jun 2019 09:42:31 -0700 (PDT)
-Date:   Thu, 20 Jun 2019 09:42:29 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     dsterba@suse.com, clm@fb.com, josef@toxicpanda.com,
-        axboe@kernel.dk, linux-btrfs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel-team@fb.com
-Subject: Re: [PATCH 4/9] blkcg: implement REQ_CGROUP_PUNT
-Message-ID: <20190620164229.GK657710@devbig004.ftw2.facebook.com>
-References: <20190615182453.843275-1-tj@kernel.org>
- <20190615182453.843275-5-tj@kernel.org>
- <20190620153733.GM30243@quack2.suse.cz>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=829lbkNVKVvO4IPRXGAwDfDwkNN3afdAsnYF+a2YEsM=;
+        b=E1Dt3DmoDrw1ddfVPFvyKJ3lhoxDcucTWqKUJrE/tuhms44eoS7zCT3HNOwNx8KrEw
+         2xwgGB1sGeCj2WIrJXYWYQVR0b8tg1e35xLzJQMA98i5GP0XCwsPGomvN90aDLPVlDjb
+         bhmS4dDTFV8swmFpA13iQ6MiNu9UZzwWIUAkvsDBuniF9kmq0pGtSKk3IfR012bMMNfU
+         FsX3gfVSpTOoMVcJUOW+XnnOJKaaEvHKywOdy75Rczk33OSU0uOeKpXRUMSDECxkzjut
+         jPQ5Gnfr8Ts+xG8JauBPdCxH1sUL2S0Y4AcMoaylRvYky6QvtLHo6NBs/PvldEStMiUX
+         G4Ag==
+X-Gm-Message-State: APjAAAUSLPNeuxvc2ir5SXLEe6Orzpd9C2drlY/U52hx/3DXG+Ogaj5+
+        Xl/izYwPnCQuJptB8WZa/bUQvA==
+X-Google-Smtp-Source: APXvYqw7o+HXcNgbAT7Mxcu/N67Vdjqf/udIRQ32pWb17pSApuDTFWC8DfL+yTMaUbEhp4oKyoolPg==
+X-Received: by 2002:ae9:ee17:: with SMTP id i23mr1814457qkg.401.1561049350327;
+        Thu, 20 Jun 2019 09:49:10 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
+        by smtp.gmail.com with ESMTPSA id u7sm94016qta.82.2019.06.20.09.49.09
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 20 Jun 2019 09:49:09 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1he0FJ-0005H9-BN; Thu, 20 Jun 2019 13:49:09 -0300
+Date:   Thu, 20 Jun 2019 13:49:09 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>,
+        Stephen Bates <sbates@raithlin.com>
+Subject: Re: [RFC PATCH 20/28] IB/core: Introduce API for initializing a RW
+ ctx from a DMA address
+Message-ID: <20190620164909.GC19891@ziepe.ca>
+References: <20190620161240.22738-1-logang@deltatee.com>
+ <20190620161240.22738-21-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190620153733.GM30243@quack2.suse.cz>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190620161240.22738-21-logang@deltatee.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Jan.
-
-On Thu, Jun 20, 2019 at 05:37:33PM +0200, Jan Kara wrote:
-> > +bool __blkcg_punt_bio_submit(struct bio *bio)
-> > +{
-> > +	struct blkcg_gq *blkg = bio->bi_blkg;
-> > +
-> > +	/* consume the flag first */
-> > +	bio->bi_opf &= ~REQ_CGROUP_PUNT;
-> > +
-> > +	/* never bounce for the root cgroup */
-> > +	if (!blkg->parent)
-> > +		return false;
-> > +
-> > +	spin_lock_bh(&blkg->async_bio_lock);
-> > +	bio_list_add(&blkg->async_bios, bio);
-> > +	spin_unlock_bh(&blkg->async_bio_lock);
-> > +
-> > +	queue_work(blkcg_punt_bio_wq, &blkg->async_bio_work);
-> > +	return true;
-> > +}
-> > +
+On Thu, Jun 20, 2019 at 10:12:32AM -0600, Logan Gunthorpe wrote:
+> Introduce rdma_rw_ctx_dma_init() and rdma_rw_ctx_dma_destroy() which
+> peform the same operation as rdma_rw_ctx_init() and
+> rdma_rw_ctx_destroy() respectively except they operate on a DMA
+> address and length instead of an SGL.
 > 
-> So does this mean that if there is some inode with lots of dirty data for a
-> blkcg that is heavily throttled, that blkcg can occupy a ton of workers all
-> being throttled in submit_bio()? Or what is constraining a number of
-> workers one blkcg can consume?
+> This will be used for struct page-less P2PDMA, but there's also
+> been opinions expressed to migrate away from SGLs and struct
+> pages in the RDMA APIs and this will likely fit with that
+> effort.
+> 
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>  drivers/infiniband/core/rw.c | 74 ++++++++++++++++++++++++++++++------
+>  include/rdma/rw.h            |  6 +++
+>  2 files changed, 69 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/infiniband/core/rw.c b/drivers/infiniband/core/rw.c
+> index 32ca8429eaae..cefa6b930bc8 100644
+> +++ b/drivers/infiniband/core/rw.c
+> @@ -319,6 +319,39 @@ int rdma_rw_ctx_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u8 port_num,
+>  }
+>  EXPORT_SYMBOL(rdma_rw_ctx_init);
+>  
+> +/**
+> + * rdma_rw_ctx_dma_init - initialize a RDMA READ/WRITE context from a
+> + *	DMA address instead of SGL
+> + * @ctx:	context to initialize
+> + * @qp:		queue pair to operate on
+> + * @port_num:	port num to which the connection is bound
+> + * @addr:	DMA address to READ/WRITE from/to
+> + * @len:	length of memory to operate on
+> + * @remote_addr:remote address to read/write (relative to @rkey)
+> + * @rkey:	remote key to operate on
+> + * @dir:	%DMA_TO_DEVICE for RDMA WRITE, %DMA_FROM_DEVICE for RDMA READ
+> + *
+> + * Returns the number of WQEs that will be needed on the workqueue if
+> + * successful, or a negative error code.
+> + */
+> +int rdma_rw_ctx_dma_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
+> +		u8 port_num, dma_addr_t addr, u32 len, u64 remote_addr,
+> +		u32 rkey, enum dma_data_direction dir)
 
-There's only one work item per blkcg-device pair, so the maximum
-number of kthreads a blkcg can occupy on a filesystem would be one.
-It's the same scheme as writeback work items.
+Why not keep the same basic signature here but replace the scatterlist
+with the dma vec ?
 
-Thanks.
+> +{
+> +	struct scatterlist sg;
+> +
+> +	sg_dma_address(&sg) = addr;
+> +	sg_dma_len(&sg) = len;
 
--- 
-tejun
+This needs to fail if the driver is one of the few that require
+struct page to work..
+
+Really want I want to do is to have this new 'dma vec' pushed through
+the RDMA APIs so we know that if a driver is using the dma vec
+interface it is struct page free.
+
+This is not so hard to do, as most drivers are already struct page
+free, but is pretty much blocked on needing some way to go from the
+block layer SGL world to the dma vec world that does not hurt storage
+performance.
+
+I am hoping that the biovec dma mapping that CH has talked about will
+give the missing pieces.
+
+FWIW, rdma is one of the places that is largely struct page free, and
+has few problems to natively handle a 'dma vec' from top to bottom, so
+I do like this approach.
+
+Someone would have to look carefully at siw, rxe and hfi/qib to see
+how they could continue to work with a dma vec, as they do actually
+seem to need to kmap the data they are transferring. However, I
+thought they were using custom dma ops these days, so maybe they just
+encode a struct page in their dma vec and reject p2p entirely?
+
+Jason
