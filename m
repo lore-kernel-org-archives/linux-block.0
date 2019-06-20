@@ -7,26 +7,26 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DEF0C48BE1
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:13:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC600C43613
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:13:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 22894208CA
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:13:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACB952084A
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:13:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732091AbfFTQNT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 12:13:19 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:59638 "EHLO ale.deltatee.com"
+        id S1732335AbfFTQNi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 12:13:38 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:59614 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732248AbfFTQNF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 12:13:05 -0400
+        id S1732245AbfFTQNE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Jun 2019 12:13:04 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzgC-00046I-85; Thu, 20 Jun 2019 10:13:04 -0600
+        id 1hdzgA-00046L-9r; Thu, 20 Jun 2019 10:13:02 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzg5-0005wu-S3; Thu, 20 Jun 2019 10:12:45 -0600
+        id 1hdzg6-0005x3-C6; Thu, 20 Jun 2019 10:12:46 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
@@ -39,8 +39,8 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Jason Gunthorpe <jgg@ziepe.ca>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 20 Jun 2019 10:12:33 -0600
-Message-Id: <20190620161240.22738-22-logang@deltatee.com>
+Date:   Thu, 20 Jun 2019 10:12:36 -0600
+Message-Id: <20190620161240.22738-25-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190620161240.22738-1-logang@deltatee.com>
 References: <20190620161240.22738-1-logang@deltatee.com>
@@ -49,7 +49,7 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, axboe@kernel.dk, hch@lst.de, bhelgaas@google.com, dan.j.williams@intel.com, sagi@grimberg.me, kbusch@kernel.org, jgg@ziepe.ca, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [RFC PATCH 21/28] nvmet: Split nvmet_bdev_execute_rw() into a helper function
+Subject: [RFC PATCH 24/28] block: Remove PCI_P2PDMA queue flag
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -57,92 +57,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move the mapping of the SG and submission of the bio
-into a static helper function to reduce the complexity.
-
-This will be useful in the next patch which submits dma-direct bios
-for P2P requests.
+This flag has been superseded by the DMA_DIRECT functionality.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/nvme/target/io-cmd-bdev.c | 52 ++++++++++++++++++-------------
- 1 file changed, 31 insertions(+), 21 deletions(-)
+ include/linux/blkdev.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index 7a1cf6437a6a..061d40b020c7 100644
---- a/drivers/nvme/target/io-cmd-bdev.c
-+++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -103,13 +103,41 @@ static void nvmet_bio_done(struct bio *bio)
- 		bio_put(bio);
- }
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index a5b856324276..9ea800645cf5 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -615,8 +615,7 @@ struct request_queue {
+ #define QUEUE_FLAG_REGISTERED	22	/* queue has been registered to a disk */
+ #define QUEUE_FLAG_SCSI_PASSTHROUGH 23	/* queue supports SCSI commands */
+ #define QUEUE_FLAG_QUIESCED	24	/* queue has been quiesced */
+-#define QUEUE_FLAG_PCI_P2PDMA	25	/* device supports PCI p2p requests */
+-#define QUEUE_FLAG_DMA_DIRECT	26	/* device supports dma-addr requests */
++#define QUEUE_FLAG_DMA_DIRECT	25	/* device supports dma-addr requests */
  
-+static void nvmet_submit_sg(struct nvmet_req *req, struct bio *bio,
-+			    sector_t sector)
-+{
-+	int sg_cnt = req->sg_cnt;
-+	struct scatterlist *sg;
-+	int i;
-+
-+	for_each_sg(req->sg, sg, req->sg_cnt, i) {
-+		while (bio_add_page(bio, sg_page(sg), sg->length, sg->offset)
-+				!= sg->length) {
-+			struct bio *prev = bio;
-+
-+			bio = bio_alloc(GFP_KERNEL,
-+					min(sg_cnt, BIO_MAX_PAGES));
-+			bio_set_dev(bio, req->ns->bdev);
-+			bio->bi_iter.bi_sector = sector;
-+			bio->bi_opf = prev->bi_opf;
-+
-+			bio_chain(bio, prev);
-+			submit_bio(prev);
-+		}
-+
-+		sector += sg->length >> 9;
-+		sg_cnt--;
-+	}
-+
-+	submit_bio(bio);
-+}
-+
- static void nvmet_bdev_execute_rw(struct nvmet_req *req)
- {
- 	int sg_cnt = req->sg_cnt;
- 	struct bio *bio;
--	struct scatterlist *sg;
- 	sector_t sector;
--	int op, op_flags = 0, i;
-+	int op, op_flags = 0;
+ #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP))
+@@ -641,8 +640,6 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
+ #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
+ #define blk_queue_scsi_passthrough(q)	\
+ 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
+-#define blk_queue_pci_p2pdma(q)	\
+-	test_bit(QUEUE_FLAG_PCI_P2PDMA, &(q)->queue_flags)
+ #define blk_queue_dma_direct(q)	\
+ 	test_bit(QUEUE_FLAG_DMA_DIRECT, &(q)->queue_flags)
  
- 	if (!req->sg_cnt) {
- 		nvmet_req_complete(req, 0);
-@@ -143,25 +171,7 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
- 	bio->bi_end_io = nvmet_bio_done;
- 	bio_set_op_attrs(bio, op, op_flags);
- 
--	for_each_sg(req->sg, sg, req->sg_cnt, i) {
--		while (bio_add_page(bio, sg_page(sg), sg->length, sg->offset)
--				!= sg->length) {
--			struct bio *prev = bio;
--
--			bio = bio_alloc(GFP_KERNEL, min(sg_cnt, BIO_MAX_PAGES));
--			bio_set_dev(bio, req->ns->bdev);
--			bio->bi_iter.bi_sector = sector;
--			bio_set_op_attrs(bio, op, op_flags);
--
--			bio_chain(bio, prev);
--			submit_bio(prev);
--		}
--
--		sector += sg->length >> 9;
--		sg_cnt--;
--	}
--
--	submit_bio(bio);
-+	nvmet_submit_sg(req, bio, sector);
- }
- 
- static void nvmet_bdev_execute_flush(struct nvmet_req *req)
 -- 
 2.20.1
 
