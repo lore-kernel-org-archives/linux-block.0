@@ -7,26 +7,26 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6747EC43613
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0E2DC43613
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 498DE2084A
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A363F20B1F
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732442AbfFTQOZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 12:14:25 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:59460 "EHLO ale.deltatee.com"
+        id S1732115AbfFTQOY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 12:14:24 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:59446 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732139AbfFTQM5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1732134AbfFTQM5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Thu, 20 Jun 2019 12:12:57 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzgA-00046R-AF; Thu, 20 Jun 2019 10:12:56 -0600
+        id 1hdzg6-00046Q-68; Thu, 20 Jun 2019 10:12:54 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzg4-0005wN-Oc; Thu, 20 Jun 2019 10:12:44 -0600
+        id 1hdzg4-0005wK-LN; Thu, 20 Jun 2019 10:12:44 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
@@ -39,8 +39,8 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Jason Gunthorpe <jgg@ziepe.ca>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 20 Jun 2019 10:12:22 -0600
-Message-Id: <20190620161240.22738-11-logang@deltatee.com>
+Date:   Thu, 20 Jun 2019 10:12:21 -0600
+Message-Id: <20190620161240.22738-10-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190620161240.22738-1-logang@deltatee.com>
 References: <20190620161240.22738-1-logang@deltatee.com>
@@ -49,7 +49,7 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, axboe@kernel.dk, hch@lst.de, bhelgaas@google.com, dan.j.williams@intel.com, sagi@grimberg.me, kbusch@kernel.org, jgg@ziepe.ca, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [RFC PATCH 10/28] block: Create generic vec_split_segs() from bvec_split_segs()
+Subject: [RFC PATCH 09/28] block: Introduce vec_gap_to_prev()
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -57,75 +57,59 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bvec_split_segs() only requires the address and length of the
-vector. In order to generalize it to work with dma_vecs, we just
-take the address and length directly instead of the bio_vec.
+Introduce vec_gap_to_prev() which is a more general
+form of bvec_gap_to_prev().
 
-The function is renamed to vec_split_segs() and a helper is added
-to avoid having to adjust the existing callsites.
-
-Note: the new bvec_split_segs() helper will be removed in a subsequent
-patch.
+In order to support splitting dma_vecs we will need to do a similar
+calcualtion using the DMA address and length.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk-merge.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ block/blk.h | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 17713d7d98d5..3581c7ac3c1b 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -158,13 +158,13 @@ static unsigned get_max_segment_size(struct request_queue *q,
+diff --git a/block/blk.h b/block/blk.h
+index 4142383eed7a..c5512fefe703 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -98,11 +98,19 @@ static inline bool dmavec_phys_mergeable(struct request_queue *q,
+ 				  vec2->dv_addr, vec2->dv_len);
+ }
+ 
++static inline bool __vec_gap_to_prev(struct request_queue *q,
++		unsigned int prv_offset, unsigned int prv_len,
++		unsigned int nxt_offset)
++{
++	return (nxt_offset & queue_virt_boundary(q)) ||
++		((prv_offset + prv_len) & queue_virt_boundary(q));
++}
++
+ static inline bool __bvec_gap_to_prev(struct request_queue *q,
+ 		struct bio_vec *bprv, unsigned int offset)
+ {
+-	return (offset & queue_virt_boundary(q)) ||
+-		((bprv->bv_offset + bprv->bv_len) & queue_virt_boundary(q));
++	return __vec_gap_to_prev(q, bprv->bv_offset, bprv->bv_len,
++				 offset);
  }
  
  /*
-- * Split the bvec @bv into segments, and update all kinds of
-- * variables.
-+ * Split the an address/offset and length into segments, and
-+ * update all kinds of variables.
-  */
--static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
--		unsigned *nsegs, unsigned *sectors, unsigned max_segs)
-+static bool vec_split_segs(struct request_queue *q, unsigned offset,
-+			   unsigned len, unsigned *nsegs, unsigned *sectors,
-+			   unsigned max_segs)
- {
--	unsigned len = bv->bv_len;
- 	unsigned total_len = 0;
- 	unsigned new_nsegs = 0, seg_size = 0;
- 
-@@ -173,14 +173,14 @@ static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
- 	 * current bvec has to be splitted as multiple segments.
- 	 */
- 	while (len && new_nsegs + *nsegs < max_segs) {
--		seg_size = get_max_segment_size(q, bv->bv_offset + total_len);
-+		seg_size = get_max_segment_size(q, offset + total_len);
- 		seg_size = min(seg_size, len);
- 
- 		new_nsegs++;
- 		total_len += seg_size;
- 		len -= seg_size;
- 
--		if ((bv->bv_offset + total_len) & queue_virt_boundary(q))
-+		if ((offset + total_len) & queue_virt_boundary(q))
- 			break;
- 	}
- 
-@@ -194,6 +194,13 @@ static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
- 	return !!len;
+@@ -117,6 +125,15 @@ static inline bool bvec_gap_to_prev(struct request_queue *q,
+ 	return __bvec_gap_to_prev(q, bprv, offset);
  }
  
-+static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
-+		unsigned *nsegs, unsigned *sectors, unsigned max_segs)
++static inline bool vec_gap_to_prev(struct request_queue *q,
++		unsigned int prv_offset, unsigned int prv_len,
++		unsigned int nxt_offset)
 +{
-+	return vec_split_segs(q, bv->bv_offset, bv->bv_len, nsegs,
-+			      sectors, max_segs);
++	if (!queue_virt_boundary(q))
++		return false;
++	return __vec_gap_to_prev(q, prv_offset, prv_len, nxt_offset);
 +}
 +
- static struct bio *blk_bio_segment_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
+ #ifdef CONFIG_BLK_DEV_INTEGRITY
+ void blk_flush_integrity(void);
+ bool __bio_integrity_endio(struct bio *);
 -- 
 2.20.1
 
