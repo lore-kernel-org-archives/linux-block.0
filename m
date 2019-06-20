@@ -2,148 +2,101 @@ Return-Path: <SRS0=D4S7=UT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC6F2C43613
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 06:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7998C43613
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 07:35:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9B988208CB
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 06:43:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE63620B1F
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 07:35:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=raithlin.onmicrosoft.com header.i=@raithlin.onmicrosoft.com header.b="izy14sJZ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="jiE9TlsI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725875AbfFTGnH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 02:43:07 -0400
-Received: from mail-eopbgr670097.outbound.protection.outlook.com ([40.107.67.97]:39311
-        "EHLO CAN01-TO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725872AbfFTGnG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 02:43:06 -0400
+        id S1726185AbfFTHfg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 03:35:36 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:41844 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725872AbfFTHfg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Jun 2019 03:35:36 -0400
+Received: by mail-ed1-f66.google.com with SMTP id p15so3231687eds.8
+        for <linux-block@vger.kernel.org>; Thu, 20 Jun 2019 00:35:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=raithlin.onmicrosoft.com; s=selector1-raithlin-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0Cft1l0RFefPjwW3ytRL2NyRjn4NX1VnorTEAWnB6eg=;
- b=izy14sJZsP8emmeQn1fAqNAkoFPz1Mffj9eNCBbRiz6F/Y9LPb2w2+CFU0HjCKggLCjFXjMng4Ldx247GPl/+i/a47CpY7YfBMb7xI8ID2L2kzBr3n1ruud0eTgZmcHHNC+eNjNiswuLEfhSv6zP7nZAGUZjRhIPBBcM7fvT3oA=
-Received: from YTOPR0101MB0793.CANPRD01.PROD.OUTLOOK.COM (52.132.44.17) by
- YTOPR0101MB1002.CANPRD01.PROD.OUTLOOK.COM (52.132.50.29) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.11; Thu, 20 Jun 2019 06:43:03 +0000
-Received: from YTOPR0101MB0793.CANPRD01.PROD.OUTLOOK.COM
- ([fe80::3535:ab58:99bd:516]) by YTOPR0101MB0793.CANPRD01.PROD.OUTLOOK.COM
- ([fe80::3535:ab58:99bd:516%7]) with mapi id 15.20.1987.014; Thu, 20 Jun 2019
- 06:43:03 +0000
-From:   "Stephen  Bates" <sbates@raithlin.com>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        "fio-owner@vger.kernel.org" <fio-owner@vger.kernel.org>
-Subject: [io_uring]: fio's ./t/io_uring on /dev/nullb0 causing CPU stalls
-Thread-Topic: [io_uring]: fio's ./t/io_uring on /dev/nullb0 causing CPU stalls
-Thread-Index: AQHVJzNoqMZLPoH9zEK2xahrKo7BiQ==
-Date:   Thu, 20 Jun 2019 06:43:03 +0000
-Message-ID: <02CA47A4-B51C-4393-9C90-8EAFFE825669@raithlin.com>
-Accept-Language: en-CA, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Microsoft-MacOutlook/10.1a.0.190609
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=sbates@raithlin.com; 
-x-originating-ip: [2a00:23c0:9680:6a00:1c38:ecb:58e7:89c7]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f5d739bd-e083-4e9a-8550-08d6f54a8b82
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(7021145)(8989299)(4534185)(7022145)(4603075)(4627221)(201702281549075)(8990200)(7048125)(7024125)(7027125)(7023125)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:YTOPR0101MB1002;
-x-ms-traffictypediagnostic: YTOPR0101MB1002:
-x-microsoft-antispam-prvs: <YTOPR0101MB10024F2EA5C0B089EC451C13AAE40@YTOPR0101MB1002.CANPRD01.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:4303;
-x-forefront-prvs: 0074BBE012
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(39830400003)(366004)(396003)(136003)(346002)(199004)(189003)(66946007)(33656002)(46003)(256004)(86362001)(486006)(4326008)(14444005)(53936002)(476003)(2501003)(68736007)(81156014)(81166006)(66476007)(316002)(25786009)(8676002)(64756008)(66556008)(66446008)(5660300002)(71200400001)(6512007)(71190400001)(6916009)(76116006)(91956017)(186003)(305945005)(8936002)(7736002)(2616005)(5640700003)(2351001)(508600001)(14454004)(6506007)(36756003)(58126008)(6486002)(99286004)(102836004)(2906002)(73956011)(6436002)(54906003)(6116002)(45080400002);DIR:OUT;SFP:1102;SCL:1;SRVR:YTOPR0101MB1002;H:YTOPR0101MB0793.CANPRD01.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: raithlin.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: GGaJtFdoE0XK+b5ed+1NaVtUdAizk8835ooIlIehT8wb/blxNpkIEyzQU3sM1gZmrUYrtq8NZ1RgClNC+p8IgPN9hVgX+T22ZIHIJD/s0cZFrMBaAa3NSI+q0gWkxNKI0YYpesrNPOoQEx1yk1VFmUxqNDynaLi1Ja7I2p4+SJPmb6preQKui+0SeWZrGyEOL+kTyhQ6GuPQC0kiA0oxitamKNEVjI0o9SSdg3q25aVJrRnBRvvPvDcWKuZ53JT6V59BIDZ0vwMUIgUtqiMMvFEY+qGyA0iIkbVc5X/4IXRLaViHFv4v/61h6jsJ+tnGue5ci9ikWsXt8WrelwvYhTCkIAok01ljyJG7Q55ibO2AeD0LxrHClfNCnyxlp1i7wa8OPGqeHhM9jeHy49yKh770Gb3MXRw5jp4a1i55dTQ=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D8B2492D63A5F74082ECF2395661E9C7@CANPRD01.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=bkJIVmzRu4B+rkHeWwgRuFzMyUV3Ol5NJZigu87ZRLs=;
+        b=jiE9TlsICjMryu0gYuIV5nvTzabSWlx106Eg6NFMdly3pbhjj9a1KAyqXDPPnapqFs
+         U7vU/TktAxOS937V7ZSdEtLkmA8S6/9fV7BerGAhK62YjTAvjc3pPbRJni23I8Vh85e2
+         5e+THbCY4W43BtGHYTAEMt/CX9VAkgIWHOD3o/bOI45NwRBKAQVabBYjbIGElv+/rCW8
+         ZJnI6IP9DfCnjBSx2sQ0U01frh1Q5ScTTszPz6Tkvz1p3U/n0Hq+3oNHV7y0L1ry96ZU
+         Bbu08mpCFNbgdo7z0h/IuuR+tmYTjXD2qcj6x9I2LUggM6DB2ZFfzOVNsT6EJn8IfP1Q
+         tOAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bkJIVmzRu4B+rkHeWwgRuFzMyUV3Ol5NJZigu87ZRLs=;
+        b=rEn/LYzj0MzMJA0ICbRSgSfe2k1GEQg5D83Ye/jjWXdoibNDiUl2i+PDbYWT29auxO
+         wG/jgA9tq7PO5OUfv6RNbODTyCjwa10j5BSfQLZKS1iYwg2NevBMaVJu4ctVeVbNthAK
+         I9V/pFOAnTU3KIAbASqgItTcJgdU5iGaIj9sKtMDTPCUMwwqx+K1k4A3uIMzZ4JnColH
+         nHb9OvQKOv0GhNPk7m1/yQH3JCvirqLoG40dxiz5DJcZLXKEGpRIn9wJHQfpER5Zf2KI
+         0JhdVO6//l/hN2EPoC0kH3s3WaYq4DiGV3lEUkJbL5FbaCHWcEQKSL4znmSdkCTkhZr6
+         275g==
+X-Gm-Message-State: APjAAAVv9zn6wCrrmWKkJTBzTafRk28v5LMO6yoPBASXTQGWhIzvp9jj
+        0jmOTe/Kjb1vD2PQFK3fB92frNeoicM4+CfK
+X-Google-Smtp-Source: APXvYqz5aXc+yO5M49+Hij+i8IWUlqLlhu2rV6qIsM/+IZqVURftjOXh3ymwVugG0SVchHg3gaRzfQ==
+X-Received: by 2002:a50:8a85:: with SMTP id j5mr88372562edj.304.1561016134653;
+        Thu, 20 Jun 2019 00:35:34 -0700 (PDT)
+Received: from [192.168.0.115] (xd520f259.cust.hiper.dk. [213.32.242.89])
+        by smtp.gmail.com with ESMTPSA id c49sm6676324eda.74.2019.06.20.00.35.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 20 Jun 2019 00:35:34 -0700 (PDT)
+Subject: Re: [PATCH V4 0/5] block: improve print_req_error
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org
+Cc:     jaegeuk@kernel.org, yuchao0@huawei.com, bvanassche@acm.org
+References: <20190619171302.10146-1-chaitanya.kulkarni@wdc.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0ec88bfe-2eb2-bf20-39bc-7f25fabe6ebb@kernel.dk>
+Date:   Thu, 20 Jun 2019 01:35:33 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: raithlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5d739bd-e083-4e9a-8550-08d6f54a8b82
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2019 06:43:03.5506
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 18519031-7ff4-4cbb-bbcb-c3252d330f4b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sbates@raithlin.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: YTOPR0101MB1002
+In-Reply-To: <20190619171302.10146-1-chaitanya.kulkarni@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SGkNCg0KSSBoaXQgdGhlIGZvbGxvd2luZyBCVUcgd2hlbiB0ZXN0aW5nIGZpbydzIHQvaW9fdXJp
-bmcgdGVzdCBvbiBhIG51bGwgYmxvY2sgZGV2aWNlLiBUaGlzIHdhcyBpbnNpZGUgYSA0IHZDUFUg
-Vk0gcnVubmluZyBVYnVudHUgMTguMDQgYW5kIGEgNS4xLjExIGtlcm5lbC4gSSBkb24ndCBzZWUg
-dGhlIHNhbWUgaXNzdWUgaWYgSSBydW4gdGhlIHNhbWUgdGVzdCBvbiBhIGZha2UgTlZNZSBkZXZp
-Y2UgKEkgaGF2ZSBub3QgdGVzdGVkIGJhcmUtbWV0YWwgb3IgcmVhbCBOVk1lIGRldmljZXMpLiBU
-aGlzIGlzIGZvciB0aGUgSEVBRCBvZiBmaW8gYXMgb2YgeWVzdGVyZGF5LiBJIGFsc28gaGFkIHRo
-ZSBtb3N0IHJlY2VudCB2ZXJzaW9uIG9mIGxpYnVyaW5nIGJ1dCBJIGRvbid0IGJlbGlldmUgLi90
-L2lvX3VyaW5nIHVzZXMgbGlidXJpbmcuIEkgd2lsbCB0ZXN0IDUuMi1yYyBzZXJpZXMgdG8gc2Vl
-IGlmIHRoZSBpc3N1ZSBhbHNvIGV4aXN0cyB0aGVyZS4NCg0KU3RlcHM6DQoNCjEuIG1vZHByb2Jl
-IG51bGxfYmxrDQoyLiBzdWRvIC4vdC9pb191cmluZyAvZGV2L251bGxiMA0KDQpiYXRlc3N0ZUBp
-b191cmluZy12bTE6fi9maW8kIGZpbyAtLXZlcnNpb24NCmZpby0zLjE0LTctZzcxODRhDQoNCmJh
-dGVzc3RlQGlvX3VyaW5nLXZtMTp+L2ZpbyQgc3VkbyAuL3QvaW9fdXJpbmcgL2Rldi9udWxsYjAN
-CltzdWRvXSBwYXNzd29yZCBmb3IgYmF0ZXNzdGU6DQpBZGRlZCBmaWxlIC9kZXYvbnVsbGIwDQpz
-cV9yaW5nIHB0ciA9IDB4MHg3ZjVlZjNiZWMwMDANCnNxZXMgcHRyICAgID0gMHgweDdmNWVmM2Jl
-YTAwMA0KY3FfcmluZyBwdHIgPSAweDB4N2Y1ZWYzYmU4MDAwDQpwb2xsZWQ9MSwgZml4ZWRidWZz
-PTEsIGJ1ZmZlcmVkPTAgUUQ9MTI4LCBzcV9yaW5nPTEyOCwgY3FfcmluZz0yNTYNCnN1Ym1pdHRl
-cj03NDMNCklPUFM9MjU5NjgwLCBJT1MvY2FsbD0zMi8zMSwgaW5mbGlnaHQ9MTI4ICgxMjgpDQoN
-ClsgIDI4OC4xOTA0NjddIHdhdGNoZG9nOiBCVUc6IHNvZnQgbG9ja3VwIC0gQ1BVIzEgc3R1Y2sg
-Zm9yIDIycyEgW2lvX3VyaW5nOjc0M10NClsgIDI4OC4xOTE0ODBdIE1vZHVsZXMgbGlua2VkIGlu
-OiBjcmN0MTBkaWZfcGNsbXVsIGNyYzMyX3BjbG11bCBnaGFzaF9jbG11bG5pX2ludGVsIGFlc25p
-X2ludGVsIGFlc194ODZfNjQgY3J5cHRvX3NpbWQgaW5wdXRfbGVkcyBqb3lkZXYgY3J5cHRkIHNl
-cmlvX3JhdyBtYWNfaGlkIGdsdWVfaGVscGVyIHNjaF9mcV9jb2RlbCBudWxsX2JsayBzdW5ycGMg
-aXBfdGFibGVzIHhfdGFibGVzIGF1dG9mczQgODEzOXRvbyBwc21vdXNlIHBhdGFfYWNwaSA4MTM5
-Y3AgaTJjX3BpaXg0IG1paSBmbG9wcHkNClsgIDI4OC4xOTE0OTJdIENQVTogMSBQSUQ6IDc0MyBD
-b21tOiBpb191cmluZyBOb3QgdGFpbnRlZCA1LjEuMTEtY3BhY2tldC1pby11cmluZyAjMQ0KWyAg
-Mjg4LjE5MTQ5M10gSGFyZHdhcmUgbmFtZTogUUVNVSBTdGFuZGFyZCBQQyAoaTQ0MEZYICsgUElJ
-WCwgMTk5NiksIEJJT1MgVWJ1bnR1LTEuOC4yLTF1YnVudHUxIDA0LzAxLzIwMTQNClsgIDI4OC4x
-OTE0OTldIFJJUDogMDAxMDpibGtkZXZfaW9wb2xsKzB4Ni8weDMwDQpbICAyODguMTkxNTAwXSBD
-b2RlOiAwMCAwZiAxZiA0MCAwMCA0OCA4OSBkZiBlOCA0NyBiNSBmZCBmZiA0OCA4MyBjNCAwOCA0
-YyA4OSBlMCA1YiA0MSA1YyA1ZCBjMyA0NSAzMSBlNCBlYiBlZiA2NiAwZiAxZiA0NCAwMCAwMCAw
-ZiAxZiA0NCAwMCAwMCA1NSA8NDg+IDhiIDA3IDg5IGYyIDhiIDc3IDI4IDBmIGI2IGQyIDQ4IDg5
-IGU1IDQ4IDhiIDgwIGYwIDAwIDAwIDAwIDQ4DQpbICAyODguMTkxNTAxXSBSU1A6IDAwMTg6ZmZm
-ZmJjM2U0MTNlM2RlMCBFRkxBR1M6IDAwMDAwMjQ2IE9SSUdfUkFYOiBmZmZmZmZmZmZmZmZmZjEz
-DQpbICAyODguMTkxNTAyXSBSQVg6IGZmZmZmZmZmYmJlZTc2NTAgUkJYOiAwMDAwMDAwMDAwMDAw
-MDAxIFJDWDogZmZmZjlkNzdmNTBhZmQxOA0KWyAgMjg4LjE5MTUwM10gUkRYOiAwMDAwMDAwMDAw
-NTA0MGQwIFJTSTogMDAwMDAwMDAwMDAwMDAwMSBSREk6IGZmZmY5ZDc3ZjUwYWZjYzANClsgIDI4
-OC4xOTE1MDRdIFJCUDogZmZmZmJjM2U0MTNlM2U4OCBSMDg6IGZmZmY5ZDc3ZjU1ZDY0MDEgUjA5
-OiBmZmZmOWQ3N2Y1NWQ2NDAwDQpbICAyODguMTkxNTA0XSBSMTA6IDAwMDAwMDAwMDAwMDAwMjAg
-UjExOiBmZmZmOWQ3N2VkNWMzODAwIFIxMjogZmZmZjlkNzdmNTBhZmE4MA0KWyAgMjg4LjE5MTUw
-NV0gUjEzOiBmZmZmOWQ3N2VkNWMzODAwIFIxNDogZmZmZmJjM2U0MTNlM2VmNCBSMTU6IGZmZmZi
-YzNlNDEzZTNlMDgNClsgIDI4OC4xOTE1MDZdIEZTOiAgMDAwMDdmNWVmMzNiNTcwMCgwMDAwKSBH
-UzpmZmZmOWQ3N2Y3YTgwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDANClsgIDI4OC4x
-OTE1MDddIENTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAwODAwNTAwMzMN
-ClsgIDI4OC4xOTE1MDddIENSMjogMDAwMDdlZmQ3NzgwMzAwMCBDUjM6IDAwMDAwMDAyMzM1YTYw
-MDEgQ1I0OiAwMDAwMDAwMDAwMzYwNmUwDQpbICAyODguMTkxNTExXSBEUjA6IDAwMDAwMDAwMDAw
-MDAwMDAgRFIxOiAwMDAwMDAwMDAwMDAwMDAwIERSMjogMDAwMDAwMDAwMDAwMDAwMA0KWyAgMjg4
-LjE5MTUxMV0gRFIzOiAwMDAwMDAwMDAwMDAwMDAwIERSNjogMDAwMDAwMDBmZmZlMGZmMCBEUjc6
-IDAwMDAwMDAwMDAwMDA0MDANClsgIDI4OC4xOTE1MTJdIENhbGwgVHJhY2U6DQpbICAyODguMTkx
-NTE3XSAgPyBpb19pb3BvbGxfZ2V0ZXZlbnRzKzB4ZjcvMHgyZTANClsgIDI4OC4xOTE1MTldICBp
-b19pb3BvbGxfY2hlY2srMHg0MC8weDcwDQpbICAyODguMTkxNTIxXSAgX194NjRfc3lzX2lvX3Vy
-aW5nX2VudGVyKzB4MTU2LzB4MzAwDQpbICAyODguMTkxNTI1XSAgZG9fc3lzY2FsbF82NCsweDVh
-LzB4MTEwDQpbICAyODguMTkxNTI4XSAgZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4
-NDQvMHhhOQ0KWyAgMjg4LjE5MTUyOV0gUklQOiAwMDMzOjB4N2Y1ZWYzNGQxODM5DQpbICAyODgu
-MTkxNTMxXSBDb2RlOiAwMCBmMyBjMyA2NiAyZSAwZiAxZiA4NCAwMCAwMCAwMCAwMCAwMCAwZiAx
-ZiA0MCAwMCA0OCA4OSBmOCA0OCA4OSBmNyA0OCA4OSBkNiA0OCA4OSBjYSA0ZCA4OSBjMiA0ZCA4
-OSBjOCA0YyA4YiA0YyAyNCAwOCAwZiAwNSA8NDg+IDNkIDAxIGYwIGZmIGZmIDczIDAxIGMzIDQ4
-IDhiIDBkIDFmIGY2IDJjIDAwIGY3IGQ4IDY0IDg5IDAxIDQ4DQpbICAyODguMTkxNTMxXSBSU1A6
-IDAwMmI6MDAwMDdmNWVmMzNiNGU3OCBFRkxBR1M6IDAwMDAwMjQ2IE9SSUdfUkFYOiAwMDAwMDAw
-MDAwMDAwMWFhDQpbICAyODguMTkxNTMyXSBSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAw
-NTY1MTdkMDA0MjYwIFJDWDogMDAwMDdmNWVmMzRkMTgzOQ0KWyAgMjg4LjE5MTUzM10gUkRYOiAw
-MDAwMDAwMDAwMDAwMDIwIFJTSTogMDAwMDAwMDAwMDAwMDAyMCBSREk6IDAwMDAwMDAwMDAwMDAw
-MDQNClsgIDI4OC4xOTE1MzNdIFJCUDogMDAwMDU2NTE3ZDAwNDI3MCBSMDg6IDAwMDAwMDAwMDAw
-MDAwMDAgUjA5OiAwMDAwMDAwMDAwMDAwMDAwDQpbICAyODguMTkxNTM0XSBSMTA6IDAwMDAwMDAw
-MDAwMDAwMDEgUjExOiAwMDAwMDAwMDAwMDAwMjQ2IFIxMjogMDAwMDAwMDAwMDAwMDA3Zg0KWyAg
-Mjg4LjE5MTUzNV0gUjEzOiAwMDAwMDAwMDAwMDNmNjgwIFIxNDogMDAwMDAwMDAwMDAwMDAyMCBS
-MTU6IDAwMDAwMDAwMDAwMDAwMjANCg0KQ2hlZXJzDQogDQpTdGVwaGVuDQogDQrvu78NCg0K
+On 6/19/19 11:12 AM, Chaitanya Kulkarni wrote:
+> Hi,
+> 
+> This patch-series is based on the initial patch posted by
+> Christoph Hellwig <hch@lst.de>. While debugging the driver and block
+> layer this print message is very meaningful. Also, we centralize the
+> REQ_OP_XXX to the string conversion in the blk-core.c so that other
+> dependent subsystems can use this helper without having to duplicate
+> the code e.g. f2fs, blk-mq-debugfs.c.
+> 
+> Please consider this for 5.3.
+
+Something is wonky here. For 5.2, I just merged:
+
+commit f9bc64a0f0f884036d76d71edeaafb994c5ceddf (origin/for-5.3/block)
+Author: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Date:   Thu Jun 13 07:14:21 2019 -0700
+
+    block: use req_op() to maintain consistency
+
+and then you go and do something different for 5.3?
+
+-- 
+Jens Axboe
+
