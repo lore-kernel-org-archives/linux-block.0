@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74EC1C48BE1
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DEA3C43613
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:15:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 573B52070B
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:14:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F30A92070B
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jun 2019 16:15:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732256AbfFTQOx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jun 2019 12:14:53 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:59390 "EHLO ale.deltatee.com"
+        id S1732293AbfFTQPA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jun 2019 12:15:00 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:59378 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731927AbfFTQMx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jun 2019 12:12:53 -0400
+        id S1731870AbfFTQMw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Jun 2019 12:12:52 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzg6-00046I-68; Thu, 20 Jun 2019 10:12:52 -0600
+        id 1hdzg6-00046K-69; Thu, 20 Jun 2019 10:12:51 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hdzg3-0005vw-T4; Thu, 20 Jun 2019 10:12:43 -0600
+        id 1hdzg4-0005w2-39; Thu, 20 Jun 2019 10:12:44 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
@@ -38,8 +38,8 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Jason Gunthorpe <jgg@ziepe.ca>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 20 Jun 2019 10:12:13 -0600
-Message-Id: <20190620161240.22738-2-logang@deltatee.com>
+Date:   Thu, 20 Jun 2019 10:12:15 -0600
+Message-Id: <20190620161240.22738-4-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190620161240.22738-1-logang@deltatee.com>
 References: <20190620161240.22738-1-logang@deltatee.com>
@@ -48,7 +48,7 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, axboe@kernel.dk, hch@lst.de, bhelgaas@google.com, dan.j.williams@intel.com, sagi@grimberg.me, kbusch@kernel.org, jgg@ziepe.ca, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [RFC PATCH 01/28] block: Introduce DMA direct request type
+Subject: [RFC PATCH 03/28] block: Warn on mis-use of dma-direct bios
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -56,79 +56,164 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A DMA direct request allows passing DMA addresses directly through
-the block layer, instead of struct pages. This allows the calling
-layer to take care of the mapping and unmapping and also creates
-a path to doing peer-to-peer transactions without using struct pages.
+This is a result of an audit of users of 'bi_io_vec'. A number of
+warnings and blocking conditions are added to ensure dma-direct bios
+are not incorrectly accessing the 'bi_io_vec' when they should access
+the 'bi_dma_vec'. These are largely just protecting against mis-uses
+in future development so depending on taste and public opinion some
+or all of these checks may not be necessary.
+
+A few other issues with dma-direct bios will be tackled in subsequent
+patches.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- include/linux/blk_types.h |  9 ++++++++-
- include/linux/blkdev.h    | 10 ++++++++++
- 2 files changed, 18 insertions(+), 1 deletion(-)
+ block/bio.c      | 33 +++++++++++++++++++++++++++++++++
+ block/blk-core.c |  3 +++
+ 2 files changed, 36 insertions(+)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 95202f80676c..f3cabfdb6774 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -322,6 +322,7 @@ enum req_flag_bits {
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+diff --git a/block/bio.c b/block/bio.c
+index 683cbb40f051..6998fceddd36 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -525,6 +525,9 @@ void zero_fill_bio_iter(struct bio *bio, struct bvec_iter start)
+ 	struct bio_vec bv;
+ 	struct bvec_iter iter;
  
- 	__REQ_HIPRI,
-+	__REQ_DMA_DIRECT,	/* DMA address direct request */
- 
- 	/* for driver use */
- 	__REQ_DRV,
-@@ -345,6 +346,7 @@ enum req_flag_bits {
- #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
- #define REQ_HIPRI		(1ULL << __REQ_HIPRI)
-+#define REQ_DMA_DIRECT		(1ULL << __REQ_DMA_DIRECT)
- 
- #define REQ_DRV			(1ULL << __REQ_DRV)
- #define REQ_SWAP		(1ULL << __REQ_SWAP)
-@@ -353,7 +355,7 @@ enum req_flag_bits {
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
- 
- #define REQ_NOMERGE_FLAGS \
--	(REQ_NOMERGE | REQ_PREFLUSH | REQ_FUA)
-+	(REQ_NOMERGE | REQ_PREFLUSH | REQ_FUA | REQ_DMA_DIRECT)
- 
- enum stat_group {
- 	STAT_READ,
-@@ -412,6 +414,11 @@ static inline int op_stat_group(unsigned int op)
- 	return op_is_write(op);
- }
- 
-+static inline int op_is_dma_direct(unsigned int op)
-+{
-+	return op & REQ_DMA_DIRECT;
-+}
++	if (WARN_ON_ONCE(bio_is_dma_direct(bio)))
++		return;
 +
- typedef unsigned int blk_qc_t;
- #define BLK_QC_T_NONE		-1U
- #define BLK_QC_T_SHIFT		16
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 592669bcc536..ce70d5dded5f 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -271,6 +271,16 @@ static inline bool bio_is_passthrough(struct bio *bio)
- 	return blk_op_is_scsi(op) || blk_op_is_private(op);
- }
+ 	__bio_for_each_segment(bv, bio, iter, start) {
+ 		char *data = bvec_kmap_irq(&bv, &flags);
+ 		memset(data, 0, bv.bv_len);
+@@ -707,6 +710,8 @@ static int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
+ 	 */
+ 	if (unlikely(bio_flagged(bio, BIO_CLONED)))
+ 		return 0;
++	if (unlikely(bio_is_dma_direct(bio)))
++		return 0;
  
-+static inline bool bio_is_dma_direct(struct bio *bio)
-+{
-+	return op_is_dma_direct(bio->bi_opf);
-+}
-+
-+static inline bool blk_rq_is_dma_direct(struct request *rq)
-+{
-+	return op_is_dma_direct(rq->cmd_flags);
-+}
-+
- static inline unsigned short req_get_ioprio(struct request *req)
+ 	if (((bio->bi_iter.bi_size + len) >> 9) > queue_max_hw_sectors(q))
+ 		return 0;
+@@ -783,6 +788,8 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
  {
- 	return req->ioprio;
+ 	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
+ 		return false;
++	if (WARN_ON_ONCE(bio_is_dma_direct(bio)))
++		return false;
+ 
+ 	if (bio->bi_vcnt > 0) {
+ 		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+@@ -814,6 +821,7 @@ void __bio_add_page(struct bio *bio, struct page *page,
+ 
+ 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
+ 	WARN_ON_ONCE(bio_full(bio));
++	WARN_ON_ONCE(bio_is_dma_direct(bio));
+ 
+ 	bv->bv_page = page;
+ 	bv->bv_offset = off;
+@@ -851,6 +859,8 @@ static void bio_get_pages(struct bio *bio)
+ 	struct bvec_iter_all iter_all;
+ 	struct bio_vec *bvec;
+ 
++	WARN_ON_ONCE(bio_is_dma_direct(bio));
++
+ 	bio_for_each_segment_all(bvec, bio, iter_all)
+ 		get_page(bvec->bv_page);
+ }
+@@ -956,6 +966,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 
+ 	if (WARN_ON_ONCE(bio->bi_vcnt))
+ 		return -EINVAL;
++	if (WARN_ON_ONCE(bio_is_dma_direct(bio)))
++		return -EINVAL;
+ 
+ 	do {
+ 		if (is_bvec)
+@@ -1029,6 +1041,9 @@ void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
+ 	void *src_p, *dst_p;
+ 	unsigned bytes;
+ 
++	if (WARN_ON_ONCE(bio_is_dma_direct(src) || bio_is_dma_direct(dst)))
++		return;
++
+ 	while (src_iter->bi_size && dst_iter->bi_size) {
+ 		src_bv = bio_iter_iovec(src, *src_iter);
+ 		dst_bv = bio_iter_iovec(dst, *dst_iter);
+@@ -1143,6 +1158,9 @@ static int bio_copy_from_iter(struct bio *bio, struct iov_iter *iter)
+ 	struct bio_vec *bvec;
+ 	struct bvec_iter_all iter_all;
+ 
++	if (WARN_ON_ONCE(bio_is_dma_direct(bio)))
++		return -EINVAL;
++
+ 	bio_for_each_segment_all(bvec, bio, iter_all) {
+ 		ssize_t ret;
+ 
+@@ -1174,6 +1192,9 @@ static int bio_copy_to_iter(struct bio *bio, struct iov_iter iter)
+ 	struct bio_vec *bvec;
+ 	struct bvec_iter_all iter_all;
+ 
++	if (WARN_ON_ONCE(bio_is_dma_direct(bio)))
++		return -EINVAL;
++
+ 	bio_for_each_segment_all(bvec, bio, iter_all) {
+ 		ssize_t ret;
+ 
+@@ -1197,6 +1218,9 @@ void bio_free_pages(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct bvec_iter_all iter_all;
+ 
++	if (WARN_ON_ONCE(bio_is_dma_direct(bio)))
++		return;
++
+ 	bio_for_each_segment_all(bvec, bio, iter_all)
+ 		__free_page(bvec->bv_page);
+ }
+@@ -1653,6 +1677,9 @@ void bio_set_pages_dirty(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct bvec_iter_all iter_all;
+ 
++	if (unlikely(bio_is_dma_direct(bio)))
++		return;
++
+ 	bio_for_each_segment_all(bvec, bio, iter_all) {
+ 		if (!PageCompound(bvec->bv_page))
+ 			set_page_dirty_lock(bvec->bv_page);
+@@ -1704,6 +1731,9 @@ void bio_check_pages_dirty(struct bio *bio)
+ 	unsigned long flags;
+ 	struct bvec_iter_all iter_all;
+ 
++	if (unlikely(bio_is_dma_direct(bio)))
++		return;
++
+ 	bio_for_each_segment_all(bvec, bio, iter_all) {
+ 		if (!PageDirty(bvec->bv_page) && !PageCompound(bvec->bv_page))
+ 			goto defer;
+@@ -1777,6 +1807,9 @@ void bio_flush_dcache_pages(struct bio *bi)
+ 	struct bio_vec bvec;
+ 	struct bvec_iter iter;
+ 
++	if (unlikely(bio_is_dma_direct(bi)))
++		return;
++
+ 	bio_for_each_segment(bvec, bi, iter)
+ 		flush_dcache_page(bvec.bv_page);
+ }
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 8340f69670d8..ea152d54c7ce 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1467,6 +1467,9 @@ void rq_flush_dcache_pages(struct request *rq)
+ 	struct req_iterator iter;
+ 	struct bio_vec bvec;
+ 
++	if (unlikely(blk_rq_is_dma_direct(rq)))
++		return;
++
+ 	rq_for_each_segment(bvec, rq, iter)
+ 		flush_dcache_page(bvec.bv_page);
+ }
 -- 
 2.20.1
 
