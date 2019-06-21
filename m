@@ -2,32 +2,32 @@ Return-Path: <SRS0=qpPD=UU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C5CC43613
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C05C43613
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:39:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EC4B52083B
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:39:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32A502083B
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:39:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726200AbfFUHjZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jun 2019 03:39:25 -0400
-Received: from mx2.suse.de ([195.135.220.15]:43098 "EHLO mx1.suse.de"
+        id S1726054AbfFUHjn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jun 2019 03:39:43 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43124 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726027AbfFUHjZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jun 2019 03:39:25 -0400
+        id S1726027AbfFUHjn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Jun 2019 03:39:43 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 6FBEEAC4E;
-        Fri, 21 Jun 2019 07:39:23 +0000 (UTC)
-Subject: Re: [PATCH V5 4/5] block: update print_req_error()
+        by mx1.suse.de (Postfix) with ESMTP id 791FBAC4E;
+        Fri, 21 Jun 2019 07:39:41 +0000 (UTC)
+Subject: Re: [PATCH V5 5/5] f2fs: use block layer helper for show_bio_op macro
 To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk
 References: <20190620175919.3273-1-chaitanya.kulkarni@wdc.com>
- <20190620175919.3273-5-chaitanya.kulkarni@wdc.com>
+ <20190620175919.3273-6-chaitanya.kulkarni@wdc.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -73,12 +73,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <adc13977-a5be-5daa-1aa0-6b1fd86a6e90@suse.de>
-Date:   Fri, 21 Jun 2019 09:39:22 +0200
+Message-ID: <06714e3d-be00-8425-9888-edb46c1c4185@suse.de>
+Date:   Fri, 21 Jun 2019 09:39:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190620175919.3273-5-chaitanya.kulkarni@wdc.com>
+In-Reply-To: <20190620175919.3273-6-chaitanya.kulkarni@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -88,15 +88,37 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 6/20/19 7:59 PM, Chaitanya Kulkarni wrote:
-> Improve the print_req_error with additional request fields which are
-> helpful for debugging. Use newly introduced blk_op_str() to print the
-> REQ_OP_XXX in the string format.
+> Adjust the f2fs tracing code to use newly introduced block layer
+> function blk_op_str() which converts the REQ_OP_XXX into the string
+> XXX.
 > 
-> Reviewed-by: Chao Yu <yuchao0@huawei.com>
 > Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 > ---
->  block/blk-core.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
+>  include/trace/events/f2fs.h | 11 +----------
+>  1 file changed, 1 insertion(+), 10 deletions(-)
+> 
+> diff --git a/include/trace/events/f2fs.h b/include/trace/events/f2fs.h
+> index 53b96f12300c..e3dc031af7f5 100644
+> --- a/include/trace/events/f2fs.h
+> +++ b/include/trace/events/f2fs.h
+> @@ -76,16 +76,7 @@ TRACE_DEFINE_ENUM(CP_TRIMMED);
+>  #define show_bio_type(op,op_flags)	show_bio_op(op),		\
+>  						show_bio_op_flags(op_flags)
+>  
+> -#define show_bio_op(op)							\
+> -	__print_symbolic(op,						\
+> -		{ REQ_OP_READ,			"READ" },		\
+> -		{ REQ_OP_WRITE,			"WRITE" },		\
+> -		{ REQ_OP_FLUSH,			"FLUSH" },		\
+> -		{ REQ_OP_DISCARD,		"DISCARD" },		\
+> -		{ REQ_OP_SECURE_ERASE,		"SECURE_ERASE" },	\
+> -		{ REQ_OP_ZONE_RESET,		"ZONE_RESET" },		\
+> -		{ REQ_OP_WRITE_SAME,		"WRITE_SAME" },		\
+> -		{ REQ_OP_WRITE_ZEROES,		"WRITE_ZEROES" })
+> +#define show_bio_op(op)		blk_op_str(op)
+>  
+>  #define show_bio_op_flags(flags)					\
+>  	__print_flags(F2FS_BIO_FLAG_MASK(flags), "|",			\
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
