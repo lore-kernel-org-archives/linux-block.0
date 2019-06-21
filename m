@@ -2,168 +2,80 @@ Return-Path: <SRS0=qpPD=UU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03B26C48BE3
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 734A0C43613
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 08:23:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C3D9320B1F
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:59:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39CB9214AF
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 08:23:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="phxZn7Y8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Tx8dE9kf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726333AbfFUH71 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jun 2019 03:59:27 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:35823 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726057AbfFUH70 (ORCPT
+        id S1726074AbfFUIXH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jun 2019 04:23:07 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:39858 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726045AbfFUIXH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jun 2019 03:59:26 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20190621075924euoutp0164de99f618490c7ce359349d007d375a~qJ8jjoTbg1980119801euoutp01V
-        for <linux-block@vger.kernel.org>; Fri, 21 Jun 2019 07:59:24 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20190621075924euoutp0164de99f618490c7ce359349d007d375a~qJ8jjoTbg1980119801euoutp01V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1561103964;
-        bh=OfcYrq4Mw2C7QWJTKY9iTkWlTTeEKFz3rb4XsrYlvSc=;
-        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
-        b=phxZn7Y8JsJWjW3gXWehIfh3D2gHgWfrmmn+ULt/4KRmscLCzVW1p3k2Owzefe8uX
-         gGg2KQfAS38Dk7IAsKt6SQwZRApV9h4vWvB57M95SG75YIaZyCqHa+xDnMdsBttH1n
-         wA6mA0vlzYl/lRozgEe1GKMGYAT+JBp9BarsnvG4=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20190621075923eucas1p2536fc35606737bb63156849d3b31a260~qJ8i5G_Fm2093320933eucas1p2D;
-        Fri, 21 Jun 2019 07:59:23 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id 65.35.04377.B5E8C0D5; Fri, 21
-        Jun 2019 08:59:23 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20190621075922eucas1p1f24348c3e298df3920d6be6ccc25cf9a~qJ8h8sPIR2245922459eucas1p1N;
-        Fri, 21 Jun 2019 07:59:22 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20190621075922eusmtrp257b4c84900cccac29fd04b8da5952db3~qJ8huVMrT1501015010eusmtrp2I;
-        Fri, 21 Jun 2019 07:59:22 +0000 (GMT)
-X-AuditID: cbfec7f4-12dff70000001119-55-5d0c8e5b694b
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 8A.CE.04140.A5E8C0D5; Fri, 21
-        Jun 2019 08:59:22 +0100 (BST)
-Received: from [106.120.50.25] (unknown [106.120.50.25]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20190621075922eusmtip2838999876e871ae7349f3cd880c88bb3~qJ8hQtFVt1543515435eusmtip2s;
-        Fri, 21 Jun 2019 07:59:22 +0000 (GMT)
-Subject: Re: [RFC PATCH v7 2/5] iommu/dma: Add a new dma_map_ops of
- get_merge_boundary()
-To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        ulf.hansson@linaro.org, hch@lst.de, robin.murphy@arm.com,
-        joro@8bytes.org, axboe@kernel.dk
-Cc:     wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org
-From:   Marek Szyprowski <m.szyprowski@samsung.com>
-Message-ID: <8bce95ea-93ac-e783-af7c-ec5bfb8e82f6@samsung.com>
-Date:   Fri, 21 Jun 2019 09:59:21 +0200
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
-        Thunderbird/60.7.1
+        Fri, 21 Jun 2019 04:23:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=hSWwJMZClWxLlMFotPRfl8SxjdwJbH68GW2swFT/BBg=; b=Tx8dE9kfJC7z1d5Gqf19YDrRe
+        TvvK5sFndH6tXKiL1bOn6pqiHumzmY1zHpqUBCVt05Q6UnZaOPLMGzZoUlwDD6w8qwsxCapzULZ+2
+        1miP4tqVjKX+N7eyjTMEfsX+KARFU8Azkc8fYGu7FRkHMjJexsCBJwf/3uiTK3yHwRr1doGAZBKgC
+        Ff6kOVVtfhCg01WsiGtJB6DwjW7TJJoUEwB/5MXz028hzinT9rKYbpj4KNF6LMihNei5ExbxVWF6Y
+        edj6cHjjPXBWzxEHyePXY1waQsh+ypgrbjvKBWWZ7JKXUoN4p6BmzR+IK315qfHzih3Gl0SCIHhCF
+        jtLfOydHg==;
+Received: from 212095005057.public.telering.at ([212.95.5.57] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1heEp3-0002VG-63; Fri, 21 Jun 2019 08:23:01 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk, tj@kernel.org, lizefan@huawei.com,
+        hannes@cmpxchg.org, linux-block@vger.kernel.org
+Cc:     cgroups@vger.kernel.org
+Subject: [PATCH for-block] cgroup: export css_next_descendant_pre for bfq
+Date:   Fri, 21 Jun 2019 10:22:48 +0200
+Message-Id: <20190621082248.11427-1-hch@lst.de>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <1561020610-953-3-git-send-email-yoshihiro.shimoda.uh@renesas.com>
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUhTYRTHe3bvtru5yXVaO2kYTCoq0oygS4YUBN1PFX2RnFIzb1Pcpuw2
-        LYMYClYrpr2QtqKslFm+RaQt7W1LXeVavmNhsGq0NFbhtCit5XZn+e33P+d/nv858BCYrI8f
-        T+TrDjF6nUqjEIjx9p6f7nVKsyR7vfNLEtX4tlJA3Wzs5lG1j9Ook5duC6mHb9ZSXcFKRLWN
-        f+FR9m9ePuVszqDM7h3U9MOAYGsU7bVf4dFNV5oQPfjSQI+NPBDQ50atiO58bRTQ311ncPrj
-        tVacDtxJ3C3KFG/JZTT5xYw+JX2/OK+79Qle5JUcrm4ZwIyoTmxCIgLIjfDH5MFNSEzIyAYE
-        v/sDETGF4OunmYgIIKgOTvPnRyrqZjGuYUVQ6xrjc8KPoNxsF4ZcsWQmjBy38UIcR9YguO3b
-        GjJhZD2CH5Onwk8JyFQw+U2CEEvJdPDZrCjEOLkCbnQOhnkxmQU1Nh/OeWLg+UVvmEXkLmio
-        exEOwMjlcM9/GeNYDm+8V3mhMCDfC+GcyxjZezvY35chjmNhwnlXyPEyCN6fHyhH8M7dLOTE
-        aQSDZTWRiTR46uyfe4mYi1gNrR0pXHkbOF0TeKgMZDSM+mO4JaLhbHs1xpWlcKJCxrlXgsXZ
-        8i/W3jeAVSGFZcFplgXnWBacY/mfW4vwW0jOGFitmmE36JiSZFalZQ06dfKBQu0dNPfPev84
-        p2yoYzbHgUgCKSTSJ5aobBlfVcwe0ToQEJgiTirRSLJl0lzVkVJGX7hPb9AwrAMlELhCLj26
-        yKOUkWrVIaaAYYoY/XyXR4jijWhJwcY917IeHU1SejZVHZzaMf7LPepWWg7b41+dlxS3t+09
-        3q4VDe1Pj96zryu5oqrsY8bjtPKGxkR3femFkWcnJuS9rMvTkbg0JzjjdxwzXwx8sGZv2DbU
-        0w+Tndc3r6nEo3wwa5weFs6sUvnQsUU7TyYY1Jl9CZPDOsvQ2OcSBc7mqVLXYHpW9ReEpLrc
-        YwMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrEIsWRmVeSWpSXmKPExsVy+t/xe7pRfTyxBq2tqhar7/azWaxcfZTJ
-        YsF+a4vO2RvYLfbe0rY48r+f0WLry3dMFgc/PGG1OL423KLvnLvF172f2Ry4PZ4cnMfksWbe
-        GkaPy2dLPe5c28PmMfnGckaP3Tcb2Dy+nZnI4vFs4XoWj8+b5AI4o/RsivJLS1IVMvKLS2yV
-        og0tjPQMLS30jEws9QyNzWOtjEyV9O1sUlJzMstSi/TtEvQyjq4/wFLwhKdi+rpLzA2MS7i6
-        GDk5JARMJNqW/GHuYuTiEBJYyijxbu19doiEjMTJaQ2sELawxJ9rXWwgtpDAa0aJWRPKQGxh
-        gSiJa+07mECaRQRmMEosWtrADuIwg0za9uovK8TY54wS+372gLWzCRhKdL2FGMUrYCfxfMdy
-        RhCbRUBVYvHuy2C2qECMxP6Dt1kgagQlTs58AmZzCvhLrFhyignEZhYwk5i3+SEzhC0vsf3t
-        HChbXOLWk/lMExiFZiFpn4WkZRaSlllIWhYwsqxiFEktLc5Nzy020itOzC0uzUvXS87P3cQI
-        jN9tx35u2cHY9S74EKMAB6MSD++BWdyxQqyJZcWVuYcYJTiYlUR4eXJ4YoV4UxIrq1KL8uOL
-        SnNSiw8xmgI9N5FZSjQ5H5ha8kriDU0NzS0sDc2NzY3NLJTEeTsEDsYICaQnlqRmp6YWpBbB
-        9DFxcEo1MC78xfGnY0IyZ61r980Cufu8AUni+2U2Ts5eLZFYXhSwse5W7ar1TbvjpvTEa9em
-        i/d/4e89bxwf8uLMnQKjtm1LfHgZ1d7HSs2YGq/eFvjpsb357RMl1Q9eSb04F7iafcrUl7fu
-        Tev7W3H3Vt8ijrVZS/WM/U8wTeQLbJjy4c6lZ97Fdu5cWUosxRmJhlrMRcWJAEiMPOH1AgAA
-X-CMS-MailID: 20190621075922eucas1p1f24348c3e298df3920d6be6ccc25cf9a
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20190620085043epcas2p1f17aa71e547cf3d2b74dfc0c0dcc5ccb
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20190620085043epcas2p1f17aa71e547cf3d2b74dfc0c0dcc5ccb
-References: <1561020610-953-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
-        <CGME20190620085043epcas2p1f17aa71e547cf3d2b74dfc0c0dcc5ccb@epcas2p1.samsung.com>
-        <1561020610-953-3-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+The bfq schedule now uses css_next_descendant_pre directly after
+the stats functionality depending on it has been from the core
+blk-cgroup code to bfq.  Export the symbol so that bfq can still
+be build modular.
 
-On 2019-06-20 10:50, Yoshihiro Shimoda wrote:
-> This patch adds a new dma_map_ops of get_merge_boundary() to
-> expose the DMA merge boundary if the domain type is IOMMU_DOMAIN_DMA.
->
-> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-> ---
->   drivers/iommu/dma-iommu.c | 11 +++++++++++
->   1 file changed, 11 insertions(+)
->
-> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> index 205d694..9950cb5 100644
-> --- a/drivers/iommu/dma-iommu.c
-> +++ b/drivers/iommu/dma-iommu.c
-> @@ -1091,6 +1091,16 @@ static int iommu_dma_get_sgtable(struct device *dev, struct sg_table *sgt,
->   	return ret;
->   }
->   
-> +static unsigned long iommu_dma_get_merge_boundary(struct device *dev)
-> +{
-> +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
-> +
-> +	if (domain->type != IOMMU_DOMAIN_DMA)
-> +		return 0;	/* can't merge */
-> +
-> +	return (1 << __ffs(domain->pgsize_bitmap)) - 1;
-> +}
+Fixes: d6258980daf2 ("bfq-iosched: move bfq_stat_recursive_sum into the only caller")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ kernel/cgroup/cgroup.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I really wonder if there is any IOMMU, which doesn't support 4KiB pages. 
-Cannot you simply assume that the merge boundary is 4KiB and avoid 
-adding this new API?
-
-> +
->   static const struct dma_map_ops iommu_dma_ops = {
->   	.alloc			= iommu_dma_alloc,
->   	.free			= iommu_dma_free,
-> @@ -1106,6 +1116,7 @@ static const struct dma_map_ops iommu_dma_ops = {
->   	.sync_sg_for_device	= iommu_dma_sync_sg_for_device,
->   	.map_resource		= iommu_dma_map_resource,
->   	.unmap_resource		= iommu_dma_unmap_resource,
-> +	.get_merge_boundary	= iommu_dma_get_merge_boundary,
->   };
->   
->   /*
-
-Best regards
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index 426a0026225c..30aba80858e3 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -4221,6 +4221,7 @@ css_next_descendant_pre(struct cgroup_subsys_state *pos,
+ 
+ 	return NULL;
+ }
++EXPORT_SYMBOL_GPL(css_next_descendant_pre);
+ 
+ /**
+  * css_rightmost_descendant - return the rightmost descendant of a css
 -- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+2.20.1
 
