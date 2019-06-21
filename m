@@ -2,177 +2,339 @@ Return-Path: <SRS0=qpPD=UU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E76B2C43613
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 13:13:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 978CDC43613
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 14:38:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B0CF62083B
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 13:13:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60FC9208C3
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 14:38:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="g2i7pJ4d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HolW+Ln/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726365AbfFUNNm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jun 2019 09:13:42 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:39672 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726250AbfFUNNm (ORCPT
+        id S1726043AbfFUOiZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jun 2019 10:38:25 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43601 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726002AbfFUOiZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jun 2019 09:13:42 -0400
-Received: by mail-ed1-f68.google.com with SMTP id m10so10061489edv.6
-        for <linux-block@vger.kernel.org>; Fri, 21 Jun 2019 06:13:40 -0700 (PDT)
+        Fri, 21 Jun 2019 10:38:25 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p13so6808181wru.10;
+        Fri, 21 Jun 2019 07:38:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=6XGwmeOwlKSVTBVyAsB4aFpWNvK64SOug+dbRa2dIBc=;
-        b=g2i7pJ4dd03mZG0WQzNY70IuD4isWP6wrHJbt1eDPspbrH8LWdsARy2JRG4gqKdJTe
-         fFSESnljolpzF8FJ2LxIehaicnqD8HYbwc87MH8WGh2RMypCpcxRMhRA8WcQGXzuiPLF
-         fsSDTogw2zQbDAS5UoCul66pOy9vKzg5qQCyfUJUY2mj+I/NClbvi23Z+n3OGwMQgPGP
-         gBSJBV5yMMM56V0h9TweNvPidIDP4sO4KbiRPGLLjAr9MwwycYdebLwgqruNRE7GI9cj
-         Gf0uVj6NEwiyCqzbHB46TXQE5fEdUp8chtO6woeasKD/2xMCkzs1tAAxFbAHM50GM+FZ
-         TbEg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Mg4igNcdFGJjlqUrOaFCGZrcCaYIMam+p6zdeSPxPvc=;
+        b=HolW+Ln/MTbIlbglAKIqv4mn4QoufFGkjBdVTNwFlsd6VXZwwKy0a4ZVyeuC2c3e1M
+         lplICypTsvlW4Lpp35f3+12IXh2UK7Yz+orv41jsTBBjuyHMsdt54H/jZPtKykdGzkGu
+         TlaDSuqcPRFonbuCyWEV2t9Fa9q961c4RR+8MKdM8MKLixtbfW5YE4if3ve4phjKCV0B
+         Yt8Q2LznP1BHAtRcXeS6PtPk7LWaMuxTTelgQuP0FgJpwOhk0kHOWjlCNK55wAkbZZfB
+         ItcKg3R22Vmtgrc4NTaK2q7mxngdwiALONbL0n+4AQXmtQRAAzN5n/ORijhrrykdedke
+         4PcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6XGwmeOwlKSVTBVyAsB4aFpWNvK64SOug+dbRa2dIBc=;
-        b=fqgtxAJk/HvTXsDTvKxfaCT7W1A4d0BMqDcAy6bV7lA/cqlC+WZCCrUH3RJzZvSrgF
-         GZRgeb4Tnn+IFCI0HOyRFBEFqBErdRN9qgvdcygNfVnFABOJqiLZBgQRapv+mPWgO6Sd
-         6mcTWGRyInxBLRkxSo9ZAdCSlW5BBoltCMvj7j0zmcw+xoDhjegzkc8glS6rF2IvtIt9
-         nelu/RG3saz7IaAzr57ex0akOgaUPBK8yl24geTblE+ld40oofofcaIWV8ywQ/BeQJi5
-         Vo2eNDumV3M13uY94WzEPFKCYF75M0GX57Auh9EXj7pxL9KG2q2aW3sp5enTy0ImPbiJ
-         6Kmw==
-X-Gm-Message-State: APjAAAV/UfFVIzSuCPCqIDryBOJTNZZb9cxQNWhhzUC9fw8SLaa8kZEW
-        exySkzFrc0wnaU1P43B1O+UyiG7zgqVsWb8K
-X-Google-Smtp-Source: APXvYqwVT0b/aSjmvor1evdYxZfzrvzWzHWaYbG4iA2o71fd9yUMI2T+qcmwrC0vkwMVxY8q3NxZEw==
-X-Received: by 2002:a05:6402:1612:: with SMTP id f18mr84636664edv.231.1561122819639;
-        Fri, 21 Jun 2019 06:13:39 -0700 (PDT)
-Received: from [192.168.1.208] (ip-5-186-115-204.cgn.fibianet.dk. [5.186.115.204])
-        by smtp.gmail.com with ESMTPSA id d12sm422255ejd.65.2019.06.21.06.13.38
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 21 Jun 2019 06:13:38 -0700 (PDT)
-Subject: Re: [io_uring]: fio's io_uring engine causing general protection
- fault
-To:     Stephen Bates <sbates@raithlin.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     "fio-owner@vger.kernel.org" <fio-owner@vger.kernel.org>
-References: <7A8449F0-0E79-43B0-9FDD-45292691F0F2@raithlin.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4882e4e8-2c58-9c37-9131-91217baa55c5@kernel.dk>
-Date:   Fri, 21 Jun 2019 07:13:38 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Mg4igNcdFGJjlqUrOaFCGZrcCaYIMam+p6zdeSPxPvc=;
+        b=rVOJ1dwwaQxrNIllIBFxGs2Rm9WyM7PBv4gYhYzZKP1XbP+swlJLpFyBt1OsRzeWAa
+         VNonlAbtl+Gd5woGwGhUmjhVZuJdlHD28T77ApjeyNPH9xKny+Lr/MUiMM4iHXY3UTil
+         OHfEWcslwRGnlzJ1TEdpHoVJhcAkkA1ZTB+kG7JflrIR7U7DQdk3kcK/Jv8aGr95kxh+
+         xcW9aFF1GaT2RdmpDF4YaMaJbGvf7EeeAMwU3XW9c202liqj68inbN815vF1Ybb2jbpq
+         LY+hFuk5vNDlLC2dd5uuoQij3ZJaKLhd97Rj70x8kv3iSLP1Wkmqx7Kq4JXbDUGBHc4c
+         WHlA==
+X-Gm-Message-State: APjAAAWfAgLLHtTYhrlsKUEdD/nwYt6dAmQzPE89dqNBtuiGoV1BGs4f
+        TcJoMLCx5txrYraoH8/BtlXZJZA7N3qksFijq+c=
+X-Google-Smtp-Source: APXvYqxgNS6HCWeaPUZQDuc4O7/qWeVp7JTpYf2RoizpKDkJP4bU7rtNi8UOegdq2/LghlKd4cvAb/ZbYYQ9JQiP2q0=
+X-Received: by 2002:a5d:4708:: with SMTP id y8mr2327119wrq.85.1561127902504;
+ Fri, 21 Jun 2019 07:38:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <7A8449F0-0E79-43B0-9FDD-45292691F0F2@raithlin.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <cover.1560679439.git.zhangweiping@didiglobal.com>
+ <0b0fa12a337f97a8cc878b58673b3eb619539174.1560679439.git.zhangweiping@didiglobal.com>
+ <20190620141614.GB12032@minwooim-desktop>
+In-Reply-To: <20190620141614.GB12032@minwooim-desktop>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Fri, 21 Jun 2019 22:38:12 +0800
+Message-ID: <CAA70yB5hnrbkgMPkb2nZtKn5iagxZRe=JRhQkYFGhmYwKuWiYw@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] nvme: add support weighted round robin queue
+To:     Minwoo Im <minwoo.im.dev@gmail.com>
+Cc:     Weiping Zhang <zhangweiping@didiglobal.com>,
+        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/21/19 6:40 AM, Stephen  Bates wrote:
-> Hi
-> 
-> I hit the following General Protection Fault when testing io_uring via the io_uring engine in fio. This was on a VM running 5.2-rc5 and the latest version of fio. The issue occurs for both null_blk and fake NVMe drives. I have not tested bare metal or real NVMe SSDs. The fio script used is given below.
-> 
-> [io_uring]
-> time_based=1
-> runtime=60
-> filename=/dev/nvme2n1 (note /dev/nullb0 also fails)
-> ioengine=io_uring
-> bs=4k
-> rw=readwrite
-> direct=1
-> fixedbufs=1
-> sqthread_poll=1
-> sqthread_poll_cpu=0
-> 
-> [  964.540374] general protection fault: 0000 [#1] SMP PTI
-> [  964.542041] CPU: 0 PID: 872 Comm: io_uring-sq Not tainted 5.2.0-rc5-cpacket-io-uring #1
-> [  964.545589] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Ubuntu-1.8.2-1ubuntu1 04/01/2014
-> [  964.549761] RIP: 0010:fput_many+0x7/0x90
-> [  964.551522] Code: 01 48 85 ff 74 17 55 48 89 e5 53 48 8b 1f e8 a0 f9 ff ff 48 85 db 48 89 df 75 f0 5b 5d f3 c3 0f 1f 40 00 0f 1f 44 00 00 89 f6 <f0> 48 29 77 38 74 01 c3 55 48 89 e5 53 48 89 fb 65 48 \
-> 8b 3c 25 c0
-> [  964.559031] RSP: 0018:ffffadeb817ebc50 EFLAGS: 00010246
-> [  964.561112] RAX: 0000000000000004 RBX: ffff8f46ad477480 RCX: 0000000000001805
-> [  964.563911] RDX: 0000000000000000 RSI: 0000000000000001 RDI: f18b51b9a39552b5
-> [  964.566580] RBP: ffffadeb817ebc58 R08: ffff8f46b7a318c0 R09: 000000000000015d
-> [  964.569109] R10: ffffadeb817ebce8 R11: 0000000000000020 R12: ffff8f46ad4cd000
-> [  964.571623] R13: 00000000fffffff7 R14: ffffadeb817ebe30 R15: 0000000000000004
-> [  964.574153] FS:  0000000000000000(0000) GS:ffff8f46b7a00000(0000) knlGS:0000000000000000
-> [  964.577020] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  964.578917] CR2: 000055828f0bbbf0 CR3: 0000000232176004 CR4: 00000000003606f0
-> [  964.581221] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [  964.583511] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> [  964.585808] Call Trace:
-> [  964.586626]  ? fput+0x13/0x20
-> [  964.587613]  io_free_req+0x20/0x40
-> [  964.588733]  io_put_req+0x1b/0x20
-> [  964.589795]  io_submit_sqe+0x40a/0x680
-> [  964.590919]  ? __switch_to_asm+0x34/0x70
-> [  964.592090]  ? __switch_to_asm+0x40/0x70
-> [  964.593270]  io_submit_sqes+0xb9/0x160
-> [  964.594392]  ? io_submit_sqes+0xb9/0x160
-> [  964.595564]  ? __switch_to_asm+0x40/0x70
-> [  964.596737]  ? __switch_to_asm+0x34/0x70
-> [  964.597918]  ? __schedule+0x3f2/0x6a0
-> [  964.599015]  ? __switch_to_asm+0x34/0x70
-> [  964.600444]  io_sq_thread+0x1af/0x470
-> [  964.601568]  ? __switch_to_asm+0x34/0x70
-> [  964.602655]  ? wait_woken+0x80/0x80
-> [  964.603625]  ? __switch_to+0x85/0x410
-> [  964.604638]  ? __switch_to_asm+0x40/0x70
-> [  964.605726]  ? __switch_to_asm+0x34/0x70
-> [  964.606811]  ? __schedule+0x3f2/0x6a0
-> [  964.607827]  kthread+0x105/0x140
-> [  964.608725]  ? io_submit_sqes+0x160/0x160
-> [  964.609836]  ? kthread+0x105/0x140
-> [  964.610780]  ? io_submit_sqes+0x160/0x160
-> [  964.611887]  ? kthread_destroy_worker+0x50/0x50
-> [  964.613158]  ret_from_fork+0x35/0x40
-> [  964.614148] Modules linked in: crct10dif_pclmul crc32_pclmul ghash_clmulni_intel aesni_intel aes_x86_64 crypto_simd cryptd glue_helper joydev input_leds serio_raw mac_hid sch_fq_codel sunrpc null_blk \
-> ip_tables x_tables autofs4 8139too psmouse 8139cp floppy mii i2c_piix4 pata_acpi
-> [  964.620856] ---[ end trace bdbba818b310272c ]---
+Hi Minwoo,
 
-Try this patch. Technically, it's not valid to use sqthread without
-fixed files registered through io_uring_register(), and this case
-looks to me like we're just not initializing ->file before we end
-up failing the request due to a violation of that requirement.
+Thanks your feedback.
 
-Not tested, on vacation...
+Minwoo Im <minwoo.im.dev@gmail.com> =E4=BA=8E2019=E5=B9=B46=E6=9C=8820=E6=
+=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=8810:17=E5=86=99=E9=81=93=EF=BC=9A
+>
+> > -static int write_queues;
+> > -module_param_cb(write_queues, &queue_count_ops, &write_queues, 0644);
+> > -MODULE_PARM_DESC(write_queues,
+> > -     "Number of queues to use for writes. If not set, reads and writes=
+ "
+> > +static int read_queues;
+> > +module_param_cb(read_queues, &queue_count_ops, &read_queues, 0644);
+> > +MODULE_PARM_DESC(read_queues,
+> > +     "Number of queues to use for reads. If not set, reads and writes =
+"
+> >       "will share a queue set.");
+>
+> Before starting my review for this, I'd like to talk about this part
+> first.  It would be better if you can split this change from this commit
+> into a new one because it just replaced the write_queues with
+> read_queues which is directly mapped to HCTX_TYPE_READ.  This change
+> might not be critical for the WRR implementation.
+>
+Yes, I'll split it into a sperate patch, the reason why I rename it to
+read is that
+it can siplify the calulation for wrr related queue count.
+> >
+> >  static int poll_queues =3D 0;
+> >  module_param_cb(poll_queues, &queue_count_ops, &poll_queues, 0644);
+> >  MODULE_PARM_DESC(poll_queues, "Number of queues to use for polled IO."=
+);
+> >
+> > +static int wrr_high_queues =3D 0;
+>
+> Nitpick here: maybe we don't need to 0-initialize static variables
+> explicitly.
+ok, I will rebase this patch set to nvme-5.3 branch.
 
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 86a2bd721900..485832deb7ea 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -579,6 +579,7 @@ static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
- 		state->cur_req++;
- 	}
- 
-+	req->file = NULL;
- 	req->ctx = ctx;
- 	req->flags = 0;
- 	/* one is dropped after submission, the other at completion */
-@@ -1801,10 +1802,8 @@ static int io_req_set_file(struct io_ring_ctx *ctx, const struct sqe_submit *s,
- 		req->sequence = ctx->cached_sq_head - 1;
- 	}
- 
--	if (!io_op_needs_file(s->sqe)) {
--		req->file = NULL;
-+	if (!io_op_needs_file(s->sqe))
- 		return 0;
--	}
- 
- 	if (flags & IOSQE_FIXED_FILE) {
- 		if (unlikely(!ctx->user_files ||
-
--- 
-Jens Axboe
-
+>
+> > +module_param_cb(wrr_high_queues, &queue_count_ops, &wrr_high_queues, 0=
+644);
+> > +MODULE_PARM_DESC(wrr_high_queues, "Number of queues to use for WRR hig=
+h.");
+> > +
+> > +static int wrr_medium_queues =3D 0;
+> > +module_param_cb(wrr_medium_queues, &queue_count_ops, &wrr_medium_queue=
+s, 0644);
+> > +MODULE_PARM_DESC(wrr_medium_queues, "Number of queues to use for WRR m=
+edium.");
+> > +
+> > +static int wrr_low_queues =3D 0;
+> > +module_param_cb(wrr_low_queues, &queue_count_ops, &wrr_low_queues, 064=
+4);
+> > +MODULE_PARM_DESC(wrr_low_queues, "Number of queues to use for WRR low.=
+");
+> > +
+> >  struct nvme_dev;
+> >  struct nvme_queue;
+> >
+> > @@ -226,9 +238,17 @@ struct nvme_iod {
+> >       struct scatterlist *sg;
+> >  };
+> >
+> > +static inline bool nvme_is_enable_wrr(struct nvme_dev *dev)
+> > +{
+> > +     return dev->io_queues[HCTX_TYPE_WRR_LOW] +
+> > +             dev->io_queues[HCTX_TYPE_WRR_MEDIUM] +
+> > +             dev->io_queues[HCTX_TYPE_WRR_HIGH] > 0;
+> > +}
+>
+> It looks like that it might be confused with AMS(Arbitration Mechanism
+> Selected) in CC or CAP?  If it meant how many irqs for the sets were
+> allocated, then can we have this function with another name like:
+>         nvme_is_wrr_allocated or something indicating the irqsets
+>
+Yes, we should dectect AMS in CAP and CC, if we not enable WRR, we should
+ignore all wrr_high/medium/low/urgent_queues.
+For my point of view, this function is used for check if nvme enable WRR, s=
+o
+we should check AMS in both CAP and CC.
+We also need define nvme_is_wrr_allocated which will be used when we
+create io queues.
+> > +
+> >  static unsigned int max_io_queues(void)
+> >  {
+> > -     return num_possible_cpus() + write_queues + poll_queues;
+> > +     return num_possible_cpus() + read_queues + poll_queues +
+> > +             wrr_high_queues + wrr_medium_queues + wrr_low_queues;
+> >  }
+> >
+> >  static unsigned int max_queue_count(void)
+> > @@ -1534,11 +1558,46 @@ static void nvme_init_queue(struct nvme_queue *=
+nvmeq, u16 qid)
+> >       wmb(); /* ensure the first interrupt sees the initialization */
+> >  }
+> >
+> > -static int nvme_create_queue(struct nvme_queue *nvmeq, int qid, bool p=
+olled)
+> > +static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
+> >  {
+> >       struct nvme_dev *dev =3D nvmeq->dev;
+> > -     int result;
+> > +     int start, end, result, wrr;
+> > +     bool polled =3D false;
+> >       u16 vector =3D 0;
+> > +     enum hctx_type type;
+> > +
+> > +     /* 0 for admain queue, io queue index >=3D 1 */
+> > +     start =3D 1;
+> > +     /* get hardware context type base on qid */
+> > +     for (type =3D HCTX_TYPE_DEFAULT; type < HCTX_MAX_TYPES; type++) {
+> > +             end =3D start + dev->io_queues[type] - 1;
+> > +             if (qid >=3D start && qid <=3D end)
+> > +                     break;
+> > +             start =3D end + 1;
+> > +     }
+> > +
+> > +     if (nvme_is_enable_wrr(dev)) {
+>
+> I think we need to check not only the irqset allocations, but also if the
+> device is really supports WRR or not.
+OK.
+>
+> > +             /* set read,poll,default to medium by default */
+> > +             switch (type) {
+> > +             case HCTX_TYPE_POLL:
+> > +                     polled =3D true;
+>
+> Question: Is poll-queue not avilable to be used in case of !WRR?
+>
+Ya, I will fix it.
+> > +             case HCTX_TYPE_DEFAULT:
+> > +             case HCTX_TYPE_READ:
+> > +             case HCTX_TYPE_WRR_MEDIUM:
+> > +                     wrr =3D NVME_SQ_PRIO_MEDIUM;
+>
+> Also it seems like it could be named like flags because it will show the
+> SQ priority.  What do you think?
+>
+It's ok, I will rename wrr to wrr_flag;
+> > +                     break;
+> > +             case HCTX_TYPE_WRR_LOW:
+> > +                     wrr =3D NVME_SQ_PRIO_LOW;
+> > +                     break;
+> > +             case HCTX_TYPE_WRR_HIGH:
+> > +                     wrr =3D NVME_SQ_PRIO_HIGH;
+> > +                     break;
+> > +             default:
+> > +                     return -EINVAL;
+> > +             }
+> > +     } else {
+> > +             wrr =3D 0;
+>
+> Would it be different with the following value ?
+>         NVME_SQ_PRIO_URGENT     =3D (0 << 1)
+> If it means no WRR, then can it be avoided the value which is already
+> defined ?
+I means no WRR, so I want to
+#define NVME_SQ_PRIO_IGNORE NVME_SQ_PRIO_URGENT,
+because if nvme's WRR is not enabled, the controller should ignore this fie=
+ld.
+>
+> > +     }
+> >
+> >       clear_bit(NVMEQ_DELETE_ERROR, &nvmeq->flags);
+> >
+>
+> > @@ -2028,35 +2079,73 @@ static int nvme_setup_host_mem(struct nvme_dev =
+*dev)
+> >  static void nvme_calc_irq_sets(struct irq_affinity *affd, unsigned int=
+ nrirqs)
+> >  {
+> >       struct nvme_dev *dev =3D affd->priv;
+> > -     unsigned int nr_read_queues;
+> > +     unsigned int nr_total, nr, nr_read, nr_default;
+> > +     unsigned int nr_wrr_high, nr_wrr_medium, nr_wrr_low;
+> > +     unsigned int nr_sets;
+> >
+> >       /*
+> >        * If there is no interupt available for queues, ensure that
+> >        * the default queue is set to 1. The affinity set size is
+> >        * also set to one, but the irq core ignores it for this case.
+> > -      *
+> > -      * If only one interrupt is available or 'write_queue' =3D=3D 0, =
+combine
+> > -      * write and read queues.
+> > -      *
+> > -      * If 'write_queues' > 0, ensure it leaves room for at least one =
+read
+> > -      * queue.
+> >        */
+> > -     if (!nrirqs) {
+> > +     if (!nrirqs)
+> >               nrirqs =3D 1;
+> > -             nr_read_queues =3D 0;
+> > -     } else if (nrirqs =3D=3D 1 || !write_queues) {
+> > -             nr_read_queues =3D 0;
+> > -     } else if (write_queues >=3D nrirqs) {
+> > -             nr_read_queues =3D 1;
+> > -     } else {
+> > -             nr_read_queues =3D nrirqs - write_queues;
+> > -     }
+> >
+> > -     dev->io_queues[HCTX_TYPE_DEFAULT] =3D nrirqs - nr_read_queues;
+> > -     affd->set_size[HCTX_TYPE_DEFAULT] =3D nrirqs - nr_read_queues;
+> > -     dev->io_queues[HCTX_TYPE_READ] =3D nr_read_queues;
+> > -     affd->set_size[HCTX_TYPE_READ] =3D nr_read_queues;
+> > -     affd->nr_sets =3D nr_read_queues ? 2 : 1;
+> > +     nr_total =3D nrirqs;
+> > +
+> > +     nr_read =3D nr_wrr_high =3D nr_wrr_medium =3D nr_wrr_low =3D 0;
+> > +
+> > +     /* set default to 1, add all the rest queue to default at last */
+> > +     nr =3D nr_default =3D 1;
+> > +     nr_sets =3D 1;
+> > +
+> > +     nr_total -=3D nr;
+> > +     if (!nr_total)
+> > +             goto done;
+> > +
+> > +     /* read queues */
+> > +     nr_sets++;
+> > +     nr_read =3D nr =3D read_queues > nr_total ? nr_total : read_queue=
+s;
+> > +     nr_total -=3D nr;
+> > +     if (!nr_total)
+> > +             goto done;
+> > +
+> > +     /* wrr low queues */
+> > +     nr_sets++;
+> > +     nr_wrr_low =3D nr =3D wrr_low_queues > nr_total ? nr_total : wrr_=
+low_queues;
+> > +     nr_total -=3D nr;
+> > +     if (!nr_total)
+> > +             goto done;
+> > +
+> > +     /* wrr medium queues */
+> > +     nr_sets++;
+> > +     nr_wrr_medium =3D nr =3D wrr_medium_queues > nr_total ? nr_total =
+: wrr_medium_queues;
+>
+> It looks like exceeded 80 chracters here.
+I will fix it.
+>
+> > +     nr_total -=3D nr;
+> > +     if (!nr_total)
+> > +             goto done;
+> > +
+> > +     /* wrr high queues */
+> > +     nr_sets++;
+> > +     nr_wrr_high =3D nr =3D wrr_high_queues > nr_total ? nr_total : wr=
+r_high_queues;
+> > +     nr_wrr_high =3D nr =3D wrr_high_queues > nr_total ? nr_total : wr=
+r_high_queues;
+>
+> Here also.
+>
+> If I misunderstood something here, please feel free to let me know.
+>
+Thanks very much for your feedback.
+> Thanks,
