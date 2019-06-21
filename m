@@ -2,339 +2,188 @@ Return-Path: <SRS0=qpPD=UU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 978CDC43613
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 14:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F28C6C43613
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 15:15:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 60FC9208C3
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 14:38:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFF9A206B7
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 15:15:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HolW+Ln/"
+	dkim=pass (1024-bit key) header.d=raithlin.onmicrosoft.com header.i=@raithlin.onmicrosoft.com header.b="NN6P8b18"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726043AbfFUOiZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jun 2019 10:38:25 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43601 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726002AbfFUOiZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jun 2019 10:38:25 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p13so6808181wru.10;
-        Fri, 21 Jun 2019 07:38:23 -0700 (PDT)
+        id S1726097AbfFUPPm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jun 2019 11:15:42 -0400
+Received: from mail-eopbgr660131.outbound.protection.outlook.com ([40.107.66.131]:2428
+        "EHLO CAN01-QB1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726002AbfFUPPm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Jun 2019 11:15:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Mg4igNcdFGJjlqUrOaFCGZrcCaYIMam+p6zdeSPxPvc=;
-        b=HolW+Ln/MTbIlbglAKIqv4mn4QoufFGkjBdVTNwFlsd6VXZwwKy0a4ZVyeuC2c3e1M
-         lplICypTsvlW4Lpp35f3+12IXh2UK7Yz+orv41jsTBBjuyHMsdt54H/jZPtKykdGzkGu
-         TlaDSuqcPRFonbuCyWEV2t9Fa9q961c4RR+8MKdM8MKLixtbfW5YE4if3ve4phjKCV0B
-         Yt8Q2LznP1BHAtRcXeS6PtPk7LWaMuxTTelgQuP0FgJpwOhk0kHOWjlCNK55wAkbZZfB
-         ItcKg3R22Vmtgrc4NTaK2q7mxngdwiALONbL0n+4AQXmtQRAAzN5n/ORijhrrykdedke
-         4PcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Mg4igNcdFGJjlqUrOaFCGZrcCaYIMam+p6zdeSPxPvc=;
-        b=rVOJ1dwwaQxrNIllIBFxGs2Rm9WyM7PBv4gYhYzZKP1XbP+swlJLpFyBt1OsRzeWAa
-         VNonlAbtl+Gd5woGwGhUmjhVZuJdlHD28T77ApjeyNPH9xKny+Lr/MUiMM4iHXY3UTil
-         OHfEWcslwRGnlzJ1TEdpHoVJhcAkkA1ZTB+kG7JflrIR7U7DQdk3kcK/Jv8aGr95kxh+
-         xcW9aFF1GaT2RdmpDF4YaMaJbGvf7EeeAMwU3XW9c202liqj68inbN815vF1Ybb2jbpq
-         LY+hFuk5vNDlLC2dd5uuoQij3ZJaKLhd97Rj70x8kv3iSLP1Wkmqx7Kq4JXbDUGBHc4c
-         WHlA==
-X-Gm-Message-State: APjAAAWfAgLLHtTYhrlsKUEdD/nwYt6dAmQzPE89dqNBtuiGoV1BGs4f
-        TcJoMLCx5txrYraoH8/BtlXZJZA7N3qksFijq+c=
-X-Google-Smtp-Source: APXvYqxgNS6HCWeaPUZQDuc4O7/qWeVp7JTpYf2RoizpKDkJP4bU7rtNi8UOegdq2/LghlKd4cvAb/ZbYYQ9JQiP2q0=
-X-Received: by 2002:a5d:4708:: with SMTP id y8mr2327119wrq.85.1561127902504;
- Fri, 21 Jun 2019 07:38:22 -0700 (PDT)
+ d=raithlin.onmicrosoft.com; s=selector1-raithlin-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=31mydS6h3hlU2xV7Ugi8iUWgjdfRn1of6RdeL+6DEW4=;
+ b=NN6P8b18Dph+meOdbo55xjRII2jVWb7WfZDrRfbKX/gsLgIZIDf1Axe/uSRhOyjqIOb93UqeroWafGEO1dIowRTomoxiq8CGpWjlKuH02a3D7WzD6EUg/+Ss8UC0BqKaqpxzDmFMQj+By46zN+I3FKOKfWQuxQBUjGm8hdDZ/6c=
+Received: from QB1PR01MB3124.CANPRD01.PROD.OUTLOOK.COM (52.132.87.149) by
+ QB1PR01MB3762.CANPRD01.PROD.OUTLOOK.COM (52.132.87.93) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.11; Fri, 21 Jun 2019 15:15:38 +0000
+Received: from QB1PR01MB3124.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::400d:d19c:d963:ff7f]) by QB1PR01MB3124.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::400d:d19c:d963:ff7f%6]) with mapi id 15.20.1987.014; Fri, 21 Jun 2019
+ 15:15:38 +0000
+From:   "Stephen  Bates" <sbates@raithlin.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     "fio-owner@vger.kernel.org" <fio-owner@vger.kernel.org>
+Subject: Re: [io_uring]: fio's io_uring engine causing general protection
+ fault
+Thread-Topic: [io_uring]: fio's io_uring engine causing general protection
+ fault
+Thread-Index: AQHVKC5xaAmPJKhZL0mabQnP2ZbTi6amFekAgAAyzAA=
+Date:   Fri, 21 Jun 2019 15:15:36 +0000
+Message-ID: <0EB5169E-C942-4974-8FEE-9F03B7574F36@raithlin.com>
+References: <7A8449F0-0E79-43B0-9FDD-45292691F0F2@raithlin.com>
+ <4882e4e8-2c58-9c37-9131-91217baa55c5@kernel.dk>
+In-Reply-To: <4882e4e8-2c58-9c37-9131-91217baa55c5@kernel.dk>
+Accept-Language: en-CA, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Microsoft-MacOutlook/10.1a.0.190609
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=sbates@raithlin.com; 
+x-originating-ip: [2001:bb6:a2c:ed58:8485:be58:c275:994a]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f98a8aac-60d8-4134-27ad-08d6f65b5118
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(7021145)(8989299)(4534185)(7022145)(4603075)(4627221)(201702281549075)(8990200)(7048125)(7024125)(7027125)(7023125)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:QB1PR01MB3762;
+x-ms-traffictypediagnostic: QB1PR01MB3762:
+x-microsoft-antispam-prvs: <QB1PR01MB37622702523C0900116B603EAAE70@QB1PR01MB3762.CANPRD01.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:247;
+x-forefront-prvs: 0075CB064E
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(136003)(39830400003)(366004)(346002)(376002)(199004)(189003)(66476007)(76116006)(68736007)(5660300002)(14444005)(46003)(2906002)(508600001)(71200400001)(33656002)(229853002)(11346002)(6512007)(71190400001)(7736002)(256004)(6486002)(58126008)(81166006)(25786009)(446003)(476003)(8936002)(8676002)(6116002)(81156014)(316002)(2616005)(486006)(66446008)(45080400002)(66556008)(110136005)(305945005)(53936002)(6436002)(86362001)(2501003)(66946007)(102836004)(64756008)(6246003)(73956011)(14454004)(76176011)(36756003)(53546011)(186003)(99286004)(4326008)(6506007)(91956017);DIR:OUT;SFP:1102;SCL:1;SRVR:QB1PR01MB3762;H:QB1PR01MB3124.CANPRD01.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: raithlin.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: dvg5qXP5YCsqZtlH4u+/njSgZ3stbLwPUU8qKlXG9VtWwsRxvzaP8JfUP/HffaYDckWfsn+ShTX8Pv8W06iSWeiwto0US6umK7FJRGdrnNOvP1vjYmJy+JBId6Dp1PsGftzA/cp5dYg2uzllvQIeQDu74GJRS0nX932EIPilfwHsfSjcC9ShiJI4eVglwTfkGHz8x0RK0iV0rWR4AulClPRJMpiUGjGBkj7McdciZ7l9W8HSSsAHVXyjwuBJo9PZUc8EZJhq2hQH9j/PgwHo4VL++fCpsPmtlzKS57Cx3DpvcWvZRW9ttD4sCFuPcLrVeVhZmvvsUDlhRRlOnaG18y8awV5Vus2M9Nl8c0eFJeqqLh7B1iJEpdaF4QslggcDwaxtgKRjCeo3E19MBFl4M4i75TwF68NoN/j/4yjMvnU=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AEA1F66D17530F4E9EB85F1F8B412C9B@CANPRD01.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <cover.1560679439.git.zhangweiping@didiglobal.com>
- <0b0fa12a337f97a8cc878b58673b3eb619539174.1560679439.git.zhangweiping@didiglobal.com>
- <20190620141614.GB12032@minwooim-desktop>
-In-Reply-To: <20190620141614.GB12032@minwooim-desktop>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Fri, 21 Jun 2019 22:38:12 +0800
-Message-ID: <CAA70yB5hnrbkgMPkb2nZtKn5iagxZRe=JRhQkYFGhmYwKuWiYw@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] nvme: add support weighted round robin queue
-To:     Minwoo Im <minwoo.im.dev@gmail.com>
-Cc:     Weiping Zhang <zhangweiping@didiglobal.com>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: raithlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f98a8aac-60d8-4134-27ad-08d6f65b5118
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jun 2019 15:15:38.1368
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 18519031-7ff4-4cbb-bbcb-c3252d330f4b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sbates@raithlin.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: QB1PR01MB3762
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Minwoo,
-
-Thanks your feedback.
-
-Minwoo Im <minwoo.im.dev@gmail.com> =E4=BA=8E2019=E5=B9=B46=E6=9C=8820=E6=
-=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=8810:17=E5=86=99=E9=81=93=EF=BC=9A
->
-> > -static int write_queues;
-> > -module_param_cb(write_queues, &queue_count_ops, &write_queues, 0644);
-> > -MODULE_PARM_DESC(write_queues,
-> > -     "Number of queues to use for writes. If not set, reads and writes=
- "
-> > +static int read_queues;
-> > +module_param_cb(read_queues, &queue_count_ops, &read_queues, 0644);
-> > +MODULE_PARM_DESC(read_queues,
-> > +     "Number of queues to use for reads. If not set, reads and writes =
-"
-> >       "will share a queue set.");
->
-> Before starting my review for this, I'd like to talk about this part
-> first.  It would be better if you can split this change from this commit
-> into a new one because it just replaced the write_queues with
-> read_queues which is directly mapped to HCTX_TYPE_READ.  This change
-> might not be critical for the WRR implementation.
->
-Yes, I'll split it into a sperate patch, the reason why I rename it to
-read is that
-it can siplify the calulation for wrr related queue count.
-> >
-> >  static int poll_queues =3D 0;
-> >  module_param_cb(poll_queues, &queue_count_ops, &poll_queues, 0644);
-> >  MODULE_PARM_DESC(poll_queues, "Number of queues to use for polled IO."=
-);
-> >
-> > +static int wrr_high_queues =3D 0;
->
-> Nitpick here: maybe we don't need to 0-initialize static variables
-> explicitly.
-ok, I will rebase this patch set to nvme-5.3 branch.
-
->
-> > +module_param_cb(wrr_high_queues, &queue_count_ops, &wrr_high_queues, 0=
-644);
-> > +MODULE_PARM_DESC(wrr_high_queues, "Number of queues to use for WRR hig=
-h.");
-> > +
-> > +static int wrr_medium_queues =3D 0;
-> > +module_param_cb(wrr_medium_queues, &queue_count_ops, &wrr_medium_queue=
-s, 0644);
-> > +MODULE_PARM_DESC(wrr_medium_queues, "Number of queues to use for WRR m=
-edium.");
-> > +
-> > +static int wrr_low_queues =3D 0;
-> > +module_param_cb(wrr_low_queues, &queue_count_ops, &wrr_low_queues, 064=
-4);
-> > +MODULE_PARM_DESC(wrr_low_queues, "Number of queues to use for WRR low.=
-");
-> > +
-> >  struct nvme_dev;
-> >  struct nvme_queue;
-> >
-> > @@ -226,9 +238,17 @@ struct nvme_iod {
-> >       struct scatterlist *sg;
-> >  };
-> >
-> > +static inline bool nvme_is_enable_wrr(struct nvme_dev *dev)
-> > +{
-> > +     return dev->io_queues[HCTX_TYPE_WRR_LOW] +
-> > +             dev->io_queues[HCTX_TYPE_WRR_MEDIUM] +
-> > +             dev->io_queues[HCTX_TYPE_WRR_HIGH] > 0;
-> > +}
->
-> It looks like that it might be confused with AMS(Arbitration Mechanism
-> Selected) in CC or CAP?  If it meant how many irqs for the sets were
-> allocated, then can we have this function with another name like:
->         nvme_is_wrr_allocated or something indicating the irqsets
->
-Yes, we should dectect AMS in CAP and CC, if we not enable WRR, we should
-ignore all wrr_high/medium/low/urgent_queues.
-For my point of view, this function is used for check if nvme enable WRR, s=
-o
-we should check AMS in both CAP and CC.
-We also need define nvme_is_wrr_allocated which will be used when we
-create io queues.
-> > +
-> >  static unsigned int max_io_queues(void)
-> >  {
-> > -     return num_possible_cpus() + write_queues + poll_queues;
-> > +     return num_possible_cpus() + read_queues + poll_queues +
-> > +             wrr_high_queues + wrr_medium_queues + wrr_low_queues;
-> >  }
-> >
-> >  static unsigned int max_queue_count(void)
-> > @@ -1534,11 +1558,46 @@ static void nvme_init_queue(struct nvme_queue *=
-nvmeq, u16 qid)
-> >       wmb(); /* ensure the first interrupt sees the initialization */
-> >  }
-> >
-> > -static int nvme_create_queue(struct nvme_queue *nvmeq, int qid, bool p=
-olled)
-> > +static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
-> >  {
-> >       struct nvme_dev *dev =3D nvmeq->dev;
-> > -     int result;
-> > +     int start, end, result, wrr;
-> > +     bool polled =3D false;
-> >       u16 vector =3D 0;
-> > +     enum hctx_type type;
-> > +
-> > +     /* 0 for admain queue, io queue index >=3D 1 */
-> > +     start =3D 1;
-> > +     /* get hardware context type base on qid */
-> > +     for (type =3D HCTX_TYPE_DEFAULT; type < HCTX_MAX_TYPES; type++) {
-> > +             end =3D start + dev->io_queues[type] - 1;
-> > +             if (qid >=3D start && qid <=3D end)
-> > +                     break;
-> > +             start =3D end + 1;
-> > +     }
-> > +
-> > +     if (nvme_is_enable_wrr(dev)) {
->
-> I think we need to check not only the irqset allocations, but also if the
-> device is really supports WRR or not.
-OK.
->
-> > +             /* set read,poll,default to medium by default */
-> > +             switch (type) {
-> > +             case HCTX_TYPE_POLL:
-> > +                     polled =3D true;
->
-> Question: Is poll-queue not avilable to be used in case of !WRR?
->
-Ya, I will fix it.
-> > +             case HCTX_TYPE_DEFAULT:
-> > +             case HCTX_TYPE_READ:
-> > +             case HCTX_TYPE_WRR_MEDIUM:
-> > +                     wrr =3D NVME_SQ_PRIO_MEDIUM;
->
-> Also it seems like it could be named like flags because it will show the
-> SQ priority.  What do you think?
->
-It's ok, I will rename wrr to wrr_flag;
-> > +                     break;
-> > +             case HCTX_TYPE_WRR_LOW:
-> > +                     wrr =3D NVME_SQ_PRIO_LOW;
-> > +                     break;
-> > +             case HCTX_TYPE_WRR_HIGH:
-> > +                     wrr =3D NVME_SQ_PRIO_HIGH;
-> > +                     break;
-> > +             default:
-> > +                     return -EINVAL;
-> > +             }
-> > +     } else {
-> > +             wrr =3D 0;
->
-> Would it be different with the following value ?
->         NVME_SQ_PRIO_URGENT     =3D (0 << 1)
-> If it means no WRR, then can it be avoided the value which is already
-> defined ?
-I means no WRR, so I want to
-#define NVME_SQ_PRIO_IGNORE NVME_SQ_PRIO_URGENT,
-because if nvme's WRR is not enabled, the controller should ignore this fie=
-ld.
->
-> > +     }
-> >
-> >       clear_bit(NVMEQ_DELETE_ERROR, &nvmeq->flags);
-> >
->
-> > @@ -2028,35 +2079,73 @@ static int nvme_setup_host_mem(struct nvme_dev =
-*dev)
-> >  static void nvme_calc_irq_sets(struct irq_affinity *affd, unsigned int=
- nrirqs)
-> >  {
-> >       struct nvme_dev *dev =3D affd->priv;
-> > -     unsigned int nr_read_queues;
-> > +     unsigned int nr_total, nr, nr_read, nr_default;
-> > +     unsigned int nr_wrr_high, nr_wrr_medium, nr_wrr_low;
-> > +     unsigned int nr_sets;
-> >
-> >       /*
-> >        * If there is no interupt available for queues, ensure that
-> >        * the default queue is set to 1. The affinity set size is
-> >        * also set to one, but the irq core ignores it for this case.
-> > -      *
-> > -      * If only one interrupt is available or 'write_queue' =3D=3D 0, =
-combine
-> > -      * write and read queues.
-> > -      *
-> > -      * If 'write_queues' > 0, ensure it leaves room for at least one =
-read
-> > -      * queue.
-> >        */
-> > -     if (!nrirqs) {
-> > +     if (!nrirqs)
-> >               nrirqs =3D 1;
-> > -             nr_read_queues =3D 0;
-> > -     } else if (nrirqs =3D=3D 1 || !write_queues) {
-> > -             nr_read_queues =3D 0;
-> > -     } else if (write_queues >=3D nrirqs) {
-> > -             nr_read_queues =3D 1;
-> > -     } else {
-> > -             nr_read_queues =3D nrirqs - write_queues;
-> > -     }
-> >
-> > -     dev->io_queues[HCTX_TYPE_DEFAULT] =3D nrirqs - nr_read_queues;
-> > -     affd->set_size[HCTX_TYPE_DEFAULT] =3D nrirqs - nr_read_queues;
-> > -     dev->io_queues[HCTX_TYPE_READ] =3D nr_read_queues;
-> > -     affd->set_size[HCTX_TYPE_READ] =3D nr_read_queues;
-> > -     affd->nr_sets =3D nr_read_queues ? 2 : 1;
-> > +     nr_total =3D nrirqs;
-> > +
-> > +     nr_read =3D nr_wrr_high =3D nr_wrr_medium =3D nr_wrr_low =3D 0;
-> > +
-> > +     /* set default to 1, add all the rest queue to default at last */
-> > +     nr =3D nr_default =3D 1;
-> > +     nr_sets =3D 1;
-> > +
-> > +     nr_total -=3D nr;
-> > +     if (!nr_total)
-> > +             goto done;
-> > +
-> > +     /* read queues */
-> > +     nr_sets++;
-> > +     nr_read =3D nr =3D read_queues > nr_total ? nr_total : read_queue=
-s;
-> > +     nr_total -=3D nr;
-> > +     if (!nr_total)
-> > +             goto done;
-> > +
-> > +     /* wrr low queues */
-> > +     nr_sets++;
-> > +     nr_wrr_low =3D nr =3D wrr_low_queues > nr_total ? nr_total : wrr_=
-low_queues;
-> > +     nr_total -=3D nr;
-> > +     if (!nr_total)
-> > +             goto done;
-> > +
-> > +     /* wrr medium queues */
-> > +     nr_sets++;
-> > +     nr_wrr_medium =3D nr =3D wrr_medium_queues > nr_total ? nr_total =
-: wrr_medium_queues;
->
-> It looks like exceeded 80 chracters here.
-I will fix it.
->
-> > +     nr_total -=3D nr;
-> > +     if (!nr_total)
-> > +             goto done;
-> > +
-> > +     /* wrr high queues */
-> > +     nr_sets++;
-> > +     nr_wrr_high =3D nr =3D wrr_high_queues > nr_total ? nr_total : wr=
-r_high_queues;
-> > +     nr_wrr_high =3D nr =3D wrr_high_queues > nr_total ? nr_total : wr=
-r_high_queues;
->
-> Here also.
->
-> If I misunderstood something here, please feel free to let me know.
->
-Thanks very much for your feedback.
-> Thanks,
+PiBkaWZmIC0tZ2l0IGEvZnMvaW9fdXJpbmcuYyBiL2ZzL2lvX3VyaW5nLmMNCj4gaW5kZXggODZh
+MmJkNzIxOTAwLi40ODU4MzJkZWI3ZWEgMTAwNjQ0DQoNCkplbnMNCg0KVGhhbmtzISBJIHRlc3Rl
+ZCB0aGF0IGFuZCBpdCBzZWVtcyB0byByZXNvbHZlIHRoZSBHUEYuIEkgbm93IGdldCBhIEJhZCBm
+aWxlIGRlc2NyaXB0b3IgZXJyb3IgaW4gZmlvICh3aGljaCBpcyBJIHRoaW5rIHdoYXQgd2UnZCBl
+eHBlY3QpLiBJZiB5b3UgdHVybiB0aGF0IHBhdGNoIGludG8gYW4gb2ZmaWNpYWwga2VybmVsIHBh
+dGNoIGZlZWwgZnJlZSB0byBhZGQNCg0KVGVzdGVkLWJ5OiBTdGVwaGVuIEJhdGVzIDxzYmF0ZXNA
+cmFpdGhsaW4uY29tPg0KDQpiYXRlc3N0ZUBpb191cmluZy12bTE6fi9pb191cmluZy10ZXN0JCBz
+dWRvIGZpbyBmaW8vaW9fdXJpbmcuZmlvDQppb191cmluZzogKGc9MCk6IHJ3PXJ3LCBicz0oUikg
+NDA5NkItNDA5NkIsIChXKSA0MDk2Qi00MDk2QiwgKFQpIDQwOTZCLTQwOTZCLCBpb2VuZ2luZT1p
+b191cmluZywgaW9kZXB0aD0xDQpmaW8tMy4xNC03LWc3MTg0YQ0KU3RhcnRpbmcgMSBwcm9jZXNz
+DQpmaW86IGlvX3UgZXJyb3Igb24gZmlsZSAvZGV2L251bGxiMDogQmFkIGZpbGUgZGVzY3JpcHRv
+cjogcmVhZCBvZmZzZXQ9MCwgYnVmbGVuPTQwOTYNCg0KQ2hlZXJzDQogDQpTdGVwaGVuDQogDQoN
+Cu+7v09uIDIwMTktMDYtMjEsIDI6MTMgUE0sICJKZW5zIEF4Ym9lIiA8YXhib2VAa2VybmVsLmRr
+PiB3cm90ZToNCg0KICAgIE9uIDYvMjEvMTkgNjo0MCBBTSwgU3RlcGhlbiAgQmF0ZXMgd3JvdGU6
+DQogICAgPiBIaQ0KICAgID4gDQogICAgPiBJIGhpdCB0aGUgZm9sbG93aW5nIEdlbmVyYWwgUHJv
+dGVjdGlvbiBGYXVsdCB3aGVuIHRlc3RpbmcgaW9fdXJpbmcgdmlhIHRoZSBpb191cmluZyBlbmdp
+bmUgaW4gZmlvLiBUaGlzIHdhcyBvbiBhIFZNIHJ1bm5pbmcgNS4yLXJjNSBhbmQgdGhlIGxhdGVz
+dCB2ZXJzaW9uIG9mIGZpby4gVGhlIGlzc3VlIG9jY3VycyBmb3IgYm90aCBudWxsX2JsayBhbmQg
+ZmFrZSBOVk1lIGRyaXZlcy4gSSBoYXZlIG5vdCB0ZXN0ZWQgYmFyZSBtZXRhbCBvciByZWFsIE5W
+TWUgU1NEcy4gVGhlIGZpbyBzY3JpcHQgdXNlZCBpcyBnaXZlbiBiZWxvdy4NCiAgICA+IA0KICAg
+ID4gW2lvX3VyaW5nXQ0KICAgID4gdGltZV9iYXNlZD0xDQogICAgPiBydW50aW1lPTYwDQogICAg
+PiBmaWxlbmFtZT0vZGV2L252bWUybjEgKG5vdGUgL2Rldi9udWxsYjAgYWxzbyBmYWlscykNCiAg
+ICA+IGlvZW5naW5lPWlvX3VyaW5nDQogICAgPiBicz00aw0KICAgID4gcnc9cmVhZHdyaXRlDQog
+ICAgPiBkaXJlY3Q9MQ0KICAgID4gZml4ZWRidWZzPTENCiAgICA+IHNxdGhyZWFkX3BvbGw9MQ0K
+ICAgID4gc3F0aHJlYWRfcG9sbF9jcHU9MA0KICAgID4gDQogICAgPiBbICA5NjQuNTQwMzc0XSBn
+ZW5lcmFsIHByb3RlY3Rpb24gZmF1bHQ6IDAwMDAgWyMxXSBTTVAgUFRJDQogICAgPiBbICA5NjQu
+NTQyMDQxXSBDUFU6IDAgUElEOiA4NzIgQ29tbTogaW9fdXJpbmctc3EgTm90IHRhaW50ZWQgNS4y
+LjAtcmM1LWNwYWNrZXQtaW8tdXJpbmcgIzENCiAgICA+IFsgIDk2NC41NDU1ODldIEhhcmR3YXJl
+IG5hbWU6IFFFTVUgU3RhbmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBCSU9TIFVidW50
+dS0xLjguMi0xdWJ1bnR1MSAwNC8wMS8yMDE0DQogICAgPiBbICA5NjQuNTQ5NzYxXSBSSVA6IDAw
+MTA6ZnB1dF9tYW55KzB4Ny8weDkwDQogICAgPiBbICA5NjQuNTUxNTIyXSBDb2RlOiAwMSA0OCA4
+NSBmZiA3NCAxNyA1NSA0OCA4OSBlNSA1MyA0OCA4YiAxZiBlOCBhMCBmOSBmZiBmZiA0OCA4NSBk
+YiA0OCA4OSBkZiA3NSBmMCA1YiA1ZCBmMyBjMyAwZiAxZiA0MCAwMCAwZiAxZiA0NCAwMCAwMCA4
+OSBmNiA8ZjA+IDQ4IDI5IDc3IDM4IDc0IDAxIGMzIDU1IDQ4IDg5IGU1IDUzIDQ4IDg5IGZiIDY1
+IDQ4IFwNCiAgICA+IDhiIDNjIDI1IGMwDQogICAgPiBbICA5NjQuNTU5MDMxXSBSU1A6IDAwMTg6
+ZmZmZmFkZWI4MTdlYmM1MCBFRkxBR1M6IDAwMDEwMjQ2DQogICAgPiBbICA5NjQuNTYxMTEyXSBS
+QVg6IDAwMDAwMDAwMDAwMDAwMDQgUkJYOiBmZmZmOGY0NmFkNDc3NDgwIFJDWDogMDAwMDAwMDAw
+MDAwMTgwNQ0KICAgID4gWyAgOTY0LjU2MzkxMV0gUkRYOiAwMDAwMDAwMDAwMDAwMDAwIFJTSTog
+MDAwMDAwMDAwMDAwMDAwMSBSREk6IGYxOGI1MWI5YTM5NTUyYjUNCiAgICA+IFsgIDk2NC41NjY1
+ODBdIFJCUDogZmZmZmFkZWI4MTdlYmM1OCBSMDg6IGZmZmY4ZjQ2YjdhMzE4YzAgUjA5OiAwMDAw
+MDAwMDAwMDAwMTVkDQogICAgPiBbICA5NjQuNTY5MTA5XSBSMTA6IGZmZmZhZGViODE3ZWJjZTgg
+UjExOiAwMDAwMDAwMDAwMDAwMDIwIFIxMjogZmZmZjhmNDZhZDRjZDAwMA0KICAgID4gWyAgOTY0
+LjU3MTYyM10gUjEzOiAwMDAwMDAwMGZmZmZmZmY3IFIxNDogZmZmZmFkZWI4MTdlYmUzMCBSMTU6
+IDAwMDAwMDAwMDAwMDAwMDQNCiAgICA+IFsgIDk2NC41NzQxNTNdIEZTOiAgMDAwMDAwMDAwMDAw
+MDAwMCgwMDAwKSBHUzpmZmZmOGY0NmI3YTAwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAw
+MDANCiAgICA+IFsgIDk2NC41NzcwMjBdIENTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6
+IDAwMDAwMDAwODAwNTAwMzMNCiAgICA+IFsgIDk2NC41Nzg5MTddIENSMjogMDAwMDU1ODI4ZjBi
+YmJmMCBDUjM6IDAwMDAwMDAyMzIxNzYwMDQgQ1I0OiAwMDAwMDAwMDAwMzYwNmYwDQogICAgPiBb
+ICA5NjQuNTgxMjIxXSBEUjA6IDAwMDAwMDAwMDAwMDAwMDAgRFIxOiAwMDAwMDAwMDAwMDAwMDAw
+IERSMjogMDAwMDAwMDAwMDAwMDAwMA0KICAgID4gWyAgOTY0LjU4MzUxMV0gRFIzOiAwMDAwMDAw
+MDAwMDAwMDAwIERSNjogMDAwMDAwMDBmZmZlMGZmMCBEUjc6IDAwMDAwMDAwMDAwMDA0MDANCiAg
+ICA+IFsgIDk2NC41ODU4MDhdIENhbGwgVHJhY2U6DQogICAgPiBbICA5NjQuNTg2NjI2XSAgPyBm
+cHV0KzB4MTMvMHgyMA0KICAgID4gWyAgOTY0LjU4NzYxM10gIGlvX2ZyZWVfcmVxKzB4MjAvMHg0
+MA0KICAgID4gWyAgOTY0LjU4ODczM10gIGlvX3B1dF9yZXErMHgxYi8weDIwDQogICAgPiBbICA5
+NjQuNTg5Nzk1XSAgaW9fc3VibWl0X3NxZSsweDQwYS8weDY4MA0KICAgID4gWyAgOTY0LjU5MDkx
+OV0gID8gX19zd2l0Y2hfdG9fYXNtKzB4MzQvMHg3MA0KICAgID4gWyAgOTY0LjU5MjA5MF0gID8g
+X19zd2l0Y2hfdG9fYXNtKzB4NDAvMHg3MA0KICAgID4gWyAgOTY0LjU5MzI3MF0gIGlvX3N1Ym1p
+dF9zcWVzKzB4YjkvMHgxNjANCiAgICA+IFsgIDk2NC41OTQzOTJdICA/IGlvX3N1Ym1pdF9zcWVz
+KzB4YjkvMHgxNjANCiAgICA+IFsgIDk2NC41OTU1NjRdICA/IF9fc3dpdGNoX3RvX2FzbSsweDQw
+LzB4NzANCiAgICA+IFsgIDk2NC41OTY3MzddICA/IF9fc3dpdGNoX3RvX2FzbSsweDM0LzB4NzAN
+CiAgICA+IFsgIDk2NC41OTc5MThdICA/IF9fc2NoZWR1bGUrMHgzZjIvMHg2YTANCiAgICA+IFsg
+IDk2NC41OTkwMTVdICA/IF9fc3dpdGNoX3RvX2FzbSsweDM0LzB4NzANCiAgICA+IFsgIDk2NC42
+MDA0NDRdICBpb19zcV90aHJlYWQrMHgxYWYvMHg0NzANCiAgICA+IFsgIDk2NC42MDE1NjhdICA/
+IF9fc3dpdGNoX3RvX2FzbSsweDM0LzB4NzANCiAgICA+IFsgIDk2NC42MDI2NTVdICA/IHdhaXRf
+d29rZW4rMHg4MC8weDgwDQogICAgPiBbICA5NjQuNjAzNjI1XSAgPyBfX3N3aXRjaF90bysweDg1
+LzB4NDEwDQogICAgPiBbICA5NjQuNjA0NjM4XSAgPyBfX3N3aXRjaF90b19hc20rMHg0MC8weDcw
+DQogICAgPiBbICA5NjQuNjA1NzI2XSAgPyBfX3N3aXRjaF90b19hc20rMHgzNC8weDcwDQogICAg
+PiBbICA5NjQuNjA2ODExXSAgPyBfX3NjaGVkdWxlKzB4M2YyLzB4NmEwDQogICAgPiBbICA5NjQu
+NjA3ODI3XSAga3RocmVhZCsweDEwNS8weDE0MA0KICAgID4gWyAgOTY0LjYwODcyNV0gID8gaW9f
+c3VibWl0X3NxZXMrMHgxNjAvMHgxNjANCiAgICA+IFsgIDk2NC42MDk4MzZdICA/IGt0aHJlYWQr
+MHgxMDUvMHgxNDANCiAgICA+IFsgIDk2NC42MTA3ODBdICA/IGlvX3N1Ym1pdF9zcWVzKzB4MTYw
+LzB4MTYwDQogICAgPiBbICA5NjQuNjExODg3XSAgPyBrdGhyZWFkX2Rlc3Ryb3lfd29ya2VyKzB4
+NTAvMHg1MA0KICAgID4gWyAgOTY0LjYxMzE1OF0gIHJldF9mcm9tX2ZvcmsrMHgzNS8weDQwDQog
+ICAgPiBbICA5NjQuNjE0MTQ4XSBNb2R1bGVzIGxpbmtlZCBpbjogY3JjdDEwZGlmX3BjbG11bCBj
+cmMzMl9wY2xtdWwgZ2hhc2hfY2xtdWxuaV9pbnRlbCBhZXNuaV9pbnRlbCBhZXNfeDg2XzY0IGNy
+eXB0b19zaW1kIGNyeXB0ZCBnbHVlX2hlbHBlciBqb3lkZXYgaW5wdXRfbGVkcyBzZXJpb19yYXcg
+bWFjX2hpZCBzY2hfZnFfY29kZWwgc3VucnBjIG51bGxfYmxrIFwNCiAgICA+IGlwX3RhYmxlcyB4
+X3RhYmxlcyBhdXRvZnM0IDgxMzl0b28gcHNtb3VzZSA4MTM5Y3AgZmxvcHB5IG1paSBpMmNfcGlp
+eDQgcGF0YV9hY3BpDQogICAgPiBbICA5NjQuNjIwODU2XSAtLS1bIGVuZCB0cmFjZSBiZGJiYTgx
+OGIzMTAyNzJjIF0tLS0NCiAgICANCiAgICBUcnkgdGhpcyBwYXRjaC4gVGVjaG5pY2FsbHksIGl0
+J3Mgbm90IHZhbGlkIHRvIHVzZSBzcXRocmVhZCB3aXRob3V0DQogICAgZml4ZWQgZmlsZXMgcmVn
+aXN0ZXJlZCB0aHJvdWdoIGlvX3VyaW5nX3JlZ2lzdGVyKCksIGFuZCB0aGlzIGNhc2UNCiAgICBs
+b29rcyB0byBtZSBsaWtlIHdlJ3JlIGp1c3Qgbm90IGluaXRpYWxpemluZyAtPmZpbGUgYmVmb3Jl
+IHdlIGVuZA0KICAgIHVwIGZhaWxpbmcgdGhlIHJlcXVlc3QgZHVlIHRvIGEgdmlvbGF0aW9uIG9m
+IHRoYXQgcmVxdWlyZW1lbnQuDQogICAgDQogICAgTm90IHRlc3RlZCwgb24gdmFjYXRpb24uLi4N
+CiAgICANCiAgICANCiAgICBkaWZmIC0tZ2l0IGEvZnMvaW9fdXJpbmcuYyBiL2ZzL2lvX3VyaW5n
+LmMNCiAgICBpbmRleCA4NmEyYmQ3MjE5MDAuLjQ4NTgzMmRlYjdlYSAxMDA2NDQNCiAgICAtLS0g
+YS9mcy9pb191cmluZy5jDQogICAgKysrIGIvZnMvaW9fdXJpbmcuYw0KICAgIEBAIC01NzksNiAr
+NTc5LDcgQEAgc3RhdGljIHN0cnVjdCBpb19raW9jYiAqaW9fZ2V0X3JlcShzdHJ1Y3QgaW9fcmlu
+Z19jdHggKmN0eCwNCiAgICAgCQlzdGF0ZS0+Y3VyX3JlcSsrOw0KICAgICAJfQ0KICAgICANCiAg
+ICArCXJlcS0+ZmlsZSA9IE5VTEw7DQogICAgIAlyZXEtPmN0eCA9IGN0eDsNCiAgICAgCXJlcS0+
+ZmxhZ3MgPSAwOw0KICAgICAJLyogb25lIGlzIGRyb3BwZWQgYWZ0ZXIgc3VibWlzc2lvbiwgdGhl
+IG90aGVyIGF0IGNvbXBsZXRpb24gKi8NCiAgICBAQCAtMTgwMSwxMCArMTgwMiw4IEBAIHN0YXRp
+YyBpbnQgaW9fcmVxX3NldF9maWxlKHN0cnVjdCBpb19yaW5nX2N0eCAqY3R4LCBjb25zdCBzdHJ1
+Y3Qgc3FlX3N1Ym1pdCAqcywNCiAgICAgCQlyZXEtPnNlcXVlbmNlID0gY3R4LT5jYWNoZWRfc3Ff
+aGVhZCAtIDE7DQogICAgIAl9DQogICAgIA0KICAgIC0JaWYgKCFpb19vcF9uZWVkc19maWxlKHMt
+PnNxZSkpIHsNCiAgICAtCQlyZXEtPmZpbGUgPSBOVUxMOw0KICAgICsJaWYgKCFpb19vcF9uZWVk
+c19maWxlKHMtPnNxZSkpDQogICAgIAkJcmV0dXJuIDA7DQogICAgLQl9DQogICAgIA0KICAgICAJ
+aWYgKGZsYWdzICYgSU9TUUVfRklYRURfRklMRSkgew0KICAgICAJCWlmICh1bmxpa2VseSghY3R4
+LT51c2VyX2ZpbGVzIHx8DQogICAgDQogICAgLS0gDQogICAgSmVucyBBeGJvZQ0KICAgIA0KICAg
+IA0KDQo=
