@@ -2,132 +2,168 @@ Return-Path: <SRS0=qpPD=UU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C05C43613
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03B26C48BE3
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:59:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 32A502083B
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:39:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3D9320B1F
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:59:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="phxZn7Y8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726054AbfFUHjn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jun 2019 03:39:43 -0400
-Received: from mx2.suse.de ([195.135.220.15]:43124 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726027AbfFUHjn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jun 2019 03:39:43 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 791FBAC4E;
-        Fri, 21 Jun 2019 07:39:41 +0000 (UTC)
-Subject: Re: [PATCH V5 5/5] f2fs: use block layer helper for show_bio_op macro
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk
-References: <20190620175919.3273-1-chaitanya.kulkarni@wdc.com>
- <20190620175919.3273-6-chaitanya.kulkarni@wdc.com>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <06714e3d-be00-8425-9888-edb46c1c4185@suse.de>
-Date:   Fri, 21 Jun 2019 09:39:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+        id S1726333AbfFUH71 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jun 2019 03:59:27 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:35823 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726057AbfFUH70 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Jun 2019 03:59:26 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20190621075924euoutp0164de99f618490c7ce359349d007d375a~qJ8jjoTbg1980119801euoutp01V
+        for <linux-block@vger.kernel.org>; Fri, 21 Jun 2019 07:59:24 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20190621075924euoutp0164de99f618490c7ce359349d007d375a~qJ8jjoTbg1980119801euoutp01V
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1561103964;
+        bh=OfcYrq4Mw2C7QWJTKY9iTkWlTTeEKFz3rb4XsrYlvSc=;
+        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
+        b=phxZn7Y8JsJWjW3gXWehIfh3D2gHgWfrmmn+ULt/4KRmscLCzVW1p3k2Owzefe8uX
+         gGg2KQfAS38Dk7IAsKt6SQwZRApV9h4vWvB57M95SG75YIaZyCqHa+xDnMdsBttH1n
+         wA6mA0vlzYl/lRozgEe1GKMGYAT+JBp9BarsnvG4=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20190621075923eucas1p2536fc35606737bb63156849d3b31a260~qJ8i5G_Fm2093320933eucas1p2D;
+        Fri, 21 Jun 2019 07:59:23 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 65.35.04377.B5E8C0D5; Fri, 21
+        Jun 2019 08:59:23 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20190621075922eucas1p1f24348c3e298df3920d6be6ccc25cf9a~qJ8h8sPIR2245922459eucas1p1N;
+        Fri, 21 Jun 2019 07:59:22 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20190621075922eusmtrp257b4c84900cccac29fd04b8da5952db3~qJ8huVMrT1501015010eusmtrp2I;
+        Fri, 21 Jun 2019 07:59:22 +0000 (GMT)
+X-AuditID: cbfec7f4-12dff70000001119-55-5d0c8e5b694b
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 8A.CE.04140.A5E8C0D5; Fri, 21
+        Jun 2019 08:59:22 +0100 (BST)
+Received: from [106.120.50.25] (unknown [106.120.50.25]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20190621075922eusmtip2838999876e871ae7349f3cd880c88bb3~qJ8hQtFVt1543515435eusmtip2s;
+        Fri, 21 Jun 2019 07:59:22 +0000 (GMT)
+Subject: Re: [RFC PATCH v7 2/5] iommu/dma: Add a new dma_map_ops of
+ get_merge_boundary()
+To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        ulf.hansson@linaro.org, hch@lst.de, robin.murphy@arm.com,
+        joro@8bytes.org, axboe@kernel.dk
+Cc:     wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org
+From:   Marek Szyprowski <m.szyprowski@samsung.com>
+Message-ID: <8bce95ea-93ac-e783-af7c-ec5bfb8e82f6@samsung.com>
+Date:   Fri, 21 Jun 2019 09:59:21 +0200
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+        Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190620175919.3273-6-chaitanya.kulkarni@wdc.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1561020610-953-3-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUhTYRTHe3bvtru5yXVaO2kYTCoq0oygS4YUBN1PFX2RnFIzb1Pcpuw2
+        LYMYClYrpr2QtqKslFm+RaQt7W1LXeVavmNhsGq0NFbhtCit5XZn+e33P+d/nv858BCYrI8f
+        T+TrDjF6nUqjEIjx9p6f7nVKsyR7vfNLEtX4tlJA3Wzs5lG1j9Ook5duC6mHb9ZSXcFKRLWN
+        f+FR9m9ePuVszqDM7h3U9MOAYGsU7bVf4dFNV5oQPfjSQI+NPBDQ50atiO58bRTQ311ncPrj
+        tVacDtxJ3C3KFG/JZTT5xYw+JX2/OK+79Qle5JUcrm4ZwIyoTmxCIgLIjfDH5MFNSEzIyAYE
+        v/sDETGF4OunmYgIIKgOTvPnRyrqZjGuYUVQ6xrjc8KPoNxsF4ZcsWQmjBy38UIcR9YguO3b
+        GjJhZD2CH5Onwk8JyFQw+U2CEEvJdPDZrCjEOLkCbnQOhnkxmQU1Nh/OeWLg+UVvmEXkLmio
+        exEOwMjlcM9/GeNYDm+8V3mhMCDfC+GcyxjZezvY35chjmNhwnlXyPEyCN6fHyhH8M7dLOTE
+        aQSDZTWRiTR46uyfe4mYi1gNrR0pXHkbOF0TeKgMZDSM+mO4JaLhbHs1xpWlcKJCxrlXgsXZ
+        8i/W3jeAVSGFZcFplgXnWBacY/mfW4vwW0jOGFitmmE36JiSZFalZQ06dfKBQu0dNPfPev84
+        p2yoYzbHgUgCKSTSJ5aobBlfVcwe0ToQEJgiTirRSLJl0lzVkVJGX7hPb9AwrAMlELhCLj26
+        yKOUkWrVIaaAYYoY/XyXR4jijWhJwcY917IeHU1SejZVHZzaMf7LPepWWg7b41+dlxS3t+09
+        3q4VDe1Pj96zryu5oqrsY8bjtPKGxkR3femFkWcnJuS9rMvTkbg0JzjjdxwzXwx8sGZv2DbU
+        0w+Tndc3r6nEo3wwa5weFs6sUvnQsUU7TyYY1Jl9CZPDOsvQ2OcSBc7mqVLXYHpW9ReEpLrc
+        YwMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrEIsWRmVeSWpSXmKPExsVy+t/xe7pRfTyxBq2tqhar7/azWaxcfZTJ
+        YsF+a4vO2RvYLfbe0rY48r+f0WLry3dMFgc/PGG1OL423KLvnLvF172f2Ry4PZ4cnMfksWbe
+        GkaPy2dLPe5c28PmMfnGckaP3Tcb2Dy+nZnI4vFs4XoWj8+b5AI4o/RsivJLS1IVMvKLS2yV
+        og0tjPQMLS30jEws9QyNzWOtjEyV9O1sUlJzMstSi/TtEvQyjq4/wFLwhKdi+rpLzA2MS7i6
+        GDk5JARMJNqW/GHuYuTiEBJYyijxbu19doiEjMTJaQ2sELawxJ9rXWwgtpDAa0aJWRPKQGxh
+        gSiJa+07mECaRQRmMEosWtrADuIwg0za9uovK8TY54wS+372gLWzCRhKdL2FGMUrYCfxfMdy
+        RhCbRUBVYvHuy2C2qECMxP6Dt1kgagQlTs58AmZzCvhLrFhyignEZhYwk5i3+SEzhC0vsf3t
+        HChbXOLWk/lMExiFZiFpn4WkZRaSlllIWhYwsqxiFEktLc5Nzy020itOzC0uzUvXS87P3cQI
+        jN9tx35u2cHY9S74EKMAB6MSD++BWdyxQqyJZcWVuYcYJTiYlUR4eXJ4YoV4UxIrq1KL8uOL
+        SnNSiw8xmgI9N5FZSjQ5H5ha8kriDU0NzS0sDc2NzY3NLJTEeTsEDsYICaQnlqRmp6YWpBbB
+        9DFxcEo1MC78xfGnY0IyZ61r980Cufu8AUni+2U2Ts5eLZFYXhSwse5W7ar1TbvjpvTEa9em
+        i/d/4e89bxwf8uLMnQKjtm1LfHgZ1d7HSs2YGq/eFvjpsb357RMl1Q9eSb04F7iafcrUl7fu
+        Tev7W3H3Vt8ijrVZS/WM/U8wTeQLbJjy4c6lZ97Fdu5cWUosxRmJhlrMRcWJAEiMPOH1AgAA
+X-CMS-MailID: 20190621075922eucas1p1f24348c3e298df3920d6be6ccc25cf9a
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20190620085043epcas2p1f17aa71e547cf3d2b74dfc0c0dcc5ccb
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20190620085043epcas2p1f17aa71e547cf3d2b74dfc0c0dcc5ccb
+References: <1561020610-953-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+        <CGME20190620085043epcas2p1f17aa71e547cf3d2b74dfc0c0dcc5ccb@epcas2p1.samsung.com>
+        <1561020610-953-3-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/20/19 7:59 PM, Chaitanya Kulkarni wrote:
-> Adjust the f2fs tracing code to use newly introduced block layer
-> function blk_op_str() which converts the REQ_OP_XXX into the string
-> XXX.
-> 
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Hi,
+
+On 2019-06-20 10:50, Yoshihiro Shimoda wrote:
+> This patch adds a new dma_map_ops of get_merge_boundary() to
+> expose the DMA merge boundary if the domain type is IOMMU_DOMAIN_DMA.
+>
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 > ---
->  include/trace/events/f2fs.h | 11 +----------
->  1 file changed, 1 insertion(+), 10 deletions(-)
-> 
-> diff --git a/include/trace/events/f2fs.h b/include/trace/events/f2fs.h
-> index 53b96f12300c..e3dc031af7f5 100644
-> --- a/include/trace/events/f2fs.h
-> +++ b/include/trace/events/f2fs.h
-> @@ -76,16 +76,7 @@ TRACE_DEFINE_ENUM(CP_TRIMMED);
->  #define show_bio_type(op,op_flags)	show_bio_op(op),		\
->  						show_bio_op_flags(op_flags)
->  
-> -#define show_bio_op(op)							\
-> -	__print_symbolic(op,						\
-> -		{ REQ_OP_READ,			"READ" },		\
-> -		{ REQ_OP_WRITE,			"WRITE" },		\
-> -		{ REQ_OP_FLUSH,			"FLUSH" },		\
-> -		{ REQ_OP_DISCARD,		"DISCARD" },		\
-> -		{ REQ_OP_SECURE_ERASE,		"SECURE_ERASE" },	\
-> -		{ REQ_OP_ZONE_RESET,		"ZONE_RESET" },		\
-> -		{ REQ_OP_WRITE_SAME,		"WRITE_SAME" },		\
-> -		{ REQ_OP_WRITE_ZEROES,		"WRITE_ZEROES" })
-> +#define show_bio_op(op)		blk_op_str(op)
->  
->  #define show_bio_op_flags(flags)					\
->  	__print_flags(F2FS_BIO_FLAG_MASK(flags), "|",			\
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+>   drivers/iommu/dma-iommu.c | 11 +++++++++++
+>   1 file changed, 11 insertions(+)
+>
+> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+> index 205d694..9950cb5 100644
+> --- a/drivers/iommu/dma-iommu.c
+> +++ b/drivers/iommu/dma-iommu.c
+> @@ -1091,6 +1091,16 @@ static int iommu_dma_get_sgtable(struct device *dev, struct sg_table *sgt,
+>   	return ret;
+>   }
+>   
+> +static unsigned long iommu_dma_get_merge_boundary(struct device *dev)
+> +{
+> +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+> +
+> +	if (domain->type != IOMMU_DOMAIN_DMA)
+> +		return 0;	/* can't merge */
+> +
+> +	return (1 << __ffs(domain->pgsize_bitmap)) - 1;
+> +}
 
-Cheers,
+I really wonder if there is any IOMMU, which doesn't support 4KiB pages. 
+Cannot you simply assume that the merge boundary is 4KiB and avoid 
+adding this new API?
 
-Hannes
+> +
+>   static const struct dma_map_ops iommu_dma_ops = {
+>   	.alloc			= iommu_dma_alloc,
+>   	.free			= iommu_dma_free,
+> @@ -1106,6 +1116,7 @@ static const struct dma_map_ops iommu_dma_ops = {
+>   	.sync_sg_for_device	= iommu_dma_sync_sg_for_device,
+>   	.map_resource		= iommu_dma_map_resource,
+>   	.unmap_resource		= iommu_dma_unmap_resource,
+> +	.get_merge_boundary	= iommu_dma_get_merge_boundary,
+>   };
+>   
+>   /*
+
+Best regards
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
+
