@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE11C43613
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DDD1C43613
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:39:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BBF922083B
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:38:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB2702083B
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 07:39:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726250AbfFUHii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jun 2019 03:38:38 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42982 "EHLO mx1.suse.de"
+        id S1726045AbfFUHjA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jun 2019 03:39:00 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43060 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726027AbfFUHih (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jun 2019 03:38:37 -0400
+        id S1726027AbfFUHi7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Jun 2019 03:38:59 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id BDE9EAC4E;
-        Fri, 21 Jun 2019 07:38:35 +0000 (UTC)
-Subject: Re: [PATCH V5 2/5] block: add centralize REQ_OP_XXX to string helper
+        by mx1.suse.de (Postfix) with ESMTP id 1B102AC4E;
+        Fri, 21 Jun 2019 07:38:58 +0000 (UTC)
+Subject: Re: [PATCH V5 3/5] block: use blk_op_str() in blk-mq-debugfs.c
 To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk
 References: <20190620175919.3273-1-chaitanya.kulkarni@wdc.com>
- <20190620175919.3273-3-chaitanya.kulkarni@wdc.com>
+ <20190620175919.3273-4-chaitanya.kulkarni@wdc.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -73,12 +73,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <83c2eed6-1895-5e6c-23c8-7227553964a5@suse.de>
-Date:   Fri, 21 Jun 2019 09:38:35 +0200
+Message-ID: <5c124834-6583-2434-f43f-18c15e74e7ab@suse.de>
+Date:   Fri, 21 Jun 2019 09:38:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190620175919.3273-3-chaitanya.kulkarni@wdc.com>
+In-Reply-To: <20190620175919.3273-4-chaitanya.kulkarni@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -88,25 +88,17 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 6/20/19 7:59 PM, Chaitanya Kulkarni wrote:
-> In order to centralize the REQ_OP_XXX to string conversion which can be
-> used in the block layer and different places in the kernel like f2fs,
-> this patch adds a new helper function along with an array similar to the
-> one present in the blk-mq-debugfs.c.
-> 
-> We keep this helper functionality centralize under blk-core.c instead of
-> blk-mq-debugfs.c since blk-core.c is configured using CONFIG_BLOCK and
-> it will not be dependent on blk-mq-debugfs.c which is configured using
-> CONFIG_BLK_DEBUG_FS.
-> 
-> Next patch adjusts the code in the blk-mq-debugfs.c with newly
-> introduced helper.
+> Now that we've a helper function blk_op_str() to convert the
+> REQ_OP_XXX to string XXX, adjust the code to use that. Get rid of
+> the duplicate array op_name which is now present in the blk-core.c
+> which we renamed it to "blk_op_name" and open coding in the
+> blk-mq-debugfs.c.
 > 
 > Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 > Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 > ---
->  block/blk-core.c       | 36 ++++++++++++++++++++++++++++++++++++
->  include/linux/blkdev.h |  3 +++
->  2 files changed, 39 insertions(+)
+>  block/blk-mq-debugfs.c | 24 ++++--------------------
+>  1 file changed, 4 insertions(+), 20 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
