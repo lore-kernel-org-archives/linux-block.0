@@ -2,80 +2,87 @@ Return-Path: <SRS0=qpPD=UU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 734A0C43613
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 08:23:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B368C43613
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 08:48:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 39CB9214AF
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 08:23:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5386D2089E
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jun 2019 08:48:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Tx8dE9kf"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="g5YlHCaQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726074AbfFUIXH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jun 2019 04:23:07 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:39858 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726045AbfFUIXH (ORCPT
+        id S1726210AbfFUIsz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jun 2019 04:48:55 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:35608 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726055AbfFUIsz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jun 2019 04:23:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=hSWwJMZClWxLlMFotPRfl8SxjdwJbH68GW2swFT/BBg=; b=Tx8dE9kfJC7z1d5Gqf19YDrRe
-        TvvK5sFndH6tXKiL1bOn6pqiHumzmY1zHpqUBCVt05Q6UnZaOPLMGzZoUlwDD6w8qwsxCapzULZ+2
-        1miP4tqVjKX+N7eyjTMEfsX+KARFU8Azkc8fYGu7FRkHMjJexsCBJwf/3uiTK3yHwRr1doGAZBKgC
-        Ff6kOVVtfhCg01WsiGtJB6DwjW7TJJoUEwB/5MXz028hzinT9rKYbpj4KNF6LMihNei5ExbxVWF6Y
-        edj6cHjjPXBWzxEHyePXY1waQsh+ypgrbjvKBWWZ7JKXUoN4p6BmzR+IK315qfHzih3Gl0SCIHhCF
-        jtLfOydHg==;
-Received: from 212095005057.public.telering.at ([212.95.5.57] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1heEp3-0002VG-63; Fri, 21 Jun 2019 08:23:01 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk, tj@kernel.org, lizefan@huawei.com,
+        Fri, 21 Jun 2019 04:48:55 -0400
+Received: by mail-ed1-f65.google.com with SMTP id w20so1356827edd.2
+        for <linux-block@vger.kernel.org>; Fri, 21 Jun 2019 01:48:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=t6tylhnbQpj1jAhFBa0rAUXZzkXjsMfz2Ana0lXAfNo=;
+        b=g5YlHCaQAlLDmldSUhxDuKeMbwZmSdbJP0pdBqdPrpFMWSk7NgHLSpYUCCbFImSvLv
+         sU9VkypB9692DZ2w3qjFUUf6N8aEyKwznxxI7KCEmeeeN7i0lzx8fwSxZTxdAreMec4M
+         UcdMadpgDWCmgAwgad1ZcdAAIzsuVFGP3PptjVlyKyrIbPMJEwbfpOjqaHLnk0hfz+Xu
+         +dWweoGYFf/FyWkxB0b66zXxIzO9HzxCpx5MxVq6wMMkxXxTY3KCNzLMV14Yuvy0JK9L
+         xzppw9j+ZK1KOEYZaWwB/unBbWK+0DBLmNGN9FEZ1pMyhXP+uWTxMxXSe6Au55r/anyg
+         vqpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=t6tylhnbQpj1jAhFBa0rAUXZzkXjsMfz2Ana0lXAfNo=;
+        b=J4zWvPo8Uko6zMwNNSYxb8+9MNXQvwKN5yltH3/1TWhM+HeavKe1Qj759ORKi3a3Zj
+         wEmq5vMXWUTBUCVfTFK/Xl3s3wdUPdDUoNI1KYmwLGPXRGkx7K1QKlssQG+NEWXzercA
+         /tFjy1UoLemkPYVHH+vgqLzZT5Aqz1KyvaE3WTelb6kPA8/Fisr/2WSM0U1m85xi0/ZV
+         u1GQYVOmdb6T1Hrb7mklIulhg2+VT5JZJrt9RgZCV0HAMHJRQGFaAsdhabMB3jkYyLgd
+         vlAcBK99xL7SikjuZgoFFbb5f6EbR7JMdFfNpjKYZKveifhD+NHdDZAGtiqdR34+6YM9
+         7fJw==
+X-Gm-Message-State: APjAAAUm8jENG+ckRGqdeN/eozzG0kr48nSEM74kUlYpnmqmHRa0vYTd
+        b9IK+ws8uYBbJ/e4bO/bK0EZ498Ftd7TYwHR
+X-Google-Smtp-Source: APXvYqyUkh2RasSYvNJRiNGjFx2DUsNhZL3V6e4Q95Cp5/uZbHJ7uOjwN8WR2atsf+BlT1S0Vevkhw==
+X-Received: by 2002:a17:906:2605:: with SMTP id h5mr89106520ejc.178.1561106933830;
+        Fri, 21 Jun 2019 01:48:53 -0700 (PDT)
+Received: from [192.168.1.208] (ip-5-186-115-204.cgn.fibianet.dk. [5.186.115.204])
+        by smtp.gmail.com with ESMTPSA id m6sm638892ede.2.2019.06.21.01.48.52
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 21 Jun 2019 01:48:52 -0700 (PDT)
+Subject: Re: [PATCH for-block] cgroup: export css_next_descendant_pre for bfq
+To:     Christoph Hellwig <hch@lst.de>, tj@kernel.org, lizefan@huawei.com,
         hannes@cmpxchg.org, linux-block@vger.kernel.org
 Cc:     cgroups@vger.kernel.org
-Subject: [PATCH for-block] cgroup: export css_next_descendant_pre for bfq
-Date:   Fri, 21 Jun 2019 10:22:48 +0200
-Message-Id: <20190621082248.11427-1-hch@lst.de>
-X-Mailer: git-send-email 2.20.1
+References: <20190621082248.11427-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c516717e-fb04-108a-02d4-28ed37140f1b@kernel.dk>
+Date:   Fri, 21 Jun 2019 02:48:51 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20190621082248.11427-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The bfq schedule now uses css_next_descendant_pre directly after
-the stats functionality depending on it has been from the core
-blk-cgroup code to bfq.  Export the symbol so that bfq can still
-be build modular.
+On 6/21/19 2:22 AM, Christoph Hellwig wrote:
+> The bfq schedule now uses css_next_descendant_pre directly after
+> the stats functionality depending on it has been from the core
+> blk-cgroup code to bfq.  Export the symbol so that bfq can still
+> be build modular.
 
-Fixes: d6258980daf2 ("bfq-iosched: move bfq_stat_recursive_sum into the only caller")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- kernel/cgroup/cgroup.c | 1 +
- 1 file changed, 1 insertion(+)
+Applied, thanks.
 
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index 426a0026225c..30aba80858e3 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -4221,6 +4221,7 @@ css_next_descendant_pre(struct cgroup_subsys_state *pos,
- 
- 	return NULL;
- }
-+EXPORT_SYMBOL_GPL(css_next_descendant_pre);
- 
- /**
-  * css_rightmost_descendant - return the rightmost descendant of a css
 -- 
-2.20.1
+Jens Axboe
 
