@@ -2,90 +2,258 @@ Return-Path: <SRS0=7YUI=UX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D95F0C48BE8
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 06:24:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C0E4C43613
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 07:00:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BCCD021655
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 06:24:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 343AF2089F
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 07:00:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727648AbfFXGYp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jun 2019 02:24:45 -0400
-Received: from verein.lst.de ([213.95.11.211]:52695 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727649AbfFXGYp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 02:24:45 -0400
-Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 19E9568AFE; Mon, 24 Jun 2019 08:24:15 +0200 (CEST)
-Date:   Mon, 24 Jun 2019 08:24:14 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc:     ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
-        robin.murphy@arm.com, joro@8bytes.org, axboe@kernel.dk,
-        wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org
-Subject: Re: [RFC PATCH v7 5/5] mmc: queue: Use bigger segments if DMA MAP
- layer can merge the segments
-Message-ID: <20190624062414.GD2989@lst.de>
-References: <1561020610-953-1-git-send-email-yoshihiro.shimoda.uh@renesas.com> <1561020610-953-6-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+        id S1727112AbfFXHAI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jun 2019 03:00:08 -0400
+Received: from mx2.suse.de ([195.135.220.15]:53966 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726077AbfFXHAI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Jun 2019 03:00:08 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 231F7AF99;
+        Mon, 24 Jun 2019 07:00:06 +0000 (UTC)
+Subject: Re: [PATCH] bcache: make stripe_size configurable and persistent for
+ hardware raid5/6
+To:     Eric Wheeler <bcache@lists.ewheeler.net>
+Cc:     linux-block@vger.kernel.org, Eric Wheeler <git@linux.ewheeler.net>,
+        Eric Wheeler <bcache@linux.ewheeler.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BCACHE (BLOCK LAYER CACHE)" <linux-bcache@vger.kernel.org>
+References: <d3f7fd44-9287-c7fa-ee95-c3b8a4d56c93@suse.de>
+ <1561245371-10235-1-git-send-email-bcache@lists.ewheeler.net>
+From:   Coly Li <colyli@suse.de>
+Openpgp: preference=signencrypt
+Organization: SUSE Labs
+Message-ID: <1185f3ad-ac4c-7f48-206f-22fdbbfe289e@suse.de>
+Date:   Mon, 24 Jun 2019 14:57:42 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1561020610-953-6-git-send-email-yoshihiro.shimoda.uh@renesas.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <1561245371-10235-1-git-send-email-bcache@lists.ewheeler.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 20, 2019 at 05:50:10PM +0900, Yoshihiro Shimoda wrote:
-> When the max_segs of a mmc host is smaller than 512, the mmc
-> subsystem tries to use 512 segments if DMA MAP layer can merge
-> the segments, and then the mmc subsystem exposes such information
-> to the block layer by using blk_queue_can_use_dma_map_merging().
+On 2019/6/23 7:16 上午, Eric Wheeler wrote:
+> From: Eric Wheeler <git@linux.ewheeler.net>
 > 
-> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> While some drivers set queue_limits.io_opt (e.g., md raid5), there are
+> currently no SCSI/RAID controller drivers that do.  Previously stripe_size
+> and partial_stripes_expensive were read-only values and could not be
+> tuned by users (eg, for hardware RAID5/6).
+> 
+> This patch enables users to save the optimal IO size via sysfs through
+> the backing device attributes stripe_size and partial_stripes_expensive
+> into the bcache superblock.
+> 
+> Superblock changes are backwards-compatable:
+> 
+> *  partial_stripes_expensive: One bit was used in the superblock flags field
+> 
+> *  stripe_size: There are eight 64-bit "pad" fields for future use in
+>    the superblock which default to 0; from those, 32-bits are now used
+>    to save the stripe_size and load at device registration time.
+> 
+> Signed-off-by: Eric Wheeler <bcache@linux.ewheeler.net>
+
+Hi Eric,
+
+In general I am OK with this patch. Since Peter comments lots of SCSI
+RAID devices reports a stripe width, could you please list the hardware
+raid devices which don't list stripe size ? Then we can make decision
+whether it is necessary to have such option enabled.
+
+Another point is, this patch changes struct cache_sb, it is no problem
+to change on-disk format. I plan to update the super block version soon,
+to store more configuration persistently into super block. stripe_size
+can be added to cache_sb with other on-disk changes.
+
+Thanks.
+
+Coly Li
+
+
 > ---
->  drivers/mmc/core/queue.c | 35 ++++++++++++++++++++++++++++++++---
->  include/linux/mmc/host.h |  1 +
->  2 files changed, 33 insertions(+), 3 deletions(-)
+>  Documentation/admin-guide/bcache.rst | 21 +++++++++++++++++++++
+>  drivers/md/bcache/super.c            | 15 ++++++++++++++-
+>  drivers/md/bcache/sysfs.c            | 33 +++++++++++++++++++++++++++++++--
+>  include/uapi/linux/bcache.h          |  6 ++++--
+>  4 files changed, 70 insertions(+), 5 deletions(-)
 > 
-> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-> index 92900a0..ab0ecc6 100644
-> --- a/drivers/mmc/core/queue.c
-> +++ b/drivers/mmc/core/queue.c
-> @@ -24,6 +24,8 @@
->  #include "card.h"
->  #include "host.h"
+> diff --git a/Documentation/admin-guide/bcache.rst b/Documentation/admin-guide/bcache.rst
+> index c0ce64d..ef82022 100644
+> --- a/Documentation/admin-guide/bcache.rst
+> +++ b/Documentation/admin-guide/bcache.rst
+> @@ -420,6 +420,12 @@ dirty_data
+>  label
+>    Name of underlying device.
 >  
-> +#define MMC_DMA_MAP_MERGE_SEGMENTS	512
+> +partial_stripes_expensive
+> +  Flag to bcache that partial or unaligned stripe_size'd
+> +  writes to the backing device are expensive (e.g., RAID5/6 incur
+> +  read-copy-write). Writing this sysfs attribute updates the superblock
+> +  and also takes effect immediately.  See also stripe_size, below.
 > +
->  static inline bool mmc_cqe_dcmd_busy(struct mmc_queue *mq)
->  {
->  	/* Allow only 1 DCMD at a time */
-> @@ -196,6 +198,12 @@ static void mmc_queue_setup_discard(struct request_queue *q,
->  		blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
->  }
+>  readahead
+>    Size of readahead that should be performed.  Defaults to 0.  If set to e.g.
+>    1M, it will round cache miss reads up to that size, but without overlapping
+> @@ -458,6 +464,21 @@ stop
+>    Write to this file to shut down the bcache device and close the backing
+>    device.
 >  
-> +static unsigned int mmc_get_max_segments(struct mmc_host *host)
-> +{
-> +	return host->can_dma_map_merge ? MMC_DMA_MAP_MERGE_SEGMENTS :
-> +					 host->max_segs;
+> +stripe_size
+> +  The stripe size in bytes of the backing device for optimial
+> +  write performance (also known as the "stride width"). This is set
+> +  automatically when using a device driver sets blk_limits_io_opt
+> +  (e.g., md, rbd, skd, zram, virtio_blk).  No hardware RAID controller
+> +  sets blk_limits_io_opt as of 2019-06-15, so configure this to suit
+> +  your needs.  Note that you must unregister and re-register the backing
+> +  device after making a change to stripe_size.
+> +
+> +  Where N is the number of data disks,
+> +    RAID5: stripe_size = (N-1)*RAID_CHUNK_SIZE.
+> +    RAID6: stripe_size = (N-2)*RAID_CHUNK_SIZE.
+> +
+> +  See also partial_stripes_expensive, above.
+> +
+>  writeback_delay
+>    When dirty data is written to the cache and it previously did not contain
+>    any, waits some number of seconds before initiating writeback. Defaults to
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 1b63ac8..d0b9501 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -80,6 +80,7 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
+>  
+>  	sb->flags		= le64_to_cpu(s->flags);
+>  	sb->seq			= le64_to_cpu(s->seq);
+> +	sb->stripe_size		= le32_to_cpu(s->stripe_size);
+>  	sb->last_mount		= le32_to_cpu(s->last_mount);
+>  	sb->first_bucket	= le16_to_cpu(s->first_bucket);
+>  	sb->keys		= le16_to_cpu(s->keys);
+> @@ -221,6 +222,7 @@ static void __write_super(struct cache_sb *sb, struct bio *bio)
+>  
+>  	out->flags		= cpu_to_le64(sb->flags);
+>  	out->seq		= cpu_to_le64(sb->seq);
+> +	out->stripe_size	= cpu_to_le32(sb->stripe_size);
+>  
+>  	out->last_mount		= cpu_to_le32(sb->last_mount);
+>  	out->first_bucket	= cpu_to_le16(sb->first_bucket);
+> @@ -1258,7 +1260,18 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
+>  
+>  	dc->disk.stripe_size = q->limits.io_opt >> 9;
+>  
+> -	if (dc->disk.stripe_size)
+> +	if (dc->sb.stripe_size) {
+> +		if (dc->disk.stripe_size &&
+> +		    dc->disk.stripe_size != dc->sb.stripe_size) {
+> +			pr_warn("superblock stripe_size (%d) overrides bdev stripe_size (%d)\n",
+> +				(int)dc->sb.stripe_size,
+> +				(int)dc->disk.stripe_size);
+> +		}
+> +
+> +		dc->disk.stripe_size = dc->sb.stripe_size;
+> +		dc->partial_stripes_expensive =
+> +			(unsigned int)BDEV_PARTIAL_STRIPES_EXPENSIVE(&dc->sb);
+> +	} else if (dc->disk.stripe_size)
+>  		dc->partial_stripes_expensive =
+>  			q->limits.raid_partial_stripes_expensive;
+>  
+> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+> index bfb437f..4ebca52 100644
+> --- a/drivers/md/bcache/sysfs.c
+> +++ b/drivers/md/bcache/sysfs.c
+> @@ -111,8 +111,8 @@
+>  rw_attribute(writeback_rate_minimum);
+>  read_attribute(writeback_rate_debug);
+>  
+> -read_attribute(stripe_size);
+> -read_attribute(partial_stripes_expensive);
+> +rw_attribute(stripe_size);
+> +rw_attribute(partial_stripes_expensive);
+>  
+>  rw_attribute(synchronous);
+>  rw_attribute(journal_delay_ms);
+> @@ -343,6 +343,35 @@ static ssize_t bch_snprint_string_list(char *buf,
+>  		}
+>  	}
+>  
+> +	if (attr == &sysfs_stripe_size) {
+> +		int v = strtoul_or_return(buf);
+> +
+> +		if (v & 0x1FF) {
+> +			pr_err("stripe_size must be a muliple of 512-byte sectors");
+> +			return -EINVAL;
+> +		}
+> +
+> +		v >>= 9;
+> +
+> +		if (v != dc->sb.stripe_size) {
+> +			dc->sb.stripe_size = v;
+> +			pr_info("stripe_size=%d, re-register to take effect.",
+> +				v<<9);
+> +			bch_write_bdev_super(dc, NULL);
+> +		} else
+> +			pr_info("stripe_size is already set to %d.", v<<9);
+> +	}
+> +
+> +	if (attr == &sysfs_partial_stripes_expensive) {
+> +		int v = strtoul_or_return(buf);
+> +
+> +		if (v != BDEV_PARTIAL_STRIPES_EXPENSIVE(&dc->sb)) {
+> +			SET_BDEV_PARTIAL_STRIPES_EXPENSIVE(&dc->sb, v);
+> +			dc->partial_stripes_expensive = v;
+> +			bch_write_bdev_super(dc, NULL);
+> +		}
+> +	}
+> +
+>  	if (attr == &sysfs_stop_when_cache_set_failed) {
+>  		v = __sysfs_match_string(bch_stop_on_failure_modes, -1, buf);
+>  		if (v < 0)
+> diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
+> index 5d4f58e..ee60914 100644
+> --- a/include/uapi/linux/bcache.h
+> +++ b/include/uapi/linux/bcache.h
+> @@ -172,7 +172,9 @@ struct cache_sb {
+>  
+>  	__u64			flags;
+>  	__u64			seq;
+> -	__u64			pad[8];
+> +	__u32			stripe_size;
+> +	__u32			pad_u32;
+> +	__u64			pad_u64[7];
+>  
+>  	union {
+>  	struct {
+> @@ -230,7 +232,7 @@ static inline _Bool SB_IS_BDEV(const struct cache_sb *sb)
+>  #define BDEV_STATE_CLEAN		1U
+>  #define BDEV_STATE_DIRTY		2U
+>  #define BDEV_STATE_STALE		3U
+> -
+> +BITMASK(BDEV_PARTIAL_STRIPES_EXPENSIVE,	struct cache_sb, flags, 60, 1);
+>  /*
+>   * Magic numbers
+>   *
+> 
 
-I personally don't like superflous use of ? : if an if would be more
-obvious:
 
-	if (host->can_dma_map_merge)
-		return MMC_DMA_MAP_MERGE_SEGMENTS;
-	return host->max_segs;
+-- 
 
-but that is really just a nitpick and for the mmc maintainer to decide.
-
-Otherwise looks good:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Coly Li
