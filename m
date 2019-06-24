@@ -2,100 +2,98 @@ Return-Path: <SRS0=7YUI=UX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 623BDC43613
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 16:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 075F6C43613
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 16:10:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2FB9A20652
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 16:09:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="etStToFO"
+	by mail.kernel.org (Postfix) with ESMTP id DA13720673
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 16:10:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731516AbfFXQJO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jun 2019 12:09:14 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:37621 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726452AbfFXQJO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 12:09:14 -0400
-Received: by mail-qt1-f195.google.com with SMTP id y57so15081949qtk.4;
-        Mon, 24 Jun 2019 09:09:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZCpezpLtCB1J9Gal7ptkDlYgmZl63QGP8artZkviCDA=;
-        b=etStToFOav+7bM42+SKEzJy5f/AScX04IseFYdc4Nm8Bc6tPADY2ROkboZShxOZLjN
-         T5DdXgzO/yRsO+xQkDqieqB/h4rlLStssB/aRi/wU85Vfxq+IFthM7NCzmFQ1d0oFoVV
-         cg6eRsMe06hlXqVAkY3UGhvqUAepoVpFRccv0sTdwRbOKbiaJw6NAv38m/fZqJP2i7b/
-         xmDlMOYu15NiEKgYHiOL5Xadw/5yRbbQcjM7B3TEG1z+ajWNMP0n/TaCvdMPxvVkSeTq
-         lde5OYPkrRzTq4hVwEbqeTNUbEnOKsCfKtUihWNY7x1iOrf4Ifwuvq9gDS2PGzdD+TXo
-         6V/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZCpezpLtCB1J9Gal7ptkDlYgmZl63QGP8artZkviCDA=;
-        b=mcupy2MT8K5mGwFkm8a1dvArNdbqRQiffRpPVquCUmzG8DQA8Bdh6uYw+vk3pCt/Ah
-         9jYb1yEXbYOKyKmOj7ZVuf+0CVo0gj1bLKippYmWId+nmkO6Ad3reZ/nCXThkCICU//p
-         DRiJjNEk3Bbd3u6KbHTOuAolGhYnUvrv/bgVt7FjRO9JvcasSKMLYpOQ7MjB7xqeyMsE
-         b95OyM9U/AJnN73e9wDqQpnVkwC0DhJGQp2ex9yGpRolzsiYIWAOHtOTLiAvlC9dg8JH
-         wUwXyL2CMJiRQcX5HtRfn7kLnaJarNwI6XGm4/TPzMnanZOoI4rZf1SRtj9XILa9Xx6U
-         HxUA==
-X-Gm-Message-State: APjAAAW0Q44iqQL53EeArg2XLnJGSBleFjAoex9Mpe9w1Ut2rQpDRInO
-        OY9cPqZtPmwk8SDiD97Mr8+womT5TtI=
-X-Google-Smtp-Source: APXvYqzmTaHXwZxuG+EwWxfqCNTumIMVXGVIF5v19QQPeIRAiB74jnqEp3jhXTw732c8NNyCSZ6QiQ==
-X-Received: by 2002:ac8:253d:: with SMTP id 58mr32092359qtm.40.1561392552988;
-        Mon, 24 Jun 2019 09:09:12 -0700 (PDT)
-Received: from continental.prv.suse.net ([177.132.134.92])
-        by smtp.gmail.com with ESMTPSA id f132sm5549791qke.88.2019.06.24.09.09.09
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 24 Jun 2019 09:09:11 -0700 (PDT)
-From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
-        Marcos Paulo de Souza <mpdesouza@suse.com>,
-        Josef Bacik <josef@toxicpanda.com>,
+        id S1729725AbfFXQKZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jun 2019 12:10:25 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:36922 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726452AbfFXQKZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Jun 2019 12:10:25 -0400
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtp (Exim 4.89)
+        (envelope-from <logang@deltatee.com>)
+        id 1hfRXt-0007iv-9o; Mon, 24 Jun 2019 10:10:18 -0600
+To:     Jason Gunthorpe <jgg@ziepe.ca>, Christoph Hellwig <hch@lst.de>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pci@vger.kernel.org, linux-rdma <linux-rdma@vger.kernel.org>,
         Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org (open list:NETWORK BLOCK DEVICE (NBD)),
-        nbd@other.debian.org (open list:NETWORK BLOCK DEVICE (NBD))
-Subject: [PATCH] driver: block: nbd: Replace magic number 9 with SECTOR_SHIFT
-Date:   Mon, 24 Jun 2019 13:09:33 -0300
-Message-Id: <20190624160933.23148-1-marcos.souza.org@gmail.com>
-X-Mailer: git-send-email 2.21.0
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20190620161240.22738-1-logang@deltatee.com>
+ <CAPcyv4ijztOK1FUjLuFing7ps4LOHt=6z=eO=98HHWauHA+yog@mail.gmail.com>
+ <20190620193353.GF19891@ziepe.ca> <20190624073126.GB3954@lst.de>
+ <20190624134641.GA8268@ziepe.ca>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <1041d2c6-f22c-81f2-c141-fb821b35c0c1@deltatee.com>
+Date:   Mon, 24 Jun 2019 10:10:16 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190624134641.GA8268@ziepe.ca>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: sbates@raithlin.com, kbusch@kernel.org, sagi@grimberg.me, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, dan.j.williams@intel.com, hch@lst.de, jgg@ziepe.ca
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-set_capacity expects the disk size in sectors of 512 bytes, and changing
-the magic number 9 to SECTOR_SHIFT clarifies this intent.
 
-Signed-off-by: Marcos Paulo de Souza <mpdesouza@suse.com>
----
- drivers/block/nbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 3a9bca3aa093..fd3bc061c600 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -288,7 +288,7 @@ static void nbd_size_update(struct nbd_device *nbd)
- 	}
- 	blk_queue_logical_block_size(nbd->disk->queue, config->blksize);
- 	blk_queue_physical_block_size(nbd->disk->queue, config->blksize);
--	set_capacity(nbd->disk, config->bytesize >> 9);
-+	set_capacity(nbd->disk, config->bytesize >> SECTOR_SHIFT);
- 	if (bdev) {
- 		if (bdev->bd_disk) {
- 			bd_set_size(bdev, config->bytesize);
--- 
-2.21.0
+On 2019-06-24 7:46 a.m., Jason Gunthorpe wrote:
+> On Mon, Jun 24, 2019 at 09:31:26AM +0200, Christoph Hellwig wrote:
+>> On Thu, Jun 20, 2019 at 04:33:53PM -0300, Jason Gunthorpe wrote:
+>>>> My primary concern with this is that ascribes a level of generality
+>>>> that just isn't there for peer-to-peer dma operations. "Peer"
+>>>> addresses are not "DMA" addresses, and the rules about what can and
+>>>> can't do peer-DMA are not generically known to the block layer.
+>>>
+>>> ?? The P2P infrastructure produces a DMA bus address for the
+>>> initiating device that is is absolutely a DMA address. There is some
+>>> intermediate CPU centric representation, but after mapping it is the
+>>> same as any other DMA bus address.
+>>>
+>>> The map function can tell if the device pair combination can do p2p or
+>>> not.
+>>
+>> At the PCIe level there is no such thing as a DMA address, it all
+>> is bus address with MMIO and DMA in the same address space (without
+>> that P2P would have not chance of actually working obviously).  But
+>> that bus address space is different per "bus" (which would be an
+>> root port in PCIe), and we need to be careful about that.
+> 
+> Sure, that is how dma_addr_t is supposed to work - it is always a
+> device specific value that can be used only by the device that it was
+> created for, and different devices could have different dma_addr_t
+> values for the same memory. 
+> 
+> So when Logan goes and puts dma_addr_t into the block stack he must
+> also invert things so that the DMA map happens at the start of the
+> process to create the right dma_addr_t early.
 
+Yes, that's correct. The intent was to invert it so the dma_map could
+happen at the start of the process so that P2PDMA code could be called
+with all the information it needs to make it's decision on how to map;
+without having to hook into the mapping process of every driver that
+wants to participate.
+
+Logan
