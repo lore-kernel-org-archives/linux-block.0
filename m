@@ -4,57 +4,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D61C43613
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 19:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 981D4C43613
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 19:41:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 654DE20673
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 19:41:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EF7420679
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 19:41:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T4BDLNKF"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K3KUyA2b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729760AbfFXTlL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jun 2019 15:41:11 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50194 "EHLO
+        id S1730717AbfFXTlS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jun 2019 15:41:18 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40649 "EHLO
         mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730371AbfFXTlL (ORCPT
+        with ESMTP id S1730715AbfFXTlP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 15:41:11 -0400
-Received: by mail-wm1-f65.google.com with SMTP id c66so502283wmf.0
-        for <linux-block@vger.kernel.org>; Mon, 24 Jun 2019 12:41:08 -0700 (PDT)
+        Mon, 24 Jun 2019 15:41:15 -0400
+Received: by mail-wm1-f65.google.com with SMTP id v19so501660wmj.5
+        for <linux-block@vger.kernel.org>; Mon, 24 Jun 2019 12:41:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=rIrEF7fqiupFIjD7AQLk7kwooWZ2ci8TyHX3uP5+Vdg=;
-        b=T4BDLNKF6YXrrP3MVBJ+/3PIHBdQ84edc6MwZfSBXner3JGB43FRyGDN9aStuNm3g6
-         ww3etrDOHkB2aBfCEZ9wejjBdGtQRmEJ4tu3kl6JCgrwURon4NtoOXwuDK1e5bG1RKe5
-         0qzy2Nds/sNVO5RyiwzAp66e7jQbuyErF3M6K00B9ZQbwSDcMFC2EhztLwMLELzgBNe0
-         ibM0urf5jU+gj3I4lGNXhLlThqPCEWr8BMG+aVSYqkap+VvnPFdfiK3Kb6zWhxxF23y8
-         EfrR75gmwwZaaLyITaAZy1spIrIVA3sf3BoGrph8ltbq+S3avz+t3Lndiy76GdRvlPhC
-         vKUw==
+        bh=JW8uE9p2cExcuevLdfaub1Bim8IPk1JSRsG24Fpy7KY=;
+        b=K3KUyA2b31P3piOKQWbeD/qXN+fkRIYaTmC3fpvh9rFOFyO6k2F4MFAAueJ2O9R04J
+         NCuphMwoCrLrX9PjK8BQMwCQJ27ABaobCAwJvRUFZh4i2l9tM/OeWlWVBbMjh4uw3aqo
+         d5YIuHyTbqaVXCCd6IfHyUAEmSeVfFTjlAEkJqW+QszM69Okt7pB8hF0z0QSaLuKBmyV
+         w3tekp0bgeDPCcTK49fqBmAXYGVJtkfgzd6INfaY5v5MG6Xqt66ykFBa0NRP4R7gwQTq
+         NgM1QD0yf+AX6lkUKHfO7MKXgrmTFwbTcQeJTn4RBQs6t+jAndrqasmxNhhqgpTb/+xN
+         vZyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=rIrEF7fqiupFIjD7AQLk7kwooWZ2ci8TyHX3uP5+Vdg=;
-        b=QTEKXTuoWX1G6rBZ0qv5fIM2Z7m52FvBGs3QCjvNMrmi3Oo2INIG/kCGuQt8klKsED
-         m5ilFko+0gy8UaLy8dQICg5k72Uka4BFZFesK992UoXAVqn19vjtOq9u6AJoyrKyueHd
-         BvLRVZpk4OC36mVKVcLG4swD6JP/G8YiMVIeZXSLmytQirdtHu2Xzqgl6ccLp6yhUrK2
-         1xoOowxTztDCFSz4ZQ9Khs8RFv5MuHFmxKVPG4vgF9CscRdsH+vBH1HKFG2WQd33XTqz
-         lBVqTSdF/M459HeC616cv59PSj+cv2sjTMSfq4EdwPGTh89S5eUclxAX4URQ7K567CJG
-         C6cg==
-X-Gm-Message-State: APjAAAUjdldTGp+w2rf0FkFs1iEFs4TyqALwdcTI4p6X72t0n36DOTLx
-        /7D4EAJjTcvrbbQkP8OCQ6ecNg==
-X-Google-Smtp-Source: APXvYqyX1Rn2HL50hIj4D0Zht9T0R92lzP9hKcP2XndfQlyRHis1sbQaguVOCWncbGUEfV3LaEJuxA==
-X-Received: by 2002:a1c:a783:: with SMTP id q125mr17917503wme.94.1561405266374;
-        Mon, 24 Jun 2019 12:41:06 -0700 (PDT)
+        bh=JW8uE9p2cExcuevLdfaub1Bim8IPk1JSRsG24Fpy7KY=;
+        b=bl26cxccIIW3nwLOYwIB9H2BaOmpg6MQL8faXs3kRAhpTP6yX3yyzMKzdZNHjCrEwK
+         4adSlLIo/BqWGlA1ZVfxHm0AeikIRaEhWK2Jj5LUkUKvX9Eci6LOJNTX2tShtW2np9x7
+         iplebxJ8D9q69+LYbZ+bM6mnNBF0zlgN8eUVod6Ovdc0Lc9ljMT7YvBqzXYLBlSE8HMC
+         vsn/YLHBDLtrhyogvTkmCEzu2j3pv0/iUKfNiwohfwc4wvTXM3Pp3xkeV6b6UKv+HDhI
+         2HwDgF4ElYTmMb4cOWfQid5doFS+IBUAevK6zBhSWp+TQSG3CxjtJ35h4hSb9YUw0ghq
+         H9dQ==
+X-Gm-Message-State: APjAAAWOL2FUsmYWtCLK7YimX/Jso9RtuuJlNPJ0JtmBJ5pj+P3yHHxV
+        OeOksRAeDomwb+56Ek7ta7tJPw==
+X-Google-Smtp-Source: APXvYqxzAyAVHsk3auhFc/TBnNSi20R2GMvTm6J4N7k53Y9pEtmcJ/UBDJS+5SEIN0uUMJKAPCm2Lg==
+X-Received: by 2002:a1c:c14b:: with SMTP id r72mr17075444wmf.166.1561405272454;
+        Mon, 24 Jun 2019 12:41:12 -0700 (PDT)
 Received: from localhost.localdomain (146-241-101-27.dyn.eolo.it. [146.241.101.27])
-        by smtp.gmail.com with ESMTPSA id q25sm17615395wrc.68.2019.06.24.12.41.05
+        by smtp.gmail.com with ESMTPSA id q25sm17615395wrc.68.2019.06.24.12.41.11
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Jun 2019 12:41:05 -0700 (PDT)
+        Mon, 24 Jun 2019 12:41:12 -0700 (PDT)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -62,9 +62,9 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
         bottura.nicola95@gmail.com, srivatsa@csail.mit.edu,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX IMPROVEMENT 1/7] block, bfq: reset inject limit when think-time state changes
-Date:   Mon, 24 Jun 2019 21:40:36 +0200
-Message-Id: <20190624194042.38747-2-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX IMPROVEMENT 6/7] block, bfq: preempt lower-weight or lower-priority queues
+Date:   Mon, 24 Jun 2019 21:40:41 +0200
+Message-Id: <20190624194042.38747-7-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190624194042.38747-1-paolo.valente@linaro.org>
 References: <20190624194042.38747-1-paolo.valente@linaro.org>
@@ -75,286 +75,191 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Until the base value of the request service times gets finally
-computed for a bfq_queue, the inject limit does depend on the
-think-time state (short|long). The limit must be 0 or 1 if the think
-time is deemed, respectively, as short or long. However, such a check
-and possible limit update is performed only periodically, once per
-second. So, to make the injection mechanism much more reactive, this
-commit performs the update also every time the think-time state
-changes.
+BFQ enqueues the I/O coming from each process into a separate
+bfq_queue, and serves bfq_queues one at a time. Each bfq_queue may be
+served for at most timeout_sync milliseconds (default: 125 ms). This
+service scheme is prone to the following inaccuracy.
 
-In addition, in the following special case, this commit lets the
-inject limit of a bfq_queue bfqq remain equal to 1 even if bfqq's
-think time is short: bfqq's I/O is synchronized with that of some
-other queue, i.e., bfqq may receive new I/O only after the I/O of the
-other queue is completed. Keeping the inject limit to 1 allows the
-blocking I/O to be served while bfqq is in service. And this is very
-convenient both for bfqq and for the total throughput, as explained
-in detail in the comments in bfq_update_has_short_ttime().
+While a bfq_queue Q1 is in service, some empty bfq_queue Q2 may
+receive I/O, and, according to BFQ's scheduling policy, may become the
+right bfq_queue to serve, in place of the currently in-service
+bfq_queue. In this respect, postponing the service of Q2 to after the
+service of Q1 finishes may delay the completion of Q2's I/O, compared
+with an ideal service in which all non-empty bfq_queues are served in
+parallel, and every non-empty bfq_queue is served at a rate
+proportional to the bfq_queue's weight. This additional delay is equal
+at most to the time Q1 may unjustly remain in service before switching
+to Q2.
 
-Tested-by: Srivatsa S. Bhat <srivatsa@csail.mit.edu>
+If Q1 and Q2 have the same weight, then this time is most likely
+negligible compared with the completion time to be guaranteed to Q2's
+I/O. In addition, first, one of the reasons why BFQ may want to serve
+Q1 for a while is that this boosts throughput and, second, serving Q1
+longer reduces BFQ's overhead. As a conclusion, it is usually better
+not to preempt Q1 if both Q1 and Q2 have the same weight.
+
+In contrast, as Q2's weight or priority becomes higher and higher
+compared with that of Q1, the above delay becomes larger and larger,
+compared with the I/O completion times that have to be guaranteed to
+Q2 according to Q2's weight. So reducing this delay may be more
+important than avoiding the costs of preempting Q1.
+
+Accordingly, this commit preempts Q1 if Q2 has a higher weight or a
+higher priority than Q1. Preemption causes Q1 to be re-scheduled, and
+triggers a new choice of the next bfq_queue to serve. If Q2 really is
+the next bfq_queue to serve, then Q2 will be set in service
+immediately.
+
+This change reduces the component of the I/O latency caused by the
+above delay by about 80%. For example, on an (old) PLEXTOR PX-256M5
+SSD, the maximum latency reported by fio drops from 15.1 to 3.2 ms for
+a process doing sporadic random reads while another process is doing
+continuous sequential reads.
+
+Signed-off-by: Nicola Bottura <bottura.nicola95@gmail.com>
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 219 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 151 insertions(+), 68 deletions(-)
+ block/bfq-iosched.c | 95 +++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 75 insertions(+), 20 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 44c6bbcd7720..9bc10198ddff 100644
+index 9e2fbb7d1fb6..6a3d05023300 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -1735,6 +1735,72 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 				false, BFQQE_PREEMPTED);
- }
- 
-+static void bfq_reset_inject_limit(struct bfq_data *bfqd,
-+				   struct bfq_queue *bfqq)
-+{
-+	/* invalidate baseline total service time */
-+	bfqq->last_serv_time_ns = 0;
-+
-+	/*
-+	 * Reset pointer in case we are waiting for
-+	 * some request completion.
-+	 */
-+	bfqd->waited_rq = NULL;
-+
-+	/*
-+	 * If bfqq has a short think time, then start by setting the
-+	 * inject limit to 0 prudentially, because the service time of
-+	 * an injected I/O request may be higher than the think time
-+	 * of bfqq, and therefore, if one request was injected when
-+	 * bfqq remains empty, this injected request might delay the
-+	 * service of the next I/O request for bfqq significantly. In
-+	 * case bfqq can actually tolerate some injection, then the
-+	 * adaptive update will however raise the limit soon. This
-+	 * lucky circumstance holds exactly because bfqq has a short
-+	 * think time, and thus, after remaining empty, is likely to
-+	 * get new I/O enqueued---and then completed---before being
-+	 * expired. This is the very pattern that gives the
-+	 * limit-update algorithm the chance to measure the effect of
-+	 * injection on request service times, and then to update the
-+	 * limit accordingly.
-+	 *
-+	 * However, in the following special case, the inject limit is
-+	 * left to 1 even if the think time is short: bfqq's I/O is
-+	 * synchronized with that of some other queue, i.e., bfqq may
-+	 * receive new I/O only after the I/O of the other queue is
-+	 * completed. Keeping the inject limit to 1 allows the
-+	 * blocking I/O to be served while bfqq is in service. And
-+	 * this is very convenient both for bfqq and for overall
-+	 * throughput, as explained in detail in the comments in
-+	 * bfq_update_has_short_ttime().
-+	 *
-+	 * On the opposite end, if bfqq has a long think time, then
-+	 * start directly by 1, because:
-+	 * a) on the bright side, keeping at most one request in
-+	 * service in the drive is unlikely to cause any harm to the
-+	 * latency of bfqq's requests, as the service time of a single
-+	 * request is likely to be lower than the think time of bfqq;
-+	 * b) on the downside, after becoming empty, bfqq is likely to
-+	 * expire before getting its next request. With this request
-+	 * arrival pattern, it is very hard to sample total service
-+	 * times and update the inject limit accordingly (see comments
-+	 * on bfq_update_inject_limit()). So the limit is likely to be
-+	 * never, or at least seldom, updated.  As a consequence, by
-+	 * setting the limit to 1, we avoid that no injection ever
-+	 * occurs with bfqq. On the downside, this proactive step
-+	 * further reduces chances to actually compute the baseline
-+	 * total service time. Thus it reduces chances to execute the
-+	 * limit-update algorithm and possibly raise the limit to more
-+	 * than 1.
-+	 */
-+	if (bfq_bfqq_has_short_ttime(bfqq))
-+		bfqq->inject_limit = 0;
-+	else
-+		bfqq->inject_limit = 1;
-+
-+	bfqq->decrease_time_jif = jiffies;
-+}
-+
- static void bfq_add_request(struct request *rq)
+@@ -1428,17 +1428,19 @@ static int bfq_min_budget(struct bfq_data *bfqd)
+  * mechanism may be re-designed in such a way to make it possible to
+  * know whether preemption is needed without needing to update service
+  * trees). In addition, queue preemptions almost always cause random
+- * I/O, and thus loss of throughput. Because of these facts, the next
+- * function adopts the following simple scheme to avoid both costly
+- * operations and too frequent preemptions: it requests the expiration
+- * of the in-service queue (unconditionally) only for queues that need
+- * to recover a hole, or that either are weight-raised or deserve to
+- * be weight-raised.
++ * I/O, which may in turn cause loss of throughput. Finally, there may
++ * even be no in-service queue when the next function is invoked (so,
++ * no queue to compare timestamps with). Because of these facts, the
++ * next function adopts the following simple scheme to avoid costly
++ * operations, too frequent preemptions and too many dependencies on
++ * the state of the scheduler: it requests the expiration of the
++ * in-service queue (unconditionally) only for queues that need to
++ * recover a hole. Then it delegates to other parts of the code the
++ * responsibility of handling the above case 2.
+  */
+ static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
+ 						struct bfq_queue *bfqq,
+-						bool arrived_in_time,
+-						bool wr_or_deserves_wr)
++						bool arrived_in_time)
  {
- 	struct bfq_queue *bfqq = RQ_BFQQ(rq);
-@@ -1755,71 +1821,8 @@ static void bfq_add_request(struct request *rq)
- 		 * bfq_update_inject_limit().
- 		 */
- 		if (time_is_before_eq_jiffies(bfqq->decrease_time_jif +
--					     msecs_to_jiffies(1000))) {
--			/* invalidate baseline total service time */
--			bfqq->last_serv_time_ns = 0;
--
--			/*
--			 * Reset pointer in case we are waiting for
--			 * some request completion.
--			 */
--			bfqd->waited_rq = NULL;
--
--			/*
--			 * If bfqq has a short think time, then start
--			 * by setting the inject limit to 0
--			 * prudentially, because the service time of
--			 * an injected I/O request may be higher than
--			 * the think time of bfqq, and therefore, if
--			 * one request was injected when bfqq remains
--			 * empty, this injected request might delay
--			 * the service of the next I/O request for
--			 * bfqq significantly. In case bfqq can
--			 * actually tolerate some injection, then the
--			 * adaptive update will however raise the
--			 * limit soon. This lucky circumstance holds
--			 * exactly because bfqq has a short think
--			 * time, and thus, after remaining empty, is
--			 * likely to get new I/O enqueued---and then
--			 * completed---before being expired. This is
--			 * the very pattern that gives the
--			 * limit-update algorithm the chance to
--			 * measure the effect of injection on request
--			 * service times, and then to update the limit
--			 * accordingly.
--			 *
--			 * On the opposite end, if bfqq has a long
--			 * think time, then start directly by 1,
--			 * because:
--			 * a) on the bright side, keeping at most one
--			 * request in service in the drive is unlikely
--			 * to cause any harm to the latency of bfqq's
--			 * requests, as the service time of a single
--			 * request is likely to be lower than the
--			 * think time of bfqq;
--			 * b) on the downside, after becoming empty,
--			 * bfqq is likely to expire before getting its
--			 * next request. With this request arrival
--			 * pattern, it is very hard to sample total
--			 * service times and update the inject limit
--			 * accordingly (see comments on
--			 * bfq_update_inject_limit()). So the limit is
--			 * likely to be never, or at least seldom,
--			 * updated.  As a consequence, by setting the
--			 * limit to 1, we avoid that no injection ever
--			 * occurs with bfqq. On the downside, this
--			 * proactive step further reduces chances to
--			 * actually compute the baseline total service
--			 * time. Thus it reduces chances to execute the
--			 * limit-update algorithm and possibly raise the
--			 * limit to more than 1.
--			 */
--			if (bfq_bfqq_has_short_ttime(bfqq))
--				bfqq->inject_limit = 0;
--			else
--				bfqq->inject_limit = 1;
--			bfqq->decrease_time_jif = jiffies;
--		}
-+					     msecs_to_jiffies(1000)))
-+			bfq_reset_inject_limit(bfqd, bfqq);
+ 	struct bfq_entity *entity = &bfqq->entity;
  
- 		/*
- 		 * The following conditions must hold to setup a new
-@@ -4855,7 +4858,7 @@ static void bfq_update_has_short_ttime(struct bfq_data *bfqd,
- 				       struct bfq_queue *bfqq,
- 				       struct bfq_io_cq *bic)
- {
--	bool has_short_ttime = true;
-+	bool has_short_ttime = true, state_changed;
- 
- 	/*
- 	 * No need to update has_short_ttime if bfqq is async or in
-@@ -4880,13 +4883,93 @@ static void bfq_update_has_short_ttime(struct bfq_data *bfqd,
- 	     bfqq->ttime.ttime_mean > bfqd->bfq_slice_idle))
- 		has_short_ttime = false;
- 
--	bfq_log_bfqq(bfqd, bfqq, "update_has_short_ttime: has_short_ttime %d",
--		     has_short_ttime);
-+	state_changed = has_short_ttime != bfq_bfqq_has_short_ttime(bfqq);
- 
- 	if (has_short_ttime)
- 		bfq_mark_bfqq_has_short_ttime(bfqq);
- 	else
- 		bfq_clear_bfqq_has_short_ttime(bfqq);
-+
-+	/*
-+	 * Until the base value for the total service time gets
-+	 * finally computed for bfqq, the inject limit does depend on
-+	 * the think-time state (short|long). In particular, the limit
-+	 * is 0 or 1 if the think time is deemed, respectively, as
-+	 * short or long (details in the comments in
-+	 * bfq_update_inject_limit()). Accordingly, the next
-+	 * instructions reset the inject limit if the think-time state
-+	 * has changed and the above base value is still to be
-+	 * computed.
-+	 *
-+	 * However, the reset is performed only if more than 100 ms
-+	 * have elapsed since the last update of the inject limit, or
-+	 * (inclusive) if the change is from short to long think
-+	 * time. The reason for this waiting is as follows.
-+	 *
-+	 * bfqq may have a long think time because of a
-+	 * synchronization with some other queue, i.e., because the
-+	 * I/O of some other queue may need to be completed for bfqq
-+	 * to receive new I/O. This happens, e.g., if bfqq is
-+	 * associated with a process that does some sync. A sync
-+	 * generates extra blocking I/O, which must be completed
-+	 * before the process associated with bfqq can go on with its
-+	 * I/O.
-+	 *
-+	 * If such a synchronization is actually in place, then,
-+	 * without injection on bfqq, the blocking I/O cannot happen
-+	 * to served while bfqq is in service. As a consequence, if
-+	 * bfqq is granted I/O-dispatch-plugging, then bfqq remains
-+	 * empty, and no I/O is dispatched, until the idle timeout
-+	 * fires. This is likely to result in lower bandwidth and
-+	 * higher latencies for bfqq, and in a severe loss of total
-+	 * throughput.
-+	 *
-+	 * On the opposite end, a non-zero inject limit may allow the
-+	 * I/O that blocks bfqq to be executed soon, and therefore
-+	 * bfqq to receive new I/O soon. But, if this actually
-+	 * happens, then the next think-time sample for bfqq may be
-+	 * very low. This in turn may cause bfqq's think time to be
-+	 * deemed short. Without the 100 ms barrier, this new state
-+	 * change would cause the body of the next if to be executed
-+	 * immediately. But this would set to 0 the inject
-+	 * limit. Without injection, the blocking I/O would cause the
-+	 * think time of bfqq to become long again, and therefore the
-+	 * inject limit to be raised again, and so on. The only effect
-+	 * of such a steady oscillation between the two think-time
-+	 * states would be to prevent effective injection on bfqq.
-+	 *
-+	 * In contrast, if the inject limit is not reset during such a
-+	 * long time interval as 100 ms, then the number of short
-+	 * think time samples can grow significantly before the reset
-+	 * is allowed. As a consequence, the think time state can
-+	 * become stable before the reset. There will be no state
-+	 * change when the 100 ms elapse, and therefore no reset of
-+	 * the inject limit. The inject limit remains steadily equal
-+	 * to 1 both during and after the 100 ms. So injection can be
-+	 * performed at all times, and throughput gets boosted.
-+	 *
-+	 * An inject limit equal to 1 is however in conflict, in
-+	 * general, with the fact that the think time of bfqq is
-+	 * short, because injection may be likely to delay bfqq's I/O
-+	 * (as explained in the comments in
-+	 * bfq_update_inject_limit()). But this does not happen in
-+	 * this special case, because bfqq's low think time is due to
-+	 * an effective handling of a synchronization, through
-+	 * injection. In this special case, bfqq's I/O does not get
-+	 * delayed by injection; on the contrary, bfqq's I/O is
-+	 * brought forward, because it is not blocked for
-+	 * milliseconds.
-+	 *
-+	 * In addition, during the 100 ms, the base value for the
-+	 * total service time is likely to get finally computed,
-+	 * freeing the inject limit from its relation with the think
-+	 * time.
-+	 */
-+	if (state_changed && bfqq->last_serv_time_ns == 0 &&
-+	    (time_is_before_eq_jiffies(bfqq->decrease_time_jif +
-+				      msecs_to_jiffies(100)) ||
-+	     !has_short_ttime))
-+		bfq_reset_inject_limit(bfqd, bfqq);
+@@ -1493,7 +1495,7 @@ static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
+ 	entity->budget = max_t(unsigned long, bfqq->max_budget,
+ 			       bfq_serv_to_charge(bfqq->next_rq, bfqq));
+ 	bfq_clear_bfqq_non_blocking_wait_rq(bfqq);
+-	return wr_or_deserves_wr;
++	return false;
  }
  
  /*
+@@ -1611,6 +1613,36 @@ static bool bfq_bfqq_idle_for_long_time(struct bfq_data *bfqd,
+ 			bfqd->bfq_wr_min_idle_time);
+ }
+ 
++
++/*
++ * Return true if bfqq is in a higher priority class, or has a higher
++ * weight than the in-service queue.
++ */
++static bool bfq_bfqq_higher_class_or_weight(struct bfq_queue *bfqq,
++					    struct bfq_queue *in_serv_bfqq)
++{
++	int bfqq_weight, in_serv_weight;
++
++	if (bfqq->ioprio_class < in_serv_bfqq->ioprio_class)
++		return true;
++
++	if (in_serv_bfqq->entity.parent == bfqq->entity.parent) {
++		bfqq_weight = bfqq->entity.weight;
++		in_serv_weight = in_serv_bfqq->entity.weight;
++	} else {
++		if (bfqq->entity.parent)
++			bfqq_weight = bfqq->entity.parent->weight;
++		else
++			bfqq_weight = bfqq->entity.weight;
++		if (in_serv_bfqq->entity.parent)
++			in_serv_weight = in_serv_bfqq->entity.parent->weight;
++		else
++			in_serv_weight = in_serv_bfqq->entity.weight;
++	}
++
++	return bfqq_weight > in_serv_weight;
++}
++
+ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 					     struct bfq_queue *bfqq,
+ 					     int old_wr_coeff,
+@@ -1655,8 +1687,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 	 */
+ 	bfqq_wants_to_preempt =
+ 		bfq_bfqq_update_budg_for_activation(bfqd, bfqq,
+-						    arrived_in_time,
+-						    wr_or_deserves_wr);
++						    arrived_in_time);
+ 
+ 	/*
+ 	 * If bfqq happened to be activated in a burst, but has been
+@@ -1721,16 +1752,40 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 
+ 	/*
+ 	 * Expire in-service queue only if preemption may be needed
+-	 * for guarantees. In this respect, the function
+-	 * next_queue_may_preempt just checks a simple, necessary
+-	 * condition, and not a sufficient condition based on
+-	 * timestamps. In fact, for the latter condition to be
+-	 * evaluated, timestamps would need first to be updated, and
+-	 * this operation is quite costly (see the comments on the
+-	 * function bfq_bfqq_update_budg_for_activation).
++	 * for guarantees. In particular, we care only about two
++	 * cases. The first is that bfqq has to recover a service
++	 * hole, as explained in the comments on
++	 * bfq_bfqq_update_budg_for_activation(), i.e., that
++	 * bfqq_wants_to_preempt is true. However, if bfqq does not
++	 * carry time-critical I/O, then bfqq's bandwidth is less
++	 * important than that of queues that carry time-critical I/O.
++	 * So, as a further constraint, we consider this case only if
++	 * bfqq is at least as weight-raised, i.e., at least as time
++	 * critical, as the in-service queue.
++	 *
++	 * The second case is that bfqq is in a higher priority class,
++	 * or has a higher weight than the in-service queue. If this
++	 * condition does not hold, we don't care because, even if
++	 * bfqq does not start to be served immediately, the resulting
++	 * delay for bfqq's I/O is however lower or much lower than
++	 * the ideal completion time to be guaranteed to bfqq's I/O.
++	 *
++	 * In both cases, preemption is needed only if, according to
++	 * the timestamps of both bfqq and of the in-service queue,
++	 * bfqq actually is the next queue to serve. So, to reduce
++	 * useless preemptions, the return value of
++	 * next_queue_may_preempt() is considered in the next compound
++	 * condition too. Yet next_queue_may_preempt() just checks a
++	 * simple, necessary condition for bfqq to be the next queue
++	 * to serve. In fact, to evaluate a sufficient condition, the
++	 * timestamps of the in-service queue would need to be
++	 * updated, and this operation is quite costly (see the
++	 * comments on bfq_bfqq_update_budg_for_activation()).
+ 	 */
+-	if (bfqd->in_service_queue && bfqq_wants_to_preempt &&
+-	    bfqd->in_service_queue->wr_coeff < bfqq->wr_coeff &&
++	if (bfqd->in_service_queue &&
++	    ((bfqq_wants_to_preempt &&
++	      bfqq->wr_coeff >= bfqd->in_service_queue->wr_coeff) ||
++	     bfq_bfqq_higher_class_or_weight(bfqq, bfqd->in_service_queue)) &&
+ 	    next_queue_may_preempt(bfqd))
+ 		bfq_bfqq_expire(bfqd, bfqd->in_service_queue,
+ 				false, BFQQE_PREEMPTED);
 -- 
 2.20.1
 
