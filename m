@@ -2,123 +2,126 @@ Return-Path: <SRS0=7YUI=UX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B56BEC43613
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 13:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63120C43613
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 13:46:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E7C0213F2
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 13:14:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32F64208E4
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 13:46:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="dy6wSAbb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730963AbfFXNOg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jun 2019 09:14:36 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:36866 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730794AbfFXNOf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 09:14:35 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id C9A3C23D76724DA3C42B;
-        Mon, 24 Jun 2019 21:14:32 +0800 (CST)
-Received: from [127.0.0.1] (10.202.227.238) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Mon, 24 Jun 2019
- 21:14:28 +0800
-Subject: Re: [PATCH 1/9] blk-mq: allow hw queues to share hostwide tags
-To:     Ming Lei <ming.lei@redhat.com>
-References: <20190531022801.10003-1-ming.lei@redhat.com>
- <20190531022801.10003-2-ming.lei@redhat.com>
- <0f1773af-170a-a6b5-54ce-274dacb2b63a@huawei.com>
- <20190624084614.GC10941@ming.t460p>
-CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        "Sathya Prakash" <sathya.prakash@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <19e409fa-d734-b0b6-b62f-787a1000e2b1@huawei.com>
-Date:   Mon, 24 Jun 2019 14:14:22 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1730038AbfFXNqp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jun 2019 09:46:45 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:51499 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728122AbfFXNqp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Jun 2019 09:46:45 -0400
+Received: by mail-wm1-f66.google.com with SMTP id 207so12892341wma.1
+        for <linux-block@vger.kernel.org>; Mon, 24 Jun 2019 06:46:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=fHFQYC4IHk3DGA5SJeJSRcnBstbORPkvgUXGBQflcbU=;
+        b=dy6wSAbb5K7xDqB+qIUCmnIAgBnIXnelPM2aUTAgaGv7Z/NwA+zSpgAUfMS9EKnB/+
+         +jj7JCp465Y0rsmu4RcnTqmWLrwgYq05636vIGBfDYDKB9piVBgk3sYP3vO8O80X5Ppi
+         gXr/EmPgtc+YIs7rxsHSu+tsA2DF8jL90FXxaqGLvXS7oLANJUDvhJHNsVoOv99U4/mU
+         sWnSluDSDrpB/EEW9PGatqncUzFY2NrOlsDe7sfTqvDPc8e8tDQ6fx1eZaoms2T8YD7x
+         GUnijP4PW6FidRXywDiiWKdcmqDowPtjb7eRZz0QEhOw0Zj/S4RIfCuqo0pSkTI13xYP
+         kC3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=fHFQYC4IHk3DGA5SJeJSRcnBstbORPkvgUXGBQflcbU=;
+        b=omrEx42w53QrBo68HvDzO2MkLrdcBTa1PdIa7eke5k82wHqusc5mdEqSyIwJkvojPZ
+         BrIUbRm+GhLc6lyJ8CrXNckJaEn27SGMk+qMmbMDh0JNGkEpIwISqw6G+RaIN96Il2RW
+         tQIhu6Nt/sK+IoBAlwmXk8SXNPhZgh+7bdBF4Nrb819I5vC0VSxFJdvryQ/ZvrCxm5rE
+         TIiYJa9piMn9UeTrLHb34X7zJZ06LNeiw8VpRfN3A3wZjWuEA0dINX5AbpdU2ozNkIM1
+         AVPrH1gvS+0MP9l5frjxC0cXipr0Xiy1+ysqG77qBk8vLQVB2syKCRa45VjsJoeaAVWf
+         EADA==
+X-Gm-Message-State: APjAAAVOZxpaRdTr6NEYld86GsumeufSiBV0hHUW+BHFEirfyGtLFdsh
+        tP4oREml+CgFpf8S74Q3z8qD0A==
+X-Google-Smtp-Source: APXvYqxH/orChM1UzN6yhkjM24At3V8ziMHSnQNkMtcNe8WEW+S3OTMlvLt8dP4L6baO7ZUaKVoRkg==
+X-Received: by 2002:a1c:618a:: with SMTP id v132mr15948959wmb.17.1561384003630;
+        Mon, 24 Jun 2019 06:46:43 -0700 (PDT)
+Received: from ziepe.ca ([66.187.232.66])
+        by smtp.gmail.com with ESMTPSA id y2sm9626575wrl.4.2019.06.24.06.46.42
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 24 Jun 2019 06:46:42 -0700 (PDT)
+Received: from jgg by jggl.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1hfPIv-0002E2-9A; Mon, 24 Jun 2019 10:46:41 -0300
+Date:   Mon, 24 Jun 2019 10:46:41 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pci@vger.kernel.org, linux-rdma <linux-rdma@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>,
+        Stephen Bates <sbates@raithlin.com>
+Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
+Message-ID: <20190624134641.GA8268@ziepe.ca>
+References: <20190620161240.22738-1-logang@deltatee.com>
+ <CAPcyv4ijztOK1FUjLuFing7ps4LOHt=6z=eO=98HHWauHA+yog@mail.gmail.com>
+ <20190620193353.GF19891@ziepe.ca>
+ <20190624073126.GB3954@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20190624084614.GC10941@ming.t460p>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.238]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190624073126.GB3954@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 24/06/2019 09:46, Ming Lei wrote:
-> On Wed, Jun 05, 2019 at 03:10:51PM +0100, John Garry wrote:
->> On 31/05/2019 03:27, Ming Lei wrote:
->>> index 32b8ad3d341b..49d73d979cb3 100644
->>> --- a/block/blk-mq.c
->>> +++ b/block/blk-mq.c
->>> @@ -2433,6 +2433,11 @@ static bool __blk_mq_alloc_rq_map(struct blk_mq_tag_set *set, int hctx_idx)
->>>  {
->>>  	int ret = 0;
->>>
->>
->> Hi Ming,
->>
->>> +	if ((set->flags & BLK_MQ_F_HOST_TAGS) && hctx_idx) {
->>> +		set->tags[hctx_idx] = set->tags[0];
->>
->> Here we set all tags same as that of hctx index 0.
->>
->>> +		return true;
->>
->>
->> As such, I think that the error handling in __blk_mq_alloc_rq_maps() is made
->> a little fragile:
->>
->> __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
->> {
->> 	int i;
->>
->> 	for (i = 0; i < set->nr_hw_queues; i++)
->> 		if (!__blk_mq_alloc_rq_map(set, i))
->> 			goto out_unwind;
->>
->> 	return 0;
->>
->> out_unwind:
->> 	while (--i >= 0)
->> 		blk_mq_free_rq_map(set->tags[i]);
->>
->> 	return -ENOMEM;
->> }
->>
->> If __blk_mq_alloc_rq_map(, i > 1) fails for when BLK_MQ_F_HOST_TAGS FLAG is
->> set (even though today it can't), then we would try to free set->tags[0]
->> multiple times.
->
+On Mon, Jun 24, 2019 at 09:31:26AM +0200, Christoph Hellwig wrote:
+> On Thu, Jun 20, 2019 at 04:33:53PM -0300, Jason Gunthorpe wrote:
+> > > My primary concern with this is that ascribes a level of generality
+> > > that just isn't there for peer-to-peer dma operations. "Peer"
+> > > addresses are not "DMA" addresses, and the rules about what can and
+> > > can't do peer-DMA are not generically known to the block layer.
+> > 
+> > ?? The P2P infrastructure produces a DMA bus address for the
+> > initiating device that is is absolutely a DMA address. There is some
+> > intermediate CPU centric representation, but after mapping it is the
+> > same as any other DMA bus address.
+> > 
+> > The map function can tell if the device pair combination can do p2p or
+> > not.
+> 
+> At the PCIe level there is no such thing as a DMA address, it all
+> is bus address with MMIO and DMA in the same address space (without
+> that P2P would have not chance of actually working obviously).  But
+> that bus address space is different per "bus" (which would be an
+> root port in PCIe), and we need to be careful about that.
 
-Hi Ming,
+Sure, that is how dma_addr_t is supposed to work - it is always a
+device specific value that can be used only by the device that it was
+created for, and different devices could have different dma_addr_t
+values for the same memory. 
 
-> Good catch, and the issue can be addressed easily by setting set->hctx[i] as
-> NULL, then check 'tags' in blk_mq_free_rq_map().
+So when Logan goes and puts dma_addr_t into the block stack he must
+also invert things so that the DMA map happens at the start of the
+process to create the right dma_addr_t early.
 
-OK, so you could do that. But I just think that it's not a great 
-practice in general to have multiple pointers pointing at the same 
-dynamic memory.
+I'm not totally clear if this series did that inversion, if it didn't
+then it should not be using the dma_addr_t label at all, or refering
+to anything as a 'dma address' as it is just confusing.
 
-Thanks,
-John
+BTW, it is not just offset right? It is possible that the IOMMU can
+generate unique dma_addr_t values for each device?? Simple offset is
+just something we saw in certain embedded cases, IIRC.
 
->
-> Thanks,
-> Ming
->
-> .
->
-
-
+Jason
