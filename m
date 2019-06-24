@@ -2,137 +2,100 @@ Return-Path: <SRS0=7YUI=UX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91126C48BE9
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 16:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 623BDC43613
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 16:09:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 736E420673
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 16:08:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FB9A20652
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 16:09:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="etStToFO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731617AbfFXQIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jun 2019 12:08:21 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:36892 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727579AbfFXQIV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 12:08:21 -0400
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtp (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1hfRVf-0007f9-UM; Mon, 24 Jun 2019 10:08:00 -0600
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190620161240.22738-1-logang@deltatee.com>
- <20190624072752.GA3954@lst.de>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <558a27ba-e7c9-9d94-cad0-377b8ee374a6@deltatee.com>
-Date:   Mon, 24 Jun 2019 10:07:56 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+        id S1731516AbfFXQJO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jun 2019 12:09:14 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:37621 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726452AbfFXQJO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Jun 2019 12:09:14 -0400
+Received: by mail-qt1-f195.google.com with SMTP id y57so15081949qtk.4;
+        Mon, 24 Jun 2019 09:09:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZCpezpLtCB1J9Gal7ptkDlYgmZl63QGP8artZkviCDA=;
+        b=etStToFOav+7bM42+SKEzJy5f/AScX04IseFYdc4Nm8Bc6tPADY2ROkboZShxOZLjN
+         T5DdXgzO/yRsO+xQkDqieqB/h4rlLStssB/aRi/wU85Vfxq+IFthM7NCzmFQ1d0oFoVV
+         cg6eRsMe06hlXqVAkY3UGhvqUAepoVpFRccv0sTdwRbOKbiaJw6NAv38m/fZqJP2i7b/
+         xmDlMOYu15NiEKgYHiOL5Xadw/5yRbbQcjM7B3TEG1z+ajWNMP0n/TaCvdMPxvVkSeTq
+         lde5OYPkrRzTq4hVwEbqeTNUbEnOKsCfKtUihWNY7x1iOrf4Ifwuvq9gDS2PGzdD+TXo
+         6V/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZCpezpLtCB1J9Gal7ptkDlYgmZl63QGP8artZkviCDA=;
+        b=mcupy2MT8K5mGwFkm8a1dvArNdbqRQiffRpPVquCUmzG8DQA8Bdh6uYw+vk3pCt/Ah
+         9jYb1yEXbYOKyKmOj7ZVuf+0CVo0gj1bLKippYmWId+nmkO6Ad3reZ/nCXThkCICU//p
+         DRiJjNEk3Bbd3u6KbHTOuAolGhYnUvrv/bgVt7FjRO9JvcasSKMLYpOQ7MjB7xqeyMsE
+         b95OyM9U/AJnN73e9wDqQpnVkwC0DhJGQp2ex9yGpRolzsiYIWAOHtOTLiAvlC9dg8JH
+         wUwXyL2CMJiRQcX5HtRfn7kLnaJarNwI6XGm4/TPzMnanZOoI4rZf1SRtj9XILa9Xx6U
+         HxUA==
+X-Gm-Message-State: APjAAAW0Q44iqQL53EeArg2XLnJGSBleFjAoex9Mpe9w1Ut2rQpDRInO
+        OY9cPqZtPmwk8SDiD97Mr8+womT5TtI=
+X-Google-Smtp-Source: APXvYqzmTaHXwZxuG+EwWxfqCNTumIMVXGVIF5v19QQPeIRAiB74jnqEp3jhXTw732c8NNyCSZ6QiQ==
+X-Received: by 2002:ac8:253d:: with SMTP id 58mr32092359qtm.40.1561392552988;
+        Mon, 24 Jun 2019 09:09:12 -0700 (PDT)
+Received: from continental.prv.suse.net ([177.132.134.92])
+        by smtp.gmail.com with ESMTPSA id f132sm5549791qke.88.2019.06.24.09.09.09
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 24 Jun 2019 09:09:11 -0700 (PDT)
+From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
+        Marcos Paulo de Souza <mpdesouza@suse.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org (open list:NETWORK BLOCK DEVICE (NBD)),
+        nbd@other.debian.org (open list:NETWORK BLOCK DEVICE (NBD))
+Subject: [PATCH] driver: block: nbd: Replace magic number 9 with SECTOR_SHIFT
+Date:   Mon, 24 Jun 2019 13:09:33 -0300
+Message-Id: <20190624160933.23148-1-marcos.souza.org@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20190624072752.GA3954@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, jgg@ziepe.ca, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+set_capacity expects the disk size in sectors of 512 bytes, and changing
+the magic number 9 to SECTOR_SHIFT clarifies this intent.
 
+Signed-off-by: Marcos Paulo de Souza <mpdesouza@suse.com>
+---
+ drivers/block/nbd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 2019-06-24 1:27 a.m., Christoph Hellwig wrote:
-> This is not going to fly.
-> 
-> For one passing a dma_addr_t through the block layer is a layering
-> violation, and one that I think will also bite us in practice.
-> The host physical to PCIe bus address mapping can have offsets, and
-> those offsets absolutely can be different for differnet root ports.
-> So with your caller generated dma_addr_t everything works fine with
-> a switched setup as the one you are probably testing on, but on a
-> sufficiently complicated setup with multiple root ports it can break.
-
-I don't follow this argument. Yes, I understand PCI Bus offsets and yes
-I understand that they only apply beyond the bus they're working with.
-But this isn't *that* complicated and it should be the responsibility of
-the P2PDMA code to sort out and provide a dma_addr_t for. The dma_addr_t
-that's passed through the block layer could be a bus address or it could
-be the result of a dma_map_* request (if the transaction is found to go
-through an RC) depending on the requirements of the devices being used.
-
-> Also duplicating the whole block I/O stack, including hooks all over
-> the fast path is pretty much a no-go.
-
-There was very little duplicate code in the patch set. (Really just the
-mapping code). There are a few hooks, but in practice not that many if
-we ignore the WARN_ONs. We might be able to work to reduce this further.
-The main hooks are: when we skip bouncing, when we skip integrity prep,
-when we split, and when we map. And the patchset drops the PCI_P2PDMA
-hook when we map. So we're talking about maybe three or four extra ifs
-that would likely normally be fast due to the branch predictor.
-
-> I've been pondering for a while if we wouldn't be better off just
-> passing a phys_addr_t + len instead of the page, offset, len tuple
-> in the bio_vec, though.  If you look at the normal I/O path here
-> is what we normally do:
-> 
->  - we get a page as input, either because we have it at hand (e.g.
->    from the page cache) or from get_user_pages (which actually caculates
->    it from a pfn in the page tables)
->  - once in the bio all the merging decisions are based on the physical
->    address, so we have to convert it to the physical address there,
->    potentially multiple times
->  - then dma mapping all works off the physical address, which it gets
->    from the page at the start
->  - then only the dma address is used for the I/O
->  - on I/O completion we often but not always need the page again.  In
->    the direct I/O case for reference counting and dirty status, in the
->    file system also for things like marking the page uptodate
-> 
-> So if we move to a phys_addr_t we'd need to go back to the page at least
-> once.  But because of how the merging works we really only need to do
-> it once per segment, as we can just do pointer arithmerics do get the
-> following pages.  As we generally go at least once from a physical
-> address to a page in the merging code even a relatively expensive vmem_map
-> looks shouldn't be too bad.  Even more so given that the super hot path
-> (small blkdev direct I/O) can actually trivially cache the affected pages
-> as well.
-
-I've always wondered why it wasn't done this way. Passing around a page
-pointer *and* an offset always seemed less efficient than just a
-physical address. If we did do this, the proposed dma_addr_t and
-phys_addr_t paths through the block layer could be a lot more similar as
-things like the split calculation could work on either address type.
-We'd just have to prevent bouncing and integrity and change have a hook
-on how it's mapped.
-
-> Linus kinda hates the pfn approach, but part of that was really that
-> it was proposed for file system data, which we all found out really
-> can't work as-is without pages the hard way.  Another part probably
-> was potential performance issue, but between the few page lookups, and
-> the fact that using a single phys_addr_t instead of pfn/page + offset
-> should avoid quite a few calculations performance should not actually
-> be affected, although we'll have to be careful to actually verify that.
-
-Yes, I'd agree that removing the offset should make things simpler. But
-that requires changing a lot of stuff and doesn't really help what I'm
-trying to do.
-
-Logan
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 3a9bca3aa093..fd3bc061c600 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -288,7 +288,7 @@ static void nbd_size_update(struct nbd_device *nbd)
+ 	}
+ 	blk_queue_logical_block_size(nbd->disk->queue, config->blksize);
+ 	blk_queue_physical_block_size(nbd->disk->queue, config->blksize);
+-	set_capacity(nbd->disk, config->bytesize >> 9);
++	set_capacity(nbd->disk, config->bytesize >> SECTOR_SHIFT);
+ 	if (bdev) {
+ 		if (bdev->bd_disk) {
+ 			bd_set_size(bdev, config->bytesize);
+-- 
+2.21.0
 
