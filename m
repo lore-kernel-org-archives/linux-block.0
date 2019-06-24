@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 981D4C43613
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 19:41:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD87CC48BE9
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 19:41:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5EF7420679
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 19:41:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BDE520679
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 19:41:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K3KUyA2b"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gUm/O1Ma"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730717AbfFXTlS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1729330AbfFXTlS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 24 Jun 2019 15:41:18 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:40649 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730715AbfFXTlP (ORCPT
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38231 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730404AbfFXTlQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 15:41:15 -0400
-Received: by mail-wm1-f65.google.com with SMTP id v19so501660wmj.5
-        for <linux-block@vger.kernel.org>; Mon, 24 Jun 2019 12:41:13 -0700 (PDT)
+        Mon, 24 Jun 2019 15:41:16 -0400
+Received: by mail-wm1-f67.google.com with SMTP id s15so511080wmj.3
+        for <linux-block@vger.kernel.org>; Mon, 24 Jun 2019 12:41:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=JW8uE9p2cExcuevLdfaub1Bim8IPk1JSRsG24Fpy7KY=;
-        b=K3KUyA2b31P3piOKQWbeD/qXN+fkRIYaTmC3fpvh9rFOFyO6k2F4MFAAueJ2O9R04J
-         NCuphMwoCrLrX9PjK8BQMwCQJ27ABaobCAwJvRUFZh4i2l9tM/OeWlWVBbMjh4uw3aqo
-         d5YIuHyTbqaVXCCd6IfHyUAEmSeVfFTjlAEkJqW+QszM69Okt7pB8hF0z0QSaLuKBmyV
-         w3tekp0bgeDPCcTK49fqBmAXYGVJtkfgzd6INfaY5v5MG6Xqt66ykFBa0NRP4R7gwQTq
-         NgM1QD0yf+AX6lkUKHfO7MKXgrmTFwbTcQeJTn4RBQs6t+jAndrqasmxNhhqgpTb/+xN
-         vZyg==
+        bh=ZqOH6JolxVNnSbSBaGe2Jh+qvF6QxJR/Z+iRWaahp5U=;
+        b=gUm/O1MaMjWuqu5r4Y+CtrV3aS9D0yUyXwhqFMQ4h1lSkub19L/ToJF17Xxu8k7hr4
+         XW6msnXjBvHuGurncF60nTYHc1l6lI9E9qAHfTHLugFl5uDJxCulJbHNrCzprbxtXhwA
+         tXYsEsIbftsjlE8DrKb8MmG5ZBy1dVIH+YwbKpX3XrEelrXSA6xoC1Jw1JaUrPoOmxpv
+         slJk9SCOaAa2q/IE0D3FHwNn7yfWJc6pvcg8Ya3dGvzK/Rpr/dRY2rxJ6ZjqD+sfYXwx
+         oX85bSZ/gtUQm7uOs+Zy307jggM0wFP6tCNdse1TCbXGeh1h8ZET9iJOPoPVies7OV/H
+         1hdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=JW8uE9p2cExcuevLdfaub1Bim8IPk1JSRsG24Fpy7KY=;
-        b=bl26cxccIIW3nwLOYwIB9H2BaOmpg6MQL8faXs3kRAhpTP6yX3yyzMKzdZNHjCrEwK
-         4adSlLIo/BqWGlA1ZVfxHm0AeikIRaEhWK2Jj5LUkUKvX9Eci6LOJNTX2tShtW2np9x7
-         iplebxJ8D9q69+LYbZ+bM6mnNBF0zlgN8eUVod6Ovdc0Lc9ljMT7YvBqzXYLBlSE8HMC
-         vsn/YLHBDLtrhyogvTkmCEzu2j3pv0/iUKfNiwohfwc4wvTXM3Pp3xkeV6b6UKv+HDhI
-         2HwDgF4ElYTmMb4cOWfQid5doFS+IBUAevK6zBhSWp+TQSG3CxjtJ35h4hSb9YUw0ghq
-         H9dQ==
-X-Gm-Message-State: APjAAAWOL2FUsmYWtCLK7YimX/Jso9RtuuJlNPJ0JtmBJ5pj+P3yHHxV
-        OeOksRAeDomwb+56Ek7ta7tJPw==
-X-Google-Smtp-Source: APXvYqxzAyAVHsk3auhFc/TBnNSi20R2GMvTm6J4N7k53Y9pEtmcJ/UBDJS+5SEIN0uUMJKAPCm2Lg==
-X-Received: by 2002:a1c:c14b:: with SMTP id r72mr17075444wmf.166.1561405272454;
-        Mon, 24 Jun 2019 12:41:12 -0700 (PDT)
+        bh=ZqOH6JolxVNnSbSBaGe2Jh+qvF6QxJR/Z+iRWaahp5U=;
+        b=fX9mdjGiHN1nqL40DZGciAKejBGYg3TyScdlWDJotIASnUPb0iiGVCOVoz4HhFHHUU
+         w/NS7uM2CIdYHu2tD4Pr3T6lSNrFJXznJ0Ygb2u3+ne2QNDu5qO+bkN8AX56CQbftqtM
+         W8RPlLtJO6Numr3kxsvmKa9CzMy76lhBi/Ct1haBXJefMz66w0H1Lf2la46iYzyLE8nt
+         kruLAByxMCWUtLbEd0qmOZ77wVFTYXohLz6p3tpHiGaWXVUW1ANb70zdMYBcYJCueWRw
+         c6SesOD/VSzl4blb97nnAuE0VRDlFz6qTgO9GUFzFojO8ZfsvDqGDWCXVw2a3oi8gcvw
+         OG0A==
+X-Gm-Message-State: APjAAAVN6PDZMAcv+2NILmhZbHZjlkQ1a/C2s1oEP9u2z17DpdJi0iRp
+        vMyGtmfDKYXMt03YE/s6O3FeOA==
+X-Google-Smtp-Source: APXvYqw9TfmlozoCrvFTLmCrZuE17w179tBYJnUNXytKNduCYCg+QJgT+dBMkA5Tj8JBAO3vMn077Q==
+X-Received: by 2002:a1c:2e09:: with SMTP id u9mr17158631wmu.137.1561405273701;
+        Mon, 24 Jun 2019 12:41:13 -0700 (PDT)
 Received: from localhost.localdomain (146-241-101-27.dyn.eolo.it. [146.241.101.27])
-        by smtp.gmail.com with ESMTPSA id q25sm17615395wrc.68.2019.06.24.12.41.11
+        by smtp.gmail.com with ESMTPSA id q25sm17615395wrc.68.2019.06.24.12.41.12
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Jun 2019 12:41:12 -0700 (PDT)
+        Mon, 24 Jun 2019 12:41:13 -0700 (PDT)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -62,9 +62,9 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
         bottura.nicola95@gmail.com, srivatsa@csail.mit.edu,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX IMPROVEMENT 6/7] block, bfq: preempt lower-weight or lower-priority queues
-Date:   Mon, 24 Jun 2019 21:40:41 +0200
-Message-Id: <20190624194042.38747-7-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX IMPROVEMENT 7/7] block, bfq: re-schedule empty queues if they deserve I/O plugging
+Date:   Mon, 24 Jun 2019 21:40:42 +0200
+Message-Id: <20190624194042.38747-8-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190624194042.38747-1-paolo.valente@linaro.org>
 References: <20190624194042.38747-1-paolo.valente@linaro.org>
@@ -75,191 +75,485 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-BFQ enqueues the I/O coming from each process into a separate
-bfq_queue, and serves bfq_queues one at a time. Each bfq_queue may be
-served for at most timeout_sync milliseconds (default: 125 ms). This
-service scheme is prone to the following inaccuracy.
+Consider, on one side, a bfq_queue Q that remains empty while in
+service, and, on the other side, the pending I/O of bfq_queues that,
+according to their timestamps, have to be served after Q.  If an
+uncontrolled amount of I/O from the latter bfq_queues were dispatched
+while Q is waiting for its new I/O to arrive, then Q's bandwidth
+guarantees would be violated. To prevent this, I/O dispatch is plugged
+until Q receives new I/O (except for a properly controlled amount of
+injected I/O). Unfortunately, preemption breaks I/O-dispatch plugging,
+for the following reason.
 
-While a bfq_queue Q1 is in service, some empty bfq_queue Q2 may
-receive I/O, and, according to BFQ's scheduling policy, may become the
-right bfq_queue to serve, in place of the currently in-service
-bfq_queue. In this respect, postponing the service of Q2 to after the
-service of Q1 finishes may delay the completion of Q2's I/O, compared
-with an ideal service in which all non-empty bfq_queues are served in
-parallel, and every non-empty bfq_queue is served at a rate
-proportional to the bfq_queue's weight. This additional delay is equal
-at most to the time Q1 may unjustly remain in service before switching
-to Q2.
+Preemption is performed in two steps. First, Q is expired and
+re-scheduled. Second, the new bfq_queue to serve is chosen. The first
+step is needed by the second, as the second can be performed only
+after Q's timestamps have been properly updated (done in the
+expiration step), and Q has been re-queued for service. This
+dependency is a consequence of the way how BFQ's scheduling algorithm
+is currently implemented.
 
-If Q1 and Q2 have the same weight, then this time is most likely
-negligible compared with the completion time to be guaranteed to Q2's
-I/O. In addition, first, one of the reasons why BFQ may want to serve
-Q1 for a while is that this boosts throughput and, second, serving Q1
-longer reduces BFQ's overhead. As a conclusion, it is usually better
-not to preempt Q1 if both Q1 and Q2 have the same weight.
+But Q is not re-scheduled at all in the first step, because Q is
+empty. As a consequence, an uncontrolled amount of I/O may be
+dispatched until Q becomes non empty again. This breaks Q's service
+guarantees.
 
-In contrast, as Q2's weight or priority becomes higher and higher
-compared with that of Q1, the above delay becomes larger and larger,
-compared with the I/O completion times that have to be guaranteed to
-Q2 according to Q2's weight. So reducing this delay may be more
-important than avoiding the costs of preempting Q1.
+This commit addresses this issue by re-scheduling Q even if it is
+empty. This in turn breaks the assumption that all scheduled queues
+are non empty. Then a few extra checks are now needed.
 
-Accordingly, this commit preempts Q1 if Q2 has a higher weight or a
-higher priority than Q1. Preemption causes Q1 to be re-scheduled, and
-triggers a new choice of the next bfq_queue to serve. If Q2 really is
-the next bfq_queue to serve, then Q2 will be set in service
-immediately.
-
-This change reduces the component of the I/O latency caused by the
-above delay by about 80%. For example, on an (old) PLEXTOR PX-256M5
-SSD, the maximum latency reported by fio drops from 15.1 to 3.2 ms for
-a process doing sporadic random reads while another process is doing
-continuous sequential reads.
-
-Signed-off-by: Nicola Bottura <bottura.nicola95@gmail.com>
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 95 +++++++++++++++++++++++++++++++++++----------
- 1 file changed, 75 insertions(+), 20 deletions(-)
+ block/bfq-iosched.c | 387 +++++++++++++++++++++++---------------------
+ 1 file changed, 203 insertions(+), 184 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 9e2fbb7d1fb6..6a3d05023300 100644
+index 6a3d05023300..72840ebf953e 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -1428,17 +1428,19 @@ static int bfq_min_budget(struct bfq_data *bfqd)
-  * mechanism may be re-designed in such a way to make it possible to
-  * know whether preemption is needed without needing to update service
-  * trees). In addition, queue preemptions almost always cause random
-- * I/O, and thus loss of throughput. Because of these facts, the next
-- * function adopts the following simple scheme to avoid both costly
-- * operations and too frequent preemptions: it requests the expiration
-- * of the in-service queue (unconditionally) only for queues that need
-- * to recover a hole, or that either are weight-raised or deserve to
-- * be weight-raised.
-+ * I/O, which may in turn cause loss of throughput. Finally, there may
-+ * even be no in-service queue when the next function is invoked (so,
-+ * no queue to compare timestamps with). Because of these facts, the
-+ * next function adopts the following simple scheme to avoid costly
-+ * operations, too frequent preemptions and too many dependencies on
-+ * the state of the scheduler: it requests the expiration of the
-+ * in-service queue (unconditionally) only for queues that need to
-+ * recover a hole. Then it delegates to other parts of the code the
-+ * responsibility of handling the above case 2.
-  */
- static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
- 						struct bfq_queue *bfqq,
--						bool arrived_in_time,
--						bool wr_or_deserves_wr)
-+						bool arrived_in_time)
- {
- 	struct bfq_entity *entity = &bfqq->entity;
- 
-@@ -1493,7 +1495,7 @@ static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
- 	entity->budget = max_t(unsigned long, bfqq->max_budget,
- 			       bfq_serv_to_charge(bfqq->next_rq, bfqq));
- 	bfq_clear_bfqq_non_blocking_wait_rq(bfqq);
--	return wr_or_deserves_wr;
-+	return false;
+@@ -3210,7 +3210,186 @@ static void bfq_dispatch_remove(struct request_queue *q, struct request *rq)
+ 	bfq_remove_request(q, rq);
  }
  
- /*
-@@ -1611,6 +1613,36 @@ static bool bfq_bfqq_idle_for_long_time(struct bfq_data *bfqd,
- 			bfqd->bfq_wr_min_idle_time);
- }
- 
-+
+-static bool __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
 +/*
-+ * Return true if bfqq is in a higher priority class, or has a higher
-+ * weight than the in-service queue.
++ * There is a case where idling does not have to be performed for
++ * throughput concerns, but to preserve the throughput share of
++ * the process associated with bfqq.
++ *
++ * To introduce this case, we can note that allowing the drive
++ * to enqueue more than one request at a time, and hence
++ * delegating de facto final scheduling decisions to the
++ * drive's internal scheduler, entails loss of control on the
++ * actual request service order. In particular, the critical
++ * situation is when requests from different processes happen
++ * to be present, at the same time, in the internal queue(s)
++ * of the drive. In such a situation, the drive, by deciding
++ * the service order of the internally-queued requests, does
++ * determine also the actual throughput distribution among
++ * these processes. But the drive typically has no notion or
++ * concern about per-process throughput distribution, and
++ * makes its decisions only on a per-request basis. Therefore,
++ * the service distribution enforced by the drive's internal
++ * scheduler is likely to coincide with the desired throughput
++ * distribution only in a completely symmetric, or favorably
++ * skewed scenario where:
++ * (i-a) each of these processes must get the same throughput as
++ *	 the others,
++ * (i-b) in case (i-a) does not hold, it holds that the process
++ *       associated with bfqq must receive a lower or equal
++ *	 throughput than any of the other processes;
++ * (ii)  the I/O of each process has the same properties, in
++ *       terms of locality (sequential or random), direction
++ *       (reads or writes), request sizes, greediness
++ *       (from I/O-bound to sporadic), and so on;
++
++ * In fact, in such a scenario, the drive tends to treat the requests
++ * of each process in about the same way as the requests of the
++ * others, and thus to provide each of these processes with about the
++ * same throughput.  This is exactly the desired throughput
++ * distribution if (i-a) holds, or, if (i-b) holds instead, this is an
++ * even more convenient distribution for (the process associated with)
++ * bfqq.
++ *
++ * In contrast, in any asymmetric or unfavorable scenario, device
++ * idling (I/O-dispatch plugging) is certainly needed to guarantee
++ * that bfqq receives its assigned fraction of the device throughput
++ * (see [1] for details).
++ *
++ * The problem is that idling may significantly reduce throughput with
++ * certain combinations of types of I/O and devices. An important
++ * example is sync random I/O on flash storage with command
++ * queueing. So, unless bfqq falls in cases where idling also boosts
++ * throughput, it is important to check conditions (i-a), i(-b) and
++ * (ii) accurately, so as to avoid idling when not strictly needed for
++ * service guarantees.
++ *
++ * Unfortunately, it is extremely difficult to thoroughly check
++ * condition (ii). And, in case there are active groups, it becomes
++ * very difficult to check conditions (i-a) and (i-b) too.  In fact,
++ * if there are active groups, then, for conditions (i-a) or (i-b) to
++ * become false 'indirectly', it is enough that an active group
++ * contains more active processes or sub-groups than some other active
++ * group. More precisely, for conditions (i-a) or (i-b) to become
++ * false because of such a group, it is not even necessary that the
++ * group is (still) active: it is sufficient that, even if the group
++ * has become inactive, some of its descendant processes still have
++ * some request already dispatched but still waiting for
++ * completion. In fact, requests have still to be guaranteed their
++ * share of the throughput even after being dispatched. In this
++ * respect, it is easy to show that, if a group frequently becomes
++ * inactive while still having in-flight requests, and if, when this
++ * happens, the group is not considered in the calculation of whether
++ * the scenario is asymmetric, then the group may fail to be
++ * guaranteed its fair share of the throughput (basically because
++ * idling may not be performed for the descendant processes of the
++ * group, but it had to be).  We address this issue with the following
++ * bi-modal behavior, implemented in the function
++ * bfq_asymmetric_scenario().
++ *
++ * If there are groups with requests waiting for completion
++ * (as commented above, some of these groups may even be
++ * already inactive), then the scenario is tagged as
++ * asymmetric, conservatively, without checking any of the
++ * conditions (i-a), (i-b) or (ii). So the device is idled for bfqq.
++ * This behavior matches also the fact that groups are created
++ * exactly if controlling I/O is a primary concern (to
++ * preserve bandwidth and latency guarantees).
++ *
++ * On the opposite end, if there are no groups with requests waiting
++ * for completion, then only conditions (i-a) and (i-b) are actually
++ * controlled, i.e., provided that conditions (i-a) or (i-b) holds,
++ * idling is not performed, regardless of whether condition (ii)
++ * holds.  In other words, only if conditions (i-a) and (i-b) do not
++ * hold, then idling is allowed, and the device tends to be prevented
++ * from queueing many requests, possibly of several processes. Since
++ * there are no groups with requests waiting for completion, then, to
++ * control conditions (i-a) and (i-b) it is enough to check just
++ * whether all the queues with requests waiting for completion also
++ * have the same weight.
++ *
++ * Not checking condition (ii) evidently exposes bfqq to the
++ * risk of getting less throughput than its fair share.
++ * However, for queues with the same weight, a further
++ * mechanism, preemption, mitigates or even eliminates this
++ * problem. And it does so without consequences on overall
++ * throughput. This mechanism and its benefits are explained
++ * in the next three paragraphs.
++ *
++ * Even if a queue, say Q, is expired when it remains idle, Q
++ * can still preempt the new in-service queue if the next
++ * request of Q arrives soon (see the comments on
++ * bfq_bfqq_update_budg_for_activation). If all queues and
++ * groups have the same weight, this form of preemption,
++ * combined with the hole-recovery heuristic described in the
++ * comments on function bfq_bfqq_update_budg_for_activation,
++ * are enough to preserve a correct bandwidth distribution in
++ * the mid term, even without idling. In fact, even if not
++ * idling allows the internal queues of the device to contain
++ * many requests, and thus to reorder requests, we can rather
++ * safely assume that the internal scheduler still preserves a
++ * minimum of mid-term fairness.
++ *
++ * More precisely, this preemption-based, idleless approach
++ * provides fairness in terms of IOPS, and not sectors per
++ * second. This can be seen with a simple example. Suppose
++ * that there are two queues with the same weight, but that
++ * the first queue receives requests of 8 sectors, while the
++ * second queue receives requests of 1024 sectors. In
++ * addition, suppose that each of the two queues contains at
++ * most one request at a time, which implies that each queue
++ * always remains idle after it is served. Finally, after
++ * remaining idle, each queue receives very quickly a new
++ * request. It follows that the two queues are served
++ * alternatively, preempting each other if needed. This
++ * implies that, although both queues have the same weight,
++ * the queue with large requests receives a service that is
++ * 1024/8 times as high as the service received by the other
++ * queue.
++ *
++ * The motivation for using preemption instead of idling (for
++ * queues with the same weight) is that, by not idling,
++ * service guarantees are preserved (completely or at least in
++ * part) without minimally sacrificing throughput. And, if
++ * there is no active group, then the primary expectation for
++ * this device is probably a high throughput.
++ *
++ * We are now left only with explaining the additional
++ * compound condition that is checked below for deciding
++ * whether the scenario is asymmetric. To explain this
++ * compound condition, we need to add that the function
++ * bfq_asymmetric_scenario checks the weights of only
++ * non-weight-raised queues, for efficiency reasons (see
++ * comments on bfq_weights_tree_add()). Then the fact that
++ * bfqq is weight-raised is checked explicitly here. More
++ * precisely, the compound condition below takes into account
++ * also the fact that, even if bfqq is being weight-raised,
++ * the scenario is still symmetric if all queues with requests
++ * waiting for completion happen to be
++ * weight-raised. Actually, we should be even more precise
++ * here, and differentiate between interactive weight raising
++ * and soft real-time weight raising.
++ *
++ * As a side note, it is worth considering that the above
++ * device-idling countermeasures may however fail in the
++ * following unlucky scenario: if idling is (correctly)
++ * disabled in a time period during which all symmetry
++ * sub-conditions hold, and hence the device is allowed to
++ * enqueue many requests, but at some later point in time some
++ * sub-condition stops to hold, then it may become impossible
++ * to let requests be served in the desired order until all
++ * the requests already queued in the device have been served.
 + */
-+static bool bfq_bfqq_higher_class_or_weight(struct bfq_queue *bfqq,
-+					    struct bfq_queue *in_serv_bfqq)
++static bool idling_needed_for_service_guarantees(struct bfq_data *bfqd,
++						 struct bfq_queue *bfqq)
 +{
-+	int bfqq_weight, in_serv_weight;
-+
-+	if (bfqq->ioprio_class < in_serv_bfqq->ioprio_class)
-+		return true;
-+
-+	if (in_serv_bfqq->entity.parent == bfqq->entity.parent) {
-+		bfqq_weight = bfqq->entity.weight;
-+		in_serv_weight = in_serv_bfqq->entity.weight;
-+	} else {
-+		if (bfqq->entity.parent)
-+			bfqq_weight = bfqq->entity.parent->weight;
-+		else
-+			bfqq_weight = bfqq->entity.weight;
-+		if (in_serv_bfqq->entity.parent)
-+			in_serv_weight = in_serv_bfqq->entity.parent->weight;
-+		else
-+			in_serv_weight = in_serv_bfqq->entity.weight;
-+	}
-+
-+	return bfqq_weight > in_serv_weight;
++	return (bfqq->wr_coeff > 1 &&
++		bfqd->wr_busy_queues <
++		bfq_tot_busy_queues(bfqd)) ||
++		bfq_asymmetric_scenario(bfqd, bfqq);
 +}
 +
- static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 					     struct bfq_queue *bfqq,
- 					     int old_wr_coeff,
-@@ -1655,8 +1687,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 	 */
- 	bfqq_wants_to_preempt =
- 		bfq_bfqq_update_budg_for_activation(bfqd, bfqq,
--						    arrived_in_time,
--						    wr_or_deserves_wr);
-+						    arrived_in_time);
- 
++static bool __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++			      enum bfqq_expiration reason)
+ {
  	/*
- 	 * If bfqq happened to be activated in a burst, but has been
-@@ -1721,16 +1752,40 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 	 * If this bfqq is shared between multiple processes, check
+@@ -3221,7 +3400,22 @@ static bool __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 	if (bfq_bfqq_coop(bfqq) && BFQQ_SEEKY(bfqq))
+ 		bfq_mark_bfqq_split_coop(bfqq);
  
- 	/*
- 	 * Expire in-service queue only if preemption may be needed
--	 * for guarantees. In this respect, the function
--	 * next_queue_may_preempt just checks a simple, necessary
--	 * condition, and not a sufficient condition based on
--	 * timestamps. In fact, for the latter condition to be
--	 * evaluated, timestamps would need first to be updated, and
--	 * this operation is quite costly (see the comments on the
--	 * function bfq_bfqq_update_budg_for_activation).
-+	 * for guarantees. In particular, we care only about two
-+	 * cases. The first is that bfqq has to recover a service
-+	 * hole, as explained in the comments on
-+	 * bfq_bfqq_update_budg_for_activation(), i.e., that
-+	 * bfqq_wants_to_preempt is true. However, if bfqq does not
-+	 * carry time-critical I/O, then bfqq's bandwidth is less
-+	 * important than that of queues that carry time-critical I/O.
-+	 * So, as a further constraint, we consider this case only if
-+	 * bfqq is at least as weight-raised, i.e., at least as time
-+	 * critical, as the in-service queue.
-+	 *
-+	 * The second case is that bfqq is in a higher priority class,
-+	 * or has a higher weight than the in-service queue. If this
-+	 * condition does not hold, we don't care because, even if
-+	 * bfqq does not start to be served immediately, the resulting
-+	 * delay for bfqq's I/O is however lower or much lower than
-+	 * the ideal completion time to be guaranteed to bfqq's I/O.
-+	 *
-+	 * In both cases, preemption is needed only if, according to
-+	 * the timestamps of both bfqq and of the in-service queue,
-+	 * bfqq actually is the next queue to serve. So, to reduce
-+	 * useless preemptions, the return value of
-+	 * next_queue_may_preempt() is considered in the next compound
-+	 * condition too. Yet next_queue_may_preempt() just checks a
-+	 * simple, necessary condition for bfqq to be the next queue
-+	 * to serve. In fact, to evaluate a sufficient condition, the
-+	 * timestamps of the in-service queue would need to be
-+	 * updated, and this operation is quite costly (see the
-+	 * comments on bfq_bfqq_update_budg_for_activation()).
+-	if (RB_EMPTY_ROOT(&bfqq->sort_list)) {
++	/*
++	 * Consider queues with a higher finish virtual time than
++	 * bfqq. If idling_needed_for_service_guarantees(bfqq) returns
++	 * true, then bfqq's bandwidth would be violated if an
++	 * uncontrolled amount of I/O from these queues were
++	 * dispatched while bfqq is waiting for its new I/O to
++	 * arrive. This is exactly what may happen if this is a forced
++	 * expiration caused by a preemption attempt, and if bfqq is
++	 * not re-scheduled. To prevent this from happening, re-queue
++	 * bfqq if it needs I/O-dispatch plugging, even if it is
++	 * empty. By doing so, bfqq is granted to be served before the
++	 * above queues (provided that bfqq is of course eligible).
++	 */
++	if (RB_EMPTY_ROOT(&bfqq->sort_list) &&
++	    !(reason == BFQQE_PREEMPTED &&
++	      idling_needed_for_service_guarantees(bfqd, bfqq))) {
+ 		if (bfqq->dispatched == 0)
+ 			/*
+ 			 * Overloading budget_timeout field to store
+@@ -3238,7 +3432,8 @@ static bool __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 		 * Resort priority tree of potential close cooperators.
+ 		 * See comments on bfq_pos_tree_add_move() for the unlikely().
+ 		 */
+-		if (unlikely(!bfqd->nonrot_with_queueing))
++		if (unlikely(!bfqd->nonrot_with_queueing &&
++			     !RB_EMPTY_ROOT(&bfqq->sort_list)))
+ 			bfq_pos_tree_add_move(bfqd, bfqq);
+ 	}
+ 
+@@ -3739,7 +3934,7 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 	 * reason.
  	 */
--	if (bfqd->in_service_queue && bfqq_wants_to_preempt &&
--	    bfqd->in_service_queue->wr_coeff < bfqq->wr_coeff &&
-+	if (bfqd->in_service_queue &&
-+	    ((bfqq_wants_to_preempt &&
-+	      bfqq->wr_coeff >= bfqd->in_service_queue->wr_coeff) ||
-+	     bfq_bfqq_higher_class_or_weight(bfqq, bfqd->in_service_queue)) &&
- 	    next_queue_may_preempt(bfqd))
- 		bfq_bfqq_expire(bfqd, bfqd->in_service_queue,
- 				false, BFQQE_PREEMPTED);
+ 	__bfq_bfqq_recalc_budget(bfqd, bfqq, reason);
+-	if (__bfq_bfqq_expire(bfqd, bfqq))
++	if (__bfq_bfqq_expire(bfqd, bfqq, reason))
+ 		/* bfqq is gone, no more actions on it */
+ 		return;
+ 
+@@ -3885,184 +4080,6 @@ static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
+ 		bfqd->wr_busy_queues == 0;
+ }
+ 
+-/*
+- * There is a case where idling does not have to be performed for
+- * throughput concerns, but to preserve the throughput share of
+- * the process associated with bfqq.
+- *
+- * To introduce this case, we can note that allowing the drive
+- * to enqueue more than one request at a time, and hence
+- * delegating de facto final scheduling decisions to the
+- * drive's internal scheduler, entails loss of control on the
+- * actual request service order. In particular, the critical
+- * situation is when requests from different processes happen
+- * to be present, at the same time, in the internal queue(s)
+- * of the drive. In such a situation, the drive, by deciding
+- * the service order of the internally-queued requests, does
+- * determine also the actual throughput distribution among
+- * these processes. But the drive typically has no notion or
+- * concern about per-process throughput distribution, and
+- * makes its decisions only on a per-request basis. Therefore,
+- * the service distribution enforced by the drive's internal
+- * scheduler is likely to coincide with the desired throughput
+- * distribution only in a completely symmetric, or favorably
+- * skewed scenario where:
+- * (i-a) each of these processes must get the same throughput as
+- *	 the others,
+- * (i-b) in case (i-a) does not hold, it holds that the process
+- *       associated with bfqq must receive a lower or equal
+- *	 throughput than any of the other processes;
+- * (ii)  the I/O of each process has the same properties, in
+- *       terms of locality (sequential or random), direction
+- *       (reads or writes), request sizes, greediness
+- *       (from I/O-bound to sporadic), and so on;
+-
+- * In fact, in such a scenario, the drive tends to treat the requests
+- * of each process in about the same way as the requests of the
+- * others, and thus to provide each of these processes with about the
+- * same throughput.  This is exactly the desired throughput
+- * distribution if (i-a) holds, or, if (i-b) holds instead, this is an
+- * even more convenient distribution for (the process associated with)
+- * bfqq.
+- *
+- * In contrast, in any asymmetric or unfavorable scenario, device
+- * idling (I/O-dispatch plugging) is certainly needed to guarantee
+- * that bfqq receives its assigned fraction of the device throughput
+- * (see [1] for details).
+- *
+- * The problem is that idling may significantly reduce throughput with
+- * certain combinations of types of I/O and devices. An important
+- * example is sync random I/O on flash storage with command
+- * queueing. So, unless bfqq falls in cases where idling also boosts
+- * throughput, it is important to check conditions (i-a), i(-b) and
+- * (ii) accurately, so as to avoid idling when not strictly needed for
+- * service guarantees.
+- *
+- * Unfortunately, it is extremely difficult to thoroughly check
+- * condition (ii). And, in case there are active groups, it becomes
+- * very difficult to check conditions (i-a) and (i-b) too.  In fact,
+- * if there are active groups, then, for conditions (i-a) or (i-b) to
+- * become false 'indirectly', it is enough that an active group
+- * contains more active processes or sub-groups than some other active
+- * group. More precisely, for conditions (i-a) or (i-b) to become
+- * false because of such a group, it is not even necessary that the
+- * group is (still) active: it is sufficient that, even if the group
+- * has become inactive, some of its descendant processes still have
+- * some request already dispatched but still waiting for
+- * completion. In fact, requests have still to be guaranteed their
+- * share of the throughput even after being dispatched. In this
+- * respect, it is easy to show that, if a group frequently becomes
+- * inactive while still having in-flight requests, and if, when this
+- * happens, the group is not considered in the calculation of whether
+- * the scenario is asymmetric, then the group may fail to be
+- * guaranteed its fair share of the throughput (basically because
+- * idling may not be performed for the descendant processes of the
+- * group, but it had to be).  We address this issue with the following
+- * bi-modal behavior, implemented in the function
+- * bfq_asymmetric_scenario().
+- *
+- * If there are groups with requests waiting for completion
+- * (as commented above, some of these groups may even be
+- * already inactive), then the scenario is tagged as
+- * asymmetric, conservatively, without checking any of the
+- * conditions (i-a), (i-b) or (ii). So the device is idled for bfqq.
+- * This behavior matches also the fact that groups are created
+- * exactly if controlling I/O is a primary concern (to
+- * preserve bandwidth and latency guarantees).
+- *
+- * On the opposite end, if there are no groups with requests waiting
+- * for completion, then only conditions (i-a) and (i-b) are actually
+- * controlled, i.e., provided that conditions (i-a) or (i-b) holds,
+- * idling is not performed, regardless of whether condition (ii)
+- * holds.  In other words, only if conditions (i-a) and (i-b) do not
+- * hold, then idling is allowed, and the device tends to be prevented
+- * from queueing many requests, possibly of several processes. Since
+- * there are no groups with requests waiting for completion, then, to
+- * control conditions (i-a) and (i-b) it is enough to check just
+- * whether all the queues with requests waiting for completion also
+- * have the same weight.
+- *
+- * Not checking condition (ii) evidently exposes bfqq to the
+- * risk of getting less throughput than its fair share.
+- * However, for queues with the same weight, a further
+- * mechanism, preemption, mitigates or even eliminates this
+- * problem. And it does so without consequences on overall
+- * throughput. This mechanism and its benefits are explained
+- * in the next three paragraphs.
+- *
+- * Even if a queue, say Q, is expired when it remains idle, Q
+- * can still preempt the new in-service queue if the next
+- * request of Q arrives soon (see the comments on
+- * bfq_bfqq_update_budg_for_activation). If all queues and
+- * groups have the same weight, this form of preemption,
+- * combined with the hole-recovery heuristic described in the
+- * comments on function bfq_bfqq_update_budg_for_activation,
+- * are enough to preserve a correct bandwidth distribution in
+- * the mid term, even without idling. In fact, even if not
+- * idling allows the internal queues of the device to contain
+- * many requests, and thus to reorder requests, we can rather
+- * safely assume that the internal scheduler still preserves a
+- * minimum of mid-term fairness.
+- *
+- * More precisely, this preemption-based, idleless approach
+- * provides fairness in terms of IOPS, and not sectors per
+- * second. This can be seen with a simple example. Suppose
+- * that there are two queues with the same weight, but that
+- * the first queue receives requests of 8 sectors, while the
+- * second queue receives requests of 1024 sectors. In
+- * addition, suppose that each of the two queues contains at
+- * most one request at a time, which implies that each queue
+- * always remains idle after it is served. Finally, after
+- * remaining idle, each queue receives very quickly a new
+- * request. It follows that the two queues are served
+- * alternatively, preempting each other if needed. This
+- * implies that, although both queues have the same weight,
+- * the queue with large requests receives a service that is
+- * 1024/8 times as high as the service received by the other
+- * queue.
+- *
+- * The motivation for using preemption instead of idling (for
+- * queues with the same weight) is that, by not idling,
+- * service guarantees are preserved (completely or at least in
+- * part) without minimally sacrificing throughput. And, if
+- * there is no active group, then the primary expectation for
+- * this device is probably a high throughput.
+- *
+- * We are now left only with explaining the additional
+- * compound condition that is checked below for deciding
+- * whether the scenario is asymmetric. To explain this
+- * compound condition, we need to add that the function
+- * bfq_asymmetric_scenario checks the weights of only
+- * non-weight-raised queues, for efficiency reasons (see
+- * comments on bfq_weights_tree_add()). Then the fact that
+- * bfqq is weight-raised is checked explicitly here. More
+- * precisely, the compound condition below takes into account
+- * also the fact that, even if bfqq is being weight-raised,
+- * the scenario is still symmetric if all queues with requests
+- * waiting for completion happen to be
+- * weight-raised. Actually, we should be even more precise
+- * here, and differentiate between interactive weight raising
+- * and soft real-time weight raising.
+- *
+- * As a side note, it is worth considering that the above
+- * device-idling countermeasures may however fail in the
+- * following unlucky scenario: if idling is (correctly)
+- * disabled in a time period during which all symmetry
+- * sub-conditions hold, and hence the device is allowed to
+- * enqueue many requests, but at some later point in time some
+- * sub-condition stops to hold, then it may become impossible
+- * to let requests be served in the desired order until all
+- * the requests already queued in the device have been served.
+- */
+-static bool idling_needed_for_service_guarantees(struct bfq_data *bfqd,
+-						 struct bfq_queue *bfqq)
+-{
+-	return (bfqq->wr_coeff > 1 &&
+-		bfqd->wr_busy_queues <
+-		bfq_tot_busy_queues(bfqd)) ||
+-		bfq_asymmetric_scenario(bfqd, bfqq);
+-}
+-
+ /*
+  * For a queue that becomes empty, device idling is allowed only if
+  * this function returns true for that queue. As a consequence, since
+@@ -4321,7 +4338,8 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+ 	    (bfqq->dispatched != 0 && bfq_better_to_idle(bfqq))) {
+ 		struct bfq_queue *async_bfqq =
+ 			bfqq->bic && bfqq->bic->bfqq[0] &&
+-			bfq_bfqq_busy(bfqq->bic->bfqq[0]) ?
++			bfq_bfqq_busy(bfqq->bic->bfqq[0]) &&
++			bfqq->bic->bfqq[0]->next_rq ?
+ 			bfqq->bic->bfqq[0] : NULL;
+ 
+ 		/*
+@@ -4403,6 +4421,7 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+ 			bfqq = bfqq->bic->bfqq[0];
+ 		else if (bfq_bfqq_has_waker(bfqq) &&
+ 			   bfq_bfqq_busy(bfqq->waker_bfqq) &&
++			   bfqq->next_rq &&
+ 			   bfq_serv_to_charge(bfqq->waker_bfqq->next_rq,
+ 					      bfqq->waker_bfqq) <=
+ 			   bfq_bfqq_budget_left(bfqq->waker_bfqq)
+@@ -4800,7 +4819,7 @@ static void bfq_exit_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 	struct hlist_node *n;
+ 
+ 	if (bfqq == bfqd->in_service_queue) {
+-		__bfq_bfqq_expire(bfqd, bfqq);
++		__bfq_bfqq_expire(bfqd, bfqq, BFQQE_BUDGET_TIMEOUT);
+ 		bfq_schedule_dispatch(bfqd);
+ 	}
+ 
 -- 
 2.20.1
 
