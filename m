@@ -2,89 +2,119 @@ Return-Path: <SRS0=7YUI=UX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B47A1C43613
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 20:16:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF98C43613
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 20:21:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A08920645
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 20:16:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E59F20645
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 20:21:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOw72oyS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731569AbfFXUQI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jun 2019 16:16:08 -0400
-Received: from outgoing-stata.csail.mit.edu ([128.30.2.210]:60293 "EHLO
-        outgoing-stata.csail.mit.edu" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727595AbfFXUQI (ORCPT
+        id S1728881AbfFXUVO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jun 2019 16:21:14 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:40769 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726393AbfFXUVO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 16:16:08 -0400
-Received: from [4.30.142.84] (helo=srivatsab-a01.vmware.com)
-        by outgoing-stata.csail.mit.edu with esmtpsa (TLS1.2:RSA_AES_128_CBC_SHA1:128)
-        (Exim 4.82)
-        (envelope-from <srivatsa@csail.mit.edu>)
-        id 1hfVNk-000XTK-Vd; Mon, 24 Jun 2019 16:16:05 -0400
-Subject: Re: [PATCH BUGFIX IMPROVEMENT 0/7] boost throughput with synced I/O,
- reduce latency and fix a bandwidth bug
-To:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ulf.hansson@linaro.org, linus.walleij@linaro.org,
-        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
-        bottura.nicola95@gmail.com
-References: <20190624194042.38747-1-paolo.valente@linaro.org>
-From:   "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-Message-ID: <f3e2d759-911b-f593-9ec5-b6b7a94df71c@csail.mit.edu>
-Date:   Mon, 24 Jun 2019 13:15:31 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.2
+        Mon, 24 Jun 2019 16:21:14 -0400
+Received: by mail-pf1-f194.google.com with SMTP id p184so8146335pfp.7;
+        Mon, 24 Jun 2019 13:21:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=K2URUWLi/i37v7K+14kEpM0KZq8GpN2UCZhu67teNXY=;
+        b=OOw72oySzClnxongvl16fJuTXhexhrWE/q4y8lfFonZMTpCIt3o/TI1qLmOLR2poFw
+         MfAzSxygGpHJ7dcNfmkrhq+wSJDkxi9mi4U6vGEYqPo7Z0/SZ1u5HbBv+1kNr+Vl3u0s
+         F8yAH7yQmycnjpiTUwjoNzXjXm7Tg6Fin3f+eTmXn0ZFO85FDQsCrfdJqahzciKrXFkn
+         VQtvoffQWEM/CACMX83eHL+5qhZ0wFH8WFwCaB21G0nyLlO0jWCOic5j6LQuIJ8RBLjb
+         F9ijJXTLAzoaX+nRx8yJWTZWQF9CpAeH2Urym0CAUzdRTr+UxRzqN8KZXKi2KXakuC3k
+         XvCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=K2URUWLi/i37v7K+14kEpM0KZq8GpN2UCZhu67teNXY=;
+        b=iglCQg5abz7cOxnTqJj9UOcAAOH4IBj9JRb/eN6YxSwG2mg5RdBfN/5z30qpulahxU
+         pdUVTN8KS92e9RkObBzKH6n9DVZHOQMOfc8qJ4whIsQWJ+n1foFQGMtgBjLC7hQrbP0R
+         YJy9qe0Umh0c6yCOnrSwGyYP7b3wWIXW9WVS1hA8jFaOhGRNYVvClq8L6lrhhuoNPb9w
+         /4J6brF0+gSXlqfic7qE19kocPUtGq04x0kqbL8WCKUJ4yTGGb/FKKBZHV9uF7yI04jL
+         5FprGPI7EPLU2tCNQcWfURzlvPIqCom/jH338yBAmZ5ndsE15Qloq0ahh0XM7RZVa/zd
+         rvEw==
+X-Gm-Message-State: APjAAAWqf6aCR4Rv3uMAw1dQ3e41xt4QOnpDzi7UKXLIkw7iOP7l6F7g
+        nAf693iTtIDrHgNSpHgO6F4=
+X-Google-Smtp-Source: APXvYqzN3DSPGn+3YbngXKJ00yEQiBNAAdY0MNO6THf0uc/OgOi7WJGWhIs2NZDIA+kWIeC2dM5YLA==
+X-Received: by 2002:a63:52:: with SMTP id 79mr34365144pga.381.1561407673484;
+        Mon, 24 Jun 2019 13:21:13 -0700 (PDT)
+Received: from localhost ([123.213.206.190])
+        by smtp.gmail.com with ESMTPSA id x25sm12526216pfm.48.2019.06.24.13.21.12
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 24 Jun 2019 13:21:12 -0700 (PDT)
+Date:   Tue, 25 Jun 2019 05:21:10 +0900
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     Weiping Zhang <zhangweiping@didiglobal.com>
+Cc:     axboe@kernel.dk, tj@kernel.org, hch@lst.de, bvanassche@acm.org,
+        keith.busch@intel.com, minwoo.im.dev@gmail.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v3 5/5] nvme: add support weighted round robin queue
+Message-ID: <20190624202110.GD6526@minwooim-desktop>
+References: <cover.1561385989.git.zhangweiping@didiglobal.com>
+ <6e3b0f511a291dd0ce570a6cc5393e10d4509d0e.1561385989.git.zhangweiping@didiglobal.com>
 MIME-Version: 1.0
-In-Reply-To: <20190624194042.38747-1-paolo.valente@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <6e3b0f511a291dd0ce570a6cc5393e10d4509d0e.1561385989.git.zhangweiping@didiglobal.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/24/19 12:40 PM, Paolo Valente wrote:
-> Hi Jens,
-> this series, based against for-5.3/block, contains:
-> 1) The improvements to recover the throughput loss reported by
->    Srivatsa [1] (first five patches)
-> 2) A preemption improvement to reduce I/O latency
-> 3) A fix of a subtle bug causing loss of control over I/O bandwidths
-> 
+> @@ -2627,7 +2752,30 @@ static int nvme_pci_get_address(struct nvme_ctrl *ctrl, char *buf, int size)
+>  
+>  static void nvme_pci_get_ams(struct nvme_ctrl *ctrl, u32 *ams)
+>  {
+> -	*ams = NVME_CC_AMS_RR;
+> +	/* if deivce doesn't support WRR, force reset wrr queues to 0 */
+> +	if (!NVME_CAP_AMS_WRRU(ctrl->cap)) {
+> +		wrr_low_queues = 0;
+> +		wrr_medium_queues = 0;
+> +		wrr_high_queues = 0;
+> +		wrr_urgent_queues = 0;
 
-Thanks a lot for these patches, Paolo!
+Could we avoid this kind of reset variables in get_XXX() function?  I
+guess it would be great if it just tries to get some value which is
+mainly focused to do.
 
-Would you mind adding:
+> +
+> +		*ams = NVME_CC_AMS_RR;
+> +		ctrl->wrr_enabled = false;
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * if device support WRR, check wrr queue count, all wrr queues are
+> +	 * 0, don't enable device's WRR.
+> +	 */
+> +	if ((wrr_low_queues + wrr_medium_queues + wrr_high_queues +
+> +				wrr_urgent_queues) > 0) {
+> +		*ams = NVME_CC_AMS_WRRU;
+> +		ctrl->wrr_enabled = true;
+> +	} else {
+> +		*ams = NVME_CC_AMS_RR;
+> +		ctrl->wrr_enabled = false;
 
-Reported-by: Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu>
-Tested-by: Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu>
+These two line can be merged into above condition:
 
-to the first 5 patches, as appropriate?
-
-Thank you!
-
-> 
-> [1] https://lkml.org/lkml/2019/5/17/755
-> 
-> Paolo Valente (7):
->   block, bfq: reset inject limit when think-time state changes
->   block, bfq: fix rq_in_driver check in bfq_update_inject_limit
->   block, bfq: update base request service times when possible
->   block, bfq: bring forward seek&think time update
->   block, bfq: detect wakers and unconditionally inject their I/O
->   block, bfq: preempt lower-weight or lower-priority queues
->   block, bfq: re-schedule empty queues if they deserve I/O plugging
-> 
->  block/bfq-iosched.c | 952 ++++++++++++++++++++++++++++++--------------
->  block/bfq-iosched.h |  25 +-
->  2 files changed, 686 insertions(+), 291 deletions(-)
-> 
-
-Regards,
-Srivatsa
-VMware Photon OS
+	if (!NVME_CAP_AMS_WRRU(ctrl->cap) ||
+		wrr_low_queues + wrr_medium_queues + wrr_high_queues +
+			wrr_urgent_queues <= 0) {
+		*ams = NVME_CC_AMS_RR;
+		ctrl->wrr_enabled = false;
+	}
