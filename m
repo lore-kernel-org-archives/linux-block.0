@@ -2,26 +2,26 @@ Return-Path: <SRS0=7YUI=UX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C0E4C43613
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 07:00:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 809D1C43613
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 07:05:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 343AF2089F
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 07:00:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 569E92089F
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 07:05:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727112AbfFXHAI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jun 2019 03:00:08 -0400
-Received: from mx2.suse.de ([195.135.220.15]:53966 "EHLO mx1.suse.de"
+        id S1727527AbfFXHFj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jun 2019 03:05:39 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54712 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726077AbfFXHAI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 03:00:08 -0400
+        id S1726340AbfFXHFj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Jun 2019 03:05:39 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 231F7AF99;
-        Mon, 24 Jun 2019 07:00:06 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id A9FDEAEEC;
+        Mon, 24 Jun 2019 07:05:37 +0000 (UTC)
 Subject: Re: [PATCH] bcache: make stripe_size configurable and persistent for
  hardware raid5/6
 To:     Eric Wheeler <bcache@lists.ewheeler.net>
@@ -37,8 +37,8 @@ References: <d3f7fd44-9287-c7fa-ee95-c3b8a4d56c93@suse.de>
 From:   Coly Li <colyli@suse.de>
 Openpgp: preference=signencrypt
 Organization: SUSE Labs
-Message-ID: <1185f3ad-ac4c-7f48-206f-22fdbbfe289e@suse.de>
-Date:   Mon, 24 Jun 2019 14:57:42 +0800
+Message-ID: <200638b0-7cba-38b4-20c4-b325f3cfe862@suse.de>
+Date:   Mon, 24 Jun 2019 15:05:27 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
  Gecko/20100101 Thunderbird/60.7.2
 MIME-Version: 1.0
