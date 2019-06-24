@@ -2,192 +2,89 @@ Return-Path: <SRS0=7YUI=UX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 655AFC43613
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 20:13:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B47A1C43613
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 20:16:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30DA120657
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 20:13:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UAq2Et+p"
+	by mail.kernel.org (Postfix) with ESMTP id 8A08920645
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jun 2019 20:16:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727774AbfFXUNA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jun 2019 16:13:00 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:35919 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725921AbfFXUNA (ORCPT
+        id S1731569AbfFXUQI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jun 2019 16:16:08 -0400
+Received: from outgoing-stata.csail.mit.edu ([128.30.2.210]:60293 "EHLO
+        outgoing-stata.csail.mit.edu" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727595AbfFXUQI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 16:13:00 -0400
-Received: by mail-pl1-f194.google.com with SMTP id k8so7528090plt.3;
-        Mon, 24 Jun 2019 13:12:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=USqQq4RtkZv36krdefC1dbFXyRTkrhEsSnTWhHiiTX8=;
-        b=UAq2Et+pia3d9R0qhpF83A5UD8W5EaC75PZwCmcojVBmj9F2Hd5oIW961tVXyMKD7C
-         hEC08TQzOBAfOIRTuPBmiotLtC2+RxH5g3gw7BvahJEm7NhHG8suI2vZxwPttT+cjZEL
-         CExcnFb8IRjqeuXOqPv774ZUfr3UqB2AA7HWXuV0NEfXOqf2bauGj5T2S8/6HYswHjhJ
-         029RkOopSH+uHZaupFpixjLVKa5II6QZWMa7JPwyvLiMYrQV8WaFuzaxN3K70YRB9/Xw
-         574ZX7VUYSsf/8DjRBYBXban/YVnPdFy40FrSFV2RjmhGm8ZlCf6jkcatD2+HXJSajzt
-         R5cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=USqQq4RtkZv36krdefC1dbFXyRTkrhEsSnTWhHiiTX8=;
-        b=EtbldXTAJRJxmFWcINDeIowLsZTSSLNu9c+StbrYiVOaVJB2rcwZnGFdnlcQZMhcfj
-         svsqXlf2YYxZ0XXxJpliRVwduma3a75unSninCVLnUDzxe5t0lmcEIeEzfMIwbD5zKYd
-         b2WzHcTcxnpHYoTGl6COg+AXRStB+QK/JyRQeJANc02rUSQEOJt3lZAqfKIU0A4sW8VU
-         TtHGZxrkYyTlkVYZhaOVb9Yg/Php82gV3yP+TcDJIHYCPn5iopjR+kWnQbnXIaRfveIp
-         q4ydx89C4IeK7y51npvSR9Juzt2WBRhekXbNwNA62ZvzqyRwaflsW9TI+YrfFxBSUxNs
-         k4dg==
-X-Gm-Message-State: APjAAAVaoEY/mpeR0raHUCqgFyKWrfMmSmAmWBFrVwTQDNQdOtK9Z+dD
-        ki9iNj64KgNMKGyogf40ELk=
-X-Google-Smtp-Source: APXvYqzPi32d1jAllYMuwcsfTzleeJQdzD8IdW8C+BXnyAZqnrl6HAe2CEmCZYz1VuODNORP3ZlQrw==
-X-Received: by 2002:a17:902:8f93:: with SMTP id z19mr62437831plo.97.1561407179277;
-        Mon, 24 Jun 2019 13:12:59 -0700 (PDT)
-Received: from localhost ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id g9sm9863715pgs.78.2019.06.24.13.12.57
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 24 Jun 2019 13:12:58 -0700 (PDT)
-Date:   Tue, 25 Jun 2019 05:12:56 +0900
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     Weiping Zhang <zhangweiping@didiglobal.com>
-Cc:     axboe@kernel.dk, tj@kernel.org, hch@lst.de, bvanassche@acm.org,
-        keith.busch@intel.com, minwoo.im.dev@gmail.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v3 2/5] nvme: add get_ams for nvme_ctrl_ops
-Message-ID: <20190624201256.GC6526@minwooim-desktop>
-References: <cover.1561385989.git.zhangweiping@didiglobal.com>
- <2c916063e19cc3f33376d7bb0fb8a5ff10ea42db.1561385989.git.zhangweiping@didiglobal.com>
+        Mon, 24 Jun 2019 16:16:08 -0400
+Received: from [4.30.142.84] (helo=srivatsab-a01.vmware.com)
+        by outgoing-stata.csail.mit.edu with esmtpsa (TLS1.2:RSA_AES_128_CBC_SHA1:128)
+        (Exim 4.82)
+        (envelope-from <srivatsa@csail.mit.edu>)
+        id 1hfVNk-000XTK-Vd; Mon, 24 Jun 2019 16:16:05 -0400
+Subject: Re: [PATCH BUGFIX IMPROVEMENT 0/7] boost throughput with synced I/O,
+ reduce latency and fix a bandwidth bug
+To:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ulf.hansson@linaro.org, linus.walleij@linaro.org,
+        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
+        bottura.nicola95@gmail.com
+References: <20190624194042.38747-1-paolo.valente@linaro.org>
+From:   "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+Message-ID: <f3e2d759-911b-f593-9ec5-b6b7a94df71c@csail.mit.edu>
+Date:   Mon, 24 Jun 2019 13:15:31 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.2
 MIME-Version: 1.0
+In-Reply-To: <20190624194042.38747-1-paolo.valente@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2c916063e19cc3f33376d7bb0fb8a5ff10ea42db.1561385989.git.zhangweiping@didiglobal.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19-06-24 22:29:05, Weiping Zhang wrote:
-> The get_ams() will return the AMS(Arbitration Mechanism Selected)
-> from the driver.
+On 6/24/19 12:40 PM, Paolo Valente wrote:
+> Hi Jens,
+> this series, based against for-5.3/block, contains:
+> 1) The improvements to recover the throughput loss reported by
+>    Srivatsa [1] (first five patches)
+> 2) A preemption improvement to reduce I/O latency
+> 3) A fix of a subtle bug causing loss of control over I/O bandwidths
 > 
-> Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
 
-Hello, Weiping.
+Thanks a lot for these patches, Paolo!
 
-Sorry, but I don't really get what your point is here.  Could you please
-elaborate this patch a little bit more?  The commit description just
-says a function would just return the AMS from nowhere..
+Would you mind adding:
 
-> ---
->  drivers/nvme/host/core.c | 9 ++++++++-
->  drivers/nvme/host/nvme.h | 1 +
->  drivers/nvme/host/pci.c  | 6 ++++++
->  include/linux/nvme.h     | 1 +
->  4 files changed, 16 insertions(+), 1 deletion(-)
+Reported-by: Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu>
+Tested-by: Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu>
+
+to the first 5 patches, as appropriate?
+
+Thank you!
+
 > 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index b2dd4e391f5c..4cb781e73123 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -1943,6 +1943,7 @@ int nvme_enable_ctrl(struct nvme_ctrl *ctrl, u64 cap)
->  	 */
->  	unsigned dev_page_min = NVME_CAP_MPSMIN(cap) + 12, page_shift = 12;
->  	int ret;
-> +	u32 ams = NVME_CC_AMS_RR;
->  
->  	if (page_shift < dev_page_min) {
->  		dev_err(ctrl->device,
-> @@ -1951,11 +1952,17 @@ int nvme_enable_ctrl(struct nvme_ctrl *ctrl, u64 cap)
->  		return -ENODEV;
->  	}
->  
-> +	/* get Arbitration Mechanism Selected */
-> +	if (ctrl->ops->get_ams) {
-
-I just wonder if this check will be valid because this patch just
-register the function nvme_pci_get_ams() without any conditions.
-
-> +		ctrl->ops->get_ams(ctrl, &ams);
-> +		ams &= NVME_CC_AMS_MASK;
-> +	}
-> +
->  	ctrl->page_size = 1 << page_shift;
->  
->  	ctrl->ctrl_config = NVME_CC_CSS_NVM;
->  	ctrl->ctrl_config |= (page_shift - 12) << NVME_CC_MPS_SHIFT;
-> -	ctrl->ctrl_config |= NVME_CC_AMS_RR | NVME_CC_SHN_NONE;
-> +	ctrl->ctrl_config |= ams | NVME_CC_SHN_NONE;
->  	ctrl->ctrl_config |= NVME_CC_IOSQES | NVME_CC_IOCQES;
->  	ctrl->ctrl_config |= NVME_CC_ENABLE;
->  
-> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-> index ea45d7d393ad..9c7e9217f78b 100644
-> --- a/drivers/nvme/host/nvme.h
-> +++ b/drivers/nvme/host/nvme.h
-> @@ -369,6 +369,7 @@ struct nvme_ctrl_ops {
->  	void (*submit_async_event)(struct nvme_ctrl *ctrl);
->  	void (*delete_ctrl)(struct nvme_ctrl *ctrl);
->  	int (*get_address)(struct nvme_ctrl *ctrl, char *buf, int size);
-> +	void (*get_ams)(struct nvme_ctrl *ctrl, u32 *ams);
-
-Can we just have a return value for the AMS value?
-
->  };
->  
->  #ifdef CONFIG_FAULT_INJECTION_DEBUG_FS
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index 189352081994..5d84241f0214 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -2627,6 +2627,11 @@ static int nvme_pci_get_address(struct nvme_ctrl *ctrl, char *buf, int size)
->  	return snprintf(buf, size, "%s", dev_name(&pdev->dev));
->  }
->  
-> +static void nvme_pci_get_ams(struct nvme_ctrl *ctrl, u32 *ams)
-> +{
-> +	*ams = NVME_CC_AMS_RR;
-> +}
-> +
->  static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
->  	.name			= "pcie",
->  	.module			= THIS_MODULE,
-> @@ -2638,6 +2643,7 @@ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
->  	.free_ctrl		= nvme_pci_free_ctrl,
->  	.submit_async_event	= nvme_pci_submit_async_event,
->  	.get_address		= nvme_pci_get_address,
-> +	.get_ams		= nvme_pci_get_ams,
-
-Question: Do we really need this being added to nvme_ctrl_ops?
-
-Also If 5th patch will make this function much more than this, then it
-would be great if you describe this kind of situation in description :)
-
->  };
->  
->  static int nvme_dev_map(struct nvme_dev *dev)
-> diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-> index da5f696aec00..8f71451fc2fa 100644
-> --- a/include/linux/nvme.h
-> +++ b/include/linux/nvme.h
-> @@ -156,6 +156,7 @@ enum {
->  	NVME_CC_AMS_RR		= 0 << NVME_CC_AMS_SHIFT,
->  	NVME_CC_AMS_WRRU	= 1 << NVME_CC_AMS_SHIFT,
->  	NVME_CC_AMS_VS		= 7 << NVME_CC_AMS_SHIFT,
-> +	NVME_CC_AMS_MASK	= 7 << NVME_CC_AMS_SHIFT,
->  	NVME_CC_SHN_NONE	= 0 << NVME_CC_SHN_SHIFT,
->  	NVME_CC_SHN_NORMAL	= 1 << NVME_CC_SHN_SHIFT,
->  	NVME_CC_SHN_ABRUPT	= 2 << NVME_CC_SHN_SHIFT,
-> -- 
-> 2.14.1
+> [1] https://lkml.org/lkml/2019/5/17/755
 > 
+> Paolo Valente (7):
+>   block, bfq: reset inject limit when think-time state changes
+>   block, bfq: fix rq_in_driver check in bfq_update_inject_limit
+>   block, bfq: update base request service times when possible
+>   block, bfq: bring forward seek&think time update
+>   block, bfq: detect wakers and unconditionally inject their I/O
+>   block, bfq: preempt lower-weight or lower-priority queues
+>   block, bfq: re-schedule empty queues if they deserve I/O plugging
+> 
+>  block/bfq-iosched.c | 952 ++++++++++++++++++++++++++++++--------------
+>  block/bfq-iosched.h |  25 +-
+>  2 files changed, 686 insertions(+), 291 deletions(-)
+> 
+
+Regards,
+Srivatsa
+VMware Photon OS
