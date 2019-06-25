@@ -4,69 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3828C48BD4
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 16:30:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49ECAC48BD5
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 16:51:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7D90208E3
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 16:30:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15E06204FD
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 16:51:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="Ef0Cu/RE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AIrSl7Vp";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="jd5PVhwq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728738AbfFYQal (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jun 2019 12:30:41 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:41620 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728351AbfFYQal (ORCPT
+        id S1726916AbfFYQvx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jun 2019 12:51:53 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:51920 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726599AbfFYQvx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jun 2019 12:30:41 -0400
-Received: by mail-ed1-f66.google.com with SMTP id p15so27969934eds.8
-        for <linux-block@vger.kernel.org>; Tue, 25 Jun 2019 09:30:40 -0700 (PDT)
+        Tue, 25 Jun 2019 12:51:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1561481516; x=1593017516;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=mAEKh2f2qxE37FX9Gt8rNXvP4TmZRL0/AtUPeup3d/I=;
+  b=AIrSl7VpZBI/a46L5MzTUJLCuso6wQhjF9qtl++C2AkW9omSEz8jHRLW
+   xSH+iaV5JXzo4NYwIm4b/Gtcoqwq8W2a7lEMIP+R4xf7O55uu+Rsh3Ugt
+   vOzNF5TuYACTH2es7NRm5eAEhOkJ77S7gt7rASNQ/Rreekllbykm5rRam
+   wkuKFJV3w/4cfOMPVnBc4q7O1U272ZDtAbjCMaNqw2YjlqeYdrd/WwWFj
+   bnFvl+oug9QxdaK3MiDfWG3v834UCpxMdHhpm5KvDWY3TmFKp2hOSPsWg
+   ZLnFZ2PPJ7zgdzw811b61+9a9ZQBc2S1aOIU3tUWU15VVzmtw5KzDEC9O
+   g==;
+X-IronPort-AV: E=Sophos;i="5.63,416,1557158400"; 
+   d="scan'208";a="211303532"
+Received: from mail-by2nam01lp2054.outbound.protection.outlook.com (HELO NAM01-BY2-obe.outbound.protection.outlook.com) ([104.47.34.54])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Jun 2019 00:51:55 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=kR0WUI8Wb/oooTRRXaBppmKY4itrnwNoAnfaDYxWCXg=;
-        b=Ef0Cu/REsmQg6MhTc0LYNFTuhGc/eYuhkoJy1MGD6n5TmP+cKrBx8wz8DHzN4qWA/w
-         vZojz0AdcMfxpwZJ7hgKiQr/hzQhMIThIwtXks+4SynHn8cJdogvib5h19034NVKrMAI
-         NjWd6xGzFc6MXM3hEvtByGou96H6k5pVi1RhgmUhXkvtUZTn8bireeiH0H5rmKaFfm32
-         I/VKCt/kPCSqGu1d2+flXrxMsqpEUghbeMhl4KnWUHVtkf6ud8zMVi9wgsEEysTlyCjC
-         jFfLAlDGpF7w1EyEsVC3njvZ7t9cUm8tcMvbOeiJOsDj8kUUmzeT+QI4FDBlt4BZ3PQZ
-         8iuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=kR0WUI8Wb/oooTRRXaBppmKY4itrnwNoAnfaDYxWCXg=;
-        b=ehf68Hjz5Uo8wIgS41IYYk144YMe7WJeM4PDg1cRL+ZPILYEib81DOEtZJ6OLaB6Il
-         m8IM2yUgcLjeTMFw3LMF6OmntMynYTvHhTk/cgT2JC3XPdDSr0cFCAD06NlbpYStrzDE
-         pRljHv/wWtVXnGKjRPSr8JPRF7FgHQtB17r8BjdwJPVyN9MsISu2VQKPbdTSO4pSdw3u
-         9oj9PyODNAIrQXvHePc156Zz5QcqSR2MD6fMKWyUz+0MS2/a3AZlt5s//Ayg8iocc2cb
-         6LcgKWUHKTOEyN20w2b1Q7EbHcpEApvzkYrnVZLy8QWZinyEq3vxVAnEJ2J5eORA03l3
-         GeMA==
-X-Gm-Message-State: APjAAAW4of03T1gQAEUcOOeOcrdzCjTxwt2M+EUU7U4ll6Q3eHAgwBm7
-        MRdmTTpuUHFmvJweLuVAJBF2pw==
-X-Google-Smtp-Source: APXvYqyj3S0faUmz2N4ooIsNesYDYB3kQPdxuPc/QEDIXsVTGkCor1MNCYdGo1SZ2+JpaeL+DTMdng==
-X-Received: by 2002:a17:906:487:: with SMTP id f7mr15597256eja.236.1561480239429;
-        Tue, 25 Jun 2019 09:30:39 -0700 (PDT)
-Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id f3sm2477238ejo.90.2019.06.25.09.30.38
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 25 Jun 2019 09:30:38 -0700 (PDT)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <798FDD1F-415C-43CD-AC8E-3BEB08FD3AE4@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_05ED6925-114F-4BB9-8D0F-85B181FB037A";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 1/4] block: add zone open, close and finish support
-Date:   Tue, 25 Jun 2019 18:30:37 +0200
-In-Reply-To: <79ca395d-8019-9ec8-0c0b-194ca6d9eda0@acm.org>
-Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iWJyh29B5Jw5+cX9ZFoS66XzsPnPmF5Wu4e4Vv9kLVM=;
+ b=jd5PVhwqdu0rsrw4PWxZNXN0/cBeqsLP722av0jhE37rx96dA6sc1xphU41V8VaU0jLA1jurt4b1MjHWpHTxQ9RVEcrJIltHZfS0YvmnZj22KPcpGZ13oiWkn4r6CGWNNAp93i5tUQ8F/bK8ZaTp6eITtbL/+qY3TRGbNd2aG/A=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
+ BYAPR04MB3845.namprd04.prod.outlook.com (52.135.214.28) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.16; Tue, 25 Jun 2019 16:51:51 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::fc2b:fcd4:7782:53d6]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::fc2b:fcd4:7782:53d6%7]) with mapi id 15.20.2008.014; Tue, 25 Jun 2019
+ 16:51:51 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        =?iso-8859-1?Q?Matias_Bj=F8rling?= <mb@lightnvm.io>,
+        "axboe@fb.com" <axboe@fb.com>, "hch@lst.de" <hch@lst.de>,
         Damien Le Moal <Damien.LeMoal@wdc.com>,
         Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
         Ajay Joshi <Ajay.Joshi@wdc.com>,
@@ -75,93 +64,100 @@ Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
         "James.Bottomley@HansenPartnership.com" 
         <James.Bottomley@HansenPartnership.com>,
         "agk@redhat.com" <agk@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "snitzer@redhat.com" <snitzer@redhat.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "dm-devel@redhat.com" <dm-devel@redhat.com>,
         Matias Bjorling <Matias.Bjorling@wdc.com>
-To:     Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH 1/4] block: add zone open, close and finish support
+Thread-Topic: [PATCH 1/4] block: add zone open, close and finish support
+Thread-Index: AQHVKDJQD2Z4QYw9b06emkXLk9EL8A==
+Date:   Tue, 25 Jun 2019 16:51:50 +0000
+Message-ID: <BYAPR04MB5749977B2FFB5CDC8A254F5A86E30@BYAPR04MB5749.namprd04.prod.outlook.com>
 References: <20190621130711.21986-1-mb@lightnvm.io>
  <20190621130711.21986-2-mb@lightnvm.io>
  <ee5764fb-473a-f118-eaac-95478d885f6f@acm.org>
  <BYAPR04MB5749CEFBB45EA34BD3345CD686E00@BYAPR04MB5749.namprd04.prod.outlook.com>
  <cce08df0-0b4d-833d-64ce-f9b81f7ad7ca@lightnvm.io>
  <79ca395d-8019-9ec8-0c0b-194ca6d9eda0@acm.org>
-X-Mailer: Apple Mail (2.3445.104.11)
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.45.63]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f10a9017-9136-4c32-a138-08d6f98d6b98
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:BYAPR04MB3845;
+x-ms-traffictypediagnostic: BYAPR04MB3845:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <BYAPR04MB3845EBE429AAED055E5376F986E30@BYAPR04MB3845.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1265;
+x-forefront-prvs: 0079056367
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(346002)(136003)(366004)(376002)(396003)(199004)(189003)(52536014)(66066001)(2906002)(26005)(99286004)(86362001)(72206003)(8676002)(14454004)(81166006)(81156014)(53936002)(2201001)(6246003)(6506007)(3846002)(68736007)(74316002)(53546011)(229853002)(6436002)(102836004)(9686003)(7416002)(71200400001)(71190400001)(7696005)(76176011)(305945005)(7736002)(186003)(33656002)(66574012)(2501003)(14444005)(316002)(54906003)(6116002)(5660300002)(55016002)(8936002)(76116006)(478600001)(25786009)(256004)(66476007)(73956011)(486006)(446003)(4326008)(64756008)(476003)(66446008)(66946007)(66556008)(110136005)(921003)(1121003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB3845;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: R0mk295SwJYhzDNQrxGPzdvnic4BYrLHH1x3sBmKIM+OHVLkO9Uc/2nB2ISOyjMI0juGM3gu3Y2J/A/RDLQqRsutRzjYcdJCSHo4shfyvLQExub1hOnWqCG4WYZxlC9iSx/ZgZ/m2bYggpiMer/trE1E0rxxuCnwvw6QBWk44p5ztgm1nNRaLtpK+vtLk+gaaor62YJ2C1dbVYcPAZvwalYX1xmhTjYTOr1vDCpCasiMCMV2CcaKR3T6bqMrsgRJ+Id1sx0PWdNjSYu63zKijkwnWlcy6VA24o569BBzMCkfgyQSJQOHcXF3LAg7sW7AT137mIfhH+EnXZ+gtvoQ3C77zNFT9tvnPvN9Qz1xmEEovdiZiIuEgzmoG1BDrPGeg4P1Mby/Jxg+JFjnq3QwoDYordxFBLZGeXfFnlVMDVw=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f10a9017-9136-4c32-a138-08d6f98d6b98
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2019 16:51:50.9344
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB3845
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---Apple-Mail=_05ED6925-114F-4BB9-8D0F-85B181FB037A
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
-
-> On 25 Jun 2019, at 17.55, Bart Van Assche <bvanassche@acm.org> wrote:
->=20
-> On 6/25/19 3:35 AM, Matias Bj=C3=B8rling wrote:
->> On 6/25/19 12:27 AM, Chaitanya Kulkarni wrote:
->>> On 6/24/19 12:43 PM, Bart Van Assche wrote:
->>>> static inline bool op_is_write(unsigned int op)
->>>> {
->>>>     return (op & 1);
->>>> }
->> The zone mgmt commands are neither write nor reads commands. I guess, =
-one could characterize them as write commands, but they don't write any =
-data, they update a state of a zone on a drive. One should keep it as =
-is? and make sure the zone mgmt commands don't get categorized as either =
-read/write.
->=20
-> Since the open, close and finish operations support modifying zone =
-data I propose to characterize these as write commands. How about the =
-following additional changes:
-> - Make bio_check_ro() refuse open/close/flush/reset zone operations =
-for read-only partitions (see also commit a32e236eb93e ("Partially =
-revert "block: fail op_is_write() requests to read-only partitions"") # =
-v4.18).
-> - In submit_bio(), change op_is_write(bio_op(bio)) ? "WRITE" : "READ" =
-into something that uses blk_op_str().
-> - Add open/close/flush zone support be added in blk_partition_remap().
->=20
-> Thanks,
->=20
-> Bart.
-
-Agreed. This is also what we do with REQ_OP_DISCARD and it makes things
-easier in the driver.
-
-Apart from the return comment from Damien and Minwoo, the patch looks =
-good to me.
-
-Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
-
-
---Apple-Mail=_05ED6925-114F-4BB9-8D0F-85B181FB037A
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAl0STC0ACgkQPEYBfS0l
-eODeeg/8CeCql8ROfdygJuY5YBknnNtJ3MBG0pVnbVyzvejjnzJUDMmAPd6dkXe+
-CqFiJ2qBtgcqQawrGwUpwG+Z3a2lq0ts9KjDEh3XWDbERplM1i9kq89xAO8E8pLU
-J0zyzYyLMzp3v2Ht+UKhH37Ml2CcfUX5+fpwcF7GhNiVi03Z+g/MhA7uyZ3p52lC
-9tFNmpPGHP818kqFZIZu+TrfCDQFeiUu6F+ve8X3BowxS9dzwbiTYteBKny1cBZ5
-1whAbzLbStIbcKZs7An6/DCDebppZkC7HAf7ZJw4yobWOqUF2sTO3+UouYpuHNob
-WPpX1+bh84AyLGVp04c2G6iNBEYfDQMRovCJ8BMOTebmRuDk7OQmldNMbGDgLhGd
-ap/hGkASIUe43bFY1kVeVwAKIms8zUMBAJxHuhhQ1DErRLBEHBVtYTqQlHhX3b/L
-Z3Tcldt3h+tMBjiDSh1yZ6ZREIJ0aWU6V4uTFSZjpxD7p2NA8p/2zmS3tNjAiZZ4
-Ng0ENcfOPtmunqXKw1sUk7Zc5LWD8ybX3EKfU2iLfN/+N2DFl+q5w5WhKQOmBscb
-DdWJglfESr6FnesiiuR3a2fhm24LlhEmNmAcE9cu6UHFcWsoIef18q+1OOdQZp5h
-UGgljTYKj1Esl9iHL6/F/MPFIcpKbyFexxhY8EFlXfUO3/Amgrg=
-=xyg2
------END PGP SIGNATURE-----
-
---Apple-Mail=_05ED6925-114F-4BB9-8D0F-85B181FB037A--
+On 06/25/2019 08:56 AM, Bart Van Assche wrote:=0A=
+> On 6/25/19 3:35 AM, Matias Bj=F8rling wrote:=0A=
+>> On 6/25/19 12:27 AM, Chaitanya Kulkarni wrote:=0A=
+>>> On 6/24/19 12:43 PM, Bart Van Assche wrote:=0A=
+>>>> static inline bool op_is_write(unsigned int op)=0A=
+>>>> {=0A=
+>>>>      return (op & 1);=0A=
+>>>> }=0A=
+>>>>=0A=
+>>>=0A=
+>>=0A=
+>> The zone mgmt commands are neither write nor reads commands. I guess,=0A=
+>> one could characterize them as write commands, but they don't write any=
+=0A=
+>> data, they update a state of a zone on a drive. One should keep it as=0A=
+>> is? and make sure the zone mgmt commands don't get categorized as either=
+=0A=
+>> read/write.=0A=
+>=0A=
+> Since the open, close and finish operations support modifying zone data=
+=0A=
+> I propose to characterize these as write commands. How about the=0A=
+> following additional changes:=0A=
+> - Make bio_check_ro() refuse open/close/flush/reset zone operations for=
+=0A=
+                                          ^=0A=
+Since finish also listed above which supports modifying data do we need =0A=
+to add finish here with flush in above line ?=0A=
+=0A=
+> read-only partitions (see also commit a32e236eb93e ("Partially revert=0A=
+> "block: fail op_is_write() requests to read-only partitions"") # v4.18).=
+=0A=
+> - In submit_bio(), change op_is_write(bio_op(bio)) ? "WRITE" : "READ"=0A=
+> into something that uses blk_op_str().=0A=
+Good idea, I've a patch for blk_op_str() and debugfs just waiting for =0A=
+this to merge. Does it make sense to add that patch in this series ?=0A=
+> - Add open/close/flush zone support be added in blk_partition_remap().=0A=
+same here for finish ?=0A=
+>=0A=
+> Thanks,=0A=
+>=0A=
+> Bart.=0A=
+>=0A=
+=0A=
