@@ -2,154 +2,136 @@ Return-Path: <SRS0=31JE=UY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF5DC48BD5
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 19:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 115EDC48BD5
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 19:54:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5124520883
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 19:24:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Llt5u6lW";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="iq7XHVEI"
+	by mail.kernel.org (Postfix) with ESMTP id E81762063F
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 19:54:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726422AbfFYTY2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jun 2019 15:24:28 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:33729 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726393AbfFYTY2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jun 2019 15:24:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1561490667; x=1593026667;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=o1Z6yI8edYlRbMea0pd6anKl3TRgqKPhJShWiU4ai7k=;
-  b=Llt5u6lWlwErb9gDv/GOxdpAHdOuuv9QVtF90ooHZxBiMgAMbOq+lBkb
-   z+n+TgyA47QTW92AJjSErCptgfZ+ORo8NmlLvCAdps5RzTu5c+iq41r/D
-   tbEct5nWboxJmcqeAoxrkO9y8A0Korw9P3pdtHWw/24A5Wd7u+rU2630y
-   wLMRUEXi3EY49D8sJFE7Pl4Z66cE2p3HGpCGhu46jQ1vMlTmaEZQs/s+f
-   RFV8vcMuV+XLEVW3uLHilpvEJn47SmXcDAy7WFpVAW2mjQts7ha2mVZvP
-   ZTinEmw/Ivvd6XxJ9DH+Nmh1xqncvhzIkHEARkN6KL4JoNCU37+PyhyKn
-   A==;
-X-IronPort-AV: E=Sophos;i="5.63,416,1557158400"; 
-   d="scan'208";a="217899513"
-Received: from mail-dm3nam05lp2057.outbound.protection.outlook.com (HELO NAM05-DM3-obe.outbound.protection.outlook.com) ([104.47.49.57])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Jun 2019 03:24:26 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vnC5pE1bxAJz5pN+iLPOA0YOBKP1Awiue5oA7TYH4cA=;
- b=iq7XHVEIjs3oeCYBdg021TZ5u/6htTqFZd10a2e/6Aq49zoe8HsfsNI84MMBAtCcZdB/ehawhzrHN7JnjcIPkQhI/yZLaBeaX4Uyh6Jv+YyLjred3mIbfYDeDlgoVXy1BXQBNr29O3X3O858UpZZctVX0KFVPD328NB1usGMajc=
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
- BYAPR04MB4360.namprd04.prod.outlook.com (20.176.251.150) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2008.16; Tue, 25 Jun 2019 19:24:25 +0000
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::fc2b:fcd4:7782:53d6]) by BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::fc2b:fcd4:7782:53d6%7]) with mapi id 15.20.2008.014; Tue, 25 Jun 2019
- 19:24:25 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Florian Knauf <florian.knauf@stud.uni-hannover.de>
-CC:     "linux-kernel@i4.cs.fau.de" <linux-kernel@i4.cs.fau.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Christian Ewert <christian.ewert@stud.uni-hannover.de>
-Subject: Re: [PATCH v2] drivers/block/loop: Replace deprecated function in
- option parsing code
-Thread-Topic: [PATCH v2] drivers/block/loop: Replace deprecated function in
- option parsing code
-Thread-Index: AQHVK386Ta6SMRAy8UW37kTixSPwpg==
-Date:   Tue, 25 Jun 2019 19:24:25 +0000
-Message-ID: <BYAPR04MB574963E31CE0DB5581F5311F86E30@BYAPR04MB5749.namprd04.prod.outlook.com>
-References: <BYAPR04MB574936B98A60EB42B9A7C97886E30@BYAPR04MB5749.namprd04.prod.outlook.com>
- <20190625175517.31133-1-florian.knauf@stud.uni-hannover.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.45.63]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2dc0c2de-cfdd-488d-b83f-08d6f9a2bc10
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4360;
-x-ms-traffictypediagnostic: BYAPR04MB4360:
-x-ms-exchange-purlcount: 1
-wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <BYAPR04MB436018DCA048D006DA29674F86E30@BYAPR04MB4360.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4941;
-x-forefront-prvs: 0079056367
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(39860400002)(376002)(366004)(396003)(136003)(199004)(189003)(6246003)(4326008)(2906002)(9686003)(52536014)(66946007)(14444005)(66066001)(476003)(6916009)(71200400001)(25786009)(446003)(6116002)(33656002)(3846002)(71190400001)(76176011)(102836004)(6506007)(486006)(26005)(186003)(53546011)(5660300002)(99286004)(7696005)(256004)(8676002)(966005)(316002)(478600001)(54906003)(72206003)(86362001)(66446008)(6436002)(55016002)(229853002)(64756008)(76116006)(73956011)(6306002)(305945005)(53936002)(7736002)(66556008)(74316002)(68736007)(66476007)(8936002)(81166006)(81156014)(14454004);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4360;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: +IxJTUpbNylKhOnxJJBnKCG/TSxIC8soMtIrZb1QOkDigAEl8H8D/H58Yy0Vto5p+NDN6PZLje35vlPhMnFVk4onKi5wy6fEXVzX1G4zSlWxfjUnYiKACcqJXGZjrhnnBk3mBRpAdKZdxoU5UEbszpheTPiAbRHnr0xNQyIpzwKIAZ71vDtJHHYm4EDbbN61qb47qTPxQJfxPKo/pToteLBOtozKgcyj0gDbOX08YIKYcHB8xyjU5/k9FRuRScHuj9D2NL2rzkohMTrvRcCG5obesh6wnP0hg4KSRBjVlkrqDlvEQkBV51vzdR5K25lNjQy7nwNUdUmU9dD/y+GkUctEPt3eECNebsCDzga6IckHIRUYNUSjpTZAN5A3p6a66a0V32cWjK6KZ+xSi5taUbSJYJDhwPKqbzKW5kJcRHc=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1727972AbfFYTyk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jun 2019 15:54:40 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:37308 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726712AbfFYTyk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Jun 2019 15:54:40 -0400
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtp (Exim 4.89)
+        (envelope-from <logang@deltatee.com>)
+        id 1hfrWI-0007CW-Rp; Tue, 25 Jun 2019 13:54:23 -0600
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20190620161240.22738-1-logang@deltatee.com>
+ <20190624072752.GA3954@lst.de>
+ <558a27ba-e7c9-9d94-cad0-377b8ee374a6@deltatee.com>
+ <20190625072008.GB30350@lst.de>
+ <f0f002bf-2b94-cd18-d18f-5d0b08311495@deltatee.com>
+ <20190625170115.GA9746@lst.de>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <41235a05-8ed1-e69a-e7cd-48cae7d8a676@deltatee.com>
+Date:   Tue, 25 Jun 2019 13:54:21 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2dc0c2de-cfdd-488d-b83f-08d6f9a2bc10
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2019 19:24:25.2965
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4360
+In-Reply-To: <20190625170115.GA9746@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: sbates@raithlin.com, jgg@ziepe.ca, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I believe you have tested this patch with loop testcases present in the =0A=
-:- https://github.com/osandov/blktests/tree/master/tests/loop.=0A=
-=0A=
-With that, looks good.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>.=0A=
-=0A=
-On 06/25/2019 10:55 AM, Florian Knauf wrote:=0A=
-> This patch removes the deprecated simple_strtol function from the option=
-=0A=
-> parsing logic in the loopback device driver. Instead kstrtoint is used to=
-=0A=
-> parse int max_loop, to ensure that input values it cannot represent are=
-=0A=
-> ignored.=0A=
->=0A=
-> Signed-off-by: Florian Knauf <florian.knauf@stud.uni-hannover.de>=0A=
-> Signed-off-by: Christian Ewert <christian.ewert@stud.uni-hannover.de>=0A=
-> ---=0A=
-> Thank you for your feedback.=0A=
->=0A=
-> There's no specific reason to use kstrtol, other than the fact that we=0A=
-> weren't yet aware that kstrtoint exists. (We're new at this, I'm afraid.)=
-=0A=
->=0A=
-> We've amended the patch to make use of kstrtoint, which is of course much=
-=0A=
-> more straightforward.=0A=
->=0A=
-> drivers/block/loop.c | 2 +-=0A=
->   1 file changed, 1 insertion(+), 1 deletion(-)=0A=
->=0A=
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c=0A=
-> index 102d79575895..adfaf4ad37d1 100644=0A=
-> --- a/drivers/block/loop.c=0A=
-> +++ b/drivers/block/loop.c=0A=
-> @@ -2289,7 +2289,7 @@ module_exit(loop_exit);=0A=
->   #ifndef MODULE=0A=
->   static int __init max_loop_setup(char *str)=0A=
->   {=0A=
-> -	max_loop =3D simple_strtol(str, NULL, 0);=0A=
-> +	kstrtoint(str, 0, &max_loop);=0A=
->   	return 1;=0A=
->   }=0A=
->=0A=
->=0A=
-=0A=
+
+
+On 2019-06-25 11:01 a.m., Christoph Hellwig wrote:
+> On Tue, Jun 25, 2019 at 09:57:52AM -0600, Logan Gunthorpe wrote:
+>>> You assume all addressing is done by the PCI bus address.  If a device
+>>> is addressing its own BAR there is no reason to use the PCI bus address,
+>>> as it might have much more intelligent schemes (usually bar + offset).
+>>
+>> Yes, that will be a bit tricky regardless of what we do.
+> 
+> At least right now it isn't at all.  I've implemented support for
+> a draft NVMe proposal for that, and it basically boils down to this
+> in the p2p path:
+> 
+> 	addr = sg_phys(sg);
+> 
+> 	if (page->pgmap->dev == ctrl->dev && HAS_RELATIVE_ADDRESSING)
+> 		addr -= ctrl->cmb_start_addr;
+> 
+> 		// set magic flag in the SGL
+> 	} else {
+> 		addr -= pgmap->pci_p2pdma_bus_offset;
+> 	}
+> 
+> without the pagemap it would require a range compare instead, which
+> isn't all that hard either.
+> 
+>>>>> Also duplicating the whole block I/O stack, including hooks all over
+>>>>> the fast path is pretty much a no-go.
+>>>>
+>>>> There was very little duplicate code in the patch set. (Really just the
+>>>> mapping code). There are a few hooks, but in practice not that many if
+>>>> we ignore the WARN_ONs. We might be able to work to reduce this further.
+>>>> The main hooks are: when we skip bouncing, when we skip integrity prep,
+>>>> when we split, and when we map. And the patchset drops the PCI_P2PDMA
+>>>> hook when we map. So we're talking about maybe three or four extra ifs
+>>>> that would likely normally be fast due to the branch predictor.
+>>>
+>>> And all of those add code to the block layer fast path.
+>>
+>> If we can't add any ifs to the block layer, there's really nothing we
+>> can do.
+> 
+> That is not what I said.  Of course we can.  But we rather have a
+> really good reason.  And adding a parallel I/O path violating the
+> highlevel model is not one.
+> 
+>> So then we're committed to using struct page for P2P?
+> 
+> Only until we have a significantly better soltution.  And I think
+> using physical address in some form instead of pages is that,
+> adding a parallel path with dma_addr_t is not, it actually is worse
+> than the current code in many respects.
+
+Well whether it's dma_addr_t, phys_addr_t, pfn_t the result isn't all
+that different. You still need roughly the same 'if' hooks for any
+backed memory that isn't in the linear mapping and you can't get a
+kernel mapping for directly.
+
+It wouldn't be too hard to do a similar patch set that uses something
+like phys_addr_t instead and have a request and queue flag for support
+of non-mappable memory. But you'll end up with very similar 'if' hooks
+and we'd have to clean up all bio-using drivers that access the struct
+pages directly.
+
+Though, we'd also still have the problem of how to recognize when the
+address points to P2PDMA and needs to be translated to the bus offset.
+The map-first inversion was what helped here because the driver
+submitting the requests had all the information. Though it could be
+another request flag and indicating non-mappable memory could be a flag
+group like REQ_NOMERGE_FLAGS -- REQ_NOMAP_FLAGS.
+
+If you think any of the above ideas sound workable I'd be happy to try
+to code up another prototype.
+
+Logan
