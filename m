@@ -2,292 +2,62 @@ Return-Path: <SRS0=31JE=UY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEF08C48BD5
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 06:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2394C48BD5
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 07:18:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 87F4C2063F
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 06:17:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1561443461;
-	bh=bXlhdI9ovTKAAlaZggrah+Nip2Ai6/P8U32aNqEP8hA=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=MdkhVr8QfxyyV/PobU+pWqHEHTjc70NJlS5BH0Qvhc87zO6VWtzL3yC3XB2aV4mnP
-	 tuV8ccic9APfd2lSbcPURJW+MJ3fIEqDPdTHq/nvLk4M9bps+eSdxFhzfFoRA5qdl0
-	 TEOqM9WrQWiYqWiWaMop+ITWdUYvI4nWM7J/CgGA=
+	by mail.kernel.org (Postfix) with ESMTP id 92A6920665
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 07:18:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729173AbfFYGRk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jun 2019 02:17:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50440 "EHLO mail.kernel.org"
+        id S1727952AbfFYHS5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jun 2019 03:18:57 -0400
+Received: from verein.lst.de ([213.95.11.211]:60200 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726495AbfFYGRk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jun 2019 02:17:40 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A7D28204FD;
-        Tue, 25 Jun 2019 06:17:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1561443458;
-        bh=bXlhdI9ovTKAAlaZggrah+Nip2Ai6/P8U32aNqEP8hA=;
-        h=Date:From:To:Cc:Subject:From;
-        b=n64ZjPtnHIkteULXW0pN38hafA8uR+DZugkqREWIym4eGpI9opidBa8atBP/522Rp
-         XEy4UAdYb57qM7A4FaSHRBSm17gVNNfOmGJZ7dET3vDdMsqt1Ttg21fZZRtVjtAEt+
-         bEaWgWhOJZhFVA3PEibygk8GAO6txWvLl0N5yT00=
-Date:   Mon, 24 Jun 2019 23:17:37 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Reminder: 11 open syzbot bugs in block subsystem
-Message-ID: <20190625061737.GG17703@sol.localdomain>
+        id S1726419AbfFYHS4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Jun 2019 03:18:56 -0400
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id 0E82368B02; Tue, 25 Jun 2019 09:18:24 +0200 (CEST)
+Date:   Tue, 25 Jun 2019 09:18:23 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pci@vger.kernel.org, linux-rdma <linux-rdma@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>,
+        Stephen Bates <sbates@raithlin.com>
+Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
+Message-ID: <20190625071823.GA30350@lst.de>
+References: <20190620161240.22738-1-logang@deltatee.com> <CAPcyv4ijztOK1FUjLuFing7ps4LOHt=6z=eO=98HHWauHA+yog@mail.gmail.com> <20190620193353.GF19891@ziepe.ca> <20190624073126.GB3954@lst.de> <20190624134641.GA8268@ziepe.ca> <1041d2c6-f22c-81f2-c141-fb821b35c0c1@deltatee.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <1041d2c6-f22c-81f2-c141-fb821b35c0c1@deltatee.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[This email was generated by a script.  Let me know if you have any suggestions
-to make it better.]
+On Mon, Jun 24, 2019 at 10:10:16AM -0600, Logan Gunthorpe wrote:
+> Yes, that's correct. The intent was to invert it so the dma_map could
+> happen at the start of the process so that P2PDMA code could be called
+> with all the information it needs to make it's decision on how to map;
+> without having to hook into the mapping process of every driver that
+> wants to participate.
 
-Of the currently open syzbot reports against the upstream kernel, I've manually
-marked 11 of them as possibly being bugs in the block subsystem.  I've listed
-these reports below, sorted by an algorithm that tries to list first the reports
-most likely to be still valid, important, and actionable.
-
-Of these 11 bugs, 5 were seen in mainline in the last week.
-
-If you believe a bug is no longer valid, please close the syzbot report by
-sending a '#syz fix', '#syz dup', or '#syz invalid' command in reply to the
-original thread, as explained at https://goo.gl/tpsmEJ#status
-
-If you believe I misattributed a bug to the block subsystem, please let me know,
-and if possible forward the report to the correct people or mailing list.
-
-Here are the bugs:
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in debugfs_remove (3)
-Last occurred:      0 days ago
-Reported:           257 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=6d5c55bc531f0ef83e8faca014cc123b4498f7a6
-Original thread:    https://lkml.kernel.org/lkml/000000000000140c370577db5ece@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+903b72a010ad6b7a40f2@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000140c370577db5ece@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in generic_make_request_checks
-Last occurred:      0 days ago
-Reported:           319 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=ff9ab4a23afa7553fb79f745a92be87ba4144508
-Original thread:    https://lkml.kernel.org/lkml/0000000000003c4e6d0572f85eb2@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000003c4e6d0572f85eb2@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in md_ioctl
-Last occurred:      1 day ago
-Reported:           421 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=fbf9eaea2e65bfcabb4e2750c3ab0892867edea1
-Original thread:    https://lkml.kernel.org/lkml/000000000000a52337056b065fb3@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+1e46a0864c1a6e9bd3d8@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000a52337056b065fb3@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in relay_switch_subbuf
-Last occurred:      2 days ago
-Reported:           271 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=13849f0d9b1b818b087341691be6cc3ac6a6bfb7
-Original thread:    https://lkml.kernel.org/lkml/0000000000002e4a260576c1589d@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+29093015c21333d1c46d@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000002e4a260576c1589d@google.com
-
---------------------------------------------------------------------------------
-Title:              memory leak in bio_copy_user_iov
-Last occurred:      8 days ago
-Reported:           6 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=3327fb1975fd130ad77d601f4facd655f0b5fa8c
-Original thread:    https://lkml.kernel.org/lkml/000000000000c75fb7058ba0c0e4@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+03e5c8ebd22cc6c3a8cb@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please reply to the original
-thread.  For the git send-email command to use, or tips on how to reply if the
-thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000c75fb7058ba0c0e4@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in kernfs_remove_by_name_ns
-Last occurred:      4 days ago
-Reported:           1 day ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=7cc35138dcc87c3cc819ad5e34eceab2360d4047
-Original thread:    https://lkml.kernel.org/lkml/0000000000001bbe63058bfd26d9@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+b76f1b62f3f98711bd93@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please reply to the original
-thread.  For the git send-email command to use, or tips on how to reply if the
-thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000001bbe63058bfd26d9@google.com
-
---------------------------------------------------------------------------------
-Title:              KMSAN: kernel-infoleak in copy_page_to_iter (2)
-Last occurred:      201 days ago
-Reported:           284 days ago
-Branches:           Mainline (with KMSAN patches)
-Dashboard link:     https://syzkaller.appspot.com/bug?id=78e9ad0e6952a3ca16e8234724b2fa92d041b9b8
-Original thread:    https://lkml.kernel.org/lkml/00000000000016eb330575bd2fab@google.com/T/#u
-
-This bug has a C reproducer.
-
-The original thread for this bug received 5 replies; the last was 40 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+2dcfeaf8cb49b05e8f1a@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000016eb330575bd2fab@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in relay_close_buf
-Last occurred:      60 days ago
-Reported:           48 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=e4265490d26d6c01cd9bc79dc915ef0a1bf15046
-Original thread:    https://lkml.kernel.org/lkml/000000000000cff4d50588490e45@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-The original thread for this bug has received 1 reply, 48 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+58320b7171734bf79d26@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000cff4d50588490e45@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in debugfs_remove
-Last occurred:      70 days ago
-Reported:           62 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=fab43e1b35f4b1004751d97182979a68a8449388
-Original thread:    https://lkml.kernel.org/lkml/000000000000b20dd60587350ae0@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-The original thread for this bug has received 1 reply, 62 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+c091783d82e47615bb28@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000b20dd60587350ae0@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in disk_map_sector_rcu
-Last occurred:      108 days ago
-Reported:           171 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=f81f92bd0974739a6c3ded8d0ea7aaafb039628e
-Original thread:    https://lkml.kernel.org/lkml/0000000000003804ff057ea47d37@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+e01322aeded15e015bbd@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000003804ff057ea47d37@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in relay_switch_subbuf
-Last occurred:      151 days ago
-Reported:           123 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=329e956ea2ff61441908dc7706656920c4ddb2e9
-Original thread:    https://lkml.kernel.org/lkml/000000000000336578058268a553@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-The original thread for this bug received 1 reply, 123 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+8e789999f280ccd6930f@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000336578058268a553@google.com
-
+And that just isn't how things work in layering.  We need to keep
+generating the dma addresses in the driver in the receiving end, as
+there are all kinds of interesting ideas how we do that.  E.g. for the
+Mellanox NICs addressing their own bars is not done by PCIe bus
+addresses but by relative offsets.  And while NVMe has refused to go
+down that route in the current band aid fix for CMB addressing I suspect
+it will sooner or later have to do the same to deal with the addressing
+problems in a multiple PASID world.
