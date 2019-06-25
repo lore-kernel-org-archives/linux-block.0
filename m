@@ -2,212 +2,160 @@ Return-Path: <SRS0=31JE=UY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E6CC4646B
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 02:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CBF0C4646C
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 03:24:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4164C206DD
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 02:50:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFB39206DD
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 03:24:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="vjyYqkBS"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="QMyzfoqX";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="OkqjWn6a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730496AbfFYCus (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jun 2019 22:50:48 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:33800 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730466AbfFYCus (ORCPT
+        id S1726301AbfFYDYc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jun 2019 23:24:32 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:53318 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725268AbfFYDYc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 22:50:48 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5P2hYfl173896;
-        Tue, 25 Jun 2019 02:48:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=XFwVO5gZ5iPnoC3Sie2eTRsT7P5Yy78QuLt59bFa7gg=;
- b=vjyYqkBSmwZZzASPkdig48f/ZQ6M2xSaGZ5JoZ2KnXyx+ZPzBBz5jpr+YfS4p8kOBgMK
- cRZUhtWzrXPbHSruaYB3vGzigEwZITmgaEgbBqmNa7sOzJDbcVDlo5qZKeAe3CL1tUcm
- 5M4bHkPHUkGiFoanu+gHs/CjaLWqLOG4JpUPmZ4inceEdsFEstJIdDbAVtv9FBNSJbdG
- XRYOi/RAKl0S0E56k2XrWz/6dp2Ko8HCpldPTqJoZNebUc5JNy0xuVOU9qutqttRf7D2
- loE5bOWw7AyYgZxdlP1pxiS+pUxQ+tWhCw3AQHcOyZqpL4n4u2Ss51RRwW+D0fKttBai Bw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2t9brt1g94-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jun 2019 02:48:44 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5P2mhmx068696;
-        Tue, 25 Jun 2019 02:48:43 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2t9p6twvmb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jun 2019 02:48:43 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5P2mdxC004165;
-        Tue, 25 Jun 2019 02:48:39 GMT
-Received: from [10.182.69.106] (/10.182.69.106)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 24 Jun 2019 19:48:39 -0700
-Subject: Re: [PATCH] blk-mq: update hctx->cpumask at cpu-hotplug(Internet
- mail)
-To:     =?UTF-8?B?d2VuYmluemVuZyjmm77mlofmlowp?= <wenbinzeng@tencent.com>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Wenbin Zeng <wenbin.zeng@gmail.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "keith.busch@intel.com" <keith.busch@intel.com>,
-        "hare@suse.com" <hare@suse.com>, "osandov@fb.com" <osandov@fb.com>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
+        Mon, 24 Jun 2019 23:24:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1561433071; x=1592969071;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=K5bXV0aYCMFXSpeWcC5UhvVrw4hiPYcdPTByQTYNIdI=;
+  b=QMyzfoqXWKW4lNcnsctjdQdswf3u+DIf5eAanuHJcXHW/l5x3oWy0ysY
+   JHNy/2ggSmlmfJXOKXMv2zNXc/Uj23jovMV+MPF3KhCl4b4QLm+JZS8R5
+   2485LXIEe2hndFNrqVA91qeIgR5jvE5maBHlKV7Y7LjCjyeBoXC7LjBxm
+   AayqEGAQ9/av5aG38O2rk7TLHmFIT1ozs880Jvr6NBNrSBbz2TFqb6fNP
+   BHMufXK7tzGsMTd7uGcMR6+aM4hhS0LthYWgAiWUEg5pMvV/TGrWRS/rs
+   1y5sIY0qb1E2yM5m4kjsbJH/D7bq/+uhX3MWIBme6P1wz0g5DpX5rXQ4w
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.63,413,1557158400"; 
+   d="scan'208";a="111437200"
+Received: from mail-co1nam05lp2052.outbound.protection.outlook.com (HELO NAM05-CO1-obe.outbound.protection.outlook.com) ([104.47.48.52])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Jun 2019 11:24:30 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wFfeB2rsTqSXZPpUK7DMv6CRWeMQn+/DK0M+zTvmUKg=;
+ b=OkqjWn6aQWl3qYiFNE6HIIRe5yaHX6fTU1w5yO3uK7LEyFBXCGfBiU33rnxO5/J8coOBck8WxTqmKPpaUYsn+3xywl3ozEmE9kugMQguac68xHlRNUzj0eq5QDIjfG17bhirNA2KIIFKs8u1VY2yfTR4Ivc2OkkJuaZ/+smkYfU=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
+ BYAPR04MB4006.namprd04.prod.outlook.com (52.135.215.33) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.17; Tue, 25 Jun 2019 03:24:27 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::fc2b:fcd4:7782:53d6]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::fc2b:fcd4:7782:53d6%7]) with mapi id 15.20.2008.014; Tue, 25 Jun 2019
+ 03:24:27 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <1561389847-30853-1-git-send-email-wenbinzeng@tencent.com>
- <20190625015512.GC23777@ming.t460p>
- <fe4f40e7bbf74311a47c9f3b981f8c53@tencent.com>
- <20190625022706.GE23777@ming.t460p>
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <9bae2938-dcb6-de91-b16f-36ce8af8b7fb@oracle.com>
-Date:   Tue, 25 Jun 2019 10:51:31 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <20190625022706.GE23777@ming.t460p>
-Content-Type: text/plain; charset=utf-8
+        Jens Axboe <axboe@kernel.dk>
+CC:     Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH 1/3] block: Allow mapping of vmalloc-ed buffers
+Thread-Topic: [PATCH 1/3] block: Allow mapping of vmalloc-ed buffers
+Thread-Index: AQHVKwA0CgkpItjWVEOnwU70Lez80g==
+Date:   Tue, 25 Jun 2019 03:24:26 +0000
+Message-ID: <BYAPR04MB5749C9178CB54B4A488408A986E30@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20190625024625.23976-1-damien.lemoal@wdc.com>
+ <20190625024625.23976-2-damien.lemoal@wdc.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9298 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906250021
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9298 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906250020
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.44.170]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 51ca4612-3e48-47e2-ba62-08d6f91ca0d4
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4006;
+x-ms-traffictypediagnostic: BYAPR04MB4006:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <BYAPR04MB4006A4E5D5F3B76207900E8C86E30@BYAPR04MB4006.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1332;
+x-forefront-prvs: 0079056367
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(366004)(136003)(39860400002)(396003)(346002)(199004)(189003)(229853002)(316002)(6436002)(54906003)(66066001)(110136005)(53936002)(55016002)(33656002)(9686003)(6246003)(53546011)(6506007)(102836004)(73956011)(66946007)(66476007)(64756008)(66556008)(66446008)(186003)(26005)(25786009)(99286004)(76176011)(7696005)(52536014)(476003)(72206003)(446003)(4326008)(68736007)(7736002)(305945005)(478600001)(74316002)(76116006)(8676002)(81156014)(81166006)(3846002)(6116002)(8936002)(71190400001)(71200400001)(86362001)(256004)(14444005)(2906002)(14454004)(2501003)(5660300002)(486006);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4006;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: ndK5klYOD2CjCLCAjLPed8co1scXT3ob4MU+IjLggwwuIr5taIKHv7+qal77ytViucC8Cy7trbeEN/QR9yLBYDW5r1h7c9Um6d6YsuXhp3gebmBbeX3EuiBKhm8fzA6xlSwI24sJFZzbtHMoolVVqjUrLGa987Yb6iKTCywSfGOf/QbHdIDExRdc7TVimOFnVImsSEyPoTwvpb0X/DK1k865U56zjRxSsA3E5F+M1imv8l6G0trlphRbOVjhBM3lktjNEbBQf5ZsqIa93NFSYiCCOIZJKYIYoPGsZLbeddQsUwllICFAltLZJeAhbFx2TEEZb090n2/JhAAu6cLND9f7MN0ii0Pdb9YW7BnLhkZMncKJWRVbSEwXcfhFPI01B/e11riAgAkEgVBiBHyPir1U/A8L/rv1TEz7O4ElGM8=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 51ca4612-3e48-47e2-ba62-08d6f91ca0d4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2019 03:24:26.2685
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4006
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 6/25/19 10:27 AM, Ming Lei wrote:
-> On Tue, Jun 25, 2019 at 02:14:46AM +0000, wenbinzeng(曾文斌) wrote:
->> Hi Ming,
->>
->>> -----Original Message-----
->>> From: Ming Lei <ming.lei@redhat.com>
->>> Sent: Tuesday, June 25, 2019 9:55 AM
->>> To: Wenbin Zeng <wenbin.zeng@gmail.com>
->>> Cc: axboe@kernel.dk; keith.busch@intel.com; hare@suse.com; osandov@fb.com;
->>> sagi@grimberg.me; bvanassche@acm.org; linux-block@vger.kernel.org;
->>> linux-kernel@vger.kernel.org; wenbinzeng(曾文斌) <wenbinzeng@tencent.com>
->>> Subject: Re: [PATCH] blk-mq: update hctx->cpumask at cpu-hotplug(Internet mail)
->>>
->>> On Mon, Jun 24, 2019 at 11:24:07PM +0800, Wenbin Zeng wrote:
->>>> Currently hctx->cpumask is not updated when hot-plugging new cpus,
->>>> as there are many chances kblockd_mod_delayed_work_on() getting
->>>> called with WORK_CPU_UNBOUND, workqueue blk_mq_run_work_fn may run
->>>
->>> There are only two cases in which WORK_CPU_UNBOUND is applied:
->>>
->>> 1) single hw queue
->>>
->>> 2) multiple hw queue, and all CPUs in this hctx become offline
->>>
->>> For 1), all CPUs can be found in hctx->cpumask.
->>>
->>>> on the newly-plugged cpus, consequently __blk_mq_run_hw_queue()
->>>> reporting excessive "run queue from wrong CPU" messages because
->>>> cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) returns false.
->>>
->>> The message means CPU hotplug race is triggered.
->>>
->>> Yeah, there is big problem in blk_mq_hctx_notify_dead() which is called
->>> after one CPU is dead, but still run this hw queue to dispatch request,
->>> and all CPUs in this hctx might become offline.
->>>
->>> We have some discussion before on this issue:
->>>
->>> https://lore.kernel.org/linux-block/CACVXFVN729SgFQGUgmu1iN7P6Mv5+puE78STz8hj
->>> 9J5bS828Ng@mail.gmail.com/
->>>
->>
->> There is another scenario, you can reproduce it by hot-plugging cpus to kvm guests via qemu monitor (I believe virsh setvcpus --live can do the same thing), for example:
->> (qemu) cpu-add 1
->> (qemu) cpu-add 2
->> (qemu) cpu-add 3
->>
->> In such scenario, cpu 1, 2 and 3 are not visible at boot, hctx->cpumask doesn't get synced when these cpus are added.
-
-Here is how I play with it with the most recent qemu and linux.
-
-Boot VM with 1 out of 4 vcpu online.
-
-# qemu-system-x86_64 -hda disk.img \
--smp 1,maxcpus=4 \
--m 4096M -enable-kvm \
--device nvme,drive=lightnvme,serial=deadbeaf1 \
--drive file=nvme.img,if=none,id=lightnvme \
--vnc :0 \
--kernel /.../mainline-linux/arch/x86_64/boot/bzImage \
--append "root=/dev/sda1 init=/sbin/init text" \
--monitor stdio -net nic -net user,hostfwd=tcp::5022-:22
-
-
-As Ming mentioned, after boot:
-
-# cat /proc/cpuinfo  | grep processor
-processor	: 0
-
-# cat /sys/block/nvme0n1/mq/0/cpu_list
-0
-# cat /sys/block/nvme0n1/mq/1/cpu_list
-1
-# cat /sys/block/nvme0n1/mq/2/cpu_list
-2
-# cat /sys/block/nvme0n1/mq/3/cpu_list
-3
-
-# cat /proc/interrupts | grep nvme
- 24:         11   PCI-MSI 65536-edge      nvme0q0
- 25:         78   PCI-MSI 65537-edge      nvme0q1
- 26:          0   PCI-MSI 65538-edge      nvme0q2
- 27:          0   PCI-MSI 65539-edge      nvme0q3
- 28:          0   PCI-MSI 65540-edge      nvme0q4
-
-I hotplug with "device_add
-qemu64-x86_64-cpu,id=core1,socket-id=1,core-id=0,thread-id=0" in qemu monitor.
-
-Dongli Zhang
-
-> 
-> It is CPU cold-plug, we suppose to support it.
-> 
-> The new added CPUs should be visible to hctx, since we spread queues
-> among all possible CPUs(), please see blk_mq_map_queues() and
-> irq_build_affinity_masks(), which is like static allocation on CPU
-> resources.
-> 
-> Otherwise, you might use an old kernel or there is bug somewhere.
-> 
->>
->>>>
->>>> This patch added a cpu-hotplug handler into blk-mq, updating
->>>> hctx->cpumask at cpu-hotplug.
->>>
->>> This way isn't correct, hctx->cpumask should be kept as sync with
->>> queue mapping.
->>
->> Please advise what should I do to deal with the above situation? Thanks a lot.
-> 
-> As I shared in last email, there is one approach discussed, which seems
-> doable.
-> 
-> Thanks,
-> Ming
-> 
+Looks good with one nit, can be done at the time of applying patch.=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+=0A=
+On 6/24/19 7:46 PM, Damien Le Moal wrote:=0A=
+> To allow the SCSI subsystem scsi_execute_req() function to issue=0A=
+> requests using large buffers that are better allocated with vmalloc()=0A=
+> rather than kmalloc(), modify bio_map_kern() to allow passing a buffer=0A=
+> allocated with the vmalloc() function. To do so, simply test the buffer=
+=0A=
+> address using is_vmalloc_addr() and use vmalloc_to_page() instead of=0A=
+> virt_to_page() to obtain the pages of vmalloc-ed buffers.=0A=
+> =0A=
+> Fixes: 515ce6061312 ("scsi: sd_zbc: Fix sd_zbc_report_zones() buffer allo=
+cation")=0A=
+> Fixes: e76239a3748c ("block: add a report_zones method")=0A=
+> Cc: stable@vger.kernel.org=0A=
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
+> ---=0A=
+>   block/bio.c | 8 +++++++-=0A=
+>   1 file changed, 7 insertions(+), 1 deletion(-)=0A=
+> =0A=
+> diff --git a/block/bio.c b/block/bio.c=0A=
+> index ce797d73bb43..05afcaf655f3 100644=0A=
+> --- a/block/bio.c=0A=
+> +++ b/block/bio.c=0A=
+> @@ -1501,6 +1501,8 @@ struct bio *bio_map_kern(struct request_queue *q, v=
+oid *data, unsigned int len,=0A=
+>   	unsigned long end =3D (kaddr + len + PAGE_SIZE - 1) >> PAGE_SHIFT;=0A=
+>   	unsigned long start =3D kaddr >> PAGE_SHIFT;=0A=
+>   	const int nr_pages =3D end - start;=0A=
+> +	bool is_vmalloc =3D is_vmalloc_addr(data); > +	struct page *page;=0A=
+>   	int offset, i;=0A=
+>   	struct bio *bio;=0A=
+>   =0A=
+> @@ -1518,7 +1520,11 @@ struct bio *bio_map_kern(struct request_queue *q, =
+void *data, unsigned int len,=0A=
+>   		if (bytes > len)=0A=
+>   			bytes =3D len;=0A=
+>   =0A=
+> -		if (bio_add_pc_page(q, bio, virt_to_page(data), bytes,=0A=
+> +		if (is_vmalloc)=0A=
+nit:- Can we use is_vmalloc_addr() call directly so that=0A=
+"if (is_vmalloc)" ->  "if (is_vmalloc_addr(data))" and remove is_vmalloc =
+=0A=
+variable.=0A=
+> +			page =3D vmalloc_to_page(data);=0A=
+> +		else=0A=
+> +			page =3D virt_to_page(data);=0A=
+> +		if (bio_add_pc_page(q, bio, page, bytes,=0A=
+>   				    offset) < bytes) {=0A=
+>   			/* we don't support partial mappings */=0A=
+>   			bio_put(bio);=0A=
+> =0A=
+=0A=
