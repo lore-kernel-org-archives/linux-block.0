@@ -2,160 +2,132 @@ Return-Path: <SRS0=31JE=UY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CBF0C4646C
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 03:24:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BE9C4646C
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 03:28:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EFB39206DD
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 03:24:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="QMyzfoqX";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="OkqjWn6a"
+	by mail.kernel.org (Postfix) with ESMTP id DE2FD206DD
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 03:28:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726301AbfFYDYc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jun 2019 23:24:32 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:53318 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725268AbfFYDYc (ORCPT
+        id S1726393AbfFYD2j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jun 2019 23:28:39 -0400
+Received: from mail2.tencent.com ([163.177.67.195]:37401 "EHLO
+        mail2.tencent.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726362AbfFYD2i (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 23:24:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1561433071; x=1592969071;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=K5bXV0aYCMFXSpeWcC5UhvVrw4hiPYcdPTByQTYNIdI=;
-  b=QMyzfoqXWKW4lNcnsctjdQdswf3u+DIf5eAanuHJcXHW/l5x3oWy0ysY
-   JHNy/2ggSmlmfJXOKXMv2zNXc/Uj23jovMV+MPF3KhCl4b4QLm+JZS8R5
-   2485LXIEe2hndFNrqVA91qeIgR5jvE5maBHlKV7Y7LjCjyeBoXC7LjBxm
-   AayqEGAQ9/av5aG38O2rk7TLHmFIT1ozs880Jvr6NBNrSBbz2TFqb6fNP
-   BHMufXK7tzGsMTd7uGcMR6+aM4hhS0LthYWgAiWUEg5pMvV/TGrWRS/rs
-   1y5sIY0qb1E2yM5m4kjsbJH/D7bq/+uhX3MWIBme6P1wz0g5DpX5rXQ4w
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.63,413,1557158400"; 
-   d="scan'208";a="111437200"
-Received: from mail-co1nam05lp2052.outbound.protection.outlook.com (HELO NAM05-CO1-obe.outbound.protection.outlook.com) ([104.47.48.52])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Jun 2019 11:24:30 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wFfeB2rsTqSXZPpUK7DMv6CRWeMQn+/DK0M+zTvmUKg=;
- b=OkqjWn6aQWl3qYiFNE6HIIRe5yaHX6fTU1w5yO3uK7LEyFBXCGfBiU33rnxO5/J8coOBck8WxTqmKPpaUYsn+3xywl3ozEmE9kugMQguac68xHlRNUzj0eq5QDIjfG17bhirNA2KIIFKs8u1VY2yfTR4Ivc2OkkJuaZ/+smkYfU=
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
- BYAPR04MB4006.namprd04.prod.outlook.com (52.135.215.33) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2008.17; Tue, 25 Jun 2019 03:24:27 +0000
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::fc2b:fcd4:7782:53d6]) by BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::fc2b:fcd4:7782:53d6%7]) with mapi id 15.20.2008.014; Tue, 25 Jun 2019
- 03:24:27 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Mon, 24 Jun 2019 23:28:38 -0400
+Received: from EXHUB-SZMAIL04.tencent.com (unknown [10.14.6.35])
+        by mail2.tencent.com (Postfix) with ESMTP id CD15E8E75D;
+        Tue, 25 Jun 2019 11:28:36 +0800 (CST)
+Received: from EX-SZ006.tencent.com (10.28.6.30) by EXHUB-SZMAIL04.tencent.com
+ (10.14.6.35) with Microsoft SMTP Server (TLS) id 14.3.408.0; Tue, 25 Jun 2019
+ 11:28:36 +0800
+Received: from EX-SZ005.tencent.com (10.28.6.29) by EX-SZ006.tencent.com
+ (10.28.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Tue, 25 Jun
+ 2019 11:28:36 +0800
+Received: from EX-SZ005.tencent.com ([fe80::80ab:5a24:b62e:8246]) by
+ EX-SZ005.tencent.com ([fe80::80ab:5a24:b62e:8246%4]) with mapi id
+ 15.01.1713.004; Tue, 25 Jun 2019 11:28:36 +0800
+From:   =?utf-8?B?d2VuYmluemVuZyjmm77mlofmlowp?= <wenbinzeng@tencent.com>
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Wenbin Zeng <wenbin.zeng@gmail.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "keith.busch@intel.com" <keith.busch@intel.com>,
+        "hare@suse.com" <hare@suse.com>, "osandov@fb.com" <osandov@fb.com>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-CC:     Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH 1/3] block: Allow mapping of vmalloc-ed buffers
-Thread-Topic: [PATCH 1/3] block: Allow mapping of vmalloc-ed buffers
-Thread-Index: AQHVKwA0CgkpItjWVEOnwU70Lez80g==
-Date:   Tue, 25 Jun 2019 03:24:26 +0000
-Message-ID: <BYAPR04MB5749C9178CB54B4A488408A986E30@BYAPR04MB5749.namprd04.prod.outlook.com>
-References: <20190625024625.23976-1-damien.lemoal@wdc.com>
- <20190625024625.23976-2-damien.lemoal@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] blk-mq: update hctx->cpumask at cpu-hotplug(Internet
+ mail)
+Thread-Topic: [PATCH] blk-mq: update hctx->cpumask at cpu-hotplug(Internet
+ mail)
+Thread-Index: AQHVKqDurKLV/sXBPUypS6FtYdqWkaarFq+AgACG9yD//4HzgIAAlnDw
+Date:   Tue, 25 Jun 2019 03:28:36 +0000
+Message-ID: <22a3941e6ddf468689918c1d15c035a8@tencent.com>
+References: <1561389847-30853-1-git-send-email-wenbinzeng@tencent.com>
+ <20190625015512.GC23777@ming.t460p>
+ <fe4f40e7bbf74311a47c9f3b981f8c53@tencent.com>
+ <20190625022706.GE23777@ming.t460p>
+In-Reply-To: <20190625022706.GE23777@ming.t460p>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.44.170]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 51ca4612-3e48-47e2-ba62-08d6f91ca0d4
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4006;
-x-ms-traffictypediagnostic: BYAPR04MB4006:
-wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <BYAPR04MB4006A4E5D5F3B76207900E8C86E30@BYAPR04MB4006.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1332;
-x-forefront-prvs: 0079056367
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(366004)(136003)(39860400002)(396003)(346002)(199004)(189003)(229853002)(316002)(6436002)(54906003)(66066001)(110136005)(53936002)(55016002)(33656002)(9686003)(6246003)(53546011)(6506007)(102836004)(73956011)(66946007)(66476007)(64756008)(66556008)(66446008)(186003)(26005)(25786009)(99286004)(76176011)(7696005)(52536014)(476003)(72206003)(446003)(4326008)(68736007)(7736002)(305945005)(478600001)(74316002)(76116006)(8676002)(81156014)(81166006)(3846002)(6116002)(8936002)(71190400001)(71200400001)(86362001)(256004)(14444005)(2906002)(14454004)(2501003)(5660300002)(486006);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4006;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: ndK5klYOD2CjCLCAjLPed8co1scXT3ob4MU+IjLggwwuIr5taIKHv7+qal77ytViucC8Cy7trbeEN/QR9yLBYDW5r1h7c9Um6d6YsuXhp3gebmBbeX3EuiBKhm8fzA6xlSwI24sJFZzbtHMoolVVqjUrLGa987Yb6iKTCywSfGOf/QbHdIDExRdc7TVimOFnVImsSEyPoTwvpb0X/DK1k865U56zjRxSsA3E5F+M1imv8l6G0trlphRbOVjhBM3lktjNEbBQf5ZsqIa93NFSYiCCOIZJKYIYoPGsZLbeddQsUwllICFAltLZJeAhbFx2TEEZb090n2/JhAAu6cLND9f7MN0ii0Pdb9YW7BnLhkZMncKJWRVbSEwXcfhFPI01B/e11riAgAkEgVBiBHyPir1U/A8L/rv1TEz7O4ElGM8=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+x-originating-ip: [10.14.87.251]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 51ca4612-3e48-47e2-ba62-08d6f91ca0d4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2019 03:24:26.2685
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4006
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good with one nit, can be done at the time of applying patch.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-=0A=
-On 6/24/19 7:46 PM, Damien Le Moal wrote:=0A=
-> To allow the SCSI subsystem scsi_execute_req() function to issue=0A=
-> requests using large buffers that are better allocated with vmalloc()=0A=
-> rather than kmalloc(), modify bio_map_kern() to allow passing a buffer=0A=
-> allocated with the vmalloc() function. To do so, simply test the buffer=
-=0A=
-> address using is_vmalloc_addr() and use vmalloc_to_page() instead of=0A=
-> virt_to_page() to obtain the pages of vmalloc-ed buffers.=0A=
-> =0A=
-> Fixes: 515ce6061312 ("scsi: sd_zbc: Fix sd_zbc_report_zones() buffer allo=
-cation")=0A=
-> Fixes: e76239a3748c ("block: add a report_zones method")=0A=
-> Cc: stable@vger.kernel.org=0A=
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-> ---=0A=
->   block/bio.c | 8 +++++++-=0A=
->   1 file changed, 7 insertions(+), 1 deletion(-)=0A=
-> =0A=
-> diff --git a/block/bio.c b/block/bio.c=0A=
-> index ce797d73bb43..05afcaf655f3 100644=0A=
-> --- a/block/bio.c=0A=
-> +++ b/block/bio.c=0A=
-> @@ -1501,6 +1501,8 @@ struct bio *bio_map_kern(struct request_queue *q, v=
-oid *data, unsigned int len,=0A=
->   	unsigned long end =3D (kaddr + len + PAGE_SIZE - 1) >> PAGE_SHIFT;=0A=
->   	unsigned long start =3D kaddr >> PAGE_SHIFT;=0A=
->   	const int nr_pages =3D end - start;=0A=
-> +	bool is_vmalloc =3D is_vmalloc_addr(data); > +	struct page *page;=0A=
->   	int offset, i;=0A=
->   	struct bio *bio;=0A=
->   =0A=
-> @@ -1518,7 +1520,11 @@ struct bio *bio_map_kern(struct request_queue *q, =
-void *data, unsigned int len,=0A=
->   		if (bytes > len)=0A=
->   			bytes =3D len;=0A=
->   =0A=
-> -		if (bio_add_pc_page(q, bio, virt_to_page(data), bytes,=0A=
-> +		if (is_vmalloc)=0A=
-nit:- Can we use is_vmalloc_addr() call directly so that=0A=
-"if (is_vmalloc)" ->  "if (is_vmalloc_addr(data))" and remove is_vmalloc =
-=0A=
-variable.=0A=
-> +			page =3D vmalloc_to_page(data);=0A=
-> +		else=0A=
-> +			page =3D virt_to_page(data);=0A=
-> +		if (bio_add_pc_page(q, bio, page, bytes,=0A=
->   				    offset) < bytes) {=0A=
->   			/* we don't support partial mappings */=0A=
->   			bio_put(bio);=0A=
-> =0A=
-=0A=
+SGkgTWluZywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBNaW5nIExl
+aSA8bWluZy5sZWlAcmVkaGF0LmNvbT4NCj4gU2VudDogVHVlc2RheSwgSnVuZSAyNSwgMjAxOSAx
+MDoyNyBBTQ0KPiBUbzogd2VuYmluemVuZyjmm77mlofmlowpIDx3ZW5iaW56ZW5nQHRlbmNlbnQu
+Y29tPg0KPiBDYzogV2VuYmluIFplbmcgPHdlbmJpbi56ZW5nQGdtYWlsLmNvbT47IGF4Ym9lQGtl
+cm5lbC5kazsga2VpdGguYnVzY2hAaW50ZWwuY29tOw0KPiBoYXJlQHN1c2UuY29tOyBvc2FuZG92
+QGZiLmNvbTsgc2FnaUBncmltYmVyZy5tZTsgYnZhbmFzc2NoZUBhY20ub3JnOw0KPiBsaW51eC1i
+bG9ja0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3Vi
+amVjdDogUmU6IFtQQVRDSF0gYmxrLW1xOiB1cGRhdGUgaGN0eC0+Y3B1bWFzayBhdCBjcHUtaG90
+cGx1ZyhJbnRlcm5ldCBtYWlsKQ0KPiANCj4gT24gVHVlLCBKdW4gMjUsIDIwMTkgYXQgMDI6MTQ6
+NDZBTSArMDAwMCwgd2VuYmluemVuZyjmm77mlofmlowpIHdyb3RlOg0KPiA+IEhpIE1pbmcsDQo+
+ID4NCj4gPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiBGcm9tOiBNaW5nIExl
+aSA8bWluZy5sZWlAcmVkaGF0LmNvbT4NCj4gPiA+IFNlbnQ6IFR1ZXNkYXksIEp1bmUgMjUsIDIw
+MTkgOTo1NSBBTQ0KPiA+ID4gVG86IFdlbmJpbiBaZW5nIDx3ZW5iaW4uemVuZ0BnbWFpbC5jb20+
+DQo+ID4gPiBDYzogYXhib2VAa2VybmVsLmRrOyBrZWl0aC5idXNjaEBpbnRlbC5jb207IGhhcmVA
+c3VzZS5jb207DQo+ID4gPiBvc2FuZG92QGZiLmNvbTsgc2FnaUBncmltYmVyZy5tZTsgYnZhbmFz
+c2NoZUBhY20ub3JnOw0KPiA+ID4gbGludXgtYmxvY2tAdmdlci5rZXJuZWwub3JnOyBsaW51eC1r
+ZXJuZWxAdmdlci5rZXJuZWwub3JnOw0KPiA+ID4gd2VuYmluemVuZyjmm77mlofmlowpIDx3ZW5i
+aW56ZW5nQHRlbmNlbnQuY29tPg0KPiA+ID4gU3ViamVjdDogUmU6IFtQQVRDSF0gYmxrLW1xOiB1
+cGRhdGUgaGN0eC0+Y3B1bWFzayBhdA0KPiA+ID4gY3B1LWhvdHBsdWcoSW50ZXJuZXQgbWFpbCkN
+Cj4gPiA+DQo+ID4gPiBPbiBNb24sIEp1biAyNCwgMjAxOSBhdCAxMToyNDowN1BNICswODAwLCBX
+ZW5iaW4gWmVuZyB3cm90ZToNCj4gPiA+ID4gQ3VycmVudGx5IGhjdHgtPmNwdW1hc2sgaXMgbm90
+IHVwZGF0ZWQgd2hlbiBob3QtcGx1Z2dpbmcgbmV3IGNwdXMsDQo+ID4gPiA+IGFzIHRoZXJlIGFy
+ZSBtYW55IGNoYW5jZXMga2Jsb2NrZF9tb2RfZGVsYXllZF93b3JrX29uKCkgZ2V0dGluZw0KPiA+
+ID4gPiBjYWxsZWQgd2l0aCBXT1JLX0NQVV9VTkJPVU5ELCB3b3JrcXVldWUgYmxrX21xX3J1bl93
+b3JrX2ZuIG1heSBydW4NCj4gPiA+DQo+ID4gPiBUaGVyZSBhcmUgb25seSB0d28gY2FzZXMgaW4g
+d2hpY2ggV09SS19DUFVfVU5CT1VORCBpcyBhcHBsaWVkOg0KPiA+ID4NCj4gPiA+IDEpIHNpbmds
+ZSBodyBxdWV1ZQ0KPiA+ID4NCj4gPiA+IDIpIG11bHRpcGxlIGh3IHF1ZXVlLCBhbmQgYWxsIENQ
+VXMgaW4gdGhpcyBoY3R4IGJlY29tZSBvZmZsaW5lDQo+ID4gPg0KPiA+ID4gRm9yIDEpLCBhbGwg
+Q1BVcyBjYW4gYmUgZm91bmQgaW4gaGN0eC0+Y3B1bWFzay4NCj4gPiA+DQo+ID4gPiA+IG9uIHRo
+ZSBuZXdseS1wbHVnZ2VkIGNwdXMsIGNvbnNlcXVlbnRseSBfX2Jsa19tcV9ydW5faHdfcXVldWUo
+KQ0KPiA+ID4gPiByZXBvcnRpbmcgZXhjZXNzaXZlICJydW4gcXVldWUgZnJvbSB3cm9uZyBDUFUi
+IG1lc3NhZ2VzIGJlY2F1c2UNCj4gPiA+ID4gY3B1bWFza190ZXN0X2NwdShyYXdfc21wX3Byb2Nl
+c3Nvcl9pZCgpLCBoY3R4LT5jcHVtYXNrKSByZXR1cm5zIGZhbHNlLg0KPiA+ID4NCj4gPiA+IFRo
+ZSBtZXNzYWdlIG1lYW5zIENQVSBob3RwbHVnIHJhY2UgaXMgdHJpZ2dlcmVkLg0KPiA+ID4NCj4g
+PiA+IFllYWgsIHRoZXJlIGlzIGJpZyBwcm9ibGVtIGluIGJsa19tcV9oY3R4X25vdGlmeV9kZWFk
+KCkgd2hpY2ggaXMNCj4gPiA+IGNhbGxlZCBhZnRlciBvbmUgQ1BVIGlzIGRlYWQsIGJ1dCBzdGls
+bCBydW4gdGhpcyBodyBxdWV1ZSB0bw0KPiA+ID4gZGlzcGF0Y2ggcmVxdWVzdCwgYW5kIGFsbCBD
+UFVzIGluIHRoaXMgaGN0eCBtaWdodCBiZWNvbWUgb2ZmbGluZS4NCj4gPiA+DQo+ID4gPiBXZSBo
+YXZlIHNvbWUgZGlzY3Vzc2lvbiBiZWZvcmUgb24gdGhpcyBpc3N1ZToNCj4gPiA+DQo+ID4gPiBo
+dHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1ibG9jay9DQUNWWEZWTjcyOVNnRlFHVWdtdTFp
+TjdQNk12NStwdQ0KPiA+ID4gRTc4U1R6OGhqDQo+ID4gPiA5SjViUzgyOE5nQG1haWwuZ21haWwu
+Y29tLw0KPiA+ID4NCj4gPg0KPiA+IFRoZXJlIGlzIGFub3RoZXIgc2NlbmFyaW8sIHlvdSBjYW4g
+cmVwcm9kdWNlIGl0IGJ5IGhvdC1wbHVnZ2luZyBjcHVzIHRvIGt2bSBndWVzdHMNCj4gdmlhIHFl
+bXUgbW9uaXRvciAoSSBiZWxpZXZlIHZpcnNoIHNldHZjcHVzIC0tbGl2ZSBjYW4gZG8gdGhlIHNh
+bWUgdGhpbmcpLCBmb3IgZXhhbXBsZToNCj4gPiAocWVtdSkgY3B1LWFkZCAxDQo+ID4gKHFlbXUp
+IGNwdS1hZGQgMg0KPiA+IChxZW11KSBjcHUtYWRkIDMNCj4gPg0KPiA+IEluIHN1Y2ggc2NlbmFy
+aW8sIGNwdSAxLCAyIGFuZCAzIGFyZSBub3QgdmlzaWJsZSBhdCBib290LCBoY3R4LT5jcHVtYXNr
+IGRvZXNuJ3QNCj4gZ2V0IHN5bmNlZCB3aGVuIHRoZXNlIGNwdXMgYXJlIGFkZGVkLg0KPiANCj4g
+SXQgaXMgQ1BVIGNvbGQtcGx1Zywgd2Ugc3VwcG9zZSB0byBzdXBwb3J0IGl0Lg0KPiANCj4gVGhl
+IG5ldyBhZGRlZCBDUFVzIHNob3VsZCBiZSB2aXNpYmxlIHRvIGhjdHgsIHNpbmNlIHdlIHNwcmVh
+ZCBxdWV1ZXMgYW1vbmcgYWxsDQo+IHBvc3NpYmxlIENQVXMoKSwgcGxlYXNlIHNlZSBibGtfbXFf
+bWFwX3F1ZXVlcygpIGFuZCBpcnFfYnVpbGRfYWZmaW5pdHlfbWFza3MoKSwNCj4gd2hpY2ggaXMg
+bGlrZSBzdGF0aWMgYWxsb2NhdGlvbiBvbiBDUFUgcmVzb3VyY2VzLg0KPiANCj4gT3RoZXJ3aXNl
+LCB5b3UgbWlnaHQgdXNlIGFuIG9sZCBrZXJuZWwgb3IgdGhlcmUgaXMgYnVnIHNvbWV3aGVyZS4N
+Cg0KSXQgdHVybnMgb3V0IHRoYXQgSSB3YXMgdXNpbmcgb2xkIGtlcm5lbCwgdmVyc2lvbiA0LjE0
+LCBJIHRlc3RlZCB0aGUgbGF0ZXN0IHZlcnNpb24sIGl0IHdvcmtzIHdlbGwgYXMgeW91IHNhaWQu
+IFRoYW5rIHlvdSB2ZXJ5IG11Y2guDQoNCj4gDQo+ID4NCj4gPiA+ID4NCj4gPiA+ID4gVGhpcyBw
+YXRjaCBhZGRlZCBhIGNwdS1ob3RwbHVnIGhhbmRsZXIgaW50byBibGstbXEsIHVwZGF0aW5nDQo+
+ID4gPiA+IGhjdHgtPmNwdW1hc2sgYXQgY3B1LWhvdHBsdWcuDQo+ID4gPg0KPiA+ID4gVGhpcyB3
+YXkgaXNuJ3QgY29ycmVjdCwgaGN0eC0+Y3B1bWFzayBzaG91bGQgYmUga2VwdCBhcyBzeW5jIHdp
+dGgNCj4gPiA+IHF1ZXVlIG1hcHBpbmcuDQo+ID4NCj4gPiBQbGVhc2UgYWR2aXNlIHdoYXQgc2hv
+dWxkIEkgZG8gdG8gZGVhbCB3aXRoIHRoZSBhYm92ZSBzaXR1YXRpb24/IFRoYW5rcyBhIGxvdC4N
+Cj4gDQo+IEFzIEkgc2hhcmVkIGluIGxhc3QgZW1haWwsIHRoZXJlIGlzIG9uZSBhcHByb2FjaCBk
+aXNjdXNzZWQsIHdoaWNoIHNlZW1zIGRvYWJsZS4NCj4gDQo+IFRoYW5rcywNCj4gTWluZw0KDQo=
