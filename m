@@ -3,102 +3,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D8BC48BD5
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 15:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA932C48BD5
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 15:59:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 37EB82146E
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 15:58:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5FC02133F
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 15:59:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732472AbfFYP6S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jun 2019 11:58:18 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:35340 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728442AbfFYP6R (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jun 2019 11:58:17 -0400
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtp (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1hfnpU-00047F-3d; Tue, 25 Jun 2019 09:57:57 -0600
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190620161240.22738-1-logang@deltatee.com>
- <20190624072752.GA3954@lst.de>
- <558a27ba-e7c9-9d94-cad0-377b8ee374a6@deltatee.com>
- <20190625072008.GB30350@lst.de>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <f0f002bf-2b94-cd18-d18f-5d0b08311495@deltatee.com>
-Date:   Tue, 25 Jun 2019 09:57:52 -0600
+        id S1731355AbfFYP7L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jun 2019 11:59:11 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:39963 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728422AbfFYP7L (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Jun 2019 11:59:11 -0400
+Received: by mail-pg1-f196.google.com with SMTP id w10so9162950pgj.7;
+        Tue, 25 Jun 2019 08:59:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wcZ4fBG9NeZpTK3uYdZwLaowSCssiEZDYa5gltsOLE8=;
+        b=T6cb7PwrOoBJ3xc22KrEkvza3R51XVUm+S1/an3wB3U3m411s7w8shyREVnd2NTeHo
+         nBB52mdeqN8eZfTTAVTKRZQDe7ETMwsUXd7G4buRuyr0M7M9I252h+yrOlZu8MfQAet0
+         kR6MkGmDiqOZfqenlf0rwakgmUVmxVfArzsZgblHlzvbf2f/t10VH7Tjjxsl3hWbV+hj
+         FJlKO2ACoAFb97emlwhoXkZ5SxhBjrl2iHN8yTWlXdfzlF/7Pk6nUOlobiNbSenkXxLK
+         Ps0/JaYBwV7s9yQfjEx1kvQI7lo2vBOIuJMXI0o2P+etI3V1SrGIORHxMYpI0q2dll35
+         TRwg==
+X-Gm-Message-State: APjAAAVh6sFTwezfznx8PUa5wfKsrVjM5mEUbxnXDegkQoANFx1lBFB2
+        MZHbnP/Ozv2MdEU9UCa5zcA=
+X-Google-Smtp-Source: APXvYqzK5Wob4kRvUauwcem7uvspmf/Q4N5OQ2XvFrYFmIIrZ79oLGa1FZHPfMlFiesN9n3RFQEnfA==
+X-Received: by 2002:a17:90a:2ec2:: with SMTP id h2mr7265236pjs.119.1561478350370;
+        Tue, 25 Jun 2019 08:59:10 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id p15sm9472110pjf.27.2019.06.25.08.59.08
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 25 Jun 2019 08:59:09 -0700 (PDT)
+Subject: Re: [PATCH 1/3] block: Allow mapping of vmalloc-ed buffers
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>
+References: <20190625024625.23976-1-damien.lemoal@wdc.com>
+ <20190625024625.23976-2-damien.lemoal@wdc.com>
+ <BYAPR04MB5749C9178CB54B4A488408A986E30@BYAPR04MB5749.namprd04.prod.outlook.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <47ab2698-9767-b080-59b7-2c4b3afaa6d3@acm.org>
+Date:   Tue, 25 Jun 2019 08:59:08 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190625072008.GB30350@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
+In-Reply-To: <BYAPR04MB5749C9178CB54B4A488408A986E30@BYAPR04MB5749.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, jgg@ziepe.ca, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 6/24/19 8:24 PM, Chaitanya Kulkarni wrote:
+> nit:- Can we use is_vmalloc_addr() call directly so that
+> "if (is_vmalloc)" ->  "if (is_vmalloc_addr(data))" and remove is_vmalloc
+> variable.
+That would change a single call of is_vmalloc_addr() into multiple?
 
-
-On 2019-06-25 1:20 a.m., Christoph Hellwig wrote:
-> On Mon, Jun 24, 2019 at 10:07:56AM -0600, Logan Gunthorpe wrote:
->>> For one passing a dma_addr_t through the block layer is a layering
->>> violation, and one that I think will also bite us in practice.
->>> The host physical to PCIe bus address mapping can have offsets, and
->>> those offsets absolutely can be different for differnet root ports.
->>> So with your caller generated dma_addr_t everything works fine with
->>> a switched setup as the one you are probably testing on, but on a
->>> sufficiently complicated setup with multiple root ports it can break.
->>
->> I don't follow this argument. Yes, I understand PCI Bus offsets and yes
->> I understand that they only apply beyond the bus they're working with.
->> But this isn't *that* complicated and it should be the responsibility of
->> the P2PDMA code to sort out and provide a dma_addr_t for. The dma_addr_t
->> that's passed through the block layer could be a bus address or it could
->> be the result of a dma_map_* request (if the transaction is found to go
->> through an RC) depending on the requirements of the devices being used.
-> 
-> You assume all addressing is done by the PCI bus address.  If a device
-> is addressing its own BAR there is no reason to use the PCI bus address,
-> as it might have much more intelligent schemes (usually bar + offset).
-
-Yes, that will be a bit tricky regardless of what we do.
-
->>> Also duplicating the whole block I/O stack, including hooks all over
->>> the fast path is pretty much a no-go.
->>
->> There was very little duplicate code in the patch set. (Really just the
->> mapping code). There are a few hooks, but in practice not that many if
->> we ignore the WARN_ONs. We might be able to work to reduce this further.
->> The main hooks are: when we skip bouncing, when we skip integrity prep,
->> when we split, and when we map. And the patchset drops the PCI_P2PDMA
->> hook when we map. So we're talking about maybe three or four extra ifs
->> that would likely normally be fast due to the branch predictor.
-> 
-> And all of those add code to the block layer fast path.
-
-If we can't add any ifs to the block layer, there's really nothing we
-can do.
-
-So then we're committed to using struct page for P2P?
-
-Logan
+Bart.
