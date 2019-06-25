@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 965E8C48BD6
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 05:13:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A78AC48BD5
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 05:13:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C01720656
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 05:13:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B594E20656
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 05:13:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lguB/sG4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ra6XFgaS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727927AbfFYFNK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jun 2019 01:13:10 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:51953 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727524AbfFYFNI (ORCPT
+        id S1728044AbfFYFNQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jun 2019 01:13:16 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40274 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728007AbfFYFNQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jun 2019 01:13:08 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 207so1384712wma.1
-        for <linux-block@vger.kernel.org>; Mon, 24 Jun 2019 22:13:06 -0700 (PDT)
+        Tue, 25 Jun 2019 01:13:16 -0400
+Received: by mail-wm1-f66.google.com with SMTP id v19so1425327wmj.5
+        for <linux-block@vger.kernel.org>; Mon, 24 Jun 2019 22:13:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=13Oq+3lknK+OOIpb6iHMyHSTB86UWpthoaBFOe5XCcE=;
-        b=lguB/sG4w2WVpo8gMGCUgUWhrmQ8C1yHw3r0GeMoSMpHgkib9Lc8QSSxR7J2+NwQlE
-         hOtX+ugNI4cDJtZvnr0ndoA5MPtuBdAZa4x634KDEGli5jjBcQFzPrvAqI4N+Ez4MH5w
-         2w7HISziG2jjeo5ylGNLqNzY2tx+QAABoVD1qVlsdanr2//psoBD45QD6J9cvaY9QdYP
-         irRTdGYBG7r1QOey0Ux2+6NZo3XFNduJgYS6rXdMD5N6UKtbAU4jVV6gCu5G/FIvZBw7
-         Yj7JeN/IZmeR5QUwHRaPil2huqVRvV+/BdhJVBd3pBA8qD602ZAMx6rMBF70On4fQu6E
-         tC/Q==
+        bh=ZqOH6JolxVNnSbSBaGe2Jh+qvF6QxJR/Z+iRWaahp5U=;
+        b=ra6XFgaS1A6h1N/8W58YTrkGriiiJHAvNjaWn53UFbrbTIy3Ec587O5LVXyY8MMu2T
+         yOtG0gBqF2OfLvhR++hWQ8rQE4RNF6+2RVZNQNSl+iZ+dPAP0BP05b4P8tpHr7z/uevY
+         iduU4i7XiZoM3pzXEAM9yH0ejnJt06LSvIztvRGL5WrXZanKNLIxWdTnOlvzZv0VQw8z
+         gnVt6pUqbB0V0vHPtwlDq12q7AFKuS8HWf3pgSdQhlR4LfmkQ7NUqZP0A8dg09y2a1pF
+         1idl+isvR+emaCN6wMbgsaQVNFdSjn5xrQBRkGlsHfyF1IM7V1Wt8/kWC27t8/AEkdoY
+         3DDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=13Oq+3lknK+OOIpb6iHMyHSTB86UWpthoaBFOe5XCcE=;
-        b=QBdl53IV/H2m3nhz/POD4DRJYpLnSjhSAdit5FMJ7Nc7LaP3WCW/k0wFoHTphsQ3it
-         hX423qsqvU89HLXavPgVBryafLVf+6NvzkXuZmLXdlx6SIHxvuTIIBbkoR5eNqMtvOCA
-         C8u/lLfBJyt/1Zwz+pGUBHtK0iMZZHVXAHjwhvZVz6A0I4ETmZ+sFq/j41VEgB0tR3ib
-         U41MBJxpCjvfVP2msurgs80tqqgyyfnu7ypIsd6+xJnWYS2TfsROX36XL+Bl5vgkT0zW
-         EGgpe+A6/NZYsQk7EtHNqSnoBVTEjMbLVPGv+XmHFHlVUjapEiRh4fDT92nZVUKww5um
-         1pEA==
-X-Gm-Message-State: APjAAAUdL0OB0j1MVv19hpOTc/IUTq0PT/eKsDN+OudopzMdMnjSzB9J
-        Py1R4oPedLB7ijkoej1AXdMk2w==
-X-Google-Smtp-Source: APXvYqzO0tm+rIdT0CcRmpGDCzLqC8ZcbLD4jGJCBeHNOtK4jeuMKoOBoVqf8JrTN3DfJ2aV3RBLUw==
-X-Received: by 2002:a1c:618a:: with SMTP id v132mr18010389wmb.17.1561439585263;
-        Mon, 24 Jun 2019 22:13:05 -0700 (PDT)
+        bh=ZqOH6JolxVNnSbSBaGe2Jh+qvF6QxJR/Z+iRWaahp5U=;
+        b=hLyMM9HC6ebE7bPuYv6+4W34Y7ryQ2QyUsJGOjMBJHs+AFe1BYytiVieWnW58NB6Xy
+         2kujfSF3C1A7uSFKOnkPmtgLBRdLrXLeO1RzgQ0BjSuxz0VBWtwwPtrg/N7HtIsbFYEM
+         QtoUpJtiI1CLaS5ZJ7KFo+Gm/dfqcy2QG8QJPVvCIt+LsHg26HMRwFZIQlwq7a7QoU0P
+         zSE6cFa8yfxPwl0YrgmWdFM9V8IP8ubi8wcykax6ltzgLHHSMYcHbkdimErz3jD06Mtv
+         fuUSQ/2x1Gk06SliYEPDqtw2Jy785tx0Jcxe3MlCz1ABhf+8ubRYtDmkx5X3qiLZ/Ojb
+         V60Q==
+X-Gm-Message-State: APjAAAV/zi+MbFMKJM3IA57MpFF36lVMVQI+JJxvm8/QaxEjN3RJixFq
+        PvFX1E/QN9mvtmK6cmYQPeWpXA==
+X-Google-Smtp-Source: APXvYqwTMTOr7Q1X17LScYCOk0Jn9SIZT2RpY/Cg0fz29dvRXFPUrWHiBcZ7QxOmFNMaUt2Yx43IuA==
+X-Received: by 2002:a7b:c4c1:: with SMTP id g1mr5529925wmk.14.1561439592734;
+        Mon, 24 Jun 2019 22:13:12 -0700 (PDT)
 Received: from localhost.localdomain (146-241-102-168.dyn.eolo.it. [146.241.102.168])
-        by smtp.gmail.com with ESMTPSA id q20sm28543149wra.36.2019.06.24.22.13.04
+        by smtp.gmail.com with ESMTPSA id q20sm28543149wra.36.2019.06.24.22.13.11
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Jun 2019 22:13:04 -0700 (PDT)
+        Mon, 24 Jun 2019 22:13:12 -0700 (PDT)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -62,9 +62,9 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
         bottura.nicola95@gmail.com, srivatsa@csail.mit.edu,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX IMPROVEMENT V2 1/7] block, bfq: reset inject limit when think-time state changes
-Date:   Tue, 25 Jun 2019 07:12:43 +0200
-Message-Id: <20190625051249.39265-2-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX IMPROVEMENT V2 7/7] block, bfq: re-schedule empty queues if they deserve I/O plugging
+Date:   Tue, 25 Jun 2019 07:12:49 +0200
+Message-Id: <20190625051249.39265-8-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190625051249.39265-1-paolo.valente@linaro.org>
 References: <20190625051249.39265-1-paolo.valente@linaro.org>
@@ -75,287 +75,485 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Until the base value of the request service times gets finally
-computed for a bfq_queue, the inject limit does depend on the
-think-time state (short|long). The limit must be 0 or 1 if the think
-time is deemed, respectively, as short or long. However, such a check
-and possible limit update is performed only periodically, once per
-second. So, to make the injection mechanism much more reactive, this
-commit performs the update also every time the think-time state
-changes.
+Consider, on one side, a bfq_queue Q that remains empty while in
+service, and, on the other side, the pending I/O of bfq_queues that,
+according to their timestamps, have to be served after Q.  If an
+uncontrolled amount of I/O from the latter bfq_queues were dispatched
+while Q is waiting for its new I/O to arrive, then Q's bandwidth
+guarantees would be violated. To prevent this, I/O dispatch is plugged
+until Q receives new I/O (except for a properly controlled amount of
+injected I/O). Unfortunately, preemption breaks I/O-dispatch plugging,
+for the following reason.
 
-In addition, in the following special case, this commit lets the
-inject limit of a bfq_queue bfqq remain equal to 1 even if bfqq's
-think time is short: bfqq's I/O is synchronized with that of some
-other queue, i.e., bfqq may receive new I/O only after the I/O of the
-other queue is completed. Keeping the inject limit to 1 allows the
-blocking I/O to be served while bfqq is in service. And this is very
-convenient both for bfqq and for the total throughput, as explained
-in detail in the comments in bfq_update_has_short_ttime().
+Preemption is performed in two steps. First, Q is expired and
+re-scheduled. Second, the new bfq_queue to serve is chosen. The first
+step is needed by the second, as the second can be performed only
+after Q's timestamps have been properly updated (done in the
+expiration step), and Q has been re-queued for service. This
+dependency is a consequence of the way how BFQ's scheduling algorithm
+is currently implemented.
 
-Reported-by: Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu>
-Tested-by: Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu>
+But Q is not re-scheduled at all in the first step, because Q is
+empty. As a consequence, an uncontrolled amount of I/O may be
+dispatched until Q becomes non empty again. This breaks Q's service
+guarantees.
+
+This commit addresses this issue by re-scheduling Q even if it is
+empty. This in turn breaks the assumption that all scheduled queues
+are non empty. Then a few extra checks are now needed.
+
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 219 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 151 insertions(+), 68 deletions(-)
+ block/bfq-iosched.c | 387 +++++++++++++++++++++++---------------------
+ 1 file changed, 203 insertions(+), 184 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 44c6bbcd7720..9bc10198ddff 100644
+index 6a3d05023300..72840ebf953e 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -1735,6 +1735,72 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 				false, BFQQE_PREEMPTED);
+@@ -3210,7 +3210,186 @@ static void bfq_dispatch_remove(struct request_queue *q, struct request *rq)
+ 	bfq_remove_request(q, rq);
  }
  
-+static void bfq_reset_inject_limit(struct bfq_data *bfqd,
-+				   struct bfq_queue *bfqq)
+-static bool __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++/*
++ * There is a case where idling does not have to be performed for
++ * throughput concerns, but to preserve the throughput share of
++ * the process associated with bfqq.
++ *
++ * To introduce this case, we can note that allowing the drive
++ * to enqueue more than one request at a time, and hence
++ * delegating de facto final scheduling decisions to the
++ * drive's internal scheduler, entails loss of control on the
++ * actual request service order. In particular, the critical
++ * situation is when requests from different processes happen
++ * to be present, at the same time, in the internal queue(s)
++ * of the drive. In such a situation, the drive, by deciding
++ * the service order of the internally-queued requests, does
++ * determine also the actual throughput distribution among
++ * these processes. But the drive typically has no notion or
++ * concern about per-process throughput distribution, and
++ * makes its decisions only on a per-request basis. Therefore,
++ * the service distribution enforced by the drive's internal
++ * scheduler is likely to coincide with the desired throughput
++ * distribution only in a completely symmetric, or favorably
++ * skewed scenario where:
++ * (i-a) each of these processes must get the same throughput as
++ *	 the others,
++ * (i-b) in case (i-a) does not hold, it holds that the process
++ *       associated with bfqq must receive a lower or equal
++ *	 throughput than any of the other processes;
++ * (ii)  the I/O of each process has the same properties, in
++ *       terms of locality (sequential or random), direction
++ *       (reads or writes), request sizes, greediness
++ *       (from I/O-bound to sporadic), and so on;
++
++ * In fact, in such a scenario, the drive tends to treat the requests
++ * of each process in about the same way as the requests of the
++ * others, and thus to provide each of these processes with about the
++ * same throughput.  This is exactly the desired throughput
++ * distribution if (i-a) holds, or, if (i-b) holds instead, this is an
++ * even more convenient distribution for (the process associated with)
++ * bfqq.
++ *
++ * In contrast, in any asymmetric or unfavorable scenario, device
++ * idling (I/O-dispatch plugging) is certainly needed to guarantee
++ * that bfqq receives its assigned fraction of the device throughput
++ * (see [1] for details).
++ *
++ * The problem is that idling may significantly reduce throughput with
++ * certain combinations of types of I/O and devices. An important
++ * example is sync random I/O on flash storage with command
++ * queueing. So, unless bfqq falls in cases where idling also boosts
++ * throughput, it is important to check conditions (i-a), i(-b) and
++ * (ii) accurately, so as to avoid idling when not strictly needed for
++ * service guarantees.
++ *
++ * Unfortunately, it is extremely difficult to thoroughly check
++ * condition (ii). And, in case there are active groups, it becomes
++ * very difficult to check conditions (i-a) and (i-b) too.  In fact,
++ * if there are active groups, then, for conditions (i-a) or (i-b) to
++ * become false 'indirectly', it is enough that an active group
++ * contains more active processes or sub-groups than some other active
++ * group. More precisely, for conditions (i-a) or (i-b) to become
++ * false because of such a group, it is not even necessary that the
++ * group is (still) active: it is sufficient that, even if the group
++ * has become inactive, some of its descendant processes still have
++ * some request already dispatched but still waiting for
++ * completion. In fact, requests have still to be guaranteed their
++ * share of the throughput even after being dispatched. In this
++ * respect, it is easy to show that, if a group frequently becomes
++ * inactive while still having in-flight requests, and if, when this
++ * happens, the group is not considered in the calculation of whether
++ * the scenario is asymmetric, then the group may fail to be
++ * guaranteed its fair share of the throughput (basically because
++ * idling may not be performed for the descendant processes of the
++ * group, but it had to be).  We address this issue with the following
++ * bi-modal behavior, implemented in the function
++ * bfq_asymmetric_scenario().
++ *
++ * If there are groups with requests waiting for completion
++ * (as commented above, some of these groups may even be
++ * already inactive), then the scenario is tagged as
++ * asymmetric, conservatively, without checking any of the
++ * conditions (i-a), (i-b) or (ii). So the device is idled for bfqq.
++ * This behavior matches also the fact that groups are created
++ * exactly if controlling I/O is a primary concern (to
++ * preserve bandwidth and latency guarantees).
++ *
++ * On the opposite end, if there are no groups with requests waiting
++ * for completion, then only conditions (i-a) and (i-b) are actually
++ * controlled, i.e., provided that conditions (i-a) or (i-b) holds,
++ * idling is not performed, regardless of whether condition (ii)
++ * holds.  In other words, only if conditions (i-a) and (i-b) do not
++ * hold, then idling is allowed, and the device tends to be prevented
++ * from queueing many requests, possibly of several processes. Since
++ * there are no groups with requests waiting for completion, then, to
++ * control conditions (i-a) and (i-b) it is enough to check just
++ * whether all the queues with requests waiting for completion also
++ * have the same weight.
++ *
++ * Not checking condition (ii) evidently exposes bfqq to the
++ * risk of getting less throughput than its fair share.
++ * However, for queues with the same weight, a further
++ * mechanism, preemption, mitigates or even eliminates this
++ * problem. And it does so without consequences on overall
++ * throughput. This mechanism and its benefits are explained
++ * in the next three paragraphs.
++ *
++ * Even if a queue, say Q, is expired when it remains idle, Q
++ * can still preempt the new in-service queue if the next
++ * request of Q arrives soon (see the comments on
++ * bfq_bfqq_update_budg_for_activation). If all queues and
++ * groups have the same weight, this form of preemption,
++ * combined with the hole-recovery heuristic described in the
++ * comments on function bfq_bfqq_update_budg_for_activation,
++ * are enough to preserve a correct bandwidth distribution in
++ * the mid term, even without idling. In fact, even if not
++ * idling allows the internal queues of the device to contain
++ * many requests, and thus to reorder requests, we can rather
++ * safely assume that the internal scheduler still preserves a
++ * minimum of mid-term fairness.
++ *
++ * More precisely, this preemption-based, idleless approach
++ * provides fairness in terms of IOPS, and not sectors per
++ * second. This can be seen with a simple example. Suppose
++ * that there are two queues with the same weight, but that
++ * the first queue receives requests of 8 sectors, while the
++ * second queue receives requests of 1024 sectors. In
++ * addition, suppose that each of the two queues contains at
++ * most one request at a time, which implies that each queue
++ * always remains idle after it is served. Finally, after
++ * remaining idle, each queue receives very quickly a new
++ * request. It follows that the two queues are served
++ * alternatively, preempting each other if needed. This
++ * implies that, although both queues have the same weight,
++ * the queue with large requests receives a service that is
++ * 1024/8 times as high as the service received by the other
++ * queue.
++ *
++ * The motivation for using preemption instead of idling (for
++ * queues with the same weight) is that, by not idling,
++ * service guarantees are preserved (completely or at least in
++ * part) without minimally sacrificing throughput. And, if
++ * there is no active group, then the primary expectation for
++ * this device is probably a high throughput.
++ *
++ * We are now left only with explaining the additional
++ * compound condition that is checked below for deciding
++ * whether the scenario is asymmetric. To explain this
++ * compound condition, we need to add that the function
++ * bfq_asymmetric_scenario checks the weights of only
++ * non-weight-raised queues, for efficiency reasons (see
++ * comments on bfq_weights_tree_add()). Then the fact that
++ * bfqq is weight-raised is checked explicitly here. More
++ * precisely, the compound condition below takes into account
++ * also the fact that, even if bfqq is being weight-raised,
++ * the scenario is still symmetric if all queues with requests
++ * waiting for completion happen to be
++ * weight-raised. Actually, we should be even more precise
++ * here, and differentiate between interactive weight raising
++ * and soft real-time weight raising.
++ *
++ * As a side note, it is worth considering that the above
++ * device-idling countermeasures may however fail in the
++ * following unlucky scenario: if idling is (correctly)
++ * disabled in a time period during which all symmetry
++ * sub-conditions hold, and hence the device is allowed to
++ * enqueue many requests, but at some later point in time some
++ * sub-condition stops to hold, then it may become impossible
++ * to let requests be served in the desired order until all
++ * the requests already queued in the device have been served.
++ */
++static bool idling_needed_for_service_guarantees(struct bfq_data *bfqd,
++						 struct bfq_queue *bfqq)
 +{
-+	/* invalidate baseline total service time */
-+	bfqq->last_serv_time_ns = 0;
-+
-+	/*
-+	 * Reset pointer in case we are waiting for
-+	 * some request completion.
-+	 */
-+	bfqd->waited_rq = NULL;
-+
-+	/*
-+	 * If bfqq has a short think time, then start by setting the
-+	 * inject limit to 0 prudentially, because the service time of
-+	 * an injected I/O request may be higher than the think time
-+	 * of bfqq, and therefore, if one request was injected when
-+	 * bfqq remains empty, this injected request might delay the
-+	 * service of the next I/O request for bfqq significantly. In
-+	 * case bfqq can actually tolerate some injection, then the
-+	 * adaptive update will however raise the limit soon. This
-+	 * lucky circumstance holds exactly because bfqq has a short
-+	 * think time, and thus, after remaining empty, is likely to
-+	 * get new I/O enqueued---and then completed---before being
-+	 * expired. This is the very pattern that gives the
-+	 * limit-update algorithm the chance to measure the effect of
-+	 * injection on request service times, and then to update the
-+	 * limit accordingly.
-+	 *
-+	 * However, in the following special case, the inject limit is
-+	 * left to 1 even if the think time is short: bfqq's I/O is
-+	 * synchronized with that of some other queue, i.e., bfqq may
-+	 * receive new I/O only after the I/O of the other queue is
-+	 * completed. Keeping the inject limit to 1 allows the
-+	 * blocking I/O to be served while bfqq is in service. And
-+	 * this is very convenient both for bfqq and for overall
-+	 * throughput, as explained in detail in the comments in
-+	 * bfq_update_has_short_ttime().
-+	 *
-+	 * On the opposite end, if bfqq has a long think time, then
-+	 * start directly by 1, because:
-+	 * a) on the bright side, keeping at most one request in
-+	 * service in the drive is unlikely to cause any harm to the
-+	 * latency of bfqq's requests, as the service time of a single
-+	 * request is likely to be lower than the think time of bfqq;
-+	 * b) on the downside, after becoming empty, bfqq is likely to
-+	 * expire before getting its next request. With this request
-+	 * arrival pattern, it is very hard to sample total service
-+	 * times and update the inject limit accordingly (see comments
-+	 * on bfq_update_inject_limit()). So the limit is likely to be
-+	 * never, or at least seldom, updated.  As a consequence, by
-+	 * setting the limit to 1, we avoid that no injection ever
-+	 * occurs with bfqq. On the downside, this proactive step
-+	 * further reduces chances to actually compute the baseline
-+	 * total service time. Thus it reduces chances to execute the
-+	 * limit-update algorithm and possibly raise the limit to more
-+	 * than 1.
-+	 */
-+	if (bfq_bfqq_has_short_ttime(bfqq))
-+		bfqq->inject_limit = 0;
-+	else
-+		bfqq->inject_limit = 1;
-+
-+	bfqq->decrease_time_jif = jiffies;
++	return (bfqq->wr_coeff > 1 &&
++		bfqd->wr_busy_queues <
++		bfq_tot_busy_queues(bfqd)) ||
++		bfq_asymmetric_scenario(bfqd, bfqq);
 +}
 +
- static void bfq_add_request(struct request *rq)
++static bool __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++			      enum bfqq_expiration reason)
  {
- 	struct bfq_queue *bfqq = RQ_BFQQ(rq);
-@@ -1755,71 +1821,8 @@ static void bfq_add_request(struct request *rq)
- 		 * bfq_update_inject_limit().
- 		 */
- 		if (time_is_before_eq_jiffies(bfqq->decrease_time_jif +
--					     msecs_to_jiffies(1000))) {
--			/* invalidate baseline total service time */
--			bfqq->last_serv_time_ns = 0;
--
--			/*
--			 * Reset pointer in case we are waiting for
--			 * some request completion.
--			 */
--			bfqd->waited_rq = NULL;
--
--			/*
--			 * If bfqq has a short think time, then start
--			 * by setting the inject limit to 0
--			 * prudentially, because the service time of
--			 * an injected I/O request may be higher than
--			 * the think time of bfqq, and therefore, if
--			 * one request was injected when bfqq remains
--			 * empty, this injected request might delay
--			 * the service of the next I/O request for
--			 * bfqq significantly. In case bfqq can
--			 * actually tolerate some injection, then the
--			 * adaptive update will however raise the
--			 * limit soon. This lucky circumstance holds
--			 * exactly because bfqq has a short think
--			 * time, and thus, after remaining empty, is
--			 * likely to get new I/O enqueued---and then
--			 * completed---before being expired. This is
--			 * the very pattern that gives the
--			 * limit-update algorithm the chance to
--			 * measure the effect of injection on request
--			 * service times, and then to update the limit
--			 * accordingly.
--			 *
--			 * On the opposite end, if bfqq has a long
--			 * think time, then start directly by 1,
--			 * because:
--			 * a) on the bright side, keeping at most one
--			 * request in service in the drive is unlikely
--			 * to cause any harm to the latency of bfqq's
--			 * requests, as the service time of a single
--			 * request is likely to be lower than the
--			 * think time of bfqq;
--			 * b) on the downside, after becoming empty,
--			 * bfqq is likely to expire before getting its
--			 * next request. With this request arrival
--			 * pattern, it is very hard to sample total
--			 * service times and update the inject limit
--			 * accordingly (see comments on
--			 * bfq_update_inject_limit()). So the limit is
--			 * likely to be never, or at least seldom,
--			 * updated.  As a consequence, by setting the
--			 * limit to 1, we avoid that no injection ever
--			 * occurs with bfqq. On the downside, this
--			 * proactive step further reduces chances to
--			 * actually compute the baseline total service
--			 * time. Thus it reduces chances to execute the
--			 * limit-update algorithm and possibly raise the
--			 * limit to more than 1.
--			 */
--			if (bfq_bfqq_has_short_ttime(bfqq))
--				bfqq->inject_limit = 0;
--			else
--				bfqq->inject_limit = 1;
--			bfqq->decrease_time_jif = jiffies;
--		}
-+					     msecs_to_jiffies(1000)))
-+			bfq_reset_inject_limit(bfqd, bfqq);
- 
- 		/*
- 		 * The following conditions must hold to setup a new
-@@ -4855,7 +4858,7 @@ static void bfq_update_has_short_ttime(struct bfq_data *bfqd,
- 				       struct bfq_queue *bfqq,
- 				       struct bfq_io_cq *bic)
- {
--	bool has_short_ttime = true;
-+	bool has_short_ttime = true, state_changed;
- 
  	/*
- 	 * No need to update has_short_ttime if bfqq is async or in
-@@ -4880,13 +4883,93 @@ static void bfq_update_has_short_ttime(struct bfq_data *bfqd,
- 	     bfqq->ttime.ttime_mean > bfqd->bfq_slice_idle))
- 		has_short_ttime = false;
+ 	 * If this bfqq is shared between multiple processes, check
+@@ -3221,7 +3400,22 @@ static bool __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 	if (bfq_bfqq_coop(bfqq) && BFQQ_SEEKY(bfqq))
+ 		bfq_mark_bfqq_split_coop(bfqq);
  
--	bfq_log_bfqq(bfqd, bfqq, "update_has_short_ttime: has_short_ttime %d",
--		     has_short_ttime);
-+	state_changed = has_short_ttime != bfq_bfqq_has_short_ttime(bfqq);
- 
- 	if (has_short_ttime)
- 		bfq_mark_bfqq_has_short_ttime(bfqq);
- 	else
- 		bfq_clear_bfqq_has_short_ttime(bfqq);
-+
+-	if (RB_EMPTY_ROOT(&bfqq->sort_list)) {
 +	/*
-+	 * Until the base value for the total service time gets
-+	 * finally computed for bfqq, the inject limit does depend on
-+	 * the think-time state (short|long). In particular, the limit
-+	 * is 0 or 1 if the think time is deemed, respectively, as
-+	 * short or long (details in the comments in
-+	 * bfq_update_inject_limit()). Accordingly, the next
-+	 * instructions reset the inject limit if the think-time state
-+	 * has changed and the above base value is still to be
-+	 * computed.
-+	 *
-+	 * However, the reset is performed only if more than 100 ms
-+	 * have elapsed since the last update of the inject limit, or
-+	 * (inclusive) if the change is from short to long think
-+	 * time. The reason for this waiting is as follows.
-+	 *
-+	 * bfqq may have a long think time because of a
-+	 * synchronization with some other queue, i.e., because the
-+	 * I/O of some other queue may need to be completed for bfqq
-+	 * to receive new I/O. This happens, e.g., if bfqq is
-+	 * associated with a process that does some sync. A sync
-+	 * generates extra blocking I/O, which must be completed
-+	 * before the process associated with bfqq can go on with its
-+	 * I/O.
-+	 *
-+	 * If such a synchronization is actually in place, then,
-+	 * without injection on bfqq, the blocking I/O cannot happen
-+	 * to served while bfqq is in service. As a consequence, if
-+	 * bfqq is granted I/O-dispatch-plugging, then bfqq remains
-+	 * empty, and no I/O is dispatched, until the idle timeout
-+	 * fires. This is likely to result in lower bandwidth and
-+	 * higher latencies for bfqq, and in a severe loss of total
-+	 * throughput.
-+	 *
-+	 * On the opposite end, a non-zero inject limit may allow the
-+	 * I/O that blocks bfqq to be executed soon, and therefore
-+	 * bfqq to receive new I/O soon. But, if this actually
-+	 * happens, then the next think-time sample for bfqq may be
-+	 * very low. This in turn may cause bfqq's think time to be
-+	 * deemed short. Without the 100 ms barrier, this new state
-+	 * change would cause the body of the next if to be executed
-+	 * immediately. But this would set to 0 the inject
-+	 * limit. Without injection, the blocking I/O would cause the
-+	 * think time of bfqq to become long again, and therefore the
-+	 * inject limit to be raised again, and so on. The only effect
-+	 * of such a steady oscillation between the two think-time
-+	 * states would be to prevent effective injection on bfqq.
-+	 *
-+	 * In contrast, if the inject limit is not reset during such a
-+	 * long time interval as 100 ms, then the number of short
-+	 * think time samples can grow significantly before the reset
-+	 * is allowed. As a consequence, the think time state can
-+	 * become stable before the reset. There will be no state
-+	 * change when the 100 ms elapse, and therefore no reset of
-+	 * the inject limit. The inject limit remains steadily equal
-+	 * to 1 both during and after the 100 ms. So injection can be
-+	 * performed at all times, and throughput gets boosted.
-+	 *
-+	 * An inject limit equal to 1 is however in conflict, in
-+	 * general, with the fact that the think time of bfqq is
-+	 * short, because injection may be likely to delay bfqq's I/O
-+	 * (as explained in the comments in
-+	 * bfq_update_inject_limit()). But this does not happen in
-+	 * this special case, because bfqq's low think time is due to
-+	 * an effective handling of a synchronization, through
-+	 * injection. In this special case, bfqq's I/O does not get
-+	 * delayed by injection; on the contrary, bfqq's I/O is
-+	 * brought forward, because it is not blocked for
-+	 * milliseconds.
-+	 *
-+	 * In addition, during the 100 ms, the base value for the
-+	 * total service time is likely to get finally computed,
-+	 * freeing the inject limit from its relation with the think
-+	 * time.
++	 * Consider queues with a higher finish virtual time than
++	 * bfqq. If idling_needed_for_service_guarantees(bfqq) returns
++	 * true, then bfqq's bandwidth would be violated if an
++	 * uncontrolled amount of I/O from these queues were
++	 * dispatched while bfqq is waiting for its new I/O to
++	 * arrive. This is exactly what may happen if this is a forced
++	 * expiration caused by a preemption attempt, and if bfqq is
++	 * not re-scheduled. To prevent this from happening, re-queue
++	 * bfqq if it needs I/O-dispatch plugging, even if it is
++	 * empty. By doing so, bfqq is granted to be served before the
++	 * above queues (provided that bfqq is of course eligible).
 +	 */
-+	if (state_changed && bfqq->last_serv_time_ns == 0 &&
-+	    (time_is_before_eq_jiffies(bfqq->decrease_time_jif +
-+				      msecs_to_jiffies(100)) ||
-+	     !has_short_ttime))
-+		bfq_reset_inject_limit(bfqd, bfqq);
++	if (RB_EMPTY_ROOT(&bfqq->sort_list) &&
++	    !(reason == BFQQE_PREEMPTED &&
++	      idling_needed_for_service_guarantees(bfqd, bfqq))) {
+ 		if (bfqq->dispatched == 0)
+ 			/*
+ 			 * Overloading budget_timeout field to store
+@@ -3238,7 +3432,8 @@ static bool __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 		 * Resort priority tree of potential close cooperators.
+ 		 * See comments on bfq_pos_tree_add_move() for the unlikely().
+ 		 */
+-		if (unlikely(!bfqd->nonrot_with_queueing))
++		if (unlikely(!bfqd->nonrot_with_queueing &&
++			     !RB_EMPTY_ROOT(&bfqq->sort_list)))
+ 			bfq_pos_tree_add_move(bfqd, bfqq);
+ 	}
+ 
+@@ -3739,7 +3934,7 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 	 * reason.
+ 	 */
+ 	__bfq_bfqq_recalc_budget(bfqd, bfqq, reason);
+-	if (__bfq_bfqq_expire(bfqd, bfqq))
++	if (__bfq_bfqq_expire(bfqd, bfqq, reason))
+ 		/* bfqq is gone, no more actions on it */
+ 		return;
+ 
+@@ -3885,184 +4080,6 @@ static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
+ 		bfqd->wr_busy_queues == 0;
  }
  
+-/*
+- * There is a case where idling does not have to be performed for
+- * throughput concerns, but to preserve the throughput share of
+- * the process associated with bfqq.
+- *
+- * To introduce this case, we can note that allowing the drive
+- * to enqueue more than one request at a time, and hence
+- * delegating de facto final scheduling decisions to the
+- * drive's internal scheduler, entails loss of control on the
+- * actual request service order. In particular, the critical
+- * situation is when requests from different processes happen
+- * to be present, at the same time, in the internal queue(s)
+- * of the drive. In such a situation, the drive, by deciding
+- * the service order of the internally-queued requests, does
+- * determine also the actual throughput distribution among
+- * these processes. But the drive typically has no notion or
+- * concern about per-process throughput distribution, and
+- * makes its decisions only on a per-request basis. Therefore,
+- * the service distribution enforced by the drive's internal
+- * scheduler is likely to coincide with the desired throughput
+- * distribution only in a completely symmetric, or favorably
+- * skewed scenario where:
+- * (i-a) each of these processes must get the same throughput as
+- *	 the others,
+- * (i-b) in case (i-a) does not hold, it holds that the process
+- *       associated with bfqq must receive a lower or equal
+- *	 throughput than any of the other processes;
+- * (ii)  the I/O of each process has the same properties, in
+- *       terms of locality (sequential or random), direction
+- *       (reads or writes), request sizes, greediness
+- *       (from I/O-bound to sporadic), and so on;
+-
+- * In fact, in such a scenario, the drive tends to treat the requests
+- * of each process in about the same way as the requests of the
+- * others, and thus to provide each of these processes with about the
+- * same throughput.  This is exactly the desired throughput
+- * distribution if (i-a) holds, or, if (i-b) holds instead, this is an
+- * even more convenient distribution for (the process associated with)
+- * bfqq.
+- *
+- * In contrast, in any asymmetric or unfavorable scenario, device
+- * idling (I/O-dispatch plugging) is certainly needed to guarantee
+- * that bfqq receives its assigned fraction of the device throughput
+- * (see [1] for details).
+- *
+- * The problem is that idling may significantly reduce throughput with
+- * certain combinations of types of I/O and devices. An important
+- * example is sync random I/O on flash storage with command
+- * queueing. So, unless bfqq falls in cases where idling also boosts
+- * throughput, it is important to check conditions (i-a), i(-b) and
+- * (ii) accurately, so as to avoid idling when not strictly needed for
+- * service guarantees.
+- *
+- * Unfortunately, it is extremely difficult to thoroughly check
+- * condition (ii). And, in case there are active groups, it becomes
+- * very difficult to check conditions (i-a) and (i-b) too.  In fact,
+- * if there are active groups, then, for conditions (i-a) or (i-b) to
+- * become false 'indirectly', it is enough that an active group
+- * contains more active processes or sub-groups than some other active
+- * group. More precisely, for conditions (i-a) or (i-b) to become
+- * false because of such a group, it is not even necessary that the
+- * group is (still) active: it is sufficient that, even if the group
+- * has become inactive, some of its descendant processes still have
+- * some request already dispatched but still waiting for
+- * completion. In fact, requests have still to be guaranteed their
+- * share of the throughput even after being dispatched. In this
+- * respect, it is easy to show that, if a group frequently becomes
+- * inactive while still having in-flight requests, and if, when this
+- * happens, the group is not considered in the calculation of whether
+- * the scenario is asymmetric, then the group may fail to be
+- * guaranteed its fair share of the throughput (basically because
+- * idling may not be performed for the descendant processes of the
+- * group, but it had to be).  We address this issue with the following
+- * bi-modal behavior, implemented in the function
+- * bfq_asymmetric_scenario().
+- *
+- * If there are groups with requests waiting for completion
+- * (as commented above, some of these groups may even be
+- * already inactive), then the scenario is tagged as
+- * asymmetric, conservatively, without checking any of the
+- * conditions (i-a), (i-b) or (ii). So the device is idled for bfqq.
+- * This behavior matches also the fact that groups are created
+- * exactly if controlling I/O is a primary concern (to
+- * preserve bandwidth and latency guarantees).
+- *
+- * On the opposite end, if there are no groups with requests waiting
+- * for completion, then only conditions (i-a) and (i-b) are actually
+- * controlled, i.e., provided that conditions (i-a) or (i-b) holds,
+- * idling is not performed, regardless of whether condition (ii)
+- * holds.  In other words, only if conditions (i-a) and (i-b) do not
+- * hold, then idling is allowed, and the device tends to be prevented
+- * from queueing many requests, possibly of several processes. Since
+- * there are no groups with requests waiting for completion, then, to
+- * control conditions (i-a) and (i-b) it is enough to check just
+- * whether all the queues with requests waiting for completion also
+- * have the same weight.
+- *
+- * Not checking condition (ii) evidently exposes bfqq to the
+- * risk of getting less throughput than its fair share.
+- * However, for queues with the same weight, a further
+- * mechanism, preemption, mitigates or even eliminates this
+- * problem. And it does so without consequences on overall
+- * throughput. This mechanism and its benefits are explained
+- * in the next three paragraphs.
+- *
+- * Even if a queue, say Q, is expired when it remains idle, Q
+- * can still preempt the new in-service queue if the next
+- * request of Q arrives soon (see the comments on
+- * bfq_bfqq_update_budg_for_activation). If all queues and
+- * groups have the same weight, this form of preemption,
+- * combined with the hole-recovery heuristic described in the
+- * comments on function bfq_bfqq_update_budg_for_activation,
+- * are enough to preserve a correct bandwidth distribution in
+- * the mid term, even without idling. In fact, even if not
+- * idling allows the internal queues of the device to contain
+- * many requests, and thus to reorder requests, we can rather
+- * safely assume that the internal scheduler still preserves a
+- * minimum of mid-term fairness.
+- *
+- * More precisely, this preemption-based, idleless approach
+- * provides fairness in terms of IOPS, and not sectors per
+- * second. This can be seen with a simple example. Suppose
+- * that there are two queues with the same weight, but that
+- * the first queue receives requests of 8 sectors, while the
+- * second queue receives requests of 1024 sectors. In
+- * addition, suppose that each of the two queues contains at
+- * most one request at a time, which implies that each queue
+- * always remains idle after it is served. Finally, after
+- * remaining idle, each queue receives very quickly a new
+- * request. It follows that the two queues are served
+- * alternatively, preempting each other if needed. This
+- * implies that, although both queues have the same weight,
+- * the queue with large requests receives a service that is
+- * 1024/8 times as high as the service received by the other
+- * queue.
+- *
+- * The motivation for using preemption instead of idling (for
+- * queues with the same weight) is that, by not idling,
+- * service guarantees are preserved (completely or at least in
+- * part) without minimally sacrificing throughput. And, if
+- * there is no active group, then the primary expectation for
+- * this device is probably a high throughput.
+- *
+- * We are now left only with explaining the additional
+- * compound condition that is checked below for deciding
+- * whether the scenario is asymmetric. To explain this
+- * compound condition, we need to add that the function
+- * bfq_asymmetric_scenario checks the weights of only
+- * non-weight-raised queues, for efficiency reasons (see
+- * comments on bfq_weights_tree_add()). Then the fact that
+- * bfqq is weight-raised is checked explicitly here. More
+- * precisely, the compound condition below takes into account
+- * also the fact that, even if bfqq is being weight-raised,
+- * the scenario is still symmetric if all queues with requests
+- * waiting for completion happen to be
+- * weight-raised. Actually, we should be even more precise
+- * here, and differentiate between interactive weight raising
+- * and soft real-time weight raising.
+- *
+- * As a side note, it is worth considering that the above
+- * device-idling countermeasures may however fail in the
+- * following unlucky scenario: if idling is (correctly)
+- * disabled in a time period during which all symmetry
+- * sub-conditions hold, and hence the device is allowed to
+- * enqueue many requests, but at some later point in time some
+- * sub-condition stops to hold, then it may become impossible
+- * to let requests be served in the desired order until all
+- * the requests already queued in the device have been served.
+- */
+-static bool idling_needed_for_service_guarantees(struct bfq_data *bfqd,
+-						 struct bfq_queue *bfqq)
+-{
+-	return (bfqq->wr_coeff > 1 &&
+-		bfqd->wr_busy_queues <
+-		bfq_tot_busy_queues(bfqd)) ||
+-		bfq_asymmetric_scenario(bfqd, bfqq);
+-}
+-
  /*
+  * For a queue that becomes empty, device idling is allowed only if
+  * this function returns true for that queue. As a consequence, since
+@@ -4321,7 +4338,8 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+ 	    (bfqq->dispatched != 0 && bfq_better_to_idle(bfqq))) {
+ 		struct bfq_queue *async_bfqq =
+ 			bfqq->bic && bfqq->bic->bfqq[0] &&
+-			bfq_bfqq_busy(bfqq->bic->bfqq[0]) ?
++			bfq_bfqq_busy(bfqq->bic->bfqq[0]) &&
++			bfqq->bic->bfqq[0]->next_rq ?
+ 			bfqq->bic->bfqq[0] : NULL;
+ 
+ 		/*
+@@ -4403,6 +4421,7 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+ 			bfqq = bfqq->bic->bfqq[0];
+ 		else if (bfq_bfqq_has_waker(bfqq) &&
+ 			   bfq_bfqq_busy(bfqq->waker_bfqq) &&
++			   bfqq->next_rq &&
+ 			   bfq_serv_to_charge(bfqq->waker_bfqq->next_rq,
+ 					      bfqq->waker_bfqq) <=
+ 			   bfq_bfqq_budget_left(bfqq->waker_bfqq)
+@@ -4800,7 +4819,7 @@ static void bfq_exit_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 	struct hlist_node *n;
+ 
+ 	if (bfqq == bfqd->in_service_queue) {
+-		__bfq_bfqq_expire(bfqd, bfqq);
++		__bfq_bfqq_expire(bfqd, bfqq, BFQQE_BUDGET_TIMEOUT);
+ 		bfq_schedule_dispatch(bfqd);
+ 	}
+ 
 -- 
 2.20.1
 
