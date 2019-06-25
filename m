@@ -2,85 +2,125 @@ Return-Path: <SRS0=31JE=UY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B745C4646B
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 01:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BEECC4646C
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 01:59:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F6AF20665
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 01:55:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FA1C2077C
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jun 2019 01:59:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730222AbfFYBz0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jun 2019 21:55:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51124 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729450AbfFYBz0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jun 2019 21:55:26 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 037DE308626C;
-        Tue, 25 Jun 2019 01:55:26 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF2CE5C277;
-        Tue, 25 Jun 2019 01:55:17 +0000 (UTC)
-Date:   Tue, 25 Jun 2019 09:55:13 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Wenbin Zeng <wenbin.zeng@gmail.com>
-Cc:     axboe@kernel.dk, keith.busch@intel.com, hare@suse.com,
-        osandov@fb.com, sagi@grimberg.me, bvanassche@acm.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Wenbin Zeng <wenbinzeng@tencent.com>
-Subject: Re: [PATCH] blk-mq: update hctx->cpumask at cpu-hotplug
-Message-ID: <20190625015512.GC23777@ming.t460p>
-References: <1561389847-30853-1-git-send-email-wenbinzeng@tencent.com>
+        id S1730189AbfFYB7d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jun 2019 21:59:33 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33656 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729601AbfFYB7d (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Jun 2019 21:59:33 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 071ACAB5F;
+        Tue, 25 Jun 2019 01:59:31 +0000 (UTC)
+Subject: Re: [PATCH] bcache: make stripe_size configurable and persistent for
+ hardware raid5/6
+To:     Eric Wheeler <bcache@lists.ewheeler.net>
+Cc:     linux-block@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BCACHE (BLOCK LAYER CACHE)" <linux-bcache@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <d3f7fd44-9287-c7fa-ee95-c3b8a4d56c93@suse.de>
+ <1561245371-10235-1-git-send-email-bcache@lists.ewheeler.net>
+ <200638b0-7cba-38b4-20c4-b325f3cfe862@suse.de>
+ <alpine.LRH.2.11.1906241800350.1114@mx.ewheeler.net>
+From:   Coly Li <colyli@suse.de>
+Openpgp: preference=signencrypt
+Organization: SUSE Labs
+Message-ID: <8a9131dc-9bf7-a24a-f7b8-35e0c019e905@suse.de>
+Date:   Tue, 25 Jun 2019 09:59:23 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1561389847-30853-1-git-send-email-wenbinzeng@tencent.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Tue, 25 Jun 2019 01:55:26 +0000 (UTC)
+In-Reply-To: <alpine.LRH.2.11.1906241800350.1114@mx.ewheeler.net>
+Content-Type: text/plain; charset=iso-2022-jp
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 24, 2019 at 11:24:07PM +0800, Wenbin Zeng wrote:
-> Currently hctx->cpumask is not updated when hot-plugging new cpus,
-> as there are many chances kblockd_mod_delayed_work_on() getting
-> called with WORK_CPU_UNBOUND, workqueue blk_mq_run_work_fn may run
-
-There are only two cases in which WORK_CPU_UNBOUND is applied:
-
-1) single hw queue
-
-2) multiple hw queue, and all CPUs in this hctx become offline
-
-For 1), all CPUs can be found in hctx->cpumask.
-
-> on the newly-plugged cpus, consequently __blk_mq_run_hw_queue()
-> reporting excessive "run queue from wrong CPU" messages because
-> cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) returns false.
-
-The message means CPU hotplug race is triggered.
-
-Yeah, there is big problem in blk_mq_hctx_notify_dead() which is called
-after one CPU is dead, but still run this hw queue to dispatch request,
-and all CPUs in this hctx might become offline.
-
-We have some discussion before on this issue:
-
-https://lore.kernel.org/linux-block/CACVXFVN729SgFQGUgmu1iN7P6Mv5+puE78STz8hj9J5bS828Ng@mail.gmail.com/
-
+On 2019/6/25 2:14 上午, Eric Wheeler wrote:
+> On Mon, 24 Jun 2019, Coly Li wrote:
 > 
-> This patch added a cpu-hotplug handler into blk-mq, updating
-> hctx->cpumask at cpu-hotplug.
+>> On 2019/6/23 7:16 上午, Eric Wheeler wrote:
+>>> From: Eric Wheeler <git@linux.ewheeler.net>
+>>>
+>>> While some drivers set queue_limits.io_opt (e.g., md raid5), there are
+>>> currently no SCSI/RAID controller drivers that do.  Previously stripe_size
+>>> and partial_stripes_expensive were read-only values and could not be
+>>> tuned by users (eg, for hardware RAID5/6).
+>>>
+>>> This patch enables users to save the optimal IO size via sysfs through
+>>> the backing device attributes stripe_size and partial_stripes_expensive
+>>> into the bcache superblock.
+>>>
+>>> Superblock changes are backwards-compatable:
+>>>
+>>> *  partial_stripes_expensive: One bit was used in the superblock flags field
+>>>
+>>> *  stripe_size: There are eight 64-bit "pad" fields for future use in
+>>>    the superblock which default to 0; from those, 32-bits are now used
+>>>    to save the stripe_size and load at device registration time.
+>>>
+>>> Signed-off-by: Eric Wheeler <bcache@linux.ewheeler.net>
+>>
+>> Hi Eric,
+>>
+>> In general I am OK with this patch. Since Peter comments lots of SCSI
+>> RAID devices reports a stripe width, could you please list the hardware
+>> raid devices which don't list stripe size ? Then we can make decision
+>> whether it is necessary to have such option enabled.
+> 
+> Perhaps they do not set stripe_width using io_opt? I did a grep to see if 
+> any of them did, but I didn't see them. How is stripe_width indicated by 
+> RAID controllers? 
+> 
+> If they do set io_opt, then at least my Areca 1883 does not set io_opt as 
+> of 4.19.x. I also have a LSI MegaRAID 3108 which does not report io_opt as 
+> of 4.1.x, but that is an older kernel so maybe support has been added 
+> since then.
+> 
+> Martin,
+> 
+> Where would stripe_width be configured in the SCSI drivers? Is it visible 
+> through sysfs or debugfs so I can check my hardware support without 
+> hacking debugging the kernel?
+> 
+>>
+>> Another point is, this patch changes struct cache_sb, it is no problem
+>> to change on-disk format. I plan to update the super block version soon,
+>> to store more configuration persistently into super block. stripe_size
+>> can be added to cache_sb with other on-disk changes.
+> 
 
-This way isn't correct, hctx->cpumask should be kept as sync with
-queue mapping.
+Hi Eric,
 
-Thanks,
-Ming
+> Maybe bumping version makes sense, but even if you do not, this is safe to 
+> use on systems without bumping the version because the values are unused 
+> and default to 0.
+
+Yes, I understand you, it works as you suggested. I need to think how to
+organize all options in struct cache_sb, stripe_size will be arranged
+then. And I will ask help to you for reviewing the changes of on-disk
+format.
+
+Thanks.
+
+[snipped]
+
+-- 
+
+Coly Li
