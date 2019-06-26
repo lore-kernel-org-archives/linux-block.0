@@ -2,114 +2,153 @@ Return-Path: <SRS0=3eIv=UZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6264CC48BD6
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1ABAC48BD6
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:47:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 42D8A208E3
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:45:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5145208E3
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:47:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="a+uaxJjK";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="zWDIy0F1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726354AbfFZUpx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jun 2019 16:45:53 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:49582 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726293AbfFZUpx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jun 2019 16:45:53 -0400
-Received: from s01061831bf6ec98c.cg.shawcable.net ([68.147.80.180] helo=[192.168.6.132])
-        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1hgEnT-0002Rd-NS; Wed, 26 Jun 2019 14:45:40 -0600
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190620161240.22738-1-logang@deltatee.com>
- <20190624072752.GA3954@lst.de>
- <558a27ba-e7c9-9d94-cad0-377b8ee374a6@deltatee.com>
- <20190625072008.GB30350@lst.de>
- <f0f002bf-2b94-cd18-d18f-5d0b08311495@deltatee.com>
- <20190625170115.GA9746@lst.de>
- <41235a05-8ed1-e69a-e7cd-48cae7d8a676@deltatee.com>
- <20190626065708.GB24531@lst.de>
- <c15d5997-9ba4-f7db-0e7a-a69e75df316c@deltatee.com>
- <20190626202107.GA5850@ziepe.ca>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <8a0a08c3-a537-bff6-0852-a5f337a70688@deltatee.com>
-Date:   Wed, 26 Jun 2019 14:45:38 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
-MIME-Version: 1.0
-In-Reply-To: <20190626202107.GA5850@ziepe.ca>
-Content-Type: text/plain; charset=utf-8
+        id S1726354AbfFZUrG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jun 2019 16:47:06 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:45514 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726271AbfFZUrG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Jun 2019 16:47:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1561582025; x=1593118025;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=EoBgMn73zttSkYEHxUIOtEcZeU5vVnsGQethK5QYpGw=;
+  b=a+uaxJjKH1zLBE3NhvBopUsknCsrexz2FCUrpSEpoFNNURi/zzt0AOfH
+   jttYGiJ8nozgoEOiIQKU17XVPxNv89xOaaT9KqOmbEwsFTpcaH1fUygY/
+   IDUUPOvkMo50kuMpHI3JMajJqDkCGUwVECgADYGjMQOQST++KlAqqVdH3
+   BQ3RrSy/Pib15SUzYMyAeGRLy9JYNdKxy35cbBA5inhZvcbkAFCponzyR
+   P3G97c+e0EYGufdtzOSnpX7xEv4DGzAViIaSGJBdLZSoB5/aR+wizc0pq
+   gKyIeD65N3JEBBYsTXtMQfpRlTsYz/7UC5jle4xMGOdKnfqPHafZYuEfu
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.63,421,1557158400"; 
+   d="scan'208";a="218001774"
+Received: from mail-by2nam01lp2055.outbound.protection.outlook.com (HELO NAM01-BY2-obe.outbound.protection.outlook.com) ([104.47.34.55])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2019 04:47:04 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A51PVHSgNfTgGVyhw0rQn9dSqj/JjepIJxj81KQYWok=;
+ b=zWDIy0F1oB7Cfm6N49ZiGPb0KLjOTb+Qu5GkNJCUscGKgdf+iLh4p2b5Qf6arsMhvJcQW4BklAm9LY0leAOV1ug/3SFBJMudxbQ3MgY4D2AWvUZA0t0EWOZ54r0jr5zWRTkI4Z/mFlpMfta/BD8dm5Obcrnw2Cxy73PC5u45V3g=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
+ BYAPR04MB4871.namprd04.prod.outlook.com (52.135.232.160) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.18; Wed, 26 Jun 2019 20:47:03 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::fc2b:fcd4:7782:53d6]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::fc2b:fcd4:7782:53d6%7]) with mapi id 15.20.2008.018; Wed, 26 Jun 2019
+ 20:47:03 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 3/9] block: use bio_release_pages in bio_unmap_user
+Thread-Topic: [PATCH 3/9] block: use bio_release_pages in bio_unmap_user
+Thread-Index: AQHVLCYKeBfZ1xLpokefcLd533fxow==
+Date:   Wed, 26 Jun 2019 20:47:03 +0000
+Message-ID: <BYAPR04MB574991E1F48DBB71554320A186E20@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20190626134928.7988-1-hch@lst.de>
+ <20190626134928.7988-4-hch@lst.de>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 68.147.80.180
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de, jgg@ziepe.ca
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.45.63]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2c45f971-daa7-43f8-b6f7-08d6fa7771bc
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4871;
+x-ms-traffictypediagnostic: BYAPR04MB4871:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <BYAPR04MB48718DB625D0E7DFF7B1B96F86E20@BYAPR04MB4871.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:109;
+x-forefront-prvs: 00808B16F3
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(39860400002)(366004)(376002)(396003)(189003)(199004)(476003)(446003)(64756008)(66476007)(66446008)(66556008)(52536014)(256004)(14444005)(5660300002)(72206003)(2906002)(86362001)(486006)(76116006)(66946007)(73956011)(71190400001)(14454004)(71200400001)(110136005)(3846002)(6116002)(8676002)(81156014)(8936002)(53936002)(316002)(26005)(55016002)(6436002)(66066001)(478600001)(74316002)(99286004)(7696005)(305945005)(7736002)(76176011)(53546011)(6506007)(6246003)(4326008)(33656002)(68736007)(9686003)(102836004)(186003)(229853002)(25786009)(81166006);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4871;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: QiHXkNxt8jM0mJD7Vw2JFmmjqgqMPE5vzY0gsTTvg5T9j8I7de75d7GhFFlar3XfW7KII41GUrVplYKIGrhPqQdSrL+OGjfovB+MFu+4csWqzUkkCEsXMoOMhFLVT8nruyLeMKlEPr+AGi7FZMfjVptRSsL72xfbL4nSKc5ROkVff0ywTN58ZXtkgOJ0aVw3hKgD6Ex1Qpe8HAACmQBeCoM7wo5/iIoxhrfL+skFWFiIyVmF/Y0680FfwsJWbJV96JLu86jXnwHQcPb2hV8/Fq2X6T977UrM4QoR34D2QziiiZ1gP3vetZkDsdeaSI4LxixLpM43Vezv2blMVQcKii34PJKdddJ6/rWiQ/OUOw2XG8v2hq9W/GgJXPyssYCCBm7Ab/vuvmGnH3KV0ok6vjVRWeZ+HBmyHIi6gYzZNsA=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2c45f971-daa7-43f8-b6f7-08d6fa7771bc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2019 20:47:03.3880
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4871
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2019-06-26 2:21 p.m., Jason Gunthorpe wrote:
-> On Wed, Jun 26, 2019 at 12:31:08PM -0600, Logan Gunthorpe wrote:
->>> we have a hole behind len where we could store flag.  Preferably
->>> optionally based on a P2P or other magic memory types config
->>> option so that 32-bit systems with 32-bit phys_addr_t actually
->>> benefit from the smaller and better packing structure.
->>
->> That seems sensible. The one thing that's unclear though is how to get
->> the PCI Bus address when appropriate. Can we pass that in instead of the
->> phys_addr with an appropriate flag? Or will we need to pass the actual
->> physical address and then, at the map step, the driver has to some how
->> lookup the PCI device to figure out the bus offset?
-> 
-> I agree with CH, if we go down this path it is a layering violation
-> for the thing injecting bio's into the block stack to know what struct
-> device they egress&dma map on just to be able to do the dma_map up
-> front.
-
-Not sure I agree with this statement. The p2pdma code already *must*
-know and access the pci_dev of the dma device ahead of when it submits
-the IO to know if it's valid to allocate and use P2P memory at all. This
-is why the submitting driver has a lot of the information needed to map
-this memory that the mapping driver does not.
-
-> So we must be able to go from this new phys_addr_t&flags to some BAR
-> information during dma_map.
-
-> For instance we could use a small hash table of the upper phys addr
-> bits, or an interval tree, to do the lookup.
-
-Yes, if we're going to take a hard stance on this. But using an interval
-tree (or similar) is a lot more work for the CPU to figure out these
-mappings that may not be strictly necessary if we could just pass better
-information down from the submitting driver to the mapping driver.
-
-> The bar info would give the exporting struct device and any other info
-> we need to make the iommu mapping.
-
-Well, the IOMMU mapping is the normal thing the mapping driver will
-always do. We'd really just need the submitting driver to, when
-appropriate, inform the mapping driver that this is a pci bus address
-and not to call dma_map_xxx(). Then, for special mappings for the CMB
-like Christoph is talking about, it's simply a matter of doing a range
-compare on the PCI Bus address and converting the bus address to a BAR
-and offset.
-
-Logan
+Looks good.=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+On 06/26/2019 06:49 AM, Christoph Hellwig wrote:=0A=
+> Use bio_release_pages instead of open coding it.=0A=
+>=0A=
+> Signed-off-by: Christoph Hellwig <hch@lst.de>=0A=
+> ---=0A=
+>   block/bio.c | 21 ++-------------------=0A=
+>   1 file changed, 2 insertions(+), 19 deletions(-)=0A=
+>=0A=
+> diff --git a/block/bio.c b/block/bio.c=0A=
+> index 7f3920b6baca..20a16347bcbb 100644=0A=
+> --- a/block/bio.c=0A=
+> +++ b/block/bio.c=0A=
+> @@ -1437,24 +1437,6 @@ struct bio *bio_map_user_iov(struct request_queue =
+*q,=0A=
+>   	return ERR_PTR(ret);=0A=
+>   }=0A=
+>=0A=
+> -static void __bio_unmap_user(struct bio *bio)=0A=
+> -{=0A=
+> -	struct bio_vec *bvec;=0A=
+> -	struct bvec_iter_all iter_all;=0A=
+> -=0A=
+> -	/*=0A=
+> -	 * make sure we dirty pages we wrote to=0A=
+> -	 */=0A=
+> -	bio_for_each_segment_all(bvec, bio, iter_all) {=0A=
+> -		if (bio_data_dir(bio) =3D=3D READ)=0A=
+> -			set_page_dirty_lock(bvec->bv_page);=0A=
+> -=0A=
+> -		put_page(bvec->bv_page);=0A=
+> -	}=0A=
+> -=0A=
+> -	bio_put(bio);=0A=
+> -}=0A=
+> -=0A=
+>   /**=0A=
+>    *	bio_unmap_user	-	unmap a bio=0A=
+>    *	@bio:		the bio being unmapped=0A=
+> @@ -1466,7 +1448,8 @@ static void __bio_unmap_user(struct bio *bio)=0A=
+>    */=0A=
+>   void bio_unmap_user(struct bio *bio)=0A=
+>   {=0A=
+> -	__bio_unmap_user(bio);=0A=
+> +	bio_release_pages(bio, bio_data_dir(bio) =3D=3D READ);=0A=
+> +	bio_put(bio);=0A=
+>   	bio_put(bio);=0A=
+>   }=0A=
+>=0A=
+>=0A=
+=0A=
