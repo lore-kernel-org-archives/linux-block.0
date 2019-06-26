@@ -2,64 +2,28 @@ Return-Path: <SRS0=3eIv=UZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0D7DC48BD3
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 21:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA4CEC48BD3
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 21:18:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7B26A2086D
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 21:00:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Bzws5exL"
+	by mail.kernel.org (Postfix) with ESMTP id B58112133F
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 21:18:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726382AbfFZVAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jun 2019 17:00:20 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:33848 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726227AbfFZVAU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jun 2019 17:00:20 -0400
-Received: by mail-pl1-f196.google.com with SMTP id i2so11175plt.1
-        for <linux-block@vger.kernel.org>; Wed, 26 Jun 2019 14:00:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=n76JK0suQeeFW6xhcmoHNw4tHnQpupZZOhWEzOjxM6k=;
-        b=Bzws5exLVLEQgXXhLhLFWqBVYZgCRHFpKtPyJBjrSzDy5QeDAHSVxsk8YbisLRWP8K
-         gyvdK9QMRZC/Q9Lv8BEC1bfZcneBYta/G2rBRALUo6HTzmUqzFrqVSlVj6lxlLP8iVD/
-         ItXAUkEnikSxp7rVIR66tj23/0yyoFt6OR9A5zPnz0Zdh0XhP3IFRUqiX6ed1780IoNc
-         68xBPq3zg9j1M+eT5Cgt5VQeye7h1DSohOgMQOI97tGEfTRmJRNbHVsgZr/i/ymDA0oA
-         rvDhJ0nAfbrM6fDUXFbeFu7iU0ZewvMV7C6xqGI1Z1GztnlgZD3hT6pAeKUwZKjoJnKO
-         +dBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=n76JK0suQeeFW6xhcmoHNw4tHnQpupZZOhWEzOjxM6k=;
-        b=UaffeCOoIbzU7F1voj28gLJTCi3yRb+K3NqQp5QpiFD3qvHb8gLQMTTwu2vmnnkzTc
-         nXOIrpQfa/D8OMZ4FyAQdQmWh29wSiY/djY+PqaPvWEgWs+gDQm8HT0CA1xjHL/T+LG3
-         6DnPA/AEKot2hAGW+vHNZm/pTk+lofoxHfIo03b7XfLuMPYwSaVP+aeIR6R/DehfxUk2
-         oW++sVVI85rxle+0Ei8koVcxRgK2H5OI4W9aW86+ukORWeX9zpc18j+Qhh+RHBrHHwbs
-         I8aCXsBvAngbOT1JVBZJGa2k6Y/DDNcb1Jme7EkUH2FEJmmH9ezsnSfAjA9YVE4Wg6S7
-         E96g==
-X-Gm-Message-State: APjAAAX2tbGOKt9SOi43VLvn7Sc3jyf5kp8nySsM5RiAj0YGQxIuTTuA
-        73AWfuuWj5+b0MepTYFR6x2Jxg==
-X-Google-Smtp-Source: APXvYqxn58rW6cya64e/DP42Cl4dWDsxuE9ORp8ZfuhKICUjVgykMrFxCwFRYmlyz7x1VeOTA+0fBw==
-X-Received: by 2002:a17:902:20b:: with SMTP id 11mr144473plc.78.1561582819849;
-        Wed, 26 Jun 2019 14:00:19 -0700 (PDT)
-Received: from ziepe.ca ([148.87.23.38])
-        by smtp.gmail.com with ESMTPSA id p27sm134242pfq.136.2019.06.26.14.00.19
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 26 Jun 2019 14:00:19 -0700 (PDT)
-Received: from jgg by jggl.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1hgF1e-0001mN-Hl; Wed, 26 Jun 2019 18:00:18 -0300
-Date:   Wed, 26 Jun 2019 18:00:18 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Logan Gunthorpe <logang@deltatee.com>
+        id S1726401AbfFZVSR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jun 2019 17:18:17 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:49938 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726239AbfFZVSR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Jun 2019 17:18:17 -0400
+Received: from s01061831bf6ec98c.cg.shawcable.net ([68.147.80.180] helo=[192.168.6.132])
+        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.89)
+        (envelope-from <logang@deltatee.com>)
+        id 1hgFIv-000310-0a; Wed, 26 Jun 2019 15:18:10 -0600
+To:     Jason Gunthorpe <jgg@ziepe.ca>
 Cc:     Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org,
@@ -69,8 +33,6 @@ Cc:     Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
         Sagi Grimberg <sagi@grimberg.me>,
         Keith Busch <kbusch@kernel.org>,
         Stephen Bates <sbates@raithlin.com>
-Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
-Message-ID: <20190626210018.GB6392@ziepe.ca>
 References: <20190624072752.GA3954@lst.de>
  <558a27ba-e7c9-9d94-cad0-377b8ee374a6@deltatee.com>
  <20190625072008.GB30350@lst.de>
@@ -81,57 +43,90 @@ References: <20190624072752.GA3954@lst.de>
  <c15d5997-9ba4-f7db-0e7a-a69e75df316c@deltatee.com>
  <20190626202107.GA5850@ziepe.ca>
  <8a0a08c3-a537-bff6-0852-a5f337a70688@deltatee.com>
+ <20190626210018.GB6392@ziepe.ca>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <c25d3333-dcd5-3313-089b-7fbbd6fbd876@deltatee.com>
+Date:   Wed, 26 Jun 2019 15:18:07 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8a0a08c3-a537-bff6-0852-a5f337a70688@deltatee.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20190626210018.GB6392@ziepe.ca>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 68.147.80.180
+X-SA-Exim-Rcpt-To: sbates@raithlin.com, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de, jgg@ziepe.ca
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 26, 2019 at 02:45:38PM -0600, Logan Gunthorpe wrote:
+
+
+On 2019-06-26 3:00 p.m., Jason Gunthorpe wrote:
+> On Wed, Jun 26, 2019 at 02:45:38PM -0600, Logan Gunthorpe wrote:
+>>
+>>
+>> On 2019-06-26 2:21 p.m., Jason Gunthorpe wrote:
+>>> On Wed, Jun 26, 2019 at 12:31:08PM -0600, Logan Gunthorpe wrote:
+>>>>> we have a hole behind len where we could store flag.  Preferably
+>>>>> optionally based on a P2P or other magic memory types config
+>>>>> option so that 32-bit systems with 32-bit phys_addr_t actually
+>>>>> benefit from the smaller and better packing structure.
+>>>>
+>>>> That seems sensible. The one thing that's unclear though is how to get
+>>>> the PCI Bus address when appropriate. Can we pass that in instead of the
+>>>> phys_addr with an appropriate flag? Or will we need to pass the actual
+>>>> physical address and then, at the map step, the driver has to some how
+>>>> lookup the PCI device to figure out the bus offset?
+>>>
+>>> I agree with CH, if we go down this path it is a layering violation
+>>> for the thing injecting bio's into the block stack to know what struct
+>>> device they egress&dma map on just to be able to do the dma_map up
+>>> front.
+>>
+>> Not sure I agree with this statement. The p2pdma code already *must*
+>> know and access the pci_dev of the dma device ahead of when it submits
+>> the IO to know if it's valid to allocate and use P2P memory at all.
 > 
+> I don't think we should make drives do that. What if it got CMB memory
+> on some other device?
+
+Huh? A driver submitting P2P requests finds appropriate memory to use
+based on the DMA device that will be doing the mapping. It *has* to. It
+doesn't necessarily have control over which P2P provider it might find
+(ie. it may get CMB memory from a random NVMe device), but it easily
+knows the NVMe device it got the CMB memory for. Look at the existing
+code in the nvme target.
+
+>>> For instance we could use a small hash table of the upper phys addr
+>>> bits, or an interval tree, to do the lookup.
+>>
+>> Yes, if we're going to take a hard stance on this. But using an interval
+>> tree (or similar) is a lot more work for the CPU to figure out these
+>> mappings that may not be strictly necessary if we could just pass better
+>> information down from the submitting driver to the mapping driver.
 > 
-> On 2019-06-26 2:21 p.m., Jason Gunthorpe wrote:
-> > On Wed, Jun 26, 2019 at 12:31:08PM -0600, Logan Gunthorpe wrote:
-> >>> we have a hole behind len where we could store flag.  Preferably
-> >>> optionally based on a P2P or other magic memory types config
-> >>> option so that 32-bit systems with 32-bit phys_addr_t actually
-> >>> benefit from the smaller and better packing structure.
-> >>
-> >> That seems sensible. The one thing that's unclear though is how to get
-> >> the PCI Bus address when appropriate. Can we pass that in instead of the
-> >> phys_addr with an appropriate flag? Or will we need to pass the actual
-> >> physical address and then, at the map step, the driver has to some how
-> >> lookup the PCI device to figure out the bus offset?
-> > 
-> > I agree with CH, if we go down this path it is a layering violation
-> > for the thing injecting bio's into the block stack to know what struct
-> > device they egress&dma map on just to be able to do the dma_map up
-> > front.
-> 
-> Not sure I agree with this statement. The p2pdma code already *must*
-> know and access the pci_dev of the dma device ahead of when it submits
-> the IO to know if it's valid to allocate and use P2P memory at all.
+> Right, this is coming down to an optimization argument. I think there
+> are very few cases (Basically yours) where the caller will know this
+> info, so we need to support the other cases anyhow.
 
-I don't think we should make drives do that. What if it got CMB memory
-on some other device?
+I disagree. I think it has to be a common pattern. A driver doing a P2P
+transaction *must* find some device to obtain memory from (or it may be
+itself)  and check if it is compatible with the device that's going to
+be mapping the memory or vice versa. So no matter what we do, a driver
+submitting P2P requests must have access to both the PCI device that's
+going to be mapping the memory and the device that's providing the memory.
 
-> > For instance we could use a small hash table of the upper phys addr
-> > bits, or an interval tree, to do the lookup.
-> 
-> Yes, if we're going to take a hard stance on this. But using an interval
-> tree (or similar) is a lot more work for the CPU to figure out these
-> mappings that may not be strictly necessary if we could just pass better
-> information down from the submitting driver to the mapping driver.
+> I think with some simple caching this will become negligible for cases
+> you care about
 
-Right, this is coming down to an optimization argument. I think there
-are very few cases (Basically yours) where the caller will know this
-info, so we need to support the other cases anyhow.
+Well *maybe* it will be negligible performance wise, but it's also a lot
+more complicated, code wise. Tree lookups will always be a lot more
+expensive than just checking a flag.
 
-I think with some simple caching this will become negligible for cases
-you care about
-
-Jason
+Logan
