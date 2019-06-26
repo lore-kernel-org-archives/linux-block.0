@@ -2,122 +2,88 @@ Return-Path: <SRS0=3eIv=UZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73BE9C48BD3
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC22EC48BD3
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:57:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E20A2086D
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:55:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC48C2086D
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:57:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b6IyOrwd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726420AbfFZUzU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jun 2019 16:55:20 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:49686 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726387AbfFZUzU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jun 2019 16:55:20 -0400
-Received: from s01061831bf6ec98c.cg.shawcable.net ([68.147.80.180] helo=[192.168.6.132])
-        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1hgEwg-0002X1-D5; Wed, 26 Jun 2019 14:55:11 -0600
-To:     Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-pci@vger.kernel.org, linux-rdma <linux-rdma@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190620161240.22738-1-logang@deltatee.com>
- <20190624072752.GA3954@lst.de>
- <558a27ba-e7c9-9d94-cad0-377b8ee374a6@deltatee.com>
- <20190625072008.GB30350@lst.de>
- <f0f002bf-2b94-cd18-d18f-5d0b08311495@deltatee.com>
- <20190625170115.GA9746@lst.de>
- <41235a05-8ed1-e69a-e7cd-48cae7d8a676@deltatee.com>
- <20190626065708.GB24531@lst.de>
- <c15d5997-9ba4-f7db-0e7a-a69e75df316c@deltatee.com>
- <20190626202107.GA5850@ziepe.ca>
- <CAPcyv4hCNoMeFyOE588=kuNUXaPS-rzaXnF2cN2TFejso1SGRw@mail.gmail.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <a17acf94-e19f-e478-27ac-93f6d2a34af4@deltatee.com>
-Date:   Wed, 26 Jun 2019 14:55:08 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+        id S1726239AbfFZU5P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jun 2019 16:57:15 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:47002 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726227AbfFZU5P (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Jun 2019 16:57:15 -0400
+Received: by mail-pg1-f195.google.com with SMTP id v9so1758203pgr.13
+        for <linux-block@vger.kernel.org>; Wed, 26 Jun 2019 13:57:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=DElaeHzaRKU1gwyCTIn1ixkk0zY05Ir+4pnV7Q83a1Y=;
+        b=b6IyOrwd/EOy4VIa0TG6JUYFsZ5s0+C0BX6ROpFPte/pvxbd8OG0RX2pYw7fBZo3BD
+         DZXD4weVZlNFFgMxuWYpwlbjRvy4Uz90AGEJMbGDkWHCU/q4hOyqTjqM/TA7wz8xtHqo
+         FK66egc/fwywApbJZ5bdRX5+mdWt+XBr6Zn6drZRLoBetZ9r0du3SBZW5Fy0UlQw/na/
+         8rGqWEOLjGmkLnjXNPeaHouI5CaqrhleiFN9FfFTjEfWh/2qJQDZYM9qUp6WM2E6vgf+
+         c/WNv+8i3N+1m8qUB2iwZ4HJ6ZnwRMG+izL3BR70/869M8gf0a8jpEKJSaiwvCioiX4u
+         yWng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=DElaeHzaRKU1gwyCTIn1ixkk0zY05Ir+4pnV7Q83a1Y=;
+        b=TTAc5NSTOc3XcIqqkRNZ8dIK3Lp7MwRBOLwX6tK/VWkH2RhLYh0AODd6SdOUUXNtUP
+         6OuJOQFTePrFI9FFcfxBmA8QL2TReSkwqbBCIHbR3cVxFAGKRNKyWyubOnZEqRLDbvy+
+         cdrZFOXZAPNB7736tTV/9F8CdSXIilK5YPOqEjP40j4WL0v7XS50I2P8Uj7SS9DNCmpJ
+         6p5AWkh4E/GaTz2N+UvPkcZAi0200G6WEG8BcRq5hzH1OFSBvpwcqw1Onb1GpJnt6j6o
+         9wk+ogoOhf1iFphPe3vk3ZZMPMq/PIBvOE2PhkdflGMOpy7hNWXfsuvm3PPGEyvsTrx9
+         bEWw==
+X-Gm-Message-State: APjAAAX0mr2gdpmN9CihB5XHLtql/m05prS6QewDqUlr+byJx5K/j11x
+        9vSB6DNxQN0j75BEbFDL9CA=
+X-Google-Smtp-Source: APXvYqya1k+LB6sCL6e/Nv709OIlEFHDnFGrZB5UOgNMvg1fXx+IqZSjeCgtTtIf9G/MDgVZSkWL6g==
+X-Received: by 2002:a65:6686:: with SMTP id b6mr4883470pgw.125.1561582634216;
+        Wed, 26 Jun 2019 13:57:14 -0700 (PDT)
+Received: from localhost ([123.213.206.190])
+        by smtp.gmail.com with ESMTPSA id u23sm132621pfn.140.2019.06.26.13.57.13
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 26 Jun 2019 13:57:13 -0700 (PDT)
+Date:   Thu, 27 Jun 2019 05:57:11 +0900
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH 9/9] block: never take page references for ITER_BVEC
+Message-ID: <20190626205711.GI4934@minwooim-desktop>
+References: <20190626134928.7988-1-hch@lst.de>
+ <20190626134928.7988-10-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4hCNoMeFyOE588=kuNUXaPS-rzaXnF2cN2TFejso1SGRw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 68.147.80.180
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, kbusch@kernel.org, sagi@grimberg.me, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de, jgg@ziepe.ca, dan.j.williams@intel.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Disposition: inline
+In-Reply-To: <20190626134928.7988-10-hch@lst.de>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2019-06-26 2:39 p.m., Dan Williams wrote:
-> On Wed, Jun 26, 2019 at 1:21 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->>
->> On Wed, Jun 26, 2019 at 12:31:08PM -0600, Logan Gunthorpe wrote:
->>>> we have a hole behind len where we could store flag.  Preferably
->>>> optionally based on a P2P or other magic memory types config
->>>> option so that 32-bit systems with 32-bit phys_addr_t actually
->>>> benefit from the smaller and better packing structure.
->>>
->>> That seems sensible. The one thing that's unclear though is how to get
->>> the PCI Bus address when appropriate. Can we pass that in instead of the
->>> phys_addr with an appropriate flag? Or will we need to pass the actual
->>> physical address and then, at the map step, the driver has to some how
->>> lookup the PCI device to figure out the bus offset?
->>
->> I agree with CH, if we go down this path it is a layering violation
->> for the thing injecting bio's into the block stack to know what struct
->> device they egress&dma map on just to be able to do the dma_map up
->> front.
->>
->> So we must be able to go from this new phys_addr_t&flags to some BAR
->> information during dma_map.
->>
->> For instance we could use a small hash table of the upper phys addr
->> bits, or an interval tree, to do the lookup.
+On 19-06-26 15:49:28, Christoph Hellwig wrote:
+> If we pass pages through an iov_iter we always already have a reference
+> in the caller.  Thus remove the ITER_BVEC_FLAG_NO_REF and don't take
+> reference to pages by default for bvec backed iov_iters.
 > 
-> Hmm, that sounds like dev_pagemap without the pages.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
-Yup, that's why I'd like to avoid it, but IMO it would still be an
-improvement to use a interval tree over struct pages because without
-struct page we just have a range and a length and it's relatively easy
-to check that the whole range belongs to a specific pci_dev. To be
-correct with the struct page approach we really have to loop through all
-pages to ensure they all belong to the same pci_dev which is a big pain.
+This looks good to me.
 
-> There's already no requirement that dev_pagemap point to real /
-> present pages (DEVICE_PRIVATE) seems a straightforward extension to
-> use it for helping coordinate phys_addr_t in 'struct bio'. Then
-> Logan's future plans to let userspace coordinate p2p operations could
-> build on PTE_DEVMAP.
-
-Well I think the biggest difficulty with struct page for user space is
-dealing with cases when the struct pages of different types get mixed
-together (or even struct pages that are all P2P pages but from different
-PCI devices). We'd have to go through each page and ensure that each
-type gets it's own bio_vec with appropriate flags.
-
-Though really, the whole mixed IO from userspace poses a bunch of
-problems. I'd prefer to just be able to say that a single IO can be all
-or nothing P2P memory from a single device.
-
-Logan
-
+Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
