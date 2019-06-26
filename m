@@ -2,131 +2,97 @@ Return-Path: <SRS0=3eIv=UZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA4CEC48BD3
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 21:18:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B845C48BD3
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 22:26:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B58112133F
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 21:18:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 434C221743
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 22:26:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Wl4IVoax"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726401AbfFZVSR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jun 2019 17:18:17 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:49938 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726239AbfFZVSR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jun 2019 17:18:17 -0400
-Received: from s01061831bf6ec98c.cg.shawcable.net ([68.147.80.180] helo=[192.168.6.132])
-        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1hgFIv-000310-0a; Wed, 26 Jun 2019 15:18:10 -0600
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190624072752.GA3954@lst.de>
- <558a27ba-e7c9-9d94-cad0-377b8ee374a6@deltatee.com>
- <20190625072008.GB30350@lst.de>
- <f0f002bf-2b94-cd18-d18f-5d0b08311495@deltatee.com>
- <20190625170115.GA9746@lst.de>
- <41235a05-8ed1-e69a-e7cd-48cae7d8a676@deltatee.com>
- <20190626065708.GB24531@lst.de>
- <c15d5997-9ba4-f7db-0e7a-a69e75df316c@deltatee.com>
- <20190626202107.GA5850@ziepe.ca>
- <8a0a08c3-a537-bff6-0852-a5f337a70688@deltatee.com>
- <20190626210018.GB6392@ziepe.ca>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <c25d3333-dcd5-3313-089b-7fbbd6fbd876@deltatee.com>
-Date:   Wed, 26 Jun 2019 15:18:07 -0600
+        id S1726563AbfFZWZ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jun 2019 18:25:59 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:37133 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726289AbfFZWZ6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Jun 2019 18:25:58 -0400
+Received: by mail-pl1-f193.google.com with SMTP id bh12so112567plb.4
+        for <linux-block@vger.kernel.org>; Wed, 26 Jun 2019 15:25:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=yXH77KA1A1IW9jOBzRWJZbCLzrA9uThM81uS89UYoSU=;
+        b=Wl4IVoaxRwbRhirOgliE8eXCyv1QrjjOgbhe7ORjLu4fDmYPjY8/Nw2F3YNETiuhFW
+         NLpzmM+qzD3PNW95ODlLblQp+YcLk4s2ZwwOTg1bhTHTUubVpSQm6FIqWAMDe/9DVGKg
+         rn2eK8pZGhtEVuitZj8wPXm9FP0/6qKIGWCX+A07/FU+Pq7kQRe/NqeN3Kz42cyEVO3A
+         uKZ8SPSD+vksqg+YDUoAAywVZD8g0YElGrWu2RTbLRKKT7s8IK2OTJOGsR7wW5J0EBJr
+         vkPHnk79i9efYSuuJJfFDlJU9eFZb90NXLIF7AO0tq+M3ws5Hv5YjFWPvTpFmFaFNqkj
+         Amuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=yXH77KA1A1IW9jOBzRWJZbCLzrA9uThM81uS89UYoSU=;
+        b=f+Ss/PpxEVp1SgIL56hnIAkBft4yw1JOZgmnEktjDUbesMWRzZ+SdIxLE7Sc0VuIMq
+         b8OAvxLSy46Mz9PlD8frJPgarIlfRZ6XKK8nL/PUVgSlDKIZFdh80fQrZIGIYgn0Y/rr
+         GIZ4Xu1mErfUM510chWZ7+WC3qAzWEq9HgCptcsPv+ZqmY3ZnDd3hNtSfEdQYx2lnfJH
+         yZGSSwzVpyht0H0D44g8uI/ZUg14duAunHVe1No3LexG6kkH2gt4+KtKDz87hekEVMsI
+         e4iIcP4J+2cPSk0xNJwJRVM59piIaan/6uyexfhTwmm6O87UI4QVljRRyCH5RQiqZdL9
+         hrKg==
+X-Gm-Message-State: APjAAAVkNGlAnDfrfDjp3WEU/NBb2sjHtwoWdn1xFu0LHwkfu00GIv0U
+        3nuI1n7YeQpkO3Q18hY0rD3u+Q==
+X-Google-Smtp-Source: APXvYqyFASo6/HuehlUHfhZusl2VH67NgnB7FpHMLSsvKvEp8xsjLhjEQg5Hu6ZMjSm/ZN4I7gMA/g==
+X-Received: by 2002:a17:902:d20f:: with SMTP id t15mr472750ply.11.1561587958017;
+        Wed, 26 Jun 2019 15:25:58 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
+        by smtp.gmail.com with ESMTPSA id t2sm124731pgo.61.2019.06.26.15.25.55
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 26 Jun 2019 15:25:56 -0700 (PDT)
+Subject: Re: [PATCH] block, bfq: Init saved_wr_start_at_switch_to_srt in
+ unlikely case
+To:     Douglas Anderson <dianders@chromium.org>,
+        Paolo Valente <paolo.valente@linaro.org>
+Cc:     groeck@chromium.org, drinkcat@chromium.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190626195919.107425-1-dianders@chromium.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8a108498-77ec-1164-b5ed-80d791f60119@kernel.dk>
+Date:   Wed, 26 Jun 2019 16:25:55 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190626210018.GB6392@ziepe.ca>
+In-Reply-To: <20190626195919.107425-1-dianders@chromium.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 68.147.80.180
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de, jgg@ziepe.ca
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2019-06-26 3:00 p.m., Jason Gunthorpe wrote:
-> On Wed, Jun 26, 2019 at 02:45:38PM -0600, Logan Gunthorpe wrote:
->>
->>
->> On 2019-06-26 2:21 p.m., Jason Gunthorpe wrote:
->>> On Wed, Jun 26, 2019 at 12:31:08PM -0600, Logan Gunthorpe wrote:
->>>>> we have a hole behind len where we could store flag.  Preferably
->>>>> optionally based on a P2P or other magic memory types config
->>>>> option so that 32-bit systems with 32-bit phys_addr_t actually
->>>>> benefit from the smaller and better packing structure.
->>>>
->>>> That seems sensible. The one thing that's unclear though is how to get
->>>> the PCI Bus address when appropriate. Can we pass that in instead of the
->>>> phys_addr with an appropriate flag? Or will we need to pass the actual
->>>> physical address and then, at the map step, the driver has to some how
->>>> lookup the PCI device to figure out the bus offset?
->>>
->>> I agree with CH, if we go down this path it is a layering violation
->>> for the thing injecting bio's into the block stack to know what struct
->>> device they egress&dma map on just to be able to do the dma_map up
->>> front.
->>
->> Not sure I agree with this statement. The p2pdma code already *must*
->> know and access the pci_dev of the dma device ahead of when it submits
->> the IO to know if it's valid to allocate and use P2P memory at all.
+On 6/26/19 1:59 PM, Douglas Anderson wrote:
+> Some debug code suggested by Paolo was tripping when I did reboot
+> stress tests.  Specifically in bfq_bfqq_resume_state()
+> "bic->saved_wr_start_at_switch_to_srt" was later than the current
+> value of "jiffies".  A bit of debugging showed that
+> "bic->saved_wr_start_at_switch_to_srt" was actually 0 and a bit more
+> debugging showed that was because we had run through the "unlikely"
+> case in the bfq_bfqq_save_state() function.
 > 
-> I don't think we should make drives do that. What if it got CMB memory
-> on some other device?
-
-Huh? A driver submitting P2P requests finds appropriate memory to use
-based on the DMA device that will be doing the mapping. It *has* to. It
-doesn't necessarily have control over which P2P provider it might find
-(ie. it may get CMB memory from a random NVMe device), but it easily
-knows the NVMe device it got the CMB memory for. Look at the existing
-code in the nvme target.
-
->>> For instance we could use a small hash table of the upper phys addr
->>> bits, or an interval tree, to do the lookup.
->>
->> Yes, if we're going to take a hard stance on this. But using an interval
->> tree (or similar) is a lot more work for the CPU to figure out these
->> mappings that may not be strictly necessary if we could just pass better
->> information down from the submitting driver to the mapping driver.
+> Let's init "saved_wr_start_at_switch_to_srt" in the unlikely case to
+> something sane.
 > 
-> Right, this is coming down to an optimization argument. I think there
-> are very few cases (Basically yours) where the caller will know this
-> info, so we need to support the other cases anyhow.
+> NOTE: this fixes no known real-world errors.
 
-I disagree. I think it has to be a common pattern. A driver doing a P2P
-transaction *must* find some device to obtain memory from (or it may be
-itself)  and check if it is compatible with the device that's going to
-be mapping the memory or vice versa. So no matter what we do, a driver
-submitting P2P requests must have access to both the PCI device that's
-going to be mapping the memory and the device that's providing the memory.
+Applied, thanks.
 
-> I think with some simple caching this will become negligible for cases
-> you care about
+-- 
+Jens Axboe
 
-Well *maybe* it will be negligible performance wise, but it's also a lot
-more complicated, code wise. Tree lookups will always be a lot more
-expensive than just checking a flag.
-
-Logan
