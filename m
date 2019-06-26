@@ -2,207 +2,130 @@ Return-Path: <SRS0=3eIv=UZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B51FC48BD3
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 13:49:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CB71C48BD6
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 18:31:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 710FD21670
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 13:49:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GogvsPHY"
+	by mail.kernel.org (Postfix) with ESMTP id E1F01216FD
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 18:31:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727455AbfFZNtv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jun 2019 09:49:51 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:45104 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726628AbfFZNtv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jun 2019 09:49:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
-        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=uWkMZCpz9fgebIVf4XB5xaCNZsjX2gMh66q0oGJG2IE=; b=GogvsPHY+8Bxfsgw2kfkRKiqZU
-        B+E7EZno/nspXZYfm7LJFaQ8sWAtP7MDQMbhpyMalNlwQe8ms22G3+O+z0ayogdlsyiumCNUkYJR4
-        2HvLlhjkzWNg/1sjwsAw2nvRvFcVVdJu2kLhuSVQLJMegQz3/TAD3lMO64RSrxj2HCDvgdaL6Je5p
-        5gUq/9M94NjvwZJ9v5JydnHTpNioRdtPcadkWLKEFn/uKS60XCV7+1uiY6oykplgk8tnSq/LLs+FM
-        CY2iRGl2OIG36yCEha7eZvY4eHvMP/N3DRieTFl4RTQq1YSn7LWqIw9G8PigEFohvgiQUucttW04t
-        Vzm03oQA==;
-Received: from clnet-p19-102.ikbnet.co.at ([83.175.77.102] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hg8J5-0003El-9C; Wed, 26 Jun 2019 13:49:51 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 9/9] block: never take page references for ITER_BVEC
-Date:   Wed, 26 Jun 2019 15:49:28 +0200
-Message-Id: <20190626134928.7988-10-hch@lst.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190626134928.7988-1-hch@lst.de>
-References: <20190626134928.7988-1-hch@lst.de>
+        id S1726271AbfFZSb3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jun 2019 14:31:29 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:48362 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726104AbfFZSb3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Jun 2019 14:31:29 -0400
+Received: from s01061831bf6ec98c.cg.shawcable.net ([68.147.80.180] helo=[192.168.6.132])
+        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.89)
+        (envelope-from <logang@deltatee.com>)
+        id 1hgChR-0000jK-UL; Wed, 26 Jun 2019 12:31:19 -0600
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20190620161240.22738-1-logang@deltatee.com>
+ <20190624072752.GA3954@lst.de>
+ <558a27ba-e7c9-9d94-cad0-377b8ee374a6@deltatee.com>
+ <20190625072008.GB30350@lst.de>
+ <f0f002bf-2b94-cd18-d18f-5d0b08311495@deltatee.com>
+ <20190625170115.GA9746@lst.de>
+ <41235a05-8ed1-e69a-e7cd-48cae7d8a676@deltatee.com>
+ <20190626065708.GB24531@lst.de>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <c15d5997-9ba4-f7db-0e7a-a69e75df316c@deltatee.com>
+Date:   Wed, 26 Jun 2019 12:31:08 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
+In-Reply-To: <20190626065708.GB24531@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-SA-Exim-Connect-IP: 68.147.80.180
+X-SA-Exim-Rcpt-To: sbates@raithlin.com, jgg@ziepe.ca, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we pass pages through an iov_iter we always already have a reference
-in the caller.  Thus remove the ITER_BVEC_FLAG_NO_REF and don't take
-reference to pages by default for bvec backed iov_iters.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/bio.c          | 14 +-------------
- drivers/block/loop.c | 16 ++++------------
- fs/io_uring.c        |  3 ---
- include/linux/uio.h  | 10 +---------
- 4 files changed, 6 insertions(+), 37 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index a96d33d2de44..3c9225caff8d 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -836,15 +836,6 @@ int bio_add_page(struct bio *bio, struct page *page,
- }
- EXPORT_SYMBOL(bio_add_page);
- 
--static void bio_get_pages(struct bio *bio)
--{
--	struct bvec_iter_all iter_all;
--	struct bio_vec *bvec;
--
--	bio_for_each_segment_all(bvec, bio, iter_all)
--		get_page(bvec->bv_page);
--}
--
- void bio_release_pages(struct bio *bio, bool mark_dirty)
- {
- 	struct bvec_iter_all iter_all;
-@@ -960,11 +951,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 			ret = __bio_iov_iter_get_pages(bio, iter);
- 	} while (!ret && iov_iter_count(iter) && !bio_full(bio));
- 
--	if (iov_iter_bvec_no_ref(iter))
-+	if (is_bvec)
- 		bio_set_flag(bio, BIO_NO_PAGE_REF);
--	else if (is_bvec)
--		bio_get_pages(bio);
--
- 	return bio->bi_vcnt ? 0 : ret;
- }
- 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f11b7dc16e9d..44c9985f352a 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -264,20 +264,12 @@ lo_do_transfer(struct loop_device *lo, int cmd,
- 	return ret;
- }
- 
--static inline void loop_iov_iter_bvec(struct iov_iter *i,
--		unsigned int direction, const struct bio_vec *bvec,
--		unsigned long nr_segs, size_t count)
--{
--	iov_iter_bvec(i, direction, bvec, nr_segs, count);
--	i->type |= ITER_BVEC_FLAG_NO_REF;
--}
--
- static int lo_write_bvec(struct file *file, struct bio_vec *bvec, loff_t *ppos)
- {
- 	struct iov_iter i;
- 	ssize_t bw;
- 
--	loop_iov_iter_bvec(&i, WRITE, bvec, 1, bvec->bv_len);
-+	iov_iter_bvec(&i, WRITE, bvec, 1, bvec->bv_len);
- 
- 	file_start_write(file);
- 	bw = vfs_iter_write(file, &i, ppos, 0);
-@@ -355,7 +347,7 @@ static int lo_read_simple(struct loop_device *lo, struct request *rq,
- 	ssize_t len;
- 
- 	rq_for_each_segment(bvec, rq, iter) {
--		loop_iov_iter_bvec(&i, READ, &bvec, 1, bvec.bv_len);
-+		iov_iter_bvec(&i, READ, &bvec, 1, bvec.bv_len);
- 		len = vfs_iter_read(lo->lo_backing_file, &i, &pos, 0);
- 		if (len < 0)
- 			return len;
-@@ -396,7 +388,7 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
- 		b.bv_offset = 0;
- 		b.bv_len = bvec.bv_len;
- 
--		loop_iov_iter_bvec(&i, READ, &b, 1, b.bv_len);
-+		iov_iter_bvec(&i, READ, &b, 1, b.bv_len);
- 		len = vfs_iter_read(lo->lo_backing_file, &i, &pos, 0);
- 		if (len < 0) {
- 			ret = len;
-@@ -563,7 +555,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	}
- 	atomic_set(&cmd->ref, 2);
- 
--	loop_iov_iter_bvec(&iter, rw, bvec, nr_bvec, blk_rq_bytes(rq));
-+	iov_iter_bvec(&iter, rw, bvec, nr_bvec, blk_rq_bytes(rq));
- 	iter.iov_offset = offset;
- 
- 	cmd->iocb.ki_pos = pos;
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 86a2bd721900..eb6ab1507913 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -997,9 +997,6 @@ static int io_import_fixed(struct io_ring_ctx *ctx, int rw,
- 	iov_iter_bvec(iter, rw, imu->bvec, imu->nr_bvecs, offset + len);
- 	if (offset)
- 		iov_iter_advance(iter, offset);
--
--	/* don't drop a reference to these pages */
--	iter->type |= ITER_BVEC_FLAG_NO_REF;
- 	return 0;
- }
- 
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 2c90a0842ee8..cea1761c5672 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -19,9 +19,6 @@ struct kvec {
- };
- 
- enum iter_type {
--	/* set if ITER_BVEC doesn't hold a bv_page ref */
--	ITER_BVEC_FLAG_NO_REF = 2,
--
- 	/* iter types */
- 	ITER_IOVEC = 4,
- 	ITER_KVEC = 8,
-@@ -56,7 +53,7 @@ struct iov_iter {
- 
- static inline enum iter_type iov_iter_type(const struct iov_iter *i)
- {
--	return i->type & ~(READ | WRITE | ITER_BVEC_FLAG_NO_REF);
-+	return i->type & ~(READ | WRITE);
- }
- 
- static inline bool iter_is_iovec(const struct iov_iter *i)
-@@ -89,11 +86,6 @@ static inline unsigned char iov_iter_rw(const struct iov_iter *i)
- 	return i->type & (READ | WRITE);
- }
- 
--static inline bool iov_iter_bvec_no_ref(const struct iov_iter *i)
--{
--	return (i->type & ITER_BVEC_FLAG_NO_REF) != 0;
--}
--
- /*
-  * Total number of bytes covered by an iovec.
-  *
--- 
-2.20.1
+On 2019-06-26 12:57 a.m., Christoph Hellwig wrote:
+> On Tue, Jun 25, 2019 at 01:54:21PM -0600, Logan Gunthorpe wrote:
+>> Well whether it's dma_addr_t, phys_addr_t, pfn_t the result isn't all
+>> that different. You still need roughly the same 'if' hooks for any
+>> backed memory that isn't in the linear mapping and you can't get a
+>> kernel mapping for directly.
+>>
+>> It wouldn't be too hard to do a similar patch set that uses something
+>> like phys_addr_t instead and have a request and queue flag for support
+>> of non-mappable memory. But you'll end up with very similar 'if' hooks
+>> and we'd have to clean up all bio-using drivers that access the struct
+>> pages directly.
+> 
+> We'll need to clean that mess up anyway, and I've been chugging
+> along doing some of that.  A lot still assume no highmem, so we need
+> to convert them over to something that kmaps anyway.  If we get
+> the abstraction right that will actually help converting over to
+> a better reprsentation.
+> 
+>> Though, we'd also still have the problem of how to recognize when the
+>> address points to P2PDMA and needs to be translated to the bus offset.
+>> The map-first inversion was what helped here because the driver
+>> submitting the requests had all the information. Though it could be
+>> another request flag and indicating non-mappable memory could be a flag
+>> group like REQ_NOMERGE_FLAGS -- REQ_NOMAP_FLAGS.
+> 
+> The assumes the request all has the same memory, which is a simplifing
+> assuption.  My idea was that if had our new bio_vec like this:
+> 
+> struct bio_vec {
+> 	phys_addr_t		paddr; // 64-bit on 64-bit systems
+> 	unsigned long		len;
+> };
+> 
+> we have a hole behind len where we could store flag.  Preferably
+> optionally based on a P2P or other magic memory types config
+> option so that 32-bit systems with 32-bit phys_addr_t actually
+> benefit from the smaller and better packing structure.
 
+That seems sensible. The one thing that's unclear though is how to get
+the PCI Bus address when appropriate. Can we pass that in instead of the
+phys_addr with an appropriate flag? Or will we need to pass the actual
+physical address and then, at the map step, the driver has to some how
+lookup the PCI device to figure out the bus offset?
+
+>> If you think any of the above ideas sound workable I'd be happy to try
+>> to code up another prototype.
+> 
+> Іt sounds workable.  To some of the first steps are cleanups independent
+> of how the bio_vec is eventually going to look like.  That is making
+> the DMA-API internals work on the phys_addr_t, which also unifies the
+> map_resource implementation with map_page.  I plan to do that relatively
+> soon.  The next is sorting out access to bios data by virtual address.
+> All these need nice kmapping helper that avoid too much open coding.
+> I was going to look into that next, mostly to kill the block layer
+> bounce buffering code.  Similar things will also be needed at the
+> scatterlist level I think.  After that we need to more audits of
+> how bv_page is still used.  something like a bv_phys() helper that
+> does "page_to_phys(bv->bv_page) + bv->bv_offset" might come in handy
+> for example.
+
+Ok, I should be able to help with that. When I have a chance I'll try to
+look at the bv_phys() helper.
+
+Logan
