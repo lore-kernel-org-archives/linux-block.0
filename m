@@ -2,130 +2,106 @@ Return-Path: <SRS0=3eIv=UZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CB71C48BD6
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 18:31:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22512C48BD3
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:00:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E1F01216FD
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 18:31:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECEFD208E3
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:00:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CkNwh7Im"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726271AbfFZSb3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jun 2019 14:31:29 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:48362 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726104AbfFZSb3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jun 2019 14:31:29 -0400
-Received: from s01061831bf6ec98c.cg.shawcable.net ([68.147.80.180] helo=[192.168.6.132])
-        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1hgChR-0000jK-UL; Wed, 26 Jun 2019 12:31:19 -0600
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190620161240.22738-1-logang@deltatee.com>
- <20190624072752.GA3954@lst.de>
- <558a27ba-e7c9-9d94-cad0-377b8ee374a6@deltatee.com>
- <20190625072008.GB30350@lst.de>
- <f0f002bf-2b94-cd18-d18f-5d0b08311495@deltatee.com>
- <20190625170115.GA9746@lst.de>
- <41235a05-8ed1-e69a-e7cd-48cae7d8a676@deltatee.com>
- <20190626065708.GB24531@lst.de>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <c15d5997-9ba4-f7db-0e7a-a69e75df316c@deltatee.com>
-Date:   Wed, 26 Jun 2019 12:31:08 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+        id S1726360AbfFZUAe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jun 2019 16:00:34 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:46802 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726293AbfFZUAe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Jun 2019 16:00:34 -0400
+Received: by mail-pg1-f194.google.com with SMTP id v9so1686094pgr.13
+        for <linux-block@vger.kernel.org>; Wed, 26 Jun 2019 13:00:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=cbc5Dh7+LimPALKjevNG5TAL9t57bWZBL2kItsK/MGQ=;
+        b=CkNwh7ImC7XRLo+IkDMSV65GVm9m0viwqgH4AavERqe8iu6suGXWtvaUEOEbUOT3Wr
+         Od3Vtk8Cjoz/hAPqd1KEq/YT4O8aCxDN8/lTdkHwqmka+YIsPr26ZS9J0caSV3HfN6fB
+         9W6mrgrc400ohIbFHSKvo0cHaaF4OOfE1xRm8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=cbc5Dh7+LimPALKjevNG5TAL9t57bWZBL2kItsK/MGQ=;
+        b=JYK7ourYlpBP6NjNSMTg9Ad07Ctpp2JEcxpubC2FGKqMzCP8IWVW2MIpM8YRiZqhuI
+         puyQxVPwOOw+E09+1inAmZaOROmQozKjQEfY+3MJSYIFsHGJsmVz5pp1uIkkT+UJL9WP
+         1YxzQuIRXk/0cd4azdbaaoQlBernUzimqG1NOqcK72uUi/gDKTF/T2KLE+rRB/IYMxx2
+         TcxczGNwKo2okzPfkjBcXVvcHa348iG+Fzl93Lyw8jaQCt2NgMGbnlmglbcFldOqHG+d
+         hl1b2v2aH0iryxvaLQboWDIIUJ1P20x6tDiIOlnYkYvW5UPQUpn9xWOBLZgmXByJrg+4
+         ylog==
+X-Gm-Message-State: APjAAAWWKsBW5ktuPViJQfvjcrYbqvR2lBT1IdqtHf4iPNLF/yj/Mw6t
+        mc64hLS6F0NYp4+HcwN9EYa1kuYGO6Q=
+X-Google-Smtp-Source: APXvYqwB3pTyrU5OpVfKMXgRlwrNkGcKuGijwGZQPEfQcgd8uyGotsUUkSTgOyEqSDdxAqwt78e5IA==
+X-Received: by 2002:a63:c006:: with SMTP id h6mr4516271pgg.285.1561579233579;
+        Wed, 26 Jun 2019 13:00:33 -0700 (PDT)
+Received: from tictac2.mtv.corp.google.com ([2620:15c:202:1:24fa:e766:52c9:e3b2])
+        by smtp.gmail.com with ESMTPSA id e20sm59204pfi.35.2019.06.26.13.00.32
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Wed, 26 Jun 2019 13:00:33 -0700 (PDT)
+From:   Douglas Anderson <dianders@chromium.org>
+To:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     groeck@chromium.org, drinkcat@chromium.org,
+        Douglas Anderson <dianders@chromium.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] block, bfq: Init saved_wr_start_at_switch_to_srt in unlikely case
+Date:   Wed, 26 Jun 2019 12:59:19 -0700
+Message-Id: <20190626195919.107425-1-dianders@chromium.org>
+X-Mailer: git-send-email 2.22.0.410.gd8fdbe21b5-goog
 MIME-Version: 1.0
-In-Reply-To: <20190626065708.GB24531@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 68.147.80.180
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, jgg@ziepe.ca, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Some debug code suggested by Paolo was tripping when I did reboot
+stress tests.  Specifically in bfq_bfqq_resume_state()
+"bic->saved_wr_start_at_switch_to_srt" was later than the current
+value of "jiffies".  A bit of debugging showed that
+"bic->saved_wr_start_at_switch_to_srt" was actually 0 and a bit more
+debugging showed that was because we had run through the "unlikely"
+case in the bfq_bfqq_save_state() function.
 
+Let's init "saved_wr_start_at_switch_to_srt" in the unlikely case to
+something sane.
 
-On 2019-06-26 12:57 a.m., Christoph Hellwig wrote:
-> On Tue, Jun 25, 2019 at 01:54:21PM -0600, Logan Gunthorpe wrote:
->> Well whether it's dma_addr_t, phys_addr_t, pfn_t the result isn't all
->> that different. You still need roughly the same 'if' hooks for any
->> backed memory that isn't in the linear mapping and you can't get a
->> kernel mapping for directly.
->>
->> It wouldn't be too hard to do a similar patch set that uses something
->> like phys_addr_t instead and have a request and queue flag for support
->> of non-mappable memory. But you'll end up with very similar 'if' hooks
->> and we'd have to clean up all bio-using drivers that access the struct
->> pages directly.
-> 
-> We'll need to clean that mess up anyway, and I've been chugging
-> along doing some of that.  A lot still assume no highmem, so we need
-> to convert them over to something that kmaps anyway.  If we get
-> the abstraction right that will actually help converting over to
-> a better reprsentation.
-> 
->> Though, we'd also still have the problem of how to recognize when the
->> address points to P2PDMA and needs to be translated to the bus offset.
->> The map-first inversion was what helped here because the driver
->> submitting the requests had all the information. Though it could be
->> another request flag and indicating non-mappable memory could be a flag
->> group like REQ_NOMERGE_FLAGS -- REQ_NOMAP_FLAGS.
-> 
-> The assumes the request all has the same memory, which is a simplifing
-> assuption.  My idea was that if had our new bio_vec like this:
-> 
-> struct bio_vec {
-> 	phys_addr_t		paddr; // 64-bit on 64-bit systems
-> 	unsigned long		len;
-> };
-> 
-> we have a hole behind len where we could store flag.  Preferably
-> optionally based on a P2P or other magic memory types config
-> option so that 32-bit systems with 32-bit phys_addr_t actually
-> benefit from the smaller and better packing structure.
+NOTE: this fixes no known real-world errors.
 
-That seems sensible. The one thing that's unclear though is how to get
-the PCI Bus address when appropriate. Can we pass that in instead of the
-phys_addr with an appropriate flag? Or will we need to pass the actual
-physical address and then, at the map step, the driver has to some how
-lookup the PCI device to figure out the bus offset?
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+Reviewed-by: Paolo Valente <paolo.valente@linaro.org>
+---
+Paolo said to add his Reviewed-by in https://crrev.com/c/1678756.
 
->> If you think any of the above ideas sound workable I'd be happy to try
->> to code up another prototype.
-> 
-> Іt sounds workable.  To some of the first steps are cleanups independent
-> of how the bio_vec is eventually going to look like.  That is making
-> the DMA-API internals work on the phys_addr_t, which also unifies the
-> map_resource implementation with map_page.  I plan to do that relatively
-> soon.  The next is sorting out access to bios data by virtual address.
-> All these need nice kmapping helper that avoid too much open coding.
-> I was going to look into that next, mostly to kill the block layer
-> bounce buffering code.  Similar things will also be needed at the
-> scatterlist level I think.  After that we need to more audits of
-> how bv_page is still used.  something like a bv_phys() helper that
-> does "page_to_phys(bv->bv_page) + bv->bv_offset" might come in handy
-> for example.
+ block/bfq-iosched.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Ok, I should be able to help with that. When I have a chance I'll try to
-look at the bv_phys() helper.
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 72840ebf953e..008c93d6b8d7 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -2678,6 +2678,7 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
+ 		 * to enjoy weight raising if split soon.
+ 		 */
+ 		bic->saved_wr_coeff = bfqq->bfqd->bfq_wr_coeff;
++		bic->saved_wr_start_at_switch_to_srt = bfq_smallest_from_now();
+ 		bic->saved_wr_cur_max_time = bfq_wr_duration(bfqq->bfqd);
+ 		bic->saved_last_wr_start_finish = jiffies;
+ 	} else {
+-- 
+2.22.0.410.gd8fdbe21b5-goog
 
-Logan
