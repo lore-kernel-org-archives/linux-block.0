@@ -2,123 +2,89 @@ Return-Path: <SRS0=3eIv=UZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BDADC48BD3
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C896FC48BD9
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:34:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6967A2085A
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:27:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B9132085A
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jun 2019 20:34:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="POv1IyE+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nhqib+yM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726339AbfFZU1K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jun 2019 16:27:10 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:40937 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726227AbfFZU1K (ORCPT
+        id S1726379AbfFZUeR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jun 2019 16:34:17 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42220 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726223AbfFZUeR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jun 2019 16:27:10 -0400
-Received: by mail-pl1-f196.google.com with SMTP id a93so2045489pla.7;
-        Wed, 26 Jun 2019 13:27:10 -0700 (PDT)
+        Wed, 26 Jun 2019 16:34:17 -0400
+Received: by mail-pg1-f196.google.com with SMTP id k13so1739367pgq.9
+        for <linux-block@vger.kernel.org>; Wed, 26 Jun 2019 13:34:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=x1o8oqi0CP9ZDnGVZ99akUd6mY/E2omAq/EbskrFW4k=;
-        b=POv1IyE+sfM8PtylMEWG9x0KHLapZZmKG9O21FYbI6DJsX5YyUowJrGlqsd1brIdG8
-         4ooVgaj5bl5g67fjcD008OmeeshHnFYPER80FNuf5bYHxde/ukJ7bWPpS8NczoyEc+cd
-         CKv88keWcLtmuhtiNaZoX+rSSEGKhfYIcDgDEeWjODEkilqjwNyropymwYsdONJxg/BT
-         RNVNSIq/3Dm6bgbcxL3pgXBZ/PJQDE9Y849OPSdGMAR8sKJdGdQE52In7DcwfdXdT/zY
-         0kLbMrXm0RsqOhLX7c87vpo1H5eqgA6gd/xXSJomam4kbPKHTDP711I23q8T80n26mkx
-         3q8Q==
+         :content-disposition:in-reply-to:user-agent;
+        bh=gtb3Zon/JQSSN+uJ4rgrW0ez0UkfCHPw99JY0M10Wy4=;
+        b=Nhqib+yMOF3K1ysvftFuwksNZ3eRvRZ4LUmkgXp1p4+IKWyniT0JpfEQwxhTTv63Xa
+         xqctyDPxd+zV3BZMgL6GpIC6uX5J37YqEadRbEfT/akf/CWgZCpBsslQrxqZ6RBtmMfI
+         xbiPL2iPBcVMgQUgyzk4IsJvKeOn8Aj49wHGjitfxBNEo+avs1iQ0ztzWtF1F/09qET+
+         KaeJojoKem4K96cF6gpW5DYICxo55VFJ/3xPyVxRsTKjYIS34O+hwA2GA8zqHK+0+wuf
+         7KrqInNob7K8g8U3eLaRmAkGkoZkVNSixwqDzIO20aUUnQwbVOm0wsdI7j4atqwScown
+         IKhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=x1o8oqi0CP9ZDnGVZ99akUd6mY/E2omAq/EbskrFW4k=;
-        b=SHDq5fb5Plw6aHWd+FfXsFUSEk/6rSZjetOcMVtIOen3dqZkZBI5jyWCEJd5z5FeF0
-         cCRIo5Jxqj9iD/hgtEtR1pRGWmVTa3R/vKWkWrDksZT6I4J6wuGywRJzj6DoLcOsdVAJ
-         ZnOUn8R3sQ0CVFvjHBXdQNjEQWZbivu/VRj/npDBuYXVrwawLoVMnINfs0A1A/qdqBis
-         rturGjulM3NxeQwDNS3hbVWMj0kN60NWpaK0B+Sail50pGTROjVYeYU4GPa67IOpEVKU
-         TBGJas6eTX/m2XOdtCTINLn1LHWuJwlUX6yspQdo0AxsHhnlwMSEQwO7YPuuAJhtL+Jr
-         TNOA==
-X-Gm-Message-State: APjAAAUjSExevr7Kh32l3zgULNXHwSjWdpKwM+IdeLx6q6W2s89y8jS5
-        PEAn18fIVr0HlcPtgUiecmc=
-X-Google-Smtp-Source: APXvYqyjymNoPT4b92sWLExLPDZZq/X+c5U+Nyf00E2YjebGqOGMookCtAi+tYDjxEy8W4ninii9dg==
-X-Received: by 2002:a17:902:9b81:: with SMTP id y1mr7962559plp.194.1561580829862;
-        Wed, 26 Jun 2019 13:27:09 -0700 (PDT)
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=gtb3Zon/JQSSN+uJ4rgrW0ez0UkfCHPw99JY0M10Wy4=;
+        b=C3wLuNnkCx+59AUUFYYK3IDB1RPoSo9QaN0H/w83m9Dvu1etwZHH/BHz+piYQcmXWE
+         j5ix3AtfbLU711obqS3p1AL1lAvKLowEzt5ZwGagr/WoxsjjDDZ3WfdczdlD4E7uEr51
+         1Dc+K6riu80e4L9DiSb1evHOrnUzwdOn+5nu9K2dmpRVe8+YTOTFIHsp8UYz5WQaxSEY
+         MQO6VyvatMkuZVx/KVt7ZwLlvqJUYFT722zJi0p6g8HHv62jy5YU/wk4FIvgEpYbQChH
+         JwPLkdxXkIuzvx1vxya9W/X8pqPNwz9ljvhIiDhiQU2K0Rm+mt5XMGmZLU0jlS8JoeJO
+         WY1w==
+X-Gm-Message-State: APjAAAWV7hLGgcwt8+WsvMWQKDRvEa7Wrc2vt2lC4twnZtxFx7mQ4Ziv
+        +h26VFe11wvLl/qiBCQExviWTsy42uo=
+X-Google-Smtp-Source: APXvYqwcB2SegJnRgBEiV+LpaifN2kNyjL/RBm1fqlKC5IYHrWLl/MBj6SinVx383qpGygFAUK2afQ==
+X-Received: by 2002:a17:90a:2041:: with SMTP id n59mr1198312pjc.6.1561581256521;
+        Wed, 26 Jun 2019 13:34:16 -0700 (PDT)
 Received: from localhost ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id p27sm83702pfq.136.2019.06.26.13.27.08
+        by smtp.gmail.com with ESMTPSA id e26sm103667pfn.94.2019.06.26.13.34.15
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 26 Jun 2019 13:27:09 -0700 (PDT)
-Date:   Thu, 27 Jun 2019 05:27:06 +0900
+        Wed, 26 Jun 2019 13:34:15 -0700 (PDT)
+Date:   Thu, 27 Jun 2019 05:34:12 +0900
 From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     Weiping Zhang <zwp10758@gmail.com>
-Cc:     Weiping Zhang <zhangweiping@didiglobal.com>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>, keith.busch@intel.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: Re: [PATCH v3 3/5] nvme-pci: rename module parameter write_queues to
- read_queues
-Message-ID: <20190626202706.GC4934@minwooim-desktop>
-References: <cover.1561385989.git.zhangweiping@didiglobal.com>
- <d61b1b9a31c3d2fae9ece26bcd5f4504b25f059f.1561385989.git.zhangweiping@didiglobal.com>
- <20190624200445.GB6526@minwooim-desktop>
- <CAA70yB5arvfaUsktN-cvd0yHpRi+FwFjL4r5_jTRWM8+rBVdnA@mail.gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH 1/9] block: move the BIO_NO_PAGE_REF check into
+ bio_release_pages
+Message-ID: <20190626203412.GD4934@minwooim-desktop>
+References: <20190626134928.7988-1-hch@lst.de>
+ <20190626134928.7988-2-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAA70yB5arvfaUsktN-cvd0yHpRi+FwFjL4r5_jTRWM8+rBVdnA@mail.gmail.com>
+In-Reply-To: <20190626134928.7988-2-hch@lst.de>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19-06-25 22:48:57, Weiping Zhang wrote:
-> Minwoo Im <minwoo.im.dev@gmail.com> 于2019年6月25日周二 上午6:00写道：
-> >
-> > On 19-06-24 22:29:19, Weiping Zhang wrote:
-> > > Now nvme support three type hardware queues, read, poll and default,
-> > > this patch rename write_queues to read_queues to set the number of
-> > > read queues more explicitly. This patch alos is prepared for nvme
-> > > support WRR(weighted round robin) that we can get the number of
-> > > each queue type easily.
-> > >
-> > > Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-> >
-> > Hello, Weiping.
-> >
-> > Thanks for making this patch as a separated one.  Actually I'd like to
-> > hear about if the origin purpose of this param can be changed or not.
-> >
-> > I can see a log from Jens when it gets added her:
-> >   Commit 3b6592f70ad7("nvme: utilize two queue maps, one for reads and
-> >                        one for writes")
-> >   It says:
-> >   """
-> >   NVMe does round-robin between queues by default, which means that
-> >   sharing a queue map for both reads and writes can be problematic
-> >   in terms of read servicing. It's much easier to flood the queue
-> >   with writes and reduce the read servicing.
-> >   """
-> >
-> > So, I'd like to hear what other people think about this patch :)
-> >
-> 
-> This patch does not change its original behavior, if we set read_queue
-> greater than 0, the read and write request will use different tagset map,
-> so they will use different hardware queue.
+On 19-06-26 15:49:20, Christoph Hellwig wrote:
+> Move the BIO_NO_PAGE_REF check into bio_release_pages instead of
+> duplicating it in both callers.
 
-Yes, that's why I want to hear some comments for this change from other
-people.  I'm not against this change, though.
+This part looks good to me.
+
+> Also make the function available outside of bio.c so that we can
+> reuse it in other direct I/O implementations.
+
+This is also for the next patches.
+
+Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
