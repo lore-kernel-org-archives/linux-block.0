@@ -2,124 +2,128 @@ Return-Path: <SRS0=TUEB=U2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A04C48BD3
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 02:59:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB5A5C48BD7
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 06:32:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4429321852
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 02:59:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D3E720656
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 06:32:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="MDFDqWWB"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="m4qtlRsu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726829AbfF0C7o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jun 2019 22:59:44 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:52735 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726816AbfF0C7o (ORCPT
+        id S1726375AbfF0GcZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jun 2019 02:32:25 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:34746 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726059AbfF0GcZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jun 2019 22:59:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1561604412; x=1593140412;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=k88Jxm6UjOcpOAysM42/2nMwgTKJ8DZeNJDi00vUgkg=;
-  b=MDFDqWWBVY5DLyFg7ad3YfnUMlxb4qJ2JZPiysLKHvYyZESXgd0iLo8R
-   TlqY01oJOvNIC/fBPtfmr1eXT7z5tYrSi43w5UB416h+zMkyB24zIYsx3
-   Gp4Tk4BGfCRV1MKsn3z2gaBa+wh0VeIFGehRfYIQR5pq8AvcmNra2Bhwf
-   6YnBEAE84jiIcTVISaXXYQx1p1MfooiyvgCGg1F25EV+VBYNF5sL2bUYQ
-   CQ6AiW4lOQSFNRz07I+FyKYKEkLTPe+LXn+/QkSbSWilCizlVbL4N5p65
-   Sit04iH8pgwR5zXmDL6Nh6HfcJMpkRnPoDajj+wllb3EEZLNV4x/nsq2t
-   g==;
-X-IronPort-AV: E=Sophos;i="5.63,422,1557158400"; 
-   d="scan'208";a="211457393"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2019 11:00:12 +0800
-IronPort-SDR: R1CRBbuKUb/MFMVxE/9MRliz4KQZqZs7cmgZDK++a9w+bAdMaLqV23rJA4pZqq9xvcpcRaq9jQ
- KjS6lHjA8Xxn5hQd/kMfKNG05BV5P6rON7WJU5JrMf9FNp8l/EddEXEi3GQmaBko8FVvh9Z6xp
- M9aq6YVi0YH6Rg/1CiE0HOsdTsGKepPbcKnKOij4sMhlb+WQTexuzGehLLtwcuz8IC4bhK9GU4
- hHytPb1Try+DQcvKWr0HoWpLNrNVSZVmf6FCBh5yOLtNk9NK7/xTTxQCBnbpD6VHgy7IBXSIhP
- ay2cbkabLyUoORMIzxOD4YN+
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 26 Jun 2019 19:58:57 -0700
-IronPort-SDR: yGnUfJNHWZ1eb1bPB2qNwZiVWeCrYPrjQPvZbu5TIoVZDJDVN4xEMJweXePM9iAd86bDXx0CW9
- MXGrvl9nvIliSs7bhhAY5hRzJwmxVyFVwFpa5L6oC2kEyaQhab+4q/yw2ipFJIZoQKCxcWfWrB
- LuM5B0yK0vJ3bvSZqB7TV24qW8nbul3oQAcsTwlM7F3TdFGl+Js4oVUQZcAsxwq70Ql843CxKF
- 2j+Gzx9o9pp1AmR444tNXctZdawoVTPrCpLkA8qh0Czwx9t5sXVefc7Kc5gW0cOa1eYBVmZO/s
- tp0=
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 26 Jun 2019 19:59:42 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] block: Remove unused code
-Date:   Thu, 27 Jun 2019 11:59:41 +0900
-Message-Id: <20190627025941.32262-1-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.21.0
+        Thu, 27 Jun 2019 02:32:25 -0400
+Received: by mail-pl1-f195.google.com with SMTP id i2so722632plt.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Jun 2019 23:32:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=CxcmhcduYl1f+p8Q6K2P2tN31Ue+lZEcvfx29yQXcTA=;
+        b=m4qtlRsuSk58BwN1KjuVxv1OBILIvoJnLL/W5x8gKQGKClqscPAZtSz5HIvZkBZeaP
+         3YNDZbTITdkT9d4NODS4YBRtUWymp+dc1Frl9vN52KgPgeSBy8PuVOd1wpDqdViUXGuU
+         TaoL6w12s1LCWVE6nAVStEUf6ToOh2LrH0l4rAjW0YWcykR1wBUiW/kiHYkRyaFw/b+m
+         5RKkHPbZrlfJtX/jysSBDiQyarjXby+MLOi6XZdFtLwkUxPqEd3s89nrZCy07o0cLs07
+         /nNhohMH1gqtNbY5OQLkVy7sE3hn5AauPYz18DSUKOmknEkjo7985c+vomp74sOA3gvV
+         PN8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=CxcmhcduYl1f+p8Q6K2P2tN31Ue+lZEcvfx29yQXcTA=;
+        b=Pg9CY2LGNUPYSk7tbTJdvabABFTQsTbTGBG+3KCNROcB9BhxeUCKb1ubRG3ndKgUcl
+         6bWgPoV6WFx5gsOeOzQ42Kbr+povz8zL7moRy0BLnMlyqYK1yXJVj/E+xv2ta6BTTpnE
+         nhQzcuoIR0OCF6Eh3qTnvD6wLB9HiBEsdmfhC7+wyJ4m0G5hx4FOGOaBQyIroIgZ6Y0T
+         rsTHoW0U3fG9+r7/90UUnRmg4XAPQ8lai6GSWa+ThdhW5V3OAEztxRtYY3wZRr/cUPc6
+         Brc3NPxtDfgh3itG0cD9lulRzLh1FlmO/nKOYZQ5DECGSZqe1T32YyqDCI5U0C0x+3Pj
+         QsPQ==
+X-Gm-Message-State: APjAAAWHKWY1ncTpVb80U9WHiGJQk0CBC4TykBPieMfRNj1QfKxVdURU
+        ssfdPcuhPMug37xNt23dvtC3Yw==
+X-Google-Smtp-Source: APXvYqwZ07G5863ndEAB+RksF+e+99jGlEHoSljL/kmhY9ivkki8aBvxOy/aBdnHgI3TPZQaVOsxJA==
+X-Received: by 2002:a17:902:549:: with SMTP id 67mr2700794plf.86.1561617144785;
+        Wed, 26 Jun 2019 23:32:24 -0700 (PDT)
+Received: from ziepe.ca ([12.199.206.50])
+        by smtp.gmail.com with ESMTPSA id k184sm1017237pgk.7.2019.06.26.23.32.24
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 26 Jun 2019 23:32:24 -0700 (PDT)
+Received: from jgg by jggl.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1hgNxH-00029V-At; Thu, 27 Jun 2019 03:32:23 -0300
+Date:   Thu, 27 Jun 2019 03:32:23 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>,
+        Stephen Bates <sbates@raithlin.com>
+Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
+Message-ID: <20190627063223.GA7736@ziepe.ca>
+References: <20190625072008.GB30350@lst.de>
+ <f0f002bf-2b94-cd18-d18f-5d0b08311495@deltatee.com>
+ <20190625170115.GA9746@lst.de>
+ <41235a05-8ed1-e69a-e7cd-48cae7d8a676@deltatee.com>
+ <20190626065708.GB24531@lst.de>
+ <c15d5997-9ba4-f7db-0e7a-a69e75df316c@deltatee.com>
+ <20190626202107.GA5850@ziepe.ca>
+ <8a0a08c3-a537-bff6-0852-a5f337a70688@deltatee.com>
+ <20190626210018.GB6392@ziepe.ca>
+ <c25d3333-dcd5-3313-089b-7fbbd6fbd876@deltatee.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c25d3333-dcd5-3313-089b-7fbbd6fbd876@deltatee.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bio_flush_dcache_pages() is unused. Remove it.
+On Wed, Jun 26, 2019 at 03:18:07PM -0600, Logan Gunthorpe wrote:
+> > I don't think we should make drives do that. What if it got CMB memory
+> > on some other device?
+> 
+> Huh? A driver submitting P2P requests finds appropriate memory to use
+> based on the DMA device that will be doing the mapping. It *has* to. It
+> doesn't necessarily have control over which P2P provider it might find
+> (ie. it may get CMB memory from a random NVMe device), but it easily
+> knows the NVMe device it got the CMB memory for. Look at the existing
+> code in the nvme target.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/bio.c         | 12 ------------
- include/linux/bio.h | 11 -----------
- 2 files changed, 23 deletions(-)
+No, this all thinking about things from the CMB perspective. With CMB
+you don't care about the BAR location because it is just a temporary
+buffer. That is a unique use model.
 
-diff --git a/block/bio.c b/block/bio.c
-index 1c21d1e7f1b8..85a9abe9cf21 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1816,18 +1816,6 @@ void generic_end_io_acct(struct request_queue *q, int req_op,
- }
- EXPORT_SYMBOL(generic_end_io_acct);
- 
--#if ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
--void bio_flush_dcache_pages(struct bio *bi)
--{
--	struct bio_vec bvec;
--	struct bvec_iter iter;
--
--	bio_for_each_segment(bvec, bi, iter)
--		flush_dcache_page(bvec.bv_page);
--}
--EXPORT_SYMBOL(bio_flush_dcache_pages);
--#endif
--
- static inline bool bio_remaining_done(struct bio *bio)
- {
- 	/*
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index f87abaa898f0..34e05a6e139c 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -444,17 +444,6 @@ void generic_end_io_acct(struct request_queue *q, int op,
- 				struct hd_struct *part,
- 				unsigned long start_time);
- 
--#ifndef ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
--# error	"You should define ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE for your platform"
--#endif
--#if ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
--extern void bio_flush_dcache_pages(struct bio *bi);
--#else
--static inline void bio_flush_dcache_pages(struct bio *bi)
--{
--}
--#endif
--
- extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
- 			       struct bio *src, struct bvec_iter *src_iter);
- extern void bio_copy_data(struct bio *dst, struct bio *src);
--- 
-2.21.0
+Every other case has data residing in BAR memory that can really only
+reside in that one place (ie on a GPU/FPGA DRAM or something). When an IO
+against that is run it should succeed, even if that means bounce
+buffering the IO - as the user has really asked for this transfer to
+happen.
 
+We certainly don't get to generally pick where the data resides before
+starting the IO, that luxury is only for CMB.
+
+> > I think with some simple caching this will become negligible for cases
+> > you care about
+> 
+> Well *maybe* it will be negligible performance wise, but it's also a lot
+> more complicated, code wise. Tree lookups will always be a lot more
+> expensive than just checking a flag.
+
+Interval trees are pretty simple API wise, and if we only populate
+them with P2P providers you probably find the tree depth is negligible
+in current systems with one or two P2P providers.
+
+Jason
