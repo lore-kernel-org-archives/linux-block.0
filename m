@@ -2,165 +2,90 @@ Return-Path: <SRS0=TUEB=U2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B79BCC48BD9
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 09:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E42B7C48BD6
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 10:22:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8F7B220815
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 09:29:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4C172080C
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 10:22:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iF+58YTU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKb75tFm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726571AbfF0J3v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jun 2019 05:29:51 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:13128 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726315AbfF0J3v (ORCPT
+        id S1726441AbfF0KWX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jun 2019 06:22:23 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:41764 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726437AbfF0KWX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jun 2019 05:29:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1561627790; x=1593163790;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=lg8pbEXqIGRxgTLVtp82Eq91m5uzXzwMVXBnCRVLznI=;
-  b=iF+58YTU2/K65VaCHJlBG7s8GYhaAd/IDqcPiwhceXwO6zzTaDdET4P/
-   9Ca/sw380iIiWZ1P/TS9RFGNfAUvuSS1/6y9RMunSjLrWQk9GIZQ6g7ak
-   KCfZR7iGVW0DOnrLMKAyv1gVerCGO7iF3Fr1Ol4AmyknA0+xjsUlARuJP
-   pyJZ02lfQjJHoggQE/JtxOXqNf1Qdur53W6e8m1DAIRfTUPe8+63/JyR6
-   lq+j6q0dFtMHaLmyS0wwphKBZ+OOpzh7t7k7YpHsFKu8KCGCM4J4JWXWh
-   qcH1j7kEAs4ijNUMdwiAgU1mxyjoXtTAsySewE2mOXFYzei1PtLVEvDB6
-   g==;
-X-IronPort-AV: E=Sophos;i="5.63,423,1557158400"; 
-   d="scan'208";a="116545303"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2019 17:29:50 +0800
-IronPort-SDR: iZusZ02A8UkSuxvH1GadwzOQv/llBC2Ldxq8a5AxDnt3+N9b8tKkTJMltzjVyVQzu5YG5gAZPD
- /ASSFBg/uPpPSKzn+TEK2nvWB56kWxIXNXjltfT2tcBi2TyDbrt+FegbdfcAZryNlB3fUltky2
- bhRGZc1LekBak2LLdoifRXGszRZL7MZugsa4V0/qeCheLTISy3TROeeSSgteS81+Xv8yV7Tp/2
- pB6Un86jj6goCiDjvGvfpst6mZ7pP2nnzowXjG3NdrANPpiwX7xka0Y3AwU3oVqH4FvnK25ay5
- iDi7AAoIaMgIb/9lBnqoo7e4
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP; 27 Jun 2019 02:28:57 -0700
-IronPort-SDR: wsae8wdZTTa0rBCsei6OLNZQm3/A5jc2Zr9CHeDq/8aO47EselAF4cGWzBcfTCeQgFHM9j4peJ
- wsuBOq4gu/yBprpj6/YCS1zckwLYw0RQ2R+EoSIlcKbet22v4hMvf1EX3DIOIp4hi9uNp4R8OL
- OxUqJnFPZH8dql6fcffJ7dC+zOisTxEdbyZ0VikEN1WFcvK+PxmhUPMQMUzE8lYntCx83KE9uL
- dTRK/MQL/CTgYuXBK6h5sYjTPphGdhOVQ43euXqvyTRhEBxQ318hXOwIGqQO7dBo+u8D0I7g0S
- Uds=
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 27 Jun 2019 02:29:49 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH V5 3/3] block: Limit zone array allocation size
-Date:   Thu, 27 Jun 2019 18:29:44 +0900
-Message-Id: <20190627092944.20957-4-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190627092944.20957-1-damien.lemoal@wdc.com>
-References: <20190627092944.20957-1-damien.lemoal@wdc.com>
+        Thu, 27 Jun 2019 06:22:23 -0400
+Received: by mail-pf1-f193.google.com with SMTP id m30so995630pff.8
+        for <linux-block@vger.kernel.org>; Thu, 27 Jun 2019 03:22:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=ggLlF2EjFVqXz9pRT82ofMFIivuIl9ESdL9ZpeeHMdI=;
+        b=RKb75tFmkVCPnHxrWVVqdwbtWbBUk/BzY/t1nQELHhp6fv/QjItEqyFx0EoSGkIkiN
+         uPRW7mhowLEeZyy/KcdjN8J4tugTir3L14FoCMoeHmEa+x4LEiCHcVxpu6aYQ5DJW3xX
+         TfblCo3eZ3n1H/WdQjsdn6KuIJAxxEFC/AcxxBf7Yo9shk7f+S2KQuMdRXchq/7l90vk
+         8TpZDOeRLUwz1ws3A3RXpiist7wFxdl25LeLQXivijUPkd2q7EYg3E5gP6jo7rmcMHlG
+         ZLrhHRBt1JWeMtdlri9cuJzYyw5Tutr82770xcLmI/3rEt2xY/VnvFvtoOkqpAyH9gYZ
+         PvaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ggLlF2EjFVqXz9pRT82ofMFIivuIl9ESdL9ZpeeHMdI=;
+        b=f2aHpTEa6A1ugX/ZD3YHtbj2qDjUgzvb5HqjMbkXePRIFqc9c3fXyhbDHHXWXj16uD
+         VGylyMumL7F704QBkbtk56qa3SmKXGRcqO9L/VaXyQG0ieP9nsbydNXe/sNXeg0+/26w
+         ChgejqOSQEv1djV88N2JdYMuDTxk3HdKQcWJPClAVDQsQ+QS29rSr8fXJdZVxII3yUX5
+         KM/XTsgofh4AqeiGbVdkAO/v50NyALxPU+OEKPXgQVOfyPw0FQPWnEehfPIyycb6LC9b
+         6ZLGa5N38ncROmNKvEYn9WhaAHKrWjpb/jgkbYqjsCWgxwz+c39rZD3hSwrofJtY09++
+         3Vww==
+X-Gm-Message-State: APjAAAWW1quy/o4k/E7T/8GGQUUXW8DI9WZt9IMDN+Y2NyxjS80pR5gW
+        boqTQDnClArOd6x9dzfscSE=
+X-Google-Smtp-Source: APXvYqyrQpK0TtgQHNXKEnRTFFN5lP+wBTZl0ur/ToS88ykuS8tpF0cbER5KuSetBCToZXbeqjICPA==
+X-Received: by 2002:a17:90a:37c8:: with SMTP id v66mr5231469pjb.33.1561630942885;
+        Thu, 27 Jun 2019 03:22:22 -0700 (PDT)
+Received: from localhost ([123.213.206.190])
+        by smtp.gmail.com with ESMTPSA id r7sm3760609pfl.134.2019.06.27.03.22.21
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 27 Jun 2019 03:22:22 -0700 (PDT)
+Date:   Thu, 27 Jun 2019 19:22:19 +0900
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH 2/9] block: optionally mark pages dirty in
+ bio_release_pages
+Message-ID: <20190627102219.GA4421@minwooim-desktop>
+References: <20190626134928.7988-1-hch@lst.de>
+ <20190626134928.7988-3-hch@lst.de>
+ <20190626205247.GH4934@minwooim-desktop>
+ <20190627082759.GC11043@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190627082759.GC11043@lst.de>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Limit the size of the struct blk_zone array used in
-blk_revalidate_disk_zones() to avoid memory allocation failures leading
-to disk revalidation failure. Further reduce the likelyhood of these
-failures by using kvmalloc() instead of directly allocating contiguous
-pages.
+On 19-06-27 10:27:59, Christoph Hellwig wrote:
+> On Thu, Jun 27, 2019 at 05:52:47AM +0900, Minwoo Im wrote:
+> > Could you please explain a bit why we should not make it dirty in case
+> > of compound page?
+> 
+> PageCompount is only true for the tail pages, and marking them dirty
+> doesn't work.  On the other hand marking the head page dirty covers
+> the whole compount, so we are fine.
 
-Fixes: 515ce6061312 ("scsi: sd_zbc: Fix sd_zbc_report_zones() buffer allocation")
-Fixes: e76239a3748c ("block: add a report_zones method")
-Cc: stable@vger.kernel.org
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-zoned.c      | 29 +++++++++++++----------------
- include/linux/blkdev.h |  5 +++++
- 2 files changed, 18 insertions(+), 16 deletions(-)
+Christoph,
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index ae7e91bd0618..26f878b9b5f5 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -373,22 +373,20 @@ static inline unsigned long *blk_alloc_zone_bitmap(int node,
-  * Allocate an array of struct blk_zone to get nr_zones zone information.
-  * The allocated array may be smaller than nr_zones.
-  */
--static struct blk_zone *blk_alloc_zones(int node, unsigned int *nr_zones)
-+static struct blk_zone *blk_alloc_zones(unsigned int *nr_zones)
- {
--	size_t size = *nr_zones * sizeof(struct blk_zone);
--	struct page *page;
--	int order;
--
--	for (order = get_order(size); order >= 0; order--) {
--		page = alloc_pages_node(node, GFP_NOIO | __GFP_ZERO, order);
--		if (page) {
--			*nr_zones = min_t(unsigned int, *nr_zones,
--				(PAGE_SIZE << order) / sizeof(struct blk_zone));
--			return page_address(page);
--		}
-+	struct blk_zone *zones;
-+	size_t nrz = min(*nr_zones, BLK_ZONED_REPORT_MAX_ZONES);
-+
-+	zones = kvcalloc(nrz, sizeof(struct blk_zone), GFP_NOIO);
-+	if (!zones) {
-+		*nr_zones = 0;
-+		return NULL;
- 	}
- 
--	return NULL;
-+	*nr_zones = nrz;
-+
-+	return zones;
- }
- 
- void blk_queue_free_zone_bitmaps(struct request_queue *q)
-@@ -443,7 +441,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 
- 	/* Get zone information and initialize seq_zones_bitmap */
- 	rep_nr_zones = nr_zones;
--	zones = blk_alloc_zones(q->node, &rep_nr_zones);
-+	zones = blk_alloc_zones(&rep_nr_zones);
- 	if (!zones)
- 		goto out;
- 
-@@ -480,8 +478,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 	blk_mq_unfreeze_queue(q);
- 
- out:
--	free_pages((unsigned long)zones,
--		   get_order(rep_nr_zones * sizeof(struct blk_zone)));
-+	kvfree(zones);
- 	kfree(seq_zones_wlock);
- 	kfree(seq_zones_bitmap);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 592669bcc536..f7faac856017 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -344,6 +344,11 @@ struct queue_limits {
- 
- #ifdef CONFIG_BLK_DEV_ZONED
- 
-+/*
-+ * Maximum number of zones to report with a single report zones command.
-+ */
-+#define BLK_ZONED_REPORT_MAX_ZONES	8192U
-+
- extern unsigned int blkdev_nr_zones(struct block_device *bdev);
- extern int blkdev_report_zones(struct block_device *bdev,
- 			       sector_t sector, struct blk_zone *zones,
--- 
-2.21.0
-
+Thanks for letting me know this.
