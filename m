@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA5EAC48BD6
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 09:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B79BCC48BD9
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 09:29:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99B3920815
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 09:29:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F7B220815
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 09:29:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KwVLtB5p"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iF+58YTU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726565AbfF0J3u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jun 2019 05:29:50 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:13123 "EHLO
+        id S1726571AbfF0J3v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jun 2019 05:29:51 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:13128 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726537AbfF0J3u (ORCPT
+        with ESMTP id S1726315AbfF0J3v (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jun 2019 05:29:50 -0400
+        Thu, 27 Jun 2019 05:29:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1561627789; x=1593163789;
+  t=1561627790; x=1593163790;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7kbEPhpOWuZEiLmXFafrzlRcGM3900czchapAYxS100=;
-  b=KwVLtB5pczxcHdQd+CAL/7WgEfU40sxE9eFHuQC2/Bwbmb4fZZq0QV56
-   nSjTmoQVYbvLFAv2oUH7j/9PYuJ9zYbUB4jYOkXLBMIob6/g3uvhwJDmb
-   5fJDfkSVcPG5uSz5GL1lBvmHlEeUSrcZaELB+YGklxkpDSKHru5ZbDzUy
-   OaF1mGc/qiUWmCjlohwvl4CK20tJlB3MLaa89TkGy1XspkrNGBsaqeNDQ
-   D6OKlYWtitIf3Xy9YxMdxxbF5YLOQyDeLZNz3f+Hikn5msE539+sJ9bL/
-   3gtHKLDAjroG8UOG/EgSrq6IF/XeHfAcl8jCtTJzEgBAKv49qb/LHAr3l
-   Q==;
+  bh=lg8pbEXqIGRxgTLVtp82Eq91m5uzXzwMVXBnCRVLznI=;
+  b=iF+58YTU2/K65VaCHJlBG7s8GYhaAd/IDqcPiwhceXwO6zzTaDdET4P/
+   9Ca/sw380iIiWZ1P/TS9RFGNfAUvuSS1/6y9RMunSjLrWQk9GIZQ6g7ak
+   KCfZR7iGVW0DOnrLMKAyv1gVerCGO7iF3Fr1Ol4AmyknA0+xjsUlARuJP
+   pyJZ02lfQjJHoggQE/JtxOXqNf1Qdur53W6e8m1DAIRfTUPe8+63/JyR6
+   lq+j6q0dFtMHaLmyS0wwphKBZ+OOpzh7t7k7YpHsFKu8KCGCM4J4JWXWh
+   qcH1j7kEAs4ijNUMdwiAgU1mxyjoXtTAsySewE2mOXFYzei1PtLVEvDB6
+   g==;
 X-IronPort-AV: E=Sophos;i="5.63,423,1557158400"; 
-   d="scan'208";a="116545300"
+   d="scan'208";a="116545303"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2019 17:29:49 +0800
-IronPort-SDR: 4Yg1pD1hz6eXEwZkc7zbyqrQegDbc7UZ4DYSC3X/ue9dsFVMgbDN3WK2EhTvq7iVE5xj6zJ8rr
- 8w4tnfpUtbYg7S80rbaOZ/C0BFVDW3T5rTSAzLD0Nm+eQjsAkArsppJlSnFN0oHtu8x+AMVyba
- ZK29gv9cR2lT0Ado2M5TTBRP9XukQTPqZnhT3N8EvNfyF/W1NEv5NJE6EIjQLtAWQfWyVXEGAd
- ub7tae8inh/PUYeDcAXsoZTyZUQT4IYzfAODheCEXYCadk4pNl5YBBVeEy27yp27VeE6SqYDor
- 0iDwxxW8GhbGhtmSTxnwDVA3
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2019 17:29:50 +0800
+IronPort-SDR: iZusZ02A8UkSuxvH1GadwzOQv/llBC2Ldxq8a5AxDnt3+N9b8tKkTJMltzjVyVQzu5YG5gAZPD
+ /ASSFBg/uPpPSKzn+TEK2nvWB56kWxIXNXjltfT2tcBi2TyDbrt+FegbdfcAZryNlB3fUltky2
+ bhRGZc1LekBak2LLdoifRXGszRZL7MZugsa4V0/qeCheLTISy3TROeeSSgteS81+Xv8yV7Tp/2
+ pB6Un86jj6goCiDjvGvfpst6mZ7pP2nnzowXjG3NdrANPpiwX7xka0Y3AwU3oVqH4FvnK25ay5
+ iDi7AAoIaMgIb/9lBnqoo7e4
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP; 27 Jun 2019 02:28:56 -0700
-IronPort-SDR: gQ03/g8/YOcQDuRgQDklGO04gWxw0S5jnK2JczT5a04utq+FCKTI+Bnt2/ylw62fAhTXLtT0De
- SRq77OUV61ZYuA8q+bCg5UP05E94v3hQYFP6LL7GZ8eHODzmXsatUwQB6aYh5MsRd/JGIG/Bj6
- JlV7pcQlCT1m0hC4R2Yo0zaqLhtfW0ogbPsxx5YNMoa/rH7z98Iueo6Uk41qrVJ3zzrl4Vl7kX
- xyPKBOo+q9EX+PM96e/nohhNGJr9vivf5TM2R3NliwYsJZrU9yngZNrTegHjxNAtd48QDHaKxh
- TcQ=
+  by uls-op-cesaep01.wdc.com with ESMTP; 27 Jun 2019 02:28:57 -0700
+IronPort-SDR: wsae8wdZTTa0rBCsei6OLNZQm3/A5jc2Zr9CHeDq/8aO47EselAF4cGWzBcfTCeQgFHM9j4peJ
+ wsuBOq4gu/yBprpj6/YCS1zckwLYw0RQ2R+EoSIlcKbet22v4hMvf1EX3DIOIp4hi9uNp4R8OL
+ OxUqJnFPZH8dql6fcffJ7dC+zOisTxEdbyZ0VikEN1WFcvK+PxmhUPMQMUzE8lYntCx83KE9uL
+ dTRK/MQL/CTgYuXBK6h5sYjTPphGdhOVQ43euXqvyTRhEBxQ318hXOwIGqQO7dBo+u8D0I7g0S
+ Uds=
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 27 Jun 2019 02:29:48 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 27 Jun 2019 02:29:49 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH V5 2/3] sd_zbc: Fix report zones buffer allocation
-Date:   Thu, 27 Jun 2019 18:29:43 +0900
-Message-Id: <20190627092944.20957-3-damien.lemoal@wdc.com>
+Subject: [PATCH V5 3/3] block: Limit zone array allocation size
+Date:   Thu, 27 Jun 2019 18:29:44 +0900
+Message-Id: <20190627092944.20957-4-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190627092944.20957-1-damien.lemoal@wdc.com>
 References: <20190627092944.20957-1-damien.lemoal@wdc.com>
@@ -72,231 +72,95 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-During disk scan and revalidation done with sd_revalidate(), the zones
-of a zoned disk are checked using the helper function
-blk_revalidate_disk_zones() if a configuration change is detected
-(change in the number of zones or zone size). The function
-blk_revalidate_disk_zones() issues report_zones calls that are very
-large, that is, to obtain zone information for all zones of the disk
-with a single command. The size of the report zones command buffer
-necessary for such large request generally is lower than the disk
-max_hw_sectors and KMALLOC_MAX_SIZE (4MB) and succeeds on boot (no
-memory fragmentation), but often fail at run time (e.g. hot-plug
-event). This causes the disk revalidation to fail and the disk
-capacity to be changed to 0.
-
-This problem can be avoided by using vmalloc() instead of kmalloc() for
-the buffer allocation. To limit the amount of memory to be allocated,
-this patch also introduces the arbitrary SD_ZBC_REPORT_MAX_ZONES
-maximum number of zones to report with a single report zones command.
-This limit may be lowered further to satisfy the disk max_hw_sectors
-limit. Finally, to ensure that the vmalloc-ed buffer can always be
-mapped in a request, the buffer size is further limited to at most
-queue_max_segments() pages, allowing successful mapping of the buffer
-even in the worst case scenario where none of the buffer pages are
-contiguous.
+Limit the size of the struct blk_zone array used in
+blk_revalidate_disk_zones() to avoid memory allocation failures leading
+to disk revalidation failure. Further reduce the likelyhood of these
+failures by using kvmalloc() instead of directly allocating contiguous
+pages.
 
 Fixes: 515ce6061312 ("scsi: sd_zbc: Fix sd_zbc_report_zones() buffer allocation")
 Fixes: e76239a3748c ("block: add a report_zones method")
 Cc: stable@vger.kernel.org
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/scsi/sd_zbc.c | 83 ++++++++++++++++++++++++++++++++-----------
- 1 file changed, 62 insertions(+), 21 deletions(-)
+ block/blk-zoned.c      | 29 +++++++++++++----------------
+ include/linux/blkdev.h |  5 +++++
+ 2 files changed, 18 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 7334024b64f1..ecd967fb39c1 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -9,6 +9,7 @@
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index ae7e91bd0618..26f878b9b5f5 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -373,22 +373,20 @@ static inline unsigned long *blk_alloc_zone_bitmap(int node,
+  * Allocate an array of struct blk_zone to get nr_zones zone information.
+  * The allocated array may be smaller than nr_zones.
   */
- 
- #include <linux/blkdev.h>
-+#include <linux/vmalloc.h>
- 
- #include <asm/unaligned.h>
- 
-@@ -50,7 +51,7 @@ static void sd_zbc_parse_report(struct scsi_disk *sdkp, u8 *buf,
- /**
-  * sd_zbc_do_report_zones - Issue a REPORT ZONES scsi command.
-  * @sdkp: The target disk
-- * @buf: Buffer to use for the reply
-+ * @buf: vmalloc-ed buffer to use for the reply
-  * @buflen: the buffer size
-  * @lba: Start LBA of the report
-  * @partial: Do partial report
-@@ -79,6 +80,7 @@ static int sd_zbc_do_report_zones(struct scsi_disk *sdkp, unsigned char *buf,
- 	put_unaligned_be32(buflen, &cmd[10]);
- 	if (partial)
- 		cmd[14] = ZBC_REPORT_ZONE_PARTIAL;
-+
- 	memset(buf, 0, buflen);
- 
- 	result = scsi_execute_req(sdp, cmd, DMA_FROM_DEVICE,
-@@ -103,6 +105,48 @@ static int sd_zbc_do_report_zones(struct scsi_disk *sdkp, unsigned char *buf,
- 	return 0;
- }
- 
-+/*
-+ * Maximum number of zones to get with one report zones command.
-+ */
-+#define SD_ZBC_REPORT_MAX_ZONES		8192U
-+
-+/**
-+ * Allocate a buffer for report zones reply.
-+ * @disk: The target disk
-+ * @nr_zones: Maximum number of zones to report
-+ * @buflen: Size of the buffer allocated
-+ * @gfp_mask: Memory allocation mask
-+ *
-+ */
-+static void *sd_zbc_alloc_report_buffer(struct request_queue *q,
-+					unsigned int nr_zones, size_t *buflen,
-+					gfp_t gfp_mask)
-+{
-+	size_t bufsize;
-+	void *buf;
-+
-+	/*
-+	 * Report zone buffer size should be at most 64B times the number of
-+	 * zones requested plus the 64B reply header, but should be at least
-+	 * SECTOR_SIZE for ATA devices.
-+	 * Make sure that this size does not exceed the hardware capabilities.
-+	 * Furthermore, since the report zone command cannot be split, make
-+	 * sure that the allocated buffer can always be mapped by limiting the
-+	 * number of pages allocated to the HBA max segments limit.
-+	 */
-+	nr_zones = min(nr_zones, SD_ZBC_REPORT_MAX_ZONES);
-+	bufsize = roundup((nr_zones + 1) * 64, 512);
-+	bufsize = min_t(size_t, bufsize,
-+			queue_max_hw_sectors(q) << SECTOR_SHIFT);
-+	bufsize = min_t(size_t, bufsize, queue_max_segments(q) << PAGE_SHIFT);
-+
-+	buf = __vmalloc(bufsize, gfp_mask, PAGE_KERNEL);
-+	if (buf)
-+		*buflen = bufsize;
-+
-+	return buf;
-+}
-+
- /**
-  * sd_zbc_report_zones - Disk report zones operation.
-  * @disk: The target disk
-@@ -118,9 +162,9 @@ int sd_zbc_report_zones(struct gendisk *disk, sector_t sector,
- 			gfp_t gfp_mask)
+-static struct blk_zone *blk_alloc_zones(int node, unsigned int *nr_zones)
++static struct blk_zone *blk_alloc_zones(unsigned int *nr_zones)
  {
- 	struct scsi_disk *sdkp = scsi_disk(disk);
--	unsigned int i, buflen, nrz = *nr_zones;
-+	unsigned int i, nrz = *nr_zones;
- 	unsigned char *buf;
--	size_t offset = 0;
-+	size_t buflen = 0, offset = 0;
- 	int ret = 0;
- 
- 	if (!sd_is_zoned(sdkp))
-@@ -132,16 +176,14 @@ int sd_zbc_report_zones(struct gendisk *disk, sector_t sector,
- 	 * without exceeding the device maximum command size. For ATA disks,
- 	 * buffers must be aligned to 512B.
- 	 */
--	buflen = min(queue_max_hw_sectors(disk->queue) << 9,
--		     roundup((nrz + 1) * 64, 512));
--	buf = kmalloc(buflen, gfp_mask);
-+	buf = sd_zbc_alloc_report_buffer(disk->queue, nrz, &buflen, gfp_mask);
- 	if (!buf)
- 		return -ENOMEM;
- 
- 	ret = sd_zbc_do_report_zones(sdkp, buf, buflen,
- 			sectors_to_logical(sdkp->device, sector), true);
- 	if (ret)
--		goto out_free_buf;
-+		goto out;
- 
- 	nrz = min(nrz, get_unaligned_be32(&buf[0]) / 64);
- 	for (i = 0; i < nrz; i++) {
-@@ -152,8 +194,8 @@ int sd_zbc_report_zones(struct gendisk *disk, sector_t sector,
- 
- 	*nr_zones = nrz;
- 
--out_free_buf:
--	kfree(buf);
-+out:
-+	kvfree(buf);
- 
- 	return ret;
- }
-@@ -287,8 +329,6 @@ static int sd_zbc_check_zoned_characteristics(struct scsi_disk *sdkp,
- 	return 0;
- }
- 
--#define SD_ZBC_BUF_SIZE 131072U
+-	size_t size = *nr_zones * sizeof(struct blk_zone);
+-	struct page *page;
+-	int order;
 -
- /**
-  * sd_zbc_check_zones - Check the device capacity and zone sizes
-  * @sdkp: Target disk
-@@ -304,22 +344,23 @@ static int sd_zbc_check_zoned_characteristics(struct scsi_disk *sdkp,
-  */
- static int sd_zbc_check_zones(struct scsi_disk *sdkp, u32 *zblocks)
- {
-+	size_t bufsize, buflen;
- 	u64 zone_blocks = 0;
- 	sector_t max_lba, block = 0;
- 	unsigned char *buf;
- 	unsigned char *rec;
--	unsigned int buf_len;
--	unsigned int list_length;
- 	int ret;
- 	u8 same;
- 
- 	/* Get a buffer */
--	buf = kmalloc(SD_ZBC_BUF_SIZE, GFP_KERNEL);
-+	buf = sd_zbc_alloc_report_buffer(sdkp->disk->queue,
-+					 SD_ZBC_REPORT_MAX_ZONES,
-+					 &bufsize, GFP_NOIO);
- 	if (!buf)
- 		return -ENOMEM;
- 
- 	/* Do a report zone to get max_lba and the same field */
--	ret = sd_zbc_do_report_zones(sdkp, buf, SD_ZBC_BUF_SIZE, 0, false);
-+	ret = sd_zbc_do_report_zones(sdkp, buf, bufsize, 0, false);
- 	if (ret)
- 		goto out_free;
- 
-@@ -355,12 +396,12 @@ static int sd_zbc_check_zones(struct scsi_disk *sdkp, u32 *zblocks)
- 	do {
- 
- 		/* Parse REPORT ZONES header */
--		list_length = get_unaligned_be32(&buf[0]) + 64;
-+		buflen = min_t(size_t, get_unaligned_be32(&buf[0]) + 64,
-+			       bufsize);
- 		rec = buf + 64;
--		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
- 
- 		/* Parse zone descriptors */
--		while (rec < buf + buf_len) {
-+		while (rec < buf + buflen) {
- 			u64 this_zone_blocks = get_unaligned_be64(&rec[8]);
- 
- 			if (zone_blocks == 0) {
-@@ -376,8 +417,8 @@ static int sd_zbc_check_zones(struct scsi_disk *sdkp, u32 *zblocks)
- 		}
- 
- 		if (block < sdkp->capacity) {
--			ret = sd_zbc_do_report_zones(sdkp, buf, SD_ZBC_BUF_SIZE,
--						     block, true);
-+			ret = sd_zbc_do_report_zones(sdkp, buf, bufsize, block,
-+						     true);
- 			if (ret)
- 				goto out_free;
- 		}
-@@ -408,7 +449,7 @@ static int sd_zbc_check_zones(struct scsi_disk *sdkp, u32 *zblocks)
+-	for (order = get_order(size); order >= 0; order--) {
+-		page = alloc_pages_node(node, GFP_NOIO | __GFP_ZERO, order);
+-		if (page) {
+-			*nr_zones = min_t(unsigned int, *nr_zones,
+-				(PAGE_SIZE << order) / sizeof(struct blk_zone));
+-			return page_address(page);
+-		}
++	struct blk_zone *zones;
++	size_t nrz = min(*nr_zones, BLK_ZONED_REPORT_MAX_ZONES);
++
++	zones = kvcalloc(nrz, sizeof(struct blk_zone), GFP_NOIO);
++	if (!zones) {
++		*nr_zones = 0;
++		return NULL;
  	}
  
- out_free:
--	kfree(buf);
-+	kvfree(buf);
- 
- 	return ret;
+-	return NULL;
++	*nr_zones = nrz;
++
++	return zones;
  }
+ 
+ void blk_queue_free_zone_bitmaps(struct request_queue *q)
+@@ -443,7 +441,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+ 
+ 	/* Get zone information and initialize seq_zones_bitmap */
+ 	rep_nr_zones = nr_zones;
+-	zones = blk_alloc_zones(q->node, &rep_nr_zones);
++	zones = blk_alloc_zones(&rep_nr_zones);
+ 	if (!zones)
+ 		goto out;
+ 
+@@ -480,8 +478,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+ 	blk_mq_unfreeze_queue(q);
+ 
+ out:
+-	free_pages((unsigned long)zones,
+-		   get_order(rep_nr_zones * sizeof(struct blk_zone)));
++	kvfree(zones);
+ 	kfree(seq_zones_wlock);
+ 	kfree(seq_zones_bitmap);
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 592669bcc536..f7faac856017 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -344,6 +344,11 @@ struct queue_limits {
+ 
+ #ifdef CONFIG_BLK_DEV_ZONED
+ 
++/*
++ * Maximum number of zones to report with a single report zones command.
++ */
++#define BLK_ZONED_REPORT_MAX_ZONES	8192U
++
+ extern unsigned int blkdev_nr_zones(struct block_device *bdev);
+ extern int blkdev_report_zones(struct block_device *bdev,
+ 			       sector_t sector, struct blk_zone *zones,
 -- 
 2.21.0
 
