@@ -2,69 +2,64 @@ Return-Path: <SRS0=TUEB=U2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF27C48BD6
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 02:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A04C48BD3
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 02:59:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A51C3216E3
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 02:49:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4429321852
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 02:59:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="NiW545gH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="MDFDqWWB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726970AbfF0CtQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jun 2019 22:49:16 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:35004 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726962AbfF0CtQ (ORCPT
+        id S1726829AbfF0C7o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jun 2019 22:59:44 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:52735 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726816AbfF0C7o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jun 2019 22:49:16 -0400
+        Wed, 26 Jun 2019 22:59:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1561603755; x=1593139755;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=lg8pbEXqIGRxgTLVtp82Eq91m5uzXzwMVXBnCRVLznI=;
-  b=NiW545gH2omc/buw7VwX6ruBCVzZg8OCBGfOUy1NQZbPxby9QVNgsFyq
-   G60KbtjXtWZ9lLxsHUdpf5Jm30XCKdTyzcdqATi0MhvWAK0ru5XsnSv3K
-   kLJJgQHFnlWRFnH5uJToOYR+Yz/ItV7gzp9SrYWdkAevi0Bcxwr4RToJH
-   XqtPfj2p4KLOQSyB5uVs2Ic8zlv0ZgGQVCacW63YZPeNl66WCOYv/8kwp
-   Y9rINzzUBmOaC2BKndHBfRb22xGH5pI75ZF8IbxSP6S3FvKWWYJWA22EC
-   nnoqG5kQTAAbLunPba+wQS5PgplHXRVcm2L1EoEwIFy34FEXZ4QNufhK7
-   A==;
+  t=1561604412; x=1593140412;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=k88Jxm6UjOcpOAysM42/2nMwgTKJ8DZeNJDi00vUgkg=;
+  b=MDFDqWWBVY5DLyFg7ad3YfnUMlxb4qJ2JZPiysLKHvYyZESXgd0iLo8R
+   TlqY01oJOvNIC/fBPtfmr1eXT7z5tYrSi43w5UB416h+zMkyB24zIYsx3
+   Gp4Tk4BGfCRV1MKsn3z2gaBa+wh0VeIFGehRfYIQR5pq8AvcmNra2Bhwf
+   6YnBEAE84jiIcTVISaXXYQx1p1MfooiyvgCGg1F25EV+VBYNF5sL2bUYQ
+   CQ6AiW4lOQSFNRz07I+FyKYKEkLTPe+LXn+/QkSbSWilCizlVbL4N5p65
+   Sit04iH8pgwR5zXmDL6Nh6HfcJMpkRnPoDajj+wllb3EEZLNV4x/nsq2t
+   g==;
 X-IronPort-AV: E=Sophos;i="5.63,422,1557158400"; 
-   d="scan'208";a="218022033"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2019 10:49:15 +0800
-IronPort-SDR: DYd6rgX/eTMCl5tvCyLWEO2p+wohGgxS9B8pusCbhLGN+414JTn4IX5NTl6vsLezm/EPelx5s7
- P1lkTkAfEj3yUJx+Cs24ijrmRscEciUamIiym4GY6dGofUAaRKmZlPlDce4Gn4ek3Ng4GXV/bc
- cxGvJMz9oGCZoEYPA7NNU8ikeqltFTjiEvPD/riw4XNLLQso8efPOSfyM2wjdtFdcmMyF7b6w1
- 31fMOv33xV3vYcHMC4WgpWupuvH7YehlvZTISJClxHGYJRcGDVoaiAzNxIpFsIqGxQ3U8uchrJ
- QVsnq4LbJMDR35qyNAZk/ZV2
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP; 26 Jun 2019 19:48:24 -0700
-IronPort-SDR: l7Q8eErx4O47E08s4VUeN4+1j05XjzrDcO/8OSqhR3Wq6y/kPfq4USFc3NfsLABvaLhOW9/UXM
- S97qAus7EP/h+saCFDvENc85isKBO7n5VkEa4Dczf9yDUKD2MpkbVDxeA8N8tEAN566jafBwDM
- eZGoM03qBqXwF8ziTlFCpichdx+Lo/CcMjL15aQhbyYgUMzb6CT7Lrmy99IP+p4Lc8f8/cQGRF
- Crpj0+/wnVes0JmD2l7u0jj5pXGM7/TOgjvynSuoz0sliE34C7I4/gpjuzKVKCH1tjlZxaRkaR
- WzI=
+   d="scan'208";a="211457393"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2019 11:00:12 +0800
+IronPort-SDR: R1CRBbuKUb/MFMVxE/9MRliz4KQZqZs7cmgZDK++a9w+bAdMaLqV23rJA4pZqq9xvcpcRaq9jQ
+ KjS6lHjA8Xxn5hQd/kMfKNG05BV5P6rON7WJU5JrMf9FNp8l/EddEXEi3GQmaBko8FVvh9Z6xp
+ M9aq6YVi0YH6Rg/1CiE0HOsdTsGKepPbcKnKOij4sMhlb+WQTexuzGehLLtwcuz8IC4bhK9GU4
+ hHytPb1Try+DQcvKWr0HoWpLNrNVSZVmf6FCBh5yOLtNk9NK7/xTTxQCBnbpD6VHgy7IBXSIhP
+ ay2cbkabLyUoORMIzxOD4YN+
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP; 26 Jun 2019 19:58:57 -0700
+IronPort-SDR: yGnUfJNHWZ1eb1bPB2qNwZiVWeCrYPrjQPvZbu5TIoVZDJDVN4xEMJweXePM9iAd86bDXx0CW9
+ MXGrvl9nvIliSs7bhhAY5hRzJwmxVyFVwFpa5L6oC2kEyaQhab+4q/yw2ipFJIZoQKCxcWfWrB
+ LuM5B0yK0vJ3bvSZqB7TV24qW8nbul3oQAcsTwlM7F3TdFGl+Js4oVUQZcAsxwq70Ql843CxKF
+ 2j+Gzx9o9pp1AmR444tNXctZdawoVTPrCpLkA8qh0Czwx9t5sXVefc7Kc5gW0cOa1eYBVmZO/s
+ tp0=
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 26 Jun 2019 19:49:15 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 26 Jun 2019 19:59:42 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH V4 3/3] block: Limit zone array allocation size
-Date:   Thu, 27 Jun 2019 11:49:10 +0900
-Message-Id: <20190627024910.23987-4-damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] block: Remove unused code
+Date:   Thu, 27 Jun 2019 11:59:41 +0900
+Message-Id: <20190627025941.32262-1-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190627024910.23987-1-damien.lemoal@wdc.com>
-References: <20190627024910.23987-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -72,95 +67,59 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Limit the size of the struct blk_zone array used in
-blk_revalidate_disk_zones() to avoid memory allocation failures leading
-to disk revalidation failure. Further reduce the likelyhood of these
-failures by using kvmalloc() instead of directly allocating contiguous
-pages.
+bio_flush_dcache_pages() is unused. Remove it.
 
-Fixes: 515ce6061312 ("scsi: sd_zbc: Fix sd_zbc_report_zones() buffer allocation")
-Fixes: e76239a3748c ("block: add a report_zones method")
-Cc: stable@vger.kernel.org
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-zoned.c      | 29 +++++++++++++----------------
- include/linux/blkdev.h |  5 +++++
- 2 files changed, 18 insertions(+), 16 deletions(-)
+ block/bio.c         | 12 ------------
+ include/linux/bio.h | 11 -----------
+ 2 files changed, 23 deletions(-)
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index ae7e91bd0618..26f878b9b5f5 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -373,22 +373,20 @@ static inline unsigned long *blk_alloc_zone_bitmap(int node,
-  * Allocate an array of struct blk_zone to get nr_zones zone information.
-  * The allocated array may be smaller than nr_zones.
-  */
--static struct blk_zone *blk_alloc_zones(int node, unsigned int *nr_zones)
-+static struct blk_zone *blk_alloc_zones(unsigned int *nr_zones)
- {
--	size_t size = *nr_zones * sizeof(struct blk_zone);
--	struct page *page;
--	int order;
--
--	for (order = get_order(size); order >= 0; order--) {
--		page = alloc_pages_node(node, GFP_NOIO | __GFP_ZERO, order);
--		if (page) {
--			*nr_zones = min_t(unsigned int, *nr_zones,
--				(PAGE_SIZE << order) / sizeof(struct blk_zone));
--			return page_address(page);
--		}
-+	struct blk_zone *zones;
-+	size_t nrz = min(*nr_zones, BLK_ZONED_REPORT_MAX_ZONES);
-+
-+	zones = kvcalloc(nrz, sizeof(struct blk_zone), GFP_NOIO);
-+	if (!zones) {
-+		*nr_zones = 0;
-+		return NULL;
- 	}
- 
--	return NULL;
-+	*nr_zones = nrz;
-+
-+	return zones;
+diff --git a/block/bio.c b/block/bio.c
+index 1c21d1e7f1b8..85a9abe9cf21 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1816,18 +1816,6 @@ void generic_end_io_acct(struct request_queue *q, int req_op,
  }
+ EXPORT_SYMBOL(generic_end_io_acct);
  
- void blk_queue_free_zone_bitmaps(struct request_queue *q)
-@@ -443,7 +441,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+-#if ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
+-void bio_flush_dcache_pages(struct bio *bi)
+-{
+-	struct bio_vec bvec;
+-	struct bvec_iter iter;
+-
+-	bio_for_each_segment(bvec, bi, iter)
+-		flush_dcache_page(bvec.bv_page);
+-}
+-EXPORT_SYMBOL(bio_flush_dcache_pages);
+-#endif
+-
+ static inline bool bio_remaining_done(struct bio *bio)
+ {
+ 	/*
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index f87abaa898f0..34e05a6e139c 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -444,17 +444,6 @@ void generic_end_io_acct(struct request_queue *q, int op,
+ 				struct hd_struct *part,
+ 				unsigned long start_time);
  
- 	/* Get zone information and initialize seq_zones_bitmap */
- 	rep_nr_zones = nr_zones;
--	zones = blk_alloc_zones(q->node, &rep_nr_zones);
-+	zones = blk_alloc_zones(&rep_nr_zones);
- 	if (!zones)
- 		goto out;
- 
-@@ -480,8 +478,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 	blk_mq_unfreeze_queue(q);
- 
- out:
--	free_pages((unsigned long)zones,
--		   get_order(rep_nr_zones * sizeof(struct blk_zone)));
-+	kvfree(zones);
- 	kfree(seq_zones_wlock);
- 	kfree(seq_zones_bitmap);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 592669bcc536..f7faac856017 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -344,6 +344,11 @@ struct queue_limits {
- 
- #ifdef CONFIG_BLK_DEV_ZONED
- 
-+/*
-+ * Maximum number of zones to report with a single report zones command.
-+ */
-+#define BLK_ZONED_REPORT_MAX_ZONES	8192U
-+
- extern unsigned int blkdev_nr_zones(struct block_device *bdev);
- extern int blkdev_report_zones(struct block_device *bdev,
- 			       sector_t sector, struct blk_zone *zones,
+-#ifndef ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
+-# error	"You should define ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE for your platform"
+-#endif
+-#if ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
+-extern void bio_flush_dcache_pages(struct bio *bi);
+-#else
+-static inline void bio_flush_dcache_pages(struct bio *bi)
+-{
+-}
+-#endif
+-
+ extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
+ 			       struct bio *src, struct bvec_iter *src_iter);
+ extern void bio_copy_data(struct bio *dst, struct bio *src);
 -- 
 2.21.0
 
