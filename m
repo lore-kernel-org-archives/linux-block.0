@@ -2,145 +2,166 @@ Return-Path: <SRS0=TUEB=U2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8713BC004E6
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 20:40:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B72A5C4321A
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 22:28:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5F6342075E
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 20:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1561668026;
-	bh=xdji0cEGXBP2ove7oTOwQREopcU+eHPw+r9vsRTde84=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=WLgSXrYsA9o8/yFkM7jEOgH8CjvF+IhrEiLUBvi4H7bKBXIxHzOkUWmBGc8Cyw4Hh
-	 y3tOcapmtXszsF8OZPpmbXHH/IyAogr7301cc8qbPtQpiZs089F60ATROQc0ipNpZD
-	 Q/++mKcXpdjf8NWbfYpvSrcncy0dgKBiDkPENKJM=
+	by mail.kernel.org (Postfix) with ESMTP id 9058B2063F
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 22:28:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726506AbfF0UkA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jun 2019 16:40:00 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:37682 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726463AbfF0Uj7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jun 2019 16:39:59 -0400
-Received: by mail-qt1-f193.google.com with SMTP id y57so3995770qtk.4;
-        Thu, 27 Jun 2019 13:39:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=AMywy7ALEe2t0mNJ1TRlsbiFePyakRxLczRqN/PYLqo=;
-        b=R0VDCHQe0+ZVtPpHXez9PeF4IKo1fN/BqfuQtE78nnlRkmudxsQrwwOWjfkHoL5sKY
-         N0Ur2BTQ62Cs6+R/42uHdn0Pso0IGX3tHyknB/AXOI69hG7Dia8Zt6MDTUsuAefjmMua
-         Amli6efEBxs/T/55RsLg9AfCjqq/ZxPXniVAYKgayjMnyJWIPmEPOqwVIn/F0vmIt12g
-         ItguiZP9RbnGqEPMz7RF7EpZ1xZh69kPWN3TBaaQTg+oclUpMByWLcny5yyFLHYakIRo
-         /sz5Yggzahgf2fmL6TWYauIEGFlgYFtrTFbuRyUQZ2J5l9pb22W62vF4K1JIPvhGCC8N
-         dV3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=AMywy7ALEe2t0mNJ1TRlsbiFePyakRxLczRqN/PYLqo=;
-        b=Yv55e6iB+CMpiWQ4ku/2bCtuZhBT4z3fllqbDfTRJCvNxRT9h6Qi6Qbf/rYnXt3cu0
-         SLwU9fYMCgOJMM//z5w1bgZrD/GZzjmbA5bncowuyqtpr1td8AX411L3R63LVHFVOaEy
-         qQlrvdCbWKFIxHMIf3XHdUANnLRGVZKVzw+ynBgmQ2fVFQ4gq5tDWKBIPEXNxJ19rxkL
-         r3UDfWzunG7JdagFxvl+7oiNrzZehGTouWPgx/UzPumMNrOKkh/mYd4+AOtU/sRbsqkp
-         1HWXLgixibQSrx9aLogIgSlFhML0tK4xuEV5ePjpAjLR6NilocgFRSqyQCFson5voFSJ
-         Ow1g==
-X-Gm-Message-State: APjAAAVuFrYJVCDtMhFK+GLvwtqrBFNdon8eKgANelfXL77iqH3onePf
-        NrMshqCzB52rgI//dUApy0c=
-X-Google-Smtp-Source: APXvYqweuAgf29mRrCJ2Yfz4Yw3CYiuLfScCA+pqmcAtQjba1z/7eF/+dYrC95C0D1Syo5Ho5LZfgA==
-X-Received: by 2002:a0c:af18:: with SMTP id i24mr4742816qvc.115.1561667998558;
-        Thu, 27 Jun 2019 13:39:58 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::5a51])
-        by smtp.gmail.com with ESMTPSA id k55sm101322qtf.68.2019.06.27.13.39.57
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 27 Jun 2019 13:39:58 -0700 (PDT)
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk
-Cc:     jack@suse.cz, josef@toxicpanda.com, clm@fb.com, dsterba@suse.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, kernel-team@fb.com,
-        Tejun Heo <tj@kernel.org>
-Subject: [PATCH 1/5] cgroup, blkcg: Prepare some symbols for module and !CONFIG_CGROUP usages
-Date:   Thu, 27 Jun 2019 13:39:48 -0700
-Message-Id: <20190627203952.386785-2-tj@kernel.org>
+        id S1726506AbfF0W2u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jun 2019 18:28:50 -0400
+Received: from mga07.intel.com ([134.134.136.100]:12615 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726445AbfF0W2u (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Jun 2019 18:28:50 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Jun 2019 15:28:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,425,1557212400"; 
+   d="scan'208";a="361315641"
+Received: from revanth-x299-aorus-gaming-3-pro.lm.intel.com ([10.232.116.91])
+  by fmsmga006.fm.intel.com with ESMTP; 27 Jun 2019 15:28:49 -0700
+From:   Revanth Rajashekar <revanth.rajashekar@intel.com>
+To:     <linux-block@vger.kernel.org>
+Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
+        Scott Bauer <sbauer@plzdonthack.me>,
+        Revanth Rajashekar <revanth.rajashekar@intel.com>
+Subject: [PATCH] block: sed-opal: PSID reverttper capability
+Date:   Thu, 27 Jun 2019 16:30:02 -0600
+Message-Id: <20190627223002.8094-1-revanth.rajashekar@intel.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190627203952.386785-1-tj@kernel.org>
-References: <20190627203952.386785-1-tj@kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-btrfs is going to use css_put() and wbc helpers to improve cgroup
-writeback support.  Add dummy css_get() definition and export wbc
-helpers to prepare for module and !CONFIG_CGROUP builds.
+PSID is a 32 character password printed on the drive label,
+to prove its physical access. This PSID reverttper function
+is very useful to regain the control over the drive when it
+is locked and the user can no longer access it because of some
+failures. However, *all the data on the drive is completely
+erased*. This method is advisable only when the user is exhausted
+of all other recovery methods.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reported-by: kbuild test robot <lkp@intel.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
+PSID capabilities are described in:
+https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage-Opal_Feature_Set_PSID_v1.00_r1.00.pdf
+
+Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
 ---
- block/blk-cgroup.c     | 1 +
- fs/fs-writeback.c      | 3 +++
- include/linux/cgroup.h | 1 +
- 3 files changed, 5 insertions(+)
+ block/sed-opal.c              | 33 +++++++++++++++++++++++++++++----
+ include/linux/sed-opal.h      |  1 +
+ include/uapi/linux/sed-opal.h |  1 +
+ 3 files changed, 31 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 53b7bd4c7000..3319ab4ff262 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -47,6 +47,7 @@ struct blkcg blkcg_root;
- EXPORT_SYMBOL_GPL(blkcg_root);
- 
- struct cgroup_subsys_state * const blkcg_root_css = &blkcg_root.css;
-+EXPORT_SYMBOL_GPL(blkcg_root_css);
- 
- static struct blkcg_policy *blkcg_policy[BLKCG_MAX_POLS];
- 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 9ebfb1b28430..a8a40bc26c2f 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -270,6 +270,7 @@ void __inode_attach_wb(struct inode *inode, struct page *page)
- 	if (unlikely(cmpxchg(&inode->i_wb, NULL, wb)))
- 		wb_put(wb);
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index a46e8d13e16d..bb8ef7963d11 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -1307,6 +1307,7 @@ static int start_generic_opal_session(struct opal_dev *dev,
+ 		break;
+ 	case OPAL_ADMIN1_UID:
+ 	case OPAL_SID_UID:
++	case OPAL_PSID_UID:
+ 		add_token_u8(&err, dev, OPAL_STARTNAME);
+ 		add_token_u8(&err, dev, 0); /* HostChallenge */
+ 		add_token_bytestring(&err, dev, key, key_len);
+@@ -1367,6 +1368,16 @@ static int start_admin1LSP_opal_session(struct opal_dev *dev, void *data)
+ 					  key->key, key->key_len);
  }
-+EXPORT_SYMBOL_GPL(__inode_attach_wb);
- 
- /**
-  * locked_inode_to_wb_and_lock_list - determine a locked inode's wb and lock it
-@@ -582,6 +583,7 @@ void wbc_attach_and_unlock_inode(struct writeback_control *wbc,
- 	if (unlikely(wb_dying(wbc->wb)))
- 		inode_switch_wbs(inode, wbc->wb_id);
+
++static int start_PSID_opal_session(struct opal_dev *dev, void *data)
++{
++	const struct opal_key *okey = data;
++
++	return start_generic_opal_session(dev, OPAL_PSID_UID,
++					  OPAL_ADMINSP_UID,
++					  okey->key,
++					  okey->key_len);
++}
++
+ static int start_auth_opal_session(struct opal_dev *dev, void *data)
+ {
+ 	struct opal_session_info *session = data;
+@@ -2030,17 +2041,28 @@ static int opal_add_user_to_lr(struct opal_dev *dev,
+ 	return ret;
  }
-+EXPORT_SYMBOL_GPL(wbc_attach_and_unlock_inode);
- 
- /**
-  * wbc_detach_inode - disassociate wbc from inode and perform foreign detection
-@@ -701,6 +703,7 @@ void wbc_detach_inode(struct writeback_control *wbc)
- 	wb_put(wbc->wb);
- 	wbc->wb = NULL;
- }
-+EXPORT_SYMBOL_GPL(wbc_detach_inode);
- 
- /**
-  * wbc_account_io - account IO issued during writeback
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index c0077adeea83..da9d2afbcf0c 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -687,6 +687,7 @@ void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
- struct cgroup_subsys_state;
- struct cgroup;
- 
-+static inline void css_get(struct cgroup_subsys_state *css) {}
- static inline void css_put(struct cgroup_subsys_state *css) {}
- static inline int cgroup_attach_task_all(struct task_struct *from,
- 					 struct task_struct *t) { return 0; }
--- 
+
+-static int opal_reverttper(struct opal_dev *dev, struct opal_key *opal)
++static int opal_reverttper(struct opal_dev *dev, struct opal_key *opal, bool psid)
+ {
++	/* controller will terminate session */
+ 	const struct opal_step revert_steps[] = {
+ 		{ start_SIDASP_opal_session, opal },
+-		{ revert_tper, } /* controller will terminate session */
++		{ revert_tper, }
+ 	};
++	const struct opal_step psid_revert_steps[] = {
++		{ start_PSID_opal_session, opal },
++		{ revert_tper, }
++	};
++
+ 	int ret;
+
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = execute_steps(dev, revert_steps, ARRAY_SIZE(revert_steps));
++	if (psid)
++		ret = execute_steps(dev, psid_revert_steps,
++				    ARRAY_SIZE(psid_revert_steps));
++	else
++		ret = execute_steps(dev, revert_steps,
++				    ARRAY_SIZE(revert_steps));
+ 	mutex_unlock(&dev->dev_lock);
+
+ 	/*
+@@ -2280,7 +2302,7 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ 		ret = opal_activate_user(dev, p);
+ 		break;
+ 	case IOC_OPAL_REVERT_TPR:
+-		ret = opal_reverttper(dev, p);
++		ret = opal_reverttper(dev, p, false);
+ 		break;
+ 	case IOC_OPAL_LR_SETUP:
+ 		ret = opal_setup_locking_range(dev, p);
+@@ -2297,6 +2319,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ 	case IOC_OPAL_SECURE_ERASE_LR:
+ 		ret = opal_secure_erase_locking_range(dev, p);
+ 		break;
++	case IOC_OPAL_PSID_REVERT_TPR:
++		ret = opal_reverttper(dev, p, true);
++		break;
+ 	default:
+ 		break;
+ 	}
+diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
+index 3e76b6d7d97f..f03bbffd3281 100644
+--- a/include/linux/sed-opal.h
++++ b/include/linux/sed-opal.h
+@@ -39,6 +39,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
+ 	case IOC_OPAL_ENABLE_DISABLE_MBR:
+ 	case IOC_OPAL_ERASE_LR:
+ 	case IOC_OPAL_SECURE_ERASE_LR:
++	case IOC_OPAL_PSID_REVERT_TPR:
+ 		return true;
+ 	}
+ 	return false;
+diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
+index 33e53b80cd1f..7a03e5b4df6e 100644
+--- a/include/uapi/linux/sed-opal.h
++++ b/include/uapi/linux/sed-opal.h
+@@ -107,5 +107,6 @@ struct opal_mbr_data {
+ #define IOC_OPAL_ENABLE_DISABLE_MBR _IOW('p', 229, struct opal_mbr_data)
+ #define IOC_OPAL_ERASE_LR           _IOW('p', 230, struct opal_session_info)
+ #define IOC_OPAL_SECURE_ERASE_LR    _IOW('p', 231, struct opal_session_info)
++#define IOC_OPAL_PSID_REVERT_TPR    _IOW('p', 232, struct opal_key)
+
+ #endif /* _UAPI_SED_OPAL_H */
+--
 2.17.1
 
