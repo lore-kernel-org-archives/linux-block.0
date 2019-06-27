@@ -2,121 +2,123 @@ Return-Path: <SRS0=TUEB=U2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,HK_RANDOM_REPLYTO,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15AF0C48BD7
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 09:26:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E612C48BD6
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 09:29:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E82C920815
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 09:26:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E78420815
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jun 2019 09:29:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="HAurZVzY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726525AbfF0J0A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jun 2019 05:26:00 -0400
-Received: from cmccmta3.chinamobile.com ([221.176.66.81]:2112 "EHLO
-        cmccmta3.chinamobile.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726293AbfF0J0A (ORCPT
+        id S1726539AbfF0J3r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jun 2019 05:29:47 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:13113 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726315AbfF0J3r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jun 2019 05:26:00 -0400
-X-Greylist: delayed 558 seconds by postgrey-1.27 at vger.kernel.org; Thu, 27 Jun 2019 05:25:53 EDT
-Received: from spf.mail.chinamobile.com (unknown[172.16.121.9]) by rmmx-syy-dmz-app12-12012 (RichMail) with SMTP id 2eec5d148953baf-36dbd; Thu, 27 Jun 2019 17:16:03 +0800 (CST)
-X-RM-TRANSID: 2eec5d148953baf-36dbd
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG: 00000000
-Received: from localhost (unknown[112.25.65.41])
-        by rmsmtp-syy-appsvr05-12005 (RichMail) with SMTP id 2ee55d14895293b-651fd;
-        Thu, 27 Jun 2019 17:16:03 +0800 (CST)
-X-RM-TRANSID: 2ee55d14895293b-651fd
-Date:   Thu, 27 Jun 2019 17:16:12 +0800
-From:   Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 06/29] bcache: fix race in btree_flush_write()
-Message-ID: <20190627091611.GA15287@byw>
-Reply-To: baiyaowei@cmss.chinamobile.com
-References: <20190614131358.2771-1-colyli@suse.de>
- <20190614131358.2771-7-colyli@suse.de>
+        Thu, 27 Jun 2019 05:29:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1561627786; x=1593163786;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=d0tYtK7vudhZyD4L09P8fkQ18yATEivI05m+fQi8yGY=;
+  b=HAurZVzYeac3VVnchxxpIfN2sPEey+GKj2Tz7x3wwn2NNlom7cjo/rmk
+   axiXXMjDFXxMigvn6yvdHMF8xvDmgq4NhGpyP5VWzclwVAynIiNenPo7E
+   CtviA6BFhyHtVKZgOTgYw9tgh4mR3h6O0XfBXVND8g7XmJaeEHoQlMZ31
+   rL1iAUSrmnykQmYT/Vek/pBlULwbNysg9LSMSf5A26qek45gNrGEy8V5Q
+   XevgnjpC1YbaQyW+KfnGWC8qLFJwrZNu1O7NyTl2PgyqhwWP5xtphIxj5
+   9v9uMUIOAoCiqh6RaHHHAM+rk/HO5wPEkWgtOCHqgvnEmGTbERZsm/PJx
+   A==;
+X-IronPort-AV: E=Sophos;i="5.63,423,1557158400"; 
+   d="scan'208";a="116545294"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2019 17:29:46 +0800
+IronPort-SDR: Sr/3r/47QY8/XIvPcOmX1KqALZm5An/kAw5tSdGN28btPb8/KYTf6EWgn7DsVL8g3K11vYbGq9
+ kGIk45V7mS+leFFLMSEAA8VgoxQoB9Q/1j4WRO8v/di4DWW0oAlbKu780r1SKjycM/Rx/czLws
+ H9i1kAF/d/KsFhiznuwybsENRFALSUcF/jBz2U4faK2t+eOC3fs0jDNvzSWTFK9HTCF7aJsbHP
+ PW60Y1f+L3Jmx2JpAOJUCgz2xyZchFLUyncm7plRBvN4/l9T3elL6fpSCHl68gNFW1us7av9NM
+ Weq0qdDM0hzL4mPuQ+ldUMgS
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP; 27 Jun 2019 02:28:53 -0700
+IronPort-SDR: DDKDQDa+LwB4fBEwo933WrtHRUoBMZsdqpfblSycgdAFfi4LeXwGlOWWddXQzgAPowWWn4ha/c
+ N6cOSjgiRScuOyKW6kt+HqC2ILbV4F+iWuHnF6VTZeK4ottr6CCAtDlysg1gOnpaFSu3qdWEgK
+ +L+2OP4Z4w/3rzJPDVWV8P5kOw9WXFFgv6iAQgyPa4d/aM/iJvaUiW8VD2rff2mMRl3R/tDtOk
+ KSd5XFWvQa+d6+7YfhwYPPU4IQOcswdPKk+dcZrZN+z4/c/yPcn4Q7bvjNPVNJZDIuRiJjv3b3
+ sS0=
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip01.wdc.com with ESMTP; 27 Jun 2019 02:29:45 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH V5 0/3] Fix zone revalidation memory allocation failures
+Date:   Thu, 27 Jun 2019 18:29:41 +0900
+Message-Id: <20190627092944.20957-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190614131358.2771-7-colyli@suse.de>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 14, 2019 at 09:13:35PM +0800, Coly Li wrote:
-> There is a race between mca_reap(), btree_node_free() and journal code
-> btree_flush_write(), which results very rare and strange deadlock or
-> panic and are very hard to reproduce.
-> 
-> Let me explain how the race happens. In btree_flush_write() one btree
-> node with oldest journal pin is selected, then it is flushed to cache
-> device, the select-and-flush is a two steps operation. Between these two
-> steps, there are something may happen inside the race window,
-> - The selected btree node was reaped by mca_reap() and allocated to
->   other requesters for other btree node.
-> - The slected btree node was selected, flushed and released by mca
->   shrink callback bch_mca_scan().
-> When btree_flush_write() tries to flush the selected btree node, firstly
-> b->write_lock is held by mutex_lock(). If the race happens and the
-> memory of selected btree node is allocated to other btree node, if that
-> btree node's write_lock is held already, a deadlock very probably
-> happens here. A worse case is the memory of the selected btree node is
-> released, then all references to this btree node (e.g. b->write_lock)
-> will trigger NULL pointer deference panic.
-> 
-> This race was introduced in commit cafe56359144 ("bcache: A block layer
-> cache"), and enlarged by commit c4dc2497d50d ("bcache: fix high CPU
-> occupancy during journal"), which selected 128 btree nodes and flushed
-> them one-by-one in a quite long time period.
-> 
-> Such race is not easy to reproduce before. On a Lenovo SR650 server with
-> 48 Xeon cores, and configure 1 NVMe SSD as cache device, a MD raid0
-> device assembled by 3 NVMe SSDs as backing device, this race can be
-> observed around every 10,000 times btree_flush_write() gets called. Both
-> deadlock and kernel panic all happened as aftermath of the race.
-> 
-> The idea of the fix is to add a btree flag BTREE_NODE_journal_flush. It
-> is set when selecting btree nodes, and cleared after btree nodes
-> flushed. Then when mca_reap() selects a btree node with this bit set,
-> this btree node will be skipped. Since mca_reap() only reaps btree node
-> without BTREE_NODE_journal_flush flag, such race is avoided.
-> 
-> Once corner case should be noticed, that is btree_node_free(). It might
-> be called in some error handling code path. For example the following
-> code piece from btree_split(),
-> 	2149 err_free2:
-> 	2150         bkey_put(b->c, &n2->key);
-> 	2151         btree_node_free(n2);
-> 	2152         rw_unlock(true, n2);
-> 	2153 err_free1:
-> 	2154         bkey_put(b->c, &n1->key);
-> 	2155         btree_node_free(n1);
-> 	2156         rw_unlock(true, n1);
-> At line 2151 and 2155, the btree node n2 and n1 are released without
-> mac_reap(), so BTREE_NODE_journal_flush also needs to be checked here.
-> If btree_node_free() is called directly in such error handling path,
-> and the selected btree node has BTREE_NODE_journal_flush bit set, just
-> wait for 1 jiffy and retry again. In this case this btree node won't
-> be skipped, just retry until the BTREE_NODE_journal_flush bit cleared,
-> and free the btree node memory.
-> 
-> Wait for 1 jiffy inside btree_node_free() does not hurt too much
-> performance here, the reasons are,
-> - Error handling code path is not frequently executed, and the race
->   inside this cold path should be very rare. If the very rare race
->   happens in the cold code path, waiting 1 jiffy should be acceptible.
-> - If bree_node_free() is called inside mca_reap(), it means the bit
->   BTREE_NODE_journal_flush is checked already, no wait will happen here.
-> 
-> Beside the above fix, the way to select flushing btree nodes is also
-> changed in this patch. Let me explain what changes in this patch.
+This series addresses a reccuring problem with zone revalidation
+failures observed during extensive testing with memory constrained
+system and device hot-plugging.
 
-Then this change should be split into another patch. :)
+The problem source is failure to allocate large memory areas with
+alloc_pages() or kmalloc() in blk_revalidate_disk_zones() to store the
+disk array of zones (struct blk_zone) or in sd_zbc_report_zones() for
+the report zones command reply buffer.
 
-> 
+The solution proposed here is to:
+1) limit the number of zones to be reported with a single report zones
+command execution, and
+2) Use vmalloc to allocate large-ish arrays and buffers in place of
+alloc_pages() or kmalloc().
 
+With these changes, tests do not show any zone revalidation failures
+while not impacting the time taken for a disk zone inspection during
+device scan and revalidation.
+
+Changes from v4:
+* bio_copy_kern does not use the vmalloc buffer for IO so does not
+  need flush/invalidate_kernel_vmap_range() of the buffer.
+
+Changes from v3:
+* Reworked use of flush_kernel_vmap_range() and
+  invalidate_kernel_vmap_range() to contain the calls within bio.c,
+  transparently to the user of bio_map_kern().
+* Add similar support to bio_copy_kern().
+
+Changes from v2:
+* Move invalidate_kernel_vmap_range() of vmalloc-ed buffer to sd_zbc.c
+  in patch 2, after completion of scsi_execute_req().
+* In patch 2, add flush_kernel_vmap_range() before scsi_execute_req().
+
+Changes from V1:
+* Added call to invalidate_kernel_vmap_range() for vmalloc-ed buffers
+  in patch 1.
+* Fixed patch 2 compilation error with Sparc64 (kbuild robot)
+
+Damien Le Moal (3):
+  block: Allow mapping of vmalloc-ed buffers
+  sd_zbc: Fix report zones buffer allocation
+  block: Limit zone array allocation size
+
+ block/bio.c            | 29 ++++++++++++++-
+ block/blk-zoned.c      | 29 +++++++--------
+ drivers/scsi/sd_zbc.c  | 83 +++++++++++++++++++++++++++++++-----------
+ include/linux/blkdev.h |  5 +++
+ 4 files changed, 108 insertions(+), 38 deletions(-)
+
+-- 
+2.21.0
 
