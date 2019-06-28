@@ -4,85 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 035FEC5B57B
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 12:31:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0C9C5B57A
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 12:31:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AFE672133F
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 12:31:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C90E3215EA
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 12:31:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1561725082;
-	bh=Sa/qTDZj/xRoiaZCg+mRibNrKJhgXoExCZJ0DKFmcqg=;
+	s=default; t=1561725114;
+	bh=RlCRR8/FGyL9fyHTy52nSy3AX9emvDcBrsSnFpE4dEI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=zw6iwJn/byk1l2JCzIxa0sOKnE0Ht3Fhg/ob5bxHGST+MiPlQupLFxBgVjE1MyKDq
-	 Sq5HAbXnlgMH3VilYMwV4yAyDuKaUTg6Jdl9wFIjXq9epn7JeRrleacxj7s+RD19Pj
-	 gtb/ivzq/9kotzmw7Qd+TxrajP9P6IyuwpAboAe8=
+	b=tE607f1d17uqZSIPKvgQV4usa9zaUyR3m4mSSGKdaVizJDRgBvHGjm5hC39n3d0mF
+	 n8knDaZC/GJdtWyGxm/NdXZ5pBM5J/XpjHxfQrC6/D0gRNVhrvfZtvH08C2JXO51W4
+	 TrH+BwUcVn0cz5Q+IThxiGl60te2BwykoVA/WFMo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726619AbfF1MbH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jun 2019 08:31:07 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:39816 "EHLO
+        id S1726789AbfF1Mbr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jun 2019 08:31:47 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:39572 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727180AbfF1Mas (ORCPT
+        with ESMTP id S1727095AbfF1Map (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jun 2019 08:30:48 -0400
+        Fri, 28 Jun 2019 08:30:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=t2SlvlYO6vN68ooBWcFQh21aLIzOtka8Klr/M76soBU=; b=GPcFupf5dzfyT165XdM5l7atm7
-        NpunVR4RVyW430xRFKelq2/bs7dtPeXB4qL/NAe4wUu90z3hkDS/UIfIGdcLRgNR2UNHiStAIHDWk
-        b5ipZ/rh5zP1MANqlxnbENYD/fVy7fINuTz8hI/7Xxd5uRjSAc/v12+G6v77fOA6pvH51AXLu2qLr
-        m1H6iZl3askKHReK+jify63bqpxZ2aZmSjKnEi33cR7epWYwKUNyxM6iw0XhbwlMf1Q1R8eIlnGAY
-        g2vrko1I5YdrDNVcbwUdqvarlbeC++auL6Ldh/LGX2VSxCdN+UgvNr4MOiHvRW17Y0Xbs+VJlMxkY
-        FFszEwYQ==;
+        bh=NQrLAHec6ZFSeCAw7w8J5S1GYNaZWnqjTjdv38X/dqo=; b=FBHE1tLP1XqPvu9XV1YZSBv0AA
+        1BX6NruIUfDALUsI/yFKXfeP23MtTtA1djhx1azVtguWE/hrRQNMTyDcq+VRq2pqHjCE/MZz+zxOH
+        /YNqiZixsQv5Th8/cuG62h0I61yKT0XvieG+UtWaO4/GsmxXey4EfOio3XWFR42puI3Q6w7Gtrkjy
+        ch0KPxpgSi+t9C6H3CVZjw2nlTZSDW4Tcv/R1nPvOESMHqHZ7TftSgL1TrITKfr1mQcY7Jpc6SW5r
+        o7hKUcrIG23NP1u2J9+q/dmWs2RXZ0T6qTlX2IfzYSwmKtdigkkprhR5C+yccbqrMEB7oeDPcV1S4
+        rvrauXCw==;
 Received: from [186.213.242.156] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hgq1U-00055h-OB; Fri, 28 Jun 2019 12:30:37 +0000
+        id 1hgq1U-00055P-Fc; Fri, 28 Jun 2019 12:30:36 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1hgq1S-0005TB-Lz; Fri, 28 Jun 2019 09:30:34 -0300
+        id 1hgq1S-0005SR-EJ; Fri, 28 Jun 2019 09:30:34 -0300
 From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
 To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
         Mauro Carvalho Chehab <mchehab@infradead.org>,
         linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Willy Tarreau <willy@haproxy.com>,
-        Ksenija Stanojevic <ksenija.stanojevic@gmail.com>,
-        "Richard Russon (FlatCap)" <ldm@flatcap.org>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Martin Mares <mj@ucw.cz>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Russell King <linux@armlinux.org.uk>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        Helge Deller <deller@gmx.de>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Rich Felker <dalias@libc.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-efi@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, linux-rtc@vger.kernel.org,
-        linux-video@atrey.karlin.mff.cuni.cz,
-        dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-parisc@vger.kernel.org,
-        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 28/39] docs: admin-guide: add a series of orphaned documents
-Date:   Fri, 28 Jun 2019 09:30:21 -0300
-Message-Id: <7ee0e33575633f689203f582259c2cbdce477176.1561724493.git.mchehab+samsung@kernel.org>
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Tim Waugh <tim@cyberelk.net>, Jens Axboe <axboe@kernel.dk>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Jiri Kosina <jikos@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-kselftest@vger.kernel.org
+Subject: [PATCH 19/39] docs: blockdev: add it to the admin-guide
+Date:   Fri, 28 Jun 2019 09:30:12 -0300
+Message-Id: <a4437f5438f2ce9e220d0910a4d98a832810479b.1561724493.git.mchehab+samsung@kernel.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <cover.1561724493.git.mchehab+samsung@kernel.org>
 References: <cover.1561724493.git.mchehab+samsung@kernel.org>
@@ -93,543 +73,358 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are lots of documents that belong to the admin-guide but
-are on random places (most under Documentation root dir).
-
-Move them to the admin guide.
+The blockdev book basically contains user-faced documentation.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
 ---
- Documentation/ABI/stable/sysfs-devices-node     |  2 +-
- Documentation/ABI/testing/procfs-diskstats      |  2 +-
- Documentation/ABI/testing/sysfs-block           |  2 +-
- .../ABI/testing/sysfs-devices-system-cpu        |  4 ++--
- .../{btmrvl.txt => admin-guide/btmrvl.rst}      |  0
- .../clearing-warn-once.rst}                     |  0
- .../{cpu-load.txt => admin-guide/cpu-load.rst}  |  0
- .../cputopology.rst}                            |  0
- .../admin-guide/device-mapper/statistics.rst    |  4 ++--
- .../{efi-stub.txt => admin-guide/efi-stub.rst}  |  0
- .../{highuid.txt => admin-guide/highuid.rst}    |  0
- Documentation/admin-guide/hw-vuln/l1tf.rst      |  2 +-
- .../hw_random.rst}                              |  0
- Documentation/admin-guide/index.rst             | 17 +++++++++++++++++
- .../{iostats.txt => admin-guide/iostats.rst}    |  0
- Documentation/admin-guide/kernel-parameters.txt |  2 +-
- .../kernel-per-CPU-kthreads.rst}                |  0
- .../lcd-panel-cgram.rst                         |  2 --
- Documentation/{ldm.txt => admin-guide/ldm.rst}  |  0
- .../lockup-watchdogs.rst}                       |  0
- .../mm/cma_debugfs.rst}                         |  2 --
- Documentation/admin-guide/mm/index.rst          |  1 +
- .../{numastat.txt => admin-guide/numastat.rst}  |  0
- Documentation/{pnp.txt => admin-guide/pnp.rst}  |  0
- Documentation/{rtc.txt => admin-guide/rtc.rst}  |  0
- .../{svga.txt => admin-guide/svga.rst}          |  0
- Documentation/admin-guide/sysctl/kernel.rst     |  2 +-
- .../video-output.rst}                           |  0
- Documentation/fb/vesafb.rst                     |  2 +-
- Documentation/x86/topology.rst                  |  2 +-
- MAINTAINERS                                     | 12 ++++++------
- arch/arm/Kconfig                                |  2 +-
- arch/parisc/Kconfig                             |  2 +-
- arch/sh/Kconfig                                 |  2 +-
- arch/sparc/Kconfig                              |  2 +-
- arch/x86/Kconfig                                |  4 ++--
- block/partitions/Kconfig                        |  2 +-
- drivers/char/Kconfig                            |  4 ++--
- drivers/char/hw_random/core.c                   |  2 +-
- include/linux/hw_random.h                       |  2 +-
- 40 files changed, 47 insertions(+), 33 deletions(-)
- rename Documentation/{btmrvl.txt => admin-guide/btmrvl.rst} (100%)
- rename Documentation/{clearing-warn-once.txt => admin-guide/clearing-warn-once.rst} (100%)
- rename Documentation/{cpu-load.txt => admin-guide/cpu-load.rst} (100%)
- rename Documentation/{cputopology.txt => admin-guide/cputopology.rst} (100%)
- rename Documentation/{efi-stub.txt => admin-guide/efi-stub.rst} (100%)
- rename Documentation/{highuid.txt => admin-guide/highuid.rst} (100%)
- rename Documentation/{hw_random.txt => admin-guide/hw_random.rst} (100%)
- rename Documentation/{iostats.txt => admin-guide/iostats.rst} (100%)
- rename Documentation/{kernel-per-CPU-kthreads.txt => admin-guide/kernel-per-CPU-kthreads.rst} (100%)
- rename Documentation/{auxdisplay => admin-guide}/lcd-panel-cgram.rst (99%)
- rename Documentation/{ldm.txt => admin-guide/ldm.rst} (100%)
- rename Documentation/{lockup-watchdogs.txt => admin-guide/lockup-watchdogs.rst} (100%)
- rename Documentation/{cma/debugfs.rst => admin-guide/mm/cma_debugfs.rst} (98%)
- rename Documentation/{numastat.txt => admin-guide/numastat.rst} (100%)
- rename Documentation/{pnp.txt => admin-guide/pnp.rst} (100%)
- rename Documentation/{rtc.txt => admin-guide/rtc.rst} (100%)
- rename Documentation/{svga.txt => admin-guide/svga.rst} (100%)
- rename Documentation/{video-output.txt => admin-guide/video-output.rst} (100%)
+ .../blockdev/drbd/DRBD-8.3-data-packets.svg    |  0
+ .../blockdev/drbd/DRBD-data-packets.svg        |  0
+ .../blockdev/drbd/conn-states-8.dot            |  0
+ .../blockdev/drbd/data-structure-v9.rst        |  0
+ .../blockdev/drbd/disk-states-8.dot            |  0
+ .../drbd/drbd-connection-state-overview.dot    |  0
+ .../blockdev/drbd/figures.rst                  |  0
+ .../{ => admin-guide}/blockdev/drbd/index.rst  |  0
+ .../blockdev/drbd/node-states-8.dot            |  1 -
+ .../{ => admin-guide}/blockdev/floppy.rst      |  0
+ .../{ => admin-guide}/blockdev/index.rst       |  2 --
+ .../{ => admin-guide}/blockdev/nbd.rst         |  0
+ .../{ => admin-guide}/blockdev/paride.rst      |  0
+ .../{ => admin-guide}/blockdev/ramdisk.rst     |  0
+ .../{ => admin-guide}/blockdev/zram.rst        |  0
+ Documentation/admin-guide/index.rst            |  1 +
+ .../admin-guide/kernel-parameters.txt          | 18 +++++++++---------
+ MAINTAINERS                                    | 10 +++++-----
+ drivers/block/Kconfig                          |  8 ++++----
+ drivers/block/floppy.c                         |  2 +-
+ drivers/block/zram/Kconfig                     |  6 +++---
+ tools/testing/selftests/zram/README            |  2 +-
+ 22 files changed, 24 insertions(+), 26 deletions(-)
+ rename Documentation/{ => admin-guide}/blockdev/drbd/DRBD-8.3-data-packets.svg (100%)
+ rename Documentation/{ => admin-guide}/blockdev/drbd/DRBD-data-packets.svg (100%)
+ rename Documentation/{ => admin-guide}/blockdev/drbd/conn-states-8.dot (100%)
+ rename Documentation/{ => admin-guide}/blockdev/drbd/data-structure-v9.rst (100%)
+ rename Documentation/{ => admin-guide}/blockdev/drbd/disk-states-8.dot (100%)
+ rename Documentation/{ => admin-guide}/blockdev/drbd/drbd-connection-state-overview.dot (100%)
+ rename Documentation/{ => admin-guide}/blockdev/drbd/figures.rst (100%)
+ rename Documentation/{ => admin-guide}/blockdev/drbd/index.rst (100%)
+ rename Documentation/{ => admin-guide}/blockdev/drbd/node-states-8.dot (99%)
+ rename Documentation/{ => admin-guide}/blockdev/floppy.rst (100%)
+ rename Documentation/{ => admin-guide}/blockdev/index.rst (94%)
+ rename Documentation/{ => admin-guide}/blockdev/nbd.rst (100%)
+ rename Documentation/{ => admin-guide}/blockdev/paride.rst (100%)
+ rename Documentation/{ => admin-guide}/blockdev/ramdisk.rst (100%)
+ rename Documentation/{ => admin-guide}/blockdev/zram.rst (100%)
 
-diff --git a/Documentation/ABI/stable/sysfs-devices-node b/Documentation/ABI/stable/sysfs-devices-node
-index f7ce68fbd4b9..df8413cf1468 100644
---- a/Documentation/ABI/stable/sysfs-devices-node
-+++ b/Documentation/ABI/stable/sysfs-devices-node
-@@ -61,7 +61,7 @@ Date:		October 2002
- Contact:	Linux Memory Management list <linux-mm@kvack.org>
- Description:
- 		The node's hit/miss statistics, in units of pages.
--		See Documentation/numastat.txt
-+		See Documentation/admin-guide/numastat.rst
- 
- What:		/sys/devices/system/node/nodeX/distance
- Date:		October 2002
-diff --git a/Documentation/ABI/testing/procfs-diskstats b/Documentation/ABI/testing/procfs-diskstats
-index abac31d216de..2c44b4f1b060 100644
---- a/Documentation/ABI/testing/procfs-diskstats
-+++ b/Documentation/ABI/testing/procfs-diskstats
-@@ -29,4 +29,4 @@ Description:
- 		17 - sectors discarded
- 		18 - time spent discarding
- 
--		For more details refer to Documentation/iostats.txt
-+		For more details refer to Documentation/admin-guide/iostats.rst
-diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
-index dfad7427817c..f8c7c7126bb1 100644
---- a/Documentation/ABI/testing/sysfs-block
-+++ b/Documentation/ABI/testing/sysfs-block
-@@ -15,7 +15,7 @@ Description:
- 		 9 - I/Os currently in progress
- 		10 - time spent doing I/Os (ms)
- 		11 - weighted time spent doing I/Os (ms)
--		For more details refer Documentation/iostats.txt
-+		For more details refer Documentation/admin-guide/iostats.rst
- 
- 
- What:		/sys/block/<disk>/<part>/stat
-diff --git a/Documentation/ABI/testing/sysfs-devices-system-cpu b/Documentation/ABI/testing/sysfs-devices-system-cpu
-index d404603c6b52..5f7d7b14fa44 100644
---- a/Documentation/ABI/testing/sysfs-devices-system-cpu
-+++ b/Documentation/ABI/testing/sysfs-devices-system-cpu
-@@ -34,7 +34,7 @@ Description:	CPU topology files that describe kernel limits related to
- 		present: cpus that have been identified as being present in
- 		the system.
- 
--		See Documentation/cputopology.txt for more information.
-+		See Documentation/admin-guide/cputopology.rst for more information.
- 
- 
- What:		/sys/devices/system/cpu/probe
-@@ -103,7 +103,7 @@ Description:	CPU topology files that describe a logical CPU's relationship
- 		thread_siblings_list: human-readable list of cpu#'s hardware
- 		threads within the same core as cpu#
- 
--		See Documentation/cputopology.txt for more information.
-+		See Documentation/admin-guide/cputopology.rst for more information.
- 
- 
- What:		/sys/devices/system/cpu/cpuidle/current_driver
-diff --git a/Documentation/btmrvl.txt b/Documentation/admin-guide/btmrvl.rst
+diff --git a/Documentation/blockdev/drbd/DRBD-8.3-data-packets.svg b/Documentation/admin-guide/blockdev/drbd/DRBD-8.3-data-packets.svg
 similarity index 100%
-rename from Documentation/btmrvl.txt
-rename to Documentation/admin-guide/btmrvl.rst
-diff --git a/Documentation/clearing-warn-once.txt b/Documentation/admin-guide/clearing-warn-once.rst
+rename from Documentation/blockdev/drbd/DRBD-8.3-data-packets.svg
+rename to Documentation/admin-guide/blockdev/drbd/DRBD-8.3-data-packets.svg
+diff --git a/Documentation/blockdev/drbd/DRBD-data-packets.svg b/Documentation/admin-guide/blockdev/drbd/DRBD-data-packets.svg
 similarity index 100%
-rename from Documentation/clearing-warn-once.txt
-rename to Documentation/admin-guide/clearing-warn-once.rst
-diff --git a/Documentation/cpu-load.txt b/Documentation/admin-guide/cpu-load.rst
+rename from Documentation/blockdev/drbd/DRBD-data-packets.svg
+rename to Documentation/admin-guide/blockdev/drbd/DRBD-data-packets.svg
+diff --git a/Documentation/blockdev/drbd/conn-states-8.dot b/Documentation/admin-guide/blockdev/drbd/conn-states-8.dot
 similarity index 100%
-rename from Documentation/cpu-load.txt
-rename to Documentation/admin-guide/cpu-load.rst
-diff --git a/Documentation/cputopology.txt b/Documentation/admin-guide/cputopology.rst
+rename from Documentation/blockdev/drbd/conn-states-8.dot
+rename to Documentation/admin-guide/blockdev/drbd/conn-states-8.dot
+diff --git a/Documentation/blockdev/drbd/data-structure-v9.rst b/Documentation/admin-guide/blockdev/drbd/data-structure-v9.rst
 similarity index 100%
-rename from Documentation/cputopology.txt
-rename to Documentation/admin-guide/cputopology.rst
-diff --git a/Documentation/admin-guide/device-mapper/statistics.rst b/Documentation/admin-guide/device-mapper/statistics.rst
-index 3d80a9f850cc..41ded0bc5933 100644
---- a/Documentation/admin-guide/device-mapper/statistics.rst
-+++ b/Documentation/admin-guide/device-mapper/statistics.rst
-@@ -13,7 +13,7 @@ the range specified.
- 
- The I/O statistics counters for each step-sized area of a region are
- in the same format as `/sys/block/*/stat` or `/proc/diskstats` (see:
--Documentation/iostats.txt).  But two extra counters (12 and 13) are
-+Documentation/admin-guide/iostats.rst).  But two extra counters (12 and 13) are
- provided: total time spent reading and writing.  When the histogram
- argument is used, the 14th parameter is reported that represents the
- histogram of latencies.  All these counters may be accessed by sending
-@@ -151,7 +151,7 @@ Messages
- 	  The first 11 counters have the same meaning as
- 	  `/sys/block/*/stat or /proc/diskstats`.
- 
--	  Please refer to Documentation/iostats.txt for details.
-+	  Please refer to Documentation/admin-guide/iostats.rst for details.
- 
- 	  1. the number of reads completed
- 	  2. the number of reads merged
-diff --git a/Documentation/efi-stub.txt b/Documentation/admin-guide/efi-stub.rst
+rename from Documentation/blockdev/drbd/data-structure-v9.rst
+rename to Documentation/admin-guide/blockdev/drbd/data-structure-v9.rst
+diff --git a/Documentation/blockdev/drbd/disk-states-8.dot b/Documentation/admin-guide/blockdev/drbd/disk-states-8.dot
 similarity index 100%
-rename from Documentation/efi-stub.txt
-rename to Documentation/admin-guide/efi-stub.rst
-diff --git a/Documentation/highuid.txt b/Documentation/admin-guide/highuid.rst
+rename from Documentation/blockdev/drbd/disk-states-8.dot
+rename to Documentation/admin-guide/blockdev/drbd/disk-states-8.dot
+diff --git a/Documentation/blockdev/drbd/drbd-connection-state-overview.dot b/Documentation/admin-guide/blockdev/drbd/drbd-connection-state-overview.dot
 similarity index 100%
-rename from Documentation/highuid.txt
-rename to Documentation/admin-guide/highuid.rst
-diff --git a/Documentation/admin-guide/hw-vuln/l1tf.rst b/Documentation/admin-guide/hw-vuln/l1tf.rst
-index 656aee262e23..f83212fae4d5 100644
---- a/Documentation/admin-guide/hw-vuln/l1tf.rst
-+++ b/Documentation/admin-guide/hw-vuln/l1tf.rst
-@@ -241,7 +241,7 @@ Guest mitigation mechanisms
-    For further information about confining guests to a single or to a group
-    of cores consult the cpusets documentation:
- 
--   https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.rst
-+   https://www.kernel.org/doc/Documentation/admin-guide/cgroup-v1/cpusets.rst
- 
- .. _interrupt_isolation:
- 
-diff --git a/Documentation/hw_random.txt b/Documentation/admin-guide/hw_random.rst
+rename from Documentation/blockdev/drbd/drbd-connection-state-overview.dot
+rename to Documentation/admin-guide/blockdev/drbd/drbd-connection-state-overview.dot
+diff --git a/Documentation/blockdev/drbd/figures.rst b/Documentation/admin-guide/blockdev/drbd/figures.rst
 similarity index 100%
-rename from Documentation/hw_random.txt
-rename to Documentation/admin-guide/hw_random.rst
+rename from Documentation/blockdev/drbd/figures.rst
+rename to Documentation/admin-guide/blockdev/drbd/figures.rst
+diff --git a/Documentation/blockdev/drbd/index.rst b/Documentation/admin-guide/blockdev/drbd/index.rst
+similarity index 100%
+rename from Documentation/blockdev/drbd/index.rst
+rename to Documentation/admin-guide/blockdev/drbd/index.rst
+diff --git a/Documentation/blockdev/drbd/node-states-8.dot b/Documentation/admin-guide/blockdev/drbd/node-states-8.dot
+similarity index 99%
+rename from Documentation/blockdev/drbd/node-states-8.dot
+rename to Documentation/admin-guide/blockdev/drbd/node-states-8.dot
+index 4a2b00c23547..bfa54e1f8016 100644
+--- a/Documentation/blockdev/drbd/node-states-8.dot
++++ b/Documentation/admin-guide/blockdev/drbd/node-states-8.dot
+@@ -11,4 +11,3 @@ digraph peer_states {
+ 	Unknown   -> Primary           [ label = "connected" ]
+ 	Unknown   -> Secondary         [ label = "connected" ]
+ }
+-
+diff --git a/Documentation/blockdev/floppy.rst b/Documentation/admin-guide/blockdev/floppy.rst
+similarity index 100%
+rename from Documentation/blockdev/floppy.rst
+rename to Documentation/admin-guide/blockdev/floppy.rst
+diff --git a/Documentation/blockdev/index.rst b/Documentation/admin-guide/blockdev/index.rst
+similarity index 94%
+rename from Documentation/blockdev/index.rst
+rename to Documentation/admin-guide/blockdev/index.rst
+index a9af6ed8b4aa..20a738d9d047 100644
+--- a/Documentation/blockdev/index.rst
++++ b/Documentation/admin-guide/blockdev/index.rst
+@@ -1,5 +1,3 @@
+-:orphan:
+-
+ ===========================
+ The Linux RapidIO Subsystem
+ ===========================
+diff --git a/Documentation/blockdev/nbd.rst b/Documentation/admin-guide/blockdev/nbd.rst
+similarity index 100%
+rename from Documentation/blockdev/nbd.rst
+rename to Documentation/admin-guide/blockdev/nbd.rst
+diff --git a/Documentation/blockdev/paride.rst b/Documentation/admin-guide/blockdev/paride.rst
+similarity index 100%
+rename from Documentation/blockdev/paride.rst
+rename to Documentation/admin-guide/blockdev/paride.rst
+diff --git a/Documentation/blockdev/ramdisk.rst b/Documentation/admin-guide/blockdev/ramdisk.rst
+similarity index 100%
+rename from Documentation/blockdev/ramdisk.rst
+rename to Documentation/admin-guide/blockdev/ramdisk.rst
+diff --git a/Documentation/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
+similarity index 100%
+rename from Documentation/blockdev/zram.rst
+rename to Documentation/admin-guide/blockdev/zram.rst
 diff --git a/Documentation/admin-guide/index.rst b/Documentation/admin-guide/index.rst
-index d5064f1802c1..2c20607e90cd 100644
+index 65e821a03aca..c073af461cdf 100644
 --- a/Documentation/admin-guide/index.rst
 +++ b/Documentation/admin-guide/index.rst
-@@ -84,8 +84,25 @@ configure specific aspects of kernel behavior to your liking.
-    perf-security
-    acpi/index
-    aoe/index
-+   btmrvl
-+   clearing-warn-once
-+   cpu-load
-+   cputopology
-    device-mapper/index
-+   efi-stub
-+   highuid
-+   hw_random
-+   iostats
-+   kernel-per-CPU-kthreads
-    laptops/index
-+   lcd-panel-cgram
-+   ldm
-+   lockup-watchdogs
-+   numastat
-+   pnp
-+   rtc
-+   svga
-+   video-output
- 
- .. only::  subproject and html
- 
-diff --git a/Documentation/iostats.txt b/Documentation/admin-guide/iostats.rst
-similarity index 100%
-rename from Documentation/iostats.txt
-rename to Documentation/admin-guide/iostats.rst
+@@ -73,6 +73,7 @@ configure specific aspects of kernel behavior to your liking.
+    java
+    ras
+    bcache
++   blockdev/index
+    ext4
+    pm/index
+    thunderbolt
 diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index e833133c8897..713d6f378fbe 100644
+index 9b535c0e22f3..49ad034c4675 100644
 --- a/Documentation/admin-guide/kernel-parameters.txt
 +++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -5092,7 +5092,7 @@
+@@ -1249,7 +1249,7 @@
+ 			See also Documentation/fault-injection/.
  
- 	vga=		[BOOT,X86-32] Select a particular video mode
- 			See Documentation/x86/boot.rst and
--			Documentation/svga.txt.
-+			Documentation/admin-guide/svga.rst.
- 			Use vga=ask for menu.
- 			This is actually a boot loader parameter; the value is
- 			passed to the kernel using a special protocol.
-diff --git a/Documentation/kernel-per-CPU-kthreads.txt b/Documentation/admin-guide/kernel-per-CPU-kthreads.rst
-similarity index 100%
-rename from Documentation/kernel-per-CPU-kthreads.txt
-rename to Documentation/admin-guide/kernel-per-CPU-kthreads.rst
-diff --git a/Documentation/auxdisplay/lcd-panel-cgram.rst b/Documentation/admin-guide/lcd-panel-cgram.rst
-similarity index 99%
-rename from Documentation/auxdisplay/lcd-panel-cgram.rst
-rename to Documentation/admin-guide/lcd-panel-cgram.rst
-index dfef50286018..a3eb00c62f53 100644
---- a/Documentation/auxdisplay/lcd-panel-cgram.rst
-+++ b/Documentation/admin-guide/lcd-panel-cgram.rst
-@@ -1,5 +1,3 @@
--:orphan:
--
- ======================================
- Parallel port LCD/Keypad Panel support
- ======================================
-diff --git a/Documentation/ldm.txt b/Documentation/admin-guide/ldm.rst
-similarity index 100%
-rename from Documentation/ldm.txt
-rename to Documentation/admin-guide/ldm.rst
-diff --git a/Documentation/lockup-watchdogs.txt b/Documentation/admin-guide/lockup-watchdogs.rst
-similarity index 100%
-rename from Documentation/lockup-watchdogs.txt
-rename to Documentation/admin-guide/lockup-watchdogs.rst
-diff --git a/Documentation/cma/debugfs.rst b/Documentation/admin-guide/mm/cma_debugfs.rst
-similarity index 98%
-rename from Documentation/cma/debugfs.rst
-rename to Documentation/admin-guide/mm/cma_debugfs.rst
-index 518fe401b5ee..4e06ffabd78a 100644
---- a/Documentation/cma/debugfs.rst
-+++ b/Documentation/admin-guide/mm/cma_debugfs.rst
-@@ -1,5 +1,3 @@
--:orphan:
--
- =====================
- CMA Debugfs Interface
- =====================
-diff --git a/Documentation/admin-guide/mm/index.rst b/Documentation/admin-guide/mm/index.rst
-index 5f61a6c429e0..11db46448354 100644
---- a/Documentation/admin-guide/mm/index.rst
-+++ b/Documentation/admin-guide/mm/index.rst
-@@ -26,6 +26,7 @@ the Linux memory management.
-    :maxdepth: 1
+ 	floppy=		[HW]
+-			See Documentation/blockdev/floppy.rst.
++			See Documentation/admin-guide/blockdev/floppy.rst.
  
-    concepts
-+   cma_debugfs
-    hugetlbpage
-    idle_page_tracking
-    ksm
-diff --git a/Documentation/numastat.txt b/Documentation/admin-guide/numastat.rst
-similarity index 100%
-rename from Documentation/numastat.txt
-rename to Documentation/admin-guide/numastat.rst
-diff --git a/Documentation/pnp.txt b/Documentation/admin-guide/pnp.rst
-similarity index 100%
-rename from Documentation/pnp.txt
-rename to Documentation/admin-guide/pnp.rst
-diff --git a/Documentation/rtc.txt b/Documentation/admin-guide/rtc.rst
-similarity index 100%
-rename from Documentation/rtc.txt
-rename to Documentation/admin-guide/rtc.rst
-diff --git a/Documentation/svga.txt b/Documentation/admin-guide/svga.rst
-similarity index 100%
-rename from Documentation/svga.txt
-rename to Documentation/admin-guide/svga.rst
-diff --git a/Documentation/admin-guide/sysctl/kernel.rst b/Documentation/admin-guide/sysctl/kernel.rst
-index a0c1d4ce403a..032c7cd3cede 100644
---- a/Documentation/admin-guide/sysctl/kernel.rst
-+++ b/Documentation/admin-guide/sysctl/kernel.rst
-@@ -327,7 +327,7 @@ when a hard lockup is detected.
-    0 - don't panic on hard lockup
-    1 - panic on hard lockup
+ 	force_pal_cache_flush
+ 			[IA-64] Avoid check_sal_cache_flush which may hang on
+@@ -2247,7 +2247,7 @@
+ 	memblock=debug	[KNL] Enable memblock debug messages.
  
--See Documentation/lockup-watchdogs.txt for more information.  This can
-+See Documentation/admin-guide/lockup-watchdogs.rst for more information.  This can
- also be set using the nmi_watchdog kernel parameter.
+ 	load_ramdisk=	[RAM] List of ramdisks to load from floppy
+-			See Documentation/blockdev/ramdisk.rst.
++			See Documentation/admin-guide/blockdev/ramdisk.rst.
  
+ 	lockd.nlm_grace_period=P  [NFS] Assign grace period.
+ 			Format: <integer>
+@@ -3294,7 +3294,7 @@
  
-diff --git a/Documentation/video-output.txt b/Documentation/admin-guide/video-output.rst
-similarity index 100%
-rename from Documentation/video-output.txt
-rename to Documentation/admin-guide/video-output.rst
-diff --git a/Documentation/fb/vesafb.rst b/Documentation/fb/vesafb.rst
-index 2ed0dfb661cf..6821c87b7893 100644
---- a/Documentation/fb/vesafb.rst
-+++ b/Documentation/fb/vesafb.rst
-@@ -30,7 +30,7 @@ How to use it?
- ==============
+ 	pcd.		[PARIDE]
+ 			See header of drivers/block/paride/pcd.c.
+-			See also Documentation/blockdev/paride.rst.
++			See also Documentation/admin-guide/blockdev/paride.rst.
  
- Switching modes is done using the vga=... boot parameter.  Read
--Documentation/svga.txt for details.
-+Documentation/admin-guide/svga.rst for details.
+ 	pci=option[,option...]	[PCI] various PCI subsystem options.
  
- You should compile in both vgacon (for text mode) and vesafb (for
- graphics mode). Which of them takes over the console depends on
-diff --git a/Documentation/x86/topology.rst b/Documentation/x86/topology.rst
-index 8e9704f61017..e29739904e37 100644
---- a/Documentation/x86/topology.rst
-+++ b/Documentation/x86/topology.rst
-@@ -9,7 +9,7 @@ representation in the kernel. Update/change when doing changes to the
- respective code.
+@@ -3538,7 +3538,7 @@
+ 			needed on a platform with proper driver support.
  
- The architecture-agnostic topology definitions are in
--Documentation/cputopology.txt. This file holds x86-specific
-+Documentation/admin-guide/cputopology.rst. This file holds x86-specific
- differences/specialities which must not necessarily apply to the generic
- definitions. Thus, the way to read up on Linux topology on x86 is to start
- with the generic one and look at this one in parallel for the x86 specifics.
+ 	pd.		[PARIDE]
+-			See Documentation/blockdev/paride.rst.
++			See Documentation/admin-guide/blockdev/paride.rst.
+ 
+ 	pdcchassis=	[PARISC,HW] Disable/Enable PDC Chassis Status codes at
+ 			boot time.
+@@ -3553,10 +3553,10 @@
+ 			and performance comparison.
+ 
+ 	pf.		[PARIDE]
+-			See Documentation/blockdev/paride.rst.
++			See Documentation/admin-guide/blockdev/paride.rst.
+ 
+ 	pg.		[PARIDE]
+-			See Documentation/blockdev/paride.rst.
++			See Documentation/admin-guide/blockdev/paride.rst.
+ 
+ 	pirq=		[SMP,APIC] Manual mp-table setup
+ 			See Documentation/x86/i386/IO-APIC.rst.
+@@ -3668,7 +3668,7 @@
+ 
+ 	prompt_ramdisk=	[RAM] List of RAM disks to prompt for floppy disk
+ 			before loading.
+-			See Documentation/blockdev/ramdisk.rst.
++			See Documentation/admin-guide/blockdev/ramdisk.rst.
+ 
+ 	psi=		[KNL] Enable or disable pressure stall information
+ 			tracking.
+@@ -3690,7 +3690,7 @@
+ 	pstore.backend=	Specify the name of the pstore backend to use
+ 
+ 	pt.		[PARIDE]
+-			See Documentation/blockdev/paride.rst.
++			See Documentation/admin-guide/blockdev/paride.rst.
+ 
+ 	pti=		[X86_64] Control Page Table Isolation of user and
+ 			kernel address spaces.  Disabling this feature
+@@ -3719,7 +3719,7 @@
+ 			See Documentation/admin-guide/md.rst.
+ 
+ 	ramdisk_size=	[RAM] Sizes of RAM disks in kilobytes
+-			See Documentation/blockdev/ramdisk.rst.
++			See Documentation/admin-guide/blockdev/ramdisk.rst.
+ 
+ 	random.trust_cpu={on,off}
+ 			[KNL] Enable or disable trusting the use of the
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 82222aa618c5..76b52a20663e 100644
+index 4c622a19ab7d..3f0f654d1166 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -6054,7 +6054,7 @@ M:	Ard Biesheuvel <ard.biesheuvel@linaro.org>
- L:	linux-efi@vger.kernel.org
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/efi/efi.git
+@@ -4974,7 +4974,7 @@ T:	git git://git.linbit.com/drbd-8.4.git
+ S:	Supported
+ F:	drivers/block/drbd/
+ F:	lib/lru_cache.c
+-F:	Documentation/blockdev/drbd/
++F:	Documentation/admin-guide/blockdev/
+ 
+ DRIVER CORE, KOBJECTS, DEBUGFS AND SYSFS
+ M:	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+@@ -11024,7 +11024,7 @@ M:	Josef Bacik <josef@toxicpanda.com>
  S:	Maintained
--F:	Documentation/efi-stub.txt
-+F:	Documentation/admin-guide/efi-stub.rst
- F:	arch/*/kernel/efi.c
- F:	arch/x86/boot/compressed/eboot.[ch]
- F:	arch/*/include/asm/efi.h
-@@ -7033,7 +7033,7 @@ M:	Herbert Xu <herbert@gondor.apana.org.au>
- L:	linux-crypto@vger.kernel.org
- S:	Odd fixes
- F:	Documentation/devicetree/bindings/rng/
--F:	Documentation/hw_random.txt
-+F:	Documentation/admin-guide/hw_random.rst
- F:	drivers/char/hw_random/
- F:	include/linux/hw_random.h
- 
-@@ -9347,7 +9347,7 @@ M:	"Richard Russon (FlatCap)" <ldm@flatcap.org>
- L:	linux-ntfs-dev@lists.sourceforge.net
- W:	http://www.linux-ntfs.org/content/view/19/37/
+ L:	linux-block@vger.kernel.org
+ L:	nbd@other.debian.org
+-F:	Documentation/blockdev/nbd.rst
++F:	Documentation/admin-guide/blockdev/nbd.rst
+ F:	drivers/block/nbd.c
+ F:	include/trace/events/nbd.h
+ F:	include/uapi/linux/nbd.h
+@@ -12028,7 +12028,7 @@ PARIDE DRIVERS FOR PARALLEL PORT IDE DEVICES
+ M:	Tim Waugh <tim@cyberelk.net>
+ L:	linux-parport@lists.infradead.org (subscribers-only)
  S:	Maintained
--F:	Documentation/ldm.txt
-+F:	Documentation/admin-guide/ldm.rst
- F:	block/partitions/ldm.*
+-F:	Documentation/blockdev/paride.rst
++F:	Documentation/admin-guide/blockdev/paride.rst
+ F:	drivers/block/paride/
  
- LSILOGIC MPT FUSION DRIVERS (FC/SAS/SPI)
-@@ -12000,7 +12000,7 @@ PARALLEL LCD/KEYPAD PANEL DRIVER
- M:	Willy Tarreau <willy@haproxy.com>
- M:	Ksenija Stanojevic <ksenija.stanojevic@gmail.com>
- S:	Odd Fixes
--F:	Documentation/auxdisplay/lcd-panel-cgram.rst
-+F:	Documentation/admin-guide/lcd-panel-cgram.rst
- F:	drivers/auxdisplay/panel.c
- 
- PARALLEL PORT SUBSYSTEM
-@@ -13419,7 +13419,7 @@ Q:	http://patchwork.ozlabs.org/project/rtc-linux/list/
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/abelloni/linux.git
+ PARISC ARCHITECTURE
+@@ -13310,7 +13310,7 @@ F:	drivers/net/wireless/ralink/rt2x00/
+ RAMDISK RAM BLOCK DEVICE DRIVER
+ M:	Jens Axboe <axboe@kernel.dk>
  S:	Maintained
- F:	Documentation/devicetree/bindings/rtc/
--F:	Documentation/rtc.txt
-+F:	Documentation/admin-guide/rtc.rst
- F:	drivers/rtc/
- F:	include/linux/rtc.h
- F:	include/uapi/linux/rtc.h
-@@ -15248,7 +15248,7 @@ SVGA HANDLING
- M:	Martin Mares <mj@ucw.cz>
- L:	linux-video@atrey.karlin.mff.cuni.cz
+-F:	Documentation/blockdev/ramdisk.rst
++F:	Documentation/admin-guide/blockdev/ramdisk.rst
+ F:	drivers/block/brd.c
+ 
+ RANCHU VIRTUAL BOARD FOR MIPS
+@@ -17672,7 +17672,7 @@ R:	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+ L:	linux-kernel@vger.kernel.org
  S:	Maintained
--F:	Documentation/svga.txt
-+F:	Documentation/admin-guide/svga.rst
- F:	arch/x86/boot/video*
+ F:	drivers/block/zram/
+-F:	Documentation/blockdev/zram.rst
++F:	Documentation/admin-guide/blockdev/zram.rst
  
- SWIOTLB SUBSYSTEM
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index d5bd4350fcbd..b1ab350b9d60 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -1286,7 +1286,7 @@ config SMP
- 	  will run faster if you say N here.
+ ZS DECSTATION Z85C30 SERIAL DRIVER
+ M:	"Maciej W. Rozycki" <macro@linux-mips.org>
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index c43690b973d8..1bb8ec575352 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -31,7 +31,7 @@ config BLK_DEV_FD
+ 	  If you want to use the floppy disk drive(s) of your PC under Linux,
+ 	  say Y. Information about this driver, especially important for IBM
+ 	  Thinkpad users, is contained in
+-	  <file:Documentation/blockdev/floppy.rst>.
++	  <file:Documentation/admin-guide/blockdev/floppy.rst>.
+ 	  That file also contains the location of the Floppy driver FAQ as
+ 	  well as location of the fdutils package used to configure additional
+ 	  parameters of the driver at run time.
+@@ -96,7 +96,7 @@ config PARIDE
+ 	  your computer's parallel port. Most of them are actually IDE devices
+ 	  using a parallel port IDE adapter. This option enables the PARIDE
+ 	  subsystem which contains drivers for many of these external drives.
+-	  Read <file:Documentation/blockdev/paride.rst> for more information.
++	  Read <file:Documentation/admin-guide/blockdev/paride.rst> for more information.
  
- 	  See also <file:Documentation/x86/i386/IO-APIC.rst>,
--	  <file:Documentation/lockup-watchdogs.txt> and the SMP-HOWTO available at
-+	  <file:Documentation/admin-guide/lockup-watchdogs.rst> and the SMP-HOWTO available at
- 	  <http://tldp.org/HOWTO/SMP-HOWTO.html>.
+ 	  If you have said Y to the "Parallel-port support" configuration
+ 	  option, you may share a single port between your printer and other
+@@ -261,7 +261,7 @@ config BLK_DEV_NBD
+ 	  userland (making server and client physically the same computer,
+ 	  communicating using the loopback network device).
  
- 	  If you don't know what to do here, say N.
-diff --git a/arch/parisc/Kconfig b/arch/parisc/Kconfig
-index 42875ff15671..6d732e451071 100644
---- a/arch/parisc/Kconfig
-+++ b/arch/parisc/Kconfig
-@@ -277,7 +277,7 @@ config SMP
- 	  machines, but will use only one CPU of a multiprocessor machine.
- 	  On a uniprocessor machine, the kernel will run faster if you say N.
+-	  Read <file:Documentation/blockdev/nbd.rst> for more information,
++	  Read <file:Documentation/admin-guide/blockdev/nbd.rst> for more information,
+ 	  especially about where to find the server code, which runs in user
+ 	  space and does not need special kernel support.
  
--	  See also <file:Documentation/lockup-watchdogs.txt> and the SMP-HOWTO
-+	  See also <file:Documentation/admin-guide/lockup-watchdogs.rst> and the SMP-HOWTO
- 	  available at <http://www.tldp.org/docs.html#howto>.
+@@ -303,7 +303,7 @@ config BLK_DEV_RAM
+ 	  during the initial install of Linux.
  
- 	  If you don't know what to do here, say N.
-diff --git a/arch/sh/Kconfig b/arch/sh/Kconfig
-index c2858ac6a46a..6b1b5941b618 100644
---- a/arch/sh/Kconfig
-+++ b/arch/sh/Kconfig
-@@ -679,7 +679,7 @@ config SMP
- 	  People using multiprocessor machines who say Y here should also say
- 	  Y to "Enhanced Real Time Clock Support", below.
- 
--	  See also <file:Documentation/lockup-watchdogs.txt> and the SMP-HOWTO
-+	  See also <file:Documentation/admin-guide/lockup-watchdogs.rst> and the SMP-HOWTO
- 	  available at <http://www.tldp.org/docs.html#howto>.
- 
- 	  If you don't know what to do here, say N.
-diff --git a/arch/sparc/Kconfig b/arch/sparc/Kconfig
-index e9f5d62e9817..7926a2e11bdc 100644
---- a/arch/sparc/Kconfig
-+++ b/arch/sparc/Kconfig
-@@ -180,7 +180,7 @@ config SMP
- 	  Y to "Enhanced Real Time Clock Support", below. The "Advanced Power
- 	  Management" code will be disabled if you say Y here.
- 
--	  See also <file:Documentation/lockup-watchdogs.txt> and the SMP-HOWTO
-+	  See also <file:Documentation/admin-guide/lockup-watchdogs.rst> and the SMP-HOWTO
- 	  available at <http://www.tldp.org/docs.html#howto>.
- 
- 	  If you don't know what to do here, say N.
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 489fd833b980..2ca471ae6756 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -402,7 +402,7 @@ config SMP
- 	  Management" code will be disabled if you say Y here.
- 
- 	  See also <file:Documentation/x86/i386/IO-APIC.rst>,
--	  <file:Documentation/lockup-watchdogs.txt> and the SMP-HOWTO available at
-+	  <file:Documentation/admin-guide/lockup-watchdogs.rst> and the SMP-HOWTO available at
- 	  <http://www.tldp.org/docs.html#howto>.
- 
- 	  If you don't know what to do here, say N.
-@@ -1959,7 +1959,7 @@ config EFI_STUB
-           This kernel feature allows a bzImage to be loaded directly
- 	  by EFI firmware without the use of a bootloader.
- 
--	  See Documentation/efi-stub.txt for more information.
-+	  See Documentation/admin-guide/efi-stub.rst for more information.
- 
- config EFI_MIXED
- 	bool "EFI mixed-mode support"
-diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
-index 37b9710cc80a..702689a628f0 100644
---- a/block/partitions/Kconfig
-+++ b/block/partitions/Kconfig
-@@ -194,7 +194,7 @@ config LDM_PARTITION
- 	  Normal partitions are now called Basic Disks under Windows 2000, XP,
- 	  and Vista.
- 
--	  For a fuller description read <file:Documentation/ldm.txt>.
-+	  For a fuller description read <file:Documentation/admin-guide/ldm.rst>.
- 
- 	  If unsure, say N.
- 
-diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
-index 442403abd73a..3e866885a405 100644
---- a/drivers/char/Kconfig
-+++ b/drivers/char/Kconfig
-@@ -291,7 +291,7 @@ config RTC
- 	  and set the RTC in an SMP compatible fashion.
- 
- 	  If you think you have a use for such a device (such as periodic data
--	  sampling), then say Y here, and read <file:Documentation/rtc.txt>
-+	  sampling), then say Y here, and read <file:Documentation/admin-guide/rtc.rst>
- 	  for details.
+ 	  Note that the kernel command line option "ramdisk=XX" is now obsolete.
+-	  For details, read <file:Documentation/blockdev/ramdisk.rst>.
++	  For details, read <file:Documentation/admin-guide/blockdev/ramdisk.rst>.
  
  	  To compile this driver as a module, choose M here: the
-@@ -313,7 +313,7 @@ config JS_RTC
- 	  /dev/rtc.
+ 	  module will be called brd. An alias "rd" has been defined
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 5c99e52f9dc1..f652c1ac3ae9 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -4424,7 +4424,7 @@ static int __init floppy_setup(char *str)
+ 		pr_cont("\n");
+ 	} else
+ 		DPRINT("botched floppy option\n");
+-	DPRINT("Read Documentation/blockdev/floppy.rst\n");
++	DPRINT("Read Documentation/admin-guide/blockdev/floppy.rst\n");
+ 	return 0;
+ }
  
- 	  If you think you have a use for such a device (such as periodic data
--	  sampling), then say Y here, and read <file:Documentation/rtc.txt>
-+	  sampling), then say Y here, and read <file:Documentation/admin-guide/rtc.rst>
- 	  for details.
+diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
+index e06b99d54816..fe7a4b7d30cf 100644
+--- a/drivers/block/zram/Kconfig
++++ b/drivers/block/zram/Kconfig
+@@ -12,7 +12,7 @@ config ZRAM
+ 	  It has several use cases, for example: /tmp storage, use as swap
+ 	  disks and maybe many more.
  
- 	  To compile this driver as a module, choose M here: the
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 95be7228f327..9044d31ab1a1 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -4,7 +4,7 @@
-  * Copyright 2006 Michael Buesch <m@bues.ch>
-  * Copyright 2005 (c) MontaVista Software, Inc.
-  *
-- * Please read Documentation/hw_random.txt for details on use.
-+ * Please read Documentation/admin-guide/hw_random.rst for details on use.
-  *
-  * This software may be used and distributed according to the terms
-  * of the GNU General Public License, incorporated herein by reference.
-diff --git a/include/linux/hw_random.h b/include/linux/hw_random.h
-index c0b93e0ff0c0..8e6dd908da21 100644
---- a/include/linux/hw_random.h
-+++ b/include/linux/hw_random.h
-@@ -1,7 +1,7 @@
- /*
- 	Hardware Random Number Generator
+-	  See Documentation/blockdev/zram.rst for more information.
++	  See Documentation/admin-guide/blockdev/zram.rst for more information.
  
--	Please read Documentation/hw_random.txt for details on use.
-+	Please read Documentation/admin-guide/hw_random.rst for details on use.
+ config ZRAM_WRITEBACK
+        bool "Write back incompressible or idle page to backing device"
+@@ -26,7 +26,7 @@ config ZRAM_WRITEBACK
+ 	 With /sys/block/zramX/{idle,writeback}, application could ask
+ 	 idle page's writeback to the backing device to save in memory.
  
- 	----------------------------------------------------------
- 	This software may be used and distributed according to the terms
+-	 See Documentation/blockdev/zram.rst for more information.
++	 See Documentation/admin-guide/blockdev/zram.rst for more information.
+ 
+ config ZRAM_MEMORY_TRACKING
+ 	bool "Track zRam block status"
+@@ -36,4 +36,4 @@ config ZRAM_MEMORY_TRACKING
+ 	  of zRAM. Admin could see the information via
+ 	  /sys/kernel/debug/zram/zramX/block_state.
+ 
+-	  See Documentation/blockdev/zram.rst for more information.
++	  See Documentation/admin-guide/blockdev/zram.rst for more information.
+diff --git a/tools/testing/selftests/zram/README b/tools/testing/selftests/zram/README
+index 5fa378391d3b..110b34834a6f 100644
+--- a/tools/testing/selftests/zram/README
++++ b/tools/testing/selftests/zram/README
+@@ -37,4 +37,4 @@ Commands required for testing:
+  - mkfs/ mkfs.ext4
+ 
+ For more information please refer:
+-kernel-source-tree/Documentation/blockdev/zram.rst
++kernel-source-tree/Documentation/admin-guide/blockdev/zram.rst
 -- 
 2.21.0
 
