@@ -2,149 +2,97 @@ Return-Path: <SRS0=XMJ3=U3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E406CC4321A
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 15:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3692C4321A
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 15:57:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C36A720828
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 15:54:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97DA020828
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 15:57:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jICs71dr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726807AbfF1Pyr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jun 2019 11:54:47 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:38384 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726686AbfF1Pyr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jun 2019 11:54:47 -0400
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtp (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1hgtCs-0008QY-EA; Fri, 28 Jun 2019 09:54:35 -0600
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190625170115.GA9746@lst.de>
- <41235a05-8ed1-e69a-e7cd-48cae7d8a676@deltatee.com>
- <20190626065708.GB24531@lst.de>
- <c15d5997-9ba4-f7db-0e7a-a69e75df316c@deltatee.com>
- <20190626202107.GA5850@ziepe.ca>
- <8a0a08c3-a537-bff6-0852-a5f337a70688@deltatee.com>
- <20190627090843.GB11548@lst.de>
- <89889319-e778-7772-ab36-dc55b59826be@deltatee.com>
- <20190627170027.GE10652@lst.de>
- <e63d0259-e17f-effe-b76d-43dbfda8ae3a@deltatee.com>
- <20190628133837.GA3801@lst.de>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <10b2b013-5b2e-f642-9524-9551809c03a3@deltatee.com>
-Date:   Fri, 28 Jun 2019 09:54:27 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726817AbfF1P5Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jun 2019 11:57:16 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:33591 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726796AbfF1P5P (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Jun 2019 11:57:15 -0400
+Received: by mail-wm1-f67.google.com with SMTP id h19so9661934wme.0
+        for <linux-block@vger.kernel.org>; Fri, 28 Jun 2019 08:57:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=wxiJ0Py1BE8Z+8GDLum/znTVbocpCo+0p2g4WsgPq+U=;
+        b=jICs71drass6uhcYgQQFV2jNMq8bgE9CQj2JLq45S6AEcOTeEpKEcrRV27dcaf+KNX
+         3idpVKIsXoISGszBSW2pM6qRHFEYV2xYVbg6n9i/bu3krm3uMrQoiFjZG0LRQn4jaS0f
+         bwiYr+oxeaa2eXfPO1qSPi+b8+M3cF9JTo/jYyhpYJ8/ifN6e0cleUYJ2rG2RBGisDv1
+         7F0IE8woPzqlBMeMEhDqpRMNbpbSTc0XYMYwh/vkoJElnnzz3agy+mtA0EU7t3rHiVke
+         0N4jKvd760uNv+XB5vqF8jsSYCTRXHhi0g/PGzwjJHmFHb0SdJBDLXSwKLhZfV7tP1A2
+         UZWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=wxiJ0Py1BE8Z+8GDLum/znTVbocpCo+0p2g4WsgPq+U=;
+        b=T5WNemCr8cT6oon0hHIoKwm++NeJtBNyBYNqx8SEGpVkHfmL0XnHZbhp6ZTPbalEGf
+         TLxSZE3NB1f8Yekv2/CVouK3NSL3rLhGYlY1PIeOM8tsUrdu+Z5O2q8e/lT6zEKQYL6g
+         O1K7PhqeiyN6wpeQxzYI7lhinM2mIGFegdLuTbIdtnb8WNuyNKCERXlHmZk/DpC21TxM
+         Mq2CfkD4mbHTyUlG8BnEncLGEDumDlDVwDedHeS4VkU9LwGaS63VdHzQwREUex9piV1N
+         nLkoTSUC9M/xZaHEfoo99Yb4IrCxMEYDAGhXxI8OcL2SGVXq3pAmlK3rBAhQrl+9cScF
+         tjoA==
+X-Gm-Message-State: APjAAAVynPloB4yrYXDB4Y1Q8RVKnTNXoifQL247UZ5tD9N8g3fMbjRR
+        u28wwyyyP59DbxqwJ/JBcSv2bSABPSoptoAmkI4=
+X-Google-Smtp-Source: APXvYqzbI8iEqZSPn8N/P8HKRn/KFRnWNx4EPochs9CsAZYejtmbHcrhuW0jBHi4fSpRq32xxlUk4EWFspZuSQPj1sQ=
+X-Received: by 2002:a7b:c3d7:: with SMTP id t23mr7552427wmj.94.1561737433931;
+ Fri, 28 Jun 2019 08:57:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190628133837.GA3801@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca, hch@lst.de
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+References: <cover.1561385989.git.zhangweiping@didiglobal.com>
+ <6e3b0f511a291dd0ce570a6cc5393e10d4509d0e.1561385989.git.zhangweiping@didiglobal.com>
+ <20190627103719.GC4421@minwooim-desktop> <20190627110342.GA13612@lst.de>
+In-Reply-To: <20190627110342.GA13612@lst.de>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Fri, 28 Jun 2019 23:57:01 +0800
+Message-ID: <CAA70yB5uve6x-t56u7RcM8=JNSXh644uErC5z4m5h2C1rkSuvA@mail.gmail.com>
+Subject: Re: [PATCH v3 5/5] nvme: add support weighted round robin queue
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Minwoo Im <minwoo.im.dev@gmail.com>, keith.busch@intel.com,
+        sagi@grimberg.me, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Christoph Hellwig <hch@lst.de> =E4=BA=8E2019=E5=B9=B46=E6=9C=8827=E6=97=A5=
+=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=887:06=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Thu, Jun 27, 2019 at 07:37:19PM +0900, Minwoo Im wrote:
+> > Hi, Maintainers
+> >
+> > Would you guys please give some thoughts about this patch?  I like this
+> > feature WRR addition to the driver so I really want to hear something
+> > from you guys.
+>
+> We are at the end of the merge window with tons of things to sort out.
+> A giant feature series with a lot of impact is not at the top of the
+> priority list right now.
 
+Hi Christoph,
 
-On 2019-06-28 7:38 a.m., Christoph Hellwig wrote:
-> On Thu, Jun 27, 2019 at 12:00:35PM -0600, Logan Gunthorpe wrote:
->>> It is not.  (c) is fundamentally very different as it is not actually
->>> an operation that ever goes out to the wire at all, and which is why the
->>> actual physical address on the wire does not matter at all.
->>> Some interfaces like NVMe have designed it in a way that it the commands
->>> used to do this internal transfer look like (b2), but that is just their
->>> (IMHO very questionable) interface design choice, that produces a whole
->>> chain of problems.
->>
->> >From the mapping device's driver's perspective yes, but from the
->> perspective of a submitting driver they would be the same.
-> 
-> With your dma_addr_t scheme it won't be the same, as you'd need
-> a magic way to generate the internal addressing and stuff it into
-> the dma_addr_t.  With a phys_addr_t based scheme they should basically
-> be all the same.
+There are some feedback in V3, I really want to get some more feedback from=
+ you
+and other people, at that time I post V4.
 
-Yes, I see the folly in the dma_addr_t scheme now. I like the
-phys_addr_t ideas we have been discussing.
+So please give some comments for V3 at your convenience after this merge wi=
+ndow.
 
->> Yes, you did suggest them. But what I'm trying to suggest is we don't
->> *necessarily* need the lookup. For demonstration purposes only, a
->> submitting driver could very roughly potentially do:
->>
->> struct bio_vec vec;
->> dist = pci_p2pdma_dist(provider_pdev, mapping_pdev);
->> if (dist < 0) {
->>      /* use regular memory */
->>      vec.bv_addr = virt_to_phys(kmalloc(...));
->>      vec.bv_flags = 0;
->> } else if (dist & PCI_P2PDMA_THRU_HOST_BRIDGE) {
->>      vec.bv_addr = pci_p2pmem_alloc_phys(provider_pdev, ...);
->>      vec.bv_flags = BVEC_MAP_RESOURCE;
->> } else {
->>      vec.bv_addr = pci_p2pmem_alloc_bus_addr(provider_pdev, ...);
->>      vec.bv_flags = BVEC_MAP_BUS_ADDR;
->> }
-> 
-> That doesn't look too bad, except..
-> 
->> -- And a mapping driver would roughly just do:
->>
->> dma_addr_t dma_addr;
->> if (vec.bv_flags & BVEC_MAP_BUS_ADDR) {
->>      if (pci_bus_addr_in_bar(mapping_pdev, vec.bv_addr, &bar, &off))  {
->>           /* case (c) */
->>           /* program the DMA engine with bar and off */
-> 
-> Why bother with that here if we could also let the caller handle
-> that? pci_p2pdma_dist() should be able to trivially find that out
-> based on provider_dev == mapping_dev.
-
-True, in fact pci_p2pdma_dist() should return 0 in that case.
-
-Though the driver will still have to do a range compare to figure out
-which BAR the address belongs to and find the offset.
-
->> The real difficulty here is that you'd really want all the above handled
->> by a dma_map_bvec() so it can combine every vector hitting the IOMMU
->> into a single continuous IOVA -- but it's hard to fit case (c) into that
->> equation. So it might be that a dma_map_bvec() handles cases (a), (b1)
->> and (b2) and the mapping driver has to then check each resulting DMA
->> vector for pci_bus_addr_in_bar() while it is programming the DMA engine
->> to deal with case (c).
-> 
-> I'd do it the other way around.  pci_p2pdma_dist is used to find
-> the p2p type.  The p2p type is stuff into the bio_vec, and we then:
-> 
->  (1) manually check for case (c) in driver for drivers that want to
->      treat it different from (b)
->  (2) we then have a dma mapping wrapper that checks the p2p type
->      and does the right thing for the rest.
-
-Sure, that could make sense.
-
-I imagine there's a lot of details that are wrong or could be done
-better in my example. The purpose of it was just to demonstrate that we
-can do it without a lookup in an interval tree on the physical address.
-
-Logan
-
+Thanks a ton
+Weiping
