@@ -2,97 +2,74 @@ Return-Path: <SRS0=XMJ3=U3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3692C4321A
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 15:57:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A475C4321A
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 16:20:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 97DA020828
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 15:57:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jICs71dr"
+	by mail.kernel.org (Postfix) with ESMTP id 0C54B20645
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 16:20:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726817AbfF1P5Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jun 2019 11:57:16 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:33591 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726796AbfF1P5P (ORCPT
+        id S1726702AbfF1QUF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jun 2019 12:20:05 -0400
+Received: from mail-pf1-f178.google.com ([209.85.210.178]:36965 "EHLO
+        mail-pf1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726667AbfF1QUF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jun 2019 11:57:15 -0400
-Received: by mail-wm1-f67.google.com with SMTP id h19so9661934wme.0
-        for <linux-block@vger.kernel.org>; Fri, 28 Jun 2019 08:57:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=wxiJ0Py1BE8Z+8GDLum/znTVbocpCo+0p2g4WsgPq+U=;
-        b=jICs71drass6uhcYgQQFV2jNMq8bgE9CQj2JLq45S6AEcOTeEpKEcrRV27dcaf+KNX
-         3idpVKIsXoISGszBSW2pM6qRHFEYV2xYVbg6n9i/bu3krm3uMrQoiFjZG0LRQn4jaS0f
-         bwiYr+oxeaa2eXfPO1qSPi+b8+M3cF9JTo/jYyhpYJ8/ifN6e0cleUYJ2rG2RBGisDv1
-         7F0IE8woPzqlBMeMEhDqpRMNbpbSTc0XYMYwh/vkoJElnnzz3agy+mtA0EU7t3rHiVke
-         0N4jKvd760uNv+XB5vqF8jsSYCTRXHhi0g/PGzwjJHmFHb0SdJBDLXSwKLhZfV7tP1A2
-         UZWg==
+        Fri, 28 Jun 2019 12:20:05 -0400
+Received: by mail-pf1-f178.google.com with SMTP id 19so3234508pfa.4
+        for <linux-block@vger.kernel.org>; Fri, 28 Jun 2019 09:20:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=wxiJ0Py1BE8Z+8GDLum/znTVbocpCo+0p2g4WsgPq+U=;
-        b=T5WNemCr8cT6oon0hHIoKwm++NeJtBNyBYNqx8SEGpVkHfmL0XnHZbhp6ZTPbalEGf
-         TLxSZE3NB1f8Yekv2/CVouK3NSL3rLhGYlY1PIeOM8tsUrdu+Z5O2q8e/lT6zEKQYL6g
-         O1K7PhqeiyN6wpeQxzYI7lhinM2mIGFegdLuTbIdtnb8WNuyNKCERXlHmZk/DpC21TxM
-         Mq2CfkD4mbHTyUlG8BnEncLGEDumDlDVwDedHeS4VkU9LwGaS63VdHzQwREUex9piV1N
-         nLkoTSUC9M/xZaHEfoo99Yb4IrCxMEYDAGhXxI8OcL2SGVXq3pAmlK3rBAhQrl+9cScF
-         tjoA==
-X-Gm-Message-State: APjAAAVynPloB4yrYXDB4Y1Q8RVKnTNXoifQL247UZ5tD9N8g3fMbjRR
-        u28wwyyyP59DbxqwJ/JBcSv2bSABPSoptoAmkI4=
-X-Google-Smtp-Source: APXvYqzbI8iEqZSPn8N/P8HKRn/KFRnWNx4EPochs9CsAZYejtmbHcrhuW0jBHi4fSpRq32xxlUk4EWFspZuSQPj1sQ=
-X-Received: by 2002:a7b:c3d7:: with SMTP id t23mr7552427wmj.94.1561737433931;
- Fri, 28 Jun 2019 08:57:13 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/ETHKHLKJuNOo4+w43DRw8i/76pXdOoH92C7kXzYDWU=;
+        b=ibWsT8Du6shy0/08eZRSCUud+pCIBlbKYb3Wd4JtiZ0vR1Unpco/dccx9FEpA5wZQu
+         /zH1AGWYU+I45aJBd5cuCIl33rbsXl1btQ51fbGj2bElANaSvRVG9/F8A/IITm9QXDq8
+         5du4zioN11elU0zrxQeiSlMyK30BnvVZus9pvSmuDIRL433wNbCPN9I9HXnIoDLxs4J4
+         +lJgCLV3569iKTnywo8UeaxNNjRmetRwZfq5MM94r9frzqKiDUJLABfBMylWdUguECWb
+         kmONDfzPTi76UzgxJI846xr56aJEyohRYku1XzIaxPZzKI/D0bUafXNt6OPnHRPQdbl2
+         El0g==
+X-Gm-Message-State: APjAAAXRFUFVifn2riJw1KxxMZQOo4Calnbv92nPMCysjecGUVlj0QOK
+        lnqgP3dBtghSobYSrkJgTYmFPHdrez0=
+X-Google-Smtp-Source: APXvYqxUJ+JNNNCZ06S3hLaPJXWtffZ5RwMPDDaUmcNUjyLeQmPDkljXLxLQ0RNH4P1DO42qlcv9Bg==
+X-Received: by 2002:a63:2c43:: with SMTP id s64mr10011954pgs.50.1561738803991;
+        Fri, 28 Jun 2019 09:20:03 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id g6sm2098683pgh.64.2019.06.28.09.20.02
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 28 Jun 2019 09:20:02 -0700 (PDT)
+Subject: Re: [REGRESSION] commit c2b3c170db610 causes blktests block/002
+ failure
+To:     Omar Sandoval <osandov@osandov.com>
+Cc:     Theodore Ts'o <tytso@mit.edu>, Omar Sandoval <osandov@fb.com>,
+        Andi Kleen <ak@linux.intel.com>, linux-block@vger.kernel.org
+References: <20190609181423.GA24173@mit.edu>
+ <e84b29e1-209e-d598-0828-bed5e3b98093@acm.org> <20190627171438.GA31481@vader>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <448fea62-23b9-3df3-4ec0-cc994abaff28@acm.org>
+Date:   Fri, 28 Jun 2019 09:20:00 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-References: <cover.1561385989.git.zhangweiping@didiglobal.com>
- <6e3b0f511a291dd0ce570a6cc5393e10d4509d0e.1561385989.git.zhangweiping@didiglobal.com>
- <20190627103719.GC4421@minwooim-desktop> <20190627110342.GA13612@lst.de>
-In-Reply-To: <20190627110342.GA13612@lst.de>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Fri, 28 Jun 2019 23:57:01 +0800
-Message-ID: <CAA70yB5uve6x-t56u7RcM8=JNSXh644uErC5z4m5h2C1rkSuvA@mail.gmail.com>
-Subject: Re: [PATCH v3 5/5] nvme: add support weighted round robin queue
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Minwoo Im <minwoo.im.dev@gmail.com>, keith.busch@intel.com,
-        sagi@grimberg.me, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190627171438.GA31481@vader>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@lst.de> =E4=BA=8E2019=E5=B9=B46=E6=9C=8827=E6=97=A5=
-=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=887:06=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Thu, Jun 27, 2019 at 07:37:19PM +0900, Minwoo Im wrote:
-> > Hi, Maintainers
-> >
-> > Would you guys please give some thoughts about this patch?  I like this
-> > feature WRR addition to the driver so I really want to hear something
-> > from you guys.
->
-> We are at the end of the merge window with tons of things to sort out.
-> A giant feature series with a lot of impact is not at the top of the
-> priority list right now.
+On 6/27/19 10:14 AM, Omar Sandoval wrote:
+> I can reproduce the failure. I'll try to find a reliable way to wait,
+> otherwise I'll probably just toss a sleep in here.
 
-Hi Christoph,
+Thanks!
 
-There are some feedback in V3, I really want to get some more feedback from=
- you
-and other people, at that time I post V4.
+Bart.
 
-So please give some comments for V3 at your convenience after this merge wi=
-ndow.
 
-Thanks a ton
-Weiping
