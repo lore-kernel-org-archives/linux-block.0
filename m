@@ -2,191 +2,232 @@ Return-Path: <SRS0=XMJ3=U3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 003C5C4321A
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 19:36:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C69C4321A
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 19:56:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CED6A208E3
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 19:36:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7E752086D
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 19:56:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726952AbfF1TgA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jun 2019 15:36:00 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:42826 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726695AbfF1TgA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jun 2019 15:36:00 -0400
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtp (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1hgwex-0003Qy-9H; Fri, 28 Jun 2019 13:35:48 -0600
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190626210018.GB6392@ziepe.ca>
- <c25d3333-dcd5-3313-089b-7fbbd6fbd876@deltatee.com>
- <20190627063223.GA7736@ziepe.ca>
- <6afe4027-26c8-df4e-65ce-49df07dec54d@deltatee.com>
- <20190627163504.GB9568@ziepe.ca>
- <4894142c-3233-a3bb-f9a3-4a4985136e9b@deltatee.com>
- <20190628045705.GD3705@ziepe.ca>
- <8022a2a4-4069-d256-11da-e6d9b2ffbf60@deltatee.com>
- <20190628172926.GA3877@ziepe.ca>
- <25a87c72-630b-e1f1-c858-9c8b417506fc@deltatee.com>
- <20190628190931.GC3877@ziepe.ca>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <cb680437-9615-da42-ebc5-4751e024a45f@deltatee.com>
-Date:   Fri, 28 Jun 2019 13:35:42 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1727060AbfF1T41 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jun 2019 15:56:27 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:34381 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726852AbfF1T41 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Jun 2019 15:56:27 -0400
+Received: by mail-pf1-f196.google.com with SMTP id c85so3522647pfc.1
+        for <linux-block@vger.kernel.org>; Fri, 28 Jun 2019 12:56:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=YB/2JR2jAw/IkswCTmL2cVE4y0V41wJIfAv0cXVbXs4=;
+        b=jAgAIBHsWs0tb9KnhR6yenqbY2tA6+ixCXOmM7Fl4FOITozykW7yld65K9R+Hi3Rwg
+         tjRvOgRr3DHyz6xGnrThEaXI+NHSoTZIzvLzsLmQLFxYPGRky9hEzC7UFR8O9Qf/mYK2
+         0Z/EYf02bDIoeVK46oomwXOOzqahDQoxLy4KU+KLd7iKi70apjRFhejssjG0XmUyTpFy
+         y+O2zqEvXOzLqPHM3b6zQMDPi+VtqNwFln+hY4dcvZUybDG/4DUl9Zyz8zj8qu+kuFyT
+         afY+HBXQK3okSJdq94Bg/4iCoj5VOLPZUaTkOob2tlez0uRKxulHhbdPDyjkg8lBT/kZ
+         aMhg==
+X-Gm-Message-State: APjAAAX/yKkNGvb7Stwt0Np5BUoIWeA93+sAbW7DsbL6PpnCOAYXVlvg
+        rd0P3rxW0fWfJ4WCReVB6B/6Lxd5Gvk=
+X-Google-Smtp-Source: APXvYqy/U55uOvNEb2h1YCh0AX5sR8FBS5AQCgYCRTGJgxxNKh8FNZW1Xsx3J75PACbxzty2ElTRWA==
+X-Received: by 2002:a65:41c6:: with SMTP id b6mr10630855pgq.399.1561751785861;
+        Fri, 28 Jun 2019 12:56:25 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id f2sm2370522pgs.83.2019.06.28.12.56.24
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 28 Jun 2019 12:56:24 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH] block: Rename hd_struct.policy into hd_struct.read_only
+Date:   Fri, 28 Jun 2019 12:56:15 -0700
+Message-Id: <20190628195615.201990-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.22.0.410.gd8fdbe21b5-goog
 MIME-Version: 1.0
-In-Reply-To: <20190628190931.GC3877@ziepe.ca>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de, jgg@ziepe.ca
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Since nobody knows what "policy" means, rename the field to "read_only"
+for clarity. Martin Petersen proposed this earlier - see also his patch
+"scsi: sd: block: Fix regressions in read-only block device handling"
+(https://www.spinics.net/lists/linux-scsi/msg129146.html). This patch
+is an extension of a subset of Martin's patch.
 
+The only change in this patch is if another value than 0 or 1 is passed
+to set_device_ro() that that function converts that value into a
+boolean. This change is not user visible because the BLKROGET ioctl
+implementation converts the part->policy value into a boolean anyway.
 
-On 2019-06-28 1:09 p.m., Jason Gunthorpe wrote:
-> On Fri, Jun 28, 2019 at 12:29:32PM -0600, Logan Gunthorpe wrote:
->>
->>
->> On 2019-06-28 11:29 a.m., Jason Gunthorpe wrote:
->>> On Fri, Jun 28, 2019 at 10:22:06AM -0600, Logan Gunthorpe wrote:
->>>
->>>>> Why not?  If we have a 'bar info' structure that could have data
->>>>> transfer op callbacks, infact, I think we might already have similar
->>>>> callbacks for migrating to/from DEVICE_PRIVATE memory with DMA..
->>>>
->>>> Well it could, in theory be done, but It just seems wrong to setup and
->>>> wait for more DMA requests while we are in mid-progress setting up
->>>> another DMA request. Especially when the block layer has historically
->>>> had issues with stack sizes. It's also possible you might have multiple
->>>> bio_vec's that have to each do a migration and with a hook here they'd
->>>> have to be done serially.
->>>
->>> *shrug* this is just standard bounce buffering stuff...
->>
->> I don't know of any "standard" bounce buffering stuff that uses random
->> other device's DMA engines where appropriate.
-> 
-> IMHO, it is conceptually the same as memcpy.. And probably we will not
-> ever need such optimization in dma map. Other copy places might be
-> different at least we have the option.
->  
->> IMO the bouncing in the DMA layer isn't a desirable thing, it was a
->> necessary addition to work around various legacy platform issues and
->> have existing code still work correctly. 
-> 
-> Of course it is not desireable! But there are many situations where we
-> do not have the luxury to work around the HW limits in the caller, so
-> those callers either have to not do DMA or they have to open code
-> bounce buffering - both are wrong.
+The policy member was introduced by commit 4d466c1fcdce ("[PATCH] r/o
+state moved to gendisks") # v2.6.12.
 
-They don't have to open code it, they can use helpers and good coding
-practices. But the submitting driver is the one that's in the best
-position to figure this stuff out. Just like it is with the dma_map
-bouncing -- all it has to do is use dma_alloc_coherent(). If we don't
-write any submitting drivers that assume the dma_map API bounces than we
-should never have to deal with it.
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-core.c          |  2 +-
+ block/genhd.c             | 18 +++++++++---------
+ block/ioctl.c             |  2 +-
+ block/partition-generic.c |  4 ++--
+ include/linux/fs.h        |  2 +-
+ include/linux/genhd.h     | 11 ++++++-----
+ 6 files changed, 20 insertions(+), 19 deletions(-)
 
->>> What I see as the question is how to layout the BIO. 
->>>
->>> If we agree the bio should only have phys_addr_t then we need some
->>> 'bar info' (ie at least the offset) in the dma map and some 'bar info'
->>> (ie the DMA device) during the bio construciton.
->>
->> Per my other email, it was phys_addr_t plus hints on how to map the
->> memory (bus address, dma_map_resource, or regular). This requires
->> exactly two flag bits in the bio_vec and no interval tree or hash table.
->> I don't want to have to pass bar info, other hooks, or anything like
->> that to the block layer.
-> 
-> This scheme makes the assumption that the dma mapping struct device is
-> all you need, and we never need to know the originating struct device
-> during dma map. This is clearly safe if the two devices are on the
-> same PCIe segment
-> 
-> However, I'd feel more comfortable about that assumption if we had
-> code to support the IOMMU case, and know for sure it doesn't require
-> more info :(
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 6361419f0b6e..cfa0687bf86c 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -802,7 +802,7 @@ static inline bool bio_check_ro(struct bio *bio, struct hd_struct *part)
+ {
+ 	const int op = bio_op(bio);
+ 
+-	if (part->policy && op_is_write(op)) {
++	if (part->read_only && op_is_write(op)) {
+ 		char b[BDEVNAME_SIZE];
+ 
+ 		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
+diff --git a/block/genhd.c b/block/genhd.c
+index 97887e59f3b2..290deeb3bacf 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1558,36 +1558,36 @@ static void set_disk_ro_uevent(struct gendisk *gd, int ro)
+ 	kobject_uevent_env(&disk_to_dev(gd)->kobj, KOBJ_CHANGE, envp);
+ }
+ 
+-void set_device_ro(struct block_device *bdev, int flag)
++void set_device_ro(struct block_device *bdev, bool read_only)
+ {
+-	bdev->bd_part->policy = flag;
++	bdev->bd_part->read_only = read_only;
+ }
+ 
+ EXPORT_SYMBOL(set_device_ro);
+ 
+-void set_disk_ro(struct gendisk *disk, int flag)
++void set_disk_ro(struct gendisk *disk, bool read_only)
+ {
+ 	struct disk_part_iter piter;
+ 	struct hd_struct *part;
+ 
+-	if (disk->part0.policy != flag) {
+-		set_disk_ro_uevent(disk, flag);
+-		disk->part0.policy = flag;
++	if (disk->part0.read_only != read_only) {
++		set_disk_ro_uevent(disk, read_only);
++		disk->part0.read_only = read_only;
+ 	}
+ 
+ 	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY);
+ 	while ((part = disk_part_iter_next(&piter)))
+-		part->policy = flag;
++		part->read_only = read_only;
+ 	disk_part_iter_exit(&piter);
+ }
+ 
+ EXPORT_SYMBOL(set_disk_ro);
+ 
+-int bdev_read_only(struct block_device *bdev)
++bool bdev_read_only(struct block_device *bdev)
+ {
+ 	if (!bdev)
+ 		return 0;
+-	return bdev->bd_part->policy;
++	return bdev->bd_part->read_only;
+ }
+ 
+ EXPORT_SYMBOL(bdev_read_only);
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 15a0eb80ada9..4871f58eaea2 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -545,7 +545,7 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 			return -EINVAL;
+ 		return put_long(arg, (bdev->bd_bdi->ra_pages*PAGE_SIZE) / 512);
+ 	case BLKROGET:
+-		return put_int(arg, bdev_read_only(bdev) != 0);
++		return put_int(arg, bdev_read_only(bdev));
+ 	case BLKBSZGET: /* get block device soft block size (cf. BLKSSZGET) */
+ 		return put_int(arg, block_size(bdev));
+ 	case BLKSSZGET: /* get block device logical block size */
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index aee643ce13d1..4ab79a66a5a6 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -98,7 +98,7 @@ static ssize_t part_ro_show(struct device *dev,
+ 			    struct device_attribute *attr, char *buf)
+ {
+ 	struct hd_struct *p = dev_to_part(dev);
+-	return sprintf(buf, "%d\n", p->policy ? 1 : 0);
++	return sprintf(buf, "%d\n", p->read_only);
+ }
+ 
+ static ssize_t part_alignment_offset_show(struct device *dev,
+@@ -345,7 +345,7 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
+ 		queue_limit_discard_alignment(&disk->queue->limits, start);
+ 	p->nr_sects = len;
+ 	p->partno = partno;
+-	p->policy = get_disk_ro(disk);
++	p->read_only = get_disk_ro(disk);
+ 
+ 	if (info) {
+ 		struct partition_meta_info *pinfo = alloc_part_info(disk);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index f7fdfe93e25d..bb679ab2bfe7 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -3034,7 +3034,7 @@ static inline void remove_inode_hash(struct inode *inode)
+ extern void inode_sb_list_add(struct inode *inode);
+ 
+ #ifdef CONFIG_BLOCK
+-extern int bdev_read_only(struct block_device *);
++extern bool bdev_read_only(struct block_device *);
+ #endif
+ extern int set_blocksize(struct block_device *, int);
+ extern int sb_set_blocksize(struct super_block *, int);
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 8b5330dd5ac0..797043ff699b 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -118,7 +118,8 @@ struct hd_struct {
+ 	unsigned int discard_alignment;
+ 	struct device __dev;
+ 	struct kobject *holder_dir;
+-	int policy, partno;
++	bool read_only;
++	int partno;
+ 	struct partition_meta_info *info;
+ #ifdef CONFIG_FAIL_MAKE_REQUEST
+ 	int make_it_fail;
+@@ -438,12 +439,12 @@ extern void del_gendisk(struct gendisk *gp);
+ extern struct gendisk *get_gendisk(dev_t dev, int *partno);
+ extern struct block_device *bdget_disk(struct gendisk *disk, int partno);
+ 
+-extern void set_device_ro(struct block_device *bdev, int flag);
+-extern void set_disk_ro(struct gendisk *disk, int flag);
++extern void set_device_ro(struct block_device *bdev, bool read_only);
++extern void set_disk_ro(struct gendisk *disk, bool read_only);
+ 
+-static inline int get_disk_ro(struct gendisk *disk)
++static inline bool get_disk_ro(struct gendisk *disk)
+ {
+-	return disk->part0.policy;
++	return disk->part0.read_only;
+ }
+ 
+ extern void disk_block_events(struct gendisk *disk);
+-- 
+2.22.0.410.gd8fdbe21b5-goog
 
-The example I posted *does* support the IOMMU case. That was case (b1)
-in the description. The idea is that pci_p2pdma_dist() returns a
-distance with a high bit set (PCI_P2PDMA_THRU_HOST_BRIDGE) when an IOMMU
-mapping is required and the appropriate flag tells it to call
-dma_map_resource(). This way, it supports both same-segment and
-different-segments without needing any look ups in the map step.
-
-For the only existing upstream use case (NVMe-of), this is ideal because
-we can calculate the mapping requirements exactly once ahead of any
-transfers. Then populating the bvecs and dma-mapping for each transfer
-is fast and doesn't require any additional work besides deciding where
-to get the memory from.
-
-For O_DIRECT and userspace RDMA, this should also be ideal, the real
-problem is how to get the necessary information out of the VMA. This
-isn't helped by having a lookup at the dma map step. But the provider
-driver is certainly going to be involved in creating the VMA so it
-should be able to easily provide the necessary hooks. Though there are
-still a bunch of challenges here.
-
-Maybe other use-cases are not this ideal but I suspect they should still
-be able to make use of the same flags. It's hard to say right now,
-though, because we haven't seen any other use cases.
-
-
-> Maybe you can hide these flags as some dma_map helper, then the
-> layering might be nicer:
-> 
->   dma_map_set_bio_p2p_flags(bio, phys_addr, source dev, dest_dev) 
-> 
-> ?
-> 
-> ie the choice of flag scheme to use is opaque to the DMA layer.
-
-If there was such a use case, I suppose you could use a couple of flag
-bits to tell you how to interpret the other flag bits but, at the
-moment, I only see a need for 2 bits so we'll probably have a lot of
-spares for a long time. You could certainly have a 3rd bit which says do
-a lookup and try to figure out bouncing, but I don't think it's a good idea.
-
->>> If we can spare 4-8 bits in the bio then I suggest a 'perfect hash
->>> table'. Assign each registered P2P 'bar info' a small 4 bit id and
->>> hash on that. It should be fast enough to not worry about the double
->>> lookup.
->>
->> This feels like it's just setting us up to run into nasty limits based
->> on the number of bits we actually have. The number of bits in a bio_vec
->> will always be a precious resource. If I have a server chassis that
->> exist today with 24 NVMe devices, and each device has a CMB, I'm already
->> using up 6 of those bits. Then we might have DEVICE_PRIVATE and other
->> uses on top of that.
-> 
-> A hash is an alternative data structure to a interval tree that has
-> better scaling for small numbers of BARs, which I think is our
-> case.
-
-But then you need a large and not necessarily future-proof number of
-bits in the bio_vec to store the hash.
-
-Logan
