@@ -2,68 +2,64 @@ Return-Path: <SRS0=XMJ3=U3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5EFC4321A
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 22:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED3A0C4321A
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 23:29:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B84B1208E3
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 22:22:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA26D2083B
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 23:29:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JZANTjyd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726563AbfF1WW0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jun 2019 18:22:26 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:49955 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726830AbfF1WW0 (ORCPT
+        id S1726813AbfF1X3J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jun 2019 19:29:09 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:49912 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726643AbfF1X3J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jun 2019 18:22:26 -0400
-Received: from mail-qt1-f200.google.com ([209.85.160.200])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <gpiccoli@canonical.com>)
-        id 1hgzC8-0004pi-Eu
-        for linux-block@vger.kernel.org; Fri, 28 Jun 2019 22:18:12 +0000
-Received: by mail-qt1-f200.google.com with SMTP id z6so7522797qtj.7
-        for <linux-block@vger.kernel.org>; Fri, 28 Jun 2019 15:18:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=n5bQiVrS+1LRta2NDI5p3A3SX0XhkU71NGdqYIImrSI=;
-        b=ZxwXHoN2DRGAlaKdFMw8JsfjnATcCzrl2mivDd5JJAYTRRwYLZb1sdJeUDAYX+6dfL
-         PUE1ps6lRNdrSC9D1nd9Q4Brj7T5nII4AoOUyUmeHdmZEBUMLqeGNpn4xJZE6d3q1kPy
-         dsMb1DwRLYpwsZPa78DHc615epmcE47uloKA791DzQPMwgUtKfz9D+R5t1bAtlx5a/0F
-         DmwIJDP63Req+qbRcw3g8TGdZVt1Bd2b7qX2PagSPr8kTwS4psJ9aCI7e/wBCvrAlxsD
-         fMwg4ZLXaQ/F6ZMirWmyE6BuZp7CgdZH/UMBppH2TfhD+aSGux1SSfj/qb28tJoDAyG3
-         9SnA==
-X-Gm-Message-State: APjAAAVR4tXu4OMRIxn/q0xsT16d1gQD9FcrR6lJw5v6ltRsxFkbTqfM
-        upY0QeNbKpoixiS7ARk7+nzwdTNhapXxI7rVao+s4EFN9qpt7SQHnV2389xwZPW5or+zL65JsX0
-        PXI0ilgvyvlefww1a2t+LTNIrmk7k35s5OArd15fF
-X-Received: by 2002:ac8:21b7:: with SMTP id 52mr10031480qty.59.1561760291611;
-        Fri, 28 Jun 2019 15:18:11 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyJgNAetkfe3QWI0Qep3GxdX+hqWUv9mu+JZ5GT1MgRrTniaFvcZ50KaBzSf7+2mPVnA9WfLQ==
-X-Received: by 2002:ac8:21b7:: with SMTP id 52mr10031469qty.59.1561760291413;
-        Fri, 28 Jun 2019 15:18:11 -0700 (PDT)
-Received: from localhost ([179.110.97.158])
-        by smtp.gmail.com with ESMTPSA id x205sm1627081qka.56.2019.06.28.15.18.10
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 28 Jun 2019 15:18:10 -0700 (PDT)
-From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-To:     stable@vger.kernel.org
-Cc:     gregkh@linuxfoundation.org, sashal@kernel.org,
-        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-        gpiccoli@canonical.com, jay.vosburgh@canonical.com,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Song Liu <songliubraving@fb.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Eric Ren <renzhengeek@gmail.com>
-Subject: [4.19.y PATCH 1/2] block: Fix a NULL pointer dereference in generic_make_request()
-Date:   Fri, 28 Jun 2019 19:17:58 -0300
-Message-Id: <20190628221759.18274-1-gpiccoli@canonical.com>
-X-Mailer: git-send-email 2.22.0
+        Fri, 28 Jun 2019 19:29:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1561764591; x=1593300591;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OsJ4533FGIsd9sT3eaMWIKnkvnlm7ICcCh8oC0A01v8=;
+  b=JZANTjydQ760Vyib04Eq6QwID6y6kSyYn3GWw4UJLM+Ss6kN6Wnnlo5S
+   KEV72MXcaHglbG3IZtItG4QJyrvBQ7PrkAj+ieaw1lx5290jeHDjgo0gN
+   KHbmMdDyDxzGTwOK7QZiJxJjxAaH51hYqb9z9DrLSzYhRl16LBY742vKu
+   PCXKQr8HOqxg5N5JWHuHDfBb15SRmlwBrG2WFGCJYYsb146grmEkOyM/u
+   Y65XXl5jeI681843TFfu0/YOtex35Aj89jb88xIIoESnCI7r/KDOBg2UD
+   /bnbCEdLWAczMWkTftSqFvQP1KGzxhje5dtAUvGQSATatbVl9NYbSCgzN
+   w==;
+X-IronPort-AV: E=Sophos;i="5.63,429,1557158400"; 
+   d="scan'208";a="211646990"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 29 Jun 2019 07:29:50 +0800
+IronPort-SDR: PNy7bUaEnRk5MK6j3lKEw8ISLd05lEPHKzqbsQguxgo9UGfExwzcDyXm9+rMfTxCl796Il+iOl
+ JlRqWc3NQCfS77i15EM6JMlMocUlZv9FunJN4Wcf9K/hcVT3W9VHcCnsq3YpSot188j3RYi2nw
+ ZJXg/GW70WuTePP5q7ec3qLz3PdSO09e0FM1ZwtJxhRSxKbxlWGS5Ubxf4vDxests2tr8nXgnc
+ lLanRBq+4cjkt1aO1Fjr59l0oou9jwzh4hcTZDEzExZJhW0BASwf5BPafKs4/IRmb6jp/82H8k
+ UXFVEceYaJ9tavCmGwiPRoxg
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP; 28 Jun 2019 16:28:13 -0700
+IronPort-SDR: 2Sy2JUfh+VD4vfM57pkQDgfzmKGQXgMknyoE0gu3c51JSNrsJjYKR3+2c8/4adaj/3V8ingvO6
+ sqkJVditaIkyThMpZ5W/ZnGnsjVRDPVxfLpw18kFutJzJXUlVoda2RzJgjh8ok6BjqL7ggjksZ
+ tSx7f/g1u8apzYeRbumNX9sm09RianykeqBLQI9DHumpNrXqQI2W4nJWy0byYvTCGrRvpflSyV
+ bYWQJ8EnW+2O4h0i9KpDvf8sHIBN0io940Gv7wb1z5C+P4wdLEB9HH7LUY8VHg8y9aWEX8T00x
+ jUQ=
+Received: from cmercuryqemu.hgst.com ([10.202.65.32])
+  by uls-op-cesaip01.wdc.com with ESMTP; 28 Jun 2019 16:29:08 -0700
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH] null_blk: fix type mismatch null_handle_cmd()
+Date:   Fri, 28 Jun 2019 16:29:04 -0700
+Message-Id: <20190628232904.31211-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -71,116 +67,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
------------------------------------------------------------------
-This patch is not on mainline and is meant to 4.19 stable *only*.
-After the patch description there's a reasoning about that.
------------------------------------------------------------------
+In null_handle_cmd() when device is configured as zoned, variable op is
+decalred as an int, where it is used to hold values of type
+REQ_OP_XXX which is of type enum req_opf. Change the type from
+int to enum req_opf.
 
-Commit 37f9579f4c31 ("blk-mq: Avoid that submitting a bio concurrently
-with device removal triggers a crash") introduced a NULL pointer
-dereference in generic_make_request(). The patch sets q to NULL and
-enter_succeeded to false; right after, there's an 'if (enter_succeeded)'
-which is not taken, and then the 'else' will dereference q in
-blk_queue_dying(q).
-
-This patch just moves the 'q = NULL' to a point in which it won't trigger
-the oops, although the semantics of this NULLification remains untouched.
-
-A simple test case/reproducer is as follows:
-a) Build kernel v4.19.56-stable with CONFIG_BLK_CGROUP=n.
-
-b) Create a raid0 md array with 2 NVMe devices as members, and mount
-it with an ext4 filesystem.
-
-c) Run the following oneliner (supposing the raid0 is mounted in /mnt):
-(dd of=/mnt/tmp if=/dev/zero bs=1M count=999 &); sleep 0.3;
-echo 1 > /sys/block/nvme1n1/device/device/remove
-(whereas nvme1n1 is the 2nd array member)
-
-This will trigger the following oops:
-
-BUG: unable to handle kernel NULL pointer dereference at 0000000000000078
-PGD 0 P4D 0
-Oops: 0000 [#1] SMP PTI
-RIP: 0010:generic_make_request+0x32b/0x400
-Call Trace:
- submit_bio+0x73/0x140
- ext4_io_submit+0x4d/0x60
- ext4_writepages+0x626/0xe90
- do_writepages+0x4b/0xe0
-[...]
-
-This patch has no functional changes and preserves the md/raid0 behavior
-when a member is removed before kernel v4.17.
-
-----------------------------
-Why this is not on mainline?
-----------------------------
-
-The patch was originally submitted upstream in linux-raid and
-linux-block mailing-lists - it was initially accepted by Song Liu,
-but Christoph Hellwig[0] observed that there was a clean-up series
-ready to be accepted from Ming Lei[1] that fixed the same issue.
-
-The accepted patches from Ming's series in upstream are: commit
-47cdee29ef9d ("block: move blk_exit_queue into __blk_release_queue") and
-commit fe2008640ae3 ("block: don't protect generic_make_request_checks
-with blk_queue_enter"). Those patches basically do a clean-up in the
-block layer involving:
-
-1) Putting back blk_exit_queue() logic into __blk_release_queue(); that
-path was changed in the past and the logic from blk_exit_queue() was
-added to blk_cleanup_queue().
-
-2) Removing the guard/protection in generic_make_request_checks() with
-blk_queue_enter().
-
-The problem with Ming's series for -stable is that it relies in the
-legacy request IO path removal. So it's "backport-able" to v5.0+,
-but doing that for early versions (like 4.19) would incur in complex
-code changes. Hence, it was suggested by Christoph and Song Liu that
-this patch was submitted to stable only; otherwise merging it upstream
-would add code to fix a path removed in a subsequent commit.
-
-[0] lore.kernel.org/linux-block/20190521172258.GA32702@infradead.org
-[1] lore.kernel.org/linux-block/20190515030310.20393-1-ming.lei@redhat.com
-
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Song Liu <songliubraving@fb.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Tested-by: Eric Ren <renzhengeek@gmail.com>
-Fixes: 37f9579f4c31 ("blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash")
-Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- block/blk-core.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/block/null_blk_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 6eed5d84c2ef..682bc561b77b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2445,10 +2445,8 @@ blk_qc_t generic_make_request(struct bio *bio)
- 			flags = 0;
- 			if (bio->bi_opf & REQ_NOWAIT)
- 				flags = BLK_MQ_REQ_NOWAIT;
--			if (blk_queue_enter(q, flags) < 0) {
-+			if (blk_queue_enter(q, flags) < 0)
- 				enter_succeeded = false;
--				q = NULL;
--			}
- 		}
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 22303e59a274..99328ded60d1 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -1198,7 +1198,7 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
+ 	if (!cmd->error && dev->zoned) {
+ 		sector_t sector;
+ 		unsigned int nr_sectors;
+-		int op;
++		enum req_opf op;
  
- 		if (enter_succeeded) {
-@@ -2479,6 +2477,7 @@ blk_qc_t generic_make_request(struct bio *bio)
- 				bio_wouldblock_error(bio);
- 			else
- 				bio_io_error(bio);
-+			q = NULL;
- 		}
- 		bio = bio_list_pop(&bio_list_on_stack[0]);
- 	} while (bio);
+ 		if (dev->queue_mode == NULL_Q_BIO) {
+ 			op = bio_op(cmd->bio);
 -- 
-2.22.0
+2.21.0
 
