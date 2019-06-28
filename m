@@ -2,92 +2,88 @@ Return-Path: <SRS0=XMJ3=U3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FF8C4321A
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 20:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC65DC4321A
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 20:26:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4958C208CB
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 20:25:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ax+sGI5/"
+	by mail.kernel.org (Postfix) with ESMTP id 9D3FB208CB
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 20:26:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727190AbfF1UZr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jun 2019 16:25:47 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:49476 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727095AbfF1UZr (ORCPT
+        id S1727206AbfF1U0E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jun 2019 16:26:04 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:38597 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727095AbfF1U0D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jun 2019 16:25:47 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5SKNh8X105887;
-        Fri, 28 Jun 2019 20:25:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=cuKdErStEbV911yNRiCd9yz0vcPar0KyqDRQ9fMwtm4=;
- b=ax+sGI5/8MWlXOtUGqi7fTAFyFLr4V7PAwIGdJcwzi2A+JH9u+HYM8sLSUGcrqk5jNPq
- vOXrk0A5gzgLFyIBI/1Q7tdxU3HZfBJKQ+amn5qJjjVWGgaivEwZWn+2rzES71JTcH2K
- 8MDSoh7KSHA2Yz/siDbMgVQuzurml9Luc8JasDXgO6isZpm/Z5VnLrlqEqldoDogaHXY
- oUHbgiKSPOGGZbqZBWy2aAWx5HVC+ci0rWwvTVM3Ic4zBclxs2LxPwZ7nI0suBBPUo6e
- hv7++R5ctFy9sUmym2IK1/EPcxRMGmWsNjOvgracS62lKGwTze1CVLkKS/IultZx+lfw cw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 2t9c9q7ebk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Jun 2019 20:25:41 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5SKNf7S122556;
-        Fri, 28 Jun 2019 20:23:41 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2t9ace0shp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Jun 2019 20:23:40 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5SKNd63001619;
-        Fri, 28 Jun 2019 20:23:39 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 28 Jun 2019 13:23:39 -0700
-To:     Bart Van Assche <bvanassche@acm.org>
+        Fri, 28 Jun 2019 16:26:03 -0400
+Received: by mail-pg1-f196.google.com with SMTP id z75so3078878pgz.5
+        for <linux-block@vger.kernel.org>; Fri, 28 Jun 2019 13:26:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pgunoje9YbXGMNCay1bN61kDNQcMxRFun4wlkSk4Mqs=;
+        b=rNvVBG+ZlxMJc2A0QqKJiypb+nZiQaF9xZNGinFOp+fc+a+kkGT6qgglDMKZbtGrDr
+         cvteV21GSikhziQnn+I3Fpm8x3wrj5+On1R53LBdw6ob6pHCIzIDpSI21m/OgV7UCiBk
+         nUkw+aLgFLv5WnWu1n/jAQUyLWKyHQLfNz5nVbe2cU2Nxes+qEJzqj9a2X+L9T71qOp4
+         0mcNqdVvap/2+28JQlFHJ2H2274mBwOe46+uv+YeWr8OumnlyW+vGngw3htvM2RxDqZw
+         MxTm2YYSA1XNHYk3KZLB9K+ewhEIdfe3QKz/zvo7DFp+hg1W79j/yLs1Kfn3/rpukcHv
+         LoAg==
+X-Gm-Message-State: APjAAAXQHWYnloIOhljolxvVIto39Yl1L5Ann4cy5I1Wp2/5Yh5IQ+OP
+        bF3Fvvm970LQB+Vz7LzRInc=
+X-Google-Smtp-Source: APXvYqw4cEikbrWM0hg4EHP+wJ2ybsA4pH6aEh0gPxxbrptL9s/mHV31XCSxfKcvO0uM1V109IIWYg==
+X-Received: by 2002:a65:5248:: with SMTP id q8mr2358109pgp.259.1561753562945;
+        Fri, 28 Jun 2019 13:26:02 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id t24sm3269361pfh.113.2019.06.28.13.26.01
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 28 Jun 2019 13:26:02 -0700 (PDT)
+Subject: Re: [PATCH] block: Rename hd_struct.policy into hd_struct.read_only
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 4/4] block, documentation: Document discard_zeroes_data, fua, max_discard_segments and write_zeroes_max_bytes
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20190628200745.206110-1-bvanassche@acm.org>
-        <20190628200745.206110-5-bvanassche@acm.org>
-Date:   Fri, 28 Jun 2019 16:23:37 -0400
-In-Reply-To: <20190628200745.206110-5-bvanassche@acm.org> (Bart Van Assche's
-        message of "Fri, 28 Jun 2019 13:07:45 -0700")
-Message-ID: <yq18stlh31y.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.com>
+References: <20190628195615.201990-1-bvanassche@acm.org>
+ <yq1y31lh3pl.fsf@oracle.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <36038ce7-8cfe-4dc4-2a65-ff26ee7d1694@acm.org>
+Date:   Fri, 28 Jun 2019 13:26:01 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9302 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906280233
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9302 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906280233
+In-Reply-To: <yq1y31lh3pl.fsf@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 6/28/19 1:09 PM, Martin K. Petersen wrote:
+> 
+> Bart,
+> 
+>> Since nobody knows what "policy" means, rename the field to "read_only"
+>> for clarity. Martin Petersen proposed this earlier - see also his patch
+>> "scsi: sd: block: Fix regressions in read-only block device handling"
+>> (https://www.spinics.net/lists/linux-scsi/msg129146.html). This patch
+>> is an extension of a subset of Martin's patch.
+> 
+> I'd rather we just get this one merged:
+> 
+> 	https://patchwork.kernel.org/patch/10967367/
+> 
+> It even comes with a shiny blktest.
 
-Bart,
+Ah, I had overlooked that patch.
 
-Looks fine.
+Jens, please drop my patch.
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Bart.
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+
