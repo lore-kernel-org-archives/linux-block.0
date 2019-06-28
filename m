@@ -4,93 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88817C4321A
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 06:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C51BEC4321A
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 07:25:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5908A2133F
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 06:22:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FB512064A
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 07:25:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Lg/Jt9Nu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Zer0a/jP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726719AbfF1GWd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jun 2019 02:22:33 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:48516 "EHLO
+        id S1727304AbfF1HZW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jun 2019 03:25:22 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:49804 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726553AbfF1GWd (ORCPT
+        with ESMTP id S1726574AbfF1HZV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jun 2019 02:22:33 -0400
+        Fri, 28 Jun 2019 03:25:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Type:MIME-Version:Message-ID:
-        Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=yaxzBZoKG5uqgp2Dc+YmYOZs72ahmoev192Hb8KX5XA=; b=Lg/Jt9NuQr2XTVo+/RHzoeNlfU
-        f3QP6Yg+3z290KEVVtouYlhsqYmlf1plU/Y0sPNJ33B9Gjb+A/doSHevT+jiFPK0IV+p9pGUYJ7QU
-        laXYFlboaf1ml/9XRMssNL/qMzTZGdD4jbo4zCAjY/DBWaWAdp8zjbQdiLiBVurgV5HJowY17QTQP
-        v7gB416/qTj427UC1w4LsUbq2mZBLNiMb79CMC7wAYdUrw/TJhiqbOxrpylCUS4b0iUScQi/MAiXH
-        YLRqvMWHmhDXgAas52qM1ZO7uKKE95i/fCSHEJfTWLwRKxlgmuSDpyPgHYwalSOOoKOnrhrAlSqta
-        DbPFUsZQ==;
-Received: from 089144214055.atnat0023.highway.a1.net ([89.144.214.55] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hgkHI-0000b6-OO
-        for linux-block@vger.kernel.org; Fri, 28 Jun 2019 06:22:33 +0000
-Date:   Fri, 28 Jun 2019 08:22:30 +0200
-From:   Christoph Hellwig <hch@infradead.org>
-To:     linux-block@vger.kernel.org
-Subject: [ANNOUNCE] Alpine Linux Persistence and Storage Summit
-Message-ID: <20190628062230.GA2014@infradead.org>
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=L59glztjBFdzd0vpM/vAEVkumpBm6raQTV6rgoEfnoA=; b=Zer0a/jPvQOc99VEP2rbwm2/r
+        584J1SYdkxFucp5cUWZZtRfM2ngZMJlyoVBRF7VAcuc9sdLj4zpuDbbeDkVeZ7SE2NFhttNNXosU4
+        vVv5+fJP/Yfs975tI2b2X3ophH2KxjRVMrFHOUsdEsHpaPWhmD8RtnDj6skxrqp6ERc7mGcKHBWHC
+        3xG9cHW7TpLICuZD6pgbV07Wi6izh7qeZmTFqyTl6lkqlBv9GQnZMm3F0S2sQ9khVB1bBCAkN+4Se
+        BpfeStB3nggiwQp3CYx98ofVBk9bQxwWNPyq7Izwiad12RzO1bJ/LVqYNjVgfidNRGBtM7eGj65dx
+        4/jZ5dS9g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
+        id 1hglG2-0001az-TF; Fri, 28 Jun 2019 07:25:18 +0000
+Date:   Fri, 28 Jun 2019 00:25:18 -0700
+From:   'Christoph Hellwig' <hch@infradead.org>
+To:     kanchan <joshi.k@samsung.com>
+Cc:     'Christoph Hellwig' <hch@infradead.org>, 'Jan Kara' <jack@suse.cz>,
+        "'Martin K. Petersen'" <martin.petersen@oracle.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, anshul@samsung.com,
+        linux-fsdevel@vger.kernel.org, prakash.v@samsung.com,
+        linux-ext4@vger.kernel.org
+Subject: Re: [PATCH v5 0/7] Extend write-hint framework, and add write-hint
+ for Ext4 journal
+Message-ID: <20190628072518.GA25577@infradead.org>
+References: <CGME20190425112347epcas2p1f7be48b8f0d2203252b8c9dd510c1b61@epcas2p1.samsung.com>
+ <1556191202-3245-1-git-send-email-joshi.k@samsung.com>
+ <20190510170249.GA26907@infradead.org>
+ <00fb01d50c71$dd358e50$97a0aaf0$@samsung.com>
+ <20190520142719.GA15705@infradead.org>
+ <20190521082528.GA17709@quack2.suse.cz>
+ <20190521082846.GA11024@infradead.org>
+ <20190522102530.GK17019@quack2.suse.cz>
+ <00f301d52c1d$58f1e820$0ad5b860$@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <00f301d52c1d$58f1e820$0ad5b860$@samsung.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We proudly announce the second Alpine Linux Persistence and Storage
-Summit (ALPSS), which will be held October 1st to October 4th 2019 at
-the Lizumerhuette [1][2] in Austria .
+On Wed, Jun 26, 2019 at 06:17:29PM +0530, kanchan wrote:
+> Christoph, 
+> May I know if you have thoughts about what Jan mentioned below? 
 
-The goal of this conference is to discuss the hot topics in Linux storage
-and file systems, such as persistent memory, NVMe, Zoned Block Device,
-and PCIe peer to peer transfers in a cool and relaxed setting with
-spectacular views in the Austrian alps.
-
-We plan to have a small selection of short and to the point talks with
-lots of room for discussion in small groups, as well as ample downtime
-to enjoy the surrounding.
-
-Attendance is free except for the accommodation and food at the lodge [3],
-but the number of seats is strictly limited.  If you are interested in
-attending please reserve a seat by mailing your favorite topic(s) to:
-
-	alpss-pc@lists.infradead.org
-
-If you are interested in giving a short and crisp talk please also send
-an abstract to the same address.
-
-Note: The Lizumerhuette is an Alpine Society lodge in a high alpine
-environment.  A hike of approximately 2 hours is required to the lodge,
-and no other accommodations are available within walking distance.
-
-More details will eventually be available on our website:
-
-        http://www.alpss.at/
-
-Thank you on behalf of the program committee:
-
-    Stephen Bates
-    Sagi Grimberg
-    Christoph Hellwig
-    Johannes Thumshirn
-    Richard Weinberger
-
-[1] http://www.tyrol.com/things-to-do/sports/hiking/refuge-huts/a-lizumer-hut
-[2] https://www.glungezer.at/l-i-z-u-m-e-r-h-%C3%BC-t-t-e/
-[3] approx. EUR 40-60 per person and night, depending on the room
-    category
+As said I fundamentally disagree with exposting the streams mess at
+the block layer.  I have no problem with setting a hint on the journal,
+but I do object to exposting the streams mess even more.
