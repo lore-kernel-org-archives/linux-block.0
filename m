@@ -2,223 +2,149 @@ Return-Path: <SRS0=XMJ3=U3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C252C4321A
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 15:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E406CC4321A
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 15:54:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0BB01205F4
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 15:51:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C36A720828
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jun 2019 15:54:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726940AbfF1PvP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jun 2019 11:51:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34362 "EHLO mx1.redhat.com"
+        id S1726807AbfF1Pyr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jun 2019 11:54:47 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:38384 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726750AbfF1PvP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jun 2019 11:51:15 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 761BF3086215;
-        Fri, 28 Jun 2019 15:51:14 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-219.rdu2.redhat.com [10.10.120.219])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D68671001B17;
-        Fri, 28 Jun 2019 15:51:11 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
- Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
- Kingdom.
- Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 6/6] Add sample notification program [ver #5]
-From:   David Howells <dhowells@redhat.com>
-To:     viro@zeniv.linux.org.uk
-Cc:     dhowells@redhat.com, Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        nicolas.dichtel@6wind.com, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>, dhowells@redhat.com,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Fri, 28 Jun 2019 16:51:11 +0100
-Message-ID: <156173707116.15650.11875602081597740176.stgit@warthog.procyon.org.uk>
-In-Reply-To: <156173701358.15650.8735203424342507015.stgit@warthog.procyon.org.uk>
-References: <156173701358.15650.8735203424342507015.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/unknown-version
+        id S1726686AbfF1Pyr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Jun 2019 11:54:47 -0400
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtp (Exim 4.89)
+        (envelope-from <logang@deltatee.com>)
+        id 1hgtCs-0008QY-EA; Fri, 28 Jun 2019 09:54:35 -0600
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20190625170115.GA9746@lst.de>
+ <41235a05-8ed1-e69a-e7cd-48cae7d8a676@deltatee.com>
+ <20190626065708.GB24531@lst.de>
+ <c15d5997-9ba4-f7db-0e7a-a69e75df316c@deltatee.com>
+ <20190626202107.GA5850@ziepe.ca>
+ <8a0a08c3-a537-bff6-0852-a5f337a70688@deltatee.com>
+ <20190627090843.GB11548@lst.de>
+ <89889319-e778-7772-ab36-dc55b59826be@deltatee.com>
+ <20190627170027.GE10652@lst.de>
+ <e63d0259-e17f-effe-b76d-43dbfda8ae3a@deltatee.com>
+ <20190628133837.GA3801@lst.de>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <10b2b013-5b2e-f642-9524-9551809c03a3@deltatee.com>
+Date:   Fri, 28 Jun 2019 09:54:27 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20190628133837.GA3801@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Fri, 28 Jun 2019 15:51:14 +0000 (UTC)
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: sbates@raithlin.com, kbusch@kernel.org, sagi@grimberg.me, dan.j.williams@intel.com, bhelgaas@google.com, axboe@kernel.dk, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca, hch@lst.de
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH 00/28] Removing struct page from P2PDMA
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This needs to be linked with -lkeyutils.
 
-It is run like:
 
-	./watch_test
+On 2019-06-28 7:38 a.m., Christoph Hellwig wrote:
+> On Thu, Jun 27, 2019 at 12:00:35PM -0600, Logan Gunthorpe wrote:
+>>> It is not.  (c) is fundamentally very different as it is not actually
+>>> an operation that ever goes out to the wire at all, and which is why the
+>>> actual physical address on the wire does not matter at all.
+>>> Some interfaces like NVMe have designed it in a way that it the commands
+>>> used to do this internal transfer look like (b2), but that is just their
+>>> (IMHO very questionable) interface design choice, that produces a whole
+>>> chain of problems.
+>>
+>> >From the mapping device's driver's perspective yes, but from the
+>> perspective of a submitting driver they would be the same.
+> 
+> With your dma_addr_t scheme it won't be the same, as you'd need
+> a magic way to generate the internal addressing and stuff it into
+> the dma_addr_t.  With a phys_addr_t based scheme they should basically
+> be all the same.
 
-and watches "/" for mount changes and the current session keyring for key
-changes:
+Yes, I see the folly in the dma_addr_t scheme now. I like the
+phys_addr_t ideas we have been discussing.
 
-	# keyctl add user a a @s
-	1035096409
-	# keyctl unlink 1035096409 @s
-	# mount -t tmpfs none /mnt/nfsv3tcp/
-	# umount /mnt/nfsv3tcp
+>> Yes, you did suggest them. But what I'm trying to suggest is we don't
+>> *necessarily* need the lookup. For demonstration purposes only, a
+>> submitting driver could very roughly potentially do:
+>>
+>> struct bio_vec vec;
+>> dist = pci_p2pdma_dist(provider_pdev, mapping_pdev);
+>> if (dist < 0) {
+>>      /* use regular memory */
+>>      vec.bv_addr = virt_to_phys(kmalloc(...));
+>>      vec.bv_flags = 0;
+>> } else if (dist & PCI_P2PDMA_THRU_HOST_BRIDGE) {
+>>      vec.bv_addr = pci_p2pmem_alloc_phys(provider_pdev, ...);
+>>      vec.bv_flags = BVEC_MAP_RESOURCE;
+>> } else {
+>>      vec.bv_addr = pci_p2pmem_alloc_bus_addr(provider_pdev, ...);
+>>      vec.bv_flags = BVEC_MAP_BUS_ADDR;
+>> }
+> 
+> That doesn't look too bad, except..
+> 
+>> -- And a mapping driver would roughly just do:
+>>
+>> dma_addr_t dma_addr;
+>> if (vec.bv_flags & BVEC_MAP_BUS_ADDR) {
+>>      if (pci_bus_addr_in_bar(mapping_pdev, vec.bv_addr, &bar, &off))  {
+>>           /* case (c) */
+>>           /* program the DMA engine with bar and off */
+> 
+> Why bother with that here if we could also let the caller handle
+> that? pci_p2pdma_dist() should be able to trivially find that out
+> based on provider_dev == mapping_dev.
 
-producing:
+True, in fact pci_p2pdma_dist() should return 0 in that case.
 
-	# ./watch_test
-	ptrs h=4 t=2 m=20003
-	NOTIFY[00000004-00000002] ty=0003 sy=0002 i=01000010
-	KEY 2ffc2e5d change=2[linked] aux=1035096409
-	ptrs h=6 t=4 m=20003
-	NOTIFY[00000006-00000004] ty=0003 sy=0003 i=01000010
-	KEY 2ffc2e5d change=3[unlinked] aux=1035096409
-	ptrs h=8 t=6 m=20003
-	NOTIFY[00000008-00000006] ty=0001 sy=0000 i=02000010
-	MOUNT 00000013 change=0[new_mount] aux=168
-	ptrs h=a t=8 m=20003
-	NOTIFY[0000000a-00000008] ty=0001 sy=0001 i=02000010
-	MOUNT 00000013 change=1[unmount] aux=168
+Though the driver will still have to do a range compare to figure out
+which BAR the address belongs to and find the offset.
 
-Other events may be produced, such as with a failing disk:
+>> The real difficulty here is that you'd really want all the above handled
+>> by a dma_map_bvec() so it can combine every vector hitting the IOMMU
+>> into a single continuous IOVA -- but it's hard to fit case (c) into that
+>> equation. So it might be that a dma_map_bvec() handles cases (a), (b1)
+>> and (b2) and the mapping driver has to then check each resulting DMA
+>> vector for pci_bus_addr_in_bar() while it is programming the DMA engine
+>> to deal with case (c).
+> 
+> I'd do it the other way around.  pci_p2pdma_dist is used to find
+> the p2p type.  The p2p type is stuff into the bio_vec, and we then:
+> 
+>  (1) manually check for case (c) in driver for drivers that want to
+>      treat it different from (b)
+>  (2) we then have a dma mapping wrapper that checks the p2p type
+>      and does the right thing for the rest.
 
-	ptrs h=5 t=2 m=6000004
-	NOTIFY[00000005-00000002] ty=0004 sy=0006 i=04000018
-	BLOCK 00800050 e=6[critical medium] s=5be8
+Sure, that could make sense.
 
-This corresponds to:
+I imagine there's a lot of details that are wrong or could be done
+better in my example. The purpose of it was just to demonstrate that we
+can do it without a lookup in an interval tree on the physical address.
 
-	print_req_error: critical medium error, dev sdf, sector 23528 flags 0
-
-in dmesg.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
----
-
- samples/watch_queue/watch_test.c |   76 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
-
-diff --git a/samples/watch_queue/watch_test.c b/samples/watch_queue/watch_test.c
-index f792c13614f4..0018ecac188a 100644
---- a/samples/watch_queue/watch_test.c
-+++ b/samples/watch_queue/watch_test.c
-@@ -30,6 +30,12 @@
- #ifndef __NR_watch_devices
- #define __NR_watch_devices -1
- #endif
-+#ifndef __NR_watch_mount
-+#define __NR_watch_mount -1
-+#endif
-+#ifndef __NR_watch_sb
-+#define __NR_watch_sb -1
-+#endif
- 
- #define BUF_SIZE 4
- 
-@@ -61,6 +67,47 @@ static void saw_key_change(struct watch_notification *n)
- 	       k->key_id, n->subtype, key_subtypes[n->subtype], k->aux);
- }
- 
-+static const char *mount_subtypes[256] = {
-+	[NOTIFY_MOUNT_NEW_MOUNT]	= "new_mount",
-+	[NOTIFY_MOUNT_UNMOUNT]		= "unmount",
-+	[NOTIFY_MOUNT_EXPIRY]		= "expiry",
-+	[NOTIFY_MOUNT_READONLY]		= "readonly",
-+	[NOTIFY_MOUNT_SETATTR]		= "setattr",
-+	[NOTIFY_MOUNT_MOVE_FROM]	= "move_from",
-+	[NOTIFY_MOUNT_MOVE_TO]		= "move_to",
-+};
-+
-+static void saw_mount_change(struct watch_notification *n)
-+{
-+	struct mount_notification *m = (struct mount_notification *)n;
-+	unsigned int len = (n->info & WATCH_INFO_LENGTH) >> WATCH_INFO_LENGTH__SHIFT;
-+
-+	if (len != sizeof(struct mount_notification) / WATCH_LENGTH_GRANULARITY)
-+		return;
-+
-+	printf("MOUNT %08x change=%u[%s] aux=%u\n",
-+	       m->triggered_on, n->subtype, mount_subtypes[n->subtype], m->changed_mount);
-+}
-+
-+static const char *super_subtypes[256] = {
-+	[NOTIFY_SUPERBLOCK_READONLY]	= "readonly",
-+	[NOTIFY_SUPERBLOCK_ERROR]	= "error",
-+	[NOTIFY_SUPERBLOCK_EDQUOT]	= "edquot",
-+	[NOTIFY_SUPERBLOCK_NETWORK]	= "network",
-+};
-+
-+static void saw_super_change(struct watch_notification *n)
-+{
-+	struct superblock_notification *s = (struct superblock_notification *)n;
-+	unsigned int len = (n->info & WATCH_INFO_LENGTH) >> WATCH_INFO_LENGTH__SHIFT;
-+
-+	if (len < sizeof(struct superblock_notification) / WATCH_LENGTH_GRANULARITY)
-+		return;
-+
-+	printf("SUPER %08llx change=%u[%s]\n",
-+	       s->sb_id, n->subtype, super_subtypes[n->subtype]);
-+}
-+
- static const char *block_subtypes[256] = {
- 	[NOTIFY_BLOCK_ERROR_TIMEOUT]			= "timeout",
- 	[NOTIFY_BLOCK_ERROR_NO_SPACE]			= "critical space allocation",
-@@ -159,6 +206,12 @@ static int consumer(int fd, struct watch_queue_buffer *buf)
- 			case WATCH_TYPE_USB_NOTIFY:
- 				saw_usb_event(n);
- 				break;
-+			case WATCH_TYPE_MOUNT_NOTIFY:
-+				saw_mount_change(n);
-+				break;
-+			case WATCH_TYPE_SB_NOTIFY:
-+				saw_super_change(n);
-+				break;
- 			}
- 
- 			tail += (n->info & WATCH_INFO_LENGTH) >> WATCH_INFO_LENGTH__SHIFT;
-@@ -186,6 +239,19 @@ static struct watch_notification_filter filter = {
- 			.type			= WATCH_TYPE_USB_NOTIFY,
- 			.subtype_filter[0]	= UINT_MAX,
- 		},
-+		[3] = {
-+			.type			= WATCH_TYPE_MOUNT_NOTIFY,
-+			// Reject move-from notifications
-+			.subtype_filter[0]	= UINT_MAX & ~(1 << NOTIFY_MOUNT_MOVE_FROM),
-+		},
-+		[4]	= {
-+			.type			= WATCH_TYPE_SB_NOTIFY,
-+			// Only accept notification of changes to R/O state
-+			.subtype_filter[0]	= (1 << NOTIFY_SUPERBLOCK_READONLY),
-+			// Only accept notifications of change-to-R/O
-+			.info_mask		= WATCH_INFO_FLAG_0,
-+			.info_filter		= WATCH_INFO_FLAG_0,
-+		},
- 	},
- };
- 
-@@ -229,5 +295,15 @@ int main(int argc, char **argv)
- 		exit(1);
- 	}
- 
-+	if (syscall(__NR_watch_mount, AT_FDCWD, "/", 0, fd, 0x02) == -1) {
-+		perror("watch_mount");
-+		exit(1);
-+	}
-+
-+	if (syscall(__NR_watch_sb, AT_FDCWD, "/mnt", 0, fd, 0x03) == -1) {
-+		perror("watch_sb");
-+		exit(1);
-+	}
-+
- 	return consumer(fd, buf);
- }
+Logan
 
