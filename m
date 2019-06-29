@@ -4,69 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D45CC4321A
-	for <linux-block@archiver.kernel.org>; Sat, 29 Jun 2019 15:38:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC363C4321A
+	for <linux-block@archiver.kernel.org>; Sat, 29 Jun 2019 15:40:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E5704208E3
-	for <linux-block@archiver.kernel.org>; Sat, 29 Jun 2019 15:38:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C087B208E3
+	for <linux-block@archiver.kernel.org>; Sat, 29 Jun 2019 15:40:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="JsRzVHcp"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xeioNt8X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbfF2PiR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Jun 2019 11:38:17 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:36307 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726836AbfF2PiR (ORCPT
+        id S1726858AbfF2Pkx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Jun 2019 11:40:53 -0400
+Received: from mail-io1-f45.google.com ([209.85.166.45]:46878 "EHLO
+        mail-io1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726819AbfF2Pkw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Jun 2019 11:38:17 -0400
-Received: by mail-io1-f66.google.com with SMTP id h6so19083212ioh.3
-        for <linux-block@vger.kernel.org>; Sat, 29 Jun 2019 08:38:16 -0700 (PDT)
+        Sat, 29 Jun 2019 11:40:52 -0400
+Received: by mail-io1-f45.google.com with SMTP id i10so5219441iol.13
+        for <linux-block@vger.kernel.org>; Sat, 29 Jun 2019 08:40:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=umCJsC+Xi/AFXT71IkKzcjjIl1YRRQ69dceOHAE2Rpw=;
-        b=JsRzVHcpRO5C6DQGxzUnXA/bBlClgjfo3FOq6JDjYMD0TIWq3wyQUlUO+zoMAAJJiN
-         plhuRyPpu+OvvKtVZ3m/MpKDH5kggibfodAC5yC1M5gZ4I8pRcy2RZlbIc1hO4tVv5B6
-         fEJtHIbdmq7FfwCJiWTyYmUCneGLLDHaSvOhLEePbh9JVd42WisZaU4KasVmEcqUoh9v
-         ztkDQGt9JfQn17Q7poVjX5v7yjBzJfIdQsZNtgYe3U4pUHA7n0CywUg5DfO3hj5BoOW+
-         COBQy2Cd8Gn8nfkOzCdTe54b6wxA0DpTjwih8OA8TYmS7OVZgPvQHgYxXgQ04cH7ZdyJ
-         LNrQ==
+        bh=8xmYoRSf8xUeqL5ashg05ILdLvPJtROoB7oEhGSMprk=;
+        b=xeioNt8X4RcLcpH4BDEhyzp8TtnN5/E97UT9BgAUeKUJZiJ/FkR1ApXJLzGUybIzzJ
+         bD4m3KsGHgjEkw+8fU1YSVwifxHaX3915zDr5BF9e2hFZERxFlC7LL39HnRBOexnZAHC
+         5BU99X0HzOp9u9nZvNALa1Myiq54IJX5Wh43f7HrWdkkKdcChZyf3CByuZYLlPmm6WQ3
+         QHSdnbug2J/5uKLLSDn7+UWqHrqyJ/0aA2rxfSQvl4CCb/HNDeEnrO13hTm409xagP/o
+         XNEGEEnEU5NCJyrop+N65IHyxyHpMUwPVB9JoNf9nyuybEv/Qt1diGYq7ZgtTm55YZZB
+         5L2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=umCJsC+Xi/AFXT71IkKzcjjIl1YRRQ69dceOHAE2Rpw=;
-        b=Ui8uhoaHatboyId2FRdxBjYz9Za8hPpeUkwHU4t4/And1vTaCKlmfs/qeEI6fmPme7
-         LogFv/AINOHDNHp16gnYReCo0HbBMgDlTMXeEY8Fb+T8RAx2H5iUwTG5TE5+7Pxy0qTI
-         JkKKQV/9Nl+P9/dQD71kDRHksTtrFz8UUXNlFkJMw60ChFe7S0NgNwSnBMxXwqe+errX
-         cbvCGi2WrGRdbMbRrZPnCC3oH0KTzVJnC4YtYd8bb5SSLmped6cN/xd5TlLsT7X36/3H
-         97ji9HIH5BjAPrFGuJ+x62ECMDtZ+WUpmWZeeMNxWob/bJLceWXxtKD9WWSFksdqUzE7
-         WatA==
-X-Gm-Message-State: APjAAAUaySIJAGevLRoWczxD/aP0sXRjzjlCWBbmk979nIwbhpQiWMwv
-        7hP7kAKDEW3CAAQ3/N54ju6/4vUi3MZ66A==
-X-Google-Smtp-Source: APXvYqyhKXf591aWyNUdyUeTN6Iy7or+i+HBbzgNvea/tB3fB+8HDAamz5UGnJNC9Dk80j8Gsj0PLw==
-X-Received: by 2002:a05:6638:201:: with SMTP id e1mr17878784jaq.45.1561822696136;
-        Sat, 29 Jun 2019 08:38:16 -0700 (PDT)
+        bh=8xmYoRSf8xUeqL5ashg05ILdLvPJtROoB7oEhGSMprk=;
+        b=DVzs0hkDOyXnt4WbElRkRMXB/8+hNeywQ8u7sjcFLf8U9uVhSqt+GXdU4ZvpT2X1D3
+         /aboZTECEsvRG2mYL1ivBDwdenX9BL4ebGdp/Sl2l9VkYMoCpGaJS8UC56/wTdA/L1uP
+         KSHK9aPtELabprbGMPWoEb9demesjb/CaQJKkQKLob4S0TydhIoXm7jrpZ95jfQqk+M+
+         7iVsu7oi/VGIzM5X8wVHWWVF8Ovk/6oSDZoKCRvstzTC/FRUlWrSut4MpGCP0GDy6hKj
+         TUR8aqE1SKXSSYtgj2ymdpTp0yB4z4dzFxqmLYsqloewRvxJlDyQfwrDICYz4STUkleD
+         yD4w==
+X-Gm-Message-State: APjAAAXu8F06AcUOyUOQdoCPF8uVGOpYci5l6cYgJDyL+U651aKsNzAy
+        DhC4pC2Qnu2lSYmGsw1E5RBZ0G+85kPHIw==
+X-Google-Smtp-Source: APXvYqzKQFNV9tBUtaLAbUbyys8/t3ghjx3cK4XhZgDtDUP3QP/XpqH81+Rpe/t/qMOXZb1DJnHfpw==
+X-Received: by 2002:a02:84e6:: with SMTP id f93mr18548263jai.73.1561822852077;
+        Sat, 29 Jun 2019 08:40:52 -0700 (PDT)
 Received: from [192.168.1.158] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id u187sm11169149iod.37.2019.06.29.08.38.14
+        by smtp.gmail.com with ESMTPSA id t4sm4476744iop.0.2019.06.29.08.40.50
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 29 Jun 2019 08:38:15 -0700 (PDT)
-Subject: Re: [PATCH 0/4] Improve block layer request queue sysfs parameter
- documentation
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20190628200745.206110-1-bvanassche@acm.org>
+        Sat, 29 Jun 2019 08:40:51 -0700 (PDT)
+Subject: Re: [PATCH] block: sed-opal: PSID reverttper capability
+To:     Revanth Rajashekar <revanth.rajashekar@intel.com>,
+        linux-block@vger.kernel.org
+Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
+        Scott Bauer <sbauer@plzdonthack.me>
+References: <20190627223002.8094-1-revanth.rajashekar@intel.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <eec45082-47e8-a736-df82-1f03bcfa939f@kernel.dk>
-Date:   Sat, 29 Jun 2019 09:38:14 -0600
+Message-ID: <a60ce160-7c6d-6474-344c-8e47bd71afc4@kernel.dk>
+Date:   Sat, 29 Jun 2019 09:40:50 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190628200745.206110-1-bvanassche@acm.org>
+In-Reply-To: <20190627223002.8094-1-revanth.rajashekar@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,16 +76,19 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/28/19 2:07 PM, Bart Van Assche wrote:
-> Hi Jens,
+On 6/27/19 4:30 PM, Revanth Rajashekar wrote:
+> PSID is a 32 character password printed on the drive label,
+> to prove its physical access. This PSID reverttper function
+> is very useful to regain the control over the drive when it
+> is locked and the user can no longer access it because of some
+> failures. However, *all the data on the drive is completely
+> erased*. This method is advisable only when the user is exhausted
+> of all other recovery methods.
 > 
-> While reviewing Documentation/block/queue-sysfs.txt I noticed one spelling
-> issue, that the parameters are not listed alphabetically, that the word
-> 'segments' needs clarification and also that documentation for some
-> parameters is missing. These patches address all four these issues. Please
-> consider these patches for kernel v5.3.
+> PSID capabilities are described in:
+> https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage-Opal_Feature_Set_PSID_v1.00_r1.00.pdf
 
-Thanks Bart, applied.
+Applied, thanks.
 
 -- 
 Jens Axboe
