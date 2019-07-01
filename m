@@ -4,61 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 515F3C5B578
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 21:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D28C4646D
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 21:58:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2387C20652
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 21:58:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C0F821479
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 21:58:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZZIFA9HV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SG6nNlNi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726830AbfGAV6E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Jul 2019 17:58:04 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:49978 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726678AbfGAV6E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jul 2019 17:58:04 -0400
+        id S1726878AbfGAV6M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Jul 2019 17:58:12 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:56724 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726688AbfGAV6L (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jul 2019 17:58:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562018284; x=1593554284;
+  t=1562018291; x=1593554291;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=SM4vBhjIMuIjQIIkPMmNSjGDUMbO4rTKMZzMc8UskaU=;
-  b=ZZIFA9HVeSYt9Y8HlXxKic9FrxKeWNYAzpDjhnh8guDtK9L7jXKwK6Wm
-   w105ZKNaZzep5NMpbluGb1G7bojNk5D90MDLORDtaqMxz16dShWHpfPON
-   THSSTYs7mCdkLDF9LxOpdZ5tWTpzwaP6fBLVAvRUjeKlYfh8FMhDmSXEE
-   8Sz084LfWBifFBxlMbxMBv0Ox0PquI8W/UbS8Xalo+TYS2RBCRY+polIS
-   t68MZQDLxytiaRyPN9TPjSYGcNVX0Cfzt6diGVhrp8NR2Jh8Bq8KeUzzg
-   dUzY7QPNKoq7mvHYHrsn3koDjEwSu5eoF4qzAkFAuJKICs9uFek1/Yx7b
+  bh=b0wGW7WtfWxUwKfj2wVFwZxNHKIT6iMJAeEE2CY/GA4=;
+  b=SG6nNlNiJDoIOUPgDjDT1vEwCaQVHRxjRTUDPplqYINBPUJeG8vtgEMZ
+   SHI4HrqsJSIuUNP5KVOT2/MqKFd58+QJ4Gp+Ne9Knp6WWWE5k80YZRkiV
+   +gq6av/fAFiDEJbJzG7GMA/dMFW3+GGq+hrRiZ9dFFMLfTxoSODHzdczj
+   6lq1TFpCKWG9SOVKFiY+ytJ320nuBtvkAB5/WK/gwrBRlzN0EwTv+Nwu4
+   odEY2VYvS/0XOWJ3DFX1QsXX3y/CO0adbC9aAF2Ecm22l7Qb/rH01k8ND
+   B3ERhVhcb3X5jveK3wZ/Ix/HI8zXHP5nMEzOYERJZrkV/qQdgkVuuMwPE
    Q==;
 X-IronPort-AV: E=Sophos;i="5.63,440,1557158400"; 
-   d="scan'208";a="113614943"
+   d="scan'208";a="116844042"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Jul 2019 05:58:04 +0800
-IronPort-SDR: t9a3E+gqKDrf65hKIG62GaXPU70B+9E1zVCG9p4NjiXFBgQmNiVIYc8DpmqnRNon0mXWL4/hpR
- LT0qxUMICaBnBMqUW+qb3Qi7X+pieonfX2MoevSqYiCDxVxMwhKvbeIBhhNRnqSs6cBTg3TV0e
- yTHKRSzUv8umB1Kq6zM87D00/qLHKJGF8WQ8Hn/UrQr3F1cKDCXP8OC/l7oWjZVd/jdxygxZ6o
- VTUD/bRiy+d53Z8/BUt/i/stnqXm0qIwSKsdxGSgyTuUMfbxVGM0FBZCs+WNaQ7gXDjVImyc1u
- n+3tpW5jBkAprvQgdwk3Qkcb
+  by ob1.hgst.iphmx.com with ESMTP; 02 Jul 2019 05:58:11 +0800
+IronPort-SDR: EVsx4/4XKkXqYlxt9dv6fEAKdFor7neKkpSKkUHf9yYsSYH+dGVXgjgTx1qsRJWxIvUyjYMHIP
+ I18UOf+7JgZdoP9g5a4EHcms9zhum2A2/PAdrYYvjvegDU2kutHExz7F2mRydk3qDbzROxgi54
+ PPcpu+C9Q5r2KRGqpluZJ3eh74NjZN+pdD9zEUVOcK0WDfaAL0edbV+9Fx5WRvU+KW3+9H+s/U
+ e9yrbDzXgSttP06vCjU099bQ7UyGqkVJU8j9/J+M6ZMmRw+ckWjdrtqWQDglIaMIKDUD0XRca4
+ kG5WqQUllHpQ1DimyqDpHACN
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 01 Jul 2019 14:57:07 -0700
-IronPort-SDR: e+BRmQAwH57/flmFvsQ6Pi8GWmwJl0oZ71gtjgNdmCq2EN3CldpqQ1InjNWVtGq0B1oBeOBsd+
- kFszZuOSH18RLPIwDQuKI4Xt94EU0l8vAv40wQPezVoRtOtGcS3DhfqFKo3eZoEEF7cqOlXdaL
- bv1kLKT8vZz+a1WGE8clxQDtDrXl/ApwMerjBGhUmCmmTEmTFNhoRp6K1sboM6C2xXyBHPjxmY
- h9eYIBUbtUcMBrxqcroJweQRK4ZibJt9YOvzlfmlJ5tyPVhAc+V2PrYsnrLymBfxnDADKmxVAS
- QQI=
+  by uls-op-cesaep02.wdc.com with ESMTP; 01 Jul 2019 14:57:13 -0700
+IronPort-SDR: AABjtBQ8ZjxtlIypq0AuDMGuICj3Ru7OQR6RTokwwI5NwnheQDs9XZu6EHSysDkGvnSbjLSLzk
+ svQHsZ3L9KuVfcFTjFKgPOsuSl7tPlG11lsjBb8z5kXGyUSeWfzv8y2JNrHN9XFqAP9GIoh801
+ 6/k7//Wxd+PiVP+eMja3fbegfEx0pWIXUEx/YSComqBkOzV5tvEeCB40Ty18Wl8YUlGpamcA0W
+ YnMn0/OE8nFdC37M/MT1FRhMxXORwaN4jwQ92KCK2O3IsgCDvM1qCknYbY7bB2yB2W4O2NYyqp
+ t5U=
 Received: from cvenusqemu.hgst.com ([10.202.66.73])
-  by uls-op-cesaip02.wdc.com with ESMTP; 01 Jul 2019 14:58:04 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 01 Jul 2019 14:58:10 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-mm@kvack.org, linux-block@vger.kernel.org
 Cc:     bvanassche@acm.org, axboe@kernel.dk,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 4/5] mm: update block_dump comment
-Date:   Mon,  1 Jul 2019 14:57:25 -0700
-Message-Id: <20190701215726.27601-5-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 5/5] Documentation/laptop: add block_dump documentation
+Date:   Mon,  1 Jul 2019 14:57:26 -0700
+Message-Id: <20190701215726.27601-6-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.17.0
 In-Reply-To: <20190701215726.27601-1-chaitanya.kulkarni@wdc.com>
 References: <20190701215726.27601-1-chaitanya.kulkarni@wdc.com>
@@ -67,29 +67,42 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With respect to the changes in the submit_bio() in the earlier patch
-now we report all the REQ_OP_XXX associated with bio along with
-REQ_OP_READ and REQ_OP_WRITE (READ/WRITE). Update the following
-comment for block_dump variable to reflect the change.
+This patch updates the block_dump documentation with respect to the
+changes from the earlier patch for submit_bio(). Also we adjust rest of
+the lines to fit with standaed format.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- mm/page-writeback.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Documentation/laptops/laptop-mode.txt | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index bdbe8b6b1225..ef299f95349f 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -109,7 +109,7 @@ EXPORT_SYMBOL_GPL(dirty_writeback_interval);
- unsigned int dirty_expire_interval = 30 * 100; /* centiseconds */
+diff --git a/Documentation/laptops/laptop-mode.txt b/Documentation/laptops/laptop-mode.txt
+index 1c707fc9b141..d4d72ed677c4 100644
+--- a/Documentation/laptops/laptop-mode.txt
++++ b/Documentation/laptops/laptop-mode.txt
+@@ -101,14 +101,14 @@ a cache miss. The disk can then be spun down in the periods of inactivity.
  
- /*
-- * Flag that makes the machine dump writes/reads and block dirtyings.
-+ * Flag that makes the machine dump block layer requests and block dirtyings.
-  */
- int block_dump;
+ If you want to find out which process caused the disk to spin up, you can
+ gather information by setting the flag /proc/sys/vm/block_dump. When this flag
+-is set, Linux reports all disk read and write operations that take place, and
+-all block dirtyings done to files. This makes it possible to debug why a disk
+-needs to spin up, and to increase battery life even more. The output of
+-block_dump is written to the kernel output, and it can be retrieved using
+-"dmesg". When you use block_dump and your kernel logging level also includes
+-kernel debugging messages, you probably want to turn off klogd, otherwise
+-the output of block_dump will be logged, causing disk activity that is not
+-normally there.
++is set, Linux reports all disk I/O operations along with read and write
++operations that take place, and all block dirtyings done to files. This makes
++it possible to debug why a disk needs to spin up, and to increase battery life
++even more. The output of block_dump is written to the kernel output, and it can
++be retrieved using "dmesg". When you use block_dump and your kernel logging
++level also includes kernel debugging messages, you probably want to turn off
++klogd, otherwise the output of block_dump will be logged, causing disk activity
++that is not normally there.
  
+ 
+ Configuration
 -- 
 2.21.0
 
