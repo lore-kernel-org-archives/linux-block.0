@@ -2,133 +2,116 @@ Return-Path: <SRS0=9MH5=U6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B7DCC0650E
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 16:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7CAAC0650E
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 16:46:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DAF4620B7C
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 16:23:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99F6721479
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 16:46:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mXpeBrdL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727275AbfGAQXg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Jul 2019 12:23:36 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:40182 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727227AbfGAQXg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jul 2019 12:23:36 -0400
-Received: by mail-pf1-f196.google.com with SMTP id p184so6820753pfp.7
-        for <linux-block@vger.kernel.org>; Mon, 01 Jul 2019 09:23:35 -0700 (PDT)
+        id S1729016AbfGAQqQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Jul 2019 12:46:16 -0400
+Received: from mail-io1-f44.google.com ([209.85.166.44]:40078 "EHLO
+        mail-io1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727030AbfGAQqP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jul 2019 12:46:15 -0400
+Received: by mail-io1-f44.google.com with SMTP id n5so30300498ioc.7
+        for <linux-block@vger.kernel.org>; Mon, 01 Jul 2019 09:46:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=NABJ8Y8qL/QPLT6ob5dOjHtr1fst4gq36GEeQURKqJk=;
+        b=mXpeBrdLN+1Pb/qqnXTe79gjLcPvyKkmbV0kYx8jFE53ewG8Pi/zKuXVCgMuq5kXxs
+         XuHeZYJgpf6m5mVQPAV9x4+OOlTs1zVaThIlyR36CDfdVlH0NpsudJXBOipAlHXmlAbw
+         NsYWQ/V+01tmVsVwuA68XrvytaqS6lMGNQcMHzzMF/K8RHGUENZa3ZiOgMKaIGnZhd3D
+         EkwlDi9IwEBWt7tzQhkWDc1aFT3pbqm8T+FMt2qZS49jU9rUNraz+wE51okvjbgd7oUV
+         SmLz7EcMeupc6rPN68AE5L0Wd3n+YwgsH3/qyT6+T8vbM1biNCoYYXOrzV4fJ3JfyrzV
+         61OQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=2wasO0hGQU50Xqo+aBfpO73qKpsy3b+tGp+OMPkmUx4=;
-        b=aWwqq5gVbBHHDpCLmDHKsBwAj09nhgTKgIHUma8+/xvgBOyfmHqPXDLQtLDppeyQWv
-         SRKvObbuB87CXXngBvFl76XVv7/M79EGMXPN6NTRUfsgXfmrs9hWcsT5WTdD4ys5x7Ue
-         JFGaY9Z8+ZFbalvSxomwc8zLXWArFsQwPA0f9u6YZcsw0LN3Yo0XXmOWzEBkSLObA/nv
-         11ltxwUT+PqJ5bNau1yaKlI9H6Z94OSuqlSfpbqBMhD0/iKBd5K3O07nT6s9/oK2ihVc
-         6sP2Njm1k6dhIW2ltQ+nKRHVaQy+IoR9pSVs5E9LuwYrk8Aa3ctZwwkEiBr8MYprFjma
-         Dn0w==
-X-Gm-Message-State: APjAAAUu5UMkI5mRafM8fsMAFuCX9AuGYo0peokZS+IK+SECSU6H7vdf
-        sc32zUgag8J6g8SWuHLFAYg=
-X-Google-Smtp-Source: APXvYqyoSvVLvLDjl4/1KXMS8QIarE5YDuKYodslNge9lMzODZdqUyTbLpPW1s0Ddxnw3/JhQGamMg==
-X-Received: by 2002:a63:c14c:: with SMTP id p12mr25783046pgi.138.1561998215464;
-        Mon, 01 Jul 2019 09:23:35 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id o16sm24646076pgi.36.2019.07.01.09.23.33
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 01 Jul 2019 09:23:34 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH] block: Document the bio splitting functions
-Date:   Mon,  1 Jul 2019 09:23:28 -0700
-Message-Id: <20190701162328.216266-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.22.0.410.gd8fdbe21b5-goog
+        bh=NABJ8Y8qL/QPLT6ob5dOjHtr1fst4gq36GEeQURKqJk=;
+        b=heG6CvbnqrVEuP8O7Uir+fY64pfnAC8yjGJyA3fDCgcUrISKicCq3Ih7Thu/TZCCQo
+         wtDUA+A1Krc8+xNwzKIKagXsUUQjjaVsxpiksDtsnaRx+6G1JjpqFforIV7XnEsaruqK
+         PYtAMU2PX4gSu1I3RpQR/ygey9UhmkWXXtJfPT48h6XEViBWhnh/Utuam8DuTh4kVKo/
+         NzahJzsWkK0TAjKrjer5LoX7WK8pXR6AASZANvEVAUldcpxkUpt39yXkXLIq4BQZsvIM
+         te1Iz8Jx7NJ3jp/hLWCYdHngg2S4B/iCq6lr72eslQgqInCsWRCnrMu4+OvrEw6x/tAc
+         pPuQ==
+X-Gm-Message-State: APjAAAUjtR3nffwVx8y6fzlFKFpRWyDjbGrgKRhtfeL08U+7i2RV+MOR
+        1738RJKYLjjXo2l2GMWPJXU7VMzDSkAjhQjE
+X-Google-Smtp-Source: APXvYqxtX9BD/WRId8znM8sG+oJXDwMepQ2tTGL4NM1sWEVTBTg+bUR/HqDCJwvzEpvrHhmb9M5XKg==
+X-Received: by 2002:a02:b710:: with SMTP id g16mr29677711jam.88.1561999574310;
+        Mon, 01 Jul 2019 09:46:14 -0700 (PDT)
+Received: from [192.168.1.158] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id e22sm10245869iob.66.2019.07.01.09.46.12
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 01 Jul 2019 09:46:13 -0700 (PDT)
+Subject: Re: remove bi_phys_segments and related cleanups
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org
+References: <20190606102904.4024-1-hch@lst.de>
+ <a703a5cb-1e39-6194-698a-56dbc4577f25@fb.com>
+Message-ID: <bbc9baba-19f2-03ec-59dc-adab225eb3b2@kernel.dk>
+Date:   Mon, 1 Jul 2019 10:46:12 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <a703a5cb-1e39-6194-698a-56dbc4577f25@fb.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since what the bio splitting functions do is nontrivial, document these
-functions.
+On 6/20/19 10:32 AM, Jens Axboe wrote:
+> On 6/6/19 4:28 AM, Christoph Hellwig wrote:
+>> Hi Jens,
+>>
+>> this series removes the bi_phys_segments member in struct bio
+>> and cleans up various areas around it.> 
+> Applied, thanks.
 
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-merge.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+Now that I'm back and can fully go through testing, I run into
+problems with this series. On one system, booting up makes it
+crash. I've managed to get it to boot, only for the first sync
+to make it crash. So seems likely related to a flush.
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 1ea00da12ca3..038eaee4438a 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -192,6 +192,23 @@ static bool bvec_split_segs(const struct request_queue *q,
- 	return !!len;
- }
- 
-+/**
-+ * blk_bio_segment_split - split a bio in two bios
-+ * @q:    [in] request queue pointer
-+ * @bio:  [in] bio to be split
-+ * @bs:	  [in] bio set to allocate the clone from
-+ * @segs: [out] number of segments in the bio with the first half of the sectors
-+ *
-+ * Clones @bio, updates the bi_iter of the clone to represent the first sectors
-+ * of @bio and updates @bio->bi_iter to represent the remaining sectors. The
-+ * following is guaranteed for the cloned bio:
-+ * - That it has at most get_max_io_size(@q, @bio) sectors.
-+ * - That it has at most queue_max_segments(@q) segments.
-+ *
-+ * Except for discard requests the cloned bio will point at the bi_io_vec of
-+ * the original bio. It is the responsibility of the caller to ensure that the
-+ * original bio is not freed before the cloned bio.
-+ */
- static struct bio *blk_bio_segment_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
-@@ -248,6 +265,16 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	return bio_split(bio, sectors, GFP_NOIO, bs);
- }
- 
-+/**
-+ * __blk_queue_split - split a bio and submit the second half
-+ * @q:       [in] request queue pointer
-+ * @bio:     [in, out] bio to be split
-+ * @nr_segs: [out] number of segments in the first bio
-+ *
-+ * Splits a bio into two bios, chains the two bios, submits the second half
-+ * and stores a pointer to the first half in *@bio. If the second bio is still
-+ * too big it will be split by a recursive call to this function.
-+ */
- void __blk_queue_split(struct request_queue *q, struct bio **bio,
- 		unsigned int *nr_segs)
- {
-@@ -292,6 +319,14 @@ void __blk_queue_split(struct request_queue *q, struct bio **bio,
- 	}
- }
- 
-+/**
-+ * blk_queue_split - split a bio and submit the second half
-+ * @q:   [in] request queue pointer
-+ * @bio: [in, out] bio to be split
-+ *
-+ * Splits a bio into two bios, chains the two bios, submits the second half
-+ * and stores a pointer to the first half in *@bio.
-+ */
- void blk_queue_split(struct request_queue *q, struct bio **bio)
- {
- 	unsigned int nr_segs;
+No console on that system, but that's OK since the trace itself
+isn't that interesting. We end up crashing in nvme_queue_rq(),
+here:
+
+(gdb) l *nvme_queue_rq+0x252
+0xffffffff8148b292 is in nvme_queue_rq (./include/linux/blkdev.h:962).
+957	 */
+958	static inline struct bio_vec req_bvec(struct request *rq)
+959	{
+960		if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
+961			return rq->special_vec;
+962		return mp_bvec_iter_bvec(rq->bio->bi_io_vec, rq->bio->bi_iter);
+963	}
+
+with a NULL pointer dereference at 0x8.
+
+Taking a look at the series, this is the offending commit:
+
+commit 14ccb66b3f585b2bc21e7256c96090abed5a512c
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Thu Jun 6 12:29:01 2019 +0200
+
+    block: remove the bi_phys_segments field in struct bio
+
+with that as the HEAD, crash. Go back one commit, works fine.
+
 -- 
-2.22.0.410.gd8fdbe21b5-goog
-
+Jens Axboe
