@@ -2,47 +2,89 @@ Return-Path: <SRS0=9MH5=U6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25254C06510
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 08:32:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82679C0650E
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 08:53:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 092FB213F2
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 08:32:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 52E5420645
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 08:53:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727669AbfGAIc5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Jul 2019 04:32:57 -0400
-Received: from verein.lst.de ([213.95.11.211]:59567 "EHLO verein.lst.de"
+        id S1728042AbfGAIxG convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Jul 2019 04:53:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57336 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727437AbfGAIc5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Jul 2019 04:32:57 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 1D56768B20; Mon,  1 Jul 2019 10:32:54 +0200 (CEST)
-Date:   Mon, 1 Jul 2019 10:32:53 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc:     ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
-        robin.murphy@arm.com, joro@8bytes.org, axboe@kernel.dk,
-        linux-renesas-soc@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-block@vger.kernel.org, wsa+renesas@sang-engineering.com,
-        iommu@lists.linux-foundation.org
-Subject: Re: [RFC PATCH v7 0/5] treewide: improve R-Car SDHI performance
-Message-ID: <20190701083253.GA22719@lst.de>
-References: <1561020610-953-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+        id S1726442AbfGAIxF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Jul 2019 04:53:05 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1E43F308FC4D;
+        Mon,  1 Jul 2019 08:52:55 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-219.rdu2.redhat.com [10.10.120.219])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 173CA19C6A;
+        Mon,  1 Jul 2019 08:52:50 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <7a288c2c-11a1-87df-9550-b247d6ce3010@infradead.org>
+References: <7a288c2c-11a1-87df-9550-b247d6ce3010@infradead.org> <156173701358.15650.8735203424342507015.stgit@warthog.procyon.org.uk> <156173703546.15650.14319137940607993268.stgit@warthog.procyon.org.uk>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     dhowells@redhat.com, viro@zeniv.linux.org.uk,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/6] Adjust watch_queue documentation to mention mount and superblock watches. [ver #5]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1561020610-953-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <8211.1561971170.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8BIT
+Date:   Mon, 01 Jul 2019 09:52:50 +0100
+Message-ID: <8212.1561971170@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Mon, 01 Jul 2019 08:53:05 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Any comments from the block, iommu and mmc maintainers?  I'd be happy
-to queue this up in the dma-mapping tree, but I'll need some ACKs
-for that fast.  Alternatively I can just queue up the DMA API bits,
-leaving the rest for the next merge window, but would drag things
-out far too long IMHO.
+Randy Dunlap <rdunlap@infradead.org> wrote:
+
+> I'm having a little trouble parsing that sentence.
+> Could you clarify it or maybe rewrite/modify it?
+> Thanks.
+
+How about:
+
+  * ``info_filter`` and ``info_mask`` act as a filter on the info field of the
+    notification record.  The notification is only written into the buffer if::
+
+	(watch.info & info_mask) == info_filter
+
+    This could be used, for example, to ignore events that are not exactly on
+    the watched point in a mount tree by specifying NOTIFY_MOUNT_IN_SUBTREE
+    must not be set, e.g.::
+
+	{
+		.type = WATCH_TYPE_MOUNT_NOTIFY,
+		.info_filter = 0,
+		.info_mask = NOTIFY_MOUNT_IN_SUBTREE,
+		.subtype_filter = ...,
+	}
+
+    as an event would be only permissible with this filter if::
+
+    	(watch.info & NOTIFY_MOUNT_IN_SUBTREE) == 0
+
+David
