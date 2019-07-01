@@ -2,93 +2,125 @@ Return-Path: <SRS0=9MH5=U6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A504C0650E
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 17:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DDB0C0650E
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 17:35:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 103F82146F
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 17:12:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF2AE21479
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 17:35:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ZD4vWDqm"
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="dNSImmto"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727154AbfGARMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Jul 2019 13:12:21 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:34856 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726840AbfGARMV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jul 2019 13:12:21 -0400
-Received: by mail-io1-f67.google.com with SMTP id m24so30554014ioo.2
-        for <linux-block@vger.kernel.org>; Mon, 01 Jul 2019 10:12:21 -0700 (PDT)
+        id S1728897AbfGARfg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Jul 2019 13:35:36 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:43154 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728672AbfGARfg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jul 2019 13:35:36 -0400
+Received: by mail-pf1-f195.google.com with SMTP id i189so6899590pfg.10
+        for <linux-block@vger.kernel.org>; Mon, 01 Jul 2019 10:35:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=RBO6ISTGE0h2dzkR+zya7y2lDF/DCB6FONDvEvwIwZk=;
-        b=ZD4vWDqmN8sC4m9U0mKDls6w/BqgwuZFplHvVoqdGIe4oA04ntk/JAvqG0CygnRXF8
-         bX97QdzxSp8NzXbEt1zs2gchFTpxDwR5jaRi4bjcIJrGLYcN4s2lD7PcPAhn8gijY9gZ
-         5Mt1aT9RNK1ytWnlKWCdk7GAXhWOUZx0csdS+eaqyY6GHwjAM3HCKH0XqtYQ02nruJhU
-         IAMKC7XXwiFKfIaWe0TdLZ+T9SEQLCRR/bIcmkUTgdq2mskXQWsWINntOzllofk5POTn
-         tFHPDaE683vmUMk5Z3nICt7IoXVvTeOy5f0X0hHInlUFIOT95X6NoaVlz6M+BOUhhwRA
-         wnSQ==
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=GjbFO6Zi6jfRe/bkXkrP+9GcrEaqmKIfWUxraeXKXoE=;
+        b=dNSImmtoyKvCh7FQUaeZ3H+IlOUassJYpIT4IOBzRA/umVqcBU+oJib3Y4Tl9gz8OO
+         IeC82sEYlTh8MQW4gFDDVlu1TUmSEWj9SxFtgDS/zlesu6iMhWD1c+tytHcwKPoQjXUD
+         bEysU3uxLQXV7tO2NZogs4GoPdJZ13MhQqGTQDa92yYqS1qt+Nu5QJRLcVeQPHr0rEED
+         EkSkPyT8Y7qGSnA9Jzcp36zaYzcXo82TuoCsleDiTHzU/XpKq1nqUqvFRFLbsehZRDWu
+         giulAdHxLjgMf+YqikwbTd+sFIgLr1y6si4OzEGSSR+CEYVRGPYJHv7sO+9bW6zPAnBz
+         rdFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RBO6ISTGE0h2dzkR+zya7y2lDF/DCB6FONDvEvwIwZk=;
-        b=GAXzC+XJrvwfWlOFELR3NhGCYQu4wtCNdgnNv6Ro3V8VCtzOlynz0I8VRfRhyjIC5Q
-         xYjFQW4wlQDxVBYaQrpx8oo07YP8JKbwPfmfm52I+kzw0RdU02CsXaKyb/Jx4mvLAI4t
-         u+Iu0/IV/iZh8GPeTOez8jfFlqarhgF5oAnTWAo9L3HOTRsb19QTQq4Cd8zJpM0x+YcC
-         6QVkTTYcD7j7XSEeMCY7YCgkY6T21fq9rBNCXWjbryxuaUHNvqpa/rbRoI8sOtJ1UrR1
-         QIY5jIqSXHZHiBn3qyc2dWGM8npl85xJTpaVLRy3UsDuPzwS/8vh2fvOYd8yEKxSvZTI
-         fWPg==
-X-Gm-Message-State: APjAAAUn0OIlTpSSBnnQpza33fe1gVtlef4cDJKhYeYZ9lusqMOJj81/
-        HhfP7925Q/YDKcsk8be30GdQ3A==
-X-Google-Smtp-Source: APXvYqx/zbfgU/smGmgDqBql6CCGIw46JMN6JlP0z9Gnibmz/Joi7z5QUmsbmrm6BSLrAvAUHiJCgw==
-X-Received: by 2002:a5d:9c4d:: with SMTP id 13mr15731987iof.47.1562001140624;
-        Mon, 01 Jul 2019 10:12:20 -0700 (PDT)
-Received: from [192.168.1.158] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id t19sm10658440iog.41.2019.07.01.10.12.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 01 Jul 2019 10:12:19 -0700 (PDT)
-Subject: Re: [PATCH] tools/io_uring: Use <asm/barrier.h> instead of
- tools/io_uring/barrier.h
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20190701154145.202722-1-bvanassche@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0dfd33f7-ebd5-22ed-4a17-49cf2b05113b@kernel.dk>
-Date:   Mon, 1 Jul 2019 11:12:18 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=GjbFO6Zi6jfRe/bkXkrP+9GcrEaqmKIfWUxraeXKXoE=;
+        b=YOahikuuuTnghuavzrcTQFiXaj8X/vrdKdcUz4VODnNILz87igfyDQdL+oazYJEgwE
+         IVOxEiKygOma7YvYGWHCl9jAXwK8S1/0KhNCRPK3AbZOchBVX8Wsql05uiNQtpn9n0B9
+         gnE3rUD004B2KWPX1AEgj0X0Rb16oDU/Rt4RjRaej4+OX2qXsZCjsNmIJyLDiDPDmb0C
+         4rCif5CyuxnhEF10MoQ2dtsJ3yWcWeFCozQVODQlQBn2JpRw7Mc4zMc3Tq1sP04cQuFu
+         miWOdQJdze8ViZNrV2eQx7asLoef0lXhpWuBZMUQcT7AhRpygTyURmKZ+9ZDZ+6oS8H9
+         o8nw==
+X-Gm-Message-State: APjAAAXU4Hu2nTxKFBqmjJv53hroPySZzzK3/sGHQU9Ix0EyxTGo0HbI
+        4xryp4QxEc4wnPTly0Bzw4RZgQ==
+X-Google-Smtp-Source: APXvYqxtxAAgSqS41C5xcQoSqXTmvzLidlYL25xNGfj2neKpWdb+qxRMeYdqx/zu68hrSA6v5Us1Zw==
+X-Received: by 2002:a17:90a:8d09:: with SMTP id c9mr428334pjo.131.1562002535372;
+        Mon, 01 Jul 2019 10:35:35 -0700 (PDT)
+Received: from vader ([2620:10d:c090:200::2:c56d])
+        by smtp.gmail.com with ESMTPSA id i126sm12622656pfb.32.2019.07.01.10.35.34
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 01 Jul 2019 10:35:34 -0700 (PDT)
+Date:   Mon, 1 Jul 2019 10:35:34 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, osandov@fb.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] sbitmap: Replace cmpxchg with xchg
+Message-ID: <20190701173534.GA10076@vader>
+References: <722e1d561f0a49dc464d3a2b1be4c077f7502726.1558625912.git.asml.silence@gmail.com>
+ <0979d23f-bc31-b653-51d0-867dd52bf7ee@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190701154145.202722-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0979d23f-bc31-b653-51d0-867dd52bf7ee@gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/1/19 9:41 AM, Bart Van Assche wrote:
-> This patch avoids that multiple definitions of barrier primitives occur in
-> the tools directory. This patch does not change the behavior of the code on
-> x86 since on x86 smp_rmb() and smp_wmb() are defined as follows in
-> tools/arch/x86/include/asm/barrier.h:
+On Sat, Jun 29, 2019 at 08:42:23AM -0700, Pavel Begunkov wrote:
+> Ping?
 > 
->   #define barrier() __asm__ __volatile__("": : :"memory")
->   #define smp_rmb() barrier()
->   #define smp_wmb() barrier()
+> On 23/05/2019 08:39, Pavel Begunkov (Silence) wrote:
+> > From: Pavel Begunkov <asml.silence@gmail.com>
+> > 
+> > cmpxchg() with an immediate value could be replaced with less expensive
+> > xchg(). The same true if new value don't _depend_ on the old one.
+> > 
+> > In the second block, atomic_cmpxchg() return value isn't checked, so
+> > after atomic_cmpxchg() ->  atomic_xchg() conversion it could be replaced
+> > with atomic_set(). Comparison with atomic_read() in the second chunk was
+> > left as an optimisation (if that was the initial intention).
+> > 
+> > Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> > ---
+> >  lib/sbitmap.c | 10 +++-------
+> >  1 file changed, 3 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> > index 155fe38756ec..7d7e0e278523 100644
+> > --- a/lib/sbitmap.c
+> > +++ b/lib/sbitmap.c
+> > @@ -37,9 +37,7 @@ static inline bool sbitmap_deferred_clear(struct sbitmap *sb, int index)
+> >  	/*
+> >  	 * First get a stable cleared mask, setting the old mask to 0.
+> >  	 */
+> > -	do {
+> > -		mask = sb->map[index].cleared;
+> > -	} while (cmpxchg(&sb->map[index].cleared, mask, 0) != mask);
+> > +	mask = xchg(&sb->map[index].cleared, 0);
 
-The kernel bits are just synced from liburing, essentially. So I don't
-think it makes a lot of sense to add this change on the kernel side,
-though cleaning up the liburing side would be great (and could then
-bubble to the kernel as well).
+This hunk is clearly correct.
 
--- 
-Jens Axboe
+> >  	/*
+> >  	 * Now clear the masked bits in our free word
+> > @@ -527,10 +525,8 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+> >  		struct sbq_wait_state *ws = &sbq->ws[wake_index];
+> >  
+> >  		if (waitqueue_active(&ws->wait)) {
+> > -			int o = atomic_read(&sbq->wake_index);
+> > -
+> > -			if (wake_index != o)
+> > -				atomic_cmpxchg(&sbq->wake_index, o, wake_index);
+> > +			if (wake_index != atomic_read(&sbq->wake_index))
+> > +				atomic_set(&sbq->wake_index, wake_index);
 
+This hunk used to imply a memory barrier and no longer does. I don't
+think that's a problem, though.
+
+Reviewed-by: Omar Sandoval <osandov@fb.com>
