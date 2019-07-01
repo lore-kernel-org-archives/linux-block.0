@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA87C5B578
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 21:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 801CCC5B578
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 21:57:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 21D7521479
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 21:57:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51AD421479
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 21:57:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="OBA5OPaS"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KADS1dQg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726793AbfGAV5u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Jul 2019 17:57:50 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:49962 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726678AbfGAV5u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jul 2019 17:57:50 -0400
+        id S1726811AbfGAV55 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Jul 2019 17:57:57 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:61244 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726678AbfGAV55 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jul 2019 17:57:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562018270; x=1593554270;
+  t=1562018277; x=1593554277;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=9J1OfplonnbynoEAMgNYcUvjFmcuTdb/IR5OisFEtak=;
-  b=OBA5OPaSvE7ob8A+CYYmji9v3XLt7jWagLW/nMNdbEh798bIOjCW+Jlp
-   xd4LHxcdSxCuPcml4+fVTO+sv7U1xD04q/plHxyGn8ZZ4KbFAQgclZUst
-   cYQBrKnpLOzJ12GpLTkppAADIk/nimc0+47lGpPUjYNfs8m0H2Yck1pQc
-   AY7QdBXvVSOFPMuQ60egEdJQizsb7xPT3msyjQhbYwqOxlAX8VICaduYk
-   WAaKTkyq3MJbUN3kfa3YaONPjdfYN8Un/T8fUH1tRdkcfzLsLnKwTibYg
-   NAoWVN22g34AB20v9/ClSyaJSSfgjuwhaufUQq3o2X/Kn6yFmJM6jl7XF
+  bh=MbHOnCWpKU9OhNQ3wNRN8l4gA1/62SoaCYINRxhsjOE=;
+  b=KADS1dQg4EU8mbhayi4lwtDMVqy1/AZq7XFlZ0iE2MZq93d3hNbrTWlL
+   mLtH4gklBoX+iXQOE0f6PiuSdl5xN6sewsBYu5sJx180CvwQzCSC5WWIL
+   vX66LVl8ju69JpJueAnZN5PjuH0yQ/4o1Y1OqfjPkIQ8a7YDTZSXmYNE+
+   0K7aJeHvWizPSjGbAYz0ex3sgXj2BhUPLDPu5CDVEnpBbunPDOpJt3vGw
+   VwOABnPAN3QHh/kBdVJUGyIEAMN1ji1crbYs4krByxz7GUPIfIcj2/JeS
+   9MlVySUBYlhFni5o0CzChLLYuDsGoJKPPv0OdWJ0BjLVZyIDh8vv8MKqp
    g==;
 X-IronPort-AV: E=Sophos;i="5.63,440,1557158400"; 
-   d="scan'208";a="113614919"
+   d="scan'208";a="113190428"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Jul 2019 05:57:50 +0800
-IronPort-SDR: y3GDar/WQhP6iyjZiGCCQWrinmOvFnEb/KLly0HKWFMMcVaAJjnJcL6akAMj5zt653pvGkwF3x
- fjbeSDeGsOsUnL03OMz5TeTuoVga0JONjAmIge81e4uTGAo2/xzntqzDHCK1BLVk4gfJq3MiNP
- w2+WUJwJLl0oA1JBHa5dkvd2rf5RLNvuBeC6Whv6XK5ogG4fqCNTxBM6f3NZdE8emKPGSZAfvk
- y1R36f+8QYil4UBVNPkddDPPjdQPwrPrH1qkQ7WsJtIhBjKq91kEE+0o4qoaNKMETbkKVD62Kf
- ASLpWwOHWrHe4PKnoCrb5hwj
+  by ob1.hgst.iphmx.com with ESMTP; 02 Jul 2019 05:57:57 +0800
+IronPort-SDR: +DvYhdhzlO9VHk6HS5cu89hX56AqM2iSrCon2n4SEzVCON3Tfsx6jInRgo4tOVCWv8wGEWL3x+
+ bb24qAiqw4sDGGK7RNokGWnsM/1/hX/pIo/an1S3P93TLecSdT38rcXdULhj43TJUQS39vgKrl
+ 3fnn8iDG23PWnahrRgzbzakWbCdFvRr4hLx0Hng2YARVKu3q/umb7+3HbWoyG+w/ppXSoyLzuf
+ qe5EWAPZHDltUlg1jGD5eK8ILPE80WA6KXHJ0VppKDPZlH+e5Hv2EOM7F+Vn2a2vJ0cYC+4rVp
+ c0q5jg9MrVqhpVwit5v5g2v/
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP; 01 Jul 2019 14:56:50 -0700
-IronPort-SDR: RUT0zDud5mdeTiDe1oPpuNFjDkJ3uuMy6naMhD7jlFJOo5Lx94cNdS/Nkt7n9zdRsqDaX8I6aS
- kpaO5xs/asgCHLZQqRzj68/bAQY1ftPJ1LuuI+Mm0adufqE1zU2V1QalNgVa5v+cw+tQbBCrsx
- z5HtwnIeWwhelc9wuGhNRmFmJqPGDwu9W68q3GBRjOdrZ8nIYKVL2ZoE53gzE6nYvBvV79r5Oi
- iHsMW4+fL3q2Caum4SGUrUHvk/O18aCQYKP5YevyAbm4yOdXJpq0lIPCo89V0C6rqMGJesnYkn
- MW0=
+  by uls-op-cesaep01.wdc.com with ESMTP; 01 Jul 2019 14:56:57 -0700
+IronPort-SDR: CL+xf59TlgjtZyTlFRdcDLuFt75xQy3gXKfSxFmbCWJT5LpCjDOhLvVhJA8iyfcFX8teiNIU61
+ JS6nyhX2Ks1O0rTthsOcqUEA8YwUv0TSYQVGKXjnChLzxvglb4z6E2l2b22Mx69PqCKDUgabxq
+ z+flC2nm/UzUtye/ZE8/A8OzzamaJyVuGujFyj+kM5z3Ul371Uu9BPqEO6baKu5HavSUMM/V2z
+ T3UMAzRyJNRY+iQgrLC/LgbFgJNzaxW0R7TuHnASZhh7TGWl6LIKon4o4jEMddBsNPFxtsL3Cn
+ T7w=
 Received: from cvenusqemu.hgst.com ([10.202.66.73])
-  by uls-op-cesaip02.wdc.com with ESMTP; 01 Jul 2019 14:57:50 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 01 Jul 2019 14:57:57 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-mm@kvack.org, linux-block@vger.kernel.org
 Cc:     bvanassche@acm.org, axboe@kernel.dk,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 2/5] block: update error message in submit_bio()
-Date:   Mon,  1 Jul 2019 14:57:23 -0700
-Message-Id: <20190701215726.27601-3-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 3/5] block: allow block_dump to print all REQ_OP_XXX
+Date:   Mon,  1 Jul 2019 14:57:24 -0700
+Message-Id: <20190701215726.27601-4-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.17.0
 In-Reply-To: <20190701215726.27601-1-chaitanya.kulkarni@wdc.com>
 References: <20190701215726.27601-1-chaitanya.kulkarni@wdc.com>
@@ -67,36 +67,67 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The existing code in the submit_bio() relies on the op_is_write().
-op_is_write() checks for the last bit in the bio_op() and we only
-print WRITE or READ as a bio_op().
+In the current implementation when block_dump is enabled we only report
+bios with data. In this way we are not logging the REQ_OP_WRITE_ZEROES,
+REQ_OP_DISCARD or any other operations without data etc.
 
-It is hard to understand which bio op based on READ/WRITE in
-submit_bio() with addition of newly discussed REQ_OP_XXX. [1]
-
-Modify the error message in submit_bio() to print correct REQ_OP_XXX
-with the help of blk_op_str().
-
-[1] https://www.spinics.net/lists/linux-block/msg41884.html. 
+This patch allows all bios with and without data to be reported when
+block_dump is enabled and adjust the existing code.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- block/blk-core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+---
+ block/blk-core.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 47c8b9c48a57..5143a8e19b63 100644
+index 5143a8e19b63..9855c5d5027d 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -1150,7 +1150,7 @@ blk_qc_t submit_bio(struct bio *bio)
- 			char b[BDEVNAME_SIZE];
- 			printk(KERN_DEBUG "%s(%d): %s block %Lu on %s (%u sectors)\n",
- 			current->comm, task_pid_nr(current),
--				op_is_write(bio_op(bio)) ? "WRITE" : "READ",
-+				blk_op_str(bio_op(bio)),
- 				(unsigned long long)bio->bi_iter.bi_sector,
- 				bio_devname(bio, b), count);
+@@ -1127,17 +1127,15 @@ EXPORT_SYMBOL_GPL(direct_make_request);
+  */
+ blk_qc_t submit_bio(struct bio *bio)
+ {
++	unsigned int count = bio_sectors(bio);
+ 	/*
+ 	 * If it's a regular read/write or a barrier with data attached,
+ 	 * go through the normal accounting stuff before submission.
+ 	 */
+ 	if (bio_has_data(bio)) {
+-		unsigned int count;
+ 
+ 		if (unlikely(bio_op(bio) == REQ_OP_WRITE_SAME))
+ 			count = queue_logical_block_size(bio->bi_disk->queue) >> 9;
+-		else
+-			count = bio_sectors(bio);
+ 
+ 		if (op_is_write(bio_op(bio))) {
+ 			count_vm_events(PGPGOUT, count);
+@@ -1145,15 +1143,16 @@ blk_qc_t submit_bio(struct bio *bio)
+ 			task_io_account_read(bio->bi_iter.bi_size);
+ 			count_vm_events(PGPGIN, count);
  		}
++	}
+ 
+-		if (unlikely(block_dump)) {
+-			char b[BDEVNAME_SIZE];
+-			printk(KERN_DEBUG "%s(%d): %s block %Lu on %s (%u sectors)\n",
+-			current->comm, task_pid_nr(current),
+-				blk_op_str(bio_op(bio)),
+-				(unsigned long long)bio->bi_iter.bi_sector,
+-				bio_devname(bio, b), count);
+-		}
++	if (unlikely(block_dump)) {
++		char b[BDEVNAME_SIZE];
++
++		printk(KERN_DEBUG "%s(%d): %s block %Lu on %s (%u sectors)\n",
++		current->comm, task_pid_nr(current),
++			blk_op_str(bio_op(bio)),
++			(unsigned long long)bio->bi_iter.bi_sector,
++			bio_devname(bio, b), count);
+ 	}
+ 
+ 	return generic_make_request(bio);
 -- 
 2.21.0
 
