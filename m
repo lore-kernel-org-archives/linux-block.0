@@ -2,76 +2,62 @@ Return-Path: <SRS0=9MH5=U6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8BFDC0650E
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 14:20:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A02C0650E
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 14:52:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C18E921721
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 14:20:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D0F32064B
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 14:52:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="NDZmZNXB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tKAdlaBk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729503AbfGAOUQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Jul 2019 10:20:16 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:36426 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729501AbfGAOUQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jul 2019 10:20:16 -0400
-Received: by mail-io1-f65.google.com with SMTP id h6so29251043ioh.3
-        for <linux-block@vger.kernel.org>; Mon, 01 Jul 2019 07:20:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=gY2k8VIohQ3ovxqeqDMTJ6ugNx1qArSvmGqVd7Pptw4=;
-        b=NDZmZNXBYjxdVurBwDt9g5WKl0ag//3VUaKT3FtinSCEP5Y94YcX/BINZsZ/Mu3tzi
-         ZSBAxmh2aZkjJfDljLD3Ov9tHbhxX0xpfe8LghnrwYd5yACyUn1fjcssgoswM+UfRz2w
-         pNzJjDgqUeXhutm+dYFFury6s38MOslCTgsNHRkUvW9258TEKv1i1fb+G/k3mzJjwC9w
-         lg4fnlg3a5ETWFvz3FqAiQdUF9RYhlcCPxocYHjc2Tcz5ZtY/6JsRhUSxVVHljPak9lO
-         JJABb2gemEOKBbob3AXWpoMzr5XSfC+HTj2lv5NFKWqaaDa6fe/t4eHyjrI/j8ywZAnG
-         68Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gY2k8VIohQ3ovxqeqDMTJ6ugNx1qArSvmGqVd7Pptw4=;
-        b=tsFbJDdH3AoxliNXGADWOoUTfTdiY4wX6rfF5a80rbgzZAHvfW33aC0S1CKvIXG/5J
-         EPJ8cRGHLeTw7xrI/H/L55yepccCpBthVYPdD7CJ+R2XrPJM+h9jWGXKRFYO3fww1376
-         43cM3OgGRjgmrwpbS+WdclnbFNLWzbMtGh7AikmJzmEd4164NRYnM8aTRvzjKOZtf6zh
-         piX/ezdOTyaZL7r84Ifiep0ZmYBDs4piUX2c0QA1BUI8C4OFsNRA9mWtHxUiIl0s/w+U
-         sksg+RQtFZwSXLidVaMjmw6SIPFSD89TByRFEws4iY6Ztv76qt9KgKfO0/7FncDEvdL7
-         bOXQ==
-X-Gm-Message-State: APjAAAV2KJ5iftE5SVgxu+4goQAxhrY4VrRYTiUYPNpFvpQq90CMRAys
-        d58h8W753KwoGVTL4L3YBt9vyQ==
-X-Google-Smtp-Source: APXvYqwSj4J+56s9p49bTmZyPQaGM1CAyE3LWgyIlQfGltnN7r1QlI1141Kni7B/XmjMjAjm5WgT7w==
-X-Received: by 2002:a02:cd83:: with SMTP id l3mr26548737jap.66.1561990815765;
-        Mon, 01 Jul 2019 07:20:15 -0700 (PDT)
-Received: from [192.168.1.158] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id x13sm9765649ioj.18.2019.07.01.07.20.14
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 01 Jul 2019 07:20:14 -0700 (PDT)
-Subject: Re: [PATCH V2] block: fix .bi_size overflow
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        Liu Yiding <liuyd.fnst@cn.fujitsu.com>,
-        kernel test robot <rong.a.chen@intel.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, stable@vger.kernel.org
-References: <20190701071446.22028-1-ming.lei@redhat.com>
- <8db73c5d-a0e2-00c9-59ab-64314097db26@kernel.dk>
- <bd45842a-e0fd-28a7-ac79-96f7cb9b66e4@kernel.dk>
-Message-ID: <8b8dc953-e663-e3d8-b991-9d8dba9270be@kernel.dk>
-Date:   Mon, 1 Jul 2019 08:20:13 -0600
+        id S1727557AbfGAOwF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Jul 2019 10:52:05 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:47448 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726967AbfGAOwF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jul 2019 10:52:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=iNgGMHAOMdwbYrGUW9dUANMTp/OnqfmLFCUXKRGNhqU=; b=tKAdlaBkc6+ZhWNkkzk5/6n+v
+        9FLtdiXQhfQnlRJPwhhhuN7r6QAfd7K2X5s5fBgSViAS+piJS1JIqKLf5tSXkUX7FiFrdWYlm9lJj
+        n3HotnqonJghfRMa66zYF+c+C7dhQ9LdhW2e6HSNiiYicixA9R9pBedgTX+fkOdHoXGm/GCUxVzAp
+        QoR1IcodhQcJLz8OwyX7ucYFio2hkDTxx9SilsZ+OYRaq1W+3vt3E5/K8meT3t3JW7Zf8Q8YtxMzO
+        1/eSFB0FTnl950+jA4eE2B+XQW27I0BXn10RSPUY+W144d/BPUjMMLME8n2VoMPHixcfv0MJvtVUs
+        rf9M2wc9Q==;
+Received: from static-50-53-52-16.bvtn.or.frontiernet.net ([50.53.52.16] helo=midway.dunlab)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hhxf1-0008LD-9H; Mon, 01 Jul 2019 14:52:03 +0000
+Subject: Re: [PATCH 2/6] Adjust watch_queue documentation to mention mount and
+ superblock watches. [ver #5]
+To:     David Howells <dhowells@redhat.com>
+Cc:     viro@zeniv.linux.org.uk, Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <7a288c2c-11a1-87df-9550-b247d6ce3010@infradead.org>
+ <156173701358.15650.8735203424342507015.stgit@warthog.procyon.org.uk>
+ <156173703546.15650.14319137940607993268.stgit@warthog.procyon.org.uk>
+ <8212.1561971170@warthog.procyon.org.uk>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <90d07cf5-5ba4-1fb6-72b3-f120423a7726@infradead.org>
+Date:   Mon, 1 Jul 2019 07:52:02 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <bd45842a-e0fd-28a7-ac79-96f7cb9b66e4@kernel.dk>
+In-Reply-To: <8212.1561971170@warthog.procyon.org.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,38 +66,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/1/19 8:14 AM, Jens Axboe wrote:
-> On 7/1/19 8:05 AM, Jens Axboe wrote:
->> On 7/1/19 1:14 AM, Ming Lei wrote:
->>> 'bio->bi_iter.bi_size' is 'unsigned int', which at most hold 4G - 1
->>> bytes.
->>>
->>> Before 07173c3ec276 ("block: enable multipage bvecs"), one bio can
->>> include very limited pages, and usually at most 256, so the fs bio
->>> size won't be bigger than 1M bytes most of times.
->>>
->>> Since we support multi-page bvec, in theory one fs bio really can
->>> be added > 1M pages, especially in case of hugepage, or big writeback
->>> with too many dirty pages. Then there is chance in which .bi_size
->>> is overflowed.
->>>
->>> Fixes this issue by using bio_full() to check if the added segment may
->>> overflow .bi_size.
->>
->> Any objections to queuing this up for 5.3? It's not a new regression
->> this series.
+On 7/1/19 1:52 AM, David Howells wrote:
+> Randy Dunlap <rdunlap@infradead.org> wrote:
 > 
-> I took a closer look, and applied for 5.3 and removed the stable tag.
-> We'll need to apply your patch for stable, and I added an adapted
-> one for 5.3. I don't want a huge merge hassle because of this.
+>> I'm having a little trouble parsing that sentence.
+>> Could you clarify it or maybe rewrite/modify it?
+>> Thanks.
+> 
+> How about:
+> 
+>   * ``info_filter`` and ``info_mask`` act as a filter on the info field of the
+>     notification record.  The notification is only written into the buffer if::
+> 
+> 	(watch.info & info_mask) == info_filter
+> 
+>     This could be used, for example, to ignore events that are not exactly on
+>     the watched point in a mount tree by specifying NOTIFY_MOUNT_IN_SUBTREE
+>     must not be set, e.g.::
+> 
+> 	{
+> 		.type = WATCH_TYPE_MOUNT_NOTIFY,
+> 		.info_filter = 0,
+> 		.info_mask = NOTIFY_MOUNT_IN_SUBTREE,
+> 		.subtype_filter = ...,
+> 	}
+> 
+>     as an event would be only permissible with this filter if::
+> 
+>     	(watch.info & NOTIFY_MOUNT_IN_SUBTREE) == 0
+> 
+> David
+> 
 
-OK, so we still get conflicts with that, due to both the same page
-merge fix, and Christophs 5.3 changes.
-
-I ended up pulling in 5.2-rc6 in for-5.3/block, which resolves at
-least most of it, and kept the stable tag since now it's possible
-to backport without too much trouble.
+Yes, better.  Thanks.
 
 -- 
-Jens Axboe
-
+~Randy
