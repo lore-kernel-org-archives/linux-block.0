@@ -1,152 +1,133 @@
-Return-Path: <SRS0=xgQW=U4=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=9MH5=U6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7F87C5B577
-	for <linux-block@archiver.kernel.org>; Sat, 29 Jun 2019 19:46:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF52C06508
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 02:59:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 92F64216FD
-	for <linux-block@archiver.kernel.org>; Sat, 29 Jun 2019 19:46:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A747C2086D
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jul 2019 02:59:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MKHZDli9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726923AbfF2TqI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Jun 2019 15:46:08 -0400
-Received: from mailout2n.rrzn.uni-hannover.de ([130.75.2.113]:46469 "EHLO
-        mailout2n.rrzn.uni-hannover.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726901AbfF2TqI (ORCPT
+        id S1726618AbfGAC7l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Jun 2019 22:59:41 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:54944 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726472AbfGAC7l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Jun 2019 15:46:08 -0400
-Received: from [192.168.32.100] (p5DCCE4B4.dip0.t-ipconnect.de [93.204.228.180])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mailout2n.rrzn.uni-hannover.de (Postfix) with ESMTPSA id 1289F1F453;
-        Sat, 29 Jun 2019 21:46:04 +0200 (CEST)
-Subject: Re: [PATCH v2] drivers/block/loop: Replace deprecated function in
- option parsing code
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     "linux-kernel@i4.cs.fau.de" <linux-kernel@i4.cs.fau.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Christian Ewert <christian.ewert@stud.uni-hannover.de>
-References: <BYAPR04MB574936B98A60EB42B9A7C97886E30@BYAPR04MB5749.namprd04.prod.outlook.com>
- <20190625175517.31133-1-florian.knauf@stud.uni-hannover.de>
- <BYAPR04MB574963E31CE0DB5581F5311F86E30@BYAPR04MB5749.namprd04.prod.outlook.com>
-From:   Florian Knauf <florian.knauf@stud.uni-hannover.de>
-Message-ID: <eb0b0981-aba3-93dc-5ae5-d36f1f728024@stud.uni-hannover.de>
-Date:   Sat, 29 Jun 2019 21:46:03 +0200
+        Sun, 30 Jun 2019 22:59:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=IHOctcrnamPZlDOqkWx9gP7HKz6z4cfFnI1BHiO0w78=; b=MKHZDli96OWvWZf7Ml4qTTeTS
+        ADyGVjgEjt6ySSV9VdCosU1hi/21jcTscAC72nDZep1VKznI9fOx5A3N3iQPcPQy90pnC1WC+eC1S
+        Rr7xFMdssx1hm0W+7gNoMx1ZjX+NiaShGwa47IjtziyeHwzGGep8ZAN86u3cCfovTY2F7wuumVf87
+        txn5FMi7ZWCH/Z/lgAMKc90KP7QwzvTaqGRrZNGra+ZSPqK40+DWONlvWDTT8RVbu20a0hZVH3uxk
+        H2OilOPm03NJt7KIxOKf2aPx1YW4NfG8NGsQC+FAYu1tdnITXha3MxrdrMgG9/RcGNspO6MR5oPXD
+        8OeSFCLlA==;
+Received: from static-50-53-52-16.bvtn.or.frontiernet.net ([50.53.52.16] helo=dragon.dunlab)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hhmXZ-0007q7-Pi; Mon, 01 Jul 2019 02:59:37 +0000
+Subject: Re: [PATCH 2/6] Adjust watch_queue documentation to mention mount and
+ superblock watches. [ver #5]
+To:     David Howells <dhowells@redhat.com>, viro@zeniv.linux.org.uk
+Cc:     Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <156173701358.15650.8735203424342507015.stgit@warthog.procyon.org.uk>
+ <156173703546.15650.14319137940607993268.stgit@warthog.procyon.org.uk>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <7a288c2c-11a1-87df-9550-b247d6ce3010@infradead.org>
+Date:   Sun, 30 Jun 2019 19:59:33 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB574963E31CE0DB5581F5311F86E30@BYAPR04MB5749.namprd04.prod.outlook.com>
-Content-Type: multipart/mixed;
- boundary="------------696AF862470C2DEF88101BCF"
+In-Reply-To: <156173703546.15650.14319137940607993268.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------696AF862470C2DEF88101BCF
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi David,
 
-I have now, on the latest staging master (test log attached, everything 
-green), and also learned a lesson about looking more thoroughly for 
-automated test cases. That's a mea culpa, I suppose. :P
-
-Before this I'd only found the Linux Test Project, which (if I'm not 
-mistaken) contains tests that use loopback devices but no tests that 
-specifically test the loopback driver itself. Given the small scope of 
-the change, we then considered it sufficient to test manually that the 
-loop device still worked and that the max_loop parameter was handled 
-correctly. Of course, the blktests way is better.
-
-Thanks for taking the time to answer and review.
-
-Am 25.06.19 um 21:24 schrieb Chaitanya Kulkarni:
-> I believe you have tested this patch with loop testcases present in the
-> :- https://github.com/osandov/blktests/tree/master/tests/loop.
+On 6/28/19 8:50 AM, David Howells wrote:
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> ---
 > 
-> With that, looks good.
+>  Documentation/watch_queue.rst |   20 +++++++++++++++++++-
+>  drivers/misc/Kconfig          |    5 +++--
+>  2 files changed, 22 insertions(+), 3 deletions(-)
 > 
-> Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>.
-> 
-> On 06/25/2019 10:55 AM, Florian Knauf wrote:
->> This patch removes the deprecated simple_strtol function from the option
->> parsing logic in the loopback device driver. Instead kstrtoint is used to
->> parse int max_loop, to ensure that input values it cannot represent are
->> ignored.
->>
->> Signed-off-by: Florian Knauf <florian.knauf@stud.uni-hannover.de>
->> Signed-off-by: Christian Ewert <christian.ewert@stud.uni-hannover.de>
->> ---
->> Thank you for your feedback.
->>
->> There's no specific reason to use kstrtol, other than the fact that we
->> weren't yet aware that kstrtoint exists. (We're new at this, I'm afraid.)
->>
->> We've amended the patch to make use of kstrtoint, which is of course much
->> more straightforward.
->>
->> drivers/block/loop.c | 2 +-
->>    1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
->> index 102d79575895..adfaf4ad37d1 100644
->> --- a/drivers/block/loop.c
->> +++ b/drivers/block/loop.c
->> @@ -2289,7 +2289,7 @@ module_exit(loop_exit);
->>    #ifndef MODULE
->>    static int __init max_loop_setup(char *str)
->>    {
->> -	max_loop = simple_strtol(str, NULL, 0);
->> +	kstrtoint(str, 0, &max_loop);
->>    	return 1;
->>    }
->>
->>
-> 
+> diff --git a/Documentation/watch_queue.rst b/Documentation/watch_queue.rst
+> index 4087a8e670a8..1bec2018d549 100644
+> --- a/Documentation/watch_queue.rst
+> +++ b/Documentation/watch_queue.rst
+> @@ -13,6 +13,10 @@ receive notifications from the kernel.  This can be used in conjunction with::
+>  
+>      * USB subsystem event notifications
+>  
+> +  * Mount topology change notifications
+> +
+> +  * Superblock event notifications
+> +
+>  
+>  The notifications buffers can be enabled by:
+>  
+> @@ -324,6 +328,19 @@ Any particular buffer can be fed from multiple sources.  Sources include:
+>      for buses and devices.  Watchpoints of this type are set on the global
+>      device watch list.
+>  
+> +  * WATCH_TYPE_MOUNT_NOTIFY
+> +
+> +    Notifications of this type indicate mount tree topology changes and mount
+> +    attribute changes.  A watch can be set on a particular file or directory
+> +    and notifications from the path subtree rooted at that point will be
+> +    intercepted.
+> +
+> +  * WATCH_TYPE_SB_NOTIFY
+> +
+> +    Notifications of this type indicate superblock events, such as quota limits
+> +    being hit, I/O errors being produced or network server loss/reconnection.
+> +    Watches of this type are set directly on superblocks.
+> +
+>  
+>  Event Filtering
+>  ===============
+> @@ -365,7 +382,8 @@ Where:
+>  	(watch.info & info_mask) == info_filter
+>  
+>      This could be used, for example, to ignore events that are not exactly on
+> -    the watched point in a mount tree.
+> +    the watched point in a mount tree by specifying NOTIFY_MOUNT_IN_SUBTREE
+> +    must be 0.
 
---------------696AF862470C2DEF88101BCF
-Content-Type: text/x-log;
- name="check.log"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="check.log"
+I'm having a little trouble parsing that sentence.
+Could you clarify it or maybe rewrite/modify it?
+Thanks.
 
-loop/001 (scan loop device partitions)                      
-    runtime  0,401s  ...
-loop/001 (scan loop device partitions)                       [passed]
-    runtime  0,401s  ...  0,269s
-loop/002 (try various loop device block sizes)              
-    runtime  0,142s  ...
-loop/002 (try various loop device block sizes)               [passed]
-    runtime  0,142s  ...  0,148s
-loop/003 (time opening and closing an unbound loop device)  
-    runtime  0,047s  ...
-loop/003 (time opening and closing an unbound loop device)   [passed]
-    runtime  0,047s  ...  0,052s
-loop/004 (combine loop direct I/O mode and a custom block size)
-    runtime  0,382s  ...
-loop/004 (combine loop direct I/O mode and a custom block size) [passed]
-    runtime  0,382s  ...  0,383s
-loop/005 (call LOOP_GET_STATUS{,64} with a NULL arg)        
-    runtime  0,024s  ...
-loop/005 (call LOOP_GET_STATUS{,64} with a NULL arg)         [passed]
-    runtime  0,024s  ...  0,025s
-loop/006 (change loop backing file while creating/removing another loop device)
-    runtime  31,071s  ...
-loop/006 (change loop backing file while creating/removing another loop device) [passed]
-    runtime  31,071s  ...  31,050s
-loop/007 (update loop device capacity with filesystem)      
-    runtime  0,417s  ...
-loop/007 (update loop device capacity with filesystem)       [passed]
-    runtime  0,417s  ...  0,351s
+>  
+>    * ``subtype_filter`` is a bitmask indicating the subtypes that are of
+>      interest.  Bit 0 of subtype_filter[0] corresponds to subtype 0, bit 1 to
 
---------------696AF862470C2DEF88101BCF--
+
+
+-- 
+~Randy
