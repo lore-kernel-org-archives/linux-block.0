@@ -2,106 +2,196 @@ Return-Path: <SRS0=UuDU=VA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1CDC06511
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:55:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67975C5B57D
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 01:01:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8560820B1F
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:55:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3179620B1F
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 01:01:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cb/Pk1At"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KBOctFt6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727126AbfGCAzl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jul 2019 20:55:41 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37961 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726930AbfGCAzl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jul 2019 20:55:41 -0400
-Received: by mail-pg1-f193.google.com with SMTP id z75so255833pgz.5;
-        Tue, 02 Jul 2019 17:55:40 -0700 (PDT)
+        id S1727165AbfGCBBF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jul 2019 21:01:05 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:35001 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727066AbfGCBBF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jul 2019 21:01:05 -0400
+Received: by mail-qt1-f196.google.com with SMTP id d23so761218qto.2;
+        Tue, 02 Jul 2019 18:01:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=hOIwG5g5qmRLAvMNTG4avtQVbsGFIvybNsnInhl+M4o=;
-        b=cb/Pk1At+z3oGkj9asXbRIPTNhtNNDhEo9ERURh8nDXjg9YfPprqQ0qQYHqhy6rSaF
-         JJspKzFbPkoHBG1kaQbIKL4Etz6H7aOfya+lfGpEAx6RnbpVdTd7Rxs7T0tbO5UisAdO
-         ZPS+HcJG5yjLZ5ZwaiZd06fGxx/3MPhHrBdRynVocTY4ZZQqWSgJAGtpgAcK2EM1t/IC
-         ql85Jt+6SJaTpykfV7iCWdY664TUtO6aseDda3Coj6ovwBG5auhQYjx2CnWoovXC0vYV
-         TGVurkVhHPuRr2MoDJiWpkQUxDkKogeLnLOiv6z74HHdSogerj7IJhsi3buT9J7QMe6q
-         XOyg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AF5wAEaSeOuu/dYORr2z7nahKEkMxFAhhFiFqhe66nc=;
+        b=KBOctFt6fuFEqux0VV7CSWgommZB4FnyANMSEPt5JjEYuv6Jls8PBdd/PPpbHE3RcE
+         /Dgl9dTtXzk0uqJPEFVIVM0BnlQFt1XupSF4Xxhu6C7pS+SCevNQfXVYnhN2ramXoA5t
+         21AO32DyWtaC8GU4kuga8tmYxU5sFXiaKNFiGSgJmfx7yLfyJOwsCG8hS9h4nUFodWMl
+         qstMTXjpmEBH/sTUzR14scYPgOyURXdmWhtHrfcMLhHB76oH0l3VFR/1w5oS+4RYxDIj
+         FTQrLLKkaJ8G1Ghm9EFb2rAvto9VjUHFN3QCgyFNrpLffEs1e821F5eS+FCEAkMxfdTW
+         oI5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=hOIwG5g5qmRLAvMNTG4avtQVbsGFIvybNsnInhl+M4o=;
-        b=t56r4wwcSIATbWPyUQVUHoUfq2qmO8W68jYB7o0rPFN0yRjQUvu/CAE0hvxAs3H9JL
-         p+uBoMc83Emy4mID6wbtSUlNEYRyAdNf1LhDDC7uoC2JgBMsPHj99Cbqg1Hzh7WFj26c
-         2pq3WMXRYqodO6wrXOdwA3/A+mZFfDg067OHAuPxu/XSMrPve91yiiL/qIgDXK5oPaVj
-         pTxlWSoouZ53BrGnfdfp1QvDsX0IqIH9XIHTgtyRFPl4kBu6CVxC51OyFZ8/vRiDovn4
-         vgsbsEMZx0hDW26C2HLWdQH1KjF0DXWvWq31y8phHSIyUfr+TK9127RE4abGwm1W5b07
-         xN/g==
-X-Gm-Message-State: APjAAAVtMqMX5jNO4sq4RwWIpEo4jcGCBvnVWCqit4ChjxcJPKLi3VZC
-        zeoAOT+uEDx/wGUsAV5iyNSH8iUxLEo=
-X-Google-Smtp-Source: APXvYqz77rLbSyHhgcZyWseydKse1/eh4HWO31E2oh1XmlIvsC+gQNegzx8lDeCvxQG38H30v200vA==
-X-Received: by 2002:a17:90a:2768:: with SMTP id o95mr8287011pje.37.1562108080227;
-        Tue, 02 Jul 2019 15:54:40 -0700 (PDT)
-Received: from continental ([189.58.144.164])
-        by smtp.gmail.com with ESMTPSA id k14sm135388pfg.6.2019.07.02.15.54.36
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 02 Jul 2019 15:54:39 -0700 (PDT)
-Date:   Tue, 2 Jul 2019 19:55:21 -0300
-From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Marcos Paulo de Souza <mpdesouza@suse.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "open list:NETWORK BLOCK DEVICE (NBD)" <linux-block@vger.kernel.org>,
-        "open list:NETWORK BLOCK DEVICE (NBD)" <nbd@other.debian.org>,
-        marcos.souza.org@gmail.com
-Subject: Re: [PATCH] driver: block: nbd: Replace magic number 9 with
- SECTOR_SHIFT
-Message-ID: <20190702225521.GA16741@continental>
-References: <20190624160933.23148-1-marcos.souza.org@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AF5wAEaSeOuu/dYORr2z7nahKEkMxFAhhFiFqhe66nc=;
+        b=YJtmUthTZ+TVvQXZe9AQ8g1/lNDtPOV3NGPsC93UIdQgJSf4BSJJ9FExNG4CVP+GtR
+         rrPbsElpxn8SzlRhwzzyz6pq4KiKJApaidFCBPizY6CTNLq8Y44UpixMTQLSFVS3kgBU
+         j3hwCfFncyyCJuhJbBkwMQlTHoz20hjcpyugfmGul0BGut+a+ep3hdy6jUkDChbBQvhm
+         HCLaeec9gaomfsomB9Y2uylk+3vxwsR/mnSVSla1Ig0hO4r0axAaGQXnq+5uglYvlmqz
+         8rvtgt87IKk/dVAhZVqKlOO572KUX0W8QjpJd7HlX7Gvfnwxdc8q9laUM0fqHpLsjm9u
+         fUPg==
+X-Gm-Message-State: APjAAAWs2rAq4ufJShvTW8MfKL0txbrH7YiMRNYNIZHNkgTVPd/BIqiM
+        pDLQuE10UMrndrxEKRiGvKW8bD66BZPN51tE/r9V4gy/XeI=
+X-Google-Smtp-Source: APXvYqwipkyidadYl9pWmBe4w7DWi2+eePr3tvjA6SB8hN83jGerGUKJ3LpMmOersX7hx5FRh8mIkt6rAtaIlTQEmcM=
+X-Received: by 2002:a0c:c68d:: with SMTP id d13mr28737569qvj.145.1562111608377;
+ Tue, 02 Jul 2019 16:53:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190624160933.23148-1-marcos.souza.org@gmail.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+References: <20190628221759.18274-1-gpiccoli@canonical.com>
+In-Reply-To: <20190628221759.18274-1-gpiccoli@canonical.com>
+From:   Song Liu <liu.song.a23@gmail.com>
+Date:   Tue, 2 Jul 2019 16:53:17 -0700
+Message-ID: <CAPhsuW5arZgFy0iur0qdgO7a1g9qiB0V2OskQPXJkL0WWHG52A@mail.gmail.com>
+Subject: Re: [4.19.y PATCH 1/2] block: Fix a NULL pointer dereference in generic_make_request()
+To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
+Cc:     stable@vger.kernel.org, gregkh@linuxfoundation.org,
+        sashal@kernel.org, linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>,
+        Jay Vosburgh <jay.vosburgh@canonical.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Song Liu <songliubraving@fb.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Eric Ren <renzhengeek@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ping?
+On Fri, Jun 28, 2019 at 3:22 PM Guilherme G. Piccoli
+<gpiccoli@canonical.com> wrote:
+>
+> -----------------------------------------------------------------
+> This patch is not on mainline and is meant to 4.19 stable *only*.
+> After the patch description there's a reasoning about that.
+> -----------------------------------------------------------------
+>
+> Commit 37f9579f4c31 ("blk-mq: Avoid that submitting a bio concurrently
+> with device removal triggers a crash") introduced a NULL pointer
+> dereference in generic_make_request(). The patch sets q to NULL and
+> enter_succeeded to false; right after, there's an 'if (enter_succeeded)'
+> which is not taken, and then the 'else' will dereference q in
+> blk_queue_dying(q).
+>
+> This patch just moves the 'q = NULL' to a point in which it won't trigger
+> the oops, although the semantics of this NULLification remains untouched.
+>
+> A simple test case/reproducer is as follows:
+> a) Build kernel v4.19.56-stable with CONFIG_BLK_CGROUP=n.
+>
+> b) Create a raid0 md array with 2 NVMe devices as members, and mount
+> it with an ext4 filesystem.
+>
+> c) Run the following oneliner (supposing the raid0 is mounted in /mnt):
+> (dd of=/mnt/tmp if=/dev/zero bs=1M count=999 &); sleep 0.3;
+> echo 1 > /sys/block/nvme1n1/device/device/remove
+> (whereas nvme1n1 is the 2nd array member)
+>
+> This will trigger the following oops:
+>
+> BUG: unable to handle kernel NULL pointer dereference at 0000000000000078
+> PGD 0 P4D 0
+> Oops: 0000 [#1] SMP PTI
+> RIP: 0010:generic_make_request+0x32b/0x400
+> Call Trace:
+>  submit_bio+0x73/0x140
+>  ext4_io_submit+0x4d/0x60
+>  ext4_writepages+0x626/0xe90
+>  do_writepages+0x4b/0xe0
+> [...]
+>
+> This patch has no functional changes and preserves the md/raid0 behavior
+> when a member is removed before kernel v4.17.
+>
+> ----------------------------
+> Why this is not on mainline?
+> ----------------------------
+>
+> The patch was originally submitted upstream in linux-raid and
+> linux-block mailing-lists - it was initially accepted by Song Liu,
+> but Christoph Hellwig[0] observed that there was a clean-up series
+> ready to be accepted from Ming Lei[1] that fixed the same issue.
+>
+> The accepted patches from Ming's series in upstream are: commit
+> 47cdee29ef9d ("block: move blk_exit_queue into __blk_release_queue") and
+> commit fe2008640ae3 ("block: don't protect generic_make_request_checks
+> with blk_queue_enter"). Those patches basically do a clean-up in the
+> block layer involving:
+>
+> 1) Putting back blk_exit_queue() logic into __blk_release_queue(); that
+> path was changed in the past and the logic from blk_exit_queue() was
+> added to blk_cleanup_queue().
+>
+> 2) Removing the guard/protection in generic_make_request_checks() with
+> blk_queue_enter().
+>
+> The problem with Ming's series for -stable is that it relies in the
+> legacy request IO path removal. So it's "backport-able" to v5.0+,
+> but doing that for early versions (like 4.19) would incur in complex
+> code changes. Hence, it was suggested by Christoph and Song Liu that
+> this patch was submitted to stable only; otherwise merging it upstream
+> would add code to fix a path removed in a subsequent commit.
+>
+> [0] lore.kernel.org/linux-block/20190521172258.GA32702@infradead.org
+> [1] lore.kernel.org/linux-block/20190515030310.20393-1-ming.lei@redhat.com
+>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Song Liu <songliubraving@fb.com>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> Tested-by: Eric Ren <renzhengeek@gmail.com>
+> Fixes: 37f9579f4c31 ("blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash")
+> Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
 
-On Mon, Jun 24, 2019 at 01:09:33PM -0300, Marcos Paulo de Souza wrote:
-> set_capacity expects the disk size in sectors of 512 bytes, and changing
-> the magic number 9 to SECTOR_SHIFT clarifies this intent.
-> 
-> Signed-off-by: Marcos Paulo de Souza <mpdesouza@suse.com>
+Acked-by: Song Liu <songliubraving@fb.com>
+
+Thanks for the fix!
+
 > ---
->  drivers/block/nbd.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 3a9bca3aa093..fd3bc061c600 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -288,7 +288,7 @@ static void nbd_size_update(struct nbd_device *nbd)
->  	}
->  	blk_queue_logical_block_size(nbd->disk->queue, config->blksize);
->  	blk_queue_physical_block_size(nbd->disk->queue, config->blksize);
-> -	set_capacity(nbd->disk, config->bytesize >> 9);
-> +	set_capacity(nbd->disk, config->bytesize >> SECTOR_SHIFT);
->  	if (bdev) {
->  		if (bdev->bd_disk) {
->  			bd_set_size(bdev, config->bytesize);
-> -- 
-> 2.21.0
-> 
+>  block/blk-core.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 6eed5d84c2ef..682bc561b77b 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -2445,10 +2445,8 @@ blk_qc_t generic_make_request(struct bio *bio)
+>                         flags = 0;
+>                         if (bio->bi_opf & REQ_NOWAIT)
+>                                 flags = BLK_MQ_REQ_NOWAIT;
+> -                       if (blk_queue_enter(q, flags) < 0) {
+> +                       if (blk_queue_enter(q, flags) < 0)
+>                                 enter_succeeded = false;
+> -                               q = NULL;
+> -                       }
+>                 }
+>
+>                 if (enter_succeeded) {
+> @@ -2479,6 +2477,7 @@ blk_qc_t generic_make_request(struct bio *bio)
+>                                 bio_wouldblock_error(bio);
+>                         else
+>                                 bio_io_error(bio);
+> +                       q = NULL;
+>                 }
+>                 bio = bio_list_pop(&bio_list_on_stack[0]);
+>         } while (bio);
+> --
+> 2.22.0
+>
