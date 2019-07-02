@@ -2,112 +2,205 @@ Return-Path: <SRS0=UuDU=VA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DBACC06510
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A69C5C5B57D
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:53:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CC73C218EA
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:50:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 684BB2184C
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:53:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="EQLsmuMm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eNnvNTFX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727040AbfGCAue (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jul 2019 20:50:34 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:52767 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727190AbfGCAud (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jul 2019 20:50:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562115033; x=1593651033;
-  h=from:to:cc:subject:date:message-id;
-  bh=wEIkFBPqXVLkAHRjVu0iLrwwsuBBJAJ7BB94GnIzxYE=;
-  b=EQLsmuMmep7jvUprYjUAuXa758DIuZHR7V26U32fh7KAfHj3zAc27xFM
-   zZj+i8BTOG+jS5PswMv86UXThW34IERg+3vqTjBsJ0vkfDWOaT2Zswkm+
-   UapiUNoE/1LX6kr+MihetE4qH1HIFseb5KEcEawh9sRoipNacDUnaHM28
-   HUq2Aa1WXdZCFVjI7rRUYEjUWkUkP4yEsQr5R1gQZIstyaYiM/nm8EM1b
-   agK0EJ7xkxL8z5EmDj0/A42hTJHhd8aKReWLTQ+V4ot68NCjQbtmbUtSH
-   FV6UWfzITG76lTTB5JpEVoMwQzS98BoP+mUxgmx5BTfRNSpZNvnv1rdj0
-   g==;
-IronPort-SDR: cyGEtSjrFE6558BjihlDU9tt4MWAIfXCAT+lH+td0d7sIv8IOMb6xkdSJjBzuFEq19K8vLVOoa
- deaj+3H0zQ5VN68AyaW4kJCfVCy7dd4zQ6Ssa5rEWScQrR7x6jyrIeFwqKDdsrW54KsuRddsy7
- RmId/k+dRXSIBWeTl6vIpZZeeDBHiwAA80kF9z31h4b4Wj9Ssc1Ms1OJQsL2OLlgZBFMMV5eXd
- yQUi+4KlEkq84w4Jp3kwKA8zD3fYa/1T5RN0lvR1vF6x9rHXSsaKz7Pc6eJnV1Npy9TLmQNo9Q
- 2x4=
-X-IronPort-AV: E=Sophos;i="5.63,444,1557158400"; 
-   d="scan'208";a="113703821"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2019 04:29:00 +0800
-IronPort-SDR: gFfCTmaI1a9ag6HHVOYA29/eEdxiul502QUUq4Hc0VeswDSHy4/UUIPLtizbm+nZZsl+iIRsCC
- IVyyML8dDPMbGPo88y/YzUrw3UhgrARTTPR6/2Ed4l+wKfqRuQ/59HYydBxVnh8uPHxoyhuMNH
- qvg5zmGITXn4NCSX67wEvDBuhTJG/+c8gXv+NqZJb8o+P7Hd49lFP0JG5eL3OIqb65e79HbM58
- B/d8BjbakTRGYSU0wGWcK6oloGSSryR8v2kXJkCY4MTO7Y64VYDmMgU49F7WjBWSuPt5w2RSZM
- xIyPOueBnW0VYJJFs5Zs36Eb
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP; 02 Jul 2019 13:27:58 -0700
-IronPort-SDR: YmkhUb3mMijoNmXoADl8y9ZbWPhaXtpbLdj+QofGRbpd/J1yV8zb3OWP1Wa0Y/q6xSzr8tiBtD
- 7E048QWkllh5C4qYH3t8xJVMNUOa1f0w7DTV+4l7xHiixKOIC5BM065eKNE5ytBkiu8UUMq9wK
- HrR4fymB5THMcR363aTFC6xypbPO1Ca+JflU3ltKp3rNA+iCv3V8eKXjMuBAgIDPagk2Wmr83G
- fvWLhHY/7bypKsYBQwHm+qiNdVUTy3aGNLTkEHHnP/gcrRTzdgFoNZvtzMSxvY22YeHqBZksoW
- Evw=
-Received: from cvenusqemu.hgst.com ([10.202.66.73])
-  by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2019 13:29:00 -0700
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH] null_blk: use SECTOR_SHIFT consistently
-Date:   Tue,  2 Jul 2019 13:28:57 -0700
-Message-Id: <20190702202857.4433-1-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.17.0
+        id S1727091AbfGCAxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jul 2019 20:53:39 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:38256 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727089AbfGCAxj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jul 2019 20:53:39 -0400
+Received: by mail-qk1-f196.google.com with SMTP id a27so448666qkk.5;
+        Tue, 02 Jul 2019 17:53:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cTgua9G58q50LFVixMsdybnWckR256ux0PIIDP1wQ5Y=;
+        b=eNnvNTFXUtK2ZmwHM5eqnMuzDgJPwkqHrI+PkZhmUjI//R1v14BzZDCU5xRUnbQYp8
+         Ys7Z4llzJPYIq260gYIW+o9qlLnHJ+O9uOVD1zyeBW+7ZZtGIti58RWbqvaiXD6Jq1HV
+         IiHX54MaIDkl3JDO31+FKWsp4hOeE6VspxxOMH/w2WazIhRAD08Iw9KPTwpRM4L6ohkU
+         Sxqk8lfvxoTpGJdqwRZc6t50tDDwgUDLJ372Lp6rAVRtD37xaQJw8ztLhM39zvLY1YRv
+         lGgchql7l2XVg1ulSTuWeb2JfGqqlFenKDasfdxLDALl3noeXRJS7RMyClKqiXo7xKCB
+         hFoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cTgua9G58q50LFVixMsdybnWckR256ux0PIIDP1wQ5Y=;
+        b=RxuIW2Ad2mluHPSFQ0njm6wofPlIH/kRQcs/K1c9YuZU48bFghBSqnnVbFu3L54T9c
+         yKvDd8+78Cs/prKoI2OC8YBX7u4mP+60qTTrrveEq5OyhrN254R5G+5Xe+dImHyB2+iv
+         P4XOp7aKhIqANs3naWzV6CItAK4I63WJEV4Vg/vNuve4LRKArle8y+hHkOceVqh5Z1S7
+         L1l1y6ZimqMXsZ3VFU0aEig/t3ELTEGhZZny0wD9yfN6mbPuTucEevX5UFZSQLjDN8dm
+         oUHboSRt2PmzKJ88zrKDUR5zsVMTDUbgksYdyF7SciO6dFWKncqAtyAGAiLr10x0AsDQ
+         zGIQ==
+X-Gm-Message-State: APjAAAWDwEAO0uwACQj92mnzqH6DmN6YKswPP++Pq9qdcp1M8TE0aVJC
+        NysdaF1WwS9hadNaPzKgtK9QnhLOJmQOkHGFop5sx+EcOw8=
+X-Google-Smtp-Source: APXvYqwXZMt+P2u8xEdlyca/T+BvLbvy+lm3kwU603/Ditp8soNe+beEqZROzQ8SEe4b0yK/AWH15xcSeRFtprWNMT0=
+X-Received: by 2002:ae9:e40f:: with SMTP id q15mr25697889qkc.241.1562111637578;
+ Tue, 02 Jul 2019 16:53:57 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190628221759.18274-1-gpiccoli@canonical.com> <20190628221759.18274-2-gpiccoli@canonical.com>
+In-Reply-To: <20190628221759.18274-2-gpiccoli@canonical.com>
+From:   Song Liu <liu.song.a23@gmail.com>
+Date:   Tue, 2 Jul 2019 16:53:46 -0700
+Message-ID: <CAPhsuW6NpgM5HXHcuqt4oL3kORrTrMWvdTNANuBr=9Px5H4vEQ@mail.gmail.com>
+Subject: Re: [4.19.y PATCH 2/2] md/raid0: Do not bypass blocking queue entered
+ for raid0 bios
+To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
+Cc:     stable@vger.kernel.org, gregkh@linuxfoundation.org,
+        sashal@kernel.org, linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>,
+        Jay Vosburgh <jay.vosburgh@canonical.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Song Liu <songliubraving@fb.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a pure cleanup patch and doesn't change any functionality.
-In null_blk_main.c we use mixed style of the code SECTOR_SHIFT and
->> 9. Get rid of the >> 9 and use SECTOR_SHIFT everywhere.
+On Fri, Jun 28, 2019 at 3:18 PM Guilherme G. Piccoli
+<gpiccoli@canonical.com> wrote:
+>
+> -----------------------------------------------------------------
+> This patch is not on mainline and is meant to 4.19 stable *only*.
+> After the patch description there's a reasoning about that.
+> -----------------------------------------------------------------
+>
+> Commit cd4a4ae4683d ("block: don't use blocking queue entered for
+> recursive bio submits") introduced the flag BIO_QUEUE_ENTERED in order
+> split bios bypass the blocking queue entering routine and use the live
+> non-blocking version. It was a result of an extensive discussion in
+> a linux-block thread[0], and the purpose of this change was to prevent
+> a hung task waiting on a reference to drop.
+>
+> Happens that md raid0 split bios all the time, and more important,
+> it changes their underlying device to the raid member. After the change
+> introduced by this flag's usage, we experience various crashes if a raid0
+> member is removed during a large write. This happens because the bio
+> reaches the live queue entering function when the queue of the raid0
+> member is dying.
+>
+> A simple reproducer of this behavior is presented below:
+> a) Build kernel v4.19.56-stable with CONFIG_BLK_DEV_THROTTLING=y.
+>
+> b) Create a raid0 md array with 2 NVMe devices as members, and mount
+> it with an ext4 filesystem.
+>
+> c) Run the following oneliner (supposing the raid0 is mounted in /mnt):
+> (dd of=/mnt/tmp if=/dev/zero bs=1M count=999 &); sleep 0.3;
+> echo 1 > /sys/block/nvme1n1/device/device/remove
+> (whereas nvme1n1 is the 2nd array member)
+>
+> This will trigger the following warning/oops:
+>
+> ------------[ cut here ]------------
+> BUG: unable to handle kernel NULL pointer dereference at 0000000000000155
+> PGD 0 P4D 0
+> Oops: 0000 [#1] SMP PTI
+> RIP: 0010:blk_throtl_bio+0x45/0x970
+> [...]
+> Call Trace:
+>  generic_make_request_checks+0x1bf/0x690
+>  generic_make_request+0x64/0x3f0
+>  raid0_make_request+0x184/0x620 [raid0]
+>  ? raid0_make_request+0x184/0x620 [raid0]
+>  md_handle_request+0x126/0x1a0
+>  md_make_request+0x7b/0x180
+>  generic_make_request+0x19e/0x3f0
+>  submit_bio+0x73/0x140
+> [...]
+>
+> This patch changes raid0 driver to fallback to the "old" blocking queue
+> entering procedure, by clearing the BIO_QUEUE_ENTERED from raid0 bios.
+> This prevents the crashes and restores the regular behavior of raid0
+> arrays when a member is removed during a large write.
+>
+> [0] lore.kernel.org/linux-block/343bbbf6-64eb-879e-d19e-96aebb037d47@I-love.SAKURA.ne.jp
+>
+> ----------------------------
+> Why this is not on mainline?
+> ----------------------------
+>
+> The patch was originally submitted upstream in linux-raid and
+> linux-block mailing-lists - it was initially accepted by Song Liu,
+> but Christoph Hellwig[1] observed that there was a clean-up series
+> ready to be accepted from Ming Lei[2] that fixed the same issue.
+>
+> The accepted patches from Ming's series in upstream are: commit
+> 47cdee29ef9d ("block: move blk_exit_queue into __blk_release_queue") and
+> commit fe2008640ae3 ("block: don't protect generic_make_request_checks
+> with blk_queue_enter"). Those patches basically do a clean-up in the
+> block layer involving:
+>
+> 1) Putting back blk_exit_queue() logic into __blk_release_queue(); that
+> path was changed in the past and the logic from blk_exit_queue() was
+> added to blk_cleanup_queue().
+>
+> 2) Removing the guard/protection in generic_make_request_checks() with
+> blk_queue_enter().
+>
+> The problem with Ming's series for -stable is that it relies in the
+> legacy request IO path removal. So it's "backport-able" to v5.0+,
+> but doing that for early versions (like 4.19) would incur in complex
+> code changes. Hence, it was suggested by Christoph and Song Liu that
+> this patch was submitted to stable only; otherwise merging it upstream
+> would add code to fix a path removed in a subsequent commit.
+>
+> [1] lore.kernel.org/linux-block/20190521172258.GA32702@infradead.org
+> [2] lore.kernel.org/linux-block/20190515030310.20393-1-ming.lei@redhat.com
+>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Song Liu <songliubraving@fb.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> Fixes: cd4a4ae4683d ("block: don't use blocking queue entered for recursive bio submits")
+> Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- drivers/block/null_blk_main.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Acked-by: Song Liu <songliubraving@fb.com>
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index cbbbb89e89ab..860d9c17b615 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1203,7 +1203,7 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
- 		if (dev->queue_mode == NULL_Q_BIO) {
- 			op = bio_op(cmd->bio);
- 			sector = cmd->bio->bi_iter.bi_sector;
--			nr_sectors = cmd->bio->bi_iter.bi_size >> 9;
-+			nr_sectors = cmd->bio->bi_iter.bi_size >> SECTOR_SHIFT;
- 		} else {
- 			op = req_op(cmd->rq);
- 			sector = blk_rq_pos(cmd->rq);
-@@ -1408,7 +1408,7 @@ static void null_config_discard(struct nullb *nullb)
- 		return;
- 	nullb->q->limits.discard_granularity = nullb->dev->blocksize;
- 	nullb->q->limits.discard_alignment = nullb->dev->blocksize;
--	blk_queue_max_discard_sectors(nullb->q, UINT_MAX >> 9);
-+	blk_queue_max_discard_sectors(nullb->q, UINT_MAX >> SECTOR_SHIFT);
- 	blk_queue_flag_set(QUEUE_FLAG_DISCARD, nullb->q);
- }
- 
-@@ -1521,7 +1521,7 @@ static int null_gendisk_register(struct nullb *nullb)
- 	if (!disk)
- 		return -ENOMEM;
- 	size = (sector_t)nullb->dev->size * 1024 * 1024ULL;
--	set_capacity(disk, size >> 9);
-+	set_capacity(disk, size >> SECTOR_SHIFT);
- 
- 	disk->flags |= GENHD_FL_EXT_DEVT | GENHD_FL_SUPPRESS_PARTITION_INFO;
- 	disk->major		= null_major;
--- 
-2.17.0
+Thanks for the fix!
 
+> ---
+>  drivers/md/raid0.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
+> index ac1cffd2a09b..f4daa56d204d 100644
+> --- a/drivers/md/raid0.c
+> +++ b/drivers/md/raid0.c
+> @@ -547,6 +547,7 @@ static void raid0_handle_discard(struct mddev *mddev, struct bio *bio)
+>                         trace_block_bio_remap(bdev_get_queue(rdev->bdev),
+>                                 discard_bio, disk_devt(mddev->gendisk),
+>                                 bio->bi_iter.bi_sector);
+> +               bio_clear_flag(bio, BIO_QUEUE_ENTERED);
+>                 generic_make_request(discard_bio);
+>         }
+>         bio_endio(bio);
+> @@ -602,6 +603,7 @@ static bool raid0_make_request(struct mddev *mddev, struct bio *bio)
+>                                 disk_devt(mddev->gendisk), bio_sector);
+>         mddev_check_writesame(mddev, bio);
+>         mddev_check_write_zeroes(mddev, bio);
+> +       bio_clear_flag(bio, BIO_QUEUE_ENTERED);
+>         generic_make_request(bio);
+>         return true;
+>  }
+> --
+> 2.22.0
+>
