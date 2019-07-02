@@ -7,20 +7,20 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94FB8C06510
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jul 2019 13:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B498DC06511
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jul 2019 13:24:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 76EA7206E0
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jul 2019 13:24:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 96F23206E0
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jul 2019 13:24:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727096AbfGBNXw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727077AbfGBNXw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 2 Jul 2019 09:23:52 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7688 "EHLO huawei.com"
+Received: from szxga07-in.huawei.com ([45.249.212.35]:40950 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727083AbfGBNXw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1726963AbfGBNXw (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Tue, 2 Jul 2019 09:23:52 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id B56142A725E3A147B9F7;
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 9252A2D5C714C1E33159;
         Tue,  2 Jul 2019 21:23:49 +0800 (CST)
 Received: from huawei.com (10.90.53.225) by DGGEMS402-HUB.china.huawei.com
  (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Tue, 2 Jul 2019
@@ -30,15 +30,15 @@ To:     <linux-raid@vger.kernel.org>, <songliubraving@fb.com>
 CC:     <neilb@suse.com>, <linux-block@vger.kernel.org>,
         <snitzer@redhat.com>, <agk@redhat.com>, <dm-devel@redhat.com>,
         <linux-kernel@vger.kernel.org>, <houtao1@huawei.com>
-Subject: [RFC PATCH 3/3] raid1: export inflight io counters and internal stats in debugfs
-Date:   Tue, 2 Jul 2019 21:29:18 +0800
-Message-ID: <20190702132918.114818-4-houtao1@huawei.com>
+Subject: [RFC PATCH 2/3] md: export inflight io counters and internal stats in debugfs
+Date:   Tue, 2 Jul 2019 21:29:17 +0800
+Message-ID: <20190702132918.114818-3-houtao1@huawei.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190702132918.114818-1-houtao1@huawei.com>
 References: <20190702132918.114818-1-houtao1@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.90.53.225]
 X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
@@ -46,138 +46,154 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just like the previous patch which exports debugfs files for md-core,
-this patch exports debugfs file for md-raid1 under
-/sys/kernel/debug/block/mdX/raid1.
+There are so many io counters and stats/flags in md, so I think
+export these info in debugfs will be helpful for online-debugging,
+especially when the vmlinux and crash utility are not available.
+And these files can also be utilized during code understanding.
+
+Debug info are divided into two debugfs files:
+* iostat
+  contains io counters and io related stats (e.g., mddev->pending_writes
+  and the active status of mddev->sb_wait)
+* stat
+  contains internal stats or flags (e.g., mddev->sb_flags)
+
+These two debugfs files will be created both by md-core and the used
+md-personality for each md device. This patch creates debug files
+for md-core under /sys/kernel/debug/block/mdX, and the following patch
+will creates these files for RAID1. The following lines show the hierarchy
+of debugfs files created for a RAID1 device:
+
+  $ pwd
+  /sys/kernel/debug/block/md0
+  $ tree
+  .
+  ├── iostat
+  ├── raid1
+  │   ├── iostat
+  │   └── stat
+  └── stat
 
 Signed-off-by: Hou Tao <houtao1@huawei.com>
 ---
- drivers/md/raid1.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++
- drivers/md/raid1.h |  1 +
- 2 files changed, 79 insertions(+)
+ drivers/md/md.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
+ drivers/md/md.h |  1 +
+ 2 files changed, 66 insertions(+)
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 2aa36e570e04..da06bb47195b 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -35,6 +35,7 @@
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 9801d540fea1..dceb8fd59ba0 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -64,11 +64,14 @@
  #include "md.h"
- #include "raid1.h"
  #include "md-bitmap.h"
+ #include "md-cluster.h"
 +#include "md-debugfs.h"
  
- #define UNSUPPORTED_MDDEV_FLAGS		\
- 	((1L << MD_HAS_JOURNAL) |	\
-@@ -2901,6 +2902,80 @@ static sector_t raid1_size(struct mddev *mddev, sector_t sectors, int raid_disks
- 	return mddev->dev_sectors;
+ #ifndef MODULE
+ static void autostart_arrays(int part);
+ #endif
+ 
++extern struct dentry *blk_debugfs_root;
++
+ /* pers_list is a list of registered personalities protected
+  * by pers_lock.
+  * pers_lock does extra service to protect accesses to
+@@ -5191,6 +5194,65 @@ md_attr_store(struct kobject *kobj, struct attribute *attr,
+ 	return rv;
  }
  
-+enum {
-+	IOSTAT_NR_PENDING = 0,
-+	IOSTAT_NR_WAITING,
-+	IOSTAT_NR_QUEUED,
-+	IOSTAT_BARRIER,
-+	IOSTAT_CNT,
-+};
-+
-+static int raid1_dbg_iostat_show(struct seq_file *m, void *data)
++static int md_dbg_iostat_show(struct seq_file *m, void *data)
 +{
-+	struct r1conf *conf = m->private;
-+	int idx;
-+	int sum[IOSTAT_CNT] = {};
++	struct mddev *mddev = m->private;
++	int active_bm_io = 0;
 +
-+	seq_printf(m, "retry_list active %d\n",
-+			!list_empty(&conf->retry_list));
-+	seq_printf(m, "bio_end_io_list active %d\n",
-+			!list_empty(&conf->bio_end_io_list));
-+	seq_printf(m, "pending_bio_list active %d cnt %d\n",
-+			!bio_list_empty(&conf->pending_bio_list),
-+			conf->pending_count);
++	spin_lock(&mddev->lock);
++	if (mddev->bitmap)
++		active_bm_io = atomic_read(&mddev->bitmap->pending_writes);
++	spin_unlock(&mddev->lock);
 +
-+	for (idx = 0; idx < BARRIER_BUCKETS_NR; idx++) {
-+		sum[IOSTAT_NR_PENDING] += atomic_read(&conf->nr_pending[idx]);
-+		sum[IOSTAT_NR_WAITING] += atomic_read(&conf->nr_waiting[idx]);
-+		sum[IOSTAT_NR_QUEUED] += atomic_read(&conf->nr_queued[idx]);
-+		sum[IOSTAT_BARRIER] += atomic_read(&conf->barrier[idx]);
-+	}
-+
-+	seq_printf(m, "sync_pending %d\n", atomic_read(&conf->nr_sync_pending));
-+	seq_printf(m, "nr_pending %d\n", sum[IOSTAT_NR_PENDING]);
-+	seq_printf(m, "nr_waiting %d\n", sum[IOSTAT_NR_WAITING]);
-+	seq_printf(m, "nr_queued %d\n", sum[IOSTAT_NR_QUEUED]);
-+	seq_printf(m, "barrier %d\n", sum[IOSTAT_BARRIER]);
++	seq_printf(m, "active_io %d\n",
++			atomic_read(&mddev->active_io));
++	seq_printf(m, "sb_wait %d pending_writes %d\n",
++			waitqueue_active(&mddev->sb_wait),
++			atomic_read(&mddev->pending_writes));
++	seq_printf(m, "recovery_active %d\n",
++			atomic_read(&mddev->recovery_active));
++	seq_printf(m, "bitmap pending_writes %d\n", active_bm_io);
 +
 +	return 0;
 +}
 +
-+static int raid1_dbg_stat_show(struct seq_file *m, void *data)
++static int md_dbg_stat_show(struct seq_file *m, void *data)
 +{
-+	struct r1conf *conf = m->private;
++	struct mddev *mddev = m->private;
 +
-+	seq_printf(m, "array_frozen %d\n", conf->array_frozen);
++	seq_printf(m, "flags 0x%lx\n", mddev->flags);
++	seq_printf(m, "sb_flags 0x%lx\n", mddev->sb_flags);
++	seq_printf(m, "recovery 0x%lx\n", mddev->recovery);
++
 +	return 0;
 +}
 +
-+static const struct md_debugfs_file raid1_dbg_files[] = {
-+	{.name = "iostat", .show = raid1_dbg_iostat_show},
-+	{.name = "stat", .show = raid1_dbg_stat_show},
++static const struct md_debugfs_file md_dbg_files[] = {
++	{.name = "iostat", .show = md_dbg_iostat_show},
++	{.name = "stat", .show = md_dbg_stat_show},
 +	{},
 +};
 +
-+static void raid1_unregister_debugfs(struct r1conf *conf)
++static void md_unregister_debugfs(struct mddev *mddev)
 +{
-+	debugfs_remove_recursive(conf->debugfs_dir);
++	debugfs_remove_recursive(mddev->debugfs_dir);
 +}
 +
-+static void raid1_register_debugfs(struct mddev *mddev, struct r1conf *conf)
++static void md_register_debugfs(struct mddev *mddev)
 +{
++	const char *name;
 +	struct dentry *dir;
 +
-+	conf->debugfs_dir = NULL;
-+
-+	if (!mddev->debugfs_dir)
-+		return;
-+
-+	dir = debugfs_create_dir("raid1", mddev->debugfs_dir);
-+	if (IS_ERR_OR_NULL(dir))
-+		return;
-+
-+	md_debugfs_create_files(dir, conf, raid1_dbg_files);
-+	conf->debugfs_dir = dir;
++	name = kobject_name(&disk_to_dev(mddev->gendisk)->kobj);
++	dir = debugfs_create_dir(name, blk_debugfs_root);
++	if (!IS_ERR_OR_NULL(dir)) {
++		md_debugfs_create_files(dir, mddev, md_dbg_files);
++		mddev->debugfs_dir = dir;
++	} else {
++		mddev->debugfs_dir = NULL;
++	}
 +}
 +
- static struct r1conf *setup_conf(struct mddev *mddev)
+ static void md_free(struct kobject *ko)
  {
- 	struct r1conf *conf;
-@@ -3022,6 +3097,8 @@ static struct r1conf *setup_conf(struct mddev *mddev)
- 	if (!conf->thread)
- 		goto abort;
+ 	struct mddev *mddev = container_of(ko, struct mddev, kobj);
+@@ -5227,6 +5289,7 @@ static void mddev_delayed_delete(struct work_struct *ws)
+ {
+ 	struct mddev *mddev = container_of(ws, struct mddev, del_work);
  
-+	raid1_register_debugfs(mddev, conf);
++	md_unregister_debugfs(mddev);
+ 	sysfs_remove_group(&mddev->kobj, &md_bitmap_group);
+ 	kobject_del(&mddev->kobj);
+ 	kobject_put(&mddev->kobj);
+@@ -5353,6 +5416,8 @@ static int md_alloc(dev_t dev, char *name)
+ 	if (mddev->kobj.sd &&
+ 	    sysfs_create_group(&mddev->kobj, &md_bitmap_group))
+ 		pr_debug("pointless warning\n");
 +
- 	return conf;
- 
++	md_register_debugfs(mddev);
+ 	mutex_unlock(&mddev->open_mutex);
   abort:
-@@ -3136,6 +3213,7 @@ static void raid1_free(struct mddev *mddev, void *priv)
- {
- 	struct r1conf *conf = priv;
+ 	mutex_unlock(&disks_mutex);
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index 7c930c091193..e79ef2101c45 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -466,6 +466,7 @@ struct mddev {
+ 	unsigned int			good_device_nr;	/* good device num within cluster raid */
  
-+	raid1_unregister_debugfs(conf);
- 	mempool_exit(&conf->r1bio_pool);
- 	kfree(conf->mirrors);
- 	safe_put_page(conf->tmppage);
-diff --git a/drivers/md/raid1.h b/drivers/md/raid1.h
-index e7ccad898736..d627020e92d4 100644
---- a/drivers/md/raid1.h
-+++ b/drivers/md/raid1.h
-@@ -139,6 +139,7 @@ struct r1conf {
- 	sector_t		cluster_sync_low;
- 	sector_t		cluster_sync_high;
- 
+ 	bool	has_superblocks:1;
 +	struct dentry *debugfs_dir;
  };
  
- /*
+ enum recovery_flags {
 -- 
 2.22.0
 
