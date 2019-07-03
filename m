@@ -2,196 +2,114 @@ Return-Path: <SRS0=UuDU=VA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67975C5B57D
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 01:01:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BDFC5B57D
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 01:10:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3179620B1F
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 01:01:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F24AE20645
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 01:10:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KBOctFt6"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Cx5YBwQx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727165AbfGCBBF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jul 2019 21:01:05 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:35001 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727066AbfGCBBF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jul 2019 21:01:05 -0400
-Received: by mail-qt1-f196.google.com with SMTP id d23so761218qto.2;
-        Tue, 02 Jul 2019 18:01:04 -0700 (PDT)
+        id S1726736AbfGCBKR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jul 2019 21:10:17 -0400
+Received: from mail-pl1-f172.google.com ([209.85.214.172]:37776 "EHLO
+        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726329AbfGCBKR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jul 2019 21:10:17 -0400
+Received: by mail-pl1-f172.google.com with SMTP id bh12so240630plb.4
+        for <linux-block@vger.kernel.org>; Tue, 02 Jul 2019 18:10:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AF5wAEaSeOuu/dYORr2z7nahKEkMxFAhhFiFqhe66nc=;
-        b=KBOctFt6fuFEqux0VV7CSWgommZB4FnyANMSEPt5JjEYuv6Jls8PBdd/PPpbHE3RcE
-         /Dgl9dTtXzk0uqJPEFVIVM0BnlQFt1XupSF4Xxhu6C7pS+SCevNQfXVYnhN2ramXoA5t
-         21AO32DyWtaC8GU4kuga8tmYxU5sFXiaKNFiGSgJmfx7yLfyJOwsCG8hS9h4nUFodWMl
-         qstMTXjpmEBH/sTUzR14scYPgOyURXdmWhtHrfcMLhHB76oH0l3VFR/1w5oS+4RYxDIj
-         FTQrLLKkaJ8G1Ghm9EFb2rAvto9VjUHFN3QCgyFNrpLffEs1e821F5eS+FCEAkMxfdTW
-         oI5w==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=SUyMsQTAT4Xex1w0m5orXD/uZpdvPJFFkpqi7cw7ARc=;
+        b=Cx5YBwQxfHbcSYTVPaaiJ095/bU5COtLFsgp3iJFRhkzhR3ZpKFNRIDHKG25E65Vck
+         emq5ODbKKS6w1+ZAAPrC8NrV/i+C6hhZPdPpF/cHVgPU/vb7CFk5gokRVt8m86TxyNzJ
+         ztNT63j2t/v10F5hsOtK8vz/Ar+61linqF5VkxecGZYg1ftz0dLQ/0RbEanr5gyTPWlH
+         S4lPmzMl3mBr2q+cXP6ZiUpI3+7eDGak6dv/DtzS2BdDLgQXQPvQzpeQOJ6uHc0NO/pk
+         yMBBorh6ye5whXiOcXma9ZrWNqY2UCyYdgThYOvdlNlYQoz02NsjaR108ZkVky8WbHXl
+         9zdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AF5wAEaSeOuu/dYORr2z7nahKEkMxFAhhFiFqhe66nc=;
-        b=YJtmUthTZ+TVvQXZe9AQ8g1/lNDtPOV3NGPsC93UIdQgJSf4BSJJ9FExNG4CVP+GtR
-         rrPbsElpxn8SzlRhwzzyz6pq4KiKJApaidFCBPizY6CTNLq8Y44UpixMTQLSFVS3kgBU
-         j3hwCfFncyyCJuhJbBkwMQlTHoz20hjcpyugfmGul0BGut+a+ep3hdy6jUkDChbBQvhm
-         HCLaeec9gaomfsomB9Y2uylk+3vxwsR/mnSVSla1Ig0hO4r0axAaGQXnq+5uglYvlmqz
-         8rvtgt87IKk/dVAhZVqKlOO572KUX0W8QjpJd7HlX7Gvfnwxdc8q9laUM0fqHpLsjm9u
-         fUPg==
-X-Gm-Message-State: APjAAAWs2rAq4ufJShvTW8MfKL0txbrH7YiMRNYNIZHNkgTVPd/BIqiM
-        pDLQuE10UMrndrxEKRiGvKW8bD66BZPN51tE/r9V4gy/XeI=
-X-Google-Smtp-Source: APXvYqwipkyidadYl9pWmBe4w7DWi2+eePr3tvjA6SB8hN83jGerGUKJ3LpMmOersX7hx5FRh8mIkt6rAtaIlTQEmcM=
-X-Received: by 2002:a0c:c68d:: with SMTP id d13mr28737569qvj.145.1562111608377;
- Tue, 02 Jul 2019 16:53:28 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SUyMsQTAT4Xex1w0m5orXD/uZpdvPJFFkpqi7cw7ARc=;
+        b=IVUr0C+VKXN9mf1/u9ihzt4MhTgwzsqTnYjefnNXS0k5eNU86tMNRqK7o3rXtS75js
+         XpgQdZNWs4eonR0fFBdJeF/pFR+aStd4fsLytjWLR3kkCKZotI5ZarxGvE7hWVEDHKbQ
+         r2q/b+ziI+lwy8xOPro2Ipbal02oCADNfRuIsoNW/EYl5Zl+QPb2nFHXqFEsI8i7uam2
+         Cu0yZf6xenaJRo7en4oVDkC/KTbBNEK6d+SiLyHJUj0dZoOvq1lvIvV4tzUM2gErfi14
+         BV33IvsdLu1rDbRiDE0rGUUZtr5R4czRADskaHiF5e1Ikr+LC2G+0HyCy+vohVFvuAde
+         oZ8Q==
+X-Gm-Message-State: APjAAAX7jsohCL8QR4F/lAFSw4MMho/DCAWrr9PC7HDpj0ZukwPRnZxj
+        +kguwRFFnIRbP4WaUG9HWbnnlz1GFmHNAg==
+X-Google-Smtp-Source: APXvYqxW36FHRIjXYS5pXxmunWiBZKGCXGnyaRwQqwIRANxRpZzwuv+sjdiy6l2cN0We/BCxA+MC1A==
+X-Received: by 2002:a17:902:8696:: with SMTP id g22mr37716047plo.249.1562116215616;
+        Tue, 02 Jul 2019 18:10:15 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
+        by smtp.gmail.com with ESMTPSA id o95sm214586pjb.4.2019.07.02.18.10.14
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 02 Jul 2019 18:10:14 -0700 (PDT)
+Subject: Re: remove bi_phys_segments and related cleanups
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org
+References: <20190606102904.4024-1-hch@lst.de>
+ <a703a5cb-1e39-6194-698a-56dbc4577f25@fb.com>
+ <bbc9baba-19f2-03ec-59dc-adab225eb3b2@kernel.dk>
+ <20190702133406.GC15874@lst.de>
+ <bfe8a4b5-901e-5ac4-e11c-0e6ccc4faec2@kernel.dk>
+ <20190702182934.GA20763@lst.de>
+ <ef4a5fb5-9d79-75e1-1231-fdfc14f91835@kernel.dk>
+ <20190703000055.GA28981@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a01c861b-8c5c-0f6d-4ca8-00e97bcecbd9@kernel.dk>
+Date:   Tue, 2 Jul 2019 19:10:13 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <20190628221759.18274-1-gpiccoli@canonical.com>
-In-Reply-To: <20190628221759.18274-1-gpiccoli@canonical.com>
-From:   Song Liu <liu.song.a23@gmail.com>
-Date:   Tue, 2 Jul 2019 16:53:17 -0700
-Message-ID: <CAPhsuW5arZgFy0iur0qdgO7a1g9qiB0V2OskQPXJkL0WWHG52A@mail.gmail.com>
-Subject: Re: [4.19.y PATCH 1/2] block: Fix a NULL pointer dereference in generic_make_request()
-To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Cc:     stable@vger.kernel.org, gregkh@linuxfoundation.org,
-        sashal@kernel.org, linux-block@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>,
-        Jay Vosburgh <jay.vosburgh@canonical.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Song Liu <songliubraving@fb.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Eric Ren <renzhengeek@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190703000055.GA28981@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 28, 2019 at 3:22 PM Guilherme G. Piccoli
-<gpiccoli@canonical.com> wrote:
->
-> -----------------------------------------------------------------
-> This patch is not on mainline and is meant to 4.19 stable *only*.
-> After the patch description there's a reasoning about that.
-> -----------------------------------------------------------------
->
-> Commit 37f9579f4c31 ("blk-mq: Avoid that submitting a bio concurrently
-> with device removal triggers a crash") introduced a NULL pointer
-> dereference in generic_make_request(). The patch sets q to NULL and
-> enter_succeeded to false; right after, there's an 'if (enter_succeeded)'
-> which is not taken, and then the 'else' will dereference q in
-> blk_queue_dying(q).
->
-> This patch just moves the 'q = NULL' to a point in which it won't trigger
-> the oops, although the semantics of this NULLification remains untouched.
->
-> A simple test case/reproducer is as follows:
-> a) Build kernel v4.19.56-stable with CONFIG_BLK_CGROUP=n.
->
-> b) Create a raid0 md array with 2 NVMe devices as members, and mount
-> it with an ext4 filesystem.
->
-> c) Run the following oneliner (supposing the raid0 is mounted in /mnt):
-> (dd of=/mnt/tmp if=/dev/zero bs=1M count=999 &); sleep 0.3;
-> echo 1 > /sys/block/nvme1n1/device/device/remove
-> (whereas nvme1n1 is the 2nd array member)
->
-> This will trigger the following oops:
->
-> BUG: unable to handle kernel NULL pointer dereference at 0000000000000078
-> PGD 0 P4D 0
-> Oops: 0000 [#1] SMP PTI
-> RIP: 0010:generic_make_request+0x32b/0x400
-> Call Trace:
->  submit_bio+0x73/0x140
->  ext4_io_submit+0x4d/0x60
->  ext4_writepages+0x626/0xe90
->  do_writepages+0x4b/0xe0
-> [...]
->
-> This patch has no functional changes and preserves the md/raid0 behavior
-> when a member is removed before kernel v4.17.
->
-> ----------------------------
-> Why this is not on mainline?
-> ----------------------------
->
-> The patch was originally submitted upstream in linux-raid and
-> linux-block mailing-lists - it was initially accepted by Song Liu,
-> but Christoph Hellwig[0] observed that there was a clean-up series
-> ready to be accepted from Ming Lei[1] that fixed the same issue.
->
-> The accepted patches from Ming's series in upstream are: commit
-> 47cdee29ef9d ("block: move blk_exit_queue into __blk_release_queue") and
-> commit fe2008640ae3 ("block: don't protect generic_make_request_checks
-> with blk_queue_enter"). Those patches basically do a clean-up in the
-> block layer involving:
->
-> 1) Putting back blk_exit_queue() logic into __blk_release_queue(); that
-> path was changed in the past and the logic from blk_exit_queue() was
-> added to blk_cleanup_queue().
->
-> 2) Removing the guard/protection in generic_make_request_checks() with
-> blk_queue_enter().
->
-> The problem with Ming's series for -stable is that it relies in the
-> legacy request IO path removal. So it's "backport-able" to v5.0+,
-> but doing that for early versions (like 4.19) would incur in complex
-> code changes. Hence, it was suggested by Christoph and Song Liu that
-> this patch was submitted to stable only; otherwise merging it upstream
-> would add code to fix a path removed in a subsequent commit.
->
-> [0] lore.kernel.org/linux-block/20190521172258.GA32702@infradead.org
-> [1] lore.kernel.org/linux-block/20190515030310.20393-1-ming.lei@redhat.com
->
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Song Liu <songliubraving@fb.com>
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> Tested-by: Eric Ren <renzhengeek@gmail.com>
-> Fixes: 37f9579f4c31 ("blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash")
-> Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
+On 7/2/19 6:00 PM, Christoph Hellwig wrote:
+> On Tue, Jul 02, 2019 at 12:37:59PM -0600, Jens Axboe wrote:
+>>> I couldn't get that to boot in my test systems even with mainline,
+>>> but that seems to be do to systemd waiting for some crap not supported
+>>> in the config.
+>>>
+>>> But with my usual test config I've just completed a test run with
+>>> KASAN enabled on a VWC=1 driver with no issues, so this keeps puzzling
+>>> me.
+>>
+>> Let me know what you want me to try. I can't reproduce it in qemu, but
+>> it's 100% on my laptop. My qemu drives also have VWC=1, so it's not
+>> (just) that.
+> 
+> I seriously have no idea unfortunately.  It works fine for me both
+> on qemu and on a real WD SN720 drive on my laptop.  Just for curiosity
+> you could try to pad the bio structure and see if bloating it to the
+> old size makes any difference.
 
-Acked-by: Song Liu <songliubraving@fb.com>
+No change with the padding, put it in the same place. Still insta crash
+before I get to login prompt, or right after I login and run sync.
 
-Thanks for the fix!
+> The other things that comes to mind is that when Johannes removed
+> BIO_SEG_VALID there also were some unexplainable side effects,
+> I'll look into seeing if there was any similarity.
 
-> ---
->  block/blk-core.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 6eed5d84c2ef..682bc561b77b 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -2445,10 +2445,8 @@ blk_qc_t generic_make_request(struct bio *bio)
->                         flags = 0;
->                         if (bio->bi_opf & REQ_NOWAIT)
->                                 flags = BLK_MQ_REQ_NOWAIT;
-> -                       if (blk_queue_enter(q, flags) < 0) {
-> +                       if (blk_queue_enter(q, flags) < 0)
->                                 enter_succeeded = false;
-> -                               q = NULL;
-> -                       }
->                 }
->
->                 if (enter_succeeded) {
-> @@ -2479,6 +2477,7 @@ blk_qc_t generic_make_request(struct bio *bio)
->                                 bio_wouldblock_error(bio);
->                         else
->                                 bio_io_error(bio);
-> +                       q = NULL;
->                 }
->                 bio = bio_list_pop(&bio_list_on_stack[0]);
->         } while (bio);
-> --
-> 2.22.0
->
+Do you have a link?
+
+I'll try and poke a bit here.
+
+-- 
+Jens Axboe
+
