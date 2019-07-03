@@ -2,98 +2,127 @@ Return-Path: <SRS0=UuDU=VA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2ACDC0650E
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 16:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF9FC0650E
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 17:07:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F6D2218A4
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 16:33:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42A6F218A4
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 17:07:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1562171627;
-	bh=ktNAerFGbQZn3KVT3pQ8NIyte4UTPdVi/RkhIoUEYeo=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:List-ID:From;
-	b=bUCZz6UOmNBTc8G0jY64P1djsqFG+rWo6i9mAe8NsEZ+kZOtdmbsIikfvQPYLOpMo
-	 oioVQ5Y57E/ozPyxxH3vXHLps8+ZLyStLoCtm9tpRISHgMPKpNfibiTkO5J+k/Ch7w
-	 nvg6MnqaBg/Wl8VnlDKEmADhZ0jB0TSIWBENKzKc=
+	s=default; t=1562173669;
+	bh=/RsbjU0GcwuC/hHmX+8fVG3Hp6wHqgpo3y9n61F0SxY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=yoXgUPC2I/riUMVYvN7/S+IP7COB3m0Djr7OekkO2gPbXNNpHbHKS/Oa+dS7mr0fY
+	 RpQisD2nexVAQmbRgyNzWYPrEKMVTJSqeSv5GLhDhJL2zCoMO1X5GeJT39KzOIiixT
+	 3RbZl/ebfRoToj6Nvoy+HcWMtq/jPcoQ9TjrfVZM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726924AbfGCQdr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jul 2019 12:33:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44226 "EHLO mail.kernel.org"
+        id S1727029AbfGCRHm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jul 2019 13:07:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33668 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726928AbfGCQdq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jul 2019 12:33:46 -0400
-Received: from tleilax.poochiereds.net (cpe-71-70-156-158.nc.res.rr.com [71.70.156.158])
+        id S1726430AbfGCRHl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Jul 2019 13:07:41 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 052E9218A0;
-        Wed,  3 Jul 2019 16:33:44 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 83B1A2187F;
+        Wed,  3 Jul 2019 17:07:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562171625;
-        bh=ktNAerFGbQZn3KVT3pQ8NIyte4UTPdVi/RkhIoUEYeo=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=JH3JQyp8x3l/vUTh+Hsf30HbLDYNfC9EAhVTElQ4ll0liaA/by7Sh4APCpGyEcQ/t
-         PSD3lSxHAkdxXpj+yG15iQj7UOByHbCY+erwZKC33eyPZKUNdedP2WQFo8PZvPwn6u
-         tJkf3P9G7cByKDDWdT2FkLxcLyIzz30vyM0qQ0Do=
-Message-ID: <e3f1ecd6f68ed34df240346fae92f9c821503c68.camel@kernel.org>
-Subject: Re: [PATCH v2 04/35] block: Use kmemdup rather than duplicating its
- implementation
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Fuqian Huang <huangfq.daxian@gmail.com>
-Cc:     Ilya Dryomov <idryomov@gmail.com>, Sage Weil <sage@redhat.com>,
-        Alex Elder <elder@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 03 Jul 2019 12:33:43 -0400
-In-Reply-To: <20190703162650.32045-1-huangfq.daxian@gmail.com>
-References: <20190703162650.32045-1-huangfq.daxian@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.3 (3.32.3-1.fc30) 
+        s=default; t=1562173661;
+        bh=/RsbjU0GcwuC/hHmX+8fVG3Hp6wHqgpo3y9n61F0SxY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=0nxWUS1La7/zEKqHAoUcBBVMRp2NYddXSWFXok0//5VtJVIdUHfaOpP+d/yq+9yex
+         UNMulkzSIaZm2boFWUuypl2hdK47+RKfEpM5PUMrKg9KRDy5yVKQMta6VZPmYTEY3Q
+         S1lI+T8f/apMXIIHf3mwnwco6ZlFoYmsGCh77dOU=
+Date:   Wed, 3 Jul 2019 19:07:38 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     viro@zeniv.linux.org.uk, Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>, nicolas.dichtel@6wind.com,
+        raven@themaw.net, Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 8/9] usb: Add USB subsystem notifications [ver #5]
+Message-ID: <20190703170738.GA24672@kroah.com>
+References: <156173690158.15137.3985163001079120218.stgit@warthog.procyon.org.uk>
+ <156173698939.15137.11150923486478934112.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <156173698939.15137.11150923486478934112.stgit@warthog.procyon.org.uk>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2019-07-04 at 00:26 +0800, Fuqian Huang wrote:
-> kmemdup is introduced to duplicate a region of memory in a neat way.
-> Rather than kmalloc/kzalloc + memcpy, which the programmer needs to
-> write the size twice (sometimes lead to mistakes), kmemdup improves
-> readability, leads to smaller code and also reduce the chances of mistakes.
-> Suggestion to use kmemdup rather than using kmalloc/kzalloc + memcpy.
+On Fri, Jun 28, 2019 at 04:49:49PM +0100, David Howells wrote:
+> Add a USB subsystem notification mechanism whereby notifications about
+> hardware events such as device connection, disconnection, reset and I/O
+> errors, can be reported to a monitoring process asynchronously.
 > 
-> Signed-off-by: Fuqian Huang <huangfq.daxian@gmail.com>
-> ---
-> Changes in v2:
->   - Fix a typo in commit message (memset -> memcpy)
+> Firstly, an event queue needs to be created:
 > 
->  drivers/block/rbd.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+> 	fd = open("/dev/event_queue", O_RDWR);
+> 	ioctl(fd, IOC_WATCH_QUEUE_SET_SIZE, page_size << n);
 > 
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index e5009a34f9c2..47ad3772dc58 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -1068,7 +1068,7 @@ static int rbd_header_from_disk(struct rbd_device *rbd_dev,
->  
->  		if (snap_names_len > (u64)SIZE_MAX)
->  			goto out_2big;
-> -		snap_names = kmalloc(snap_names_len, GFP_KERNEL);
-> +		snap_names = kmemdup(&ondisk->snaps[snap_count], snap_names_len, GFP_KERNEL);
->  		if (!snap_names)
->  			goto out_err;
->  
-> @@ -1088,7 +1088,6 @@ static int rbd_header_from_disk(struct rbd_device *rbd_dev,
->  		 * snap_names_len bytes beyond the end of the
->  		 * snapshot id array, this memcpy() is safe.
->  		 */
-> -		memcpy(snap_names, &ondisk->snaps[snap_count], snap_names_len);
->  		snaps = ondisk->snaps;
->  		for (i = 0; i < snap_count; i++) {
->  			snapc->snaps[i] = le64_to_cpu(snaps[i].id);
+> then a notification can be set up to report USB notifications via that
+> queue:
+> 
+> 	struct watch_notification_filter filter = {
+> 		.nr_filters = 1,
+> 		.filters = {
+> 			[0] = {
+> 				.type = WATCH_TYPE_USB_NOTIFY,
+> 				.subtype_filter[0] = UINT_MAX;
+> 			},
+> 		},
+> 	};
+> 	ioctl(fd, IOC_WATCH_QUEUE_SET_FILTER, &filter);
+> 	notify_devices(fd, 12);
+> 
+> After that, records will be placed into the queue when events occur on a
+> USB device or bus.  Records are of the following format:
+> 
+> 	struct usb_notification {
+> 		struct watch_notification watch;
+> 		__u32	error;
+> 		__u32	reserved;
+> 		__u8	name_len;
+> 		__u8	name[0];
+> 	} *n;
+> 
+> Where:
+> 
+> 	n->watch.type will be WATCH_TYPE_USB_NOTIFY
+> 
+> 	n->watch.subtype will be the type of notification, such as
+> 	NOTIFY_USB_DEVICE_ADD.
+> 
+> 	n->watch.info & WATCH_INFO_LENGTH will indicate the length of the
+> 	record.
+> 
+> 	n->watch.info & WATCH_INFO_ID will be the second argument to
+> 	device_notify(), shifted.
+> 
+> 	n->error and n->reserved are intended to convey information such as
+> 	error codes, but are currently not used
+> 
+> 	n->name_len and n->name convey the USB device name as an
+> 	unterminated string.  This may be truncated - it is currently
+> 	limited to a maximum 63 chars.
+> 
+> Note that it is permissible for event records to be of variable length -
+> or, at least, the length may be dependent on the subtype.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> cc: linux-usb@vger.kernel.org
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
