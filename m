@@ -2,86 +2,238 @@ Return-Path: <SRS0=UuDU=VA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAFEEC5B57D
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 02:34:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 970B8C5B57D
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 02:45:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9AE53206E0
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 02:34:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="MKfDNkbE"
+	by mail.kernel.org (Postfix) with ESMTP id 7039C21721
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 02:45:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbfGCCeE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jul 2019 22:34:04 -0400
-Received: from mail-pl1-f182.google.com ([209.85.214.182]:39798 "EHLO
-        mail-pl1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726430AbfGCCeE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jul 2019 22:34:04 -0400
-Received: by mail-pl1-f182.google.com with SMTP id b7so340561pls.6
-        for <linux-block@vger.kernel.org>; Tue, 02 Jul 2019 19:34:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=t5yPtRjTOFSfJoMHMCSkek8mrEgFqerNmil1XFrNTIs=;
-        b=MKfDNkbEiDbgB07fc0pBTYcSw+1a9gGh9t2UwQyCb/H3nvt/uOyNjgMgmldzdz+IZA
-         MmNMyeOJ19V+28WBjC8keGqQj0fPpc9xJQKqJyk3/SEM0TGK+GOG22WdDRDQJ08NzZIh
-         rpchh0GSO1k2EVelRN4bQ45geGnQs8fyZnm2uHKF5QhSo0Twhyp6QcOZZ2C1MWiZ17yW
-         rY+PqGlYJFiyIrrV9hya5l0lOsQA1RQrBMboHPMmrNOgIN4QGBDQo2oduxoTJ//vVB97
-         pI28ovKGs/rrniS/I82dk9IK3n1audlKEyBg3COeg34PbQr44CVcwBS2Weaf+x3CMUms
-         SfvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=t5yPtRjTOFSfJoMHMCSkek8mrEgFqerNmil1XFrNTIs=;
-        b=qrd3zCxmYYmzo736bWZEva8OaPm5y4rt6DzriaUUNiJSJnBhmvMNJ2Fiw+NzXNIsRj
-         pmmfHQEmGeuif8yFY/eUQGFdXuocti7KeINQP0Qg0rivAgZcyb55KLDUi0HB+4m3oEvV
-         +OxmirMR3L49AVnC/JRt5LAnW2g0Gz3n2ig8dGvTKKO/WbeYJfBddbzuZrWctUeJ+8Qo
-         ijbE1BZe/uCmrpEbSfJfNS0UfR9h2PqaCJlVf4dXR1iqZCJ3n547Z7zZ5/Bw/Qzhqzha
-         G6gNQ0pkxC9/bHbEJ8AMn83zvxJ7vVgOHQYdaS/+ds+AXERdkUnjPZ1QjcdYloT+jWD/
-         hPMQ==
-X-Gm-Message-State: APjAAAW4etUxOxb8oXiI8hi9Y8M7/IQBW84i/0MEGbRo4VeiPBANaWJa
-        6LcSe2q4RxTuMLnkqwXXApPxnA==
-X-Google-Smtp-Source: APXvYqzf1HRPP08XYWVStujcGy39p+TsTB2UWFtJI4FpPttGgoO292XJFi/Dcb6RVIYfiWuI91b7mg==
-X-Received: by 2002:a17:902:549:: with SMTP id 67mr38900406plf.86.1562121243731;
-        Tue, 02 Jul 2019 19:34:03 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id p7sm420403pfp.131.2019.07.02.19.34.02
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 02 Jul 2019 19:34:02 -0700 (PDT)
-Subject: Re: [PATCH, RESEND 0/2] Simplify blk-mq implementation
+        id S1727469AbfGCCp4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jul 2019 22:45:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55148 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727461AbfGCCp4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Jul 2019 22:45:56 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E4C693082E44;
+        Wed,  3 Jul 2019 02:45:50 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C376D7E56B;
+        Wed,  3 Jul 2019 02:45:28 +0000 (UTC)
+Date:   Wed, 3 Jul 2019 10:45:16 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>, Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH 1/2] blk-mq: Remove blk_mq_put_ctx()
+Message-ID: <20190703024513.GA30102@ming.t460p>
 References: <20190701154730.203795-1-bvanassche@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7bff723f-0a66-d1a1-9309-8e120ab420d3@kernel.dk>
-Date:   Tue, 2 Jul 2019 20:34:01 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ <20190701154730.203795-2-bvanassche@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20190701154730.203795-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190701154730.203795-2-bvanassche@acm.org>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Wed, 03 Jul 2019 02:45:56 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/1/19 9:47 AM, Bart Van Assche wrote:
-> Hi Jens,
+On Mon, Jul 01, 2019 at 08:47:29AM -0700, Bart Van Assche wrote:
+> No code that occurs between blk_mq_get_ctx() and blk_mq_put_ctx() depends
+> on preemption being disabled for its correctness. Since removing the CPU
+> preemption calls does not measurably affect performance, simplify the
+> blk-mq code by removing the blk_mq_put_ctx() function and also by not
+> disabling preemption in blk_mq_get_ctx().
 > 
-> While reviewing the blk_mq_make_request() code I noticed that it is possible
-> to simplify the implementation of that function. Please consider these patches
-> for kernel v5.3.
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/blk-mq-sched.c  |  5 +----
+>  block/blk-mq-tag.c    |  8 --------
+>  block/blk-mq.c        | 16 +++-------------
+>  block/blk-mq.h        |  7 +------
+>  block/kyber-iosched.c |  1 -
+>  5 files changed, 5 insertions(+), 32 deletions(-)
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 956a7aa9a637..c9d183d6c499 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -330,10 +330,8 @@ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio,
+>  	bool ret = false;
+>  	enum hctx_type type;
+>  
+> -	if (e && e->type->ops.bio_merge) {
+> -		blk_mq_put_ctx(ctx);
+> +	if (e && e->type->ops.bio_merge)
+>  		return e->type->ops.bio_merge(hctx, bio, nr_segs);
+> -	}
+>  
+>  	type = hctx->type;
+>  	if ((hctx->flags & BLK_MQ_F_SHOULD_MERGE) &&
+> @@ -344,7 +342,6 @@ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio,
+>  		spin_unlock(&ctx->lock);
+>  	}
+>  
+> -	blk_mq_put_ctx(ctx);
+>  	return ret;
+>  }
+>  
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 7513c8eaabee..da19f0bc8876 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -113,7 +113,6 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>  	struct sbq_wait_state *ws;
+>  	DEFINE_SBQ_WAIT(wait);
+>  	unsigned int tag_offset;
+> -	bool drop_ctx;
+>  	int tag;
+>  
+>  	if (data->flags & BLK_MQ_REQ_RESERVED) {
+> @@ -136,7 +135,6 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>  		return BLK_MQ_TAG_FAIL;
+>  
+>  	ws = bt_wait_ptr(bt, data->hctx);
+> -	drop_ctx = data->ctx == NULL;
+>  	do {
+>  		struct sbitmap_queue *bt_prev;
+>  
+> @@ -161,9 +159,6 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>  		if (tag != -1)
+>  			break;
+>  
+> -		if (data->ctx)
+> -			blk_mq_put_ctx(data->ctx);
+> -
+>  		bt_prev = bt;
+>  		io_schedule();
+>  
+> @@ -189,9 +184,6 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>  		ws = bt_wait_ptr(bt, data->hctx);
+>  	} while (1);
+>  
+> -	if (drop_ctx && data->ctx)
+> -		blk_mq_put_ctx(data->ctx);
+> -
+>  	sbitmap_finish_wait(bt, ws, &wait);
+>  
+>  found_tag:
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 2f0b14d2ecdc..4d661545ad1d 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -359,13 +359,13 @@ static struct request *blk_mq_get_request(struct request_queue *q,
+>  	struct elevator_queue *e = q->elevator;
+>  	struct request *rq;
+>  	unsigned int tag;
+> -	bool put_ctx_on_error = false;
+> +	bool clear_ctx_on_error = false;
+>  
+>  	blk_queue_enter_live(q);
+>  	data->q = q;
+>  	if (likely(!data->ctx)) {
+>  		data->ctx = blk_mq_get_ctx(q);
+> -		put_ctx_on_error = true;
+> +		clear_ctx_on_error = true;
+>  	}
+>  	if (likely(!data->hctx))
+>  		data->hctx = blk_mq_map_queue(q, data->cmd_flags,
+> @@ -391,10 +391,8 @@ static struct request *blk_mq_get_request(struct request_queue *q,
+>  
+>  	tag = blk_mq_get_tag(data);
+>  	if (tag == BLK_MQ_TAG_FAIL) {
+> -		if (put_ctx_on_error) {
+> -			blk_mq_put_ctx(data->ctx);
+> +		if (clear_ctx_on_error)
+>  			data->ctx = NULL;
+> -		}
+>  		blk_queue_exit(q);
+>  		return NULL;
+>  	}
+> @@ -431,8 +429,6 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+>  	if (!rq)
+>  		return ERR_PTR(-EWOULDBLOCK);
+>  
+> -	blk_mq_put_ctx(alloc_data.ctx);
+> -
+>  	rq->__data_len = 0;
+>  	rq->__sector = (sector_t) -1;
+>  	rq->bio = rq->biotail = NULL;
+> @@ -1981,7 +1977,6 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>  
+>  	plug = current->plug;
+>  	if (unlikely(is_flush_fua)) {
+> -		blk_mq_put_ctx(data.ctx);
+>  		blk_mq_bio_to_request(rq, bio, nr_segs);
+>  
+>  		/* bypass scheduler for flush rq */
+> @@ -1995,7 +1990,6 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>  		unsigned int request_count = plug->rq_count;
+>  		struct request *last = NULL;
+>  
+> -		blk_mq_put_ctx(data.ctx);
+>  		blk_mq_bio_to_request(rq, bio, nr_segs);
+>  
+>  		if (!request_count)
+> @@ -2029,8 +2023,6 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>  		blk_add_rq_to_plug(plug, rq);
+>  		trace_block_plug(q);
+>  
+> -		blk_mq_put_ctx(data.ctx);
+> -
+>  		if (same_queue_rq) {
+>  			data.hctx = same_queue_rq->mq_hctx;
+>  			trace_block_unplug(q, 1, true);
+> @@ -2039,11 +2031,9 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>  		}
+>  	} else if ((q->nr_hw_queues > 1 && is_sync) || (!q->elevator &&
+>  			!data.hctx->dispatch_busy)) {
+> -		blk_mq_put_ctx(data.ctx);
+>  		blk_mq_bio_to_request(rq, bio, nr_segs);
+>  		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
+>  	} else {
+> -		blk_mq_put_ctx(data.ctx);
+>  		blk_mq_bio_to_request(rq, bio, nr_segs);
+>  		blk_mq_sched_insert_request(rq, false, true, true);
+>  	}
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index 633a5a77ee8b..f4bf5161333e 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -151,12 +151,7 @@ static inline struct blk_mq_ctx *__blk_mq_get_ctx(struct request_queue *q,
+>   */
+>  static inline struct blk_mq_ctx *blk_mq_get_ctx(struct request_queue *q)
+>  {
+> -	return __blk_mq_get_ctx(q, get_cpu());
+> -}
+> -
+> -static inline void blk_mq_put_ctx(struct blk_mq_ctx *ctx)
+> -{
+> -	put_cpu();
+> +	return __blk_mq_get_ctx(q, raw_smp_processor_id());
+>  }
 
-Applied, thanks Bart.
+Then there isn't any difference between __blk_mq_get_ctx() and blk_mq_get_ctx(),
+so could you kill __blk_mq_get_ctx()?
 
--- 
-Jens Axboe
+Otherwise, looks fine:
 
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming
