@@ -2,75 +2,74 @@ Return-Path: <SRS0=UuDU=VA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19985C5B57D
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 02:24:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69465C5B57D
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 02:26:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B68FF206E0
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 02:24:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EAC9206E0
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 02:26:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="PPjOvIhr";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="dOzrR3/5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ifO7+UNp";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="JwBNFhqw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726652AbfGCCYr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jul 2019 22:24:47 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:14356 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726635AbfGCCYr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jul 2019 22:24:47 -0400
+        id S1727083AbfGCC03 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jul 2019 22:26:29 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:26322 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726635AbfGCC03 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jul 2019 22:26:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562120686; x=1593656686;
+  t=1562120789; x=1593656789;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=eLqr3YGEcjwRsvSxL9Oa93imwBHSulTZR/nx7qCHdL8=;
-  b=PPjOvIhrqOtCEkCzK+QMur/6wYpyddn/qNQHNZXl62cUp14dy5eCzX4/
-   FLllxcMXJ0Y8vEEntJSkPMwt7dWq+YrhyGI2oN+5hvAwq/lHO6fsxrn0a
-   rfN8+uh9L+0zzxDd1SXakbOm0he8MoeWr4EtvQxNo20nUeTnluFuTqOf1
-   bYbo7UGHW4XFl7FeSEIkxmENWIvkTMmqyIyihcAPYnPebN0e5+Jce90tu
-   lHXDW2RKh47IHjsD/tnV/j1ptsSskeh7kzxGtc8ImTWv9IeMbQRB95gPT
-   afOofaHajcQN9Q8aZ+fW951vkQQBH+PY5a22Vg4lln/QMv3mcz4/TBNT+
+  bh=uYXP/tvfkePzVLr9b/gED5alltN7mwDdJmPo++BSBIo=;
+  b=ifO7+UNp9/MdJvJlcoFxQO6L/TN11emSiR8XfSpfwm7Ejxe/xiJ4IpdY
+   fZMBFj3MWRtTkFZuiZhQhn5FLoaB/YUwS13I3iKvR6dt+GCe9bDxSJoj/
+   kdp3LRVgHirINbnuErLnx0TILA+V+ZUUhev1fHdHOkXz/pG3K8WwST+bo
+   2ugEqY2R80qUCtC/vesAEZkK9aZ3pBl53MUCkAVheH3YZTshVw5s0s31H
+   gph0Bca8+VR8DS75NsNDCMP3XPYkSFOhQLBhyRO+wIBjvd1j/7s1iAotY
+   9fMyM43uJFao+dHLVnTBabiLS7p++FK0jhF88m7Vo7i2nsr6x2LWvmf/l
    w==;
-IronPort-SDR: Tf1fgAkKZTAnewuShaYCGV31+NcIKmTeWIHABLSwwtY1PDFaGmqBYUnkrBjPslxfs7XNfaJT6w
- ltoJtw8Q2bWI6LsBrjJ1rN169BnPyUieFPvojKy5p7y6Lq5Ujn9btmO4sjsYK3UeI33Ik8i/QD
- /DjHUe86u4cvCcciA7YumMsmDw/mS2JnJVzkOso/JROM3tvf3QyDK2qWYSDjnv7rvWRI+VrYEW
- FaRHc0IZp+ezx3RwZZqUC8UkermtsH6g+H0nKX0Qvhb5Qm/iB+9EzHryn/UROhk2ElVsjIwH+z
- cPU=
+IronPort-SDR: 2ZUgImMyQQwY3lsU/9/Qi9Q9CXfhdO2+2lQfbsgx85AmrkcXkL7MSvWA5SUCE8I/t8JP+9Bcyt
+ iVkKsUbHERj5KWjfIBe5NR0oqwxJf18KVijY5rV2JBy3ZgkwmL9hK7l7pF+wtT+ZrNJig9zChx
+ R+tx+Ujmwkuzl5zgddu6Yi0iSVrer4ZXJWyHk/9ZWuFAQqQ0XfGr0Jb2U4g0+CinTjDK7NKyN8
+ UlygvOyogwBgAZI6Edy9QYa6LYzMpUio/N1uLyhm7iFgTF0CprVfepCDPdV76hrGwlHrhGsh3C
+ cBA=
 X-IronPort-AV: E=Sophos;i="5.63,445,1557158400"; 
-   d="scan'208";a="116945250"
-Received: from mail-co1nam05lp2058.outbound.protection.outlook.com (HELO NAM05-CO1-obe.outbound.protection.outlook.com) ([104.47.48.58])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2019 10:24:38 +0800
+   d="scan'208";a="113721372"
+Received: from mail-dm3nam05lp2053.outbound.protection.outlook.com (HELO NAM05-DM3-obe.outbound.protection.outlook.com) ([104.47.49.53])
+  by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2019 10:26:25 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vFc8XnmtnNLYmpPO90zqeHzC1DZEXLIy0xWmcAv1o4M=;
- b=dOzrR3/5pEkjR68Xu4QGqcdez+1vPntulg8/lRGFOzejTepkwCedgSEukwaNp22s0w1YZcRSNFKURJhEhFfgEqV0Prqw3ka46eNmMYIKl1+QjtIsieLHZtaZme+q+uSNbunDbKCgyLLocgfgL86z9BVT+JHbiVYl5ryXrgM+yvU=
+ bh=cibTOPyzBfTBhtqterbni9+jlviX1pH2JSCCe5oKGLU=;
+ b=JwBNFhqwidnVt2ZoJqWed9zWo6kPEsmlin//5hRk2J2xix7xpfHXhs0cHe0D9nnL03rHnCyfDC6MuwNqdCTtYmIo+BENtCewztSY7WfZCGnCh8vg6UAqlOVTpdSNSQ1NzOwptZIb4EPlFlLHWi++UJjUeHgxJQfCdHpc59KlhH0=
 Received: from DM6PR04MB5754.namprd04.prod.outlook.com (20.179.52.22) by
- DM6PR04MB4666.namprd04.prod.outlook.com (20.176.107.139) with Microsoft SMTP
+ DM6PR04MB5388.namprd04.prod.outlook.com (20.178.27.25) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2032.20; Wed, 3 Jul 2019 02:24:36 +0000
+ 15.20.2032.20; Wed, 3 Jul 2019 02:26:22 +0000
 Received: from DM6PR04MB5754.namprd04.prod.outlook.com
  ([fe80::a07d:d226:c10f:7211]) by DM6PR04MB5754.namprd04.prod.outlook.com
  ([fe80::a07d:d226:c10f:7211%6]) with mapi id 15.20.2052.010; Wed, 3 Jul 2019
- 02:24:36 +0000
+ 02:26:22 +0000
 From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
 To:     Minwoo Im <minwoo.im.dev@gmail.com>
 CC:     "linux-mm@kvack.org" <linux-mm@kvack.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "bvanassche@acm.org" <bvanassche@acm.org>,
         "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH 1/5] block: update error message for bio_check_ro()
-Thread-Topic: [PATCH 1/5] block: update error message for bio_check_ro()
-Thread-Index: AQHVMFgDV4oewrYTVUu2VG2j0GA+dg==
-Date:   Wed, 3 Jul 2019 02:24:36 +0000
-Message-ID: <DM6PR04MB57548A80980931468D63D61386FB0@DM6PR04MB5754.namprd04.prod.outlook.com>
+Subject: Re: [PATCH 3/5] block: allow block_dump to print all REQ_OP_XXX
+Thread-Topic: [PATCH 3/5] block: allow block_dump to print all REQ_OP_XXX
+Thread-Index: AQHVMFgLgX/VuwLWwEqQgqcXWabmgA==
+Date:   Wed, 3 Jul 2019 02:26:22 +0000
+Message-ID: <DM6PR04MB57546ECC4CFDDB5535E3382586FB0@DM6PR04MB5754.namprd04.prod.outlook.com>
 References: <20190701215726.27601-1-chaitanya.kulkarni@wdc.com>
- <20190701215726.27601-2-chaitanya.kulkarni@wdc.com>
- <20190703004240.GA19081@minwoo-desktop>
+ <20190701215726.27601-4-chaitanya.kulkarni@wdc.com>
+ <20190703005023.GC19081@minwoo-desktop>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -79,90 +78,92 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
 x-originating-ip: [2605:e000:3e45:f500:c10e:84d:47cf:30ea]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4fa2ebc2-b46c-4f05-c9c4-08d6ff5d9819
+x-ms-office365-filtering-correlation-id: 950a896c-2d53-4353-58c5-08d6ff5dd72c
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM6PR04MB4666;
-x-ms-traffictypediagnostic: DM6PR04MB4666:
-x-microsoft-antispam-prvs: <DM6PR04MB4666D8F8EA0BB56FEE5BF8E886FB0@DM6PR04MB4666.namprd04.prod.outlook.com>
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM6PR04MB5388;
+x-ms-traffictypediagnostic: DM6PR04MB5388:
+x-microsoft-antispam-prvs: <DM6PR04MB5388817C41562EECD90A0CCD86FB0@DM6PR04MB5388.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:2958;
+x-ms-oob-tlc-oobclassifiers: OLM:514;
 x-forefront-prvs: 00872B689F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(366004)(39860400002)(376002)(396003)(346002)(189003)(199004)(33656002)(25786009)(316002)(71190400001)(71200400001)(7736002)(53936002)(8936002)(81166006)(81156014)(99286004)(102836004)(53546011)(74316002)(6506007)(6436002)(486006)(15650500001)(305945005)(54906003)(6246003)(8676002)(14444005)(68736007)(476003)(446003)(256004)(478600001)(229853002)(55016002)(91956017)(14454004)(9686003)(52536014)(66946007)(66476007)(86362001)(66446008)(64756008)(76116006)(66556008)(73956011)(2906002)(6916009)(186003)(4326008)(46003)(5660300002)(7696005)(6116002)(76176011)(72206003)(21314003);DIR:OUT;SFP:1102;SCL:1;SRVR:DM6PR04MB4666;H:DM6PR04MB5754.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(346002)(376002)(39860400002)(396003)(366004)(136003)(189003)(199004)(99286004)(53936002)(6436002)(9686003)(55016002)(71200400001)(7696005)(14454004)(25786009)(73956011)(6506007)(54906003)(186003)(71190400001)(53546011)(316002)(476003)(446003)(91956017)(486006)(6246003)(6116002)(102836004)(76176011)(4326008)(6916009)(229853002)(256004)(5024004)(14444005)(86362001)(76116006)(66446008)(33656002)(68736007)(66556008)(64756008)(8676002)(7736002)(72206003)(46003)(52536014)(478600001)(66946007)(305945005)(8936002)(81156014)(81166006)(2906002)(74316002)(5660300002)(66476007);DIR:OUT;SFP:1102;SCL:1;SRVR:DM6PR04MB5388;H:DM6PR04MB5754.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: tq1JtujoYHdq2gSFBwElLTkuTd8YFpypCrIkVdSJNAxK0OsvHYMgEaX1rJbcNgPOyTYAeyFkwJsz6RK/+QOf6hBRXUzPShR8tMzofUud3fZFNuZLfG/Rlbs9COx2IcRjkHwyMHm2jJIRI/XGQ2+lq+X0N2meOAlzktDkEshRmV/sEpDwsnRTkFWvtPUZhqtk98amTh8NeO/fUbOxnsjtyCwhu6udP3shojuIUeu5NHZVmb4Hskq8k6zabMqzD8GLzhaNbbeUZ/wp+y7TRxfYAGjFn2xUy/IHex6koMB40pZjuzz66XPJ0jTLKjuu6x9rakJtLuSnvv6QH2FDa9bAWUg+i+PW5+3yqbJgtYCuOMMpdws+jFazAq2Fzd/AG+E1reo6y62/xyvlMCn7Q8RMkDhaKoTqcmxhUFdQPOznZ+Y=
+x-microsoft-antispam-message-info: recYYssfJjMPpLPOis0W06Fed9NSjE/9ubs4x3bLoE1sVTbXhl8iy5Bz5xGPYbtMT1Os44IgVje5Jt2dMmgL1VyF0JCLGEILmqJpq2RvJYS8Dsxd91pRuVgdk5QnMGJ0tLXDVs0WKI/Ag2U3oHRcahdEGUciGOscEibzutkzxWT3Ai6OijxQvApqSEwI0sN4udsCxyMjlqVQRd5hYjFY29l3VleycGG8faVoOQ5Rhk86q33n7ACOxW9L9KSEt/QfYQu5PUo7sHFAK3oo+j094n44VSfbpxnm5B9qqk+TuhP0B2x5jh72FFfIUOJK44L+8g1laUktDzg4nOm4PZxYa7ZfBDwX2FF1zwdVD/IYHQ2qba7ZWJF7SIh6FTuLqp5JRDm/NKDG+1uLxIUZdrlfK3jCKgbWYAn/Ox0LSANM/mY=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fa2ebc2-b46c-4f05-c9c4-08d6ff5d9819
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2019 02:24:36.6533
+X-MS-Exchange-CrossTenant-Network-Message-Id: 950a896c-2d53-4353-58c5-08d6ff5dd72c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2019 02:26:22.4654
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
 X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB4666
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB5388
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/2/19 5:42 PM, Minwoo Im wrote:=0A=
-> On 19-07-01 14:57:22, Chaitanya Kulkarni wrote:=0A=
->> The existing code in the bio_check_ro() relies on the op_is_write().=0A=
->> op_is_write() checks for the last bit in the bio_op(). Now that we have=
-=0A=
->> multiple REQ_OP_XXX with last bit set to 1 such as, (from blk_types.h):=
-=0A=
->>=0A=
->> 	/* write sectors to the device */=0A=
->> 	REQ_OP_WRITE		=3D 1,=0A=
->> 	/* flush the volatile write cache */=0A=
->> 	REQ_OP_DISCARD		=3D 3,=0A=
->> 	/* securely erase sectors */=0A=
->> 	REQ_OP_SECURE_ERASE	=3D 5,=0A=
->> 	/* write the same sector many times */=0A=
->> 	REQ_OP_WRITE_SAME	=3D 7,=0A=
->> 	/* write the zero filled sector many times */=0A=
->> 	REQ_OP_WRITE_ZEROES	=3D 9,=0A=
->>=0A=
->> it is hard to understand which bio op failed in the bio_check_ro().=0A=
->>=0A=
->> Modify the error message in bio_check_ro() to print correct REQ_OP_XXX=
-=0A=
->> with the help of blk_op_str().=0A=
->>=0A=
->> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
->> ---=0A=
->>  block/blk-core.c | 6 +++---=0A=
->>  1 file changed, 3 insertions(+), 3 deletions(-)=0A=
->>=0A=
+On 7/2/19 5:50 PM, Minwoo Im wrote:=0A=
 >> diff --git a/block/blk-core.c b/block/blk-core.c=0A=
->> index 5d1fc8e17dd1..47c8b9c48a57 100644=0A=
+>> index 5143a8e19b63..9855c5d5027d 100644=0A=
 >> --- a/block/blk-core.c=0A=
 >> +++ b/block/blk-core.c=0A=
->> @@ -786,9 +786,9 @@ static inline bool bio_check_ro(struct bio *bio, str=
-uct hd_struct *part)=0A=
->>  			return false;=0A=
->>  =0A=
->>  		WARN_ONCE(1,=0A=
->> -		       "generic_make_request: Trying to write "=0A=
->> -			"to read-only block-device %s (partno %d)\n",=0A=
->> -			bio_devname(bio, b), part->partno);=0A=
->> +			"generic_make_request: Trying op %s on the "=0A=
->> +			"read-only block-device %s (partno %d)\n",=0A=
->> +			blk_op_str(op), bio_devname(bio, b), part->partno);=0A=
-> Maybe "s/Trying op %s on/Tyring op %s to" just like the previous one?=0A=
-> Not a native speaker, though ;)=0A=
+>> @@ -1127,17 +1127,15 @@ EXPORT_SYMBOL_GPL(direct_make_request);=0A=
+>>   */=0A=
+>>  blk_qc_t submit_bio(struct bio *bio)=0A=
+>>  {=0A=
+>> +	unsigned int count =3D bio_sectors(bio);=0A=
+> Chaitanya,=0A=
+>=0A=
+> Could it have a single empty line right after this just like you have=0A=
+> for the if-statement below for the block_dump.  It's just a nitpick.=0A=
 =0A=
-Yeah, can be done at the time of applying patch if Jens is okay with it.=0A=
+Yeah, again can be done at the time of applying patch, if Jens is okay=0A=
+with that.=0A=
 =0A=
-Otherwise I'll send V2.=0A=
+Otherwise I can send V2.=0A=
 =0A=
 >=0A=
-> I think it would be better to see the log which holds the exact request=
-=0A=
-> operation type in a string.=0A=
+>>  	/*=0A=
+>>  	 * If it's a regular read/write or a barrier with data attached,=0A=
+>>  	 * go through the normal accounting stuff before submission.=0A=
+>>  	 */=0A=
+>>  	if (bio_has_data(bio)) {=0A=
+>> -		unsigned int count;=0A=
+>>  =0A=
+>>  		if (unlikely(bio_op(bio) =3D=3D REQ_OP_WRITE_SAME))=0A=
+>>  			count =3D queue_logical_block_size(bio->bi_disk->queue) >> 9;=0A=
+>> -		else=0A=
+>> -			count =3D bio_sectors(bio);=0A=
+>>  =0A=
+>>  		if (op_is_write(bio_op(bio))) {=0A=
+>>  			count_vm_events(PGPGOUT, count);=0A=
+>> @@ -1145,15 +1143,16 @@ blk_qc_t submit_bio(struct bio *bio)=0A=
+>>  			task_io_account_read(bio->bi_iter.bi_size);=0A=
+>>  			count_vm_events(PGPGIN, count);=0A=
+>>  		}=0A=
+>> +	}=0A=
+>>  =0A=
+>> -		if (unlikely(block_dump)) {=0A=
+>> -			char b[BDEVNAME_SIZE];=0A=
+>> -			printk(KERN_DEBUG "%s(%d): %s block %Lu on %s (%u sectors)\n",=0A=
+>> -			current->comm, task_pid_nr(current),=0A=
+>> -				blk_op_str(bio_op(bio)),=0A=
+>> -				(unsigned long long)bio->bi_iter.bi_sector,=0A=
+>> -				bio_devname(bio, b), count);=0A=
+>> -		}=0A=
+>> +	if (unlikely(block_dump)) {=0A=
+>> +		char b[BDEVNAME_SIZE];=0A=
+>> +=0A=
+>> +		printk(KERN_DEBUG "%s(%d): %s block %Lu on %s (%u sectors)\n",=0A=
+>> +		current->comm, task_pid_nr(current),=0A=
+>> +			blk_op_str(bio_op(bio)),=0A=
+>> +			(unsigned long long)bio->bi_iter.bi_sector,=0A=
+>> +			bio_devname(bio, b), count);=0A=
+> It would be great if non-data command is traced, I think.=0A=
 >=0A=
 > Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>=0A=
 >=0A=
