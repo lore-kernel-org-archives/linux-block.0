@@ -2,43 +2,42 @@ Return-Path: <SRS0=UuDU=VA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA3ECC06511
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 17:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F0B0C06513
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 17:16:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B4B12218A0
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 17:12:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F8C5218A0
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 17:16:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1562173924;
-	bh=436WDhYAGRaHC7DhWZalpPfSr0ODNk1419c0VWx8viE=;
+	s=default; t=1562174191;
+	bh=wAY71ePpwrDaNFkq0PM1Dpq4LuZP2NtIHZTtqRudRyA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=I+nRnWETvdIRpvIZ5AGAjYchww9HVP0TxRk9i97STBc5KbUuSvm69abi2QhISbU1A
-	 NEKIh76JyuU8hLoDO/cVXa+VmO7MmwBGF3TC4oePz93G//tjchHrptnVKmCrzWS4Lz
-	 FEmDXqp0w9cScTkOIh2YAKrOE2jtIBhVAzMnvi0A=
+	b=14PXjeCsbyj29tdeA6D2/8MIaAa69fJ/BWIYk1N54xgeNc2dW6u0tutM4dHG//zI6
+	 3YTygUITnnJQVUfC8+GWc0M5BJ0o++z696tzsjITxJtDjKGyxpuVsyI6ASUS9o21ux
+	 Df0m8X8ToRMMrwTrCeIG+fvMB/7LmFH7C6Y4xpYA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726945AbfGCRL7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jul 2019 13:11:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35192 "EHLO mail.kernel.org"
+        id S1727014AbfGCRQ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jul 2019 13:16:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37410 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726430AbfGCRL7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jul 2019 13:11:59 -0400
+        id S1726550AbfGCRQ0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Jul 2019 13:16:26 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5575A2187F;
-        Wed,  3 Jul 2019 17:11:57 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id BA2A721881;
+        Wed,  3 Jul 2019 17:16:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562173917;
-        bh=436WDhYAGRaHC7DhWZalpPfSr0ODNk1419c0VWx8viE=;
+        s=default; t=1562174185;
+        bh=wAY71ePpwrDaNFkq0PM1Dpq4LuZP2NtIHZTtqRudRyA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=LW8bdLtCYoDfg6i3v8/Zb0LcmNqE8rpNUBgIps/4onsP5WYZ8jFkGmxdI9HoGhFV/
-         0d/AgJ6q/XRAimimUZT/3XK7cS2LB9i7IFiLCpLtrxyTMU6j5c6r0990l9bYQUWtk5
-         gCSth1cwabsT5F31+PUYCFKvhk3LouU7MR1EZeZw=
-Date:   Wed, 3 Jul 2019 19:11:55 +0200
+        b=aXCzjGovYsJE9GxJZUFPNADxn+l7zIN2HKBArp3F1hPAV1IK7L1Ern/YQCbbMW7mH
+         li5SzyGQ3VrRvnV0s/pRv+iwUEYWuuJb6KbZ6lAhZc2mdfHSVQKi5Sz9AAoqhd4ZbB
+         4GBlGioG7fpE8qE7mMpzcsyL+8lfUf4ATvsaDI0g=
+Date:   Wed, 3 Jul 2019 19:16:23 +0200
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     David Howells <dhowells@redhat.com>
 Cc:     viro@zeniv.linux.org.uk, Casey Schaufler <casey@schaufler-ca.com>,
@@ -48,75 +47,48 @@ Cc:     viro@zeniv.linux.org.uk, Casey Schaufler <casey@schaufler-ca.com>,
         linux-security-module@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/9] General notification queue with user mmap()'able
- ring buffer [ver #5]
-Message-ID: <20190703171155.GC24672@kroah.com>
+Subject: Re: [PATCH 6/9] Add a general, global device notification watch list
+ [ver #5]
+Message-ID: <20190703171623.GD24672@kroah.com>
 References: <156173690158.15137.3985163001079120218.stgit@warthog.procyon.org.uk>
- <156173695061.15137.17196611619288074120.stgit@warthog.procyon.org.uk>
+ <156173697086.15137.9549379251509621554.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <156173695061.15137.17196611619288074120.stgit@warthog.procyon.org.uk>
+In-Reply-To: <156173697086.15137.9549379251509621554.stgit@warthog.procyon.org.uk>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 28, 2019 at 04:49:10PM +0100, David Howells wrote:
-> Implement a misc device that implements a general notification queue as a
-> ring buffer that can be mmap()'d from userspace.
+On Fri, Jun 28, 2019 at 04:49:30PM +0100, David Howells wrote:
+> Create a general, global watch list that can be used for the posting of
+> device notification events, for such things as device attachment,
+> detachment and errors on sources such as block devices and USB devices.
+> This can be enabled with:
 > 
-> The way this is done is:
+> 	CONFIG_DEVICE_NOTIFICATIONS
 > 
->  (1) An application opens the device and indicates the size of the ring
->      buffer that it wants to reserve in pages (this can only be set once):
+> To add a watch on this list, an event queue must be created and configured:
 > 
-> 	fd = open("/dev/watch_queue", O_RDWR);
-> 	ioctl(fd, IOC_WATCH_QUEUE_NR_PAGES, nr_of_pages);
+>         fd = open("/dev/event_queue", O_RDWR);
+>         ioctl(fd, IOC_WATCH_QUEUE_SET_SIZE, page_size << n);
 > 
->  (2) The application should then map the pages that the device has
->      reserved.  Each instance of the device created by open() allocates
->      separate pages so that maps of different fds don't interfere with one
->      another.  Multiple mmap() calls on the same fd, however, will all work
->      together.
+> and then a watch can be placed upon it using a system call:
 > 
-> 	page_size = sysconf(_SC_PAGESIZE);
-> 	mapping_size = nr_of_pages * page_size;
-> 	char *buf = mmap(NULL, mapping_size, PROT_READ|PROT_WRITE,
-> 			 MAP_SHARED, fd, 0);
+>         watch_devices(fd, 12, 0);
 > 
-> The ring is divided into 8-byte slots.  Entries written into the ring are
-> variable size and can use between 1 and 63 slots.  A special entry is
-> maintained in the first two slots of the ring that contains the head and
-> tail pointers.  This is skipped when the ring wraps round.  Note that
-> multislot entries, therefore, aren't allowed to be broken over the end of
-> the ring, but instead "skip" entries are inserted to pad out the buffer.
-> 
-> Each entry has a 1-slot header that describes it:
-> 
-> 	struct watch_notification {
-> 		__u32	type:24;
-> 		__u32	subtype:8;
-> 		__u32	info;
-> 	};
-> 
-> The type indicates the source (eg. mount tree changes, superblock events,
-> keyring changes, block layer events) and the subtype indicates the event
-> type (eg. mount, unmount; EIO, EDQUOT; link, unlink).  The info field
-> indicates a number of things, including the entry length, an ID assigned to
-> a watchpoint contributing to this buffer, type-specific flags and meta
-> flags, such as an overrun indicator.
-> 
-> Supplementary data, such as the key ID that generated an event, are
-> attached in additional slots.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
+> Unless the application wants to receive all events, it should employ
+> appropriate filters.
 
-I don't know if I mentioned this before, but your naming seems a bit
-"backwards" from other subsystems. Should "watch_queue" always be the
-prefix, instead of a mix of prefix/suffix usage?
+What "filter"?  Who is going to use this and why a new system call for
+this?  You can do this today with udev/netlink/hotplug/whatever so why
+create yet-another-way?
 
-Anyway, your call, it's your code :)
+I don't think this is a good idea unless we really nail down the api and
+who is going to be using it.
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+thanks,
+
+greg k-h
