@@ -1,101 +1,87 @@
-Return-Path: <SRS0=exTe=U7=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=UuDU=VA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C01C06510
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jul 2019 18:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB254C06510
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:26:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1D4F22184B
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jul 2019 18:40:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B44DC21E6C
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:26:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tizq4CrV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726329AbfGBSkE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jul 2019 14:40:04 -0400
-Received: from mx2.suse.de ([195.135.220.15]:36814 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726150AbfGBSkE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Jul 2019 14:40:04 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 5E40EB17C;
-        Tue,  2 Jul 2019 18:40:03 +0000 (UTC)
+        id S1727094AbfGCA0l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jul 2019 20:26:41 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:40800 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726150AbfGCA0k (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jul 2019 20:26:40 -0400
+Received: by mail-pg1-f195.google.com with SMTP id w10so218242pgj.7;
+        Tue, 02 Jul 2019 17:26:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=G2YqfkEvAQAEaHiI4AbuUSgjkEW4+tXLhh4WWMs6JGc=;
+        b=tizq4CrVTABFZl6lnMuMEVk6tKI1qJnrWGFe4D/LjmvB+V/tTxAnsgpyrZ8ifIyQMT
+         DeSjjLtTF+MYi9fu+Udh57TbTdSonKNX1fyQwjbtUsQ1mNxyYGZ0tOg7kdONrRwWYHRU
+         /81FIsGttSimYEFso4N+gs0xCCAPgOYT7desTo5Us0nvxbySoSFC5NjbJlBLCdASlvYe
+         Z+BerYub+aib38bjlte4Y2MPUytGx4mmaBBg24mm2Se4RN4gJJ/BwU8sdjhBPIqh0JjG
+         vO+YziBW9IDARDb2dlpWDmQmaMHMRdAKP9RusLrskr5Z+0YQY4lT5v/jU4vBxDvMKwVO
+         ynBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=G2YqfkEvAQAEaHiI4AbuUSgjkEW4+tXLhh4WWMs6JGc=;
+        b=YcHjJbAoBwDOL91jJCesHPC+ll8kDFpBgsA2kdJsBTnplL3cuTZa9q18eiUdxRh71r
+         GoK4ciKg9u++p+g0i/hCwv7veIlbTKx1LnMlcsNppewnlhqzdtF58/shW7QUtFfijZa3
+         ZYWhc1XyGw8kOtC+pAvZb4XlCgotull7+GIVOtGVYzWYBQ5wNxc/I5x04ftOMDRaD6m3
+         rFU3O4gl3h1qD1W28l3y9ZOLVDMelAARSh9/5OX8xAJMrFwjY8yANMJrg06WkGFKZe/c
+         j2a61MopcbUMdiWey3LOK10cDOGK6R9hemWuivB9rp7sER4riDpMfXY48rR3JldH8Pk/
+         HXww==
+X-Gm-Message-State: APjAAAUGeytt7k7Ag4ies8iP4HBUz0oc/0POnehYsOLM8sL9w2Li/kVx
+        Jusd2/WjPuN60LYcaWHYGO8=
+X-Google-Smtp-Source: APXvYqy+IWFwh62Asy5np8pkDyBI/cyqwDN82970y6xL03Sfn32ecxy0iA6/KhMffPZM6PpjIKF3hg==
+X-Received: by 2002:a17:90a:1785:: with SMTP id q5mr8609557pja.106.1562113148665;
+        Tue, 02 Jul 2019 17:19:08 -0700 (PDT)
+Received: from localhost ([123.213.206.190])
+        by smtp.gmail.com with ESMTPSA id y5sm246107pgv.12.2019.07.02.17.19.06
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 02 Jul 2019 17:19:07 -0700 (PDT)
+Date:   Wed, 3 Jul 2019 09:19:04 +0900
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     linux-block@vger.kernel.org, colyli@suse.de,
+        linux-bcache@vger.kernel.org, linux-btrace@vger.kernel.org,
+        xen-devel@lists.xenproject.org, kent.overstreet@gmail.com,
+        yuchao0@huawei.com, jaegeuk@kernel.org, damien.lemoal@wdc.com,
+        konrad.wilk@oracle.com, roger.pau@citrix.com, bvanassche@acm.org,
+        linux-scsi@vger.kernel.org, Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH V3 1/9] block: add a helper function to read nr_setcs
+Message-ID: <20190703001904.GB15705@minwoo-desktop>
+References: <20190702174236.3332-1-chaitanya.kulkarni@wdc.com>
+ <20190702174236.3332-2-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Tue, 02 Jul 2019 20:40:03 +0200
-From:   Roman Penyaev <rpenyaev@suse.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH liburing 2/2] Fix the use of memory barriers
-In-Reply-To: <876fa5e3-f050-b95c-a30c-755d1e0430d1@acm.org>
-References: <20190701214232.29338-1-bvanassche@acm.org>
- <20190701214232.29338-3-bvanassche@acm.org>
- <5d5931e08e338a8a8edb1e58a33a120e@suse.de>
- <876fa5e3-f050-b95c-a30c-755d1e0430d1@acm.org>
-Message-ID: <723180510314b2928ba97752e5383202@suse.de>
-X-Sender: rpenyaev@suse.de
-User-Agent: Roundcube Webmail
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190702174236.3332-2-chaitanya.kulkarni@wdc.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019-07-02 18:17, Bart Van Assche wrote:
-> On 7/2/19 2:07 AM, Roman Penyaev wrote:
->> Hi Bart,
->> 
->> On 2019-07-01 23:42, Bart Van Assche wrote:
->> 
->> ...
->> 
->>> +#if defined(__x86_64__)
->>> +#define smp_store_release(p, v)            \
->>> +do {                        \
->>> +    barrier();                \
->>> +    WRITE_ONCE(*(p), (v));            \
->>> +} while (0)
->>> +
->>> +#define smp_load_acquire(p)            \
->>> +({                        \
->>> +    typeof(*p) ___p1 = READ_ONCE(*(p));    \
->>> +    barrier();                \
->>> +    ___p1;                    \
->>> +})
->> 
->> Can we have these two macros for x86_32 as well?
->> For i386 it will take another branch with full mb,
->> which is not needed.
->> 
->> Besides that both patches looks good to me.
-> 
-> Hi Roman,
-> 
-> Thanks for having taken a look. From Linux kernel source file
-> arch/x86/include/asm/barrier.h:
-> 
-> #ifdef CONFIG_X86_32
-> #define mb() asm volatile(ALTERNATIVE("lock; addl $0,-4(%%esp)",\
-> 		"mfence", X86_FEATURE_XMM2) ::: "memory", "cc")
-> #define rmb() asm volatile(ALTERNATIVE("lock; addl $0,-4(%%esp)",\
-> 		"lfence", X86_FEATURE_XMM2) ::: "memory", "cc")
-> #define wmb() asm volatile(ALTERNATIVE("lock; addl $0,-4(%%esp)",\
-> 		"sfence", X86_FEATURE_XMM2) ::: "memory", "cc")
-> #else
-> #define mb() 	asm volatile("mfence":::"memory")
-> #define rmb()	asm volatile("lfence":::"memory")
-> #define wmb()	asm volatile("sfence" ::: "memory")
-> #endif
-> 
-> In other words, I think that 32-bit and 64-bit systems really have to
-> be treated in a different way.
+On 19-07-02 10:42:27, Chaitanya Kulkarni wrote:
+> This patch introduces helper function to read the number of sectors
+> from struct block_device->bd_part member. For more details Please refer
+> to the comment in the include/linux/genhd.h for part_nr_sects_read().
 
-I meant smp_load_acquire / smp_store_release
+Without bd_mutex locked, this helper seems useful to have.
 
---
-Roman
-
+Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
