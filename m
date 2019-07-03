@@ -3,50 +3,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E0EC06511
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 14:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3DBC0650E
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 15:03:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B889E218A4
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 14:40:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3518720828
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 15:03:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726621AbfGCOkV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jul 2019 10:40:21 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55078 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725847AbfGCOkV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jul 2019 10:40:21 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id AC0BFB728;
-        Wed,  3 Jul 2019 14:40:19 +0000 (UTC)
-Date:   Wed, 3 Jul 2019 16:40:19 +0200
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/3] block: improve the gap check in __bio_add_pc_page
-Message-ID: <20190703144018.GG4026@x250.microfocus.com>
-References: <20190703130036.4105-1-hch@lst.de>
- <20190703130036.4105-2-hch@lst.de>
+        id S1726656AbfGCPDb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jul 2019 11:03:31 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:45458 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726605AbfGCPDb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jul 2019 11:03:31 -0400
+Received: by mail-pf1-f193.google.com with SMTP id r1so1403676pfq.12;
+        Wed, 03 Jul 2019 08:03:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=UpKw9Zxoxe8rge03LP2f6638eI4p8y0legXuCWEjCsI=;
+        b=ICppt5lQcaGL40MP1SDxZWfyOqWoiNJPn1viioHfqHinIW1hSNeOuOwgJDGYA5OIVx
+         l1PJ+JXCfjC04S3ZxA/2dyjVjb34vc5q4i/z6V1kPeMMnoaMidgtGjzagEEqiJw9pg5/
+         PRvRzDQJaahpjVW/xrhy+/PyNRusP2RzUTzy4iJiP3+i9FQGI1Q9+AmaG/G+Ccvv8ASx
+         99NQM61TL0AUnXNfAl3pLUGFqBH4i9O710nCA4qdz0NBYY9OO7XRlawjZa9OOdHWWP0u
+         jnBI40lY3GuxQamj/mkqFTibIbtapuq6clhjAxHuDsLCqUmeU83LhYxp8MKb+l53sa1z
+         /Y4Q==
+X-Gm-Message-State: APjAAAWaFZ8uBLxegWcwfZSvyVzNzJECrE3itJV/jyNBLcdS+BkdF4jT
+        6emqME+uy7NylDTuq8w8Bo5w1JFRfZs=
+X-Google-Smtp-Source: APXvYqyR83vJcx0j6MO8XREogh+x0eiGjMP5GA+fOFSvZ7wYxEQvReZcXoMSmjWhPLNI5xsp0sPuDQ==
+X-Received: by 2002:a17:90a:ff17:: with SMTP id ce23mr13281431pjb.47.1562166210114;
+        Wed, 03 Jul 2019 08:03:30 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id o13sm2450376pje.28.2019.07.03.08.03.28
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 03 Jul 2019 08:03:29 -0700 (PDT)
+Subject: Re: [PATCH V3 1/9] block: add a helper function to read nr_setcs
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org
+Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
+        linux-btrace@vger.kernel.org, xen-devel@lists.xenproject.org,
+        kent.overstreet@gmail.com, yuchao0@huawei.com, jaegeuk@kernel.org,
+        damien.lemoal@wdc.com, konrad.wilk@oracle.com,
+        roger.pau@citrix.com, linux-scsi@vger.kernel.org
+References: <20190702174236.3332-1-chaitanya.kulkarni@wdc.com>
+ <20190702174236.3332-2-chaitanya.kulkarni@wdc.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <26917678-fd82-b6c8-761e-220bc7d3b179@acm.org>
+Date:   Wed, 3 Jul 2019 08:03:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190703130036.4105-2-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190702174236.3332-2-chaitanya.kulkarni@wdc.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
--- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+On 7/2/19 10:42 AM, Chaitanya Kulkarni wrote:
+> +/* Helper function to read the bdev->bd_part->nr_sects */
+> +static inline sector_t bdev_nr_sects(struct block_device *bdev)
+> +{
+> +	return part_nr_sects_read(bdev->bd_part);
+> +}
+
+Is the comment above bdev_nr_sects() really useful or should it be left out?
+
+Thanks,
+
+Bart.
