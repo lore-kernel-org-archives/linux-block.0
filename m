@@ -2,60 +2,124 @@ Return-Path: <SRS0=UuDU=VA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05FD6C5B57D
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACBA8C06511
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:42:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D8895218AD
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:39:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85F49218EA
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 00:42:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dzT2FZTy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727087AbfGCAjZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jul 2019 20:39:25 -0400
-Received: from verein.lst.de ([213.95.11.211]:46642 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727069AbfGCAjZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Jul 2019 20:39:25 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 7744268C7B; Wed,  3 Jul 2019 02:00:55 +0200 (CEST)
-Date:   Wed, 3 Jul 2019 02:00:55 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, Matias Bjorling <mb@lightnvm.io>,
-        linux-block@vger.kernel.org
-Subject: Re: remove bi_phys_segments and related cleanups
-Message-ID: <20190703000055.GA28981@lst.de>
-References: <20190606102904.4024-1-hch@lst.de> <a703a5cb-1e39-6194-698a-56dbc4577f25@fb.com> <bbc9baba-19f2-03ec-59dc-adab225eb3b2@kernel.dk> <20190702133406.GC15874@lst.de> <bfe8a4b5-901e-5ac4-e11c-0e6ccc4faec2@kernel.dk> <20190702182934.GA20763@lst.de> <ef4a5fb5-9d79-75e1-1231-fdfc14f91835@kernel.dk>
+        id S1726824AbfGCAmp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jul 2019 20:42:45 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:35851 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726736AbfGCAmo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jul 2019 20:42:44 -0400
+Received: by mail-pf1-f194.google.com with SMTP id r7so295743pfl.3
+        for <linux-block@vger.kernel.org>; Tue, 02 Jul 2019 17:42:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=3+88rqRK28VKisC+37wlmaYyoSMpDKjaXlPRwLTc81A=;
+        b=dzT2FZTy6mtiH9VhpzQzcGg9srgeIi7ULRstbUxhYdbumgVyC/BccJNUTeeqM1JxeU
+         /aJ5Yh18Qhitb2uNCOgrqAJCQJCooh5kppJeFISYa3vTW8w8SZxXSzU3q+z+Y8nFvLFm
+         7UmoIeMOk9x4NdUuGct6yT4j/uqa59drJqUwOsnG7+WOlDf9pYrCXpOMAb1Ug0jw04yr
+         SAPFSsgeuDtEdJsxFXFieMadb9VHG15xWRp9t7JYXycs9+fXJ9FIhQsAwh+12iAX31ay
+         fdkmhF4pBle4Q3xXpB/fyTvqk4KZ8o4Aea0TaSNKPkeiHJQDb+qfydVF0WnF17USk+zV
+         1U4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=3+88rqRK28VKisC+37wlmaYyoSMpDKjaXlPRwLTc81A=;
+        b=reOON3dxWH2oVCCnJANpB9wx8wVR7ovcwgIuUTniFVW7XegYKD1WL30P/AOkpu4eIB
+         EO43LRWnzgnyzcDRNjOC0dofiVg8lzrDGXTe0kRG88glqnW7VDc4kGrBP8fHaJkOhB4o
+         Vsp5bO8D0KW/E9xcJi4tZ7R8sog1kTkpYX+ixTc1nfC2AeFOD0sQUO+glJwvgg24nl1i
+         5pbKBtes1Z6g0Mj8hY492bDOMskwEjEuJkWzp+HNszdK9xbLe9cpi5dYYGzUQOP6wZkB
+         Iw+JMaqSj/u6E1vUEI2mo/65Zzo9T3HJr6qO//Te7dblJ+x4+vUAS2TCaOOB0NDeBuTf
+         bowg==
+X-Gm-Message-State: APjAAAWMKqLarykm9QR/U8VzNtn5K/U8DrO3mgAcvZZyfVow8i2XQ+Hp
+        FZsFu7pdMCLeKYX41YjDmMI=
+X-Google-Smtp-Source: APXvYqy4XjIjmrg7EOdGeLB40liOwbHKiGqRa8PnbMoJxGCcXUMnLbqCHk5S0oYvRWhq9TvOZCkYow==
+X-Received: by 2002:a63:6883:: with SMTP id d125mr34024381pgc.281.1562114563831;
+        Tue, 02 Jul 2019 17:42:43 -0700 (PDT)
+Received: from localhost ([123.213.206.190])
+        by smtp.gmail.com with ESMTPSA id p1sm250858pff.74.2019.07.02.17.42.42
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 02 Jul 2019 17:42:43 -0700 (PDT)
+Date:   Wed, 3 Jul 2019 09:42:40 +0900
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     linux-mm@kvack.org, linux-block@vger.kernel.org,
+        bvanassche@acm.org, axboe@kernel.dk,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH 1/5] block: update error message for bio_check_ro()
+Message-ID: <20190703004240.GA19081@minwoo-desktop>
+References: <20190701215726.27601-1-chaitanya.kulkarni@wdc.com>
+ <20190701215726.27601-2-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ef4a5fb5-9d79-75e1-1231-fdfc14f91835@kernel.dk>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20190701215726.27601-2-chaitanya.kulkarni@wdc.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 02, 2019 at 12:37:59PM -0600, Jens Axboe wrote:
-> > I couldn't get that to boot in my test systems even with mainline,
-> > but that seems to be do to systemd waiting for some crap not supported
-> > in the config.
-> > 
-> > But with my usual test config I've just completed a test run with
-> > KASAN enabled on a VWC=1 driver with no issues, so this keeps puzzling
-> > me.
+On 19-07-01 14:57:22, Chaitanya Kulkarni wrote:
+> The existing code in the bio_check_ro() relies on the op_is_write().
+> op_is_write() checks for the last bit in the bio_op(). Now that we have
+> multiple REQ_OP_XXX with last bit set to 1 such as, (from blk_types.h):
 > 
-> Let me know what you want me to try. I can't reproduce it in qemu, but
-> it's 100% on my laptop. My qemu drives also have VWC=1, so it's not
-> (just) that.
+> 	/* write sectors to the device */
+> 	REQ_OP_WRITE		= 1,
+> 	/* flush the volatile write cache */
+> 	REQ_OP_DISCARD		= 3,
+> 	/* securely erase sectors */
+> 	REQ_OP_SECURE_ERASE	= 5,
+> 	/* write the same sector many times */
+> 	REQ_OP_WRITE_SAME	= 7,
+> 	/* write the zero filled sector many times */
+> 	REQ_OP_WRITE_ZEROES	= 9,
+> 
+> it is hard to understand which bio op failed in the bio_check_ro().
+> 
+> Modify the error message in bio_check_ro() to print correct REQ_OP_XXX
+> with the help of blk_op_str().
+> 
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> ---
+>  block/blk-core.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 5d1fc8e17dd1..47c8b9c48a57 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -786,9 +786,9 @@ static inline bool bio_check_ro(struct bio *bio, struct hd_struct *part)
+>  			return false;
+>  
+>  		WARN_ONCE(1,
+> -		       "generic_make_request: Trying to write "
+> -			"to read-only block-device %s (partno %d)\n",
+> -			bio_devname(bio, b), part->partno);
+> +			"generic_make_request: Trying op %s on the "
+> +			"read-only block-device %s (partno %d)\n",
+> +			blk_op_str(op), bio_devname(bio, b), part->partno);
 
-I seriously have no idea unfortunately.  It works fine for me both
-on qemu and on a real WD SN720 drive on my laptop.  Just for curiosity
-you could try to pad the bio structure and see if bloating it to the
-old size makes any difference.
+Maybe "s/Trying op %s on/Tyring op %s to" just like the previous one?
+Not a native speaker, though ;)
 
-The other things that comes to mind is that when Johannes removed
-BIO_SEG_VALID there also were some unexplainable side effects,
-I'll look into seeing if there was any similarity.
+I think it would be better to see the log which holds the exact request
+operation type in a string.
+
+Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
