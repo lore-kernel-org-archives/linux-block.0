@@ -2,94 +2,124 @@ Return-Path: <SRS0=UuDU=VA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA86C5B578
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 07:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B8EC0650E
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 09:49:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E2AF21897
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 07:17:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G1A9AYBK"
+	by mail.kernel.org (Postfix) with ESMTP id ACF5621882
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 09:49:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727174AbfGCHRl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jul 2019 03:17:41 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:35311 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726236AbfGCHRl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jul 2019 03:17:41 -0400
-Received: by mail-pf1-f196.google.com with SMTP id d126so783410pfd.2
-        for <linux-block@vger.kernel.org>; Wed, 03 Jul 2019 00:17:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=iisGLnpDMCDcRGYnZFrm5QNOBopjV0PFBP/WVXC7UXs=;
-        b=G1A9AYBKheMdFrnvN1YyO1MJLGjXEDLlSzS7pWcdPzD8H3eDh9cX1ySjCHXjZSiGQl
-         znxHfP4GxqdPDd+d/tsGHq5GaPoiegA+hQU9sBBTXJqA510+yr7UsxW70ghiXYMvEgxh
-         1wnvoGFinNBNQfPzDnZW+yzYO6UBWF5YEEDxEE8UzxF0GG6oqPPOKiMdD51EzWGBWMpY
-         /2DEz40WGLLb6JFmUYip8R9rp0U2LQF/x8KNCOh9D5HglfIItrkyj1o4p/j3XDZdbDnU
-         jxeaDnXhltcEsiXt7LXVFYVrF7bQNMR7EGCF2CPpY03iRmvxMbsT/y9SufbVFVsWFO5v
-         TYOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=iisGLnpDMCDcRGYnZFrm5QNOBopjV0PFBP/WVXC7UXs=;
-        b=m9Eq88r/sRdNqfhJ9Z//WBIT7VUfce670D2zV4NtmO2rz5WmNsVVDjVprjf8p1+HQZ
-         VQYM7u8rtTiimylgjZnhx9Ru1udy9tC4QCXUAxhUj6OVSFZGijepANW9cSE6MpDediYi
-         dDl3Luq0LEeoKC40YA2wPfCeTT62bvLJo2tw7bsdYDyuCYC+ipTuuie2rKbHbgtUDC14
-         zv9Cdj5XnDP3qOdcIy0QD7Dft28oVnJ3IyuHENSou5uwyP0ci/htb7DLt/RZzdGboPfe
-         SA+JIFUl7gJXQ+/k5XBJG7iVKtMSyqj4IUUmhuYCBOj9i6P8huyK5lw0U5lvu4yjNUpl
-         PcFg==
-X-Gm-Message-State: APjAAAXzq+d16nbUUV85Fq9TIWZQCOCec8a/l++9hDQMEqbAsDRytQZM
-        Mt8xKPSJmAlCFKp+02YQJ84=
-X-Google-Smtp-Source: APXvYqxNMAsx58gkg+4a+u9KFhWHrEfwfu6HTSLrngVE9uUwVIVHTcYsa7TsuZwpHGst59l40NvRXw==
-X-Received: by 2002:a65:62c2:: with SMTP id m2mr35932735pgv.413.1562138260273;
-        Wed, 03 Jul 2019 00:17:40 -0700 (PDT)
-Received: from localhost ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id f19sm1663392pfk.180.2019.07.03.00.17.38
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 03 Jul 2019 00:17:39 -0700 (PDT)
-Date:   Wed, 3 Jul 2019 16:17:37 +0900
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc:     linux-block@vger.kernel.org, Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: Re: [PATCH] null_blk: add unlikely for REQ_OP_DISACRD handling
-Message-ID: <20190703071737.GD21258@minwoo-desktop>
-References: <20190702032027.24066-1-chaitanya.kulkarni@wdc.com>
+        id S1726457AbfGCJta (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jul 2019 05:49:30 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48768 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726434AbfGCJt3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Jul 2019 05:49:29 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id BF7D6AFAE;
+        Wed,  3 Jul 2019 09:49:28 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190702032027.24066-1-chaitanya.kulkarni@wdc.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Wed, 03 Jul 2019 11:49:27 +0200
+From:   Roman Penyaev <rpenyaev@suse.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH liburing 2/2] Fix the use of memory barriers
+In-Reply-To: <0bffbfd9-a57e-857f-4699-856295a11f3a@acm.org>
+References: <20190701214232.29338-1-bvanassche@acm.org>
+ <20190701214232.29338-3-bvanassche@acm.org>
+ <5d5931e08e338a8a8edb1e58a33a120e@suse.de>
+ <876fa5e3-f050-b95c-a30c-755d1e0430d1@acm.org>
+ <723180510314b2928ba97752e5383202@suse.de>
+ <0bffbfd9-a57e-857f-4699-856295a11f3a@acm.org>
+Message-ID: <2cd14f5d8cfcc36dec90574ff8a9e8b5@suse.de>
+X-Sender: rpenyaev@suse.de
+User-Agent: Roundcube Webmail
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19-07-01 20:20:27, Chaitanya Kulkarni wrote:
-> Since discard requests are not as common as read and write requests
-> mark REQ_OP_DISCARD condition unlikely in the null_handle_rq() and
-> null_handle_bio().
+On 2019-07-02 22:31, Bart Van Assche wrote:
+> On 7/2/19 11:40 AM, Roman Penyaev wrote:
+>> On 2019-07-02 18:17, Bart Van Assche wrote:
+>>> On 7/2/19 2:07 AM, Roman Penyaev wrote:
+>>>> Hi Bart,
+>>>> 
+>>>> On 2019-07-01 23:42, Bart Van Assche wrote:
+>>>> 
+>>>> ...
+>>>> 
+>>>>> +#if defined(__x86_64__)
+>>>>> +#define smp_store_release(p, v)            \
+>>>>> +do {                        \
+>>>>> +    barrier();                \
+>>>>> +    WRITE_ONCE(*(p), (v));            \
+>>>>> +} while (0)
+>>>>> +
+>>>>> +#define smp_load_acquire(p)            \
+>>>>> +({                        \
+>>>>> +    typeof(*p) ___p1 = READ_ONCE(*(p));    \
+>>>>> +    barrier();                \
+>>>>> +    ___p1;                    \
+>>>>> +})
+>>>> 
+>>>> Can we have these two macros for x86_32 as well?
+>>>> For i386 it will take another branch with full mb,
+>>>> which is not needed.
+>>>> 
+>>>> Besides that both patches looks good to me.
+>>> 
+>>> Hi Roman,
+>>> 
+>>> Thanks for having taken a look. From Linux kernel source file
+>>> arch/x86/include/asm/barrier.h:
+>>> 
+>>> #ifdef CONFIG_X86_32
+>>> #define mb() asm volatile(ALTERNATIVE("lock; addl $0,-4(%%esp)",\
+>>>         "mfence", X86_FEATURE_XMM2) ::: "memory", "cc")
+>>> #define rmb() asm volatile(ALTERNATIVE("lock; addl $0,-4(%%esp)",\
+>>>         "lfence", X86_FEATURE_XMM2) ::: "memory", "cc")
+>>> #define wmb() asm volatile(ALTERNATIVE("lock; addl $0,-4(%%esp)",\
+>>>         "sfence", X86_FEATURE_XMM2) ::: "memory", "cc")
+>>> #else
+>>> #define mb()     asm volatile("mfence":::"memory")
+>>> #define rmb()    asm volatile("lfence":::"memory")
+>>> #define wmb()    asm volatile("sfence" ::: "memory")
+>>> #endif
+>>> 
+>>> In other words, I think that 32-bit and 64-bit systems really have to
+>>> be treated in a different way.
+>> 
+>> I meant smp_load_acquire / smp_store_release
 > 
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> Hi Roman,
+> 
 
-Chaitanya,
+Hi Bart,
 
-Just a simple doubt here.  I just have tested this patch with 'dd' to
-see any performance benefit when queue_mode == 0 || 1.  But I don't
-think it's worth it for the performance of read/write OR I have an wrong
-way to test it.  you have never mentioned performance in this patch,
-though.
+It seems you took the chunk of the code with macros from
+tools/arch/x86/include/asm/barrier.h, where indeed smp_store_release
+and smp_load_acquire are defined only for x86-64.  If I am not mistaken
+kernel defines both __smp_store_release / __smp_load_acquire equally
+for x86 memory model in arch/x86/include/asm/barrier.h.
 
-But, I do like this patch because it will indicate what you have
-mentioned in the commit message in the code level.
+> Since there are 32-bit x86 CPUs that can reorder loads and stores
 
-Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
+Only "loads may be reordered with earlier stores"
+(Intel® 64 and IA-32 Architectures, section 8.2.3.4), but "stores are 
+not
+reordered with earlier loads" (section 8.2.3.3), so smp_store_release 
+and
+and smp_load_acquire can be relaxed.
 
-Thanks!
+--
+Roman
+
