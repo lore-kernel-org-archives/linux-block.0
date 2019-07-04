@@ -2,126 +2,259 @@ Return-Path: <SRS0=Oz6T=VB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 109B8C5B578
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 00:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F11C06517
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 03:58:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D00DD218A0
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 00:15:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F8DE218A3
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 03:58:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RVClWjoq";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ViGKD7bC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vKzoQBSt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727395AbfGDAPB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jul 2019 20:15:01 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:50325 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727345AbfGDAPB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jul 2019 20:15:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562199316; x=1593735316;
-  h=from:to:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=UTkRxZq+ySkkM8YY8Sb0Pe9eNRE1wlH7UjxDPwNRoNA=;
-  b=RVClWjoqwuFYKOLSgdLYOLsKWQoop89+FIiwJVkXkySpSNEUPUFndvvm
-   64cIU8ZJu+zUCZmSoNhWPoVO9q1ERyW5Ev/C3GrRvTLeNVnFKig4e4RzY
-   Yw/658sGKDqBDY9a7tcEiPib0eDfP+QancM8RF6y7lprhvG755EqqCQ/F
-   MrXT6jwsD0c6CWJW4E0tHUnh94JOYhs3QoaA17d+NASZTsAYO+r7ovM75
-   me49LKsOoQyg46BGrxyGPmtMM9bZvtkDE/JhjkmCEd5XjeIbOnXed7/cc
-   So1/qXyt53AQ362ydqt+p41Ov2d65COfDgb9JeA0RWBJrpKf4buCHDZYa
-   A==;
-IronPort-SDR: q6STnOzmWQNDTSLd5dU9ALbrki5zsKAdJRHAMngotT7A5zzRov5Cw6cpST+WeP4oKoJ9mKN5et
- 79ThoZi4WEUQ9QOuiwxAvbsGNxmHboA+PBPVpGP9yldg/aT7sabii/GLAXxTdfXnFB3XP7yY6u
- b/UZ/1tZ+P/P9N/AIhfJeX7r3aPG1ZKOs8cuWmHm0MgStL+S7QXZVx/a7md42ou0r9fVTIhOn4
- p/r9DYJ0mGYRYFib18PJ02Qb+hV4KlywctQBptwDc2eCbuQfVkLI6Mbd1K99Is2/18O2hTXANU
- K4g=
-X-IronPort-AV: E=Sophos;i="5.63,449,1557158400"; 
-   d="scan'208";a="212055038"
-Received: from mail-cys01nam02lp2057.outbound.protection.outlook.com (HELO NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.57])
-  by ob1.hgst.iphmx.com with ESMTP; 04 Jul 2019 08:15:15 +0800
+        id S1727348AbfGDD6x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jul 2019 23:58:53 -0400
+Received: from mail-yw1-f66.google.com ([209.85.161.66]:43832 "EHLO
+        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726696AbfGDD6x (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jul 2019 23:58:53 -0400
+Received: by mail-yw1-f66.google.com with SMTP id t2so872684ywe.10;
+        Wed, 03 Jul 2019 20:58:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UTkRxZq+ySkkM8YY8Sb0Pe9eNRE1wlH7UjxDPwNRoNA=;
- b=ViGKD7bCybD6iyIS3Az8mjllsadimOIpcUyvFLAIPjK66ZivxDYy5dG32ROuOrU+/HWooPgDvAKrlL9fAhGtndIyifX2qOYVOjr6bP3TYUADc+gphMScexGeyeHzfph2jf6Ky3ux/BXd+A5pAVVuMAcRXagPRjz/o8PtPJ6LEh4=
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
- BYAPR04MB4485.namprd04.prod.outlook.com (52.135.237.222) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2032.20; Thu, 4 Jul 2019 00:14:57 +0000
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::8025:ccea:a0e6:9078]) by BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::8025:ccea:a0e6:9078%5]) with mapi id 15.20.2052.010; Thu, 4 Jul 2019
- 00:14:57 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] null_blk: add unlikely for REQ_OP_DISACRD handling
-Thread-Topic: [PATCH] null_blk: add unlikely for REQ_OP_DISACRD handling
-Thread-Index: AQHVMIUbuJn4kztvYk2XiiEoPdjo8Q==
-Date:   Thu, 4 Jul 2019 00:14:57 +0000
-Message-ID: <BYAPR04MB574988931BE197AB00EDAA4E86FA0@BYAPR04MB5749.namprd04.prod.outlook.com>
-References: <20190702032027.24066-1-chaitanya.kulkarni@wdc.com>
- <0760ecc6-feef-16b0-dc45-1e86c3b3d09e@kernel.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [2605:e000:3e45:f500:b8d2:4d45:f4cb:6e09]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d5b06d3b-d514-47fd-db3d-08d70014a5ea
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4485;
-x-ms-traffictypediagnostic: BYAPR04MB4485:
-x-microsoft-antispam-prvs: <BYAPR04MB448592BC0089438B56D2C7F186FA0@BYAPR04MB4485.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6790;
-x-forefront-prvs: 0088C92887
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(346002)(39860400002)(376002)(136003)(366004)(51914003)(189003)(199004)(66946007)(64756008)(66556008)(66446008)(66476007)(72206003)(6246003)(316002)(81156014)(53936002)(446003)(8676002)(86362001)(52536014)(25786009)(478600001)(476003)(73956011)(486006)(76116006)(55016002)(81166006)(14454004)(71190400001)(71200400001)(76176011)(256004)(6506007)(74316002)(6436002)(9686003)(4744005)(229853002)(7696005)(2501003)(186003)(53546011)(5660300002)(102836004)(110136005)(8936002)(68736007)(33656002)(99286004)(46003)(2906002)(305945005)(6116002)(7736002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4485;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: ZQlo0HyojnnBuV8qiEQPSH+mpciE62D3uQyNUlUEqrxF8hkxem/0lQmNtZOk3nAYrobXut5tthCbVzWL0GzOXcj+m4rni/kP+GBe2pA2crTBSFr+vDGvftv6DloAUtRS3DzECupfLNGWARQCe3c4VlEtuiPznqkj9Kz6sf6z9aJJ3Mz9o7MsSMLgsHlB3MB6SZaxbj36SjmUrOrQjN5abcfzwKMJ3I/jGOe2/R4yLkz2a1mU9gb73Z4342LJAHGjmuT22SStZKndVz+emtwbNORPY6DImWGUoptrI+HREhoPYNEIQfnRpGlsUYlHhN4mGJe8I8cXCqPr3AOsX77cBisBz//QdrW4dCPfM0ODNNXbugvqHXvCQDpbcdGZrWVCFvMySgyYXd7DR3n2U3ZSc6yMyTm3QOV3UtmRvX5lV5k=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=CK0G9OZ8DCWe3vF1wOzHFZ3dAxdvPZiD2n1DgHZeubU=;
+        b=vKzoQBSt1weaqDTHZcbDVvitZexnoIlkvDDWG6UQ04h+M0e5OoP234Dh369tQKvHcf
+         XHRZIyelz/ANC0Li3Q972vi72DVlKknC3sUFUiMLi9d0Mu3x5mneBQHWGWadysS9YrVZ
+         /6ylPeatZ3wSgUsPom//wCrSvPGEFehhoXwoDXYNngcza3vhUiiCQAe9QD/A55odu+wW
+         GszrEhx2R9m19iPh0akwZE/RRerJ5QOjybmoFeiMPAokkGae15S9q1/yBkkxE9HnnTUN
+         Ph/kHJRIDYDeTdhagRZdQLOv7zaS4NHmPzwfqUMdKBtQFrE7rzlW37gSR39Kger7yMR0
+         wcAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=CK0G9OZ8DCWe3vF1wOzHFZ3dAxdvPZiD2n1DgHZeubU=;
+        b=APWE68hDc4Ld5qVT+Gh/Gm2wHuXylIQbpBfDWelzEr+xOKAcJAQZSFPtFKyuQOgDpT
+         H093G3SlsXqkwx8YKK8u1m84lAM0T3uD+a4sIJgMw7qWUT4ucKpXvx6+2SCCCT8GaBm9
+         CJX6/iAmgrzmJerM0zsWx/AZKkTcWg+zSryClqc//WsmSyWOAruLe6l865+8pX5avFnR
+         +26dlP6IaPtCECvNlSYW0BenmZFxSsOtI9BHJ73imdS1ztPYTn5zwi5pvYKGXYW/pJHT
+         /PPVMfwu3eGArMXuDFzfyOwC7UWm2//xn6P41PipimCFSdu/0pfq3gQ4kfU8GPOao66Z
+         z0Uw==
+X-Gm-Message-State: APjAAAUMMn24zNkilD5ohW8ygf025p/N+ozEgH7OJzdoXXCN9129Xsir
+        RpCV5+DRElFpKuahGIJyTg8Hf2E8s77NM0aGyts=
+X-Google-Smtp-Source: APXvYqyY3GI0IPQwU5ZZloMHbZqaSJqEZ3fz6zE8Z3sh+orn2QGkQewP7GJkUz9eaMTDfDwA/0utBMnIc42E3PVkx5w=
+X-Received: by 2002:a0d:d853:: with SMTP id a80mr25949702ywe.426.1562212731962;
+ Wed, 03 Jul 2019 20:58:51 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5b06d3b-d514-47fd-db3d-08d70014a5ea
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jul 2019 00:14:57.7313
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4485
+References: <000000000000665152058c0d7ed9@google.com> <20190702060030.GD27702@sol.localdomain>
+In-Reply-To: <20190702060030.GD27702@sol.localdomain>
+From:   JackieLiu <jackieliu2113@gmail.com>
+Date:   Thu, 4 Jul 2019 11:58:40 +0800
+Message-ID: <CAPV7t-2jOgUs-LxiQYxqp_h8RH7X-CxxMcLL2SzOk1kEyc55Ug@mail.gmail.com>
+Subject: Re: INFO: task hung in io_uring_release
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        syzbot <syzbot+94324416c485d422fe15@syzkaller.appspotmail.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/3/19 6:39 AM, Jens Axboe wrote:=0A=
-> We should let normal branch prediction handle this. What if you=0A=
-> are running a pure discard workload?=0A=
-=0A=
-Hmm, I'm wasn't aware of such workload especially for null_blk where=0A=
-disacard=0A=
-=0A=
-is being used with memory back-end, I'll keep in mind from next time.=0A=
-=0A=
-> In general I'm not a huge fan of likely/unlikely annotations,=0A=
-> they only tend to make sense when it's an unlikely() for an=0A=
-> error case, not for something that could potentially be quite=0A=
-> the opposite of an unlikely case.=0A=
-=0A=
-Make sense to drop this patch and future such usage of likely()/unlikely()=
-=0A=
-=0A=
-usage. Thanks for the clarification.=0A=
-=0A=
->=0A=
-> -- Jens Axboe=0A=
-=0A=
-=0A=
+Hello Eric Biggers
+
+I have reproduced this problem and are looking for a solution. maybe
+just use kthread_unpark to replace kthread_stop in io_uring_release
+function.
+
+---
+Jackie Liu
+
+Eric Biggers <ebiggers@kernel.org> =E4=BA=8E2019=E5=B9=B47=E6=9C=882=E6=97=
+=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=882:01=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Jens, any idea about this?
+>
+> On Mon, Jun 24, 2019 at 01:21:06AM -0700, syzbot wrote:
+> > Hello,
+> >
+> > syzbot found the following crash on:
+> >
+> > HEAD commit:    bed3c0d8 Merge tag 'for-5.2-rc5-tag' of git://git.kerne=
+l.o..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D1418bf0aa00=
+000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D28ec3437a53=
+94ee0
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=3D94324416c485d=
+422fe15
+> > compiler:       clang version 9.0.0 (/home/glider/llvm/clang
+> > 80fee25776c2fb61e74c1ecb1a523375c2500b69)
+> >
+> > Unfortunately, I don't have any reproducer for this crash yet.
+> >
+> > IMPORTANT: if you fix the bug, please add the following tag to the comm=
+it:
+> > Reported-by: syzbot+94324416c485d422fe15@syzkaller.appspotmail.com
+> >
+> > INFO: task syz-executor.5:8634 blocked for more than 143 seconds.
+> >       Not tainted 5.2.0-rc5+ #3
+> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
+e.
+> > syz-executor.5  D25632  8634   8224 0x00004004
+> > Call Trace:
+> >  context_switch kernel/sched/core.c:2818 [inline]
+> >  __schedule+0x658/0x9e0 kernel/sched/core.c:3445
+> >  schedule+0x131/0x1d0 kernel/sched/core.c:3509
+> >  schedule_timeout+0x9a/0x2b0 kernel/time/timer.c:1783
+> >  do_wait_for_common+0x35e/0x5a0 kernel/sched/completion.c:83
+> >  __wait_for_common kernel/sched/completion.c:104 [inline]
+> >  wait_for_common kernel/sched/completion.c:115 [inline]
+> >  wait_for_completion+0x47/0x60 kernel/sched/completion.c:136
+> >  kthread_stop+0xb4/0x150 kernel/kthread.c:559
+> >  io_sq_thread_stop fs/io_uring.c:2252 [inline]
+> >  io_finish_async fs/io_uring.c:2259 [inline]
+> >  io_ring_ctx_free fs/io_uring.c:2770 [inline]
+> >  io_ring_ctx_wait_and_kill+0x268/0x880 fs/io_uring.c:2834
+> >  io_uring_release+0x5d/0x70 fs/io_uring.c:2842
+> >  __fput+0x2e4/0x740 fs/file_table.c:280
+> >  ____fput+0x15/0x20 fs/file_table.c:313
+> >  task_work_run+0x17e/0x1b0 kernel/task_work.c:113
+> >  tracehook_notify_resume include/linux/tracehook.h:185 [inline]
+> >  exit_to_usermode_loop arch/x86/entry/common.c:168 [inline]
+> >  prepare_exit_to_usermode+0x402/0x4f0 arch/x86/entry/common.c:199
+> >  syscall_return_slowpath+0x110/0x440 arch/x86/entry/common.c:279
+> >  do_syscall_64+0x126/0x140 arch/x86/entry/common.c:304
+> >  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> > RIP: 0033:0x412fb1
+> > Code: 80 3b 7c 0f 84 c7 02 00 00 c7 85 d0 00 00 00 00 00 00 00 48 8b 05=
+ cf
+> > a6 24 00 49 8b 14 24 41 b9 cb 2a 44 00 48 89 ee 48 89 df <48> 85 c0 4c =
+0f 45
+> > c8 45 31 c0 31 c9 e8 0e 5b 00 00 85 c0 41 89 c7
+> > RSP: 002b:00007ffe7ee6a180 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
+> > RAX: 0000000000000000 RBX: 0000000000000004 RCX: 0000000000412fb1
+> > RDX: 0000001b2d920000 RSI: 0000000000000000 RDI: 0000000000000003
+> > RBP: 0000000000000001 R08: 00000000f3a3e1f8 R09: 00000000f3a3e1fc
+> > R10: 00007ffe7ee6a260 R11: 0000000000000293 R12: 000000000075c9a0
+> > R13: 000000000075c9a0 R14: 0000000000024c00 R15: 000000000075bf2c
+> >
+> > Showing all locks held in the system:
+> > 1 lock held by khungtaskd/1043:
+> >  #0: 00000000ec789630 (rcu_read_lock){....}, at: rcu_lock_acquire+0x4/0=
+x30
+> > include/linux/rcupdate.h:207
+> > 1 lock held by rsyslogd/8054:
+> >  #0: 00000000a1730567 (&f->f_pos_lock){+.+.}, at: __fdget_pos+0x243/0x2=
+e0
+> > fs/file.c:801
+> > 2 locks held by getty/8167:
+> >  #0: 000000000d85b796 (&tty->ldisc_sem){++++}, at:
+> > tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:272
+> >  #1: 000000006ecd2335 (&ldata->atomic_read_lock){+.+.}, at:
+> > n_tty_read+0x2ee/0x1c80 drivers/tty/n_tty.c:2156
+> > 2 locks held by getty/8168:
+> >  #0: 000000005c58bd1f (&tty->ldisc_sem){++++}, at:
+> > tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:272
+> >  #1: 00000000158ead38 (&ldata->atomic_read_lock){+.+.}, at:
+> > n_tty_read+0x2ee/0x1c80 drivers/tty/n_tty.c:2156
+> > 2 locks held by getty/8169:
+> >  #0: 000000003d373884 (&tty->ldisc_sem){++++}, at:
+> > tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:272
+> >  #1: 0000000026014169 (&ldata->atomic_read_lock){+.+.}, at:
+> > n_tty_read+0x2ee/0x1c80 drivers/tty/n_tty.c:2156
+> > 2 locks held by getty/8170:
+> >  #0: 00000000ba3eabbd (&tty->ldisc_sem){++++}, at:
+> > tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:272
+> >  #1: 0000000003284ce2 (&ldata->atomic_read_lock){+.+.}, at:
+> > n_tty_read+0x2ee/0x1c80 drivers/tty/n_tty.c:2156
+> > 2 locks held by getty/8171:
+> >  #0: 000000009fcb2c0e (&tty->ldisc_sem){++++}, at:
+> > tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:272
+> >  #1: 00000000ac5d0da7 (&ldata->atomic_read_lock){+.+.}, at:
+> > n_tty_read+0x2ee/0x1c80 drivers/tty/n_tty.c:2156
+> > 2 locks held by getty/8172:
+> >  #0: 000000003f4e772c (&tty->ldisc_sem){++++}, at:
+> > tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:272
+> >  #1: 000000000c930b31 (&ldata->atomic_read_lock){+.+.}, at:
+> > n_tty_read+0x2ee/0x1c80 drivers/tty/n_tty.c:2156
+> > 2 locks held by getty/8173:
+> >  #0: 000000002a3615cf (&tty->ldisc_sem){++++}, at:
+> > tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:272
+> >  #1: 00000000dd5c3618 (&ldata->atomic_read_lock){+.+.}, at:
+> > n_tty_read+0x2ee/0x1c80 drivers/tty/n_tty.c:2156
+> >
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > NMI backtrace for cpu 0
+> > CPU: 0 PID: 1043 Comm: khungtaskd Not tainted 5.2.0-rc5+ #3
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> > Google 01/01/2011
+> > Call Trace:
+> >  __dump_stack lib/dump_stack.c:77 [inline]
+> >  dump_stack+0x1d8/0x2f8 lib/dump_stack.c:113
+> >  nmi_cpu_backtrace+0x89/0x160 lib/nmi_backtrace.c:101
+> >  nmi_trigger_cpumask_backtrace+0x125/0x230 lib/nmi_backtrace.c:62
+> >  arch_trigger_cpumask_backtrace+0x10/0x20 arch/x86/kernel/apic/hw_nmi.c=
+:38
+> >  trigger_all_cpu_backtrace+0x17/0x20 include/linux/nmi.h:146
+> >  check_hung_uninterruptible_tasks kernel/hung_task.c:205 [inline]
+> >  watchdog+0xbb9/0xbd0 kernel/hung_task.c:289
+> >  kthread+0x325/0x350 kernel/kthread.c:255
+> >  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+> > Sending NMI from CPU 0 to CPUs 1:
+> > NMI backtrace for cpu 1
+> > CPU: 1 PID: 2546 Comm: kworker/u4:4 Not tainted 5.2.0-rc5+ #3
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> > Google 01/01/2011
+> > Workqueue: bat_events batadv_nc_worker
+> > RIP: 0010:__read_once_size include/linux/compiler.h:194 [inline]
+> > RIP: 0010:arch_atomic_read arch/x86/include/asm/atomic.h:31 [inline]
+> > RIP: 0010:atomic_read include/asm-generic/atomic-instrumented.h:27 [inl=
+ine]
+> > RIP: 0010:rcu_dynticks_curr_cpu_in_eqs kernel/rcu/tree.c:292 [inline]
+> > RIP: 0010:rcu_is_watching+0x62/0xa0 kernel/rcu/tree.c:872
+> > Code: 4c 89 f7 e8 70 50 4c 00 48 c7 c3 b8 5f 03 00 49 03 1e 48 89 df be=
+ 04
+> > 00 00 00 e8 89 25 4c 00 48 89 d8 48 c1 e8 03 42 8a 04 38 <84> c0 75 1e =
+8b 03
+> > 65 ff 0d 5d 72 9f 7e 74 0c 83 e0 02 d1 e8 5b 41
+> > RSP: 0018:ffff8880a10ffbe8 EFLAGS: 00000a02
+> > RAX: 1ffff11015d66b00 RBX: ffff8880aeb35fb8 RCX: ffffffff81628ad7
+> > RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff8880aeb35fb8
+> > RBP: ffff8880a10ffc00 R08: dffffc0000000000 R09: ffffed1015d66bf8
+> > R10: ffffed1015d66bf8 R11: 1ffff11015d66bf7 R12: dffffc0000000000
+> > R13: ffff8880a93c9b00 R14: ffffffff8881f258 R15: dffffc0000000000
+> > FS:  0000000000000000(0000) GS:ffff8880aeb00000(0000) knlGS:00000000000=
+00000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 000000c434bbb720 CR3: 000000008e6fa000 CR4: 00000000001406e0
+> > Call Trace:
+> >  rcu_read_lock include/linux/rcupdate.h:594 [inline]
+> >  batadv_nc_purge_orig_hash net/batman-adv/network-coding.c:407 [inline]
+> >  batadv_nc_worker+0x115/0x600 net/batman-adv/network-coding.c:718
+> >  process_one_work+0x814/0x1130 kernel/workqueue.c:2269
+> >  worker_thread+0xc01/0x1640 kernel/workqueue.c:2415
+> >  kthread+0x325/0x350 kernel/kthread.c:255
+> >  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+> >
+> >
+> > ---
+> > This bug is generated by a bot. It may contain errors.
+> > See https://goo.gl/tpsmEJ for more information about syzbot.
+> > syzbot engineers can be reached at syzkaller@googlegroups.com.
+> >
+> > syzbot will keep track of this bug report. See:
+> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
