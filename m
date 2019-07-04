@@ -2,189 +2,79 @@ Return-Path: <SRS0=Oz6T=VB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71CF2C06513
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 11:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E28EEC0651F
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 16:04:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38F3F218A0
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 11:27:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=acronis.com header.i=@acronis.com header.b="KP6WW9YU"
+	by mail.kernel.org (Postfix) with ESMTP id BA5492085A
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 16:04:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727577AbfGDL1U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Jul 2019 07:27:20 -0400
-Received: from us-edge-1.acronis.com ([69.20.59.99]:54032 "EHLO
-        us-edge-1.acronis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727558AbfGDL1U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jul 2019 07:27:20 -0400
-X-Greylist: delayed 304 seconds by postgrey-1.27 at vger.kernel.org; Thu, 04 Jul 2019 07:27:18 EDT
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=acronis.com
-        ; s=exim; h=MIME-Version:Content-Transfer-Encoding:Content-Type:Message-ID:
-        Date:Subject:CC:To:From:Sender:Reply-To:Content-ID:Content-Description:
-        Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-        In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=ebLt+rgN7+eRdUOrhQJKd9HTr215QAx3NpL4JVnj+J8=; b=KP6WW9YUufMfCC1ywYXDnLOq3q
-        fgNT8E2lfEOrE/LW2ounRUZwyldYFc+S8LIhlVsQEeZk63EEvq+1dr4ueTA6M6FNBP8T8YaRXnzkX
-        1rYSUkfgcktdNKXfhLp9x2Y4FL8vkGNdqiPq5bM0nkVp3EI5PxQSZuJ//AStH7K5IgIY=;
-Received: from [91.195.22.121] (helo=ru-ex-2.corp.acronis.com)
-        by us-edge-1.acronis.com with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.92)
-        (envelope-from <Filipp.Mikoian@acronis.com>)
-        id 1hizoO-0001FI-SQ; Thu, 04 Jul 2019 07:22:00 -0400
-Received: from ru-ex-2.corp.acronis.com (10.250.32.21) by
- ru-ex-2.corp.acronis.com (10.250.32.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.1591.10; Thu, 4 Jul 2019 14:21:57 +0300
-Received: from ru-ex-2.corp.acronis.com ([fe80::3163:6934:fc33:4bd3]) by
- ru-ex-2.corp.acronis.com ([fe80::3163:6934:fc33:4bd3%4]) with mapi id
- 15.01.1591.011; Thu, 4 Jul 2019 14:21:57 +0300
-From:   Filipp Mikoian <Filipp.Mikoian@acronis.com>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jmoyer@redhat.com" <jmoyer@redhat.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>
-Subject: io_uring question
-Thread-Topic: io_uring question
-Thread-Index: AQHVMlktc6wBW1EANEu5MaqUCERTlQ==
-Date:   Thu, 4 Jul 2019 11:21:57 +0000
-Message-ID: <76524892f9c048ea88c7d87295ec85ae@acronis.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.250.3.5]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        id S1726038AbfGDQEv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Jul 2019 12:04:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58875 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725865AbfGDQEv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 Jul 2019 12:04:51 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D4784C058CA8;
+        Thu,  4 Jul 2019 16:04:39 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-9.rdu2.redhat.com [10.10.120.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AE1C37D958;
+        Thu,  4 Jul 2019 16:04:26 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20190703190846.GA15663@kroah.com>
+References: <20190703190846.GA15663@kroah.com> <156173690158.15137.3985163001079120218.stgit@warthog.procyon.org.uk> <156173697086.15137.9549379251509621554.stgit@warthog.procyon.org.uk>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     dhowells@redhat.com, viro@zeniv.linux.org.uk,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>, nicolas.dichtel@6wind.com,
+        raven@themaw.net, Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6/9] Add a general, global device notification watch list [ver #5]
 MIME-Version: 1.0
-X-MessageID-Signature: 294ead3f9692afd3605e2efd4a21308e2b740685
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <10294.1562256260.1@warthog.procyon.org.uk>
+Date:   Thu, 04 Jul 2019 17:04:20 +0100
+Message-ID: <10295.1562256260@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 04 Jul 2019 16:04:50 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi dear io_uring developers,
+Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
 
-Recently I started playing with io_uring, and the main difference I expecte=
-d
-to see with old AIO(io_submit(), etc.) was submission syscall(io_uring_ente=
-r())
-not blocking in case submission might take long time, e.g. if waiting for a=
- slot
-in block device request queue is required. AFAIU, 'workers' machinery is us=
-ed
-solely to be able to submit requests in async context, thus not forcing cal=
-ling
-thread to block for a significant time. At worst EAGAIN is expected.
+> Don't we need a manpage and a kselftest for it?
 
-However, when I installed fresh 5.2.0-rc7 kernel on the machine with HDD wi=
-th
-64-requests-deep queue, I noticed significant increase in time spent in
-io_uring_enter() once request queue became full. Below you can find output
-of the program that submits random(in 1GB range) 4K read requests in batche=
-s
-of 32. Though O_DIRECT is used, the same phenomenon is observed when using
-page cache. Source code can be found here:
-https://github.com/Phikimon/io_uring_question
+I've got part of a manpage, but it needs more work.
 
-While analyzing stack dump, I found out that IOCB_NOWAIT flag being set
-does not prevent generic_file_read_iter() from calling blkdev_direct_IO(),
-so thread gets stuck for hundreds of milliseconds. However, I am not a
-Linux kernel expert, so I can not be sure this is actually related to the
-mentioned issue.
+How do you do a kselftest for this when it does nothing unless hardware events
+happen?
 
-Is it actually expected that io_uring would sleep in case there is no slot
-in block device's request queue, or is this a bug of current implementation=
-?
+> > +	u64 id = 0; /* Might want to allow dev# here. */
+> 
+> I don't understand the comment here, what does "dev#" refer to?
 
-root@localhost:~/io_uring# uname -msr
-Linux 5.2.0-rc7 x86_64
-root@localhost:~/io_uring# hdparm -I /dev/sda | grep Model
-Model Number:       Hitachi HTS541075A9E680
-root@localhost:~/io_uring# cat /sys/block/sda/queue/nr_requests
-64
-root@localhost:~/io_uring# ./io_uring_read_blkdev /dev/sda8
-submitted_already =3D   0, submitted_now =3D  32, submit_time =3D     246 u=
-s
-submitted_already =3D  32, submitted_now =3D  32, submit_time =3D     130 u=
-s
-submitted_already =3D  64, submitted_now =3D  32, submit_time =3D  189548 u=
-s
-submitted_already =3D  96, submitted_now =3D  32, submit_time =3D  121542 u=
-s
-submitted_already =3D 128, submitted_now =3D  32, submit_time =3D  128314 u=
-s
-submitted_already =3D 160, submitted_now =3D  32, submit_time =3D  136345 u=
-s
-submitted_already =3D 192, submitted_now =3D  32, submit_time =3D  162320 u=
-s
-root@localhost:~/io_uring# cat pstack_output # This is where process slept
-[<0>] io_schedule+0x16/0x40
-[<0>] blk_mq_get_tag+0x166/0x280
-[<0>] blk_mq_get_request+0xde/0x380
-[<0>] blk_mq_make_request+0x11e/0x5b0
-[<0>] generic_make_request+0x191/0x3c0
-[<0>] submit_bio+0x75/0x140
-[<0>] blkdev_direct_IO+0x3f8/0x4a0
-[<0>] generic_file_read_iter+0xbf/0xdc0
-[<0>] blkdev_read_iter+0x37/0x40
-[<0>] io_read+0xf6/0x180
-[<0>] __io_submit_sqe+0x1cd/0x6a0
-[<0>] io_submit_sqe+0xea/0x4b0
-[<0>] io_ring_submit+0x86/0x120
-[<0>] __x64_sys_io_uring_enter+0x241/0x2d0
-[<0>] do_syscall_64+0x60/0x1a0
-[<0>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-[<0>] 0xffffffffffffffff
+This is really for mount subtree watches, so I'm removing it for now.
 
-P.S. There are also several suspicious places in liburing and io_uring's ke=
-rnel
-     part. I'm not sure if these are really bugs, so please point out if an=
-y of
-     them needs a fixing patch. Among them:
-1. Inaccurate handling of errors in liburing/__io_uring_submit(). Because
-   liburing currently does not care about queue head that kernel sets, it c=
-annot
-   know how many entries have been actually consumed. In case e.g.
-   io_uring_enter() returns EAGAIN, and consumes none of the sqes, sq->sqe_=
-head
-   still advances in __io_uring_submit(), this can eventually cause both
-   io_uring_submit() and io_uring_sqe() return 0 forever.
-2. There is also a related issue -- when using IORING_SETUP_SQPOLL, in case
-   polling kernel thread already went to sleep(IORING_SQ_NEED_WAKEUP is set=
-),
-   io_uring_enter() just wakes it up and immediately reports all @to_submit
-   requests are consumed, while this is not true until awaken thread will m=
-anage
-   to handle them. At least this contradicts with man page, which states:
-   > When the system call returns that a certain amount of SQEs have been
-   > consumed and submitted, it's safe to reuse SQE entries in the ring.
-   It is easy to reproduce this bug -- just change e.g. ->offset field in t=
-he
-   SQE immediately after io_uring_enter() successfully returns and you will=
- see
-   that IO happened on new offset.
-3. Again due to lack of synchronization between io_sq_thread() and
-   io_uring_enter(), in case the ring is full and IORING_SETUP_SQPOLL is us=
-ed,
-   it seems there is no other way for application to wait for slots in SQ t=
-o
-   become available but busy waiting for *sq->khead to advance. Thus from o=
-ne
-   busy waiting thread we get two. Is this the expected behavior? Should th=
-e
-   user of IORING_SETUP_SQPOLL busy wait for slots in SQ?
-4. Minor one: in case sq_thread_idle is set to ridiculously big value(e.g. =
-100
-   sec), kernel watchdog starts reporting this as a bug.
-   > Message from syslogd@centos-linux at Jun 21 20:00:04 ...
-   >  kernel:watchdog: BUG: soft lockup - CPU#0 stuck for 21s! [io_uring-sq=
-:10691]
+The reason it's there is because a mount object may have multiple watches, but
+each watch is set on a dentry within that mount, and it doesn't have to be the
+same dentry each time.  The queue is shared between all the dentries, and the
+ID is used (a) to label them so that they can be manually removed, (b) to
+match them to each dentry when the notification is being propagated rootwards
+along the tree and (c) to avoid adding another field to struct dentry.
 
-Looking forward to your reply and thank you in advance.=
+David
