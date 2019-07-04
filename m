@@ -1,106 +1,127 @@
-Return-Path: <SRS0=UuDU=VA=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Oz6T=VB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E65E3C0650E
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 20:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 109B8C5B578
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 00:15:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C196221882
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jul 2019 20:49:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D00DD218A0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 00:15:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RVClWjoq";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ViGKD7bC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727287AbfGCUts (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jul 2019 16:49:48 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:35665 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727261AbfGCUts (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jul 2019 16:49:48 -0400
-Received: by mail-pf1-f196.google.com with SMTP id u14so656281pfn.2
-        for <linux-block@vger.kernel.org>; Wed, 03 Jul 2019 13:49:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=i0Qt59q0lr75zT5BR3Wr9KLQYkuxO6+SoYwgj4mE+eQ=;
-        b=BVEkegxTkosg4YUALBM05Bdwy4IV7Pa8QVpd2OnNuuZbgcVT0XEJB3+nWKSvl8dsEm
-         HXIGer4/SRP7y9mspwlQxWvbeBit0w0ByodIb364x6Ixd/XjiA718U9zkl2ExU0MSihV
-         0nK4ZjzJvZqxC8asVodfMLM7RwPdTRe3QXUMPWHwahed9sy1/xytxUYNgCRwhxzHPCOo
-         fVcV0VqPWz2DqY1w8EYlKDGUymFE/nVhmBIugsJPox0Qc8epTV68y178iRuVwkqWTnni
-         aaOl5EzN++bPcX6OTX45rAWr0MvmOZEO2M8hGrlpA4nO2Q/mmY1wd+UcQZderU/Pk0as
-         RXvg==
-X-Gm-Message-State: APjAAAV0B8XreY88XXCqXeFAYK1fOWReWaa/wusxfG8ZdewP6Ezcqqt2
-        R62C3ZhXzFm53t0w47Wf3vg=
-X-Google-Smtp-Source: APXvYqyQ5gXZuogNg6VTNbSpb+/YBuj21jqRndRNQPFsS27B9ofd5Mbd3phnfepK5dsthihb856GAw==
-X-Received: by 2002:a17:90a:24ac:: with SMTP id i41mr14904753pje.124.1562186987155;
-        Wed, 03 Jul 2019 13:49:47 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id o12sm2585314pjr.22.2019.07.03.13.49.45
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 03 Jul 2019 13:49:46 -0700 (PDT)
-Subject: Re: [PATCH liburing 2/2] Fix the use of memory barriers
-To:     Roman Penyaev <rpenyaev@suse.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>
-References: <20190701214232.29338-1-bvanassche@acm.org>
- <20190701214232.29338-3-bvanassche@acm.org>
- <5d5931e08e338a8a8edb1e58a33a120e@suse.de>
- <876fa5e3-f050-b95c-a30c-755d1e0430d1@acm.org>
- <723180510314b2928ba97752e5383202@suse.de>
- <0bffbfd9-a57e-857f-4699-856295a11f3a@acm.org>
- <2cd14f5d8cfcc36dec90574ff8a9e8b5@suse.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <77df5484-9737-715a-2cb8-968f02ae6473@acm.org>
-Date:   Wed, 3 Jul 2019 13:49:45 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
-MIME-Version: 1.0
-In-Reply-To: <2cd14f5d8cfcc36dec90574ff8a9e8b5@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        id S1727395AbfGDAPB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jul 2019 20:15:01 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:50325 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727345AbfGDAPB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jul 2019 20:15:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1562199316; x=1593735316;
+  h=from:to:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=UTkRxZq+ySkkM8YY8Sb0Pe9eNRE1wlH7UjxDPwNRoNA=;
+  b=RVClWjoqwuFYKOLSgdLYOLsKWQoop89+FIiwJVkXkySpSNEUPUFndvvm
+   64cIU8ZJu+zUCZmSoNhWPoVO9q1ERyW5Ev/C3GrRvTLeNVnFKig4e4RzY
+   Yw/658sGKDqBDY9a7tcEiPib0eDfP+QancM8RF6y7lprhvG755EqqCQ/F
+   MrXT6jwsD0c6CWJW4E0tHUnh94JOYhs3QoaA17d+NASZTsAYO+r7ovM75
+   me49LKsOoQyg46BGrxyGPmtMM9bZvtkDE/JhjkmCEd5XjeIbOnXed7/cc
+   So1/qXyt53AQ362ydqt+p41Ov2d65COfDgb9JeA0RWBJrpKf4buCHDZYa
+   A==;
+IronPort-SDR: q6STnOzmWQNDTSLd5dU9ALbrki5zsKAdJRHAMngotT7A5zzRov5Cw6cpST+WeP4oKoJ9mKN5et
+ 79ThoZi4WEUQ9QOuiwxAvbsGNxmHboA+PBPVpGP9yldg/aT7sabii/GLAXxTdfXnFB3XP7yY6u
+ b/UZ/1tZ+P/P9N/AIhfJeX7r3aPG1ZKOs8cuWmHm0MgStL+S7QXZVx/a7md42ou0r9fVTIhOn4
+ p/r9DYJ0mGYRYFib18PJ02Qb+hV4KlywctQBptwDc2eCbuQfVkLI6Mbd1K99Is2/18O2hTXANU
+ K4g=
+X-IronPort-AV: E=Sophos;i="5.63,449,1557158400"; 
+   d="scan'208";a="212055038"
+Received: from mail-cys01nam02lp2057.outbound.protection.outlook.com (HELO NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.57])
+  by ob1.hgst.iphmx.com with ESMTP; 04 Jul 2019 08:15:15 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UTkRxZq+ySkkM8YY8Sb0Pe9eNRE1wlH7UjxDPwNRoNA=;
+ b=ViGKD7bCybD6iyIS3Az8mjllsadimOIpcUyvFLAIPjK66ZivxDYy5dG32ROuOrU+/HWooPgDvAKrlL9fAhGtndIyifX2qOYVOjr6bP3TYUADc+gphMScexGeyeHzfph2jf6Ky3ux/BXd+A5pAVVuMAcRXagPRjz/o8PtPJ6LEh4=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
+ BYAPR04MB4485.namprd04.prod.outlook.com (52.135.237.222) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2032.20; Thu, 4 Jul 2019 00:14:57 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::8025:ccea:a0e6:9078]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::8025:ccea:a0e6:9078%5]) with mapi id 15.20.2052.010; Thu, 4 Jul 2019
+ 00:14:57 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] null_blk: add unlikely for REQ_OP_DISACRD handling
+Thread-Topic: [PATCH] null_blk: add unlikely for REQ_OP_DISACRD handling
+Thread-Index: AQHVMIUbuJn4kztvYk2XiiEoPdjo8Q==
+Date:   Thu, 4 Jul 2019 00:14:57 +0000
+Message-ID: <BYAPR04MB574988931BE197AB00EDAA4E86FA0@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20190702032027.24066-1-chaitanya.kulkarni@wdc.com>
+ <0760ecc6-feef-16b0-dc45-1e86c3b3d09e@kernel.dk>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [2605:e000:3e45:f500:b8d2:4d45:f4cb:6e09]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d5b06d3b-d514-47fd-db3d-08d70014a5ea
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4485;
+x-ms-traffictypediagnostic: BYAPR04MB4485:
+x-microsoft-antispam-prvs: <BYAPR04MB448592BC0089438B56D2C7F186FA0@BYAPR04MB4485.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 0088C92887
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(346002)(39860400002)(376002)(136003)(366004)(51914003)(189003)(199004)(66946007)(64756008)(66556008)(66446008)(66476007)(72206003)(6246003)(316002)(81156014)(53936002)(446003)(8676002)(86362001)(52536014)(25786009)(478600001)(476003)(73956011)(486006)(76116006)(55016002)(81166006)(14454004)(71190400001)(71200400001)(76176011)(256004)(6506007)(74316002)(6436002)(9686003)(4744005)(229853002)(7696005)(2501003)(186003)(53546011)(5660300002)(102836004)(110136005)(8936002)(68736007)(33656002)(99286004)(46003)(2906002)(305945005)(6116002)(7736002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4485;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: ZQlo0HyojnnBuV8qiEQPSH+mpciE62D3uQyNUlUEqrxF8hkxem/0lQmNtZOk3nAYrobXut5tthCbVzWL0GzOXcj+m4rni/kP+GBe2pA2crTBSFr+vDGvftv6DloAUtRS3DzECupfLNGWARQCe3c4VlEtuiPznqkj9Kz6sf6z9aJJ3Mz9o7MsSMLgsHlB3MB6SZaxbj36SjmUrOrQjN5abcfzwKMJ3I/jGOe2/R4yLkz2a1mU9gb73Z4342LJAHGjmuT22SStZKndVz+emtwbNORPY6DImWGUoptrI+HREhoPYNEIQfnRpGlsUYlHhN4mGJe8I8cXCqPr3AOsX77cBisBz//QdrW4dCPfM0ODNNXbugvqHXvCQDpbcdGZrWVCFvMySgyYXd7DR3n2U3ZSc6yMyTm3QOV3UtmRvX5lV5k=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5b06d3b-d514-47fd-db3d-08d70014a5ea
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jul 2019 00:14:57.7313
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4485
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/3/19 2:49 AM, Roman Penyaev wrote:
-> It seems you took the chunk of the code with macros from
-> tools/arch/x86/include/asm/barrier.h, where indeed smp_store_release
-> and smp_load_acquire are defined only for x86-64.  If I am not mistaken
-> kernel defines both __smp_store_release / __smp_load_acquire equally
-> for x86 memory model in arch/x86/include/asm/barrier.h.
-
-Agreed.
-
->> Since there are 32-bit x86 CPUs that can reorder loads and stores
-> 
-> Only "loads may be reordered with earlier stores"
-> (Intel® 64 and IA-32 Architectures, section 8.2.3.4), but "stores are not
-> reordered with earlier loads" (section 8.2.3.3), so smp_store_release and
-> and smp_load_acquire can be relaxed.
-
-Certain IA-32 CPUs do not follow that model. From Linux kernel v4.15:
-
-config X86_PPRO_FENCE
-    bool "PentiumPro memory ordering errata workaround"
-    depends on M686 || M586MMX || M586TSC || M586 || M486 || MGEODEGX1
-    ---help---
-    Old PentiumPro multiprocessor systems had errata that could cause
-    memory operations to violate the x86 ordering standard in rare cases.
-    Enabling this option will attempt to work around some (but not all)
-    occurrences of this problem, at the cost of much heavier spinlock and
-    memory barrier operations.
-
-    If unsure, say n here. Even distro kernels should think twice before
-    enabling this: there are few systems, and an unlikely bug.
-
-Since support for these CPUs has been removed from the Linux kernel it's 
-probably fine not to worry about these CPUs in liburing either. See also 
-commit 5927145efd5d ("x86/cpu: Remove the CONFIG_X86_PPRO_FENCE=y 
-quirk") # v4.16.
-
-Bart.
+On 7/3/19 6:39 AM, Jens Axboe wrote:=0A=
+> We should let normal branch prediction handle this. What if you=0A=
+> are running a pure discard workload?=0A=
+=0A=
+Hmm, I'm wasn't aware of such workload especially for null_blk where=0A=
+disacard=0A=
+=0A=
+is being used with memory back-end, I'll keep in mind from next time.=0A=
+=0A=
+> In general I'm not a huge fan of likely/unlikely annotations,=0A=
+> they only tend to make sense when it's an unlikely() for an=0A=
+> error case, not for something that could potentially be quite=0A=
+> the opposite of an unlikely case.=0A=
+=0A=
+Make sense to drop this patch and future such usage of likely()/unlikely()=
+=0A=
+=0A=
+usage. Thanks for the clarification.=0A=
+=0A=
+>=0A=
+> -- Jens Axboe=0A=
+=0A=
+=0A=
