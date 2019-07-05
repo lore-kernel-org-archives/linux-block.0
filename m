@@ -1,80 +1,83 @@
-Return-Path: <SRS0=Oz6T=VB=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Wa/x=VC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E28EEC0651F
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 16:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BB5C5B57D
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jul 2019 05:17:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA5492085A
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jul 2019 16:04:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CD85218A0
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jul 2019 05:17:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1562303860;
+	bh=7wlnbU7f7NI4tp/aNkJpCkcXuqZ5WwcXUMv6L1ELc9A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=sTg7nO6jmJ7wBxKwpATnalSBfrl4f9Gat8cmFomsF0O1CW4x/6sy+mIW+knmUQnK6
+	 CydCDWoLKk3mwWrYIcrLtvmBgkddL4Lmd4eUcBWNavaoq3x+cGN91EGGqtbhfamaGd
+	 /Kv2vuY+MkRNTFv6iY/HtdJhvi0xEU16uGttDhcA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726038AbfGDQEv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Jul 2019 12:04:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58875 "EHLO mx1.redhat.com"
+        id S1725827AbfGEFRj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Jul 2019 01:17:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56860 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725865AbfGDQEv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 4 Jul 2019 12:04:51 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1725681AbfGEFRi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Jul 2019 01:17:38 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D4784C058CA8;
-        Thu,  4 Jul 2019 16:04:39 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-9.rdu2.redhat.com [10.10.120.9])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AE1C37D958;
-        Thu,  4 Jul 2019 16:04:26 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20190703190846.GA15663@kroah.com>
-References: <20190703190846.GA15663@kroah.com> <156173690158.15137.3985163001079120218.stgit@warthog.procyon.org.uk> <156173697086.15137.9549379251509621554.stgit@warthog.procyon.org.uk>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     dhowells@redhat.com, viro@zeniv.linux.org.uk,
-        Casey Schaufler <casey@schaufler-ca.com>,
+        by mail.kernel.org (Postfix) with ESMTPSA id DF97D216FD;
+        Fri,  5 Jul 2019 05:17:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1562303857;
+        bh=7wlnbU7f7NI4tp/aNkJpCkcXuqZ5WwcXUMv6L1ELc9A=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ugFyFfFKxNGYgqcsh/MHx4NXJCIKEN54oVlmcVYIMOOV+VWzrlEZvmbebID8zJ5bL
+         eqmwYQmbvOmjFYhkaVSALkugyKBmfb1VfnBe27/tme7AWsfKHTvt939Fp5y9LAsG40
+         T1T2qcyfsYKp8T79H0xukTrXjRdyvTpc+Fm0NASY=
+Date:   Fri, 5 Jul 2019 07:17:33 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     viro@zeniv.linux.org.uk, Casey Schaufler <casey@schaufler-ca.com>,
         Stephen Smalley <sds@tycho.nsa.gov>, nicolas.dichtel@6wind.com,
         raven@themaw.net, Christian Brauner <christian@brauner.io>,
         keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
         linux-security-module@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/9] Add a general, global device notification watch list [ver #5]
+Subject: Re: [PATCH 6/9] Add a general, global device notification watch list
+ [ver #5]
+Message-ID: <20190705051733.GA15821@kroah.com>
+References: <20190703190846.GA15663@kroah.com>
+ <156173690158.15137.3985163001079120218.stgit@warthog.procyon.org.uk>
+ <156173697086.15137.9549379251509621554.stgit@warthog.procyon.org.uk>
+ <10295.1562256260@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <10294.1562256260.1@warthog.procyon.org.uk>
-Date:   Thu, 04 Jul 2019 17:04:20 +0100
-Message-ID: <10295.1562256260@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 04 Jul 2019 16:04:50 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <10295.1562256260@warthog.procyon.org.uk>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
-
-> Don't we need a manpage and a kselftest for it?
-
-I've got part of a manpage, but it needs more work.
-
-How do you do a kselftest for this when it does nothing unless hardware events
-happen?
-
-> > +	u64 id = 0; /* Might want to allow dev# here. */
+On Thu, Jul 04, 2019 at 05:04:20PM +0100, David Howells wrote:
+> Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
 > 
-> I don't understand the comment here, what does "dev#" refer to?
+> > Don't we need a manpage and a kselftest for it?
+> 
+> I've got part of a manpage, but it needs more work.
+> 
+> How do you do a kselftest for this when it does nothing unless hardware events
+> happen?
 
-This is really for mount subtree watches, so I'm removing it for now.
+Hm, good point, but there should be some way to test this to verify it
+works.  Maybe for the other types of events?
 
-The reason it's there is because a mount object may have multiple watches, but
-each watch is set on a dentry within that mount, and it doesn't have to be the
-same dentry each time.  The queue is shared between all the dentries, and the
-ID is used (a) to label them so that they can be manually removed, (b) to
-match them to each dentry when the notification is being propagated rootwards
-along the tree and (c) to avoid adding another field to struct dentry.
+thanks,
 
-David
+greg k-h
