@@ -2,84 +2,99 @@ Return-Path: <SRS0=GXCF=VD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29891C48BDA
-	for <linux-block@archiver.kernel.org>; Sat,  6 Jul 2019 16:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 643A8C48BD5
+	for <linux-block@archiver.kernel.org>; Sat,  6 Jul 2019 17:59:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E924420856
-	for <linux-block@archiver.kernel.org>; Sat,  6 Jul 2019 16:51:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1562431864;
-	bh=03VXPoBGTEudhnVcaNxaOVX1cfv+o2GmUaqaEjZx+50=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=2IGhzlU8QcLpzZHrrZ/5Z6EeO75x6JxTrN0siRMGMz7xu4tl35U2s4Dy7Dwt4hmUI
-	 cTtEexTH1UXo/zDkzR6qjL4SLXQ0pUPO1/USYgC+UBYgEIL25YJQPEHGYZ3UwlZ4AZ
-	 CbIYPgyasro2lMAyjRC3NtOimp97abygd721FOXM=
+	by mail.kernel.org (Postfix) with ESMTP id 421F020838
+	for <linux-block@archiver.kernel.org>; Sat,  6 Jul 2019 17:59:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qLvECEom"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726712AbfGFQvD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 6 Jul 2019 12:51:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58190 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726702AbfGFQvD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 6 Jul 2019 12:51:03 -0400
-Received: from localhost (unknown [62.119.166.9])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2853320836;
-        Sat,  6 Jul 2019 16:51:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562431862;
-        bh=03VXPoBGTEudhnVcaNxaOVX1cfv+o2GmUaqaEjZx+50=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ingCHlRr0ouEaWbvT2OAbv4fmZiMg8QNjH2L9FhoMGSqugRHJmIARkHwSKyL33kre
-         vPXZUXBONySfsLLpPPfpnN15DFDgsLpD/PxSpt7+T0/WNYTSfFCb7DJmeg0AZQRV7h
-         b4fIS0eHgwXqi8X/UCTjOCyn5Zu5J56nsunnQ4Gg=
-Date:   Sat, 6 Jul 2019 18:50:44 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable <stable@vger.kernel.org>
-Subject: Re: [PATCH] blk-mq: fix up placement of debugfs directory of queue
- files
-Message-ID: <20190706165044.GA18886@kroah.com>
-References: <20190706155032.GA3106@kroah.com>
- <a4e28385-6f87-05f5-edb2-d68446771b7c@kernel.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a4e28385-6f87-05f5-edb2-d68446771b7c@kernel.dk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+        id S1726877AbfGFR7S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 6 Jul 2019 13:59:18 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:42371 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726743AbfGFR7S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Jul 2019 13:59:18 -0400
+Received: by mail-pg1-f194.google.com with SMTP id t132so5625056pgb.9;
+        Sat, 06 Jul 2019 10:59:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=2cGuSYY6mbXznH1xjP8nBUhy/VF4nuf7EL6OSy18Q/4=;
+        b=qLvECEomhGFfCpbOlv758hJ9GpqNuJUBJkFum2+A+iQA+QKjunUINdzv7aKGAC/D/p
+         gw5q1zEzKTETCJSe1DwXe9rXGxhyQl1ZerxmM0D4wMRBZh7I+V4jROrwA9yUg0gSDJma
+         KMIsDT02ojOEw3anix4ZFQZ0QmI3c5qyvaZODpLhuODO1bDFhUA6eMPevM5i2PjIRxgQ
+         +XbfyeLA7mZeqBcYiRkDztdsTLoX5y8ll6JTDxsPZP1ACxXzQciK5i6qNc3ZBOmJZ//D
+         McuQQfGKES6yR50oEHGK8BCtjIiZz6Um7Ph1VF6QEAqloUlOIcSSdjdt+Ilm2ZY4ZpF/
+         fwuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=2cGuSYY6mbXznH1xjP8nBUhy/VF4nuf7EL6OSy18Q/4=;
+        b=TpUCvdv+N1cRJR5KVYuCNziZdMCeamxbJHTgR++aUkMm2gq/jgFu64s7bu7ZKIYx5D
+         56yc3pNUY5UjICMhcNhxEMUPaGahKVF5OgSzYITGeIK7mhwK6U+wknVVMDKi60ZxE+cP
+         wMPMC++LEUA0JN/xzppo+zg2McjVeEKUmP4B9DXa6Sk4L9NfPFlTK5Qcl8NMe7b7Zb5d
+         t42awZ8aD4DtA2cW6rWeuOoxUSCp61imh89Rfi7KlSdIuYIBFOpjbFLQqhpT6Od9cQOo
+         hBizVm6+IDrcxee41MVdZum8zMrwetGWl1yQDaea8dYF2iyB1cMT2pUjtwOwS+txJ8Nf
+         IxPA==
+X-Gm-Message-State: APjAAAWy4ji9yZAng6QgukrSpiZxLhT/zeO+q9ovq5CLKPpJHuJWQZEz
+        QmgYltBN56f9tuQBdwEAKFQjkBVj
+X-Google-Smtp-Source: APXvYqwj1B2Y8tzvvWy8bVp8gUwudON4bJIp+MSF+TSzRtLMKVVGJttTBuIMekkDXP9fRgsguKxI1Q==
+X-Received: by 2002:a17:90a:fa07:: with SMTP id cm7mr13023090pjb.115.1562435957625;
+        Sat, 06 Jul 2019 10:59:17 -0700 (PDT)
+Received: from localhost.localdomain ([240f:34:212d:1:368e:e048:68f1:84e7])
+        by smtp.gmail.com with ESMTPSA id h6sm11967528pfn.79.2019.07.06.10.59.14
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Sat, 06 Jul 2019 10:59:16 -0700 (PDT)
+From:   Akinobu Mita <akinobu.mita@gmail.com>
+To:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Cc:     Akinobu Mita <akinobu.mita@gmail.com>,
+        Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>,
+        Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+        Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 0/2] introduce LED block device activity trigger
+Date:   Sun,  7 Jul 2019 02:58:57 +0900
+Message-Id: <1562435939-15466-1-git-send-email-akinobu.mita@gmail.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 06, 2019 at 10:07:14AM -0600, Jens Axboe wrote:
-> On 7/6/19 9:50 AM, Greg Kroah-Hartman wrote:
-> > When the blk-mq debugfs file creation logic was "cleaned up" it was
-> > cleaned up too much, causing the queue file to not be created in the
-> > correct location.  Turns out the check for the directory being present
-> > is needed as if that has not happened yet, the files should not be
-> > created, and the function will be called later on in the initialization
-> > code so that the files can be created in the correct location.
-> 
-> How about we shove this in for 5.2 final? Trivial enough to do, and it
-> would suck to have 5.2 released with this.
+This work is inspired by the recent report on linux-nvme mailing list.
 
-Sure, no objection from me!
+disk-activity trigger not working for nvme disk:
+http://lists.infradead.org/pipermail/linux-nvme/2019-July/025253.html
 
-> Though not sure what devices this actually impacts, I haven't noticed
-> anything awry on my setups?
+This LED block device activity trigger works with any block devices.
 
-I can easily trigger this with loop devices.  I know Stephen reported
-this and I don't know if that was the driver that caused it for him.  I
-have also seen this happen in syzbot boot logs already, but again, don't
-know what block devices they are using that causes this.
+Akinobu Mita (2):
+  leds: move declaration of led_stop_software_blink() to linux/leds.h
+  block: introduce LED block device activity trigger
 
-thanks,
+ block/Makefile        |   1 +
+ block/blk-ledtrig.c   | 219 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/blk.h           |  13 +++
+ block/genhd.c         |   2 +
+ drivers/leds/leds.h   |   1 -
+ include/linux/genhd.h |   4 +
+ include/linux/leds.h  |   2 +
+ 7 files changed, 241 insertions(+), 1 deletion(-)
+ create mode 100644 block/blk-ledtrig.c
 
-greg k-h
+Cc: Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>
+Cc: Jacek Anaszewski <jacek.anaszewski@gmail.com>
+Cc: Pavel Machek <pavel@ucw.cz>
+Cc: Dan Murphy <dmurphy@ti.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+-- 
+2.7.4
+
