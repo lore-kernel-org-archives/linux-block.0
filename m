@@ -1,107 +1,95 @@
-Return-Path: <SRS0=Wa/x=VC=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=GXCF=VD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B46F7C46499
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jul 2019 21:14:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CDB7C0650E
+	for <linux-block@archiver.kernel.org>; Sat,  6 Jul 2019 15:50:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8893E20449
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jul 2019 21:14:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AVLZNY7H"
+	by mail.kernel.org (Postfix) with ESMTP id E460920989
+	for <linux-block@archiver.kernel.org>; Sat,  6 Jul 2019 15:50:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1562428247;
+	bh=DoMosQyj+D2mjOogflP8YGGJ6A9R8/xlAkdk2iL0qLk=;
+	h=Date:From:To:Cc:Subject:List-ID:From;
+	b=SEoy7IZ7v4bwP9DSwVogSC5uvh+dAheA/9zLXkLP7i9ol3Uxn1Q1tqFbs1ZzmA/q1
+	 4jbyvBjeQ6EXsaf5nCPlCRLi55LBp9AAWZ4Hl4MJe0Mj0Y/Qu6UB4oFd0P7WEntLrp
+	 N+FJfR+33scvvm7ao5RGOwEo67NsLKJVl1Z69NDs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727010AbfGEVOt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Jul 2019 17:14:49 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:38667 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725813AbfGEVOt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jul 2019 17:14:49 -0400
-Received: by mail-pf1-f195.google.com with SMTP id y15so4789235pfn.5
-        for <linux-block@vger.kernel.org>; Fri, 05 Jul 2019 14:14:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=/7sZUFxUANgrKwZaqSwAspZ8SITW9fKQroiR42hBGA4=;
-        b=AVLZNY7HvgtTqG8qSJ8rrlHa6oPWCJbGkOo2mbSBAGR2f037N3nHVrdjVzuX1S3EjU
-         ZQ0sZZzZiuI0eTwfKkwAu/jq5b9Dkt8JOEY7zZO4mw56goXGRJuw326D4ul2HF9s5lV8
-         dMGcw+enhA0P7CfZo4PmKHtSDbz2gwMH3eiuKQMh55jEFwBAHg58IfM2LqDIx/w4F17T
-         wrXqlFBgLUc41rP45OXQDJ/RvQe2NsZD4qI32c2Z8j9bdJxpp3noP2NhIdCPARd9XZiA
-         4sRaNU9lQ3TOZxB6YYQLXxGY73v25TbRHPk20KaJKGnn/4sVKjKUGctf1l1G94rdkjBv
-         kBiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/7sZUFxUANgrKwZaqSwAspZ8SITW9fKQroiR42hBGA4=;
-        b=niHuUkI/n/mXv4OpZ3CiGSlUeKtZgH5JTwIsqgT2WD6U4muLlL/7Ah0IihqdleOlDC
-         sVdPE1n3e/ZSkQQyBLAfeNJULjVrEmuT0Y753+eBdBB9SppjCnRzyjkYdLFlJh8qNX8D
-         CCq/Zki39hc+NYFU4bv5cA+R0FrKL/hdCIB1w46OgzN4ic1ANiSFA9lNnkeJVgILdn5P
-         1BmMBe/9U6gyFLk8MYHGE7+a4y4qkOaDnRDeF+EJ+tVYJ6I7dh0oFnpgZvIe+BKyXItE
-         Z67X+lcX31Sw26nyF7LQbXqyB0STagzBwD/TmLinZb3S54keQGw+C8vi7+sqvvHcqWxD
-         eYVg==
-X-Gm-Message-State: APjAAAUG+OQnxfahcg+SXe5zM3Auv2rMwQCO34MpInluP5c0ndjnfUlP
-        3WvAXOcRO87hn1MLlARFo65zrTFIK8eeXw==
-X-Google-Smtp-Source: APXvYqz6BDQH4rK2bc0RJgE080Jy2A3c3I0cjWgbYCmxihXtOHdmNBVtvaFKJmtLBWrjVwyQzuR8gw==
-X-Received: by 2002:a17:90a:c481:: with SMTP id j1mr7869857pjt.96.1562361288894;
-        Fri, 05 Jul 2019 14:14:48 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id 27sm8845789pgt.6.2019.07.05.14.14.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Jul 2019 14:14:48 -0700 (PDT)
-Subject: Re: [PATCH v2] blk-iolatency: fix STS_AGAIN handling
-To:     Dennis Zhou <dennis@kernel.org>, Josef Bacik <josef@toxicpanda.com>
-Cc:     kernel-team@fb.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190705210909.82263-1-dennis@kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <084ad6be-7bef-4cf4-eefc-41359a880f01@kernel.dk>
-Date:   Fri, 5 Jul 2019 15:14:44 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726808AbfGFPuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 6 Jul 2019 11:50:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38638 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726794AbfGFPuq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 6 Jul 2019 11:50:46 -0400
+Received: from localhost (unknown [62.119.166.9])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 123AE20838;
+        Sat,  6 Jul 2019 15:50:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1562428245;
+        bh=DoMosQyj+D2mjOogflP8YGGJ6A9R8/xlAkdk2iL0qLk=;
+        h=Date:From:To:Cc:Subject:From;
+        b=kbjtnzPQNMvZHlhZ/kx7zMACMZ7PPjTCyuSNTZ93unBmycxP/8i7lY0yA/VpfVq9r
+         rgmzBLFZkfc6hpAGJs6Ys68JjkqahB6er5JvH7gooh+lVn78rR6XMmDq7hG27Dt9sk
+         K+Bi4RvnPAtYT3HrHkd0CPHOzRBhi8R5nhs4ZihM=
+Date:   Sat, 6 Jul 2019 17:50:32 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable <stable@vger.kernel.org>
+Subject: [PATCH] blk-mq: fix up placement of debugfs directory of queue files
+Message-ID: <20190706155032.GA3106@kroah.com>
 MIME-Version: 1.0
-In-Reply-To: <20190705210909.82263-1-dennis@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/5/19 3:09 PM, Dennis Zhou wrote:
-> The iolatency controller is based on rq_qos. It increments on
-> rq_qos_throttle() and decrements on either rq_qos_cleanup() or
-> rq_qos_done_bio(). a3fb01ba5af0 fixes the double accounting issue where
-> blk_mq_make_request() may call both rq_qos_cleanup() and
-> rq_qos_done_bio() on REQ_NO_WAIT. So checking STS_AGAIN prevents the
-> double decrement.
-> 
-> The above works upstream as the only way we can get STS_AGAIN is from
-> blk_mq_get_request() failing. The STS_AGAIN handling isn't a real
-> problem as bio_endio() skipping only happens on reserved tag allocation
-> failures which can only be caused by driver bugs and already triggers
-> WARN.
-> 
-> However, the fix creates a not so great dependency on how STS_AGAIN can
-> be propagated. Internally, we (Facebook) carry a patch that kills read
-> ahead if a cgroup is io congested or a fatal signal is pending. This
-> combined with chained bios progagate their bi_status to the parent is
-> not already set can can cause the parent bio to not clean up properly
-> even though it was successful. This consequently leaks the inflight
-> counter and can hang all IOs under that blkg.
-> 
-> To nip the adverse interaction early, this removes the rq_qos_cleanup()
-> callback in iolatency in favor of cleaning up always on the
-> rq_qos_done_bio() path.
+When the blk-mq debugfs file creation logic was "cleaned up" it was
+cleaned up too much, causing the queue file to not be created in the
+correct location.  Turns out the check for the directory being present
+is needed as if that has not happened yet, the files should not be
+created, and the function will be called later on in the initialization
+code so that the files can be created in the correct location.
 
-Looks good, applied for 5.3. Thanks Dennis.
+Fixes: 6cfc0081b046 ("blk-mq: no need to check return value of debugfs_create functions")
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: stable <stable@vger.kernel.org> # 5.2+
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ block/blk-mq-debugfs.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 2489ddbb21db..3afe327f816f 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -934,6 +934,13 @@ void blk_mq_debugfs_register_sched(struct request_queue *q)
+ {
+ 	struct elevator_type *e = q->elevator->type;
+ 
++	/*
++	 * If the parent directory has not been created yet, return, we will be
++	 * called again later on and the directory/files will be created then.
++	 */
++	if (!q->debugfs_dir)
++		return;
++
+ 	if (!e->queue_debugfs_attrs)
+ 		return;
+ 
 -- 
-Jens Axboe
+2.22.0
 
