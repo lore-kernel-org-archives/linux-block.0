@@ -2,404 +2,96 @@ Return-Path: <SRS0=GXCF=VD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F053AC0650E
-	for <linux-block@archiver.kernel.org>; Sat,  6 Jul 2019 17:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5888BC0650E
+	for <linux-block@archiver.kernel.org>; Sat,  6 Jul 2019 18:47:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C33512083B
-	for <linux-block@archiver.kernel.org>; Sat,  6 Jul 2019 17:59:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BE4020838
+	for <linux-block@archiver.kernel.org>; Sat,  6 Jul 2019 18:47:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pqEM5slj"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="oTZtAUoh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726921AbfGFR7Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 6 Jul 2019 13:59:25 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:45356 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726743AbfGFR7Y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Jul 2019 13:59:24 -0400
-Received: by mail-pf1-f196.google.com with SMTP id r1so5602489pfq.12;
-        Sat, 06 Jul 2019 10:59:24 -0700 (PDT)
+        id S1726889AbfGFSro (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 6 Jul 2019 14:47:44 -0400
+Received: from mail-pl1-f175.google.com ([209.85.214.175]:39915 "EHLO
+        mail-pl1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726876AbfGFSro (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Jul 2019 14:47:44 -0400
+Received: by mail-pl1-f175.google.com with SMTP id b7so6120541pls.6
+        for <linux-block@vger.kernel.org>; Sat, 06 Jul 2019 11:47:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=MKPqD+627nJjW9lPF1ZZQ2GzyS3eqERC5b0zjyo4PCg=;
-        b=pqEM5sljLVT+ej4a5afr5R1lt1glE+jS4FfSFBwcozX3CxX4bKsiG4PODmABX0mRkC
-         GFSfcj1RkaSB4ovI8M3N61On65u63Wk4B6BquTZrbg79hGzkuDJzlRXo7RIKWRZ9e+JB
-         cZpubHZ2YPBrKnsrfMWdrYYoxRce+fDcU8aXk6o1EcuMYiEudquJeLg/2SsW2ETSTagh
-         qmf/nTRICcxYqgUk/ZlMcc05SNPVLvePrbvBPekIPjWigwsjrNMaYCkGNsqi5IT1KEf2
-         reuEk+2RceyoxuuezchvKDrUZh6eW5kaw1yu7pTefUhkS5bm/W9k43W8xmJxdLdK8jjd
-         D5+Q==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:subject:to:cc:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=F1aK7B2lFTi7PxmV0UUUKGw/dtT36IEQUyQRNofgAws=;
+        b=oTZtAUoh6C4AtwWPw5eQoXw5qeksDE8d+WYdva2mjN2/1YXC/xGAfCE4JYOtCJfYJp
+         PO8qskjnfWIGKH+cKSN49XTcHk/dhiPxRo13LOb1CRCCXcXXlBinr6h5qItTaQ8oHn+L
+         PHHSTsegYs9DH9jdQmS3z8ihuCeKN0e3sMLK9rKZCZgU7KAh0p3kGHDkrgpb4l/dwbDf
+         Q7jNjZbhnASgNO5EMB6pAuNmKxN3Cn0uUbTDwA5PFGQrOV4HGIDsMEufnI+PU4hONMg/
+         3NrtcUYeYbZ0svG8O8NEojRrc4eKPJvSRWPC66f9RzoT50lBV61o9RGtHzoQSDsMT0Hl
+         CS3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=MKPqD+627nJjW9lPF1ZZQ2GzyS3eqERC5b0zjyo4PCg=;
-        b=PVQQ5fa2zJEnxWpuqmsqsLp1KRGnGdZsCDv7eJ8/Lpb0AFue3Pwk1rRiCZHok8h/lz
-         dpu3CIfPlHIV8p5iqJUJngk4/hIwnogQMZyywE7aYdP4dIiDg0CEIqB9rH2kMUfQhA4d
-         OeXcvStFr8wb4waBLwYcfI/d1Xnl34k6XPR/pqe9BdsD4jJgD2WTRO7UFDFJHKZYtjrv
-         4fT8edhku66jF94CsZ9VWvlgnTb+1xvVi1sD+FzPfqHBOsQC4v6tTUJuL2vh6OYq2T+w
-         qYdB/eHQjQ3pWfjv/MUSY9bodcldfudZfkizE3ctFBnFL5rFn1hXOrK34KrBrjBH/vU6
-         V1Wg==
-X-Gm-Message-State: APjAAAWnwcK4eE0Nx5zbihY4ycms5fSmCBnD+uLVtdPAld+Jf5wK8N8c
-        JF6mQvTcpeikUWDunnWvGdN3cvKf
-X-Google-Smtp-Source: APXvYqyefaPxo4nQI6I3PIsmRoW739gCOyVpaq9T/pbhqBPLrjTnDIKxHFMbxGSnHqiGLbIik6mw9g==
-X-Received: by 2002:a63:f44a:: with SMTP id p10mr12278870pgk.148.1562435963777;
-        Sat, 06 Jul 2019 10:59:23 -0700 (PDT)
-Received: from localhost.localdomain ([240f:34:212d:1:368e:e048:68f1:84e7])
-        by smtp.gmail.com with ESMTPSA id h6sm11967528pfn.79.2019.07.06.10.59.21
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sat, 06 Jul 2019 10:59:23 -0700 (PDT)
-From:   Akinobu Mita <akinobu.mita@gmail.com>
-To:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Cc:     Akinobu Mita <akinobu.mita@gmail.com>,
-        Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>,
-        Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-        Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/2] block: introduce LED block device activity trigger
-Date:   Sun,  7 Jul 2019 02:58:59 +0900
-Message-Id: <1562435939-15466-3-git-send-email-akinobu.mita@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1562435939-15466-1-git-send-email-akinobu.mita@gmail.com>
-References: <1562435939-15466-1-git-send-email-akinobu.mita@gmail.com>
+        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=F1aK7B2lFTi7PxmV0UUUKGw/dtT36IEQUyQRNofgAws=;
+        b=VI2iffrK0EjI5gUHdJS61nCyjHAHRfsIBDQ8WPB7YKtbjTFi4a2NKUovDhTNXppwWO
+         6ewvEP578Txv54IQ8ywYKOc3i05z7acBaTwsZbpQSlOlpGIEp1eYZCGQGU4otJCiWL/p
+         GD24x2929sz7p5++Gh7u+I7qVTgY4X/LAElWTB5IeEw0E1vDT5mv42/z2BoyCr528WUJ
+         OIzSFYHNJr+iI7DIE3eVUAWn0TRg8Q1Xw3a3yFJ+uJAZi5kOwFGqtS8mPrJx8sCP6jtq
+         iyNocH8kEz7szVRWgO7A1up8FqHtekKayQtuePCFHwJHBWPxoOi0ivBwydE5Kg4fhM0Q
+         AkGA==
+X-Gm-Message-State: APjAAAU93mNVnITrJUnjPDgTqjJBwi6le2cJQqQ58ux9qxIKg1mtoWQU
+        ECvUv1xA+L1WUs9DC27zpiIclw==
+X-Google-Smtp-Source: APXvYqz3oUKPtG5A+SuPHx/VW/p92rA7qlZ3GBj3dsGUrO17l100tvo1ee8vVM33y+3+txkEZsrLGw==
+X-Received: by 2002:a17:902:29c3:: with SMTP id h61mr12658792plb.37.1562438863402;
+        Sat, 06 Jul 2019 11:47:43 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
+        by smtp.gmail.com with ESMTPSA id 23sm15647067pfn.176.2019.07.06.11.47.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 06 Jul 2019 11:47:41 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Single block fix for 5.2-final
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Message-ID: <c6d22c16-de8e-396c-6a17-982498f3e93f@kernel.dk>
+Date:   Sat, 6 Jul 2019 12:47:39 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This allows LEDs to be controlled by block device activity.
+Hi Linus,
 
-We already have ledtrig-disk (LED disk activity trigger), but the lower
-level disk drivers need to utilize ledtrig_disk_activity() to make the
-LED blink.
+Just a single fix for a patch from Greg KH, which reportedly break
+block debugfs locations for certain setups. Trivial enough that I think
+we should include it now, rather than wait and release 5.2 with it,
+since it's a regression in this series.
 
-The LED block device trigger doesn't require the lower level drivers to
-have any instrumentation. The activity is collected by polling the disk
-stats.
+Please pull!
 
-Example:
 
-echo block-nvme0n1 > /sys/class/leds/diy/trigger
+  git://git.kernel.dk/linux-block.git tags/for-linus-20190706
 
-Cc: Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>
-Cc: Jacek Anaszewski <jacek.anaszewski@gmail.com>
-Cc: Pavel Machek <pavel@ucw.cz>
-Cc: Dan Murphy <dmurphy@ti.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
----
- block/Makefile        |   1 +
- block/blk-ledtrig.c   | 219 ++++++++++++++++++++++++++++++++++++++++++++++++++
- block/blk.h           |  13 +++
- block/genhd.c         |   2 +
- include/linux/genhd.h |   4 +
- 5 files changed, 239 insertions(+)
- create mode 100644 block/blk-ledtrig.c
 
-diff --git a/block/Makefile b/block/Makefile
-index eee1b4c..c74d84e6 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -35,3 +35,4 @@ obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
- obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+= blk-mq-debugfs-zoned.o
- obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o
- obj-$(CONFIG_BLK_PM)		+= blk-pm.o
-+obj-$(CONFIG_LEDS_TRIGGERS)	+= blk-ledtrig.o
-diff --git a/block/blk-ledtrig.c b/block/blk-ledtrig.c
-new file mode 100644
-index 0000000..da93b06
---- /dev/null
-+++ b/block/blk-ledtrig.c
-@@ -0,0 +1,219 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// LED Kernel Blockdev Trigger
-+// Derived from ledtrig-netdev.c
-+
-+#include <linux/atomic.h>
-+#include <linux/genhd.h>
-+#include <linux/leds.h>
-+#include <linux/workqueue.h>
-+
-+struct blk_ledtrig_data {
-+	struct delayed_work work;
-+	struct led_classdev *led_cdev;
-+
-+	atomic_t interval;
-+	u64 last_activity;
-+
-+	unsigned long mode;
-+#define BLK_LEDTRIG_READ BIT(0)
-+#define BLK_LEDTRIG_WRITE BIT(1)
-+#define BLK_LEDTRIG_DISCARD BIT(2)
-+};
-+
-+static ssize_t blk_ledtrig_attr_show(struct device *dev, char *buf,
-+				     unsigned long blk_ledtrig)
-+{
-+	struct blk_ledtrig_data *trig_data = led_trigger_get_drvdata(dev);
-+
-+	return sprintf(buf, "%u\n", test_bit(blk_ledtrig, &trig_data->mode));
-+}
-+
-+static ssize_t blk_ledtrig_attr_store(struct device *dev, const char *buf,
-+				      size_t size, unsigned long blk_ledtrig)
-+{
-+	struct blk_ledtrig_data *trig_data = led_trigger_get_drvdata(dev);
-+	unsigned long state;
-+	int ret;
-+
-+	ret = kstrtoul(buf, 0, &state);
-+	if (ret)
-+		return ret;
-+
-+	if (state)
-+		set_bit(blk_ledtrig, &trig_data->mode);
-+	else
-+		clear_bit(blk_ledtrig, &trig_data->mode);
-+
-+	return size;
-+}
-+
-+static ssize_t read_show(struct device *dev, struct device_attribute *attr,
-+			 char *buf)
-+{
-+	return blk_ledtrig_attr_show(dev, buf, BLK_LEDTRIG_READ);
-+}
-+static ssize_t read_store(struct device *dev, struct device_attribute *attr,
-+			  const char *buf, size_t size)
-+{
-+	return blk_ledtrig_attr_store(dev, buf, size, BLK_LEDTRIG_READ);
-+}
-+static DEVICE_ATTR_RW(read);
-+
-+static ssize_t write_show(struct device *dev, struct device_attribute *attr,
-+			  char *buf)
-+{
-+	return blk_ledtrig_attr_show(dev, buf, BLK_LEDTRIG_WRITE);
-+}
-+static ssize_t write_store(struct device *dev, struct device_attribute *attr,
-+			   const char *buf, size_t size)
-+{
-+	return blk_ledtrig_attr_store(dev, buf, size, BLK_LEDTRIG_WRITE);
-+}
-+static DEVICE_ATTR_RW(write);
-+
-+static ssize_t discard_show(struct device *dev, struct device_attribute *attr,
-+			    char *buf)
-+{
-+	return blk_ledtrig_attr_show(dev, buf, BLK_LEDTRIG_DISCARD);
-+}
-+static ssize_t discard_store(struct device *dev, struct device_attribute *attr,
-+			     const char *buf, size_t size)
-+{
-+	return blk_ledtrig_attr_store(dev, buf, size, BLK_LEDTRIG_DISCARD);
-+}
-+static DEVICE_ATTR_RW(discard);
-+
-+static ssize_t interval_show(struct device *dev, struct device_attribute *attr,
-+			     char *buf)
-+{
-+	struct blk_ledtrig_data *trig_data = led_trigger_get_drvdata(dev);
-+
-+	return sprintf(buf, "%u\n",
-+		       jiffies_to_msecs(atomic_read(&trig_data->interval)));
-+}
-+static ssize_t interval_store(struct device *dev, struct device_attribute *attr,
-+			      const char *buf, size_t size)
-+{
-+	struct blk_ledtrig_data *trig_data = led_trigger_get_drvdata(dev);
-+	unsigned long value;
-+	int ret;
-+
-+	ret = kstrtoul(buf, 0, &value);
-+	if (ret)
-+		return ret;
-+
-+	/* impose some basic bounds on the timer interval */
-+	if (value >= 5 && value <= 10000) {
-+		cancel_delayed_work_sync(&trig_data->work);
-+		atomic_set(&trig_data->interval, msecs_to_jiffies(value));
-+		schedule_delayed_work(&trig_data->work,
-+				      atomic_read(&trig_data->interval) * 2);
-+	}
-+
-+	return size;
-+}
-+static DEVICE_ATTR_RW(interval);
-+
-+static struct attribute *blk_ledtrig_attrs[] = {
-+	&dev_attr_read.attr,
-+	&dev_attr_write.attr,
-+	&dev_attr_discard.attr,
-+	&dev_attr_interval.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(blk_ledtrig);
-+
-+static void blk_ledtrig_work(struct work_struct *work)
-+{
-+	struct blk_ledtrig_data *trig_data =
-+		container_of(work, struct blk_ledtrig_data, work.work);
-+	struct gendisk *disk = container_of(trig_data->led_cdev->trigger,
-+					    struct gendisk, led_trig);
-+	u64 activity = 0;
-+
-+	if (test_bit(BLK_LEDTRIG_READ, &trig_data->mode))
-+		activity += part_stat_read(&disk->part0, ios[STAT_READ]);
-+	if (test_bit(BLK_LEDTRIG_WRITE, &trig_data->mode))
-+		activity += part_stat_read(&disk->part0, ios[STAT_WRITE]);
-+	if (test_bit(BLK_LEDTRIG_DISCARD, &trig_data->mode))
-+		activity += part_stat_read(&disk->part0, ios[STAT_DISCARD]);
-+
-+	if (trig_data->last_activity != activity) {
-+		unsigned long interval;
-+
-+		led_stop_software_blink(trig_data->led_cdev);
-+		interval = jiffies_to_msecs(atomic_read(&trig_data->interval));
-+		led_blink_set_oneshot(trig_data->led_cdev, &interval, &interval,
-+				      0);
-+
-+		trig_data->last_activity = activity;
-+	}
-+
-+	schedule_delayed_work(&trig_data->work,
-+			      atomic_read(&trig_data->interval) * 2);
-+}
-+
-+static int blk_ledtrig_activate(struct led_classdev *led_cdev)
-+{
-+	struct blk_ledtrig_data *trig_data;
-+
-+	trig_data = kzalloc(sizeof(*trig_data), GFP_KERNEL);
-+	if (!trig_data)
-+		return -ENOMEM;
-+
-+	trig_data->mode = BLK_LEDTRIG_READ | BLK_LEDTRIG_WRITE |
-+			  BLK_LEDTRIG_DISCARD;
-+
-+	atomic_set(&trig_data->interval, msecs_to_jiffies(50));
-+	trig_data->last_activity = 0;
-+	trig_data->led_cdev = led_cdev;
-+
-+	INIT_DELAYED_WORK(&trig_data->work, blk_ledtrig_work);
-+
-+	led_set_trigger_data(led_cdev, trig_data);
-+
-+	schedule_delayed_work(&trig_data->work,
-+			      atomic_read(&trig_data->interval) * 2);
-+
-+	return 0;
-+}
-+
-+static void blk_ledtrig_deactivate(struct led_classdev *led_cdev)
-+{
-+	struct blk_ledtrig_data *trig_data = led_get_trigger_data(led_cdev);
-+
-+	cancel_delayed_work_sync(&trig_data->work);
-+	kfree(trig_data);
-+}
-+
-+int blk_ledtrig_register(struct gendisk *disk)
-+{
-+	int ret;
-+
-+	disk->led_trig.name = kasprintf(GFP_KERNEL, "block-%s",
-+					disk->disk_name);
-+	if (!disk->led_trig.name)
-+		return -ENOMEM;
-+
-+	disk->led_trig.activate = blk_ledtrig_activate;
-+	disk->led_trig.deactivate = blk_ledtrig_deactivate;
-+	disk->led_trig.groups = blk_ledtrig_groups;
-+
-+	ret = led_trigger_register(&disk->led_trig);
-+	if (ret) {
-+		kfree(disk->led_trig.name);
-+		disk->led_trig.name = NULL;
-+	}
-+
-+	return ret;
-+}
-+
-+void blk_ledtrig_unregister(struct gendisk *disk)
-+{
-+	if (!disk->led_trig.name)
-+		return;
-+
-+	led_trigger_unregister(&disk->led_trig);
-+	kfree(disk->led_trig.name);
-+	disk->led_trig.name = NULL;
-+}
-diff --git a/block/blk.h b/block/blk.h
-index 7814aa2..dd4c230a 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -331,4 +331,17 @@ void blk_queue_free_zone_bitmaps(struct request_queue *q);
- static inline void blk_queue_free_zone_bitmaps(struct request_queue *q) {}
- #endif
- 
-+#ifdef CONFIG_LEDS_TRIGGERS
-+int blk_ledtrig_register(struct gendisk *disk);
-+void blk_ledtrig_unregister(struct gendisk *disk);
-+#else
-+static inline int blk_ledtrig_register(struct gendisk *disk)
-+{
-+	return 0;
-+}
-+static inline void blk_ledtrig_unregister(struct gendisk *disk)
-+{
-+}
-+#endif /* CONFIG_LEDS_TRIGGERS */
-+
- #endif /* BLK_INTERNAL_H */
-diff --git a/block/genhd.c b/block/genhd.c
-index 24654e1..dfd210c 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -745,6 +745,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- 
- 	disk_add_events(disk);
- 	blk_integrity_add(disk);
-+	blk_ledtrig_register(disk);
- }
- 
- void device_add_disk(struct device *parent, struct gendisk *disk,
-@@ -766,6 +767,7 @@ void del_gendisk(struct gendisk *disk)
- 	struct disk_part_iter piter;
- 	struct hd_struct *part;
- 
-+	blk_ledtrig_unregister(disk);
- 	blk_integrity_del(disk);
- 	disk_del_events(disk);
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 8b5330d..9250e9c 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -17,6 +17,7 @@
- #include <linux/percpu-refcount.h>
- #include <linux/uuid.h>
- #include <linux/blk_types.h>
-+#include <linux/leds.h>
- #include <asm/local.h>
- 
- #ifdef CONFIG_BLOCK
-@@ -219,6 +220,9 @@ struct gendisk {
- 	int node_id;
- 	struct badblocks *bb;
- 	struct lockdep_map lockdep_map;
-+#ifdef CONFIG_LEDS_TRIGGERS
-+	struct led_trigger led_trig;
-+#endif
- };
- 
- static inline struct gendisk *part_to_disk(struct hd_struct *part)
+----------------------------------------------------------------
+Greg Kroah-Hartman (1):
+      blk-mq: fix up placement of debugfs directory of queue files
+
+ block/blk-mq-debugfs.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
 -- 
-2.7.4
+Jens Axboe
 
