@@ -2,125 +2,163 @@ Return-Path: <SRS0=8/B6=VF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 650CCC0650E
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 02:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC5BC0650E
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 02:07:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3ADEF2053B
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 02:02:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SCh/dpnl";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ee4LqQup"
+	by mail.kernel.org (Postfix) with ESMTP id BE4D920665
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 02:07:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728398AbfGHCCK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 Jul 2019 22:02:10 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:58453 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727218AbfGHCCK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Jul 2019 22:02:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562551330; x=1594087330;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=dywAFDrj0MfAgVkHqaTVZ9P6BjevwEczcnCxLBSf4Sg=;
-  b=SCh/dpnl7SFmcielTato6fuyWH0XXHRNt5Som/CKI4XUsQf/f8cSvFlp
-   rpBWofH9JH938WQK0k6HLQncFI1jp1+fzA4Ie60bBgxl0/kzfi9KmL4Tt
-   xCWvIXLAugWkI27QJrx0rVCEG9MRGDZvgtjXoaYYXVllXdOat+IptOoa/
-   gIEYd9usoZk6oui1ckuzIsAc8qFBJnabTGP6+C1Qw/wCq/XZw4dzeRY3a
-   Th0wOskiNpSdOiZSjposMsB9KJIP6T2GP1DNDwFYjIjzpiD5ZYXhgjw3n
-   6rnNkgMR3hPUmIMfmnTH3Ai6d39rqR4GqWiP+QajfreawuW0/69BgaGVq
-   w==;
-IronPort-SDR: Nuwvt1vSYB9AK/4EaB3/mkm2iSck6iVQOHpsJiylSYGGHgRdPHP5Fxa0U2uM6JwiHfYX2RqS4d
- nnDW/tm6lxfDOo2cXQaD0epQwVdqoVhAQGnRuwzENrRquLXqYwb8EgVfUwN4ciwFg/QEPbaxag
- NRs43ByCufgghDlalQK7TTqVT2iDll2WEVAgLPRmB116un+dbVqzZpsp15wohvyKL5fmipJU7h
- /p61xz+iaZbEHBPQWWD0qE2m/mSYH0I+5M20M69aXQK/xU0ZPK2zhSF1edxTIOhDBb7csuTkO8
- LXA=
-X-IronPort-AV: E=Sophos;i="5.63,464,1557158400"; 
-   d="scan'208";a="113580885"
-Received: from mail-sn1nam02lp2052.outbound.protection.outlook.com (HELO NAM02-SN1-obe.outbound.protection.outlook.com) ([104.47.36.52])
-  by ob1.hgst.iphmx.com with ESMTP; 08 Jul 2019 10:02:08 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dywAFDrj0MfAgVkHqaTVZ9P6BjevwEczcnCxLBSf4Sg=;
- b=ee4LqQuprJ1WGiHqfCiM/XbQeJ6M9xrEiDBXoHTs4BtNAjQlyNRDtFSkJ3tARCZBC79kIsJL2gq/TUQ1kkiYfTUB3IkzSnKFJxaORzudzWA84Ps+PYeCRJ85e3ATbtOrzqT/Yz7FnqxkdxmZkV7nydEZGIyO8MJe1DUC99u4lEg=
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.58.207) by
- BYAPR04MB5864.namprd04.prod.outlook.com (20.179.59.82) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2052.18; Mon, 8 Jul 2019 02:02:07 +0000
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::65a9:db0a:646d:eb1e]) by BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::65a9:db0a:646d:eb1e%6]) with mapi id 15.20.2052.020; Mon, 8 Jul 2019
- 02:02:07 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-CC:     Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH V6 0/4] Fix zone revalidation memory allocation failures
-Thread-Topic: [PATCH V6 0/4] Fix zone revalidation memory allocation failures
-Thread-Index: AQHVL8ssJYyertgVkky0I6r2FZ0yYw==
-Date:   Mon, 8 Jul 2019 02:02:06 +0000
-Message-ID: <BYAPR04MB5816BC7EC358F5785AEE1EA9E7F60@BYAPR04MB5816.namprd04.prod.outlook.com>
-References: <20190701050918.27511-1-damien.lemoal@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [199.255.47.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 1d0f2b04-9a7e-408b-18e0-08d7034847a5
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5864;
-x-ms-traffictypediagnostic: BYAPR04MB5864:
-x-microsoft-antispam-prvs: <BYAPR04MB58643D8DB32AAB7739ED6344E7F60@BYAPR04MB5864.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:1186;
-x-forefront-prvs: 00922518D8
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(39860400002)(346002)(366004)(396003)(136003)(376002)(189003)(199004)(2501003)(486006)(26005)(6436002)(54906003)(53546011)(9686003)(316002)(53936002)(7416002)(476003)(446003)(55016002)(102836004)(76176011)(186003)(86362001)(6506007)(110136005)(7696005)(229853002)(8936002)(14444005)(2906002)(33656002)(81166006)(72206003)(99286004)(3846002)(81156014)(256004)(8676002)(478600001)(6246003)(66066001)(4744005)(71200400001)(7736002)(25786009)(71190400001)(4326008)(73956011)(66946007)(76116006)(91956017)(52536014)(68736007)(74316002)(6116002)(14454004)(5660300002)(66556008)(66446008)(305945005)(64756008)(66476007);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5864;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: XSdjz4wqQe6MIde04G1uCKnIysFNjimO+WZUG9lZ03I1rJ/w0p2lygjCoM4s73jCaKXmbNBRsIAgDRUcBx7NqvSreO5D3xjEqm/UnyAVj7qhv1fnyDKkYLU1egwO+WWy/8TrPuK2VaptGKvc7dWdbQB7S5UBKYfA1bkySRe5TFTvVH3b7fqvkSs4l2YEITS7DbKdyMHa9AIBq9Ot+TnTLAIl+7uz8DArxvTnuF7vDuoCFHbpak5YRBh0HvCtFz5rHoi3OzsqUZhoGO+MQh3dlAZWvKVTuG70PZgE3kKCGfhIvVgsmf0OwFQjMwjDgEUiARuU+kpeJdcf/XT8cVcTcUfXsaaiLymGoJzcP2W2r00IWSKuuECUc5ebXtVuwkoMISfQE6QbxYSTY6izR5fOfVMLy6ooHwCH4IND8JJdm64=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d0f2b04-9a7e-408b-18e0-08d7034847a5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jul 2019 02:02:06.8556
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Damien.LeMoal@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5864
+        id S1728547AbfGHCHh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 Jul 2019 22:07:37 -0400
+Received: from smtpbg202.qq.com ([184.105.206.29]:39998 "EHLO smtpbg202.qq.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727891AbfGHCHh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 7 Jul 2019 22:07:37 -0400
+X-QQ-mid: bizesmtp20t1562551648txgmiwij
+Received: from localhost.localdomain (unknown [218.76.23.26])
+        by esmtp6.qq.com (ESMTP) with 
+        id ; Mon, 08 Jul 2019 10:07:27 +0800 (CST)
+X-QQ-SSF: 01400000002000Q0WO70000A0000000
+X-QQ-FEAT: 0NiUPldU1c6YWKWjxYiX8leSSBzhZQMnxoO2U6nKuzPWlpSWR1qW0kyxMoagg
+        AMI6scpaznrb6MUXDpU40wSYEvaPiCbvC5sb/BgC1SikwmOLA0ov212VIBPk1H/Y2+1y9hH
+        K3R1hwuXKbb7i8crnT8/CDoxt/BVOxiYaJJbXtGS4GM+qrdPztl4MgK5nOgm67DvB6sRiLC
+        7LQMO4fyEBxIcpAu23j0dcPVl+gu+MrHbRPH9t1aWN/GmzJKitcSwkuQ/zYUMgyaMGulo2Y
+        x8IT5j12DKKLOfAkrkTqqq/g/bJPNxWsFC0cQsk74fyETTINzM31Gq9zOsnWNBbIMvww==
+X-QQ-GoodBg: 2
+From:   Jackie Liu <liuyun01@kylinos.cn>
+To:     axboe@kernel.dk
+Cc:     ebiggers@kernel.org, liuzhengyuan@kylinos.cn,
+        linux-block@vger.kernel.org, Jackie Liu <liuyun01@kylinos.cn>
+Subject: [PATCH v2] io_uring: fix io_sq_thread_stop running in front of io_sq_thread
+Date:   Mon,  8 Jul 2019 10:07:06 +0800
+Message-Id: <1562551626-22358-1-git-send-email-liuyun01@kylinos.cn>
+X-Mailer: git-send-email 2.7.4
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign2
+X-QQ-Bgrelay: 1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/07/01 14:09, Damien Le Moal wrote:=0A=
-> This series addresses a recuring problem with zone revalidation=0A=
-> failures observed during extensive testing with memory constrained=0A=
-> system and device hot-plugging.=0A=
-=0A=
-Jens, Martin,=0A=
-=0A=
-Any comment regarding this series ?=0A=
-=0A=
-Best regards.=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+INFO: task syz-executor.5:8634 blocked for more than 143 seconds.
+       Not tainted 5.2.0-rc5+ #3
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+syz-executor.5  D25632  8634   8224 0x00004004
+Call Trace:
+  context_switch kernel/sched/core.c:2818 [inline]
+  __schedule+0x658/0x9e0 kernel/sched/core.c:3445
+  schedule+0x131/0x1d0 kernel/sched/core.c:3509
+  schedule_timeout+0x9a/0x2b0 kernel/time/timer.c:1783
+  do_wait_for_common+0x35e/0x5a0 kernel/sched/completion.c:83
+  __wait_for_common kernel/sched/completion.c:104 [inline]
+  wait_for_common kernel/sched/completion.c:115 [inline]
+  wait_for_completion+0x47/0x60 kernel/sched/completion.c:136
+  kthread_stop+0xb4/0x150 kernel/kthread.c:559
+  io_sq_thread_stop fs/io_uring.c:2252 [inline]
+  io_finish_async fs/io_uring.c:2259 [inline]
+  io_ring_ctx_free fs/io_uring.c:2770 [inline]
+  io_ring_ctx_wait_and_kill+0x268/0x880 fs/io_uring.c:2834
+  io_uring_release+0x5d/0x70 fs/io_uring.c:2842
+  __fput+0x2e4/0x740 fs/file_table.c:280
+  ____fput+0x15/0x20 fs/file_table.c:313
+  task_work_run+0x17e/0x1b0 kernel/task_work.c:113
+  tracehook_notify_resume include/linux/tracehook.h:185 [inline]
+  exit_to_usermode_loop arch/x86/entry/common.c:168 [inline]
+  prepare_exit_to_usermode+0x402/0x4f0 arch/x86/entry/common.c:199
+  syscall_return_slowpath+0x110/0x440 arch/x86/entry/common.c:279
+  do_syscall_64+0x126/0x140 arch/x86/entry/common.c:304
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x412fb1
+Code: 80 3b 7c 0f 84 c7 02 00 00 c7 85 d0 00 00 00 00 00 00 00 48 8b 05 cf
+a6 24 00 49 8b 14 24 41 b9 cb 2a 44 00 48 89 ee 48 89 df <48> 85 c0 4c 0f
+45 c8 45 31 c0 31 c9 e8 0e 5b 00 00 85 c0 41 89 c7
+RSP: 002b:00007ffe7ee6a180 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
+RAX: 0000000000000000 RBX: 0000000000000004 RCX: 0000000000412fb1
+RDX: 0000001b2d920000 RSI: 0000000000000000 RDI: 0000000000000003
+RBP: 0000000000000001 R08: 00000000f3a3e1f8 R09: 00000000f3a3e1fc
+R10: 00007ffe7ee6a260 R11: 0000000000000293 R12: 000000000075c9a0
+R13: 000000000075c9a0 R14: 0000000000024c00 R15: 000000000075bf2c
+
+=============================================
+
+There is an wrong logic, when kthread_park running
+in front of io_sq_thread.
+
+CPU#0					CPU#1
+
+io_sq_thread_stop:			int kthread(void *_create):
+
+kthread_park()
+					__kthread_parkme(self);	 <<< Wrong
+kthread_stop()
+    << wait for self->exited
+    << clear_bit KTHREAD_SHOULD_PARK
+
+					ret = threadfn(data);
+					   |
+					   |- io_sq_thread
+					       |- kthread_should_park()	<< false
+					       |- schedule() <<< nobody wake up
+
+stuck CPU#0				stuck CPU#1
+
+So, use a new variable sqo_thread_started to ensure that io_sq_thread
+run first, then io_sq_thread_stop.
+
+Reported-by: syzbot+94324416c485d422fe15@syzkaller.appspotmail.com
+Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
+---
+ fs/io_uring.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 4ef62a4..b7d92fa 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -78,6 +78,8 @@
+ #define IORING_MAX_ENTRIES	4096
+ #define IORING_MAX_FIXED_FILES	1024
+ 
++#define SQO_THREAD_STARTED	1
++
+ struct io_uring {
+ 	u32 head ____cacheline_aligned_in_smp;
+ 	u32 tail ____cacheline_aligned_in_smp;
+@@ -231,6 +233,7 @@ struct io_ring_ctx {
+ 	struct task_struct	*sqo_thread;	/* if using sq thread polling */
+ 	struct mm_struct	*sqo_mm;
+ 	wait_queue_head_t	sqo_wait;
++	unsigned long		sqo_flags;
+ 
+ 	struct {
+ 		/* CQ ring */
+@@ -2009,6 +2012,9 @@ static int io_sq_thread(void *data)
+ 	unsigned inflight;
+ 	unsigned long timeout;
+ 
++	/* io_sq_thread should run before io_sq_thread_stop */
++	set_bit(SQO_THREAD_STARTED, &ctx->sqo_flags);
++
+ 	old_fs = get_fs();
+ 	set_fs(USER_DS);
+ 
+@@ -2243,6 +2249,8 @@ static int io_sqe_files_unregister(struct io_ring_ctx *ctx)
+ static void io_sq_thread_stop(struct io_ring_ctx *ctx)
+ {
+ 	if (ctx->sqo_thread) {
++		while (unlikely(!test_bit(SQO_THREAD_STARTED, &ctx->sqo_flags)))
++			schedule();
+ 		/*
+ 		 * The park is a bit of a work-around, without it we get
+ 		 * warning spews on shutdown with SQPOLL set and affinity
+-- 
+2.7.4
+
+
+
