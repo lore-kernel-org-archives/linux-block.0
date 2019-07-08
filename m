@@ -2,161 +2,136 @@ Return-Path: <SRS0=8/B6=VF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 333C7C48BE7
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 05:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 967A0C606AF
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 11:46:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F160B20659
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 05:41:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FA992086D
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 11:46:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XXb+Q80f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727286AbfGHFl1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Jul 2019 01:41:27 -0400
-Received: from smtpbg202.qq.com ([184.105.206.29]:44807 "EHLO smtpbg202.qq.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726284AbfGHFl1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Jul 2019 01:41:27 -0400
-X-QQ-mid: bizesmtp18t1562564482talv5730
-Received: from localhost.localdomain (unknown [218.76.23.26])
-        by esmtp6.qq.com (ESMTP) with 
-        id ; Mon, 08 Jul 2019 13:41:21 +0800 (CST)
-X-QQ-SSF: 01400000002000Q0WO70000A0000000
-X-QQ-FEAT: ZCfpn3Y0+jORNTwBrW8N/3Sy9l8+5A03WhHkEXLCblwgOPgRTItKFGdIJQTCG
-        qkJBwPbtXuDuyTjWVPx5LyurPJkcg9W7gTKdf2m9xAlDT1kvG5iztFqdzAI3jxoAXX2Elvy
-        L8QxvoAHjBhEG6Hn6A1xv63r3f4bZnv2KHnGO7VlUb5KGHDkgN9JohRpgVPtPREiPVcs+uP
-        BVXReASRA3R7fuSprEikXGWC4fiYqjjir188W6tXKs0em1oDGSzUf55nzRNcd5akIuWRBoZ
-        tMdX6fQuu5wFBuY5cZE/qt/Aqs+ltBeIWBzbFgdbBtyXiw93A9k7XuW4LaZpRUQhBJpejRs
-        fyiNSCsoP6Uha+nDxySnqql5mx8GQ==
-X-QQ-GoodBg: 2
-From:   Jackie Liu <liuyun01@kylinos.cn>
-To:     axboe@kernel.dk
-Cc:     ebiggers@kernel.org, liuzhengyuan@kylinos.cn,
-        linux-block@vger.kernel.org, Jackie Liu <liuyun01@kylinos.cn>
-Subject: [PATCH v3] io_uring: fix io_sq_thread_stop running in front of io_sq_thread
-Date:   Mon,  8 Jul 2019 13:41:12 +0800
-Message-Id: <1562564472-18277-1-git-send-email-liuyun01@kylinos.cn>
-X-Mailer: git-send-email 2.7.4
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign1
-X-QQ-Bgrelay: 1
+        id S1730550AbfGHLq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Jul 2019 07:46:27 -0400
+Received: from mail-ua1-f68.google.com ([209.85.222.68]:47103 "EHLO
+        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727415AbfGHLq1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jul 2019 07:46:27 -0400
+Received: by mail-ua1-f68.google.com with SMTP id o19so4808851uap.13
+        for <linux-block@vger.kernel.org>; Mon, 08 Jul 2019 04:46:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=flSipI0xpnq86C8I/rrm9xZYmUfxRgobFckLUfbaRC8=;
+        b=XXb+Q80fYNPiOi+n2vBpTR7ILscbEfWMSgFLUGGBp0WIXyrchBmIU+NDlQakm7jnM8
+         tMOGGlXLa6lhxN8Ra5giF5vusg5FAGcyYjayn4957m4SVC5MJ6sWMYf/OxIiDdEXGjyl
+         t0iUctAF15Luy9UaHIMu7DeLX/vVTxmDkPCj5Sd3ctiKIAbE6unYRJZiySlXBWUfp3Qt
+         wSm5DjC32317VN9BrP1dS0bGuEjxebRetq6Ln0vcwZpEzFLSO9tqdk3raraxZko69lN0
+         02Xs/0veoLx/lL8aN++HqWTdEhSnkt6acjQytnwnnYv3k8Q3yxAL+Dnno9K+Jo/jxapZ
+         ShmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=flSipI0xpnq86C8I/rrm9xZYmUfxRgobFckLUfbaRC8=;
+        b=gnagHvN5I4f0CjJkyub3SepuAyiTqTSZSakHeS28cO13C0SAzDMx3mGuZHoQt++TIt
+         /iL+bLXjvtV6uf4wrJEMLv2VggL+7KH5/UWw/C6a1ucculIzms/qVqUzyD6aGZMvEFkA
+         qk8QkQz8rs1Tb4+PSZo5O9AsU4Pql2JANbLz1jbxPDpbeAFK12YbmvdsgNt+ZMZ653Wn
+         DW3J6iiBnk4tM2m+xP9lYQ2ACuf4Vwhev1Yq+/h9+DhR2AeAjbcsNrVwnnLko8KecHwL
+         ZpKrqLM1N7LdEvI1bStHyH5WL9kRqR3aO0J9LwUNh94MEfp9oeiNl5Bi1/RowSxKgPrn
+         3crg==
+X-Gm-Message-State: APjAAAUjCWM04L0wobE1JziHJJCl7USiBtyit20n8YLiKGKp7M+fM+sj
+        4DirdsvyRp4OFJSMg90PY0DhYnJwXR8ZZqneA3kZVw==
+X-Google-Smtp-Source: APXvYqyFEUscJD5GsIV+BS++o/YX8MWQdCWyg9O7X6Nb/wsuAeld8qTTFnYvdC785Otd3OEmiYJn0ixqzjixmeBiM0Q=
+X-Received: by 2002:ab0:60ad:: with SMTP id f13mr9491120uam.129.1562586386291;
+ Mon, 08 Jul 2019 04:46:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <1561020610-953-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+ <1561020610-953-6-git-send-email-yoshihiro.shimoda.uh@renesas.com> <20190624062414.GD2989@lst.de>
+In-Reply-To: <20190624062414.GD2989@lst.de>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Mon, 8 Jul 2019 13:45:50 +0200
+Message-ID: <CAPDyKFpuRzmZUK730FMnh0hf3WRFb9aA=o9ciNt2ei8n803vsQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v7 5/5] mmc: queue: Use bigger segments if DMA MAP
+ layer can merge the segments
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "list@263.net:IOMMU DRIVERS <iommu@lists.linux-foundation.org>, Joerg
+        Roedel <joro@8bytes.org>," <joro@8bytes.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "list@263.net:IOMMU DRIVERS <iommu@lists.linux-foundation.org>, Joerg
+        Roedel <joro@8bytes.org>," <iommu@lists.linux-foundation.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-INFO: task syz-executor.5:8634 blocked for more than 143 seconds.
-       Not tainted 5.2.0-rc5+ #3
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-syz-executor.5  D25632  8634   8224 0x00004004
-Call Trace:
-  context_switch kernel/sched/core.c:2818 [inline]
-  __schedule+0x658/0x9e0 kernel/sched/core.c:3445
-  schedule+0x131/0x1d0 kernel/sched/core.c:3509
-  schedule_timeout+0x9a/0x2b0 kernel/time/timer.c:1783
-  do_wait_for_common+0x35e/0x5a0 kernel/sched/completion.c:83
-  __wait_for_common kernel/sched/completion.c:104 [inline]
-  wait_for_common kernel/sched/completion.c:115 [inline]
-  wait_for_completion+0x47/0x60 kernel/sched/completion.c:136
-  kthread_stop+0xb4/0x150 kernel/kthread.c:559
-  io_sq_thread_stop fs/io_uring.c:2252 [inline]
-  io_finish_async fs/io_uring.c:2259 [inline]
-  io_ring_ctx_free fs/io_uring.c:2770 [inline]
-  io_ring_ctx_wait_and_kill+0x268/0x880 fs/io_uring.c:2834
-  io_uring_release+0x5d/0x70 fs/io_uring.c:2842
-  __fput+0x2e4/0x740 fs/file_table.c:280
-  ____fput+0x15/0x20 fs/file_table.c:313
-  task_work_run+0x17e/0x1b0 kernel/task_work.c:113
-  tracehook_notify_resume include/linux/tracehook.h:185 [inline]
-  exit_to_usermode_loop arch/x86/entry/common.c:168 [inline]
-  prepare_exit_to_usermode+0x402/0x4f0 arch/x86/entry/common.c:199
-  syscall_return_slowpath+0x110/0x440 arch/x86/entry/common.c:279
-  do_syscall_64+0x126/0x140 arch/x86/entry/common.c:304
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x412fb1
-Code: 80 3b 7c 0f 84 c7 02 00 00 c7 85 d0 00 00 00 00 00 00 00 48 8b 05 cf
-a6 24 00 49 8b 14 24 41 b9 cb 2a 44 00 48 89 ee 48 89 df <48> 85 c0 4c 0f
-45 c8 45 31 c0 31 c9 e8 0e 5b 00 00 85 c0 41 89 c7
-RSP: 002b:00007ffe7ee6a180 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 0000000000000004 RCX: 0000000000412fb1
-RDX: 0000001b2d920000 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 0000000000000001 R08: 00000000f3a3e1f8 R09: 00000000f3a3e1fc
-R10: 00007ffe7ee6a260 R11: 0000000000000293 R12: 000000000075c9a0
-R13: 000000000075c9a0 R14: 0000000000024c00 R15: 000000000075bf2c
+On Mon, 24 Jun 2019 at 08:24, Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Thu, Jun 20, 2019 at 05:50:10PM +0900, Yoshihiro Shimoda wrote:
+> > When the max_segs of a mmc host is smaller than 512, the mmc
+> > subsystem tries to use 512 segments if DMA MAP layer can merge
+> > the segments, and then the mmc subsystem exposes such information
+> > to the block layer by using blk_queue_can_use_dma_map_merging().
+> >
+> > Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> > ---
+> >  drivers/mmc/core/queue.c | 35 ++++++++++++++++++++++++++++++++---
+> >  include/linux/mmc/host.h |  1 +
+> >  2 files changed, 33 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+> > index 92900a0..ab0ecc6 100644
+> > --- a/drivers/mmc/core/queue.c
+> > +++ b/drivers/mmc/core/queue.c
+> > @@ -24,6 +24,8 @@
+> >  #include "card.h"
+> >  #include "host.h"
+> >
+> > +#define MMC_DMA_MAP_MERGE_SEGMENTS   512
+> > +
+> >  static inline bool mmc_cqe_dcmd_busy(struct mmc_queue *mq)
+> >  {
+> >       /* Allow only 1 DCMD at a time */
+> > @@ -196,6 +198,12 @@ static void mmc_queue_setup_discard(struct request_queue *q,
+> >               blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
+> >  }
+> >
+> > +static unsigned int mmc_get_max_segments(struct mmc_host *host)
+> > +{
+> > +     return host->can_dma_map_merge ? MMC_DMA_MAP_MERGE_SEGMENTS :
+> > +                                      host->max_segs;
+>
+> I personally don't like superflous use of ? : if an if would be more
+> obvious:
+>
+>         if (host->can_dma_map_merge)
+>                 return MMC_DMA_MAP_MERGE_SEGMENTS;
+>         return host->max_segs;
+>
+> but that is really just a nitpick and for the mmc maintainer to decide.
 
-=============================================
+I have no strong opinions, both formats are used in mmc code, so I am
+fine as is.
 
-There is an wrong logic, when kthread_park running
-in front of io_sq_thread.
+>
+> Otherwise looks good:
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-CPU#0					CPU#1
+Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-io_sq_thread_stop:			int kthread(void *_create):
-
-kthread_park()
-					__kthread_parkme(self);	 <<< Wrong
-kthread_stop()
-    << wait for self->exited
-    << clear_bit KTHREAD_SHOULD_PARK
-
-					ret = threadfn(data);
-					   |
-					   |- io_sq_thread
-					       |- kthread_should_park()	<< false
-					       |- schedule() <<< nobody wake up
-
-stuck CPU#0				stuck CPU#1
-
-So, use a new variable sqo_thread_started to ensure that io_sq_thread
-run first, then io_sq_thread_stop.
-
-Reported-by: syzbot+94324416c485d422fe15@syzkaller.appspotmail.com
-Suggested-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
----
- fs/io_uring.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 86a2bd7..264c76b 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -231,6 +231,7 @@ struct io_ring_ctx {
- 	struct task_struct	*sqo_thread;	/* if using sq thread polling */
- 	struct mm_struct	*sqo_mm;
- 	wait_queue_head_t	sqo_wait;
-+	struct completion	sqo_thread_started;
- 
- 	struct {
- 		/* CQ ring */
-@@ -403,6 +404,7 @@ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
- 	ctx->flags = p->flags;
- 	init_waitqueue_head(&ctx->cq_wait);
- 	init_completion(&ctx->ctx_done);
-+	init_completion(&ctx->sqo_thread_started);
- 	mutex_init(&ctx->uring_lock);
- 	init_waitqueue_head(&ctx->wait);
- 	for (i = 0; i < ARRAY_SIZE(ctx->pending_async); i++) {
-@@ -2010,6 +2012,8 @@ static int io_sq_thread(void *data)
- 	unsigned inflight;
- 	unsigned long timeout;
- 
-+	complete(&ctx->sqo_thread_started);
-+
- 	old_fs = get_fs();
- 	set_fs(USER_DS);
- 
-@@ -2243,6 +2247,7 @@ static int io_sqe_files_unregister(struct io_ring_ctx *ctx)
- static void io_sq_thread_stop(struct io_ring_ctx *ctx)
- {
- 	if (ctx->sqo_thread) {
-+		wait_for_completion(&ctx->sqo_thread_started);
- 		/*
- 		 * The park is a bit of a work-around, without it we get
- 		 * warning spews on shutdown with SQPOLL set and affinity
--- 
-2.7.4
-
-
-
+Kind regards
+Uffe
