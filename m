@@ -2,53 +2,51 @@ Return-Path: <SRS0=8/B6=VF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42DF1C606C2
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 15:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D7AC606C1
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 15:38:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10D7421537
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 15:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C89F620665
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jul 2019 15:38:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="ve3zJM8j"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="zZVm+Lqv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389701AbfGHPbV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Jul 2019 11:31:21 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:42246 "EHLO
+        id S2389799AbfGHPaF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Jul 2019 11:30:05 -0400
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:40592 "EHLO
         forwardcorp1p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726318AbfGHPbU (ORCPT
+        by vger.kernel.org with ESMTP id S2389785AbfGHPaD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Jul 2019 11:31:20 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net [IPv6:2a02:6b8:0:1619::119])
-        by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 1B4CE2E0AFB;
-        Mon,  8 Jul 2019 18:31:18 +0300 (MSK)
-Received: from smtpcorp1o.mail.yandex.net (smtpcorp1o.mail.yandex.net [2a02:6b8:0:1a2d::30])
-        by mxbackcorp2j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id IybuJqQbtA-VHUevqMH;
-        Mon, 08 Jul 2019 18:31:18 +0300
+        Mon, 8 Jul 2019 11:30:03 -0400
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net [IPv6:2a02:6b8:0:1402::301])
+        by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id F27A32E0A47;
+        Mon,  8 Jul 2019 18:29:58 +0300 (MSK)
+Received: from smtpcorp1p.mail.yandex.net (smtpcorp1p.mail.yandex.net [2a02:6b8:0:1472:2741:0:8b6:10])
+        by mxbackcorp1g.mail.yandex.net (nwsmtp/Yandex) with ESMTP id SGvld7Yg6z-Twtq6Pmt;
+        Mon, 08 Jul 2019 18:29:58 +0300
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1562599878; bh=++lrfvwZjaLsfQzgaVw0H2rIS5jqJhN6AJSriPvsrIY=;
-        h=Message-ID:References:Date:To:From:Subject:In-Reply-To;
-        b=ve3zJM8jhAoeWRKWPa6NVzg904mXBEzV97CoUdwtLmTzRS5A2tkLlckrpJdlV2s0n
-         dxc3Y/GFnYWQJu5fLUmYVTk48k5Y+VBREqe4LJbhKKGTtreuRg0m9RIjEacGsSYDlS
-         8l97F7f7upQMOSfCX+QaTjM7Z7R5XTarP7xDs5n4=
-Authentication-Results: mxbackcorp2j.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
+        t=1562599798; bh=0ZLPgrM5RZIP8rfkfWdS2iGaxPtAPBUurmkYWYh9nVw=;
+        h=Message-ID:Date:To:From:Subject:Cc;
+        b=zZVm+LqvUNOElt9D5Fpn62DNu+R6E0Ocf8yo6kaWwidtIpAQSdGKp/OkZzxLJBe+J
+         gtdlZnaG0r8g/Cm3GNijyGzyJNsyDCOld478M6SLZArM9/xmFLAlaoZozKfdQt6Vlk
+         UHan79Lq3uT+tyIP2BtXXdXM5co4Gn4d4ZGRLyYA=
+Authentication-Results: mxbackcorp1g.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
 Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net [2a02:6b8:0:40c:fce8:911:2fe8:4dfb])
-        by smtpcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id nA5P8SeRQi-VH9CfHCJ;
-        Mon, 08 Jul 2019 18:31:17 +0300
+        by smtpcorp1p.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id 7RpncgZf1J-Tww4iCld;
+        Mon, 08 Jul 2019 18:29:58 +0300
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (Client certificate not present)
-Subject: [PATCH 2/2] null_blk: fix race and oops at removing device with
- bandwidth limit
+Subject: [PATCH] blk-throttle: fix zero wait time for iops throttled group
 From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         linux-kernel@vger.kernel.org
-Date:   Mon, 08 Jul 2019 18:31:17 +0300
-Message-ID: <156259987752.2590.11230901750437507796.stgit@buzz>
-In-Reply-To: <156259987576.2590.3397115585587914567.stgit@buzz>
-References: <156259987576.2590.3397115585587914567.stgit@buzz>
+Cc:     Liu Bo <bo.liu@linux.alibaba.com>, stable@vger.kernel.org
+Date:   Mon, 08 Jul 2019 18:29:57 +0300
+Message-ID: <156259979778.2486.6296077059654653057.stgit@buzz>
 User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -58,29 +56,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Function null_del_dev should disable throttling before canceling timer,
-otherwise timer could be restarted by null_handle_cmd().
+After commit 991f61fe7e1d ("Blk-throttle: reduce tail io latency when iops
+limit is enforced") wait time could be zero even if group is throttled and
+cannot issue requests right now. As a result throtl_select_dispatch() turns
+into busy-loop under irq-safe queue spinlock.
 
-Remove bump of cur_bytes - without NULLB_DEV_FL_THROTTLED it has no effect.
+Fix is simple: always round up target time to the next throttle slice.
 
-Fixes: eff2c4f10873 ("nullb: bandwidth control")
+Fixes: 991f61fe7e1d ("Blk-throttle: reduce tail io latency when iops limit is enforced")
 Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Cc: stable@vger.kernel.org # v4.19+
 ---
- drivers/block/null_blk_main.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-throttle.c |    9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 15925b355965..2d4ba7b05e2f 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1398,8 +1398,8 @@ static void null_del_dev(struct nullb *nullb)
- 	del_gendisk(nullb->disk);
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 9ea7c0ecad10..8ab6c8153223 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -881,13 +881,10 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+ 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
+ 	u64 tmp;
  
- 	if (test_bit(NULLB_DEV_FL_THROTTLED, &nullb->dev->flags)) {
-+		clear_bit(NULLB_DEV_FL_THROTTLED, &nullb->dev->flags);
- 		hrtimer_cancel(&nullb->bw_timer);
--		atomic_long_set(&nullb->cur_bytes, LONG_MAX);
- 		null_restart_queue_async(nullb);
- 	}
+-	jiffy_elapsed = jiffy_elapsed_rnd = jiffies - tg->slice_start[rw];
+-
+-	/* Slice has just started. Consider one slice interval */
+-	if (!jiffy_elapsed)
+-		jiffy_elapsed_rnd = tg->td->throtl_slice;
++	jiffy_elapsed = jiffies - tg->slice_start[rw];
  
+-	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
++	/* Round up to the next throttle slice, wait time must be nonzero */
++	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
+ 
+ 	/*
+ 	 * jiffy_elapsed_rnd should not be a big value as minimum iops can be
 
