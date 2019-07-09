@@ -2,70 +2,75 @@ Return-Path: <SRS0=ruTu=VG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06393C73C53
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 20:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C75C73C53
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 21:27:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C412D2166E
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 20:35:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="dgIPp7dT"
+	by mail.kernel.org (Postfix) with ESMTP id D21BC2073D
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 21:27:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729228AbfGIUfx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Jul 2019 16:35:53 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:41654 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729179AbfGIUfx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 16:35:53 -0400
-Received: by mail-io1-f65.google.com with SMTP id j5so26704076ioj.8
-        for <linux-block@vger.kernel.org>; Tue, 09 Jul 2019 13:35:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=R4pxG1ZYSx2dIuXVzQtCTrGDL0o/YKhhWIjq9TfXU1E=;
-        b=dgIPp7dTLqn/bPXw+FoO1qAHhuET7InfYp6VMrGIQ0eW8Pz0zf6CKDG5PI38nrasen
-         vYqme4kCgLmdmpKUl+ijBz4928fwqq0eXrF2IuC/IlTCo38oaKicQvU0Xa9Z2lgYcdrO
-         Q/u7ry+CT6pDHilngTS+DU0qaYVCXbhS8gAI3ZgoV7eSUpJdgu5gyz+XlgIUHLE+UEfW
-         IiGqUb2penb/GCSs5/O/oar9IkT8Pb2Z1FnNcXkORvtrcPiySGijk0tR8zmKmuDj8+od
-         vVJbxkg+IND4dM3x+2kmJDveH94AFxxlzme1rXGIN8aZxRyGl4W0fsZiUVLs4zidG4dy
-         Sa6w==
+        id S1726803AbfGIV1p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Jul 2019 17:27:45 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:32972 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726428AbfGIV1p (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 17:27:45 -0400
+Received: by mail-oi1-f194.google.com with SMTP id u15so16549741oiv.0;
+        Tue, 09 Jul 2019 14:27:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=R4pxG1ZYSx2dIuXVzQtCTrGDL0o/YKhhWIjq9TfXU1E=;
-        b=BF8B6XPpjcIn5KpPoOmcW18XEmAR7x8ilES73uNQuXincKbtAlWdOUUIACaWIPu84n
-         1Z7qGmsUf8v6s4tH5rFMSBzDZ+Xrp+ulf8aZJNwuebGOzOlsEBD++BbCFjlRf85CVaD3
-         NeKM+hkwZjaIMOkh3BtsJBdmQhDoj365zNBhSb1zS1Y8eLNo5GO8CKpH7K87MebN9vIl
-         XXa9fSIaiM+72cx+Vtb8jlfQA1S+P1W3TCPSV3ylPd7vc8eqwYDZ6gA6wBUjq6i4YlTC
-         O+PLjk8s5Zl3nOrhXrKNZTx84bk5hoa2bSjNiZsVApQBg5NOKdMMKcPODbboeijcapKE
-         0+8A==
-X-Gm-Message-State: APjAAAUlm6sAd3an1oSDruq6UzrpNINDqKvnQET5cdL7zrIIynUSrO0G
-        ryVep4OH1CrIAfU/NxxVWmnLn9KDMFDHVg==
-X-Google-Smtp-Source: APXvYqwjO34qDS1yZ9O4v429raTP9QO4kaXAQCm0aBV+KUzo3BZA8r0MRa2X3IB5pw6vSgHj0Xm67w==
-X-Received: by 2002:a5d:80d6:: with SMTP id h22mr21181181ior.231.1562704551910;
-        Tue, 09 Jul 2019 13:35:51 -0700 (PDT)
-Received: from [192.168.1.158] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id p63sm22897849iof.45.2019.07.09.13.35.50
+        bh=JFmZc74oeeM35zjBvo4+BukpLYLvklQy3qJm+E2OtJU=;
+        b=KlBUku48coRkOcM346aG1N84w+w094WErXhf3NDNsJ8Ev4ofPfyJ84st/VXAHZ+qWN
+         hbjUjMNtuFYssDOkZVmwQd3jjZ2aRHB7LzZXMudOMxdKhUXjQvgE99NClgNPIO9Hpbsn
+         DIzB9bQbLC40kM7pMc6/KHr5SMVkYeHFCvBdMqfHphhwbUtugNsyLNSNokIRfza2ig2X
+         /PMvJE1angF7Z5mFBMnIgt+z1vmKeipku7Z9X8AxWGgPHhFuGAHgyr6b+hgeRoZvAitO
+         MaMZtVMtexu/mDiDaPJDmIj/PXEPssl8OybHTMF+x7fDOqDtGMhu4cZlWCM+hLUEM+WA
+         /zRg==
+X-Gm-Message-State: APjAAAVI9Ye44jivetFVqOZCFmvvH+8LUTdSKcFV7Un8OFJwL0f6DqB6
+        JHSlWrWIbWHqb/KJfPSj59g=
+X-Google-Smtp-Source: APXvYqxDF0A6yCgF0FCviLWVZqNRm5Hbs7TmfD5YpmIKbBad5iRl8KSOywojmloSncHdk6BuyEh3eg==
+X-Received: by 2002:aca:d7d5:: with SMTP id o204mr1337022oig.16.1562707664103;
+        Tue, 09 Jul 2019 14:27:44 -0700 (PDT)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id o18sm140782ote.63.2019.07.09.14.27.42
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Jul 2019 13:35:51 -0700 (PDT)
-Subject: Re: [PATCH] Add regression test cases for kthread stuck
-To:     Jackie Liu <liuyun01@kylinos.cn>
-Cc:     linux-block@vger.kernel.org
-References: <20190709012527.1816-1-liuyun01@kylinos.cn>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <87cacc33-0e77-c92c-8cdc-3d7d9c24aa62@kernel.dk>
-Date:   Tue, 9 Jul 2019 14:35:49 -0600
+        Tue, 09 Jul 2019 14:27:43 -0700 (PDT)
+Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
+ Device (IBNBD)
+To:     Jason Gunthorpe <jgg@mellanox.com>,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Cc:     Jinpu Wang <jinpuwang@gmail.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "dledford@redhat.com" <dledford@redhat.com>,
+        Roman Pen <r.peniaev@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <20190620150337.7847-1-jinpuwang@gmail.com>
+ <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
+ <20190709110036.GQ7034@mtr-leonro.mtl.com>
+ <CAD9gYJL=fo4Oa2hmU4WZgQrzypRbzoPrrFjNQKP2EZFXYxYNCA@mail.gmail.com>
+ <20190709120606.GB3436@mellanox.com>
+ <CAMGffE=T+FVfVzV5cCtVrm_6ikdJ9pjpFsPgx+t0EUpegoZELQ@mail.gmail.com>
+ <20190709131932.GI3436@mellanox.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <1cd86f4b-7cd1-4e00-7111-5c8e09ba06be@grimberg.me>
+Date:   Tue, 9 Jul 2019 14:27:41 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190709012527.1816-1-liuyun01@kylinos.cn>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190709131932.GI3436@mellanox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -73,12 +78,17 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks, committed as:
 
-test/a4c0b3decb33-test.c
+>> Thanks Jason for feedback.
+>> Can you be  more specific about  "the invalidation model for MR was wrong"
+> 
+> MR's must be invalidated before data is handed over to the block
+> layer. It can't leave MRs open for access and then touch the memory
+> the MR covers.
 
-since there's now a properly upstream bound commit for it.
-
--- 
-Jens Axboe
-
+Jason is referring to these fixes:
+2f122e4f5107 ("nvme-rdma: wait for local invalidation before completing 
+a request")
+4af7f7ff92a4 ("nvme-rdma: don't complete requests before a send work 
+request has completed")
+b4b591c87f2b ("nvme-rdma: don't suppress send completions")
