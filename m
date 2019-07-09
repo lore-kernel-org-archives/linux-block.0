@@ -2,63 +2,70 @@ Return-Path: <SRS0=ruTu=VG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F50FC73C56
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 19:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06393C73C53
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 20:35:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0CC9B208C4
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 19:46:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C412D2166E
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 20:35:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="dgIPp7dT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726491AbfGITqB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Jul 2019 15:46:01 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:39315 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726318AbfGITqB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 15:46:01 -0400
-Received: by mail-oi1-f195.google.com with SMTP id m202so16295663oig.6;
-        Tue, 09 Jul 2019 12:46:00 -0700 (PDT)
+        id S1729228AbfGIUfx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Jul 2019 16:35:53 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:41654 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729179AbfGIUfx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 16:35:53 -0400
+Received: by mail-io1-f65.google.com with SMTP id j5so26704076ioj.8
+        for <linux-block@vger.kernel.org>; Tue, 09 Jul 2019 13:35:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=R4pxG1ZYSx2dIuXVzQtCTrGDL0o/YKhhWIjq9TfXU1E=;
+        b=dgIPp7dTLqn/bPXw+FoO1qAHhuET7InfYp6VMrGIQ0eW8Pz0zf6CKDG5PI38nrasen
+         vYqme4kCgLmdmpKUl+ijBz4928fwqq0eXrF2IuC/IlTCo38oaKicQvU0Xa9Z2lgYcdrO
+         Q/u7ry+CT6pDHilngTS+DU0qaYVCXbhS8gAI3ZgoV7eSUpJdgu5gyz+XlgIUHLE+UEfW
+         IiGqUb2penb/GCSs5/O/oar9IkT8Pb2Z1FnNcXkORvtrcPiySGijk0tR8zmKmuDj8+od
+         vVJbxkg+IND4dM3x+2kmJDveH94AFxxlzme1rXGIN8aZxRyGl4W0fsZiUVLs4zidG4dy
+         Sa6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=0qM3i82qaJzPdPQ1QKhtsBhG9j6T7uOCTBb84AUQwmw=;
-        b=A493FvIVQQrIKhxO1QxOINFe4XgSR1tTS0sXeAEspOk43z7BKF6tyAzER9S31hAfG1
-         mUb2D2QHpBDupfWOJz5lydxc08a1DMQVk2edu1BP4witP3vNod810DZP4xtE5mXUm5Wy
-         7p8nWPT92AOYxB8zHfwt1mHKNmnWh98K62xmE2SfPO/6LLh8ZUm09G7VcPD6xoRZ3N9g
-         uPMxMkERDtvU1dynn+eECgAjZYTP23/IP/CwlSX4kra/Guqy7ikwzSSjJbWi2SKY47z/
-         bvPl5KUUeGPiChViirmucXMNXGYmwz9LjlUPf143EnZCDT4D/ou7nizgoRX+gSIV6fYl
-         KHyQ==
-X-Gm-Message-State: APjAAAWhf1WpRQ8zlV7aGanTlhHKLDxAYeitSy9a/da4Y/RBSKkG1XDu
-        q7CGhe81dDYu1C/7vDGdIU0=
-X-Google-Smtp-Source: APXvYqzo6p+6SStIQ+IoTvFpt0PopksiDPZF6pv8ez8wqni0GmAiXqymsiRMqFbyayhRxfG6vvmsRg==
-X-Received: by 2002:aca:ea41:: with SMTP id i62mr1004031oih.144.1562701560031;
-        Tue, 09 Jul 2019 12:46:00 -0700 (PDT)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id n26sm22491otq.10.2019.07.09.12.45.58
+        bh=R4pxG1ZYSx2dIuXVzQtCTrGDL0o/YKhhWIjq9TfXU1E=;
+        b=BF8B6XPpjcIn5KpPoOmcW18XEmAR7x8ilES73uNQuXincKbtAlWdOUUIACaWIPu84n
+         1Z7qGmsUf8v6s4tH5rFMSBzDZ+Xrp+ulf8aZJNwuebGOzOlsEBD++BbCFjlRf85CVaD3
+         NeKM+hkwZjaIMOkh3BtsJBdmQhDoj365zNBhSb1zS1Y8eLNo5GO8CKpH7K87MebN9vIl
+         XXa9fSIaiM+72cx+Vtb8jlfQA1S+P1W3TCPSV3ylPd7vc8eqwYDZ6gA6wBUjq6i4YlTC
+         O+PLjk8s5Zl3nOrhXrKNZTx84bk5hoa2bSjNiZsVApQBg5NOKdMMKcPODbboeijcapKE
+         0+8A==
+X-Gm-Message-State: APjAAAUlm6sAd3an1oSDruq6UzrpNINDqKvnQET5cdL7zrIIynUSrO0G
+        ryVep4OH1CrIAfU/NxxVWmnLn9KDMFDHVg==
+X-Google-Smtp-Source: APXvYqwjO34qDS1yZ9O4v429raTP9QO4kaXAQCm0aBV+KUzo3BZA8r0MRa2X3IB5pw6vSgHj0Xm67w==
+X-Received: by 2002:a5d:80d6:: with SMTP id h22mr21181181ior.231.1562704551910;
+        Tue, 09 Jul 2019 13:35:51 -0700 (PDT)
+Received: from [192.168.1.158] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id p63sm22897849iof.45.2019.07.09.13.35.50
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Jul 2019 12:45:59 -0700 (PDT)
-Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
- Device (IBNBD)
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jack Wang <jinpuwang@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        axboe@kernel.dk, Christoph Hellwig <hch@infradead.org>,
-        bvanassche@acm.org, jgg@mellanox.com, dledford@redhat.com,
-        Roman Pen <r.peniaev@gmail.com>, gregkh@linuxfoundation.org
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me>
-Date:   Tue, 9 Jul 2019 12:45:57 -0700
+        Tue, 09 Jul 2019 13:35:51 -0700 (PDT)
+Subject: Re: [PATCH] Add regression test cases for kthread stuck
+To:     Jackie Liu <liuyun01@kylinos.cn>
+Cc:     linux-block@vger.kernel.org
+References: <20190709012527.1816-1-liuyun01@kylinos.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <87cacc33-0e77-c92c-8cdc-3d7d9c24aa62@kernel.dk>
+Date:   Tue, 9 Jul 2019 14:35:49 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190709012527.1816-1-liuyun01@kylinos.cn>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -66,61 +73,12 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Danil and Jack,
+Thanks, committed as:
 
-> Hallo Doug, Hallo Jason, Hallo Jens, Hallo Greg,
-> 
-> Could you please provide some feedback to the IBNBD driver and the
-> IBTRS library?
-> So far we addressed all the requests provided by the community
+test/a4c0b3decb33-test.c
 
-That is not exactly correct AFAIR,
+since there's now a properly upstream bound commit for it.
 
-My main issues which were raised before are:
-- IMO there isn't any justification to this ibtrs layering separation
-   given that the only user of this is your ibnbd. Unless you are
-   trying to submit another consumer, you should avoid adding another
-   subsystem that is not really general purpose.
+-- 
+Jens Axboe
 
-- ibtrs in general is using almost no infrastructure from the existing
-   kernel subsystems. Examples are:
-   - tag allocation mechanism (which I'm not clear why its needed)
-   - rdma rw abstraction similar to what we have in the core
-   - list_next_or_null_rr_rcu ??
-   - few other examples sprinkled around..
-
-Another question, from what I understand from the code, the client
-always rdma_writes data on writes (with imm) from a remote pool of
-server buffers dedicated to it. Essentially all writes are immediate (no
-rdma reads ever). How is that different than using send wrs to a set of
-pre-posted recv buffers (like all others are doing)? Is it faster?
-
-Also, given that the server pre-allocate a substantial amount of memory
-for each connection, is it documented the requirements from the server
-side? Usually kernel implementations (especially upstream ones) will
-avoid imposing such large longstanding memory requirements on the system
-by default. I don't have a firm stand on this, but wanted to highlight
-this as you are sending this for upstream inclusion.
-
-  and
-> continue to maintain our code up-to-date with the upstream kernel
-> while having an extra compatibility layer for older kernels in our
-> out-of-tree repository.
-
-Overall, while I absolutely support your cause to lower your maintenance
-overhead by having this sit upstream, I don't see why this can be
-helpful to anyone else in the rdma community. If instead you can
-crystallize why/how ibnbd is faster than anything else, and perhaps
-contribute a common infrastructure piece (or enhance an existing one)
-such that other existing ulps can leverage, it will be a lot more
-compelling to include it upstream.
-
-> I understand that SRP and NVMEoF which are in the kernel already do
-> provide equivalent functionality for the majority of the use cases.
-> IBNBD on the other hand is showing higher performance and more
-> importantly includes the IBTRS - a general purpose library to
-> establish connections and transport BIO-like read/write sg-lists over
-> RDMA,
-
-But who needs it? Can other ulps use it or pieces of it? I keep failing
-to understand why is this a benefit if its specific to your ibnbd?
