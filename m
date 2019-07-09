@@ -2,108 +2,204 @@ Return-Path: <SRS0=ruTu=VG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06681C73C46
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 13:51:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FD2C73C46
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 14:17:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D8A47214AF
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 13:51:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91BD0216FD
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 14:17:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="FiG6jhAt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726089AbfGINvv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Jul 2019 09:51:51 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:43273 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726060AbfGINvv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 09:51:51 -0400
-Received: by mail-pf1-f195.google.com with SMTP id i189so9327626pfg.10
-        for <linux-block@vger.kernel.org>; Tue, 09 Jul 2019 06:51:50 -0700 (PDT)
+        id S1726055AbfGIORV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Jul 2019 10:17:21 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:43749 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726025AbfGIORV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 10:17:21 -0400
+Received: by mail-wr1-f66.google.com with SMTP id p13so2067115wru.10
+        for <linux-block@vger.kernel.org>; Tue, 09 Jul 2019 07:17:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=ihAKPWnieId+qKVCfau5qTiytguyF5R9ui15t377qac=;
+        b=FiG6jhAtkrn0uWaUNwk3gU//0grYdL1Io1xZAI9A5iUo+wqBhPNCZ50hc3RBVwlkQJ
+         HhV2wYJ+qDVSvFp96fanh/ueIcj8EpzMCYqNP2ZPZ84ej3ECWzaGOtcHI294VAW7qKIc
+         GXAQHlh1KIVLIKOL7iqo/MVyxyE3tD1An+cQ7pQaS3F6Nb0CQnDYtvDHi+CpzMCJFPyk
+         /nRms7K/xWkKfjXhN4kX91mKkMoYLI7bikm4lYAQK+OfWN9YrerZ+yLh8C/J+F5Jszoz
+         lBI++OfVoe8LzdxZ9JxfMp23oD6AYoQd2P6xzNmUeDSaDuvJw3Et1C98mNpfLM3+w8RY
+         xb/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3IgSjAndKBaL5yNV0LHiVtAxGsoydE+aRc6pMYRyyZ8=;
-        b=mMcT279V7/UMNzdt3NCDIhNKda+AT0CehQ9hVk0RzPIkYYC1wFIjPpQPsAnCj/MgLg
-         rTQDWEU36j8n8YZO2Bqg1BLTcDupfJfIB/ic8ilprXCHxzGLvq33lgj69904iXMZLPbO
-         B7MjFFPqHDNsjFqMCiZtpbpF5jxPPp3eJJN8T+58lkWRqkHcpOA3o3kgQLRQKN87QiWO
-         ncve9YICm8OeDqUtjgUVmE6OmV09Mu/wXICksSHwOjvQAgobh2yBW3jeDPx6ns5wJ3nD
-         i98P1GSQzUDZFfIQ61agmbeNfs7ACqox6C4D5A33/xni2U8+FJ+6Q3G8vjQ5uYrSm0J0
-         NA0w==
-X-Gm-Message-State: APjAAAVU8LQheCr+Dm4D6zne0l5RZ9czu9hKoaNltQ0PkWEQ8vvzRaGl
-        j81mc4EYvDU5E5fUSe03+DDYcDTS
-X-Google-Smtp-Source: APXvYqz4GUJ3WKb81FoOeQ49/MfN1jTXD+EnfafXbdVxUhn6SlfZZBUqXiccPQXfC6Fpg+/D6q5LdQ==
-X-Received: by 2002:a63:2cd1:: with SMTP id s200mr31197433pgs.439.1562680310177;
-        Tue, 09 Jul 2019 06:51:50 -0700 (PDT)
-Received: from asus.site ([2601:647:4000:5dd1:b5e7:ffc0:231b:2d76])
-        by smtp.gmail.com with ESMTPSA id c5sm16482756pgq.80.2019.07.09.06.51.48
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Jul 2019 06:51:49 -0700 (PDT)
-Subject: Re: [PATCH] block: Disable write plugging for zoned block devices
-To:     Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Matias Bjorling <matias.bjorling@wdc.com>
-References: <20190709090219.8784-1-damien.lemoal@wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <f5beffea-f856-c076-e2bd-0cf5fe2b0383@acm.org>
-Date:   Tue, 9 Jul 2019 06:51:47 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ihAKPWnieId+qKVCfau5qTiytguyF5R9ui15t377qac=;
+        b=RqMwbTUI7ba0HKXFT1WPxqP+yxplEYdN5cYp1TR6CE1cIzTtiemRTjSH4a8zP6Lk2Q
+         6+AZHVAaUxFvSQdwAMv6QdsfVALaJ0zLZkKeEjV5/z0hx5Eits8hE8Gx9R6LRS7/rrcl
+         ARw63Vd3m6PWqhA4YMbXHHmMhusJ1Ig1FLZtZ8vjfHTxnO3HX2u9cVPNxd7XEi+Jm8wM
+         ms7duiTCqKNzk+8LaPfg3Vx0jz3o/vfZVzQzmjW9yVYLK5IO0a59uXtIYeWznJXYmlDq
+         1N72opo3pxJgQspBQUYlAI86UoOK83GGJo9H/fXrHE3b+fdNfNyP0r4FNCJz+bVqHrsZ
+         LsLA==
+X-Gm-Message-State: APjAAAWRTxgc/qP5viDVi7XcRaknoW34zNj5v66r0FX+m30esUfvC/S+
+        Q6U3DIn8oP9OABvhjABbNUMsu0DCaKovXjZwtNRc8w==
+X-Google-Smtp-Source: APXvYqyT5+VMNZt+6XVpKpLgiY1UhgFDlLrpZz2kfpvy5WmC2hujvZbiDY91aYt9TfIJBBipIWvTPPwpXpt5HiA7ujs=
+X-Received: by 2002:adf:ea87:: with SMTP id s7mr26175882wrm.24.1562681838630;
+ Tue, 09 Jul 2019 07:17:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190709090219.8784-1-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
+ <20190709110036.GQ7034@mtr-leonro.mtl.com> <CAD9gYJL=fo4Oa2hmU4WZgQrzypRbzoPrrFjNQKP2EZFXYxYNCA@mail.gmail.com>
+ <20190709120606.GB3436@mellanox.com> <CAMGffE=T+FVfVzV5cCtVrm_6ikdJ9pjpFsPgx+t0EUpegoZELQ@mail.gmail.com>
+ <20190709131932.GI3436@mellanox.com>
+In-Reply-To: <20190709131932.GI3436@mellanox.com>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Tue, 9 Jul 2019 16:17:07 +0200
+Message-ID: <CAMGffEnhyoxtpu=tHgTfEX5n5=Ckw+jMBYnF6q5cxqkq9UnSVQ@mail.gmail.com>
+Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
+ Device (IBNBD)
+To:     Jason Gunthorpe <jgg@mellanox.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "bvanassche@acm.org" <bvanassche@acm.org>, chuck.lever@oracle.com
+Cc:     Jinpu Wang <jinpuwang@gmail.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "dledford@redhat.com" <dledford@redhat.com>,
+        Roman Pen <r.peniaev@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/9/19 2:02 AM, Damien Le Moal wrote:
-> Simultaneously writing to a sequential zone of a zoned block device
-> from multiple contexts requires mutual exclusion for BIO issuing to
-> ensure that writes happen sequentially. However, even for a well
-> behaved user correctly implementing such synchronization, BIO plugging
-> may interfere and result in BIOs from the different contextx to be
-> reordered if plugging is done outside of the mutual exclusion section,
-> e.g. the plug was started by a function higher in the call chain than
-> the function issuing BIOs.
-> 
->        Context A                           Context B
-> 
->     | blk_start_plug()
->     | ...
->     | seq_write_zone()
->       | mutex_lock(zone)
->       | submit_bio(bio-0)
->       | submit_bio(bio-1)
->       | mutex_unlock(zone)
->       | return
->     | ------------------------------> | seq_write_zone()
->    				       | mutex_lock(zone)
-> 				       | submit_bio(bio-2)
-> 				       | mutex_unlock(zone)
->     | <------------------------------ |
->     | blk_finish_plug()
-> 
-> In the above example, despite the mutex synchronization resulting in the
-> correct BIO issuing order 0, 1, 2, context A BIOs 0 and 1 end up being
-> issued after BIO 2 when the plug is released with blk_finish_plug().
-> 
-> To fix this problem, introduce the internal helper function
-> blk_mq_plug() to access the current context plug, return the current
-> plug only if the target device is not a zoned block device or if the
-> BIO to be plugged not a write operation. Otherwise, ignore the plug and
-> return NULL, resulting is all writes to zoned block device to never be
-> plugged.
+On Tue, Jul 9, 2019 at 3:19 PM Jason Gunthorpe <jgg@mellanox.com> wrote:
+>
+> On Tue, Jul 09, 2019 at 03:15:46PM +0200, Jinpu Wang wrote:
+> > On Tue, Jul 9, 2019 at 2:06 PM Jason Gunthorpe <jgg@mellanox.com> wrote=
+:
+> > >
+> > > On Tue, Jul 09, 2019 at 01:37:39PM +0200, Jinpu Wang wrote:
+> > > > Leon Romanovsky <leon@kernel.org> =E4=BA=8E2019=E5=B9=B47=E6=9C=889=
+=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=881:00=E5=86=99=E9=81=93=EF=BC=
+=9A
+> > > > >
+> > > > > On Tue, Jul 09, 2019 at 11:55:03AM +0200, Danil Kipnis wrote:
+> > > > > > Hallo Doug, Hallo Jason, Hallo Jens, Hallo Greg,
+> > > > > >
+> > > > > > Could you please provide some feedback to the IBNBD driver and =
+the
+> > > > > > IBTRS library?
+> > > > > > So far we addressed all the requests provided by the community =
+and
+> > > > > > continue to maintain our code up-to-date with the upstream kern=
+el
+> > > > > > while having an extra compatibility layer for older kernels in =
+our
+> > > > > > out-of-tree repository.
+> > > > > > I understand that SRP and NVMEoF which are in the kernel alread=
+y do
+> > > > > > provide equivalent functionality for the majority of the use ca=
+ses.
+> > > > > > IBNBD on the other hand is showing higher performance and more
+> > > > > > importantly includes the IBTRS - a general purpose library to
+> > > > > > establish connections and transport BIO-like read/write sg-list=
+s over
+> > > > > > RDMA, while SRP is targeting SCSI and NVMEoF is addressing NVME=
+. While
+> > > > > > I believe IBNBD does meet the kernel coding standards, it doesn=
+'t have
+> > > > > > a lot of users, while SRP and NVMEoF are widely accepted. Do yo=
+u think
+> > > > > > it would make sense for us to rework our patchset and try pushi=
+ng it
+> > > > > > for staging tree first, so that we can proof IBNBD is well main=
+tained,
+> > > > > > beneficial for the eco-system, find a proper location for it wi=
+thin
+> > > > > > block/rdma subsystems? This would make it easier for people to =
+try it
+> > > > > > out and would also be a huge step for us in terms of maintenanc=
+e
+> > > > > > effort.
+> > > > > > The names IBNBD and IBTRS are in fact misleading. IBTRS sits on=
+ top of
+> > > > > > RDMA and is not bound to IB (We will evaluate IBTRS with ROCE i=
+n the
+> > > > > > near future). Do you think it would make sense to rename the dr=
+iver to
+> > > > > > RNBD/RTRS?
+> > > > >
+> > > > > It is better to avoid "staging" tree, because it will lack attent=
+ion of
+> > > > > relevant people and your efforts will be lost once you will try t=
+o move
+> > > > > out of staging. We are all remembering Lustre and don't want to s=
+ee it
+> > > > > again.
+> > > > >
+> > > > > Back then, you was asked to provide support for performance super=
+iority.
+> > > > > Can you please share any numbers with us?
+> > > > Hi Leon,
+> > > >
+> > > > Thanks for you feedback.
+> > > >
+> > > > For performance numbers,  Danil did intensive benchmark, and create
+> > > > some PDF with graphes here:
+> > > > https://github.com/ionos-enterprise/ibnbd/tree/master/performance/v=
+4-v5.2-rc3
+> > > >
+> > > > It includes both single path results also different multipath polic=
+y results.
+> > > >
+> > > > If you have any question regarding the results, please let us know.
+> > >
+> > > I kind of recall that last time the perf numbers were skewed toward
+> > > IBNBD because the invalidation model for MR was wrong - did this get
+> > > fixed?
+> > >
+> > > Jason
+> >
+> > Thanks Jason for feedback.
+> > Can you be  more specific about  "the invalidation model for MR was wro=
+ng"
+>
+> MR's must be invalidated before data is handed over to the block
+> layer. It can't leave MRs open for access and then touch the memory
+> the MR covers.
+>
+> IMHO this is the most likely explanation for any performance difference
+> from nvme..
+>
+> > I checked in the history of the email thread, only found
+> > "I think from the RDMA side, before we accept something like this, I'd
+> > like to hear from Christoph, Chuck or Sagi that the dataplane
+> > implementation of this is correct, eg it uses the MRs properly and
+> > invalidates at the right time, sequences with dma_ops as required,
+> > etc.
+> > "
+> > And no reply from any of you since then.
+>
+> This task still needs to happen..
+>
+> Jason
 
-Are there classes of zoned devices for which the plug list is useful? If 
-so, have you considered any other approaches, e.g. one plug list per 
-request queue instead of one plug list per task in case of zoned devices?
+We did extensive testing and cross-checked how iser and nvmeof does
+invalidation of MR,
+doesn't find a problem.
 
-Thanks,
++ Chuck
+It will be appreciated if Christoph, Chuck, Sagi or Bart could give a
+check, thank you in advance.
 
-Bart.
+Thanks
+Jack
