@@ -2,204 +2,101 @@ Return-Path: <SRS0=ruTu=VG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FD2C73C46
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 14:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE9E9C73C46
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 14:29:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91BD0216FD
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 14:17:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="FiG6jhAt"
+	by mail.kernel.org (Postfix) with ESMTP id CD2BC2082A
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 14:29:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726055AbfGIORV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Jul 2019 10:17:21 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43749 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726025AbfGIORV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 10:17:21 -0400
-Received: by mail-wr1-f66.google.com with SMTP id p13so2067115wru.10
-        for <linux-block@vger.kernel.org>; Tue, 09 Jul 2019 07:17:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=ihAKPWnieId+qKVCfau5qTiytguyF5R9ui15t377qac=;
-        b=FiG6jhAtkrn0uWaUNwk3gU//0grYdL1Io1xZAI9A5iUo+wqBhPNCZ50hc3RBVwlkQJ
-         HhV2wYJ+qDVSvFp96fanh/ueIcj8EpzMCYqNP2ZPZ84ej3ECWzaGOtcHI294VAW7qKIc
-         GXAQHlh1KIVLIKOL7iqo/MVyxyE3tD1An+cQ7pQaS3F6Nb0CQnDYtvDHi+CpzMCJFPyk
-         /nRms7K/xWkKfjXhN4kX91mKkMoYLI7bikm4lYAQK+OfWN9YrerZ+yLh8C/J+F5Jszoz
-         lBI++OfVoe8LzdxZ9JxfMp23oD6AYoQd2P6xzNmUeDSaDuvJw3Et1C98mNpfLM3+w8RY
-         xb/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ihAKPWnieId+qKVCfau5qTiytguyF5R9ui15t377qac=;
-        b=RqMwbTUI7ba0HKXFT1WPxqP+yxplEYdN5cYp1TR6CE1cIzTtiemRTjSH4a8zP6Lk2Q
-         6+AZHVAaUxFvSQdwAMv6QdsfVALaJ0zLZkKeEjV5/z0hx5Eits8hE8Gx9R6LRS7/rrcl
-         ARw63Vd3m6PWqhA4YMbXHHmMhusJ1Ig1FLZtZ8vjfHTxnO3HX2u9cVPNxd7XEi+Jm8wM
-         ms7duiTCqKNzk+8LaPfg3Vx0jz3o/vfZVzQzmjW9yVYLK5IO0a59uXtIYeWznJXYmlDq
-         1N72opo3pxJgQspBQUYlAI86UoOK83GGJo9H/fXrHE3b+fdNfNyP0r4FNCJz+bVqHrsZ
-         LsLA==
-X-Gm-Message-State: APjAAAWRTxgc/qP5viDVi7XcRaknoW34zNj5v66r0FX+m30esUfvC/S+
-        Q6U3DIn8oP9OABvhjABbNUMsu0DCaKovXjZwtNRc8w==
-X-Google-Smtp-Source: APXvYqyT5+VMNZt+6XVpKpLgiY1UhgFDlLrpZz2kfpvy5WmC2hujvZbiDY91aYt9TfIJBBipIWvTPPwpXpt5HiA7ujs=
-X-Received: by 2002:adf:ea87:: with SMTP id s7mr26175882wrm.24.1562681838630;
- Tue, 09 Jul 2019 07:17:18 -0700 (PDT)
+        id S1726060AbfGIO3d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Jul 2019 10:29:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58992 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726025AbfGIO3d (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 9 Jul 2019 10:29:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BDACF3082E44;
+        Tue,  9 Jul 2019 14:29:27 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DF51F5D70D;
+        Tue,  9 Jul 2019 14:29:21 +0000 (UTC)
+Date:   Tue, 9 Jul 2019 22:29:16 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Matias Bjorling <matias.bjorling@wdc.com>
+Subject: Re: [PATCH] block: Disable write plugging for zoned block devices
+Message-ID: <20190709142915.GA30082@ming.t460p>
+References: <20190709090219.8784-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
- <20190709110036.GQ7034@mtr-leonro.mtl.com> <CAD9gYJL=fo4Oa2hmU4WZgQrzypRbzoPrrFjNQKP2EZFXYxYNCA@mail.gmail.com>
- <20190709120606.GB3436@mellanox.com> <CAMGffE=T+FVfVzV5cCtVrm_6ikdJ9pjpFsPgx+t0EUpegoZELQ@mail.gmail.com>
- <20190709131932.GI3436@mellanox.com>
-In-Reply-To: <20190709131932.GI3436@mellanox.com>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Tue, 9 Jul 2019 16:17:07 +0200
-Message-ID: <CAMGffEnhyoxtpu=tHgTfEX5n5=Ckw+jMBYnF6q5cxqkq9UnSVQ@mail.gmail.com>
-Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
- Device (IBNBD)
-To:     Jason Gunthorpe <jgg@mellanox.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        "bvanassche@acm.org" <bvanassche@acm.org>, chuck.lever@oracle.com
-Cc:     Jinpu Wang <jinpuwang@gmail.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "dledford@redhat.com" <dledford@redhat.com>,
-        Roman Pen <r.peniaev@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190709090219.8784-1-damien.lemoal@wdc.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 09 Jul 2019 14:29:32 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 9, 2019 at 3:19 PM Jason Gunthorpe <jgg@mellanox.com> wrote:
->
-> On Tue, Jul 09, 2019 at 03:15:46PM +0200, Jinpu Wang wrote:
-> > On Tue, Jul 9, 2019 at 2:06 PM Jason Gunthorpe <jgg@mellanox.com> wrote=
-:
-> > >
-> > > On Tue, Jul 09, 2019 at 01:37:39PM +0200, Jinpu Wang wrote:
-> > > > Leon Romanovsky <leon@kernel.org> =E4=BA=8E2019=E5=B9=B47=E6=9C=889=
-=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=881:00=E5=86=99=E9=81=93=EF=BC=
-=9A
-> > > > >
-> > > > > On Tue, Jul 09, 2019 at 11:55:03AM +0200, Danil Kipnis wrote:
-> > > > > > Hallo Doug, Hallo Jason, Hallo Jens, Hallo Greg,
-> > > > > >
-> > > > > > Could you please provide some feedback to the IBNBD driver and =
-the
-> > > > > > IBTRS library?
-> > > > > > So far we addressed all the requests provided by the community =
-and
-> > > > > > continue to maintain our code up-to-date with the upstream kern=
-el
-> > > > > > while having an extra compatibility layer for older kernels in =
-our
-> > > > > > out-of-tree repository.
-> > > > > > I understand that SRP and NVMEoF which are in the kernel alread=
-y do
-> > > > > > provide equivalent functionality for the majority of the use ca=
-ses.
-> > > > > > IBNBD on the other hand is showing higher performance and more
-> > > > > > importantly includes the IBTRS - a general purpose library to
-> > > > > > establish connections and transport BIO-like read/write sg-list=
-s over
-> > > > > > RDMA, while SRP is targeting SCSI and NVMEoF is addressing NVME=
-. While
-> > > > > > I believe IBNBD does meet the kernel coding standards, it doesn=
-'t have
-> > > > > > a lot of users, while SRP and NVMEoF are widely accepted. Do yo=
-u think
-> > > > > > it would make sense for us to rework our patchset and try pushi=
-ng it
-> > > > > > for staging tree first, so that we can proof IBNBD is well main=
-tained,
-> > > > > > beneficial for the eco-system, find a proper location for it wi=
-thin
-> > > > > > block/rdma subsystems? This would make it easier for people to =
-try it
-> > > > > > out and would also be a huge step for us in terms of maintenanc=
-e
-> > > > > > effort.
-> > > > > > The names IBNBD and IBTRS are in fact misleading. IBTRS sits on=
- top of
-> > > > > > RDMA and is not bound to IB (We will evaluate IBTRS with ROCE i=
-n the
-> > > > > > near future). Do you think it would make sense to rename the dr=
-iver to
-> > > > > > RNBD/RTRS?
-> > > > >
-> > > > > It is better to avoid "staging" tree, because it will lack attent=
-ion of
-> > > > > relevant people and your efforts will be lost once you will try t=
-o move
-> > > > > out of staging. We are all remembering Lustre and don't want to s=
-ee it
-> > > > > again.
-> > > > >
-> > > > > Back then, you was asked to provide support for performance super=
-iority.
-> > > > > Can you please share any numbers with us?
-> > > > Hi Leon,
-> > > >
-> > > > Thanks for you feedback.
-> > > >
-> > > > For performance numbers,  Danil did intensive benchmark, and create
-> > > > some PDF with graphes here:
-> > > > https://github.com/ionos-enterprise/ibnbd/tree/master/performance/v=
-4-v5.2-rc3
-> > > >
-> > > > It includes both single path results also different multipath polic=
-y results.
-> > > >
-> > > > If you have any question regarding the results, please let us know.
-> > >
-> > > I kind of recall that last time the perf numbers were skewed toward
-> > > IBNBD because the invalidation model for MR was wrong - did this get
-> > > fixed?
-> > >
-> > > Jason
-> >
-> > Thanks Jason for feedback.
-> > Can you be  more specific about  "the invalidation model for MR was wro=
-ng"
->
-> MR's must be invalidated before data is handed over to the block
-> layer. It can't leave MRs open for access and then touch the memory
-> the MR covers.
->
-> IMHO this is the most likely explanation for any performance difference
-> from nvme..
->
-> > I checked in the history of the email thread, only found
-> > "I think from the RDMA side, before we accept something like this, I'd
-> > like to hear from Christoph, Chuck or Sagi that the dataplane
-> > implementation of this is correct, eg it uses the MRs properly and
-> > invalidates at the right time, sequences with dma_ops as required,
-> > etc.
-> > "
-> > And no reply from any of you since then.
->
-> This task still needs to happen..
->
-> Jason
+On Tue, Jul 09, 2019 at 06:02:19PM +0900, Damien Le Moal wrote:
+> Simultaneously writing to a sequential zone of a zoned block device
+> from multiple contexts requires mutual exclusion for BIO issuing to
+> ensure that writes happen sequentially. However, even for a well
+> behaved user correctly implementing such synchronization, BIO plugging
+> may interfere and result in BIOs from the different contextx to be
+> reordered if plugging is done outside of the mutual exclusion section,
+> e.g. the plug was started by a function higher in the call chain than
+> the function issuing BIOs.
+> 
+>       Context A                           Context B
+> 
+>    | blk_start_plug()
+>    | ...
+>    | seq_write_zone()
+>      | mutex_lock(zone)
+>      | submit_bio(bio-0)
+>      | submit_bio(bio-1)
+>      | mutex_unlock(zone)
+>      | return
+>    | ------------------------------> | seq_write_zone()
+>   				       | mutex_lock(zone)
+> 				       | submit_bio(bio-2)
+> 				       | mutex_unlock(zone)
+>    | <------------------------------ |
+>    | blk_finish_plug()
+> 
+> In the above example, despite the mutex synchronization resulting in the
+> correct BIO issuing order 0, 1, 2, context A BIOs 0 and 1 end up being
+> issued after BIO 2 when the plug is released with blk_finish_plug().
 
-We did extensive testing and cross-checked how iser and nvmeof does
-invalidation of MR,
-doesn't find a problem.
+I am wondering how you guarantee that context B is always run after
+context A.
 
-+ Chuck
-It will be appreciated if Christoph, Chuck, Sagi or Bart could give a
-check, thank you in advance.
+> 
+> To fix this problem, introduce the internal helper function
+> blk_mq_plug() to access the current context plug, return the current
+> plug only if the target device is not a zoned block device or if the
+> BIO to be plugged not a write operation. Otherwise, ignore the plug and
+> return NULL, resulting is all writes to zoned block device to never be
+> plugged.
 
-Thanks
-Jack
+Another candidate approach is to run the following code before
+releasing 'zone' lock:
+
+	if (current->plug)
+		blk_finish_plug(context->plug)
+
+Then we can fix zone specific issue in zone code only, and avoid generic
+blk-core change for zone issue.
+
+Thanks,
+Ming
