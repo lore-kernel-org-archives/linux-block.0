@@ -2,150 +2,269 @@ Return-Path: <SRS0=ruTu=VG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD09C606CF
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 00:45:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 689E5C606B0
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 01:25:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ACB7E216C4
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 00:45:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41C1421537
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 01:25:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726981AbfGIApq convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Jul 2019 20:45:46 -0400
-Received: from smtpbgsg2.qq.com ([54.254.200.128]:51080 "EHLO smtpbgsg2.qq.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726970AbfGIApp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Jul 2019 20:45:45 -0400
-X-QQ-mid: bizesmtp28t1562633138t7drh2e9
-Received: from [192.168.142.168] (unknown [218.76.23.26])
-        by esmtp10.qq.com (ESMTP) with 
-        id ; Tue, 09 Jul 2019 08:45:37 +0800 (CST)
-X-QQ-SSF: 00400000002000Q0WO70000A0000000
-X-QQ-FEAT: ZCfpn3Y0+jOX0ipQlHpu/yS04TS50q2JRaVTYErCQpkAsTWlCfKW7b0qGEk9y
-        4bgoOMEqXYShCG54fdMFE+FDpsNmysAHSNW3Riy0Qs0Xwzn5l8AoWP9KrDbeBBLWhbkXAhc
-        /Byf7MXxKB/gw5Tn2V/NrYJbcNLWHTulB5bU979JnrKJDG49UspA7RBcmFQnY5Lgd5Km9+K
-        6KI/761jDoAwBhoTWd6QmSc5MTB0pMutuK+qqqMAW8dDUUQ4o5rlbfv5VE7G/j479H0v285
-        bdsiu/YklQMguo7maKW4IYus7rZLt43Lac+1pxBk4sNfECXdSNorsH7qQcEX3DBjB/pVo2f
-        sQCJy29s+mIVO29D7Y=
+        id S1725925AbfGIBZv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Jul 2019 21:25:51 -0400
+Received: from smtpproxy19.qq.com ([184.105.206.84]:35947 "EHLO
+        smtpproxy19.qq.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725886AbfGIBZv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jul 2019 21:25:51 -0400
+X-QQ-mid: bizesmtp22t1562635532tc7jf95e
+Received: from Macbook.pro (unknown [218.76.23.26])
+        by esmtp6.qq.com (ESMTP) with 
+        id ; Tue, 09 Jul 2019 09:25:32 +0800 (CST)
+X-QQ-SSF: 01400000000000Q0WO70000A0000000
+X-QQ-FEAT: WM/j9RKF0KpKDiTvQgoNzVXEVF8H0o8X2Jux/ZxyvZlj/HMpIowGH4UeZqYTt
+        77HSj7O18slKmo660e578W6XwzVDFvZ428LxVr6plvWR+qMPZi+u8yzHfXsh4G4h18ZRttH
+        PyoQKr9866eeMYNosR3DjoL+lqyyWRbIPc97e9x0wSGV5bsKEAACt//DL44DBpPSAnJ0OH8
+        N90nSPGz2RLCVoDUGsVAdFtT4yuz4+K5Cgqsnn8jKnHAWY3wUriq99K+Imsh8Mfd+xqSC35
+        G8/5QDqWeVlFeppLNWGxm7OFiScBPpM1ORYRZrobxEgjKcMADoG+jS//l9x2gOcSaOYS5er
+        hkHug95if69EBkRZUsmo/r8PpJAUA==
 X-QQ-GoodBg: 2
-Content-Type: text/plain;
-        charset=gb2312
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v3] io_uring: fix io_sq_thread_stop running in front of
- io_sq_thread
-From:   JackieLiu <liuyun01@kylinos.cn>
-In-Reply-To: <7db0b9eb-ae1a-f133-ed49-83813e0ed632@kernel.dk>
-Date:   Tue, 9 Jul 2019 08:45:37 +0800
-Cc:     ebiggers@kernel.org,
-        =?gb2312?B?wfXV/dSq?= <liuzhengyuan@kylinos.cn>,
-        linux-block@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <48F1415A-8A02-4DC8-B610-73A304423681@kylinos.cn>
-References: <1562564472-18277-1-git-send-email-liuyun01@kylinos.cn>
- <d157c7f6-712b-a904-5335-2b4ac803376c@kernel.dk>
- <29EFA309-E42B-423B-9260-0E5FD0A2D7ED@kylinos.cn>
- <7db0b9eb-ae1a-f133-ed49-83813e0ed632@kernel.dk>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3445.104.11)
+From:   Jackie Liu <liuyun01@kylinos.cn>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Jackie Liu <liuyun01@kylinos.cn>
+Subject: [PATCH] Add regression test cases for kthread stuck
+Date:   Tue,  9 Jul 2019 09:25:27 +0800
+Message-Id: <20190709012527.1816-1-liuyun01@kylinos.cn>
+X-Mailer: git-send-email 2.22.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign4
+Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign2
 X-QQ-Bgrelay: 1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks.
+Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
+---
+ test/Makefile            |   6 +-
+ test/kthread_stop-test.c | 172 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 176 insertions(+), 2 deletions(-)
+ create mode 100644 test/kthread_stop-test.c
 
-> 在 2019年7月9日，08:41，Jens Axboe <axboe@kernel.dk> 写道：
-> 
-> On 7/8/19 6:37 PM, JackieLiu wrote:
->> 
->> 
->>> 在 2019年7月9日，06:31，Jens Axboe <axboe@kernel.dk> 写道：
->>> 
->>> On 7/7/19 11:41 PM, Jackie Liu wrote:
->>>> INFO: task syz-executor.5:8634 blocked for more than 143 seconds.
->>>>        Not tainted 5.2.0-rc5+ #3
->>>> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
->>>> syz-executor.5  D25632  8634   8224 0x00004004
->>>> Call Trace:
->>>>   context_switch kernel/sched/core.c:2818 [inline]
->>>>   __schedule+0x658/0x9e0 kernel/sched/core.c:3445
->>>>   schedule+0x131/0x1d0 kernel/sched/core.c:3509
->>>>   schedule_timeout+0x9a/0x2b0 kernel/time/timer.c:1783
->>>>   do_wait_for_common+0x35e/0x5a0 kernel/sched/completion.c:83
->>>>   __wait_for_common kernel/sched/completion.c:104 [inline]
->>>>   wait_for_common kernel/sched/completion.c:115 [inline]
->>>>   wait_for_completion+0x47/0x60 kernel/sched/completion.c:136
->>>>   kthread_stop+0xb4/0x150 kernel/kthread.c:559
->>>>   io_sq_thread_stop fs/io_uring.c:2252 [inline]
->>>>   io_finish_async fs/io_uring.c:2259 [inline]
->>>>   io_ring_ctx_free fs/io_uring.c:2770 [inline]
->>>>   io_ring_ctx_wait_and_kill+0x268/0x880 fs/io_uring.c:2834
->>>>   io_uring_release+0x5d/0x70 fs/io_uring.c:2842
->>>>   __fput+0x2e4/0x740 fs/file_table.c:280
->>>>   ____fput+0x15/0x20 fs/file_table.c:313
->>>>   task_work_run+0x17e/0x1b0 kernel/task_work.c:113
->>>>   tracehook_notify_resume include/linux/tracehook.h:185 [inline]
->>>>   exit_to_usermode_loop arch/x86/entry/common.c:168 [inline]
->>>>   prepare_exit_to_usermode+0x402/0x4f0 arch/x86/entry/common.c:199
->>>>   syscall_return_slowpath+0x110/0x440 arch/x86/entry/common.c:279
->>>>   do_syscall_64+0x126/0x140 arch/x86/entry/common.c:304
->>>>   entry_SYSCALL_64_after_hwframe+0x49/0xbe
->>>> RIP: 0033:0x412fb1
->>>> Code: 80 3b 7c 0f 84 c7 02 00 00 c7 85 d0 00 00 00 00 00 00 00 48 8b 05 cf
->>>> a6 24 00 49 8b 14 24 41 b9 cb 2a 44 00 48 89 ee 48 89 df <48> 85 c0 4c 0f
->>>> 45 c8 45 31 c0 31 c9 e8 0e 5b 00 00 85 c0 41 89 c7
->>>> RSP: 002b:00007ffe7ee6a180 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
->>>> RAX: 0000000000000000 RBX: 0000000000000004 RCX: 0000000000412fb1
->>>> RDX: 0000001b2d920000 RSI: 0000000000000000 RDI: 0000000000000003
->>>> RBP: 0000000000000001 R08: 00000000f3a3e1f8 R09: 00000000f3a3e1fc
->>>> R10: 00007ffe7ee6a260 R11: 0000000000000293 R12: 000000000075c9a0
->>>> R13: 000000000075c9a0 R14: 0000000000024c00 R15: 000000000075bf2c
->>>> 
->>>> =============================================
->>>> 
->>>> There is an wrong logic, when kthread_park running
->>>> in front of io_sq_thread.
->>>> 
->>>> CPU#0					CPU#1
->>>> 
->>>> io_sq_thread_stop:			int kthread(void *_create):
->>>> 
->>>> kthread_park()
->>>> 					__kthread_parkme(self);	 <<< Wrong
->>>> kthread_stop()
->>>>     << wait for self->exited
->>>>     << clear_bit KTHREAD_SHOULD_PARK
->>>> 
->>>> 					ret = threadfn(data);
->>>> 					   |
->>>> 					   |- io_sq_thread
->>>> 					       |- kthread_should_park()	<< false
->>>> 					       |- schedule() <<< nobody wake up
->>>> 
->>>> stuck CPU#0				stuck CPU#1
->>>> 
->>>> So, use a new variable sqo_thread_started to ensure that io_sq_thread
->>>> run first, then io_sq_thread_stop.
->>> 
->>> I think this looks fine now, I'll apply it. Thanks!
->>> 
->>> Do you have the test case as well? Would like to add it to the
->>> liburing arsenal of regression tests.
->> 
->> Yes, I will. but what's the rules for naming file, they look like sha1
->> or MD5 values.
-> 
-> It's the git sha of the commit that fixed the problem. But don't worry
-> about that, call it whatever and I'll fix it up, if need be.
-> 
-> -- 
-> Jens Axboe
+diff --git a/test/Makefile b/test/Makefile
+index 52b4c9e..53c964d 100644
+--- a/test/Makefile
++++ b/test/Makefile
+@@ -4,14 +4,14 @@ override CFLAGS += -Wall -D_GNU_SOURCE -L../src/
+ all_targets += poll poll-cancel ring-leak fsync io_uring_setup io_uring_register \
+ 	       io_uring_enter nop sq-full cq-full 35fa71a030ca-test \
+ 		917257daa0fe-test b19062a56726-test eeed8b54e0df-test link \
+-		send_recvmsg
++		send_recvmsg kthread_stop-test
+ 
+ all: $(all_targets)
+ 
+ test_srcs := poll.c poll-cancel.c ring-leak.c fsync.c io_uring_setup.c \
+ 	io_uring_register.c io_uring_enter.c nop.c sq-full.c cq-full.c \
+ 	35fa71a030ca-test.c 917257daa0fe-test.c b19062a56726-test.c \
+-	eeed8b54e0df-test.c link.c send_recvmsg.c
++	eeed8b54e0df-test.c link.c send_recvmsg.c kthread_stop-test.c
+ 
+ test_objs := $(patsubst %.c,%.ol,$(test_srcs))
+ 
+@@ -47,6 +47,8 @@ link: link.c
+ 	$(CC) $(CFLAGS) -o $@ link.c -luring
+ send_recvmsg: send_recvmsg.c
+ 	$(CC) $(CFLAGS) -o $@ send_recvmsg.c -luring
++kthread_stop-test: kthread_stop-test.c
++	$(CC) $(CFLAGS) -o $@ kthread_stop-test.c -luring
+ 
+ clean:
+ 	rm -f $(all_targets) $(test_objs)
+diff --git a/test/kthread_stop-test.c b/test/kthread_stop-test.c
+new file mode 100644
+index 0000000..e1e0706
+--- /dev/null
++++ b/test/kthread_stop-test.c
+@@ -0,0 +1,172 @@
++// autogenerated by syzkaller (https://github.com/google/syzkaller)
++
++#include <dirent.h>
++#include <endian.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <signal.h>
++#include <stdarg.h>
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/prctl.h>
++#include <sys/stat.h>
++#include <sys/syscall.h>
++#include <sys/types.h>
++#include <sys/wait.h>
++#include <time.h>
++#include <unistd.h>
++
++static void sleep_ms(uint64_t ms)
++{
++	usleep(ms * 1000);
++}
++
++static uint64_t current_time_ms(void)
++{
++	struct timespec ts;
++	if (clock_gettime(CLOCK_MONOTONIC, &ts))
++		exit(1);
++	return (uint64_t)ts.tv_sec * 1000 + (uint64_t)ts.tv_nsec / 1000000;
++}
++
++static bool write_file(const char* file, const char* what, ...)
++{
++	char buf[1024];
++	va_list args;
++	va_start(args, what);
++	vsnprintf(buf, sizeof(buf), what, args);
++	va_end(args);
++	buf[sizeof(buf) - 1] = 0;
++	int len = strlen(buf);
++	int fd = open(file, O_WRONLY | O_CLOEXEC);
++	if (fd == -1)
++		return false;
++	if (write(fd, buf, len) != len) {
++		int err = errno;
++		close(fd);
++		errno = err;
++		return false;
++	}
++	close(fd);
++	return true;
++}
++
++static void kill_and_wait(int pid, int* status)
++{
++	kill(-pid, SIGKILL);
++	kill(pid, SIGKILL);
++	int i;
++	for (i = 0; i < 100; i++) {
++		if (waitpid(-1, status, WNOHANG | __WALL) == pid)
++			return;
++		usleep(1000);
++	}
++	DIR* dir = opendir("/sys/fs/fuse/connections");
++	if (dir) {
++		for (;;) {
++			struct dirent* ent = readdir(dir);
++			if (!ent)
++				break;
++			if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
++				continue;
++			char abort[300];
++			snprintf(abort, sizeof(abort), "/sys/fs/fuse/connections/%s/abort",
++					ent->d_name);
++			int fd = open(abort, O_WRONLY);
++			if (fd == -1) {
++				continue;
++			}
++			if (write(fd, abort, 1) < 0) {
++			}
++			close(fd);
++		}
++		closedir(dir);
++	} else {
++	}
++	while (waitpid(-1, status, __WALL) != pid) {
++	}
++}
++
++static void setup_test()
++{
++	prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
++	setpgrp();
++	write_file("/proc/self/oom_score_adj", "1000");
++}
++
++static void execute_one(void);
++
++#define WAIT_FLAGS __WALL
++
++static void loop(void)
++{
++	int iter;
++	for (iter = 0;; iter++) {
++		int pid = fork();
++		if (pid < 0)
++			exit(1);
++		if (pid == 0) {
++			setup_test();
++			execute_one();
++			exit(0);
++		}
++		int status = 0;
++		uint64_t start = current_time_ms();
++		for (;;) {
++			if (waitpid(-1, &status, WNOHANG | WAIT_FLAGS) == pid)
++				break;
++			sleep_ms(1);
++			if (current_time_ms() - start < 5 * 1000)
++				continue;
++			kill_and_wait(pid, &status);
++			break;
++		}
++	}
++}
++
++#ifndef __NR_io_uring_setup
++#define __NR_io_uring_setup 425
++#endif
++
++void execute_one(void)
++{
++	*(uint32_t*)0x20000080 = 0;
++	*(uint32_t*)0x20000084 = 0;
++	*(uint32_t*)0x20000088 = 3;
++	*(uint32_t*)0x2000008c = 3;
++	*(uint32_t*)0x20000090 = 0x175;
++	*(uint32_t*)0x20000094 = 0;
++	*(uint32_t*)0x20000098 = 0;
++	*(uint32_t*)0x2000009c = 0;
++	*(uint32_t*)0x200000a0 = 0;
++	*(uint32_t*)0x200000a4 = 0;
++	*(uint32_t*)0x200000a8 = 0;
++	*(uint32_t*)0x200000ac = 0;
++	*(uint32_t*)0x200000b0 = 0;
++	*(uint32_t*)0x200000b4 = 0;
++	*(uint32_t*)0x200000b8 = 0;
++	*(uint32_t*)0x200000bc = 0;
++	*(uint32_t*)0x200000c0 = 0;
++	*(uint32_t*)0x200000c4 = 0;
++	*(uint64_t*)0x200000c8 = 0;
++	*(uint32_t*)0x200000d0 = 0;
++	*(uint32_t*)0x200000d4 = 0;
++	*(uint32_t*)0x200000d8 = 0;
++	*(uint32_t*)0x200000dc = 0;
++	*(uint32_t*)0x200000e0 = 0;
++	*(uint32_t*)0x200000e4 = 0;
++	*(uint32_t*)0x200000e8 = 0;
++	*(uint32_t*)0x200000ec = 0;
++	*(uint64_t*)0x200000f0 = 0;
++	syscall(__NR_io_uring_setup, 0x983, 0x20000080);
++}
++
++int main(void)
++{
++	syscall(__NR_mmap, 0x20000000, 0x1000000, 3, 0x32, -1, 0);
++	loop();
++	return 0;
++}
+-- 
+2.7.4
 
 
 
