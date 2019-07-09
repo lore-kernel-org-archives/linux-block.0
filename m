@@ -6,68 +6,69 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4624C73C50
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 14:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 901E4C73C46
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 14:59:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 665BC21537
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 14:47:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5326B21537
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 14:59:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="IgJ04ZaS";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="kfbLzqOj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="lEkXERxa";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="JPg/6xvA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726046AbfGIOra (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Jul 2019 10:47:30 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:59665 "EHLO
+        id S1726519AbfGIO7G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Jul 2019 10:59:06 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:12559 "EHLO
         esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726025AbfGIOra (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 10:47:30 -0400
+        with ESMTP id S1726318AbfGIO7G (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 10:59:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562683689; x=1594219689;
+  t=1562684472; x=1594220472;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=881fdYuXJzMxFyx3zRhTsMRMfRwPvjA48AOYbQleQ0g=;
-  b=IgJ04ZaSr8oDXL1H9ejWAtnYJ/nHJ6rZGHIjnOtKdVy8YzGNkEoJZLaB
-   Ydx962QYKl1uW0TQvWxTYnmjFL9k5Mqurw+ut8bRrI+tW6vHqpgN49ENO
-   EexjtVm8N16G6TW0s30pgTx1DIzpgPqXOoMDuBkZ/130aMUeaWOWNL293
-   gH6hfwZXuWPeitCAIKeWuTAENYHjeigiAx6+gqAufvnRqAYvDhZMc9Hu3
-   2KketJgUWjgq+Ar0MD9HFW3pAKSvCTZbWCLKH+4KFT6YxLu1dTDycfsFL
-   YE6R2AimmYrJDPlCW2k9ZUPq9JCbbulMJMihCgDuP42jWREerZTnHxGnN
-   g==;
-IronPort-SDR: CDhbHO3tb0daY50m/R3fT5Ap/ZeiqcPE7hWadAtJtDMCvY+us6KsUmgDEfuoicoACXeyrjBgDV
- HQOD7eHFmVVDi8Ho3Q1jRlbfGUT0PZ4t80Nrrr4zpF6J4ru1d0F/d9Sam5pN/WYdsWnWt2BzcU
- aut+lkUGDgfG66XsseDkoaS347114hhyNzWpyhHeeGTtHsv7b2b5pAQROP09LsSAMzGP8S5D3r
- 8lgldqnEOZtoge1UeGNrqlTxneuVk3+0b7PYoNGB3cY8MprrkLFHW3FWLKhiHquE/cOjEWe9fa
- La8=
+  bh=NAmm2g3gE7B2A97tNlx6WZ7OCKvV9Pa0s+EkjxcQVls=;
+  b=lEkXERxaVKeY/ELzSY0YqeYRkxehY+cb+zlPAxqpeqJssLUm96dkHACo
+   lwaQzFQ5XWbJoux/lNpe+TraoiClZ7CmAgJyU35PDg5C/l+oj3/nMinBl
+   OR2cDx1OiP2+ZxorzdudqEDv94JitGhOkfDaw07N50JORfhk+ge3s0R8g
+   FugG9RHfiw9NG5bKt1TiYKbcuioPUwhZkKNY/YZDheOBNM296r0Wa4tHU
+   gh8NtpJpn9WMUInDvHxz0fKGr+/xMVqVe7LhdvmLQHDXd0KGe3Eio3wyY
+   +GyiMcaWnBVoTAtyVnxzgsvmgSNJXb7KjUaiSInlQZBztwgY+4Mtqc8px
+   Q==;
+IronPort-SDR: g4c45tA03xX1a400je24tl8QjiMGIZHNpUwMFGKKrEiKP8SCgyIpokwBipAWEsgxjVY8geEwKQ
+ IYnOJGfygYd6cMDVrCSr76EsbpQkTwdp1jneWCv2yqOTjbNDajXNwTEJH01mR0LObQISeP5Qxv
+ pi16OJM6ha2x4WNsZa3UbjVrURY7fw5x+JdF15q7/KstEasrMRQu30xQOqcRVV07DPHavS36R6
+ YGyEuvrhi0AdahfKLFaAPG6O5tjhkH7yIkkFgea+NdDkThyUP2yNhjr0Xbl2CagphQ4yzW/mTD
+ Hlo=
 X-IronPort-AV: E=Sophos;i="5.63,470,1557158400"; 
-   d="scan'208";a="212450765"
-Received: from mail-by2nam05lp2058.outbound.protection.outlook.com (HELO NAM05-BY2-obe.outbound.protection.outlook.com) ([104.47.50.58])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Jul 2019 22:47:46 +0800
+   d="scan'208";a="212451699"
+Received: from mail-dm3nam03lp2058.outbound.protection.outlook.com (HELO NAM03-DM3-obe.outbound.protection.outlook.com) ([104.47.41.58])
+  by ob1.hgst.iphmx.com with ESMTP; 09 Jul 2019 23:01:11 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gtvyiy1sbOuMHadXREx2sNhgvF1tP9J4O5ld+nrpBIA=;
- b=kfbLzqOjr8ir4KFbKdaM1rdkcN6/wXVablcmTD0tpJC0RJMkIy3lr3eRPcu/SLZCtSIl8NZlWuL2LM16d204dolQjxN4knq8LtPxD43SxoXRyvs64NGq96O6a5E4+KVphPRtw7O5uz9S8pkkJsszN7T0fVqYYlYrX7dRIoxzo5k=
+ bh=/j05MViEiIv13q/8R5HSkgvTiJTH6jA4OkRBLs5Ydcg=;
+ b=JPg/6xvADNVI8srGUWOZTkYG3w4zKGMbDThKDaVRdx4YDllWXwYxBWkMqrvTp1zhJCYcDm/KxlbhYEcOymKEU5HHF0ZEfcbAnhgPzsCjtc67PNW7CiAGjDQtt/gDFRmJNns1Vq0b765fQzNRHuaqbnZiE1IqAys6HWfxoFk1ygc=
 Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.58.207) by
- BYAPR04MB6200.namprd04.prod.outlook.com (20.178.235.22) with Microsoft SMTP
+ BYAPR04MB4279.namprd04.prod.outlook.com (20.176.251.22) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2052.18; Tue, 9 Jul 2019 14:47:13 +0000
+ 15.20.2052.18; Tue, 9 Jul 2019 14:59:03 +0000
 Received: from BYAPR04MB5816.namprd04.prod.outlook.com
  ([fe80::65a9:db0a:646d:eb1e]) by BYAPR04MB5816.namprd04.prod.outlook.com
  ([fe80::65a9:db0a:646d:eb1e%6]) with mapi id 15.20.2073.008; Tue, 9 Jul 2019
- 14:47:12 +0000
+ 14:59:03 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+To:     Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+CC:     Christoph Hellwig <hch@lst.de>,
         Matias Bjorling <Matias.Bjorling@wdc.com>
 Subject: Re: [PATCH] block: Disable write plugging for zoned block devices
 Thread-Topic: [PATCH] block: Disable write plugging for zoned block devices
 Thread-Index: AQHVNjUIGjEvOj9COU2i4snLn/f5ow==
-Date:   Tue, 9 Jul 2019 14:47:12 +0000
-Message-ID: <BYAPR04MB58162A2087D53F27BAF8176BE7F10@BYAPR04MB5816.namprd04.prod.outlook.com>
+Date:   Tue, 9 Jul 2019 14:59:03 +0000
+Message-ID: <BYAPR04MB5816C66406E71DF324CC1F11E7F10@BYAPR04MB5816.namprd04.prod.outlook.com>
 References: <20190709090219.8784-1-damien.lemoal@wdc.com>
- <20190709142915.GA30082@ming.t460p>
+ <f5beffea-f856-c076-e2bd-0cf5fe2b0383@acm.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -76,38 +77,36 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=Damien.LeMoal@wdc.com; 
 x-originating-ip: [60.117.181.124]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0e7884cd-dfd7-4d56-8b4d-08d7047c541b
+x-ms-office365-filtering-correlation-id: e62c0836-dba3-4652-4d94-08d7047dfbc5
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB6200;
-x-ms-traffictypediagnostic: BYAPR04MB6200:
-x-microsoft-antispam-prvs: <BYAPR04MB6200631B1D99481BC0DD365EE7F10@BYAPR04MB6200.namprd04.prod.outlook.com>
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4279;
+x-ms-traffictypediagnostic: BYAPR04MB4279:
+x-microsoft-antispam-prvs: <BYAPR04MB427942026A62FE430C611C59E7F10@BYAPR04MB4279.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
 x-forefront-prvs: 0093C80C01
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(136003)(39860400002)(396003)(346002)(376002)(199004)(189003)(66476007)(5660300002)(52536014)(66446008)(64756008)(91956017)(66946007)(73956011)(76116006)(66066001)(66556008)(71200400001)(71190400001)(6246003)(316002)(53936002)(2906002)(9686003)(55016002)(229853002)(8936002)(81166006)(81156014)(8676002)(6436002)(86362001)(102836004)(6916009)(4326008)(478600001)(68736007)(446003)(6506007)(53546011)(76176011)(14454004)(33656002)(25786009)(186003)(26005)(305945005)(74316002)(7736002)(54906003)(7696005)(72206003)(256004)(14444005)(486006)(476003)(3846002)(6116002)(99286004);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB6200;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(39860400002)(346002)(136003)(396003)(376002)(366004)(199004)(189003)(52084003)(6246003)(9686003)(478600001)(72206003)(55016002)(53936002)(6436002)(25786009)(14454004)(2906002)(229853002)(6116002)(3846002)(4326008)(2501003)(316002)(110136005)(54906003)(33656002)(446003)(486006)(76116006)(64756008)(6506007)(53546011)(66476007)(476003)(102836004)(305945005)(7736002)(66446008)(73956011)(66556008)(52536014)(66946007)(74316002)(8936002)(76176011)(91956017)(5660300002)(66066001)(186003)(8676002)(26005)(256004)(14444005)(81166006)(81156014)(7696005)(86362001)(68736007)(71190400001)(71200400001)(99286004);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4279;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: tOUAQfFdOqdKtZDro7pWO3B6t3NqnbMdMKHH51BfMO5eUCT/DI9E6ydHsp0niRoKilZSsLdxKoMophkXScvN9V72WKyBeStTzNd3/OEdNMtPVHjKNgd/O3mf2qmkOf931xy1LdwsTF4KUywfqDDtPFa42vB0EsoHmQ8hcuMIj7ngJ4xwYwYkEj+W8vEsAHx+HuPXUIo/2LVHfgJdgvzqF4b85rdKyapa6Y7fPh8kJ6emqfgncOmvXlWG96azCbzUrmNlYBqHVW8SI8V6wube5ZixOb9A0uGIXTeTTtpBkF/VE2QhwgAJffgGAMPDW9XnDdhTUEQQqvdOgOTHBxEuBaBPHXcw14ld/HbFRR+C2UxWoNaramXHB6804FFL+H6KyySMhkx3LiHHN4EXqz2DTq4PtK/FsmJOJgeJUIrOuy4=
+x-microsoft-antispam-message-info: cRmvp/rNWIbtgP5tX8IiqQ6mZ/yc/9pubehXYNyZF9Og/Ume//Aj2oBYgGc665CtmgbLJQ726ckKcDznISCAEyaZguR/EdtzzaEkuvh6T4Pqd2gcr2x9SJ2akI/ZWpAZQFI3QHJDUQo/YQQAR7WwCFhUFKso9dqjX7ns5TTtagngR5uJlY7I+AK+kFM3L48AdPPs0uWb5G991kJJxd1MUkHuRt9uHIfXinqCRcqdDeF8WrD6vDNY3UK1q9+0kKDr3Ui0gUu5RuoLXVZyDSzkHT7MUezdL5i25WJxKYKa0vnuvspmjoxMqq7bhrCm5MM4nRYeZKrrhvB1mWauJyJmaHIJgRndKtffH+ERRWUA5SSuVxtJzE8b9wQE8m1KJI4+j0g5A74ZEYbbzXR9g/atP222kjU6JspmMjegLp0y3PE=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e7884cd-dfd7-4d56-8b4d-08d7047c541b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2019 14:47:12.8812
+X-MS-Exchange-CrossTenant-Network-Message-Id: e62c0836-dba3-4652-4d94-08d7047dfbc5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2019 14:59:03.7039
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
 X-MS-Exchange-CrossTenant-userprincipalname: Damien.LeMoal@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB6200
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4279
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,=0A=
-=0A=
-On 2019/07/09 23:29, Ming Lei wrote:=0A=
-> On Tue, Jul 09, 2019 at 06:02:19PM +0900, Damien Le Moal wrote:=0A=
+On 2019/07/09 22:51, Bart Van Assche wrote:=0A=
+> On 7/9/19 2:02 AM, Damien Le Moal wrote:=0A=
 >> Simultaneously writing to a sequential zone of a zoned block device=0A=
 >> from multiple contexts requires mutual exclusion for BIO issuing to=0A=
 >> ensure that writes happen sequentially. However, even for a well=0A=
@@ -119,58 +118,29 @@ On 2019/07/09 23:29, Ming Lei wrote:=0A=
 >> e.g. the plug was started by a function higher in the call chain than=0A=
 >> the function issuing BIOs.=0A=
 >>=0A=
->>       Context A                           Context B=0A=
+>>        Context A                           Context B=0A=
 >>=0A=
->>    | blk_start_plug()=0A=
->>    | ...=0A=
->>    | seq_write_zone()=0A=
->>      | mutex_lock(zone)=0A=
->>      | submit_bio(bio-0)=0A=
->>      | submit_bio(bio-1)=0A=
->>      | mutex_unlock(zone)=0A=
->>      | return=0A=
->>    | ------------------------------> | seq_write_zone()=0A=
->>   				       | mutex_lock(zone)=0A=
+>>     | blk_start_plug()=0A=
+>>     | ...=0A=
+>>     | seq_write_zone()=0A=
+>>       | mutex_lock(zone)=0A=
+>>       | submit_bio(bio-0)=0A=
+>>       | submit_bio(bio-1)=0A=
+>>       | mutex_unlock(zone)=0A=
+>>       | return=0A=
+>>     | ------------------------------> | seq_write_zone()=0A=
+>>    				       | mutex_lock(zone)=0A=
 >> 				       | submit_bio(bio-2)=0A=
 >> 				       | mutex_unlock(zone)=0A=
->>    | <------------------------------ |=0A=
->>    | blk_finish_plug()=0A=
+>>     | <------------------------------ |=0A=
+>>     | blk_finish_plug()=0A=
 >>=0A=
 >> In the above example, despite the mutex synchronization resulting in the=
 =0A=
 >> correct BIO issuing order 0, 1, 2, context A BIOs 0 and 1 end up being=
 =0A=
 >> issued after BIO 2 when the plug is released with blk_finish_plug().=0A=
-> =0A=
-> I am wondering how you guarantee that context B is always run after=0A=
-> context A.=0A=
-=0A=
-My example was a little too oversimplified. Think of a file system allocati=
-ng=0A=
-blocks sequentially and issuing page I/Os for the allocated blocks sequenti=
-ally.=0A=
-The typical sequence is:=0A=
-=0A=
-mutex_lock(zone)=0A=
-alloc_block_extent(zone)=0A=
-for all blocks in the extent=0A=
-	submit_bio()=0A=
-mutex_unlock(zone)=0A=
-=0A=
-This way, it does not matter which context gets the lock first, all write B=
-IOs=0A=
-for the zone remain sequential. The problem with plugs as explained above i=
-s=0A=
-that if the plug start/finish is not within the zone lock, reordering can h=
-appen=0A=
-for the 2 sequences of BIOs issued by the 2 contexts.=0A=
-=0A=
-We hit this problem with btrfs writepages (page writeback) where plugging i=
-s=0A=
-done before the above sequence execution, in the caller function of the pag=
-e=0A=
-writeback processing, resulting in unaligned write errors.=0A=
-=0A=
+>>=0A=
 >> To fix this problem, introduce the internal helper function=0A=
 >> blk_mq_plug() to access the current context plug, return the current=0A=
 >> plug only if the target device is not a zoned block device or if the=0A=
@@ -180,35 +150,36 @@ writeback processing, resulting in unaligned write errors.=0A=
 =0A=
 >> plugged.=0A=
 > =0A=
-> Another candidate approach is to run the following code before=0A=
-> releasing 'zone' lock:=0A=
-> =0A=
-> 	if (current->plug)=0A=
-> 		blk_finish_plug(context->plug)=0A=
-> =0A=
-> Then we can fix zone specific issue in zone code only, and avoid generic=
+> Are there classes of zoned devices for which the plug list is useful? If =
 =0A=
-> blk-core change for zone issue.=0A=
+> so, have you considered any other approaches, e.g. one plug list per =0A=
+> request queue instead of one plug list per task in case of zoned devices?=
 =0A=
-Yes indeed, that would work too. But this patch is precisely to avoid havin=
-g to=0A=
-add such code and simplify implementing support for zoned block device in=
 =0A=
-existing code. Furthermore, plugging for writes to sequential zones has no =
-real=0A=
-value because mq-deadline will dispatch at most one write per zone. So writ=
-es=0A=
-for a single zone tend to accumulate in the scheduler queue, and that creat=
-es=0A=
-plenty of opportunities for merging small sequential writes (e.g. file syst=
-em=0A=
-page BIOs).=0A=
+Plugging for writes to zoned block devices is not really useful at all. The=
 =0A=
-If you think this patch is really not appropriate, we can still address the=
+reason is that for any user of the disk executing requests at a queue depth=
 =0A=
-problem case by case in the support we add for zoned devices. But again, a=
+larger than 1, to preserve write ordering, mq-deadline must be used. With t=
+his=0A=
+scheduler, zone write locking will prevent dispatching more than one write=
 =0A=
-generic solution makes things simpler I think.=0A=
+request per zone at any time, resulting in the accumulation of sequential w=
+rites=0A=
+for a zone in the scheduler queue. This creates plenty of opportunities for=
+=0A=
+merging small (i.e. single page) write BIOs with preceding pending requests=
+,=0A=
+which is exactly the intent of plugging in the first place.=0A=
+=0A=
+A per request queue plug list would work, but it would require a single loc=
+k,=0A=
+going against blk-mq design principle. Such method would also result in a l=
+ot=0A=
+more changes for no real gain at all (for the reason explained above).=0A=
+Performance-wise, simply disabling per context plugging for writes only has=
+ no=0A=
+measurable impact and is far simpler I think.=0A=
 =0A=
 Best regards.=0A=
 =0A=
