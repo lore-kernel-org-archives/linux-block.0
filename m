@@ -2,269 +2,110 @@ Return-Path: <SRS0=ruTu=VG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 689E5C606B0
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 01:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF1B1C606D8
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 07:18:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 41C1421537
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 01:25:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B536F21707
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 07:18:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="KDE2FjPs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725925AbfGIBZv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Jul 2019 21:25:51 -0400
-Received: from smtpproxy19.qq.com ([184.105.206.84]:35947 "EHLO
-        smtpproxy19.qq.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725886AbfGIBZv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jul 2019 21:25:51 -0400
-X-QQ-mid: bizesmtp22t1562635532tc7jf95e
-Received: from Macbook.pro (unknown [218.76.23.26])
-        by esmtp6.qq.com (ESMTP) with 
-        id ; Tue, 09 Jul 2019 09:25:32 +0800 (CST)
-X-QQ-SSF: 01400000000000Q0WO70000A0000000
-X-QQ-FEAT: WM/j9RKF0KpKDiTvQgoNzVXEVF8H0o8X2Jux/ZxyvZlj/HMpIowGH4UeZqYTt
-        77HSj7O18slKmo660e578W6XwzVDFvZ428LxVr6plvWR+qMPZi+u8yzHfXsh4G4h18ZRttH
-        PyoQKr9866eeMYNosR3DjoL+lqyyWRbIPc97e9x0wSGV5bsKEAACt//DL44DBpPSAnJ0OH8
-        N90nSPGz2RLCVoDUGsVAdFtT4yuz4+K5Cgqsnn8jKnHAWY3wUriq99K+Imsh8Mfd+xqSC35
-        G8/5QDqWeVlFeppLNWGxm7OFiScBPpM1ORYRZrobxEgjKcMADoG+jS//l9x2gOcSaOYS5er
-        hkHug95if69EBkRZUsmo/r8PpJAUA==
-X-QQ-GoodBg: 2
-From:   Jackie Liu <liuyun01@kylinos.cn>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, Jackie Liu <liuyun01@kylinos.cn>
-Subject: [PATCH] Add regression test cases for kthread stuck
-Date:   Tue,  9 Jul 2019 09:25:27 +0800
-Message-Id: <20190709012527.1816-1-liuyun01@kylinos.cn>
-X-Mailer: git-send-email 2.22.0
+        id S1726060AbfGIHSk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Jul 2019 03:18:40 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:39650 "EHLO
+        forwardcorp1j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725886AbfGIHSj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 9 Jul 2019 03:18:39 -0400
+Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net [IPv6:2a02:6b8:0:1619::119])
+        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id D282C2E0D96;
+        Tue,  9 Jul 2019 10:18:36 +0300 (MSK)
+Received: from smtpcorp1j.mail.yandex.net (smtpcorp1j.mail.yandex.net [2a02:6b8:0:1619::137])
+        by mxbackcorp2j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id akmrB41YWg-IaU4L3b8;
+        Tue, 09 Jul 2019 10:18:36 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1562656716; bh=HVi/4mii0aOLlDy7iHHak1FI+515jxoexIoDkfss/1A=;
+        h=In-Reply-To:Message-ID:From:Date:References:To:Subject:Cc;
+        b=KDE2FjPstQZ1JWZ8y87Fy8Px3Mh8orINWRH+1EOfNxxQHiQLYHWfGVHIMa/ShuluM
+         Qf6dUMrJmXHj6E0x24mRGYnuhU5YSwAR6sRTChUEt/OlmSWNakUQoMGBKHJGaEBK4N
+         /1geVVpagIy7GU7iyswpuG5DG9YoWpreUdoEST0I=
+Authentication-Results: mxbackcorp2j.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net [2a02:6b8:0:40c:fce8:911:2fe8:4dfb])
+        by smtpcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id 4g1gL3BDrd-IaQCCUKv;
+        Tue, 09 Jul 2019 10:18:36 +0300
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (Client certificate not present)
+Subject: Re: [PATCH] blk-throttle: fix zero wait time for iops throttled group
+To:     bo.liu@linux.alibaba.com
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <156259979778.2486.6296077059654653057.stgit@buzz>
+ <20190708190809.l4fdhigexzdujvuv@US-160370MP2.local>
+From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Message-ID: <2240c382-502d-d112-418b-d44aa67d0ab2@yandex-team.ru>
+Date:   Tue, 9 Jul 2019 10:18:36 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign2
-X-QQ-Bgrelay: 1
+In-Reply-To: <20190708190809.l4fdhigexzdujvuv@US-160370MP2.local>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
----
- test/Makefile            |   6 +-
- test/kthread_stop-test.c | 172 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 176 insertions(+), 2 deletions(-)
- create mode 100644 test/kthread_stop-test.c
+On 08.07.2019 22:08, Liu Bo wrote:
+> On Mon, Jul 08, 2019 at 06:29:57PM +0300, Konstantin Khlebnikov wrote:
+>> After commit 991f61fe7e1d ("Blk-throttle: reduce tail io latency when iops
+>> limit is enforced") wait time could be zero even if group is throttled and
+>> cannot issue requests right now. As a result throtl_select_dispatch() turns
+>> into busy-loop under irq-safe queue spinlock.
+>>
+>> Fix is simple: always round up target time to the next throttle slice.
+>>
+>> Fixes: 991f61fe7e1d ("Blk-throttle: reduce tail io latency when iops limit is enforced")
+>> Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+>> Cc: stable@vger.kernel.org # v4.19+
+>> ---
+>>   block/blk-throttle.c |    9 +++------
+>>   1 file changed, 3 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+>> index 9ea7c0ecad10..8ab6c8153223 100644
+>> --- a/block/blk-throttle.c
+>> +++ b/block/blk-throttle.c
+>> @@ -881,13 +881,10 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+>>   	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
+>>   	u64 tmp;
+>>   
+>> -	jiffy_elapsed = jiffy_elapsed_rnd = jiffies - tg->slice_start[rw];
+>> -
+>> -	/* Slice has just started. Consider one slice interval */
+>> -	if (!jiffy_elapsed)
+>> -		jiffy_elapsed_rnd = tg->td->throtl_slice;
+>> +	jiffy_elapsed = jiffies - tg->slice_start[rw];
+>>   
+>> -	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
+>> +	/* Round up to the next throttle slice, wait time must be nonzero */
+>> +	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
+>>   
+>>   	/*
+>>   	 * jiffy_elapsed_rnd should not be a big value as minimum iops can be
+> 
+> Did you use a tiny iops limit to run into this?
 
-diff --git a/test/Makefile b/test/Makefile
-index 52b4c9e..53c964d 100644
---- a/test/Makefile
-+++ b/test/Makefile
-@@ -4,14 +4,14 @@ override CFLAGS += -Wall -D_GNU_SOURCE -L../src/
- all_targets += poll poll-cancel ring-leak fsync io_uring_setup io_uring_register \
- 	       io_uring_enter nop sq-full cq-full 35fa71a030ca-test \
- 		917257daa0fe-test b19062a56726-test eeed8b54e0df-test link \
--		send_recvmsg
-+		send_recvmsg kthread_stop-test
- 
- all: $(all_targets)
- 
- test_srcs := poll.c poll-cancel.c ring-leak.c fsync.c io_uring_setup.c \
- 	io_uring_register.c io_uring_enter.c nop.c sq-full.c cq-full.c \
- 	35fa71a030ca-test.c 917257daa0fe-test.c b19062a56726-test.c \
--	eeed8b54e0df-test.c link.c send_recvmsg.c
-+	eeed8b54e0df-test.c link.c send_recvmsg.c kthread_stop-test.c
- 
- test_objs := $(patsubst %.c,%.ol,$(test_srcs))
- 
-@@ -47,6 +47,8 @@ link: link.c
- 	$(CC) $(CFLAGS) -o $@ link.c -luring
- send_recvmsg: send_recvmsg.c
- 	$(CC) $(CFLAGS) -o $@ send_recvmsg.c -luring
-+kthread_stop-test: kthread_stop-test.c
-+	$(CC) $(CFLAGS) -o $@ kthread_stop-test.c -luring
- 
- clean:
- 	rm -f $(all_targets) $(test_objs)
-diff --git a/test/kthread_stop-test.c b/test/kthread_stop-test.c
-new file mode 100644
-index 0000000..e1e0706
---- /dev/null
-+++ b/test/kthread_stop-test.c
-@@ -0,0 +1,172 @@
-+// autogenerated by syzkaller (https://github.com/google/syzkaller)
-+
-+#include <dirent.h>
-+#include <endian.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <signal.h>
-+#include <stdarg.h>
-+#include <stdbool.h>
-+#include <stdint.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/prctl.h>
-+#include <sys/stat.h>
-+#include <sys/syscall.h>
-+#include <sys/types.h>
-+#include <sys/wait.h>
-+#include <time.h>
-+#include <unistd.h>
-+
-+static void sleep_ms(uint64_t ms)
-+{
-+	usleep(ms * 1000);
-+}
-+
-+static uint64_t current_time_ms(void)
-+{
-+	struct timespec ts;
-+	if (clock_gettime(CLOCK_MONOTONIC, &ts))
-+		exit(1);
-+	return (uint64_t)ts.tv_sec * 1000 + (uint64_t)ts.tv_nsec / 1000000;
-+}
-+
-+static bool write_file(const char* file, const char* what, ...)
-+{
-+	char buf[1024];
-+	va_list args;
-+	va_start(args, what);
-+	vsnprintf(buf, sizeof(buf), what, args);
-+	va_end(args);
-+	buf[sizeof(buf) - 1] = 0;
-+	int len = strlen(buf);
-+	int fd = open(file, O_WRONLY | O_CLOEXEC);
-+	if (fd == -1)
-+		return false;
-+	if (write(fd, buf, len) != len) {
-+		int err = errno;
-+		close(fd);
-+		errno = err;
-+		return false;
-+	}
-+	close(fd);
-+	return true;
-+}
-+
-+static void kill_and_wait(int pid, int* status)
-+{
-+	kill(-pid, SIGKILL);
-+	kill(pid, SIGKILL);
-+	int i;
-+	for (i = 0; i < 100; i++) {
-+		if (waitpid(-1, status, WNOHANG | __WALL) == pid)
-+			return;
-+		usleep(1000);
-+	}
-+	DIR* dir = opendir("/sys/fs/fuse/connections");
-+	if (dir) {
-+		for (;;) {
-+			struct dirent* ent = readdir(dir);
-+			if (!ent)
-+				break;
-+			if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
-+				continue;
-+			char abort[300];
-+			snprintf(abort, sizeof(abort), "/sys/fs/fuse/connections/%s/abort",
-+					ent->d_name);
-+			int fd = open(abort, O_WRONLY);
-+			if (fd == -1) {
-+				continue;
-+			}
-+			if (write(fd, abort, 1) < 0) {
-+			}
-+			close(fd);
-+		}
-+		closedir(dir);
-+	} else {
-+	}
-+	while (waitpid(-1, status, __WALL) != pid) {
-+	}
-+}
-+
-+static void setup_test()
-+{
-+	prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
-+	setpgrp();
-+	write_file("/proc/self/oom_score_adj", "1000");
-+}
-+
-+static void execute_one(void);
-+
-+#define WAIT_FLAGS __WALL
-+
-+static void loop(void)
-+{
-+	int iter;
-+	for (iter = 0;; iter++) {
-+		int pid = fork();
-+		if (pid < 0)
-+			exit(1);
-+		if (pid == 0) {
-+			setup_test();
-+			execute_one();
-+			exit(0);
-+		}
-+		int status = 0;
-+		uint64_t start = current_time_ms();
-+		for (;;) {
-+			if (waitpid(-1, &status, WNOHANG | WAIT_FLAGS) == pid)
-+				break;
-+			sleep_ms(1);
-+			if (current_time_ms() - start < 5 * 1000)
-+				continue;
-+			kill_and_wait(pid, &status);
-+			break;
-+		}
-+	}
-+}
-+
-+#ifndef __NR_io_uring_setup
-+#define __NR_io_uring_setup 425
-+#endif
-+
-+void execute_one(void)
-+{
-+	*(uint32_t*)0x20000080 = 0;
-+	*(uint32_t*)0x20000084 = 0;
-+	*(uint32_t*)0x20000088 = 3;
-+	*(uint32_t*)0x2000008c = 3;
-+	*(uint32_t*)0x20000090 = 0x175;
-+	*(uint32_t*)0x20000094 = 0;
-+	*(uint32_t*)0x20000098 = 0;
-+	*(uint32_t*)0x2000009c = 0;
-+	*(uint32_t*)0x200000a0 = 0;
-+	*(uint32_t*)0x200000a4 = 0;
-+	*(uint32_t*)0x200000a8 = 0;
-+	*(uint32_t*)0x200000ac = 0;
-+	*(uint32_t*)0x200000b0 = 0;
-+	*(uint32_t*)0x200000b4 = 0;
-+	*(uint32_t*)0x200000b8 = 0;
-+	*(uint32_t*)0x200000bc = 0;
-+	*(uint32_t*)0x200000c0 = 0;
-+	*(uint32_t*)0x200000c4 = 0;
-+	*(uint64_t*)0x200000c8 = 0;
-+	*(uint32_t*)0x200000d0 = 0;
-+	*(uint32_t*)0x200000d4 = 0;
-+	*(uint32_t*)0x200000d8 = 0;
-+	*(uint32_t*)0x200000dc = 0;
-+	*(uint32_t*)0x200000e0 = 0;
-+	*(uint32_t*)0x200000e4 = 0;
-+	*(uint32_t*)0x200000e8 = 0;
-+	*(uint32_t*)0x200000ec = 0;
-+	*(uint64_t*)0x200000f0 = 0;
-+	syscall(__NR_io_uring_setup, 0x983, 0x20000080);
-+}
-+
-+int main(void)
-+{
-+	syscall(__NR_mmap, 0x20000000, 0x1000000, 3, 0x32, -1, 0);
-+	loop();
-+	return 0;
-+}
--- 
-2.7.4
+Yep. 25 iops
 
+also kernel built with HZ=250, this might be related
 
-
+> 
+> thanks,
+> -liubo
+> 
