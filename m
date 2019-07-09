@@ -2,167 +2,318 @@ Return-Path: <SRS0=ruTu=VG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB61CC606B0
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 09:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9813C606B0
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 09:55:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99E9E216C4
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 09:02:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B9D02080C
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 09:55:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="d+PD7Ajk"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="g+JBpHsT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725989AbfGIJCW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Jul 2019 05:02:22 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:20455 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725985AbfGIJCV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 05:02:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562662941; x=1594198941;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=QFFEhtTPlnJx7vpNBJ42wHRu1IlH/2nKJuOt87/gRUs=;
-  b=d+PD7Ajk4tJzVAuRS4lAr8STXA7W63/oOhWE48JO7zvYJJ94JqAGspie
-   ns8dSq3ELFmZWR0TqNPV+b1mpzs3m8JOeKL96ZDBRM+9uSf4kUMg+RTjy
-   x/xp1PrcIxOocOtB6j48D24rE9GORfuCfpeEs1rBnljP+g4Z1ajXFEjQr
-   UtfzwkPycj4wSWPUd61gbAVQyp/Ox+o2eZoLcAgUtb815pxNj9Uz3/NYl
-   Y+yuYfVb+vm0mvrd/ouITk1w2MrTEG0ckeqJtiex2EKBvbwNeJTovqRZB
-   Yk2b9bYN13u7B3u+AEeIvvDBS9pIOEjoe7pFZ5Vl9HW9jEy6fHIsnhcYY
-   g==;
-IronPort-SDR: ljwoKlEnYGBD9wE2AHdLb0Nxgw6FMgI25d+PjcPe/meWH6PdPKwwU0w6FZ+iT+JjZjpPlnhTIZ
- uAmZnoK458UiClTr9UU9uCeL0xeStR0kC0VQ5cmmmtNLylxyokJX47guhAoKXSepks9H7gN6eq
- nGpXXxkzUGoq3MpoR8epydp03JQQxPssr5F+O+RDUAT/KiKLTD6oCtBH1fDUuystk8uzGzw02J
- ak3K+9dB/gsztf1cz74lTr3bNvoVSbcmRZrMAZ6hiSHjcu8ApJ5nCkQKbWaR2LPQjs4ehnnK2M
- Jtg=
-X-IronPort-AV: E=Sophos;i="5.63,470,1557158400"; 
-   d="scan'208";a="112531838"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Jul 2019 17:02:21 +0800
-IronPort-SDR: F6bo6d1vubz1wnuOGTYcGIIQbU/w6E/KsnoBtGsv9ZGAF3FMzpRrvleXvV7HAlJLOPFvEBOoHs
- 4QXpvDhVK638DHKAEzm/3eRRXDz8HOSKbBblaJq8xO/IoU9tzHj71JgcsWgMZPZ9q0XeZA8Fkf
- 8D/nEzt5/pOkkv2x7U7xYiTKRBpVIJh/acLGv8RNZYPdog5BDTTRiNMFMuCIxRvGTVkDclTs2r
- zGgavR3fa6La3GBkhVCDWTL/PwqHH53ZR34n0Zsz/4eaBtBzuCsgCwdERicziWIuIEWM7uMI7V
- MCu+aMAlcnb9ofbNjKLN/s2w
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 09 Jul 2019 02:01:08 -0700
-IronPort-SDR: nmZHKQGjlsBvW0M+pTcKy9sbXw2iMlRAAxlbiKZ3RNjxuXOrRBxPyjqf3oWG9kDgO/NXzezC2s
- qNo22J4D2je1rVSRg1s0eJM+G7GJ11QcD9GrqL/MhpZZL2d82ai3Gf/zzSoyhIBKG9ZpYzQj4s
- Zjdy0Sf+YZjnyVCTt6EnKKMpH/WYJ3lchZZEzgoG/nLo4fMu79f3GgIjxePhtDuxC41kH7htj8
- ngjLd+sWwJQptToKTZesUV7qfvw8xZzWuxhAR99PsPidwBYN8x0d7JERzgpUqgJjpr57gNjuIN
- ayo=
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 09 Jul 2019 02:02:20 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH] block: Disable write plugging for zoned block devices
-Date:   Tue,  9 Jul 2019 18:02:19 +0900
-Message-Id: <20190709090219.8784-1-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.21.0
+        id S1726229AbfGIJzP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Jul 2019 05:55:15 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:35628 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726089AbfGIJzP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 05:55:15 -0400
+Received: by mail-io1-f66.google.com with SMTP id m24so32347585ioo.2
+        for <linux-block@vger.kernel.org>; Tue, 09 Jul 2019 02:55:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=g28ewgu3PEIy6WR2nZnTXXY+P5BVPY2YX8c512lYR/0=;
+        b=g+JBpHsTTp4fibOxnPjhEV6bf/MWx3NAHwHQmAETUudxbqElhdV3rprUcijyZe4R7x
+         2Pw2o602GpD08VEiSwx4XWdkFIjM3LAFMa3ML2KlpSCMx3Uj88i1MhYy73KOVlz6DlcU
+         PYIy/WBBBtCHnMiufKHiLifWz784Fo0XlAwjWrONicMRh8bd1QRwfJ2PcSuvVzyuS6Bv
+         sOSQfQMLym1O4xu9a/fbnBxjxgmcPdONigcOVvO6JZ5CXlM/CRzTxiVHaGZWumJnL5Cz
+         mWRSWYI4EBBDBnYqpK4HbrweQdt6enBT45/+V8D4t/vdKOEs2b6LNhLcVW0bM+INtyox
+         CKdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=g28ewgu3PEIy6WR2nZnTXXY+P5BVPY2YX8c512lYR/0=;
+        b=PABEFExX/Gc//0JeiP5j4/35QOYkkm0rIybLoEcY0Qrnfb9u4y6xEM9fwAS6EHPk0T
+         5zx9JGV7ILW/iaAaF8yNMBvdF9Rc18RJyKOfcXBQCskGblxDUd32tSFf4EnzR5T1rhej
+         e5yXmTZrJ+zIdMGklz4oyGuaB1eq3RmVf20LbAuUCcv2X05s0IcwiLi4EEK8kEWFekbt
+         b5Lx+xAbOMztJQO8TGGR28d9vfHNdsLXAAwlXwEfVGRzfIqLZvbwvEWnlPxE/XXgCd8X
+         UFSfRAsXzbcmhCPREaQv39T4HbJJJfzSFjRhn54uDsIce5a9AmZ+bgGIPHYMwM5TspL5
+         zl/w==
+X-Gm-Message-State: APjAAAWy2MELIpn98O/ehDT8bWAvWJKbTGMOp5wuT4vpgq+EFzF5lGJs
+        lu9iiZvWj2YTT+ThcCGqjhl/DORUFlgoMacrbjiZ
+X-Google-Smtp-Source: APXvYqzct1/tIO3nEIHVmSQewosSGSjypfcnK7czUlJiGCmeSLkJeDaTsG8Le+jUXxZq5Pg5XTpO2Fxg2uQMZq5Zorc=
+X-Received: by 2002:a6b:5b01:: with SMTP id v1mr19748790ioh.120.1562666114366;
+ Tue, 09 Jul 2019 02:55:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190620150337.7847-1-jinpuwang@gmail.com>
+In-Reply-To: <20190620150337.7847-1-jinpuwang@gmail.com>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Tue, 9 Jul 2019 11:55:03 +0200
+Message-ID: <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
+Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
+ Device (IBNBD)
+To:     Jack Wang <jinpuwang@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        axboe@kernel.dk, Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>, bvanassche@acm.org,
+        jgg@mellanox.com, dledford@redhat.com,
+        Roman Pen <r.peniaev@gmail.com>, gregkh@linuxfoundation.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Simultaneously writing to a sequential zone of a zoned block device
-from multiple contexts requires mutual exclusion for BIO issuing to
-ensure that writes happen sequentially. However, even for a well
-behaved user correctly implementing such synchronization, BIO plugging
-may interfere and result in BIOs from the different contextx to be
-reordered if plugging is done outside of the mutual exclusion section,
-e.g. the plug was started by a function higher in the call chain than
-the function issuing BIOs.
+Hallo Doug, Hallo Jason, Hallo Jens, Hallo Greg,
 
-      Context A                           Context B
+Could you please provide some feedback to the IBNBD driver and the
+IBTRS library?
+So far we addressed all the requests provided by the community and
+continue to maintain our code up-to-date with the upstream kernel
+while having an extra compatibility layer for older kernels in our
+out-of-tree repository.
+I understand that SRP and NVMEoF which are in the kernel already do
+provide equivalent functionality for the majority of the use cases.
+IBNBD on the other hand is showing higher performance and more
+importantly includes the IBTRS - a general purpose library to
+establish connections and transport BIO-like read/write sg-lists over
+RDMA, while SRP is targeting SCSI and NVMEoF is addressing NVME. While
+I believe IBNBD does meet the kernel coding standards, it doesn't have
+a lot of users, while SRP and NVMEoF are widely accepted. Do you think
+it would make sense for us to rework our patchset and try pushing it
+for staging tree first, so that we can proof IBNBD is well maintained,
+beneficial for the eco-system, find a proper location for it within
+block/rdma subsystems? This would make it easier for people to try it
+out and would also be a huge step for us in terms of maintenance
+effort.
+The names IBNBD and IBTRS are in fact misleading. IBTRS sits on top of
+RDMA and is not bound to IB (We will evaluate IBTRS with ROCE in the
+near future). Do you think it would make sense to rename the driver to
+RNBD/RTRS?
 
-   | blk_start_plug()
-   | ...
-   | seq_write_zone()
-     | mutex_lock(zone)
-     | submit_bio(bio-0)
-     | submit_bio(bio-1)
-     | mutex_unlock(zone)
-     | return
-   | ------------------------------> | seq_write_zone()
-  				       | mutex_lock(zone)
-				       | submit_bio(bio-2)
-				       | mutex_unlock(zone)
-   | <------------------------------ |
-   | blk_finish_plug()
+Thank you,
+Best Regards,
+Danil
 
-In the above example, despite the mutex synchronization resulting in the
-correct BIO issuing order 0, 1, 2, context A BIOs 0 and 1 end up being
-issued after BIO 2 when the plug is released with blk_finish_plug().
-
-To fix this problem, introduce the internal helper function
-blk_mq_plug() to access the current context plug, return the current
-plug only if the target device is not a zoned block device or if the
-BIO to be plugged not a write operation. Otherwise, ignore the plug and
-return NULL, resulting is all writes to zoned block device to never be
-plugged.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-core.c |  2 +-
- block/blk-mq.c   |  2 +-
- block/blk-mq.h   | 12 ++++++++++++
- 3 files changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 8340f69670d8..3957ea6811c3 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -645,7 +645,7 @@ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
- 	struct request *rq;
- 	struct list_head *plug_list;
- 
--	plug = current->plug;
-+	plug = blk_mq_plug(q, bio);
- 	if (!plug)
- 		return false;
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ce0f5f4ede70..90be5bb6fa1b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1969,7 +1969,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 
- 	cookie = request_to_qc_t(data.hctx, rq);
- 
--	plug = current->plug;
-+	plug = blk_mq_plug(q, bio);
- 	if (unlikely(is_flush_fua)) {
- 		blk_mq_put_ctx(data.ctx);
- 		blk_mq_bio_to_request(rq, bio);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 633a5a77ee8b..d9b1e94b82a4 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -238,4 +238,16 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
- 		qmap->mq_map[cpu] = 0;
- }
- 
-+static inline struct blk_plug *blk_mq_plug(struct request_queue *q,
-+					   struct bio *bio)
-+{
-+	struct blk_plug *plug = current->plug;
-+
-+	if (!blk_queue_is_zoned(q) || !op_is_write(bio_op(bio)))
-+		return plug;
-+
-+	/* Zoned block device write case: do not plug the BIO */
-+	return NULL;
-+}
-+
- #endif
--- 
-2.21.0
-
+On Thu, Jun 20, 2019 at 5:03 PM Jack Wang <jinpuwang@gmail.com> wrote:
+>
+> Hi all,
+>
+> Here is v4 of IBNBD/IBTRS patches, which have minor changes
+>
+>  Changelog
+>  ---------
+> v4:
+>   o Protocol extended to transport IO priorities
+>   o Support for Mellanox ConnectX-4/X-5
+>   o Minor sysfs extentions (display access mode on server side)
+>   o Bug fixes: cleaning up sysfs folders, race on deallocation of resources
+>   o Style fixes
+>
+> v3:
+>   o Sparse fixes:
+>      - le32 -> le16 conversion
+>      - pcpu and RCU wrong declaration
+>      - sysfs: dynamically alloc array of sockaddr structures to reduce
+>            size of a stack frame
+>
+>   o Rename sysfs folder on client and server sides to show source and
+>     destination addresses of the connection, i.e.:
+>            .../<session-name>/paths/<src@dst>/
+>
+>   o Remove external inclusions from Makefiles.
+>   * https://lwn.net/Articles/756994/
+>
+> v2:
+>   o IBNBD:
+>      - No legacy request IO mode, only MQ is left.
+>
+>   o IBTRS:
+>      - No FMR registration, only FR is left.
+>
+>   * https://lwn.net/Articles/755075/
+>
+> v1:
+>   - IBTRS: load-balancing and IO fail-over using multipath features were added.
+>
+>   - Major parts of the code were rewritten, simplified and overall code
+>     size was reduced by a quarter.
+>
+>   * https://lwn.net/Articles/746342/
+>
+> v0:
+>   - Initial submission
+>
+>   * https://lwn.net/Articles/718181/
+>
+>
+>  Introduction
+>  -------------
+>
+> IBTRS (InfiniBand Transport) is a reliable high speed transport library
+> which allows for establishing connection between client and server
+> machines via RDMA. It is based on RDMA-CM, so expect also to support RoCE
+> and iWARP, but we mainly tested in IB environment. It is optimized to
+> transfer (read/write) IO blocks in the sense that it follows the BIO
+> semantics of providing the possibility to either write data from a
+> scatter-gather list to the remote side or to request ("read") data
+> transfer from the remote side into a given set of buffers.
+>
+> IBTRS is multipath capable and provides I/O fail-over and load-balancing
+> functionality, i.e. in IBTRS terminology, an IBTRS path is a set of RDMA
+> CMs and particular path is selected according to the load-balancing policy.
+> It can be used for other components not bind to IBNBD.
+>
+>
+> IBNBD (InfiniBand Network Block Device) is a pair of kernel modules
+> (client and server) that allow for remote access of a block device on
+> the server over IBTRS protocol. After being mapped, the remote block
+> devices can be accessed on the client side as local block devices.
+> Internally IBNBD uses IBTRS as an RDMA transport library.
+>
+>
+>    - IBNBD/IBTRS is developed in order to map thin provisioned volumes,
+>      thus internal protocol is simple.
+>    - IBTRS was developed as an independent RDMA transport library, which
+>      supports fail-over and load-balancing policies using multipath, thus
+>      it can be used for any other IO needs rather than only for block
+>      device.
+>    - IBNBD/IBTRS is fast.
+>      Old comparison results:
+>      https://www.spinics.net/lists/linux-rdma/msg48799.html
+>      New comparison results: see performance measurements section below.
+>
+> Key features of IBTRS transport library and IBNBD block device:
+>
+> o High throughput and low latency due to:
+>    - Only two RDMA messages per IO.
+>    - IMM InfiniBand messages on responses to reduce round trip latency.
+>    - Simplified memory management: memory allocation happens once on
+>      server side when IBTRS session is established.
+>
+> o IO fail-over and load-balancing by using multipath.  According to
+>   our test loads additional path brings ~20% of bandwidth.
+>
+> o Simple configuration of IBNBD:
+>    - Server side is completely passive: volumes do not need to be
+>      explicitly exported.
+>    - Only IB port GID and device path needed on client side to map
+>      a block device.
+>    - A device is remapped automatically i.e. after storage reboot.
+>
+> Commits for kernel can be found here:
+>    https://github.com/ionos-enterprise/ibnbd/tree/linux-5.2-rc3--ibnbd-v4
+> The out-of-tree modules are here:
+>    https://github.com/ionos-enterprise/ibnbd
+>
+> Vault 2017 presentation:
+>   https://events.static.linuxfound.org/sites/events/files/slides/IBNBD-Vault-2017.pdf
+>
+>  Performance measurements
+>  ------------------------
+>
+> o IBNBD and NVMEoRDMA
+>
+>   Performance results for the v5.2-rc3 kernel
+>   link: https://github.com/ionos-enterprise/ibnbd/tree/develop/performance/v4-v5.2-rc3
+>
+> Roman Pen (25):
+>   sysfs: export sysfs_remove_file_self()
+>   ibtrs: public interface header to establish RDMA connections
+>   ibtrs: private headers with IBTRS protocol structs and helpers
+>   ibtrs: core: lib functions shared between client and server modules
+>   ibtrs: client: private header with client structs and functions
+>   ibtrs: client: main functionality
+>   ibtrs: client: statistics functions
+>   ibtrs: client: sysfs interface functions
+>   ibtrs: server: private header with server structs and functions
+>   ibtrs: server: main functionality
+>   ibtrs: server: statistics functions
+>   ibtrs: server: sysfs interface functions
+>   ibtrs: include client and server modules into kernel compilation
+>   ibtrs: a bit of documentation
+>   ibnbd: private headers with IBNBD protocol structs and helpers
+>   ibnbd: client: private header with client structs and functions
+>   ibnbd: client: main functionality
+>   ibnbd: client: sysfs interface functions
+>   ibnbd: server: private header with server structs and functions
+>   ibnbd: server: main functionality
+>   ibnbd: server: functionality for IO submission to file or block dev
+>   ibnbd: server: sysfs interface functions
+>   ibnbd: include client and server modules into kernel compilation
+>   ibnbd: a bit of documentation
+>   MAINTAINERS: Add maintainer for IBNBD/IBTRS modules
+>
+>  MAINTAINERS                                   |   14 +
+>  drivers/block/Kconfig                         |    2 +
+>  drivers/block/Makefile                        |    1 +
+>  drivers/block/ibnbd/Kconfig                   |   24 +
+>  drivers/block/ibnbd/Makefile                  |   13 +
+>  drivers/block/ibnbd/README                    |  315 ++
+>  drivers/block/ibnbd/ibnbd-clt-sysfs.c         |  691 ++++
+>  drivers/block/ibnbd/ibnbd-clt.c               | 1832 +++++++++++
+>  drivers/block/ibnbd/ibnbd-clt.h               |  166 +
+>  drivers/block/ibnbd/ibnbd-log.h               |   59 +
+>  drivers/block/ibnbd/ibnbd-proto.h             |  378 +++
+>  drivers/block/ibnbd/ibnbd-srv-dev.c           |  408 +++
+>  drivers/block/ibnbd/ibnbd-srv-dev.h           |  143 +
+>  drivers/block/ibnbd/ibnbd-srv-sysfs.c         |  270 ++
+>  drivers/block/ibnbd/ibnbd-srv.c               |  945 ++++++
+>  drivers/block/ibnbd/ibnbd-srv.h               |   94 +
+>  drivers/infiniband/Kconfig                    |    1 +
+>  drivers/infiniband/ulp/Makefile               |    1 +
+>  drivers/infiniband/ulp/ibtrs/Kconfig          |   22 +
+>  drivers/infiniband/ulp/ibtrs/Makefile         |   15 +
+>  drivers/infiniband/ulp/ibtrs/README           |  385 +++
+>  .../infiniband/ulp/ibtrs/ibtrs-clt-stats.c    |  447 +++
+>  .../infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c    |  514 +++
+>  drivers/infiniband/ulp/ibtrs/ibtrs-clt.c      | 2844 +++++++++++++++++
+>  drivers/infiniband/ulp/ibtrs/ibtrs-clt.h      |  308 ++
+>  drivers/infiniband/ulp/ibtrs/ibtrs-log.h      |   84 +
+>  drivers/infiniband/ulp/ibtrs/ibtrs-pri.h      |  463 +++
+>  .../infiniband/ulp/ibtrs/ibtrs-srv-stats.c    |  103 +
+>  .../infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c    |  303 ++
+>  drivers/infiniband/ulp/ibtrs/ibtrs-srv.c      | 1998 ++++++++++++
+>  drivers/infiniband/ulp/ibtrs/ibtrs-srv.h      |  170 +
+>  drivers/infiniband/ulp/ibtrs/ibtrs.c          |  610 ++++
+>  drivers/infiniband/ulp/ibtrs/ibtrs.h          |  318 ++
+>  fs/sysfs/file.c                               |    1 +
+>  34 files changed, 13942 insertions(+)
+>  create mode 100644 drivers/block/ibnbd/Kconfig
+>  create mode 100644 drivers/block/ibnbd/Makefile
+>  create mode 100644 drivers/block/ibnbd/README
+>  create mode 100644 drivers/block/ibnbd/ibnbd-clt-sysfs.c
+>  create mode 100644 drivers/block/ibnbd/ibnbd-clt.c
+>  create mode 100644 drivers/block/ibnbd/ibnbd-clt.h
+>  create mode 100644 drivers/block/ibnbd/ibnbd-log.h
+>  create mode 100644 drivers/block/ibnbd/ibnbd-proto.h
+>  create mode 100644 drivers/block/ibnbd/ibnbd-srv-dev.c
+>  create mode 100644 drivers/block/ibnbd/ibnbd-srv-dev.h
+>  create mode 100644 drivers/block/ibnbd/ibnbd-srv-sysfs.c
+>  create mode 100644 drivers/block/ibnbd/ibnbd-srv.c
+>  create mode 100644 drivers/block/ibnbd/ibnbd-srv.h
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/Kconfig
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/Makefile
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/README
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-clt-stats.c
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-clt.c
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-clt.h
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-log.h
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-pri.h
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv.c
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv.h
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs.c
+>  create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs.h
+>
+> --
+> 2.17.1
+>
