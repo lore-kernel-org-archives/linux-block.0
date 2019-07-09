@@ -2,151 +2,125 @@ Return-Path: <SRS0=ruTu=VG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A444C73C53
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 19:22:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F50FC73C56
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 19:46:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 156D02073D
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 19:22:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qDGjfDnO"
+	by mail.kernel.org (Postfix) with ESMTP id 0CC9B208C4
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jul 2019 19:46:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726133AbfGITWL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Jul 2019 15:22:11 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:63366 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727787AbfGITWL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 15:22:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562700131; x=1594236131;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=gg1RQqZox7MSG1EY1vzn6USs2m3IemJZS3jkF39bG7g=;
-  b=qDGjfDnO+kjJA9V7tv7VMxb8Llc8+K6m2JBsAwAk1ZT43Ngpn3kM0BES
-   oFZtCE8m72y+n6ZQqYZVTyNPnCQUAcwr0QprdgcNDqn7NZNGzsFnZhdge
-   giUctT7yitVc9dwSPogOZuAubjqFFEnsM7CKwjTdkBdbccCe+6F6JKU5N
-   WTMqf+UX7FDSI1nPDRF4FFjrRMP/98jkwekt+0793fSkfGMKLXmJKucIz
-   P9mQZDSDHpbgmPFykqukKIHf7Y41tK5lRHENA4tGadbBbEsuqiIc7UxyF
-   ndVag+HaYTH/bP6SB3cI39kYnRfK4pksKKWAfTd4nyDxDJTpVfjmmr9L3
-   g==;
-IronPort-SDR: YpRHI6caJQwjWQoApXGBqaPwVvqTLfdOOd8hvRwROGqjja/waNnYpkpQLICCfbHZ/DSHGCQ2hs
- EkCEbgBOlvG2iYX8aOmI1zsInniegRTu0IOKkcgGsTnnpn5IHRc/NS96FkwdW8Fq1zpl8cM+6r
- YbTWff9FTc//Diu5fVGaepxt2qABWgDj/CemmOZaHgXDNlJ2Iw+TuSIHeb7Ixo5EJK/gKAGeNJ
- QEay38KVwRzF6Sl5HFt1aCgU8ZqdWVgIskF4sL1lmUTSbUzhM6zwgYhoKhMZi3XznG6KdPa75Z
- CaU=
-X-IronPort-AV: E=Sophos;i="5.63,471,1557158400"; 
-   d="scan'208";a="114198824"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jul 2019 03:22:11 +0800
-IronPort-SDR: 7Oc6RIRXmgSsvjDVDYkvv/7BeUxbI5734CqnE2bxxFeS2iw2xlfhtsI7CU90a3lc4XltG1JyaY
- quxfwdZHw8GyFt5MRVknA3hyu6X2n30gIbwj+dWH8Flh/G2Ig2farYArYh/lzJoEeIsJV8auic
- lP8/vo3adyFkY5Mv7kxOp7g9D9+kGmpibSdLQPj6hufG+JI61OsImWE/xBPcdcyzWWWi+giWRX
- d9JO6s/b2qcoaS2SQZH2QQ6R4B6WcUapIReQHdONjBRsQMuFBLyEKxTH0Zt3EJeU9DIsWzzn9D
- UEyb7Vk0SNkEsgK7T+F8GRmE
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP; 09 Jul 2019 12:20:57 -0700
-IronPort-SDR: h+XBQAHf1vBsdEeyLrebeAOjXI//MEA9hzO3EFKvl4sJe3uhdRiBy5mpgL/5PptdwxJ061qVw3
- C17b3qL2bBTQ73T3NKtzWGUK8xQJEu1igl+GIBDG13Oq/+GTVh2VQciUsYJwRfiTaHmXgGKt1S
- XOIPlHLQE9Pt/J09GTv6taJi8zC2Vfw+XZRYE4+UIY6K2wTao3OZxSeaVRG4I5aohMDl3Bw7OT
- FborN/hdx9nNMwrzSfuXlW1Xbz+BcbT3e/YUibPIBDmwpnCHKK6hbS4zaDEViGEgZF9Ty6nYGx
- ks0=
-Received: from cvenusqemu.hgst.com ([10.202.66.73])
-  by uls-op-cesaip02.wdc.com with ESMTP; 09 Jul 2019 12:22:11 -0700
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     hch@lst.de, Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V2 6/6] null_blk: create a helper for req completion
-Date:   Tue,  9 Jul 2019 12:21:32 -0700
-Message-Id: <20190709192132.24723-7-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20190709192132.24723-1-chaitanya.kulkarni@wdc.com>
-References: <20190709192132.24723-1-chaitanya.kulkarni@wdc.com>
+        id S1726491AbfGITqB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Jul 2019 15:46:01 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:39315 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726318AbfGITqB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jul 2019 15:46:01 -0400
+Received: by mail-oi1-f195.google.com with SMTP id m202so16295663oig.6;
+        Tue, 09 Jul 2019 12:46:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0qM3i82qaJzPdPQ1QKhtsBhG9j6T7uOCTBb84AUQwmw=;
+        b=A493FvIVQQrIKhxO1QxOINFe4XgSR1tTS0sXeAEspOk43z7BKF6tyAzER9S31hAfG1
+         mUb2D2QHpBDupfWOJz5lydxc08a1DMQVk2edu1BP4witP3vNod810DZP4xtE5mXUm5Wy
+         7p8nWPT92AOYxB8zHfwt1mHKNmnWh98K62xmE2SfPO/6LLh8ZUm09G7VcPD6xoRZ3N9g
+         uPMxMkERDtvU1dynn+eECgAjZYTP23/IP/CwlSX4kra/Guqy7ikwzSSjJbWi2SKY47z/
+         bvPl5KUUeGPiChViirmucXMNXGYmwz9LjlUPf143EnZCDT4D/ou7nizgoRX+gSIV6fYl
+         KHyQ==
+X-Gm-Message-State: APjAAAWhf1WpRQ8zlV7aGanTlhHKLDxAYeitSy9a/da4Y/RBSKkG1XDu
+        q7CGhe81dDYu1C/7vDGdIU0=
+X-Google-Smtp-Source: APXvYqzo6p+6SStIQ+IoTvFpt0PopksiDPZF6pv8ez8wqni0GmAiXqymsiRMqFbyayhRxfG6vvmsRg==
+X-Received: by 2002:aca:ea41:: with SMTP id i62mr1004031oih.144.1562701560031;
+        Tue, 09 Jul 2019 12:46:00 -0700 (PDT)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id n26sm22491otq.10.2019.07.09.12.45.58
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 09 Jul 2019 12:45:59 -0700 (PDT)
+Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
+ Device (IBNBD)
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jack Wang <jinpuwang@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        axboe@kernel.dk, Christoph Hellwig <hch@infradead.org>,
+        bvanassche@acm.org, jgg@mellanox.com, dledford@redhat.com,
+        Roman Pen <r.peniaev@gmail.com>, gregkh@linuxfoundation.org
+References: <20190620150337.7847-1-jinpuwang@gmail.com>
+ <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me>
+Date:   Tue, 9 Jul 2019 12:45:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+In-Reply-To: <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch creates a helper function for handling the request
-completion in the null_handle_cmd().
+Hi Danil and Jack,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- drivers/block/null_blk_main.c | 49 +++++++++++++++++++----------------
- 1 file changed, 27 insertions(+), 22 deletions(-)
+> Hallo Doug, Hallo Jason, Hallo Jens, Hallo Greg,
+> 
+> Could you please provide some feedback to the IBNBD driver and the
+> IBTRS library?
+> So far we addressed all the requests provided by the community
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 8ec3753aaf9b..e9bd599516cc 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1202,6 +1202,32 @@ static inline blk_status_t null_handle_zoned(struct nullb_cmd *cmd,
- 	return sts;
- }
- 
-+static inline void nullb_handle_cmd_completion(struct nullb_cmd *cmd)
-+{
-+	/* Complete IO by inline, softirq or timer */
-+	switch (cmd->nq->dev->irqmode) {
-+	case NULL_IRQ_SOFTIRQ:
-+		switch (cmd->nq->dev->queue_mode) {
-+		case NULL_Q_MQ:
-+			blk_mq_complete_request(cmd->rq);
-+			break;
-+		case NULL_Q_BIO:
-+			/*
-+			 * XXX: no proper submitting cpu information available.
-+			 */
-+			end_cmd(cmd);
-+			break;
-+		}
-+		break;
-+	case NULL_IRQ_NONE:
-+		end_cmd(cmd);
-+		break;
-+	case NULL_IRQ_TIMER:
-+		null_cmd_end_timer(cmd);
-+		break;
-+	}
-+}
-+
- static blk_status_t null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
- 				    sector_t nr_sectors, enum req_opf op)
- {
-@@ -1233,28 +1259,7 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
- 		cmd->error = null_handle_zoned(cmd, op, sector, nr_sectors);
- 
- out:
--	/* Complete IO by inline, softirq or timer */
--	switch (dev->irqmode) {
--	case NULL_IRQ_SOFTIRQ:
--		switch (dev->queue_mode)  {
--		case NULL_Q_MQ:
--			blk_mq_complete_request(cmd->rq);
--			break;
--		case NULL_Q_BIO:
--			/*
--			 * XXX: no proper submitting cpu information available.
--			 */
--			end_cmd(cmd);
--			break;
--		}
--		break;
--	case NULL_IRQ_NONE:
--		end_cmd(cmd);
--		break;
--	case NULL_IRQ_TIMER:
--		null_cmd_end_timer(cmd);
--		break;
--	}
-+	nullb_handle_cmd_completion(cmd);
- 	return BLK_STS_OK;
- }
- 
--- 
-2.17.0
+That is not exactly correct AFAIR,
 
+My main issues which were raised before are:
+- IMO there isn't any justification to this ibtrs layering separation
+   given that the only user of this is your ibnbd. Unless you are
+   trying to submit another consumer, you should avoid adding another
+   subsystem that is not really general purpose.
+
+- ibtrs in general is using almost no infrastructure from the existing
+   kernel subsystems. Examples are:
+   - tag allocation mechanism (which I'm not clear why its needed)
+   - rdma rw abstraction similar to what we have in the core
+   - list_next_or_null_rr_rcu ??
+   - few other examples sprinkled around..
+
+Another question, from what I understand from the code, the client
+always rdma_writes data on writes (with imm) from a remote pool of
+server buffers dedicated to it. Essentially all writes are immediate (no
+rdma reads ever). How is that different than using send wrs to a set of
+pre-posted recv buffers (like all others are doing)? Is it faster?
+
+Also, given that the server pre-allocate a substantial amount of memory
+for each connection, is it documented the requirements from the server
+side? Usually kernel implementations (especially upstream ones) will
+avoid imposing such large longstanding memory requirements on the system
+by default. I don't have a firm stand on this, but wanted to highlight
+this as you are sending this for upstream inclusion.
+
+  and
+> continue to maintain our code up-to-date with the upstream kernel
+> while having an extra compatibility layer for older kernels in our
+> out-of-tree repository.
+
+Overall, while I absolutely support your cause to lower your maintenance
+overhead by having this sit upstream, I don't see why this can be
+helpful to anyone else in the rdma community. If instead you can
+crystallize why/how ibnbd is faster than anything else, and perhaps
+contribute a common infrastructure piece (or enhance an existing one)
+such that other existing ulps can leverage, it will be a lot more
+compelling to include it upstream.
+
+> I understand that SRP and NVMEoF which are in the kernel already do
+> provide equivalent functionality for the majority of the use cases.
+> IBNBD on the other hand is showing higher performance and more
+> importantly includes the IBTRS - a general purpose library to
+> establish connections and transport BIO-like read/write sg-lists over
+> RDMA,
+
+But who needs it? Can other ulps use it or pieces of it? I keep failing
+to understand why is this a benefit if its specific to your ibnbd?
