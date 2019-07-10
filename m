@@ -2,110 +2,92 @@ Return-Path: <SRS0=ACpf=VH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67CEFC74A21
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 13:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40516C74A21
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 13:57:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3761D2084B
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 13:55:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 127332087F
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 13:57:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="HnF7coio"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="U81telEo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727656AbfGJNzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jul 2019 09:55:21 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:40786 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727541AbfGJNzV (ORCPT
+        id S1727693AbfGJN5k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jul 2019 09:57:40 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:47085 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726080AbfGJN5k (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jul 2019 09:55:21 -0400
-Received: by mail-qk1-f193.google.com with SMTP id s145so1917074qke.7
-        for <linux-block@vger.kernel.org>; Wed, 10 Jul 2019 06:55:21 -0700 (PDT)
+        Wed, 10 Jul 2019 09:57:40 -0400
+Received: by mail-io1-f67.google.com with SMTP id i10so4813045iol.13
+        for <linux-block@vger.kernel.org>; Wed, 10 Jul 2019 06:57:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=i4ZDIYYMpB4xI6JA/ZkqGYa48YuxcupLaiYzrYpkWgE=;
-        b=HnF7coioS3LLcQQ0tjurgS0gTfwhOIoV/gglwo4ytxPOY/5BXXEVZFc1lw8GMb5iIb
-         xHmvHXcBj355CsMazSyAuzO3dO6OOSuUiMc5B/YVDL1605H4nBBQP563jXc/dxxbZKId
-         xvYYJ5ZxXMQmZZHrFkfgC4/5x4zJnhFSMXPDms/xU1x1mdYjG4pQzq1zmVRWxLqDeB3p
-         VyXjA4Oq/FDR4InAQqsbe9Od20VwgaH6r/I+FYCu7UjwhIVjcPlrts7MV9WDG774FJSd
-         LO0/XtgTm6mBO3l2lnm0l/EGT1T5xNYvqOodPYu0sDJR+W7RxqbQlIuZ+wpPu1hEcNiZ
-         IRWw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5GbjAQ2BkHHz7jIGN1nXh7A5POhfC3B+GwTz5D7kHeg=;
+        b=U81telEoGjTphWwolw10dnGCq9TEdxQUtE3bYGzcr8Fm1jrlDrBPJFWH4ePAez0Okf
+         IfBdxV2eJmcr1TvSFStxjj9qwh6UFrGAtZZ6ByaoxpmFY39hixg1fuBK0xF4Q+GnMzkR
+         Wax7Jvyvw6JEUuQJefySOlP6bbMjD1kazfJ02naBA6oP7XQC0qxNR5tOgr+PyR9wPBzQ
+         f4Euj9caDahH+XHNTz1gHIm2ffh52frwbyj0lfyUJXgTb+a44XKtsabSHE/4bjnUM5DF
+         ZhCnMsxHIZ7SAuCi08p4bAYQXMzeYB9V4LcRa4uGmQlkkAB8PSi3w6mYOvVR/Xifm/kl
+         l5WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=i4ZDIYYMpB4xI6JA/ZkqGYa48YuxcupLaiYzrYpkWgE=;
-        b=fXGRwkMMOMjN9rSiAVl+emGvI3SsbKuD/tg2Szwah5MYYNBpgipwm/IIXkEX9PdaS9
-         lgF2+1uH5ZRUdXqYtnS/k+IbUqFZZC3R+yUfh+oiifYYR8cY+yfXfs1pL6iktIzuimfZ
-         1krRGpzIjSU9Rj+yEiwjiIxXK8Mdz92TP1+A/5SatjOAaoFHfUbqwiOOswqzlieHVFa2
-         R2ykLSP2ThkOtMh0JtiNwi573pAgV9+9KNW3zptf1FbBvr+lzlNgQ14xKcNyqB0zALWs
-         X5PTY/5R4STFbmgonFGSKR0z2yOUFtG3D8jrUl8hQaP/mAgohv0SDD+1wNssqHchgcM8
-         /SCw==
-X-Gm-Message-State: APjAAAUCM53i1HCEp7WZKfHO6NJG7lvOmZ/eYpMtyIy3xK6+j6HWF7dk
-        dr4mZjAlC5H3y4iey9pMia2q+w==
-X-Google-Smtp-Source: APXvYqxEsUY67bXs0nm8Rdn9s1J51pbL4D8MfdK1/zrb6tDJPB6XV1iPys5n79RzmSFIQWvAUuFJMw==
-X-Received: by 2002:a37:474b:: with SMTP id u72mr24149105qka.470.1562766920522;
-        Wed, 10 Jul 2019 06:55:20 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id c82sm1198530qkb.112.2019.07.10.06.55.19
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 10 Jul 2019 06:55:20 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1hlD43-00016H-IJ; Wed, 10 Jul 2019 10:55:19 -0300
-Date:   Wed, 10 Jul 2019 10:55:19 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, axboe@kernel.dk,
-        Christoph Hellwig <hch@infradead.org>, bvanassche@acm.org,
-        dledford@redhat.com, Roman Pen <r.peniaev@gmail.com>,
-        gregkh@linuxfoundation.org
-Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
- Device (IBNBD)
-Message-ID: <20190710135519.GA4051@ziepe.ca>
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
- <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5GbjAQ2BkHHz7jIGN1nXh7A5POhfC3B+GwTz5D7kHeg=;
+        b=PC4pb9QHF5A+Yw5Z2e6w5ogsSSbrC7nYzKOhxqA9jxCezRDpJ4fmMxZGAKZ6BW5XAm
+         QXoFbBvd9jSC6q1u9ETQQEgB3E7NkZE9TbSt3vIWwBdaSZsAZZfwBsiGbi8h9suPajte
+         ae9oG11lveZe8IEa+DPgC0yvQEmeK2UOiDDwLAN6udQw3Ft84Xfm1QCuAtaSgIDSwV0G
+         hWNLenGjbH/wrEg1VBYm069I63dvT7hvgGb0bR3m6eviTXXn+4DhzEtKNJyG9LFRUbq3
+         NMwzZdMhIhdbbfzp6o3ow3g+TNPxEiRPtJJwSy6IaU0WiH+hrwjPCweVThRodBDzlOLU
+         8Aqw==
+X-Gm-Message-State: APjAAAVzqxqsx5XTkBH5AWbl+gaw0Go1dR9XTv/niwZZbpPTcK/yG+p2
+        m1aNSmYmDbYE0QsUQUafB3hRdLhXd0dz1Q==
+X-Google-Smtp-Source: APXvYqzTacWpL5RT00+fI1TO17cpw8pqMaE5AGvHLm8mRXi/OWYn4rcNEiP3HSPp+S1lY9rBd82DSw==
+X-Received: by 2002:a5e:881a:: with SMTP id l26mr14536823ioj.185.1562767059198;
+        Wed, 10 Jul 2019 06:57:39 -0700 (PDT)
+Received: from [192.168.1.158] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id c81sm2510343iof.28.2019.07.10.06.57.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 10 Jul 2019 06:57:38 -0700 (PDT)
+Subject: Re: [PATCH] io_uring: fix stuck problem caused by potential memory
+ alloc failure
+To:     Jackie Liu <liuyun01@kylinos.cn>
+Cc:     linux-block@vger.kernel.org
+References: <20190710083558.5940-1-liuyun01@kylinos.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <25691b9f-8c0f-0d19-d1db-4c4ce6dfb5a9@kernel.dk>
+Date:   Wed, 10 Jul 2019 07:57:37 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20190710083558.5940-1-liuyun01@kylinos.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 09, 2019 at 12:45:57PM -0700, Sagi Grimberg wrote:
+On 7/10/19 2:35 AM, Jackie Liu wrote:
+> when io_req_defer alloc memory failed, it will be return -EAGAIN.
+> But io_submit_sqe cannot be returned immediately because the reference
+> count for req is still hold. we should be clean it.
 
-> Another question, from what I understand from the code, the client
-> always rdma_writes data on writes (with imm) from a remote pool of
-> server buffers dedicated to it. Essentially all writes are immediate (no
-> rdma reads ever). How is that different than using send wrs to a set of
-> pre-posted recv buffers (like all others are doing)? Is it faster?
+Looks like this actually got fixed in my for-5.3/io_uring branch which
+I haven't pushed out yet. Once that's in, I'd suggest we send yours to
+stable separately. Probably change the wording to:
 
-RDMA WRITE only is generally a bit faster, and if you use a buffer
-pool in a smart way it is possible to get very good data packing. With
-SEND the number of recvq entries dictates how big the rx buffer can
-be, or you waste even more memory by using partial send buffers..
+When io_req_defer alloc memory fails, it will be -EAGAIN. But
+io_submit_sqe cannot return immediately because the reference count for
+req is still held. Ensure that we free it.
 
-A scheme like this seems like a high performance idea, but on the
-other side, I have no idea how you could possibly manage invalidations
-efficiently with a shared RX buffer pool...
+-- 
+Jens Axboe
 
-The RXer has to push out an invalidation for the shared buffer pool
-MR, but we don't have protocols for partial MR invalidation.
-
-Which is back to my earlier thought that the main reason this perfoms
-better is because it doesn't have synchronous MR invalidation.
-
-Maybe this is fine, but it needs to be made very clear that it uses
-this insecure operating model to get higher performance..
-
-Jason
