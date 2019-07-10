@@ -2,146 +2,212 @@ Return-Path: <SRS0=ACpf=VH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44575C74A36
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 21:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4304CC74A36
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 22:56:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B320208C4
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 21:21:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1562793711;
-	bh=V/Wa8OqWtFdGckahHkvEhfXCx2DmBiBGDL79DnzH1vk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=vfZm17//SGVQesFakVMeDAyRhHTp30RXbLStqIf6/1wlUkGI0R1rATn9eHvhs/w+s
-	 ZwUzRrvA5w5P8pRP9bhaNxzUhWtudQuJ4rsHSxRanL/FSVqmfW6tULXXjL0FBg7Q/A
-	 2wB9Vez/CSpWCdfgihIfJ602YTDWG7qjMWgvcFnA=
+	by mail.kernel.org (Postfix) with ESMTP id 119F9214AF
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 22:56:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U98632Z8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727222AbfGJVVq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jul 2019 17:21:46 -0400
-Received: from mail-pf1-f169.google.com ([209.85.210.169]:40971 "EHLO
-        mail-pf1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725956AbfGJVVq (ORCPT
+        id S1727546AbfGJW4P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jul 2019 18:56:15 -0400
+Received: from mail-pl1-f202.google.com ([209.85.214.202]:50210 "EHLO
+        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727559AbfGJW4O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jul 2019 17:21:46 -0400
-Received: by mail-pf1-f169.google.com with SMTP id m30so1674118pff.8;
-        Wed, 10 Jul 2019 14:21:46 -0700 (PDT)
+        Wed, 10 Jul 2019 18:56:14 -0400
+Received: by mail-pl1-f202.google.com with SMTP id d6so2051440pls.17
+        for <linux-block@vger.kernel.org>; Wed, 10 Jul 2019 15:56:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=siIn1w9IRj9EyAz1dx7Gl8hkgFfIWbx6jNb+pkUBwDM=;
-        b=CWXXPYiJmNO2VkL3MT7DkHV+hmD6kdOoGicSmCBWezxnW3FtZWUaM6vZU1jQNA/eS+
-         ln6xoL5gaBXAKj+Ud0V0NkTKNiTDmbUXXBzRXsgE1yQmVCRot+YPhZcGoM758uw19VmT
-         CnnGu6vGxos82NuqzEfkrNw+TtW7B1jITstDIG5KEQR4BKgB2lIqHSCLaqrsgNMQxsfj
-         Zcpjs6nphhqe+2Bt9te7fqFOQ0J1rBiZI3EyD11sChA1bbYVICRaNWJ6c+cVl2mprSR7
-         4YfoDL5JUBiN7h9J+arYvdtZjXF4lBEAxb5wNcCPLRGk4SlBvVCGts/PESbNS7CE3hqa
-         K6rw==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=32EvgBFnAv8ONpLqCSd3ioyTEVOAmc+wOjmDzUT8IVQ=;
+        b=U98632Z82hYy5Krk4Woknk4M3J9Oxbj8OLfRcRkOhGhPsLAgvlQ8rL9cjAJhLQGT0e
+         nCfY2aMLctKH69TtquMoZpasiCSaNu9WP3yBAzUUbRQV4pKQdoUmylbSx427Z6QJe+Zc
+         XUyFaop39sDlqJv7rWzmRkcjpxyL+cehPcD3+KZr4BOSB2t4QIKV2J9aUANKGFF0b4RV
+         SEPT/+e+lPQTrLb0lC8jN6riSephuN1tXaX5Jqeb9/n+hVCc1tFDWqp8O6PDklw8PheP
+         TahcnXsLHuoRbvMEJGYz1WRDNelCbzAdlcE/6FLE+qvY21MZ2HRfX3yQtfzql02E8Qjb
+         zszA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=siIn1w9IRj9EyAz1dx7Gl8hkgFfIWbx6jNb+pkUBwDM=;
-        b=G31mc882SuOiuD0N1mw7JnNKERYDORTa67csrSf2+wZtJS1WbvacojJa08pYUdwVOz
-         SQ18iWt9eVpMRKC9l0/IkrgmigzF/3e7xZNs0cooV7r8aWnzoQlMvzS6WINk0XDeuDaJ
-         B1DDPp918zLoBc+Ukg4YqEvmsBrk+i+erXyX/lfmz+Axk5WngVovw65qFyam/5yNr3Cy
-         VWcnmo/1DCVg2+1qXZ1lYalxQ3UEWTzfjqlyOyifUw4i1kleQ6aAMzx3MsddNSJ4XGK+
-         jZ6dWyhufFjPbP4wgjkuOIzJ2XbOUr0W6Jy08/OH5WpIUSOOaFd4O/r+R+Ft6llzH3Al
-         gsPw==
-X-Gm-Message-State: APjAAAV8u15dOr7ORhUpFdg28PyneAkQtmR/io4PtZVHXMETu2jnT8jf
-        hAOH6V7C+B7rY2HSO5JweFg=
-X-Google-Smtp-Source: APXvYqxQfsexkWldj+RCgTAbmj+xZvqfEumit5Aa+odfoOiHhmjsD1wG+GkD6dTNi1iGZIz2KvODBQ==
-X-Received: by 2002:a63:5550:: with SMTP id f16mr363820pgm.426.1562793705481;
-        Wed, 10 Jul 2019 14:21:45 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::3:2bbe])
-        by smtp.gmail.com with ESMTPSA id f19sm3851402pfk.180.2019.07.10.14.21.44
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Jul 2019 14:21:44 -0700 (PDT)
-Date:   Wed, 10 Jul 2019 14:21:42 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
-        dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org
-Cc:     linux-kernel@vger.kernel.org, kernel-team@fb.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org
-Subject: [PATCH 11/10] block: omit request->pre_start_time_ns if
- !CONFIG_BLK_CGROUP_IOCOST work-conserving porportional controller
-Message-ID: <20190710212142.GP657710@devbig004.ftw2.facebook.com>
-References: <20190710205128.1316483-1-tj@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190710205128.1316483-1-tj@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=32EvgBFnAv8ONpLqCSd3ioyTEVOAmc+wOjmDzUT8IVQ=;
+        b=nPk6Bp/KzkNBdShDzo13XrN7RC16/eEgwIVJa1dzbpZqTLmu0iaNJFMwkp6q3iPUId
+         0yvn4OXAGHJmkL8WK/F1Z0BrEncqhRgGMQNVC+Ws2n3FKGo0aoNOYkZolPvMzSUL2tVM
+         HDhUPH5f2fAWg7tLdhhAsgyUw8h4k3GkhSpIxPNcNUPT8SUt0+X5fOKDoeT8W41Xm8ip
+         6IybO4hVhAFgcrLHCRzyQu63NHbA4E5Zzs8xIJbe98dnLVR7rFHva7y5jDzLHPL/z7MH
+         Nq6JlKVKBUlSFlMiKxjN0H3vzJTJVV8C7W9TNaHB2fE8uOHgvAgSZXAtKfvc8YdFCu0S
+         vpKA==
+X-Gm-Message-State: APjAAAVi4MSqLFa0RlOL/FtNdGnNwfqF8wYXumGhF2q6JW5I0cYMUiDZ
+        GBwsxJjCPk78KH923EuGmQoLmVac1Av8dky9ldvBXz8gm5Yj32x8S3fDp7i0M/CxLP7xoNbzfXn
+        +4o2yWVT8eCnv7Hxioqn0COsFnip/XGCH9AcCjqlsh7f75hO7obS9y/eWs7PwgxZ/cO0i
+X-Google-Smtp-Source: APXvYqzdWJGCD39Cu1PKryLNuGp95rnlt/uZL9RjQk8mERUDsK4hp6quJ1mm2cPMcmKqqfHIDneVHcjisAg=
+X-Received: by 2002:a63:b904:: with SMTP id z4mr749685pge.388.1562799373417;
+ Wed, 10 Jul 2019 15:56:13 -0700 (PDT)
+Date:   Wed, 10 Jul 2019 15:56:01 -0700
+Message-Id: <20190710225609.192252-1-satyat@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.22.0.410.gd8fdbe21b5-goog
+Subject: [PATCH v3 0/8] Inline Encryption Support
+From:   Satya Tangirala <satyat@google.com>
+To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net
+Cc:     Parshuram Raju Thombare <pthombar@cadence.com>,
+        Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Satya Tangirala <satyat@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From e2693136fa64d5c9dde73d2d663bde84f8326877 Mon Sep 17 00:00:00 2001
-From: Tejun Heo <tj@kernel.org>
-Date: Wed, 10 Jul 2019 14:18:12 -0700
+This patch series adds support for Inline Encryption to the block layer,
+UFS, fscrypt and f2fs.
 
-request->pre_start_time is currently only used by the iocost
-controller.  Let's omit the field if disabled and avoid wasting space
-in struct request.
+Inline Encryption hardware allows software to specify an encryption context
+(an encryption key, crypto algorithm, data unit num, data unit size, etc.)
+along with a data transfer request to a storage device, and the inline
+encryption hardware will use that context to en/decrypt the data. The
+inline encryption hardware is part of the storage device, and it
+conceptually sits on the data path between system memory and the storage
+device. Inline Encryption hardware has become increasingly common, and we
+want to support it in the kernel.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Suggested-by: Jens Axboe <axboe@kernel.dk>
----
-The git branch is updated accordingly.
+Inline Encryption hardware implementations often function around the
+concept of a limited number of "keyslots", which can hold an encryption
+context each. The storage device can be directed to en/decrypt any
+particular request with the encryption context stored in any particular
+keyslot.
 
-Thanks.
+Patch 1 introduces a Keyslot Manager to efficiently manage keyslots.
+The keyslot manager also functions as the interface that blk-crypto
+(introduced in Path 3), will use to program keys into inline encryption
+hardware. For more information on the Keyslot Manager, refer to
+documentation found in block/keyslot-manager.c and linux/keyslot-manager.h.
 
- block/blk-mq.c         | 2 ++
- include/linux/blkdev.h | 7 +++++++
- 2 files changed, 9 insertions(+)
+Patch 2 introduces struct bio_crypt_ctx, and a ptr to one in struct bio,
+which allows struct bio to represent an encryption context that can be
+passed down the storage stack from the filesystem layer to the storage
+driver.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 90b46988cc02..ce96bcd7e260 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -325,7 +325,9 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	RB_CLEAR_NODE(&rq->rb_node);
- 	rq->rq_disk = NULL;
- 	rq->part = NULL;
-+#ifdef CONFIG_BLK_CGROUP_IOCOST
- 	rq->pre_start_time_ns = pre_start_time_ns;
-+#endif
- 	if (blk_mq_need_time_stamp(rq))
- 		rq->start_time_ns = ktime_get_ns();
- 	else
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4247a9bc44b7..2425af6d3f5e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -194,8 +194,10 @@ struct request {
- 
- 	struct gendisk *rq_disk;
- 	struct hd_struct *part;
-+#ifdef CONFIG_BLK_CGROUP_IOCOST
- 	/* Time that the first bio started allocating this request. */
- 	u64 pre_start_time_ns;
-+#endif
- 	/* Time that this request was allocated for this IO. */
- 	u64 start_time_ns;
- 	/* Time that I/O was submitted to the device. */
-@@ -635,8 +637,13 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
- 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
- #define blk_queue_pci_p2pdma(q)	\
- 	test_bit(QUEUE_FLAG_PCI_P2PDMA, &(q)->queue_flags)
-+
-+#ifdef CONFIG_BLK_CGROUP_IOCOST
- #define blk_queue_rec_prestart(q)	\
- 	test_bit(QUEUE_FLAG_REC_PRESTART, &(q)->queue_flags)
-+#else
-+#define blk_queue_rec_prestart(q)		false
-+#endif
- 
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
+Patch 3 introduces blk-crypto. Blk-crypto delegates crypto operations to
+inline encryption hardware when available, and also contains a software
+fallback to the kernel crypto API. Blk-crypto also makes it possible for
+layered devices like device mapper to make use of inline encryption
+hardware. Given that blk-crypto works as a software fallback, we are
+considering removing file content en/decryption from fscrypt and simply
+using blk-crypto in a future patch. For more details on blk-crypto, refer
+to Documentation/block/blk-crypto.txt.
+
+Patches 4-6 add support for inline encryption into the UFS driver according
+to the JEDEC UFS HCI v2.1 specification. Inline encryption support for
+other drivers (like eMMC) may be added in the same way - the device driver
+should set up a Keyslot Manager in the device's request_queue (refer to
+the UFS crypto additions in ufshcd-crypto.c and ufshcd.c for an example).
+
+Patches 7 and 8 add support to fscrypt and f2fs, so that we have
+a complete stack that can make use of inline encryption.
+
+There have been a few patch sets addressing Inline Encryption Support in
+the past. Briefly, this patch set differs from those as follows:
+
+1) "crypto: qce: ice: Add support for Inline Crypto Engine"
+is specific to certain hardware, while our patch set's Inline
+Encryption support for UFS is implemented according to the JEDEC UFS
+specification.
+
+2) "scsi: ufs: UFS Host Controller crypto changes" registers inline
+encryption support as a kernel crypto algorithm. Our patch views inline
+encryption as being fundamentally different from a generic crypto
+provider (in that inline encryption is tied to a device), and so does
+not use the kernel crypto API to represent inline encryption hardware.
+
+3) "scsi: ufs: add real time/inline crypto support to UFS HCD" requires
+the device mapper to work - our patch does not.
+
+Changes v2 => v3:
+ - Overhauled keyslot manager's get keyslot logic and optimized LRU.
+ - Block crypto en/decryption fallback now supports data unit sizes
+   that divide each of the bio's segment's lengths (instead of requiring
+   each segment's length to be the same as the data unit size).
+ - fscrypt master key is now keyed additionally by super_block and
+   ci_ctfm != NULL.
+ - all references of "hw encryption" are replaced by inline encryption.
+ - address various other review comments from Eric.
+
+Changes v1 => v2:
+ - Block layer and UFS changes are split into 3 patches each.
+ - We now only have a ptr to a struct bio_crypt_ctx in struct bio, instead
+   of the struct itself.
+ - struct bio_crypt_ctx no longer has flags.
+ - blk-crypto now correctly handles the case when it fails to init
+   (because of insufficient memory), but kernel continues to boot.
+ - ufshcd-crypto now works on big endian cpus.
+ - Many cleanups.
+
+Satya Tangirala (8):
+  block: Keyslot Manager for Inline Encryption
+  block: Add encryption context to struct bio
+  block: blk-crypto for Inline Encryption
+  scsi: ufs: UFS driver v2.1 spec crypto additions
+  scsi: ufs: UFS crypto API
+  scsi: ufs: Add inline encryption support to UFS
+  fscrypt: wire up fscrypt to use blk-crypto
+  f2fs: Wire up f2fs to use inline encryption via fscrypt
+
+ Documentation/block/inline-encryption.txt | 185 +++++++
+ block/Kconfig                             |   8 +
+ block/Makefile                            |   2 +
+ block/bio-crypt-ctx.c                     | 122 +++++
+ block/bio.c                               |  16 +-
+ block/blk-core.c                          |  11 +-
+ block/blk-crypto.c                        | 585 ++++++++++++++++++++++
+ block/blk-merge.c                         |  34 +-
+ block/bounce.c                            |   9 +-
+ block/keyslot-manager.c                   | 314 ++++++++++++
+ drivers/md/dm.c                           |  15 +-
+ drivers/scsi/ufs/Kconfig                  |  10 +
+ drivers/scsi/ufs/Makefile                 |   1 +
+ drivers/scsi/ufs/ufshcd-crypto.c          | 435 ++++++++++++++++
+ drivers/scsi/ufs/ufshcd-crypto.h          |  86 ++++
+ drivers/scsi/ufs/ufshcd.c                 |  84 +++-
+ drivers/scsi/ufs/ufshcd.h                 |  29 ++
+ drivers/scsi/ufs/ufshci.h                 |  67 ++-
+ fs/crypto/Kconfig                         |   6 +
+ fs/crypto/bio.c                           | 138 ++++-
+ fs/crypto/crypto.c                        |   4 +
+ fs/crypto/fscrypt_private.h               |  11 +
+ fs/crypto/keyinfo.c                       |  94 +++-
+ fs/crypto/policy.c                        |  10 +
+ fs/f2fs/data.c                            |  83 ++-
+ fs/f2fs/super.c                           |  13 +-
+ include/linux/bio.h                       | 208 ++++++++
+ include/linux/blk-crypto.h                |  40 ++
+ include/linux/blk_types.h                 |   7 +
+ include/linux/blkdev.h                    |   6 +
+ include/linux/fscrypt.h                   |  62 +++
+ include/linux/keyslot-manager.h           |  75 +++
+ include/uapi/linux/fs.h                   |   3 +-
+ 33 files changed, 2697 insertions(+), 76 deletions(-)
+ create mode 100644 Documentation/block/inline-encryption.txt
+ create mode 100644 block/bio-crypt-ctx.c
+ create mode 100644 block/blk-crypto.c
+ create mode 100644 block/keyslot-manager.c
+ create mode 100644 drivers/scsi/ufs/ufshcd-crypto.c
+ create mode 100644 drivers/scsi/ufs/ufshcd-crypto.h
+ create mode 100644 include/linux/blk-crypto.h
+ create mode 100644 include/linux/keyslot-manager.h
+
 -- 
-2.17.1
+2.22.0.410.gd8fdbe21b5-goog
 
