@@ -2,322 +2,117 @@ Return-Path: <SRS0=ACpf=VH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B40BC74A36
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 22:56:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36053C74A36
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 23:58:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA08621019
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 22:56:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A2F020859
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 23:58:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kho3XDqc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UHhVNB9j";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ZYSH917m"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbfGJW4q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jul 2019 18:56:46 -0400
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:54484 "EHLO
-        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727865AbfGJW4q (ORCPT
+        id S1727523AbfGJX6S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jul 2019 19:58:18 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:4802 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727386AbfGJX6S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jul 2019 18:56:46 -0400
-Received: by mail-pl1-f202.google.com with SMTP id u10so2050861plq.21
-        for <linux-block@vger.kernel.org>; Wed, 10 Jul 2019 15:56:46 -0700 (PDT)
+        Wed, 10 Jul 2019 19:58:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1562803098; x=1594339098;
+  h=from:to:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=ALodN8WFjVJUOOoRgCiYywofiWq+x0fv/0Whw5MV+1U=;
+  b=UHhVNB9jzX3xNuXQJdBh88PwrV+nWWUiLavXJdkrGOUSZnHdTV7UECJ3
+   5oX6AwJXeKC2FfC6QTwwYVNRzIqxPhvaKUriKuT9FxhfWZoU7HRDqaC8m
+   MKzhxLbBc9q30LIHQhYGXpEbTAys7kWB7gL16W1wxkusAa2IZNrBESCMk
+   FWvB35WPcIgLnAjqetuRTp8NAtbWnFqOA+mxiqZa8lt25WKd0WgBk2W2a
+   f3PEaodLR9kY81HBzxiFFuj0qAKGVmT6YBjLmqklp6s248ta0I01mj3pg
+   g85FH/0Ao6Xubv59cfZijzMSIdhk0sarBAsQMx30ZWjwzXIXSFj5rIXnI
+   w==;
+IronPort-SDR: abc3KyVzGMOlMEH15JaYbMTlS7D3ya2/vdHBQJ5VV837/ldzF92aM+3esoqYaN4bsF9ko2d+wE
+ 41Za+tq/oPsYT3xbgu/3ePsWshrGbIcQJbltp7P6hghwPK8jRfwvbyLQQCvJPX31jZ1SqYo0DC
+ 32AmnYsiX6nEDribSms2MtVVMmHBI0PY+EeyFlNUz5EOJg2/aIS607OHgkAMvH5Wcc0g06MAOl
+ OEqEfELmJT+B/a8s1V+gzrVfq+C8lzc+xZ15lUVo+Rs+22fkoPFhqQTmz0afJ+KYc39AAnl7CI
+ wZE=
+X-IronPort-AV: E=Sophos;i="5.63,476,1557158400"; 
+   d="scan'208";a="114334321"
+Received: from mail-bn3nam04lp2055.outbound.protection.outlook.com (HELO NAM04-BN3-obe.outbound.protection.outlook.com) ([104.47.46.55])
+  by ob1.hgst.iphmx.com with ESMTP; 11 Jul 2019 07:58:17 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=LUW76wulPtAQJ8tF39qY7tplldIIDt/m1N3Ol2sQlm4=;
-        b=kho3XDqcjmOl8GDbw4318WLtIgRvB6gKjfbUaa7DKgW+XE8DUl+dZcSAoNp20MjToB
-         15QtsLB/h7Kf8Mmovg6F7KOeJLDBlGCiyuTOAlF8H6ri/aQfWxLrFUtNXdIlTqI9PBuC
-         GNGybI3Ps6EfquuIUvHCCXmW2W+FU647sue0RV9biZwfUpGfedOakHsQ9kH/kVSFDYcb
-         e0MeRtRBh5lm7MMEANcnywoJk2cv/IOuxYZu+pemlXjWF3SwVC+0UGwIUB2LuJj8KQHq
-         ZKIkQhZ0ebofXsn97/AhQ7scm4Vf+FIM3quhOFgQguZyBt6lVN/2/BXayvISrW++RMiR
-         P4BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=LUW76wulPtAQJ8tF39qY7tplldIIDt/m1N3Ol2sQlm4=;
-        b=X2lBe1Au4VprxT3gVf89gpxWIZLWrfZS5IuJCqchhWbmUOLXYBJNVNHio2zK8nV89R
-         7rur8Jr1U6ggvddaoRncWebgev7XDQT6jRTRbHWl5LMuq9N634mFwuIy3sYy4Kp1dF1y
-         Ku3ZuAsuFDKuOMG5WGFIp533uNI7pl9kUamFVfiDATVO2vn7uVQ1ixObeiTOrQuueY56
-         JUhM3Ta8Hl5m8te31xMzNSH/AdqLD2pzow6Z/jVS0NJt/uPZp7XYgg8HBU1vUm0mZEAp
-         OLgYsMSNCntd7Gaco+gWh3A6NeyBYXS9lBGhjQuduLtF1oxa7GDI2YSedP3eqkq5+1W3
-         KHZw==
-X-Gm-Message-State: APjAAAXF9LlQqAIXzwiHVVudTFwcMPO58KQd2jjBVpW96OURBU/DoqdC
-        NCag2B2ES20CJBUB4EhN7CZBCrJfvX0rPdJY5oijn26TWo6QJl80tX6VD14WUAu+SLmptvyIJC4
-        UeVEUrba63g36WpxjW8NcsVtch/fRHVO/Rh75vp79kEmyqdUSRA+ikzSVtTD0kjXju/Ux
-X-Google-Smtp-Source: APXvYqw32IMJ529CC2GTWHf+cGlz2NO953GXJ0xYwvrMmv68MViep9809UYsLy0nOxUjV4tCHruZKCd7v/U=
-X-Received: by 2002:a63:6981:: with SMTP id e123mr773006pgc.136.1562799405213;
- Wed, 10 Jul 2019 15:56:45 -0700 (PDT)
-Date:   Wed, 10 Jul 2019 15:56:09 -0700
-In-Reply-To: <20190710225609.192252-1-satyat@google.com>
-Message-Id: <20190710225609.192252-9-satyat@google.com>
-Mime-Version: 1.0
-References: <20190710225609.192252-1-satyat@google.com>
-X-Mailer: git-send-email 2.22.0.410.gd8fdbe21b5-goog
-Subject: [PATCH 8/8] f2fs: Wire up f2fs to use inline encryption via fscrypt
-From:   Satya Tangirala <satyat@google.com>
-To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net
-Cc:     Parshuram Raju Thombare <pthombar@cadence.com>,
-        Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Satya Tangirala <satyat@google.com>
-Content-Type: text/plain; charset="UTF-8"
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ALodN8WFjVJUOOoRgCiYywofiWq+x0fv/0Whw5MV+1U=;
+ b=ZYSH917mqtwWtTdaNcb6QPy98Fu9aggHLLnTketoYISLtHSk3lETzk/TIJM8h1G8OTGTPUmg84XaRfxyXX6gVlUUoTFeE7F2GsMDvib0I3YUhOfrggHPdWkwvg7zeePEISefpoV7tCvN8c3piZTwOCipWHF27PsW7VqZuRDJzis=
+Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.58.207) by
+ BYAPR04MB4197.namprd04.prod.outlook.com (20.176.250.145) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2052.17; Wed, 10 Jul 2019 23:58:15 +0000
+Received: from BYAPR04MB5816.namprd04.prod.outlook.com
+ ([fe80::65a9:db0a:646d:eb1e]) by BYAPR04MB5816.namprd04.prod.outlook.com
+ ([fe80::65a9:db0a:646d:eb1e%6]) with mapi id 15.20.2073.008; Wed, 10 Jul 2019
+ 23:58:15 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH V3] block: Disable write plugging for zoned block devices
+Thread-Topic: [PATCH V3] block: Disable write plugging for zoned block devices
+Thread-Index: AQHVNzsnjQigOjycPkaflPwYWsh5HQ==
+Date:   Wed, 10 Jul 2019 23:58:15 +0000
+Message-ID: <BYAPR04MB5816A8552060E715084F943CE7F00@BYAPR04MB5816.namprd04.prod.outlook.com>
+References: <20190710161831.25250-1-damien.lemoal@wdc.com>
+ <c9b5b4cd-68d5-7c29-8f76-ad5b04007594@kernel.dk>
+ <26e4505d-7de8-5e7c-d20c-3d82b9cff2d9@kernel.dk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Damien.LeMoal@wdc.com; 
+x-originating-ip: [60.117.181.124]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e352bebe-e06d-4d23-bbab-08d70592797f
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4197;
+x-ms-traffictypediagnostic: BYAPR04MB4197:
+x-microsoft-antispam-prvs: <BYAPR04MB4197B374F409C898872D7C11E7F00@BYAPR04MB4197.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-forefront-prvs: 0094E3478A
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(376002)(346002)(366004)(136003)(39860400002)(189003)(199004)(66946007)(66556008)(66476007)(71190400001)(66446008)(71200400001)(76116006)(64756008)(91956017)(316002)(7736002)(81156014)(256004)(110136005)(476003)(446003)(486006)(305945005)(74316002)(6506007)(8936002)(76176011)(7696005)(86362001)(81166006)(99286004)(8676002)(102836004)(53546011)(186003)(26005)(66066001)(558084003)(478600001)(2906002)(6246003)(229853002)(55016002)(9686003)(53936002)(6436002)(2501003)(5660300002)(3846002)(52536014)(6116002)(25786009)(33656002)(68736007)(14454004);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4197;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: rQ1KWUlFtH7N2PHKhIM0kQExswka3L/A8QSlRbjnRDlCgH98mPJ24BeNyLG9RZxsc83e7yBFb5wnepg1xqcl+pMW4T/VxDkkjown/muMasIGY/+Pa4snqTqHAmFS6FBpqZB7JzQNbxvB5hX7BJN38dgZ2fcfA1N6+C9TKYitIKcIoA6fXTtTuzbOoLrfaT4+osXVDPF5lgnzzijnWgPiQ1BanSpE/p+5WTeilBJaJYLdSaCfNRcI8AiYxX7UxcQzLZvPMtmbtcpKl6H2uP7UNvRtA+Qr06OXxffVCqecfTnSVIXhbCydciSCAG0SX+3WqxeEiFpEMfJ4V2LA+KKwFt+hdh4YLoQ3icoK5SSToro9QD7K8CGC6zeY3tLqMN4CFBQZH66q3heRivST9duhBxhmlZS5fvg7s9VCvsFCF80=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e352bebe-e06d-4d23-bbab-08d70592797f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2019 23:58:15.6363
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Damien.LeMoal@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4197
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Satya Tangirala <satyat@google.com>
----
- fs/f2fs/data.c  | 83 +++++++++++++++++++++++++++++++++++++++++++++----
- fs/f2fs/super.c | 13 ++++----
- 2 files changed, 84 insertions(+), 12 deletions(-)
-
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index eda4181d2092..6fa947725fc2 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -142,6 +142,8 @@ static bool f2fs_bio_post_read_required(struct bio *bio)
- 
- static void f2fs_read_end_io(struct bio *bio)
- {
-+	fscrypt_unset_bio_crypt_ctx(bio);
-+
- 	if (time_to_inject(F2FS_P_SB(bio_first_page_all(bio)),
- 						FAULT_READ_IO)) {
- 		f2fs_show_injection_info(FAULT_READ_IO);
-@@ -165,6 +167,8 @@ static void f2fs_write_end_io(struct bio *bio)
- 	struct bio_vec *bvec;
- 	struct bvec_iter_all iter_all;
- 
-+	fscrypt_unset_bio_crypt_ctx(bio);
-+
- 	if (time_to_inject(sbi, FAULT_WRITE_IO)) {
- 		f2fs_show_injection_info(FAULT_WRITE_IO);
- 		bio->bi_status = BLK_STS_IOERR;
-@@ -282,9 +286,18 @@ static struct bio *__bio_alloc(struct f2fs_sb_info *sbi, block_t blk_addr,
- 	return bio;
- }
- 
-+static inline u64 inline_crypt_dun(struct inode *inode, pgoff_t offset)
-+{
-+	return (((u64)inode->i_ino) << 32) | lower_32_bits(offset);
-+}
-+
- static inline void __submit_bio(struct f2fs_sb_info *sbi,
- 				struct bio *bio, enum page_type type)
- {
-+	struct page *page;
-+	struct inode *inode;
-+	int err = 0;
-+
- 	if (!is_read_io(bio_op(bio))) {
- 		unsigned int start;
- 
-@@ -326,7 +339,22 @@ static inline void __submit_bio(struct f2fs_sb_info *sbi,
- 		trace_f2fs_submit_read_bio(sbi->sb, type, bio);
- 	else
- 		trace_f2fs_submit_write_bio(sbi->sb, type, bio);
--	submit_bio(bio);
-+
-+	if (bio_has_data(bio)) {
-+		page = bio_page(bio);
-+		if (page && page->mapping && page->mapping->host) {
-+			inode = page->mapping->host;
-+			err = fscrypt_set_bio_crypt_ctx(inode, bio,
-+						inline_crypt_dun(inode,
-+								 page->index));
-+		}
-+	}
-+	if (err) {
-+		bio->bi_status = BLK_STS_IOERR;
-+		bio_endio(bio);
-+	} else {
-+		submit_bio(bio);
-+	}
- }
- 
- static void __submit_merged_bio(struct f2fs_bio_info *io)
-@@ -487,6 +515,9 @@ void f2fs_submit_page_write(struct f2fs_io_info *fio)
- 	enum page_type btype = PAGE_TYPE_OF_BIO(fio->type);
- 	struct f2fs_bio_info *io = sbi->write_io[btype] + fio->temp;
- 	struct page *bio_page;
-+	struct inode *fio_inode, *bio_inode;
-+	struct page *first_page;
-+	u64 next_dun = 0;
- 
- 	f2fs_bug_on(sbi, is_read_io(fio->op));
- 
-@@ -513,10 +544,28 @@ void f2fs_submit_page_write(struct f2fs_io_info *fio)
- 
- 	inc_page_count(sbi, WB_DATA_TYPE(bio_page));
- 
-+	fio_inode = fio->page->mapping->host;
-+	bio_inode = NULL;
-+	first_page = NULL;
-+	next_dun = 0;
-+	if (io->bio && bio_page(io->bio)->mapping) {
-+		first_page = bio_page(io->bio);
-+		bio_inode = first_page->mapping->host;
-+		if (fscrypt_inode_is_inline_crypted(bio_inode)) {
-+			next_dun = inline_crypt_dun(bio_inode,
-+						    first_page->index) +
-+				   (io->bio->bi_iter.bi_size >> PAGE_SHIFT);
-+		}
-+	}
- 	if (io->bio && (io->last_block_in_bio != fio->new_blkaddr - 1 ||
- 	    (io->fio.op != fio->op || io->fio.op_flags != fio->op_flags) ||
--			!__same_bdev(sbi, fio->new_blkaddr, io->bio)))
-+			!__same_bdev(sbi, fio->new_blkaddr, io->bio) ||
-+			!fscrypt_inode_crypt_mergeable(bio_inode, fio_inode) ||
-+			(fscrypt_inode_is_inline_crypted(bio_inode) &&
-+			 next_dun != inline_crypt_dun(fio_inode,
-+						  fio->page->index))))
- 		__submit_merged_bio(io);
-+
- alloc_new:
- 	if (io->bio == NULL) {
- 		if ((fio->type == DATA || fio->type == NODE) &&
-@@ -568,8 +617,9 @@ static struct bio *f2fs_grab_read_bio(struct inode *inode, block_t blkaddr,
- 	bio->bi_end_io = f2fs_read_end_io;
- 	bio_set_op_attrs(bio, REQ_OP_READ, op_flag);
- 
--	if (f2fs_encrypted_file(inode))
-+	if (fscrypt_needs_fs_layer_crypto(inode))
- 		post_read_steps |= 1 << STEP_DECRYPT;
-+
- 	if (post_read_steps) {
- 		ctx = mempool_alloc(bio_post_read_ctx_pool, GFP_NOFS);
- 		if (!ctx) {
-@@ -1519,6 +1569,7 @@ static int f2fs_read_single_page(struct inode *inode, struct page *page,
- 					struct f2fs_map_blocks *map,
- 					struct bio **bio_ret,
- 					sector_t *last_block_in_bio,
-+					u64 *next_dun,
- 					bool is_readahead)
- {
- 	struct bio *bio = *bio_ret;
-@@ -1592,6 +1643,13 @@ static int f2fs_read_single_page(struct inode *inode, struct page *page,
- 		__submit_bio(F2FS_I_SB(inode), bio, DATA);
- 		bio = NULL;
- 	}
-+
-+	if (bio && fscrypt_inode_is_inline_crypted(inode) &&
-+	    *next_dun != inline_crypt_dun(inode, page->index)) {
-+		__submit_bio(F2FS_I_SB(inode), bio, DATA);
-+		bio = NULL;
-+	}
-+
- 	if (bio == NULL) {
- 		bio = f2fs_grab_read_bio(inode, block_nr, nr_pages,
- 				is_readahead ? REQ_RAHEAD : 0);
-@@ -1611,6 +1669,9 @@ static int f2fs_read_single_page(struct inode *inode, struct page *page,
- 	if (bio_add_page(bio, page, blocksize, 0) < blocksize)
- 		goto submit_and_realloc;
- 
-+	if (fscrypt_inode_is_inline_crypted(inode))
-+		*next_dun = inline_crypt_dun(inode, page->index) + 1;
-+
- 	inc_page_count(F2FS_I_SB(inode), F2FS_RD_DATA);
- 	ClearPageError(page);
- 	*last_block_in_bio = block_nr;
-@@ -1644,6 +1705,7 @@ static int f2fs_mpage_readpages(struct address_space *mapping,
- 	struct inode *inode = mapping->host;
- 	struct f2fs_map_blocks map;
- 	int ret = 0;
-+	u64 next_dun = 0;
- 
- 	map.m_pblk = 0;
- 	map.m_lblk = 0;
-@@ -1667,7 +1729,8 @@ static int f2fs_mpage_readpages(struct address_space *mapping,
- 		}
- 
- 		ret = f2fs_read_single_page(inode, page, nr_pages, &map, &bio,
--					&last_block_in_bio, is_readahead);
-+					&last_block_in_bio, &next_dun,
-+					is_readahead);
- 		if (ret) {
- 			SetPageError(page);
- 			zero_user_segment(page, 0, PAGE_SIZE);
-@@ -1720,7 +1783,7 @@ static int encrypt_one_page(struct f2fs_io_info *fio)
- 	struct page *mpage;
- 	gfp_t gfp_flags = GFP_NOFS;
- 
--	if (!f2fs_encrypted_file(inode))
-+	if (!fscrypt_needs_fs_layer_crypto(inode))
- 		return 0;
- 
- 	/* wait for GCed page writeback via META_MAPPING */
-@@ -1899,7 +1962,7 @@ int f2fs_do_write_data_page(struct f2fs_io_info *fio)
- 			f2fs_unlock_op(fio->sbi);
- 		err = f2fs_inplace_write_data(fio);
- 		if (err) {
--			if (f2fs_encrypted_file(inode))
-+			if (fscrypt_needs_fs_layer_crypto(inode))
- 				fscrypt_pullback_bio_page(&fio->encrypted_page,
- 									true);
- 			if (PageWriteback(page))
-@@ -2617,6 +2680,8 @@ static void f2fs_dio_end_io(struct bio *bio)
- {
- 	struct f2fs_private_dio *dio = bio->bi_private;
- 
-+	fscrypt_unset_bio_crypt_ctx(bio);
-+
- 	dec_page_count(F2FS_I_SB(dio->inode),
- 			dio->write ? F2FS_DIO_WRITE : F2FS_DIO_READ);
- 
-@@ -2633,12 +2698,18 @@ static void f2fs_dio_submit_bio(struct bio *bio, struct inode *inode,
- {
- 	struct f2fs_private_dio *dio;
- 	bool write = (bio_op(bio) == REQ_OP_WRITE);
-+	u64 data_unit_num = inline_crypt_dun(inode, file_offset >> PAGE_SHIFT);
- 
- 	dio = f2fs_kzalloc(F2FS_I_SB(inode),
- 			sizeof(struct f2fs_private_dio), GFP_NOFS);
- 	if (!dio)
- 		goto out;
- 
-+	if (fscrypt_set_bio_crypt_ctx(inode, bio, data_unit_num) != 0) {
-+		kvfree(dio);
-+		goto out;
-+	}
-+
- 	dio->inode = inode;
- 	dio->orig_end_io = bio->bi_end_io;
- 	dio->orig_private = bio->bi_private;
-diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
-index 6b959bbb336a..2a7b3bae98aa 100644
---- a/fs/f2fs/super.c
-+++ b/fs/f2fs/super.c
-@@ -2223,12 +2223,13 @@ static bool f2fs_dummy_context(struct inode *inode)
- }
- 
- static const struct fscrypt_operations f2fs_cryptops = {
--	.key_prefix	= "f2fs:",
--	.get_context	= f2fs_get_context,
--	.set_context	= f2fs_set_context,
--	.dummy_context	= f2fs_dummy_context,
--	.empty_dir	= f2fs_empty_dir,
--	.max_namelen	= F2FS_NAME_LEN,
-+	.key_prefix		= "f2fs:",
-+	.get_context		= f2fs_get_context,
-+	.set_context		= f2fs_set_context,
-+	.dummy_context		= f2fs_dummy_context,
-+	.empty_dir		= f2fs_empty_dir,
-+	.max_namelen		= F2FS_NAME_LEN,
-+	.inline_crypt_supp	= true,
- };
- #endif
- 
--- 
-2.22.0.410.gd8fdbe21b5-goog
-
+On 2019/07/11 5:18, Jens Axboe wrote:=0A=
+> On 7/10/19 2:05 PM, Jens Axboe wrote:=0A=
+>> Looks fine to me now, but doesn't apply cleanly to master/for-linus.=0A=
+> =0A=
+> I fixed it up manually, fwiw.=0A=
+> =0A=
+=0A=
+Thanks !=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
