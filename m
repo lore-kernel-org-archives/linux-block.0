@@ -2,68 +2,67 @@ Return-Path: <SRS0=ACpf=VH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B12CDC74A2B
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 16:17:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DAAC74A21
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 16:18:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 76687208E4
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 16:17:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA5EA208E4
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 16:18:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SwmTIX0Z"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mOeDQxfN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727974AbfGJQRO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jul 2019 12:17:14 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:40537 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727520AbfGJQRO (ORCPT
+        id S1727528AbfGJQSg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jul 2019 12:18:36 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:25698 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727520AbfGJQSg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jul 2019 12:17:14 -0400
+        Wed, 10 Jul 2019 12:18:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562775434; x=1594311434;
-  h=from:to:cc:subject:date:message-id:mime-version:
+  t=1562775516; x=1594311516;
+  h=from:to:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=j0zDEuXSIQdovDOm8s3stqcFSu7ZVemsj2ZORHnJ3uE=;
-  b=SwmTIX0ZIKm6y4f223owd0rMpQUCmIB+F4oy+IDZuGgXdRjPcGUCu/q9
-   Jg61N4v7IhlTLuD7UbCAuVnLm/VMJpT7HjKkopgfkuoFXFpoyZh9qwf2R
-   Sj6yNUd2maA/zUzXqzaMEQCge35WeHnUG9zYefyCMVnOtE7PjX6ACVhh+
-   MzrppJF/HtAKQqHkc2Am5xaUvjtNuZIykBr6CG76DQFZuLTWbvYfPJsgJ
-   YzFPXKeB3VDl0JuChXF/cNU9jYmrLP498mEJnZv70IVOCeyhkPfK/VfTf
-   v4dIr9Jc0839YLptcYqkdSaYnqvrI/rVnFb5EIhybjXYi609bosFO1nml
-   g==;
-IronPort-SDR: hMsKYueJDGFlh2tHdpjtNLjoUOTTDJwDmt2wfms5009LfnQI4it4FPKRAK6MlTu0BwZuKVRzi/
- FaXrMWjY5LOne100q1m/mTg1ekJN5FOtaQFNdu3VvU4gFzXbXfbOm+sQWNUe0Nh3lyCrzXyd0m
- rAKF1R/WnPl26civ49IXj8jyhVyAa+EbiQKTElsHx4QH22evrAXpKvZHQ8/BdIBPTL7xjxFbIM
- uan34QtXY3/NW2rC1josLEAPKTGgdr+MZ/a4NiB4Ke2SypLjwlWFYIrb5ZlDqVnbu31fzZ3qNW
- sKc=
+  bh=2GYmRz/cqU/GcOrb6cQ/fAYZVV1DBRix49T1KwGMTh8=;
+  b=mOeDQxfNHpfakkyTzVW2vHXakJos0UESYHpBxIYXf2+X3zlP9fKn9DE7
+   EUde9OGDrB1X7Baj1RlHBa7DUNJ+gZU/1QL20YDeQL1eTO/LN87krhV/8
+   4BbH4CCEExKUsgF7ESCHUZJxUwKvuc/0hGM/u4V71VafAGSAlFPML+pzF
+   yNopNSsRqd2b7vA8nh62bK4C4jWmc4wVnXB3/YMwPVpAFVMRa7CrDkusK
+   6jT5MiPb/Z73c1T2cqysacx5UzlBw9iVPPRnincZIcgfTVgKEMdEeQIG5
+   lVCCrFX3/cB/rWdU7dxfNurq5smSX9ql2mRSu7irtde7KD+Mtprll5/63
+   A==;
+IronPort-SDR: s/ZjOkFUYlLxFcoPcE4W67qVQxr5D026oHHwbzuCBH6ux5jgmhtoy5uABXip/msphlYZQ6NqIE
+ FlNkVKPHImlht38BY3km/htC7T6vY31TcymLFHCmdPP7yaojMGxW4otsN5t4htpowDRDGdFpLV
+ 3k40v1fX+RiDYIOuML8dzFkabCIqTPPt8XoYC45pikq7L2SjFYTKuuhz8LCP9VofhDkeTY5W78
+ I8CWsMUL/nWbv0wtQEcEIRB2C76kKGzQpGJZ58O/dfNT4NkRpYpZLHoUInLMAPlAFiNqc0TbVL
+ 4Z0=
 X-IronPort-AV: E=Sophos;i="5.63,475,1557158400"; 
-   d="scan'208";a="117487008"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jul 2019 23:54:50 +0800
-IronPort-SDR: H0wmKB2R25tjfZSAVHKFiKo++x17n+57aKlvFeBJ9w0WyRlW1PqFOPtAHlpLBqAvQ52Ide7zGC
- tP7P/o1hjonx/wAiY/MAvrc6VHIXQZmK3SG24D9uA1hhTzwmmGdvq1JCHl3nLeamo/8lCMw2qt
- ncdR3lQYGU1Wop7mOi4KJJOGsxOhnWhgTU2N67QcFkWEbLp0uoh7YpbdqjjEWtoxIvtcfk4atg
- v9xXt7GD5jAX1mY42eOH6oYmvMb7EXCzK1DCkYNtc00rGH+/DGnCdh8pxKRoePogLOtgHwfVN1
- 41K2KdrQ2ZTFxsdBEeLlGWcH
+   d="scan'208";a="112681105"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 11 Jul 2019 00:18:33 +0800
+IronPort-SDR: RNitutdDi6vX3eHm6bJnSAUeFNoHGmNlG9HuErXOiCozecvbvXdNIe4yJcBaMMQDzfVJGio2aD
+ Efpwps+nIKgjH8qRyRnbNOCZt4OFNersonzpLsuKKEPW+Vd6gaXYuZzdwjxaHtkHLLBYxM7idr
+ SVkz2/CduvwGoukn2g6pFFnQPPie+GsqnGyjYUnl8uVUjC2VrGnDIe197H04TkHs7Rvhe7u7g/
+ H7oWYga7cVlBz0ALLMePt3lMo4nyyICStrxKm4JnFQCn1zM/5QfvjD0Qn97YhAPixBDX7wB3z5
+ 4MQCsz738zEB2IjF7mWLQBK+
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP; 10 Jul 2019 08:53:34 -0700
-IronPort-SDR: f/1XsaRuw56HZKEbDZX6BNIer9/xRvg8LczqXdTiKJUQsXZRwo7/yrliMY389rdrWTo/EYcDPZ
- yOQ48krXPT3l1XV0quICZp6/i7p3Qn3TiGavlFMe4Oz+4HkCdxE7LYAULr1/hivJQkESxwqgRq
- 2XJ7YV89m9wPZmOqo+EDvtHv6p5J1nDk8MZhFKwc5HOZ0cFU1sXpgUXncSe7Jxhgy1D/orbNb2
- MD8T+fsZW3s/8Nse2bx7cfxIsFJTTRMuaYKkk+h81nRbEjD048U7BWeBdKZewBMGejpKdNBtdq
- Vbw=
+  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jul 2019 09:17:14 -0700
+IronPort-SDR: KUnJrVp/WXTiFGA9FL6vWMmEKl7HtIVbpALMQyrhWxJg37Yxb5sxfSUxbk4BFeGNVgGK/hjwrM
+ fhQfbi/pvAlorWR0Dw6+b3KIp+wwmRdGr1neji6DFMCRwmIMCSEtIp6F1sF2d/y0hV6XOmYvs7
+ HYMXn59izd2PFvSlsXkJLTZmCcKIaAAiRT+5W2YXYSjGimZkI7YkSz6MhVtiWel/0sqQZFsr7q
+ H/oLKCpcvH6wHdAsJ2rAsiVFm3mhpn5h1x8ElY1XHhQ0HlkyriEOoof0ASDpF375V2n1Bf1Ni2
+ Jr8=
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jul 2019 08:54:49 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jul 2019 09:18:32 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH V2] block: Disable write plugging for zoned block devices
-Date:   Thu, 11 Jul 2019 00:54:47 +0900
-Message-Id: <20190710155447.11112-1-damien.lemoal@wdc.com>
+Subject: [PATCH V3] block: Disable write plugging for zoned block devices
+Date:   Thu, 11 Jul 2019 01:18:31 +0900
+Message-Id: <20190710161831.25250-1-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -125,8 +124,8 @@ Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
  block/blk-core.c |  2 +-
  block/blk-mq.c   |  2 +-
- block/blk-mq.h   | 10 ++++++++++
- 3 files changed, 12 insertions(+), 2 deletions(-)
+ block/blk-mq.h   | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 34 insertions(+), 2 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
 index 8340f69670d8..3957ea6811c3 100644
@@ -155,20 +154,42 @@ index ce0f5f4ede70..90be5bb6fa1b 100644
  		blk_mq_put_ctx(data.ctx);
  		blk_mq_bio_to_request(rq, bio);
 diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 633a5a77ee8b..c9195a2cd670 100644
+index 633a5a77ee8b..4a63c96188c5 100644
 --- a/block/blk-mq.h
 +++ b/block/blk-mq.h
-@@ -238,4 +238,14 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
+@@ -238,4 +238,36 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
  		qmap->mq_map[cpu] = 0;
  }
  
++/*
++ * blk_mq_plug() - Get caller context plug
++ * @q: request queue
++ * @bio : the bio being submitted by the caller context
++ *
++ * Plugging, by design, may delay the insertion of BIOs into the elevator in
++ * order to increase BIO merging opportunities. This however can cause BIO
++ * insertion order to change from the order in which submit_bio() is being
++ * executed in the case of multiple contexts concurrently issuing BIOs to a
++ * device, even if these context are synchronized to tightly control BIO issuing
++ * order. While this is not a problem with regular block devices, this ordering
++ * change can cause write BIO failures with zoned block devices as these
++ * require sequential write patterns to zones. Prevent this from happening by
++ * ignoring the plug state of a BIO issuing context if the target request queue
++ * is for a zoned block device and the BIO to plug is a write operation.
++ *
++ * Return current->plug if the bio can be plugged and NULL otherwise
++ */
 +static inline struct blk_plug *blk_mq_plug(struct request_queue *q,
 +					   struct bio *bio)
 +{
++	/*
++	 * For regular block devices or read operations, use the context plug
++	 * which may be NULL if blk_start_plug() was not executed.
++	 */
 +	if (!blk_queue_is_zoned(q) || !op_is_write(bio_op(bio)))
 +		return current->plug;
 +
-+	/* Zoned block device write case: do not plug the BIO */
++	/* Zoned block device write operation case: do not plug the BIO */
 +	return NULL;
 +}
 +
