@@ -2,80 +2,122 @@ Return-Path: <SRS0=ACpf=VH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD9F6C74A21
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 15:39:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B830C74A2B
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 15:56:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE0942086D
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 15:39:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BDA22064A
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 15:56:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="WQBpPcoi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727327AbfGJPjf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jul 2019 11:39:35 -0400
-Received: from smtpbgbr2.qq.com ([54.207.22.56]:56137 "EHLO smtpbgbr2.qq.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726105AbfGJPjf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jul 2019 11:39:35 -0400
-X-QQ-mid: bizesmtp17t1562773167tyqe66yy
-Received: from Macbook.Pro.openvpn (unknown [175.10.88.112])
-        by esmtp6.qq.com (ESMTP) with 
-        id ; Wed, 10 Jul 2019 23:39:26 +0800 (CST)
-X-QQ-SSF: 01400000002000Q0WO70000A0000000
-X-QQ-FEAT: CPznDyfYuPezqzP1SsqcTPI7vZYFhX4sE4lpw35QoMQs/PxJBA6NGQryb2djc
-        HtfXEtHWefTkfwuosdjOGjeM9eKkTPkWFpI2f3HBmowqi5VtBA/selaQz+f9YruOv8FsdOy
-        o6eKs54iHTot5Nn98fKMqy+a7VKRCBpf1ty7d8vifwihvIj+3rG59TXbO8ffOJ8DWCVYSqV
-        zntmaAcmwCiRZ7j+9zbW7ke8opQAi0gu962USQAOQSACbGVlDiBABcUan6h1xBJ9wmpKzIa
-        kzS4yBKLxEVl5DuNFEihfCrZe3+9+YrqQvhW71fEsq4GVmbsiPLLuTuJ6Q01ISEq9gVNnwW
-        Lqb5QuT7ljt/3B7joHQ2rPCcML1Fw==
-X-QQ-GoodBg: 2
-From:   Jackie Liu <liuyun01@kylinos.cn>
-To:     axboe@kernel.dk
-Cc:     Jackie Liu <liuyun01@kylinos.cn>, linux-block@vger.kernel.org
-Subject: [PATCH v2] io_uring: fix stuck problem caused by potential memory alloc failure
-Date:   Wed, 10 Jul 2019 23:39:16 +0800
-Message-Id: <20190710153916.1022-1-liuyun01@kylinos.cn>
-X-Mailer: git-send-email 2.22.0
+        id S1727428AbfGJP4O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jul 2019 11:56:14 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:16878 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725832AbfGJP4O (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Jul 2019 11:56:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1562774174; x=1594310174;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8GgE56wd3g+Ymp3kg9iNwAzAB1LJNJfXdZVXkUg/UJQ=;
+  b=WQBpPcoioZrfaHsdzr0uHsy8GEUsVhSMfsz5fNPkMuggMg3p0GOf7Tmi
+   Lr4QBDfqIISpnKX7lfKjII5mXGxZzYCqA7Ih8ljlubeO1WnudzCwaNyRL
+   v7MqmicvjrQ77+1J2kyZtRvSF1PqSmKlBnCo2OgbhmuPbAt260u7tW69f
+   rc4M2+FQXo3d0gZvoRtWFS97Kb5f4FatZxBpo/bND12w1elIH2kKhmCfZ
+   o/hi69XOrSBPeV8CBKmFwk2wcw1SaSG0qX++1qE5RQt/nv2WSiD8DTCml
+   3eYTbddStB9YHrlnkfuESkIr7OnUT8TUHkLIwqBya7Wc/rZ62WTZEbEwL
+   g==;
+IronPort-SDR: Q4qwL2lD45dIx6ooGvOqqgNNkcmyrbehfhWDNK6CfgCRiHHpXBrrsnen09vmyaEHzQcgvE4M0v
+ aKM1P+z+mSFJYsi0WfwAwP84T/67RyrmVfPuvB1ZEdFSRf2q5GHS2XCw5Egrvfuua7REGc4bsa
+ ZcYwR2Kb5XWzirY2I1qMNEz6zPGOhEU1c0+t9g4PZyFeCA39P1MDdyrUaDUv10AQ69ycAwUWpF
+ dRkkWN/U+Y/92qrBXpf5EDfDfEiBMuYNeEviVn5nbvq99afQAyQcv/rqOYvMBjdzRBvjmiLGzl
+ wRM=
+X-IronPort-AV: E=Sophos;i="5.63,475,1557158400"; 
+   d="scan'208";a="114296289"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jul 2019 23:56:10 +0800
+IronPort-SDR: 9tKhmA5A1elgJGx6oNY4HM/moLEVfnPsMYxmoP3eanfXz6Bby7wCEPskKYIl/F1mPu9gvKX7S2
+ msxtf6e6jbdfIqDnav52v5g/uAj+nT4pNV+eb666ylEK65MF16e2vUtFg3GzVfdOMR97C/6jCi
+ c7GVR6kqLUCCzlo7cshh+N0qCeLhGF9mbOxnO28606n+GLeVvQKPnJOOqBxzPvsNcvru/7Q4PG
+ TEwCWT6Qz1SlzvgGnZBWiHLdDLRIt/8kMW93Tlx2zhtaowHW9HaK2DhcuWTE7C5qPCEWTYsyig
+ rIZ0iEES7ylcI7S1puVGJvAg
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jul 2019 08:54:51 -0700
+IronPort-SDR: DPxj78hureI1gt3X0XLWgUalEUyUcRFtkVAmsdqEcKaNitd/Qaecad51IEXv3bgK/nAbrp2VQd
+ zXCND8ZfRbiJvovhDPtzltrghjA76CTdndBQLITCVE3y2dTeaW3ePPnvesmU6kNNGr/va+B8Hp
+ YyrnkY+rZQJnQ03v1FbQQhLJgRa3zkDkIlu8DfkARRkxwCJGPtWvbLP4qzjcyaOo7mebdA0C4+
+ WqqAOH4qp0vHkSiEDD1o8+ol/iD2KrekZPDbYqxCMk6qpabnZ6N8PMEPapc0KDqX+L2vwfZkKj
+ lv0=
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jul 2019 08:56:10 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: Remove unused definitions
+Date:   Thu, 11 Jul 2019 00:56:08 +0900
+Message-Id: <20190710155608.11227-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign4
-X-QQ-Bgrelay: 1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When io_req_defer alloc memory fails, it will be -EAGAIN. But
-io_submit_sqe cannot return immediately because the reference count for
-req is still held. Ensure that we free it.
+The ELV_MQUEUE_XXX definitions in include/linux/elevator.h are unused
+since the removal of elevator_may_queue_fn in kernel 5.0. Remove these
+definitions and also remove the documentation of elevator_may_queue_fn
+in Documentiation/block/biodoc.txt.
 
-[axboe@kernel.dk: reword commit message]
-Fixes: de0617e46717 ("io_uring: add support for marking commands as draining")
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- fs/io_uring.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ Documentation/block/biodoc.txt | 5 -----
+ include/linux/elevator.h       | 9 ---------
+ 2 files changed, 14 deletions(-)
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 4ef62a45045d..1c388533cdc8 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -1843,8 +1843,8 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
- 	ret = io_req_defer(ctx, req, s->sqe);
- 	if (ret) {
- 		if (ret == -EIOCBQUEUED)
--			ret = 0;
--		return ret;
-+			return 0;
-+		goto out;
- 	}
+diff --git a/Documentation/block/biodoc.txt b/Documentation/block/biodoc.txt
+index ac18b488cb5e..f0d15b0cb3c0 100644
+--- a/Documentation/block/biodoc.txt
++++ b/Documentation/block/biodoc.txt
+@@ -844,11 +844,6 @@ elevator_latter_req_fn		These return the request before or after the
  
- 	ret = __io_submit_sqe(ctx, req, s, true);
+ elevator_completed_req_fn	called when a request is completed.
+ 
+-elevator_may_queue_fn		returns true if the scheduler wants to allow the
+-				current context to queue a new request even if
+-				it is over the queue limit. This must be used
+-				very carefully!!
+-
+ elevator_set_req_fn
+ elevator_put_req_fn		Must be used to allocate and free any elevator
+ 				specific storage for a request.
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index 6e8bc53740f0..9842e53623f3 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -160,15 +160,6 @@ extern struct request *elv_rb_find(struct rb_root *, sector_t);
+ #define ELEVATOR_INSERT_FLUSH	5
+ #define ELEVATOR_INSERT_SORT_MERGE	6
+ 
+-/*
+- * return values from elevator_may_queue_fn
+- */
+-enum {
+-	ELV_MQUEUE_MAY,
+-	ELV_MQUEUE_NO,
+-	ELV_MQUEUE_MUST,
+-};
+-
+ #define rq_end_sector(rq)	(blk_rq_pos(rq) + blk_rq_sectors(rq))
+ #define rb_entry_rq(node)	rb_entry((node), struct request, rb_node)
+ 
 -- 
-2.22.0
-
-
+2.21.0
 
