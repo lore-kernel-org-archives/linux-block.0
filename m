@@ -2,198 +2,146 @@ Return-Path: <SRS0=ACpf=VH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 603EAC74A36
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 20:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44575C74A36
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 21:21:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24B1821530
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 20:52:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B320208C4
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 21:21:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1562791945;
-	bh=I8UqzSMqyz3zNVOR2QT8kCVplxl2mivVkYsrG/7l0YI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=glBzpmaur4mzdOYxJM7iSAd3Fa2L24K8WIwBxVK2G7ajlXxOvQH384KYb8x3YTWA4
-	 wQPj2ZYNXZxskSRsnogIMXslCZVIXM2UN0jxfXDMFleuXi4tJfgjrI8IEE4eTMImGF
-	 WskP9KczyQAto5SK+HZ4B5VtuSVjyiTLr7WDFJ60=
+	s=default; t=1562793711;
+	bh=V/Wa8OqWtFdGckahHkvEhfXCx2DmBiBGDL79DnzH1vk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=vfZm17//SGVQesFakVMeDAyRhHTp30RXbLStqIf6/1wlUkGI0R1rATn9eHvhs/w+s
+	 ZwUzRrvA5w5P8pRP9bhaNxzUhWtudQuJ4rsHSxRanL/FSVqmfW6tULXXjL0FBg7Q/A
+	 2wB9Vez/CSpWCdfgihIfJ602YTDWG7qjMWgvcFnA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727867AbfGJUvi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jul 2019 16:51:38 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:44599 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726033AbfGJUvh (ORCPT
+        id S1727222AbfGJVVq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jul 2019 17:21:46 -0400
+Received: from mail-pf1-f169.google.com ([209.85.210.169]:40971 "EHLO
+        mail-pf1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725956AbfGJVVq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jul 2019 16:51:37 -0400
-Received: by mail-pl1-f193.google.com with SMTP id t14so1792279plr.11;
-        Wed, 10 Jul 2019 13:51:37 -0700 (PDT)
+        Wed, 10 Jul 2019 17:21:46 -0400
+Received: by mail-pf1-f169.google.com with SMTP id m30so1674118pff.8;
+        Wed, 10 Jul 2019 14:21:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=1kGp2m3bMKTZuBvKVapVVACURbt75AkZ89ShYdU2gWU=;
-        b=uId0l74koPJus9gxnB2KmVc9Yb7a0ZeDYWZUVR3OVuF+uBfffZW/Z0RRVa5rjGw8Yu
-         Mg8Fj+rkk0m2h3LFRoNxCa4iMG1f1mqeMsGreQKz7jFr+Prqf3YaIoocMsAKRAlGtO0C
-         TKXC5TKzPYljgz5bRq0mkz7bkpZ/s2mmMCyfDCkkFHsn9vFzVtAkX4OUbhHyW+xt89LD
-         L8wgVOZHGzBXnhPYcUeO3kILztCTIXiWfjjyXE+x+w2oZmBz9+NIXq620imJ3m8GcvuH
-         4b5ChNiKpKcjfW72nGKspgxv3Unck1XOYGa1pXDBahVhDJY2AyNHt9hVy7HqJ4S5zxNc
-         mzng==
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=siIn1w9IRj9EyAz1dx7Gl8hkgFfIWbx6jNb+pkUBwDM=;
+        b=CWXXPYiJmNO2VkL3MT7DkHV+hmD6kdOoGicSmCBWezxnW3FtZWUaM6vZU1jQNA/eS+
+         ln6xoL5gaBXAKj+Ud0V0NkTKNiTDmbUXXBzRXsgE1yQmVCRot+YPhZcGoM758uw19VmT
+         CnnGu6vGxos82NuqzEfkrNw+TtW7B1jITstDIG5KEQR4BKgB2lIqHSCLaqrsgNMQxsfj
+         Zcpjs6nphhqe+2Bt9te7fqFOQ0J1rBiZI3EyD11sChA1bbYVICRaNWJ6c+cVl2mprSR7
+         4YfoDL5JUBiN7h9J+arYvdtZjXF4lBEAxb5wNcCPLRGk4SlBvVCGts/PESbNS7CE3hqa
+         K6rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=1kGp2m3bMKTZuBvKVapVVACURbt75AkZ89ShYdU2gWU=;
-        b=EjOeotBZSv+TIknETL4R3sGmRYZa9m7upBKyfLeQhINF/ZsfNaWXvg1NIuyHzCbwRt
-         jmFOxFCfRTb7tBy+WiEKmchmvkiIOX65tfpVZ+HM7akO+VAN56NFQTSQ4v1VAJtM/4Ni
-         wpDO6+rlorR25A49ENNZY6WBwXc4bgEIRhmomDHTdJBuvn4SrZgq8mJbS8Ih3jZslH/T
-         9t9tjJbjfrFbuqI05maRjoIR5SKREpIS/BPBYk20Lg29wF1HtD44I4VHEHC+Wo8tBVF5
-         RobX2WTHT8LmU60ma2JNoFlYvdtb9HTgwTebQ0sp1wdY2VZ1V589BUXGdgnOmnUn4ztd
-         wdGw==
-X-Gm-Message-State: APjAAAXzxqD6FH+m8CWDQ1JcT4hIHETdJp3AV6poDQM/Sm2ec3l3Tdwg
-        yqSBugKlLlW4+mUzkAJI8h8=
-X-Google-Smtp-Source: APXvYqxbg69FNrxzCRtbJhaE4oUMB4DplouWYC2LAzaH81rs5wWhaGmVB89348u/GJ+ny4fmpNRnQA==
-X-Received: by 2002:a17:902:2e81:: with SMTP id r1mr210432plb.193.1562791896637;
-        Wed, 10 Jul 2019 13:51:36 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=siIn1w9IRj9EyAz1dx7Gl8hkgFfIWbx6jNb+pkUBwDM=;
+        b=G31mc882SuOiuD0N1mw7JnNKERYDORTa67csrSf2+wZtJS1WbvacojJa08pYUdwVOz
+         SQ18iWt9eVpMRKC9l0/IkrgmigzF/3e7xZNs0cooV7r8aWnzoQlMvzS6WINk0XDeuDaJ
+         B1DDPp918zLoBc+Ukg4YqEvmsBrk+i+erXyX/lfmz+Axk5WngVovw65qFyam/5yNr3Cy
+         VWcnmo/1DCVg2+1qXZ1lYalxQ3UEWTzfjqlyOyifUw4i1kleQ6aAMzx3MsddNSJ4XGK+
+         jZ6dWyhufFjPbP4wgjkuOIzJ2XbOUr0W6Jy08/OH5WpIUSOOaFd4O/r+R+Ft6llzH3Al
+         gsPw==
+X-Gm-Message-State: APjAAAV8u15dOr7ORhUpFdg28PyneAkQtmR/io4PtZVHXMETu2jnT8jf
+        hAOH6V7C+B7rY2HSO5JweFg=
+X-Google-Smtp-Source: APXvYqxQfsexkWldj+RCgTAbmj+xZvqfEumit5Aa+odfoOiHhmjsD1wG+GkD6dTNi1iGZIz2KvODBQ==
+X-Received: by 2002:a63:5550:: with SMTP id f16mr363820pgm.426.1562793705481;
+        Wed, 10 Jul 2019 14:21:45 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:500::3:2bbe])
-        by smtp.gmail.com with ESMTPSA id h9sm2838600pgh.51.2019.07.10.13.51.35
+        by smtp.gmail.com with ESMTPSA id f19sm3851402pfk.180.2019.07.10.14.21.44
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Jul 2019 13:51:36 -0700 (PDT)
+        Wed, 10 Jul 2019 14:21:44 -0700 (PDT)
+Date:   Wed, 10 Jul 2019 14:21:42 -0700
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
         dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org
 Cc:     linux-kernel@vger.kernel.org, kernel-team@fb.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>
-Subject: [PATCH 01/10] blkcg: pass @q and @blkcg into blkcg_pol_alloc_pd_fn()
-Date:   Wed, 10 Jul 2019 13:51:19 -0700
-Message-Id: <20190710205128.1316483-2-tj@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190710205128.1316483-1-tj@kernel.org>
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org
+Subject: [PATCH 11/10] block: omit request->pre_start_time_ns if
+ !CONFIG_BLK_CGROUP_IOCOST work-conserving porportional controller
+Message-ID: <20190710212142.GP657710@devbig004.ftw2.facebook.com>
 References: <20190710205128.1316483-1-tj@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190710205128.1316483-1-tj@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of @node, pass in @q and @blkcg so that the alloc function has
-more context.  This doesn't cause any behavior change and will be used
-by io.weight implementation.
+From e2693136fa64d5c9dde73d2d663bde84f8326877 Mon Sep 17 00:00:00 2001
+From: Tejun Heo <tj@kernel.org>
+Date: Wed, 10 Jul 2019 14:18:12 -0700
+
+request->pre_start_time is currently only used by the iocost
+controller.  Let's omit the field if disabled and avoid wasting space
+in struct request.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
+Suggested-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/bfq-cgroup.c         | 5 +++--
- block/blk-cgroup.c         | 6 +++---
- block/blk-iolatency.c      | 6 ++++--
- block/blk-throttle.c       | 6 ++++--
- include/linux/blk-cgroup.h | 3 ++-
- 5 files changed, 16 insertions(+), 10 deletions(-)
+The git branch is updated accordingly.
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 0f6cd688924f..e6fb537b4bfc 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -501,11 +501,12 @@ static void bfq_cpd_free(struct blkcg_policy_data *cpd)
- 	kfree(cpd_to_bfqgd(cpd));
- }
+Thanks.
+
+ block/blk-mq.c         | 2 ++
+ include/linux/blkdev.h | 7 +++++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 90b46988cc02..ce96bcd7e260 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -325,7 +325,9 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	RB_CLEAR_NODE(&rq->rb_node);
+ 	rq->rq_disk = NULL;
+ 	rq->part = NULL;
++#ifdef CONFIG_BLK_CGROUP_IOCOST
+ 	rq->pre_start_time_ns = pre_start_time_ns;
++#endif
+ 	if (blk_mq_need_time_stamp(rq))
+ 		rq->start_time_ns = ktime_get_ns();
+ 	else
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 4247a9bc44b7..2425af6d3f5e 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -194,8 +194,10 @@ struct request {
  
--static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, int node)
-+static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, struct request_queue *q,
-+					     struct blkcg *blkcg)
- {
- 	struct bfq_group *bfqg;
+ 	struct gendisk *rq_disk;
+ 	struct hd_struct *part;
++#ifdef CONFIG_BLK_CGROUP_IOCOST
+ 	/* Time that the first bio started allocating this request. */
+ 	u64 pre_start_time_ns;
++#endif
+ 	/* Time that this request was allocated for this IO. */
+ 	u64 start_time_ns;
+ 	/* Time that I/O was submitted to the device. */
+@@ -635,8 +637,13 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
+ 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
+ #define blk_queue_pci_p2pdma(q)	\
+ 	test_bit(QUEUE_FLAG_PCI_P2PDMA, &(q)->queue_flags)
++
++#ifdef CONFIG_BLK_CGROUP_IOCOST
+ #define blk_queue_rec_prestart(q)	\
+ 	test_bit(QUEUE_FLAG_REC_PRESTART, &(q)->queue_flags)
++#else
++#define blk_queue_rec_prestart(q)		false
++#endif
  
--	bfqg = kzalloc_node(sizeof(*bfqg), gfp, node);
-+	bfqg = kzalloc_node(sizeof(*bfqg), gfp, q->node);
- 	if (!bfqg)
- 		return NULL;
- 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 24ed26957367..75f7f78b87b2 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -175,7 +175,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
- 			continue;
- 
- 		/* alloc per-policy data and attach it to blkg */
--		pd = pol->pd_alloc_fn(gfp_mask, q->node);
-+		pd = pol->pd_alloc_fn(gfp_mask, q, blkcg);
- 		if (!pd)
- 			goto err_free;
- 
-@@ -1349,7 +1349,7 @@ int blkcg_activate_policy(struct request_queue *q,
- 		blk_mq_freeze_queue(q);
- pd_prealloc:
- 	if (!pd_prealloc) {
--		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q->node);
-+		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q, &blkcg_root);
- 		if (!pd_prealloc) {
- 			ret = -ENOMEM;
- 			goto out_bypass_end;
-@@ -1365,7 +1365,7 @@ int blkcg_activate_policy(struct request_queue *q,
- 		if (blkg->pd[pol->plid])
- 			continue;
- 
--		pd = pol->pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN, q->node);
-+		pd = pol->pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN, q, &blkcg_root);
- 		if (!pd)
- 			swap(pd, pd_prealloc);
- 		if (!pd) {
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index d973c38ee4fd..e613f89b37d3 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -931,11 +931,13 @@ static size_t iolatency_pd_stat(struct blkg_policy_data *pd, char *buf,
- }
- 
- 
--static struct blkg_policy_data *iolatency_pd_alloc(gfp_t gfp, int node)
-+static struct blkg_policy_data *iolatency_pd_alloc(gfp_t gfp,
-+						   struct request_queue *q,
-+						   struct blkcg *blkcg)
- {
- 	struct iolatency_grp *iolat;
- 
--	iolat = kzalloc_node(sizeof(*iolat), gfp, node);
-+	iolat = kzalloc_node(sizeof(*iolat), gfp, q->node);
- 	if (!iolat)
- 		return NULL;
- 	iolat->stats = __alloc_percpu_gfp(sizeof(struct latency_stat),
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 8ab6c8153223..0445c998c377 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -478,12 +478,14 @@ static void throtl_service_queue_init(struct throtl_service_queue *sq)
- 	timer_setup(&sq->pending_timer, throtl_pending_timer_fn, 0);
- }
- 
--static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
-+static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
-+						struct request_queue *q,
-+						struct blkcg *blkcg)
- {
- 	struct throtl_grp *tg;
- 	int rw;
- 
--	tg = kzalloc_node(sizeof(*tg), gfp, node);
-+	tg = kzalloc_node(sizeof(*tg), gfp, q->node);
- 	if (!tg)
- 		return NULL;
- 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 689a58231288..930631cad5cf 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -149,7 +149,8 @@ typedef struct blkcg_policy_data *(blkcg_pol_alloc_cpd_fn)(gfp_t gfp);
- typedef void (blkcg_pol_init_cpd_fn)(struct blkcg_policy_data *cpd);
- typedef void (blkcg_pol_free_cpd_fn)(struct blkcg_policy_data *cpd);
- typedef void (blkcg_pol_bind_cpd_fn)(struct blkcg_policy_data *cpd);
--typedef struct blkg_policy_data *(blkcg_pol_alloc_pd_fn)(gfp_t gfp, int node);
-+typedef struct blkg_policy_data *(blkcg_pol_alloc_pd_fn)(gfp_t gfp,
-+				struct request_queue *q, struct blkcg *blkcg);
- typedef void (blkcg_pol_init_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_online_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_offline_pd_fn)(struct blkg_policy_data *pd);
+ #define blk_noretry_request(rq) \
+ 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
 -- 
 2.17.1
 
