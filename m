@@ -2,153 +2,131 @@ Return-Path: <SRS0=ACpf=VH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D7B7C73C63
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 03:10:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28665C73C68
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 04:02:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF01320656
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 03:10:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA1D320665
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 04:02:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UcvyDjfR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725993AbfGJDKS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Jul 2019 23:10:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38298 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725880AbfGJDKS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 9 Jul 2019 23:10:18 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8850430917A8;
-        Wed, 10 Jul 2019 03:10:17 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E3DB85FCB1;
-        Wed, 10 Jul 2019 03:10:09 +0000 (UTC)
-Date:   Wed, 10 Jul 2019 11:10:05 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>
-Subject: Re: [PATCH] block: Disable write plugging for zoned block devices
-Message-ID: <20190710031003.GB2621@ming.t460p>
-References: <20190709090219.8784-1-damien.lemoal@wdc.com>
- <20190709142915.GA30082@ming.t460p>
- <BYAPR04MB58162A2087D53F27BAF8176BE7F10@BYAPR04MB5816.namprd04.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR04MB58162A2087D53F27BAF8176BE7F10@BYAPR04MB5816.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 10 Jul 2019 03:10:17 +0000 (UTC)
+        id S1726055AbfGJECw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jul 2019 00:02:52 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:26719 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725791AbfGJECv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Jul 2019 00:02:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1562731371; x=1594267371;
+  h=from:to:cc:subject:date:message-id;
+  bh=HQDkGifMsOy550KH3uxQdCDI+Fv4P11XTs4Xx1b5rmA=;
+  b=UcvyDjfRmteseOPAE6Ob492lrDSUghYTqOsM8za3NJrKC6rQmLDC6Nei
+   bEvB/JopT1dTa6EguwCgVv58t8d4IOB3I57DLzAEck/mLh/ER5pTmlAoB
+   efyHlzSdzq0FGhdXzvV/KuGMHMAqrY63hzmMRi71rts/m9Bs5u+Gcvpnv
+   MCd+mBbrkFs8PKysBOQm1Sii+2mykKuxIrTDKx2ryodoG97vmCXg/9ImQ
+   +Xd31enioEXxSGu8UUxZ+Ea3Zawjl0uFIx+naDLKpyEA+aLT3OEenahwq
+   K72lxWWNkWboFVGPX8eIXDJ+RTi0bIsZOHuaqElUeYZMgNruReacjPbk7
+   Q==;
+IronPort-SDR: Sm5FpCR+cpE66nuHxkZDue+STxNwv4S9jCu1gYT8zC9VsOOjJ4tM3KJUiU516ncvXkN1e7YYJz
+ Q4+HRfm1WUkDKDh3JYY/h6daMNN7Xn9lJIrHRnxp/24lcyzAFp1RPy9PQ7aPSOWGnnN76FFTnJ
+ 8cLK4XQUaM4NBxDs2u3ITWOwcVG9W5VO5vUDhIvPzcC3xiVIbyhF2O+TeUWzS4c12J9E+yocf6
+ wvphdxSdXqnu4ZSbwyaHvqk6kkyUGdxxYOP0jwQ6CtzG/FUeNYUcRDxiPKw0jpLa5A+bM7cpqa
+ Et4=
+X-IronPort-AV: E=Sophos;i="5.63,473,1557158400"; 
+   d="scan'208";a="219037267"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jul 2019 12:02:50 +0800
+IronPort-SDR: eZX6A68I/7kv6BFaKz6rNmPq5oa4YvrIIW5avenyWctHkg77ccoevFe1J4teqJlojmMP4Qrhed
+ f8crum1hk7AjdUEVJZZS3t+ZAtAsW0E7cq1AQPZbZ+XbaAbl2Rfrg2ubkvJhOD5w1MgYrJyZWI
+ ycfp7O4vU70KYC1ft8UmcC16FcxmR5QixFDJkYBzI+xY59hxi3K8VeU3SKdzf+ZhMdpxJDGJry
+ X2Eg8Aj7+ML+i+8dSVyidpV7rFba6ruEuvCa01h2m1pxOivCWBfLwJ5hpnOr2z1ZxuG873/UM1
+ hzc/rN0AOkOyW6O8+vSlyxSn
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP; 09 Jul 2019 21:01:37 -0700
+IronPort-SDR: 9l2tLyqPmcvVky0ICx7cTRiZfJNr5TvCp3GYUSZdhZQzPnZ4qSEg8YJq2QfAooXZCjq2+TWXPX
+ LTi7yb44wefdnwoRe+04+5JzMbvoIUeOty8MWgMCHQQ0gYUlg+Ru0nPs2bq6FInBilSwwugSFy
+ Di6AytqA+8F5GAssofLmtcSFra37atmqCLDu4IL7OYLpKduK68G0nI+6b/AYS8OkJZcx1PfvWN
+ iP1Je8+lRM6kDrQQeyJYjLCb+DuVmj1f0TG77eDgkku4ooBW6YXQFRTthr1IGBFeb2LsFjzLvv
+ zu4=
+Received: from cvenusqemu.hgst.com ([10.202.66.73])
+  by uls-op-cesaip02.wdc.com with ESMTP; 09 Jul 2019 21:02:51 -0700
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>, axboe@kernel.dk,
+        hch@lst.de
+Subject: [PATCH 0/3] block: set ioprio value
+Date:   Tue,  9 Jul 2019 21:02:21 -0700
+Message-Id: <20190710040224.12342-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.17.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 09, 2019 at 02:47:12PM +0000, Damien Le Moal wrote:
-> Hi Ming,
-> 
-> On 2019/07/09 23:29, Ming Lei wrote:
-> > On Tue, Jul 09, 2019 at 06:02:19PM +0900, Damien Le Moal wrote:
-> >> Simultaneously writing to a sequential zone of a zoned block device
-> >> from multiple contexts requires mutual exclusion for BIO issuing to
-> >> ensure that writes happen sequentially. However, even for a well
-> >> behaved user correctly implementing such synchronization, BIO plugging
-> >> may interfere and result in BIOs from the different contextx to be
-> >> reordered if plugging is done outside of the mutual exclusion section,
-> >> e.g. the plug was started by a function higher in the call chain than
-> >> the function issuing BIOs.
-> >>
-> >>       Context A                           Context B
-> >>
-> >>    | blk_start_plug()
-> >>    | ...
-> >>    | seq_write_zone()
-> >>      | mutex_lock(zone)
-> >>      | submit_bio(bio-0)
-> >>      | submit_bio(bio-1)
-> >>      | mutex_unlock(zone)
-> >>      | return
-> >>    | ------------------------------> | seq_write_zone()
-> >>   				       | mutex_lock(zone)
-> >> 				       | submit_bio(bio-2)
-> >> 				       | mutex_unlock(zone)
-> >>    | <------------------------------ |
-> >>    | blk_finish_plug()
-> >>
-> >> In the above example, despite the mutex synchronization resulting in the
-> >> correct BIO issuing order 0, 1, 2, context A BIOs 0 and 1 end up being
-> >> issued after BIO 2 when the plug is released with blk_finish_plug().
-> > 
-> > I am wondering how you guarantee that context B is always run after
-> > context A.
-> 
-> My example was a little too oversimplified. Think of a file system allocating
-> blocks sequentially and issuing page I/Os for the allocated blocks sequentially.
-> The typical sequence is:
-> 
-> mutex_lock(zone)
-> alloc_block_extent(zone)
-> for all blocks in the extent
-> 	submit_bio()
-> mutex_unlock(zone)
-> 
-> This way, it does not matter which context gets the lock first, all write BIOs
-> for the zone remain sequential. The problem with plugs as explained above is
+Hi,
 
-But wrt. the example in the commit log, it does matter which context gets the lock
-first, and it implies that context A has to run seq_write_zone() first,
-because you mentioned bio-2 has to be issued after bio-0 and bio-1.
+While experimenting with the ionice, I came across the scenario where
+I cannot see the bio/request priority field being set when using
+blkdiscard for REQ_OP_DISCARD, REQ_OP_WRITE_ZEROES and other operations
+like REQ_OP_WRITE_SAME, REQ_OP_ZONE_RESET, and flush.
 
-If there is 3rd context which is holding the lock, then either context A or
-context B can win in getting the lock first. So looks the zone lock itself
-isn't enough for maintaining the IO order. But that may not be related
-with this patch.
+This is a small patch-series which sets the ioprio value at various
+places for the zone-reset, flush, write-zeroes and discard operations.
+This patch series uses get_current_ioprio() so that bio associated
+with the respective operation can inherit the value from current
+process.
 
-Also seems there is issue with REQ_NOWAIT for zone support, for example,
-context A may see out-of-request and return earlier, however context B
-may get request and move on.
+In order to test this, I've modified the null_blk and enabled the 
+write_zeroes through module param. Following are the results.
 
-> that if the plug start/finish is not within the zone lock, reordering can happen
-> for the 2 sequences of BIOs issued by the 2 contexts.
-> 
-> We hit this problem with btrfs writepages (page writeback) where plugging is
-> done before the above sequence execution, in the caller function of the page
-> writeback processing, resulting in unaligned write errors.
-> 
-> >> To fix this problem, introduce the internal helper function
-> >> blk_mq_plug() to access the current context plug, return the current
-> >> plug only if the target device is not a zoned block device or if the
-> >> BIO to be plugged not a write operation. Otherwise, ignore the plug and
-> >> return NULL, resulting is all writes to zoned block device to never be
-> >> plugged.
-> > 
-> > Another candidate approach is to run the following code before
-> > releasing 'zone' lock:
-> > 
-> > 	if (current->plug)
-> > 		blk_finish_plug(context->plug)
-> > 
-> > Then we can fix zone specific issue in zone code only, and avoid generic
-> > blk-core change for zone issue.
-> 
-> Yes indeed, that would work too. But this patch is precisely to avoid having to
-> add such code and simplify implementing support for zoned block device in
-> existing code. Furthermore, plugging for writes to sequential zones has no real
-> value because mq-deadline will dispatch at most one write per zone. So writes
-> for a single zone tend to accumulate in the scheduler queue, and that creates
-> plenty of opportunities for merging small sequential writes (e.g. file system
-> page BIOs).
-> 
-> If you think this patch is really not appropriate, we can still address the
-> problem case by case in the support we add for zoned devices. But again, a
-> generic solution makes things simpler I think.
+Without these patches:-  
 
-OK, then I am fine with this simple generic approach.
+# modprobe null_blk gb=5 nr_devices=1 write_zeroes=1
+# for prio in `seq 0 3`; do ionice -c ${prio} blkdiscard -z -o 0 -l 4096 /dev/nullb0; done
+# dmesg  -c 
+[  402.958458] null_handle_cmd REQ_OP_WRITE_ZEROES priority class 0
+[  402.966024] null_handle_cmd REQ_OP_WRITE_ZEROES priority class 0
+[  402.973960] null_handle_cmd REQ_OP_WRITE_ZEROES priority class 0
+[  402.981373] null_handle_cmd REQ_OP_WRITE_ZEROES priority class 0
+# 
 
-Thanks,
-Ming
+With these patches:-
+
+# modprobe null_blk gb=5 nr_devices=1 write_zeroes=1
+# for prio in `seq 0 3`; do ionice -c ${prio} blkdiscard -z -o 0 -l 4096 /dev/nullb0; done 
+# dmesg  -c 
+[ 1426.091772] null_handle_cmd REQ_OP_WRITE_ZEROES priority class 0
+[ 1426.100177] null_handle_cmd REQ_OP_WRITE_ZEROES priority class 1
+[ 1426.108035] null_handle_cmd REQ_OP_WRITE_ZEROES priority class 2
+[ 1426.115768] null_handle_cmd REQ_OP_WRITE_ZEROES priority class 3
+# 
+
+With the block trace extension support is being worked on [1] which has
+the ability to report the I/O priority, now we can track the correct
+priority values with this patch-series.
+
+Regards,
+Chaitanya
+
+[1] https://www.spinics.net/lists/linux-btrace/msg00880.html
+
+
+Chaitanya Kulkarni (3):
+  block: set ioprio for zone-reset bio
+  block: set ioprio for flush bio
+  block: set ioprio for write-zeroes, discard etc
+
+ block/blk-flush.c | 2 ++
+ block/blk-lib.c   | 6 ++++++
+ block/blk-zoned.c | 1 +
+ 3 files changed, 9 insertions(+)
+
+-- 
+2.17.0
+
