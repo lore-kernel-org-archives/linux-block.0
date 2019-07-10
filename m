@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40516C74A21
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 13:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77055C74A23
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 13:58:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 127332087F
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 13:57:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C0142087F
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 13:58:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="U81telEo"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KRiM6njX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727693AbfGJN5k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jul 2019 09:57:40 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:47085 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726080AbfGJN5k (ORCPT
+        id S1727552AbfGJN6R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jul 2019 09:58:17 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:45740 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726080AbfGJN6R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jul 2019 09:57:40 -0400
-Received: by mail-io1-f67.google.com with SMTP id i10so4813045iol.13
-        for <linux-block@vger.kernel.org>; Wed, 10 Jul 2019 06:57:40 -0700 (PDT)
+        Wed, 10 Jul 2019 09:58:17 -0400
+Received: by mail-io1-f68.google.com with SMTP id g20so4834696ioc.12
+        for <linux-block@vger.kernel.org>; Wed, 10 Jul 2019 06:58:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=5GbjAQ2BkHHz7jIGN1nXh7A5POhfC3B+GwTz5D7kHeg=;
-        b=U81telEoGjTphWwolw10dnGCq9TEdxQUtE3bYGzcr8Fm1jrlDrBPJFWH4ePAez0Okf
-         IfBdxV2eJmcr1TvSFStxjj9qwh6UFrGAtZZ6ByaoxpmFY39hixg1fuBK0xF4Q+GnMzkR
-         Wax7Jvyvw6JEUuQJefySOlP6bbMjD1kazfJ02naBA6oP7XQC0qxNR5tOgr+PyR9wPBzQ
-         f4Euj9caDahH+XHNTz1gHIm2ffh52frwbyj0lfyUJXgTb+a44XKtsabSHE/4bjnUM5DF
-         ZhCnMsxHIZ7SAuCi08p4bAYQXMzeYB9V4LcRa4uGmQlkkAB8PSi3w6mYOvVR/Xifm/kl
-         l5WA==
+        bh=pIQpfAt1e83serf0hVzNYdFMyomenwlXspGATZm2D+Q=;
+        b=KRiM6njX6t1vmNqlvvLgHkpdNJfqY8yiWa+WNZHlRI50xzf8g2DjiBP11Asz8EldIA
+         j8ke0n88FJ85mmlAKXneocrdhp1AGtdWmM3PeY29oM7eJVYeCfs70qGMuuOPuGkDGgxZ
+         1qnLR0XNkU4QbtQTbQDHdOaydTUuDyx7bgn/cfIOLWQr/DQeT36ve5gMZ6KShieAWDK6
+         lzjRYKoj+Ggv3Bx65SNPdMSanWtxS/qvqjkLpOzv4w6/Vyw4/UlV8VnCTHFPJ5Wa+mEt
+         0u2QkIQlbBIBYI0zzMTstE+DT1HvrwUkAvsFptT3vMbSIxM5sIGfH4FLvgLR5u0Eys36
+         VT6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=5GbjAQ2BkHHz7jIGN1nXh7A5POhfC3B+GwTz5D7kHeg=;
-        b=PC4pb9QHF5A+Yw5Z2e6w5ogsSSbrC7nYzKOhxqA9jxCezRDpJ4fmMxZGAKZ6BW5XAm
-         QXoFbBvd9jSC6q1u9ETQQEgB3E7NkZE9TbSt3vIWwBdaSZsAZZfwBsiGbi8h9suPajte
-         ae9oG11lveZe8IEa+DPgC0yvQEmeK2UOiDDwLAN6udQw3Ft84Xfm1QCuAtaSgIDSwV0G
-         hWNLenGjbH/wrEg1VBYm069I63dvT7hvgGb0bR3m6eviTXXn+4DhzEtKNJyG9LFRUbq3
-         NMwzZdMhIhdbbfzp6o3ow3g+TNPxEiRPtJJwSy6IaU0WiH+hrwjPCweVThRodBDzlOLU
-         8Aqw==
-X-Gm-Message-State: APjAAAVzqxqsx5XTkBH5AWbl+gaw0Go1dR9XTv/niwZZbpPTcK/yG+p2
-        m1aNSmYmDbYE0QsUQUafB3hRdLhXd0dz1Q==
-X-Google-Smtp-Source: APXvYqzTacWpL5RT00+fI1TO17cpw8pqMaE5AGvHLm8mRXi/OWYn4rcNEiP3HSPp+S1lY9rBd82DSw==
-X-Received: by 2002:a5e:881a:: with SMTP id l26mr14536823ioj.185.1562767059198;
-        Wed, 10 Jul 2019 06:57:39 -0700 (PDT)
+        bh=pIQpfAt1e83serf0hVzNYdFMyomenwlXspGATZm2D+Q=;
+        b=j/ADS9kkP3O+3Uo9doySL8NMKDSMZbIcCtxgl80Pj1JU8N++bYugbxAX67mshx7N2A
+         8FoI8hFMVsVMzwatEOwhqL0B9z+Vxph/X+/GGuiZ1O67LufpFY4eIJOZcCDKUyY1I2Hi
+         2JrVKlYbXlLO2EP3bKsQO0vqj/q7bAHKRuP7SMMZkA2KI4Oe/92gsZWbzMgUjP4FmZI4
+         dQaDe/+6YkT5dAdIWv8XCbzjISwylZC82s7EepT4L96NxfwdHmynUpKOXnV0jXtzEhI2
+         JEGEyFihgkiW8GFCwW+B3U94ULlFFCLUhQvxSbZrcn6GuB6b2HYiV3KlWCPZzsLDwfF3
+         qiwA==
+X-Gm-Message-State: APjAAAXNEelXR8aaHaRWtJoQo4qhi0KgcYf3I+sYtyDW2iqPbos2tGZj
+        cPCmVAtoxE+aMiOD3UQOaMbtbw==
+X-Google-Smtp-Source: APXvYqwnmX2gXE5q0b4q6nAa3nYRCxhoCoTXcCbs5d2I2xQNVHyM10JwQONjJeO8S5ahqWZBKEOmpw==
+X-Received: by 2002:a02:ce35:: with SMTP id v21mr3732251jar.108.1562767096866;
+        Wed, 10 Jul 2019 06:58:16 -0700 (PDT)
 Received: from [192.168.1.158] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id c81sm2510343iof.28.2019.07.10.06.57.37
+        by smtp.gmail.com with ESMTPSA id z26sm2025659ioi.85.2019.07.10.06.58.15
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Jul 2019 06:57:38 -0700 (PDT)
-Subject: Re: [PATCH] io_uring: fix stuck problem caused by potential memory
- alloc failure
-To:     Jackie Liu <liuyun01@kylinos.cn>
-Cc:     linux-block@vger.kernel.org
-References: <20190710083558.5940-1-liuyun01@kylinos.cn>
+        Wed, 10 Jul 2019 06:58:16 -0700 (PDT)
+Subject: Re: [PATCH V2] block: Fix potential overflow in blk_report_zones()
+To:     Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Matias Bjorling <matias.bjorling@wdc.com>
+References: <20190710045310.12397-1-damien.lemoal@wdc.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <25691b9f-8c0f-0d19-d1db-4c4ce6dfb5a9@kernel.dk>
-Date:   Wed, 10 Jul 2019 07:57:37 -0600
+Message-ID: <7ae06bbb-cb83-0c34-6209-ee9da4abd7f9@kernel.dk>
+Date:   Wed, 10 Jul 2019 07:58:15 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190710083558.5940-1-liuyun01@kylinos.cn>
+In-Reply-To: <20190710045310.12397-1-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,18 +75,23 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/10/19 2:35 AM, Jackie Liu wrote:
-> when io_req_defer alloc memory failed, it will be return -EAGAIN.
-> But io_submit_sqe cannot be returned immediately because the reference
-> count for req is still hold. we should be clean it.
+On 7/9/19 10:53 PM, Damien Le Moal wrote:
+> For large values of the number of zones reported and/or large zone
+> sizes, the sector increment calculated with
+> 
+> blk_queue_zone_sectors(q) * n
+> 
+> in blk_report_zones() loop can overflow the unsigned int type used for
+> the calculation as both "n" and blk_queue_zone_sectors() value are
+> unsigned int. E.g. for a device with 256 MB zones (524288 sectors),
+> overflow happens with 8192 or more zones reported.
+> 
+> Changing the return type of blk_queue_zone_sectors() to sector_t, fixes
+> this problem and avoids overflow problem for all other callers of this
+> helper too. The same change is also applied to the bdev_zone_sectors()
+> helper.
 
-Looks like this actually got fixed in my for-5.3/io_uring branch which
-I haven't pushed out yet. Once that's in, I'd suggest we send yours to
-stable separately. Probably change the wording to:
-
-When io_req_defer alloc memory fails, it will be -EAGAIN. But
-io_submit_sqe cannot return immediately because the reference count for
-req is still held. Ensure that we free it.
+Applied, thanks.
 
 -- 
 Jens Axboe
