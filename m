@@ -4,70 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE38C74A3F
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 20:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 603EAC74A36
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 20:52:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 035A92064A
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 20:52:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24B1821530
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 20:52:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1562791939;
-	bh=1Z5MnhcCnJucV2BxszFw5vX5BU+wdUVCFPVBR7g2QiI=;
+	s=default; t=1562791945;
+	bh=I8UqzSMqyz3zNVOR2QT8kCVplxl2mivVkYsrG/7l0YI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=C3PjSAotGKw2NcTgpQ/MXu7Zxlzrua9G0M+xIgimKAlKqWGV3VA6yJ9qf9w0xmbad
-	 wbk9nOl9kCqCiPt/RMlsvzVfqdY7iQ7GsmOyoP51FwXGjAEPfl7OujCT+d1u/n01RS
-	 ingE1ZLqhKtD4VqcraOqaDwkjJIE2CTEFz2RkhD0=
+	b=glBzpmaur4mzdOYxJM7iSAd3Fa2L24K8WIwBxVK2G7ajlXxOvQH384KYb8x3YTWA4
+	 wQPj2ZYNXZxskSRsnogIMXslCZVIXM2UN0jxfXDMFleuXi4tJfgjrI8IEE4eTMImGF
+	 WskP9KczyQAto5SK+HZ4B5VtuSVjyiTLr7WDFJ60=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727458AbfGJUwS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jul 2019 16:52:18 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:39739 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727896AbfGJUvo (ORCPT
+        id S1727867AbfGJUvi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jul 2019 16:51:38 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:44599 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726033AbfGJUvh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jul 2019 16:51:44 -0400
-Received: by mail-pf1-f195.google.com with SMTP id j2so1641406pfe.6;
-        Wed, 10 Jul 2019 13:51:44 -0700 (PDT)
+        Wed, 10 Jul 2019 16:51:37 -0400
+Received: by mail-pl1-f193.google.com with SMTP id t14so1792279plr.11;
+        Wed, 10 Jul 2019 13:51:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=JIWlTDHRU3mjWfgflvhaa5vcE8JQAEkvNv7BJwQpcU4=;
-        b=ko2iX2X5bcEWp600/qku8sen9UEgNgcKUWlCMJOwU399AGW5/bivrtNQrJL7HGj2sQ
-         wDG9sMPdOFKvirT8KNF44f6g0g/iKzIQb6amaxQnVhfpuMYetdJX0pVfWRX/WPJfEkkR
-         TyRhm0RdqBqowpzAyqV0Iq4FMbxplDiz2ny2QbYdge8ld2AYWulXV97GHTgygzhhg3H8
-         xPG2mAJMvftGLkQgXk6YCclBNKT6qwbGguLE/Y3jCFSjT2WkSHYdk8Gv0PU82XmvKImR
-         bPsEa4rFWcxAECpK3Scjg2Vi4qwdC/zVz4qYsWW1hR4vbIGkXPPm7zraSBf3mYe6d2qk
-         +ltw==
+        bh=1kGp2m3bMKTZuBvKVapVVACURbt75AkZ89ShYdU2gWU=;
+        b=uId0l74koPJus9gxnB2KmVc9Yb7a0ZeDYWZUVR3OVuF+uBfffZW/Z0RRVa5rjGw8Yu
+         Mg8Fj+rkk0m2h3LFRoNxCa4iMG1f1mqeMsGreQKz7jFr+Prqf3YaIoocMsAKRAlGtO0C
+         TKXC5TKzPYljgz5bRq0mkz7bkpZ/s2mmMCyfDCkkFHsn9vFzVtAkX4OUbhHyW+xt89LD
+         L8wgVOZHGzBXnhPYcUeO3kILztCTIXiWfjjyXE+x+w2oZmBz9+NIXq620imJ3m8GcvuH
+         4b5ChNiKpKcjfW72nGKspgxv3Unck1XOYGa1pXDBahVhDJY2AyNHt9hVy7HqJ4S5zxNc
+         mzng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=JIWlTDHRU3mjWfgflvhaa5vcE8JQAEkvNv7BJwQpcU4=;
-        b=S+PjI8odAruFrLh3jHeb6q6WmHc9SPnv+TJNgNqWcCNPD8piVngV6gi7FWD+wJzd3R
-         qLHJEk/cWaik2RbgWij94R0ZA0udRQoJGXskj3anvBxFERKC9WlifmYzukJuz13Iaf+y
-         +sKhV5JfzMCgxNx3qw7R65R8n9jfVBz2qjIfVq22zjTvHUbh0IkX8rT9/RBjGhKYLyku
-         fvrmu4rDFSc5BY34jAw/UG0mzh0SWuC8hlK8jXq0GFPUQ0V4F10JsS7jmX0CpIlAP4TS
-         Wv001uAecSjCr14IxrlN86dWzN86iwH2Nhn82GOSfUTrZKIHPSI8N5IlGMjv6ZtU1XUw
-         GfVA==
-X-Gm-Message-State: APjAAAWXybMcQ+lT0iO2rWD1+2cKBzPe6JnWyb047GRV0vHw1YT9fZs4
-        pW7C7xgp+Op1HeEZQCLiG2+LtLVXuZc=
-X-Google-Smtp-Source: APXvYqzLUmGA4IjAo8d3P7aJvfwjy6fUo5BUTNFCtXR8zdG1EiK9k+yHvl6tJ056YMBZwoIZZxkm3g==
-X-Received: by 2002:a65:654f:: with SMTP id a15mr206363pgw.73.1562791903957;
-        Wed, 10 Jul 2019 13:51:43 -0700 (PDT)
+        bh=1kGp2m3bMKTZuBvKVapVVACURbt75AkZ89ShYdU2gWU=;
+        b=EjOeotBZSv+TIknETL4R3sGmRYZa9m7upBKyfLeQhINF/ZsfNaWXvg1NIuyHzCbwRt
+         jmFOxFCfRTb7tBy+WiEKmchmvkiIOX65tfpVZ+HM7akO+VAN56NFQTSQ4v1VAJtM/4Ni
+         wpDO6+rlorR25A49ENNZY6WBwXc4bgEIRhmomDHTdJBuvn4SrZgq8mJbS8Ih3jZslH/T
+         9t9tjJbjfrFbuqI05maRjoIR5SKREpIS/BPBYk20Lg29wF1HtD44I4VHEHC+Wo8tBVF5
+         RobX2WTHT8LmU60ma2JNoFlYvdtb9HTgwTebQ0sp1wdY2VZ1V589BUXGdgnOmnUn4ztd
+         wdGw==
+X-Gm-Message-State: APjAAAXzxqD6FH+m8CWDQ1JcT4hIHETdJp3AV6poDQM/Sm2ec3l3Tdwg
+        yqSBugKlLlW4+mUzkAJI8h8=
+X-Google-Smtp-Source: APXvYqxbg69FNrxzCRtbJhaE4oUMB4DplouWYC2LAzaH81rs5wWhaGmVB89348u/GJ+ny4fmpNRnQA==
+X-Received: by 2002:a17:902:2e81:: with SMTP id r1mr210432plb.193.1562791896637;
+        Wed, 10 Jul 2019 13:51:36 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:500::3:2bbe])
-        by smtp.gmail.com with ESMTPSA id g62sm3271010pje.11.2019.07.10.13.51.43
+        by smtp.gmail.com with ESMTPSA id h9sm2838600pgh.51.2019.07.10.13.51.35
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Jul 2019 13:51:43 -0700 (PDT)
+        Wed, 10 Jul 2019 13:51:36 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
         dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org
 Cc:     linux-kernel@vger.kernel.org, kernel-team@fb.com,
         linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         Tejun Heo <tj@kernel.org>
-Subject: [PATCH 04/10] block/rq_qos: add rq_qos_merge()
-Date:   Wed, 10 Jul 2019 13:51:22 -0700
-Message-Id: <20190710205128.1316483-5-tj@kernel.org>
+Subject: [PATCH 01/10] blkcg: pass @q and @blkcg into blkcg_pol_alloc_pd_fn()
+Date:   Wed, 10 Jul 2019 13:51:19 -0700
+Message-Id: <20190710205128.1316483-2-tj@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190710205128.1316483-1-tj@kernel.org>
 References: <20190710205128.1316483-1-tj@kernel.org>
@@ -76,98 +76,124 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a merge hook for rq_qos.  This will be used by io.weight.
+Instead of @node, pass in @q and @blkcg so that the alloc function has
+more context.  This doesn't cause any behavior change and will be used
+by io.weight implementation.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-core.c   | 4 ++++
- block/blk-rq-qos.c | 9 +++++++++
- block/blk-rq-qos.h | 9 +++++++++
- 3 files changed, 22 insertions(+)
+ block/bfq-cgroup.c         | 5 +++--
+ block/blk-cgroup.c         | 6 +++---
+ block/blk-iolatency.c      | 6 ++++--
+ block/blk-throttle.c       | 6 ++++--
+ include/linux/blk-cgroup.h | 3 ++-
+ 5 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 260e36a2c343..4696a89ca039 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -601,6 +601,7 @@ bool bio_attempt_back_merge(struct request *req, struct bio *bio,
- 		return false;
- 
- 	trace_block_bio_backmerge(req->q, req, bio);
-+	rq_qos_merge(req->q, req, bio);
- 
- 	if ((req->cmd_flags & REQ_FAILFAST_MASK) != ff)
- 		blk_rq_set_mixed_merge(req);
-@@ -622,6 +623,7 @@ bool bio_attempt_front_merge(struct request *req, struct bio *bio,
- 		return false;
- 
- 	trace_block_bio_frontmerge(req->q, req, bio);
-+	rq_qos_merge(req->q, req, bio);
- 
- 	if ((req->cmd_flags & REQ_FAILFAST_MASK) != ff)
- 		blk_rq_set_mixed_merge(req);
-@@ -647,6 +649,8 @@ bool bio_attempt_discard_merge(struct request_queue *q, struct request *req,
- 	    blk_rq_get_max_sectors(req, blk_rq_pos(req)))
- 		goto no_merge;
- 
-+	rq_qos_merge(q, req, bio);
-+
- 	req->biotail->bi_next = bio;
- 	req->biotail = bio;
- 	req->__data_len += bio->bi_iter.bi_size;
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 659ccb8b693f..7debcaf1ee53 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -83,6 +83,15 @@ void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio)
- 	} while (rqos);
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 0f6cd688924f..e6fb537b4bfc 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -501,11 +501,12 @@ static void bfq_cpd_free(struct blkcg_policy_data *cpd)
+ 	kfree(cpd_to_bfqgd(cpd));
  }
  
-+void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio)
-+{
-+	do {
-+		if (rqos->ops->merge)
-+			rqos->ops->merge(rqos, rq, bio);
-+		rqos = rqos->next;
-+	} while (rqos);
-+}
-+
- void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio)
+-static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, int node)
++static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, struct request_queue *q,
++					     struct blkcg *blkcg)
  {
- 	do {
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 2300e038b9fa..8e426a8505b6 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -35,6 +35,7 @@ struct rq_qos {
- struct rq_qos_ops {
- 	void (*throttle)(struct rq_qos *, struct bio *);
- 	void (*track)(struct rq_qos *, struct request *, struct bio *);
-+	void (*merge)(struct rq_qos *, struct request *, struct bio *);
- 	void (*issue)(struct rq_qos *, struct request *);
- 	void (*requeue)(struct rq_qos *, struct request *);
- 	void (*done)(struct rq_qos *, struct request *);
-@@ -135,6 +136,7 @@ void __rq_qos_issue(struct rq_qos *rqos, struct request *rq);
- void __rq_qos_requeue(struct rq_qos *rqos, struct request *rq);
- void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio);
- void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio);
-+void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio);
- void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio);
+ 	struct bfq_group *bfqg;
  
- static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
-@@ -185,6 +187,13 @@ static inline void rq_qos_track(struct request_queue *q, struct request *rq,
- 		__rq_qos_track(q->rq_qos, rq, bio);
+-	bfqg = kzalloc_node(sizeof(*bfqg), gfp, node);
++	bfqg = kzalloc_node(sizeof(*bfqg), gfp, q->node);
+ 	if (!bfqg)
+ 		return NULL;
+ 
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 24ed26957367..75f7f78b87b2 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -175,7 +175,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
+ 			continue;
+ 
+ 		/* alloc per-policy data and attach it to blkg */
+-		pd = pol->pd_alloc_fn(gfp_mask, q->node);
++		pd = pol->pd_alloc_fn(gfp_mask, q, blkcg);
+ 		if (!pd)
+ 			goto err_free;
+ 
+@@ -1349,7 +1349,7 @@ int blkcg_activate_policy(struct request_queue *q,
+ 		blk_mq_freeze_queue(q);
+ pd_prealloc:
+ 	if (!pd_prealloc) {
+-		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q->node);
++		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q, &blkcg_root);
+ 		if (!pd_prealloc) {
+ 			ret = -ENOMEM;
+ 			goto out_bypass_end;
+@@ -1365,7 +1365,7 @@ int blkcg_activate_policy(struct request_queue *q,
+ 		if (blkg->pd[pol->plid])
+ 			continue;
+ 
+-		pd = pol->pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN, q->node);
++		pd = pol->pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN, q, &blkcg_root);
+ 		if (!pd)
+ 			swap(pd, pd_prealloc);
+ 		if (!pd) {
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index d973c38ee4fd..e613f89b37d3 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -931,11 +931,13 @@ static size_t iolatency_pd_stat(struct blkg_policy_data *pd, char *buf,
  }
  
-+static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
-+				struct bio *bio)
-+{
-+	if (q->rq_qos)
-+		__rq_qos_merge(q->rq_qos, rq, bio);
-+}
-+
- void rq_qos_exit(struct request_queue *);
  
- #endif
+-static struct blkg_policy_data *iolatency_pd_alloc(gfp_t gfp, int node)
++static struct blkg_policy_data *iolatency_pd_alloc(gfp_t gfp,
++						   struct request_queue *q,
++						   struct blkcg *blkcg)
+ {
+ 	struct iolatency_grp *iolat;
+ 
+-	iolat = kzalloc_node(sizeof(*iolat), gfp, node);
++	iolat = kzalloc_node(sizeof(*iolat), gfp, q->node);
+ 	if (!iolat)
+ 		return NULL;
+ 	iolat->stats = __alloc_percpu_gfp(sizeof(struct latency_stat),
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 8ab6c8153223..0445c998c377 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -478,12 +478,14 @@ static void throtl_service_queue_init(struct throtl_service_queue *sq)
+ 	timer_setup(&sq->pending_timer, throtl_pending_timer_fn, 0);
+ }
+ 
+-static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
++static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
++						struct request_queue *q,
++						struct blkcg *blkcg)
+ {
+ 	struct throtl_grp *tg;
+ 	int rw;
+ 
+-	tg = kzalloc_node(sizeof(*tg), gfp, node);
++	tg = kzalloc_node(sizeof(*tg), gfp, q->node);
+ 	if (!tg)
+ 		return NULL;
+ 
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 689a58231288..930631cad5cf 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -149,7 +149,8 @@ typedef struct blkcg_policy_data *(blkcg_pol_alloc_cpd_fn)(gfp_t gfp);
+ typedef void (blkcg_pol_init_cpd_fn)(struct blkcg_policy_data *cpd);
+ typedef void (blkcg_pol_free_cpd_fn)(struct blkcg_policy_data *cpd);
+ typedef void (blkcg_pol_bind_cpd_fn)(struct blkcg_policy_data *cpd);
+-typedef struct blkg_policy_data *(blkcg_pol_alloc_pd_fn)(gfp_t gfp, int node);
++typedef struct blkg_policy_data *(blkcg_pol_alloc_pd_fn)(gfp_t gfp,
++				struct request_queue *q, struct blkcg *blkcg);
+ typedef void (blkcg_pol_init_pd_fn)(struct blkg_policy_data *pd);
+ typedef void (blkcg_pol_online_pd_fn)(struct blkg_policy_data *pd);
+ typedef void (blkcg_pol_offline_pd_fn)(struct blkg_policy_data *pd);
 -- 
 2.17.1
 
