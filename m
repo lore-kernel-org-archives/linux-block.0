@@ -2,114 +2,113 @@ Return-Path: <SRS0=ACpf=VH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BCE2C74A36
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 17:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58625C74A3C
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 19:05:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DBC992087F
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 17:25:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2573F2087F
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jul 2019 19:05:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="ncmtdtrO"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="T1AbzOdW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726111AbfGJRZJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jul 2019 13:25:09 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:37011 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727175AbfGJRZI (ORCPT
+        id S1727782AbfGJTFR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jul 2019 15:05:17 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:35147 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727636AbfGJTFR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jul 2019 13:25:08 -0400
-Received: by mail-qk1-f193.google.com with SMTP id d15so2523841qkl.4
-        for <linux-block@vger.kernel.org>; Wed, 10 Jul 2019 10:25:08 -0700 (PDT)
+        Wed, 10 Jul 2019 15:05:17 -0400
+Received: by mail-qk1-f196.google.com with SMTP id r21so2807905qke.2
+        for <linux-block@vger.kernel.org>; Wed, 10 Jul 2019 12:05:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=TWts3AWfLnZY/8+mDzywCA4nm3cpMgjgcvkY/eDGR8o=;
-        b=ncmtdtrO5IfRIdy6defB/gA1akppNcnrs/xDXn6wjW/eWkMukIrAk8PP/ePQIhRMbi
-         54aoWJB5p7Lbx+mF1/hicNwDphXcetqHU2j3iUsddC4fGCH8bY5TnJZPD0//g/Xjs2S4
-         EaekTTVYdUM3ylNuE2NNtIDnRIsxFjhSmM+8ID1PtZvKbRC8kIkioM7t4qzCbvtPIsBF
-         D/WZ5xnPT0XBrlT6C4zpOkmQkMBGLwM4KPXvEw7cBt64OJZYFRJm5qA2SqbuzsBeqOUd
-         ZH1QM+bLzcENhT+4B0d/ht/Se7EBhN48Jur9ancatz4ItZPZuNjxzihfLyr9B5f0kq26
-         eK6w==
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id;
+        bh=M3ayD2hVBHLZkT6zKh8ThN0a45uWqaYleKmqMJEURb0=;
+        b=T1AbzOdWPx36MIw2csPs4FNvQrxOcVVVd791SXEgS+dEvWWJ70Xb7G8jcMgtc0rjMh
+         p8qtitbBOy+I0TpnXjLbtB13guUa/2tFZjwOIPQEl6yYNI6E2GdogGsd9434pLJvP2S7
+         gjfc6/t7EyMZuHaNAE3yI6SC439Zw6SFM5M7Nj+BYJfpZobzD4VbnN3KhwOwHkEnjK+C
+         mElWCE2uTQBxv/t19fxE8+wtlEAt+e66Y73dWXOV+mXwotyXfT8fnmkB2cDLvslImgGH
+         QfKEHvvHBVuBZdCUAgrlaQ2x7N9WzcwQUCmaOd7qfdjrZ5eiFlBr0NMjXhV5XaWeW31G
+         G2lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=TWts3AWfLnZY/8+mDzywCA4nm3cpMgjgcvkY/eDGR8o=;
-        b=kU7zu76EK3DdUr/dzfvhtWVcZ1cu5h1Zfq0KhvpecqJkhpf29o9edbmBnPi4ir28zG
-         mOR6PAKM9IPswAqBNnawBFnl3CyXBSswi4zd+NCran1hJ9D2iUdQKybaHeU+bcLReiaI
-         EY5MmIMIpbd8xv5M8geg/X6vHw+WdTUB4PyGrG8yN37AyPoUwgmpmx620JPlAYNxuh3Y
-         +gIkFDH4a6rWN69zZlSTbRv37NJDdF88AgMeppWg50usjEQToKCaGC4iyBtl+egkG4iD
-         UydsDUa2VL8H71ND4oLB1ADfyMYFPwyLdpiQooYmnO/wzUKs6WdqzE95YlN4N166vnC1
-         jb0g==
-X-Gm-Message-State: APjAAAWsiFNOBQuIeLkXxc4ocaPw8xVsTCfdf7+OLpH0Zfxa9JtxfPcD
-        b0iJ4V7xVwfgayU2/nABYsq+YA==
-X-Google-Smtp-Source: APXvYqywp1nQDJSnPdloNfzGTdBxnieSDQEVi61zIVsJYQritxdbe6jGkDlH5zkBnCGtuhW9rBbfIA==
-X-Received: by 2002:a37:b045:: with SMTP id z66mr24424150qke.501.1562779507861;
-        Wed, 10 Jul 2019 10:25:07 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id y194sm1420543qkb.111.2019.07.10.10.25.05
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 10 Jul 2019 10:25:06 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1hlGL3-00046r-EV; Wed, 10 Jul 2019 14:25:05 -0300
-Date:   Wed, 10 Jul 2019 14:25:05 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, axboe@kernel.dk,
-        Christoph Hellwig <hch@infradead.org>, bvanassche@acm.org,
-        dledford@redhat.com, Roman Pen <r.peniaev@gmail.com>,
-        gregkh@linuxfoundation.org
-Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
- Device (IBNBD)
-Message-ID: <20190710172505.GD4051@ziepe.ca>
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
- <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me>
- <20190710135519.GA4051@ziepe.ca>
- <c49bf227-5274-9d13-deba-a405c75d1358@grimberg.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c49bf227-5274-9d13-deba-a405c75d1358@grimberg.me>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=M3ayD2hVBHLZkT6zKh8ThN0a45uWqaYleKmqMJEURb0=;
+        b=ujD9vtNM8QNk5yQK5ii1FVZfkgsZO4KAAnKDnbFhSvrIKAe8j+dfOlt5Ta6bh4BCc4
+         o7B9RYs9BkJhH43mX8srhSn0UbxZaTLU+6VUyz8C8Lodxj0x2TQsW4xiL8kkb9FRKuWM
+         Sa3kqQhtlQ2XLSqOB6nng68otqAFdeN9uGWSfjWIPRDzssFcoElVDUg6S4tYwcekYTZc
+         coT0oH2zZI+RTj6asdjBM1B1esGwrlJpvSzgPV4brgDno9RKYmgKc8lT9j4fsYkrwC2T
+         QV0hp0Q22RkwqPq6zaOUk6jwC7n6QTdrRX78uxD4l/M67neO1SPOKjpYbsix/LczNbFq
+         HrEw==
+X-Gm-Message-State: APjAAAWDHESo6Oi16oLFISfiD/m+SLZjfUvx2WfPFKD895J82yfo24am
+        +jfrhqOEl43PShurY3zpSOtfOA==
+X-Google-Smtp-Source: APXvYqwP0wWEgakSqeygObThhBiApbOJVknyqiheUu+ptpVSNiagEf9/8Ss0m6kFSC6WLF77+VCmOg==
+X-Received: by 2002:a05:620a:685:: with SMTP id f5mr20063045qkh.238.1562785516064;
+        Wed, 10 Jul 2019 12:05:16 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::5ce])
+        by smtp.gmail.com with ESMTPSA id z18sm1409751qki.110.2019.07.10.12.05.14
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 10 Jul 2019 12:05:15 -0700 (PDT)
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org, kernel-team@fb.com
+Subject: [PATCH] rq-qos: fix missed wake-ups in rq_qos_throttle
+Date:   Wed, 10 Jul 2019 15:05:14 -0400
+Message-Id: <20190710190514.86911-1-josef@toxicpanda.com>
+X-Mailer: git-send-email 2.13.5
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 10, 2019 at 09:25:05AM -0700, Sagi Grimberg wrote:
-> 
-> > > Another question, from what I understand from the code, the client
-> > > always rdma_writes data on writes (with imm) from a remote pool of
-> > > server buffers dedicated to it. Essentially all writes are immediate (no
-> > > rdma reads ever). How is that different than using send wrs to a set of
-> > > pre-posted recv buffers (like all others are doing)? Is it faster?
-> > 
-> > RDMA WRITE only is generally a bit faster, and if you use a buffer
-> > pool in a smart way it is possible to get very good data packing.
-> 
-> There is no packing, its used exactly as send/recv, but with a remote
-> buffer pool (pool of 512K buffers) and the client selects one and rdma
-> write with imm to it.
+We saw a hang in production with WBT where there was only one waiter in
+the throttle path and no outstanding IO.  This is because of the
+has_sleepers optimization that is used to make sure we don't steal an
+inflight counter for new submitters when there are people already on the
+list.
 
-Well that makes little sense then:)
+We can race with our check to see if the waitqueue has any waiters (this
+is done locklessly) and the time we actually add ourselves to the
+waitqueue.  If this happens we'll go to sleep and never be woken up
+because nobody is doing IO to wake us up.
 
-> > Maybe this is fine, but it needs to be made very clear that it uses
-> > this insecure operating model to get higher performance..
-> 
-> I still do not understand why this should give any notice-able
-> performance advantage.
+Fix this by open coding prepare_to_wait_exclusive (yes, yes, I know) in
+order to get a real value for has_sleepers.  This way we keep our
+optimization in place and avoid hanging forever if there are no longer
+any waiters on the list.
 
-Usually omitting invalidations gives a healthy bump.
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+---
+ block/blk-rq-qos.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Also, RDMA WRITE is generally faster than READ at the HW level in
-various ways.
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index 659ccb8b693f..04590666f7c4 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -237,13 +237,18 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
+ 		.cb = acquire_inflight_cb,
+ 		.private_data = private_data,
+ 	};
++	unsigned long flags;
+ 	bool has_sleeper;
+ 
+ 	has_sleeper = wq_has_sleeper(&rqw->wait);
+ 	if (!has_sleeper && acquire_inflight_cb(rqw, private_data))
+ 		return;
+ 
+-	prepare_to_wait_exclusive(&rqw->wait, &data.wq, TASK_UNINTERRUPTIBLE);
++	spin_lock_irqsave(&rqw->wait.lock, flags);
++	has_sleeper = !list_empty(&rqw->wait.head);
++	__add_wait_queue_entry_tail_exclusive(&rqw->wait, &data.wq);
++	set_current_state(TASK_UNINTERRUPTIBLE);
++	spin_unlock_irqrestore(&rqw->wait.lock, flags);
+ 	do {
+ 		if (data.got_token)
+ 			break;
+-- 
+2.17.1
 
-Jason
