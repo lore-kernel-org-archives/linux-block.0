@@ -2,276 +2,124 @@ Return-Path: <SRS0=DuRR=VI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A26D6C74A42
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 05:48:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0C9C74A42
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 07:27:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6443A21019
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 05:48:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14D2621670
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 07:27:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RRjFSuCz"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="LIY6xG3B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727796AbfGKFsG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 01:48:06 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:37982 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727737AbfGKFsG (ORCPT
+        id S1728057AbfGKH1Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 03:27:24 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:43381 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725963AbfGKH1X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 01:48:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=yLVbE+XFgjMoAumwgvc4hXQJYFBFqwZNbZCj546Cjyo=; b=RRjFSuCzZVxgZ3pgfmbDXDIDu
-        209L8xZf4KWUAW4vhMavJAP455U9x3P3PShbgKAL9jV1ERWs2tvaYPC3mMPoB7M2bl44pDs/d6nwW
-        LAiAbZcTIYnu972UvmOzwyvnQBeMDHaBJt2kn4Di5mg+hIRIhpLZyF4aBNyJvE3Ji0cSygM5fwlJX
-        yGge9m7BOx2IW/iq2/YDUmRHgAs+/b7CQMcdr2+7EG/w+smVBMFLRna1k0aEPLdRo35rJgG6O/Kwk
-        wGwlBrTGu2+FAFEHv6JkvtaO6ys6dtx1kAabdBA4EsGmICACQMlnsBcpGoYPfpyRPGcycMwi3RqRK
-        CUA7UquYQ==;
-Received: from static-50-53-52-16.bvtn.or.frontiernet.net ([50.53.52.16] helo=dragon.dunlab)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hlRvw-00018H-Dm; Thu, 11 Jul 2019 05:47:56 +0000
-Subject: Re: [PATCH 3/8] block: blk-crypto for Inline Encryption
-To:     Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net
-Cc:     Parshuram Raju Thombare <pthombar@cadence.com>,
-        Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <20190710225609.192252-1-satyat@google.com>
- <20190710225609.192252-4-satyat@google.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <e1066ded-af22-6a8c-e198-8d123adeca9e@infradead.org>
-Date:   Wed, 10 Jul 2019 22:47:54 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        Thu, 11 Jul 2019 03:27:23 -0400
+Received: by mail-io1-f65.google.com with SMTP id k20so10352683ios.10
+        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 00:27:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=p5UDD2PQr8A+4fkF74jRpQjrDOTSh0xYZIA6dZ/Htjw=;
+        b=LIY6xG3BDrWKAzQfPkWVRL4sqiSwKj8n1WnjhzZ9UggwxDvZ7D5bXXBnwM3oiZbDFP
+         EZIejnyXLp+gnnZSNUY4pb1sz6Lhekpnec9VrsvTvwCHaIlJeTKPB1V4nzOcbFx3Ip5g
+         taEnuWMVV+FejKgzVRcZQZ+sMb4X2aDcEfams0VFEfadP8sZ11+f7bMP3NHNc27I2RTb
+         0QxorSLgyoAmO/IgOfsZBNYDMq+8ttbTzJc9ycdJB21rycBS0c7WEfkRacMeZV2ThCV8
+         Maic0mwqjs6TeIQFGw5wEndmpXdpJo6fkkVpO1rBDrn/MTxh45OlJ8APM4jninCGu6SG
+         f/7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=p5UDD2PQr8A+4fkF74jRpQjrDOTSh0xYZIA6dZ/Htjw=;
+        b=jDRIbutgPpCLRug2jhujo8XAFV+6awmAyvHynfxGzsgXh5Bw+ScyIITZdYoiWcvpZc
+         0h0Kg82L11pw+zfotDwV5qM8QyKaZJm88l+ZW6xg6HKaMgx7iRO5ttaS7SAM9NzWmC2S
+         MPVuZarWjb6c0ysGBTmJ8kFQ5owwgod09dRRh3C66SZ1qIendZAQjUsb5UzzU7HYYNqO
+         51PKgVJvjnZ0PDCzzcPLeInpYZ29B/iEDV4VOCiXAW3CntZfTre5PSyWudZYKrX0VMKH
+         D52MTJ8fzbQMOp9UzJn2LAG0T1fwHDlDtZg97wTNEZ6un92BbcBcIb4M7VwdRS6sFv1z
+         vPWw==
+X-Gm-Message-State: APjAAAUgTq/ZZ8W03+qcUP1/QUO5wXTe9G4C1Vk5hPt12YYVS0zhIEMy
+        GxT4F4kZAr7X+P0YFg0hd8uriVOKL12lsgoVBzU9
+X-Google-Smtp-Source: APXvYqzP/GEHKRGAFz3PmilWWiv14j8G7gP975ds+zKIubBHvlXkC/uFiFlTKauhqCCNbkssheN5c1gR/lm0DQFWEJc=
+X-Received: by 2002:a05:6638:81:: with SMTP id v1mr2792250jao.72.1562830043055;
+ Thu, 11 Jul 2019 00:27:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190710225609.192252-4-satyat@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
+ <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me> <20190710135519.GA4051@ziepe.ca>
+ <c49bf227-5274-9d13-deba-a405c75d1358@grimberg.me> <20190710172505.GD4051@ziepe.ca>
+ <930e0bc6-8c5c-97b5-c500-0bd1706b32c1@grimberg.me>
+In-Reply-To: <930e0bc6-8c5c-97b5-c500-0bd1706b32c1@grimberg.me>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Thu, 11 Jul 2019 09:27:11 +0200
+Message-ID: <CAHg0HuxmYV3=L9ifjiOW3c+Zv-+neHMozxCk8_rovdohV=Q-Bg@mail.gmail.com>
+Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
+ Device (IBNBD)
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Jack Wang <jinpuwang@gmail.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        axboe@kernel.dk, Christoph Hellwig <hch@infradead.org>,
+        bvanassche@acm.org, dledford@redhat.com,
+        Roman Pen <r.peniaev@gmail.com>, gregkh@linuxfoundation.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hi Sagi,
 
-Documentation nits, typos. questions...
+thanks a lot for the analysis. I didn't know about about the
+inline_data_size parameter in nvmet. It is at PAGE_SIZE on our
+systems.
+Will rerun our benchmarks with
+echo 2097152 > /sys/kernel/config/nvmet/ports/1/param_inline_data_size
+echo 2097152 > /sys/kernel/config/nvmet/ports/2/param_inline_data_size
+before enabling the port.
+Best
+Danil.
 
-On 7/10/19 3:56 PM, Satya Tangirala wrote:
-> diff --git a/Documentation/block/inline-encryption.txt b/Documentation/block/inline-encryption.txt
-> new file mode 100644
-> index 000000000000..96a7983a117d
-> --- /dev/null
-> +++ b/Documentation/block/inline-encryption.txt
-> @@ -0,0 +1,185 @@
-> +BLK-CRYPTO and KEYSLOT MANAGER
-> +===========================
-> +
-> +CONTENTS
-> +1. Objective
-> +2. Constraints and notes
-> +3. Design
-> +4. Blk-crypto
-> + 4-1 What does blk-crypto do on bio submission
-> +5. Layered Devices
-> +6. Future optimizations for layered devices
-> +
-> +1. Objective
-> +============
-> +
-> +We want to support inline encryption (IE) in the kernel.
-> +To allow for testing, we also want a software fallback when actual
-> +IE hardware is absent. We also want IE to work with layered devices
-> +like dm and loopback (i.e. we want to be able to use the IE hardware
-> +of the underlying devices if present, or else fall back to software
-> +en/decryption).
-> +
-> +
-> +2. Constraints and notes
-> +========================
-> +
-> +1) IE hardware have a limited number of “keyslots” that can be programmed
-> +with an encryption context (key, algorithm, data unit size, etc.) at any time.
-> +One can specify a keyslot in a data request made to the device, and the
-> +device will en/decrypt the data using the encryption context programmed into
-> +that specified keyslot. When possible, we want to make multiple requests with
-> +the same encryption context share the same keyslot.
-> +
-> +2) We need a way for filesystems to specify an encryption context to use for
-> +en/decrypting a struct bio, and a device driver (like UFS) needs to be able
-> +to use that encryption context when it processes the bio.
-> +
-> +3) We need a way for device drivers to expose their capabilities in a unified
-> +way to the upper layers.
-> +
-> +
-> +3. Design
-> +=========
-> +
-> +We add a struct bio_crypt_context to struct bio that can represent an
+On Wed, Jul 10, 2019 at 9:11 PM Sagi Grimberg <sagi@grimberg.me> wrote:
+>
+>
+> >> I still do not understand why this should give any notice-able
+> >> performance advantage.
+> >
+> > Usually omitting invalidations gives a healthy bump.
+> >
+> > Also, RDMA WRITE is generally faster than READ at the HW level in
+> > various ways.
+>
+> Yes, but this should be essentially identical to running nvme-rdma
+> with 512KB of immediate-data (the nvme term is in-capsule data).
+>
+> In the upstream nvme target we have inline_data_size port attribute
+> that is tunable for that (defaults to PAGE_SIZE).
 
-         is this   bi_crypt_context ??
-
-> +encryption context, because we need to able to pass this encryption context
-
-                                       to be able
-
-> +from the FS layer to the device driver to act upon.
-> +
-> +While IE hardware works on the notion of keyslots, the FS layer has no
-> +knowledge of keyslots - it simply wants to specify an encryption context to
-> +use while en/decrypting a bio.
-> +
-> +We introduce a keyslot manager (KSM) that handles the translation from
-> +encryption contexts specified by the FS to keyslots on the IE hardware.
-> +This KSM also serves as the way IE hardware can expose their capabilities to
-> +upper layers. The generic mode of operation is: each device driver that wants
-> +to support IE will construct a KSM and set it up in its struct request_queue.
-> +Upper layers that want to use IE on this device can then use this KSM in
-> +the device’s struct request_queue to translate an encryption context into
-> +a keyslot. The presence of the KSM in the request queue shall be used to mean
-> +that the device supports IE.
-> +
-> +On the device driver end of the interface, the device driver needs to tell the
-> +KSM how to actually manipulate the IE hardware in the device to do things like
-> +programming the crypto key into the IE hardware into a particular keyslot. All
-> +this is achieved through the struct keyslot_mgmt_ll_ops that the device driver
-> +passes to the KSM when creating it.
-> +
-> +It uses refcounts to track which keyslots are idle (either they have no
-> +encryption context programmed, or there are no in flight struct bios
-
-                                                  in-flight
-
-> +referencing that keyslot). When a new encryption context needs a keyslot, it
-> +tries to find a keyslot that has already been programmed with the same
-> +encryption context, and if there is no such keyslot, it evicts the least
-> +recently used idle keyslot and programs the new encryption context into that
-> +one. If no idle keyslots are available, then the caller will sleep until there
-> +is at least one.
-> +
-> +
-> +4. Blk-crypto
-> +=============
-> +
-> +The above is sufficient for simple cases, but does not work if there is a
-> +need for a software fallback, or if we are want to use IE with layered devices.
-> +To these ends, we introduce blk-crypto. Blk-crypto allows us to present a
-> +unified view of encryption to the FS (so FS only needs to specify an
-> +encryption context and not worry about keyslots at all), and blk-crypto can
-> +decide whether to delegate the en/decryption to IE hardware or to software
-> +(i.e. to the kernel crypto API). Blk-crypto maintains an internal KSM that
-> +serves as the software fallback to the kernel crypto API.
-> +
-> +Blk-crypto needs to ensure that the encryption context is programmed into the
-> +"correct" keyslot manager for IE. If a bio is submitted to a layered device
-> +that eventually passes the bio down to a device that really does support IE, we
-> +want the encryption context to be programmed into a keyslot for the KSM of the
-> +device with IE support. However, blk-crypto does not know a priori whether a
-> +particular device is the final device in the layering structure for a bio or
-> +not. So in the case that a particular device does not support IE, since it is
-> +possibly the final destination device for the bio, if the bio requires
-> +encryption (i.e. the bio is doing a write operation), blk-crypto must fallback
-> +to software *before* sending the bio to the device.
-> +
-> +Blk-crypto ensures that
-> +1) The bio’s encryption context is programmed into a keyslot in the KSM of the
-> +request queue that the bio is being submitted to (or the software fallback KSM
-> +if the request queue doesn’t have a KSM), and that the processing_ksm in the
-> +bi_crypt_context is set to this KSM
-> +
-> +2) That the bio has its own individual reference to the keyslot in this KSM.
-> +Once the bio passes through blk-crypto, its encryption context is programmed
-> +in some KSM. The “its own individual reference to the keyslot” ensures that
-> +keyslots can be released by each bio independently of other bios while ensuring
-> +that the bio has a valid reference to the keyslot when, for e.g., the software
-> +fallback KSM in blk-crypto performs crypto for on the device’s behalf. The
-> +individual references are ensured by increasing the refcount for the keyslot in
-> +the processing_ksm when a bio with a programmed encryption context is cloned.
-> +
-> +
-> +4-1. What blk-crypto does on bio submission
-> +-------------------------------------------
-> +
-> +Case 1: blk-crypto is given a bio with only an encryption context that hasn’t
-> +been programmed into any keyslot in any KSM (for e.g. a bio from the FS). In
-> +this case, blk-crypto will program the encryption context into the KSM of the
-> +request queue the bio is being submitted to (and if this KSM does not exist,
-> +then it will program it into blk-crypto’s internal KSM for software fallback).
-> +The KSM that this encryption context was programmed into is stored as the
-> +processing_ksm in the bio’s bi_crypt_context.
-> +
-> +Case 2: blk-crypto is given a bio whose encryption context has already been
-> +programmed into a keyslot in the *software fallback KSM*. In this case,
-> +blk-crypto does nothing; it treats the bio as not having specified an
-> +encryption context. Note that we cannot do what we will do in Case 3 here
-
-                       Note that we cannot do here what we will do in Case 3
-
-> +because we would have already encrypted the bio in software by this point.
-> +
-> +Case 3: blk-crypto is given a bio whose encryption context has already been
-> +programmed into a keyslot in some KSM (that is *not* the software fallback
-> +KSM). In this case, blk-crypto first releases that keyslot from that KSM and
-> +then treats the bio as in Case 1.
-> +
-> +This way, when a device driver is processing a bio, it can be sure that
-> +the bio’s encryption context has been programmed into some KSM (either the
-> +device driver’s request queue’s KSM, or blk-crypto’s software fallback KSM).
-> +It then simply needs to check if the bio’s processing_ksm is the device’s
-> +request queue’s KSM. If so, then it should proceed with IE. If not, it should
-> +simply do nothing with respect to crypto, because some other KSM (perhaps the
-> +blk-crypto software fallback KSM) is handling the en/decryption.
-> +
-> +Blk-crypto will release the keyslot that is being held by the bio (and also
-> +decrypt it if the bio is using the software fallback KSM) once
-> +bio_remaining_done returns true for the bio.
-> +
-> +
-> +5. Layered Devices
-> +==================
-> +
-> +Layered devices that wish to support IE need to create their own keyslot
-> +manager for their request queue, and expose whatever functionality they choose.
-> +When a layered device wants to pass a bio to another layer (either by
-> +resubmitting the same bio, or by submitting a clone), it doesn’t need to do
-> +anything special because the bio (or the clone) will once again pass through
-> +blk-crypto, which will work as described in Case 3. If a layered device wants
-> +for some reason to do the IO by itself instead of passing it on to a child
-> +device, but it also chose to expose IE capabilities by setting up a KSM in its
-> +request queue, it is then responsible for en/decrypting the data itself. In
-> +such cases, the device can choose to call the blk-crypto function
-> +blk_crypto_fallback_to_software (TODO: Not yet implemented), which will
-> +cause the en/decryption to be done via software fallback.
-> +
-> +
-> +6. Future Optimizations for layered devices
-> +===========================================
-> +
-> +Creating a keyslot manager for the layered device uses up memory for each
-> +keyslot, and in general, a layered device (like dm-linear) merely passes the
-> +request on to a “child” device, so the keyslots in the layered device itself
-> +might be completely unused. We can instead define a new type of KSM; the
-> +“passthrough KSM”, that layered devices can use to let blk-crypto know that
-> +this layered device *will* pass the bio to some child device (and hence
-> +through blk-crypto again, at which point blk-crypto can program the encryption
-> +context, instead of programming it into the layered device’s KSM). Again, if
-> +the device “lies” and decides to do the IO itself instead of passing it on to
-> +a child device, it is responsible for doing the en/decryption (and can choose
-> +to call blk_crypto_fallback_to_software). Another use case for the
-> +"passthrough KSM" is for IE devices that want to manage their own keyslots/do
-> +not have a limited number of keyslots.
 
 
 -- 
-~Randy
+Danil Kipnis
+Linux Kernel Developer
+
+1&1 IONOS Cloud GmbH | Greifswalder Str. 207 | 10405 Berlin | Germany
+E-mail: danil.kipnis@cloud.ionos.com | Web: www.ionos.de
+
+
+Head Office: Berlin, Germany
+District Court Berlin Charlottenburg, Registration number: HRB 125506 B
+Executive Management: Christoph Steffens, Matthias Steinberg, Achim Weiss
+
+Member of United Internet
+
+This e-mail may contain confidential and/or privileged information. If
+you are not the intended recipient of this e-mail, you are hereby
+notified that saving, distribution or use of the content of this
+e-mail in any way is prohibited. If you have received this e-mail in
+error, please notify the sender and delete the e-mail.
