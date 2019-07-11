@@ -2,161 +2,125 @@ Return-Path: <SRS0=DuRR=VI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C8FC742A1
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 19:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE9E3C742A5
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 19:22:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 063D720872
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 19:21:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8793820872
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 19:22:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="S/ROkNGc"
+	dkim=pass (2048-bit key) header.d=umn.edu header.i=@umn.edu header.b="kRCDtdkK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726549AbfGKTVQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 15:21:16 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:45823 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726446AbfGKTVQ (ORCPT
+        id S1726446AbfGKTWh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 15:22:37 -0400
+Received: from mta-p7.oit.umn.edu ([134.84.196.207]:42992 "EHLO
+        mta-p7.oit.umn.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728914AbfGKTWg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 15:21:16 -0400
-Received: by mail-pf1-f194.google.com with SMTP id r1so3185488pfq.12
-        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 12:21:15 -0700 (PDT)
+        Thu, 11 Jul 2019 15:22:36 -0400
+Received: from localhost (unknown [127.0.0.1])
+        by mta-p7.oit.umn.edu (Postfix) with ESMTP id 956F7ACB
+        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 19:22:34 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at umn.edu
+Received: from mta-p7.oit.umn.edu ([127.0.0.1])
+        by localhost (mta-p7.oit.umn.edu [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id okYuYL9TnsYG for <linux-block@vger.kernel.org>;
+        Thu, 11 Jul 2019 14:22:34 -0500 (CDT)
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+        (using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mta-p7.oit.umn.edu (Postfix) with ESMTPS id 6DDD1A12
+        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 14:22:34 -0500 (CDT)
+Received: by mail-io1-f72.google.com with SMTP id 132so7863145iou.0
+        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 12:22:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=jjJDt4c8s8Wx2l2CMYbWjw8ETw/oZJkwEnPdvyXBhBA=;
-        b=S/ROkNGcw6RU0xVpHVxjlkaYtcvxu00mYXYtPHmU5X1TzLXi2jJTYFTJD+hBWS26PV
-         miVcA2MUmCswJ7IEeRdlIEXelK5Rzrzw3T9p7LqgdZCu+H4K+YN9EoPPvfsFS2pOcCth
-         g6Jns1oN/ZJNBcT+xwu8IlEjzrBOIuTzoNQsJcma/iF1NGSBoWSjRv3jqzz/FaRHjOdf
-         EXS2lFP3WwYgEWk24zPV1JSnlHMUb6lh5z5e+LhPm7Fra0gGfYxBdN6UOxg/+RIDl+aT
-         lK113qS90eTgWw8C2C3TSdSa+NLmsPrlVJwsLlVUvUgPSuQTKrFg+WXB8kKqjV/iSFo9
-         LZeQ==
+        d=umn.edu; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=04r+xkfi3OIxIAnYMbyBVwPuxdAwHrdKDxo/QJz9TXo=;
+        b=kRCDtdkKWDupkwiDvuAHjTjjn6YF6vYe+M23iFm7rjC9nCrglDHxUtsu9IqVnPNCUw
+         f1efLF/yBqTHqxnNCsqMC4iZCGCu2FiBJBRDofzVGoOeNd1aEjcIB3EQ1AecMz19ls4Q
+         dkJKau+qfJRQnsQC5BgI9cI259ChqPd/LRs1T8/1UjSsrNMWjzAvNTrTYhhfhByM8ai/
+         Fuy1f00937LWrXRFuBCiNieNncfblHnTD2if+0J8Vk9a5qUW1mqEmI0EFKblfyvyuy65
+         VQbiEGyFf9+GcFtQ2laOCumU/cr+x85rQKzlqHBKqeUsuf8jfQG6ciLpHJnq70t0Mhpk
+         WJzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=jjJDt4c8s8Wx2l2CMYbWjw8ETw/oZJkwEnPdvyXBhBA=;
-        b=lK/Jr6ssoEDodEvdjxlxK8oqtcGq++NhSslLTzujIBCcDk1wlVGfoQgLzpL7OvV1hn
-         DbbqV64DuaX/R0d7IMwFPmTFSnDF8wFLknGdBhlu5QKR0ow+cKDA83xAwvNI4uj7zoDx
-         Q/8z7WETWdmhrJ/ZL5fRgi9rSqzt7NXjXOGyt83/iUlvev710T05jG5p6l637wAVUdJR
-         0YhE/UjjsMvVN3QEXNexqndwaczjugwDmin3Lw8NqNvOyXKARDp8nj3U80zzgOD+q4qh
-         Kvh2P0Yv1pKCdpyj76cyz26figJspL0S7HoiHhBMC2GD9D1rjs/zglbuiG+No8SwW0Tp
-         tozA==
-X-Gm-Message-State: APjAAAUXwO1F9zVH1yAMt5owTICqiRyda0hRJ1iTz3mRwGmNLvZDwYQ4
-        xLNg6oFZhm1ma+Sx9+c+24I=
-X-Google-Smtp-Source: APXvYqyFJcGrr5lL27uWfzNAbH2ndZyTElHLrWTm7X8eMfFGSy2oiq1PRf6djx5Obu9RvUjfQnZxIw==
-X-Received: by 2002:a63:778a:: with SMTP id s132mr3684120pgc.242.1562872875179;
-        Thu, 11 Jul 2019 12:21:15 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::c242])
-        by smtp.gmail.com with ESMTPSA id g2sm11208840pfq.88.2019.07.11.12.21.14
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 11 Jul 2019 12:21:14 -0700 (PDT)
-Date:   Thu, 11 Jul 2019 15:21:12 -0400
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Oleg Nesterov <oleg@redhat.com>
-Cc:     Jens Axboe <axboe@fb.com>, Peter Zijlstra <peterz@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Kernel Team <Kernel-team@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH 1/2] wait: add wq_has_multiple_sleepers helper
-Message-ID: <20190711192110.aqpin7pr6jwmydsr@macbook-pro-91.dhcp.thefacebook.com>
-References: <20190710195227.92322-1-josef@toxicpanda.com>
- <bbe73e4e-9270-46ac-16d7-39a40485fe53@kernel.dk>
- <20190710203516.GL3419@hirez.programming.kicks-ass.net>
- <752dbdc9-945d-e70c-e6f3-0c48932c7f60@fb.com>
- <20190711114543.GA14901@redhat.com>
- <20190711134006.GA19160@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190711134006.GA19160@redhat.com>
-User-Agent: NeoMutt/20180716
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=04r+xkfi3OIxIAnYMbyBVwPuxdAwHrdKDxo/QJz9TXo=;
+        b=dOzBZbmRRjCS6G/5EOQOjr12MvPPF6BpA+WWvxXyO8e2w8eVs9+EguV4Ugbb9R7E1O
+         bBnnP9imBtI49YMw78CZlQGIkWIXQCvRDwqG2eIbP/HuGNrFUC5WYIlSM0odgsduL62U
+         DTZgxxYPsaEE/7KBWost467PlkFk2jkPW6a75uM3jicG5nguDO3C4zBQpfxI2bQ13k5Z
+         wG0yl/0BPNVwpdf7N2Ko5ZpkisiSXWeLoFNFGyMHxaQ5UiVvTogHTkwx8y1aQ25zvS1H
+         9GBIoWUtEime/8zM3MbLXfIE7faBeq4HCYtZcMHNi/FENswzV9lPV22LPYgL0LEJ1YPt
+         TuOA==
+X-Gm-Message-State: APjAAAVEwGjAw0gTpWRMGOSgYhKmRTkzz5/lFhk/eZa0J6iJHzCtzQVH
+        H05uFy6eOZSeyHjnUPdfmD/xpEYSuSZFBL6Cw9SacDc8Iq3D9McGPH7EbpOfjSiP37Qe2TZ7dZV
+        kwhbB4B81ePxLcZ0SyrKFRJf1TRo=
+X-Received: by 2002:a6b:f711:: with SMTP id k17mr5891515iog.273.1562872953858;
+        Thu, 11 Jul 2019 12:22:33 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx/oBuIk60mhI4isOWmFv2H/1EonKWKX/fEvEckRCa0a+lY1XboOURnqhKOt66OGfCLdBxd3A==
+X-Received: by 2002:a6b:f711:: with SMTP id k17mr5891495iog.273.1562872953548;
+        Thu, 11 Jul 2019 12:22:33 -0700 (PDT)
+Received: from cs-u-cslp16.dtc.umn.edu (cs-u-cslp16.cs.umn.edu. [128.101.106.40])
+        by smtp.gmail.com with ESMTPSA id 8sm5505611ion.26.2019.07.11.12.22.31
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Thu, 11 Jul 2019 12:22:32 -0700 (PDT)
+From:   Wenwen Wang <wang6495@umn.edu>
+To:     Wenwen Wang <wenwen@cs.uga.edu>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v2] block/bio-integrity: fix a memory leak bug
+Date:   Thu, 11 Jul 2019 14:22:02 -0500
+Message-Id: <1562872923-2463-1-git-send-email-wang6495@umn.edu>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 11, 2019 at 03:40:06PM +0200, Oleg Nesterov wrote:
-> On 07/11, Oleg Nesterov wrote:
-> >
-> > Jens,
-> >
-> > I managed to convince myself I understand why 2/2 needs this change...
-> > But rq_qos_wait() still looks suspicious to me. Why can't the main loop
-> > "break" right after io_schedule()? rq_qos_wake_function() either sets
-> > data->got_token = true or it doesn't wakeup the waiter sleeping in
-> > io_schedule()
-> >
-> > This means that data.got_token = F at the 2nd iteration is only possible
-> > after a spurious wakeup, right? But in this case we need to set state =
-> > TASK_UNINTERRUPTIBLE again to avoid busy-wait looping ?
-> 
-> Oh. I can be easily wrong, I never read this code before, but it seems to
-> me there is another unrelated race.
-> 
-> rq_qos_wait() can't rely on finish_wait() because it doesn't necessarily
-> take wq_head->lock.
-> 
-> rq_qos_wait() inside the main loop does
-> 
-> 		if (!has_sleeper && acquire_inflight_cb(rqw, private_data)) {
-> 			finish_wait(&rqw->wait, &data.wq);
-> 
-> 			/*
-> 			 * We raced with wbt_wake_function() getting a token,
-> 			 * which means we now have two. Put our local token
-> 			 * and wake anyone else potentially waiting for one.
-> 			 */
-> 			if (data.got_token)
-> 				cleanup_cb(rqw, private_data);
-> 			break;
-> 		}
-> 
-> finish_wait() + "if (data.got_token)" can race with rq_qos_wake_function()
-> which does
-> 
-> 	data->got_token = true;
-> 	list_del_init(&curr->entry);
-> 
+From: Wenwen Wang <wenwen@cs.uga.edu>
 
-Argh finish_wait() does __set_current_state, well that's shitty.  I guess we
-need to do
+In bio_integrity_prep(), a kernel buffer is allocated through kmalloc() to
+hold integrity metadata. Later on, the buffer will be attached to the bio
+structure through bio_integrity_add_page(), which returns the number of
+bytes of integrity metadata attached. Due to unexpected situations,
+bio_integrity_add_page() may return 0. As a result, bio_integrity_prep()
+needs to be terminated with 'false' returned to indicate this error.
+However, the allocated kernel buffer is not freed on this execution path,
+leading to a memory leak.
 
-data->got_token = true;
-smp_wmb()
-list_del_init(&curr->entry);
+To fix this issue, free the allocated buffer before returning from
+bio_integrity_prep().
 
-and then do
+Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+---
+ block/bio-integrity.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-smp_rmb();
-if (data.got_token)
-	cleanup_cb(rqw, private_data);
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 4db6208..fb95dbb 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -276,8 +276,12 @@ bool bio_integrity_prep(struct bio *bio)
+ 		ret = bio_integrity_add_page(bio, virt_to_page(buf),
+ 					     bytes, offset);
+ 
+-		if (ret == 0)
+-			return false;
++		if (ret == 0) {
++			printk(KERN_ERR "could not attach integrity payload\n");
++			kfree(buf);
++			status = BLK_STS_RESOURCE;
++			goto err_end_io;
++		}
+ 
+ 		if (ret < bytes)
+ 			break;
+-- 
+2.7.4
 
-to be safe?
-
-> rq_qos_wait() can see these changes out-of-order: finish_wait() can see
-> list_empty_careful() == T and avoid wq_head->lock, and in this case the
-> code above can see data->got_token = false.
-> 
-> No?
-> 
-> and I don't really understand
-> 
-> 	has_sleeper = false;
-> 
-> at the end of the main loop. I think it should do "has_sleeper = true",
-> we need to execute the code above only once, right after prepare_to_wait().
-> But this is harmless.
-
-We want has_sleeper = false because the second time around we just want to grab
-the inflight counter.  Yes we should have been worken up by our special thing
-and so should already have data.got_token, but that sort of thinking ends in
-hung boxes and me having to try to mitigate thousands of boxes suddenly hitting
-a case we didn't think was possible.  Thanks,
-
-Josef
