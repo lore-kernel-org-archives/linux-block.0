@@ -2,208 +2,113 @@ Return-Path: <SRS0=DuRR=VI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7362DC74A4B
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 08:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60865C74A4B
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 09:22:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C1CF20872
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 08:54:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35E2421019
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 09:22:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="WkvGTnj8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZMUfbc+l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727991AbfGKIyP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 04:54:15 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:33584 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727974AbfGKIyP (ORCPT
+        id S1727940AbfGKJWI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 05:22:08 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42375 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727595AbfGKJWI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 04:54:15 -0400
-Received: by mail-io1-f65.google.com with SMTP id z3so10939436iog.0
-        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 01:54:14 -0700 (PDT)
+        Thu, 11 Jul 2019 05:22:08 -0400
+Received: by mail-wr1-f67.google.com with SMTP id j8so1358838wrj.9;
+        Thu, 11 Jul 2019 02:22:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=xB7gk9GV4LWD0anuaWOfarGLjo+bG9F97Mtskx4V/Hw=;
-        b=WkvGTnj8CGB7fL8BikYeBlqTCQ057+a3pULdM5uKVpcvXnQdFbte3ikKyd7nb3+gjs
-         2Ejwwk7QdEBWLQSC8W6u1mG6PA//3+GBQ9BPP+ShensmB0NO1j5leJByivlOExenf/Mk
-         KMafUef//v4s8JTxuHUHsbhZkfZ2Pf95N8RWO4ndOwZP3jLSKlhChHDXsr82mOb+NEzp
-         i4pX2wBYuoCm5K1eGgDnkssmIZVYb1NMerQ4xbCl74WXA/UJgogS9YSZ3f1dAYbR5dEL
-         FAyFsUJQha71pAqbc05epNCeU0/6yRvK6Y/JIyBFshAenxuhWLc83V5mw15GD5iqfa3K
-         E9pg==
+        bh=xlwYflAq0smJi21KRy7k4mCMg2ux1t1pjB1v5UR/AcA=;
+        b=ZMUfbc+lo/eM2LuIizHmmX3xB85uswxxsVQh/1jdqeXN1oEi1wVOI6kZ1IKFV1kxaN
+         R8LXYQRJ6LG7okRNM9IeK4wPsGza3MX9GtnXM1pYk6qhEwGpRs/1kZkPev8fxIbfW1/3
+         Tn2/mcAJZVq1G46LxhKiOfcD6bCEES2tRTWcdi4sYkvsJZQ4VkR+5n69Fw2LfUukh6XC
+         SbdxahGhEajGb5/QPy2Cp5dVNnUuLbFsZxkLZIIGPxv5rvYlwovBHo++b//XGGcjLGmN
+         zZaLfD/e+lmTmCZG8q4E6jlE1n04G253PSy+Wf3cr96vAi1DNF49SIAk3NRpalIZo2fb
+         c6vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=xB7gk9GV4LWD0anuaWOfarGLjo+bG9F97Mtskx4V/Hw=;
-        b=tE/O91KM1h5POOO5OB83Gq6HyPCCHDsCUPkABCOe8I2rUWq79vwoeP0ao1Pcd0cIZy
-         /MEMExV7Um3H0sAFZ+4ICTlKGuDZCZH4WXh73Ai7MShk2EljTqUp/7hurqGkwYwoBcEx
-         bUlCDy/6scQs4oRiK/CRCONP8+GJQBtA7B7fuXD4zEt7dpx5s+DtfYb3L6q0Z5HcxpUF
-         EHVylX4xZ6NmqGELG42v78eRIdaiFydt8ws6lEb9E9x3j9J/C30FvqUWPU12huWI01ye
-         desDTuWt4QKxbUZEiE4ja4yd3TQ/oEKzZpxDAgP0XrixdpG93ykOFaYHcRx7LWxcwqdc
-         cQ2g==
-X-Gm-Message-State: APjAAAUHkwnWyrnVqHOo1rgGuZpX3hDe2s60dkbFurV7LH5LLM9JzAF8
-        H+0N02IhGiGBBeqFsbczqZilq6zZeITOlHblvNVH
-X-Google-Smtp-Source: APXvYqyWgsLLfKCpK5w/OwXMN+gzsFDhaFJYaKpDGrf45/1NkZTG0xJ1JEyZs0Umaj0wr0weFx59ptW2BSP1BKO30CQ=
-X-Received: by 2002:a6b:ce19:: with SMTP id p25mr3186764iob.201.1562835253969;
- Thu, 11 Jul 2019 01:54:13 -0700 (PDT)
+        bh=xlwYflAq0smJi21KRy7k4mCMg2ux1t1pjB1v5UR/AcA=;
+        b=Q3u3gctdLiVIOuZe6YsQ+we2PyRq7MSg9nfEENfxZl+YUGBvCELETJmVpcUcUowwn2
+         d9mO7sONjxRZxr6iN5wPrV6ZR8XTqkQhmMfaYW8mKG5UVpichX7sP4ZHinocoM8VusUx
+         G+Smhf8lhTl5SQ/vOk9p6KxieE0hmBD9/2BuQcbVCBJjUc63TH7i6ZTXDkPyHERF7DrQ
+         5tpsMTQNYo5Ek/s4cLqeNO/V/fhpnICFxo2UhE/KAl5desYJCm3BIEc9CMkvJRtkDv9Q
+         UGTIAfm54YwUj/CHEKBbKs/PcshGLzxjJWEwJfCsGgY8jEtxaql4dKucsbtXYJ2EMeou
+         17Xw==
+X-Gm-Message-State: APjAAAVZJwZoBt9BumdMtBpvmoAgjfOgGFG6op6F2nJn8dL09WNZtuU7
+        lfol1CAf/N09XsxpCGMvpLJgCuo0qnSgSHSiuE0=
+X-Google-Smtp-Source: APXvYqwgHRM4EU5lxrlGRWVq+LF0HyGIoXyg9CVgIpOLVtJNBQrCJSBSq85hAvQ02NGS+ov0N3npjfAmTim3vtVhWsg=
+X-Received: by 2002:adf:e4c6:: with SMTP id v6mr3714252wrm.315.1562836926040;
+ Thu, 11 Jul 2019 02:22:06 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
- <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me>
-In-Reply-To: <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Thu, 11 Jul 2019 10:54:02 +0200
-Message-ID: <CAHg0HuxZvXH899=M4vC7BTH-bP2J35aTwsGhiGoC8AamD8gOyA@mail.gmail.com>
-Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
- Device (IBNBD)
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, axboe@kernel.dk,
-        Christoph Hellwig <hch@infradead.org>, bvanassche@acm.org,
-        jgg@mellanox.com, dledford@redhat.com,
-        Roman Pen <r.peniaev@gmail.com>, gregkh@linuxfoundation.org
+References: <1562830033-24239-1-git-send-email-wang6495@umn.edu>
+In-Reply-To: <1562830033-24239-1-git-send-email-wang6495@umn.edu>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Thu, 11 Jul 2019 17:21:54 +0800
+Message-ID: <CACVXFVO-gwVhZRajRx41_sYJKDTX2qZUnZVRXCB0NcegVVTGVw@mail.gmail.com>
+Subject: Re: [PATCH] block/bio-integrity: fix a memory leak bug
+To:     Wenwen Wang <wang6495@umn.edu>
+Cc:     Wenwen Wang <wenwen@cs.uga.edu>, Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Sagi,
-
-thanks a lot for the detailed reply. Answers inline below:
-
-On Tue, Jul 9, 2019 at 9:46 PM Sagi Grimberg <sagi@grimberg.me> wrote:
+On Thu, Jul 11, 2019 at 3:36 PM Wenwen Wang <wang6495@umn.edu> wrote:
 >
-> Hi Danil and Jack,
+> From: Wenwen Wang <wenwen@cs.uga.edu>
 >
-> > Hallo Doug, Hallo Jason, Hallo Jens, Hallo Greg,
-> >
-> > Could you please provide some feedback to the IBNBD driver and the
-> > IBTRS library?
-> > So far we addressed all the requests provided by the community
+> In bio_integrity_prep(), a kernel buffer is allocated through kmalloc() to
+> hold integrity metadata. Later on, the buffer will be attached to the bio
+> structure through bio_integrity_add_page(), which returns the number of
+> bytes of integrity metadata attached. Due to unexpected situations,
+> bio_integrity_add_page() may return 0. As a result, bio_integrity_prep()
+> needs to be terminated with 'false' returned to indicate this error.
+> However, the allocated kernel buffer is not freed on this execution path,
+> leading to a memory leak.
 >
-> That is not exactly correct AFAIR,
+> To fix this issue, free the allocated buffer before returning from
+> bio_integrity_prep().
 >
-> My main issues which were raised before are:
-> - IMO there isn't any justification to this ibtrs layering separation
->    given that the only user of this is your ibnbd. Unless you are
->    trying to submit another consumer, you should avoid adding another
->    subsystem that is not really general purpose.
-We designed ibtrs not only with the IBNBD in mind but also as the
-transport layer for a distributed SDS. We'd like to be able to do what
-ceph is capable of (automatic up/down scaling of the storage cluster,
-automatic recovery) but using in-kernel rdma-based IO transport
-drivers, thin-provisioned volume managers, etc. to keep the highest
-possible performance. That modest plan of ours should among others
-cover for the following:
-When using IBNBD/SRP/NVMEoF to export devices (say, thin-provisioned
-volumes) from server to client and building an (md-)raid on top of the
-imported devices on client side in order to provide for redundancy
-across different machines, one gets very decent throughput and low
-latency, since the IOs are sent in parallel to the storage machines.
-One downside of this setup, is that the resync traffic has to flow
-over the client, where the md-raid is sitting. Ideally the resync
-traffic should flow directly between the two "legs" (storage machines)
-of the raid. The server side of such a "distributed raid" capable of
-this direct syncing between the array members would necessarily
-require to have some logic on server side and hence could also sit on
-top of ibtrs. (To continue the analogy, the "server" side of an
-md-raid build on top of say two NVMEoF devices are just two block
-devices, which couldn't communicate with each other)
-All in all itbrs is a library to establish a "fat", multipath,
-autoreconnectable connection between two hosts on top of rdma,
-optimized for transport of IO traffic.
-
-> - ibtrs in general is using almost no infrastructure from the existing
->    kernel subsystems. Examples are:
->    - tag allocation mechanism (which I'm not clear why its needed)
-As you correctly noticed our client manages the buffers allocated and
-registered by the server on the connection establishment. Our tags are
-just a mechanism to take and release those buffers for incoming
-requests on client side. Since the buffers allocated by the server are
-to be shared between all the devices mapped from that server and all
-their HW queues (each having num_cpus of them) the mechanism behind
-get_tag/put_tag also takes care of the fairness.
-
->    - rdma rw abstraction similar to what we have in the core
-On the one hand we have only single IO related function:
-ibtrs_clt_request(READ/WRITE, session,...), which executes rdma write
-with imm, or requests an rdma write with imm to be executed by the
-server. On the other hand we provide an abstraction to establish and
-manage what we call "session", which consist of multiple paths (to do
-failover and multipath with different policies), where each path
-consists of num_cpu rdma connections. Once you established a session
-you can add or remove paths from it on the fly. In case the connection
-to server is lost, the client does periodic attempts to reconnect
-automatically. On the server side you get just sg-lists with a
-direction READ or WRITE as requested by the client. We designed this
-interface not only as the minimum required to build a block device on
-top of rdma but also with a distributed raid in mind.
-
->    - list_next_or_null_rr_rcu ??
-We use that for multipath. The macro (and more importantly the way we
-use it) has been reviewed by Linus and quit closely by Paul E.
-McKenney. AFAIR the conclusion was that Romans implementation is
-correct, but too tricky to use correctly in order to be included into
-kernel as a public interface. See https://lkml.org/lkml/2018/5/18/659
-
->    - few other examples sprinkled around..
-To my best knowledge we addressed everything we got comments on and
-will definitely do so in the future.
-
-> Another question, from what I understand from the code, the client
-> always rdma_writes data on writes (with imm) from a remote pool of
-> server buffers dedicated to it. Essentially all writes are immediate (no
-> rdma reads ever). How is that different than using send wrs to a set of
-> pre-posted recv buffers (like all others are doing)? Is it faster?
-At the very beginning of the project we did some measurements and saw,
-that it is faster. I'm not sure if this is still true, since the
-hardware and the drivers and rdma subsystem did change in that time.
-Also it seemed to make the code simpler.
-
-> Also, given that the server pre-allocate a substantial amount of memory
-> for each connection, is it documented the requirements from the server
-> side? Usually kernel implementations (especially upstream ones) will
-> avoid imposing such large longstanding memory requirements on the system
-> by default. I don't have a firm stand on this, but wanted to highlight
-> this as you are sending this for upstream inclusion.
-We definitely need to stress that somewhere. Will include into readme
-and add to the cover letter next time. Our memory management is indeed
-basically absent in favor of performance: The server reserves
-queue_depth of say 512K buffers. Each buffer is used by client for
-single IO only, no matter how big the request is. So if client only
-issues 4K IOs, we do waste 508*queue_depth K of memory. We were aiming
-for lowest possible latency from the beginning. It is probably
-possible to implement some clever allocator on the server side which
-wouldn't affect the performance a lot.
-
+> Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+> ---
+>  block/bio-integrity.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >
->   and
-> > continue to maintain our code up-to-date with the upstream kernel
-> > while having an extra compatibility layer for older kernels in our
-> > out-of-tree repository.
+> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+> index 4db6208..bfae10c 100644
+> --- a/block/bio-integrity.c
+> +++ b/block/bio-integrity.c
+> @@ -276,8 +276,10 @@ bool bio_integrity_prep(struct bio *bio)
+>                 ret = bio_integrity_add_page(bio, virt_to_page(buf),
+>                                              bytes, offset);
 >
-> Overall, while I absolutely support your cause to lower your maintenance
-> overhead by having this sit upstream, I don't see why this can be
-> helpful to anyone else in the rdma community. If instead you can
-> crystallize why/how ibnbd is faster than anything else, and perhaps
-> contribute a common infrastructure piece (or enhance an existing one)
-> such that other existing ulps can leverage, it will be a lot more
-> compelling to include it upstream.
->
-> > I understand that SRP and NVMEoF which are in the kernel already do
-> > provide equivalent functionality for the majority of the use cases.
-> > IBNBD on the other hand is showing higher performance and more
-> > importantly includes the IBTRS - a general purpose library to
-> > establish connections and transport BIO-like read/write sg-lists over
-> > RDMA,
->
-> But who needs it? Can other ulps use it or pieces of it? I keep failing
-> to understand why is this a benefit if its specific to your ibnbd?
-See above and please ask if you have more questions to this.
+> -               if (ret == 0)
+> +               if (ret == 0) {
+> +                       kfree(buf);
+>                         return false;
+> +               }
 
-Thank you,
-Danil.
+This way may not be enough, and the bio payload needs to be freed.
+
+And you may refer to the error handling for 'IS_ERR(bip)', and bio->bi_status
+needs to be set, and bio_endio() needs to be called too.
+
+
+Thanks,
+Ming Lei
