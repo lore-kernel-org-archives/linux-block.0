@@ -2,120 +2,59 @@ Return-Path: <SRS0=DuRR=VI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECCA8C74A36
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 01:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A26D6C74A42
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 05:48:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8B3C20844
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 01:17:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6443A21019
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 05:48:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LgPpxHNX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RRjFSuCz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727846AbfGKBR4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jul 2019 21:17:56 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:35640 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727463AbfGKBRz (ORCPT
+        id S1727796AbfGKFsG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 01:48:06 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:37982 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727737AbfGKFsG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jul 2019 21:17:55 -0400
-Received: by mail-wr1-f67.google.com with SMTP id y4so4374568wrm.2;
-        Wed, 10 Jul 2019 18:17:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:from:to:cc:references:openpgp:autocrypt:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EFkC/Uucw0aZjkYFDU2AiSEc++d077HkZhSnsHwuQJA=;
-        b=LgPpxHNXNGjpkdVJSGF/lZR7UiSRyDpu9LdwPOPohD7wDA0OkqnrzC51ekJs+BKA+5
-         N0/s6+z21lkTCdn73Z/AkGV7tJD59VyjMg5AYl6J6Tz6zUvsAZYAyY2Bap/UVKAXOIku
-         YbovaWTII/e8T4iviNJ6LCWfvQrgiobBtLfCC+feKRrJKNpOjt1MnzqJXIA2oRX2LnQp
-         jJr4OCnavCx4l0tVWwtfSlUymHPScLQlrUho3aSByx1HPGnC6Xo1EudtE8uuRJUPmRUE
-         bdbDqlw1l3oqX3+6F/ngujHL3Q3DrIZu9qI4fsFLUTCEIpe0QcmH3Eci1qUzYM7Mh3k8
-         9/YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=EFkC/Uucw0aZjkYFDU2AiSEc++d077HkZhSnsHwuQJA=;
-        b=KK8w+ZCxdVjxThYupe5tA3DqP08VDlRN2TxHEGunIaZoS24KNXWU2l5IfL9HCaucKA
-         YSLHYn1bErjgC4/hKuVdO2mQFSCGUyMdGMBArkUuI5r5k8r2sSbVvMK0xfO75zkUQz1u
-         LPoBDEKExualcIPAmhP5SBTx/qmAInagKJdfDbG5kktmgFSct4hGRIJg7gXtosjpp2VP
-         ma00p2QUuVN3XSwZCafppKnQ1bPQmbI5CCJ8TvVj1QQmVk/dZJlWaykyWqptzg2d3AtR
-         FzihyGF1Wu9GQMNuNKBLZrmCruWCr9xgj8Fy7sylrzH6Gkcw4OfcBadfbQA2n7UB13U5
-         pTKw==
-X-Gm-Message-State: APjAAAV50a+S9t+dtF3kTjqajKz47FjN36M0zJ0AaMYRxMAXS+fEiEtY
-        Celh8SGs1PpI7vW1JyTOuEA=
-X-Google-Smtp-Source: APXvYqzN/Q+dDgqoOO0srwJykdx28KV9Ue3b8amCBEmXaz4Q9uFOeMh1bbMNhkS1BQeCv7YwL63ikQ==
-X-Received: by 2002:adf:f851:: with SMTP id d17mr515509wrq.77.1562807872544;
-        Wed, 10 Jul 2019 18:17:52 -0700 (PDT)
-Received: from [192.168.43.145] ([109.126.142.165])
-        by smtp.gmail.com with ESMTPSA id s25sm3496915wmc.21.2019.07.10.18.17.51
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Jul 2019 18:17:51 -0700 (PDT)
-Subject: Re: [PATCH 0/2] Fix misuse of blk_rq_stats in blk-iolatency
-From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     Josef Bacik <josef@toxicpanda.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dennis@kernel.org
-References: <cover.1560510935.git.asml.silence@gmail.com>
- <20190614134037.ie7zs4rb4oyesifr@MacBook-Pro-91.local>
- <054f3ab6-0a03-ff0e-ac46-5d0fba012cf0@gmail.com>
- <226043f8-4dc6-1ad3-7c66-8d85312f4cae@gmail.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
- 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 bA==
-Message-ID: <ac0700a1-0984-417b-d5d8-35c4ba56f6f6@gmail.com>
-Date:   Thu, 11 Jul 2019 04:17:47 +0300
+        Thu, 11 Jul 2019 01:48:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=yLVbE+XFgjMoAumwgvc4hXQJYFBFqwZNbZCj546Cjyo=; b=RRjFSuCzZVxgZ3pgfmbDXDIDu
+        209L8xZf4KWUAW4vhMavJAP455U9x3P3PShbgKAL9jV1ERWs2tvaYPC3mMPoB7M2bl44pDs/d6nwW
+        LAiAbZcTIYnu972UvmOzwyvnQBeMDHaBJt2kn4Di5mg+hIRIhpLZyF4aBNyJvE3Ji0cSygM5fwlJX
+        yGge9m7BOx2IW/iq2/YDUmRHgAs+/b7CQMcdr2+7EG/w+smVBMFLRna1k0aEPLdRo35rJgG6O/Kwk
+        wGwlBrTGu2+FAFEHv6JkvtaO6ys6dtx1kAabdBA4EsGmICACQMlnsBcpGoYPfpyRPGcycMwi3RqRK
+        CUA7UquYQ==;
+Received: from static-50-53-52-16.bvtn.or.frontiernet.net ([50.53.52.16] helo=dragon.dunlab)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hlRvw-00018H-Dm; Thu, 11 Jul 2019 05:47:56 +0000
+Subject: Re: [PATCH 3/8] block: blk-crypto for Inline Encryption
+To:     Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net
+Cc:     Parshuram Raju Thombare <pthombar@cadence.com>,
+        Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <20190710225609.192252-1-satyat@google.com>
+ <20190710225609.192252-4-satyat@google.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <e1066ded-af22-6a8c-e198-8d123adeca9e@infradead.org>
+Date:   Wed, 10 Jul 2019 22:47:54 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <226043f8-4dc6-1ad3-7c66-8d85312f4cae@gmail.com>
+In-Reply-To: <20190710225609.192252-4-satyat@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -126,52 +65,213 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi,
 
-Any thoughts? Is there something wrong with the patchset?
+Documentation nits, typos. questions...
 
+On 7/10/19 3:56 PM, Satya Tangirala wrote:
+> diff --git a/Documentation/block/inline-encryption.txt b/Documentation/block/inline-encryption.txt
+> new file mode 100644
+> index 000000000000..96a7983a117d
+> --- /dev/null
+> +++ b/Documentation/block/inline-encryption.txt
+> @@ -0,0 +1,185 @@
+> +BLK-CRYPTO and KEYSLOT MANAGER
+> +===========================
+> +
+> +CONTENTS
+> +1. Objective
+> +2. Constraints and notes
+> +3. Design
+> +4. Blk-crypto
+> + 4-1 What does blk-crypto do on bio submission
+> +5. Layered Devices
+> +6. Future optimizations for layered devices
+> +
+> +1. Objective
+> +============
+> +
+> +We want to support inline encryption (IE) in the kernel.
+> +To allow for testing, we also want a software fallback when actual
+> +IE hardware is absent. We also want IE to work with layered devices
+> +like dm and loopback (i.e. we want to be able to use the IE hardware
+> +of the underlying devices if present, or else fall back to software
+> +en/decryption).
+> +
+> +
+> +2. Constraints and notes
+> +========================
+> +
+> +1) IE hardware have a limited number of “keyslots” that can be programmed
+> +with an encryption context (key, algorithm, data unit size, etc.) at any time.
+> +One can specify a keyslot in a data request made to the device, and the
+> +device will en/decrypt the data using the encryption context programmed into
+> +that specified keyslot. When possible, we want to make multiple requests with
+> +the same encryption context share the same keyslot.
+> +
+> +2) We need a way for filesystems to specify an encryption context to use for
+> +en/decrypting a struct bio, and a device driver (like UFS) needs to be able
+> +to use that encryption context when it processes the bio.
+> +
+> +3) We need a way for device drivers to expose their capabilities in a unified
+> +way to the upper layers.
+> +
+> +
+> +3. Design
+> +=========
+> +
+> +We add a struct bio_crypt_context to struct bio that can represent an
 
-On 29/06/2019 18:37, Pavel Begunkov wrote:
-> Ping?
-> 
-> On 20/06/2019 10:18, Pavel Begunkov wrote:
->> Hi,
->>
->> Josef, thanks for taking a look.
->>
->>
->> Although, there is nothing critical yet -- just a not working / disabled
->> optimisation, but changes in stats could sublty break it. E.g. grouping
->> @batch and @mean into a union will increase estimated average by several
->> orders of magnitude.
->>
->> Jens, what do you think?
->>
->>
->>
->> On 14/06/2019 16:40, Josef Bacik wrote:
->>> On Fri, Jun 14, 2019 at 02:44:11PM +0300, Pavel Begunkov (Silence) wrote:
->>>> From: Pavel Begunkov <asml.silence@gmail.com>
->>>>
->>>> There are implicit assumptions about struct blk_rq_stats, which make
->>>> it's very easy to misuse. The first patch fixes consequences, and the
->>>> second employs type-system to prevent recurrences.
->>>>
->>>>
->>>> Pavel Begunkov (2):
->>>>   blk-iolatency: Fix zero mean in previous stats
->>>>   blk-stats: Introduce explicit stat staging buffers
->>>>
->>>
->>> I don't have a problem with this, but it's up to Jens I suppose
->>>
->>> Acked-by: Josef Bacik <josef@toxicpanda.com>
->>>
->>> Thanks,
->>>
->>> Josef
->>>
->>
-> 
+         is this   bi_crypt_context ??
+
+> +encryption context, because we need to able to pass this encryption context
+
+                                       to be able
+
+> +from the FS layer to the device driver to act upon.
+> +
+> +While IE hardware works on the notion of keyslots, the FS layer has no
+> +knowledge of keyslots - it simply wants to specify an encryption context to
+> +use while en/decrypting a bio.
+> +
+> +We introduce a keyslot manager (KSM) that handles the translation from
+> +encryption contexts specified by the FS to keyslots on the IE hardware.
+> +This KSM also serves as the way IE hardware can expose their capabilities to
+> +upper layers. The generic mode of operation is: each device driver that wants
+> +to support IE will construct a KSM and set it up in its struct request_queue.
+> +Upper layers that want to use IE on this device can then use this KSM in
+> +the device’s struct request_queue to translate an encryption context into
+> +a keyslot. The presence of the KSM in the request queue shall be used to mean
+> +that the device supports IE.
+> +
+> +On the device driver end of the interface, the device driver needs to tell the
+> +KSM how to actually manipulate the IE hardware in the device to do things like
+> +programming the crypto key into the IE hardware into a particular keyslot. All
+> +this is achieved through the struct keyslot_mgmt_ll_ops that the device driver
+> +passes to the KSM when creating it.
+> +
+> +It uses refcounts to track which keyslots are idle (either they have no
+> +encryption context programmed, or there are no in flight struct bios
+
+                                                  in-flight
+
+> +referencing that keyslot). When a new encryption context needs a keyslot, it
+> +tries to find a keyslot that has already been programmed with the same
+> +encryption context, and if there is no such keyslot, it evicts the least
+> +recently used idle keyslot and programs the new encryption context into that
+> +one. If no idle keyslots are available, then the caller will sleep until there
+> +is at least one.
+> +
+> +
+> +4. Blk-crypto
+> +=============
+> +
+> +The above is sufficient for simple cases, but does not work if there is a
+> +need for a software fallback, or if we are want to use IE with layered devices.
+> +To these ends, we introduce blk-crypto. Blk-crypto allows us to present a
+> +unified view of encryption to the FS (so FS only needs to specify an
+> +encryption context and not worry about keyslots at all), and blk-crypto can
+> +decide whether to delegate the en/decryption to IE hardware or to software
+> +(i.e. to the kernel crypto API). Blk-crypto maintains an internal KSM that
+> +serves as the software fallback to the kernel crypto API.
+> +
+> +Blk-crypto needs to ensure that the encryption context is programmed into the
+> +"correct" keyslot manager for IE. If a bio is submitted to a layered device
+> +that eventually passes the bio down to a device that really does support IE, we
+> +want the encryption context to be programmed into a keyslot for the KSM of the
+> +device with IE support. However, blk-crypto does not know a priori whether a
+> +particular device is the final device in the layering structure for a bio or
+> +not. So in the case that a particular device does not support IE, since it is
+> +possibly the final destination device for the bio, if the bio requires
+> +encryption (i.e. the bio is doing a write operation), blk-crypto must fallback
+> +to software *before* sending the bio to the device.
+> +
+> +Blk-crypto ensures that
+> +1) The bio’s encryption context is programmed into a keyslot in the KSM of the
+> +request queue that the bio is being submitted to (or the software fallback KSM
+> +if the request queue doesn’t have a KSM), and that the processing_ksm in the
+> +bi_crypt_context is set to this KSM
+> +
+> +2) That the bio has its own individual reference to the keyslot in this KSM.
+> +Once the bio passes through blk-crypto, its encryption context is programmed
+> +in some KSM. The “its own individual reference to the keyslot” ensures that
+> +keyslots can be released by each bio independently of other bios while ensuring
+> +that the bio has a valid reference to the keyslot when, for e.g., the software
+> +fallback KSM in blk-crypto performs crypto for on the device’s behalf. The
+> +individual references are ensured by increasing the refcount for the keyslot in
+> +the processing_ksm when a bio with a programmed encryption context is cloned.
+> +
+> +
+> +4-1. What blk-crypto does on bio submission
+> +-------------------------------------------
+> +
+> +Case 1: blk-crypto is given a bio with only an encryption context that hasn’t
+> +been programmed into any keyslot in any KSM (for e.g. a bio from the FS). In
+> +this case, blk-crypto will program the encryption context into the KSM of the
+> +request queue the bio is being submitted to (and if this KSM does not exist,
+> +then it will program it into blk-crypto’s internal KSM for software fallback).
+> +The KSM that this encryption context was programmed into is stored as the
+> +processing_ksm in the bio’s bi_crypt_context.
+> +
+> +Case 2: blk-crypto is given a bio whose encryption context has already been
+> +programmed into a keyslot in the *software fallback KSM*. In this case,
+> +blk-crypto does nothing; it treats the bio as not having specified an
+> +encryption context. Note that we cannot do what we will do in Case 3 here
+
+                       Note that we cannot do here what we will do in Case 3
+
+> +because we would have already encrypted the bio in software by this point.
+> +
+> +Case 3: blk-crypto is given a bio whose encryption context has already been
+> +programmed into a keyslot in some KSM (that is *not* the software fallback
+> +KSM). In this case, blk-crypto first releases that keyslot from that KSM and
+> +then treats the bio as in Case 1.
+> +
+> +This way, when a device driver is processing a bio, it can be sure that
+> +the bio’s encryption context has been programmed into some KSM (either the
+> +device driver’s request queue’s KSM, or blk-crypto’s software fallback KSM).
+> +It then simply needs to check if the bio’s processing_ksm is the device’s
+> +request queue’s KSM. If so, then it should proceed with IE. If not, it should
+> +simply do nothing with respect to crypto, because some other KSM (perhaps the
+> +blk-crypto software fallback KSM) is handling the en/decryption.
+> +
+> +Blk-crypto will release the keyslot that is being held by the bio (and also
+> +decrypt it if the bio is using the software fallback KSM) once
+> +bio_remaining_done returns true for the bio.
+> +
+> +
+> +5. Layered Devices
+> +==================
+> +
+> +Layered devices that wish to support IE need to create their own keyslot
+> +manager for their request queue, and expose whatever functionality they choose.
+> +When a layered device wants to pass a bio to another layer (either by
+> +resubmitting the same bio, or by submitting a clone), it doesn’t need to do
+> +anything special because the bio (or the clone) will once again pass through
+> +blk-crypto, which will work as described in Case 3. If a layered device wants
+> +for some reason to do the IO by itself instead of passing it on to a child
+> +device, but it also chose to expose IE capabilities by setting up a KSM in its
+> +request queue, it is then responsible for en/decrypting the data itself. In
+> +such cases, the device can choose to call the blk-crypto function
+> +blk_crypto_fallback_to_software (TODO: Not yet implemented), which will
+> +cause the en/decryption to be done via software fallback.
+> +
+> +
+> +6. Future Optimizations for layered devices
+> +===========================================
+> +
+> +Creating a keyslot manager for the layered device uses up memory for each
+> +keyslot, and in general, a layered device (like dm-linear) merely passes the
+> +request on to a “child” device, so the keyslots in the layered device itself
+> +might be completely unused. We can instead define a new type of KSM; the
+> +“passthrough KSM”, that layered devices can use to let blk-crypto know that
+> +this layered device *will* pass the bio to some child device (and hence
+> +through blk-crypto again, at which point blk-crypto can program the encryption
+> +context, instead of programming it into the layered device’s KSM). Again, if
+> +the device “lies” and decides to do the IO itself instead of passing it on to
+> +a child device, it is responsible for doing the en/decryption (and can choose
+> +to call blk_crypto_fallback_to_software). Another use case for the
+> +"passthrough KSM" is for IE devices that want to manage their own keyslots/do
+> +not have a limited number of keyslots.
+
 
 -- 
-Yours sincerely,
-Pavel Begunkov
+~Randy
