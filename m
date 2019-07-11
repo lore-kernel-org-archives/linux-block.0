@@ -2,124 +2,123 @@ Return-Path: <SRS0=DuRR=VI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0C9C74A42
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 07:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47ED1C74A42
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 07:33:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 14D2621670
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 07:27:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 194F821537
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 07:33:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="LIY6xG3B"
+	dkim=pass (2048-bit key) header.d=umn.edu header.i=@umn.edu header.b="B5cgJ620"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728057AbfGKH1Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 03:27:24 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:43381 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725963AbfGKH1X (ORCPT
+        id S1728217AbfGKHdu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 03:33:50 -0400
+Received: from mta-p6.oit.umn.edu ([134.84.196.206]:43040 "EHLO
+        mta-p6.oit.umn.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728193AbfGKHdu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 03:27:23 -0400
-Received: by mail-io1-f65.google.com with SMTP id k20so10352683ios.10
-        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 00:27:23 -0700 (PDT)
+        Thu, 11 Jul 2019 03:33:50 -0400
+X-Greylist: delayed 383 seconds by postgrey-1.27 at vger.kernel.org; Thu, 11 Jul 2019 03:33:49 EDT
+Received: from localhost (unknown [127.0.0.1])
+        by mta-p6.oit.umn.edu (Postfix) with ESMTP id 0176FBAC
+        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 07:27:26 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at umn.edu
+Received: from mta-p6.oit.umn.edu ([127.0.0.1])
+        by localhost (mta-p6.oit.umn.edu [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id Yx4EVCbR9rX2 for <linux-block@vger.kernel.org>;
+        Thu, 11 Jul 2019 02:27:25 -0500 (CDT)
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+        (using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mta-p6.oit.umn.edu (Postfix) with ESMTPS id CA8227B5
+        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 02:27:25 -0500 (CDT)
+Received: by mail-io1-f71.google.com with SMTP id s83so5803893iod.13
+        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 00:27:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=p5UDD2PQr8A+4fkF74jRpQjrDOTSh0xYZIA6dZ/Htjw=;
-        b=LIY6xG3BDrWKAzQfPkWVRL4sqiSwKj8n1WnjhzZ9UggwxDvZ7D5bXXBnwM3oiZbDFP
-         EZIejnyXLp+gnnZSNUY4pb1sz6Lhekpnec9VrsvTvwCHaIlJeTKPB1V4nzOcbFx3Ip5g
-         taEnuWMVV+FejKgzVRcZQZ+sMb4X2aDcEfams0VFEfadP8sZ11+f7bMP3NHNc27I2RTb
-         0QxorSLgyoAmO/IgOfsZBNYDMq+8ttbTzJc9ycdJB21rycBS0c7WEfkRacMeZV2ThCV8
-         Maic0mwqjs6TeIQFGw5wEndmpXdpJo6fkkVpO1rBDrn/MTxh45OlJ8APM4jninCGu6SG
-         f/7A==
+        d=umn.edu; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=X6Z4l/JCt0vrAzTI2h9ZAgt6VJx8sy/c7Jhl6qpnxtE=;
+        b=B5cgJ620d3ZMpNa1G6S58M+oUNja9lxJD/3DbqQQ93KJ3PcWiMcxlTG/amKvq3j2Gp
+         pRiE1AmRc1JY8Sjx8DCP5bM/9XpaeHEGWPxHk7PvLqdHZk3+imC4zK0kCBPofu2LfFDe
+         PoYANvx2C2YDJKnkW3Z7e+OYbxsvOFy9fvf13eqIwF4jDepHNoGR26LtkC+UPVwCl9YU
+         gCL3pzHzExUWWSGYbBgUL6EnNFOad7g+KiOA4rYVK7m9inz8KLIwzG9E8x7V3NLyrrrv
+         NMNb7wFw5QgMx1cafyxNzCOcn9LfBdAMiVYSKNK7PbQOULlKxcTqIoFq3FYebPKshazh
+         oCwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=p5UDD2PQr8A+4fkF74jRpQjrDOTSh0xYZIA6dZ/Htjw=;
-        b=jDRIbutgPpCLRug2jhujo8XAFV+6awmAyvHynfxGzsgXh5Bw+ScyIITZdYoiWcvpZc
-         0h0Kg82L11pw+zfotDwV5qM8QyKaZJm88l+ZW6xg6HKaMgx7iRO5ttaS7SAM9NzWmC2S
-         MPVuZarWjb6c0ysGBTmJ8kFQ5owwgod09dRRh3C66SZ1qIendZAQjUsb5UzzU7HYYNqO
-         51PKgVJvjnZ0PDCzzcPLeInpYZ29B/iEDV4VOCiXAW3CntZfTre5PSyWudZYKrX0VMKH
-         D52MTJ8fzbQMOp9UzJn2LAG0T1fwHDlDtZg97wTNEZ6un92BbcBcIb4M7VwdRS6sFv1z
-         vPWw==
-X-Gm-Message-State: APjAAAUgTq/ZZ8W03+qcUP1/QUO5wXTe9G4C1Vk5hPt12YYVS0zhIEMy
-        GxT4F4kZAr7X+P0YFg0hd8uriVOKL12lsgoVBzU9
-X-Google-Smtp-Source: APXvYqzP/GEHKRGAFz3PmilWWiv14j8G7gP975ds+zKIubBHvlXkC/uFiFlTKauhqCCNbkssheN5c1gR/lm0DQFWEJc=
-X-Received: by 2002:a05:6638:81:: with SMTP id v1mr2792250jao.72.1562830043055;
- Thu, 11 Jul 2019 00:27:23 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
- <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me> <20190710135519.GA4051@ziepe.ca>
- <c49bf227-5274-9d13-deba-a405c75d1358@grimberg.me> <20190710172505.GD4051@ziepe.ca>
- <930e0bc6-8c5c-97b5-c500-0bd1706b32c1@grimberg.me>
-In-Reply-To: <930e0bc6-8c5c-97b5-c500-0bd1706b32c1@grimberg.me>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Thu, 11 Jul 2019 09:27:11 +0200
-Message-ID: <CAHg0HuxmYV3=L9ifjiOW3c+Zv-+neHMozxCk8_rovdohV=Q-Bg@mail.gmail.com>
-Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
- Device (IBNBD)
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Jack Wang <jinpuwang@gmail.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        axboe@kernel.dk, Christoph Hellwig <hch@infradead.org>,
-        bvanassche@acm.org, dledford@redhat.com,
-        Roman Pen <r.peniaev@gmail.com>, gregkh@linuxfoundation.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=X6Z4l/JCt0vrAzTI2h9ZAgt6VJx8sy/c7Jhl6qpnxtE=;
+        b=Fa0bcowCNA37KyfNfubE0U5f4LzoQHy2E9nKx+nIiDe/37nPH5RD1sY2In4+9OYfMv
+         Fr6ZSyH8+MgP5vuAm3IrQvb6GDd3Y+MEV+uVs0RIM3+cEK124xfgzEwdzvUhHREwq2UD
+         xpwim0UhZDAIvsl/zKKd9D9UngshGj3P7kF5BoqLn7PT4e+g9Q+PFnc8Ixf7LUYaafct
+         aawc5U8kRjJQ4jpqH/IowY8YKm94JE0RsiGCDOvPeJaEAoGlZDYJ2ukJ7yjfqYvQjA1x
+         sB07q+JPLEI9eC6d6L9QLGO9J7R5CrVqGVj0mCfVByPtJWL/AWrZKfAsw4shUb4pI5j6
+         gLEA==
+X-Gm-Message-State: APjAAAVtKs5OyS9YJoKC67SnknisR8XZQoW8nNi6J63wXHWZ/eDm+4jY
+        mdpimO3LB8huO7d4QIn7Mj85Q/nrdBBmK9gH+jHQUqoH5IrsCLzQok6gFgcSNW43ajfSf19g4eO
+        ENY0K8hpyKuRG8R+8bXEvBIcOsJw=
+X-Received: by 2002:a5d:8253:: with SMTP id n19mr2771289ioo.80.1562830045520;
+        Thu, 11 Jul 2019 00:27:25 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwykBuhMY0MflryJAdOCZjSU5Q8jTPnO1WMGnm3QHHt+0CnduoPwCZxjmV6fOsHBxPhCV2Z2A==
+X-Received: by 2002:a5d:8253:: with SMTP id n19mr2771269ioo.80.1562830045327;
+        Thu, 11 Jul 2019 00:27:25 -0700 (PDT)
+Received: from cs-u-cslp16.dtc.umn.edu (cs-u-cslp16.cs.umn.edu. [128.101.106.40])
+        by smtp.gmail.com with ESMTPSA id i23sm3303359ioj.24.2019.07.11.00.27.23
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Thu, 11 Jul 2019 00:27:24 -0700 (PDT)
+From:   Wenwen Wang <wang6495@umn.edu>
+To:     Wenwen Wang <wenwen@cs.uga.edu>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] block/bio-integrity: fix a memory leak bug
+Date:   Thu, 11 Jul 2019 02:27:12 -0500
+Message-Id: <1562830033-24239-1-git-send-email-wang6495@umn.edu>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Sagi,
+From: Wenwen Wang <wenwen@cs.uga.edu>
 
-thanks a lot for the analysis. I didn't know about about the
-inline_data_size parameter in nvmet. It is at PAGE_SIZE on our
-systems.
-Will rerun our benchmarks with
-echo 2097152 > /sys/kernel/config/nvmet/ports/1/param_inline_data_size
-echo 2097152 > /sys/kernel/config/nvmet/ports/2/param_inline_data_size
-before enabling the port.
-Best
-Danil.
+In bio_integrity_prep(), a kernel buffer is allocated through kmalloc() to
+hold integrity metadata. Later on, the buffer will be attached to the bio
+structure through bio_integrity_add_page(), which returns the number of
+bytes of integrity metadata attached. Due to unexpected situations,
+bio_integrity_add_page() may return 0. As a result, bio_integrity_prep()
+needs to be terminated with 'false' returned to indicate this error.
+However, the allocated kernel buffer is not freed on this execution path,
+leading to a memory leak.
 
-On Wed, Jul 10, 2019 at 9:11 PM Sagi Grimberg <sagi@grimberg.me> wrote:
->
->
-> >> I still do not understand why this should give any notice-able
-> >> performance advantage.
-> >
-> > Usually omitting invalidations gives a healthy bump.
-> >
-> > Also, RDMA WRITE is generally faster than READ at the HW level in
-> > various ways.
->
-> Yes, but this should be essentially identical to running nvme-rdma
-> with 512KB of immediate-data (the nvme term is in-capsule data).
->
-> In the upstream nvme target we have inline_data_size port attribute
-> that is tunable for that (defaults to PAGE_SIZE).
+To fix this issue, free the allocated buffer before returning from
+bio_integrity_prep().
 
+Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+---
+ block/bio-integrity.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 4db6208..bfae10c 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -276,8 +276,10 @@ bool bio_integrity_prep(struct bio *bio)
+ 		ret = bio_integrity_add_page(bio, virt_to_page(buf),
+ 					     bytes, offset);
+ 
+-		if (ret == 0)
++		if (ret == 0) {
++			kfree(buf);
+ 			return false;
++		}
+ 
+ 		if (ret < bytes)
+ 			break;
 -- 
-Danil Kipnis
-Linux Kernel Developer
+2.7.4
 
-1&1 IONOS Cloud GmbH | Greifswalder Str. 207 | 10405 Berlin | Germany
-E-mail: danil.kipnis@cloud.ionos.com | Web: www.ionos.de
-
-
-Head Office: Berlin, Germany
-District Court Berlin Charlottenburg, Registration number: HRB 125506 B
-Executive Management: Christoph Steffens, Matthias Steinberg, Achim Weiss
-
-Member of United Internet
-
-This e-mail may contain confidential and/or privileged information. If
-you are not the intended recipient of this e-mail, you are hereby
-notified that saving, distribution or use of the content of this
-e-mail in any way is prohibited. If you have received this e-mail in
-error, please notify the sender and delete the e-mail.
