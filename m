@@ -2,69 +2,69 @@ Return-Path: <SRS0=DuRR=VI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E9CC73C66
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 17:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8448C71142
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 17:54:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A54720645
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 17:53:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B5EC20872
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 17:54:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="blsfSutx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JLOzwGCf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728458AbfGKRx4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 13:53:56 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:53237 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728355AbfGKRxz (ORCPT
+        id S1728757AbfGKRyF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 13:54:05 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:2232 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728355AbfGKRyF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 13:53:55 -0400
+        Thu, 11 Jul 2019 13:54:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562867712; x=1594403712;
+  t=1562867645; x=1594403645;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=gWfetoeiKPzHdzvdliRZb0O5EwrxdvdVo+6ayJ+HVq4=;
-  b=blsfSutxdaudBptF8+DOs7an4+yK4cZZBmjJFkWIZoAP4CtBXpUFdoDv
-   I0oKq9BQ2oYBmMI2y2tkdXqyeJoGWkwei5lbPP4bp8qoHgmoYjrTu5axO
-   iy0uJhPJCXIV1SQB5l4glEL/2EE78QzPilU9O8qjXOceg2n+CGw0wIvm6
-   TUf7UZLVEe6bKisUulbyTJGU0YdkxozZKEHJQPdhNqs9ScS2RZ1ItKxab
-   N0MZWdyUAkylVO1um0sC6hoszOgx74aUcnKm4I6FXwMFJMIYOT0vJDR9c
-   4MVd4m6CRLASEam3C4mrDKV9/UkVqBKZGdjkzHS+ucaDbcHvh5APUS7bX
-   Q==;
-IronPort-SDR: 8xNu9M0XGHeOlUdHcJdlBKl8YOWZ4d0SddHGp5wzlNPaP+XZV67AGdgxwxzweRyPHPHYe8q5yS
- 1P72mHdEzmrUT57+HIi6dF+IgJ7ppqko7RPu+cJmtml8VzqJ5Pdpk0Tfu1qfEv3VZppXu3YctD
- /RhFdeSyYKbggOLILFgXUUK8gP8ghhK7GCuSTZp4e0P4xnXl97xZl4LqBJuo7uD0zP84u9m/z0
- eEbqQ6D78aIeAzH/lQT/rY0vbSFuqHKx7B+UAcvViA8E1LO/Tkn5VTMsj64kYHeTA3uEJa+ben
- dXI=
+  bh=rc5d1BORUsGfUd0z/ZS6DHDg5KgvcI3LpvPn05LYeEM=;
+  b=JLOzwGCfsJB3sPBO7o5p8eWs4E40sBAe3nJQp4pJnEbx3pkExb99cmaI
+   XyW9bqFkB9GkkGYuAP0R2IncC13wWu5sd7+OgLuOF/A9Awcu5FsDKjstK
+   Q7LX+WDmokMble3E47vWx0h+o01M7KOaBXLUUfpLXUEXQhgqImEYeQlrK
+   3MHrBi4kFjxOf6OmA8JhDWZFY35GW4pEaP+eDjpHC/nHB7I//jVUDk/ue
+   CwTu2W9Qgnh2H2lAcIuWylNUvxCAsnD99PGJF4stxsUy/F8+XFA5VgX6C
+   n8SI+to8CAqXzmakI/WigZw7IayNGsEdwDF3RDKtDntzfIvDKLzoB9Sm7
+   g==;
+IronPort-SDR: SZaT0qaq8sLtl2n3IK8oojmfNiJMzLvxV3W1Ph6ZCHBcrHjT8THpLmazcFsEqwwWZncynPMQmQ
+ WIv9Zn9Nwcb4tEs/KuoxLCzytX7yIdZlG6Vcj2eHV/JDYVPMBjSCWRjCxoUv4SzNh5Jk1WTeBr
+ e/Vz82ra8R52KsaR8B2CZ5380pKt2W2thBUxKfbSmLEZ5ifszot7+zbhCdZXkRoQVzSicRbDt6
+ 2x4Zr2dXlmf+8Q7GKp2sqE+G9JSsS8SMj75JE2kZR+GLkd2budL35xf7Srt3Y+2/2WK8eMnaae
+ pXg=
 X-IronPort-AV: E=Sophos;i="5.63,479,1557158400"; 
-   d="scan'208";a="212743405"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Jul 2019 01:55:12 +0800
-IronPort-SDR: agCcj3Wu1ZwEJHZiA/yD6KCrNvbx5L1LrJI7E4AXKT8l08Sv7eiTAXanSvCZvGi4UlMSBhfDlq
- OwtceuYzlTgCzBqmlIbSZyQ7irH9DWU3Pq+gjgbLDvJM1gO2o98TTWnvKd49FwgnDM2vx30PIK
- G57m9zswo6LwY8Kc223h3qajZ3AG1ztL8yXurMYB1XM2JVh6fK0wRtYsAao/iVr9HEx0fdK2Rm
- cUpMnI3t6dpyhcqwPJhwqsK2RnPHY5QhC6jd+ZkFGLpXFwHeECJhWvgTSCSL6iS3d9hH8u5Yb5
- yUtdstfdElwH5D9xqsYqLiNK
+   d="scan'208";a="112812805"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Jul 2019 01:54:04 +0800
+IronPort-SDR: 4VmuJ3YCcwVmJZ8wezX/9UebYvHE9vOM+EXiC4jJihLoYQR82jh52NFDpYU7uebuZK9lSw1EpF
+ T+Ho/6jAClpSwjc8KG06bgvCRhNKbzvPi+DTXd/0T8D0Gi5iCxYkJ/iTUcqI4VXRFMQ01MrTb6
+ d3Va9Kr/9f1K6K/TDz/E0Pz4hlN+9sBtWpG9iF7fMTi4/ZDOup6jvVy5hP0UD0yO6UC4nncm/q
+ 4ySxyf4dDt/NDBT74fkTTCStb9bnrUt/ETkxsVUQAjwDOAZcleZsSvgBWc+xl58+m1kWb+E6q9
+ VNmv+qk3TNTGXqOmyzQL9V4f
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 11 Jul 2019 10:52:32 -0700
-IronPort-SDR: UPnRcSkmbyKysCRsHnaGx6AiVRdnEmpTunped8mvb7gl93NOXyj78HwCLfipHsX8rpuPIUvLIl
- 18e4WOq4KALXdJkENtsyoaB3DBf4JVHAFheE9S2asSPUyDOnBYc2+JVaOrx9G+fwrzUdV2Id7i
- gI+cVXXn3xvSuXt/5JDX+vq/f59SICySnmnc6+bAyjlqo29KbXO0m7KdIo4ZLrwypwqdWeIUUU
- dIiVhlK/EHbzWX+ndcvKMUg4DjL9Od18k5SKDUDNHHhwGHmv3cKYBTnS+0y/PBnA3JrzZaG0wD
- mOA=
+  by uls-op-cesaep02.wdc.com with ESMTP; 11 Jul 2019 10:52:41 -0700
+IronPort-SDR: 2mMyEIP42R8+9Ba9gJMRduVZWrGnRHYfzzwgFNSrSdnNySgR4bIeVVNAo1Bkczi8lm/epFHa15
+ 8q+LpnKyCVfmJHHErrk5Ist6bDh2Zy+/u3KkrMQ/cp3howCzLPnAMrqf2jIVTFZRESW2IRb9RD
+ lPJRxFo/Yq+w57DynMASFLjdTGe6FhUcRSet4kiLPg2rOw2zA9NyYbGfxnDME6lFHmvnp5RXVs
+ 4IatW8z6k5HQZB/qsKJJXN3GXMunD6Pkh8whTW2XrNhxjt1rXAghNMbe8q/Yb9iHXUqIzMlsd7
+ lNY=
 Received: from cvenusqemu.hgst.com ([10.202.66.73])
-  by uls-op-cesaip02.wdc.com with ESMTP; 11 Jul 2019 10:53:55 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 11 Jul 2019 10:54:04 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@lst.de,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 2/8] null_blk: add REQ_OP_WRITE_ZEROES config property
-Date:   Thu, 11 Jul 2019 10:53:22 -0700
-Message-Id: <20190711175328.16430-3-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 3/8] null_blk: add support for write-zeroes
+Date:   Thu, 11 Jul 2019 10:53:23 -0700
+Message-Id: <20190711175328.16430-4-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.17.0
 In-Reply-To: <20190711175328.16430-1-chaitanya.kulkarni@wdc.com>
 References: <20190711175328.16430-1-chaitanya.kulkarni@wdc.com>
@@ -73,29 +73,62 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a preparation patch for implementing the support for the
-write-zeroes operations for null_blk. We introduce a new bool flag
-write-zeroes for nullb_device structure so that user can either set
-this value through configfs when null_blk is memory backed or use
-module parameter. Following two patches are implementing respective
-support for REQ_OP_WRITE_ZEROES.
+This patch adds support to execute REQ_OP_WRITE_ZEROES operations on
+the null_blk device when device is not memory-backed. Just like
+REQ_OP_DISCARD we add a new module parameter to enable this support.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- drivers/block/null_blk.h | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/block/null_blk_main.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
-index 34b22d6523ba..ecd1e45f6eb9 100644
---- a/drivers/block/null_blk.h
-+++ b/drivers/block/null_blk.h
-@@ -63,6 +63,7 @@ struct nullb_device {
- 	bool power; /* power on/off the device */
- 	bool memory_backed; /* if data is stored in memory */
- 	bool discard; /* if support discard */
-+	bool write_zeroes; /* if support write_zeroes */
- 	bool zoned; /* if device is zoned */
- };
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 20d60b951622..65da7c2d93b9 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -198,6 +198,10 @@ static bool g_discard;
+ module_param_named(discard, g_discard, bool, 0444);
+ MODULE_PARM_DESC(discard, "Allow REQ_OP_DISCARD processing. Default: false");
+ 
++static bool g_write_zeroes;
++module_param_named(write_zeroes, g_write_zeroes, bool, 0444);
++MODULE_PARM_DESC(write_zeroes, "Allow REQ_OP_WRITE_ZEROES processing. Default: false");
++
+ static struct nullb_device *null_alloc_dev(void);
+ static void null_free_dev(struct nullb_device *dev);
+ static void null_del_dev(struct nullb *nullb);
+@@ -535,7 +539,10 @@ static struct nullb_device *null_alloc_dev(void)
+ 	dev->zone_size = g_zone_size;
+ 	dev->zone_nr_conv = g_zone_nr_conv;
+ 	dev->discard = g_discard;
++	dev->write_zeroes = g_write_zeroes;
+ 	pr_info("discard : %s\n", dev->discard ? "TRUE" : "FALSE");
++	pr_info("write-zeroes : %s\n", dev->write_zeroes ? "TRUE" : "FALSE");
++
+ 	return dev;
+ }
+ 
+@@ -1419,6 +1426,13 @@ static void null_config_discard(struct nullb *nullb)
+ 	blk_queue_flag_set(QUEUE_FLAG_DISCARD, nullb->q);
+ }
+ 
++static void null_config_write_zeroes(struct nullb *nullb)
++{
++	if (nullb->dev->write_zeroes == false)
++		return;
++	blk_queue_max_write_zeroes_sectors(nullb->q, UINT_MAX >> SECTOR_SHIFT);
++}
++
+ static int null_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	return 0;
+@@ -1710,6 +1724,7 @@ static int null_add_dev(struct nullb_device *dev)
+ 	blk_queue_physical_block_size(nullb->q, dev->blocksize);
+ 
+ 	null_config_discard(nullb);
++	null_config_write_zeroes(nullb);
+ 
+ 	sprintf(nullb->disk_name, "nullb%d", nullb->index);
  
 -- 
 2.17.0
