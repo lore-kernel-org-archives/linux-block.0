@@ -2,163 +2,163 @@ Return-Path: <SRS0=GKUn=VJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB58C742A8
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 08:05:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05379C742A8
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 08:26:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F215E2084B
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 08:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D23D521019
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 08:26:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BAFql+Ha"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726112AbfGLIFh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Jul 2019 04:05:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41556 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726057AbfGLIFh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Jul 2019 04:05:37 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6AB4859441;
-        Fri, 12 Jul 2019 08:05:36 +0000 (UTC)
-Received: from dhcp-27-174.brq.redhat.com (unknown [10.43.17.136])
-        by smtp.corp.redhat.com (Postfix) with SMTP id F00D55D9C5;
-        Fri, 12 Jul 2019 08:05:34 +0000 (UTC)
-Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
-        oleg@redhat.com; Fri, 12 Jul 2019 10:05:36 +0200 (CEST)
-Date:   Fri, 12 Jul 2019 10:05:34 +0200
-From:   Oleg Nesterov <oleg@redhat.com>
-To:     Josef Bacik <josef@toxicpanda.com>
-Cc:     Jens Axboe <axboe@fb.com>, Peter Zijlstra <peterz@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Kernel Team <Kernel-team@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH 1/2] wait: add wq_has_multiple_sleepers helper
-Message-ID: <20190712080533.GA21989@redhat.com>
-References: <20190710195227.92322-1-josef@toxicpanda.com>
- <bbe73e4e-9270-46ac-16d7-39a40485fe53@kernel.dk>
- <20190710203516.GL3419@hirez.programming.kicks-ass.net>
- <752dbdc9-945d-e70c-e6f3-0c48932c7f60@fb.com>
- <20190711114543.GA14901@redhat.com>
- <20190711134006.GA19160@redhat.com>
- <20190711192110.aqpin7pr6jwmydsr@macbook-pro-91.dhcp.thefacebook.com>
+        id S1726418AbfGLIZ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Jul 2019 04:25:59 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:36628 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725877AbfGLIZ7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Jul 2019 04:25:59 -0400
+Received: by mail-pf1-f193.google.com with SMTP id r7so3994293pfl.3
+        for <linux-block@vger.kernel.org>; Fri, 12 Jul 2019 01:25:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/RTxoumVNtB1PBld0antS4Z7J0pCK7ZhiGq0s+u+T8Q=;
+        b=BAFql+HaVxohUfVl9mYP/S5YzuA9cwdMGK2nCDIC66akftcSMq/vzOqHPsPfc6/6QO
+         3jbIxFLWL9RGB511maoma3UoAL51vux8VnJePTL/VCgMZPr6RxN5Bw1+YMc/2Gt+m8we
+         3O5VAqNXBto7Ij4ZOE6HDlreMkSzh4Wj+AQqk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/RTxoumVNtB1PBld0antS4Z7J0pCK7ZhiGq0s+u+T8Q=;
+        b=DMqZyEBb08PmAtbg5E5r/I9UNxXuoXZBozQJlTNGzmgXoPmOYqw5Rpti3DkNc1KuuL
+         7NnbFQCjK33YmVezhvVoAnax4HWzrLGIznOebQ5WUPxk2qubkzPemafjERS4geG63oEZ
+         LGaickBZYxpA6HywRwClVd8gZmpo0yeDKj1kUoABnIamghlO2Jnun6J9c5K2Ya9hrNuY
+         9QTx+A2GszITnQylDkPCmeZDRjSVBK9PAbjbk6pmipCuhIcyQjOYv+hJJGZyS3ebKcJ4
+         wb54mSTQNvV057N+XAE2mTftXu9gg/UVlsIqpFBT82rzPRlvO8AAwa6IP/qRcsrg0MK0
+         K3HA==
+X-Gm-Message-State: APjAAAU7DgBRdqCOUsl09RectLotlfX8/BTvSRl2N0tME4RsEqt7gVyt
+        oTpMwqj6DHT4/o89nU8Yx+nh3TtYZrpqwlWviH2HTg==
+X-Google-Smtp-Source: APXvYqwAnknqjQvGUnrEC5ubqLeQGMCESFeladMIiOfwXF9UrCGRG+5+L2hqDm0nBHA51jOduboUlYnwqXtHNbzKgbU=
+X-Received: by 2002:a17:90a:ac14:: with SMTP id o20mr10306970pjq.114.1562919958370;
+ Fri, 12 Jul 2019 01:25:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190711192110.aqpin7pr6jwmydsr@macbook-pro-91.dhcp.thefacebook.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Fri, 12 Jul 2019 08:05:36 +0000 (UTC)
+References: <CGME20190621063708epcms2p309f4173afabe5de28942ba15d13987f7@epcms2p3>
+ <20190621063708epcms2p309f4173afabe5de28942ba15d13987f7@epcms2p3>
+In-Reply-To: <20190621063708epcms2p309f4173afabe5de28942ba15d13987f7@epcms2p3>
+From:   Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+Date:   Fri, 12 Jul 2019 13:55:47 +0530
+Message-ID: <CAK=zhgr_T8vA=BCdFCT37RxGCgS3xr8Wp9MEMK_9nZ=oYHy=7Q@mail.gmail.com>
+Subject: Re: [RESEND RFC PATCH] mpt3sas: support target smid for [abort|query] task
+To:     minwoo.im@samsung.com
+Cc:     "sathya.prakash@broadcom.com" <sathya.prakash@broadcom.com>,
+        "suganath-prabu.subramani@broadcom.com" 
+        <suganath-prabu.subramani@broadcom.com>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "MPT-FusionLinux.pdl@broadcom.com" <MPT-FusionLinux.pdl@broadcom.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Euihyeok Kwon <eh81.kwon@samsung.com>,
+        Sarah Cho <sohyeon.jo@samsung.com>,
+        Sanggwan Lee <sanggwan.lee@samsung.com>,
+        Gyeongmin Nam <gm.nam@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 07/11, Josef Bacik wrote:
+On Fri, Jun 21, 2019 at 12:07 PM Minwoo Im <minwoo.im@samsung.com> wrote:
 >
-> On Thu, Jul 11, 2019 at 03:40:06PM +0200, Oleg Nesterov wrote:
-> > rq_qos_wait() inside the main loop does
-> >
-> > 		if (!has_sleeper && acquire_inflight_cb(rqw, private_data)) {
-> > 			finish_wait(&rqw->wait, &data.wq);
-> >
-> > 			/*
-> > 			 * We raced with wbt_wake_function() getting a token,
-> > 			 * which means we now have two. Put our local token
-> > 			 * and wake anyone else potentially waiting for one.
-> > 			 */
-> > 			if (data.got_token)
-> > 				cleanup_cb(rqw, private_data);
-> > 			break;
-> > 		}
-> >
-> > finish_wait() + "if (data.got_token)" can race with rq_qos_wake_function()
-> > which does
-> >
-> > 	data->got_token = true;
-> > 	list_del_init(&curr->entry);
-> >
+> We can request task management IOCTL command(MPI2_FUNCTION_SCSI_TASK_MGMT)
+> to /dev/mpt3ctl.  If the given task_type is either abort task or query
+> task, it may need a field named "Initiator Port Transfer Tag to Manage"
+> in the IU.
 >
-> Argh finish_wait() does __set_current_state, well that's shitty.
-
-Hmm. I think this is irrelevant,
-
-> data->got_token = true;
-> smp_wmb()
-> list_del_init(&curr->entry);
+> Current code does not support to check target IPTT tag from the
+> tm_request.  This patch introduces to check TaskMID given from the
+> userspace as a target tag.  We have a rule of relationship between
+> (struct request *req->tag) and smid in mpt3sas_base.c:
 >
-> and then do
+> 3318 u16
+> 3319 mpt3sas_base_get_smid_scsiio(struct MPT3SAS_ADAPTER *ioc, u8 cb_idx,
+> 3320         struct scsi_cmnd *scmd)
+> 3321 {
+> 3322         struct scsiio_tracker *request = scsi_cmd_priv(scmd);
+> 3323         unsigned int tag = scmd->request->tag;
+> 3324         u16 smid;
+> 3325
+> 3326         smid = tag + 1;
 >
-> smp_rmb();
-> if (data.got_token)
-> 	cleanup_cb(rqw, private_data);
-
-Yes, this should work,
-
-> > and I don't really understand
-> >
-> > 	has_sleeper = false;
-> >
-> > at the end of the main loop. I think it should do "has_sleeper = true",
-> > we need to execute the code above only once, right after prepare_to_wait().
-> > But this is harmless.
+> So if we want to abort a request tagged #X, then we can pass (X + 1) to
+> this IOCTL handler.
 >
-> We want has_sleeper = false because the second time around we just want to grab
-> the inflight counter.
+> Cc: Sathya Prakash <sathya.prakash@broadcom.com>
+> Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
+> Cc: James E.J. Bottomley <jejb@linux.ibm.com>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: MPT-FusionLinux.pdl@broadcom.com
+> Signed-off-by: Minwoo Im <minwoo.im@samsung.com>
+> ---
+>  drivers/scsi/mpt3sas/mpt3sas_ctl.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/scsi/mpt3sas/mpt3sas_ctl.c b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
+> index b2bb47c14d35..5c7539dae713 100644
+> --- a/drivers/scsi/mpt3sas/mpt3sas_ctl.c
+> +++ b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
+> @@ -596,15 +596,17 @@ _ctl_set_task_mid(struct MPT3SAS_ADAPTER *ioc, struct mpt3_ioctl_command *karg,
+>                 if (priv_data->sas_target->handle != handle)
+>                         continue;
+>                 st = scsi_cmd_priv(scmd);
+> -               tm_request->TaskMID = cpu_to_le16(st->smid);
+> -               found = 1;
+> +               if (tm_request->TaskMID == st->smid) {
 
-I don't think so.
+I think it will difficult for the user to find the smid that he want
+to abort. For this user has to enable the scsi logging level and get
+the tag and pass the ioctl with tag +1 value in TaskMID field. And
+hence currently driver will loop over all the smid's and if it fines
+any outstanding smid then it will issue task abort or task query TM
+for this outstanding smid to the HBA firmware.
 
-> Yes we should have been worken up by our special thing
-> and so should already have data.got_token,
+May be we can do like below,
+* First check whether user provided "TaskMID" is non zero or not. if
+user provided TaskMID is non-zero and if this TaskMID is outstanding
+then driver will issue TaskAbort/QueryTask TM with this TaskMID value
+else driver will loop over all the smid's and if finds any smid is
+outstanding then it will issue TaskAbort/QueryTask TM with TaskMID
+value set to outstanding smid.
 
-Yes. Again, unless wakeup was spurious and this needs another trivial fix.
+With the above logic still legacy application will be supported
+without breaking anything where they provide TaskMID filed as zero.
+And it also allows the user to abort the IO which he wants.
 
-If we can't rely on this then this code is simply broken?
+Thanks,
+Sreekanth
 
-> but that sort of thinking ends in
-> hung boxes and me having to try to mitigate thousands of boxes suddenly hitting
-> a case we didn't think was possible.  Thanks,
-
-I can't understand this logic, but I can't argue. However, in this case I'd
-suggest the patch below instead of this series.
-
-If rq_qos_wait() does the unnecessary acquire_inflight_cb() because it can
-hit a case we didn't think was possible, then why can't it do on the first
-iteration for the same reason? This should equally fix the problem and
-simplify the code.
-
-In case it is not clear: no, I don't like it. Just I can't understand your
-logic.
-
-And btw... again, I won't argue, but wq_has_multiple_sleepers is badly named,
-and the comments are simply wrong. It can return T if wq has no sleepers, iow
-if list_empty(wq_head->head). 2/2 actualy uses !wq_has_multiple_sleepers(),
-this turns the condition back into list_is_singular(), but to me this alll
-looks very confusing.
-
-Plus I too do not understand smp_mb() in this helper.
-
-Oleg.
-
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -247,7 +247,7 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
- 	do {
- 		if (data.got_token)
- 			break;
--		if (!has_sleeper && acquire_inflight_cb(rqw, private_data)) {
-+		if (acquire_inflight_cb(rqw, private_data)) {
- 			finish_wait(&rqw->wait, &data.wq);
- 
- 			/*
-@@ -260,7 +260,6 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
- 			break;
- 		}
- 		io_schedule();
--		has_sleeper = false;
- 	} while (1);
- 	finish_wait(&rqw->wait, &data.wq);
- }
-
+> +                       tm_request->TaskMID = cpu_to_le16(st->smid);
+> +                       found = 1;
+> +               }
+>         }
+>
+>         if (!found) {
+>                 dctlprintk(ioc,
+> -                          ioc_info(ioc, "%s: handle(0x%04x), lun(%d), no active mid!!\n",
+> +                          ioc_info(ioc, "%s: handle(0x%04x), lun(%d), no matched mid(%d)!!\n",
+>                                     desc, le16_to_cpu(tm_request->DevHandle),
+> -                                   lun));
+> +                                   lun, tm_request->TaskMID));
+>                 tm_reply = ioc->ctl_cmds.reply;
+>                 tm_reply->DevHandle = tm_request->DevHandle;
+>                 tm_reply->Function = MPI2_FUNCTION_SCSI_TASK_MGMT;
+> --
+> 2.16.1
