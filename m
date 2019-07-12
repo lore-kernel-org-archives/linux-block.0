@@ -2,125 +2,255 @@ Return-Path: <SRS0=GKUn=VJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AB63C742AE
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 09:03:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A99BC742B2
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 10:58:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 23E9920645
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 09:03:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1482C2166E
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 10:58:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z07apoYj"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Tm3aqK4A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725993AbfGLJDz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Jul 2019 05:03:55 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:33255 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725987AbfGLJDz (ORCPT
+        id S1726198AbfGLK6p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Jul 2019 06:58:45 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:38008 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726140AbfGLK6p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Jul 2019 05:03:55 -0400
-Received: by mail-pl1-f193.google.com with SMTP id c14so4462109plo.0;
-        Fri, 12 Jul 2019 02:03:54 -0700 (PDT)
+        Fri, 12 Jul 2019 06:58:45 -0400
+Received: by mail-io1-f68.google.com with SMTP id j6so19399405ioa.5
+        for <linux-block@vger.kernel.org>; Fri, 12 Jul 2019 03:58:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=i93erGQBEdGUvhjnj900r6ImbBuHJewNb/EPkRjgFew=;
-        b=Z07apoYj4RIC+0LNfxgd6x0FLOITlM4REZEHTQ3WMwMzpqrAF53njy07hpNn3Ijm58
-         d/mzdc+qqSsp9G+WoR9XqJOptmNHHRUkvzm6S2YNE9k9Ulm4UvvmK+/kgXkEF2xRDawO
-         p1S+JYa1HPNS00sY0DVPDBDep9dCVfm1pUlJz1BJNlLBp7rvK4pcQpc899o4irEYeILz
-         EAb6qcJh23GPGjsxVmsBzQyQMui+qxfmyitaEYdN/adGMTNVFJaNVCtZaPAJi7AzQf5L
-         S9nx6WNwKJcKrYvWU3BtOnQFRsdaK729Q42R9OAhqhRQAet/AWeSC4CGAnaUjokNS4KY
-         i6Wg==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1+3fd2zHMOyIWuoG2jZcMi83f1rKIExq3w7kl21HtFk=;
+        b=Tm3aqK4AmkWF0z8BGjr2tOkqkxqYW1NY6Jra/clVlDv4cVEmd8wig2JB7H+jCBl+x1
+         BGgLaGmY2XbFi+5B+lcnsOC7xCBNFhDC325wtXNtAzt6MMegV3DoX+a6DdJYbTMV2r1b
+         E0ceVK4ljCXOtuhxC3eBnWgq6uGSKF31Y6IGHhosw3V8qqSZIJRW4LGC3QFC9n4kOBjE
+         JUQnrlKb8eFgpgGE4WDLMU2B12FnoVatyPzCiNwFIiobOZVDxwp7RoigIpsigcz7OSeH
+         +HjwpjVrnJvuCj3hs8J/1p4Vi/fDoZmT4qLt01yNSqO596qnesi7wyto1DsHb9d88Wej
+         7INA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=i93erGQBEdGUvhjnj900r6ImbBuHJewNb/EPkRjgFew=;
-        b=GOKiam7eIas9O1o2Lz3LuNCsK3byA1GVLBDf62jn2uQfghPh+hn9z2kTxXXlsrmjws
-         fZRZTpiF3UjpW2piSxkxEkz8AvA+DGpYM4GQadMGLedA8AHtrnJGbefjT6vEJz3sU3Fe
-         mTIeTRrdoXPRwqWB4re7zXZRA0T1ZyYGSr2QqdpFn95jT0KIGqEAnQIjhRSohWr8lGkM
-         +u/LBp2ZWtWTlWnT0xYneZQfKobWXgEcJB9+2Esg8TpyklxZTslnkl3N6HCS2sobOQvw
-         yGqCGtDzLbmT1g2lWHe/JXwl+dHIYoT4tf27vmR1Pjb5Z/htBLZQSsWF8GbBRfJC7aab
-         Y9og==
-X-Gm-Message-State: APjAAAUD6jsSeq+h215ekbLrvjU/XsQI9d78fWSZwORd6PeEADSKkCak
-        pT+RqbDe+tmTsbWfTSQumu8=
-X-Google-Smtp-Source: APXvYqxdW9/IthRQ7rsmpCwbf0zLG/Lgcp8qZuEfY0tONfvOF6G0RNnXVCtqwWbLt7x1yyzKwe3SDA==
-X-Received: by 2002:a17:902:76c6:: with SMTP id j6mr10061115plt.102.1562922234461;
-        Fri, 12 Jul 2019 02:03:54 -0700 (PDT)
-Received: from localhost ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id y8sm7341206pfn.52.2019.07.12.02.03.52
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 12 Jul 2019 02:03:53 -0700 (PDT)
-Date:   Fri, 12 Jul 2019 18:03:50 +0900
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: Re: [RFC PATCH 3/7] blk-mq: stop to handle IO before hctx's all CPUs
- become offline
-Message-ID: <20190712090350.GB31048@minwoo-desktop>
-References: <20190712024726.1227-1-ming.lei@redhat.com>
- <20190712024726.1227-4-ming.lei@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1+3fd2zHMOyIWuoG2jZcMi83f1rKIExq3w7kl21HtFk=;
+        b=UW+wJ3qDCetzouHL4xizRD2EWLoiAM2SK7LxVjAqwllR3862Fj08Jj8F7g4/5rccva
+         WQYU0Ug1C0qrsFeCyu3uFrMn6jnP52HM4jueGeMBVkYRigycCkMOeHCRT7nFqwX56ErA
+         mA4k1al5aO5Vzc9T0S+zfA7WGjW3kkAkEbwQOaR8FPzJY/QiVbIwH3NoxrMgXzq+jpMY
+         MEE3BdqtBrj7FpajNDvVFasswzNSCa+hVe0lBUYA2DaEhbv9AYpemsxbow2hk6/fKmy1
+         aZ++R0kp+lFO/rEHo95jnvhxfcFyBWmqfKeg9/GGJJy8R2aBFbKPUfzW7hGo/+ebCE4z
+         aE6w==
+X-Gm-Message-State: APjAAAUknSp0qc/j7nudqdG8nBAYMW+9hg7A/wKj+auyNb01xprzOibP
+        YcBUudI04rx9i9yWKK3oRVvWCFJfv77EpBy+AWv8pQXccEPp
+X-Google-Smtp-Source: APXvYqxPnwKKgjUWw452crE9EdyzyT52l0dIR+2xUAo5Ik9nM9WgSTx+L1pF1XyuIioApoBVo5KJ4JpBpFmg/B0SqMY=
+X-Received: by 2002:a5e:881a:: with SMTP id l26mr9938653ioj.185.1562929123791;
+ Fri, 12 Jul 2019 03:58:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190712024726.1227-4-ming.lei@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
+ <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me> <CAHg0HuxZvXH899=M4vC7BTH-bP2J35aTwsGhiGoC8AamD8gOyA@mail.gmail.com>
+ <aef765ed-4bb9-2211-05d0-b320cc3ac275@grimberg.me>
+In-Reply-To: <aef765ed-4bb9-2211-05d0-b320cc3ac275@grimberg.me>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Fri, 12 Jul 2019 12:58:31 +0200
+Message-ID: <CAHg0Huz93nUTYA8PcXOLaunBF0CT6yc-DcD8EhRJkw+GGL8c7A@mail.gmail.com>
+Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
+ Device (IBNBD)
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, axboe@kernel.dk,
+        Christoph Hellwig <hch@infradead.org>, bvanassche@acm.org,
+        jgg@mellanox.com, dledford@redhat.com,
+        Roman Pen <r.peniaev@gmail.com>, gregkh@linuxfoundation.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19-07-12 10:47:22, Ming Lei wrote:
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index e5ef40c603ca..028c5d78e409 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2205,6 +2205,64 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->  	return -ENOMEM;
->  }
->  
-> +static bool blk_mq_count_inflight_rq(struct request *rq, void *data,
-> +				     bool reserved)
-> +{
-> +	unsigned *count = data;
-> +
-> +	if ((blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT))
-> +		(*count)++;
-> +
-> +	return true;
-> +}
-> +
-> +unsigned blk_mq_tags_inflight_rqs(struct blk_mq_tags *tags)
-> +{
-> +	unsigned count = 0;
-> +
-> +	blk_mq_all_tag_busy_iter(tags, blk_mq_count_inflight_rq, &count);
-> +
-> +	return count;
-> +}
+On Fri, Jul 12, 2019 at 2:22 AM Sagi Grimberg <sagi@grimberg.me> wrote:
+>
+>
+> >> My main issues which were raised before are:
+> >> - IMO there isn't any justification to this ibtrs layering separation
+> >>     given that the only user of this is your ibnbd. Unless you are
+> >>     trying to submit another consumer, you should avoid adding another
+> >>     subsystem that is not really general purpose.
+> > We designed ibtrs not only with the IBNBD in mind but also as the
+> > transport layer for a distributed SDS. We'd like to be able to do what
+> > ceph is capable of (automatic up/down scaling of the storage cluster,
+> > automatic recovery) but using in-kernel rdma-based IO transport
+> > drivers, thin-provisioned volume managers, etc. to keep the highest
+> > possible performance.
+>
+> Sounds lovely, but still very much bound to your ibnbd. And that part
+> is not included in the patch set, so I still don't see why should this
+> be considered as a "generic" transport subsystem (it clearly isn't).
+Having IBTRS sit on a storage enables that storage to communicate with
+other storages (forward requests, request read from other storages
+i.e. for sync traffic). IBTRS is generic in the sense that it removes
+the strict separation into initiator (converting BIOs into some
+hardware specific protocol messages) and target (which forwards those
+messages to some local device supporting that protocol).
+It appears less generic to me to talk SCSI or NVME between storages if
+some storages have SCSI, other NVME disks or LVM volumes, or mixed
+setup. IBTRS allows to just send or request read of an sg-list between
+machines over rdma - the very minimum required to transport a BIO.
+It would in-deed support our case with the library if we would propose
+at least two users of it. We now only have a very early stage
+prototype capable of organizing storages in pools, multiplexing io
+between different storages, etc. sitting on top of ibtrs, it's not
+functional yet. On the other hand ibnbd with ibtrs alone already make
+over 10000 lines.
 
-Ming,
+> > All in all itbrs is a library to establish a "fat", multipath,
+> > autoreconnectable connection between two hosts on top of rdma,
+> > optimized for transport of IO traffic.
+>
+> That is also dictating a wire-protocol which makes it useless to pretty
+> much any other consumer. Personally, I don't see how this library
+> would ever be used outside of your ibnbd.
+Its true, IBTRS also imposes a protocol for connection establishment
+and IO path. I think at least the IO part we did reduce to a bare
+minimum:
+350 * Write *
+351
+352 1. When processing a write request client selects one of the memory chunks
+353 on the server side and rdma writes there the user data, user header and the
+354 IBTRS_MSG_RDMA_WRITE message. Apart from the type (write), the message only
+355 contains size of the user header. The client tells the server
+which chunk has
+356 been accessed and at what offset the IBTRS_MSG_RDMA_WRITE can be found by
+357 using the IMM field.
+358
+359 2. When confirming a write request server sends an "empty" rdma message with
+360 an immediate field. The 32 bit field is used to specify the outstanding
+361 inflight IO and for the error code.
+362
+363 CLT                                                          SRV
+364 usr_data + usr_hdr + ibtrs_msg_rdma_write ----------------->
+[IBTRS_IO_REQ_IMM]
+365 [IBTRS_IO_RSP_IMM]                        <----------------- (id + errno)
+366
+367 * Read *
+368
+369 1. When processing a read request client selects one of the memory chunks
+370 on the server side and rdma writes there the user header and the
+371 IBTRS_MSG_RDMA_READ message. This message contains the type (read), size of
+372 the user header, flags (specifying if memory invalidation is
+necessary) and the
+373 list of addresses along with keys for the data to be read into.
+374
+375 2. When confirming a read request server transfers the requested data first,
+376 attaches an invalidation message if requested and finally an "empty" rdma
+377 message with an immediate field. The 32 bit field is used to specify the
+378 outstanding inflight IO and the error code.
+379
+380 CLT                                           SRV
+381 usr_hdr + ibtrs_msg_rdma_read --------------> [IBTRS_IO_REQ_IMM]
+382 [IBTRS_IO_RSP_IMM]            <-------------- usr_data + (id + errno)
+383 or in case client requested invalidation:
+384 [IBTRS_IO_RSP_IMM_W_INV]      <-------------- usr_data + (INV) +
+(id + errno)
 
-Maybe it can be static?
+> >> - ibtrs in general is using almost no infrastructure from the existing
+> >>     kernel subsystems. Examples are:
+> >>     - tag allocation mechanism (which I'm not clear why its needed)
+> > As you correctly noticed our client manages the buffers allocated and
+> > registered by the server on the connection establishment. Our tags are
+> > just a mechanism to take and release those buffers for incoming
+> > requests on client side. Since the buffers allocated by the server are
+> > to be shared between all the devices mapped from that server and all
+> > their HW queues (each having num_cpus of them) the mechanism behind
+> > get_tag/put_tag also takes care of the fairness.
+>
+> We have infrastructure for this, sbitmaps.
+AFAIR Roman did try to use sbitmap but found no benefits in terms of
+readability or number of lines:
+" What is left unchanged on IBTRS side but was suggested to modify:
+     - Bart suggested to use sbitmap instead of calling find_first_zero_bit()
+  and friends.  I found calling pure bit API is more explicit in
+  comparison to sbitmap - there is no need in using sbitmap_queue
+  and all the power of wait queues, no benefits in terms of LoC
+  as well." https://lwn.net/Articles/756994/
 
-> +
-> +static void blk_mq_drain_inflight_rqs(struct blk_mq_hw_ctx *hctx)
-> +{
-> +	while (1) {
-> +		if (!blk_mq_tags_inflight_rqs(hctx->tags))
-> +			break;
-> +		msleep(5);
-> +	}
-> +}
+If sbitmap is a must for our use case from the infrastructure point of
+view, we will reiterate on it.
+
+>
+> >>     - rdma rw abstraction similar to what we have in the core
+> > On the one hand we have only single IO related function:
+> > ibtrs_clt_request(READ/WRITE, session,...), which executes rdma write
+> > with imm, or requests an rdma write with imm to be executed by the
+> > server.
+>
+> For sure you can enhance the rw API to have imm support?
+I'm not familiar with the architectural intention behind rw.c.
+Extending the API with the support of imm field is (I guess) doable.
+
+> > On the other hand we provide an abstraction to establish and
+> > manage what we call "session", which consist of multiple paths (to do
+> > failover and multipath with different policies), where each path
+> > consists of num_cpu rdma connections.
+>
+> That's fine, but it doesn't mean that it also needs to re-write
+> infrastructure that we already have.
+Do you refer to rw.c?
+
+> > Once you established a session
+> > you can add or remove paths from it on the fly. In case the connection
+> > to server is lost, the client does periodic attempts to reconnect
+> > automatically. On the server side you get just sg-lists with a
+> > direction READ or WRITE as requested by the client. We designed this
+> > interface not only as the minimum required to build a block device on
+> > top of rdma but also with a distributed raid in mind.
+>
+> I suggest you take a look at the rw API and use that in your transport.
+We will look into rw.c. Do you suggest we move the multipath and the
+multiple QPs per path and connection establishment on *top* of it or
+*into* it?
+
+> >> Another question, from what I understand from the code, the client
+> >> always rdma_writes data on writes (with imm) from a remote pool of
+> >> server buffers dedicated to it. Essentially all writes are immediate (no
+> >> rdma reads ever). How is that different than using send wrs to a set of
+> >> pre-posted recv buffers (like all others are doing)? Is it faster?
+> > At the very beginning of the project we did some measurements and saw,
+> > that it is faster. I'm not sure if this is still true
+>
+> Its not significantly faster (can't imagine why it would be).
+> What could make a difference is probably the fact that you never
+> do rdma reads for I/O writes which might be better. Also perhaps the
+> fact that you normally don't wait for send completions before completing
+> I/O (which is broken), and the fact that you batch recv operations.
+>
+> I would be interested to understand what indeed makes ibnbd run faster
+> though.
+Yes, we would like to understand this too. I will try increasing the
+inline_data_size on nvme in our benchmarks as the next step to check
+if this influences the results.
+
+> >> Also, given that the server pre-allocate a substantial amount of memory
+> >> for each connection, is it documented the requirements from the server
+> >> side? Usually kernel implementations (especially upstream ones) will
+> >> avoid imposing such large longstanding memory requirements on the system
+> >> by default. I don't have a firm stand on this, but wanted to highlight
+> >> this as you are sending this for upstream inclusion.
+> > We definitely need to stress that somewhere. Will include into readme
+> > and add to the cover letter next time. Our memory management is indeed
+> > basically absent in favor of performance: The server reserves
+> > queue_depth of say 512K buffers. Each buffer is used by client for
+> > single IO only, no matter how big the request is. So if client only
+> > issues 4K IOs, we do waste 508*queue_depth K of memory. We were aiming
+> > for lowest possible latency from the beginning. It is probably
+> > possible to implement some clever allocator on the server side which
+> > wouldn't affect the performance a lot.
+>
+> Or you can fallback to rdma_read like the rest of the ulps.
+We currently have a single round trip for every write IO: write + ack.
+Wouldn't switching to rdma_read make 2 round trips out of it: command
++ rdma_read + ack?
