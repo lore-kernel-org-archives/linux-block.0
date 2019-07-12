@@ -2,100 +2,93 @@ Return-Path: <SRS0=GKUn=VJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3B5C742A5
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:05:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 746FDC742A2
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:07:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8A7721019
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:05:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E3092084B
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:07:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ZRxqi0+u"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ThpceOik"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728956AbfGLCFJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 22:05:09 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:46758 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728853AbfGLCFJ (ORCPT
+        id S1728916AbfGLCHM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 22:07:12 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:60068 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728853AbfGLCHM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 22:05:09 -0400
-Received: by mail-pf1-f196.google.com with SMTP id c73so3576521pfb.13
-        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 19:05:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=zYr8UzDI7biFQnbTpSDLCT68yuvF3CA/Is+C1xTs8Kw=;
-        b=ZRxqi0+uwfd/EXs2qS0gTss24yOP3a/nHPkifQtAcCm58w79HcGNu4EWv0NbxYawku
-         AK1T8FHFgDxt/JZli9NM3Qa96jOu7ZgESJVqYzzOP6+/XCRrSitHAMIwLrcDeL5gyS3r
-         xbLsolmvHSvDmwetd/a0I/ZoztCE7EXCtMp69KTXt1DSL0nQHHZiRJJnpuE007cl1B8S
-         KwOInMzsJJTYqUCVuYlEzk3L1PRoDm0osjnYi427GGq8yc3jBvsYP/bBDi3/zip7I21/
-         83G5Md5fG62b2qkvYzE0T4YCqEoqZ/kNEIeLFNgXTRiuL0SEPdzM8kda2EvGJfPUaMU6
-         xYpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zYr8UzDI7biFQnbTpSDLCT68yuvF3CA/Is+C1xTs8Kw=;
-        b=VH4ccRKBVcec7WtVRm4/IauepVQunVYUDP1jtB5COCztZc2PxHCcBqwtHZ/ttqNniy
-         NblEzNFTrxgLQvS6VtIBW/EvR0PKlcULxlxb0qmlnvK2Ie5Ka3MUpc2zQYcz2XFua6yN
-         4ekaHRqmWhn299X28VUSbF38Gaee9+yc7JR4CS0I47d6GmJledmy4Yo8jIKCjVZr2mfw
-         eau/XHpF6xRb3oD2uOuD8lMPrJ86N/OQCxxR5bLfwE/Jh9GFm9P8ZY8ezFORQdgKQuWu
-         Otu4ESvx2H3FEA4h0rR8l7FF9Cz4SBW+93z5mPW8OsOnbGFs0WuFkFsgXlGRFg2NN7I9
-         AYrQ==
-X-Gm-Message-State: APjAAAX7zknyqFqKOnz5dNUVWylMFS8T/ksXtltwo5pIjrdlT8T2+gQe
-        CzFidtrvSqJtH05nEPDxPd0=
-X-Google-Smtp-Source: APXvYqwkoCxRxL6Tt/icdrxjvdW2QNNKuKiS5OHCXOb/WcWrbo2VzUJyQBzxCpp8z9PfHbsATpR+9g==
-X-Received: by 2002:a65:6401:: with SMTP id a1mr7839009pgv.42.1562897108820;
-        Thu, 11 Jul 2019 19:05:08 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id j15sm6611298pfe.3.2019.07.11.19.05.05
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 11 Jul 2019 19:05:06 -0700 (PDT)
-Subject: Re: [PATCH V6 0/4] Fix zone revalidation memory allocation failures
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <20190701050918.27511-1-damien.lemoal@wdc.com>
- <BYAPR04MB5816BC7EC358F5785AEE1EA9E7F60@BYAPR04MB5816.namprd04.prod.outlook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <cb26f686-ce7e-9d1a-4735-2375d65c0ea5@kernel.dk>
-Date:   Thu, 11 Jul 2019 20:05:04 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        Thu, 11 Jul 2019 22:07:12 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6C24ive152789;
+        Fri, 12 Jul 2019 02:07:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=1O+a8zU/pTxG5RusyzsKpmYdKee4MqcAOJTPVcylUhY=;
+ b=ThpceOikmwkXZMzC1+uoShlkr1RIqe6hkQyocYeeh+z6ZezHCU6GtfXvxiFkFP47ZvxS
+ x6DMKtRa/NktAqBVvPxoRfG+C/GSNsSvGtcsCIqB3qv/xCKmsSG4mSE5BwHjzWHl3Ie6
+ v8Q+C+SZ0oo04QO8d5mpm0bTl5m6Wnpu1JaNJTDOdfwQ8BaTu5/RvPCr/nEZpy4JOhH6
+ G9coe7zyPKxoX02IJuT9EshQX6amQuT31F6X0GXUmAUUhdRnpAJYf3rmcco8/ynGke6h
+ b8XGUaO3IzZwDsqd5KIh2wtD13J5hemeu0Z+5DHUXfbYULTwwnVgH7f7eHA70W4q5G81 TQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2tjm9r31pn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 02:07:07 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6C230Cp117101;
+        Fri, 12 Jul 2019 02:07:07 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2tnc8tvu3r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 02:07:07 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6C2741p017758;
+        Fri, 12 Jul 2019 02:07:05 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 11 Jul 2019 19:07:04 -0700
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de
+Subject: Re: [PATCH 1/3] block: set ioprio for zone-reset bio
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190710040224.12342-1-chaitanya.kulkarni@wdc.com>
+        <20190710040224.12342-2-chaitanya.kulkarni@wdc.com>
+Date:   Thu, 11 Jul 2019 22:07:02 -0400
+In-Reply-To: <20190710040224.12342-2-chaitanya.kulkarni@wdc.com> (Chaitanya
+        Kulkarni's message of "Tue, 9 Jul 2019 21:02:22 -0700")
+Message-ID: <yq14l3s57ll.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB5816BC7EC358F5785AEE1EA9E7F60@BYAPR04MB5816.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9315 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907120024
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9315 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907120024
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/7/19 8:02 PM, Damien Le Moal wrote:
-> On 2019/07/01 14:09, Damien Le Moal wrote:
->> This series addresses a recuring problem with zone revalidation
->> failures observed during extensive testing with memory constrained
->> system and device hot-plugging.
-> 
-> Jens, Martin,
-> 
-> Any comment regarding this series ?
 
-LGTM, I'll queue it up for this release.
+Chaitanya,
+
+> Set the current process's iopriority to the bio for REQ_OP_ZONE_RESET.
+
+Looks fine.
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
 -- 
-Jens Axboe
-
+Martin K. Petersen	Oracle Linux Engineering
