@@ -2,106 +2,142 @@ Return-Path: <SRS0=GKUn=VJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC0CC742C8
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 15:15:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DE6C742CA
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 16:09:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 03CA521019
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 15:15:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C32AD21019
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 16:09:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="BMS+LBZ1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="EX78Am3Y";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="NCcXh2b2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727164AbfGLPPc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Jul 2019 11:15:32 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:34736 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727078AbfGLPPc (ORCPT
+        id S1726602AbfGLQJ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Jul 2019 12:09:59 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:19105 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726867AbfGLQJ6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Jul 2019 11:15:32 -0400
-Received: by mail-io1-f68.google.com with SMTP id k8so21139258iot.1
-        for <linux-block@vger.kernel.org>; Fri, 12 Jul 2019 08:15:31 -0700 (PDT)
+        Fri, 12 Jul 2019 12:09:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1562947861; x=1594483861;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=N0fhyTrShdGrfIW5zABp0j8FA7VDbZFhG3Fjh78mCWY=;
+  b=EX78Am3YmUBBzP9jqt5n8T9a4o17ht3kvSmuxqV/PnxHvndQfaSRkRWJ
+   m1GD63IV9kvZ9k5DOE63by6RWlby3L5DZ6IzJd7w7uOy2vgJ9P2yDLaNu
+   P0wrPMvSsbguMd/N2s4hyJHq9FFZvmSRgqcH9tBRWKJp40wI4ioNTLMPf
+   y5xWnW3LN+w03H8HGr2piLl7x7Kd02+AniwnJET683V6BMn003MmOfEIL
+   yGb3y/m/seYXHO3uZ9OLdnq/K2Fn//O9TdSR1nlla+GYs9fLo2LoVgH6R
+   TO7pwXsZiyWZV7RizAhfjWPzyXQuG0kdmjCyXb4MqT5cy+tnccwHUh5XL
+   A==;
+IronPort-SDR: D7AKZ0sFotlHabHpoZYaGMlm/sydqrz7/jqe+0fse36zw+twTcdZhYTT7MlL0ogV0CKYTD55Gf
+ Bsr2889sTfy/fjz0AmhXWUW/HzFzQVnlr9a939AsqK2BjTAwJgbdLKHdPZkJ4/1uutLKEUG2oS
+ ixF0mtoh0DBGZKyxKNd0HIZZnMM0sayw/CHbgPIBMhOWqf1HSDECJbNf6uFj+O8f9fBDElS60m
+ eAOWlVIw9dMYzDqHv41RHTXPlHbO80gMayCx1rw5SnOhmQ6xfbWc0WIU1B5s3ZLJAflbLLFuQ3
+ mOo=
+X-IronPort-AV: E=Sophos;i="5.63,483,1557158400"; 
+   d="scan'208";a="212841637"
+Received: from mail-by2nam01lp2054.outbound.protection.outlook.com (HELO NAM01-BY2-obe.outbound.protection.outlook.com) ([104.47.34.54])
+  by ob1.hgst.iphmx.com with ESMTP; 13 Jul 2019 00:11:00 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=2opEnBuVBF2b4E5QanZT3B1PxQTl1jpFqVeaeD4Jvac=;
-        b=BMS+LBZ1HOJ+oPmT+jj9cCB2CMuhLD9hOgL1EGxhXgjcCFU+uRhdlTEHJctcvcAfAC
-         93xCyhVww0XoYzbRJRJbpZBsYO3Bm1q/MlPGVvrNSmWS6qfkXQz8BXXUjRJsSG2wkg1B
-         oUhykgoEyU+U5WMY8pngtLd8pQv2pIfwtfSV3MVO+kJRkbbD+jxi3cwlmNKFU6maqscI
-         iIz0r5umTAoC5x9daY2n1PVhdWCYjSYP5JjtzczVfPEaIuMScEe303uYSFPRxEjPxbTY
-         wo2uvzLdn+ynMMpp8KKHkC8MInm7bHAk0Gz2dmFjF6xGUKzzWIe57apPN0x9lMRWIqqQ
-         wFDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2opEnBuVBF2b4E5QanZT3B1PxQTl1jpFqVeaeD4Jvac=;
-        b=Svpal6WNkwvvOJEAqgTnhoNj5quBOk/4/Y4UmfzNI1ayvsVWiYTnwi7t5mBZIR8KcR
-         1gbH1Vh2QcJFv5eAsjba0qIi44DzZHi47bwfnnTO8f/IJ4CE8J76JK7B1EiVCiTBc5eO
-         UDfouOhpL+LwggmpZjjwBoWYsEzkD2cxjwgR/Z02I9LtwiECMqBBiKrI23uBugRWn3gR
-         KE7rzqFFwI1QwIO6jAy/yMdBYibN7edGUqIAPpWgvFLNcaVURTBghujAqLOU24cKxXSK
-         CiF4VdXbIRRmm+OkyG/zagUZd5UfHGolOkqBrysUSk6eq3/sZYgoMUeCNRYJnI+qM9V6
-         pIJg==
-X-Gm-Message-State: APjAAAVQZafuOF+nlpgUg0Zx8RVo0vVNT5lUWUgfv+GI0qiqyPiEC3VX
-        QTiq4ZEcGPk4Jm2eLJKxwVs=
-X-Google-Smtp-Source: APXvYqxNzK45erpGagcbIG8GrfCOqm46U/1e0qdgZFVftYMWqnRGnTZfkMPl7UYDH4Wj4yMq6IdAPw==
-X-Received: by 2002:a02:b812:: with SMTP id o18mr1716469jam.64.1562944530468;
-        Fri, 12 Jul 2019 08:15:30 -0700 (PDT)
-Received: from [192.168.1.158] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id e22sm6692139iob.66.2019.07.12.08.15.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Jul 2019 08:15:29 -0700 (PDT)
-Subject: Re: [PATCH] MAINTAINERS: add entry for block io cgroup
-To:     Tejun Heo <tj@kernel.org>,
-        Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cgroups@vger.kernel.org
-References: <156284038698.3851.6531328622774377848.stgit@buzz>
- <20190712142502.GA680549@devbig004.ftw2.facebook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <82bc7337-c48f-7559-bd9b-6a21ccbfceb0@kernel.dk>
-Date:   Fri, 12 Jul 2019 09:15:28 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <20190712142502.GA680549@devbig004.ftw2.facebook.com>
-Content-Type: text/plain; charset=utf-8
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pDqjVCuNjygIykNV6cNUa9bqD2yACUy0tABSvnq9LH8=;
+ b=NCcXh2b2sDhx2kujb9Mi9sQjnCYoIL7v+saCw3b9UvlfBu4AwEhdHn/6a/NuFDaOIkcVUtCpPZ49UhWCpV8b4sFB9xqHr8qd/vBLp1q9XaoomtOQHdzCgQmui2yVJm+Y22Syi3fUzsgUXlC8RCMR1HtCRw9OiK0QJSc/O975Y50=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
+ BYAPR04MB5992.namprd04.prod.outlook.com (20.178.233.21) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2052.19; Fri, 12 Jul 2019 16:09:57 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::8025:ccea:a0e6:9078]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::8025:ccea:a0e6:9078%5]) with mapi id 15.20.2073.008; Fri, 12 Jul 2019
+ 16:09:57 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "colyli@suse.de" <colyli@suse.de>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "linux-btrace@vger.kernel.org" <linux-btrace@vger.kernel.org>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>,
+        "yuchao0@huawei.com" <yuchao0@huawei.com>,
+        "jaegeuk@kernel.org" <jaegeuk@kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        "roger.pau@citrix.com" <roger.pau@citrix.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Subject: Re: [PATCH V4 1/9] block: add a helper function to read nr_setcs
+Thread-Topic: [PATCH V4 1/9] block: add a helper function to read nr_setcs
+Thread-Index: AQHVNb2Z4KyEErtQ+UKxJ+HV/zvqXg==
+Date:   Fri, 12 Jul 2019 16:09:56 +0000
+Message-ID: <BYAPR04MB5749AF90A9E9C81B4A6857F386F20@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20190708184711.2984-1-chaitanya.kulkarni@wdc.com>
+ <20190708184711.2984-2-chaitanya.kulkarni@wdc.com>
+ <yq18st457yb.fsf@oracle.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.45.64]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1fd8b164-03d7-4925-211a-08d706e3622d
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5992;
+x-ms-traffictypediagnostic: BYAPR04MB5992:
+x-microsoft-antispam-prvs: <BYAPR04MB59928DC0BC9E08C4D8F6E87B86F20@BYAPR04MB5992.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-forefront-prvs: 00963989E5
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(39860400002)(346002)(136003)(396003)(376002)(199004)(189003)(6506007)(316002)(71200400001)(74316002)(68736007)(8676002)(52536014)(53546011)(486006)(7736002)(476003)(81156014)(229853002)(305945005)(71190400001)(54906003)(81166006)(86362001)(446003)(7416002)(9686003)(99286004)(66066001)(2906002)(55016002)(4326008)(53936002)(6116002)(3846002)(4744005)(14454004)(478600001)(25786009)(7696005)(8936002)(186003)(66946007)(66476007)(6916009)(76176011)(66446008)(66556008)(64756008)(33656002)(26005)(256004)(5660300002)(6436002)(76116006)(102836004)(6246003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5992;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: m65h7YZuEY0B2mfDKE2vkIXVULnruRvyk75fkhxpzgV8FGZL0HMHPsVsO3Ld72vawN7WKVVQVXbNEJOmwfyNDP2X4a+0E0paeczD8wg8EJdAk/MO31iAajhL+AClW8vfPHDJxKpz6murAWqgDaWbazuQSy0jckZX4eiBk6CvM943Zgx+byGUPYfyINRdHDL/cvOEIMyW0DZt8bX9qToeV6rDXeZXWJnCz2EWjWnKcjDNOG9yw0cMYRInUFzmF8Dp7k+BYNk4UxCHdsb4X9p6N17n1ruhBfeEFtMd9MzKAEjKWLfM4lmH5QnVWwFc35IF0T0ny/7DZiTyjcatQnmN1qV/jZ+mz/bps1cVRQ/K1JFQKMab76cKP5gARNjhf8PUjQnUxyEF/QBlfMbONiOUw0ACwiDqha4PIrw/QTNZJfU=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1fd8b164-03d7-4925-211a-08d706e3622d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jul 2019 16:09:56.9522
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Chaitanya.Kulkarni@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5992
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/12/19 8:25 AM, Tejun Heo wrote:
-> Hello, Konstantin.
-> 
-> On Thu, Jul 11, 2019 at 01:19:47PM +0300, Konstantin Khlebnikov wrote:
->> +CONTROL GROUP - BLOCK IO CONTROLLER (BLKIO)
->> +L:	cgroups@vger.kernel.org
->> +F:	Documentation/cgroup-v1/blkio-controller.rst
->> +F:	block/blk-cgroup.c
->> +F:	include/linux/blk-cgroup.h
->> +F:	block/blk-throttle.c
->> +F:	block/blk-iolatency.c
->> +F:	block/bfq-cgroup.c
-> 
-> Given that blkcg changes are often entangled with generic block
-> changes and best routed through block tree, I think it'd be useful to
-> add the followings.
-> 
-> M:      Tejun Heo <tj@kernel.org>
-> M:      Jens Axboe <axboe@kernel.dk>
-> L:      linux-block@vger.kernel.org
-> T:      git git://git.kernel.dk/linux-block
-
-I applied the patch with these additions.
-
--- 
-Jens Axboe
-
+On 7/11/19 6:59 PM, Martin K. Petersen wrote:=0A=
+> Hi Chaitanya,=0A=
+>=0A=
+>> +static inline sector_t bdev_nr_sects(struct block_device *bdev)=0A=
+>> +{=0A=
+>> +	return part_nr_sects_read(bdev->bd_part);=0A=
+>> +}=0A=
+> Can bdev end up being NULL in any of the call sites?=0A=
+>=0A=
+> Otherwise no objections.=0A=
+>=0A=
+Thanks for mentioning that. Initial version which was not posted had=0A=
+that check.=0A=
+=0A=
+This series just replaces the existing accesses without changing anything.=
+=0A=
+=0A=
+So if any of the exiting code has that bug then it will blow up nicely.=0A=
+=0A=
+For future callers I don't mind adding a new check and resend the series.=
+=0A=
+=0A=
+Would you prefer adding a check  ?=0A=
+=0A=
+=0A=
