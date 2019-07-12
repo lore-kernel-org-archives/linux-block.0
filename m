@@ -2,168 +2,103 @@ Return-Path: <SRS0=GKUn=VJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 361B2C742A1
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 00:22:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4384C742A1
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 00:24:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A42421537
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 00:22:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9094208E4
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 00:24:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UFSugVI/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730537AbfGLAWa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 20:22:30 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:34040 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728102AbfGLAWa (ORCPT
+        id S1730510AbfGLAYB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 20:24:01 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:40294 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728102AbfGLAYB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 20:22:30 -0400
-Received: by mail-ot1-f65.google.com with SMTP id n5so7762767otk.1;
-        Thu, 11 Jul 2019 17:22:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jXZQvwZ+WxHloRkZdb0DMVv7eaNNsxBD6ps2KyCl09Y=;
-        b=P6xsbYPqutA2TM1WAD/JWrYqrTyijMZgu6r4uqMgG5+0/ODz7/29rl+dKC8IY0V4vC
-         i4+TG6fM3MvXa2MBs/bAiE+kArTCUKJ8o7+rT2ZeXrRCud689T9+8YiNEzgL15GxKh9m
-         G3wURS0ib6DvnphB63fm+jMSLBZsOvktqs0D/tovXJylA/PUEa50H+xDEHnA7DM9Efd9
-         pQRsYvLWS5F5u9Q/qxDJdprU6Mo7ITU8jRM6bbLOxebWPZJpFcZHFk5PDlbsMEQiG6EV
-         MPYpWQF7yfVit5dmZamEBWmMIh0N6kia3kTvVTCMNN28IxRbGUm37co1vYgGqrOeYuSK
-         glag==
-X-Gm-Message-State: APjAAAX/Fa06j4Ij5f94kxLWMVIEuQLlyLyj8XB2X9ckSfP0l6aM6zaQ
-        lZEYyZf6brRJtLFvik3U1Tg=
-X-Google-Smtp-Source: APXvYqxzFkcd+fCSstleSDxY7LurqciKea5lf41DlefWqIyWr15+e48X2y5oaegjnRVEng15aayIcg==
-X-Received: by 2002:a9d:51cf:: with SMTP id d15mr6137989oth.206.1562890949154;
-        Thu, 11 Jul 2019 17:22:29 -0700 (PDT)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id a20sm2539222otl.44.2019.07.11.17.22.27
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 11 Jul 2019 17:22:28 -0700 (PDT)
-Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
- Device (IBNBD)
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, axboe@kernel.dk,
-        Christoph Hellwig <hch@infradead.org>, bvanassche@acm.org,
-        jgg@mellanox.com, dledford@redhat.com,
-        Roman Pen <r.peniaev@gmail.com>, gregkh@linuxfoundation.org
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
- <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me>
- <CAHg0HuxZvXH899=M4vC7BTH-bP2J35aTwsGhiGoC8AamD8gOyA@mail.gmail.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <aef765ed-4bb9-2211-05d0-b320cc3ac275@grimberg.me>
-Date:   Thu, 11 Jul 2019 17:22:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        Thu, 11 Jul 2019 20:24:01 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6C0JpFh170785;
+        Fri, 12 Jul 2019 00:22:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=HYlQE+c1teU9A33RM7brccxSFdyltTyRTPhHWge3Gdg=;
+ b=UFSugVI/MGi4JmHKsvvE0MDnEPlJkyYH4MkkpcMuHDGBi6TX77YMUZOpW3i8AohVFzTC
+ Z6+Wa1g6n5Sd8OLAGdEIhHcJXtY/ki91VL7cQFFiui25IbYli3u8i7FWGPVoyeiax3Z5
+ PacAejYCiRj1ygTMyRXPVutGmAB9Xtq6ONwr453q+eqkyuGbVq7ZdDMIro/cPZvjQtH0
+ 9kT6BSrVUoppwmquINavE0kFe4zwa2NYFVdfW1tco0tUiyneddyEyvuapxqY8oSIOLIv
+ Fo9J7ZsJkTU8Xrnt4jyqdNWiVKkRflvRr3WZ2kIlEsKhUPulj8JiRBjhkG5FwfaRaxaS lQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2tjkkq2twa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 00:22:50 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6C0HUOl090850;
+        Fri, 12 Jul 2019 00:22:49 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3030.oracle.com with ESMTP id 2tmwgyf9q4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 00:22:49 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6C0MlOl029885;
+        Fri, 12 Jul 2019 00:22:47 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 11 Jul 2019 17:22:46 -0700
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH V6 1/4] block: Allow mapping of vmalloc-ed buffers
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190701050918.27511-1-damien.lemoal@wdc.com>
+        <20190701050918.27511-2-damien.lemoal@wdc.com>
+Date:   Thu, 11 Jul 2019 20:22:36 -0400
+In-Reply-To: <20190701050918.27511-2-damien.lemoal@wdc.com> (Damien Le Moal's
+        message of "Mon, 1 Jul 2019 14:09:15 +0900")
+Message-ID: <yq15zo89k4z.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <CAHg0HuxZvXH899=M4vC7BTH-bP2J35aTwsGhiGoC8AamD8gOyA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9315 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=720
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907120002
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9315 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=776 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907120002
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
->> My main issues which were raised before are:
->> - IMO there isn't any justification to this ibtrs layering separation
->>     given that the only user of this is your ibnbd. Unless you are
->>     trying to submit another consumer, you should avoid adding another
->>     subsystem that is not really general purpose.
-> We designed ibtrs not only with the IBNBD in mind but also as the
-> transport layer for a distributed SDS. We'd like to be able to do what
-> ceph is capable of (automatic up/down scaling of the storage cluster,
-> automatic recovery) but using in-kernel rdma-based IO transport
-> drivers, thin-provisioned volume managers, etc. to keep the highest
-> possible performance.
+Damien,
 
-Sounds lovely, but still very much bound to your ibnbd. And that part
-is not included in the patch set, so I still don't see why should this
-be considered as a "generic" transport subsystem (it clearly isn't).
+> To allow the SCSI subsystem scsi_execute_req() function to issue
+> requests using large buffers that are better allocated with vmalloc()
+> rather than kmalloc(), modify bio_map_kern() to allow passing a buffer
+> allocated with vmalloc().
 
-> All in all itbrs is a library to establish a "fat", multipath,
-> autoreconnectable connection between two hosts on top of rdma,
-> optimized for transport of IO traffic.
+Looks good to me.
 
-That is also dictating a wire-protocol which makes it useless to pretty
-much any other consumer. Personally, I don't see how this library
-would ever be used outside of your ibnbd.
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
->> - ibtrs in general is using almost no infrastructure from the existing
->>     kernel subsystems. Examples are:
->>     - tag allocation mechanism (which I'm not clear why its needed)
-> As you correctly noticed our client manages the buffers allocated and
-> registered by the server on the connection establishment. Our tags are
-> just a mechanism to take and release those buffers for incoming
-> requests on client side. Since the buffers allocated by the server are
-> to be shared between all the devices mapped from that server and all
-> their HW queues (each having num_cpus of them) the mechanism behind
-> get_tag/put_tag also takes care of the fairness.
-
-We have infrastructure for this, sbitmaps.
-
->>     - rdma rw abstraction similar to what we have in the core
-> On the one hand we have only single IO related function:
-> ibtrs_clt_request(READ/WRITE, session,...), which executes rdma write
-> with imm, or requests an rdma write with imm to be executed by the
-> server.
-
-For sure you can enhance the rw API to have imm support?
-
-> On the other hand we provide an abstraction to establish and
-> manage what we call "session", which consist of multiple paths (to do
-> failover and multipath with different policies), where each path
-> consists of num_cpu rdma connections.
-
-That's fine, but it doesn't mean that it also needs to re-write
-infrastructure that we already have.
-
-> Once you established a session
-> you can add or remove paths from it on the fly. In case the connection
-> to server is lost, the client does periodic attempts to reconnect
-> automatically. On the server side you get just sg-lists with a
-> direction READ or WRITE as requested by the client. We designed this
-> interface not only as the minimum required to build a block device on
-> top of rdma but also with a distributed raid in mind.
-
-I suggest you take a look at the rw API and use that in your transport.
-
->> Another question, from what I understand from the code, the client
->> always rdma_writes data on writes (with imm) from a remote pool of
->> server buffers dedicated to it. Essentially all writes are immediate (no
->> rdma reads ever). How is that different than using send wrs to a set of
->> pre-posted recv buffers (like all others are doing)? Is it faster?
-> At the very beginning of the project we did some measurements and saw,
-> that it is faster. I'm not sure if this is still true
-
-Its not significantly faster (can't imagine why it would be).
-What could make a difference is probably the fact that you never
-do rdma reads for I/O writes which might be better. Also perhaps the
-fact that you normally don't wait for send completions before completing
-I/O (which is broken), and the fact that you batch recv operations.
-
-I would be interested to understand what indeed makes ibnbd run faster
-though.
-
->> Also, given that the server pre-allocate a substantial amount of memory
->> for each connection, is it documented the requirements from the server
->> side? Usually kernel implementations (especially upstream ones) will
->> avoid imposing such large longstanding memory requirements on the system
->> by default. I don't have a firm stand on this, but wanted to highlight
->> this as you are sending this for upstream inclusion.
-> We definitely need to stress that somewhere. Will include into readme
-> and add to the cover letter next time. Our memory management is indeed
-> basically absent in favor of performance: The server reserves
-> queue_depth of say 512K buffers. Each buffer is used by client for
-> single IO only, no matter how big the request is. So if client only
-> issues 4K IOs, we do waste 508*queue_depth K of memory. We were aiming
-> for lowest possible latency from the beginning. It is probably
-> possible to implement some clever allocator on the server side which
-> wouldn't affect the performance a lot.
-
-Or you can fallback to rdma_read like the rest of the ulps.
+-- 
+Martin K. Petersen	Oracle Linux Engineering
