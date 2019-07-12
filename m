@@ -2,98 +2,73 @@ Return-Path: <SRS0=GKUn=VJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 079BFC742D2
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 19:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E72BDC742DA
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 20:13:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D780F205C9
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 19:40:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C717A20989
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 20:13:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727125AbfGLTkJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Jul 2019 15:40:09 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:33441 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727226AbfGLTkI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Jul 2019 15:40:08 -0400
-Received: by mail-ot1-f65.google.com with SMTP id q20so10576428otl.0;
-        Fri, 12 Jul 2019 12:40:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HFpxZgsSIxsazA1/oZg/kAp/zrOjt6UHihSAZrgcZlE=;
-        b=Ae4lZh/7hluwXWWoHAwv/UxbvQkZ3mhXQxISte0T+aLmWoht5y5eLA5RRW7CeodQlH
-         SI+ZUvEgGUdsKBuwzaFPUYMXK+K7rmRz9c1LhGwaq6iULRHEBcAZwwAQyP1dPq8Dugyo
-         QLsWegTKxfYgdbpsNkVn5oL2ozbB4diD7LIsmyfqfrDTZ3TKBUvJC+4bKPRf2ik2VVrs
-         iOlPzlNC7k5RfbvDKgiVS47JFHvAVF4m+8ZeQ4bIBaXp0p622qG6wF1tzbAxCjI1CfWJ
-         fT7AONZ63kfeOSpDbe/9xYNKj6C9n13U1Rs9WimJpidC8bPQzcOzIjYdjZ2dwmnryGcJ
-         fjnQ==
-X-Gm-Message-State: APjAAAVIcNowOGg9Aa75mlf+YzTjZHfTZttQbuZ10/xGIv5VKN8OFO26
-        VyB1dqY5ta+uqKWgxGtltQ8=
-X-Google-Smtp-Source: APXvYqzveAK2peSCSmr6FwEGqa68OjQzEs78W1hOb+X3FP4XQUInf/BMTUhVYhWSQQweFrMPHqspLA==
-X-Received: by 2002:a05:6830:120e:: with SMTP id r14mr9497773otp.4.1562960407781;
-        Fri, 12 Jul 2019 12:40:07 -0700 (PDT)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id 68sm3380373otg.78.2019.07.12.12.40.06
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Jul 2019 12:40:07 -0700 (PDT)
-Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
- Device (IBNBD)
-To:     Jinpu Wang <jinpuwang@gmail.com>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>, bvanassche@acm.org,
-        jgg@mellanox.com, dledford@redhat.com,
-        Roman Pen <r.peniaev@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
- <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me>
- <CAHg0HuxZvXH899=M4vC7BTH-bP2J35aTwsGhiGoC8AamD8gOyA@mail.gmail.com>
- <aef765ed-4bb9-2211-05d0-b320cc3ac275@grimberg.me>
- <CAD9gYJKcJ47ogKL4S_KMtxpS1gPHHhqqG7-GTi-2c0cOJ-LJtw@mail.gmail.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <11653912-924a-965a-45fe-3abd1ca00053@grimberg.me>
-Date:   Fri, 12 Jul 2019 12:40:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1727544AbfGLUNA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Jul 2019 16:13:00 -0400
+Received: from namei.org ([65.99.196.166]:34928 "EHLO namei.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727487AbfGLUNA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Jul 2019 16:13:00 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by namei.org (8.14.4/8.14.4) with ESMTP id x6CKBdwI009529;
+        Fri, 12 Jul 2019 20:11:40 GMT
+Date:   Sat, 13 Jul 2019 06:11:39 +1000 (AEST)
+From:   James Morris <jmorris@namei.org>
+To:     David Howells <dhowells@redhat.com>
+cc:     viro@zeniv.linux.org.uk, Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/6] security: Add hooks to rule on setting a superblock
+ or mount watch [ver #5]
+In-Reply-To: <156173702349.15650.1484210092464492434.stgit@warthog.procyon.org.uk>
+Message-ID: <alpine.LRH.2.21.1907130611040.4685@namei.org>
+References: <156173701358.15650.8735203424342507015.stgit@warthog.procyon.org.uk> <156173702349.15650.1484210092464492434.stgit@warthog.procyon.org.uk>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <CAD9gYJKcJ47ogKL4S_KMtxpS1gPHHhqqG7-GTi-2c0cOJ-LJtw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, 28 Jun 2019, David Howells wrote:
 
-> Hi Sagi,
+> Add security hooks that will allow an LSM to rule on whether or not a watch
+> may be set on a mount or on a superblock.  More than one hook is required
+> as the watches watch different types of object.
 > 
->>>> Another question, from what I understand from the code, the client
->>>> always rdma_writes data on writes (with imm) from a remote pool of
->>>> server buffers dedicated to it. Essentially all writes are immediate (no
->>>> rdma reads ever). How is that different than using send wrs to a set of
->>>> pre-posted recv buffers (like all others are doing)? Is it faster?
->>> At the very beginning of the project we did some measurements and saw,
->>> that it is faster. I'm not sure if this is still true
->>
->> Its not significantly faster (can't imagine why it would be).
->> What could make a difference is probably the fact that you never
->> do rdma reads for I/O writes which might be better. Also perhaps the
->> fact that you normally don't wait for send completions before completing
->> I/O (which is broken), and the fact that you batch recv operations.
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Casey Schaufler <casey@schaufler-ca.com>
+> cc: Stephen Smalley <sds@tycho.nsa.gov>
+> cc: linux-security-module@vger.kernel.org
+> ---
 > 
-> I don't know how do you come to the conclusion we don't wait for send
-> completion before completing IO.
-> 
-> We do chain wr on successfull read request from server, see funtion
-> rdma_write_sg,
+>  include/linux/lsm_hooks.h |   16 ++++++++++++++++
+>  include/linux/security.h  |   10 ++++++++++
+>  security/security.c       |   10 ++++++++++
+>  3 files changed, 36 insertions(+)
 
-I was referring to the client side
+
+Acked-by: James Morris <jamorris@linux.microsoft.com>
+
+
+-- 
+James Morris
+<jmorris@namei.org>
+
