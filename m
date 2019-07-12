@@ -2,201 +2,167 @@ Return-Path: <SRS0=GKUn=VJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 816BCC742A2
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:37:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D58FC742A5
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:44:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4971E21530
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:37:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20D1C208E4
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:44:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BREfGqR9";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="CpJacHx7"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="yE9iMMiv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728981AbfGLChe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 22:37:34 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:1376 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726505AbfGLChe (ORCPT
+        id S1729038AbfGLCob (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 22:44:31 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:36081 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729015AbfGLCob (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 22:37:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562899133; x=1594435133;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=EycIbVv2lQ6WnToSgnsueGKGsZQnYgTIzBCGeW6rU+4=;
-  b=BREfGqR9f689rc7m80Z4DNDDMLzrdA+fJgIch42wm4xGVBAM1vGGt1lr
-   KvF17NWtEGLBIFk5yeI13Y4btptyjuhPlhWgd7BaqZ2MyfvEMaqeqphvf
-   Rrgq/GrGtd4AQyBYU4sfAcuJI0jxTE0SXvx3s6dU2B8IkCRxhkuFleFaN
-   q66+QdFiFdwYukx/a41LEpI9IU/uWgxsvMTwTsSbtgi+UOg43ytCf0oUo
-   TfVn8j7nodkSKeIWVfH8N05oPQ1lmz9dgOpzGKqCGa2wio+nrY2ie7hJD
-   iDTI5ECuaghjrmNUfxLxpxYCY87TuEICHsXncZN2r6x0WFV47EVbTpnIx
-   Q==;
-IronPort-SDR: 0YI+VUYA94tdrNrQgKbO2PyFpxikGN0Tm7XgBZDlpbiegT3BkVduvnrPnALzLE9Ff2p/XCoqFX
- vEwj0EQPB9oppVbTgdnmf1V7z5Xla3wEW9VfwPeJ2807bbB4rEunFpF/C3ZtwbVT66vwAdYLr5
- wG9Z79e2WR+k6hKaY6Jmsrf914Cp0Lhe7q2i4K2DsUICptnH0ZOGuQWzgKmQpe9iCGP+lbi+/p
- pAA/HO0LCi0I0PwyG88maM7vYLopRWrgMahzXrvzcdFZZc6dTJGVubHmFD84bemk5faPHRTVuM
- n7g=
-X-IronPort-AV: E=Sophos;i="5.63,480,1557158400"; 
-   d="scan'208";a="212780749"
-Received: from mail-dm3nam03lp2059.outbound.protection.outlook.com (HELO NAM03-DM3-obe.outbound.protection.outlook.com) ([104.47.41.59])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Jul 2019 10:38:47 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FEg4Kz95Edj/rNhbSJ4YHRSzDHxzqdyrceuwGhl3MAE2dMJ6Y1i7NqOYqcLh4ltbyIrpo8+L0JohUOr43hIAxjH+Nr6pgr1kzq5vOzpxP+wz2geKYVIUw0gAWWeekjwar1eMT/ULsYi+7rbAjMniFxfglb9VoPHbE7JHjywBbNBMb/F4mn2UfAxYULaoDdFvbapKD0c7OiumuFnTVOPUL2GgmE3jXrdY9h/g9RERMVnf91O9qDVH3UtiqcWiv9YwkNRk6SK4jj2ucV4eSPe+DpZqGmHjZuqlQlDSeh6brbVApX1w/mV7HvMnZJOtb2ZjlVEDgSG7MS1ucAI3mK0IGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B56Vg36McHBe62B7ZuWElJW38iO9wXDefSNCKbCA6lA=;
- b=c4byYs/w/dJ7E6KyqJN7X9vJ6n6ex9X8uDn2ZnCjeSDOtJrvVWqidpPQK3LrEVnUoNZEQ/l39PTQRsQ8w3v3dvveL19EYRe8pYjN2HDbEO6S+/N52KrH1ayLmPB+qIPWeCBDxcAon+QTi2QTZsLUdgMUaT9zDPZbD5q5bgtEMetbKZfzeVXN42m2O+t9dSao3UVG50WOVczEw1zr3aCquJYS1w0xu1fn1hghBQjMTL0klcgCZBtnP0XKvtadJdUhE4xC801/anyRg8GEagTzuOeyqunMPGcQ82opkg5XQVSuysKDzYTHGy9+EbG37SKdUeYZVJ02IEAk6CnUa6Cr/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=wdc.com;dmarc=pass action=none header.from=wdc.com;dkim=pass
- header.d=wdc.com;arc=none
+        Thu, 11 Jul 2019 22:44:31 -0400
+Received: by mail-pf1-f195.google.com with SMTP id r7so3633820pfl.3
+        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2019 19:44:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B56Vg36McHBe62B7ZuWElJW38iO9wXDefSNCKbCA6lA=;
- b=CpJacHx7E9UyJzdYgtE59cAWUtKbKVynXQvsTqpzA1wS7swJWEkx2lC7huWtzsokiRFEBX41H4C5T7udUuAGZFn/HR0CxjiPKDG0BE9XGzgLCojQhk9NMmubq6+8x8ZACbIEkcIeuOP47M73eiVDSzsiGoDcQ5J01+0dRLSM3ZQ=
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.58.207) by
- BYAPR04MB5543.namprd04.prod.outlook.com (20.178.232.150) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2073.10; Fri, 12 Jul 2019 02:37:29 +0000
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::65a9:db0a:646d:eb1e]) by BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::65a9:db0a:646d:eb1e%6]) with mapi id 15.20.2073.008; Fri, 12 Jul 2019
- 02:37:29 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=cl7fhg8lBpEQW7dma5LXG4fo5CaaraE0u/K19/WC6D8=;
+        b=yE9iMMiv7zZJT8r4F0JF5rJFPdESrYfMgqD7djVbGfs14PywlHkFQDQNGvJegNFfpB
+         SRs++D/DwalbNz9W0wWll3A2TUyZUTSThOjQDvHqs6hKDwBakWBYu24fxFk/3BEn34rP
+         rWpM9KqSNnYGwaEVx9x7iP9o0vnS6ZbrDk3JH2zPh3GIMDaosx4ZghFD1EQBBGtVggoT
+         mhKFnUfCHjlN8gpErbckLXvf2BrERlWLPGz/wIusdVZsqolLtcrug1hYlWU3FJDfdLXz
+         ++HkA9Gc+Po6NHD5pOODoyBKA35LQM29rTbnL9LICLYXD60mQRp5t90pIRSjpJGGdzv6
+         8K+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=cl7fhg8lBpEQW7dma5LXG4fo5CaaraE0u/K19/WC6D8=;
+        b=kxAXM7HYk7Xnh4NhCE1v9lm2OMsZunz8VAxbsu5h6inqMMmzwcvSzudgKLsx2smE51
+         augy5og+8ELcR/WOjPLwpOgd5Ndsvb6wXaic457k77Vceo988OzPVNHR8IFGeqN9+i3D
+         kXrWbZUhSi4QVJmZBAnnLHRBLLla7oC/3ROl+wg077dBQmjSyLKgGGLvFEx5J71t4l1L
+         bTcrXRX27t2JA21JePz/3pzq0LsnsC/mMafOAStY6sCv2wwoyR+MaiiDRRNmx6n0Cqq1
+         bHOxrypAu4X6192Ud+OSv8/ZOhLE3W37c8SXirxaF1oFTfsf4+Xto0KOmebbYPfLXBBe
+         HOGg==
+X-Gm-Message-State: APjAAAX02I2iezEnHBYBqm9yhlT7aHsjG8ADiybTm1XzgYdL/2UN5q6/
+        ecYU/gzd4m3ZNHJ2kc1HBq519X5c0Yw=
+X-Google-Smtp-Source: APXvYqyaF3f8uPJN3uLUR9Lds9jPhhyD6yI6LiLAFCX7DtmWKvthfZUJxoYHeZVNwrRUoMm2JzIf8Q==
+X-Received: by 2002:a17:90a:9905:: with SMTP id b5mr8872323pjp.70.1562899470172;
+        Thu, 11 Jul 2019 19:44:30 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
+        by smtp.gmail.com with ESMTPSA id x67sm9243858pfb.21.2019.07.11.19.44.28
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 11 Jul 2019 19:44:29 -0700 (PDT)
 Subject: Re: [PATCH] block: tidy up blk_mq_plug
-Thread-Topic: [PATCH] block: tidy up blk_mq_plug
-Thread-Index: AQHVN9o+sndcsfGM/ka+J11i8GzIeg==
-Date:   Fri, 12 Jul 2019 02:37:29 +0000
-Message-ID: <BYAPR04MB5816B7867433C3A946E7411DE7F20@BYAPR04MB5816.namprd04.prod.outlook.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <20190711111714.4802-1-hch@lst.de>
  <53c09d04-3f29-2cea-ede4-cdf443539a17@kernel.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [199.255.47.9]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 68fd8341-faa4-4dd2-fff3-08d70671e254
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5543;
-x-ms-traffictypediagnostic: BYAPR04MB5543:
-x-microsoft-antispam-prvs: <BYAPR04MB5543EB4C03529FAA3D59DDC5E7F20@BYAPR04MB5543.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:2958;
-x-forefront-prvs: 00963989E5
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(39860400002)(376002)(396003)(366004)(346002)(199004)(189003)(53936002)(446003)(6246003)(305945005)(81166006)(102836004)(5660300002)(81156014)(86362001)(66066001)(4326008)(7736002)(9686003)(229853002)(316002)(6116002)(74316002)(8936002)(256004)(478600001)(52536014)(14444005)(99286004)(53546011)(486006)(7696005)(6506007)(2906002)(26005)(8676002)(76176011)(64756008)(66556008)(66446008)(25786009)(66476007)(6436002)(476003)(91956017)(76116006)(110136005)(3846002)(71200400001)(71190400001)(14454004)(33656002)(68736007)(186003)(55016002)(66946007);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5543;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 4tpOvZWmRCd2sFMkuDqOB26tYOCRozOKmQkvAFj4FO6q+/7GP0VHttRnXkHt8TkRNGPQmPV0yd3/hcKzvW7kNgJTMudHSd8Y42pfoWtoQf77inGj77G7aPwgYu/yvL24XR5SBKHYzkoe9cHB1h99sNY2eAoB2ZbL5xIoDFsnC6Avkl2vT+9GFXxbizn8iWMLYefVTA6ZMXPZQVMRdFFOrQfcT6Sr6WIHq6B9UDzrVuSnrjPQcq0cVVMq1fOhbc3z623Zf5AqF9k0kOcNnzd0VS+H9Vg1jesMeXmKG1AT7vkexX3q6VwgvAPwxfGjCK061u3aH3E6XEiOHInnHEONWcjWfVAbqI5vp8aq3GREU7e4dVdmFrne5v5kgijGAy+KZnVOoWNHmNDdp+hexOBQaig5iqRnsk8aDlzuXQPD5xQ=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ <BYAPR04MB5816B7867433C3A946E7411DE7F20@BYAPR04MB5816.namprd04.prod.outlook.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ff1df7c2-93a8-5233-3873-005817356c27@kernel.dk>
+Date:   Thu, 11 Jul 2019 20:44:27 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68fd8341-faa4-4dd2-fff3-08d70671e254
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jul 2019 02:37:29.3887
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Damien.LeMoal@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5543
+In-Reply-To: <BYAPR04MB5816B7867433C3A946E7411DE7F20@BYAPR04MB5816.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/07/12 3:09, Jens Axboe wrote:=0A=
-> On 7/11/19 5:17 AM, Christoph Hellwig wrote:=0A=
->> Make the zoned device write path the special case and just fall=0A=
->> though to the defaul case to make the code easier to read.  Also=0A=
->> update the top of function comment to use the proper kdoc format=0A=
->> and remove the extra in-function comments that just duplicate it.=0A=
->>=0A=
->> Signed-off-by: Christoph Hellwig <hch@lst.de>=0A=
->> ---=0A=
->>   block/blk-mq.h | 14 ++++----------=0A=
->>   1 file changed, 4 insertions(+), 10 deletions(-)=0A=
->>=0A=
->> diff --git a/block/blk-mq.h b/block/blk-mq.h=0A=
->> index 32c62c64e6c2..ab80fd2b3803 100644=0A=
->> --- a/block/blk-mq.h=0A=
->> +++ b/block/blk-mq.h=0A=
->> @@ -233,7 +233,7 @@ static inline void blk_mq_clear_mq_map(struct blk_mq=
-_queue_map *qmap)=0A=
->>   		qmap->mq_map[cpu] =3D 0;=0A=
->>   }=0A=
->>   =0A=
->> -/*=0A=
->> +/**=0A=
->>    * blk_mq_plug() - Get caller context plug=0A=
->>    * @q: request queue=0A=
->>    * @bio : the bio being submitted by the caller context=0A=
->> @@ -254,15 +254,9 @@ static inline void blk_mq_clear_mq_map(struct blk_m=
-q_queue_map *qmap)=0A=
->>   static inline struct blk_plug *blk_mq_plug(struct request_queue *q,=0A=
->>   					   struct bio *bio)=0A=
->>   {=0A=
->> -	/*=0A=
->> -	 * For regular block devices or read operations, use the context plug=
-=0A=
->> -	 * which may be NULL if blk_start_plug() was not executed.=0A=
->> -	 */=0A=
->> -	if (!blk_queue_is_zoned(q) || !op_is_write(bio_op(bio)))=0A=
->> -		return current->plug;=0A=
->> -=0A=
->> -	/* Zoned block device write operation case: do not plug the BIO */=0A=
->> -	return NULL;=0A=
->> +	if (blk_queue_is_zoned(q) && op_is_write(bio_op(bio)))=0A=
->> +		return NULL;=0A=
->> +	return current->plug;=0A=
->>   }=0A=
->>   =0A=
->>   #endif=0A=
-> =0A=
-> I agree it's more readable, but probably also means that the path that we=
-=0A=
-> care the least about (zoned+write) is now the inline one.=0A=
-=0A=
-What about an additional inline function ?=0A=
-So something like this is very readable I think and blk_mq_plug() can also =
-be=0A=
-optimized with #ifdef for the !CONFIG_BLK_DEV_ZONED case.=0A=
-=0A=
-#ifndef CONFIG_BLK_DEV_ZONED=0A=
-static inline struct blk_plug *blk_mq_plug(struct request_queue *q,=0A=
-  					   struct bio *bio)=0A=
-{=0A=
-	return current->plug;=0A=
-}=0A=
-#else=0A=
-static inline struct blk_plug *blk_zoned_get_plug(struct request_queue *q,=
-=0A=
-  						  struct bio *bio)=0A=
-{=0A=
-	if (op_is_write(bio_op(bio)))=0A=
-		return NULL;=0A=
-=0A=
-	return current->plug;=0A=
-}=0A=
-=0A=
-static inline struct blk_plug *blk_mq_plug(struct request_queue *q,=0A=
-  					   struct bio *bio)=0A=
-{=0A=
-	if (!blk_queue_is_zoned(q))=0A=
-		return current->plug;=0A=
-=0A=
-	return blk_zoned_get_plug(q, bio);=0A=
-}=0A=
-#endif=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On 7/11/19 8:37 PM, Damien Le Moal wrote:
+> On 2019/07/12 3:09, Jens Axboe wrote:
+>> On 7/11/19 5:17 AM, Christoph Hellwig wrote:
+>>> Make the zoned device write path the special case and just fall
+>>> though to the defaul case to make the code easier to read.  Also
+>>> update the top of function comment to use the proper kdoc format
+>>> and remove the extra in-function comments that just duplicate it.
+>>>
+>>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>>> ---
+>>>    block/blk-mq.h | 14 ++++----------
+>>>    1 file changed, 4 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/block/blk-mq.h b/block/blk-mq.h
+>>> index 32c62c64e6c2..ab80fd2b3803 100644
+>>> --- a/block/blk-mq.h
+>>> +++ b/block/blk-mq.h
+>>> @@ -233,7 +233,7 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
+>>>    		qmap->mq_map[cpu] = 0;
+>>>    }
+>>>    
+>>> -/*
+>>> +/**
+>>>     * blk_mq_plug() - Get caller context plug
+>>>     * @q: request queue
+>>>     * @bio : the bio being submitted by the caller context
+>>> @@ -254,15 +254,9 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
+>>>    static inline struct blk_plug *blk_mq_plug(struct request_queue *q,
+>>>    					   struct bio *bio)
+>>>    {
+>>> -	/*
+>>> -	 * For regular block devices or read operations, use the context plug
+>>> -	 * which may be NULL if blk_start_plug() was not executed.
+>>> -	 */
+>>> -	if (!blk_queue_is_zoned(q) || !op_is_write(bio_op(bio)))
+>>> -		return current->plug;
+>>> -
+>>> -	/* Zoned block device write operation case: do not plug the BIO */
+>>> -	return NULL;
+>>> +	if (blk_queue_is_zoned(q) && op_is_write(bio_op(bio)))
+>>> +		return NULL;
+>>> +	return current->plug;
+>>>    }
+>>>    
+>>>    #endif
+>>
+>> I agree it's more readable, but probably also means that the path that we
+>> care the least about (zoned+write) is now the inline one.
+> 
+> What about an additional inline function ?
+> So something like this is very readable I think and blk_mq_plug() can also be
+> optimized with #ifdef for the !CONFIG_BLK_DEV_ZONED case.
+> 
+> #ifndef CONFIG_BLK_DEV_ZONED
+> static inline struct blk_plug *blk_mq_plug(struct request_queue *q,
+>    					   struct bio *bio)
+> {
+> 	return current->plug;
+> }
+> #else
+> static inline struct blk_plug *blk_zoned_get_plug(struct request_queue *q,
+>    						  struct bio *bio)
+> {
+> 	if (op_is_write(bio_op(bio)))
+> 		return NULL;
+> 
+> 	return current->plug;
+> }
+> 
+> static inline struct blk_plug *blk_mq_plug(struct request_queue *q,
+>    					   struct bio *bio)
+> {
+> 	if (!blk_queue_is_zoned(q))
+> 		return current->plug;
+> 
+> 	return blk_zoned_get_plug(q, bio);
+> }
+> #endif
+
+Let's not go that far into ifdef'ery, please... Besides, that usually
+solves nothing, as most/all kernels will have zoned support enabled.
+
+I'm actually fine with the existing setup. Yes, the other variant is
+easier to read, but I bet the existing one inlines better.
+
+-- 
+Jens Axboe
+
