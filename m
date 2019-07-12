@@ -2,163 +2,125 @@ Return-Path: <SRS0=GKUn=VJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05379C742A8
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 08:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AB63C742AE
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 09:03:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D23D521019
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 08:26:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23E9920645
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 09:03:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BAFql+Ha"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z07apoYj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726418AbfGLIZ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Jul 2019 04:25:59 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:36628 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725877AbfGLIZ7 (ORCPT
+        id S1725993AbfGLJDz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Jul 2019 05:03:55 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:33255 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbfGLJDz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Jul 2019 04:25:59 -0400
-Received: by mail-pf1-f193.google.com with SMTP id r7so3994293pfl.3
-        for <linux-block@vger.kernel.org>; Fri, 12 Jul 2019 01:25:58 -0700 (PDT)
+        Fri, 12 Jul 2019 05:03:55 -0400
+Received: by mail-pl1-f193.google.com with SMTP id c14so4462109plo.0;
+        Fri, 12 Jul 2019 02:03:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/RTxoumVNtB1PBld0antS4Z7J0pCK7ZhiGq0s+u+T8Q=;
-        b=BAFql+HaVxohUfVl9mYP/S5YzuA9cwdMGK2nCDIC66akftcSMq/vzOqHPsPfc6/6QO
-         3jbIxFLWL9RGB511maoma3UoAL51vux8VnJePTL/VCgMZPr6RxN5Bw1+YMc/2Gt+m8we
-         3O5VAqNXBto7Ij4ZOE6HDlreMkSzh4Wj+AQqk=
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=i93erGQBEdGUvhjnj900r6ImbBuHJewNb/EPkRjgFew=;
+        b=Z07apoYj4RIC+0LNfxgd6x0FLOITlM4REZEHTQ3WMwMzpqrAF53njy07hpNn3Ijm58
+         d/mzdc+qqSsp9G+WoR9XqJOptmNHHRUkvzm6S2YNE9k9Ulm4UvvmK+/kgXkEF2xRDawO
+         p1S+JYa1HPNS00sY0DVPDBDep9dCVfm1pUlJz1BJNlLBp7rvK4pcQpc899o4irEYeILz
+         EAb6qcJh23GPGjsxVmsBzQyQMui+qxfmyitaEYdN/adGMTNVFJaNVCtZaPAJi7AzQf5L
+         S9nx6WNwKJcKrYvWU3BtOnQFRsdaK729Q42R9OAhqhRQAet/AWeSC4CGAnaUjokNS4KY
+         i6Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/RTxoumVNtB1PBld0antS4Z7J0pCK7ZhiGq0s+u+T8Q=;
-        b=DMqZyEBb08PmAtbg5E5r/I9UNxXuoXZBozQJlTNGzmgXoPmOYqw5Rpti3DkNc1KuuL
-         7NnbFQCjK33YmVezhvVoAnax4HWzrLGIznOebQ5WUPxk2qubkzPemafjERS4geG63oEZ
-         LGaickBZYxpA6HywRwClVd8gZmpo0yeDKj1kUoABnIamghlO2Jnun6J9c5K2Ya9hrNuY
-         9QTx+A2GszITnQylDkPCmeZDRjSVBK9PAbjbk6pmipCuhIcyQjOYv+hJJGZyS3ebKcJ4
-         wb54mSTQNvV057N+XAE2mTftXu9gg/UVlsIqpFBT82rzPRlvO8AAwa6IP/qRcsrg0MK0
-         K3HA==
-X-Gm-Message-State: APjAAAU7DgBRdqCOUsl09RectLotlfX8/BTvSRl2N0tME4RsEqt7gVyt
-        oTpMwqj6DHT4/o89nU8Yx+nh3TtYZrpqwlWviH2HTg==
-X-Google-Smtp-Source: APXvYqwAnknqjQvGUnrEC5ubqLeQGMCESFeladMIiOfwXF9UrCGRG+5+L2hqDm0nBHA51jOduboUlYnwqXtHNbzKgbU=
-X-Received: by 2002:a17:90a:ac14:: with SMTP id o20mr10306970pjq.114.1562919958370;
- Fri, 12 Jul 2019 01:25:58 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=i93erGQBEdGUvhjnj900r6ImbBuHJewNb/EPkRjgFew=;
+        b=GOKiam7eIas9O1o2Lz3LuNCsK3byA1GVLBDf62jn2uQfghPh+hn9z2kTxXXlsrmjws
+         fZRZTpiF3UjpW2piSxkxEkz8AvA+DGpYM4GQadMGLedA8AHtrnJGbefjT6vEJz3sU3Fe
+         mTIeTRrdoXPRwqWB4re7zXZRA0T1ZyYGSr2QqdpFn95jT0KIGqEAnQIjhRSohWr8lGkM
+         +u/LBp2ZWtWTlWnT0xYneZQfKobWXgEcJB9+2Esg8TpyklxZTslnkl3N6HCS2sobOQvw
+         yGqCGtDzLbmT1g2lWHe/JXwl+dHIYoT4tf27vmR1Pjb5Z/htBLZQSsWF8GbBRfJC7aab
+         Y9og==
+X-Gm-Message-State: APjAAAUD6jsSeq+h215ekbLrvjU/XsQI9d78fWSZwORd6PeEADSKkCak
+        pT+RqbDe+tmTsbWfTSQumu8=
+X-Google-Smtp-Source: APXvYqxdW9/IthRQ7rsmpCwbf0zLG/Lgcp8qZuEfY0tONfvOF6G0RNnXVCtqwWbLt7x1yyzKwe3SDA==
+X-Received: by 2002:a17:902:76c6:: with SMTP id j6mr10061115plt.102.1562922234461;
+        Fri, 12 Jul 2019 02:03:54 -0700 (PDT)
+Received: from localhost ([123.213.206.190])
+        by smtp.gmail.com with ESMTPSA id y8sm7341206pfn.52.2019.07.12.02.03.52
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 12 Jul 2019 02:03:53 -0700 (PDT)
+Date:   Fri, 12 Jul 2019 18:03:50 +0900
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [RFC PATCH 3/7] blk-mq: stop to handle IO before hctx's all CPUs
+ become offline
+Message-ID: <20190712090350.GB31048@minwoo-desktop>
+References: <20190712024726.1227-1-ming.lei@redhat.com>
+ <20190712024726.1227-4-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <CGME20190621063708epcms2p309f4173afabe5de28942ba15d13987f7@epcms2p3>
- <20190621063708epcms2p309f4173afabe5de28942ba15d13987f7@epcms2p3>
-In-Reply-To: <20190621063708epcms2p309f4173afabe5de28942ba15d13987f7@epcms2p3>
-From:   Sreekanth Reddy <sreekanth.reddy@broadcom.com>
-Date:   Fri, 12 Jul 2019 13:55:47 +0530
-Message-ID: <CAK=zhgr_T8vA=BCdFCT37RxGCgS3xr8Wp9MEMK_9nZ=oYHy=7Q@mail.gmail.com>
-Subject: Re: [RESEND RFC PATCH] mpt3sas: support target smid for [abort|query] task
-To:     minwoo.im@samsung.com
-Cc:     "sathya.prakash@broadcom.com" <sathya.prakash@broadcom.com>,
-        "suganath-prabu.subramani@broadcom.com" 
-        <suganath-prabu.subramani@broadcom.com>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "MPT-FusionLinux.pdl@broadcom.com" <MPT-FusionLinux.pdl@broadcom.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Euihyeok Kwon <eh81.kwon@samsung.com>,
-        Sarah Cho <sohyeon.jo@samsung.com>,
-        Sanggwan Lee <sanggwan.lee@samsung.com>,
-        Gyeongmin Nam <gm.nam@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190712024726.1227-4-ming.lei@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 21, 2019 at 12:07 PM Minwoo Im <minwoo.im@samsung.com> wrote:
->
-> We can request task management IOCTL command(MPI2_FUNCTION_SCSI_TASK_MGMT)
-> to /dev/mpt3ctl.  If the given task_type is either abort task or query
-> task, it may need a field named "Initiator Port Transfer Tag to Manage"
-> in the IU.
->
-> Current code does not support to check target IPTT tag from the
-> tm_request.  This patch introduces to check TaskMID given from the
-> userspace as a target tag.  We have a rule of relationship between
-> (struct request *req->tag) and smid in mpt3sas_base.c:
->
-> 3318 u16
-> 3319 mpt3sas_base_get_smid_scsiio(struct MPT3SAS_ADAPTER *ioc, u8 cb_idx,
-> 3320         struct scsi_cmnd *scmd)
-> 3321 {
-> 3322         struct scsiio_tracker *request = scsi_cmd_priv(scmd);
-> 3323         unsigned int tag = scmd->request->tag;
-> 3324         u16 smid;
-> 3325
-> 3326         smid = tag + 1;
->
-> So if we want to abort a request tagged #X, then we can pass (X + 1) to
-> this IOCTL handler.
->
-> Cc: Sathya Prakash <sathya.prakash@broadcom.com>
-> Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
-> Cc: James E.J. Bottomley <jejb@linux.ibm.com>
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: MPT-FusionLinux.pdl@broadcom.com
-> Signed-off-by: Minwoo Im <minwoo.im@samsung.com>
-> ---
->  drivers/scsi/mpt3sas/mpt3sas_ctl.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/scsi/mpt3sas/mpt3sas_ctl.c b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
-> index b2bb47c14d35..5c7539dae713 100644
-> --- a/drivers/scsi/mpt3sas/mpt3sas_ctl.c
-> +++ b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
-> @@ -596,15 +596,17 @@ _ctl_set_task_mid(struct MPT3SAS_ADAPTER *ioc, struct mpt3_ioctl_command *karg,
->                 if (priv_data->sas_target->handle != handle)
->                         continue;
->                 st = scsi_cmd_priv(scmd);
-> -               tm_request->TaskMID = cpu_to_le16(st->smid);
-> -               found = 1;
-> +               if (tm_request->TaskMID == st->smid) {
+On 19-07-12 10:47:22, Ming Lei wrote:
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e5ef40c603ca..028c5d78e409 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2205,6 +2205,64 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>  	return -ENOMEM;
+>  }
+>  
+> +static bool blk_mq_count_inflight_rq(struct request *rq, void *data,
+> +				     bool reserved)
+> +{
+> +	unsigned *count = data;
+> +
+> +	if ((blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT))
+> +		(*count)++;
+> +
+> +	return true;
+> +}
+> +
+> +unsigned blk_mq_tags_inflight_rqs(struct blk_mq_tags *tags)
+> +{
+> +	unsigned count = 0;
+> +
+> +	blk_mq_all_tag_busy_iter(tags, blk_mq_count_inflight_rq, &count);
+> +
+> +	return count;
+> +}
 
-I think it will difficult for the user to find the smid that he want
-to abort. For this user has to enable the scsi logging level and get
-the tag and pass the ioctl with tag +1 value in TaskMID field. And
-hence currently driver will loop over all the smid's and if it fines
-any outstanding smid then it will issue task abort or task query TM
-for this outstanding smid to the HBA firmware.
+Ming,
 
-May be we can do like below,
-* First check whether user provided "TaskMID" is non zero or not. if
-user provided TaskMID is non-zero and if this TaskMID is outstanding
-then driver will issue TaskAbort/QueryTask TM with this TaskMID value
-else driver will loop over all the smid's and if finds any smid is
-outstanding then it will issue TaskAbort/QueryTask TM with TaskMID
-value set to outstanding smid.
+Maybe it can be static?
 
-With the above logic still legacy application will be supported
-without breaking anything where they provide TaskMID filed as zero.
-And it also allows the user to abort the IO which he wants.
-
-Thanks,
-Sreekanth
-
-> +                       tm_request->TaskMID = cpu_to_le16(st->smid);
-> +                       found = 1;
-> +               }
->         }
->
->         if (!found) {
->                 dctlprintk(ioc,
-> -                          ioc_info(ioc, "%s: handle(0x%04x), lun(%d), no active mid!!\n",
-> +                          ioc_info(ioc, "%s: handle(0x%04x), lun(%d), no matched mid(%d)!!\n",
->                                     desc, le16_to_cpu(tm_request->DevHandle),
-> -                                   lun));
-> +                                   lun, tm_request->TaskMID));
->                 tm_reply = ioc->ctl_cmds.reply;
->                 tm_reply->DevHandle = tm_request->DevHandle;
->                 tm_reply->Function = MPI2_FUNCTION_SCSI_TASK_MGMT;
-> --
-> 2.16.1
+> +
+> +static void blk_mq_drain_inflight_rqs(struct blk_mq_hw_ctx *hctx)
+> +{
+> +	while (1) {
+> +		if (!blk_mq_tags_inflight_rqs(hctx->tags))
+> +			break;
+> +		msleep(5);
+> +	}
+> +}
