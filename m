@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C660DC742A5
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:48:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 168E0C742A2
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:48:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9B314214AF
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:48:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E172E208E4
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:48:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728956AbfGLCsC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 22:48:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57404 "EHLO mx1.redhat.com"
+        id S1729234AbfGLCsF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 22:48:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42634 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726505AbfGLCsC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 22:48:02 -0400
+        id S1728743AbfGLCsF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jul 2019 22:48:05 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 964358666A;
-        Fri, 12 Jul 2019 02:48:01 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id F29BA307D915;
+        Fri, 12 Jul 2019 02:48:04 +0000 (UTC)
 Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A3C3419C67;
-        Fri, 12 Jul 2019 02:47:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 295EC1972A;
+        Fri, 12 Jul 2019 02:48:03 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
@@ -37,27 +37,27 @@ Cc:     linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>,
         Keith Busch <keith.busch@intel.com>
-Subject: [RFC PATCH 4/7] blk-mq: add callback of .free_request
-Date:   Fri, 12 Jul 2019 10:47:23 +0800
-Message-Id: <20190712024726.1227-5-ming.lei@redhat.com>
+Subject: [RFC PATCH 5/7] SCSI: implement .free_request callback
+Date:   Fri, 12 Jul 2019 10:47:24 +0800
+Message-Id: <20190712024726.1227-6-ming.lei@redhat.com>
 In-Reply-To: <20190712024726.1227-1-ming.lei@redhat.com>
 References: <20190712024726.1227-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Fri, 12 Jul 2019 02:48:01 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Fri, 12 Jul 2019 02:48:05 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_steal_bios() is usually used before freeing the request, however,
-we have to tell driver that the un-completed request will be freed,
-then driver can free any private part for the request.
+Implement .free_request() callback for freeing driver private part
+of the request. Then we can avoid to leak this part if the request isn't
+completed by SCSI, and freed by blk-mq finally.
 
-Then we can apply blk_steal_bios() in other cases, such as freeing
-the request and re-submit the stolen bios after the hctx is down
-in CPU hotplug situation.
+One use case is that for handling CPU hotplug when the current
+hctx is down, but some requests allocated from this hctx are still
+in queue.
 
 Cc: Bart Van Assche <bvanassche@acm.org>
 Cc: Hannes Reinecke <hare@suse.com>
@@ -66,34 +66,40 @@ Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Keith Busch <keith.busch@intel.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/blk-mq.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/scsi/scsi_lib.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index dc86bdac08f4..353606023a0f 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -141,6 +141,7 @@ typedef int (poll_fn)(struct blk_mq_hw_ctx *);
- typedef int (map_queues_fn)(struct blk_mq_tag_set *set);
- typedef bool (busy_fn)(struct request_queue *);
- typedef void (complete_fn)(struct request *);
-+typedef void (free_request_fn)(struct request *);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 65d0a10c76ad..e07a376a8c38 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1073,6 +1073,18 @@ static void scsi_initialize_rq(struct request *rq)
+ 	cmd->retries = 0;
+ }
  
- 
- struct blk_mq_ops {
-@@ -201,6 +202,12 @@ struct blk_mq_ops {
- 	/* Called from inside blk_get_request() */
- 	void (*initialize_rq_fn)(struct request *rq);
- 
-+	/*
-+	 * Called before freeing one request which isn't completed yet,
-+	 * and usually for freeing the driver private part
-+	 */
-+	free_request_fn		*free_request;
++/*
++ * Only called when the request isn't completed by SCSI, and freed by
++ * blk-mq
++ */
++static void scsi_free_rq(struct request *rq)
++{
++	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
 +
- 	/*
- 	 * If set, returns whether or not this queue currently is busy
- 	 */
++	if (rq->rq_flags & RQF_DONTPREP)
++		scsi_mq_uninit_cmd(cmd);
++}
++
+ /* Add a command to the list used by the aacraid and dpt_i2o drivers */
+ void scsi_add_cmd_to_list(struct scsi_cmnd *cmd)
+ {
+@@ -1800,6 +1812,7 @@ static const struct blk_mq_ops scsi_mq_ops = {
+ 	.init_request	= scsi_mq_init_request,
+ 	.exit_request	= scsi_mq_exit_request,
+ 	.initialize_rq_fn = scsi_initialize_rq,
++	.free_request	= scsi_free_rq,
+ 	.busy		= scsi_mq_lld_busy,
+ 	.map_queues	= scsi_map_queues,
+ };
 -- 
 2.20.1
 
