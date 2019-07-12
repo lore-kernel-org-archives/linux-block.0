@@ -1,97 +1,169 @@
-Return-Path: <SRS0=DuRR=VI=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=GKUn=VJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 905B1C742A1
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 19:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 361B2C742A1
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 00:22:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6CFB5208E4
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jul 2019 19:59:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A42421537
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 00:22:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728898AbfGKT7f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 15:59:35 -0400
-Received: from ajax.cs.uga.edu ([128.192.4.6]:55458 "EHLO ajax.cs.uga.edu"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726505AbfGKT7e (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 15:59:34 -0400
-X-Greylist: delayed 2416 seconds by postgrey-1.27 at vger.kernel.org; Thu, 11 Jul 2019 15:59:33 EDT
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-        (authenticated bits=0)
-        by ajax.cs.uga.edu (8.14.4/8.14.4) with ESMTP id x6BJJFVn054162
-        (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=OK);
-        Thu, 11 Jul 2019 15:19:17 -0400
-Received: by mail-lf1-f50.google.com with SMTP id h28so4811584lfj.5;
-        Thu, 11 Jul 2019 12:19:17 -0700 (PDT)
-X-Gm-Message-State: APjAAAWxheXejtPBkf3TaMAvpn/+tA0N+iGsz0xgfiAGKc7Mri0Xr5JA
-        R7Zu/l2iW5sxEp5lgEyrt7/Hg+Elaq5qCPaS1oc=
-X-Google-Smtp-Source: APXvYqwunc/O9uRDAgMduACqLWOqC09W6hXRDVHDdvBA5YcONGMc9t6fPqw9wsUN4kmB4dulWuL+7iJOiMAcA27WMv4=
-X-Received: by 2002:ac2:418f:: with SMTP id z15mr2543647lfh.177.1562872755598;
- Thu, 11 Jul 2019 12:19:15 -0700 (PDT)
+        id S1730537AbfGLAWa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 20:22:30 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:34040 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728102AbfGLAWa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jul 2019 20:22:30 -0400
+Received: by mail-ot1-f65.google.com with SMTP id n5so7762767otk.1;
+        Thu, 11 Jul 2019 17:22:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jXZQvwZ+WxHloRkZdb0DMVv7eaNNsxBD6ps2KyCl09Y=;
+        b=P6xsbYPqutA2TM1WAD/JWrYqrTyijMZgu6r4uqMgG5+0/ODz7/29rl+dKC8IY0V4vC
+         i4+TG6fM3MvXa2MBs/bAiE+kArTCUKJ8o7+rT2ZeXrRCud689T9+8YiNEzgL15GxKh9m
+         G3wURS0ib6DvnphB63fm+jMSLBZsOvktqs0D/tovXJylA/PUEa50H+xDEHnA7DM9Efd9
+         pQRsYvLWS5F5u9Q/qxDJdprU6Mo7ITU8jRM6bbLOxebWPZJpFcZHFk5PDlbsMEQiG6EV
+         MPYpWQF7yfVit5dmZamEBWmMIh0N6kia3kTvVTCMNN28IxRbGUm37co1vYgGqrOeYuSK
+         glag==
+X-Gm-Message-State: APjAAAX/Fa06j4Ij5f94kxLWMVIEuQLlyLyj8XB2X9ckSfP0l6aM6zaQ
+        lZEYyZf6brRJtLFvik3U1Tg=
+X-Google-Smtp-Source: APXvYqxzFkcd+fCSstleSDxY7LurqciKea5lf41DlefWqIyWr15+e48X2y5oaegjnRVEng15aayIcg==
+X-Received: by 2002:a9d:51cf:: with SMTP id d15mr6137989oth.206.1562890949154;
+        Thu, 11 Jul 2019 17:22:29 -0700 (PDT)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id a20sm2539222otl.44.2019.07.11.17.22.27
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 11 Jul 2019 17:22:28 -0700 (PDT)
+Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
+ Device (IBNBD)
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, axboe@kernel.dk,
+        Christoph Hellwig <hch@infradead.org>, bvanassche@acm.org,
+        jgg@mellanox.com, dledford@redhat.com,
+        Roman Pen <r.peniaev@gmail.com>, gregkh@linuxfoundation.org
+References: <20190620150337.7847-1-jinpuwang@gmail.com>
+ <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
+ <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me>
+ <CAHg0HuxZvXH899=M4vC7BTH-bP2J35aTwsGhiGoC8AamD8gOyA@mail.gmail.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <aef765ed-4bb9-2211-05d0-b320cc3ac275@grimberg.me>
+Date:   Thu, 11 Jul 2019 17:22:26 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <1562830033-24239-1-git-send-email-wang6495@umn.edu> <CACVXFVO-gwVhZRajRx41_sYJKDTX2qZUnZVRXCB0NcegVVTGVw@mail.gmail.com>
-In-Reply-To: <CACVXFVO-gwVhZRajRx41_sYJKDTX2qZUnZVRXCB0NcegVVTGVw@mail.gmail.com>
-From:   Wenwen Wang <wenwen@cs.uga.edu>
-Date:   Thu, 11 Jul 2019 14:18:42 -0500
-X-Gmail-Original-Message-ID: <CAAa=b7fUF1NSDa-dr7VqCZ4wBm1vChe9BRpgx9A_S8wM_OoNAg@mail.gmail.com>
-Message-ID: <CAAa=b7fUF1NSDa-dr7VqCZ4wBm1vChe9BRpgx9A_S8wM_OoNAg@mail.gmail.com>
-Subject: Re: [PATCH] block/bio-integrity: fix a memory leak bug
-To:     Ming Lei <tom.leiming@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Wenwen Wang <wenwen@cs.uga.edu>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAHg0HuxZvXH899=M4vC7BTH-bP2J35aTwsGhiGoC8AamD8gOyA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 11, 2019 at 4:22 AM Ming Lei <tom.leiming@gmail.com> wrote:
->
-> On Thu, Jul 11, 2019 at 3:36 PM Wenwen Wang <wang6495@umn.edu> wrote:
-> >
-> > From: Wenwen Wang <wenwen@cs.uga.edu>
-> >
-> > In bio_integrity_prep(), a kernel buffer is allocated through kmalloc() to
-> > hold integrity metadata. Later on, the buffer will be attached to the bio
-> > structure through bio_integrity_add_page(), which returns the number of
-> > bytes of integrity metadata attached. Due to unexpected situations,
-> > bio_integrity_add_page() may return 0. As a result, bio_integrity_prep()
-> > needs to be terminated with 'false' returned to indicate this error.
-> > However, the allocated kernel buffer is not freed on this execution path,
-> > leading to a memory leak.
-> >
-> > To fix this issue, free the allocated buffer before returning from
-> > bio_integrity_prep().
-> >
-> > Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
-> > ---
-> >  block/bio-integrity.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-> > index 4db6208..bfae10c 100644
-> > --- a/block/bio-integrity.c
-> > +++ b/block/bio-integrity.c
-> > @@ -276,8 +276,10 @@ bool bio_integrity_prep(struct bio *bio)
-> >                 ret = bio_integrity_add_page(bio, virt_to_page(buf),
-> >                                              bytes, offset);
-> >
-> > -               if (ret == 0)
-> > +               if (ret == 0) {
-> > +                       kfree(buf);
-> >                         return false;
-> > +               }
->
-> This way may not be enough, and the bio payload needs to be freed.
->
-> And you may refer to the error handling for 'IS_ERR(bip)', and bio->bi_status
-> needs to be set, and bio_endio() needs to be called too.
 
-Thanks for your comments! I will rework the patch.
+>> My main issues which were raised before are:
+>> - IMO there isn't any justification to this ibtrs layering separation
+>>     given that the only user of this is your ibnbd. Unless you are
+>>     trying to submit another consumer, you should avoid adding another
+>>     subsystem that is not really general purpose.
+> We designed ibtrs not only with the IBNBD in mind but also as the
+> transport layer for a distributed SDS. We'd like to be able to do what
+> ceph is capable of (automatic up/down scaling of the storage cluster,
+> automatic recovery) but using in-kernel rdma-based IO transport
+> drivers, thin-provisioned volume managers, etc. to keep the highest
+> possible performance.
 
-Wenwen
+Sounds lovely, but still very much bound to your ibnbd. And that part
+is not included in the patch set, so I still don't see why should this
+be considered as a "generic" transport subsystem (it clearly isn't).
+
+> All in all itbrs is a library to establish a "fat", multipath,
+> autoreconnectable connection between two hosts on top of rdma,
+> optimized for transport of IO traffic.
+
+That is also dictating a wire-protocol which makes it useless to pretty
+much any other consumer. Personally, I don't see how this library
+would ever be used outside of your ibnbd.
+
+>> - ibtrs in general is using almost no infrastructure from the existing
+>>     kernel subsystems. Examples are:
+>>     - tag allocation mechanism (which I'm not clear why its needed)
+> As you correctly noticed our client manages the buffers allocated and
+> registered by the server on the connection establishment. Our tags are
+> just a mechanism to take and release those buffers for incoming
+> requests on client side. Since the buffers allocated by the server are
+> to be shared between all the devices mapped from that server and all
+> their HW queues (each having num_cpus of them) the mechanism behind
+> get_tag/put_tag also takes care of the fairness.
+
+We have infrastructure for this, sbitmaps.
+
+>>     - rdma rw abstraction similar to what we have in the core
+> On the one hand we have only single IO related function:
+> ibtrs_clt_request(READ/WRITE, session,...), which executes rdma write
+> with imm, or requests an rdma write with imm to be executed by the
+> server.
+
+For sure you can enhance the rw API to have imm support?
+
+> On the other hand we provide an abstraction to establish and
+> manage what we call "session", which consist of multiple paths (to do
+> failover and multipath with different policies), where each path
+> consists of num_cpu rdma connections.
+
+That's fine, but it doesn't mean that it also needs to re-write
+infrastructure that we already have.
+
+> Once you established a session
+> you can add or remove paths from it on the fly. In case the connection
+> to server is lost, the client does periodic attempts to reconnect
+> automatically. On the server side you get just sg-lists with a
+> direction READ or WRITE as requested by the client. We designed this
+> interface not only as the minimum required to build a block device on
+> top of rdma but also with a distributed raid in mind.
+
+I suggest you take a look at the rw API and use that in your transport.
+
+>> Another question, from what I understand from the code, the client
+>> always rdma_writes data on writes (with imm) from a remote pool of
+>> server buffers dedicated to it. Essentially all writes are immediate (no
+>> rdma reads ever). How is that different than using send wrs to a set of
+>> pre-posted recv buffers (like all others are doing)? Is it faster?
+> At the very beginning of the project we did some measurements and saw,
+> that it is faster. I'm not sure if this is still true
+
+Its not significantly faster (can't imagine why it would be).
+What could make a difference is probably the fact that you never
+do rdma reads for I/O writes which might be better. Also perhaps the
+fact that you normally don't wait for send completions before completing
+I/O (which is broken), and the fact that you batch recv operations.
+
+I would be interested to understand what indeed makes ibnbd run faster
+though.
+
+>> Also, given that the server pre-allocate a substantial amount of memory
+>> for each connection, is it documented the requirements from the server
+>> side? Usually kernel implementations (especially upstream ones) will
+>> avoid imposing such large longstanding memory requirements on the system
+>> by default. I don't have a firm stand on this, but wanted to highlight
+>> this as you are sending this for upstream inclusion.
+> We definitely need to stress that somewhere. Will include into readme
+> and add to the cover letter next time. Our memory management is indeed
+> basically absent in favor of performance: The server reserves
+> queue_depth of say 512K buffers. Each buffer is used by client for
+> single IO only, no matter how big the request is. So if client only
+> issues 4K IOs, we do waste 508*queue_depth K of memory. We were aiming
+> for lowest possible latency from the beginning. It is probably
+> possible to implement some clever allocator on the server side which
+> wouldn't affect the performance a lot.
+
+Or you can fallback to rdma_read like the rest of the ulps.
