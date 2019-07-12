@@ -2,207 +2,253 @@ Return-Path: <SRS0=GKUn=VJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E564CC742A2
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21463C742A5
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 07:58:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC552208E4
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:50:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE1B921019
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 07:58:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="dvN+mRfn";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="CgOdBMzx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bw3YfM6r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728903AbfGLCue (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 22:50:34 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:65005 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728485AbfGLCud (ORCPT
+        id S1726073AbfGLH6J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Jul 2019 03:58:09 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:46586 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726047AbfGLH6J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 22:50:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1562899833; x=1594435833;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=7R8In/4F777ie8jq47YXBU7Zra0vZkjPnM2LOwltLWU=;
-  b=dvN+mRfn8wMoWdmQ8KRkI444YmNi9r3IF+mQgV3/z9I+qpUjD0cuAHb0
-   /b6nexelfaX7KPl9oaLQAMmvvOeL+s8uecwPw2nao3aLLZCk+VPypznZD
-   xFMCee2rT+Zp6/ESwVqWz1bxuDiIoZRDAI59Iv2gGgo6hE7Q/BL6Hbtod
-   FYTOnA5A4BhfV0iPGN59Stwqtcf5hwNVOfScZd674puBJWo/hrVijpC7q
-   ofrBVh0h5oSPLkgflDfKN+l0GdYkh/qFBoDIx2mZ4pNoHZ3SZv0gN2phG
-   wi4b/XMdSNJAeHRNPPStSsLG/Em754mFOBqb7VhKAzADP7hIZ2HiLEV2j
-   A==;
-IronPort-SDR: T/YSXhNFfb0mUWnK/aH7lGkeFpmcuWqTQznI4sQfgOdF4u1qSBPC6BYxbFKRhylVH0QBanHPfk
- WBtUTs01xPVH6GTSX4KbsVpWxEhba+PvwBxgHm6avoCniUd3SDw3VNsoHy45zQNWI0ruFC0ab0
- r+4UXLhsJFqpY2WF0k6czJ/7MDMhIq3xx8YwBmG9z5ZFvG/2hDPn0EL42UQAp0k/qOtPQNYFPE
- W6cGJTJSuKAew/SGSmX6G80SeVrHhuCEmqDW+qI50Mt6jcaaH5VkH+OKnWXVmIaJl6HfYdb3Wt
- 1CU=
-X-IronPort-AV: E=Sophos;i="5.63,480,1557158400"; 
-   d="scan'208";a="117638372"
-Received: from mail-co1nam05lp2054.outbound.protection.outlook.com (HELO NAM05-CO1-obe.outbound.protection.outlook.com) ([104.47.48.54])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Jul 2019 10:50:33 +0800
+        Fri, 12 Jul 2019 03:58:09 -0400
+Received: by mail-lj1-f195.google.com with SMTP id v24so8416706ljg.13;
+        Fri, 12 Jul 2019 00:58:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r61vwOalJ7YeLIH/ocZe+B4l/+PLBK/CGqOEqjtiKKo=;
- b=CgOdBMzxu9gjVrJ00DYlgxomQCKyf5xFgnwX2GI610VCPyfLYic2XhUTKNO6XN67BV/yNo7KA5+8lOa7N2fB65/tR09hO6mckili9+Nqm78Q9zOh9DmYDKNOdO/hq44fbq+bS7MW82RBap0AXJy6ZMaSS+5N31CKFyvfErDUbAY=
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.58.207) by
- BYAPR04MB4950.namprd04.prod.outlook.com (52.135.232.219) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2052.19; Fri, 12 Jul 2019 02:50:31 +0000
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::65a9:db0a:646d:eb1e]) by BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::65a9:db0a:646d:eb1e%6]) with mapi id 15.20.2073.008; Fri, 12 Jul 2019
- 02:50:31 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: tidy up blk_mq_plug
-Thread-Topic: [PATCH] block: tidy up blk_mq_plug
-Thread-Index: AQHVN9o+sndcsfGM/ka+J11i8GzIeg==
-Date:   Fri, 12 Jul 2019 02:50:30 +0000
-Message-ID: <BYAPR04MB5816CEFFB1AB14A14D6A03D7E7F20@BYAPR04MB5816.namprd04.prod.outlook.com>
-References: <20190711111714.4802-1-hch@lst.de>
- <53c09d04-3f29-2cea-ede4-cdf443539a17@kernel.dk>
- <BYAPR04MB5816B7867433C3A946E7411DE7F20@BYAPR04MB5816.namprd04.prod.outlook.com>
- <ff1df7c2-93a8-5233-3873-005817356c27@kernel.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [199.255.47.9]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c3d53f9a-1bd9-49af-b188-08d70673b447
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4950;
-x-ms-traffictypediagnostic: BYAPR04MB4950:
-x-microsoft-antispam-prvs: <BYAPR04MB49503F2B994BF66B59194709E7F20@BYAPR04MB4950.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:5797;
-x-forefront-prvs: 00963989E5
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(39860400002)(376002)(136003)(396003)(346002)(199004)(189003)(9686003)(74316002)(186003)(8936002)(305945005)(66066001)(26005)(486006)(53936002)(6506007)(71190400001)(71200400001)(53546011)(102836004)(478600001)(6436002)(55016002)(99286004)(2906002)(68736007)(229853002)(316002)(256004)(33656002)(14454004)(14444005)(5660300002)(52536014)(110136005)(6246003)(7736002)(6116002)(446003)(81166006)(66446008)(66946007)(76116006)(91956017)(25786009)(64756008)(66556008)(81156014)(66476007)(86362001)(8676002)(4326008)(3846002)(476003)(7696005)(76176011);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4950;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: ehuBePKKbAmpFbvZMK2Gm9zy48ZGBpmzjsBIVhjxlmHW9Qm4eoGBJw2X5EIMNmTUweWaB9JsOlqfhq4ixODUr+O6YBuaTp8x/WBpfUvHES/JSnFyOLTolPDETcip9aSRla2EqSbMdu2LxJ87VRZMou8qu4tLUwOLmVxu54Zw1fSUrB4Abh2vUG9wVpMZWXFGHbyJhzUajmeFP/T4ICAT+yQ9Xd5h9+FjUz8xUBo6HUprKSb/4KDinqt2BUePbTBL/cT8ht+Xy2p6t3B7xTG7S4HN2ywcsJa/cH2bhyMVGoYIsptyw95ef4VTH1Q0UoYBO/uc0dLxj+jjAfYF9XGq1GB1VAxqdfoYr+Ea4mVGk2sYao7Tk7ct1+HuWRRNIvJoQsJmWqiNz2L+q5/kkXJh3TSkcCMYOZsGVaArXvjYi2M=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fImaj8thWSSI1s0o2kWcty7GzKelijqQaaGELeSxg5A=;
+        b=Bw3YfM6ra9CLrYqK6VjocfnlM5x7dd04QT2MNRtlEy9TJ39YO/5H5s97UnAe/BbVXm
+         FSkTgNkhuA1N8+U2A+Ztb+SVnocFy4Bpg+W1NsN2qG+Hd9NNd8sCQqah+UzdduWyhOgM
+         BjVbusZv+G9NMUN3L772GC9+MntURENU6cysnoaZk9Cf2nqy7WfH6PiiF4VhnxJF5NjJ
+         s0XakN6cDnqJb8gyV0RdNzCNc5qN4LunR3/KUGsXO94f2+EUjaLqXJUpGwg44OTl+v3Z
+         CJ/ONvQ+3/iahDq2nvXtnJoGcDN9zK/rhR0H6W0Eh3lzzNHaAq/Rt3zQGhnbRH5ftFUx
+         iD2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fImaj8thWSSI1s0o2kWcty7GzKelijqQaaGELeSxg5A=;
+        b=nbwMFGZnLw1vJG3gZnZEskZr2z82YkDPAUqrUcWHaKfDjPwhi9DJrNaOqnlvBdnauW
+         89ncEAyWh6DQhPpy0LEO5zrI+IsLsNj6w7XHu9rimvjn/tNwcF6I/XuEBiAMCk0HZWsc
+         Zpoh0w5pcGwlN/yKzjpfXyNxEO+CPbOr3R7XN3BsuJTJlkYbKqLW4mQKvv6osocgbrq+
+         1AUCueI1IqcprToVqGbHn+Sz+aL+1Z36GAmM3BzVwKUbSc74o0rUtgHiaSgt3drb6KxP
+         od0/MRl5FsCSauMqXlHeZx8VC6KlNE7BWGZjq/60bkhsAyBNQSfDbTY7dWTaUW3UBDeG
+         cwMQ==
+X-Gm-Message-State: APjAAAUyKeC5w7okye5yFf4IVdQmEaV8XuulzjQSn/iC3Zu6WaUUi36i
+        mtE8yM027aoMtzni1+KL5ioec+Z56w3DZEPFFeC8hw5a
+X-Google-Smtp-Source: APXvYqwTV1wVTRulOJlMD7Zxj53FAfbdP/rFVwvHlE8gXKQEjMvnmBEqn0pUdTQLGPWWQ7pckW94lbcZjkcflJQh0II=
+X-Received: by 2002:a2e:9ec9:: with SMTP id h9mr4833425ljk.90.1562918285821;
+ Fri, 12 Jul 2019 00:58:05 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3d53f9a-1bd9-49af-b188-08d70673b447
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jul 2019 02:50:30.9218
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Damien.LeMoal@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4950
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
+ <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me> <CAHg0HuxZvXH899=M4vC7BTH-bP2J35aTwsGhiGoC8AamD8gOyA@mail.gmail.com>
+ <aef765ed-4bb9-2211-05d0-b320cc3ac275@grimberg.me>
+In-Reply-To: <aef765ed-4bb9-2211-05d0-b320cc3ac275@grimberg.me>
+From:   Jinpu Wang <jinpuwang@gmail.com>
+Date:   Fri, 12 Jul 2019 09:57:54 +0200
+Message-ID: <CAD9gYJKcJ47ogKL4S_KMtxpS1gPHHhqqG7-GTi-2c0cOJ-LJtw@mail.gmail.com>
+Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
+ Device (IBNBD)
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>, bvanassche@acm.org,
+        jgg@mellanox.com, dledford@redhat.com,
+        Roman Pen <r.peniaev@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/07/12 11:44, Jens Axboe wrote:=0A=
-> On 7/11/19 8:37 PM, Damien Le Moal wrote:=0A=
->> On 2019/07/12 3:09, Jens Axboe wrote:=0A=
->>> On 7/11/19 5:17 AM, Christoph Hellwig wrote:=0A=
->>>> Make the zoned device write path the special case and just fall=0A=
->>>> though to the defaul case to make the code easier to read.  Also=0A=
->>>> update the top of function comment to use the proper kdoc format=0A=
->>>> and remove the extra in-function comments that just duplicate it.=0A=
->>>>=0A=
->>>> Signed-off-by: Christoph Hellwig <hch@lst.de>=0A=
->>>> ---=0A=
->>>>    block/blk-mq.h | 14 ++++----------=0A=
->>>>    1 file changed, 4 insertions(+), 10 deletions(-)=0A=
->>>>=0A=
->>>> diff --git a/block/blk-mq.h b/block/blk-mq.h=0A=
->>>> index 32c62c64e6c2..ab80fd2b3803 100644=0A=
->>>> --- a/block/blk-mq.h=0A=
->>>> +++ b/block/blk-mq.h=0A=
->>>> @@ -233,7 +233,7 @@ static inline void blk_mq_clear_mq_map(struct blk_=
-mq_queue_map *qmap)=0A=
->>>>    		qmap->mq_map[cpu] =3D 0;=0A=
->>>>    }=0A=
->>>>    =0A=
->>>> -/*=0A=
->>>> +/**=0A=
->>>>     * blk_mq_plug() - Get caller context plug=0A=
->>>>     * @q: request queue=0A=
->>>>     * @bio : the bio being submitted by the caller context=0A=
->>>> @@ -254,15 +254,9 @@ static inline void blk_mq_clear_mq_map(struct blk=
-_mq_queue_map *qmap)=0A=
->>>>    static inline struct blk_plug *blk_mq_plug(struct request_queue *q,=
-=0A=
->>>>    					   struct bio *bio)=0A=
->>>>    {=0A=
->>>> -	/*=0A=
->>>> -	 * For regular block devices or read operations, use the context plu=
-g=0A=
->>>> -	 * which may be NULL if blk_start_plug() was not executed.=0A=
->>>> -	 */=0A=
->>>> -	if (!blk_queue_is_zoned(q) || !op_is_write(bio_op(bio)))=0A=
->>>> -		return current->plug;=0A=
->>>> -=0A=
->>>> -	/* Zoned block device write operation case: do not plug the BIO */=
-=0A=
->>>> -	return NULL;=0A=
->>>> +	if (blk_queue_is_zoned(q) && op_is_write(bio_op(bio)))=0A=
->>>> +		return NULL;=0A=
->>>> +	return current->plug;=0A=
->>>>    }=0A=
->>>>    =0A=
->>>>    #endif=0A=
->>>=0A=
->>> I agree it's more readable, but probably also means that the path that =
-we=0A=
->>> care the least about (zoned+write) is now the inline one.=0A=
->>=0A=
->> What about an additional inline function ?=0A=
->> So something like this is very readable I think and blk_mq_plug() can al=
-so be=0A=
->> optimized with #ifdef for the !CONFIG_BLK_DEV_ZONED case.=0A=
->>=0A=
->> #ifndef CONFIG_BLK_DEV_ZONED=0A=
->> static inline struct blk_plug *blk_mq_plug(struct request_queue *q,=0A=
->>    					   struct bio *bio)=0A=
->> {=0A=
->> 	return current->plug;=0A=
->> }=0A=
->> #else=0A=
->> static inline struct blk_plug *blk_zoned_get_plug(struct request_queue *=
-q,=0A=
->>    						  struct bio *bio)=0A=
->> {=0A=
->> 	if (op_is_write(bio_op(bio)))=0A=
->> 		return NULL;=0A=
->>=0A=
->> 	return current->plug;=0A=
->> }=0A=
->>=0A=
->> static inline struct blk_plug *blk_mq_plug(struct request_queue *q,=0A=
->>    					   struct bio *bio)=0A=
->> {=0A=
->> 	if (!blk_queue_is_zoned(q))=0A=
->> 		return current->plug;=0A=
->>=0A=
->> 	return blk_zoned_get_plug(q, bio);=0A=
->> }=0A=
->> #endif=0A=
-> =0A=
-> Let's not go that far into ifdef'ery, please... Besides, that usually=0A=
-> solves nothing, as most/all kernels will have zoned support enabled.=0A=
-> =0A=
-> I'm actually fine with the existing setup. Yes, the other variant is=0A=
-> easier to read, but I bet the existing one inlines better.=0A=
-> =0A=
-=0A=
-OK. Thanks.=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+Hi Sagi,
+
+> >> Another question, from what I understand from the code, the client
+> >> always rdma_writes data on writes (with imm) from a remote pool of
+> >> server buffers dedicated to it. Essentially all writes are immediate (no
+> >> rdma reads ever). How is that different than using send wrs to a set of
+> >> pre-posted recv buffers (like all others are doing)? Is it faster?
+> > At the very beginning of the project we did some measurements and saw,
+> > that it is faster. I'm not sure if this is still true
+>
+> Its not significantly faster (can't imagine why it would be).
+> What could make a difference is probably the fact that you never
+> do rdma reads for I/O writes which might be better. Also perhaps the
+> fact that you normally don't wait for send completions before completing
+> I/O (which is broken), and the fact that you batch recv operations.
+
+I don't know how do you come to the conclusion we don't wait for send
+completion before completing IO.
+
+We do chain wr on successfull read request from server, see funtion
+rdma_write_sg,
+
+ 318 static int rdma_write_sg(struct ibtrs_srv_op *id)
+ 319 {
+ 320         struct ibtrs_srv_sess *sess = to_srv_sess(id->con->c.sess);
+ 321         dma_addr_t dma_addr = sess->dma_addr[id->msg_id];
+ 322         struct ibtrs_srv *srv = sess->srv;
+ 323         struct ib_send_wr inv_wr, imm_wr;
+ 324         struct ib_rdma_wr *wr = NULL;
+snip
+333         need_inval = le16_to_cpu(id->rd_msg->flags) &
+IBTRS_MSG_NEED_INVAL_F;
+snip
+ 357                 wr->wr.wr_cqe   = &io_comp_cqe;
+ 358                 wr->wr.sg_list  = list;
+ 359                 wr->wr.num_sge  = 1;
+ 360                 wr->remote_addr = le64_to_cpu(id->rd_msg->desc[i].addr);
+ 361                 wr->rkey        = le32_to_cpu(id->rd_msg->desc[i].key);
+ snip
+368                 if (i < (sg_cnt - 1))
+ 369                         wr->wr.next = &id->tx_wr[i + 1].wr;
+ 370                 else if (need_inval)
+ 371                         wr->wr.next = &inv_wr;
+ 372                 else
+ 373                         wr->wr.next = &imm_wr;
+ 374
+ 375                 wr->wr.opcode = IB_WR_RDMA_WRITE;
+ 376                 wr->wr.ex.imm_data = 0;
+ 377                 wr->wr.send_flags  = 0;
+snip
+ 386         if (need_inval) {
+ 387                 inv_wr.next = &imm_wr;
+ 388                 inv_wr.wr_cqe = &io_comp_cqe;
+ 389                 inv_wr.sg_list = NULL;
+ 390                 inv_wr.num_sge = 0;
+ 391                 inv_wr.opcode = IB_WR_SEND_WITH_INV;
+ 392                 inv_wr.send_flags = 0;
+ 393                 inv_wr.ex.invalidate_rkey = rkey;
+ 394         }
+ 395         imm_wr.next = NULL;
+ 396         imm_wr.wr_cqe = &io_comp_cqe;
+ 397         imm_wr.sg_list = NULL;
+ 398         imm_wr.num_sge = 0;
+ 399         imm_wr.opcode = IB_WR_RDMA_WRITE_WITH_IMM;
+ 400         imm_wr.send_flags = flags;
+ 401         imm_wr.ex.imm_data = cpu_to_be32(ibtrs_to_io_rsp_imm(id->msg_id,
+ 402                                                              0,
+need_inval));
+ 403
+
+
+when we need to do invalidation of remote memory, there will chain WR
+togather, last 2 are inv_wr, and imm_wr.
+imm_wr is the last one, this is important, due to the fact RC QP are
+ordered, we know when when we received
+IB_WC_RECV_RDMA_WITH_IMM and w_inval is true, hardware should already
+finished it's job to invalidate the MR.
+If server fails to invalidate, we will do local invalidation, and wait
+for completion.
+
+On client side
+284 static void complete_rdma_req(struct ibtrs_clt_io_req *req, int errno,
+ 285                               bool notify, bool can_wait)
+ 286 {
+ 287         struct ibtrs_clt_con *con = req->con;
+ 288         struct ibtrs_clt_sess *sess;
+ 289         struct ibtrs_clt *clt;
+ 290         int err;
+ 291
+ 292         if (WARN_ON(!req->in_use))
+ 293                 return;
+ 294         if (WARN_ON(!req->con))
+ 295                 return;
+ 296         sess = to_clt_sess(con->c.sess);
+ 297         clt = sess->clt;
+ 298
+ 299         if (req->sg_cnt) {
+ 300                 if (unlikely(req->dir == DMA_FROM_DEVICE &&
+req->need_inv)) {
+ 301                         /*
+ 302                          * We are here to invalidate RDMA read requests
+ 303                          * ourselves.  In normal scenario server should
+ 304                          * send INV for all requested RDMA reads, but
+ 305                          * we are here, thus two things could happen:
+ 306                          *
+ 307                          *    1.  this is failover, when errno != 0
+ 308                          *        and can_wait == 1,
+ 309                          *
+ 310                          *    2.  something totally bad happened and
+ 311                          *        server forgot to send INV, so we
+ 312                          *        should do that ourselves.
+ 313                          */
+ 314
+ 315                         if (likely(can_wait)) {
+ 316                                 req->need_inv_comp = true;
+ 317                         } else {
+ 318                                 /* This should be IO path, so
+always notify */
+ 319                                 WARN_ON(!notify);
+ 320                                 /* Save errno for INV callback */
+ 321                                 req->inv_errno = errno;
+ 322                         }
+ 323
+ 324                         err = ibtrs_inv_rkey(req);
+ 325                         if (unlikely(err)) {
+ 326                                 ibtrs_err(sess, "Send INV WR
+key=%#x: %d\n",
+ 327                                           req->mr->rkey, err);
+ 328                         } else if (likely(can_wait)) {
+ 329                                 wait_for_completion(&req->inv_comp);
+ 330                         } else {
+330                         } else {
+ 331                                 /*
+ 332                                  * Something went wrong, so request will be
+ 333                                  * completed from INV callback.
+ 334                                  */
+ 335                                 WARN_ON_ONCE(1);
+ 336
+ 337                                 return;
+ 338                         }
+ 339                 }
+ 340                 ib_dma_unmap_sg(sess->s.dev->ib_dev, req->sglist,
+ 341                                 req->sg_cnt, req->dir);
+ 342         }
+ 343         if (sess->stats.enable_rdma_lat)
+ 344                 ibtrs_clt_update_rdma_lat(&sess->stats,
+ 345                                 req->dir == DMA_FROM_DEVICE,
+ 346                                 jiffies_to_msecs(jiffies -
+req->start_jiffies));
+ 347         ibtrs_clt_decrease_inflight(&sess->stats);
+ 348
+ 349         req->in_use = false;
+ 350         req->con = NULL;
+ 351
+ 352         if (notify)
+ 353                 req->conf(req->priv, errno);
+ 354 }
+
+ 356 static void process_io_rsp(struct ibtrs_clt_sess *sess, u32
+msg_id,
+ 357                            s16 errno, bool w_inval)
+ 358 {
+ 359         struct ibtrs_clt_io_req *req;
+ 360
+ 361         if (WARN_ON(msg_id >= sess->queue_depth))
+ 362                 return;
+ 363
+ 364         req = &sess->reqs[msg_id];
+ 365         /* Drop need_inv if server responsed with invalidation */
+ 366         req->need_inv &= !w_inval;
+ 367         complete_rdma_req(req, errno, true, false);
+ 368 }
+
+Hope this clears the doubt.
+
+Regards,
+Jack
