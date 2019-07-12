@@ -2,30 +2,30 @@ Return-Path: <SRS0=GKUn=VJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B4FC742DE
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 23:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65234C742DD
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 23:57:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6FCB20874
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 23:57:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3BEC420874
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 23:57:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727053AbfGLX55 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Jul 2019 19:57:57 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:60310 "EHLO ale.deltatee.com"
+        id S1727451AbfGLX56 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Jul 2019 19:57:58 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:60306 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727451AbfGLX55 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1727393AbfGLX55 (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Fri, 12 Jul 2019 19:57:57 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hm5QG-0004Ot-Dx; Fri, 12 Jul 2019 17:57:57 -0600
+        id 1hm5QG-0004P6-E3; Fri, 12 Jul 2019 17:57:56 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hm5QE-0005uA-3I; Fri, 12 Jul 2019 17:57:50 -0600
+        id 1hm5QF-0005uk-8y; Fri, 12 Jul 2019 17:57:51 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Omar Sandoval <osandov@fb.com>
@@ -34,15 +34,17 @@ Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         Johannes Thumshirn <jthumshirn@suse.de>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Fri, 12 Jul 2019 17:57:30 -0600
-Message-Id: <20190712235742.22646-1-logang@deltatee.com>
+Date:   Fri, 12 Jul 2019 17:57:42 -0600
+Message-Id: <20190712235742.22646-13-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190712235742.22646-1-logang@deltatee.com>
+References: <20190712235742.22646-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, osandov@fb.com, chaitanya.kulkarni@wdc.com, tytso@mit.edu, mmoese@suse.de, jthumshirn@suse.de, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH blktests 00/12] Fix nvme block test issues
+Subject: [PATCH blktests 12/12] nvme: Ignore errors when removing modules
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -50,107 +52,34 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+It is no longer important for correct test functionality to
+remove the modules between tests. Therefore, we ignore errors
+if the modules are not removed (ie. if they are builtin).
 
-This patchset cleans up a number of issues and pain points
-I've had with getting the nvme blktests to pass and run cleanly.
+With this patch, it is now safe to run the tests with the nvmet
+modules built-in. This will be more convienent for developers
+that want to run the tests in a simple VM.
 
-The first three patches are meant to fix the Generation Counter
-issue that's been discussed before but hasn't been fixed in months.
-I primarily use a slightly fixed up patch posted by Michael Moese[1]
-but add another patch to properly test the Generation Counter that
-would no longer be tested otherwise.
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+---
+ tests/nvme/rc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I've also taken it a step further to filter out more of the discovery
-information so that we are less fragile against churn and less dependant
-on the version of nvme-cli in use. This should also fix the issue discussed
-in [2].
-
-Patches 4 through 7 fix a number of smaller issues I've found with
-individual tests.
-
-Patches 8 through 10 implement a system to ensure the nvme tests
-clean themselves up properly especially when ctrl-c is used to
-interrupt a test (working with the tests before this was a huge
-pain seeing,  when you ctrl-c, you have to either manually clean
-up the nvmet configuration or reboot to get the system in a state
-where it's sane to run the tests again).
-
-Patches 11 and 12 make some minor changes that allow running the
-tests with the nvme modules built into the kernel.
-
-With these patches, plus a couple I've sent to the nvme list for the
-kernel, I can consistently pass the entire nvme suite with the
-exception of the lockdep false-positive with nvme/012 that still
-seems to be in a bit of contention[3].
-
-Thanks,
-
-Logan
-
-[1] https://github.com/osandov/blktests/pull/34
-[2] https://lore.kernel.org/linux-block/20190505150611.15776-4-minwoo.im.dev@gmail.com/
-[3] https://lore.kernel.org/lkml/20190214230058.196511-22-bvanassche@acm.org/
-
---
-
-Logan Gunthorpe (11):
-  nvme: More agressively filter the discovery output
-  nvme: Add new test to verify the generation counter
-  nvme/003,004: Add missing calls to nvme disconnect
-  nvme/005: Don't rely on modprobing to set the multipath paramater
-  nvme/015: Ensure the namespace is flushed not the char device
-  nvme/018: Ignore error message generated by nvme read
-  check: Add the ability to call a cleanup function after a test ends
-  nvme: Cleanup modprobe lines into helper functions
-  nvme: Ensure all ports and subsystems are removed on cleanup
-  common: Use sysfs instead of modinfo for _have_module_param()
-  nvme: Ignore errors when removing modules
-
-Michael Moese (1):
-  Add filter function for nvme discover
-
- check              |    9 +
- common/rc          |   18 +-
- tests/nvme/002     |   10 +-
- tests/nvme/002.out | 6003 +-------------------------------------------
- tests/nvme/003     |    6 +-
- tests/nvme/003.out |    1 +
- tests/nvme/004     |    6 +-
- tests/nvme/004.out |    1 +
- tests/nvme/005     |   16 +-
- tests/nvme/006     |    6 +-
- tests/nvme/007     |    6 +-
- tests/nvme/008     |    6 +-
- tests/nvme/009     |    5 +-
- tests/nvme/010     |    6 +-
- tests/nvme/011     |    6 +-
- tests/nvme/012     |    6 +-
- tests/nvme/013     |    6 +-
- tests/nvme/014     |    6 +-
- tests/nvme/015     |    5 +-
- tests/nvme/016     |    6 +-
- tests/nvme/016.out |    9 +-
- tests/nvme/017     |    8 +-
- tests/nvme/017.out |    9 +-
- tests/nvme/018     |    8 +-
- tests/nvme/019     |    6 +-
- tests/nvme/020     |    5 +-
- tests/nvme/021     |    6 +-
- tests/nvme/022     |    6 +-
- tests/nvme/023     |    6 +-
- tests/nvme/024     |    6 +-
- tests/nvme/025     |    6 +-
- tests/nvme/026     |    6 +-
- tests/nvme/027     |    6 +-
- tests/nvme/028     |    6 +-
- tests/nvme/029     |    6 +-
- tests/nvme/030     |   72 +
- tests/nvme/030.out |    2 +
- tests/nvme/rc      |   64 +
- 38 files changed, 208 insertions(+), 6163 deletions(-)
- create mode 100755 tests/nvme/030
- create mode 100644 tests/nvme/030.out
-
---
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 1c9e4af0cbe5..0b98b89d0634 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -68,8 +68,8 @@ _cleanup_nvmet() {
+ 	shopt -u nullglob
+ 	stty isig
+ 
+-	modprobe -r nvme-loop
+-	modprobe -r nvmet
++	modprobe -r nvme-loop 2>/dev/null
++	modprobe -r nvmet 2>/dev/null
+ }
+ 
+ _setup_nvmet() {
+-- 
 2.17.1
+
