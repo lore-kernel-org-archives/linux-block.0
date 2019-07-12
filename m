@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFBC5C742A2
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:47:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E6F0C742A5
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:47:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E25B208E4
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:47:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C3E6208E4
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jul 2019 02:47:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729207AbfGLCrp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jul 2019 22:47:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55724 "EHLO mx1.redhat.com"
+        id S1728745AbfGLCrv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jul 2019 22:47:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37020 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728743AbfGLCrp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jul 2019 22:47:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S1728743AbfGLCrv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jul 2019 22:47:51 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C788D308338F;
-        Fri, 12 Jul 2019 02:47:44 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9DB7030842B5;
+        Fri, 12 Jul 2019 02:47:50 +0000 (UTC)
 Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C9C15DD8C;
-        Fri, 12 Jul 2019 02:47:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 554821001B32;
+        Fri, 12 Jul 2019 02:47:47 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
@@ -37,25 +37,28 @@ Cc:     linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>,
         Keith Busch <keith.busch@intel.com>
-Subject: [RFC PATCH 1/7] blk-mq: add new state of BLK_MQ_S_INTERNAL_STOPPED
-Date:   Fri, 12 Jul 2019 10:47:20 +0800
-Message-Id: <20190712024726.1227-2-ming.lei@redhat.com>
+Subject: [RFC PATCH 2/7] blk-mq: add blk-mq flag of BLK_MQ_F_NO_MANAGED_IRQ
+Date:   Fri, 12 Jul 2019 10:47:21 +0800
+Message-Id: <20190712024726.1227-3-ming.lei@redhat.com>
 In-Reply-To: <20190712024726.1227-1-ming.lei@redhat.com>
 References: <20190712024726.1227-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Fri, 12 Jul 2019 02:47:44 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Fri, 12 Jul 2019 02:47:50 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a new hw queue state of BLK_MQ_S_INTERNAL_STOPPED, which prepares
-for stopping hw queue before all CPUs of this hctx become offline.
+We will stop hw queue and wait for completion of in-flight requests
+when one hctx is becoming dead in the following patch. This way may
+cause dead-lock for some stacking blk-mq drivers, such as dm-rq and
+loop.
 
-We can't reuse BLK_MQ_S_STOPPED because that state can be cleared during IO
-completion.
+Add blk-mq flag of BLK_MQ_F_NO_MANAGED_IRQ and mark it for dm-rq and
+loop, so we needn't to wait for completion of in-flight requests of
+dm-rq & loop, then the potential dead-lock can be avoided.
 
 Cc: Bart Van Assche <bvanassche@acm.org>
 Cc: Hannes Reinecke <hare@suse.com>
@@ -65,50 +68,61 @@ Cc: Keith Busch <keith.busch@intel.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
  block/blk-mq-debugfs.c | 1 +
- block/blk-mq.h         | 3 ++-
- include/linux/blk-mq.h | 3 +++
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ drivers/block/loop.c   | 2 +-
+ drivers/md/dm-rq.c     | 2 +-
+ include/linux/blk-mq.h | 1 +
+ 4 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index b3f2ba483992..af40a02c46ee 100644
+index af40a02c46ee..24fff8c90942 100644
 --- a/block/blk-mq-debugfs.c
 +++ b/block/blk-mq-debugfs.c
-@@ -213,6 +213,7 @@ static const char *const hctx_state_name[] = {
- 	HCTX_STATE_NAME(STOPPED),
- 	HCTX_STATE_NAME(TAG_ACTIVE),
- 	HCTX_STATE_NAME(SCHED_RESTART),
-+	HCTX_STATE_NAME(INTERNAL_STOPPED),
+@@ -240,6 +240,7 @@ static const char *const hctx_flag_name[] = {
+ 	HCTX_FLAG_NAME(TAG_SHARED),
+ 	HCTX_FLAG_NAME(BLOCKING),
+ 	HCTX_FLAG_NAME(NO_SCHED),
++	HCTX_FLAG_NAME(NO_MANAGED_IRQ),
  };
- #undef HCTX_STATE_NAME
+ #undef HCTX_FLAG_NAME
  
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index f4bf5161333e..9d821adf5765 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -176,7 +176,8 @@ static inline struct blk_mq_tags *blk_mq_tags_from_data(struct blk_mq_alloc_data
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 44c9985f352a..199d76e8bf46 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1986,7 +1986,7 @@ static int loop_add(struct loop_device **l, int i)
+ 	lo->tag_set.queue_depth = 128;
+ 	lo->tag_set.numa_node = NUMA_NO_NODE;
+ 	lo->tag_set.cmd_size = sizeof(struct loop_cmd);
+-	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
++	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_NO_MANAGED_IRQ;
+ 	lo->tag_set.driver_data = lo;
  
- static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
- {
--	return test_bit(BLK_MQ_S_STOPPED, &hctx->state);
-+	return test_bit(BLK_MQ_S_STOPPED, &hctx->state) ||
-+		test_bit(BLK_MQ_S_INTERNAL_STOPPED, &hctx->state);
- }
+ 	err = blk_mq_alloc_tag_set(&lo->tag_set);
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 5f7063f05ae0..f7fbef2d3cd7 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -546,7 +546,7 @@ int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t)
+ 	md->tag_set->ops = &dm_mq_ops;
+ 	md->tag_set->queue_depth = dm_get_blk_mq_queue_depth();
+ 	md->tag_set->numa_node = md->numa_node_id;
+-	md->tag_set->flags = BLK_MQ_F_SHOULD_MERGE;
++	md->tag_set->flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_NO_MANAGED_IRQ;
+ 	md->tag_set->nr_hw_queues = dm_get_blk_mq_nr_hw_queues();
+ 	md->tag_set->driver_data = md;
  
- static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
 diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 3fa1fa59f9b2..3a731c3c0762 100644
+index 3a731c3c0762..911cdc6479dc 100644
 --- a/include/linux/blk-mq.h
 +++ b/include/linux/blk-mq.h
-@@ -228,6 +228,9 @@ enum {
- 	BLK_MQ_S_TAG_ACTIVE	= 1,
- 	BLK_MQ_S_SCHED_RESTART	= 2,
- 
-+	/* hw queue is internal stopped, driver do not use it */
-+	BLK_MQ_S_INTERNAL_STOPPED	= 3,
-+
- 	BLK_MQ_MAX_DEPTH	= 10240,
- 
- 	BLK_MQ_CPU_WORK_BATCH	= 8,
+@@ -219,6 +219,7 @@ struct blk_mq_ops {
+ enum {
+ 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
+ 	BLK_MQ_F_TAG_SHARED	= 1 << 1,
++	BLK_MQ_F_NO_MANAGED_IRQ	= 1 << 2,
+ 	BLK_MQ_F_BLOCKING	= 1 << 5,
+ 	BLK_MQ_F_NO_SCHED	= 1 << 6,
+ 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
 -- 
 2.20.1
 
