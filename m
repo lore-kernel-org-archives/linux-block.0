@@ -1,340 +1,129 @@
-Return-Path: <SRS0=YXNx=VL=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=FYaB=VM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 142E9C74A44
-	for <linux-block@archiver.kernel.org>; Sun, 14 Jul 2019 23:33:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7147C73C66
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 01:26:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB6A320C01
-	for <linux-block@archiver.kernel.org>; Sun, 14 Jul 2019 23:33:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 866D920868
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 01:26:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="r1gPsCog"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JFsY4oNs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728884AbfGNXdu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Jul 2019 19:33:50 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:11460 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728851AbfGNXdu (ORCPT
+        id S1728965AbfGOB0A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Jul 2019 21:26:00 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:37707 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727006AbfGOB0A (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Jul 2019 19:33:50 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d2bbbde0000>; Sun, 14 Jul 2019 16:33:50 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Sun, 14 Jul 2019 16:33:44 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Sun, 14 Jul 2019 16:33:44 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sun, 14 Jul
- 2019 23:33:43 +0000
-Subject: Re: [PATCH] mm/gup: Use put_user_page*() instead of put_page*()
-To:     Bharath Vedartham <linux.bhar@gmail.com>,
-        <akpm@linux-foundation.org>, <ira.weiny@intel.com>
-CC:     Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dimitri Sivanich <sivanich@sgi.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jakub Kicinski <jakub.kicinski@netronome.com>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Enrico Weigelt <info@metux.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Matt Sickler <Matt.Sickler@daktronics.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Keith Busch <keith.busch@intel.com>,
-        YueHaibing <yuehaibing@huawei.com>,
-        <linux-media@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devel@driverdev.osuosl.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-mm@kvack.org>, <netdev@vger.kernel.org>,
-        <bpf@vger.kernel.org>, <xdp-newbies@vger.kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-References: <1563131456-11488-1-git-send-email-linux.bhar@gmail.com>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <deea584f-2da2-8e1f-5a07-e97bf32c63bb@nvidia.com>
-Date:   Sun, 14 Jul 2019 16:33:42 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        Sun, 14 Jul 2019 21:26:00 -0400
+Received: by mail-wm1-f65.google.com with SMTP id f17so13475785wme.2;
+        Sun, 14 Jul 2019 18:25:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=MXtprjYX3LMZPcPvIkCQpHQOi7CXiEJzMLuO2MOHDFY=;
+        b=JFsY4oNs0InJ0zKTLAT5/DNZA3GeQ5vUGlzj4vJoyukxjE9wh31D0X5E2dFcXBkuu9
+         5baYD+BB44bzldFblCMubnJYeJQHfm+bo8qvYWrq7FCoCCyNcEos9rL8vCxW80743jj4
+         djzYr+jT48v68VGOmXfKBu3szUoeqTYbIoQcYpMzOKVoMpyiZN+psoOl5RnCea+QznzW
+         u/GrX5TTepNy2ZGNckHIRJWkEtOBfIPZsFJnVrI6VK85cFq90YQ0oV33WqMnvuGZRV4N
+         5HhfV9vrDA1aLeatn8qE221SvZsxUuJzvEFhzSgrEuapTnXcocerUWiLIDXfdgvxUkZJ
+         VDfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MXtprjYX3LMZPcPvIkCQpHQOi7CXiEJzMLuO2MOHDFY=;
+        b=DNX1pTWBCiEWhroEWUAJRCDdNUOhXN1W+yKcYjiHdjqLr/ofhVIdnvYbbp6KB45nvK
+         Fa/X+elZB5M5OcbpBWwRbdlSgJ6OadZX1Oq1+WT0+XIj6c/rSttW0yQaiBrz0wS3djrc
+         agFYBZ7pzzLJ+DjxDfcYFKlQaiadbfxWzSoBR4uD2fgULti7SVue420lfPko1OiRKk2Y
+         7RuA/YrX7Oj72t/bGA1BtpbAx2yT4ogT6NwbMNlYoE1wubw6Pv1dhoo6MPv7ckFNbWak
+         Z0cL7Xsfs87UZAog0j1UPBsMatbPts5c4eGTMywtTmv2TbxA8o9TDmBYjabCaoAGhHJ6
+         Qe5g==
+X-Gm-Message-State: APjAAAVenMoK/7whlCGPlyuAdFu40PH/BaUq/Lcv9YT/LPc85RO2oSps
+        b1TZtTykqh3bDgsf1q478JHBQ1vEx2irAPyzfeg=
+X-Google-Smtp-Source: APXvYqySfMIGh9QaP384gEwM9t69jEpaX7PiQK1qs9kxdiu7h7Kj/FqkvR6LDKFq42u1aaGMZWWhp3rmBxjL7I8ruZg=
+X-Received: by 2002:a05:600c:204c:: with SMTP id p12mr20916333wmg.121.1563153957506;
+ Sun, 14 Jul 2019 18:25:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1563131456-11488-1-git-send-email-linux.bhar@gmail.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL108.nvidia.com (172.18.146.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1563147230; bh=sUtQbAVHKMUq6RFPtKou/JVDvKaLNXmga3Yy3wKxfoA=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=r1gPsCog8Wy8uxXR6oPi9CZ88dx7g7L7elOSl44oNIP1rI4/lkKGF9dnlvvfdYA/b
-         O8GUFPF84ojdVeX8QMV3hJ8+zgk4tR88myJZyetUbYd9bq60hfbfXeF0iJlYAVkubx
-         JOoXVe/7uD2/55/W/MIxdUvILTPB1/5/S5oSyd5brPO5Z4/Keu0Xvr8jrmH/IiEYoP
-         +AIIsSoV1pBraQcZgi5+ULXONecHESIQmh/9tZbs/C10RJWwUL5/YKXsdU8Sk8oBdA
-         NOeOi2iHzHVNK0AKkN3agfSzKCXeIFIHG7vkyBUlPLmDEWfEvazCokcgH4rg3HIpDk
-         byWb1Hr99HYHA==
+References: <1563087801-7373-1-git-send-email-wang6495@umn.edu>
+In-Reply-To: <1563087801-7373-1-git-send-email-wang6495@umn.edu>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Mon, 15 Jul 2019 09:25:46 +0800
+Message-ID: <CACVXFVOXZCtYtt3UuYBa7OYHEwsMkYFznfpL=1q9HkJV8xcx0Q@mail.gmail.com>
+Subject: Re: [PATCH] blk-mq: fix a memory leak bug
+To:     Wenwen Wang <wang6495@umn.edu>
+Cc:     Wenwen Wang <wenwen@cs.uga.edu>, Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/14/19 12:08 PM, Bharath Vedartham wrote:
-> This patch converts all call sites of get_user_pages
-> to use put_user_page*() instead of put_page*() functions to
-> release reference to gup pinned pages.
+On Sun, Jul 14, 2019 at 3:04 PM Wenwen Wang <wang6495@umn.edu> wrote:
+>
+> From: Wenwen Wang <wenwen@cs.uga.edu>
+>
+> In blk_mq_init_allocated_queue(), a kernel buffer is allocated through
+> kcalloc_node() to hold hardware dispatch queues in the request queue 'q',
+> i.e., 'q->queue_hw_ctx'.  Later on, if the blk-mq device has no scheduler
+> set, a scheduler will be initialized through elevator_init_mq(). If this
+> initialization fails, blk_mq_init_allocated_queue() needs to be terminated
+> with an error code returned to indicate this failure. However, the
+> allocated buffer is not freed on this execution path, leading to a memory
+> leak bug. Moreover, the required cleanup work is also missed on this path.
+>
+> To fix the above issues, free the allocated buffer and invoke the cleanup
+> functions.
+>
+> Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+> ---
+>  block/blk-mq.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e5ef40c..04fe077 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2845,6 +2845,8 @@ static unsigned int nr_hw_queues(struct blk_mq_tag_set *set)
+>  struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>                                                   struct request_queue *q)
+>  {
+> +       int ret = -ENOMEM;
+> +
 
-Hi Bharath,
+The above isn't necessary because the function always returns
+ERR_PTR(-ENOMEM) in case of failure.
 
-Thanks for jumping in to help, and welcome to the party!
+>         /* mark the queue as mq asap */
+>         q->mq_ops = set->ops;
+>
+> @@ -2906,11 +2908,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>         blk_mq_map_swqueue(q);
+>
+>         if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
+> -               int ret;
+> -
+>                 ret = elevator_init_mq(q);
+>                 if (ret)
+> -                       return ERR_PTR(ret);
+> +                       goto err_hctxs;
 
-You've caught everyone in the middle of a merge window, btw.  As a
-result, I'm busy rebasing and reworking the get_user_pages call sites, 
-and gup tracking, in the wake of some semi-traumatic changes to bio 
-and gup and such. I plan to re-post right after 5.3-rc1 shows up, from 
-here:
+The above change itself is fine.
 
-    https://github.com/johnhubbard/linux/commits/gup_dma_core
-
-...which you'll find already covers the changes you've posted, except for:
-
-    drivers/misc/sgi-gru/grufault.c
-    drivers/staging/kpc2000/kpc_dma/fileops.c
-
-...and this one, which is undergoing to larger local changes, due to
-bvec, so let's leave it out of the choices:
-
-    fs/io_uring.c
-
-Therefore, until -rc1, if you'd like to help, I'd recommend one or more
-of the following ideas:
-
-1. Pull down https://github.com/johnhubbard/linux/commits/gup_dma_core
-and find missing conversions: look for any additional missing 
-get_user_pages/put_page conversions. You've already found a couple missing 
-ones. I haven't re-run a search in a long time, so there's probably even more.
-
-	a) And find more, after I rebase to 5.3-rc1: people probably are adding
-	get_user_pages() calls as we speak. :)
-
-2. Patches: Focus on just one subsystem at a time, and perfect the patch for
-it. For example, I think this the staging driver would be perfect to start with:
-
-    drivers/staging/kpc2000/kpc_dma/fileops.c
-
-	a) verify that you've really, corrected converted the whole
-	driver. (Hint: I think you might be overlooking a put_page call.)
-
-	b) Attempt to test it if you can (I'm being hypocritical in
-	the extreme here, but one of my problems is that testing
-	has been light, so any help is very valuable). qemu...?
-	OTOH, maybe even qemu cannot easily test a kpc2000, but
-	perhaps `git blame` and talking to the authors would help
-	figure out a way to validate the changes.
-
-	Thinking about whether you can run a test that would prove or
-	disprove my claim in (a), above, could be useful in coming up
-	with tests to run.
-
-In other words, a few very high quality conversions (even just one) that
-we can really put our faith in, is what I value most here. Tested patches
-are awesome.
-
-3. Once I re-post, turn on the new CONFIG_DEBUG_GET_USER_PAGES_REFERENCES
-and run things such as xfstest/fstest. (Again, doing so would be going
-further than I have yet--very helpful). Help clarify what conversions have
-actually been tested and work, and which ones remain unvalidated.
-
-Other: Please note that this:
-
-    https://github.com/johnhubbard/linux/commits/gup_dma_core
-
-    a) gets rebased often, and
-
-    b) has a bunch of commits (iov_iter and related) that conflict
-       with the latest linux.git,
-
-    c) has some bugs in the bio area, that I'm fixing, so I don't trust
-       that's it's safely runnable, for a few more days.
-
-One note below, for the future:
-
-> 
-> This is a bunch of trivial conversions which is a part of an effort
-> by John Hubbard to solve issues with gup pinned pages and 
-> filesystem writeback.
-> 
-> The issue is more clearly described in John Hubbard's patch[1] where
-> put_user_page*() functions are introduced.
-> 
-> Currently put_user_page*() simply does put_page but future implementations
-> look to change that once treewide change of put_page callsites to 
-> put_user_page*() is finished.
-> 
-> The lwn article describing the issue with gup pinned pages and filesystem 
-> writeback [2].
-> 
-> This patch has been tested by building and booting the kernel as I don't
-> have the required hardware to test the device drivers.
-> 
-> I did not modify gpu/drm drivers which use release_pages instead of
-> put_page() to release reference of gup pinned pages as I am not clear
-> whether release_pages and put_page are interchangable. 
-> 
-> [1] https://lkml.org/lkml/2019/3/26/1396
-
-When referring to patches in a commit description, please use the 
-commit hash, not an external link. See Submitting Patches [1] for details.
-
-Also, once you figure out the right maintainers and other involved people,
-putting Cc: in the commit description is common practice, too.
-
-[1] https://www.kernel.org/doc/html/latest/process/submitting-patches.html
+However, elevator_init_mq() shouldn't return failure since none should
+work any time.
+That said 'none' should be fallback to in case that default
+mq-deadline can't be initialized.
 
 thanks,
--- 
-John Hubbard
-NVIDIA
-
-> 
-> [2] https://lwn.net/Articles/784574/
-> 
-> Signed-off-by: Bharath Vedartham <linux.bhar@gmail.com>
-> ---
->  drivers/media/v4l2-core/videobuf-dma-sg.c | 3 +--
->  drivers/misc/sgi-gru/grufault.c           | 2 +-
->  drivers/staging/kpc2000/kpc_dma/fileops.c | 4 +---
->  drivers/vfio/vfio_iommu_type1.c           | 2 +-
->  fs/io_uring.c                             | 7 +++----
->  mm/gup_benchmark.c                        | 6 +-----
->  net/xdp/xdp_umem.c                        | 7 +------
->  7 files changed, 9 insertions(+), 22 deletions(-)
-> 
-> diff --git a/drivers/media/v4l2-core/videobuf-dma-sg.c b/drivers/media/v4l2-core/videobuf-dma-sg.c
-> index 66a6c6c..d6eeb43 100644
-> --- a/drivers/media/v4l2-core/videobuf-dma-sg.c
-> +++ b/drivers/media/v4l2-core/videobuf-dma-sg.c
-> @@ -349,8 +349,7 @@ int videobuf_dma_free(struct videobuf_dmabuf *dma)
->  	BUG_ON(dma->sglen);
->  
->  	if (dma->pages) {
-> -		for (i = 0; i < dma->nr_pages; i++)
-> -			put_page(dma->pages[i]);
-> +		put_user_pages(dma->pages, dma->nr_pages);
->  		kfree(dma->pages);
->  		dma->pages = NULL;
->  	}
-> diff --git a/drivers/misc/sgi-gru/grufault.c b/drivers/misc/sgi-gru/grufault.c
-> index 4b713a8..61b3447 100644
-> --- a/drivers/misc/sgi-gru/grufault.c
-> +++ b/drivers/misc/sgi-gru/grufault.c
-> @@ -188,7 +188,7 @@ static int non_atomic_pte_lookup(struct vm_area_struct *vma,
->  	if (get_user_pages(vaddr, 1, write ? FOLL_WRITE : 0, &page, NULL) <= 0)
->  		return -EFAULT;
->  	*paddr = page_to_phys(page);
-> -	put_page(page);
-> +	put_user_page(page);
->  	return 0;
->  }
->  
-> diff --git a/drivers/staging/kpc2000/kpc_dma/fileops.c b/drivers/staging/kpc2000/kpc_dma/fileops.c
-> index 6166587..26dceed 100644
-> --- a/drivers/staging/kpc2000/kpc_dma/fileops.c
-> +++ b/drivers/staging/kpc2000/kpc_dma/fileops.c
-> @@ -198,9 +198,7 @@ int  kpc_dma_transfer(struct dev_private_data *priv, struct kiocb *kcb, unsigned
->  	sg_free_table(&acd->sgt);
->   err_dma_map_sg:
->   err_alloc_sg_table:
-> -	for (i = 0 ; i < acd->page_count ; i++){
-> -		put_page(acd->user_pages[i]);
-> -	}
-> +	put_user_pages(acd->user_pages, acd->page_count);
->   err_get_user_pages:
->  	kfree(acd->user_pages);
->   err_alloc_userpages:
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index add34ad..c491524 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -369,7 +369,7 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  		 */
->  		if (ret > 0 && vma_is_fsdax(vmas[0])) {
->  			ret = -EOPNOTSUPP;
-> -			put_page(page[0]);
-> +			put_user_page(page[0]);
->  		}
->  	}
->  	up_read(&mm->mmap_sem);
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index 4ef62a4..b4a4549 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-> @@ -2694,10 +2694,9 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
->  			 * if we did partial map, or found file backed vmas,
->  			 * release any pages we did get
->  			 */
-> -			if (pret > 0) {
-> -				for (j = 0; j < pret; j++)
-> -					put_page(pages[j]);
-> -			}
-> +			if (pret > 0)
-> +				put_user_pages(pages, pret);
-> +
->  			if (ctx->account_mem)
->  				io_unaccount_mem(ctx->user, nr_pages);
->  			kvfree(imu->bvec);
-> diff --git a/mm/gup_benchmark.c b/mm/gup_benchmark.c
-> index 7dd602d..15fc7a2 100644
-> --- a/mm/gup_benchmark.c
-> +++ b/mm/gup_benchmark.c
-> @@ -76,11 +76,7 @@ static int __gup_benchmark_ioctl(unsigned int cmd,
->  	gup->size = addr - gup->addr;
->  
->  	start_time = ktime_get();
-> -	for (i = 0; i < nr_pages; i++) {
-> -		if (!pages[i])
-> -			break;
-> -		put_page(pages[i]);
-> -	}
-> +	put_user_pages(pages, nr_pages);
->  	end_time = ktime_get();
->  	gup->put_delta_usec = ktime_us_delta(end_time, start_time);
->  
-> diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
-> index 9c6de4f..6103e19 100644
-> --- a/net/xdp/xdp_umem.c
-> +++ b/net/xdp/xdp_umem.c
-> @@ -173,12 +173,7 @@ static void xdp_umem_unpin_pages(struct xdp_umem *umem)
->  {
->  	unsigned int i;
->  
-> -	for (i = 0; i < umem->npgs; i++) {
-> -		struct page *page = umem->pgs[i];
-> -
-> -		set_page_dirty_lock(page);
-> -		put_page(page);
-> -	}
-> +	put_user_pages_dirty_lock(umem->pgs, umem->npgs);
->  
->  	kfree(umem->pgs);
->  	umem->pgs = NULL;
-> 
+Ming Lei
