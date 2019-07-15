@@ -4,62 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3983AC7618F
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 20:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7169BC76191
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 20:11:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 11FC32171F
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 20:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DC7A2171F
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 20:11:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="sEHOuZwJ"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="xQKVpC/g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730859AbfGOUL1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jul 2019 16:11:27 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:36719 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729844AbfGOUL1 (ORCPT
+        id S1730754AbfGOULa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jul 2019 16:11:30 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:33003 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729844AbfGOULa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jul 2019 16:11:27 -0400
-Received: by mail-pl1-f193.google.com with SMTP id k8so8865066plt.3
-        for <linux-block@vger.kernel.org>; Mon, 15 Jul 2019 13:11:27 -0700 (PDT)
+        Mon, 15 Jul 2019 16:11:30 -0400
+Received: by mail-pl1-f194.google.com with SMTP id c14so8836713plo.0
+        for <linux-block@vger.kernel.org>; Mon, 15 Jul 2019 13:11:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=ZWvLpiy8LsbkNpgxUihtSHfUQdquxnVHPH9fwkxLy2U=;
-        b=sEHOuZwJ+BIE4P1ZiXDV0TH7shHP117fYRKQpA5BigDI/0l8pSGUvBLBHvSg3SnJrH
-         E8vygy29R4ETfHRbefwSVptD/vymZ1I6RiNrywBCkMlycvvDn8IcJga5V+jn0GSrMTFk
-         QRotMxIwlVamTSmE1HbjMxBZ45Ye2nh6qZsSIANnTSOrwttE90DdRnaluUfZ6NHV8qrz
-         6McH7qRWuUsUpcWB1kwD8EC/dJhtygH6AWR74MzdZywIRhvHzNj6uPuwif3OIPXPSf5g
-         KnmA6LzPBsiikOl44CqcOO2qeNbC0CW3fqZS2EbVntOUnrtB7iKGFhkthHEsFcT5vm3m
-         HxEA==
+        bh=MB4gVXqWNYaKJnrlVX20etvhbnggMPAbdHNsnWIPeXs=;
+        b=xQKVpC/gFkHj9XGqYbFT9QwlUw9vLWV/I4yEjny8GRIwQY4j4Cwv+TKgRgyZ71pHBe
+         +Q2Qor1COxoZyyDuXq4xTORWGxFS69X32EehQoWuETojAYG2SmNQ0T5xKo+kHbZLmEwH
+         iYkC3xUB8W9EEE9GjbpxQeyLP7o82fm4ewTW5B1lt+t8z9fTPxBz4dLOztClI2LDQXJs
+         M8SBSxSOQNZaxtEO9nKKHih66xOKyWCDXkNj7grcGMaUlmacW+8/JPr1Q8tnEFeC1sXx
+         AN1DvvqFbc57FzsgzHXKfUilI3LdTMrorN5dpVv+D9ABXUGUf27Uw5SMkEid3DVf6mAx
+         hVoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references;
-        bh=ZWvLpiy8LsbkNpgxUihtSHfUQdquxnVHPH9fwkxLy2U=;
-        b=j73cmgk/+6XdR1gV5n6mEdyoKHduWwTYO+CCqKRnsiv2ctkaiRmcnlX3ynZHlGfmK9
-         f5QGNh62NpTaenaIvL76bbRCe8eqUwBInOlwqnvYeXEM6cmZJ2DqSBlqPwspozHwia+Q
-         DTQRSLhuGDQe3g7H8g1KL0WEWHXxk1sZyHhlKI96/9ERUZUrxYafWZuu2pvNhiN5h4E/
-         FX5PxomhYNiNlFIDJGkmJhC+P5TwSld/epMo1HnEm0TYao18m0r2NeJhRpKQs41hPDaa
-         0tyyV8UBMS/eu0KczB6z43gSlTK4/6RLSwmDjtFDQYYNlyU6849g370/aMcmJUkDMUp1
-         EuiQ==
-X-Gm-Message-State: APjAAAVTKre2co7ZeoLUH6NhgW4q+0E0c24GnbuOjmMdJaNupHoHZhWC
-        BOijiIKNzmaXfZ4ThXUEN2U=
-X-Google-Smtp-Source: APXvYqwsAL3ErP2ILEO0DCMd1V6VC7J0kOlBY+GrN2v5wIUoSqYN9htNnvIaemXXeHDzUOPRxHUNcw==
-X-Received: by 2002:a17:902:44e:: with SMTP id 72mr30311235ple.326.1563221486694;
-        Mon, 15 Jul 2019 13:11:26 -0700 (PDT)
+        bh=MB4gVXqWNYaKJnrlVX20etvhbnggMPAbdHNsnWIPeXs=;
+        b=rzPr4EALmL80D03umdgPj75aM6FXN+S9h3ZRguURHO16INu2Kjoe1t774g923z93C8
+         khFYXwVnupy+kvVQrXn4MVD4TwrZIyf5jS0sGINtjBgDHM4xWTb+h4EUuY3YffTN9Gzx
+         Mp6CmJaE87ofjQPuqfa2t++XZq9mc0QBk/PEvs2bd7N4ZXDQLwi0hqAoi5Txii4dmF0q
+         KHsgDoO1eAqrB3IO3EUJwu5PFBnSOcCnuoaG/9WtjDW10G0JljlXMHHV8AF1qFFqK9vD
+         dh7Q4swYpHHfJiomSW+0nTj6A91ERaWrxM1cfNK5SK9usJxlWRyw3exBRL/+8gNctStB
+         bFwQ==
+X-Gm-Message-State: APjAAAW6tHl/Qm6oBZq3cNDICa0UXR9XBzU9B7YhoHMKwwWJts5KXhVr
+        /lBgondhw2r8YczYqHfdQHZCZjB8AE4=
+X-Google-Smtp-Source: APXvYqxhVQMunxrDtxDEzFdb/upPWtMDsgL1O0zWrOChUH/xczkCKXzjvwUvgPJnaHdqlrUFb4lsBA==
+X-Received: by 2002:a17:902:76c7:: with SMTP id j7mr29155243plt.247.1563221489457;
+        Mon, 15 Jul 2019 13:11:29 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::4caf])
-        by smtp.gmail.com with ESMTPSA id j13sm17302484pfh.13.2019.07.15.13.11.25
+        by smtp.gmail.com with ESMTPSA id h12sm23119181pje.12.2019.07.15.13.11.28
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 15 Jul 2019 13:11:26 -0700 (PDT)
+        Mon, 15 Jul 2019 13:11:28 -0700 (PDT)
 From:   Josef Bacik <josef@toxicpanda.com>
 To:     axboe@kernel.dk, linux-block@vger.kernel.org, kernel-team@fb.com,
         peterz@infradead.org, oleg@redhat.com
-Subject: [PATCH 1/4] wait: add wq_has_single_sleeper helper
-Date:   Mon, 15 Jul 2019 16:11:16 -0400
-Message-Id: <20190715201120.72749-2-josef@toxicpanda.com>
+Subject: [PATCH 2/4] rq-qos: fix missed wake-ups in rq_qos_throttle
+Date:   Mon, 15 Jul 2019 16:11:17 -0400
+Message-Id: <20190715201120.72749-3-josef@toxicpanda.com>
 X-Mailer: git-send-email 2.13.5
 In-Reply-To: <20190715201120.72749-1-josef@toxicpanda.com>
 References: <20190715201120.72749-1-josef@toxicpanda.com>
@@ -68,44 +68,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-rq-qos sits in the io path so we want to take locks as sparingly as
-possible.  To accomplish this we try not to take the waitqueue head lock
-unless we are sure we need to go to sleep, and we have an optimization
-to make sure that we don't starve out existing waiters.  Since we check
-if there are existing waiters locklessly we need to be able to update
-our view of the waitqueue list after we've added ourselves to the
-waitqueue.  Accomplish this by adding this helper to see if there is
-more than just ourselves on the list.
+We saw a hang in production with WBT where there was only one waiter in
+the throttle path and no outstanding IO.  This is because of the
+has_sleepers optimization that is used to make sure we don't steal an
+inflight counter for new submitters when there are people already on the
+list.
+
+We can race with our check to see if the waitqueue has any waiters (this
+is done locklessly) and the time we actually add ourselves to the
+waitqueue.  If this happens we'll go to sleep and never be woken up
+because nobody is doing IO to wake us up.
+
+Fix this by checking if the waitqueue has a single sleeper on the list
+after we add ourselves, that way we have an uptodate view of the list.
 
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 ---
- include/linux/wait.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ block/blk-rq-qos.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/wait.h b/include/linux/wait.h
-index b6f77cf60dd7..30c515520fb2 100644
---- a/include/linux/wait.h
-+++ b/include/linux/wait.h
-@@ -126,6 +126,19 @@ static inline int waitqueue_active(struct wait_queue_head *wq_head)
- 	return !list_empty(&wq_head->head);
- }
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index 659ccb8b693f..67a0a4c07060 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -244,6 +244,7 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
+ 		return;
  
-+/**
-+ * wq_has_single_sleeper - check if there is only one sleeper
-+ * @wq_head: wait queue head
-+ *
-+ * Returns true of wq_head has only one sleeper on the list.
-+ *
-+ * Please refer to the comment for waitqueue_active.
-+ */
-+static inline bool wq_has_single_sleeper(struct wait_queue_head *wq_head)
-+{
-+	return list_is_singular(&wq_head->head);
-+}
-+
- /**
-  * wq_has_sleeper - check if there are any waiting processes
-  * @wq_head: wait queue head
+ 	prepare_to_wait_exclusive(&rqw->wait, &data.wq, TASK_UNINTERRUPTIBLE);
++	has_sleeper = !wq_has_single_sleeper(&rqw->wait);
+ 	do {
+ 		if (data.got_token)
+ 			break;
 -- 
 2.17.1
 
