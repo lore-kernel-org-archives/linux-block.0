@@ -2,95 +2,121 @@ Return-Path: <SRS0=FYaB=VM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA972C7618F
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 20:11:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4AF9C7618F
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 23:07:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 815452171F
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 20:11:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86A8E21738
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 23:07:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="XEf2gZju"
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="nO7JDWku"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731168AbfGOULg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jul 2019 16:11:36 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:34910 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730882AbfGOULf (ORCPT
+        id S1731661AbfGOXHf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jul 2019 19:07:35 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:43237 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731521AbfGOXHf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jul 2019 16:11:35 -0400
-Received: by mail-pg1-f193.google.com with SMTP id s1so1931100pgr.2
-        for <linux-block@vger.kernel.org>; Mon, 15 Jul 2019 13:11:35 -0700 (PDT)
+        Mon, 15 Jul 2019 19:07:35 -0400
+Received: by mail-pl1-f196.google.com with SMTP id 4so2093181pld.10
+        for <linux-block@vger.kernel.org>; Mon, 15 Jul 2019 16:07:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=SJf4C6KejtjXuljRmpFGx9hGgMD/PzbLxtQzdurli00=;
-        b=XEf2gZjuQsH1ka7bXG6EbQb9vscFZbQwJD1e5tErbkF2mj1opSw/jrqlb7VP9Z6vR/
-         V7hfb+upbv2VoCdZc9VVvKpvPhU2/dtbcOthkuFgQ8/gCcSxUII2LzhngNa2WvCg+i8C
-         qNxWD+U0UvQu3f1I0JXc0+BX4PcWwwAZ0USR6lsF1ZENnCgAqBte8ggCurdQ2jC5YarE
-         XAgafgfG/HQzzFQaM6V9tK3LDKQQ9kTpxNRIG8kg6vdvxcWqCi29LhYcZROsCdhmziut
-         7iEM8x3u6EBYxhVTkw7zJNJZRV70K3KXbYH7HYKCEFPQdksnKMk9bcTGuN6ImEFrubTd
-         PvXQ==
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=xm5ERYpf8xDBMsIMMEqpgHX/opm0oJBnr4ig5qE1akc=;
+        b=nO7JDWkuSSVYlYAV1lm1SFqOKeBU7k6gxnehcsFT2x21a+ESXU0ippEXhoevTOPLId
+         lwjqaYsNnuR3zIvqfzk7w6lymIAQr7rpO1UaguCmQ1xX4YdVpks2fH9dPASW9wW2ZVdS
+         BtLCigSaoTQxnnFf0GYsqQ9eRi/Q+JkxvfRtSJEFvFJRH/MRRf24qCd+RR+HSDyswRom
+         W5f3Guevmmlhek6RNJjwNu8V+Wz6N0YiWBT8+nt2cC+D7WkaqrzKl19PmDxGkRy3BBL/
+         QQKzDElT/H+cMOKPDwcIzk8sN4brFH38vR88WZJ+TJrovAERF7fMiwbxaebgdLSD9i4R
+         Ds1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references;
-        bh=SJf4C6KejtjXuljRmpFGx9hGgMD/PzbLxtQzdurli00=;
-        b=DM+mjjvfTKq4j3pZJR//Wu52BK8fggbeX052nhcfsi3SUopezRENV1AtMQgLIGcAm/
-         6qGbKEjzF+0q4BIgeyxgx0E5GiHUWgQVcwgQLpw589wW5l7MWr1UShc9Os0aCYvbQHaJ
-         xTfuIT8E7Y5htJlDe713tTpYWV+rwsMJCfPCvxPmVyzHfZuEidG6pIv1B+d13yADQmcj
-         5BNWEt4zrXxqUIBwv1qNMGkYt1OZMv47ADhXiqh0Cvbe/YpiD9hT0KiyB43x3gmPeQbu
-         A/1bwrNwQZAXZAqP4akrhCGdbVhKsVRHMC4Jhm6xsZQHITxh9rWPCn3+OhxdIjE4zuCR
-         hoSQ==
-X-Gm-Message-State: APjAAAUDsI0zgfmdKjLcEpUjzCS8FEa/XDhJUMuSRb77SAo67Ep3ZTkF
-        8RRZSjHHpYqql8hkoRVfDuY=
-X-Google-Smtp-Source: APXvYqw24vVbSWaGT1XYSVoCsx77tNpMoTKR6cg3dqCR+s4/Mxl6zTKM7kFs3jPH73aua2yoVNXa8g==
-X-Received: by 2002:a63:f501:: with SMTP id w1mr371963pgh.444.1563221495103;
-        Mon, 15 Jul 2019 13:11:35 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::4caf])
-        by smtp.gmail.com with ESMTPSA id a3sm20020489pfo.49.2019.07.15.13.11.33
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 15 Jul 2019 13:11:34 -0700 (PDT)
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org, kernel-team@fb.com,
-        peterz@infradead.org, oleg@redhat.com
-Subject: [PATCH 4/4] rq-qos: don't reset has_sleepers on spurious wakeups
-Date:   Mon, 15 Jul 2019 16:11:19 -0400
-Message-Id: <20190715201120.72749-5-josef@toxicpanda.com>
-X-Mailer: git-send-email 2.13.5
-In-Reply-To: <20190715201120.72749-1-josef@toxicpanda.com>
-References: <20190715201120.72749-1-josef@toxicpanda.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=xm5ERYpf8xDBMsIMMEqpgHX/opm0oJBnr4ig5qE1akc=;
+        b=ClhBih6h0ihJfpcygrAs/YLyOUuFLKjUsAXsfNM4GFAZjOr6Oj7VzJFCtueMGaauUP
+         BZlUiBaIzvETBwNg3gGZ3J2OHbqKu2PKAOljvE/dY7O5Vfw/mqALaiQp7lWQ2G4M9PVb
+         SkXPr5xWV2Nhn81jJ0FrHBotNeg7CHMugKJSQdhiMZw8a4iCj/aN4hsi/rP1/e3Wh5Gl
+         RG4HdZRenT4vQmfs3skUuB2dJEqmkAskgoDwmr/Q0fQFH+PoyhLok8hvnwVEd4hnK4as
+         qe5R4m0F1fxUybYtNNTwpV765jQ3XvraIR7qJ+dv17n9HTkcCF9as85mTiiLkzvVYEYL
+         izeQ==
+X-Gm-Message-State: APjAAAWlxOAVpP+rIUsqF7XdwIBPE5YRqFdzZpwpzyk29VU2FjaqAuFs
+        nC13HkyiBYb2s1FcMhYlYJla3w==
+X-Google-Smtp-Source: APXvYqyya/YYukqoHalj390zEcSYsHkxdFRXscVPfyVy23LFXlpDY2hDnBnBtRsd2NvkqIwGwSx2zw==
+X-Received: by 2002:a17:902:bcc4:: with SMTP id o4mr30597758pls.90.1563232054358;
+        Mon, 15 Jul 2019 16:07:34 -0700 (PDT)
+Received: from vader ([2620:10d:c090:200::2:f4a5])
+        by smtp.gmail.com with ESMTPSA id v27sm21592917pgn.76.2019.07.15.16.07.23
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 15 Jul 2019 16:07:33 -0700 (PDT)
+Date:   Mon, 15 Jul 2019 16:07:13 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Omar Sandoval <osandov@fb.com>, Theodore Ts'o <tytso@mit.edu>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Michael Moese <mmoese@suse.de>
+Subject: Re: [PATCH blktests 02/12] nvme: More agressively filter the
+ discovery output
+Message-ID: <20190715230713.GA5449@vader>
+References: <20190712235742.22646-1-logang@deltatee.com>
+ <20190712235742.22646-3-logang@deltatee.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190712235742.22646-3-logang@deltatee.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we had multiple sleepers before we don't need to worry about never
-being woken up.  If we're woken up randomly without having gotten our
-inflight token then we need to go back to sleep, we won't be properly
-woken up without being given our inflight token anyway so this resetting
-isn't needed.
+On Fri, Jul 12, 2019 at 05:57:32PM -0600, Logan Gunthorpe wrote:
+> Comparing the entire output of nvme-cli for discovery is fragile
+> and error prone as things change. There's already been the
+> long standing issue of the generation counter mismatching
+> and also some versions of nvme-cli print an extra "sq flow control
+> disable supported" text[1].
+> 
+> Instead, filter out all but a few key values from the discovery
+> text which should still be sufficient for this test and much
+> less likely to be subject to churn.
+> 
+> [1] https://lore.kernel.org/linux-block/20190505150611.15776-4-minwoo.im.dev@gmail.com/
+> 
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+> ---
+>  tests/nvme/002.out | 6001 --------------------------------------------
+>  tests/nvme/016.out |    7 -
+>  tests/nvme/017.out |    7 -
+>  tests/nvme/rc      |    4 +-
+>  4 files changed, 2 insertions(+), 6017 deletions(-)
 
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
----
- block/blk-rq-qos.c | 1 -
- 1 file changed, 1 deletion(-)
+[snip]
 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index f4aa7b818cf5..35bc6f54d088 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -261,7 +261,6 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
- 			break;
- 		}
- 		io_schedule();
--		has_sleeper = false;
- 	} while (1);
- 	finish_wait(&rqw->wait, &data.wq);
- }
--- 
-2.17.1
+> diff --git a/tests/nvme/rc b/tests/nvme/rc
+> index 22833d8ef9bb..60dc05869726 100644
+> --- a/tests/nvme/rc
+> +++ b/tests/nvme/rc
+> @@ -120,6 +120,6 @@ _find_nvme_loop_dev() {
+>  }
+>  
+>  _filter_discovery() {
+> -	sed -r  -e "s/portid:  [0-9]+/portid:  X/" \
+> -		-e "s/Generation counter [0-9]+/Generation counter X/"
+> +	sed -r -e "s/Generation counter [0-9]+/Generation counter X/" |
+> +		grep 'Discovery Log Number\|Log Entry\|trtype\|subnqn'
+>  }
 
+This can be done in a single sed command instead of sed + grep:
+
+sed -rn -e 's/Generation counter [0-9]+/Generation counter X/' \
+	-e '/Discovery Log Number|Log Entry|trtype|subnqn/p'
