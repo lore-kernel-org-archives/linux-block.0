@@ -4,50 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 516A6C7618F
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 15:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E407AC76195
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 15:09:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A48B2067C
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 15:03:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC8C72054F
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 15:09:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563203008;
-	bh=oLaZZsiAsWPg5tIXJ0siM1ZrBH71h7yIil+f0MEhA/0=;
+	s=default; t=1563203361;
+	bh=3jtqXFsdy9+nN0Tz9J17po0Nvk+gwLyZ0NOhRPT6fiY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=OLKwpP5WCqsEEZcxGCXi5eXYpj961rMf00XQkvIh6N7+N3h7A6LH/+tByi04+xWE+
-	 OqFWnMzHFVnTHDyQm4DOUPL06otPwvnljGuoFdrzxHyab4/DHNcrY6UNumI61EIBt6
-	 gUpsBlC4hOq1L/ar1vvtYlcK7234lXJJytVVxRJs=
+	b=p6CtSiZNy1NmhDx/KmoMLFo7MpvI+fnehC/syJf9GVGV2mzCOq35XsxASmuyzbqqF
+	 upR6xxj/ouv6fNjp6Aw6kI6EcztJbXTeb22VvnJYBjEMlxKYEeUIzbVSKrs5X+jWnb
+	 /HMMCGyJSfCkj6BEJL1fhs/2fCYMCAO/VwCgK4Cs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388242AbfGOOJO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:09:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60582 "EHLO mail.kernel.org"
+        id S1732409AbfGON5M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jul 2019 09:57:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34882 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731241AbfGOOJL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:09:11 -0400
+        id S1732378AbfGON5L (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Jul 2019 09:57:11 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E146521841;
-        Mon, 15 Jul 2019 14:09:09 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4D5B420C01;
+        Mon, 15 Jul 2019 13:57:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563199751;
-        bh=oLaZZsiAsWPg5tIXJ0siM1ZrBH71h7yIil+f0MEhA/0=;
+        s=default; t=1563199030;
+        bh=3jtqXFsdy9+nN0Tz9J17po0Nvk+gwLyZ0NOhRPT6fiY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YUlHdat+StXVRr4EVSI9D7P4RSI+S1pV8JPq0Gb5pWess+IrJWyWDTsbtMheKgIM4
-         YJfxUq1jK1VCXn8T8c/RILiJfXVYhOAMrrJtXi5EcRnlhFuuLriboJEcfyXz62S44s
-         FSxRQis1W4XasL6fRFw+G3R2Qvs32V/rPsRQBMvQ=
+        b=sfR32nCtKz8xD9WS4lRGJ7KWIV4gmH8X34QtasGm+iXgRy41+Qz4x2AlTLP52Nv9I
+         nrDyMmxGFIpBq9oSPZ4VsMgGRBKb3jmKxP6aW51bXeUhwXoB6ThCKQj/QGDT3Dzqok
+         upMLmaGOsJnvxMjnUiKNWretx3DnJk1dRPhufpWw=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Bob Liu <bob.liu@oracle.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.1 095/219] block: null_blk: fix race condition for null_del_dev
-Date:   Mon, 15 Jul 2019 10:01:36 -0400
-Message-Id: <20190715140341.6443-95-sashal@kernel.org>
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        "Srivatsa S . Bhat" <srivatsa@csail.mit.edu>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.2 169/249] block, bfq: fix rq_in_driver check in bfq_update_inject_limit
+Date:   Mon, 15 Jul 2019 09:45:34 -0400
+Message-Id: <20190715134655.4076-169-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715140341.6443-1-sashal@kernel.org>
-References: <20190715140341.6443-1-sashal@kernel.org>
+In-Reply-To: <20190715134655.4076-1-sashal@kernel.org>
+References: <20190715134655.4076-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -57,90 +59,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Bob Liu <bob.liu@oracle.com>
+From: Paolo Valente <paolo.valente@linaro.org>
 
-[ Upstream commit 7602843fd873cae43a444b83b14dfdd114a9659c ]
+[ Upstream commit db599f9ed9bd31b018b6c48ad7c6b21d5b790ecf ]
 
-Dulicate call of null_del_dev() will trigger null pointer error like below.
-The reason is a race condition between nullb_device_power_store() and
-nullb_group_drop_item().
+One of the cases where the parameters for injection may be updated is
+when there are no more in-flight I/O requests. The number of in-flight
+requests is stored in the field bfqd->rq_in_driver of the descriptor
+bfqd of the device. So, the controlled condition is
+bfqd->rq_in_driver == 0.
 
-  CPU#0                         CPU#1
-  ----------------              -----------------
-  do_rmdir()
-   >configfs_rmdir()
-    >client_drop_item()
-     >nullb_group_drop_item()
-                                nullb_device_power_store()
-				>null_del_dev()
+Unfortunately, this is wrong because, the instruction that checks this
+condition is in the code path that handles the completion of a
+request, and, in particular, the instruction is executed before
+bfqd->rq_in_driver is decremented in such a code path.
 
-      >test_and_clear_bit(NULLB_DEV_FL_UP
-       >null_del_dev()
-       ^^^^^
-       Duplicated null_dev_dev() triger null pointer error
+This commit fixes this issue by just replacing 0 with 1 in the
+comparison.
 
-				>clear_bit(NULLB_DEV_FL_UP
-
-The fix could be keep the sequnce of clear NULLB_DEV_FL_UP and null_del_dev().
-
-[  698.613600] BUG: unable to handle kernel NULL pointer dereference at 0000000000000018
-[  698.613608] #PF error: [normal kernel read fault]
-[  698.613611] PGD 0 P4D 0
-[  698.613619] Oops: 0000 [#1] SMP PTI
-[  698.613627] CPU: 3 PID: 6382 Comm: rmdir Not tainted 5.0.0+ #35
-[  698.613631] Hardware name: LENOVO 20LJS2EV08/20LJS2EV08, BIOS R0SET33W (1.17 ) 07/18/2018
-[  698.613644] RIP: 0010:null_del_dev+0xc/0x110 [null_blk]
-[  698.613649] Code: 00 00 00 5b 41 5c 41 5d 41 5e 41 5f 5d c3 0f 0b eb 97 e8 47 bb 2a e8 0f 1f 80 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 54 53 <8b> 77 18 48 89 fb 4c 8b 27 48 c7 c7 40 57 1e c1 e8 bf c7 cb e8 48
-[  698.613654] RSP: 0018:ffffb887888bfde0 EFLAGS: 00010286
-[  698.613659] RAX: 0000000000000000 RBX: ffff9d436d92bc00 RCX: ffff9d43a9184681
-[  698.613663] RDX: ffffffffc11e5c30 RSI: 0000000068be6540 RDI: 0000000000000000
-[  698.613667] RBP: ffffb887888bfdf0 R08: 0000000000000001 R09: 0000000000000000
-[  698.613671] R10: ffffb887888bfdd8 R11: 0000000000000f16 R12: ffff9d436d92bc08
-[  698.613675] R13: ffff9d436d94e630 R14: ffffffffc11e5088 R15: ffffffffc11e5000
-[  698.613680] FS:  00007faa68be6540(0000) GS:ffff9d43d14c0000(0000) knlGS:0000000000000000
-[  698.613685] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  698.613689] CR2: 0000000000000018 CR3: 000000042f70c002 CR4: 00000000003606e0
-[  698.613693] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  698.613697] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  698.613700] Call Trace:
-[  698.613712]  nullb_group_drop_item+0x50/0x70 [null_blk]
-[  698.613722]  client_drop_item+0x29/0x40
-[  698.613728]  configfs_rmdir+0x1ed/0x300
-[  698.613738]  vfs_rmdir+0xb2/0x130
-[  698.613743]  do_rmdir+0x1c7/0x1e0
-[  698.613750]  __x64_sys_rmdir+0x17/0x20
-[  698.613759]  do_syscall_64+0x5a/0x110
-[  698.613768]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-Signed-off-by: Bob Liu <bob.liu@oracle.com>
+Reported-by: Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu>
+Tested-by: Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/null_blk_main.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ block/bfq-iosched.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index d7ac09c092f2..21d0b651b335 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -326,11 +326,12 @@ static ssize_t nullb_device_power_store(struct config_item *item,
- 		set_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
- 		dev->power = newp;
- 	} else if (dev->power && !newp) {
--		mutex_lock(&lock);
--		dev->power = newp;
--		null_del_dev(dev->nullb);
--		mutex_unlock(&lock);
--		clear_bit(NULLB_DEV_FL_UP, &dev->flags);
-+		if (test_and_clear_bit(NULLB_DEV_FL_UP, &dev->flags)) {
-+			mutex_lock(&lock);
-+			dev->power = newp;
-+			null_del_dev(dev->nullb);
-+			mutex_unlock(&lock);
-+		}
- 		clear_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
- 	}
- 
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index e5db3856b194..404e776aa36d 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5398,8 +5398,14 @@ static void bfq_update_inject_limit(struct bfq_data *bfqd,
+ 	 * total service time, and there seem to be the right
+ 	 * conditions to do it, or we can lower the last base value
+ 	 * computed.
++	 *
++	 * NOTE: (bfqd->rq_in_driver == 1) means that there is no I/O
++	 * request in flight, because this function is in the code
++	 * path that handles the completion of a request of bfqq, and,
++	 * in particular, this function is executed before
++	 * bfqd->rq_in_driver is decremented in such a code path.
+ 	 */
+-	if ((bfqq->last_serv_time_ns == 0 && bfqd->rq_in_driver == 0) ||
++	if ((bfqq->last_serv_time_ns == 0 && bfqd->rq_in_driver == 1) ||
+ 	    tot_time_ns < bfqq->last_serv_time_ns) {
+ 		bfqq->last_serv_time_ns = tot_time_ns;
+ 		/*
 -- 
 2.20.1
 
