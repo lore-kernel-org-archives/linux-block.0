@@ -2,117 +2,119 @@ Return-Path: <SRS0=FYaB=VM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B7B5C7618A
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 04:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57510C7618A
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 05:38:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6DA262067C
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 04:58:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C78120C01
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 05:38:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="XTxJjDZf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726049AbfGOE6K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jul 2019 00:58:10 -0400
-Received: from ajax.cs.uga.edu ([128.192.4.6]:59176 "EHLO ajax.cs.uga.edu"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725954AbfGOE6K (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jul 2019 00:58:10 -0400
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-        (authenticated bits=0)
-        by ajax.cs.uga.edu (8.14.4/8.14.4) with ESMTP id x6F4w7NR055490
-        (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=OK);
-        Mon, 15 Jul 2019 00:58:08 -0400
-Received: by mail-lj1-f179.google.com with SMTP id d24so14756901ljg.8;
-        Sun, 14 Jul 2019 21:58:08 -0700 (PDT)
-X-Gm-Message-State: APjAAAUquadBHdEk7tXfMrFHNTA8XxABrqse6uQUDRCTCGWSgc/6QCyH
-        FTHxqDHdaZsdyFQMEZBxRSQN4K6abArsUN7ApJc=
-X-Google-Smtp-Source: APXvYqw7bjzk5JgPCfj0SZ6gpRSy1WzzbhX/WmJACvYoEVXzu7A6fi9r+HTDgtk6QADKDwxb+1xcb62uVjg+PrfoDaA=
-X-Received: by 2002:a2e:8681:: with SMTP id l1mr13133432lji.166.1563166687219;
- Sun, 14 Jul 2019 21:58:07 -0700 (PDT)
+        id S1726059AbfGOFig (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jul 2019 01:38:36 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:37497 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725385AbfGOFig (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Jul 2019 01:38:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1563169115; x=1594705115;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=v+bSBg6jjIAj4+AXOXVxZAQGqn3jMajngF3sUFLboa4=;
+  b=XTxJjDZf2zRpGms183oaJIGeQv7gJ4nW4SrPOQzQmt4gusmpef1Pzejk
+   e+RijdevFI/n8fkn0IDxcGlWOO4DKEY3rX/OfB+YQbwiwrlKkgp4qfFde
+   629kMchJVnUufO+kfwJc06p4K7p4KTz9bfsW5PxekxgCM9XsZpiZFbK9T
+   KWKlzfRRCz6kfZhwqwX+oTjCErnOjyTW4FFto6FqlbRSRgczgNjx9ZqDC
+   GLk/d1auMAtpIbDnk+IBRDpl4O5ofGX4RSr43IyI/CRRLfXBHqyky/taR
+   cHVgAdQe8gFO0n8WGqKTpwBoTzDbCvIc8V0SnyJ99pb9AeLNuZvSChaNp
+   g==;
+IronPort-SDR: Xj9rxWAf4q8cvHXfPR6HhEXQcdehbJeXRjWWRZG9dFKB2A/19gVfbCkfFZdOpHi/OLz4LOlCMD
+ G446NMLxDzyW3m3rjEifrZq2etEzaI9V+Z39PMI933bWmCXQXm6Fnv8I/vHw8ogmxDyJevet1M
+ 5PwoarbJ6zx3v6TlwpDNjAJo5Sk7Jy8PFV/I8EKLIJokNELAGpfj4AVN2zY28AHmBRGB1J8KRs
+ MhywbkINte7FN3/oiXnfu54e0Et4etT3Q4M2zhhC4x7GVzm2CWIJYoH/4TK4P/9Hfyk4YrlhVa
+ hF8=
+X-IronPort-AV: E=Sophos;i="5.63,493,1557158400"; 
+   d="scan'208";a="219467783"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Jul 2019 13:38:35 +0800
+IronPort-SDR: VCb40TSfXw4SkHY+9sok5FMij9qh/COwXXhwJwDHYoq46mMSa5Ti1oJRsvpdroswnjqqAEuZyQ
+ B0Aow9+ePinANFwZ6IvuJzXSUEwf76NDAYSdzKZvWFDVrPZtebFWIcgrD2qOpdf0EtBI6JznQF
+ jtRtMN5kz4UdYmL929vQynRyDMlPzTuiSl9BLM8kTewl0f0F+CwoWRiIMG4feUmT1gcCFRs97I
+ 487zr4YeDl5PpMM7FxZ6cPVe7Yk1UIFT57foqZ3POcVXchusWRSO6ck7EaIV6VFZXLsKLqNm6d
+ 9dLifxVEETD2Zpr7Vo/pkOTP
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP; 14 Jul 2019 22:37:10 -0700
+IronPort-SDR: y+vpzPHJZp/IHdGFEGtQjRhb5l7KwOBuEKFB3udkb+zhATdyWNCqohOX8KoR3+IefvpWUDE+dT
+ WLiu2aV7WYzWfu3dALvzsn+AHDFD3cTyGkE+4wRGKDKFT792UIKRYQtGDY8ZlJ6qidHQ6i2ngJ
+ hr9SHCHFVDBqebxIZfinf0A4QID0f1rV1a0T+qCPjnsZ9FX2G/wKyfPSz24qFEjHb9ZFOWSeiL
+ dDTQBQwMFufHbEHORFv7BlutHZFVyyvXlL+M6clsx/LUwYA1pHneQqyN2oE/V2TFo6KskO4pIl
+ iO4=
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip01.wdc.com with ESMTP; 14 Jul 2019 22:38:35 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] scsi: sd_zbc: Fix compilation warning
+Date:   Mon, 15 Jul 2019 14:38:33 +0900
+Message-Id: <20190715053833.5973-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <1563087801-7373-1-git-send-email-wang6495@umn.edu> <CACVXFVOXZCtYtt3UuYBa7OYHEwsMkYFznfpL=1q9HkJV8xcx0Q@mail.gmail.com>
-In-Reply-To: <CACVXFVOXZCtYtt3UuYBa7OYHEwsMkYFznfpL=1q9HkJV8xcx0Q@mail.gmail.com>
-From:   Wenwen Wang <wenwen@cs.uga.edu>
-Date:   Sun, 14 Jul 2019 23:57:31 -0500
-X-Gmail-Original-Message-ID: <CAAa=b7fyp5__wW6No1aLsnB+TO5UZMTWKc2u7r3H0+cDy2aSXw@mail.gmail.com>
-Message-ID: <CAAa=b7fyp5__wW6No1aLsnB+TO5UZMTWKc2u7r3H0+cDy2aSXw@mail.gmail.com>
-Subject: Re: [PATCH] blk-mq: fix a memory leak bug
-To:     Ming Lei <tom.leiming@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Wenwen Wang <wenwen@cs.uga.edu>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 14, 2019 at 8:26 PM Ming Lei <tom.leiming@gmail.com> wrote:
->
-> On Sun, Jul 14, 2019 at 3:04 PM Wenwen Wang <wang6495@umn.edu> wrote:
-> >
-> > From: Wenwen Wang <wenwen@cs.uga.edu>
-> >
-> > In blk_mq_init_allocated_queue(), a kernel buffer is allocated through
-> > kcalloc_node() to hold hardware dispatch queues in the request queue 'q',
-> > i.e., 'q->queue_hw_ctx'.  Later on, if the blk-mq device has no scheduler
-> > set, a scheduler will be initialized through elevator_init_mq(). If this
-> > initialization fails, blk_mq_init_allocated_queue() needs to be terminated
-> > with an error code returned to indicate this failure. However, the
-> > allocated buffer is not freed on this execution path, leading to a memory
-> > leak bug. Moreover, the required cleanup work is also missed on this path.
-> >
-> > To fix the above issues, free the allocated buffer and invoke the cleanup
-> > functions.
-> >
-> > Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
-> > ---
-> >  block/blk-mq.c | 8 ++++----
-> >  1 file changed, 4 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index e5ef40c..04fe077 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -2845,6 +2845,8 @@ static unsigned int nr_hw_queues(struct blk_mq_tag_set *set)
-> >  struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
-> >                                                   struct request_queue *q)
-> >  {
-> > +       int ret = -ENOMEM;
-> > +
->
-> The above isn't necessary because the function always returns
-> ERR_PTR(-ENOMEM) in case of failure.
->
-> >         /* mark the queue as mq asap */
-> >         q->mq_ops = set->ops;
-> >
-> > @@ -2906,11 +2908,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
-> >         blk_mq_map_swqueue(q);
-> >
-> >         if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
-> > -               int ret;
-> > -
-> >                 ret = elevator_init_mq(q);
-> >                 if (ret)
-> > -                       return ERR_PTR(ret);
-> > +                       goto err_hctxs;
->
-> The above change itself is fine.
->
-> However, elevator_init_mq() shouldn't return failure since none should
-> work any time.
-> That said 'none' should be fallback to in case that default
-> mq-deadline can't be initialized.
+kbuild test robot gets the following compilation warning using gcc 7.4
+cross compilation for c6x (GCC_VERSION=7.4.0 make.cross ARCH=c6x).
 
-Thanks for your comments! I agree that 'none' is the fallback if
-'mq-deadline' cannot be initialized.
+   In file included from include/asm-generic/bug.h:18:0,
+                    from arch/c6x/include/asm/bug.h:12,
+                    from include/linux/bug.h:5,
+                    from include/linux/thread_info.h:12,
+                    from include/asm-generic/current.h:5,
+                    from ./arch/c6x/include/generated/asm/current.h:1,
+                    from include/linux/sched.h:12,
+                    from include/linux/blkdev.h:5,
+                    from drivers//scsi/sd_zbc.c:11:
+   drivers//scsi/sd_zbc.c: In function 'sd_zbc_read_zones':
+>> include/linux/kernel.h:62:48: warning: 'zone_blocks' may be used
+   uninitialized in this function [-Wmaybe-uninitialized]
+    #define __round_mask(x, y) ((__typeof__(x))((y)-1))
+                                                   ^
+   drivers//scsi/sd_zbc.c:464:6: note: 'zone_blocks' was declared here
+     u32 zone_blocks;
+         ^~~~~~~~~~~
 
-But, the error-handling branch after elevator_init_mq() is still
-necessary, unless elevator_init_mq() always returns zero, which is not
-true.
+Fix this by initializing the zone_blocks variable to 0.
 
-Thanks!
-Wenwen
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ drivers/scsi/sd_zbc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index db16c19e05c4..5d6ff3931632 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -461,7 +461,7 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+ {
+ 	struct gendisk *disk = sdkp->disk;
+ 	unsigned int nr_zones;
+-	u32 zone_blocks;
++	u32 zone_blocks = 0;
+ 	int ret;
+ 
+ 	if (!sd_is_zoned(sdkp))
+-- 
+2.21.0
+
