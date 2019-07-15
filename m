@@ -2,194 +2,134 @@ Return-Path: <SRS0=FYaB=VM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5C1C76192
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 10:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CBFC7618F
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 11:22:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C145206B8
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 10:57:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C87DE2081C
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 11:22:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PVCcrEcg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PHsHodDx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729533AbfGOK5h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jul 2019 06:57:37 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34027 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729674AbfGOK5g (ORCPT
+        id S1729821AbfGOLWB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jul 2019 07:22:01 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:36421 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729725AbfGOLWA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jul 2019 06:57:36 -0400
-Received: by mail-wr1-f67.google.com with SMTP id 31so16614806wrm.1
-        for <linux-block@vger.kernel.org>; Mon, 15 Jul 2019 03:57:35 -0700 (PDT)
+        Mon, 15 Jul 2019 07:22:00 -0400
+Received: by mail-lj1-f195.google.com with SMTP id i21so15777034ljj.3;
+        Mon, 15 Jul 2019 04:21:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=WaB1byT4JsbLlwfkX3CoW4ge37EsFViei1bqZF3vhgQ=;
-        b=PVCcrEcgXD4t/PHRjKm5ZBTSDivX6rZVBaO78lCNdM+qKjD4LDcSHq3mY5LQxt0XUJ
-         njJiWST37pPTRWN7bErirw/FVkhMJi0Pbc/1au4rmRa7s6kyZblDFxgc82MWz6DPRiDb
-         a+C5fG2RgdItSoK4E6PxsaVQ2x6xEWXRA/ctcf2TG96hkkP8xikLpzPf/t/A83dYYT6c
-         5ab7HDkL96Gx1mR5isouM5OvTlHwyJex4m2BjOqej8Z+ADRCbdZ/w7NakgXMAxE4WITl
-         tEkP/3LK/sxuV9S56gVkz2PehcAIGEbsPd0ttOivgIU0Od0p+btuh+4UjJPg78lTXxZr
-         XbnQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=gVFqb2ZAh43FCjbdEnlEQIc2JRQwHvSxVmi0yjJ0kAo=;
+        b=PHsHodDxb4KtiLFGCXDUFeRaswzWlgBJeoV92SFmmlP3kyYv0P1xtwA+t/SRQ5jI4a
+         aW4oAyM6WRHI3loIlxsPfdJdrnQP7lKwhECbIHlr8iT7eXp1ihyOU/9NDkaEQcJsEpUx
+         NgHVebj8noMJBQ2BXFmxc9cJnA8/CZP5ye3me20P1QaJxJM5WvA85/rFBzPh3M/acgqm
+         80jtwgXUm/hCZp8m/OyoXm+bLI0cHTNv+EtVBWoCAU7we9A0y901KhnQvH672gJM4QTL
+         mEIQtOOXxAUzMSRlAAQGsxzVgMWtc4kdnyAiwi6GnlDUjhxtpTa/XNV/+YqANlLmgbS5
+         /n1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=WaB1byT4JsbLlwfkX3CoW4ge37EsFViei1bqZF3vhgQ=;
-        b=XWslRdADr9MujhEKRmICtncwd0Nrzi4b2feRtQ5vxKMfkmnthTQ0eUKcZ98mOEjTsB
-         7hhfFqISVXngXPKVymh+J0B8CLh6GJDmUpPmE6VdgX/ULqd1XXATjx6xmHpeHXa0X/mR
-         25Rl/+pNx3xy61Uo+vTMky8m4QxfMHIN5vj+jLFUEvejfg115Ic4JX1sxQYxeeEMVrHR
-         xHmV/CE1h7ox4wMX3WcW+wuAueiM79gHdRqUHiBD3qgrN4Ej3Uo9Y0DYwiKNGfotACCS
-         I2Rlhc70x7MsuUyZ0gLq4txHxUr/DeqvH79TFCkJfNja9j7afE72oYRvrraezEYkPDyt
-         w2+g==
-X-Gm-Message-State: APjAAAXCGj1BW+2NJFMFWfHDkub/4CI0GJWbVZN9QLbQf6GSqTfU3gRI
-        6o/tMQn66DVbzMHezleXnwuWuA==
-X-Google-Smtp-Source: APXvYqzF6bNJQqXNJGaP06qZDyUQawckQyA7evyJkYptGT6S7Hyl9i1bpRNAF5VD2OvNqKW7ds56UA==
-X-Received: by 2002:adf:80e1:: with SMTP id 88mr27801008wrl.127.1563188254593;
-        Mon, 15 Jul 2019 03:57:34 -0700 (PDT)
-Received: from localhost.localdomain (146-241-97-230.dyn.eolo.it. [146.241.97.230])
-        by smtp.gmail.com with ESMTPSA id z1sm18186559wrv.90.2019.07.15.03.57.33
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 15 Jul 2019 03:57:34 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ulf.hansson@linaro.org, linus.walleij@linaro.org,
-        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX IMPROVEMENT V2 1/1] block, bfq: check also in-flight I/O in dispatch plugging
-Date:   Mon, 15 Jul 2019 12:57:19 +0200
-Message-Id: <20190715105719.20353-2-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715105719.20353-1-paolo.valente@linaro.org>
-References: <20190715105719.20353-1-paolo.valente@linaro.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=gVFqb2ZAh43FCjbdEnlEQIc2JRQwHvSxVmi0yjJ0kAo=;
+        b=fUziWqeV8w+gQRAWXoB4uq0iQM83bc5XTI7YwYBqOTSJLgoyUwLsCM9bYOdIMOi97B
+         h4GP/mEdr4dDT0qMWMPoqSXbN7CM3CqsL/Xf+D1UfhtMW/FBZQEEskK2+XKcoBNSRKKB
+         O/QEf+ciCJ0l+DybpgaiRqnm+Zm4vO+ohFGKwXRkNE1o/VLPs4sU1Y0omqY3TvFNuAH7
+         0aaTt2PZPhDnEXm0ZUqfjaMOeU3+lJk4GZsICP+yIrBwvNOCRoyvwM5CHyDlEQV7bzvJ
+         5Lyw2FzBO85X5jsSxFyMOCYbhUk3ma8MMR7tJcySkPC7E74ncMeh7ytqIhuI7go0rOp4
+         UvfQ==
+X-Gm-Message-State: APjAAAWL+sEsHQUPvODlYNx1v8dVBXs0bfwaFJPg2cIWplZ28P8BRuV6
+        6UXTtoCzH7zTeoPRcjgu4BTmQF/3DwdAO6+Wkh8=
+X-Google-Smtp-Source: APXvYqz29uFTNm018kjJZXVHplrRKz3F5/gtgS4MImXtgnN/jM6PuvZjPvdIIlU8BM5o+sM2V1Yxzrx0N9s6knwKoEs=
+X-Received: by 2002:a2e:3e01:: with SMTP id l1mr10882783lja.208.1563189718743;
+ Mon, 15 Jul 2019 04:21:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
+ <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me> <CAHg0HuxZvXH899=M4vC7BTH-bP2J35aTwsGhiGoC8AamD8gOyA@mail.gmail.com>
+ <aef765ed-4bb9-2211-05d0-b320cc3ac275@grimberg.me> <CAD9gYJKcJ47ogKL4S_KMtxpS1gPHHhqqG7-GTi-2c0cOJ-LJtw@mail.gmail.com>
+ <11653912-924a-965a-45fe-3abd1ca00053@grimberg.me>
+In-Reply-To: <11653912-924a-965a-45fe-3abd1ca00053@grimberg.me>
+From:   Jinpu Wang <jinpuwang@gmail.com>
+Date:   Mon, 15 Jul 2019 13:21:47 +0200
+Message-ID: <CAD9gYJ+e-RyDEq4LYL4bZBYNLwCcMqjrEV0cGVjC4k5iK7iMaA@mail.gmail.com>
+Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
+ Device (IBNBD)
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>, bvanassche@acm.org,
+        jgg@mellanox.com, dledford@redhat.com,
+        Roman Pen <r.peniaev@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Consider a sync bfq_queue Q that remains empty while in service, and
-suppose that, when this happens, there is a fair amount of already
-in-flight I/O not belonging to Q. This situation is not considered
-when deciding whether to plug I/O dispatching (until new I/O arrives
-for Q). But it has to be checked, for the following reason.
+Sagi Grimberg <sagi@grimberg.me> =E4=BA=8E2019=E5=B9=B47=E6=9C=8812=E6=97=
+=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=889:40=E5=86=99=E9=81=93=EF=BC=9A
+>
+>
+> > Hi Sagi,
+> >
+> >>>> Another question, from what I understand from the code, the client
+> >>>> always rdma_writes data on writes (with imm) from a remote pool of
+> >>>> server buffers dedicated to it. Essentially all writes are immediate=
+ (no
+> >>>> rdma reads ever). How is that different than using send wrs to a set=
+ of
+> >>>> pre-posted recv buffers (like all others are doing)? Is it faster?
+> >>> At the very beginning of the project we did some measurements and saw=
+,
+> >>> that it is faster. I'm not sure if this is still true
+> >>
+> >> Its not significantly faster (can't imagine why it would be).
+> >> What could make a difference is probably the fact that you never
+> >> do rdma reads for I/O writes which might be better. Also perhaps the
+> >> fact that you normally don't wait for send completions before completi=
+ng
+> >> I/O (which is broken), and the fact that you batch recv operations.
+> >
+> > I don't know how do you come to the conclusion we don't wait for send
+> > completion before completing IO.
+> >
+> > We do chain wr on successfull read request from server, see funtion
+> > rdma_write_sg,
+>
+> I was referring to the client side
+Hi Sagi,
 
-The drive may decide to serve in-flight non-Q's I/O requests before
-Q's ones, thereby delaying the arrival of new I/O requests for Q
-(recall that Q is sync). If I/O-dispatching is not plugged, then,
-while Q remains empty, a basically uncontrolled amount of I/O from
-other queues may be dispatched too, possibly causing the service of
-Q's I/O to be delayed even longer in the drive. This problem gets more
-and more serious as the speed and the queue depth of the drive grow,
-because, as these two quantities grow, the probability to find no
-queue busy but many requests in flight grows too.
+I checked the 3 commits you mentioned in earlier thread again, I now
+get your point.
+You meant the behavior following commits try to fix.
 
-This commit performs I/O-dispatch plugging in this scenario.  Plugging
-minimizes the delay induced by already in-flight I/O, and enables Q to
-recover the bandwidth it may lose because of this delay.
+4af7f7ff92a4 ("nvme-rdma: don't complete requests before a send work
+request has completed")
+b4b591c87f2b ("nvme-rdma: don't suppress send completions")
 
-As a practical example, under write load on a Samsung SSD 970 PRO,
-gnome-terminal starts in 1.5 seconds after this fix, against 15
-seconds before the fix (as a reference, gnome-terminal takes about 35
-seconds to start with any of the other I/O schedulers).
+In this sense, ibtrs client side are not waiting for the completions
+for RDMA WRITE WR to finish.
+But we did it right for local invalidation.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 67 +++++++++++++++++++++++++++++----------------
- 1 file changed, 43 insertions(+), 24 deletions(-)
+I checked SRP/iser, they are not even wait for local invalidation, no
+signal flag set.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 50c9d2598500..b627e3fc6d53 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -3354,38 +3354,57 @@ static void bfq_dispatch_remove(struct request_queue *q, struct request *rq)
-  * there is no active group, then the primary expectation for
-  * this device is probably a high throughput.
-  *
-- * We are now left only with explaining the additional
-- * compound condition that is checked below for deciding
-- * whether the scenario is asymmetric. To explain this
-- * compound condition, we need to add that the function
-+ * We are now left only with explaining the two sub-conditions in the
-+ * additional compound condition that is checked below for deciding
-+ * whether the scenario is asymmetric. To explain the first
-+ * sub-condition, we need to add that the function
-  * bfq_asymmetric_scenario checks the weights of only
-- * non-weight-raised queues, for efficiency reasons (see
-- * comments on bfq_weights_tree_add()). Then the fact that
-- * bfqq is weight-raised is checked explicitly here. More
-- * precisely, the compound condition below takes into account
-- * also the fact that, even if bfqq is being weight-raised,
-- * the scenario is still symmetric if all queues with requests
-- * waiting for completion happen to be
-- * weight-raised. Actually, we should be even more precise
-- * here, and differentiate between interactive weight raising
-- * and soft real-time weight raising.
-+ * non-weight-raised queues, for efficiency reasons (see comments on
-+ * bfq_weights_tree_add()). Then the fact that bfqq is weight-raised
-+ * is checked explicitly here. More precisely, the compound condition
-+ * below takes into account also the fact that, even if bfqq is being
-+ * weight-raised, the scenario is still symmetric if all queues with
-+ * requests waiting for completion happen to be
-+ * weight-raised. Actually, we should be even more precise here, and
-+ * differentiate between interactive weight raising and soft real-time
-+ * weight raising.
-+ *
-+ * The second sub-condition checked in the compound condition is
-+ * whether there is a fair amount of already in-flight I/O not
-+ * belonging to bfqq. If so, I/O dispatching is to be plugged, for the
-+ * following reason. The drive may decide to serve in-flight
-+ * non-bfqq's I/O requests before bfqq's ones, thereby delaying the
-+ * arrival of new I/O requests for bfqq (recall that bfqq is sync). If
-+ * I/O-dispatching is not plugged, then, while bfqq remains empty, a
-+ * basically uncontrolled amount of I/O from other queues may be
-+ * dispatched too, possibly causing the service of bfqq's I/O to be
-+ * delayed even longer in the drive. This problem gets more and more
-+ * serious as the speed and the queue depth of the drive grow,
-+ * because, as these two quantities grow, the probability to find no
-+ * queue busy but many requests in flight grows too. By contrast,
-+ * plugging I/O dispatching minimizes the delay induced by already
-+ * in-flight I/O, and enables bfqq to recover the bandwidth it may
-+ * lose because of this delay.
-  *
-  * As a side note, it is worth considering that the above
-- * device-idling countermeasures may however fail in the
-- * following unlucky scenario: if idling is (correctly)
-- * disabled in a time period during which all symmetry
-- * sub-conditions hold, and hence the device is allowed to
-- * enqueue many requests, but at some later point in time some
-- * sub-condition stops to hold, then it may become impossible
-- * to let requests be served in the desired order until all
-- * the requests already queued in the device have been served.
-+ * device-idling countermeasures may however fail in the following
-+ * unlucky scenario: if I/O-dispatch plugging is (correctly) disabled
-+ * in a time period during which all symmetry sub-conditions hold, and
-+ * therefore the device is allowed to enqueue many requests, but at
-+ * some later point in time some sub-condition stops to hold, then it
-+ * may become impossible to make requests be served in the desired
-+ * order until all the requests already queued in the device have been
-+ * served. The last sub-condition commented above somewhat mitigates
-+ * this problem for weight-raised queues.
-  */
- static bool idling_needed_for_service_guarantees(struct bfq_data *bfqd,
- 						 struct bfq_queue *bfqq)
- {
- 	return (bfqq->wr_coeff > 1 &&
--		bfqd->wr_busy_queues <
--		bfq_tot_busy_queues(bfqd)) ||
-+		(bfqd->wr_busy_queues <
-+		 bfq_tot_busy_queues(bfqd) ||
-+		 bfqd->rq_in_driver >=
-+		 bfqq->dispatched + 4)) ||
- 		bfq_asymmetric_scenario(bfqd, bfqq);
- }
- 
--- 
-2.20.1
+If it's a problem, we should fix them too, maybe more.
 
+My question is do you see the behavior (HCA retry send due to drop ack
+) in the field,
+is it possible to reproduce?
+
+Thanks,
+Jack
