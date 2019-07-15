@@ -2,173 +2,183 @@ Return-Path: <SRS0=FYaB=VM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D203AC7618A
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 05:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CF62C7618B
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 06:13:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7B74B20838
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 05:43:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="bw7fqmbH";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="FkGkbbyO"
+	by mail.kernel.org (Postfix) with ESMTP id 19D1A20868
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 06:13:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725787AbfGOFn2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jul 2019 01:43:28 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:42224 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725385AbfGOFn2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jul 2019 01:43:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1563169408; x=1594705408;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=4hx671f/aQhME8AYjWzjwLSB0YbXUExgJn7TMeOrvXY=;
-  b=bw7fqmbH/xrkxoO7Kxx8x0PIJs7p7g8kPYqgT5qruOGwUhxV1Sz1mA/X
-   DGdb7jhSlYBWGx0fZ/cQM2HqtTtrdjuQQU/K9ccfMS6O0QVx17p5WDIww
-   F3G3+vfSWyWr0X1n7pbgZiGXDuVAEPOBVjmB7iCqi664Mubr1y3aC4afJ
-   b3y4658oq0dx+Fg6ouGt0AAILYZDlZEr5CVnJe4NISu8bIjm+44Totd0/
-   K4MkCsBZUhdusB88HIVxhLrNSDOkqQyXnzWJ8CV1RISk4E3WkauSE3jLA
-   8eZSqCi5alZYPVZKNekEpEYlWnQ8gR4OxRr8mHwqVDAhxaa/A3Gtv5+vL
-   g==;
-IronPort-SDR: jybk3ZN2A0JTW10dVNAPs4Mn/enD2M/BjcQUDgE7uNZXVMG5F8DSI94iQYVzXGHiy4kyV5umJ6
- SiuiMIcG1Fa4XzliPVJIk/EMoUkegu6ckQL0cwR6mQnpNxdvBQ+w7b2CmwF1911Z/cFsXHEKWQ
- 0ilceFUmUV1B1LLMEyatywdLZF9HIHQADxCrF3M+ZEL+t2IkZrR6MIhby7bVukDjDeodZqjDdD
- xzROP8RvIJMGWYW9MHkEPd7sncdEIFr3fXVYErJlsIgia4AiC8Xce+Y3ALyJhbzJIDo0/QZ9Zp
- /Js=
-X-IronPort-AV: E=Sophos;i="5.63,493,1557158400"; 
-   d="scan'208";a="117811435"
-Received: from mail-cys01nam02lp2051.outbound.protection.outlook.com (HELO NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.51])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Jul 2019 13:43:26 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n93VPa2YJX/AIFpHcl2hxbxStiyEWExabknuJ2EDvCDOuUYJFypoKMJ1EjQR2jmrn7AMQv9Im5aki1pjbl2dD+kO8pcWnbixJqLWIvYfVOVWPq3L5/mbSmn2GVJOfJdHbouFJJpZkfIhJWEXKJRb7/b7UXCn0bB97CvZr/LXaiIvQVzBntzwFhGKe1l1K9qtBEugk6skuC6NU1Xw/vGpIbKTXdr6aQ2SWqnaA5F0ZZW0mm4NLsmoObCFlRG0XF6L8mfCPMMQ5xxL535DEXxq1LdhvB67IB3vZReZPOcej82Rdk9zLCQ7bvNQkwqYb3JxiqbqROqsnEzUGKj83ngF+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QyZ9f0PWBB0PgRCksS1xQ8gxC87+B8rYNAv/g9j3SkM=;
- b=ZuZuW0vGTxP/bvxNlme7c8UEwWE0JcyQkI8VRwZkOV00TKNpLSL0dxtXfxIqbaZwRsiiSGoYJLvdS9O/Uz1eGBaF6pWU//MNafiaPbRtbkB9Tmz5GTRCDlRDUmDGfsdOBNgyFRRu7d7dBqMFdwJCBdhF0OvFOnEfp7qIJEjh9UAkm6GPPgOoXAPWNuHJ+I2eP4B5QNPTci1lZinkQgZxZEDIb1u2BrZhaizYH1al2YaZOnu9RBl8XsIaCKqMTDPUYw5L9153c/zMRPISiwx5eKjx3PHpGut7zQ60kIgBNexT5ESzY3Kmol4ZHgKoB/HwdRBRWmTvZ8teyxCTfjj92w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=wdc.com;dmarc=pass action=none header.from=wdc.com;dkim=pass
- header.d=wdc.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QyZ9f0PWBB0PgRCksS1xQ8gxC87+B8rYNAv/g9j3SkM=;
- b=FkGkbbyO1+Xra38EN9EuzPPIIwDZZx67VfMwqJiMNAljPlTycMdRy7gMJNzlizhfgcfUcsAkq8WyFcmKCX30ufhYPdg+XPEg9aYBtJQBPOYCbM4MCgp+mfp3/7vMSP8Est0pARZf+/y2o+rlXtFQaxyoZWNsdmiOEUdvFCcRO7Q=
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.58.207) by
- BYAPR04MB5653.namprd04.prod.outlook.com (20.179.56.211) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2073.13; Mon, 15 Jul 2019 05:43:24 +0000
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::65a9:db0a:646d:eb1e]) by BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::65a9:db0a:646d:eb1e%6]) with mapi id 15.20.2073.012; Mon, 15 Jul 2019
- 05:43:24 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [block:for-linus 20/23] include/linux/kernel.h:62:48: warning:
- 'zone_blocks' may be used uninitialized in this function
-Thread-Topic: [block:for-linus 20/23] include/linux/kernel.h:62:48: warning:
- 'zone_blocks' may be used uninitialized in this function
-Thread-Index: AQHVOVrdX1MDkvxcvEijEWF8X5rW2Q==
-Date:   Mon, 15 Jul 2019 05:43:24 +0000
-Message-ID: <BYAPR04MB5816C2EFC9D3C9FEF6DCCD2CE7CF0@BYAPR04MB5816.namprd04.prod.outlook.com>
-References: <201907131730.Br9OqtbO%lkp@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [129.253.182.57]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: baef5ff0-5171-4daa-e63a-08d708e75ab2
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5653;
-x-ms-traffictypediagnostic: BYAPR04MB5653:
-x-ms-exchange-purlcount: 3
-x-microsoft-antispam-prvs: <BYAPR04MB56531CC6C8BDE647E56B9276E7CF0@BYAPR04MB5653.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:81;
-x-forefront-prvs: 00997889E7
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(39860400002)(366004)(346002)(376002)(136003)(189003)(199004)(6116002)(25786009)(8936002)(966005)(3846002)(68736007)(86362001)(478600001)(53546011)(102836004)(6506007)(74316002)(186003)(26005)(33656002)(6436002)(19625735003)(8676002)(7696005)(71200400001)(76176011)(14454004)(476003)(446003)(305945005)(2906002)(54906003)(256004)(66556008)(53936002)(316002)(9686003)(7736002)(110136005)(52536014)(66446008)(5024004)(4326008)(229853002)(2501003)(14444005)(6246003)(486006)(64756008)(5660300002)(55016002)(99286004)(6306002)(66946007)(66476007)(76116006)(71190400001)(66066001)(81156014)(81166006);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5653;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Zs9hjebFcBCTLXnrRWcurOrfHU5Py8RBGY8aaP4rgo0S2/U7Xq5rTK4vpk1Hrvm95GxZqcEQsd2iA6lM6OK4wIYRMAXUti82OuKyhjw5fiQOROVK/G+6hY5xV7SYk5xx+UOqABQx2FgigVsVkIdHWSzO2AZiF9VfeYOv3Z0vf1gTuDnW5+BGCSE0WpalvL8rP6Es5zdN56+XoOCdVjF+u33X+b50sBMNV8vCITClFNanEnOFdUg5li6NjKJoOSMRg6jcnekuTS+c/VsmD93pBiLsvj0VW9RdaQKVVnERxYWVFK1g8ps/9OnaGN2YBVshycF+RzZCKvbWyHW1xe2NaAaTxRc149Pfvlxar14EdNSBHYrvDr+9f/i9Ous2oVdC5O/4VuOvVRbjIQ8kzPrRqoX9/vk8nJxTHXQpvILfMFM=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1728933AbfGOGNk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jul 2019 02:13:40 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52670 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726075AbfGOGNj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Jul 2019 02:13:39 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id E7ECFAEA4;
+        Mon, 15 Jul 2019 06:13:37 +0000 (UTC)
+Subject: Re: [PATCH V2] mpt3sas: support target smid for [abort|query] task
+To:     minwoo.im@samsung.com,
+        "sreekanth.reddy@broadcom.com" <sreekanth.reddy@broadcom.com>,
+        "sathya.prakash@broadcom.com" <sathya.prakash@broadcom.com>,
+        "suganath-prabu.subramani@broadcom.com" 
+        <suganath-prabu.subramani@broadcom.com>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+Cc:     "MPT-FusionLinux.pdl@broadcom.com" <MPT-FusionLinux.pdl@broadcom.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Euihyeok Kwon <eh81.kwon@samsung.com>,
+        Sarah Cho <sohyeon.jo@samsung.com>,
+        Sanggwan Lee <sanggwan.lee@samsung.com>,
+        Gyeongmin Nam <gm.nam@samsung.com>,
+        Sungjun Park <sj1228.park@samsung.com>,
+        "minwoo.im.dev@gmail.com" <minwoo.im.dev@gmail.com>
+References: <CGME20190714034415epcms2p25f9787cb71993a30f58524d2f355b543@epcms2p2>
+ <20190714034415epcms2p25f9787cb71993a30f58524d2f355b543@epcms2p2>
+From:   Hannes Reinecke <hare@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+ azzYF4VRJsdl+d0MCaSy8mUh
+Message-ID: <860cc8cf-6419-c649-b2d9-19b82f6ebc99@suse.de>
+Date:   Mon, 15 Jul 2019 08:13:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: baef5ff0-5171-4daa-e63a-08d708e75ab2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jul 2019 05:43:24.6127
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Damien.LeMoal@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5653
+In-Reply-To: <20190714034415epcms2p25f9787cb71993a30f58524d2f355b543@epcms2p2>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/07/13 18:10, kbuild test robot wrote:=0A=
-> tree:   https://kernel.googlesource.com/pub/scm/linux/kernel/git/axboe/li=
-nux-block.git for-linus=0A=
-> head:   787c79d6393fc028887cc1b6066915f0b094e92f=0A=
-> commit: b091ac616846a1da75b1f2566b41255ce7f0e0a6 [20/23] sd_zbc: Fix repo=
-rt zones buffer allocation=0A=
-> config: c6x-allyesconfig (attached as .config)=0A=
-> compiler: c6x-elf-gcc (GCC) 7.4.0=0A=
-> reproduce:=0A=
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbi=
-n/make.cross -O ~/bin/make.cross=0A=
->         chmod +x ~/bin/make.cross=0A=
->         git checkout b091ac616846a1da75b1f2566b41255ce7f0e0a6=0A=
->         # save the attached .config to linux build tree=0A=
->         GCC_VERSION=3D7.4.0 make.cross ARCH=3Dc6x =0A=
-> =0A=
-> If you fix the issue, kindly add following tag=0A=
-> Reported-by: kbuild test robot <lkp@intel.com>=0A=
-> =0A=
-> Note: it may well be a FALSE warning. FWIW you are at least aware of it n=
-ow.=0A=
-> http://gcc.gnu.org/wiki/Better_Uninitialized_Warnings=0A=
-> =0A=
-> All warnings (new ones prefixed by >>):=0A=
-> =0A=
->    In file included from include/asm-generic/bug.h:18:0,=0A=
->                     from arch/c6x/include/asm/bug.h:12,=0A=
->                     from include/linux/bug.h:5,=0A=
->                     from include/linux/thread_info.h:12,=0A=
->                     from include/asm-generic/current.h:5,=0A=
->                     from ./arch/c6x/include/generated/asm/current.h:1,=0A=
->                     from include/linux/sched.h:12,=0A=
->                     from include/linux/blkdev.h:5,=0A=
->                     from drivers//scsi/sd_zbc.c:11:=0A=
->    drivers//scsi/sd_zbc.c: In function 'sd_zbc_read_zones':=0A=
->>> include/linux/kernel.h:62:48: warning: 'zone_blocks' may be used uninit=
-ialized in this function [-Wmaybe-uninitialized]=0A=
->     #define __round_mask(x, y) ((__typeof__(x))((y)-1))=0A=
->                                                    ^=0A=
->    drivers//scsi/sd_zbc.c:464:6: note: 'zone_blocks' was declared here=0A=
->      u32 zone_blocks;=0A=
->          ^~~~~~~~~~~=0A=
-[...]=0A=
-=0A=
-Jens,=0A=
-=0A=
-This warning does not show up on x86_64 native build with gcc 9.1.=0A=
-I just sent a patch to remove the warning, but I do not have a c6x cross=0A=
-compilation environment available so the patch was checked only on x86.=0A=
-=0A=
-Best regards.=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On 7/14/19 5:44 AM, Minwoo Im wrote:
+> We can request task management IOCTL command(MPI2_FUNCTION_SCSI_TASK_MGMT)
+> to /dev/mpt3ctl.  If the given task_type is either abort task or query
+> task, it may need a field named "Initiator Port Transfer Tag to Manage"
+> in the IU.
+> 
+> Current code does not support to check target IPTT tag from the
+> tm_request.  This patch introduces to check TaskMID given from the
+> userspace as a target tag.  We have a rule of relationship between
+> (struct request *req->tag) and smid in mpt3sas_base.c:
+> 
+> 3318 u16
+> 3319 mpt3sas_base_get_smid_scsiio(struct MPT3SAS_ADAPTER *ioc, u8 cb_idx,
+> 3320         struct scsi_cmnd *scmd)
+> 3321 {
+> 3322         struct scsiio_tracker *request = scsi_cmd_priv(scmd);
+> 3323         unsigned int tag = scmd->request->tag;
+> 3324         u16 smid;
+> 3325
+> 3326         smid = tag + 1;
+> 
+> So if we want to abort a request tagged #X, then we can pass (X + 1) to
+> this IOCTL handler.  Otherwise, user space just can pass 0 TaskMID to
+> abort the first outstanding smid which is legacy behaviour.
+> 
+> Cc: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+> Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
+> Cc: Sathya Prakash <sathya.prakash@broadcom.com>
+> Cc: James E.J. Bottomley <jejb@linux.ibm.com>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: MPT-FusionLinux.pdl@broadcom.com
+> Signed-off-by: Minwoo Im <minwoo.im@samsung.com>
+> ---
+>  drivers/scsi/mpt3sas/mpt3sas_ctl.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/scsi/mpt3sas/mpt3sas_ctl.c b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
+> index b2bb47c14d35..f6b8fd90610a 100644
+> --- a/drivers/scsi/mpt3sas/mpt3sas_ctl.c
+> +++ b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
+> @@ -596,8 +596,16 @@ _ctl_set_task_mid(struct MPT3SAS_ADAPTER *ioc, struct mpt3_ioctl_command *karg,
+>  		if (priv_data->sas_target->handle != handle)
+>  			continue;
+>  		st = scsi_cmd_priv(scmd);
+> -		tm_request->TaskMID = cpu_to_le16(st->smid);
+> -		found = 1;
+> +
+> +		/*
+> +		 * If the given TaskMID from the user space is zero, then the
+> +		 * first outstanding smid will be picked up.  Otherwise,
+> +		 * targeted smid will be the one.
+> +		 */
+> +		if (!tm_request->TaskMID || tm_request->TaskMID == st->smid) {
+> +			tm_request->TaskMID = cpu_to_le16(st->smid);
+> +			found = 1;
+> +		}
+>  	}
+>  
+>  	if (!found) {
+> 
+I think this is fundamentally wrong.
+ABORT_TASK is used to abort a single task, which of course has to be
+known beforehand. If you don't know the task, what exactly do you hope
+to achieve here? Aborting random I/O?
+Or, even worse, aborting I/O the driver uses internally and corrupt the
+internal workflow of the driver?
+
+We should simply disallow any ABORT TASK from userspace if the TaskMID
+is zero. And I would even argue to disabllow ABORT TASK from userspace
+completely, as the smid is never relayed to userland, and as such the
+user cannot know which task should be aborted.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
