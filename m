@@ -4,47 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C179C7618F
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 13:53:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3995EC76191
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 13:55:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 048F32083D
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 13:53:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02C5D212F5
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 13:55:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563198807;
-	bh=bcugwZrgfkt91kE0UZ1wyfz5E91dboIotcE0g0UedEA=;
+	s=default; t=1563198901;
+	bh=gj0zBDm52IIackDZtC7KVsYGiEuhEY9qeD30u0iD1ss=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=UcokZS36C10blZQRAE1vkwN3noQ0KaaRY4pdbY6rTcnxMpzYJkuFHM5ZIRYCWgLT4
-	 V4SDmAyuO0nSO7A51hW2CjI8mkZgM0eRE9hTMFZl8d0N0B3KVf7RGytn3POR/BN1k4
-	 BpshbfiwCjtE70FzKsFJLwp7dF0WCvWxfGj3v+cU=
+	b=TxJVHnT/px4v3kiKWevONfQJgjFIEPdEbEOir3JJrSMTJK2xmiJMay5/QZ3SGouG9
+	 WzCugX45XtW7R3VUUYSjV0GbYL4n/+o3l/52CGaewIV5KCBNUGxdv0TpMy3EcK4PAK
+	 9PDz9PfCCodfyq8jMvLEcuqSyU9MZhkvhuByP4+0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732382AbfGONxZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jul 2019 09:53:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51426 "EHLO mail.kernel.org"
+        id S1732127AbfGONyw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jul 2019 09:54:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55834 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732372AbfGONxY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jul 2019 09:53:24 -0400
+        id S1732553AbfGONyu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Jul 2019 09:54:50 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 99E2A212F5;
-        Mon, 15 Jul 2019 13:53:21 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C0CDC212F5;
+        Mon, 15 Jul 2019 13:54:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563198803;
-        bh=bcugwZrgfkt91kE0UZ1wyfz5E91dboIotcE0g0UedEA=;
+        s=default; t=1563198889;
+        bh=gj0zBDm52IIackDZtC7KVsYGiEuhEY9qeD30u0iD1ss=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=slKSdo7ZdmCL95rHA0qmUKinspXWpMl427LBCpQfvGpVXfeTFr8ExRgVMBiolaDoK
-         3kAb12fYZLtMRwE/vKazFJ98M179iB8DDnEAg531mctJ9g4YemM+W4an9uEMrxuxsr
-         Wf1xDSk3ds18rwrlHlB+YR9vY1pZG0kEN1XDdbeE=
+        b=Xbf/oMhPRWW5zjmncl0vn6JnaOBfY86I2kZ3gcFcavEfYx5V/JCO1WA6w+sFS4PDR
+         4dGFtuHaNlj+gSQlLZa/1qz+oH8uG2oFcZySelpq1/TiFd27ASqTUL8cELlLdhxEuS
+         tgg2DR2Gfjhf6O438IXn0v4QYfGdr7jIL//d1dso=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Bob Liu <bob.liu@oracle.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 108/249] block: null_blk: fix race condition for null_del_dev
-Date:   Mon, 15 Jul 2019 09:44:33 -0400
-Message-Id: <20190715134655.4076-108-sashal@kernel.org>
+Cc:     Dennis Zhou <dennis@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.2 129/249] blk-iolatency: only account submitted bios
+Date:   Mon, 15 Jul 2019 09:44:54 -0400
+Message-Id: <20190715134655.4076-129-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715134655.4076-1-sashal@kernel.org>
 References: <20190715134655.4076-1-sashal@kernel.org>
@@ -57,90 +59,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Bob Liu <bob.liu@oracle.com>
+From: Dennis Zhou <dennis@kernel.org>
 
-[ Upstream commit 7602843fd873cae43a444b83b14dfdd114a9659c ]
+[ Upstream commit a3fb01ba5af066521f3f3421839e501bb2c71805 ]
 
-Dulicate call of null_del_dev() will trigger null pointer error like below.
-The reason is a race condition between nullb_device_power_store() and
-nullb_group_drop_item().
+As is, iolatency recognizes done_bio and cleanup as ending paths. If a
+request is marked REQ_NOWAIT and fails to get a request, the bio is
+cleaned up via rq_qos_cleanup() and ended in bio_wouldblock_error().
+This results in underflowing the inflight counter. Fix this by only
+accounting bios that were actually submitted.
 
-  CPU#0                         CPU#1
-  ----------------              -----------------
-  do_rmdir()
-   >configfs_rmdir()
-    >client_drop_item()
-     >nullb_group_drop_item()
-                                nullb_device_power_store()
-				>null_del_dev()
-
-      >test_and_clear_bit(NULLB_DEV_FL_UP
-       >null_del_dev()
-       ^^^^^
-       Duplicated null_dev_dev() triger null pointer error
-
-				>clear_bit(NULLB_DEV_FL_UP
-
-The fix could be keep the sequnce of clear NULLB_DEV_FL_UP and null_del_dev().
-
-[  698.613600] BUG: unable to handle kernel NULL pointer dereference at 0000000000000018
-[  698.613608] #PF error: [normal kernel read fault]
-[  698.613611] PGD 0 P4D 0
-[  698.613619] Oops: 0000 [#1] SMP PTI
-[  698.613627] CPU: 3 PID: 6382 Comm: rmdir Not tainted 5.0.0+ #35
-[  698.613631] Hardware name: LENOVO 20LJS2EV08/20LJS2EV08, BIOS R0SET33W (1.17 ) 07/18/2018
-[  698.613644] RIP: 0010:null_del_dev+0xc/0x110 [null_blk]
-[  698.613649] Code: 00 00 00 5b 41 5c 41 5d 41 5e 41 5f 5d c3 0f 0b eb 97 e8 47 bb 2a e8 0f 1f 80 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 54 53 <8b> 77 18 48 89 fb 4c 8b 27 48 c7 c7 40 57 1e c1 e8 bf c7 cb e8 48
-[  698.613654] RSP: 0018:ffffb887888bfde0 EFLAGS: 00010286
-[  698.613659] RAX: 0000000000000000 RBX: ffff9d436d92bc00 RCX: ffff9d43a9184681
-[  698.613663] RDX: ffffffffc11e5c30 RSI: 0000000068be6540 RDI: 0000000000000000
-[  698.613667] RBP: ffffb887888bfdf0 R08: 0000000000000001 R09: 0000000000000000
-[  698.613671] R10: ffffb887888bfdd8 R11: 0000000000000f16 R12: ffff9d436d92bc08
-[  698.613675] R13: ffff9d436d94e630 R14: ffffffffc11e5088 R15: ffffffffc11e5000
-[  698.613680] FS:  00007faa68be6540(0000) GS:ffff9d43d14c0000(0000) knlGS:0000000000000000
-[  698.613685] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  698.613689] CR2: 0000000000000018 CR3: 000000042f70c002 CR4: 00000000003606e0
-[  698.613693] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  698.613697] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  698.613700] Call Trace:
-[  698.613712]  nullb_group_drop_item+0x50/0x70 [null_blk]
-[  698.613722]  client_drop_item+0x29/0x40
-[  698.613728]  configfs_rmdir+0x1ed/0x300
-[  698.613738]  vfs_rmdir+0xb2/0x130
-[  698.613743]  do_rmdir+0x1c7/0x1e0
-[  698.613750]  __x64_sys_rmdir+0x17/0x20
-[  698.613759]  do_syscall_64+0x5a/0x110
-[  698.613768]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-Signed-off-by: Bob Liu <bob.liu@oracle.com>
+Signed-off-by: Dennis Zhou <dennis@kernel.org>
+Cc: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/null_blk_main.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ block/blk-iolatency.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 447d635c79a2..2a4f8bc4f930 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -327,11 +327,12 @@ static ssize_t nullb_device_power_store(struct config_item *item,
- 		set_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
- 		dev->power = newp;
- 	} else if (dev->power && !newp) {
--		mutex_lock(&lock);
--		dev->power = newp;
--		null_del_dev(dev->nullb);
--		mutex_unlock(&lock);
--		clear_bit(NULLB_DEV_FL_UP, &dev->flags);
-+		if (test_and_clear_bit(NULLB_DEV_FL_UP, &dev->flags)) {
-+			mutex_lock(&lock);
-+			dev->power = newp;
-+			null_del_dev(dev->nullb);
-+			mutex_unlock(&lock);
-+		}
- 		clear_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
- 	}
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index d22e61bced86..c91b84bb9d0a 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -600,6 +600,10 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+ 	if (!blkg || !bio_flagged(bio, BIO_TRACKED))
+ 		return;
  
++	/* We didn't actually submit this bio, don't account it. */
++	if (bio->bi_status == BLK_STS_AGAIN)
++		return;
++
+ 	iolat = blkg_to_lat(bio->bi_blkg);
+ 	if (!iolat)
+ 		return;
 -- 
 2.20.1
 
