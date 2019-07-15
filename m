@@ -4,53 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3995EC76191
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 13:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC02C76195
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 13:55:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02C5D212F5
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 13:55:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89F2B2067C
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 13:55:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563198901;
-	bh=gj0zBDm52IIackDZtC7KVsYGiEuhEY9qeD30u0iD1ss=;
+	s=default; t=1563198913;
+	bh=uIxwGh11w8bs6mPsamrje8/1REWkHMV4vr8N6bdpo3I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=TxJVHnT/px4v3kiKWevONfQJgjFIEPdEbEOir3JJrSMTJK2xmiJMay5/QZ3SGouG9
-	 WzCugX45XtW7R3VUUYSjV0GbYL4n/+o3l/52CGaewIV5KCBNUGxdv0TpMy3EcK4PAK
-	 9PDz9PfCCodfyq8jMvLEcuqSyU9MZhkvhuByP4+0=
+	b=tckvcBLOqk6C7EGu8YtwSoUmZ2Kf/ppnLiOJRoKhw2X991281Dv/AudSbwVfUdaJT
+	 mfNiJP5SL7Gb9+6+2ehLmVRsSArgY0U4jSFb8fx6OiIBkbPPFjjevGHfIOXKt/R2pR
+	 A3X5+hqZXedSTXaA0m4Hxisuaw9MWApiUjReAbXo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732127AbfGONyw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jul 2019 09:54:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55834 "EHLO mail.kernel.org"
+        id S1732727AbfGONzL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jul 2019 09:55:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58230 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732553AbfGONyu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jul 2019 09:54:50 -0400
+        id S1732259AbfGONzL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Jul 2019 09:55:11 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C0CDC212F5;
-        Mon, 15 Jul 2019 13:54:48 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8F3C12067C;
+        Mon, 15 Jul 2019 13:55:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563198889;
-        bh=gj0zBDm52IIackDZtC7KVsYGiEuhEY9qeD30u0iD1ss=;
+        s=default; t=1563198909;
+        bh=uIxwGh11w8bs6mPsamrje8/1REWkHMV4vr8N6bdpo3I=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Xbf/oMhPRWW5zjmncl0vn6JnaOBfY86I2kZ3gcFcavEfYx5V/JCO1WA6w+sFS4PDR
-         4dGFtuHaNlj+gSQlLZa/1qz+oH8uG2oFcZySelpq1/TiFd27ASqTUL8cELlLdhxEuS
-         tgg2DR2Gfjhf6O438IXn0v4QYfGdr7jIL//d1dso=
+        b=cyvL04hlASNaNDH8EEzlAgw9KR31VFCVkd7c0kyxTZXgZ052bTWKlghmgmwf+PRdN
+         TGbT/+w043zm3tZ2mWp4TM6jQlI3PtMUY/tYwHFh6b4PFpRQWbuLzrFpB+vCvhQKs1
+         38Wqp+Hbm/jpzIDuc8CCyCP9+e68xZOiqks04WHc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Dennis Zhou <dennis@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
+Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 129/249] blk-iolatency: only account submitted bios
-Date:   Mon, 15 Jul 2019 09:44:54 -0400
-Message-Id: <20190715134655.4076-129-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.2 138/249] lightnvm: fix uninitialized pointer in nvm_remove_tgt()
+Date:   Mon, 15 Jul 2019 09:45:03 -0400
+Message-Id: <20190715134655.4076-138-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715134655.4076-1-sashal@kernel.org>
 References: <20190715134655.4076-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -59,39 +60,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Dennis Zhou <dennis@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
 
-[ Upstream commit a3fb01ba5af066521f3f3421839e501bb2c71805 ]
+[ Upstream commit 2f5af4ab7de14bd35f3435e6a47300276bbb6c17 ]
 
-As is, iolatency recognizes done_bio and cleanup as ending paths. If a
-request is marked REQ_NOWAIT and fails to get a request, the bio is
-cleaned up via rq_qos_cleanup() and ended in bio_wouldblock_error().
-This results in underflowing the inflight counter. Fix this by only
-accounting bios that were actually submitted.
+With gcc 4.1:
 
-Signed-off-by: Dennis Zhou <dennis@kernel.org>
-Cc: Josef Bacik <josef@toxicpanda.com>
+    drivers/lightnvm/core.c: In function ‘nvm_remove_tgt’:
+    drivers/lightnvm/core.c:510: warning: ‘t’ is used uninitialized in this function
+
+Indeed, if no NVM devices have been registered, t will be an
+uninitialized pointer, and may be dereferenced later.  A call to
+nvm_remove_tgt() can be triggered from userspace by issuing the
+NVM_DEV_REMOVE ioctl on the lightnvm control device.
+
+Fix this by preinitializing t to NULL.
+
+Fixes: 843f2edbdde085b4 ("lightnvm: do not remove instance under global lock")
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-iolatency.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/lightnvm/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index d22e61bced86..c91b84bb9d0a 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -600,6 +600,10 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
- 	if (!blkg || !bio_flagged(bio, BIO_TRACKED))
- 		return;
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 7d555b110ecd..a600934fdd9c 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -478,7 +478,7 @@ static void __nvm_remove_target(struct nvm_target *t, bool graceful)
+  */
+ static int nvm_remove_tgt(struct nvm_ioctl_remove *remove)
+ {
+-	struct nvm_target *t;
++	struct nvm_target *t = NULL;
+ 	struct nvm_dev *dev;
  
-+	/* We didn't actually submit this bio, don't account it. */
-+	if (bio->bi_status == BLK_STS_AGAIN)
-+		return;
-+
- 	iolat = blkg_to_lat(bio->bi_blkg);
- 	if (!iolat)
- 		return;
+ 	down_read(&nvm_lock);
 -- 
 2.20.1
 
