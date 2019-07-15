@@ -2,134 +2,110 @@ Return-Path: <SRS0=FYaB=VM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CBFC7618F
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 11:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20915C76191
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 13:52:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C87DE2081C
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 11:22:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB6D420C01
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jul 2019 13:52:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PHsHodDx"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cUndtAoS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729821AbfGOLWB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jul 2019 07:22:01 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:36421 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729725AbfGOLWA (ORCPT
+        id S1731735AbfGONwy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jul 2019 09:52:54 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:33921 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731752AbfGONwy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jul 2019 07:22:00 -0400
-Received: by mail-lj1-f195.google.com with SMTP id i21so15777034ljj.3;
-        Mon, 15 Jul 2019 04:21:59 -0700 (PDT)
+        Mon, 15 Jul 2019 09:52:54 -0400
+Received: by mail-pf1-f194.google.com with SMTP id b13so7460069pfo.1
+        for <linux-block@vger.kernel.org>; Mon, 15 Jul 2019 06:52:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=gVFqb2ZAh43FCjbdEnlEQIc2JRQwHvSxVmi0yjJ0kAo=;
-        b=PHsHodDxb4KtiLFGCXDUFeRaswzWlgBJeoV92SFmmlP3kyYv0P1xtwA+t/SRQ5jI4a
-         aW4oAyM6WRHI3loIlxsPfdJdrnQP7lKwhECbIHlr8iT7eXp1ihyOU/9NDkaEQcJsEpUx
-         NgHVebj8noMJBQ2BXFmxc9cJnA8/CZP5ye3me20P1QaJxJM5WvA85/rFBzPh3M/acgqm
-         80jtwgXUm/hCZp8m/OyoXm+bLI0cHTNv+EtVBWoCAU7we9A0y901KhnQvH672gJM4QTL
-         mEIQtOOXxAUzMSRlAAQGsxzVgMWtc4kdnyAiwi6GnlDUjhxtpTa/XNV/+YqANlLmgbS5
-         /n1w==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=0V2mBu6FYx4cMtcSGcye6x8Ut9HBWrXqdo4bnPYOIBs=;
+        b=cUndtAoSclRDbi4ERxPslBm1nkQDppOdNGhxE981ZEXGpiKVSRFJIlaLXECLEL3Ubh
+         ohJ3Pf8kbht/nNWEqDXT7y1gF6R9XXj2kE6RX8fWIms/RLLlGV1xLY69G8yHgRILa2aE
+         CBuGwwQ45KhvV1xZUSyRN/d1l3yBNOTqvzjgV5wm1f+i00TFNzxE1ogSBj9l7P1poNpS
+         klRO0VZsemeXeOPNTR8emPzZCHvqsCDzvLyFD2vaIePsD5J6EevnRgs2rM/i1UJVlA7l
+         +Vw0+821CZhGHIpPZAY8oUak1vbyhi/liTNOdm8nlDyIJ/UN97bt73kEf2ByeSaO/IT9
+         JpYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=gVFqb2ZAh43FCjbdEnlEQIc2JRQwHvSxVmi0yjJ0kAo=;
-        b=fUziWqeV8w+gQRAWXoB4uq0iQM83bc5XTI7YwYBqOTSJLgoyUwLsCM9bYOdIMOi97B
-         h4GP/mEdr4dDT0qMWMPoqSXbN7CM3CqsL/Xf+D1UfhtMW/FBZQEEskK2+XKcoBNSRKKB
-         O/QEf+ciCJ0l+DybpgaiRqnm+Zm4vO+ohFGKwXRkNE1o/VLPs4sU1Y0omqY3TvFNuAH7
-         0aaTt2PZPhDnEXm0ZUqfjaMOeU3+lJk4GZsICP+yIrBwvNOCRoyvwM5CHyDlEQV7bzvJ
-         5Lyw2FzBO85X5jsSxFyMOCYbhUk3ma8MMR7tJcySkPC7E74ncMeh7ytqIhuI7go0rOp4
-         UvfQ==
-X-Gm-Message-State: APjAAAWL+sEsHQUPvODlYNx1v8dVBXs0bfwaFJPg2cIWplZ28P8BRuV6
-        6UXTtoCzH7zTeoPRcjgu4BTmQF/3DwdAO6+Wkh8=
-X-Google-Smtp-Source: APXvYqz29uFTNm018kjJZXVHplrRKz3F5/gtgS4MImXtgnN/jM6PuvZjPvdIIlU8BM5o+sM2V1Yxzrx0N9s6knwKoEs=
-X-Received: by 2002:a2e:3e01:: with SMTP id l1mr10882783lja.208.1563189718743;
- Mon, 15 Jul 2019 04:21:58 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0V2mBu6FYx4cMtcSGcye6x8Ut9HBWrXqdo4bnPYOIBs=;
+        b=KTxMzYzG57UiBDiRzM2H85FTCf4tgR4fNJZlAjyrfUQh3NhUGiPDd/8nTwmryhW+L1
+         UinYNt+iAzFYJj1DdSVJbkj6r730ygoknRNFmYW7Xbf4OYPUEnHb5CT25EE+yD+WAhgE
+         qBSMQlNW4NnM9d5314Yy3MOjIUO12ZxMyq0tyvbCzCNIvEkf/6a5BUW+EPxjH+P22MEy
+         /2PD7UBIkUjbPlGPAfBJhZVjAetp8pmaXWLz1hLUvkgriqSdWHgDNuPPvgXnijxTeTcr
+         JtulZlo+oX5ROB/oh9cePL4qImRkBA8WSqFSgSOwiTy09tY1i2cRVX4tPGKzP82Yiptr
+         rfKQ==
+X-Gm-Message-State: APjAAAXOoZp1V5QdzlHtmCu0Sx03lshaKd8HMLuCfijqS+DORVOxl4LC
+        4kyM4Bxecpfcdq2TfK5jktFx0JjNzGk=
+X-Google-Smtp-Source: APXvYqyLNq4KfSGcXgpn7eFfD+z+OJ2JwfO3jE4cBLjuHsjPwZ1D3gXdq/76icRxJMChD7z5x6g//w==
+X-Received: by 2002:a63:5b52:: with SMTP id l18mr27167050pgm.21.1563198773049;
+        Mon, 15 Jul 2019 06:52:53 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
+        by smtp.gmail.com with ESMTPSA id v22sm16379992pgk.69.2019.07.15.06.52.51
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 15 Jul 2019 06:52:52 -0700 (PDT)
+Subject: Re: [PATCH 3/3] io_uring: use kmem_cache to alloc sqe
+To:     Zhengyuan Liu <liuzhengyuan@kylinos.cn>
+Cc:     linux-block@vger.kernel.org
+References: <20190713045454.2929-1-liuzhengyuan@kylinos.cn>
+ <1f56dacc-6f69-35ff-dfb9-0b3e91696e36@kernel.dk>
+ <5d2bf52d.1c69fb81.af3a2.b57fSMTPIN_ADDED_BROKEN@mx.google.com>
+ <BD843851-A62C-4368-A78B-F863A72E589C@kernel.dk>
+ <5d2c1314.1c69fb81.ecfb1.bf96SMTPIN_ADDED_BROKEN@mx.google.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6059ea46-b87f-e8e9-5e41-47b77f4c4c60@kernel.dk>
+Date:   Mon, 15 Jul 2019 07:52:50 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
- <a8f2f1d2-b5d9-92fc-40c8-090af0487723@grimberg.me> <CAHg0HuxZvXH899=M4vC7BTH-bP2J35aTwsGhiGoC8AamD8gOyA@mail.gmail.com>
- <aef765ed-4bb9-2211-05d0-b320cc3ac275@grimberg.me> <CAD9gYJKcJ47ogKL4S_KMtxpS1gPHHhqqG7-GTi-2c0cOJ-LJtw@mail.gmail.com>
- <11653912-924a-965a-45fe-3abd1ca00053@grimberg.me>
-In-Reply-To: <11653912-924a-965a-45fe-3abd1ca00053@grimberg.me>
-From:   Jinpu Wang <jinpuwang@gmail.com>
-Date:   Mon, 15 Jul 2019 13:21:47 +0200
-Message-ID: <CAD9gYJ+e-RyDEq4LYL4bZBYNLwCcMqjrEV0cGVjC4k5iK7iMaA@mail.gmail.com>
-Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
- Device (IBNBD)
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>, bvanassche@acm.org,
-        jgg@mellanox.com, dledford@redhat.com,
-        Roman Pen <r.peniaev@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <5d2c1314.1c69fb81.ecfb1.bf96SMTPIN_ADDED_BROKEN@mx.google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sagi Grimberg <sagi@grimberg.me> =E4=BA=8E2019=E5=B9=B47=E6=9C=8812=E6=97=
-=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=889:40=E5=86=99=E9=81=93=EF=BC=9A
+On 7/14/19 11:45 PM, Zhengyuan Liu wrote:
+> 
+> On 7/15/19 11:51 AM, Jens Axboe wrote:
+>> On Jul 14, 2019, at 9:38 PM, Zhengyuan Liu <liuzhengyuan@kylinos.cn> wrote:
+>>>
+>>>> On 7/14/19 5:44 AM, Jens Axboe wrote:
+>>>>> On 7/12/19 10:54 PM, Zhengyuan Liu wrote:
+>>>>> As we introduced three lists(async, defer, link), there could been
+>>>>> many sqe allocation. A natural idea is using kmem_cache to satisfy
+>>>>> the allocation just like io_kiocb does.
+>>>> A change like this needs to come with some performance numbers
+>>>> or utilization numbers showing the benefit. I have considered
+>>>> doing this before, but just never got around to testing if it's
+>>>> worth while or not.
+>>>> Have you?
+>>> I only did some simple testing with fio. The benefit was deeply depend on the IO  scenarios. For random and direct IO , it appears to be nearly no seq copying, but for buffered sequential rw, it appears to be more than 60% copying compared to original submition.
+>> Right, which is great as it’s then working as designed! But my
+>> question was, for that sequential case, what kind of speed up (or
+>> reduction in overhead) do you see from allocating the unit out of
+>> slab vs kmalloc? There has to be a win there for the change to be
+>> worthwhile.
 >
->
-> > Hi Sagi,
-> >
-> >>>> Another question, from what I understand from the code, the client
-> >>>> always rdma_writes data on writes (with imm) from a remote pool of
-> >>>> server buffers dedicated to it. Essentially all writes are immediate=
- (no
-> >>>> rdma reads ever). How is that different than using send wrs to a set=
- of
-> >>>> pre-posted recv buffers (like all others are doing)? Is it faster?
-> >>> At the very beginning of the project we did some measurements and saw=
-,
-> >>> that it is faster. I'm not sure if this is still true
-> >>
-> >> Its not significantly faster (can't imagine why it would be).
-> >> What could make a difference is probably the fact that you never
-> >> do rdma reads for I/O writes which might be better. Also perhaps the
-> >> fact that you normally don't wait for send completions before completi=
-ng
-> >> I/O (which is broken), and the fact that you batch recv operations.
-> >
-> > I don't know how do you come to the conclusion we don't wait for send
-> > completion before completing IO.
-> >
-> > We do chain wr on successfull read request from server, see funtion
-> > rdma_write_sg,
->
-> I was referring to the client side
-Hi Sagi,
+> Thanks for your comments  Jens. No speed up indeed in overhead from my
+> testing.
 
-I checked the 3 commits you mentioned in earlier thread again, I now
-get your point.
-You meant the behavior following commits try to fix.
+Then I suggest we just drop this change, it only makes sense if there's
+a win.
 
-4af7f7ff92a4 ("nvme-rdma: don't complete requests before a send work
-request has completed")
-b4b591c87f2b ("nvme-rdma: don't suppress send completions")
+-- 
+Jens Axboe
 
-In this sense, ibtrs client side are not waiting for the completions
-for RDMA WRITE WR to finish.
-But we did it right for local invalidation.
-
-I checked SRP/iser, they are not even wait for local invalidation, no
-signal flag set.
-
-If it's a problem, we should fix them too, maybe more.
-
-My question is do you see the behavior (HCA retry send due to drop ack
-) in the field,
-is it possible to reproduce?
-
-Thanks,
-Jack
