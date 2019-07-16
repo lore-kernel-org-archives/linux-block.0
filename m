@@ -2,146 +2,106 @@ Return-Path: <SRS0=S2CA=VN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C944CC7618F
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jul 2019 14:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C313CC7618F
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jul 2019 15:26:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9EF302173C
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jul 2019 14:58:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563289115;
-	bh=GVa3Pzfot0wGOMqXW/rBABUae/1hIs7xVjZ0/iD6hwE=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=Qr7ZTQYl0VtEEMz3DahyfMpK8kXsY+2qDvRRcSF0F3C/Z8rIVaGeR0ytepuyBjMF/
-	 KHqNJuf3Rx47NmTCzbY0w0imNBOxip/GpJveDiGBZSv8ErwzjW034d69hTB5yS3GW5
-	 AjLEoNsSrsXZo34H+daUaslR28KaCP0eaEvK+ZdQ=
+	by mail.kernel.org (Postfix) with ESMTP id 9B44B21743
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jul 2019 15:26:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387896AbfGPO6f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Jul 2019 10:58:35 -0400
-Received: from mail-pl1-f172.google.com ([209.85.214.172]:36606 "EHLO
-        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387892AbfGPO6e (ORCPT
+        id S1728190AbfGPP0i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Jul 2019 11:26:38 -0400
+Received: from smtpproxy19.qq.com ([184.105.206.84]:45081 "EHLO
+        smtpproxy19.qq.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728421AbfGPP0h (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jul 2019 10:58:34 -0400
-Received: by mail-pl1-f172.google.com with SMTP id k8so10263967plt.3;
-        Tue, 16 Jul 2019 07:58:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=noCeewt6B+I5mcY7gyfnCkii7BiHslOWQNbYJEI0Pb4=;
-        b=XCra2U/8s0/cYjDOtIiT9fbHvLoYIm6g/EVkcLR6hAGgt1K6xJTzPp/r7/1IUlombn
-         Ty/5nx4zAM3jpfGXsh5oT264gV2XSNm5OOKbruZ/t0kgGv8zv/5AtCMYklYe27U6PVj4
-         6Gl+OoVHh0IEEYjkPvLB96ghC6uWIRsnDSbhOHamJaNzUxXgVazDL8f4yJfH7S3/uEuu
-         8oosKVbzLgUCwIOTv832g6N+fiCQB1wbC7YbjPrNaPbi3uKtuyXuALUVPpe2roi3PsDJ
-         JsQU06BDaQqrppSILlkXfj3JG9gh7GsBtbpDlf3ETHm5T4gMXE28M32YAfmJgcwibKq6
-         z00g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition:user-agent;
-        bh=noCeewt6B+I5mcY7gyfnCkii7BiHslOWQNbYJEI0Pb4=;
-        b=FPxQV6uxOq+jvhTrrHw954l7bTFqJUFZBQj7azLQJ3dMbKsw+Qd7LEayYzcByY8KD8
-         V/WeMEhkShNLy/7KT3BfiFi6C61+clZJC1t8CziQdc6hd/U0/72gZH1qQRJGE6BW2hH7
-         4L2oK4UGaep326jpCrqkhmlTzEJLZ44iJtPUgvppcdgqAMh86J46+Ug+Tprid5TOrZDt
-         HNjKdlQeYZdX4neV4wtb02VqNI7Vo1qQ6jtThZzV41dCBeCWg7wqXEAGv6xkbxLsfLbx
-         k9iFkZGftgNLT8DS4eMGCIzlELKfdI1aMjL8/LECzmQZ3y1aLlEAoYXBNtnuI7W75P0j
-         qsHQ==
-X-Gm-Message-State: APjAAAUm51NmFYdTvFsXCOSR49Op+TfEhp+cvH4+n8B6toKetnwNW4aJ
-        /MogewwcUmUHPpxvGxCJ8B4=
-X-Google-Smtp-Source: APXvYqw2X0R6A9irqs2ehIdF3GIdr3HsMC92RKvPU9jNmrTnLAKYQ+Gbiz7GIp7uVeYgcRaztqOBbQ==
-X-Received: by 2002:a17:902:1566:: with SMTP id b35mr37124834plh.147.1563289113589;
-        Tue, 16 Jul 2019 07:58:33 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::2:4779])
-        by smtp.gmail.com with ESMTPSA id m4sm30712788pgs.71.2019.07.16.07.58.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Jul 2019 07:58:33 -0700 (PDT)
-Date:   Tue, 16 Jul 2019 07:58:31 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, kernel-team@fb.com,
-        Josef Bacik <josef@toxicpanda.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH block/for-linus] blkcg: allow blkcg_policy->pd_stat() to
- print non-debug info too
-Message-ID: <20190716145749.GB680549@devbig004.ftw2.facebook.com>
+        Tue, 16 Jul 2019 11:26:37 -0400
+X-QQ-mid: bizesmtp12t1563290792tc155f3n
+Received: from localhost.localdomain (unknown [113.240.214.107])
+        by esmtp6.qq.com (ESMTP) with 
+        id ; Tue, 16 Jul 2019 23:26:15 +0800 (CST)
+X-QQ-SSF: 01400000002000H0ZG31000A0000000
+X-QQ-FEAT: Oo4T8aaKqtNjzxQ5PLb2cWvqte5ytmeO9woJLjEjoPjxO8liyo0yq0miwNLFX
+        79614LhSSNATrRGue2HcRR7rOSgtXzGPKUXxbQP8LrZw1R9FX6e4dLdD8yipySpKNl2lyq/
+        RbfxbPU24hnBWtwhBdbvsGiTpdaEmeRSeJ/cKT2aK5Fa8mPRwGPS1yu5C05GC5G/brTHNxE
+        7LwxMDJeqft/QA/92l5EFivhv6vYhVmYslxqCNpHol/WWRcwPmkbVUA1B78NMJVIMQyDW9e
+        nUBhJftIBMxk4/+SlJr9NV24NqFn8V1nkA/ogExi1IGTPROLJtGuyDmin5jXv81J0+i1aHB
+        SIXYLI/miAZXIb/j3E=
+X-QQ-GoodBg: 2
+From:   Zhengyuan Liu <liuzhengyuan@kylinos.cn>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH v2] io_uring: fix the wrong counter in async_list
+Date:   Tue, 16 Jul 2019 23:26:14 +0800
+Message-Id: <20190716152614.15901-1-liuzhengyuan@kylinos.cn>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign2
+X-QQ-Bgrelay: 1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, ->pd_stat() is called only when moduleparam
-blkcg_debug_stats is set which prevents it from printing non-debug
-policy-specific statistics.  Let's move debug testing down so that
-->pd_stat() can print non-debug stat too.  This patch doesn't cause
-any visible behavior change.
+We would queue a work for each req in defer and link list without
+increasing async_list->cnt, so we shouldn't decrease it while exiting
+from workqueue as well as shouldn't process the req in async list.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Cc: Josef Bacik <josef@toxicpanda.com>
+Thanks to Jens Axboe <axboe@kernel.dk> for his guidance.
+
+Signed-off-by: Zhengyuan Liu <liuzhengyuan@kylinos.cn>
 ---
- block/blk-cgroup.c         |    9 +++------
- block/blk-iolatency.c      |    3 +++
- include/linux/blk-cgroup.h |    1 +
- 3 files changed, 7 insertions(+), 6 deletions(-)
+ fs/io_uring.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -54,7 +54,7 @@ static struct blkcg_policy *blkcg_policy
- 
- static LIST_HEAD(all_blkcgs);		/* protected by blkcg_pol_mutex */
- 
--static bool blkcg_debug_stats = false;
-+bool blkcg_debug_stats = false;
- static struct workqueue_struct *blkcg_punt_bio_wq;
- 
- static bool blkcg_policy_enabled(struct request_queue *q,
-@@ -968,10 +968,7 @@ static int blkcg_print_stat(struct seq_f
- 					 dbytes, dios);
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 7e932c572f26..e554091c713c 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -333,7 +333,8 @@ struct io_kiocb {
+ #define REQ_F_IO_DRAIN		16	/* drain existing IO first */
+ #define REQ_F_IO_DRAINED	32	/* drain done */
+ #define REQ_F_LINK		64	/* linked sqes */
+-#define REQ_F_FAIL_LINK		128	/* fail rest of links */
++#define REQ_F_LINK_DONE		128	/* linked sqes done */
++#define REQ_F_FAIL_LINK		256	/* fail rest of links */
+ 	u64			user_data;
+ 	u32			result;
+ 	u32			sequence;
+@@ -630,6 +631,7 @@ static void io_req_link_next(struct io_kiocb *req)
+ 			nxt->flags |= REQ_F_LINK;
  		}
  
--		if (!blkcg_debug_stats)
--			goto next;
--
--		if (atomic_read(&blkg->use_delay)) {
-+		if (blkcg_debug_stats && atomic_read(&blkg->use_delay)) {
- 			has_stats = true;
- 			off += scnprintf(buf+off, size-off,
- 					 " use_delay=%d delay_nsec=%llu",
-@@ -991,7 +988,7 @@ static int blkcg_print_stat(struct seq_f
- 				has_stats = true;
- 			off += written;
++		nxt->flags |= REQ_F_LINK_DONE;
+ 		INIT_WORK(&nxt->work, io_sq_wq_submit_work);
+ 		queue_work(req->ctx->sqo_wq, &nxt->work);
+ 	}
+@@ -1845,6 +1847,10 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+ 		/* async context always use a copy of the sqe */
+ 		kfree(sqe);
+ 
++		/* req from defer and link list needn't decrease async cnt */
++		if (req->flags & (REQ_F_IO_DRAINED | REQ_F_LINK_DONE))
++			goto out;
++
+ 		if (!async_list)
+ 			break;
+ 		if (!list_empty(&req_list)) {
+@@ -1892,6 +1898,7 @@ static void io_sq_wq_submit_work(struct work_struct *work)
  		}
--next:
-+
- 		if (has_stats) {
- 			if (off < size - 1) {
- 				off += scnprintf(buf+off, size-off, "\n");
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -917,6 +917,9 @@ static size_t iolatency_pd_stat(struct b
- 	unsigned long long avg_lat;
- 	unsigned long long cur_win;
+ 	}
  
-+	if (!blkcg_debug_stats)
-+		return 0;
-+
- 	if (iolat->ssd)
- 		return iolatency_ssd_stat(iolat, buf, size);
- 
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -182,6 +182,7 @@ struct blkcg_policy {
- 
- extern struct blkcg blkcg_root;
- extern struct cgroup_subsys_state * const blkcg_root_css;
-+extern bool blkcg_debug_stats;
- 
- struct blkcg_gq *blkg_lookup_slowpath(struct blkcg *blkcg,
- 				      struct request_queue *q, bool update_hint);
++out:
+ 	if (cur_mm) {
+ 		set_fs(old_fs);
+ 		unuse_mm(cur_mm);
+-- 
+2.19.1
+
+
+
