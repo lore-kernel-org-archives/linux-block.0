@@ -2,92 +2,110 @@ Return-Path: <SRS0=S2CA=VN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17742C76188
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jul 2019 12:59:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A83C7618F
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jul 2019 14:05:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D409A2173B
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jul 2019 12:59:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC01720880
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jul 2019 14:05:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZSTX/MOl"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="oB+KUHUY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727796AbfGPM7v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Jul 2019 08:59:51 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:34256 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725926AbfGPM7v (ORCPT
+        id S1733148AbfGPOFX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Jul 2019 10:05:23 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:40769 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728004AbfGPOFW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jul 2019 08:59:51 -0400
-Received: by mail-pf1-f194.google.com with SMTP id b13so9093169pfo.1
-        for <linux-block@vger.kernel.org>; Tue, 16 Jul 2019 05:59:50 -0700 (PDT)
+        Tue, 16 Jul 2019 10:05:22 -0400
+Received: by mail-pg1-f196.google.com with SMTP id w10so9502788pgj.7
+        for <linux-block@vger.kernel.org>; Tue, 16 Jul 2019 07:05:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=HKBne90hDm9vNrkTEEdEpDrjib0o59wHPm5tU1kvnX4=;
-        b=ZSTX/MOlkHU/Im361h0M+y3VurKvcwVVEXQbBgtefBCraTf9JqeLqwwGmj2LNLg5+C
-         ESGSwrT3dK9Y0OvGbBaRlaiE0YO78eTN16IaVSIHnCfgdY6kXJxj/On7sV1C895OtV0y
-         qUIYJBlKphtv1nlng7xfHfRG/9Y5kgwBby8tNjqX6hO5U0YmXv6YD6ytboLf2sEZoWZ/
-         CKs+S1m9F+2Si87C6hA9OmZtEv+P3qtily+Q4JAgU3dthHp9DG0buOsrU3MjR6l/ClvX
-         3PAtbRMzRDLDtQkHJk+6L8vfL0Ztnko7MLqcWxivWUPQZn5H6LJX7IqWvnlTuLxj34TT
-         CKwA==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=aoVagbFNhgXjrt3W/Zg0iqvw808Ej48g/8edVM2FIxY=;
+        b=oB+KUHUY8jt3xmhaIq2rMBhWkYYVxc9eFPInFzebpABp/zB+uYCQgZ3glw+vyYLnV/
+         2mg0EhT075HTjuRnRbAKJuaqPU6ib+K895FCPnCxGwszWDGOVKc/wfSnREM+UVMRqXuv
+         ZnK5puZMup9/KjRqYLNSRS01VzBq4dGdDSRsonnY3FhPNMMziuHRz/Ej0PvtLCYFO8fn
+         f78ZjcEb4EYtPsZ22IkAKG8on/FD308r+91bk9uDXS/bIliBn7bIFfX7rXQdNq2RpHUI
+         lyg4akf0G03slJn5OrL6b2iISkyDq+PBy/dQYwKhRTaUFQ7GjaLqGsS6wAOseBsIwewQ
+         Fd9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=HKBne90hDm9vNrkTEEdEpDrjib0o59wHPm5tU1kvnX4=;
-        b=VZcfS+y0PIXieKhIVWYGYz0dlzaPIEwZ6f4f5pohx6ZGWs/lWHw6aKOgfSxW8FqPy9
-         5/dOIufAqmsoCSHJ4KSo2ehDEjakOsHIlbwHQD3uwhBa8jkJp2Hzn0lPzGzfbJvMq7BM
-         lncDRsZdrhoZL5d5+SG4lQTkiDshMHE/RWxsV1RSZ3s4fFsqhtgLoMhJHP8TSlhZ8b/p
-         GBLt9g5CpRLi0obMl24pWL/rp/ZmENbYPdRtCOaRCkl4vzKuvBX9ewuFLMpaARuWuEOp
-         1TZslqz7S/b5JffUhlSZCCdIHt6B/1IuT2p4T8xeDU/PZYcApCHhQbpScBnTB7MNcARr
-         TrMQ==
-X-Gm-Message-State: APjAAAXvpIvOIBWoaPHF+UxGzv5F2g70an9Mc5LIwBUBMjCvXNE4HOYN
-        f8hf+DckERbRVsqNoKzaG9enyuqL
-X-Google-Smtp-Source: APXvYqzbvOqe6vipw5sDDC0eENT3xybM7hUV7qg48ffSmSB+aKlh5nfeFykON2wfxR4W4xlk4awwqg==
-X-Received: by 2002:a17:90a:338b:: with SMTP id n11mr35691625pjb.21.1563281990393;
-        Tue, 16 Jul 2019 05:59:50 -0700 (PDT)
-Received: from localhost.localdomain ([240f:34:212d:1:368e:e048:68f1:84e7])
-        by smtp.gmail.com with ESMTPSA id m16sm21513841pfd.127.2019.07.16.05.59.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 16 Jul 2019 05:59:49 -0700 (PDT)
-From:   Akinobu Mita <akinobu.mita@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     Akinobu Mita <akinobu.mita@gmail.com>, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: fix sysfs module parameters directory path in comment
-Date:   Tue, 16 Jul 2019 21:59:35 +0900
-Message-Id: <1563281975-6353-1-git-send-email-akinobu.mita@gmail.com>
-X-Mailer: git-send-email 2.7.4
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=aoVagbFNhgXjrt3W/Zg0iqvw808Ej48g/8edVM2FIxY=;
+        b=j8Lo2WITgg0NUyxEzLIjhZCIUDIqJfgwOtBL88BdQYPLDvYpUB7PznSSJvSAnNmm5C
+         ItkdtfQz5j0ELQgRVo4nj0kEVQX30K/rCTiEXO0GV5aLhWKYvpgqTNmhR3swgoi5hONJ
+         K6bBiPjeqr9DEb1mQsKTPu6yN8gvGkoBOt5hwzJjHSosXdHy6N2mCQ3XHzvlZ5S5cF7c
+         gQakLHAh1jNToyFVC5wfytVDF/srLaWAUVBYf03K1ixqUfW0QSleSW/9NodfKxAsFo8J
+         rngMUWyFjfSH64nzADOOi7T8h76V3LQ3M8YPga0vpVyk3loaK6QqXTvgoatETka9WmEn
+         RyEA==
+X-Gm-Message-State: APjAAAWg2DwgXMjYpXxf9fFHUl0NO6kxrk2Wmp0A5ZPTvaV/WKesezLV
+        throYmUaOUgNyUYEe7xjP1M=
+X-Google-Smtp-Source: APXvYqzjx0xWwCczyNCO7AxzI9Vek3/4hKvb7RI6GhrXm06aGJFLjKM6citOIZnYOh4ngmsyCA3uRQ==
+X-Received: by 2002:a63:9318:: with SMTP id b24mr24121376pge.31.1563285922055;
+        Tue, 16 Jul 2019 07:05:22 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
+        by smtp.gmail.com with ESMTPSA id i198sm7788161pgd.44.2019.07.16.07.05.20
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 16 Jul 2019 07:05:20 -0700 (PDT)
+Subject: Re: [PATCH] scsi: sd_zbc: Fix compilation warning
+To:     Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
+Cc:     linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20190715053833.5973-1-damien.lemoal@wdc.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f4812ac1-dfae-73d7-4722-4158c38d2382@kernel.dk>
+Date:   Tue, 16 Jul 2019 08:05:18 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+In-Reply-To: <20190715053833.5973-1-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The runtime configurable module parameter files are located under
-/sys/module/MODULENAME/parameters, not /sys/module/MODULENAME.
+On 7/14/19 11:38 PM, Damien Le Moal wrote:
+> kbuild test robot gets the following compilation warning using gcc 7.4
+> cross compilation for c6x (GCC_VERSION=7.4.0 make.cross ARCH=c6x).
+> 
+>     In file included from include/asm-generic/bug.h:18:0,
+>                      from arch/c6x/include/asm/bug.h:12,
+>                      from include/linux/bug.h:5,
+>                      from include/linux/thread_info.h:12,
+>                      from include/asm-generic/current.h:5,
+>                      from ./arch/c6x/include/generated/asm/current.h:1,
+>                      from include/linux/sched.h:12,
+>                      from include/linux/blkdev.h:5,
+>                      from drivers//scsi/sd_zbc.c:11:
+>     drivers//scsi/sd_zbc.c: In function 'sd_zbc_read_zones':
+>>> include/linux/kernel.h:62:48: warning: 'zone_blocks' may be used
+>     uninitialized in this function [-Wmaybe-uninitialized]
+>      #define __round_mask(x, y) ((__typeof__(x))((y)-1))
+>                                                     ^
+>     drivers//scsi/sd_zbc.c:464:6: note: 'zone_blocks' was declared here
+>       u32 zone_blocks;
+>           ^~~~~~~~~~~
+> 
+> Fix this by initializing the zone_blocks variable to 0.
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
----
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Probably worth noting that this is a false positive, and even if it is,
+include a Fixes: entry as well.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index d8c71a4..73a4999 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1971,7 +1971,7 @@ static const struct attribute *disk_events_attrs[] = {
-  * The default polling interval can be specified by the kernel
-  * parameter block.events_dfl_poll_msecs which defaults to 0
-  * (disable).  This can also be modified runtime by writing to
-- * /sys/module/block/events_dfl_poll_msecs.
-+ * /sys/module/block/parameters/events_dfl_poll_msecs.
-  */
- static int disk_events_set_dfl_poll_msecs(const char *val,
- 					  const struct kernel_param *kp)
+Otherwise obviously looks fine to me. Martin, do you want to pick this
+one up?
+
 -- 
-2.7.4
+Jens Axboe
 
