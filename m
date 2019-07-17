@@ -2,93 +2,112 @@ Return-Path: <SRS0=ez2/=VO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8542C76186
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jul 2019 08:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A792AC76186
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jul 2019 12:12:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BDFA220818
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jul 2019 08:29:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 818C220880
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jul 2019 12:12:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rcwhe/pO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725912AbfGQI3j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jul 2019 04:29:39 -0400
-Received: from out4437.biz.mail.alibaba.com ([47.88.44.37]:5928 "EHLO
-        out4437.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725799AbfGQI3i (ORCPT
+        id S1726284AbfGQMMI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jul 2019 08:12:08 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:34953 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726081AbfGQMMH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jul 2019 04:29:38 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e07417;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0TX6Y9GM_1563352168;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0TX6Y9GM_1563352168)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 17 Jul 2019 16:29:36 +0800
-From:   Jeffle Xu <jefflexu@linux.alibaba.com>
-To:     osandov@fb.com
-Cc:     linux-block@vger.kernel.org, Jeffle Xu <jefflexu@linux.alibaba.com>
-Subject: [PATCH blktests] block/024: disable IO requests merging
-Date:   Wed, 17 Jul 2019 16:29:22 +0800
-Message-Id: <1563352162-2756-1-git-send-email-jefflexu@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+        Wed, 17 Jul 2019 08:12:07 -0400
+Received: by mail-pl1-f196.google.com with SMTP id w24so11887378plp.2;
+        Wed, 17 Jul 2019 05:12:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=p/Gb7jEE+ZplI0EyTPs6qOyFsh+o6XOv4kVQ51JCMkA=;
+        b=rcwhe/pOh/DKHRE75RRh3McP6NnmkSW99cb7AUyjWSX12bH7QqCxEl4D6tlsJXdK3S
+         gP8qjwnXpE4d7OadncmdHOzdNZbUYatXxmx+LTl/JPJ8JdcI8p8zuqMrMT/aWYiXlGr3
+         Q9nLc7wHVPm0w+sfk8qyEeKhunF00mRJmhzfQsWqtnY6c90r00rTBYhx2VUwQuZ8D+EX
+         2XjDlq8g3nVDmj/6JZoYDQeZD3kmsA0EI6d5RW3SK/t7FdGeSJ2gtiXFdcjqyJ5BrhBL
+         Md4iAWujKNGP5mP6urAUoZLW1nT9PPTb/bRys4yy+lYiIGV5dqTGhgM+es2PUKewe1Jc
+         WenQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=p/Gb7jEE+ZplI0EyTPs6qOyFsh+o6XOv4kVQ51JCMkA=;
+        b=QYV4vPqyzWD4D2+YV1KG7qNSHCO77Wn9b0/aU9IxHTQV+VinRlaObKIIv0gkL8oWvB
+         Ma3fYbFGY2dlPch2oA+JsT1dEXz+f5bm81YxuGK6uwcQH14eU9QncN/pL+8GGJJatBEv
+         1lbfg5E8t3icuGHlubvE8SvrlN4kleO1ivqBzwXok/Hv5GZKrhVD4B+I/YFcTG816Aot
+         wSPg8isHAhr1Vrn6mIZLA9hI7SCGekwshY0qrfxswg4CGfRGvYLuEDIBfE58/YRRgFZH
+         2m8VLFnG9/g2D49UZDuGtqHxfNmp0xWPM1g3BwZvSOnmVwTWrmMhm9xaLD/ejYwu5HUD
+         Fsrg==
+X-Gm-Message-State: APjAAAWT3mf2AhjjGl/Dg4sO7yVOe81eEfOpBbW6QpbFJhyqedDgzEtP
+        97OxhI/AmPVrmZJY+snOAQg=
+X-Google-Smtp-Source: APXvYqzBZ+hy9Pqe1AbK+XLm/UpVjxZ6oNOlD0cIM+IMV3HiQI83dgqAbpNpjzhyCn1HLQ1D8exNhw==
+X-Received: by 2002:a17:902:2ae8:: with SMTP id j95mr39288806plb.276.1563365526969;
+        Wed, 17 Jul 2019 05:12:06 -0700 (PDT)
+Received: from localhost ([123.213.206.190])
+        by smtp.gmail.com with ESMTPSA id b1sm22695471pfi.91.2019.07.17.05.12.05
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 17 Jul 2019 05:12:06 -0700 (PDT)
+Date:   Wed, 17 Jul 2019 21:12:03 +0900
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+Cc:     minwoo.im@samsung.com,
+        "sreekanth.reddy@broadcom.com" <sreekanth.reddy@broadcom.com>,
+        "sathya.prakash@broadcom.com" <sathya.prakash@broadcom.com>,
+        "suganath-prabu.subramani@broadcom.com" 
+        <suganath-prabu.subramani@broadcom.com>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "MPT-FusionLinux.pdl@broadcom.com" <MPT-FusionLinux.pdl@broadcom.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Euihyeok Kwon <eh81.kwon@samsung.com>,
+        Sarah Cho <sohyeon.jo@samsung.com>,
+        Sanggwan Lee <sanggwan.lee@samsung.com>,
+        Gyeongmin Nam <gm.nam@samsung.com>,
+        Sungjun Park <sj1228.park@samsung.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH V2] mpt3sas: support target smid for [abort|query] task
+Message-ID: <20190717121203.GE10495@minwoo-desktop>
+References: <CGME20190714034415epcms2p25f9787cb71993a30f58524d2f355b543@epcms2p2>
+ <20190714034415epcms2p25f9787cb71993a30f58524d2f355b543@epcms2p2>
+ <860cc8cf-6419-c649-b2d9-19b82f6ebc99@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <860cc8cf-6419-c649-b2d9-19b82f6ebc99@suse.de>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-block/024 works in a way that, if we submit N bio requests and each bio
-requests will consume M ns, then the total time consumed should be
-(N * M) ns.
+On 19-07-15 08:13:36, Hannes Reinecke wrote:
+> I think this is fundamentally wrong.
+> ABORT_TASK is used to abort a single task, which of course has to be
+> known beforehand. If you don't know the task, what exactly do you hope
+> to achieve here? Aborting random I/O?
+> Or, even worse, aborting I/O the driver uses internally and corrupt the
+> internal workflow of the driver?
+> 
+> We should simply disallow any ABORT TASK from userspace if the TaskMID
+> is zero. And I would even argue to disabllow ABORT TASK from userspace
+> completely, as the smid is never relayed to userland, and as such the
+> user cannot know which task should be aborted.
+> 
+> Cheers,
+> 
+> Hannes
 
-However there may be some merging of write bio requests, and thus the value
-of the "write ticks" filed of "/sys/block/<dev>/stat" may be less than
-what we expect.
+Sreekanth,
 
-For example, running the following script,
-
-```sh
-
-modprobe -r null_blk
-modprobe null_blk queue_mode=2 irqmode=2 completion_nsec=500000
-dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1800 status=none &
-dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1800 status=none &
-wait
-cat /sys/block/nullb0/stat
-```
-
-and we get output
-
-```
-       1        0        8        0     2626      411    28800     1388        0      943     1444        0        0        0        0
-```
-
-In this case, we submit 3600 (1800 * 2) write bio requests, among which 411 bio requests
-are merged (2626 + 411 * 2 = 3448).
-
-Thus we need to disable the merging of bio requests by
-
-```
-```
-
-Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
----
- tests/block/024 | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/tests/block/024 b/tests/block/024
-index b40a869..0ffc63f 100755
---- a/tests/block/024
-+++ b/tests/block/024
-@@ -42,6 +42,9 @@ test() {
- 		return 1
- 	fi
- 
-+    # Disable IO request merging
-+    echo 2 > /sys/block/nullb0/queue/nomerges
-+
- 	init_times
- 	show_times
- 
--- 
-1.8.3.1
-
+Could you please give some thoughts about what Hannes said?
