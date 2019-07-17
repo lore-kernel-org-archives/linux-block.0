@@ -2,189 +2,150 @@ Return-Path: <SRS0=ez2/=VO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B84C7618F
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jul 2019 14:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65EB3C7618F
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jul 2019 14:56:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0A4C21743
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jul 2019 14:27:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E4DC2173E
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jul 2019 14:56:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fZbqig6D"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=acronis.com header.i=@acronis.com header.b="qtlSsX7M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726717AbfGQO16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jul 2019 10:27:58 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:33457 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726598AbfGQO15 (ORCPT
+        id S1726620AbfGQO4X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jul 2019 10:56:23 -0400
+Received: from us-edge-1.acronis.com ([69.20.59.99]:45756 "EHLO
+        us-edge-1.acronis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726063AbfGQO4X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jul 2019 10:27:57 -0400
-Received: by mail-pg1-f195.google.com with SMTP id f20so2019481pgj.0;
-        Wed, 17 Jul 2019 07:27:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=nvqNr9SLuwwZZcGIJgyeLTzR5iN49WRmD1bzET7qrX0=;
-        b=fZbqig6DExgJMx86f03afKw6OwCDHbTpt3kZa8PZYEL3OaDDQRrrRg8tQI3mt8mqxN
-         s3RW8s5Za59L4GeXU2LEhWXBPRhMvkhNhDyB5sUYzVamWXn2p3DYqzbZcxWqFUOC5x3D
-         RvkB/2/3DxL+SP7N7+TPjU4UjQ+gU2nB2XgCVPSn7s8eJTMe4MZjvY98/JDunyEYu0fp
-         7Kh0buABkIsMJNBGrzzG4cRrnZrc/b89mAqQj6VlVT9nMDGpcjrdS/MnwqnfgM8TqiAq
-         /6SOCMQ385Yv/JxsdNTvI6yptg9NnkTKSVxsXrh2je/S0i3YgZdaiJzz+aBFbgT0E8Vv
-         iAcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=nvqNr9SLuwwZZcGIJgyeLTzR5iN49WRmD1bzET7qrX0=;
-        b=klqn5Wy9KniOWtNVkw4guWGjo0J6MqY6gmIDo5GtKArjDaCWN078dc2bPCAzu/z/Et
-         PL4f0xP4DPLyWXpTEjAs8CrnnTQpLZG3feATeYmrr207GOs9QbeH4GrrWicLO1Y0FCdq
-         g8bdEHLkGfOoV2CtWYawf5azwq0sn7QM5Ks7Wa4HAs1DRjINh/BD1BcNg3pnslTngs06
-         nHVFDB2QwM39/LXhE+pkJq1JCRFvpkySwyvSlb2XG/D1+BYbqVgO2ARvrFXfXLyq/3F/
-         SzvOox4pzwlnXZ8z2JsL9KSKR5Ju8HlyMyI4/z6avRR3V6EDlk/n7GgF7J9DRUykIBIL
-         XGQA==
-X-Gm-Message-State: APjAAAULhLajj2DxOSb+s+k0Xvbb7KRyB9t69DhFvhe+1Mx2LARq1LjY
-        QEdTVAy9aDDtR+DSQHbJ2tEnejvHF/CwWimebMg=
-X-Google-Smtp-Source: APXvYqwhAEQJYHqg+zo9ow9mDEV6qDdC8D9kEUY/g6y1OE313KSTV8uAp24yxQENP1K6vRVs9TLqvxUbZ5cUiyq4jCU=
-X-Received: by 2002:a63:7455:: with SMTP id e21mr35805147pgn.439.1563373677041;
- Wed, 17 Jul 2019 07:27:57 -0700 (PDT)
+        Wed, 17 Jul 2019 10:56:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=acronis.com
+        ; s=exim; h=MIME-Version:Content-Transfer-Encoding:Content-ID:Content-Type:
+        In-Reply-To:References:Message-ID:Date:Subject:CC:To:From:Sender:Reply-To:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=yW4SuzaBU8qUYaHFqprIkAtJHv9ihhc/wlf0+5ms/jw=; b=qtlSsX7MXWcRA9ipryfhMmDjXN
+        St1z8oHCJc13lUShZ5Xh04n/kWzGEJ3E17X2YW3xEaY5ocKcUhQI7htAkyNO2ehC/EYRaOxjbIteX
+        6J9pWtvxuML4OwFSNrK64HNpnNyJYriaNRZC/PI0QNtCj2eUZWxE5AhuRHLErc+wF5R0=;
+Received: from [91.195.22.120] (helo=ru-ex-1.corp.acronis.com)
+        by us-edge-1.acronis.com with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+        (Exim 4.92)
+        (envelope-from <Filipp.Mikoian@acronis.com>)
+        id 1hnlLx-0008I3-7i; Wed, 17 Jul 2019 10:56:21 -0400
+Received: from ru-ex-2.corp.acronis.com (10.250.32.21) by
+ ru-ex-1.corp.acronis.com (10.250.32.20) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.1591.10; Wed, 17 Jul 2019 17:56:18 +0300
+Received: from ru-ex-2.corp.acronis.com ([fe80::3163:6934:fc33:4bd3]) by
+ ru-ex-2.corp.acronis.com ([fe80::3163:6934:fc33:4bd3%4]) with mapi id
+ 15.01.1591.011; Wed, 17 Jul 2019 17:56:18 +0300
+From:   Filipp Mikoian <Filipp.Mikoian@acronis.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>
+CC:     "jmoyer@redhat.com" <jmoyer@redhat.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>
+Subject: Re: io_uring question
+Thread-Topic: io_uring question
+Thread-Index: AQHVMlktc6wBW1EANEu5MaqUCERTlabNWhmAgAGgx4A=
+Date:   Wed, 17 Jul 2019 14:56:17 +0000
+Message-ID: <01104FE4-007E-471F-AD37-E32663CEB038@acronis.com>
+References: <76524892f9c048ea88c7d87295ec85ae@acronis.com>
+ <92e17024-55ca-069d-3aae-56bd0b2e96f6@kernel.dk>
+In-Reply-To: <92e17024-55ca-069d-3aae-56bd0b2e96f6@kernel.dk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.246.144.16]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <36D7E8076B658B438CF7C3AA26CAA23F@acronis.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1562435939-15466-1-git-send-email-akinobu.mita@gmail.com>
- <1562435939-15466-3-git-send-email-akinobu.mita@gmail.com> <89262967-667f-80cc-0fd5-ba480e879fe0@gmail.com>
-In-Reply-To: <89262967-667f-80cc-0fd5-ba480e879fe0@gmail.com>
-From:   Akinobu Mita <akinobu.mita@gmail.com>
-Date:   Wed, 17 Jul 2019 23:27:45 +0900
-Message-ID: <CAC5umyjDNh+MP+jLST1sLyFhGsRe-SJCm+KjSOp4ppHqXog3Qw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] block: introduce LED block device activity trigger
-To:     Jacek Anaszewski <jacek.anaszewski@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>,
-        Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
-        Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MessageID-Signature: ae4595e5dac985501a879d8c46c1d44cadf4cac9
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-2019=E5=B9=B47=E6=9C=8817=E6=97=A5(=E6=B0=B4) 5:57 Jacek Anaszewski <jacek.=
-anaszewski@gmail.com>:
->
-> Hi Akinobu,
->
-> Thank you for the patch set. It looks nice in general, but I'd like
-> to maintain it under LED subsystem. See my below comments.
-
-Thanks for reviewing. I'll apply your feedback.
-
-> On 7/6/19 7:58 PM, Akinobu Mita wrote:
-> > This allows LEDs to be controlled by block device activity.
-> >
-> > We already have ledtrig-disk (LED disk activity trigger), but the lower
-> > level disk drivers need to utilize ledtrig_disk_activity() to make the
-> > LED blink.
-> >
-> > The LED block device trigger doesn't require the lower level drivers to
-> > have any instrumentation. The activity is collected by polling the disk
-> > stats.
-> >
-> > Example:
-> >
-> > echo block-nvme0n1 > /sys/class/leds/diy/trigger
-> >
-> > Cc: Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>
-> > Cc: Jacek Anaszewski <jacek.anaszewski@gmail.com>
-> > Cc: Pavel Machek <pavel@ucw.cz>
-> > Cc: Dan Murphy <dmurphy@ti.com>
-> > Cc: Jens Axboe <axboe@kernel.dk>
-> > Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
-> > ---
-> >  block/Makefile        |   1 +
-> >  block/blk-ledtrig.c   | 219 ++++++++++++++++++++++++++++++++++++++++++=
-++++++++
-> >  block/blk.h           |  13 +++
-> >  block/genhd.c         |   2 +
-> >  include/linux/genhd.h |   4 +
-> >  5 files changed, 239 insertions(+)
-> >  create mode 100644 block/blk-ledtrig.c
-> >
-> > diff --git a/block/Makefile b/block/Makefile
-> > index eee1b4c..c74d84e6 100644
-> > --- a/block/Makefile
-> > +++ b/block/Makefile
-> > @@ -35,3 +35,4 @@ obj-$(CONFIG_BLK_DEBUG_FS)  +=3D blk-mq-debugfs.o
-> >  obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+=3D blk-mq-debugfs-zoned.o
-> >  obj-$(CONFIG_BLK_SED_OPAL)   +=3D sed-opal.o
-> >  obj-$(CONFIG_BLK_PM)         +=3D blk-pm.o
-> > +obj-$(CONFIG_LEDS_TRIGGERS)  +=3D blk-ledtrig.o
-> > diff --git a/block/blk-ledtrig.c b/block/blk-ledtrig.c
->
-> Please move the whole trigger implementation to
-> drivers/leds/trigger and rename the file to ledtrig-blk.c
-
-OK. Then we don't need to patch 1/2 ("leds: move declaration of
-led_stop_software_blink() to linux/leds.h") anymore.
-
-> > new file mode 100644
-> > index 0000000..da93b06
-> > --- /dev/null
-> > +++ b/block/blk-ledtrig.c
-> > @@ -0,0 +1,219 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +// LED Kernel Blockdev Trigger
-> > +// Derived from ledtrig-netdev.c
-> > +
-> > +#include <linux/atomic.h>
-> > +#include <linux/genhd.h>
-> > +#include <linux/leds.h>
-> > +#include <linux/workqueue.h>
-> > +
-> > +struct blk_ledtrig_data {
-> > +     struct delayed_work work;
-> > +     struct led_classdev *led_cdev;
-> > +
-> > +     atomic_t interval;
-> > +     u64 last_activity;
-> > +
-> > +     unsigned long mode;
-> > +#define BLK_LEDTRIG_READ BIT(0)
-> > +#define BLK_LEDTRIG_WRITE BIT(1)
-> > +#define BLK_LEDTRIG_DISCARD BIT(2)
->
-> s/BLK_LEDTRIG/LEDTRIG_BLK/
-
-OK.
-
-> > diff --git a/block/blk.h b/block/blk.h
-> > index 7814aa2..dd4c230a 100644
-> > --- a/block/blk.h
-> > +++ b/block/blk.h
-> > @@ -331,4 +331,17 @@ void blk_queue_free_zone_bitmaps(struct request_qu=
-eue *q);
-> >  static inline void blk_queue_free_zone_bitmaps(struct request_queue *q=
-) {}
-> >  #endif
-> >
-> > +#ifdef CONFIG_LEDS_TRIGGERS
-> > +int blk_ledtrig_register(struct gendisk *disk);
-> > +void blk_ledtrig_unregister(struct gendisk *disk);
-> > +#else
-> > +static inline int blk_ledtrig_register(struct gendisk *disk)
-> > +{
-> > +     return 0;
-> > +}
-> > +static inline void blk_ledtrig_unregister(struct gendisk *disk)
-> > +{
-> > +}
-> > +#endif /* CONFIG_LEDS_TRIGGERS */
->
-> Please move this part to include/linux/leds.h, next to the other
-> triggers' facilities.
-
-OK.
+PiBDYW4geW91IHRyeSB0aGUgYXR0YWNoZWQgcGF0Y2ggYW5kIHNlZSBpZiBpdCBmaXhlcyBpdCBm
+b3IgeW91Pw0KDQpUaGFuayB5b3UgdmVyeSBtdWNoLCB0aGF0IHdvcmtlZCBsaWtlIGEgY2hhcm0g
+Zm9yIGJvdGggT19ESVJFQ1QgYW5kIHBhZ2UNCmNhY2hlLiBCZWxvdyBpcyB0aGUgb3V0cHV0IGZv
+ciBPX0RJUkVDVCByZWFkcyBzdWJtaXNzaW9uIG9uIHRoZSBzYW1lIG1hY2hpbmU6DQoNCnJvb3RA
+bG9jYWxob3N0On4vaW9fdXJpbmcjIC4vaW9fdXJpbmdfcmVhZF9ibGtkZXYgL2Rldi9zZGE4DQpz
+dWJtaXR0ZWRfYWxyZWFkeSA9ICAgMCwgc3VibWl0dGVkX25vdyA9ICAzMiwgc3VibWl0X3RpbWUg
+PSAgICAgMjc3IHVzDQpzdWJtaXR0ZWRfYWxyZWFkeSA9ICAzMiwgc3VibWl0dGVkX25vdyA9ICAz
+Miwgc3VibWl0X3RpbWUgPSAgICAgMTMxIHVzDQpzdWJtaXR0ZWRfYWxyZWFkeSA9ICA2NCwgc3Vi
+bWl0dGVkX25vdyA9ICAzMiwgc3VibWl0X3RpbWUgPSAgICAgMjEzIHVzDQpzdWJtaXR0ZWRfYWxy
+ZWFkeSA9ICA5Niwgc3VibWl0dGVkX25vdyA9ICAzMiwgc3VibWl0X3RpbWUgPSAgICAgMTcwIHVz
+DQpzdWJtaXR0ZWRfYWxyZWFkeSA9IDEyOCwgc3VibWl0dGVkX25vdyA9ICAzMiwgc3VibWl0X3Rp
+bWUgPSAgICAgMTYxIHVzDQpzdWJtaXR0ZWRfYWxyZWFkeSA9IDE2MCwgc3VibWl0dGVkX25vdyA9
+ICAzMiwgc3VibWl0X3RpbWUgPSAgICAgMTY5IHVzDQpzdWJtaXR0ZWRfYWxyZWFkeSA9IDE5Miwg
+c3VibWl0dGVkX25vdyA9ICAzMiwgc3VibWl0X3RpbWUgPSAgICAgMTg0IHVzDQoNCj4gTm90IHN1
+cmUgaG93IGJlc3QgdG8gY29udmVyeSB0aGF0IGJpdCBvZiBpbmZvcm1hdGlvbi4gSWYgeW91J3Jl
+IHVzaW5nDQo+IHRoZSBzcSB0aHJlYWQgZm9yIHN1Ym1pc3Npb24sIHRoZW4gd2UgY2Fubm90IHJl
+bGlhYmx5IHRlbGwgdGhlDQo+IGFwcGxpY2F0aW9uIHdoZW4gYW4gc3FlIGhhcyBiZWVuIGNvbnN1
+bWVkLiBUaGUgYXBwbGljYXRpb24gbXVzdCBsb29rIGZvcg0KPiBjb21wbGV0aW9ucyAoc3VjY2Vz
+c2Z1bCBvciBlcnJvcnMpIGluIHRoZSBDUSByaW5nLg0KDQpJIGtub3cgdGhhdCBTUVBPTEwgZmVh
+dHVyZSBzdXBwb3J0IGlzIG5vdCBmdWxseSBpbXBsZW1lbnRlZCBpbiBsaWJ1cmluZywNCnNvIGZv
+ciBub3cgaXQgc2VlbXMgdGhhdCBpb191cmluZ19nZXRfc3FlKCkgY291bGQgcmV0dXJuIG5vdCBh
+Y3R1YWxseQ0Kc3VibWl0dGVkIFNRRSwgZWRpdGluZyB3aGljaCBjb3VsZCBsZWFkIHRvIHJhY2Ug
+YmV0d2VlbiBrZXJuZWwgcG9sbGluZw0KdGhyZWFkIGFuZCB1c2VyIHNwYWNlLiBJIGp1c3QgdGhp
+bmsgaXQgaXMgd29ydGggbWVudGlvbmluZyB0aGlzIGZhY3QgaW4NCmRvY3VtZW50YXRpb24uDQoN
+Cj4gWW91IGNvdWxkIHdhaXQgb24gY3EgcmluZyBjb21wbGV0aW9ucywgZWFjaCBzcWUgc2hvdWxk
+IHRyaWdnZXIgb25lLg0KDQpVbmZvcnR1bmF0ZWx5IGZldyBpc3N1ZXMgc2VlbSB0byBhcmlzZSBp
+ZiB0aGlzIGFwcHJvYWNoIGlzIHRha2VuIGluDQpJTy1pbnRlbnNpdmUgYXBwbGljYXRpb24uIEFz
+IGEgZGlzY2xhaW1lciBJIHNob3VsZCBub3RlIHRoYXQgU1EgcmluZw0Kb3ZlcmZsb3cgaXMgYSBy
+YXJlIGV2ZW50IGdpdmVuIGVub3VnaCBlbnRyaWVzLCBuZXZlcnRoZWxlc3MgYXBwbGljYXRpb25z
+LA0KZXNwZWNpYWxseSB0aG9zZSB1c2luZyBTUVBPTEwsIHNob3VsZCBoYW5kbGUgdGhpcyBzaXR1
+YXRpb24gZ3JhY2VmdWxseQ0KYW5kIGluIGEgcGVyZm9ybWFudCBtYW5uZXIuDQoNClNvIHdoYXQg
+d2UgaGF2ZSBpcyBoaWdobHkgSU8taW50ZW5zaXZlIGFwcGxpY2F0aW9uIHRoYXQgc3VibWl0cyB2
+ZXJ5DQpzbG93IElPcyoqKiAodGhhdCdzIHdoeSBpdCB1c2VzIGFzeW5jIElPIGluIHRoZSBmaXJz
+dCBwbGFjZSkgYW5kDQpjYXJlcyBtdWNoIGFib3V0IHRoZSBwcm9ncmVzcyBvZiB0aGUgc3VibWl0
+dGluZyB0aHJlYWRzKHRoZSBtb3N0IHByb2JhYmxlDQpyZWFzb24gdG8gdXNlIFNRUE9MTCBmZWF0
+dXJlKS4gR2l2ZW4gc3VjaCBwcmVyZXF1aXNpdGVzLCB0aGUgZm9sbG93aW5nDQpzY2VuYXJpbyBp
+cyBwcm9iYWJsZToNCg0KKioqIGJ5ICd2ZXJ5IHNsb3cnIEkgbWVhbiBJT3MsIGNvbXBsZXRpb24g
+b2Ygd2hpY2ggdGFrZXMgc2lnbmlmaWNhbnRseQ0KICAgIG1vcmUgdGltZSB0aGFuIHN1Ym1pc3Np
+b24NCg0KMS4gUHV0IEBzcV9lbnRyaWVzIHdpdGggdmVyeSBzbG93IElPcyBpbiBTUS4uLg0KICBQ
+RU5ESU5HICAgICAgU1EgICAgIElORkxJR0hUICAgICAgIENRDQogICArLS0tKyAgICAgKy0tLSsg
+ICAgICstLS0rICAgICArLS0tKy0tLSsNCj09PT09PT09PT09PT58IFggfCAgICAgfCAgIHwgICAg
+IHwgICB8ICAgfA0KICAgKy0tLSsgICAgICstLS0rICAgICArLS0tKyAgICAgKy0tLSstLS0rDQog
+ICAuLi53aGljaCB3aWxsIGJlIHN1Ym1pdHRlZCBieSBwb2xsaW5nIHRocmVhZA0KICBQRU5ESU5H
+ICAgICAgU1EgICAgIElORkxJR0hUICAgICAgIENRDQogICArLS0tKyAgICAgKy0tLSsgICAgICst
+LS0rICAgICArLS0tKy0tLSsNCiAgIHwgICB8ICAgICB8ICAgfD09PT0+fCBYIHwgICAgIHwgICB8
+ICAgfA0KICAgKy0tLSsgICAgICstLS0rICAgICArLS0tKyAgICAgKy0tLSstLS0rDQoyLiBUaGVu
+IHRyeSB0byBhZGQgKEBzcV9lbnRyaWVzICsgQHBlbmRpbmcpIGVudHJpZXMgdG8gU1EsIGJ1dCBv
+bmx5DQogICBzdWNjZWVkIHdpdGggQHNxX2VudHJpZXMuDQogIFBFTkRJTkcgICAgICBTUSAgICAg
+SU5GTElHSFQgICAgICAgQ1ENCiAgICstLS0rICAgICArLS0tKyAgICAgKy0tLSsgICAgICstLS0r
+LS0tKw0KPT0+fCBYIHw9PT09PnwgWCB8ICAgICB8IFggfCAgICAgfCAgIHwgICB8DQogICArLS0t
+KyAgICAgKy0tLSsgICAgICstLS0rICAgICArLS0tKy0tLSsNCjMuIFdhaXQgdmVyeSBsb25nIHRp
+bWUgaW4gaW9fdXJpbmdfZW50ZXIoR0VURVZFTlRTKSB3YWl0aW5nIGZvciBDUSByaW5nDQogICBj
+b21wbGV0aW9uLi4uDQogIFBFTkRJTkcgICAgICBTUSAgICAgSU5GTElHSFQgICAgICAgQ1ENCiAg
+ICstLS0rICAgICArLS0tKyAgICAgKy0tLSsgICAgICstLS0rLS0tKw0KICAgfCBYIHwgICAgIHwg
+WCB8ICAgICB8ICAgfD09PT0+fCBYIHwgICB8DQogICArLS0tKyAgICAgKy0tLSsgICAgICstLS0r
+ICAgICArLS0tKy0tLSsNCiAgIC4uLmFuZCBzdGlsbCB0aGVyZSBpcyBubyBndWFyYW50ZWUgdGhh
+dCBzbG90IGluIFNRIHJpbmcgYmVjYW1lDQogICBhdmFpbGFibGUuIFNob3VsZCB3ZSBjYWxsDQog
+ICAgICAgaW9fdXJpbmdfZW50ZXIoR0VURVZFTlRTLCBtaW5fY29tcGxldGUgPSAxKTsNCiAgIGlu
+IGEgbG9vcCwgY2hlY2tpbmcgKCpraGVhZCA9PSAqa3RhaWwpIGF0IGV2ZXJ5IGl0ZXJhdGlvbj8N
+Cg0KQ29uY2x1ZGluZywgaXQgc2VlbXMgcmVhc29uYWJsZSB0byBpbnN0cnVjdCBhcHBsaWNhdGlv
+bnMgdXNpbmcgU1FQT0xMIHRvDQpzdWJtaXQgU1FFcyB1bnRpbCB0aGUgcXVldWUgaXMgZnVsbCwg
+YW5kIHRoZW4gY2FsbCBpb191cmluZ19lbnRlcigpLA0KcHJvYmFibHkgd2l0aCBzb21lIGZsYWcs
+IHRvIHdhaXQgZm9yIGEgc2xvdCBpbiBzdWJtaXNzaW9uIHF1ZXVlLCBub3QgZm9yDQpjb21wbGV0
+aW9ucywgc2luY2UNCjEpIFRpbWUgbmVlZGVkIHRvIGNvbXBsZXRlIElPIHRlbmRzIHRvIGJlIG11
+Y2ggZ3JlYXRlciB0aGFuIHRpbWUgbmVlZGVkDQogICB0byBzdWJtaXQgaXQuDQoyKSBDUSByaW5n
+IGNvbXBsZXRpb24gZG9lcyBub3QgaW1wbHkgdGhlIHNsb3QgYmVjYW1lIGF2YWlsYWJsZSBpbiBT
+USAoc2VlDQogICBkaWFncmFtIGFib3ZlKS4NCjMpIEJ1c3kgd2FpdGluZyBvZiBzdWJtaXR0aW5n
+IHRocmVhZCBpcyBwcm9iYWJseSBub3Qgd2hhdCBpcyBkZXNpcmVkIGJ5DQogICBTUVBPTEwgdXNl
+cnMuDQoNClNpZGUgbm90ZTogZXZlbnRsb29wLWRyaXZlbiBhcHBsaWNhdGlvbnMgY291bGQgZmlu
+ZCB0aGVtc2VsdmVzIGNvbWZvcnRlZA0KYnkgZXBvbGwoKS1pbmcgaW9yaW5nIGZkIHdpdGggRVBP
+TExPVVQgdG8gd2FpdCBmb3IgdGhlIGF2YWlsYWJsZSBlbnRyeSBpbg0KU1EuIERvIEkgdW5kZXJz
+dGFuZCBpdCBjb3JyZWN0bHkgdGhhdCBzcHVyaW91cyB3YWtldXBzIGFyZSBjdXJyZW50bHkNCnBv
+c3NpYmxlIHNpbmNlIGlvX3VyaW5nX3BvbGwoKSBpcyBhd2FrZW5lZCBvbmx5IG9uIGlvX2NvbW1p
+dF9jcXJpbmcoKSwNCndoaWNoLCBhcyBzaG93biBhYm92ZSwgZG9lc24ndCBndWFyYW50ZWUgdGhh
+dCBFUE9MTE9VVCBtYXkgYmUgc2V0Pw0KDQpUaGFuayB5b3UgYWdhaW4hDQpfXw0KQmVzdCByZWdh
+cmRzLA0KRmlsaXBwIE1pa29pYW4NCg0K
