@@ -3,26 +3,26 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 890AFC76191
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 07:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAFC6C76191
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 07:09:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2B24D20880
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 07:08:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A95ED20880
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 07:09:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726482AbfGRHIj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jul 2019 03:08:39 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56756 "EHLO mx1.suse.de"
+        id S1726513AbfGRHJC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jul 2019 03:09:02 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56806 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726383AbfGRHIj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jul 2019 03:08:39 -0400
+        id S1726383AbfGRHJC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Jul 2019 03:09:02 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 32F82ABC6;
-        Thu, 18 Jul 2019 07:08:38 +0000 (UTC)
-Date:   Thu, 18 Jul 2019 09:08:37 +0200
+        by mx1.suse.de (Postfix) with ESMTP id 1CE95ABC6;
+        Thu, 18 Jul 2019 07:09:01 +0000 (UTC)
+Date:   Thu, 18 Jul 2019 09:09:00 +0200
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 To:     Logan Gunthorpe <logang@deltatee.com>
 Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
@@ -30,16 +30,16 @@ Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         Michael Moese <mmoese@suse.de>, Theodore Ts'o <tytso@mit.edu>,
         Stephen Bates <sbates@raithlin.com>
-Subject: Re: [PATCH blktests v2 11/12] common: Use sysfs instead of modinfo
- for _have_module_param()
-Message-ID: <20190718070837.GK15760@x250.microfocus.com>
+Subject: Re: [PATCH blktests v2 12/12] nvme: Ignore errors when removing
+ modules
+Message-ID: <20190718070900.GL15760@x250.microfocus.com>
 References: <20190717171259.3311-1-logang@deltatee.com>
- <20190717171259.3311-12-logang@deltatee.com>
+ <20190717171259.3311-13-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190717171259.3311-12-logang@deltatee.com>
+In-Reply-To: <20190717171259.3311-13-logang@deltatee.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
