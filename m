@@ -6,23 +6,23 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F38C76191
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 07:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 945DCC76191
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 07:04:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 21DC221019
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 07:04:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74DDA21019
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 07:04:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726482AbfGRHEU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jul 2019 03:04:20 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55882 "EHLO mx1.suse.de"
+        id S1726397AbfGRHEt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jul 2019 03:04:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55962 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726386AbfGRHEU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jul 2019 03:04:20 -0400
+        id S1726386AbfGRHEs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Jul 2019 03:04:48 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 1D256AD35;
-        Thu, 18 Jul 2019 07:04:19 +0000 (UTC)
-Date:   Thu, 18 Jul 2019 09:04:18 +0200
+        by mx1.suse.de (Postfix) with ESMTP id 6E88BAD35;
+        Thu, 18 Jul 2019 07:04:47 +0000 (UTC)
+Date:   Thu, 18 Jul 2019 09:04:47 +0200
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 To:     Logan Gunthorpe <logang@deltatee.com>
 Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
@@ -30,16 +30,16 @@ Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         Michael Moese <mmoese@suse.de>, Theodore Ts'o <tytso@mit.edu>,
         Stephen Bates <sbates@raithlin.com>
-Subject: Re: [PATCH blktests v2 05/12] nvme/005: Don't rely on modprobing to
- set the multipath paramater
-Message-ID: <20190718070418.GE15760@x250.microfocus.com>
+Subject: Re: [PATCH blktests v2 06/12] nvme/015: Ensure the namespace is
+ flushed not the char device
+Message-ID: <20190718070447.GF15760@x250.microfocus.com>
 References: <20190717171259.3311-1-logang@deltatee.com>
- <20190717171259.3311-6-logang@deltatee.com>
+ <20190717171259.3311-7-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190717171259.3311-6-logang@deltatee.com>
+In-Reply-To: <20190717171259.3311-7-logang@deltatee.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -47,7 +47,7 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Looks good,
-eviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
 Johannes Thumshirn                            SUSE Labs Filesystems
 jthumshirn@suse.de                                +49 911 74053 689
