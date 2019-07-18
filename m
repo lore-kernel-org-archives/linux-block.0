@@ -2,111 +2,109 @@ Return-Path: <SRS0=jAbK=VP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AA02C76191
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 13:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BDCC7618F
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 14:52:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 22F7B217F4
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 13:59:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563458361;
-	bh=L4yAaascoYhpqh8x2UbwZPouQnIJwaSBPbDdsN9uRjI=;
-	h=Date:From:To:Subject:References:In-Reply-To:List-ID:From;
-	b=QLxgtYp8wohqCy+p9mXSG/9chSVmWYqkcCwPIMbG92VrZXsTbGfyCDO1aoEJyBIWc
-	 gIRy5AGRN/pAhNuUQxIF19MJfFspdAyCvUxZtpXxlVd7iqODOBx3uCR6j7DQl2vg9l
-	 t/9F/gAPWFV3SUpvYxCg8/ZOJFMRXCgVyHBIBVi8=
+	by mail.kernel.org (Postfix) with ESMTP id BDCA921850
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jul 2019 14:52:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727733AbfGRN7U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jul 2019 09:59:20 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:37325 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726608AbfGRN7U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jul 2019 09:59:20 -0400
-Received: by mail-pl1-f193.google.com with SMTP id b3so13946659plr.4;
-        Thu, 18 Jul 2019 06:59:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=NUBO4YCRDgiN4UTvulVlnqUREX1vo2A5l3XRIoGqGME=;
-        b=HB2wxzPrDEbYvHZRxbCo9QRYUEqFFdl/rLdSPDNQYHaEXWjZkxMi5D3ZDvSHU+GimH
-         SjcBOAyXrOFaRY0/xrjsItgWCiNyLkHR22zMFkHeN5NIyS9rLfXrSGDxiRtB3m76QUSe
-         /zMrEvjf8vwCUkix56WOcpeoCu3cMSS8jTI5uDV9f7v2E+6pf01BfrasSPbmS1t2lb0d
-         jIylXQGdbBV6wsnHLlR0FIX4ZevsifJ+0fXpE9MeaNqosdEUDzHJZmINobNAcB5l20d8
-         C+arXOCsEGPjD+C3b/NqjC0jhOHPsaVVIwQx0NzkHOVSIdU5STuQzJ1UChfJRB7Mhe9y
-         dbyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=NUBO4YCRDgiN4UTvulVlnqUREX1vo2A5l3XRIoGqGME=;
-        b=fvSLcgTL6BK0k1H/x/TiRCGME4y7Iyd9IVib1+OC6syqTdV0V+SUYR3nJ3DyMck3yL
-         hM2K2Vm6C7ScTh4Q6bdHrHFHIYKJpqKiNwCQYdF8OBs3PMPnKvmB3ts4XyTaHAVL2Kvl
-         v8LwWulHa898iuwetIcv0LpsUUGFc2VkLvXVI5GeU0Y7kFtOe3h3iF4nFthyD+mJiCoG
-         VcNYxiAzjetfi2xptnpNV4awsOhPijoZkrA+QseDB9HxH/wwAY4N7NlzU0GM9DKJRorZ
-         ijRc8hnAJY0FblhLbuO+uC8EadoR2425nXSahTVQj/q34bP3N+gXIAxufzcVN8BT0CSC
-         s4cA==
-X-Gm-Message-State: APjAAAWOWIHuHTuH8YGMEYDqlPo5CTeChBzcemrS5rdqU4NbYTHCU1tI
-        pgM6o+eGGnVpNbX9+mxV5s8=
-X-Google-Smtp-Source: APXvYqx173fSB7lx9dKAPXlsiipxa5JyR/hpYuhUgImVW+wGnZmLIzDlKvpQwh4ZL+yVrTeDqFz9yg==
-X-Received: by 2002:a17:902:5c3:: with SMTP id f61mr46783088plf.98.1563458359244;
-        Thu, 18 Jul 2019 06:59:19 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::3:ef9b])
-        by smtp.gmail.com with ESMTPSA id e11sm33141264pfm.35.2019.07.18.06.59.18
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Jul 2019 06:59:18 -0700 (PDT)
-Date:   Thu, 18 Jul 2019 06:59:16 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, hch@lst.de, bvanassche@acm.org,
-        keith.busch@intel.com, minwoo.im.dev@gmail.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v3 1/5] block: add weighted round robin for blkcgroup
-Message-ID: <20190718135916.GC696309@devbig004.ftw2.facebook.com>
-References: <cover.1561385989.git.zhangweiping@didiglobal.com>
- <1333161d2c64dbe93f9dcd0814ffaf6d00216d58.1561385989.git.zhangweiping@didiglobal.com>
+        id S1727931AbfGROwM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jul 2019 10:52:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47368 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727685AbfGROwM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Jul 2019 10:52:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A9918308338F;
+        Thu, 18 Jul 2019 14:52:11 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6953A4E6D2;
+        Thu, 18 Jul 2019 14:52:02 +0000 (UTC)
+Date:   Thu, 18 Jul 2019 10:52:01 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, "Ewan D . Milne" <emilne@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] blk-mq: add callback of .cleanup_rq
+Message-ID: <20190718145201.GA2305@redhat.com>
+References: <20190718032519.28306-1-ming.lei@redhat.com>
+ <20190718032519.28306-2-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1333161d2c64dbe93f9dcd0814ffaf6d00216d58.1561385989.git.zhangweiping@didiglobal.com>
+In-Reply-To: <20190718032519.28306-2-ming.lei@redhat.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Thu, 18 Jul 2019 14:52:12 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Weiping.
+On Wed, Jul 17 2019 at 11:25pm -0400,
+Ming Lei <ming.lei@redhat.com> wrote:
 
-On Mon, Jun 24, 2019 at 10:28:51PM +0800, Weiping Zhang wrote:
-> +static const char *blk_wrr_name[BLK_WRR_COUNT] = {
-> +	[BLK_WRR_NONE]		= "none",
-> +	[BLK_WRR_LOW]		= "low",
-> +	[BLK_WRR_MEDIUM]	= "medium",
-> +	[BLK_WRR_HIGH]		= "high",
-> +	[BLK_WRR_URGENT]	= "urgent",
-> +};
+> dm-rq needs to free request which has been dispatched and not completed
+> by underlying queue. However, the underlying queue may have allocated
+> private stuff for this request in .queue_rq(), so dm-rq will leak the
+> request private part.
 
-cgroup controllers must be fully hierarchical which the proposed
-implementation isn't.  While it can be made hierarchical, there's only
-so much one can do if there are only five priority levels.
+No, SCSI (and blk-mq) will leak.  DM doesn't know anything about the
+internal memory SCSI uses.  That memory is a SCSI implementation detail.
 
-Can you please take a look at the following?
+Please fix header to properly reflect which layer is doing the leaking.
 
-  http://lkml.kernel.org/r/20190710205128.1316483-1-tj@kernel.org
+> Add one new callback of .cleanup_rq() to fix the memory leak issue.
+> 
+> Another use case is to free request when the hctx is dead during
+> cpu hotplug context.
+> 
+> Cc: Ewan D. Milne <emilne@redhat.com>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Cc: dm-devel@redhat.com
+> Cc: <stable@vger.kernel.org>
+> Fixes: 396eaf21ee17 ("blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/md/dm-rq.c     |  1 +
+>  include/linux/blk-mq.h | 13 +++++++++++++
+>  2 files changed, 14 insertions(+)
+> 
+> diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+> index c9e44ac1f9a6..21d5c1784d0c 100644
+> --- a/drivers/md/dm-rq.c
+> +++ b/drivers/md/dm-rq.c
+> @@ -408,6 +408,7 @@ static int map_request(struct dm_rq_target_io *tio)
+>  		ret = dm_dispatch_clone_request(clone, rq);
+>  		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
+>  			blk_rq_unprep_clone(clone);
+> +			blk_mq_cleanup_rq(clone);
+>  			tio->ti->type->release_clone_rq(clone, &tio->info);
+>  			tio->clone = NULL;
+>  			return DM_MAPIO_REQUEUE;
 
-In comparison, I'm having a bit of hard time seeing the benefits of
-this approach.  In addition to the finite level limitation, the actual
-WRR behavior would be device dependent and what each level means is
-likely to fluctuate depending on the workload and device model.
+Requiring upper layer driver (dm-rq) to explicitly call blk_mq_cleanup_rq() 
+seems wrong.  In this instance tio->ti->type->release_clone_rq()
+(dm-mpath's multipath_release_clone) calls blk_put_request().  Why can't
+blk_put_request(), or blk_mq_free_request(), call blk_mq_cleanup_rq()?
 
-I wonder whether WRR is something more valuable to help internal queue
-management rather than being exposed to userspace directly.
+Not looked at the cpu hotplug case you mention, but my naive thought is
+it'd be pretty weird to also sprinkle a call to blk_mq_cleanup_rq() from
+that specific "dead hctx" code path.
 
-Thanks.
-
--- 
-tejun
+Mike
