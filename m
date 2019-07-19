@@ -2,139 +2,107 @@ Return-Path: <SRS0=PH3O=VQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1EE4C7618F
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 01:36:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF5EEC76196
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 04:20:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AFA522173B
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 01:36:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 800502082F
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 04:20:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1563510002;
+	bh=jNIFKjZHxKkIsndmhUja/7mPzA7vtoEBNyrYHMQ5Zgw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=GOE+HXbFi7Hex4e0MxCrWN4TQcsqwCU3cyTE8CqV4ivdLHSN5VCNnLYWX8hcI+pYW
+	 ucB6zz/BN1j7OusX22SHeLJHfMFBuPBbl+xCuNX77jGnEXJ9iNgFeYNV37hSbDghu3
+	 veh+2RTMGCHimLFEUKI2s1FfAef8nd6qwNBgNnp4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726112AbfGSBgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jul 2019 21:36:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37610 "EHLO mx1.redhat.com"
+        id S2387709AbfGSEMt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jul 2019 00:12:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48302 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726015AbfGSBgM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jul 2019 21:36:12 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S2387639AbfGSEMs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Jul 2019 00:12:48 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 43972C0A4F49;
-        Fri, 19 Jul 2019 01:36:11 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EE9D360CD7;
-        Fri, 19 Jul 2019 01:35:53 +0000 (UTC)
-Date:   Fri, 19 Jul 2019 09:35:47 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        by mail.kernel.org (Postfix) with ESMTPSA id 5CFB1218D1;
+        Fri, 19 Jul 2019 04:12:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1563509568;
+        bh=jNIFKjZHxKkIsndmhUja/7mPzA7vtoEBNyrYHMQ5Zgw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=iMrKOoGkHzvyhwFyRNZtHS9PPLiLOQZOUFJb0rB9itk8oul3UdIYdxzWQmTTM9sr7
+         fXi7XfhOw32lF81SXQj0h/Feokk5ULfsUUr1wtcbaAFJ0buCxRfqNlaRFRHoYaC3no
+         13so0BtoNosAdeOE+dMIOcjki3GXRlHfXca0iFkk=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Wenwen Wang <wenwen@cs.uga.edu>, Ming Lei <ming.lei@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, "Ewan D . Milne" <emilne@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] blk-mq: add callback of .cleanup_rq
-Message-ID: <20190719013546.GA12004@ming.t460p>
-References: <20190718032519.28306-1-ming.lei@redhat.com>
- <20190718032519.28306-2-ming.lei@redhat.com>
- <20190718145201.GA2305@redhat.com>
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 53/60] block/bio-integrity: fix a memory leak bug
+Date:   Fri, 19 Jul 2019 00:11:02 -0400
+Message-Id: <20190719041109.18262-53-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190719041109.18262-1-sashal@kernel.org>
+References: <20190719041109.18262-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190718145201.GA2305@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Fri, 19 Jul 2019 01:36:11 +0000 (UTC)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 18, 2019 at 10:52:01AM -0400, Mike Snitzer wrote:
-> On Wed, Jul 17 2019 at 11:25pm -0400,
-> Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> > dm-rq needs to free request which has been dispatched and not completed
-> > by underlying queue. However, the underlying queue may have allocated
-> > private stuff for this request in .queue_rq(), so dm-rq will leak the
-> > request private part.
-> 
-> No, SCSI (and blk-mq) will leak.  DM doesn't know anything about the
-> internal memory SCSI uses.  That memory is a SCSI implementation detail.
+From: Wenwen Wang <wenwen@cs.uga.edu>
 
-It isn't noting to do with dm-rq, which frees one request after BLK_STS_*RESOURCE
-is returned from blk_insert_cloned_request(), in this case it has to be
-the user for releasing the request private data.
+[ Upstream commit e7bf90e5afe3aa1d1282c1635a49e17a32c4ecec ]
 
-> 
-> Please fix header to properly reflect which layer is doing the leaking.
+In bio_integrity_prep(), a kernel buffer is allocated through kmalloc() to
+hold integrity metadata. Later on, the buffer will be attached to the bio
+structure through bio_integrity_add_page(), which returns the number of
+bytes of integrity metadata attached. Due to unexpected situations,
+bio_integrity_add_page() may return 0. As a result, bio_integrity_prep()
+needs to be terminated with 'false' returned to indicate this error.
+However, the allocated kernel buffer is not freed on this execution path,
+leading to a memory leak.
 
-Fine.
+To fix this issue, free the allocated buffer before returning from
+bio_integrity_prep().
 
-> 
-> > Add one new callback of .cleanup_rq() to fix the memory leak issue.
-> > 
-> > Another use case is to free request when the hctx is dead during
-> > cpu hotplug context.
-> > 
-> > Cc: Ewan D. Milne <emilne@redhat.com>
-> > Cc: Bart Van Assche <bvanassche@acm.org>
-> > Cc: Hannes Reinecke <hare@suse.com>
-> > Cc: Christoph Hellwig <hch@lst.de>
-> > Cc: Mike Snitzer <snitzer@redhat.com>
-> > Cc: dm-devel@redhat.com
-> > Cc: <stable@vger.kernel.org>
-> > Fixes: 396eaf21ee17 ("blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback")
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/md/dm-rq.c     |  1 +
-> >  include/linux/blk-mq.h | 13 +++++++++++++
-> >  2 files changed, 14 insertions(+)
-> > 
-> > diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-> > index c9e44ac1f9a6..21d5c1784d0c 100644
-> > --- a/drivers/md/dm-rq.c
-> > +++ b/drivers/md/dm-rq.c
-> > @@ -408,6 +408,7 @@ static int map_request(struct dm_rq_target_io *tio)
-> >  		ret = dm_dispatch_clone_request(clone, rq);
-> >  		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
-> >  			blk_rq_unprep_clone(clone);
-> > +			blk_mq_cleanup_rq(clone);
-> >  			tio->ti->type->release_clone_rq(clone, &tio->info);
-> >  			tio->clone = NULL;
-> >  			return DM_MAPIO_REQUEUE;
-> 
-> Requiring upper layer driver (dm-rq) to explicitly call blk_mq_cleanup_rq() 
-> seems wrong.  In this instance tio->ti->type->release_clone_rq()
-> (dm-mpath's multipath_release_clone) calls blk_put_request().  Why can't
-> blk_put_request(), or blk_mq_free_request(), call blk_mq_cleanup_rq()?
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/bio-integrity.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-I did think about doing it in blk_put_request(), and I just want to
-avoid the little cost in generic fast path, given freeing request after
-dispatch is very unusual, so far only nvme multipath and dm-rq did in
-that way.
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 5df32907ff3b..7f8010662437 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -313,8 +313,12 @@ bool bio_integrity_prep(struct bio *bio)
+ 		ret = bio_integrity_add_page(bio, virt_to_page(buf),
+ 					     bytes, offset);
+ 
+-		if (ret == 0)
+-			return false;
++		if (ret == 0) {
++			printk(KERN_ERR "could not attach integrity payload\n");
++			kfree(buf);
++			status = BLK_STS_RESOURCE;
++			goto err_end_io;
++		}
+ 
+ 		if (ret < bytes)
+ 			break;
+-- 
+2.20.1
 
-However, if no one objects to move blk_mq_cleanup_rq() to blk_put_request()
-or blk_mq_free_request(), I am fine to do that in V2.
-
-> 
-> Not looked at the cpu hotplug case you mention, but my naive thought is
-> it'd be pretty weird to also sprinkle a call to blk_mq_cleanup_rq() from
-> that specific "dead hctx" code path.
-
-It isn't weird, and it is exactly what NVMe multipath is doing, please see
-nvme_failover_req(). And it is just that nvme doesn't allocate request
-private data.
-
-Wrt. blk-mq cpu hotplug handling: after one hctx is dead, we can't dispatch
-request to this hctx any more, however one request has been bounded to its
-hctx since its allocation and the association can't(or quite hard to) be
-changed any more, do you have any better idea to deal with this issue?
-
-
-Thanks,
-Ming
