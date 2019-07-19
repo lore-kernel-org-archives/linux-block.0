@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF5EEC76196
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 04:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A04DC76196
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 04:23:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 800502082F
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 04:20:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD8F62173B
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 04:23:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563510002;
-	bh=jNIFKjZHxKkIsndmhUja/7mPzA7vtoEBNyrYHMQ5Zgw=;
+	s=default; t=1563510205;
+	bh=Squpm5wiFhJ7jYX3tobIsYEcUfe7On3sn+I53JoOGrY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=GOE+HXbFi7Hex4e0MxCrWN4TQcsqwCU3cyTE8CqV4ivdLHSN5VCNnLYWX8hcI+pYW
-	 ucB6zz/BN1j7OusX22SHeLJHfMFBuPBbl+xCuNX77jGnEXJ9iNgFeYNV37hSbDghu3
-	 veh+2RTMGCHimLFEUKI2s1FfAef8nd6qwNBgNnp4=
+	b=aBy6iOTqg4sWqSJvK41d6bnsXtSyiyBL2BaFl0AtEAJ0Uap6GplIbBAQ5bdLiMwCO
+	 0FxqnabA1AaDrj55VucBV0M9mXlxWCxCax3a7IYpAsw8vYnWb235tTmeIcLVYP/tRv
+	 6QQoc9e7A1br53lvsYG0gHS6GrUFYpGVzcWlNsQY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387709AbfGSEMt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jul 2019 00:12:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48302 "EHLO mail.kernel.org"
+        id S2387430AbfGSEXX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jul 2019 00:23:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45128 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387639AbfGSEMs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jul 2019 00:12:48 -0400
+        id S2388044AbfGSEKY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Jul 2019 00:10:24 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5CFB1218D1;
-        Fri, 19 Jul 2019 04:12:47 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 438CC218B6;
+        Fri, 19 Jul 2019 04:10:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563509568;
-        bh=jNIFKjZHxKkIsndmhUja/7mPzA7vtoEBNyrYHMQ5Zgw=;
+        s=default; t=1563509424;
+        bh=Squpm5wiFhJ7jYX3tobIsYEcUfe7On3sn+I53JoOGrY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=iMrKOoGkHzvyhwFyRNZtHS9PPLiLOQZOUFJb0rB9itk8oul3UdIYdxzWQmTTM9sr7
-         fXi7XfhOw32lF81SXQj0h/Feokk5ULfsUUr1wtcbaAFJ0buCxRfqNlaRFRHoYaC3no
-         13so0BtoNosAdeOE+dMIOcjki3GXRlHfXca0iFkk=
+        b=0UQJzw86fxWVI85OcqdNdbY67V6uZZmqcw5uqIPs320oyG0F3TKuL+dlV4eGT0sw4
+         HGlyz3ObNOlq2V8EVNOffiDgyMdZjuJq/J4WbSlLrN7vxic9ZJYbkKVyA0kPISPiGk
+         b2RQVa8GRiOaCGuBhL9amJ/pVaYIij/wStcvMPfg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Wenwen Wang <wenwen@cs.uga.edu>, Ming Lei <ming.lei@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 53/60] block/bio-integrity: fix a memory leak bug
-Date:   Fri, 19 Jul 2019 00:11:02 -0400
-Message-Id: <20190719041109.18262-53-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 086/101] block/bio-integrity: fix a memory leak bug
+Date:   Fri, 19 Jul 2019 00:07:17 -0400
+Message-Id: <20190719040732.17285-86-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190719041109.18262-1-sashal@kernel.org>
-References: <20190719041109.18262-1-sashal@kernel.org>
+In-Reply-To: <20190719040732.17285-1-sashal@kernel.org>
+References: <20190719040732.17285-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -85,10 +85,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 5df32907ff3b..7f8010662437 100644
+index 67b5fb861a51..5bd90cd4b51e 100644
 --- a/block/bio-integrity.c
 +++ b/block/bio-integrity.c
-@@ -313,8 +313,12 @@ bool bio_integrity_prep(struct bio *bio)
+@@ -291,8 +291,12 @@ bool bio_integrity_prep(struct bio *bio)
  		ret = bio_integrity_add_page(bio, virt_to_page(buf),
  					     bytes, offset);
  
