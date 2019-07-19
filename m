@@ -2,178 +2,151 @@ Return-Path: <SRS0=PH3O=VQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D11BBC76188
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 04:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EF1FC76195
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 12:27:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A8F4E2173B
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 04:35:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563510929;
-	bh=XCD9iVH2VFQCkF776NAHQBSgULYTtbS4COICYJp0DIg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=1GoikHw5JOJzDIHA5OS0bGWkuVLv025mJBAR2yVzSyF+9bk2Eh2sCJIuzSnuIbQdW
-	 d8WK3ANaHEadLCg/6ZKX8b7e90aS2t/v2h96yAWSckOXjpjqK7mO8Seh5Sg3hyrqx3
-	 vB4fao+fENX9uE+8YXjPNgY7jW2WDrqf69n/bUYY=
+	by mail.kernel.org (Postfix) with ESMTP id E727321851
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 12:27:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729310AbfGSEfW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jul 2019 00:35:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33204 "EHLO mail.kernel.org"
+        id S1727559AbfGSM1B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jul 2019 08:27:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57412 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729449AbfGSEB2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jul 2019 00:01:28 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1727552AbfGSM1B (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Jul 2019 08:27:01 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B653A21851;
-        Fri, 19 Jul 2019 04:01:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563508887;
-        bh=XCD9iVH2VFQCkF776NAHQBSgULYTtbS4COICYJp0DIg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Ml7VersReUCqZft+LtcmO5TIJmixdPe/Tq5i+ugLuI8y4BAEp85M3fzdEVxsW/xhj
-         baoRQDPjWZxmeFCGCcdZGzPpzAar766V+GbSv+Fh/S+vQ0DOH3K8O5Xe1pW1HzHlYJ
-         EKk2XRYi/RFF4UQbsmBXGXL0tB2d643wU3Ojv3yA=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jackie Liu <liuyun01@kylinos.cn>,
-        syzbot+94324416c485d422fe15@syzkaller.appspotmail.com,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 138/171] io_uring: fix io_sq_thread_stop running in front of io_sq_thread
-Date:   Thu, 18 Jul 2019 23:56:09 -0400
-Message-Id: <20190719035643.14300-138-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190719035643.14300-1-sashal@kernel.org>
-References: <20190719035643.14300-1-sashal@kernel.org>
+        by mx1.redhat.com (Postfix) with ESMTPS id 236F53086258;
+        Fri, 19 Jul 2019 12:27:00 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 807A61001B14;
+        Fri, 19 Jul 2019 12:26:55 +0000 (UTC)
+Date:   Fri, 19 Jul 2019 08:26:54 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, "Ewan D . Milne" <emilne@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] blk-mq: add callback of .cleanup_rq
+Message-ID: <20190719122654.GA7339@redhat.com>
+References: <20190718032519.28306-1-ming.lei@redhat.com>
+ <20190718032519.28306-2-ming.lei@redhat.com>
+ <20190718145201.GA2305@redhat.com>
+ <20190719013546.GA12004@ming.t460p>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190719013546.GA12004@ming.t460p>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Fri, 19 Jul 2019 12:27:00 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jackie Liu <liuyun01@kylinos.cn>
+On Thu, Jul 18 2019 at  9:35pm -0400,
+Ming Lei <ming.lei@redhat.com> wrote:
 
-[ Upstream commit a4c0b3decb33fb4a2b5ecc6234a50680f0b21e7d ]
+> On Thu, Jul 18, 2019 at 10:52:01AM -0400, Mike Snitzer wrote:
+> > On Wed, Jul 17 2019 at 11:25pm -0400,
+> > Ming Lei <ming.lei@redhat.com> wrote:
+> > 
+> > > dm-rq needs to free request which has been dispatched and not completed
+> > > by underlying queue. However, the underlying queue may have allocated
+> > > private stuff for this request in .queue_rq(), so dm-rq will leak the
+> > > request private part.
+> > 
+> > No, SCSI (and blk-mq) will leak.  DM doesn't know anything about the
+> > internal memory SCSI uses.  That memory is a SCSI implementation detail.
+> 
+> It isn't noting to do with dm-rq, which frees one request after BLK_STS_*RESOURCE
+> is returned from blk_insert_cloned_request(), in this case it has to be
+> the user for releasing the request private data.
+> 
+> > 
+> > Please fix header to properly reflect which layer is doing the leaking.
+> 
+> Fine.
+> 
+> > 
+> > > Add one new callback of .cleanup_rq() to fix the memory leak issue.
+> > > 
+> > > Another use case is to free request when the hctx is dead during
+> > > cpu hotplug context.
+> > > 
+> > > Cc: Ewan D. Milne <emilne@redhat.com>
+> > > Cc: Bart Van Assche <bvanassche@acm.org>
+> > > Cc: Hannes Reinecke <hare@suse.com>
+> > > Cc: Christoph Hellwig <hch@lst.de>
+> > > Cc: Mike Snitzer <snitzer@redhat.com>
+> > > Cc: dm-devel@redhat.com
+> > > Cc: <stable@vger.kernel.org>
+> > > Fixes: 396eaf21ee17 ("blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback")
+> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > ---
+> > >  drivers/md/dm-rq.c     |  1 +
+> > >  include/linux/blk-mq.h | 13 +++++++++++++
+> > >  2 files changed, 14 insertions(+)
+> > > 
+> > > diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+> > > index c9e44ac1f9a6..21d5c1784d0c 100644
+> > > --- a/drivers/md/dm-rq.c
+> > > +++ b/drivers/md/dm-rq.c
+> > > @@ -408,6 +408,7 @@ static int map_request(struct dm_rq_target_io *tio)
+> > >  		ret = dm_dispatch_clone_request(clone, rq);
+> > >  		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
+> > >  			blk_rq_unprep_clone(clone);
+> > > +			blk_mq_cleanup_rq(clone);
+> > >  			tio->ti->type->release_clone_rq(clone, &tio->info);
+> > >  			tio->clone = NULL;
+> > >  			return DM_MAPIO_REQUEUE;
+> > 
+> > Requiring upper layer driver (dm-rq) to explicitly call blk_mq_cleanup_rq() 
+> > seems wrong.  In this instance tio->ti->type->release_clone_rq()
+> > (dm-mpath's multipath_release_clone) calls blk_put_request().  Why can't
+> > blk_put_request(), or blk_mq_free_request(), call blk_mq_cleanup_rq()?
+> 
+> I did think about doing it in blk_put_request(), and I just want to
+> avoid the little cost in generic fast path, given freeing request after
+> dispatch is very unusual, so far only nvme multipath and dm-rq did in
+> that way.
+> 
+> However, if no one objects to move blk_mq_cleanup_rq() to blk_put_request()
+> or blk_mq_free_request(), I am fine to do that in V2.
 
-INFO: task syz-executor.5:8634 blocked for more than 143 seconds.
-       Not tainted 5.2.0-rc5+ #3
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-syz-executor.5  D25632  8634   8224 0x00004004
-Call Trace:
-  context_switch kernel/sched/core.c:2818 [inline]
-  __schedule+0x658/0x9e0 kernel/sched/core.c:3445
-  schedule+0x131/0x1d0 kernel/sched/core.c:3509
-  schedule_timeout+0x9a/0x2b0 kernel/time/timer.c:1783
-  do_wait_for_common+0x35e/0x5a0 kernel/sched/completion.c:83
-  __wait_for_common kernel/sched/completion.c:104 [inline]
-  wait_for_common kernel/sched/completion.c:115 [inline]
-  wait_for_completion+0x47/0x60 kernel/sched/completion.c:136
-  kthread_stop+0xb4/0x150 kernel/kthread.c:559
-  io_sq_thread_stop fs/io_uring.c:2252 [inline]
-  io_finish_async fs/io_uring.c:2259 [inline]
-  io_ring_ctx_free fs/io_uring.c:2770 [inline]
-  io_ring_ctx_wait_and_kill+0x268/0x880 fs/io_uring.c:2834
-  io_uring_release+0x5d/0x70 fs/io_uring.c:2842
-  __fput+0x2e4/0x740 fs/file_table.c:280
-  ____fput+0x15/0x20 fs/file_table.c:313
-  task_work_run+0x17e/0x1b0 kernel/task_work.c:113
-  tracehook_notify_resume include/linux/tracehook.h:185 [inline]
-  exit_to_usermode_loop arch/x86/entry/common.c:168 [inline]
-  prepare_exit_to_usermode+0x402/0x4f0 arch/x86/entry/common.c:199
-  syscall_return_slowpath+0x110/0x440 arch/x86/entry/common.c:279
-  do_syscall_64+0x126/0x140 arch/x86/entry/common.c:304
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x412fb1
-Code: 80 3b 7c 0f 84 c7 02 00 00 c7 85 d0 00 00 00 00 00 00 00 48 8b 05 cf
-a6 24 00 49 8b 14 24 41 b9 cb 2a 44 00 48 89 ee 48 89 df <48> 85 c0 4c 0f
-45 c8 45 31 c0 31 c9 e8 0e 5b 00 00 85 c0 41 89 c7
-RSP: 002b:00007ffe7ee6a180 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 0000000000000004 RCX: 0000000000412fb1
-RDX: 0000001b2d920000 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 0000000000000001 R08: 00000000f3a3e1f8 R09: 00000000f3a3e1fc
-R10: 00007ffe7ee6a260 R11: 0000000000000293 R12: 000000000075c9a0
-R13: 000000000075c9a0 R14: 0000000000024c00 R15: 000000000075bf2c
+Think it'd be a less fragile/nuanced way to extend the blk-mq
+interface.  Otherwise there is potential for other future drivers
+experiencing leaks.
 
-=============================================
+> > Not looked at the cpu hotplug case you mention, but my naive thought is
+> > it'd be pretty weird to also sprinkle a call to blk_mq_cleanup_rq() from
+> > that specific "dead hctx" code path.
+> 
+> It isn't weird, and it is exactly what NVMe multipath is doing, please see
+> nvme_failover_req(). And it is just that nvme doesn't allocate request
+> private data.
+> 
+> Wrt. blk-mq cpu hotplug handling: after one hctx is dead, we can't dispatch
+> request to this hctx any more, however one request has been bounded to its
+> hctx since its allocation and the association can't(or quite hard to) be
+> changed any more, do you have any better idea to deal with this issue?
 
-There is an wrong logic, when kthread_park running
-in front of io_sq_thread.
+No, as I prefaced before "Not looked at the cpu hotplug case you
+mention".  As such I should've stayed silent ;)
 
-CPU#0					CPU#1
+But my point was we should hook off current interfaces rather than rely
+on a new primary function call.
 
-io_sq_thread_stop:			int kthread(void *_create):
-
-kthread_park()
-					__kthread_parkme(self);	 <<< Wrong
-kthread_stop()
-    << wait for self->exited
-    << clear_bit KTHREAD_SHOULD_PARK
-
-					ret = threadfn(data);
-					   |
-					   |- io_sq_thread
-					       |- kthread_should_park()	<< false
-					       |- schedule() <<< nobody wake up
-
-stuck CPU#0				stuck CPU#1
-
-So, use a new variable sqo_thread_started to ensure that io_sq_thread
-run first, then io_sq_thread_stop.
-
-Reported-by: syzbot+94324416c485d422fe15@syzkaller.appspotmail.com
-Suggested-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/io_uring.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 4ef62a45045d..fef2cd44b2ac 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -231,6 +231,7 @@ struct io_ring_ctx {
- 	struct task_struct	*sqo_thread;	/* if using sq thread polling */
- 	struct mm_struct	*sqo_mm;
- 	wait_queue_head_t	sqo_wait;
-+	struct completion	sqo_thread_started;
- 
- 	struct {
- 		/* CQ ring */
-@@ -403,6 +404,7 @@ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
- 	ctx->flags = p->flags;
- 	init_waitqueue_head(&ctx->cq_wait);
- 	init_completion(&ctx->ctx_done);
-+	init_completion(&ctx->sqo_thread_started);
- 	mutex_init(&ctx->uring_lock);
- 	init_waitqueue_head(&ctx->wait);
- 	for (i = 0; i < ARRAY_SIZE(ctx->pending_async); i++) {
-@@ -2009,6 +2011,8 @@ static int io_sq_thread(void *data)
- 	unsigned inflight;
- 	unsigned long timeout;
- 
-+	complete(&ctx->sqo_thread_started);
-+
- 	old_fs = get_fs();
- 	set_fs(USER_DS);
- 
-@@ -2243,6 +2247,7 @@ static int io_sqe_files_unregister(struct io_ring_ctx *ctx)
- static void io_sq_thread_stop(struct io_ring_ctx *ctx)
- {
- 	if (ctx->sqo_thread) {
-+		wait_for_completion(&ctx->sqo_thread_started);
- 		/*
- 		 * The park is a bit of a work-around, without it we get
- 		 * warning spews on shutdown with SQPOLL set and affinity
--- 
-2.20.1
-
+Mike
