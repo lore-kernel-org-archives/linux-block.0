@@ -2,167 +2,139 @@ Return-Path: <SRS0=PH3O=VQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A794C7618F
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 00:44:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1EE4C7618F
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 01:36:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10D582173B
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 00:44:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFA522173B
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 01:36:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726028AbfGSAof convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jul 2019 20:44:35 -0400
-Received: from smtpbgbr2.qq.com ([54.207.22.56]:41254 "EHLO smtpbgbr2.qq.com"
+        id S1726112AbfGSBgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jul 2019 21:36:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37610 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726015AbfGSAof (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jul 2019 20:44:35 -0400
-X-QQ-mid: bizesmtp20t1563497067txkf3law
-Received: from [192.168.142.168] (unknown [218.76.23.26])
-        by esmtp6.qq.com (ESMTP) with 
-        id ; Fri, 19 Jul 2019 08:44:27 +0800 (CST)
-X-QQ-SSF: 00400000002000Q0WP70000A0000000
-X-QQ-FEAT: 3jlOKZxptE5LPSE/amu2+KmpbpefOI9Q2kwmWJVGsrejvt10kKAvrVg6l0ClB
-        xxDAN7XhSMuaNhuyvg2KCEFKM1+0b6u5yrPmfl7Ykm2e+O9eM/8iBnnBOe8s49u/z1uP3U7
-        BOGgHE529mQ0TncFqdzp0fpYEmDhgIArYGX5tXucoD5BODso3KQPtY+mWjHx+NkoFD8EFB2
-        suCMapaIB23Ixq17KrrF97lYaUr2ncy0OYTj52wll1XlgVFSUlvAaIoVwZ4ALYCIE0E6HJX
-        nr1i3SCvns9XSI69rsYtVAva2hLCkKqeixQi1DSNd0oaP132SoY/OWfNHbEsow7exnpdCEI
-        bkZTrd6Fy65cFlxaYQ=
-X-QQ-GoodBg: 2
-Content-Type: text/plain;
-        charset=gb2312
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [RFC PATCH] io_uring: add a memory barrier before atomic_read
-From:   Jackie Liu <liuyun01@kylinos.cn>
-In-Reply-To: <0c992e5e-e7f7-6b25-9347-04ec90e3e106@kernel.dk>
-Date:   Fri, 19 Jul 2019 08:44:27 +0800
-Cc:     =?gb2312?B?wfXV/dSq?= <liuzhengyuan@kylinos.cn>,
-        linux-block@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <1C57FBBB-1753-4C7C-8230-B569A98CF31D@kylinos.cn>
-References: <1563453840-19778-1-git-send-email-liuzhengyuan@kylinos.cn>
- <9b8f3de8-48c9-35e3-d985-00bad339b74d@kernel.dk>
- <0c992e5e-e7f7-6b25-9347-04ec90e3e106@kernel.dk>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign2
-X-QQ-Bgrelay: 1
+        id S1726015AbfGSBgM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Jul 2019 21:36:12 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 43972C0A4F49;
+        Fri, 19 Jul 2019 01:36:11 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EE9D360CD7;
+        Fri, 19 Jul 2019 01:35:53 +0000 (UTC)
+Date:   Fri, 19 Jul 2019 09:35:47 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, "Ewan D . Milne" <emilne@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] blk-mq: add callback of .cleanup_rq
+Message-ID: <20190719013546.GA12004@ming.t460p>
+References: <20190718032519.28306-1-ming.lei@redhat.com>
+ <20190718032519.28306-2-ming.lei@redhat.com>
+ <20190718145201.GA2305@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190718145201.GA2305@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Fri, 19 Jul 2019 01:36:11 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-> 在 2019年7月19日，00:43，Jens Axboe <axboe@kernel.dk> 写道：
+On Thu, Jul 18, 2019 at 10:52:01AM -0400, Mike Snitzer wrote:
+> On Wed, Jul 17 2019 at 11:25pm -0400,
+> Ming Lei <ming.lei@redhat.com> wrote:
 > 
-> On 7/18/19 9:41 AM, Jens Axboe wrote:
->> On 7/18/19 6:44 AM, Zhengyuan Liu wrote:
->>> There is a hang issue while using fio to do some basic test. The issue can
->>> been easily reproduced using bellow scripts:
->>> 
->>>          while true
->>>          do
->>>                  fio  --ioengine=io_uring  -rw=write -bs=4k -numjobs=1 \
->>>                       -size=1G -iodepth=64 -name=uring   --filename=/dev/zero
->>>          done
->>> 
->>> After serveral minutes, maybe more, fio would block at
->>> io_uring_enter->io_cqring_wait in order to waiting for previously committed
->>> sqes to be completed and cann't return to user anymore until we send a SIGTERM
->>> to fio. After got SIGTERM, fio turns to hang at io_ring_ctx_wait_and_kill with
->>> a backtrace like this:
->>> 
->>>          [54133.243816] Call Trace:
->>>          [54133.243842]  __schedule+0x3a0/0x790
->>>          [54133.243868]  schedule+0x38/0xa0
->>>          [54133.243880]  schedule_timeout+0x218/0x3b0
->>>          [54133.243891]  ? sched_clock+0x9/0x10
->>>          [54133.243903]  ? wait_for_completion+0xa3/0x130
->>>          [54133.243916]  ? _raw_spin_unlock_irq+0x2c/0x40
->>>          [54133.243930]  ? trace_hardirqs_on+0x3f/0xe0
->>>          [54133.243951]  wait_for_completion+0xab/0x130
->>>          [54133.243962]  ? wake_up_q+0x70/0x70
->>>          [54133.243984]  io_ring_ctx_wait_and_kill+0xa0/0x1d0
->>>          [54133.243998]  io_uring_release+0x20/0x30
->>>          [54133.244008]  __fput+0xcf/0x270
->>>          [54133.244029]  ____fput+0xe/0x10
->>>          [54133.244040]  task_work_run+0x7f/0xa0
->>>          [54133.244056]  do_exit+0x305/0xc40
->>>          [54133.244067]  ? get_signal+0x13b/0xbd0
->>>          [54133.244088]  do_group_exit+0x50/0xd0
->>>          [54133.244103]  get_signal+0x18d/0xbd0
->>>          [54133.244112]  ? _raw_spin_unlock_irqrestore+0x36/0x60
->>>          [54133.244142]  do_signal+0x34/0x720
->>>          [54133.244171]  ? exit_to_usermode_loop+0x7e/0x130
->>>          [54133.244190]  exit_to_usermode_loop+0xc0/0x130
->>>          [54133.244209]  do_syscall_64+0x16b/0x1d0
->>>          [54133.244221]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
->>> 
->>> The reason is that we had added a req to ctx->pending_async at the very end, but
->>> it got no chance to be processed anymore. How could this be happened?
->>> 
->>>          fio#cpu0                                        wq#cpu1
->>> 
->>>          io_add_to_prev_work                    io_sq_wq_submit_work
->>> 
->>>            atomic_read() <<< 1
->>> 
->>>                                                    atomic_dec_return() << 1->0
->>>                                                    list_empty();    <<< true;
->>> 
->>>            list_add_tail()
->>>            atomic_read() << 0 or 1?
->>> 
->>> As was said in atomic_ops.rst, atomic_read does not guarantee that the runtime
->>> initialization by any other thread is visible yet, so we must take care of that
->>> with a proper implicit or explicit memory barrier;
->> 
->> Thanks for looking at this and finding this issue, it does looks like a problem.
->> But I'm not sure about the fix. Shouldn't we just need an smp_mb__after_atomic()
->> on the atomic_dec_return() side of things? Like the below.
->> 
->> 
->> diff --git a/fs/io_uring.c b/fs/io_uring.c
->> index 5ec06e5ba0be..3c2a6f88a6b0 100644
->> --- a/fs/io_uring.c
->> +++ b/fs/io_uring.c
->> @@ -1881,6 +1881,7 @@ static void io_sq_wq_submit_work(struct work_struct *work)
->>  	 */
->>  	if (async_list) {
->>  		ret = atomic_dec_return(&async_list->cnt);
->> +		smp_mb__after_atomic();
->>  		while (!ret && !list_empty(&async_list->list)) {
->>  			spin_lock(&async_list->lock);
->>  			atomic_inc(&async_list->cnt);
->> @@ -1894,6 +1895,7 @@ static void io_sq_wq_submit_work(struct work_struct *work)
->>  				goto restart;
->>  			}
->>  			ret = atomic_dec_return(&async_list->cnt);
->> +			smp_mb__after_atomic();
->>  		}
->>  	}
->> 
->> 
+> > dm-rq needs to free request which has been dispatched and not completed
+> > by underlying queue. However, the underlying queue may have allocated
+> > private stuff for this request in .queue_rq(), so dm-rq will leak the
+> > request private part.
 > 
-> I don't think this is enough, I actually think your fix is the most
-> appropriate. I will apply it, thank you!
+> No, SCSI (and blk-mq) will leak.  DM doesn't know anything about the
+> internal memory SCSI uses.  That memory is a SCSI implementation detail.
+
+It isn't noting to do with dm-rq, which frees one request after BLK_STS_*RESOURCE
+is returned from blk_insert_cloned_request(), in this case it has to be
+the user for releasing the request private data.
+
 > 
+> Please fix header to properly reflect which layer is doing the leaking.
 
-Actually, although we can passed test use smp_mb(), but in the end we still do not
-understand where the race conditions are, could you explain it. If it is said as 
-Zhengyuan, because of atomic_read, I think we should only need smp_rmb. but failed.
-smp_rmb can't help us pass the test. At the same time, we have tried smp_wmb, failed too.
-it seems that only smp_mb works correctly.
+Fine.
 
-Is it because list_add_tail requires smp_wmb and atomic_read requires smp_rmb? 
+> 
+> > Add one new callback of .cleanup_rq() to fix the memory leak issue.
+> > 
+> > Another use case is to free request when the hctx is dead during
+> > cpu hotplug context.
+> > 
+> > Cc: Ewan D. Milne <emilne@redhat.com>
+> > Cc: Bart Van Assche <bvanassche@acm.org>
+> > Cc: Hannes Reinecke <hare@suse.com>
+> > Cc: Christoph Hellwig <hch@lst.de>
+> > Cc: Mike Snitzer <snitzer@redhat.com>
+> > Cc: dm-devel@redhat.com
+> > Cc: <stable@vger.kernel.org>
+> > Fixes: 396eaf21ee17 ("blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback")
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/md/dm-rq.c     |  1 +
+> >  include/linux/blk-mq.h | 13 +++++++++++++
+> >  2 files changed, 14 insertions(+)
+> > 
+> > diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+> > index c9e44ac1f9a6..21d5c1784d0c 100644
+> > --- a/drivers/md/dm-rq.c
+> > +++ b/drivers/md/dm-rq.c
+> > @@ -408,6 +408,7 @@ static int map_request(struct dm_rq_target_io *tio)
+> >  		ret = dm_dispatch_clone_request(clone, rq);
+> >  		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
+> >  			blk_rq_unprep_clone(clone);
+> > +			blk_mq_cleanup_rq(clone);
+> >  			tio->ti->type->release_clone_rq(clone, &tio->info);
+> >  			tio->clone = NULL;
+> >  			return DM_MAPIO_REQUEUE;
+> 
+> Requiring upper layer driver (dm-rq) to explicitly call blk_mq_cleanup_rq() 
+> seems wrong.  In this instance tio->ti->type->release_clone_rq()
+> (dm-mpath's multipath_release_clone) calls blk_put_request().  Why can't
+> blk_put_request(), or blk_mq_free_request(), call blk_mq_cleanup_rq()?
 
---
-Jackie Liu
+I did think about doing it in blk_put_request(), and I just want to
+avoid the little cost in generic fast path, given freeing request after
+dispatch is very unusual, so far only nvme multipath and dm-rq did in
+that way.
+
+However, if no one objects to move blk_mq_cleanup_rq() to blk_put_request()
+or blk_mq_free_request(), I am fine to do that in V2.
+
+> 
+> Not looked at the cpu hotplug case you mention, but my naive thought is
+> it'd be pretty weird to also sprinkle a call to blk_mq_cleanup_rq() from
+> that specific "dead hctx" code path.
+
+It isn't weird, and it is exactly what NVMe multipath is doing, please see
+nvme_failover_req(). And it is just that nvme doesn't allocate request
+private data.
+
+Wrt. blk-mq cpu hotplug handling: after one hctx is dead, we can't dispatch
+request to this hctx any more, however one request has been bounded to its
+hctx since its allocation and the association can't(or quite hard to) be
+changed any more, do you have any better idea to deal with this issue?
 
 
-
-
+Thanks,
+Ming
