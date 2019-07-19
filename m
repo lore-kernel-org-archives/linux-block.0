@@ -2,151 +2,117 @@ Return-Path: <SRS0=PH3O=VQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EF1FC76195
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 12:27:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0E1C76195
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 13:12:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E727321851
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 12:27:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E746920873
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jul 2019 13:12:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Eq21zHlT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727559AbfGSM1B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jul 2019 08:27:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57412 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727552AbfGSM1B (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jul 2019 08:27:01 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 236F53086258;
-        Fri, 19 Jul 2019 12:27:00 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 807A61001B14;
-        Fri, 19 Jul 2019 12:26:55 +0000 (UTC)
-Date:   Fri, 19 Jul 2019 08:26:54 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, "Ewan D . Milne" <emilne@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] blk-mq: add callback of .cleanup_rq
-Message-ID: <20190719122654.GA7339@redhat.com>
-References: <20190718032519.28306-1-ming.lei@redhat.com>
- <20190718032519.28306-2-ming.lei@redhat.com>
- <20190718145201.GA2305@redhat.com>
- <20190719013546.GA12004@ming.t460p>
+        id S1728767AbfGSNM6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jul 2019 09:12:58 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:43783 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728152AbfGSNM6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Jul 2019 09:12:58 -0400
+Received: by mail-io1-f67.google.com with SMTP id k20so58232949ios.10
+        for <linux-block@vger.kernel.org>; Fri, 19 Jul 2019 06:12:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=s91tKYIQeKJmNASGzuZv62jiVZtvz7cNLDd/Mhsd4sI=;
+        b=Eq21zHlTIxuHyTj24874Uia3TBD6JWRoJBGL8HEpwLYwO0hdt4FpurhceTYVlMceuu
+         sP9U8EaERO10hICk89qjaOP5X4UzWG+rM0z9WeO4UO1DgkioRYhU6vqTH+tugxhSOPwE
+         MvP+eupf7S88R3RtL/u5B0LFSxabJCoHMbqeDX3C9TtSYw9REmt8wJJp5u2M5ICuc8ru
+         PamhdpDm4iWuSCqYszFDWpnsLqlvZxLA72wOdzY3n0iFPxBFh4/enjoHLMni5AowZyfU
+         OcRwWSpjcAXnFHQ0V+Yet0W4wc/RYIZzTH1oHviTAcdEhfd3Zd82+LEvr0KbPwUiFZAI
+         I2Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=s91tKYIQeKJmNASGzuZv62jiVZtvz7cNLDd/Mhsd4sI=;
+        b=qAAUcfcRVy/xk10GPo981Qr80dyJvIGu2OHQt3A6xoGMYAEMuT1G9q7kv2t/wyugqn
+         YHrWXQoLlmrjN+o1EBKdqOERbIeSEkhVfxYelZ7V9cFbZpW8fm4rdA8RDHuUgT7utota
+         XCHDZAOYWwlAHxFFHySjgma+sGunskUnJ0xj7clJKW5ksuGYNTPsCqDMPPEt0Bh97Ja4
+         mHnHiBQpUSmFN4CQxBSzcIwLv92yhOedtuYFgR5ZYG6FQdEKYLIXpyOE435xcxwJe5qK
+         oSh4iZa7XZLK7r7pVdkzIiq7fMOaP/HDDpdNdLAJnW8Gw2DacknaFeDtNl9Vei8aRL3F
+         k6sQ==
+X-Gm-Message-State: APjAAAUVX6WMeLjXNnVvYi/XcDW4PIFs9y0YtyoVVOBkm3xCaQZAbvbL
+        lMqq3STy7lJ8HxSKlK3BkMIj3NyhoIyLg8Pqt3UA
+X-Google-Smtp-Source: APXvYqx1oWVR2cuAetmaPy1R06U3aM9TtEWw/74jY3DbA4y4W2lGaVACp9491HJ2avHInLSMczhmXCExrEmelimPS54=
+X-Received: by 2002:a6b:f216:: with SMTP id q22mr10710978ioh.65.1563541977484;
+ Fri, 19 Jul 2019 06:12:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190719013546.GA12004@ming.t460p>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Fri, 19 Jul 2019 12:27:00 +0000 (UTC)
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <CAHg0HuzUaKs-ACHah-VdNHbot0_usx4ErMesVAw8+DFR63FFqw@mail.gmail.com>
+ <20190709110036.GQ7034@mtr-leonro.mtl.com> <CAD9gYJL=fo4Oa2hmU4WZgQrzypRbzoPrrFjNQKP2EZFXYxYNCA@mail.gmail.com>
+ <20190709120606.GB3436@mellanox.com> <CAMGffE=T+FVfVzV5cCtVrm_6ikdJ9pjpFsPgx+t0EUpegoZELQ@mail.gmail.com>
+ <20190709131932.GI3436@mellanox.com> <1cd86f4b-7cd1-4e00-7111-5c8e09ba06be@grimberg.me>
+In-Reply-To: <1cd86f4b-7cd1-4e00-7111-5c8e09ba06be@grimberg.me>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Fri, 19 Jul 2019 15:12:46 +0200
+Message-ID: <CAHg0HuxJn8Uv7jJKyTd36udqvMF+ajECjpOhnTJcnHV_PFrdRg@mail.gmail.com>
+Subject: Re: [PATCH v4 00/25] InfiniBand Transport (IBTRS) and Network Block
+ Device (IBNBD)
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Jason Gunthorpe <jgg@mellanox.com>,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
+        Jinpu Wang <jinpuwang@gmail.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "dledford@redhat.com" <dledford@redhat.com>,
+        Roman Pen <r.peniaev@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 18 2019 at  9:35pm -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
+Hi Sagi,
 
-> On Thu, Jul 18, 2019 at 10:52:01AM -0400, Mike Snitzer wrote:
-> > On Wed, Jul 17 2019 at 11:25pm -0400,
-> > Ming Lei <ming.lei@redhat.com> wrote:
-> > 
-> > > dm-rq needs to free request which has been dispatched and not completed
-> > > by underlying queue. However, the underlying queue may have allocated
-> > > private stuff for this request in .queue_rq(), so dm-rq will leak the
-> > > request private part.
-> > 
-> > No, SCSI (and blk-mq) will leak.  DM doesn't know anything about the
-> > internal memory SCSI uses.  That memory is a SCSI implementation detail.
-> 
-> It isn't noting to do with dm-rq, which frees one request after BLK_STS_*RESOURCE
-> is returned from blk_insert_cloned_request(), in this case it has to be
-> the user for releasing the request private data.
-> 
-> > 
-> > Please fix header to properly reflect which layer is doing the leaking.
-> 
-> Fine.
-> 
-> > 
-> > > Add one new callback of .cleanup_rq() to fix the memory leak issue.
-> > > 
-> > > Another use case is to free request when the hctx is dead during
-> > > cpu hotplug context.
-> > > 
-> > > Cc: Ewan D. Milne <emilne@redhat.com>
-> > > Cc: Bart Van Assche <bvanassche@acm.org>
-> > > Cc: Hannes Reinecke <hare@suse.com>
-> > > Cc: Christoph Hellwig <hch@lst.de>
-> > > Cc: Mike Snitzer <snitzer@redhat.com>
-> > > Cc: dm-devel@redhat.com
-> > > Cc: <stable@vger.kernel.org>
-> > > Fixes: 396eaf21ee17 ("blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback")
-> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > ---
-> > >  drivers/md/dm-rq.c     |  1 +
-> > >  include/linux/blk-mq.h | 13 +++++++++++++
-> > >  2 files changed, 14 insertions(+)
-> > > 
-> > > diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-> > > index c9e44ac1f9a6..21d5c1784d0c 100644
-> > > --- a/drivers/md/dm-rq.c
-> > > +++ b/drivers/md/dm-rq.c
-> > > @@ -408,6 +408,7 @@ static int map_request(struct dm_rq_target_io *tio)
-> > >  		ret = dm_dispatch_clone_request(clone, rq);
-> > >  		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
-> > >  			blk_rq_unprep_clone(clone);
-> > > +			blk_mq_cleanup_rq(clone);
-> > >  			tio->ti->type->release_clone_rq(clone, &tio->info);
-> > >  			tio->clone = NULL;
-> > >  			return DM_MAPIO_REQUEUE;
-> > 
-> > Requiring upper layer driver (dm-rq) to explicitly call blk_mq_cleanup_rq() 
-> > seems wrong.  In this instance tio->ti->type->release_clone_rq()
-> > (dm-mpath's multipath_release_clone) calls blk_put_request().  Why can't
-> > blk_put_request(), or blk_mq_free_request(), call blk_mq_cleanup_rq()?
-> 
-> I did think about doing it in blk_put_request(), and I just want to
-> avoid the little cost in generic fast path, given freeing request after
-> dispatch is very unusual, so far only nvme multipath and dm-rq did in
-> that way.
-> 
-> However, if no one objects to move blk_mq_cleanup_rq() to blk_put_request()
-> or blk_mq_free_request(), I am fine to do that in V2.
+thanks a lot for the information. We are doing the right thing
+regarding the invalidation (your 2f122e4f5107), but we do use
+unsignalled sends and need to fix that. Please correct me if I'm
+wrong: The patches (b4b591c87f2b, b4b591c87f2b) fix the problem that
+if the ack from target is lost for some reason, the initiators HCA
+will resend it even after the request is completed.
+But doesn't the same problem persist also other way around: for the
+lost acks from client? I mean, target is did a send for the "read"
+IOs; client completed the request (after invalidation, refcount
+dropped to 0, etc), but the ack is not delivered to the HCA of the
+target, so the target will also resend it. This seems unfixable, since
+the client can't possible know if the server received his ack or not?
+Doesn't the problem go away, if rdma_conn_param.retry_count is just set to 0?
 
-Think it'd be a less fragile/nuanced way to extend the blk-mq
-interface.  Otherwise there is potential for other future drivers
-experiencing leaks.
+Thanks for your help,
+Best,
+Danil.
 
-> > Not looked at the cpu hotplug case you mention, but my naive thought is
-> > it'd be pretty weird to also sprinkle a call to blk_mq_cleanup_rq() from
-> > that specific "dead hctx" code path.
-> 
-> It isn't weird, and it is exactly what NVMe multipath is doing, please see
-> nvme_failover_req(). And it is just that nvme doesn't allocate request
-> private data.
-> 
-> Wrt. blk-mq cpu hotplug handling: after one hctx is dead, we can't dispatch
-> request to this hctx any more, however one request has been bounded to its
-> hctx since its allocation and the association can't(or quite hard to) be
-> changed any more, do you have any better idea to deal with this issue?
-
-No, as I prefaced before "Not looked at the cpu hotplug case you
-mention".  As such I should've stayed silent ;)
-
-But my point was we should hook off current interfaces rather than rely
-on a new primary function call.
-
-Mike
+On Tue, Jul 9, 2019 at 11:27 PM Sagi Grimberg <sagi@grimberg.me> wrote:
+>
+>
+> >> Thanks Jason for feedback.
+> >> Can you be  more specific about  "the invalidation model for MR was wrong"
+> >
+> > MR's must be invalidated before data is handed over to the block
+> > layer. It can't leave MRs open for access and then touch the memory
+> > the MR covers.
+>
+> Jason is referring to these fixes:
+> 2f122e4f5107 ("nvme-rdma: wait for local invalidation before completing
+> a request")
+> 4af7f7ff92a4 ("nvme-rdma: don't complete requests before a send work
+> request has completed")
+> b4b591c87f2b ("nvme-rdma: don't suppress send completions")
