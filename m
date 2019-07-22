@@ -2,186 +2,86 @@ Return-Path: <SRS0=hu+R=VT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB111C76190
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 15:00:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC24FC76188
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 15:25:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 840F92190F
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 15:00:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T/wva0yc"
+	by mail.kernel.org (Postfix) with ESMTP id 995652084D
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 15:25:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726816AbfGVPAD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jul 2019 11:00:03 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:40807 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725899AbfGVPAD (ORCPT
+        id S1728578AbfGVPZK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jul 2019 11:25:10 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:41748 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728474AbfGVPZK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jul 2019 11:00:03 -0400
-Received: by mail-pl1-f193.google.com with SMTP id a93so19279671pla.7;
-        Mon, 22 Jul 2019 08:00:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=H/mgA5Q6Tay1+ixdoqgmaZ9E59OoWK8q1G0jb5mfWTU=;
-        b=T/wva0ycJqMHPLQKhAXy5V2lfzKN76yWpvWsrPHtca0NDIyzmovmqZgvwVqF14v2L8
-         fBrD47foZqJBwmOlF5kvBbL5MtnGVvtp6/bOZvyElrrjnl63poUJtgV/ycVD0VAkKCe0
-         IJWuezmPWL2Onh1qDU+eD3K5ATWu2YrINCgSIrdoGFLXUa5IyTfvzNGUJAblJbCNi3p5
-         8fPvWMfBE8yA5Y1Gts097/nIort/T/1wP1L1J4wFIhOKveGGWVIYyN8/YbCTc6HmCYI5
-         r7xdAi1ReLdIIJwpHR+9VK//9e7Uz4d7vSNv9p/9skFEMIpNHEgnPE1wGq4kbPK2N+3H
-         Pqlw==
+        Mon, 22 Jul 2019 11:25:10 -0400
+Received: by mail-pf1-f196.google.com with SMTP id m30so17546014pff.8
+        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2019 08:25:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=H/mgA5Q6Tay1+ixdoqgmaZ9E59OoWK8q1G0jb5mfWTU=;
-        b=qk9NDY1hPvmnCl8i9A0F9d2RFvKbdlcFeA4u9M8vuU8PMSwhvQkg25xHCNDWCggQcs
-         Af//vCouwZJaVuAP3WvlLMVVpm/ayRbNU7jOaz+XMEskCKAvNKZxQ9NNXd8Q8HX0n9EN
-         oi2pQZmKYxmvwFbf8SNL9Xh99iXv15f0IfEGvvd1iHeTs1e/lYx0tZHcm+QfEekK5HbN
-         bPyeeY+eT081Y7tjDRW7Qr7U0O5+imXEuZgKRiaUNTAQbsJ5n0ICM3ne6koy340LBEl9
-         nENBOCwaqCPHB9gSpW/4xLkAIqASyfUIJW7G1q5gtVOBk/lm5ZRT7do56hPbsQm0m9KZ
-         3Ndw==
-X-Gm-Message-State: APjAAAV2WpQwxynm//oihyc7koHoml4T3btjtw/ju+CXI6JKqaYhzsN9
-        08Kc4x45b5JbZMSqC5cYi6Jpi8wV
-X-Google-Smtp-Source: APXvYqxgJ+C74y1G4cEu9kZN1sEr0LOAv6Ih4XmhsV8n8HLqX2VM3eQps23ZbUAPOuHVbaq3um9WrQ==
-X-Received: by 2002:a17:902:8ec3:: with SMTP id x3mr74560918plo.313.1563807602716;
-        Mon, 22 Jul 2019 08:00:02 -0700 (PDT)
-Received: from mita-MS-7A45.lan (KD027092233113.ppp-bb.dion.ne.jp. [27.92.233.113])
-        by smtp.gmail.com with ESMTPSA id a16sm42533174pfd.68.2019.07.22.07.59.49
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 22 Jul 2019 08:00:02 -0700 (PDT)
-From:   Akinobu Mita <akinobu.mita@gmail.com>
-To:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
-Cc:     Akinobu Mita <akinobu.mita@gmail.com>,
-        Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>,
-        Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-        Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v2 3/3] scsi: sd: stop polling disk stats by ledtrig-blk during runtime suspend
-Date:   Mon, 22 Jul 2019 23:59:12 +0900
-Message-Id: <1563807552-23498-4-git-send-email-akinobu.mita@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1563807552-23498-1-git-send-email-akinobu.mita@gmail.com>
-References: <1563807552-23498-1-git-send-email-akinobu.mita@gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9jCVali6gKyIf+iTVA7FGys0/plNy2aSpdO4EPkxFHY=;
+        b=jZWISgsl/6NgEd0biIfJ5O2ie9y0BAKLSZMawA6W0yVC4lIJETcVieGLWof8Qzz4Oz
+         nKSd667U8Gxx/IDrk6Lm4XJtCJ3RKz7SwWpDlm2Hv6cZQERABsVJ/CGVxzxyTyO/x5N9
+         7l78LARVFGLgNsxtMnyj/dUCBaRWDet16bHeENfJonKlbxZXBkyG9VfTzReZyA4dJoep
+         LO5yZsf6o8b0XY+D6X+t7AedXd2sLhtM8to4tEdCn0UjKirgckHChoE9GvF52FtkCnfM
+         w71Kr1/WPrxkNKOEAnLVlx/SOtYTiLqVdgSxjAlJNDPMqdpYxJ+KvW5IOlTKkp/rvu+u
+         Mx2w==
+X-Gm-Message-State: APjAAAUJGjYAGupA5HOuE/gUcoTRcKPCZmFxezcXJ7FSGjHSIztlCD0q
+        0NQRbUz35g4oZ6V9af8uTdk=
+X-Google-Smtp-Source: APXvYqzIStTvg9h7MwNPMWX/s1A/lVS1FdstXi9YHhtd8dwEX5Skqs1eRYLn0XS50glRBzcMKyx//w==
+X-Received: by 2002:a17:90a:d343:: with SMTP id i3mr80813836pjx.15.1563809109921;
+        Mon, 22 Jul 2019 08:25:09 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id g4sm51862448pfo.93.2019.07.22.08.25.08
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 22 Jul 2019 08:25:08 -0700 (PDT)
+Subject: Re: [PATCH 2/5] blk-mq: introduce
+ blk_mq_tagset_wait_completed_request()
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20190722053954.25423-1-ming.lei@redhat.com>
+ <20190722053954.25423-3-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <c2722892-9cbf-0747-58a8-91a99b72bc53@acm.org>
+Date:   Mon, 22 Jul 2019 08:25:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+In-Reply-To: <20190722053954.25423-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The LED block device activity trigger periodically polls the disk stats
-to collect the activity.  However, it is pointless to poll while the
-scsi device is in runtime suspend.
+On 7/21/19 10:39 PM, Ming Lei wrote:
+> blk-mq may schedule to call queue's complete function on remote CPU via
+> IPI, but doesn't provide any way to synchronize the request's complete
+> fn.
+> 
+> In some driver's EH(such as NVMe), hardware queue's resource may be freed &
+> re-allocated. If the completed request's complete fn is run finally after the
+> hardware queue's resource is released, kernel crash will be triggered.
+> 
+> Prepare for fixing this kind of issue by introducing
+> blk_mq_tagset_wait_completed_request().
 
-This stops polling disk stats when the device is successfully runtime
-suspended, and restarts polling when the device is successfully runtime
-resumed.
+An explanation is missing of why the block layer is modified to fix this 
+instead of the NVMe driver.
 
-Cc: Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>
-Cc: Jacek Anaszewski <jacek.anaszewski@gmail.com>
-Cc: Pavel Machek <pavel@ucw.cz>
-Cc: Dan Murphy <dmurphy@ti.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
----
- drivers/scsi/sd.c | 40 +++++++++++++++++++++++-----------------
- 1 file changed, 23 insertions(+), 17 deletions(-)
+Thanks,
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 149d406..5f73142 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3538,7 +3538,7 @@ static int sd_suspend_common(struct device *dev, bool ignore_stop_errors)
- {
- 	struct scsi_disk *sdkp = dev_get_drvdata(dev);
- 	struct scsi_sense_hdr sshdr;
--	int ret = 0;
-+	int ret;
- 
- 	if (!sdkp)	/* E.g.: runtime suspend following sd_remove() */
- 		return 0;
-@@ -3550,18 +3550,16 @@ static int sd_suspend_common(struct device *dev, bool ignore_stop_errors)
- 		if (ret) {
- 			/* ignore OFFLINE device */
- 			if (ret == -ENODEV)
--				return 0;
--
--			if (!scsi_sense_valid(&sshdr) ||
--			    sshdr.sense_key != ILLEGAL_REQUEST)
--				return ret;
-+				goto success;
- 
- 			/*
- 			 * sshdr.sense_key == ILLEGAL_REQUEST means this drive
- 			 * doesn't support sync. There's not much to do and
- 			 * suspend shouldn't fail.
- 			 */
--			ret = 0;
-+			if (!scsi_sense_valid(&sshdr) ||
-+			    sshdr.sense_key != ILLEGAL_REQUEST)
-+				return ret;
- 		}
- 	}
- 
-@@ -3569,11 +3567,14 @@ static int sd_suspend_common(struct device *dev, bool ignore_stop_errors)
- 		sd_printk(KERN_NOTICE, sdkp, "Stopping disk\n");
- 		/* an error is not worth aborting a system sleep */
- 		ret = sd_start_stop_device(sdkp, 0);
--		if (ignore_stop_errors)
--			ret = 0;
-+		if (ret && !ignore_stop_errors)
-+			return ret;
- 	}
- 
--	return ret;
-+success:
-+	ledtrig_blk_disable(sdkp->disk);
-+
-+	return 0;
- }
- 
- static int sd_suspend_system(struct device *dev)
-@@ -3589,19 +3590,24 @@ static int sd_suspend_runtime(struct device *dev)
- static int sd_resume(struct device *dev)
- {
- 	struct scsi_disk *sdkp = dev_get_drvdata(dev);
--	int ret;
- 
- 	if (!sdkp)	/* E.g.: runtime resume at the start of sd_probe() */
- 		return 0;
- 
--	if (!sdkp->device->manage_start_stop)
--		return 0;
-+	if (sdkp->device->manage_start_stop) {
-+		int ret;
-+
-+		sd_printk(KERN_NOTICE, sdkp, "Starting disk\n");
-+		ret = sd_start_stop_device(sdkp, 1);
-+		if (ret)
-+			return ret;
- 
--	sd_printk(KERN_NOTICE, sdkp, "Starting disk\n");
--	ret = sd_start_stop_device(sdkp, 1);
--	if (!ret)
- 		opal_unlock_from_suspend(sdkp->opal_dev);
--	return ret;
-+	}
-+
-+	ledtrig_blk_enable(sdkp->disk);
-+
-+	return 0;
- }
- 
- /**
--- 
-2.7.4
-
+Bart.
