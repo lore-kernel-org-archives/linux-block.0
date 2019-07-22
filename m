@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A76C76188
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 15:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC345C7618F
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 16:51:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2167B2190F
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 15:40:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF0E421985
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 16:51:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727753AbfGVPk1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jul 2019 11:40:27 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:43727 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726944AbfGVPk1 (ORCPT
+        id S1730559AbfGVQvc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jul 2019 12:51:32 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:35452 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728752AbfGVQvb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jul 2019 11:40:27 -0400
-Received: by mail-pf1-f193.google.com with SMTP id i189so17558831pfg.10;
-        Mon, 22 Jul 2019 08:40:26 -0700 (PDT)
+        Mon, 22 Jul 2019 12:51:31 -0400
+Received: by mail-pg1-f195.google.com with SMTP id s1so11626050pgr.2;
+        Mon, 22 Jul 2019 09:51:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=9VDIEaBQFbumPn4Bce8zgt7MQLL9xp5pDaU4ejJmVDg=;
-        b=HbXbSf2siFI7RoYBcjwG5qMJdJ8iaUBVB23bvupFZQD/G4zq+YDi7IvYLEjXqTJzWA
-         SqJDhlEyGEfri/a8yfalssNSK8+VHjQgXp3mgrM/sHd4P0PFfJz1mDgSTdp4mHWS1jyW
-         JgZJm8n4FMol+6nIvasgb5WI+RgJs5cgs6nygik1s+zGAEZi3/ju8mew6R7WXMl275zW
-         pP+b9VawFvXi9gQkWuE/PsGmjiTwRIutqm1a9QwpJ2OMT6ZuRR2QipLflTTf2gRSHZFb
-         6Rshd+tYuexauHmtQ92bThJ7/PDEnr3Mmp8lctyNu2LiVdUSGqxlYAX2n1nb3g5nAhw1
-         Ro7A==
-X-Gm-Message-State: APjAAAVRNJV3+AFnCzkY84Jhko3E5vHKY1yjwdOCPSljBpCOrXVPw0Wq
-        nNK6rD5Xr2iBHs1A1XXQUjM73GRG
-X-Google-Smtp-Source: APXvYqzPGeYPDGcgeAkgH93yM2lKMQlRZowrweQeb+g1Y8vjkzbLJ9ZNl2ah7SODOkL9aCxA75AdGg==
-X-Received: by 2002:a17:90a:b312:: with SMTP id d18mr75654365pjr.35.1563810025966;
-        Mon, 22 Jul 2019 08:40:25 -0700 (PDT)
+        bh=sx4jGeZD1NAFZD3tRCTmaYml1fVFOhGJ/2sRj2Sic6g=;
+        b=laMC66jr1i34BApU20ATF+b80NLJrA5zDeYpvIrHvBFtGcdgpPd0Qe5aJjJQHtK1BX
+         IH48OJKSvKpRS4X1pABnMSdZMHQOaxCaIGeKrKgIjBnEmQLKZYB7YgtF/aNdnQpZn9+T
+         irxA7qVgJw7SShS8FXcIWUJ7PJj+Ejr4q8aYLKn1NHxgsAQXaVSnwTZbLetMO0zPad55
+         bcJL/s2nRjqabKNd2WWOp4ddpAZTXy6ASGCYzvSgOKA1BeByCIEE0Y84jaRRO5t4pPef
+         wAvsA6bMtOTNjO/n89tLganov9F4m5E3q2tpD6LIIOcY45TTFDNYw1QirUk7TAFEjbxR
+         dNRw==
+X-Gm-Message-State: APjAAAV8O6j1bHUJeTXvAxIoSWt4JM3onAAyGIjqbREmq2SutfkgoWZQ
+        lKLsagGnrVgmoc188q2v+eX2T83i
+X-Google-Smtp-Source: APXvYqzgKB+ahambBQH5r+rB5Xfqr8ZuYUyKs+7UZ6PacGfkrBMgMtfp+VqBqVxhZA1PNYh9nmwRsw==
+X-Received: by 2002:a17:90a:3247:: with SMTP id k65mr34724555pjb.49.1563814290331;
+        Mon, 22 Jul 2019 09:51:30 -0700 (PDT)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id 85sm41323334pfv.130.2019.07.22.08.40.23
+        by smtp.gmail.com with ESMTPSA id m4sm75534750pff.108.2019.07.22.09.51.28
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Jul 2019 08:40:24 -0700 (PDT)
-Subject: Re: [PATCH V2 2/2] scsi: implement .cleanup_rq callback
+        Mon, 22 Jul 2019 09:51:29 -0700 (PDT)
+Subject: Re: [PATCH V2 1/2] blk-mq: add callback of .cleanup_rq
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         "James E . J . Bottomley" <jejb@linux.ibm.com>,
@@ -53,14 +53,14 @@ Cc:     linux-block@vger.kernel.org,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
         stable@vger.kernel.org
 References: <20190720030637.14447-1-ming.lei@redhat.com>
- <20190720030637.14447-3-ming.lei@redhat.com>
+ <20190720030637.14447-2-ming.lei@redhat.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <eed624d5-0585-699c-9084-9f5f0ea09e52@acm.org>
-Date:   Mon, 22 Jul 2019 08:40:23 -0700
+Message-ID: <4ffe9dd8-9e86-fd93-828e-78c1e5931c5f@acm.org>
+Date:   Mon, 22 Jul 2019 09:51:27 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190720030637.14447-3-ming.lei@redhat.com>
+In-Reply-To: <20190720030637.14447-2-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -70,42 +70,25 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 7/19/19 8:06 PM, Ming Lei wrote:
-> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> index e1da8c70a266..52537c145762 100644
-> --- a/drivers/scsi/scsi_lib.c
-> +++ b/drivers/scsi/scsi_lib.c
-> @@ -154,12 +154,9 @@ scsi_set_blocked(struct scsi_cmnd *cmd, int reason)
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index b038ec680e84..fc38d95c557f 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -502,6 +502,9 @@ void blk_mq_free_request(struct request *rq)
+>   	struct blk_mq_ctx *ctx = rq->mq_ctx;
+>   	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
 >   
->   static void scsi_mq_requeue_cmd(struct scsi_cmnd *cmd)
->   {
-> -	if (cmd->request->rq_flags & RQF_DONTPREP) {
-> -		cmd->request->rq_flags &= ~RQF_DONTPREP;
-> -		scsi_mq_uninit_cmd(cmd);
-> -	} else {
-> -		WARN_ON_ONCE(true);
-> -	}
-> +	WARN_ON_ONCE(!(cmd->request->rq_flags & RQF_DONTPREP));
+> +	if (q->mq_ops->cleanup_rq)
+> +		q->mq_ops->cleanup_rq(rq);
 > +
-> +	scsi_mq_uninit_cmd(cmd);
->   	blk_mq_requeue_request(cmd->request, true);
->   }
+>   	if (rq->rq_flags & RQF_ELVPRIV) {
+>   		if (e && e->type->ops.finish_request)
+>   			e->type->ops.finish_request(rq);
 
-The above changes are independent of this patch series. Have you 
-considered to move these into a separate patch?
-
-> +/*
-> + * Only called when the request isn't completed by SCSI, and not freed by
-> + * SCSI
-> + */
-> +static void scsi_cleanup_rq(struct request *rq)
-> +{
-> +	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
-> +
-> +	scsi_mq_uninit_cmd(cmd);
-> +}
-
-Is the comment above this function correct? The previous patch adds an 
-unconditional call to mq_ops->cleanup_rq() in blk_mq_free_request().
+I'm concerned about the performance impact of this change. How about not 
+introducing .cleanup_rq() and adding a call to
+scsi_mq_uninit_cmd() in scsi_queue_rq() just before that function 
+returns BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE?
 
 Thanks,
 
