@@ -2,142 +2,118 @@ Return-Path: <SRS0=hu+R=VT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0545EC7618F
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 17:30:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 793E4C76194
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 17:39:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2A0C21897
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 17:30:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sMnH79el"
+	by mail.kernel.org (Postfix) with ESMTP id 5E8A12229C
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 17:39:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726347AbfGVRaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jul 2019 13:30:52 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:46733 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726283AbfGVRaw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jul 2019 13:30:52 -0400
-Received: by mail-pg1-f195.google.com with SMTP id i8so17969022pgm.13;
-        Mon, 22 Jul 2019 10:30:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=3WkrBlhQGLRNnJo/MXZZ7vnmbCcs74q4XJirvLk0V8M=;
-        b=sMnH79elSRWNVhT7udK5QBveox3svU97zhfgWSuiCqRHFr423/n22/TjxOGShUPHJ5
-         glbE8Wkj/A91exHCpMAiiYFTrwYE2AYlLInM/cMkICuEY06qwxfkjqDZbyNJBstapcx5
-         jKcRXT60w04z9Fuv0T7Bl0HZFY83C7lrE63T4HC9+vEZpE/7LWqKKAYCwhmr6rJN+SUw
-         XYRSydbnF0NZE1keAvOjfQZLePK/QKpKaaLs3BLj750WLkx5I+SCHdGWB4dRiF2KsziF
-         242EFmmgJr+o1jBWMLck5PWTILTWnu3nKdEzqlxRK01QVEQjJTWjocpHmG4mHeaufh/z
-         OzDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=3WkrBlhQGLRNnJo/MXZZ7vnmbCcs74q4XJirvLk0V8M=;
-        b=azr9CHQ59Ig9F7Pwh67GYzOFuTlgaehW/DVteIICL3dDq28jIXEbH7x2Sr6JW7xh83
-         YRyGesMjfYC5jOmQ9BUySq6xj9gWOiDklB/eCYQwVsm4UOGhyW7ih/zhIRCwN+Xphq9J
-         gFx2Bni/UicE69xhdrgLLIQDvwG9qqAKCRr7u68qn4bsCOj8GnTvOKqNYwGNdDqsAVmn
-         miBr6V539URHCFSZuXPbgMP5RoE5ton7h4i2EpyLZWZhPqrNhi9IYb10Y5Lr6vEC6nqu
-         WACSMsZLlxApxwYro4dYPgqyKNTK5R+WwRLywWR2SCnAjgj3qo9ZxxAj3glnF7hoDk7R
-         mITA==
-X-Gm-Message-State: APjAAAVDjllKVoMA47IEoSxv/h8s/+VS+N+UpCelRLShFOB7MdoQj1nH
-        GwXkZyfHv9RBVGLZgXft6qBMjCzJ
-X-Google-Smtp-Source: APXvYqybia81FEHbBtIsKy2f17+dgZLRK5oM7wUDCFjbIJnf2XyxwwRcQFfFwNNfePBYPs7mNxd6QQ==
-X-Received: by 2002:aa7:8d98:: with SMTP id i24mr1343890pfr.199.1563816651231;
-        Mon, 22 Jul 2019 10:30:51 -0700 (PDT)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id o12sm30748558pjr.22.2019.07.22.10.30.49
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Jul 2019 10:30:50 -0700 (PDT)
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Guenter Roeck <linux@roeck-us.net>,
-        Hsin-Yi Wang <hsinyi@google.com>,
-        Nicolas Boichat <drinkcat@chromium.org>,
-        Doug Anderson <dianders@chromium.org>
-Subject: [PATCH] bfq: Check if bfqq is NULL in bfq_insert_request
-Date:   Mon, 22 Jul 2019 10:30:48 -0700
-Message-Id: <1563816648-12057-1-git-send-email-linux@roeck-us.net>
-X-Mailer: git-send-email 2.7.4
+        id S1728734AbfGVRj1 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jul 2019 13:39:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:16971 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728551AbfGVRj1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Jul 2019 13:39:27 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1207630BC57D
+        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2019 17:39:26 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A1BD5D970
+        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2019 17:39:26 +0000 (UTC)
+Received: from zmail25.collab.prod.int.phx2.redhat.com (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 00C9741F40
+        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2019 17:39:25 +0000 (UTC)
+Date:   Mon, 22 Jul 2019 13:39:25 -0400 (EDT)
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     linux-block@vger.kernel.org
+Message-ID: <1106410976.2184883.1563817165884.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1008069208.2174989.1563813991726.JavaMail.zimbra@redhat.com>
+Subject: regression: block/001 lead kernel NULL pointer from v5.3-rc1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [10.68.5.41, 10.4.195.8]
+Thread-Topic: regression: block/001 lead kernel NULL pointer from v5.3-rc1
+Thread-Index: p8n3rPyFxWB8ecbE4ORssvDJ121m4A==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Mon, 22 Jul 2019 17:39:26 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In bfq_insert_request(), bfqq is initialized with:
-	bfqq = bfq_init_rq(rq);
-In bfq_init_rq(), we find:
-	if (unlikely(!rq->elv.icq))
-		return NULL;
-Indeed, rq->elv.icq can be NULL if the memory allocation in
-create_task_io_context() failed.
+Hello
 
-A comment in bfq_insert_request() suggests that bfqq is supposed to be
-non-NULL if 'at_head || blk_rq_is_passthrough(rq)' is false. Yet, as
-debugging and practical experience shows, this is not the case in the
-above situation.
+With step[1], this kernel NULL pointer[2] can be triggered every time from v5.3-rc1, let me know if you need more info, thanks.
 
-This results in the following crash.
+[1] from blktests block/001
+#modprobe scsi-debug add_host=4 num_tgts=1 ptype=0
 
-Unable to handle kernel NULL pointer dereference
-	at virtual address 00000000000001b0
-...
-Call trace:
- bfq_setup_cooperator+0x44/0x134
- bfq_insert_requests+0x10c/0x630
- blk_mq_sched_insert_requests+0x60/0xb4
- blk_mq_flush_plug_list+0x290/0x2d4
- blk_flush_plug_list+0xe0/0x230
- blk_finish_plug+0x30/0x40
- generic_writepages+0x60/0x94
- blkdev_writepages+0x24/0x30
- do_writepages+0x74/0xac
- __filemap_fdatawrite_range+0x94/0xc8
- file_write_and_wait_range+0x44/0xa0
- blkdev_fsync+0x38/0x68
- vfs_fsync_range+0x68/0x80
- do_fsync+0x44/0x80
+[2]
+[14628.973272] run blktests block/001 at 2019-07-22 12:45:10
+[14629.017215] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[14629.018326] scsi host13: scsi_debug: version 0188 [20190125]
+[14629.018326]   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
+[14629.024988] #PF: supervisor read access in kernel mode
+[14629.024990] #PF: error_code(0x0000) - not-present page
+[14629.024991] PGD 0 P4D 0 
+[14629.024994] Oops: 0000 [#1] SMP PTI
+[14629.024999] CPU: 6 PID: 699 Comm: kworker/u25:9 Not tainted 5.3.0-rc1 #1
+[14629.038771] scsi host14: scsi_debug: version 0188 [20190125]
+[14629.038771]   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
+[14629.044118] Hardware name: Dell Inc. PowerEdge R730xd/ɲ�Pow, BIOS 2.9.1 12/04/2018
+[14629.044124] Workqueue: events_unbound async_run_entry_fn
+[14629.044131] RIP: 0010:dma_direct_max_mapping_size+0x2b/0x64
+[14629.044134] Code: 1f 44 00 00 55 53 48 89 fb e8 51 13 00 00 84 c0 75 0a 48 c7 c0 ff ff ff ff 5b 5d c3 48 8b 83 28 02 00 00 48 8b ab 38 02 00 00 <48> 8b 00 48 85 c0 74 0c 48 85 ed 74 27 48 39 c5 48 0f 47 e8 48 89
+[14629.119071] RSP: 0018:ffffa98482453c40 EFLAGS: 00010202
+[14629.124899] RAX: 0000000000000000 RBX: ffff8cc96d9d1018 RCX: 0000000000000000
+[14629.132860] RDX: ffff8cc96d594080 RSI: 0000000000000800 RDI: ffff8cc96d9d1018
+[14629.140821] RBP: 0000000000000000 R08: ffff8cc977aef0e0 R09: ffff8cc805c072c0
+[14629.148782] R10: 0000000000030400 R11: ffff8cc973398a00 R12: ffff8cc96d9d1018
+[14629.156743] R13: 00000000ffffffff R14: ffff8ccb74b42428 R15: 0000000000000000
+[14629.164705] FS:  0000000000000000(0000) GS:ffff8cc977ac0000(0000) knlGS:0000000000000000
+[14629.173734] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[14629.180142] CR2: 0000000000000000 CR3: 000000010740a006 CR4: 00000000001606e0
+[14629.188103] Call Trace:
+[14629.190836]  __scsi_init_queue+0x75/0x140
+[14629.195309]  scsi_mq_alloc_queue+0x3a/0x50
+[14629.199877]  scsi_alloc_sdev+0x1d1/0x290
+[14629.204253]  scsi_probe_and_add_lun+0x487/0xe20
+[14629.209311]  ? mutex_lock+0xe/0x30
+[14629.213115]  ? ata_tdev_release+0x10/0x10 [libata]
+[14629.218462]  ? attribute_container_add_device+0x55/0x120
+[14629.224389]  __scsi_scan_target+0xec/0x5b0
+[14629.228960]  ? __switch_to_asm+0x40/0x70
+[14629.233335]  ? __switch_to_asm+0x34/0x70
+[14629.237710]  ? __switch_to_asm+0x40/0x70
+[14629.242085]  ? __switch_to_asm+0x40/0x70
+[14629.246460]  ? __switch_to_asm+0x34/0x70
+[14629.250836]  scsi_scan_channel+0x5a/0x80
+[14629.255212]  scsi_scan_host_selected+0xdb/0x110
+[14629.260267]  do_scan_async+0x17/0x150
+[14629.264352]  async_run_entry_fn+0x39/0x160
+[14629.268923]  process_one_work+0x1a1/0x360
+[14629.273394]  worker_thread+0x30/0x380
+[14629.277477]  ? process_one_work+0x360/0x360
+[14629.282143]  kthread+0x10c/0x130
+[14629.285741]  ? kthread_create_on_node+0x60/0x60
+[14629.290795]  ret_from_fork+0x35/0x40
+[14629.294783] Modules linked in: scsi_debug sunrpc intel_rapl_msr intel_rapl_common sb_edac x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel mgag200 drm_vram_helper i2c_algo_bit kvm ttm irqbypass drm_kms_helper crct10dif_pclmul syscopyarea sysfillrect sysimgblt fb_sys_fops iTCO_wdt crc32_pclmul iTCO_vendor_support drm ghash_clmulni_intel dcdbas intel_cstate mxm_wmi intel_uncore pcspkr intel_rapl_perf lpc_ich ipmi_ssif mei_me sg mei ipmi_si ipmi_devintf ipmi_msghandler acpi_power_meter vfat fat xfs libcrc32c sd_mod ahci nvme libahci crc32c_intel nvme_core libata tg3 megaraid_sas wmi dm_mirror dm_region_hash dm_log dm_mod
+[14629.356675] CR2: 0000000000000000
+[14629.360381] ---[ end trace 96df6c036b903d89 ]---
 
-The problem is relatively easy to reproduce by running an image with
-failslab enabled, such as with:
 
-cd /sys/kernel/debug/failslab
-echo 10 > probability
-echo 300 > times
 
-Avoid the problem by checking if bfqq is NULL before using it. With the
-NULL check in place, requests with missing io context are queued
-immediately, and the crash is no longer seen.
 
-Fixes: 18e5a57d79878 ("block, bfq: postpone rq preparation to insert or merge")
-Reported-by: Hsin-Yi Wang  <hsinyi@google.com>
-Cc: Hsin-Yi Wang <hsinyi@google.com>
-Cc: Nicolas Boichat <drinkcat@chromium.org>
-Cc: Doug Anderson <dianders@chromium.org>
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
- block/bfq-iosched.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 72860325245a..56f3f4227010 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5417,7 +5417,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 
- 	spin_lock_irq(&bfqd->lock);
- 	bfqq = bfq_init_rq(rq);
--	if (at_head || blk_rq_is_passthrough(rq)) {
-+	if (!bfqq || at_head || blk_rq_is_passthrough(rq)) {
- 		if (at_head)
- 			list_add(&rq->queuelist, &bfqd->dispatch);
- 		else
--- 
-2.7.4
+Best Regards,
+  Yi Zhang
+
 
