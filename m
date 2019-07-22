@@ -2,114 +2,128 @@ Return-Path: <SRS0=hu+R=VT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB8BC76194
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 23:22:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70466C7618F
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 23:27:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B6CD8219BE
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 23:22:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4413E21951
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 23:27:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u0kI8lG+"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Q8PU/3Wg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726120AbfGVXWq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jul 2019 19:22:46 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:36022 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726585AbfGVXWq (ORCPT
+        id S1727200AbfGVX1o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jul 2019 19:27:44 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:45860 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727157AbfGVX1o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jul 2019 19:22:46 -0400
-Received: by mail-wr1-f68.google.com with SMTP id n4so41167956wrs.3
-        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2019 16:22:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=w8RmrKCLNV6A0HgHZ+FerLtUh99eSc8LM/7Qtq8LAJo=;
-        b=u0kI8lG+YC0TmWykIx8xQEGsoI+nGMJ/i3uHiGKfD5w7rR1bJKBeN9YhhoU5JtdZ8c
-         WaHQbZckfqd6y+R4tWVCnlj/Xzo42nMktJqCLnAfOp6gz/mL9IAFsyTBfl4XQE3OOvA1
-         Hg+MEa4vo4YJibO6ezdJY4091FMcOmHRd23IAGnx+annB2AZb87UQjZzdDmuATaZccym
-         59AecHUOdFhbZi7G77EKZyM0Fw+EI+R9mVz4v7cUz5QE8DVkNSoWkZ+r43uV/5W6menk
-         Y/gJwPsn5tN9Tg3DpmV9EuIxgDl3z7c1m4fjpmUak7RpVx5ZdVg68HPo9dPbKB3ky3tr
-         JWRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=w8RmrKCLNV6A0HgHZ+FerLtUh99eSc8LM/7Qtq8LAJo=;
-        b=QFh3tGZQkPav+wmEWxgDfXqgvRb+QhNITPXMLpIYTMEmd3vhg778+7m6+VZ2n37wyr
-         sdnPKqbG4QRR57msmNVnUTlUotKz5SQW2oqOSia8/qOWSjDEzO8M/cyZo9izjKlB4oNM
-         kvw5tSqiLG2ADxlhEtfDbtB2QND355O/PY//NHRJXSz9qJTjRfNKsyy2By2e7hXkAFw2
-         2F/aDYnyfDZNIHQsEbOxKG7p+1eWTj7J8OmB9s5hUBQENRW04yu/KSEQ5YT9tbm0yjO6
-         ZCFA7Lo76BTbvA+afdlaHC7gcGPn4RAj2l96yDr1ISJUnnCY6dXTUn/un2mEU9JtLTW5
-         pRhw==
-X-Gm-Message-State: APjAAAWVpNeDYkhBgUInLjVxMnMqrmiJ/8jxVJc+jsHOlZat0Kc6Z0b9
-        GE+Fpsaunm+gQPIqHBMq/VfWdcsjoPItJBbDBsU=
-X-Google-Smtp-Source: APXvYqzhZz7CnaC0oTLchBJevUk/xHJs7yT2V0xsuTZrWkdrGh4pYTmo6wXaIICBDEdvD1m0kMEXHiC9ZzOuoQal53Q=
-X-Received: by 2002:a5d:630c:: with SMTP id i12mr71823262wru.312.1563837764191;
- Mon, 22 Jul 2019 16:22:44 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190722053954.25423-1-ming.lei@redhat.com> <20190722053954.25423-4-ming.lei@redhat.com>
- <d82ead02-c893-4d14-307e-70a6d4596439@acm.org>
-In-Reply-To: <d82ead02-c893-4d14-307e-70a6d4596439@acm.org>
-From:   Keith Busch <keith.busch@gmail.com>
-Date:   Mon, 22 Jul 2019 17:22:33 -0600
-Message-ID: <CAOSXXT5TkrfH0AFZCV0c+YtbFCQ4MnShKM-gkZrj8Qex+Z7Png@mail.gmail.com>
-Subject: Re: [PATCH 3/5] nvme: don't abort completed request in nvme_cancel_request
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme <linux-nvme@lists.infradead.org>,
-        Keith Busch <keith.busch@intel.com>,
+        Mon, 22 Jul 2019 19:27:44 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6MNO7kL100304;
+        Mon, 22 Jul 2019 23:27:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=nH/h94l6KgprwBxgjWXlmx9Jit7OQZwgCgUjL3XIoKI=;
+ b=Q8PU/3WgHzA4QDiw2OVdtRQqVZOzQxJC6Ax+LGUKvbzRtF14Rquj5Ocozrad8OF3hamK
+ zCg3YEg1UI2/gka4cbX8e6FyyqvlbzdUk7xojklQ5nY6wPEjtHugzh8sy6oeka9EqYgF
+ 7RdxMqglocgxbNRT6jhoewCKBAm2KMVNEN1GiVvdpAYtICl5CAktMBuwulYYzAPmSocg
+ ooVQz7G378+JGMNRG3iubrLp/UahLuy3iHUu402LbTQHqrt3KHG9g+wJDcOH5hOJGNHg
+ y2Ep2ns9CQ2UD7wcMlJWtrM07IyZP66Ck1H7yp767UkoHdtFPyqJ985TZm/oPgJzVyjw 2g== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2tutctadt8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Jul 2019 23:27:08 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6MNNtNG196056;
+        Mon, 22 Jul 2019 23:27:08 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2tuts3avxu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Jul 2019 23:27:08 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6MNR7px024371;
+        Mon, 22 Jul 2019 23:27:07 GMT
+Received: from [192.168.1.14] (/180.165.87.209)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 22 Jul 2019 16:27:06 -0700
+Subject: Re: [PATCH 0/5] blk-mq: wait until completed req's complete fn is run
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Max Gurtovoy <maxg@mellanox.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@intel.com>,
         Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+References: <20190722053954.25423-1-ming.lei@redhat.com>
+From:   Bob Liu <bob.liu@oracle.com>
+Message-ID: <a22e7266-98cb-875d-aa89-f37dd6c34ad5@oracle.com>
+Date:   Tue, 23 Jul 2019 07:27:00 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
+MIME-Version: 1.0
+In-Reply-To: <20190722053954.25423-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9326 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907220247
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9326 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907220247
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 22, 2019 at 9:27 AM Bart Van Assche <bvanassche@acm.org> wrote:
-> On 7/21/19 10:39 PM, Ming Lei wrote:
-> > Before aborting in-flight requests, all IO queues have been shutdown.
-> > However, request's completion fn may not be done yet because it may
-> > be scheduled to run via IPI.
-> >
-> > So don't abort one request if it is marked as completed, otherwise
-> > we may abort one normal completed request.
-> >
-> > Cc: Max Gurtovoy <maxg@mellanox.com>
-> > Cc: Sagi Grimberg <sagi@grimberg.me>
-> > Cc: Keith Busch <keith.busch@intel.com>
-> > Cc: Christoph Hellwig <hch@lst.de>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >   drivers/nvme/host/core.c | 4 ++++
-> >   1 file changed, 4 insertions(+)
-> >
-> > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> > index cc09b81fc7f4..cb8007cce4d1 100644
-> > --- a/drivers/nvme/host/core.c
-> > +++ b/drivers/nvme/host/core.c
-> > @@ -285,6 +285,10 @@ EXPORT_SYMBOL_GPL(nvme_complete_rq);
-> >
-> >   bool nvme_cancel_request(struct request *req, void *data, bool reserved)
-> >   {
-> > +     /* don't abort one completed request */
-> > +     if (blk_mq_request_completed(req))
-> > +             return;
-> > +
-> >       dev_dbg_ratelimited(((struct nvme_ctrl *) data)->device,
-> >                               "Cancelling I/O %d", req->tag);
->
-> Something I probably already asked before: what prevents that
-> nvme_cancel_request() is executed concurrently with the completion
-> handler of the same request?
+On 7/22/19 1:39 PM, Ming Lei wrote:
+> Hi,
+> 
+> blk-mq may schedule to call queue's complete function on remote CPU via
+> IPI, but never provide any way to synchronize the request's complete
+> fn.
+> 
+> In some driver's EH(such as NVMe), hardware queue's resource may be freed &
+> re-allocated. If the completed request's complete fn is run finally after the
+> hardware queue's resource is released, kernel crash will be triggered.
+> 
 
-At least for pci, we've shutdown the queues and their interrupts prior
-to tagset iteration, so we can't concurrently execute a natural
-completion for in-flight requests while cancelling them.
+Have you seen the crash? Anyway to emulate/verify this bug..
+
+> Fixes this issue by waitting until completed req's complete fn is run.
+> 
+> Thanks,
+> Ming
+> 
+> Ming Lei (5):
+>   blk-mq: introduce blk_mq_request_completed()
+>   blk-mq: introduce blk_mq_tagset_wait_completed_request()
+>   nvme: don't abort completed request in nvme_cancel_request
+>   nvme: wait until all completed request's complete fn is called
+>   blk-mq: remove blk_mq_complete_request_sync
+> 
+>  block/blk-mq-tag.c         | 32 ++++++++++++++++++++++++++++++++
+>  block/blk-mq.c             | 13 ++++++-------
+>  drivers/nvme/host/core.c   |  6 +++++-
+>  drivers/nvme/host/pci.c    |  2 ++
+>  drivers/nvme/host/rdma.c   |  8 ++++++--
+>  drivers/nvme/host/tcp.c    |  8 ++++++--
+>  drivers/nvme/target/loop.c |  2 ++
+>  include/linux/blk-mq.h     |  3 ++-
+>  8 files changed, 61 insertions(+), 13 deletions(-)
+> 
+> Cc: Max Gurtovoy <maxg@mellanox.com>
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> 
+
