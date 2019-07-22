@@ -2,125 +2,68 @@ Return-Path: <SRS0=hu+R=VT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B740FC7618F
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 22:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50EFBC7618F
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 22:36:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 87ED121985
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 22:26:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563834370;
-	bh=SaCZr/lqE3KBkwJxJ3lN9pVqMFlNvyqSapA1Iar2Yz4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=DyuqWeGi77JU8xnZHh8bwPJFXXcqEtK5Pan3rFV14lYlOwwA40AkqlIhWp5YIlsd7
-	 mHlkF/pI97S87Q9OYfc2krgVbcKnCV8bLKgugRLLbQGsymXWOQKQBpONxuiTKXkMSS
-	 sG7TlJzbam1+r3YU3TZuYX7dCZSkvlEiiVGovdVM=
+	by mail.kernel.org (Postfix) with ESMTP id 2CADB21985
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 22:36:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732962AbfGVW0J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jul 2019 18:26:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40010 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728633AbfGVW0J (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jul 2019 18:26:09 -0400
-Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 484D921985;
-        Mon, 22 Jul 2019 22:26:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563834368;
-        bh=SaCZr/lqE3KBkwJxJ3lN9pVqMFlNvyqSapA1Iar2Yz4=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Ogi3k+rE6tk0IM0RMI1sxYzidV8NLfAQfkbaqZqpx47sIH3rytjrFbF0L2h9+viUc
-         HXSYDvdHUkfN2kpbEa5fKWrQdie7drx8APmpPamwnuov0yvOqo0lk8hQ21R7nNODV1
-         D/z8/0j2BEGTqS2l1Mi4j87EjG/KCZECdTJfkpyY=
-Date:   Mon, 22 Jul 2019 15:26:07 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Johannes Weiner <hannes@cmpxchg.org>
-Cc:     linux-mm@kvack.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] psi: annotate refault stalls from IO submission
-Message-Id: <20190722152607.dd175a9d517a5f6af06a8bdc@linux-foundation.org>
-In-Reply-To: <20190722201337.19180-1-hannes@cmpxchg.org>
-References: <20190722201337.19180-1-hannes@cmpxchg.org>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        id S1729193AbfGVWgg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jul 2019 18:36:36 -0400
+Received: from mail-pl1-f170.google.com ([209.85.214.170]:37204 "EHLO
+        mail-pl1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727731AbfGVWgg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Jul 2019 18:36:36 -0400
+Received: by mail-pl1-f170.google.com with SMTP id b3so19766695plr.4
+        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2019 15:36:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=VZSH/y6lzo3OVrB+7LdKq5eKo9+FLnxE8eH5ENXUlTU=;
+        b=Yl8SwC3pw2ZHY6qBfj/vy14VNQdJfOBc9OYY7XrZnnMydRbdy/MsUQSUwlKQrGdPaE
+         Ar5bHUEzaPmLM0+otsMDmE0ogBWuQnWdAaGIa9FzZQml+lElRoKhS5fiQ1NxO81hg7da
+         SKQr3c9YDRik606cGnhplrgk8BpVjL44FB28DhddVKPOQVbHPt1ez4qzZhdFMyPQcR30
+         rXzhHyJs0QGn/O+xX2hk9/zP3gxDXU93voe+KtqQzARSI5WqP37HUeP1ccIrwxmHnW/E
+         sEsRG0SBE2EGhGTyWNHZ+xjtsPQanvOn/lxFMt7EtJ8W8JWSdxz+WItREaXIn+uDYxIF
+         yWWw==
+X-Gm-Message-State: APjAAAXe9shweT56ziSz0XcyPB9Jt8xSHwyZ9ELaDrYCJLI8FBpqrT2S
+        9gC36usEW5pcNamiAblNV0oIzYrUlHk=
+X-Google-Smtp-Source: APXvYqxRXRv60EiwFE5PtRhiAj8Ru7dka87acQoL/bEkbzIK2j3GVOVOEdpNn+wNGlMfaPcYyOhj3w==
+X-Received: by 2002:a17:902:1566:: with SMTP id b35mr79499430plh.147.1563834994920;
+        Mon, 22 Jul 2019 15:36:34 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id e6sm45215160pfn.71.2019.07.22.15.36.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 22 Jul 2019 15:36:34 -0700 (PDT)
+Subject: Re: regression: block/001 lead kernel NULL pointer from v5.3-rc1
+To:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org
+References: <1106410976.2184883.1563817165884.JavaMail.zimbra@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <2ef64389-39e0-455e-d972-0fcb72f76b54@acm.org>
+Date:   Mon, 22 Jul 2019 15:36:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+In-Reply-To: <1106410976.2184883.1563817165884.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 22 Jul 2019 16:13:37 -0400 Johannes Weiner <hannes@cmpxchg.org> wrote:
+On 7/22/19 10:39 AM, Yi Zhang wrote:
+> With step[1], this kernel NULL pointer[2] can be triggered every time from v5.3-rc1, let me know if you need more info, thanks.
 
-> psi tracks the time tasks wait for refaulting pages to become
-> uptodate, but it does not track the time spent submitting the IO. The
-> submission part can be significant if backing storage is contended or
-> when cgroup throttling (io.latency) is in effect - a lot of time is
-> spent in submit_bio(). In that case, we underreport memory pressure.
+Have you already tried patch "[PATCH] scsi: fix the dma_max_mapping_size 
+call" (https://marc.info/?l=linux-scsi&m=156378725427719)?
 
-It's a somewhat broad patch.  How significant is this problem in the
-real world?  Can we be confident that the end-user benefit is worth the
-code changes?
-
-> Annotate the submit_bio() paths (or the indirection through readpage)
-> for refaults and swapin to get proper psi coverage of delays there.
-> 
-> Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
-> ---
->  fs/btrfs/extent_io.c | 14 ++++++++++++--
->  fs/ext4/readpage.c   |  9 +++++++++
->  fs/f2fs/data.c       |  8 ++++++++
->  fs/mpage.c           |  9 +++++++++
->  mm/filemap.c         | 20 ++++++++++++++++++++
->  mm/page_io.c         | 11 ++++++++---
->  mm/readahead.c       | 24 +++++++++++++++++++++++-
-
-We touch three filesystems.  Why these three?  Are all other
-filesystems OK or will they need work as well?
-
-> ...
->
-> --- a/mm/filemap.c
-> +++ b/mm/filemap.c
->
-> ...
->
-> @@ -2753,11 +2763,14 @@ static struct page *do_read_cache_page(struct address_space *mapping,
->  				void *data,
->  				gfp_t gfp)
->  {
-> +	bool refault = false;
->  	struct page *page;
->  	int err;
->  repeat:
->  	page = find_get_page(mapping, index);
->  	if (!page) {
-> +		unsigned long pflags;
-> +
-
-That was a bit odd.  This?
-
---- a/mm/filemap.c~psi-annotate-refault-stalls-from-io-submission-fix
-+++ a/mm/filemap.c
-@@ -2815,12 +2815,12 @@ static struct page *do_read_cache_page(s
- 				void *data,
- 				gfp_t gfp)
- {
--	bool refault = false;
- 	struct page *page;
- 	int err;
- repeat:
- 	page = find_get_page(mapping, index);
- 	if (!page) {
-+		bool refault = false;
- 		unsigned long pflags;
- 
- 		page = __page_cache_alloc(gfp);
-_
-
+Bart.
