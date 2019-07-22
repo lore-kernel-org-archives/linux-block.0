@@ -1,114 +1,111 @@
-Return-Path: <SRS0=enhP=VS=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=hu+R=VT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A2C6C76191
-	for <linux-block@archiver.kernel.org>; Sun, 21 Jul 2019 16:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCDF6C76195
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 00:39:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C40621743
-	for <linux-block@archiver.kernel.org>; Sun, 21 Jul 2019 16:56:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="vdxJfD4w"
+	by mail.kernel.org (Postfix) with ESMTP id B8A3B206BF
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 00:39:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1563755995;
+	bh=4/CB9Ayev5JKrE0XJ4YE64N8BfVO1NLnfPU/tzmyKWQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Q3J+SYMwRvp6Lp2q3D3VLXuu960yjnA5S5Ir8HvfI7PSxZl1Xu1GoLo0a8Sa+q9ts
+	 y0HrSCLvIMKPD8T3p1O7Mi1bHllehbGOEZV3pngEyeNM9MOGh1xSIHRHWHFL8wqOTF
+	 hIO6vqFL+V76rOSXixbVA1+bTLyWK0lwqJndfA0w=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726022AbfGUQ4t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 21 Jul 2019 12:56:49 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:35291 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725943AbfGUQ4s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Jul 2019 12:56:48 -0400
-Received: by mail-pf1-f195.google.com with SMTP id u14so16226347pfn.2
-        for <linux-block@vger.kernel.org>; Sun, 21 Jul 2019 09:56:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=OVS4MEdSGpRv7y7usEiXEtbX3dhcWAe/BZ2X97D8/ZI=;
-        b=vdxJfD4wxIDnR8+EshUfVilphMAKnAeVpb1zH9llxhLGffzOO/lgSCYZcUsmwsiLlc
-         +QOj7LEpb3vrJFbS+NNBdJQUl1ogptRYsO7L5HCqRc0h6sTgA4OVQqGEVGj5NIPEX0I0
-         A+nwLM4+DzfWg2fKzGTRaH0Cqk/sSGUboVVok4so3BLVV/koTF9yB5+BZJzPhpdMpuk6
-         b0Coa0pIbWVSwVmvD8XlWqQ3NE+sXxDYTqAKAzAH4AAek1vjhcfc4oetbChfOzjOA9Bd
-         t+y33wt63UG4LtC4tVPZyUBokK4sTFhDcaVEzh+bkeV1+ZavuGv32iOqy9aUoDChjVOF
-         w4Vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OVS4MEdSGpRv7y7usEiXEtbX3dhcWAe/BZ2X97D8/ZI=;
-        b=M7Za699Q8EdcGu5+w6WYIyTzgfyiZEHaIA7R/TTYwr/KiNC5nzNz/Imi934xDfxVYC
-         7t7H1C0SX3kDac10NNu5jB4EcjfaE9MJK0jwhbFu/8Eta3nLYTQlSlt65TfEzh60tYJK
-         36bwxmVn0QDt2wp5bKFEI8End9jhuQ386G/6feoDXXxCAqVyv01jc3kkEmHWWyQtNVKq
-         RejOht4/ED6BEJJUOA0XVnOzt/fGj0OPcYDcT8kyn9IMfVwvLUmGxYP312uqhjWanxW2
-         5HBY8HkMtCoUhnFPM+kzHECeaZgYxpaqHTSRBBGG5y4YOeDkjlYSCQiCiO6zJlODNxNx
-         uzfA==
-X-Gm-Message-State: APjAAAViOw3wwf6Ukf/FQdpePegykNAofcUyNCDuWSi64GaZt+Yso5f4
-        G1FPXD92o+BDYxEZVUNWRG960G1HKyw=
-X-Google-Smtp-Source: APXvYqzB7BL1W0Qqr8lzDWzaBBH2kCHPnnzc8K7yCRu6FVtAECO3YFFLS3OVyK7PWYeoZcfxRhjNeA==
-X-Received: by 2002:a63:c44c:: with SMTP id m12mr29097040pgg.396.1563728207660;
-        Sun, 21 Jul 2019 09:56:47 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id z4sm26548414pgp.80.2019.07.21.09.56.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 21 Jul 2019 09:56:46 -0700 (PDT)
-Subject: Re: [PATCH] io_uring: use bytes instead of pages to decide len
- exceeding
-To:     Zhengyuan Liu <liuzhengyuan@kylinos.cn>
-Cc:     linux-block@vger.kernel.org
-References: <20190721155408.14009-1-liuzhengyuan@kylinos.cn>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <282d488e-ac68-bbc9-e727-07d6bf2bf3c0@kernel.dk>
-Date:   Sun, 21 Jul 2019 10:56:44 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726643AbfGVAjw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 Jul 2019 20:39:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49330 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725904AbfGVAjw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 21 Jul 2019 20:39:52 -0400
+Received: from localhost (unknown [216.243.17.14])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 390EC206BF;
+        Mon, 22 Jul 2019 00:39:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1563755991;
+        bh=4/CB9Ayev5JKrE0XJ4YE64N8BfVO1NLnfPU/tzmyKWQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WScm1ORm+ix420nLZYK26vO4F4umJ40LKSDGPOakSl0fyTreIKkR7EPyUfNsCLg0u
+         y0y8WaNpLrv3OLH8z1IvXwlD62ECXecZ7cyMmYFwKEW5ibuiZs+EzcdeAFM5Mbcmfs
+         YVTrt0lwB62hI+ONtjKcxfodws8st6L+P9zp/7vg=
+Date:   Sun, 21 Jul 2019 20:39:50 -0400
+From:   Sasha Levin <sashal@kernel.org>
+To:     Dennis Zhou <dennis@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 5.2 129/249] blk-iolatency: only account
+ submitted bios
+Message-ID: <20190722003950.GC1607@sasha-vm>
+References: <20190715134655.4076-1-sashal@kernel.org>
+ <20190715134655.4076-129-sashal@kernel.org>
+ <20190715195806.GA77907@dennisz-mbp>
 MIME-Version: 1.0
-In-Reply-To: <20190721155408.14009-1-liuzhengyuan@kylinos.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20190715195806.GA77907@dennisz-mbp>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/21/19 9:54 AM, Zhengyuan Liu wrote:
-> We are using PAGE_SIZE as the unit to determine if the total len in
-> async_list has exceeded max_pages, it's not fair for smaller io sizes.
-> For example, if we are doing 1k-size io streams, we will never exceed
-> max_pages since len >>= PAGE_SHIFT always gets zero. So use original
-> bytes to make things fair.
+On Mon, Jul 15, 2019 at 03:58:06PM -0400, Dennis Zhou wrote:
+>On Mon, Jul 15, 2019 at 09:44:54AM -0400, Sasha Levin wrote:
+>> From: Dennis Zhou <dennis@kernel.org>
+>>
+>> [ Upstream commit a3fb01ba5af066521f3f3421839e501bb2c71805 ]
+>>
+>> As is, iolatency recognizes done_bio and cleanup as ending paths. If a
+>> request is marked REQ_NOWAIT and fails to get a request, the bio is
+>> cleaned up via rq_qos_cleanup() and ended in bio_wouldblock_error().
+>> This results in underflowing the inflight counter. Fix this by only
+>> accounting bios that were actually submitted.
+>>
+>> Signed-off-by: Dennis Zhou <dennis@kernel.org>
+>> Cc: Josef Bacik <josef@toxicpanda.com>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>> ---
+>>  block/blk-iolatency.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+>> index d22e61bced86..c91b84bb9d0a 100644
+>> --- a/block/blk-iolatency.c
+>> +++ b/block/blk-iolatency.c
+>> @@ -600,6 +600,10 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+>>  	if (!blkg || !bio_flagged(bio, BIO_TRACKED))
+>>  		return;
+>>
+>> +	/* We didn't actually submit this bio, don't account it. */
+>> +	if (bio->bi_status == BLK_STS_AGAIN)
+>> +		return;
+>> +
+>>  	iolat = blkg_to_lat(bio->bi_blkg);
+>>  	if (!iolat)
+>>  		return;
+>> --
+>> 2.20.1
+>>
+>
+>Hi Sasha,
+>
+>If you're going to pick this up, c9b3007feca0 ("blk-iolatency: fix
+>STS_AGAIN handling") fixes this patch, so please pick that up too.
 
-Thanks, we do need this for sub page sized reads to be accurate. One
-minor nit:
+I've picked it up, thanks!
 
-> @@ -1121,28 +1121,27 @@ static void io_async_list_note(int rw, struct io_kiocb *req, size_t len)
->   	off_t io_end = kiocb->ki_pos + len;
->   
->   	if (filp == async_list->file && kiocb->ki_pos == async_list->io_end) {
-> -		unsigned long max_pages;
-> +		unsigned long max_pages, max_bytes;
->   
->   		/* Use 8x RA size as a decent limiter for both reads/writes */
->   		max_pages = filp->f_ra.ra_pages;
->   		if (!max_pages)
->   			max_pages = VM_READAHEAD_PAGES;
-> -		max_pages *= 8;
-> +		max_bytes = (max_pages * 8) << PAGE_SHIFT;
-
-Let's get rid of max_pages, and just do:
-
-	/* Use 8x RA size as a decent limiter for both reads/writes */
-	max_bytes = filp->f_ra.ra_pages << (PAGE_SHIFT + 3);
-	if (!max_bytes)
-		max_bytes = VM_READAHEAD_PAGES << (PAGE_SHIFT + 3);
-
-There's really no need to have both a max_pages and max_bytes variable
-if we're tracking and limiting based on bytes.
-
--- 
-Jens Axboe
-
+--
+Thanks,
+Sasha
