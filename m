@@ -1,126 +1,186 @@
-Return-Path: <SRS0=hu+R=VT=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=ppXp=VU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 550F0C7618F
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 23:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2DB5C7618F
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 00:06:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 28CEB2199C
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jul 2019 23:51:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A47E2218BE
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 00:06:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cUgjbkKy"
+	dkim=pass (2048-bit key) header.d=tds.net header.i=@tds.net header.b="hoORmh2c"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733062AbfGVXvu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jul 2019 19:51:50 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:37666 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731112AbfGVXvu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jul 2019 19:51:50 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6MNikq2011913;
-        Mon, 22 Jul 2019 23:51:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=ovE6K7lxivhCfH9LRjGsrr23JzVy9SPekmo6Fjy51g8=;
- b=cUgjbkKyVdRpvx2tHG2zrFgR+9AW8gnBau68E1hJds8h8ymnYlgHsks+r/9kWjEdf6jt
- U3NWEI8fYjqOgCmOkf6kFWNoFjVw4zw9SFq1JUu/Va2fuGdJF5qTrOsUUPzwxX0OJo6Q
- MuakUM9yQqEDLHhw3MAtBXajfcxRPuUNOcsBQZRA0wM1MC9IX2SeznwmmdDaRQdSy8ke
- 4l69y3As1t+2EjR54fFT0nnLMvy2THQYOeVckczkSdf8Ek5dFwEsgknrTE1VSt2efOOM
- JHNivp76NIpmx9cY9AFLOeh9PDwU05B9m/FIHphrz/I1gEZOHmhkcY6jR95ejCobIwsu nA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2tutwpafs4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Jul 2019 23:51:46 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6MNhEEQ124720;
-        Mon, 22 Jul 2019 23:51:45 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2tut9mma0b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Jul 2019 23:51:45 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6MNpi1t011900;
-        Mon, 22 Jul 2019 23:51:44 GMT
-Received: from [192.168.1.14] (/180.165.87.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 22 Jul 2019 16:51:44 -0700
-Subject: Re: [PATCH 1/4] block: elevator.c: Remove now unused elevator=
- argument
-To:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
-        linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-References: <20190714053453.1655-1-marcos.souza.org@gmail.com>
- <20190714053453.1655-2-marcos.souza.org@gmail.com>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <e428794d-f02d-d47a-4e2a-12c99028cb7d@oracle.com>
-Date:   Tue, 23 Jul 2019 07:51:38 +0800
+        id S1728128AbfGWAGd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jul 2019 20:06:33 -0400
+Received: from smtp.tds.cmh.synacor.com ([64.8.70.105]:24341 "EHLO
+        mail.tds.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727643AbfGWAGd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Jul 2019 20:06:33 -0400
+DKIM-Signature: v=1; a=rsa-sha1; d=tds.net; s=20180112; c=relaxed/simple;
+        q=dns/txt; i=@tds.net; t=1563840391;
+        h=From:Subject:Date:To:MIME-Version:Content-Type;
+        bh=HfLnM7usCbRgzhfPrAB/SI0JDWA=;
+        b=hoORmh2c1vqHrXIG+9QCA6e5tAomSGjOYz5FFNJtK5jF30QTXfgEoEPrC8InPu8r
+        5McPaFyCy4N4EWug3XN8EIkq6yzvCcr6TWgxDVLZOfnfQg2MPHtla+agvrRQ2Sto
+        wBtXwidSjjPYJ8WiPuY9WoML7RSfIQSzZdyWVQyKT8hsYGnR5YrWJlcEKPr3SQH9
+        dKThVoLp/p0/u+vS5//pMzPLvI15IsmcbzktqavC+vgY2JeB3ZBxA2hvgM5RPb9W
+        OVfaKSjBWoDCHbkeJP8zRZGM1mD6JiozWCeKDCllHXGz3bP3eGA0mJ5AyHkeWZT3
+        o3EmrCiqzfqa2wB6SGY0Dw==;
+X_CMAE_Category: , ,
+X-CNFS-Analysis: v=2.2 cv=T/zOdLCQ c=1 sm=1 tr=0 a=QQ1z/TRHJLkw7QGu0419XQ==:117 a=QQ1z/TRHJLkw7QGu0419XQ==:17 a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=KGjhK52YXX0A:10 a=IkcTkHD0fZMA:10 a=nHvWMnLLnzEA:10 a=0o9FgrsRnhwA:10 a=C9He5zk_2WUA:10 a=kU5C1K9T137bR3JZkYMA:9 a=h6HAsI16Cc7kcdTR:21 a=PMgU3WoxihswJ-e1:21 a=GGopsvZ8UP8xCoVB:21 a=QEXdDO2ut3YA:10
+X-CM-Score: 0
+X-Scanned-by: Cloudmark Authority Engine
+X-Authed-Username: ZGF2aWRjNTAyQHRkcy5uZXQ=
+Authentication-Results:  smtp01.tds.cmh.synacor.com smtp.user=davidc502; auth=pass (LOGIN)
+Received: from [69.21.125.220] ([69.21.125.220:41042] helo=[192.168.2.226])
+        by mail.tds.net (envelope-from <davidc502@tds.net>)
+        (ecelerity 3.6.5.45644 r(Core:3.6.5.0)) with ESMTPSA (cipher=AES128-SHA) 
+        id 3A/61-28836-78F463D5; Mon, 22 Jul 2019 20:06:31 -0400
+Subject: Re: fstrim error - AORUS NVMe Gen4 SSD
+From:   davidc502 <davidc502@tds.net>
+To:     linux-block@vger.kernel.org
+References: <fb510e33-5c81-6d62-fcde-a2989b3a1a8f@tds.net>
+ <4b76413b-1af4-a406-5b16-6789b2b7012a@tds.net>
+Message-ID: <bdb8e486-bcda-1b11-0fd7-f25bc48eeb2c@tds.net>
+Date:   Mon, 22 Jul 2019 19:06:30 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190714053453.1655-2-marcos.souza.org@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <4b76413b-1af4-a406-5b16-6789b2b7012a@tds.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9326 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907220251
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9326 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907220251
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/14/19 1:34 PM, Marcos Paulo de Souza wrote:
-> Since the inclusion of blk-mq, elevator argument was not being
-> considered anymore, and it's utility died long with the legacy IO path,
-> now removed too.
-> 
-> Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-> ---
->  block/elevator.c | 14 --------------
->  1 file changed, 14 deletions(-)
-> 
-> diff --git a/block/elevator.c b/block/elevator.c
-> index 2f17d66d0e61..f56d9c7d5cbc 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -135,20 +135,6 @@ static struct elevator_type *elevator_get(struct request_queue *q,
->  	return e;
->  }
->  
-> -static char chosen_elevator[ELV_NAME_MAX];
-> -
-> -static int __init elevator_setup(char *str)
-> -{
-> -	/*
-> -	 * Be backwards-compatible with previous kernels, so users
-> -	 * won't get the wrong elevator.
-> -	 */
-> -	strncpy(chosen_elevator, str, sizeof(chosen_elevator) - 1);
-> -	return 1;
-> -}
-> -
-> -__setup("elevator=", elevator_setup);
-> -
->  static struct kobj_type elv_ktype;
->  
->  struct elevator_queue *elevator_alloc(struct request_queue *q,
-> 
 
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
+
+  Hello,
+
+  I'm not sure my email from yesterday went through due to .txt 
+requirements.  However, I've added some additional logs at the end of 
+this email.
+
+  If this email group does not deal with these type of issues, please 
+let me know.
+
+  Best Regards,
+
+  David
+
+  On 7/20/19 9:41 PM, davidc502 wrote:
+
+
+   Hello,
+
+   I've assembled a X570 board with a 1TB AORUS NVMe Gen4 SSD.
+
+   When attempting to fstrim the NVMe, I receive the following error.
+   davidc502@Ryzen-3900x:~$ sudo fstrim -a -v
+   fstrim: /boot/efi: FITRIM ioctl failed: Input/output error
+   fstrim: /: FITRIM ioctl failed: Input/output error
+
+   Anyhow, I have put some details below which might be helpful. Note 
+that this NVMe is supposed to be TRIM and SMART compliant. The SMART 
+outputs are available using the utility “nvme-cli”.
+   I am willing to provide whatever command outputs that are needed to 
+help solve this issue.
+
+   OS= Ubuntu 18.4.2 LTS
+   Different Kernels I’ve tried = 5.1.16, 5.2 rc7, and 4.18
+   fstrim version =  fstrim from util-linux 2.31.1
+   Firmware version for Aorus NVMe = EGFM11.0
+
+   mount output
+   /dev/nvme0n1p2 on / type ext4 (rw,relatime,errors=remount-ro)
+   /dev/nvme0n1p1 on /boot/efi type vfat 
+(rw,relatime,fmask=0077,dmask=0077,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro)
+
+   NVMe firmware version using utility ‘nvme’
+
+   $ sudo nvme list /dev/nvme0n1
+
+   Node             SN Model Namespace Usage                      
+Format           FW Rev
+   ---------------- -------------------- 
+---------------------------------------- --------- 
+-------------------------- ---------------- --------
+   /dev/nvme0n1     SNX       GIGABYTE GP-ASM2NE6100TTTD               
+1           1.00  TB /   1.00 TB 512   B +  0 B   EGFM11.0
+
+    More Log information
+
+  [Fri Jul 19 17:05:08 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] print_req_error: I/O error, dev nvme0n1, 
+sector 4160 flags 803
+  [Fri Jul 19 17:05:08 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] amd_iommu_report_page_fault: 28 callbacks 
+suppressed
+  [Fri Jul 19 17:05:08 2019] AMD-Vi: Event logged [IO_PAGE_FAULT 
+device=01:00.0 domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] AMD-Vi: Event logged [IO_PAGE_FAULT 
+device=01:00.0 domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:08 2019] print_req_error: I/O error, dev nvme0n1, 
+sector 1141976 flags 803
+  [Fri Jul 19 17:05:59 2019] amd_iommu_report_page_fault: 2 callbacks 
+suppressed
+  [Fri Jul 19 17:05:59 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] print_req_error: I/O error, dev nvme0n1, 
+sector 4160 flags 803
+  [Fri Jul 19 17:05:59 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] nvme 0000:01:00.0: AMD-Vi: Event logged 
+[IO_PAGE_FAULT domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] AMD-Vi: Event logged [IO_PAGE_FAULT 
+device=01:00.0 domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] AMD-Vi: Event logged [IO_PAGE_FAULT 
+device=01:00.0 domain=0x0000 address=0x0 flags=0x0000]
+  [Fri Jul 19 17:05:59 2019] print_req_error: I/O error, dev nvme0n1, 
+sector 1141976 flags 803
+
+  If there is any other additional information I can provide please let 
+me know.
+
+   Best Regards,
+
+   David
 
