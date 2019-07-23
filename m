@@ -2,129 +2,86 @@ Return-Path: <SRS0=ppXp=VU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB69FC76188
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 04:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E29C76190
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 05:27:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A724921911
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 04:38:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B8EA2239E
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 05:27:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731864AbfGWEiT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jul 2019 00:38:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52252 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727251AbfGWEiT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jul 2019 00:38:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4125F3082E51;
-        Tue, 23 Jul 2019 04:38:19 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E4C05D9C5;
-        Tue, 23 Jul 2019 04:38:12 +0000 (UTC)
-Date:   Tue, 23 Jul 2019 12:38:04 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     davidc502 <davidc502@tds.net>
-Cc:     linux-block@vger.kernel.org, ilnux-nvme@lists.infradead.org
-Subject: Re: fstrim error - AORUS NVMe Gen4 SSD
-Message-ID: <20190723043803.GB13829@ming.t460p>
-References: <fb510e33-5c81-6d62-fcde-a2989b3a1a8f@tds.net>
- <20190723021928.GF30776@ming.t460p>
- <4a7ec7aa-f6ee-f9dc-4a17-38f2b169c721@tds.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4a7ec7aa-f6ee-f9dc-4a17-38f2b169c721@tds.net>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 23 Jul 2019 04:38:19 +0000 (UTC)
+        id S1728759AbfGWF1y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jul 2019 01:27:54 -0400
+Received: from relmlor2.renesas.com ([210.160.252.172]:21989 "EHLO
+        relmlie6.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728245AbfGWF1y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jul 2019 01:27:54 -0400
+X-IronPort-AV: E=Sophos;i="5.64,297,1559487600"; 
+   d="scan'208";a="21926857"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 23 Jul 2019 14:27:52 +0900
+Received: from localhost.localdomain (unknown [10.166.17.210])
+        by relmlir6.idc.renesas.com (Postfix) with ESMTP id 3340941E3CDD;
+        Tue, 23 Jul 2019 14:27:52 +0900 (JST)
+From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To:     ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
+        robin.murphy@arm.com, joro@8bytes.org, axboe@kernel.dk
+Cc:     wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: [PATCH v8 2/5] iommu/dma: Add a new dma_map_ops of get_merge_boundary()
+Date:   Tue, 23 Jul 2019 14:26:45 +0900
+Message-Id: <1563859608-19456-3-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1563859608-19456-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+References: <1563859608-19456-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+This patch adds a new dma_map_ops of get_merge_boundary() to
+expose the DMA merge boundary if the domain type is IOMMU_DOMAIN_DMA.
 
-On Mon, Jul 22, 2019 at 09:39:07PM -0500, davidc502 wrote:
-> See attached:  nvme_io_trace.log
-> 
-> 
-> On 7/22/19 9:19 PM, Ming Lei wrote:
-> > Hi,
-> > 
-> > On Sat, Jul 20, 2019 at 09:41:24PM -0500, davidc502 wrote:
-> > >   Hello,
-> > > 
-> > >   I've assembled a X570 board with a 1TB AORUS NVMe Gen4 SSD.
-> > > 
-> > >   When attempting to fstrim the NVMe, I receive the following error.
-> > >   davidc502@Ryzen-3900x:~$ sudo fstrim -a -v
-> > >   fstrim: /boot/efi: FITRIM ioctl failed: Input/output error
-> > >   fstrim: /: FITRIM ioctl failed: Input/output error
-> > > 
-> > >   Anyhow, I have put some details below which might be helpful. Note that
-> > > this NVMe is supposed to be TRIM and SMART compliant. The SMART outputs are
-> > > available using the utility “nvme-cli”.
-> > >   I am willing to provide whatever command outputs that are needed to help
-> > > solve this issue.
-> > > 
-> > >   OS= Ubuntu 18.4.2 LTS
-> > >   Different Kernels I’ve tried = 5.1.16, 5.2 rc7, and 4.18
-> > >   fstrim version =  fstrim from util-linux 2.31.1
-> > >   Firmware version for Aorus NVMe = EGFM11.0
-> > > 
-> > I saw discard timeout on HGST 1.6TB NVMe, not sure if yours is same with
-> > that one.
-> > 
-> > Could you collect logs via the following steps?
-> > 
-> > Suppose your nvme disk name is /dev/nvme0n1:
-> > 
-> > 1) queue limits log:
-> > 
-> > 	#(cd /sys/block/nvme0n1/queue && find . -type f -exec grep -aH . {} \;)
-> > 
-> > 
-> > 2) NVMe IO trace
-> > 
-> > - enable nvme IO trace before running fstrim:
-> > 
-> > 	#echo 1  > /sys/kernel/debug/tracing/events/nvme_setup_cmd/enable
-> > 	#echo 1  > /sys/kernel/debug/tracing/events/nvme_complete_rq/enable
-> > 
-> > - run fstrim
-> > 
-> > - after the fstrim failure is triggered, disable the nvme io trace & post the log:
-> > 
-> > 	#echo 0  > /sys/kernel/debug/tracing/events/nvme_setup_cmd/enable
-> > 	#echo 0  > /sys/kernel/debug/tracing/events/nvme_complete_rq/enable
-> > 
-> > 	#cp	/sys/kernel/debug/tracing/trace /root/nvme_io_trace.log
-> > 
-> > 
-> > 
-> > thanks,
-> > Ming
-> 
-> 
-> Hello Ming
-> 
-> Thank you for the quick reply --  See attached
+Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+---
+ drivers/iommu/dma-iommu.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-From the IO trace, discard command(nvme_cmd_dsm) is failed:
+diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+index a7f9c3e..f3e5f2b 100644
+--- a/drivers/iommu/dma-iommu.c
++++ b/drivers/iommu/dma-iommu.c
+@@ -1085,6 +1085,16 @@ static int iommu_dma_get_sgtable(struct device *dev, struct sg_table *sgt,
+ 	return ret;
+ }
+ 
++static unsigned long iommu_dma_get_merge_boundary(struct device *dev)
++{
++	struct iommu_domain *domain = iommu_get_dma_domain(dev);
++
++	if (domain->type != IOMMU_DOMAIN_DMA)
++		return 0;	/* can't merge */
++
++	return (1 << __ffs(domain->pgsize_bitmap)) - 1;
++}
++
+ static const struct dma_map_ops iommu_dma_ops = {
+ 	.alloc			= iommu_dma_alloc,
+ 	.free			= iommu_dma_free,
+@@ -1100,6 +1110,7 @@ static const struct dma_map_ops iommu_dma_ops = {
+ 	.sync_sg_for_device	= iommu_dma_sync_sg_for_device,
+ 	.map_resource		= iommu_dma_map_resource,
+ 	.unmap_resource		= iommu_dma_unmap_resource,
++	.get_merge_boundary	= iommu_dma_get_merge_boundary,
+ };
+ 
+ /*
+-- 
+2.7.4
 
-  kworker/15:1H-462   [015] .... 91814.342452: nvme_setup_cmd: nvme0: disk=nvme0n1, qid=7, cmdid=552, nsid=1, flags=0x0, meta=0x0, cmd=(nvme_cmd_dsm nr=0, attributes=4)
-          <idle>-0     [013] d.h. 91814.342708: nvme_complete_rq: nvme0: disk=nvme0n1, qid=7, cmdid=552, res=0, retries=0, flags=0x0, status=8198
-
-And the returned error code is 0x8198, I am not sure how to parse the
-'Command Specific Status Values' of 0x98, maybe Christoph, Keith or our other
-NVMe guys can help to understand the failure.
-
-
-Thanks,
-Ming
