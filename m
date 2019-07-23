@@ -4,27 +4,28 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D6FC76188
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 05:28:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DBFCC76188
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 05:28:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 177C32239E
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 05:28:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FB7021BF6
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 05:28:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729073AbfGWF16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jul 2019 01:27:58 -0400
-Received: from relmlor1.renesas.com ([210.160.252.171]:6931 "EHLO
+        id S1729126AbfGWF17 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jul 2019 01:27:59 -0400
+Received: from relmlor1.renesas.com ([210.160.252.171]:19018 "EHLO
         relmlie5.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727467AbfGWF15 (ORCPT
+        by vger.kernel.org with ESMTP id S1728790AbfGWF16 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jul 2019 01:27:57 -0400
+        Tue, 23 Jul 2019 01:27:58 -0400
 X-IronPort-AV: E=Sophos;i="5.64,297,1559487600"; 
-   d="scan'208";a="22145540"
+   d="scan'208";a="22145543"
 Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
   by relmlie5.idc.renesas.com with ESMTP; 23 Jul 2019 14:27:52 +0900
 Received: from localhost.localdomain (unknown [10.166.17.210])
-        by relmlir6.idc.renesas.com (Postfix) with ESMTP id 6316641E4097;
+        by relmlir6.idc.renesas.com (Postfix) with ESMTP id AA50541E4097;
         Tue, 23 Jul 2019 14:27:52 +0900 (JST)
 From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 To:     ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
@@ -33,9 +34,9 @@ Cc:     wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
         iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
         linux-renesas-soc@vger.kernel.org,
         Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Subject: [PATCH v8 3/5] block: sort headers on blk-setting.c
-Date:   Tue, 23 Jul 2019 14:26:46 +0900
-Message-Id: <1563859608-19456-4-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+Subject: [PATCH v8 5/5] mmc: queue: Use bigger segments if DMA MAP layer can merge the segments
+Date:   Tue, 23 Jul 2019 14:26:48 +0900
+Message-Id: <1563859608-19456-6-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1563859608-19456-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 References: <1563859608-19456-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
@@ -44,42 +45,110 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch sorts the headers in alphabetic order to ease
-the maintenance for this part.
+When the max_segs of a mmc host is smaller than 512, the mmc
+subsystem tries to use 512 segments if DMA MAP layer can merge
+the segments, and then the mmc subsystem exposes such information
+to the block layer by using blk_queue_can_use_dma_map_merging().
 
 Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
 ---
- block/blk-settings.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/mmc/core/queue.c | 35 ++++++++++++++++++++++++++++++++---
+ include/linux/mmc/host.h |  1 +
+ 2 files changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 2ae348c..45f2c52 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -2,16 +2,16 @@
- /*
-  * Functions related to setting various queue properties from drivers
-  */
--#include <linux/kernel.h>
--#include <linux/module.h>
--#include <linux/init.h>
- #include <linux/bio.h>
- #include <linux/blkdev.h>
--#include <linux/memblock.h>	/* for max_pfn/max_low_pfn */
- #include <linux/gcd.h>
--#include <linux/lcm.h>
--#include <linux/jiffies.h>
- #include <linux/gfp.h>
-+#include <linux/init.h>
-+#include <linux/jiffies.h>
-+#include <linux/kernel.h>
-+#include <linux/lcm.h>
-+#include <linux/memblock.h>     /* for max_pfn/max_low_pfn */
-+#include <linux/module.h>
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index e327f80..ce337b2 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -20,6 +20,8 @@
+ #include "card.h"
+ #include "host.h"
  
- #include "blk.h"
- #include "blk-wbt.h"
++#define MMC_DMA_MAP_MERGE_SEGMENTS	512
++
+ static inline bool mmc_cqe_dcmd_busy(struct mmc_queue *mq)
+ {
+ 	/* Allow only 1 DCMD at a time */
+@@ -192,6 +194,12 @@ static void mmc_queue_setup_discard(struct request_queue *q,
+ 		blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
+ }
+ 
++static unsigned int mmc_get_max_segments(struct mmc_host *host)
++{
++	return host->can_dma_map_merge ? MMC_DMA_MAP_MERGE_SEGMENTS :
++					 host->max_segs;
++}
++
+ /**
+  * mmc_init_request() - initialize the MMC-specific per-request data
+  * @q: the request queue
+@@ -205,7 +213,7 @@ static int __mmc_init_request(struct mmc_queue *mq, struct request *req,
+ 	struct mmc_card *card = mq->card;
+ 	struct mmc_host *host = card->host;
+ 
+-	mq_rq->sg = mmc_alloc_sg(host->max_segs, gfp);
++	mq_rq->sg = mmc_alloc_sg(mmc_get_max_segments(host), gfp);
+ 	if (!mq_rq->sg)
+ 		return -ENOMEM;
+ 
+@@ -361,13 +369,23 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
+ 		blk_queue_bounce_limit(mq->queue, BLK_BOUNCE_HIGH);
+ 	blk_queue_max_hw_sectors(mq->queue,
+ 		min(host->max_blk_count, host->max_req_size / 512));
+-	blk_queue_max_segments(mq->queue, host->max_segs);
++	if (host->can_dma_map_merge)
++		WARN(!blk_queue_can_use_dma_map_merging(mq->queue,
++							mmc_dev(host)),
++		     "merging was advertised but not possible");
++	blk_queue_max_segments(mq->queue, mmc_get_max_segments(host));
+ 
+ 	if (mmc_card_mmc(card))
+ 		block_size = card->ext_csd.data_sector_size;
+ 
+ 	blk_queue_logical_block_size(mq->queue, block_size);
+-	blk_queue_max_segment_size(mq->queue,
++	/*
++	 * After blk_queue_can_use_dma_map_merging() was called with succeed,
++	 * since it calls blk_queue_virt_boundary(), the mmc should not call
++	 * both blk_queue_max_segment_size().
++	 */
++	if (host->can_dma_map_merge)
++		blk_queue_max_segment_size(mq->queue,
+ 			round_down(host->max_seg_size, block_size));
+ 
+ 	dma_set_max_seg_size(mmc_dev(host), queue_max_segment_size(mq->queue));
+@@ -417,6 +435,17 @@ int mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card)
+ 	mq->tag_set.cmd_size = sizeof(struct mmc_queue_req);
+ 	mq->tag_set.driver_data = mq;
+ 
++	/*
++	 * Since blk_mq_alloc_tag_set() calls .init_request() of mmc_mq_ops,
++	 * the host->can_dma_map_merge should be set before to get max_segs
++	 * from mmc_get_max_segments().
++	 */
++	if (host->max_segs < MMC_DMA_MAP_MERGE_SEGMENTS &&
++	    dma_get_merge_boundary(mmc_dev(host)))
++		host->can_dma_map_merge = 1;
++	else
++		host->can_dma_map_merge = 0;
++
+ 	ret = blk_mq_alloc_tag_set(&mq->tag_set);
+ 	if (ret)
+ 		return ret;
+diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
+index 4a351cb..c5662b3 100644
+--- a/include/linux/mmc/host.h
++++ b/include/linux/mmc/host.h
+@@ -396,6 +396,7 @@ struct mmc_host {
+ 	unsigned int		retune_paused:1; /* re-tuning is temporarily disabled */
+ 	unsigned int		use_blk_mq:1;	/* use blk-mq */
+ 	unsigned int		retune_crc_disable:1; /* don't trigger retune upon crc */
++	unsigned int		can_dma_map_merge:1; /* merging can be used */
+ 
+ 	int			rescan_disable;	/* disable card detection */
+ 	int			rescan_entered;	/* used with nonremovable devices */
 -- 
 2.7.4
 
