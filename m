@@ -2,139 +2,76 @@ Return-Path: <SRS0=ppXp=VU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8D8C76194
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 15:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FFC9C76190
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 15:39:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 974F7218B8
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 15:28:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sILLQhYH"
+	by mail.kernel.org (Postfix) with ESMTP id E0CEA217D4
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 15:39:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729652AbfGWP2j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jul 2019 11:28:39 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:42595 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726283AbfGWP2j (ORCPT
+        id S1725601AbfGWPj4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jul 2019 11:39:56 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:41101 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388432AbfGWPjz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jul 2019 11:28:39 -0400
-Received: by mail-pf1-f195.google.com with SMTP id q10so19313928pff.9;
-        Tue, 23 Jul 2019 08:28:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=gN2NTbMjgP0TcnnxiZaPLNnmbetdQsD4pX+fgmFtE3Q=;
-        b=sILLQhYHkz0hsTzPPAOlsZq62m0+BakINShYPWdy8tukzrefq/YGrvPz3zMYRLuQ7i
-         fehD9ajxRmArTBv1mZkHvycEy4QK3TfncqjROxYQOIIaZXYk/pXQiyG4mgo+Cwm1l/qu
-         cUpQIP1+1JmkqTp/RWjr9S7abcvDPRgfizoctF4U8zPhxRpdmc/js7pgDYWLCWNIyawv
-         8VEa6tQBMigmmTMD5Wlko6Rp5BNa3/05FqZWHSegaas5U39z9yTVaGxJMJns8hG+jtyV
-         PsJl9q+JGW5N8zuIBIfozQ1DBEZil9L8R1damG5JTRMbihgVnUKoFbDwxijHFGumBMqs
-         iRCA==
+        Tue, 23 Jul 2019 11:39:55 -0400
+Received: by mail-pl1-f194.google.com with SMTP id m9so20669920pls.8
+        for <linux-block@vger.kernel.org>; Tue, 23 Jul 2019 08:39:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=gN2NTbMjgP0TcnnxiZaPLNnmbetdQsD4pX+fgmFtE3Q=;
-        b=N5dUQwfuyM/Jrfsc1rkwZh1xTTv/Gw3fq3oXQGaWCm6WI1qi8FCGh/YyuOv5M9269h
-         08P2OqraPObQ/J7cyHhLBRL2D/TFBGf/jApJb4bwc7CC8Ai62dHQsfQjp7fTppav5Vel
-         EBlvOvF3ZpQKxc0QgoiqpAyDzGtl3XSPwWQuYXoZVFlickUQ5ulLszMwfGEkR27h7MvI
-         Jf7B8zZ8UkWavgl8La6PPJY+4GEn5XOnj7DWGmBqKFprJqOP+NABS93QpEVqLefv6WRq
-         ApDstF512+0BmAlLRHYcpT667j0IfLzqHGx2FPxv0nhvmoyQXU3lku8CPI6E+PlOp3CJ
-         MvEg==
-X-Gm-Message-State: APjAAAUJk19FAVmNW08CmBtMhygixCjMjPIzQcIdvxqfFlhpjujqbnNh
-        5u0TkFm8LzYFSJajK2GxRCWiuZyC00EyDx4Owpg=
-X-Google-Smtp-Source: APXvYqwr1+MClcxRpR3QHoRQhxy47KjKeLLybBqw5qgcnJE8csTvsL6em13Q1xnfHMHbwVL6v1kOD7JNmc6qUPoOElc=
-X-Received: by 2002:a17:90a:fa07:: with SMTP id cm7mr48873905pjb.115.1563895719034;
- Tue, 23 Jul 2019 08:28:39 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PMNkmI0JwKIWE38ndwkoXj7J/daKkC19/6Ub5V3Y2Uo=;
+        b=FettHZjDVlASy/OITko+42iAYw/87LTOnphg9kMBSYR7SRi8DCymP36DgsFXcFty1d
+         bJCo1tV0Bap7yJMutn06OEBclv6RsaD5ovMpgRA6IOjd35Evj9MfoNjrOnfgoBntXiat
+         6PG9iONaxA8RAosUhyOSwmJyaG2yN7hD6izEK0M/OYM+IZD7zE3Jkqe77QsD9l3G1Eq0
+         PmqAjjQq8qdcY//z4CxQEaV6E6ZsOPygfm8dYLXJ4Fn3sXNy3NNxchA7s1B/mrAiKmh6
+         McLhsfiipn3vuoZhdJRCdeR37tHss1d6SZGlLFT+8CiSnJEWUxITA+Y8eECB/hItPXm/
+         L7tw==
+X-Gm-Message-State: APjAAAVPeuCfY9akavCkh9yv2oyWqFY9ehdMg0cnsWNUa9uyMka1+38F
+        ZkEvZ2eI+rx0JAmxXBEwEOs=
+X-Google-Smtp-Source: APXvYqzMo+kM0avCroGH08NhAlDstB0YiN01vwaXysJ8IgORSbPvOTc9KJmMIlYT3bEVaKHKNRD6mg==
+X-Received: by 2002:a17:902:e282:: with SMTP id cf2mr82220094plb.301.1563896394656;
+        Tue, 23 Jul 2019 08:39:54 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id n7sm49298814pff.59.2019.07.23.08.39.53
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 23 Jul 2019 08:39:53 -0700 (PDT)
+Subject: Re: [PATCH 3/5] block: Micro-optimize bvec_split_segs()
+To:     Johannes Thumshirn <jthumshirn@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.com>
+References: <20190722171210.149443-1-bvanassche@acm.org>
+ <20190722171210.149443-4-bvanassche@acm.org>
+ <20190723082058.GC3997@x250.microfocus.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <28419fcf-63a7-62e1-e91d-00ddd3ecb69e@acm.org>
+Date:   Tue, 23 Jul 2019 08:39:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <1563807552-23498-2-git-send-email-akinobu.mita@gmail.com> <201907231041.n2ZW7zai%lkp@intel.com>
-In-Reply-To: <201907231041.n2ZW7zai%lkp@intel.com>
-From:   Akinobu Mita <akinobu.mita@gmail.com>
-Date:   Wed, 24 Jul 2019 00:28:28 +0900
-Message-ID: <CAC5umyi0O7iXW3x4vE2yTgjTkerKn+VQHJVOwdD7qPJnwJUyAQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] block: introduce LED block device activity trigger
-To:     kbuild test robot <lkp@intel.com>
-Cc:     kbuild-all@01.org, linux-block@vger.kernel.org,
-        linux-leds@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org,
-        Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>,
-        Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-        Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190723082058.GC3997@x250.microfocus.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-2019=E5=B9=B47=E6=9C=8823=E6=97=A5(=E7=81=AB) 11:22 kbuild test robot <lkp@=
-intel.com>:
->
-> Hi Akinobu,
->
-> I love your patch! Yet something to improve:
->
-> [auto build test ERROR on linus/master]
-> [cannot apply to v5.3-rc1 next-20190722]
-> [if your patch is applied to the wrong git tree, please drop us a note to=
- help improve the system]
->
-> url:    https://github.com/0day-ci/linux/commits/Akinobu-Mita/block-intro=
-duce-LED-block-device-activity-trigger/20190723-074956
-> config: x86_64-rhel (attached as .config)
-> compiler: gcc-7 (Debian 7.4.0-10) 7.4.0
-> reproduce:
->         # save the attached .config to linux build tree
->         make ARCH=3Dx86_64
->
-> If you fix the issue, kindly add following tag
-> Reported-by: kbuild test robot <lkp@intel.com>
->
-> All errors (new ones prefixed by >>):
->
->    In file included from drivers/scsi/mvsas/mv_94xx.c:11:0:
-> >> drivers/scsi/mvsas/mv_94xx.h:278:2: error: redeclaration of enumerator=
- 'LED_OFF'
->      LED_OFF =3D 0,
->      ^~~~~~~
->    In file included from include/linux/genhd.h:20:0,
->                     from include/linux/blkdev.h:11,
->                     from include/linux/blk-mq.h:5,
->                     from include/scsi/scsi_host.h:11,
->                     from include/linux/libata.h:21,
->                     from include/scsi/libsas.h:16,
->                     from drivers/scsi/mvsas/mv_sas.h:27,
->                     from drivers/scsi/mvsas/mv_94xx.c:10:
->    include/linux/leds.h:27:2: note: previous definition of 'LED_OFF' was =
-here
->      LED_OFF  =3D 0,
->      ^~~~~~~
->    In file included from drivers/scsi/mvsas/mv_94xx.c:11:0:
-> >> drivers/scsi/mvsas/mv_94xx.h:279:2: error: redeclaration of enumerator=
- 'LED_ON'
->      LED_ON =3D 1,
->      ^~~~~~
->    In file included from include/linux/genhd.h:20:0,
->                     from include/linux/blkdev.h:11,
->                     from include/linux/blk-mq.h:5,
->                     from include/scsi/scsi_host.h:11,
->                     from include/linux/libata.h:21,
->                     from include/scsi/libsas.h:16,
->                     from drivers/scsi/mvsas/mv_sas.h:27,
->                     from drivers/scsi/mvsas/mv_94xx.c:10:
->    include/linux/leds.h:28:2: note: previous definition of 'LED_ON' was h=
-ere
->      LED_ON  =3D 1,
->      ^~~~~~
+On 7/23/19 1:20 AM, Johannes Thumshirn wrote:
+> Although I'm always interested in performance numbers when a patch claims to
+> (micro) optimize something.
 
-The mvsas driver declares LED_* enums for enum sgpio_led_status.
-I'm going to prepare a patch that adds 'SGPIO_' prefix to these enums.
+Maybe I should have used the word "Simplify" in the patch subject. 
+Anyway, thanks for the review.
+
+Bart.
+
+
