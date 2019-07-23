@@ -8,54 +8,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF78C76186
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 18:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1178DC76186
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 18:43:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 43693216C8
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 18:42:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D535921841
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 18:43:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qHO+CknR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ck/sNN5z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387606AbfGWSm6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jul 2019 14:42:58 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:42612 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731007AbfGWSm6 (ORCPT
+        id S2391457AbfGWSn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jul 2019 14:43:29 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:40866 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731007AbfGWSn2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jul 2019 14:42:58 -0400
-Received: by mail-pf1-f193.google.com with SMTP id q10so19567630pff.9;
-        Tue, 23 Jul 2019 11:42:57 -0700 (PDT)
+        Tue, 23 Jul 2019 14:43:28 -0400
+Received: by mail-pf1-f196.google.com with SMTP id p184so19567749pfp.7;
+        Tue, 23 Jul 2019 11:43:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=CuBq2ea9RAnOcCp/a/6zA6IGtHEy600UrSm5Gali8kE=;
-        b=qHO+CknRnfSVrIIIdLUDFEacZZ6VkaWRORHECxikg5ah0nnn7qZZITAv1s82JMIi4w
-         iC0W6/bFUe0Na49tk1fkV1/vFTEmx/UUkLA66GaxGKjnDuDyeutazt3G5UOiNCgk5F5H
-         XoRYfLvtItoKCFrwWG1GNrc5Imq/RvI7sSJyf76+7X2jb0RutEPw+i5mJ99a5gykJF4l
-         026ZAGw3gDUXlVZDMZKSPZABPLHVS2wG9CTuAzsUTOVOHfClUVU03PQmnLoW/Q+A30lx
-         HBwAmXRmXH+icepv1NFFwB2VWeqGrlB44h17eGHsA8B21PTvU8Ni5FsmXzz0jo0fQ7v0
-         WfTw==
+        b=Ck/sNN5zztaTkCVnWcWUKBEA3MUfxkhyrQh5pCzkvhVtoahE7756iKQbQ0Zevd0bOP
+         jzHXscsR0DabCPswgdIRwLrp+dXX+MX2kO5PJNsy/pKJ+5yhodp5C/MSbwtWnzduWBpQ
+         1usP+L0nOJUjKHywbQkjXODzweYYdDD1MrkFbrMk0Q1H+mlG1k/EDM+B9GkVsY+lW4Us
+         ATIN2j1g1Zi32bKtelyPvrEYavE93gsmklSWtkMVNCEN3Tf3u88iZNkyXENmjJ7k64p+
+         CqJ+vG2T0rr8BbAxg27p9+HFiMGYZTAzr7CN6f5fGgeaHHQxsT+YxpDDEW5+9/yQ4Qmq
+         GI/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=CuBq2ea9RAnOcCp/a/6zA6IGtHEy600UrSm5Gali8kE=;
-        b=U8s20QZqX2mB0hy2URXJdsxelbfLHy1kG1Svi2VIfhh3pujn5IzJSAoeOqcc+BfjRF
-         upSp5uWeYD5Nr4a1uLYBMA1Sc4wErVn+3W9URmVeDhifIRAQGFx28KQXTExSc1zzdxBO
-         tL++zj5hyMBhJ9xLVI7ed1JXEk5TVvNL5P6FzGKUCLWTXoOrIScrL5zYQfjeYuj1OSx8
-         OyfQ3IBBfvkLJFFI/fE9OPR7snMIYl4ySywZNJGVf2mLSlHgrlRBVEaNoxNJCdPKY9Aa
-         pw7owA/oFgnhyE5qNCbDe/KU+EOFAe//cG+D1DyVBJIQpyXDnycqB4DsVqdpUJu055s0
-         6RDQ==
-X-Gm-Message-State: APjAAAVHuADkL1ihZ8jwDMRITy17SLTdmlaB/bATcDJ1HYKMo2vONG1e
-        gLB97OHK+Xd22ZKnleUiBETk76e6x+Y=
-X-Google-Smtp-Source: APXvYqzhx6iNGBbySKd5BbxX60bDbxsKE9vmVlL7QESq9Cq4w5vEKwrejO8eWv4HOtTGgaYRIjnTGg==
-X-Received: by 2002:a63:b10f:: with SMTP id r15mr8348615pgf.230.1563907376801;
-        Tue, 23 Jul 2019 11:42:56 -0700 (PDT)
+        b=T2H+39ku+NLUu08cVVv7rFPD9UBcquePhnRKLCuoACnzgDLYztSYJnOt9CsAyk1xXz
+         fGNrI/4TX0+HIJtG/w5v8dMYI8NOWbRfoH5NMQZHYYdw9HhiQByCVEB+sazaF0R05CNg
+         /1ZytQFwdl0wnT6SVIWSZkSP8UoFbRKHrv7omfmVv+8ZeMyux61u4oA5N7WnELIBm1AE
+         TyLovmLUHjIU7xV0kqk7IYeKzzvqVmnUkKBjrk/ByE9LUH2W1KVmFSns3tilk3ncBM/Y
+         i56ThARNDVcT8yVFy/8GZftzduY7r3L6IytS0wz2f+uvVzbVuZtxqyLgPDEWMqgt0Ja1
+         4Tgw==
+X-Gm-Message-State: APjAAAWqRf8ApfRAocARJ0dvXfnzdauPo4aNfm+AmC/z2t6Vhck++T1v
+        rSNRmYnvN3MZOScembewb7OBI+Ssw5Y=
+X-Google-Smtp-Source: APXvYqwEftuarkE0r5rFmsqps1YVeYIPYpPuuOvaYE3jXVvqivdCUfbJK8yEAcpV9PkGNCW7DgWjTQ==
+X-Received: by 2002:a63:f750:: with SMTP id f16mr47824276pgk.317.1563907407653;
+        Tue, 23 Jul 2019 11:43:27 -0700 (PDT)
 Received: from localhost.localdomain ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id s66sm47416373pfs.8.2019.07.23.11.42.53
+        by smtp.gmail.com with ESMTPSA id b190sm33891056pga.37.2019.07.23.11.43.24
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 23 Jul 2019 11:42:55 -0700 (PDT)
+        Tue, 23 Jul 2019 11:43:26 -0700 (PDT)
 From:   Minwoo Im <minwoo.im.dev@gmail.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>,
@@ -64,9 +64,9 @@ Cc:     =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         Jens Axboe <axboe@kernel.dk>,
         Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: [PATCH V2] lightnvm: introduce pr_fmt for the previx nvm
-Date:   Wed, 24 Jul 2019 03:42:43 +0900
-Message-Id: <20190723184243.4347-1-minwoo.im.dev@gmail.com>
+Subject: [PATCH V3] lightnvm: introduce pr_fmt for the prefix nvm
+Date:   Wed, 24 Jul 2019 03:43:19 +0900
+Message-Id: <20190723184319.4427-1-minwoo.im.dev@gmail.com>
 X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
