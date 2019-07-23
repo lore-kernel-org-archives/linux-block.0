@@ -2,247 +2,100 @@ Return-Path: <SRS0=ppXp=VU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD788C76190
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 20:42:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82CA0C76186
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 20:54:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6CDB229ED
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 20:42:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="Br7NzGnD"
+	by mail.kernel.org (Postfix) with ESMTP id 5D5542253D
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 20:54:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387466AbfGWUmK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jul 2019 16:42:10 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:45111 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391964AbfGWUmK (ORCPT
+        id S1732206AbfGWUyz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jul 2019 16:54:55 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:40663 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730145AbfGWUyz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jul 2019 16:42:10 -0400
-Received: by mail-pf1-f194.google.com with SMTP id r1so19711150pfq.12
-        for <linux-block@vger.kernel.org>; Tue, 23 Jul 2019 13:42:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=46Sn1TjB+7cXjJ1oCwsYotRCUk4eF4IUbdpH2VBpW9w=;
-        b=Br7NzGnD5/uCHAmUbgP3kHHUnne3uBIYrLHkT3Hm0Jyj+iblE7CK2NiIlIoP+/F9pU
-         01vAz3ku27SycTFXXZSK3irK4+2oOhqILT01R36pQq5zL8cSp9bP7tPG26Sif9oRY3qf
-         0PGSjIRMkZxbsAsxuTMrP9jGTuePIPWJAwuqtn6tYRCVFakd06ytTSrREcFqXS1rEUOO
-         nLOByE+Car72iOAp7zUMnMsh4fAUlmL3oeI8qX9R+sm2mp+h0QjDlfY+G/xzmOyxGloQ
-         /gu0INMxBzrUMs2JSktwTYaMrL4gmyd4KmevwUVfEIdocwgHrBWdFH7GTqrWirEsJ/Fw
-         aDJw==
+        Tue, 23 Jul 2019 16:54:55 -0400
+Received: by mail-pg1-f195.google.com with SMTP id w10so20008975pgj.7
+        for <linux-block@vger.kernel.org>; Tue, 23 Jul 2019 13:54:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=46Sn1TjB+7cXjJ1oCwsYotRCUk4eF4IUbdpH2VBpW9w=;
-        b=AhfC6Nokz2d9VCoAjxhqRw6v69Dvh8n/ubnhPs+3fdNM0eVGK+c8/IA+vRl3L2PCk9
-         bqx7rQkI3vEAaXXjkYgfVB88khUuGo+pqAb1FNJ8t26orr8HrIeqCaJ0d9uyHUjO0PP7
-         CLEj+PUR0o5ZxX01+UPraMY4huFT787osg7QzWDcFkDJzpERcH9Gs1gtft8uhizqGSC5
-         hbkp1coWZxM37LU9OFZZRr8W/obQP3ZzATzU8gJCoW+V7FR9GaWTx5IZygBltX8JgKia
-         JyUZgZWg5xQQLNBwHqwatv1efp6ApSR4Pz5NFHRQ1GAJRyoZ29pcMH/zVWStG7t+9XkW
-         FnWQ==
-X-Gm-Message-State: APjAAAWkM6VIfjn6fyU2vQDk73l22wZF2FsXE674DSnSmuJx/HYNKEU+
-        FVeTaTwjmhCGpkppo+Ab3vk=
-X-Google-Smtp-Source: APXvYqyJqnV/CGvEDEu2xDeIC1Qvo93stTXChykOGP1ABuWnCB7sJFtX0B0wjIsZWY7FJuPTVEmakQ==
-X-Received: by 2002:a17:90a:7d04:: with SMTP id g4mr84685532pjl.41.1563914528974;
-        Tue, 23 Jul 2019 13:42:08 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::2:a7f8])
-        by smtp.gmail.com with ESMTPSA id g11sm41178603pgu.11.2019.07.23.13.42.07
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 23 Jul 2019 13:42:08 -0700 (PDT)
-Date:   Tue, 23 Jul 2019 16:42:06 -0400
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] psi: annotate refault stalls from IO submission
-Message-ID: <20190723204206.GA30522@cmpxchg.org>
-References: <20190722201337.19180-1-hannes@cmpxchg.org>
- <20190723000226.GV7777@dread.disaster.area>
- <20190723190438.GA22541@cmpxchg.org>
- <2d80cfdb-f5e0-54f1-29a3-a05dee5b94eb@kernel.dk>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=a8iFh5BbQND0J1Dwrc0Vos5lZnrpVUYNNsd3hBJPA34=;
+        b=mZdYpm25fvamHrw1ttODa9o+UZc5Fs9+UHWovU5oqofKbJVNNVdTxlVtouBRZtXngy
+         SmxduLsKUlLuAmvnSG3RycQAJfMRVEHRoUCbrpLItkhhqqPPPSoHbwLuWWtYWS9hv7S0
+         HWCa0yuhcBCxQFmf6/WNZCb3mAEDCJ5xVzmKMbs46Lzv0sBVcTvRLQzw/OGfeNmVDf6j
+         8cs4yrBhIgBFpiZR/OoAFCThJSfFqTy+72twnvIdjr2kwPMZVtDQq/+Usuq5/F04lmBP
+         RQtPSApI7bqxN0tQIZH5Yg4INkUbRorjkb7swspHejCFan6N5Obm2CuCW8eLi8s3MPYt
+         Bh/A==
+X-Gm-Message-State: APjAAAUIyOoUUpqUQQTVlqclqqfvfFAyTBHoIZ/Y6VgmhYSO+j2POu5p
+        FCbJRgKFPp4VRn98Flhl1Bs=
+X-Google-Smtp-Source: APXvYqz9vS3CD0YxxS6FLT0olRRoiZHe2LxKsuIwSjFixP+MX3waHzzb/CVdoRCsXYheYJYEQ6JRjw==
+X-Received: by 2002:a17:90a:24ac:: with SMTP id i41mr83137777pje.124.1563915294648;
+        Tue, 23 Jul 2019 13:54:54 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id t7sm36935088pfh.101.2019.07.23.13.54.53
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 23 Jul 2019 13:54:53 -0700 (PDT)
+Subject: Re: [PATCH 2/5] blk-mq: introduce
+ blk_mq_tagset_wait_completed_request()
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20190722053954.25423-1-ming.lei@redhat.com>
+ <20190722053954.25423-3-ming.lei@redhat.com>
+ <c2722892-9cbf-0747-58a8-91a99b72bc53@acm.org>
+ <20190723010616.GC30776@ming.t460p>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <d4d3ded9-0012-68c1-7511-f5ac3aa7b1fb@acm.org>
+Date:   Tue, 23 Jul 2019 13:54:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2d80cfdb-f5e0-54f1-29a3-a05dee5b94eb@kernel.dk>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+In-Reply-To: <20190723010616.GC30776@ming.t460p>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 23, 2019 at 01:34:50PM -0600, Jens Axboe wrote:
-> On 7/23/19 1:04 PM, Johannes Weiner wrote:
-> > CCing Jens for bio layer stuff
-> > 
-> > On Tue, Jul 23, 2019 at 10:02:26AM +1000, Dave Chinner wrote:
-> >> Even better: If this memstall and "refault" check is needed to
-> >> account for bio submission blocking, then page cache iteration is
-> >> the wrong place to be doing this check. It should be done entirely
-> >> in the bio code when adding pages to the bio because we'll only ever
-> >> be doing page cache read IO on page cache misses. i.e. this isn't
-> >> dependent on adding a new page to the LRU or not - if we add a new
-> >> page then we are going to be doing IO and so this does not require
-> >> magic pixie dust at the page cache iteration level
-> > 
-> > That could work. I had it at the page cache level because that's
-> > logically where the refault occurs. But PG_workingset encodes
-> > everything we need from the page cache layer and is available where
-> > the actual stall occurs, so we should be able to push it down.
-> > 
-> >> e.g. bio_add_page_memstall() can do the working set check and then
-> >> set a flag on the bio to say it contains a memstall page. Then on
-> >> submission of the bio the memstall condition can be cleared.
-> > 
-> > A separate bio_add_page_memstall() would have all the problems you
-> > pointed out with the original patch: it's magic, people will get it
-> > wrong, and it'll be hard to verify and notice regressions.
-> > 
-> > How about just doing it in __bio_add_page()? PG_workingset is not
-> > overloaded - when we see it set, we can generally and unconditionally
-> > flag the bio as containing userspace workingset pages.
-> > 
-> > At submission time, in conjunction with the IO direction, we can
-> > clearly tell whether we are reloading userspace workingset data,
-> > i.e. stalling on memory.
-> > 
-> > This?
+On 7/22/19 6:06 PM, Ming Lei wrote:
+> On Mon, Jul 22, 2019 at 08:25:07AM -0700, Bart Van Assche wrote:
+>> On 7/21/19 10:39 PM, Ming Lei wrote:
+>>> blk-mq may schedule to call queue's complete function on remote CPU via
+>>> IPI, but doesn't provide any way to synchronize the request's complete
+>>> fn.
+>>>
+>>> In some driver's EH(such as NVMe), hardware queue's resource may be freed &
+>>> re-allocated. If the completed request's complete fn is run finally after the
+>>> hardware queue's resource is released, kernel crash will be triggered.
+>>>
+>>> Prepare for fixing this kind of issue by introducing
+>>> blk_mq_tagset_wait_completed_request().
+>>
+>> An explanation is missing of why the block layer is modified to fix this
+>> instead of the NVMe driver.
 > 
-> Not vehemently opposed to it, even if it sucks having to test page flags
-> in the hot path.
+> The above commit log has explained that there isn't sync mechanism in
+> blk-mq wrt. request completion, and there might be similar issue in other
+> future drivers.
 
-Yeah, it's not great :/ Just seems marginally better than annotating
-all the callsites and maintain correctness there in the future.
+That is not sufficient as a motivation to modify the block layer because 
+there is already a way to wait until request completions have finished, 
+namely the request queue freeze mechanism. Have you considered to use 
+that mechanism instead of introducing 
+blk_mq_tagset_wait_completed_request()?
 
-> Maybe even do:
-> 
-> 	if (!bio_flagged(bio, BIO_WORKINGSET) && PageWorkingset(page))
-> 		bio_set_flag(bio, BIO_WORKINGSET);
-> 
-> to at least avoid it for the (common?) case where multiple pages are
-> marked as workingset.
+Thanks,
 
-Sounds good. If refaults occur, most likely the whole readahead batch
-has that flag set, so I've added that. I've also marked the page test
-unlikely.
-
-This way we have no jumps in the most common path (no refaults), one
-jump in the second most common (bit already set), and the double for
-the least likely case of hitting the first refault page in a batch.
-
-Updated patch below.
-
----
-From 1b3888bdf075f86f226af4e350c8a88435d1fe8e Mon Sep 17 00:00:00 2001
-From: Johannes Weiner <hannes@cmpxchg.org>
-Date: Thu, 11 Jul 2019 16:01:40 -0400
-Subject: [PATCH] psi: annotate refault stalls from IO submission
-
-psi tracks the time tasks wait for refaulting pages to become
-uptodate, but it does not track the time spent submitting the IO. The
-submission part can be significant if backing storage is contended or
-when cgroup throttling (io.latency) is in effect - a lot of time is
-spent in submit_bio(). In that case, we underreport memory pressure.
-
-Annotate submit_bio() to account submission time as memory stall when
-the bio is reading userspace workingset pages.
-
-Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
----
- block/bio.c               |  3 +++
- block/blk-core.c          | 23 ++++++++++++++++++++++-
- include/linux/blk_types.h |  1 +
- 3 files changed, 26 insertions(+), 1 deletion(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 29cd6cf4da51..4dd9ea0b068b 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -805,6 +805,9 @@ void __bio_add_page(struct bio *bio, struct page *page,
- 
- 	bio->bi_iter.bi_size += len;
- 	bio->bi_vcnt++;
-+
-+	if (!bio_flagged(bio, BIO_WORKINGSET) && unlikely(PageWorkingset(page)))
-+		bio_set_flag(bio, BIO_WORKINGSET);
- }
- EXPORT_SYMBOL_GPL(__bio_add_page);
- 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5d1fc8e17dd1..5993922d63fb 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -36,6 +36,7 @@
- #include <linux/blk-cgroup.h>
- #include <linux/debugfs.h>
- #include <linux/bpf.h>
-+#include <linux/psi.h>
- 
- #define CREATE_TRACE_POINTS
- #include <trace/events/block.h>
-@@ -1127,6 +1128,10 @@ EXPORT_SYMBOL_GPL(direct_make_request);
-  */
- blk_qc_t submit_bio(struct bio *bio)
- {
-+	bool workingset_read = false;
-+	unsigned long pflags;
-+	blk_qc_t ret;
-+
- 	/*
- 	 * If it's a regular read/write or a barrier with data attached,
- 	 * go through the normal accounting stuff before submission.
-@@ -1142,6 +1147,8 @@ blk_qc_t submit_bio(struct bio *bio)
- 		if (op_is_write(bio_op(bio))) {
- 			count_vm_events(PGPGOUT, count);
- 		} else {
-+			if (bio_flagged(bio, BIO_WORKINGSET))
-+				workingset_read = true;
- 			task_io_account_read(bio->bi_iter.bi_size);
- 			count_vm_events(PGPGIN, count);
- 		}
-@@ -1156,7 +1163,21 @@ blk_qc_t submit_bio(struct bio *bio)
- 		}
- 	}
- 
--	return generic_make_request(bio);
-+	/*
-+	 * If we're reading data that is part of the userspace
-+	 * workingset, count submission time as memory stall. When the
-+	 * device is congested, or the submitting cgroup IO-throttled,
-+	 * submission can be a significant part of overall IO time.
-+	 */
-+	if (workingset_read)
-+		psi_memstall_enter(&pflags);
-+
-+	ret = generic_make_request(bio);
-+
-+	if (workingset_read)
-+		psi_memstall_leave(&pflags);
-+
-+	return ret;
- }
- EXPORT_SYMBOL(submit_bio);
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 6a53799c3fe2..2f77e3446760 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -209,6 +209,7 @@ enum {
- 	BIO_BOUNCED,		/* bio is a bounce bio */
- 	BIO_USER_MAPPED,	/* contains user pages */
- 	BIO_NULL_MAPPED,	/* contains invalid user pages */
-+	BIO_WORKINGSET,		/* contains userspace workingset pages */
- 	BIO_QUIET,		/* Make BIO Quiet */
- 	BIO_CHAIN,		/* chained bio, ->bi_remaining in effect */
- 	BIO_REFFED,		/* bio has elevated ->bi_cnt */
--- 
-2.22.0
-
+Bart.
