@@ -5,64 +5,66 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B26CAC7618F
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 02:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC3BC76194
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 02:14:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 819732238B
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 02:14:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26D1B2239E
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 02:14:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NTWxuGoE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IELyJyyy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728720AbfGWCN5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jul 2019 22:13:57 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:43013 "EHLO
+        id S1729510AbfGWCOB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jul 2019 22:14:01 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:38801 "EHLO
         mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727753AbfGWCN4 (ORCPT
+        with ESMTP id S1727753AbfGWCOB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jul 2019 22:13:56 -0400
-Received: by mail-pl1-f194.google.com with SMTP id 4so12962432pld.10;
-        Mon, 22 Jul 2019 19:13:56 -0700 (PDT)
+        Mon, 22 Jul 2019 22:14:01 -0400
+Received: by mail-pl1-f194.google.com with SMTP id az7so19933298plb.5;
+        Mon, 22 Jul 2019 19:14:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=MlQn19xkFS3Ba2rtt43rWTYoRgMfcqbz+hy4lbmkZYU=;
-        b=NTWxuGoEsdh/1JWj2rcSPa8nOmSGqeLDSCcDqVgl5cRWQZ9SQxIDxiUs5pLU/Jad1M
-         2fyfXjf19Jeox+cJtRHqOg3gKYoDgEmXQems3scyLLLwu8VEE9N7/dAN7U3GVQIs4fjV
-         YnpZVlClBnjmI5sfOhxIvSgZFYTm2lxZ4bEqaFNkGVyZmHIs8rQfpZfXTMELzgETQaPd
-         uZ8v7ozuGtEdYa+AfTtBw3hw70ZpXPW3D+HrmqkDWS6Tgx7ejaoeGYH50ilBxy2y7e/I
-         z+SmhmwTOTN/GsbhCs0QVDD3yr1Nmv27dYZaTxC0SCL+aDbZPYM546pYEiMy+r1J1/7u
-         yUBw==
+        bh=bcJiCvbMXNOA/uN8ruxT781zjh9D6EPOuwlY9SZ0FHs=;
+        b=IELyJyyym8TNmLoys+GUIZL8k3PcKiok4b+5IqeJ8Y25pV0llokCEjDZz8mGyrfJWr
+         CHXZSc0HFJahfZu2W4OF+zGScl7nyYpuDc0mAhDg5Q8AAbTODW86wxpkeQ8uKT950+fi
+         YoILo3U+D5L4tGecuRmsqZQeWuJzh7BMhdg6j+Z0ZXgtFA2PTvHkBsUDB7naHTaEl9GE
+         flBHr8axRUDC6wtYgzlnWZrdHnYWwJ2ISyo22JRIp/GMGDxGxl3yAI9HRrqKGgca5Vf4
+         IxEG0LUYyQaefZtRoU6BqKphhDMuSbKiqnRvW3rr0yRfi7tjlCR9Odc7gaLYDWC26Erv
+         BhMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=MlQn19xkFS3Ba2rtt43rWTYoRgMfcqbz+hy4lbmkZYU=;
-        b=Y1crl599KLtAnGP7j8nRNjSp+lmVPP/e48CD395hma2Z1mXaYngETiy6vlQf2qt7gc
-         fjQJ+VZ/RNoKJEIwfd74q3ClLfo51HuF1BNe/DZQIIb/S1JQmSsaAa9XD2fHKqJnFUPF
-         N3yuJhWetlviAj7OJd/fZE128cpfn64v+sv1tRTFBJAPBT5hv9WMuUoegs5UZDpeQc57
-         bRboDusrR4Z8kNnlH0omy0U4sH0KkVuevLceN1rWPHrFGg0HAnhatDwVt3H98FFPLG5v
-         OcoVk1FuyETVK3H/00u/D/EvV6wVkqPlKrAPdwF7z6qvmqUgCMdxgSqiOamG4ajBNEov
-         mLsw==
-X-Gm-Message-State: APjAAAVUjmHPB9pli5ddq5wmuGn9+7Uu3+l9CRoj1a6rFiY3QWgXMClE
-        dndujNZ6jhLflow2bZqa0tzwGTjyP64=
-X-Google-Smtp-Source: APXvYqw+zt1XfvS1B7M/6NM2A83h2lOsy2cyfYPYfPT7qa1cnP4ch9yz5YEX3N8NlnYeoXWlwRPsNQ==
-X-Received: by 2002:a17:902:e582:: with SMTP id cl2mr78748450plb.60.1563848034665;
-        Mon, 22 Jul 2019 19:13:54 -0700 (PDT)
+        bh=bcJiCvbMXNOA/uN8ruxT781zjh9D6EPOuwlY9SZ0FHs=;
+        b=B1TXYA+I6PmlVHIC8nftqh2Nb/Hz/l5VmhkH5/VQI4FE/3hCEawDHYvCsxeUrhkCLH
+         tgaMmlJ2rH1gfEavg8IE+Q/frjlx4NUzSQGirYnv2kkFnHRuavKZGJmQhwfQCa8NIB39
+         RDFYd0tgs9vtB9m0TQAz7l7sEktAyPDn1zuEGK3Wjkq/fHMyRf9+fnBl7UDO7VQ2hU4K
+         AWKtUceNx7Lzrzf4GXvJpJ7R7UHyeOhhQcbrUV0Mzwz61mGmiwuI9K/SWq6R17uweFPy
+         3Stbgo3rtkdP3KcRADLpSnjmXcj5lii5m9DT1kmfVqHY5ZSsxuZiXaTI7QR5KXBPQSHH
+         CB0w==
+X-Gm-Message-State: APjAAAWjbm/5w3xIbCPE3t0DMqArrrXLKkJxXB4Mrm3S8syOomVwkC/3
+        xse+z4chI6oMROqcVa+jeYN76C4QLJ8=
+X-Google-Smtp-Source: APXvYqwJlApLg8k9xUxoYw0CE/f4MdedKH2O4nqfxcLPO80QsXqJI7H8K5qQm2kHNNu+5G5eP+9BCg==
+X-Received: by 2002:a17:902:4683:: with SMTP id p3mr72153269pld.31.1563848039881;
+        Mon, 22 Jul 2019 19:13:59 -0700 (PDT)
 Received: from continental.prv.suse.net ([191.248.110.143])
-        by smtp.gmail.com with ESMTPSA id v126sm7999257pgb.23.2019.07.22.19.13.52
+        by smtp.gmail.com with ESMTPSA id v126sm7999257pgb.23.2019.07.22.19.13.56
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 22 Jul 2019 19:13:53 -0700 (PDT)
+        Mon, 22 Jul 2019 19:13:59 -0700 (PDT)
 From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
 To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         axboe@kernel.dk, hare@suse.com
-Cc:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-Subject: [PATCH 1/2] block: blk-mq: Remove blk_mq_sched_started_request function
-Date:   Mon, 22 Jul 2019 23:14:38 -0300
-Message-Id: <20190723021439.8419-2-marcos.souza.org@gmail.com>
+Cc:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
+        Omar Sandoval <osandov@fb.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH 2/2] include: elevator.h: Remove started_request from elevator_mq_ops
+Date:   Mon, 22 Jul 2019 23:14:39 -0300
+Message-Id: <20190723021439.8419-3-marcos.souza.org@gmail.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190723021439.8419-1-marcos.souza.org@gmail.com>
 References: <20190723021439.8419-1-marcos.souza.org@gmail.com>
@@ -73,49 +75,26 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This function checks if the elevator related to the request has
-started_request implemented, but currently, none of the available IO
-schedulers implement started_request.
+This function is not implemented by any available IO scheduler, so
+remove it.
 
 Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
 ---
- block/blk-mq-sched.h | 9 ---------
- block/blk-mq.c       | 2 --
- 2 files changed, 11 deletions(-)
+ include/linux/elevator.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index cf22ab00fefb..126021fc3a11 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -61,15 +61,6 @@ static inline void blk_mq_sched_completed_request(struct request *rq, u64 now)
- 		e->type->ops.completed_request(rq, now);
- }
- 
--static inline void blk_mq_sched_started_request(struct request *rq)
--{
--	struct request_queue *q = rq->q;
--	struct elevator_queue *e = q->elevator;
--
--	if (e && e->type->ops.started_request)
--		e->type->ops.started_request(rq);
--}
--
- static inline void blk_mq_sched_requeue_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b038ec680e84..3e8902714253 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -669,8 +669,6 @@ void blk_mq_start_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
- 
--	blk_mq_sched_started_request(rq);
--
- 	trace_block_rq_issue(q, rq);
- 
- 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index 17cd0078377c..1dd014c9c87b 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -45,7 +45,6 @@ struct elevator_mq_ops {
+ 	struct request *(*dispatch_request)(struct blk_mq_hw_ctx *);
+ 	bool (*has_work)(struct blk_mq_hw_ctx *);
+ 	void (*completed_request)(struct request *, u64);
+-	void (*started_request)(struct request *);
+ 	void (*requeue_request)(struct request *);
+ 	struct request *(*former_request)(struct request_queue *, struct request *);
+ 	struct request *(*next_request)(struct request_queue *, struct request *);
 -- 
 2.22.0
 
