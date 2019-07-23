@@ -2,192 +2,145 @@ Return-Path: <SRS0=ppXp=VU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D46C76186
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 21:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9989C76186
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 22:06:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3710222387
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 21:56:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=tds.net header.i=@tds.net header.b="rcz7KSWZ"
+	by mail.kernel.org (Postfix) with ESMTP id 91468218F0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 22:06:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731468AbfGWV4M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jul 2019 17:56:12 -0400
-Received: from smtp.tds.cmh.synacor.com ([64.8.70.105]:60901 "EHLO
-        mail.tds.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731354AbfGWV4M (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jul 2019 17:56:12 -0400
-DKIM-Signature: v=1; a=rsa-sha1; d=tds.net; s=20180112; c=relaxed/simple;
-        q=dns/txt; i=@tds.net; t=1563918971;
-        h=From:Subject:Date:To:MIME-Version:Content-Type;
-        bh=V1a4hjIRpHYqJvBSV4HYli3pzJM=;
-        b=rcz7KSWZ/I7aOj4Ey6alkmX33RsRIoeFk3Q+zrQIzOrLU4ACFEv1xWdyd8tKOBGe
-        UZSXcH1lL/mtDM9kfCSwladDt6JHC1WF3REZCDkToIw6OZcCQLy7fVZ8EZIqXfxZ
-        IFvXavi94AJH962/XabpcVVbSurVVlH3QVj49yftXZ+t3jzeBX3ZDXmdXeGNdB0I
-        E2w6hNYF6I1SX2q5mLVVUozdtQBbaG3SW3rp3lZ7qiYhf6oh+acm/kdTDqi/KJmJ
-        SFi13du0k0Pqp23dzjSksPhZbAgFyppsalwseWBx8IozLDBqFxZE+AeiBII9x/NP
-        f8o7ppXrko821Rq0ydkewQ==;
-X_CMAE_Category: , ,
-X-CNFS-Analysis: v=2.2 cv=MI4io4Rl c=1 sm=1 tr=0 a=QQ1z/TRHJLkw7QGu0419XQ==:117 a=QQ1z/TRHJLkw7QGu0419XQ==:17 a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=KGjhK52YXX0A:10 a=IkcTkHD0fZMA:10 a=nHvWMnLLnzEA:10 a=0o9FgrsRnhwA:10 a=C9He5zk_2WUA:10 a=2n64sO5BAAAA:8 a=JfrnYn6hAAAA:8 a=TWMFMMwqqXzE9VEJuPsA:9 a=QEXdDO2ut3YA:10 a=yX3wAsJuk6BbNaD5pWsV:22 a=1CNFftbPRP8L7MoqJWF3:22
-X-CM-Score: 0
-X-Scanned-by: Cloudmark Authority Engine
-X-Authed-Username: ZGF2aWRjNTAyQHRkcy5uZXQ=
-Authentication-Results:  smtp02.tds.cmh.synacor.com smtp.user=davidc502; auth=pass (LOGIN)
-Received: from [69.21.125.220] ([69.21.125.220:45754] helo=[192.168.2.226])
-        by mail.tds.net (envelope-from <davidc502@tds.net>)
-        (ecelerity 3.6.5.45644 r(Core:3.6.5.0)) with ESMTPSA (cipher=AES128-SHA) 
-        id 91/F2-30811-B72873D5; Tue, 23 Jul 2019 17:56:11 -0400
-Subject: Re: fstrim error - AORUS NVMe Gen4 SSD
-From:   davidc502 <davidc502@tds.net>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, ilnux-nvme@lists.infradead.org
-References: <fb510e33-5c81-6d62-fcde-a2989b3a1a8f@tds.net>
- <20190723021928.GF30776@ming.t460p>
- <4a7ec7aa-f6ee-f9dc-4a17-38f2b169c721@tds.net>
- <20190723043803.GB13829@ming.t460p>
- <38cf2485-727b-268d-f42c-6c53b971cb87@tds.net>
-Message-ID: <5ef41ec4-abb8-90bf-e2eb-8a62f51ad951@tds.net>
-Date:   Tue, 23 Jul 2019 16:56:10 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1731500AbfGWWGO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jul 2019 18:06:14 -0400
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:36032 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727921AbfGWWGN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jul 2019 18:06:13 -0400
+Received: from dread.disaster.area (pa49-195-139-63.pa.nsw.optusnet.com.au [49.195.139.63])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 7CB4B43C205;
+        Wed, 24 Jul 2019 08:06:09 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92)
+        (envelope-from <david@fromorbit.com>)
+        id 1hq2u6-0003l2-46; Wed, 24 Jul 2019 08:05:02 +1000
+Date:   Wed, 24 Jul 2019 08:05:02 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, linux-block@vger.kernel.org,
+        Aarushi Mehta <mehta.aaru20@gmail.com>,
+        Julia Suvorova <jusual@mail.ru>, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: EIO with io_uring O_DIRECT writes on ext4
+Message-ID: <20190723220502.GX7777@dread.disaster.area>
+References: <20190723080701.GA3198@stefanha-x1.localdomain>
+ <9a13c3b9-ecf2-6ba7-f0fb-c59a1e1539f3@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <38cf2485-727b-268d-f42c-6c53b971cb87@tds.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9a13c3b9-ecf2-6ba7-f0fb-c59a1e1539f3@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0 cx=a_idp_d
+        a=fNT+DnnR6FjB+3sUuX8HHA==:117 a=fNT+DnnR6FjB+3sUuX8HHA==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=0o9FgrsRnhwA:10
+        a=0zNzEECMAAAA:20 a=u-UUKw4dAAAA:8 a=7-415B0cAAAA:8
+        a=doMjY3b_vQCcGa0qDDIA:9 a=CjuIK1q_8ugA:10 a=cklHB5Dw1nV-3JPruhv7:22
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ming,
+On Tue, Jul 23, 2019 at 09:20:05AM -0600, Jens Axboe wrote:
+> On 7/23/19 2:07 AM, Stefan Hajnoczi wrote:
+> > Hi,
+> > io_uring O_DIRECT writes can fail with EIO on ext4.  Please see the
+> > function graph trace from Linux 5.3.0-rc1 below for details.  It was
+> > produced with the following qemu-io command (using Aarushi's QEMU
+> > patches from https://github.com/rooshm/qemu/commits/io_uring):
+> > 
+> >    $ qemu-io --cache=none --aio=io_uring --format=qcow2 -c 'writev -P 185 131072 65536' tests/qemu-iotests/scratch/test.qcow2
+> > 
+> > This issue is specific to ext4.  XFS and the underlying LVM logical
+> > volume both work.
+> > 
+> > The storage configuration is an LVM logical volume (device-mapper linear
+> > target), on top of LUKS, on top of a SATA disk.  The logical volume's
+> > request_queue does not have mq_ops and this causes
+> > generic_make_request_checks() to fail:
+> > 
+> >    if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_mq(q))
+> >            goto not_supported;
+> > 
+> > I guess this could be worked around by deferring the request to the
+> > io_uring work queue to avoid REQ_NOWAIT.  But XFS handles this fine so
+> > how can io_uring.c detect this case cleanly or is there a bug in ext4?
+> 
+> I actually think it's XFS that's broken here, it's not passing down
+> the IOCB_NOWAIT -> IOMAP_NOWAIT -> REQ_NOWAIT. This means we lose that
+> important request bit, and we just block instead of triggering the
+> not_supported case.
 
-On 7/23/19 4:38 PM, davidc502 wrote:
-> Hello,
->
-> On 7/22/19 11:38 PM, Ming Lei wrote:
->> Hi,
->>
->> On Mon, Jul 22, 2019 at 09:39:07PM -0500, davidc502 wrote:
->>> See attached:  nvme_io_trace.log
->>>
->>>
->>> On 7/22/19 9:19 PM, Ming Lei wrote:
->>>> Hi,
->>>>
->>>> On Sat, Jul 20, 2019 at 09:41:24PM -0500, davidc502 wrote:
->>>>>    Hello,
->>>>>
->>>>>    I've assembled a X570 board with a 1TB AORUS NVMe Gen4 SSD.
->>>>>
->>>>>    When attempting to fstrim the NVMe, I receive the following error.
->>>>>    davidc502@Ryzen-3900x:~$ sudo fstrim -a -v
->>>>>    fstrim: /boot/efi: FITRIM ioctl failed: Input/output error
->>>>>    fstrim: /: FITRIM ioctl failed: Input/output error
->>>>>
->>>>>    Anyhow, I have put some details below which might be helpful. 
->>>>> Note that
->>>>> this NVMe is supposed to be TRIM and SMART compliant. The SMART 
->>>>> outputs are
->>>>> available using the utility “nvme-cli”.
->>>>>    I am willing to provide whatever command outputs that are 
->>>>> needed to help
->>>>> solve this issue.
->>>>>
->>>>>    OS= Ubuntu 18.4.2 LTS
->>>>>    Different Kernels I’ve tried = 5.1.16, 5.2 rc7, and 4.18
->>>>>    fstrim version =  fstrim from util-linux 2.31.1
->>>>>    Firmware version for Aorus NVMe = EGFM11.0
->>>>>
->>>> I saw discard timeout on HGST 1.6TB NVMe, not sure if yours is same 
->>>> with
->>>> that one.
->>>>
->>>> Could you collect logs via the following steps?
->>>>
->>>> Suppose your nvme disk name is /dev/nvme0n1:
->>>>
->>>> 1) queue limits log:
->>>>
->>>>     #(cd /sys/block/nvme0n1/queue && find . -type f -exec grep -aH 
->>>> . {} \;)
->>>>
->>>>
->>>> 2) NVMe IO trace
->>>>
->>>> - enable nvme IO trace before running fstrim:
->>>>
->>>>     #echo 1  > /sys/kernel/debug/tracing/events/nvme_setup_cmd/enable
->>>>     #echo 1  > 
->>>> /sys/kernel/debug/tracing/events/nvme_complete_rq/enable
->>>>
->>>> - run fstrim
->>>>
->>>> - after the fstrim failure is triggered, disable the nvme io trace 
->>>> & post the log:
->>>>
->>>>     #echo 0  > /sys/kernel/debug/tracing/events/nvme_setup_cmd/enable
->>>>     #echo 0  > 
->>>> /sys/kernel/debug/tracing/events/nvme_complete_rq/enable
->>>>
->>>>     #cp    /sys/kernel/debug/tracing/trace /root/nvme_io_trace.log
->>>>
->>>>
->>>>
->>>> thanks,
->>>> Ming
->>>
->>> Hello Ming
->>>
->>> Thank you for the quick reply --  See attached
->>  From the IO trace, discard command(nvme_cmd_dsm) is failed:
->>
->>    kworker/15:1H-462   [015] .... 91814.342452: nvme_setup_cmd: 
->> nvme0: disk=nvme0n1, qid=7, cmdid=552, nsid=1, flags=0x0, meta=0x0, 
->> cmd=(nvme_cmd_dsm nr=0, attributes=4)
->>            <idle>-0     [013] d.h. 91814.342708: nvme_complete_rq: 
->> nvme0: disk=nvme0n1, qid=7, cmdid=552, res=0, retries=0, flags=0x0, 
->> status=8198
->>
->> And the returned error code is 0x8198, I am not sure how to parse the
->> 'Command Specific Status Values' of 0x98, maybe Christoph, Keith or 
->> our other
->> NVMe guys can help to understand the failure.
->>
->>
->> Thanks,
->> Ming
->
-> Long story short we have 3 new PCI Gen 4 SSD - NVMe drives from 
-> Gigabyte. But actually, Gigabyte is just putting their name on it as I 
-> believe it is actually from "Phison".
->
-> Here is the website where you can see the new drives -- 
-> https://www.gigabyte.com/Solid-State-Drive/Gen-4
->
-> I have opened a ticket with Gigabyte, and have inquired about any 
-> available firmware updates. It will take 3-5 days to hear back from 
-> them, but will report back the finding.
->
-> Thank you for taking a look at the tracing file, and hopefully that 
-> gives enough insight as to what might be happening.
->
-> Best Regards,
->
-> David
->
->
-I have attempted to CC ilnux-nvme@lists.infradead.org, but receive a 
-immediate notification " 550 Unknown recipient ".  So it just gets 
-bounced back to me.
+I wouldn't say XFS is broken, we didn't implement it because it
+meant that IOCB_NOWAIT did not work on all block devices. i.e. the
+biggest issue IOCB_NOWAIT is avoiding is blocking on filesytem
+locks, and blocking in the request queue was largely just noise for
+the applications RWF_NOWAIT was initially implemented for.
 
-Thanks,
-
-David
+IOWs, if you have the wrong hardware, you can't use RWF_NOWAIT at
+all, despite it providing massive benefits for AIO at the filesystem
+level. Hence to say how IOMAP_NOWAIT is implemented (i.e. does not
+set REQ_NOWAIT) is broken ignores the fact that RWF_NOWAIT was
+originally intended as a "don't block on contended filesystem locks" 
+directive, not as something that is conditional on block layer
+functionality...
 
 
+> Outside of that, that case needs similar treatment to what I did for
+> the EAGAIN case here:
+> 
+> http://git.kernel.dk/cgit/linux-block/commit/?h=for-linus&id=893a1c97205a3ece0cbb3f571a3b972080f3b4c7
 
+I don't see REQ_NOWAIT_INLINE in 5.3-rc1.
+
+However, nobody checks the cookie returned by submit_bio() for error
+status. It's only a recent addition for block polling and so the
+only time it is checked is if we are polling and it gets passed to
+blk_poll when RWF_HIPRI is set. So this change, by itself, doesn't
+solve any problem.
+
+In fact, the way the direct IO code is right now a multi-bio DIO
+submission will overwrite the submit cookie repeatedly and hence may
+end up only doing partial submission but still report success
+because the last bio in the chain didn't block and REQ_NOWAIT_INLINE
+doesn't actually mark the bio itself with an error, so the bio
+completion function won't report it, either.
+
+> It was a big mistake to pass back these values in an async fashion,
+
+IMO, the big mistake was to have only some block device
+configurations support REQ_NOWAIT - that was an expedient hack to
+get block layer polling into the kernel fast. The way the error is
+passed back is largely irrelevant from that perspective, and
+REQ_NOWAIT_INLINE doesn't resolve this problem at all.
+
+Indeed, I think REQ_NOWAIT is largely redundant, because if we care
+about IO submission blocking because the request queue is full, then
+we simply use the existing bdi_congested() interface to check.
+That works for all types of block devices - not just random mq
+devices - and matches code we have all over the kernel to avoid
+blocking async IO submission on congested reuqest queues...
+
+So, yeah, I think REQ_NOWAIT needs to die and the direct IO callers
+should do just congestion checks on IOCB_NOWAIT/IOMAP_NOWAIT rather
+than try to add new error reporting mechanisms into bios that lots
+of code will need to be changed to support....
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
