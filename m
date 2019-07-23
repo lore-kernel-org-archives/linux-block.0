@@ -4,112 +4,149 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC49C7618F
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 00:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED6ADC76195
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 00:22:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 87DFF21951
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 00:07:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D07F92199C
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 00:22:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387620AbfGWAHz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jul 2019 20:07:55 -0400
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:43791 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387595AbfGWAHz (ORCPT
+        id S1731497AbfGWAWB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jul 2019 20:22:01 -0400
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:43712 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731854AbfGWAWB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jul 2019 20:07:55 -0400
-Received: by mail-oi1-f194.google.com with SMTP id w79so30985337oif.10
-        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2019 17:07:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=fjcB1FH4OIEzwCsv2saOPnLiM1UTiS07EKgrxMRYBfk=;
-        b=mrua4zZplRsf8rEJCits9QYus/B7ZhFYjY4rLOQmATQvzNlEfal93EbmG6jcSrH2K2
-         CQ16hxRu1EKZXu0WPHkiq6PWZaaj5oT52gCsfaPV+K7q1L3FPoL0ospSS0hcIsKwLyrX
-         rP68g3Sdt0jOtYV1uJ0rRNoXI7F9pTOMi8QJil4IlS8VobTKQZqcbeH1c/8y0cIPFNfg
-         5oggFWb3P82UBs0oCHPzrWofEynN1356yWwZKijEzBF6SXhoOQ/SjxYUbCEj7O5Eu/1S
-         cjhPxVu1B1U4OFDtqc0jNzCvRC0dlz3BddEE27okZY32q4LwwwqPv+NFOEIqQXIakFFs
-         zleg==
-X-Gm-Message-State: APjAAAX9/YG7p27UBERcqSW2rEvnRLNaErjju2Ea5S7YTy9IdjWCmvDt
-        7O0808UoprPpS0HdQA/iUmk=
-X-Google-Smtp-Source: APXvYqwea4YnEJu6LuLrymkLkcWKnNCXqEHllMPIzZtYxWFX32bCNusnaNoOlVNGrKCOT6rkwxe3Jw==
-X-Received: by 2002:aca:3a0a:: with SMTP id h10mr37399735oia.52.1563840474588;
-        Mon, 22 Jul 2019 17:07:54 -0700 (PDT)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id z69sm13985238oia.48.2019.07.22.17.07.52
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Jul 2019 17:07:53 -0700 (PDT)
-Subject: Re: [PATCH 3/5] nvme: don't abort completed request in
- nvme_cancel_request
-To:     Keith Busch <keith.busch@gmail.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        linux-nvme <linux-nvme@lists.infradead.org>,
-        Keith Busch <keith.busch@intel.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20190722053954.25423-1-ming.lei@redhat.com>
- <20190722053954.25423-4-ming.lei@redhat.com>
- <d82ead02-c893-4d14-307e-70a6d4596439@acm.org>
- <CAOSXXT5TkrfH0AFZCV0c+YtbFCQ4MnShKM-gkZrj8Qex+Z7Png@mail.gmail.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <29a64c98-5da2-c954-1272-e8705a4941c4@grimberg.me>
-Date:   Mon, 22 Jul 2019 17:07:51 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        Mon, 22 Jul 2019 20:22:01 -0400
+X-Greylist: delayed 1102 seconds by postgrey-1.27 at vger.kernel.org; Mon, 22 Jul 2019 20:21:58 EDT
+Received: from dread.disaster.area (pa49-195-139-63.pa.nsw.optusnet.com.au [49.195.139.63])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 4C6C843B788;
+        Tue, 23 Jul 2019 10:03:33 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92)
+        (envelope-from <david@fromorbit.com>)
+        id 1hpiGA-0001mL-5I; Tue, 23 Jul 2019 10:02:26 +1000
+Date:   Tue, 23 Jul 2019 10:02:26 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Johannes Weiner <hannes@cmpxchg.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] psi: annotate refault stalls from IO submission
+Message-ID: <20190723000226.GV7777@dread.disaster.area>
+References: <20190722201337.19180-1-hannes@cmpxchg.org>
 MIME-Version: 1.0
-In-Reply-To: <CAOSXXT5TkrfH0AFZCV0c+YtbFCQ4MnShKM-gkZrj8Qex+Z7Png@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190722201337.19180-1-hannes@cmpxchg.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0 cx=a_idp_d
+        a=fNT+DnnR6FjB+3sUuX8HHA==:117 a=fNT+DnnR6FjB+3sUuX8HHA==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=0o9FgrsRnhwA:10
+        a=ufHFDILaAAAA:8 a=7-415B0cAAAA:8 a=o-jcnmsilH93K4pHmdQA:9
+        a=EdKfoW5OtvoDdtON:21 a=SJvZlBx9A85TV0R8:21 a=CjuIK1q_8ugA:10
+        a=ZmIg1sZ3JBWsdXgziEIF:22 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
->> On 7/21/19 10:39 PM, Ming Lei wrote:
->>> Before aborting in-flight requests, all IO queues have been shutdown.
->>> However, request's completion fn may not be done yet because it may
->>> be scheduled to run via IPI.
->>>
->>> So don't abort one request if it is marked as completed, otherwise
->>> we may abort one normal completed request.
->>>
->>> Cc: Max Gurtovoy <maxg@mellanox.com>
->>> Cc: Sagi Grimberg <sagi@grimberg.me>
->>> Cc: Keith Busch <keith.busch@intel.com>
->>> Cc: Christoph Hellwig <hch@lst.de>
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> ---
->>>    drivers/nvme/host/core.c | 4 ++++
->>>    1 file changed, 4 insertions(+)
->>>
->>> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
->>> index cc09b81fc7f4..cb8007cce4d1 100644
->>> --- a/drivers/nvme/host/core.c
->>> +++ b/drivers/nvme/host/core.c
->>> @@ -285,6 +285,10 @@ EXPORT_SYMBOL_GPL(nvme_complete_rq);
->>>
->>>    bool nvme_cancel_request(struct request *req, void *data, bool reserved)
->>>    {
->>> +     /* don't abort one completed request */
->>> +     if (blk_mq_request_completed(req))
->>> +             return;
->>> +
->>>        dev_dbg_ratelimited(((struct nvme_ctrl *) data)->device,
->>>                                "Cancelling I/O %d", req->tag);
->>
->> Something I probably already asked before: what prevents that
->> nvme_cancel_request() is executed concurrently with the completion
->> handler of the same request?
+On Mon, Jul 22, 2019 at 04:13:37PM -0400, Johannes Weiner wrote:
+> psi tracks the time tasks wait for refaulting pages to become
+> uptodate, but it does not track the time spent submitting the IO. The
+> submission part can be significant if backing storage is contended or
+> when cgroup throttling (io.latency) is in effect - a lot of time is
+> spent in submit_bio(). In that case, we underreport memory pressure.
 > 
-> At least for pci, we've shutdown the queues and their interrupts prior
-> to tagset iteration, so we can't concurrently execute a natural
-> completion for in-flight requests while cancelling them.
+> Annotate the submit_bio() paths (or the indirection through readpage)
+> for refaults and swapin to get proper psi coverage of delays there.
+> 
+> Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
+> ---
+>  fs/btrfs/extent_io.c | 14 ++++++++++++--
+>  fs/ext4/readpage.c   |  9 +++++++++
+>  fs/f2fs/data.c       |  8 ++++++++
+>  fs/mpage.c           |  9 +++++++++
+>  mm/filemap.c         | 20 ++++++++++++++++++++
+>  mm/page_io.c         | 11 ++++++++---
+>  mm/readahead.c       | 24 +++++++++++++++++++++++-
+>  7 files changed, 89 insertions(+), 6 deletions(-)
+> 
+> diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+> index 1eb671c16ff1..2d2b3239965a 100644
+> --- a/fs/btrfs/extent_io.c
+> +++ b/fs/btrfs/extent_io.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/pagevec.h>
+>  #include <linux/prefetch.h>
+>  #include <linux/cleancache.h>
+> +#include <linux/psi.h>
+>  #include "extent_io.h"
+>  #include "extent_map.h"
+>  #include "ctree.h"
+> @@ -4267,6 +4268,9 @@ int extent_readpages(struct address_space *mapping, struct list_head *pages,
+>  	struct extent_io_tree *tree = &BTRFS_I(mapping->host)->io_tree;
+>  	int nr = 0;
+>  	u64 prev_em_start = (u64)-1;
+> +	int ret = 0;
+> +	bool refault = false;
+> +	unsigned long pflags;
+>  
+>  	while (!list_empty(pages)) {
+>  		u64 contig_end = 0;
+> @@ -4281,6 +4285,10 @@ int extent_readpages(struct address_space *mapping, struct list_head *pages,
+>  				put_page(page);
+>  				break;
+>  			}
+> +			if (PageWorkingset(page) && !refault) {
+> +				psi_memstall_enter(&pflags);
+> +				refault = true;
+> +			}
+>  
+>  			pagepool[nr++] = page;
+>  			contig_end = page_offset(page) + PAGE_SIZE - 1;
+> @@ -4301,8 +4309,10 @@ int extent_readpages(struct address_space *mapping, struct list_head *pages,
+>  		free_extent_map(em_cached);
+>  
+>  	if (bio)
+> -		return submit_one_bio(bio, 0, bio_flags);
+> -	return 0;
+> +		ret = submit_one_bio(bio, 0, bio_flags);
+> +	if (refault)
+> +		psi_memstall_leave(&pflags);
+> +	return ret;
 
-Same for tcp and rdma.
+This all seems extremely fragile to me. Sprinkling magic,
+undocumented pixie dust through the IO paths to account for
+something nobody can actually determine is working correctly is a
+bad idea.  People are going to break this without knowing it, nobody
+is going to notice because there are no regression tests for it,
+and this will all end up in frustration for users because it
+constantly gets broken and doesn't work reliably.
+
+e.g. If this is needed around all calls to ->readpage(), then please
+write a readpage wrapper function and convert all the callers to use
+that wrapper.
+
+Even better: If this memstall and "refault" check is needed to
+account for bio submission blocking, then page cache iteration is
+the wrong place to be doing this check. It should be done entirely
+in the bio code when adding pages to the bio because we'll only ever
+be doing page cache read IO on page cache misses. i.e. this isn't
+dependent on adding a new page to the LRU or not - if we add a new
+page then we are going to be doing IO and so this does not require
+magic pixie dust at the page cache iteration level
+
+e.g. bio_add_page_memstall() can do the working set check and then
+set a flag on the bio to say it contains a memstall page. Then on
+submission of the bio the memstall condition can be cleared.
+
+Cheers,
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
