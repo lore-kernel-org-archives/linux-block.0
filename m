@@ -2,94 +2,84 @@ Return-Path: <SRS0=+4Fh=VV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0F8BC7618B
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 11:48:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F2FFC41517
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 14:14:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6EC73229ED
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 11:48:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D31822ADB
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 14:14:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20150623.gappssmtp.com header.i=@linbit-com.20150623.gappssmtp.com header.b="P/Uz1vqQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P64B5njO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727902AbfGXLsn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jul 2019 07:48:43 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:41612 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727128AbfGXLsn (ORCPT
+        id S1726178AbfGXOOp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Jul 2019 10:14:45 -0400
+Received: from mail-lj1-f174.google.com ([209.85.208.174]:44939 "EHLO
+        mail-lj1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725870AbfGXOOp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jul 2019 07:48:43 -0400
-Received: by mail-wr1-f67.google.com with SMTP id c2so43428313wrm.8
-        for <linux-block@vger.kernel.org>; Wed, 24 Jul 2019 04:48:41 -0700 (PDT)
+        Wed, 24 Jul 2019 10:14:45 -0400
+Received: by mail-lj1-f174.google.com with SMTP id k18so44649389ljc.11
+        for <linux-block@vger.kernel.org>; Wed, 24 Jul 2019 07:14:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=6ja8qOZBd/+yPpakrfgGOO9Lsjgvj3+ENbjktOu7PQg=;
-        b=P/Uz1vqQq8oTd7cuw88+8LKg4UMpx/GPMqE8FjyIKrALHxccYwxrrS5IA0bnYBWN2z
-         AiPq/PW8v6DI6Rj+Fta0BYE0v7+XUbhdpjc3/s3kijRktL+u6AdV6STGtga6cTCBSiqt
-         k2V2MxsWYugo60P9luWE+sT/58/mo9CpZx1it+vKxBV5qljjcO6F+gIKzTGPCHqa+R/U
-         ga2kJT5ZpI6bXSb6sUsAROUihfuMumxnDD+RA3pNVCZqpMso+DHB/NIIrH3AM4EvcIKX
-         8nqTtsWPpihGh7iIzDYcoCGE1273gk6xYTy865HsxclPsMHiYhBEZUqE6/SwHX+oDrZ6
-         UjFg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=sbhv8LhBo4aKuCuDZ4rTmdHYc9oX+NLCwFJRpoCernI=;
+        b=P64B5njOFfeF04DpLURzFCzvVnBS2nOluBuBAbtqOFTIcnhPmMothXMtQJuPzohoXn
+         f8muQ3nE7KcFqgLE0eheoVsqdNCLF3FxM75zUNVatLwbbDwBitqYCmXkrZM3y165nkS7
+         JkcV+yMfE6SbLIysnoQAveESL5pa+RFIOeCNYDQFJonsR+fEis41AE6MDifCByRUslp0
+         yVaXJKQRYoyLYA2PQLZGeIJQQWzB5uDBEbhGGB75Cygx/y81YqxJllAP++6AizZ97ER3
+         1IwpMWPD1ve20LEodvydY4UVV/MkoiJdIVgBwUDQOO4M3HtIH8zyr6mhrmMKtbizL2kW
+         2Fsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=6ja8qOZBd/+yPpakrfgGOO9Lsjgvj3+ENbjktOu7PQg=;
-        b=VgxAzlM4yZ4kxi3iXLcn5AKKRxjzKT8mVjHrWycdCfeRoQBun8vTBMaq9UnGfxlpdc
-         9xWqQxv+2tDTcI8dJaTgANA63EmlWqFs6/pUkbYs4vVg8Akocm+Q23cCYNI9YKVJ2cSi
-         pxgWKDnN20cPRI8WmZ/qmoMNIGtFTpz4U1nDkcW93hPtQHHzeFfPLaX9CVy2DDWzQuuV
-         tIZVN1NLymGHAD1pbWuHnAZT6pWVSSOCCCpE/kMprjMwG7bpmAE8DLkYWJzDqATHLdTt
-         Zb+KHa34lEpNqEAVMP4BCfsRG8quq9ybwuOL3OXrtHLdkMx1B6KrBn2p95vxXvDFJasE
-         l4WA==
-X-Gm-Message-State: APjAAAXpE5t2J2YOEICfXf7QtInoTW+2WdmGx0VJm1aRUYP0wKjNNdLW
-        h2fln6gagNhRFICwdW4qHLJXMA==
-X-Google-Smtp-Source: APXvYqxtbimswj1+iqEbPXS+959hF1x39IRwg6ckgQ3h6RiygXt2444TSZdS5jTfDlL37IKCtELZKw==
-X-Received: by 2002:adf:e883:: with SMTP id d3mr91261045wrm.330.1563968921330;
-        Wed, 24 Jul 2019 04:48:41 -0700 (PDT)
-Received: from localhost (static.20.139.203.116.clients.your-server.de. [116.203.139.20])
-        by smtp.gmail.com with ESMTPSA id g11sm46247726wru.24.2019.07.24.04.48.40
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 24 Jul 2019 04:48:40 -0700 (PDT)
-Date:   Wed, 24 Jul 2019 13:48:39 +0200
-From:   Roland Kammerer <roland.kammerer@linbit.com>
-To:     Jia-Ju Bai <baijiaju1990@gmail.com>
-Cc:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        axboe@kernel.dk, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jia-Ju Bai <baijiaju1990@gmail.com>
-Subject: Re: [PATCH 1/2] block: drbd: Fix a possible null-pointer dereference
- in receive_protocol()
-Message-ID: <20190724114839.fl3ldycrn3zwfgaw@rck.sh>
-References: <20190724034916.28703-1-baijiaju1990@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sbhv8LhBo4aKuCuDZ4rTmdHYc9oX+NLCwFJRpoCernI=;
+        b=LkVmGlK4sJYBScOVPsdj+aAxp+lCwmfM9Tp12GIPmOvDu3QcIzE3qyAYsVp/2JJ8aW
+         h6w6zL+u14bn31dEanynGwq0aMUnW9pKgE2gkr3WlDZYYLvdTL97416sGHHZVudxpIKB
+         tbq/WK7V5R7JLc8XsS5JkXZL6TSzcWtES3rMhCLASX5L/NQEGo1miGycNHxIB/wynww0
+         jnF8vmJdmaoAf04/sTx8pvqJfe4TzLW7JauM4uhhFJFSr1zMrirhMx5zCNxyCahIgXIP
+         5FgRIzt5hWjhYsMCwpSSiVvYpg8571bZoWOEd7yWwWQoiJEHoA/A93uQGavz+bWAHi3h
+         E8kA==
+X-Gm-Message-State: APjAAAU9v0S5T/vhfBOY+WppY0iFLjBRVW1pqlpC+gyrCOfMSM8jvE7Y
+        k3klm7+wYSfjdzBWckTLqY370265GOoUNwHrMAE=
+X-Google-Smtp-Source: APXvYqy/v3ORWntBZmFE5+LYUxxgbFfkau47Yj2h7xiy0fBVA5HysjAp4i8i+z+PqqA/cv+tiRKv1/VLPnFJfH1VsPE=
+X-Received: by 2002:a2e:7619:: with SMTP id r25mr42319011ljc.199.1563977683452;
+ Wed, 24 Jul 2019 07:14:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190724034916.28703-1-baijiaju1990@gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <CABbHjzYH7q6zV8uErKJUTQWhrNw2DFH_7XFbPG7ORGcWTuH36g@mail.gmail.com>
+In-Reply-To: <CABbHjzYH7q6zV8uErKJUTQWhrNw2DFH_7XFbPG7ORGcWTuH36g@mail.gmail.com>
+From:   Daniel Kozak <kozzi11@gmail.com>
+Date:   Wed, 24 Jul 2019 16:14:32 +0200
+Message-ID: <CABbHjzZOUv91viBQUj3O_doHUMcWTRauXUfhHfTxpwAuuKaT+Q@mail.gmail.com>
+Subject: Re: io_uring completly hang my pc
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 24, 2019 at 11:49:16AM +0800, Jia-Ju Bai wrote:
-> In receive_protocol(), when crypto_alloc_shash() on line 3754 fails,
-> peer_integrity_tfm is NULL, and error handling code is executed.
-> In this code, crypto_free_shash() is called with NULL, which can cause a
-> null-pointer dereference, because:
-> crypto_free_shash(NULL)
->     crypto_ahash_tfm(NULL)
->         "return &NULL->base"
-> 
-> To fix this bug, peer_integrity_tfm is checked before calling
-> crypto_free_shash().
-> 
-> This bug is found by a static analysis tool STCheck written by us.
-> 
-> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+Hi,
 
-Reviewed-by: Roland Kammerer <roland.kammerer@linbit.com>
+I am playing with io_uring interface and for some reason it is causing
+freezing my pc.
+Here is some example code which cause this:
+
+https://bitbucket.org/kozzi11/uring_hang/src/master/main.c
+
+When runing this and test it with wrk (https://github.com/wg/wrk) :
+wrk --latency -d 15 -c 2048 --timeout 8 -t 8 http://localhost:8080/
+
+it completly hang pc.
+
+Thank you for any hint if there is something wrong with way how I am
+using io_uring interface or it is a bug in io_uring itself.
+
+Daniel Kozak
