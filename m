@@ -2,214 +2,295 @@ Return-Path: <SRS0=+4Fh=VV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7910EC76194
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 02:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B3FC76186
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 02:26:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4BD3B229F3
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 02:24:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEC2920665
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 02:26:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1563935190;
+	bh=F1hSEqx86O/Z6scfRK7IqSoUWL7fCXdUU0PGQqpNCrI=;
+	h=Date:From:To:Cc:Subject:List-ID:From;
+	b=trYVf/1FAMSgnXKQbYfEanW6vjVjr+krUSEnUaBfrREu2Ca0VUfd7YkMMdMEPd3Hg
+	 SIYqI1D+/cbuc1Y3AznmjioVx85V/mW4WLdgBVqZEkbpjOpTKbkKppSg9cZi5AwFXW
+	 TqgvZTXPatU2ufbUWxV00ashC+15fO9sjn28fYlk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728671AbfGXCYU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jul 2019 22:24:20 -0400
-Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:56574 "EHLO
-        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726108AbfGXCYT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jul 2019 22:24:19 -0400
-Received: from dread.disaster.area (pa49-195-139-63.pa.nsw.optusnet.com.au [49.195.139.63])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id BD4B01ED9B1;
-        Wed, 24 Jul 2019 12:24:16 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92)
-        (envelope-from <david@fromorbit.com>)
-        id 1hq6vt-0005GG-NF; Wed, 24 Jul 2019 12:23:09 +1000
-Date:   Wed, 24 Jul 2019 12:23:09 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>, linux-block@vger.kernel.org,
-        Aarushi Mehta <mehta.aaru20@gmail.com>,
-        Julia Suvorova <jusual@mail.ru>, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: EIO with io_uring O_DIRECT writes on ext4
-Message-ID: <20190724022309.GZ7777@dread.disaster.area>
-References: <20190723080701.GA3198@stefanha-x1.localdomain>
- <9a13c3b9-ecf2-6ba7-f0fb-c59a1e1539f3@kernel.dk>
- <20190723220502.GX7777@dread.disaster.area>
- <d875750c-62ce-5773-39a7-74d5bf920aaf@kernel.dk>
+        id S1728343AbfGXC03 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jul 2019 22:26:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41632 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728284AbfGXC02 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jul 2019 22:26:28 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 72CD320665;
+        Wed, 24 Jul 2019 02:26:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1563935187;
+        bh=F1hSEqx86O/Z6scfRK7IqSoUWL7fCXdUU0PGQqpNCrI=;
+        h=Date:From:To:Cc:Subject:From;
+        b=JqCtwKmyAbjDL4jwKK0bqIoNwfH2mLPKLvvATAoMNIJee4Dojqg2wyaSzZPFkctX2
+         fq0C18W24HkzIfjLbX09hlBX4nFjStT6gL73Tv9BY7Ve6PK7qc2li+JMRaEl/VzYRB
+         /jTi+c79fo+zB2UXjdJA6MyWlQdZaRcuQhMRhrfA=
+Date:   Tue, 23 Jul 2019 19:26:26 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Subject: Reminder: 11 open syzbot bugs in block subsystem
+Message-ID: <20190724022626.GM643@sol.localdomain>
+Mail-Followup-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d875750c-62ce-5773-39a7-74d5bf920aaf@kernel.dk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.2 cv=FNpr/6gs c=1 sm=1 tr=0 cx=a_idp_d
-        a=fNT+DnnR6FjB+3sUuX8HHA==:117 a=fNT+DnnR6FjB+3sUuX8HHA==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=0o9FgrsRnhwA:10
-        a=0zNzEECMAAAA:20 a=u-UUKw4dAAAA:8 a=7-415B0cAAAA:8
-        a=dpbPxidW0Cb951tOLkUA:9 a=CjuIK1q_8ugA:10 a=cklHB5Dw1nV-3JPruhv7:22
-        a=biEYGPWJfzWAr4FL6Ov7:22
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 23, 2019 at 04:19:31PM -0600, Jens Axboe wrote:
-> On 7/23/19 4:05 PM, Dave Chinner wrote:
-> > On Tue, Jul 23, 2019 at 09:20:05AM -0600, Jens Axboe wrote:
-> >> On 7/23/19 2:07 AM, Stefan Hajnoczi wrote:
-> >>> Hi,
-> >>> io_uring O_DIRECT writes can fail with EIO on ext4.  Please see the
-> >>> function graph trace from Linux 5.3.0-rc1 below for details.  It was
-> >>> produced with the following qemu-io command (using Aarushi's QEMU
-> >>> patches from https://github.com/rooshm/qemu/commits/io_uring):
-> >>>
-> >>>     $ qemu-io --cache=none --aio=io_uring --format=qcow2 -c 'writev -P 185 131072 65536' tests/qemu-iotests/scratch/test.qcow2
-> >>>
-> >>> This issue is specific to ext4.  XFS and the underlying LVM logical
-> >>> volume both work.
-> >>>
-> >>> The storage configuration is an LVM logical volume (device-mapper linear
-> >>> target), on top of LUKS, on top of a SATA disk.  The logical volume's
-> >>> request_queue does not have mq_ops and this causes
-> >>> generic_make_request_checks() to fail:
-> >>>
-> >>>     if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_mq(q))
-> >>>             goto not_supported;
-> >>>
-> >>> I guess this could be worked around by deferring the request to the
-> >>> io_uring work queue to avoid REQ_NOWAIT.  But XFS handles this fine so
-> >>> how can io_uring.c detect this case cleanly or is there a bug in ext4?
-> >>
-> >> I actually think it's XFS that's broken here, it's not passing down
-> >> the IOCB_NOWAIT -> IOMAP_NOWAIT -> REQ_NOWAIT. This means we lose that
-> >> important request bit, and we just block instead of triggering the
-> >> not_supported case.
-> > 
-> > I wouldn't say XFS is broken, we didn't implement it because it
-> > meant that IOCB_NOWAIT did not work on all block devices. i.e. the
-> > biggest issue IOCB_NOWAIT is avoiding is blocking on filesytem
-> > locks, and blocking in the request queue was largely just noise for
-> > the applications RWF_NOWAIT was initially implemented for.
-> 
-> Blocking due to resource starvation (like requests) is definitely not
-> just noise, in some case it's cases it's an equal or larger amount of
-> time.
+[This email was generated by a script.  Let me know if you have any suggestions
+to make it better, or if you want it re-generated with the latest status.]
 
-Yes, it can be, but that wasn't what RWF_NOWAIT was targetted at -
-it was for non-blocking AIO-based applications like the seastar DB
-which was primarily deployed on XFS.
+Of the currently open syzbot reports against the upstream kernel, I've manually
+marked 11 of them as possibly being bugs in the block subsystem.  I've listed
+these reports below, sorted by an algorithm that tries to list first the reports
+most likely to be still valid, important, and actionable.
 
-Indeed, it was largely for avoiding latencies in filesystem extent
-allocation - having a filesystem block on space allocation means it
-might issue and wait synchronously for tens of metadata IOs (which
-may all throttled in the block layer individually), block on memory
-reclaim trying to allocate the memory for all that metadata, block
-on log space whihc might require thousands of IOs to be issued and
-complete, etc.
+Of these 11 bugs, 3 were seen in mainline in the last week.
 
-i.e.  the latency of space allocation during IO submission can
-be orders of magnitude worse than just submission of a single bio
-that hits a congested queue. Blocking in the request queue for a
-single IO dispatch is just noise compared to the long tail latencies
-RWF_NOWAIT avoids in the filesystem layers.
+If you believe a bug is no longer valid, please close the syzbot report by
+sending a '#syz fix', '#syz dup', or '#syz invalid' command in reply to the
+original thread, as explained at https://goo.gl/tpsmEJ#status
 
-> > IOWs, if you have the wrong hardware, you can't use RWF_NOWAIT at
-> 
-> Define wrong...
+If you believe I misattributed a bug to the block subsystem, please let me know,
+and if possible forward the report to the correct people or mailing list.
 
-Wrong as in any hardware that doesn't have a blk_mq driver
-interface.
+Here are the bugs:
 
-Which means it's not just hardware that is a problem here, it's also
-stacked software device configs (e.g. various dm/md configs,
-loopback, etc) that can cause RWF_NOWAIT IO to mysteriously fail...
+--------------------------------------------------------------------------------
+Title:              KASAN: use-after-free Read in debugfs_remove (3)
+Last occurred:      1 day ago
+Reported:           286 days ago
+Branches:           Mainline and others
+Dashboard link:     https://syzkaller.appspot.com/bug?id=6d5c55bc531f0ef83e8faca014cc123b4498f7a6
+Original thread:    https://lkml.kernel.org/lkml/000000000000140c370577db5ece@google.com/T/#u
 
-> > level. Hence to say how IOMAP_NOWAIT is implemented (i.e. does not
-> > set REQ_NOWAIT) is broken ignores the fact that RWF_NOWAIT was
-> > originally intended as a "don't block on contended filesystem locks"
-> > directive, not as something that is conditional on block layer
-> > functionality...
-> 
-> RWF_NOWAIT should have nothing to do with the block layer at all, each
-> storage layer would have to support it.
+This bug has a C reproducer.
 
-Jens, that's -exactly- the problem I'm telling you exists - the
-fs/direct-io.c code path sets REQ_NOWAIT unconditionally when
-RWF_NOWAIT is set in userspace via:
+No one replied to the original thread for this bug.
 
-RWF_NOWAIT -> IOCB_NOWAIT -> fs/direct-io.c -> REQ_NOWAIT
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+903b72a010ad6b7a40f2@syzkaller.appspotmail.com
 
-And hence userspace IO fails in very unpredictable ways. Indeed, it
-only does this for write direct IOs - why would you want to not
-block DIO writes but allow blocking DIO reads is beyond me, but
-that's what the code does, and that's why it breaks....
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lkml.kernel.org/r/000000000000140c370577db5ece@google.com
 
-> >> Outside of that, that case needs similar treatment to what I did for
-> >> the EAGAIN case here:
-> >>
-> >> http://git.kernel.dk/cgit/linux-block/commit/?h=for-linus&id=893a1c97205a3ece0cbb3f571a3b972080f3b4c7
-> > 
-> > I don't see REQ_NOWAIT_INLINE in 5.3-rc1.
-> 
-> That's because it isn't in 5.3-rc1 :-)
-> 
-> > However, nobody checks the cookie returned by submit_bio() for error
-> > status. It's only a recent addition for block polling and so the
-> > only time it is checked is if we are polling and it gets passed to
-> > blk_poll when RWF_HIPRI is set. So this change, by itself, doesn't
-> > solve any problem.
-> 
-> REQ_NOWAIT wasn't introduced as part of the polling work, it was done
-> earlier for libaio.
+--------------------------------------------------------------------------------
+Title:              WARNING in generic_make_request_checks
+Last occurred:      0 days ago
+Reported:           348 days ago
+Branches:           Mainline and others
+Dashboard link:     https://syzkaller.appspot.com/bug?id=ff9ab4a23afa7553fb79f745a92be87ba4144508
+Original thread:    https://lkml.kernel.org/lkml/0000000000003c4e6d0572f85eb2@google.com/T/#u
 
-I know that.
+This bug has a C reproducer.
 
-I was talking about the introduction of returning of errors from
-submit_bio() - that came with RWF_HIPRI, not the introduction of
-REQ_NOWAIT. Two different things altogether, and that means there is
-no support anywhere for REQ_NOWAIT_INLINE error handling except
-the block polling code.
+No one replied to the original thread for this bug.
 
-> > In fact, the way the direct IO code is right now a multi-bio DIO
-> > submission will overwrite the submit cookie repeatedly and hence may
-> > end up only doing partial submission but still report success
-> > because the last bio in the chain didn't block and REQ_NOWAIT_INLINE
-> > doesn't actually mark the bio itself with an error, so the bio
-> > completion function won't report it, either.
-> 
-> Agree, details around multi-bio was largely ignored for the polling,
-> since multi-bio implies larger IO and that was somewhat ignored (as less
-> interesting).
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com
 
-So it was never tested and so nobody developing that functionality
-noticed that block device congestion can result in random data
-corruption when RWF_HIPRI is used.
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lkml.kernel.org/r/0000000000003c4e6d0572f85eb2@google.com
 
-I have absolutely nothing good to say in response to this
-relevation.
+--------------------------------------------------------------------------------
+Title:              WARNING in md_ioctl
+Last occurred:      2 days ago
+Reported:           450 days ago
+Branches:           Mainline and others
+Dashboard link:     https://syzkaller.appspot.com/bug?id=fbf9eaea2e65bfcabb4e2750c3ab0892867edea1
+Original thread:    https://lkml.kernel.org/lkml/000000000000a52337056b065fb3@google.com/T/#u
 
-> > Indeed, I think REQ_NOWAIT is largely redundant, because if we care
-> > about IO submission blocking because the request queue is full, then
-> > we simply use the existing bdi_congested() interface to check.
-> > That works for all types of block devices - not just random mq
-> > devices - and matches code we have all over the kernel to avoid
-> > blocking async IO submission on congested reuqest queues...
-> 
-> No... The congestion logic is silly and I think a design mistake from
-> way back when. There's no race free way to answer that question and
-> utilize the answer safely,
+This bug has a C reproducer.
 
-We don't care that it's racy - RWF_NOWAIT is best effort only, so if
-we occasionally get it wrong and block it's not the end of the
-world. Perfect is the enemy of good; having something that is good
-that works for everything is far, far better than having something
-perfect that only works for certain configurations.
+No one replied to the original thread for this bug.
 
-Cheers,
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+1e46a0864c1a6e9bd3d8@syzkaller.appspotmail.com
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lkml.kernel.org/r/000000000000a52337056b065fb3@google.com
+
+--------------------------------------------------------------------------------
+Title:              memory leak in bio_copy_user_iov
+Last occurred:      0 days ago
+Reported:           35 days ago
+Branches:           Mainline
+Dashboard link:     https://syzkaller.appspot.com/bug?id=3327fb1975fd130ad77d601f4facd655f0b5fa8c
+Original thread:    https://lkml.kernel.org/lkml/000000000000c75fb7058ba0c0e4@google.com/T/#u
+
+This bug has a C reproducer.
+
+No one has replied to the original thread for this bug yet.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+03e5c8ebd22cc6c3a8cb@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lkml.kernel.org/r/000000000000c75fb7058ba0c0e4@google.com
+
+--------------------------------------------------------------------------------
+Title:              INFO: task hung in blkdev_issue_flush (2)
+Last occurred:      15 days ago
+Reported:           21 days ago
+Branches:           Mainline and others
+Dashboard link:     https://syzkaller.appspot.com/bug?id=fe76ab34a650b6af00852eb4da93d6bf283ea2dd
+Original thread:    https://lkml.kernel.org/lkml/0000000000009c93d5058cb46073@google.com/T/#u
+
+This bug has a C reproducer.
+
+syzbot has bisected this bug, but I think the bisection result is incorrect.
+
+The original thread for this bug has received 1 reply, 21 days ago.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+e7624af9c1ef3b617512@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lkml.kernel.org/r/0000000000009c93d5058cb46073@google.com
+
+--------------------------------------------------------------------------------
+Title:              KASAN: use-after-free Read in relay_switch_subbuf
+Last occurred:      30 days ago
+Reported:           300 days ago
+Branches:           Mainline and others
+Dashboard link:     https://syzkaller.appspot.com/bug?id=13849f0d9b1b818b087341691be6cc3ac6a6bfb7
+Original thread:    https://lkml.kernel.org/lkml/0000000000002e4a260576c1589d@google.com/T/#u
+
+Unfortunately, this bug does not have a reproducer.
+
+No one replied to the original thread for this bug.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+29093015c21333d1c46d@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lkml.kernel.org/r/0000000000002e4a260576c1589d@google.com
+
+--------------------------------------------------------------------------------
+Title:              KMSAN: kernel-infoleak in copy_page_to_iter (2)
+Last occurred:      230 days ago
+Reported:           313 days ago
+Branches:           Mainline (with KMSAN patches)
+Dashboard link:     https://syzkaller.appspot.com/bug?id=78e9ad0e6952a3ca16e8234724b2fa92d041b9b8
+Original thread:    https://lkml.kernel.org/lkml/00000000000016eb330575bd2fab@google.com/T/#u
+
+This bug has a C reproducer.
+
+The original thread for this bug received 5 replies; the last was 69 days ago.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+2dcfeaf8cb49b05e8f1a@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lkml.kernel.org/r/00000000000016eb330575bd2fab@google.com
+
+--------------------------------------------------------------------------------
+Title:              WARNING in kernfs_remove_by_name_ns
+Last occurred:      26 days ago
+Reported:           30 days ago
+Branches:           Mainline and others
+Dashboard link:     https://syzkaller.appspot.com/bug?id=7cc35138dcc87c3cc819ad5e34eceab2360d4047
+Original thread:    https://lkml.kernel.org/lkml/0000000000001bbe63058bfd26d9@google.com/T/#u
+
+Unfortunately, this bug does not have a reproducer.
+
+No one has replied to the original thread for this bug yet.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+b76f1b62f3f98711bd93@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lkml.kernel.org/r/0000000000001bbe63058bfd26d9@google.com
+
+--------------------------------------------------------------------------------
+Title:              general protection fault in debugfs_remove
+Last occurred:      99 days ago
+Reported:           91 days ago
+Branches:           Mainline
+Dashboard link:     https://syzkaller.appspot.com/bug?id=fab43e1b35f4b1004751d97182979a68a8449388
+Original thread:    https://lkml.kernel.org/lkml/000000000000b20dd60587350ae0@google.com/T/#u
+
+Unfortunately, this bug does not have a reproducer.
+
+The original thread for this bug received 1 reply, 91 days ago.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+c091783d82e47615bb28@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lkml.kernel.org/r/000000000000b20dd60587350ae0@google.com
+
+--------------------------------------------------------------------------------
+Title:              general protection fault in relay_close_buf
+Last occurred:      89 days ago
+Reported:           77 days ago
+Branches:           Mainline
+Dashboard link:     https://syzkaller.appspot.com/bug?id=e4265490d26d6c01cd9bc79dc915ef0a1bf15046
+Original thread:    https://lkml.kernel.org/lkml/000000000000cff4d50588490e45@google.com/T/#u
+
+Unfortunately, this bug does not have a reproducer.
+
+The original thread for this bug has received 1 reply, 77 days ago.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+58320b7171734bf79d26@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lkml.kernel.org/r/000000000000cff4d50588490e45@google.com
+
+--------------------------------------------------------------------------------
+Title:              KASAN: use-after-free Read in disk_map_sector_rcu
+Last occurred:      137 days ago
+Reported:           200 days ago
+Branches:           Mainline
+Dashboard link:     https://syzkaller.appspot.com/bug?id=f81f92bd0974739a6c3ded8d0ea7aaafb039628e
+Original thread:    https://lkml.kernel.org/lkml/0000000000003804ff057ea47d37@google.com/T/#u
+
+Unfortunately, this bug does not have a reproducer.
+
+No one replied to the original thread for this bug.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+e01322aeded15e015bbd@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lkml.kernel.org/r/0000000000003804ff057ea47d37@google.com
