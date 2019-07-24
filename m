@@ -2,99 +2,83 @@ Return-Path: <SRS0=+4Fh=VV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38815C41517
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 16:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E929CC7618B
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 16:27:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1993C21850
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 16:18:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBD8F21871
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 16:27:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DEJmM/V9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726539AbfGXQST (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jul 2019 12:18:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34088 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726441AbfGXQST (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jul 2019 12:18:19 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id DBD5D30917AC;
-        Wed, 24 Jul 2019 16:18:18 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 52E6B102482F;
-        Wed, 24 Jul 2019 16:18:14 +0000 (UTC)
-Date:   Wed, 24 Jul 2019 12:18:13 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
-        stable@vger.kernel.org
-Subject: Re: [PATCH V3 1/2] blk-mq: add callback of .cleanup_rq
-Message-ID: <20190724161813.GA13896@redhat.com>
-References: <20190724031258.31688-1-ming.lei@redhat.com>
- <20190724031258.31688-2-ming.lei@redhat.com>
+        id S1726242AbfGXQ1E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Jul 2019 12:27:04 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:34452 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725882AbfGXQ1D (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Jul 2019 12:27:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=yNhGV6A1IPVP4ZHdx1ozA8WOlPpuWHgtt88D569y5bM=; b=DEJmM/V9hVWzSJqf25q7KhQxP
+        Pee1MY0G7u9uHIQHf5iyK6QOyVcmz8IOxGCO07KMTpYF7rMymimxwAF8pCd2F2TfjJUY/Yi000Tsq
+        D6C9l/Tu0iDaJijOsx6OYTdsGSKiSxmBSbc1YQmxnSo1Ppt1XyzqInUvKi0yJBrW9/yrbCRaGnf5X
+        eYShlyPQgZ6/lzk4vS1ytGE0W4BEOUUzN0V8bvhRvWQLbutyWkqjwVOoUVjMBp8C6t4n4gOsRs9t3
+        gSB8w0D+ynQmHtNJYayRusbUwiHCgeM905OyIKoGcfqjmpT6olHq9t9DrLSbdQ7xjHJQoDOJ+Wr10
+        aPWA2tZLg==;
+Received: from [46.183.103.8] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hqK6W-00015Z-B0; Wed, 24 Jul 2019 16:27:00 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux@roeck-us.net, James.Bottomley@HansenPartnership.com,
+        linux-block@vger.kernel.org
+Subject: [PATCH] block: fix max segment size handling in blk_queue_virt_boundary
+Date:   Wed, 24 Jul 2019 18:26:56 +0200
+Message-Id: <20190724162656.3967-1-hch@lst.de>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190724031258.31688-2-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 24 Jul 2019 16:18:19 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 23 2019 at 11:12pm -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
+We should only set the max segment size to unlimited if we actually
+have a virt boundary.  Otherwise we accidentally clear that limit
+when called from the SCSI midlayer, which always calls
+blk_queue_virt_boundary, even if that mask is 0.
 
-> dm-rq needs to free request which has been dispatched and not completed
-> by underlying queue. However, the underlying queue may have allocated
-> private data for this request in .queue_rq(), so the request private data
-> will be leaked in dm multipath IO code path.
-> 
-> Add one new callback of .cleanup_rq() to fix the memory leak.
+Fixes: 7ad388d8e4c7 ("scsi: core: add a host / host template field for the virt boundary")
+Reported-by: Guenter Roeck <linux@roeck-us.net>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-settings.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Think the above kind of glosses over the nature of the issue.  While
-this issue _is_ unique to request-based DM multipath's use of blk-mq it
-ultimately is a failing of the existing blk-mq interface that SCSI's
-per-request private data is leaking.  SO all said, I'd rather this patch
-header reflect the nuance of why you skinned the cat like you have.
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 2ae348c101a0..2c1831207a8f 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -752,7 +752,8 @@ void blk_queue_virt_boundary(struct request_queue *q, unsigned long mask)
+ 	 * page (which might not be idential to the Linux PAGE_SIZE).  Because
+ 	 * of that they are not limited by our notion of "segment size".
+ 	 */
+-	q->limits.max_segment_size = UINT_MAX;
++	if (mask)
++		q->limits.max_segment_size = UINT_MAX;
+ }
+ EXPORT_SYMBOL(blk_queue_virt_boundary);
+ 
+-- 
+2.20.1
 
-Something like this would be a better header IMHO:
-
-SCSI maintains its own driver private data hooked off of each SCSI
-request.  An upper layer driver (e.g. dm-rq) may need to retry these
-SCSI requests, before SCSI has fully dispatched them, due to a lower
-level SCSI driver's resource limitation identified in scsi_queue_rq().
-Currently SCSI's per-request private data is leaked when the upper layer
-driver (dm-rq) frees and then retries these requests in response to
-BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE returns from scsi_queue_rq().
-
-This usecase is so specialized that it doesn't warrant training an
-existing blk-mq interface (e.g. blk_mq_free_request) to allow SCSI to
-account for freeing its driver private data -- doing so would add an
-extra branch for handling a special case that all other consumers of
-SCSI (and blk-mq) won't ever need to worry about.
-
-So the most pragmatic way forward is to delegate freeing SCSI driver
-private data to the upper layer driver (dm-rq).  Do so by calling a new
-blk_mq_cleanup_rq() method from dm-rq.  A following commit will
-implement the .cleanup_rq() hook in scsi_mq_ops.
-
-
-> Another use case is to free request when the hctx is dead during
-> cpu hotplug context.
-
-Not seeing any point forecasting this .cleanup_rq() hook's potential
-ability to address that cpu hotplug case; the future patch that provides
-that fix can deal with it.  Reality is the existing SCSI per-request
-private data leak justifies this new hook on its own.
-
-Mike
