@@ -2,295 +2,94 @@ Return-Path: <SRS0=+4Fh=VV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B3FC76186
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 02:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 341BEC76191
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 03:13:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DEC2920665
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 02:26:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563935190;
-	bh=F1hSEqx86O/Z6scfRK7IqSoUWL7fCXdUU0PGQqpNCrI=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=trYVf/1FAMSgnXKQbYfEanW6vjVjr+krUSEnUaBfrREu2Ca0VUfd7YkMMdMEPd3Hg
-	 SIYqI1D+/cbuc1Y3AznmjioVx85V/mW4WLdgBVqZEkbpjOpTKbkKppSg9cZi5AwFXW
-	 TqgvZTXPatU2ufbUWxV00ashC+15fO9sjn28fYlk=
+	by mail.kernel.org (Postfix) with ESMTP id 0BCA2227BF
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 03:13:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728343AbfGXC03 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jul 2019 22:26:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41632 "EHLO mail.kernel.org"
+        id S1725828AbfGXDNO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jul 2019 23:13:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49430 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728284AbfGXC02 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jul 2019 22:26:28 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1725468AbfGXDNO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jul 2019 23:13:14 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 72CD320665;
-        Wed, 24 Jul 2019 02:26:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563935187;
-        bh=F1hSEqx86O/Z6scfRK7IqSoUWL7fCXdUU0PGQqpNCrI=;
-        h=Date:From:To:Cc:Subject:From;
-        b=JqCtwKmyAbjDL4jwKK0bqIoNwfH2mLPKLvvATAoMNIJee4Dojqg2wyaSzZPFkctX2
-         fq0C18W24HkzIfjLbX09hlBX4nFjStT6gL73Tv9BY7Ve6PK7qc2li+JMRaEl/VzYRB
-         /jTi+c79fo+zB2UXjdJA6MyWlQdZaRcuQhMRhrfA=
-Date:   Tue, 23 Jul 2019 19:26:26 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Reminder: 11 open syzbot bugs in block subsystem
-Message-ID: <20190724022626.GM643@sol.localdomain>
-Mail-Followup-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+        by mx1.redhat.com (Postfix) with ESMTPS id ED92E3365E;
+        Wed, 24 Jul 2019 03:13:13 +0000 (UTC)
+Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 56F0B600CD;
+        Wed, 24 Jul 2019 03:13:05 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        stable@vger.kernel.org
+Subject: [PATCH V3 0/2] block/scsi/dm-rq: fix leak of request private data in dm-mpath
+Date:   Wed, 24 Jul 2019 11:12:56 +0800
+Message-Id: <20190724031258.31688-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Wed, 24 Jul 2019 03:13:14 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[This email was generated by a script.  Let me know if you have any suggestions
-to make it better, or if you want it re-generated with the latest status.]
+Hi,
 
-Of the currently open syzbot reports against the upstream kernel, I've manually
-marked 11 of them as possibly being bugs in the block subsystem.  I've listed
-these reports below, sorted by an algorithm that tries to list first the reports
-most likely to be still valid, important, and actionable.
+When one request is dispatched to LLD via dm-rq, if the result is
+BLK_STS_*RESOURCE, dm-rq will free the request. However, LLD may allocate
+private data for this request, so this way will cause memory leak.
 
-Of these 11 bugs, 3 were seen in mainline in the last week.
+Add .cleanup_rq() callback and implement it in SCSI for fixing the issue,
+since SCSI is the only driver which allocates private requst data in
+.queue_rq() path.
 
-If you believe a bug is no longer valid, please close the syzbot report by
-sending a '#syz fix', '#syz dup', or '#syz invalid' command in reply to the
-original thread, as explained at https://goo.gl/tpsmEJ#status
+Another use case of this callback is to free the request and re-submit
+bios during cpu hotplug when the hctx is dead, see the following link:
 
-If you believe I misattributed a bug to the block subsystem, please let me know,
-and if possible forward the report to the correct people or mailing list.
+https://lore.kernel.org/linux-block/f122e8f2-5ede-2d83-9ca0-bc713ce66d01@huawei.com/T/#t
 
-Here are the bugs:
+V3:
+	- run .cleanup_rq() from dm-rq because this issue is dm-rq specific,
+	and even in future it should be still very unusual to free request
+	in this way. If we call .cleanup_rq() in generic rq free code(fast
+	path), cost will be introduced unnecessarily, also we have to
+	consider related race.
 
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in debugfs_remove (3)
-Last occurred:      1 day ago
-Reported:           286 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=6d5c55bc531f0ef83e8faca014cc123b4498f7a6
-Original thread:    https://lkml.kernel.org/lkml/000000000000140c370577db5ece@google.com/T/#u
+V2:
+	- run .cleanup_rq() in blk_mq_free_request(), as suggested by Mike 
 
-This bug has a C reproducer.
 
-No one replied to the original thread for this bug.
+Ming Lei (2):
+  blk-mq: add callback of .cleanup_rq
+  scsi: implement .cleanup_rq callback
 
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+903b72a010ad6b7a40f2@syzkaller.appspotmail.com
+ drivers/md/dm-rq.c      |  1 +
+ drivers/scsi/scsi_lib.c | 13 +++++++++++++
+ include/linux/blk-mq.h  | 13 +++++++++++++
+ 3 files changed, 27 insertions(+)
 
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000140c370577db5ece@google.com
+Cc: Ewan D. Milne <emilne@redhat.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: dm-devel@redhat.com
+Cc: <stable@vger.kernel.org>
+Fixes: 396eaf21ee17 ("blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback")
+-- 
+2.20.1
 
---------------------------------------------------------------------------------
-Title:              WARNING in generic_make_request_checks
-Last occurred:      0 days ago
-Reported:           348 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=ff9ab4a23afa7553fb79f745a92be87ba4144508
-Original thread:    https://lkml.kernel.org/lkml/0000000000003c4e6d0572f85eb2@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000003c4e6d0572f85eb2@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in md_ioctl
-Last occurred:      2 days ago
-Reported:           450 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=fbf9eaea2e65bfcabb4e2750c3ab0892867edea1
-Original thread:    https://lkml.kernel.org/lkml/000000000000a52337056b065fb3@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+1e46a0864c1a6e9bd3d8@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000a52337056b065fb3@google.com
-
---------------------------------------------------------------------------------
-Title:              memory leak in bio_copy_user_iov
-Last occurred:      0 days ago
-Reported:           35 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=3327fb1975fd130ad77d601f4facd655f0b5fa8c
-Original thread:    https://lkml.kernel.org/lkml/000000000000c75fb7058ba0c0e4@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+03e5c8ebd22cc6c3a8cb@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000c75fb7058ba0c0e4@google.com
-
---------------------------------------------------------------------------------
-Title:              INFO: task hung in blkdev_issue_flush (2)
-Last occurred:      15 days ago
-Reported:           21 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=fe76ab34a650b6af00852eb4da93d6bf283ea2dd
-Original thread:    https://lkml.kernel.org/lkml/0000000000009c93d5058cb46073@google.com/T/#u
-
-This bug has a C reproducer.
-
-syzbot has bisected this bug, but I think the bisection result is incorrect.
-
-The original thread for this bug has received 1 reply, 21 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+e7624af9c1ef3b617512@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000009c93d5058cb46073@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in relay_switch_subbuf
-Last occurred:      30 days ago
-Reported:           300 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=13849f0d9b1b818b087341691be6cc3ac6a6bfb7
-Original thread:    https://lkml.kernel.org/lkml/0000000000002e4a260576c1589d@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+29093015c21333d1c46d@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000002e4a260576c1589d@google.com
-
---------------------------------------------------------------------------------
-Title:              KMSAN: kernel-infoleak in copy_page_to_iter (2)
-Last occurred:      230 days ago
-Reported:           313 days ago
-Branches:           Mainline (with KMSAN patches)
-Dashboard link:     https://syzkaller.appspot.com/bug?id=78e9ad0e6952a3ca16e8234724b2fa92d041b9b8
-Original thread:    https://lkml.kernel.org/lkml/00000000000016eb330575bd2fab@google.com/T/#u
-
-This bug has a C reproducer.
-
-The original thread for this bug received 5 replies; the last was 69 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+2dcfeaf8cb49b05e8f1a@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000016eb330575bd2fab@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in kernfs_remove_by_name_ns
-Last occurred:      26 days ago
-Reported:           30 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=7cc35138dcc87c3cc819ad5e34eceab2360d4047
-Original thread:    https://lkml.kernel.org/lkml/0000000000001bbe63058bfd26d9@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+b76f1b62f3f98711bd93@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000001bbe63058bfd26d9@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in debugfs_remove
-Last occurred:      99 days ago
-Reported:           91 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=fab43e1b35f4b1004751d97182979a68a8449388
-Original thread:    https://lkml.kernel.org/lkml/000000000000b20dd60587350ae0@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-The original thread for this bug received 1 reply, 91 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+c091783d82e47615bb28@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000b20dd60587350ae0@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in relay_close_buf
-Last occurred:      89 days ago
-Reported:           77 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=e4265490d26d6c01cd9bc79dc915ef0a1bf15046
-Original thread:    https://lkml.kernel.org/lkml/000000000000cff4d50588490e45@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-The original thread for this bug has received 1 reply, 77 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+58320b7171734bf79d26@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000cff4d50588490e45@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in disk_map_sector_rcu
-Last occurred:      137 days ago
-Reported:           200 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=f81f92bd0974739a6c3ded8d0ea7aaafb039628e
-Original thread:    https://lkml.kernel.org/lkml/0000000000003804ff057ea47d37@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+e01322aeded15e015bbd@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000003804ff057ea47d37@google.com
