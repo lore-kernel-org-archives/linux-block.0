@@ -2,101 +2,93 @@ Return-Path: <SRS0=+4Fh=VV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C7DC76191
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 03:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A81CC76186
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 03:48:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D49D227BF
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 03:13:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 374612080C
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 03:48:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725861AbfGXDNs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jul 2019 23:13:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34020 "EHLO mx1.redhat.com"
+        id S1726086AbfGXDsx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jul 2019 23:48:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49938 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725848AbfGXDNr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jul 2019 23:13:47 -0400
+        id S1726024AbfGXDsx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jul 2019 23:48:53 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8D7C030C1D39;
-        Wed, 24 Jul 2019 03:13:47 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id C65153092652;
+        Wed, 24 Jul 2019 03:48:52 +0000 (UTC)
 Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A69661F21;
-        Wed, 24 Jul 2019 03:13:31 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E0C85D772;
+        Wed, 24 Jul 2019 03:48:49 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        stable@vger.kernel.org
-Subject: [PATCH V3 2/2] scsi: implement .cleanup_rq callback
-Date:   Wed, 24 Jul 2019 11:12:58 +0800
-Message-Id: <20190724031258.31688-3-ming.lei@redhat.com>
-In-Reply-To: <20190724031258.31688-1-ming.lei@redhat.com>
-References: <20190724031258.31688-1-ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Ming Lei <ming.lei@redhat.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@intel.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V2 0/5] blk-mq: wait until completed req's complete fn is run
+Date:   Wed, 24 Jul 2019 11:48:38 +0800
+Message-Id: <20190724034843.10879-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Wed, 24 Jul 2019 03:13:47 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Wed, 24 Jul 2019 03:48:53 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implement .cleanup_rq() callback for freeing driver private part
-of the request. Then we can avoid to leak this part if the request isn't
-completed by SCSI, and freed by blk-mq or upper layer(such as dm-rq) finally.
+Hi,
 
-Cc: Ewan D. Milne <emilne@redhat.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Hannes Reinecke <hare@suse.com>
+blk-mq may schedule to call queue's complete function on remote CPU via
+IPI, but never provide any way to synchronize the request's complete
+fn.
+
+In some driver's EH(such as NVMe), hardware queue's resource may be freed &
+re-allocated. If the completed request's complete fn is run finally after the
+hardware queue's resource is released, kernel crash will be triggered.
+
+Fixes this issue by waitting until completed req's complete fn is run.
+
+V2:
+	- fix one build warning
+	- fix commit log
+	- apply the wait on nvme-fc code too
+
+Thanks,
+Ming
+
+Ming Lei (5):
+  blk-mq: introduce blk_mq_request_completed()
+  blk-mq: introduce blk_mq_tagset_wait_completed_request()
+  nvme: don't abort completed request in nvme_cancel_request
+  nvme: wait until all completed request's complete fn is called
+  blk-mq: remove blk_mq_complete_request_sync
+
+ block/blk-mq-tag.c         | 32 ++++++++++++++++++++++++++++++++
+ block/blk-mq.c             | 13 ++++++-------
+ drivers/nvme/host/core.c   |  6 +++++-
+ drivers/nvme/host/fc.c     |  2 ++
+ drivers/nvme/host/pci.c    |  2 ++
+ drivers/nvme/host/rdma.c   |  8 ++++++--
+ drivers/nvme/host/tcp.c    |  8 ++++++--
+ drivers/nvme/target/loop.c |  2 ++
+ include/linux/blk-mq.h     |  3 ++-
+ 9 files changed, 63 insertions(+), 13 deletions(-)
+
+Cc: Max Gurtovoy <maxg@mellanox.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Keith Busch <keith.busch@intel.com>
 Cc: Christoph Hellwig <hch@lst.de>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: dm-devel@redhat.com
-Cc: <stable@vger.kernel.org>
-Fixes: 396eaf21ee17 ("blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_lib.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index e1da8c70a266..eb848ff46afd 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1089,6 +1089,18 @@ static void scsi_initialize_rq(struct request *rq)
- 	cmd->retries = 0;
- }
- 
-+/*
-+ * Only called when the request isn't completed by SCSI, and not freed by
-+ * SCSI
-+ */
-+static void scsi_cleanup_rq(struct request *rq)
-+{
-+	if (rq->rq_flags & RQF_DONTPREP) {
-+		scsi_mq_uninit_cmd(blk_mq_rq_to_pdu(rq));
-+		rq->rq_flags &= ~RQF_DONTPREP;
-+	}
-+}
-+
- /* Add a command to the list used by the aacraid and dpt_i2o drivers */
- void scsi_add_cmd_to_list(struct scsi_cmnd *cmd)
- {
-@@ -1816,6 +1828,7 @@ static const struct blk_mq_ops scsi_mq_ops = {
- 	.init_request	= scsi_mq_init_request,
- 	.exit_request	= scsi_mq_exit_request,
- 	.initialize_rq_fn = scsi_initialize_rq,
-+	.cleanup_rq	= scsi_cleanup_rq,
- 	.busy		= scsi_mq_lld_busy,
- 	.map_queues	= scsi_map_queues,
- };
 -- 
 2.20.1
 
