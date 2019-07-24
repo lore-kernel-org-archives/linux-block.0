@@ -1,100 +1,89 @@
-Return-Path: <SRS0=ppXp=VU=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=+4Fh=VV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF58EC76186
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 23:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D04C76186
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 01:34:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C28972238C
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jul 2019 23:02:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8CkXQHt"
+	by mail.kernel.org (Postfix) with ESMTP id 53FE02253D
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 01:34:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389523AbfGWXCM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jul 2019 19:02:12 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:38138 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392608AbfGWXCG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jul 2019 19:02:06 -0400
-Received: by mail-io1-f67.google.com with SMTP id j6so10304752ioa.5;
-        Tue, 23 Jul 2019 16:02:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=WLivNX+IOU3BF5pVPZ4dT2PGyWr1z46q52x8JkbNVPY=;
-        b=Z8CkXQHtW2MsPGieVx6RX8eY6KKzotV/eE19hybmIqhS5dToSWjnczzuz+1Uhz6rrh
-         zxz4ZMS9cEwRPfXnSTKOW5vFjehBiljmlg3X5Oymz/MvTObEZ5yIV0dYXCM0cOuYiM47
-         0+DQlGJ16dCKLm+K09Sdb6aVtLmafnOddQhhRip9PBFKIb7qv7GjaliBMwqhpP4po6ho
-         2bd5iFeZBYllACr5dGiIlaK2i6/PSoPpL6wa1FI+xK2R7S7a/siCQNUhBTukQufvqygC
-         aeugjPFBUR4ng4oCJi5khHw2z0OogUaddtLA//mvVhVcIGG4HRoj5TT20nHyXs3rDOX2
-         bsdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=WLivNX+IOU3BF5pVPZ4dT2PGyWr1z46q52x8JkbNVPY=;
-        b=WkFxVBxusoF8J4Rg2YejSuqnlOJCCChR/cjTmBJ/gSDlvad64JjnBgjrfwwt4vqDo+
-         66XxGvbr67AERM/eox8lN+7xKiSGYu1OPIGr9jHbmVR2JwyAsrnWd8RBEQ1/P2sedxRS
-         7BDKu2GuZRUPB0NjRsxa2dHU2M13NHM2PBPGR4y+P5wUxVOGoR78mgUZNMXycACRjL3Y
-         jU5QZjArFc6+xHE2DK5Wg58MPBUyaSbEtaIoz4BukKt+Vf3maPpa4bv5XRhlPVSnEecd
-         IhZMQqPSUlYxsHWLnALWLUvy+cLQsWK7tcK5vnOkCWnJnKZf/ZLisKyivn0gCUHaXuOn
-         w53g==
-X-Gm-Message-State: APjAAAUgH9tKjb7EMCT2Jck0fvnMoyUEK+SrL4nxqbH4KnwkjgwleKu3
-        1+ZUOUnI5nmgdlhCqVTCcM0=
-X-Google-Smtp-Source: APXvYqx+pftMEVYYB/3f9Gf0UovCtgpLezh4sifw7pJ/oYZWL0Q9aQ7ncsyrdWy5Sdc+AS5N6YhmHw==
-X-Received: by 2002:a02:37d6:: with SMTP id r205mr80277850jar.57.1563922925974;
-        Tue, 23 Jul 2019 16:02:05 -0700 (PDT)
-Received: from cs-dulles.cs.umn.edu (cs-dulles.cs.umn.edu. [128.101.35.54])
-        by smtp.googlemail.com with ESMTPSA id m10sm84918390ioj.75.2019.07.23.16.02.04
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 23 Jul 2019 16:02:05 -0700 (PDT)
-From:   Navid Emamdoost <navid.emamdoost@gmail.com>
-Cc:     emamd001@umn.edu, kjlu@umn.edu, smccaman@umn.edu,
-        secalert@redhat.com, Navid Emamdoost <navid.emamdoost@gmail.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] nbd_genl_status: null check for nla_nest_start
-Date:   Tue, 23 Jul 2019 18:01:57 -0500
-Message-Id: <20190723230157.14484-1-navid.emamdoost@gmail.com>
-X-Mailer: git-send-email 2.17.1
-To:     unlisted-recipients:; (no To-header on input)
+        id S1728234AbfGXBez (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jul 2019 21:34:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55852 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728300AbfGXBez (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jul 2019 21:34:55 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 32AF2308C21E;
+        Wed, 24 Jul 2019 01:34:55 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 335431001DD7;
+        Wed, 24 Jul 2019 01:34:42 +0000 (UTC)
+Date:   Wed, 24 Jul 2019 09:34:34 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 2/5] blk-mq: introduce
+ blk_mq_tagset_wait_completed_request()
+Message-ID: <20190724013432.GB22421@ming.t460p>
+References: <20190722053954.25423-1-ming.lei@redhat.com>
+ <20190722053954.25423-3-ming.lei@redhat.com>
+ <c2722892-9cbf-0747-58a8-91a99b72bc53@acm.org>
+ <20190723010616.GC30776@ming.t460p>
+ <d4d3ded9-0012-68c1-7511-f5ac3aa7b1fb@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d4d3ded9-0012-68c1-7511-f5ac3aa7b1fb@acm.org>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Wed, 24 Jul 2019 01:34:55 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-nla_nest_start may fail and return NULL. The check is inserted, and
-errno is selected based on other call sites within the same source code.
+On Tue, Jul 23, 2019 at 01:54:52PM -0700, Bart Van Assche wrote:
+> On 7/22/19 6:06 PM, Ming Lei wrote:
+> > On Mon, Jul 22, 2019 at 08:25:07AM -0700, Bart Van Assche wrote:
+> > > On 7/21/19 10:39 PM, Ming Lei wrote:
+> > > > blk-mq may schedule to call queue's complete function on remote CPU via
+> > > > IPI, but doesn't provide any way to synchronize the request's complete
+> > > > fn.
+> > > > 
+> > > > In some driver's EH(such as NVMe), hardware queue's resource may be freed &
+> > > > re-allocated. If the completed request's complete fn is run finally after the
+> > > > hardware queue's resource is released, kernel crash will be triggered.
+> > > > 
+> > > > Prepare for fixing this kind of issue by introducing
+> > > > blk_mq_tagset_wait_completed_request().
+> > > 
+> > > An explanation is missing of why the block layer is modified to fix this
+> > > instead of the NVMe driver.
+> > 
+> > The above commit log has explained that there isn't sync mechanism in
+> > blk-mq wrt. request completion, and there might be similar issue in other
+> > future drivers.
+> 
+> That is not sufficient as a motivation to modify the block layer because
+> there is already a way to wait until request completions have finished,
+> namely the request queue freeze mechanism. Have you considered to use that
+> mechanism instead of introducing blk_mq_tagset_wait_completed_request()?
 
-Signed-off-by: Navid Emamdoost <navid.emamdoost@gmail.com>
----
- drivers/block/nbd.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+The introduced interface is used in EH, during which the aborted
+requests will stay at blk-mq sw/scheduler queue, so queue freeze will
+cause deadlock. We simply can't use it.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 9bcde2325893..dba362de4d91 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -2149,6 +2149,12 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
- 	}
- 
- 	dev_list = nla_nest_start_noflag(reply, NBD_ATTR_DEVICE_LIST);
-+
-+	if (!dev_list) {
-+		ret = -EMSGSIZE;
-+		goto out;
-+	}
-+
- 	if (index == -1) {
- 		ret = idr_for_each(&nbd_index_idr, &status_cb, reply);
- 		if (ret) {
--- 
-2.17.1
-
+Thanks,
+Ming
