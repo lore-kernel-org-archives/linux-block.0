@@ -6,71 +6,73 @@ X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B197C76186
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 17:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DFDCC76186
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 17:37:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0678620840
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 17:35:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0889F2189F
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 17:37:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563989723;
-	bh=qxfrAz/oCN+LYLiWGVCs207H4awBoTJEDskVIhTJOdw=;
-	h=Date:From:Cc:Subject:To:List-ID:From;
-	b=yTVrHNsaqnbWsL7Xr+JlL/S/FB0v/6IX8Ak9qCqzigfdOd0ts/SabgvP0uADbrNV1
-	 +QBBzxKx5ygWgAnfbt0SnIR1ONyyf+DaOeoVF2ouwJDGx4MXA3MO2AauFQyJuGZFch
-	 6025yMdewplq0TXT6qy0yuofAuQjU/rqpkMV0S9Q=
+	s=default; t=1563989847;
+	bh=CoUiERLHZxnSU81JTfU1X+t9+HsHukjllHZZ384/Ye8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ni3f81i0UNDs0QirVWBow+JHpPPyhuygJqb6Ja5yQpUfV8bQueuG4Mf7m+WexuiL1
+	 MfwkaKg9LRVARHBuyjcdSWoMWZ8Man/m0imIMWmzc9Hwa87SHhldzNS9x7kyaNS/lw
+	 lN//P06QPH4xVn5viMVDCRwTcwXMOIaX/hEdyvWI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728211AbfGXRfW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jul 2019 13:35:22 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:37205 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726323AbfGXRfV (ORCPT
+        id S1726911AbfGXRh0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Jul 2019 13:37:26 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:37958 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727458AbfGXRh0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jul 2019 13:35:21 -0400
-Received: by mail-pf1-f194.google.com with SMTP id 19so21295889pfa.4;
-        Wed, 24 Jul 2019 10:35:20 -0700 (PDT)
+        Wed, 24 Jul 2019 13:37:26 -0400
+Received: by mail-pg1-f195.google.com with SMTP id f5so12750591pgu.5;
+        Wed, 24 Jul 2019 10:37:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:date:from:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=8RQRpxikwiuWC4OpfiWsZAC2vrJJElg4wu6sWoYszZI=;
-        b=sOJfZ06V7ejN/9i8fpp/cdoSscwWicyjRlh+pMD/TjNdnQ2HDBoCFeUSamK4uoEdC7
-         m0lC6463xWV5YcFl7FPoJFwI6gysOkof2xy4mt9ueCdaFm9A98ZTOOPFk+f4UcJFcYXs
-         H9ECm1szgWP/LyFYg6KnD2wHRINDmmBtRrTwdzrqtjaLDY53avYI/rVZUuUdRyuzpO3y
-         VbxTnsjlRlE1IC/bXPtSI+S2szVuwcx9RzcaR1njXKRwypROI56kpBDNmlEGGlb/tqrz
-         SGJGby9iJ0eT4Q8D6m0l3RksHwVqhUtabu28+7DINMeGOSH8sDoH7hGMem7r7d1Q4GrH
-         cf+g==
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=cHxf1kTdWDT0gUqEm0BhBo9+91LG1FL8yrCj/eDjN5Q=;
+        b=ZFjj/SoOb4H/1IrlfjFztvbIO1Bsh8BYcN0SwpbOE0BRo+gHZCy74Y5vkvBaDeJHoi
+         UhuC8apPTWl9jCTNHFDLqLY9O5jg925z0nTsXAFcaK4NUHgb54HHKIcT126TPO8kzPWV
+         4YxeqDr374ZiyQLQ4TSijs58a7dlf3cMbZYfIRfzOT7uC1mps8qnerrY+JgHaZq5QVAN
+         krgdsbOeSTxS0CpNRbR7Cc9Uxew1ohLZY23j4JVimyBi+qee7oQI46TYuoymFlZn9E/b
+         sCmix2SVuOSy3t+rUc1T6KdV74Mzxcy5kREmM++gtDZqR38wvgoQe89Q8oCRN6Y30jPN
+         TrOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:cc:subject:message-id
-         :mime-version:content-disposition:user-agent;
-        bh=8RQRpxikwiuWC4OpfiWsZAC2vrJJElg4wu6sWoYszZI=;
-        b=MAhY6yP5sHmQSmCFiiAtSWZzQuT/v0QqDEAmO88ojfFYUwI8G7GF2B0MTb7/3yaM5l
-         Z9fuSnaXMPxfFTYlRvSvGD6Cd2IgVuTy6CCw9wWYuOorxYUq6CwRW/PHdDsJn9DI+rSI
-         wWTvgve2sWE1rPvC9Kd42K96zJRJW/wJLIp/fPGcBPMhZvWkFA42TGAFRYne599jEoTM
-         LwrUaClBhmPPPHlkLgFzkuD54GkWhd0Y10sQzdrNaIrnt9QeKKKGgaRPepxRDzgUePiE
-         Q7mX/TsCxuMOitXjPhCp0dBfzOoV8rc2kmFCyJ3KjAXAvMRttepstZ3cEypNi2VHkx8M
-         PkKg==
-X-Gm-Message-State: APjAAAV9uNRMjJWva80MleXGmAuTjGeaxBbVRFa4juCmlik4W69JiV/S
-        rIAI/dSfEuHaygrZJzEe11STI1JL
-X-Google-Smtp-Source: APXvYqy/45xbVWCxW+UkluVuSTVF+aqyq3asyDnKB4CgboplhcFJTPArsIlNrywOkJTzGkKNPyk3Vw==
-X-Received: by 2002:a17:90a:2627:: with SMTP id l36mr90862845pje.71.1563989720109;
-        Wed, 24 Jul 2019 10:35:20 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=cHxf1kTdWDT0gUqEm0BhBo9+91LG1FL8yrCj/eDjN5Q=;
+        b=FwHoY9vVSSwH7mmmHvmg2aoZsVUq8b8RatAvbYE5g9eTdM7uo+d2XjZvllcYvkgsFM
+         A8NBdTwTmpkyTSnfU+oLJGXKDDb4T3y6JilAwPF2FzKpqsHMuJ8Gdz041AGgc3r3SG3y
+         Ajd7AAtG0XuTeR1LQnM8W8YrgHDF7jdnlG7jYTSsDK7yLObj5TJ7jm/EL5SmdC02n71i
+         WAqgvZXKwdbsyQmbIvFn0VBPjPkNk+6ubaXp0IhU7FY4Jhi/lF+7sZrs+MPGAC6O27SD
+         FtR69+6MG++2GWnMx0iJIv4nRkM7pJom8gAQYTfLyhjdXLPHIbYj04oWFgk6lwMUTMfS
+         v41Q==
+X-Gm-Message-State: APjAAAUWVR0wtzWUHVm/wtMd5Y931FlhVaHhvOkzEXuP2f7QAIGGLb8Q
+        /hKk+iXEQnhhpQMHySzLI0Q=
+X-Google-Smtp-Source: APXvYqwROvBNdwR2JGWp0IvGhoGV0WlnB62tVM2PJk7IS+1rw1bl5XAJaH9t3EgBH+R+/lh4emQQpw==
+X-Received: by 2002:a63:d301:: with SMTP id b1mr74847311pgg.379.1563989844842;
+        Wed, 24 Jul 2019 10:37:24 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:500::2:c91a])
-        by smtp.gmail.com with ESMTPSA id l25sm57901670pff.143.2019.07.24.10.35.19
+        by smtp.gmail.com with ESMTPSA id f19sm65642862pfk.180.2019.07.24.10.37.23
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Jul 2019 10:35:19 -0700 (PDT)
-Date:   Wed, 24 Jul 2019 10:35:17 -0700
+        Wed, 24 Jul 2019 10:37:24 -0700 (PDT)
+Date:   Wed, 24 Jul 2019 10:37:22 -0700
 From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         kernel-team@fb.com
-Subject: [PATCH 1/2] blkcg: rename blkcg->cgwb_refcnt to ->online_pin and
- always use it
-Message-ID: <20190724173517.GA559934@devbig004.ftw2.facebook.com>
+Subject: [PATCH RESEND 1/2] blkcg: rename blkcg->cgwb_refcnt to ->online_pin
+ and always use it
+Message-ID: <20190724173722.GA569612@devbig004.ftw2.facebook.com>
+References: <20190724173517.GA559934@devbig004.ftw2.facebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20190724173517.GA559934@devbig004.ftw2.facebook.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
-To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -92,6 +94,8 @@ In prepartion,
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
+(Resending cuz somehow I cleared To: line before sending)
+
 Hello,
 
 The asynchronous blkcg offlining can break offline ordering.  This
