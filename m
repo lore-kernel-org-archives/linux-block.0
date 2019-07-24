@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B39C76191
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 03:48:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F520C76186
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 03:49:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9B8E22070D
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 03:48:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CC4F2070D
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 03:49:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726393AbfGXDs6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jul 2019 23:48:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53756 "EHLO mx1.redhat.com"
+        id S1726518AbfGXDtF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jul 2019 23:49:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58898 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726513AbfGXDs5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jul 2019 23:48:57 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1726513AbfGXDtE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jul 2019 23:49:04 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 96160859FE;
-        Wed, 24 Jul 2019 03:48:57 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2D0C030BD1C6;
+        Wed, 24 Jul 2019 03:49:04 +0000 (UTC)
 Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5307C5D71A;
-        Wed, 24 Jul 2019 03:48:55 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EFE9819C58;
+        Wed, 24 Jul 2019 03:49:00 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
@@ -34,24 +34,31 @@ Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Sagi Grimberg <sagi@grimberg.me>,
         Keith Busch <keith.busch@intel.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V2 1/5] blk-mq: introduce blk_mq_request_completed()
-Date:   Wed, 24 Jul 2019 11:48:39 +0800
-Message-Id: <20190724034843.10879-2-ming.lei@redhat.com>
+Subject: [PATCH V2 2/5] blk-mq: introduce blk_mq_tagset_wait_completed_request()
+Date:   Wed, 24 Jul 2019 11:48:40 +0800
+Message-Id: <20190724034843.10879-3-ming.lei@redhat.com>
 In-Reply-To: <20190724034843.10879-1-ming.lei@redhat.com>
 References: <20190724034843.10879-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Wed, 24 Jul 2019 03:48:57 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Wed, 24 Jul 2019 03:49:04 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-NVMe needs this function to decide if one request to be aborted has
-been completed in normal IO path already.
+blk-mq may schedule to call queue's complete function on remote CPU via
+IPI, but doesn't provide any way to synchronize the request's complete
+fn. The current queue freeze interface can't provide the synchonization
+because aborted requests stay at blk-mq queues during EH.
 
-So introduce it.
+In some driver's EH(such as NVMe), hardware queue's resource may be freed &
+re-allocated. If the completed request's complete fn is run finally after the
+hardware queue's resource is released, kernel crash will be triggered.
+
+Prepare for fixing this kind of issue by introducing
+blk_mq_tagset_wait_completed_request().
 
 Cc: Max Gurtovoy <maxg@mellanox.com>
 Cc: Sagi Grimberg <sagi@grimberg.me>
@@ -60,39 +67,72 @@ Cc: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c         | 6 ++++++
- include/linux/blk-mq.h | 1 +
- 2 files changed, 7 insertions(+)
+ block/blk-mq-tag.c     | 32 ++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 33 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b038ec680e84..e1d0b4567388 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -665,6 +665,12 @@ int blk_mq_request_started(struct request *rq)
- }
- EXPORT_SYMBOL_GPL(blk_mq_request_started);
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index da19f0bc8876..008388e82b5c 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -10,6 +10,7 @@
+ #include <linux/module.h>
  
-+int blk_mq_request_completed(struct request *rq)
+ #include <linux/blk-mq.h>
++#include <linux/delay.h>
+ #include "blk.h"
+ #include "blk-mq.h"
+ #include "blk-mq-tag.h"
+@@ -354,6 +355,37 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ }
+ EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+ 
++static bool blk_mq_tagset_count_completed_rqs(struct request *rq,
++		void *data, bool reserved)
 +{
-+	return blk_mq_rq_state(rq) == MQ_RQ_COMPLETE;
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_request_completed);
++	unsigned *count = data;
 +
- void blk_mq_start_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
++	if (blk_mq_request_completed(rq))
++		(*count)++;
++	return true;
++}
++
++/**
++ * blk_mq_tagset_wait_completed_request - wait until all completed req's
++ * complete funtion is run
++ * @tagset:	Tag set to drain completed request
++ *
++ * Note: This function has to be run after all IO queues are shutdown
++ */
++void blk_mq_tagset_wait_completed_request(struct blk_mq_tag_set *tagset)
++{
++	while (true) {
++		unsigned count = 0;
++
++		blk_mq_tagset_busy_iter(tagset,
++				blk_mq_tagset_count_completed_rqs, &count);
++		if (!count)
++			break;
++		msleep(5);
++	}
++}
++EXPORT_SYMBOL(blk_mq_tagset_wait_completed_request);
++
+ /**
+  * blk_mq_queue_tag_busy_iter - iterate over all requests with a driver tag
+  * @q:		Request queue to examine.
 diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index ab25e69a15d1..cc5115ca0e19 100644
+index cc5115ca0e19..f9f722aeb535 100644
 --- a/include/linux/blk-mq.h
 +++ b/include/linux/blk-mq.h
-@@ -303,6 +303,7 @@ static inline u16 blk_mq_unique_tag_to_tag(u32 unique_tag)
- 
- 
- int blk_mq_request_started(struct request *rq);
-+int blk_mq_request_completed(struct request *rq);
- void blk_mq_start_request(struct request *rq);
- void blk_mq_end_request(struct request *rq, blk_status_t error);
- void __blk_mq_end_request(struct request *rq, blk_status_t error);
+@@ -329,6 +329,7 @@ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv);
++void blk_mq_tagset_wait_completed_request(struct blk_mq_tag_set *tagset);
+ void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_unfreeze_queue(struct request_queue *q);
+ void blk_freeze_queue_start(struct request_queue *q);
 -- 
 2.20.1
 
