@@ -6,72 +6,72 @@ X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DFDCC76186
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 17:37:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3925C76186
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 17:37:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0889F2189F
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 17:37:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDA4B21926
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 17:37:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563989847;
-	bh=CoUiERLHZxnSU81JTfU1X+t9+HsHukjllHZZ384/Ye8=;
+	s=default; t=1563989879;
+	bh=HU+UJEwKj7oJ8yx1arDBtwt//GkoHkAe1Tgtv1vNwIE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ni3f81i0UNDs0QirVWBow+JHpPPyhuygJqb6Ja5yQpUfV8bQueuG4Mf7m+WexuiL1
-	 MfwkaKg9LRVARHBuyjcdSWoMWZ8Man/m0imIMWmzc9Hwa87SHhldzNS9x7kyaNS/lw
-	 lN//P06QPH4xVn5viMVDCRwTcwXMOIaX/hEdyvWI=
+	b=PVLOtDo3reov6LhjvNfvYusPlOf3+0aa9vGtpbkdnqoOlLIzRGxVpsKLwSSok6rbP
+	 ynz/EE3MIOiQdJdf1Jn1z+QSXRuD7pfGVo+PEhhiW43FUtzfNooUhM5K6nlzZqJOgR
+	 6EDjZaYJfRkftjfazg3fqFzIEtJt8SPM20kkhRbs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726911AbfGXRh0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jul 2019 13:37:26 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:37958 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727458AbfGXRh0 (ORCPT
+        id S1727458AbfGXRh7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Jul 2019 13:37:59 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:44995 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726323AbfGXRh6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jul 2019 13:37:26 -0400
-Received: by mail-pg1-f195.google.com with SMTP id f5so12750591pgu.5;
-        Wed, 24 Jul 2019 10:37:25 -0700 (PDT)
+        Wed, 24 Jul 2019 13:37:58 -0400
+Received: by mail-pl1-f196.google.com with SMTP id t14so22248469plr.11;
+        Wed, 24 Jul 2019 10:37:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=cHxf1kTdWDT0gUqEm0BhBo9+91LG1FL8yrCj/eDjN5Q=;
-        b=ZFjj/SoOb4H/1IrlfjFztvbIO1Bsh8BYcN0SwpbOE0BRo+gHZCy74Y5vkvBaDeJHoi
-         UhuC8apPTWl9jCTNHFDLqLY9O5jg925z0nTsXAFcaK4NUHgb54HHKIcT126TPO8kzPWV
-         4YxeqDr374ZiyQLQ4TSijs58a7dlf3cMbZYfIRfzOT7uC1mps8qnerrY+JgHaZq5QVAN
-         krgdsbOeSTxS0CpNRbR7Cc9Uxew1ohLZY23j4JVimyBi+qee7oQI46TYuoymFlZn9E/b
-         sCmix2SVuOSy3t+rUc1T6KdV74Mzxcy5kREmM++gtDZqR38wvgoQe89Q8oCRN6Y30jPN
-         TrOw==
+        bh=210jieYj6x4iDn+RzSO4QMxbDZOJTaHp79XKUEHy4po=;
+        b=hEIOZzj60rL78OaSsU8W3pEv0nJLPBgdwJhBm+OTrlPQ4Dd28EfK2xeqNvC+YGG1iS
+         o7+D047hKFmZkjPSVvrcm81oE1rDcz+IZmg6FJ/axEGwNDZR95o5vSzbXgpbwrf2/mfc
+         z8SddeI9szOe6KIUJ7vMY/XhgwLeyq8qXJzegLuhJRZrhtXpnYfG93bp8qHbj5Z5m+BC
+         eGqOrfAFGREptDwpyg3OOnPOGiQK1kk2OIYuZ8WwuEv+wR1kuDyJz5E4YTlRTomysIRU
+         LP0OHdDIafKLY5KlYpdPJE9e41tYkm7y46iWC3NOVLtZveI4poFnX5aOg9hOiMzgpwn/
+         +9/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
          :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=cHxf1kTdWDT0gUqEm0BhBo9+91LG1FL8yrCj/eDjN5Q=;
-        b=FwHoY9vVSSwH7mmmHvmg2aoZsVUq8b8RatAvbYE5g9eTdM7uo+d2XjZvllcYvkgsFM
-         A8NBdTwTmpkyTSnfU+oLJGXKDDb4T3y6JilAwPF2FzKpqsHMuJ8Gdz041AGgc3r3SG3y
-         Ajd7AAtG0XuTeR1LQnM8W8YrgHDF7jdnlG7jYTSsDK7yLObj5TJ7jm/EL5SmdC02n71i
-         WAqgvZXKwdbsyQmbIvFn0VBPjPkNk+6ubaXp0IhU7FY4Jhi/lF+7sZrs+MPGAC6O27SD
-         FtR69+6MG++2GWnMx0iJIv4nRkM7pJom8gAQYTfLyhjdXLPHIbYj04oWFgk6lwMUTMfS
-         v41Q==
-X-Gm-Message-State: APjAAAUWVR0wtzWUHVm/wtMd5Y931FlhVaHhvOkzEXuP2f7QAIGGLb8Q
-        /hKk+iXEQnhhpQMHySzLI0Q=
-X-Google-Smtp-Source: APXvYqwROvBNdwR2JGWp0IvGhoGV0WlnB62tVM2PJk7IS+1rw1bl5XAJaH9t3EgBH+R+/lh4emQQpw==
-X-Received: by 2002:a63:d301:: with SMTP id b1mr74847311pgg.379.1563989844842;
-        Wed, 24 Jul 2019 10:37:24 -0700 (PDT)
+        bh=210jieYj6x4iDn+RzSO4QMxbDZOJTaHp79XKUEHy4po=;
+        b=P/C3R4isLq1o+mFXfYrNrFyhzJb4hVbwYxGkWIXXSZE598Jfs1hsROXWBnMwkpWtI2
+         yqJgLry+LuF+QAUoCEkKV7uobc+mZGOiT9I65ptD8lRgnGUyvLHN0+15nT+taQMwQBs1
+         BgUizfAy2AFkgqul34xw8HkSZ+MaOv4adeBKduTBZRGvv6f+LrTIcwYAFEDKmbISm0vl
+         I8++DR39U/1mS9MSdnO1GWXRIszaMWugCZUPNSFR7NtTwf5hUCBvAJrT/F/N50IX/MJQ
+         z6CPnJ2z4ir7JdZFcs/JZQo4ETGnFZP4W9RI1krTU9vQ1oPEgdHQedi4ju/EFP3AnTRA
+         cACQ==
+X-Gm-Message-State: APjAAAWiN4LFYeCtgy40kANFvRQOEp1iBEw0ZZxTKFZ/blGdbFaGhhP8
+        Iv5eTZAVAekj7ABpOejp6V+sY54+
+X-Google-Smtp-Source: APXvYqz22Xp4Bha/kHcoUHwURa5oH9/WA3W1Js1+o3th/+U8OIMfM61Tbdg9ifuIT2cMuqk1plKZQA==
+X-Received: by 2002:a17:902:6a87:: with SMTP id n7mr85600071plk.336.1563989877739;
+        Wed, 24 Jul 2019 10:37:57 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:500::2:c91a])
-        by smtp.gmail.com with ESMTPSA id f19sm65642862pfk.180.2019.07.24.10.37.23
+        by smtp.gmail.com with ESMTPSA id d15sm82710266pjc.8.2019.07.24.10.37.57
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Jul 2019 10:37:24 -0700 (PDT)
-Date:   Wed, 24 Jul 2019 10:37:22 -0700
+        Wed, 24 Jul 2019 10:37:57 -0700 (PDT)
+Date:   Wed, 24 Jul 2019 10:37:55 -0700
 From:   Tejun Heo <tj@kernel.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         kernel-team@fb.com
-Subject: [PATCH RESEND 1/2] blkcg: rename blkcg->cgwb_refcnt to ->online_pin
- and always use it
-Message-ID: <20190724173722.GA569612@devbig004.ftw2.facebook.com>
+Subject: [PATCH 2/2] blkcg: don't offline parent blkcg first
+Message-ID: <20190724173755.GB569612@devbig004.ftw2.facebook.com>
 References: <20190724173517.GA559934@devbig004.ftw2.facebook.com>
+ <20190724173722.GA569612@devbig004.ftw2.facebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190724173517.GA559934@devbig004.ftw2.facebook.com>
+In-Reply-To: <20190724173722.GA569612@devbig004.ftw2.facebook.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -83,157 +83,62 @@ don't get offlined while there are active cgwbs on them.  However, it
 ends up making offlining unordered sometimes causing parents to be
 offlined before children.
 
-To fix it, we want child blkcgs to pin the parents' online states
-turning the refcnt into a more generic online pinning mechanism.
+Let's fix this by making child blkcgs pin the parents' online states.
 
-In prepartion,
-
-* blkcg->cgwb_refcnt -> blkcg->online_pin
-* blkcg_cgwb_get/put() -> blkcg_pin/unpin_online()
-* Take them out of CONFIG_CGROUP_WRITEBACK
+Note that pin/unpin names are chosen over get/put intentionally
+because css uses get/put online for something different.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
-(Resending cuz somehow I cleared To: line before sending)
-
-Hello,
-
-The asynchronous blkcg offlining can break offline ordering.  This
-doesn't affect any of in-kernel users but it broke an assumption that
-the pending io.cost controller was making and is generally nasty.
-These two patches fix the offlining ordering by making children pin
-parents.
-
-Thanks.
-
- block/blk-cgroup.c         |    6 +++---
- include/linux/blk-cgroup.h |   39 +++++++++++++--------------------------
- mm/backing-dev.c           |    6 +++---
- 3 files changed, 19 insertions(+), 32 deletions(-)
+ block/blk-cgroup.c         |   16 ++++++++++++++++
+ include/linux/blk-cgroup.h |    6 +++++-
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
 --- a/block/blk-cgroup.c
 +++ b/block/blk-cgroup.c
-@@ -1035,8 +1035,8 @@ static void blkcg_css_offline(struct cgr
- 	/* this prevents anyone from attaching or migrating to this blkcg */
- 	wb_blkcg_offline(blkcg);
- 
--	/* put the base cgwb reference allowing step 2 to be triggered */
--	blkcg_cgwb_put(blkcg);
-+	/* put the base online pin allowing step 2 to be triggered */
-+	blkcg_unpin_online(blkcg);
+@@ -1158,6 +1158,21 @@ unlock:
+ 	return ret;
  }
  
++static int blkcg_css_online(struct cgroup_subsys_state *css)
++{
++	struct blkcg *blkcg = css_to_blkcg(css);
++	struct blkcg *parent = blkcg_parent(blkcg);
++
++	/*
++	 * blkcg_pin_online() is used to delay blkcg offline so that blkgs
++	 * don't go offline while cgwbs are still active on them.  Pin the
++	 * parent so that offline always happens towards the root.
++	 */
++	if (parent)
++		blkcg_pin_online(parent);
++	return 0;
++}
++
  /**
-@@ -1135,11 +1135,11 @@ blkcg_css_alloc(struct cgroup_subsys_sta
- 	}
+  * blkcg_init_queue - initialize blkcg part of request queue
+  * @q: request_queue to initialize
+@@ -1300,6 +1315,7 @@ static void blkcg_exit(struct task_struc
  
- 	spin_lock_init(&blkcg->lock);
-+	refcount_set(&blkcg->online_pin, 1);
- 	INIT_RADIX_TREE(&blkcg->blkg_tree, GFP_NOWAIT | __GFP_NOWARN);
- 	INIT_HLIST_HEAD(&blkcg->blkg_list);
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	INIT_LIST_HEAD(&blkcg->cgwb_list);
--	refcount_set(&blkcg->cgwb_refcnt, 1);
- #endif
- 	list_add_tail(&blkcg->all_blkcgs_node, &all_blkcgs);
- 
+ struct cgroup_subsys io_cgrp_subsys = {
+ 	.css_alloc = blkcg_css_alloc,
++	.css_online = blkcg_css_online,
+ 	.css_offline = blkcg_css_offline,
+ 	.css_free = blkcg_css_free,
+ 	.can_attach = blkcg_can_attach,
 --- a/include/linux/blk-cgroup.h
 +++ b/include/linux/blk-cgroup.h
-@@ -47,6 +47,7 @@ struct blkcg_gq;
- struct blkcg {
- 	struct cgroup_subsys_state	css;
- 	spinlock_t			lock;
-+	refcount_t			online_pin;
- 
- 	struct radix_tree_root		blkg_tree;
- 	struct blkcg_gq	__rcu		*blkg_hint;
-@@ -57,7 +58,6 @@ struct blkcg {
- 	struct list_head		all_blkcgs_node;
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	struct list_head		cgwb_list;
--	refcount_t			cgwb_refcnt;
- #endif
- };
- 
-@@ -431,47 +431,34 @@ static inline struct blkcg *cpd_to_blkcg
- 
- extern void blkcg_destroy_blkgs(struct blkcg *blkcg);
- 
--#ifdef CONFIG_CGROUP_WRITEBACK
--
- /**
-- * blkcg_cgwb_get - get a reference for blkcg->cgwb_list
-+ * blkcg_pin_online - pin online state
-  * @blkcg: blkcg of interest
-  *
-- * This is used to track the number of active wb's related to a blkcg.
-+ * While pinned, a blkcg is kept online.  This is primarily used to
-+ * impedance-match blkg and cgwb lifetimes so that blkg doesn't go offline
-+ * while an associated cgwb is still active.
+@@ -455,8 +455,12 @@ static inline void blkcg_pin_online(stru
   */
--static inline void blkcg_cgwb_get(struct blkcg *blkcg)
-+static inline void blkcg_pin_online(struct blkcg *blkcg)
+ static inline void blkcg_unpin_online(struct blkcg *blkcg)
  {
--	refcount_inc(&blkcg->cgwb_refcnt);
-+	refcount_inc(&blkcg->online_pin);
- }
- 
- /**
-- * blkcg_cgwb_put - put a reference for @blkcg->cgwb_list
-+ * blkcg_unpin_online - unpin online state
-  * @blkcg: blkcg of interest
-  *
-- * This is used to track the number of active wb's related to a blkcg.
-- * When this count goes to zero, all active wb has finished so the
-+ * This is primarily used to impedance-match blkg and cgwb lifetimes so
-+ * that blkg doesn't go offline while an associated cgwb is still active.
-+ * When this count goes to zero, all active cgwbs have finished so the
-  * blkcg can continue destruction by calling blkcg_destroy_blkgs().
-- * This work may occur in cgwb_release_workfn() on the cgwb_release
-- * workqueue.
-  */
--static inline void blkcg_cgwb_put(struct blkcg *blkcg)
-+static inline void blkcg_unpin_online(struct blkcg *blkcg)
- {
--	if (refcount_dec_and_test(&blkcg->cgwb_refcnt))
-+	if (refcount_dec_and_test(&blkcg->online_pin))
+-	if (refcount_dec_and_test(&blkcg->online_pin))
++	do {
++		if (!refcount_dec_and_test(&blkcg->online_pin))
++			break;
  		blkcg_destroy_blkgs(blkcg);
++		blkcg = blkcg_parent(blkcg);
++	} while (blkcg);
  }
  
--#else
--
--static inline void blkcg_cgwb_get(struct blkcg *blkcg) { }
--
--static inline void blkcg_cgwb_put(struct blkcg *blkcg)
--{
--	/* wb isn't being accounted, so trigger destruction right away */
--	blkcg_destroy_blkgs(blkcg);
--}
--
--#endif
--
  /**
-  * blkg_path - format cgroup path of blkg
-  * @blkg: blkg of interest
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -487,8 +487,8 @@ static void cgwb_release_workfn(struct w
- 	css_put(wb->blkcg_css);
- 	mutex_unlock(&wb->bdi->cgwb_release_mutex);
- 
--	/* triggers blkg destruction if cgwb_refcnt becomes zero */
--	blkcg_cgwb_put(blkcg);
-+	/* triggers blkg destruction if no online users left */
-+	blkcg_unpin_online(blkcg);
- 
- 	fprop_local_destroy_percpu(&wb->memcg_completions);
- 	percpu_ref_exit(&wb->refcnt);
-@@ -588,7 +588,7 @@ static int cgwb_create(struct backing_de
- 			list_add_tail_rcu(&wb->bdi_node, &bdi->wb_list);
- 			list_add(&wb->memcg_node, memcg_cgwb_list);
- 			list_add(&wb->blkcg_node, blkcg_cgwb_list);
--			blkcg_cgwb_get(blkcg);
-+			blkcg_pin_online(blkcg);
- 			css_get(memcg_css);
- 			css_get(blkcg_css);
- 		}
