@@ -2,174 +2,94 @@ Return-Path: <SRS0=+4Fh=VV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51ACBC7618F
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 08:08:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1097C7618B
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 08:24:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 335A421873
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 08:08:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF2F8229FA
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 08:24:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726074AbfGXIII (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jul 2019 04:08:08 -0400
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:41595 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725999AbfGXIII (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jul 2019 04:08:08 -0400
-Received: by mail-qk1-f196.google.com with SMTP id v22so33109547qkj.8
-        for <linux-block@vger.kernel.org>; Wed, 24 Jul 2019 01:08:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=/MFYQFzENwHk5G46kOvOVKTzaxjp4jXpKM7WypPWBDc=;
-        b=SAM/Ges4JdmyY/E+MtJ19ilqDDs4d5p4ABHKIXp6Vz0dx4A64GS6RW1/TcHTmcd5u+
-         g4Dkco3HTo/+wRiubRsZBRR3/Dzgfn/klyubjmTUYNQRhzR0AaYbncRX9iMg76pN01s3
-         RtdwdR7whmEtApdEQVMoBBvL5X5qBikJE0cEb/N1d0NV5xrMtqdJcXTEjNBzIMQ0MFcN
-         FNeVJaTNHLOsLd6x15WkQsIDZ9cFvC4RmMiOvtVnhiYRL67PH3mJAhi/dhHd01qJLnSX
-         h/fRHhEy4pXk+miCk389GGe4VFIOM9/JNMD6L6JARVwNtkEZO38LxaR58KDcmpEAKs97
-         Vqxg==
-X-Gm-Message-State: APjAAAXp8xyswyyfK9r2PE3POF71kRZy8dhWl1pxqDxz/eZo61+n0hgT
-        tOUHgBiotO9Jioz7Qy2S4U0x5Q==
-X-Google-Smtp-Source: APXvYqyqOJ7xj5WyBSGnSKw6r+fHzKSSQgggyWILPC/N5KbhyvrIGi3wpGDnO2q6i0xNWsrtSCd37A==
-X-Received: by 2002:a05:620a:31b:: with SMTP id s27mr17648521qkm.264.1563955687250;
-        Wed, 24 Jul 2019 01:08:07 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
-        by smtp.gmail.com with ESMTPSA id t26sm23203051qtc.95.2019.07.24.01.07.58
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 24 Jul 2019 01:08:06 -0700 (PDT)
-Date:   Wed, 24 Jul 2019 04:07:55 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     john.hubbard@gmail.com
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        LKML <linux-kernel@vger.kernel.org>, ceph-devel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        netdev@vger.kernel.org, samba-technical@lists.samba.org,
-        v9fs-developer@lists.sourceforge.net,
-        virtualization@lists.linux-foundation.org,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>, Jan Kara <jack@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Boaz Harrosh <boaz@plexistor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        id S1725870AbfGXIYz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Jul 2019 04:24:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43794 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725851AbfGXIYz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Jul 2019 04:24:55 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BCEBB335C0;
+        Wed, 24 Jul 2019 08:24:54 +0000 (UTC)
+Received: from localhost (ovpn-117-162.ams2.redhat.com [10.36.117.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A4AC75C224;
+        Wed, 24 Jul 2019 08:24:51 +0000 (UTC)
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Aarushi Mehta <mehta.aaru20@gmail.com>,
+        Julia Suvorova <jusual@mail.ru>,
+        Jeff Moyer <jmoyer@redhat.com>, linux-block@vger.kernel.org,
         Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH 07/12] vhost-scsi: convert put_page() to put_user_page*()
-Message-ID: <20190724040745-mutt-send-email-mst@kernel.org>
-References: <20190724042518.14363-1-jhubbard@nvidia.com>
- <20190724042518.14363-8-jhubbard@nvidia.com>
+Subject: [PATCH liburing 0/4] Fedora packaging preparation
+Date:   Wed, 24 Jul 2019 09:24:46 +0100
+Message-Id: <20190724082450.12135-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190724042518.14363-8-jhubbard@nvidia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Wed, 24 Jul 2019 08:24:54 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 23, 2019 at 09:25:13PM -0700, john.hubbard@gmail.com wrote:
-> From: Jérôme Glisse <jglisse@redhat.com>
-> 
-> For pages that were retained via get_user_pages*(), release those pages
-> via the new put_user_page*() routines, instead of via put_page().
-> 
-> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-> ("mm: introduce put_user_page*(), placeholder versions").
-> 
-> Changes from Jérôme's original patch:
-> 
-> * Changed a WARN_ON to a BUG_ON.
-> 
-> Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> Cc: virtualization@lists.linux-foundation.org
-> Cc: linux-fsdevel@vger.kernel.org
-> Cc: linux-block@vger.kernel.org
-> Cc: linux-mm@kvack.org
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> Cc: Johannes Thumshirn <jthumshirn@suse.de>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Dave Chinner <david@fromorbit.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Matthew Wilcox <willy@infradead.org>
-> Cc: Boaz Harrosh <boaz@plexistor.com>
-> Cc: Miklos Szeredi <miklos@szeredi.hu>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+This patch series includes further steps towards Fedora packaging.  The most
+notable one is moving private headers into <liburing/*.h> to prevent naming
+collisions with other software.  Existing applications are unaffected because
+the public <liburing.h> header remains in its old location.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Stefan Hajnoczi (4):
+  pkgconfig: add missing config-host.mak dependency
+  spec: invoke ./configure with arguments
+  src/Makefile: honor the caller's includedir and libdir
+  src/Makefile: keep private headers in <liburing/*.h>
 
-> ---
->  drivers/vhost/scsi.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-> index a9caf1bc3c3e..282565ab5e3f 100644
-> --- a/drivers/vhost/scsi.c
-> +++ b/drivers/vhost/scsi.c
-> @@ -329,11 +329,11 @@ static void vhost_scsi_release_cmd(struct se_cmd *se_cmd)
->  
->  	if (tv_cmd->tvc_sgl_count) {
->  		for (i = 0; i < tv_cmd->tvc_sgl_count; i++)
-> -			put_page(sg_page(&tv_cmd->tvc_sgl[i]));
-> +			put_user_page(sg_page(&tv_cmd->tvc_sgl[i]));
->  	}
->  	if (tv_cmd->tvc_prot_sgl_count) {
->  		for (i = 0; i < tv_cmd->tvc_prot_sgl_count; i++)
-> -			put_page(sg_page(&tv_cmd->tvc_prot_sgl[i]));
-> +			put_user_page(sg_page(&tv_cmd->tvc_prot_sgl[i]));
->  	}
->  
->  	vhost_scsi_put_inflight(tv_cmd->inflight);
-> @@ -630,6 +630,13 @@ vhost_scsi_map_to_sgl(struct vhost_scsi_cmd *cmd,
->  	size_t offset;
->  	unsigned int npages = 0;
->  
-> +	/*
-> +	 * Here in all cases we should have an IOVEC which use GUP. If that is
-> +	 * not the case then we will wrongly call put_user_page() and the page
-> +	 * refcount will go wrong (this is in vhost_scsi_release_cmd())
-> +	 */
-> +	WARN_ON(!iov_iter_get_pages_use_gup(iter));
-> +
->  	bytes = iov_iter_get_pages(iter, pages, LONG_MAX,
->  				VHOST_SCSI_PREALLOC_UPAGES, &offset);
->  	/* No pages were pinned */
-> @@ -681,7 +688,7 @@ vhost_scsi_iov_to_sgl(struct vhost_scsi_cmd *cmd, bool write,
->  			while (p < sg) {
->  				struct page *page = sg_page(p++);
->  				if (page)
-> -					put_page(page);
-> +					put_user_page(page);
->  			}
->  			return ret;
->  		}
-> -- 
-> 2.22.0
+ Makefile                              |  2 +-
+ examples/Makefile                     |  2 +-
+ src/Makefile                          | 18 +++++++++---------
+ test/Makefile                         |  2 +-
+ src/{ => include}/liburing.h          |  6 +++---
+ src/{ => include/liburing}/barrier.h  |  0
+ src/{ => include/liburing}/compat.h   |  0
+ src/{ => include/liburing}/io_uring.h |  0
+ examples/io_uring-cp.c                |  2 +-
+ examples/io_uring-test.c              |  2 +-
+ examples/link-cp.c                    |  2 +-
+ src/queue.c                           |  6 +++---
+ src/register.c                        |  4 ++--
+ src/setup.c                           |  4 ++--
+ src/syscall.c                         |  4 ++--
+ test/cq-full.c                        |  2 +-
+ test/eeed8b54e0df-test.c              |  2 +-
+ test/fsync.c                          |  2 +-
+ test/io_uring_enter.c                 |  4 ++--
+ test/io_uring_register.c              |  2 +-
+ test/io_uring_setup.c                 |  2 +-
+ test/link.c                           |  2 +-
+ test/nop.c                            |  2 +-
+ test/poll-cancel.c                    |  2 +-
+ test/poll.c                           |  2 +-
+ test/ring-leak.c                      |  2 +-
+ test/send_recvmsg.c                   |  2 +-
+ test/sq-full.c                        |  2 +-
+ liburing.spec                         |  6 ++++--
+ 29 files changed, 45 insertions(+), 43 deletions(-)
+ rename src/{ => include}/liburing.h (98%)
+ rename src/{ => include/liburing}/barrier.h (100%)
+ rename src/{ => include/liburing}/compat.h (100%)
+ rename src/{ => include/liburing}/io_uring.h (100%)
+
+-- 
+2.21.0
+
