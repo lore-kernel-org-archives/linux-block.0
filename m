@@ -2,88 +2,99 @@ Return-Path: <SRS0=+4Fh=VV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F7CC7618B
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 15:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38815C41517
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 16:18:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B183221738
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 15:12:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="b7wci5v+"
+	by mail.kernel.org (Postfix) with ESMTP id 1993C21850
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 16:18:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387514AbfGXPMK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jul 2019 11:12:10 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:40768 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387503AbfGXPMK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jul 2019 11:12:10 -0400
-Received: by mail-io1-f68.google.com with SMTP id h6so3774869iom.7
-        for <linux-block@vger.kernel.org>; Wed, 24 Jul 2019 08:12:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=QJHssONEhZIyAmvNE/Dt5/SrjwAj1mcDMbQg9vLevbA=;
-        b=b7wci5v+oCm7RxTvEBS5kZABHnS7btZ3cV5tLZqAXk6YUle2WBE3OcUCpCK6NxgMU6
-         JmT3hYwfNyg8jLQWAEZQ/7nuclviKeviSmK4V1d1IFAg9LdErsnjLbdJmX58LHWwggDH
-         TmLTuuEHzdg9Ov7O0LwyOtrPXD1ntFd2hME9NMgGk8PxVMA9RH15KBBL3Zakt7AENPki
-         xmN5psB0KdURkO9ucA3Y7XYPhW/sMXnCXfS/CJwzl0Ofc/5ht73UGU0u2Wr/FNDnzGAp
-         Og3e2H+Sj7404GkZlHPtm9BcB6AeCdD+mCAQl/1vrjgFgx3PWNEKVEuFmlQoGApSDGwW
-         Mtxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=QJHssONEhZIyAmvNE/Dt5/SrjwAj1mcDMbQg9vLevbA=;
-        b=LL3mn5RPDWLoEpvSMsiPEPMUx2gZie6bX+xnAaxLXwOMF2F/xHxdwH39OFEuCLdZEP
-         /wvyxOHz2Zm4AtsQ/2UbGVfXPc3PcI07/u7WSgPnXs6ucgf7nIeHZzzsVJAREe2ZXnrE
-         c6diphoeSFix5iDhJJiWQr63SAXsDl4Vw0ypg8YAfunEZx/log832JBFsJCMQyUyn34h
-         Sx7r0NuLX/tX8sZUd6s4e3dW1Cc6slhygo0URazOGJc1Wdxpaf2nsiu8WFGTT2P4f6f8
-         78eCjX4SspmW8MK/EywPW4f9PWpfCb8MNFOGrM+bvJzSF6icEJpfVrqpeSVpD10Kjfjn
-         JTRg==
-X-Gm-Message-State: APjAAAWQrdIigOOHCb5/TH/n6YSxPGr2gFdtDdPhhRBRkozSb2Fb8fJl
-        EM1i0A9lZU6Qmc+3H3ZgycbIpf21tfk=
-X-Google-Smtp-Source: APXvYqxBvbVarpxI5hXCuvn8ANYsE8HbbflFSePljhd8cbGsZKgnV7WZ/H3nhmkMgn+2T0+rdDmfkw==
-X-Received: by 2002:a6b:ee12:: with SMTP id i18mr16611404ioh.172.1563981128744;
-        Wed, 24 Jul 2019 08:12:08 -0700 (PDT)
-Received: from [192.168.1.158] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id a7sm37195262iok.19.2019.07.24.08.12.07
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Jul 2019 08:12:07 -0700 (PDT)
-Subject: Re: [PATCH liburing 0/4] Fedora packaging preparation
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Aarushi Mehta <mehta.aaru20@gmail.com>,
-        Julia Suvorova <jusual@mail.ru>,
-        Jeff Moyer <jmoyer@redhat.com>, linux-block@vger.kernel.org
-References: <20190724082450.12135-1-stefanha@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <64f0511e-36d9-a59e-abb6-acae1aed2653@kernel.dk>
-Date:   Wed, 24 Jul 2019 09:12:06 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726539AbfGXQST (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Jul 2019 12:18:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34088 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726441AbfGXQST (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Jul 2019 12:18:19 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id DBD5D30917AC;
+        Wed, 24 Jul 2019 16:18:18 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 52E6B102482F;
+        Wed, 24 Jul 2019 16:18:14 +0000 (UTC)
+Date:   Wed, 24 Jul 2019 12:18:13 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
+        stable@vger.kernel.org
+Subject: Re: [PATCH V3 1/2] blk-mq: add callback of .cleanup_rq
+Message-ID: <20190724161813.GA13896@redhat.com>
+References: <20190724031258.31688-1-ming.lei@redhat.com>
+ <20190724031258.31688-2-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190724082450.12135-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190724031258.31688-2-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 24 Jul 2019 16:18:19 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/24/19 2:24 AM, Stefan Hajnoczi wrote:
-> This patch series includes further steps towards Fedora packaging.  The most
-> notable one is moving private headers into <liburing/*.h> to prevent naming
-> collisions with other software.  Existing applications are unaffected because
-> the public <liburing.h> header remains in its old location.
+On Tue, Jul 23 2019 at 11:12pm -0400,
+Ming Lei <ming.lei@redhat.com> wrote:
 
-Applied, thanks.
+> dm-rq needs to free request which has been dispatched and not completed
+> by underlying queue. However, the underlying queue may have allocated
+> private data for this request in .queue_rq(), so the request private data
+> will be leaked in dm multipath IO code path.
+> 
+> Add one new callback of .cleanup_rq() to fix the memory leak.
 
--- 
-Jens Axboe
+Think the above kind of glosses over the nature of the issue.  While
+this issue _is_ unique to request-based DM multipath's use of blk-mq it
+ultimately is a failing of the existing blk-mq interface that SCSI's
+per-request private data is leaking.  SO all said, I'd rather this patch
+header reflect the nuance of why you skinned the cat like you have.
 
+Something like this would be a better header IMHO:
+
+SCSI maintains its own driver private data hooked off of each SCSI
+request.  An upper layer driver (e.g. dm-rq) may need to retry these
+SCSI requests, before SCSI has fully dispatched them, due to a lower
+level SCSI driver's resource limitation identified in scsi_queue_rq().
+Currently SCSI's per-request private data is leaked when the upper layer
+driver (dm-rq) frees and then retries these requests in response to
+BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE returns from scsi_queue_rq().
+
+This usecase is so specialized that it doesn't warrant training an
+existing blk-mq interface (e.g. blk_mq_free_request) to allow SCSI to
+account for freeing its driver private data -- doing so would add an
+extra branch for handling a special case that all other consumers of
+SCSI (and blk-mq) won't ever need to worry about.
+
+So the most pragmatic way forward is to delegate freeing SCSI driver
+private data to the upper layer driver (dm-rq).  Do so by calling a new
+blk_mq_cleanup_rq() method from dm-rq.  A following commit will
+implement the .cleanup_rq() hook in scsi_mq_ops.
+
+
+> Another use case is to free request when the hctx is dead during
+> cpu hotplug context.
+
+Not seeing any point forecasting this .cleanup_rq() hook's potential
+ability to address that cpu hotplug case; the future patch that provides
+that fix can deal with it.  Reality is the existing SCSI per-request
+private data leak justifies this new hook on its own.
+
+Mike
