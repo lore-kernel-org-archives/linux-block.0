@@ -2,30 +2,30 @@ Return-Path: <SRS0=R/PO=VW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A973C7618B
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 335F5C76194
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:23:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EF6D822C7C
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:23:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1812A22C7C
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:23:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391141AbfGYRXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2391157AbfGYRXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 25 Jul 2019 13:23:55 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:39732 "EHLO ale.deltatee.com"
+Received: from ale.deltatee.com ([207.54.116.67]:39754 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391128AbfGYRXy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jul 2019 13:23:54 -0400
+        id S2391148AbfGYRXz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Jul 2019 13:23:55 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hqhSv-0001JE-V9; Thu, 25 Jul 2019 11:23:53 -0600
+        id 1hqhSw-0001Ja-5R; Thu, 25 Jul 2019 11:23:54 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hqhSu-0001n5-TK; Thu, 25 Jul 2019 11:23:40 -0600
+        id 1hqhSw-0001nZ-0T; Thu, 25 Jul 2019 11:23:42 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
@@ -34,20 +34,19 @@ Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         Max Gurtovoy <maxg@mellanox.com>,
         Stephen Bates <sbates@raithlin.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Date:   Thu, 25 Jul 2019 11:23:20 -0600
-Message-Id: <20190725172335.6825-2-logang@deltatee.com>
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Thu, 25 Jul 2019 11:23:30 -0600
+Message-Id: <20190725172335.6825-12-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190725172335.6825-1-logang@deltatee.com>
 References: <20190725172335.6825-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, Chaitanya.Kulkarni@wdc.com, maxg@mellanox.com, sbates@raithlin.com, logang@deltatee.com, gregkh@linuxfoundation.org, viro@zeniv.linux.org.uk
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, maxg@mellanox.com, sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, chaitanya.kulkarni@wdc.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v6 01/16] chardev: factor out cdev_lookup() helper
+Subject: [PATCH v6 11/16] nvmet-core: allow one host per passthru-ctrl
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -55,72 +54,138 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Create a new helper out of the code in chrdev_open() which looks up
-a struct cdev from a struct inode.
+From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 
-This will be necessary to create a cdev_get_by_path() which is
-similar to blkdev_get_by_path() and is required to allow NVMe-OF
-passthru to lookup an NVMe controller cdev from a path.
+This patch rejects any new connection to the passthru-ctrl if this
+controller is already connected to host. At the time of allocating the
+controller we check if the subsys associated with the passthru ctrl is
+already connected to the host.
 
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+[logang@deltatee.com:
+   * drop the overide of the target cntlid with the passthru cntlid;
+     this seemed like a really bad idea especially in the presence of
+     mixed systems as you could end up with two ctrlrs with the same
+     cntlid
+   * push the check to ensure only one ctrlr per subsys into
+     functions in passthru-cmd.c to avoid excess inline #ifdefs
+]
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
 ---
- fs/char_dev.c | 26 +++++++++++++++++++-------
- 1 file changed, 19 insertions(+), 7 deletions(-)
+ drivers/nvme/target/core.c            |  6 +++++
+ drivers/nvme/target/io-cmd-passthru.c | 32 +++++++++++++++++++++++++++
+ drivers/nvme/target/nvmet.h           | 10 +++++++++
+ 3 files changed, 48 insertions(+)
 
-diff --git a/fs/char_dev.c b/fs/char_dev.c
-index 00dfe17871ac..5cc53bd5f654 100644
---- a/fs/char_dev.c
-+++ b/fs/char_dev.c
-@@ -367,12 +367,8 @@ void cdev_put(struct cdev *p)
- 	}
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index 2e75968af7f4..9e92486e2ee9 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -13,6 +13,7 @@
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+ 
++#include "../host/nvme.h"
+ #include "nvmet.h"
+ 
+ struct workqueue_struct *buffered_io_wq;
+@@ -1278,6 +1279,10 @@ u16 nvmet_alloc_ctrl(const char *subsysnqn, const char *hostnqn,
+ 	if (!ctrl->sqs)
+ 		goto out_free_cqs;
+ 
++	ret = nvmet_passthru_alloc_ctrl(subsys);
++	if (ret)
++		goto out_free_sqs;
++
+ 	ret = ida_simple_get(&cntlid_ida,
+ 			     NVME_CNTLID_MIN, NVME_CNTLID_MAX,
+ 			     GFP_KERNEL);
+@@ -1341,6 +1346,7 @@ static void nvmet_ctrl_free(struct kref *ref)
+ 	flush_work(&ctrl->async_event_work);
+ 	cancel_work_sync(&ctrl->fatal_err_work);
+ 
++	nvmet_passthru_ctrl_free(subsys);
+ 	ida_simple_remove(&cntlid_ida, ctrl->cntlid);
+ 
+ 	kfree(ctrl->sqs);
+diff --git a/drivers/nvme/target/io-cmd-passthru.c b/drivers/nvme/target/io-cmd-passthru.c
+index 9ddcdb8415fc..aefdd534cb4a 100644
+--- a/drivers/nvme/target/io-cmd-passthru.c
++++ b/drivers/nvme/target/io-cmd-passthru.c
+@@ -104,6 +104,38 @@ void nvmet_passthru_subsys_free(struct nvmet_subsys *subsys)
+ 	mutex_unlock(&subsys->lock);
  }
  
--/*
-- * Called every time a character special file is opened
-- */
--static int chrdev_open(struct inode *inode, struct file *filp)
-+static struct cdev *cdev_lookup(struct inode *inode)
- {
--	const struct file_operations *fops;
- 	struct cdev *p;
- 	struct cdev *new = NULL;
- 	int ret = 0;
-@@ -385,7 +381,7 @@ static int chrdev_open(struct inode *inode, struct file *filp)
- 		spin_unlock(&cdev_lock);
- 		kobj = kobj_lookup(cdev_map, inode->i_rdev, &idx);
- 		if (!kobj)
--			return -ENXIO;
-+			return ERR_PTR(-ENXIO);
- 		new = container_of(kobj, struct cdev, kobj);
- 		spin_lock(&cdev_lock);
- 		/* Check i_cdev again in case somebody beat us to it while
-@@ -402,7 +398,23 @@ static int chrdev_open(struct inode *inode, struct file *filp)
- 	spin_unlock(&cdev_lock);
- 	cdev_put(new);
- 	if (ret)
--		return ret;
-+		return ERR_PTR(ret);
++int nvmet_passthru_alloc_ctrl(struct nvmet_subsys *subsys)
++{
++	/*
++	 * Check here if this subsystem is already connected to the passthru
++	 * ctrl. We allow only one target ctrl for one passthru subsystem.
++	 */
 +
-+	return p;
++	mutex_lock(&subsys->lock);
++
++	if (!subsys->passthru_ctrl)
++		goto out;
++
++	if (subsys->passthru_connected) {
++		mutex_unlock(&subsys->lock);
++		return -ENODEV;
++	}
++
++	subsys->passthru_connected = true;
++
++out:
++	mutex_unlock(&subsys->lock);
++
++	return 0;
 +}
 +
-+/*
-+ * Called every time a character special file is opened
-+ */
-+static int chrdev_open(struct inode *inode, struct file *filp)
++void nvmet_passthru_ctrl_free(struct nvmet_subsys *subsys)
 +{
-+	const struct file_operations *fops;
-+	struct cdev *p;
-+	int ret = 0;
++	mutex_lock(&subsys->lock);
++	subsys->passthru_connected = false;
++	mutex_unlock(&subsys->lock);
++}
 +
-+	p = cdev_lookup(inode);
-+	if (IS_ERR(p))
-+		return PTR_ERR(p);
+ static void nvmet_passthru_req_complete(struct nvmet_req *req,
+ 		struct request *rq, u16 status)
+ {
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index aff4db03269d..004949b6b666 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -231,6 +231,7 @@ struct nvmet_subsys {
+ #ifdef CONFIG_NVME_TARGET_PASSTHRU
+ 	struct nvme_ctrl	*passthru_ctrl;
+ 	char			*passthru_ctrl_path;
++	bool			passthru_connected;
+ #endif /* CONFIG_NVME_TARGET_PASSTHRU */
+ };
  
- 	ret = -ENXIO;
- 	fops = fops_get(p->ops);
+@@ -513,6 +514,8 @@ void nvmet_passthru_destroy(void);
+ void nvmet_passthru_subsys_free(struct nvmet_subsys *subsys);
+ int nvmet_passthru_ctrl_enable(struct nvmet_subsys *subsys);
+ void nvmet_passthru_ctrl_disable(struct nvmet_subsys *subsys);
++int nvmet_passthru_alloc_ctrl(struct nvmet_subsys *subsys);
++void nvmet_passthru_ctrl_free(struct nvmet_subsys *subsys);
+ u16 nvmet_parse_passthru_cmd(struct nvmet_req *req);
+ 
+ static inline
+@@ -536,6 +539,13 @@ static inline void nvmet_passthru_subsys_free(struct nvmet_subsys *subsys)
+ static inline void nvmet_passthru_ctrl_disable(struct nvmet_subsys *subsys)
+ {
+ }
++static inline int nvmet_passthru_alloc_ctrl(struct nvmet_subsys *subsys)
++{
++	return 0;
++}
++static inline void nvmet_passthru_ctrl_free(struct nvmet_subsys *subsys)
++{
++}
+ static inline u16 nvmet_parse_passthru_cmd(struct nvmet_req *req)
+ {
+ 	return 0;
 -- 
 2.20.1
 
