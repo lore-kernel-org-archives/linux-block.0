@@ -6,107 +6,83 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B96FC76190
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 20:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8359C76190
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 23:55:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6AF9122BF5
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 20:37:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD390218F0
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 23:55:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726896AbfGYUhV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jul 2019 16:37:21 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:43852 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726741AbfGYUhU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jul 2019 16:37:20 -0400
-Received: from s01061831bf6ec98c.cg.shawcable.net ([68.147.80.180] helo=[192.168.6.132])
-        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1hqkU7-0005Lc-87; Thu, 25 Jul 2019 14:37:08 -0600
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@fb.com>,
+        id S1726958AbfGYXzY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jul 2019 19:55:24 -0400
+Received: from zeniv.linux.org.uk ([195.92.253.2]:57542 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726380AbfGYXzX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Jul 2019 19:55:23 -0400
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92 #3 (Red Hat Linux))
+        id 1hqnZe-0004a0-QJ; Thu, 25 Jul 2019 23:55:02 +0000
+Date:   Fri, 26 Jul 2019 00:55:02 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jens Axboe <axboe@fb.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190725172335.6825-1-logang@deltatee.com>
- <20190725172335.6825-5-logang@deltatee.com>
- <20190725175023.GA30641@bombadil.infradead.org>
- <da58f91e-6cfa-02e0-dd89-3cfa23764a0e@deltatee.com>
- <20190725195835.GA7317@localhost.localdomain>
- <5dd6a41d-21c4-cf8d-a81d-271549de6763@deltatee.com>
- <20190725203118.GB7317@localhost.localdomain>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <3bb266ae-abf3-0146-5d93-e7a600453493@deltatee.com>
-Date:   Thu, 25 Jul 2019 14:37:05 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Stephen Bates <sbates@raithlin.com>,
+        linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+        linux-fsdevel@vger.kernel.org, Max Gurtovoy <maxg@mellanox.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v6 02/16] chardev: introduce cdev_get_by_path()
+Message-ID: <20190725235502.GJ1131@ZenIV.linux.org.uk>
+References: <20190725172335.6825-3-logang@deltatee.com>
+ <20190725174032.GA27818@kroah.com>
+ <682ff89f-04e0-7a94-5aeb-895ac65ee7c9@deltatee.com>
+ <20190725180816.GA32305@kroah.com>
+ <da0eacb7-3738-ddf3-8c61-7ffc61aa41f4@deltatee.com>
+ <20190725182701.GA11547@kroah.com>
+ <20190725190024.GD30641@bombadil.infradead.org>
+ <27943e06-a503-162e-356b-abb9e106ab2e@grimberg.me>
+ <20190725191124.GE30641@bombadil.infradead.org>
+ <425dd2ac-333d-a8c4-ce49-870c8dadf436@deltatee.com>
 MIME-Version: 1.0
-In-Reply-To: <20190725203118.GB7317@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 68.147.80.180
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, maxg@mellanox.com, Chaitanya.Kulkarni@wdc.com, axboe@fb.com, sagi@grimberg.me, hch@lst.de, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, willy@infradead.org, kbusch@kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v6 04/16] nvme-core: introduce nvme_get_by_path()
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <425dd2ac-333d-a8c4-ce49-870c8dadf436@deltatee.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2019-07-25 2:31 p.m., Keith Busch wrote:
-> On Thu, Jul 25, 2019 at 02:28:28PM -0600, Logan Gunthorpe wrote:
->>
->>
->> On 2019-07-25 1:58 p.m., Keith Busch wrote:
->>> On Thu, Jul 25, 2019 at 11:54:18AM -0600, Logan Gunthorpe wrote:
->>>>
->>>>
->>>> On 2019-07-25 11:50 a.m., Matthew Wilcox wrote:
->>>>> On Thu, Jul 25, 2019 at 11:23:23AM -0600, Logan Gunthorpe wrote:
->>>>>> nvme_get_by_path() is analagous to blkdev_get_by_path() except it
->>>>>> gets a struct nvme_ctrl from the path to its char dev (/dev/nvme0).
->>>>>>
->>>>>> The purpose of this function is to support NVMe-OF target passthru.
->>>>>
->>>>> I can't find anywhere that you use this in this patchset.
->>>>>
->>>>
->>>> Oh sorry, the commit message is out of date the function was actually
->>>> called nvme_ctrl_get_by_path() and it's used in Patch 10.
->>>
->>> Instead of by path, could we have configfs take something else, like
->>> the unique controller instance or serial number? I know that's different
->>> than how we handle blocks and files, but that way nvme core can lookup
->>> the cooresponding controller without adding new cdev dependencies.
->>
->> Well the previous version of the patchset just used the ctrl name
->> ("nvme1") and looped through all the controllers to find a match. But
->> this sucks because of the inconsistency and the fact that the name can
->> change if hardware changes and the number changes. Allowing the user to
->> make use of standard udev rules seems important to me.
+On Thu, Jul 25, 2019 at 01:24:22PM -0600, Logan Gunthorpe wrote:
 > 
-> Should we then create a new udev rule for persistent controller
-> names? /dev/nvme1 may not be the same controller each time you refer
-> to it.
+> 
+> On 2019-07-25 1:11 p.m., Matthew Wilcox wrote:
+> > On Thu, Jul 25, 2019 at 12:05:29PM -0700, Sagi Grimberg wrote:
+> >>
+> >>>>> NVMe-OF is configured using configfs. The target is specified by the
+> >>>>> user writing a path to a configfs attribute. This is the way it works
+> >>>>> today but with blkdev_get_by_path()[1]. For the passthru code, we need
+> >>>>> to get a nvme_ctrl instead of a block_device, but the principal is the same.
+> >>>>
+> >>>> Why isn't a fd being passed in there instead of a random string?
+> >>>
+> >>> I suppose we could echo a string of the file descriptor number there,
+> >>> and look up the fd in the process' file descriptor table ...
+> >>
+> >> Assuming that there is a open handle somewhere out there...
+> 
+> Yes, that would be a step backwards from an interface. The user would
+> then need a special process to open the fd and pass it through configfs.
+> They couldn't just do it with basic bash commands.
 
-Udev can only create symlinks from /dev/nvme0 to
-/dev/nvme-persistent-name and users can do this as they need now. No
-changes needed.
+First of all, they can, but... WTF not have filp_open() done right there?
+Yes, by name.  With permission checks done.  And pick your object from the
+sodding struct file you'll get.
 
-My point was if we use the ctrl name (nvme0) as a reference then the
-kernel can't make use of these symlinks or anything udev does seeing
-that name is internal to the kernel only.
-
-If we use cdev_get_by_path()/nvme_ctrl_get_by_path() then this isn't a
-problem as we can open a symlink to /dev/nvme0 without any issues.
-
-Logan
-
+What's the problem?  Why do you need cdev lookups, etc., when you are
+dealing with files under your full control?  Just open them and use
+->private_data or whatever you set in ->open() to access the damn thing.
+All there is to it...
