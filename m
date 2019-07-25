@@ -1,142 +1,116 @@
-Return-Path: <SRS0=+4Fh=VV=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=R/PO=VW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D44DC7618F
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 23:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BD6C76186
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 00:34:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 454F62189F
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jul 2019 23:23:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8A1521855
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 00:34:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="POKycPna"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Khkgru1E"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727845AbfGXXX0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jul 2019 19:23:26 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:2928 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726314AbfGXXX0 (ORCPT
+        id S1728887AbfGYAe3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Jul 2019 20:34:29 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:52292 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727059AbfGYAe2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jul 2019 19:23:26 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d38e8730000>; Wed, 24 Jul 2019 16:23:31 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Wed, 24 Jul 2019 16:23:23 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Wed, 24 Jul 2019 16:23:23 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 24 Jul
- 2019 23:23:22 +0000
-Subject: Re: [PATCH 00/12] block/bio, fs: convert put_page() to
- put_user_page*()
-To:     Christoph Hellwig <hch@infradead.org>, <john.hubbard@gmail.com>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>, <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <ceph-devel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <samba-technical@lists.samba.org>,
-        <v9fs-developer@lists.sourceforge.net>,
-        <virtualization@lists.linux-foundation.org>
-References: <20190724042518.14363-1-jhubbard@nvidia.com>
- <20190724061750.GA19397@infradead.org>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <17f12f3d-981e-a717-c8e5-bfbbfb7ec1a3@nvidia.com>
-Date:   Wed, 24 Jul 2019 16:23:21 -0700
+        Wed, 24 Jul 2019 20:34:28 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6P0TJ0s053857;
+        Thu, 25 Jul 2019 00:34:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=JnKBvhRjV3PTJbylEfcrAcm4Io7m297kThqCQ7Xf6ec=;
+ b=Khkgru1Eh037gaI43Nr1UnSTB5ih4YvG8u235f9K/lv48GKv8NdqOg/jktrqe8uyRjY4
+ b3ITJWV/u/8rtu97ldYUN3WEjrnu8bcu6oMGum4nH3jIH7NmX4swJ/Qszx20RTWSveCe
+ pbIMh13zF6J2BQBOZF1slAeXiYVlv0GjMTA3B2HzcZY9TaO+tfTPp6Vs/bFr1lJ7YpuR
+ Q5OolqiDpGihAzN5vKDXrwy8iuWA0W5Y0ZOmzfQT6xU1bdd3y6MnRKl9TEq9B9mN4+a0
+ nwF5y0ZGP6Vn56elFpVkSmAJH+9Fe2sbIN6Ji1v972BgB5MemM3rkPz/lSBkEuxNUJG3 aw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2tx61c0gd3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 25 Jul 2019 00:34:00 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6P0Re30157812;
+        Thu, 25 Jul 2019 00:32:00 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2tx60xgxs3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 25 Jul 2019 00:32:00 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6P0VsOR021827;
+        Thu, 25 Jul 2019 00:31:55 GMT
+Received: from [192.168.1.14] (/180.165.87.209)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 24 Jul 2019 17:31:54 -0700
+Subject: Re: [PATCH] block: fix max segment size handling in
+ blk_queue_virt_boundary
+To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc:     linux@roeck-us.net, James.Bottomley@HansenPartnership.com,
+        linux-block@vger.kernel.org
+References: <20190724162656.3967-1-hch@lst.de>
+From:   Bob Liu <bob.liu@oracle.com>
+Message-ID: <46f296a0-515a-d662-efaf-742d90654e7c@oracle.com>
+Date:   Thu, 25 Jul 2019 08:31:51 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20190724061750.GA19397@infradead.org>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20190724162656.3967-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1564010611; bh=U/byz8o3kezigETW8hWUjg+JqkNm/y0Q4UHjAnDVaRI=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=POKycPna3sFHaptSpPG8JFNhdv+KWPJt4Fqq7qra/U5uujHxVhga0mA2hyYe3oLWO
-         rvMjdBQgQaYdhe3tYVq3xzWzC7PXLH9gVg6v6GfrdnHKhzPSXOdrUzDa4Sfy+FpWme
-         AYx8XN4QHijtxUQThz9jDsFglp/BwmD6wmVyo2Ou4HoX36ySg8r0DnnWDfRMrkzmXC
-         XvSXsG7L9llJHump4bjV4yoH02Li7EYgdYhEFhGR3d1oO3a9DGx7nb70VEc+guaDrP
-         BAn4DIKE83X0lqImHCnmIIbgjVMdzz9Q4ePUhHR77cnRWD+JGehn4V8I2IYZgTvKbn
-         0ENu9Hbk0xmXw==
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9328 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1907250001
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9328 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1907250002
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/23/19 11:17 PM, Christoph Hellwig wrote:
-> On Tue, Jul 23, 2019 at 09:25:06PM -0700, john.hubbard@gmail.com wrote:
->> * Store, in the iov_iter, a "came from gup (get_user_pages)" parameter.
->>   Then, use the new iov_iter_get_pages_use_gup() to retrieve it when
->>   it is time to release the pages. That allows choosing between put_page=
-()
->>   and put_user_page*().
->>
->> * Pass in one more piece of information to bio_release_pages: a "from_gu=
-p"
->>   parameter. Similar use as above.
->>
->> * Change the block layer, and several file systems, to use
->>   put_user_page*().
->=20
-> I think we can do this in a simple and better way.  We have 5 ITER_*
-> types.  Of those ITER_DISCARD as the name suggests never uses pages, so
-> we can skip handling it.  ITER_PIPE is rejected =D1=96n the direct I/O pa=
-th,
-> which leaves us with three.
->=20
-> Out of those ITER_BVEC needs a user page reference, so we want to call
+On 7/25/19 12:26 AM, Christoph Hellwig wrote:
+> We should only set the max segment size to unlimited if we actually
+> have a virt boundary.  Otherwise we accidentally clear that limit
+> when called from the SCSI midlayer, which always calls
+> blk_queue_virt_boundary, even if that mask is 0.
+> 
+> Fixes: 7ad388d8e4c7 ("scsi: core: add a host / host template field for the virt boundary")
+> Reported-by: Guenter Roeck <linux@roeck-us.net>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-settings.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 2ae348c101a0..2c1831207a8f 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -752,7 +752,8 @@ void blk_queue_virt_boundary(struct request_queue *q, unsigned long mask)
+>  	 * page (which might not be idential to the Linux PAGE_SIZE).  Because
+>  	 * of that they are not limited by our notion of "segment size".
+>  	 */
+> -	q->limits.max_segment_size = UINT_MAX;
+> +	if (mask)
+> +		q->limits.max_segment_size = UINT_MAX;
+>  }
+>  EXPORT_SYMBOL(blk_queue_virt_boundary);
+>  
 
-               ^ ITER_IOVEC, I hope. Otherwise I'm hopeless lost. :)
+Looks good to me!
+Reviewed-by: Bob Liu <bob.liu@oracle.com>
 
-> put_user_page* on it.  ITER_BVEC always already has page reference,
-> which means in the block direct I/O path path we alread don't take
-> a page reference.  We should extent that handling to all other calls
-> of iov_iter_get_pages / iov_iter_get_pages_alloc.  I think we should
-> just reject ITER_KVEC for direct I/O as well as we have no users and
-> it is rather pointless.  Alternatively if we see a use for it the
-> callers should always have a life page reference anyway (or might
-> be on kmalloc memory), so we really should not take a reference either.
->=20
-> In other words:  the only time we should ever have to put a page in
-> this patch is when they are user pages.  We'll need to clean up
-> various bits of code for that, but that can be done gradually before
-> even getting to the actual put_user_pages conversion.
->=20
-
-Sounds great. I'm part way into it and it doesn't look too bad. The main
-question is where to scatter various checks and assertions, to keep
-the kvecs out of direct I/0. Or at least keep the gups away from=20
-direct I/0.
-
-
-thanks,
---=20
-John Hubbard
-NVIDIA
