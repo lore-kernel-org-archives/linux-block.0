@@ -2,109 +2,94 @@ Return-Path: <SRS0=R/PO=VW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71964C76190
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 20:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41262C76194
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 20:12:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3DB472190F
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 20:03:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bf9ynE3U"
+	by mail.kernel.org (Postfix) with ESMTP id 2642E218F0
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 20:12:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726416AbfGYUDs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jul 2019 16:03:48 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:43016 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726126AbfGYUDs (ORCPT
+        id S1726422AbfGYUMk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jul 2019 16:12:40 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:42354 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726319AbfGYUMk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jul 2019 16:03:48 -0400
-Received: by mail-pg1-f194.google.com with SMTP id f25so23548561pgv.10;
-        Thu, 25 Jul 2019 13:03:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=i7HKiq/WRQz0iWC9yLf6vBbDqvnWRhx/n8XJNQctoPo=;
-        b=Bf9ynE3UDgxm+Zv/OCeEt0hGTZlFH9kWNuDrIjMNRKazUpHigok5aNmkyRntw5dwZo
-         pvUV79f6rYQ6mCBOGFzlOCWHteiTwzF8wshenVMnuq4w58dgiOZIZSMB2G0xy1iC6mnP
-         WFIlvc1QaoQLbi5N6R9ezEXpMKYn+sBte0RsUegRQNms7gXlCn+R781ZcOy9GfjaLmOv
-         r27JY6BJWyUG00cXHWw8+yCY9iWtTdb7F+q5+BmMLG7SMINGlgK9oRKN/TwOhd0WF6mk
-         PJyxuba3I4JDLOpT0b2XBWVOP98Cb8eA9/Q6eIKSe8+RHDO7jSQ2oFevbErk6CMOk26G
-         X5PQ==
+        Thu, 25 Jul 2019 16:12:40 -0400
+Received: by mail-ot1-f67.google.com with SMTP id l15so52962159otn.9;
+        Thu, 25 Jul 2019 13:12:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=i7HKiq/WRQz0iWC9yLf6vBbDqvnWRhx/n8XJNQctoPo=;
-        b=SSjivrCyqu9RsE8gGLVZdhOVOBooXms7cits+6eZIrfKvGFmp12bQTUVRkYu0PUxX5
-         V8PHTcbyluxWevklyY9Rnu/ReyATp0+3CMY5/ehFBSFMuFyPwBRTDgsmVlVbnBu8SGIi
-         GlIweuviyAuHhs2tGXo6plhVCLTo8Qa2pU5f1jIwbqKCxOJVMMZTSlsP2TJ9JUtoHhiz
-         V77/mHasSUCDFZRtJ9q+g+RWg1JPlXMbPe70W8iempLHf62vqQP8/qrl4H6fzlM/R14g
-         dBGf1d0rkJ4NxSug/HWa8WYuMgww/VmF7hxtZJZNo5eZ0zP4h4l5GPP1iOeUrg7PnmXb
-         J8qQ==
-X-Gm-Message-State: APjAAAVD7QAu8cLxw5rM/htVGnf46PUl1l8EiluqbTBnw8e+T4+m3iyI
-        avQlpECBay2Ff/xB7Rc2WnZ58dCFgng=
-X-Google-Smtp-Source: APXvYqxOQb+pjaW/NNI6FKmYDbf4JjFnZFJz2vIPuOgex0YMNmWgGKTQsnWEaV7W3FG2p1b/4JA+zA==
-X-Received: by 2002:a63:f857:: with SMTP id v23mr62941932pgj.228.1564085026955;
-        Thu, 25 Jul 2019 13:03:46 -0700 (PDT)
-Received: from continental ([179.185.209.0])
-        by smtp.gmail.com with ESMTPSA id a3sm50666740pfl.145.2019.07.25.13.03.44
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 25 Jul 2019 13:03:45 -0700 (PDT)
-Date:   Thu, 25 Jul 2019 17:04:34 -0300
-From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 0/4] Remove elevator kernel parameter
-Message-ID: <20190725200434.GA16459@continental>
-References: <20190714053453.1655-1-marcos.souza.org@gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=upMmfHcaeRgVvK81CCV//tdiGx+ZtNGeUUY24jsfROs=;
+        b=gvQtENRn5rpL/dvfsFbVIQjibLT2YJy1FT/4/LYeVG0ahJ+hKL02+pLi+aGuJ8A1FO
+         Xwz7wmutD74ykaWjS2fPLsa4LmjlIkHouoyn0jvvADggoldar5AZeeAqxWvpzkrR0Bja
+         Dn9j1pdVC+gvo+33qYzQ4o4TIZ7WX32eciF4jeSkKVj7sIsvYAjvEY+gBZlQ5/QLVtC/
+         70Fe6ldmc4qdA8Y+cbK9noaIh3xQpJfTRJnGYYM7Hf4z3fenNh8aIWTC1OPsO6NBe2nZ
+         ylIHKI5XWaG49w4kiKUV49dUgrU/8ln5cSwujFGPexrNu9xUHC87JuzFqh5Mu2E3HrB0
+         nerA==
+X-Gm-Message-State: APjAAAXSNq1om+lgTfoKAlCxsUbD1aWbVnJBvCydXlkT68ls2Mf47+SO
+        C42tDcNjHspMFSFmyHFYV6Q=
+X-Google-Smtp-Source: APXvYqwoBViFnDcf+6pZDHGyFoMwEdvzaHQEty7ZB96NCnpf03fgmpW+suC4/aEJXauiaGWPDAcRcQ==
+X-Received: by 2002:a05:6830:6:: with SMTP id c6mr3006263otp.14.1564085559039;
+        Thu, 25 Jul 2019 13:12:39 -0700 (PDT)
+Received: from [192.168.1.114] (162-195-240-247.lightspeed.sntcca.sbcglobal.net. [162.195.240.247])
+        by smtp.gmail.com with ESMTPSA id 20sm8615958oth.43.2019.07.25.13.12.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 25 Jul 2019 13:12:38 -0700 (PDT)
+Subject: Re: [PATCH v6 04/16] nvme-core: introduce nvme_get_by_path()
+To:     Keith Busch <kbusch@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>
+Cc:     Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@fb.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20190725172335.6825-1-logang@deltatee.com>
+ <20190725172335.6825-5-logang@deltatee.com>
+ <20190725175023.GA30641@bombadil.infradead.org>
+ <da58f91e-6cfa-02e0-dd89-3cfa23764a0e@deltatee.com>
+ <20190725195835.GA7317@localhost.localdomain>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <0b7e5d9f-207c-ee4e-a992-024c178cdd49@grimberg.me>
+Date:   Thu, 25 Jul 2019 13:12:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190714053453.1655-1-marcos.souza.org@gmail.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20190725195835.GA7317@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
 
-there are two reviewers for this patchset, can you take a look?
+>>>> nvme_get_by_path() is analagous to blkdev_get_by_path() except it
+>>>> gets a struct nvme_ctrl from the path to its char dev (/dev/nvme0).
+>>>>
+>>>> The purpose of this function is to support NVMe-OF target passthru.
+>>>
+>>> I can't find anywhere that you use this in this patchset.
+>>>
+>>
+>> Oh sorry, the commit message is out of date the function was actually
+>> called nvme_ctrl_get_by_path() and it's used in Patch 10.
+> 
+> Instead of by path, could we have configfs take something else, like
+> the unique controller instance or serial number? I know that's different
+> than how we handle blocks and files, but that way nvme core can lookup
+> the cooresponding controller without adding new cdev dependencies.
 
-Thanks,
-Marcos
+We could... but did we find sufficient justification to have the user
+handle passthru devices differently than any other backend?
+once we commit to an interface its very hard to change.
 
-On Sun, Jul 14, 2019 at 02:34:49AM -0300, Marcos Paulo de Souza wrote:
-> After the first patch sent[1], together with some background from Jens[2], this
-> patchset aims to remove completely elevator kernel parameter, since it is not
-> being used since blk-mq was set by default.
-> 
-> Along with elevator code, some documentation was also updated to remove elevator
-> references.
-> 
-> Please review, thanks.
-> 
-> [1]: https://lkml.org/lkml/2019/7/12/1008
-> [2]: https://lkml.org/lkml/2019/7/13/232
-> 
-> Marcos Paulo de Souza (4):
->   block: elevator.c: Remove now unused elevator= argument
->   kernel-parameters.txt: Remove elevator argument
->   Documenation: switching-sched: Remove notes about elevator argument
->   Documentation:kernel-per-CPU-kthreads.txt: Remove reference to
->     elevator=
-> 
->  Documentation/admin-guide/kernel-parameters.txt |  6 ------
->  Documentation/block/switching-sched.txt         |  4 ----
->  Documentation/kernel-per-CPU-kthreads.txt       |  8 +++-----
->  block/elevator.c                                | 14 --------------
->  4 files changed, 3 insertions(+), 29 deletions(-)
-> 
-> -- 
-> 2.22.0
-> 
