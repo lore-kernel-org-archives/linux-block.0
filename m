@@ -2,116 +2,117 @@ Return-Path: <SRS0=R/PO=VW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5123C7618B
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 16:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7194EC7618B
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 16:53:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BF0A922C7B
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 16:24:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4401C22BF5
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 16:53:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Aw4o5QSP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ir8ythaT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390476AbfGYQY3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jul 2019 12:24:29 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38846 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390437AbfGYQY2 (ORCPT
+        id S1729575AbfGYQxb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jul 2019 12:53:31 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:41290 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729083AbfGYQxb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jul 2019 12:24:28 -0400
-Received: by mail-io1-f66.google.com with SMTP id j6so23344456ioa.5
-        for <linux-block@vger.kernel.org>; Thu, 25 Jul 2019 09:24:28 -0700 (PDT)
+        Thu, 25 Jul 2019 12:53:31 -0400
+Received: by mail-pl1-f195.google.com with SMTP id m9so23538336pls.8;
+        Thu, 25 Jul 2019 09:53:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+VPzjzJbmRozJIvTKRd41RQ1wR4Ggz73XJuu/DaeZOI=;
-        b=Aw4o5QSPeXfCC0cUBILFJ39Ujxpj2PDCQA58od61nHc9KeJHRB3XIaCcWsKI/+c4iP
-         1xZ62E92cHcFPxZar05zfHc1RffcUAhok3vq04x1K3s4KfatrYAOySWqUA0lmNZCdvI0
-         d8lpZgeYmu6RbVpWyYw1Jlf8eiW1ItmqCOwkIzdWJzLb906RSDnWu9i03actatrW7mWh
-         6YHRfYGJqolyTjVyNejVg51ES4UyK1GR2a6XK2RW+q7BgjuxwvkZwl+Kbse5Ed4v6QPW
-         pXfE8Ixyg+KJwjN54OhADvfEgZLAFMOH0y2PneIOGG2XTRbWnQrrK3n7I1b8XcGBziRJ
-         Xb2g==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=In7FvxuJSL3nD+oAuTVZBinyIAwT8H4rTKstMSgDT6k=;
+        b=Ir8ythaTdYfmhG6ThebrvPMDl6Or+u2JFZT2YGgHeTyemmRXmccljqmFK4CYCsFVu4
+         b0obGx93qGpsIIm5LIyXE6vG7aOY/mtqok+8OuZbnEuUJQgD8kVZ4cOWX0Fbc/EK5b7U
+         cBLe1gONSrxZDK4rSdj2iqlQqvWzc7bL+PwOJ06TTJIoFZ8/51euqd/vjVH5WMdfHGPa
+         WEkR5xccCYN6KFevS0FdvtROl0rzmIujbWB63A0oDjuFhPOAOPpN4cmGihpjABbdeRUl
+         2mU/YhQ7YtU+bSdUiEcCqXr6uP0dII213cspLlDHHvkg7ShzRQdV/mwu6N8XaGDHL7fQ
+         fO0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+VPzjzJbmRozJIvTKRd41RQ1wR4Ggz73XJuu/DaeZOI=;
-        b=NZliqPTacNUarKs/+dzKfTZmrAwA5fmiJCqD/XUvPURjHgysTfGYsddA1pxarmAaD6
-         jF2VfoBrRbEzlVLOVaRfSSa8cpAOACuy7U2yCl0b14PIAYeOEe8IOAstZ25mpOFzeNwU
-         IaZLM62pIakowMlXcNSVtLJQK8Gv6tNRXh1ybCdZyJB8v0psE68l2e9pJVeZJZD6bFO/
-         Z+z2/O/aaGhEcVfKHH5BOlsFcvK+Ve9JaLKSz6CFz3SgoLeFrk1Kr9gaJJIPM+GAC1NH
-         fGdnfpDWbkNQZmn4cQdiNoT9sFr3ppEO+b/X2wx583aA2olNRzCeZ6ytIuYOnKFXU9wq
-         qN0Q==
-X-Gm-Message-State: APjAAAWwjR2GhTBtdA4x9gU7O6B5MAd5KIUmk7/FucODzeMGXahs9HTN
-        E2pHc9EJEpa8st4DsEVnLm8=
-X-Google-Smtp-Source: APXvYqzLbWGkPs++0ubPK5ICYVIG3stE+tmXo13HNSwsXkens1k99m8h9trJRSm59YMMoXLhCFO55Q==
-X-Received: by 2002:a5d:9908:: with SMTP id x8mr32048739iol.304.1564071867888;
-        Thu, 25 Jul 2019 09:24:27 -0700 (PDT)
-Received: from [192.168.1.57] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id c23sm41593655iod.11.2019.07.25.09.24.26
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 25 Jul 2019 09:24:26 -0700 (PDT)
-Subject: Re: [GIT PULL] nvme fixes for 5.3
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <20190725141245.GA4339@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f1bda303-27f9-8c5c-3cb1-a2bb58c91566@kernel.dk>
-Date:   Thu, 25 Jul 2019 10:24:25 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=In7FvxuJSL3nD+oAuTVZBinyIAwT8H4rTKstMSgDT6k=;
+        b=cNv3uSi9tgsU47D2rxN6/WsZKQ+HeT5tzK0z9CefUJ/TQrd4Ir0eTVAVX4k+l0E8tu
+         ojxt6zlEwII+JwaLLAvJgor8sK88IKu/8I9L7pPxKjHOz6Tt1sJNE+dLwsnISV1zcFOk
+         DqT44kz6ZS+epH5alhpdVK5CY6XbyNcakj49LqArJSSYJoqkCVTMriPIAjoz/CXI8Kl6
+         5/zmWujTZlOscND+UwRcL6cP+Ly3qnsQAH3mfS9U9L54dYAQ+8dsvqq/2g2ARVf61Eth
+         7ddwdWeu5zgMv2shg/e7yfhHO065q6Sa/gw3X9mt23ohqF6iSKM8ghKapCakBqFDt/g+
+         KYzA==
+X-Gm-Message-State: APjAAAW62aKSGLBwE/U26h9ueqbFDlq6kP8X40XO9UUU2AzlhLHfmGlV
+        wXv8lyk69UcVvzPBX6rK9SU=
+X-Google-Smtp-Source: APXvYqyGN37PGpgWry3wj5md3YEsS6cW6xq7SrPkHtyUxnRKecWuxvpMKzZuTLCreZ2GPKr2WEy9uQ==
+X-Received: by 2002:a17:902:f216:: with SMTP id gn22mr89782294plb.118.1564073610528;
+        Thu, 25 Jul 2019 09:53:30 -0700 (PDT)
+Received: from localhost ([123.213.206.190])
+        by smtp.gmail.com with ESMTPSA id i15sm54516319pfd.160.2019.07.25.09.53.29
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 25 Jul 2019 09:53:29 -0700 (PDT)
+Date:   Fri, 26 Jul 2019 01:53:27 +0900
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+Cc:     Hannes Reinecke <hare@suse.de>, minwoo.im@samsung.com,
+        "sathya.prakash@broadcom.com" <sathya.prakash@broadcom.com>,
+        "suganath-prabu.subramani@broadcom.com" 
+        <suganath-prabu.subramani@broadcom.com>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "MPT-FusionLinux.pdl@broadcom.com" <MPT-FusionLinux.pdl@broadcom.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Euihyeok Kwon <eh81.kwon@samsung.com>,
+        Sarah Cho <sohyeon.jo@samsung.com>,
+        Sanggwan Lee <sanggwan.lee@samsung.com>,
+        Gyeongmin Nam <gm.nam@samsung.com>,
+        Sungjun Park <sj1228.park@samsung.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH V2] mpt3sas: support target smid for [abort|query] task
+Message-ID: <20190725165327.GA3081@minwoo-desktop>
+References: <CGME20190714034415epcms2p25f9787cb71993a30f58524d2f355b543@epcms2p2>
+ <20190714034415epcms2p25f9787cb71993a30f58524d2f355b543@epcms2p2>
+ <860cc8cf-6419-c649-b2d9-19b82f6ebc99@suse.de>
+ <CAK=zhgocY3Ute_6RiowaWsOROx3+Nzq6+WvkobmR_SB0Rt9_1g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190725141245.GA4339@infradead.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <CAK=zhgocY3Ute_6RiowaWsOROx3+Nzq6+WvkobmR_SB0Rt9_1g@mail.gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/25/19 8:12 AM, Christoph Hellwig wrote:
+On 19-07-23 16:57:49, Sreekanth Reddy wrote:
+> On Mon, Jul 15, 2019 at 11:43 AM Hannes Reinecke <hare@suse.de> wrote:
+> > I think this is fundamentally wrong.
+> > ABORT_TASK is used to abort a single task, which of course has to be
+> > known beforehand. If you don't know the task, what exactly do you hope
+> > to achieve here? Aborting random I/O?
+> > Or, even worse, aborting I/O the driver uses internally and corrupt the
+> > internal workflow of the driver?
+> >
+> > We should simply disallow any ABORT TASK from userspace if the TaskMID
+> > is zero. And I would even argue to disabllow ABORT TASK from userspace
+> > completely, as the smid is never relayed to userland, and as such the
+> > user cannot know which task should be aborted.
 > 
-> The following changes since commit 77ce56e2bfaa64127ae5e23ef136c0168b818777:
+> Hannes,
 > 
->    drbd: dynamically allocate shash descriptor (2019-07-23 07:35:18 -0600)
-> 
-> are available in the Git repository at:
-> 
->    git://git.infradead.org/nvme.git nvme-5.3
-> 
-> for you to fetch changes up to 8fe34be14ecb5eb0ef8d8d44aa7ab62d9e2911ca:
-> 
->    Revert "nvme-pci: don't create a read hctx mapping without read queues" (2019-07-23 17:47:02 +0200)
-> 
-> ----------------------------------------------------------------
-> Logan Gunthorpe (1):
->        nvme: fix memory leak caused by incorrect subsystem free
-> 
-> Marta Rybczynska (1):
->        nvme: fix multipath crash when ANA is deactivated
-> 
-> Misha Nasledov (1):
->        nvme: ignore subnqn for ADATA SX6000LNP
-> 
-> yangerkun (1):
->        Revert "nvme-pci: don't create a read hctx mapping without read queues"
-> 
->   drivers/nvme/host/core.c      | 12 +++++-------
->   drivers/nvme/host/multipath.c |  8 ++------
->   drivers/nvme/host/nvme.h      |  6 +++++-
->   drivers/nvme/host/pci.c       |  6 +++---
->   4 files changed, 15 insertions(+), 17 deletions(-)
+> This interface was added long time back in mpt2sas driver and I don't
+> have exact reason of adding this interface at that time.
+> But I know that this interface is still used by BRCM test team & few
+> customers only for some functionality and regression testing.
 
-Pulled, thanks.
+Sreekanth, and Hannes,
 
--- 
-Jens Axboe
+Could you please give some review points on this?
 
+Thanks,
