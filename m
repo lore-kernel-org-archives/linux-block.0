@@ -7,26 +7,26 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8377DC76191
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FC00C7618B
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:24:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61B582081B
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:24:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36E252081B
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:24:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391243AbfGYRYT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jul 2019 13:24:19 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:39736 "EHLO ale.deltatee.com"
+        id S2391260AbfGYRY1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jul 2019 13:24:27 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:39706 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391129AbfGYRXy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jul 2019 13:23:54 -0400
+        id S2391101AbfGYRXw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Jul 2019 13:23:52 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hqhSw-0001Jc-8e; Thu, 25 Jul 2019 11:23:53 -0600
+        id 1hqhSw-0001Jh-Ff; Thu, 25 Jul 2019 11:23:51 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hqhSw-0001nc-3Q; Thu, 25 Jul 2019 11:23:42 -0600
+        id 1hqhSw-0001ni-An; Thu, 25 Jul 2019 11:23:42 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
@@ -35,19 +35,18 @@ Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         Max Gurtovoy <maxg@mellanox.com>,
         Stephen Bates <sbates@raithlin.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 25 Jul 2019 11:23:31 -0600
-Message-Id: <20190725172335.6825-13-logang@deltatee.com>
+Date:   Thu, 25 Jul 2019 11:23:33 -0600
+Message-Id: <20190725172335.6825-15-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190725172335.6825-1-logang@deltatee.com>
 References: <20190725172335.6825-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, maxg@mellanox.com, sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, chaitanya.kulkarni@wdc.com, logang@deltatee.com
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, Chaitanya.Kulkarni@wdc.com, maxg@mellanox.com, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v6 12/16] nvmet-core: don't check the data len for pt-ctrl
+Subject: [PATCH v6 14/16] block: don't check blk_rq_is_passthrough() in blk_do_io_stat()
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -55,47 +54,50 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Instead of checking blk_rq_is_passthruough() for every call to
+blk_do_io_stat(), don't set RQF_IO_STAT for passthrough requests.
+This should be equivalent, and opens the possibility of passthrough
+requests specifically requesting statistics tracking.
 
-Right now, data_len is calculated before the transfer len after we
-parse the command, With passthru interface we allow VUCs (Vendor-Unique
-Commands). In order to make the code simple and compact, instead of
-assigning the data len or each VUC in the command parse function
-just use the transfer len as it is. This may result in error if expected
-data_len != transfer_len.
-
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-[logang@deltatee.com:
-   * added definition of VUC to the commit message and comment
-   * use nvmet_req_passthru_ctrl() helper seeing we can't dereference
-     subsys->passthru_ctrl if CONFIG_NVME_TARGET_PASSTHRU is not set]
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/nvme/target/core.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ block/blk-mq.c | 2 +-
+ block/blk.h    | 5 ++---
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
-index 9e92486e2ee9..77660dfc6c8f 100644
---- a/drivers/nvme/target/core.c
-+++ b/drivers/nvme/target/core.c
-@@ -942,7 +942,16 @@ EXPORT_SYMBOL_GPL(nvmet_req_uninit);
- 
- void nvmet_req_execute(struct nvmet_req *req)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b038ec680e84..b8d41d6824f6 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -318,7 +318,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	rq->cmd_flags = op;
+ 	if (data->flags & BLK_MQ_REQ_PREEMPT)
+ 		rq->rq_flags |= RQF_PREEMPT;
+-	if (blk_queue_io_stat(data->q))
++	if (blk_queue_io_stat(data->q) && !blk_rq_is_passthrough(rq))
+ 		rq->rq_flags |= RQF_IO_STAT;
+ 	INIT_LIST_HEAD(&rq->queuelist);
+ 	INIT_HLIST_NODE(&rq->hash);
+diff --git a/block/blk.h b/block/blk.h
+index de6b2e146d6e..554efa769bfe 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -234,13 +234,12 @@ int blk_dev_init(void);
+  *
+  *	a) it's attached to a gendisk, and
+  *	b) the queue had IO stats enabled when this request was started, and
+- *	c) it's a file system request
++ *	c) it's a file system request (RQF_IO_STAT will not be set otherwise)
+  */
+ static inline bool blk_do_io_stat(struct request *rq)
  {
--	if (unlikely(req->data_len != req->transfer_len)) {
-+	/*
-+	 * data_len is calculated before the transfer len after we parse
-+	 * the command, With passthru interface we allow VUC (Vendor-Unique
-+	 * Commands)'s. In order to make the code simple and compact,
-+	 * instead of assinging the dala len for each VUC in the command
-+	 * parse function just use the transfer len as it is. This may
-+	 * result in error if expected data_len != transfer_len.
-+	 */
-+	if (!(req->sq->ctrl && nvmet_req_passthru_ctrl(req)) &&
-+	    unlikely(req->data_len != req->transfer_len)) {
- 		req->error_loc = offsetof(struct nvme_common_command, dptr);
- 		nvmet_req_complete(req, NVME_SC_SGL_INVALID_DATA | NVME_SC_DNR);
- 	} else
+ 	return rq->rq_disk &&
+-	       (rq->rq_flags & RQF_IO_STAT) &&
+-		!blk_rq_is_passthrough(rq);
++	       (rq->rq_flags & RQF_IO_STAT);
+ }
+ 
+ static inline void req_set_nomerge(struct request_queue *q, struct request *req)
 -- 
 2.20.1
 
