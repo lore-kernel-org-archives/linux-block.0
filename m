@@ -7,26 +7,26 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF2AC76191
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E82EC76194
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:25:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 139A52081B
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:25:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4AE82081B
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:25:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391373AbfGYRZB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jul 2019 13:25:01 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:39638 "EHLO ale.deltatee.com"
+        id S2387631AbfGYRXr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jul 2019 13:23:47 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:39610 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388580AbfGYRXs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jul 2019 13:23:48 -0400
+        id S1726283AbfGYRXp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Jul 2019 13:23:45 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hqhSv-0001JI-Lu; Thu, 25 Jul 2019 11:23:46 -0600
+        id 1hqhSv-0001JO-Pc; Thu, 25 Jul 2019 11:23:43 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1hqhSv-0001nH-BN; Thu, 25 Jul 2019 11:23:41 -0600
+        id 1hqhSv-0001nN-KG; Thu, 25 Jul 2019 11:23:41 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
@@ -35,19 +35,19 @@ Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         Max Gurtovoy <maxg@mellanox.com>,
         Stephen Bates <sbates@raithlin.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 25 Jul 2019 11:23:24 -0600
-Message-Id: <20190725172335.6825-6-logang@deltatee.com>
+        Logan Gunthorpe <logang@deltatee.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Date:   Thu, 25 Jul 2019 11:23:26 -0600
+Message-Id: <20190725172335.6825-8-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190725172335.6825-1-logang@deltatee.com>
 References: <20190725172335.6825-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, maxg@mellanox.com, sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, chaitanya.kulkarni@wdc.com, logang@deltatee.com
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, maxg@mellanox.com, sbates@raithlin.com, logang@deltatee.com, Chaitanya.Kulkarni@wdc.com, chaitanya.kulkarni@wdc.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v6 05/16] nvme-core: export existing ctrl and ns interfaces
+Subject: [PATCH v6 07/16] nvmet: make nvmet_copy_ns_identifier() non-static
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -55,135 +55,45 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+This function will be needed by the upcoming passthru code.
 
-We export existing nvme ctrl and ns management APIs so that target
-passthru code can manage the nvme ctrl.
-
-This is a preparation patch for implementing NVMe Over Fabric target
-passthru feature.
-
+[chaitanya.kulkarni@wdc.com: this was factored out of a patch
+ originally authored by Chaitanya]
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/nvme/host/core.c | 17 +++++++++++------
- drivers/nvme/host/nvme.h |  7 +++++++
- 2 files changed, 18 insertions(+), 6 deletions(-)
+ drivers/nvme/target/admin-cmd.c | 4 ++--
+ drivers/nvme/target/nvmet.h     | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 61e7b016ec36..f9642e26aafc 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -412,10 +412,11 @@ static void nvme_free_ns(struct kref *kref)
- 	kfree(ns);
+diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
+index 4dc12ea52f23..eeb24f606d00 100644
+--- a/drivers/nvme/target/admin-cmd.c
++++ b/drivers/nvme/target/admin-cmd.c
+@@ -506,8 +506,8 @@ static void nvmet_execute_identify_nslist(struct nvmet_req *req)
+ 	nvmet_req_complete(req, status);
  }
  
--static void nvme_put_ns(struct nvme_ns *ns)
-+void nvme_put_ns(struct nvme_ns *ns)
+-static u16 nvmet_copy_ns_identifier(struct nvmet_req *req, u8 type, u8 len,
+-				    void *id, off_t *off)
++u16 nvmet_copy_ns_identifier(struct nvmet_req *req, u8 type, u8 len,
++			     void *id, off_t *off)
  {
- 	kref_put(&ns->kref, nvme_free_ns);
- }
-+EXPORT_SYMBOL_GPL(nvme_put_ns);
+ 	struct nvme_ns_id_desc desc = {
+ 		.nidt = type,
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index 217a787952e8..d1a0a3190a24 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -489,6 +489,8 @@ u16 nvmet_bdev_flush(struct nvmet_req *req);
+ u16 nvmet_file_flush(struct nvmet_req *req);
+ void nvmet_ns_changed(struct nvmet_subsys *subsys, u32 nsid);
  
- static inline void nvme_clear_nvme_request(struct request *req)
++u16 nvmet_copy_ns_identifier(struct nvmet_req *req, u8 type, u8 len,
++			     void *id, off_t *off);
+ static inline u32 nvmet_rw_len(struct nvmet_req *req)
  {
-@@ -1088,7 +1089,7 @@ static int nvme_identify_ns_list(struct nvme_ctrl *dev, unsigned nsid, __le32 *n
- 				    NVME_IDENTIFY_DATA_SIZE);
- }
- 
--static struct nvme_id_ns *nvme_identify_ns(struct nvme_ctrl *ctrl,
-+struct nvme_id_ns *nvme_identify_ns(struct nvme_ctrl *ctrl,
- 		unsigned nsid)
- {
- 	struct nvme_id_ns *id;
-@@ -1113,6 +1114,7 @@ static struct nvme_id_ns *nvme_identify_ns(struct nvme_ctrl *ctrl,
- 
- 	return id;
- }
-+EXPORT_SYMBOL_GPL(nvme_identify_ns);
- 
- static int nvme_features(struct nvme_ctrl *dev, u8 op, unsigned int fid,
- 		unsigned int dword11, void *buffer, size_t buflen, u32 *result)
-@@ -1261,8 +1263,8 @@ static u32 nvme_known_admin_effects(u8 opcode)
- 	return 0;
- }
- 
--static u32 nvme_passthru_start(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
--								u8 opcode)
-+u32 nvme_passthru_start(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
-+		u8 opcode)
- {
- 	u32 effects = 0;
- 
-@@ -1291,6 +1293,7 @@ static u32 nvme_passthru_start(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 	}
- 	return effects;
- }
-+EXPORT_SYMBOL_GPL(nvme_passthru_start);
- 
- static void nvme_update_formats(struct nvme_ctrl *ctrl)
- {
-@@ -1305,7 +1308,7 @@ static void nvme_update_formats(struct nvme_ctrl *ctrl)
- 	nvme_remove_invalid_namespaces(ctrl, NVME_NSID_ALL);
- }
- 
--static void nvme_passthru_end(struct nvme_ctrl *ctrl, u32 effects)
-+void nvme_passthru_end(struct nvme_ctrl *ctrl, u32 effects)
- {
- 	/*
- 	 * Revalidate LBA changes prior to unfreezing. This is necessary to
-@@ -1323,6 +1326,7 @@ static void nvme_passthru_end(struct nvme_ctrl *ctrl, u32 effects)
- 	if (effects & (NVME_CMD_EFFECTS_NIC | NVME_CMD_EFFECTS_NCC))
- 		nvme_queue_scan(ctrl);
- }
-+EXPORT_SYMBOL_GPL(nvme_passthru_end);
- 
- static int nvme_user_cmd(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 			struct nvme_passthru_cmd __user *ucmd)
-@@ -3263,7 +3267,7 @@ static int ns_cmp(void *priv, struct list_head *a, struct list_head *b)
- 	return nsa->head->ns_id - nsb->head->ns_id;
- }
- 
--static struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned nsid)
-+struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- {
- 	struct nvme_ns *ns, *ret = NULL;
- 
-@@ -3281,6 +3285,7 @@ static struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	up_read(&ctrl->namespaces_rwsem);
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(nvme_find_get_ns);
- 
- static int nvme_setup_streams_ns(struct nvme_ctrl *ctrl, struct nvme_ns *ns)
- {
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index a19bd0091de6..ac0a8b896861 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -436,6 +436,8 @@ void nvme_start_ctrl(struct nvme_ctrl *ctrl);
- void nvme_stop_ctrl(struct nvme_ctrl *ctrl);
- void nvme_put_ctrl(struct nvme_ctrl *ctrl);
- int nvme_init_identify(struct nvme_ctrl *ctrl);
-+struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned int nsid);
-+void nvme_put_ns(struct nvme_ns *ns);
- 
- void nvme_remove_namespaces(struct nvme_ctrl *ctrl);
- 
-@@ -472,8 +474,13 @@ int nvme_set_features(struct nvme_ctrl *dev, unsigned int fid,
- int nvme_get_features(struct nvme_ctrl *dev, unsigned int fid,
- 		      unsigned int dword11, void *buffer, size_t buflen,
- 		      u32 *result);
-+u32 nvme_passthru_start(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
-+		u8 opcode);
-+void nvme_passthru_end(struct nvme_ctrl *ctrl, u32 effects);
- int nvme_set_queue_count(struct nvme_ctrl *ctrl, int *count);
- void nvme_stop_keep_alive(struct nvme_ctrl *ctrl);
-+struct nvme_id_ns *nvme_identify_ns(struct nvme_ctrl *ctrl,
-+		unsigned int nsid);
- int nvme_reset_ctrl(struct nvme_ctrl *ctrl);
- int nvme_reset_ctrl_sync(struct nvme_ctrl *ctrl);
- int nvme_delete_ctrl(struct nvme_ctrl *ctrl);
+ 	return ((u32)le16_to_cpu(req->cmd->rw.length) + 1) <<
 -- 
 2.20.1
 
