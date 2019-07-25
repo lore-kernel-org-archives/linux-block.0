@@ -2,92 +2,85 @@ Return-Path: <SRS0=R/PO=VW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB599C76191
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34465C76194
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:40:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C29D21951
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:25:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0742D22BEF
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jul 2019 17:40:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564076440;
+	bh=v5yXlm0ySbjH9KYVN6Nqcko2ymh4rZfsF2TdFPmyY7A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=j7/JBXJFZ4vJ58Et5q78vc2x+KhcrZOfF9bzpxu6eJ6Ox7dcBFPfSd5x/dUZ1a33L
+	 tHOuUqU0Fck71aY6rjzvlQnhVvYFitawzo763uWRZCFXjflpyYMtY98FomCelz39Zu
+	 l/v6BPsNoega+SgjT/Ppec7su+E41o19W8XlRigQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729878AbfGYRXr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jul 2019 13:23:47 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:39614 "EHLO ale.deltatee.com"
+        id S1727094AbfGYRkg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jul 2019 13:40:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43362 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729868AbfGYRXp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jul 2019 13:23:45 -0400
-Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
-        by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <gunthorp@deltatee.com>)
-        id 1hqhSv-0001JQ-SF; Thu, 25 Jul 2019 11:23:44 -0600
-Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
-        (envelope-from <gunthorp@deltatee.com>)
-        id 1hqhSv-0001nQ-NU; Thu, 25 Jul 2019 11:23:41 -0600
-From:   Logan Gunthorpe <logang@deltatee.com>
-To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        id S1725774AbfGYRkg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Jul 2019 13:40:36 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 79AF422BE8;
+        Thu, 25 Jul 2019 17:40:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1564076435;
+        bh=v5yXlm0ySbjH9KYVN6Nqcko2ymh4rZfsF2TdFPmyY7A=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=cf0NrbzxwN1M9j7L43mP+u3u8SJKAyjDsM0cOYEdgJvIpWskctistAzocLZjDHkEN
+         ba/45n2CQ0Z0Vu5YE8bZ1WQSq7k3lFsVvFslO0EgJItOxPoN3cpbF0XLhnLZMiHACv
+         SqahQYWRTwQbD+2RwOPjk7Yu0qf8B7tBjUz8+4cA=
+Date:   Thu, 25 Jul 2019 19:40:32 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
         Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         Max Gurtovoy <maxg@mellanox.com>,
         Stephen Bates <sbates@raithlin.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 25 Jul 2019 11:23:27 -0600
-Message-Id: <20190725172335.6825-9-logang@deltatee.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190725172335.6825-1-logang@deltatee.com>
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH v6 02/16] chardev: introduce cdev_get_by_path()
+Message-ID: <20190725174032.GA27818@kroah.com>
 References: <20190725172335.6825-1-logang@deltatee.com>
+ <20190725172335.6825-3-logang@deltatee.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, maxg@mellanox.com, sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, chaitanya.kulkarni@wdc.com, logang@deltatee.com
-X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v6 08/16] nvmet-passthru: update KConfig with config passthru option
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190725172335.6825-3-logang@deltatee.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+On Thu, Jul 25, 2019 at 11:23:21AM -0600, Logan Gunthorpe wrote:
+> cdev_get_by_path() attempts to retrieve a struct cdev from
+> a path name. It is analagous to blkdev_get_by_path().
+> 
+> This will be necessary to create a nvme_ctrl_get_by_path()to
+> support NVMe-OF passthru.
 
-This patch updates KConfig file for the NVMeOF target where we add new
-option so that user can selectively enable/disable passthru code.
+Ick, why?  Why would a cdev have a "pathname"?
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-[logang@deltatee.com: fixed some of the wording in the help message]
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
----
- drivers/nvme/target/Kconfig | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+What is "NVMe-OF passthru"?  Why does a char device node have anything
+to do with NVMe?
 
-diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
-index d7f48c0fb311..2478cb5a932d 100644
---- a/drivers/nvme/target/Kconfig
-+++ b/drivers/nvme/target/Kconfig
-@@ -15,6 +15,16 @@ config NVME_TARGET
- 	  To configure the NVMe target you probably want to use the nvmetcli
- 	  tool from http://git.infradead.org/users/hch/nvmetcli.git.
- 
-+config NVME_TARGET_PASSTHRU
-+	bool "NVMe Target Passthrough support"
-+	depends on NVME_CORE
-+	depends on NVME_TARGET
-+	help
-+	  This enables target side NVMe passthru controller support for the
-+	  NVMe Over Fabrics protocol. It allows for hosts to manage and
-+	  directly access an actual NVMe controller residing on the target
-+	  side, incuding executing Vendor Unique Commands.
-+
- config NVME_TARGET_LOOP
- 	tristate "NVMe loopback device support"
- 	depends on NVME_TARGET
--- 
-2.20.1
+We have way too many ways to abuse cdevs today, my long-term-wish has
+always been to clean this interface up to make it more sane and unified,
+and get rid of the "outliers" (all created at the time for a good
+reason, that's not the problem.)  But to add "just one more" seems
+really odd to me.
 
+thanks,
+
+greg k-h
