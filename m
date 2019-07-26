@@ -2,87 +2,117 @@ Return-Path: <SRS0=SSPg=VX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B5B8C7618B
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE495C76191
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:47:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C762F22BF5
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:26:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=tds.net header.i=@tds.net header.b="eRGk1ybN"
+	by mail.kernel.org (Postfix) with ESMTP id 8898B22CE5
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:47:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564148834;
+	bh=IKqPvwO/J1gl0Te7r7i+nqmrap3Pg4zpB7nnpfushCM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=W1g+NYsmSjNug2/7oe/qcJDdgcqBYZ5dCb9ZEFZ/qcRL9JtY1ekXzetY85j+l5A52
+	 RL559J40pxACK/YsynEH69VftNsxZEjLwGuIQC00iA5hpc5Hpc50LH1cNo/TQb0qs+
+	 UjSEGFixjii1q3Msiy0i4N0IPZCmMuFG38Q8/ynA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726364AbfGZN0S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jul 2019 09:26:18 -0400
-Received: from smtp.tds.cmh.synacor.com ([64.8.70.105]:31296 "EHLO
-        mail.tds.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726265AbfGZN0S (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jul 2019 09:26:18 -0400
-DKIM-Signature: v=1; a=rsa-sha1; d=tds.net; s=20180112; c=relaxed/simple;
-        q=dns/txt; i=@tds.net; t=1564147576;
-        h=From:Subject:Date:To:MIME-Version:Content-Type;
-        bh=c4XJqzh+0S/Bu07gYj4dcWrvoRE=;
-        b=eRGk1ybNA2atQTfUQnpB0xy7IHgIgdRERDKBKeGmLJhVWc9ju58WzYCkwUtRtV2m
-        3k2VCzJyJse6eFP1GsIEYHSet8CBNu3OyLsvPlNy3V2HR5HSN6nQLDokoBW+fS7Y
-        urMU7tU1nEP2aFn8bTJ1SbYKQ9EMeKc/fYOOqDEZHxafUP1MyXnPI73fkStqEZdV
-        uK1LM5TRfKuONZDaG0G0m3Ardgk7DQAVs2XMtxOF1f/+KcRTEW5b9Hudvp7RB4KT
-        YDxe+O48ruaNpPMBpZUXNkK34PtDzcHRxaMCtIeUh1K2+8ItbAnqL/4MOgHUFZMV
-        YG6LdrZ+1arbyMTj1SiRFA==;
-X_CMAE_Category: , ,
-X-CNFS-Analysis: v=2.3 cv=epShMbhX c=1 sm=1 tr=0 a=QQ1z/TRHJLkw7QGu0419XQ==:117 a=QQ1z/TRHJLkw7QGu0419XQ==:17 a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=KGjhK52YXX0A:10 a=IkcTkHD0fZMA:10 a=nHvWMnLLnzEA:10 a=0o9FgrsRnhwA:10 a=C9He5zk_2WUA:10 a=BqQhp60dDaIf8CMFjd8A:9 a=QEXdDO2ut3YA:10
-X-CM-Score: 0
-X-Scanned-by: Cloudmark Authority Engine
-X-Authed-Username: ZGF2aWRjNTAyQHRkcy5uZXQ=
-Authentication-Results:  smtp02.tds.cmh.synacor.com smtp.user=davidc502; auth=pass (LOGIN)
-Received: from [69.21.125.220] ([69.21.125.220:54208] helo=[192.168.2.226])
-        by mail.tds.net (envelope-from <davidc502@tds.net>)
-        (ecelerity 3.6.5.45644 r(Core:3.6.5.0)) with ESMTPSA (cipher=AES128-SHA) 
-        id FD/EB-22763-77FFA3D5; Fri, 26 Jul 2019 09:26:15 -0400
-Subject: Re: fstrim error - AORUS NVMe Gen4 SSD
-To:     Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, ilnux-nvme@lists.infradead.org
-References: <fb510e33-5c81-6d62-fcde-a2989b3a1a8f@tds.net>
- <20190723021928.GF30776@ming.t460p>
- <4a7ec7aa-f6ee-f9dc-4a17-38f2b169c721@tds.net>
- <20190723043803.GB13829@ming.t460p>
- <20190724213054.GA5921@localhost.localdomain>
-From:   davidc502 <davidc502@tds.net>
-Message-ID: <906e532a-e17a-cd91-cdb6-3f8c76df6064@tds.net>
-Date:   Fri, 26 Jul 2019 08:26:15 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2388131AbfGZNq5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jul 2019 09:46:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55504 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727301AbfGZNqH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Jul 2019 09:46:07 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7091D22CD8;
+        Fri, 26 Jul 2019 13:46:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1564148766;
+        bh=IKqPvwO/J1gl0Te7r7i+nqmrap3Pg4zpB7nnpfushCM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=CDclx+L6pi74KKVLZjdXUjdq75APytQjtckNTSXYsFypU1r1xAJ7wh0MBcie6Zfjn
+         2giEYzLEsxO+qgNQN4yg7hBLm8RLw/kFGD/7DeM7WvL09PB5lARUQgVYRERQmglPMn
+         rty72j99r08bUScR8tZzrk0y85T5vZIcOrHYJdrA=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Denis Efremov <efremov@ispras.ru>, Willy Tarreau <w@1wt.eu>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.4 21/23] floppy: fix div-by-zero in setup_format_params
+Date:   Fri, 26 Jul 2019 09:45:20 -0400
+Message-Id: <20190726134522.13308-21-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190726134522.13308-1-sashal@kernel.org>
+References: <20190726134522.13308-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20190724213054.GA5921@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+From: Denis Efremov <efremov@ispras.ru>
 
-On 7/24/19 4:30 PM, Keith Busch wrote:
-> On Tue, Jul 23, 2019 at 12:38:04PM +0800, Ming Lei wrote:
->>  From the IO trace, discard command(nvme_cmd_dsm) is failed:
->>
->>    kworker/15:1H-462   [015] .... 91814.342452: nvme_setup_cmd: nvme0: disk=nvme0n1, qid=7, cmdid=552, nsid=1, flags=0x0, meta=0x0, cmd=(nvme_cmd_dsm nr=0, attributes=4)
->>            <idle>-0     [013] d.h. 91814.342708: nvme_complete_rq: nvme0: disk=nvme0n1, qid=7, cmdid=552, res=0, retries=0, flags=0x0, status=8198
->>
->> And the returned error code is 0x8198, I am not sure how to parse the
->> 'Command Specific Status Values' of 0x98, maybe Christoph, Keith or our other
->> NVMe guys can help to understand the failure.
-> The 198h status code is still marked reserved in the latest spec for an
-> NVM command set, so not sure what to make of it. I think we would have
-> to refer back to the vendor.
+[ Upstream commit f3554aeb991214cbfafd17d55e2bfddb50282e32 ]
 
-Thank you  for taking a look at this. I guess my question would be if 
-you have a vehicle in place to be able to refer back to the vendor?
+This fixes a divide by zero error in the setup_format_params function of
+the floppy driver.
 
-David
+Two consecutive ioctls can trigger the bug: The first one should set the
+drive geometry with such .sect and .rate values for the F_SECT_PER_TRACK
+to become zero.  Next, the floppy format operation should be called.
 
+A floppy disk is not required to be inserted.  An unprivileged user
+could trigger the bug if the device is accessible.
 
+The patch checks F_SECT_PER_TRACK for a non-zero value in the
+set_geometry function.  The proper check should involve a reasonable
+upper limit for the .sect and .rate fields, but it could change the
+UAPI.
+
+The patch also checks F_SECT_PER_TRACK in the setup_format_params, and
+cancels the formatting operation in case of zero.
+
+The bug was found by syzkaller.
+
+Signed-off-by: Denis Efremov <efremov@ispras.ru>
+Tested-by: Willy Tarreau <w@1wt.eu>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/floppy.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 2daa5b84abbc..42ae1d2d8243 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -2113,6 +2113,9 @@ static void setup_format_params(int track)
+ 	raw_cmd->kernel_data = floppy_track_buffer;
+ 	raw_cmd->length = 4 * F_SECT_PER_TRACK;
+ 
++	if (!F_SECT_PER_TRACK)
++		return;
++
+ 	/* allow for about 30ms for data transport per track */
+ 	head_shift = (F_SECT_PER_TRACK + 5) / 6;
+ 
+@@ -3235,6 +3238,8 @@ static int set_geometry(unsigned int cmd, struct floppy_struct *g,
+ 	/* sanity checking for parameters. */
+ 	if (g->sect <= 0 ||
+ 	    g->head <= 0 ||
++	    /* check for zero in F_SECT_PER_TRACK */
++	    (unsigned char)((g->sect << 2) >> FD_SIZECODE(g)) == 0 ||
+ 	    g->track <= 0 || g->track > UDP->tracks >> STRETCH(g) ||
+ 	    /* check if reserved bits are set */
+ 	    (g->stretch & ~(FD_STRETCH | FD_SWAPSIDES | FD_SECTBASEMASK)) != 0)
+-- 
+2.20.1
 
