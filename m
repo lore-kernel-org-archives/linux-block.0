@@ -2,145 +2,97 @@ Return-Path: <SRS0=SSPg=VX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA862C7618B
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 09:50:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B42C7618B
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 11:47:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 819F222CED
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 09:50:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cp4F4YKD"
+	by mail.kernel.org (Postfix) with ESMTP id CD05422BEF
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 11:47:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564141656;
+	bh=YHG5UqClqlIpbUAtmrnq6jmnpPsTRvjdJLTh3pRD0PI=;
+	h=From:Cc:Subject:Date:In-Reply-To:References:To:List-ID:From;
+	b=YZp2nseKVfx51lEXiXvuDfjopCi6cQ/U84pAa/EBG/JKf0Vp2PcEjfkXBF/4lklNa
+	 rYIEEBunjyM5LtkMGPlpvv+OukFFbWx8LxcaT3Esd9Ty44S37Y7zn1MZLZ9ZdSCIZ3
+	 ch0y81f1woWaSNcQ2Gv25u2nghTM3g6GPoTiHmyo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726220AbfGZJuE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jul 2019 05:50:04 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:46315 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726000AbfGZJuD (ORCPT
+        id S1726529AbfGZLrf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jul 2019 07:47:35 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:47404 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726180AbfGZLre (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jul 2019 05:50:03 -0400
-Received: by mail-pg1-f196.google.com with SMTP id k189so5486801pgk.13
-        for <linux-block@vger.kernel.org>; Fri, 26 Jul 2019 02:50:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YLdfLrMSiT4KXAf/cjnjVZ2fM60YfkutQSVFLbjZHOQ=;
-        b=cp4F4YKDtn8FmO7tNNvB1Zl3+soGtcVxxS1B3gZMO5dm5UHaIEj4ZvwJ49y/fcp7aF
-         mYyqoW5O0g8Os9efZeigNDVGy3qdJDkXsKnCAGlnuMtVgVGJ6Jp5cDHrjpz8Id6GpWCS
-         3ZdVi9q/2s4zkI6SjQEULEWmkQOnWdR5ZyDSU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YLdfLrMSiT4KXAf/cjnjVZ2fM60YfkutQSVFLbjZHOQ=;
-        b=hyygoheJP+R1RdYILxlwcgNjtSGifgTs7Zu4Qc5Y75sySuI1FELuoFpFErDwsXTD1u
-         P2SG3xTMmSIpeOpAzdTvcuqEouLrCudzwqzwGB2Tv0L0RDrNWC+755GqvMrk8+XYuHPx
-         bCPOK9iWSy33Qceofp/WF6Hph/+DZa/aPwM/8w0GPEON6tqiA71JDEYJHs2iNHCdmX7Y
-         78ZbSw0kZHyw25jn+sEuMMndN+0GU/StOFZYgMF+4NdvDSYBQkAEDNp+scJMCbqqjEAm
-         U6jMIOh2YmFwizKeL5Sk6pvr9zXbH8JyDMaiDDAvMmQQ8a5XCbpnZhhx5iohUjFF5q2k
-         3Y1w==
-X-Gm-Message-State: APjAAAUi1BIzSP1imW1WFENpCqOl1IzooROuq0NZeYVs2pnG9uTZc6J1
-        itIwgLaqzpTld+3Nm6qNolng7T/shyNvl7lnZpsscw==
-X-Google-Smtp-Source: APXvYqw1c2xASRmY1awQwTYYEA2qAtfGkQi+5W6p4QqQ6+VOVIAsQpW0Ti3ZVLpjihaeVcD5W4AeV12h6Zw0qkafmD0=
-X-Received: by 2002:a63:eb06:: with SMTP id t6mr85181196pgh.107.1564134601904;
- Fri, 26 Jul 2019 02:50:01 -0700 (PDT)
+        Fri, 26 Jul 2019 07:47:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=ns01a/+dJBOEjeT/1CWh/+CD7/ir0pFGY6xdTOQcPbo=; b=UP9N99OCHIHEjE6YNaXL68byYU
+        T9OJh95quUUTHJmwl1TlhrNz3vPuPsRL/wcHureyhjtx5cqyF5XtXCwM6My/a2IaX/vVEUGlLAlO3
+        tccfZ5isggOwEGTdT6AOhuXMTLPlhENjcDg5T+DxsqsofwgGP8JzQ/XKnUl9EP9tx0dqglHSrS2Ww
+        ezZ6hkOBtGKC8sZ208lIhOiNGGIqQLhhp65h+1Zcsb9nzvCs2Vttku+Za3kWcsGeTlYn+bLwAnoCI
+        kMJymY+XshcL8KCiZDeMtN6R7Y3+9D/BAISo0T1XS5qy4chqi/mR24cmui7/zDBhgQKrqm0HIZz9p
+        8nlVayPQ==;
+Received: from [179.95.31.157] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hqyh9-0003Bb-4m; Fri, 26 Jul 2019 11:47:31 +0000
+Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
+        (envelope-from <mchehab@bombadil.infradead.org>)
+        id 1hqyh7-0000u9-3J; Fri, 26 Jul 2019 08:47:29 -0300
+From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: [PATCH 5/7] docs: cgroup-v1/blkio-controller.rst: remove a CFQ left over
+Date:   Fri, 26 Jul 2019 08:47:25 -0300
+Message-Id: <21b9281684395202d815d574121df89fa0c7ac62.1564140865.git.mchehab+samsung@kernel.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <cover.1564140865.git.mchehab+samsung@kernel.org>
+References: <cover.1564140865.git.mchehab+samsung@kernel.org>
 MIME-Version: 1.0
-References: <CGME20190714034415epcms2p25f9787cb71993a30f58524d2f355b543@epcms2p2>
- <20190714034415epcms2p25f9787cb71993a30f58524d2f355b543@epcms2p2>
-In-Reply-To: <20190714034415epcms2p25f9787cb71993a30f58524d2f355b543@epcms2p2>
-From:   Sreekanth Reddy <sreekanth.reddy@broadcom.com>
-Date:   Fri, 26 Jul 2019 15:19:50 +0530
-Message-ID: <CAK=zhgoqoTDZb=q9Cq7hC+RDNOC9GTKCnDdHeiPsYcKOaT8N6g@mail.gmail.com>
-Subject: Re: [PATCH V2] mpt3sas: support target smid for [abort|query] task
-To:     minwoo.im@samsung.com
-Cc:     "sathya.prakash@broadcom.com" <sathya.prakash@broadcom.com>,
-        "suganath-prabu.subramani@broadcom.com" 
-        <suganath-prabu.subramani@broadcom.com>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "MPT-FusionLinux.pdl@broadcom.com" <MPT-FusionLinux.pdl@broadcom.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Euihyeok Kwon <eh81.kwon@samsung.com>,
-        Sarah Cho <sohyeon.jo@samsung.com>,
-        Sanggwan Lee <sanggwan.lee@samsung.com>,
-        Gyeongmin Nam <gm.nam@samsung.com>,
-        Sungjun Park <sj1228.park@samsung.com>,
-        "minwoo.im.dev@gmail.com" <minwoo.im.dev@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 14, 2019 at 9:14 AM Minwoo Im <minwoo.im@samsung.com> wrote:
->
-> We can request task management IOCTL command(MPI2_FUNCTION_SCSI_TASK_MGMT)
-> to /dev/mpt3ctl.  If the given task_type is either abort task or query
-> task, it may need a field named "Initiator Port Transfer Tag to Manage"
-> in the IU.
->
-> Current code does not support to check target IPTT tag from the
-> tm_request.  This patch introduces to check TaskMID given from the
-> userspace as a target tag.  We have a rule of relationship between
-> (struct request *req->tag) and smid in mpt3sas_base.c:
->
-> 3318 u16
-> 3319 mpt3sas_base_get_smid_scsiio(struct MPT3SAS_ADAPTER *ioc, u8 cb_idx,
-> 3320         struct scsi_cmnd *scmd)
-> 3321 {
-> 3322         struct scsiio_tracker *request = scsi_cmd_priv(scmd);
-> 3323         unsigned int tag = scmd->request->tag;
-> 3324         u16 smid;
-> 3325
-> 3326         smid = tag + 1;
->
-> So if we want to abort a request tagged #X, then we can pass (X + 1) to
-> this IOCTL handler.  Otherwise, user space just can pass 0 TaskMID to
-> abort the first outstanding smid which is legacy behaviour.
->
-> Cc: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
-> Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
-> Cc: Sathya Prakash <sathya.prakash@broadcom.com>
-> Cc: James E.J. Bottomley <jejb@linux.ibm.com>
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: MPT-FusionLinux.pdl@broadcom.com
-> Signed-off-by: Minwoo Im <minwoo.im@samsung.com>
+changeset fb5772cbfe48 ("blkio-controller.txt: Remove references to CFQ")
+removed cgroup references to CFQ, but it kept one left. Get rid of
+it.
 
-Acked-by:  Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+Fixes: fb5772cbfe48 ("blkio-controller.txt: Remove references to CFQ")
+Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+---
+ Documentation/admin-guide/cgroup-v1/blkio-controller.rst | 6 ------
+ 1 file changed, 6 deletions(-)
 
-> ---
->  drivers/scsi/mpt3sas/mpt3sas_ctl.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/scsi/mpt3sas/mpt3sas_ctl.c b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
-> index b2bb47c14d35..f6b8fd90610a 100644
-> --- a/drivers/scsi/mpt3sas/mpt3sas_ctl.c
-> +++ b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
-> @@ -596,8 +596,16 @@ _ctl_set_task_mid(struct MPT3SAS_ADAPTER *ioc, struct mpt3_ioctl_command *karg,
->                 if (priv_data->sas_target->handle != handle)
->                         continue;
->                 st = scsi_cmd_priv(scmd);
-> -               tm_request->TaskMID = cpu_to_le16(st->smid);
-> -               found = 1;
-> +
-> +               /*
-> +                * If the given TaskMID from the user space is zero, then the
-> +                * first outstanding smid will be picked up.  Otherwise,
-> +                * targeted smid will be the one.
-> +                */
-> +               if (!tm_request->TaskMID || tm_request->TaskMID == st->smid) {
-> +                       tm_request->TaskMID = cpu_to_le16(st->smid);
-> +                       found = 1;
-> +               }
->         }
->
->         if (!found) {
-> --
-> 2.16.1
->
+diff --git a/Documentation/admin-guide/cgroup-v1/blkio-controller.rst b/Documentation/admin-guide/cgroup-v1/blkio-controller.rst
+index 1d7d962933be..36d43ae7dc13 100644
+--- a/Documentation/admin-guide/cgroup-v1/blkio-controller.rst
++++ b/Documentation/admin-guide/cgroup-v1/blkio-controller.rst
+@@ -130,12 +130,6 @@ Proportional weight policy files
+ 	    dev     weight
+ 	    8:16    300
+ 
+-- blkio.leaf_weight[_device]
+-	- Equivalents of blkio.weight[_device] for the purpose of
+-          deciding how much weight tasks in the given cgroup has while
+-          competing with the cgroup's child cgroups. For details,
+-          please refer to Documentation/block/cfq-iosched.txt.
+-
+ - blkio.time
+ 	- disk time allocated to cgroup per device in milliseconds. First
+ 	  two fields specify the major and minor number of the device and
+-- 
+2.21.0
+
