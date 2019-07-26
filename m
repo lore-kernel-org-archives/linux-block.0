@@ -2,100 +2,117 @@ Return-Path: <SRS0=SSPg=VX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3185FC7618B
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 17:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DEA4C7618F
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 17:57:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E08421734
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 17:08:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72A42218B8
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 17:57:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564163821;
+	bh=RNMEIiOnFyjV6sNYOt95vbi9kIoEI1nXNx4ROd0+Pbk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=vet/7C+Zz5a5fbJCgqTutuu3wsKSUCHIJzt6VTyMFALUYoMMV1lxERyabrLdkOoco
+	 9nc1DgM8kbf+x4KWYilG+RIHEuWMxVdY4D/Kw20WWc+QFPaN4T4LFMNP4TCTiPgWsj
+	 lBWzE2V1h9VknRJIXLGfGPOyLiEsxw/XJbwRCAns=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387445AbfGZRIE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jul 2019 13:08:04 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:35658 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387437AbfGZRIE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jul 2019 13:08:04 -0400
-Received: from s01061831bf6ec98c.cg.shawcable.net ([68.147.80.180] helo=[192.168.6.132])
-        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1hr3h5-0004NW-W6; Fri, 26 Jul 2019 11:07:48 -0600
-To:     Hannes Reinecke <hare@suse.de>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190725172335.6825-1-logang@deltatee.com>
- <1f202de3-1122-f4a3-debd-0d169f545047@suse.de>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <8fd8813f-f8e1-2139-13bf-b0635a03bc30@deltatee.com>
-Date:   Fri, 26 Jul 2019 11:07:44 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727653AbfGZR5A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jul 2019 13:57:00 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:35364 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727516AbfGZR5A (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Jul 2019 13:57:00 -0400
+Received: by mail-lf1-f68.google.com with SMTP id p197so37617156lfa.2
+        for <linux-block@vger.kernel.org>; Fri, 26 Jul 2019 10:56:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zfmsfBmT17PJJ74ANUzoszKWmZYNwTxSI7eHLYgnatM=;
+        b=dgaJ0WL2L14193aZi6FUX47ldYOF2Rp/E7f64/OFB3tYBGyxOp8iTQCHfM6/L8Xxe4
+         anbouLngD9B9DF422OFWmp9gQdzWfI9K3GFOYLsUe68uQOCU9sbWGvC+TzILXPnaXcx7
+         aGfPUVs+0oi1puJhMtFgtRAb6cnStUOqZQDow=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zfmsfBmT17PJJ74ANUzoszKWmZYNwTxSI7eHLYgnatM=;
+        b=uP1HWH9oNOINux5iE9/I61IlzXJIIYx8Yve1VcffVIYGKL8ZxiSbLGxMeoe/kCvHJ3
+         coF+8bZC0JCAf1XfPvGX6fqO/mfKXrw4FP3HM5PbnbxGt68xFxlzsg0kWz9vcyXpKTmk
+         mSXuh6PQaZTUQo80D3kA8thMtmIVbW6EFU0D545r0HeIv/jNvtFMPgfSWebE1xXvuRK0
+         7wwH0AwNaOUgsGYYWDBZhqdGvUfeIXwAQEe53kx0wGWeZcA2fzQEYgqhln6Mg1ZeQicY
+         FoMPIelam7abM37TDXfLqn0b15YR5+r4QLLJVcMHn6tAoH5HsinNQHCDtu+YEoQ33kS+
+         P8WQ==
+X-Gm-Message-State: APjAAAX7JYiOcz4aHnUWpG2IfmIgv/sz+ILZdw3SxsK/3vdYqM2/8fS2
+        XhXJRHYmTDD73HI7KOHx1JeeZN5jlbg=
+X-Google-Smtp-Source: APXvYqxBBndqtDAYJNqBaGiArSAXXcogkuT6sV/j/s6XgwZw4HLg0/9EU51DdANPOCNOFp8bSygdiQ==
+X-Received: by 2002:a19:c514:: with SMTP id w20mr45448600lfe.182.1564163818206;
+        Fri, 26 Jul 2019 10:56:58 -0700 (PDT)
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com. [209.85.167.50])
+        by smtp.gmail.com with ESMTPSA id 189sm9588525lfa.0.2019.07.26.10.56.56
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Fri, 26 Jul 2019 10:56:57 -0700 (PDT)
+Received: by mail-lf1-f50.google.com with SMTP id r15so20657855lfm.11
+        for <linux-block@vger.kernel.org>; Fri, 26 Jul 2019 10:56:56 -0700 (PDT)
+X-Received: by 2002:ac2:4565:: with SMTP id k5mr45204978lfm.170.1564163816531;
+ Fri, 26 Jul 2019 10:56:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1f202de3-1122-f4a3-debd-0d169f545047@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 68.147.80.180
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, maxg@mellanox.com, Chaitanya.Kulkarni@wdc.com, axboe@fb.com, kbusch@kernel.org, sagi@grimberg.me, hch@lst.de, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, hare@suse.de
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v6 00/16] nvmet: add target passthru commands support
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+References: <2b22063e-660c-a238-f109-fcf3f1b888b5@kernel.dk>
+In-Reply-To: <2b22063e-660c-a238-f109-fcf3f1b888b5@kernel.dk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 26 Jul 2019 10:56:40 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjV1cykm1UYSVR1KzwV4ZF0QtU9rOTsThVJj8qSX6hKgQ@mail.gmail.com>
+Message-ID: <CAHk-=wjV1cykm1UYSVR1KzwV4ZF0QtU9rOTsThVJj8qSX6hKgQ@mail.gmail.com>
+Subject: Re: [GIT PULL] Block fixes for 5.3-rc2
+To:     Jens Axboe <axboe@kernel.dk>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Guenter Roeck <linux@roeck-us.net>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Guys, what happened to the wrong sector boundary and max sector mess?
 
+There are at least two different issues (with one of them having two
+proposed fixes);
 
-On 2019-07-26 12:23 a.m., Hannes Reinecke wrote:
-> How do you handle subsystem naming?
-> If you enable the 'passthru' device, the (nvmet) subsystem (and its
-> name) is already created. Yet the passthru device will have its own
-> internal subsystem naming, so if you're not extra careful you'll end up
-> with a nvmet subsystem which doesn't have any relationship with the
-> passthru subsystem, making addressing etc ... tricky.
-> Any thoughts about that?
+  https://lore.kernel.org/linux-block/1563896932.3609.15.camel@HansenPartnership.com/
+  https://lore.kernel.org/lkml/1563895995.3609.10.camel@HansenPartnership.com/
+  https://lore.kernel.org/lkml/1563839144.2504.5.camel@HansenPartnership.com/
 
-Well I can't say I have a great understanding of how multipath works, but...
+but I don't actually seem to have a pull request for any of this.
 
-I don't think it necessarily makes sense for the target subsynqn and the
-target's device nqn to be the same. It would be weird for a user to want
-to use the same device and a passed through device (through a loop) as
-part of the same subsystem. That being said, it's possible for the user
-to use the subsysnqn from the passed through device for the name of the
-subsys of the target. I tried this and it works except for the fact that
-the device I'm passing through doesn't set id->cmic.
+The
 
-> Similarly: how do you propose to handle multipath devices?
-> Any NVMe with several paths will be enabling NVMe multipathing
-> automatically, presenting you with a single multipathed namespace.
-> How will these devices be treated?
+   dma_max_mapping_size(dev) << SECTOR_SHIFT
 
-Well passthru works on the controller level not on the namespace level.
-So it can't make use of the multipath handling on the target system.
+this in scsi_lib.c is clearly completely wrong, and is still there in my tree.
 
-The one case that I think makes sense to me, but I don't know how if we
-can handle, is if the user had a couple multipath enabled controllers
-with the same subsynqn and wanted to passthru all of them to another
-system and use multipath on the host with both controllers. This would
-require having multiple target subsystems with the same name which I
-don't think will work too well.
+The virt_boundary_mask thing can apparently be fixed other ways too
+(ie questionable whether it should be fixed in block/blk-settings.c or
+in drivers/scsi/scsi_lib.c, but I don't see either one. I was
+expecting the block/blk-settings.c one to be in this pull request.
 
-> Will the multipathed namespace be used for passthru?
+Maybe I'm missing some alternate fix? I don't think so, particularly
+since I still see the wrong-way shift, at least.
 
-Nope.
+Is this due to some confusion about who is supposed to fix it?
+Christoph was involved in both, issues, and the problems came throigh
+different trees (ie block tree for the virt_boundary_mask, scsi with
+the
 
-Honestly, I think the answer is if someone wants to use multipathed
-controllers they should use regular NVMe-of as it doesn't really mesh
-well with the passthru approach.
+                  Linus
 
-Logan
+On Fri, Jul 26, 2019 at 8:12 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> A set of fixes that should make it into this release. This pull request
+> contains:
