@@ -2,128 +2,109 @@ Return-Path: <SRS0=SSPg=VX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B6FC76191
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 01:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B8DBC7618F
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 04:29:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2AAF22082E
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 01:24:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="PQnzJX5x"
+	by mail.kernel.org (Postfix) with ESMTP id EE69E21951
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 04:29:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725838AbfGZBYS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jul 2019 21:24:18 -0400
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:12796 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725808AbfGZBYS (ORCPT
+        id S1725942AbfGZE3n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jul 2019 00:29:43 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:42368 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725781AbfGZE3n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jul 2019 21:24:18 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d3a563e0000>; Thu, 25 Jul 2019 18:24:14 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Thu, 25 Jul 2019 18:24:17 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Thu, 25 Jul 2019 18:24:17 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 26 Jul
- 2019 01:24:16 +0000
-Subject: Re: [PATCH 00/12] block/bio, fs: convert put_page() to
- put_user_page*()
-To:     Bob Liu <bob.liu@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-CC:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>, <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <ceph-devel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <samba-technical@lists.samba.org>,
-        <v9fs-developer@lists.sourceforge.net>,
-        <virtualization@lists.linux-foundation.org>
-References: <20190724042518.14363-1-jhubbard@nvidia.com>
- <8621066c-e242-c449-eb04-4f2ce6867140@oracle.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <88864b91-516d-9774-f4ca-b45927ac4556@nvidia.com>
-Date:   Thu, 25 Jul 2019 18:24:16 -0700
+        Fri, 26 Jul 2019 00:29:43 -0400
+Received: by mail-pl1-f195.google.com with SMTP id ay6so24281363plb.9;
+        Thu, 25 Jul 2019 21:29:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rIhtYBAd0ZZLe9n3b3Z0c0rQPCJrZwUCsuW99j3TPW0=;
+        b=mxV7PiMoJwWfGsfJthExu2EHCQn7FkBbwSjEc5iaRGNbbiL/9osbhwaFm884EucjGy
+         dTF8PEKlWrhW4rShPHy8XHGnyONrttwha9r/Gxwk8XfEzhFOkz9r9XgjJvnJsHdKjnaH
+         goBBOaXer60ebpmxdW3j3dVXpEDWc2F4pHqUXcWvJhZsIl6v/aKmFKsi8QpnOakCHxSF
+         Dc4p0yo2mb6JBJ4RAqn7wiHRsKbQTw+ZfvLqfW3SVRYhDsDdKEHYWxF3Dl2Ia4RQ/1dF
+         WPdyUlTrfG5cM96KR1hvFEQPHNmWVNc6RNsk68TicHUN2/8r7EDCY/Tbi3XLWj1fH6k6
+         OEqw==
+X-Gm-Message-State: APjAAAXPH4rUDkxRP4YovkArZkiMFjz6mQWp3ytIz4WupZT9ys4a3E1k
+        me+nQFZI9CdJxuildc+w/2o=
+X-Google-Smtp-Source: APXvYqy6Y8TmjZHX0TeLB6uThXges+cpfWm4YHO0/c1/D3r6g01LStF4IJjmP89egICijdne4RtXQg==
+X-Received: by 2002:a17:902:3081:: with SMTP id v1mr96243822plb.169.1564115382626;
+        Thu, 25 Jul 2019 21:29:42 -0700 (PDT)
+Received: from ?IPv6:2601:647:4800:973f:9c9c:d9b0:80ed:96d1? ([2601:647:4800:973f:9c9c:d9b0:80ed:96d1])
+        by smtp.gmail.com with ESMTPSA id l44sm45186630pje.29.2019.07.25.21.29.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 25 Jul 2019 21:29:41 -0700 (PDT)
+Subject: Re: [PATCH v6 02/16] chardev: introduce cdev_get_by_path()
+To:     Al Viro <viro@zeniv.linux.org.uk>,
+        Logan Gunthorpe <logang@deltatee.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jens Axboe <axboe@fb.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Stephen Bates <sbates@raithlin.com>,
+        linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+        linux-fsdevel@vger.kernel.org, Max Gurtovoy <maxg@mellanox.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20190725172335.6825-3-logang@deltatee.com>
+ <20190725174032.GA27818@kroah.com>
+ <682ff89f-04e0-7a94-5aeb-895ac65ee7c9@deltatee.com>
+ <20190725180816.GA32305@kroah.com>
+ <da0eacb7-3738-ddf3-8c61-7ffc61aa41f4@deltatee.com>
+ <20190725182701.GA11547@kroah.com>
+ <20190725190024.GD30641@bombadil.infradead.org>
+ <27943e06-a503-162e-356b-abb9e106ab2e@grimberg.me>
+ <20190725191124.GE30641@bombadil.infradead.org>
+ <425dd2ac-333d-a8c4-ce49-870c8dadf436@deltatee.com>
+ <20190725235502.GJ1131@ZenIV.linux.org.uk>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <7f48a40c-6e0f-2545-a939-45fc10862dfd@grimberg.me>
+Date:   Thu, 25 Jul 2019 21:29:40 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <8621066c-e242-c449-eb04-4f2ce6867140@oracle.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20190725235502.GJ1131@ZenIV.linux.org.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1564104254; bh=QKXKINFukbwLIIsnFYM0gxF2tKYcHndEGgwougXKa7I=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=PQnzJX5xz5ikEiwrLKM8WsALivZ88h6rrpD5As08defMJIkdP+u4c4qNjj9VJ4tt7
-         nwv4lirmE3zmhFpqjjtQZ51fomZqIx7+Z5K/hIMgtkne3B/lAraavguLY6SA4HXRUi
-         W4SUZZlps8N4rFxPowCNQkldeoVK/fBECjRShYxjtzJx8yvDnyDgvLG3XjCMQgN0HE
-         j0RlPZtSamPdX7GpRyHeIVO0klar+OAGzPGoJx+oiz7wZ/GbisDHnJkR/hoyBrvfQa
-         +HuyKaWvKrWvHxopvgEQcRa8uv0hWn0N0u4M8vDDfrnuUHyPlJZxMytFt1GB3uPYBU
-         1cdZ+M2GXGeqw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/24/19 5:41 PM, Bob Liu wrote:
-> On 7/24/19 12:25 PM, john.hubbard@gmail.com wrote:
->> From: John Hubbard <jhubbard@nvidia.com>
+
+>>>>>>> NVMe-OF is configured using configfs. The target is specified by the
+>>>>>>> user writing a path to a configfs attribute. This is the way it works
+>>>>>>> today but with blkdev_get_by_path()[1]. For the passthru code, we need
+>>>>>>> to get a nvme_ctrl instead of a block_device, but the principal is the same.
+>>>>>>
+>>>>>> Why isn't a fd being passed in there instead of a random string?
+>>>>>
+>>>>> I suppose we could echo a string of the file descriptor number there,
+>>>>> and look up the fd in the process' file descriptor table ...
+>>>>
+>>>> Assuming that there is a open handle somewhere out there...
 >>
->> Hi,
->>
->> This is mostly Jerome's work, converting the block/bio and related areas
->> to call put_user_page*() instead of put_page(). Because I've changed
->> Jerome's patches, in some cases significantly, I'd like to get his
->> feedback before we actually leave him listed as the author (he might
->> want to disown some or all of these).
->>
+>> Yes, that would be a step backwards from an interface. The user would
+>> then need a special process to open the fd and pass it through configfs.
+>> They couldn't just do it with basic bash commands.
 > 
-> Could you add some background to the commit log for people don't have the context..
-> Why this converting? What's the main differences?
+> First of all, they can, but... WTF not have filp_open() done right there?
+> Yes, by name.  With permission checks done.  And pick your object from the
+> sodding struct file you'll get.
 > 
-
-Hi Bob,
-
-1. Many of the patches have a blurb like this:
-
-For pages that were retained via get_user_pages*(), release those pages
-via the new put_user_page*() routines, instead of via put_page().
-
-This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-("mm: introduce put_user_page*(), placeholder versions").
-
-...and if you look at that commit, you'll find several pages of
-information in its commit description, which should address your point.
-
-2. This whole series has to be re-worked, as per the other feedback thread.
-So I'll keep your comment in mind when I post a new series.
-
-thanks,
--- 
-John Hubbard
-NVIDIA
+> What's the problem?  Why do you need cdev lookups, etc., when you are
+> dealing with files under your full control?  Just open them and use
+> ->private_data or whatever you set in ->open() to access the damn thing.
+> All there is to it...
+Oh this is so much simpler. There is really no point in using anything
+else. Just need to remember to compare f->f_op to what we expect to make
+sure that it is indeed the same device class.
