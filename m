@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3526DC76191
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6455C7618B
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:53:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0525722CD8
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:50:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8114122CEB
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:53:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564149046;
-	bh=8bKqOjSUUQC1mnRNDLkjrxM4PpNvEvT4NFD5HvX0/1g=;
+	s=default; t=1564149215;
+	bh=+ji7mFsUFkSIoN123yX2W9OUGZf68/Hsg61RzvHrGZA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=NMQoN4tp6K/jQRgYHzQ32BGrq8Wxpq4hQvq1sHInKOVweK2WvrAbvO8sTyW+zfwFj
-	 u/z5JRPJ0rvOTg9AvBNU6SDTA8jGw54POtT1wjBQQ4jOLINPdblfjZAGa7KXe3k/nH
-	 leM8K6d9GZLeLdMeVPflQfCRcoCGoKKH8lRf9zyU=
+	b=jgG8hHWK/iZg0T/vr9sflHpuc5SIaFGCrCdZC6U/DKQPndZORRzUyl58m9yx1+cC+
+	 IVrcBCfYGRcEaupe5A04hLU7NnE3FfL4uSbK3yvQKdNKiAiP2z2cysvNqLE5DtDUGG
+	 /dFb0DKJNfLDG2hTFDUFv9vaAGfvLedoSKZXaaiE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387567AbfGZNuj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jul 2019 09:50:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52556 "EHLO mail.kernel.org"
+        id S2388176AbfGZNnW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jul 2019 09:43:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51008 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728096AbfGZNoW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jul 2019 09:44:22 -0400
+        id S2388171AbfGZNnV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Jul 2019 09:43:21 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8DE5222CD8;
-        Fri, 26 Jul 2019 13:44:20 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 67DDE22BF5;
+        Fri, 26 Jul 2019 13:43:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564148661;
-        bh=8bKqOjSUUQC1mnRNDLkjrxM4PpNvEvT4NFD5HvX0/1g=;
+        s=default; t=1564148600;
+        bh=+ji7mFsUFkSIoN123yX2W9OUGZf68/Hsg61RzvHrGZA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nPtuQRW0/diSn3YIaUDnob/F7aGKpOXza4ldm6pYi+3h7hMCNJB6uIPzU8x8etQ33
-         pKMnamOPa8Z7IeRRFTCo5nJ9lhl65UkcQ9AS+lOpZr/zU03VeEtODxDkkNcl2reyGD
-         0IH+yX5dLEfr02zQke4U9mCSxheiucCWGC7E9Axs=
+        b=hxO83RbQvgLYww6IV3AivStxozIKbdTBkMekw2UDAL1bmzoGLE3noOQ29WyUt1boL
+         NRmfUF9BnWkzgwd18w0PlPUbC3NmqodMfxfnaNS89amRR+iu78m9PRCgkLZctT4QHN
+         xlKUOCCYeu4KToPb4BLS77lnVpeFRMZARimLEjxU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Denis Efremov <efremov@ispras.ru>, Willy Tarreau <w@1wt.eu>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 31/37] floppy: fix out-of-bounds read in copy_buffer
-Date:   Fri, 26 Jul 2019 09:43:26 -0400
-Message-Id: <20190726134332.12626-31-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 40/47] floppy: fix out-of-bounds read in copy_buffer
+Date:   Fri, 26 Jul 2019 09:42:03 -0400
+Message-Id: <20190726134210.12156-40-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190726134332.12626-1-sashal@kernel.org>
-References: <20190726134332.12626-1-sashal@kernel.org>
+In-Reply-To: <20190726134210.12156-1-sashal@kernel.org>
+References: <20190726134210.12156-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -88,10 +88,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 4c6c20376a83..1205472a9f63 100644
+index b1425b218606..0d43e90eb252 100644
 --- a/drivers/block/floppy.c
 +++ b/drivers/block/floppy.c
-@@ -3239,8 +3239,10 @@ static int set_geometry(unsigned int cmd, struct floppy_struct *g,
+@@ -3244,8 +3244,10 @@ static int set_geometry(unsigned int cmd, struct floppy_struct *g,
  	int cnt;
  
  	/* sanity checking for parameters. */
