@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6455C7618B
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22532C76191
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:53:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8114122CEB
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:53:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFAB222CE5
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:53:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564149215;
-	bh=+ji7mFsUFkSIoN123yX2W9OUGZf68/Hsg61RzvHrGZA=;
+	s=default; t=1564149227;
+	bh=33cINULepAK2WAGBMpp/TCjw4aYqKuqQcWDaV6QpBaw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=jgG8hHWK/iZg0T/vr9sflHpuc5SIaFGCrCdZC6U/DKQPndZORRzUyl58m9yx1+cC+
-	 IVrcBCfYGRcEaupe5A04hLU7NnE3FfL4uSbK3yvQKdNKiAiP2z2cysvNqLE5DtDUGG
-	 /dFb0DKJNfLDG2hTFDUFv9vaAGfvLedoSKZXaaiE=
+	b=O4UZso01fXMpw7dcuWf0bxcTRdR/E7l8ffs5n9ccXH5YeO/4oPwyvtDNmc52Lt2JB
+	 JOxmvMTGTHe6+iJ5tx7MnhIblV15kI27ZxF5rPfra9fweW7zhO1A/bdmx6ksc9wHBp
+	 C+AHbmkXQXoGK90nwn/hhs73bJ5OU0Uzc3QNbOt4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388176AbfGZNnW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jul 2019 09:43:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51008 "EHLO mail.kernel.org"
+        id S2388350AbfGZNxf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jul 2019 09:53:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50984 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388171AbfGZNnV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jul 2019 09:43:21 -0400
+        id S2387951AbfGZNnU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Jul 2019 09:43:20 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 67DDE22BF5;
-        Fri, 26 Jul 2019 13:43:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4D1BB22CBF;
+        Fri, 26 Jul 2019 13:43:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564148600;
-        bh=+ji7mFsUFkSIoN123yX2W9OUGZf68/Hsg61RzvHrGZA=;
+        s=default; t=1564148599;
+        bh=33cINULepAK2WAGBMpp/TCjw4aYqKuqQcWDaV6QpBaw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hxO83RbQvgLYww6IV3AivStxozIKbdTBkMekw2UDAL1bmzoGLE3noOQ29WyUt1boL
-         NRmfUF9BnWkzgwd18w0PlPUbC3NmqodMfxfnaNS89amRR+iu78m9PRCgkLZctT4QHN
-         xlKUOCCYeu4KToPb4BLS77lnVpeFRMZARimLEjxU=
+        b=Fcqv4WDfQY+IBbj4fK1IjXKFyFeblQ3y3G23mlPDMqtsWZpT8e5HA0RCp5s22Tzh+
+         xApZcgE2kZA1coqSoLx5v7EVrstyYU3/JS7EMEyOEl0ng0TaVtBOrR8gSq9Q0IoKv8
+         4ksQ95ekTVYFYQfEWdj2ijBjYwWYWxGB2gtxOtvQ=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Denis Efremov <efremov@ispras.ru>, Willy Tarreau <w@1wt.eu>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 40/47] floppy: fix out-of-bounds read in copy_buffer
-Date:   Fri, 26 Jul 2019 09:42:03 -0400
-Message-Id: <20190726134210.12156-40-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 39/47] floppy: fix div-by-zero in setup_format_params
+Date:   Fri, 26 Jul 2019 09:42:02 -0400
+Message-Id: <20190726134210.12156-39-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190726134210.12156-1-sashal@kernel.org>
 References: <20190726134210.12156-1-sashal@kernel.org>
@@ -60,22 +60,25 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Denis Efremov <efremov@ispras.ru>
 
-[ Upstream commit da99466ac243f15fbba65bd261bfc75ffa1532b6 ]
+[ Upstream commit f3554aeb991214cbfafd17d55e2bfddb50282e32 ]
 
-This fixes a global out-of-bounds read access in the copy_buffer
-function of the floppy driver.
+This fixes a divide by zero error in the setup_format_params function of
+the floppy driver.
 
-The FDDEFPRM ioctl allows one to set the geometry of a disk.  The sect
-and head fields (unsigned int) of the floppy_drive structure are used to
-compute the max_sector (int) in the make_raw_rw_request function.  It is
-possible to overflow the max_sector.  Next, max_sector is passed to the
-copy_buffer function and used in one of the memcpy calls.
+Two consecutive ioctls can trigger the bug: The first one should set the
+drive geometry with such .sect and .rate values for the F_SECT_PER_TRACK
+to become zero.  Next, the floppy format operation should be called.
 
-An unprivileged user could trigger the bug if the device is accessible,
-but requires a floppy disk to be inserted.
+A floppy disk is not required to be inserted.  An unprivileged user
+could trigger the bug if the device is accessible.
 
-The patch adds the check for the .sect * .head multiplication for not
-overflowing in the set_geometry function.
+The patch checks F_SECT_PER_TRACK for a non-zero value in the
+set_geometry function.  The proper check should involve a reasonable
+upper limit for the .sect and .rate fields, but it could change the
+UAPI.
+
+The patch also checks F_SECT_PER_TRACK in the setup_format_params, and
+cancels the formatting operation in case of zero.
 
 The bug was found by syzkaller.
 
@@ -84,26 +87,32 @@ Tested-by: Willy Tarreau <w@1wt.eu>
 Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/floppy.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/block/floppy.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index b1425b218606..0d43e90eb252 100644
+index a8de56f1936d..b1425b218606 100644
 --- a/drivers/block/floppy.c
 +++ b/drivers/block/floppy.c
-@@ -3244,8 +3244,10 @@ static int set_geometry(unsigned int cmd, struct floppy_struct *g,
- 	int cnt;
+@@ -2119,6 +2119,9 @@ static void setup_format_params(int track)
+ 	raw_cmd->kernel_data = floppy_track_buffer;
+ 	raw_cmd->length = 4 * F_SECT_PER_TRACK;
  
++	if (!F_SECT_PER_TRACK)
++		return;
++
+ 	/* allow for about 30ms for data transport per track */
+ 	head_shift = (F_SECT_PER_TRACK + 5) / 6;
+ 
+@@ -3243,6 +3246,8 @@ static int set_geometry(unsigned int cmd, struct floppy_struct *g,
  	/* sanity checking for parameters. */
--	if (g->sect <= 0 ||
--	    g->head <= 0 ||
-+	if ((int)g->sect <= 0 ||
-+	    (int)g->head <= 0 ||
-+	    /* check for overflow in max_sector */
-+	    (int)(g->sect * g->head) <= 0 ||
- 	    /* check for zero in F_SECT_PER_TRACK */
- 	    (unsigned char)((g->sect << 2) >> FD_SIZECODE(g)) == 0 ||
+ 	if (g->sect <= 0 ||
+ 	    g->head <= 0 ||
++	    /* check for zero in F_SECT_PER_TRACK */
++	    (unsigned char)((g->sect << 2) >> FD_SIZECODE(g)) == 0 ||
  	    g->track <= 0 || g->track > UDP->tracks >> STRETCH(g) ||
+ 	    /* check if reserved bits are set */
+ 	    (g->stretch & ~(FD_STRETCH | FD_SWAPSIDES | FD_SECTBASEMASK)) != 0)
 -- 
 2.20.1
 
