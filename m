@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E64BCC7618B
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:48:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 007F0C7618B
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:50:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BFF0622CE8
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:48:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBBC322CD8
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jul 2019 13:50:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564148915;
-	bh=6H3V95Rkj95ytRF6BwwNX/yuyl+ZuXbdxk8+F232DmU=;
+	s=default; t=1564149045;
+	bh=Ucqr2C+XMCRm+Qzt8YSulePDv+pQyMACI3l8ABCE9pc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=bqwjHxAzK5IZBMTqZsbKBQ6r9cGFKGpz4BbtNiYgJxQ6dlOjtEBDocr+3zPnvECip
-	 nmd9v38i8b4CK7VMJ0fVmSYEMkOKo+zLWceh1mXN3cAGYkn8ZGwovt0itwAs1dMExi
-	 cW77Tk38l7Kln1KlN9QRaXlxYmwHVJrUe7K+sfH0=
+	b=FJvkfBqJ1TPOQmQWVc2KXU4lq94xEBRhl8Roh/QH/UUxl/9UMvqsi7mO+nsieI/tD
+	 c8adq0CIf8Capll4AYrGYDLaQrFnT+zrpN7nxjh34sjmjfG+cVfrfTWXuCQVqHmxDR
+	 5Gm8DLzR1Rz5N/bcGf0pfNDUTxwfW6CRkFw0Z+9k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388336AbfGZNsb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jul 2019 09:48:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54098 "EHLO mail.kernel.org"
+        id S1728098AbfGZNoV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jul 2019 09:44:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52534 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387530AbfGZNpQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jul 2019 09:45:16 -0400
+        id S1728082AbfGZNoV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Jul 2019 09:44:21 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AAC9122CC2;
-        Fri, 26 Jul 2019 13:45:14 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7416E22CBF;
+        Fri, 26 Jul 2019 13:44:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564148715;
-        bh=6H3V95Rkj95ytRF6BwwNX/yuyl+ZuXbdxk8+F232DmU=;
+        s=default; t=1564148660;
+        bh=Ucqr2C+XMCRm+Qzt8YSulePDv+pQyMACI3l8ABCE9pc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UpGM8bGoLlPWD1b+1oPXRhPB3aUJlc3Vba/3Fa/U0cpV+o5y8EGG7Gneazy6mxScl
-         uDuBsnwVtxBoaKS57aCw1M0Fg4IeAWMtbBXaIG09p7d+06D5L/UYwD7sGL3ZYUWoyt
-         bk9/LInYYZWvMHgXRmrtL6DjS/oAjODeuV/q7Mfg=
+        b=qBvJfxxq+7epw8jABRLaZmCDrlwk6uT+0uhq80sFCx2hZ40ytA1wrf494RleKab+n
+         eDt9MP99fAByyNu59JSiH1B+2koYGWkQBzcks8EvLAUMi0Voy534vKHnD1QgNOUnxv
+         XEsSoaOLovQyYorDB0A6PsMzW3zKzNIlZ3C6mj7k=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Denis Efremov <efremov@ispras.ru>, Willy Tarreau <w@1wt.eu>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 26/30] floppy: fix div-by-zero in setup_format_params
-Date:   Fri, 26 Jul 2019 09:44:28 -0400
-Message-Id: <20190726134432.12993-26-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 30/37] floppy: fix div-by-zero in setup_format_params
+Date:   Fri, 26 Jul 2019 09:43:25 -0400
+Message-Id: <20190726134332.12626-30-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190726134432.12993-1-sashal@kernel.org>
-References: <20190726134432.12993-1-sashal@kernel.org>
+In-Reply-To: <20190726134332.12626-1-sashal@kernel.org>
+References: <20190726134332.12626-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -91,10 +91,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+)
 
 diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 6914c6e1e1a8..bb9b50d1d828 100644
+index 3ea9c3e9acb3..4c6c20376a83 100644
 --- a/drivers/block/floppy.c
 +++ b/drivers/block/floppy.c
-@@ -2113,6 +2113,9 @@ static void setup_format_params(int track)
+@@ -2114,6 +2114,9 @@ static void setup_format_params(int track)
  	raw_cmd->kernel_data = floppy_track_buffer;
  	raw_cmd->length = 4 * F_SECT_PER_TRACK;
  
@@ -104,7 +104,7 @@ index 6914c6e1e1a8..bb9b50d1d828 100644
  	/* allow for about 30ms for data transport per track */
  	head_shift = (F_SECT_PER_TRACK + 5) / 6;
  
-@@ -3235,6 +3238,8 @@ static int set_geometry(unsigned int cmd, struct floppy_struct *g,
+@@ -3238,6 +3241,8 @@ static int set_geometry(unsigned int cmd, struct floppy_struct *g,
  	/* sanity checking for parameters. */
  	if (g->sect <= 0 ||
  	    g->head <= 0 ||
