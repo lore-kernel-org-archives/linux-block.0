@@ -2,169 +2,80 @@ Return-Path: <SRS0=8nuL=VY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98705C7618B
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 05:55:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C9EEC41514
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 10:16:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 739DB20840
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 05:55:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FA9321655
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 10:16:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728250AbfG0FzL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Jul 2019 01:55:11 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3181 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726197AbfG0FzL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jul 2019 01:55:11 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 90ECAACDCD1F5D8835B8;
-        Sat, 27 Jul 2019 13:55:09 +0800 (CST)
-Received: from [127.0.0.1] (10.177.31.14) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Sat, 27 Jul 2019
- 13:55:06 +0800
-Subject: Re: [RFC PATCH 0/3] md: export internal stats through debugfs
-To:     Bob Liu <bob.liu@oracle.com>, <linux-raid@vger.kernel.org>,
-        <songliubraving@fb.com>
-CC:     <neilb@suse.com>, <linux-block@vger.kernel.org>,
-        <snitzer@redhat.com>, <agk@redhat.com>, <dm-devel@redhat.com>,
-        <linux-kernel@vger.kernel.org>
-References: <20190702132918.114818-1-houtao1@huawei.com>
- <1ebcf2e8-f3ce-7417-4060-b9264a5a4e51@oracle.com>
-From:   Hou Tao <houtao1@huawei.com>
-Message-ID: <9e74accf-14c6-91f7-55ca-6bdabe0fb878@huawei.com>
-Date:   Sat, 27 Jul 2019 13:55:06 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.8.0
+        id S1728795AbfG0KQB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Jul 2019 06:16:01 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:54462 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728407AbfG0KQB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 Jul 2019 06:16:01 -0400
+Received: by mail-io1-f71.google.com with SMTP id n8so61567632ioo.21
+        for <linux-block@vger.kernel.org>; Sat, 27 Jul 2019 03:16:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=x2XPPyWw+kTQEvjXcX/vC5JNb6a5vMqFuiwlUWd2Kag=;
+        b=NfTnGzBgaoXnNdC09WciXZI7gc02epU27QYm0vZ3eHc8wrpM6Ch45s4YewpDLlgpGa
+         cVSsFofsmG7mLQDWawiu2fIzQ3dv3GGFTRfWB9tAsb5+c131EzNm+SlN04DYpNKxnX2x
+         F48lCQNilcFEWBJ2hU6EF7XEf0u1U2j1xw7beSL61nZarVQanW4tl1ba0FsO8GOuc4W5
+         lIezAHIY1fVe0XeKlmbMwu/g/JZhnr+DV2B2oyC39o59gh52gx4YN1/AnioO5Wre6Bza
+         7Wo5EBjtiW0/K3XU9T2MwfKjGMSU5bmkPbpOf99A0/rn0+SZ9DgVQ3aHpD6+y9w84sWL
+         b67w==
+X-Gm-Message-State: APjAAAWubRD9jii9eNSwIG/AdZsxkHtXksKyh4bRQ/ia+/udbxJDtFNg
+        +Y6UD8kWUdaoP8mnYsK5QyvcOGJPn/lL0+cdJIBVJhSLGAEy
+X-Google-Smtp-Source: APXvYqyUUXRwrDhv+Q8VwK3XJ+lyMBkXhuGvc/B+mH+HMjh06Rq3S9TIzl2shA7qpymnG5hvTqwSBsZorpk8Y0tjAKx1u9bCuJWS
 MIME-Version: 1.0
-In-Reply-To: <1ebcf2e8-f3ce-7417-4060-b9264a5a4e51@oracle.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.177.31.14]
-X-CFilter-Loop: Reflected
+X-Received: by 2002:a5d:994b:: with SMTP id v11mr46002856ios.165.1564222560256;
+ Sat, 27 Jul 2019 03:16:00 -0700 (PDT)
+Date:   Sat, 27 Jul 2019 03:16:00 -0700
+In-Reply-To: <000000000000111cbe058dc7754d@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000dc874058ea6f261@google.com>
+Subject: Re: memory leak in new_inode_pseudo (2)
+From:   syzbot <syzbot+e682cca30bc101a4d9d9@syzkaller.appspotmail.com>
+To:     axboe@fb.com, axboe@kernel.dk, catalin.marinas@arm.com,
+        davem@davemloft.net, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        michaelcallahan@fb.com, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+syzbot has bisected this bug to:
 
-On 2019/7/23 7:30, Bob Liu wrote:
-> On 7/2/19 9:29 PM, Hou Tao wrote:
->> Hi,
->>
->> There are so many io counters, stats and flags in md, so I think
->> export these info to userspace will be helpful for online-debugging,
-> 
-> For online-debugging, I'd suggest you have a try eBPF which can be very helpful.
-> 
+commit a21f2a3ec62abe2e06500d6550659a0ff5624fbb
+Author: Michael Callahan <michaelcallahan@fb.com>
+Date:   Tue May 3 15:12:49 2016 +0000
 
-Thanks for your suggestion. Using an eBPF program to read these internal status
-from a host which is fully under your control is a good choice, but when
-the dependencies of an eBPF program (e.g., the minor version of the kernel
-and the kernel configuration which will influence the struct layout) is
-out-of-your-control, it's not a good choice.
+     block: Minor blk_account_io_start usage cleanup
 
-Thanks,
-Tao
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13565e92600000
+start commit:   be8454af Merge tag 'drm-next-2019-07-16' of git://anongit...
+git tree:       upstream
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=10d65e92600000
+console output: https://syzkaller.appspot.com/x/log.txt?x=17565e92600000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d23a1a7bf85c5250
+dashboard link: https://syzkaller.appspot.com/bug?extid=e682cca30bc101a4d9d9
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=155c5800600000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1738f800600000
 
-> -Bob
-> 
->> especially when the vmlinux file and the crash utility are not
->> available. And these info can also be utilized during code
->> understanding.
->>
->> MD has already exported some stats through sysfs files under
->> /sys/block/mdX/md, but using sysfs file to export more internal
->> stats are not a good choice, because we need to create a single
->> sysfs file for each internal stat according to the use convention
->> of sysfs and there are too many internal stats. Further, the
->> newly-created sysfs files would become APIs for userspace tools,
->> but that is not we wanted, because these files are related with
->> internal stats and internal stats may change from time to time.
->>
->> And I think debugfs is a better choice. Because we can show multiple
->> related stats in a debugfs file, and the debugfs file will never be
->> used as an userspace API.
->>
->> Two debugfs files are created to expose these internal stats:
->> * iostat: io counters and io related stats (e.g., mddev->active_io,
->> 	r1conf->nr_pending, or r1confi->retry_list)
->> * stat: normal stats/flags (e.g., mddev->recovery, conf->array_frozen)
->>
->> Because internal stats are spreaded all over md-core and md-personality,
->> so both md-core and md-personality will create these two debugfs files
->> under different debugfs directory.
->>
->> Patch 1 factors out the debugfs files creation routine for md-core and
->> md-personality, patch 2 creates two debugfs files: iostat & stat under
->> /sys/kernel/debug/block/mdX for md-core, and patch 3 creates two debugfs
->> files: iostat & stat under /sys/kernel/debug/block/mdX/raid1 for md-raid1.
->>
->> The following lines show the hierarchy and the content of these debugfs
->> files for a RAID1 device:
->>
->> $ pwd
->> /sys/kernel/debug/block/md0
->> $ tree
->> .
->> ├── iostat
->> ├── raid1
->> │   ├── iostat
->> │   └── stat
->> └── stat
->>
->> $ cat iostat
->> active_io 0
->> sb_wait 0 pending_writes 0
->> recovery_active 0
->> bitmap pending_writes 0
->>
->> $ cat stat
->> flags 0x20
->> sb_flags 0x0
->> recovery 0x0
->>
->> $ cat raid1/iostat
->> retry_list active 0
->> bio_end_io_list active 0
->> pending_bio_list active 0 cnt 0
->> sync_pending 0
->> nr_pending 0
->> nr_waiting 0
->> nr_queued 0
->> barrier 0
->>
->> $ cat raid1/stat
->> array_frozen 0
->>
->> I'm not sure whether the division of internal stats is appropriate and
->> whether the internal stats in debugfs files are sufficient, so questions
->> and comments are weclome.
->>
->> Regards,
->> Tao
->>
->> Hou Tao (3):
->>   md-debugfs: add md_debugfs_create_files()
->>   md: export inflight io counters and internal stats in debugfs
->>   raid1: export inflight io counters and internal stats in debugfs
->>
->>  drivers/md/Makefile     |  2 +-
->>  drivers/md/md-debugfs.c | 35 ++++++++++++++++++
->>  drivers/md/md-debugfs.h | 16 +++++++++
->>  drivers/md/md.c         | 65 ++++++++++++++++++++++++++++++++++
->>  drivers/md/md.h         |  1 +
->>  drivers/md/raid1.c      | 78 +++++++++++++++++++++++++++++++++++++++++
->>  drivers/md/raid1.h      |  1 +
->>  7 files changed, 197 insertions(+), 1 deletion(-)
->>  create mode 100644 drivers/md/md-debugfs.c
->>  create mode 100644 drivers/md/md-debugfs.h
->>
-> 
-> 
-> .
-> 
+Reported-by: syzbot+e682cca30bc101a4d9d9@syzkaller.appspotmail.com
+Fixes: a21f2a3ec62a ("block: Minor blk_account_io_start usage cleanup")
 
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
