@@ -8,102 +8,142 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE39C433FF
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 18:26:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 925FCC76186
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 18:53:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12E982087C
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 18:26:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FD9120840
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 18:53:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jM5kJK/Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ix+I4uDU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388074AbfG0S0j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Jul 2019 14:26:39 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:38633 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388044AbfG0S0j (ORCPT
+        id S2388088AbfG0Sxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Jul 2019 14:53:46 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:37160 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387794AbfG0Sxp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jul 2019 14:26:39 -0400
-Received: by mail-pg1-f193.google.com with SMTP id f5so17433895pgu.5;
-        Sat, 27 Jul 2019 11:26:38 -0700 (PDT)
+        Sat, 27 Jul 2019 14:53:45 -0400
+Received: by mail-pf1-f195.google.com with SMTP id 19so26020583pfa.4;
+        Sat, 27 Jul 2019 11:53:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=0/WFTXFh8VdFeha4sOv1sy8hRLL0ZORE8CbLTzAFxDU=;
-        b=jM5kJK/QG896IzPX8gLWoIbGB1GZb4bGfTFin1fzKFOk4db0gRJwIe1CP5hvXFVGgz
-         JN+iZkM/AstYm00x0Y6l2ey4CN3v1VD285jZ4leXt6IiT+54qApHgq0UaSffo3Fr6Gz6
-         WJ5VsVEtmhv4fRe0LgiHx1nnTBlEc95P5H7XMG3fqA/R2o5STmfP8sqe2IoZiRuIz0fr
-         xOpIJ3YzycIftBxYSto+u5ZFyZ2bdTrxcS2IDiQpzazSGzSgeizQgG4r2h/RJkVW4r2w
-         Hf4B6p2vV6cmdAfMIKIKkGG2bL1bn2HxJu2mvyGVyjOwIG6WnB3l9uj3AMjXM5mQ5sEu
-         6asQ==
+        h=from:to:cc:subject:date:message-id;
+        bh=y3DnasAilMtI3RHpffbNTgKJ99rymltM1iusWTe3er4=;
+        b=Ix+I4uDUS+gstrellW1g3Ojk4+fwQ2/s3x9Iu03wCV2yR0JJ5oQDgFZOeqTuyGDrny
+         EuiEnHsq8/vKBvSOmZFZNYgbsAj5t3Df70F9XY+1FyTQXCxi9ko9ktlCVNJql+pyiEfK
+         aGaWBAkqEyp8t1mfUMmMnoBoATOQ3qzoWSC6i+oraTxhAFL/BbqkIlDwiNRb4+F/rWp7
+         /h4UK1pDWIa5HGI8yq51vQx1QV3PaHRUKNEwoRC6WaCOJxuTkBsQt1Gq6yYarZJsJ5we
+         J8aiugN7hfvWBo9+a+LDXnyNur2GOzWOBj4QLKPe7ohqfhzvEWYm1k+bB/JQFtGXtA3r
+         4xTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=0/WFTXFh8VdFeha4sOv1sy8hRLL0ZORE8CbLTzAFxDU=;
-        b=KgDVUPJSNFKi6G5iDa8NQ8+k8IU0DsVFdGY0C6iH+zGVqKHiJ2h/ul/MqK8uAYSJjR
-         rRwowqvc0qF+odhjA698jfowplrJqPh0nORoqVA6IVNLH78GpfA/Nju9/v6SYx/bgyaR
-         Za1NotlA8WMJ5klPNBfyLK5zIws7dAOOfuwubnuFajHg2q//ux9NUZkZQi1aZcg2aKui
-         jNhfchBOT2XL+8DYEh9gGrNzpbZpOXlCq7lYRv5qwTFdFW1lYCYTkpodPjok/9QlamZp
-         DAYBuRaogANFasmFoG0NUo5F8EdFqtfod0cuzJxXS1NW7nHzell4eQw9nHJrOLSROVSo
-         ujGw==
-X-Gm-Message-State: APjAAAUR/lodS6KUmMyGkPEiKhhRCGZil1zDl6JooHlsTzil4TbB1WVd
-        OzE9V2r74umsxRTYkuSXX5oo8HctNE4=
-X-Google-Smtp-Source: APXvYqzW8q1PgFJz1qu0su24N6Jk/O2UxB7FTG/76lB0tPQi6e1h2r2jUUkLDfIuu7O6sMS1A/wkfw==
-X-Received: by 2002:a63:d741:: with SMTP id w1mr22068419pgi.155.1564251998108;
-        Sat, 27 Jul 2019 11:26:38 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=y3DnasAilMtI3RHpffbNTgKJ99rymltM1iusWTe3er4=;
+        b=E9tvL7LgYtG28qoqvFbpi+tlr9+FIHGpbeuZx9xZw9oASIFO9Le4Y7MyHUIbwiGcrb
+         v4I/tJkbUMC7hkEHIwuewnMInsnG3N3/xVduBOyUegFldr3JG+hR7nGs+tuYNa8fy/GY
+         57fLt2nE6DryiULMlgdRcVVT75qRf9MSrwJz7XRh8tnpTB0OS76++gO0IGXr2b6bA+Fg
+         TTonE4kNbDIB/WPziWxUa40DxBSA4GMnWJZ86a76h77ohyDtBDzG4/jDdbdMpcwmA+1u
+         mgaVPP8GYUCsiIaJqtZs/3IjZJDZCgW7fwAaryS6t6AOiLrKRBqXJCT/xZ0xAbK9a7cH
+         rs2w==
+X-Gm-Message-State: APjAAAWpjskDbYXKLo/DvALdB7l12IyuhwMnnM7FJKg7QFm/BOIrK20i
+        miqxCelbrJdQ2HucjnoG1Von/3dVJN8=
+X-Google-Smtp-Source: APXvYqxYevqHhJ6dt1EzQWwOWP8c4KB8DdOUpnfAfnIMcQ6mqofCdtY7VyEV2Cy2pdWlVImmnMp1CQ==
+X-Received: by 2002:a62:2f06:: with SMTP id v6mr28749668pfv.195.1564253624486;
+        Sat, 27 Jul 2019 11:53:44 -0700 (PDT)
 Received: from localhost.localdomain ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id w4sm75161780pfn.144.2019.07.27.11.26.35
+        by smtp.gmail.com with ESMTPSA id j10sm22023163pfn.188.2019.07.27.11.53.40
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sat, 27 Jul 2019 11:26:37 -0700 (PDT)
+        Sat, 27 Jul 2019 11:53:43 -0700 (PDT)
 From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Klaus Birkelund <klaus@birkelund.eu>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
-Subject: [PATCH 2/2] lightnvm: print error when target is not found
-Date:   Sun, 28 Jul 2019 03:26:26 +0900
-Message-Id: <20190727182626.27991-3-minwoo.im.dev@gmail.com>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Euihyeok Kwon <eh81.kwon@samsung.com>,
+        Sarah Cho <sohyeon.jo@samsung.com>,
+        Sanggwan Lee <sanggwan.lee@samsung.com>,
+        Gyeongmin Nam <gm.nam@samsung.com>,
+        Sungjun Park <sj1228.park@samsung.com>,
+        Minwoo Im <minwoo.im@samsung.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        MPT-FusionLinux.pdl@broadcom.com,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: [RESEND PATCH] mpt3sas: support target smid for [abort|query] task
+Date:   Sun, 28 Jul 2019 03:53:37 +0900
+Message-Id: <20190727185337.19299-1-minwoo.im.dev@gmail.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190727182626.27991-1-minwoo.im.dev@gmail.com>
-References: <20190727182626.27991-1-minwoo.im.dev@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If userspace requests target to be removed, nvm_remove_tgt() will
-iterate the nvm_devices to find out the given target, but if not
-found, then it should print out the error.
+From: Minwoo Im <minwoo.im@samsung.com>
 
-Cc: Matias Bjørling <mb@lightnvm.io>
-Cc: Javier González <javier@javigon.com>
+From: Minwoo Im <minwoo.im@samsung.com>
+
+We can request task management IOCTL command(MPI2_FUNCTION_SCSI_TASK_MGMT)
+to /dev/mpt3ctl.  If the given task_type is either abort task or query
+task, it may need a field named "Initiator Port Transfer Tag to Manage"
+in the IU.
+
+Current code does not support to check target IPTT tag from the
+tm_request.  This patch introduces to check TaskMID given from the
+userspace as a target tag.  We have a rule of relationship between
+(struct request *req->tag) and smid in mpt3sas_base.c:
+
+3318 u16
+3319 mpt3sas_base_get_smid_scsiio(struct MPT3SAS_ADAPTER *ioc, u8 cb_idx,
+3320         struct scsi_cmnd *scmd)
+3321 {
+3322         struct scsiio_tracker *request = scsi_cmd_priv(scmd);
+3323         unsigned int tag = scmd->request->tag;
+3324         u16 smid;
+3325
+3326         smid = tag + 1;
+
+So if we want to abort a request tagged #X, then we can pass (X + 1) to
+this IOCTL handler.  Otherwise, user space just can pass 0 TaskMID to
+abort the first outstanding smid which is legacy behaviour.
+
+Cc: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
+Cc: Sathya Prakash <sathya.prakash@broadcom.com>
+Cc: James E.J. Bottomley <jejb@linux.ibm.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: MPT-FusionLinux.pdl@broadcom.com
+Signed-off-by: Minwoo Im <minwoo.im@samsung.com>
+Acked-by: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
 Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
 ---
- drivers/lightnvm/core.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/scsi/mpt3sas/mpt3sas_ctl.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 4c7b48f72e80..4c89a2420a51 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -494,8 +494,11 @@ static int nvm_remove_tgt(struct nvm_ioctl_remove *remove)
+diff --git a/drivers/scsi/mpt3sas/mpt3sas_ctl.c b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
+index d4ecfbbe738c..a26c5516ea3e 100644
+--- a/drivers/scsi/mpt3sas/mpt3sas_ctl.c
++++ b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
+@@ -596,8 +596,16 @@ _ctl_set_task_mid(struct MPT3SAS_ADAPTER *ioc, struct mpt3_ioctl_command *karg,
+ 		if (priv_data->sas_target->handle != handle)
+ 			continue;
+ 		st = scsi_cmd_priv(scmd);
+-		tm_request->TaskMID = cpu_to_le16(st->smid);
+-		found = 1;
++
++		/*
++		 * If the given TaskMID from the user space is zero, then the
++		 * first outstanding smid will be picked up.  Otherwise,
++		 * targeted smid will be the one.
++		 */
++		if (!tm_request->TaskMID || tm_request->TaskMID == st->smid) {
++			tm_request->TaskMID = cpu_to_le16(st->smid);
++			found = 1;
++		}
  	}
- 	up_read(&nvm_lock);
  
--	if (!t)
-+	if (!t) {
-+		pr_err("failed to remove target %s not found\n",
-+				remove->tgtname);
- 		return 1;
-+	}
- 
- 	__nvm_remove_target(t, true);
- 	kref_put(&dev->ref, nvm_free);
+ 	if (!found) {
 -- 
 2.17.1
 
