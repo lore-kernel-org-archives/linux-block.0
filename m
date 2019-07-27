@@ -3,43 +3,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A296C7618B
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 05:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98705C7618B
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 05:55:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2151E206BF
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 05:47:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 739DB20840
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jul 2019 05:55:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726046AbfG0FrZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Jul 2019 01:47:25 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:38002 "EHLO huawei.com"
+        id S1728250AbfG0FzL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Jul 2019 01:55:11 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3181 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726010AbfG0FrY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jul 2019 01:47:24 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id B11BDA591B15D1329791;
-        Sat, 27 Jul 2019 13:47:21 +0800 (CST)
-Received: from [127.0.0.1] (10.177.31.14) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Sat, 27 Jul 2019
- 13:47:20 +0800
+        id S1726197AbfG0FzL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 Jul 2019 01:55:11 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 90ECAACDCD1F5D8835B8;
+        Sat, 27 Jul 2019 13:55:09 +0800 (CST)
+Received: from [127.0.0.1] (10.177.31.14) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Sat, 27 Jul 2019
+ 13:55:06 +0800
 Subject: Re: [RFC PATCH 0/3] md: export internal stats through debugfs
-To:     Song Liu <liu.song.a23@gmail.com>
-CC:     linux-raid <linux-raid@vger.kernel.org>,
-        Song Liu <songliubraving@fb.com>, NeilBrown <neilb@suse.com>,
-        <linux-block@vger.kernel.org>, <snitzer@redhat.com>,
-        <agk@redhat.com>, <dm-devel@redhat.com>,
-        open list <linux-kernel@vger.kernel.org>
+To:     Bob Liu <bob.liu@oracle.com>, <linux-raid@vger.kernel.org>,
+        <songliubraving@fb.com>
+CC:     <neilb@suse.com>, <linux-block@vger.kernel.org>,
+        <snitzer@redhat.com>, <agk@redhat.com>, <dm-devel@redhat.com>,
+        <linux-kernel@vger.kernel.org>
 References: <20190702132918.114818-1-houtao1@huawei.com>
- <CAPhsuW6yH7np1=+e5Rgutp3m1VA0TPvtANeX=0ZdpJaRKEvBkQ@mail.gmail.com>
+ <1ebcf2e8-f3ce-7417-4060-b9264a5a4e51@oracle.com>
 From:   Hou Tao <houtao1@huawei.com>
-Message-ID: <b047c187-e4a6-a82a-3177-3da7fef2f6b8@huawei.com>
-Date:   Sat, 27 Jul 2019 13:47:19 +0800
+Message-ID: <9e74accf-14c6-91f7-55ca-6bdabe0fb878@huawei.com>
+Date:   Sat, 27 Jul 2019 13:55:06 +0800
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
  Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAPhsuW6yH7np1=+e5Rgutp3m1VA0TPvtANeX=0ZdpJaRKEvBkQ@mail.gmail.com>
+In-Reply-To: <1ebcf2e8-f3ce-7417-4060-b9264a5a4e51@oracle.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -52,13 +51,27 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi,
 
-On 2019/7/23 5:31, Song Liu wrote:
-> On Tue, Jul 2, 2019 at 6:25 AM Hou Tao <houtao1@huawei.com> wrote:
->>
+On 2019/7/23 7:30, Bob Liu wrote:
+> On 7/2/19 9:29 PM, Hou Tao wrote:
 >> Hi,
 >>
 >> There are so many io counters, stats and flags in md, so I think
 >> export these info to userspace will be helpful for online-debugging,
+> 
+> For online-debugging, I'd suggest you have a try eBPF which can be very helpful.
+> 
+
+Thanks for your suggestion. Using an eBPF program to read these internal status
+from a host which is fully under your control is a good choice, but when
+the dependencies of an eBPF program (e.g., the minor version of the kernel
+and the kernel configuration which will influence the struct layout) is
+out-of-your-control, it's not a good choice.
+
+Thanks,
+Tao
+
+> -Bob
+> 
 >> especially when the vmlinux file and the crash utility are not
 >> available. And these info can also be utilized during code
 >> understanding.
@@ -78,7 +91,7 @@ On 2019/7/23 5:31, Song Liu wrote:
 >>
 >> Two debugfs files are created to expose these internal stats:
 >> * iostat: io counters and io related stats (e.g., mddev->active_io,
->>         r1conf->nr_pending, or r1confi->retry_list)
+>> 	r1conf->nr_pending, or r1confi->retry_list)
 >> * stat: normal stats/flags (e.g., mddev->recovery, conf->array_frozen)
 >>
 >> Because internal stats are spreaded all over md-core and md-personality,
@@ -99,8 +112,8 @@ On 2019/7/23 5:31, Song Liu wrote:
 >> .
 >> ├── iostat
 >> ├── raid1
->> │   ├── iostat
->> │   └── stat
+>> │   ├── iostat
+>> │   └── stat
 >> └── stat
 >>
 >> $ cat iostat
@@ -123,28 +136,34 @@ On 2019/7/23 5:31, Song Liu wrote:
 >> nr_waiting 0
 >> nr_queued 0
 >> barrier 0
+>>
+>> $ cat raid1/stat
+>> array_frozen 0
+>>
+>> I'm not sure whether the division of internal stats is appropriate and
+>> whether the internal stats in debugfs files are sufficient, so questions
+>> and comments are weclome.
+>>
+>> Regards,
+>> Tao
+>>
+>> Hou Tao (3):
+>>   md-debugfs: add md_debugfs_create_files()
+>>   md: export inflight io counters and internal stats in debugfs
+>>   raid1: export inflight io counters and internal stats in debugfs
+>>
+>>  drivers/md/Makefile     |  2 +-
+>>  drivers/md/md-debugfs.c | 35 ++++++++++++++++++
+>>  drivers/md/md-debugfs.h | 16 +++++++++
+>>  drivers/md/md.c         | 65 ++++++++++++++++++++++++++++++++++
+>>  drivers/md/md.h         |  1 +
+>>  drivers/md/raid1.c      | 78 +++++++++++++++++++++++++++++++++++++++++
+>>  drivers/md/raid1.h      |  1 +
+>>  7 files changed, 197 insertions(+), 1 deletion(-)
+>>  create mode 100644 drivers/md/md-debugfs.c
+>>  create mode 100644 drivers/md/md-debugfs.h
+>>
 > 
-> Hi,
-> 
-> Sorry for the late reply.
-> 
-> I think these information are really debug information that we should not
-> show in /sys. Once we expose them in /sys, we need to support them
-> because some use space may start searching data from them.
-So debugfs is used to place these debug information instead of sysfs.
-
-It's OK for user-space tools to search data from these files as long as these
-tools don't expect these information to be stable. And the most possible user
-of these files would be test programs, and if some user-space tools may truly
-expect some stable information from the debugfs file, maybe we should move
-these information from debugfs to sysfs file.
-
-Regards,
-Tao
-
-> 
-> Thanks,
-> Song
 > 
 > .
 > 
