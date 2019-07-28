@@ -8,120 +8,133 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5740EC7618F
-	for <linux-block@archiver.kernel.org>; Sun, 28 Jul 2019 06:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1819BC7618B
+	for <linux-block@archiver.kernel.org>; Sun, 28 Jul 2019 06:11:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 272442075E
-	for <linux-block@archiver.kernel.org>; Sun, 28 Jul 2019 06:08:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1EFF2075E
+	for <linux-block@archiver.kernel.org>; Sun, 28 Jul 2019 06:11:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjoHpB28"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T0T69VKg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725956AbfG1GIY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Jul 2019 02:08:24 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:46392 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725875AbfG1GIY (ORCPT
+        id S1725938AbfG1GLQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Jul 2019 02:11:16 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:38367 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725875AbfG1GLQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Jul 2019 02:08:24 -0400
-Received: by mail-pg1-f196.google.com with SMTP id k189so7602633pgk.13
-        for <linux-block@vger.kernel.org>; Sat, 27 Jul 2019 23:08:23 -0700 (PDT)
+        Sun, 28 Jul 2019 02:11:16 -0400
+Received: by mail-pl1-f195.google.com with SMTP id az7so26244298plb.5
+        for <linux-block@vger.kernel.org>; Sat, 27 Jul 2019 23:11:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=5+GP7qdv+AVyCrN3vNUjydQUTuh5aKMTj137o5Nk0wI=;
-        b=LjoHpB28WYkjEQ0e344luxKvSKz+sCAQ5Q5FwKOsctT8OlhOno2Z+svuwOVgMEH7lX
-         9KPIBiavma8iI5KGlPN5nPXtwM9+W0eUGOiy1+DDxrRnKYxKwahEbesOp9zL9cai9uR9
-         sRai9LZvYeg2oF0BdiaFOF8Frb3T8i4/Nz6VH7YvedD3rUBa+f1zivJJ9YqVEtnEZPt9
-         1Ebg1Wo3Irt1TicFxs7r0ZE6Kw8opL4V27cG7k/OlzaAGEW3FJqqY2HcTkXvwhinBnCM
-         OE/ki8XdQO/0AHapyg7iyvDcB+iGQ6LZ6Pv2F465pqxpgKqN/ghLny1WfT+bF01kaEM6
-         Guhg==
+        bh=jTx7Y/r/xG8c10+KnesD9oqg8PyfoMKPyvB2yptpYzE=;
+        b=T0T69VKgrDowa6QK8xrQHhqH6KeTkaUkizdDF/ms7hr//sLK+ImJhjrcXajgXckzkw
+         /RL3y5nyZ8ex+Eq5l7xq/RCPG8Uv2XKcMYNU/F6RUP/dq1rXBOL8zFotO8wWxPzburW7
+         Ez7Yhgy/2QG1Sqb82wI9c22dFFMkYeTwt7u4IQprqqzrA9diL+WZtn3/3+KrB/q4OJOn
+         lc29MFqx+WSbki+89v3KbhBr2Y+AS2K9GRPCLyHSzG0AV0630VJtGt4QAbK8l0XpYkfM
+         BtlhxeVy2YA48afMvwpH2JVVhU4RMsVcKzoaii3JnyZkOVXVONNXwxaIp9cPdc9on1Hi
+         /1Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=5+GP7qdv+AVyCrN3vNUjydQUTuh5aKMTj137o5Nk0wI=;
-        b=c83R2/iY1LrGPFVPYBDxAm0mfDi8rPHpXGjsUg4aKN+IJfkf32DZ/u1TlPVac80UKj
-         sQ2dnI3GTggnb++aarIy18Sv65I2DU0D8Txe7u6l4v035ZWFulOzGWfs2M4Z7DayxL3K
-         PqaL52Bw/3Y2NYYXiYS7fQgwYW/njfCeg5WpuClIsNAKH8aOGc7jWYu5EHallRYMPUbQ
-         lMvvHk9GfWq/oEbNPAkEciRiBQP2Pl7CBFiiDNp8MK9YRCkq9ilDPCcInhvdg/alErE5
-         dbV/CA3EFVt1JwFLvbxws9AKlB5CdL02gWBziowZfqxp7QCLLOUhql5mwgZWkQ1AZWm/
-         b4ZQ==
-X-Gm-Message-State: APjAAAXjjYrx+swNTNvDzHLdlEdB1Q0EdzhNWIdWuuzX5/7EQ9Lx9Yev
-        fqma5QcoCeaZSPnAymifX9E=
-X-Google-Smtp-Source: APXvYqwwrwj9qfmFzHIGftxE6cZQbEcQWotZqUPPl90me1wxjRPc9+4zSKpTWnCfwnz9QYjNlIgT2Q==
-X-Received: by 2002:a62:7994:: with SMTP id u142mr30773698pfc.39.1564294103357;
-        Sat, 27 Jul 2019 23:08:23 -0700 (PDT)
+        bh=jTx7Y/r/xG8c10+KnesD9oqg8PyfoMKPyvB2yptpYzE=;
+        b=A8EUYZsr65FI2XgCiOqky7v/sKBvlBC0kazkS82KW4hkjq2tFV7+KNqVNGmKHKCT9f
+         8CGDcMiOHPbrb2joaDssp9kjHUGvFW2szrUbpsqzLbwF3l+RIzVrpFKkn2WItgqvND+b
+         CEFGtDBjcOvuZz4Y6hHBO3y6qbiGy8CKLSXREiuSXs/FU2XU0pWMrdE4vceTsO6aT20C
+         VhefuBEoBeRqVN7qVqLlMC/HF9dSX/z6ZaVsJI+DGpjgW7VRB7zty+dIpuS9FEq1ZRlC
+         DxFoSSgKd/oti2Sjf+JTmvd3N6MImLG6Gr8h96rsZsG3zdkJyXAyfYj6JjPIsfzaccuR
+         8MNQ==
+X-Gm-Message-State: APjAAAWgFMV3/VTJAoQzB88DtXy1OSTId4e6QuWD0BQtOjkruwH/ZpCs
+        ngiXeHTm1tO9xInIzZOkVzU=
+X-Google-Smtp-Source: APXvYqxjwHRG1iYcfx8/vKM+071A5gkQB6KCiyO+DIYXwp1+0rcNtBrYygx1f2ad4KOtQPSWNljKMg==
+X-Received: by 2002:a17:902:f087:: with SMTP id go7mr103757790plb.330.1564294275577;
+        Sat, 27 Jul 2019 23:11:15 -0700 (PDT)
 Received: from localhost ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id v18sm53350671pgl.87.2019.07.27.23.08.21
+        by smtp.gmail.com with ESMTPSA id s5sm36465268pfm.97.2019.07.27.23.11.14
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sat, 27 Jul 2019 23:08:22 -0700 (PDT)
-Date:   Sun, 28 Jul 2019 15:08:20 +0900
+        Sat, 27 Jul 2019 23:11:14 -0700 (PDT)
+Date:   Sun, 28 Jul 2019 15:11:12 +0900
 From:   Minwoo Im <minwoo.im.dev@gmail.com>
 To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Cc:     linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
         Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: Re: [PATCH 3/8] null_blk: add support for write-zeroes
-Message-ID: <20190728060820.GE24390@minwoo-desktop>
+Subject: Re: [PATCH 4/8] null_blk: allow memory-backed write-zeroes-req
+Message-ID: <20190728061112.GF24390@minwoo-desktop>
 References: <20190711175328.16430-1-chaitanya.kulkarni@wdc.com>
- <20190711175328.16430-4-chaitanya.kulkarni@wdc.com>
+ <20190711175328.16430-5-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190711175328.16430-4-chaitanya.kulkarni@wdc.com>
+In-Reply-To: <20190711175328.16430-5-chaitanya.kulkarni@wdc.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19-07-11 10:53:23, Chaitanya Kulkarni wrote:
-> This patch adds support to execute REQ_OP_WRITE_ZEROES operations on
-> the null_blk device when device is not memory-backed. Just like
-> REQ_OP_DISCARD we add a new module parameter to enable this support.
+On 19-07-11 10:53:24, Chaitanya Kulkarni wrote:
+> This patch adds support for memory backed REQ_OP_WRITE_ZEROES
+> operations for the null_blk request mode. We introduce two new
+> functions where we zeroout the sector(s) using memset which are part
+> of the payloadless write-zeroes request.
 > 
 > Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 > ---
->  drivers/block/null_blk_main.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+>  drivers/block/null_blk_main.c | 45 ++++++++++++++++++++++++++++++++++-
+>  1 file changed, 44 insertions(+), 1 deletion(-)
 > 
 > diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-> index 20d60b951622..65da7c2d93b9 100644
+> index 65da7c2d93b9..fca011a05277 100644
 > --- a/drivers/block/null_blk_main.c
 > +++ b/drivers/block/null_blk_main.c
-> @@ -198,6 +198,10 @@ static bool g_discard;
->  module_param_named(discard, g_discard, bool, 0444);
->  MODULE_PARM_DESC(discard, "Allow REQ_OP_DISCARD processing. Default: false");
->  
-> +static bool g_write_zeroes;
-> +module_param_named(write_zeroes, g_write_zeroes, bool, 0444);
-> +MODULE_PARM_DESC(write_zeroes, "Allow REQ_OP_WRITE_ZEROES processing. Default: false");
-> +
->  static struct nullb_device *null_alloc_dev(void);
->  static void null_free_dev(struct nullb_device *dev);
->  static void null_del_dev(struct nullb *nullb);
-> @@ -535,7 +539,10 @@ static struct nullb_device *null_alloc_dev(void)
->  	dev->zone_size = g_zone_size;
->  	dev->zone_nr_conv = g_zone_nr_conv;
->  	dev->discard = g_discard;
-> +	dev->write_zeroes = g_write_zeroes;
->  	pr_info("discard : %s\n", dev->discard ? "TRUE" : "FALSE");
-> +	pr_info("write-zeroes : %s\n", dev->write_zeroes ? "TRUE" : "FALSE");
-> +
->  	return dev;
+> @@ -725,6 +725,24 @@ static void null_free_sector(struct nullb *nullb, sector_t sector,
+>  	}
 >  }
 >  
-> @@ -1419,6 +1426,13 @@ static void null_config_discard(struct nullb *nullb)
->  	blk_queue_flag_set(QUEUE_FLAG_DISCARD, nullb->q);
->  }
->  
-> +static void null_config_write_zeroes(struct nullb *nullb)
+> +static void null_zero_sector(struct nullb_device *d, sector_t sect,
+> +			     sector_t nr_sects, bool cache)
 > +{
-> +	if (nullb->dev->write_zeroes == false)
+> +	struct radix_tree_root *root = cache ? &d->cache : &d->data;
+> +	struct nullb_page *t_page;
+> +	unsigned int offset;
+> +	void *dest;
+> +
+> +	t_page = radix_tree_lookup(root, sect >> PAGE_SECTORS_SHIFT);
+> +	if (!t_page)
+> +		return;
+> +
+> +	offset = (sect & SECTOR_MASK) << SECTOR_SHIFT;
+> +	dest = kmap_atomic(t_page->page);
+> +	memset(dest + offset, 0, SECTOR_SIZE * nr_sects);
+> +	kunmap_atomic(dest);
+> +}
+> +
+>  static struct nullb_page *null_radix_tree_insert(struct nullb *nullb, u64 idx,
+>  	struct nullb_page *t_page, bool is_cache)
+>  {
+> @@ -1026,6 +1044,25 @@ static void null_handle_discard(struct nullb *nullb, sector_t sector, size_t n)
+>  	spin_unlock_irq(&nullb->lock);
+>  }
+>  
+> +static void null_handle_write_zeroes(struct nullb *nullb, sector_t sector,
+> +				     unsigned int bytes_left)
+> +{
+> +	sector_t nr_sectors;
+> +	size_t curr_bytes;
+> +
+> +	spin_lock_irq(&nullb->lock);
+> +	while (bytes_left > 0) {
 
-Can this trivial one for the style like the others in this module ?
-	if (!nullb->dev->write_zeroes)
+Hi Chaitanya,
 
-Besides that it looks good to me :)
+Thanks for your support for this!
+
+I have a simple query here.  Is there any recommended rule about using
+the function argument to be changed inside of that function like
+_bytes_left_?  I'm not against it, but I'd like to know if it's okay to
+decrement inside of this function in code-style point-of-view.
 
 Thanks!
