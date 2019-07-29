@@ -2,149 +2,124 @@ Return-Path: <SRS0=KgRV=V2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F31C7618F
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jul 2019 01:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC08C433FF
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jul 2019 09:43:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7587206DD
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jul 2019 01:04:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="B82Lq/jH"
+	by mail.kernel.org (Postfix) with ESMTP id 350B920679
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jul 2019 09:43:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726238AbfG2BEm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Jul 2019 21:04:42 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:56114 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726216AbfG2BEl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Jul 2019 21:04:41 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6T13Z7j002189;
-        Mon, 29 Jul 2019 01:03:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=PdcdzZqByBsaJyFO6zEiMqm8RLM0rmvXzok8u84h7X0=;
- b=B82Lq/jHSPm245ufPF5M6jy2Eo6E1wZPk3U4D7Yb5mvr3xuSNflB6H5sN+awMaP5/Nx5
- /TbzU3VSBQ4la/fRMI5hdNQA8u9NbGBkC4UdGEw0tksCWU8hqsMbBUukJyQ6YrF420TU
- RWQPElUdaIj/mdBhdRahbwuZc8c8WNnR1h1XH6h7RpjEPDVy/KmdoHcpKyVLU5MMLO+6
- BwkhFag5ysFg1ATmZqnmPp/pMnh8rwoaRTzyxu/hT3vzGzUaDQDvfWmomyhjB0pq4voa
- Kcc7DZehQqFfwpxyDZ69ha2zE6pGOmd2xAMyf7ivC72uW7QsQBZCGZKmjXT4viLBEv9w 7A== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2u0e1tcfc2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Jul 2019 01:03:34 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6T12tCC124045;
-        Mon, 29 Jul 2019 01:03:34 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2u0ee3n58p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Jul 2019 01:03:33 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6T13UEn008054;
-        Mon, 29 Jul 2019 01:03:30 GMT
-Received: from [192.168.1.14] (/180.165.87.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 28 Jul 2019 18:03:30 -0700
-Subject: Re: memory leak in bio_copy_user_iov
-To:     syzbot <syzbot+03e5c8ebd22cc6c3a8cb@syzkaller.appspotmail.com>,
-        agk@redhat.com, axboe@kernel.dk, coreteam@netfilter.org,
-        davem@davemloft.net, dm-devel@redhat.com, hdanton@sina.com,
-        kaber@trash.net, kadlec@blackhole.kfki.hu,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-raid@vger.kernel.org, netdev@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, pablo@netfilter.org,
-        shli@kernel.org, snitzer@redhat.com,
-        syzkaller-bugs@googlegroups.com
-References: <000000000000aec4ec058ec71a3d@google.com>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <81dcfa59-152c-4f22-2054-615662364394@oracle.com>
-Date:   Mon, 29 Jul 2019 09:03:21 +0800
+        id S1728028AbfG2Jni (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Jul 2019 05:43:38 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42120 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728024AbfG2Jnh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jul 2019 05:43:37 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 81B4BAF40;
+        Mon, 29 Jul 2019 09:43:35 +0000 (UTC)
+Subject: Re: [PATCH 1/3] block: umem: rename LED_* macros to LEDCTRL_*
+To:     Akinobu Mita <akinobu.mita@gmail.com>, linux-block@vger.kernel.org,
+        linux-leds@vger.kernel.org, linux-scsi@vger.kernel.org
+Cc:     Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>,
+        Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+        Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1564322446-28255-1-git-send-email-akinobu.mita@gmail.com>
+ <1564322446-28255-2-git-send-email-akinobu.mita@gmail.com>
+From:   Hannes Reinecke <hare@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+ azzYF4VRJsdl+d0MCaSy8mUh
+Message-ID: <a0564cab-e690-afae-be41-ecef262c3ebf@suse.de>
+Date:   Mon, 29 Jul 2019 11:43:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <000000000000aec4ec058ec71a3d@google.com>
+In-Reply-To: <1564322446-28255-2-git-send-email-akinobu.mita@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9332 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1907290010
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9332 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1907290010
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/29/19 8:38 AM, syzbot wrote:
-> syzbot has bisected this bug to:
+On 7/28/19 4:00 PM, Akinobu Mita wrote:
+> The umem driver defines LED_* macros for MEMCTRLCMD_LEDCTRL register
+> values.  The LED_OFF and LED_ON macros conflict with the LED subsystem's
+> LED_OFF and LED_ON enums.
 > 
-> commit 664820265d70a759dceca87b6eb200cd2b93cda8
-> Author: Mike Snitzer <snitzer@redhat.com>
-> Date:   Thu Feb 18 20:44:39 2016 +0000
+> This renames these LED_* macros to LEDCTRL_* in umem driver.
 > 
->     dm: do not return target from dm_get_live_table_for_ioctl()
+> Cc: Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>
+> Cc: Jacek Anaszewski <jacek.anaszewski@gmail.com>
+> Cc: Pavel Machek <pavel@ucw.cz>
+> Cc: Dan Murphy <dmurphy@ti.com>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
+> ---
+>  drivers/block/umem.c | 20 ++++++++++----------
+>  drivers/block/umem.h | 20 ++++++++++----------
+>  2 files changed, 20 insertions(+), 20 deletions(-)
 > 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-This(and previous bisection) look not related to the reported leak.
+Cheers,
 
-
-A possible reason may be KASAN can't recognize the failure path of bio_alloc_bioset()
-where mempool_free() is called but not kmalloc(p).
-
-But it's not a real bug, because we have the condition if (nr_iovecs > inline_vecs).
-
-Below fix may avoid the syzbot bug report..
-
-diff --git a/block/bio.c b/block/bio.c
-index 4db1008..04a7879 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -513,8 +513,10 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
-                        bvl = bvec_alloc(gfp_mask, nr_iovecs, &idx, &bs->bvec_pool);
-                }
- 
--               if (unlikely(!bvl))
--                       goto err_free;
-+               if (unlikely(!bvl)) {
-+                       mempool_free(p, &bs->bio_pool);
-+                       return NULL;
-+               }
- 
-                bio->bi_flags |= idx << BVEC_POOL_OFFSET;
-        } else if (nr_iovecs) {
-@@ -525,10 +527,6 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
-        bio->bi_max_vecs = nr_iovecs;
-        bio->bi_io_vec = bvl;
-        return bio;
--
--err_free:
--       mempool_free(p, &bs->bio_pool);
--       return NULL;
- }
- EXPORT_SYMBOL(bio_alloc_bioset);
-
-
-Regards, -Bob
-
-> bisection log:  https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_x_bisect.txt-3Fx-3D13f4eb64600000&d=DwIBaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=NfGQRVxYCfZacAKiml9Wue-G1r2h8qkuAhAMOx_uFcc&s=MNjYy_nft_s0ErmK2n89p7y2yhKmeWlxWch0z7_dsm8&e=start commit:   0011572c Merge branch 'for-5.2-fixes' of git://git.kernel...
-> git tree:       upstream
-> final crash:    https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_x_report.txt-3Fx-3D100ceb64600000&d=DwIBaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=NfGQRVxYCfZacAKiml9Wue-G1r2h8qkuAhAMOx_uFcc&s=iviPOQNPEIjkuqBma_VWEQ9l1Ve3eOiTwads42E4ZPo&e=console output: https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_x_log.txt-3Fx-3D17f4eb64600000&d=DwIBaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=NfGQRVxYCfZacAKiml9Wue-G1r2h8qkuAhAMOx_uFcc&s=MBwnFwjEcSQfYymfv8EYt_EawVdK9vD-OAqDMutO-YY&e=kernel config:  https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_x_.config-3Fx-3Dcb38d33cd06d8d48&d=DwIBaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=NfGQRVxYCfZacAKiml9Wue-G1r2h8qkuAhAMOx_uFcc&s=SqmDUenNFS-961PGgiMW5mIUv0nIBrf0oBrzUxYZ8Do&e=dashboard link:
-> https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_bug-3Fextid-3D03e5c8ebd22cc6c3a8cb&d=DwIBaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=NfGQRVxYCfZacAKiml9Wue-G1r2h8qkuAhAMOx_uFcc&s=jKd2ocY5X94uyB8Or-OC3yffbOgClPQPlXqFnLzvvSY&e=syz repro:      https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_x_repro.syz-3Fx-3D13244221a00000&d=DwIBaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=NfGQRVxYCfZacAKiml9Wue-G1r2h8qkuAhAMOx_uFcc&s=K-C39Kcd1oEOtJKwnby-s1EyEZZA10mr9bcXZ0J9Kh0&e=C reproducer:   https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_x_repro.c-3Fx-3D117b2432a00000&d=DwIBaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=NfGQRVxYCfZacAKiml9Wue-G1r2h8qkuAhAMOx_uFcc&s=7J685CwQN6_FA2KgO3Vgy1msF0zi5O0OqZj_bgvEqBE&e=
-> Reported-by: syzbot+03e5c8ebd22cc6c3a8cb@syzkaller.appspotmail.com
-> Fixes: 664820265d70 ("dm: do not return target from dm_get_live_table_for_ioctl()")
-> 
-> For information about bisection process see: https://urldefense.proofpoint.com/v2/url?u=https-3A__goo.gl_tpsmEJ-23bisection&d=DwIBaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=NfGQRVxYCfZacAKiml9Wue-G1r2h8qkuAhAMOx_uFcc&s=rs52TkiEQCrV4V8YQa2wT55HD8E-0AX9pn7MNIDcje4&e=
-
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
