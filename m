@@ -2,199 +2,327 @@ Return-Path: <SRS0=ZBGg=V3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA7FC433FF
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 13:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF470C0650F
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 13:36:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 748A22064A
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 13:35:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hUFM9W8G"
+	by mail.kernel.org (Postfix) with ESMTP id A36DA2089E
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 13:36:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726133AbfG3Nfb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jul 2019 09:35:31 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:46633 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725889AbfG3Nfb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jul 2019 09:35:31 -0400
-Received: by mail-pl1-f194.google.com with SMTP id c2so28883455plz.13;
-        Tue, 30 Jul 2019 06:35:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=D0myQa878LoDhB10dhpZ38+k3ChAHNGIV6DAjCm92ls=;
-        b=hUFM9W8Gj4mPlzEJyOjPQiGt5ZeJSZ4NBK0060jBEGBRBh3AR5QYMJiQZr1LaqWQD+
-         SBjZBnkB72KzONPwvYCsT/HhUapKkqVx1MEL1mLT8lhPsAq+YSXi/MnjxrQ4GaYehGsO
-         GrYFacs5UiwMYucENV4vGKFCJPHvJ5LAEvnaph3Unn9lxxOlYKbmiA1yNdu7nA6ycsIr
-         VBRkw7M9nMn6NlE2IfaxmU2mb3C9pnssOSe+Tnx5KewLH39cb58fhjVX6+U+fkVhb5PR
-         p+KVh4Wg9GS3/u8fcU4RmKessByo7eQSEIH0AR2W186hP/gbfwnFlRZhi27dwVsje0eZ
-         tUtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=D0myQa878LoDhB10dhpZ38+k3ChAHNGIV6DAjCm92ls=;
-        b=llSqXFQFd7yhUAJIVfjxEOMYYqyF8wjV0/aYST5PnC1gFHCOioyg9Su3ohcV1A4xfR
-         M5MsZjOo/WMEr812UYuNmj7jVoMFcq7U3rxvqlSwneBRkfOhrYx56hfqxEsxYmEOUuAR
-         ez+kQt/MCsCpg5RokOe32ldnEu9Yf8fbW4NJ/m0/xoC+okmxZg3g8DFtZNizoMD1AAec
-         Mr0p5q7L+itkYVnFDm6Gqnv3Ni3NTEakxMIMZrx3ViqLL3cvpMNEk+QmttRLkRR7hngC
-         dz6LIPLDb7uJRUCGg2ZLN2L+o4D3TRPr7CR7uIoEBWmhIMlQhYTWzX7aD51uDsWxad6W
-         W3xQ==
-X-Gm-Message-State: APjAAAWehQ5dMtcb8JuHJC7YltASNG2iTp8xhA0uuV0rpv0qEdqb5fVX
-        dT+onUDFIrtmXSKXWaIldKo=
-X-Google-Smtp-Source: APXvYqywgDjfpG/mRBois7D/7Z/tVtbteNVt5H2Bw8ZXuMw2EIqqPAX9RIhBUWbFXCxtOA5LZl1auA==
-X-Received: by 2002:a17:902:a409:: with SMTP id p9mr116469763plq.218.1564493730500;
-        Tue, 30 Jul 2019 06:35:30 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id u3sm58383392pjn.5.2019.07.30.06.35.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Jul 2019 06:35:29 -0700 (PDT)
-Subject: Re: [PATCH] bfq: Check if bfqq is NULL in bfq_insert_request
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Hsin-Yi Wang <hsinyi@google.com>,
-        Nicolas Boichat <drinkcat@chromium.org>,
-        Doug Anderson <dianders@chromium.org>
-References: <1563816648-12057-1-git-send-email-linux@roeck-us.net>
- <20190728151931.GA29181@roeck-us.net>
- <0BCD5EDA-6D08-4023-9EEA-087F0AB99D47@linaro.org>
-From:   Guenter Roeck <linux@roeck-us.net>
-Message-ID: <23890163-facd-3838-ddee-770b7c2f32ea@roeck-us.net>
-Date:   Tue, 30 Jul 2019 06:35:28 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726118AbfG3NgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jul 2019 09:36:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42312 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727860AbfG3NgK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jul 2019 09:36:10 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id EBA47ABF1;
+        Tue, 30 Jul 2019 13:36:07 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 552FC1E440D; Tue, 30 Jul 2019 15:36:07 +0200 (CEST)
+Date:   Tue, 30 Jul 2019 15:36:07 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     John Lenton <john.lenton@canonical.com>
+Cc:     Jan Kara <jack@suse.cz>, Kai-Heng Feng <kaihengfeng@me.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        linux-block@vger.kernel.org, jean-baptiste.lallement@canonical.com
+Subject: Re: [PATCH] loop: Don't change loop device under exclusive opener
+Message-ID: <20190730133607.GD28829@quack2.suse.cz>
+References: <20190516140127.23272-1-jack@suse.cz>
+ <50edd0fa-9cfa-38e1-8870-0fbc5c618522@kernel.dk>
+ <20190527122915.GB9998@quack2.suse.cz>
+ <b0f27980-be75-bded-3e74-bce14fc7ea47@kernel.dk>
+ <894DDAA8-2ADD-467C-8E4F-4DE6B9A50625@me.com>
+ <20190730092939.GB28829@quack2.suse.cz>
+ <CAL1QPZQWDx2YEAP168C+Eb4g4DmGg8eOBoOqkbUOBKTMDc9gjg@mail.gmail.com>
+ <20190730101646.GC28829@quack2.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <0BCD5EDA-6D08-4023-9EEA-087F0AB99D47@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="XsQoSWH+UP9D9v3l"
+Content-Disposition: inline
+In-Reply-To: <20190730101646.GC28829@quack2.suse.cz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/30/19 1:55 AM, Paolo Valente wrote:
-> Hi Guenter,
-> sorry for the delay (Dolomiti's fault).
-> 
-> I didn't consider that rq->elv-icq might have been NULL also
-> because of OOM.  Thanks for spotting this issue.
-> 
-> As for the other places where the return value of bfq_init_rq is used,
-> unfortunately I think they matter too.  Those other places are related
-> to request merging, which is the alternative destiny of requests
-> (instead of being just inserted).  But, regardless of whether a
-> request is to be merged or inserted, that request may be destined to a
-> bfq_queue (possibly merged with a request already in a bfq_queue), and
-> a NULL return value by bfq_init_rq leads to a crash.  I guess you can
-> reproduce your failure also for the merge case, by generating
-> sequential, direct I/O with queue depth > 1, and of course by enabling
-> failslab.
-> 
-My assumption was that requests would only be merged if they are associated
-with the same io context. In that case, that IO context isn't reallocated
-with ioc_create_icq() but reused, and icq would thus never be NULL.
-I guess that assumption was wrong.
 
-> If my considerations above are correct, do you want to propose a
-> complete fix yourself?
-> 
+--XsQoSWH+UP9D9v3l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Sure, I'll send an updated patch.
-
-Thanks,
-Guenter
-
-> Thanks,
-> Paolo
+On Tue 30-07-19 12:16:46, Jan Kara wrote:
+> On Tue 30-07-19 10:36:59, John Lenton wrote:
+> > On Tue, 30 Jul 2019 at 10:29, Jan Kara <jack@suse.cz> wrote:
+> > >
+> > > Thanks for the notice and the references. What's your version of
+> > > util-linux? What your test script does is indeed racy. You have there:
+> > >
+> > > echo Running:
+> > > for i in {a..z}{a..z}; do
+> > >     mount $i.squash /mnt/$i &
+> > > done
+> > >
+> > > So all mount(8) commands will run in parallel and race to setup loop
+> > > devices with LOOP_SET_FD and mount them. However util-linux (at least in
+> > > the current version) seems to handle EBUSY from LOOP_SET_FD just fine and
+> > > retries with the new loop device. So at this point I don't see why the patch
+> > > makes difference... I guess I'll need to reproduce and see what's going on
+> > > in detail.
+> > 
+> > We've observed this in arch with util-linux 2.34, and ubuntu 19.10
+> > (eoan ermine) with util-linux 2.33.
+> > 
+> > just to be clear, the initial reports didn't involve a zany loop of
+> > mounts, but were triggered by effectively the same thing as systemd
+> > booted a system with a lot of snaps. The reroducer tries to makes
+> > things simpler to reproduce :-). FWIW,  systemd versions were 244 and
+> > 242 for those systems, respectively.
 > 
->> Il giorno 28 lug 2019, alle ore 17:19, Guenter Roeck <linux@roeck-us.net> ha scritto:
->>
->> ping ... just in case this patch got lost in Paolo's queue.
->>
->> Guenter
->>
->> On Mon, Jul 22, 2019 at 10:30:48AM -0700, Guenter Roeck wrote:
->>> In bfq_insert_request(), bfqq is initialized with:
->>> 	bfqq = bfq_init_rq(rq);
->>> In bfq_init_rq(), we find:
->>> 	if (unlikely(!rq->elv.icq))
->>> 		return NULL;
->>> Indeed, rq->elv.icq can be NULL if the memory allocation in
->>> create_task_io_context() failed.
->>>
->>> A comment in bfq_insert_request() suggests that bfqq is supposed to be
->>> non-NULL if 'at_head || blk_rq_is_passthrough(rq)' is false. Yet, as
->>> debugging and practical experience shows, this is not the case in the
->>> above situation.
->>>
->>> This results in the following crash.
->>>
->>> Unable to handle kernel NULL pointer dereference
->>> 	at virtual address 00000000000001b0
->>> ...
->>> Call trace:
->>> bfq_setup_cooperator+0x44/0x134
->>> bfq_insert_requests+0x10c/0x630
->>> blk_mq_sched_insert_requests+0x60/0xb4
->>> blk_mq_flush_plug_list+0x290/0x2d4
->>> blk_flush_plug_list+0xe0/0x230
->>> blk_finish_plug+0x30/0x40
->>> generic_writepages+0x60/0x94
->>> blkdev_writepages+0x24/0x30
->>> do_writepages+0x74/0xac
->>> __filemap_fdatawrite_range+0x94/0xc8
->>> file_write_and_wait_range+0x44/0xa0
->>> blkdev_fsync+0x38/0x68
->>> vfs_fsync_range+0x68/0x80
->>> do_fsync+0x44/0x80
->>>
->>> The problem is relatively easy to reproduce by running an image with
->>> failslab enabled, such as with:
->>>
->>> cd /sys/kernel/debug/failslab
->>> echo 10 > probability
->>> echo 300 > times
->>>
->>> Avoid the problem by checking if bfqq is NULL before using it. With the
->>> NULL check in place, requests with missing io context are queued
->>> immediately, and the crash is no longer seen.
->>>
->>> Fixes: 18e5a57d79878 ("block, bfq: postpone rq preparation to insert or merge")
->>> Reported-by: Hsin-Yi Wang  <hsinyi@google.com>
->>> Cc: Hsin-Yi Wang <hsinyi@google.com>
->>> Cc: Nicolas Boichat <drinkcat@chromium.org>
->>> Cc: Doug Anderson <dianders@chromium.org>
->>> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
->>> ---
->>> block/bfq-iosched.c | 2 +-
->>> 1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->>> index 72860325245a..56f3f4227010 100644
->>> --- a/block/bfq-iosched.c
->>> +++ b/block/bfq-iosched.c
->>> @@ -5417,7 +5417,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->>>
->>> 	spin_lock_irq(&bfqd->lock);
->>> 	bfqq = bfq_init_rq(rq);
->>> -	if (at_head || blk_rq_is_passthrough(rq)) {
->>> +	if (!bfqq || at_head || blk_rq_is_passthrough(rq)) {
->>> 		if (at_head)
->>> 			list_add(&rq->queuelist, &bfqd->dispatch);
->>> 		else
->>> -- 
->>> 2.7.4
->>>
+> Thanks for info! So I think I see what's going on. The two mounts race
+> like:
 > 
+> MOUNT1					MOUNT2
+> num = ioctl(LOOP_CTL_GET_FREE)
+> 					num = ioctl(LOOP_CTL_GET_FREE)
+> ioctl("/dev/loop$num", LOOP_SET_FD, ..)
+>  - returns OK
+> 					ioctl("/dev/loop$num", LOOP_SET_FD, ..)
+> 					  - acquires exclusine loop$num
+> 					    reference
+> mount("/dev/loop$num", ...)
+>  - sees exclusive reference from MOUNT2 and fails
+> 					  - sees loop device is already
+> 					    bound and fails
 > 
+> It is a bug in the scheme I've chosen that racing LOOP_SET_FD can block
+> perfectly valid mount. I'll think how to fix this...
 
+So how about attached patch? It fixes the regression for me.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
+
+--XsQoSWH+UP9D9v3l
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment; filename="0001-loop-Fix-mount-2-failure-due-to-race-with-LOOP_SET_F.patch"
+
+From 5069263402e9daef5df1ee02576107e11bd138a6 Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Tue, 30 Jul 2019 13:10:14 +0200
+Subject: [PATCH] loop: Fix mount(2) failure due to race with LOOP_SET_FD
+
+Commit 33ec3e53e7b1 ("loop: Don't change loop device under exclusive
+opener") made LOOP_SET_FD ioctl acquire exclusive block device reference
+while it updates loop device binding. However this can make perfectly
+valid mount(2) fail with EBUSY due to racing LOOP_SET_FD holding
+temporarily the exclusive bdev reference in cases like this:
+
+for i in {a..z}{a..z}; do
+        dd if=/dev/zero of=$i.image bs=1k count=0 seek=1024
+        mkfs.ext2 $i.image
+        mkdir mnt$i
+done
+
+echo "Run"
+for i in {a..z}{a..z}; do
+        mount -o loop -t ext2 $i.image mnt$i &
+done
+
+Fix the problem by not getting full exclusive bdev reference in
+LOOP_SET_FD but instead just mark the bdev as being claimed while we
+update the binding information. This just blocks new exclusive openers
+instead of failing them with EBUSY thus fixing the problem.
+
+Fixes: 33ec3e53e7b1 ("loop: Don't change loop device under exclusive opener")
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ drivers/block/loop.c | 16 +++++-----
+ fs/block_dev.c       | 83 ++++++++++++++++++++++++++++++++++++----------------
+ include/linux/fs.h   |  6 ++++
+ 3 files changed, 73 insertions(+), 32 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 44c9985f352a..3036883fc9f8 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -924,6 +924,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	struct file	*file;
+ 	struct inode	*inode;
+ 	struct address_space *mapping;
++	struct block_device *claimed_bdev = NULL;
+ 	int		lo_flags = 0;
+ 	int		error;
+ 	loff_t		size;
+@@ -942,10 +943,11 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	 * here to avoid changing device under exclusive owner.
+ 	 */
+ 	if (!(mode & FMODE_EXCL)) {
+-		bdgrab(bdev);
+-		error = blkdev_get(bdev, mode | FMODE_EXCL, loop_set_fd);
+-		if (error)
++		claimed_bdev = bd_start_claiming(bdev, loop_set_fd);
++		if (IS_ERR(claimed_bdev)) {
++			error = PTR_ERR(claimed_bdev);
+ 			goto out_putf;
++		}
+ 	}
+ 
+ 	error = mutex_lock_killable(&loop_ctl_mutex);
+@@ -1015,15 +1017,15 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	mutex_unlock(&loop_ctl_mutex);
+ 	if (partscan)
+ 		loop_reread_partitions(lo, bdev);
+-	if (!(mode & FMODE_EXCL))
+-		blkdev_put(bdev, mode | FMODE_EXCL);
++	if (claimed_bdev)
++		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd);
+ 	return 0;
+ 
+ out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
+ out_bdev:
+-	if (!(mode & FMODE_EXCL))
+-		blkdev_put(bdev, mode | FMODE_EXCL);
++	if (claimed_bdev)
++		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd);
+ out_putf:
+ 	fput(file);
+ out:
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index c2a85b587922..22591bad9353 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1181,8 +1181,7 @@ static struct gendisk *bdev_get_gendisk(struct block_device *bdev, int *partno)
+  * Pointer to the block device containing @bdev on success, ERR_PTR()
+  * value on failure.
+  */
+-static struct block_device *bd_start_claiming(struct block_device *bdev,
+-					      void *holder)
++struct block_device *bd_start_claiming(struct block_device *bdev, void *holder)
+ {
+ 	struct gendisk *disk;
+ 	struct block_device *whole;
+@@ -1229,6 +1228,62 @@ static struct block_device *bd_start_claiming(struct block_device *bdev,
+ 		return ERR_PTR(err);
+ 	}
+ }
++EXPORT_SYMBOL(bd_start_claiming);
++
++static void bd_clear_claiming(struct block_device *whole, void *holder)
++{
++	lockdep_assert_held(&bdev_lock);
++	/* tell others that we're done */
++	BUG_ON(whole->bd_claiming != holder);
++	whole->bd_claiming = NULL;
++	wake_up_bit(&whole->bd_claiming, 0);
++}
++
++/**
++ * bd_finish_claiming - finish claiming of a block device
++ * @bdev: block device of interest
++ * @whole: whole block device (returned from bd_start_claiming())
++ * @holder: holder that has claimed @bdev
++ *
++ * Finish exclusive open of a block device. Mark the device as exlusively
++ * open by the holder and wake up all waiters for exclusive open to finish.
++ */
++void bd_finish_claiming(struct block_device *bdev, struct block_device *whole,
++			void *holder)
++{
++	spin_lock(&bdev_lock);
++	BUG_ON(!bd_may_claim(bdev, whole, holder));
++	/*
++	 * Note that for a whole device bd_holders will be incremented twice,
++	 * and bd_holder will be set to bd_may_claim before being set to holder
++	 */
++	whole->bd_holders++;
++	whole->bd_holder = bd_may_claim;
++	bdev->bd_holders++;
++	bdev->bd_holder = holder;
++	bd_clear_claiming(whole, holder);
++	spin_unlock(&bdev_lock);
++}
++EXPORT_SYMBOL(bd_finish_claiming);
++
++/**
++ * bd_abort_claiming - abort claiming of a block device
++ * @bdev: block device of interest
++ * @whole: whole block device (returned from bd_start_claiming())
++ * @holder: holder that has claimed @bdev
++ *
++ * Abort claiming of a block device when the exclusive open failed. This can be
++ * also used when exclusive open is not actually desired and we just needed
++ * to block other exclusive openers for a while.
++ */
++void bd_abort_claiming(struct block_device *bdev, struct block_device *whole,
++		       void *holder)
++{
++	spin_lock(&bdev_lock);
++	bd_clear_claiming(whole, holder);
++	spin_unlock(&bdev_lock);
++}
++EXPORT_SYMBOL(bd_abort_claiming);
+ 
+ #ifdef CONFIG_SYSFS
+ struct bd_holder_disk {
+@@ -1698,29 +1753,7 @@ int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
+ 
+ 		/* finish claiming */
+ 		mutex_lock(&bdev->bd_mutex);
+-		spin_lock(&bdev_lock);
+-
+-		if (!res) {
+-			BUG_ON(!bd_may_claim(bdev, whole, holder));
+-			/*
+-			 * Note that for a whole device bd_holders
+-			 * will be incremented twice, and bd_holder
+-			 * will be set to bd_may_claim before being
+-			 * set to holder
+-			 */
+-			whole->bd_holders++;
+-			whole->bd_holder = bd_may_claim;
+-			bdev->bd_holders++;
+-			bdev->bd_holder = holder;
+-		}
+-
+-		/* tell others that we're done */
+-		BUG_ON(whole->bd_claiming != holder);
+-		whole->bd_claiming = NULL;
+-		wake_up_bit(&whole->bd_claiming, 0);
+-
+-		spin_unlock(&bdev_lock);
+-
++		bd_finish_claiming(bdev, whole, holder);
+ 		/*
+ 		 * Block event polling for write claims if requested.  Any
+ 		 * write holder makes the write_holder state stick until
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 56b8e358af5c..997a530ff4e9 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2598,6 +2598,12 @@ extern struct block_device *blkdev_get_by_path(const char *path, fmode_t mode,
+ 					       void *holder);
+ extern struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode,
+ 					      void *holder);
++extern struct block_device *bd_start_claiming(struct block_device *bdev,
++					      void *holder);
++extern void bd_finish_claiming(struct block_device *bdev,
++			       struct block_device *whole, void *holder);
++extern void bd_abort_claiming(struct block_device *bdev,
++			      struct block_device *whole, void *holder);
+ extern void blkdev_put(struct block_device *bdev, fmode_t mode);
+ extern int __blkdev_reread_part(struct block_device *bdev);
+ extern int blkdev_reread_part(struct block_device *bdev);
+-- 
+2.16.4
+
+
+--XsQoSWH+UP9D9v3l--
