@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D656AC31E40
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 18:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04C8CC0650F
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 18:37:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B5AF62064A
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 18:37:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D68632064A
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 18:37:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728473AbfG3ShD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jul 2019 14:37:03 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:46583 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726896AbfG3ShD (ORCPT
+        id S1728513AbfG3ShE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jul 2019 14:37:04 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:40806 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726896AbfG3ShE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jul 2019 14:37:03 -0400
-Received: by mail-pl1-f193.google.com with SMTP id c2so29200796plz.13
-        for <linux-block@vger.kernel.org>; Tue, 30 Jul 2019 11:37:02 -0700 (PDT)
+        Tue, 30 Jul 2019 14:37:04 -0400
+Received: by mail-pl1-f196.google.com with SMTP id a93so29180263pla.7
+        for <linux-block@vger.kernel.org>; Tue, 30 Jul 2019 11:37:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=FFf7FfipKf4YjMmj4Z92Pfv4esvoZUAtr/L6dGQBO9E=;
-        b=lhgG21HNz6vI+w3nfW2oLEFtyieRYZaOwKu4kHh94PFukZqrgGGYBxJ80qC2OErcXY
-         kb8pUARKTTFA97WbDi+q5XB5RVqsIaoO0lz7F+CWCHV8h1IGoM4Fc6C3ftqe4FKrxs+m
-         VEH9kirnOgoBhe23JEzawemsKCk25wh4t+xZyvSnHoOQNS3QdVd6acF+MF9SNZkOE5UC
-         laFsOa/QpiPKhCFZ7ApPxgJ/NZdxMWpMrm82f9O6GlHMzNobDotCxTpu8GYcFNDRihJt
-         mCXYdKf6t70/AzORr1lbIps+g6sKwXPZ1t1Ka5NPY/2Hi6UVWRX0qKlmD9MR/T4volKI
-         6Iqg==
-X-Gm-Message-State: APjAAAVX8TfjEhSM+sdC9QsLPLDk278VmOJB3pkjtSzpnaPnWL3031oD
-        xSoag1TEcdljLTRm2tdPK1o=
-X-Google-Smtp-Source: APXvYqwAyo26Y9TJaFnBY6ERXY9Qr3fEnWJSwp4ycGOx0dKVVcHsCLTI+2I9J/E37tgOGD+uCDuh+w==
-X-Received: by 2002:a17:902:4222:: with SMTP id g31mr42057748pld.41.1564511822221;
-        Tue, 30 Jul 2019 11:37:02 -0700 (PDT)
+        bh=8PYXK4K9FmQm/Qr0PK2yNVvdfScvC1ohjK9lKgPxuIw=;
+        b=TRADkoXvwWE0aB5whTHx6Gurxa0d2dghPlcjvtIZAKanIm/pVdCYid0xuYoCrqWqgv
+         PqW7FJEPceBZNMvJB2Ht2LrBtEKhc6hsqfk2TZtN3jHUOlo5Mwqhz5mSrmq9vIdLyHXc
+         53QiyVCcj2C/ghFlXGTJOlN0EwKhc5gurvS1VobglckxqZHEq0k7/waFwFtdROl4KCKi
+         Lni3+1EjSKbk7pHEtdKSED08bythw9imxiKK2XgloDPxsGFqOgjiMAoEJrs56RPviHtg
+         2uoewVm8TeeQry5hQG/jx0ow6f7Q5vuJilBBSEF7csR7HTtJ9h3QJRLeX7p6qtyIl/Wu
+         zfig==
+X-Gm-Message-State: APjAAAWNnuUCaJZdnXfNn1g7eGpkKBOdEaPkL8YYTBrMuvvOO4WHmUp/
+        vWH/1dSgRKNoWx+jFVM8h4g=
+X-Google-Smtp-Source: APXvYqxrHZpsrtW7oGDkOtFdpf5q8hRYW7uF7idrsTfAOBt+SLGcOelmzLFOxUpXyYiU+LuiVy+uEA==
+X-Received: by 2002:a17:902:4201:: with SMTP id g1mr208520pld.300.1564511823433;
+        Tue, 30 Jul 2019 11:37:03 -0700 (PDT)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id a128sm73759777pfb.185.2019.07.30.11.37.01
+        by smtp.gmail.com with ESMTPSA id a128sm73759777pfb.185.2019.07.30.11.37.02
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 30 Jul 2019 11:37:01 -0700 (PDT)
+        Tue, 30 Jul 2019 11:37:02 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -49,10 +49,11 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Hannes Reinecke <hare@suse.com>,
         Johannes Thumshirn <jthumshirn@suse.de>,
         Alexandru Moise <00moses.alexander00@gmail.com>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: [PATCH v2 1/2] block: Verify whether blk_queue_enter() is used when necessary
-Date:   Tue, 30 Jul 2019 11:36:52 -0700
-Message-Id: <20190730183653.253579-2-bvanassche@acm.org>
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com
+Subject: [PATCH v2 2/2] block: Fix a race condition in submit_bio()
+Date:   Tue, 30 Jul 2019 11:36:53 -0700
+Message-Id: <20190730183653.253579-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.22.0.709.g102302147b-goog
 In-Reply-To: <20190730183653.253579-1-bvanassche@acm.org>
 References: <20190730183653.253579-1-bvanassche@acm.org>
@@ -63,18 +64,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It is required to protect blkg_lookup() calls with a blk_queue_enter() /
-blk_queue_exit() pair. Since it is nontrivial to verify whether this is
-the case, verify this at runtime. Only perform this verification if
-CONFIG_LOCKDEP=y to avoid that unnecessary runtime overhead is added.
+generic_make_request_checks() needs to be protected by a
+blk_queue_enter() / blk_queue_exit() pair because it calls
+blkcg_bio_issue_check() and because that last function calls
+blkg_lookup().
 
-Note: using lock_acquire()/lock_release() to verify whether blkg_lookup()
-is protected correctly is not possible since lock_acquire() and
-lock_release() must be called from the same task and since
-blk_queue_enter() and blk_queue_exit() can be called from different
-tasks.
+This patch fixes https://syzkaller.appspot.com/bug?id=ff9ab4a23afa7553fb79f745a92be87ba4144508.
 
-Suggested-by: Tejun Heo <tj@kernel.org>
+This patch also fixes the following kernel warning, triggered by
+blktests:
+
+WARNING: CPU: 5 PID: 10706 at block/blk-core.c:903 generic_make_request_checks+0x9c6/0xe60
+RIP: 0010:generic_make_request_checks+0x9c6/0xe60
+Call Trace:
+ generic_make_request+0x7a/0x5c0
+ submit_bio+0x92/0x280
+ mpage_readpages+0x2b1/0x300
+ blkdev_readpages+0x1d/0x20
+ read_pages+0xd9/0x2c0
+ __do_page_cache_readahead+0x2e0/0x310
+ force_page_cache_readahead+0xfb/0x170
+ page_cache_sync_readahead+0x28d/0x2a0
+ generic_file_read_iter+0xc13/0x1530
+ blkdev_read_iter+0x7d/0x90
+ new_sync_read+0x2c5/0x3d0
+ __vfs_read+0x7b/0x90
+ vfs_read+0xc6/0x1f0
+ ksys_read+0xc3/0x160
+ __x64_sys_read+0x43/0x50
+ do_syscall_64+0x71/0x270
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+
 Cc: Tejun Heo <tj@kernel.org>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
@@ -82,98 +102,43 @@ Cc: Hannes Reinecke <hare@suse.com>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
 Cc: Alexandru Moise <00moses.alexander00@gmail.com>
 Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
+Reported-by: syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-cgroup.c         |  2 ++
- block/blk-core.c           | 21 +++++++++++++++++++++
- include/linux/blk-cgroup.h |  2 ++
- include/linux/blkdev.h     |  8 ++++++++
- 4 files changed, 33 insertions(+)
+ block/blk-core.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 24ed26957367..04b6e962eefb 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -196,6 +196,8 @@ struct blkcg_gq *blkg_lookup_slowpath(struct blkcg *blkcg,
- {
- 	struct blkcg_gq *blkg;
- 
-+	WARN_ON_ONCE(!blk_entered_queue(q));
-+
- 	/*
- 	 * Hint didn't match.  Look up from the radix tree.  Note that the
- 	 * hint can only be updated under queue_lock as otherwise @blkg
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 5878504a29af..ff27c3080348 100644
+index ff27c3080348..cd844c54e9f1 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -389,6 +389,25 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
- }
- EXPORT_SYMBOL(blk_alloc_queue);
- 
-+#ifdef CONFIG_PROVE_LOCKING
-+/**
-+ * blk_entered_queue() - whether or not it is safe to access cgroup information
-+ * @q: request queue pointer
-+ *
-+ * In order to avoid races between accessing cgroup information and the cgroup
-+ * information removal from inside __blk_release_queue(), any code that accesses
-+ * cgroup information must be protected by a blk_queue_enter()/blk_queue_exit()
-+ * pair or must be called after queue cleanup progressed to a stage in which
-+ * only the cleanup code accesses the queue.
-+ */
-+bool blk_entered_queue(struct request_queue *q)
-+{
-+	return percpu_ref_is_dying(&q->q_usage_counter) ||
-+		!percpu_ref_is_zero(&q->q_usage_counter);
-+}
-+EXPORT_SYMBOL(blk_entered_queue);
-+#endif
+@@ -1150,6 +1150,9 @@ EXPORT_SYMBOL_GPL(direct_make_request);
+  */
+ blk_qc_t submit_bio(struct bio *bio)
+ {
++	struct request_queue *q = bio->bi_disk->queue;
++	blk_qc_t ret;
 +
- /**
-  * blk_queue_enter() - try to increase q->q_usage_counter
-  * @q: request queue pointer
-@@ -878,6 +897,8 @@ generic_make_request_checks(struct bio *bio)
- 		goto end_io;
+ 	if (blkcg_punt_bio_submit(bio))
+ 		return BLK_QC_T_NONE;
+ 
+@@ -1182,7 +1185,15 @@ blk_qc_t submit_bio(struct bio *bio)
+ 		}
  	}
  
-+	WARN_ON_ONCE(!blk_entered_queue(q));
+-	return generic_make_request(bio);
++	if (unlikely(blk_queue_enter(q, 0) < 0)) {
++		bio->bi_status = BLK_STS_IOERR;
++		bio->bi_end_io(bio);
++		return BLK_QC_T_NONE;
++	}
++	ret = generic_make_request(bio);
++	blk_queue_exit(q);
 +
- 	/*
- 	 * For a REQ_NOWAIT based request, return -EOPNOTSUPP
- 	 * if queue is not a request based queue.
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 689a58231288..397df0719bda 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -358,6 +358,8 @@ static inline struct blkcg_gq *__blkg_lookup(struct blkcg *blkcg,
- {
- 	struct blkcg_gq *blkg;
++	return ret;
+ }
+ EXPORT_SYMBOL(submit_bio);
  
-+	WARN_ON_ONCE(!blk_entered_queue(q));
-+
- 	if (blkcg == &blkcg_root)
- 		return q->root_blkg;
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 96a29a72fd4a..e57651888450 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -856,6 +856,14 @@ extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
- 
- extern int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags);
- extern void blk_queue_exit(struct request_queue *q);
-+#ifdef CONFIG_PROVE_LOCKING
-+extern bool blk_entered_queue(struct request_queue *q);
-+#else
-+static inline bool blk_entered_queue(struct request_queue *q)
-+{
-+	return true;
-+}
-+#endif
- extern void blk_sync_queue(struct request_queue *q);
- extern int blk_rq_map_user(struct request_queue *, struct request *,
- 			   struct rq_map_data *, void __user *, unsigned long,
 -- 
 2.22.0.709.g102302147b-goog
 
