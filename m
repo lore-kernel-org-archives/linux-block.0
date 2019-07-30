@@ -6,97 +6,97 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B615C433FF
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 10:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB558C433FF
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 10:16:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6417A20693
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 10:16:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E2E420693
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 10:16:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732185AbfG3KQi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jul 2019 06:16:38 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:61027 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726078AbfG3KQi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jul 2019 06:16:38 -0400
-Received: from fsav304.sakura.ne.jp (fsav304.sakura.ne.jp [153.120.85.135])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id x6UAGNlK066838;
-        Tue, 30 Jul 2019 19:16:24 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav304.sakura.ne.jp (F-Secure/fsigk_smtp/530/fsav304.sakura.ne.jp);
- Tue, 30 Jul 2019 19:16:23 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/530/fsav304.sakura.ne.jp)
-Received: from [192.168.1.8] (softbank126012062002.bbtec.net [126.12.62.2])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id x6UAGJHQ066824
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NO);
-        Tue, 30 Jul 2019 19:16:23 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+        id S1732459AbfG3KQs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jul 2019 06:16:48 -0400
+Received: from mx2.suse.de ([195.135.220.15]:46056 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726078AbfG3KQs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jul 2019 06:16:48 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id EC570AE2D;
+        Tue, 30 Jul 2019 10:16:46 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id A5DA91E440D; Tue, 30 Jul 2019 12:16:46 +0200 (CEST)
+Date:   Tue, 30 Jul 2019 12:16:46 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     John Lenton <john.lenton@canonical.com>
+Cc:     Jan Kara <jack@suse.cz>, Kai-Heng Feng <kaihengfeng@me.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        linux-block@vger.kernel.org, jean-baptiste.lallement@canonical.com
 Subject: Re: [PATCH] loop: Don't change loop device under exclusive opener
-To:     Jan Kara <jack@suse.cz>, Kai-Heng Feng <kaihengfeng@me.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        John Lenton <john.lenton@canonical.com>,
-        jean-baptiste.lallement@canonical.com
+Message-ID: <20190730101646.GC28829@quack2.suse.cz>
 References: <20190516140127.23272-1-jack@suse.cz>
  <50edd0fa-9cfa-38e1-8870-0fbc5c618522@kernel.dk>
  <20190527122915.GB9998@quack2.suse.cz>
  <b0f27980-be75-bded-3e74-bce14fc7ea47@kernel.dk>
  <894DDAA8-2ADD-467C-8E4F-4DE6B9A50625@me.com>
  <20190730092939.GB28829@quack2.suse.cz>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <f7e6717f-be46-1dfe-80ed-f85a18065c85@i-love.sakura.ne.jp>
-Date:   Tue, 30 Jul 2019 19:16:19 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ <CAL1QPZQWDx2YEAP168C+Eb4g4DmGg8eOBoOqkbUOBKTMDc9gjg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190730092939.GB28829@quack2.suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAL1QPZQWDx2YEAP168C+Eb4g4DmGg8eOBoOqkbUOBKTMDc9gjg@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/07/30 18:29, Jan Kara wrote:
->> This patch introduced a regression [1].
->> A reproducer can be found at [2].
->>
->> [1] https://bugs.launchpad.net/bugs/1836914
->> [2] https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1836914/comments/4
+On Tue 30-07-19 10:36:59, John Lenton wrote:
+> On Tue, 30 Jul 2019 at 10:29, Jan Kara <jack@suse.cz> wrote:
+> >
+> > Thanks for the notice and the references. What's your version of
+> > util-linux? What your test script does is indeed racy. You have there:
+> >
+> > echo Running:
+> > for i in {a..z}{a..z}; do
+> >     mount $i.squash /mnt/$i &
+> > done
+> >
+> > So all mount(8) commands will run in parallel and race to setup loop
+> > devices with LOOP_SET_FD and mount them. However util-linux (at least in
+> > the current version) seems to handle EBUSY from LOOP_SET_FD just fine and
+> > retries with the new loop device. So at this point I don't see why the patch
+> > makes difference... I guess I'll need to reproduce and see what's going on
+> > in detail.
 > 
-> Thanks for the notice and the references. What's your version of
-> util-linux? What your test script does is indeed racy. You have there:
+> We've observed this in arch with util-linux 2.34, and ubuntu 19.10
+> (eoan ermine) with util-linux 2.33.
 > 
-> echo Running:
-> for i in {a..z}{a..z}; do
->     mount $i.squash /mnt/$i &
-> done
-> 
-> So all mount(8) commands will run in parallel and race to setup loop
-> devices with LOOP_SET_FD and mount them. However util-linux (at least in
-> the current version) seems to handle EBUSY from LOOP_SET_FD just fine and
-> retries with the new loop device. So at this point I don't see why the patch
-> makes difference... I guess I'll need to reproduce and see what's going on
-> in detail.
+> just to be clear, the initial reports didn't involve a zany loop of
+> mounts, but were triggered by effectively the same thing as systemd
+> booted a system with a lot of snaps. The reroducer tries to makes
+> things simpler to reproduce :-). FWIW,  systemd versions were 244 and
+> 242 for those systems, respectively.
 
-Firstly, why not to check the return value of blkdev_get() ?
-EBUSY is not the only error code blkdev_get() might return.
+Thanks for info! So I think I see what's going on. The two mounts race
+like:
 
- 	/*
- 	 * If we don't hold exclusive handle for the device, upgrade to it
- 	 * here to avoid changing device under exclusive owner.
- 	 */
- 	if (!(mode & FMODE_EXCL)) {
- 		bdgrab(bdev);
- 		error = blkdev_get(bdev, mode | FMODE_EXCL, loop_set_fd);
--		if (error)
-+		if (error) {
-+			printk("loop_set_fd: %d\n", error);
- 			goto out_putf;
-+		}
- 	}
+MOUNT1					MOUNT2
+num = ioctl(LOOP_CTL_GET_FREE)
+					num = ioctl(LOOP_CTL_GET_FREE)
+ioctl("/dev/loop$num", LOOP_SET_FD, ..)
+ - returns OK
+					ioctl("/dev/loop$num", LOOP_SET_FD, ..)
+					  - acquires exclusine loop$num
+					    reference
+mount("/dev/loop$num", ...)
+ - sees exclusive reference from MOUNT2 and fails
+					  - sees loop device is already
+					    bound and fails
 
-And try finding which line is returning an error
-(like https://marc.info/?l=linux-xfs&m=156437221703110 does).
+It is a bug in the scheme I've chosen that racing LOOP_SET_FD can block
+perfectly valid mount. I'll think how to fix this...
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
