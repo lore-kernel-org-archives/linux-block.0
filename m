@@ -2,145 +2,84 @@ Return-Path: <SRS0=ZBGg=V3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB9EC0650F
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 17:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B868C0650F
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 18:18:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D99A2089E
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 17:59:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07EEC20C01
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 18:18:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726672AbfG3R71 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jul 2019 13:59:27 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:45954 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726268AbfG3R70 (ORCPT
+        id S1726797AbfG3SSF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jul 2019 14:18:05 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:40147 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729160AbfG3SSF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jul 2019 13:59:26 -0400
-Received: from mail-pf1-f200.google.com ([209.85.210.200])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <kai.heng.feng@canonical.com>)
-        id 1hsWPE-0005F5-T0
-        for linux-block@vger.kernel.org; Tue, 30 Jul 2019 17:59:25 +0000
-Received: by mail-pf1-f200.google.com with SMTP id j22so41268767pfe.11
-        for <linux-block@vger.kernel.org>; Tue, 30 Jul 2019 10:59:24 -0700 (PDT)
+        Tue, 30 Jul 2019 14:18:05 -0400
+Received: by mail-pf1-f196.google.com with SMTP id p184so30257900pfp.7
+        for <linux-block@vger.kernel.org>; Tue, 30 Jul 2019 11:18:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=rStdt81f8tuOpW8xQfJL2o59lCgPCTZV6A0fkffTtIU=;
-        b=Am/IZDWgupQWLF5AbudjDJ11GgC7Cp+tHUt2Tt83H/Z7vpkJmbnQFjFpaB+Q8HOJML
-         dl+MV1DKhXGOLBVWtfZMru6nk5MHk5vPstHo9rHRn2T5SQ7DaoMAD4+kD72JLFEfnmC3
-         fO9q/nzbefXxEP7utuV1xxLWOroPgulJ3DNt4TepxS0ia3ipqEFg+b9htxlJQ2t0JeFE
-         znkZEvfF0HDONKJl1QspxJDqqFj3n/U651vap7mwCm4onIv7m3qc/ogIE0aDKeS+E7GU
-         mC3JGBEamOHTjYyEN3duoEdDlgYJbUxKC4ullFykx/YzLPyMuA/bJ7SumRtr6RUYCszq
-         g1Kg==
-X-Gm-Message-State: APjAAAX+jnJlG4v9wEXo1Xe+y0m1nlS+cL2ysBHckcP25QQ8ZJE6EHZe
-        jHlaAEEuznXxmaNcWDRPS5ZIgxDj3f4RNrm0D5MffaTrvqWMKenT/SXCbCk5U/n3WfGib3KP7OD
-        FMxwf7T+inEqps76DwcqWwsrjpFlu1iyHD7+Q3lW0
-X-Received: by 2002:a17:90a:7f85:: with SMTP id m5mr117732489pjl.78.1564509563592;
-        Tue, 30 Jul 2019 10:59:23 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxzeRBIKEFOlxgxMxM0hd7uN6RigG82Hmvugzh5aQit2iVArjjX+ZWjPILzbTMFMQBMAhtl3A==
-X-Received: by 2002:a17:90a:7f85:: with SMTP id m5mr117732473pjl.78.1564509563305;
-        Tue, 30 Jul 2019 10:59:23 -0700 (PDT)
-Received: from 2001-b011-380f-37d3-91ca-5fad-3233-fb26.dynamic-ip6.hinet.net (2001-b011-380f-37d3-91ca-5fad-3233-fb26.dynamic-ip6.hinet.net. [2001:b011:380f:37d3:91ca:5fad:3233:fb26])
-        by smtp.gmail.com with ESMTPSA id h9sm78797928pgk.10.2019.07.30.10.59.21
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Jul 2019 10:59:22 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii;
-        delsp=yes;
-        format=flowed
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] loop: Don't change loop device under exclusive opener
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-In-Reply-To: <20190730133607.GD28829@quack2.suse.cz>
-Date:   Wed, 31 Jul 2019 01:59:20 +0800
-Cc:     John Lenton <john.lenton@canonical.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        linux-block@vger.kernel.org, jean-baptiste.lallement@canonical.com
-Content-Transfer-Encoding: 7bit
-Message-Id: <A5D409B1-A8D2-4C06-ACA3-775594759FDE@canonical.com>
-References: <20190516140127.23272-1-jack@suse.cz>
- <50edd0fa-9cfa-38e1-8870-0fbc5c618522@kernel.dk>
- <20190527122915.GB9998@quack2.suse.cz>
- <b0f27980-be75-bded-3e74-bce14fc7ea47@kernel.dk>
- <894DDAA8-2ADD-467C-8E4F-4DE6B9A50625@me.com>
- <20190730092939.GB28829@quack2.suse.cz>
- <CAL1QPZQWDx2YEAP168C+Eb4g4DmGg8eOBoOqkbUOBKTMDc9gjg@mail.gmail.com>
- <20190730101646.GC28829@quack2.suse.cz>
- <20190730133607.GD28829@quack2.suse.cz>
-To:     Jan Kara <jack@suse.cz>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=brM2vy8GAAw7hQGH8n7IiDhTyVm/OGsWJf8LH5FSdzI=;
+        b=H0uXvwP49dFtV9sS1aNAvxnVgBSUC33PhTgAYTTaZERIIEuROsdezX+7tS5Da/9D5t
+         gPxau5359iyw0Fmjh83dPMWNr4jRFbxAvWOktTqZW4oV1Nr6PYP/zkTSmxUs3JZFxUFg
+         hN6y22xeRNVm7E+wx1YozZ0lOs4DnJ+l/ziudkouw23F/xn2PITlB4DIIX6BBu9MBWHd
+         d+wkhZgtHmhUExoA2lV1VhFOOYrb7DPDIErIgJD67JYGbwVUDexMgTt/1qb3dLUCZXSZ
+         +GF7EKI1dSTV6tbD9i8bgrO+1eu7EpIE3+06CRWxuPLkpK6K41GrZrQcQb92kg3v3b4v
+         kYOQ==
+X-Gm-Message-State: APjAAAUo4/wbXENE43d3X71OcBIWZwaafPSVIzQP9UWojjvxtrd87iTP
+        /TL3jQzYC9x6j+n7jWNwu10=
+X-Google-Smtp-Source: APXvYqz5Pf/eXdnsNtX7WLnCgUnjg+Xtut3kh2r8ukmLhtIwpVUdIssx+HdXQeD3+Q5Oe6FqvCy7cA==
+X-Received: by 2002:aa7:9ad2:: with SMTP id x18mr45016770pfp.192.1564510684663;
+        Tue, 30 Jul 2019 11:18:04 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id 32sm12165895pgt.43.2019.07.30.11.18.03
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 30 Jul 2019 11:18:03 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 0/2] Fix a race condition triggered by submit_bio()
+Date:   Tue, 30 Jul 2019 11:17:55 -0700
+Message-Id: <20190730181757.248832-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.22.0.709.g102302147b-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-at 21:36, Jan Kara <jack@suse.cz> wrote:
+Hi Jens,
 
-> On Tue 30-07-19 12:16:46, Jan Kara wrote:
->> On Tue 30-07-19 10:36:59, John Lenton wrote:
->>> On Tue, 30 Jul 2019 at 10:29, Jan Kara <jack@suse.cz> wrote:
->>>> Thanks for the notice and the references. What's your version of
->>>> util-linux? What your test script does is indeed racy. You have there:
->>>>
->>>> echo Running:
->>>> for i in {a..z}{a..z}; do
->>>>     mount $i.squash /mnt/$i &
->>>> done
->>>>
->>>> So all mount(8) commands will run in parallel and race to setup loop
->>>> devices with LOOP_SET_FD and mount them. However util-linux (at least in
->>>> the current version) seems to handle EBUSY from LOOP_SET_FD just fine  
->>>> and
->>>> retries with the new loop device. So at this point I don't see why the  
->>>> patch
->>>> makes difference... I guess I'll need to reproduce and see what's  
->>>> going on
->>>> in detail.
->>>
->>> We've observed this in arch with util-linux 2.34, and ubuntu 19.10
->>> (eoan ermine) with util-linux 2.33.
->>>
->>> just to be clear, the initial reports didn't involve a zany loop of
->>> mounts, but were triggered by effectively the same thing as systemd
->>> booted a system with a lot of snaps. The reroducer tries to makes
->>> things simpler to reproduce :-). FWIW,  systemd versions were 244 and
->>> 242 for those systems, respectively.
->>
->> Thanks for info! So I think I see what's going on. The two mounts race
->> like:
->>
->> MOUNT1					MOUNT2
->> num = ioctl(LOOP_CTL_GET_FREE)
->> 					num = ioctl(LOOP_CTL_GET_FREE)
->> ioctl("/dev/loop$num", LOOP_SET_FD, ..)
->>  - returns OK
->> 					ioctl("/dev/loop$num", LOOP_SET_FD, ..)
->> 					  - acquires exclusine loop$num
->> 					    reference
->> mount("/dev/loop$num", ...)
->>  - sees exclusive reference from MOUNT2 and fails
->> 					  - sees loop device is already
->> 					    bound and fails
->>
->> It is a bug in the scheme I've chosen that racing LOOP_SET_FD can block
->> perfectly valid mount. I'll think how to fix this...
->
-> So how about attached patch? It fixes the regression for me.
+One of the consequences of the switch to blk-mq is that generic_make_request()
+calls, a function called by submit_bio(), must be protected by a
+blk_queue_enter() / blk_queue_exit() pair to avoid that the block-cgroup
+functions called by generic_make_request() trigger a race condition. This patch
+series makes the kernel report a warning if that race condition is hit and also
+adds the necessary protection in submit_bio(). Please consider these patches
+for kernel v5.4.
 
-Tested-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Thanks,
 
->
-> 								Honza
-> -- 
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
-> <0001-loop-Fix-mount-2-failure-due-to-race-with-LOOP_SET_F.patch>
+Bart.
 
+Bart Van Assche (2):
+  block: Verify whether blk_queue_enter() is used when necessary
+  block: Fix a race condition in submit_bio()
+
+ block/blk-cgroup.c         |  2 ++
+ block/blk-core.c           | 34 +++++++++++++++++++++++++++++++++-
+ include/linux/blk-cgroup.h |  2 ++
+ include/linux/blkdev.h     |  8 ++++++++
+ 4 files changed, 45 insertions(+), 1 deletion(-)
+
+-- 
+2.22.0.709.g102302147b-goog
 
