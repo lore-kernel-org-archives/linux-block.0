@@ -1,115 +1,185 @@
-Return-Path: <SRS0=KgRV=V2=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=ZBGg=V3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E62C433FF
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jul 2019 21:35:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 774D1C76186
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 00:08:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E3B8206DD
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jul 2019 21:35:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="dc0L4KP/"
+	by mail.kernel.org (Postfix) with ESMTP id 45D9220679
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 00:08:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729128AbfG2Vff (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Jul 2019 17:35:35 -0400
-Received: from gateway36.websitewelcome.com ([192.185.201.2]:26776 "EHLO
-        gateway36.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729297AbfG2Vfe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jul 2019 17:35:34 -0400
-X-Greylist: delayed 1479 seconds by postgrey-1.27 at vger.kernel.org; Mon, 29 Jul 2019 17:35:34 EDT
-Received: from cm14.websitewelcome.com (cm14.websitewelcome.com [100.42.49.7])
-        by gateway36.websitewelcome.com (Postfix) with ESMTP id 7DF94400C34C1
-        for <linux-block@vger.kernel.org>; Mon, 29 Jul 2019 15:35:01 -0500 (CDT)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id sCv1h0boj2qH7sCv1h2ycM; Mon, 29 Jul 2019 16:10:55 -0500
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        MIME-Version:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=Vyp07Q2BMZxkBU4I91lGXX/CgC/9r6rOUx013x0Y1/g=; b=dc0L4KP/HtmIe4hcEzHC+YuT1A
-        cUbxGgV3pXJAvpHt4MZ9EvTS3AtAF3Fw9DoZ7DNyikCjesw7pthWqml/8BWGAOSKWnDBSDkAK205g
-        6CU1I/oXWNav0CYtfi5RvFV2mJcLRK35CpwESSwraUhf46MFi6axNphdI1S0hu5SU5r/Inv5VLWGR
-        t+fy+IGmvMZCeKdKqkOOpwQewQJPCh4D8j8uKSL0NZsrwfWfznDp+wW+YsAhcAmvxd4gwH9JsTWk/
-        4BW2Ajk622cRYA3iKfocNTRmi6OMVfNis9/OIKya4DTF2ZbF/h5iPPuj9jt/OCh2MRaVGqsHQsI04
-        I5DWICaA==;
-Received: from [187.192.11.120] (port=60400 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1hsCv0-001Tpb-2B; Mon, 29 Jul 2019 16:10:54 -0500
-Date:   Mon, 29 Jul 2019 16:10:53 -0500
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Kees Cook <keescook@chromium.org>
-Subject: [PATCH] ataflop: Mark expected switch fall-through
-Message-ID: <20190729211053.GA6735@embeddedor>
+        id S1727324AbfG3AIz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Jul 2019 20:08:55 -0400
+Received: from mx2.suse.de ([195.135.220.15]:35878 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725925AbfG3AIz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jul 2019 20:08:55 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 2051CAC9A;
+        Tue, 30 Jul 2019 00:08:53 +0000 (UTC)
+From:   NeilBrown <neilb@suse.com>
+To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
+        linux-raid@vger.kernel.org
+Date:   Tue, 30 Jul 2019 10:08:45 +1000
+Cc:     jay.vosburgh@canonical.com, Song Liu <songliubraving@fb.com>,
+        dm-devel@redhat.com, Neil F Brown <nfbrown@suse.com>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] md/raid0: Fail BIOs if their underlying block device is gone
+In-Reply-To: <20190729193359.11040-1-gpiccoli@canonical.com>
+References: <20190729193359.11040-1-gpiccoli@canonical.com>
+Message-ID: <87zhkwl6ya.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 187.192.11.120
-X-Source-L: No
-X-Exim-ID: 1hsCv0-001Tpb-2B
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [187.192.11.120]:60400
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 7
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Mark switch cases where we are expecting to fall through.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-This patch fixes the following warning (Building: m68k):
+On Mon, Jul 29 2019,  Guilherme G. Piccoli  wrote:
 
-drivers/block/ataflop.c: In function ‘fd_locked_ioctl’:
-drivers/block/ataflop.c:1728:3: warning: this statement may fall through [-Wimplicit-fallthrough=]
-   set_capacity(floppy->disk, MAX_DISK_SIZE * 2);
-   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/block/ataflop.c:1729:2: note: here
-  case FDFMTEND:
-  ^~~~
+> Currently md/raid0 is not provided with any mechanism to validate if
+> an array member got removed or failed. The driver keeps sending BIOs
+> regardless of the state of array members. This leads to the following
+> situation: if a raid0 array member is removed and the array is mounted,
+> some user writing to this array won't realize that errors are happening
+> unless they check kernel log or perform one fsync per written file.
+>
+> In other words, no -EIO is returned and writes (except direct ones) appear
+> normal. Meaning the user might think the wrote data is correctly stored in
+> the array, but instead garbage was written given that raid0 does stripping
+> (and so, it requires all its members to be working in order to not corrupt
+> data).
+>
+> This patch proposes a small change in this behavior: we check if the block
+> device's gendisk is UP when submitting the BIO to the array member, and if
+> it isn't, we flag the md device as broken and fail subsequent I/Os. In ca=
+se
+> the array is restored (i.e., the missing array member is back), the flag =
+is
+> cleared and we can submit BIOs normally.
+>
+> With this patch, the filesystem reacts much faster to the event of missing
+> array member: after some I/O errors, ext4 for instance aborts the journal
+> and prevents corruption. Without this change, we're able to keep writing
+> in the disk and after a machine reboot, e2fsck shows some severe fs errors
+> that demand fixing. This patch was tested in both ext4 and xfs
+> filesystems.
+>
+> Cc: NeilBrown <neilb@suse.com>
+> Cc: Song Liu <songliubraving@fb.com>
+> Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
+> ---
+>
+> After an attempt to change the way md/raid0 fails in case one of its
+> members gets removed (see [0]), we got not so great feedback from the
+> community and also, the change was complex and had corner cases.
+> One of the points which seemed to be a consensus in that attempt was
+> that raid0 could benefit from a way of failing faster in case a member
+> gets removed. This patch aims for that, in a simpler way than earlier
+> proposed. Any feedbacks are welcome, thanks in advance!
+>
+>
+> Guilherme
+>
+>
+> [0] lore.kernel.org/linux-block/20190418220448.7219-1-gpiccoli@canonical.=
+com
+>
+>
+>  drivers/md/md.c    | 5 +++++
+>  drivers/md/md.h    | 3 +++
+>  drivers/md/raid0.c | 8 ++++++++
+>  3 files changed, 16 insertions(+)
+>
+> diff --git a/drivers/md/md.c b/drivers/md/md.c
+> index 24638ccedce4..fba49918d591 100644
+> --- a/drivers/md/md.c
+> +++ b/drivers/md/md.c
+> @@ -376,6 +376,11 @@ static blk_qc_t md_make_request(struct request_queue=
+ *q, struct bio *bio)
+>  	struct mddev *mddev =3D q->queuedata;
+>  	unsigned int sectors;
+>=20=20
+> +	if (unlikely(test_bit(MD_BROKEN, &mddev->flags))) {
+> +		bio_io_error(bio);
+> +		return BLK_QC_T_NONE;
+> +	}
 
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- drivers/block/ataflop.c | 1 +
- 1 file changed, 1 insertion(+)
+I think this should only fail WRITE requests, not READ requests.
 
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index 85f20e371f2f..bd7d3bb8b890 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -1726,6 +1726,7 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
- 		/* MSch: invalidate default_params */
- 		default_params[drive].blocks  = 0;
- 		set_capacity(floppy->disk, MAX_DISK_SIZE * 2);
-+		/* Fall through */
- 	case FDFMTEND:
- 	case FDFLUSH:
- 		/* invalidate the buffer track to force a reread */
--- 
-2.22.0
+Otherwise the patch is probably reasonable.
 
+NeilBrown
+
+
+> +
+>  	blk_queue_split(q, &bio);
+>=20=20
+>  	if (mddev =3D=3D NULL || mddev->pers =3D=3D NULL) {
+> diff --git a/drivers/md/md.h b/drivers/md/md.h
+> index 10f98200e2f8..41552e615c4c 100644
+> --- a/drivers/md/md.h
+> +++ b/drivers/md/md.h
+> @@ -248,6 +248,9 @@ enum mddev_flags {
+>  	MD_UPDATING_SB,		/* md_check_recovery is updating the metadata
+>  				 * without explicitly holding reconfig_mutex.
+>  				 */
+> +	MD_BROKEN,              /* This is used in RAID-0 only, to stop I/O
+> +				 * in case an array member is gone/failed.
+> +				 */
+>  };
+>=20=20
+>  enum mddev_sb_flags {
+> diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
+> index bf5cf184a260..58a9cc5193bf 100644
+> --- a/drivers/md/raid0.c
+> +++ b/drivers/md/raid0.c
+> @@ -586,6 +586,14 @@ static bool raid0_make_request(struct mddev *mddev, =
+struct bio *bio)
+>=20=20
+>  	zone =3D find_zone(mddev->private, &sector);
+>  	tmp_dev =3D map_sector(mddev, zone, sector, &sector);
+> +
+> +	if (unlikely(!(tmp_dev->bdev->bd_disk->flags & GENHD_FL_UP))) {
+> +		set_bit(MD_BROKEN, &mddev->flags);
+> +		bio_io_error(bio);
+> +		return true;
+> +	}
+> +
+> +	clear_bit(MD_BROKEN, &mddev->flags);
+>  	bio_set_dev(bio, tmp_dev->bdev);
+>  	bio->bi_iter.bi_sector =3D sector + zone->dev_start +
+>  		tmp_dev->data_offset;
+> --=20
+> 2.22.0
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAl0/io4ACgkQOeye3VZi
+gbkPnw//ZDAHleCZDsGZjuID2XCXBfEvuRDbTSMrk2NaIj/z/DlsSQOkNDYYGP5m
+H4g7AssCnA49f67+F8sfkH/Fy+crnjR9p0e22bzKdXSi3O0HOGvkHkqHLjtWt7Pu
++atITqeUB/riI/v0b9y9whdFO1P3itEuZ+Nv+3hf3AlQ7P01Pv3v9ntpFycztqgG
+VN0EkaGudLA5lkCphHmajgUUfLWF4GmP0dLsCHvd9GYCqpKGChImrHLrqgVPXTKz
+T5BLp5l+icj59dM7Gn1iF3Hmub46QkGlfF0Flfp0jduqADB/khx7+smapYcBPXBu
+pVsCV/fZtnWE/82CjYQiGeU+z6YZ2mFQRnRmgUFGE/Da6Te51DdyipU1NwYRRHB4
+EgBOO76o9EaKBfqPzWMmxAuBUbdvZI2Dk1ZvYhSL0tZ2kFHXmlQwlY98VOc+D8WK
+0bEMNJYmiiNkQzIqS3W1BiNFfG+ZDAgw6gC2quVlTVXgMpW205QpN1CbyRpC4Ayi
+MSEHFyMDUQMLeehZ5HWK/51PvyvXlrWTjGWvv13EdqhROjzQ0TykR4RbPcrVK/00
+ZPxKUZWwk9lh/ko6vfh1ZzcmPEnZ6Ft1pnvbdrH0wd3WOM7cRgjOYMqo/O7nHOQX
+PkZVA3CNUYC4Y6oZNTXX9Re8W87Ola4kh00+jT2qddVprwuiaOQ=
+=0n/S
+-----END PGP SIGNATURE-----
+--=-=-=--
