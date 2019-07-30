@@ -2,64 +2,63 @@ Return-Path: <SRS0=ZBGg=V3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA3CC433FF
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 11:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C96C0650F
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 12:19:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8225B20644
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 11:43:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6600F2087F
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 12:19:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727392AbfG3Lnb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jul 2019 07:43:31 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:35891 "EHLO
+        id S1726842AbfG3MTJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jul 2019 08:19:09 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:37127 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728406AbfG3Lna (ORCPT
+        with ESMTP id S1726524AbfG3MTJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jul 2019 07:43:30 -0400
-Received: from mail-pf1-f197.google.com ([209.85.210.197])
+        Tue, 30 Jul 2019 08:19:09 -0400
+Received: from mail-pg1-f200.google.com ([209.85.215.200])
         by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
         (Exim 4.76)
         (envelope-from <gpiccoli@canonical.com>)
-        id 1hsQXQ-0001aD-Rc
-        for linux-block@vger.kernel.org; Tue, 30 Jul 2019 11:43:29 +0000
-Received: by mail-pf1-f197.google.com with SMTP id 6so40658199pfz.10
-        for <linux-block@vger.kernel.org>; Tue, 30 Jul 2019 04:43:28 -0700 (PDT)
+        id 1hsR5u-0004w9-Tz
+        for linux-block@vger.kernel.org; Tue, 30 Jul 2019 12:19:07 +0000
+Received: by mail-pg1-f200.google.com with SMTP id n23so28620435pgf.18
+        for <linux-block@vger.kernel.org>; Tue, 30 Jul 2019 05:19:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=4KlUTmLKGdfGcyISyvot6nwpcs6RPe9hQLv7GSaByVg=;
-        b=EDYzy5k0xUHOfu7ItbGdsMLGcJgxdilfWnkz9CTxMDN3/LJffJjtR89FIp1MxBMP1d
-         7s2AIm8iz1KDJZKD+jNJ3VEY8Idr7wtV3K6UiEvPws57Bl6Pme1uKZW6AjLBupZ8m8TZ
-         5zq8fl5kZYpOMtqZ8+Dk0UDWzC0hxDZptr4OjpSD7SndUpbGPrYF5ZtOivR/BJYdYf9x
-         hTj+697mUgpalpoZ8Vw4Pht+OkFseorAnk2faWNdinzKH4EC+CTCvQXDRXAReoTW6mXv
-         vmixnb09s76rPxYQ0gLVbj1qMHguuNbPQASyBfdW47KW56d9L6X/ZNAkEVhbkzTfh1MB
-         ckAA==
-X-Gm-Message-State: APjAAAW2FHw11g9JGWecLxP1PLE7Z7wO1mLlUxBpL+XvRG+vsQj//Wws
-        tArXwmLv6LR/MfLPrp9S9YMIrF/vlPeDn7cBuAFfoDlLJCDDljxoE7ud+w9w52ZZdBHmm3FxCDw
-        +wq1BjLKJBfCUoDV0oqSxoHu6crc6RjNKuqZf4WaQ
-X-Received: by 2002:a17:90b:d8b:: with SMTP id bg11mr116845249pjb.30.1564487006913;
-        Tue, 30 Jul 2019 04:43:26 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyRl52zNy+T+lE1SC0yFNVABBNPatQQwwGO3yIZ8cF/begXpLwDZ8umDmsu9XwfWTGqFDNHDA==
-X-Received: by 2002:a17:90b:d8b:: with SMTP id bg11mr116845234pjb.30.1564487006684;
-        Tue, 30 Jul 2019 04:43:26 -0700 (PDT)
+        bh=duNeCgPARK5/DNYmXliLtl2PHvOx7FRmtH6Afr/ogZ8=;
+        b=YuR9mRhnZwuad9YicqJEQ+exEpMVmHs63PTWYaHQ/cy8IkwE6OldHA407EuBSFtHzz
+         mHLWKTKYbUjD4WZvSW+o8f9lQ+ffRAD+d1FxwsV0N2FZo3hTNsUvEZRNHNOouc4IiPfC
+         3btHU2NdujeNQ1TiGh5+y6bHpzh/hh4gWY9UZ9oD9lZdMNaAHDcxqL28XC5CnMQLnTYL
+         7xrCdEU60fudCT1L0e9Azrq6cIcf9zCvNMLrvJlgJky78tM8ZwiZMEm68NwcHmFRkVEy
+         ihPp5+IIsbh0sM3IIk+1yx8+BGD0jlsPPtJMUjEoTdxvTauKpq38D7th7sZ+dh7TD18+
+         epSQ==
+X-Gm-Message-State: APjAAAUtcPjKZ6pBFuvNHl9RgOD4jQpAMVkUMru8MNFwKTqWU1Q5VMaJ
+        Uk0AvWx5A640RJYcmIcTWhDtNn8ZX7IuXSwsbQCtwT8mzD8NZKG/bpW2N3XoJcBXxioLarwj0xJ
+        wcWC2/Ay4co5gMs1eDbiaHDmyLS7R7UYgAmMjlxi0
+X-Received: by 2002:a62:1d8f:: with SMTP id d137mr42586380pfd.207.1564489145694;
+        Tue, 30 Jul 2019 05:19:05 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz3VqyZIP60VysathrWyL1Khg+ulJL5jfJ25tNxj1jx8o8wkADOY5OI0aR6Pr1uAwShW4fTiQ==
+X-Received: by 2002:a62:1d8f:: with SMTP id d137mr42586372pfd.207.1564489145562;
+        Tue, 30 Jul 2019 05:19:05 -0700 (PDT)
 Received: from [192.168.1.202] ([152.254.214.186])
-        by smtp.gmail.com with ESMTPSA id s67sm66340537pjb.8.2019.07.30.04.43.20
+        by smtp.gmail.com with ESMTPSA id e189sm45931655pgc.15.2019.07.30.05.18.59
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Jul 2019 04:43:25 -0700 (PDT)
+        Tue, 30 Jul 2019 05:19:04 -0700 (PDT)
 Subject: Re: [PATCH 1/2] md/raid0: Introduce new array state 'broken' for
  raid0
-To:     NeilBrown <neilb@suse.com>, linux-raid@vger.kernel.org
-Cc:     jay.vosburgh@canonical.com, songliubraving@fb.com,
-        dm-devel@redhat.com, Neil F Brown <nfbrown@suse.com>,
-        linux-block@vger.kernel.org
+To:     Bob Liu <bob.liu@oracle.com>, linux-raid@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+        jay.vosburgh@canonical.com, neilb@suse.com, songliubraving@fb.com
 References: <20190729203135.12934-1-gpiccoli@canonical.com>
  <20190729203135.12934-2-gpiccoli@canonical.com>
- <87wog0l6u2.fsf@notabene.neil.brown.name>
+ <d730c417-a328-3df3-1e31-32b6df48b6ad@oracle.com>
 From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
@@ -86,115 +85,58 @@ Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
  Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
  kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
  X18zwLgdiQ==
-Message-ID: <20348d5f-fa41-58f1-a7d8-2989233b97f1@canonical.com>
-Date:   Tue, 30 Jul 2019 08:43:13 -0300
+Message-ID: <000c20fe-3bcd-2dff-a5ab-9a294bdc7746@canonical.com>
+Date:   Tue, 30 Jul 2019 09:18:54 -0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <87wog0l6u2.fsf@notabene.neil.brown.name>
+In-Reply-To: <d730c417-a328-3df3-1e31-32b6df48b6ad@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 29/07/2019 21:11, NeilBrown wrote:
+On 30/07/2019 03:20, Bob Liu wrote:
 > [...]
->> -	else {
->> +
->> +		if ((mddev->pers->level == 0) &&
+>> + * broken
+>> + *     RAID0-only: same as clean, but array is missing a member.
+>> + *     It's useful because RAID0 mounted-arrays aren't stopped
+>> + *     when a member is gone, so this state will at least alert
+>> + *     the user that something is wrong.
 > 
-> Don't test if ->level is 0.  Instead, test if ->is_missing_dev is not
-> NULL.
 > 
-> NeilBrown
+> Curious why only raid0 has this issue? 
+> 
+> Thanks, -Bob
 
-Hi Neil, thanks for the feedback. I'll change that in a potential V2,
-(if the patches are likely to be accepted), good idea.
+Hi Bob, I understand that all other levels have fault-tolerance logic,
+while raid0 is just a "bypass" driver that selects the correct
+underlying device to send the BIO and blindly sends it. It's known to be
+a performance-only /lightweight solution whereas the other levels aim to
+be reliable.
+
+I've quickly tested raid5 and rai10, and see messages like this on
+kernel log when removing a device (in raid5):
+
+[35.764975] md/raid:md0: Disk failure on nvme1n1, disabling device.
+md/raid:md0: Operation continuing on 1 devices.
+
+The message seen in raid10 is basically the same. As a (cheap)
+comparison of the complexity among levels, look that:
+
+<...>/linux-mainline/drivers/md# cat raid5* | wc -l
+14191
+
+<...>/linux-mainline/drivers/md# cat raid10* | wc -l
+5135
+
+<...>/linux-mainline/drivers/md# cat raid0* | wc -l
+820
+
 Cheers,
 
 
 Guilherme
-
-
-> 
-> 
->> +		   ((st == clean) || (st == broken))) {
->> +			if (mddev->pers->is_missing_dev(mddev))
->> +				st = broken;
->> +			else
->> +				st = clean;
->> +		}
->> +	} else {
->>  		if (list_empty(&mddev->disks) &&
->>  		    mddev->raid_disks == 0 &&
->>  		    mddev->dev_sectors == 0)
->> @@ -4315,6 +4329,7 @@ array_state_store(struct mddev *mddev, const char *buf, size_t len)
->>  		break;
->>  	case write_pending:
->>  	case active_idle:
->> +	case broken:
->>  		/* these cannot be set */
->>  		break;
->>  	}
->> diff --git a/drivers/md/md.h b/drivers/md/md.h
->> index 41552e615c4c..e7b42b75701a 100644
->> --- a/drivers/md/md.h
->> +++ b/drivers/md/md.h
->> @@ -590,6 +590,8 @@ struct md_personality
->>  	int (*congested)(struct mddev *mddev, int bits);
->>  	/* Changes the consistency policy of an active array. */
->>  	int (*change_consistency_policy)(struct mddev *mddev, const char *buf);
->> +	/* Check if there is any missing/failed members - RAID0 only for now. */
->> +	bool (*is_missing_dev)(struct mddev *mddev);
->>  };
->>  
->>  struct md_sysfs_entry {
->> diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
->> index 58a9cc5193bf..79618a6ae31a 100644
->> --- a/drivers/md/raid0.c
->> +++ b/drivers/md/raid0.c
->> @@ -455,6 +455,31 @@ static inline int is_io_in_chunk_boundary(struct mddev *mddev,
->>  	}
->>  }
->>  
->> +bool raid0_is_missing_dev(struct mddev *mddev)
->> +{
->> +	struct md_rdev *rdev;
->> +	static int already_missing;
->> +	int def_disks, work_disks = 0;
->> +	struct r0conf *conf = mddev->private;
->> +
->> +	def_disks = conf->strip_zone[0].nb_dev;
->> +	rdev_for_each(rdev, mddev)
->> +		if (rdev->bdev->bd_disk->flags & GENHD_FL_UP)
->> +			work_disks++;
->> +
->> +	if (unlikely(def_disks - work_disks)) {
->> +		if (!already_missing) {
->> +			already_missing = 1;
->> +			pr_warn("md: %s: raid0 array has %d missing/failed members\n",
->> +				mdname(mddev), (def_disks - work_disks));
->> +		}
->> +		return true;
->> +	}
->> +
->> +	already_missing = 0;
->> +	return false;
->> +}
->> +
->>  static void raid0_handle_discard(struct mddev *mddev, struct bio *bio)
->>  {
->>  	struct r0conf *conf = mddev->private;
->> @@ -789,6 +814,7 @@ static struct md_personality raid0_personality=
->>  	.takeover	= raid0_takeover,
->>  	.quiesce	= raid0_quiesce,
->>  	.congested	= raid0_congested,
->> +	.is_missing_dev	= raid0_is_missing_dev,
->>  };
->>  
->>  static int __init raid0_init (void)
->> -- 
->> 2.22.0
