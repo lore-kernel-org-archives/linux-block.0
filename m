@@ -2,101 +2,84 @@ Return-Path: <SRS0=ZBGg=V3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB558C433FF
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 10:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48212C0650F
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 10:26:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E2E420693
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 10:16:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 297C420651
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 10:26:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732459AbfG3KQs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jul 2019 06:16:48 -0400
-Received: from mx2.suse.de ([195.135.220.15]:46056 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726078AbfG3KQs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jul 2019 06:16:48 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id EC570AE2D;
-        Tue, 30 Jul 2019 10:16:46 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id A5DA91E440D; Tue, 30 Jul 2019 12:16:46 +0200 (CEST)
-Date:   Tue, 30 Jul 2019 12:16:46 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     John Lenton <john.lenton@canonical.com>
-Cc:     Jan Kara <jack@suse.cz>, Kai-Heng Feng <kaihengfeng@me.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        linux-block@vger.kernel.org, jean-baptiste.lallement@canonical.com
-Subject: Re: [PATCH] loop: Don't change loop device under exclusive opener
-Message-ID: <20190730101646.GC28829@quack2.suse.cz>
-References: <20190516140127.23272-1-jack@suse.cz>
- <50edd0fa-9cfa-38e1-8870-0fbc5c618522@kernel.dk>
- <20190527122915.GB9998@quack2.suse.cz>
- <b0f27980-be75-bded-3e74-bce14fc7ea47@kernel.dk>
- <894DDAA8-2ADD-467C-8E4F-4DE6B9A50625@me.com>
- <20190730092939.GB28829@quack2.suse.cz>
- <CAL1QPZQWDx2YEAP168C+Eb4g4DmGg8eOBoOqkbUOBKTMDc9gjg@mail.gmail.com>
+        id S1732562AbfG3K0E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jul 2019 06:26:04 -0400
+Received: from verein.lst.de ([213.95.11.211]:49987 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727156AbfG3K0D (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jul 2019 06:26:03 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 4C21468B02; Tue, 30 Jul 2019 12:25:57 +0200 (CEST)
+Date:   Tue, 30 Jul 2019 12:25:57 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jerome Glisse <jglisse@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, john.hubbard@gmail.com,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        LKML <linux-kernel@vger.kernel.org>, ceph-devel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        netdev@vger.kernel.org, samba-technical@lists.samba.org,
+        v9fs-developer@lists.sourceforge.net,
+        virtualization@lists.linux-foundation.org,
+        John Hubbard <jhubbard@nvidia.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH 03/12] block: bio_release_pages: use flags arg instead
+ of bool
+Message-ID: <20190730102557.GA1700@lst.de>
+References: <20190724042518.14363-1-jhubbard@nvidia.com> <20190724042518.14363-4-jhubbard@nvidia.com> <20190724053053.GA18330@infradead.org> <20190729205721.GB3760@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAL1QPZQWDx2YEAP168C+Eb4g4DmGg8eOBoOqkbUOBKTMDc9gjg@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190729205721.GB3760@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 30-07-19 10:36:59, John Lenton wrote:
-> On Tue, 30 Jul 2019 at 10:29, Jan Kara <jack@suse.cz> wrote:
-> >
-> > Thanks for the notice and the references. What's your version of
-> > util-linux? What your test script does is indeed racy. You have there:
-> >
-> > echo Running:
-> > for i in {a..z}{a..z}; do
-> >     mount $i.squash /mnt/$i &
-> > done
-> >
-> > So all mount(8) commands will run in parallel and race to setup loop
-> > devices with LOOP_SET_FD and mount them. However util-linux (at least in
-> > the current version) seems to handle EBUSY from LOOP_SET_FD just fine and
-> > retries with the new loop device. So at this point I don't see why the patch
-> > makes difference... I guess I'll need to reproduce and see what's going on
-> > in detail.
+On Mon, Jul 29, 2019 at 04:57:21PM -0400, Jerome Glisse wrote:
+> > All pages releases by bio_release_pages should come from
+> > get_get_user_pages, so I don't really see the point here.
 > 
-> We've observed this in arch with util-linux 2.34, and ubuntu 19.10
-> (eoan ermine) with util-linux 2.33.
+> No they do not all comes from GUP for see various callers
+> of bio_check_pages_dirty() for instance iomap_dio_zero()
 > 
-> just to be clear, the initial reports didn't involve a zany loop of
-> mounts, but were triggered by effectively the same thing as systemd
-> booted a system with a lot of snaps. The reroducer tries to makes
-> things simpler to reproduce :-). FWIW,  systemd versions were 244 and
-> 242 for those systems, respectively.
+> I have carefully tracked down all this and i did not do
+> anyconvertion just for the fun of it :)
 
-Thanks for info! So I think I see what's going on. The two mounts race
-like:
+Well, the point is _should_ not necessarily do.  iomap_dio_zero adds the
+ZERO_PAGE, which we by definition don't need to refcount.  So we can
+mark this bio BIO_NO_PAGE_REF safely after removing the get_page there.
 
-MOUNT1					MOUNT2
-num = ioctl(LOOP_CTL_GET_FREE)
-					num = ioctl(LOOP_CTL_GET_FREE)
-ioctl("/dev/loop$num", LOOP_SET_FD, ..)
- - returns OK
-					ioctl("/dev/loop$num", LOOP_SET_FD, ..)
-					  - acquires exclusine loop$num
-					    reference
-mount("/dev/loop$num", ...)
- - sees exclusive reference from MOUNT2 and fails
-					  - sees loop device is already
-					    bound and fails
+Note that the equivalent in the old direct I/O code, dio_refill_pages,
+will be a little more complicated as it can match user pages and the
+ZERO_PAGE in a single bio, so a per-bio flag won't handle it easily.
+Maybe we just need to use a separate bio there as well.
 
-It is a bug in the scheme I've chosen that racing LOOP_SET_FD can block
-perfectly valid mount. I'll think how to fix this...
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+In general with series like this we should not encode the status quo an
+pile new hacks upon the old one, but thing where we should be and fix
+up the old warts while having to wade through all that code.
