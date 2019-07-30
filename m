@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C96C0650F
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 12:19:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A12C0650F
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 12:30:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6600F2087F
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 12:19:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2705E206E0
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 12:30:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726842AbfG3MTJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jul 2019 08:19:09 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:37127 "EHLO
+        id S1728279AbfG3Mas (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jul 2019 08:30:48 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:37372 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726524AbfG3MTJ (ORCPT
+        with ESMTP id S1728381AbfG3Maq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jul 2019 08:19:09 -0400
-Received: from mail-pg1-f200.google.com ([209.85.215.200])
+        Tue, 30 Jul 2019 08:30:46 -0400
+Received: from mail-pg1-f198.google.com ([209.85.215.198])
         by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
         (Exim 4.76)
         (envelope-from <gpiccoli@canonical.com>)
-        id 1hsR5u-0004w9-Tz
-        for linux-block@vger.kernel.org; Tue, 30 Jul 2019 12:19:07 +0000
-Received: by mail-pg1-f200.google.com with SMTP id n23so28620435pgf.18
-        for <linux-block@vger.kernel.org>; Tue, 30 Jul 2019 05:19:06 -0700 (PDT)
+        id 1hsRHA-0005jj-HO
+        for linux-block@vger.kernel.org; Tue, 30 Jul 2019 12:30:44 +0000
+Received: by mail-pg1-f198.google.com with SMTP id w5so40468331pgs.5
+        for <linux-block@vger.kernel.org>; Tue, 30 Jul 2019 05:30:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=duNeCgPARK5/DNYmXliLtl2PHvOx7FRmtH6Afr/ogZ8=;
-        b=YuR9mRhnZwuad9YicqJEQ+exEpMVmHs63PTWYaHQ/cy8IkwE6OldHA407EuBSFtHzz
-         mHLWKTKYbUjD4WZvSW+o8f9lQ+ffRAD+d1FxwsV0N2FZo3hTNsUvEZRNHNOouc4IiPfC
-         3btHU2NdujeNQ1TiGh5+y6bHpzh/hh4gWY9UZ9oD9lZdMNaAHDcxqL28XC5CnMQLnTYL
-         7xrCdEU60fudCT1L0e9Azrq6cIcf9zCvNMLrvJlgJky78tM8ZwiZMEm68NwcHmFRkVEy
-         ihPp5+IIsbh0sM3IIk+1yx8+BGD0jlsPPtJMUjEoTdxvTauKpq38D7th7sZ+dh7TD18+
-         epSQ==
-X-Gm-Message-State: APjAAAUtcPjKZ6pBFuvNHl9RgOD4jQpAMVkUMru8MNFwKTqWU1Q5VMaJ
-        Uk0AvWx5A640RJYcmIcTWhDtNn8ZX7IuXSwsbQCtwT8mzD8NZKG/bpW2N3XoJcBXxioLarwj0xJ
-        wcWC2/Ay4co5gMs1eDbiaHDmyLS7R7UYgAmMjlxi0
-X-Received: by 2002:a62:1d8f:: with SMTP id d137mr42586380pfd.207.1564489145694;
-        Tue, 30 Jul 2019 05:19:05 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqz3VqyZIP60VysathrWyL1Khg+ulJL5jfJ25tNxj1jx8o8wkADOY5OI0aR6Pr1uAwShW4fTiQ==
-X-Received: by 2002:a62:1d8f:: with SMTP id d137mr42586372pfd.207.1564489145562;
-        Tue, 30 Jul 2019 05:19:05 -0700 (PDT)
+        bh=epsg8o9SJ8QYu2h+n3GBIMR7ashpfZp82u6PNELR9R0=;
+        b=RlIMUe4RERP2bN6q5mMidAimcOQQNhDX/O6AwHlwU2X1KyKuC8ninLTtK+iB+P8+qV
+         ujP0VKaYVEzCIZf69wlQL4ZS87benLb9tyDG91rkPvoFgFnvDvWDI8/r0+rH9QQ4763X
+         N8Lx2amiObsjtPnz0EBVPH4R7CCIVavRktjDVNkCMHd+0t27n7zotMWayCCZWcI9Eacp
+         oyVsBeTqs6P3e1wq+e6URr6EJX9EWSe0pNBXO4b8dBn4ipSbzOaBxMS5XDvtw/EyolH8
+         eOaUPMcDrhnfZraqPCW8VW7j1zcQ1A3K68RZFRAC+fOQZ5cdPbSlQX8TmkpGlLLOvRJv
+         RrUQ==
+X-Gm-Message-State: APjAAAVMDK8+jqX+btwBqA/F/jbNuUaYoXH6q0hSASHMNtIuP/0gU9bT
+        8RsaTqt2bhBw4dNlpeIJcnSXnwTkEzwrlm3+5Ge6Ef0OkvqQAosyFeSBXzhr8gUl++if9qiRq+L
+        H6TKUF73fQJ4S3VkFyrgszvNhE9yeLnmXDry5pT9T
+X-Received: by 2002:a17:902:8a94:: with SMTP id p20mr114567053plo.312.1564489842819;
+        Tue, 30 Jul 2019 05:30:42 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy0VsDJiydDk2IU/zaDnE7MxD9OWWEeZZZ3QAEoamnUMMOh2M43oOlEha15TE8IWLdFKfsSxA==
+X-Received: by 2002:a17:902:8a94:: with SMTP id p20mr114567041plo.312.1564489842701;
+        Tue, 30 Jul 2019 05:30:42 -0700 (PDT)
 Received: from [192.168.1.202] ([152.254.214.186])
-        by smtp.gmail.com with ESMTPSA id e189sm45931655pgc.15.2019.07.30.05.18.59
+        by smtp.gmail.com with ESMTPSA id 85sm69146580pfv.130.2019.07.30.05.30.36
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Jul 2019 05:19:04 -0700 (PDT)
-Subject: Re: [PATCH 1/2] md/raid0: Introduce new array state 'broken' for
- raid0
-To:     Bob Liu <bob.liu@oracle.com>, linux-raid@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
-        jay.vosburgh@canonical.com, neilb@suse.com, songliubraving@fb.com
-References: <20190729203135.12934-1-gpiccoli@canonical.com>
- <20190729203135.12934-2-gpiccoli@canonical.com>
- <d730c417-a328-3df3-1e31-32b6df48b6ad@oracle.com>
+        Tue, 30 Jul 2019 05:30:41 -0700 (PDT)
+Subject: Re: [PATCH] md/raid0: Fail BIOs if their underlying block device is
+ gone
+To:     NeilBrown <neilb@suse.com>, linux-raid@vger.kernel.org
+Cc:     jay.vosburgh@canonical.com, Song Liu <songliubraving@fb.com>,
+        dm-devel@redhat.com, Neil F Brown <nfbrown@suse.com>,
+        linux-block@vger.kernel.org
+References: <20190729193359.11040-1-gpiccoli@canonical.com>
+ <87zhkwl6ya.fsf@notabene.neil.brown.name>
 From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
@@ -85,56 +85,37 @@ Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
  Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
  kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
  X18zwLgdiQ==
-Message-ID: <000c20fe-3bcd-2dff-a5ab-9a294bdc7746@canonical.com>
-Date:   Tue, 30 Jul 2019 09:18:54 -0300
+Message-ID: <6400083b-3cf3-cbc6-650a-c3ae6629b14c@canonical.com>
+Date:   Tue, 30 Jul 2019 09:30:31 -0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <d730c417-a328-3df3-1e31-32b6df48b6ad@oracle.com>
+In-Reply-To: <87zhkwl6ya.fsf@notabene.neil.brown.name>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 30/07/2019 03:20, Bob Liu wrote:
-> [...]
->> + * broken
->> + *     RAID0-only: same as clean, but array is missing a member.
->> + *     It's useful because RAID0 mounted-arrays aren't stopped
->> + *     when a member is gone, so this state will at least alert
->> + *     the user that something is wrong.
+On 29/07/2019 21:08, NeilBrown wrote:
+>[...]
+>> +	if (unlikely(test_bit(MD_BROKEN, &mddev->flags))) {
+>> +		bio_io_error(bio);
+>> +		return BLK_QC_T_NONE;
+>> +	}
 > 
+> I think this should only fail WRITE requests, not READ requests.
 > 
-> Curious why only raid0 has this issue? 
+> Otherwise the patch is probably reasonable.
 > 
-> Thanks, -Bob
+> NeilBrown
 
-Hi Bob, I understand that all other levels have fault-tolerance logic,
-while raid0 is just a "bypass" driver that selects the correct
-underlying device to send the BIO and blindly sends it. It's known to be
-a performance-only /lightweight solution whereas the other levels aim to
-be reliable.
-
-I've quickly tested raid5 and rai10, and see messages like this on
-kernel log when removing a device (in raid5):
-
-[35.764975] md/raid:md0: Disk failure on nvme1n1, disabling device.
-md/raid:md0: Operation continuing on 1 devices.
-
-The message seen in raid10 is basically the same. As a (cheap)
-comparison of the complexity among levels, look that:
-
-<...>/linux-mainline/drivers/md# cat raid5* | wc -l
-14191
-
-<...>/linux-mainline/drivers/md# cat raid10* | wc -l
-5135
-
-<...>/linux-mainline/drivers/md# cat raid0* | wc -l
-820
+Thanks for the feedback Neil! I thought about it; it seemed to me better
+to deny/fail the reads instead of returning "wrong" reads, since a file
+read in a raid0 will be incomplete if one member is missing.
+But it's fine for me to change that in the next iteration of this patch.
 
 Cheers,
 
