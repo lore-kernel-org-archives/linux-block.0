@@ -2,363 +2,155 @@ Return-Path: <SRS0=Z/SB=V4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A90EBC433FF
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 14:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4ECCC433FF
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 14:44:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6465C20693
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 14:00:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67E0520659
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 14:44:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="xG0GYs/9"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="JfDhaN3A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727232AbfGaOAc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Jul 2019 10:00:32 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:45703 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726968AbfGaOAc (ORCPT
+        id S1728507AbfGaOoq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Jul 2019 10:44:46 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:44902 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728482AbfGaOoq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jul 2019 10:00:32 -0400
-Received: by mail-lj1-f194.google.com with SMTP id m23so65645493lje.12
-        for <linux-block@vger.kernel.org>; Wed, 31 Jul 2019 07:00:30 -0700 (PDT)
+        Wed, 31 Jul 2019 10:44:46 -0400
+Received: by mail-io1-f65.google.com with SMTP id s7so136657699iob.11
+        for <linux-block@vger.kernel.org>; Wed, 31 Jul 2019 07:44:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=AeV5y/7YBAzauJ9CVUGWrPfn2zkUpRwL++Z4I//XVkE=;
-        b=xG0GYs/9AY+AfUaDlbO1ElJJ7rh8GhV1FOevcba29M4K73Q11ogJdSBcPkJzj637Ct
-         uDlercjZnQfrSSl54toQ6XMOoGz68/ZcYWxwb4y4VKQK2dFEVT5HeNkWJfJhNplolu4r
-         8+YlYtvv994M/ZNyRcaCi7EMvLVmDi1VotFAof3R1pc12nmS25l/WRTEMtQ/tZqHv8j5
-         LxxRL4Y/3Zz/iW+VnMLgpwuPXEfNC37hUyb436ixBZcn7HOHqUzlLR5sgjVSPw0K3drv
-         6PRY0HC4vQQmDMrDLDZ8hbMq89LCBi3rBcTkmjLPhgADTw6JKbwgXUC1z/cSOw2lmceX
-         3WIQ==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=qrlqtZ2LKCO/jAEUyoC0ndYHr6eCC8ojnK1cOs+wqck=;
+        b=JfDhaN3AScGDGpzWgm9xrnPXbQ++2WNE1r4GEcLr/qd34GmXeLRGat/k+Hvh3TcqNf
+         SueYicShJy6t5NnHvDWnleUMrfbqIcMLGoAmYQMBQFiPsT13VrqghyxzoJ7Dhtc/j/K6
+         kfDXD94VIddubuxk8T5ieXXqjmkdzAiMq2/nHt+lHNYdnpii7ngINLFyHE8SM4lAHQyg
+         QcwXzJT13C8Tsbpxf6tBUIu7kGinpFNrXKT7yV7Vs0WB2MfQyum+xhWbT/sAl/ZicrgU
+         /xC1x47bQA7ORxTjt/03vry8pa7fyFJYjoxcvfH8d7DDNzGzdffa3/+rJ+meIcfGsEdd
+         jDQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=AeV5y/7YBAzauJ9CVUGWrPfn2zkUpRwL++Z4I//XVkE=;
-        b=KpnlYQ4q5E0fwnUCG7ixE/HBFDU5lPdiIjg5q5Pg+q5rHz3wdQUEeE1sMdbWDSZWQW
-         CaoyLoPOuQxfKE8Y8sd3ArLuOimoK//5uFqMBOf850Ps/BrLeaGyaVsYw0iUVE7ZQINM
-         sRG3zyx+8dXSYOp2aptlUjKSYBEgdyTp/U8Wj5tGGCE+16ij35R38UENSDagujPnpJJW
-         iDTDlfY1z1XeSwffpI3KyJ4foHmKwEY/KC6o0Wj6mqHo3JIO2PNPJpfbBdDoQbNWBIuw
-         DWD9n/PK6pEN6msZ5Vl8cabneahVZGl2s0qQPjTKB5R65Xxt4X9dzyuu9wPLbA+OnYfr
-         8mVw==
-X-Gm-Message-State: APjAAAXXQMpXmR9uwOZB0ciuno0C5nnIvtCyqBlgat1Eox6m73n6xaMm
-        wuEKzzeBlyrM9aaMtgrfQUU=
-X-Google-Smtp-Source: APXvYqy8fdmmdAPM+l8TKnTqCVnzZd8UpK4K4eaT+cd+spJRryTiEanq++W2ZeB2FnK904DWa3w2+Q==
-X-Received: by 2002:a2e:2bd3:: with SMTP id r80mr65679932ljr.23.1564581630216;
-        Wed, 31 Jul 2019 07:00:30 -0700 (PDT)
-Received: from [172.20.10.13] (212.27.19.10.bredband.3.dk. [212.27.19.10])
-        by smtp.gmail.com with ESMTPSA id b25sm11830812lfq.11.2019.07.31.07.00.28
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qrlqtZ2LKCO/jAEUyoC0ndYHr6eCC8ojnK1cOs+wqck=;
+        b=bwQtSeUMgIOrCNtU7f7CchScjNnFH1UV+WViDkhM4it6OKa2zjrQhVGoDm5k+fy1WN
+         XsF5CHtS6CFRWqGGlwSpLYy26AZ9MpaZ87JYSzHjRgOmjH8oiAdgOy6FgDa6Ay12Cnlt
+         qV84HSNcMKMBiPXgzWsOdN9tQ8zypELZNvpSOw2BuATHKQFLIyqjozUyT5kjXrYizC9D
+         GPogIfVrycrpqccWeCqA0dkO4cbx4+CEeWI4DxSCLFxdv9ky2UnYjqDw8hNeWrLVjbF5
+         zNypLjp4RI6FW643PtLHjQmN00cVKujF1cv07pIckrVJ69pSTSPKGS6L2Zyr8+iQlTDw
+         IcYg==
+X-Gm-Message-State: APjAAAVP3aFG0V3Y3KPYtsVpi6peUnaqfXNiCeaum9ivBvNEukvdeyzj
+        jd9rvZ78eCf5vjPSTVOeREp7J3kdruo=
+X-Google-Smtp-Source: APXvYqzGdyAEJDKYQW25Oj8eyD6mVr2igsVbGdOolZ/umcOu9umrQHNk0C2oEwDLx04PtjYdf2VXSA==
+X-Received: by 2002:a5d:8a10:: with SMTP id w16mr1589851iod.175.1564584284936;
+        Wed, 31 Jul 2019 07:44:44 -0700 (PDT)
+Received: from [192.168.1.57] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id h8sm62015017ioq.61.2019.07.31.07.44.43
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 07:00:29 -0700 (PDT)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <AC013EF0-BA7D-40B0-AE0D-BC533494E01F@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_59644D71-A35A-4BDE-90ED-960C50DA39B9";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 3/4] lightnvm: pblk: use kvmalloc for metadata
-Date:   Wed, 31 Jul 2019 16:00:27 +0200
-In-Reply-To: <1564566096-28756-4-git-send-email-hans@owltronix.com>
-Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To:     Hans Holmberg <hans@owltronix.com>
-References: <1564566096-28756-1-git-send-email-hans@owltronix.com>
- <1564566096-28756-4-git-send-email-hans@owltronix.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Wed, 31 Jul 2019 07:44:43 -0700 (PDT)
+Subject: Re: [PATCH v2] io_uring: fix KASAN use after free in
+ io_sq_wq_submit_work
+To:     Jackie Liu <liuyun01@kylinos.cn>
+Cc:     Zhengyuan Liu <liuzhengyuan@kylinos.cn>,
+        linux-block@vger.kernel.org
+References: <1564555173-10766-1-git-send-email-liuyun01@kylinos.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <183aa5ea-67b6-0fd5-04e1-46d4a5c96c5c@kernel.dk>
+Date:   Wed, 31 Jul 2019 08:44:42 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <1564555173-10766-1-git-send-email-liuyun01@kylinos.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 7/31/19 12:39 AM, Jackie Liu wrote:
+> [root@localhost ~]# ./liburing/test/link
+> 
+> QEMU Standard PC report that:
+> 
+> [   29.379892] CPU: 0 PID: 84 Comm: kworker/u2:2 Not tainted 5.3.0-rc2-00051-g4010b622f1d2-dirty #86
+> [   29.379902] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-1 04/01/2014
+> [   29.379913] Workqueue: io_ring-wq io_sq_wq_submit_work
+> [   29.379929] Call Trace:
+> [   29.379953]  dump_stack+0xa9/0x10e
+> [   29.379970]  ? io_sq_wq_submit_work+0xbf4/0xe90
+> [   29.379986]  print_address_description.cold.6+0x9/0x317
+> [   29.379999]  ? io_sq_wq_submit_work+0xbf4/0xe90
+> [   29.380010]  ? io_sq_wq_submit_work+0xbf4/0xe90
+> [   29.380026]  __kasan_report.cold.7+0x1a/0x34
+> [   29.380044]  ? io_sq_wq_submit_work+0xbf4/0xe90
+> [   29.380061]  kasan_report+0xe/0x12
+> [   29.380076]  io_sq_wq_submit_work+0xbf4/0xe90
+> [   29.380104]  ? io_sq_thread+0xaf0/0xaf0
+> [   29.380152]  process_one_work+0xb59/0x19e0
+> [   29.380184]  ? pwq_dec_nr_in_flight+0x2c0/0x2c0
+> [   29.380221]  worker_thread+0x8c/0xf40
+> [   29.380248]  ? __kthread_parkme+0xab/0x110
+> [   29.380265]  ? process_one_work+0x19e0/0x19e0
+> [   29.380278]  kthread+0x30b/0x3d0
+> [   29.380292]  ? kthread_create_on_node+0xe0/0xe0
+> [   29.380311]  ret_from_fork+0x3a/0x50
+> 
+> [   29.380635] Allocated by task 209:
+> [   29.381255]  save_stack+0x19/0x80
+> [   29.381268]  __kasan_kmalloc.constprop.6+0xc1/0xd0
+> [   29.381279]  kmem_cache_alloc+0xc0/0x240
+> [   29.381289]  io_submit_sqe+0x11bc/0x1c70
+> [   29.381300]  io_ring_submit+0x174/0x3c0
+> [   29.381311]  __x64_sys_io_uring_enter+0x601/0x780
+> [   29.381322]  do_syscall_64+0x9f/0x4d0
+> [   29.381336]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> 
+> [   29.381633] Freed by task 84:
+> [   29.382186]  save_stack+0x19/0x80
+> [   29.382198]  __kasan_slab_free+0x11d/0x160
+> [   29.382210]  kmem_cache_free+0x8c/0x2f0
+> [   29.382220]  io_put_req+0x22/0x30
+> [   29.382230]  io_sq_wq_submit_work+0x28b/0xe90
+> [   29.382241]  process_one_work+0xb59/0x19e0
+> [   29.382251]  worker_thread+0x8c/0xf40
+> [   29.382262]  kthread+0x30b/0x3d0
+> [   29.382272]  ret_from_fork+0x3a/0x50
+> 
+> [   29.382569] The buggy address belongs to the object at ffff888067172140
+>                  which belongs to the cache io_kiocb of size 224
+> [   29.384692] The buggy address is located 120 bytes inside of
+>                  224-byte region [ffff888067172140, ffff888067172220)
+> [   29.386723] The buggy address belongs to the page:
+> [   29.387575] page:ffffea00019c5c80 refcount:1 mapcount:0 mapping:ffff88806ace5180 index:0x0
+> [   29.387587] flags: 0x100000000000200(slab)
+> [   29.387603] raw: 0100000000000200 dead000000000100 dead000000000122 ffff88806ace5180
+> [   29.387617] raw: 0000000000000000 00000000800c000c 00000001ffffffff 0000000000000000
+> [   29.387624] page dumped because: kasan: bad access detected
+> 
+> [   29.387920] Memory state around the buggy address:
+> [   29.388771]  ffff888067172080: fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+> [   29.390062]  ffff888067172100: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
+> [   29.391325] >ffff888067172180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> [   29.392578]                                         ^
+> [   29.393480]  ffff888067172200: fb fb fb fb fc fc fc fc fc fc fc fc fc fc fc fc
+> [   29.394744]  ffff888067172280: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [   29.396003] ==================================================================
+> [   29.397260] Disabling lock debugging due to kernel taint
+> 
+> io_sq_wq_submit_work free and read req again.
 
---Apple-Mail=_59644D71-A35A-4BDE-90ED-960C50DA39B9
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
-
-> On 31 Jul 2019, at 11.41, Hans Holmberg <hans@owltronix.com> wrote:
->=20
-> There is no reason now not to use kvmalloc, so
-> so replace the internal metadata allocation scheme.
-
-2 x so
-
->=20
-> Signed-off-by: Hans Holmberg <hans@owltronix.com>
-> ---
-> drivers/lightnvm/pblk-core.c |  3 +--
-> drivers/lightnvm/pblk-gc.c   | 19 ++++++++-----------
-> drivers/lightnvm/pblk-init.c | 38 =
-++++++++++----------------------------
-> drivers/lightnvm/pblk.h      | 23 -----------------------
-> 4 files changed, 19 insertions(+), 64 deletions(-)
->=20
-> diff --git a/drivers/lightnvm/pblk-core.c =
-b/drivers/lightnvm/pblk-core.c
-> index a58d3c84a3f2..b413bafe93fd 100644
-> --- a/drivers/lightnvm/pblk-core.c
-> +++ b/drivers/lightnvm/pblk-core.c
-> @@ -1839,8 +1839,7 @@ static void pblk_save_lba_list(struct pblk =
-*pblk, struct pblk_line *line)
-> 	struct pblk_w_err_gc *w_err_gc =3D line->w_err_gc;
-> 	struct pblk_emeta *emeta =3D line->emeta;
->=20
-> -	w_err_gc->lba_list =3D pblk_malloc(lba_list_size,
-> -					 l_mg->emeta_alloc_type, =
-GFP_KERNEL);
-> +	w_err_gc->lba_list =3D kvmalloc(lba_list_size, GFP_KERNEL);
-> 	memcpy(w_err_gc->lba_list, emeta_to_lbas(pblk, emeta->buf),
-> 				lba_list_size);
-> }
-> diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-> index 63ee205b41c4..2581eebcfc41 100644
-> --- a/drivers/lightnvm/pblk-gc.c
-> +++ b/drivers/lightnvm/pblk-gc.c
-> @@ -132,14 +132,12 @@ static __le64 *get_lba_list_from_emeta(struct =
-pblk *pblk,
-> 				       struct pblk_line *line)
-> {
-> 	struct line_emeta *emeta_buf;
-> -	struct pblk_line_mgmt *l_mg =3D &pblk->l_mg;
-> 	struct pblk_line_meta *lm =3D &pblk->lm;
-> 	unsigned int lba_list_size =3D lm->emeta_len[2];
-> 	__le64 *lba_list;
-> 	int ret;
->=20
-> -	emeta_buf =3D pblk_malloc(lm->emeta_len[0],
-> -				l_mg->emeta_alloc_type, GFP_KERNEL);
-> +	emeta_buf =3D kvmalloc(lm->emeta_len[0], GFP_KERNEL);
-> 	if (!emeta_buf)
-> 		return NULL;
->=20
-> @@ -147,7 +145,7 @@ static __le64 *get_lba_list_from_emeta(struct pblk =
-*pblk,
-> 	if (ret) {
-> 		pblk_err(pblk, "line %d read emeta failed (%d)\n",
-> 				line->id, ret);
-> -		pblk_mfree(emeta_buf, l_mg->emeta_alloc_type);
-> +		kvfree(emeta_buf);
-> 		return NULL;
-> 	}
->=20
-> @@ -161,16 +159,16 @@ static __le64 *get_lba_list_from_emeta(struct =
-pblk *pblk,
-> 	if (ret) {
-> 		pblk_err(pblk, "inconsistent emeta (line %d)\n",
-> 				line->id);
-> -		pblk_mfree(emeta_buf, l_mg->emeta_alloc_type);
-> +		kvfree(emeta_buf);
-> 		return NULL;
-> 	}
->=20
-> -	lba_list =3D pblk_malloc(lba_list_size,
-> -			       l_mg->emeta_alloc_type, GFP_KERNEL);
-> +	lba_list =3D kvmalloc(lba_list_size, GFP_KERNEL);
-> +
-> 	if (lba_list)
-> 		memcpy(lba_list, emeta_to_lbas(pblk, emeta_buf), =
-lba_list_size);
->=20
-> -	pblk_mfree(emeta_buf, l_mg->emeta_alloc_type);
-> +	kvfree(emeta_buf);
->=20
-> 	return lba_list;
-> }
-> @@ -181,7 +179,6 @@ static void pblk_gc_line_prepare_ws(struct =
-work_struct *work)
-> 									=
-ws);
-> 	struct pblk *pblk =3D line_ws->pblk;
-> 	struct pblk_line *line =3D line_ws->line;
-> -	struct pblk_line_mgmt *l_mg =3D &pblk->l_mg;
-> 	struct pblk_line_meta *lm =3D &pblk->lm;
-> 	struct nvm_tgt_dev *dev =3D pblk->dev;
-> 	struct nvm_geo *geo =3D &dev->geo;
-> @@ -272,7 +269,7 @@ static void pblk_gc_line_prepare_ws(struct =
-work_struct *work)
-> 		goto next_rq;
->=20
-> out:
-> -	pblk_mfree(lba_list, l_mg->emeta_alloc_type);
-> +	kvfree(lba_list);
-> 	kfree(line_ws);
-> 	kfree(invalid_bitmap);
->=20
-> @@ -286,7 +283,7 @@ static void pblk_gc_line_prepare_ws(struct =
-work_struct *work)
-> fail_free_gc_rq:
-> 	kfree(gc_rq);
-> fail_free_lba_list:
-> -	pblk_mfree(lba_list, l_mg->emeta_alloc_type);
-> +	kvfree(lba_list);
-> fail_free_invalid_bitmap:
-> 	kfree(invalid_bitmap);
-> fail_free_ws:
-> diff --git a/drivers/lightnvm/pblk-init.c =
-b/drivers/lightnvm/pblk-init.c
-> index b351c7f002de..9a967a2e83dd 100644
-> --- a/drivers/lightnvm/pblk-init.c
-> +++ b/drivers/lightnvm/pblk-init.c
-> @@ -543,7 +543,7 @@ static void pblk_line_mg_free(struct pblk *pblk)
->=20
-> 	for (i =3D 0; i < PBLK_DATA_LINES; i++) {
-> 		kfree(l_mg->sline_meta[i]);
-> -		pblk_mfree(l_mg->eline_meta[i]->buf, =
-l_mg->emeta_alloc_type);
-> +		kvfree(l_mg->eline_meta[i]->buf);
-> 		kfree(l_mg->eline_meta[i]);
-> 	}
->=20
-> @@ -560,7 +560,7 @@ static void pblk_line_meta_free(struct =
-pblk_line_mgmt *l_mg,
-> 	kfree(line->erase_bitmap);
-> 	kfree(line->chks);
->=20
-> -	pblk_mfree(w_err_gc->lba_list, l_mg->emeta_alloc_type);
-> +	kvfree(w_err_gc->lba_list);
-> 	kfree(w_err_gc);
-> }
->=20
-> @@ -890,29 +890,14 @@ static int pblk_line_mg_init(struct pblk *pblk)
-> 		if (!emeta)
-> 			goto fail_free_emeta;
->=20
-> -		if (lm->emeta_len[0] > KMALLOC_MAX_CACHE_SIZE) {
-> -			l_mg->emeta_alloc_type =3D PBLK_VMALLOC_META;
-> -
-> -			emeta->buf =3D vmalloc(lm->emeta_len[0]);
-> -			if (!emeta->buf) {
-> -				kfree(emeta);
-> -				goto fail_free_emeta;
-> -			}
-> -
-> -			emeta->nr_entries =3D lm->emeta_sec[0];
-> -			l_mg->eline_meta[i] =3D emeta;
-> -		} else {
-> -			l_mg->emeta_alloc_type =3D PBLK_KMALLOC_META;
-> -
-> -			emeta->buf =3D kmalloc(lm->emeta_len[0], =
-GFP_KERNEL);
-> -			if (!emeta->buf) {
-> -				kfree(emeta);
-> -				goto fail_free_emeta;
-> -			}
-> -
-> -			emeta->nr_entries =3D lm->emeta_sec[0];
-> -			l_mg->eline_meta[i] =3D emeta;
-> +		emeta->buf =3D kvmalloc(lm->emeta_len[0], GFP_KERNEL);
-> +		if (!emeta->buf) {
-> +			kfree(emeta);
-> +			goto fail_free_emeta;
-> 		}
-> +
-> +		emeta->nr_entries =3D lm->emeta_sec[0];
-> +		l_mg->eline_meta[i] =3D emeta;
-> 	}
->=20
-> 	for (i =3D 0; i < l_mg->nr_lines; i++)
-> @@ -926,10 +911,7 @@ static int pblk_line_mg_init(struct pblk *pblk)
->=20
-> fail_free_emeta:
-> 	while (--i >=3D 0) {
-> -		if (l_mg->emeta_alloc_type =3D=3D PBLK_VMALLOC_META)
-> -			vfree(l_mg->eline_meta[i]->buf);
-> -		else
-> -			kfree(l_mg->eline_meta[i]->buf);
-> +		kvfree(l_mg->eline_meta[i]->buf);
-> 		kfree(l_mg->eline_meta[i]);
-> 	}
->=20
-> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-> index d515d3409a74..86ffa875bfe1 100644
-> --- a/drivers/lightnvm/pblk.h
-> +++ b/drivers/lightnvm/pblk.h
-> @@ -482,11 +482,6 @@ struct pblk_line {
-> #define PBLK_DATA_LINES 4
->=20
-> enum {
-> -	PBLK_KMALLOC_META =3D 1,
-> -	PBLK_VMALLOC_META =3D 2,
-> -};
-> -
-> -enum {
-> 	PBLK_EMETA_TYPE_HEADER =3D 1,	/* struct line_emeta first =
-sector */
-> 	PBLK_EMETA_TYPE_LLBA =3D 2,	/* lba list - type: __le64 */
-> 	PBLK_EMETA_TYPE_VSC =3D 3,	/* vsc list - type: __le32 */
-> @@ -521,9 +516,6 @@ struct pblk_line_mgmt {
->=20
-> 	__le32 *vsc_list;		/* Valid sector counts for all =
-lines */
->=20
-> -	/* Metadata allocation type: VMALLOC | KMALLOC */
-> -	int emeta_alloc_type;
-> -
-> 	/* Pre-allocated metadata for data lines */
-> 	struct pblk_smeta *sline_meta[PBLK_DATA_LINES];
-> 	struct pblk_emeta *eline_meta[PBLK_DATA_LINES];
-> @@ -934,21 +926,6 @@ void pblk_rl_werr_line_out(struct pblk_rl *rl);
-> int pblk_sysfs_init(struct gendisk *tdisk);
-> void pblk_sysfs_exit(struct gendisk *tdisk);
->=20
-> -static inline void *pblk_malloc(size_t size, int type, gfp_t flags)
-> -{
-> -	if (type =3D=3D PBLK_KMALLOC_META)
-> -		return kmalloc(size, flags);
-> -	return vmalloc(size);
-> -}
-> -
-> -static inline void pblk_mfree(void *ptr, int type)
-> -{
-> -	if (type =3D=3D PBLK_KMALLOC_META)
-> -		kfree(ptr);
-> -	else
-> -		vfree(ptr);
-> -}
-> -
-> static inline struct nvm_rq *nvm_rq_from_c_ctx(void *c_ctx)
-> {
-> 	return c_ctx - sizeof(struct nvm_rq);
-> --
-> 2.7.4
-
-Looks good to me.
-
-Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
+Good catch, and I v2 is much cleaner than the first one. Applied.
 
 
+-- 
+Jens Axboe
 
-
---Apple-Mail=_59644D71-A35A-4BDE-90ED-960C50DA39B9
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAl1BnvsACgkQPEYBfS0l
-eOBJaQ/6Al8WuAZAGY23iYGwA6vJVrO1UGp+CHzs9uqmQ1svg4OfckPRbwLkjctN
-5WCadZtI2aid3J5o/Ikg3VDkLcES5n32plBrlBjsvXHkWutwqCtR2tYzNuvq4Aih
-34Y+mZJI5gmzRPAtRYyik2ao08eD5kmc9OMQyS6fQ3ZoZRP7oTtpUHblZ03eLOwG
-jurmsluDg8aE12bTIZdOPfhciUlQbr3Hjr6C0lx+ywE5De9IGWT+5baNaD0Sd5j7
-jFBi+IA7lFW2/au5IrtqsfH8npAY5Z2yk+1F9BKVCEuGFPNw0sa9b53hfKfw3TTv
-iva/RDzhizhgk+/U8GEm7LK1gupStwBek1hLHG8LFR2YTBQh75yhdUlY8Erveomz
-3+XGNMjo7oENQ1aKvjRAiuH96bIdawf6b6NHZJTonqmSithZ2EXGqn3QsmAlsyCB
-3CZoAk3TeI+RLn5UEG+gKsJx6WSoOhrbyGpwXBcs+mAXYlLAiESlZK1Hca4MxRWe
-IeBKJYpWeKK23VNRWOE/NKwgA9dfWOtsFD3Z3n9eXZ/v+AcMFeDhxUBJn2XRIYVf
-GytRcIliIHDnOF0SR5I6xWk7IDDstUjSq3XZGz8hemlIT3q2vyIkgGi37lJPSLzS
-hSjR88u4ITmeoKFsj2Q2qs1or+yJqw7exdDJ2dlmdz6JV3HT/vM=
-=5P2q
------END PGP SIGNATURE-----
-
---Apple-Mail=_59644D71-A35A-4BDE-90ED-960C50DA39B9--
