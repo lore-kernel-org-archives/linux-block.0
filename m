@@ -2,128 +2,141 @@ Return-Path: <SRS0=Z/SB=V4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96147C433FF
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 15:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF497C433FF
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 17:13:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69757206A3
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 15:31:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B316206A2
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 17:13:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KiEwryao"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="Gm0DNahb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726679AbfGaPbJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Jul 2019 11:31:09 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:43934 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726448AbfGaPbJ (ORCPT
+        id S1728254AbfGaRNU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Jul 2019 13:13:20 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:46590 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728083AbfGaRNU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jul 2019 11:31:09 -0400
-Received: by mail-io1-f67.google.com with SMTP id k20so137154656ios.10
-        for <linux-block@vger.kernel.org>; Wed, 31 Jul 2019 08:31:09 -0700 (PDT)
+        Wed, 31 Jul 2019 13:13:20 -0400
+Received: by mail-ed1-f68.google.com with SMTP id d4so66433208edr.13
+        for <linux-block@vger.kernel.org>; Wed, 31 Jul 2019 10:13:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=NhDp9pB52pEJ9oRSh1f9rOMY2HRPDd+xxEBM3tyomOA=;
-        b=KiEwryaotyWrJjNgeSpDaJXe1nW/Kc3GwwMNMx04fKoGaN9GQjSX5+Kkm3KXxhaYpE
-         ygjDhFMPIVMGhBpr+7Xe0o0x0ut78ghCFj/Sb1+Z5+PUhR2l10jY/jQU1n/4bsP6cVEf
-         2vKxLtbMLXK6WZWHSBacQe2wGDOM9nhDVekIdZqvvxXOyBb7Yewuw07ZieaTv6OfLrqP
-         gTiQZBGS/Oj5NbArVgHD2Wqvz46vGEvmWlUi8wB1E0+MtkxShFQXsJ0WbKG+WvH0jZad
-         eDETGaRcbelhCY3YPbD59ynmcQgORQbhBf16FgTzNjGZpxowTbgC6T8piKFAbe2fWmrk
-         dprQ==
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
+         :references;
+        bh=f1LF3yb4DZ7OR897ZGLAel5hvQn+h9DZaHtHoF52s7U=;
+        b=Gm0DNahbdzmxTjb6RPdo8UA5Qe2qrTf0rvxt5t7sud1MKQnztfM2FEhX1kh+2hucRs
+         pxY7Z6HR7rnXXYfCUaeEjI4m583IjMjYpZu8TzCGhT80vv7G6GBg4mJCYIVIsaHyOJc7
+         D2HNqHynhlXiS3kLSg6BPCjjmSoYz6JZrNgVATnEB+1RZSECXDcapTw3s/fQfdVAZVml
+         MEjOaHsdyjlb30goi6Z2/uQ2x1arQHVcfqxOfxpLKZX1D16EVlG3Qf2HTVZfDC2EIp6H
+         0E4gjixEiCze8baRPdPaheKeU9M5tgehQAyx93gP132xV88yxJ8Zvs5mT2vZtN0syRMS
+         547A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NhDp9pB52pEJ9oRSh1f9rOMY2HRPDd+xxEBM3tyomOA=;
-        b=lb78pTFDYRxp+VpyL9f3E54ULB0RBVvnBiKZ6OODpu5k5mv2o2MrTEAe3UGvtaLxG5
-         8xUoFkiJksLvvNo1DaAR8n6yHYqdhZ6pNy+D2EEtzFxXikZmuMrN+6Hux+LHJb3LUniJ
-         zYodlw1eo7CY1WGzpcgloLpj3vUFdkp4YxE9ZjEkWaRSikU9ZwzfEtwb6iFco2B6ce6B
-         SZxamy+29XkYZoiQ/5bcOtU9wqn3JkT/JBHV6zf6Wu4jcwjJHeiXmfJ1vka7oaOTHLvD
-         rl79GsvDgFbIsl7VwA1OD74jQZPpIoaJ+UrxxY/10gCFpcu3SCWvesyMFSHx6yutDGhY
-         8ilg==
-X-Gm-Message-State: APjAAAXPRCWV8ebMQP5W/vWlPK0DDUjbHm9rf1cG4UN9p20MJAqdWru5
-        1ATNyJUPaLBsXSqlMVJemEo=
-X-Google-Smtp-Source: APXvYqwGXXjJXjEsoxOuddpeliVA63sBvMHhTn1ZCrzLO5mUN9Bt6IhneaHjxuTusUpX/lvztpwbIw==
-X-Received: by 2002:a5e:9b05:: with SMTP id j5mr50822005iok.75.1564587068518;
-        Wed, 31 Jul 2019 08:31:08 -0700 (PDT)
-Received: from [192.168.1.57] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id l2sm48642691ioh.20.2019.07.31.08.31.06
+        h=x-gm-message-state:from:message-id:mime-version:subject:date
+         :in-reply-to:cc:to:references;
+        bh=f1LF3yb4DZ7OR897ZGLAel5hvQn+h9DZaHtHoF52s7U=;
+        b=AN4OM0tRT2ZEeabInFjIOjysp4OOIohUrwUE3oBL/agMvS/tnnnpmqhnJrsOEtRPTc
+         2JvYtFZQqH1etQ6mVsM16Z6lsMPai2GKBRTqHgtXF7oaungayVMFuF8PABy4/NrOk88l
+         mSFf6i4nQDugBNYuZpuDy/v3qvRbFAA16cn7I43dRiunUayVv4sHG7LNjAwojjTDC5q7
+         VEJtKatCDs8TCB1F/4H1PO+q1TpXTyrN4Dn2rhYV/i7F/8Y8nSzOo5btfYQusFxLY4Cn
+         7zBUCe8LE6GcDhyzOERFJJOYI4+bdgJV5ebEzASHuKmMGrjgdGXEblmmhJmypoymAk2R
+         BQRQ==
+X-Gm-Message-State: APjAAAVreHzHFjgOkbooOOlV1FI/oR8GaPlnEH6NwGxs2e47zAzkqey4
+        3sPWh6vEZgcdf5RIMo/OI+jsO9P5
+X-Google-Smtp-Source: APXvYqxYX4Jgwcn5jKDKS1R3hovfm+uGF81JcTlllqIrn/pRLr2iPcDoZYhxFP1N3pz5IGZWXmbtvw==
+X-Received: by 2002:a17:906:bcd6:: with SMTP id lw22mr96345683ejb.68.1564593199104;
+        Wed, 31 Jul 2019 10:13:19 -0700 (PDT)
+Received: from [192.168.1.177] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
+        by smtp.gmail.com with ESMTPSA id a18sm9699868ejp.2.2019.07.31.10.13.17
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 08:31:07 -0700 (PDT)
-Subject: Re: [PATCH] MAINTAINERS: floppy: take over maintainership
-To:     Will Deacon <will@kernel.org>
-Cc:     efremov@linux.com, Jiri Kosina <jikos@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Willy Tarreau <w@1wt.eu>, Greg KH <greg@kroah.com>,
-        Alexander Popov <alex.popov@linux.com>, efremov@ispras.ru,
-        linux-block@vger.kernel.org,
-        "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
-References: <20190712185523.7208-1-efremov@ispras.ru>
- <20190713080726.GA19611@1wt.eu>
- <ec0a6c5e-bdee-3c26-f5d2-31b883c0de5d@ispras.ru>
- <CAHk-=wi=fHuiQg1fMzqAP9cuykBQSN_feD=eALDwRPmw27UwEg@mail.gmail.com>
- <nycvar.YFH.7.76.1907172355020.5899@cbobk.fhfr.pm>
- <57af5f3e-9cfe-b6d8-314c-f59855408cd5@linux.com>
- <431bd981-d81a-d4dd-75fe-96a29f8f1065@kernel.dk>
- <20190731152220.xgif4fwyqybb37pp@willie-the-truck>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e98a4fdd-530b-28e0-f8a3-cc8fb1b95320@kernel.dk>
-Date:   Wed, 31 Jul 2019 09:31:05 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190731152220.xgif4fwyqybb37pp@willie-the-truck>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Wed, 31 Jul 2019 10:13:17 -0700 (PDT)
+From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Message-Id: <C081CC43-4FBD-43DD-B494-9AFF545F79D8@javigon.com>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_216A0ED2-C55E-4922-AD94-CE22385C5ADA";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH 4/4] block: stop exporting bio_map_kern
+Date:   Wed, 31 Jul 2019 19:13:17 +0200
+In-Reply-To: <1564566096-28756-5-git-send-email-hans@owltronix.com>
+Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To:     Hans Holmberg <hans@owltronix.com>
+References: <1564566096-28756-1-git-send-email-hans@owltronix.com>
+ <1564566096-28756-5-git-send-email-hans@owltronix.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/31/19 9:22 AM, Will Deacon wrote:
-> On Wed, Jul 31, 2019 at 08:53:22AM -0600, Jens Axboe wrote:
->> On 7/31/19 8:47 AM, Denis Efremov wrote:
->>> Hi All,
->>>
->>> On 18.07.2019 01:03, Jiri Kosina wrote:
->>>> On Wed, 17 Jul 2019, Linus Torvalds wrote:
->>>>
->>>>> I don't think we really have a floppy maintainer any more,
->>>>
->>>> Yeah, I basically volunteered myself to maintain it quite some time
->>>> ago back when I fixed the concurrency issues which exhibited itself
->>>> only with VM-emulated devices, and at the same time I still had the
->>>> physical 3.5" reader.
->>>>
->>>> The hardware doesn't work any more though. So I guess I should just
->>>> remove myself as a maintainer to reflect the reality and mark floppy.c
->>>> as Orphaned.
->>>
->>> Well, without jokes about Thunderdome, I've got time, hardware and
->>> would like to maintain the floppy. Except the for recent fixes,
->>> I described floppy ioctls in syzkaller. I've already spent quite
->>> a lot of time with this code. Thus, if nobody minds
->>
->> Great, can't see anyone objecting to doling out some floppy love.
-> 
-> Whatever that involves, I don't like the sound of it.
 
-Floppy love? It's not that hard.
+--Apple-Mail=_216A0ED2-C55E-4922-AD94-CE22385C5ADA
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-This is where we need GIFs in kernel communication...
+> On 31 Jul 2019, at 11.41, Hans Holmberg <hans@owltronix.com> wrote:
+>=20
+> Now that there no module users left of bio_map_kern, stop
+> exporting the symbol.
+>=20
+> Signed-off-by: Hans Holmberg <hans@owltronix.com>
+> ---
+> block/bio.c | 1 -
+> 1 file changed, 1 deletion(-)
+>=20
+> diff --git a/block/bio.c b/block/bio.c
+> index 299a0e7651ec..96ca0b4e73bb 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1521,7 +1521,6 @@ struct bio *bio_map_kern(struct request_queue =
+*q, void *data, unsigned int len,
+> 	bio->bi_end_io =3D bio_map_kern_endio;
+> 	return bio;
+> }
+> -EXPORT_SYMBOL(bio_map_kern);
+>=20
+> static void bio_copy_kern_endio(struct bio *bio)
+> {
+> --
+> 2.7.4
 
-> Here's a belated Ack if you can add it:
-> 
-> Acked-by: Will Deacon <will@kernel.org>
+Haven=E2=80=99t realized we were the only users at this point. Nice =
+cleanup.
 
-Added, thanks.
+Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
 
--- 
-Jens Axboe
 
+--Apple-Mail=_216A0ED2-C55E-4922-AD94-CE22385C5ADA
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAl1BzC0ACgkQPEYBfS0l
+eOBpoA//S0BjiAVpc1ZrajXZt6THci8rGkpZBJFH5R4am3mtz6rg5QGzEZrUavtp
+AS0ZSxh5R3DonHJQYn0+Uw/GoqRy1TLxGqfnCwJTWmCN3bwT8C4eKgMmirSAdgit
+NyiitH73st+bU5DGa2dU5mWIxru/QQJnzvVNV+K8IVgqTScG6KaZG0fK4DOCK95g
+rcjvEJjLzaS5uNtFVSeC9AVdhMHaIK1WUT27gLiad+MRGHhxyJMRkPYGR+CQW1qd
+6okzT9aCSKFvOSvIQPlXOIZ5e2IwMru0LfaLXcfVf3JDQ6jkYx+0LKj5o3Cffbw6
+MWguizKs5WHom4SQaxhsNeoUpkQYiKTwvaJBumQRISpoFJR1HJ34igRpULVyh9VS
+8vXqwHoFqwx/D/HMof6o72OET83kWKvR/sd990nMQMF0mpk5BlMpM+/S3aGMrCSI
+U7WNFHKcFhyFiB6eqsd/+GtpYYLOx0BqBZZZ6yUW/i89aSSqJhKEinceh854+du/
+rIQhJluKmRiinxpqdaLuwkLOvhJCUzfLJS8M3LoTn9nc9+C8qpi5GRwRil+B58jI
+suQRdZjufg3N+17k6jxR7S1jxAghSsqTTZDLY4xMde4hzNerfQEXtHqJR4rgSP6n
+TqShO63GV76Ub6K4gBuIWJlqUQg/sIyZfGON7d5UWcxnxmcX5wc=
+=Egr4
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_216A0ED2-C55E-4922-AD94-CE22385C5ADA--
