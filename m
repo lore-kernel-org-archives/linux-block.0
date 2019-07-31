@@ -2,99 +2,81 @@ Return-Path: <SRS0=Z/SB=V4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A04C433FF
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 13:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D1A4C433FF
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 13:20:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F0B9206B8
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 13:06:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0914320693
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 13:20:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KpTCqN38"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387862AbfGaNGP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Jul 2019 09:06:15 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:40454 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387730AbfGaNGO (ORCPT
+        id S1729310AbfGaNUX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Jul 2019 09:20:23 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:36527 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728082AbfGaNUX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jul 2019 09:06:14 -0400
-Received: from mail-pf1-f198.google.com ([209.85.210.198])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <gpiccoli@canonical.com>)
-        id 1hsoHU-0004Zr-PW
-        for linux-block@vger.kernel.org; Wed, 31 Jul 2019 13:04:37 +0000
-Received: by mail-pf1-f198.google.com with SMTP id u21so43187340pfn.15
-        for <linux-block@vger.kernel.org>; Wed, 31 Jul 2019 06:04:36 -0700 (PDT)
+        Wed, 31 Jul 2019 09:20:23 -0400
+Received: by mail-pg1-f196.google.com with SMTP id l21so31997774pgm.3;
+        Wed, 31 Jul 2019 06:20:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=SuGziHCZaqdGOaxnWifTyczH00jv+Hf3/wqgot98H2A=;
+        b=KpTCqN385YEbwb/+5SOdVN47wgdelZs/dBwlZ2vQz98vrvv3jEcae1NLpsOMN/iUSd
+         jczkybTqK5j4un38yeDcIBsiGFkIb5fZ7ijL8vKxlvYuZLjekozCse8RMkD/fZORak+q
+         GrWXj1Lr2s7u+HciKcnuVDxFFc7le+BCik3HBMlTb4P7MVi83y2BQNQo5xy6YYWDEFuQ
+         spKwl1TZhxomzM9nIgt419VvJ4i8Zi4aeAnr1oRvG9aFY6A9AWIKkf/7idI0RUiXwR+o
+         c2ywz3oJ74Uzdo/LPDwOV/BWIV+NyxnbfYKpSVfxkRJAGkBjH2BH+mB2iize9+031LSv
+         tZVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=ZVJqYCt6y7kDQk5e4VajzmV5IXeiBUBYB5EIHeYIrC0=;
-        b=YDYJI368HlCDT3Ujo4zizQ6lmyco9fQrLtpWLVwgremT/LTNykwOSyZF7Se2xP5wh0
-         O4C1vupHNxAPk+vb984CCuHBRmuiskSoJucFexX709+Z1GdGwf9yndQ9QcFJx+Ln+3Vz
-         S2fu8f8/JjMsnxhvlqv+iOXxYD4/1073uXVbWUwWW0xfI+q0E06r93axtrJz7eVFk31d
-         NbDECH4Gw1VscY06jcHV8z+EOszjEPhxVv8ZdT0el7J+q6NNBuPPY1quOJhYS7srB5d1
-         jLByGkVM/V5aFXfqak5WqJ2tVGJEqL50KlU26++RZ/14V55BWhhUQDTe6MWlMShfwXVs
-         sRUA==
-X-Gm-Message-State: APjAAAUVaLdH3jXyOuYiXkx7OKirxbTFD1xSKkuvj+W+mO8XcVYRL5nV
-        5Kuy6qWPgrNfmRL/uqltsRNWyuhwwVcT9FfAtZw8Q/qNtUTx4Ag2canUc/M5KerIcfZoqJ9YcNr
-        GZNTNOfISayosDNudIsK/zkood5/X6v/IuXscKNVD
-X-Received: by 2002:a17:902:b591:: with SMTP id a17mr39314901pls.96.1564578275201;
-        Wed, 31 Jul 2019 06:04:35 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwR1CH6m9mU2cXXtekQvrfWE11ZuQqjWDIftLSWs2cw2Yuy7o81N8NFr/tfEfOAEV580sOfRw==
-X-Received: by 2002:a17:902:b591:: with SMTP id a17mr39314886pls.96.1564578275053;
-        Wed, 31 Jul 2019 06:04:35 -0700 (PDT)
-Received: from [192.168.1.202] ([152.254.214.186])
-        by smtp.gmail.com with ESMTPSA id b126sm103400673pfa.126.2019.07.31.06.04.28
+        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SuGziHCZaqdGOaxnWifTyczH00jv+Hf3/wqgot98H2A=;
+        b=LdLjZ5zchubhaDGTp8U4XK5m8e0QvbkifuDraX1Nsm9Dntyz7V19NbzERp/pgyrnwN
+         gR3Adc8PHVUyyunp0Ob1f3NTUC1XRZpGsm+ALVL4imZfU2kTWRHAwoX90osikuw7kdlZ
+         QjUQveNbQT36nyq5ldmQW9Nu6ukd4yk16HB9opd8lds4Kj8pz3lKNHZPc6ictEAj6JP0
+         wi9eO3UmoH/Fq1JA9jxfPbpk0qKlJ3vHVHhtR6ErhTcehKORxe+c2mNoyuwFGWsrQeLw
+         UC/FqTSmZHHpDylh+zcIzisDigiDiK6UfMRIcxsi61k5gnC0ZbGE2bSbSvaMNWx1QA8z
+         daOQ==
+X-Gm-Message-State: APjAAAWvNFACSNI4Z/LjIM8APZ3SZdTXq8w1solWNpNQqvIHkOocspgR
+        Ts8uLQDPKJerLEn6xn8bUlQ=
+X-Google-Smtp-Source: APXvYqz1iQAkX9vyi4RK4ygqUGxesbUw8qQgEHooIGFUqZjupA4wSSRcWbh6/1KykczoQbUI6cfVEA==
+X-Received: by 2002:a63:61c6:: with SMTP id v189mr106442381pgb.36.1564579222288;
+        Wed, 31 Jul 2019 06:20:22 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id 131sm2029774pge.37.2019.07.31.06.20.21
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 06:04:34 -0700 (PDT)
-Subject: Re: [PATCH 1/2] md/raid0: Introduce new array state 'broken' for
- raid0
-To:     NeilBrown <neilb@suse.com>, Bob Liu <bob.liu@oracle.com>,
-        linux-raid@vger.kernel.org
-Cc:     jay.vosburgh@canonical.com, songliubraving@fb.com,
-        dm-devel@redhat.com, Neil F Brown <nfbrown@suse.com>,
-        linux-block@vger.kernel.org
-References: <20190729203135.12934-1-gpiccoli@canonical.com>
- <20190729203135.12934-2-gpiccoli@canonical.com>
- <d730c417-a328-3df3-1e31-32b6df48b6ad@oracle.com>
- <87ftmnkpxi.fsf@notabene.neil.brown.name>
-From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
- mQENBFpVBxcBCADPNKmu2iNKLepiv8+Ssx7+fVR8lrL7cvakMNFPXsXk+f0Bgq9NazNKWJIn
- Qxpa1iEWTZcLS8ikjatHMECJJqWlt2YcjU5MGbH1mZh+bT3RxrJRhxONz5e5YILyNp7jX+Vh
- 30rhj3J0vdrlIhPS8/bAt5tvTb3ceWEic9mWZMsosPavsKVcLIO6iZFlzXVu2WJ9cov8eQM/
- irIgzvmFEcRyiQ4K+XUhuA0ccGwgvoJv4/GWVPJFHfMX9+dat0Ev8HQEbN/mko/bUS4Wprdv
- 7HR5tP9efSLucnsVzay0O6niZ61e5c97oUa9bdqHyApkCnGgKCpg7OZqLMM9Y3EcdMIJABEB
- AAG0LUd1aWxoZXJtZSBHLiBQaWNjb2xpIDxncGljY29saUBjYW5vbmljYWwuY29tPokBNwQT
- AQgAIQUCWmClvQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRDOR5EF9K/7Gza3B/9d
- 5yczvEwvlh6ksYq+juyuElLvNwMFuyMPsvMfP38UslU8S3lf+ETukN1S8XVdeq9yscwtsRW/
- 4YoUwHinJGRovqy8gFlm3SAtjfdqysgJqUJwBmOtcsHkmvFXJmPPGVoH9rMCUr9s6VDPox8f
- q2W5M7XE9YpsfchS/0fMn+DenhQpV3W6pbLtuDvH/81GKrhxO8whSEkByZbbc+mqRhUSTdN3
- iMpRL0sULKPVYbVMbQEAnfJJ1LDkPqlTikAgt3peP7AaSpGs1e3pFzSEEW1VD2jIUmmDku0D
- LmTHRl4t9KpbU/H2/OPZkrm7809QovJGRAxjLLPcYOAP7DUeltveuQENBFpVBxcBCADbxD6J
- aNw/KgiSsbx5Sv8nNqO1ObTjhDR1wJw+02Bar9DGuFvx5/qs3ArSZkl8qX0X9Vhptk8rYnkn
- pfcrtPBYLoux8zmrGPA5vRgK2ItvSc0WN31YR/6nqnMfeC4CumFa/yLl26uzHJa5RYYQ47jg
- kZPehpc7IqEQ5IKy6cCKjgAkuvM1rDP1kWQ9noVhTUFr2SYVTT/WBHqUWorjhu57/OREo+Tl
- nxI1KrnmW0DbF52tYoHLt85dK10HQrV35OEFXuz0QPSNrYJT0CZHpUprkUxrupDgkM+2F5LI
- bIcaIQ4uDMWRyHpDbczQtmTke0x41AeIND3GUc+PQ4hWGp9XABEBAAGJAR8EGAEIAAkFAlpV
- BxcCGwwACgkQzkeRBfSv+xv1wwgAj39/45O3eHN5pK0XMyiRF4ihH9p1+8JVfBoSQw7AJ6oU
- 1Hoa+sZnlag/l2GTjC8dfEGNoZd3aRxqfkTrpu2TcfT6jIAsxGjnu+fUCoRNZzmjvRziw3T8
- egSPz+GbNXrTXB8g/nc9mqHPPprOiVHDSK8aGoBqkQAPZDjUtRwVx112wtaQwArT2+bDbb/Y
- Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
- kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
- X18zwLgdiQ==
-Message-ID: <9dd836f8-7358-834f-8d29-cd0db717d01b@canonical.com>
-Date:   Wed, 31 Jul 2019 10:04:23 -0300
+        Wed, 31 Jul 2019 06:20:21 -0700 (PDT)
+Subject: Re: [PATCH] bfq: Check if bfqq is NULL in bfq_insert_request
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Hsin-Yi Wang <hsinyi@google.com>,
+        Nicolas Boichat <drinkcat@chromium.org>,
+        Doug Anderson <dianders@chromium.org>
+References: <1563816648-12057-1-git-send-email-linux@roeck-us.net>
+ <20190728151931.GA29181@roeck-us.net>
+ <0BCD5EDA-6D08-4023-9EEA-087F0AB99D47@linaro.org>
+ <23890163-facd-3838-ddee-770b7c2f32ea@roeck-us.net>
+ <5162CB3B-39B1-4348-AEBD-2197330A3BA3@linaro.org>
+From:   Guenter Roeck <linux@roeck-us.net>
+Message-ID: <ed9d530d-a5d5-44fb-1e9d-1c9f562f0ce3@roeck-us.net>
+Date:   Wed, 31 Jul 2019 06:20:20 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <87ftmnkpxi.fsf@notabene.neil.brown.name>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5162CB3B-39B1-4348-AEBD-2197330A3BA3@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -102,24 +84,138 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 30/07/2019 21:28, NeilBrown wrote:
-> On Tue, Jul 30 2019, Bob Liu wrote:
+On 7/31/19 3:11 AM, Paolo Valente wrote:
+> 
+> 
+>> Il giorno 30 lug 2019, alle ore 15:35, Guenter Roeck <linux@roeck-us.net> ha scritto:
 >>
+>> On 7/30/19 1:55 AM, Paolo Valente wrote:
+>>> Hi Guenter,
+>>> sorry for the delay (Dolomiti's fault).
+>>> I didn't consider that rq->elv-icq might have been NULL also
+>>> because of OOM.  Thanks for spotting this issue.
+>>> As for the other places where the return value of bfq_init_rq is used,
+>>> unfortunately I think they matter too.  Those other places are related
+>>> to request merging, which is the alternative destiny of requests
+>>> (instead of being just inserted).  But, regardless of whether a
+>>> request is to be merged or inserted, that request may be destined to a
+>>> bfq_queue (possibly merged with a request already in a bfq_queue), and
+>>> a NULL return value by bfq_init_rq leads to a crash.  I guess you can
+>>> reproduce your failure also for the merge case, by generating
+>>> sequential, direct I/O with queue depth > 1, and of course by enabling
+>>> failslab.
+>> My assumption was that requests would only be merged if they are associated
+>> with the same io context. In that case, that IO context isn't reallocated
+>> with ioc_create_icq() but reused, and icq would thus never be NULL.
+>> I guess that assumption was wrong.
+> 
+> I don't remember such a filtering.  I had a look again, but didn't
+> find anything relevant.  However, more competent people see these
+
+Me not either, when I had a closer look yesterday. My conclusion was
+that your analysis is correct.
+
+Thanks,
+Guenter
+
+> emails.  Maybe someone can give us better advice.  Otherwise, to stay
+> on the safe side, I'd propose to handle any possible NULL return.
+> 
+> And I'll manage it, as per your request.
+> 
+> Thanks,
+> Paolo
+> 
 >>
->> Curious why only raid0 has this issue? 
+>>> If my considerations above are correct, do you want to propose a
+>>> complete fix yourself?
+>>
+>> Sure, I'll send an updated patch.
+>>
+>> Thanks,
+>> Guenter
+>>
+>>> Thanks,
+>>> Paolo
+>>>> Il giorno 28 lug 2019, alle ore 17:19, Guenter Roeck <linux@roeck-us.net> ha scritto:
+>>>>
+>>>> ping ... just in case this patch got lost in Paolo's queue.
+>>>>
+>>>> Guenter
+>>>>
+>>>> On Mon, Jul 22, 2019 at 10:30:48AM -0700, Guenter Roeck wrote:
+>>>>> In bfq_insert_request(), bfqq is initialized with:
+>>>>> 	bfqq = bfq_init_rq(rq);
+>>>>> In bfq_init_rq(), we find:
+>>>>> 	if (unlikely(!rq->elv.icq))
+>>>>> 		return NULL;
+>>>>> Indeed, rq->elv.icq can be NULL if the memory allocation in
+>>>>> create_task_io_context() failed.
+>>>>>
+>>>>> A comment in bfq_insert_request() suggests that bfqq is supposed to be
+>>>>> non-NULL if 'at_head || blk_rq_is_passthrough(rq)' is false. Yet, as
+>>>>> debugging and practical experience shows, this is not the case in the
+>>>>> above situation.
+>>>>>
+>>>>> This results in the following crash.
+>>>>>
+>>>>> Unable to handle kernel NULL pointer dereference
+>>>>> 	at virtual address 00000000000001b0
+>>>>> ...
+>>>>> Call trace:
+>>>>> bfq_setup_cooperator+0x44/0x134
+>>>>> bfq_insert_requests+0x10c/0x630
+>>>>> blk_mq_sched_insert_requests+0x60/0xb4
+>>>>> blk_mq_flush_plug_list+0x290/0x2d4
+>>>>> blk_flush_plug_list+0xe0/0x230
+>>>>> blk_finish_plug+0x30/0x40
+>>>>> generic_writepages+0x60/0x94
+>>>>> blkdev_writepages+0x24/0x30
+>>>>> do_writepages+0x74/0xac
+>>>>> __filemap_fdatawrite_range+0x94/0xc8
+>>>>> file_write_and_wait_range+0x44/0xa0
+>>>>> blkdev_fsync+0x38/0x68
+>>>>> vfs_fsync_range+0x68/0x80
+>>>>> do_fsync+0x44/0x80
+>>>>>
+>>>>> The problem is relatively easy to reproduce by running an image with
+>>>>> failslab enabled, such as with:
+>>>>>
+>>>>> cd /sys/kernel/debug/failslab
+>>>>> echo 10 > probability
+>>>>> echo 300 > times
+>>>>>
+>>>>> Avoid the problem by checking if bfqq is NULL before using it. With the
+>>>>> NULL check in place, requests with missing io context are queued
+>>>>> immediately, and the crash is no longer seen.
+>>>>>
+>>>>> Fixes: 18e5a57d79878 ("block, bfq: postpone rq preparation to insert or merge")
+>>>>> Reported-by: Hsin-Yi Wang  <hsinyi@google.com>
+>>>>> Cc: Hsin-Yi Wang <hsinyi@google.com>
+>>>>> Cc: Nicolas Boichat <drinkcat@chromium.org>
+>>>>> Cc: Doug Anderson <dianders@chromium.org>
+>>>>> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+>>>>> ---
+>>>>> block/bfq-iosched.c | 2 +-
+>>>>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>>>>> index 72860325245a..56f3f4227010 100644
+>>>>> --- a/block/bfq-iosched.c
+>>>>> +++ b/block/bfq-iosched.c
+>>>>> @@ -5417,7 +5417,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>>>>>
+>>>>> 	spin_lock_irq(&bfqd->lock);
+>>>>> 	bfqq = bfq_init_rq(rq);
+>>>>> -	if (at_head || blk_rq_is_passthrough(rq)) {
+>>>>> +	if (!bfqq || at_head || blk_rq_is_passthrough(rq)) {
+>>>>> 		if (at_head)
+>>>>> 			list_add(&rq->queuelist, &bfqd->dispatch);
+>>>>> 		else
+>>>>> -- 
+>>>>> 2.7.4
+>>>>>
+>>
 > 
-> Actually, it isn't only raid0.  'linear' has the same issue.
-> Probably the fix for raid0 should be applied to linear too.
-> 
-> NeilBrown
 > 
 
-Thanks Neil, it makes sense! I didn't considered "linear" and indeed,
-after some testing, it reacts exactly as raid0/stripping.
-
-In case this patch gets good acceptance I can certainly include
-md/linear in that!
-Cheers,
-
-
-Guilherme
