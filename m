@@ -1,4 +1,4 @@
-Return-Path: <SRS0=ZBGg=V3=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Z/SB=V4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,71 +6,73 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF63C433FF
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 21:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A77C433FF
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 00:28:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ED2A42067D
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jul 2019 21:11:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D115A20644
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 00:28:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728724AbfG3VLZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jul 2019 17:11:25 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:50276 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726522AbfG3VLZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jul 2019 17:11:25 -0400
-Received: from mail-wr1-f72.google.com ([209.85.221.72])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <john.lenton@canonical.com>)
-        id 1hsZP1-0001Fi-2a
-        for linux-block@vger.kernel.org; Tue, 30 Jul 2019 21:11:23 +0000
-Received: by mail-wr1-f72.google.com with SMTP id i2so32379420wrp.12
-        for <linux-block@vger.kernel.org>; Tue, 30 Jul 2019 14:11:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=I8zeu7ZUyAJjcWYRBBJAwoN6DzL1w3rGJu58PoKrAk4=;
-        b=Op0fjqMa5seDdmKLj+UfY/bSqorUL4wqaudKIechWJECN/9w4MuHaCk25YZi1w4J66
-         c2Gz2h+boClIJ7DddBnoduwPJwZZ20iJ2clcDLxc3eyu+qAP+xy4yHyrjxNNKEN8lLz4
-         sz3B0xQ2jq+rys61Zh2YXKP41EmKKi7MAR/YuBEYoonrnlVWuZcfe7X2mLtr/23Ee5qC
-         WX5aV6N1WF53jdsJV2IB4Qe7yXaAmN8eGPTRqj7D5cYriMCeQJxR4LHMeHuGRMiN4HR2
-         Hlr8IH5NNmMWOttQRZstGiFrhN97kEYoFDAzfcqo23ghrcZm+1Z7xbiWfehI5aY1okEH
-         EM2w==
-X-Gm-Message-State: APjAAAVEmXjXtJ2vzGGaGVbdy0qpoh6AH7HRh2v+ARmRXANhsbcbwx7N
-        +r03lQ0s+47Ov2cjuWesNC7VpBC4P5O3JHmiyERv3tJX4b56xzaZnvoMdPYoS/kGbEgY5Jnn+K8
-        X1oOmko7fiRstN+BcxCiVwNmf47R41FarT1zQArsa/GK1FH3xntYb10Qb
-X-Received: by 2002:adf:d4c1:: with SMTP id w1mr57901639wrk.229.1564521082714;
-        Tue, 30 Jul 2019 14:11:22 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxyBESk9rM/vvx4iIE6FFUTXB87MlPQamg3WDEiezxZ0DBT3Ce9Lpps+xmmheKrW69oCH8+Ss0afboyREJttns=
-X-Received: by 2002:adf:d4c1:: with SMTP id w1mr57901626wrk.229.1564521082493;
- Tue, 30 Jul 2019 14:11:22 -0700 (PDT)
+        id S1726165AbfGaA2v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jul 2019 20:28:51 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41428 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725947AbfGaA2u (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jul 2019 20:28:50 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 83660B019;
+        Wed, 31 Jul 2019 00:28:49 +0000 (UTC)
+From:   NeilBrown <neilb@suse.com>
+To:     Bob Liu <bob.liu@oracle.com>,
+        "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
+        linux-raid@vger.kernel.org
+Date:   Wed, 31 Jul 2019 10:28:41 +1000
+Cc:     jay.vosburgh@canonical.com, songliubraving@fb.com,
+        dm-devel@redhat.com, Neil F Brown <nfbrown@suse.com>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] md/raid0: Introduce new array state 'broken' for raid0
+In-Reply-To: <d730c417-a328-3df3-1e31-32b6df48b6ad@oracle.com>
+References: <20190729203135.12934-1-gpiccoli@canonical.com> <20190729203135.12934-2-gpiccoli@canonical.com> <d730c417-a328-3df3-1e31-32b6df48b6ad@oracle.com>
+Message-ID: <87ftmnkpxi.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-References: <20190516140127.23272-1-jack@suse.cz> <50edd0fa-9cfa-38e1-8870-0fbc5c618522@kernel.dk>
- <20190527122915.GB9998@quack2.suse.cz> <b0f27980-be75-bded-3e74-bce14fc7ea47@kernel.dk>
- <894DDAA8-2ADD-467C-8E4F-4DE6B9A50625@me.com> <20190730092939.GB28829@quack2.suse.cz>
- <CAL1QPZQWDx2YEAP168C+Eb4g4DmGg8eOBoOqkbUOBKTMDc9gjg@mail.gmail.com>
- <20190730101646.GC28829@quack2.suse.cz> <20190730133607.GD28829@quack2.suse.cz>
- <009a7a06-67c5-6b3c-5aa3-7d67ca35fc3a@kernel.dk>
-In-Reply-To: <009a7a06-67c5-6b3c-5aa3-7d67ca35fc3a@kernel.dk>
-From:   John Lenton <john.lenton@canonical.com>
-Date:   Tue, 30 Jul 2019 22:11:09 +0100
-Message-ID: <CAL1QPZS0zTdovk0BqFu-GxQf2xfXqJFhQZQCzZD=Ev6hkO456w@mail.gmail.com>
-Subject: Re: [PATCH] loop: Don't change loop device under exclusive opener
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Jan Kara <jack@suse.cz>, Kai-Heng Feng <kaihengfeng@me.com>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        linux-block@vger.kernel.org, jean-baptiste.lallement@canonical.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 30 Jul 2019 at 20:17, Jens Axboe <axboe@kernel.dk> wrote:
->
-> Jan, I've applied this patch - and also marked it for stable, so it'll
-> end up in 5.2-stable. Thanks.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-thank you all!
+On Tue, Jul 30 2019, Bob Liu wrote:
+>
+>
+> Curious why only raid0 has this issue?=20
+
+Actually, it isn't only raid0.  'linear' has the same issue.
+Probably the fix for raid0 should be applied to linear too.
+
+NeilBrown
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAl1A4LoACgkQOeye3VZi
+gbn0wRAAuH9h2Qxza5xLzWsV8tlEajzIAXMeAxp4Q+IY9Na0AgXSZPtyyE5lv2TR
+wcQhQPFc+rDV+GF2rWoDOkhLKhJENtiTUoGH8ZrhU4C9hW5NRjDx80DruXKwBRll
+G5OxcVY9kCDAOPtJnQHw6YjUwvWCiuoYnGqwBqoilnprsH13gPs1YFgaX+wvAj3P
+ReAYsTxXQnPOQScQLJQlyis6s+unhCb8++viZmEVSnjK7i+W4i16p2xKyZTWXmXe
+FZ+rsOiSll2aaYaBHIGH4oIW7wTNFeOt0z9hJ+Ce0aoQDynccbrNgtoKvkS7NN2O
+k8Ci9sGX/GAmUmMD1pZgbJaRaPzMmY61gtVh25hKBMXSe9BTn+B1X9dYm44wQdP0
++hI0lSo4aP0v+aH2KByTg8e2VOOKEgtxJbeqDybgkxjGAiKW8Q82PnCt7jPmAbth
+MCFuLsRp/jBClDvvvQUAYTa5rX4rASKzdFs9bQ3O7xG78SUoBBm9qyXu2HjAbYWO
+BBXKWLqOXkjol1m5NWJMvY8XIvIhl8SDZNy4kzFdbuSD7eXIWBrp+RXFo7aMdRv9
+krY0LAjQKYrzB7TmK7JJmI3rvGnSzBi4pQrJNc6NjOTyaCYF2qg/4LexXa27fNXj
+lmWELXJmHvz4WHPJvjhPY5FAO2NjeNNDGpb5AJy4eDhyuF7hfH8=
+=ErRK
+-----END PGP SIGNATURE-----
+--=-=-=--
