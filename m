@@ -2,93 +2,157 @@ Return-Path: <SRS0=Z/SB=V4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ED50C433FF
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 21:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6995AC32751
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 23:38:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2B3882067D
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 21:07:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E081208E4
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 23:38:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h5N5XV/6"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ufN57qAL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728171AbfGaVHz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Jul 2019 17:07:55 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:43215 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727273AbfGaVHz (ORCPT
+        id S1728540AbfGaXii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Jul 2019 19:38:38 -0400
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:55316 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726448AbfGaXii (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jul 2019 17:07:55 -0400
-Received: by mail-qt1-f194.google.com with SMTP id w17so23646508qto.10;
-        Wed, 31 Jul 2019 14:07:54 -0700 (PDT)
+        Wed, 31 Jul 2019 19:38:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CVs/vyQ7FGVG4RTAjLbBzwKgO6T77q0zizvqZWReG4U=;
-        b=h5N5XV/6OzpHcXrprkzwKaYmJNAD9E8RdEvB+YK0FrlqjphI8KIf7oYowR11IArgLk
-         88GJaOD/tMG54niEk7uFAUi66JZCPn+OJkRq3zPNN/KYAmb0rsZ2FpMe6vk+5EoCmN4O
-         1mUcGpSPVxXH68CKu+HAhTRbBso352YVX3klLp+TdTF2bV5QNFdIddc8hpz9Bh6ljy+M
-         y8I2BKGTyIIxhGXzv/Lx5gt+riMvMtc2cTzhU3sqkrQwRS5ZlO8F2CLlDiP+F2FCiBpo
-         PGUJBB+NTy/FuqG/6vALo6kpveZd09LjDljEeXZxaOGN293ojUIRuCxnAzlrO24slLk0
-         6EPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CVs/vyQ7FGVG4RTAjLbBzwKgO6T77q0zizvqZWReG4U=;
-        b=fFDmTA0qwLdKjWIQyhLE0Rprxo0X2k+a81ppzjlM5DsXivlrdKH+1vCs7A4w7xXdTm
-         ofqMAceptasUVAxu/DCbzbezWQVFTF0Xm1a+2bHsSMVBttOSm5F7LwAwpS+qa+wym88Y
-         2WYW+ktMUuDchcg3T2/YymqRyJxZ9xPdhzqqH1H6ioJTK3OHjxM+KELX8/b/26gMavpN
-         E9Z5YynzqkkmKhNLLAv+hbcUegp7nmYHsvRNE6HcWxjNMGSVPCTbrOLTfl8nty1PJm/3
-         H7m3dA4+sP+Z2UZ4lq8dbMErJqrX0om/oImqxO3LSZZRTSN5zAJ84Eq0qTORJSSX6I/g
-         6zpw==
-X-Gm-Message-State: APjAAAXukP71F4/AiFBIrcB2uq9vC+WF8Kz1GCJF8wSFVjSSPgW0exWE
-        k3sEpiYbTq+gAIMHCulE1JmV7d5ZUmnKoHv/5pY=
-X-Google-Smtp-Source: APXvYqy4QvtrszYJsHl599Ic3SuR88R8Eufu4CdNo+IYoKhGrYyNtuaYcaEFwl3crNQGDCHIWfL5uXK87UIOeU0HklE=
-X-Received: by 2002:ac8:25e7:: with SMTP id f36mr87328163qtf.139.1564607274505;
- Wed, 31 Jul 2019 14:07:54 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1564616317; x=1596152317;
+  h=subject:to:references:from:message-id:date:mime-version:
+   in-reply-to:content-transfer-encoding;
+  bh=Kd98BXsBmYyhXF8NQI/xoh/VfpCf36zrcpwwmqSjLZQ=;
+  b=ufN57qAL04haOgigzx7ujX7uLOeeVw20tdenmE5/Jm25qxWK/TH+hRc2
+   2hdKSO8FFTr41LSy+pKxclrhdTbw3CSTyWuzOxPzm/ZWq6Q1cA5TsrALo
+   Hv5OTAO/Bnx0OZP88BJHDXRBaf7VGxMH0k2mxiFxZLGRH4zBabUYIDQb/
+   Q=;
+X-IronPort-AV: E=Sophos;i="5.64,332,1559520000"; 
+   d="scan'208";a="413325993"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2a-d0be17ee.us-west-2.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 31 Jul 2019 23:38:35 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2a-d0be17ee.us-west-2.amazon.com (Postfix) with ESMTPS id 73F2CA1E0F;
+        Wed, 31 Jul 2019 23:38:34 +0000 (UTC)
+Received: from EX13D10UWB004.ant.amazon.com (10.43.161.121) by
+ EX13MTAUWB001.ant.amazon.com (10.43.161.249) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 31 Jul 2019 23:38:34 +0000
+Received: from [10.63.178.84] (10.43.160.160) by EX13D10UWB004.ant.amazon.com
+ (10.43.161.121) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Wed, 31 Jul
+ 2019 23:38:33 +0000
+Subject: Re: [PATCH v2] nbd: replace kill_bdev() with __invalidate_device()
+ again
+To:     SunKe <sunke32@huawei.com>, <josef@toxicpanda.com>,
+        <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <nbd@other.debian.org>, <linux-kernel@vger.kernel.org>,
+        <manoj.br@gmail.com>, <stable@vger.kernel.org>, <dwmw@amazon.com>
+References: <1564575190-132357-1-git-send-email-sunke32@huawei.com>
+From:   Munehisa Kamata <kamatam@amazon.com>
+Message-ID: <98ac17cf-c658-9e80-8505-4309805fc1f0@amazon.com>
+Date:   Wed, 31 Jul 2019 16:38:33 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190702132918.114818-1-houtao1@huawei.com> <CAPhsuW6yH7np1=+e5Rgutp3m1VA0TPvtANeX=0ZdpJaRKEvBkQ@mail.gmail.com>
- <b047c187-e4a6-a82a-3177-3da7fef2f6b8@huawei.com>
-In-Reply-To: <b047c187-e4a6-a82a-3177-3da7fef2f6b8@huawei.com>
-From:   Song Liu <liu.song.a23@gmail.com>
-Date:   Wed, 31 Jul 2019 14:07:43 -0700
-Message-ID: <CAPhsuW5c96vQDiwbPhDvKOG8_XkPapW62bkthPAHFOum2N2VhQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] md: export internal stats through debugfs
-To:     Hou Tao <houtao1@huawei.com>
-Cc:     linux-raid <linux-raid@vger.kernel.org>,
-        Song Liu <songliubraving@fb.com>, NeilBrown <neilb@suse.com>,
-        linux-block@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
-        agk@redhat.com, dm-devel@redhat.com,
-        open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1564575190-132357-1-git-send-email-sunke32@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.43.160.160]
+X-ClientProxiedBy: EX13D15UWB004.ant.amazon.com (10.43.161.61) To
+ EX13D10UWB004.ant.amazon.com (10.43.161.121)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 26, 2019 at 10:48 PM Hou Tao <houtao1@huawei.com> wrote:
->
-> Hi,
->
-[...]
-> >
-> > Hi,
-> >
-> > Sorry for the late reply.
-> >
-> > I think these information are really debug information that we should not
-> > show in /sys. Once we expose them in /sys, we need to support them
-> > because some use space may start searching data from them.
-> So debugfs is used to place these debug information instead of sysfs.
+On 7/31/2019 5:13 AM, SunKe wrote:
+> From: Munehisa Kamata <kamatam@amazon.com>
+> 
+> Commit abbbdf12497d ("replace kill_bdev() with __invalidate_device()")
+> once did this, but 29eaadc03649 ("nbd: stop using the bdev everywhere")
+> resurrected kill_bdev() and it has been there since then. So buffer_head
+> mappings still get killed on a server disconnection, and we can still
+> hit the BUG_ON on a filesystem on the top of the nbd device.
+> 
+>   EXT4-fs (nbd0): mounted filesystem with ordered data mode. Opts: (null)
+>   block nbd0: Receive control failed (result -32)
+>   block nbd0: shutting down sockets
+>   print_req_error: I/O error, dev nbd0, sector 66264 flags 3000
+>   EXT4-fs warning (device nbd0): htree_dirblock_to_tree:979: inode #2: lblock 0: comm ls: error -5 reading directory block
+>   print_req_error: I/O error, dev nbd0, sector 2264 flags 3000
+>   EXT4-fs error (device nbd0): __ext4_get_inode_loc:4690: inode #2: block 283: comm ls: unable to read itable block
+>   EXT4-fs error (device nbd0) in ext4_reserve_inode_write:5894: IO failure
+>   ------------[ cut here ]------------
+>   kernel BUG at fs/buffer.c:3057!
+>   invalid opcode: 0000 [#1] SMP PTI
+>   CPU: 7 PID: 40045 Comm: jbd2/nbd0-8 Not tainted 5.1.0-rc3+ #4
+>   Hardware name: Amazon EC2 m5.12xlarge/, BIOS 1.0 10/16/2017
+>   RIP: 0010:submit_bh_wbc+0x18b/0x190
+>   ...
+>   Call Trace:
+>    jbd2_write_superblock+0xf1/0x230 [jbd2]
+>    ? account_entity_enqueue+0xc5/0xf0
+>    jbd2_journal_update_sb_log_tail+0x94/0xe0 [jbd2]
+>    jbd2_journal_commit_transaction+0x12f/0x1d20 [jbd2]
+>    ? __switch_to_asm+0x40/0x70
+>    ...
+>    ? lock_timer_base+0x67/0x80
+>    kjournald2+0x121/0x360 [jbd2]
+>    ? remove_wait_queue+0x60/0x60
+>    kthread+0xf8/0x130
+>    ? commit_timeout+0x10/0x10 [jbd2]
+>    ? kthread_bind+0x10/0x10
+>    ret_from_fork+0x35/0x40
+> 
+> With __invalidate_device(), I no longer hit the BUG_ON with sync or
+> unmount on the disconnected device.
+> 
+> Fixes: 29eaadc03649 ("nbd: stop using the bdev everywhere")
+> Cc: linux-block@vger.kernel.org
+> Cc: Ratna Manoj Bolla <manoj.br@gmail.com>
+> Cc: nbd@other.debian.org
+> Cc: stable@vger.kernel.org
+> Cc: David Woodhouse <dwmw@amazon.com>
+> Signed-off-by: Munehisa Kamata <kamatam@amazon.com>
+> 
+> ---
+> I reproduced this phenomenon on the fat file system.
+> reproduce steps :
+> 1.Establish a nbd connection.
+> 2.Run two threads:one do mount and umount,anther one do clear_sock ioctl
+> 3.Then hit the BUG_ON.
+> 
+> v2: Delete a link.
+> 
+> Signed-off-by: SunKe <sunke32@huawei.com>
+> 
+>  drivers/block/nbd.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 9bcde23..e21d2de 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1231,7 +1231,7 @@ static void nbd_clear_sock_ioctl(struct nbd_device *nbd,
+>  				 struct block_device *bdev)
+>  {
+>  	sock_shutdown(nbd);
+> -	kill_bdev(bdev);
+> +	__invalidate_device(bdev, true);
+>  	nbd_bdev_reset(bdev);
+>  	if (test_and_clear_bit(NBD_HAS_CONFIG_REF,
+>  			       &nbd->config->runtime_flags))
+> 
 
-I don't think we should dump random information into debugfs. It is common
-for the developers to carry some local patches that dumps information for
-debug. We cannot get these patches upstream.
+Hi SunKe,
 
-Thanks,
-Song
+I accidentally included the link in the original one. Sorry about that and thanks
+for picking this up.
+
+Regards,
+Munehsia
