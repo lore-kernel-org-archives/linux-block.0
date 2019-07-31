@@ -6,69 +6,76 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDFFCC32751
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 14:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 495E8C32751
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 14:53:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8874B208C3
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 14:52:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C0D0206B8
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 14:53:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="w5PNd0Oy"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="dHTL7S/e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387950AbfGaOwM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Jul 2019 10:52:12 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:38783 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387593AbfGaOwL (ORCPT
+        id S2387926AbfGaOxZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Jul 2019 10:53:25 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:44428 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388074AbfGaOxZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jul 2019 10:52:11 -0400
-Received: by mail-io1-f65.google.com with SMTP id j6so17078534ioa.5
-        for <linux-block@vger.kernel.org>; Wed, 31 Jul 2019 07:52:11 -0700 (PDT)
+        Wed, 31 Jul 2019 10:53:25 -0400
+Received: by mail-io1-f67.google.com with SMTP id s7so136725864iob.11
+        for <linux-block@vger.kernel.org>; Wed, 31 Jul 2019 07:53:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=EIQbB2zgXphNhV7qrszr5PCCFMAd5NNV0AVDvZDtQIY=;
-        b=w5PNd0Oyg/E4hXSbxfvWzwDASd18H5hGr1WPuqn6x9JkzxAwMO5M4PwFnsWEV8u0Mn
-         Z+7bXvfVF4WF6st+1vDCd0fdxuP05KjVqvU4UsZ1f8DeVvMT5WloCrS+6FJ45yBs+V2N
-         jdFs5+xkoKU13Rv+zCSRJk79Kexzqkilh3GUoyqDfblCZXdr4POkWQoQIoELpP0yfuCt
-         VTA7ATIKZ2FUZ2xsPsu4/MNNrCvX1JnpUEOR21x2xd/vz093ubat96QBlN+TSX2AlC7g
-         FBOpG294Bi3M5k4pjAexrtU+zQdxs6uVOBMum/As04W+q3X5jWtJjm8RcgusSbFdocxX
-         E5+w==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=zlcAXkKW8QVqrB0POXO1HOMAe1Y+4ab/2cQba0Zxxzc=;
+        b=dHTL7S/edkTumLq61B3dgRSTYGv9sotAJDMUJepTiJ29to2FTPzeJyv09hKFMXSzVd
+         KVPKvqqxnR/Oh93EXD/+aFdn2oJMNE728ofoODS4waMtHAjizmUISSWpa+PZSNsMK6NQ
+         D4CDBalZTrgsHbDmKAYrktzLxkox+OFDWkabHXC0WMtzWNWuyZqFzjM9SZoMlUM6fHy3
+         9gbAeeSYDTQl6aace1YXOpFKb0gJ082cn/p7wayzz/OmrcxO69KKCcvN0V7GBreuTHvJ
+         Ds3VuIZk98nydQHyX418KEGGQp02TOtX8eDxYbChd7t564PMfRLKvw9ZmOo/KQMqaLLe
+         FQhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=EIQbB2zgXphNhV7qrszr5PCCFMAd5NNV0AVDvZDtQIY=;
-        b=tYGwqnMKFxgtSHBjAwO3psBSaqDpBjW2A0e1IlaVEcWyUpAJoX7K3I0Es3FCf8cn+4
-         SvJbTNevYpBjIShnS7Hay+0PUUC7+mOSsGoeDtxAsYXUABZZodhCYpB8/7xJ21DkYxay
-         3MkdhgrnpNQVcCMIgtX7rNjcMzYWzwUtY1yEE4VF5GRe24tteF0/13rKS2jpRD0iq2BG
-         61vk+UFr4O5EOkB5GOvVJ+Hk15IekDp1w8k3HduBRxIlH0eoo9lKBwAX8s0bu0vNFMcX
-         5eq1duovIboYhFx+4qBmODnl/BSOMnuV+mcbmWoV1um4KFc+n3UvLL4luLlsdvuc6e46
-         g+fQ==
-X-Gm-Message-State: APjAAAVsWgTq4IQE6m1T1/6bwe3UtQ/JKl2HtIPeRD77YKqfDjE+2S9x
-        WDE/HWxDNum1ehblL3t18IE=
-X-Google-Smtp-Source: APXvYqzGTKAm/77GYVRlS+dpkqPeW8l/Pd4ZwGUtpE7m7NKS5bwuzo9CN+a6M86+KtzKEnQ59JgzPA==
-X-Received: by 2002:a6b:6b14:: with SMTP id g20mr83413865ioc.28.1564584731100;
-        Wed, 31 Jul 2019 07:52:11 -0700 (PDT)
+        bh=zlcAXkKW8QVqrB0POXO1HOMAe1Y+4ab/2cQba0Zxxzc=;
+        b=VN4N+Rx5E9QRS7b57+N9mkw4JXQi4wpKrYzyfCuZXOCcqFGS4wcDW6naIslycFNCyd
+         WlvDO1l8llu3ChYLcpKLDfWBcdgNxDaaV5884ySynnL+Et2JyRNaK4rZIrOsNDK71x+6
+         iy/Sq3c7TzgCKb+myF+fYPGpQM0nrxfT9Dbi05fo850uHf18bb+p9s6NhcjgzCvXzS+L
+         18W89QwjMvhWBLgZOU1EUt0F/GvvyowE5VQn7IBJKy+plrpuDYbABUsW8s7FmAkucBLe
+         IFDlR3tX9fCODw2Hjr7XM2XBMbU/ZpHbdJBXyJI1ZQ0RcTrun4dhzl1tjGaV2QDdTa0v
+         F5WQ==
+X-Gm-Message-State: APjAAAUQpCNOhojdvN69afxTi17IibEbSTciheVRbWOw5mudzmFGYgC3
+        BDe2Sh5XeW0++rbys+w9P9g=
+X-Google-Smtp-Source: APXvYqx+BXSVFPqAnw9J/ZjOuQ8bb3S7c7lnWx+PLlV1IxzY4n+cXUeefovmQctozHourMkeKSzzsA==
+X-Received: by 2002:a5e:9e0a:: with SMTP id i10mr2803063ioq.44.1564584804230;
+        Wed, 31 Jul 2019 07:53:24 -0700 (PDT)
 Received: from [192.168.1.57] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id j14sm57989996ioa.78.2019.07.31.07.52.09
+        by smtp.gmail.com with ESMTPSA id y18sm65072836iob.64.2019.07.31.07.53.22
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 07:52:10 -0700 (PDT)
-Subject: Re: [PATCH v2] nbd: replace kill_bdev() with __invalidate_device()
- again
-To:     SunKe <sunke32@huawei.com>, josef@toxicpanda.com,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, kamatam@amazon.com,
-        manoj.br@gmail.com, stable@vger.kernel.org, dwmw@amazon.com
-References: <1564575190-132357-1-git-send-email-sunke32@huawei.com>
+        Wed, 31 Jul 2019 07:53:23 -0700 (PDT)
+Subject: Re: [PATCH] MAINTAINERS: floppy: take over maintainership
+To:     efremov@linux.com, Jiri Kosina <jikos@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Willy Tarreau <w@1wt.eu>, Will Deacon <will@kernel.org>,
+        Greg KH <greg@kroah.com>,
+        Alexander Popov <alex.popov@linux.com>, efremov@ispras.ru,
+        linux-block@vger.kernel.org,
+        "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
+References: <20190712185523.7208-1-efremov@ispras.ru>
+ <20190713080726.GA19611@1wt.eu>
+ <ec0a6c5e-bdee-3c26-f5d2-31b883c0de5d@ispras.ru>
+ <CAHk-=wi=fHuiQg1fMzqAP9cuykBQSN_feD=eALDwRPmw27UwEg@mail.gmail.com>
+ <nycvar.YFH.7.76.1907172355020.5899@cbobk.fhfr.pm>
+ <57af5f3e-9cfe-b6d8-314c-f59855408cd5@linux.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2b77d06d-3610-b2f7-d95f-8925b6bd49bf@kernel.dk>
-Date:   Wed, 31 Jul 2019 08:52:09 -0600
+Message-ID: <431bd981-d81a-d4dd-75fe-96a29f8f1065@kernel.dk>
+Date:   Wed, 31 Jul 2019 08:53:22 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1564575190-132357-1-git-send-email-sunke32@huawei.com>
+In-Reply-To: <57af5f3e-9cfe-b6d8-314c-f59855408cd5@linux.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,48 +84,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/31/19 6:13 AM, SunKe wrote:
-> From: Munehisa Kamata <kamatam@amazon.com>
+On 7/31/19 8:47 AM, Denis Efremov wrote:
+> Hi All,
 > 
-> Commit abbbdf12497d ("replace kill_bdev() with __invalidate_device()")
-> once did this, but 29eaadc03649 ("nbd: stop using the bdev everywhere")
-> resurrected kill_bdev() and it has been there since then. So buffer_head
-> mappings still get killed on a server disconnection, and we can still
-> hit the BUG_ON on a filesystem on the top of the nbd device.
+> On 18.07.2019 01:03, Jiri Kosina wrote:
+>> On Wed, 17 Jul 2019, Linus Torvalds wrote:
+>>
+>>> I don't think we really have a floppy maintainer any more,
+>>
+>> Yeah, I basically volunteered myself to maintain it quite some time
+>> ago back when I fixed the concurrency issues which exhibited itself
+>> only with VM-emulated devices, and at the same time I still had the
+>> physical 3.5" reader.
+>>
+>> The hardware doesn't work any more though. So I guess I should just
+>> remove myself as a maintainer to reflect the reality and mark floppy.c
+>> as Orphaned.
 > 
->    EXT4-fs (nbd0): mounted filesystem with ordered data mode. Opts: (null)
->    block nbd0: Receive control failed (result -32)
->    block nbd0: shutting down sockets
->    print_req_error: I/O error, dev nbd0, sector 66264 flags 3000
->    EXT4-fs warning (device nbd0): htree_dirblock_to_tree:979: inode #2: lblock 0: comm ls: error -5 reading directory block
->    print_req_error: I/O error, dev nbd0, sector 2264 flags 3000
->    EXT4-fs error (device nbd0): __ext4_get_inode_loc:4690: inode #2: block 283: comm ls: unable to read itable block
->    EXT4-fs error (device nbd0) in ext4_reserve_inode_write:5894: IO failure
->    ------------[ cut here ]------------
->    kernel BUG at fs/buffer.c:3057!
->    invalid opcode: 0000 [#1] SMP PTI
->    CPU: 7 PID: 40045 Comm: jbd2/nbd0-8 Not tainted 5.1.0-rc3+ #4
->    Hardware name: Amazon EC2 m5.12xlarge/, BIOS 1.0 10/16/2017
->    RIP: 0010:submit_bh_wbc+0x18b/0x190
->    ...
->    Call Trace:
->     jbd2_write_superblock+0xf1/0x230 [jbd2]
->     ? account_entity_enqueue+0xc5/0xf0
->     jbd2_journal_update_sb_log_tail+0x94/0xe0 [jbd2]
->     jbd2_journal_commit_transaction+0x12f/0x1d20 [jbd2]
->     ? __switch_to_asm+0x40/0x70
->     ...
->     ? lock_timer_base+0x67/0x80
->     kjournald2+0x121/0x360 [jbd2]
->     ? remove_wait_queue+0x60/0x60
->     kthread+0xf8/0x130
->     ? commit_timeout+0x10/0x10 [jbd2]
->     ? kthread_bind+0x10/0x10
->     ret_from_fork+0x35/0x40
-> 
-> With __invalidate_device(), I no longer hit the BUG_ON with sync or
-> unmount on the disconnected device.
+> Well, without jokes about Thunderdome, I've got time, hardware and
+> would like to maintain the floppy. Except the for recent fixes,
+> I described floppy ioctls in syzkaller. I've already spent quite
+> a lot of time with this code. Thus, if nobody minds
 
+Great, can't see anyone objecting to doling out some floppy love.
 Applied, thanks.
 
 -- 
