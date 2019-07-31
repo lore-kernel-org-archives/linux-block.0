@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4909C32751
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 09:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F18DC32753
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 09:42:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 925572089E
-	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 09:42:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7D192089E
+	for <linux-block@archiver.kernel.org>; Wed, 31 Jul 2019 09:42:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="w5A9WS7J"
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="JOI95AzR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728582AbfGaJmU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Jul 2019 05:42:20 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:39061 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727023AbfGaJmU (ORCPT
+        id S1727171AbfGaJmS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Jul 2019 05:42:18 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:45841 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726300AbfGaJmR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jul 2019 05:42:20 -0400
-Received: by mail-lf1-f66.google.com with SMTP id v85so46929975lfa.6
-        for <linux-block@vger.kernel.org>; Wed, 31 Jul 2019 02:42:18 -0700 (PDT)
+        Wed, 31 Jul 2019 05:42:17 -0400
+Received: by mail-lf1-f65.google.com with SMTP id u10so8210947lfm.12
+        for <linux-block@vger.kernel.org>; Wed, 31 Jul 2019 02:42:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=owltronix-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=ruGLS7qlWMQ2x0nF7R27l+9sEyn5zr5g4bSB5JJD5E8=;
-        b=w5A9WS7JZTV1AwMxJtkiM8y3lQz+Ic3KOzFHMizjLEmKkoce+WbU3TLR7oLJ3QMcds
-         +FkCYpxRbm27ytBUYqJxHePK7uLEQ0ZmtagJpjlB0BfZaPlN8s7q//7lHc7ZzPqPJNbV
-         XRv1kUyyxda8FxC0TSWPxcNv4iFnTq5JT3aYfZOEXc8xMheIIXMuV5emNBtGLOYOBS45
-         KlrQ2SOh6JA5dlcKBRF3V0bkeZRyU+bYF/RTC4eFrDq9d86mfwjvUHZcdvc6sczevsDB
-         SySuUG1Kj9Rv/xGwBvplkdVXDN6HxXospm3JGlSfAr1lE9S3uxaP+J9mimRFEsnawsID
-         Gbxg==
+        bh=AVYd9Rjb1zedauayC59UHepF1L1QYQNNE4PKhmE9Kd4=;
+        b=JOI95AzROG8gnpLKyQRW0ZocblqZjHpYx9ghlJ8q9AYJ8WNVXLv6lLE2gQn6ET54pS
+         BJN+zSfPUtzU0sitK6V6ttUhuyFe/uXJFASXF32TGzhH18oI2Oy+Up2xOmwF32gKVsuk
+         Rvb9iSqctIKy6lXtk/8W2PdrOQH9kS+vq4JkGlwelxy9ljzVy4L1qT41S5O+w6gn0IFo
+         mZFfzgJioyC/Pp99I6FFVWqQgTZqyUz1YU8dbvMPwJzZY5qNl9+qlkv3cL3yNda7nMBi
+         uN7PFYsMrPMSFxz2PGucPwYmssSb22t6nDvwDW3XBFnA/d1uHoNfzJFoYqjXZEGiB+Xr
+         qBdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=ruGLS7qlWMQ2x0nF7R27l+9sEyn5zr5g4bSB5JJD5E8=;
-        b=LUtjIFlFVzsrQc6HWD9F5ZUPY57rrCgldLPNKbE/BFuccoytolLnxo6/gF6Yq2qi0k
-         7j6vXipR6uY0jOJpl/3XNxyx/ckMAfYOLYs2al1X4kn/Q/c+ojf3vtRXde0lLDAxcAlR
-         mjIJLVrmXqCwWZEoeP3gx6Y3cRHIQ2fLxs7hZFOq3/BnSlG5wIMtDB7TMpXpWUo03uqs
-         m3axu3sM2Io2LGsRE8zN+zKYdfjGn6i5ZuZ/79mdax6J7jqewCR7cpLHXhp1qsHvIdRT
-         IPXpnJymePofOHMwu4S/FsfzcyO+gothLKsNbHOsxFAjpWUfv7xhwjAcuK8QF2MJY9OY
-         Plzw==
-X-Gm-Message-State: APjAAAXI8uwzejksdCPeeIdY2wXyY7JQXTj//d+iW80d+87zC+z7I9lz
-        y3qmRRpej02YJ8QZzfOXzZA=
-X-Google-Smtp-Source: APXvYqx1b9nmoDTCR6aOEby82ARJ8uYbuEyVCUwBwnrKkb3uR8jAO2YsHbHUhEMmFFFHiMd2vUOQxw==
-X-Received: by 2002:a19:641a:: with SMTP id y26mr55770553lfb.29.1564566137275;
-        Wed, 31 Jul 2019 02:42:17 -0700 (PDT)
+        bh=AVYd9Rjb1zedauayC59UHepF1L1QYQNNE4PKhmE9Kd4=;
+        b=UdaRWJlhLGj4enCGIEdJ6BifDg4U8WPnsIIm3PCYNkHHs4crVP65ODcx46ZcmstwpM
+         vxFgNKc6Tfuhk+2rG2EbNKZauBrCRH9/BsbDz2ymB7TKRZQNo9e6zs6ZmePHMNLQniKl
+         GXtXooGmlBTS3D0Csek+cnSsVp25x+lkcw2jQh+MHUjrZBmnqTGphxBy2SZ8REu0Kuao
+         /2Xl/YdzL2aO3diYSTrQLtz9kUX5vkgk5igwGNfzNJjPTke3IS4Q5+W4Le9bZHh87VBH
+         IUB1WzEad+uOo/HKjom3G6MgXe8b25FJbpKsjuWCsKOvEYcoH0KafBWKaPwY5mzxCoNb
+         Qvww==
+X-Gm-Message-State: APjAAAWMQhxYQfrjPcbaltqQC8ai+g3DvdBbhqSfMNf6qdEcXTftYr/D
+        oOgFakTBtR9FrZQ5K0wep4I=
+X-Google-Smtp-Source: APXvYqw2ByT2MQk28RLvGMX3/YVd74Edp6aRaSYjkH6sC38jgHnjvMto+y737ZYrzNvjhka/j+GxHA==
+X-Received: by 2002:ac2:5690:: with SMTP id 16mr55625639lfr.43.1564566134534;
+        Wed, 31 Jul 2019 02:42:14 -0700 (PDT)
 Received: from titan.lan (90-230-197-193-no86.tbcn.telia.com. [90.230.197.193])
-        by smtp.gmail.com with ESMTPSA id t4sm15408200ljh.9.2019.07.31.02.42.15
+        by smtp.gmail.com with ESMTPSA id t4sm15408200ljh.9.2019.07.31.02.42.13
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 31 Jul 2019 02:42:16 -0700 (PDT)
+        Wed, 31 Jul 2019 02:42:14 -0700 (PDT)
 From:   Hans Holmberg <hans@owltronix.com>
 To:     Matias Bjorling <mb@lightnvm.io>
 Cc:     Christoph Hellwig <hch@lst.de>,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Hans Holmberg <hans@owltronix.com>
-Subject: [PATCH 3/4] lightnvm: pblk: use kvmalloc for metadata
-Date:   Wed, 31 Jul 2019 11:41:35 +0200
-Message-Id: <1564566096-28756-4-git-send-email-hans@owltronix.com>
+Subject: [PATCH 1/4] lightnvm: remove nvm_submit_io_sync_fn
+Date:   Wed, 31 Jul 2019 11:41:33 +0200
+Message-Id: <1564566096-28756-2-git-send-email-hans@owltronix.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564566096-28756-1-git-send-email-hans@owltronix.com>
 References: <1564566096-28756-1-git-send-email-hans@owltronix.com>
@@ -71,226 +71,152 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no reason now not to use kvmalloc, so
-so replace the internal metadata allocation scheme.
+Move the redundant sync handling interface and wait for a completion
+in the lightnvm core instead.
 
 Signed-off-by: Hans Holmberg <hans@owltronix.com>
 ---
- drivers/lightnvm/pblk-core.c |  3 +--
- drivers/lightnvm/pblk-gc.c   | 19 ++++++++-----------
- drivers/lightnvm/pblk-init.c | 38 ++++++++++----------------------------
- drivers/lightnvm/pblk.h      | 23 -----------------------
- 4 files changed, 19 insertions(+), 64 deletions(-)
+ drivers/lightnvm/core.c      | 35 +++++++++++++++++++++++++++++------
+ drivers/nvme/host/lightnvm.c | 29 -----------------------------
+ include/linux/lightnvm.h     |  2 --
+ 3 files changed, 29 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index a58d3c84a3f2..b413bafe93fd 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1839,8 +1839,7 @@ static void pblk_save_lba_list(struct pblk *pblk, struct pblk_line *line)
- 	struct pblk_w_err_gc *w_err_gc = line->w_err_gc;
- 	struct pblk_emeta *emeta = line->emeta;
- 
--	w_err_gc->lba_list = pblk_malloc(lba_list_size,
--					 l_mg->emeta_alloc_type, GFP_KERNEL);
-+	w_err_gc->lba_list = kvmalloc(lba_list_size, GFP_KERNEL);
- 	memcpy(w_err_gc->lba_list, emeta_to_lbas(pblk, emeta->buf),
- 				lba_list_size);
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index a600934fdd9c..01d098fb96ac 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -752,12 +752,36 @@ int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
  }
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 63ee205b41c4..2581eebcfc41 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -132,14 +132,12 @@ static __le64 *get_lba_list_from_emeta(struct pblk *pblk,
- 				       struct pblk_line *line)
+ EXPORT_SYMBOL(nvm_submit_io);
+ 
++static void nvm_sync_end_io(struct nvm_rq *rqd)
++{
++	struct completion *waiting = rqd->private;
++
++	complete(waiting);
++}
++
++static int nvm_submit_io_wait(struct nvm_dev *dev, struct nvm_rq *rqd)
++{
++	DECLARE_COMPLETION_ONSTACK(wait);
++	int ret = 0;
++
++	rqd->end_io = nvm_sync_end_io;
++	rqd->private = &wait;
++
++	ret = dev->ops->submit_io(dev, rqd);
++	if (ret)
++		return ret;
++
++	wait_for_completion_io(&wait);
++
++	return 0;
++}
++
+ int nvm_submit_io_sync(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
  {
- 	struct line_emeta *emeta_buf;
--	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	unsigned int lba_list_size = lm->emeta_len[2];
- 	__le64 *lba_list;
+ 	struct nvm_dev *dev = tgt_dev->parent;
  	int ret;
  
--	emeta_buf = pblk_malloc(lm->emeta_len[0],
--				l_mg->emeta_alloc_type, GFP_KERNEL);
-+	emeta_buf = kvmalloc(lm->emeta_len[0], GFP_KERNEL);
- 	if (!emeta_buf)
- 		return NULL;
+-	if (!dev->ops->submit_io_sync)
++	if (!dev->ops->submit_io)
+ 		return -ENODEV;
  
-@@ -147,7 +145,7 @@ static __le64 *get_lba_list_from_emeta(struct pblk *pblk,
- 	if (ret) {
- 		pblk_err(pblk, "line %d read emeta failed (%d)\n",
- 				line->id, ret);
--		pblk_mfree(emeta_buf, l_mg->emeta_alloc_type);
-+		kvfree(emeta_buf);
- 		return NULL;
- 	}
+ 	nvm_rq_tgt_to_dev(tgt_dev, rqd);
+@@ -765,9 +789,7 @@ int nvm_submit_io_sync(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+ 	rqd->dev = tgt_dev;
+ 	rqd->flags = nvm_set_flags(&tgt_dev->geo, rqd);
  
-@@ -161,16 +159,16 @@ static __le64 *get_lba_list_from_emeta(struct pblk *pblk,
- 	if (ret) {
- 		pblk_err(pblk, "inconsistent emeta (line %d)\n",
- 				line->id);
--		pblk_mfree(emeta_buf, l_mg->emeta_alloc_type);
-+		kvfree(emeta_buf);
- 		return NULL;
- 	}
+-	/* In case of error, fail with right address format */
+-	ret = dev->ops->submit_io_sync(dev, rqd);
+-	nvm_rq_dev_to_tgt(tgt_dev, rqd);
++	ret = nvm_submit_io_wait(dev, rqd);
  
--	lba_list = pblk_malloc(lba_list_size,
--			       l_mg->emeta_alloc_type, GFP_KERNEL);
-+	lba_list = kvmalloc(lba_list_size, GFP_KERNEL);
-+
- 	if (lba_list)
- 		memcpy(lba_list, emeta_to_lbas(pblk, emeta_buf), lba_list_size);
- 
--	pblk_mfree(emeta_buf, l_mg->emeta_alloc_type);
-+	kvfree(emeta_buf);
- 
- 	return lba_list;
+ 	return ret;
  }
-@@ -181,7 +179,6 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 									ws);
- 	struct pblk *pblk = line_ws->pblk;
- 	struct pblk_line *line = line_ws->line;
--	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
-@@ -272,7 +269,7 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 		goto next_rq;
+@@ -788,12 +810,13 @@ EXPORT_SYMBOL(nvm_end_io);
  
- out:
--	pblk_mfree(lba_list, l_mg->emeta_alloc_type);
-+	kvfree(lba_list);
- 	kfree(line_ws);
- 	kfree(invalid_bitmap);
- 
-@@ -286,7 +283,7 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- fail_free_gc_rq:
- 	kfree(gc_rq);
- fail_free_lba_list:
--	pblk_mfree(lba_list, l_mg->emeta_alloc_type);
-+	kvfree(lba_list);
- fail_free_invalid_bitmap:
- 	kfree(invalid_bitmap);
- fail_free_ws:
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index b351c7f002de..9a967a2e83dd 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -543,7 +543,7 @@ static void pblk_line_mg_free(struct pblk *pblk)
- 
- 	for (i = 0; i < PBLK_DATA_LINES; i++) {
- 		kfree(l_mg->sline_meta[i]);
--		pblk_mfree(l_mg->eline_meta[i]->buf, l_mg->emeta_alloc_type);
-+		kvfree(l_mg->eline_meta[i]->buf);
- 		kfree(l_mg->eline_meta[i]);
- 	}
- 
-@@ -560,7 +560,7 @@ static void pblk_line_meta_free(struct pblk_line_mgmt *l_mg,
- 	kfree(line->erase_bitmap);
- 	kfree(line->chks);
- 
--	pblk_mfree(w_err_gc->lba_list, l_mg->emeta_alloc_type);
-+	kvfree(w_err_gc->lba_list);
- 	kfree(w_err_gc);
- }
- 
-@@ -890,29 +890,14 @@ static int pblk_line_mg_init(struct pblk *pblk)
- 		if (!emeta)
- 			goto fail_free_emeta;
- 
--		if (lm->emeta_len[0] > KMALLOC_MAX_CACHE_SIZE) {
--			l_mg->emeta_alloc_type = PBLK_VMALLOC_META;
--
--			emeta->buf = vmalloc(lm->emeta_len[0]);
--			if (!emeta->buf) {
--				kfree(emeta);
--				goto fail_free_emeta;
--			}
--
--			emeta->nr_entries = lm->emeta_sec[0];
--			l_mg->eline_meta[i] = emeta;
--		} else {
--			l_mg->emeta_alloc_type = PBLK_KMALLOC_META;
--
--			emeta->buf = kmalloc(lm->emeta_len[0], GFP_KERNEL);
--			if (!emeta->buf) {
--				kfree(emeta);
--				goto fail_free_emeta;
--			}
--
--			emeta->nr_entries = lm->emeta_sec[0];
--			l_mg->eline_meta[i] = emeta;
-+		emeta->buf = kvmalloc(lm->emeta_len[0], GFP_KERNEL);
-+		if (!emeta->buf) {
-+			kfree(emeta);
-+			goto fail_free_emeta;
- 		}
-+
-+		emeta->nr_entries = lm->emeta_sec[0];
-+		l_mg->eline_meta[i] = emeta;
- 	}
- 
- 	for (i = 0; i < l_mg->nr_lines; i++)
-@@ -926,10 +911,7 @@ static int pblk_line_mg_init(struct pblk *pblk)
- 
- fail_free_emeta:
- 	while (--i >= 0) {
--		if (l_mg->emeta_alloc_type == PBLK_VMALLOC_META)
--			vfree(l_mg->eline_meta[i]->buf);
--		else
--			kfree(l_mg->eline_meta[i]->buf);
-+		kvfree(l_mg->eline_meta[i]->buf);
- 		kfree(l_mg->eline_meta[i]);
- 	}
- 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index d515d3409a74..86ffa875bfe1 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -482,11 +482,6 @@ struct pblk_line {
- #define PBLK_DATA_LINES 4
- 
- enum {
--	PBLK_KMALLOC_META = 1,
--	PBLK_VMALLOC_META = 2,
--};
--
--enum {
- 	PBLK_EMETA_TYPE_HEADER = 1,	/* struct line_emeta first sector */
- 	PBLK_EMETA_TYPE_LLBA = 2,	/* lba list - type: __le64 */
- 	PBLK_EMETA_TYPE_VSC = 3,	/* vsc list - type: __le32 */
-@@ -521,9 +516,6 @@ struct pblk_line_mgmt {
- 
- 	__le32 *vsc_list;		/* Valid sector counts for all lines */
- 
--	/* Metadata allocation type: VMALLOC | KMALLOC */
--	int emeta_alloc_type;
--
- 	/* Pre-allocated metadata for data lines */
- 	struct pblk_smeta *sline_meta[PBLK_DATA_LINES];
- 	struct pblk_emeta *eline_meta[PBLK_DATA_LINES];
-@@ -934,21 +926,6 @@ void pblk_rl_werr_line_out(struct pblk_rl *rl);
- int pblk_sysfs_init(struct gendisk *tdisk);
- void pblk_sysfs_exit(struct gendisk *tdisk);
- 
--static inline void *pblk_malloc(size_t size, int type, gfp_t flags)
--{
--	if (type == PBLK_KMALLOC_META)
--		return kmalloc(size, flags);
--	return vmalloc(size);
--}
--
--static inline void pblk_mfree(void *ptr, int type)
--{
--	if (type == PBLK_KMALLOC_META)
--		kfree(ptr);
--	else
--		vfree(ptr);
--}
--
- static inline struct nvm_rq *nvm_rq_from_c_ctx(void *c_ctx)
+ static int nvm_submit_io_sync_raw(struct nvm_dev *dev, struct nvm_rq *rqd)
  {
- 	return c_ctx - sizeof(struct nvm_rq);
+-	if (!dev->ops->submit_io_sync)
++	if (!dev->ops->submit_io)
+ 		return -ENODEV;
+ 
++	rqd->dev = NULL;
+ 	rqd->flags = nvm_set_flags(&dev->geo, rqd);
+ 
+-	return dev->ops->submit_io_sync(dev, rqd);
++	return nvm_submit_io_wait(dev, rqd);
+ }
+ 
+ static int nvm_bb_chunk_sense(struct nvm_dev *dev, struct ppa_addr ppa)
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index ba009d4c9dfa..d6f121452d5d 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -690,34 +690,6 @@ static int nvme_nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
+ 	return 0;
+ }
+ 
+-static int nvme_nvm_submit_io_sync(struct nvm_dev *dev, struct nvm_rq *rqd)
+-{
+-	struct request_queue *q = dev->q;
+-	struct request *rq;
+-	struct nvme_nvm_command cmd;
+-	int ret = 0;
+-
+-	memset(&cmd, 0, sizeof(struct nvme_nvm_command));
+-
+-	rq = nvme_nvm_alloc_request(q, rqd, &cmd);
+-	if (IS_ERR(rq))
+-		return PTR_ERR(rq);
+-
+-	/* I/Os can fail and the error is signaled through rqd. Callers must
+-	 * handle the error accordingly.
+-	 */
+-	blk_execute_rq(q, NULL, rq, 0);
+-	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
+-		ret = -EINTR;
+-
+-	rqd->ppa_status = le64_to_cpu(nvme_req(rq)->result.u64);
+-	rqd->error = nvme_req(rq)->status;
+-
+-	blk_mq_free_request(rq);
+-
+-	return ret;
+-}
+-
+ static void *nvme_nvm_create_dma_pool(struct nvm_dev *nvmdev, char *name,
+ 					int size)
+ {
+@@ -754,7 +726,6 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
+ 	.get_chk_meta		= nvme_nvm_get_chk_meta,
+ 
+ 	.submit_io		= nvme_nvm_submit_io,
+-	.submit_io_sync		= nvme_nvm_submit_io_sync,
+ 
+ 	.create_dma_pool	= nvme_nvm_create_dma_pool,
+ 	.destroy_dma_pool	= nvme_nvm_destroy_dma_pool,
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 4d0d5655c7b2..8891647b24b1 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -89,7 +89,6 @@ typedef int (nvm_op_set_bb_fn)(struct nvm_dev *, struct ppa_addr *, int, int);
+ typedef int (nvm_get_chk_meta_fn)(struct nvm_dev *, sector_t, int,
+ 							struct nvm_chk_meta *);
+ typedef int (nvm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
+-typedef int (nvm_submit_io_sync_fn)(struct nvm_dev *, struct nvm_rq *);
+ typedef void *(nvm_create_dma_pool_fn)(struct nvm_dev *, char *, int);
+ typedef void (nvm_destroy_dma_pool_fn)(void *);
+ typedef void *(nvm_dev_dma_alloc_fn)(struct nvm_dev *, void *, gfp_t,
+@@ -104,7 +103,6 @@ struct nvm_dev_ops {
+ 	nvm_get_chk_meta_fn	*get_chk_meta;
+ 
+ 	nvm_submit_io_fn	*submit_io;
+-	nvm_submit_io_sync_fn	*submit_io_sync;
+ 
+ 	nvm_create_dma_pool_fn	*create_dma_pool;
+ 	nvm_destroy_dma_pool_fn	*destroy_dma_pool;
 -- 
 2.7.4
 
