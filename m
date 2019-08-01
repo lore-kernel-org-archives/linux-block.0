@@ -2,135 +2,81 @@ Return-Path: <SRS0=+9gR=V5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C9DFC19759
-	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 14:19:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B62C433FF
+	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 14:28:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFEBB216C8
-	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 14:19:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="M+yZ5LoJ"
+	by mail.kernel.org (Postfix) with ESMTP id AC3BC214DA
+	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 14:28:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731868AbfHAOTJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Aug 2019 10:19:09 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:39390 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731915AbfHAOTJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 10:19:09 -0400
-Received: by mail-qt1-f196.google.com with SMTP id l9so70317610qtu.6
-        for <linux-block@vger.kernel.org>; Thu, 01 Aug 2019 07:19:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=hMA7vlwUroWdb0REjDf2neAobLqIjEsoQepgHkXMGQc=;
-        b=M+yZ5LoJGbhm7g0i1sIHAJmyeoJlxlLUxNMBipkE5Gk2KmuVJyj40RCbT2OMJyeUYM
-         zJHmHpLP79mwX+1GU1gaWmI+ZgMsrzh906sNv8d/eg/a5Xw25HKRKuFNgKcyKLM02Ww0
-         rufqIlPpawx9cNcQ6Ahy2tSEtMjGQsDi0/1f8f63o7vcW+ionqvcAAZen0904J/Ypmil
-         ZGhx4rO03KDS05ILM46VGBWJuCbsSKMR9WjJEMoOyUFc9cwx/Lc3OXwHZWF/4cg/Lo1f
-         MMC8Huc/zfOSWQ3eMe0y7mSe9oVAGDhdbvvwgs3CG/GKyE01CIy0PPbv9CbdNkVNHI2q
-         Ytxw==
+        id S1727198AbfHAO2b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Aug 2019 10:28:31 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:36463 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726227AbfHAO2a (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 10:28:30 -0400
+Received: by mail-pg1-f193.google.com with SMTP id l21so34308429pgm.3
+        for <linux-block@vger.kernel.org>; Thu, 01 Aug 2019 07:28:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=hMA7vlwUroWdb0REjDf2neAobLqIjEsoQepgHkXMGQc=;
-        b=dxH35+/LD8m3hsPgBI+uAtbQ+AlMufmrYEfm0KOSkbtG7MHJIQkE8X3cLIXHCfZHFh
-         WSmXQkZ4hRVi5Ecaji0Lup9y9ge9yGQJGT+e+ZP4+QsfG7tsTtdldH/RHi8YF+Y19Lbp
-         mGUere4BgdzCWsvpxFYGtLvGYzxfOLxbxGagTZjCZ50u1QGZNynEfh8eDJUFHYbNQBXB
-         x1fL0+UK9rHpKX0ksH8Um+jNdCIaCtIYt2WIgahRGt0j+p6L+OkM1NA1xn1M7yYbRuXP
-         lS/7kRyszmgO+NcfuQajAAqib4tixWG7gI1X7iSTOc/D+x3i4A7ZbhlcyYF3MCwf3dd0
-         D0dQ==
-X-Gm-Message-State: APjAAAUNhRxlbn+tcYmQL3G31iOwkDj3QSx8gHgUoE6TKyMLqhrrANkN
-        3ZonPvUE+tXT86nJ6oHKEzAqDw==
-X-Google-Smtp-Source: APXvYqwTQf1KGpY8PZ+10TO7pJmffd0/JJ0SGE6m65X5GOGwylr1cSmZUzuB803q9/jTvKSKgNYkxg==
-X-Received: by 2002:a0c:aed0:: with SMTP id n16mr93783119qvd.101.1564669147681;
-        Thu, 01 Aug 2019 07:19:07 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id s127sm30805414qkd.107.2019.08.01.07.19.07
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 01 Aug 2019 07:19:07 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1htBv8-00084t-Lf; Thu, 01 Aug 2019 11:19:06 -0300
-Date:   Thu, 1 Aug 2019 11:19:06 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Benvenuti <benve@cisco.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>,
-        Jerome Glisse <jglisse@redhat.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Matthew Wilcox <willy@infradead.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Mike Marciniszyn <mike.marciniszyn@intel.com>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v4 1/3] mm/gup: add make_dirty arg to
- put_user_pages_dirty_lock()
-Message-ID: <20190801141906.GC23899@ziepe.ca>
-References: <20190730205705.9018-1-jhubbard@nvidia.com>
- <20190730205705.9018-2-jhubbard@nvidia.com>
- <20190801060755.GA14893@lst.de>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3+pyBVpWrGWFwo6CRFg6HFI3k917P3uucTxDT1CY470=;
+        b=mP5Dz/vVb2cvSqlXJw71+4Oa4tJxb3ERW+1aoBDcoKmneSLU3uPz++oAdCx3qz9vXy
+         nAYGtIMiADMLseLq/fyZEn2mAxWWNi4ngSyRcvR42XSWaUiuZwkKqXMc7adPujFUMI1Y
+         ig5YslNaxl39eFYCDe1M2x/B14l+rXOMPw22cLl7+K4BhzeaYVWigCJO2Iqaykaa+IiU
+         M8KSVmyxWb2rQt+gefi+S8Tmg+k779jA5Q2hTdS51DA+vrOc4PscEGd0hzol3sx3ofOf
+         1eu2uNtifm7o6xvr7NrCFDsry4gDz+LDq53S1MZLv0f/RUGcSFDJmRqTR9a9915iRx9i
+         x2EA==
+X-Gm-Message-State: APjAAAV9NWTFJpKMtPkPrSHwHtY4pwdSOtB8qQS+c9vDLkt7gdGjVYxu
+        Cau3GPJwnuGk2hZME5pd/38=
+X-Google-Smtp-Source: APXvYqzioTwzejHNkwFExVF/K0FB6CyilQfkFintItvAcOz9DFpqR6FzepR6NdWlQbjAlKMHrkbxDg==
+X-Received: by 2002:a17:90a:1785:: with SMTP id q5mr9005763pja.106.1564669709983;
+        Thu, 01 Aug 2019 07:28:29 -0700 (PDT)
+Received: from ?IPv6:2601:647:4800:973f:45eb:53c1:ba3f:2a0a? ([2601:647:4800:973f:45eb:53c1:ba3f:2a0a])
+        by smtp.gmail.com with ESMTPSA id 97sm9803018pjz.12.2019.08.01.07.28.28
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 01 Aug 2019 07:28:29 -0700 (PDT)
+Subject: Re: [PATCH V2 0/5] blk-mq: wait until completed req's complete fn is
+ run
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Max Gurtovoy <maxg@mellanox.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
+References: <20190724034843.10879-1-ming.lei@redhat.com>
+ <20190730004525.GB28708@ming.t460p>
+ <7eeb2e89-a056-456a-8be3-6edbda83b7bc@grimberg.me>
+ <944c6735-f03e-c055-33d8-fe7f9a760b8a@kernel.dk>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <4788e1e5-6874-c510-5fa9-f07c98ec42e5@grimberg.me>
+Date:   Thu, 1 Aug 2019 07:28:28 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190801060755.GA14893@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <944c6735-f03e-c055-33d8-fe7f9a760b8a@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 01, 2019 at 08:07:55AM +0200, Christoph Hellwig wrote:
-> On Tue, Jul 30, 2019 at 01:57:03PM -0700, john.hubbard@gmail.com wrote:
-> > @@ -40,10 +40,7 @@
-> >  static void __qib_release_user_pages(struct page **p, size_t num_pages,
-> >  				     int dirty)
-> >  {
-> > -	if (dirty)
-> > -		put_user_pages_dirty_lock(p, num_pages);
-> > -	else
-> > -		put_user_pages(p, num_pages);
-> > +	put_user_pages_dirty_lock(p, num_pages, dirty);
-> >  }
-> 
-> __qib_release_user_pages should be removed now as a direct call to
-> put_user_pages_dirty_lock is a lot more clear.
-> 
-> > index 0b0237d41613..62e6ffa9ad78 100644
-> > +++ b/drivers/infiniband/hw/usnic/usnic_uiom.c
-> > @@ -75,10 +75,7 @@ static void usnic_uiom_put_pages(struct list_head *chunk_list, int dirty)
-> >  		for_each_sg(chunk->page_list, sg, chunk->nents, i) {
-> >  			page = sg_page(sg);
-> >  			pa = sg_phys(sg);
-> > -			if (dirty)
-> > -				put_user_pages_dirty_lock(&page, 1);
-> > -			else
-> > -				put_user_page(page);
-> > +			put_user_pages_dirty_lock(&page, 1, dirty);
-> >  			usnic_dbg("pa: %pa\n", &pa);
-> 
-> There is a pre-existing bug here, as this needs to use the sg_page
-> iterator.  Probably worth throwing in a fix into your series while you
-> are at it.
 
-Sadly usnic does not use the core rdma umem abstraction but open codes
-an old version of it.
+>>> Hello Jens, Chritoph and Guys,
+>>>
+>>> Ping on this fix.
+>>
+>> Given that this is nvme related, we could feed
+>> it to jens from the nvme tree.
+>> Applying to nvme-5.4 tree for now, if Jens picks
+>> it up, we'll drop it.
+> 
+> It's on my top of list to review, I'd like to take it through
+> the block tree though. I think that makes the most sense.
 
-In this version each sge in the sgl is exactly one page. See
-usnic_uiom_get_pages - so I think this loop is not a bug?
-
-Jason
+No problem at all. removing it from the nvme tree.
