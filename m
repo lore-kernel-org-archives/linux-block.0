@@ -6,48 +6,49 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F14C32753
-	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 22:51:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6BA0C19759
+	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 22:51:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3FD322084C
-	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 22:51:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 822572084C
+	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 22:51:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733289AbfHAWu7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Aug 2019 18:50:59 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37907 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388942AbfHAWu6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 18:50:58 -0400
-Received: by mail-pg1-f193.google.com with SMTP id f5so26176064pgu.5
-        for <linux-block@vger.kernel.org>; Thu, 01 Aug 2019 15:50:58 -0700 (PDT)
+        id S1726268AbfHAWvB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Aug 2019 18:51:01 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:32970 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728904AbfHAWvA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 18:51:00 -0400
+Received: by mail-pf1-f196.google.com with SMTP id g2so34901871pfq.0
+        for <linux-block@vger.kernel.org>; Thu, 01 Aug 2019 15:50:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Em7UK3RYeN+WOGI1E/PxkPUM7IdJO+sUsMzC6fv5ULA=;
-        b=puMarA9cPTrFR4t/itHv/ugMEJtFSCh5dbO+toYNqZhDumHastLDn4OMu4+iSe62Jr
-         6RvwThZ8GNMsZKRTSaMAboLVRBherb2mP4kEx5CC0jVvWqBdQuoGUw8w8Bobx46evB9s
-         2fWqbGJ79MlJuoy0qH0aCoQg7KHQAU6gjTT2uOYVpwOYQPirNt3SLUwy+hg9bWPZr1cF
-         TTBOG5Q0UjYXdn5zUGfl3aqx2wS/VU4zP8Wa7ecrcVVQWMYHngWnwcTl2FbGcO1v4VWM
-         dFhNS7PYvuBdO9560XVyUfkVJN4ttBx45K9x8iKWcFLn0yGMnrgD55/bXogSUveKJpAX
-         epIw==
-X-Gm-Message-State: APjAAAUzevmp91nTGrHzL1wjWD/6TCm+oKdKP3scuyYLQh4uzc0qqthb
-        imrKywVA/FsbICVQ9NOmEiw=
-X-Google-Smtp-Source: APXvYqzxuKfEtD7jGxVxS+GQp3FGBazzlOHztLaVHNHDCb9RlzduLmGBS31zQZKKcxG0fL6IUdrD2Q==
-X-Received: by 2002:a17:90a:346c:: with SMTP id o99mr1139951pjb.20.1564699857856;
-        Thu, 01 Aug 2019 15:50:57 -0700 (PDT)
+        bh=EhWldTClpduPmOO/VmISBa3rF5geaIGGYKKo8yPkexo=;
+        b=NuRUgyKe9Gn2yGPI1NDzu0uPs3gDLx+xHNHVUraLQnOxzSOe7gY4gRkzfuFEdiVnWB
+         IYeBgEwqkGWJI5XIfIUmg6vcxuZmRAvluZiigEU76gKlQrgqWT0wUjozJ+DT5YYPJpp4
+         dutIH4LCY2g2zNUcwPsUw2gkns4oJWqylPRBMzjuERuYJVTHvnEdcAjVjfO8zFMUYG5u
+         PXQka42QHzpGGlg+eDDMI1lPFA+0lQ3ilEYVLfqocI3Yx5w+LF7iSnW53Qrz/Ey29r51
+         MzXWKGjTAQAnslgTgsUKm68L7MuXLK5cnJyyIGyolnw0AfYNhwdbAMpPv17Mrag2fy+f
+         ml3g==
+X-Gm-Message-State: APjAAAWWgrTOiOS6gQhkUqnRABmj3zRiW4NBmXF1vfYkJFg0skmi/uud
+        69MH4/X6RMwOQ7seHhZ2yFo=
+X-Google-Smtp-Source: APXvYqzAEbp/QPfntLQwmfFIaVw6ieR3K/vZYR0eXEXNgFZ9xitps583DyC+XXHP+h7VhuiOf2dhuA==
+X-Received: by 2002:a62:6dc2:: with SMTP id i185mr56894680pfc.40.1564699859202;
+        Thu, 01 Aug 2019 15:50:59 -0700 (PDT)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id d12sm35472010pfn.11.2019.08.01.15.50.56
+        by smtp.gmail.com with ESMTPSA id d12sm35472010pfn.11.2019.08.01.15.50.57
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 01 Aug 2019 15:50:57 -0700 (PDT)
+        Thu, 01 Aug 2019 15:50:58 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@infradead.org>,
         Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v2 4/5] block: Simplify blk_bio_segment_split()
-Date:   Thu,  1 Aug 2019 15:50:43 -0700
-Message-Id: <20190801225044.143478-5-bvanassche@acm.org>
+Subject: [PATCH v2 5/5] block: Improve physical block alignment of split bios
+Date:   Thu,  1 Aug 2019 15:50:44 -0700
+Message-Id: <20190801225044.143478-6-bvanassche@acm.org>
 X-Mailer: git-send-email 2.22.0.770.g0f2c4a37fd-goog
 In-Reply-To: <20190801225044.143478-1-bvanassche@acm.org>
 References: <20190801225044.143478-1-bvanassche@acm.org>
@@ -58,130 +59,72 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move the max_sectors check into bvec_split_segs() such that a single
-call to that function can do all the necessary checks. This patch
-optimizes the fast path further, namely if a bvec fits in a page.
+Consider the following example:
+* The logical block size is 4 KB.
+* The physical block size is 8 KB.
+* max_sectors equals (16 KB >> 9) sectors.
+* A non-aligned 4 KB and an aligned 64 KB bio are merged into a single
+  non-aligned 68 KB bio.
 
-Cc: Christoph Hellwig <hch@lst.de>
+The current behavior is to split such a bio into (16 KB + 16 KB + 16 KB
++ 16 KB + 4 KB). The start of none of these five bio's is aligned to a
+physical block boundary.
+
+This patch ensures that such a bio is split into four aligned and
+one non-aligned bio instead of being split into five non-aligned bios.
+This improves performance because most block devices can handle aligned
+requests faster than non-aligned requests.
+
+Since the physical block size is larger than or equal to the logical
+block size, this patch preserves the guarantee that the returned
+value is a multiple of the logical block size.
+
+Cc: Christoph Hellwig <hch@infradead.org>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Hannes Reinecke <hare@suse.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-merge.c | 68 +++++++++++++++++++++++------------------------
- 1 file changed, 33 insertions(+), 35 deletions(-)
+ block/blk-merge.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 7cea5050bbcf..a6bc08255b1b 100644
+index a6bc08255b1b..48e6725b32ee 100644
 --- a/block/blk-merge.c
 +++ b/block/blk-merge.c
-@@ -157,22 +157,36 @@ static unsigned get_max_segment_size(const struct request_queue *q,
- 		     queue_max_segment_size(q));
+@@ -132,16 +132,29 @@ static struct bio *blk_bio_write_same_split(struct request_queue *q,
+ 	return bio_split(bio, q->limits.max_write_same_sectors, GFP_NOIO, bs);
  }
  
--/*
-- * Split the bvec @bv into segments, and update all kinds of
-- * variables.
-+/**
-+ * bvec_split_segs - verify whether or not a bvec should be split in the middle
-+ * @q:        [in] request queue associated with the bio associated with @bv
-+ * @bv:       [in] bvec to examine
-+ * @nsegs:    [in,out] Number of segments in the bio being built. Incremented
-+ *            by the number of segments from @bv that may be appended to that
-+ *            bio without exceeding @max_segs
-+ * @sectors:  [in,out] Number of sectors in the bio being built. Incremented
-+ *            by the number of sectors from @bv that may be appended to that
-+ *            bio without exceeding @max_sectors
-+ * @max_segs: [in] upper bound for *@nsegs
-+ * @max_sectors: [in] upper bound for *@sectors
-+ *
-+ * When splitting a bio, it can happen that a bvec is encountered that is too
-+ * big to fit in a single segment and hence that it has to be split in the
-+ * middle. This function verifies whether or not that should happen. The value
-+ * %true is returned if and only if appending the entire @bv to a bio with
-+ * *@nsegs segments and *@sectors sectors would make that bio unacceptable for
-+ * the block driver.
-  */
- static bool bvec_split_segs(const struct request_queue *q,
- 			    const struct bio_vec *bv, unsigned *nsegs,
--			    unsigned *sectors, unsigned max_segs)
-+			    unsigned *sectors, unsigned max_segs,
-+			    unsigned max_sectors)
++/*
++ * Return the maximum number of sectors from the start of a bio that may be
++ * submitted as a single request to a block device. If enough sectors remain,
++ * align the end to the physical block size. Otherwise align the end to the
++ * logical block size. This approach minimizes the number of non-aligned
++ * requests that are submitted to a block device if the start of a bio is not
++ * aligned to a physical block boundary.
++ */
+ static inline unsigned get_max_io_size(struct request_queue *q,
+ 				       struct bio *bio)
  {
--	unsigned len = bv->bv_len;
-+	unsigned max_len = (min(max_sectors, UINT_MAX >> 9) - *sectors) << 9;
-+	unsigned len = min(bv->bv_len, max_len);
- 	unsigned total_len = 0;
- 	unsigned seg_size = 0;
+ 	unsigned sectors = blk_max_size_offset(q, bio->bi_iter.bi_sector);
+-	unsigned mask = queue_logical_block_size(q) - 1;
++	unsigned max_sectors = sectors;
++	unsigned pbs = queue_physical_block_size(q) >> SECTOR_SHIFT;
++	unsigned lbs = queue_logical_block_size(q) >> SECTOR_SHIFT;
++	unsigned start_offset = bio->bi_iter.bi_sector & (pbs - 1);
  
--	/*
--	 * Multi-page bvec may be too big to hold in one segment, so the
--	 * current bvec has to be splitted as multiple segments.
--	 */
- 	while (len && *nsegs < max_segs) {
- 		seg_size = get_max_segment_size(q, bv->bv_offset + total_len);
- 		seg_size = min(seg_size, len);
-@@ -187,8 +201,8 @@ static bool bvec_split_segs(const struct request_queue *q,
+-	/* aligned to logical block size */
+-	sectors &= ~(mask >> 9);
++	max_sectors += start_offset;
++	max_sectors &= ~(pbs - 1);
++	if (max_sectors > start_offset)
++		return max_sectors - start_offset;
  
- 	*sectors += total_len >> 9;
- 
--	/* split in the middle of the bvec if len != 0 */
--	return !!len;
-+	/* tell the caller to split the bvec if it is too big to fit */
-+	return len > 0 || bv->bv_len > max_len;
+-	return sectors;
++	return sectors & (lbs - 1);
  }
  
- /**
-@@ -229,34 +243,18 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		if (bvprvp && bvec_gap_to_prev(q, bvprvp, bv.bv_offset))
- 			goto split;
- 
--		if (sectors + (bv.bv_len >> 9) > max_sectors) {
--			/*
--			 * Consider this a new segment if we're splitting in
--			 * the middle of this vector.
--			 */
--			if (nsegs < max_segs &&
--			    sectors < max_sectors) {
--				/* split in the middle of bvec */
--				bv.bv_len = (max_sectors - sectors) << 9;
--				bvec_split_segs(q, &bv, &nsegs,
--						&sectors, max_segs);
--			}
-+		if (nsegs < max_segs &&
-+		    sectors + (bv.bv_len >> 9) <= max_sectors &&
-+		    bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
-+			nsegs++;
-+			sectors += bv.bv_len >> 9;
-+		} else if (bvec_split_segs(q, &bv, &nsegs, &sectors, max_segs,
-+					 max_sectors)) {
- 			goto split;
- 		}
- 
--		if (nsegs == max_segs)
--			goto split;
--
- 		bvprv = bv;
- 		bvprvp = &bvprv;
--
--		if (bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
--			nsegs++;
--			sectors += bv.bv_len >> 9;
--		} else if (bvec_split_segs(q, &bv, &nsegs, &sectors,
--				max_segs)) {
--			goto split;
--		}
- 	}
- 
- 	*segs = nsegs;
-@@ -363,7 +361,7 @@ unsigned int blk_recalc_rq_segments(struct request *rq)
- 
- 	rq_for_each_bvec(bv, rq, iter)
- 		bvec_split_segs(rq->q, &bv, &nr_phys_segs, &nr_sectors,
--				UINT_MAX);
-+				UINT_MAX, UINT_MAX);
- 	return nr_phys_segs;
- }
- 
+ static unsigned get_max_segment_size(const struct request_queue *q,
 -- 
 2.22.0.770.g0f2c4a37fd-goog
 
