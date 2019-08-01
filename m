@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43EB3C433FF
-	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 17:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18093C19759
+	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 17:27:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 150A820838
-	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 17:27:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2B3320838
+	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 17:27:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="FOCAfLTE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="n0YAi/xG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732497AbfHAR1R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Aug 2019 13:27:17 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:50984 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729220AbfHAR1R (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 13:27:17 -0400
+        id S1732608AbfHAR1T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Aug 2019 13:27:19 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:47187 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729220AbfHAR1T (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 13:27:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1564680437; x=1596216437;
+  t=1564680438; x=1596216438;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=Mvy1iTjx2yZ5G9ARlRidklLCeyu3cbc66p6imiUTEB4=;
-  b=FOCAfLTE1toX0kYN7jj6e2NwVDr75EGPSgGno2WqeqlYna1lpSuYY+f4
-   YTyYZ8xq72sPGZMDwbreZMXUwhGpI33M3ndbIvldtXDqfy6F/X08wH7cu
-   gwnk/5c+qQg+ZYTL4Srw8hm/DqdUYapLFr+KQLYlt+T9Z2R0ZuUZiEmEH
-   2NYzfT1inaJ+7bCNdILAOuDe0f+MOPtQRuozA7zBEnr6z8GWY4MzFm4Gy
-   JROxXVdi8buBOCQ5mxCyyT9sPk2l7kN9didthRAckhVoR781Rqjv652LC
-   J77xQpR2+q468xs3sEV6PeparEUggDrz/Tyv0fw0LZaffmDaE2xcimxcm
+  bh=C+H5gUGHdpr37/tOvEeOA73qgjfRJSOePkW4JUKuD5s=;
+  b=n0YAi/xGwv6RHAPdIaD8Um1ulev5PIyPQdK5wEtREEeyeGWCtg7SqlQZ
+   46SdS6vCmbh4zNz/s+HYDNsDPlLIv/HNXSYRFZunyiiNdxqdPq9n85HhO
+   YiTuCSgscD5lKQNlz3GmX70d7yk9HU1OBx/o3kJvNEINrr3GYAMN7HGHP
+   k7JvhuLth1fMU5u34avU5EW19UHcEkq5vAAs9hfMe0A9bdcXB/8AtnZWV
+   yUXJqKzhTaw0FPyA94ImlK2bW1vwAZ6vJlGkjQpqMXg77Z9luMsLAjRLR
+   oMazUhMQI9zVDGZILnT7wI2+FWUzgZaKwiExmbqJlBQ7itWVokZvC2Bjp
    A==;
-IronPort-SDR: WZPqu/nSH7YxEm1eqwSqLLTc0fV04oZLWYdhhBuBZAI8WHb286Pp94FV6DQyS39mU3ifKxtfLI
- uELIqFSfoODN81r7ww3B0B7t52YHbfg6MA8WXNco2CKWmAZlJQRGU20IHs8d9dJ4D/jQPsiCO5
- QUraJWz4tPW750DmXUX85udLBptUTZYgH6qp/PW9OqdSwCUi6EjjxLsxWxae05WVAqELKV/MYN
- 1v/9XaGx8dj7LCeWMn0Ty27WJI97cf4jgHIDj914Ghrpvd+bLapp7Bhv3BaBEakgC0Nc5OLQwX
- QWQ=
+IronPort-SDR: /UwQpoDUY4A7IqpnLY1+rKOT/dMJEIk7eNKtvaTK5Y6fgOtOl59DTelMc3PQe7T+1UqtiQfgOZ
+ okJtxYWAAg/nV08zLSKEFLhhOQLi1f+HHmC/QYewTriWlxflnixWO4UzWuyAmOQL7ls0HPrclU
+ piVA8ePVmWKAOWiuk5YW4QwesUwlxTdpRy0rz7tUbJKIAyqXsM6a7LCwOYFSBEOQyIBQryeFOp
+ Z/3VLVOoBfsh7AaRxGuIWz36DeWGrukvMwYTDnwPcZeyPYrED9/vi3garGkJG8oD11GpDEe16w
+ 5ow=
 X-IronPort-AV: E=Sophos;i="5.64,334,1559491200"; 
-   d="scan'208";a="116323226"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Aug 2019 01:27:07 +0800
-IronPort-SDR: SOSuLcWdPRdqx2Rqa7WQnr8GE/KtF5bVMG+ZzFRC5ylTiVRYmEmfBElk6r653kk65iBMXYZZ9F
- 8S5V/aa/HjcxLh/gDUL9gV5F4q5R+3NPsBKRfiIhvDqCwkixrWx8acQRUsUnApT7mGN6cDgz1W
- 1d2XursPbm54ksKJgoOBaaeIZdlKWs+Ds5S50cjjEI2C8enfStolZXbJjihQziRth50cNX1jGN
- SIF7dopMmicDicoaZpw+Z887mPDeMXzsKe12wGQv38zw+7ctayPKDAj15wI7B959ejTsf+yHY4
- hNuDcTpmdJP0cMck2SKhTaoP
+   d="scan'208";a="119390131"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Aug 2019 01:27:18 +0800
+IronPort-SDR: b2upGwq+GyCyrUQUrw50XZd0tc3XTJgb3R4ydCGf4pC2soprbE0EX/+KUYQ3ZVvzJwal5pbRm4
+ VETGmbwOnSMKVsjqtIi+3h4QRlUAp+lhrkZoA1I3/FfwxweSPg/hVHfGX6+AOX+dK9nIXhpnDx
+ +58b97nn8oNh/7uHkjYegcEr+Tm0DHIQQJ+gmxfVn4HLDGcqV8hNobRb/HQe+YfKaZ0aTNY7sV
+ QBx3t5gYbA8RRySesTfyA0rhyvTavAU2FnGQnYU7vec8PIkgoed9O6f6mbsbqTY/OsWasMnCy2
+ b/BsUQG91djlEw5ikx86Mfvr
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2019 10:25:06 -0700
-IronPort-SDR: nV8qtY4XPDj0N/iW1mPkGGi7wlvLeP87GeAYecaGLRsTHM4uQBWclabSUWHg4ThDymdMoe+PB8
- VQ+24EpkQwhgQwS/UpOT3Pm38WdR15Kif5uREjEdXrwhPlOzORQ8a5atlkEFKV7+7y7yyQlNRi
- x+jpcvAlyMX6lvI36qLF7OCD810aRi6+7NX5NGnNlgLwbuT/pze4zBX5bOENUoTVVW3vnkcGXo
- Zyd6jQiKOJf0kPcFayo5/zg7OJ3UGhinUMo0rFqdIItfjhdJDicVrlacwk16sAu8c1zDsg9wUF
- 2uU=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2019 10:25:16 -0700
+IronPort-SDR: +ufA1CYTZ8W1Duj6KnJzcBk0Zb6LUDEPMdG1ySwXrqU3cBe6Cq39sSFE6LMo5lQS9TNbIu0SGQ
+ 5Lw4pEdAl1EntNM/u/hhAKt5cgqYeveG56K57lSNuyebZzPWzNjy2OHKAooVjlJA4dnPWM5QDd
+ NzEETOvOGRmiEHfTNw6UYhE5gWvvmz4wjp3WznMrxkuVIytFHBcbu87d/AsFbZFMPzXuxeew7h
+ 3AAUw+yELdGYjFMyL0TP5F4EZuaEYoLnUB0sty2Kqxn5VurKLfjCTBpwqz3RQIrLv4FzWUuTsL
+ IiQ=
 Received: from cvenusqemu.hgst.com ([10.202.66.73])
-  by uls-op-cesaip02.wdc.com with ESMTP; 01 Aug 2019 10:27:07 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 01 Aug 2019 10:27:18 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
 Cc:     axboe@kernel.dk, jejb@linux.ibm.com, dennis@kernel.org,
@@ -65,9 +65,9 @@ Cc:     axboe@kernel.dk, jejb@linux.ibm.com, dennis@kernel.org,
         ming.lei@redhat.com, tj@kernel.org, bvanassche@acm.org,
         martin.petersen@oracle.com,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V2 1/4] block: add req op to reset all zones and flag
-Date:   Thu,  1 Aug 2019 10:26:35 -0700
-Message-Id: <20190801172638.4060-2-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V2 2/4] blk-zoned: implement REQ_OP_ZONE_RESET_ALL
+Date:   Thu,  1 Aug 2019 10:26:36 -0700
+Message-Id: <20190801172638.4060-3-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.17.0
 In-Reply-To: <20190801172638.4060-1-chaitanya.kulkarni@wdc.com>
 References: <20190801172638.4060-1-chaitanya.kulkarni@wdc.com>
@@ -76,53 +76,107 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch introduces a new request operation REQ_OP_ZONE_RESET_ALL.
-This is useful for the applications like mkfs where it needs to reset
-all the zones present on the underlying block device. As part for this
-patch we also introduce new QUEUE_FLAG_ZONE_RESETALL which indicates the
-queue zone reset all capability and corresponding helper macro.
+This implements REQ_OP_ZONE_RESET_ALL as a special case of the block
+device zone reset operations where we just simply issue bio with the
+newly introduced req op.
 
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+We issue this req op when the number of sectors is equal to the device's
+partition's number of sectors and device has no partitions.
+
+We also add support so that blk_op_str() can print the new reset-all
+zone operation.
+
+This patch also adds a generic make request check for newly
+introduced REQ_OP_ZONE_RESET_ALL req_opf. We simply return error
+when queue is zoned and reset-all flag is not set for
+REQ_OP_ZONE_RESET_ALL.
+
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- include/linux/blk_types.h | 2 ++
- include/linux/blkdev.h    | 3 +++
- 2 files changed, 5 insertions(+)
+ block/blk-core.c  |  5 +++++
+ block/blk-zoned.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index feff3fe4467e..3991b580d6bd 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -282,6 +282,8 @@ enum req_opf {
- 	REQ_OP_ZONE_RESET	= 6,
- 	/* write the same sector many times */
- 	REQ_OP_WRITE_SAME	= 7,
-+	/* reset all the zone present on the device */
-+	REQ_OP_ZONE_RESET_ALL	= 8,
- 	/* write the zero filled sector many times */
- 	REQ_OP_WRITE_ZEROES	= 9,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d0cc6e14d2f0..1b53ab56228b 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -129,6 +129,7 @@ static const char *const blk_op_name[] = {
+ 	REQ_OP_NAME(DISCARD),
+ 	REQ_OP_NAME(SECURE_ERASE),
+ 	REQ_OP_NAME(ZONE_RESET),
++	REQ_OP_NAME(ZONE_RESET_ALL),
+ 	REQ_OP_NAME(WRITE_SAME),
+ 	REQ_OP_NAME(WRITE_ZEROES),
+ 	REQ_OP_NAME(SCSI_IN),
+@@ -931,6 +932,10 @@ generic_make_request_checks(struct bio *bio)
+ 		if (!blk_queue_is_zoned(q))
+ 			goto not_supported;
+ 		break;
++	case REQ_OP_ZONE_RESET_ALL:
++		if (!blk_queue_is_zoned(q) || !blk_queue_zone_resetall(q))
++			goto not_supported;
++		break;
+ 	case REQ_OP_WRITE_ZEROES:
+ 		if (!q->limits.max_write_zeroes_sectors)
+ 			goto not_supported;
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 6c503824ba3f..4bc5f260248a 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -202,6 +202,42 @@ int blkdev_report_zones(struct block_device *bdev, sector_t sector,
+ }
+ EXPORT_SYMBOL_GPL(blkdev_report_zones);
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1ef375dafb1c..474008bffee2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -611,6 +611,7 @@ struct request_queue {
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 23	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED	24	/* queue has been quiesced */
- #define QUEUE_FLAG_PCI_P2PDMA	25	/* device supports PCI p2p requests */
-+#define QUEUE_FLAG_ZONE_RESETALL 26	/* supports Zone Reset All */
++/*
++ * Special case of zone reset operation to reset all zones in one command,
++ * useful for applications like mkfs.
++ */
++static int __blkdev_reset_all_zones(struct block_device *bdev, gfp_t gfp_mask)
++{
++	struct bio *bio = bio_alloc(gfp_mask, 0);
++	int ret;
++
++	/* across the zones operations, don't need any sectors */
++	bio_set_dev(bio, bdev);
++	bio_set_op_attrs(bio, REQ_OP_ZONE_RESET_ALL, 0);
++
++	ret = submit_bio_wait(bio);
++	bio_put(bio);
++
++	return ret;
++}
++
++static inline bool blkdev_allow_reset_all_zones(struct block_device *bdev,
++						sector_t nr_sectors)
++{
++	if (!blk_queue_zone_resetall(bdev_get_queue(bdev)))
++		return false;
++
++	if (nr_sectors != part_nr_sects_read(bdev->bd_part))
++		return false;
++	/*
++	 * REQ_OP_ZONE_RESET_ALL can be executed only if the block device is
++	 * the entire disk, that is, if the blocks device start offset is 0 and
++	 * its capacity is the same as the entire disk.
++	 */
++	return get_start_sect(bdev) == 0 &&
++	       part_nr_sects_read(bdev->bd_part) == get_capacity(bdev->bd_disk);
++}
++
+ /**
+  * blkdev_reset_zones - Reset zones write pointer
+  * @bdev:	Target block device
+@@ -235,6 +271,9 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 		/* Out of range */
+ 		return -EINVAL;
  
- #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP))
-@@ -630,6 +631,8 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
- #define blk_queue_io_stat(q)	test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
- #define blk_queue_add_random(q)	test_bit(QUEUE_FLAG_ADD_RANDOM, &(q)->queue_flags)
- #define blk_queue_discard(q)	test_bit(QUEUE_FLAG_DISCARD, &(q)->queue_flags)
-+#define blk_queue_zone_resetall(q)	\
-+	test_bit(QUEUE_FLAG_ZONE_RESETALL, &(q)->queue_flags)
- #define blk_queue_secure_erase(q) \
- 	(test_bit(QUEUE_FLAG_SECERASE, &(q)->queue_flags))
- #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
++	if (blkdev_allow_reset_all_zones(bdev, nr_sectors))
++		return  __blkdev_reset_all_zones(bdev, gfp_mask);
++
+ 	/* Check alignment (handle eventual smaller last zone) */
+ 	zone_sectors = blk_queue_zone_sectors(q);
+ 	if (sector & (zone_sectors - 1))
 -- 
 2.17.0
 
