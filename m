@@ -7,26 +7,26 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD815C433FF
-	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 23:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E150C32753
+	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 23:45:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ACDE020838
-	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 23:45:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED79D20838
+	for <linux-block@archiver.kernel.org>; Thu,  1 Aug 2019 23:45:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390439AbfHAXp2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2390435AbfHAXp2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 1 Aug 2019 19:45:28 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:33064 "EHLO ale.deltatee.com"
+Received: from ale.deltatee.com ([207.54.116.67]:33036 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390427AbfHAXp1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 1 Aug 2019 19:45:27 -0400
+        id S2390419AbfHAXpZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Aug 2019 19:45:25 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1htKl2-0002MJ-Oa; Thu, 01 Aug 2019 17:45:26 -0600
+        id 1htKl2-0002MH-Od; Thu, 01 Aug 2019 17:45:24 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1htKl2-00025X-ET; Thu, 01 Aug 2019 17:45:16 -0600
+        id 1htKl2-00025R-80; Thu, 01 Aug 2019 17:45:16 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
@@ -35,18 +35,19 @@ Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         Max Gurtovoy <maxg@mellanox.com>,
         Stephen Bates <sbates@raithlin.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu,  1 Aug 2019 17:45:10 -0600
-Message-Id: <20190801234514.7941-12-logang@deltatee.com>
+Date:   Thu,  1 Aug 2019 17:45:08 -0600
+Message-Id: <20190801234514.7941-10-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190801234514.7941-1-logang@deltatee.com>
 References: <20190801234514.7941-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, Chaitanya.Kulkarni@wdc.com, maxg@mellanox.com, sbates@raithlin.com, logang@deltatee.com
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, maxg@mellanox.com, sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, chaitanya.kulkarni@wdc.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v7 11/14] nvmet-configfs: introduce passthru configfs interface
+Subject: [PATCH v7 09/14] nvmet-core: don't check the data len for pt-ctrl
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -54,151 +55,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When CONFIG_NVME_TARGET_PASSTHRU as 'passthru' directory will
-be added to each subsystem. The directory is similar to a namespace
-and has two attributes: device_path and enable. The user must set the
-path to the nvme controller's char device and write '1' to enable the
-subsystem to use passthru.
+From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 
-Any given subsystem is prevented from enabling both a regular namespace
-and the passthru device. If one is enabled, enabling the other will
-produce an error.
+Right now, data_len is calculated before the transfer len after we
+parse the command, With passthru interface we allow VUCs (Vendor-Unique
+Commands). In order to make the code simple and compact, instead of
+assigning the data len or each VUC in the command parse function
+just use the transfer len as it is. This may result in error if expected
+data_len != transfer_len.
 
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+[logang@deltatee.com:
+   * added definition of VUC to the commit message and comment
+   * use nvmet_req_passthru_ctrl() helper seeing we can't dereference
+     subsys->passthru_ctrl if CONFIG_NVME_TARGET_PASSTHRU is not set]
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/nvme/target/configfs.c | 99 ++++++++++++++++++++++++++++++++++
- drivers/nvme/target/nvmet.h    |  1 +
- 2 files changed, 100 insertions(+)
+ drivers/nvme/target/core.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/target/configfs.c b/drivers/nvme/target/configfs.c
-index 98613a45bd3b..b15d64c19f58 100644
---- a/drivers/nvme/target/configfs.c
-+++ b/drivers/nvme/target/configfs.c
-@@ -615,6 +615,103 @@ static const struct config_item_type nvmet_namespaces_type = {
- 	.ct_owner		= THIS_MODULE,
- };
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index c655f26db3da..1cda94437fbf 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -941,7 +941,16 @@ EXPORT_SYMBOL_GPL(nvmet_req_uninit);
  
-+#ifdef CONFIG_NVME_TARGET_PASSTHRU
-+
-+static ssize_t nvmet_passthru_device_path_show(struct config_item *item,
-+		char *page)
-+{
-+	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
-+
-+	return snprintf(page, PAGE_SIZE, "%s\n", subsys->passthru_ctrl_path);
-+}
-+
-+static ssize_t nvmet_passthru_device_path_store(struct config_item *item,
-+		const char *page, size_t count)
-+{
-+	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
-+	int ret = -ENOMEM;
-+	size_t len;
-+
-+	mutex_lock(&subsys->lock);
-+
-+	ret = -EBUSY;
-+	if (subsys->passthru_ctrl)
-+		goto out_unlock;
-+
-+	ret = -EINVAL;
-+	len = strcspn(page, "\n");
-+	if (!len)
-+		goto out_unlock;
-+
-+	kfree(subsys->passthru_ctrl_path);
-+	ret = -ENOMEM;
-+	subsys->passthru_ctrl_path = kstrndup(page, len, GFP_KERNEL);
-+	if (!subsys->passthru_ctrl_path)
-+		goto out_unlock;
-+
-+	mutex_unlock(&subsys->lock);
-+
-+	return count;
-+out_unlock:
-+	mutex_unlock(&subsys->lock);
-+	return ret;
-+}
-+CONFIGFS_ATTR(nvmet_passthru_, device_path);
-+
-+static ssize_t nvmet_passthru_enable_show(struct config_item *item,
-+		char *page)
-+{
-+	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
-+
-+	return sprintf(page, "%d\n", subsys->passthru_ctrl ? 1 : 0);
-+}
-+
-+static ssize_t nvmet_passthru_enable_store(struct config_item *item,
-+		const char *page, size_t count)
-+{
-+	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
-+	bool enable;
-+	int ret = 0;
-+
-+	if (strtobool(page, &enable))
-+		return -EINVAL;
-+
-+	if (enable)
-+		ret = nvmet_passthru_ctrl_enable(subsys);
-+	else
-+		nvmet_passthru_ctrl_disable(subsys);
-+
-+	return ret ? ret : count;
-+}
-+CONFIGFS_ATTR(nvmet_passthru_, enable);
-+
-+static struct configfs_attribute *nvmet_passthru_attrs[] = {
-+	&nvmet_passthru_attr_device_path,
-+	&nvmet_passthru_attr_enable,
-+	NULL,
-+};
-+
-+static const struct config_item_type nvmet_passthru_type = {
-+	.ct_attrs		= nvmet_passthru_attrs,
-+	.ct_owner		= THIS_MODULE,
-+};
-+
-+static void nvmet_add_passthru_group(struct nvmet_subsys *subsys)
-+{
-+	config_group_init_type_name(&subsys->passthru_group,
-+				    "passthru", &nvmet_passthru_type);
-+	configfs_add_default_group(&subsys->passthru_group,
-+				   &subsys->group);
-+}
-+
-+#else /* CONFIG_NVME_TARGET_PASSTHRU */
-+
-+static void nvmet_add_passthru_group(struct nvmet_subsys *subsys)
-+{
-+}
-+
-+#endif /* CONFIG_NVME_TARGET_PASSTHRU */
-+
- static int nvmet_port_subsys_allow_link(struct config_item *parent,
- 		struct config_item *target)
+ void nvmet_req_execute(struct nvmet_req *req)
  {
-@@ -915,6 +1012,8 @@ static struct config_group *nvmet_subsys_make(struct config_group *group,
- 	configfs_add_default_group(&subsys->allowed_hosts_group,
- 			&subsys->group);
- 
-+	nvmet_add_passthru_group(subsys);
-+
- 	return &subsys->group;
- }
- 
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index 6436cb990905..f9c593f1305d 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -231,6 +231,7 @@ struct nvmet_subsys {
- #ifdef CONFIG_NVME_TARGET_PASSTHRU
- 	struct nvme_ctrl	*passthru_ctrl;
- 	char			*passthru_ctrl_path;
-+	struct config_group	passthru_group;
- #endif /* CONFIG_NVME_TARGET_PASSTHRU */
- };
- 
+-	if (unlikely(req->data_len != req->transfer_len)) {
++	/*
++	 * data_len is calculated before the transfer len after we parse
++	 * the command, With passthru interface we allow VUC (Vendor-Unique
++	 * Commands)'s. In order to make the code simple and compact,
++	 * instead of assinging the dala len for each VUC in the command
++	 * parse function just use the transfer len as it is. This may
++	 * result in error if expected data_len != transfer_len.
++	 */
++	if (!(req->sq->ctrl && nvmet_req_passthru_ctrl(req)) &&
++	    unlikely(req->data_len != req->transfer_len)) {
+ 		req->error_loc = offsetof(struct nvme_common_command, dptr);
+ 		nvmet_req_complete(req, NVME_SC_SGL_INVALID_DATA | NVME_SC_DNR);
+ 	} else
 -- 
 2.20.1
 
