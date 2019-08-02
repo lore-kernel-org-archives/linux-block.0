@@ -2,106 +2,94 @@ Return-Path: <SRS0=5K92=V6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE89C433FF
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 14:24:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF7AC32750
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 14:32:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B182420679
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 14:24:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A753221773
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 14:32:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="G2sxycFA"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="k6b4D+oA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388759AbfHBOYt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Aug 2019 10:24:49 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:52950 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731067AbfHBOYt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Aug 2019 10:24:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=jvuzp+6FCROkRR+waxcd/xSBD2jk0LdlEwwlmE/QRVo=; b=G2sxycFAx+YSXemaZWFj5rBoO
-        L5W+suRd87Fzi03i9UbUkz+K/l4OLA7u4vdCzpFKd8kbKkpNT5POJKTjl3Y9NgF+IfuEQiw+Ya9sZ
-        Uz98GhfWAglGYt98RBvfBnca/15T9G/n1hhy4hthNjlrIrfsKUlfX1Lr9suoRAYQ/pICfFJo13kmR
-        L+hbvfVY5BZygvFEilaamnzYAdT/2P4dTNkPPWEPWi3WZyJpk4mE3pZYxvO4hCe5QB9xougEB5c3g
-        IV0U5HMFOk+fqAqk6ui4QqQV5LiDqQxBtFq8kG3bamWa6AZ5dtGBvDFf6uxZiiuQmelcNvOe6qNsg
-        wQg03COuw==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1htYU7-0007La-VU; Fri, 02 Aug 2019 14:24:43 +0000
-Date:   Fri, 2 Aug 2019 07:24:43 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Michal Hocko <mhocko@kernel.org>, john.hubbard@gmail.com,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-Message-ID: <20190802142443.GB5597@bombadil.infradead.org>
-References: <20190802022005.5117-1-jhubbard@nvidia.com>
- <20190802091244.GD6461@dhcp22.suse.cz>
- <20190802124146.GL25064@quack2.suse.cz>
+        id S2394952AbfHBOch (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Aug 2019 10:32:37 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39391 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389189AbfHBOcg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Aug 2019 10:32:36 -0400
+Received: by mail-pf1-f193.google.com with SMTP id f17so32151054pfn.6
+        for <linux-block@vger.kernel.org>; Fri, 02 Aug 2019 07:32:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=A27eyn7fv8+87QCGwvjGeuh58DzMZREuqk7dBBhRC7M=;
+        b=k6b4D+oAskRKA2IOhSIr4jtOxHHPieA4fsfMXbUnhPbSeiIya5KycFpVIXPlm4yRM3
+         2vXqNEv6x7AHEZRhkK0u7jqibHROFQ537Z8xwo0obqs9uLv5mWVXCmIAUFfxGD45IKDs
+         C8/HhWky+gos9UjoGJLY2E78qMasSIXew/dwFeK2f++LqWZ/G5bjoOwPy0EtVt9OenSl
+         ME6WU5E8NUui98Xbx+IsIYaoPGpbJWalf1R1MYfrtslWaM8qdRMnrp3aTSaN5c5tpbkX
+         kCXIf6j9oyR64ldOISFeBUl8qlg4QaAUgeZG68GJ9F8eVjNUlO0pg2yBHNt97Fj7DBw6
+         P4MA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=A27eyn7fv8+87QCGwvjGeuh58DzMZREuqk7dBBhRC7M=;
+        b=KOWuhbpTBRTwXwWacWxCPbY9z8uOYBkUliCIp456UqW5CXObbjXnVRr0jjuK7pqogE
+         c0S015CREYNwIyWeaok/bCrnHc/v6HEGpu/xSSQyMw531Wt34LKzn083X0HrO0/z+yOz
+         ZwZ71n2mdc1RsS9ntUbqs66+TzSjL2EMajawftVRNnAIybhjcCnvoMXyuD0j/ME0xnrK
+         Xdq6g7UXJPN/yw4AyjXKZzfFehBmLGYmBjdKfl1dreYH5oldAM07hoha9+IevXryeoMx
+         XsvFU5edJ3etvConnOmmClOnFACdPT2q7mPXFhdPEXAU0kEbZjMMuHOM7wLbhVOAUF3w
+         NM/Q==
+X-Gm-Message-State: APjAAAUS5ZjKwCPoqzCau9Lb5euayRqDj1pZF3zSK11n02/VSra9HBQd
+        KnkJ+9mXZTSsyL6i0C5TQEM=
+X-Google-Smtp-Source: APXvYqz/GeqeGCtVNZutn4ZyH/Uwt3zoVVgkPPZcSDyGdG47OrHBP/uyvRRqJ0ygnyfCyfMeKDHdEQ==
+X-Received: by 2002:aa7:9197:: with SMTP id x23mr59494402pfa.95.1564756356024;
+        Fri, 02 Aug 2019 07:32:36 -0700 (PDT)
+Received: from [192.168.200.229] (rrcs-76-80-14-36.west.biz.rr.com. [76.80.14.36])
+        by smtp.gmail.com with ESMTPSA id m6sm75804562pfb.151.2019.08.02.07.32.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 02 Aug 2019 07:32:35 -0700 (PDT)
+Subject: Re: [PATCH V2 0/4] block: introduce REQ_OP_ZONE_RESET_ALL
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        jejb@linux.ibm.com, dennis@kernel.org, hare@suse.com,
+        damien.lemoal@wdc.com, sagi@grimberg.me, dennisszhou@gmail.com,
+        jthumshirn@suse.de, osandov@fb.com, ming.lei@redhat.com,
+        tj@kernel.org, bvanassche@acm.org
+References: <20190801172638.4060-1-chaitanya.kulkarni@wdc.com>
+ <0c30519f-2829-ec2c-8fb4-ccddd2580321@kernel.dk> <yq1r263irfa.fsf@oracle.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a471e444-0cdc-b1a9-2870-bf12d8e39da1@kernel.dk>
+Date:   Fri, 2 Aug 2019 08:32:32 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190802124146.GL25064@quack2.suse.cz>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <yq1r263irfa.fsf@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 02, 2019 at 02:41:46PM +0200, Jan Kara wrote:
-> On Fri 02-08-19 11:12:44, Michal Hocko wrote:
-> > On Thu 01-08-19 19:19:31, john.hubbard@gmail.com wrote:
-> > [...]
-> > > 2) Convert all of the call sites for get_user_pages*(), to
-> > > invoke put_user_page*(), instead of put_page(). This involves dozens of
-> > > call sites, and will take some time.
-> > 
-> > How do we make sure this is the case and it will remain the case in the
-> > future? There must be some automagic to enforce/check that. It is simply
-> > not manageable to do it every now and then because then 3) will simply
-> > be never safe.
-> > 
-> > Have you considered coccinele or some other scripted way to do the
-> > transition? I have no idea how to deal with future changes that would
-> > break the balance though.
+On 8/2/19 8:16 AM, Martin K. Petersen wrote:
 > 
-> Yeah, that's why I've been suggesting at LSF/MM that we may need to create
-> a gup wrapper - say vaddr_pin_pages() - and track which sites dropping
-> references got converted by using this wrapper instead of gup. The
-> counterpart would then be more logically named as unpin_page() or whatever
-> instead of put_user_page().  Sure this is not completely foolproof (you can
-> create new callsite using vaddr_pin_pages() and then just drop refs using
-> put_page()) but I suppose it would be a high enough barrier for missed
-> conversions... Thoughts?
+> Jens,
+> 
+>> Martin, I'd like someone to vet/review the SCSI side of it before I
+>> apply it.
+> 
+> Looks good to me.
 
-I think the API we really need is get_user_bvec() / put_user_bvec(),
-and I know Christoph has been putting some work into that.  That avoids
-doing refcount operations on hundreds of pages if the page in question is
-a huge page.  Once people are switched over to that, they won't be tempted
-to manually call put_page() on the individual constituent pages of a bvec.
+Great thanks, applied with your acked-by.
+
+-- 
+Jens Axboe
+
