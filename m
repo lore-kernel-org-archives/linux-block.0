@@ -2,253 +2,210 @@ Return-Path: <SRS0=5K92=V6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE9DC19759
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 01:07:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA5EBC32753
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:17:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E0E7206A3
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 01:07:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D6F22083B
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:17:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mgfAWNAd";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Nq1S2cty"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ri/g8fH5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388659AbfHBBHj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Aug 2019 21:07:39 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:43364 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388658AbfHBBHi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 21:07:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1564708058; x=1596244058;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=+7ltFzWWSD1CF3GHa44SnNZQWVpk6t0nxCUU96kG9os=;
-  b=mgfAWNAdcW3r1GqOhrdcONkc1vxjFVmEgVD9n9RB6+LxOSBbvJysv1Ce
-   3GER4sKpJ4Ox8jkMhsjgOF5oyPbSVEvUIoDdYxYWS0eTkmQ6sN/WKuwMY
-   6xA8vSh7P+6y9QpZ8VGhtkrNh+apZFN5cxFLlSmGUm1r2fqHOmYfT8+s+
-   +0hFd8V2GJc3MVm5jGIW56mKCASHh8H+7KVJsGSPeIF31R4RglLyWFd7H
-   2/dJrF1iKMLT8Dxd0A9I35Bu8XiMnYYsNYZdNAAKknbKxevKaXXjMsJT4
-   aNP98Kmoxg76KcNhWK4UyuBqE5MXibLebreq7hzZz2FU2VV0CsSwZ4OF6
-   A==;
-IronPort-SDR: sJu0iGOHD5BGZMqd2ygHeK+CjbC9K4MzaQ3OG6I3ZLFbCZXrAvOhdfkeGzZsvyO7RiOpMzzxHY
- Avme+ajz9NWjljAuqW3PVY0lUHvYdPgZySvUJRASCvwzyNsCoEfv6wi+QS0sjGkiGIdHXHtw7+
- uS7Bqh8IMojDrXGXPjC/ynkeQbYqCcIiLWYZdIX3dlct2Bk8m/gXvyF8j9BUeUWC7U1JX2bCAy
- 1O/aRSPJ4bFGNdeVbIsrHuEfU62AbN7zpvDxuiDUG0YhFxepVbW6KyUXh1XcmwVbbXzPB/UaQh
- A8s=
-X-IronPort-AV: E=Sophos;i="5.64,336,1559491200"; 
-   d="scan'208";a="115755109"
-Received: from mail-dm3nam05lp2053.outbound.protection.outlook.com (HELO NAM05-DM3-obe.outbound.protection.outlook.com) ([104.47.49.53])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Aug 2019 09:07:27 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n/+LoAAyoYSXOuPmm3hHq2ZKgnHmha16XNaejyPtRuvTeb1q4giEqznVnGqQVo3zw1gXXqrDtQMHorUb8hCdYV02OlxNTk3keUxx+uxdwV3FXeOJwIE2LZQUN0Sax/WZMWzgITxKM7v4OKgaAqwzBiQ0CEmk09zxc15ZNnXtBth1PeiIJ+Naj8PAPOmF004Y7Ym3wXVXmZxS4VrXUrD3IqhMbhLtRwlWmdWvPcI4yQPHeLKSbK/nyWRSnVFH+LvNCRPlDzUBESSoIuMSobjyDNjfzUxp1iAh5aOibrRR5BbwKOQ/mOy8WwbW3SdmFE/DmdVxECCeZ1R58bOnc3vKpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZFfWFfAIMBNzsPTd4o8MSA5aL+9xvaz33X/kr5NHCCo=;
- b=U7DDWBAdXiOh9ljjcLYZPXmled+UP6AllhYOgCnMsBb0XuBH5p8TiUz+VGhqVJnRokApCYSxnOz484cZv8l1TK/56BTCS3KfOdqqsrbjaA9NNUQv0YMKRlHJUclTXDwOUSGgMjtnqusIFo9pFW5BlZsRtSak9b6j6yKR2mEEtvpYeN+PAvA3r6MCHTdLYQjivbiRAALD+QakMU873evWCHbMv2NzazD15yfZ3BFuDe9XuOIicxKNJnKX7tPJiV/2f0P/ttYsunA6ulrgeb2qkJXoAA8ec4nn+UEkQd0PrWW/DE17Lgc5nY3eYayfR5f3mhc3BZAecjLBtTQ5iAkFPA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=wdc.com;dmarc=pass action=none header.from=wdc.com;dkim=pass
- header.d=wdc.com;arc=none
+        id S2390660AbfHBCRD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Aug 2019 22:17:03 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:38226 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728255AbfHBCRD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 22:17:03 -0400
+Received: by mail-pf1-f194.google.com with SMTP id y15so35157527pfn.5;
+        Thu, 01 Aug 2019 19:17:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZFfWFfAIMBNzsPTd4o8MSA5aL+9xvaz33X/kr5NHCCo=;
- b=Nq1S2cty+Sg8NSpypeEQ0u6CKyEzmwIjRDz5OjnhPplfKn+qA7Vu/Je/sEmSdjOMbeGFN2hph/wPX69FFQEupbz8tULMTvw1ZOaegE8981krRpotGp3Xp62py2KbItsbBsG7bv0CczYirIwAHSs4wmPL12/aVc3ld7TLVgeGUts=
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.58.207) by
- BYAPR04MB4103.namprd04.prod.outlook.com (52.135.216.10) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2115.15; Fri, 2 Aug 2019 01:07:26 +0000
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::65a9:db0a:646d:eb1e]) by BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::65a9:db0a:646d:eb1e%6]) with mapi id 15.20.2136.010; Fri, 2 Aug 2019
- 01:07:26 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "dennis@kernel.org" <dennis@kernel.org>,
-        "hare@suse.com" <hare@suse.com>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "dennisszhou@gmail.com" <dennisszhou@gmail.com>,
-        "jthumshirn@suse.de" <jthumshirn@suse.de>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-Subject: Re: [PATCH V2 3/4] scsi: implement REQ_OP_ZONE_RESET_ALL
-Thread-Topic: [PATCH V2 3/4] scsi: implement REQ_OP_ZONE_RESET_ALL
-Thread-Index: AQHVSI5o3BN681RaXUGmIyildT++Bg==
-Date:   Fri, 2 Aug 2019 01:07:25 +0000
-Message-ID: <BYAPR04MB5816E0755EA3A1D90C8FA63AE7D90@BYAPR04MB5816.namprd04.prod.outlook.com>
-References: <20190801172638.4060-1-chaitanya.kulkarni@wdc.com>
- <20190801172638.4060-4-chaitanya.kulkarni@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [60.117.181.124]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 08cbb364-3c6d-41ea-d710-08d716e5c84c
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4103;
-x-ms-traffictypediagnostic: BYAPR04MB4103:
-x-microsoft-antispam-prvs: <BYAPR04MB4103A4C3A94AB5F12296A740E7D90@BYAPR04MB4103.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:5516;
-x-forefront-prvs: 011787B9DD
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(39860400002)(136003)(346002)(396003)(376002)(366004)(189003)(199004)(5660300002)(8936002)(81156014)(2906002)(8676002)(6246003)(66476007)(26005)(66946007)(2201001)(7696005)(3846002)(71190400001)(53936002)(53546011)(7736002)(76176011)(110136005)(6116002)(52536014)(7416002)(91956017)(76116006)(54906003)(99286004)(71200400001)(66446008)(256004)(9686003)(102836004)(55016002)(86362001)(229853002)(6506007)(81166006)(14444005)(6436002)(25786009)(66556008)(64756008)(74316002)(446003)(305945005)(4326008)(2501003)(33656002)(476003)(14454004)(486006)(68736007)(186003)(66066001)(478600001)(316002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4103;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: ZR/h3M15miQS3icTZdcp9euzsHvKALXp1KMj50XVLnniaj//FZ3coCYrwVFCo1RVekP7uCLpenOn9fnKuNK0wt1GjiYIFg54FOPpwnWGgumPEnXd5b/j5OmUL/cUzjARvLhbfFS3bNRH35qSnIfRG/bdlvRBiX/FLWsvz9p/wKn0B1JzKIGQYgEy6u3AUO/e0We+Y2EOx0vi6Jo+AMdlqLuf4Wf3HFY//lac9tsEssVlMTOpjAxzU9z0HufPFmWVq45cCRAJIJOPphd/UMuwd54WgnAwvKc4MptxsJT1M1ZSAR7/seOEd5AibzGH+ePwIOiFCVVZFlbXM8TWRtwOX42NC4UgTe9c99ml7cS0PtFV85e4qQ2TJ7M/v+XTN1TSrEqkHVirL7oICptGBGvu5xcOXb5B986VmOSU2oyuhHk=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=qSYlns3rxzw4u/DyjG2ivKH4pSlvpz3tTvNpv+Vzl0A=;
+        b=ri/g8fH5EMbaRGeRCBUMa0gqvf5sZKxxRTcoGNlKvndtobuEMarAmuyiWR0Or0yt3d
+         ZgeLr0P+kW4cqW28KQH/rOYsII5pR9Pk0M0WFYUApB7SKz6vEgjXY+F34hxONagLYY9L
+         Py6Blyj3NR1ZdTatlTm5llaJcajjxdcYrAkl23WVqTVg9XAD+0Qg+cC1rauwop+vVeNx
+         bVVFBfM1nAEvoH8ncIKlerRWnqRBlhjzlfCDLJ981KoDXyQRyzFGpLUw/iRcSWFkJ5xl
+         t+5zV5laKnX+3Bq/BiZ3lREDjIqp5Q8qRulPXvOqGHi7pfUVWIrfUbywjbnDPsqYnoHP
+         +z/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=qSYlns3rxzw4u/DyjG2ivKH4pSlvpz3tTvNpv+Vzl0A=;
+        b=XZMe4VWepSzRYP8UfKwIQgcNVPi7T4oWjUKoJ/zaLDDn9OKiQ/4TFUtBI9K0iBeWFu
+         GshMR9aCMIazDL2sP9SlMzF2d60qV7HsniUuLNuzIr93tQ2c0P3vfYQvH6XPdmiLZfzY
+         cVbmpIs0FqXAjbQp/24n7DNFkbwon6xycMfrH8WryCEQwGMw9CwC5HMeX/oEPwny9i4q
+         Q9SQ4OuuDWKkC+5uW+5whsaV/Pn4gBSfTn3DFjHDWyLCHSjG++1WP/WrCNz8ijslmXAw
+         LvA3tDHg//dawpNGtEqmA7+X+5GNk1PV5Rs97z1b9uotfNu/LPZcr297Gy24RssPy5QJ
+         ECDQ==
+X-Gm-Message-State: APjAAAW9ErcAfOpiOx8HQwtIH0T4zToF5mWK8tf1miYJQmEB1pG8GpJ4
+        xhL6yvGSwLkZC3QiKNE1BSU=
+X-Google-Smtp-Source: APXvYqzbu0fqyx1S9wHk9TZWdOKFNLR8W4aJ20JQpVBVWnaUPwqEe+RFqTrVv58Rvjaf0s5gNM1HPA==
+X-Received: by 2002:a17:90a:ba93:: with SMTP id t19mr1809345pjr.139.1564712221494;
+        Thu, 01 Aug 2019 19:17:01 -0700 (PDT)
+Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
+        by smtp.gmail.com with ESMTPSA id p187sm118200292pfg.89.2019.08.01.19.16.59
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 01 Aug 2019 19:17:00 -0700 (PDT)
+From:   john.hubbard@gmail.com
+X-Google-Original-From: jhubbard@nvidia.com
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        "David S . Miller" <davem@davemloft.net>
+Subject: [PATCH 02/34] net/rds: convert put_page() to put_user_page*()
+Date:   Thu,  1 Aug 2019 19:16:21 -0700
+Message-Id: <20190802021653.4882-3-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190802021653.4882-1-jhubbard@nvidia.com>
+References: <20190802021653.4882-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08cbb364-3c6d-41ea-d710-08d716e5c84c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2019 01:07:25.8496
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Damien.LeMoal@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4103
+X-NVConfidentiality: public
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/08/02 2:27, Chaitanya Kulkarni wrote:=0A=
-> This patch implements the zone reset all operation for sd_zbc.c. We add=
-=0A=
-> a new boolean parameter for the sd_zbc_setup_reset_cmd() to indicate=0A=
-> REQ_OP_ZONE_RESET_ALL command setup. Along with that we add support in=0A=
-> the completion path for the zone reset all.=0A=
-> =0A=
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-> ---=0A=
->  drivers/scsi/sd.c     |  5 ++++-=0A=
->  drivers/scsi/sd.h     |  5 +++--=0A=
->  drivers/scsi/sd_zbc.c | 10 ++++++++--=0A=
->  3 files changed, 15 insertions(+), 5 deletions(-)=0A=
-> =0A=
-> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c=0A=
-> index a3406bd62391..42ef930c4df5 100644=0A=
-> --- a/drivers/scsi/sd.c=0A=
-> +++ b/drivers/scsi/sd.c=0A=
-> @@ -1292,7 +1292,9 @@ static blk_status_t sd_init_command(struct scsi_cmn=
-d *cmd)=0A=
->  	case REQ_OP_WRITE:=0A=
->  		return sd_setup_read_write_cmnd(cmd);=0A=
->  	case REQ_OP_ZONE_RESET:=0A=
-> -		return sd_zbc_setup_reset_cmnd(cmd);=0A=
-> +		return sd_zbc_setup_reset_cmnd(cmd, false);=0A=
-> +	case REQ_OP_ZONE_RESET_ALL:=0A=
-> +		return sd_zbc_setup_reset_cmnd(cmd, true);=0A=
->  	default:=0A=
->  		WARN_ON_ONCE(1);=0A=
->  		return BLK_STS_NOTSUPP;=0A=
-> @@ -1958,6 +1960,7 @@ static int sd_done(struct scsi_cmnd *SCpnt)=0A=
->  	case REQ_OP_WRITE_ZEROES:=0A=
->  	case REQ_OP_WRITE_SAME:=0A=
->  	case REQ_OP_ZONE_RESET:=0A=
-> +	case REQ_OP_ZONE_RESET_ALL:=0A=
->  		if (!result) {=0A=
->  			good_bytes =3D blk_rq_bytes(req);=0A=
->  			scsi_set_resid(SCpnt, 0);=0A=
-> diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h=0A=
-> index 38c50946fc42..1eab779f812b 100644=0A=
-> --- a/drivers/scsi/sd.h=0A=
-> +++ b/drivers/scsi/sd.h=0A=
-> @@ -209,7 +209,7 @@ static inline int sd_is_zoned(struct scsi_disk *sdkp)=
-=0A=
->  =0A=
->  extern int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buff=
-er);=0A=
->  extern void sd_zbc_print_zones(struct scsi_disk *sdkp);=0A=
-> -extern blk_status_t sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd);=0A=
-> +extern blk_status_t sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd, bool =
-all);=0A=
->  extern void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_byt=
-es,=0A=
->  			    struct scsi_sense_hdr *sshdr);=0A=
->  extern int sd_zbc_report_zones(struct gendisk *disk, sector_t sector,=0A=
-> @@ -225,7 +225,8 @@ static inline int sd_zbc_read_zones(struct scsi_disk =
-*sdkp,=0A=
->  =0A=
->  static inline void sd_zbc_print_zones(struct scsi_disk *sdkp) {}=0A=
->  =0A=
-> -static inline blk_status_t sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd=
-)=0A=
-> +static inline blk_status_t sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd=
-,=0A=
-> +						   bool all)=0A=
->  {=0A=
->  	return BLK_STS_TARGET;=0A=
->  }=0A=
-> diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c=0A=
-> index db16c19e05c4..c1c7140ea787 100644=0A=
-> --- a/drivers/scsi/sd_zbc.c=0A=
-> +++ b/drivers/scsi/sd_zbc.c=0A=
-> @@ -209,10 +209,11 @@ static inline sector_t sd_zbc_zone_sectors(struct s=
-csi_disk *sdkp)=0A=
->  /**=0A=
->   * sd_zbc_setup_reset_cmnd - Prepare a RESET WRITE POINTER scsi command.=
-=0A=
->   * @cmd: the command to setup=0A=
-> + * @all: Reset all zones control.=0A=
->   *=0A=
->   * Called from sd_init_command() for a REQ_OP_ZONE_RESET request.=0A=
->   */=0A=
-> -blk_status_t sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)=0A=
-> +blk_status_t sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd, bool all)=0A=
->  {=0A=
->  	struct request *rq =3D cmd->request;=0A=
->  	struct scsi_disk *sdkp =3D scsi_disk(rq->rq_disk);=0A=
-> @@ -234,7 +235,10 @@ blk_status_t sd_zbc_setup_reset_cmnd(struct scsi_cmn=
-d *cmd)=0A=
->  	memset(cmd->cmnd, 0, cmd->cmd_len);=0A=
->  	cmd->cmnd[0] =3D ZBC_OUT;=0A=
->  	cmd->cmnd[1] =3D ZO_RESET_WRITE_POINTER;=0A=
-> -	put_unaligned_be64(block, &cmd->cmnd[2]);=0A=
-> +	if (all)=0A=
-> +		cmd->cmnd[14] =3D 0x1;=0A=
-> +	else=0A=
-> +		put_unaligned_be64(block, &cmd->cmnd[2]);=0A=
->  =0A=
->  	rq->timeout =3D SD_TIMEOUT;=0A=
->  	cmd->sc_data_direction =3D DMA_NONE;=0A=
-> @@ -261,6 +265,7 @@ void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned =
-int good_bytes,=0A=
->  =0A=
->  	switch (req_op(rq)) {=0A=
->  	case REQ_OP_ZONE_RESET:=0A=
-> +	case REQ_OP_ZONE_RESET_ALL:=0A=
->  =0A=
->  		if (result &&=0A=
->  		    sshdr->sense_key =3D=3D ILLEGAL_REQUEST &&=0A=
-> @@ -487,6 +492,7 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigne=
-d char *buf)=0A=
->  	/* The drive satisfies the kernel restrictions: set it up */=0A=
->  	blk_queue_chunk_sectors(sdkp->disk->queue,=0A=
->  			logical_to_sectors(sdkp->device, zone_blocks));=0A=
-> +	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, sdkp->disk->queue);=0A=
->  	nr_zones =3D round_up(sdkp->capacity, zone_blocks) >> ilog2(zone_blocks=
-);=0A=
->  =0A=
->  	/* READ16/WRITE16 is mandatory for ZBC disks */=0A=
-> =0A=
-=0A=
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+From: John Hubbard <jhubbard@nvidia.com>
+
+For pages that were retained via get_user_pages*(), release those pages
+via the new put_user_page*() routines, instead of via put_page() or
+release_pages().
+
+This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+("mm: introduce put_user_page*(), placeholder versions").
+
+Cc: Santosh Shilimkar <santosh.shilimkar@oracle.com>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: netdev@vger.kernel.org
+Cc: linux-rdma@vger.kernel.org
+Cc: rds-devel@oss.oracle.com
+Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+---
+ net/rds/info.c    |  5 ++---
+ net/rds/message.c |  2 +-
+ net/rds/rdma.c    | 15 +++++++--------
+ 3 files changed, 10 insertions(+), 12 deletions(-)
+
+diff --git a/net/rds/info.c b/net/rds/info.c
+index 03f6fd56d237..ca6af2889adf 100644
+--- a/net/rds/info.c
++++ b/net/rds/info.c
+@@ -162,7 +162,6 @@ int rds_info_getsockopt(struct socket *sock, int optname, char __user *optval,
+ 	struct rds_info_lengths lens;
+ 	unsigned long nr_pages = 0;
+ 	unsigned long start;
+-	unsigned long i;
+ 	rds_info_func func;
+ 	struct page **pages = NULL;
+ 	int ret;
+@@ -235,8 +234,8 @@ int rds_info_getsockopt(struct socket *sock, int optname, char __user *optval,
+ 		ret = -EFAULT;
+ 
+ out:
+-	for (i = 0; pages && i < nr_pages; i++)
+-		put_page(pages[i]);
++	if (pages)
++		put_user_pages(pages, nr_pages);
+ 	kfree(pages);
+ 
+ 	return ret;
+diff --git a/net/rds/message.c b/net/rds/message.c
+index 50f13f1d4ae0..d7b0d266c437 100644
+--- a/net/rds/message.c
++++ b/net/rds/message.c
+@@ -404,7 +404,7 @@ static int rds_message_zcopy_from_user(struct rds_message *rm, struct iov_iter *
+ 			int i;
+ 
+ 			for (i = 0; i < rm->data.op_nents; i++)
+-				put_page(sg_page(&rm->data.op_sg[i]));
++				put_user_page(sg_page(&rm->data.op_sg[i]));
+ 			mmp = &rm->data.op_mmp_znotifier->z_mmp;
+ 			mm_unaccount_pinned_pages(mmp);
+ 			ret = -EFAULT;
+diff --git a/net/rds/rdma.c b/net/rds/rdma.c
+index 916f5ec373d8..6762e8696b99 100644
+--- a/net/rds/rdma.c
++++ b/net/rds/rdma.c
+@@ -162,8 +162,7 @@ static int rds_pin_pages(unsigned long user_addr, unsigned int nr_pages,
+ 				  pages);
+ 
+ 	if (ret >= 0 && ret < nr_pages) {
+-		while (ret--)
+-			put_page(pages[ret]);
++		put_user_pages(pages, ret);
+ 		ret = -EFAULT;
+ 	}
+ 
+@@ -276,7 +275,7 @@ static int __rds_rdma_map(struct rds_sock *rs, struct rds_get_mr_args *args,
+ 
+ 	if (IS_ERR(trans_private)) {
+ 		for (i = 0 ; i < nents; i++)
+-			put_page(sg_page(&sg[i]));
++			put_user_page(sg_page(&sg[i]));
+ 		kfree(sg);
+ 		ret = PTR_ERR(trans_private);
+ 		goto out;
+@@ -464,9 +463,10 @@ void rds_rdma_free_op(struct rm_rdma_op *ro)
+ 		 * to local memory */
+ 		if (!ro->op_write) {
+ 			WARN_ON(!page->mapping && irqs_disabled());
+-			set_page_dirty(page);
++			put_user_pages_dirty_lock(&page, 1, true);
++		} else {
++			put_user_page(page);
+ 		}
+-		put_page(page);
+ 	}
+ 
+ 	kfree(ro->op_notifier);
+@@ -481,8 +481,7 @@ void rds_atomic_free_op(struct rm_atomic_op *ao)
+ 	/* Mark page dirty if it was possibly modified, which
+ 	 * is the case for a RDMA_READ which copies from remote
+ 	 * to local memory */
+-	set_page_dirty(page);
+-	put_page(page);
++	put_user_pages_dirty_lock(&page, 1, true);
+ 
+ 	kfree(ao->op_notifier);
+ 	ao->op_notifier = NULL;
+@@ -867,7 +866,7 @@ int rds_cmsg_atomic(struct rds_sock *rs, struct rds_message *rm,
+ 	return ret;
+ err:
+ 	if (page)
+-		put_page(page);
++		put_user_page(page);
+ 	rm->atomic.op_active = 0;
+ 	kfree(rm->atomic.op_notifier);
+ 
+-- 
+2.22.0
+
