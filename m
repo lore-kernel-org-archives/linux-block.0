@@ -2,70 +2,122 @@ Return-Path: <SRS0=5K92=V6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E329DC0650F
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 22:10:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB25DC31E40
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 22:32:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B826F2087E
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 22:10:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DE0A2087E
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 22:32:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564783819;
-	bh=C0wVo17fKYx2j3ao2c1BYC/5b/RvbXABwmmbVN+QdUc=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=mwlk5cKLTVur+qY6xCyR9zOxZiOuwbR8nOxLR5Gx+NsR01K/3xFtCHvbqzctHbZBS
-	 X51e5eOToqqJ2N/CEHXn4gYk8ISe6eynoyndzNUz6K6cL4pKrhHxiYtka54/2hUkhL
-	 wZsbluTj9qT0aHhWKUHb8PHt9SKBviiexpFZEnug=
+	s=default; t=1564785170;
+	bh=z6ytUlp+CIECyVYgzsmKAgNAlD3y+8CHq71PuCQ0D+c=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:List-ID:From;
+	b=dy5ce5ZqWpqN6LaSN0ZnHVoqOi3g0nfIcmV5g1PSd8vGLwk32ZtPe+Esp/wNmHzgU
+	 SpQWVZH70hixtYMch22aF46xl7VPgN8uMxabTOBBJEHbvjrpSQojkOTM50uyhbnkOF
+	 nEN4V8n6VvoAL1PpfuFfPHVJT3LUSPMNJ8nRWNXc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437201AbfHBWKS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Aug 2019 18:10:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40672 "EHLO mail.kernel.org"
+        id S2392209AbfHBWcj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Aug 2019 18:32:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44032 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731120AbfHBWKO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 2 Aug 2019 18:10:14 -0400
-Subject: Re: [git pull] device mapper fixes for 5.3-rc3
+        id S1729919AbfHBWci (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 2 Aug 2019 18:32:38 -0400
+Received: from tleilax.poochiereds.net (cpe-71-70-156-158.nc.res.rr.com [71.70.156.158])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 58F57206A3;
+        Fri,  2 Aug 2019 22:32:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564783813;
-        bh=C0wVo17fKYx2j3ao2c1BYC/5b/RvbXABwmmbVN+QdUc=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=avAomMnpZnQsIIFF7r6kxdWlXpSmz/jcS+O+KZK/POzMxjYBWjfLmFgafaaEIG9ke
-         gTzI8E8eCHXNpCx2Bn275iEOgbb0SX8UgoAoYjzpOlI21+IFMW0HjEN6WUJm4jpsay
-         kaSRPmTv5uQu9xe6gK09qXlvXE9vSbjTWkj+jwFQ=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20190802151824.GA86075@lobo>
-References: <20190802151824.GA86075@lobo>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20190802151824.GA86075@lobo>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
- tags/for-5.3/dm-fixes-1
-X-PR-Tracked-Commit-Id: 9c50a98f55f4b123227eebb25009524d20bc4c2a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b2c742373d19b356b112d9f3ca4e9377c6f9708d
-Message-Id: <156478381353.28292.12883710388695934497.pr-tracker-bot@kernel.org>
-Date:   Fri, 02 Aug 2019 22:10:13 +0000
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>
+        s=default; t=1564785158;
+        bh=z6ytUlp+CIECyVYgzsmKAgNAlD3y+8CHq71PuCQ0D+c=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=cpjIBy8JqGDmfo2YvJ1zHX2H3F5SzV7XyBEUvKOoDGfZiHGtVeJHlsiNF8f/o/lw/
+         1IriX/50tm1jxxFU6BHxnU7AmYr31cK1qfEIW7FiUI67JvLd42gEz50jymZEZTSESa
+         2e28o/zwwAXm5Iq/SkAmipJbFc8z+f7/iU9PnXtA=
+Message-ID: <2f0d5993e9731808b73b0018f5fc4b3335fc6373.camel@kernel.org>
+Subject: Re: [PATCH 03/34] net/ceph: convert put_page() to put_user_page*()
+From:   Jeff Layton <jlayton@kernel.org>
+To:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?ISO-8859-1?Q?J=E9r=F4me?= Glisse <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Ilya Dryomov <idryomov@gmail.com>, Sage Weil <sage@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>
+Date:   Fri, 02 Aug 2019 18:32:33 -0400
+In-Reply-To: <20190802022005.5117-4-jhubbard@nvidia.com>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+         <20190802022005.5117-4-jhubbard@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.4 (3.32.4-1.fc30) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 2 Aug 2019 11:18:25 -0400:
+On Thu, 2019-08-01 at 19:19 -0700, john.hubbard@gmail.com wrote:
+> From: John Hubbard <jhubbard@nvidia.com>
+> 
+> For pages that were retained via get_user_pages*(), release those pages
+> via the new put_user_page*() routines, instead of via put_page() or
+> release_pages().
+> 
+> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+> ("mm: introduce put_user_page*(), placeholder versions").
+> 
+> Cc: Ilya Dryomov <idryomov@gmail.com>
+> Cc: Sage Weil <sage@redhat.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: ceph-devel@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  net/ceph/pagevec.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
+> 
+> diff --git a/net/ceph/pagevec.c b/net/ceph/pagevec.c
+> index 64305e7056a1..c88fff2ab9bd 100644
+> --- a/net/ceph/pagevec.c
+> +++ b/net/ceph/pagevec.c
+> @@ -12,13 +12,7 @@
+>  
+>  void ceph_put_page_vector(struct page **pages, int num_pages, bool dirty)
+>  {
+> -	int i;
+> -
+> -	for (i = 0; i < num_pages; i++) {
+> -		if (dirty)
+> -			set_page_dirty_lock(pages[i]);
+> -		put_page(pages[i]);
+> -	}
+> +	put_user_pages_dirty_lock(pages, num_pages, dirty);
+>  	kvfree(pages);
+>  }
+>  EXPORT_SYMBOL(ceph_put_page_vector);
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.3/dm-fixes-1
+This patch looks sane enough. Assuming that the earlier patches are OK:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b2c742373d19b356b112d9f3ca4e9377c6f9708d
+Acked-by: Jeff Layton <jlayton@kernel.org>
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
