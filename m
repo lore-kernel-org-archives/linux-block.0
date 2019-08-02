@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44EF2C19759
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:17:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3043C433FF
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:20:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0EA582080C
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:17:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F84D2083B
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:20:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pAxzsc9v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WgvMYxfg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732330AbfHBCRA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Aug 2019 22:17:00 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:37847 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728255AbfHBCQ7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 22:16:59 -0400
-Received: by mail-pg1-f194.google.com with SMTP id d1so2414548pgp.4;
-        Thu, 01 Aug 2019 19:16:58 -0700 (PDT)
+        id S1727103AbfHBCUN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Aug 2019 22:20:13 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:44544 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726796AbfHBCUN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 22:20:13 -0400
+Received: by mail-pg1-f193.google.com with SMTP id i18so35236564pgl.11;
+        Thu, 01 Aug 2019 19:20:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=3GzlMAdD/Fj4tpT1z/PK8Fr3raamoGX6ZwkHP2yb6K8=;
-        b=pAxzsc9vmHAK9ZK89AacBmqXQvuHXeShpu27WlEkAV6xBcEz/H1GAWLFbWBo+u7caH
-         KIqDnTL+IS2r069Sqit6niTwIVD3yHwM2oL4UXxooa0ZG6T9kc1SZGdEzbmbTAJoZkzv
-         Zbj81BMMiMsLujqrLP+vNRoPoAfxuyhBIJfz/EZgUl0FsiQZK3MgWkswQuDuhoaZBO9G
-         KrSO58P9Rr9KxqN5N1BphpFtggyeHWY4ZqA08b5SYu2LL+896Hx8WIi0vBM/z3/TtXKP
-         sQF/9gkVaL/sxZPp1Zgqo9a2gtCNNW4Q0F26WcstDN/wMJyWuPSmF5s5FUO43iGXa+xl
-         t4bA==
+        b=WgvMYxfgb6Molfspondn33ZYB1WcvyhUHuuLQJHqj92K0W/u5k0B5ZQj1BN5Ns2IZE
+         M0GWxKjoZrIPc//wnMwUJTmV5TMSYpm02fQgVP/BH2szNXvyzzeOa5FiDRKrjlN3+luO
+         9Jy7V18qn+4b0ojFo/dXh7wBvGZvx4G8yqL9GdVH2uaO753yJYW/vuKj6Ghg+xpVFc5A
+         N5wBHvH3PD3PXLn+hz8omKP+6e2hjXrqsj1JOQPHhNWSLJbaM8A5usTldb4lWZTBhIo0
+         mLxHVdEO0uyXR6yvbfmKtCZaa5xv6j5LsvjMwT4z5+CpizIhX6UVhXHqVJggfrPMULjn
+         H4uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=3GzlMAdD/Fj4tpT1z/PK8Fr3raamoGX6ZwkHP2yb6K8=;
-        b=pxUI9uQSiPkrdaYjjCg63ri9x81eIH4tA4uNKQeuSqnlbqNn68GBhlo1oliYAZkNd+
-         f/ff4lrJJ5FSq+dMmai39K50JTR6skZNK1/SYJ6xIrqIpgkFnWhXD5JpEcImySXufeEc
-         5lpHw1QNCji0YtLFogyj9Q0GQwgqHEzmaCLzfQ916IcJeLVOXBHgnucF9EVAt2P87WgL
-         IFSg8UxticbZBM5vxmmfLzemLMpqv52ujuBqI+d1A9G1kG0XP6vAnBxZ5HOVasgRB9yz
-         +PY/9Fn4sTf2CDLEHuzFlDv+TctiwF4Ed2SZXRoCLsimOeNz1TMScSe8+f5sIAOswLTV
-         Mrbw==
-X-Gm-Message-State: APjAAAU77NZ/WZfIFO8YjVlx1yPL3pTLoRIOlIhqJbQom5/1tFn6nADk
-        sGNLf+j83301UXEmh6cqCSM=
-X-Google-Smtp-Source: APXvYqzWsTlsiBNw6waYjgVc0NeqKYlyVqx46uMvNCwkUysDnG1IH1bMSSj1oKU/Y8CdBrk8llU2wQ==
-X-Received: by 2002:a63:dd16:: with SMTP id t22mr90672497pgg.140.1564712218248;
-        Thu, 01 Aug 2019 19:16:58 -0700 (PDT)
+        b=peF76MfVhMgEz16x/6nIWyY11lhL2V4a4UcgfHUcR3EXAVwYsXVC2QFEXGjRtMbhmN
+         rql/yKhbFXQjAOOz/ZNuTZHbE0tYINijZg9S2wNbh2qLdszeUoMPgDRsXOIRT9XsEFn8
+         lcvilgKRgPLul7V+qy8vJvbiAeH5g+FSbC3AufBB0cW7GIg1ANnKZIS3tY6+jxzOKlO7
+         BP79jKglv+1rjWnfxfFkiw2SLcP2GAKwFURwhs/+8BdJRkOuBZd8NP351rNP983B9kAK
+         rUbMQVqhq6s0XuYddnsDxGx8YZ8lSFrMxGjYkT4Lw6eQ4teaReZYGHPC+POTmAI5HWYN
+         1SLw==
+X-Gm-Message-State: APjAAAUTfYu0bh9kprF1kTfeCNCmnX/4aynIaNuecXZ94uggYke+P5xo
+        fdMnkFxOlhLnvsVM+p6wA/w=
+X-Google-Smtp-Source: APXvYqxheUI3U4eMXPfQOAu0iMAgy84p0nt5Unb4jdDMlWNxu88KGGVSWktP7DU/iS6MqE4v20pMKQ==
+X-Received: by 2002:a63:550d:: with SMTP id j13mr59450607pgb.173.1564712411856;
+        Thu, 01 Aug 2019 19:20:11 -0700 (PDT)
 Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id p187sm118200292pfg.89.2019.08.01.19.16.56
+        by smtp.gmail.com with ESMTPSA id u9sm38179744pgc.5.2019.08.01.19.20.10
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 01 Aug 2019 19:16:57 -0700 (PDT)
+        Thu, 01 Aug 2019 19:20:11 -0700 (PDT)
 From:   john.hubbard@gmail.com
 X-Google-Original-From: jhubbard@nvidia.com
 To:     Andrew Morton <akpm@linux-foundation.org>
@@ -78,8 +78,8 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         sparclinux@vger.kernel.org, x86@kernel.org,
         xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>
 Subject: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-Date:   Thu,  1 Aug 2019 19:16:19 -0700
-Message-Id: <20190802021653.4882-1-jhubbard@nvidia.com>
+Date:   Thu,  1 Aug 2019 19:19:31 -0700
+Message-Id: <20190802022005.5117-1-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
