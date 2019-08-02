@@ -6,23 +6,23 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C89C32750
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 08:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD9D0C32750
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 08:26:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6F302184E
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 08:25:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F30F20644
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 08:26:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404119AbfHBIZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Aug 2019 04:25:36 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39774 "EHLO mx1.suse.de"
+        id S2404121AbfHBI0C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Aug 2019 04:26:02 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39860 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726164AbfHBIZf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 2 Aug 2019 04:25:35 -0400
+        id S1726164AbfHBI0B (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 2 Aug 2019 04:26:01 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id C1041AFE2;
-        Fri,  2 Aug 2019 08:25:33 +0000 (UTC)
-Subject: Re: [PATCH V2 3/4] scsi: implement REQ_OP_ZONE_RESET_ALL
+        by mx1.suse.de (Postfix) with ESMTP id C8C40AFE2;
+        Fri,  2 Aug 2019 08:25:59 +0000 (UTC)
+Subject: Re: [PATCH V2 4/4] null_blk: implement REQ_OP_ZONE_RESET_ALL
 To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
 Cc:     bvanassche@acm.org, osandov@fb.com, dennisszhou@gmail.com,
@@ -31,7 +31,7 @@ Cc:     bvanassche@acm.org, osandov@fb.com, dennisszhou@gmail.com,
         ming.lei@redhat.com, Hannes Reinecke <hare@suse.com>,
         jthumshirn@suse.de, damien.lemoal@wdc.com
 References: <20190801172638.4060-1-chaitanya.kulkarni@wdc.com>
- <20190801172638.4060-4-chaitanya.kulkarni@wdc.com>
+ <20190801172638.4060-5-chaitanya.kulkarni@wdc.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -77,12 +77,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <40d1072d-ab17-4182-85fd-ae53939b6dbd@suse.de>
-Date:   Fri, 2 Aug 2019 10:25:33 +0200
+Message-ID: <809a35d7-6263-4d2e-7543-b6f93a018cbd@suse.de>
+Date:   Fri, 2 Aug 2019 10:25:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190801172638.4060-4-chaitanya.kulkarni@wdc.com>
+In-Reply-To: <20190801172638.4060-5-chaitanya.kulkarni@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -92,17 +92,15 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 8/1/19 7:26 PM, Chaitanya Kulkarni wrote:
-> This patch implements the zone reset all operation for sd_zbc.c. We add
-> a new boolean parameter for the sd_zbc_setup_reset_cmd() to indicate
-> REQ_OP_ZONE_RESET_ALL command setup. Along with that we add support in
-> the completion path for the zone reset all.
+> This patch implements newly introduced zone reset all operation for
+> null_blk driver.
 > 
+> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
 > Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 > ---
->  drivers/scsi/sd.c     |  5 ++++-
->  drivers/scsi/sd.h     |  5 +++--
->  drivers/scsi/sd_zbc.c | 10 ++++++++--
->  3 files changed, 15 insertions(+), 5 deletions(-)
+>  drivers/block/null_blk_main.c  |  3 +++
+>  drivers/block/null_blk_zoned.c | 28 ++++++++++++++++++++++------
+>  2 files changed, 25 insertions(+), 6 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
