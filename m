@@ -6,67 +6,69 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4764C32754
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C50C32750
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 03:57:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A8FBA20840
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:56:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7049206A3
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 03:57:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WVlsnLCY"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="rqxUXr2A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729659AbfHBC4n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Aug 2019 22:56:43 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:40864 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729641AbfHBC4n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 22:56:43 -0400
-Received: by mail-oi1-f195.google.com with SMTP id w196so34378971oie.7
-        for <linux-block@vger.kernel.org>; Thu, 01 Aug 2019 19:56:42 -0700 (PDT)
+        id S1730941AbfHBD5p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Aug 2019 23:57:45 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42310 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730934AbfHBD5o (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 23:57:44 -0400
+Received: by mail-pg1-f196.google.com with SMTP id t132so35346270pgb.9
+        for <linux-block@vger.kernel.org>; Thu, 01 Aug 2019 20:57:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=SZXg7MkvG8X4G/e4/KyUmpRLOzGXiJZkoKc+bGigKJY=;
-        b=WVlsnLCY9reULBgfQIA4QFxuBSbdil0JyDx29QmZCA6kdJbwhCqsOqYJZk9tzPrutG
-         g2TVFIt3Mqow/U9r82MOuUJFDOGd1+MUL0CbPgXfX0uKm34PjjpPOkdE5/Io9NLGSA++
-         i80s6/ZUY1qR1SarBjuFykXltCia6AzsWUvSJI7tkYYspXOL5URCE3EpG3aFI+UzMjuJ
-         oJ/D8nA5ZD0q0OTaZe9tbq8uE+ehrHRhRkvsUpnfXJpQq4bVJ6STpUmaIdPiOTI2NNhl
-         gmJ0VzWFdRb3pWCooVk+sPiN8qV5df5GHakCsIgnEjl7M1WfrWIxF8Z9+6IrBEPyddYf
-         d1kQ==
+        bh=hpB9ww8EWgTbKIu/vDphodNz7BlPJgOXt0hZXWNaRRE=;
+        b=rqxUXr2AbstRYuUvajB6bOEJxqpauI7Wev9AXFL/UefXKQKpwQ+KArinQC8fgu2O66
+         Mkc8+c5wld6D5fkMJkHCq5OS/fUdU5bjm9+phFV0lUCszmuaVj73vgmFIaWdpamWIEoh
+         80Vhrv/J7/wZgVK0syEdhhx6q0qm1BzzqiqHFVfLxmLkBs20i9T2zTwy86wezFMIbhF7
+         YyMhmUxhcbUcJSpBflL3ssq6dPdb42Y/yAdNEOFqW40wQH6x+xM6V2+IDO3JdURkEsny
+         jsi5AICQYL/2is5iaSsVlCwJdFxAwRYX7yJwyL4JaCU3/frnItwYPR8VjjQb6C6JDA+9
+         kv4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=SZXg7MkvG8X4G/e4/KyUmpRLOzGXiJZkoKc+bGigKJY=;
-        b=YL3GRveONg+c9CdCb6KoTmyOSzYSWgE+xWHh4+w9SOIfORUYbR0Byz2jR3uol/vzVF
-         ejvN0vywFnckah1pPVvWNKHzzj8yRniG5jrskTLh+rt9mpS+YzHh5qErZE7Y9vi8wWxr
-         ByyNi1zztjTYfQ76wmq11twNmYlMRlhJnIj0/yKrhxb8nLk0rqND6MmkAFGPbSHO5oBK
-         yxIFcsI/jdl+HtE7DcnDRyCGXSmwHBWeTNEv5lRQgaJuKxYo6OTO1y1+qGA4F0y62N8D
-         a1MGKwSxOO3MkgPGvgIGOxw9JKv/FAwai4Hw077SqfsPFW/OS9Cx0bj2UvYr2m1Bej4D
-         xyXw==
-X-Gm-Message-State: APjAAAUXSMad5GlW4m+Voe1nrq/7YpNts3L0SijcNUDMqZOck1BHrMhN
-        hcRJPq6JHyVZ2OYhrILcU58Cg9WXJwc=
-X-Google-Smtp-Source: APXvYqxMAwM7gRmuihJFSYVFiyid8C3J+3mI4xgjPNsp/9po6iCu1laSZtFXCPcmwZrzuwtRAq4Umw==
-X-Received: by 2002:a63:1046:: with SMTP id 6mr125224852pgq.111.1564714049618;
-        Thu, 01 Aug 2019 19:47:29 -0700 (PDT)
-Received: from [192.168.200.229] (rrcs-76-80-14-36.west.biz.rr.com. [76.80.14.36])
-        by smtp.gmail.com with ESMTPSA id p68sm85467533pfb.80.2019.08.01.19.47.28
+        bh=hpB9ww8EWgTbKIu/vDphodNz7BlPJgOXt0hZXWNaRRE=;
+        b=BJx6OxxznRlO0D7UmAofvN2sI5mQm/gDyqv96DPD+xYmGHAo+8Q2QzIwVg+FPMgl8T
+         qLKrRyWlPk5mpbjZ7NWFdiZRkbzbqNxI06YrAY1PH8UYioFlcCX6jfwKhPQGYYXoO+b7
+         cuj+TFN/ETTWQbZ+/tFJz49YkTEaZafAdo+jnYYfwBfbOJ9hI33v3pJiksl9xTA56SHd
+         6k/g708+tTlVvCtW0foqts4IgcFH0ddkVXxPe/4KOdrrUmqJH3G5au10zDADEdGdmJ0z
+         bVoyQPmg1p4V8eCgsNzMvKLawCCvu2KEfWWT0maOlNZvmzJOGDOds5E1P0kIjmCEUcSf
+         Nijw==
+X-Gm-Message-State: APjAAAVJXWmzoswMG3t2qMmtGfBZ52WevUjlS4Pzfrw9bhGs7ItNK0LX
+        /U1E2IS+MF4Nb5Lnxa1XARk=
+X-Google-Smtp-Source: APXvYqzsAK2DkGhbGk/xxPqvstYt28+Pouzz3w4xrGwXAelEj9NooEyyB7/H+rwwOxlT6nCOJCyLhg==
+X-Received: by 2002:a63:7b4d:: with SMTP id k13mr119736915pgn.182.1564718264104;
+        Thu, 01 Aug 2019 20:57:44 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c081:1134::11cc? ([2620:10d:c090:180::1:d9b1])
+        by smtp.gmail.com with ESMTPSA id 131sm6216660pge.37.2019.08.01.20.57.41
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 01 Aug 2019 19:47:28 -0700 (PDT)
-Subject: Re: [PATCH 0/1] sending DASD patches through linux-block
-To:     Stefan Haberland <sth@linux.ibm.com>
-Cc:     linux-block@vger.kernel.org, linux-s390@vger.kernel.org,
-        hoeppner@linux.ibm.com, heiko.carstens@de.ibm.com,
-        borntraeger@de.ibm.com, gor@linux.ibm.com
-References: <20190801110630.82432-1-sth@linux.ibm.com>
+        Thu, 01 Aug 2019 20:57:42 -0700 (PDT)
+Subject: Re: [PATCH] block: Fix __blkdev_direct_IO()
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Masato Suzuki <masato.suzuki@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>
+References: <20190801102151.7846-1-damien.lemoal@wdc.com>
+ <19115dcc-8a4b-8bb7-f8db-e2474196a5d0@kernel.dk>
+ <BYAPR04MB581699C381CE35C34DE45EBCE7D90@BYAPR04MB5816.namprd04.prod.outlook.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c66977ae-7a17-5a54-0519-a69d8f825070@kernel.dk>
-Date:   Thu, 1 Aug 2019 20:47:27 -0600
+Message-ID: <0bf921d3-162b-8e51-63fa-5da757ccbbd2@kernel.dk>
+Date:   Thu, 1 Aug 2019 21:57:39 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190801110630.82432-1-sth@linux.ibm.com>
+In-Reply-To: <BYAPR04MB581699C381CE35C34DE45EBCE7D90@BYAPR04MB5816.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,25 +77,59 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/1/19 5:06 AM, Stefan Haberland wrote:
-> Hi Jens,
+On 8/1/19 7:05 PM, Damien Le Moal wrote:
+> On 2019/08/02 4:51, Jens Axboe wrote:
+>> On 8/1/19 4:21 AM, Damien Le Moal wrote:
+>>> The recent fix to properly handle IOCB_NOWAIT for async O_DIRECT IO
+>>> (patch 6a43074e2f46) introduced two problems with BIO fragment handling
+>>> for direct IOs:
+>>> 1) The dio size processed is claculated by incrementing the ret variable
+>>> by the size of the bio fragment issued for the dio. However, this size
+>>> is obtained directly from bio->bi_iter.bi_size AFTER the bio submission
+>>> which may result in referencing the bi_size value after the bio
+>>> completed, resulting in an incorrect value use.
+>>> 2) The ret variable is not incremented by the size of the last bio
+>>> fragment issued for the bio, leading to an invalid IO size being
+>>> returned to the user.
+>>>
+>>> Fix both problem by using dio->size (which is incremented before the bio
+>>> submission) to update the value of ret after bio submissions, including
+>>> for the last bio fragment issued.
+>>
+>> Thanks, applied. Do you have a test case? I ran this through the usual
+>> xfstests and block bits, but didn't catch anything.
+>>
 > 
-> we would like to get our DASD related patches upstream through your
-> linux-block git tree in the future.
-> We hope to get a better integration and that we are able to identify
-> potential conflicts with generic blocklayer changes earlier.
+> The problem was detected with our weekly RC test runs for zoned block
+> devices.  RC1 last week was OK, but failures happen on RC2 Monday. We
+> never hit a oops for the BIO reference after submission but we were
+> getting a lot of unaligned write errors for all types of zoned drive
+> tested (real SMR disks, tcmu-runner ZBC handler disks and nullblk in
+> zoned mode) using various applications (fio, dd, ...)
 > 
-> I hope this is OK for you. I have attached a first patch that fixes a
-> bug in the DASD driver. This patch is based on the master branch of your
-> linux-block git tree.
+> Masato isolated the problem to very large direct writes and could
+> reliably recreate the problem with a dd doing a single 8MB write to a
+> sequential zone.  With this case, blktrace showed that the 8MB write
+> was split into multiple BIOs (expected) and the whole 8MB being
+> cleanly written sequentially. But this was followed by a stream of
+> small 4K writes starting around the end of the 8MB chunk, but within
+> it, causing unaligned write errors (overwrite in sequential zones not
+> being possible).
+> 
+> dd if=/dev/zero of=/dev/nullb0 bs=8M oflag=direct count=1
+> 
+> On a nullblk disk in zoned mode should recreate the problem, and
+> blktrace revealing that dd sees a short write for the 8M IO and issues
+> remaining as 4K requests.
+> 
+> Using a regular disk, this however does not generate any error at all,
+> which may explain why you did not see any problem. I think we can
+> create a blktest case for this using nullblk in zoned mode. Would you
+> like us to send one ?
 
-Certainly. No extra hassle for me, and if it makes it easier for you,
-then by all means.
-
-> Please let me know if I should change something in my workflow.
-
-Looks fine to me, I generally prefer patches (individual or series)
-to git trees, unless it's a huge series.
+Thanks for the detailed explanation. I think we should absolutely have a
+blktests case for this, even if O_DIRECT isn't strictly block level,
+it's definitely in a grey zone that I think we should cover.
 
 -- 
 Jens Axboe
