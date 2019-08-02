@@ -2,148 +2,171 @@ Return-Path: <SRS0=5K92=V6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA59C32750
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 19:08:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C1AC32754
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 19:16:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC7F320B7C
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 19:08:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564772897;
-	bh=CsffykniwlTR3rvuw5e4RdykOop71bDHLXneOB9IolA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=kGhKiF7PNKrmQJ3QT7nspkvpRtwJNSyxeQJGlGrluj0Q4d88JLy/F/s1JKc8N4kxq
-	 +R4w/QRYewEcFt2gYsa/62TrZXpWSMwxPqVIl3MVdFeg5asBsvHjNkwgySmVWY2gmo
-	 TjqsCSfu/duUySu/RFHSJb/N7WC0PwLE79nS/udw=
+	by mail.kernel.org (Postfix) with ESMTP id 061FE2171F
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 19:16:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="dIZIhWEt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727008AbfHBTIR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Aug 2019 15:08:17 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:35040 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725866AbfHBTIQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Aug 2019 15:08:16 -0400
-Received: by mail-qk1-f194.google.com with SMTP id r21so55700912qke.2;
-        Fri, 02 Aug 2019 12:08:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=bg0IYF6s1vKTQqCOaTbUbf6y5ZEAOUzglk0PVhrL/38=;
-        b=glnSl1NWmZ0mA06pxO5NHcGHYLGSDwCYCk/lpygM3hxebdjzwZ5c9BT/0rVS0KRQSO
-         vqi0RMww/iVfyDm53cDgznuv6lJmZSUElxWkFtkwGBC7HXv3MauHjfH1kZBfVno4qqNq
-         Y/5L6tSxXegWmVMoAF0PLhqqO3NaA7vZqe3ZDaEmNZAMRViBgsk1i7sHYjxg4jXlzglN
-         WRkJ1GC+jvZEpr424Rs9LV5Fa6L6Se02pQ8Dkpy4UeuLVvaOmsMnhyY4rrwIr4Cu/34D
-         XatcJnT31nWYAqOxuQhEGnwi/uBE6DuFDvgUaJkBgkrtbHkKL4UG5rFY42lGVPdLUqce
-         OZmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=bg0IYF6s1vKTQqCOaTbUbf6y5ZEAOUzglk0PVhrL/38=;
-        b=JIQyOYoBxwwCNCrndDlVUm/zFOiJv8xu8REDo9TBH/QFAwtVxYaq2QUhYmmmE5QR+a
-         drbFc72oYjUBzNe61pnNLNZCittnoRswO/EzyQ16Q5zuo7MVRF2HzEp7E+1gvONf96uk
-         Ebtu7SIa+6219eyRU+VYdfc2y4BmBNWxRjcMaxoW+qZ0aZefGGKSaFlhaB63LHHW6reo
-         K6slMZCxn/REinQFhF/OeFX4FO2e1lxWbK8jyMd2Z2/Gx4oBOnZfaaK3g1vRuZXAPnu0
-         uOuLOc3G81P+V7Og5Aa4wsEqOwbaUtSH2L+84M9QbqLtrY1N78L3jTeMVgUlVDkZUNdt
-         +Rbw==
-X-Gm-Message-State: APjAAAUx8tmiuD0i9R6u2QZwmbSCKZSQEM3ngAy8y9H5oW2khjWyQQOv
-        7f94xBEtJ6sNNs73e9VpTfI=
-X-Google-Smtp-Source: APXvYqxgawn9tHsWo/hnfD4MDtBAftgnXje7tfHbQ08P5aSqCvzWjxnLHZsE1oZzyNlm82t1vBerUg==
-X-Received: by 2002:a37:a142:: with SMTP id k63mr8115850qke.278.1564772895730;
-        Fri, 02 Aug 2019 12:08:15 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::38f0])
-        by smtp.gmail.com with ESMTPSA id f25sm38408246qta.81.2019.08.02.12.08.14
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Aug 2019 12:08:15 -0700 (PDT)
-Date:   Fri, 2 Aug 2019 12:08:13 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>
-Cc:     linux-block@vger.kernel.org, kernel-team@fb.com,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH block 2/2] writeback, cgroup: inode_switch_wbs() shouldn't
- give up on wb_switch_rwsem trylock fail
-Message-ID: <20190802190813.GC136335@devbig004.ftw2.facebook.com>
-References: <20190802190738.GB136335@devbig004.ftw2.facebook.com>
+        id S2392065AbfHBTPu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Aug 2019 15:15:50 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:16559 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391984AbfHBTPu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Aug 2019 15:15:50 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d448be40000>; Fri, 02 Aug 2019 12:15:49 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Fri, 02 Aug 2019 12:15:47 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Fri, 02 Aug 2019 12:15:47 -0700
+Received: from [10.2.171.217] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 2 Aug
+ 2019 19:15:46 +0000
+Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
+To:     Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>
+CC:     Michal Hocko <mhocko@kernel.org>, <john.hubbard@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
+        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
+        <dri-devel@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linux-rpi-kernel@lists.infradead.org>,
+        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
+        <x86@kernel.org>, <xen-devel@lists.xenproject.org>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+ <20190802091244.GD6461@dhcp22.suse.cz>
+ <20190802124146.GL25064@quack2.suse.cz>
+ <20190802142443.GB5597@bombadil.infradead.org>
+ <20190802145227.GQ25064@quack2.suse.cz>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <076e7826-67a5-4829-aae2-2b90f302cebd@nvidia.com>
+Date:   Fri, 2 Aug 2019 12:14:09 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190802190738.GB136335@devbig004.ftw2.facebook.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190802145227.GQ25064@quack2.suse.cz>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1564773349; bh=Ykr8zuBl8qD6qRk+6CuJmCvWs6y/6SnwmHdkeYBJDDI=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=dIZIhWEtL/6DtZGzemgJsDJsVLyADAMaN//lJ1grJLFkCmFOkzTj/rs0FvLfEl2Hi
+         oGzaotnI6n/OU/9zhZLMfdrrUHRJGxX7AYLyG2WZvgX4Lg54c2pU4PjbkWrNUgOXfI
+         uv8TTyv/DF3hYu24iq7PnVxsiQftZ7SHYqoH7NBkU536G72MURkyt2TZuU0HsMwqx1
+         3Glf+aCLRqZtZbMei0ZGioStTFz2Vyclh08xm02uGWhgBmLM1you/SeWFTun4O+4QV
+         968ZBWSTwuYIseJKnsPYve06ID75kz8N2rJE61L933vzLxD+Ru7sU6sLx/7LpcpGPg
+         O3OFkZJZEBCjA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As inode wb switching may make sync(2) miss some inodes, they're
-synchronized using wb_switch_rwsem so that no wb switching happens
-while sync(2) is in progress.  In addition to synchronizing the actual
-switching, the rwsem is also used to prevent queueing new switch
-attempts while sync(2) is in progress.  This is to avoid queueing too
-many instances while the rwsem is held by sync(2).  Unfortunately,
-this is too agressive and can block wb switching for a long time if
-sync(2) is frequent.
+On 8/2/19 7:52 AM, Jan Kara wrote:
+> On Fri 02-08-19 07:24:43, Matthew Wilcox wrote:
+>> On Fri, Aug 02, 2019 at 02:41:46PM +0200, Jan Kara wrote:
+>>> On Fri 02-08-19 11:12:44, Michal Hocko wrote:
+>>>> On Thu 01-08-19 19:19:31, john.hubbard@gmail.com wrote:
+>>>> [...]
+>>>>> 2) Convert all of the call sites for get_user_pages*(), to
+>>>>> invoke put_user_page*(), instead of put_page(). This involves dozens of
+>>>>> call sites, and will take some time.
+>>>>
+>>>> How do we make sure this is the case and it will remain the case in the
+>>>> future? There must be some automagic to enforce/check that. It is simply
+>>>> not manageable to do it every now and then because then 3) will simply
+>>>> be never safe.
+>>>>
+>>>> Have you considered coccinele or some other scripted way to do the
+>>>> transition? I have no idea how to deal with future changes that would
+>>>> break the balance though.
 
-The goal is avoiding expolding the number of scheduled switches, not
-avoiding scheduling anything.  Let's use wb_switch_rwsem only for
-synchronizing the actual switching and sync(2) and use
-isw_nr_in_flight instead for limiting the maximum number of scheduled
-switches.  The limit is set to 1024 which should be more than enough
-while still avoiding extreme situations.
+Hi Michal,
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- fs/fs-writeback.c |   17 +++++------------
- 1 file changed, 5 insertions(+), 12 deletions(-)
+Yes, I've thought about it, and coccinelle falls a bit short (it's not smart
+enough to know which put_page()'s to convert). However, there is a debug
+option planned: a yet-to-be-posted commit [1] uses struct page extensions
+(obviously protected by CONFIG_DEBUG_GET_USER_PAGES_REFERENCES) to add
+a redundant counter. That allows:
 
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -237,6 +237,7 @@ static void wb_wait_for_completion(struc
- 					/* if foreign slots >= 8, switch */
- #define WB_FRN_HIST_MAX_SLOTS	(WB_FRN_HIST_THR_SLOTS / 2 + 1)
- 					/* one round can affect upto 5 slots */
-+#define WB_FRN_MAX_IN_FLIGHT	1024	/* don't queue too many concurrently */
- 
- static atomic_t isw_nr_in_flight = ATOMIC_INIT(0);
- static struct workqueue_struct *isw_wq;
-@@ -489,18 +490,13 @@ static void inode_switch_wbs(struct inod
- 	if (inode->i_state & I_WB_SWITCH)
- 		return;
- 
--	/*
--	 * Avoid starting new switches while sync_inodes_sb() is in
--	 * progress.  Otherwise, if the down_write protected issue path
--	 * blocks heavily, we might end up starting a large number of
--	 * switches which will block on the rwsem.
--	 */
--	if (!down_read_trylock(&bdi->wb_switch_rwsem))
-+	/* avoid queueing a new switch if too many are already in flight */
-+	if (atomic_read(&isw_nr_in_flight) > WB_FRN_MAX_IN_FLIGHT)
- 		return;
- 
- 	isw = kzalloc(sizeof(*isw), GFP_ATOMIC);
- 	if (!isw)
--		goto out_unlock;
-+		return;
- 
- 	/* find and pin the new wb */
- 	rcu_read_lock();
-@@ -534,15 +530,12 @@ static void inode_switch_wbs(struct inod
- 	call_rcu(&isw->rcu_head, inode_switch_wbs_rcu_fn);
- 
- 	atomic_inc(&isw_nr_in_flight);
--
--	goto out_unlock;
-+	return;
- 
- out_free:
- 	if (isw->new_wb)
- 		wb_put(isw->new_wb);
- 	kfree(isw);
--out_unlock:
--	up_read(&bdi->wb_switch_rwsem);
- }
- 
- /**
+void __put_page(struct page *page)
+{
+	...
+	/* Someone called put_page() instead of put_user_page() */
+	WARN_ON_ONCE(atomic_read(&page_ext->pin_count) > 0);
+
+>>>
+>>> Yeah, that's why I've been suggesting at LSF/MM that we may need to create
+>>> a gup wrapper - say vaddr_pin_pages() - and track which sites dropping
+>>> references got converted by using this wrapper instead of gup. The
+>>> counterpart would then be more logically named as unpin_page() or whatever
+>>> instead of put_user_page().  Sure this is not completely foolproof (you can
+>>> create new callsite using vaddr_pin_pages() and then just drop refs using
+>>> put_page()) but I suppose it would be a high enough barrier for missed
+>>> conversions... Thoughts?
+
+The debug option above is still a bit simplistic in its implementation (and maybe
+not taking full advantage of the data it has), but I think it's preferable,
+because it monitors the "core" and WARNs.
+
+Instead of the wrapper, I'm thinking: documentation and the passage of time,
+plus the debug option (perhaps enhanced--probably once I post it someone will
+notice opportunities), yes?
+
+>>
+>> I think the API we really need is get_user_bvec() / put_user_bvec(),
+>> and I know Christoph has been putting some work into that.  That avoids
+>> doing refcount operations on hundreds of pages if the page in question is
+>> a huge page.  Once people are switched over to that, they won't be tempted
+>> to manually call put_page() on the individual constituent pages of a bvec.
+> 
+> Well, get_user_bvec() is certainly a good API for one class of users but
+> just looking at the above series, you'll see there are *many* places that
+> just don't work with bvecs at all and you need something for those.
+> 
+
+Yes, there are quite a few places that don't involve _bvec, as we can see
+right here. So we need something. Andrew asked for a debug option some time
+ago, and several people (Dave Hansen, Dan Williams, Jerome) had the idea
+of vmap-ing gup pages separately, so you can definitely tell where each
+page came from. I'm hoping not to have to go to that level of complexity
+though.
+
+
+[1] "mm/gup: debug tracking of get_user_pages() references" :
+https://github.com/johnhubbard/linux/commit/21ff7d6161ec2a14d3f9d17c98abb00cc969d4d6
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
