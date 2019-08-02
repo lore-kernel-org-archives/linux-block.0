@@ -6,69 +6,67 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB38AC433FF
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4764C32754
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:56:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A788E20840
-	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:53:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8FBA20840
+	for <linux-block@archiver.kernel.org>; Fri,  2 Aug 2019 02:56:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fEkUMSb8"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WVlsnLCY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727299AbfHBCx6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Aug 2019 22:53:58 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:37843 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726467AbfHBCx5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 22:53:57 -0400
-Received: by mail-pl1-f193.google.com with SMTP id b3so33069926plr.4
-        for <linux-block@vger.kernel.org>; Thu, 01 Aug 2019 19:53:57 -0700 (PDT)
+        id S1729659AbfHBC4n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Aug 2019 22:56:43 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:40864 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729641AbfHBC4n (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Aug 2019 22:56:43 -0400
+Received: by mail-oi1-f195.google.com with SMTP id w196so34378971oie.7
+        for <linux-block@vger.kernel.org>; Thu, 01 Aug 2019 19:56:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=BvkY4aVBVPfmgyNrK1xBM8Fg1dpebDjbELoJMy6SXxI=;
-        b=fEkUMSb8f0VAD/xcGka5xQk7/E6jRDQogO9opCbYglQs6NjrKOX44pm2RKm+zwT1W4
-         Mqvow+9ZBifiKM8Bhf4C2nAVjnTcvkJIldn+kS5xB3NVmk5dGX++Bcr87eLoX0L1kdY4
-         hmNwPudcy8RJlOL+HDls7F+LHPUB84lhlq4edLEVljT8UyPFE2p46H63IiD+LZj70ZxQ
-         A2G/tonzfkrMXh9QYsx5TWYHDcz9QrLqibOfR6qAWA8O4om8CYrBPBL2jVzxRX+Z6Wzy
-         chtYca2cRhes4z2MK5kKL7JUi00FDWFvcjAi/bgpO6Exv2DUhZcxUELO7ikwGTT5tLL4
-         rfAg==
+        bh=SZXg7MkvG8X4G/e4/KyUmpRLOzGXiJZkoKc+bGigKJY=;
+        b=WVlsnLCY9reULBgfQIA4QFxuBSbdil0JyDx29QmZCA6kdJbwhCqsOqYJZk9tzPrutG
+         g2TVFIt3Mqow/U9r82MOuUJFDOGd1+MUL0CbPgXfX0uKm34PjjpPOkdE5/Io9NLGSA++
+         i80s6/ZUY1qR1SarBjuFykXltCia6AzsWUvSJI7tkYYspXOL5URCE3EpG3aFI+UzMjuJ
+         oJ/D8nA5ZD0q0OTaZe9tbq8uE+ehrHRhRkvsUpnfXJpQq4bVJ6STpUmaIdPiOTI2NNhl
+         gmJ0VzWFdRb3pWCooVk+sPiN8qV5df5GHakCsIgnEjl7M1WfrWIxF8Z9+6IrBEPyddYf
+         d1kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=BvkY4aVBVPfmgyNrK1xBM8Fg1dpebDjbELoJMy6SXxI=;
-        b=ti460CU9//7P+KCUveocp68KSADtOhfxkcLQSfwe1RTyTQHkyDOF6XwSgaPBquZkNz
-         Fw2RNZQqD5NE00BjZMOaEXCp48IQ99MzEWzVGuh3b11jL9fDoi91PHHKhv+O3y6t/B2i
-         FBvMurHxAXn9bMqG7amwSZ3n5QyXkrStKSoG3OKNJkoRikBYMBNfss8KoDQUQcqc39gv
-         9NINkhzg6TqH1mp1WST2A1MKHOaMg5nea3qi6PJ5Zl/oMmbalhvynxwSS8XDqcDw+sZT
-         B4X0jxPoCzoJHqvdYeUTybBSn4u2NCJ2Sia8qVViUcjphvGpZ/po6QvQYuDAIpNWS2+O
-         OKLQ==
-X-Gm-Message-State: APjAAAWA0/WNmikH8jx0UYR2I6Ip6/dmB/Cty/8kW9kutxAvyivJvTsH
-        depvS5SrRcYQMWsXQdjfybQ=
-X-Google-Smtp-Source: APXvYqy8GNhUeLTLw/HJEURnHibq3O3UhDOV9vTMK2iJwmC7Cez4RItwvtxsxOo4Vsu7fmErZFtYVg==
-X-Received: by 2002:a17:902:7d86:: with SMTP id a6mr128929986plm.199.1564714074979;
-        Thu, 01 Aug 2019 19:47:54 -0700 (PDT)
+        bh=SZXg7MkvG8X4G/e4/KyUmpRLOzGXiJZkoKc+bGigKJY=;
+        b=YL3GRveONg+c9CdCb6KoTmyOSzYSWgE+xWHh4+w9SOIfORUYbR0Byz2jR3uol/vzVF
+         ejvN0vywFnckah1pPVvWNKHzzj8yRniG5jrskTLh+rt9mpS+YzHh5qErZE7Y9vi8wWxr
+         ByyNi1zztjTYfQ76wmq11twNmYlMRlhJnIj0/yKrhxb8nLk0rqND6MmkAFGPbSHO5oBK
+         yxIFcsI/jdl+HtE7DcnDRyCGXSmwHBWeTNEv5lRQgaJuKxYo6OTO1y1+qGA4F0y62N8D
+         a1MGKwSxOO3MkgPGvgIGOxw9JKv/FAwai4Hw077SqfsPFW/OS9Cx0bj2UvYr2m1Bej4D
+         xyXw==
+X-Gm-Message-State: APjAAAUXSMad5GlW4m+Voe1nrq/7YpNts3L0SijcNUDMqZOck1BHrMhN
+        hcRJPq6JHyVZ2OYhrILcU58Cg9WXJwc=
+X-Google-Smtp-Source: APXvYqxMAwM7gRmuihJFSYVFiyid8C3J+3mI4xgjPNsp/9po6iCu1laSZtFXCPcmwZrzuwtRAq4Umw==
+X-Received: by 2002:a63:1046:: with SMTP id 6mr125224852pgq.111.1564714049618;
+        Thu, 01 Aug 2019 19:47:29 -0700 (PDT)
 Received: from [192.168.200.229] (rrcs-76-80-14-36.west.biz.rr.com. [76.80.14.36])
-        by smtp.gmail.com with ESMTPSA id p2sm100756471pfb.118.2019.08.01.19.47.52
+        by smtp.gmail.com with ESMTPSA id p68sm85467533pfb.80.2019.08.01.19.47.28
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 01 Aug 2019 19:47:53 -0700 (PDT)
-Subject: Re: [PATCH 1/1] s390/dasd: fix endless loop after read unit address
- configuration
+        Thu, 01 Aug 2019 19:47:28 -0700 (PDT)
+Subject: Re: [PATCH 0/1] sending DASD patches through linux-block
 To:     Stefan Haberland <sth@linux.ibm.com>
 Cc:     linux-block@vger.kernel.org, linux-s390@vger.kernel.org,
         hoeppner@linux.ibm.com, heiko.carstens@de.ibm.com,
         borntraeger@de.ibm.com, gor@linux.ibm.com
 References: <20190801110630.82432-1-sth@linux.ibm.com>
- <20190801110630.82432-2-sth@linux.ibm.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <20c4971d-68cd-b4d0-fb40-deef771602b1@kernel.dk>
-Date:   Thu, 1 Aug 2019 20:47:51 -0600
+Message-ID: <c66977ae-7a17-5a54-0519-a69d8f825070@kernel.dk>
+Date:   Thu, 1 Aug 2019 20:47:27 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190801110630.82432-2-sth@linux.ibm.com>
+In-Reply-To: <20190801110630.82432-1-sth@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,22 +76,24 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 8/1/19 5:06 AM, Stefan Haberland wrote:
-> After getting a storage server event that causes the DASD device driver
-> to update its unit address configuration during a device shutdown there is
-> the possibility of an endless loop in the device driver.
+> Hi Jens,
 > 
-> In the system log there will be ongoing DASD error messages with RC: -19.
+> we would like to get our DASD related patches upstream through your
+> linux-block git tree in the future.
+> We hope to get a better integration and that we are able to identify
+> potential conflicts with generic blocklayer changes earlier.
 > 
-> The reason is that the loop starting the ruac request only terminates when
-> the retry counter is decreased to 0. But in the sleep_on function there are
-> early exit paths that do not decrease the retry counter.
-> 
-> Prevent an endless loop by handling those cases separately.
-> 
-> Remove the unnecessary do..while loop since the sleep_on function takes
-> care of retries by itself.
+> I hope this is OK for you. I have attached a first patch that fixes a
+> bug in the DASD driver. This patch is based on the master branch of your
+> linux-block git tree.
 
-Applied for 5.3, thanks.
+Certainly. No extra hassle for me, and if it makes it easier for you,
+then by all means.
+
+> Please let me know if I should change something in my workflow.
+
+Looks fine to me, I generally prefer patches (individual or series)
+to git trees, unless it's a huge series.
 
 -- 
 Jens Axboe
