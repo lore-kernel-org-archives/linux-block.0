@@ -2,158 +2,72 @@ Return-Path: <SRS0=u38M=V7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 479A2C433FF
-	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 01:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05839C31E40
+	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 05:01:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B7F02086A
-	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 01:41:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF3F12087C
+	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 05:01:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="OLRFKsHo"
+	dkim=pass (2048-bit key) header.d=csquare-ca.20150623.gappssmtp.com header.i=@csquare-ca.20150623.gappssmtp.com header.b="SgyYIeat"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389585AbfHCBll (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Aug 2019 21:41:41 -0400
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:14532 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387864AbfHCBll (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Aug 2019 21:41:41 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d44e6540001>; Fri, 02 Aug 2019 18:41:40 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Fri, 02 Aug 2019 18:41:39 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Fri, 02 Aug 2019 18:41:39 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sat, 3 Aug
- 2019 01:41:38 +0000
-Subject: Re: [PATCH 31/34] nfs: convert put_page() to put_user_page*()
-To:     Calum Mackay <calum.mackay@oracle.com>, <john.hubbard@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-CC:     Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
-        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
-        <dri-devel@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linux-rpi-kernel@lists.infradead.org>,
-        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
-        <x86@kernel.org>, <xen-devel@lists.xenproject.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>
-References: <20190802022005.5117-1-jhubbard@nvidia.com>
- <20190802022005.5117-32-jhubbard@nvidia.com>
- <1738cb1e-15d8-0bbe-5362-341664f6efc8@oracle.com>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <db136399-ed87-56ea-bd6e-e5d29b145eda@nvidia.com>
-Date:   Fri, 2 Aug 2019 18:41:38 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726341AbfHCFBk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Aug 2019 01:01:40 -0400
+Received: from mail-io1-f54.google.com ([209.85.166.54]:43902 "EHLO
+        mail-io1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725283AbfHCFBk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Aug 2019 01:01:40 -0400
+Received: by mail-io1-f54.google.com with SMTP id k20so3505669ios.10
+        for <linux-block@vger.kernel.org>; Fri, 02 Aug 2019 22:01:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=csquare-ca.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=/vk/77LSDoOzoE1ULKx1uk+L67ix7QMx5QSiEUP86do=;
+        b=SgyYIeatgQLyy3cF4iGKgPhKHYZKVidyUYUEvSO6R6SAA+CI31RqCoLeBJq6V/hHir
+         LIdYGJFHExkRd9ciS0bNNyh/D7pa6Oe3Lvipv0vq6h4TNKQeSjn5bWoQHO8wi1iBu3uL
+         z2ZD67MIDuFWoOTk0TUbti/5cgTVfMA5cJcUE692a+FqaeeK6ZH5ON2ZXMkUZtQeAv6c
+         OJBUnwB2/itVaeSjaJfsCDXFDYbeysT2jF/mBa5m7Ibq1SkMhHvzvm/LXDnLVqBUG+LH
+         kRvqVfSA0x/hzcYXhSS8l1siEHzMfz5YGSVeqSOocpKP9j8FBQ1PYd5osMGaEmq2Cv6B
+         xdJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=/vk/77LSDoOzoE1ULKx1uk+L67ix7QMx5QSiEUP86do=;
+        b=EZ4xDc1/d8McQ7wOU/f/MsXXRElsLyq5Bb11w4NOBeTcCT2RyppzgF/tCS2x5UBuXv
+         URqCz3lw7EF3QceC7wX6BgOnjglv2MUpISNCp0NjhyhQE5T+a2zPJMmYGdNZa8tLKgVe
+         K4Q/8U8v4Fng+Fr9sinopHPEiKmDR5AxaGGyL7P2MaFfg2AqfvSd8+9aFLkJZPXrejfZ
+         l4sGgi8ONdLTmEfKuGE8cbBwTGQ0KG9wvU2eU/LZR9a+5+ldm55Uo3yOtuGDc8feHVNI
+         Nhnxxy4mUpYwQwzym8rI/IahP3nkQYh7E5lju+slwk9gndadrgg1tgBBn9a3Ftlxf87A
+         pbhQ==
+X-Gm-Message-State: APjAAAWVqbOYKBGsgo5pwRgpt29XZigDwDopUZDw8HPRDgVZyQskti8n
+        95RDGsDWz1nCES4Tt9YZcAiUmZq2GaCYN4+mYYbJtios
+X-Google-Smtp-Source: APXvYqyTWPhaI0/tFkENa12WEGl3Jwbecm83cHbvt/2xahLMVSl2Orzbn16UafknCDMMcv6em579/WYKsXxEmIdcIK8=
+X-Received: by 2002:a5d:9f4a:: with SMTP id u10mr2979784iot.243.1564808499618;
+ Fri, 02 Aug 2019 22:01:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1738cb1e-15d8-0bbe-5362-341664f6efc8@oracle.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL104.nvidia.com (172.18.146.11) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1564796500; bh=zc1wJBCk6oa4TZJ5kpnxYLs8I/mCQFC0KqXiV/MQqAc=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=OLRFKsHoXBw1TGfx4yjE0Mz6/NwSHjUP/99RYZUV8BmAJcU3vy970b00AWaqBbqwn
-         eDliId8mLescIf+v3MwQ2SrvN7VrnEwLTirEIw8jXzAjeXgqN3dtxI2Suyrp0L+f3G
-         YPfLBq5YLuEzykUeYyNQ/IXUTk0ew3pKoxF86cxfpvc0Iih+8axjrF9wmXCYOssEh/
-         dFyCupj1u3LqFaTu0iXYZzaL8I/Fkdd+Hdao45WQIFetVoCK43sV9CCZfHZ6uY+1an
-         0Rm4XSFjiP2H1hfdLpXkesSoEJK75cPPtD+8sANcEv6R5DjbxYeg7dbcB8wnnzerOG
-         BX10+9E+Fxe0Q==
+From:   John Sully <john@csquare.ca>
+Date:   Sat, 3 Aug 2019 01:01:28 -0400
+Message-ID: <CACVf4-7Y5w_AXXruXV37ng_9ZbRY=4TMoq91UYGBRaEAcnS+LQ@mail.gmail.com>
+Subject: Invalidating Caches When a Block Device Changes
+To:     linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/2/19 6:27 PM, Calum Mackay wrote:
-> On 02/08/2019 3:20 am, john.hubbard@gmail.com wrote:
-...=20
-> Since it's static, and only called twice, might it be better to change it=
-s two callers [nfs_direct_{read,write}_schedule_iovec()] to call put_user_p=
-ages() directly, and remove nfs_direct_release_pages() entirely?
->=20
-> thanks,
-> calum.
->=20
->=20
->> =C2=A0 =C2=A0 void nfs_init_cinfo_from_dreq(struct nfs_commit_info *cinf=
-o,
->>
-=20
-Hi Calum,
+Hello,
 
-Absolutely! Is it OK to add your reviewed-by, with the following incrementa=
-l
-patch made to this one?
+I'm writing a block device driver for a device who's data might change
+without the kernel performing any specific writes.  I'm looking for a
+way to inform any upstream caches that the data it holds is no longer
+valid and must be discarded.
 
-diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
-index b00b89dda3c5..c0c1b9f2c069 100644
---- a/fs/nfs/direct.c
-+++ b/fs/nfs/direct.c
-@@ -276,11 +276,6 @@ ssize_t nfs_direct_IO(struct kiocb *iocb, struct iov_i=
-ter *iter)
-        return nfs_file_direct_write(iocb, iter);
- }
-=20
--static void nfs_direct_release_pages(struct page **pages, unsigned int npa=
-ges)
--{
--       put_user_pages(pages, npages);
--}
--
- void nfs_init_cinfo_from_dreq(struct nfs_commit_info *cinfo,
-                              struct nfs_direct_req *dreq)
- {
-@@ -510,7 +505,7 @@ static ssize_t nfs_direct_read_schedule_iovec(struct nf=
-s_direct_req *dreq,
-                        pos +=3D req_len;
-                        dreq->bytes_left -=3D req_len;
-                }
--               nfs_direct_release_pages(pagevec, npages);
-+               put_user_pages(pagevec, npages);
-                kvfree(pagevec);
-                if (result < 0)
-                        break;
-@@ -933,7 +928,7 @@ static ssize_t nfs_direct_write_schedule_iovec(struct n=
-fs_direct_req *dreq,
-                        pos +=3D req_len;
-                        dreq->bytes_left -=3D req_len;
-                }
--               nfs_direct_release_pages(pagevec, npages);
-+               put_user_pages(pagevec, npages);
-                kvfree(pagevec);
-                if (result < 0)
-                        break;
+I've found APIs for flushing caches *to* the block device, but none
+that makes sense to call within the context of the block device driver
+itself when it has learned the underlying device itself has changed.
 
-
-
-thanks,
---=20
-John Hubbard
-NVIDIA
+Can anyone point me to the proper APIs?
