@@ -2,85 +2,153 @@ Return-Path: <SRS0=u38M=V7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE42C433FF
-	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 16:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B590C433FF
+	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 20:03:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 72FE32075C
-	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 16:17:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50E5221773
+	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 20:03:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YTMLQb4x"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="I2YSIJHt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387961AbfHCQRs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Aug 2019 12:17:48 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:33636 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387958AbfHCQRs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Aug 2019 12:17:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=/X3WDI0mWhLkrrAZYpOBF14jsWJC/LWwN2nM68m2FXE=; b=YTMLQb4x9LXJC64dxUjr6v4Xk
-        GMXQsTaDR1vmYROgRuPGQmcgEYe76/aACMQQWCtkZimsYaMoot1ZvwPQDm2Ihc2qq7OidsOSLkgi5
-        5h4VKxOmA9p2bsT/wyW0eiE02ATnGIGZFQZ1DcJKqPFLLhndN++tne2fJkGXmLxkZ5sdM7ADQfEHj
-        ZUnzIYOL2jqDrOkrkXILUmtHBpDlM7HqH5QWkJ6gkEmQSJSg1PFxAP5KxYT78scR0A+zv9wLYi74s
-        ucUhUJiJLtSFE9BZiIREAP1CItRqGkb5o5/6a4VXeKUPosSTon4rRzJYDNgxMmGjhEAcUMcDZEnKr
-        HD/miYdsw==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1htwj1-0007V1-Ge; Sat, 03 Aug 2019 16:17:43 +0000
-Date:   Sat, 3 Aug 2019 09:17:43 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     axboe@kernel.dk, jack@suse.cz, hannes@cmpxchg.org,
-        mhocko@kernel.org, vdavydov.dev@gmail.com, cgroups@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@fb.com, guro@fb.com,
-        akpm@linux-foundation.org
-Subject: Re: [PATCH 2/4] bdi: Add bdi->id
-Message-ID: <20190803161743.GB932@bombadil.infradead.org>
-References: <20190803140155.181190-1-tj@kernel.org>
- <20190803140155.181190-3-tj@kernel.org>
- <20190803153908.GA932@bombadil.infradead.org>
- <20190803155349.GD136335@devbig004.ftw2.facebook.com>
+        id S1728985AbfHCUDI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Aug 2019 16:03:08 -0400
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:10527 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727585AbfHCUDI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Aug 2019 16:03:08 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d45e87a0000>; Sat, 03 Aug 2019 13:03:06 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Sat, 03 Aug 2019 13:03:06 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Sat, 03 Aug 2019 13:03:06 -0700
+Received: from [10.110.48.28] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sat, 3 Aug
+ 2019 20:03:05 +0000
+Subject: Re: [PATCH 06/34] drm/i915: convert put_page() to put_user_page*()
+From:   John Hubbard <jhubbard@nvidia.com>
+To:     Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        <john.hubbard@gmail.com>
+CC:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
+        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
+        <dri-devel@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linux-rpi-kernel@lists.infradead.org>,
+        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
+        <x86@kernel.org>, <xen-devel@lists.xenproject.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        David Airlie <airlied@linux.ie>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+ <20190802022005.5117-7-jhubbard@nvidia.com>
+ <156473756254.19842.12384378926183716632@jlahtine-desk.ger.corp.intel.com>
+ <7d9a9c57-4322-270b-b636-7214019f87e9@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <22c309f6-a7ca-2624-79c3-b16a1487f488@nvidia.com>
+Date:   Sat, 3 Aug 2019 13:03:05 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190803155349.GD136335@devbig004.ftw2.facebook.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <7d9a9c57-4322-270b-b636-7214019f87e9@nvidia.com>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1564862587; bh=ilU/8cKxAxLoWjJW9QtQ++HPyf9Kp7C47ReaMR8aBDk=;
+        h=X-PGP-Universal:Subject:From:To:CC:References:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=I2YSIJHtEvh6s6ys5+qZOy9oK09e18lfnMQt77fXZCyrgzqntxCUGfZ7oWikmHJt5
+         4V1+y4MySAejsYy1JLbf4x7KQ0hiidb6jg5xsakkPPG/MxjywoS180jIN6uhV11y/O
+         011sP6dgxSCe7CPHZfVmc5h9v3h4EFz6CzWGnO3zjeLQA+xNf7n8Aq4VIo5dqejc1s
+         ogxZqWO3QmjUKVwNVzjjVrVg9ptoPI8+f8bAuuTtyZ6ixyHn7fxeF7f3r5zkr6u4id
+         LKe10E8R/74E4Fa+DG9GwiVmNsBu++raNIZCy4+8RyCJBTlO14Pl8lc8yCIpDgUHCO
+         oxDfeJ3aA6pnw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 03, 2019 at 08:53:49AM -0700, Tejun Heo wrote:
-> Hey, Matthew.
-> 
-> On Sat, Aug 03, 2019 at 08:39:08AM -0700, Matthew Wilcox wrote:
-> > On Sat, Aug 03, 2019 at 07:01:53AM -0700, Tejun Heo wrote:
-> > > There currently is no way to universally identify and lookup a bdi
-> > > without holding a reference and pointer to it.  This patch adds an
-> > > non-recycling bdi->id and implements bdi_get_by_id() which looks up
-> > > bdis by their ids.  This will be used by memcg foreign inode flushing.
-> > > 
-> > > I left bdi_list alone for simplicity and because while rb_tree does
-> > > support rcu assignment it doesn't seem to guarantee lossless walk when
-> > > walk is racing aginst tree rebalance operations.
-> > 
-> > This would seem like the perfect use for an allocating xarray.  That
-> > does guarantee lossless walk under the RCU lock.  You could get rid of the
-> > bdi_list too.
-> 
-> It definitely came to mind but there's a bunch of downsides to
-> recycling IDs or using radix tree for non-compacting allocations.
+On 8/2/19 11:48 AM, John Hubbard wrote:
+> On 8/2/19 2:19 AM, Joonas Lahtinen wrote:
+>> Quoting john.hubbard@gmail.com (2019-08-02 05:19:37)
+>>> From: John Hubbard <jhubbard@nvidia.com>
+...
+> In order to deal with the merge problem, I'll drop this patch from my ser=
+ies,
+> and I'd recommend that the drm-intel-next take the following approach:
 
-Ah, I wasn't sure what would happen if you recycled an ID.  I agree, the
-radix tree is pretty horrid for monotonically increasing IDs.  I'm still
-working on the maple tree to replace it, but that's going slower than
-I would like, so I can't in good conscience ask you to wait for it to
-be ready.
+Actually, I just pulled the latest linux.git, and there are a few changes:
+
+>=20
+> 1) For now, s/put_page/put_user_page/ in i915_gem_userptr_put_pages(),
+> and fix up the set_page_dirty() --> set_page_dirty_lock() issue, like thi=
+s
+> (based against linux.git):
+>=20
+> diff --git a/drivers/gpu/drm/i915/gem/i915_gem_userptr.c b/drivers/gpu/dr=
+m/i915/gem/i915_gem_userptr.c
+> index 528b61678334..94721cc0093b 100644
+> --- a/drivers/gpu/drm/i915/gem/i915_gem_userptr.c
+> +++ b/drivers/gpu/drm/i915/gem/i915_gem_userptr.c
+> @@ -664,10 +664,10 @@ i915_gem_userptr_put_pages(struct drm_i915_gem_obje=
+ct *obj,
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for_each_sgt_page(page, sgt_it=
+er, pages) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 if (obj->mm.dirty)
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 set_page_dirty=
+(page);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 set_page_dirty=
+_lock(page);
+
+I see you've already applied this fix to your tree, in linux.git already.
+
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 mark_page_accessed(page);
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 put_page(page);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 put_user_page(page);
+
+But this conversion still needs doing. So I'll repost a patch that only doe=
+s=20
+this (plus the other call sites).=20
+
+That can go in via either your tree, or Andrew's -mm tree, without generati=
+ng
+any conflicts.
+
+thanks,
+--=20
+John Hubbard
+NVIDIA
