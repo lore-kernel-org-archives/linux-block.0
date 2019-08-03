@@ -2,75 +2,122 @@ Return-Path: <SRS0=u38M=V7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4159FC31E40
-	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 08:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F52C433FF
+	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 14:02:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1089221783
-	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 08:46:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C31B2166E
+	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 14:02:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564840927;
+	bh=v3GeeXZhsLEC1E2fDl6kbDg+xmUYPF82erNXj5B1f+M=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=gUwGwDu/oYsKharXkfDbXJl6ntYi/qIFyyHZOUourGr6UhPO03Zs6iEuXBJZ76BOq
+	 zaVeUvmFL4cYB5nShW8eXZXqxq5a5giTJ+AHK49K3LqOpQhDdCvu+553Mje1B9fgT7
+	 uJeqQYUxUxyNeYFALZKogIA/lZLoFkkaROyravXU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387767AbfHCIqF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Aug 2019 04:46:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36596 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387692AbfHCIqF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 3 Aug 2019 04:46:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 26B4C308FB82;
-        Sat,  3 Aug 2019 08:46:05 +0000 (UTC)
-Received: from localhost (ovpn-116-62.ams2.redhat.com [10.36.116.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BDE70608C2;
-        Sat,  3 Aug 2019 08:46:04 +0000 (UTC)
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Jeff Moyer <jmoyer@redhat.com>,
-        Aarushi Mehta <mehta.aaru20@gmail.com>,
-        linux-block@vger.kernel.org, Julia Suvorova <jusual@mail.ru>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: [PATCH liburing 4/4] spec: fix <liburing/*.h> permissions
-Date:   Sat,  3 Aug 2019 09:45:26 +0100
-Message-Id: <20190803084526.3837-5-stefanha@redhat.com>
-In-Reply-To: <20190803084526.3837-1-stefanha@redhat.com>
-References: <20190803084526.3837-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Sat, 03 Aug 2019 08:46:05 +0000 (UTC)
+        id S2391008AbfHCOCD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Aug 2019 10:02:03 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:33357 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387781AbfHCOCD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Aug 2019 10:02:03 -0400
+Received: by mail-qt1-f194.google.com with SMTP id r6so72621246qtt.0;
+        Sat, 03 Aug 2019 07:02:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=AiTM5WxUhwBn/0+fPLrU4NXRLZPLKnlQS1xIhWaJzpg=;
+        b=tfT01MLuJKUwtU61ZxhKrZL6uuTYcpg4nXhf60oe0IrgWdG+XWg7SytG8ERsq3bvX8
+         A+e4WnbVDrMQxtUgmUCHknAGfXaYg+2CxcWZ2ZbT6n7dMSHoxs5u/cz8JXmfAqH/cBPt
+         aXnpRRuUe2fQtDlx3L2JHIJwPUaNpVX5L6s+NZ/q9HjqbhhbPhoSd680vE+8vvxS8y8K
+         /IjAIxVBjB2wm3P06AH/7CgQgSjnsSyc9euHSKr9iuS17mANP+9NnfW22gTMHIt/RGwY
+         PQ2chv1aMEKUWdBpJywMQP3q7/mQrd3UQdDY+QtZLHmq3nSvFRpZdaBN1SmpQ5Ar2/IC
+         tE3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=AiTM5WxUhwBn/0+fPLrU4NXRLZPLKnlQS1xIhWaJzpg=;
+        b=n9qmL+8+6TjRWT6xnDyCX7u/fAEMMGULz23j33EFN/3/NrbOxMmfLaMY+wyVpZKDmT
+         nEFlDMK7DgDy4M5N1lK6/suloTeuVAq8QqaauKxd0odRpWyZu9t5tByZwZMcYbSz4HcG
+         Kph75OqiIlIcEG9FH/IVgmd9FQPg/hGASYWuUBD1rAG9SP7/KAMurZ/blBPLN0cu7GAC
+         aJEhUMItrWMldqPNYEXWmodVp0gcUnk6IFJ18CRexkB83YMk1UntrG7g4lJnmqt8oc92
+         gP3T0p1sWSnFdnTBDjvfsVb8yfn6Fvr1ouBIXAmQIDTwOXse1/Bg3Iu/l6mOhM6PqCE+
+         gG6w==
+X-Gm-Message-State: APjAAAUxmHIIgOVPVWoGm4gEnvfLzlxo3qARUN0nTdDOU3zHrqerZdXZ
+        nmydQ0chT2PtWJIEUCWz8vs=
+X-Google-Smtp-Source: APXvYqzzgCoVrYOzV3Sh22dKmWqWg/eQVur3HjvBhsdIJFMLo/Q8sCxblPPzca1gNgyMp+0/Sw1UCw==
+X-Received: by 2002:a05:6214:1c3:: with SMTP id c3mr94720009qvt.144.1564840921783;
+        Sat, 03 Aug 2019 07:02:01 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::efce])
+        by smtp.gmail.com with ESMTPSA id i62sm35045931qke.52.2019.08.03.07.02.00
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 03 Aug 2019 07:02:01 -0700 (PDT)
+From:   Tejun Heo <tj@kernel.org>
+To:     axboe@kernel.dk, jack@suse.cz, hannes@cmpxchg.org,
+        mhocko@kernel.org, vdavydov.dev@gmail.com
+Cc:     cgroups@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@fb.com, guro@fb.com, akpm@linux-foundation.org
+Subject: [PATCHSET] writeback, memcg: Implement foreign inode flushing
+Date:   Sat,  3 Aug 2019 07:01:51 -0700
+Message-Id: <20190803140155.181190-1-tj@kernel.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are two issues with the <liburing/*.h> headers:
-1. They are installed with 0755 permissions.
-2. The empty /usr/include/liburing/ directory is left behind by rpm -e.
+Hello,
 
-Fix this by specifying the directory (not just globbing the files inside
-it) and letting rpm use the default permissions on these files.
+There's an inherent mismatch between memcg and writeback.  The former
+trackes ownership per-page while the latter per-inode.  This was a
+deliberate design decision because honoring per-page ownership in the
+writeback path is complicated, may lead to higher CPU and IO overheads
+and deemed unnecessary given that write-sharing an inode across
+different cgroups isn't a common use-case.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- liburing.spec | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Combined with inode majority-writer ownership switching, this works
+well enough in most cases but there are some pathological cases.  For
+example, let's say there are two cgroups A and B which keep writing to
+different but confined parts of the same inode.  B owns the inode and
+A's memory is limited far below B's.  A's dirty ratio can rise enough
+to trigger balance_dirty_pages() sleeps but B's can be low enough to
+avoid triggering background writeback.  A will be slowed down without
+a way to make writeback of the dirty pages happen.
 
-diff --git a/liburing.spec b/liburing.spec
-index 31dfde0..1337034 100644
---- a/liburing.spec
-+++ b/liburing.spec
-@@ -48,7 +48,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
- 
- %files devel
- %defattr(-,root,root)
--%attr(0755,root,root) %{_includedir}/liburing/*
-+%attr(-,root,root) %{_includedir}/liburing/
- %attr(0644,root,root) %{_includedir}/liburing.h
- %attr(0755,root,root) %{_libdir}/liburing.so
- %attr(0644,root,root) %{_libdir}/liburing.a
--- 
-2.21.0
+This patchset implements foreign dirty recording and foreign mechanism
+so that when a memcg encounters a condition as above it can trigger
+flushes on bdi_writebacks which can clean its pages.  Please see the
+last patch for more details.
+
+This patchset contains the following four patches.
+
+ 0001-writeback-Generalize-and-expose-wb_completion.patch
+ 0002-bdi-Add-bdi-id.patch
+ 0003-writeback-memcg-Implement-cgroup_writeback_by_id.patch
+ 0004-writeback-memcg-Implement-foreign-dirty-flushing.patch
+
+0001-0003 are prep patches which expose wb_completion and implement
+bdi->id and flushing by bdi and memcg IDs.
+
+0004 implement foreign inode flushing.
+
+Thanks.  diffstat follows.
+
+ fs/fs-writeback.c                |  111 ++++++++++++++++++++++++----------
+ include/linux/backing-dev-defs.h |   23 +++++++
+ include/linux/backing-dev.h      |    3 
+ include/linux/memcontrol.h       |   35 ++++++++++
+ include/linux/writeback.h        |    4 +
+ mm/backing-dev.c                 |   65 +++++++++++++++++++-
+ mm/memcontrol.c                  |  125 +++++++++++++++++++++++++++++++++++++++
+ mm/page-writeback.c              |    4 +
+ 8 files changed, 335 insertions(+), 35 deletions(-)
+
+--
+tejun
 
