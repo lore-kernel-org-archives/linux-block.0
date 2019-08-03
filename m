@@ -2,180 +2,93 @@ Return-Path: <SRS0=u38M=V7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFCDC31E40
-	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 14:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A356EC31E40
+	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 14:25:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9387F21773
-	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 14:02:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564840941;
-	bh=uC3hLV8Vdd6pU/aPrXuamysCCgg+9etpBqi5fAXT8X0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=2izfOqWVEPVKeNiB0Gey3PVSTaUWYWRs/VMxvzyQeOhCcA8OSUenx8cptIRII3WF1
-	 l7cSgSLAkcGS+mNVNr3Jd0FoIEt3NFLPeovJ+IDsl8uqtWQcyVjYMFL87zHjADYsK3
-	 ZPdeZ6bGx2rdzXaiZHyXghNo0hA+0egeFNysO6c8=
+	by mail.kernel.org (Postfix) with ESMTP id 67E822073D
+	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 14:25:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="asL6pZes"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391281AbfHCOCL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Aug 2019 10:02:11 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:42907 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391220AbfHCOCK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Aug 2019 10:02:10 -0400
-Received: by mail-qt1-f194.google.com with SMTP id h18so76879718qtm.9;
-        Sat, 03 Aug 2019 07:02:09 -0700 (PDT)
+        id S1726841AbfHCOZO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Aug 2019 10:25:14 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:42889 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726505AbfHCOZO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Aug 2019 10:25:14 -0400
+Received: by mail-pl1-f193.google.com with SMTP id ay6so34788961plb.9
+        for <linux-block@vger.kernel.org>; Sat, 03 Aug 2019 07:25:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=D9orjRjfDP9pgbxu2ifvLHy1ukGCDC2EnGjf/tPTneg=;
-        b=cYPLPoMt3nONdxSxEBH2DXkIoLL+c9kekNeZLQCrDU7eCfsa88/QnKRrpo2uMjGpnt
-         8yr36k8tiB7bRtBvd+j8pp9LWfqhmue6miSiyxYELzY5FOgfWc3t58Snbg5xMh32u7rt
-         53KM77N+vC78kPnMnfPjHh98M4fvvJg+TDfRrGu/otL4kB49lI+RXnGcUJn6ggTljn6T
-         9eY1HB5jWO32Zsqkc6HchBQ3JKLeJC5KoocZEgyb7QzmFt3SrF//DO0yYyQMG7d5kpQr
-         HLMxXYD/noRAOoXbQ7C1kXaOd/Rh95WKAb4novdD59drxwXue25gMwWDx4RmQHus7pYV
-         t6ug==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=LEY/R4JdluLnEoZvfNetYTGhrvG9h4fW18rpVnCXlkI=;
+        b=asL6pZesc361ZotnLed0tzz1szMbohvHSdJFqfd0PxDwCXXPSsa7oMoopjYMMEWRTG
+         t5h71rxcDSBf+P2cXRrl1puCHN8n6zsFKQ7o8UCuXvf3s71zaN6S4nEobQ+wnPVuAZ0g
+         pQrPRqkYez4fCmOgdW/sB7252oGTS0Jit5JLkPcrX/uK3Y4PkIX5OT2fLl4KOX1qLIsc
+         xpAHNWLOUFi1M+rLXAIerlnxCqGL272FInl1/D06SMEoH6EAD2Yns1KDJX7g0WRVYd7U
+         zN1szgFYScisFTbizr03lNJHmNsmo7WmflG06vCiKP8UlwX8PvoRg5sW9dSAM+CTl/kT
+         LeCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=D9orjRjfDP9pgbxu2ifvLHy1ukGCDC2EnGjf/tPTneg=;
-        b=ehgp3uUV42wj8ZD3UceWkL8fKNHhXJtqi4mZmqhCqP5p0Q3iLWGFp2uxl5OxX5SCfu
-         xcJ/xEBXDOL4CyMTM4wzpHmiVL91NohD8PQQCpY6LEsgxNJDY+jzETYY1tgOMETU6P39
-         G71MEAoIVBM2q7nKIyn+xgB8X8bS9YVz0QA9TGzMZqz6hlgmVoooUOGGK8Qz9EijQS9i
-         LfdHiRIhP//eWuoQWum/k8I49owwuugibgtUqeYq4A6qq4MTkmTC2bnuXpE1Yz1v6zQ2
-         /OI/TIX4BeUMACiITqq+pDXGIjCsZQ4ane5IiTk3/Vk3pS72B9Vuup9QCzvmFbH8Eo+L
-         Gzsw==
-X-Gm-Message-State: APjAAAXljUJ19k3B+rBiFEwtdjjz5eVUm/dTxIoRP+aumYfuvlFUTnmc
-        pnYcd3tlX5hpdLEoSaiq8dY=
-X-Google-Smtp-Source: APXvYqzq4ivE4tAq5lf09J8xU7TbLV1kaIEe1KkD0cgBL2Q8YLk017OZlnCCIbvPhSic+6Qi+z3/Ew==
-X-Received: by 2002:ac8:c45:: with SMTP id l5mr96088707qti.63.1564840929275;
-        Sat, 03 Aug 2019 07:02:09 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::efce])
-        by smtp.gmail.com with ESMTPSA id 18sm35265973qkh.77.2019.08.03.07.02.08
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LEY/R4JdluLnEoZvfNetYTGhrvG9h4fW18rpVnCXlkI=;
+        b=RWXhwa7CnBIKHdLnisQ1Ov5/6639atK0lrko3SHgOS52TcK1l6pGivr9nhkoa3uKk/
+         jvpKEril+JSKimbiQnaOL2X3/k5406ri0/46mbXkxi9JQ6nxFJQnPae4Q4b1QUPZJNso
+         TDHS86cLBKsuzzrUwMxesVucFzYYskmeElv0IOI5YNosVkb4LssCf2bOn4LVKWQdX44F
+         zmX7YveuPC5CsZx68QS6aOWcJsqRmU/pQ96Ayb09OHQLXnBh7OlMGZr1xpn1VfDQkWHp
+         nVzFaSin1BBRoxBvzFe5hpJ7H6I3AOriqE+UFiV50DEylwX/s8BzkLsKyFwD4PdlbwLb
+         wbZw==
+X-Gm-Message-State: APjAAAUcjscyE4yRiPDkgTfwP80i8Cjo87vX//5LZs8KKmb+qJCSCawq
+        4E5V1Vg7D5oOPSGRdw0pxwE=
+X-Google-Smtp-Source: APXvYqz4YO6EKT601GVgI0nBFwWu18eMjnstX9qZ+k5GgFpURDn/iSMdj+PjIS8Ab74E6YOHjIOtPg==
+X-Received: by 2002:a17:902:ba96:: with SMTP id k22mr139552203pls.44.1564842313932;
+        Sat, 03 Aug 2019 07:25:13 -0700 (PDT)
+Received: from [192.168.86.24] (cpe-75-85-219-51.dc.res.rr.com. [75.85.219.51])
+        by smtp.gmail.com with ESMTPSA id 124sm80764903pfw.142.2019.08.03.07.25.12
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 03 Aug 2019 07:02:08 -0700 (PDT)
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, jack@suse.cz, hannes@cmpxchg.org,
-        mhocko@kernel.org, vdavydov.dev@gmail.com
-Cc:     cgroups@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, guro@fb.com, akpm@linux-foundation.org,
-        Tejun Heo <tj@kernel.org>
-Subject: [PATCH 3/4] writeback, memcg: Implement cgroup_writeback_by_id()
-Date:   Sat,  3 Aug 2019 07:01:54 -0700
-Message-Id: <20190803140155.181190-4-tj@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190803140155.181190-1-tj@kernel.org>
-References: <20190803140155.181190-1-tj@kernel.org>
+        Sat, 03 Aug 2019 07:25:13 -0700 (PDT)
+Subject: Re: [PATCH liburing 0/4] spec: rpmlint fixes in preparation for
+ Fedora packaging
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Jeff Moyer <jmoyer@redhat.com>,
+        Aarushi Mehta <mehta.aaru20@gmail.com>,
+        linux-block@vger.kernel.org, Julia Suvorova <jusual@mail.ru>
+References: <20190803084526.3837-1-stefanha@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <1ecc837f-6177-c0a9-2d29-13efd29faf28@kernel.dk>
+Date:   Sat, 3 Aug 2019 07:25:11 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190803084526.3837-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implement cgroup_writeback_by_id() which initiates cgroup writeback
-from bdi and memcg IDs.  This will be used by memcg foreign inode
-flushing.
+On 8/3/19 2:45 AM, Stefan Hajnoczi wrote:
+> This series addresses the remaining rpm issues that I'm aware of.
+> 
+> Jens: Once the patches are merged and you publish a 0.1 release tag I could
+> roll the first liburing rpm for Fedora.  liburing itself is in good shape for
+> wider consumption but maybe it makes sense to wait for kernel issues to settle.
+> There are qemu-iotests failures that are probably kernel bugs (hopefully known
+> ones!) and will be investigated soon.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- fs/fs-writeback.c         | 64 +++++++++++++++++++++++++++++++++++++++
- include/linux/writeback.h |  4 +++
- 2 files changed, 68 insertions(+)
+Applied all 4, thanks.
 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 6129debdc938..5c79d7acefdb 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -880,6 +880,70 @@ static void bdi_split_work_to_wbs(struct backing_dev_info *bdi,
- 		wb_put(last_wb);
- }
- 
-+/**
-+ * cgroup_writeback_by_id - initiate cgroup writeback from bdi and memcg IDs
-+ * @bdi_id: target bdi id
-+ * @memcg_id: target memcg css id
-+ * @nr_pages: number of pages to write
-+ * @reason: reason why some writeback work initiated
-+ * @done: target wb_completion
-+ *
-+ * Initiate flush of the bdi_writeback identified by @bdi_id and @memcg_id
-+ * with the specified parameters.
-+ */
-+int cgroup_writeback_by_id(u64 bdi_id, int memcg_id, unsigned long nr,
-+			   enum wb_reason reason, struct wb_completion *done)
-+{
-+	struct backing_dev_info *bdi;
-+	struct cgroup_subsys_state *memcg_css;
-+	struct bdi_writeback *wb;
-+	struct wb_writeback_work *work;
-+	int ret;
-+
-+	/* lookup bdi and memcg */
-+	bdi = bdi_get_by_id(bdi_id);
-+	if (!bdi)
-+		return -ENOENT;
-+
-+	rcu_read_lock();
-+	memcg_css = css_from_id(memcg_id, &memory_cgrp_subsys);
-+	if (memcg_css && !css_tryget(memcg_css))
-+		memcg_css = NULL;
-+	rcu_read_unlock();
-+	if (!memcg_css) {
-+		ret = -ENOENT;
-+		goto out_bdi_put;
-+	}
-+
-+	/* and find the associated wb */
-+	wb = wb_get_create(bdi, memcg_css, GFP_NOWAIT | __GFP_NOWARN);
-+	if (!wb) {
-+		ret = -ENOMEM;
-+		goto out_css_put;
-+	}
-+
-+	/* issue the writeback work */
-+	work = kzalloc(sizeof(*work), GFP_NOWAIT | __GFP_NOWARN);
-+	if (work) {
-+		work->nr_pages = nr;
-+		work->sync_mode = WB_SYNC_NONE;
-+		work->reason = reason;
-+		work->done = done;
-+		work->auto_free = 1;
-+		wb_queue_work(wb, work);
-+		ret = 0;
-+	} else {
-+		ret = -ENOMEM;
-+	}
-+
-+	wb_put(wb);
-+out_css_put:
-+	css_put(memcg_css);
-+out_bdi_put:
-+	bdi_put(bdi);
-+	return ret;
-+}
-+
- /**
-  * cgroup_writeback_umount - flush inode wb switches for umount
-  *
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index 8945aac31392..ad794f2a7d42 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -217,6 +217,10 @@ void wbc_attach_and_unlock_inode(struct writeback_control *wbc,
- void wbc_detach_inode(struct writeback_control *wbc);
- void wbc_account_cgroup_owner(struct writeback_control *wbc, struct page *page,
- 			      size_t bytes);
-+int cgroup_writeback_by_id(u64 bdi_id, int memcg_id, unsigned long nr_pages,
-+			   enum wb_reason reason, struct wb_completion *done);
-+int writeback_by_id(int id, unsigned long nr, enum wb_reason reason,
-+		    struct wb_completion *done);
- void cgroup_writeback_umount(void);
- 
- /**
+Any pointers to the qemu-iotests failures?
+
 -- 
-2.17.1
+Jens Axboe
 
