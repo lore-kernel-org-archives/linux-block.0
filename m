@@ -2,112 +2,66 @@ Return-Path: <SRS0=u38M=V7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A389C433FF
-	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 07:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 128D1C433FF
+	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 08:45:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20CA92087C
-	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 07:07:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564816039;
-	bh=pPLKovyN1NMpp946XJreXv1Y0yg1S4P9Y162ukSMn64=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ALzqzJp3bWkjNTLjXLAXnyLZvBXEMxE4pCvRSUCeyUAAq9rZ7ZW/CEx6xEjzCpOFg
-	 4AWRQ1xRB9UR3KF69FtPIr+ApK2iiBaCG/92CeARhV39/hE2u/+3gbX1bAgwLQEpjV
-	 kCd9yuA2R3F3zJl8G54fR6CSnpGbQaCUdogawHDM=
+	by mail.kernel.org (Postfix) with ESMTP id DE85521783
+	for <linux-block@archiver.kernel.org>; Sat,  3 Aug 2019 08:45:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727101AbfHCHGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Aug 2019 03:06:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40602 "EHLO mail.kernel.org"
+        id S2387728AbfHCIpy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Aug 2019 04:45:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59094 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727100AbfHCHGv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 3 Aug 2019 03:06:51 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S2387692AbfHCIpy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 3 Aug 2019 04:45:54 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 08D01206A2;
-        Sat,  3 Aug 2019 07:06:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564816009;
-        bh=pPLKovyN1NMpp946XJreXv1Y0yg1S4P9Y162ukSMn64=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Rlojk96gVoiyivb+U7yrIkDTuHtioqnhmcEmMjAk1MQVJmXSmgcGRpi/2JLag+Dd6
-         M19hr//PiOu9iNAJPJwAfgv2wtT5dx2nyCeRHoSIIHS1qKxvoiJQ2X4AR13zqgfnZk
-         KxaPAYdBHbY01Ff9SDG1UhnB5NnA5pYpWqC1XkA0=
-Date:   Sat, 3 Aug 2019 09:06:21 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     john.hubbard@gmail.com
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        linux-fbdev@vger.kernel.org, Jan Kara <jack@suse.cz>,
-        kvm@vger.kernel.org, Dave Hansen <dave.hansen@linux.intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
-        sparclinux@vger.kernel.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, rds-devel@oss.oracle.com,
-        linux-rdma@vger.kernel.org, Suniel Mahesh <sunil.m@techveda.org>,
-        x86@kernel.org, amd-gfx@lists.freedesktop.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Mihaela Muraru <mihaela.muraru21@gmail.com>,
-        xen-devel@lists.xenproject.org, devel@lists.orangefs.org,
-        linux-media@vger.kernel.org,
-        Stefan Wahren <stefan.wahren@i2se.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        intel-gfx@lists.freedesktop.org,
-        Kishore KP <kishore.p@techveda.org>,
-        linux-block@vger.kernel.org,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        linux-rpi-kernel@lists.infradead.org,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sidong Yang <realwakka@gmail.com>,
-        linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org,
-        Eric Anholt <eric@anholt.net>, netdev@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>, linux-xfs@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH 15/34] staging/vc04_services: convert put_page() to
- put_user_page*()
-Message-ID: <20190803070621.GA2508@kroah.com>
-References: <20190802022005.5117-1-jhubbard@nvidia.com>
- <20190802022005.5117-16-jhubbard@nvidia.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id C4EFB307D970;
+        Sat,  3 Aug 2019 08:45:53 +0000 (UTC)
+Received: from localhost (ovpn-116-62.ams2.redhat.com [10.36.116.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E679E608C2;
+        Sat,  3 Aug 2019 08:45:50 +0000 (UTC)
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Jeff Moyer <jmoyer@redhat.com>,
+        Aarushi Mehta <mehta.aaru20@gmail.com>,
+        linux-block@vger.kernel.org, Julia Suvorova <jusual@mail.ru>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: [PATCH liburing 0/4] spec: rpmlint fixes in preparation for Fedora packaging
+Date:   Sat,  3 Aug 2019 09:45:22 +0100
+Message-Id: <20190803084526.3837-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190802022005.5117-16-jhubbard@nvidia.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Sat, 03 Aug 2019 08:45:54 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 01, 2019 at 07:19:46PM -0700, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
-> 
-> For pages that were retained via get_user_pages*(), release those pages
-> via the new put_user_page*() routines, instead of via put_page() or
-> release_pages().
-> 
-> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-> ("mm: introduce put_user_page*(), placeholder versions").
-> 
-> Cc: Eric Anholt <eric@anholt.net>
-> Cc: Stefan Wahren <stefan.wahren@i2se.com>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Mihaela Muraru <mihaela.muraru21@gmail.com>
-> Cc: Suniel Mahesh <sunil.m@techveda.org>
-> Cc: Al Viro <viro@zeniv.linux.org.uk>
-> Cc: Sidong Yang <realwakka@gmail.com>
-> Cc: Kishore KP <kishore.p@techveda.org>
-> Cc: linux-rpi-kernel@lists.infradead.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: devel@driverdev.osuosl.org
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  .../vc04_services/interface/vchiq_arm/vchiq_2835_arm.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
+This series addresses the remaining rpm issues that I'm aware of.
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Jens: Once the patches are merged and you publish a 0.1 release tag I could
+roll the first liburing rpm for Fedora.  liburing itself is in good shape for
+wider consumption but maybe it makes sense to wait for kernel issues to settle.
+There are qemu-iotests failures that are probably kernel bugs (hopefully known
+ones!) and will be investigated soon.
+
+Stefan Hajnoczi (4):
+  COPYING: update to latest LGPL v2.1 text
+  spec: use Fedora "LGPLv2+" license identifier
+  spec: add URL tag
+  spec: fix <liburing/*.h> permissions
+
+ COPYING       | 79 +++++++++++++++++++++------------------------------
+ liburing.spec |  5 ++--
+ 2 files changed, 36 insertions(+), 48 deletions(-)
+
+-- 
+2.21.0
+
