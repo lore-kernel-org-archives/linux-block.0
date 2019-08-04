@@ -2,86 +2,141 @@ Return-Path: <SRS0=RXFR=WA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF23C433FF
-	for <linux-block@archiver.kernel.org>; Sun,  4 Aug 2019 22:16:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E38C433FF
+	for <linux-block@archiver.kernel.org>; Sun,  4 Aug 2019 22:50:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9957420880
-	for <linux-block@archiver.kernel.org>; Sun,  4 Aug 2019 22:16:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564956968;
-	bh=nZTSrb/LTY2MAB6nAXO0fol/JfFShvONnnQGkzjOUa4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:List-ID:From;
-	b=nDQ+a/kCE1efVO45foULCcLYab8CV10dqKEVthrLs4u2YqL5n+B9qYRGnMMen9T4U
-	 M3v+dLt1AaRIDHsyQI7iBj15ze7g64+vOXTRNNW7jdCpM2i8/exk/b4+v3IUwOBgpJ
-	 Cvhl1BUQT8Q8EU+1OZ+wOY5nVEHBbNfYXqgnDuSU=
+	by mail.kernel.org (Postfix) with ESMTP id 8DDEC2089F
+	for <linux-block@archiver.kernel.org>; Sun,  4 Aug 2019 22:50:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aCkaquio"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726805AbfHDWPU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Aug 2019 18:15:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33024 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726687AbfHDWPU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 4 Aug 2019 18:15:20 -0400
-Received: from pobox.suse.cz (prg-ext-pat.suse.com [213.151.95.130])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AE15520880;
-        Sun,  4 Aug 2019 22:15:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564956919;
-        bh=nZTSrb/LTY2MAB6nAXO0fol/JfFShvONnnQGkzjOUa4=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-        b=dqaJuMpQupF/rvtPwFx9HqozchB7AHHAWObO+7ekInaLVD/YidquVA8O3XFxP+cIZ
-         Z0j7jhUeL8CTuBfQn1Op04anAzluRoUpRJLi0Pz2ipPu9DVEn59D0ltfLIRFIkO7DZ
-         dTHsnBb5T4uQmi96cmd9trbNT2XGVc9Ug6hFVfjU=
-Date:   Mon, 5 Aug 2019 00:15:14 +0200 (CEST)
-From:   Jiri Kosina <jikos@kernel.org>
-To:     Denis Efremov <efremov@linux.com>
-cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Willy Tarreau <w@1wt.eu>, Will Deacon <will@kernel.org>,
-        Greg KH <greg@kroah.com>,
-        Alexander Popov <alex.popov@linux.com>, efremov@ispras.ru,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] MAINTAINERS: floppy: take over maintainership
-In-Reply-To: <57af5f3e-9cfe-b6d8-314c-f59855408cd5@linux.com>
-Message-ID: <nycvar.YFH.7.76.1908050013270.5899@cbobk.fhfr.pm>
-References: <20190712185523.7208-1-efremov@ispras.ru> <20190713080726.GA19611@1wt.eu> <ec0a6c5e-bdee-3c26-f5d2-31b883c0de5d@ispras.ru> <CAHk-=wi=fHuiQg1fMzqAP9cuykBQSN_feD=eALDwRPmw27UwEg@mail.gmail.com> <nycvar.YFH.7.76.1907172355020.5899@cbobk.fhfr.pm>
- <57af5f3e-9cfe-b6d8-314c-f59855408cd5@linux.com>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+        id S1727877AbfHDWub (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Aug 2019 18:50:31 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:35170 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727851AbfHDWuO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Aug 2019 18:50:14 -0400
+Received: by mail-pg1-f195.google.com with SMTP id n4so3391534pgv.2;
+        Sun, 04 Aug 2019 15:50:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=cegKTIaYJ+tSle0YiC1yJpybmvJrVZXG5Xryw9OToL0=;
+        b=aCkaquioWJVgZ9oxi+kgs0xYn9XvezpV99sLT07IcNs8SpVl8RxEWxB8NfzIRBrjBL
+         2B4dJHw2cG5TO6qtCk6u4ZcIwavE5x+pbFyHjAA9Gawo5yJz/cR/RN7KLFsBrzcuwVZV
+         WP2fTbo7D/YmdMo3LfJiKW1AjSHc3oDEIZmC59HJW1UrPrOWaY8WJXtwgsxilT0195Uq
+         ocw3UqvOC5KedpAwMEgqM2mZYVxGq6/tGgBNtuTtcR3B451sP4Bb3FZmj7gUlwzeWEUc
+         XzVXXNThe+NP4na45hxvXL3T6bslaXSJNEyIhO73A4aiizrSPKRgEZ7pYwnnfabRC/Y3
+         oqhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=cegKTIaYJ+tSle0YiC1yJpybmvJrVZXG5Xryw9OToL0=;
+        b=R0OBge7xlskAREalUc4IgtIyuIX1H2PZ6jI8WzXviu44sVM+vRz97caUS/TB5yJjJS
+         iClDwKm+dRynEYD9qXpIncRKQxeGZLZNYUJNMtAaIy2rOM2NCOeKDmAkpKfIohuNX0G/
+         b/EOmS8J16HpJKuHKk/IG3Z5IkjqG8ojSwnN7eOg44zhifMYa6fcAAy6FmyUUJAO2Q+p
+         QdhM4RanjlObvbog8Ozfwkt9x1zOEtqC1pmksZ4QJ6HQxjM29pgTAgYd2tnYWY0lmjvu
+         lHlANQtFOkEwcXpNd+27YgJT2M83aiX72X5epT/ATM60eXFACPuCpG0fgyuzNrTGyvVo
+         dKvA==
+X-Gm-Message-State: APjAAAXw1aibgHaSM4ozGSjc8Vidnopgne/iDeEByIUJLkcQ1+/baIDw
+        0zWKzASGlvwVa+fj7QwGjIg=
+X-Google-Smtp-Source: APXvYqwQo0taKdXUQzpI7809Qn44c5UC2qpj3t9n7qUuNadX/5xLSvSBDLCQnHDNoFHPmzlJl8WofQ==
+X-Received: by 2002:a17:90a:2767:: with SMTP id o94mr14743655pje.25.1564959012976;
+        Sun, 04 Aug 2019 15:50:12 -0700 (PDT)
+Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
+        by smtp.gmail.com with ESMTPSA id r6sm35946836pjb.22.2019.08.04.15.50.11
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Sun, 04 Aug 2019 15:50:12 -0700 (PDT)
+From:   john.hubbard@gmail.com
+X-Google-Original-From: jhubbard@nvidia.com
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH v2 34/34] fs/binfmt_elf: convert put_page() to put_user_page*()
+Date:   Sun,  4 Aug 2019 15:49:15 -0700
+Message-Id: <20190804224915.28669-35-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190804224915.28669-1-jhubbard@nvidia.com>
+References: <20190804224915.28669-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+X-NVConfidentiality: public
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 31 Jul 2019, Denis Efremov wrote:
+From: Ira Weiny <ira.weiny@intel.com>
 
-> Well, without jokes about Thunderdome, I've got time, hardware and
-> would like to maintain the floppy. Except the for recent fixes,
-> I described floppy ioctls in syzkaller. I've already spent quite
-> a lot of time with this code. Thus, if nobody minds
-> 
-> -- >8 --
-> From: Denis Efremov <efremov@linux.com>
-> Subject: [PATCH] MAINTAINERS: floppy: take over maintainership
-> 
-> I would like to maintain the floppy driver. After the recent fixes,
-> I think I know the code pretty well. Nowadays I've got 2 physical 3.5"
-> readers to test all the changes.
-> 
-> Signed-off-by: Denis Efremov <efremov@linux.com>
+For pages that were retained via get_user_pages*(), release those pages
+via the new put_user_page*() routines, instead of via put_page() or
+release_pages().
 
-Awesome, thanks a lot Denis for offering to carry the torch I dropped. 
-Obviously:
+This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+("mm: introduce put_user_page*(), placeholder versions").
 
-	Acked-by: Jiri Kosina <jkosina@suse.cz>
+get_dump_page calls get_user_page so put_user_page must be used
+to match.
 
+Signed-off-by: Ira Weiny <ira.weiny@intel.com>
+Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+---
+ fs/binfmt_elf.c       | 2 +-
+ fs/binfmt_elf_fdpic.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fs/binfmt_elf.c b/fs/binfmt_elf.c
+index d4e11b2e04f6..92e4a5ca99d8 100644
+--- a/fs/binfmt_elf.c
++++ b/fs/binfmt_elf.c
+@@ -2377,7 +2377,7 @@ static int elf_core_dump(struct coredump_params *cprm)
+ 				void *kaddr = kmap(page);
+ 				stop = !dump_emit(cprm, kaddr, PAGE_SIZE);
+ 				kunmap(page);
+-				put_page(page);
++				put_user_page(page);
+ 			} else
+ 				stop = !dump_skip(cprm, PAGE_SIZE);
+ 			if (stop)
+diff --git a/fs/binfmt_elf_fdpic.c b/fs/binfmt_elf_fdpic.c
+index d86ebd0dcc3d..321724b3be22 100644
+--- a/fs/binfmt_elf_fdpic.c
++++ b/fs/binfmt_elf_fdpic.c
+@@ -1511,7 +1511,7 @@ static bool elf_fdpic_dump_segments(struct coredump_params *cprm)
+ 				void *kaddr = kmap(page);
+ 				res = dump_emit(cprm, kaddr, PAGE_SIZE);
+ 				kunmap(page);
+-				put_page(page);
++				put_user_page(page);
+ 			} else {
+ 				res = dump_skip(cprm, PAGE_SIZE);
+ 			}
 -- 
-Jiri Kosina
-SUSE Labs
+2.22.0
 
