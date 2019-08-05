@@ -2,97 +2,76 @@ Return-Path: <SRS0=923v=WB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE497C0650F
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 23:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F41C433FF
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 23:59:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 914472070D
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 23:25:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9FCA20825
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 23:59:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729999AbfHEXZU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Aug 2019 19:25:20 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:33628 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728870AbfHEXZT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Aug 2019 19:25:19 -0400
-Received: by mail-pf1-f194.google.com with SMTP id g2so40415047pfq.0
-        for <linux-block@vger.kernel.org>; Mon, 05 Aug 2019 16:25:19 -0700 (PDT)
+        id S1730037AbfHEX7C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Aug 2019 19:59:02 -0400
+Received: from mail-ot1-f69.google.com ([209.85.210.69]:51567 "EHLO
+        mail-ot1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728483AbfHEX7C (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Aug 2019 19:59:02 -0400
+Received: by mail-ot1-f69.google.com with SMTP id h12so47330233otn.18
+        for <linux-block@vger.kernel.org>; Mon, 05 Aug 2019 16:59:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=NvFUBf4wBfd2sLnVnccckZVTV0U+FEVxEHBCis6K9cQ=;
-        b=ZUL5Bm61z66V4lQtgCERBHC1p13vEgP3VpgcDCjjNnEGp8/2ph6eEuj/dbyD4UtadY
-         thTFZ8or6UQTfdak/RTrhb1FwNAJeEY/Ku3WLDjY9y8Y8eC6N6yEHlqjmMQE3w4DSD+R
-         vuE/96mBUA5f/ug61fVGrVWdWRI4NHjZHqaPY6spz8xSSWh5Iy/x+Z9gk5jzTSRYFBIi
-         YxOQiQGr2GNIHm87pRVPJZDnTm8VcXgy5w/a6NP8t3Zn37986eyhsN/cEe26XY/nmYC/
-         abocvfDOo5A3ozBB9U7hRvYeu73ljGN+Qp+p5caf1xVC15RDjiQOKrqUFr14sSu8rmTj
-         JDIA==
-X-Gm-Message-State: APjAAAW013o2/yuM+Q077sKfxzcRWvtts5GMvaTLSE7RMo4qx6Po0PUe
-        JgqdNomp9nA/wDuRv7szJyU=
-X-Google-Smtp-Source: APXvYqwGkUgEUOqRdT+nfBrgKxHiM3pKwUb1mqcrFTkUNRf0YMSSq7RGMLtVjz+MFbQpuc7NqFCZAA==
-X-Received: by 2002:a17:90b:d8a:: with SMTP id bg10mr189248pjb.92.1565047519042;
-        Mon, 05 Aug 2019 16:25:19 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id a5sm17905209pjv.21.2019.08.05.16.25.17
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 05 Aug 2019 16:25:17 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Omar Sandoval <osandov@fb.com>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests] Make the NVMe tests more reliable
-Date:   Mon,  5 Aug 2019 16:25:12 -0700
-Message-Id: <20190805232512.50992-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.22.0.770.g0f2c4a37fd-goog
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=cCEYw1YNz6YzHWfgF679x03NeagqCuKTljhuC5ujasE=;
+        b=anQkQ6CSrSbAcHcCzaPdcUYb34osMDK8xAMkzco4h08KozPT/HOfv0qLFWHwb6V3ye
+         9OiIW0UFQ1ekJifnoJRxXMbn+EavIG3xPfw6xXv0osDnrKNrBJ6UwfeQOtXao2NAc2bX
+         RjfpGy0OL6B4YdVmYjnYMBU1nvVB1GgbTr2RPrAYu+yyF2WI71/pvvRcJU9bOvLXwxN4
+         ZUb30V0J9VRRL8AGSfpdqpFJMcO5EtNDcqag99b8KCZmNXU0nmd4o35+jx7KSVpNpM7o
+         WMpMu7Qipnkp3QUkLGwe2uObodJgHnxOsN+W0D1qOFGF1chG0A3jQYjUdfrpLj55c4KK
+         h9IQ==
+X-Gm-Message-State: APjAAAWnR058vkn7HrHI8gpBC7XWQbEowidauhOCIJr/KK2WRBDImAAf
+        nS9co3dPgi1tCbYNkt+B0nJZoamlAom8Xr7f0YGg5ZdV/Kvh
+X-Google-Smtp-Source: APXvYqwnWehfXVv+cTgMbmC8JDtGgeKanwz/g7rHrVO82/VKU6rQkcOihO2EYpiU+OJoGnyjFk/K9Z7NbCjOUvfNijzTrmNmUP5+
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:5:: with SMTP id z5mr1098412jao.58.1565049541088;
+ Mon, 05 Aug 2019 16:59:01 -0700 (PDT)
+Date:   Mon, 05 Aug 2019 16:59:01 -0700
+In-Reply-To: <000000000000d0df7f058f625d13@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f3dd5b058f677d84@google.com>
+Subject: Re: WARNING: refcount bug in blk_mq_free_request (2)
+From:   syzbot <syzbot+f4316dab9d4518b755eb@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, hch@lst.de, keith.busch@intel.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When running blktests with kernel debugging enabled it can happen that
-_find_nvme_loop_dev() returns before the NVMe block device has appeared
-in sysfs. This patch avoids that the NVMe tests fail as follows:
+syzbot has bisected this bug to:
 
-+cat: /sys/block/nvme1n1/uuid: No such file or directory
-+cat: /sys/block/nvme1n1/wwid: No such file or directory
+commit 12f5b93145450c750f315657ef239a314811aeeb
+Author: Keith Busch <keith.busch@intel.com>
+Date:   Tue May 29 13:52:28 2018 +0000
 
-Cc: Logan Gunthorpe <logang@deltatee.com>
-Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- tests/nvme/rc | 8 ++++++++
- 1 file changed, 8 insertions(+)
+     blk-mq: Remove generation seqeunce
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 348b4a3c2cbc..05dfc5915a13 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -169,8 +169,16 @@ _find_nvme_loop_dev() {
- 		transport="$(cat "/sys/class/nvme/${dev}/transport")"
- 		if [[ "$transport" == "loop" ]]; then
- 			echo "$dev"
-+			for ((i=0;i<10;i++)); do
-+				[ -e /sys/block/$dev/uuid ] &&
-+					[ -e /sys/block/$dev/wwid ] &&
-+					return 0
-+				sleep .1
-+			done
-+			return 1
- 		fi
- 	done
-+	return 1
- }
- 
- _filter_discovery() {
--- 
-2.22.0.770.g0f2c4a37fd-goog
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1263808c600000
+start commit:   e21a712a Linux 5.3-rc3
+git tree:       upstream
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=1163808c600000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1663808c600000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a4c9e9f08e9e8960
+dashboard link: https://syzkaller.appspot.com/bug?extid=f4316dab9d4518b755eb
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=117a1906600000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11aa11aa600000
 
+Reported-by: syzbot+f4316dab9d4518b755eb@syzkaller.appspotmail.com
+Fixes: 12f5b9314545 ("blk-mq: Remove generation seqeunce")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
