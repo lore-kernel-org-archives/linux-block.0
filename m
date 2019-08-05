@@ -2,170 +2,209 @@ Return-Path: <SRS0=923v=WB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E250C433FF
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 20:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64446C32751
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 20:31:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2BC0120665
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 20:02:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38A2F216F4
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 20:31:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="d4bkb6vW"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AK706tHM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728831AbfHEUCO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Aug 2019 16:02:14 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:33264 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727830AbfHEUCO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Aug 2019 16:02:14 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x75JxJoa014801;
-        Mon, 5 Aug 2019 20:02:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2018-07-02;
- bh=0s5SjS/9VwIFL1MIYzBpG9oPEz0xwSOto06hAmnmhEc=;
- b=d4bkb6vWGEi/v1DM15Xnylb7MkgrqE/lVuk+JTyr7ERubC03jczrFbvJcenfiL2+XV1e
- d2V03/RtwGm3fE1NHLvCvBI8gQY0Albyb8gPf2NqPStBk+Ov6sSI0SRrK8bQ6ZOoBKq/
- mBsWJfUWEqaCKCyRaDrtP9aqtN7OW2EHPeYSUM0iR6aiIrGSG7e7axBDQC493ILK/s9z
- LRelKD5zJYsumXdgCYEtHmHvv3jouEQKjWXbmnfoRYGfmPLCnCTqGgKHiTwLIib+/oAt
- pUL5unAGqJHVmmyEHdoJmbqPsfwbY8Q24+XY2pzUZ8l49MyunZz0LMC7GEnvOypa8zS3 TQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2u51ptsj3e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 05 Aug 2019 20:02:11 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x75JwOSX180328;
-        Mon, 5 Aug 2019 20:02:11 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 2u50ac2xau-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 05 Aug 2019 20:02:10 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x75K2AcQ032183;
-        Mon, 5 Aug 2019 20:02:10 GMT
-Received: from jubi-laptop.us.oracle.com (/10.11.23.49)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 05 Aug 2019 13:02:10 -0700
-From:   Junxiao Bi <junxiao.bi@oracle.com>
-To:     linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, axboe@kernel.dk,
-        martin.petersen@oracle.com, junxiao.bi@oracle.com
-Subject: [PATCH] block: fix RO partition with RW disk
-Date:   Mon,  5 Aug 2019 13:01:38 -0700
-Message-Id: <20190805200138.28098-1-junxiao.bi@oracle.com>
-X-Mailer: git-send-email 2.17.1
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9340 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908050200
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9340 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908050200
+        id S1730457AbfHEUbu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Aug 2019 16:31:50 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:39495 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730222AbfHEUbu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Aug 2019 16:31:50 -0400
+Received: by mail-pf1-f196.google.com with SMTP id f17so36218947pfn.6
+        for <linux-block@vger.kernel.org>; Mon, 05 Aug 2019 13:31:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=pu0np+1ZYOIyBqJfLbasl0leNFngQoE5A8k5UJvBeCE=;
+        b=AK706tHMVu65YfAgXewsEIlem10gCwIao/L4J/aHh2vWYsTOXDhrysOPgkiG9jd7ky
+         dtXRrvwwGbK1RvstZJucysjRXwrvPFflMS3hksAltHbpZvXuZ1U7N9TyuBLsiUyIYBln
+         V3SlSTCo7005VPp9YwLl1O5TG5ioWCAWznStvlnI0tBvWvyXjDfjYZG4RlYfGBWtx8h+
+         7u6beFzY7M6z89ssP+fOFgGjPgunAVJdJ3/samMrxsyh1IMRS2JPtsEyYYJ+vWk/52/x
+         w9Berm9Vakf5pvbcNU8uvX4fQXI+Gwkk/glB5f4tjpagtMqA6DsJHY+5hzB89OOxEv1k
+         OHug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pu0np+1ZYOIyBqJfLbasl0leNFngQoE5A8k5UJvBeCE=;
+        b=ZM9duenES986lawd3UqOqpJe5/WD2x72VuDszJMUBFlrhq0xQELFZtDCaLr9O2nHku
+         njLi7IzjWTqfwbXReXrxbOkTWoMYo2AgeWdKfRn+yagXyeT61a7o/C25QS0vDQbJWUis
+         A4xbgJ8OpM1NG5PV1+ijVwl9umJkJ+c3DPxe/bAl1NwnKtI5rzt05xze66VxIJ1VlvVs
+         Snlww4unVAGfJZCveSKavUUR7P5NgohWm0YbxXc1GjbYleMQN3Sb9l28148+4uBMMvMm
+         jGHnyBWgwaYtrSJGRd19JcHE5tvidtqFCh1eDfWMscZDsMRIdS8ir0sS0/jcg4jnTDQU
+         K1Sw==
+X-Gm-Message-State: APjAAAWopiQLK9eTqhIEMA0yd9aIaybEBAp+ssPfNuFPb7eVLiqcbXyv
+        WLOpqgC9IIFz3GlUQptBW5Y=
+X-Google-Smtp-Source: APXvYqx5G7YqOdl8z0h8sD/iUkvtbc7v12NcUh3B4/js0BnY7bNEPNtNZBQ3Z+JJ71hyrr3kgruQNA==
+X-Received: by 2002:a62:642:: with SMTP id 63mr75352982pfg.257.1565037108634;
+        Mon, 05 Aug 2019 13:31:48 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:83a1:3cf5:36ed:899e:8d54? ([2605:e000:100e:83a1:3cf5:36ed:899e:8d54])
+        by smtp.gmail.com with ESMTPSA id u128sm97527386pfu.48.2019.08.05.13.31.46
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 05 Aug 2019 13:31:47 -0700 (PDT)
+Subject: Re: Block device direct read EIO handling broken?
+From:   Jens Axboe <axboe@kernel.dk>
+To:     "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org, xfs <linux-xfs@vger.kernel.org>
+References: <20190805181524.GE7129@magnolia>
+ <66bd785d-7598-5cc2-5e98-447fd128c153@kernel.dk>
+Message-ID: <36973a52-e876-fc09-7a63-2fc16b855f8d@kernel.dk>
+Date:   Mon, 5 Aug 2019 13:31:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <66bd785d-7598-5cc2-5e98-447fd128c153@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When md raid1 was used with imsm metadata, during the boot stage,
-the raid device will first be set to readonly, then mdmon will set
-it read-write later. When there were some partitions in this device,
-the following race would make some partition left ro and fail to mount.
+On 8/5/19 11:31 AM, Jens Axboe wrote:
+> On 8/5/19 11:15 AM, Darrick J. Wong wrote:
+>> Hi Damien,
+>>
+>> I noticed a regression in xfs/747 (an unreleased xfstest for the
+>> xfs_scrub media scanning feature) on 5.3-rc3.  I'll condense that down
+>> to a simpler reproducer:
+>>
+>> # dmsetup table
+>> error-test: 0 209 linear 8:48 0
+>> error-test: 209 1 error
+>> error-test: 210 6446894 linear 8:48 210
+>>
+>> Basically we have a ~3G /dev/sdd and we set up device mapper to fail IO
+>> for sector 209 and to pass the io to the scsi device everywhere else.
+>>
+>> On 5.3-rc3, performing a directio pread of this range with a < 1M buffer
+>> (in other words, a request for fewer than MAX_BIO_PAGES bytes) yields
+>> EIO like you'd expect:
+>>
+>> # strace -e pread64 xfs_io -d -c 'pread -b 1024k 0k 1120k' /dev/mapper/error-test
+>> pread64(3, 0x7f880e1c7000, 1048576, 0)  = -1 EIO (Input/output error)
+>> pread: Input/output error
+>> +++ exited with 0 +++
+>>
+>> But doing it with a larger buffer succeeds(!):
+>>
+>> # strace -e pread64 xfs_io -d -c 'pread -b 2048k 0k 1120k' /dev/mapper/error-test
+>> pread64(3, "XFSB\0\0\20\0\0\0\0\0\0\fL\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 1146880, 0) = 1146880
+>> read 1146880/1146880 bytes at offset 0
+>> 1 MiB, 1 ops; 0.0009 sec (1.124 GiB/sec and 1052.6316 ops/sec)
+>> +++ exited with 0 +++
+>>
+>> (Note that the part of the buffer corresponding to the dm-error area is
+>> uninitialized)
+>>
+>> On 5.3-rc2, both commands would fail with EIO like you'd expect.  The
+>> only change between rc2 and rc3 is commit 0eb6ddfb865c ("block: Fix
+>> __blkdev_direct_IO() for bio fragments").
+>>
+>> AFAICT we end up in __blkdev_direct_IO with a 1120K buffer, which gets
+>> split into two bios: one for the first BIO_MAX_PAGES worth of data (1MB)
+>> and a second one for the 96k after that.
+>>
+>> I think the problem is that every time we submit a bio, we increase ret
+>> by the size of that bio, but at the time we do that we have no idea if
+>> the bio is going to succeed or not.  At the end of the function we do:
+>>
+>> 	if (!ret)
+>> 		ret = blk_status_to_errno(dio->bio.bi_status);
+>>
+>> Which means that we only pick up the IO error if we haven't already set
+>> ret.  I suppose that was useful for being able to return a short read,
+>> but now that we always increment ret by the size of the bio, we act like
+>> the whole buffer was read.  I tried a -rc2 kernel and found that 40% of
+>> the time I'd get an EIO and the rest of the time I got a short read.
+>>
+>> Not sure where to go from here, but something's not right...
+> 
+> I'll take a look.
 
-CPU 1:                                                 CPU 2:
-add_partition()                                        set_disk_ro() //set disk RW
- //disk was RO, so partition set to RO
- p->policy = get_disk_ro(disk);
-                                                        if (disk->part0.policy != flag) {
-                                                            set_disk_ro_uevent(disk, flag);
-                                                            // disk set to RW
-                                                            disk->part0.policy = flag;
-                                                        }
-                                                        // set all exit partition to RW
-                                                        while ((part = disk_part_iter_next(&piter)))
-                                                            part->policy = flag;
- // this part was not yet added, so it was still RO
- rcu_assign_pointer(ptbl->part[partno], p);
+How about this? The old code did:
 
-Move RO status setting of partitions after they were added into partition
-table and introduce a mutex to sync RO status between disk and partitions.
+	if (!ret)
+		ret = blk_status_to_errno(dio->bio.bi_status);
+	if (likely(!ret))
+		ret = dio->size;
 
-Signed-off-by: Junxiao Bi <junxiao.bi@oracle.com>
----
- block/genhd.c             | 3 +++
- block/partition-generic.c | 5 ++++-
- include/linux/genhd.h     | 1 +
- 3 files changed, 8 insertions(+), 1 deletion(-)
+where 'ret' was just tracking the error. With 'ret' now being the
+positive IO size, we should overwrite it if ret is >= 0, not just if
+it's zero.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 54f1f0d381f4..f3cce1d354cf 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1479,6 +1479,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+Also kill a use-after-free.
+
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index a6f7c892cb4a..67c8e87c9481 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -386,6 +386,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 
+ 	ret = 0;
+ 	for (;;) {
++		ssize_t this_size;
+ 		int err;
+ 
+ 		bio_set_dev(bio, bdev);
+@@ -433,13 +434,14 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 				polled = true;
+ 			}
+ 
++			this_size = bio->bi_iter.bi_size;
+ 			qc = submit_bio(bio);
+ 			if (qc == BLK_QC_T_EAGAIN) {
+ 				if (!ret)
+ 					ret = -EAGAIN;
+ 				goto error;
+ 			}
+-			ret = dio->size;
++			ret += this_size;
+ 
+ 			if (polled)
+ 				WRITE_ONCE(iocb->ki_cookie, qc);
+@@ -460,13 +462,14 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 			atomic_inc(&dio->ref);
  		}
- 		ptbl = rcu_dereference_protected(disk->part_tbl, 1);
- 		rcu_assign_pointer(ptbl->part[0], &disk->part0);
-+		mutex_init(&disk->part_lock);
  
- 		/*
- 		 * set_capacity() and get_capacity() currently don't use
-@@ -1570,6 +1571,7 @@ void set_disk_ro(struct gendisk *disk, int flag)
- 	struct disk_part_iter piter;
- 	struct hd_struct *part;
++		this_size = bio->bi_iter.bi_size;
+ 		qc = submit_bio(bio);
+ 		if (qc == BLK_QC_T_EAGAIN) {
+ 			if (!ret)
+ 				ret = -EAGAIN;
+ 			goto error;
+ 		}
+-		ret = dio->size;
++		ret += this_size;
  
-+	mutex_lock(&disk->part_lock);
- 	if (disk->part0.policy != flag) {
- 		set_disk_ro_uevent(disk, flag);
- 		disk->part0.policy = flag;
-@@ -1579,6 +1581,7 @@ void set_disk_ro(struct gendisk *disk, int flag)
- 	while ((part = disk_part_iter_next(&piter)))
- 		part->policy = flag;
- 	disk_part_iter_exit(&piter);
-+	mutex_unlock(&disk->part_lock);
- }
+ 		bio = bio_alloc(gfp, nr_pages);
+ 		if (!bio) {
+@@ -494,7 +497,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 	__set_current_state(TASK_RUNNING);
  
- EXPORT_SYMBOL(set_disk_ro);
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index aee643ce13d1..63cb6fb996ff 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -345,7 +345,6 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
- 		queue_limit_discard_alignment(&disk->queue->limits, start);
- 	p->nr_sects = len;
- 	p->partno = partno;
--	p->policy = get_disk_ro(disk);
+ out:
+-	if (!ret)
++	if (ret >= 0)
+ 		ret = blk_status_to_errno(dio->bio.bi_status);
  
- 	if (info) {
- 		struct partition_meta_info *pinfo = alloc_part_info(disk);
-@@ -401,6 +400,10 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
- 	/* everything is up and running, commence */
- 	rcu_assign_pointer(ptbl->part[partno], p);
- 
-+	mutex_lock(&disk->part_lock);
-+	p->policy = get_disk_ro(disk);
-+	mutex_unlock(&disk->part_lock);
-+
- 	/* suppress uevent if the disk suppresses it */
- 	if (!dev_get_uevent_suppress(ddev))
- 		kobject_uevent(&pdev->kobj, KOBJ_ADD);
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 8b5330dd5ac0..df6ddca8a92c 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -201,6 +201,7 @@ struct gendisk {
- 	 */
- 	struct disk_part_tbl __rcu *part_tbl;
- 	struct hd_struct part0;
-+	struct mutex part_lock;
- 
- 	const struct block_device_operations *fops;
- 	struct request_queue *queue;
+ 	bio_put(&dio->bio);
+
 -- 
-2.17.1
+Jens Axboe
 
