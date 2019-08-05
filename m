@@ -2,96 +2,139 @@ Return-Path: <SRS0=923v=WB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C8BC0650F
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 18:19:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C476EC0650F
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 18:31:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 893A1216F4
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 18:19:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565029172;
-	bh=JcOyHGnvJbkKZAaNNwgc9g3yP2z3wX2Ay4Kx76HjVQU=;
-	h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:
-	 List-ID:From;
-	b=TB5xMZb5NX7xOKL1q9Ak36BQXYIGLXlu9/qQCRz9Y/nYWQNKr3xtoXDbsbLQJGu1x
-	 HuAdwzNBYyrZuUTSzy/mqcZdgS/hALH5xJIntkU8FQ38jZAUIQAPD9fkcj73Tc877U
-	 gSoPX6FG6gHJYqo4xn0s9KCLOZNSnZAHg/VSGDyQ=
+	by mail.kernel.org (Postfix) with ESMTP id 8866B20B1F
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 18:31:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="FQ8/QJpU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729334AbfHESTc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Aug 2019 14:19:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37394 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728701AbfHESTb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Aug 2019 14:19:31 -0400
-Received: from localhost (unknown [23.100.24.84])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AB86F214C6;
-        Mon,  5 Aug 2019 18:19:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565029170;
-        bh=JcOyHGnvJbkKZAaNNwgc9g3yP2z3wX2Ay4Kx76HjVQU=;
-        h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:From;
-        b=tTQcM4Yja+YjnDgwLWJ7lDTeAFzlebskea74Hf5kuPAqQFC5CPbrfLbAjBZ28dsI4
-         11w6bAdpSWg0lyLxcYnZmHT50xVvadOMgi/lTlh8JqX6jnhF/9fJ8sN2p2h79SywPX
-         oBU5wae9g3mb6dUZ7vEIhucp7HHxoOrJ2fQCSTkU=
-Date:   Mon, 05 Aug 2019 18:19:29 +0000
-From:   Sasha Levin <sashal@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
-To:     Mike Christie <mchristi@redhat.com>
-To:     josef@toxicpanda.com, linux-block@vger.kernel.org
-Cc:     Mike Christie <mchristi@redhat.com>, stable@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH 1/1] nbd: fix max number of supported devs
-In-Reply-To: <20190804191006.5359-1-mchristi@redhat.com>
-References: <20190804191006.5359-1-mchristi@redhat.com>
-Message-Id: <20190805181930.AB86F214C6@mail.kernel.org>
+        id S1730034AbfHESbi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Aug 2019 14:31:38 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:45376 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729962AbfHESbi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Aug 2019 14:31:38 -0400
+Received: by mail-pf1-f196.google.com with SMTP id r1so40054959pfq.12
+        for <linux-block@vger.kernel.org>; Mon, 05 Aug 2019 11:31:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=vb8nbD2Y1AOSenS6ipNePv+hTU0AoDzRe+mZjBVr60M=;
+        b=FQ8/QJpU54Q9mPsBz1vezdjjZXYOxrJuwkraIVrC3qVrJy+JMQvnudcxnrGnmYGIis
+         7AK36mhKrkFLaZybuTAqOIop6z79CkC10BJ+ZUqsHEDSzK79w1IFtwJ5EUlFWKrJ4Io2
+         mFPMStY1iUCBfcBX87585Ups5roZeKCmm5w1N9uypZU/sORcrcDobdmQwgHQaljfACEj
+         xXetezN1a597Jlhmre0s3NXXzRpiJeCPBOd9pUkij22C2/JjPabN0W2fpiJHHeH29sFd
+         MEUKK7uODxB/qLFxj+bXjbAMYsdFad36OcaKn1AjVefqUkMMX4zaQluV4Z9L/VSHur+n
+         i65g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vb8nbD2Y1AOSenS6ipNePv+hTU0AoDzRe+mZjBVr60M=;
+        b=DoP/uot2p2Z1SCCL33Ce1RmMBwqEWcHuCtEOkwK9Q3pZuzqtgZCVxhPSt9ug61wGLP
+         ncyp0aYvFrw0oKlbZ5XnzzCBYoWHxhaVxRT4T/66TUSGyGvbU1GWPjZegH+OJ0vhKRId
+         9cQWeQck6er064qXmnmefaId279I8lUd7f1JCLfiVkpZIms/L7Xe8gr5248/PTWyH+w+
+         zQxLFAYNBPu44jS4fnFqYTM6NSg1JICOVwGWnIlIIFmHZSXsPyyTWmOMp9xb9oI+Pw3I
+         ALzyOYc8NxstqksAu+215qJgts6z1uqbr4flvYkuuTXxPQ099flvPR0UJApzSyV8VCrJ
+         Zuww==
+X-Gm-Message-State: APjAAAUP9jcpwjEZP6UCQx55p2p4tSHuJMGErRsnp8neZCuEPQUr6AhR
+        kta6zQee42dIom2dP3v/coE=
+X-Google-Smtp-Source: APXvYqwX4fkAXNbMrX/LeQdVs9rPoIiPR2SpBszm11zSzS9alOptNdzZLMy3TcM4lU/bdoQWooQc0Q==
+X-Received: by 2002:a63:3ec7:: with SMTP id l190mr141567457pga.334.1565029897982;
+        Mon, 05 Aug 2019 11:31:37 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:83a1:3cf5:36ed:899e:8d54? ([2605:e000:100e:83a1:3cf5:36ed:899e:8d54])
+        by smtp.gmail.com with ESMTPSA id q69sm21408838pjb.0.2019.08.05.11.31.36
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 05 Aug 2019 11:31:36 -0700 (PDT)
+Subject: Re: Block device direct read EIO handling broken?
+To:     "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org, xfs <linux-xfs@vger.kernel.org>
+References: <20190805181524.GE7129@magnolia>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <66bd785d-7598-5cc2-5e98-447fd128c153@kernel.dk>
+Date:   Mon, 5 Aug 2019 11:31:35 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190805181524.GE7129@magnolia>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 8/5/19 11:15 AM, Darrick J. Wong wrote:
+> Hi Damien,
+> 
+> I noticed a regression in xfs/747 (an unreleased xfstest for the
+> xfs_scrub media scanning feature) on 5.3-rc3.  I'll condense that down
+> to a simpler reproducer:
+> 
+> # dmsetup table
+> error-test: 0 209 linear 8:48 0
+> error-test: 209 1 error
+> error-test: 210 6446894 linear 8:48 210
+> 
+> Basically we have a ~3G /dev/sdd and we set up device mapper to fail IO
+> for sector 209 and to pass the io to the scsi device everywhere else.
+> 
+> On 5.3-rc3, performing a directio pread of this range with a < 1M buffer
+> (in other words, a request for fewer than MAX_BIO_PAGES bytes) yields
+> EIO like you'd expect:
+> 
+> # strace -e pread64 xfs_io -d -c 'pread -b 1024k 0k 1120k' /dev/mapper/error-test
+> pread64(3, 0x7f880e1c7000, 1048576, 0)  = -1 EIO (Input/output error)
+> pread: Input/output error
+> +++ exited with 0 +++
+> 
+> But doing it with a larger buffer succeeds(!):
+> 
+> # strace -e pread64 xfs_io -d -c 'pread -b 2048k 0k 1120k' /dev/mapper/error-test
+> pread64(3, "XFSB\0\0\20\0\0\0\0\0\0\fL\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 1146880, 0) = 1146880
+> read 1146880/1146880 bytes at offset 0
+> 1 MiB, 1 ops; 0.0009 sec (1.124 GiB/sec and 1052.6316 ops/sec)
+> +++ exited with 0 +++
+> 
+> (Note that the part of the buffer corresponding to the dm-error area is
+> uninitialized)
+> 
+> On 5.3-rc2, both commands would fail with EIO like you'd expect.  The
+> only change between rc2 and rc3 is commit 0eb6ddfb865c ("block: Fix
+> __blkdev_direct_IO() for bio fragments").
+> 
+> AFAICT we end up in __blkdev_direct_IO with a 1120K buffer, which gets
+> split into two bios: one for the first BIO_MAX_PAGES worth of data (1MB)
+> and a second one for the 96k after that.
+> 
+> I think the problem is that every time we submit a bio, we increase ret
+> by the size of that bio, but at the time we do that we have no idea if
+> the bio is going to succeed or not.  At the end of the function we do:
+> 
+> 	if (!ret)
+> 		ret = blk_status_to_errno(dio->bio.bi_status);
+> 
+> Which means that we only pick up the IO error if we haven't already set
+> ret.  I suppose that was useful for being able to return a short read,
+> but now that we always increment ret by the size of the bio, we act like
+> the whole buffer was read.  I tried a -rc2 kernel and found that 40% of
+> the time I'd get an EIO and the rest of the time I got a short read.
+> 
+> Not sure where to go from here, but something's not right...
 
-[This is an automated email]
+I'll take a look.
 
-This commit has been processed because it contains a -stable tag.
-The stable tag indicates that it's relevant for the following trees: all
+-- 
+Jens Axboe
 
-The bot has tested the following trees: v5.2.6, v4.19.64, v4.14.136, v4.9.187, v4.4.187.
-
-v5.2.6: Build OK!
-v4.19.64: Build OK!
-v4.14.136: Failed to apply! Possible dependencies:
-    2189c97cdbed ("block/ndb: add WQ_UNBOUND to the knbd-recv workqueue")
-
-v4.9.187: Failed to apply! Possible dependencies:
-    20032ec38d16 ("nbd: reset the setup task for NBD_CLEAR_SOCK")
-    5ea8d10802ec ("nbd: separate out the config information")
-    9442b739207a ("nbd: cleanup ioctl handling")
-    9561a7ade0c2 ("nbd: add multi-connection support")
-    feffa5cc7b47 ("nbd: fix setting of 'error' in NBD_DO_IT ioctl")
-
-v4.4.187: Failed to apply! Possible dependencies:
-    0e4f0f6f63d3 ("nbd: Cleanup reset of nbd and bdev after a disconnect")
-    1f7b5cf1be43 ("nbd: Timeouts are not user requested disconnects")
-    23272a6754b8 ("nbd: Remove signal usage")
-    37091fdd831f ("nbd: Create size change events for userspace")
-    5ea8d10802ec ("nbd: separate out the config information")
-    9561a7ade0c2 ("nbd: add multi-connection support")
-    97240963eb30 ("nbd: fix race in ioctl")
-    9b4a6ba9185a ("nbd: use flags instead of bool")
-    fd8383fd88a2 ("nbd: convert to blkmq")
-
-
-NOTE: The patch will not be queued to stable trees until it is upstream.
-
-How should we proceed with this patch?
-
---
-Thanks,
-Sasha
