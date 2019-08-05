@@ -2,85 +2,67 @@ Return-Path: <SRS0=923v=WB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B90C433FF
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 03:44:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96835C433FF
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 04:15:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2FC8B217D9
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 03:44:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IXcfai26"
+	by mail.kernel.org (Postfix) with ESMTP id 6F1452086D
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 04:15:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726847AbfHEDoa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Aug 2019 23:44:30 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:43620 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727057AbfHEDo0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Aug 2019 23:44:26 -0400
-Received: by mail-pg1-f194.google.com with SMTP id r26so3005847pgl.10
-        for <linux-block@vger.kernel.org>; Sun, 04 Aug 2019 20:44:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=qaevOKKBkx9wzczWsPhokAptJGi+7DJxhR9knuVBhIc=;
-        b=IXcfai26P/X8GzjqUOtmAH/Jo83R/2UjSztaety4x290UiwGJr62Nqbed+2gcSQnQq
-         dqrgQtS9ocweR9XW2Mm9pHhrHFFRMBaxYLcm1pzOCTxIROUS9hvQ0qWmtamBqxPLZnOT
-         EhjWLNHhSgeW0KfvyTB5RDtd5Dx9aJd7gcu2qMZsycPbBk5FRPwlnfzs1JqQpV41O2NT
-         TPWPxUu0Sy5kUJDKrSn5SMTtpXqbO/vsBlmx8w9Dg1h8usHVPrStDNgIQeda0jezkGNQ
-         kPsX+LoS4FBe/97ALO78rYF45eRlRbbdHtywIrV0PhhVjh1e7t5mswweENmRPEKXbsYl
-         gxSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=qaevOKKBkx9wzczWsPhokAptJGi+7DJxhR9knuVBhIc=;
-        b=su2S8pjdvyV7shxvvz3vHCPUqHIPTYGC/SMNbIzPa3wdiwdrEyFRmyb1yygBgsUIcC
-         q3H8vEJza4uD9I0kMe/29bv5IsXARD4MK57wRi1XWmwtaz/YxIhxbqqId1Ws/476XdFS
-         CcsCcAtbQdEPn5rnjdQg/Dv4YRMoz4Y1O4j21sYx+77mo89CdAJqSERp9evjumxU9dyF
-         bbnKzFzLoLtLO4PeknP/JFDpdc4+YyodRvENuETUhGY9clBMl2HyMiZR8HL+PALwabMk
-         yNZ9ERfSskchsE1lWHnzqN5KEA3rG5ncdD/Ee3A+hJELSMbAlkgBWKpbJG4vkbure2/3
-         PCVw==
-X-Gm-Message-State: APjAAAVOb6IMiZ6sCznq0z0WAdHkaKAG39PL+zyALFI/KZB9PFsNCfoO
-        s/Dc4X7EO9i9QuZauURNOFQ1I5fxidA=
-X-Google-Smtp-Source: APXvYqy4lnuT+Nq4f5lxPk3nmqptozGkTW1Nn0qcFMewuAbFZKOxXjof5Tv5YsVkUmYJ47dOKqH08g==
-X-Received: by 2002:a17:90a:376f:: with SMTP id u102mr16333110pjb.5.1564976665920;
-        Sun, 04 Aug 2019 20:44:25 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:83a1:61e6:1197:7c18:827e? ([2605:e000:100e:83a1:61e6:1197:7c18:827e])
-        by smtp.gmail.com with ESMTPSA id t8sm13977229pji.24.2019.08.04.20.44.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 04 Aug 2019 20:44:25 -0700 (PDT)
-Subject: Re: [PATCH] fs/io_uring.c: convert put_page() to put_user_page*()
+        id S1727123AbfHEEPc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Aug 2019 00:15:32 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41512 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726454AbfHEEPc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Aug 2019 00:15:32 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 56732ACC1;
+        Mon,  5 Aug 2019 04:15:29 +0000 (UTC)
+Subject: Re: [PATCH v2 20/34] xen: convert put_page() to put_user_page*()
 To:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jerome Glisse <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-block@vger.kernel.org
-References: <20190805023206.8831-1-jhubbard@nvidia.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fe0b9303-fce0-e7a8-a27d-af8e3903f097@kernel.dk>
-Date:   Sun, 4 Aug 2019 20:44:23 -0700
+Cc:     devel@driverdev.osuosl.org, Dave Chinner <david@fromorbit.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, x86@kernel.org,
+        linux-mm@kvack.org, Dave Hansen <dave.hansen@linux.intel.com>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-rpi-kernel@lists.infradead.org, devel@lists.orangefs.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        rds-devel@oss.oracle.com,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, ceph-devel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-media@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, sparclinux@vger.kernel.org,
+        Jason Gunthorpe <jgg@ziepe.ca>
+References: <20190804224915.28669-1-jhubbard@nvidia.com>
+ <20190804224915.28669-21-jhubbard@nvidia.com>
+From:   Juergen Gross <jgross@suse.com>
+Message-ID: <82afb221-52a2-b399-46f5-0ee1f21c3417@suse.com>
+Date:   Mon, 5 Aug 2019 06:15:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190805023206.8831-1-jhubbard@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20190804224915.28669-21-jhubbard@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: de-DE
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/4/19 7:32 PM, john.hubbard@gmail.com wrote:
+On 05.08.19 00:49, john.hubbard@gmail.com wrote:
 > From: John Hubbard <jhubbard@nvidia.com>
 > 
 > For pages that were retained via get_user_pages*(), release those pages
@@ -89,9 +71,24 @@ On 8/4/19 7:32 PM, john.hubbard@gmail.com wrote:
 > 
 > This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
 > ("mm: introduce put_user_page*(), placeholder versions").
+> 
+> This also handles pages[i] == NULL cases, thanks to an approach
+> that is actually written by Juergen Gross.
+> 
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> 
+> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+> Cc: xen-devel@lists.xenproject.org
+> ---
+> 
+> Hi Juergen,
+> 
+> Say, this is *exactly* what you proposed in your gup.patch, so
+> I've speculatively added your Signed-off-by above, but need your
+> approval before that's final. Let me know please...
 
-Applied for 5.4, thanks.
+Yes, that's fine with me.
 
--- 
-Jens Axboe
 
+Juergen
