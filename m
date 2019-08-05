@@ -2,134 +2,145 @@ Return-Path: <SRS0=923v=WB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E822C0650F
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 13:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0437C433FF
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 15:08:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E689320651
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 13:27:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565011637;
-	bh=xpJM/gqp3zYrSfs70sHH80p2hZCGqfxlZBzlDuDyikQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=gw29OheQxPDo/uUqf/qoJYcNplCY2wMMH2zXc8LvEBwb+a+4fRqktTLpC4tdYjGDQ
-	 BXcup04NKqRbhgYbJK3yHAq1XU/PtZQbr0yucuGdNjSwi9FhnQJX+AJ5SDqlMp+kWH
-	 MmFeczlf98olu0HGH3SqQyB+LcLOD3yjKBbAB3h4=
+	by mail.kernel.org (Postfix) with ESMTP id 68BCB214C6
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 15:08:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jbxxzFHH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729539AbfHEN1M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Aug 2019 09:27:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33722 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730189AbfHENZN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Aug 2019 09:25:13 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 576FE20644;
-        Mon,  5 Aug 2019 13:25:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565011512;
-        bh=xpJM/gqp3zYrSfs70sHH80p2hZCGqfxlZBzlDuDyikQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yKeqRwbqXoYBlzX7wfNiHiZkV52HFJFESa68nYxWSSXDFcIuUu/MlsR3JRHuRAc+6
-         D35tMl80icwIIfiiYXsSHiTvsMiXWQI8Jc2KxFVcaoxNvEGvvlxn3l8HZNKYWcBq0R
-         BeWzW3Dk4EGLhqwfQ8B2N7euLqHnCdHpzlZOopfM=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, linux-block@vger.kernel.org,
-        Ratna Manoj Bolla <manoj.br@gmail.com>, nbd@other.debian.org,
-        David Woodhouse <dwmw@amazon.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Munehisa Kamata <kamatam@amazon.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 5.2 117/131] nbd: replace kill_bdev() with __invalidate_device() again
-Date:   Mon,  5 Aug 2019 15:03:24 +0200
-Message-Id: <20190805124959.791932900@linuxfoundation.org>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190805124951.453337465@linuxfoundation.org>
-References: <20190805124951.453337465@linuxfoundation.org>
-User-Agent: quilt/0.66
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        id S1728885AbfHEPIl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Aug 2019 11:08:41 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53354 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727259AbfHEPIl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Aug 2019 11:08:41 -0400
+Received: by mail-wm1-f67.google.com with SMTP id x15so75123614wmj.3
+        for <linux-block@vger.kernel.org>; Mon, 05 Aug 2019 08:08:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=CfGlMJlJq1yx6eSWof1+4yQXKTkrtm+XZNLVyiuuYPc=;
+        b=jbxxzFHHvusryD5w8vzHeuPeqU/d3yLi9SHaw+kphMYUNZbQHKRDzd0wOyUR/cmUgM
+         iMB55vlb/E8GPsyr5ucRPmimQH23RpGgdFiQBLzrxFXoq1sqDkFlGV+7etEF2y6fKRcg
+         mc5VTGedBcNbRLHK58Op9xwxSGRqTW4NNy2ZXqz4/zNBv9SNY0VBWz5gJVC1blrGH3jF
+         vNnmQ7gxzsoLn1ExYyoQuw5LWo9CH554+vbq0kfDJVdyCK4eq5LocjSQ4KunVUAkwDaG
+         7q2NuNsw16RVT8AZxS87xuORXknHwk+nYviQ763BWAYD5i9CYfsX2MjrExgAgGrwLfWf
+         gQXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=CfGlMJlJq1yx6eSWof1+4yQXKTkrtm+XZNLVyiuuYPc=;
+        b=M+Akg8mpmQ9VkY0bWHCytyoPS3qjr2SwbWemha1/lTQiaMOzgi7Up4L4Asp4DKWXF+
+         MFpMe/05Wco8sShitxkeyv7lE/Z1+32QrpyTHMX+wQ6gBNOrh4LT4EgSUACD6DN2AFEK
+         2+eYUglvipvVUOupJLf1AtWUaII0jD1Tds9gLeH8BNrgRNlWSNjn9b1l1vlJouWJdOsg
+         esXt92K4KhohC+rv/2tEi0XLHM/HN49XRBvveayMt6fzRRmE57s7/SWOg6TAse/coW/j
+         BEYFmmVcrIccq5FtT10ShZ94C1TAnbGExl6iCybjGZBBpBLPtIaHJ03SHzLUgjPPY06E
+         2nvQ==
+X-Gm-Message-State: APjAAAVjpiEzV5L6CYDQ0QUmbLqf58Kln10fMPDNDYnZBc7CjdHRnhd7
+        YVokLga7KKUrr9KmBpkry7PlBA==
+X-Google-Smtp-Source: APXvYqxRh/11CyvYNBmPNpSUQlUGVd7DPB6MVKtbk4hpZxUXI6n37AJ0hZvqbtL18gsPQ4efe74OnA==
+X-Received: by 2002:a1c:1a87:: with SMTP id a129mr18849472wma.21.1565017719279;
+        Mon, 05 Aug 2019 08:08:39 -0700 (PDT)
+Received: from [192.168.0.100] (88-147-69-71.dyn.eolo.it. [88.147.69.71])
+        by smtp.gmail.com with ESMTPSA id c3sm87272983wrx.19.2019.08.05.08.08.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 05 Aug 2019 08:08:38 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [PATCH v2 0/3] Implement BFQ per-device weight interface
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20190805063807.9494-1-zhengfeiran@bytedance.com>
+Date:   Mon, 5 Aug 2019 17:08:36 +0200
+Cc:     kernel list <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Fam Zheng <fam@euphon.net>,
+        duanxiongchun@bytedance.com,
+        linux-block <linux-block@vger.kernel.org>, tj@kernel.org,
+        cgroups@vger.kernel.org, zhangjiachen.jc@bytedance.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A6E36505-16B1-4E6D-BCA8-53E5FD4AEE98@linaro.org>
+References: <20190805063807.9494-1-zhengfeiran@bytedance.com>
+To:     Fam Zheng <zhengfeiran@bytedance.com>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Munehisa Kamata <kamatam@amazon.com>
+Thank you very much, Fam, for this extension.
 
-commit 2b5c8f0063e4b263cf2de82029798183cf85c320 upstream.
+Reviewed-by: Paolo Valente <paolo.valente@linaro.org>
 
-Commit abbbdf12497d ("replace kill_bdev() with __invalidate_device()")
-once did this, but 29eaadc03649 ("nbd: stop using the bdev everywhere")
-resurrected kill_bdev() and it has been there since then. So buffer_head
-mappings still get killed on a server disconnection, and we can still
-hit the BUG_ON on a filesystem on the top of the nbd device.
-
-  EXT4-fs (nbd0): mounted filesystem with ordered data mode. Opts: (null)
-  block nbd0: Receive control failed (result -32)
-  block nbd0: shutting down sockets
-  print_req_error: I/O error, dev nbd0, sector 66264 flags 3000
-  EXT4-fs warning (device nbd0): htree_dirblock_to_tree:979: inode #2: lblock 0: comm ls: error -5 reading directory block
-  print_req_error: I/O error, dev nbd0, sector 2264 flags 3000
-  EXT4-fs error (device nbd0): __ext4_get_inode_loc:4690: inode #2: block 283: comm ls: unable to read itable block
-  EXT4-fs error (device nbd0) in ext4_reserve_inode_write:5894: IO failure
-  ------------[ cut here ]------------
-  kernel BUG at fs/buffer.c:3057!
-  invalid opcode: 0000 [#1] SMP PTI
-  CPU: 7 PID: 40045 Comm: jbd2/nbd0-8 Not tainted 5.1.0-rc3+ #4
-  Hardware name: Amazon EC2 m5.12xlarge/, BIOS 1.0 10/16/2017
-  RIP: 0010:submit_bh_wbc+0x18b/0x190
-  ...
-  Call Trace:
-   jbd2_write_superblock+0xf1/0x230 [jbd2]
-   ? account_entity_enqueue+0xc5/0xf0
-   jbd2_journal_update_sb_log_tail+0x94/0xe0 [jbd2]
-   jbd2_journal_commit_transaction+0x12f/0x1d20 [jbd2]
-   ? __switch_to_asm+0x40/0x70
-   ...
-   ? lock_timer_base+0x67/0x80
-   kjournald2+0x121/0x360 [jbd2]
-   ? remove_wait_queue+0x60/0x60
-   kthread+0xf8/0x130
-   ? commit_timeout+0x10/0x10 [jbd2]
-   ? kthread_bind+0x10/0x10
-   ret_from_fork+0x35/0x40
-
-With __invalidate_device(), I no longer hit the BUG_ON with sync or
-unmount on the disconnected device.
-
-Fixes: 29eaadc03649 ("nbd: stop using the bdev everywhere")
-Cc: linux-block@vger.kernel.org
-Cc: Ratna Manoj Bolla <manoj.br@gmail.com>
-Cc: nbd@other.debian.org
-Cc: stable@vger.kernel.org
-Cc: David Woodhouse <dwmw@amazon.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Signed-off-by: Munehisa Kamata <kamatam@amazon.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
----
- drivers/block/nbd.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1229,7 +1229,7 @@ static void nbd_clear_sock_ioctl(struct
- 				 struct block_device *bdev)
- {
- 	sock_shutdown(nbd);
--	kill_bdev(bdev);
-+	__invalidate_device(bdev, true);
- 	nbd_bdev_reset(bdev);
- 	if (test_and_clear_bit(NBD_HAS_CONFIG_REF,
- 			       &nbd->config->runtime_flags))
-
+> Il giorno 5 ago 2019, alle ore 08:38, Fam Zheng =
+<zhengfeiran@bytedance.com> ha scritto:
+>=20
+> (Revision starting from v2 since v1 was used off-list)
+>=20
+> Hi Paolo and others,
+>=20
+> This adds to BFQ the missing per-device weight interfaces:
+> blkio.bfq.weight_device on legacy and io.bfq.weight on unified. The
+> implementation pretty closely resembles what we had in CFQ and the =
+parsing code
+> is basically reused.
+>=20
+> Tests
+> =3D=3D=3D=3D=3D
+>=20
+> Using two cgroups and three block devices, having weights setup as:
+>=20
+> Cgroup          test1           test2
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> default         100             500
+> sda             500             100
+> sdb             default         default
+> sdc             200             200
+>=20
+> cgroup v1 runs
+> --------------
+>=20
+>    sda.test1.out:   READ: bw=3D913MiB/s
+>    sda.test2.out:   READ: bw=3D183MiB/s
+>=20
+>    sdb.test1.out:   READ: bw=3D213MiB/s
+>    sdb.test2.out:   READ: bw=3D1054MiB/s
+>=20
+>    sdc.test1.out:   READ: bw=3D650MiB/s
+>    sdc.test2.out:   READ: bw=3D650MiB/s
+>=20
+> cgroup v2 runs
+> --------------
+>=20
+>    sda.test1.out:   READ: bw=3D915MiB/s
+>    sda.test2.out:   READ: bw=3D184MiB/s
+>=20
+>    sdb.test1.out:   READ: bw=3D216MiB/s
+>    sdb.test2.out:   READ: bw=3D1069MiB/s
+>=20
+>    sdc.test1.out:   READ: bw=3D621MiB/s
+>    sdc.test2.out:   READ: bw=3D622MiB/s
+>=20
+> Fam Zheng (3):
+>  bfq: Fix the missing barrier in __bfq_entity_update_weight_prio
+>  bfq: Extract bfq_group_set_weight from bfq_io_set_weight_legacy
+>  bfq: Add per-device weight
+>=20
+> block/bfq-cgroup.c  | 151 =
++++++++++++++++++++++++++++++++++++++++-------------
+> block/bfq-iosched.h |   3 ++
+> block/bfq-wf2q.c    |   2 +
+> 3 files changed, 119 insertions(+), 37 deletions(-)
+>=20
+> --=20
+> 2.11.0
+>=20
 
