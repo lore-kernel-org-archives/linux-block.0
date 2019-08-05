@@ -2,166 +2,116 @@ Return-Path: <SRS0=923v=WB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04AC6C433FF
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 00:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E87C41514
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 00:55:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CD4872086D
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 00:29:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UxnSsely"
+	by mail.kernel.org (Postfix) with ESMTP id 38AB320880
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 00:55:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726892AbfHEA2z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Aug 2019 20:28:55 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:35932 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726844AbfHEA2z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Aug 2019 20:28:55 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x750PN8L099080;
-        Mon, 5 Aug 2019 00:27:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc : subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=csR1CFI12mg4Wfl/I1DmedWmi55eZjSHDbam/aE57Lg=;
- b=UxnSselyJSkDrlgtrJqirrqIgp3f8N92FZdRzvuEzRyV0BK1GmSaf9C8PKnong3YQqHb
- MCpznjeWe33FH9kWSVMHzf3ueNmMrgta/dHNshxU+ezcH/SlcYl3T1BbtssK9RamgmgB
- uxHaAwYQYSv2zhs8xcIQpAvtnAqvLsICBKD/Oi73oWTTrzZCg0llYMmo1CN1xJK1/n6p
- FN3jH23l0bDAY+8rbi5+pi71wYYr59UK7ki0dfZmNagJqJGpCz4Dhc49Z+1r5jDxqopk
- IUz6WPSid5pJVTZGy3yYzlDcCEYZUIldAG3FEELFmfGykxTqdKwI/FpOYaMM05PGsiiD Lg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2u527pc6va-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 05 Aug 2019 00:27:22 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x750Mxa2125660;
-        Mon, 5 Aug 2019 00:27:22 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by aserp3020.oracle.com with ESMTP id 2u5232s8j6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 05 Aug 2019 00:27:22 +0000
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x750RLrL130645;
-        Mon, 5 Aug 2019 00:27:22 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2u5232s8hy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 05 Aug 2019 00:27:21 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x750R78g009479;
-        Mon, 5 Aug 2019 00:27:08 GMT
-Received: from mbp2018.cdmnet.org (/82.27.120.181)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 04 Aug 2019 17:27:07 -0700
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>
-Subject: Re: [PATCH v2 31/34] fs/nfs: convert put_page() to put_user_page*()
-To:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>
-References: <20190804224915.28669-1-jhubbard@nvidia.com>
- <20190804224915.28669-32-jhubbard@nvidia.com>
-From:   Calum Mackay <calum.mackay@oracle.com>
-Organization: Oracle
-Message-ID: <cf978e10-facc-ba5b-d7e4-d7fc2c3f7ebc@oracle.com>
-Date:   Mon, 5 Aug 2019 01:26:59 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:70.0)
- Gecko/20100101 Thunderbird/70.0a1
+        id S1726899AbfHEAzu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Aug 2019 20:55:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39030 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726621AbfHEAzu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 4 Aug 2019 20:55:50 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id ECB127FDCD;
+        Mon,  5 Aug 2019 00:55:49 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BE24960922;
+        Mon,  5 Aug 2019 00:55:38 +0000 (UTC)
+Date:   Mon, 5 Aug 2019 08:55:33 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, "Ewan D . Milne" <emilne@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        stable@vger.kernel.org
+Subject: Re: [PATCH V4 0/2] block/scsi/dm-rq: fix leak of request private
+ data in dm-mpath
+Message-ID: <20190805005532.GA3449@ming.t460p>
+References: <20190725020500.4317-1-ming.lei@redhat.com>
+ <20190730004359.GA28708@ming.t460p>
 MIME-Version: 1.0
-In-Reply-To: <20190804224915.28669-32-jhubbard@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9339 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908050001
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190730004359.GA28708@ming.t460p>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 05 Aug 2019 00:55:50 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 04/08/2019 11:49 pm, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
+On Tue, Jul 30, 2019 at 08:43:59AM +0800, Ming Lei wrote:
+> On Thu, Jul 25, 2019 at 10:04:58AM +0800, Ming Lei wrote:
+> > Hi,
+> > 
+> > When one request is dispatched to LLD via dm-rq, if the result is
+> > BLK_STS_*RESOURCE, dm-rq will free the request. However, LLD may allocate
+> > private data for this request, so this way will cause memory leak.
+> > 
+> > Add .cleanup_rq() callback and implement it in SCSI for fixing the issue,
+> > since SCSI is the only driver which allocates private requst data in
+> > .queue_rq() path.
+> > 
+> > Another use case of this callback is to free the request and re-submit
+> > bios during cpu hotplug when the hctx is dead, see the following link:
+> > 
+> > https://lore.kernel.org/linux-block/f122e8f2-5ede-2d83-9ca0-bc713ce66d01@huawei.com/T/#t
+> > 
+> > V4:
+> > 	- add more commit log on the new .cleanup_rq callback, as suggested
+> > 	  by Mike
+> > 
+> > V3:
+> > 	- run .cleanup_rq() from dm-rq because this issue is dm-rq specific,
+> > 	and even in future it should be still very unusual to free request
+> > 	in this way. If we call .cleanup_rq() in generic rq free code(fast
+> > 	path), cost will be introduced unnecessarily, also we have to
+> > 	consider related race.
+> > 
+> > V2:
+> > 	- run .cleanup_rq() in blk_mq_free_request(), as suggested by Mike 
+> > 
+> > 
+> > 
+> > Ming Lei (2):
+> >   blk-mq: add callback of .cleanup_rq
+> >   scsi: implement .cleanup_rq callback
+> > 
+> >  drivers/md/dm-rq.c      |  1 +
+> >  drivers/scsi/scsi_lib.c | 13 +++++++++++++
+> >  include/linux/blk-mq.h  | 13 +++++++++++++
+> >  3 files changed, 27 insertions(+)
+> > 
+> > Cc: Ewan D. Milne <emilne@redhat.com>
+> > Cc: Bart Van Assche <bvanassche@acm.org>
+> > Cc: Hannes Reinecke <hare@suse.com>
+> > Cc: Christoph Hellwig <hch@lst.de>
+> > Cc: Mike Snitzer <snitzer@redhat.com>
+> > Cc: dm-devel@redhat.com
+> > Cc: <stable@vger.kernel.org>
+> > Fixes: 396eaf21ee17 ("blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback")
 > 
-> For pages that were retained via get_user_pages*(), release those pages
-> via the new put_user_page*() routines, instead of via put_page() or
-> release_pages().
+> Hello Jens & guys,
 > 
-> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-> ("mm: introduce put_user_page*(), placeholder versions").
-> 
-> Cc: Calum Mackay <calum.mackay@oracle.com>
-> Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
-> Cc: Anna Schumaker <anna.schumaker@netapp.com>
-> Cc: linux-nfs@vger.kernel.org
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->   fs/nfs/direct.c | 11 ++---------
->   1 file changed, 2 insertions(+), 9 deletions(-)
+> Ping on this fix.
 
-Reviewed-by: Calum Mackay <calum.mackay@oracle.com>
+Hi Jens,
+
+Could you make the patcheset merged for 5.4? And it has been verified
+that big memory leak issue can be fixed by this patchset.
 
 
-> diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
-> index 0cb442406168..c0c1b9f2c069 100644
-> --- a/fs/nfs/direct.c
-> +++ b/fs/nfs/direct.c
-> @@ -276,13 +276,6 @@ ssize_t nfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
->   	return nfs_file_direct_write(iocb, iter);
->   }
->   
-> -static void nfs_direct_release_pages(struct page **pages, unsigned int npages)
-> -{
-> -	unsigned int i;
-> -	for (i = 0; i < npages; i++)
-> -		put_page(pages[i]);
-> -}
-> -
->   void nfs_init_cinfo_from_dreq(struct nfs_commit_info *cinfo,
->   			      struct nfs_direct_req *dreq)
->   {
-> @@ -512,7 +505,7 @@ static ssize_t nfs_direct_read_schedule_iovec(struct nfs_direct_req *dreq,
->   			pos += req_len;
->   			dreq->bytes_left -= req_len;
->   		}
-> -		nfs_direct_release_pages(pagevec, npages);
-> +		put_user_pages(pagevec, npages);
->   		kvfree(pagevec);
->   		if (result < 0)
->   			break;
-> @@ -935,7 +928,7 @@ static ssize_t nfs_direct_write_schedule_iovec(struct nfs_direct_req *dreq,
->   			pos += req_len;
->   			dreq->bytes_left -= req_len;
->   		}
-> -		nfs_direct_release_pages(pagevec, npages);
-> +		put_user_pages(pagevec, npages);
->   		kvfree(pagevec);
->   		if (result < 0)
->   			break;
-> 
+thanks,
+Ming
