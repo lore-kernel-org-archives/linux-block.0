@@ -2,116 +2,136 @@ Return-Path: <SRS0=923v=WB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E87C41514
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 00:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E26C19759
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 00:57:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38AB320880
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 00:55:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72A362133F
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 00:57:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726899AbfHEAzu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Aug 2019 20:55:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39030 "EHLO mx1.redhat.com"
+        id S1726709AbfHEA5d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Aug 2019 20:57:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54016 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726621AbfHEAzu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 4 Aug 2019 20:55:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1726621AbfHEA5c (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 4 Aug 2019 20:57:32 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id ECB127FDCD;
-        Mon,  5 Aug 2019 00:55:49 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3755188311;
+        Mon,  5 Aug 2019 00:57:32 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BE24960922;
-        Mon,  5 Aug 2019 00:55:38 +0000 (UTC)
-Date:   Mon, 5 Aug 2019 08:55:33 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D2B4E5D6B0;
+        Mon,  5 Aug 2019 00:57:23 +0000 (UTC)
+Date:   Mon, 5 Aug 2019 08:57:18 +0800
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, "Ewan D . Milne" <emilne@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        stable@vger.kernel.org
-Subject: Re: [PATCH V4 0/2] block/scsi/dm-rq: fix leak of request private
- data in dm-mpath
-Message-ID: <20190805005532.GA3449@ming.t460p>
-References: <20190725020500.4317-1-ming.lei@redhat.com>
- <20190730004359.GA28708@ming.t460p>
+Cc:     linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>,
+        Bob Liu <bob.liu@oracle.com>
+Subject: Re: [PATCH V2] blk-mq: balance mapping between present CPUs and
+ queues
+Message-ID: <20190805005717.GB3449@ming.t460p>
+References: <20190725094146.18560-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190730004359.GA28708@ming.t460p>
+In-Reply-To: <20190725094146.18560-1-ming.lei@redhat.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 05 Aug 2019 00:55:50 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Mon, 05 Aug 2019 00:57:32 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 30, 2019 at 08:43:59AM +0800, Ming Lei wrote:
-> On Thu, Jul 25, 2019 at 10:04:58AM +0800, Ming Lei wrote:
-> > Hi,
-> > 
-> > When one request is dispatched to LLD via dm-rq, if the result is
-> > BLK_STS_*RESOURCE, dm-rq will free the request. However, LLD may allocate
-> > private data for this request, so this way will cause memory leak.
-> > 
-> > Add .cleanup_rq() callback and implement it in SCSI for fixing the issue,
-> > since SCSI is the only driver which allocates private requst data in
-> > .queue_rq() path.
-> > 
-> > Another use case of this callback is to free the request and re-submit
-> > bios during cpu hotplug when the hctx is dead, see the following link:
-> > 
-> > https://lore.kernel.org/linux-block/f122e8f2-5ede-2d83-9ca0-bc713ce66d01@huawei.com/T/#t
-> > 
-> > V4:
-> > 	- add more commit log on the new .cleanup_rq callback, as suggested
-> > 	  by Mike
-> > 
-> > V3:
-> > 	- run .cleanup_rq() from dm-rq because this issue is dm-rq specific,
-> > 	and even in future it should be still very unusual to free request
-> > 	in this way. If we call .cleanup_rq() in generic rq free code(fast
-> > 	path), cost will be introduced unnecessarily, also we have to
-> > 	consider related race.
-> > 
-> > V2:
-> > 	- run .cleanup_rq() in blk_mq_free_request(), as suggested by Mike 
-> > 
-> > 
-> > 
-> > Ming Lei (2):
-> >   blk-mq: add callback of .cleanup_rq
-> >   scsi: implement .cleanup_rq callback
-> > 
-> >  drivers/md/dm-rq.c      |  1 +
-> >  drivers/scsi/scsi_lib.c | 13 +++++++++++++
-> >  include/linux/blk-mq.h  | 13 +++++++++++++
-> >  3 files changed, 27 insertions(+)
-> > 
-> > Cc: Ewan D. Milne <emilne@redhat.com>
-> > Cc: Bart Van Assche <bvanassche@acm.org>
-> > Cc: Hannes Reinecke <hare@suse.com>
-> > Cc: Christoph Hellwig <hch@lst.de>
-> > Cc: Mike Snitzer <snitzer@redhat.com>
-> > Cc: dm-devel@redhat.com
-> > Cc: <stable@vger.kernel.org>
-> > Fixes: 396eaf21ee17 ("blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback")
+On Thu, Jul 25, 2019 at 05:41:46PM +0800, Ming Lei wrote:
+> Spread queues among present CPUs first, then building mapping on other
+> non-present CPUs.
 > 
-> Hello Jens & guys,
+> So we can minimize count of dead queues which are mapped by un-present
+> CPUs only. Then bad IO performance can be avoided by unbalanced mapping
+> between present CPUs and queues.
 > 
-> Ping on this fix.
+> The similar policy has been applied on Managed IRQ affinity.
+> 
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Cc: Yi Zhang <yi.zhang@redhat.com>
+> Cc: Bob Liu <bob.liu@oracle.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> 
+> V2:
+> 	- make sure that sequential mapping can be done
+> 
+>  block/blk-mq-cpumap.c | 29 ++++++++++++++++++++++-------
+>  1 file changed, 22 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
+> index f945621a0e8f..0157f2b3485a 100644
+> --- a/block/blk-mq-cpumap.c
+> +++ b/block/blk-mq-cpumap.c
+> @@ -15,10 +15,10 @@
+>  #include "blk.h"
+>  #include "blk-mq.h"
+>  
+> -static int cpu_to_queue_index(struct blk_mq_queue_map *qmap,
+> -			      unsigned int nr_queues, const int cpu)
+> +static int queue_index(struct blk_mq_queue_map *qmap,
+> +		       unsigned int nr_queues, const int q)
+>  {
+> -	return qmap->queue_offset + (cpu % nr_queues);
+> +	return qmap->queue_offset + (q % nr_queues);
+>  }
+>  
+>  static int get_first_sibling(unsigned int cpu)
+> @@ -36,21 +36,36 @@ int blk_mq_map_queues(struct blk_mq_queue_map *qmap)
+>  {
+>  	unsigned int *map = qmap->mq_map;
+>  	unsigned int nr_queues = qmap->nr_queues;
+> -	unsigned int cpu, first_sibling;
+> +	unsigned int cpu, first_sibling, q = 0;
+> +
+> +	for_each_possible_cpu(cpu)
+> +		map[cpu] = -1;
+> +
+> +	/*
+> +	 * Spread queues among present CPUs first for minimizing
+> +	 * count of dead queues which are mapped by all un-present CPUs
+> +	 */
+> +	for_each_present_cpu(cpu) {
+> +		if (q >= nr_queues)
+> +			break;
+> +		map[cpu] = queue_index(qmap, nr_queues, q++);
+> +	}
+>  
+>  	for_each_possible_cpu(cpu) {
+> +		if (map[cpu] != -1)
+> +			continue;
+>  		/*
+>  		 * First do sequential mapping between CPUs and queues.
+>  		 * In case we still have CPUs to map, and we have some number of
+>  		 * threads per cores then map sibling threads to the same queue
+>  		 * for performance optimizations.
+>  		 */
+> -		if (cpu < nr_queues) {
+> -			map[cpu] = cpu_to_queue_index(qmap, nr_queues, cpu);
+> +		if (q < nr_queues) {
+> +			map[cpu] = queue_index(qmap, nr_queues, q++);
+>  		} else {
+>  			first_sibling = get_first_sibling(cpu);
+>  			if (first_sibling == cpu)
+> -				map[cpu] = cpu_to_queue_index(qmap, nr_queues, cpu);
+> +				map[cpu] = queue_index(qmap, nr_queues, q++);
+>  			else
+>  				map[cpu] = map[first_sibling];
+>  		}
 
 Hi Jens,
 
-Could you make the patcheset merged for 5.4? And it has been verified
-that big memory leak issue can be fixed by this patchset.
+Could you consider to merge this patch to 5.4?
 
-
-thanks,
+Thanks,
 Ming
