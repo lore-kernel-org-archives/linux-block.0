@@ -7,52 +7,49 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E67C0650F
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 13:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DEEBC433FF
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 13:25:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5F7782067D
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 13:14:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AAA82075B
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 13:25:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565010869;
-	bh=IqjSK9W3j2L6/NohAdlcBv+/sC6WYnsk0r0fGiwNuA8=;
+	s=default; t=1565011512;
+	bh=M5XLCrLXO58Fa1EK7vbtFtKGYwFSzsWIZeij3TjsELI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=q0Q90/WrPTNGJYGO4k1nQxUBNI+33SxrZH4/KGnjNJIb4FXtd2r/yXtcLifFN1yp7
-	 2ytcjAQJlwyYVIT04+wEf+J/n6LoGDbI2SXb/M2lhLZ7BavXq977SR58I+fuLe2RH+
-	 ZHCai9ZXMQyT7iE9r+x8EgzFJw92mYGDuaUIcT5U=
+	b=hTcYNwMJp6IiSdGnRloM/Hd715LFV8BoVNKfJ66jDBs9ieGt3fyvfuhAjRmXK96rT
+	 OQqW1cyFUiCjFHpGleMpfgzoeeVI7niX5LGQPGfOlPJW3b2AVvtFFeADmbq19Kugz/
+	 KmzRfH1RWmaVOjbWYZoxKP11/Hd2TIoQKt2C2Lzo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729217AbfHENII (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Aug 2019 09:08:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46034 "EHLO mail.kernel.org"
+        id S1731159AbfHENZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Aug 2019 09:25:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33576 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729955AbfHENIH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Aug 2019 09:08:07 -0400
+        id S1731150AbfHENZF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Aug 2019 09:25:05 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4DCB92075B;
-        Mon,  5 Aug 2019 13:08:06 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 763B020880;
+        Mon,  5 Aug 2019 13:25:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565010486;
-        bh=IqjSK9W3j2L6/NohAdlcBv+/sC6WYnsk0r0fGiwNuA8=;
+        s=default; t=1565011505;
+        bh=M5XLCrLXO58Fa1EK7vbtFtKGYwFSzsWIZeij3TjsELI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=x8e50++dqz1ikr54ufAbsgC6MMDp+N5DN9wU0Yc3eIEVOy+u8CvM2tc1YrSoZ79Fk
-         eUkf7Y+hhTbU7vwistQyh9jkyZzR122hgDFv+mJm0EIZGOOENUhH0G4SxqwKne4tbw
-         ETiI1+cQl1mHqVLUlfSEOo5iSMX+Ig91u7M2DRbs=
+        b=nOzX8CT4gyxqy7taFrZrKLbfXh3pVqvDD9gf3NtVlJuCTTtKPar41n9Qz5QcAq0Fs
+         eCjVhoZmq416TZmJwLgZ1XTLaelBxQLtO11Z5N43qDT0pq1Nz0HBBw2JdQW4ofimuD
+         RrddcH+vFT+95AC7ynnMTqzvJtcWFckyFPOKVOP8=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, linux-block@vger.kernel.org,
-        Ratna Manoj Bolla <manoj.br@gmail.com>, nbd@other.debian.org,
-        David Woodhouse <dwmw@amazon.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Munehisa Kamata <kamatam@amazon.com>,
+        stable@vger.kernel.org, Zhengyuan Liu <liuzhengyuan@kylinos.cn>,
+        linux-block@vger.kernel.org, Jackie Liu <liuyun01@kylinos.cn>,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4.14 43/53] nbd: replace kill_bdev() with __invalidate_device() again
-Date:   Mon,  5 Aug 2019 15:03:08 +0200
-Message-Id: <20190805124932.785697070@linuxfoundation.org>
+Subject: [PATCH 5.2 114/131] io_uring: fix KASAN use after free in io_sq_wq_submit_work
+Date:   Mon,  5 Aug 2019 15:03:21 +0200
+Message-Id: <20190805124959.595607216@linuxfoundation.org>
 X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190805124927.973499541@linuxfoundation.org>
-References: <20190805124927.973499541@linuxfoundation.org>
+In-Reply-To: <20190805124951.453337465@linuxfoundation.org>
+References: <20190805124951.453337465@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -62,74 +59,111 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Munehisa Kamata <kamatam@amazon.com>
+From: Jackie Liu <liuyun01@kylinos.cn>
 
-commit 2b5c8f0063e4b263cf2de82029798183cf85c320 upstream.
+commit d0ee879187df966ef638031b5f5183078d672141 upstream.
 
-Commit abbbdf12497d ("replace kill_bdev() with __invalidate_device()")
-once did this, but 29eaadc03649 ("nbd: stop using the bdev everywhere")
-resurrected kill_bdev() and it has been there since then. So buffer_head
-mappings still get killed on a server disconnection, and we can still
-hit the BUG_ON on a filesystem on the top of the nbd device.
+[root@localhost ~]# ./liburing/test/link
 
-  EXT4-fs (nbd0): mounted filesystem with ordered data mode. Opts: (null)
-  block nbd0: Receive control failed (result -32)
-  block nbd0: shutting down sockets
-  print_req_error: I/O error, dev nbd0, sector 66264 flags 3000
-  EXT4-fs warning (device nbd0): htree_dirblock_to_tree:979: inode #2: lblock 0: comm ls: error -5 reading directory block
-  print_req_error: I/O error, dev nbd0, sector 2264 flags 3000
-  EXT4-fs error (device nbd0): __ext4_get_inode_loc:4690: inode #2: block 283: comm ls: unable to read itable block
-  EXT4-fs error (device nbd0) in ext4_reserve_inode_write:5894: IO failure
-  ------------[ cut here ]------------
-  kernel BUG at fs/buffer.c:3057!
-  invalid opcode: 0000 [#1] SMP PTI
-  CPU: 7 PID: 40045 Comm: jbd2/nbd0-8 Not tainted 5.1.0-rc3+ #4
-  Hardware name: Amazon EC2 m5.12xlarge/, BIOS 1.0 10/16/2017
-  RIP: 0010:submit_bh_wbc+0x18b/0x190
-  ...
-  Call Trace:
-   jbd2_write_superblock+0xf1/0x230 [jbd2]
-   ? account_entity_enqueue+0xc5/0xf0
-   jbd2_journal_update_sb_log_tail+0x94/0xe0 [jbd2]
-   jbd2_journal_commit_transaction+0x12f/0x1d20 [jbd2]
-   ? __switch_to_asm+0x40/0x70
-   ...
-   ? lock_timer_base+0x67/0x80
-   kjournald2+0x121/0x360 [jbd2]
-   ? remove_wait_queue+0x60/0x60
-   kthread+0xf8/0x130
-   ? commit_timeout+0x10/0x10 [jbd2]
-   ? kthread_bind+0x10/0x10
-   ret_from_fork+0x35/0x40
+QEMU Standard PC report that:
 
-With __invalidate_device(), I no longer hit the BUG_ON with sync or
-unmount on the disconnected device.
+[   29.379892] CPU: 0 PID: 84 Comm: kworker/u2:2 Not tainted 5.3.0-rc2-00051-g4010b622f1d2-dirty #86
+[   29.379902] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-1 04/01/2014
+[   29.379913] Workqueue: io_ring-wq io_sq_wq_submit_work
+[   29.379929] Call Trace:
+[   29.379953]  dump_stack+0xa9/0x10e
+[   29.379970]  ? io_sq_wq_submit_work+0xbf4/0xe90
+[   29.379986]  print_address_description.cold.6+0x9/0x317
+[   29.379999]  ? io_sq_wq_submit_work+0xbf4/0xe90
+[   29.380010]  ? io_sq_wq_submit_work+0xbf4/0xe90
+[   29.380026]  __kasan_report.cold.7+0x1a/0x34
+[   29.380044]  ? io_sq_wq_submit_work+0xbf4/0xe90
+[   29.380061]  kasan_report+0xe/0x12
+[   29.380076]  io_sq_wq_submit_work+0xbf4/0xe90
+[   29.380104]  ? io_sq_thread+0xaf0/0xaf0
+[   29.380152]  process_one_work+0xb59/0x19e0
+[   29.380184]  ? pwq_dec_nr_in_flight+0x2c0/0x2c0
+[   29.380221]  worker_thread+0x8c/0xf40
+[   29.380248]  ? __kthread_parkme+0xab/0x110
+[   29.380265]  ? process_one_work+0x19e0/0x19e0
+[   29.380278]  kthread+0x30b/0x3d0
+[   29.380292]  ? kthread_create_on_node+0xe0/0xe0
+[   29.380311]  ret_from_fork+0x3a/0x50
 
-Fixes: 29eaadc03649 ("nbd: stop using the bdev everywhere")
+[   29.380635] Allocated by task 209:
+[   29.381255]  save_stack+0x19/0x80
+[   29.381268]  __kasan_kmalloc.constprop.6+0xc1/0xd0
+[   29.381279]  kmem_cache_alloc+0xc0/0x240
+[   29.381289]  io_submit_sqe+0x11bc/0x1c70
+[   29.381300]  io_ring_submit+0x174/0x3c0
+[   29.381311]  __x64_sys_io_uring_enter+0x601/0x780
+[   29.381322]  do_syscall_64+0x9f/0x4d0
+[   29.381336]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+
+[   29.381633] Freed by task 84:
+[   29.382186]  save_stack+0x19/0x80
+[   29.382198]  __kasan_slab_free+0x11d/0x160
+[   29.382210]  kmem_cache_free+0x8c/0x2f0
+[   29.382220]  io_put_req+0x22/0x30
+[   29.382230]  io_sq_wq_submit_work+0x28b/0xe90
+[   29.382241]  process_one_work+0xb59/0x19e0
+[   29.382251]  worker_thread+0x8c/0xf40
+[   29.382262]  kthread+0x30b/0x3d0
+[   29.382272]  ret_from_fork+0x3a/0x50
+
+[   29.382569] The buggy address belongs to the object at ffff888067172140
+                which belongs to the cache io_kiocb of size 224
+[   29.384692] The buggy address is located 120 bytes inside of
+                224-byte region [ffff888067172140, ffff888067172220)
+[   29.386723] The buggy address belongs to the page:
+[   29.387575] page:ffffea00019c5c80 refcount:1 mapcount:0 mapping:ffff88806ace5180 index:0x0
+[   29.387587] flags: 0x100000000000200(slab)
+[   29.387603] raw: 0100000000000200 dead000000000100 dead000000000122 ffff88806ace5180
+[   29.387617] raw: 0000000000000000 00000000800c000c 00000001ffffffff 0000000000000000
+[   29.387624] page dumped because: kasan: bad access detected
+
+[   29.387920] Memory state around the buggy address:
+[   29.388771]  ffff888067172080: fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+[   29.390062]  ffff888067172100: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
+[   29.391325] >ffff888067172180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[   29.392578]                                         ^
+[   29.393480]  ffff888067172200: fb fb fb fb fc fc fc fc fc fc fc fc fc fc fc fc
+[   29.394744]  ffff888067172280: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[   29.396003] ==================================================================
+[   29.397260] Disabling lock debugging due to kernel taint
+
+io_sq_wq_submit_work free and read req again.
+
+Cc: Zhengyuan Liu <liuzhengyuan@kylinos.cn>
 Cc: linux-block@vger.kernel.org
-Cc: Ratna Manoj Bolla <manoj.br@gmail.com>
-Cc: nbd@other.debian.org
 Cc: stable@vger.kernel.org
-Cc: David Woodhouse <dwmw@amazon.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Signed-off-by: Munehisa Kamata <kamatam@amazon.com>
+Fixes: f7b76ac9d17e ("io_uring: fix counter inc/dec mismatch in async_list")
+Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 ---
- drivers/block/nbd.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/io_uring.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1207,7 +1207,7 @@ static void nbd_clear_sock_ioctl(struct
- 				 struct block_device *bdev)
- {
- 	sock_shutdown(nbd);
--	kill_bdev(bdev);
-+	__invalidate_device(bdev, true);
- 	nbd_bdev_reset(bdev);
- 	if (test_and_clear_bit(NBD_HAS_CONFIG_REF,
- 			       &nbd->config->runtime_flags))
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -1692,6 +1692,7 @@ restart:
+ 	do {
+ 		struct sqe_submit *s = &req->submit;
+ 		const struct io_uring_sqe *sqe = s->sqe;
++		unsigned int flags = req->flags;
+ 
+ 		/* Ensure we clear previously set non-block flag */
+ 		req->rw.ki_flags &= ~IOCB_NOWAIT;
+@@ -1737,7 +1738,7 @@ restart:
+ 		kfree(sqe);
+ 
+ 		/* req from defer and link list needn't decrease async cnt */
+-		if (req->flags & (REQ_F_IO_DRAINED | REQ_F_LINK_DONE))
++		if (flags & (REQ_F_IO_DRAINED | REQ_F_LINK_DONE))
+ 			goto out;
+ 
+ 		if (!async_list)
 
 
