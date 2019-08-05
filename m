@@ -2,126 +2,101 @@ Return-Path: <SRS0=923v=WB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF402C19759
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 02:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B109C433FF
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 03:42:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89A8B2075C
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 02:32:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 352492070D
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 03:42:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CKraWwqk"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="b94eJbBl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726805AbfHECcJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Aug 2019 22:32:09 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:40102 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726767AbfHECcJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Aug 2019 22:32:09 -0400
-Received: by mail-pg1-f196.google.com with SMTP id w10so38876167pgj.7;
-        Sun, 04 Aug 2019 19:32:09 -0700 (PDT)
+        id S1726805AbfHEDm3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Aug 2019 23:42:29 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:36772 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726757AbfHEDm3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Aug 2019 23:42:29 -0400
+Received: by mail-pl1-f195.google.com with SMTP id k8so35921124plt.3
+        for <linux-block@vger.kernel.org>; Sun, 04 Aug 2019 20:42:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=UZHhZu7UO1jH1fQJkZzMyLRgsNTiTLatRpcoqCnRJ18=;
-        b=CKraWwqkZg3c2qd7Q6WpNuUpw+dh0cgfSan9Gc4M6oztcD2jYks4Hb4bo13E6rJErQ
-         DuEnbjTFVBizjVe4SAifSMkHIVfWrYlU2SpY1yqvnSK9ALH06GWdibnMn+oDJEwWttwM
-         8XEzY1NThUu/6KjyO2+/vNzjE1iJ93hyj7kKNrgI+4bFKwBxpqxmIcLvBXB2s/AREGLZ
-         2yLtMRwvlAputd3raT0mu/uXk6A2qPMy/pwibQjdm/jNFkKe52tcH02yIHG/cbtBomqb
-         /JwAbGqvZ/xlURNEF75r57r9uENgKlgqGcwtmrtgsfQt3aWi0bzleotTEDpQekp9eKkx
-         mTAw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=TyxUsFy0g0AoyoXbyHa8cG3SKeSFUmzhTiNZ1jvQoMY=;
+        b=b94eJbBllBeKjACUA7ZSo9nWNoeamDyyUJLzT5V6v2JKv/tL0pgq/kK9PjSqL7kVdG
+         NRyIUFYJD9QLfNkDvHAKSWO4GdpQqnzN2cVDZvRKuPzztSkAmUQquyQ6GllHwmIzkm+u
+         mdoRQiDfAdpO1Nb6kouGlS5XcrVWJ+Rg6l3PZJeBxvrBiJpwRVAJ8ps46Kv8ww45//Fj
+         RTQhPKHbmhlRJEfz0d8Vvcr35cQoymlOc6gj7yKoS3vLu90eSPOVGu8fHrdKg0dmXOQf
+         gu0Tekg9SDldJlVdFqtOyeiFy0/CAjRAysgOaYSgOnmvRC4AKJNKeb2GMEuN59RJm4xF
+         HfeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=UZHhZu7UO1jH1fQJkZzMyLRgsNTiTLatRpcoqCnRJ18=;
-        b=LLNCMKyKrN2i72BUd7ccYD4rfZl3QQtzkBhoyLarwqoCvI4JADVKDwxBV+yMpv6tm1
-         14I+TvbuGWptJo0Ga/af2Sa3lM09yVEcGxErDgvGuw0RJTjfr3ThKeELN86jppMFgeEH
-         qUBUqTk5qMSWfF0/htvZkCAXK5mM01SbJPjUxgii6Ol0lnOXVfDzAS756yffkwQDuAEn
-         YZ2G49YrIBur6Dy3J5Fe8R1QrvNdsVzPYrWezGCUBTG9fuz19b7KLuC/gP0BvbxENaIU
-         IGWsYv3hf7ttZ5XiOgNjKMIfJTyimik4KdiFmQE3ZcmNP0wfL+9GBXAwGCJtEFYPHkfm
-         bCig==
-X-Gm-Message-State: APjAAAXEKryko+Cr2zQmtaNjCfXGCsOlGn0DnthhvkjZJymG/D8INRRS
-        rYimTDzotLgFWCxnxylR0RM=
-X-Google-Smtp-Source: APXvYqyLrqI7gGqCgmIwbmF9a0CEz3uJYMrD1LI9rhekWLAO8LK0W3mWt00RvgrLzC1hsNBPyLQDdg==
-X-Received: by 2002:aa7:86cc:: with SMTP id h12mr63989613pfo.2.1564972328962;
-        Sun, 04 Aug 2019 19:32:08 -0700 (PDT)
-Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id y128sm102095363pgy.41.2019.08.04.19.32.07
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sun, 04 Aug 2019 19:32:08 -0700 (PDT)
-From:   john.hubbard@gmail.com
-X-Google-Original-From: jhubbard@nvidia.com
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jerome Glisse <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH] fs/io_uring.c: convert put_page() to put_user_page*()
-Date:   Sun,  4 Aug 2019 19:32:06 -0700
-Message-Id: <20190805023206.8831-1-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.22.0
+        bh=TyxUsFy0g0AoyoXbyHa8cG3SKeSFUmzhTiNZ1jvQoMY=;
+        b=lyUOO6HzuwBlsrvx9KhLvli3CUd6sQLRywR6JDJ7o/KTBVjWNGluVyo4DToy6sbWP1
+         aHu43tw5CWBluPXOj6WyATn7bOpfXWio3pHPMusq8S5DoFZKsrovnJ6e/cDBt2mqkIqt
+         ijkdWIpqlR3iEW7NBf6h/1t6RL6SoBOq9Pla+spGJFmYsWg4bLzonKOhej0/3LarurWI
+         wjclJ0xYBG6lZUO4E9gruM3FPt+WuQHs61sn+0bFomtWy2xS2wc4K7nSfW2lbkNhUJra
+         0IPUGd+weulT1DgF/Uhww2lJTIhH3Q7iVLGyKGT1NX9/YdqTJ/c/OVRyEpexEEq9R7Lw
+         NkBA==
+X-Gm-Message-State: APjAAAUXWa5XLQTzmGuDdUHntelSLD9C4wsfL/Cd8Pn3cc/P2+jcg6l7
+        nsxkj6mFMqzyXWd7K50TX+s=
+X-Google-Smtp-Source: APXvYqwLmx/zPu6DfQ6/dzDHZTfJz/tMSWimusqin+r7kDygU7dS7M/pjBgVPVIyhYb8fBZ8W3K+7Q==
+X-Received: by 2002:a17:902:ac87:: with SMTP id h7mr21880581plr.36.1564976548565;
+        Sun, 04 Aug 2019 20:42:28 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:83a1:61e6:1197:7c18:827e? ([2605:e000:100e:83a1:61e6:1197:7c18:827e])
+        by smtp.gmail.com with ESMTPSA id o3sm14505866pje.1.2019.08.04.20.42.26
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 04 Aug 2019 20:42:27 -0700 (PDT)
+Subject: Re: [PATCH V4 0/2] block/scsi/dm-rq: fix leak of request private data
+ in dm-mpath
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, "Ewan D . Milne" <emilne@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        stable@vger.kernel.org
+References: <20190725020500.4317-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c7bd89e5-6fa9-2b3c-94f5-ca7ff9004e6a@kernel.dk>
+Date:   Sun, 4 Aug 2019 20:42:26 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190725020500.4317-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: John Hubbard <jhubbard@nvidia.com>
+On 7/24/19 7:04 PM, Ming Lei wrote:
+> Hi,
+> 
+> When one request is dispatched to LLD via dm-rq, if the result is
+> BLK_STS_*RESOURCE, dm-rq will free the request. However, LLD may allocate
+> private data for this request, so this way will cause memory leak.
+> 
+> Add .cleanup_rq() callback and implement it in SCSI for fixing the issue,
+> since SCSI is the only driver which allocates private requst data in
+> .queue_rq() path.
+> 
+> Another use case of this callback is to free the request and re-submit
+> bios during cpu hotplug when the hctx is dead, see the following link:
+> 
+> https://lore.kernel.org/linux-block/f122e8f2-5ede-2d83-9ca0-bc713ce66d01@huawei.com/T/#t
 
-For pages that were retained via get_user_pages*(), release those pages
-via the new put_user_page*() routines, instead of via put_page() or
-release_pages().
+Applied for 5.4, thanks.
 
-This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-("mm: introduce put_user_page*(), placeholder versions").
-
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-fsdevel@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
----
- fs/io_uring.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index d542f1cf4428..8a1de5ab9c6d 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2815,7 +2815,7 @@ static int io_sqe_buffer_unregister(struct io_ring_ctx *ctx)
- 		struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
- 
- 		for (j = 0; j < imu->nr_bvecs; j++)
--			put_page(imu->bvec[j].bv_page);
-+			put_user_page(imu->bvec[j].bv_page);
- 
- 		if (ctx->account_mem)
- 			io_unaccount_mem(ctx->user, imu->nr_bvecs);
-@@ -2959,10 +2959,8 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
- 			 * if we did partial map, or found file backed vmas,
- 			 * release any pages we did get
- 			 */
--			if (pret > 0) {
--				for (j = 0; j < pret; j++)
--					put_page(pages[j]);
--			}
-+			if (pret > 0)
-+				put_user_pages(pages, pret);
- 			if (ctx->account_mem)
- 				io_unaccount_mem(ctx->user, nr_pages);
- 			kvfree(imu->bvec);
 -- 
-2.22.0
+Jens Axboe
 
