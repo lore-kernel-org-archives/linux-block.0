@@ -2,93 +2,125 @@ Return-Path: <SRS0=923v=WB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96835C433FF
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 04:15:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04848C433FF
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 06:38:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F1452086D
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 04:15:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE42F2086D
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 06:38:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="OIeSnNO7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727123AbfHEEPc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Aug 2019 00:15:32 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41512 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726454AbfHEEPc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Aug 2019 00:15:32 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 56732ACC1;
-        Mon,  5 Aug 2019 04:15:29 +0000 (UTC)
-Subject: Re: [PATCH v2 20/34] xen: convert put_page() to put_user_page*()
-To:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>
-Cc:     devel@driverdev.osuosl.org, Dave Chinner <david@fromorbit.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, x86@kernel.org,
-        linux-mm@kvack.org, Dave Hansen <dave.hansen@linux.intel.com>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-rpi-kernel@lists.infradead.org, devel@lists.orangefs.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        rds-devel@oss.oracle.com,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, ceph-devel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-media@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, sparclinux@vger.kernel.org,
-        Jason Gunthorpe <jgg@ziepe.ca>
-References: <20190804224915.28669-1-jhubbard@nvidia.com>
- <20190804224915.28669-21-jhubbard@nvidia.com>
-From:   Juergen Gross <jgross@suse.com>
-Message-ID: <82afb221-52a2-b399-46f5-0ee1f21c3417@suse.com>
-Date:   Mon, 5 Aug 2019 06:15:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190804224915.28669-21-jhubbard@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: de-DE
-Content-Transfer-Encoding: 7bit
+        id S1726659AbfHEGiM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Aug 2019 02:38:12 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:34222 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726436AbfHEGiL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Aug 2019 02:38:11 -0400
+Received: by mail-pl1-f194.google.com with SMTP id i2so36088924plt.1
+        for <linux-block@vger.kernel.org>; Sun, 04 Aug 2019 23:38:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=c8VHeq19ya4NgPAfDdaqw+9aj+OFOs4WuaGxyy8ErMY=;
+        b=OIeSnNO7cj0zewIOCmHFYjKvW+fx4JZINu923BjB0Hq/ubX+bwiftL7/216vqNXYB1
+         Lvks5py6y2q6fGu/M7MagQ8j0/yj5L9KGlvU+Mibf3MLnOSONPXVuTIdfPrUM7z974aj
+         /eVzeZ2pbGEtDq1N5I9ns4JjUvVzAwJ2GuM0Dp56b/MMHk55rwpC8sB9F58psHo3HV3f
+         yiHG0YyHEFKQXZ6Lwpmr6OB9/t3xUkgMGy95WPvIGYYGwp00ReDgvYx+1hfgOoTkb4Hg
+         HooskmgqWCHsPqVKWhVei8eC/pOEyaijR9Pk8/gclfLyAZkvoIiS+vIgNoO0O5tg/PcS
+         4VqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=c8VHeq19ya4NgPAfDdaqw+9aj+OFOs4WuaGxyy8ErMY=;
+        b=QqmECd9C4iuAUoxjR17Y0k7Xk+nLopvnNPS224yUc1xM6XWb36tA9dhvRWqHy+Vubz
+         oem4eoeBzBENxz3OnUhmTs+Tq9wIdZ/vRlQSap3nUbAZOmB1LntfowY4WO0Bn/wZeDTM
+         k8EY9gXslWgOxTl6nstG+BMMTwRt56hZFf/IHEDgMJ6yXd9Ko2R36jA+3+5RzTmujNP8
+         TqQtiWGegVJmXiHWXXHO7jOo+ttaaxfix5P3SiXtf4KXPtGGqt7ykj+L8tMwkt/tqCBR
+         Hns0Ve6W3wEfJDFsBFewX2/U/Goav8ZaTLBnouBhMhibfqmhOmRW74C07EIeOarlUaaT
+         CvUA==
+X-Gm-Message-State: APjAAAV51pKX+aSu/9FVMKjulTq+8NaMLeUzoErh4g1Q4/rF3ilO4MiN
+        EN476dFhmfwznD63poZlmNcNIg==
+X-Google-Smtp-Source: APXvYqzqL7SmIZkzv/9i2XMvJNac9FyB+DvqB1wnGifjnJX39xY3diG41KDD+0TGRZPyCyR1hnSZ+w==
+X-Received: by 2002:a17:902:29e6:: with SMTP id h93mr83120613plb.297.1564987090946;
+        Sun, 04 Aug 2019 23:38:10 -0700 (PDT)
+Received: from localhost ([61.120.150.70])
+        by smtp.gmail.com with ESMTPSA id r18sm88580639pfg.77.2019.08.04.23.38.09
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Sun, 04 Aug 2019 23:38:10 -0700 (PDT)
+From:   Fam Zheng <zhengfeiran@bytedance.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     axboe@kernel.dk, fam@euphon.net, paolo.valente@linaro.org,
+        duanxiongchun@bytedance.com, linux-block@vger.kernel.org,
+        tj@kernel.org, cgroups@vger.kernel.org,
+        zhangjiachen.jc@bytedance.com
+Subject: [PATCH v2 0/3] Implement BFQ per-device weight interface
+Date:   Mon,  5 Aug 2019 14:38:04 +0800
+Message-Id: <20190805063807.9494-1-zhengfeiran@bytedance.com>
+X-Mailer: git-send-email 2.11.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05.08.19 00:49, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
-> 
-> For pages that were retained via get_user_pages*(), release those pages
-> via the new put_user_page*() routines, instead of via put_page() or
-> release_pages().
-> 
-> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-> ("mm: introduce put_user_page*(), placeholder versions").
-> 
-> This also handles pages[i] == NULL cases, thanks to an approach
-> that is actually written by Juergen Gross.
-> 
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> 
-> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> Cc: xen-devel@lists.xenproject.org
-> ---
-> 
-> Hi Juergen,
-> 
-> Say, this is *exactly* what you proposed in your gup.patch, so
-> I've speculatively added your Signed-off-by above, but need your
-> approval before that's final. Let me know please...
+(Revision starting from v2 since v1 was used off-list)
 
-Yes, that's fine with me.
+Hi Paolo and others,
 
+This adds to BFQ the missing per-device weight interfaces:
+blkio.bfq.weight_device on legacy and io.bfq.weight on unified. The
+implementation pretty closely resembles what we had in CFQ and the parsing code
+is basically reused.
 
-Juergen
+Tests
+=====
+
+Using two cgroups and three block devices, having weights setup as:
+
+Cgroup          test1           test2
+============================================
+default         100             500
+sda             500             100
+sdb             default         default
+sdc             200             200
+
+cgroup v1 runs
+--------------
+
+    sda.test1.out:   READ: bw=913MiB/s
+    sda.test2.out:   READ: bw=183MiB/s
+
+    sdb.test1.out:   READ: bw=213MiB/s
+    sdb.test2.out:   READ: bw=1054MiB/s
+
+    sdc.test1.out:   READ: bw=650MiB/s
+    sdc.test2.out:   READ: bw=650MiB/s
+
+cgroup v2 runs
+--------------
+
+    sda.test1.out:   READ: bw=915MiB/s
+    sda.test2.out:   READ: bw=184MiB/s
+
+    sdb.test1.out:   READ: bw=216MiB/s
+    sdb.test2.out:   READ: bw=1069MiB/s
+
+    sdc.test1.out:   READ: bw=621MiB/s
+    sdc.test2.out:   READ: bw=622MiB/s
+
+Fam Zheng (3):
+  bfq: Fix the missing barrier in __bfq_entity_update_weight_prio
+  bfq: Extract bfq_group_set_weight from bfq_io_set_weight_legacy
+  bfq: Add per-device weight
+
+ block/bfq-cgroup.c  | 151 +++++++++++++++++++++++++++++++++++++++-------------
+ block/bfq-iosched.h |   3 ++
+ block/bfq-wf2q.c    |   2 +
+ 3 files changed, 119 insertions(+), 37 deletions(-)
+
+-- 
+2.11.0
+
