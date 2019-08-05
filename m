@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF82C433FF
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 13:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E67C0650F
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 13:14:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 862982075B
-	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 13:11:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F7782067D
+	for <linux-block@archiver.kernel.org>; Mon,  5 Aug 2019 13:14:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565010691;
-	bh=KnrFv3vDarcaPhQcdemoJlumUpCpVGh+3zak/sjMUo4=;
+	s=default; t=1565010869;
+	bh=IqjSK9W3j2L6/NohAdlcBv+/sC6WYnsk0r0fGiwNuA8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=FmcT6qr1zl3b7VONtUlzsmtVxEJGKEA3ZCTFVrIZdPu/6bZAi+IJdwUHNEX0txgwO
-	 /e2j6WGdD8BzKBeXAW20H+RWJ2QZPPIZfO8IZrflfZ+bz8tqB8WQ7DFSHeNHF3BHFY
-	 0VtzpnvPHevkfIs0U9ASgo95MUZETvi39XgWYZj8=
+	b=q0Q90/WrPTNGJYGO4k1nQxUBNI+33SxrZH4/KGnjNJIb4FXtd2r/yXtcLifFN1yp7
+	 2ytcjAQJlwyYVIT04+wEf+J/n6LoGDbI2SXb/M2lhLZ7BavXq977SR58I+fuLe2RH+
+	 ZHCai9ZXMQyT7iE9r+x8EgzFJw92mYGDuaUIcT5U=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729923AbfHENLN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Aug 2019 09:11:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50476 "EHLO mail.kernel.org"
+        id S1729217AbfHENII (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Aug 2019 09:08:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46034 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730483AbfHENLN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Aug 2019 09:11:13 -0400
+        id S1729955AbfHENIH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Aug 2019 09:08:07 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 786072075B;
-        Mon,  5 Aug 2019 13:11:11 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4DCB92075B;
+        Mon,  5 Aug 2019 13:08:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565010672;
-        bh=KnrFv3vDarcaPhQcdemoJlumUpCpVGh+3zak/sjMUo4=;
+        s=default; t=1565010486;
+        bh=IqjSK9W3j2L6/NohAdlcBv+/sC6WYnsk0r0fGiwNuA8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qnMKDvt899UrATZEZrj2gSAA9lvefcI72rCMvr7D+iC9T4jpgfF6jvYfYtICyMfXy
-         0HIcTYd1KcZQHYnRcz0abP/VSdf1rE7w5XpY5fB7gQBn9mCDPuVN7z4bEk6nvTQL0Q
-         Q/n3ORhCL9nCFzHGbMlYWiAEQg1MCvRJJaqDUhqw=
+        b=x8e50++dqz1ikr54ufAbsgC6MMDp+N5DN9wU0Yc3eIEVOy+u8CvM2tc1YrSoZ79Fk
+         eUkf7Y+hhTbU7vwistQyh9jkyZzR122hgDFv+mJm0EIZGOOENUhH0G4SxqwKne4tbw
+         ETiI1+cQl1mHqVLUlfSEOo5iSMX+Ig91u7M2DRbs=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -47,12 +47,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Josef Bacik <josef@toxicpanda.com>,
         Munehisa Kamata <kamatam@amazon.com>,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4.19 60/74] nbd: replace kill_bdev() with __invalidate_device() again
-Date:   Mon,  5 Aug 2019 15:03:13 +0200
-Message-Id: <20190805124940.695248947@linuxfoundation.org>
+Subject: [PATCH 4.14 43/53] nbd: replace kill_bdev() with __invalidate_device() again
+Date:   Mon,  5 Aug 2019 15:03:08 +0200
+Message-Id: <20190805124932.785697070@linuxfoundation.org>
 X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190805124935.819068648@linuxfoundation.org>
-References: <20190805124935.819068648@linuxfoundation.org>
+In-Reply-To: <20190805124927.973499541@linuxfoundation.org>
+References: <20190805124927.973499541@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -122,7 +122,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1218,7 +1218,7 @@ static void nbd_clear_sock_ioctl(struct
+@@ -1207,7 +1207,7 @@ static void nbd_clear_sock_ioctl(struct
  				 struct block_device *bdev)
  {
  	sock_shutdown(nbd);
