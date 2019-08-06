@@ -2,130 +2,107 @@ Return-Path: <SRS0=0w4s=WC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 372BEC433FF
-	for <linux-block@archiver.kernel.org>; Tue,  6 Aug 2019 08:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA203C433FF
+	for <linux-block@archiver.kernel.org>; Tue,  6 Aug 2019 10:24:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C98F20651
-	for <linux-block@archiver.kernel.org>; Tue,  6 Aug 2019 08:11:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0B8420B1F
+	for <linux-block@archiver.kernel.org>; Tue,  6 Aug 2019 10:24:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W6yaIi5E"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728991AbfHFILk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Aug 2019 04:11:40 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49642 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727259AbfHFILk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Aug 2019 04:11:40 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 09A80AF1D;
-        Tue,  6 Aug 2019 08:11:38 +0000 (UTC)
-Subject: Re: [PATCH blktests] Make the NVMe tests more reliable
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Omar Sandoval <osandov@fb.com>
-Cc:     linux-block@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-References: <20190805232512.50992-1-bvanassche@acm.org>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <9f8a82f6-5a7b-89ff-4a3a-fa4e9853fc35@suse.de>
-Date:   Tue, 6 Aug 2019 10:11:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1732290AbfHFKXy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Aug 2019 06:23:54 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:44087 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726713AbfHFKXy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Aug 2019 06:23:54 -0400
+Received: by mail-ed1-f66.google.com with SMTP id k8so81764920edr.11;
+        Tue, 06 Aug 2019 03:23:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=nHAZm0GZeVyi0k2jXAqZJ6+K/F+OXmkni52x4h/2WKU=;
+        b=W6yaIi5Eo9POup4WUZfRIHlyJ8IGxq+DvAHVwLOkie5rWs0Fk9vvDlFBrcwFpoK+VL
+         Tj0JydlTDm1RimAaQo0IBtt0NGVl1bzVHDI3DDYlzgCDaqlQoQAc43r3qj7Ivm8RcyhC
+         eJKN/HvOYiTmeFsPcLvX9daiIIXSgCUlLR/bJOUTieraPl+UPBZrrJQFtXaclzq/bra+
+         AF+Zksj+MchmgA6LNPHlmULwQwjjdyA4PjX01pHQg3/ZCrqEzkOKxlLBpKVN6jmSv01r
+         C80UUtClWdQqFzFISc93OQENgf7/tFHSDLNumfYDptwVttiXjO3XgQEc1Tc+85IfBkBA
+         9y8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=nHAZm0GZeVyi0k2jXAqZJ6+K/F+OXmkni52x4h/2WKU=;
+        b=tdMKdsBAdbrtBhxYHaokf5Ibn8HPuH0qfkGNbT9ewlu3G53+zDCY7us5ksycetQ2h7
+         FwJDyc/3bYG7IxkiJz1H2jq4VaD5ifz+PK4x3PcJmgURTUAamDCVMppm5BTWasdnuFNI
+         FdaX/uicv9gbV3FqAk5Vontu7PjgXXrPEQKGz77dBRPW+YMANLuv6ffSxkAAyq98CQ1v
+         +hGjiNrdkkyUBD3vk6qqimDRME+4CyQAuj6gHpLIQcJgikQunC9ja1Wz07efWj+DIr/x
+         W5v/IYufaoqS+IP5nNJFJqLkwUwTBAIDDCKJrem5zWYBThyvXe8hLj3kcqnqGAv6Esjf
+         mGeg==
+X-Gm-Message-State: APjAAAXnHzPpDYVmlDzTcxBmn72mkgc1nizfYx7ehTUl3n9XDfEeYsA7
+        KfWiSDPa9ZRdjbGSZ7rTp3k=
+X-Google-Smtp-Source: APXvYqxNSOOeEKipsPzXzNB35eNLgJeH0dlFgOZerwtyAg1/J6mRzv95o7+dpOqMTQU7nPiqxQkS0w==
+X-Received: by 2002:a17:906:8386:: with SMTP id p6mr2356514ejx.139.1565087031956;
+        Tue, 06 Aug 2019 03:23:51 -0700 (PDT)
+Received: from continental ([187.112.244.117])
+        by smtp.gmail.com with ESMTPSA id jt17sm14779247ejb.90.2019.08.06.03.23.44
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 06 Aug 2019 03:23:51 -0700 (PDT)
+Date:   Tue, 6 Aug 2019 07:24:56 -0300
+From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Doug Gilbert <dgilbert@interlog.com>,
+        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
+        Hannes Reinecke <hare@suse.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        "open list:SCSI SUBSYSTEM" <linux-scsi@vger.kernel.org>,
+        "open list:SCSI TARGET SUBSYSTEM" <target-devel@vger.kernel.org>
+Subject: Re: [PATCH] block: Remove request_queue argument from
+ blk_execute_rq_nowait
+Message-ID: <20190806102456.GA29914@continental>
+References: <20190806011754.7722-1-marcos.souza.org@gmail.com>
+ <20190806051911.GA13409@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20190805232512.50992-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190806051911.GA13409@lst.de>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 06/08/2019 01:25, Bart Van Assche wrote:
-[...]
+On Tue, Aug 06, 2019 at 07:19:11AM +0200, Christoph Hellwig wrote:
+> On Mon, Aug 05, 2019 at 10:17:51PM -0300, Marcos Paulo de Souza wrote:
+> > +void blk_execute_rq_nowait(struct gendisk *bd_disk, struct request *rq,
+> > +			int at_head, rq_end_io_fn *done)
+> 
+> We store a ->rq_disk in struct request, so we should also not need
+> that.  And at_head should either become a bool, or be replaced with
+> a flags argument, ints used boolean are usually not a good idea.
 
-> +			for ((i=0;i<10;i++)); do
-> +				[ -e /sys/block/$dev/uuid ] &&
-> +					[ -e /sys/block/$dev/wwid ] &&
-> +					return 0
-> +				sleep .1
-> +			done
-> +			return 1
->  		fi
->  	done
-> +	return 1
+Makes sense.
 
-Hmmm, I don't really understand why you're adding the return {0,1} here.
-None of the callers of _find_nvme_loop_dev() does anything with the
-return value of the function.
+> 
+> > @@ -81,7 +80,7 @@ void blk_execute_rq(struct request_queue *q, struct gendisk *bd_disk,
+> 
+> And all the same argument changes that apply to blk_execute_rq_nowait
+> apply to blk_execute_rq as well.
 
-They expect either a nvme-device or an empty string and fail if the
-string is empty due to a non-empty diff in the golden output.
-
-Thanks,
-	Johannes
--- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Thanks for the suggestions, I will send a v2 soon.
