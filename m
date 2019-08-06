@@ -2,161 +2,96 @@ Return-Path: <SRS0=0w4s=WC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2722BC433FF
-	for <linux-block@archiver.kernel.org>; Tue,  6 Aug 2019 20:39:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E87C32751
+	for <linux-block@archiver.kernel.org>; Tue,  6 Aug 2019 22:05:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E8E8B20B1F
-	for <linux-block@archiver.kernel.org>; Tue,  6 Aug 2019 20:39:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 464EF21880
+	for <linux-block@archiver.kernel.org>; Tue,  6 Aug 2019 22:05:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="De7r6lQU"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="F0Ff2uTw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726044AbfHFUjT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Aug 2019 16:39:19 -0400
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:2263 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726018AbfHFUjT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Aug 2019 16:39:19 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d49e5760000>; Tue, 06 Aug 2019 13:39:18 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 06 Aug 2019 13:39:17 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 06 Aug 2019 13:39:17 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 6 Aug
- 2019 20:39:16 +0000
-Subject: Re: [PATCH v2 01/34] mm/gup: add make_dirty arg to
- put_user_pages_dirty_lock()
-To:     Ira Weiny <ira.weiny@intel.com>, <john.hubbard@gmail.com>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Jan Kara <jack@suse.cz>, Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
-        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
-        <dri-devel@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linux-rpi-kernel@lists.infradead.org>,
-        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
-        <x86@kernel.org>, <xen-devel@lists.xenproject.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>
-References: <20190804224915.28669-1-jhubbard@nvidia.com>
- <20190804224915.28669-2-jhubbard@nvidia.com>
- <20190806173945.GA4748@iweiny-DESK2.sc.intel.com>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <0e232d84-e6ea-159e-91d4-77e938377161@nvidia.com>
-Date:   Tue, 6 Aug 2019 13:39:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726133AbfHFWFv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Aug 2019 18:05:51 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:56194 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726716AbfHFWFv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Aug 2019 18:05:51 -0400
+Received: by mail-wm1-f66.google.com with SMTP id a15so79698768wmj.5
+        for <linux-block@vger.kernel.org>; Tue, 06 Aug 2019 15:05:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=android.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=D7kIZFgGybpcf1I/lUbPOT+bnIDjPdUpNNf2NGVocZo=;
+        b=F0Ff2uTwa31Ysn929Q7uzlxnogUkI+Bcnwayo/cc/LIGOsaIOOlAz7+Wdb7VJkG6Md
+         9m5KPfc04xft/5DxMlp/Ck+BPif+B/vzc/PpDntW/kB5iYyHDMSkLYofitvUt9JX+ASo
+         45JHolnWmY1CaGLCIk18wK3TkpAMpJv1xEGa0J7kSIq/BlA+tgfTiO2JXgMhFxcdfgIM
+         /9cb0eaGWIuWgZVevaHBsHlEZIqDuhZJV/yZUJsam/AQ94bLbMw88PvDE1x7WbInouGq
+         Hwnc/tfdixHMePg7Gk2rrzIHmRL1cWFt2r23/1XCmzM6xLht4/rC1WBdQVJNuS9NSbSr
+         4c3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=D7kIZFgGybpcf1I/lUbPOT+bnIDjPdUpNNf2NGVocZo=;
+        b=OtKcIaaXmlybw5aH1gEpE0D/8jKCb/8bT/xHIAjVCNVBiyLfmizr5wfq9+QDgxBgvA
+         731XMeurrBGUY8hFA1TUcMkpMhFRPNWsgS3KyycnUDYUlNBaVw3VAgXtUPryuSPWzfEg
+         VuFuoP0D9tY3ml/fMJ0YR6fStrZW3qd/8tdIbmP2GBwvxP92WtVxED+y/ZY92LpU5HiC
+         ncTYdEtPYtyuTZpv1dv8wjxHmLbIMKlIlT+veBoz8rRAFplnnq2pJ1wnJOyTUcmzN/L8
+         9GxHxzZNGoI3p4CeSQ6uUzQtgHuqnBy80C3QjKGHIh7AWw08m62bNFlMVUHVtbAsVF9I
+         b6NQ==
+X-Gm-Message-State: APjAAAVZA71U4V+ditngjoYGbCr+lMGRceAzCDpeVJ9PMpEtKYQ28sp1
+        6rD+lMfptczcjk3dLBp2D++MzN3+Vto=
+X-Google-Smtp-Source: APXvYqxOLRZTDczeSVrI3miadMJLEFaxVK0c2u1bVfx0uaVXU9QKEAFYtItXHnkQIlI/Sgy9gwK73g==
+X-Received: by 2002:a1c:751a:: with SMTP id o26mr6375286wmc.13.1565129149305;
+        Tue, 06 Aug 2019 15:05:49 -0700 (PDT)
+Received: from balsini.lon.corp.google.com ([2a00:79e0:d:210:e751:37a0:1e95:e65d])
+        by smtp.gmail.com with ESMTPSA id s3sm93652190wmh.27.2019.08.06.15.05.48
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 06 Aug 2019 15:05:48 -0700 (PDT)
+From:   Alessio Balsini <balsini@android.com>
+To:     linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, axboe@kernel.dk, dvander@gmail.com,
+        elsk@google.com, gregkh@linuxfoundation.org,
+        kernel-team@android.com
+Subject: [PATCH] loop: Add LOOP_SET_DIRECT_IO in compat ioctl
+Date:   Tue,  6 Aug 2019 23:05:24 +0100
+Message-Id: <20190806220524.251404-1-balsini@android.com>
+X-Mailer: git-send-email 2.22.0.770.g0f2c4a37fd-goog
 MIME-Version: 1.0
-In-Reply-To: <20190806173945.GA4748@iweiny-DESK2.sc.intel.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL104.nvidia.com (172.18.146.11) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1565123958; bh=kP7gTuC3ZdPRsl2ZM8hKtRsMZoJPCXuUqs/7ZYFYlas=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=De7r6lQUtbn+GTEsMqljgVKTlQIrCw8ZESuRqc7w4LEYPASOCDyQM6KfNGQouIjYR
-         fh0BckBJVbNT9AbXMQb66ZhMKSleBMpCp4Q67sEppT12m031guaO+mSQiN77Vubrty
-         dLwAVLGyjRDyH8bKz/ie59UuEUjWXDBsQB9IGYcfiHyqrDkJ8dhLAwUMAPjRDqyeiY
-         KJw8zEX2A8/HIUmoazoyVwItiLDzuGpYh0geDqgdodA5dwJzt0S2azlo+PhdmfDHXO
-         6GhmRkzx66GKpfVpxeAm8ztIGHTRgebRJf3i5iJHgoMtdv7J6YmmRpepQCyIfl7KA0
-         CyUb7h3ZsvM+w==
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/6/19 10:39 AM, Ira Weiny wrote:
-> On Sun, Aug 04, 2019 at 03:48:42PM -0700, john.hubbard@gmail.com wrote:
->> From: John Hubbard <jhubbard@nvidia.com>
-...
->> -
->>  /**
->> - * put_user_pages_dirty() - release and dirty an array of gup-pinned pages
->> - * @pages:  array of pages to be marked dirty and released.
->> + * put_user_pages_dirty_lock() - release and optionally dirty gup-pinned pages
->> + * @pages:  array of pages to be maybe marked dirty, and definitely released.
-> 
-> Better would be.
-> 
-> @pages:  array of pages to be put
+Export LOOP_SET_DIRECT_IO as additional lo_compat_ioctl.
+The input argument for this ioctl is a single long, in the end converted
+to a 1-bit boolean. Compatibility is then preserved.
 
-OK, I'll change to that wording.
+Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Alessio Balsini <balsini@android.com>
+---
+ drivers/block/loop.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> 
->>   * @npages: number of pages in the @pages array.
->> + * @make_dirty: whether to mark the pages dirty
->>   *
->>   * "gup-pinned page" refers to a page that has had one of the get_user_pages()
->>   * variants called on that page.
->>   *
->>   * For each page in the @pages array, make that page (or its head page, if a
->> - * compound page) dirty, if it was previously listed as clean. Then, release
->> - * the page using put_user_page().
->> + * compound page) dirty, if @make_dirty is true, and if the page was previously
->> + * listed as clean. In any case, releases all pages using put_user_page(),
->> + * possibly via put_user_pages(), for the non-dirty case.
-> 
-> I don't think users of this interface need this level of detail.  I think
-> something like.
-> 
->  * For each page in the @pages array, release the page.  If @make_dirty is
->  * true, mark the page dirty prior to release.
-
-Yes, it is too wordy, I'll change to that.
-
-> 
-...
->> -void put_user_pages_dirty_lock(struct page **pages, unsigned long npages)
->> -{
->> -	__put_user_pages_dirty(pages, npages, set_page_dirty_lock);
->> +	/*
->> +	 * TODO: this can be optimized for huge pages: if a series of pages is
->> +	 * physically contiguous and part of the same compound page, then a
->> +	 * single operation to the head page should suffice.
->> +	 */
-> 
-> I think this comment belongs to the for loop below...  or just something about
-> how to make this and put_user_pages() more efficient.  It is odd, that this is
-> the same comment as in put_user_pages()...
-
-Actually I think I'll just delete the comment entirely, it's just noise really.
-
-> 
-> The code is good.  So... Other than the comments.
-> 
-> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-
-
-Thanks for the review!
-
-
-thanks,
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 3036883fc9f8..a7461f482467 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1755,6 +1755,7 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case LOOP_SET_FD:
+ 	case LOOP_CHANGE_FD:
+ 	case LOOP_SET_BLOCK_SIZE:
++	case LOOP_SET_DIRECT_IO:
+ 		err = lo_ioctl(bdev, mode, cmd, arg);
+ 		break;
+ 	default:
 -- 
-John Hubbard
-NVIDIA
+2.22.0.770.g0f2c4a37fd-goog
+
