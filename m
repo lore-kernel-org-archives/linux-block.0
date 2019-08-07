@@ -2,104 +2,141 @@ Return-Path: <SRS0=SzsG=WD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1149FC31E40
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 00:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B19C41532
+	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFE2C21738
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 00:50:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D24FB2186A
+	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="RFvhDhAz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SyrfptYH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726238AbfHGAuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Aug 2019 20:50:46 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42175 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726542AbfHGAuq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Aug 2019 20:50:46 -0400
-Received: by mail-wr1-f66.google.com with SMTP id x1so39700759wrr.9
-        for <linux-block@vger.kernel.org>; Tue, 06 Aug 2019 17:50:45 -0700 (PDT)
+        id S1729841AbfHGBeg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Aug 2019 21:34:36 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:43311 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729743AbfHGBed (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Aug 2019 21:34:33 -0400
+Received: by mail-pg1-f195.google.com with SMTP id r26so6587190pgl.10;
+        Tue, 06 Aug 2019 18:34:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
+        d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=z5+rKbwY4FKqVWmbsGvvdEeOmqTq+9PbufWY+vIRJyY=;
-        b=RFvhDhAzsEGmP3R8DL+pcMrzIbrq7k+polU6BnPglD2j6Ds3u6BvfSCwQrHN/oSbUo
-         ZQWbBRIwhTDubauU1tBRlsnHba4NQW5MFP6x+0n71sG6JIBHQJ6CgdFofTEp2E//sVeZ
-         2NN6sWNnuDOyl6ehYH4jFJ28qsVckaeA4MhqeNCBtmdooWzBz4xpyCmIduZtAplwogqH
-         oibugB4zkY5h7pF5VSgR1yDskxbQF74yap84y6xXHY1Sd1Q7fzyVWEeLuH+v9Q3yXMJV
-         W0auuFW6rZErNPQflCH6ojmh9PLMuBUEvYpGu/yt49vkEevA1XB5Ks+baotLc5FA64Yb
-         ENIA==
+        bh=GAYBkmVoEF3i3+udFKn42Z4HyLG0jAAiACtL32v96bk=;
+        b=SyrfptYHZmeMKLLq8uTuDSlh448/TZCFpG6Zn4FeLZy9cTZZGFbCJ1UNBJPoCIn+aW
+         ygsAzBiAVH0kcipZ4ihTHldNmhfD0znPMjSBKoUKvh0NP49BRvqIlmsIg6DT8KHAwPBe
+         4kKUVEJdNXvGigLmpKs15CkjDKUzxh1vmFZZWbslFSuyKlpacG3oD1RXF7xFsxcwBIbL
+         0fmLLMJWYpY6/OBVXor4D0pE1ZvktHc8OSEdcNEszsvYRmiqmzBZ8eGFZOKusFOHPIrj
+         /e89tRQCCSxcnEZ4JUtQARmnCroQo1zfhGtcxjcGVNa5FV+aQSWzJVN76YDHje0qrdo9
+         NXRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=z5+rKbwY4FKqVWmbsGvvdEeOmqTq+9PbufWY+vIRJyY=;
-        b=bNdd7pACirpt2i+Dy26kJiFcvPWN7MLu4f2/t6p0SXHAjlBgbAlBvq+bE2rI12974U
-         UYjUaoFsEXmfFwtDhoVDSUx2joiyir5wo++H4D8KcZ57UtiKlzi97x32KgGcIS4O7HS6
-         3lgSWCWVAp+XRVJtVti5SumOje5E5NRKA7dvzwujrlM97rqyiuw0idEMZCdxpqwC1l8M
-         2kOIrxa86juAnUK/GxVvk9Jy3VHkPhGAUkpw722fVDm12Fa2X3jgQyM3VDnAGebe4j5B
-         hUMiMa8czXW9yJm+V+Dj1Fi1F55qSftSDCNhU9/PGB3xIFjRzlX4v4v1gwdld9CyOAmx
-         jKtA==
-X-Gm-Message-State: APjAAAX16JU07AdxnEW+XJcW6L3UVWWHjjtbMeRCThaTjwknqRb+t14G
-        XnmWz5PaIehWbjXC5gN+16f0hZenlyHWsg==
-X-Google-Smtp-Source: APXvYqy8KQjeNNxOIH8SeUbJwgyA5CS+DhnMMoQmPDKz4PGFRVmsXJYIn35yv5oyM8mLa/a/mW6Dow==
-X-Received: by 2002:adf:e8c8:: with SMTP id k8mr6854010wrn.285.1565139044280;
-        Tue, 06 Aug 2019 17:50:44 -0700 (PDT)
-Received: from balsini.lon.corp.google.com ([2a00:79e0:d:210:e751:37a0:1e95:e65d])
-        by smtp.gmail.com with ESMTPSA id h8sm99831846wmf.12.2019.08.06.17.50.43
+        bh=GAYBkmVoEF3i3+udFKn42Z4HyLG0jAAiACtL32v96bk=;
+        b=lJO8rtBVEwGgrUORHpOyjxTue4Pb0QLNu7657mTltZU5d3/+xsP5kCEVDW9nDMgSuu
+         ZYzutopVQf5F4E0ILnlNHEKQjXvHvyAaKEnYp2xIt/Xtz9JOC/jOGnPk5MuldADLGiBQ
+         cVRF68vj24re73iStc2SVOq8YlUDCmjyTUByidDQr35kb13UEKRuC7igJn2kWtiX4x1Y
+         noGUnH2um0mbRv62B46VUbgGaE25IiHXnnYtBK7qXztbTQW36uegeSof5w6+8OAiqGHx
+         148WGqJXSqOMaJt7jV6EgXxkXwZvHv8uoDAgBi7PHbz80XYLERoU2pH08eagFBU4jOW9
+         w50Q==
+X-Gm-Message-State: APjAAAXCVQjC+oZmS2iLNUCK01sVOeDd6mOX3bdd0aMDisXL3w+vb0+n
+        h1I2vjZsTz3D+S+s0k9dTmg=
+X-Google-Smtp-Source: APXvYqwmirpRx7sRgblxTdJDdZc3lNLPB7sz+os8JHE4peLsZYES+zILuE4KL76TUaGsLoa8NjKqJA==
+X-Received: by 2002:a62:ae02:: with SMTP id q2mr6578356pff.1.1565141671450;
+        Tue, 06 Aug 2019 18:34:31 -0700 (PDT)
+Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
+        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.29
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 06 Aug 2019 17:50:43 -0700 (PDT)
-From:   Alessio Balsini <balsini@android.com>
-To:     linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, axboe@kernel.dk, dvander@gmail.com,
-        elsk@google.com, gregkh@linuxfoundation.org, joelaf@google.com,
-        kernel-team@android.com
-Subject: [PATCH v2] loop: Add LOOP_SET_DIRECT_IO to compat ioctl
-Date:   Wed,  7 Aug 2019 01:48:28 +0100
-Message-Id: <20190807004828.28059-1-balsini@android.com>
-X-Mailer: git-send-email 2.23.0.rc1.153.gdeed80330f-goog
-In-Reply-To: <CAJWu+oo=GrZ+SbA6=bboM4==TKXBsTRWkTrkWiZ55pqhJtgQqQ@mail.gmail.com>
-References: <CAJWu+oo=GrZ+SbA6=bboM4==TKXBsTRWkTrkWiZ55pqhJtgQqQ@mail.gmail.com>
+        Tue, 06 Aug 2019 18:34:30 -0700 (PDT)
+From:   john.hubbard@gmail.com
+X-Google-Original-From: jhubbard@nvidia.com
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>,
+        Huang Ying <ying.huang@intel.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Hocko <mhocko@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rik van Riel <riel@surriel.com>,
+        Souptick Joarder <jrdr.linux@gmail.com>,
+        Will Deacon <will.deacon@arm.com>
+Subject: [PATCH v3 29/41] mm/memory.c: convert put_page() to put_user_page*()
+Date:   Tue,  6 Aug 2019 18:33:28 -0700
+Message-Id: <20190807013340.9706-30-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190807013340.9706-1-jhubbard@nvidia.com>
+References: <20190807013340.9706-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-NVConfidentiality: public
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Enabling Direct I/O with loop devices helps reducing memory usage by
-avoiding double caching.  32 bit applications running on 64 bits systems
-are currently not able to request direct I/O because is missing from the
-lo_compat_ioctl.
+From: John Hubbard <jhubbard@nvidia.com>
 
-This patch fixes the compatibility issue mentioned above by exporting
-LOOP_SET_DIRECT_IO as additional lo_compat_ioctl() entry.
-The input argument for this ioctl is a single long converted to a 1-bit
-boolean, so compatibility is preserved.
+For pages that were retained via get_user_pages*(), release those pages
+via the new put_user_page*() routines, instead of via put_page() or
+release_pages().
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Alessio Balsini <balsini@android.com>
+This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+("mm: introduce put_user_page*(), placeholder versions").
+
+Cc: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Cc: Huang Ying <ying.huang@intel.com>
+Cc: Jérôme Glisse <jglisse@redhat.com>
+Cc: Matthew Wilcox <willy@infradead.org>
+Cc: Michal Hocko <mhocko@suse.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Rik van Riel <riel@surriel.com>
+Cc: Souptick Joarder <jrdr.linux@gmail.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- drivers/block/loop.c | 1 +
- 1 file changed, 1 insertion(+)
+ mm/memory.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 44c9985f352ab..2e2193f754ab0 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1753,6 +1753,7 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- 	case LOOP_SET_FD:
- 	case LOOP_CHANGE_FD:
- 	case LOOP_SET_BLOCK_SIZE:
-+	case LOOP_SET_DIRECT_IO:
- 		err = lo_ioctl(bdev, mode, cmd, arg);
- 		break;
- 	default:
+diff --git a/mm/memory.c b/mm/memory.c
+index e2bb51b6242e..8870968496ea 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -4337,7 +4337,7 @@ int __access_remote_vm(struct task_struct *tsk, struct mm_struct *mm,
+ 						    buf, maddr + offset, bytes);
+ 			}
+ 			kunmap(page);
+-			put_page(page);
++			put_user_page(page);
+ 		}
+ 		len -= bytes;
+ 		buf += bytes;
 -- 
-2.23.0.rc1.153.gdeed80330f-goog
+2.22.0
 
