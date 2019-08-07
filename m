@@ -5,116 +5,136 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E63C5C32751
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 23:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3421EC433FF
+	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 23:51:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA5C4217D7
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 23:32:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 05661214C6
+	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 23:51:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nIrYsSA3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhTHm5Nw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730145AbfHGXcn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Aug 2019 19:32:43 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36802 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729624AbfHGXcn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 19:32:43 -0400
-Received: by mail-wr1-f66.google.com with SMTP id n4so93087349wrs.3;
-        Wed, 07 Aug 2019 16:32:41 -0700 (PDT)
+        id S2388425AbfHGXvN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Aug 2019 19:51:13 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:33603 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388123AbfHGXvN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 19:51:13 -0400
+Received: by mail-wr1-f65.google.com with SMTP id n9so93153309wru.0;
+        Wed, 07 Aug 2019 16:51:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=d9pVbIpLJvYHpW51yLVzRoQLiv107x9ELi8HQ3TSd7g=;
-        b=nIrYsSA3nPN1wHjF5rjTY4bWCaUPRftz1QKySm1Ov2giKzvoKNJ+OY8RqOEGX6m1y3
-         M8gnhSm+hO/g5l6KBBvUzCENROH09mk8YDGCcuFDViTP8FSysKLVdj7EymmHbmUAkCIH
-         fk4Qm1eM33fFaHywCfXlYO7RhA4McjuVM8wOZFD1pFY8mEzGtIiLW97KjvgSz1iE4cqb
-         EQYEtQjbch2N8MvmRrlWVI3KDbcOqEYoPQLHEjEGFWj7YfMrYd27F+KBvn01KzpElFNc
-         e+w62LitUTP8quCKbnlUzWRN9iGhPZs4Qz7Kw/R7ZIjNLE7NCOA2fc8eDWJyoytPiB4W
-         cI9w==
+        bh=81W60zVYjF0WkGNMIxtxV/QpHZxdSDjYkRGFZyoC9NQ=;
+        b=hhTHm5Nw3iub40WKb4H1rqVluoBt3pHck0QiywNeJGfgGNfnNjbzVrBPozkC5g8j9g
+         8aab+mE+4ulrI+yy3QFobs6H3wCMogQfTTEjQ5LK3wee/MLE5uYV9hg9P3EWlEO24S4A
+         GGcRJ0l3FkefLaW5R2D6+IUs60CB3RRjd630LA8qt65E0pXuyLQuHc03dYbuendzW8it
+         7nEsYz/9xvm9+lK46TAYUqXDRS06we3dkaQ4lBBiwYFZJ6UCQRLZ6KAyHmrnHas1Yv09
+         Fsrqehj9A5Sp6lSVWLuV7I3FdqXigC8Jlton0NbJR+TCmrH+wznz/IqijdnDjUtkTRZ5
+         s6aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=d9pVbIpLJvYHpW51yLVzRoQLiv107x9ELi8HQ3TSd7g=;
-        b=KmJqdWGigPwncPnDX+eulGOt1YhItJsqtZntryOCheQO8fVEBg/7svdCPLN+8+wJBf
-         9mnsRG/HMZkzsRdHa3n0V1ipo+PZEa9bAW8x5eQ3ZvyWLGNknJX8tUjICtoUwlCZhW1u
-         pIIDhoxY4uvmWFLEsOhBle7LrvpBQ4xpTcHtItCsekpkJktq2MXP9u8IporrAchV9ixw
-         G0yEPylOe6eRqfK9xAfcTjJPG4hmRcWKazvfLyx0ac8u04cfHPnrRYjv/+CTfO8GMuLR
-         5BlrxMET9Uu2MzH13J5la/oE9dBVzG1eU0uDRHEz/zep4a8s3+uy8/tnt8ZESfz0CbFA
-         Jvsw==
-X-Gm-Message-State: APjAAAUxgojWWRFM/5KOZO51LR+U9lz7yNHd0FgbbW1SA4KNFzOUJyRz
-        7y31rUAQeJ9IhCn/EP4we/XbkSg7eK+lHoNONeEDrJQ7GjfrPA==
-X-Google-Smtp-Source: APXvYqxtF8Xvm+tm4IZuVjVZGBCJtz7+06a5/1hAvnnEAxC6bsAXdJ7lSoaNNZISpWZcktt+oPMXhYhpd+tpojMOPr8=
-X-Received: by 2002:adf:f088:: with SMTP id n8mr13044701wro.58.1565220760576;
- Wed, 07 Aug 2019 16:32:40 -0700 (PDT)
+        bh=81W60zVYjF0WkGNMIxtxV/QpHZxdSDjYkRGFZyoC9NQ=;
+        b=LKpF5+OiYEksh0PzBiWhy7Q1YNJ4NDKSKTUKT7gNlVSHI8hph8oLR9dU06xGQgQM1w
+         t0drqBh0ZUkrio4CxDhmsVfs2nxI2z/YqYE+Wr/u9vuBFuhZBwUQnLBkiuKWOk4NRzMN
+         Ud16RCNUsRS/usoAS03J7mUAQg2EZgf2/H6wXY27CNqyCZuncmnEzSgQSHKV2jLmO9bv
+         1oFGSyR6NEd9a11C8Ou4U3LM++6tteTlXhTBa0XmueQAUY53Xw91j0YZyKPM9OEVEr7w
+         6nDVTVW7tkfTvENZqB2y8+soGujoKx5SGRC4LJu89pHBwowfyI6RkYZMV2xlkuEuueTV
+         383w==
+X-Gm-Message-State: APjAAAX7oRodd1yh/CXhAjj92nTqVKybRtVWCm5tBMoTtSWfzCgPNffW
+        6YfOa0BiMRsHns5A1Fr7HgSH8brNicnipIN3T8Q=
+X-Google-Smtp-Source: APXvYqwt7F5BkB58H5wD984WMZT43ugAcQRwg0VeBjol0Scsm8pOYOWjbYcauyyRwVif41pglTfX8hitoIVSFX1lIAs=
+X-Received: by 2002:adf:f088:: with SMTP id n8mr13084998wro.58.1565221870134;
+ Wed, 07 Aug 2019 16:51:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190807144948.28265-1-maier@linux.ibm.com> <20190807144948.28265-2-maier@linux.ibm.com>
-In-Reply-To: <20190807144948.28265-2-maier@linux.ibm.com>
+References: <20190805011906.5020-1-ming.lei@redhat.com>
+In-Reply-To: <20190805011906.5020-1-ming.lei@redhat.com>
 From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Thu, 8 Aug 2019 07:32:29 +0800
-Message-ID: <CACVXFVM0tFj8CmcHON04_KjxR=QErCbUx0abJgG2W9OBb7akZA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] scsi: core: fix missing .cleanup_rq for SCSI hosts
- without request batching
-To:     Steffen Maier <maier@linux.ibm.com>
-Cc:     "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
+Date:   Thu, 8 Aug 2019 07:50:59 +0800
+Message-ID: <CACVXFVNn9wu2sU=47csi+stvzN0TnOV4E8xBHYknxo9uDksMuQ@mail.gmail.com>
+Subject: Re: [PATCH] genirq/affinity: create affinity mask for single vector
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Marc Zyngier <marc.zyngier@arm.com>, linux-pci@vger.kernel.org,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-nvme <linux-nvme@lists.infradead.org>,
         linux-block <linux-block@vger.kernel.org>,
-        "open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Benjamin Block <bblock@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Mike Snitzer <snitzer@redhat.com>
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 7, 2019 at 10:55 PM Steffen Maier <maier@linux.ibm.com> wrote:
->
-> This was missing from scsi_mq_ops_no_commit of linux-next commit
-> 8930a6c20791 ("scsi: core: add support for request batching")
-> from Martin's scsi/5.4/scsi-queue or James' scsi/misc.
->
-> See also linux-next commit b7e9e1fb7a92 ("scsi: implement .cleanup_rq
-> callback") from block/for-next.
->
-> Signed-off-by: Steffen Maier <maier@linux.ibm.com>
-> Fixes: 8930a6c20791 ("scsi: core: add support for request batching")
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/scsi/scsi_lib.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> index ae03d3e2600f..90c257622bb0 100644
-> --- a/drivers/scsi/scsi_lib.c
-> +++ b/drivers/scsi/scsi_lib.c
-> @@ -1834,6 +1834,7 @@ static const struct blk_mq_ops scsi_mq_ops_no_commit = {
->         .init_request   = scsi_mq_init_request,
->         .exit_request   = scsi_mq_exit_request,
->         .initialize_rq_fn = scsi_initialize_rq,
-> +       .cleanup_rq     = scsi_cleanup_rq,
->         .busy           = scsi_mq_lld_busy,
->         .map_queues     = scsi_map_queues,
->  };
+Hello Thomas and Guys,
 
-This one is a cross-tree thing, either scsi/5.4/scsi-queue needs to
-pull for-5.4/block, or
-do it after both land linus tree.
+On Mon, Aug 5, 2019 at 9:19 AM Ming Lei <ming.lei@redhat.com> wrote:
+>
+> Since commit c66d4bd110a1f8 ("genirq/affinity: Add new callback for
+> (re)calculating interrupt sets"), irq_create_affinity_masks() returns
+> NULL in case of single vector. This change has caused regression on some
+> drivers, such as lpfc.
+>
+> The problem is that single vector may be triggered in some generic cases:
+> 1) kdump kernel 2) irq vectors resource is close to exhaustion.
+>
+> If we don't create affinity mask for single vector, almost every caller
+> has to handle the special case.
+>
+> So still create affinity mask for single vector, since irq_create_affinity_masks()
+> is capable of handling that.
+>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Bjorn Helgaas <helgaas@kernel.org>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: linux-block@vger.kernel.org
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> Cc: linux-nvme@lists.infradead.org
+> Cc: linux-pci@vger.kernel.org
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: Sumit Saxena <sumit.saxena@broadcom.com>
+> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> Cc: Shivasharan Srikanteshwara <shivasharan.srikanteshwara@broadcom.com>
+> Fixes: c66d4bd110a1f8 ("genirq/affinity: Add new callback for (re)calculating interrupt sets")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  kernel/irq/affinity.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+> index 4352b08ae48d..6fef48033f96 100644
+> --- a/kernel/irq/affinity.c
+> +++ b/kernel/irq/affinity.c
+> @@ -251,11 +251,9 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
+>          * Determine the number of vectors which need interrupt affinities
+>          * assigned. If the pre/post request exhausts the available vectors
+>          * then nothing to do here except for invoking the calc_sets()
+> -        * callback so the device driver can adjust to the situation. If there
+> -        * is only a single vector, then managing the queue is pointless as
+> -        * well.
+> +        * callback so the device driver can adjust to the situation.
+>          */
+> -       if (nvecs > 1 && nvecs > affd->pre_vectors + affd->post_vectors)
+> +       if (nvecs > affd->pre_vectors + affd->post_vectors)
+>                 affvecs = nvecs - affd->pre_vectors - affd->post_vectors;
+>         else
+>                 affvecs = 0;
+
+Without this patch, kdump kernel may not work, so could you take a look
+at this patch?
 
 Thanks,
 Ming Lei
