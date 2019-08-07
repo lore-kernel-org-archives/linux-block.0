@@ -2,167 +2,104 @@ Return-Path: <SRS0=SzsG=WD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C2EC31E40
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 00:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1149FC31E40
+	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 00:50:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6132216F4
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 00:11:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFE2C21738
+	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 00:50:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="p2bipK/h"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="RFvhDhAz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726518AbfHGALe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Aug 2019 20:11:34 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:41447 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726133AbfHGALe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Aug 2019 20:11:34 -0400
-Received: by mail-pf1-f193.google.com with SMTP id m30so42407908pff.8
-        for <linux-block@vger.kernel.org>; Tue, 06 Aug 2019 17:11:33 -0700 (PDT)
+        id S1726238AbfHGAuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Aug 2019 20:50:46 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42175 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726542AbfHGAuq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Aug 2019 20:50:46 -0400
+Received: by mail-wr1-f66.google.com with SMTP id x1so39700759wrr.9
+        for <linux-block@vger.kernel.org>; Tue, 06 Aug 2019 17:50:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=FHkYZFdhu0EroWjiQgrWlC/DWW5EUBpZdJOx/PE1gZQ=;
-        b=p2bipK/hp+GWCpIUnLm5PJ2DUZuZCS1DAuEkkJqx8OyM4PHsr3j1AbqHt5cZBXssbA
-         m2rrDFLvqgYjdmkdAvn5Vct8fnwqsn8ll0w8RPzEkO0fl0BPIzBs9FLkULW6uk9QYUhF
-         vbyds1+r9XVS5m5REgqxayqvcvxEENUghKfgDET1Nk+awEcyWmneeCTpILk69v3nUgQc
-         ESwBdORAm1R26Ezo5UPM7K+XjVJ1irEFOER1gWPx46ZTMlw8DhkVlnN87KQket49tzPT
-         VayODgU/GPeAkQruipkpLQh5odQXOUhCL0uoRngTv02FhhvpMQEGpDBhUEMNi+xeAuLp
-         /aIA==
+        d=android.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=z5+rKbwY4FKqVWmbsGvvdEeOmqTq+9PbufWY+vIRJyY=;
+        b=RFvhDhAzsEGmP3R8DL+pcMrzIbrq7k+polU6BnPglD2j6Ds3u6BvfSCwQrHN/oSbUo
+         ZQWbBRIwhTDubauU1tBRlsnHba4NQW5MFP6x+0n71sG6JIBHQJ6CgdFofTEp2E//sVeZ
+         2NN6sWNnuDOyl6ehYH4jFJ28qsVckaeA4MhqeNCBtmdooWzBz4xpyCmIduZtAplwogqH
+         oibugB4zkY5h7pF5VSgR1yDskxbQF74yap84y6xXHY1Sd1Q7fzyVWEeLuH+v9Q3yXMJV
+         W0auuFW6rZErNPQflCH6ojmh9PLMuBUEvYpGu/yt49vkEevA1XB5Ks+baotLc5FA64Yb
+         ENIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=FHkYZFdhu0EroWjiQgrWlC/DWW5EUBpZdJOx/PE1gZQ=;
-        b=H1aJMXG2SyjRdeVs07c1GXEho7FP5ug4AooTjyzTLlGX53VLFiVMvXWPufvneHQ6qa
-         6XRGeyg8MSHpMb9nWpauiWOVJStwqVa3MbGuqylHxGgNq7mx73q8MaKs47kQinNc4NKS
-         fBYkMgBfylu8u68P1xMthQG/sRN1EgsZyGAWcSdZl5nfb7t08b6mfvMdHXyKKceK0so5
-         YoifE5cgl6xW4EeVhiCOprmtyObg+lWgPxHMLUcTj0nGED5mmdRjsSbafIHx+YkrbsfG
-         a8eK/wBc5pZn7w/cUKPLh8hVvp10s5B0TeoKz5xbYKsRwCqr1Ayh/+92mox7vHTVvLUz
-         bgEQ==
-X-Gm-Message-State: APjAAAUJu0HQEIWCFi7/J1vRzNea/ecQ+q+mcGpEt4y0x7jhs490q+ye
-        W/x8RDHt55wJMETgoFXnE+1H9w==
-X-Google-Smtp-Source: APXvYqxhuUyZmPzhQA90jaQ84hjwbgbba83Yuz+P3uc30r1sQHJ49cSlriadx1oApsIuUDHdBti7GA==
-X-Received: by 2002:a17:90a:8a84:: with SMTP id x4mr5603574pjn.105.1565136693315;
-        Tue, 06 Aug 2019 17:11:33 -0700 (PDT)
-Received: from vader ([2620:10d:c090:200::aa33])
-        by smtp.gmail.com with ESMTPSA id n17sm95514602pfq.182.2019.08.06.17.11.32
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=z5+rKbwY4FKqVWmbsGvvdEeOmqTq+9PbufWY+vIRJyY=;
+        b=bNdd7pACirpt2i+Dy26kJiFcvPWN7MLu4f2/t6p0SXHAjlBgbAlBvq+bE2rI12974U
+         UYjUaoFsEXmfFwtDhoVDSUx2joiyir5wo++H4D8KcZ57UtiKlzi97x32KgGcIS4O7HS6
+         3lgSWCWVAp+XRVJtVti5SumOje5E5NRKA7dvzwujrlM97rqyiuw0idEMZCdxpqwC1l8M
+         2kOIrxa86juAnUK/GxVvk9Jy3VHkPhGAUkpw722fVDm12Fa2X3jgQyM3VDnAGebe4j5B
+         hUMiMa8czXW9yJm+V+Dj1Fi1F55qSftSDCNhU9/PGB3xIFjRzlX4v4v1gwdld9CyOAmx
+         jKtA==
+X-Gm-Message-State: APjAAAX16JU07AdxnEW+XJcW6L3UVWWHjjtbMeRCThaTjwknqRb+t14G
+        XnmWz5PaIehWbjXC5gN+16f0hZenlyHWsg==
+X-Google-Smtp-Source: APXvYqy8KQjeNNxOIH8SeUbJwgyA5CS+DhnMMoQmPDKz4PGFRVmsXJYIn35yv5oyM8mLa/a/mW6Dow==
+X-Received: by 2002:adf:e8c8:: with SMTP id k8mr6854010wrn.285.1565139044280;
+        Tue, 06 Aug 2019 17:50:44 -0700 (PDT)
+Received: from balsini.lon.corp.google.com ([2a00:79e0:d:210:e751:37a0:1e95:e65d])
+        by smtp.gmail.com with ESMTPSA id h8sm99831846wmf.12.2019.08.06.17.50.43
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 06 Aug 2019 17:11:32 -0700 (PDT)
-Date:   Tue, 6 Aug 2019 17:11:32 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH blktests] tests/srp/014: Add a test that triggers a SCSI
- reset while I/O is ongoing
-Message-ID: <20190807001132.GA29151@vader>
-References: <20190801220937.133392-1-bvanassche@acm.org>
+        Tue, 06 Aug 2019 17:50:43 -0700 (PDT)
+From:   Alessio Balsini <balsini@android.com>
+To:     linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, axboe@kernel.dk, dvander@gmail.com,
+        elsk@google.com, gregkh@linuxfoundation.org, joelaf@google.com,
+        kernel-team@android.com
+Subject: [PATCH v2] loop: Add LOOP_SET_DIRECT_IO to compat ioctl
+Date:   Wed,  7 Aug 2019 01:48:28 +0100
+Message-Id: <20190807004828.28059-1-balsini@android.com>
+X-Mailer: git-send-email 2.23.0.rc1.153.gdeed80330f-goog
+In-Reply-To: <CAJWu+oo=GrZ+SbA6=bboM4==TKXBsTRWkTrkWiZ55pqhJtgQqQ@mail.gmail.com>
+References: <CAJWu+oo=GrZ+SbA6=bboM4==TKXBsTRWkTrkWiZ55pqhJtgQqQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190801220937.133392-1-bvanassche@acm.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 01, 2019 at 03:09:37PM -0700, Bart Van Assche wrote:
+Enabling Direct I/O with loop devices helps reducing memory usage by
+avoiding double caching.  32 bit applications running on 64 bits systems
+are currently not able to request direct I/O because is missing from the
+lo_compat_ioctl.
 
-Hi, Bart, a few comments.
+This patch fixes the compatibility issue mentioned above by exporting
+LOOP_SET_DIRECT_IO as additional lo_compat_ioctl() entry.
+The input argument for this ioctl is a single long converted to a 1-bit
+boolean, so compatibility is preserved.
 
-> This test triggers the task management function handling code in the SRP
-> initiator and target drivers. This test verifies the following kernel
-> patch: fd5614124406 ("scsi: RDMA/srp: Fix a sleep-in-invalid-context
-> bug") # v5.3.
+Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Alessio Balsini <balsini@android.com>
+---
+ drivers/block/loop.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The commit reference belongs in the test file itself (see, e.g.,
-block/001).
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 44c9985f352ab..2e2193f754ab0 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1753,6 +1753,7 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case LOOP_SET_FD:
+ 	case LOOP_CHANGE_FD:
+ 	case LOOP_SET_BLOCK_SIZE:
++	case LOOP_SET_DIRECT_IO:
+ 		err = lo_ioctl(bdev, mode, cmd, arg);
+ 		break;
+ 	default:
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
 
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
-> 
-> A note regarding the copyright notice: I wrote this patch more than a year
-> ago. Hence the copyright attribution to Western Digital.
-> 
->  tests/srp/014     | 104 ++++++++++++++++++++++++++++++++++++++++++++++
->  tests/srp/014.out |   2 +
->  2 files changed, 106 insertions(+)
->  create mode 100755 tests/srp/014
->  create mode 100644 tests/srp/014.out
-
-> diff --git a/tests/srp/014 b/tests/srp/014
-> new file mode 100755
-> index 000000000000..bc2e844abdd2
-> --- /dev/null
-> +++ b/tests/srp/014
-> @@ -0,0 +1,104 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0+
-> +# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-> +
-> +. tests/srp/rc
-> +
-> +DESCRIPTION="Run sg_reset while I/O is ongoing"
-> +TIMED=1
-> +
-
-[snip]
-
-> +test_sg_reset() {
-> +	local dev fio_status m job jobfile
-> +
-> +	use_blk_mq y y || return $?
-> +	dev=$(get_bdev 0) || return $?
-> +	sg_reset_loop "$dev" "$TIMEOUT" &
-
-TIMEOUT is only set if the user configured it, so you should set a
-default (see block/001).
-
-> +	jobfile=$(mktemp)
-> +	# Redirect stderr to suppress the bash "Terminated" message.
-> +	(set_running_loop "$dev" 2>/dev/null & echo $! > "$jobfile")
-
-Why is the subshell/jobfile necessary here? The following seems to work,
-am I missing something?
-
-	set_running_loop "$dev" 2>/dev/null &
-	job=$!
-
-Thanks!
-
-> +	job=$(<"$jobfile")
-> +	rm -f "$jobfile"
-> +	run_fio --verify=md5 --rw=randwrite --bs=64K --loops=$((10**6)) \
-> +		--iodepth=16 --group_reporting --sync=1 --direct=1 \
-> +		--ioengine=libaio --runtime="${TIMEOUT}" \
-> +		--filename="$dev" --name=sg-reset-test --thread --numjobs=1 \
-> +		--output="${RESULTS_DIR}/srp/fio-output-014.txt" \
-> +		>>"$FULL"
-> +	fio_status=$?
-> +	kill "$job"
-> +	make_all_running "$dev"
-> +	wait
-> +	return $fio_status
-> +}
-> +
-> +test() {
-> +	trap 'trap "" EXIT; teardown' EXIT
-> +	setup && test_sg_reset && echo Passed
-> +}
-> diff --git a/tests/srp/014.out b/tests/srp/014.out
-> new file mode 100644
-> index 000000000000..5e25d8e8672d
-> --- /dev/null
-> +++ b/tests/srp/014.out
-> @@ -0,0 +1,2 @@
-> +Configured SRP target driver
-> +Passed
-> -- 
-> 2.22.0.770.g0f2c4a37fd-goog
-> 
