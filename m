@@ -2,118 +2,119 @@ Return-Path: <SRS0=SzsG=WD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4429C32751
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 20:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E63C5C32751
+	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 23:32:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A566421BE3
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 20:34:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565210058;
-	bh=NhwCFDPz/7iaYt/Hrpi8PqkjLtu1AlWyBvTjjDwXQ64=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=OIkRLRtc6c2RUJJThJci42oQVJ0APfvo3i0phoD45K6yhuBYzxgoWLJhEfyWuCfDT
-	 A0UNbbNexjhnE7nNaBODoXNdITrxiz5nGg3csCtvm+NmVfCzRCyK/tqpwm4s+z+9sq
-	 1rcCHf1Pxf3ITfFfxJVHRXY06NIQChD+wMNac2lM=
+	by mail.kernel.org (Postfix) with ESMTP id BA5C4217D7
+	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 23:32:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nIrYsSA3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389419AbfHGUeS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Aug 2019 16:34:18 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:34763 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389420AbfHGUeR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 16:34:17 -0400
-Received: by mail-qt1-f195.google.com with SMTP id k10so20638986qtq.1;
-        Wed, 07 Aug 2019 13:34:17 -0700 (PDT)
+        id S1730145AbfHGXcn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Aug 2019 19:32:43 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:36802 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729624AbfHGXcn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 19:32:43 -0400
+Received: by mail-wr1-f66.google.com with SMTP id n4so93087349wrs.3;
+        Wed, 07 Aug 2019 16:32:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=IC+13V8Mtk7y8HC7bnHIWtqIcy1I5HJyllIeTOClBTQ=;
-        b=gA2Gxo3VVUUiZocJ2EWD7FWO7YBQ8ft67UkLPK3AQg2nN2DoElFq/GksGEaLO+Xxs7
-         yBG49lmFjj6YiLTjAaIGIQ41gk0yijO+ArJDE8dr0MOM8hPWXP6zZJu4zTmZ5U0pgrQi
-         HknnD6KZRyK/MCSoGtYJTTYotU0YW8UoTRgeuRn+pC5MZtc7pzuYv6kj3xs5K4Iq01gZ
-         86PLHXMC6iInXVPSj6NydUiB8ADQvz4JihwAriUqmR/FNZBo1PmtDfw6VQ/NCCRIFgf2
-         ZxOvpizlKlGxc62Gw+giLRS40hco+rKNH4/JXvGmrSXjrc5JQOrAHKmp7zbC6NOQ0jDG
-         Tr4A==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=d9pVbIpLJvYHpW51yLVzRoQLiv107x9ELi8HQ3TSd7g=;
+        b=nIrYsSA3nPN1wHjF5rjTY4bWCaUPRftz1QKySm1Ov2giKzvoKNJ+OY8RqOEGX6m1y3
+         M8gnhSm+hO/g5l6KBBvUzCENROH09mk8YDGCcuFDViTP8FSysKLVdj7EymmHbmUAkCIH
+         fk4Qm1eM33fFaHywCfXlYO7RhA4McjuVM8wOZFD1pFY8mEzGtIiLW97KjvgSz1iE4cqb
+         EQYEtQjbch2N8MvmRrlWVI3KDbcOqEYoPQLHEjEGFWj7YfMrYd27F+KBvn01KzpElFNc
+         e+w62LitUTP8quCKbnlUzWRN9iGhPZs4Qz7Kw/R7ZIjNLE7NCOA2fc8eDWJyoytPiB4W
+         cI9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=IC+13V8Mtk7y8HC7bnHIWtqIcy1I5HJyllIeTOClBTQ=;
-        b=WErBU2JVTnivnYok6uEqcbprxPiFogqS8RZo0a6+HyUTYt7ZZbdRdp7DjriLbZP9FM
-         hTLPCbPlWurgcPH4UQuOQVd2alH63aQta6EdWKthwa2RIhaphAjoRJkpf0RitAeerEu7
-         R8FrxQiJAG+JVEsqTEiT4FWHMonNIVX25Kb0S9/tEY3j2XV8pIGgidJzitJ6ON5L/jpH
-         2an+loySG7FaJuwm178kc5UC8ikuz9MwTgX2KlIg3W3rUxG9MBiO8ApECiYWNEeEoBQ9
-         dccOpuRq7hgYCUicWe5foiDPzzXPOYlaa/nDC/watiAdM65cFzNxh7YQkhBcv7EqTyuX
-         zq2Q==
-X-Gm-Message-State: APjAAAUW0fFX/ofCROSzuf0qY51pIgPG2w36AH2fe9W72nVeUmLyVeIJ
-        biKp/9TJmZm8lmf3W0Q0zO0=
-X-Google-Smtp-Source: APXvYqzu1jOsh0kIjF9dIWwpYxRpLf5Yj5gvt8IrWIJbtljX2Px5uBUwWjZwjoub/a03bW3NQndjfA==
-X-Received: by 2002:ac8:45d2:: with SMTP id e18mr9931619qto.258.1565210056622;
-        Wed, 07 Aug 2019 13:34:16 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::2:49ab])
-        by smtp.gmail.com with ESMTPSA id t11sm6284977qkt.85.2019.08.07.13.34.15
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 07 Aug 2019 13:34:15 -0700 (PDT)
-Date:   Wed, 7 Aug 2019 13:34:14 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     axboe@kernel.dk, jack@suse.cz, hannes@cmpxchg.org,
-        mhocko@kernel.org, vdavydov.dev@gmail.com, cgroups@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@fb.com, guro@fb.com
-Subject: Re: [PATCH 2/4] bdi: Add bdi->id
-Message-ID: <20190807203414.GA554060@devbig004.ftw2.facebook.com>
-References: <20190803140155.181190-1-tj@kernel.org>
- <20190803140155.181190-3-tj@kernel.org>
- <20190806160102.11366694af6b56d9c4ca6ea3@linux-foundation.org>
- <20190807183151.GM136335@devbig004.ftw2.facebook.com>
- <20190807120037.72018c136db40e88d89c05d1@linux-foundation.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=d9pVbIpLJvYHpW51yLVzRoQLiv107x9ELi8HQ3TSd7g=;
+        b=KmJqdWGigPwncPnDX+eulGOt1YhItJsqtZntryOCheQO8fVEBg/7svdCPLN+8+wJBf
+         9mnsRG/HMZkzsRdHa3n0V1ipo+PZEa9bAW8x5eQ3ZvyWLGNknJX8tUjICtoUwlCZhW1u
+         pIIDhoxY4uvmWFLEsOhBle7LrvpBQ4xpTcHtItCsekpkJktq2MXP9u8IporrAchV9ixw
+         G0yEPylOe6eRqfK9xAfcTjJPG4hmRcWKazvfLyx0ac8u04cfHPnrRYjv/+CTfO8GMuLR
+         5BlrxMET9Uu2MzH13J5la/oE9dBVzG1eU0uDRHEz/zep4a8s3+uy8/tnt8ZESfz0CbFA
+         Jvsw==
+X-Gm-Message-State: APjAAAUxgojWWRFM/5KOZO51LR+U9lz7yNHd0FgbbW1SA4KNFzOUJyRz
+        7y31rUAQeJ9IhCn/EP4we/XbkSg7eK+lHoNONeEDrJQ7GjfrPA==
+X-Google-Smtp-Source: APXvYqxtF8Xvm+tm4IZuVjVZGBCJtz7+06a5/1hAvnnEAxC6bsAXdJ7lSoaNNZISpWZcktt+oPMXhYhpd+tpojMOPr8=
+X-Received: by 2002:adf:f088:: with SMTP id n8mr13044701wro.58.1565220760576;
+ Wed, 07 Aug 2019 16:32:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190807120037.72018c136db40e88d89c05d1@linux-foundation.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <20190807144948.28265-1-maier@linux.ibm.com> <20190807144948.28265-2-maier@linux.ibm.com>
+In-Reply-To: <20190807144948.28265-2-maier@linux.ibm.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Thu, 8 Aug 2019 07:32:29 +0800
+Message-ID: <CACVXFVM0tFj8CmcHON04_KjxR=QErCbUx0abJgG2W9OBb7akZA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] scsi: core: fix missing .cleanup_rq for SCSI hosts
+ without request batching
+To:     Steffen Maier <maier@linux.ibm.com>
+Cc:     "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        "open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Benjamin Block <bblock@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Wed, Aug 7, 2019 at 10:55 PM Steffen Maier <maier@linux.ibm.com> wrote:
+>
+> This was missing from scsi_mq_ops_no_commit of linux-next commit
+> 8930a6c20791 ("scsi: core: add support for request batching")
+> from Martin's scsi/5.4/scsi-queue or James' scsi/misc.
+>
+> See also linux-next commit b7e9e1fb7a92 ("scsi: implement .cleanup_rq
+> callback") from block/for-next.
+>
+> Signed-off-by: Steffen Maier <maier@linux.ibm.com>
+> Fixes: 8930a6c20791 ("scsi: core: add support for request batching")
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/scsi/scsi_lib.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index ae03d3e2600f..90c257622bb0 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1834,6 +1834,7 @@ static const struct blk_mq_ops scsi_mq_ops_no_commit = {
+>         .init_request   = scsi_mq_init_request,
+>         .exit_request   = scsi_mq_exit_request,
+>         .initialize_rq_fn = scsi_initialize_rq,
+> +       .cleanup_rq     = scsi_cleanup_rq,
+>         .busy           = scsi_mq_lld_busy,
+>         .map_queues     = scsi_map_queues,
+>  };
 
-On Wed, Aug 07, 2019 at 12:00:37PM -0700, Andrew Morton wrote:
-> OK, but why is recycling a problem?  For example, file descriptors
-> recycle as aggressively as is possible, and that doesn't cause any
-> trouble.  Presumably recycling is a problem with cgroups because of
-> some sort of stale reference problem?
+This one is a cross-tree thing, either scsi/5.4/scsi-queue needs to
+pull for-5.4/block, or
+do it after both land linus tree.
 
-Oh, because there are use cases where the consumers are detached from
-the lifetime synchronization.  In this example, the benefit of using
-IDs is that memcgs don't need to pin foreign bdi_wb's and just look up
-and verify when it wants to flush them.  If we use pointers, we have
-to pin the objects which then requires either shooting down those
-references with timers or somehow doing reverse lookup to shoot them
-down when bdi_wb is taken offline.  If we use IDs which can be
-recycling aggressively, there can be pathological cases where remote
-flushes are issued on the wrong target possibly repeatedly, which may
-or may not be a real problem.
-
-For cgroup ID, the problem is more immediate.  We give out the IDs to
-userspace and there is no way to shoot those references down when the
-cgroup goes away and the ID gets recycled, so when the user comes back
-and asks "I want to attach this bpf program to the cgroup identified
-with this ID", we can end up attaching it to the wrong cgroup if we
-recycle IDs.  cgroup ended up with two separate IDs, which is kinda
-dumb.
-
-tl;dr is that it's either cumbersome or impossible to synchronize the
-users of these IDs, so if they get recycled, they end up identifying
-the wrong thing.
-
-Thanks.
-
--- 
-tejun
+Thanks,
+Ming Lei
