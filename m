@@ -2,95 +2,97 @@ Return-Path: <SRS0=SzsG=WD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D0D6C32751
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 16:09:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E20DEC32751
+	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 16:17:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F279721BE6
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 16:09:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="tHivpiIw"
+	by mail.kernel.org (Postfix) with ESMTP id C3D1A2229C
+	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 16:17:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729550AbfHGQJJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Aug 2019 12:09:09 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:47120 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727213AbfHGQJJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 12:09:09 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x77G4FDP083468;
-        Wed, 7 Aug 2019 16:09:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=S+9K2lIF+033jPwHdL6JaebTLAXp/BEK2P9DPkT2MB4=;
- b=tHivpiIw1bNgysYk0lyNW8KsRzDfiquxPencLz+RSs1EIqtMyhCEm6eBxlqC4vDx3gqI
- HB5UgtsU7Wo87+l4M1hlO9evOPc9TMJ8GSUOP5oVehuY+MSKEst7PasLUHRrF8yNhd0f
- Gjw13sUlFM8NmVfpdp2YHEsJxPG4kGamdrD0oAPhmRjIzkQYvF8UfieJm66w+YgvhMRt
- FYPMQDl3rg56GYcDHRG+LHzMCnVbmcaKHaRG69/rD4cmKHhgXAUas1g7ff7f0jRtpWuA
- vBmdTgqRDRjhRGWoA2Drl9ZfJyLAtOuRMuLWxozYMiqB9Uxifmn++c8sKExWbJO230TP WQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2u527pwafp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 07 Aug 2019 16:09:06 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x77G3JFB158155;
-        Wed, 7 Aug 2019 16:09:06 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2u7578359n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 07 Aug 2019 16:09:05 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x77G94WD021390;
-        Wed, 7 Aug 2019 16:09:04 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 07 Aug 2019 09:09:04 -0700
-To:     Junxiao Bi <junxiao.bi@oracle.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        axboe@kernel.dk, martin.petersen@oracle.com
-Subject: Re: [PATCH] block: fix RO partition with RW disk
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20190805200138.28098-1-junxiao.bi@oracle.com>
-        <b191908b-cc67-660a-468e-2f4164f430ba@oracle.com>
-Date:   Wed, 07 Aug 2019 12:09:02 -0400
-In-Reply-To: <b191908b-cc67-660a-468e-2f4164f430ba@oracle.com> (Junxiao Bi's
-        message of "Wed, 7 Aug 2019 08:59:27 -0700")
-Message-ID: <yq1v9v9ez4x.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+        id S2388999AbfHGQRR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Aug 2019 12:17:17 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38740 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388640AbfHGQRR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 12:17:17 -0400
+Received: by mail-wr1-f65.google.com with SMTP id g17so91957436wrr.5
+        for <linux-block@vger.kernel.org>; Wed, 07 Aug 2019 09:17:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rimRfJuK8em3IqAQSX92nJpilfNEDReWvsTTczdkS5I=;
+        b=SNqTbTuSSwmDyng5cxNuLuhB8kSHSFn+k3odhqBeNUJCc1Gy54FQbS7OObeCbtmdSd
+         1J4+YhGo3rLFz46rXjKsNhv+ylocmGWC4KweciMa/XLHK1b6dGdlm+g6BjGaZgIqd6Hz
+         4qdJMFYXUp9IspX45w6Jpozz3xp4Z7h5ts5WhGasV91MkzxBM+ndjrhK7EO6dd0rKa2P
+         NiTIdkS/JBcozgmjB5+l1dtRz7ZUcakFA4H+Lu8tDpC85+odpTCRaiMZm+o3yPgKBfgH
+         I9lau7CgMaO376cWfOuaGf8OcpFo4ebR/rnOdByHhsQ9rO7eLlgK2D9FFTEgNLUxaIyQ
+         XG9Q==
+X-Gm-Message-State: APjAAAXgxc/FiSRqq7afWQYd9cF9/f/WnKZS8VnVwsJxZ/ZtGNzh525i
+        uHgQID1CpfZBKXOyRhNuojJAvg==
+X-Google-Smtp-Source: APXvYqzazjaE77Dv6t5Ci6gVHioOlkD24Kr5pc/9tKvr9Hj/6DlaId/9yHdHHf/uwryHMeAikdLuZA==
+X-Received: by 2002:a5d:6606:: with SMTP id n6mr4280889wru.346.1565194635282;
+        Wed, 07 Aug 2019 09:17:15 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id f10sm79635116wrs.22.2019.08.07.09.17.11
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Wed, 07 Aug 2019 09:17:14 -0700 (PDT)
+Subject: Re: [PATCH 0/2] scsi: core: regression fixes for request batching
+To:     Steffen Maier <maier@linux.ibm.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     linux-next@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-s390@vger.kernel.org, Benjamin Block <bblock@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@redhat.com>
+References: <20190807144948.28265-1-maier@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <700f3175-561a-c577-0cb7-3f9ae4d82db0@redhat.com>
+Date:   Wed, 7 Aug 2019 18:17:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9342 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=731
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908070163
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9342 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=798 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908070163
+In-Reply-To: <20190807144948.28265-1-maier@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 07/08/19 16:49, Steffen Maier wrote:
+> Hi James, Martin, Paolo, Ming,
+> 
+> multipathing with linux-next is broken since 20190723 in our CI.
+> The patches fix a memleak and a severe dh/multipath functional regression.
+> It would be nice if we could get them to 5.4/scsi-queue and also next.
+> 
+> I would have preferred if such a new feature had used its own
+> new copy scsi_mq_ops_batching instead of changing the use case and
+> semantics of the existing scsi_mq_ops, because this would likely
+> cause less regressions for all the other users not using the new feature.
+> 
+> Steffen Maier (2):
+>   scsi: core: fix missing .cleanup_rq for SCSI hosts without request
+>     batching
+>   scsi: core: fix dh and multipathing for SCSI hosts without request
+>     batching
+> 
+>  drivers/scsi/scsi_lib.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
 
-Junxiao,
-
-> Anybody could help review this bug?
-
-It's on my list. However, your patch is clashing with my general
-read-only handling changes so I'll probably need to roll your changes
-into mine.
-
-I'll try to look at this today.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
