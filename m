@@ -2,114 +2,88 @@ Return-Path: <SRS0=kddI=WE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61350C0650F
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 19:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF147C433FF
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 20:05:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 336CE21874
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 19:11:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6A3321743
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 20:05:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404949AbfHHTLG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Aug 2019 15:11:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37364 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2405416AbfHHTLE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Aug 2019 15:11:04 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x78J7A1w012467
-        for <linux-block@vger.kernel.org>; Thu, 8 Aug 2019 15:11:03 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2u8s1hhjb0-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 15:11:03 -0400
-Received: from localhost
-        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <jejb@linux.vnet.ibm.com>;
-        Thu, 8 Aug 2019 20:11:01 +0100
-Received: from b01cxnp22035.gho.pok.ibm.com (9.57.198.25)
-        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 8 Aug 2019 20:10:58 +0100
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x78JAvpN53936594
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 8 Aug 2019 19:10:57 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 10BCB112062;
-        Thu,  8 Aug 2019 19:10:57 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 218FB112061;
-        Thu,  8 Aug 2019 19:10:56 +0000 (GMT)
-Received: from jarvis.ext.hansenpartnership.com (unknown [9.85.197.215])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu,  8 Aug 2019 19:10:55 +0000 (GMT)
-Subject: Re: [PATCH v3 00/20] sg: add v4 interface
-From:   James Bottomley <jejb@linux.vnet.ibm.com>
-To:     Douglas Gilbert <dgilbert@interlog.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org
-Cc:     martin.petersen@oracle.com, hare@suse.de, bvanassche@acm.org
-Date:   Thu, 08 Aug 2019 12:10:55 -0700
-In-Reply-To: <20190807114252.2565-1-dgilbert@interlog.com>
-References: <20190807114252.2565-1-dgilbert@interlog.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19080819-0052-0000-0000-000003E95F5F
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011571; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000287; SDB=6.01243968; UDB=6.00656263; IPR=6.01025446;
- MB=3.00028096; MTD=3.00000008; XFM=3.00000015; UTC=2019-08-08 19:11:00
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19080819-0053-0000-0000-000062060CE5
-Message-Id: <1565291455.3435.48.camel@linux.vnet.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-08_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=528 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908080172
+        id S2389974AbfHHUFQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Aug 2019 16:05:16 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42135 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732704AbfHHUFP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 16:05:15 -0400
+Received: by mail-pg1-f196.google.com with SMTP id t132so44606390pgb.9
+        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 13:05:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Q33UV+kyAkfwjtWCI6GSA1j4rOL/y9CvPBxJLJxZjEs=;
+        b=NiXHYWAduV5zrcHKenEwVQFYRs83SNEsliPY6PO6+83xdLl+6DMxtLbJ7tqCZJ5Yli
+         tMG1gtqoQSvKjiQfYXScoIwg4ujJTey2hc/Ly+7AaYvgIplwkaLkNCf5DtBkTrgchMiE
+         rPYgykiKcQcYd61WvDPThg6SaX0P4gOTwdn87HSll3GdY25Jjxw+M8FtSkR8DvZ4E/uv
+         826KSBvsAfeYaX794fgztGLViLgfuTt9sLeTscILWaWa26XhJmfGt0X09Gg3YqTqjdoV
+         z4BsB/wxzkrbfqWpcJSeo1Mb8hd9qwymlVWMw/BlCdFWP65bAkFJPJEUWrZK0o5YWw9n
+         IKTA==
+X-Gm-Message-State: APjAAAX+cw5rz2GUO/cQ0a66JtmQuG9v8Bzv1+0RdBd44hcFLQRAxL1t
+        Z/O9R8aR21kDR2Ck8rwZk2wIkO5u
+X-Google-Smtp-Source: APXvYqzUBIQaEUnUQMH6YbZOrPo8TfNC4qh4S2xVnEYxUby8QJNRAAhnK1xelVPq/Fh327yzXAzaMg==
+X-Received: by 2002:a17:90a:d983:: with SMTP id d3mr5724376pjv.88.1565294714757;
+        Thu, 08 Aug 2019 13:05:14 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id b6sm83307093pgq.26.2019.08.08.13.05.13
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 08 Aug 2019 13:05:13 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Omar Sandoval <osandov@fb.com>
+Cc:     linux-block@vger.kernel.org,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH blktests 0/4] Four blktests patches
+Date:   Thu,  8 Aug 2019 13:05:02 -0700
+Message-Id: <20190808200506.186137-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.22.0.770.g0f2c4a37fd-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2019-08-07 at 13:42 +0200, Douglas Gilbert wrote:
-> This patchset extends the SCSI generic (sg) driver found in
-> lk 5.3 .  The sg driver has a version number which is visible
-> via ioctl(SG_GET_VERSION_NUM) and is bumped from 3.5.36 to
-> 4.0.03 by this patchset. The additions and changes are
-> described in some detail in this long webpage:
->     http://sg.danny.cz/sg/sg_v40.html
-> 
-> Most new features described in the above webpage are not
-> implemented in this patchset.
+Hi Omar,
 
-Since this will be an extension of something that exists both in your
-sg driver and in the block bsg interface (and thus needs an
-implementation there), I added both linux-block and linux-api to the cc
-(the latter because you're adding to an API).
+This series includes one improvement for the NVMe tests, two improvements for
+the NVMeOF-multipath tests and version two of the SRP test that triggers a SCSI
+reset while I/O is ongoing. Please consider these for the official blktests
+git repository.
 
-Simply extending sg to use the v4 header protocol in uapi/linux/bsg.h
-is fine modulo the code being in the right form.  The problems are the
-new ioctls you want to add that would need to be present there as well.
- The specific question being how we support async or non-blocking I/O
-on the sg and bsg interfaces.  The standard way we add asynchronous I/O
-is supposed to be via .poll on the file descriptor.  you already use
-read and write in sg and bsg doesn't have a polling interface, but it
-looks like we could use MSG to signal an ioctl is ready to be serviced
-for both.  Would shifting to a non-blocking poll based interface for
-ioctls remove the need to add these SG_IOSUBMIT/SG_IORECEIVE ioctls
-since we could now do everything over blocking or non-blocking SG_IO?
+Thanks,
 
-James
+Bart.
 
+Bart Van Assche (4):
+  tests/nvme/rc: Modify the approach for disabling and re-enabling
+    Ctrl-C
+  tests/nvmeof-mp/rc: Make simulate_network_failure_loop() more robust
+  tests/nvmeof-mp/rc: Make the NVMeOF multipath tests more reliable
+  tests/srp/014: Add a test that triggers a SCSI reset while I/O is
+    ongoing
 
+ tests/nvme/rc      |   4 +-
+ tests/nvmeof-mp/rc |   7 +--
+ tests/srp/014      | 107 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/srp/014.out  |   2 +
+ 4 files changed, 115 insertions(+), 5 deletions(-)
+ create mode 100755 tests/srp/014
+ create mode 100644 tests/srp/014.out
+
+-- 
+2.22.0.770.g0f2c4a37fd-goog
 
