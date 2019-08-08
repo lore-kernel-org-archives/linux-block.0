@@ -2,109 +2,142 @@ Return-Path: <SRS0=kddI=WE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7AEC433FF
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 15:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A77ECC0650F
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 16:12:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20503218BB
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 15:20:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565277614;
-	bh=NLAkM7nhlj9bc/eJJx4m2IxT4urf2Gn0v2LjH9jDBfo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=kn2Qlmtaz15MaFev+oUtO0dOxR4upYpLPbofwlOt22JTEKowmPP5OKESGYeFOefB2
-	 ESKFy/ZMjPjxEeW8yHq6TTa/suOjF3bNUSWKORv5dNYfAVWgmI4mwTeek4uBDMPQFg
-	 9TO940Y0lY25UoeMlAbok+ANAQetviighce5b0/Q=
+	by mail.kernel.org (Postfix) with ESMTP id 74E6821743
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 16:12:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="aHd3BMPy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733140AbfHHPUH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Aug 2019 11:20:07 -0400
-Received: from mga01.intel.com ([192.55.52.88]:46713 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725535AbfHHPUH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Aug 2019 11:20:07 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Aug 2019 08:20:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,361,1559545200"; 
-   d="scan'208";a="203611641"
-Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
-  by fmsmga002.fm.intel.com with ESMTP; 08 Aug 2019 08:20:06 -0700
-Date:   Thu, 8 Aug 2019 09:17:40 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-        Keith Busch <keith.busch@intel.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>
-Subject: Re: [PATCH] genirq/affinity: create affinity mask for single vector
-Message-ID: <20190808151740.GA27077@localhost.localdomain>
-References: <20190805011906.5020-1-ming.lei@redhat.com>
+        id S2404095AbfHHQMl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Aug 2019 12:12:41 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:35358 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404108AbfHHQMl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 12:12:41 -0400
+Received: by mail-pf1-f194.google.com with SMTP id u14so44382302pfn.2
+        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 09:12:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=GbKZkWdFW3/LathJiTmUB/es7Gx9lbtHm6GJXlHv5+E=;
+        b=aHd3BMPydi+5PV5TxAyyoXAB2//OlcpWaOb9Ulv9m4G+dGQDsVHyoJELks6vv29zZs
+         +l9YLHqxG6PA7RsVkwpwZLjgZzwTnKooalsTD+ERQtN8bpHaq1JEAX79Q/0Q4JFzQWqX
+         Zv7Za4X5k+/VUeEYrNZJJSLO7c+scqObfiMwnA2GipbI5hhnzUw2LCdhtgUFP2BnLpE2
+         et7yYRwFoml44eQaKQF8+SGCmFWcKVzwtMQTEXAtjYSre8zV7f3nMDxyKkS/3fiM3pd8
+         5g+VisQ2Yg7qdOQWYCT5hJZbqMllgcveePnnq+gYbnNhRPiHgqBwxulg0iqhWdshus0G
+         /Fjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=GbKZkWdFW3/LathJiTmUB/es7Gx9lbtHm6GJXlHv5+E=;
+        b=tNsLDpuNL+b8fTtA/eYYm7KmVy1tkPqB8CbsVh1E9XV9UZn42GYhkb8oWo3hT4HGxM
+         /6e/KLygEyBUQTlPmF1DCuuPxlXU779PDMSI65jUWPixFV2LZWiVE96R6kibbSZ0XgM+
+         I8yTJdYk9mzNNrNVXVbDRkYlcbLzyHPMHgw+mQks2gS6F9k9u3nPK7FLWbV1fGPUlc9v
+         OePm8/RmakfHL8XO7Qntxw1sluXgUCMowCtwtlzhrE6MrOtLLTbIwAE2L2IUR+Tv0VLR
+         NPQFlSXVdg6vXjB9JgqB6v0ZTvkZRfRKV+jwmuBd66fMA5LK7GkdKzuENJycIzTpGm4z
+         VPFA==
+X-Gm-Message-State: APjAAAUfqS1HtDTuka+a89kSBcl6Ip0Km8cUUjGU0pNZbi1bMrcbRg2e
+        UNBHUkvyNl+1opk3Vx5ZCG+VpAAXSw9qjg==
+X-Google-Smtp-Source: APXvYqyiYb+knMp0JBJQrh+fcsfPoG9yFxitkP7TY7Atel9io4mNwiZe7WDGrcZe1yoOZtvrtpSkzA==
+X-Received: by 2002:a65:690e:: with SMTP id s14mr13663644pgq.47.1565280759945;
+        Thu, 08 Aug 2019 09:12:39 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:83a1:4042:6c37:d29d:2320? ([2605:e000:100e:83a1:4042:6c37:d29d:2320])
+        by smtp.gmail.com with ESMTPSA id 196sm103224711pfy.167.2019.08.08.09.12.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 08 Aug 2019 09:12:38 -0700 (PDT)
+Subject: Re: [PATCH] loop: set PF_MEMALLOC_NOIO for the worker thread
+To:     Mikulas Patocka <mpatocka@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Mike Snitzer <msnitzer@redhat.com>, junxiao.bi@oracle.com,
+        dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>,
+        honglei.wang@oracle.com, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <alpine.LRH.2.02.1908080540240.15519@file01.intranet.prod.int.rdu2.redhat.com>
+ <20190808135329.GG5482@bombadil.infradead.org>
+ <alpine.LRH.2.02.1908081113540.18950@file01.intranet.prod.int.rdu2.redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <4625547c-f172-a0bf-720e-849fb7ff85a2@kernel.dk>
+Date:   Thu, 8 Aug 2019 09:12:37 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190805011906.5020-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+In-Reply-To: <alpine.LRH.2.02.1908081113540.18950@file01.intranet.prod.int.rdu2.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 05, 2019 at 09:19:06AM +0800, Ming Lei wrote:
-> Since commit c66d4bd110a1f8 ("genirq/affinity: Add new callback for
-> (re)calculating interrupt sets"), irq_create_affinity_masks() returns
-> NULL in case of single vector. This change has caused regression on some
-> drivers, such as lpfc.
+On 8/8/19 8:17 AM, Mikulas Patocka wrote:
+> A deadlock with this stacktrace was observed.
 > 
-> The problem is that single vector may be triggered in some generic cases:
-> 1) kdump kernel 2) irq vectors resource is close to exhaustion.
+> The loop thread does a GFP_KERNEL allocation, it calls into dm-bufio
+> shrinker and the shrinker depends on I/O completion in the dm-bufio
+> subsystem.
 > 
-> If we don't create affinity mask for single vector, almost every caller
-> has to handle the special case.
+> In order to fix the deadlock (and other similar ones), we set the flag
+> PF_MEMALLOC_NOIO at loop thread entry.
 > 
-> So still create affinity mask for single vector, since irq_create_affinity_masks()
-> is capable of handling that.
+> PID: 474    TASK: ffff8813e11f4600  CPU: 10  COMMAND: "kswapd0"
+>     #0 [ffff8813dedfb938] __schedule at ffffffff8173f405
+>     #1 [ffff8813dedfb990] schedule at ffffffff8173fa27
+>     #2 [ffff8813dedfb9b0] schedule_timeout at ffffffff81742fec
+>     #3 [ffff8813dedfba60] io_schedule_timeout at ffffffff8173f186
+>     #4 [ffff8813dedfbaa0] bit_wait_io at ffffffff8174034f
+>     #5 [ffff8813dedfbac0] __wait_on_bit at ffffffff8173fec8
+>     #6 [ffff8813dedfbb10] out_of_line_wait_on_bit at ffffffff8173ff81
+>     #7 [ffff8813dedfbb90] __make_buffer_clean at ffffffffa038736f [dm_bufio]
+>     #8 [ffff8813dedfbbb0] __try_evict_buffer at ffffffffa0387bb8 [dm_bufio]
+>     #9 [ffff8813dedfbbd0] dm_bufio_shrink_scan at ffffffffa0387cc3 [dm_bufio]
+>    #10 [ffff8813dedfbc40] shrink_slab at ffffffff811a87ce
+>    #11 [ffff8813dedfbd30] shrink_zone at ffffffff811ad778
+>    #12 [ffff8813dedfbdc0] kswapd at ffffffff811ae92f
+>    #13 [ffff8813dedfbec0] kthread at ffffffff810a8428
+>    #14 [ffff8813dedfbf50] ret_from_fork at ffffffff81745242
+> 
+>    PID: 14127  TASK: ffff881455749c00  CPU: 11  COMMAND: "loop1"
+>     #0 [ffff88272f5af228] __schedule at ffffffff8173f405
+>     #1 [ffff88272f5af280] schedule at ffffffff8173fa27
+>     #2 [ffff88272f5af2a0] schedule_preempt_disabled at ffffffff8173fd5e
+>     #3 [ffff88272f5af2b0] __mutex_lock_slowpath at ffffffff81741fb5
+>     #4 [ffff88272f5af330] mutex_lock at ffffffff81742133
+>     #5 [ffff88272f5af350] dm_bufio_shrink_count at ffffffffa03865f9 [dm_bufio]
+>     #6 [ffff88272f5af380] shrink_slab at ffffffff811a86bd
+>     #7 [ffff88272f5af470] shrink_zone at ffffffff811ad778
+>     #8 [ffff88272f5af500] do_try_to_free_pages at ffffffff811adb34
+>     #9 [ffff88272f5af590] try_to_free_pages at ffffffff811adef8
+>    #10 [ffff88272f5af610] __alloc_pages_nodemask at ffffffff811a09c3
+>    #11 [ffff88272f5af710] alloc_pages_current at ffffffff811e8b71
+>    #12 [ffff88272f5af760] new_slab at ffffffff811f4523
+>    #13 [ffff88272f5af7b0] __slab_alloc at ffffffff8173a1b5
+>    #14 [ffff88272f5af880] kmem_cache_alloc at ffffffff811f484b
+>    #15 [ffff88272f5af8d0] do_blockdev_direct_IO at ffffffff812535b3
+>    #16 [ffff88272f5afb00] __blockdev_direct_IO at ffffffff81255dc3
+>    #17 [ffff88272f5afb30] xfs_vm_direct_IO at ffffffffa01fe3fc [xfs]
+>    #18 [ffff88272f5afb90] generic_file_read_iter at ffffffff81198994
+>    #19 [ffff88272f5afc50] __dta_xfs_file_read_iter_2398 at ffffffffa020c970 [xfs]
+>    #20 [ffff88272f5afcc0] lo_rw_aio at ffffffffa0377042 [loop]
+>    #21 [ffff88272f5afd70] loop_queue_work at ffffffffa0377c3b [loop]
+>    #22 [ffff88272f5afe60] kthread_worker_fn at ffffffff810a8a0c
+>    #23 [ffff88272f5afec0] kthread at ffffffff810a8428
+>    #24 [ffff88272f5aff50] ret_from_fork at ffffffff81745242
 
-Hi Ming,
+Applied, thanks.
 
-Looks good to me.
+-- 
+Jens Axboe
 
-Reviewed-by: Keith Busch <keith.busch@intel.com>
- 
-> ---
->  kernel/irq/affinity.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-> index 4352b08ae48d..6fef48033f96 100644
-> --- a/kernel/irq/affinity.c
-> +++ b/kernel/irq/affinity.c
-> @@ -251,11 +251,9 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
->  	 * Determine the number of vectors which need interrupt affinities
->  	 * assigned. If the pre/post request exhausts the available vectors
->  	 * then nothing to do here except for invoking the calc_sets()
-> -	 * callback so the device driver can adjust to the situation. If there
-> -	 * is only a single vector, then managing the queue is pointless as
-> -	 * well.
-> +	 * callback so the device driver can adjust to the situation.
->  	 */
-> -	if (nvecs > 1 && nvecs > affd->pre_vectors + affd->post_vectors)
-> +	if (nvecs > affd->pre_vectors + affd->post_vectors)
->  		affvecs = nvecs - affd->pre_vectors - affd->post_vectors;
->  	else
->  		affvecs = 0;
-> -- 
