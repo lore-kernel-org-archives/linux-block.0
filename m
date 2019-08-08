@@ -2,174 +2,114 @@ Return-Path: <SRS0=kddI=WE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4704EC433FF
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 19:03:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61350C0650F
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 19:11:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1493E2173E
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 19:03:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="HIQxeRJU"
+	by mail.kernel.org (Postfix) with ESMTP id 336CE21874
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 19:11:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390305AbfHHTDE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Aug 2019 15:03:04 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:34339 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390297AbfHHTDE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 15:03:04 -0400
-Received: by mail-pf1-f193.google.com with SMTP id b13so44613893pfo.1
-        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 12:03:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=YaDw968sYZinLHwfTVtmoWadaU+xxvDOnKy5RkNnHhY=;
-        b=HIQxeRJULmhNEAqcWiiIVZr0UAHZw/vMZ/YXLmvIkXIat0A1z75P9Q0d/P74XRw3do
-         R7+ctJwPKZUsckjeTNvykCKZsWrBGUXA5z5ZhyRNBYXd8H4O6Fr/Cfh1Tgcp0VtQSpzQ
-         sHkoTTEtlwzMapLsx/9XmEPsqlkUGcTTXFX0+zFyl6atF/lOxErRKyNsY876FIdy4kom
-         iHrVYxjJMl+rUFyMB+98d2/kmsgt03t7E0C/Gw5ePaTD8Sis0vFdJXbU/8NWpzUYzFd/
-         +GAdy2lZyujaVYVCBCBCH4QSjJMb3LYnJxKiTOIRpKMlA/KjrXwRHyDPiu3C/9kVghl3
-         PqlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=YaDw968sYZinLHwfTVtmoWadaU+xxvDOnKy5RkNnHhY=;
-        b=gCzAsZWy9z/fgyxJbqcpzD5T3uUvW6f5cB+JoK19B2XRu4w0toTw+BWjiH9s5A4b4u
-         i7QcmeDJHrsRhT0eMmqKUYSzJduzjI19SIUHKt5qDXWEorhzunssb5LD8zd8YU2RpKT/
-         Aib9vq81dNZ93X75S0KUDeatvWXWIv34WTr7TFwSy4mkL/TAm1M+6mPyIYGNB7eK3W3l
-         RWv2+f3oaO5xhaun5kkeM8GmwglMJNLScpKc+8/j301UvxFvH20sKYdM6fP/meauOpZZ
-         G2HgmDiK2HVVgXQMRjPh7Vw2ZF3VxnylS/q1+mSd+NBYbLBSBqX5yGLpaaHzv2d1kDZn
-         3Agg==
-X-Gm-Message-State: APjAAAULeMRUaNq9m8uFoBJ8fARmngpPCbZsgdlUruDcfBkjjuU5eoO9
-        SOVqyuhYvHc6c3T/YI9k9mr72w==
-X-Google-Smtp-Source: APXvYqyauxFlil+jXyg34wXrmqepCBj1OqcfC1/2Gy4eTEI53he4OQNjlsbx5piBhi7v9zETXwpdnA==
-X-Received: by 2002:a17:90a:8b98:: with SMTP id z24mr5545969pjn.77.1565290983429;
-        Thu, 08 Aug 2019 12:03:03 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::1:e15f])
-        by smtp.gmail.com with ESMTPSA id t6sm22068113pgu.23.2019.08.08.12.03.02
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 08 Aug 2019 12:03:02 -0700 (PDT)
-Date:   Thu, 8 Aug 2019 15:03:00 -0400
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND] block: annotate refault stalls from IO submission
-Message-ID: <20190808190300.GA9067@cmpxchg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.12.0 (2019-05-25)
+        id S2404949AbfHHTLG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Aug 2019 15:11:06 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37364 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2405416AbfHHTLE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Aug 2019 15:11:04 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x78J7A1w012467
+        for <linux-block@vger.kernel.org>; Thu, 8 Aug 2019 15:11:03 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2u8s1hhjb0-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 15:11:03 -0400
+Received: from localhost
+        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <jejb@linux.vnet.ibm.com>;
+        Thu, 8 Aug 2019 20:11:01 +0100
+Received: from b01cxnp22035.gho.pok.ibm.com (9.57.198.25)
+        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 8 Aug 2019 20:10:58 +0100
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x78JAvpN53936594
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 8 Aug 2019 19:10:57 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 10BCB112062;
+        Thu,  8 Aug 2019 19:10:57 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 218FB112061;
+        Thu,  8 Aug 2019 19:10:56 +0000 (GMT)
+Received: from jarvis.ext.hansenpartnership.com (unknown [9.85.197.215])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu,  8 Aug 2019 19:10:55 +0000 (GMT)
+Subject: Re: [PATCH v3 00/20] sg: add v4 interface
+From:   James Bottomley <jejb@linux.vnet.ibm.com>
+To:     Douglas Gilbert <dgilbert@interlog.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org
+Cc:     martin.petersen@oracle.com, hare@suse.de, bvanassche@acm.org
+Date:   Thu, 08 Aug 2019 12:10:55 -0700
+In-Reply-To: <20190807114252.2565-1-dgilbert@interlog.com>
+References: <20190807114252.2565-1-dgilbert@interlog.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19080819-0052-0000-0000-000003E95F5F
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011571; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000287; SDB=6.01243968; UDB=6.00656263; IPR=6.01025446;
+ MB=3.00028096; MTD=3.00000008; XFM=3.00000015; UTC=2019-08-08 19:11:00
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19080819-0053-0000-0000-000062060CE5
+Message-Id: <1565291455.3435.48.camel@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-08_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=528 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908080172
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-psi tracks the time tasks wait for refaulting pages to become
-uptodate, but it does not track the time spent submitting the IO. The
-submission part can be significant if backing storage is contended or
-when cgroup throttling (io.latency) is in effect - a lot of time is
-spent in submit_bio(). In that case, we underreport memory pressure.
+On Wed, 2019-08-07 at 13:42 +0200, Douglas Gilbert wrote:
+> This patchset extends the SCSI generic (sg) driver found in
+> lk 5.3 .  The sg driver has a version number which is visible
+> via ioctl(SG_GET_VERSION_NUM) and is bumped from 3.5.36 to
+> 4.0.03 by this patchset. The additions and changes are
+> described in some detail in this long webpage:
+>     http://sg.danny.cz/sg/sg_v40.html
+> 
+> Most new features described in the above webpage are not
+> implemented in this patchset.
 
-Annotate submit_bio() to account submission time as memory stall when
-the bio is reading userspace workingset pages.
+Since this will be an extension of something that exists both in your
+sg driver and in the block bsg interface (and thus needs an
+implementation there), I added both linux-block and linux-api to the cc
+(the latter because you're adding to an API).
 
-Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
----
- block/bio.c               |  3 +++
- block/blk-core.c          | 23 ++++++++++++++++++++++-
- include/linux/blk_types.h |  1 +
- 3 files changed, 26 insertions(+), 1 deletion(-)
+Simply extending sg to use the v4 header protocol in uapi/linux/bsg.h
+is fine modulo the code being in the right form.  The problems are the
+new ioctls you want to add that would need to be present there as well.
+ The specific question being how we support async or non-blocking I/O
+on the sg and bsg interfaces.  The standard way we add asynchronous I/O
+is supposed to be via .poll on the file descriptor.  you already use
+read and write in sg and bsg doesn't have a polling interface, but it
+looks like we could use MSG to signal an ioctl is ready to be serviced
+for both.  Would shifting to a non-blocking poll based interface for
+ioctls remove the need to add these SG_IOSUBMIT/SG_IORECEIVE ioctls
+since we could now do everything over blocking or non-blocking SG_IO?
 
-diff --git a/block/bio.c b/block/bio.c
-index 299a0e7651ec..4196865dd300 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -806,6 +806,9 @@ void __bio_add_page(struct bio *bio, struct page *page,
- 
- 	bio->bi_iter.bi_size += len;
- 	bio->bi_vcnt++;
-+
-+	if (!bio_flagged(bio, BIO_WORKINGSET) && unlikely(PageWorkingset(page)))
-+		bio_set_flag(bio, BIO_WORKINGSET);
- }
- EXPORT_SYMBOL_GPL(__bio_add_page);
- 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d0cc6e14d2f0..1b1705b7dde7 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -36,6 +36,7 @@
- #include <linux/blk-cgroup.h>
- #include <linux/debugfs.h>
- #include <linux/bpf.h>
-+#include <linux/psi.h>
- 
- #define CREATE_TRACE_POINTS
- #include <trace/events/block.h>
-@@ -1128,6 +1129,10 @@ EXPORT_SYMBOL_GPL(direct_make_request);
-  */
- blk_qc_t submit_bio(struct bio *bio)
- {
-+	bool workingset_read = false;
-+	unsigned long pflags;
-+	blk_qc_t ret;
-+
- 	if (blkcg_punt_bio_submit(bio))
- 		return BLK_QC_T_NONE;
- 
-@@ -1146,6 +1151,8 @@ blk_qc_t submit_bio(struct bio *bio)
- 		if (op_is_write(bio_op(bio))) {
- 			count_vm_events(PGPGOUT, count);
- 		} else {
-+			if (bio_flagged(bio, BIO_WORKINGSET))
-+				workingset_read = true;
- 			task_io_account_read(bio->bi_iter.bi_size);
- 			count_vm_events(PGPGIN, count);
- 		}
-@@ -1160,7 +1167,21 @@ blk_qc_t submit_bio(struct bio *bio)
- 		}
- 	}
- 
--	return generic_make_request(bio);
-+	/*
-+	 * If we're reading data that is part of the userspace
-+	 * workingset, count submission time as memory stall. When the
-+	 * device is congested, or the submitting cgroup IO-throttled,
-+	 * submission can be a significant part of overall IO time.
-+	 */
-+	if (workingset_read)
-+		psi_memstall_enter(&pflags);
-+
-+	ret = generic_make_request(bio);
-+
-+	if (workingset_read)
-+		psi_memstall_leave(&pflags);
-+
-+	return ret;
- }
- EXPORT_SYMBOL(submit_bio);
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 1b1fa1557e68..a9dadfc16a92 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -209,6 +209,7 @@ enum {
- 	BIO_BOUNCED,		/* bio is a bounce bio */
- 	BIO_USER_MAPPED,	/* contains user pages */
- 	BIO_NULL_MAPPED,	/* contains invalid user pages */
-+	BIO_WORKINGSET,		/* contains userspace workingset pages */
- 	BIO_QUIET,		/* Make BIO Quiet */
- 	BIO_CHAIN,		/* chained bio, ->bi_remaining in effect */
- 	BIO_REFFED,		/* bio has elevated ->bi_cnt */
--- 
-2.22.0
+James
+
+
 
