@@ -2,79 +2,69 @@ Return-Path: <SRS0=kddI=WE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E03C433FF
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 13:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE1AC0650F
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 15:00:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C02F72171F
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 13:38:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="T6vR6iJX"
+	by mail.kernel.org (Postfix) with ESMTP id A139C217D7
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 15:00:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733046AbfHHNiQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Aug 2019 09:38:16 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:45321 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733075AbfHHNiQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 09:38:16 -0400
-Received: by mail-pg1-f196.google.com with SMTP id o13so44073519pgp.12
-        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 06:38:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=FC8WMRYCc08/2iY3rGHR1xp6uCgxjUjBA3bfpUjoiT4=;
-        b=T6vR6iJXDPF9uwOrsPc5YE90CqDuG/xN2Wlzt24YUN4hX/3xX6gsVFKIYQ7buLpMmO
-         1s4KKsrRJsFNpI8wWDClfPRqg8UriYmOudk1Bxh995ZUYlyLpGsCKHtB/h/GMR+2a525
-         biReX75H6CQHkxy1c4uOIxfemfoWJltcR0ByJB/tFLsi3VGrpnRYFrNgtYPN86MikbRM
-         Y51fcvCBeKiiND8ib/aib3FpAWgPwXSQhxfs19b9t1AcT2xSloXRZ1+vFIPRlWofGJvo
-         WuCymUU7HLzDrtuJKGyCzeLRGrcg+tT/QW5En+Qn4GGuA5uaMtE9ITj3M8r9/9vTkbtE
-         YT5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FC8WMRYCc08/2iY3rGHR1xp6uCgxjUjBA3bfpUjoiT4=;
-        b=ncgq2IgFLmxXz8/szN67Kvk7MXc3JL7rc4iWHqdEgxxTpApXyPvp8JKBFf08FZiAau
-         itcXgaj463gftidlB7AnAx/OyvXoKvU/WgtG5v+rqlnyonyEYaosxlw2ls9p/cHuG+4b
-         cgszIxUSfqxQgdiO9bA0fxCD5ayMkogyCcgXWvJa12cnmn9Q8+y5XU6afg1F8U8qUj+/
-         BJwAP5gYPov4Jp5rxl2EMISjUAoi0MInpq/X0s3+z5W5uX8dSGZ/444Gye98QwsNupUV
-         JPhynebZttJSF/DIi+Uo7ODIuTZ/Nq3G6YmZJYwdqsOhE0OwxFNukfOjWsSyBE7N6fi5
-         EuXg==
-X-Gm-Message-State: APjAAAWSA59fh4Nia1ioSPg2b7iOAQ3UUUNvhmpLn7r7kspyog/ZgrJo
-        8oUNWolVaZbKmmrreW5LjqLNwQ==
-X-Google-Smtp-Source: APXvYqwR9PJ3zPvk3ivmgS/oVWYZl4l1bRCg1qh2JwUu2XrqcUwF/W35Fvtu98MQ1xRPkOy2pB4BvA==
-X-Received: by 2002:a17:90a:8d0c:: with SMTP id c12mr4008126pjo.140.1565271495115;
-        Thu, 08 Aug 2019 06:38:15 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:83a1:186c:3a47:dc97:3ed1? ([2605:e000:100e:83a1:186c:3a47:dc97:3ed1])
-        by smtp.gmail.com with ESMTPSA id x22sm101589775pff.5.2019.08.08.06.38.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Aug 2019 06:38:13 -0700 (PDT)
+        id S1732446AbfHHPAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Aug 2019 11:00:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:30897 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728380AbfHHPAT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Aug 2019 11:00:19 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 433952E95A5;
+        Thu,  8 Aug 2019 15:00:19 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 26C6D61F3E;
+        Thu,  8 Aug 2019 15:00:19 +0000 (UTC)
+Received: from zmail25.collab.prod.int.phx2.redhat.com (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 0E6111800B74;
+        Thu,  8 Aug 2019 15:00:19 +0000 (UTC)
+Date:   Thu, 8 Aug 2019 11:00:18 -0400 (EDT)
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block <linux-block@vger.kernel.org>, jack@suse.cz,
+        kai heng feng <kai.heng.feng@canonical.com>
+Message-ID: <1651590600.5231735.1565276418558.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1eec3a2a-3409-7220-6a8b-ff5aeedd2093@kernel.dk>
+References: <1303057871.5074831.1565247040675.JavaMail.zimbra@redhat.com> <1eec3a2a-3409-7220-6a8b-ff5aeedd2093@kernel.dk>
 Subject: Re: regression: blktests block/001 failed with commit "loop: Fix
  mount(2) failure due to race with LOOP_SET_FD"
-To:     Yi Zhang <yi.zhang@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>
-Cc:     jack@suse.cz, kai.heng.feng@canonical.com
-References: <1303057871.5074831.1565247040675.JavaMail.zimbra@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <1eec3a2a-3409-7220-6a8b-ff5aeedd2093@kernel.dk>
-Date:   Thu, 8 Aug 2019 06:38:12 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1303057871.5074831.1565247040675.JavaMail.zimbra@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.68.5.41, 10.4.195.6]
+Thread-Topic: regression: blktests block/001 failed with commit "loop: Fix mount(2) failure due to race with LOOP_SET_FD"
+Thread-Index: PilKONWkx8tjODMqrpYyH6oNiHKiiA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Thu, 08 Aug 2019 15:00:19 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
+
+Hi Jens
+The issue fixed by this patch, thanks.
+
+Best Regards,
+  Yi Zhang
+
+
+----- Original Message -----
+From: "Jens Axboe" <axboe@kernel.dk>
+To: "Yi Zhang" <yi.zhang@redhat.com>, "linux-block" <linux-block@vger.kernel.org>
+Cc: jack@suse.cz, "kai heng feng" <kai.heng.feng@canonical.com>
+Sent: Thursday, August 8, 2019 9:38:12 PM
+Subject: Re: regression: blktests block/001 failed with commit "loop: Fix mount(2) failure due to race with LOOP_SET_FD"
 
 On 8/7/19 11:50 PM, Yi Zhang wrote:
 > Hello
