@@ -2,90 +2,94 @@ Return-Path: <SRS0=kddI=WE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0528C433FF
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 13:35:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DCCFC0650F
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 13:35:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9358821479
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 13:35:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GyfDnfPt"
+	by mail.kernel.org (Postfix) with ESMTP id 7EAE0214C6
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 13:35:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732882AbfHHNfF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Aug 2019 09:35:05 -0400
-Received: from mail-pf1-f170.google.com ([209.85.210.170]:38452 "EHLO
-        mail-pf1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733075AbfHHNfC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 09:35:02 -0400
-Received: by mail-pf1-f170.google.com with SMTP id y15so44142557pfn.5
-        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 06:35:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GpmhOOhkjZn/xPUlAc0Il+1MLsQaxLxLhCEUVCkaXcY=;
-        b=GyfDnfPtZ50Yp5OLwkB9MAp59zkRYwuo2uowH34HWERv68pXqjexeZf/LiildrlfkG
-         SUWFQBm4VtFWSeVThF6R2fdBrOjnmJAwD3HBW+48GDXr4kpvnF44jBRpLCS4kBPr3YD0
-         HPWmUbWFP+ndfXLRh200lCvjlg5g54sN+Ok12oavsDAKYb8fxTfesCaRtW3zQO0beCo4
-         VDEcxrZWX9fC0vkkhDspzw9VWnSb8UoOUpZQ/7d/4ouPmgvHPNrPIIpDWidBUOuiL/gT
-         2SzOYPj/ggMeTsVyTgO+zGHSIDa+vhdvlUaFG7NFFMMh235WXPtAtUxr6RdzZP7/9J2o
-         eVUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GpmhOOhkjZn/xPUlAc0Il+1MLsQaxLxLhCEUVCkaXcY=;
-        b=AcN6YBM3A+33qbxpsEMxXwqbNImFd5/Idju/vxREwRTaYDiJGie24Da2rlwlkjjORd
-         fusRBYZbXKkvAgBkMVmg4hgE5771/l/40i8BS0FrnaJWnSLJ8ykUNwQxGISf7M/xcuco
-         hknDHZ9JbQxBxQs8N5M57VhlIRX2hk7e+7PUBBDa6ehInu2Y4LKBtqL7AgjyYR6oU4yO
-         MsSH1LW9y8UCJoxgZXXTV7um9nqsqw7m567+fBLutW8NqRbzl2SGbXgSoSCpm6b6W2Cf
-         BfZR3G2pbkNMR3ETHjiNsM2Q+SuYmpQeTxd49MQAxHoOw3jktKpJuO7e7zvaXGYRmzm3
-         qDjQ==
-X-Gm-Message-State: APjAAAWl0ShyDj/qoxW7cbXiBFN+zVHmzB4X+tvtwsEdhHzNiXjMnMmj
-        XVLpVwakUCafy2a+deA/dS/lgQXjDKA19Q==
-X-Google-Smtp-Source: APXvYqwuGRL9zpfvmjxOsypOQVucm/W3gHDymvkqRK/j43viONqdygL9QT+paQgK/bWk97ALxnOYMA==
-X-Received: by 2002:a63:6a81:: with SMTP id f123mr12979749pgc.348.1565271301170;
-        Thu, 08 Aug 2019 06:35:01 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:83a1:186c:3a47:dc97:3ed1? ([2605:e000:100e:83a1:186c:3a47:dc97:3ed1])
-        by smtp.gmail.com with ESMTPSA id f19sm142886966pfk.180.2019.08.08.06.34.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Aug 2019 06:35:00 -0700 (PDT)
-Subject: Re: [PATCH -next] lightnvm: remove set but not used variables
- 'data_len' and 'rq_len'
-To:     YueHaibing <yuehaibing@huawei.com>, mb@lightnvm.io,
-        hans@owltronix.com, hch@lst.de
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20190807131847.62412-1-yuehaibing@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <93b23b81-cc4e-4008-cffe-38f87da11481@kernel.dk>
-Date:   Thu, 8 Aug 2019 06:34:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1733075AbfHHNfS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Aug 2019 09:35:18 -0400
+Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:28577 "EHLO
+        esa2.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732982AbfHHNfR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 09:35:17 -0400
+Authentication-Results: esa2.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
+  receiver=esa2.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible
+Received-SPF: Pass (esa2.hc3370-68.iphmx.com: domain of
+  roger.pau@citrix.com designates 162.221.158.21 as permitted
+  sender) identity=mailfrom; client-ip=162.221.158.21;
+  receiver=esa2.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible; x-record-type="v=spf1";
+  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@mail.citrix.com) identity=helo;
+  client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="postmaster@mail.citrix.com";
+  x-conformance=sidf_compatible
+IronPort-SDR: nEDU6LVRbg88KTlTux6ru2PgFlw3LZjUfq4C1Lk4MHjAdYYLx5hH5dgAN+PxYLeziP35n1JIkU
+ V9/9gTTKBFaujkKcXN+7jTqPGwdxUON4C8t9vauc6bqqS5VS2VfgYKYCgkoY0mPwr3McBoUsMN
+ bRXbiVpK7UnxHm2OUDKfgczWJCS1nMhKNkWTo0BYps8sKTld02npKy+2E2kcAibKuNvv6aWJeW
+ uPS33gMZybumugUioywI5gGjPgweC8x1Al6DE1locvpzmoxG/q3OOVbjPNnzHDRPL6qIZxb2j3
+ tEA=
+X-SBRS: 2.7
+X-MesageID: 4024476
+X-Ironport-Server: esa2.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,361,1559534400"; 
+   d="scan'208";a="4024476"
+Date:   Thu, 8 Aug 2019 15:35:10 +0200
+From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To:     Chuhong Yuan <hslester96@gmail.com>
+CC:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, <xen-devel@lists.xenproject.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 3/3] xen/blkback: Use refcount_t for refcount
+Message-ID: <20190808133510.tre6twn764pv3e7m@Air-de-Roger>
+References: <20190808131100.24751-1-hslester96@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190807131847.62412-1-yuehaibing@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190808131100.24751-1-hslester96@gmail.com>
+User-Agent: NeoMutt/20180716
+X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
+ AMSPEX02CL02.citrite.net (10.69.22.126)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/7/19 6:18 AM, YueHaibing wrote:
-> drivers/lightnvm/pblk-read.c: In function pblk_submit_read_gc:
-> drivers/lightnvm/pblk-read.c:423:6: warning: variable data_len set but not used [-Wunused-but-set-variable]
-> drivers/lightnvm/pblk-recovery.c: In function pblk_recov_scan_oob:
-> drivers/lightnvm/pblk-recovery.c:368:15: warning: variable rq_len set but not used [-Wunused-but-set-variable]
-> 
-> They are not used since commit 48e5da725581 ("lightnvm:
-> move metadata mapping to lower level driver")
+On Thu, Aug 08, 2019 at 09:11:00PM +0800, Chuhong Yuan wrote:
+> Reference counters are preferred to use refcount_t instead of
+> atomic_t.
+> This is because the implementation of refcount_t can prevent
+> overflows and detect possible use-after-free.
+> So convert atomic_t ref counters to refcount_t.
 
-Applied, thanks.
+Thanks!
 
--- 
-Jens Axboe
+I think there are more reference counters in blkback than
+the one you fixed. There's also an inflight field in xen_blkif_ring,
+and a pendcnt in pending_req which look like possible candidates to
+switch to use refcount_t, have you looked into switching those two
+also?
 
+Roger.
