@@ -1,140 +1,100 @@
-Return-Path: <SRS0=SzsG=WD=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=kddI=WE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3421EC433FF
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 23:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD7FC433FF
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 02:06:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 05661214C6
-	for <linux-block@archiver.kernel.org>; Wed,  7 Aug 2019 23:51:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9460F20B7C
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 02:06:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhTHm5Nw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eHIFGG2y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388425AbfHGXvN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Aug 2019 19:51:13 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:33603 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388123AbfHGXvN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 19:51:13 -0400
-Received: by mail-wr1-f65.google.com with SMTP id n9so93153309wru.0;
-        Wed, 07 Aug 2019 16:51:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=81W60zVYjF0WkGNMIxtxV/QpHZxdSDjYkRGFZyoC9NQ=;
-        b=hhTHm5Nw3iub40WKb4H1rqVluoBt3pHck0QiywNeJGfgGNfnNjbzVrBPozkC5g8j9g
-         8aab+mE+4ulrI+yy3QFobs6H3wCMogQfTTEjQ5LK3wee/MLE5uYV9hg9P3EWlEO24S4A
-         GGcRJ0l3FkefLaW5R2D6+IUs60CB3RRjd630LA8qt65E0pXuyLQuHc03dYbuendzW8it
-         7nEsYz/9xvm9+lK46TAYUqXDRS06we3dkaQ4lBBiwYFZJ6UCQRLZ6KAyHmrnHas1Yv09
-         Fsrqehj9A5Sp6lSVWLuV7I3FdqXigC8Jlton0NbJR+TCmrH+wznz/IqijdnDjUtkTRZ5
-         s6aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=81W60zVYjF0WkGNMIxtxV/QpHZxdSDjYkRGFZyoC9NQ=;
-        b=LKpF5+OiYEksh0PzBiWhy7Q1YNJ4NDKSKTUKT7gNlVSHI8hph8oLR9dU06xGQgQM1w
-         t0drqBh0ZUkrio4CxDhmsVfs2nxI2z/YqYE+Wr/u9vuBFuhZBwUQnLBkiuKWOk4NRzMN
-         Ud16RCNUsRS/usoAS03J7mUAQg2EZgf2/H6wXY27CNqyCZuncmnEzSgQSHKV2jLmO9bv
-         1oFGSyR6NEd9a11C8Ou4U3LM++6tteTlXhTBa0XmueQAUY53Xw91j0YZyKPM9OEVEr7w
-         6nDVTVW7tkfTvENZqB2y8+soGujoKx5SGRC4LJu89pHBwowfyI6RkYZMV2xlkuEuueTV
-         383w==
-X-Gm-Message-State: APjAAAX7oRodd1yh/CXhAjj92nTqVKybRtVWCm5tBMoTtSWfzCgPNffW
-        6YfOa0BiMRsHns5A1Fr7HgSH8brNicnipIN3T8Q=
-X-Google-Smtp-Source: APXvYqwt7F5BkB58H5wD984WMZT43ugAcQRwg0VeBjol0Scsm8pOYOWjbYcauyyRwVif41pglTfX8hitoIVSFX1lIAs=
-X-Received: by 2002:adf:f088:: with SMTP id n8mr13084998wro.58.1565221870134;
- Wed, 07 Aug 2019 16:51:10 -0700 (PDT)
+        id S1730655AbfHHCGM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Aug 2019 22:06:12 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:40150 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730467AbfHHCGM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 22:06:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1565229972; x=1596765972;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2CkeJX6kyd7jnlMdFoIQy0PKnwSIIvXdEH/jB/rk5iE=;
+  b=eHIFGG2ye1HWBz2Y6+BPbjYIhm4spA2RRRp6c9lqGAIgf7TZVKbPEEjr
+   NW0d7llybZkAUKgvxDqFq06HU2szHet6WDizTc6ueUX0Vg26W7QuhvP+D
+   1ozNXFplYFEpCZG07OSbm45GAqpt0yD8/MAGqfFI4JJj95eIy35qfcxWb
+   vq+hPfmflwSaodh7mr+CKvm278fTNMEpcC4mf//km01wuBOeIgookD30I
+   tdRzHXqV6TcGifrt787Cw/A89oS0n0CHKalrrAHKxsoM+wmzg1Jq8TPpY
+   yNEG90Az4WPvBtQU2WRG1nUCpw7otMzptUnnOCScVb9KhR/+JoCxs0e8L
+   w==;
+IronPort-SDR: sSpsFZSmKIIbwZZ0srGqv9n+fm6RBe0utoG89PA7+A+gijDxmtEDM4Cy2dSXzwvSawuVK/toJO
+ 4aq1Rvgf4UzpAzb/AtXr/SBSOn05zMCDRtzaJzSSxf6lpvysDjhY3RNUgziOD1QMf/iuLJXdZ5
+ DSpMaL9ZDeKD7B7uoPSMQ2zObvvypvnEYWXhNNrRGfaKcbyxhlTr8twJ6WVtvTS/qWzDttWr2Y
+ TR5sod5+vAojw9sLyNU2peymxg3Z/qNnBWNnYYkhJBYcr1pDSzuK31GcrvL1gxMEh+UL7+7pqA
+ Jks=
+X-IronPort-AV: E=Sophos;i="5.64,358,1559491200"; 
+   d="scan'208";a="221800548"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 08 Aug 2019 10:06:11 +0800
+IronPort-SDR: lG1ICQi5ZEUD4CDK2CXD2Eqjwo7TaDs9bidZrCpbGEZYI+Cs9f9RQTGXq5KMsZQ5DlAU8ZvDr2
+ q6i0V3eJGyobXe9HVbZ8JLeuBHFI8NsDtUGNoty9nWUxPdkSSTfvLILmBkR2H1OVVPQGQ1edNY
+ ZjO9ybKDdxSeQghMVZMuUpEgGe0AEjZ1ksZyF/FFhain1Ht6H00tkoKWO5AZ4Yy/xxTLb23HWy
+ fxOwdBmKSkLT8xJgbM3RNUs063tKxj0sXkgQc5EqfhIT7n8oOOit0oIkiaVaU8+cRx4ikgD8kP
+ HQydQT3x6G2tlMoA1nEDkDa+
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2019 19:03:56 -0700
+IronPort-SDR: JYK02IEyXHrHCHIuUEdSX2S6Qg7AUx5+lMyN1iBhhDcxBoHxVnGwmPkn5nGuA2xMQV/xeVTOn2
+ QuIbAz1IIsq1j4K1iQcrhmPVs8Ol1Ja4JFWyEKvTskJUCuH/9tCvirgFdLxDiAnW1yJqACTGfZ
+ K7C3zbK/5IPr+HgX+PWD9zpp8WKHHBlzy9eXgCOJl+jxvXyAopmLJErvJ5mXVdF0g/WacPDEyx
+ 2ieV7fTY6Ifxpm7pWCy0T9evdRnwGek0XvYryPIVkXjnQSWJW9JSKqHH667O0F7SOIo2JopgjA
+ ATE=
+Received: from dhcp-10-88-173-43.hgst.com (HELO localhost.localdomain) ([10.88.173.43])
+  by uls-op-cesaip02.wdc.com with ESMTP; 07 Aug 2019 19:06:11 -0700
+From:   Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH] block: only set DYING flag once in blk_cleanup_queue()
+Date:   Wed,  7 Aug 2019 19:06:10 -0700
+Message-Id: <20190808020610.23121-1-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20190805011906.5020-1-ming.lei@redhat.com>
-In-Reply-To: <20190805011906.5020-1-ming.lei@redhat.com>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Thu, 8 Aug 2019 07:50:59 +0800
-Message-ID: <CACVXFVNn9wu2sU=47csi+stvzN0TnOV4E8xBHYknxo9uDksMuQ@mail.gmail.com>
-Subject: Re: [PATCH] genirq/affinity: create affinity mask for single vector
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Marc Zyngier <marc.zyngier@arm.com>, linux-pci@vger.kernel.org,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-nvme <linux-nvme@lists.infradead.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Thomas and Guys,
+This commit removes the statement in blk_cleanup_queue() function that
+marks the queue as dying. QUEUE_FLAG_DYING is already set inside
+blk_set_queue_dying() a few lines above, no need to do it again.
 
-On Mon, Aug 5, 2019 at 9:19 AM Ming Lei <ming.lei@redhat.com> wrote:
->
-> Since commit c66d4bd110a1f8 ("genirq/affinity: Add new callback for
-> (re)calculating interrupt sets"), irq_create_affinity_masks() returns
-> NULL in case of single vector. This change has caused regression on some
-> drivers, such as lpfc.
->
-> The problem is that single vector may be triggered in some generic cases:
-> 1) kdump kernel 2) irq vectors resource is close to exhaustion.
->
-> If we don't create affinity mask for single vector, almost every caller
-> has to handle the special case.
->
-> So still create affinity mask for single vector, since irq_create_affinity_masks()
-> is capable of handling that.
->
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Bjorn Helgaas <helgaas@kernel.org>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: linux-block@vger.kernel.org
-> Cc: Sagi Grimberg <sagi@grimberg.me>
-> Cc: linux-nvme@lists.infradead.org
-> Cc: linux-pci@vger.kernel.org
-> Cc: Keith Busch <keith.busch@intel.com>
-> Cc: Sumit Saxena <sumit.saxena@broadcom.com>
-> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-> Cc: Shivasharan Srikanteshwara <shivasharan.srikanteshwara@broadcom.com>
-> Fixes: c66d4bd110a1f8 ("genirq/affinity: Add new callback for (re)calculating interrupt sets")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  kernel/irq/affinity.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-> index 4352b08ae48d..6fef48033f96 100644
-> --- a/kernel/irq/affinity.c
-> +++ b/kernel/irq/affinity.c
-> @@ -251,11 +251,9 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
->          * Determine the number of vectors which need interrupt affinities
->          * assigned. If the pre/post request exhausts the available vectors
->          * then nothing to do here except for invoking the calc_sets()
-> -        * callback so the device driver can adjust to the situation. If there
-> -        * is only a single vector, then managing the queue is pointless as
-> -        * well.
-> +        * callback so the device driver can adjust to the situation.
->          */
-> -       if (nvecs > 1 && nvecs > affd->pre_vectors + affd->post_vectors)
-> +       if (nvecs > affd->pre_vectors + affd->post_vectors)
->                 affvecs = nvecs - affd->pre_vectors - affd->post_vectors;
->         else
->                 affvecs = 0;
+No functional change.
 
-Without this patch, kdump kernel may not work, so could you take a look
-at this patch?
+Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ block/blk-core.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Thanks,
-Ming Lei
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d0cc6e14d2f0..0822acc423a3 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -339,7 +339,6 @@ void blk_cleanup_queue(struct request_queue *q)
+ 
+ 	blk_queue_flag_set(QUEUE_FLAG_NOMERGES, q);
+ 	blk_queue_flag_set(QUEUE_FLAG_NOXMERGES, q);
+-	blk_queue_flag_set(QUEUE_FLAG_DYING, q);
+ 	mutex_unlock(&q->sysfs_lock);
+ 
+ 	/*
+-- 
+2.21.0
+
