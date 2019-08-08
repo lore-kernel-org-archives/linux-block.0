@@ -2,136 +2,123 @@ Return-Path: <SRS0=kddI=WE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C1CC0650F
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 13:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0689C433FF
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 13:29:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4908D2184E
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 13:11:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A02D921479
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 13:29:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HDAKTHGL"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="EjjD3Ce6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732961AbfHHNLG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Aug 2019 09:11:06 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:37404 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732645AbfHHNLG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 09:11:06 -0400
-Received: by mail-pf1-f194.google.com with SMTP id 19so44078856pfa.4;
-        Thu, 08 Aug 2019 06:11:06 -0700 (PDT)
+        id S1733025AbfHHN3U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Aug 2019 09:29:20 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:33908 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732990AbfHHN3T (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 09:29:19 -0400
+Received: by mail-pg1-f195.google.com with SMTP id n9so37860299pgc.1
+        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 06:29:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ghbafTZeER7tFVSxKR0FoUNjQNOkuIPxO4zFms6fLUg=;
-        b=HDAKTHGLr1vPMQY+1M6UtNpZ4aeffhDs6Ljt9HwWSKX66NP7I8ulEYeU3JHSfA7U4z
-         L/lmA+ZPFy8xEfhQY/9tgoRPhcm17M29Hl/cbelWsrzDEtrazQlmLSLHuphKSBes3abF
-         5z2hjaD7/BicGKOen58Qi1gnUe69nFMu8mt0alEWPQX8TofJMEePz2LvW7hKz3UQUsfi
-         KovTVAtUDnU/If8ePS/euYbFvhO9+A2GThccvjadlmLbouIyYRAgpgnvZTE6zrJSXhjg
-         OhZtipnGYL6SJ5EDdw5Urtq4sD/HX8IOppoXkyXh8vlEEwzO6ZQCa2bv5r7x6b+C5sk/
-         EcWw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=ca6T0eASzQmOiSyowdSYOXK1MYWFMr9czZcrawwTVio=;
+        b=EjjD3Ce6v8QFullurWeuJW0wfMh/7I6a7/IK9ya0V4taor3Y0gtAVc7PwXgIoRAOJW
+         KtQQCjCwIQZVmRduz3VEAunShPTG4cSz+91Q2TtGR4UY4hULwdTceHqaHgNlAcSGqAWC
+         0Dwrl7UTsabIzmCnMfFOxbmML9WkFwJyUyyGasEkkrDBGxHqM5I0kn/9Z2SOcqL/1kyB
+         yruxmmD3xers5FhXyF67+ZSaiZ6DGyoIF9bzJLXmyJfcoDTFeDX+nok7cWnHNO+dfp+f
+         4b0/1ZJnS3CRKMoSyVNqjSthN71rFsKaEGC+5FhYX74nqkocqLb3ldh0QSxaWaWG08EB
+         R4xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ghbafTZeER7tFVSxKR0FoUNjQNOkuIPxO4zFms6fLUg=;
-        b=UZO+PlRCgNq1Wm0LysUTfNBnEiYe8S2I8IgjmOG/C1OAEbsjGmGrAys5s+1oMOZdjr
-         1ie3UnbCgQ1jPtoUw0QP26rrSz/05KZI/WlTM6KMXVJB4iRzVzL2rIfL4Ch0CtgJuqbm
-         un2qhric10uJSlKuDMegy3BeIoLnu+KFbmehLTICDl5/YVGNfl2pgp7NYgIEv/1Nn5bj
-         e0nofB93vUdNULn878ly0NsRWLSNHgFT+86BDhYje2UKhcnnxK4p7grfFGO4qckNxt1J
-         xGD2h0Lif4aLg0ngO75DQxp77RH+I65Ek3WcPjE4M8+cspLqhyh6GmRAHM5BtcFB70gd
-         MbQg==
-X-Gm-Message-State: APjAAAUUj69VRgwREBjDr47235b5rIiktiAzaMjooqGm9XQ+MF50rzt5
-        tYTTbSRfANr1rcIS8C8lWlk=
-X-Google-Smtp-Source: APXvYqyXuh6uMII74oJqQCwpZfDp6HK/LdI9I13SlK2HkQifbdw6zcUTOtC0or/jJO1UDnoNYWLCLg==
-X-Received: by 2002:a62:5252:: with SMTP id g79mr15208485pfb.18.1565269865807;
-        Thu, 08 Aug 2019 06:11:05 -0700 (PDT)
-Received: from suzukaze.ipads-lab.se.sjtu.edu.cn ([89.31.126.54])
-        by smtp.gmail.com with ESMTPSA id p67sm118773185pfg.124.2019.08.08.06.11.02
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 08 Aug 2019 06:11:05 -0700 (PDT)
-From:   Chuhong Yuan <hslester96@gmail.com>
-Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Chuhong Yuan <hslester96@gmail.com>
-Subject: [PATCH 3/3] xen/blkback: Use refcount_t for refcount
-Date:   Thu,  8 Aug 2019 21:11:00 +0800
-Message-Id: <20190808131100.24751-1-hslester96@gmail.com>
-X-Mailer: git-send-email 2.20.1
+        bh=ca6T0eASzQmOiSyowdSYOXK1MYWFMr9czZcrawwTVio=;
+        b=WBsp9f6Ay0tinQOYn6nxyhbjsejf0ev2GUUlxeu6Fqp5o9vdm2SQSO35RqvrsnEMQZ
+         4krL/xuWoOZKkDvxcJdNPBv0UYpSct2shN/YwmZq+uqlhb1Bj5Pg3sNAFmEDx2qfVSU5
+         rjhGXgIX5vWX19vguZL2B3iz9qWlS4ok+deX0TT+5yfnLYiMf3qrbmrFCF4ZwhH8y9wR
+         1El6oZjn7a3+sCNN299JZgwxPDrFi7I9flwf6VFMMhF4zckihGE6YymZXa8UxN/aML3m
+         R16rYGU0OG4u1onWfocWAhZXcRzyY97aLRdABf3fP9j88LzqlGS3PetzT/whT2sK3SQR
+         WVRw==
+X-Gm-Message-State: APjAAAU/WzXh1gdT7YOJncv2gQaf2aB408tFsTLZmpibpQWbasWIGaaL
+        zYaLvmTeGie8YQ6+EDisu5vMWD+VoNsS1Q==
+X-Google-Smtp-Source: APXvYqzIeeoxgmWqY2PHZ7+/r4DJz+6DXaU8neOzjuD3iYXAVFgS3BwyCO7BxyDiaz6U3oFxg89qvA==
+X-Received: by 2002:a65:60d2:: with SMTP id r18mr12522270pgv.71.1565270958957;
+        Thu, 08 Aug 2019 06:29:18 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:83a1:186c:3a47:dc97:3ed1? ([2605:e000:100e:83a1:186c:3a47:dc97:3ed1])
+        by smtp.gmail.com with ESMTPSA id f14sm16978362pgu.8.2019.08.08.06.29.17
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 08 Aug 2019 06:29:18 -0700 (PDT)
+Subject: Re: [PATCH] block: aoe: Fix kernel crash due to atomic sleep when
+ exiting
+To:     zhe.he@windriver.com, justin@coraid.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1565233794-458496-1-git-send-email-zhe.he@windriver.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <afd1ac3b-127b-d436-98ac-e4f2748eacb8@kernel.dk>
+Date:   Thu, 8 Aug 2019 06:29:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
+In-Reply-To: <1565233794-458496-1-git-send-email-zhe.he@windriver.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reference counters are preferred to use refcount_t instead of
-atomic_t.
-This is because the implementation of refcount_t can prevent
-overflows and detect possible use-after-free.
-So convert atomic_t ref counters to refcount_t.
+On 8/7/19 8:09 PM, zhe.he@windriver.com wrote:
+> From: He Zhe <zhe.he@windriver.com>
+> 
+> Since commit 3582dd291788 ("aoe: convert aoeblk to blk-mq"), aoedev_downdev
+> has had the possibility of sleeping and causing the following crash.
+> 
+> BUG: scheduling while atomic: rmmod/2242/0x00000003
+> Modules linked in: aoe
+> Preemption disabled at:
+> [<ffffffffc01d95e5>] flush+0x95/0x4a0 [aoe]
+> CPU: 7 PID: 2242 Comm: rmmod Tainted: G          I       5.2.3 #1
+> Hardware name: Intel Corporation S5520HC/S5520HC, BIOS S5500.86B.01.10.0025.030220091519 03/02/2009
+> Call Trace:
+>   dump_stack+0x4f/0x6a
+>   ? flush+0x95/0x4a0 [aoe]
+>   __schedule_bug.cold+0x44/0x54
+>   __schedule+0x44f/0x680
+>   schedule+0x44/0xd0
+>   blk_mq_freeze_queue_wait+0x46/0xb0
+>   ? wait_woken+0x80/0x80
+>   blk_mq_freeze_queue+0x1b/0x20
+>   aoedev_downdev+0x111/0x160 [aoe]
+>   flush+0xff/0x4a0 [aoe]
+>   aoedev_exit+0x23/0x30 [aoe]
+>   aoe_exit+0x35/0x948 [aoe]
+>   __se_sys_delete_module+0x183/0x210
+>   __x64_sys_delete_module+0x16/0x20
+>   do_syscall_64+0x4d/0x130
+>   entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> RIP: 0033:0x7f24e0043b07
+> Code: 73 01 c3 48 8b 0d 89 73 0b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f
+> 1f 84 00 00 00 00 00 0f 1f 44 00 00 b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff
+> ff 73 01 c3 48 8b 0d 59 73 0b 00 f7 d8 64 89 01 48
+> RSP: 002b:00007ffe18f7f1e8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f24e0043b07
+> RDX: 000000000000000a RSI: 0000000000000800 RDI: 0000555c3ecf87c8
+> RBP: 00007ffe18f7f1f0 R08: 0000000000000000 R09: 0000000000000000
+> R10: 00007f24e00b4ac0 R11: 0000000000000206 R12: 00007ffe18f7f238
+> R13: 00007ffe18f7f410 R14: 00007ffe18f80e73 R15: 0000555c3ecf8760
+> 
+> This patch, handling in the same way of pass two, unlocks the locks and
+> restart pass one after aoedev_downdev is done.
 
-Signed-off-by: Chuhong Yuan <hslester96@gmail.com>
----
- drivers/block/xen-blkback/common.h | 7 ++++---
- drivers/block/xen-blkback/xenbus.c | 2 +-
- 2 files changed, 5 insertions(+), 4 deletions(-)
+Applied, thanks.
 
-diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
-index 1d3002d773f7..9db5f3586fb4 100644
---- a/drivers/block/xen-blkback/common.h
-+++ b/drivers/block/xen-blkback/common.h
-@@ -35,6 +35,7 @@
- #include <linux/wait.h>
- #include <linux/io.h>
- #include <linux/rbtree.h>
-+#include <linux/refcount.h>
- #include <asm/setup.h>
- #include <asm/pgalloc.h>
- #include <asm/hypervisor.h>
-@@ -309,7 +310,7 @@ struct xen_blkif {
- 	struct xen_vbd		vbd;
- 	/* Back pointer to the backend_info. */
- 	struct backend_info	*be;
--	atomic_t		refcnt;
-+	refcount_t		refcnt;
- 	/* for barrier (drain) requests */
- 	struct completion	drain_complete;
- 	atomic_t		drain;
-@@ -362,10 +363,10 @@ struct pending_req {
- 			 (_v)->bdev->bd_part->nr_sects : \
- 			  get_capacity((_v)->bdev->bd_disk))
- 
--#define xen_blkif_get(_b) (atomic_inc(&(_b)->refcnt))
-+#define xen_blkif_get(_b) (refcount_inc(&(_b)->refcnt))
- #define xen_blkif_put(_b)				\
- 	do {						\
--		if (atomic_dec_and_test(&(_b)->refcnt))	\
-+		if (refcount_dec_and_test(&(_b)->refcnt))	\
- 			schedule_work(&(_b)->free_work);\
- 	} while (0)
- 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 3ac6a5d18071..ecc5f9c5bf3f 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -169,7 +169,7 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
- 		return ERR_PTR(-ENOMEM);
- 
- 	blkif->domid = domid;
--	atomic_set(&blkif->refcnt, 1);
-+	refcount_set(&blkif->refcnt, 1);
- 	init_completion(&blkif->drain_complete);
- 	INIT_WORK(&blkif->free_work, xen_blkif_deferred_free);
- 
 -- 
-2.20.1
+Jens Axboe
 
