@@ -2,213 +2,142 @@ Return-Path: <SRS0=kddI=WE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6397C32751
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 02:37:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E4FEC433FF
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 03:10:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 826FF20B7C
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 02:37:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74DF6216C8
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 03:10:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728245AbfHHChI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Aug 2019 22:37:08 -0400
-Received: from mga02.intel.com ([134.134.136.20]:4305 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728025AbfHHChH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 7 Aug 2019 22:37:07 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Aug 2019 19:36:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,358,1559545200"; 
-   d="scan'208";a="186207302"
-Received: from iweiny-desk2.sc.intel.com ([10.3.52.157])
-  by orsmga002.jf.intel.com with ESMTP; 07 Aug 2019 19:36:38 -0700
-Date:   Wed, 7 Aug 2019 19:36:37 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, John Hubbard <jhubbard@nvidia.com>,
-        Matthew Wilcox <willy@infradead.org>, john.hubbard@gmail.com,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-Message-ID: <20190808023637.GA1508@iweiny-DESK2.sc.intel.com>
-References: <20190802022005.5117-1-jhubbard@nvidia.com>
- <20190802091244.GD6461@dhcp22.suse.cz>
- <20190802124146.GL25064@quack2.suse.cz>
- <20190802142443.GB5597@bombadil.infradead.org>
- <20190802145227.GQ25064@quack2.suse.cz>
- <076e7826-67a5-4829-aae2-2b90f302cebd@nvidia.com>
- <20190807083726.GA14658@quack2.suse.cz>
- <20190807084649.GQ11812@dhcp22.suse.cz>
+        id S1728060AbfHHDKC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Aug 2019 23:10:02 -0400
+Received: from mail.windriver.com ([147.11.1.11]:57463 "EHLO
+        mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727984AbfHHDKC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 23:10:02 -0400
+Received: from ALA-HCA.corp.ad.wrs.com ([147.11.189.40])
+        by mail.windriver.com (8.15.2/8.15.1) with ESMTPS id x7839uuQ020218
+        (version=TLSv1 cipher=AES128-SHA bits=128 verify=FAIL);
+        Wed, 7 Aug 2019 20:09:56 -0700 (PDT)
+Received: from pek-lpg-core2.corp.ad.wrs.com (128.224.153.41) by
+ ALA-HCA.corp.ad.wrs.com (147.11.189.40) with Microsoft SMTP Server id
+ 14.3.468.0; Wed, 7 Aug 2019 20:09:56 -0700
+From:   <zhe.he@windriver.com>
+To:     <justin@coraid.com>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <zhe.he@windriver.com>
+Subject: [PATCH] block: aoe: Fix kernel crash due to atomic sleep when exiting
+Date:   Thu, 8 Aug 2019 11:09:54 +0800
+Message-ID: <1565233794-458496-1-git-send-email-zhe.he@windriver.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190807084649.GQ11812@dhcp22.suse.cz>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 07, 2019 at 10:46:49AM +0200, Michal Hocko wrote:
-> On Wed 07-08-19 10:37:26, Jan Kara wrote:
-> > On Fri 02-08-19 12:14:09, John Hubbard wrote:
-> > > On 8/2/19 7:52 AM, Jan Kara wrote:
-> > > > On Fri 02-08-19 07:24:43, Matthew Wilcox wrote:
-> > > > > On Fri, Aug 02, 2019 at 02:41:46PM +0200, Jan Kara wrote:
-> > > > > > On Fri 02-08-19 11:12:44, Michal Hocko wrote:
-> > > > > > > On Thu 01-08-19 19:19:31, john.hubbard@gmail.com wrote:
-> > > > > > > [...]
-> > > > > > > > 2) Convert all of the call sites for get_user_pages*(), to
-> > > > > > > > invoke put_user_page*(), instead of put_page(). This involves dozens of
-> > > > > > > > call sites, and will take some time.
-> > > > > > > 
-> > > > > > > How do we make sure this is the case and it will remain the case in the
-> > > > > > > future? There must be some automagic to enforce/check that. It is simply
-> > > > > > > not manageable to do it every now and then because then 3) will simply
-> > > > > > > be never safe.
-> > > > > > > 
-> > > > > > > Have you considered coccinele or some other scripted way to do the
-> > > > > > > transition? I have no idea how to deal with future changes that would
-> > > > > > > break the balance though.
-> > > 
-> > > Hi Michal,
-> > > 
-> > > Yes, I've thought about it, and coccinelle falls a bit short (it's not smart
-> > > enough to know which put_page()'s to convert). However, there is a debug
-> > > option planned: a yet-to-be-posted commit [1] uses struct page extensions
-> > > (obviously protected by CONFIG_DEBUG_GET_USER_PAGES_REFERENCES) to add
-> > > a redundant counter. That allows:
-> > > 
-> > > void __put_page(struct page *page)
-> > > {
-> > > 	...
-> > > 	/* Someone called put_page() instead of put_user_page() */
-> > > 	WARN_ON_ONCE(atomic_read(&page_ext->pin_count) > 0);
-> > > 
-> > > > > > 
-> > > > > > Yeah, that's why I've been suggesting at LSF/MM that we may need to create
-> > > > > > a gup wrapper - say vaddr_pin_pages() - and track which sites dropping
-> > > > > > references got converted by using this wrapper instead of gup. The
-> > > > > > counterpart would then be more logically named as unpin_page() or whatever
-> > > > > > instead of put_user_page().  Sure this is not completely foolproof (you can
-> > > > > > create new callsite using vaddr_pin_pages() and then just drop refs using
-> > > > > > put_page()) but I suppose it would be a high enough barrier for missed
-> > > > > > conversions... Thoughts?
-> > > 
-> > > The debug option above is still a bit simplistic in its implementation
-> > > (and maybe not taking full advantage of the data it has), but I think
-> > > it's preferable, because it monitors the "core" and WARNs.
-> > > 
-> > > Instead of the wrapper, I'm thinking: documentation and the passage of
-> > > time, plus the debug option (perhaps enhanced--probably once I post it
-> > > someone will notice opportunities), yes?
-> > 
-> > So I think your debug option and my suggested renaming serve a bit
-> > different purposes (and thus both make sense). If you do the renaming, you
-> > can just grep to see unconverted sites. Also when someone merges new GUP
-> > user (unaware of the new rules) while you switch GUP to use pins instead of
-> > ordinary references, you'll get compilation error in case of renaming
-> > instead of hard to debug refcount leak without the renaming. And such
-> > conflict is almost bound to happen given the size of GUP patch set... Also
-> > the renaming serves against the "coding inertia" - i.e., GUP is around for
-> > ages so people just use it without checking any documentation or comments.
-> > After switching how GUP works, what used to be correct isn't anymore so
-> > renaming the function serves as a warning that something has really
-> > changed.
-> 
-> Fully agreed!
+From: He Zhe <zhe.he@windriver.com>
 
-Ok Prior to this I've been basing all my work for the RDMA/FS DAX stuff in
-Johns put_user_pages()...  (Including when I proposed failing truncate with a
-lease in June [1])
+Since commit 3582dd291788 ("aoe: convert aoeblk to blk-mq"), aoedev_downdev
+has had the possibility of sleeping and causing the following crash.
 
-However, based on the suggestions in that thread it became clear that a new
-interface was going to need to be added to pass in the "RDMA file" information
-to GUP to associate file pins with the correct processes...
+BUG: scheduling while atomic: rmmod/2242/0x00000003
+Modules linked in: aoe
+Preemption disabled at:
+[<ffffffffc01d95e5>] flush+0x95/0x4a0 [aoe]
+CPU: 7 PID: 2242 Comm: rmmod Tainted: G          I       5.2.3 #1
+Hardware name: Intel Corporation S5520HC/S5520HC, BIOS S5500.86B.01.10.0025.030220091519 03/02/2009
+Call Trace:
+ dump_stack+0x4f/0x6a
+ ? flush+0x95/0x4a0 [aoe]
+ __schedule_bug.cold+0x44/0x54
+ __schedule+0x44f/0x680
+ schedule+0x44/0xd0
+ blk_mq_freeze_queue_wait+0x46/0xb0
+ ? wait_woken+0x80/0x80
+ blk_mq_freeze_queue+0x1b/0x20
+ aoedev_downdev+0x111/0x160 [aoe]
+ flush+0xff/0x4a0 [aoe]
+ aoedev_exit+0x23/0x30 [aoe]
+ aoe_exit+0x35/0x948 [aoe]
+ __se_sys_delete_module+0x183/0x210
+ __x64_sys_delete_module+0x16/0x20
+ do_syscall_64+0x4d/0x130
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x7f24e0043b07
+Code: 73 01 c3 48 8b 0d 89 73 0b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f
+1f 84 00 00 00 00 00 0f 1f 44 00 00 b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff
+ff 73 01 c3 48 8b 0d 59 73 0b 00 f7 d8 64 89 01 48
+RSP: 002b:00007ffe18f7f1e8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f24e0043b07
+RDX: 000000000000000a RSI: 0000000000000800 RDI: 0000555c3ecf87c8
+RBP: 00007ffe18f7f1f0 R08: 0000000000000000 R09: 0000000000000000
+R10: 00007f24e00b4ac0 R11: 0000000000000206 R12: 00007ffe18f7f238
+R13: 00007ffe18f7f410 R14: 00007ffe18f80e73 R15: 0000555c3ecf8760
 
-I have many drawings on my white board with "a whole lot of lines" on them to
-make sure that if a process opens a file, mmaps it, pins it with RDMA, _closes_
-it, and ummaps it; that the resulting file pin can still be traced back to the
-RDMA context and all the processes which may have access to it....  No matter
-where the original context may have come from.  I believe I have accomplished
-that.
+This patch, handling in the same way of pass two, unlocks the locks and
+restart pass one after aoedev_downdev is done.
 
-Before I go on, I would like to say that the "imbalance" of get_user_pages()
-and put_page() bothers me from a purist standpoint...  However, since this
-discussion cropped up I went ahead and ported my work to Linus' current master
-(5.3-rc3+) and in doing so I only had to steal a bit of Johns code...  Sorry
-John...  :-(
+Fixes: 3582dd291788 ("aoe: convert aoeblk to blk-mq")
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ drivers/block/aoe/aoedev.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-I don't have the commit messages all cleaned up and I know there may be some
-discussion on these new interfaces but I wanted to throw this series out there
-because I think it may be what Jan and Michal are driving at (or at least in
-that direction.
+diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
+index 5b49f1b..e2ea235 100644
+--- a/drivers/block/aoe/aoedev.c
++++ b/drivers/block/aoe/aoedev.c
+@@ -323,10 +323,14 @@ flush(const char __user *str, size_t cnt, int exiting)
+ 	}
+ 
+ 	flush_scheduled_work();
+-	/* pass one: without sleeping, do aoedev_downdev */
++	/* pass one: do aoedev_downdev, which might sleep */
++restart1:
+ 	spin_lock_irqsave(&devlist_lock, flags);
+ 	for (d = devlist; d; d = d->next) {
+ 		spin_lock(&d->lock);
++		if (d->flags & DEVFL_TKILL)
++			goto cont;
++
+ 		if (exiting) {
+ 			/* unconditionally take each device down */
+ 		} else if (specified) {
+@@ -338,8 +342,11 @@ flush(const char __user *str, size_t cnt, int exiting)
+ 		|| d->ref)
+ 			goto cont;
+ 
++		spin_unlock(&d->lock);
++		spin_unlock_irqrestore(&devlist_lock, flags);
+ 		aoedev_downdev(d);
+ 		d->flags |= DEVFL_TKILL;
++		goto restart1;
+ cont:
+ 		spin_unlock(&d->lock);
+ 	}
+@@ -348,7 +355,7 @@ flush(const char __user *str, size_t cnt, int exiting)
+ 	/* pass two: call freedev, which might sleep,
+ 	 * for aoedevs marked with DEVFL_TKILL
+ 	 */
+-restart:
++restart2:
+ 	spin_lock_irqsave(&devlist_lock, flags);
+ 	for (d = devlist; d; d = d->next) {
+ 		spin_lock(&d->lock);
+@@ -357,7 +364,7 @@ flush(const char __user *str, size_t cnt, int exiting)
+ 			spin_unlock(&d->lock);
+ 			spin_unlock_irqrestore(&devlist_lock, flags);
+ 			freedev(d);
+-			goto restart;
++			goto restart2;
+ 		}
+ 		spin_unlock(&d->lock);
+ 	}
+-- 
+2.7.4
 
-Right now only RDMA and DAX FS's are supported.  Other users of GUP will still
-fail on a DAX file and regular files will still be at risk.[2]
-
-I've pushed this work (based 5.3-rc3+ (33920f1ec5bf)) here[3]:
-
-https://github.com/weiny2/linux-kernel/tree/linus-rdmafsdax-b0-v3
-
-I think the most relevant patch to this conversation is:
-
-https://github.com/weiny2/linux-kernel/commit/5d377653ba5cf11c3b716f904b057bee6641aaf6
-
-I stole Jans suggestion for a name as the name I used while prototyping was
-pretty bad...  So Thanks Jan...  ;-)
-
-Also thanks to John for his contribution on some of this.  I'm still tweaking
-put_user_pages under the hood on the DAX path.
-
-Ira
-
-[1] https://lwn.net/Articles/790544/
-
-[2] I've been looking into how to support io_uring next but I've had some issue
-getting a test program to actually call GUP in that code path...  :-(
-
-[3] If it would be easier I can just throw an RFC on the list but right now the
-cover letter and some of the commit messages are full of the old stuff and
-various ideas I have had...
-
-> 
-> > Your refcount debug patches are good to catch bugs in the conversions done
-> > but that requires you to be able to excercise the code path in the first
-> > place which may require particular HW or so, and you also have to enable
-> > the debug option which means you already aim at verifying the GUP
-> > references are treated properly.
-> > 
-> > 								Honza
-> > 
-> > -- 
-> > Jan Kara <jack@suse.com>
-> > SUSE Labs, CR
-> 
-> -- 
-> Michal Hocko
-> SUSE Labs
