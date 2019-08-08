@@ -2,141 +2,174 @@ Return-Path: <SRS0=kddI=WE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CFC1C41514
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 18:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4704EC433FF
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 19:03:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6735121880
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 18:18:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1493E2173E
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 19:03:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Ne1ScLdQ"
+	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="HIQxeRJU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733200AbfHHSSw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Aug 2019 14:18:52 -0400
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:14243 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731038AbfHHSSw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 14:18:52 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d4c678b0000>; Thu, 08 Aug 2019 11:18:52 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Thu, 08 Aug 2019 11:18:50 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Thu, 08 Aug 2019 11:18:50 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 8 Aug
- 2019 18:18:49 +0000
-Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-To:     "Weiny, Ira" <ira.weiny@intel.com>,
-        Michal Hocko <mhocko@kernel.org>
-CC:     Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
-        "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
-        "devel@lists.orangefs.org" <devel@lists.orangefs.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-rpi-kernel@lists.infradead.org" 
-        <linux-rpi-kernel@lists.infradead.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-References: <20190802022005.5117-1-jhubbard@nvidia.com>
- <20190802091244.GD6461@dhcp22.suse.cz>
- <20190802124146.GL25064@quack2.suse.cz>
- <20190802142443.GB5597@bombadil.infradead.org>
- <20190802145227.GQ25064@quack2.suse.cz>
- <076e7826-67a5-4829-aae2-2b90f302cebd@nvidia.com>
- <20190807083726.GA14658@quack2.suse.cz>
- <20190807084649.GQ11812@dhcp22.suse.cz>
- <20190808023637.GA1508@iweiny-DESK2.sc.intel.com>
- <e648a7f3-6a1b-c9ea-1121-7ab69b6b173d@nvidia.com>
- <2807E5FD2F6FDA4886F6618EAC48510E79E79644@CRSMSX101.amr.corp.intel.com>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <b1b33292-d929-f9ff-dd75-02828228f35e@nvidia.com>
-Date:   Thu, 8 Aug 2019 11:18:49 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2390305AbfHHTDE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Aug 2019 15:03:04 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:34339 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390297AbfHHTDE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 15:03:04 -0400
+Received: by mail-pf1-f193.google.com with SMTP id b13so44613893pfo.1
+        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 12:03:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=YaDw968sYZinLHwfTVtmoWadaU+xxvDOnKy5RkNnHhY=;
+        b=HIQxeRJULmhNEAqcWiiIVZr0UAHZw/vMZ/YXLmvIkXIat0A1z75P9Q0d/P74XRw3do
+         R7+ctJwPKZUsckjeTNvykCKZsWrBGUXA5z5ZhyRNBYXd8H4O6Fr/Cfh1Tgcp0VtQSpzQ
+         sHkoTTEtlwzMapLsx/9XmEPsqlkUGcTTXFX0+zFyl6atF/lOxErRKyNsY876FIdy4kom
+         iHrVYxjJMl+rUFyMB+98d2/kmsgt03t7E0C/Gw5ePaTD8Sis0vFdJXbU/8NWpzUYzFd/
+         +GAdy2lZyujaVYVCBCBCH4QSjJMb3LYnJxKiTOIRpKMlA/KjrXwRHyDPiu3C/9kVghl3
+         PqlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=YaDw968sYZinLHwfTVtmoWadaU+xxvDOnKy5RkNnHhY=;
+        b=gCzAsZWy9z/fgyxJbqcpzD5T3uUvW6f5cB+JoK19B2XRu4w0toTw+BWjiH9s5A4b4u
+         i7QcmeDJHrsRhT0eMmqKUYSzJduzjI19SIUHKt5qDXWEorhzunssb5LD8zd8YU2RpKT/
+         Aib9vq81dNZ93X75S0KUDeatvWXWIv34WTr7TFwSy4mkL/TAm1M+6mPyIYGNB7eK3W3l
+         RWv2+f3oaO5xhaun5kkeM8GmwglMJNLScpKc+8/j301UvxFvH20sKYdM6fP/meauOpZZ
+         G2HgmDiK2HVVgXQMRjPh7Vw2ZF3VxnylS/q1+mSd+NBYbLBSBqX5yGLpaaHzv2d1kDZn
+         3Agg==
+X-Gm-Message-State: APjAAAULeMRUaNq9m8uFoBJ8fARmngpPCbZsgdlUruDcfBkjjuU5eoO9
+        SOVqyuhYvHc6c3T/YI9k9mr72w==
+X-Google-Smtp-Source: APXvYqyauxFlil+jXyg34wXrmqepCBj1OqcfC1/2Gy4eTEI53he4OQNjlsbx5piBhi7v9zETXwpdnA==
+X-Received: by 2002:a17:90a:8b98:: with SMTP id z24mr5545969pjn.77.1565290983429;
+        Thu, 08 Aug 2019 12:03:03 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::1:e15f])
+        by smtp.gmail.com with ESMTPSA id t6sm22068113pgu.23.2019.08.08.12.03.02
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 08 Aug 2019 12:03:02 -0700 (PDT)
+Date:   Thu, 8 Aug 2019 15:03:00 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH RESEND] block: annotate refault stalls from IO submission
+Message-ID: <20190808190300.GA9067@cmpxchg.org>
 MIME-Version: 1.0
-In-Reply-To: <2807E5FD2F6FDA4886F6618EAC48510E79E79644@CRSMSX101.amr.corp.intel.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1565288332; bh=JXH0z+PATu5ChINAttu0xw8NI7VYrjVhdTogRmB3Q5s=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=Ne1ScLdQ+tu5qOaISiLlk/MzD+D0tWGCUEcW8KATp/99KORz80qhTvSS0MA86k71v
-         1gG74XZNfpVRbFXyQsXs+wV66Ly/i7Omeym8buU22OwtUh/B674iBCJPOoXFe5hxmV
-         1e7OUBsDbdwXkl/h4Pjx1eOWT4qAVANZ24jESe93raeMkGLORABLpzcfJ+l/YUvFr/
-         bUBCYBUk9JXLyxcXRRJ6Qo5DLPNTbuOY1/JVx8JLOWf78tx+O5w4P2ZxYGmo4q53CG
-         aum+FjJWUhUsxhssDMyUyjXEHRPMBfcGtXYtpdJqmbhfodN4x0QDM6mw3fwyew2GF4
-         p5OXETBP5SbRg==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/8/19 9:25 AM, Weiny, Ira wrote:
->>
->> On 8/7/19 7:36 PM, Ira Weiny wrote:
->>> On Wed, Aug 07, 2019 at 10:46:49AM +0200, Michal Hocko wrote:
->>>> On Wed 07-08-19 10:37:26, Jan Kara wrote:
->>>>> On Fri 02-08-19 12:14:09, John Hubbard wrote:
->>>>>> On 8/2/19 7:52 AM, Jan Kara wrote:
->>>>>>> On Fri 02-08-19 07:24:43, Matthew Wilcox wrote:
->>>>>>>> On Fri, Aug 02, 2019 at 02:41:46PM +0200, Jan Kara wrote:
->>>>>>>>> On Fri 02-08-19 11:12:44, Michal Hocko wrote:
->>>>>>>>>> On Thu 01-08-19 19:19:31, john.hubbard@gmail.com wrote:
->>   [...]
-> Yep I can do this.  I did not realize that Andrew had accepted any of this work.  I'll check out his tree.  But I don't think he is going to accept this series through his tree.  So what is the ETA on that landing in Linus' tree?
-> 
+psi tracks the time tasks wait for refaulting pages to become
+uptodate, but it does not track the time spent submitting the IO. The
+submission part can be significant if backing storage is contended or
+when cgroup throttling (io.latency) is in effect - a lot of time is
+spent in submit_bio(). In that case, we underreport memory pressure.
 
-I'd expect it to go into 5.4, according to my understanding of how
-the release cycles are arranged.
+Annotate submit_bio() to account submission time as memory stall when
+the bio is reading userspace workingset pages.
 
+Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
+---
+ block/bio.c               |  3 +++
+ block/blk-core.c          | 23 ++++++++++++++++++++++-
+ include/linux/blk_types.h |  1 +
+ 3 files changed, 26 insertions(+), 1 deletion(-)
 
-> To that point I'm still not sure who would take all this as I am now touching mm, procfs, rdma, ext4, and xfs.
-> 
-> I just thought I would chime in with my progress because I'm to a point where things are working and so I can submit the code but I'm not sure what I can/should depend on landing...  Also, now that 0day has run overnight it has found issues with this rebase so I need to clean those up...  Perhaps I will base on Andrew's tree prior to doing that...
-
-I'm certainly not the right person to answer, but in spite of that, I'd think
-Andrew's tree is a reasonable place for it. Sort of.
-
-thanks,
+diff --git a/block/bio.c b/block/bio.c
+index 299a0e7651ec..4196865dd300 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -806,6 +806,9 @@ void __bio_add_page(struct bio *bio, struct page *page,
+ 
+ 	bio->bi_iter.bi_size += len;
+ 	bio->bi_vcnt++;
++
++	if (!bio_flagged(bio, BIO_WORKINGSET) && unlikely(PageWorkingset(page)))
++		bio_set_flag(bio, BIO_WORKINGSET);
+ }
+ EXPORT_SYMBOL_GPL(__bio_add_page);
+ 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d0cc6e14d2f0..1b1705b7dde7 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -36,6 +36,7 @@
+ #include <linux/blk-cgroup.h>
+ #include <linux/debugfs.h>
+ #include <linux/bpf.h>
++#include <linux/psi.h>
+ 
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/block.h>
+@@ -1128,6 +1129,10 @@ EXPORT_SYMBOL_GPL(direct_make_request);
+  */
+ blk_qc_t submit_bio(struct bio *bio)
+ {
++	bool workingset_read = false;
++	unsigned long pflags;
++	blk_qc_t ret;
++
+ 	if (blkcg_punt_bio_submit(bio))
+ 		return BLK_QC_T_NONE;
+ 
+@@ -1146,6 +1151,8 @@ blk_qc_t submit_bio(struct bio *bio)
+ 		if (op_is_write(bio_op(bio))) {
+ 			count_vm_events(PGPGOUT, count);
+ 		} else {
++			if (bio_flagged(bio, BIO_WORKINGSET))
++				workingset_read = true;
+ 			task_io_account_read(bio->bi_iter.bi_size);
+ 			count_vm_events(PGPGIN, count);
+ 		}
+@@ -1160,7 +1167,21 @@ blk_qc_t submit_bio(struct bio *bio)
+ 		}
+ 	}
+ 
+-	return generic_make_request(bio);
++	/*
++	 * If we're reading data that is part of the userspace
++	 * workingset, count submission time as memory stall. When the
++	 * device is congested, or the submitting cgroup IO-throttled,
++	 * submission can be a significant part of overall IO time.
++	 */
++	if (workingset_read)
++		psi_memstall_enter(&pflags);
++
++	ret = generic_make_request(bio);
++
++	if (workingset_read)
++		psi_memstall_leave(&pflags);
++
++	return ret;
+ }
+ EXPORT_SYMBOL(submit_bio);
+ 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 1b1fa1557e68..a9dadfc16a92 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -209,6 +209,7 @@ enum {
+ 	BIO_BOUNCED,		/* bio is a bounce bio */
+ 	BIO_USER_MAPPED,	/* contains user pages */
+ 	BIO_NULL_MAPPED,	/* contains invalid user pages */
++	BIO_WORKINGSET,		/* contains userspace workingset pages */
+ 	BIO_QUIET,		/* Make BIO Quiet */
+ 	BIO_CHAIN,		/* chained bio, ->bi_remaining in effect */
+ 	BIO_REFFED,		/* bio has elevated ->bi_cnt */
 -- 
-John Hubbard
-NVIDIA
+2.22.0
+
