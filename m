@@ -2,99 +2,114 @@ Return-Path: <SRS0=kddI=WE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD7FC433FF
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 02:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7CD9C433FF
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 02:22:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9460F20B7C
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 02:06:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9890E2173C
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 02:22:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eHIFGG2y"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JByW4jwG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730655AbfHHCGM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Aug 2019 22:06:12 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:40150 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730467AbfHHCGM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 22:06:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1565229972; x=1596765972;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=2CkeJX6kyd7jnlMdFoIQy0PKnwSIIvXdEH/jB/rk5iE=;
-  b=eHIFGG2ye1HWBz2Y6+BPbjYIhm4spA2RRRp6c9lqGAIgf7TZVKbPEEjr
-   NW0d7llybZkAUKgvxDqFq06HU2szHet6WDizTc6ueUX0Vg26W7QuhvP+D
-   1ozNXFplYFEpCZG07OSbm45GAqpt0yD8/MAGqfFI4JJj95eIy35qfcxWb
-   vq+hPfmflwSaodh7mr+CKvm278fTNMEpcC4mf//km01wuBOeIgookD30I
-   tdRzHXqV6TcGifrt787Cw/A89oS0n0CHKalrrAHKxsoM+wmzg1Jq8TPpY
-   yNEG90Az4WPvBtQU2WRG1nUCpw7otMzptUnnOCScVb9KhR/+JoCxs0e8L
-   w==;
-IronPort-SDR: sSpsFZSmKIIbwZZ0srGqv9n+fm6RBe0utoG89PA7+A+gijDxmtEDM4Cy2dSXzwvSawuVK/toJO
- 4aq1Rvgf4UzpAzb/AtXr/SBSOn05zMCDRtzaJzSSxf6lpvysDjhY3RNUgziOD1QMf/iuLJXdZ5
- DSpMaL9ZDeKD7B7uoPSMQ2zObvvypvnEYWXhNNrRGfaKcbyxhlTr8twJ6WVtvTS/qWzDttWr2Y
- TR5sod5+vAojw9sLyNU2peymxg3Z/qNnBWNnYYkhJBYcr1pDSzuK31GcrvL1gxMEh+UL7+7pqA
- Jks=
-X-IronPort-AV: E=Sophos;i="5.64,358,1559491200"; 
-   d="scan'208";a="221800548"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 08 Aug 2019 10:06:11 +0800
-IronPort-SDR: lG1ICQi5ZEUD4CDK2CXD2Eqjwo7TaDs9bidZrCpbGEZYI+Cs9f9RQTGXq5KMsZQ5DlAU8ZvDr2
- q6i0V3eJGyobXe9HVbZ8JLeuBHFI8NsDtUGNoty9nWUxPdkSSTfvLILmBkR2H1OVVPQGQ1edNY
- ZjO9ybKDdxSeQghMVZMuUpEgGe0AEjZ1ksZyF/FFhain1Ht6H00tkoKWO5AZ4Yy/xxTLb23HWy
- fxOwdBmKSkLT8xJgbM3RNUs063tKxj0sXkgQc5EqfhIT7n8oOOit0oIkiaVaU8+cRx4ikgD8kP
- HQydQT3x6G2tlMoA1nEDkDa+
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2019 19:03:56 -0700
-IronPort-SDR: JYK02IEyXHrHCHIuUEdSX2S6Qg7AUx5+lMyN1iBhhDcxBoHxVnGwmPkn5nGuA2xMQV/xeVTOn2
- QuIbAz1IIsq1j4K1iQcrhmPVs8Ol1Ja4JFWyEKvTskJUCuH/9tCvirgFdLxDiAnW1yJqACTGfZ
- K7C3zbK/5IPr+HgX+PWD9zpp8WKHHBlzy9eXgCOJl+jxvXyAopmLJErvJ5mXVdF0g/WacPDEyx
- 2ieV7fTY6Ifxpm7pWCy0T9evdRnwGek0XvYryPIVkXjnQSWJW9JSKqHH667O0F7SOIo2JopgjA
- ATE=
-Received: from dhcp-10-88-173-43.hgst.com (HELO localhost.localdomain) ([10.88.173.43])
-  by uls-op-cesaip02.wdc.com with ESMTP; 07 Aug 2019 19:06:11 -0700
-From:   Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH] block: only set DYING flag once in blk_cleanup_queue()
-Date:   Wed,  7 Aug 2019 19:06:10 -0700
-Message-Id: <20190808020610.23121-1-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
+        id S1727978AbfHHCWG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Aug 2019 22:22:06 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:36892 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727946AbfHHCWG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 22:22:06 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x782IO1G084078;
+        Thu, 8 Aug 2019 02:21:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=ACq7S8nv7dzK0UkdAc/DjZFBJLQC3vr+kzfxusPxV1A=;
+ b=JByW4jwGa6f+Xwbst5KPM8rIDbegbBj7AhOUjZK4MebDLGwMcDdoPU3xUW3WCFpNGH2r
+ B0LC7542OLvCigeDvVClu5FxFhy/QF57BLn9iR3GojxMB9S2zYA8SwO+Ptyz09NYB39i
+ mw+Yy/rH6noS2QnTkh/9cpow8SjRCZ3NIAUkDYqFLxlD3BPj5R3wWP2TPpy8uo9Cv6m9
+ S2tAVATA29SQFJm/Ji7uy5ZmpWC7G2O+Ba6ji0Aa1TUM6mNku82RpnFbQqQtivLPvFRw
+ k1TB+o1dXqjECG57jOTNE3EI+Rw97jV/P264JDlW50FvSwt+rDzEk7vnQssXTnXA/DJq NA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2u51pu7rvp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 08 Aug 2019 02:21:07 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x782HTul031517;
+        Thu, 8 Aug 2019 02:19:06 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2u763jjs5v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 08 Aug 2019 02:19:06 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x782J3Qu015908;
+        Thu, 8 Aug 2019 02:19:03 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 07 Aug 2019 19:19:02 -0700
+To:     Ming Lei <tom.leiming@gmail.com>
+Cc:     Steffen Maier <maier@linux.ibm.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        "open list\:DEVICE-MAPPER \(LVM\)" <dm-devel@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Benjamin Block <bblock@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [PATCH 1/2] scsi: core: fix missing .cleanup_rq for SCSI hosts without request batching
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190807144948.28265-1-maier@linux.ibm.com>
+        <20190807144948.28265-2-maier@linux.ibm.com>
+        <CACVXFVM0tFj8CmcHON04_KjxR=QErCbUx0abJgG2W9OBb7akZA@mail.gmail.com>
+Date:   Wed, 07 Aug 2019 22:18:59 -0400
+In-Reply-To: <CACVXFVM0tFj8CmcHON04_KjxR=QErCbUx0abJgG2W9OBb7akZA@mail.gmail.com>
+        (Ming Lei's message of "Thu, 8 Aug 2019 07:32:29 +0800")
+Message-ID: <yq136iccsbw.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9342 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908080022
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9342 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908080022
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This commit removes the statement in blk_cleanup_queue() function that
-marks the queue as dying. QUEUE_FLAG_DYING is already set inside
-blk_set_queue_dying() a few lines above, no need to do it again.
 
-No functional change.
+Ming,
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-core.c | 1 -
- 1 file changed, 1 deletion(-)
+>> +       .cleanup_rq     = scsi_cleanup_rq,
+>>         .busy           = scsi_mq_lld_busy,
+>>         .map_queues     = scsi_map_queues,
+>>  };
+>
+> This one is a cross-tree thing, either scsi/5.4/scsi-queue needs to
+> pull for-5.4/block, or do it after both land linus tree.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d0cc6e14d2f0..0822acc423a3 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -339,7 +339,6 @@ void blk_cleanup_queue(struct request_queue *q)
- 
- 	blk_queue_flag_set(QUEUE_FLAG_NOMERGES, q);
- 	blk_queue_flag_set(QUEUE_FLAG_NOXMERGES, q);
--	blk_queue_flag_set(QUEUE_FLAG_DYING, q);
- 	mutex_unlock(&q->sysfs_lock);
- 
- 	/*
+I'll set up an amalgamated for-next branch tomorrow.
+
 -- 
-2.21.0
-
+Martin K. Petersen	Oracle Linux Engineering
