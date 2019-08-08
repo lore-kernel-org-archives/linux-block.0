@@ -2,142 +2,145 @@ Return-Path: <SRS0=kddI=WE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E4FEC433FF
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 03:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0944BC0650F
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 03:47:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 74DF6216C8
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 03:10:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D01A120880
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 03:47:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="caNdsK+H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728060AbfHHDKC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Aug 2019 23:10:02 -0400
-Received: from mail.windriver.com ([147.11.1.11]:57463 "EHLO
-        mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727984AbfHHDKC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 23:10:02 -0400
-Received: from ALA-HCA.corp.ad.wrs.com ([147.11.189.40])
-        by mail.windriver.com (8.15.2/8.15.1) with ESMTPS id x7839uuQ020218
-        (version=TLSv1 cipher=AES128-SHA bits=128 verify=FAIL);
-        Wed, 7 Aug 2019 20:09:56 -0700 (PDT)
-Received: from pek-lpg-core2.corp.ad.wrs.com (128.224.153.41) by
- ALA-HCA.corp.ad.wrs.com (147.11.189.40) with Microsoft SMTP Server id
- 14.3.468.0; Wed, 7 Aug 2019 20:09:56 -0700
-From:   <zhe.he@windriver.com>
-To:     <justin@coraid.com>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <zhe.he@windriver.com>
-Subject: [PATCH] block: aoe: Fix kernel crash due to atomic sleep when exiting
-Date:   Thu, 8 Aug 2019 11:09:54 +0800
-Message-ID: <1565233794-458496-1-git-send-email-zhe.he@windriver.com>
-X-Mailer: git-send-email 2.7.4
+        id S1728025AbfHHDqy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Aug 2019 23:46:54 -0400
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:14417 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728167AbfHHDqy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Aug 2019 23:46:54 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d4b9b2c0000>; Wed, 07 Aug 2019 20:46:53 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 07 Aug 2019 20:46:51 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 07 Aug 2019 20:46:51 -0700
+Received: from ngvpn01-164-84.dyn.scz.us.nvidia.com (172.20.13.39) by
+ HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Thu, 8 Aug 2019 03:46:50 +0000
+Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
+To:     Ira Weiny <ira.weiny@intel.com>, Michal Hocko <mhocko@kernel.org>
+CC:     Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
+        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
+        <dri-devel@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linux-rpi-kernel@lists.infradead.org>,
+        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
+        <x86@kernel.org>, <xen-devel@lists.xenproject.org>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+ <20190802091244.GD6461@dhcp22.suse.cz>
+ <20190802124146.GL25064@quack2.suse.cz>
+ <20190802142443.GB5597@bombadil.infradead.org>
+ <20190802145227.GQ25064@quack2.suse.cz>
+ <076e7826-67a5-4829-aae2-2b90f302cebd@nvidia.com>
+ <20190807083726.GA14658@quack2.suse.cz>
+ <20190807084649.GQ11812@dhcp22.suse.cz>
+ <20190808023637.GA1508@iweiny-DESK2.sc.intel.com>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <e648a7f3-6a1b-c9ea-1121-7ab69b6b173d@nvidia.com>
+Date:   Wed, 7 Aug 2019 20:46:50 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20190808023637.GA1508@iweiny-DESK2.sc.intel.com>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1565236013; bh=oa/UlzMF1BY8hfwSUK2E34E4BK86wv0rI2GL87o8kWQ=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=caNdsK+H718e8IaMHboxAo7N5kSDjdO0aPPP7qMD/uXC6LIuseTU5yocCYztoyhLS
+         A8theOeNn9DFbaKSyltNZVy/0B3VPZPEr/7HwHnfipqBI1W9E/1RXgk4cYboMCcd2v
+         K1AubOjDxM7RJmlTd1q1ZO/DARZkbUQqfdDa7AtzCGn8CgjUMfboXlhtit5supcfVJ
+         t3SF5BlWoOZ+ktHQ+Gy0QbysjhXaepl4K0zI9Pv3YsYauPp0cOOqMsTfKIdJYZp847
+         qDjXLEk745BEl9a58mwF6yYg4Z7StCZBL718mfzBDBCPCwNZsIoTbJbWCkazTDd50+
+         NvHzitKycTv2g==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: He Zhe <zhe.he@windriver.com>
+On 8/7/19 7:36 PM, Ira Weiny wrote:
+> On Wed, Aug 07, 2019 at 10:46:49AM +0200, Michal Hocko wrote:
+>> On Wed 07-08-19 10:37:26, Jan Kara wrote:
+>>> On Fri 02-08-19 12:14:09, John Hubbard wrote:
+>>>> On 8/2/19 7:52 AM, Jan Kara wrote:
+>>>>> On Fri 02-08-19 07:24:43, Matthew Wilcox wrote:
+>>>>>> On Fri, Aug 02, 2019 at 02:41:46PM +0200, Jan Kara wrote:
+>>>>>>> On Fri 02-08-19 11:12:44, Michal Hocko wrote:
+>>>>>>>> On Thu 01-08-19 19:19:31, john.hubbard@gmail.com wrote:
+  [...]
+> Before I go on, I would like to say that the "imbalance" of get_user_pages()
+> and put_page() bothers me from a purist standpoint...  However, since this
+> discussion cropped up I went ahead and ported my work to Linus' current master
+> (5.3-rc3+) and in doing so I only had to steal a bit of Johns code...  Sorry
+> John...  :-(
+> 
+> I don't have the commit messages all cleaned up and I know there may be some
+> discussion on these new interfaces but I wanted to throw this series out there
+> because I think it may be what Jan and Michal are driving at (or at least in
+> that direction.
+> 
+> Right now only RDMA and DAX FS's are supported.  Other users of GUP will still
+> fail on a DAX file and regular files will still be at risk.[2]
+> 
+> I've pushed this work (based 5.3-rc3+ (33920f1ec5bf)) here[3]:
+> 
+> https://github.com/weiny2/linux-kernel/tree/linus-rdmafsdax-b0-v3
+> 
+> I think the most relevant patch to this conversation is:
+> 
+> https://github.com/weiny2/linux-kernel/commit/5d377653ba5cf11c3b716f904b057bee6641aaf6
+> 
 
-Since commit 3582dd291788 ("aoe: convert aoeblk to blk-mq"), aoedev_downdev
-has had the possibility of sleeping and causing the following crash.
+ohhh...can you please avoid using the old __put_user_pages_dirty()
+function? I thought I'd caught things early enough to get away with
+the rename and deletion of that. You could either:
 
-BUG: scheduling while atomic: rmmod/2242/0x00000003
-Modules linked in: aoe
-Preemption disabled at:
-[<ffffffffc01d95e5>] flush+0x95/0x4a0 [aoe]
-CPU: 7 PID: 2242 Comm: rmmod Tainted: G          I       5.2.3 #1
-Hardware name: Intel Corporation S5520HC/S5520HC, BIOS S5500.86B.01.10.0025.030220091519 03/02/2009
-Call Trace:
- dump_stack+0x4f/0x6a
- ? flush+0x95/0x4a0 [aoe]
- __schedule_bug.cold+0x44/0x54
- __schedule+0x44f/0x680
- schedule+0x44/0xd0
- blk_mq_freeze_queue_wait+0x46/0xb0
- ? wait_woken+0x80/0x80
- blk_mq_freeze_queue+0x1b/0x20
- aoedev_downdev+0x111/0x160 [aoe]
- flush+0xff/0x4a0 [aoe]
- aoedev_exit+0x23/0x30 [aoe]
- aoe_exit+0x35/0x948 [aoe]
- __se_sys_delete_module+0x183/0x210
- __x64_sys_delete_module+0x16/0x20
- do_syscall_64+0x4d/0x130
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x7f24e0043b07
-Code: 73 01 c3 48 8b 0d 89 73 0b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f
-1f 84 00 00 00 00 00 0f 1f 44 00 00 b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff
-ff 73 01 c3 48 8b 0d 59 73 0b 00 f7 d8 64 89 01 48
-RSP: 002b:00007ffe18f7f1e8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f24e0043b07
-RDX: 000000000000000a RSI: 0000000000000800 RDI: 0000555c3ecf87c8
-RBP: 00007ffe18f7f1f0 R08: 0000000000000000 R09: 0000000000000000
-R10: 00007f24e00b4ac0 R11: 0000000000000206 R12: 00007ffe18f7f238
-R13: 00007ffe18f7f410 R14: 00007ffe18f80e73 R15: 0000555c3ecf8760
+a) open code an implementation of vaddr_put_pages_dirty_lock() that
+doesn't call any of the *put_user_pages_dirty*() variants, or
 
-This patch, handling in the same way of pass two, unlocks the locks and
-restart pass one after aoedev_downdev is done.
+b) include my first patch ("") are part of your series, or
 
-Fixes: 3582dd291788 ("aoe: convert aoeblk to blk-mq")
-Signed-off-by: He Zhe <zhe.he@windriver.com>
----
- drivers/block/aoe/aoedev.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+c) base this on Andrews's tree, which already has merged in my first patch.
 
-diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
-index 5b49f1b..e2ea235 100644
---- a/drivers/block/aoe/aoedev.c
-+++ b/drivers/block/aoe/aoedev.c
-@@ -323,10 +323,14 @@ flush(const char __user *str, size_t cnt, int exiting)
- 	}
- 
- 	flush_scheduled_work();
--	/* pass one: without sleeping, do aoedev_downdev */
-+	/* pass one: do aoedev_downdev, which might sleep */
-+restart1:
- 	spin_lock_irqsave(&devlist_lock, flags);
- 	for (d = devlist; d; d = d->next) {
- 		spin_lock(&d->lock);
-+		if (d->flags & DEVFL_TKILL)
-+			goto cont;
-+
- 		if (exiting) {
- 			/* unconditionally take each device down */
- 		} else if (specified) {
-@@ -338,8 +342,11 @@ flush(const char __user *str, size_t cnt, int exiting)
- 		|| d->ref)
- 			goto cont;
- 
-+		spin_unlock(&d->lock);
-+		spin_unlock_irqrestore(&devlist_lock, flags);
- 		aoedev_downdev(d);
- 		d->flags |= DEVFL_TKILL;
-+		goto restart1;
- cont:
- 		spin_unlock(&d->lock);
- 	}
-@@ -348,7 +355,7 @@ flush(const char __user *str, size_t cnt, int exiting)
- 	/* pass two: call freedev, which might sleep,
- 	 * for aoedevs marked with DEVFL_TKILL
- 	 */
--restart:
-+restart2:
- 	spin_lock_irqsave(&devlist_lock, flags);
- 	for (d = devlist; d; d = d->next) {
- 		spin_lock(&d->lock);
-@@ -357,7 +364,7 @@ flush(const char __user *str, size_t cnt, int exiting)
- 			spin_unlock(&d->lock);
- 			spin_unlock_irqrestore(&devlist_lock, flags);
- 			freedev(d);
--			goto restart;
-+			goto restart2;
- 		}
- 		spin_unlock(&d->lock);
- 	}
+
+thanks,
 -- 
-2.7.4
-
+John Hubbard
+NVIDIA
