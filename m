@@ -6,75 +6,71 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A77ECC0650F
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 16:12:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE69BC0650F
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 16:13:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 74E6821743
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 16:12:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F30721743
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 16:13:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="aHd3BMPy"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="auFYz7/q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404095AbfHHQMl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Aug 2019 12:12:41 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:35358 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404108AbfHHQMl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 12:12:41 -0400
-Received: by mail-pf1-f194.google.com with SMTP id u14so44382302pfn.2
-        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 09:12:41 -0700 (PDT)
+        id S2404102AbfHHQNz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Aug 2019 12:13:55 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:36563 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404099AbfHHQNz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 12:13:55 -0400
+Received: by mail-pg1-f193.google.com with SMTP id l21so44302410pgm.3
+        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 09:13:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GbKZkWdFW3/LathJiTmUB/es7Gx9lbtHm6GJXlHv5+E=;
-        b=aHd3BMPydi+5PV5TxAyyoXAB2//OlcpWaOb9Ulv9m4G+dGQDsVHyoJELks6vv29zZs
-         +l9YLHqxG6PA7RsVkwpwZLjgZzwTnKooalsTD+ERQtN8bpHaq1JEAX79Q/0Q4JFzQWqX
-         Zv7Za4X5k+/VUeEYrNZJJSLO7c+scqObfiMwnA2GipbI5hhnzUw2LCdhtgUFP2BnLpE2
-         et7yYRwFoml44eQaKQF8+SGCmFWcKVzwtMQTEXAtjYSre8zV7f3nMDxyKkS/3fiM3pd8
-         5g+VisQ2Yg7qdOQWYCT5hJZbqMllgcveePnnq+gYbnNhRPiHgqBwxulg0iqhWdshus0G
-         /Fjg==
+        bh=fStnaNjXUWAg/OKYuQqYQGZmoa78iOIp6NL7XaIjD7o=;
+        b=auFYz7/qJjXjBsfd7bJRpvC8qFOt9Gs6WL3NXJL5ze9wHPiQLSH2j2U6JINaC4h0QH
+         vW+vFxGjKJA5bkmPv2pSbbkItFO1zsvsbsIsc0trXG3HPsDy/KHZVdNSmmGiToYosxi6
+         lFd8BE+bR9+qRhgcZ4OogK1CuBdcxQ3vCJcEINpgBcyHFU39F9pFLZipbMvh5jReoZCl
+         Y11sb3S77Dp+RAwQIDB9QlySFkoNfbAqQLXxulJM4UgRoJVsLPzdXCZ3mb/RBRFY0zhn
+         LeBPa7kI2elNeyMf9YgsRv0V8/GZD2mQQA07/BjIRDUlfCfCmGBZsLYx2NOxFyriF5AU
+         Rlbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=GbKZkWdFW3/LathJiTmUB/es7Gx9lbtHm6GJXlHv5+E=;
-        b=tNsLDpuNL+b8fTtA/eYYm7KmVy1tkPqB8CbsVh1E9XV9UZn42GYhkb8oWo3hT4HGxM
-         /6e/KLygEyBUQTlPmF1DCuuPxlXU779PDMSI65jUWPixFV2LZWiVE96R6kibbSZ0XgM+
-         I8yTJdYk9mzNNrNVXVbDRkYlcbLzyHPMHgw+mQks2gS6F9k9u3nPK7FLWbV1fGPUlc9v
-         OePm8/RmakfHL8XO7Qntxw1sluXgUCMowCtwtlzhrE6MrOtLLTbIwAE2L2IUR+Tv0VLR
-         NPQFlSXVdg6vXjB9JgqB6v0ZTvkZRfRKV+jwmuBd66fMA5LK7GkdKzuENJycIzTpGm4z
-         VPFA==
-X-Gm-Message-State: APjAAAUfqS1HtDTuka+a89kSBcl6Ip0Km8cUUjGU0pNZbi1bMrcbRg2e
-        UNBHUkvyNl+1opk3Vx5ZCG+VpAAXSw9qjg==
-X-Google-Smtp-Source: APXvYqyiYb+knMp0JBJQrh+fcsfPoG9yFxitkP7TY7Atel9io4mNwiZe7WDGrcZe1yoOZtvrtpSkzA==
-X-Received: by 2002:a65:690e:: with SMTP id s14mr13663644pgq.47.1565280759945;
-        Thu, 08 Aug 2019 09:12:39 -0700 (PDT)
+        bh=fStnaNjXUWAg/OKYuQqYQGZmoa78iOIp6NL7XaIjD7o=;
+        b=PFzMxlbTzFAc2QinMitl9PN4Q/oE7YFF3gHwKlK9UAwO/o9UZ5Kv3uRApeL6E4tQQS
+         KkB1DjabpLkyO9AedpWe53Pt76DNUmOh5MZs5CC3BpIR+YbiSmjvbsTtpT/RBeMbK0OM
+         DKMqf3HBeJrMO23msYTafpMkvycjeecinQxIpxp+Emn/zYSKo5h1fII69cAZhC2mygOy
+         D3SpcuYESkR+I4WQjqajTqSsVIzvWX168GDftIjLnxZ+1L2tFe/amfqhK9xK4rKyZNXR
+         Ao674fXEOu8+vknC9H3QbJd2pU8UsHWy5hHceqy59mONB0HixWRarWKvkRUCADYybReK
+         YBPw==
+X-Gm-Message-State: APjAAAVSlKMNCGT0+rbyuckUilh6pIZCX53i7dRgmYLsDHFidkShn/Q5
+        4mwwEIGOEYLKzUmOHIYEhNkIM5boyK/40A==
+X-Google-Smtp-Source: APXvYqy0OjtSzFmnkkHWxfix7dd2lxQgeI5J415PWHZKmz3KIiP3j+ZeI2fitmOiF4SSqd9uwxVz2w==
+X-Received: by 2002:a17:90a:8c18:: with SMTP id a24mr4726741pjo.111.1565280833786;
+        Thu, 08 Aug 2019 09:13:53 -0700 (PDT)
 Received: from ?IPv6:2605:e000:100e:83a1:4042:6c37:d29d:2320? ([2605:e000:100e:83a1:4042:6c37:d29d:2320])
-        by smtp.gmail.com with ESMTPSA id 196sm103224711pfy.167.2019.08.08.09.12.37
+        by smtp.gmail.com with ESMTPSA id r27sm113131691pgn.25.2019.08.08.09.13.52
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Aug 2019 09:12:38 -0700 (PDT)
-Subject: Re: [PATCH] loop: set PF_MEMALLOC_NOIO for the worker thread
-To:     Mikulas Patocka <mpatocka@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Mike Snitzer <msnitzer@redhat.com>, junxiao.bi@oracle.com,
-        dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>,
-        honglei.wang@oracle.com, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <alpine.LRH.2.02.1908080540240.15519@file01.intranet.prod.int.rdu2.redhat.com>
- <20190808135329.GG5482@bombadil.infradead.org>
- <alpine.LRH.2.02.1908081113540.18950@file01.intranet.prod.int.rdu2.redhat.com>
+        Thu, 08 Aug 2019 09:13:53 -0700 (PDT)
+Subject: Re: [PATCH liburing 0/4] spec: rpmlint fixes in preparation for
+ Fedora packaging
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Jeff Moyer <jmoyer@redhat.com>,
+        Aarushi Mehta <mehta.aaru20@gmail.com>,
+        Julia Suvorova <jusual@mail.ru>, linux-block@vger.kernel.org
+References: <1ecc837f-6177-c0a9-2d29-13efd29faf28@kernel.dk>
+ <20190805161411.GA10487@stefanha-x1.localdomain>
+ <20190808103254.GA3120@stefanha-x1.localdomain>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4625547c-f172-a0bf-720e-849fb7ff85a2@kernel.dk>
-Date:   Thu, 8 Aug 2019 09:12:37 -0700
+Message-ID: <595efa3b-484a-188a-f867-cf2962cb0bdf@kernel.dk>
+Date:   Thu, 8 Aug 2019 09:13:51 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.02.1908081113540.18950@file01.intranet.prod.int.rdu2.redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190808103254.GA3120@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -82,61 +78,41 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/8/19 8:17 AM, Mikulas Patocka wrote:
-> A deadlock with this stacktrace was observed.
+On 8/8/19 3:32 AM, Stefan Hajnoczi wrote:
+> On Mon, Aug 05, 2019 at 05:14:11PM +0100, Stefan Hajnoczi wrote:
 > 
-> The loop thread does a GFP_KERNEL allocation, it calls into dm-bufio
-> shrinker and the shrinker depends on I/O completion in the dm-bufio
-> subsystem.
+> Sorry Jens, I had your old email address.  Resent.
 > 
-> In order to fix the deadlock (and other similar ones), we set the flag
-> PF_MEMALLOC_NOIO at loop thread entry.
-> 
-> PID: 474    TASK: ffff8813e11f4600  CPU: 10  COMMAND: "kswapd0"
->     #0 [ffff8813dedfb938] __schedule at ffffffff8173f405
->     #1 [ffff8813dedfb990] schedule at ffffffff8173fa27
->     #2 [ffff8813dedfb9b0] schedule_timeout at ffffffff81742fec
->     #3 [ffff8813dedfba60] io_schedule_timeout at ffffffff8173f186
->     #4 [ffff8813dedfbaa0] bit_wait_io at ffffffff8174034f
->     #5 [ffff8813dedfbac0] __wait_on_bit at ffffffff8173fec8
->     #6 [ffff8813dedfbb10] out_of_line_wait_on_bit at ffffffff8173ff81
->     #7 [ffff8813dedfbb90] __make_buffer_clean at ffffffffa038736f [dm_bufio]
->     #8 [ffff8813dedfbbb0] __try_evict_buffer at ffffffffa0387bb8 [dm_bufio]
->     #9 [ffff8813dedfbbd0] dm_bufio_shrink_scan at ffffffffa0387cc3 [dm_bufio]
->    #10 [ffff8813dedfbc40] shrink_slab at ffffffff811a87ce
->    #11 [ffff8813dedfbd30] shrink_zone at ffffffff811ad778
->    #12 [ffff8813dedfbdc0] kswapd at ffffffff811ae92f
->    #13 [ffff8813dedfbec0] kthread at ffffffff810a8428
->    #14 [ffff8813dedfbf50] ret_from_fork at ffffffff81745242
-> 
->    PID: 14127  TASK: ffff881455749c00  CPU: 11  COMMAND: "loop1"
->     #0 [ffff88272f5af228] __schedule at ffffffff8173f405
->     #1 [ffff88272f5af280] schedule at ffffffff8173fa27
->     #2 [ffff88272f5af2a0] schedule_preempt_disabled at ffffffff8173fd5e
->     #3 [ffff88272f5af2b0] __mutex_lock_slowpath at ffffffff81741fb5
->     #4 [ffff88272f5af330] mutex_lock at ffffffff81742133
->     #5 [ffff88272f5af350] dm_bufio_shrink_count at ffffffffa03865f9 [dm_bufio]
->     #6 [ffff88272f5af380] shrink_slab at ffffffff811a86bd
->     #7 [ffff88272f5af470] shrink_zone at ffffffff811ad778
->     #8 [ffff88272f5af500] do_try_to_free_pages at ffffffff811adb34
->     #9 [ffff88272f5af590] try_to_free_pages at ffffffff811adef8
->    #10 [ffff88272f5af610] __alloc_pages_nodemask at ffffffff811a09c3
->    #11 [ffff88272f5af710] alloc_pages_current at ffffffff811e8b71
->    #12 [ffff88272f5af760] new_slab at ffffffff811f4523
->    #13 [ffff88272f5af7b0] __slab_alloc at ffffffff8173a1b5
->    #14 [ffff88272f5af880] kmem_cache_alloc at ffffffff811f484b
->    #15 [ffff88272f5af8d0] do_blockdev_direct_IO at ffffffff812535b3
->    #16 [ffff88272f5afb00] __blockdev_direct_IO at ffffffff81255dc3
->    #17 [ffff88272f5afb30] xfs_vm_direct_IO at ffffffffa01fe3fc [xfs]
->    #18 [ffff88272f5afb90] generic_file_read_iter at ffffffff81198994
->    #19 [ffff88272f5afc50] __dta_xfs_file_read_iter_2398 at ffffffffa020c970 [xfs]
->    #20 [ffff88272f5afcc0] lo_rw_aio at ffffffffa0377042 [loop]
->    #21 [ffff88272f5afd70] loop_queue_work at ffffffffa0377c3b [loop]
->    #22 [ffff88272f5afe60] kthread_worker_fn at ffffffff810a8a0c
->    #23 [ffff88272f5afec0] kthread at ffffffff810a8428
->    #24 [ffff88272f5aff50] ret_from_fork at ffffffff81745242
+>> Hi Jens,
+>> I've minimized one of the qemu-iotests failures and it looks like a
+>> kernel bug.  io_uring completes a request with EAGAIN on an O_DIRECT
+>> file with Linux 5.3-rc1 on XFS + dm-thin + dm-crypt:
+>>
+>>    $ qemu-img create -f raw t.img 6G
+>>    $ qemu-io -f raw -n -i io_uring -c "aio_write 0 1M" -c "aio_write 512 1M" t.img
+>>    $ qemu-io -f raw -n -i io_uring -c "aio_write $((1 * 1024 * 1024)) 1M" -c "aio_write $((1 * 1024 * 1024 + 512)) 1M" t.img
+>>    Formatting 'tests/qemu-iotests/scratch/t.img', fmt=raw size=6442450944
+>>    wrote 1048576/1048576 bytes at offset 0
+>>    1 MiB, 1 ops; 00.01 sec (128.598 MiB/sec and 128.5985 ops/sec)
+>>    wrote 1048576/1048576 bytes at offset 512
+>>    1 MiB, 1 ops; 00.00 sec (201.017 MiB/sec and 201.0169 ops/sec)
+>>    aio_write failed: Resource temporarily unavailable
+>>    wrote 1048576/1048576 bytes at offset 1049088
+>>    1 MiB, 1 ops; 00.00 sec (391.620 MiB/sec and 391.6198 ops/sec)
+>>
+>> The third write request should not fail with EAGAIN ("Resource
+>> temporarily available").  I think device-mapper is returning EAGAIN at
+>> some point but I haven't gotten to the bottom of this yet.
+>>
+>> Interestingly it only happens when qemu-img create is run before the
+>> test to create a new file.  Rerun qemu-io on an existing raw image file
+>> and it succeeds.  This could be because the failing request is XFS a
+>> metadata I/O request that only happens when writing the file for the
+>> first time.
 
-Applied, thanks.
+It's due to how XFS handles (or doesn't handle) REQ_NOWAIT. I've got
+a patch for this that needs some testing, but I probably won't get to
+this until Monday, currently out on vacation until Sunday.
 
 -- 
 Jens Axboe
