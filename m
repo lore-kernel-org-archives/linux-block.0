@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A99DDC0650F
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 20:05:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B7C0C32754
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 20:05:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7B65F21743
-	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 20:05:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EA3421743
+	for <linux-block@archiver.kernel.org>; Thu,  8 Aug 2019 20:05:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390169AbfHHUFQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Aug 2019 16:05:16 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:42968 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732704AbfHHUFQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 16:05:16 -0400
-Received: by mail-pl1-f193.google.com with SMTP id ay6so44026941plb.9
-        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 13:05:16 -0700 (PDT)
+        id S2403831AbfHHUFR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Aug 2019 16:05:17 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:35325 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732704AbfHHUFR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 16:05:17 -0400
+Received: by mail-pg1-f195.google.com with SMTP id n4so2880993pgv.2
+        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2019 13:05:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=PLkRSmrn41W++1njDG0plghfflSWM76SF0ZekFVoOoA=;
-        b=W0lTbLI9Abn7VdmuXgk+9pdVsxLjcKJKgbhjaDGSjS18N3A7m191efUCrZsmo51MKr
-         4gqa3pCNuN2LQGpt5YfbAs8SD/HsNRqUxaKvXga3/RzVIOMQZDdNd6+ymTZqO034XWfp
-         uQFWK4JvEjUfusedJnlAMlDvaElbi5PEkizV+iI+Kik3JGPnNMvNosm8xv1NW2A5lhQK
-         1jrhe2AhIoMOUfWaVk+fxo0m1Y4QAEKq2TQxNngYFcZBQVw3S3pCHwIxlLxVrEXXNdke
-         pWq8b1RWxuh4v56zhftH9wsH7nr6863efV/p8ocWVMHAtKMRQmL8WqcovGLJAbCmTmik
-         9d4Q==
-X-Gm-Message-State: APjAAAWJrEaAj4VelrdxGdF9hTQg307I4FYI1EsmsFreEDvEIbzTq+PJ
-        8aQMj1+GYoG8PMOPFmrCB68=
-X-Google-Smtp-Source: APXvYqyT0ujooYRUe+4LgLRsVNwnzlmU63fgIXwRMfSXaZAEsU0z9kYLgkgB85WG6kOfxb3gMKxNTQ==
-X-Received: by 2002:a17:902:2bc5:: with SMTP id l63mr15950672plb.30.1565294715831;
-        Thu, 08 Aug 2019 13:05:15 -0700 (PDT)
+        bh=GPuTl/pW34NW20Oqtx9tQBNVNvCI52BUN4vQW8QKfe8=;
+        b=m0HumNMSSfaQsHjIy/Q/tIYMiqu5H0pkTr33uXaKBdhBpXryKSHYH+CrED0mCuLxNq
+         thKDC4dIi51PnyBIs7S35LZGBYiN6QLU7ls+8ZAHvSndM8cLgDHvam0u5FjNCN07+3kD
+         wzeSxCJ1uqzXihgwoZyNVFMpWc9S1VBt9jmpr4P1gnTU2DnjHFJrCwG6dlST8seiB3uS
+         N8qjRl+jFIqutktnEybzcjyNFQb3ySYDLCrw/4cfQPFTOHYw4NuEXV8qx+feqOCMP8rB
+         wi+PjilI+r5CSwF0AyIbWUG7QnMAqk1oREuRTxypImnaizjWS/PSPwEhq68QNoAp4VKV
+         pf6A==
+X-Gm-Message-State: APjAAAUhwthSm0BXrOZaDL1yAu4r0YgjsuxYY3aUQ+V5G1Yt1Ulp+Ju+
+        EoSpza5QCD/Ri1TLuI8NRfE=
+X-Google-Smtp-Source: APXvYqwDTToc8YPZsieK/CnPh5VpdG+EXBZiBHWil6OnD6kpTcuhYrkJ1SkYrZ+1NnE5smmFxaLslw==
+X-Received: by 2002:a17:90a:228b:: with SMTP id s11mr5609801pjc.23.1565294716938;
+        Thu, 08 Aug 2019 13:05:16 -0700 (PDT)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id b6sm83307093pgq.26.2019.08.08.13.05.14
+        by smtp.gmail.com with ESMTPSA id b6sm83307093pgq.26.2019.08.08.13.05.15
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 08 Aug 2019 13:05:15 -0700 (PDT)
+        Thu, 08 Aug 2019 13:05:16 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Omar Sandoval <osandov@fb.com>
 Cc:     linux-block@vger.kernel.org,
         Johannes Thumshirn <jthumshirn@suse.de>,
         Logan Gunthorpe <logang@deltatee.com>,
         Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH blktests 1/4] tests/nvme/rc: Modify the approach for disabling and re-enabling Ctrl-C
-Date:   Thu,  8 Aug 2019 13:05:03 -0700
-Message-Id: <20190808200506.186137-2-bvanassche@acm.org>
+Subject: [PATCH blktests 2/4] tests/nvmeof-mp/rc: Make simulate_network_failure_loop() more robust
+Date:   Thu,  8 Aug 2019 13:05:04 -0700
+Message-Id: <20190808200506.186137-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.22.0.770.g0f2c4a37fd-goog
 In-Reply-To: <20190808200506.186137-1-bvanassche@acm.org>
 References: <20190808200506.186137-1-bvanassche@acm.org>
@@ -59,41 +59,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Avoid that the following error messages are reported when redirecting stdin:
+Avoid that the following is logged in the nvmeof-mp .full log files:
 
-stty: 'standard input': Inappropriate ioctl for device
-stty: 'standard input': Inappropriate ioctl for device
+ls: cannot access '/sys/class/nvme/*/device/*/nvme0n1/reset_controller': No such
+file or directory
+tests/nvmeof-mp/rc: line 124: : No such file or directory
 
-Cc: Logan Gunthorpe <logang@deltatee.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Fixes: a987b10bc179 ("nvme: Ensure all ports and subsystems are removed on cleanup")
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- tests/nvme/rc | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/nvmeof-mp/rc | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index d4e18e635dea..40f0413d32d2 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -36,7 +36,7 @@ _cleanup_nvmet() {
- 	fi
+diff --git a/tests/nvmeof-mp/rc b/tests/nvmeof-mp/rc
+index 9324dd1e8e4f..7352b1628cd3 100755
+--- a/tests/nvmeof-mp/rc
++++ b/tests/nvmeof-mp/rc
+@@ -117,8 +117,9 @@ simulate_network_failure_loop() {
+ 	while [ $rc = 0 ]; do
+ 		sleep_until 5 ${deadline} || break
+ 		for d in $(held_by "$dev"); do
+-			sf=$(ls -d /sys/class/nvme/*/device/*/"${d#/dev/}/reset_controller")
+-			echo 1 > "$sf"
++			for sf in /sys/class/nvme/*/device/*/"${d#/dev/}/reset_controller"; do
++				[ -e "$sf" ] && echo 1 > "$sf"
++			done
+ 		done
+ 	done 2>>"$FULL"
  
- 	# Don't let successive Ctrl-Cs interrupt the cleanup processes
--	stty -isig
-+	trap '' SIGINT
- 
- 	shopt -s nullglob
- 
-@@ -66,7 +66,7 @@ _cleanup_nvmet() {
- 	done
- 
- 	shopt -u nullglob
--	stty isig
-+	trap SIGINT
- 
- 	modprobe -r nvme-loop 2>/dev/null
- 	modprobe -r nvmet 2>/dev/null
 -- 
 2.22.0.770.g0f2c4a37fd-goog
 
