@@ -6,94 +6,77 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 008FDC433FF
-	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 13:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3377C31E40
+	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 13:43:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CC68620B7C
-	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 13:42:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B302520B7C
+	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 13:43:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406490AbfHINmv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Aug 2019 09:42:51 -0400
-Received: from mail.cybernetics.com ([173.71.130.66]:55370 "EHLO
-        mail.cybernetics.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406197AbfHINmv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Aug 2019 09:42:51 -0400
-X-ASG-Debug-ID: 1565357334-0fb3b0188454c7b0001-Cu09wu
-Received: from cybernetics.com ([10.10.4.126]) by mail.cybernetics.com with ESMTP id nxLn55IMaWHgjfyE (version=SSLv3 cipher=DES-CBC3-SHA bits=112 verify=NO); Fri, 09 Aug 2019 09:28:54 -0400 (EDT)
-X-Barracuda-Envelope-From: tonyb@cybernetics.com
-X-ASG-Whitelist: Client
-Received: from [10.157.2.224] (account tonyb HELO [192.168.200.1])
-  by cybernetics.com (CommuniGate Pro SMTP 5.1.14)
-  with ESMTPSA id 9045384; Fri, 09 Aug 2019 09:28:54 -0400
-Subject: Re: [PATCH v3 00/20] sg: add v4 interface
-To:     Bart Van Assche <bvanassche@acm.org>, dgilbert@interlog.com,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org
-X-ASG-Orig-Subj: Re: [PATCH v3 00/20] sg: add v4 interface
-Cc:     martin.petersen@oracle.com, hare@suse.de,
-        Arnd Bergmann <arnd@arndb.de>
-References: <20190807114252.2565-1-dgilbert@interlog.com>
- <1565291455.3435.48.camel@linux.vnet.ibm.com>
- <7edab448-22cc-493a-f745-acc5be38f6a5@interlog.com>
- <5a80d09c-c1a5-429d-d46a-5e108b6292df@cybernetics.com>
- <517f279d-38ec-79eb-cc7f-77d1e873ea62@acm.org>
-From:   Tony Battersby <tonyb@cybernetics.com>
-Message-ID: <cd26b3a8-5943-6e3b-9e81-4cfd280777c1@cybernetics.com>
-Date:   Fri, 9 Aug 2019 09:28:54 -0400
+        id S2405928AbfHINnw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Aug 2019 09:43:52 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:44195 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726216AbfHINnw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Aug 2019 09:43:52 -0400
+Received: by mail-wr1-f67.google.com with SMTP id p17so98280866wrf.11;
+        Fri, 09 Aug 2019 06:43:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SVXw2/bA5C08+BykjuTS3dhz6TKyxWMjOdIKpXnFiF0=;
+        b=TcFa53Pe6w905vM1bqYF+nLYo8tQrTgJIrxxnpRw/rxcr/2qaSe82JgI1DQHu/qAu8
+         VzcYmYfaN/c4oA20PLjIdbl8BxAtrBDuri/cT6GPeC5BI+8dkmku2QLrZ5r04Ven0BHX
+         ZiExBDuyFNxcsa6XkWzGHV5i5Lz3DZLoEjMjC8NdtMtawGcnSgbNmMKD7VmWWDgI/4Ei
+         kar3LbVj01LhCiJcUsQVHy7eo8YaYe6KL73Mh1MAGKVpk0jZrBy1QmuPVVXE4zLOO/uj
+         wyyn3K2KJGLEA+taNPtBy83suO6qqtb6rZi+pII/Sifi1YNKnwpKaD4fF8Ntq1KFgWxh
+         Djuw==
+X-Gm-Message-State: APjAAAUjgl40HQRK71Rw/b4FShS95oErkBSeWXYOsJeSq1jAqzZBZ5r4
+        nSXDtPEFxZFKy1kcLjwoxJo=
+X-Google-Smtp-Source: APXvYqzgfODOd8I82ICcOo3N3RU4p19HM2GuesacfNF1Br8xggXKcJZpItkDTk8yUNwJ/N/88Pfi3Q==
+X-Received: by 2002:a5d:460a:: with SMTP id t10mr23215213wrq.83.1565358230117;
+        Fri, 09 Aug 2019 06:43:50 -0700 (PDT)
+Received: from [10.68.32.192] (broadband-188-32-48-208.ip.moscow.rt.ru. [188.32.48.208])
+        by smtp.gmail.com with ESMTPSA id z1sm98784974wrp.51.2019.08.09.06.43.48
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Fri, 09 Aug 2019 06:43:49 -0700 (PDT)
+Subject: Re: [PATCH] floppy: fix usercopy direction
+To:     Jens Axboe <axboe@kernel.dk>, alex.popov@linux.com,
+        Jann Horn <jannh@google.com>
+Cc:     Jiri Kosina <jikos@kernel.org>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>,
+        Mukesh Ojha <mojha@codeaurora.org>,
+        "kernel-hardening@lists.openwall.com" 
+        <kernel-hardening@lists.openwall.com>,
+        Julia Lawall <Julia.Lawall@lip6.fr>,
+        Gilles Muller <Gilles.Muller@lip6.fr>,
+        Nicolas Palix <nicolas.palix@imag.fr>,
+        Michal Marek <michal.lkml@markovi.net>, cocci@systeme.lip6.fr
+References: <20190326220348.61172-1-jannh@google.com>
+ <9ced7a06-5048-ad1a-3428-c8f943f7469c@linux.com>
+ <b324719d-4cb4-89c9-ed00-2e0cd85ee375@kernel.dk>
+From:   Denis Efremov <efremov@linux.com>
+Message-ID: <b509abcf-224b-7bfd-a792-dd8579dbcca9@linux.com>
+Date:   Fri, 9 Aug 2019 16:43:47 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <517f279d-38ec-79eb-cc7f-77d1e873ea62@acm.org>
+In-Reply-To: <b324719d-4cb4-89c9-ed00-2e0cd85ee375@kernel.dk>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Barracuda-Connect: UNKNOWN[10.10.4.126]
-X-Barracuda-Start-Time: 1565357334
-X-Barracuda-Encrypted: DES-CBC3-SHA
-X-Barracuda-URL: https://10.10.4.122:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at cybernetics.com
-X-Barracuda-Scan-Msg-Size: 1747
-X-Barracuda-BRTS-Status: 1
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/8/19 6:25 PM, Bart Van Assche wrote:
-> On 8/8/19 2:37 PM, Tony Battersby wrote:
->> On 8/8/19 5:08 PM, Douglas Gilbert wrote:
->>> *** Tony Battersby is a sg driver power user. He has lamented wading through
->>>       very large logs looking for some hint of why the sg driver is playing
->>>       up. He has stated the strong preference for more, not less, ioctls.
->>>
->> One of the reasons ioctls have a bad reputation is because they can be
->> used to implement poorly-thought-out interfaces.  So kernel maintainers
->> push back on adding new ioctls.  But the push back isn't about the
->> number of ioctls, it is about the poor interfaces.  My advice was that
->> in general, to implement a given API, it would be better to add more
->> ioctls with a simple interface for each one rather than to add fewer
->> extremely complex multiplexing ioctls.
-> Hi Tony,
->
-> What is your motivation to use the SG_IO API? Is it controlling SMR 
-> drives or are you using SG_IO for another reason? I'm asking because 
-> depending on the use case there may be a better solution than using the 
-> SG_IO API.
->
-> Thanks,
->
-> Bart.
->
-Actually I used the asynchronous write()/read()/poll() sg interface to
-implement RAID-like functionality for tape drives and medium changers,
-in a commercial product that has been around since 2002.  These days our
-products use a lot more disk I/O than tape I/O, so I don't write much
-new code using the sg interface anymore, although that code is still
-there and has to be maintained as needed.  So I don't have any immediate
-plans to use any of the new sgv4 features being introduced, and
-unfortunately I am way too busy to even give it a good review...
+>> So I add a new floppy maintainer Denis Efremov to CC.
+> 
+> Looks like it got lost indeed, I will just apply this one directly for
+> 5.4.
+> 
 
-Tony Battersby
-Cybernetics
+Thank you!
 
+Denis
