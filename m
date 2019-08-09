@@ -2,140 +2,68 @@ Return-Path: <SRS0=j1eM=WF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3462C433FF
-	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 16:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CFBC433FF
+	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 16:35:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 698B22086A
-	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 16:05:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="geqmG9h9"
+	by mail.kernel.org (Postfix) with ESMTP id 5287820C01
+	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 16:35:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1565368516;
+	bh=GwwC0GsN8qBgoOLpQn7LqtwEV9SyJ/J3C3PDOpJBof8=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=LBMZ5ZXAf//gIKdXmqqxuQQUqxSnzfw+FqapuQcXnwlOa+5YWhxb0Ndw8c/JyuFzi
+	 YxBfFn0y+9vgBCptmDGeLSr/NsYo5ypy40PIDak0h4d+K2l8jDB3/UUTUDYHbz71Lr
+	 75N9FriCpO62czdb2tEX9ubrme715cdXzXBM9v/s=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436819AbfHIQFo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Aug 2019 12:05:44 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:34091 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726441AbfHIQFo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Aug 2019 12:05:44 -0400
-Received: by mail-pg1-f196.google.com with SMTP id n9so39859073pgc.1
-        for <linux-block@vger.kernel.org>; Fri, 09 Aug 2019 09:05:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=zKKoOqHywF2bTPoVET6LAftqPnv09CFIlUAmHA3SV2g=;
-        b=geqmG9h9RvP21uXyRyTUIL7SV0q8fpx1voDVXvKTJorpxgvGWo9pFIjCnkGNZpkOUK
-         R3RhpTqLdMxB3SCO4RZVZCFQEaz8fTwQO0Y1h0Fd2e0jcfWDKlCmakzY6GJFNoLYz2Rx
-         rNCgUE9IqdP/xnltxqT+6qwIGm/uLoGhXAOFX1+Nevkl+5bZDah+EwTfajXfmK7KRdvH
-         jm9hGi4Sqw5q1I9PpCz1/QSblYE2K0WL0iTdF7g6pCHPPj4eCbpNbWgAKP92VPxMHZru
-         nVGEWdw/ReFelWWYPEjsx0me3HCQbMO9uDwVtUVaSOJNdKl/UNcdADuA8j5plWiLHQJV
-         vJIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=zKKoOqHywF2bTPoVET6LAftqPnv09CFIlUAmHA3SV2g=;
-        b=XBjNMLOFBem0LPQzJfoGY0fnK80HWQn9nw0j4j23lRWg+xwN3YCL7GKpfMB/dmHq4w
-         ym/Wv+l/pxWKswhrG2Eff3kqSmdaTspD6Y5WNXm7aeZQkfdxxbwOmFqWSjNthu3A8TFS
-         5GioqUBKnEvbPVlqe+Pzqsjmn8yszkX4L8iMfw4HGLpDriTpBcJtTXJlqMINGZIsf4hI
-         eIB5KsB12HYiDn76JnQ6Y9KhtR4f+4+nRGZUNdNGVlmLECz3DYmocCS0B/0Opv65i030
-         N7t//eMCbgO8jmfECJd+X+TZt2ubS6aGVi5iU26BuCjLo3p0B/4qKDlE49zDCUneq8G9
-         Rynw==
-X-Gm-Message-State: APjAAAWdLgHz8dSl3q0LCjSHjgsXTZxlIWip3o2gS52EBdZLET/NQ5tK
-        BT360CrG6/YUVZiAnEoEN/kheQ4lo23MlA==
-X-Google-Smtp-Source: APXvYqxUIjX3nWU2W4xG/1hfqwZCMtnBSbR2q0hZe7+f4WEi6ry8dgfN1GREIBC9O2fYe6F3YEyFMg==
-X-Received: by 2002:aa7:8804:: with SMTP id c4mr21999678pfo.65.1565366743107;
-        Fri, 09 Aug 2019 09:05:43 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:83a1:8460:a1eb:bc6a:7081? ([2605:e000:100e:83a1:8460:a1eb:bc6a:7081])
-        by smtp.gmail.com with ESMTPSA id v14sm20895088pgi.79.2019.08.09.09.05.41
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 09 Aug 2019 09:05:42 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.3-rc4
-Message-ID: <f3f005d2-701c-c943-b906-675d58d1164c@kernel.dk>
-Date:   Fri, 9 Aug 2019 09:05:41 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S2437362AbfHIQfO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Aug 2019 12:35:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50660 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2437087AbfHIQfN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 9 Aug 2019 12:35:13 -0400
+Subject: Re: [GIT PULL] Block fixes for 5.3-rc4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1565368512;
+        bh=GwwC0GsN8qBgoOLpQn7LqtwEV9SyJ/J3C3PDOpJBof8=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=cTA9rfvI+bhib1+9R3V++xhwwtveEhulDaiWx2iJrLcZtvszRv79t1j81qOZ618PO
+         ScsJAmH2y5rOZkhG5Z0rUFkU7g52APGj4pvB398vZW3Rjpkp9YW469gpGYnDNmuyx7
+         q63FSAoQSYKocvPjteaOWW4Zer/4Sqe3bL23BHTM=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <f3f005d2-701c-c943-b906-675d58d1164c@kernel.dk>
+References: <f3f005d2-701c-c943-b906-675d58d1164c@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <f3f005d2-701c-c943-b906-675d58d1164c@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/for-linus-20190809
+X-PR-Tracked-Commit-Id: 20621fedb2a696e4dc60bc1c5de37cf21976abcb
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 50e73a4a41598f9a785a986d25b731d3968dedb1
+Message-Id: <156536851285.6429.2134338807240345548.pr-tracker-bot@kernel.org>
+Date:   Fri, 09 Aug 2019 16:35:12 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+The pull request you sent on Fri, 9 Aug 2019 09:05:41 -0700:
 
-Here's a set of fixes that should go into this release. This pull
-request contains:
+> git://git.kernel.dk/linux-block.git tags/for-linus-20190809
 
-- Revert of a bcache patch that caused an oops for some (Coly)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/50e73a4a41598f9a785a986d25b731d3968dedb1
 
-- ata rb532 unused warning fix (Gustavo)
-
-- AoE kernel crash fix (He)
-
-- Error handling fixup for blkdev_get() (Jan)
-
-- libata read/write translation and SFF PIO fix (me)
-
-- Use after free and error handling fix for O_DIRECT fragments. There's
-  still a nowait + sync oddity in there, we'll nail that start next
-  week. If all else fails, I'll queue a revert of the NOWAIT change. (me)
-
-- Loop GFP_KERNEL -> GFP_NOIO deadlock fix (Mikulas)
-
-- Two BFQ regression fixes that caused crashes (Paolo)
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20190809
-
-
-----------------------------------------------------------------
-Coly Li (1):
-      bcache: Revert "bcache: use sysfs_match_string() instead of __sysfs_match_string()"
-
-Gustavo A. R. Silva (1):
-      ata: rb532_cf: Fix unused variable warning in rb532_pata_driver_probe
-
-He Zhe (1):
-      block: aoe: Fix kernel crash due to atomic sleep when exiting
-
-Jan Kara (1):
-      bdev: Fixup error handling in blkdev_get()
-
-Jens Axboe (3):
-      block: fix O_DIRECT error handling for bio fragments
-      libata: have ata_scsi_rw_xlat() fail invalid passthrough requests
-      libata: add SG safety checks in SFF pio transfers
-
-Mikulas Patocka (1):
-      loop: set PF_MEMALLOC_NOIO for the worker thread
-
-Paolo Valente (3):
-      block, bfq: reset last_completed_rq_bfqq if the pointed queue is freed
-      block, bfq: move update of waker and woken list to queue freeing
-      block, bfq: handle NULL return value by bfq_init_rq()
-
- block/bfq-iosched.c         | 68 +++++++++++++++++++++++++++++++--------------
- drivers/ata/libata-scsi.c   | 21 ++++++++++++++
- drivers/ata/libata-sff.c    |  6 ++++
- drivers/ata/pata_rb532_cf.c |  1 -
- drivers/block/aoe/aoedev.c  | 13 +++++++--
- drivers/block/loop.c        |  2 +-
- drivers/md/bcache/sysfs.c   | 20 +++++++------
- fs/block_dev.c              | 33 +++++++++++-----------
- 8 files changed, 113 insertions(+), 51 deletions(-)
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
