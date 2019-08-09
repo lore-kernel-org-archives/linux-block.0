@@ -2,91 +2,118 @@ Return-Path: <SRS0=j1eM=WF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1534CC433FF
-	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 01:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0243DC0650F
+	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 01:26:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D34F62166E
-	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 01:12:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C63862171F
+	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 01:26:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ap3AA5Q7"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="sN/0osHq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404787AbfHIBMQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Aug 2019 21:12:16 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:36568 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404550AbfHIBMQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 21:12:16 -0400
-Received: by mail-ed1-f68.google.com with SMTP id k21so93084685edq.3;
-        Thu, 08 Aug 2019 18:12:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=q1VDmvy5H5V/lcQDElMHgpagqDBHRV5q2PlN+0yp058=;
-        b=ap3AA5Q7qTtE00hxn3S74U63HIxZRuOIEAkqJtskyVa1jNpnNvhKUvDrT3dAGsl5SF
-         h2/RDfNHPRr5jvA8f6B8NXM6HB02DfY+BP/8ghY3TDNi1E4A+9px3gb2AWH8EVgw6UWR
-         5dKfp34zFQ2H1rLuXMNlFRuIVPEVt1gWvaRQdkB+rmgNXZPrMxnMrkunvkhKFoqjPcCv
-         Dwrzw1Kt5tlCv0D2XXpTb9ueZanzUxnqkS1xdp9MK3eHxRebHwIBUF6xH07LUxddrU32
-         95wwhu60FOS1kgOLv3zM+npKW+J94/3fxc84boCfaA3Y2puUH5U6GxfSjl1rwe5Hrjq4
-         iBEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=q1VDmvy5H5V/lcQDElMHgpagqDBHRV5q2PlN+0yp058=;
-        b=ZXAZxqasuxJOQGf/QK5MMecDd4sGl44k0D1SnQkInTITjCcsETm6CaBsltFwyEVzi7
-         dzEoQFpPl1wpYIAD2NalB5LeUPSzBqEJax8WqXWMwgiV77xaCbhlJw3Fa2T8D/iJg+g4
-         zynFAWxRsh/BRrUdqjFbr0Gc/JevulMDLXwxGlewmSn9ECTFEI+yS457EfIw4NjlX1nM
-         Q/gdKDemYTr+h7xZKs1AjoAuw1/VzHXNnUgV6wW5FtXvdONNtqi8PYdoyaWC14YkahnR
-         o12urW0QQ2ZtKl1V0yc0vryhoU5C3YAL+ssK7s5aBTrj9rvmk2xM2uXedR36VCnvYNLp
-         WC8g==
-X-Gm-Message-State: APjAAAXubARfIRy+mr0x5ILMsIqYtGBVZJuIAXgJu/hXFMyJAjXYOLUa
-        +kAIZQQnxcAw8OTVtgNurAIKG3lbmVl6AdvCFQE=
-X-Google-Smtp-Source: APXvYqw72mDmwWU01nhdnAQXUm1rWO+j4MknD7wIqU6RymBJZboowbBNIAROGI7j1bBlzLXNIgbxAtgfJJR0skLrINI=
-X-Received: by 2002:a17:906:7cd6:: with SMTP id h22mr16154601ejp.254.1565313134395;
- Thu, 08 Aug 2019 18:12:14 -0700 (PDT)
+        id S2405149AbfHIB0p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Aug 2019 21:26:45 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:16697 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405142AbfHIB0o (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Aug 2019 21:26:44 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d4ccbd50000>; Thu, 08 Aug 2019 18:26:45 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Thu, 08 Aug 2019 18:26:43 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Thu, 08 Aug 2019 18:26:43 -0700
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 9 Aug
+ 2019 01:26:42 +0000
+Subject: Re: [PATCH v3 38/41] powerpc: convert put_page() to put_user_page*()
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Andrew Morton <akpm@linux-foundation.org>
+CC:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
+        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
+        <dri-devel@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linux-rpi-kernel@lists.infradead.org>,
+        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
+        <x86@kernel.org>, <xen-devel@lists.xenproject.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christoph Hellwig <hch@lst.de>, <linuxppc-dev@lists.ozlabs.org>
+References: <20190807013340.9706-1-jhubbard@nvidia.com>
+ <20190807013340.9706-39-jhubbard@nvidia.com>
+ <87k1botdpx.fsf@concordia.ellerman.id.au>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <248c9ab2-93cc-6d8b-606d-d85b83e791e5@nvidia.com>
+Date:   Thu, 8 Aug 2019 18:26:42 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190808131100.24751-1-hslester96@gmail.com> <20190808133510.tre6twn764pv3e7m@Air-de-Roger>
-In-Reply-To: <20190808133510.tre6twn764pv3e7m@Air-de-Roger>
-From:   Chuhong Yuan <hslester96@gmail.com>
-Date:   Fri, 9 Aug 2019 09:12:04 +0800
-Message-ID: <CANhBUQ1rSUPsg+XddCQ4B=JiSA8VV+YkdC-pmgY25hFnvwdFcw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] xen/blkback: Use refcount_t for refcount
-To:     =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>
-Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87k1botdpx.fsf@concordia.ellerman.id.au>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1565314005; bh=mIo2y95DYwpm5TwfN0ChMwsAj72bzfnkFfj+rLdjqVU=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=sN/0osHqfMASG3Gn5uYJsmBevNgkDITrwy5z0XhYDRnSVjTtczC6Zn93vXUVACtgl
+         zsE5J5OQn1U0e8RQtUv/QuY5iXNoztc7U7xk0b8D/XTbbdQX85oERprBP+FlchEBmH
+         cDA/Z0zP30Are5EcBXQtJgaAWOYtGMQytxGRabpoiJwuifLVi+3nH2crRLrU8L/jsz
+         NjANrKoFZE22mpOq52s3fZ9ut+mKAUlAXHfdi2WiqPjr5KVieTASv9oPdSZ5QUx628
+         sL0qbeXqIPI+CnsO9wdJm+9w+qSRY9+X67MIO8EOa4e3TPJTGVb16/VuBW7YteYrzL
+         bdoBRcdIA11ng==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 8, 2019 at 9:35 PM Roger Pau Monn=C3=A9 <roger.pau@citrix.com> =
-wrote:
->
-> On Thu, Aug 08, 2019 at 09:11:00PM +0800, Chuhong Yuan wrote:
-> > Reference counters are preferred to use refcount_t instead of
-> > atomic_t.
-> > This is because the implementation of refcount_t can prevent
-> > overflows and detect possible use-after-free.
-> > So convert atomic_t ref counters to refcount_t.
->
-> Thanks!
->
-> I think there are more reference counters in blkback than
-> the one you fixed. There's also an inflight field in xen_blkif_ring,
-> and a pendcnt in pending_req which look like possible candidates to
-> switch to use refcount_t, have you looked into switching those two
-> also?
->
+On 8/7/19 10:42 PM, Michael Ellerman wrote:
+> Hi John,
+> 
+> john.hubbard@gmail.com writes:
+>> diff --git a/arch/powerpc/mm/book3s64/iommu_api.c b/arch/powerpc/mm/book3s64/iommu_api.c
+>> index b056cae3388b..e126193ba295 100644
+>> --- a/arch/powerpc/mm/book3s64/iommu_api.c
+>> +++ b/arch/powerpc/mm/book3s64/iommu_api.c
+>> @@ -203,6 +202,7 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
+>>  {
+>>  	long i;
+>>  	struct page *page = NULL;
+>> +	bool dirty = false;
+> 
+> I don't think you need that initialisation do you?
+> 
 
-I will switch those two in next version.
+Nope, it can go. Fixed locally, thanks.
 
-> Roger.
+Did you get a chance to look at enough of the other bits to feel comfortable 
+with the patch, overall?
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
