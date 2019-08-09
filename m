@@ -6,72 +6,90 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40159C31E40
-	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 21:32:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27B11C32756
+	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 22:14:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 14B0D208C3
-	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 21:32:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E8F2121773
+	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 22:14:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726125AbfHIVcK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Aug 2019 17:32:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51018 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726022AbfHIVcK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 9 Aug 2019 17:32:10 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 24F278E22B;
-        Fri,  9 Aug 2019 21:32:10 +0000 (UTC)
-Received: from [10.10.125.29] (ovpn-125-29.rdu2.redhat.com [10.10.125.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BD11960BF7;
-        Fri,  9 Aug 2019 21:32:09 +0000 (UTC)
-Subject: Re: [PATCH 1/4] nbd: add set cmd timeout helper
-To:     josef@toxicpanda.com, linux-block@vger.kernel.org
-References: <20190809212610.19412-1-mchristi@redhat.com>
- <20190809212610.19412-2-mchristi@redhat.com>
-From:   Mike Christie <mchristi@redhat.com>
-Message-ID: <5D4DE659.5050909@redhat.com>
-Date:   Fri, 9 Aug 2019 16:32:09 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
- Thunderbird/38.6.0
+        id S1726475AbfHIWOD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Aug 2019 18:14:03 -0400
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:38798 "EHLO
+        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725985AbfHIWOD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 9 Aug 2019 18:14:03 -0400
+Received: from dread.disaster.area (pa49-181-167-148.pa.nsw.optusnet.com.au [49.181.167.148])
+        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 6AD0036420D;
+        Sat, 10 Aug 2019 08:13:56 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92)
+        (envelope-from <david@fromorbit.com>)
+        id 1hwD7w-000108-Ua; Sat, 10 Aug 2019 08:12:48 +1000
+Date:   Sat, 10 Aug 2019 08:12:48 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Johannes Weiner <hannes@cmpxchg.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND] block: annotate refault stalls from IO submission
+Message-ID: <20190809221248.GK7689@dread.disaster.area>
+References: <20190808190300.GA9067@cmpxchg.org>
 MIME-Version: 1.0
-In-Reply-To: <20190809212610.19412-2-mchristi@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Fri, 09 Aug 2019 21:32:10 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190808190300.GA9067@cmpxchg.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0
+        a=gu9DDhuZhshYSb5Zs/lkOA==:117 a=gu9DDhuZhshYSb5Zs/lkOA==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=FmdZ9Uzk2mMA:10
+        a=7-415B0cAAAA:8 a=tU5beferOtS2JaHV9NYA:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 08/09/2019 04:26 PM, Mike Christie wrote:
->  
-> +static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout)
-> +{
-> +	nbd->tag_set.timeout = timeout * HZ;
-> +	blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
-> +}
-> +
->  /* Must be called with config_lock held */
->  static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
->  		       unsigned int cmd, unsigned long arg)
-> @@ -1275,10 +1281,8 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
->  		nbd_size_set(nbd, config->blksize, arg);
->  		return 0;
->  	case NBD_SET_TIMEOUT:
-> -		if (arg) {
-> -			nbd->tag_set.timeout = arg * HZ;
-> -			blk_queue_rq_timeout(nbd->disk->queue, arg * HZ);
-> -		}
-> +		if (arg)
-> +			nbd_set_cmd_timeout(nbd, arg);
->  		return 0;
+On Thu, Aug 08, 2019 at 03:03:00PM -0400, Johannes Weiner wrote:
+> psi tracks the time tasks wait for refaulting pages to become
+> uptodate, but it does not track the time spent submitting the IO. The
+> submission part can be significant if backing storage is contended or
+> when cgroup throttling (io.latency) is in effect - a lot of time is
 
-Josef,
+Or the wbt is throttling.
 
-These patches still leave one regression where you used to be able to
-disable the timer after it has already been set. My patches did not fix
-that yet. I will fix it on the resend after you give me your comments.
+> spent in submit_bio(). In that case, we underreport memory pressure.
+> 
+> Annotate submit_bio() to account submission time as memory stall when
+> the bio is reading userspace workingset pages.
 
+PAtch looks fine to me, but it raises another question w.r.t. IO
+stalls and reclaim pressure feedback to the vm: how do we make use
+of the pressure stall infrastructure to track inode cache pressure
+and stalls?
+
+With the congestion_wait() and wait_iff_congested() being entire
+non-functional for block devices since 5.0, there is no IO load
+based feedback going into memory reclaim from shrinkers that might
+require IO to free objects before they can be reclaimed. This is
+directly analogous to page reclaim writing back dirty pages from
+the LRU, and as I understand it one of things the PSI is supposed
+to be tracking.
+
+Lots of workloads create inode cache pressure and often it can
+dominate the time spent in memory reclaim, so it would seem to me
+that having PSI only track/calculate pressure and stalls from LRU
+pages misses a fair chunk of the memory pressure and reclaim stalls
+that can be occurring.
+
+Any thoughts of how we might be able to integrate more of the system
+caches into the PSI infrastructure, Johannes?
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
