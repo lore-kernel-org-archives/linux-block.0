@@ -1,179 +1,106 @@
-Return-Path: <SRS0=j1eM=WF=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=e7Kt=WG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D49BBC31E40
-	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 23:03:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1526BC32751
+	for <linux-block@archiver.kernel.org>; Sat, 10 Aug 2019 07:39:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A9BD120B7C
-	for <linux-block@archiver.kernel.org>; Fri,  9 Aug 2019 23:03:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CACE32166E
+	for <linux-block@archiver.kernel.org>; Sat, 10 Aug 2019 07:39:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hgx4J6Xn"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="niQjzXtg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727948AbfHIXDx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Aug 2019 19:03:53 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45469 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726475AbfHIXDx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Aug 2019 19:03:53 -0400
-Received: by mail-wr1-f65.google.com with SMTP id q12so9330298wrj.12
-        for <linux-block@vger.kernel.org>; Fri, 09 Aug 2019 16:03:51 -0700 (PDT)
+        id S1726066AbfHJHjo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 10 Aug 2019 03:39:44 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:33687 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725862AbfHJHjo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 10 Aug 2019 03:39:44 -0400
+Received: by mail-lj1-f195.google.com with SMTP id z17so5640438ljz.0
+        for <linux-block@vger.kernel.org>; Sat, 10 Aug 2019 00:39:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AA45q6IMPxeio0FSS0wDQ5w5I6FSh5bk8IxEXeZUP0E=;
-        b=Hgx4J6XnzbPi/G6IzDkRvXBDXp3Xw1iLGFI/8Hl4XZuiFH/pUvEk+HOHKKjP76/hQX
-         mWBD6zQ+rQEL/nOuq0/6OmDbIxxGtFO6mY0LVFTTsqFrIlaZRSb6M8aKKowHzhH3DQTm
-         2V+ddlS0fA173GTaNiMA1v1CE+VrS8SelYzm2zJvLS4DQ8ADl33KFGIwXY+3yOoWJZOf
-         43vCBcpxoWOuxjX+XDan+MgqKv25HMcRzB9Sdy38s8MR02Rff0hzlNnG2pYSL2LO5aSF
-         Ub94moH3Leka0deP3ghd/pfu+DURzPTrsZXYAaf5nPRADSxRxH4ONydFG4lxIGtrLsfa
-         iSyA==
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=AK/YMa4Udhu0TeTUabdaTm8LRtt+TVVYWot+B288Uf0=;
+        b=niQjzXtgqzrHnuK8XNSSBNRpO2CR/Omb5Zr/BEJArkRu1Hu3aP7NGTrfawQAi8xjNq
+         B63012N1cBSRUQoZfggC60spukhH4XFe9z+CHLd/zTBD+uWvjodx3m4yl+T5SanUEOlI
+         tOwDS2cMYCMt0wSqWgvCEYrBCsMYUx5CD0ljhWRrRAUQZxXesR1EkTLV7I7uOCI4sHWN
+         DVaSPJPjwJwZfjENt0rPA/MXLELO8WXSKwvm5JfHwAfYgCcOamlcbJadtdDxn5PtRW3Q
+         9f64OMI57PXiPbFmETcrIgaSJpRgP3/ta/cJetbzOGcTg/PtvtZQVILvere+coTyVejG
+         S7UA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AA45q6IMPxeio0FSS0wDQ5w5I6FSh5bk8IxEXeZUP0E=;
-        b=ne6oSj1pACkIvwCa1G1WJYh23OwZwcTAUtaTy1u9kqPLLotQVzYwmWXBnE3NA9X+zG
-         Qj1tzXu8chr1kqiz2ik2Stdog36AeAI6WAYrb/vBULoM5nJ3zVMMti9Lxik/WYGJkYhP
-         Xgdcu+gHQiXBVhU+cPH/a3u4cjMyEmW7RGPJQ3O89NFTuiW8zr4BjW53V5rh6suk2SQW
-         uRWQxSaucWn+QwIgsOFcYbXcK4VjdM5PMtvQccdSIUcVlc9boq/9os4DzsQNY8toYdgz
-         v/1eX+7U5yhi8ydihadVbVdt2iIxas0aItRl5FXFh29J+PcUUtRBdz3A1Sy+Cc3CviEQ
-         Ucng==
-X-Gm-Message-State: APjAAAVqQb3ziaNFwRelfjKz7BzC9r3kQuQFn3sUTWlbcPbLiS2XOLhm
-        nV6k3ltghQPUl9hwFYNjM6u4JxvRIEYUp1i/vZ927A==
-X-Google-Smtp-Source: APXvYqxNIFUtq0mvXkjapWy5+xX1d0Xp8TP4K9kMBJ6lZAuc7uPuLpfox+P3pZ3dVwbona9mq6bzyo+H3lZPiB9qFJI=
-X-Received: by 2002:adf:ce88:: with SMTP id r8mr28161681wrn.42.1565391830743;
- Fri, 09 Aug 2019 16:03:50 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=AK/YMa4Udhu0TeTUabdaTm8LRtt+TVVYWot+B288Uf0=;
+        b=cc23GhTekUAPY3Jt5v+FAantoQKQA4LYTZCjCL4vdy/XPpOFhOFlYqr2CyiV3bGFo6
+         TAu7lyvt+RS7KTpw6bbklaTF/41QuYU9RDhoNdQoDOKUilTIMAIqJNC28ojUtfckKxj6
+         aJXNuWCKd+Q2gYnuZnvL6HOR68GJM8214w2bBejifdmfmnMRqXKVBaEO3e7HdEwo3j4W
+         hc+At5ZxdVgOXgyXBgSMsp4DTHWdHsAerfF6ccFwmXl9l7a9kypj09LZCWBgCDHi+Rjm
+         pEPkdeTCKQXQbCmYWRuEu+nndtjp+fxHUgcsymiAsWo5P/urJSF60sROp2go3Wy6z4Zj
+         mE3g==
+X-Gm-Message-State: APjAAAWROUIEDg+yMB/+SRKqmy8ipi73JeDAXQXRmBWTlGXRNsoEWZMD
+        QJpjOYC8FoGOJi+9u7veflPKUg==
+X-Google-Smtp-Source: APXvYqxqSQEUfu7bZAFnqxkQX6eGcAAC0oG9UXAGDZV2DRYTYAV3Mi+sXLGdmHn8wqr9Vabz4S2gKg==
+X-Received: by 2002:a2e:9dd7:: with SMTP id x23mr7776491ljj.160.1565422782584;
+        Sat, 10 Aug 2019 00:39:42 -0700 (PDT)
+Received: from localhost (c-243c70d5.07-21-73746f28.bbcust.telenor.se. [213.112.60.36])
+        by smtp.gmail.com with ESMTPSA id l22sm19707633ljc.4.2019.08.10.00.39.41
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Sat, 10 Aug 2019 00:39:41 -0700 (PDT)
+From:   Anders Roxell <anders.roxell@linaro.org>
+To:     mb@lightnvm.io
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Anders Roxell <anders.roxell@linaro.org>
+Subject: [PATCH] lightnvm: remove unused variable 'geo'
+Date:   Sat, 10 Aug 2019 09:39:36 +0200
+Message-Id: <20190810073936.28700-1-anders.roxell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20190808190300.GA9067@cmpxchg.org>
-In-Reply-To: <20190808190300.GA9067@cmpxchg.org>
-From:   Suren Baghdasaryan <surenb@google.com>
-Date:   Fri, 9 Aug 2019 16:03:39 -0700
-Message-ID: <CAJuCfpFQdCmhdCQQGxmWuwjYRdMCL8-xtkuUiqYE03ut+uvW6g@mail.gmail.com>
-Subject: Re: [PATCH RESEND] block: annotate refault stalls from IO submission
-To:     Johannes Weiner <hannes@cmpxchg.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Dave Chinner <david@fromorbit.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-mm <linux-mm@kvack.org>, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 8, 2019 at 12:03 PM Johannes Weiner <hannes@cmpxchg.org> wrote:
->
-> psi tracks the time tasks wait for refaulting pages to become
-> uptodate, but it does not track the time spent submitting the IO. The
-> submission part can be significant if backing storage is contended or
-> when cgroup throttling (io.latency) is in effect - a lot of time is
-> spent in submit_bio(). In that case, we underreport memory pressure.
->
-> Annotate submit_bio() to account submission time as memory stall when
-> the bio is reading userspace workingset pages.
->
-> Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
-> ---
->  block/bio.c               |  3 +++
->  block/blk-core.c          | 23 ++++++++++++++++++++++-
->  include/linux/blk_types.h |  1 +
->  3 files changed, 26 insertions(+), 1 deletion(-)
->
-> diff --git a/block/bio.c b/block/bio.c
-> index 299a0e7651ec..4196865dd300 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -806,6 +806,9 @@ void __bio_add_page(struct bio *bio, struct page *page,
->
->         bio->bi_iter.bi_size += len;
->         bio->bi_vcnt++;
-> +
-> +       if (!bio_flagged(bio, BIO_WORKINGSET) && unlikely(PageWorkingset(page)))
-> +               bio_set_flag(bio, BIO_WORKINGSET);
->  }
->  EXPORT_SYMBOL_GPL(__bio_add_page);
->
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index d0cc6e14d2f0..1b1705b7dde7 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -36,6 +36,7 @@
->  #include <linux/blk-cgroup.h>
->  #include <linux/debugfs.h>
->  #include <linux/bpf.h>
-> +#include <linux/psi.h>
->
->  #define CREATE_TRACE_POINTS
->  #include <trace/events/block.h>
-> @@ -1128,6 +1129,10 @@ EXPORT_SYMBOL_GPL(direct_make_request);
->   */
->  blk_qc_t submit_bio(struct bio *bio)
->  {
-> +       bool workingset_read = false;
-> +       unsigned long pflags;
-> +       blk_qc_t ret;
-> +
->         if (blkcg_punt_bio_submit(bio))
->                 return BLK_QC_T_NONE;
->
-> @@ -1146,6 +1151,8 @@ blk_qc_t submit_bio(struct bio *bio)
->                 if (op_is_write(bio_op(bio))) {
->                         count_vm_events(PGPGOUT, count);
->                 } else {
-> +                       if (bio_flagged(bio, BIO_WORKINGSET))
-> +                               workingset_read = true;
->                         task_io_account_read(bio->bi_iter.bi_size);
->                         count_vm_events(PGPGIN, count);
->                 }
-> @@ -1160,7 +1167,21 @@ blk_qc_t submit_bio(struct bio *bio)
->                 }
->         }
->
-> -       return generic_make_request(bio);
-> +       /*
-> +        * If we're reading data that is part of the userspace
-> +        * workingset, count submission time as memory stall. When the
-> +        * device is congested, or the submitting cgroup IO-throttled,
-> +        * submission can be a significant part of overall IO time.
-> +        */
-> +       if (workingset_read)
-> +               psi_memstall_enter(&pflags);
-> +
-> +       ret = generic_make_request(bio);
-> +
-> +       if (workingset_read)
-> +               psi_memstall_leave(&pflags);
-> +
-> +       return ret;
->  }
->  EXPORT_SYMBOL(submit_bio);
->
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index 1b1fa1557e68..a9dadfc16a92 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -209,6 +209,7 @@ enum {
->         BIO_BOUNCED,            /* bio is a bounce bio */
->         BIO_USER_MAPPED,        /* contains user pages */
->         BIO_NULL_MAPPED,        /* contains invalid user pages */
-> +       BIO_WORKINGSET,         /* contains userspace workingset pages */
->         BIO_QUIET,              /* Make BIO Quiet */
->         BIO_CHAIN,              /* chained bio, ->bi_remaining in effect */
->         BIO_REFFED,             /* bio has elevated ->bi_cnt */
-> --
-> 2.22.0
->
+The variable 'geo' is no longer used.
 
-The change contributes to the amount of recorded stall while running
-memory stress test with and without the patch. Did not notice any
-performance regressions so far. Thanks!
+../drivers/lightnvm/pblk-read.c: In function ‘pblk_submit_read_gc’:
+../drivers/lightnvm/pblk-read.c:421:18: warning: unused variable ‘geo’
+ [-Wunused-variable]
+  struct nvm_geo *geo = &dev->geo;
+                  ^~~
 
-Tested-by: Suren Baghdasaryan <surenb@google.com>
+Rework to remove the unused variable 'geo' and also the unused variable
+'dev' that got unused when the 'geo' variable was removed.
+
+Fixes: ba6f7da99aaf ("lightnvm: remove set but not used variables 'data_len' and 'rq_len'")
+Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+---
+ drivers/lightnvm/pblk-read.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 0cdc48f9cfbf..8efd14e683dc 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -417,8 +417,6 @@ static int read_rq_gc(struct pblk *pblk, struct nvm_rq *rqd,
+ 
+ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
+ {
+-	struct nvm_tgt_dev *dev = pblk->dev;
+-	struct nvm_geo *geo = &dev->geo;
+ 	struct nvm_rq rqd;
+ 	int ret = NVM_IO_OK;
+ 
+-- 
+2.20.1
+
