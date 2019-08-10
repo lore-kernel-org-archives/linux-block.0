@@ -2,105 +2,100 @@ Return-Path: <SRS0=e7Kt=WG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1526BC32751
-	for <linux-block@archiver.kernel.org>; Sat, 10 Aug 2019 07:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B2DDC433FF
+	for <linux-block@archiver.kernel.org>; Sat, 10 Aug 2019 16:20:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CACE32166E
-	for <linux-block@archiver.kernel.org>; Sat, 10 Aug 2019 07:39:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A1682086A
+	for <linux-block@archiver.kernel.org>; Sat, 10 Aug 2019 16:20:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="niQjzXtg"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=familiesteiner.de header.i=@familiesteiner.de header.b="pTemYD2w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726066AbfHJHjo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 10 Aug 2019 03:39:44 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:33687 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbfHJHjo (ORCPT
+        id S1726284AbfHJQUJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 10 Aug 2019 12:20:09 -0400
+Received: from cp120.sp-server.net ([195.30.85.120]:40062 "EHLO
+        cp120.sp-server.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726145AbfHJQUJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Aug 2019 03:39:44 -0400
-Received: by mail-lj1-f195.google.com with SMTP id z17so5640438ljz.0
-        for <linux-block@vger.kernel.org>; Sat, 10 Aug 2019 00:39:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=AK/YMa4Udhu0TeTUabdaTm8LRtt+TVVYWot+B288Uf0=;
-        b=niQjzXtgqzrHnuK8XNSSBNRpO2CR/Omb5Zr/BEJArkRu1Hu3aP7NGTrfawQAi8xjNq
-         B63012N1cBSRUQoZfggC60spukhH4XFe9z+CHLd/zTBD+uWvjodx3m4yl+T5SanUEOlI
-         tOwDS2cMYCMt0wSqWgvCEYrBCsMYUx5CD0ljhWRrRAUQZxXesR1EkTLV7I7uOCI4sHWN
-         DVaSPJPjwJwZfjENt0rPA/MXLELO8WXSKwvm5JfHwAfYgCcOamlcbJadtdDxn5PtRW3Q
-         9f64OMI57PXiPbFmETcrIgaSJpRgP3/ta/cJetbzOGcTg/PtvtZQVILvere+coTyVejG
-         S7UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=AK/YMa4Udhu0TeTUabdaTm8LRtt+TVVYWot+B288Uf0=;
-        b=cc23GhTekUAPY3Jt5v+FAantoQKQA4LYTZCjCL4vdy/XPpOFhOFlYqr2CyiV3bGFo6
-         TAu7lyvt+RS7KTpw6bbklaTF/41QuYU9RDhoNdQoDOKUilTIMAIqJNC28ojUtfckKxj6
-         aJXNuWCKd+Q2gYnuZnvL6HOR68GJM8214w2bBejifdmfmnMRqXKVBaEO3e7HdEwo3j4W
-         hc+At5ZxdVgOXgyXBgSMsp4DTHWdHsAerfF6ccFwmXl9l7a9kypj09LZCWBgCDHi+Rjm
-         pEPkdeTCKQXQbCmYWRuEu+nndtjp+fxHUgcsymiAsWo5P/urJSF60sROp2go3Wy6z4Zj
-         mE3g==
-X-Gm-Message-State: APjAAAWROUIEDg+yMB/+SRKqmy8ipi73JeDAXQXRmBWTlGXRNsoEWZMD
-        QJpjOYC8FoGOJi+9u7veflPKUg==
-X-Google-Smtp-Source: APXvYqxqSQEUfu7bZAFnqxkQX6eGcAAC0oG9UXAGDZV2DRYTYAV3Mi+sXLGdmHn8wqr9Vabz4S2gKg==
-X-Received: by 2002:a2e:9dd7:: with SMTP id x23mr7776491ljj.160.1565422782584;
-        Sat, 10 Aug 2019 00:39:42 -0700 (PDT)
-Received: from localhost (c-243c70d5.07-21-73746f28.bbcust.telenor.se. [213.112.60.36])
-        by smtp.gmail.com with ESMTPSA id l22sm19707633ljc.4.2019.08.10.00.39.41
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sat, 10 Aug 2019 00:39:41 -0700 (PDT)
-From:   Anders Roxell <anders.roxell@linaro.org>
-To:     mb@lightnvm.io
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Anders Roxell <anders.roxell@linaro.org>
-Subject: [PATCH] lightnvm: remove unused variable 'geo'
-Date:   Sat, 10 Aug 2019 09:39:36 +0200
-Message-Id: <20190810073936.28700-1-anders.roxell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+        Sat, 10 Aug 2019 12:20:09 -0400
+X-Greylist: delayed 2304 seconds by postgrey-1.27 at vger.kernel.org; Sat, 10 Aug 2019 12:20:08 EDT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=familiesteiner.de; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=sKTLfk8K9SjhDpUf4GXwgavY4u6umKfNFkXSIwX5Gyg=; b=pTemYD2wObtFALk/8QHRiYdFZJ
+        Qnk6PJqmTpXeXkOBeaZB3Kj/UMyv+SdQE/iFPwE4juYBVpfTMtCIfbtKuhKnNCLKd7V+zeGxiFWZR
+        aIYYjY+larFbC3Y7Est3rlpvRK9iuCnPmzrbmbX+o0l8Tki66h3y2snxMZzR+t2+8FGsK3hyFvzG6
+        rESBs8xInTybfvBkDrf0AHbsaxkNzsbT5gJVCZYcRboycxrhB5VCa7On7u0lVI9svlMA7N+ygYopH
+        V2NuEQCRg1GX3L7OsmjxrUCSpg45kuZUF92+QiQ1/x7Y0hfcC8Yqt7xh2xfJCCBpu/LmOIZV9xj2q
+        aY7iq1cA==;
+Received: from [2a02:810d:e80:408c:4a2a:e3ff:fe44:40d9] (port=36846)
+        by cp120.sp-server.net with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.92)
+        (envelope-from <fsteiner-mail1@bio.ifi.lmu.de>)
+        id 1hwTV0-0007gE-1g; Sat, 10 Aug 2019 17:41:42 +0200
+Subject: Re: [PATCH v2 0/3] introduce LED block device activity trigger
+To:     Akinobu Mita <akinobu.mita@gmail.com>, linux-block@vger.kernel.org,
+        linux-leds@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org
+Cc:     Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+        Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1563807552-23498-1-git-send-email-akinobu.mita@gmail.com>
+From:   Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>
+Message-ID: <0c3fa931-bdcd-5e7c-3d2a-16c8d6a95d28@bio.ifi.lmu.de>
+Date:   Sat, 10 Aug 2019 17:41:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1563807552-23498-1-git-send-email-akinobu.mita@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - cp120.sp-server.net
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - bio.ifi.lmu.de
+X-Get-Message-Sender-Via: cp120.sp-server.net: authenticated_id: steiner@familiesteiner.de
+X-Authenticated-Sender: cp120.sp-server.net: steiner@familiesteiner.de
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The variable 'geo' is no longer used.
+Akinobu Mita wrote:
 
-../drivers/lightnvm/pblk-read.c: In function ‘pblk_submit_read_gc’:
-../drivers/lightnvm/pblk-read.c:421:18: warning: unused variable ‘geo’
- [-Wunused-variable]
-  struct nvm_geo *geo = &dev->geo;
-                  ^~~
+> This work is inspired by the report on linux-nvme mailing list.
+> 
+> disk-activity trigger not working for nvme disk:
+> http://lists.infradead.org/pipermail/linux-nvme/2019-July/025253.html
+> 
+> This LED block device activity trigger works with any block devices.
 
-Rework to remove the unused variable 'geo' and also the unused variable
-'dev' that got unused when the 'geo' variable was removed.
+I've backported/hacked this (together with the "rename LED_OFF and LED_ON"
+and some additional patches) to the current SLES 15 kernel (4.12.14)
+and can confirm that it works great for my Thinkpad T580 with e.g. the
+FnLock LED, as well as for all our office desktops, using block-nvme0n1
+as trigger.
 
-Fixes: ba6f7da99aaf ("lightnvm: remove set but not used variables 'data_len' and 'rq_len'")
-Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
----
- drivers/lightnvm/pblk-read.c | 2 --
- 1 file changed, 2 deletions(-)
+cu,
+Frank
 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 0cdc48f9cfbf..8efd14e683dc 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -417,8 +417,6 @@ static int read_rq_gc(struct pblk *pblk, struct nvm_rq *rqd,
- 
- int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
- {
--	struct nvm_tgt_dev *dev = pblk->dev;
--	struct nvm_geo *geo = &dev->geo;
- 	struct nvm_rq rqd;
- 	int ret = NVM_IO_OK;
- 
+
 -- 
-2.20.1
-
+Dipl.-Inform. Frank Steiner   Web:  http://www.bio.ifi.lmu.de/~steiner/
+Lehrstuhl f. Bioinformatik    Mail: http://www.bio.ifi.lmu.de/~steiner/m/
+LMU, Amalienstr. 17           Phone: +49 89 2180-4049
+80333 Muenchen, Germany       Fax:   +49 89 2180-99-4049
+* Rekursion kann man erst verstehen, wenn man Rekursion verstanden hat. *
