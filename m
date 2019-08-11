@@ -2,97 +2,103 @@ Return-Path: <SRS0=/IjG=WH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D54BC0650F
-	for <linux-block@archiver.kernel.org>; Sun, 11 Aug 2019 13:47:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5A0BC433FF
+	for <linux-block@archiver.kernel.org>; Sun, 11 Aug 2019 17:23:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 514732084D
-	for <linux-block@archiver.kernel.org>; Sun, 11 Aug 2019 13:47:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="p2tu4E4X"
+	by mail.kernel.org (Postfix) with ESMTP id 8CBDD208C2
+	for <linux-block@archiver.kernel.org>; Sun, 11 Aug 2019 17:23:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726231AbfHKNrY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 11 Aug 2019 09:47:24 -0400
-Received: from mail-pg1-f170.google.com ([209.85.215.170]:38503 "EHLO
-        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726451AbfHKNrV (ORCPT
+        id S1725870AbfHKRXl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 11 Aug 2019 13:23:41 -0400
+Received: from mail-yw1-f66.google.com ([209.85.161.66]:43813 "EHLO
+        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725847AbfHKRXl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Aug 2019 09:47:21 -0400
-Received: by mail-pg1-f170.google.com with SMTP id z14so10954528pga.5
-        for <linux-block@vger.kernel.org>; Sun, 11 Aug 2019 06:47:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=eKL1dA155QCu6WYrg0VrgaVF1x3BPFSyhRdmz8vLW5g=;
-        b=p2tu4E4X7s81MRwfV968FP5zSv+IZkMFZa/KVtay3OLVJ1mqT6IMqCCZhnuIGTAoMQ
-         UnqjNXTSubbJTUxUoz6J68iuBG4+dhtyAj6PcBhjcx1PH9NtPkm1abxJQ73avVAZeOJ1
-         VXYoyC8CG0Qy6FJz2J9CYFtoTNELIQ+qMlwf52gZ/EhTr9l6jOaXVKYjdaMyK9nTdvxk
-         P6IeLoTamnbJ/xJwB8kCgFXjLoiahqQReE4Rdt76EUt2H2ffVHkrMH6Z+FKXtovHKfuq
-         xjdtEqmhiTQWFBo81uR3XjPAs03z4vTUtSrDvXFxqW5Q1BhQUq3I/BevvE7sDTnI3rgZ
-         hbHg==
+        Sun, 11 Aug 2019 13:23:41 -0400
+Received: by mail-yw1-f66.google.com with SMTP id n205so37953992ywb.10;
+        Sun, 11 Aug 2019 10:23:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eKL1dA155QCu6WYrg0VrgaVF1x3BPFSyhRdmz8vLW5g=;
-        b=AiaYL5OSGeyUqH3NbxiGhpvEem0Hctg6r9d1VZNmPnUzVFEZTs4mzqvt6lzstOxvnu
-         Z/bJjOTWESneZbko2ljHMoKpVLIHolMolk94Bk1H94IrN8KHs4oYUboWZZDCwwJUSANr
-         /kUoaIyf+u3iQVcwCEtCCXHuFZg+6PXkpfs4l4RcHefpMxhSupeqgA8H2+ONLL2p5jph
-         k/1t+KyeZlMCJiLZi5VQ3dZlkaJzQcByMlr9I6KNYsM+ovWXPEJi08wIxzNXQIgtjl3i
-         q1z6D46qApasV3RlFT+C+FIfTyXrWEXPoodSxj87CIHiNvhXF9puwQDyzh9/IpLpa7eP
-         BePA==
-X-Gm-Message-State: APjAAAXx4Zd+2pkJYw16ekTyWEuK2qXfchutxU2Utgi4DwXMTb7Fn4E0
-        bE+Co+yM3Oz4Tg1DASgp6eBPXEMM+65YLQ==
-X-Google-Smtp-Source: APXvYqxIGqIKdUE8+57ofBw5l8grr/0GPy0neLSmHefZqohaJwNu6RjqIkrC6ao1tj7ncQD1Z2+KNg==
-X-Received: by 2002:a17:90a:94c3:: with SMTP id j3mr1151182pjw.10.1565531240464;
-        Sun, 11 Aug 2019 06:47:20 -0700 (PDT)
-Received: from [192.168.1.188] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id 131sm33085239pge.37.2019.08.11.06.47.18
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 11 Aug 2019 06:47:19 -0700 (PDT)
-Subject: Re: [PATCHv2 0/4] blk_execute_rq{_nowait} cleanup part1
-To:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
-        linux-kernel@vger.kernel.org
-Cc:     hch@lst.de, linux-block@vger.kernel.org
-References: <20190809105433.8946-1-marcos.souza.org@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <55246cff-6d32-e7d5-bee0-9940bc59250a@kernel.dk>
-Date:   Sun, 11 Aug 2019 07:47:17 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190809105433.8946-1-marcos.souza.org@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=tn6nhjNQ7pdIDBNVvjNcCirLgHTb4d9vEhC1PgN0dmg=;
+        b=Q4HxoqNQmDtNQG+lssU+Y9bv60ghSM7/KASV/auxtsiUOQQACxYd0jfDCBz1zp1otq
+         ijytVPKRnPklz5rW4gVMY3aeiiDfQtjji8tD7gM8kG1/icmXA97OgLeWQEkihf/qYdb7
+         y8eCe0uVu7iPZoScrjjaeCLbdJ9/PqfQ3yN9nhRkkBR4r4YG6G75iVo9i7sb+rhOtbkV
+         jNPhiGyvuk3SfW5cxySYn1787idvlqrp8xL4aJC1RpX+jSkw2kq+7c1oRqhJzpIDBvft
+         y4VhHrNUuMWjyOr9WzAI/FFZUCj77gB/gKx7q41QAC9RLA3+rU6Nyd0Wgeugvnxadrzp
+         I2kQ==
+X-Gm-Message-State: APjAAAV1XJkdQbB6Qsqe6DdRGW8G2GGM51q57+ql/hMISnY7pF4T3eKi
+        viwTBo/I2r/KwEWWLw+pPP5Z+usWh4w=
+X-Google-Smtp-Source: APXvYqyQ0YGPfGErlB97Ql1pCAIUrzC/nGiwLC0F+lrA2nquYsm718zy1jqHZRJ/vG2HIjgexdP3cQ==
+X-Received: by 2002:a81:50c:: with SMTP id 12mr22280201ywf.380.1565544220073;
+        Sun, 11 Aug 2019 10:23:40 -0700 (PDT)
+Received: from localhost.localdomain (24-158-240-219.dhcp.smyr.ga.charter.com. [24.158.240.219])
+        by smtp.gmail.com with ESMTPSA id l4sm1027236ywd.0.2019.08.11.10.23.38
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Sun, 11 Aug 2019 10:23:39 -0700 (PDT)
+From:   Wenwen Wang <wenwen@cs.uga.edu>
+To:     Wenwen Wang <wenwen@cs.uga.edu>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        xen-devel@lists.xenproject.org (moderated list:XEN BLOCK SUBSYSTEM),
+        linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] xen/blkback: fix memory leaks
+Date:   Sun, 11 Aug 2019 12:23:22 -0500
+Message-Id: <1565544202-3927-1-git-send-email-wenwen@cs.uga.edu>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/9/19 3:54 AM, Marcos Paulo de Souza wrote:
-> After checking the request_queue argument of funtion blk_execute_rq_nowait, I
-> now added three more patches, one to remove the same argument from
-> blk_execute_rq and other two to change the at_head argument from
-> blk_exeute_rq_{nowait} from int to bool.
-> 
-> Original patch can be checked here[1].
-> 
-> After this patch gets merged, my plan is to analyse the usage the gendisk
-> argument, is being set as NULL but the majority of callers.
-> 
-> [1]: https://lkml.org/lkml/2019/8/6/31
+In read_per_ring_refs(), after 'req' and related memory regions are
+allocated, xen_blkif_map() is invoked to map the shared frame, irq, and
+etc. However, if this mapping process fails, no cleanup is performed,
+leading to memory leaks. To fix this issue, invoke the cleanup before
+returning the error.
 
-Don't ever send something out that hasn't even been compiled. I already
-detest doing kernel-wide cleanup changes like this, but when I do, I
-need absolute confidence in it actually being tested. The fact that it
-hasn't even been compiled is a big black mark on the submitter.
+Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+---
+ drivers/block/xen-blkback/xenbus.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index 3ac6a5d..b90dbcd 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -965,6 +965,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+ 		}
+ 	}
+ 
++	err = -ENOMEM;
+ 	for (i = 0; i < nr_grefs * XEN_BLKIF_REQS_PER_PAGE; i++) {
+ 		req = kzalloc(sizeof(*req), GFP_KERNEL);
+ 		if (!req)
+@@ -987,7 +988,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+ 	err = xen_blkif_map(ring, ring_ref, nr_grefs, evtchn);
+ 	if (err) {
+ 		xenbus_dev_fatal(dev, err, "mapping ring-ref port %u", evtchn);
+-		return err;
++		goto fail;
+ 	}
+ 
+ 	return 0;
+@@ -1007,8 +1008,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+ 		}
+ 		kfree(req);
+ 	}
+-	return -ENOMEM;
+-
++	return err;
+ }
+ 
+ static int connect_ring(struct backend_info *be)
 -- 
-Jens Axboe
+2.7.4
 
