@@ -2,170 +2,161 @@ Return-Path: <SRS0=3NZC=WI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D75C433FF
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 22:30:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0470C31E40
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 22:45:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12F272067D
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 22:30:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79D7F20665
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 22:45:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726895AbfHLWao (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Aug 2019 18:30:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39776 "EHLO mx1.redhat.com"
+        id S1726568AbfHLWpt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Aug 2019 18:45:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45186 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726786AbfHLWao (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Aug 2019 18:30:44 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S1726488AbfHLWpt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Aug 2019 18:45:49 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7D75B30615BF;
-        Mon, 12 Aug 2019 22:30:43 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id E6827693C8;
+        Mon, 12 Aug 2019 22:45:48 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AB7698036E;
-        Mon, 12 Aug 2019 22:30:36 +0000 (UTC)
-Date:   Tue, 13 Aug 2019 06:30:29 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D893D7A417;
+        Mon, 12 Aug 2019 22:45:39 +0000 (UTC)
+Date:   Tue, 13 Aug 2019 06:45:32 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Hannes Reinecke <hare@suse.de>
+To:     John Garry <john.garry@huawei.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Minwoo Im <minwoo.im.dev@gmail.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Keith Busch <keith.busch@intel.com>
-Subject: Re: [PATCH V2 4/5] blk-mq: re-submit IO in case that hctx is dead
-Message-ID: <20190812223028.GB17645@ming.t460p>
+        Keith Busch <keith.busch@intel.com>,
+        chenxiang <chenxiang66@hisilicon.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Subject: Re: [PATCH V2 0/5] blk-mq: improvement on handling IO during CPU
+ hotplug
+Message-ID: <20190812224531.GC17645@ming.t460p>
 References: <20190812134312.16732-1-ming.lei@redhat.com>
- <20190812134312.16732-5-ming.lei@redhat.com>
- <03516e51-a9ff-9ff2-9da0-d57cea7336f9@suse.de>
+ <20190812134608.GA16803@ming.t460p>
+ <658b0e7f-72f6-3673-d35e-4d8078069258@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <03516e51-a9ff-9ff2-9da0-d57cea7336f9@suse.de>
+In-Reply-To: <658b0e7f-72f6-3673-d35e-4d8078069258@huawei.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 12 Aug 2019 22:30:43 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Mon, 12 Aug 2019 22:45:49 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 12, 2019 at 04:26:42PM +0200, Hannes Reinecke wrote:
-> On 8/12/19 3:43 PM, Ming Lei wrote:
-> > When all CPUs in one hctx are offline, we shouldn't run this hw queue
-> > for completing request any more.
+On Mon, Aug 12, 2019 at 05:21:44PM +0100, John Garry wrote:
+> On 12/08/2019 14:46, Ming Lei wrote:
+> > Hi John,
 > > 
-> > So steal bios from the request, and resubmit them, and finally free
-> > the request in blk_mq_hctx_notify_dead().
+> > On Mon, Aug 12, 2019 at 09:43:07PM +0800, Ming Lei wrote:
+> > > Hi,
+> > > 
+> > > Thomas mentioned:
+> > >     "
+> > >      That was the constraint of managed interrupts from the very beginning:
+> > > 
+> > >       The driver/subsystem has to quiesce the interrupt line and the associated
+> > >       queue _before_ it gets shutdown in CPU unplug and not fiddle with it
+> > >       until it's restarted by the core when the CPU is plugged in again.
+> > >     "
+> > > 
+> > > But no drivers or blk-mq do that before one hctx becomes dead(all
+> > > CPUs for one hctx are offline), and even it is worse, blk-mq stills tries
+> > > to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead().
+> > > 
+> > > This patchset tries to address the issue by two stages:
+> > > 
+> > > 1) add one new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE
+> > > 
+> > > - mark the hctx as internal stopped, and drain all in-flight requests
+> > > if the hctx is going to be dead.
+> > > 
+> > > 2) re-submit IO in the state of CPUHP_BLK_MQ_DEAD after the hctx becomes dead
+> > > 
+> > > - steal bios from the request, and resubmit them via generic_make_request(),
+> > > then these IO will be mapped to other live hctx for dispatch
+> > > 
+> > > Please comment & review, thanks!
+> > > 
+> > > V2:
+> > > 	- patch4 & patch 5 in V1 have been merged to block tree, so remove
+> > > 	  them
+> > > 	- address comments from John Garry and Minwoo
+> > > 
+> > > 
+> > > Ming Lei (5):
+> > >   blk-mq: add new state of BLK_MQ_S_INTERNAL_STOPPED
+> > >   blk-mq: add blk-mq flag of BLK_MQ_F_NO_MANAGED_IRQ
+> > >   blk-mq: stop to handle IO before hctx's all CPUs become offline
+> > >   blk-mq: re-submit IO in case that hctx is dead
+> > >   blk-mq: handle requests dispatched from IO scheduler in case that hctx
+> > >     is dead
+> > > 
+> > >  block/blk-mq-debugfs.c     |   2 +
+> > >  block/blk-mq-tag.c         |   2 +-
+> > >  block/blk-mq-tag.h         |   2 +
+> > >  block/blk-mq.c             | 143 +++++++++++++++++++++++++++++++++----
+> > >  block/blk-mq.h             |   3 +-
+> > >  drivers/block/loop.c       |   2 +-
+> > >  drivers/md/dm-rq.c         |   2 +-
+> > >  include/linux/blk-mq.h     |   5 ++
+> > >  include/linux/cpuhotplug.h |   1 +
+> > >  9 files changed, 146 insertions(+), 16 deletions(-)
+> > > 
+> > > Cc: Bart Van Assche <bvanassche@acm.org>
+> > > Cc: Hannes Reinecke <hare@suse.com>
+> > > Cc: Christoph Hellwig <hch@lst.de>
+> > > Cc: Thomas Gleixner <tglx@linutronix.de>
+> > > Cc: Keith Busch <keith.busch@intel.com>
+> > > --
+> > > 2.20.1
+> > > 
 > > 
-> > Cc: Bart Van Assche <bvanassche@acm.org>
-> > Cc: Hannes Reinecke <hare@suse.com>
-> > Cc: Christoph Hellwig <hch@lst.de>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Keith Busch <keith.busch@intel.com>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/blk-mq.c | 48 +++++++++++++++++++++++++++++++++++++++++-------
-> >  1 file changed, 41 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 6931b2ba2776..ed334fd867c4 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -2261,10 +2261,30 @@ static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node *node)
-> >  	return 0;
-> >  }
-> >  
-> > +static void blk_mq_resubmit_io(struct request *rq)
-> > +{
-> > +	struct bio_list list;
-> > +	struct bio *bio;
-> > +
-> > +	bio_list_init(&list);
-> > +	blk_steal_bios(&list, rq);
-> > +
-> > +	while (true) {
-> > +		bio = bio_list_pop(&list);
-> > +		if (!bio)
-> > +			break;
-> > +
-> > +		generic_make_request(bio);
-> > +	}
-> > +
-> > +	blk_mq_cleanup_rq(rq);
-> > +	blk_mq_end_request(rq, 0);
-> > +}
-> > +
-> >  /*
-> > - * 'cpu' is going away. splice any existing rq_list entries from this
-> > - * software queue to the hw queue dispatch list, and ensure that it
-> > - * gets run.
-> > + * 'cpu' has gone away. If this hctx is dead, we can't dispatch request
-> > + * to the hctx any more, so steal bios from requests of this hctx, and
-> > + * re-submit them to the request queue, and free these requests finally.
-> >   */
-> >  static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
-> >  {
-> > @@ -2272,6 +2292,8 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
-> >  	struct blk_mq_ctx *ctx;
-> >  	LIST_HEAD(tmp);
-> >  	enum hctx_type type;
-> > +	bool hctx_dead;
-> > +	struct request *rq;
-> >  
-> >  	hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
-> >  	ctx = __blk_mq_get_ctx(hctx->queue, cpu);
-> > @@ -2279,6 +2301,9 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
-> >  
-> >  	clear_bit(BLK_MQ_S_INTERNAL_STOPPED, &hctx->state);
-> >  
-> > +	hctx_dead = cpumask_first_and(hctx->cpumask, cpu_online_mask) >=
-> > +		nr_cpu_ids;
-> > +
-> >  	spin_lock(&ctx->lock);
-> >  	if (!list_empty(&ctx->rq_lists[type])) {
-> >  		list_splice_init(&ctx->rq_lists[type], &tmp);
-> > @@ -2289,11 +2314,20 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
-> >  	if (list_empty(&tmp))
-> >  		return 0;
-> >  
-> > -	spin_lock(&hctx->lock);
-> > -	list_splice_tail_init(&tmp, &hctx->dispatch);
-> > -	spin_unlock(&hctx->lock);
-> > +	if (!hctx_dead) {
-> > +		spin_lock(&hctx->lock);
-> > +		list_splice_tail_init(&tmp, &hctx->dispatch);
-> > +		spin_unlock(&hctx->lock);
-> > +		blk_mq_run_hw_queue(hctx, true);
-> > +		return 0;
-> > +	}
-> > +
-> > +	while (!list_empty(&tmp)) {
-> > +		rq = list_entry(tmp.next, struct request, queuelist);
-> > +		list_del_init(&rq->queuelist);
-> > +		blk_mq_resubmit_io(rq);
-> > +	}
-> >  
-> > -	blk_mq_run_hw_queue(hctx, true);
-> >  	return 0;
-> >  }
-> >  
-> > 
-> So what happens when all CPUs assigned to a hardware queue go offline?
-> Wouldn't blk_steal_bios() etc resend the I/O to the same hw queue,
-> causing an infinite loop?
-
-No, blk_mq_hctx_notify_dead() is always called on one online CPU, so the I/O
-won't be remapped to same hw queue.
-
+> > Sorry for forgetting to Cc you.
 > 
-> Don't we have to rearrange the hardware queues here?
+> Already subscribed :)
+> 
+> I don't mean to hijack this thread, but JFYI we're getting around to test
+> https://github.com/ming1/linux/commits/v5.2-rc-host-tags-V2 - unfortunately
+> we're still seeing a performance regression. I can't see where it's coming
+> from. We're double-checking the test though.
 
-No, we use static queue mapping for managed IRQ, all possible CPUs have
-been spread on all hw queues.
+host-tag patchset is only for several particular drivers which use
+private reply queue as completion queue.
+
+This patchset is for handling generic blk-mq CPU hotplug issue, and
+the several particular scsi drivers(hisi_sas_v3, hpsa, megaraid_sas and
+mp3sas) won't be covered so far.
+
+I'd suggest to move on for generic blk-mq devices first given now blk-mq
+is the only request IO path now.
+
+There are at least two choices for us to handle drivers/devices with
+private completion queue:
+
+1) host-tags
+- performance issue shouldn't be hard to solve, given it is same with
+with single tags in theory, and just corner cases is there.
+
+What I am not glad with this approach is that blk-mq-tag code becomes mess.
+
+2) private callback
+- we could define private callback to drain each completion queue in
+  driver simply.
+- problem is that the four drivers have to duplicate the same job
+
 
 Thanks,
 Ming
