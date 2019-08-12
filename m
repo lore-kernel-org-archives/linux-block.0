@@ -6,24 +6,23 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FACCC433FF
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 14:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE077C41514
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 14:26:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2EDC420665
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 14:24:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 830B920665
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 14:26:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726995AbfHLOYF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Aug 2019 10:24:05 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39540 "EHLO mx1.suse.de"
+        id S1726911AbfHLO0o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Aug 2019 10:26:44 -0400
+Received: from mx2.suse.de ([195.135.220.15]:40564 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727805AbfHLOYE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Aug 2019 10:24:04 -0400
+        id S1726530AbfHLO0o (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Aug 2019 10:26:44 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 18F75AEA5;
-        Mon, 12 Aug 2019 14:24:03 +0000 (UTC)
-Subject: Re: [PATCH V2 3/5] blk-mq: stop to handle IO before hctx's all CPUs
- become offline
+        by mx1.suse.de (Postfix) with ESMTP id C576FB021;
+        Mon, 12 Aug 2019 14:26:42 +0000 (UTC)
+Subject: Re: [PATCH V2 4/5] blk-mq: re-submit IO in case that hctx is dead
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Minwoo Im <minwoo.im.dev@gmail.com>,
         Bart Van Assche <bvanassche@acm.org>,
@@ -32,7 +31,7 @@ Cc:     linux-block@vger.kernel.org, Minwoo Im <minwoo.im.dev@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Keith Busch <keith.busch@intel.com>
 References: <20190812134312.16732-1-ming.lei@redhat.com>
- <20190812134312.16732-4-ming.lei@redhat.com>
+ <20190812134312.16732-5-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -78,12 +77,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <7d757a7b-6e8f-3bb4-e9b9-7308cb86e2e3@suse.de>
-Date:   Mon, 12 Aug 2019 16:24:01 +0200
+Message-ID: <03516e51-a9ff-9ff2-9da0-d57cea7336f9@suse.de>
+Date:   Mon, 12 Aug 2019 16:26:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190812134312.16732-4-ming.lei@redhat.com>
+In-Reply-To: <20190812134312.16732-5-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -93,26 +92,11 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 8/12/19 3:43 PM, Ming Lei wrote:
-> Most of blk-mq drivers depend on managed IRQ's auto-affinity to setup
-> up queue mapping. Thomas mentioned the following point[1]:
+> When all CPUs in one hctx are offline, we shouldn't run this hw queue
+> for completing request any more.
 > 
-> "
->  That was the constraint of managed interrupts from the very beginning:
-> 
->   The driver/subsystem has to quiesce the interrupt line and the associated
->   queue _before_ it gets shutdown in CPU unplug and not fiddle with it
->   until it's restarted by the core when the CPU is plugged in again.
-> "
-> 
-> However, current blk-mq implementation doesn't quiesce hw queue before
-> the last CPU in the hctx is shutdown. Even worse, CPUHP_BLK_MQ_DEAD is
-> one cpuhp state handled after the CPU is down, so there isn't any chance
-> to quiesce hctx for blk-mq wrt. CPU hotplug.
-> 
-> Add new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE for blk-mq to stop queues
-> and wait for completion of in-flight requests.
-> 
-> [1] https://lore.kernel.org/linux-block/alpine.DEB.2.21.1904051331270.1802@nanos.tec.linutronix.de/
+> So steal bios from the request, and resubmit them, and finally free
+> the request in blk_mq_hctx_notify_dead().
 > 
 > Cc: Bart Van Assche <bvanassche@acm.org>
 > Cc: Hannes Reinecke <hare@suse.com>
@@ -121,111 +105,97 @@ On 8/12/19 3:43 PM, Ming Lei wrote:
 > Cc: Keith Busch <keith.busch@intel.com>
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  block/blk-mq-tag.c         |  2 +-
->  block/blk-mq-tag.h         |  2 ++
->  block/blk-mq.c             | 65 ++++++++++++++++++++++++++++++++++++++
->  include/linux/blk-mq.h     |  1 +
->  include/linux/cpuhotplug.h |  1 +
->  5 files changed, 70 insertions(+), 1 deletion(-)
+>  block/blk-mq.c | 48 +++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 41 insertions(+), 7 deletions(-)
 > 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index 008388e82b5c..31828b82552b 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -325,7 +325,7 @@ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
->   *		true to continue iterating tags, false to stop.
->   * @priv:	Will be passed as second argument to @fn.
->   */
-> -static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
-> +void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
->  		busy_tag_iter_fn *fn, void *priv)
->  {
->  	if (tags->nr_reserved_tags)
-> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-> index 61deab0b5a5a..321fd6f440e6 100644
-> --- a/block/blk-mq-tag.h
-> +++ b/block/blk-mq-tag.h
-> @@ -35,6 +35,8 @@ extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
->  extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
->  void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
->  		void *priv);
-> +void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
-> +		busy_tag_iter_fn *fn, void *priv);
->  
->  static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
->  						 struct blk_mq_hw_ctx *hctx)
 > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 6968de9d7402..6931b2ba2776 100644
+> index 6931b2ba2776..ed334fd867c4 100644
 > --- a/block/blk-mq.c
 > +++ b/block/blk-mq.c
-> @@ -2206,6 +2206,61 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->  	return -ENOMEM;
+> @@ -2261,10 +2261,30 @@ static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node *node)
+>  	return 0;
 >  }
 >  
-> +static bool blk_mq_count_inflight_rq(struct request *rq, void *data,
-> +				     bool reserved)
+> +static void blk_mq_resubmit_io(struct request *rq)
 > +{
-> +	unsigned *count = data;
+> +	struct bio_list list;
+> +	struct bio *bio;
 > +
-> +	if ((blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT))
-> +		(*count)++;
-> +
-> +	return true;
-> +}
-> +
-> +static unsigned blk_mq_tags_inflight_rqs(struct blk_mq_tags *tags)
-> +{
-> +	unsigned count = 0;
-> +
-> +	blk_mq_all_tag_busy_iter(tags, blk_mq_count_inflight_rq, &count);
-> +
-> +	return count;
-> +}
-> +
-> +static void blk_mq_drain_inflight_rqs(struct blk_mq_hw_ctx *hctx)
-> +{
-> +	while (1) {
-> +		if (!blk_mq_tags_inflight_rqs(hctx->tags))
-> +			break;
-> +		msleep(5);
-> +	}
-> +}
-> +
-> +static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node *node)
-> +{
-> +	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
-> +			struct blk_mq_hw_ctx, cpuhp_online);
-> +	unsigned prev_cpu = -1;
+> +	bio_list_init(&list);
+> +	blk_steal_bios(&list, rq);
 > +
 > +	while (true) {
-> +		unsigned next_cpu = cpumask_next_and(prev_cpu, hctx->cpumask,
-> +				cpu_online_mask);
-> +
-> +		if (next_cpu >= nr_cpu_ids)
+> +		bio = bio_list_pop(&list);
+> +		if (!bio)
 > +			break;
 > +
-> +		/* return if there is other online CPU on this hctx */
-> +		if (next_cpu != cpu)
-> +			return 0;
-> +
-> +		prev_cpu = next_cpu;
+> +		generic_make_request(bio);
 > +	}
 > +
-> +	set_bit(BLK_MQ_S_INTERNAL_STOPPED, &hctx->state);
-> +	blk_mq_drain_inflight_rqs(hctx);
-> +
-> +	return 0;
+> +	blk_mq_cleanup_rq(rq);
+> +	blk_mq_end_request(rq, 0);
 > +}
 > +
 >  /*
->   * 'cpu' is going away. splice any existing rq_list entries from this
->   * software queue to the hw queue dispatch list, and ensure that it
+> - * 'cpu' is going away. splice any existing rq_list entries from this
+> - * software queue to the hw queue dispatch list, and ensure that it
+> - * gets run.
+> + * 'cpu' has gone away. If this hctx is dead, we can't dispatch request
+> + * to the hctx any more, so steal bios from requests of this hctx, and
+> + * re-submit them to the request queue, and free these requests finally.
+>   */
+>  static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+>  {
+> @@ -2272,6 +2292,8 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+>  	struct blk_mq_ctx *ctx;
+>  	LIST_HEAD(tmp);
+>  	enum hctx_type type;
+> +	bool hctx_dead;
+> +	struct request *rq;
+>  
+>  	hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
+>  	ctx = __blk_mq_get_ctx(hctx->queue, cpu);
+> @@ -2279,6 +2301,9 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+>  
+>  	clear_bit(BLK_MQ_S_INTERNAL_STOPPED, &hctx->state);
+>  
+> +	hctx_dead = cpumask_first_and(hctx->cpumask, cpu_online_mask) >=
+> +		nr_cpu_ids;
+> +
+>  	spin_lock(&ctx->lock);
+>  	if (!list_empty(&ctx->rq_lists[type])) {
+>  		list_splice_init(&ctx->rq_lists[type], &tmp);
+> @@ -2289,11 +2314,20 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+>  	if (list_empty(&tmp))
+>  		return 0;
+>  
+> -	spin_lock(&hctx->lock);
+> -	list_splice_tail_init(&tmp, &hctx->dispatch);
+> -	spin_unlock(&hctx->lock);
+> +	if (!hctx_dead) {
+> +		spin_lock(&hctx->lock);
+> +		list_splice_tail_init(&tmp, &hctx->dispatch);
+> +		spin_unlock(&hctx->lock);
+> +		blk_mq_run_hw_queue(hctx, true);
+> +		return 0;
+> +	}
+> +
+> +	while (!list_empty(&tmp)) {
+> +		rq = list_entry(tmp.next, struct request, queuelist);
+> +		list_del_init(&rq->queuelist);
+> +		blk_mq_resubmit_io(rq);
+> +	}
+>  
+> -	blk_mq_run_hw_queue(hctx, true);
+>  	return 0;
+>  }
+>  
+> 
+So what happens when all CPUs assigned to a hardware queue go offline?
+Wouldn't blk_steal_bios() etc resend the I/O to the same hw queue,
+causing an infinite loop?
 
-Isn't that inverted?
-From the function I would assume it'll be called once the CPU is being
-set toe 'online', yet from the description I would have assumed the
-INTERNAL_STOPPED bit is set when the cpu goes offline.
-Care to elaborate?
+Don't we have to rearrange the hardware queues here?
 
 Cheers,
 
