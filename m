@@ -2,135 +2,101 @@ Return-Path: <SRS0=3NZC=WI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 761A5C433FF
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 15:40:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8DD9C31E40
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 16:03:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B18E2085A
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 15:40:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97DDC20665
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 16:03:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NRxCKeNW"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="RnEDrGWz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726497AbfHLPkL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Aug 2019 11:40:11 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:58140 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726383AbfHLPkL (ORCPT
+        id S1726334AbfHLQDT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Aug 2019 12:03:19 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:35041 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725822AbfHLQDT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Aug 2019 11:40:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
-        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=YTDBTjPd7ekLBRE5sGfdUi2mYhUHaZiKi+iIg/dveWc=; b=NRxCKeNWox69+UlTVzjzD3jVoi
-        71TKYXM2XLzdbZMtouKys7FuuHsa+vgM8P8gdNUkup636f6zgsZS2k8PStHsYdtSf0vhxH5C1zrJo
-        8/aMvuSJio3ipVofTRW+blLXSbKxPw7T7XR6hj7iW2+OyrJ10e2oz62U5QMPvULzKns33fbIQgR10
-        MsWSW6cA6CGaESuGqYU35onzPmTkrBfnqiHCMPUwh81A0iamCuMFOa62pvyErSAIQb33nkGcWjaFt
-        riiAjv6XIrLaxES1Wb9hJJxHsn3M/eOMNfb7DNYHn5wpoj0uSrwW95t4A1oL4LgJIcq//Wz4IZoYU
-        VKEvqtBQ==;
-Received: from [2001:4bb8:180:1ec3:c70:4a89:bc61:2] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hxCQb-0003YC-VW; Mon, 12 Aug 2019 15:40:10 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 3/3] block: move same page handling from __bio_add_pc_page to the callers
-Date:   Mon, 12 Aug 2019 17:39:58 +0200
-Message-Id: <20190812153958.29560-4-hch@lst.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190812153958.29560-1-hch@lst.de>
-References: <20190812153958.29560-1-hch@lst.de>
+        Mon, 12 Aug 2019 12:03:19 -0400
+Received: by mail-ot1-f67.google.com with SMTP id g17so9780264otl.2
+        for <linux-block@vger.kernel.org>; Mon, 12 Aug 2019 09:03:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=y2vC5MASi0neUbnDo7XSWsxJ0q98nBk3UrdR+dIcZtA=;
+        b=RnEDrGWzjAn/f3aQRxaVDqOwZHyKXULAlS6mvSyYbl0Dz6KNCrj9HhycvI4boX95M+
+         guluq7bkf9xfhp9YNLAT6nb7gklSAQ729NHV7yGeBFrNWo4X3q9bR0HfUz+3vORrTo/4
+         l2bjvVPNVtM9r+O3Y6L0op8lyvDix4662p1OiuAwLap0YtnI95VxAIrY77IH5PLcVsV9
+         veNDRb05aES2ftgfUsynEIdCINVJMLPF/6DUfHyD+JQxU4kkd0qBiBDRCBthSAlW26Ol
+         WRz75Qo9N2azRNTYSG7RcZ1LVLXel6gBORned6DeIDQbD3MPuQKiMeEdxkyEV3fi6Mmo
+         kC/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=y2vC5MASi0neUbnDo7XSWsxJ0q98nBk3UrdR+dIcZtA=;
+        b=uDDFXa5iBLQ3oEpRSkQxBJ/oeqFIy1nIHUxuF1p9oksGSHn6ti3oZn2xicvFIAqj30
+         d1U15ud2udsLQjuyrAZ3AJdmMgniXOuLOmIw4rK6MRJ4xGt0nY1kFb27TIUHGkvzD9WW
+         1jU0K4UHUPWxzPlyOp+ANFWpf0uqNrDiJFr9iYdo0YP/6K68h9FJ6r2clxJ8SOsZMOjv
+         TXkkZFp+fJJDBZrm8xeJFLxzkPTzVO+PpDkdSOB6qiVgOj7kA5CcsmSoE8X36fdYelnw
+         YKjU6e+ArUGPJqQrO8daehvKZhZotVkOHGWuJ+WVMOZiA9Fqr7kuJrtNTUZF1+DEBhfc
+         AB3Q==
+X-Gm-Message-State: APjAAAUTr7jHNxOAKVmtsGqVN5iLnmurvkoCYv6amx6RdrixeSVip3CS
+        +j2X5jbDyWN7IzvclOxUx7INQJiEa9q09Q==
+X-Google-Smtp-Source: APXvYqywlwoe3JQh7ZmfdQLqNhkxuQ/rP+bz36b0eEFcUMsxpGnlbKLfZ1PIW8PYCOU+aq83ocbG9Q==
+X-Received: by 2002:a6b:6f06:: with SMTP id k6mr11107648ioc.232.1565625798858;
+        Mon, 12 Aug 2019 09:03:18 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id o3sm17282188ioo.74.2019.08.12.09.03.17
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 12 Aug 2019 09:03:17 -0700 (PDT)
+Subject: Re: [PATCH] liburing/barrier.h: Add prefix io_uring to barriers
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Julia Suvorova <jusual@redhat.com>
+Cc:     linux-block@vger.kernel.org, Stefan Hajnoczi <stefanha@gmail.com>,
+        Aarushi Mehta <mehta.aaru20@gmail.com>
+References: <20190812123933.24814-1-jusual@redhat.com>
+ <592fe38c-1fa2-9ba5-cd6c-da69c95edb33@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <75c89da5-2ec1-9725-62c8-f6abd3a24202@kernel.dk>
+Date:   Mon, 12 Aug 2019 10:03:16 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <592fe38c-1fa2-9ba5-cd6c-da69c95edb33@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hiding page refcount manipulation inside a low-level bio helper is
-somewhat awkward.  Instead return the same page information to the
-callers, where it fits in much better.
+On 8/12/19 7:55 AM, Bart Van Assche wrote:
+> On 8/12/19 5:39 AM, Julia Suvorova wrote:
+>> -#define mb()	asm volatile("mfence" ::: "memory")
+>> -#define rmb()	asm volatile("lfence" ::: "memory")
+>> -#define wmb()	asm volatile("sfence" ::: "memory")
+>> -#define smp_rmb() barrier()
+>> -#define smp_wmb() barrier()
+>> +#define io_uring_mb()		asm volatile("mfence" ::: "memory")
+>> +#define io_uring_rmb()		asm volatile("lfence" ::: "memory")
+>> +#define io_uring_wmb()		asm volatile("sfence" ::: "memory")
+>> +#define io_uring_smp_rmb()	io_uring_barrier()
+>> +#define io_uring_smp_wmb()	io_uring_barrier()
+> 
+> Do users of liburing need these macros? If not, have you considered to
+> move these macros to a new header file that is only used inside liburing
+> and such that these macros are no longer visible to liburing users?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bio.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+The exposed API should not need any explicit barriers from the user,
+so this suggestion makes a lot of sense to me.
 
-diff --git a/block/bio.c b/block/bio.c
-index 6ea4b9257667..11aa6738ed62 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -669,7 +669,7 @@ static bool bio_try_merge_pc_page(struct request_queue *q, struct bio *bio,
-  *	@page: page to add
-  *	@len: vec entry length
-  *	@offset: vec entry offset
-- *	@put_same_page: put the page if it is same with last added page
-+ *	@same_page: return if the merge happen inside the same page
-  *
-  *	Attempt to add a page to the bio_vec maplist. This can fail for a
-  *	number of reasons, such as the bio being full or target block device
-@@ -680,10 +680,9 @@ static bool bio_try_merge_pc_page(struct request_queue *q, struct bio *bio,
-  */
- static int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
- 		struct page *page, unsigned int len, unsigned int offset,
--		bool put_same_page)
-+		bool *same_page)
- {
- 	struct bio_vec *bvec;
--	bool same_page = false;
- 
- 	/*
- 	 * cloned bio must not modify vec list
-@@ -695,12 +694,8 @@ static int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
- 		return 0;
- 
- 	if (bio->bi_vcnt > 0) {
--		if (bio_try_merge_pc_page(q, bio, page, len, offset,
--				&same_page)) {
--			if (put_same_page && same_page)
--				put_page(page);
-+		if (bio_try_merge_pc_page(q, bio, page, len, offset, same_page))
- 			return len;
--		}
- 
- 		/*
- 		 * If the queue doesn't support SG gaps and adding this segment
-@@ -729,7 +724,8 @@ static int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
- int bio_add_pc_page(struct request_queue *q, struct bio *bio,
- 		struct page *page, unsigned int len, unsigned int offset)
- {
--	return __bio_add_pc_page(q, bio, page, len, offset, false);
-+	bool same_page = false;
-+	return __bio_add_pc_page(q, bio, page, len, offset, &same_page);
- }
- EXPORT_SYMBOL(bio_add_pc_page);
- 
-@@ -1370,13 +1366,17 @@ struct bio *bio_map_user_iov(struct request_queue *q,
- 			for (j = 0; j < npages; j++) {
- 				struct page *page = pages[j];
- 				unsigned int n = PAGE_SIZE - offs;
-+				bool same_page = false;
- 
- 				if (n > bytes)
- 					n = bytes;
- 
- 				if (!__bio_add_pc_page(q, bio, page, n, offs,
--							true))
-+						&same_page)) {
-+					if (same_page)
-+						put_page(page);
- 					break;
-+				}
- 
- 				added += n;
- 				bytes -= n;
 -- 
-2.20.1
+Jens Axboe
 
