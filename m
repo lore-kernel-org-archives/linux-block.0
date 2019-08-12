@@ -2,91 +2,92 @@ Return-Path: <SRS0=3NZC=WI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 620E6C433FF
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 15:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07591C433FF
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 15:34:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 337CC208C2
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 15:23:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RFejK4Mg"
+	by mail.kernel.org (Postfix) with ESMTP id D683E20842
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 15:34:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727081AbfHLPXl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Aug 2019 11:23:41 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:50176 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726831AbfHLPXl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Aug 2019 11:23:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=j335fiiDQMBjJDi/0YItD4IEXZCw2bFlsQGThx9UUxc=; b=RFejK4MgtfOMyLRCkPcGWWTXk
-        nTXMwXgnvOqZBGhKIdS/oTSJC7Fa85pRnJpLb7/jmoDHvGt61cOj4sd/jUfzOjmAhwKkJxvFq1SaV
-        XiwPP5ctlHaLhGtfWQPjQ8/0lfftVXJfOlBjbWk+B0IDUDkXl1kii7giVW1MT54tQFaITVWSYQHgL
-        mvUbOF1EpBU8ob8+BygFFUD/GZdH7lceZc9oHRBQ+TOVrjJD1JsXp5w8kquMyGbYL3L+qYdUjt1z+
-        vo5heiTAcl4VEqb3Dmlgae8apLDPWMUyZJ0wmeKksUAfdqieEIFJqSdegrazCsWwroeB82cwHwW59
-        fLV17OjtA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1hxCAd-0005L5-Uf; Mon, 12 Aug 2019 15:23:39 +0000
-Date:   Mon, 12 Aug 2019 08:23:39 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     James Bottomley <jejb@linux.vnet.ibm.com>
-Cc:     Douglas Gilbert <dgilbert@interlog.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, martin.petersen@oracle.com,
-        hare@suse.de, bvanassche@acm.org
-Subject: Re: [PATCH v3 00/20] sg: add v4 interface
-Message-ID: <20190812152339.GA15295@infradead.org>
-References: <20190807114252.2565-1-dgilbert@interlog.com>
- <1565291455.3435.48.camel@linux.vnet.ibm.com>
+        id S1726463AbfHLPeq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Aug 2019 11:34:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55762 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725843AbfHLPeq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Aug 2019 11:34:46 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BE0BF307D84B;
+        Mon, 12 Aug 2019 15:34:45 +0000 (UTC)
+Received: from [10.10.124.11] (ovpn-124-11.rdu2.redhat.com [10.10.124.11])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0938637DD;
+        Mon, 12 Aug 2019 15:34:44 +0000 (UTC)
+Subject: Re: [PATCH] nbd: add a missed nbd_config_put() in nbd_xmit_timeout()
+To:     Sun Ke <sunke32@huawei.com>, josef@toxicpanda.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org
+References: <1565613086-13776-1-git-send-email-sunke32@huawei.com>
+From:   Mike Christie <mchristi@redhat.com>
+Message-ID: <5D518714.5000408@redhat.com>
+Date:   Mon, 12 Aug 2019 10:34:44 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
+ Thunderbird/38.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1565291455.3435.48.camel@linux.vnet.ibm.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <1565613086-13776-1-git-send-email-sunke32@huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 12 Aug 2019 15:34:45 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 08, 2019 at 12:10:55PM -0700, James Bottomley wrote:
-> Since this will be an extension of something that exists both in your
-> sg driver and in the block bsg interface (and thus needs an
-> implementation there), I added both linux-block and linux-api to the cc
-> (the latter because you're adding to an API).
+On 08/12/2019 07:31 AM, Sun Ke wrote:
+> When try to get the lock failed, before return, execute the
+> nbd_config_put() to decrease the nbd->config_refs.
 > 
-> Simply extending sg to use the v4 header protocol in uapi/linux/bsg.h
-> is fine modulo the code being in the right form.  The problems are the
-> new ioctls you want to add that would need to be present there as well.
->  The specific question being how we support async or non-blocking I/O
-> on the sg and bsg interfaces.  The standard way we add asynchronous I/O
-> is supposed to be via .poll on the file descriptor.  you already use
-> read and write in sg and bsg doesn't have a polling interface, but it
-> looks like we could use MSG to signal an ioctl is ready to be serviced
-> for both.  Would shifting to a non-blocking poll based interface for
-> ioctls remove the need to add these SG_IOSUBMIT/SG_IORECEIVE ioctls
-> since we could now do everything over blocking or non-blocking SG_IO?
+> If the nbd->config_refs is added but not decreased. Then will not
+> execute nbd_clear_sock() in nbd_config_put(). bd->task_setup will
+> not be cleared away. Finally, print"Device being setup by another
+> task" in nbd_add_sock() and nbd device can not be reused.
+> 
+> Fixes: 8f3ea35929a0 ("nbd: handle unexpected replies better")
+> Signed-off-by: Sun Ke <sunke32@huawei.com>
+> ---
+>  drivers/block/nbd.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index e21d2de..a69a90a 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -357,8 +357,10 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+>  	}
+>  	config = nbd->config;
+>  
+> -	if (!mutex_trylock(&cmd->lock))
+> +	if (!mutex_trylock(&cmd->lock)) {
+> +		nbd_config_put(nbd);
+>  		return BLK_EH_RESET_TIMER;
+> +	}
+>  
+>  	if (config->num_connections > 1) {
+>  		dev_err_ratelimited(nbd_to_dev(nbd),
+> 
 
-I've spent some wading through this patchset, and it is huge.  I thing
-we need to stage it a bit better and split it into multiple.
+I just sent the same patch
 
- 1) One (or maybe even multiple) with all the cleanups and minor
-    speedups.  That alone is a lot of changes, and will take a while
-    to settle
- 2) extending the bsg/v4 API to /dev/sg.  I think that is very useful,
-    although I need to look at the details a bit more
- 3) adding a new async API.  While this seems very useful from the
-    theoretical perspective, I really thing the guts need to be in
-    common code and then be used by sg and the block device nodes
-    (if it happens to be an ioctl).  What worries me a bit there
-    is that we have another way to deal with async I/O.  I wonder
-    if we can fit this into aio/io_uring somehow.  But I'd rather
-    not even thing about that much until we've done all the groundwork.
+https://www.spinics.net/lists/linux-block/msg43718.html
+
+here
+
+https://www.spinics.net/lists/linux-block/msg43715.html
+
+so it looks good to me.
+
+Reviewed-by: Mike Christie <mchristi@redhat.com>
