@@ -6,68 +6,70 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A86CAC31E40
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 14:17:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1708EC433FF
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 14:18:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5721B20679
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 14:17:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFC1C20679
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 14:18:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="njLP4ZMa"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Kk64r5VS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727764AbfHLORD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Aug 2019 10:17:03 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:34501 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726605AbfHLORD (ORCPT
+        id S1726354AbfHLOSw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Aug 2019 10:18:52 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:38861 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726296AbfHLOSw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Aug 2019 10:17:03 -0400
-Received: by mail-pf1-f194.google.com with SMTP id b13so49763986pfo.1
-        for <linux-block@vger.kernel.org>; Mon, 12 Aug 2019 07:17:03 -0700 (PDT)
+        Mon, 12 Aug 2019 10:18:52 -0400
+Received: by mail-pg1-f196.google.com with SMTP id z14so12331247pga.5
+        for <linux-block@vger.kernel.org>; Mon, 12 Aug 2019 07:18:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Hjm5zIRUG1rVFASTjyjP9Aq60PPfTvqAdxXcDryP2Y0=;
-        b=njLP4ZMacYdtFtqIH2bWbhUs3B0orNhpOwNoZ0xMNf+3XG/nowQtTPNxxk/ncwvvpT
-         AjaqI0ZFrwZ5Ypqzu4LkUetH1TnBgzMcJAi0XgE0EnQSc/hNRwX9gmtKaRTkRrHJxCMk
-         kMxMm+KNUe0vVDbj1DUepNIXBdNCTpELxvU/H9eVeKNGVqJJaScR4kY6pxYZ7QATNGDD
-         nTiyGWTaUoAZAZtEhJCQDq+79fMA7uYc0EyqER4ZdPYcKGNplvdhybFNFIsFayxKZwZi
-         uRxvK1GFuqQOZc5S6qWjnNrPzBRPkG8GDGgRbauXnkVuIcc5NUjyRnmidrjp+QB0VGYe
-         3F/w==
+        bh=7rrMGWz+cOb7SutGzZqKRd+swOkY9Fr7uDlylm/LIEA=;
+        b=Kk64r5VS2ussB1Th19KWQGM0tqg1CvhoXPzjTJeq2UhXZTRgzlKj2xRBylyqZp/Ji4
+         XYspgHHlaMvUnCk6Vs+98dbPKx3L06DdBpKGgm5KO3X47SxEg64u8j1tQZSVJPH8TiR5
+         akPX2w8NvMur/EGP1HYpH6N3i82x2laj6lSYHtkK4WRMqsOXUmthMfNDrZDzzf7wvB6q
+         HtXguBSt7WGu4vKb/MV6ONqSRWNqz5tMgMXBDcj5qJhToi5HpK26fW/upGOc52ncqLfd
+         ISP8EcrhIOlLyBQg5Cb6qTVx4NjXMrNwiqstVb8JgfSqbSKNm8EWLv3PUzUmdQLfM2TR
+         ExSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Hjm5zIRUG1rVFASTjyjP9Aq60PPfTvqAdxXcDryP2Y0=;
-        b=jP34wpDelQdNUeLjJavtE5ENXKyUi1K7SFqzkIdh+iBFcHvVS66quYLcn5tUGPZ8zX
-         zAdH7FBXcazHItcWF0aaO7ftbClwYoWy6TSle5wT2xp0LZGreztCL3RozTJMzW9CAF6k
-         Hj/S10wX45Pf3DFG/7RZmoWf0G5X5hdybyfdbF4n2y/T86OkX4ccCOhzJS191KRhsdg2
-         gCFlGLK7E6ZjI9HTmvvEzGV6G9aEujfIA0TXNwFa8GeAmKfaVfD1cp+LWHFWpwdBYx2N
-         lByX5n11AV2XtVDyAEbdo7iGMoQiXQ5VMwI3orVZL6gbaWim/T0SwfbdWKPg376WHu5L
-         UE4Q==
-X-Gm-Message-State: APjAAAUeFSCnyBKEsTIlSbKE3ljXw+HgypT4/eJGRhefnJI+35ilSSGi
-        Zr9lzoZ7p7uJ57N0bDkziqZV6Q==
-X-Google-Smtp-Source: APXvYqxicOrLucvAZkbMWAmW/KpjOj9NBBiSJYXj1QNug6OYNBLNpY5g+LrI/AGcfvyR3YEszEKDfw==
-X-Received: by 2002:a63:2744:: with SMTP id n65mr30029753pgn.277.1565619422739;
-        Mon, 12 Aug 2019 07:17:02 -0700 (PDT)
+        bh=7rrMGWz+cOb7SutGzZqKRd+swOkY9Fr7uDlylm/LIEA=;
+        b=R5aagimDnZgDrlerLsbJqmrX7jO/trlCMLc7z7k6613FgNIG9vRdC8FMH12ovHclqc
+         RL6XJv9zYEYu3s8QMrZdM+4bKLMnXgUP5nDnzJh1dWILi6uSgPCiQPuf6l5yGFFJDqry
+         LOReeeseyIWLAe4kr9LvFXzoOg8xltZC99tAJGnGrKSDgditCcgNL+siqBUP4B3az0z/
+         hlnFo/BtQOd7fp5aC5gA4M2t6QeF040MOacmtWGKrzfTo5EXNv1m0hPIx9sSr1+IAZDW
+         6gzVED1nijHNqD0JdCJ/mB3KMTe4SG8UBBTTT1o61Bg87xJzJHGVsGbJyd5es4aUMLAz
+         EtwQ==
+X-Gm-Message-State: APjAAAX2fHCLbsomeFUYk97QU4gpp64OmrgWtI83BfnR5iyYojjSZ0Zh
+        dwoFujNRR4F7sO34SCVz+5+CCg==
+X-Google-Smtp-Source: APXvYqzbxyx0fmxJS1Ju4I3T95etCWQ9Tx7GsBM119oZzixfSTVP+n/gCY/etw1wPdiR6UM5OdrXjw==
+X-Received: by 2002:aa7:8108:: with SMTP id b8mr16421518pfi.197.1565619531291;
+        Mon, 12 Aug 2019 07:18:51 -0700 (PDT)
 Received: from [192.168.1.188] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id q13sm8499863pfl.124.2019.08.12.07.17.01
+        by smtp.gmail.com with ESMTPSA id o9sm70853775pgv.19.2019.08.12.07.18.49
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 12 Aug 2019 07:17:01 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: Fix memory leak in blk_mq_init_allocated_queue
- error handling
-To:     zhengbin <zhengbin13@huawei.com>, ming.lei@redhat.com,
-        linux-block@vger.kernel.org
-Cc:     yi.zhang@huawei.com
-References: <1563891042-25448-1-git-send-email-zhengbin13@huawei.com>
+        Mon, 12 Aug 2019 07:18:50 -0700 (PDT)
+Subject: Re: [PATCH] xen/blkback: fix memory leaks
+To:     Wenwen Wang <wenwen@cs.uga.edu>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        "moderated list:XEN BLOCK SUBSYSTEM" <xen-devel@lists.xenproject.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+References: <1565544202-3927-1-git-send-email-wenwen@cs.uga.edu>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fbbc52cf-04c2-2bdf-f2a2-234c57d1d1ae@kernel.dk>
-Date:   Mon, 12 Aug 2019 08:17:00 -0600
+Message-ID: <0b0bce35-a735-2484-37fa-11d7d3570a1b@kernel.dk>
+Date:   Mon, 12 Aug 2019 08:18:48 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1563891042-25448-1-git-send-email-zhengbin13@huawei.com>
+In-Reply-To: <1565544202-3927-1-git-send-email-wenwen@cs.uga.edu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -76,15 +78,14 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/23/19 7:10 AM, zhengbin wrote:
-> If blk_mq_init_allocated_queue->elevator_init_mq fails, need to release
-> the previously requested resources.
-> 
-> Fixes: d34849913 ("blk-mq-sched: allow setting of default IO scheduler")
+On 8/11/19 10:23 AM, Wenwen Wang wrote:
+> In read_per_ring_refs(), after 'req' and related memory regions are
+> allocated, xen_blkif_map() is invoked to map the shared frame, irq, and
+> etc. However, if this mapping process fails, no cleanup is performed,
+> leading to memory leaks. To fix this issue, invoke the cleanup before
+> returning the error.
 
-Please always use 12 char abbreviations for git shas. I fixed it up.
-
-But thanks for the patch, applied.
+Applied, thanks.
 
 -- 
 Jens Axboe
