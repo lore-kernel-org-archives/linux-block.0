@@ -2,89 +2,110 @@ Return-Path: <SRS0=3NZC=WI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99065C31E40
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 13:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB25BC433FF
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 13:43:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C778206C2
-	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 13:40:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZhLp6AZo"
+	by mail.kernel.org (Postfix) with ESMTP id A0ADE20665
+	for <linux-block@archiver.kernel.org>; Mon, 12 Aug 2019 13:43:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726538AbfHLNk4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Aug 2019 09:40:56 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:33143 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726502AbfHLNk4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Aug 2019 09:40:56 -0400
-Received: by mail-qt1-f194.google.com with SMTP id v38so10399034qtb.0
-        for <linux-block@vger.kernel.org>; Mon, 12 Aug 2019 06:40:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dSKRXGL/+plLto3WJPtbZQ6KO+hSsWvmFnRTt1dlNH0=;
-        b=ZhLp6AZoKqWhg8Ucptk+pLo9uaCCUU8mVjkyhgPemnxlkY14tpjJOfib2Wy1QBUndy
-         hWMeKfomvd9goicQahQ7KK0c2eQuJRLIYnqFSAun5Jmcql+aS19QeSwPlV7W2VJqlFhn
-         uF7Zw0qwmVgaByWOqqNN4YN3PJierJgbwPzk/tfwM3Un2e1DP+nOS8QTI0lzV6BjHrHH
-         ubnFyvCbB5ZbgSw1tNBrius6ITeYQq5NyjYqnISSRPSqCiWpAeaiqBnmrTAJ5lbl9xzb
-         zvaViyCzOMkxgm3uKzFOyOw3sgHk0Q9AujB4sunCqEXnZeQ4NQPkXAqREJPmVUEpddKU
-         FBqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dSKRXGL/+plLto3WJPtbZQ6KO+hSsWvmFnRTt1dlNH0=;
-        b=Nkaoubf85ayvYgAp1U8jk7mPvpZfS8vEIuiZ/5oDdBXDayOyRv9eK66VtVzn3M9nbp
-         EZ1TBFifHDTmWiQQZTjK/3L7Mk3NOXWo/4SWE7rEI1eEoQPVsS3el/ioxty+FT9xuNT1
-         aViYThfGLO1xiRfVgpFg4qPFehUTBEdDeKk+P6/9XAoFlW5IQAvVhKYOH72v9xlzi98+
-         o6W35oBnx3Eqea5Jh70QpaSUYL9fi7B+6dGAl99nlptJaXN4EmCTwxQ0jGopD+AsfE5L
-         nrM2mja2d0EmrP25rOSkXYtSlIYULd28fPg0a7M0miBIy2PIgGUx4+2CQ3Ci+6LEqKD8
-         cCCA==
-X-Gm-Message-State: APjAAAVeVDwUvA8znkBCAWfohXfNA7DHCLzSugKTVXdwinl14NEEj5MA
-        kX6lc7U5F5ekJ/oNrSRcDnz1c/PDmkxEAPvNVj6mk2dDAFQ=
-X-Google-Smtp-Source: APXvYqzCzKuUpNLcRbh5woMxr/qfpgGqTqweAfP/qmr53h4CPwfvxG0/1omN+uNvTYFDSOaRV0lpbl7si2ltHvkMSZo=
-X-Received: by 2002:a0c:d851:: with SMTP id i17mr30224587qvj.243.1565617255092;
- Mon, 12 Aug 2019 06:40:55 -0700 (PDT)
+        id S1727029AbfHLNnb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Aug 2019 09:43:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43662 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726998AbfHLNnb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Aug 2019 09:43:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A5EFD30FB8F7;
+        Mon, 12 Aug 2019 13:43:30 +0000 (UTC)
+Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 41F8E5D6D0;
+        Mon, 12 Aug 2019 13:43:26 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Minwoo Im <minwoo.im.dev@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>
+Subject: [PATCH V2 0/5] blk-mq: improvement on handling IO during CPU hotplug
+Date:   Mon, 12 Aug 2019 21:43:07 +0800
+Message-Id: <20190812134312.16732-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20190812123933.24814-1-jusual@redhat.com>
-In-Reply-To: <20190812123933.24814-1-jusual@redhat.com>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Mon, 12 Aug 2019 14:40:44 +0100
-Message-ID: <CAJSP0QXoNOhuFQs2WRXT3md=xOT0RcYe77Xs+vphsZ_oRc4V1w@mail.gmail.com>
-Subject: Re: [PATCH] liburing/barrier.h: Add prefix io_uring to barriers
-To:     Julia Suvorova <jusual@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Aarushi Mehta <mehta.aaru20@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Mon, 12 Aug 2019 13:43:30 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 12, 2019 at 1:39 PM Julia Suvorova <jusual@redhat.com> wrote:
-> diff --git a/src/include/liburing/barrier.h b/src/include/liburing/barrier.h
-> index 98be9e5..4f3d1d7 100644
-> --- a/src/include/liburing/barrier.h
-> +++ b/src/include/liburing/barrier.h
-> @@ -23,7 +23,7 @@ after the acquire operation executes. This is implemented using
->  /* From tools/include/linux/compiler.h */
->  /* Optimization barrier */
->  /* The "volatile" is due to gcc bugs */
-> -#define barrier() __asm__ __volatile__("": : :"memory")
-> +#define io_uring_barrier()     __asm__ __volatile__("": : :"memory")
->
->  /* From tools/virtio/linux/compiler.h */
->  #define WRITE_ONCE(var, val) \
+Hi,
 
-Please prefix WRITE_ONCE() and READ_ONCE() with IO_URING_ as well.
-They are fairly likely to be used in code derived from the Linux
-kernel.
+Thomas mentioned:
+    "
+     That was the constraint of managed interrupts from the very beginning:
+    
+      The driver/subsystem has to quiesce the interrupt line and the associated
+      queue _before_ it gets shutdown in CPU unplug and not fiddle with it
+      until it's restarted by the core when the CPU is plugged in again.
+    "
 
-Otherwise:
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+But no drivers or blk-mq do that before one hctx becomes dead(all
+CPUs for one hctx are offline), and even it is worse, blk-mq stills tries
+to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead().
+
+This patchset tries to address the issue by two stages:
+
+1) add one new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE
+
+- mark the hctx as internal stopped, and drain all in-flight requests
+if the hctx is going to be dead.
+
+2) re-submit IO in the state of CPUHP_BLK_MQ_DEAD after the hctx becomes dead
+
+- steal bios from the request, and resubmit them via generic_make_request(),
+then these IO will be mapped to other live hctx for dispatch
+
+Please comment & review, thanks!
+
+V2:
+	- patch4 & patch 5 in V1 have been merged to block tree, so remove
+	  them
+	- address comments from John Garry and Minwoo
+
+
+Ming Lei (5):
+  blk-mq: add new state of BLK_MQ_S_INTERNAL_STOPPED
+  blk-mq: add blk-mq flag of BLK_MQ_F_NO_MANAGED_IRQ
+  blk-mq: stop to handle IO before hctx's all CPUs become offline
+  blk-mq: re-submit IO in case that hctx is dead
+  blk-mq: handle requests dispatched from IO scheduler in case that hctx
+    is dead
+
+ block/blk-mq-debugfs.c     |   2 +
+ block/blk-mq-tag.c         |   2 +-
+ block/blk-mq-tag.h         |   2 +
+ block/blk-mq.c             | 143 +++++++++++++++++++++++++++++++++----
+ block/blk-mq.h             |   3 +-
+ drivers/block/loop.c       |   2 +-
+ drivers/md/dm-rq.c         |   2 +-
+ include/linux/blk-mq.h     |   5 ++
+ include/linux/cpuhotplug.h |   1 +
+ 9 files changed, 146 insertions(+), 16 deletions(-)
+
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Keith Busch <keith.busch@intel.com>
+-- 
+2.20.1
+
