@@ -2,106 +2,121 @@ Return-Path: <SRS0=l92v=WJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 307B7C32750
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 08:20:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3507BC32750
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 08:31:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0651C206C1
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 08:20:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Y13i+U+x"
+	by mail.kernel.org (Postfix) with ESMTP id 15A5A20663
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 08:31:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727166AbfHMIU3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Aug 2019 04:20:29 -0400
-Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:9755 "EHLO
-        esa5.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727029AbfHMIU2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Aug 2019 04:20:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1565684428;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=MSNDb5M/uhPTXoW2QG6d7ZGLQTVW3BXr4dqZJhjvQKQ=;
-  b=Y13i+U+x/AgK3isELAIBDsHkbNux7rc1RKX2+zt0jz+pec7S/CmE3nMb
-   VRCmM4zdkvDAdcOCvgmWIRhu2KQZxmMqMafGeVFyXV7PTILtlb6MyO6vM
-   2akom2Z1OOv92hF5gKT9b+715PxBS2I4iper+udSswO6k4yJWkmKT02m+
-   Q=;
-Authentication-Results: esa5.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
-  receiver=esa5.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible
-Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
-  roger.pau@citrix.com designates 162.221.158.21 as permitted
-  sender) identity=mailfrom; client-ip=162.221.158.21;
-  receiver=esa5.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible; x-record-type="v=spf1";
-  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
-  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
-  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
-  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  postmaster@mail.citrix.com) identity=helo;
-  client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="postmaster@mail.citrix.com";
-  x-conformance=sidf_compatible
-IronPort-SDR: YyJYPQ6VXMkgmOH9bE1bW7wGRnEWWYVdrhqf1LUNH9JZt+GUSq/a+mDF8iOZMrkfEZepWz3MKB
- Nbl/e827DePlYKulChWdpxlyiyCPXsSZwI3waKlSrxQtvyQHMnB796aa+296RQS+E6MqK4aQiJ
- Ih2+dXOCKw2EarPKHZodwm4FdZkwjlQZF+Psh/QfCgm0QI1BZrC0/Rs7ltNVStNAsgoeRAzvAI
- J0wCCJBaCBN938BDYB6CeYXoTL2y3zsHEmo7JiHgunnzNyMeFLf/2QMEZHcjVWFJqd/8sKSpgQ
- yWU=
-X-SBRS: 2.7
-X-MesageID: 4340732
-X-Ironport-Server: esa5.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.64,380,1559534400"; 
-   d="scan'208";a="4340732"
-Date:   Tue, 13 Aug 2019 10:20:00 +0200
-From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To:     Chuhong Yuan <hslester96@gmail.com>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <xen-devel@lists.xenproject.org>
-Subject: Re: [Xen-devel] [PATCH v2 3/3] xen/blkback: Use refcount_t for
- refcount
-Message-ID: <20190813082000.shprs2ci33v5eapd@Air-de-Roger>
-References: <20190813061650.5483-1-hslester96@gmail.com>
+        id S1728159AbfHMIbV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Aug 2019 04:31:21 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4668 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727784AbfHMIbU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Aug 2019 04:31:20 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 1687FFF1F082E568E156;
+        Tue, 13 Aug 2019 16:31:15 +0800 (CST)
+Received: from [127.0.0.1] (10.202.227.238) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 13 Aug 2019
+ 16:31:03 +0800
+Subject: Re: [PATCH 0/9] blk-mq/scsi: convert private reply queue into blk_mq
+ hw queue
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+References: <20190531022801.10003-1-ming.lei@redhat.com>
+ <d1c786d8-d3a9-551b-52fb-fe6f7805e50e@huawei.com>
+CC:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Don Brace <don.brace@microsemi.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        "Sathya Prakash" <sathya.prakash@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>,
+        chenxiang <chenxiang66@hisilicon.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <b862dfc7-dfcf-1986-8f18-75ae7f02510c@huawei.com>
+Date:   Tue, 13 Aug 2019 09:30:56 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190813061650.5483-1-hslester96@gmail.com>
-User-Agent: NeoMutt/20180716
-X-ClientProxiedBy: AMSPEX02CAS01.citrite.net (10.69.22.112) To
- AMSPEX02CL02.citrite.net (10.69.22.126)
+In-Reply-To: <d1c786d8-d3a9-551b-52fb-fe6f7805e50e@huawei.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.238]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 13, 2019 at 02:16:50PM +0800, Chuhong Yuan wrote:
-> Reference counters are preferred to use refcount_t instead of
-> atomic_t.
-> This is because the implementation of refcount_t can prevent
-> overflows and detect possible use-after-free.
-> So convert atomic_t ref counters to refcount_t.
-> 
-> Signed-off-by: Chuhong Yuan <hslester96@gmail.com>
+On 04/06/2019 09:49, John Garry wrote:
+> On 31/05/2019 03:27, Ming Lei wrote:
+>> Hi,
 
-Acked-by: Roger Pau Monné <roger.pau@citrix.com>
 
-Thanks, Roger.
+Hi Ming,
+
+I'm raising the hostwide tags issue again, which I brought up in 
+https://www.spinics.net/lists/linux-block/msg43754.html
+
+Here's that discussion:
+
+ >> I don't mean to hijack this thread, but JFYI we're getting around to 
+test
+ >> https://github.com/ming1/linux/commits/v5.2-rc-host-tags-V2 - 
+unfortunately
+ >> we're still seeing a performance regression. I can't see where it's 
+coming
+ >> from. We're double-checking the test though.
+ >
+ > host-tag patchset is only for several particular drivers which use
+ > private reply queue as completion queue.
+ >
+ > This patchset is for handling generic blk-mq CPU hotplug issue, and
+ > the several particular scsi drivers(hisi_sas_v3, hpsa, megaraid_sas and
+ > mp3sas) won't be covered so far.
+ >
+ > I'd suggest to move on for generic blk-mq devices first given now blk-mq
+ > is the only request IO path now.
+ >
+ > There are at least two choices for us to handle drivers/devices with
+ > private completion queue:
+ >
+ > 1) host-tags
+ > - performance issue shouldn't be hard to solve, given it is same with
+ > with single tags in theory, and just corner cases is there.
+ >
+ > What I am not glad with this approach is that blk-mq-tag code becomes 
+mess.
+
+Right, not so neat. And we see a 3M vs 2.4M IOPS drop with this 
+patchset. That's without any optimisation like discussed in 
+https://lkml.org/lkml/2019/8/10/124
+
+And I don't know about any impact of performance of hosts which already 
+exposed multiple queues.
+
+Note that it's still much better than the 700K IOPS we see without 
+managed interrupts at all.
+
+ >
+ > 2) private callback
+ > - we could define private callback to drain each completion queue in
+ >   driver simply.
+
+Yeah, but then we raise the question of why the LLDD can't just register 
+for hotplug handler itself.
+
+Personally I prefer #1. I'll have a look at the issues when I get a chance.
+
+Much appreciated,
+John
+
+
+
