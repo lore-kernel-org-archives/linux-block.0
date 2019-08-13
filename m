@@ -2,100 +2,105 @@ Return-Path: <SRS0=l92v=WJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC94BC32750
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 15:40:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF38EC32750
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 15:45:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 92CBE20679
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 15:40:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sGF94uH4"
+	by mail.kernel.org (Postfix) with ESMTP id AEBEB205F4
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 15:45:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729672AbfHMPkR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Aug 2019 11:40:17 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:34761 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727621AbfHMPkQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Aug 2019 11:40:16 -0400
-Received: by mail-pl1-f193.google.com with SMTP id i2so49474774plt.1;
-        Tue, 13 Aug 2019 08:40:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=IFpHEZmO8P8ibZrjmbskVYzECLFyHY2hgPRhajuorfs=;
-        b=sGF94uH4H9+S8YPc2Ukpi/1ZXz9Nz5ogn48iUe10002eaQGeW9R76QEXvloVxsJ8O5
-         HHftRakxcyAtdpvm67SMNg/n8Ms24pXF0JFkGxKiA9TSjLsTxHN4KiK1qDDaENtFYpBt
-         pmPZipPh5fmh3J6IRmnn807Dr6BBZ6KL4t3OwWfjNFfSGg/FtMNgrTbl42hETtN6zrxc
-         XR3dq0hBHLWzqTvDFUd7bvaxJ20xYbY6J6UGBaoyO/YfbNb7xjWwF/yuUSlnsoywXPkN
-         fTJ2EQilg187cc0fxhxA7//cI8yhQ83tgZtcbR/xaZDvN63r5FpSi9ydJ1D3w7zAenm+
-         iedA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=IFpHEZmO8P8ibZrjmbskVYzECLFyHY2hgPRhajuorfs=;
-        b=lo3o1Mk0jI1MZrSTwjF+kximH8Z/oBSzkkVWkIoeqGte1fieTW8JGEZM43AlRi9PzR
-         J9o7ESDTEUwkrcOjrE3yDgGAdQbtWxxrgFx+4S1B1qHKglpGWyIvARDv8OuwvaOSKyka
-         gBqeqyEDiJfWokwwhlPCsV/U6Pd5wNEiSU+ID/FZrA6fJBLjBV074q5fGJkhfXRlJhDT
-         CUz5tEdI5iBLaZ2O1ldh5fNQJ5bRTWRQofIbCcOOg6VTJ14zfwSD2lBWrlp9ga3C/tpt
-         ILlvlDYcCzLvifAcV0q4PFYbfh86dtozs5FV+vis1ubK/lSQUY6EDj4pcAI4yhT2iqpR
-         QsPQ==
-X-Gm-Message-State: APjAAAUwRdd590qPGoJuTcG/FBqWGyqLlqyRO9BHbJVdsirS+QVT26xK
-        a8/lm8erfPeAIy+TE2JzbawkzIv+blDCoU8S0SA=
-X-Google-Smtp-Source: APXvYqyi5GZcial+3zjrwPbvHTkx2yuaQQdgUEbv9P1uEG6WC3VBx9CpmJ5hPZttqtau7i2XXxydh7GEOMuGWFo/Izc=
-X-Received: by 2002:a17:902:44f:: with SMTP id 73mr38874274ple.192.1565710815744;
- Tue, 13 Aug 2019 08:40:15 -0700 (PDT)
+        id S1730108AbfHMPp5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Aug 2019 11:45:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46154 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727284AbfHMPp4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Aug 2019 11:45:56 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id ED2753098434;
+        Tue, 13 Aug 2019 15:45:55 +0000 (UTC)
+Received: from [10.10.122.147] (ovpn-122-147.rdu2.redhat.com [10.10.122.147])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9115310A301F;
+        Tue, 13 Aug 2019 15:45:55 +0000 (UTC)
+Subject: Re: [PATCH 4/4] nbd: fix zero cmd timeout handling
+To:     Josef Bacik <josef@toxicpanda.com>
+References: <20190809212610.19412-1-mchristi@redhat.com>
+ <20190809212610.19412-5-mchristi@redhat.com>
+ <20190813131357.dpyd5mqbfubqhiaa@MacBook-Pro-91.local>
+Cc:     linux-block@vger.kernel.org
+From:   Mike Christie <mchristi@redhat.com>
+Message-ID: <5D52DB33.8070307@redhat.com>
+Date:   Tue, 13 Aug 2019 10:45:55 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
+ Thunderbird/38.6.0
 MIME-Version: 1.0
-References: <1565459703-30513-1-git-send-email-akinobu.mita@gmail.com>
- <1565459703-30513-5-git-send-email-akinobu.mita@gmail.com> <20190813103313.GC26337@amd>
-In-Reply-To: <20190813103313.GC26337@amd>
-From:   Akinobu Mita <akinobu.mita@gmail.com>
-Date:   Wed, 14 Aug 2019 00:40:04 +0900
-Message-ID: <CAC5umyhpVdMwrm_U7RGq=q4F+mrgGJC01rLvjs4HbF5_C-kXQw@mail.gmail.com>
-Subject: Re: [PATCH v3 4/6] block: introduce LED block device activity trigger
-To:     Pavel Machek <pavel@ucw.cz>
-Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>,
-        Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-        Dan Murphy <dmurphy@ti.com>, Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190813131357.dpyd5mqbfubqhiaa@MacBook-Pro-91.local>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Tue, 13 Aug 2019 15:45:56 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-2019=E5=B9=B48=E6=9C=8813=E6=97=A5(=E7=81=AB) 19:33 Pavel Machek <pavel@ucw=
-.cz>:
->
-> On Sun 2019-08-11 02:55:01, Akinobu Mita wrote:
-> > This allows LEDs to be controlled by block device activity.
-> >
-> > We already have ledtrig-disk (LED disk activity trigger), but the lower
-> > level disk drivers need to utilize ledtrig_disk_activity() to make the
-> > LED blink.
-> >
-> > The LED block device trigger doesn't require the lower level drivers to
-> > have any instrumentation. The activity is collected by polling the disk
-> > stats.
-> >
-> > Example:
-> >
-> > echo block-nvme0n1 > /sys/class/leds/diy/trigger
->
-> Some machines have lots of block devices... Should we perhaps have
-> "echo block > trigger; echo nvme0n1 > device"?
+On 08/13/2019 08:13 AM, Josef Bacik wrote:
+> On Fri, Aug 09, 2019 at 04:26:10PM -0500, Mike Christie wrote:
+>> This fixes a regression added in 4.9 with commit:
+>>
+>> commit 0eadf37afc2500e1162c9040ec26a705b9af8d47
+>> Author: Josef Bacik <jbacik@fb.com>
+>> Date:   Thu Sep 8 12:33:40 2016 -0700
+>>
+>>     nbd: allow block mq to deal with timeouts
+>>
+>> where before the patch userspace would set the timeout to 0 to disable
+>> it. With the above patch, a zero timeout tells the block layer to use
+>> the default value of 30 seconds. For setups where commands can take a
+>> long time or experience transient issues like network disruptions this
+>> then results in IO errors being sent to the application.
+>>
+>> To fix this, the patch still uses the common block layer timeout
+>> framework, but if zero is set, nbd just logs a message and then resets
+>> the timer when it expires.
+>>
+>> Josef,
+>>
+>> I did not cc stable, but I think we want to port the patches to some
+>> releases. We originally hit this with users using the longterm kernels
+>> with ceph. The patch does not apply anywhere cleanly with older ones
+>> like 4.9, so I was not sure how we wanted to handle it.
+>>
+> 
+> I assume you tested this?  IIRC there was a problem where 0 really meant 0 and
 
-I originally considered doing so, just like ledtrig-netdev. However, it
-turned out that we needed an additional mechanism to mediate between
-the led trigger registration and the block device unregistration.
+Yes.
+
+> commands would insta-timeout.  But my memory is foggy here, so I'm not sure if
+> it was setting the tag_set timeout to 0 that made things go wrong, or what.  Or
+> I could be making it all up, who knows.
+
+Yes, if you call blk_queue_rq_timeout with 0, then the command will
+timeout almost immediately. I added a check for this in the first patch.
+
+If blk_mq_tag_set.timeout is 0, blk_mq_init_allocated_queue uses the
+default 30 second value.
+
+So with the patch if the user sets the timeout to 0, then we will just
+log a message every 30 seconds that the command is stuck.
+
+> 
+> There's a blktest that just runs fio on a normal device with no timeouts or
+> anything, that's where I would see the problem since it was a little racy.
+> Basically have the timeout set to 0 and put load on the disk and eventually
+> you'd start seeing timeouts.  If that all goes fine then you can add
+> 
+> Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+> 
+
+Ok.
+
