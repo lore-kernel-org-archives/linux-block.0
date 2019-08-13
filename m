@@ -6,22 +6,22 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C1CC433FF
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 10:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B7CAC32753
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 10:33:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6EBEC206C1
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 10:12:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 114CF20679
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 10:33:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728484AbfHMKMK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Aug 2019 06:12:10 -0400
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:49681 "EHLO
+        id S1726184AbfHMKdQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Aug 2019 06:33:16 -0400
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:51510 "EHLO
         atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727053AbfHMKMK (ORCPT
+        with ESMTP id S1725981AbfHMKdP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Aug 2019 06:12:10 -0400
+        Tue, 13 Aug 2019 06:33:15 -0400
 Received: by atrey.karlin.mff.cuni.cz (Postfix, from userid 512)
-        id 188CB8071A; Tue, 13 Aug 2019 12:11:56 +0200 (CEST)
-Date:   Tue, 13 Aug 2019 12:12:08 +0200
+        id 5500180723; Tue, 13 Aug 2019 12:33:01 +0200 (CEST)
+Date:   Tue, 13 Aug 2019 12:33:13 +0200
 From:   Pavel Machek <pavel@ucw.cz>
 To:     Akinobu Mita <akinobu.mita@gmail.com>
 Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
@@ -32,15 +32,15 @@ Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH v3 2/6] scsi: mvsas: rename LED_* enums to SGPIO_LED_*
-Message-ID: <20190813101208.GB26337@amd>
+Subject: Re: [PATCH v3 4/6] block: introduce LED block device activity trigger
+Message-ID: <20190813103313.GC26337@amd>
 References: <1565459703-30513-1-git-send-email-akinobu.mita@gmail.com>
- <1565459703-30513-3-git-send-email-akinobu.mita@gmail.com>
+ <1565459703-30513-5-git-send-email-akinobu.mita@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="l76fUT7nc3MelDdI"
+        protocol="application/pgp-signature"; boundary="da4uJneut+ArUgXk"
 Content-Disposition: inline
-In-Reply-To: <1565459703-30513-3-git-send-email-akinobu.mita@gmail.com>
+In-Reply-To: <1565459703-30513-5-git-send-email-akinobu.mita@gmail.com>
 User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -48,38 +48,46 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---l76fUT7nc3MelDdI
+--da4uJneut+ArUgXk
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun 2019-08-11 02:54:59, Akinobu Mita wrote:
-> The mvsas driver declares LED_* enums for enum sgpio_led_status. The
-> LED_OFF and LED_ON enums cause redeclaration of enumerator with the
-> LED subsystem's LED_OFF and LED_ON enums.
+On Sun 2019-08-11 02:55:01, Akinobu Mita wrote:
+> This allows LEDs to be controlled by block device activity.
 >=20
-> This adds 'SGPIO_' prefix to these enums in mvsas driver.
+> We already have ledtrig-disk (LED disk activity trigger), but the lower
+> level disk drivers need to utilize ledtrig_disk_activity() to make the
+> LED blink.
 >=20
-> Cc: Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>
-> Cc: Jacek Anaszewski <jacek.anaszewski@gmail.com>
+> The LED block device trigger doesn't require the lower level drivers to
+> have any instrumentation. The activity is collected by polling the disk
+> stats.
+>=20
+> Example:
+>=20
+> echo block-nvme0n1 > /sys/class/leds/diy/trigger
 
-Acked-by: Pavel Machek <pavel@ucw.cz>
+Some machines have lots of block devices... Should we perhaps have
+"echo block > trigger; echo nvme0n1 > device"?
 
+Best regards,
+									Pavel
 --=20
 (english) http://www.livejournal.com/~pavelmachek
 (cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
 g.html
 
---l76fUT7nc3MelDdI
+--da4uJneut+ArUgXk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: Digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAl1SjPgACgkQMOfwapXb+vJtfgCggrF36qSmvQY9Psijznov+tNz
-g4AAoLNaTE8k8ljYCuI5fktfarBJ10VZ
-=mIgq
+iEYEARECAAYFAl1SkekACgkQMOfwapXb+vIYIQCcCQatKldtygxinfIx5q0mAEse
+f7kAn1dmVugrnJLtH409sL+2qgiJx6M0
+=x9Iu
 -----END PGP SIGNATURE-----
 
---l76fUT7nc3MelDdI--
+--da4uJneut+ArUgXk--
