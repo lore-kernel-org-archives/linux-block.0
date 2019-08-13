@@ -5,65 +5,66 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4413CC32750
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 06:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A791C433FF
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 06:16:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1507920578
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 06:16:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DBD120578
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 06:16:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M6a1lbX/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lR0mpVGl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727692AbfHMGQr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Aug 2019 02:16:47 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:42403 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727371AbfHMGQr (ORCPT
+        id S1727724AbfHMGQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Aug 2019 02:16:56 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:34277 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727404AbfHMGQ4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Aug 2019 02:16:47 -0400
-Received: by mail-pg1-f194.google.com with SMTP id p3so392785pgb.9;
-        Mon, 12 Aug 2019 23:16:47 -0700 (PDT)
+        Tue, 13 Aug 2019 02:16:56 -0400
+Received: by mail-pl1-f195.google.com with SMTP id i2so48881435plt.1;
+        Mon, 12 Aug 2019 23:16:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=nL9PyzNKtAFr+Adeyaa0mv/ZBzbqceeQurZwipQbI9U=;
-        b=M6a1lbX/QMKRBowg/REKBlhpahKFtMjvvZG2VZlHVhn8xWNE8HMKDSiu2uNAFYXTLH
-         2az6Yz3meyyw5ob2HxAIYn3xlyYIZMsvr2BQShotqy9pxElgOb+4QqW6Ep/62XLU1n2w
-         Vn/JWUFBYYG/i9oCq4qlSuAAdxX0e1Qqjy+CsNXrl80Q2ymuwCSg0PKeZ5zvDOYU0+CX
-         a9y/1guN+eb+Ug6IiLSvmIB5eyENxmN5kpxxLT8zs3ezLZf1RILCDSFpz4GhvzUU4RgM
-         Tj1tTp95hpuvfucv6lwUcCjHiAn5rk7bJt2IrhJazdYtQy5UthwgjeNagIUw28xYOMqr
-         if+Q==
+        bh=lB2W34FFRFhSU+6xsPtiaBhXXvBNBgq1m83tH9jQCgk=;
+        b=lR0mpVGl7S5m6GiFXrWKwRq9XC7qJOtZEOUALc7cmgel+BKbdeD2iiqbSm6eSQvJMy
+         nOuO40CVTkMbqWBy/vbyR1IBBGNQFVd/w+pb6qlW5FYWdsIqviQBhejEhP/0xveynMmI
+         vYEX5DvPhD6WtMhiBVmS6NoNE8EpTDP2nprVIoqp1dD4M8iwW/ZIbzIrdvUnnxOlfiwW
+         3X2olAWRnWo5GuLkRTzNn2959BE6SlZ5JD72dOEX0yCVy9I8Ty+6ERxWw4yJSBnqZNq2
+         WH47O9SfGx1ufW3OOF+gpMj4koZoFQX2Ejw6wNAJrtnGzpt+Z5JDDBMandk4lOtnQLVE
+         SzOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=nL9PyzNKtAFr+Adeyaa0mv/ZBzbqceeQurZwipQbI9U=;
-        b=UCtaFwH9HHLraucVm1E1/GgtwklTWVWgheGQABtuNHPFsFO932ZMVFjtt11PHUJb/A
-         qSeTDlTmpsIgjPJGFs19dOqkGmM/nv8O2hNRaa7s9pVzisuI0uL//4+ZYDKNVp/Dr5QO
-         b4uw5pG/sC7cGL8fu9s4p+0UH77el1HnImzM9okpQWlL6RMXF8HZti8fuCu58ssMpRZW
-         +MPpIGTPfltAaFrdRd+5uZJ8i+phnYe39Gavu/M1vKvrU0xecZjb0CoglGBsXJ9aUBNI
-         Wjg+XnMIXHEQHMwPwWAHmiPFK6/HszDgNfBobmJZ4fxZJ25o5iDu51FxGWntzz9xQQTi
-         +wSQ==
-X-Gm-Message-State: APjAAAUbob5WLLkvNJpS2CFCho27ISvj1NWcuMDus+ZLINYg+roCN58E
-        4Y8J31F+a2jYw7VqhsQ3a/E=
-X-Google-Smtp-Source: APXvYqwLQhlZXFxPe2sOgdGVt1EiVo8WOfWlft8uB5djhw5MMQlc564Zq6Rna3xdpeGiEnuUOI9g6Q==
-X-Received: by 2002:a17:90a:eb08:: with SMTP id j8mr772974pjz.72.1565677006908;
-        Mon, 12 Aug 2019 23:16:46 -0700 (PDT)
+        bh=lB2W34FFRFhSU+6xsPtiaBhXXvBNBgq1m83tH9jQCgk=;
+        b=BcNU7JozQCrJnYAzxRcCbP9BwJTRJm7uevM3n4f0/Jv5SZKl79TncumAPB3EY4b1H3
+         8nuiA3ssuGsdqxcD/RmezF/t1lSKTBjhSrcLoqg6KDVSF64E5QYcxvJ0UOofyoMu21vQ
+         PN+BUJjh9fjsEbZl7a9YLp9NEvGX1DtDkzrSYdcoFlR8H8Ymm+a9XiDZy4qppN5IQDx1
+         PwIo66n4oF1f+5aR5h/s5zeDpWnyXdwH6GZtx4eW2TShRonZn5oJ5Zlr4qAXywOuIPb+
+         7FfrYYxBb8XJpZueUMvUgK6OdY4N003jxXwgBhXl7ldDu7HEtFP38f5VrkLsYHObvtel
+         Fzjw==
+X-Gm-Message-State: APjAAAXGIiqVDD5JkPkbDCQtysKWuErrGbXdbEkLi+yZ0wh5JOWvG5Is
+        LATyJzF9ZbH07hbHbo+h/Ig=
+X-Google-Smtp-Source: APXvYqy02phZk28jrMxAd/3ZbPtBeJasaqaq1E4b04hPXcUojIzejAySe0BILM0w/izcaXiRSARIRg==
+X-Received: by 2002:a17:902:7202:: with SMTP id ba2mr37151447plb.266.1565677015327;
+        Mon, 12 Aug 2019 23:16:55 -0700 (PDT)
 Received: from suzukaze.ipads-lab.se.sjtu.edu.cn ([89.31.126.54])
-        by smtp.gmail.com with ESMTPSA id k5sm6062037pfg.167.2019.08.12.23.16.43
+        by smtp.gmail.com with ESMTPSA id j15sm140141434pfn.150.2019.08.12.23.16.52
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 12 Aug 2019 23:16:46 -0700 (PDT)
+        Mon, 12 Aug 2019 23:16:54 -0700 (PDT)
 From:   Chuhong Yuan <hslester96@gmail.com>
-Cc:     Ilya Dryomov <idryomov@gmail.com>, Sage Weil <sage@redhat.com>,
-        Alex Elder <elder@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Chuhong Yuan <hslester96@gmail.com>
-Subject: [PATCH v2 2/3] rbd: Use refcount_t for refcount
-Date:   Tue, 13 Aug 2019 14:16:41 +0800
-Message-Id: <20190813061641.5428-1-hslester96@gmail.com>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Chuhong Yuan <hslester96@gmail.com>
+Subject: [PATCH v2 3/3] xen/blkback: Use refcount_t for refcount
+Date:   Tue, 13 Aug 2019 14:16:50 +0800
+Message-Id: <20190813061650.5483-1-hslester96@gmail.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -81,127 +82,101 @@ So convert atomic_t ref counters to refcount_t.
 
 Signed-off-by: Chuhong Yuan <hslester96@gmail.com>
 ---
- drivers/block/rbd.c | 57 ++++++++-------------------------------------
- 1 file changed, 10 insertions(+), 47 deletions(-)
+Changes in v2:
+  - Also convert pending_req::pendcnt to refcount_t.
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 3327192bb71f..74d2dddbe108 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -46,44 +46,12 @@
- #include <linux/slab.h>
- #include <linux/idr.h>
- #include <linux/workqueue.h>
+ drivers/block/xen-blkback/blkback.c | 6 +++---
+ drivers/block/xen-blkback/common.h  | 9 +++++----
+ drivers/block/xen-blkback/xenbus.c  | 2 +-
+ 3 files changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+index fd1e19f1a49f..b24bb0aea35f 100644
+--- a/drivers/block/xen-blkback/blkback.c
++++ b/drivers/block/xen-blkback/blkback.c
+@@ -1098,7 +1098,7 @@ static void __end_block_io_op(struct pending_req *pending_req,
+ 	 * the grant references associated with 'request' and provide
+ 	 * the proper response on the ring.
+ 	 */
+-	if (atomic_dec_and_test(&pending_req->pendcnt))
++	if (refcount_dec_and_test(&pending_req->pendcnt))
+ 		xen_blkbk_unmap_and_respond(pending_req);
+ }
+ 
+@@ -1395,7 +1395,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+ 		bio_set_op_attrs(bio, operation, operation_flags);
+ 	}
+ 
+-	atomic_set(&pending_req->pendcnt, nbio);
++	refcount_set(&pending_req->pendcnt, nbio);
+ 	blk_start_plug(&plug);
+ 
+ 	for (i = 0; i < nbio; i++)
+@@ -1424,7 +1424,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+  fail_put_bio:
+ 	for (i = 0; i < nbio; i++)
+ 		bio_put(biolist[i]);
+-	atomic_set(&pending_req->pendcnt, 1);
++	refcount_set(&pending_req->pendcnt, 1);
+ 	__end_block_io_op(pending_req, BLK_STS_RESOURCE);
+ 	msleep(1); /* back off a bit */
+ 	return -EIO;
+diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
+index 1d3002d773f7..824d64a8339b 100644
+--- a/drivers/block/xen-blkback/common.h
++++ b/drivers/block/xen-blkback/common.h
+@@ -35,6 +35,7 @@
+ #include <linux/wait.h>
+ #include <linux/io.h>
+ #include <linux/rbtree.h>
 +#include <linux/refcount.h>
+ #include <asm/setup.h>
+ #include <asm/pgalloc.h>
+ #include <asm/hypervisor.h>
+@@ -309,7 +310,7 @@ struct xen_blkif {
+ 	struct xen_vbd		vbd;
+ 	/* Back pointer to the backend_info. */
+ 	struct backend_info	*be;
+-	atomic_t		refcnt;
++	refcount_t		refcnt;
+ 	/* for barrier (drain) requests */
+ 	struct completion	drain_complete;
+ 	atomic_t		drain;
+@@ -343,7 +344,7 @@ struct pending_req {
+ 	struct xen_blkif_ring   *ring;
+ 	u64			id;
+ 	int			nr_segs;
+-	atomic_t		pendcnt;
++	refcount_t		pendcnt;
+ 	unsigned short		operation;
+ 	int			status;
+ 	struct list_head	free_list;
+@@ -362,10 +363,10 @@ struct pending_req {
+ 			 (_v)->bdev->bd_part->nr_sects : \
+ 			  get_capacity((_v)->bdev->bd_disk))
  
- #include "rbd_types.h"
+-#define xen_blkif_get(_b) (atomic_inc(&(_b)->refcnt))
++#define xen_blkif_get(_b) (refcount_inc(&(_b)->refcnt))
+ #define xen_blkif_put(_b)				\
+ 	do {						\
+-		if (atomic_dec_and_test(&(_b)->refcnt))	\
++		if (refcount_dec_and_test(&(_b)->refcnt))	\
+ 			schedule_work(&(_b)->free_work);\
+ 	} while (0)
  
- #define RBD_DEBUG	/* Activate rbd_assert() calls */
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index 3ac6a5d18071..ecc5f9c5bf3f 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -169,7 +169,7 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
+ 		return ERR_PTR(-ENOMEM);
  
--/*
-- * Increment the given counter and return its updated value.
-- * If the counter is already 0 it will not be incremented.
-- * If the counter is already at its maximum value returns
-- * -EINVAL without updating it.
-- */
--static int atomic_inc_return_safe(atomic_t *v)
--{
--	unsigned int counter;
--
--	counter = (unsigned int)atomic_fetch_add_unless(v, 1, 0);
--	if (counter <= (unsigned int)INT_MAX)
--		return (int)counter;
--
--	atomic_dec(v);
--
--	return -EINVAL;
--}
--
--/* Decrement the counter.  Return the resulting value, or -EINVAL */
--static int atomic_dec_return_safe(atomic_t *v)
--{
--	int counter;
--
--	counter = atomic_dec_return(v);
--	if (counter >= 0)
--		return counter;
--
--	atomic_inc(v);
--
--	return -EINVAL;
--}
--
- #define RBD_DRV_NAME "rbd"
+ 	blkif->domid = domid;
+-	atomic_set(&blkif->refcnt, 1);
++	refcount_set(&blkif->refcnt, 1);
+ 	init_completion(&blkif->drain_complete);
+ 	INIT_WORK(&blkif->free_work, xen_blkif_deferred_free);
  
- #define RBD_MINORS_PER_MAJOR		256
-@@ -438,7 +406,7 @@ struct rbd_device {
- 
- 	struct rbd_spec		*parent_spec;
- 	u64			parent_overlap;
--	atomic_t		parent_ref;
-+	refcount_t		parent_ref;
- 	struct rbd_device	*parent;
- 
- 	/* Block layer tags. */
-@@ -1680,21 +1648,19 @@ static void rbd_dev_unparent(struct rbd_device *rbd_dev)
-  */
- static void rbd_dev_parent_put(struct rbd_device *rbd_dev)
- {
--	int counter;
-+	bool is_dec_to_zero;
- 
- 	if (!rbd_dev->parent_spec)
- 		return;
- 
--	counter = atomic_dec_return_safe(&rbd_dev->parent_ref);
--	if (counter > 0)
-+	is_dec_to_zero = refcount_dec_and_test_checked(&rbd_dev->parent_ref);
-+	if (!is_dec_to_zero)
- 		return;
- 
- 	/* Last reference; clean up parent data structures */
- 
--	if (!counter)
-+	if (is_dec_to_zero)
- 		rbd_dev_unparent(rbd_dev);
--	else
--		rbd_warn(rbd_dev, "parent reference underflow");
- }
- 
- /*
-@@ -1707,20 +1673,17 @@ static void rbd_dev_parent_put(struct rbd_device *rbd_dev)
-  */
- static bool rbd_dev_parent_get(struct rbd_device *rbd_dev)
- {
--	int counter = 0;
-+	bool is_inc_suc = false;
- 
- 	if (!rbd_dev->parent_spec)
- 		return false;
- 
- 	down_read(&rbd_dev->header_rwsem);
- 	if (rbd_dev->parent_overlap)
--		counter = atomic_inc_return_safe(&rbd_dev->parent_ref);
-+		is_inc_suc = refcount_inc_not_zero_checked(&rbd_dev->parent_ref);
- 	up_read(&rbd_dev->header_rwsem);
- 
--	if (counter < 0)
--		rbd_warn(rbd_dev, "parent reference overflow");
--
--	return counter > 0;
-+	return is_inc_suc;
- }
- 
- /*
-@@ -6823,7 +6786,7 @@ static int rbd_dev_probe_parent(struct rbd_device *rbd_dev, int depth)
- 		goto out_err;
- 
- 	rbd_dev->parent = parent;
--	atomic_set(&rbd_dev->parent_ref, 1);
-+	refcount_set(&rbd_dev->parent_ref, 1);
- 	return 0;
- 
- out_err:
 -- 
 2.20.1
 
