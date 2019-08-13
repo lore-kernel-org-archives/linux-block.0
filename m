@@ -2,142 +2,106 @@ Return-Path: <SRS0=l92v=WJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 119F3C32750
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 07:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 307B7C32750
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 08:20:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C59CD20651
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 07:51:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0651C206C1
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 08:20:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="cZYdEYqH"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Y13i+U+x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726489AbfHMHvp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Aug 2019 03:51:45 -0400
-Received: from mout.web.de ([212.227.15.3]:48099 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725842AbfHMHvp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Aug 2019 03:51:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1565682664;
-        bh=V01gp/w04ZjopqkMSgzFlyhYSrsB6LuFV8+G4mLHDnM=;
-        h=X-UI-Sender-Class:Cc:References:Subject:To:From:Date:In-Reply-To;
-        b=cZYdEYqHUIF71PCyXjlATlwdpEVAZ+vhpWKFUN3b+1zioxjZ2JTPowAMU5ogAjdrS
-         X/4ybfqUvdOTFCRqaX1sXEctegexyQKs3EQAkHedu58dAyEfohsjYux903HT16vMvs
-         H7G2KwusiDZPOLKhh/GAKeMkS2rShZdrZe0kq4Uw=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.2] ([93.133.76.64]) by smtp.web.de (mrweb004
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0La1Sn-1ij73t1fKv-00lmff; Tue, 13
- Aug 2019 09:51:04 +0200
-Cc:     kernel-hardening@lists.openwall.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>,
-        Denis Efremov <efremov@linux.com>,
-        Gilles Muller <Gilles.Muller@lip6.fr>,
-        Jann Horn <jannh@google.com>, Jens Axboe <axboe@kernel.dk>,
-        Jiri Kosina <jikos@kernel.org>,
-        Julia Lawall <julia.lawall@lip6.fr>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Mukesh Ojha <mojha@codeaurora.org>,
-        Nicolas Palix <nicolas.palix@imag.fr>
-References: <9ced7a06-5048-ad1a-3428-c8f943f7469c@linux.com>
-Subject: Re: floppy: fix usercopy direction
-To:     Alexander Popov <alex.popov@linux.com>, cocci@systeme.lip6.fr
-From:   Markus Elfring <Markus.Elfring@web.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
- 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 FEE=
-Message-ID: <6168f58a-891c-1527-93ec-4d3778a59aa2@web.de>
-Date:   Tue, 13 Aug 2019 09:50:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727166AbfHMIU3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Aug 2019 04:20:29 -0400
+Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:9755 "EHLO
+        esa5.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727029AbfHMIU2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Aug 2019 04:20:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1565684428;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=MSNDb5M/uhPTXoW2QG6d7ZGLQTVW3BXr4dqZJhjvQKQ=;
+  b=Y13i+U+x/AgK3isELAIBDsHkbNux7rc1RKX2+zt0jz+pec7S/CmE3nMb
+   VRCmM4zdkvDAdcOCvgmWIRhu2KQZxmMqMafGeVFyXV7PTILtlb6MyO6vM
+   2akom2Z1OOv92hF5gKT9b+715PxBS2I4iper+udSswO6k4yJWkmKT02m+
+   Q=;
+Authentication-Results: esa5.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
+  receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible
+Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
+  roger.pau@citrix.com designates 162.221.158.21 as permitted
+  sender) identity=mailfrom; client-ip=162.221.158.21;
+  receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible; x-record-type="v=spf1";
+  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@mail.citrix.com) identity=helo;
+  client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="postmaster@mail.citrix.com";
+  x-conformance=sidf_compatible
+IronPort-SDR: YyJYPQ6VXMkgmOH9bE1bW7wGRnEWWYVdrhqf1LUNH9JZt+GUSq/a+mDF8iOZMrkfEZepWz3MKB
+ Nbl/e827DePlYKulChWdpxlyiyCPXsSZwI3waKlSrxQtvyQHMnB796aa+296RQS+E6MqK4aQiJ
+ Ih2+dXOCKw2EarPKHZodwm4FdZkwjlQZF+Psh/QfCgm0QI1BZrC0/Rs7ltNVStNAsgoeRAzvAI
+ J0wCCJBaCBN938BDYB6CeYXoTL2y3zsHEmo7JiHgunnzNyMeFLf/2QMEZHcjVWFJqd/8sKSpgQ
+ yWU=
+X-SBRS: 2.7
+X-MesageID: 4340732
+X-Ironport-Server: esa5.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,380,1559534400"; 
+   d="scan'208";a="4340732"
+Date:   Tue, 13 Aug 2019 10:20:00 +0200
+From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To:     Chuhong Yuan <hslester96@gmail.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <xen-devel@lists.xenproject.org>
+Subject: Re: [Xen-devel] [PATCH v2 3/3] xen/blkback: Use refcount_t for
+ refcount
+Message-ID: <20190813082000.shprs2ci33v5eapd@Air-de-Roger>
+References: <20190813061650.5483-1-hslester96@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <9ced7a06-5048-ad1a-3428-c8f943f7469c@linux.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Provags-ID: V03:K1:RtvWsN85Lv08lGLSsKH9XvVQOe95drRnwlvrMlEEiFj+RuEg1o5
- J2lEmjxW9l5b2whmTn+59ttXvoYVGYYB4MWL5BdmTdNcEZTOkMlEJfxVWfvf/kurv8RxPOX
- 8QiRLdocKPm2lAK7j/XmNZwa8NZ35fkxQaslhD3QUcW7bUWKRm2IPKTrNBg+FWjDU/+xX9+
- fCFV6Vo2r96eStQaa33UA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:94H3yKCCfVM=:gEDyJIzOxmXRU/yY+w5GuA
- kKTyQJk6mvlRnbmDDNJ7fkJo/kvo0ylqFfvqDeIi63Y4bD4xL7Pyfo45iqtWfU9erCuJdor2M
- YuUQjLlpQBgX17kl9e9nAqxmdMpnp9mdCHOV6RPLqIv+2AxEOoN7Fe4m3AZ7kqNAaWPw8SxjX
- J5nvYGcYzOZRlS1S/G2tS4OEgDqByEyvKRdSYb0lnFpSoooEx2R7IZ0bd2ZvKfpnrQY/l0+WA
- 0ykfL/EishjZbXewDAk1g7XcJ+S7cjti3WU3KO9vClfmGIuuO43YwstwxCyLJ/m6kPd4RQ3Qz
- Zokm4AwDL7AwPLMIRNPyw8i3u11KJD0p4fJ1ffBuU8hC7liSDPIFjKXlvy27WLUUeikuyHOm+
- 8LKwTXc74V+EB33rUG5orGpP2l3aRZoxF1egZo0cnUrH6nRpveiI994BXq8SkiwtPoL712hHv
- wgn6zeC47Aa3fVjZyMhXPyOgqqjTOARPToDA18A35artmEchn32+1wGVZA+N59SonGjFXfKUb
- v6Ziu1ESbhHm5oAv/T9hfCc8ku2uID1fxroVRmJIE/opurxKqwYxPfrHKAMHpo8C8AIl3Uj/I
- zJiBqn4XFBXzga5vhMNe2x+plUUt9klgMCe5Ak/ht2f5fTXh+S+ptnzo3671o/j68e8sdrXAS
- kEx/eE5OQX+1racJxeWJ0VBvIrsrG6tg+hSpvfIGtqaC5fLSQ+LNIV39YiwLK8GMeeNILDZu5
- 8xEUiN0hKJ+56YGvg2+fTutaH8SBYJotJjIiK8D26vPSkSBb1Ysw8aS/UKdXZd6uTq+u9UQo1
- DjGJ8N9fJMZftm2H3n3H7AIyaSpndef5+/hbv87XAzxuRv0kj+cPVLZhcntNjCo0xThSDHBxM
- hH9nHA5qpAUNfhLE7p1XYvAHNQL4Xf6viZJStCass4QFt9xpCBbmerhLstnYUb1LrEHQwK3ix
- 23cseQoW7AGf9nqgPKvxghWUPw4JIPqXpEwxu2iSQBRwdHQeSff+Tw2/yqxnEd1843BKoms95
- qgmJ/g2vpI6yQJnK5JYgtRG8zA5Vuq8/m6ITeVN5ZROynfkXHkTnuKFS/GVtiwHto2foPyaGC
- v75pCT1eJd0k4R3rvhWrpyso1Hxm5H4weGplm0cxvdOL3Bpo1E02lRODCIYsQDX911latoRCj
- qtJxQ=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190813061650.5483-1-hslester96@gmail.com>
+User-Agent: NeoMutt/20180716
+X-ClientProxiedBy: AMSPEX02CAS01.citrite.net (10.69.22.112) To
+ AMSPEX02CL02.citrite.net (10.69.22.126)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> @script:python@
-> f << cfu.f;
-> t << cfu.t;
-> v << cfu.v;
-> decl_p << cfu.decl_p;
-> copy_p << cfu.copy_p;
-> @@
->
-> if '__user' in t:
+On Tue, Aug 13, 2019 at 02:16:50PM +0800, Chuhong Yuan wrote:
+> Reference counters are preferred to use refcount_t instead of
+> atomic_t.
+> This is because the implementation of refcount_t can prevent
+> overflows and detect possible use-after-free.
+> So convert atomic_t ref counters to refcount_t.
+> 
+> Signed-off-by: Chuhong Yuan <hslester96@gmail.com>
 
-Can this check be specified as a constraint for a metavariable
-in the initial SmPL rule?
-Would you like to move it to an other place?
+Acked-by: Roger Pau Monné <roger.pau@citrix.com>
 
-Regards,
-Markus
+Thanks, Roger.
