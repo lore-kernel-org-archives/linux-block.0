@@ -2,95 +2,139 @@ Return-Path: <SRS0=l92v=WJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D968DC433FF
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 16:42:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 912B8C32753
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 17:46:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A26AD20663
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 16:42:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6233020840
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 17:46:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cmurf-com.20150623.gappssmtp.com header.i=@cmurf-com.20150623.gappssmtp.com header.b="Ig3ZzK+f"
+	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="j6j9cc3o"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726769AbfHMQmh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Aug 2019 12:42:37 -0400
-Received: from mail-lf1-f51.google.com ([209.85.167.51]:45777 "EHLO
-        mail-lf1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726802AbfHMQmh (ORCPT
+        id S1727954AbfHMRq3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Aug 2019 13:46:29 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:46816 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726137AbfHMRq3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Aug 2019 12:42:37 -0400
-Received: by mail-lf1-f51.google.com with SMTP id a30so14150431lfk.12
-        for <linux-block@vger.kernel.org>; Tue, 13 Aug 2019 09:42:35 -0700 (PDT)
+        Tue, 13 Aug 2019 13:46:29 -0400
+Received: by mail-pg1-f195.google.com with SMTP id w3so14422807pgt.13
+        for <linux-block@vger.kernel.org>; Tue, 13 Aug 2019 10:46:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmurf-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=9/me9AyG3+z6/xBlLhKMnSijxn45CKmb1z2Iv3P/dzo=;
-        b=Ig3ZzK+fbGTSrw/5GbSSMVy9Zpdv88Boor0HPHtvGm4xnqukiJtymfGX6EEzU+bEY5
-         +3UQje/xQPKXY5vwfyb+7cAx6IXN0AlPJSn4xN12tTlL2vGLSCa4zglEWXavBVRmyZLz
-         DmfkPwBXmPee++bW8uSKrCBlPIKYatsIakfZ6nrz01wuoQH8oAKAYDTr9c2RspXTOn66
-         5wdlxUJlYA97iSFZRPD0HdzQb8pHNN+SusaQtQyz8OZJW2sRzPXdYxk2cqgvDb48B6oi
-         mMGHwt5pt8XKgdGIrJgU9dJfjO+MJrI+52GKESoxpo9cuC2sjvTjLvVCKgLPUV0+GAtM
-         6S1Q==
+        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=mXGH6sfF5Mv8489pO8HNMnvL4N6Kj76jRZqkd1Btows=;
+        b=j6j9cc3oeGRVjeb4q1mX5UvZe7oyDjzfb402Fg+7HhPoR8ZZ6I+HCu+AQE3gq0eDDd
+         5SBPUQaw2UJReVDDVyXNzMhXDX6rSNUrGZEzebEzR3mC+q1snggT0oxh7Uly5MzYNf5r
+         yJLjMHsZJW7MI2LqKKAA1/VIg6caDPkH/ibZtIg4WtRiccYwshL2Lm7PbBhc9gdSlBBi
+         BZoO7hz6wHRCK6BnX9Ew8PkGymJjUq48Of9zE+Aq9pDUvh2e/I/OMBDu85QL/WNz3rPv
+         lyKbsxEcKoQzkyqDhiw2oQOo/gaNSd8BdY6gFL1sHjdu/3qsLd9O7/r4sNtlcfFs2fOa
+         62CQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=9/me9AyG3+z6/xBlLhKMnSijxn45CKmb1z2Iv3P/dzo=;
-        b=jScuDthpGY2FpzhYFttmJ/BJRGWcfx7BoeY9x76PGjGn75/7my0sfANsyDnLDFAwu1
-         OKXiJiKz8HWrW0fdQ4troqNXnU43Nn1ncOyaaVNvYvjHSJX9uFd9zFWFtR20/ZxV2YsZ
-         Dh+iuhJZLBchIu+I+r7ly3qhTGBa+u87DhzZuyBBeSyk7FepkTG6MjPpgv7PPJnVd0gP
-         fcV9lT2x2S2olk7EKyZplkGcwOb0LAeUVnEy5qvb0S3BMER66yCbHNYbBfunpvxAWQCe
-         aiC0LJlttLCtHexn6w/N9PNEY1VDF26IZ7ibqup7O2MUtU0q9H3rjeQ91TvFVGrd5F+o
-         RyRg==
-X-Gm-Message-State: APjAAAU6a/DlW7Vz78YQpqGL33T3P83n8M8CzwlTF6fqJmaUGPwIm1s4
-        GcgHqOJm6VowkbjH7G0s0y0cCvWem8seTL9YfeYsKEO9B6YYCA==
-X-Google-Smtp-Source: APXvYqw2K8dKfpIRXdKZX8OSLXlp1MPn/llit6XOxB44tETSUpS4EgaAG3Gghx+coNXEVqpLvP++tkH3h6qzlylZ7uU=
-X-Received: by 2002:a19:9111:: with SMTP id t17mr23000185lfd.113.1565714554325;
- Tue, 13 Aug 2019 09:42:34 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=mXGH6sfF5Mv8489pO8HNMnvL4N6Kj76jRZqkd1Btows=;
+        b=TmqSh9xFthZCWJ8Z4KfwxTpvysgTygJ+e9Wd5qcsI7HSc3Z4QmBi12RgYnBl6VowfZ
+         TaP7AgZFzPwjCOSpvm1gQOoWwPuBVnQ8b439VLVFO5OU8Ek24+rMBfEtrVQ4gYkX4LjK
+         660mF8AF+fabqxzOhHwHOvgFfXVfl7q3rlvgPWPN35/8aYmCfvoQAfOg+VHyNPAMTa5p
+         QrwygMglaosTmN6LFcjlwWK5s/99RUDvrQE55eZvAHdkXTbgj/wb/f6AIJ2KZKvxFmsg
+         bh7LUfACHB49enwzzVA9QSJjM+WikuDMEZD835/w9dSKaV4aZqNX3TgbkrCaLutTVG8c
+         a6iw==
+X-Gm-Message-State: APjAAAXcfwdVeBuluOe78hz9J2jwpWtU2MxPgNz/Idxrz3bXVOlNIy8Y
+        IHZhq1VTrVLWfhyysm0g8bCwWQ==
+X-Google-Smtp-Source: APXvYqyIrpmWgiXBiK3PDYma3AbBRu7FLdOh0ZmeN1sG7QioNu25fJleeVa7zulYpZwXNMNhBdfcVQ==
+X-Received: by 2002:a17:90b:d8f:: with SMTP id bg15mr3266929pjb.65.1565718388234;
+        Tue, 13 Aug 2019 10:46:28 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::2:674])
+        by smtp.gmail.com with ESMTPSA id g11sm9780395pfh.121.2019.08.13.10.46.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Aug 2019 10:46:27 -0700 (PDT)
+Date:   Tue, 13 Aug 2019 13:46:25 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND] block: annotate refault stalls from IO submission
+Message-ID: <20190813174625.GA21982@cmpxchg.org>
+References: <20190808190300.GA9067@cmpxchg.org>
+ <20190809221248.GK7689@dread.disaster.area>
 MIME-Version: 1.0
-From:   Chris Murphy <chris@cmurf.com>
-Date:   Tue, 13 Aug 2019 10:42:23 -0600
-Message-ID: <CAMN_aZAEVowMRhjrODJ1wrnMK6jejqBipciyxWSJx6i+8SmrQQ@mail.gmail.com>
-Subject: [bug] segfault btrfs fi usage on seed sprout
-To:     Btrfs BTRFS <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190809221248.GK7689@dread.disaster.area>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-segfault 'btrfs fi usage' on two device btrfs seed+sprout volume
-https://bugzilla.kernel.org/show_bug.cgi?id=204569
+On Sat, Aug 10, 2019 at 08:12:48AM +1000, Dave Chinner wrote:
+> On Thu, Aug 08, 2019 at 03:03:00PM -0400, Johannes Weiner wrote:
+> > psi tracks the time tasks wait for refaulting pages to become
+> > uptodate, but it does not track the time spent submitting the IO. The
+> > submission part can be significant if backing storage is contended or
+> > when cgroup throttling (io.latency) is in effect - a lot of time is
+> 
+> Or the wbt is throttling.
+> 
+> > spent in submit_bio(). In that case, we underreport memory pressure.
+> > 
+> > Annotate submit_bio() to account submission time as memory stall when
+> > the bio is reading userspace workingset pages.
+> 
+> PAtch looks fine to me, but it raises another question w.r.t. IO
+> stalls and reclaim pressure feedback to the vm: how do we make use
+> of the pressure stall infrastructure to track inode cache pressure
+> and stalls?
+> 
+> With the congestion_wait() and wait_iff_congested() being entire
+> non-functional for block devices since 5.0, there is no IO load
+> based feedback going into memory reclaim from shrinkers that might
+> require IO to free objects before they can be reclaimed. This is
+> directly analogous to page reclaim writing back dirty pages from
+> the LRU, and as I understand it one of things the PSI is supposed
+> to be tracking.
+>
+> Lots of workloads create inode cache pressure and often it can
+> dominate the time spent in memory reclaim, so it would seem to me
+> that having PSI only track/calculate pressure and stalls from LRU
+> pages misses a fair chunk of the memory pressure and reclaim stalls
+> that can be occurring.
 
-kernel 5.2.8
-btrfs-progs 5.2.1
+psi already tracks the entire reclaim operation. So if reclaim calls
+into the shrinker and the shrinker scans inodes, initiates IO, or even
+waits on IO, that time is accounted for as memory pressure stalling.
 
-'btrfs fi show' does work:
-Label: 'first'  uuid: f7638175-SNIP
-        Total devices 2 FS bytes used 841.10GiB
-        devid    2 size 1024.00GiB used 882.00GiB path /dev/mapper/first
-        devid    3 size 698.62GiB used 2.06GiB path /dev/mapper/sdc
+If you can think of asynchronous events that are initiated from
+reclaim but cause indirect stalls in other contexts, contexts which
+can clearly link the stall back to reclaim activity, we can annotate
+them using psi_memstall_enter() / psi_memstall_leave().
 
-devid2 is the seed
-devid3 is the sprout
+In that vein, what would be great to have is be a distinction between
+read stalls on dentries/inodes that have never been touched before
+versus those that have been recently reclaimed - analogous to cold
+page faults vs refaults.
 
-Mount options
-/dev/mapper/first on /mnt/first type btrfs
-(rw,noatime,seclabel,space_cache=v2,subvolid=5,subvol=/)
+It would help psi, sure, but more importantly it would help us better
+balance pressure between filesystem metadata and the data pages. We
+would be able to tell the difference between a `find /' and actual
+thrashing, where hot inodes are getting kicked out and reloaded
+repeatedly - and we could backfeed that pressure to the LRU pages to
+allow the metadata caches to grow as needed.
 
-'btrfs fi usage /mnt/first' crashes with segmentation fault and no
-other messages
+For example, it could make sense to swap out a couple of completely
+unused anonymous pages if it means we could hold the metadata
+workingset fully in memory. But right now we cannot do that, because
+we cannot risk swapping just because somebody runs find /.
 
-dmesg shows
-[126052.599013] btrfs[14847]: segfault at 7ffe5e1e1018 ip
-000000000046db14 sp 00007ffe5e1df1a0 error 4 in btrfs[40c000+7c000]
-[126052.599034] Code: 28 48 c7 40 08 00 00 00 00 48 8b 74 24 08 48 89
-70 18 48 8b 74 24 10 48 01 70 08 48 83 c3 20 48 3b 5c 24 18 0f 84 12
-ff ff ff <48> 8b 2b 41 8b 0e 85 c9 7e 95 49 8b 17 8d 41 ff 48 c1 e0 05
-48 8d
-
-
-
--- 
-Chris
+I have semi-seriously talked to Josef about this before, but it wasn't
+quite obvious where we could track non-residency or eviction
+information for inodes, dentries etc. Maybe you have an idea?
