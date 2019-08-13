@@ -2,139 +2,61 @@ Return-Path: <SRS0=l92v=WJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 912B8C32753
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 17:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8D3AC433FF
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 21:41:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6233020840
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 17:46:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="j6j9cc3o"
+	by mail.kernel.org (Postfix) with ESMTP id 93B8B205F4
+	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 21:41:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727954AbfHMRq3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Aug 2019 13:46:29 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:46816 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726137AbfHMRq3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Aug 2019 13:46:29 -0400
-Received: by mail-pg1-f195.google.com with SMTP id w3so14422807pgt.13
-        for <linux-block@vger.kernel.org>; Tue, 13 Aug 2019 10:46:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=mXGH6sfF5Mv8489pO8HNMnvL4N6Kj76jRZqkd1Btows=;
-        b=j6j9cc3oeGRVjeb4q1mX5UvZe7oyDjzfb402Fg+7HhPoR8ZZ6I+HCu+AQE3gq0eDDd
-         5SBPUQaw2UJReVDDVyXNzMhXDX6rSNUrGZEzebEzR3mC+q1snggT0oxh7Uly5MzYNf5r
-         yJLjMHsZJW7MI2LqKKAA1/VIg6caDPkH/ibZtIg4WtRiccYwshL2Lm7PbBhc9gdSlBBi
-         BZoO7hz6wHRCK6BnX9Ew8PkGymJjUq48Of9zE+Aq9pDUvh2e/I/OMBDu85QL/WNz3rPv
-         lyKbsxEcKoQzkyqDhiw2oQOo/gaNSd8BdY6gFL1sHjdu/3qsLd9O7/r4sNtlcfFs2fOa
-         62CQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=mXGH6sfF5Mv8489pO8HNMnvL4N6Kj76jRZqkd1Btows=;
-        b=TmqSh9xFthZCWJ8Z4KfwxTpvysgTygJ+e9Wd5qcsI7HSc3Z4QmBi12RgYnBl6VowfZ
-         TaP7AgZFzPwjCOSpvm1gQOoWwPuBVnQ8b439VLVFO5OU8Ek24+rMBfEtrVQ4gYkX4LjK
-         660mF8AF+fabqxzOhHwHOvgFfXVfl7q3rlvgPWPN35/8aYmCfvoQAfOg+VHyNPAMTa5p
-         QrwygMglaosTmN6LFcjlwWK5s/99RUDvrQE55eZvAHdkXTbgj/wb/f6AIJ2KZKvxFmsg
-         bh7LUfACHB49enwzzVA9QSJjM+WikuDMEZD835/w9dSKaV4aZqNX3TgbkrCaLutTVG8c
-         a6iw==
-X-Gm-Message-State: APjAAAXcfwdVeBuluOe78hz9J2jwpWtU2MxPgNz/Idxrz3bXVOlNIy8Y
-        IHZhq1VTrVLWfhyysm0g8bCwWQ==
-X-Google-Smtp-Source: APXvYqyIrpmWgiXBiK3PDYma3AbBRu7FLdOh0ZmeN1sG7QioNu25fJleeVa7zulYpZwXNMNhBdfcVQ==
-X-Received: by 2002:a17:90b:d8f:: with SMTP id bg15mr3266929pjb.65.1565718388234;
-        Tue, 13 Aug 2019 10:46:28 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::2:674])
-        by smtp.gmail.com with ESMTPSA id g11sm9780395pfh.121.2019.08.13.10.46.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2019 10:46:27 -0700 (PDT)
-Date:   Tue, 13 Aug 2019 13:46:25 -0400
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND] block: annotate refault stalls from IO submission
-Message-ID: <20190813174625.GA21982@cmpxchg.org>
-References: <20190808190300.GA9067@cmpxchg.org>
- <20190809221248.GK7689@dread.disaster.area>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190809221248.GK7689@dread.disaster.area>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+        id S1726602AbfHMVlz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Aug 2019 17:41:55 -0400
+Received: from mga03.intel.com ([134.134.136.65]:61614 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726589AbfHMVlz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Aug 2019 17:41:55 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Aug 2019 14:41:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,382,1559545200"; 
+   d="scan'208";a="176328284"
+Received: from unknown (HELO revanth-X299-AORUS-Gaming-3-Pro.lm.intel.com) ([10.232.116.91])
+  by fmsmga008.fm.intel.com with ESMTP; 13 Aug 2019 14:41:54 -0700
+From:   Revanth Rajashekar <revanth.rajashekar@intel.com>
+To:     <linux-block@vger.kernel.org>
+Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
+        Scott Bauer <sbauer@plzdonthack.me>
+Subject: [PATCH 0/3] block: sed-opal: Code Cleanup Patches
+Date:   Tue, 13 Aug 2019 15:43:37 -0600
+Message-Id: <20190813214340.15533-1-revanth.rajashekar@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 10, 2019 at 08:12:48AM +1000, Dave Chinner wrote:
-> On Thu, Aug 08, 2019 at 03:03:00PM -0400, Johannes Weiner wrote:
-> > psi tracks the time tasks wait for refaulting pages to become
-> > uptodate, but it does not track the time spent submitting the IO. The
-> > submission part can be significant if backing storage is contended or
-> > when cgroup throttling (io.latency) is in effect - a lot of time is
-> 
-> Or the wbt is throttling.
-> 
-> > spent in submit_bio(). In that case, we underreport memory pressure.
-> > 
-> > Annotate submit_bio() to account submission time as memory stall when
-> > the bio is reading userspace workingset pages.
-> 
-> PAtch looks fine to me, but it raises another question w.r.t. IO
-> stalls and reclaim pressure feedback to the vm: how do we make use
-> of the pressure stall infrastructure to track inode cache pressure
-> and stalls?
-> 
-> With the congestion_wait() and wait_iff_congested() being entire
-> non-functional for block devices since 5.0, there is no IO load
-> based feedback going into memory reclaim from shrinkers that might
-> require IO to free objects before they can be reclaimed. This is
-> directly analogous to page reclaim writing back dirty pages from
-> the LRU, and as I understand it one of things the PSI is supposed
-> to be tracking.
->
-> Lots of workloads create inode cache pressure and often it can
-> dominate the time spent in memory reclaim, so it would seem to me
-> that having PSI only track/calculate pressure and stalls from LRU
-> pages misses a fair chunk of the memory pressure and reclaim stalls
-> that can be occurring.
+This series of patch is a cleanup for sed-opal in kernel 5.4. It
+1. Adds/removes spaces.
+2. Eliminates dead error condition.
+3. Eliminates definition defined twice.
 
-psi already tracks the entire reclaim operation. So if reclaim calls
-into the shrinker and the shrinker scans inodes, initiates IO, or even
-waits on IO, that time is accounted for as memory pressure stalling.
+These cleanup patches are submitted with the intend to submit a new feature
+after this.
 
-If you can think of asynchronous events that are initiated from
-reclaim but cause indirect stalls in other contexts, contexts which
-can clearly link the stall back to reclaim activity, we can annotate
-them using psi_memstall_enter() / psi_memstall_leave().
+Revanth Rajashekar (3):
+  block: sed-opal: Add/remove spaces
+  block: sed-opal: Eliminating the dead error
+  block: sed-opal: OPAL_METHOD_LENGTH defined twice
 
-In that vein, what would be great to have is be a distinction between
-read stalls on dentries/inodes that have never been touched before
-versus those that have been recently reclaimed - analogous to cold
-page faults vs refaults.
+ block/opal_proto.h |  5 +----
+ block/sed-opal.c   | 49 ++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 42 insertions(+), 12 deletions(-)
 
-It would help psi, sure, but more importantly it would help us better
-balance pressure between filesystem metadata and the data pages. We
-would be able to tell the difference between a `find /' and actual
-thrashing, where hot inodes are getting kicked out and reloaded
-repeatedly - and we could backfeed that pressure to the LRU pages to
-allow the metadata caches to grow as needed.
+--
+2.17.1
 
-For example, it could make sense to swap out a couple of completely
-unused anonymous pages if it means we could hold the metadata
-workingset fully in memory. But right now we cannot do that, because
-we cannot risk swapping just because somebody runs find /.
-
-I have semi-seriously talked to Josef about this before, but it wasn't
-quite obvious where we could track non-residency or eviction
-information for inodes, dentries etc. Maybe you have an idea?
