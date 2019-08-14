@@ -2,94 +2,86 @@ Return-Path: <SRS0=ptuj=WK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 475C3C433FF
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 14:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB7BC433FF
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 15:23:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 18FD12084F
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 14:50:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lXrxUu2G"
+	by mail.kernel.org (Postfix) with ESMTP id 129EF208C2
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 15:23:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726585AbfHNOug (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Aug 2019 10:50:36 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:38908 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726166AbfHNOug (ORCPT
+        id S1726551AbfHNPXq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Aug 2019 11:23:46 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:35735 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726525AbfHNPXq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Aug 2019 10:50:36 -0400
-Received: by mail-ot1-f67.google.com with SMTP id r20so33099000ota.5
-        for <linux-block@vger.kernel.org>; Wed, 14 Aug 2019 07:50:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=cWx0cFqnOpCViIJ4tMHIiuLTvCAxlz9fs3eE3H38dRE=;
-        b=lXrxUu2GbQ/3WBKNQg6bGoE9vwtRUCP4SFYSH0scEDD89DaRziNNmLBjE0vttmjUe/
-         O4oi/JbfzfFG5Xw+9gyej9xa8Hxo6VT5l/5Uhu6Ny65juAt0JRUAzvszKia3iSP6nh2r
-         cE0Ny9xPzGSah2fDAN6DN8EjpM8B6mh5i7nhJfiWPFDueWS5tsen90BhvNf8os6QfOaB
-         R9wxOqDAIO9Yz9t6d1bMDRQ3gDdzZeohh4mmfilwhiOUUe/mDlQ6e3WFeK9AEwQGx/YF
-         rY1tFBsimehN69v0SOIHFcLiMcb9eRNPzSfZvNrcyjLsWDG+3r2rJKdeGRUyQs6JW23U
-         vFbA==
+        Wed, 14 Aug 2019 11:23:46 -0400
+Received: by mail-lj1-f196.google.com with SMTP id l14so15224472lje.2
+        for <linux-block@vger.kernel.org>; Wed, 14 Aug 2019 08:23:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cWx0cFqnOpCViIJ4tMHIiuLTvCAxlz9fs3eE3H38dRE=;
-        b=GG2y5MzZamGT2wpyi6ilIsWxeM7a0ryQnGM5+RptEed1n4hVRDpQcD0dehmeToSAyV
-         WI6df8jk9f7JeV5sIvSaeazinlwltl8mPIYPFP9UYv8rPT033ofbdczyELtYOtVueKwh
-         cGW8jl6tGIxNCciA4bqi6FY2iO6YdRxlicjj8hBNp4h+7eBOLZEDUCba4I5bTDiHx1CZ
-         RuUetQNMOrNzxZfhzDJTSDlyoznMACICeL1XtKXeRfrcsfuVJzg/odllY0KnQmoC8XuP
-         mDNHfgR0n7wogQooH0PcTm5UkLsNHHFuf9n9gyeJWKHaTpOtn7/fQ3dpKTVabtQJ7a8z
-         LmRg==
-X-Gm-Message-State: APjAAAX3zqZO1kLhtF7JcGvKJ7ruSyoLrAU7LE0v0qLgorq+hIbNFBZk
-        JulOqwY2CI00AHzUlGpToAIRNw==
-X-Google-Smtp-Source: APXvYqzQoRGPHjcNHC/V15omIqsc2Ze631e9qimSe/1ZAhI9YzS7mHKxHhdIL75MIuw/sd9unwIaTQ==
-X-Received: by 2002:a5e:834d:: with SMTP id y13mr288968iom.79.1565794234700;
-        Wed, 14 Aug 2019 07:50:34 -0700 (PDT)
-Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id e22sm101663iog.2.2019.08.14.07.50.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 14 Aug 2019 07:50:33 -0700 (PDT)
-Subject: Re: [PATCH RESEND] block: annotate refault stalls from IO submission
-To:     Johannes Weiner <hannes@cmpxchg.org>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190808190300.GA9067@cmpxchg.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4ad47b61-e917-16cc-95a0-18e070b6b4e0@kernel.dk>
-Date:   Wed, 14 Aug 2019 08:50:32 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Qz7Z2Fc44cwZREiMyH8d13QtVZz2oMJeswQns/7qg58=;
+        b=pohdqEShuIQvFquXCqCIw/dXTcC+AOlnq4+s/b0wxKc/AgB7UbcEbKVMeQCy7hLtLv
+         gvi1jCUAMaYA6E8mbZeGIQHCHpkmzDaPveLWdGzizofJBt+r/tNVdMOeFnfmIz40yB7e
+         XySr/YCoeJOd3yz6tzR4lBSGtfm+hg/Ks0tTTaPNGkGI+alfxHW7YpNCIHoK/c8sMam2
+         PW70ZPM1xtkgo64LewQX1+nmx0Fmlx6XD/b3UkVquuGxWumhKEsEXX4c93OqxHyBV6wU
+         nbe6hFoYDG50MUyFs7lI0syehxK8RDV3S1HA2+Fd0uMTLwcRX8MA/OggMKclJLbwI8dh
+         mYJA==
+X-Gm-Message-State: APjAAAXjcqvTqKXduzG/8JKfXubVFh1rQ78NAGoCONPbf8ptWJrsR199
+        JJVlPj97EDPPWY5M05QtwFON/ZkzDo21Y6Ktlij1mw==
+X-Google-Smtp-Source: APXvYqzsR0MxMgI5hCLVVL4VPMgJeeth4xL8PEO/NyV/B3HoKwKpoX9EWEzSbvBuvNaiVPVor1dRAyV+dBsnmXYU49s=
+X-Received: by 2002:a2e:824f:: with SMTP id j15mr169272ljh.117.1565796224496;
+ Wed, 14 Aug 2019 08:23:44 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190808190300.GA9067@cmpxchg.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190812123933.24814-1-jusual@redhat.com> <592fe38c-1fa2-9ba5-cd6c-da69c95edb33@acm.org>
+ <75c89da5-2ec1-9725-62c8-f6abd3a24202@kernel.dk>
+In-Reply-To: <75c89da5-2ec1-9725-62c8-f6abd3a24202@kernel.dk>
+From:   Julia Suvorova <jusual@redhat.com>
+Date:   Wed, 14 Aug 2019 17:23:33 +0200
+Message-ID: <CAMDeoFXJ3r_axyrDWwHkbz-9o42WyT-rcTfXZjrmmp7GK82brA@mail.gmail.com>
+Subject: Re: [PATCH] liburing/barrier.h: Add prefix io_uring to barriers
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@gmail.com>,
+        Aarushi Mehta <mehta.aaru20@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/8/19 1:03 PM, Johannes Weiner wrote:
-> psi tracks the time tasks wait for refaulting pages to become
-> uptodate, but it does not track the time spent submitting the IO. The
-> submission part can be significant if backing storage is contended or
-> when cgroup throttling (io.latency) is in effect - a lot of time is
-> spent in submit_bio(). In that case, we underreport memory pressure.
-> 
-> Annotate submit_bio() to account submission time as memory stall when
-> the bio is reading userspace workingset pages.
+On Mon, Aug 12, 2019 at 6:03 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 8/12/19 7:55 AM, Bart Van Assche wrote:
+> > On 8/12/19 5:39 AM, Julia Suvorova wrote:
+> >> -#define mb()        asm volatile("mfence" ::: "memory")
+> >> -#define rmb()       asm volatile("lfence" ::: "memory")
+> >> -#define wmb()       asm volatile("sfence" ::: "memory")
+> >> -#define smp_rmb() barrier()
+> >> -#define smp_wmb() barrier()
+> >> +#define io_uring_mb()               asm volatile("mfence" ::: "memory")
+> >> +#define io_uring_rmb()              asm volatile("lfence" ::: "memory")
+> >> +#define io_uring_wmb()              asm volatile("sfence" ::: "memory")
+> >> +#define io_uring_smp_rmb()  io_uring_barrier()
+> >> +#define io_uring_smp_wmb()  io_uring_barrier()
+> >
+> > Do users of liburing need these macros? If not, have you considered to
+> > move these macros to a new header file that is only used inside liburing
+> > and such that these macros are no longer visible to liburing users?
+>
+> The exposed API should not need any explicit barriers from the user,
+> so this suggestion makes a lot of sense to me.
 
-Applied for 5.4.
+How about moving the definition of io_uring_cqe_seen() with whole
+io_uring_cq_advance() and io_uring_for_each_cqe() from liburing.h to
+queue.c? This way we can cover all barriers, and leave barrier.h local.
 
--- 
-Jens Axboe
+Do you need io_uring_cq_advance and io_uring_for_each_cqe in the
+library?
 
+Best regards, Julia Suvorova.
