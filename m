@@ -1,158 +1,104 @@
-Return-Path: <SRS0=l92v=WJ=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=ptuj=WK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92847C32750
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 22:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA30C32750
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:04:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69630206C2
-	for <linux-block@archiver.kernel.org>; Tue, 13 Aug 2019 22:28:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80ED920844
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:04:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l9ndCYzl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727195AbfHMW2C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Aug 2019 18:28:02 -0400
-Received: from mga06.intel.com ([134.134.136.31]:21969 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727116AbfHMW2C (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Aug 2019 18:28:02 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Aug 2019 15:28:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,382,1559545200"; 
-   d="p7s'?scan'208";a="194290657"
-Received: from orsmsx104.amr.corp.intel.com ([10.22.225.131])
-  by fmsmga001.fm.intel.com with ESMTP; 13 Aug 2019 15:28:01 -0700
-Received: from orsmsx125.amr.corp.intel.com (10.22.240.125) by
- ORSMSX104.amr.corp.intel.com (10.22.225.131) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 13 Aug 2019 15:28:01 -0700
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.157]) by
- ORSMSX125.amr.corp.intel.com ([169.254.3.92]) with mapi id 14.03.0439.000;
- Tue, 13 Aug 2019 15:28:01 -0700
-From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
-To:     "Rajashekar, Revanth" <revanth.rajashekar@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "hch@lst.de" <hch@lst.de>,
-        "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH 0/3] block: sed-opal: Code Cleanup Patches
-Thread-Topic: [PATCH 0/3] block: sed-opal: Code Cleanup Patches
-Thread-Index: AQHVUh/2LNijM34Xc0CPl2QrHP8fZKb6HdGA
-Date:   Tue, 13 Aug 2019 22:28:00 +0000
-Message-ID: <b0d747e6f5ab36837f9edc088dde9329cb911b2e.camel@intel.com>
-References: <20190813214340.15533-1-revanth.rajashekar@intel.com>
-In-Reply-To: <20190813214340.15533-1-revanth.rajashekar@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.232.115.165]
-Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-2lo7Np3Ov1WnPffanuHa"
+        id S1726373AbfHNCEa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Aug 2019 22:04:30 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:38059 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726007AbfHNCEa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Aug 2019 22:04:30 -0400
+Received: by mail-ed1-f65.google.com with SMTP id r12so5708122edo.5;
+        Tue, 13 Aug 2019 19:04:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=yClt4IiYnvtlCU9uUEc5mhIYUjABpvyWOso+HI4mu3o=;
+        b=l9ndCYzlwR5qGpefWEgVLiJsPd4v8Dk4nsao6j4NOxiRFw3jG0aPROGqZxMVJR3lpC
+         GgflwMHAjzTKnoSfg6myFWphE5+A5HM8M2CC4ZNWiHjcMVl9lJ/c+PaDElSrNzJrfBGb
+         BniQUVDawR1ghe7yEsAp2HWpQJrndum1p0fxY5vT+knYDfn0SUqQPRT2Fgy1pQLXrb+I
+         WtvdlASjkuw+vO/1ZJ0V56F047OwOcNphKVmF3q3LEuJ6bEUsRuU1v5RdOVyx6oBNJbf
+         7glrhkCTTq7yr9ZGLALrsby9RiapZVvRb2IKimk68pRikKBjUMxUDjEVDYoqd8rLVkoM
+         IM0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=yClt4IiYnvtlCU9uUEc5mhIYUjABpvyWOso+HI4mu3o=;
+        b=PJgHaZPnbKXJKqkVYvGMnUNUfRFlbwaYKHASInI+ak4LtttNCCeqJ76LQ8L0kRUoMu
+         nb5khdCVbmC5yh8dkT0NiG4h3oyi6ZRFbHx0u2aaGPIF1z5XztRWriuun9s3PPocmx2E
+         wpX5Ae06CvRJMVxBORvj4gc6PXxW5UDLjhTp79JsSkjwKsqS6zvLuKux4keZGxszKP1M
+         0Y7u3MC18JU6ogMhXIfwoDQzCfFmDOJ/qIAU1Gmy6oiQKjS7rPecf2pQDfIqQ++15yho
+         V9LSMp1lrd4A03viztn2IfuerY1ZcEskeJgL4TAiesCI9Iaf8giwUncg5d5Wj8SLIFKQ
+         UBYA==
+X-Gm-Message-State: APjAAAWlXr3axFgvQqD2sIfb/UNK9sdsTFp/dycanfm8SpF3HM98KvXi
+        puMwbSm/91qLiPRMIFJ65qA=
+X-Google-Smtp-Source: APXvYqxhOvGYIm/p1syoBfmRH4Nh5i7jAhIt7mkfGBb6oygRhVeG0iblgw2hn7e0AoAKsPwHBKza7g==
+X-Received: by 2002:a50:b48f:: with SMTP id w15mr45996037edd.260.1565748268455;
+        Tue, 13 Aug 2019 19:04:28 -0700 (PDT)
+Received: from continental ([186.212.91.40])
+        by smtp.gmail.com with ESMTPSA id x11sm25444255eda.80.2019.08.13.19.04.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Aug 2019 19:04:27 -0700 (PDT)
+Date:   Tue, 13 Aug 2019 23:05:40 -0300
+From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, hch@lst.de,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv2 0/4] blk_execute_rq{_nowait} cleanup part1
+Message-ID: <20190814020540.GA27622@continental>
+References: <20190809105433.8946-1-marcos.souza.org@gmail.com>
+ <55246cff-6d32-e7d5-bee0-9940bc59250a@kernel.dk>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <55246cff-6d32-e7d5-bee0-9940bc59250a@kernel.dk>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---=-2lo7Np3Ov1WnPffanuHa
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Sun, Aug 11, 2019 at 07:47:17AM -0600, Jens Axboe wrote:
+> On 8/9/19 3:54 AM, Marcos Paulo de Souza wrote:
+> > After checking the request_queue argument of funtion blk_execute_rq_nowait, I
+> > now added three more patches, one to remove the same argument from
+> > blk_execute_rq and other two to change the at_head argument from
+> > blk_exeute_rq_{nowait} from int to bool.
+> > 
+> > Original patch can be checked here[1].
+> > 
+> > After this patch gets merged, my plan is to analyse the usage the gendisk
+> > argument, is being set as NULL but the majority of callers.
+> > 
+> > [1]: https://lkml.org/lkml/2019/8/6/31
+> 
+> Don't ever send something out that hasn't even been compiled. I already
+> detest doing kernel-wide cleanup changes like this, but when I do, I
+> need absolute confidence in it actually being tested. The fact that it
+> hasn't even been compiled is a big black mark on the submitter.
 
-+Christoph, Jens
+My bad. I compiled the code locally and tested in VM, but later on I removed
+the semicolon by mistake while reviewing the changes once more and the code
+was commited without the semicolon. I'm improving my setup (scripts
+and whatnot) to avoid this happening again in the future.
 
-On Tue, 2019-08-13 at 15:43 -0600, Rajashekar, Revanth wrote:
-> This series of patch is a cleanup for sed-opal in kernel 5.4. It
-> 1. Adds/removes spaces.
-> 2. Eliminates dead error condition.
-> 3. Eliminates definition defined twice.
->=20
-> These cleanup patches are submitted with the intend to submit a new
-> feature
-> after this.
->=20
-> Revanth Rajashekar (3):
->   block: sed-opal: Add/remove spaces
->   block: sed-opal: Eliminating the dead error
->   block: sed-opal: OPAL_METHOD_LENGTH defined twice
->=20
->  block/opal_proto.h |  5 +----
->  block/sed-opal.c   | 49 ++++++++++++++++++++++++++++++++++++++----
-> ----
->  2 files changed, 42 insertions(+), 12 deletions(-)
->=20
-> --
-> 2.17.1
->=20
-
---=-2lo7Np3Ov1WnPffanuHa
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-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
-PNauajAtxgRKfqfSMb+IcL/VXiPtVZOxVq+CTZeDJkaEmn/79vg8OYxpR+YhFF+tGlKf/Zc4id1P
-AgMBAAGjggI3MIICMzAdBgNVHQ4EFgQU4oawcWXM1cPGdwGcIszDfjORVZAwHwYDVR0jBBgwFoAU
-HmkqtNwo/kcYTiELP7ysES/wmPUwZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5pbnRlbC5j
-b20vcmVwb3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENB
-JTIwNEEuY3JsMIGfBggrBgEFBQcBAQSBkjCBjzBpBggrBgEFBQcwAoZdaHR0cDovL3d3dy5pbnRl
-bC5jb20vcmVwb3NpdG9yeS9jZXJ0aWZpY2F0ZXMvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIw
-SXNzdWluZyUyMENBJTIwNEEuY3J0MCIGCCsGAQUFBzABhhZodHRwOi8vb2NzcC5pbnRlbC5jb20v
-MAsGA1UdDwQEAwIHgDA8BgkrBgEEAYI3FQcELzAtBiUrBgEEAYI3FQiGw4x1hJnlUYP9gSiFjp9T
-gpHACWeB3r05lfBDAgFkAgEJMB8GA1UdJQQYMBYGCCsGAQUFBwMEBgorBgEEAYI3CgMMMCkGCSsG
-AQQBgjcVCgQcMBowCgYIKwYBBQUHAwQwDAYKKwYBBAGCNwoDDDBRBgNVHREESjBIoCoGCisGAQQB
-gjcUAgOgHAwaam9uYXRoYW4uZGVycmlja0BpbnRlbC5jb22BGmpvbmF0aGFuLmRlcnJpY2tAaW50
-ZWwuY29tMA0GCSqGSIb3DQEBBQUAA4IBAQBxGkHe05DNpYel4b9WbbyQqD1G6y6YA6C93TjKULZi
-p8+gO1LL096ixD44+frVm3jtXMikoadRHQJmBJdzsCywNE1KgtrYF0k4zRWr7a28nyfGgQe4UHHD
-7ARyZFeGd7AKSQ1y4/LU57I2Aw2HKx9/PXavv1JXjjO2/bqTfnZDJTQmOQ0nvlO3/gvbbABxZHqz
-NtfHZsQWS7s+Elk2xGUQ0Po2pMCQoaPo9R96mm+84UP9q3OvSqMoaZwfzoUeAx2wGJYl0h3S+ABr
-CPVfCgq9qnmVCn5DyHWE3V/BRjJCoILLBLxAxnmSdH4pF6wJ6pYRLEw9qoyNhpzGUIJU/Lk1MYIC
-FzCCAhMCAQEwgZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBD
-bGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFs
-IEJhc2ljIElzc3VpbmcgQ0EgNEECEzMAAMamAkocC+WQNPgAAAAAxqYwCQYFKw4DAhoFAKBdMBgG
-CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDgxMzIyMjc1OVowIwYJ
-KoZIhvcNAQkEMRYEFIfkyeiRgtdFul1pKD7OS+LWouCnMA0GCSqGSIb3DQEBAQUABIIBAJt/w3xq
-Kv3EJM7h5N6D/25kZ+fRYG3f//4BTI0t/q79Uj9K4h/WLV5GlLX8bSlloKftK3kSYniSxaKPcJBY
-bu3RFRPLICYwZxZ7dvPX17KIzKW7jgorsah3kQNk0Pu8AMCe9hjuZQU++5kG8vXJbgpA2+ysp6fL
-Ul8ke49+qRqJrmYesJLjHQSDDiTULlLseOITng/Vrg1TKnZ2wpJ3zJx+jsDcRpqX4DeDqTAxb4nm
-ZUqSPwInsz1NuOz2A4MhLwGL3K3VQFjciiin1hzSVcJ/+SBphGVFGUYr2VjeLxoDJ9wai3oYmKsB
-rRUXe9ayHjCdw3mYq5Wk1Vdrv2eDd/IAAAAAAAA=
-
-
---=-2lo7Np3Ov1WnPffanuHa--
+> 
+> -- 
+> Jens Axboe
+> 
