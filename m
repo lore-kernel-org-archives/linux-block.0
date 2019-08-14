@@ -2,234 +2,372 @@ Return-Path: <SRS0=ptuj=WK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C00C32750
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB23C433FF
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 04:20:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F32032084F
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC15820843
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 04:20:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727017AbfHNCwq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Aug 2019 22:52:46 -0400
-Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:56391 "EHLO
-        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726750AbfHNCwq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Aug 2019 22:52:46 -0400
-Received: from dread.disaster.area (pa49-181-167-148.pa.nsw.optusnet.com.au [49.181.167.148])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 4FE0C361163;
-        Wed, 14 Aug 2019 12:52:37 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92)
-        (envelope-from <david@fromorbit.com>)
-        id 1hxjNq-0007K4-DZ; Wed, 14 Aug 2019 12:51:30 +1000
-Date:   Wed, 14 Aug 2019 12:51:30 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Johannes Weiner <hannes@cmpxchg.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND] block: annotate refault stalls from IO submission
-Message-ID: <20190814025130.GI7777@dread.disaster.area>
-References: <20190808190300.GA9067@cmpxchg.org>
- <20190809221248.GK7689@dread.disaster.area>
- <20190813174625.GA21982@cmpxchg.org>
+        id S1725895AbfHNEUJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Aug 2019 00:20:09 -0400
+Received: from smtp.infotech.no ([82.134.31.41]:44022 "EHLO smtp.infotech.no"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725263AbfHNEUI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Aug 2019 00:20:08 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.infotech.no (Postfix) with ESMTP id 7CB2B20423A;
+        Wed, 14 Aug 2019 06:20:05 +0200 (CEST)
+X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
+Received: from smtp.infotech.no ([127.0.0.1])
+        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id iLhfFv5AlQcz; Wed, 14 Aug 2019 06:20:02 +0200 (CEST)
+Received: from [192.168.48.23] (host-23-251-188-50.dyn.295.ca [23.251.188.50])
+        by smtp.infotech.no (Postfix) with ESMTPA id A93D820414F;
+        Wed, 14 Aug 2019 06:20:00 +0200 (CEST)
+From:   Douglas Gilbert <dgilbert@interlog.com>
+Subject: Re: [PATCH v3 00/20] sg: add v4 interface
+Reply-To: dgilbert@interlog.com
+To:     James Bottomley <jejb@linux.vnet.ibm.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org
+Cc:     martin.petersen@oracle.com, hare@suse.de, bvanassche@acm.org,
+        Arnd Bergmann <arnd@arndb.de>,
+        Tony Battersby <tonyb@cybernetics.com>
+References: <20190807114252.2565-1-dgilbert@interlog.com>
+ <1565291455.3435.48.camel@linux.vnet.ibm.com>
+ <7edab448-22cc-493a-f745-acc5be38f6a5@interlog.com>
+ <1565305243.25619.27.camel@linux.vnet.ibm.com>
+Message-ID: <51e7cdfb-7921-9368-9b78-90ba5ac50c77@interlog.com>
+Date:   Wed, 14 Aug 2019 00:19:57 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190813174625.GA21982@cmpxchg.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.2 cv=FNpr/6gs c=1 sm=1 tr=0
-        a=gu9DDhuZhshYSb5Zs/lkOA==:117 a=gu9DDhuZhshYSb5Zs/lkOA==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=FmdZ9Uzk2mMA:10
-        a=7-415B0cAAAA:8 a=bDTW_sOx19nDKLnYJhUA:9 a=cnofGfEq4Fq2u8Yj:21
-        a=FLub2pyhoGWWgdtb:21 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <1565305243.25619.27.camel@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 13, 2019 at 01:46:25PM -0400, Johannes Weiner wrote:
-> On Sat, Aug 10, 2019 at 08:12:48AM +1000, Dave Chinner wrote:
-> > On Thu, Aug 08, 2019 at 03:03:00PM -0400, Johannes Weiner wrote:
-> > > psi tracks the time tasks wait for refaulting pages to become
-> > > uptodate, but it does not track the time spent submitting the IO. The
-> > > submission part can be significant if backing storage is contended or
-> > > when cgroup throttling (io.latency) is in effect - a lot of time is
-> > 
-> > Or the wbt is throttling.
-> > 
-> > > spent in submit_bio(). In that case, we underreport memory pressure.
-> > > 
-> > > Annotate submit_bio() to account submission time as memory stall when
-> > > the bio is reading userspace workingset pages.
-> > 
-> > PAtch looks fine to me, but it raises another question w.r.t. IO
-> > stalls and reclaim pressure feedback to the vm: how do we make use
-> > of the pressure stall infrastructure to track inode cache pressure
-> > and stalls?
-> > 
-> > With the congestion_wait() and wait_iff_congested() being entire
-> > non-functional for block devices since 5.0, there is no IO load
-> > based feedback going into memory reclaim from shrinkers that might
-> > require IO to free objects before they can be reclaimed. This is
-> > directly analogous to page reclaim writing back dirty pages from
-> > the LRU, and as I understand it one of things the PSI is supposed
-> > to be tracking.
-> >
-> > Lots of workloads create inode cache pressure and often it can
-> > dominate the time spent in memory reclaim, so it would seem to me
-> > that having PSI only track/calculate pressure and stalls from LRU
-> > pages misses a fair chunk of the memory pressure and reclaim stalls
-> > that can be occurring.
+On 2019-08-09 1:00 a.m., James Bottomley wrote:
+> On Thu, 2019-08-08 at 23:08 +0200, Douglas Gilbert wrote:
+>> On 2019-08-08 9:10 p.m., James Bottomley wrote:
+>>> On Wed, 2019-08-07 at 13:42 +0200, Douglas Gilbert wrote:
+>>>> This patchset extends the SCSI generic (sg) driver found in
+>>>> lk 5.3 .  The sg driver has a version number which is visible
+>>>> via ioctl(SG_GET_VERSION_NUM) and is bumped from 3.5.36 to
+>>>> 4.0.03 by this patchset. The additions and changes are
+>>>> described in some detail in this long webpage:
+>>>>       http://sg.danny.cz/sg/sg_v40.html
+>>>>
+>>>> Most new features described in the above webpage are not
+>>>> implemented in this patchset.
+>>>
+>>> Since this will be an extension of something that exists both in
+>>> your sg driver and in the block bsg interface (and thus needs an
+>>> implementation there), I added both linux-block and linux-api to
+>>> the cc (the latter because you're adding to an API).
+>>
+>> The SG_IO ioctl has been the synchronous SCSI pass-through interface
+>> for over 15 years. Its quirk is that it takes two different formats
+>> depending on the character device its file descriptor belongs to:
+>>      - sg device file descriptor: sg v3 interface (struct sg_io_hdr)
+>>      - bsg device file descriptor: sg v4 interface (struct sg_io_v4)
+>>
+>> I'm only proposing one change in the synchronous interface based
+>> on the SG_IO ioctl: to additionally accept the sg v4 interface in
+>> the sg driver.
 > 
-> psi already tracks the entire reclaim operation. So if reclaim calls
-> into the shrinker and the shrinker scans inodes, initiates IO, or even
-> waits on IO, that time is accounted for as memory pressure stalling.
+> Right, as I said below, adding v4 to sg looks to be fine.  We don't
+> need v3 in BSG since v4 is a superset.
+> 
+>> Arnd Bergmann considers two interface structures through one ioctl
+>> as undesirable but is prepared to accept SG_IO. His POV is as the
+>> maintainer of 32/64 bit compatibility ioctls. The case of SG_IO
+>> is a well established exception to his rules (i.e. a known evil).
+>>
+>> I don't believe extending ioctl SG_IO for asynchronous work is a
+>> good idea. As pointed out above, it is already overloaded too
+>> much. Additionally it would need further flags to differentiate
+>> these cases:
+>>      - sync/async
+>>      - if async: submission or reception
+>>      - and optionally if async: abort (an inflight request)
+>>      - and do you want to add multiple requests in there too?
+>>
+>> So are you looking at reducing the number of ioctl to the absolute
+>> minimum? If so I don't think the SG_IO ioctl is the correct vehicle
+>> for that. It doesn't use the _IOR(W) macros, instead it is hard
+>> coded at 0x2285 ***. And the size checking offered by the _IOR(W)
+>> macro (on the object pointed to by the 3rd argument) is useless with
+>> SG_IO because it takes two different sized objects. Worse, one of
+>> those objects changes size between 32 and 64 bits, while the other
+>> does not.
+> 
+> OK, so this is where interface design is important.  It's perfectly
+> possible to design an async interface using the current v4 BSG SG_IO.
+> You simply open the device O_NONBLOCK and send the ioctl which will
+> return immediately.  To find out when it returns you poll (we'd
+> obviously need to add polling in bsg, but that's fairly simple).  Since
+>   poll/select/epoll is our standard async event handling mechanism, we
+> should at least try it and have a good reason why it doesn't work
+> before inventing our own equivalent.
 
-hmmmm - reclaim _scanning_ is considered a stall event? i.e. even if
-scanning does not block, it's still accounting that _time_ as a
-memory pressure stall?
+I don't see much new interface design here over what was done by
+Lawrence Foard 27 years ago. Linux cleverness has broken the
+classic use of read() and write() in char drivers. Hard to hold that
+against the original design. The design works if the last 27 years
+is any guide and maps reasonably closely to how the mid-level
+(or the block layer) issues SCSI commands. All other general
+purpose OSes that I am aware of, with the exception of Darwin,
+have a similar SCSI pass-through, at least on the sync side.
 
-I'm probably missing it, but I don't see anything in vmpressure()
-that actually accounts for time spent scanning.  AFAICT it accounts
-for LRU objects scanned and reclaimed from memcgs, and then the
-memory freed from the shrinkers is accounted only to the
-sc->target_mem_cgroup once all memcgs have been iterated.
+>> Stepping back, this started about 18 months ago when security
+>> janitors got upset about the bsg driver's use of write()/read() for
+>> its async interface. Linus Torvalds suggested SG_IOSUBMIT and
+>> SG_IORECEIVE to replace write() and read() respectively in bsg.
+>> Instead the write()/read() interface was removed from the bsg driver.
+>> With it went the ability to submit multiple requests in one write()
+>> call (by passing an array of sg_io_v4 objects rather than just one).
+>> My intention is to re-add that capability in the sg driver, using the
+>> ioctls that Linus suggested.
+> 
+> What I'm saying is let's discuss the interface design before we add it.
+>   the submit/receive interface is essentially a packet one.  The problem
+> with a packet one is that we're request/response where the response
+> likely altered some user memory area, so each response has to be
+> matched with the outbound request to find out what happened ... how is
+> that done?
 
-So, AFAICT, there's no time aspect to this, and the amount of
-scanning that shrinkers do is not taken into account, so pressure
-can't really be determined properly there. It seems like what the
-shrinkers reclaim will actually give an incorrect interpretation of
-pressure right now...
+Well this has been fundamental to the sg driver design. There are
+now three mechanisms, described below with the oldest first:
+   1) pack_id: an identifying integer supplied by the user in the
+      submit that can be given as input to the receive call so
+      it either yields the (first) matching response, or waits (sync
+      action) or returns saying nothing was found (async action).
+      pack_id was present in the sg driver in version 1.0 of Linux
+      in 1992. It still works fine.
+   2) usr_ptr: sometimes described as a "closure pointer". User
+      provided, untouched by the driver, and placed in the
+      corresponding response. Present in sg v3 and v4 interfaces.
+      In place over 15 years.
+   3) tag: like pack_id but issued by the block layer so it is
+      _output_ by the submit call. In practice it does not work
+      reliably *** due to questionable design in the block layer. After
+      blk_execute_rq_nowait() is called the tag is picked out of
+      its data structure. However that command may not have started
+      (so no valid tag) or could have already finished (a stale tag).
+      Tag is a new feature in the proposed patchsets.
 
-> If you can think of asynchronous events that are initiated from
-> reclaim but cause indirect stalls in other contexts, contexts which
-> can clearly link the stall back to reclaim activity, we can annotate
-> them using psi_memstall_enter() / psi_memstall_leave().
+> One way to do it simply with existing SG_IO is to allow only one
+> outstanding request per FD, so if you want five requests, you open five
+> FDs and then poll all of them to see which one returns.  I'm not saying
+> it's the best because FDs are a somewhat precious commodity, but it is
+> possible and it's a simple extension of what exists today.
 
-Well, I was more thinking that issuing/waiting on IOs is a stall
-event, not scanning.
+I believe this is adequately covered by the mechanisms above.
 
-The IO-less inode reclaim stuff for XFS really needs the main
-reclaim loop to back off under heavy IO load, but we cannot put the
-entire metadata writeback path under psi_memstall_enter/leave()
-because:
+>> Initially I had both the sg v3 and v4 interfaces passing through the
+>> two ioctls. Arnd Bergmann preferred that a separate pair of ioctls
+>> be used for each interface. Hence SG_IOSUBMIT_V3 and SG_IORECEIVE_V3
+>> were added for the v3 interface. And thus SG_IOSUBMIT and
+>> SG_IORECEIVE only use the v4 interface. This cleaned up my code and
+>> documentation. As a bonus, all four ioctls use the _IORW macros and
+>> can check the fixed size of the third argument to each ioctl
+>> invocation.
+> 
+> Can we talk first about how the interface should work.  We can get into
+> assigning ioctls and what extensions are needed later.
 
-	a) it's not linked to any user context - it's a
-	per-superblock kernel thread; and
+I have been trying for 9 months to get some feedback on
+the current design. The attitude seems to be present some
+patches; no, those ones are too big, etc. As for my design
+document at:
+     http://sg.danny.cz/sg/sg_v40.html
 
-	b) it's designed to always be stalled on IO when there is
-	metadata writeback pressure. That pressure most often comes from
-	running out of journal space rather than memory pressure, and
-	really there is no way to distinguish between the two from
-	the writeback context.
+tl;dr ?
 
-Hence I don't think the vmpressure mechanism does what the memory
-reclaim scanning loops really need because they do not feed back a
-clear picture of the load on the IO subsystem load into the reclaim
-loops.....
+Evidently write() and read() system calls have special features
+that could be exploited by an attack via the bsg or sg drivers.
+ioctl(SG_IOSUBMIT) is just write(sg_fd, ...) that is less
+exploitable. There is a similar relationship between
+ioctl(SG_IORECEIVE) an read(sg_fd, ...). Otherwise the async
+interface design remains the same in the sg driver as it was
+when introduced 27 years ago. ^^^
 
-> In that vein, what would be great to have is be a distinction between
-> read stalls on dentries/inodes that have never been touched before
-> versus those that have been recently reclaimed - analogous to cold
-> page faults vs refaults.
+Bart Van Assche hinted at a better API design but didn't present
+it. If he did, that would be the first time an alternate API
+design was presented for async usage in the 20 years that I have
+been associated with the driver.
 
-See my "nonblocking inode reclaim for XFS" series. It adds new
-measures of that the shrinkers feed back to the main reclaim loop.
+>>> Simply extending sg to use the v4 header protocol in
+>>> uapi/linux/bsg.h is fine modulo the code being in the right
+>>> form.  The problems are the new ioctls you want to add that would
+>>> need to be present there as well.
+>>
+>> Why? The bsg driver has never accepted the sg v3 interface. It has
+>> also removed functionality that I'm trying to re-add in this, and a
+>> follow-on patchset. The bsg driver has reduced its functionality as a
+>> generalized SCSI pass-through, but it has more than enough other
+>> roles to justify its existence, for example as a SMP (SAS) pass-
+>> through and a driver/transport specific pass-through to various LLDs.
+>> I don't see the need for the sg and bsg driver to move forward in
+>> lockstep.
+> 
+> You quote Linus a lot above, but he also said "I wonder if we could at
 
-One of those measures is the number of objects scanned. Shrinkers
-already report the number of objects they free, but that it tossed
-away and not used by the main reclaim loop.
+twice
 
-As for cold faults vs refaults, we could only report that for
-dentries - if the inode is still cached in memory, then the dentry
-hits the inode cache (hot fault), otherwise it's got to fetch the
-inode from disk (cold fault). There is no mechanisms for tracking
-inodes that have been recently reclaimed - the VFS uses a hash for
-tracking cached inodes and so there's nothign you can drop
-exceptional entries into to track reclaim state.
+> least try to unify the bsg/sg code - possibly by making sg use the
+> prettier bsg code (but definitely have to add all the security
+> measures)".  It's in the interests of unity that we need to make the
+> code paths look the same as possible, so eventually one could call the
+> other.  ideally sg would call bsg for v4 and we'd add async to bsg so
+> it would work for both.
 
-That said, we /could/ do this with the XFS inode cache. It uses
-radix trees to index the cache, not the VFS level inode hash. Hence
-we could place exceptional entries into the tree on reclaim to do
-working set tracking similar to the way the page cache is used to
-track the working set of pages.
+The bsg driver needs to be rewritten. Ah, no need since by removing the
+async (including multiple requests) part, the broken implementation is
+no more. Its implementation is sufficient to issue synchronous
+SCSI commands, not much more +++. The bsg v4 interface implementation
+was only a superset of the sg driver's v3 interface while the Linux
+kernel supported bidi. That has unwisely been (completely) removed
+from the kernel. So now I would regard the bsg v4 implementation
+as a subset of the functionality in the sg v3 implementation which
+itself is a subset of the proposed sg v4 implementation. So I see
+no reason to use the bsg v4 implementation or handicap the proposed
+sg v4 implementation.
 
-The other thing we could do here is similar to the dentry cache - we
-often have inode metadata buffers in the buffer cache (we have a
-multi-level cache heirarchy that spans most of the metadata in the
-active working set in XFS) and so if we miss the inode cache we
-might hit the inode buffer in the buffer cache (hot fault).  If we
-miss the inode cache and have to do IO to read the inodes, then it's
-a cold fault.
+>>>    The specific question being how we support async or non-blocking
+>>> I/O on the sg and bsg interfaces.  The standard way we add
+>>> asynchronous I/O is supposed to be via .poll on the file
+>>> descriptor.  you already use read and write in sg and bsg doesn't
+>>> have a polling interface,
+>>
+>> It is hard to parse that last sentence; the sg driver has always
+>> supported select/poll/epoll (and SIGIO plus RT signals). sg_poll()
+>> will work just as well irrespective of whether a request is submitted
+>> by write(), ioctl(SG_IOSUBMIT) or ioctl(SG_IOSUBMIT_V3).
+> 
+> The way I read how the interface works, it only works when the fd is
+> ready for read (i.e. a packet submitted with read has returned).  We
+> need to extend it to make it work with ioctl.  Since ioctl returns
+> isn't either a 'ready to read' or 'ready to write' event on the fd I
+> was suggesting using 'msg ready' event for it.
 
-That might be misleading, however, because the inode buffers cache
-32 physical inodes and so reading 32 sequential cold inodes would
-give 1 cold fault and 31 hot faults, even though those 31 inodes
-have never been referenced by the workload before and that's not
-ideal.
+A ready response causes a POLL_IN event. POLL_OUT is only cleared when
+the command queueing on a fd is turned off and a request is inflight or
+awaiting a ioctl(SG_IORECEIVE) (a.k.a. read()). So the existing POLL
+events map quite well. As a bonus, if there is a surprise removal of
+a sg device, then a SIG_HUP is generated.
 
-To complicate matters further, we can thrash the buffer cache,
-resulting in cached inodes that have no backing buffer in memory.
-then we we go to write the inode, we have to read in the inode
-buffer before we can write it. This may have nothing to do with
-working set thrashing, too. e.g. we have an inode that has been
-referenced over and over again by the workload for several hours,
-then a relatime update occurs and the inode is dirtied. when
-writeback occurs, the inode buffer is nowhere to be found because it
-was cycled out of the buffer cache hours ago and hasn't been
-referenced since. hence I think we're probably best to ignore the
-underlying filesystem metadata cache for the purposes of measuring
-and detecting inode cache working set thrashing...
+As I noted, if an app doesn't need to monitor multiple file
+descriptors, then ioctl(SG_GET_NUM_WAITING) is an option. It been in
+place for 20 years and is sped up by this patchset. I clocked it at
+500 nanoconds per call (i.e. 2 million could be issued in one thread
+in 1 second) on my laptop. And since you then find out how many are
+waiting to be processed, the user could issue a multiple requests
+ioctl(SG_IORECEIVE) and pick them all up in one system call invocation.
 
-> It would help psi, sure, but more importantly it would help us better
-> balance pressure between filesystem metadata and the data pages. We
-> would be able to tell the difference between a `find /' and actual
-> thrashing, where hot inodes are getting kicked out and reloaded
-> repeatedly - and we could backfeed that pressure to the LRU pages to
-> allow the metadata caches to grow as needed.
+>>> but it looks like we could use MSG to signal an ioctl is ready to
+>>> be serviced for both.  Would shifting to a non-blocking poll based
+>>> interface for ioctls remove the need to add these
+>>> SG_IOSUBMIT/SG_IORECEIVE ioctls since we could now do everything
+>>> over blocking or non-blocking SG_IO?
+>>
+>> Not sure what the MSG is you refer to. The sg driver has had
+>> ioctl(SG_GET_NUM_WAITING) for a long time. And it is made even
+>> more lightweight in this patchset: it takes no locks, just reads one
+>> atomic (a counter obviously) and returns. My guess is its faster the
+>> select()/poll()/epoll() but doesn't have the ability to monitor
+>> multiple file descriptors.
+> 
+> the poll interfaces don't tell you how many outstanding request you
+> have, they tell you when some event happened on the fd.  The event
+> we're looking for with async packets is an indication of what
+> completed.
 
-Well, hot inodes getting kicked out and immmediate re-used is
-something we largely already handle via caching inode buffers in the
-buffer cache.  So inode cache misses on XFS likely happen a lot more
-than is obvious as we only see inode cache thrashing when we have
-misses the metadata cache, not the inode cache.
+As well as ioctl(SG_GET_NUM_WAITING) described above there is also
+ioctl(SG_GET_PACK_ID) which will return the pack_id (or tag) of the
+response that has been waiting the longest to be processed (or -1
+if nothing is waiting).
 
-> For example, it could make sense to swap out a couple of completely
-> unused anonymous pages if it means we could hold the metadata
-> workingset fully in memory. But right now we cannot do that, because
-> we cannot risk swapping just because somebody runs find /.
+In the area of async polling the existing sg driver supports both
+standard Unix techniques and driver-specific techniques that convey
+extra information.
 
-I have workloads that run find to produce slab cache memory
-pressure. On 5.2, they cause the system to swap madly because
-there's no file page cache to reclaim and so the only reclaim that
-can be done is inodes/dentries and swapping anonymous pages.
+>> Here is the full set of extra ioctls I have, or will be proposing:
+>>      SG_IOSUBMIT
+>>      SG_IOSUBMIT_V3
+>>      SG_IORECEIVE
+>>      SG_IORECEIVE_V3
+>>      SG_IOABORT
+>>      SG_SG_SET_GET_EXTENDED
+> 
+> Well, i/o cancellation is another huge can of worms, but let's get the
+> submit interface sorted out first before worrying about how
+> cancellation works.
 
-And swap it does - if we don't throttle reclaim sufficiently to
-allow IO to make progress, then direct relcaim ends up in priority
-windup and I see lots of OOM kills on swap-in. I found quite a few
-ways to end up in "reclaim doesn't throttle on IO sufficiently and
-OOM kills" in the last 3-4 weeks...
+Yes, and its a great way to test code. The sgh_dd utility (sg3_utils
+package, testing folder) has a ae=AEN option for "abort every n
+commands". When it decides to abort a command it sets up another
+(killer) thread that waits a random amount of time (within bounds)
+then issues ioctl(SG_IOABORT). Great fun. For even more fun there
+is ae=AEN,MAEN where the extra MAEN parameter is for "abort every
+n multiple requests invocations". There are a lot more corner cases
+when aborting a multiple requests invocation. Testing with these
+found several problems with my code.
 
-> I have semi-seriously talked to Josef about this before, but it wasn't
-> quite obvious where we could track non-residency or eviction
-> information for inodes, dentries etc. Maybe you have an idea?
+It seems to me we are not actually on the same page when it comes
+to where this project stands.
 
-See above - I think only XFS could track working inodes because of
-it's unique caching infrastructure. Dentries largely don't matter,
-because dentry cache misses either hit or miss the inode cache and
-that's the working set that largely matters in terms of detecting
-IO-related thrashing...
+>> They are all new style ioctls using the _IOR(W) macros with fixed
+>> size objects referenced by the ioctl's third argument. ioctls have
+>> been referred to as the "garbage bin of Unix". Well that last one is
+>> a garbage bin within a garbage bin :-) On the plus side, it keeps
+>> that list relatively short.
+>>
+>> Doug Gilbert
+>>
+>>
+>> *** Tony Battersby is a sg driver power user. He has lamented wading
+>> through very large logs looking for some hint of why the sg driver is
+>> playing up he has stated the strong preference for more, not less,
+>> ioctls.
+> 
+> I'm not really bothered about the number of ioctls; I'm bothered about
+> getting the interface right.
 
-Cheers,
+Great. Then please leave ioctl(SG_IO) as is (i.e. sync only).
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+>> BTW the write()/read() interface still remains in the sg driver after
+>> these patchsets. It will continue to only support the sg v3
+>> interface. Perhaps calling it should cause a "deprecated" log message
+>> once for each kernel run to annoy maintainers of old code.
+> 
+> That would be ideal given all the security complaints we have about it.
+
+That is easily done.
+
+Doug Gilbert
+
+
+*** at least with scsi_debug with a command delay set at 5000 nanoseconds.
+     With real storage devices with latencies around 50 microseconds or higher
+     it may be more reliable. Some sort of handle or the tag itself back from
+     blk_execute_rq_nowait() is the real solution.
+
++++ but the bsg driver can do much more than issue SCSI commands. Question
+     is, given the removal of its SCSI async functionality, should it be
+     generating SCSI commands at all? Just the general ioctl(SG_IO) as
+     supported by sd, sr and st devices should suffice.
+
+^^^ another approach to the write()/read() security problems would be for
+     their implementation to check if the given file descriptor was to a
+     char (and maybe block) device and if so reduce its exploitable behaviour
+     accordingly.
