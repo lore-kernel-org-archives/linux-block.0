@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BDD0C32750
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C049AC32757
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:23:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 71E382084D
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:15:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9839320842
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:23:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565748919;
-	bh=r7ayX704IyXRWS3/YkEL0eHkv7jnfU7ipjAhsSVwEqo=;
+	s=default; t=1565749389;
+	bh=NSafegQqM6bZHr8DIYO0zVk1Y9lQxdXuReFFnkivw10=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=2sb6hdFOGZ9caJRcS3bVU3AkpJIYc2xYPZXdQDevLaV4oY3rrnZFljFY1GYwEt6t3
-	 wLSpo2Nn1y1TjVUuSOYfX0moK/Q5XiK5U4twOeyoJg17cQNTpkqRDwWjS1n49aiwK2
-	 ZKR97x/Dj0gNnGy2cG6V/pGk/gYfqd7E7/dS026E=
+	b=STBdMfvWgbseKD/naSZzeswtWn2IAFQgBXihmCv+XHyrLyAa9sJkU+tUvcXmWNgjn
+	 Hojda8Z1hdn6uoU3+5ql3w2dVNKoowINeahK4wcWwAFn6PHNI9E4NbLn6nTnJ4MfnR
+	 D9/gfr4njlYkf9fL+04lUdxgbfPVlqkEOzUgjyDE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726771AbfHNCPO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Aug 2019 22:15:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46430 "EHLO mail.kernel.org"
+        id S1729734AbfHNCXC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Aug 2019 22:23:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48788 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728756AbfHNCOb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Aug 2019 22:14:31 -0400
+        id S1729412AbfHNCRa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Aug 2019 22:17:30 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 87495214DA;
-        Wed, 14 Aug 2019 02:14:29 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6730F20843;
+        Wed, 14 Aug 2019 02:17:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565748870;
-        bh=r7ayX704IyXRWS3/YkEL0eHkv7jnfU7ipjAhsSVwEqo=;
+        s=default; t=1565749049;
+        bh=NSafegQqM6bZHr8DIYO0zVk1Y9lQxdXuReFFnkivw10=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=h1+00wlRwjEQktEEr4PNHDZrhSvfs4U5aR2wv7sGNpdUY6ZCKJb4ebKcb4nVSQYdA
-         zLD7iASy4+6Gps7Z7rwtBYCYYDcRvQ6IFeBtZ+NqQ0uJ3t11YlTFUiR91efrfyavsj
-         SPNsmdawXLpTOp4sHhxcJZUKZinyzyP9VBUfIU4c=
+        b=H5O2f+EU+ncEOfmjWcQk4UtAgQgqlXIsiroFTpCiMsxXq4PeHJQLSug235Qa7Pn8m
+         8MhjCLTOHGOB/6qvEY40V/AVRZ5T1DytWMw/KcvEoBhNhQMPC38X+X6Ms8l0nM2qPc
+         gLGytBrw4BZWKK3GD8G9Om6qYqLqHIzLHESygjUc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Paolo Valente <paolo.valente@linaro.org>,
@@ -47,12 +47,12 @@ Cc:     Paolo Valente <paolo.valente@linaro.org>,
         Guenter Roeck <linux@roeck-us.net>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 116/123] block, bfq: handle NULL return value by bfq_init_rq()
-Date:   Tue, 13 Aug 2019 22:10:40 -0400
-Message-Id: <20190814021047.14828-116-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 62/68] block, bfq: handle NULL return value by bfq_init_rq()
+Date:   Tue, 13 Aug 2019 22:15:40 -0400
+Message-Id: <20190814021548.16001-62-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190814021047.14828-1-sashal@kernel.org>
-References: <20190814021047.14828-1-sashal@kernel.org>
+In-Reply-To: <20190814021548.16001-1-sashal@kernel.org>
+References: <20190814021548.16001-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -88,10 +88,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 404e776aa36d0..b528710364e9e 100644
+index becd793a258c8..d8d2ac294b0c0 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -2085,9 +2085,14 @@ static void bfq_request_merged(struct request_queue *q, struct request *req,
+@@ -1886,9 +1886,14 @@ static void bfq_request_merged(struct request_queue *q, struct request *req,
  	    blk_rq_pos(container_of(rb_prev(&req->rb_node),
  				    struct request, rb_node))) {
  		struct bfq_queue *bfqq = bfq_init_rq(req);
@@ -107,7 +107,7 @@ index 404e776aa36d0..b528710364e9e 100644
  		/* Reposition request in its sort_list */
  		elv_rb_del(&bfqq->sort_list, req);
  		elv_rb_add(&bfqq->sort_list, req);
-@@ -2134,6 +2139,9 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
+@@ -1930,6 +1935,9 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
  	struct bfq_queue *bfqq = bfq_init_rq(rq),
  		*next_bfqq = bfq_init_rq(next);
  
@@ -117,7 +117,7 @@ index 404e776aa36d0..b528710364e9e 100644
  	/*
  	 * If next and rq belong to the same bfq_queue and next is older
  	 * than rq, then reposition rq in the fifo (by substituting next
-@@ -5061,12 +5069,12 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+@@ -4590,12 +4598,12 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
  
  	spin_lock_irq(&bfqd->lock);
  	bfqq = bfq_init_rq(rq);
