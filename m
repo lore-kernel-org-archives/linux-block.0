@@ -2,103 +2,163 @@ Return-Path: <SRS0=ptuj=WK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA30C32750
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:04:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9513DC433FF
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:15:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 80ED920844
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:04:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l9ndCYzl"
+	by mail.kernel.org (Postfix) with ESMTP id 6A3442084D
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 02:15:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1565748914;
+	bh=jXq3HxdqcBVaiiBH64H4RZ+vzF6yUb7uplOY5oXTSow=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=XcqABXKMvcJldijtCztZG2FaBuWRpVT4IhqXKvkCDjjGOBYNFN//yYNua4662Lsvu
+	 CdcVQQiY+CZR5yDhTxVjp0YxB2/iLBr9db41hrYBlo0qhBBa9TXJJx8jOJf+d/Um58
+	 WdbtaJR3Pj4gVrJRZhWTcI/0qn2yP0YqYhWOFvZk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726373AbfHNCEa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Aug 2019 22:04:30 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:38059 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726007AbfHNCEa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Aug 2019 22:04:30 -0400
-Received: by mail-ed1-f65.google.com with SMTP id r12so5708122edo.5;
-        Tue, 13 Aug 2019 19:04:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=yClt4IiYnvtlCU9uUEc5mhIYUjABpvyWOso+HI4mu3o=;
-        b=l9ndCYzlwR5qGpefWEgVLiJsPd4v8Dk4nsao6j4NOxiRFw3jG0aPROGqZxMVJR3lpC
-         GgflwMHAjzTKnoSfg6myFWphE5+A5HM8M2CC4ZNWiHjcMVl9lJ/c+PaDElSrNzJrfBGb
-         BniQUVDawR1ghe7yEsAp2HWpQJrndum1p0fxY5vT+knYDfn0SUqQPRT2Fgy1pQLXrb+I
-         WtvdlASjkuw+vO/1ZJ0V56F047OwOcNphKVmF3q3LEuJ6bEUsRuU1v5RdOVyx6oBNJbf
-         7glrhkCTTq7yr9ZGLALrsby9RiapZVvRb2IKimk68pRikKBjUMxUDjEVDYoqd8rLVkoM
-         IM0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=yClt4IiYnvtlCU9uUEc5mhIYUjABpvyWOso+HI4mu3o=;
-        b=PJgHaZPnbKXJKqkVYvGMnUNUfRFlbwaYKHASInI+ak4LtttNCCeqJ76LQ8L0kRUoMu
-         nb5khdCVbmC5yh8dkT0NiG4h3oyi6ZRFbHx0u2aaGPIF1z5XztRWriuun9s3PPocmx2E
-         wpX5Ae06CvRJMVxBORvj4gc6PXxW5UDLjhTp79JsSkjwKsqS6zvLuKux4keZGxszKP1M
-         0Y7u3MC18JU6ogMhXIfwoDQzCfFmDOJ/qIAU1Gmy6oiQKjS7rPecf2pQDfIqQ++15yho
-         V9LSMp1lrd4A03viztn2IfuerY1ZcEskeJgL4TAiesCI9Iaf8giwUncg5d5Wj8SLIFKQ
-         UBYA==
-X-Gm-Message-State: APjAAAWlXr3axFgvQqD2sIfb/UNK9sdsTFp/dycanfm8SpF3HM98KvXi
-        puMwbSm/91qLiPRMIFJ65qA=
-X-Google-Smtp-Source: APXvYqxhOvGYIm/p1syoBfmRH4Nh5i7jAhIt7mkfGBb6oygRhVeG0iblgw2hn7e0AoAKsPwHBKza7g==
-X-Received: by 2002:a50:b48f:: with SMTP id w15mr45996037edd.260.1565748268455;
-        Tue, 13 Aug 2019 19:04:28 -0700 (PDT)
-Received: from continental ([186.212.91.40])
-        by smtp.gmail.com with ESMTPSA id x11sm25444255eda.80.2019.08.13.19.04.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2019 19:04:27 -0700 (PDT)
-Date:   Tue, 13 Aug 2019 23:05:40 -0300
-From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, hch@lst.de,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv2 0/4] blk_execute_rq{_nowait} cleanup part1
-Message-ID: <20190814020540.GA27622@continental>
-References: <20190809105433.8946-1-marcos.souza.org@gmail.com>
- <55246cff-6d32-e7d5-bee0-9940bc59250a@kernel.dk>
+        id S1728758AbfHNCOb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Aug 2019 22:14:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46412 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728749AbfHNCOa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Aug 2019 22:14:30 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 829BB20843;
+        Wed, 14 Aug 2019 02:14:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1565748869;
+        bh=jXq3HxdqcBVaiiBH64H4RZ+vzF6yUb7uplOY5oXTSow=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=k6jFz7/UZPD911mIzbsnfKi1pJA/97DA8ZaXkxo6eq1VeVx6oAgvW+zhu0+FrxCqT
+         WF2h1dYBQKwiKJDpw7czMdGq2arYncBozx5Shpt/cVCExeWDGJB7OybpELf1gEJvby
+         UqWApJCtnybEMaBtkzxKJfyMV4wA+Ih8I5e0JnZ8=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     He Zhe <zhe.he@windriver.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.2 115/123] block: aoe: Fix kernel crash due to atomic sleep when exiting
+Date:   Tue, 13 Aug 2019 22:10:39 -0400
+Message-Id: <20190814021047.14828-115-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190814021047.14828-1-sashal@kernel.org>
+References: <20190814021047.14828-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <55246cff-6d32-e7d5-bee0-9940bc59250a@kernel.dk>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Aug 11, 2019 at 07:47:17AM -0600, Jens Axboe wrote:
-> On 8/9/19 3:54 AM, Marcos Paulo de Souza wrote:
-> > After checking the request_queue argument of funtion blk_execute_rq_nowait, I
-> > now added three more patches, one to remove the same argument from
-> > blk_execute_rq and other two to change the at_head argument from
-> > blk_exeute_rq_{nowait} from int to bool.
-> > 
-> > Original patch can be checked here[1].
-> > 
-> > After this patch gets merged, my plan is to analyse the usage the gendisk
-> > argument, is being set as NULL but the majority of callers.
-> > 
-> > [1]: https://lkml.org/lkml/2019/8/6/31
-> 
-> Don't ever send something out that hasn't even been compiled. I already
-> detest doing kernel-wide cleanup changes like this, but when I do, I
-> need absolute confidence in it actually being tested. The fact that it
-> hasn't even been compiled is a big black mark on the submitter.
+From: He Zhe <zhe.he@windriver.com>
 
-My bad. I compiled the code locally and tested in VM, but later on I removed
-the semicolon by mistake while reviewing the changes once more and the code
-was commited without the semicolon. I'm improving my setup (scripts
-and whatnot) to avoid this happening again in the future.
+[ Upstream commit 430380b4637aec646996b4aef67ad417593923b2 ]
 
-> 
-> -- 
-> Jens Axboe
-> 
+Since commit 3582dd291788 ("aoe: convert aoeblk to blk-mq"), aoedev_downdev
+has had the possibility of sleeping and causing the following crash.
+
+BUG: scheduling while atomic: rmmod/2242/0x00000003
+Modules linked in: aoe
+Preemption disabled at:
+[<ffffffffc01d95e5>] flush+0x95/0x4a0 [aoe]
+CPU: 7 PID: 2242 Comm: rmmod Tainted: G          I       5.2.3 #1
+Hardware name: Intel Corporation S5520HC/S5520HC, BIOS S5500.86B.01.10.0025.030220091519 03/02/2009
+Call Trace:
+ dump_stack+0x4f/0x6a
+ ? flush+0x95/0x4a0 [aoe]
+ __schedule_bug.cold+0x44/0x54
+ __schedule+0x44f/0x680
+ schedule+0x44/0xd0
+ blk_mq_freeze_queue_wait+0x46/0xb0
+ ? wait_woken+0x80/0x80
+ blk_mq_freeze_queue+0x1b/0x20
+ aoedev_downdev+0x111/0x160 [aoe]
+ flush+0xff/0x4a0 [aoe]
+ aoedev_exit+0x23/0x30 [aoe]
+ aoe_exit+0x35/0x948 [aoe]
+ __se_sys_delete_module+0x183/0x210
+ __x64_sys_delete_module+0x16/0x20
+ do_syscall_64+0x4d/0x130
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x7f24e0043b07
+Code: 73 01 c3 48 8b 0d 89 73 0b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f
+1f 84 00 00 00 00 00 0f 1f 44 00 00 b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff
+ff 73 01 c3 48 8b 0d 59 73 0b 00 f7 d8 64 89 01 48
+RSP: 002b:00007ffe18f7f1e8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f24e0043b07
+RDX: 000000000000000a RSI: 0000000000000800 RDI: 0000555c3ecf87c8
+RBP: 00007ffe18f7f1f0 R08: 0000000000000000 R09: 0000000000000000
+R10: 00007f24e00b4ac0 R11: 0000000000000206 R12: 00007ffe18f7f238
+R13: 00007ffe18f7f410 R14: 00007ffe18f80e73 R15: 0000555c3ecf8760
+
+This patch, handling in the same way of pass two, unlocks the locks and
+restart pass one after aoedev_downdev is done.
+
+Fixes: 3582dd291788 ("aoe: convert aoeblk to blk-mq")
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/aoe/aoedev.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
+index 5b49f1b33ebec..e2ea2356da061 100644
+--- a/drivers/block/aoe/aoedev.c
++++ b/drivers/block/aoe/aoedev.c
+@@ -323,10 +323,14 @@ flush(const char __user *str, size_t cnt, int exiting)
+ 	}
+ 
+ 	flush_scheduled_work();
+-	/* pass one: without sleeping, do aoedev_downdev */
++	/* pass one: do aoedev_downdev, which might sleep */
++restart1:
+ 	spin_lock_irqsave(&devlist_lock, flags);
+ 	for (d = devlist; d; d = d->next) {
+ 		spin_lock(&d->lock);
++		if (d->flags & DEVFL_TKILL)
++			goto cont;
++
+ 		if (exiting) {
+ 			/* unconditionally take each device down */
+ 		} else if (specified) {
+@@ -338,8 +342,11 @@ flush(const char __user *str, size_t cnt, int exiting)
+ 		|| d->ref)
+ 			goto cont;
+ 
++		spin_unlock(&d->lock);
++		spin_unlock_irqrestore(&devlist_lock, flags);
+ 		aoedev_downdev(d);
+ 		d->flags |= DEVFL_TKILL;
++		goto restart1;
+ cont:
+ 		spin_unlock(&d->lock);
+ 	}
+@@ -348,7 +355,7 @@ flush(const char __user *str, size_t cnt, int exiting)
+ 	/* pass two: call freedev, which might sleep,
+ 	 * for aoedevs marked with DEVFL_TKILL
+ 	 */
+-restart:
++restart2:
+ 	spin_lock_irqsave(&devlist_lock, flags);
+ 	for (d = devlist; d; d = d->next) {
+ 		spin_lock(&d->lock);
+@@ -357,7 +364,7 @@ flush(const char __user *str, size_t cnt, int exiting)
+ 			spin_unlock(&d->lock);
+ 			spin_unlock_irqrestore(&devlist_lock, flags);
+ 			freedev(d);
+-			goto restart;
++			goto restart2;
+ 		}
+ 		spin_unlock(&d->lock);
+ 	}
+-- 
+2.20.1
+
