@@ -2,239 +2,517 @@ Return-Path: <SRS0=ptuj=WK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C93C433FF
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:45:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3EBEC433FF
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:54:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6AACA216F4
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:45:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79D7E20651
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:54:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729803AbfHNUpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Aug 2019 16:45:43 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:55885 "EHLO
+        id S1729252AbfHNUyQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Aug 2019 16:54:16 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:42871 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725895AbfHNUpn (ORCPT
+        with ESMTP id S1727975AbfHNUyP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Aug 2019 16:45:43 -0400
+        Wed, 14 Aug 2019 16:54:15 -0400
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue010 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1MJmbB-1hiokV3nNB-00K75E; Wed, 14 Aug 2019 22:43:31 +0200
+ (mreue012 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1MnWx3-1ifH7b3rC1-00jcFW; Wed, 14 Aug 2019 22:53:43 +0200
 From:   Arnd Bergmann <arnd@arndb.de>
 To:     linux-kernel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        linux-fsdevel@vger.kernel.org
-Cc:     Arnd Bergmann <arnd@arndb.de>, davem@davemloft.net,
-        axboe@kernel.dk, linux-block@vger.kernel.org, minyard@acm.org,
-        gregkh@linuxfoundation.org, linux@roeck-us.net,
-        alexandre.belloni@bootlin.com, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, dgilbert@interlog.com, jslaby@suse.com,
-        wim@linux-watchdog.org, tytso@mit.edu, adilger.kernel@dilger.ca,
-        jaegeuk@kernel.org, rpeterso@redhat.com, agruenba@redhat.com,
-        mikulas@artax.karlin.mff.cuni.cz, konishi.ryusuke@gmail.com,
-        jlbec@evilplan.org, joseph.qi@linux.alibaba.com,
-        darrick.wong@oracle.com, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, openipmi-developer@lists.sourceforge.net,
-        linux-hwmon@vger.kernel.org, linux-ppp@vger.kernel.org,
-        linux-rtc@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-watchdog@vger.kernel.org, ecryptfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-nilfs@vger.kernel.org,
-        ocfs2-devel@oss.oracle.com
-Subject: [PATCH v5 00/18] compat_ioctl.c removal, part 2/3 
-Date:   Wed, 14 Aug 2019 22:42:27 +0200
-Message-Id: <20190814204259.120942-1-arnd@arndb.de>
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Doug Gilbert <dgilbert@interlog.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: [PATCH v5 07/18] compat_ioctl: reimplement SG_IO handling
+Date:   Wed, 14 Aug 2019 22:49:19 +0200
+Message-Id: <20190814205245.121691-2-arnd@arndb.de>
 X-Mailer: git-send-email 2.20.0
+In-Reply-To: <20190814204259.120942-1-arnd@arndb.de>
+References: <20190814204259.120942-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:xGnsbJFEb5cp5VgCCKba17rABY8rw5YpFHVSp9sUcOzQSe+UXGP
- EfEYa61AjTCAHzUWX6wv2lDU7UbSUWqI2oz4Izzo8ktMHBlxmH8NVFj4hnZmHzHR9j3PmnD
- FdXT0A0EWAS6WaUuOwbDeG9tdQjqBuRZe/Qa9Z37r+1tBtsxN6SEXAY5fO0COcyHnB4qqcA
- G33rmG1j8a0kHXtMGaC3A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:lZeESLReWcA=:o8v1Y+WXV56E6iMJG8Ogif
- 2FqbIgZz9Cf28eQxkb1FeOSJmjwIDMMG6qZymgcdySt/904oRKzRXaxzdToNS9eKtscmO3Pqe
- /FgBQD2UqihLwK3P/Pddn1urtJAP8i4lHDXy2HhE2jK8dPb6o36J+yFC20qjDEZ2PrwGmI4P+
- eCWYNuv25DY/1Lti33SSmno2KcNiHGryG0RZ4MxsltqQfXdWyvsKej7eST7IWNiMWKhvjyU37
- hE4nHYkj/tcVvmbwEjgJuruEJRODw6lCU7hWqw9twzGmBAmy8QMD8J//vGUTZ4q5+VzF9VhjQ
- bG82fyrhMmJKoue644MCK3h+10nGq6fpc0+zn8mYx07fSdSIGFWt2VJ2pxnSCWgeITy6Ere97
- sRmxqZNBv/e8jpN7Uc0JBjNzz9yYdvbFlJfGeIc2ao4vxcJORGyxhpoqAIRlQzpHC31QgNZum
- edQsMV2appVThHuGv1ov/A9jLW2kPA47ZPWpCcXW+dzl4v7v86+29DJTNjj3mVImCRQNSuJS4
- cAtYqWH6jHUAOn8v98eCWJv3t830ah1HbsJkf7tJ7ckvhUNIWDFHYDwgsfXjt098IoD2AtXor
- PgWxV3iIYDq+x9Wym9Nl2f8rz27kROMPDKgPXeM8TeWHxiZbHQgKAuei5tzhS7HSjk0UKFYhp
- 9Oh+W+y+k0I/NRheX6o+PUjcCpNRjNPLHuD9piLtJmz92aChC6F/e9SyB7FzdHKmmf4IcD77K
- 7HYEjW+U1QhnWXZOIuSxIrYkaKmPv6aeBud5fA==
+X-Provags-ID: V03:K1:/JQAz9jbmNi46KdiXkmQBzuzdZGvU7yA4i2fYTIxsCWcn54Byn+
+ cZSLNL4wecRpJeB91mHzyKN9NNSJ3ULDskRlMVxYXOTO+ptqPBOWuE58W/Zey9cnvoZ/ovy
+ UtgaVm4/NG8hfni+6Js5WJEi9KApQ25Y7TnAG3cmdBsqsQ8OO8jvecnRbTxzrYgpjHl8s0+
+ 1ND4U/lB+ZPB8uDowQj2A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8FuODb/6KPU=:gOdtUHMZdpbvut9olHBgd6
+ DkWH+wqXU9cvMxiHCdC7DpM+xeDBjcinYvg6WNWYeaj+wYQbEzD5y2kIWP3/YI+QE8X4JlbWa
+ HHzWST7F5eSSyDYa6Lyqw52NH+kE7eiZrsE9XK6u7RgELNEYIsUPJaNgBLRcHEVaxMmUIsYrF
+ B/0PGqDsjudRd9blhA+aVRqYyOD34HrfPcw9NvRuao434oNgDHXaz3mH0gceEbaDf1NTP4M5w
+ rrAJqJd6Ph/Dq2cOqKVMA1Cj93HScfjd6FKChJzpSKo1uf2Qc+TbstnF17fkRyzaMcERJqafW
+ LKAzVdDVRG+H1nD+8BIIxwzJFBetCVeSsXvXzq4VNE/8R1UxjnePVJCsm53Hfj+qNmlq98xAY
+ zaHRxnP0YfP0JZcv5U53SGBr2kb6jRaFdBSczcpsofU1h94f8BuVhWEMlGCIFMpkiP53xNL0A
+ mYO44gp5h+PsmbqExAuPH0Ib88cJpIpjxWN13J5h4biRGxb/CN7uVR/OfmFv2pkiVGGBXeQ8w
+ YJ+GWIeoiP0tUNkgQDI2bWuYc/avQYRsR3iwOcfnL0re5lBCGK0IQ/oeP/PSkScluXXYukOnJ
+ 6Yy6wC1JZfnd+oJ/YqNobNEOdq4AvN6HOOqP7tkIgJ9oELugIb4ZWxPVtfDypetursZmtMZJa
+ WsmPAITMwAtWde59K0qUUhAcAuQB1IOgNkSeqCCzJA7cvi/Ac7gFPsNaLizPQegTo0twTblmG
+ DnjtAd4YwQ+B78088p9b4g9buz+WkDP4iR238A==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a follow-up to part 1/3 that I posted after -rc2.
-I hope these are still largely uncontroversial changes, and
-I would like to get them into linux-5.4.
+There are two code locations that implement the SG_IO ioctl: the old
+sg.c driver, and the generic scsi_ioctl helper that is in turn used by
+multiple drivers.
 
-Part 1 was in
+To eradicate the old compat_ioctl conversion handler for the SG_IO
+command, I implement a readable pair of put_sg_io_hdr() /get_sg_io_hdr()
+helper functions that can be used for both compat and native mode,
+and then I call this from both drivers.
 
-https://lore.kernel.org/lkml/CAPcyv4i_nHzV155RcgnAQ189aq2Lfd2g8pA1D5NbZqo9E_u+Dw@mail.gmail.com/
+For the iovec handling, there is already a compat_import_iovec() function
+that can simply be called in place of import_iovec().
 
-Part 3 will be one kernel release after part 2 is merged,
-as that still needs a little extra work.
+To avoid having to pass the compat/native state through multiple
+indirections, I mark the SG_IO command itself as compatible in
+fs/compat_ioctl.c and use in_compat_syscall() to figure out where
+we are called from.
 
-The entire series is available at
+As a side-effect of this, the sg.c driver now also accepts the 32-bit
+sg_io_hdr format in compat mode using the read/write interface, not
+just ioctl. This should improve compatiblity with old 32-bit binaries,
+but it would break if any application intentionally passes the 64-bit
+data structure in compat mode here.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/arnd/playground.git compat_ioctl
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ block/scsi_ioctl.c     | 132 ++++++++++++++++++++++++++++++++++--
+ drivers/scsi/sg.c      |  19 +++---
+ fs/compat_ioctl.c      | 148 +----------------------------------------
+ include/linux/blkdev.h |   2 +
+ lib/iov_iter.c         |   1 +
+ 5 files changed, 143 insertions(+), 159 deletions(-)
 
-      Arnd
-
-Al Viro (2):
-  compat_ioctl: unify copy-in of ppp filters
-  compat_ioctl: move PPPIOCSCOMPRESS to ppp_generic
-
-Arnd Bergmann (16):
-  xfs: compat_ioctl: use compat_ptr()
-  xfs: compat_ioctl: add missing conversions
-  gfs2: add compat_ioctl support
-  fs: compat_ioctl: move FITRIM emulation into file systems
-  watchdog: cpwd: use generic compat_ptr_ioctl
-  compat_ioctl: move WDIOC handling into wdt drivers
-  compat_ioctl: reimplement SG_IO handling
-  af_unix: add compat_ioctl support
-  compat_ioctl: handle SIOCOUTQNSD
-  compat_ioctl: move SIOCOUTQ out of compat_ioctl.c
-  tty: handle compat PPP ioctls
-  compat_ioctl: handle PPPIOCGIDLE for 64-bit time_t
-  compat_ioctl: ppp: move simple commands into ppp_generic.c
-  compat_ioctl: move SG_GET_REQUEST_TABLE handling
-  pktcdvd: add compat_ioctl handler
-  scsi: sd: enable compat ioctls for sed-opal
-
- Documentation/networking/ppp_generic.txt  |   2 +
- arch/powerpc/platforms/52xx/mpc52xx_gpt.c |   1 +
- arch/um/drivers/harddog_kern.c            |   1 +
- block/scsi_ioctl.c                        | 132 ++++++++-
- drivers/block/pktcdvd.c                   |  25 ++
- drivers/char/ipmi/ipmi_watchdog.c         |   1 +
- drivers/hwmon/fschmd.c                    |   1 +
- drivers/net/ppp/ppp_generic.c             | 245 ++++++++++-----
- drivers/rtc/rtc-ds1374.c                  |   1 +
- drivers/scsi/sd.c                         |  14 +-
- drivers/scsi/sg.c                         |  59 +++-
- drivers/tty/tty_io.c                      |   5 +
- drivers/watchdog/acquirewdt.c             |   1 +
- drivers/watchdog/advantechwdt.c           |   1 +
- drivers/watchdog/alim1535_wdt.c           |   1 +
- drivers/watchdog/alim7101_wdt.c           |   1 +
- drivers/watchdog/ar7_wdt.c                |   1 +
- drivers/watchdog/at91rm9200_wdt.c         |   1 +
- drivers/watchdog/ath79_wdt.c              |   1 +
- drivers/watchdog/bcm63xx_wdt.c            |   1 +
- drivers/watchdog/cpu5wdt.c                |   1 +
- drivers/watchdog/cpwd.c                   |  25 +-
- drivers/watchdog/eurotechwdt.c            |   1 +
- drivers/watchdog/f71808e_wdt.c            |   1 +
- drivers/watchdog/gef_wdt.c                |   1 +
- drivers/watchdog/geodewdt.c               |   1 +
- drivers/watchdog/ib700wdt.c               |   1 +
- drivers/watchdog/ibmasr.c                 |   1 +
- drivers/watchdog/indydog.c                |   1 +
- drivers/watchdog/intel_scu_watchdog.c     |   1 +
- drivers/watchdog/iop_wdt.c                |   1 +
- drivers/watchdog/it8712f_wdt.c            |   1 +
- drivers/watchdog/ixp4xx_wdt.c             |   1 +
- drivers/watchdog/ks8695_wdt.c             |   1 +
- drivers/watchdog/m54xx_wdt.c              |   1 +
- drivers/watchdog/machzwd.c                |   1 +
- drivers/watchdog/mixcomwd.c               |   1 +
- drivers/watchdog/mtx-1_wdt.c              |   1 +
- drivers/watchdog/mv64x60_wdt.c            |   1 +
- drivers/watchdog/nuc900_wdt.c             |   1 +
- drivers/watchdog/nv_tco.c                 |   1 +
- drivers/watchdog/pc87413_wdt.c            |   1 +
- drivers/watchdog/pcwd.c                   |   1 +
- drivers/watchdog/pcwd_pci.c               |   1 +
- drivers/watchdog/pcwd_usb.c               |   1 +
- drivers/watchdog/pika_wdt.c               |   1 +
- drivers/watchdog/pnx833x_wdt.c            |   1 +
- drivers/watchdog/rc32434_wdt.c            |   1 +
- drivers/watchdog/rdc321x_wdt.c            |   1 +
- drivers/watchdog/riowd.c                  |   1 +
- drivers/watchdog/sa1100_wdt.c             |   1 +
- drivers/watchdog/sb_wdog.c                |   1 +
- drivers/watchdog/sbc60xxwdt.c             |   1 +
- drivers/watchdog/sbc7240_wdt.c            |   1 +
- drivers/watchdog/sbc_epx_c3.c             |   1 +
- drivers/watchdog/sbc_fitpc2_wdt.c         |   1 +
- drivers/watchdog/sc1200wdt.c              |   1 +
- drivers/watchdog/sc520_wdt.c              |   1 +
- drivers/watchdog/sch311x_wdt.c            |   1 +
- drivers/watchdog/scx200_wdt.c             |   1 +
- drivers/watchdog/smsc37b787_wdt.c         |   1 +
- drivers/watchdog/w83877f_wdt.c            |   1 +
- drivers/watchdog/w83977f_wdt.c            |   1 +
- drivers/watchdog/wafer5823wdt.c           |   1 +
- drivers/watchdog/watchdog_dev.c           |   1 +
- drivers/watchdog/wdrtas.c                 |   1 +
- drivers/watchdog/wdt.c                    |   1 +
- drivers/watchdog/wdt285.c                 |   1 +
- drivers/watchdog/wdt977.c                 |   1 +
- drivers/watchdog/wdt_pci.c                |   1 +
- fs/compat_ioctl.c                         | 346 +---------------------
- fs/ecryptfs/file.c                        |   1 +
- fs/ext4/ioctl.c                           |   1 +
- fs/f2fs/file.c                            |   1 +
- fs/gfs2/file.c                            |  24 ++
- fs/hpfs/dir.c                             |   1 +
- fs/hpfs/file.c                            |   1 +
- fs/nilfs2/ioctl.c                         |   1 +
- fs/ocfs2/ioctl.c                          |   1 +
- fs/xfs/xfs_ioctl32.c                      |  11 +-
- include/linux/blkdev.h                    |   2 +
- include/uapi/linux/ppp-ioctl.h            |   2 +
- include/uapi/linux/ppp_defs.h             |  14 +
- lib/iov_iter.c                            |   1 +
- net/socket.c                              |   3 +
- net/unix/af_unix.c                        |  19 ++
- 86 files changed, 526 insertions(+), 472 deletions(-)
-
+diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+index f5e0ad65e86a..cbeb629ee917 100644
+--- a/block/scsi_ioctl.c
++++ b/block/scsi_ioctl.c
+@@ -2,6 +2,7 @@
+ /*
+  * Copyright (C) 2001 Jens Axboe <axboe@suse.de>
+  */
++#include <linux/compat.h>
+ #include <linux/kernel.h>
+ #include <linux/errno.h>
+ #include <linux/string.h>
+@@ -327,7 +328,14 @@ static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
+ 		struct iov_iter i;
+ 		struct iovec *iov = NULL;
+ 
+-		ret = import_iovec(rq_data_dir(rq),
++#ifdef CONFIG_COMPAT
++		if (in_compat_syscall())
++			ret = compat_import_iovec(rq_data_dir(rq),
++				   hdr->dxferp, hdr->iovec_count,
++				   0, &iov, &i);
++		else
++#endif
++			ret = import_iovec(rq_data_dir(rq),
+ 				   hdr->dxferp, hdr->iovec_count,
+ 				   0, &iov, &i);
+ 		if (ret < 0)
+@@ -542,6 +550,122 @@ static inline int blk_send_start_stop(struct request_queue *q,
+ 	return __blk_send_generic(q, bd_disk, GPCMD_START_STOP_UNIT, data);
+ }
+ 
++#ifdef CONFIG_COMPAT
++struct compat_sg_io_hdr {
++	compat_int_t interface_id;	/* [i] 'S' for SCSI generic (required) */
++	compat_int_t dxfer_direction;	/* [i] data transfer direction  */
++	unsigned char cmd_len;		/* [i] SCSI command length ( <= 16 bytes) */
++	unsigned char mx_sb_len;	/* [i] max length to write to sbp */
++	unsigned short iovec_count;	/* [i] 0 implies no scatter gather */
++	compat_uint_t dxfer_len;	/* [i] byte count of data transfer */
++	compat_uint_t dxferp;		/* [i], [*io] points to data transfer memory
++						or scatter gather list */
++	compat_uptr_t cmdp;		/* [i], [*i] points to command to perform */
++	compat_uptr_t sbp;		/* [i], [*o] points to sense_buffer memory */
++	compat_uint_t timeout;		/* [i] MAX_UINT->no timeout (unit: millisec) */
++	compat_uint_t flags;		/* [i] 0 -> default, see SG_FLAG... */
++	compat_int_t pack_id;		/* [i->o] unused internally (normally) */
++	compat_uptr_t usr_ptr;		/* [i->o] unused internally */
++	unsigned char status;		/* [o] scsi status */
++	unsigned char masked_status;	/* [o] shifted, masked scsi status */
++	unsigned char msg_status;	/* [o] messaging level data (optional) */
++	unsigned char sb_len_wr;	/* [o] byte count actually written to sbp */
++	unsigned short host_status;	/* [o] errors from host adapter */
++	unsigned short driver_status;	/* [o] errors from software driver */
++	compat_int_t resid;		/* [o] dxfer_len - actual_transferred */
++	compat_uint_t duration;		/* [o] time taken by cmd (unit: millisec) */
++	compat_uint_t info;		/* [o] auxiliary information */
++};
++#endif
++
++int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp)
++{
++#ifdef CONFIG_COMPAT
++	if (in_compat_syscall()) {
++		struct compat_sg_io_hdr hdr32 =  {
++			.interface_id	 = hdr->interface_id,
++			.dxfer_direction = hdr->dxfer_direction,
++			.cmd_len	 = hdr->cmd_len,
++			.mx_sb_len	 = hdr->mx_sb_len,
++			.iovec_count	 = hdr->iovec_count,
++			.dxfer_len	 = hdr->dxfer_len,
++			.dxferp		 = (uintptr_t)hdr->dxferp,
++			.cmdp		 = (uintptr_t)hdr->cmdp,
++			.sbp		 = (uintptr_t)hdr->sbp,
++			.timeout	 = hdr->timeout,
++			.flags		 = hdr->flags,
++			.pack_id	 = hdr->pack_id,
++			.usr_ptr	 = (uintptr_t)hdr->usr_ptr,
++			.status		 = hdr->status,
++			.masked_status	 = hdr->masked_status,
++			.msg_status	 = hdr->msg_status,
++			.sb_len_wr	 = hdr->sb_len_wr,
++			.host_status	 = hdr->host_status,
++			.driver_status	 = hdr->driver_status,
++			.resid		 = hdr->resid,
++			.duration	 = hdr->duration,
++			.info		 = hdr->info,
++		};
++
++		if (copy_to_user(argp, &hdr32, sizeof(hdr)))
++			return -EFAULT;
++
++		return 0;
++	}
++#endif
++
++	if (copy_to_user(argp, &hdr, sizeof(hdr)))
++		return -EFAULT;
++
++	return 0;
++}
++EXPORT_SYMBOL(put_sg_io_hdr);
++
++int get_sg_io_hdr(struct sg_io_hdr *hdr, const void __user *argp)
++{
++#ifdef CONFIG_COMPAT
++	struct compat_sg_io_hdr hdr32;
++
++	if (in_compat_syscall()) {
++		if (copy_from_user(&hdr32, argp, sizeof(hdr32)))
++			return -EFAULT;
++
++		*hdr = (struct sg_io_hdr) {
++			.interface_id	 = hdr32.interface_id,
++			.dxfer_direction = hdr32.dxfer_direction,
++			.cmd_len	 = hdr32.cmd_len,
++			.mx_sb_len	 = hdr32.mx_sb_len,
++			.iovec_count	 = hdr32.iovec_count,
++			.dxfer_len	 = hdr32.dxfer_len,
++			.dxferp		 = compat_ptr(hdr32.dxferp),
++			.cmdp		 = compat_ptr(hdr32.cmdp),
++			.sbp		 = compat_ptr(hdr32.sbp),
++			.timeout	 = hdr32.timeout,
++			.flags		 = hdr32.flags,
++			.pack_id	 = hdr32.pack_id,
++			.usr_ptr	 = compat_ptr(hdr32.usr_ptr),
++			.status		 = hdr32.status,
++			.masked_status	 = hdr32.masked_status,
++			.msg_status	 = hdr32.msg_status,
++			.sb_len_wr	 = hdr32.sb_len_wr,
++			.host_status	 = hdr32.host_status,
++			.driver_status	 = hdr32.driver_status,
++			.resid		 = hdr32.resid,
++			.duration	 = hdr32.duration,
++			.info		 = hdr32.info,
++		};
++
++		return 0;
++	}
++#endif
++
++	if (copy_from_user(&hdr, argp, sizeof(hdr)))
++		return -EFAULT;
++
++	return 0;
++}
++EXPORT_SYMBOL(get_sg_io_hdr);
++
+ int scsi_cmd_ioctl(struct request_queue *q, struct gendisk *bd_disk, fmode_t mode,
+ 		   unsigned int cmd, void __user *arg)
+ {
+@@ -581,14 +705,14 @@ int scsi_cmd_ioctl(struct request_queue *q, struct gendisk *bd_disk, fmode_t mod
+ 		case SG_IO: {
+ 			struct sg_io_hdr hdr;
+ 
+-			err = -EFAULT;
+-			if (copy_from_user(&hdr, arg, sizeof(hdr)))
++			err = get_sg_io_hdr(&hdr, arg);
++			if (err)
+ 				break;
+ 			err = sg_io(q, bd_disk, &hdr, mode);
+ 			if (err == -EFAULT)
+ 				break;
+ 
+-			if (copy_to_user(arg, &hdr, sizeof(hdr)))
++			if (put_sg_io_hdr(&hdr, arg))
+ 				err = -EFAULT;
+ 			break;
+ 		}
+diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
+index cce757506383..8ae096af2667 100644
+--- a/drivers/scsi/sg.c
++++ b/drivers/scsi/sg.c
+@@ -447,8 +447,7 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
+ 					retval = -ENOMEM;
+ 					goto free_old_hdr;
+ 				}
+-				retval =__copy_from_user
+-				    (new_hdr, buf, SZ_SG_IO_HDR);
++				retval = get_sg_io_hdr(new_hdr, buf);
+ 				req_pack_id = new_hdr->pack_id;
+ 				kfree(new_hdr);
+ 				if (retval) {
+@@ -589,10 +588,7 @@ sg_new_read(Sg_fd * sfp, char __user *buf, size_t count, Sg_request * srp)
+ 	}
+ 	if (hp->masked_status || hp->host_status || hp->driver_status)
+ 		hp->info |= SG_INFO_CHECK;
+-	if (copy_to_user(buf, hp, SZ_SG_IO_HDR)) {
+-		err = -EFAULT;
+-		goto err_out;
+-	}
++	err = put_sg_io_hdr(hp, buf);
+ err_out:
+ 	err2 = sg_finish_rem_req(srp);
+ 	sg_remove_request(sfp, srp);
+@@ -735,7 +731,7 @@ sg_new_write(Sg_fd *sfp, struct file *file, const char __user *buf,
+ 	}
+ 	srp->sg_io_owned = sg_io_owned;
+ 	hp = &srp->header;
+-	if (__copy_from_user(hp, buf, SZ_SG_IO_HDR)) {
++	if (get_sg_io_hdr(hp, buf)) {
+ 		sg_remove_request(sfp, srp);
+ 		return -EFAULT;
+ 	}
+@@ -1797,7 +1793,14 @@ sg_start_req(Sg_request *srp, unsigned char *cmd)
+ 		struct iovec *iov = NULL;
+ 		struct iov_iter i;
+ 
+-		res = import_iovec(rw, hp->dxferp, iov_count, 0, &iov, &i);
++#ifdef CONFIG_COMPAT
++		if (in_compat_syscall())
++			res = compat_import_iovec(rw, hp->dxferp, iov_count,
++						  0, &iov, &i);
++		else
++#endif
++			res = import_iovec(rw, hp->dxferp, iov_count,
++					   0, &iov, &i);
+ 		if (res < 0)
+ 			return res;
+ 
+diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
+index 10ba2d9e20bc..f279e77df256 100644
+--- a/fs/compat_ioctl.c
++++ b/fs/compat_ioctl.c
+@@ -64,151 +64,6 @@ static int do_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+ }
+ 
+ #ifdef CONFIG_BLOCK
+-typedef struct sg_io_hdr32 {
+-	compat_int_t interface_id;	/* [i] 'S' for SCSI generic (required) */
+-	compat_int_t dxfer_direction;	/* [i] data transfer direction  */
+-	unsigned char cmd_len;		/* [i] SCSI command length ( <= 16 bytes) */
+-	unsigned char mx_sb_len;		/* [i] max length to write to sbp */
+-	unsigned short iovec_count;	/* [i] 0 implies no scatter gather */
+-	compat_uint_t dxfer_len;		/* [i] byte count of data transfer */
+-	compat_uint_t dxferp;		/* [i], [*io] points to data transfer memory
+-					      or scatter gather list */
+-	compat_uptr_t cmdp;		/* [i], [*i] points to command to perform */
+-	compat_uptr_t sbp;		/* [i], [*o] points to sense_buffer memory */
+-	compat_uint_t timeout;		/* [i] MAX_UINT->no timeout (unit: millisec) */
+-	compat_uint_t flags;		/* [i] 0 -> default, see SG_FLAG... */
+-	compat_int_t pack_id;		/* [i->o] unused internally (normally) */
+-	compat_uptr_t usr_ptr;		/* [i->o] unused internally */
+-	unsigned char status;		/* [o] scsi status */
+-	unsigned char masked_status;	/* [o] shifted, masked scsi status */
+-	unsigned char msg_status;		/* [o] messaging level data (optional) */
+-	unsigned char sb_len_wr;		/* [o] byte count actually written to sbp */
+-	unsigned short host_status;	/* [o] errors from host adapter */
+-	unsigned short driver_status;	/* [o] errors from software driver */
+-	compat_int_t resid;		/* [o] dxfer_len - actual_transferred */
+-	compat_uint_t duration;		/* [o] time taken by cmd (unit: millisec) */
+-	compat_uint_t info;		/* [o] auxiliary information */
+-} sg_io_hdr32_t;  /* 64 bytes long (on sparc32) */
+-
+-typedef struct sg_iovec32 {
+-	compat_uint_t iov_base;
+-	compat_uint_t iov_len;
+-} sg_iovec32_t;
+-
+-static int sg_build_iovec(sg_io_hdr_t __user *sgio, void __user *dxferp, u16 iovec_count)
+-{
+-	sg_iovec_t __user *iov = (sg_iovec_t __user *) (sgio + 1);
+-	sg_iovec32_t __user *iov32 = dxferp;
+-	int i;
+-
+-	for (i = 0; i < iovec_count; i++) {
+-		u32 base, len;
+-
+-		if (get_user(base, &iov32[i].iov_base) ||
+-		    get_user(len, &iov32[i].iov_len) ||
+-		    put_user(compat_ptr(base), &iov[i].iov_base) ||
+-		    put_user(len, &iov[i].iov_len))
+-			return -EFAULT;
+-	}
+-
+-	if (put_user(iov, &sgio->dxferp))
+-		return -EFAULT;
+-	return 0;
+-}
+-
+-static int sg_ioctl_trans(struct file *file, unsigned int cmd,
+-			sg_io_hdr32_t __user *sgio32)
+-{
+-	sg_io_hdr_t __user *sgio;
+-	u16 iovec_count;
+-	u32 data;
+-	void __user *dxferp;
+-	int err;
+-	int interface_id;
+-
+-	if (get_user(interface_id, &sgio32->interface_id))
+-		return -EFAULT;
+-	if (interface_id != 'S')
+-		return do_ioctl(file, cmd, (unsigned long)sgio32);
+-
+-	if (get_user(iovec_count, &sgio32->iovec_count))
+-		return -EFAULT;
+-
+-	{
+-		void __user *top = compat_alloc_user_space(0);
+-		void __user *new = compat_alloc_user_space(sizeof(sg_io_hdr_t) +
+-				       (iovec_count * sizeof(sg_iovec_t)));
+-		if (new > top)
+-			return -EINVAL;
+-
+-		sgio = new;
+-	}
+-
+-	/* Ok, now construct.  */
+-	if (copy_in_user(&sgio->interface_id, &sgio32->interface_id,
+-			 (2 * sizeof(int)) +
+-			 (2 * sizeof(unsigned char)) +
+-			 (1 * sizeof(unsigned short)) +
+-			 (1 * sizeof(unsigned int))))
+-		return -EFAULT;
+-
+-	if (get_user(data, &sgio32->dxferp))
+-		return -EFAULT;
+-	dxferp = compat_ptr(data);
+-	if (iovec_count) {
+-		if (sg_build_iovec(sgio, dxferp, iovec_count))
+-			return -EFAULT;
+-	} else {
+-		if (put_user(dxferp, &sgio->dxferp))
+-			return -EFAULT;
+-	}
+-
+-	{
+-		unsigned char __user *cmdp;
+-		unsigned char __user *sbp;
+-
+-		if (get_user(data, &sgio32->cmdp))
+-			return -EFAULT;
+-		cmdp = compat_ptr(data);
+-
+-		if (get_user(data, &sgio32->sbp))
+-			return -EFAULT;
+-		sbp = compat_ptr(data);
+-
+-		if (put_user(cmdp, &sgio->cmdp) ||
+-		    put_user(sbp, &sgio->sbp))
+-			return -EFAULT;
+-	}
+-
+-	if (copy_in_user(&sgio->timeout, &sgio32->timeout,
+-			 3 * sizeof(int)))
+-		return -EFAULT;
+-
+-	if (get_user(data, &sgio32->usr_ptr))
+-		return -EFAULT;
+-	if (put_user(compat_ptr(data), &sgio->usr_ptr))
+-		return -EFAULT;
+-
+-	err = do_ioctl(file, cmd, (unsigned long) sgio);
+-
+-	if (err >= 0) {
+-		void __user *datap;
+-
+-		if (copy_in_user(&sgio32->pack_id, &sgio->pack_id,
+-				 sizeof(int)) ||
+-		    get_user(datap, &sgio->usr_ptr) ||
+-		    put_user((u32)(unsigned long)datap,
+-			     &sgio32->usr_ptr) ||
+-		    copy_in_user(&sgio32->status, &sgio->status,
+-				 (4 * sizeof(unsigned char)) +
+-				 (2 * sizeof(unsigned short)) +
+-				 (3 * sizeof(int))))
+-			err = -EFAULT;
+-	}
+-
+-	return err;
+-}
+-
+ struct compat_sg_req_info { /* used by SG_GET_REQUEST_TABLE ioctl() */
+ 	char req_state;
+ 	char orphan;
+@@ -358,6 +213,7 @@ COMPATIBLE_IOCTL(SCSI_IOCTL_GET_PCI)
+ #endif
+ #ifdef CONFIG_BLOCK
+ /* SG stuff */
++COMPATIBLE_IOCTL(SG_IO)
+ COMPATIBLE_IOCTL(SG_SET_TIMEOUT)
+ COMPATIBLE_IOCTL(SG_GET_TIMEOUT)
+ COMPATIBLE_IOCTL(SG_EMULATED_HOST)
+@@ -435,8 +291,6 @@ static long do_ioctl_trans(unsigned int cmd,
+ 	case PPPIOCSACTIVE32:
+ 		return ppp_sock_fprog_ioctl_trans(file, cmd, argp);
+ #ifdef CONFIG_BLOCK
+-	case SG_IO:
+-		return sg_ioctl_trans(file, cmd, argp);
+ 	case SG_GET_REQUEST_TABLE:
+ 		return sg_grt_trans(file, cmd, argp);
+ #endif
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1ef375dafb1c..a1050710d846 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -853,6 +853,8 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ 			  unsigned int, void __user *);
+ extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ 			 struct scsi_ioctl_command __user *);
++extern int get_sg_io_hdr(struct sg_io_hdr *hdr, const void __user *argp);
++extern int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp);
+ 
+ extern int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags);
+ extern void blk_queue_exit(struct request_queue *q);
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index f1e0569b4539..7baaa989404b 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1678,6 +1678,7 @@ ssize_t compat_import_iovec(int type,
+ 	*iov = p == *iov ? NULL : p;
+ 	return n;
+ }
++EXPORT_SYMBOL(compat_import_iovec);
+ #endif
+ 
+ int import_single_range(int rw, void __user *buf, size_t len,
 -- 
 2.20.0
 
-Cc: davem@davemloft.net
-Cc: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Cc: minyard@acm.org
-Cc: gregkh@linuxfoundation.org
-Cc: linux@roeck-us.net
-Cc: alexandre.belloni@bootlin.com
-Cc: jejb@linux.ibm.com
-Cc: martin.petersen@oracle.com
-Cc: dgilbert@interlog.com
-Cc: jslaby@suse.com
-Cc: wim@linux-watchdog.org
-Cc: viro@zeniv.linux.org.uk
-Cc: tytso@mit.edu
-Cc: adilger.kernel@dilger.ca
-Cc: jaegeuk@kernel.org
-Cc: rpeterso@redhat.com
-Cc: agruenba@redhat.com
-Cc: mikulas@artax.karlin.mff.cuni.cz
-Cc: konishi.ryusuke@gmail.com
-Cc: jlbec@evilplan.org
-Cc: joseph.qi@linux.alibaba.com
-Cc: darrick.wong@oracle.com
-Cc: linux-xfs@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: openipmi-developer@lists.sourceforge.net
-Cc: linux-hwmon@vger.kernel.org
-Cc: linux-ppp@vger.kernel.org
-Cc: linux-rtc@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org
-Cc: linux-watchdog@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org
-Cc: ecryptfs@vger.kernel.org
-Cc: linux-ext4@vger.kernel.org
-Cc: linux-f2fs-devel@lists.sourceforge.net
-Cc: cluster-devel@redhat.com
-Cc: linux-nilfs@vger.kernel.org
-Cc: ocfs2-devel@oss.oracle.com
