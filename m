@@ -2,158 +2,239 @@ Return-Path: <SRS0=ptuj=WK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F9DC433FF
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C93C433FF
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:45:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 41F012133F
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:34:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AACA216F4
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:45:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726126AbfHNUeC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Aug 2019 16:34:02 -0400
-Received: from mga09.intel.com ([134.134.136.24]:11728 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725895AbfHNUeC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Aug 2019 16:34:02 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Aug 2019 13:34:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,386,1559545200"; 
-   d="p7s'?scan'208";a="352026750"
-Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
-  by orsmga005.jf.intel.com with ESMTP; 14 Aug 2019 13:34:01 -0700
-Received: from orsmsx125.amr.corp.intel.com (10.22.240.125) by
- ORSMSX110.amr.corp.intel.com (10.22.240.8) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 14 Aug 2019 13:34:01 -0700
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.157]) by
- ORSMSX125.amr.corp.intel.com ([169.254.3.92]) with mapi id 14.03.0439.000;
- Wed, 14 Aug 2019 13:34:01 -0700
-From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
-To:     "Rajashekar, Revanth" <revanth.rajashekar@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "hch@lst.de" <hch@lst.de>,
-        "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH 3/3] block: sed-opal: OPAL_METHOD_LENGTH defined twice
-Thread-Topic: [PATCH 3/3] block: sed-opal: OPAL_METHOD_LENGTH defined twice
-Thread-Index: AQHVUh/4QTJWHukzJ0GSXihhNHGIKKb7kE0A
-Date:   Wed, 14 Aug 2019 20:34:01 +0000
-Message-ID: <388973c55cdc324659761ee1e4474345e0e40990.camel@intel.com>
-References: <20190813214340.15533-1-revanth.rajashekar@intel.com>
-         <20190813214340.15533-4-revanth.rajashekar@intel.com>
-In-Reply-To: <20190813214340.15533-4-revanth.rajashekar@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.232.115.165]
-Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-Zvcw8aIVIXwTS3wPYu9k"
+        id S1729803AbfHNUpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Aug 2019 16:45:43 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:55885 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725895AbfHNUpn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Aug 2019 16:45:43 -0400
+Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
+ (mreue010 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1MJmbB-1hiokV3nNB-00K75E; Wed, 14 Aug 2019 22:43:31 +0200
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     linux-kernel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        linux-fsdevel@vger.kernel.org
+Cc:     Arnd Bergmann <arnd@arndb.de>, davem@davemloft.net,
+        axboe@kernel.dk, linux-block@vger.kernel.org, minyard@acm.org,
+        gregkh@linuxfoundation.org, linux@roeck-us.net,
+        alexandre.belloni@bootlin.com, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, dgilbert@interlog.com, jslaby@suse.com,
+        wim@linux-watchdog.org, tytso@mit.edu, adilger.kernel@dilger.ca,
+        jaegeuk@kernel.org, rpeterso@redhat.com, agruenba@redhat.com,
+        mikulas@artax.karlin.mff.cuni.cz, konishi.ryusuke@gmail.com,
+        jlbec@evilplan.org, joseph.qi@linux.alibaba.com,
+        darrick.wong@oracle.com, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, openipmi-developer@lists.sourceforge.net,
+        linux-hwmon@vger.kernel.org, linux-ppp@vger.kernel.org,
+        linux-rtc@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, ecryptfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        cluster-devel@redhat.com, linux-nilfs@vger.kernel.org,
+        ocfs2-devel@oss.oracle.com
+Subject: [PATCH v5 00/18] compat_ioctl.c removal, part 2/3 
+Date:   Wed, 14 Aug 2019 22:42:27 +0200
+Message-Id: <20190814204259.120942-1-arnd@arndb.de>
+X-Mailer: git-send-email 2.20.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:xGnsbJFEb5cp5VgCCKba17rABY8rw5YpFHVSp9sUcOzQSe+UXGP
+ EfEYa61AjTCAHzUWX6wv2lDU7UbSUWqI2oz4Izzo8ktMHBlxmH8NVFj4hnZmHzHR9j3PmnD
+ FdXT0A0EWAS6WaUuOwbDeG9tdQjqBuRZe/Qa9Z37r+1tBtsxN6SEXAY5fO0COcyHnB4qqcA
+ G33rmG1j8a0kHXtMGaC3A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:lZeESLReWcA=:o8v1Y+WXV56E6iMJG8Ogif
+ 2FqbIgZz9Cf28eQxkb1FeOSJmjwIDMMG6qZymgcdySt/904oRKzRXaxzdToNS9eKtscmO3Pqe
+ /FgBQD2UqihLwK3P/Pddn1urtJAP8i4lHDXy2HhE2jK8dPb6o36J+yFC20qjDEZ2PrwGmI4P+
+ eCWYNuv25DY/1Lti33SSmno2KcNiHGryG0RZ4MxsltqQfXdWyvsKej7eST7IWNiMWKhvjyU37
+ hE4nHYkj/tcVvmbwEjgJuruEJRODw6lCU7hWqw9twzGmBAmy8QMD8J//vGUTZ4q5+VzF9VhjQ
+ bG82fyrhMmJKoue644MCK3h+10nGq6fpc0+zn8mYx07fSdSIGFWt2VJ2pxnSCWgeITy6Ere97
+ sRmxqZNBv/e8jpN7Uc0JBjNzz9yYdvbFlJfGeIc2ao4vxcJORGyxhpoqAIRlQzpHC31QgNZum
+ edQsMV2appVThHuGv1ov/A9jLW2kPA47ZPWpCcXW+dzl4v7v86+29DJTNjj3mVImCRQNSuJS4
+ cAtYqWH6jHUAOn8v98eCWJv3t830ah1HbsJkf7tJ7ckvhUNIWDFHYDwgsfXjt098IoD2AtXor
+ PgWxV3iIYDq+x9Wym9Nl2f8rz27kROMPDKgPXeM8TeWHxiZbHQgKAuei5tzhS7HSjk0UKFYhp
+ 9Oh+W+y+k0I/NRheX6o+PUjcCpNRjNPLHuD9piLtJmz92aChC6F/e9SyB7FzdHKmmf4IcD77K
+ 7HYEjW+U1QhnWXZOIuSxIrYkaKmPv6aeBud5fA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---=-Zvcw8aIVIXwTS3wPYu9k
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+This is a follow-up to part 1/3 that I posted after -rc2.
+I hope these are still largely uncontroversial changes, and
+I would like to get them into linux-5.4.
 
-lgtm
+Part 1 was in
 
-Reviewed-by: Jon Derrick <jonathan.derrick@intel.com>
+https://lore.kernel.org/lkml/CAPcyv4i_nHzV155RcgnAQ189aq2Lfd2g8pA1D5NbZqo9E_u+Dw@mail.gmail.com/
 
-On Tue, 2019-08-13 at 15:43 -0600, Revanth Rajashekar wrote:
-> Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
-> ---
->  block/opal_proto.h | 2 --
->  1 file changed, 2 deletions(-)
->=20
-> diff --git a/block/opal_proto.h b/block/opal_proto.h
-> index 562b78f40824..5532412d567c 100644
-> --- a/block/opal_proto.h
-> +++ b/block/opal_proto.h
-> @@ -119,8 +119,6 @@ enum opal_uid {
->  	OPAL_UID_HEXFF,
->  };
->=20
-> -#define OPAL_METHOD_LENGTH 8
-> -
->  /* Enum for indexing the OPALMETHOD array */
->  enum opal_method {
->  	OPAL_PROPERTIES,
-> --
-> 2.17.1
->=20
+Part 3 will be one kernel release after part 2 is merged,
+as that still needs a little extra work.
 
---=-Zvcw8aIVIXwTS3wPYu9k
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+The entire series is available at
 
-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
-PNauajAtxgRKfqfSMb+IcL/VXiPtVZOxVq+CTZeDJkaEmn/79vg8OYxpR+YhFF+tGlKf/Zc4id1P
-AgMBAAGjggI3MIICMzAdBgNVHQ4EFgQU4oawcWXM1cPGdwGcIszDfjORVZAwHwYDVR0jBBgwFoAU
-HmkqtNwo/kcYTiELP7ysES/wmPUwZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5pbnRlbC5j
-b20vcmVwb3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENB
-JTIwNEEuY3JsMIGfBggrBgEFBQcBAQSBkjCBjzBpBggrBgEFBQcwAoZdaHR0cDovL3d3dy5pbnRl
-bC5jb20vcmVwb3NpdG9yeS9jZXJ0aWZpY2F0ZXMvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIw
-SXNzdWluZyUyMENBJTIwNEEuY3J0MCIGCCsGAQUFBzABhhZodHRwOi8vb2NzcC5pbnRlbC5jb20v
-MAsGA1UdDwQEAwIHgDA8BgkrBgEEAYI3FQcELzAtBiUrBgEEAYI3FQiGw4x1hJnlUYP9gSiFjp9T
-gpHACWeB3r05lfBDAgFkAgEJMB8GA1UdJQQYMBYGCCsGAQUFBwMEBgorBgEEAYI3CgMMMCkGCSsG
-AQQBgjcVCgQcMBowCgYIKwYBBQUHAwQwDAYKKwYBBAGCNwoDDDBRBgNVHREESjBIoCoGCisGAQQB
-gjcUAgOgHAwaam9uYXRoYW4uZGVycmlja0BpbnRlbC5jb22BGmpvbmF0aGFuLmRlcnJpY2tAaW50
-ZWwuY29tMA0GCSqGSIb3DQEBBQUAA4IBAQBxGkHe05DNpYel4b9WbbyQqD1G6y6YA6C93TjKULZi
-p8+gO1LL096ixD44+frVm3jtXMikoadRHQJmBJdzsCywNE1KgtrYF0k4zRWr7a28nyfGgQe4UHHD
-7ARyZFeGd7AKSQ1y4/LU57I2Aw2HKx9/PXavv1JXjjO2/bqTfnZDJTQmOQ0nvlO3/gvbbABxZHqz
-NtfHZsQWS7s+Elk2xGUQ0Po2pMCQoaPo9R96mm+84UP9q3OvSqMoaZwfzoUeAx2wGJYl0h3S+ABr
-CPVfCgq9qnmVCn5DyHWE3V/BRjJCoILLBLxAxnmSdH4pF6wJ6pYRLEw9qoyNhpzGUIJU/Lk1MYIC
-FzCCAhMCAQEwgZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBD
-bGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFs
-IEJhc2ljIElzc3VpbmcgQ0EgNEECEzMAAMamAkocC+WQNPgAAAAAxqYwCQYFKw4DAhoFAKBdMBgG
-CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDgxNDIwMzQwMFowIwYJ
-KoZIhvcNAQkEMRYEFIlqYO7ibOUZTRHshAxqwLb4IEBRMA0GCSqGSIb3DQEBAQUABIIBACYW+CrS
-PPM3UBHuKU0V6ejts3Z/JAvL2OoqG5h4Chz3zSQ4JKmjwdDs32B+GpsqXaGTgho63Mxu4xaVPL8q
-84ymZznBlAnXCGvtwKYSBAGTTLLu2LZ8BcM5I7qt1DC4Eg9Sib8c6pXCwI1Rema5qHcc2ioqHLWu
-T67TSA0JPnvlD01GC1BK2KoX81azI18AxS8Ji21kkaG/YJj94V/lSt3Ptrm3hZ6g234vu2KeQaoF
-HXnKtmNIXiHUND24NU/Ii9XFLjZK5bW3cj2BKbQGZyDgan4G5GJIt40SEp4l6zaZYX3rLffr1grG
-9C4ADUOsNE6YptnNuyxMgh6xyZJLCLIAAAAAAAA=
+git://git.kernel.org/pub/scm/linux/kernel/git/arnd/playground.git compat_ioctl
 
+      Arnd
 
---=-Zvcw8aIVIXwTS3wPYu9k--
+Al Viro (2):
+  compat_ioctl: unify copy-in of ppp filters
+  compat_ioctl: move PPPIOCSCOMPRESS to ppp_generic
+
+Arnd Bergmann (16):
+  xfs: compat_ioctl: use compat_ptr()
+  xfs: compat_ioctl: add missing conversions
+  gfs2: add compat_ioctl support
+  fs: compat_ioctl: move FITRIM emulation into file systems
+  watchdog: cpwd: use generic compat_ptr_ioctl
+  compat_ioctl: move WDIOC handling into wdt drivers
+  compat_ioctl: reimplement SG_IO handling
+  af_unix: add compat_ioctl support
+  compat_ioctl: handle SIOCOUTQNSD
+  compat_ioctl: move SIOCOUTQ out of compat_ioctl.c
+  tty: handle compat PPP ioctls
+  compat_ioctl: handle PPPIOCGIDLE for 64-bit time_t
+  compat_ioctl: ppp: move simple commands into ppp_generic.c
+  compat_ioctl: move SG_GET_REQUEST_TABLE handling
+  pktcdvd: add compat_ioctl handler
+  scsi: sd: enable compat ioctls for sed-opal
+
+ Documentation/networking/ppp_generic.txt  |   2 +
+ arch/powerpc/platforms/52xx/mpc52xx_gpt.c |   1 +
+ arch/um/drivers/harddog_kern.c            |   1 +
+ block/scsi_ioctl.c                        | 132 ++++++++-
+ drivers/block/pktcdvd.c                   |  25 ++
+ drivers/char/ipmi/ipmi_watchdog.c         |   1 +
+ drivers/hwmon/fschmd.c                    |   1 +
+ drivers/net/ppp/ppp_generic.c             | 245 ++++++++++-----
+ drivers/rtc/rtc-ds1374.c                  |   1 +
+ drivers/scsi/sd.c                         |  14 +-
+ drivers/scsi/sg.c                         |  59 +++-
+ drivers/tty/tty_io.c                      |   5 +
+ drivers/watchdog/acquirewdt.c             |   1 +
+ drivers/watchdog/advantechwdt.c           |   1 +
+ drivers/watchdog/alim1535_wdt.c           |   1 +
+ drivers/watchdog/alim7101_wdt.c           |   1 +
+ drivers/watchdog/ar7_wdt.c                |   1 +
+ drivers/watchdog/at91rm9200_wdt.c         |   1 +
+ drivers/watchdog/ath79_wdt.c              |   1 +
+ drivers/watchdog/bcm63xx_wdt.c            |   1 +
+ drivers/watchdog/cpu5wdt.c                |   1 +
+ drivers/watchdog/cpwd.c                   |  25 +-
+ drivers/watchdog/eurotechwdt.c            |   1 +
+ drivers/watchdog/f71808e_wdt.c            |   1 +
+ drivers/watchdog/gef_wdt.c                |   1 +
+ drivers/watchdog/geodewdt.c               |   1 +
+ drivers/watchdog/ib700wdt.c               |   1 +
+ drivers/watchdog/ibmasr.c                 |   1 +
+ drivers/watchdog/indydog.c                |   1 +
+ drivers/watchdog/intel_scu_watchdog.c     |   1 +
+ drivers/watchdog/iop_wdt.c                |   1 +
+ drivers/watchdog/it8712f_wdt.c            |   1 +
+ drivers/watchdog/ixp4xx_wdt.c             |   1 +
+ drivers/watchdog/ks8695_wdt.c             |   1 +
+ drivers/watchdog/m54xx_wdt.c              |   1 +
+ drivers/watchdog/machzwd.c                |   1 +
+ drivers/watchdog/mixcomwd.c               |   1 +
+ drivers/watchdog/mtx-1_wdt.c              |   1 +
+ drivers/watchdog/mv64x60_wdt.c            |   1 +
+ drivers/watchdog/nuc900_wdt.c             |   1 +
+ drivers/watchdog/nv_tco.c                 |   1 +
+ drivers/watchdog/pc87413_wdt.c            |   1 +
+ drivers/watchdog/pcwd.c                   |   1 +
+ drivers/watchdog/pcwd_pci.c               |   1 +
+ drivers/watchdog/pcwd_usb.c               |   1 +
+ drivers/watchdog/pika_wdt.c               |   1 +
+ drivers/watchdog/pnx833x_wdt.c            |   1 +
+ drivers/watchdog/rc32434_wdt.c            |   1 +
+ drivers/watchdog/rdc321x_wdt.c            |   1 +
+ drivers/watchdog/riowd.c                  |   1 +
+ drivers/watchdog/sa1100_wdt.c             |   1 +
+ drivers/watchdog/sb_wdog.c                |   1 +
+ drivers/watchdog/sbc60xxwdt.c             |   1 +
+ drivers/watchdog/sbc7240_wdt.c            |   1 +
+ drivers/watchdog/sbc_epx_c3.c             |   1 +
+ drivers/watchdog/sbc_fitpc2_wdt.c         |   1 +
+ drivers/watchdog/sc1200wdt.c              |   1 +
+ drivers/watchdog/sc520_wdt.c              |   1 +
+ drivers/watchdog/sch311x_wdt.c            |   1 +
+ drivers/watchdog/scx200_wdt.c             |   1 +
+ drivers/watchdog/smsc37b787_wdt.c         |   1 +
+ drivers/watchdog/w83877f_wdt.c            |   1 +
+ drivers/watchdog/w83977f_wdt.c            |   1 +
+ drivers/watchdog/wafer5823wdt.c           |   1 +
+ drivers/watchdog/watchdog_dev.c           |   1 +
+ drivers/watchdog/wdrtas.c                 |   1 +
+ drivers/watchdog/wdt.c                    |   1 +
+ drivers/watchdog/wdt285.c                 |   1 +
+ drivers/watchdog/wdt977.c                 |   1 +
+ drivers/watchdog/wdt_pci.c                |   1 +
+ fs/compat_ioctl.c                         | 346 +---------------------
+ fs/ecryptfs/file.c                        |   1 +
+ fs/ext4/ioctl.c                           |   1 +
+ fs/f2fs/file.c                            |   1 +
+ fs/gfs2/file.c                            |  24 ++
+ fs/hpfs/dir.c                             |   1 +
+ fs/hpfs/file.c                            |   1 +
+ fs/nilfs2/ioctl.c                         |   1 +
+ fs/ocfs2/ioctl.c                          |   1 +
+ fs/xfs/xfs_ioctl32.c                      |  11 +-
+ include/linux/blkdev.h                    |   2 +
+ include/uapi/linux/ppp-ioctl.h            |   2 +
+ include/uapi/linux/ppp_defs.h             |  14 +
+ lib/iov_iter.c                            |   1 +
+ net/socket.c                              |   3 +
+ net/unix/af_unix.c                        |  19 ++
+ 86 files changed, 526 insertions(+), 472 deletions(-)
+
+-- 
+2.20.0
+
+Cc: davem@davemloft.net
+Cc: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Cc: minyard@acm.org
+Cc: gregkh@linuxfoundation.org
+Cc: linux@roeck-us.net
+Cc: alexandre.belloni@bootlin.com
+Cc: jejb@linux.ibm.com
+Cc: martin.petersen@oracle.com
+Cc: dgilbert@interlog.com
+Cc: jslaby@suse.com
+Cc: wim@linux-watchdog.org
+Cc: viro@zeniv.linux.org.uk
+Cc: tytso@mit.edu
+Cc: adilger.kernel@dilger.ca
+Cc: jaegeuk@kernel.org
+Cc: rpeterso@redhat.com
+Cc: agruenba@redhat.com
+Cc: mikulas@artax.karlin.mff.cuni.cz
+Cc: konishi.ryusuke@gmail.com
+Cc: jlbec@evilplan.org
+Cc: joseph.qi@linux.alibaba.com
+Cc: darrick.wong@oracle.com
+Cc: linux-xfs@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: openipmi-developer@lists.sourceforge.net
+Cc: linux-hwmon@vger.kernel.org
+Cc: linux-ppp@vger.kernel.org
+Cc: linux-rtc@vger.kernel.org
+Cc: linux-scsi@vger.kernel.org
+Cc: linux-watchdog@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org
+Cc: ecryptfs@vger.kernel.org
+Cc: linux-ext4@vger.kernel.org
+Cc: linux-f2fs-devel@lists.sourceforge.net
+Cc: cluster-devel@redhat.com
+Cc: linux-nilfs@vger.kernel.org
+Cc: ocfs2-devel@oss.oracle.com
