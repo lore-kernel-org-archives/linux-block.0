@@ -6,62 +6,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26A79C433FF
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F9DC433FF
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:34:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB7EB214C6
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:33:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41F012133F
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:34:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726119AbfHNUdu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Aug 2019 16:33:50 -0400
-Received: from mga07.intel.com ([134.134.136.100]:9289 "EHLO mga07.intel.com"
+        id S1726126AbfHNUeC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Aug 2019 16:34:02 -0400
+Received: from mga09.intel.com ([134.134.136.24]:11728 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725895AbfHNUdu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Aug 2019 16:33:50 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1725895AbfHNUeC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Aug 2019 16:34:02 -0400
+X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Aug 2019 13:33:48 -0700
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Aug 2019 13:34:02 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,386,1559545200"; 
-   d="p7s'?scan'208";a="179167652"
-Received: from orsmsx103.amr.corp.intel.com ([10.22.225.130])
-  by orsmga003.jf.intel.com with ESMTP; 14 Aug 2019 13:33:48 -0700
-Received: from orsmsx154.amr.corp.intel.com (10.22.226.12) by
- ORSMSX103.amr.corp.intel.com (10.22.225.130) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 14 Aug 2019 13:33:48 -0700
+   d="p7s'?scan'208";a="352026750"
+Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
+  by orsmga005.jf.intel.com with ESMTP; 14 Aug 2019 13:34:01 -0700
+Received: from orsmsx125.amr.corp.intel.com (10.22.240.125) by
+ ORSMSX110.amr.corp.intel.com (10.22.240.8) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 14 Aug 2019 13:34:01 -0700
 Received: from orsmsx101.amr.corp.intel.com ([169.254.8.157]) by
- ORSMSX154.amr.corp.intel.com ([169.254.11.172]) with mapi id 14.03.0439.000;
- Wed, 14 Aug 2019 13:33:48 -0700
+ ORSMSX125.amr.corp.intel.com ([169.254.3.92]) with mapi id 14.03.0439.000;
+ Wed, 14 Aug 2019 13:34:01 -0700
 From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
 To:     "Rajashekar, Revanth" <revanth.rajashekar@intel.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 CC:     "hch@lst.de" <hch@lst.de>,
         "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>,
         "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH 2/3] block: sed-opal: Eliminating the dead error
-Thread-Topic: [PATCH 2/3] block: sed-opal: Eliminating the dead error
-Thread-Index: AQHVUh/4O7VbbLBLr0a+kSluPAbg36b7kD0A
-Date:   Wed, 14 Aug 2019 20:33:47 +0000
-Message-ID: <bd8b06415d47d7c8453afa282ea640fb291a3f8e.camel@intel.com>
+Subject: Re: [PATCH 3/3] block: sed-opal: OPAL_METHOD_LENGTH defined twice
+Thread-Topic: [PATCH 3/3] block: sed-opal: OPAL_METHOD_LENGTH defined twice
+Thread-Index: AQHVUh/4QTJWHukzJ0GSXihhNHGIKKb7kE0A
+Date:   Wed, 14 Aug 2019 20:34:01 +0000
+Message-ID: <388973c55cdc324659761ee1e4474345e0e40990.camel@intel.com>
 References: <20190813214340.15533-1-revanth.rajashekar@intel.com>
-         <20190813214340.15533-3-revanth.rajashekar@intel.com>
-In-Reply-To: <20190813214340.15533-3-revanth.rajashekar@intel.com>
+         <20190813214340.15533-4-revanth.rajashekar@intel.com>
+In-Reply-To: <20190813214340.15533-4-revanth.rajashekar@intel.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.232.115.165]
 Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-V3PHAOd0+xXZYigFsnG5"
+        protocol="application/x-pkcs7-signature"; boundary="=-Zvcw8aIVIXwTS3wPYu9k"
 MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---=-V3PHAOd0+xXZYigFsnG5
+--=-Zvcw8aIVIXwTS3wPYu9k
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -69,37 +68,30 @@ lgtm
 
 Reviewed-by: Jon Derrick <jonathan.derrick@intel.com>
 
-On Tue, 2019-08-13 at 15:43 -0600, Rajashekar, Revanth wrote:
-> In the function 'response_parse', num_entries will never be 0 as
-> slen is checked for 0. Hence, the condition 'if (num_entries =3D=3D 0)'
-> can never be true.
->=20
+On Tue, 2019-08-13 at 15:43 -0600, Revanth Rajashekar wrote:
 > Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
 > ---
->  block/sed-opal.c | 4 ----
->  1 file changed, 4 deletions(-)
+>  block/opal_proto.h | 2 --
+>  1 file changed, 2 deletions(-)
 >=20
-> diff --git a/block/sed-opal.c b/block/sed-opal.c
-> index d442f29e84f1..4e95a9792162 100644
-> --- a/block/sed-opal.c
-> +++ b/block/sed-opal.c
-> @@ -905,10 +905,6 @@ static int response_parse(const u8 *buf, size_t leng=
-th,
->  		num_entries++;
->  	}
+> diff --git a/block/opal_proto.h b/block/opal_proto.h
+> index 562b78f40824..5532412d567c 100644
+> --- a/block/opal_proto.h
+> +++ b/block/opal_proto.h
+> @@ -119,8 +119,6 @@ enum opal_uid {
+>  	OPAL_UID_HEXFF,
+>  };
 >=20
-> -	if (num_entries =3D=3D 0) {
-> -		pr_debug("Couldn't parse response.\n");
-> -		return -EINVAL;
-> -	}
->  	resp->num =3D num_entries;
->=20
->  	return 0;
+> -#define OPAL_METHOD_LENGTH 8
+> -
+>  /* Enum for indexing the OPALMETHOD array */
+>  enum opal_method {
+>  	OPAL_PROPERTIES,
 > --
 > 2.17.1
 >=20
 
---=-V3PHAOd0+xXZYigFsnG5
+--=-Zvcw8aIVIXwTS3wPYu9k
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -155,13 +147,13 @@ CPVfCgq9qnmVCn5DyHWE3V/BRjJCoILLBLxAxnmSdH4pF6wJ6pYRLEw9qoyNhpzGUIJU/Lk1MYIC
 FzCCAhMCAQEwgZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBD
 bGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFs
 IEJhc2ljIElzc3VpbmcgQ0EgNEECEzMAAMamAkocC+WQNPgAAAAAxqYwCQYFKw4DAhoFAKBdMBgG
-CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDgxNDIwMzM0NlowIwYJ
-KoZIhvcNAQkEMRYEFGdYO2ZDZFemvdbhYx8m7aGom3uiMA0GCSqGSIb3DQEBAQUABIIBABrzMR4w
-z5GWFftO56izZdbDPuDmsxejADy37R5rfohXfkYMlxy6sKd9SsKU8CV4E+pPp3jzOe837KvpbXWD
-xNgkaTgtLCts9duRcC5clcWEPL8djWOkBO75ue3OqVPyFWcK7n28O0I288EY7piVmB/+hqoIg3cS
-jSh+i45B2c4EM6ol13N17v5vydrSzwaT1G57eRcITt1AkbP5K6u8Jdxrnb8RfQVGDmhr1i2XAmqu
-rppCJkW3lOFbi2+PWfa85Bt77PguWMJoYTPsdKNoIIWwyTsbUiexkfKNpvwhWqFkdp1JycpRW1yP
-gSbe8TVITK5E0MRwH7oEO/2DLHT5heQAAAAAAAA=
+CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDgxNDIwMzQwMFowIwYJ
+KoZIhvcNAQkEMRYEFIlqYO7ibOUZTRHshAxqwLb4IEBRMA0GCSqGSIb3DQEBAQUABIIBACYW+CrS
+PPM3UBHuKU0V6ejts3Z/JAvL2OoqG5h4Chz3zSQ4JKmjwdDs32B+GpsqXaGTgho63Mxu4xaVPL8q
+84ymZznBlAnXCGvtwKYSBAGTTLLu2LZ8BcM5I7qt1DC4Eg9Sib8c6pXCwI1Rema5qHcc2ioqHLWu
+T67TSA0JPnvlD01GC1BK2KoX81azI18AxS8Ji21kkaG/YJj94V/lSt3Ptrm3hZ6g234vu2KeQaoF
+HXnKtmNIXiHUND24NU/Ii9XFLjZK5bW3cj2BKbQGZyDgan4G5GJIt40SEp4l6zaZYX3rLffr1grG
+9C4ADUOsNE6YptnNuyxMgh6xyZJLCLIAAAAAAAA=
 
 
---=-V3PHAOd0+xXZYigFsnG5--
+--=-Zvcw8aIVIXwTS3wPYu9k--
