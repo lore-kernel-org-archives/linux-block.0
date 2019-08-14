@@ -2,63 +2,33 @@ Return-Path: <SRS0=ptuj=WK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB6DDC433FF
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 11:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 237E1C433FF
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 11:47:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8BDD9206C2
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 11:38:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="jbPsuqGC"
+	by mail.kernel.org (Postfix) with ESMTP id EC1E2208C2
+	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 11:47:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726980AbfHNLii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Aug 2019 07:38:38 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:34944 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726121AbfHNLih (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Aug 2019 07:38:37 -0400
-Received: by mail-lf1-f67.google.com with SMTP id p197so79041151lfa.2
-        for <linux-block@vger.kernel.org>; Wed, 14 Aug 2019 04:38:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tl4lHPgUKyjZ4PA5frXihhV1cgSueNxdkLcdZsBaY4I=;
-        b=jbPsuqGC/o2ZqbZIV5mCeR3UJ7x6ztoAqdeOaM7bCjV7XeQ2b2f5KSNZRWcy5T2J1F
-         nhf36FHFqaSyVDvmlGFM3VfNnoGwd6y14WLITLKeO607r5sFOoZY2t9WNLsEX++muVKG
-         FvIB2nYIXiTZ5DBylglUMRIypMmbVkAjleOlU8tGJpKD1PYbLOZVNMVnixtiI4DAP3lz
-         jikVx7bcSI8WeTCcfEHqLoa2EwRwtE4bIj/HjAWX9k0U78xbi4AlhNCTfiIwbTD3WmDU
-         j78kMNCxdbgOggwf8Z5c3Ckm88BxzvbfnG516bYC+LKJru+dvuDZcGYad6olsS+OaK6h
-         G7LQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tl4lHPgUKyjZ4PA5frXihhV1cgSueNxdkLcdZsBaY4I=;
-        b=H/dBLr0mN9VmYEJW5bis8+/asCexOUlqV7TtVCoAQeZFZOi5GYJO4xBgHJm5oAle2u
-         Pcwz6WHhMMZepJ1snqP4soQQPOXlSBCNv8/I4LFEV1v5HrCa7ptUX9QMJyZQPU81xFU+
-         sEf608Ro/2tTpxplhMgmDa0yGb+BAQ1b8v7Mqr9mzIOJS5bzrKQWw/6tuVJ6QbAhU62I
-         30L6OguTuX/RvR4uGqsKIOUavZav1ahEb/EQk2dj677dd5nQcRU97GeOh+iQwURsgmjU
-         YgDvKBD9/l4qboSgG4ewsfSRTlEAS9cm/XoFN/CzxniiYQLZ/rkaK6/Lw9ce4zlX6OUR
-         PQbw==
-X-Gm-Message-State: APjAAAUiuX+F3jYzliCcIE6mTupbZf5RT436atFXzuT4DCUYZnYedrP7
-        P1LdXYOddDBvgJyevxrmY4vgYnez+7oEpF2FLzYYXA==
-X-Google-Smtp-Source: APXvYqwdp0z7dISVyQdXlhFPeViRhkBkT7bHEq6kyIgkUCGOt5rMfFVE/QcTv/yI+SBrUgZYYqu3wwbwFOkJT3h5PoY=
-X-Received: by 2002:ac2:4ac4:: with SMTP id m4mr24826096lfp.172.1565782716019;
- Wed, 14 Aug 2019 04:38:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190814103244.92518-1-maco@android.com> <20190814113348.GA525@ming.t460p>
-In-Reply-To: <20190814113348.GA525@ming.t460p>
-From:   Martijn Coenen <maco@android.com>
-Date:   Wed, 14 Aug 2019 13:38:25 +0200
-Message-ID: <CAB0TPYHdaOTUKf5ix-oU7cXsV12ZW6YDYBsG+VKr6zk=RCW2NA@mail.gmail.com>
-Subject: Re: [PATCH] RFC: loop: Avoid calling blk_mq_freeze_queue() when possible.
-To:     Ming Lei <ming.lei@redhat.com>
+        id S1726265AbfHNLrd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Aug 2019 07:47:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46886 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726126AbfHNLrd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Aug 2019 07:47:33 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1B806307C820;
+        Wed, 14 Aug 2019 11:47:33 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D74A1600C8;
+        Wed, 14 Aug 2019 11:47:02 +0000 (UTC)
+Date:   Wed, 14 Aug 2019 19:46:48 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Martijn Coenen <maco@android.com>
 Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
         LKML <linux-kernel@vger.kernel.org>,
         Greg KH <gregkh@linuxfoundation.org>, kernel-team@android.com,
@@ -67,64 +37,42 @@ Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
         Nikita Ioffe <ioffe@google.com>,
         Jiyong Park <jiyong@google.com>,
         Martijn Coenen <maco@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH] RFC: loop: Avoid calling blk_mq_freeze_queue() when
+ possible.
+Message-ID: <20190814114646.GA14561@ming.t460p>
+References: <20190814103244.92518-1-maco@android.com>
+ <20190814113348.GA525@ming.t460p>
+ <CAB0TPYHdaOTUKf5ix-oU7cXsV12ZW6YDYBsG+VKr6zk=RCW2NA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAB0TPYHdaOTUKf5ix-oU7cXsV12ZW6YDYBsG+VKr6zk=RCW2NA@mail.gmail.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 14 Aug 2019 11:47:33 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 14, 2019 at 1:34 PM Ming Lei <ming.lei@redhat.com> wrote:
-> Another candidate is to not switch to q_usage_counter's percpu mode
-> until loop becomes Lo_bound, and this way may be more clean.
+On Wed, Aug 14, 2019 at 01:38:25PM +0200, Martijn Coenen wrote:
+> On Wed, Aug 14, 2019 at 1:34 PM Ming Lei <ming.lei@redhat.com> wrote:
+> > Another candidate is to not switch to q_usage_counter's percpu mode
+> > until loop becomes Lo_bound, and this way may be more clean.
+> 
+> Thanks! I had considered this too, but thought it a bit risky to mess
+> with the init flag from the loop driver. Maybe we could delay
 
-Thanks! I had considered this too, but thought it a bit risky to mess
-with the init flag from the loop driver. Maybe we could delay
-switching q_usage_counter to per-cpu mode in the block layer in
-general, until the first request comes in?
+blk_queue_init_done() is only called in blk_queue_init_done() for
+this purpose, so this approach should be fine, IMO.
 
-This would also address our issues, and potentially be an even smaller change.
+> switching q_usage_counter to per-cpu mode in the block layer in
+> general, until the first request comes in?
 
-Martijn
->
-> Something like the following patch:
->
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index a7461f482467..8791f9242583 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -1015,6 +1015,9 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
->          */
->         bdgrab(bdev);
->         mutex_unlock(&loop_ctl_mutex);
-> +
-> +       percpu_ref_switch_to_percpu(&lo->lo_queue->q_usage_counter);
-> +
->         if (partscan)
->                 loop_reread_partitions(lo, bdev);
->         if (claimed_bdev)
-> @@ -1171,6 +1174,8 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
->         lo->lo_state = Lo_unbound;
->         mutex_unlock(&loop_ctl_mutex);
->
-> +       percpu_ref_switch_to_atomic(&lo->lo_queue->q_usage_counter, NULL);
-> +
->         /*
->          * Need not hold loop_ctl_mutex to fput backing file.
->          * Calling fput holding loop_ctl_mutex triggers a circular
-> @@ -2003,6 +2008,12 @@ static int loop_add(struct loop_device **l, int i)
->         }
->         lo->lo_queue->queuedata = lo;
->
-> +       /*
-> +        * cheat block layer for not switching to q_usage_counter's
-> +        * percpu mode before loop becomes Lo_bound
-> +        */
-> +       blk_queue_flag_set(QUEUE_FLAG_INIT_DONE, lo->lo_queue);
-> +
->         blk_queue_max_hw_sectors(lo->lo_queue, BLK_DEF_MAX_SECTORS);
->
->         /*
->
->
-> thanks,
-> Ming
+This approach may not help your issue on loop, IO request comes
+just after disk is added, such as by systemd, or reading partition table.
+
+However, loop only starts to handle IO really after it becomes 'Lo_bound'.
+
+thanks, 
+Ming
