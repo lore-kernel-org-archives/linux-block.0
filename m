@@ -2,265 +2,124 @@ Return-Path: <SRS0=WP4r=WL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F7D6C3A589
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 12:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF63C3A589
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 13:01:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CEB122084D
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 12:47:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=Mellanox.com header.i=@Mellanox.com header.b="acN6uK7a"
+	by mail.kernel.org (Postfix) with ESMTP id 1BF27206C1
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 13:01:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729838AbfHOMrW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 08:47:22 -0400
-Received: from mail-eopbgr80078.outbound.protection.outlook.com ([40.107.8.78]:3262
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725977AbfHOMrV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 08:47:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JjtnFhlaf1LguE37MKXL4S9X0b7ouQAuDuB6KLrLudC6ygUdmKsbYn5JW9XT3o9eyY5qqcNB5o8/uqXNyTfMCVAuq5Go3NZ0DKq290wQzkCXDoPzxTAi8NErBYMTlG/IwyBdAHJjPBFVS3HDwLjA8ylY/Gqy7TPCBhfUk5SAsPA2QBQkn8VcfdlZ2pWYqAJvNlIlAMotG3jTgVwikJrYE+B5DeaTrlxsfBxVusiSAPh1wjY/Hm7nMgEJoDLX86dS1kiU4ffWJmzrOw90Yb7CJr78kpraOt5vmLUqXGLGgmFyhzITmC8188B2vZz+qC7JUKcK7wXnqTP18je0EqBPCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YQieUppWTPN5s0q+2YP8EPrBtQkxpuVTjMWl7KBSNH4=;
- b=YIlRIRHkOc/Fpav6qES9INOaQgM6LXNuGwvjjxEbzF74Kd0vX184tItrX8XjwCIV7t/4+W6o0f8gpjqX7k1UqNX3dUNGNCuxivNFY/W5wMVsT6ssUAl0dccqc5IY9YvKvvFknZhZ/Umc6Rol/WjO7CfkZpQmnjup+wWYSS579Tbe9r7uXn7cria2dYyX7G5g9VL6xyK8m/8WWX5xxNbOgSo0jwRp6w2mku60QM2cA5M+qrfE8GWxWTYlGC/jQ77p5D+SknXIZA1RXH3F/QtvohHfMVBDoYetVF0Nt/fyG4jfD5GSWVJT3SQkhazmALEJm0gBuwQ5hMFNLja9GFjgag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 193.47.165.251) smtp.rcpttodomain=raithlin.com smtp.mailfrom=mellanox.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=mellanox.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YQieUppWTPN5s0q+2YP8EPrBtQkxpuVTjMWl7KBSNH4=;
- b=acN6uK7aO5ejSvaaZDcBgP/HcukYY2DRa4UJ1kLBNV5+oNaNXqN5Vh54ej4IzzrivKBwAwed0+0WJluY90ktIgbYX37hf0UM+wV+qDqTDgLWG+Wdxsd+j38SpMJ1FT5tvpuo68T//ASGShkAwq9wDCCu3aipvT3quXtwhQbqPA0=
-Received: from DB6PR05CA0030.eurprd05.prod.outlook.com (2603:10a6:6:14::43) by
- AM5PR0502MB3060.eurprd05.prod.outlook.com (2603:10a6:203:95::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2157.18; Thu, 15 Aug
- 2019 12:47:15 +0000
-Received: from DB5EUR03FT029.eop-EUR03.prod.protection.outlook.com
- (2a01:111:f400:7e0a::200) by DB6PR05CA0030.outlook.office365.com
- (2603:10a6:6:14::43) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.2157.16 via Frontend
- Transport; Thu, 15 Aug 2019 12:47:14 +0000
-Authentication-Results: spf=pass (sender IP is 193.47.165.251)
- smtp.mailfrom=mellanox.com; raithlin.com; dkim=none (message not signed)
- header.d=none;raithlin.com; dmarc=pass action=none header.from=mellanox.com;
-Received-SPF: Pass (protection.outlook.com: domain of mellanox.com designates
- 193.47.165.251 as permitted sender) receiver=protection.outlook.com;
- client-ip=193.47.165.251; helo=mtlcas13.mtl.com;
-Received: from mtlcas13.mtl.com (193.47.165.251) by
- DB5EUR03FT029.mail.protection.outlook.com (10.152.20.131) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.2178.16 via Frontend Transport; Thu, 15 Aug 2019 12:47:14 +0000
-Received: from MTLCAS13.mtl.com (10.0.8.78) by mtlcas13.mtl.com (10.0.8.78)
- with Microsoft SMTP Server (TLS) id 15.0.1178.4; Thu, 15 Aug 2019 15:47:13
- +0300
-Received: from MTLCAS01.mtl.com (10.0.8.71) by MTLCAS13.mtl.com (10.0.8.78)
- with Microsoft SMTP Server (TLS) id 15.0.1178.4 via Frontend Transport; Thu,
- 15 Aug 2019 15:47:13 +0300
-Received: from [10.223.0.54] (10.223.0.54) by MTLCAS01.mtl.com (10.0.8.71)
- with Microsoft SMTP Server (TLS) id 14.3.301.0; Thu, 15 Aug 2019 15:46:16
- +0300
-Subject: Re: [PATCH v7 11/14] nvmet-configfs: introduce passthru configfs
- interface
-To:     Logan Gunthorpe <logang@deltatee.com>,
-        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
-CC:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-        "Keith Busch" <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190801234514.7941-1-logang@deltatee.com>
- <20190801234514.7941-12-logang@deltatee.com>
-From:   Max Gurtovoy <maxg@mellanox.com>
-Message-ID: <28a807ae-fbba-5016-3b71-04baa121e522@mellanox.com>
-Date:   Thu, 15 Aug 2019 15:46:16 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+        id S1729818AbfHONBx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 09:01:53 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:44489 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726109AbfHONBx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Aug 2019 09:01:53 -0400
+Received: from mail-qk1-f199.google.com ([209.85.222.199])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <gpiccoli@canonical.com>)
+        id 1hyFO3-0007X8-9P
+        for linux-block@vger.kernel.org; Thu, 15 Aug 2019 13:01:51 +0000
+Received: by mail-qk1-f199.google.com with SMTP id r200so1952785qke.19
+        for <linux-block@vger.kernel.org>; Thu, 15 Aug 2019 06:01:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=WcgGhKrzEqQFcbftTHdoLG8OGi4gCwQvJKGdNd0Y8Mc=;
+        b=jxJhqyM+c5hSRfg7gHuFB5lako9GhDNR6rHNK+nNhR1bVxX4dXj7EMYTTPrEH6ay5/
+         98IMgz1cM2UJuajpCYsCFUDVfeLeAV6IeVcFpHUXopNmTYxR/o6Nam1WBK8CGvhDaxGX
+         AURAkDaMFsZEDwF74/+wqk6WZY3rGdQCq0yQkvmrD1moG15M1XLgi23L0fC2Oy/jT2kV
+         wC4Dh4cG4DOx7Ko3ZqNNGnF6+zDW9Ze2vPv24brs+1DG8ky0cW2PV6xlV/T/emecseNJ
+         x4D27EBQ1E0nPjwM8UhIAQfcJq6kWxgs69S34fyvvL+m4+9AlfylF5w4eibMTciA/gGT
+         80ng==
+X-Gm-Message-State: APjAAAUIx0J/jks74ZbFCGovzFozxWXl/nDWDGFD24jH740zfRg7uA2Y
+        xoz38Rbkv6AZuQJ9hPmQaXMaWc17TaYJgKYhnifW6uA66lxtA/h653C6sfNJh23bnxp4gRxyuTt
+        DNS6my6+0bMvKoOpJNZJg70+RAt9dL4mpU3A+1RQb
+X-Received: by 2002:a37:9c88:: with SMTP id f130mr3837759qke.494.1565874110546;
+        Thu, 15 Aug 2019 06:01:50 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyn7TqrI2aPfIK5FkKXReFXUa6cToRv5dkS287uBNrZhKNDXoFPigPVQKtNordm0tBgQ55XYw==
+X-Received: by 2002:a37:9c88:: with SMTP id f130mr3837738qke.494.1565874110392;
+        Thu, 15 Aug 2019 06:01:50 -0700 (PDT)
+Received: from [192.168.1.75] ([191.13.19.2])
+        by smtp.gmail.com with ESMTPSA id g207sm1345819qke.11.2019.08.15.06.01.45
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 15 Aug 2019 06:01:48 -0700 (PDT)
+Subject: Re: [PATCH] nvme: Use first ctrl->instance id as subsystem id
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>, "hch@lst.de" <hch@lst.de>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "jay.vosburgh@canonical.com" <jay.vosburgh@canonical.com>,
+        Dan Streetman <dan.streetman@canonical.com>
+References: <20190814142836.2322-1-gpiccoli@canonical.com>
+ <20190814160640.GA3256@localhost.localdomain>
+ <abfc4bd0-f4f0-5655-81ee-ec32d3516f35@canonical.com>
+ <20190814162754.GB3256@localhost.localdomain>
+ <b5b471cc-8935-cf96-d55a-a7dc731cb0d6@canonical.com>
+ <20190814190814.GC3256@localhost.localdomain>
+From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
+ mQENBFpVBxcBCADPNKmu2iNKLepiv8+Ssx7+fVR8lrL7cvakMNFPXsXk+f0Bgq9NazNKWJIn
+ Qxpa1iEWTZcLS8ikjatHMECJJqWlt2YcjU5MGbH1mZh+bT3RxrJRhxONz5e5YILyNp7jX+Vh
+ 30rhj3J0vdrlIhPS8/bAt5tvTb3ceWEic9mWZMsosPavsKVcLIO6iZFlzXVu2WJ9cov8eQM/
+ irIgzvmFEcRyiQ4K+XUhuA0ccGwgvoJv4/GWVPJFHfMX9+dat0Ev8HQEbN/mko/bUS4Wprdv
+ 7HR5tP9efSLucnsVzay0O6niZ61e5c97oUa9bdqHyApkCnGgKCpg7OZqLMM9Y3EcdMIJABEB
+ AAG0LUd1aWxoZXJtZSBHLiBQaWNjb2xpIDxncGljY29saUBjYW5vbmljYWwuY29tPokBNwQT
+ AQgAIQUCWmClvQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRDOR5EF9K/7Gza3B/9d
+ 5yczvEwvlh6ksYq+juyuElLvNwMFuyMPsvMfP38UslU8S3lf+ETukN1S8XVdeq9yscwtsRW/
+ 4YoUwHinJGRovqy8gFlm3SAtjfdqysgJqUJwBmOtcsHkmvFXJmPPGVoH9rMCUr9s6VDPox8f
+ q2W5M7XE9YpsfchS/0fMn+DenhQpV3W6pbLtuDvH/81GKrhxO8whSEkByZbbc+mqRhUSTdN3
+ iMpRL0sULKPVYbVMbQEAnfJJ1LDkPqlTikAgt3peP7AaSpGs1e3pFzSEEW1VD2jIUmmDku0D
+ LmTHRl4t9KpbU/H2/OPZkrm7809QovJGRAxjLLPcYOAP7DUeltveuQENBFpVBxcBCADbxD6J
+ aNw/KgiSsbx5Sv8nNqO1ObTjhDR1wJw+02Bar9DGuFvx5/qs3ArSZkl8qX0X9Vhptk8rYnkn
+ pfcrtPBYLoux8zmrGPA5vRgK2ItvSc0WN31YR/6nqnMfeC4CumFa/yLl26uzHJa5RYYQ47jg
+ kZPehpc7IqEQ5IKy6cCKjgAkuvM1rDP1kWQ9noVhTUFr2SYVTT/WBHqUWorjhu57/OREo+Tl
+ nxI1KrnmW0DbF52tYoHLt85dK10HQrV35OEFXuz0QPSNrYJT0CZHpUprkUxrupDgkM+2F5LI
+ bIcaIQ4uDMWRyHpDbczQtmTke0x41AeIND3GUc+PQ4hWGp9XABEBAAGJAR8EGAEIAAkFAlpV
+ BxcCGwwACgkQzkeRBfSv+xv1wwgAj39/45O3eHN5pK0XMyiRF4ihH9p1+8JVfBoSQw7AJ6oU
+ 1Hoa+sZnlag/l2GTjC8dfEGNoZd3aRxqfkTrpu2TcfT6jIAsxGjnu+fUCoRNZzmjvRziw3T8
+ egSPz+GbNXrTXB8g/nc9mqHPPprOiVHDSK8aGoBqkQAPZDjUtRwVx112wtaQwArT2+bDbb/Y
+ Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
+ kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
+ X18zwLgdiQ==
+Message-ID: <9edcb6b3-806c-a422-8d44-c1ab49ce0b57@canonical.com>
+Date:   Thu, 15 Aug 2019 10:01:43 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190801234514.7941-12-logang@deltatee.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190814190814.GC3256@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Originating-IP: [10.223.0.54]
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:193.47.165.251;IPV:NLI;CTRY:IL;EFV:NLI;SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(396003)(376002)(346002)(2980300002)(199004)(189003)(31686004)(53546011)(81156014)(16526019)(8676002)(65826007)(186003)(81166006)(70206006)(70586007)(478600001)(4326008)(305945005)(2486003)(126002)(7416002)(486006)(106002)(64126003)(76176011)(23676004)(6116002)(336012)(356004)(16576012)(110136005)(229853002)(446003)(2616005)(316002)(5660300002)(14444005)(2201001)(58126008)(50466002)(11346002)(476003)(47776003)(86362001)(230700001)(26005)(54906003)(6246003)(65806001)(65956001)(2906002)(31696002)(3846002)(36756003)(53936002)(7736002)(8936002)(3940600001)(2101003);DIR:OUT;SFP:1101;SCL:1;SRVR:AM5PR0502MB3060;H:mtlcas13.mtl.com;FPR:;SPF:Pass;LANG:en;PTR:InfoDomainNonexistent;A:1;MX:1;
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a612fff5-8cea-4e9d-76fd-08d7217eb2c9
-X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(4709080)(1401327)(2017052603328)(7193020);SRVR:AM5PR0502MB3060;
-X-MS-TrafficTypeDiagnostic: AM5PR0502MB3060:
-X-Microsoft-Antispam-PRVS: <AM5PR0502MB30607A8B61A7E0D7A8E3A447B6AC0@AM5PR0502MB3060.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1303;
-X-Forefront-PRVS: 01304918F3
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Message-Info: n6yJUHEmdFuQfHM9LWDRjHEZLbksBC6aPsfsv6Dv6o0AG+ht3nomV+bdjUcxDwfQOtIfMjCgPQtTn9iUSXx/WB4N7Ar1IMyK3UAVRM6PsS5uFFueb9nqUVjGalzdyGmXF89xICpEBjElhV94OSOOw7kHVNup68wTMcCpTAYG8VcMJ3Vk62bLCuTqzumvBMxOHytHbDWTwMhRquRO5TERHq4lL/fcgLPQsNViRtDx0hakrWwLbp4lTteIENvkXeK1sQVPgt72278VSipFSiJG/Aig6tG/wVJLHCRHUWnywPd+cljArD9cwMlHJvJYa9pP/zLhJx489b0OcwfXzcaD5B892DwxvaY8cMog8SXRtv6CV21mEzdMgDEISeW2F1LN8n0r6e965q6FzQCTeDHwZUr62Db0BNRJQ+fTYfKvXIQ=
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2019 12:47:14.3046
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a612fff5-8cea-4e9d-76fd-08d7217eb2c9
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=a652971c-7d2e-4d9b-a6a4-d149256f461b;Ip=[193.47.165.251];Helo=[mtlcas13.mtl.com]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0502MB3060
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 14/08/2019 16:08, Keith Busch wrote:
+> On Wed, Aug 14, 2019 at 11:29:17AM -0700, Guilherme G. Piccoli wrote:
+>> It is a suggestion from my colleague Dan (CCed here), something like:
+>> for non-multipath nvme, keep nvmeC and nvmeCnN (C=controller ida,
+>> N=namespace); for multipath nvme, use nvmeScCnN (S=subsystem ida).
+> 
+> This will inevitably lead to collisions. The existing naming scheme was
+> selected specifically to avoid that problem.
+> 
 
-On 8/2/2019 2:45 AM, Logan Gunthorpe wrote:
-> When CONFIG_NVME_TARGET_PASSTHRU as 'passthru' directory will
-> be added to each subsystem. The directory is similar to a namespace
-> and has two attributes: device_path and enable. The user must set the
-> path to the nvme controller's char device and write '1' to enable the
-> subsystem to use passthru.
->
-> Any given subsystem is prevented from enabling both a regular namespace
-> and the passthru device. If one is enabled, enabling the other will
-> produce an error.
->
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> ---
->   drivers/nvme/target/configfs.c | 99 ++++++++++++++++++++++++++++++++++
->   drivers/nvme/target/nvmet.h    |  1 +
->   2 files changed, 100 insertions(+)
->
-> diff --git a/drivers/nvme/target/configfs.c b/drivers/nvme/target/configfs.c
-> index 98613a45bd3b..b15d64c19f58 100644
-> --- a/drivers/nvme/target/configfs.c
-> +++ b/drivers/nvme/target/configfs.c
-> @@ -615,6 +615,103 @@ static const struct config_item_type nvmet_namespaces_type = {
->   	.ct_owner		= THIS_MODULE,
->   };
->   
-> +#ifdef CONFIG_NVME_TARGET_PASSTHRU
-> +
-> +static ssize_t nvmet_passthru_device_path_show(struct config_item *item,
-> +		char *page)
-> +{
-> +	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
-> +
-> +	return snprintf(page, PAGE_SIZE, "%s\n", subsys->passthru_ctrl_path);
-> +}
-> +
-> +static ssize_t nvmet_passthru_device_path_store(struct config_item *item,
-> +		const char *page, size_t count)
-> +{
-> +	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
-> +	int ret = -ENOMEM;
+Thanks again for the discussion Keith! So, I guess the way to go is
+really the kernel parameter in case users want to fallback to the old
+numbering (and only if they're not using multipath).
 
-seems like a redundant initialization.
+Cheers,
 
-> +	size_t len;
-> +
-> +	mutex_lock(&subsys->lock);
-> +
-> +	ret = -EBUSY;
-> +	if (subsys->passthru_ctrl)
-> +		goto out_unlock;
-> +
-> +	ret = -EINVAL;
-> +	len = strcspn(page, "\n");
-> +	if (!len)
-> +		goto out_unlock;
-> +
-> +	kfree(subsys->passthru_ctrl_path);
-> +	ret = -ENOMEM;
-> +	subsys->passthru_ctrl_path = kstrndup(page, len, GFP_KERNEL);
-> +	if (!subsys->passthru_ctrl_path)
-> +		goto out_unlock;
-> +
-> +	mutex_unlock(&subsys->lock);
-> +
-> +	return count;
-> +out_unlock:
-> +	mutex_unlock(&subsys->lock);
-> +	return ret;
-> +}
-> +CONFIGFS_ATTR(nvmet_passthru_, device_path);
-> +
-> +static ssize_t nvmet_passthru_enable_show(struct config_item *item,
-> +		char *page)
-> +{
-> +	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
-> +
-> +	return sprintf(page, "%d\n", subsys->passthru_ctrl ? 1 : 0);
-> +}
-> +
-> +static ssize_t nvmet_passthru_enable_store(struct config_item *item,
-> +		const char *page, size_t count)
-> +{
-> +	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
-> +	bool enable;
-> +	int ret = 0;
-> +
-> +	if (strtobool(page, &enable))
-> +		return -EINVAL;
-> +
-> +	if (enable)
-> +		ret = nvmet_passthru_ctrl_enable(subsys);
-> +	else
-> +		nvmet_passthru_ctrl_disable(subsys);
-> +
-> +	return ret ? ret : count;
-> +}
-> +CONFIGFS_ATTR(nvmet_passthru_, enable);
-> +
-> +static struct configfs_attribute *nvmet_passthru_attrs[] = {
-> +	&nvmet_passthru_attr_device_path,
-> +	&nvmet_passthru_attr_enable,
-> +	NULL,
-> +};
-> +
-> +static const struct config_item_type nvmet_passthru_type = {
-> +	.ct_attrs		= nvmet_passthru_attrs,
-> +	.ct_owner		= THIS_MODULE,
-> +};
-> +
-> +static void nvmet_add_passthru_group(struct nvmet_subsys *subsys)
-> +{
-> +	config_group_init_type_name(&subsys->passthru_group,
-> +				    "passthru", &nvmet_passthru_type);
-> +	configfs_add_default_group(&subsys->passthru_group,
-> +				   &subsys->group);
-> +}
-> +
-> +#else /* CONFIG_NVME_TARGET_PASSTHRU */
-> +
-> +static void nvmet_add_passthru_group(struct nvmet_subsys *subsys)
-> +{
-> +}
-> +
-> +#endif /* CONFIG_NVME_TARGET_PASSTHRU */
-> +
->   static int nvmet_port_subsys_allow_link(struct config_item *parent,
->   		struct config_item *target)
->   {
-> @@ -915,6 +1012,8 @@ static struct config_group *nvmet_subsys_make(struct config_group *group,
->   	configfs_add_default_group(&subsys->allowed_hosts_group,
->   			&subsys->group);
->   
-> +	nvmet_add_passthru_group(subsys);
-> +
->   	return &subsys->group;
->   }
->   
-> diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-> index 6436cb990905..f9c593f1305d 100644
-> --- a/drivers/nvme/target/nvmet.h
-> +++ b/drivers/nvme/target/nvmet.h
-> @@ -231,6 +231,7 @@ struct nvmet_subsys {
->   #ifdef CONFIG_NVME_TARGET_PASSTHRU
->   	struct nvme_ctrl	*passthru_ctrl;
->   	char			*passthru_ctrl_path;
-> +	struct config_group	passthru_group;
->   #endif /* CONFIG_NVME_TARGET_PASSTHRU */
->   };
->   
+
+Guilherme
