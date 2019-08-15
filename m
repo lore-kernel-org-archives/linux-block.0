@@ -2,501 +2,235 @@ Return-Path: <SRS0=WP4r=WL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1996BC3A589
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 19:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5287FC3A59B
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 23:10:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C95702089E
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 19:59:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565899177;
-	bh=wmSBauOVSN4oaefmAUJQ1oQhSCRfh2Dd7PQusms57F4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=CwiQEJ+r3iuJ/nFV2p8JvsVW4YW5MqJE9rrbNo14EQHwIFJ0JqZWpf34nnzS1ZHUl
-	 X9FuFCVlQ1+iIdEFpEaszidD6BQV0us2BXFtMa0ps0xPQTTX0zFLcSPERgQmEa5PAG
-	 nWUCzUS7Az03lLrVyOWwQKLkvSdvWNCjcwh3NwDc=
+	by mail.kernel.org (Postfix) with ESMTP id 23E3D2086C
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 23:10:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733097AbfHOT7e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 15:59:34 -0400
-Received: from mail-qt1-f174.google.com ([209.85.160.174]:46889 "EHLO
-        mail-qt1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727814AbfHOT7e (ORCPT
+        id S2387637AbfHOXKt convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 19:10:49 -0400
+Received: from mx0a-002e3701.pphosted.com ([148.163.147.86]:42672 "EHLO
+        mx0a-002e3701.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387636AbfHOXKt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 15:59:34 -0400
-Received: by mail-qt1-f174.google.com with SMTP id j15so3588646qtl.13;
-        Thu, 15 Aug 2019 12:59:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=ud07z5/psxOSblwwNPdaBzV4BiEQea+btrLNqweJWnU=;
-        b=fTUAJHmuWefuhAPMBB40xKzqRQvfZGdI5MSSx6kqGIf7gsV/T4U348k1z68knsQH6L
-         Iu+r0xrblgbGagjwASJnb64jKFKE95AvsfKlufI0kDhF1C71zfuh6wJ2RmSWH47a6Ehm
-         X/u/cyuChrpjLgwyWxFiHKZLPfJ53zBwwHqz1fsoH9meT7WMDbHNG9kxAem1YFlvWSdj
-         srVCnHILR7v8ZgI848qGgf0VBsDF9SM4ftGyQ6c1GuT8x4tWidfnsBzg5jitemFhjzov
-         GI5LaBziSWIT06uQt4/71Tud45I6LnwoWxH4NtYV6Dj4h0na/ClottBDdc9nFsZqf836
-         paEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ud07z5/psxOSblwwNPdaBzV4BiEQea+btrLNqweJWnU=;
-        b=IeOIbmYjOERILAGznjjxa0txOBJkFhIY4LbgPMng/+WaKBLtM0u3WK93Lz0rrCCFPv
-         Fk0pwa/nGloqhsHlAUsAyBIoDiuEIxlftx04iegRv40XtE+akXOJiuVyqppw6x8fWhbi
-         Wx9o4MFHyTewAVUYdfXQPYUq3yeM6MdSaSd7cdGEAtEzUkZt80bFZwr3K9Bf6RIFMhmM
-         QQjjy20wOFrR6IQ+/iV1U8yhQlAIePbJVbkLBv/Z1Tg0mbBX8srMiE7lKFu6dpZykZT7
-         7V5tbvviwRJoUHI8KcT7LY1hEl+StWWJQ85ORE4irb3t2reDgFVpzxtVFHWq+2TDTTqv
-         pq6g==
-X-Gm-Message-State: APjAAAVWhH9M7bNw7Wl64KFoIC3Cf/TmkCnhhX7vshhqE6FY+0Hmx48V
-        bo5s71Z8ifpeYZrB5uJOkW4=
-X-Google-Smtp-Source: APXvYqyzw9nynFYELzR4kvkflWQBz/g9lbMuvJ70B+XSdD7MvLeKCxsDFr9wopZOwF2ouzGK1o5wJg==
-X-Received: by 2002:ac8:358e:: with SMTP id k14mr3954849qtb.83.1565899172696;
-        Thu, 15 Aug 2019 12:59:32 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::1:25cd])
-        by smtp.gmail.com with ESMTPSA id m9sm1773171qtp.27.2019.08.15.12.59.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Aug 2019 12:59:32 -0700 (PDT)
-Date:   Thu, 15 Aug 2019 12:59:30 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, jack@suse.cz, hannes@cmpxchg.org,
-        mhocko@kernel.org, vdavydov.dev@gmail.com
-Cc:     cgroups@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, guro@fb.com, akpm@linux-foundation.org
-Subject: [PATCH 5/5] writeback, memcg: Implement foreign dirty flushing
-Message-ID: <20190815195930.GF2263813@devbig004.ftw2.facebook.com>
-References: <20190815195619.GA2263813@devbig004.ftw2.facebook.com>
+        Thu, 15 Aug 2019 19:10:49 -0400
+Received: from pps.filterd (m0148663.ppops.net [127.0.0.1])
+        by mx0a-002e3701.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7FNAirA002217;
+        Thu, 15 Aug 2019 23:10:44 GMT
+Received: from g9t5008.houston.hpe.com (g9t5008.houston.hpe.com [15.241.48.72])
+        by mx0a-002e3701.pphosted.com with ESMTP id 2udeyt8j0y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Aug 2019 23:10:44 +0000
+Received: from G4W9121.americas.hpqcorp.net (g4w9121.houston.hp.com [16.210.21.16])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by g9t5008.houston.hpe.com (Postfix) with ESMTPS id 3B46D57;
+        Thu, 15 Aug 2019 23:10:43 +0000 (UTC)
+Received: from G2W6309.americas.hpqcorp.net (2002:10c5:4033::10c5:4033) by
+ G4W9121.americas.hpqcorp.net (2002:10d2:1510::10d2:1510) with Microsoft SMTP
+ Server (TLS) id 15.0.1367.3; Thu, 15 Aug 2019 23:10:36 +0000
+Received: from NAM02-CY1-obe.outbound.protection.outlook.com (15.241.52.12) by
+ G2W6309.americas.hpqcorp.net (16.197.64.51) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3 via Frontend Transport; Thu, 15 Aug 2019 23:10:36 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gG/HvUX8hGUPrWbV8lXa5MoWu4nvFFu9CTuxIKK2EYPxo/giKLqEiEO0/NJHEGKlaUdCyY2mIzHnlOPujK5jIjOrVLMG+nekuOjMOw6Xud3dMqf1H7Vr40ghj7xLXzfgh104AgI+iEgrHoeXHpe5Pqzlm3NbD//0wD/PT778tJlidRGvY4+yB4yZ8EMcY44J4oPNamhWRVgTv0O34ggHT6ehA8Hr1ik0nAIFR1RY67MnAEiMlOe+hXcjAcrMZYjc5G76jE89sR6w9+H+F8lHff+Mu1VhGGxqoIJy+kXnj9gE5WuOCzN57D8fYXaMC/eWMAYbFO3GQC5ir+uVei8S5A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zXfuhPaNJFRgXlGJb1ytUBphAfPyTmDCyY3X6QdxgVc=;
+ b=KLIsJqp3WdUuNl19QtKeN2jnb2aWL7NB14dIEi0vHMmwguyE/90ZaaNVDXk4CC+szAD68vOmgMdf8FsBBjzPo80YdQanjXfWLyPQXj6wfxYqkwyAcNMs8WwBCJYCt2ToGKkG9QgFHR1nHviM7gMN79iVxyBVJHx70pdhFoP4R5xlS/jV2JhFSrpPLT5iCJorv8qVxte17dxpzZ1Sf+B8Sy34g/TwNyzrmc2/b1GNaBWpI/FYHQ/IaOK/GcsusajxmrXzfpLcSk6J/IPwXXp8dXi4L++ydwUMhMDJSiS08JvyIwbzBRgwdRDPxwK5sYNFcXcY74FkSIsPeeGoC+wQzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
+ header.d=hpe.com; arc=none
+Received: from AT5PR8401MB0578.NAMPRD84.PROD.OUTLOOK.COM (10.169.3.139) by
+ AT5PR8401MB0641.NAMPRD84.PROD.OUTLOOK.COM (10.169.5.141) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2157.18; Thu, 15 Aug 2019 23:10:35 +0000
+Received: from AT5PR8401MB0578.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::e5bc:403c:fbdc:7026]) by AT5PR8401MB0578.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::e5bc:403c:fbdc:7026%9]) with mapi id 15.20.2157.022; Thu, 15 Aug 2019
+ 23:10:35 +0000
+From:   "Ray, Mark C (Global Solutions Engineering (GSE))" <mark.ray@hpe.com>
+To:     Ming Lei <ming.lei@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "Ray, Mark C (Global Solutions Engineering (GSE))" <mark.ray@hpe.com>
+Subject: RE: [PATCH] blk-mq: avoid sysfs buffer overflow by too many CPU cores
+Thread-Topic: [PATCH] blk-mq: avoid sysfs buffer overflow by too many CPU
+ cores
+Thread-Index: AQHVU2MoxEteYEWqIEmO0zyt7t+tmab8IfKAgAABWwCAAAHLgIAAAi0AgACuUfA=
+Date:   Thu, 15 Aug 2019 23:10:35 +0000
+Message-ID: <AT5PR8401MB05784C37BAF2939B776103FC99AC0@AT5PR8401MB0578.NAMPRD84.PROD.OUTLOOK.COM>
+References: <20190815121518.16675-1-ming.lei@redhat.com>
+ <20190815122419.GA31891@kroah.com> <20190815122909.GA28032@ming.t460p>
+ <20190815123535.GA29217@kroah.com> <20190815124321.GB28032@ming.t460p>
+In-Reply-To: <20190815124321.GB28032@ming.t460p>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [211.219.0.129]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c5fce7bb-94e7-4476-33ec-08d721d5c774
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:AT5PR8401MB0641;
+x-ms-traffictypediagnostic: AT5PR8401MB0641:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AT5PR8401MB0641B4DC3DC5C8CABEAC4E6E99AC0@AT5PR8401MB0641.NAMPRD84.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 01304918F3
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(136003)(396003)(346002)(39860400002)(366004)(199004)(189003)(13464003)(5660300002)(14444005)(86362001)(25786009)(71190400001)(76176011)(71200400001)(7696005)(6436002)(256004)(6506007)(66446008)(6116002)(81166006)(52536014)(102836004)(186003)(81156014)(66066001)(446003)(476003)(99286004)(53546011)(8676002)(229853002)(11346002)(486006)(26005)(8936002)(14454004)(54906003)(53936002)(7736002)(74316002)(9686003)(6246003)(316002)(305945005)(478600001)(2906002)(66946007)(55016002)(110136005)(4326008)(3846002)(76116006)(33656002)(64756008)(66476007)(66556008);DIR:OUT;SFP:1102;SCL:1;SRVR:AT5PR8401MB0641;H:AT5PR8401MB0578.NAMPRD84.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: hpe.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: H0zif1Ne3t+yUKwn/tV+UjNwtsbTd9Otu0ZWGYSKqemE/nMuVHJ0LEMM+jQEWIgbjt7ADwtbPY5k83DbIUoQiCHzxfkbm8dXOV3rZLY6mW/r0426qoJNXXwzdlHl88Csz7e3S4NRlIyEnGr5udl+6hFgAVoiHCbl+XPkcjCWLfuPYr8N1JSLhGPCC6+L2bc/4IUrtT9Dwj5GO0WOm308YEGcbK3iONE+8bDZuoyCnMcFl3VIv6Saa8hNd7ie24F1qw0DQpVP0xAPunjd8m5CDo596778+Ja+U7i8o7C2LxhNVpjIiTwFdymsSDYGHWW3+fTF+XE3rNJ/lRte1ahGY1kgdS5gyFEju5hnN2kZXwXrbPF8hbcjYoucObIUk9IX3xQEYUZ8tbQfgeqH4OjanBFUkHpIXbvwArPOmfUMcXE=
+Content-Type: text/plain; charset="us-ascii"
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5fce7bb-94e7-4476-33ec-08d721d5c774
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Aug 2019 23:10:35.2917
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rxBjit5dTFCSOsd50r3DRNY4RvR5iMd24S8qERTH0B4LYa14R/QUiSZRIohpaFDIXAdOooZO48o3u8f690+41g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AT5PR8401MB0641
+X-OriginatorOrg: hpe.com
+Content-Transfer-Encoding: 8BIT
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190815195619.GA2263813@devbig004.ftw2.facebook.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-15_10:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908150221
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There's an inherent mismatch between memcg and writeback.  The former
-trackes ownership per-page while the latter per-inode.  This was a
-deliberate design decision because honoring per-page ownership in the
-writeback path is complicated, may lead to higher CPU and IO overheads
-and deemed unnecessary given that write-sharing an inode across
-different cgroups isn't a common use-case.
+Hi Ming,
 
-Combined with inode majority-writer ownership switching, this works
-well enough in most cases but there are some pathological cases.  For
-example, let's say there are two cgroups A and B which keep writing to
-different but confined parts of the same inode.  B owns the inode and
-A's memory is limited far below B's.  A's dirty ratio can rise enough
-to trigger balance_dirty_pages() sleeps but B's can be low enough to
-avoid triggering background writeback.  A will be slowed down without
-a way to make writeback of the dirty pages happen.
+In the customer case, the cpu_list file was not needed.   It was just part of a SAP Hana script to collect all the block device data (similar to sosreport).    So they were just dumping everything, and it picks up the mq-related files.  
 
-This patch implements foreign dirty recording and foreign mechanism so
-that when a memcg encounters a condition as above it can trigger
-flushes on bdi_writebacks which can clean its pages.  Please see the
-comment on top of mem_cgroup_track_foreign_dirty_slowpath() for
-details.
+I know with IRQs, we have bitmaps/mask, and can represent the list such as "0-27", without listing every CPU.   I'm sure there's lots of options to address this, and getting rid of the cpu_list is one of them.
 
-A reproducer follows.
+Best Regards,
 
-write-range.c::
+Mark Ray
+HPE Global Solutions Engineering
+mark.ray@hpe.com
 
-  #include <stdio.h>
-  #include <stdlib.h>
-  #include <unistd.h>
-  #include <fcntl.h>
-  #include <sys/types.h>
 
-  static const char *usage = "write-range FILE START SIZE\n";
 
-  int main(int argc, char **argv)
-  {
-	  int fd;
-	  unsigned long start, size, end, pos;
-	  char *endp;
-	  char buf[4096];
+-----Original Message-----
+From: Ming Lei [mailto:ming.lei@redhat.com] 
+Sent: Thursday, August 15, 2019 9:43 PM
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Jens Axboe <axboe@kernel.dk>; linux-block@vger.kernel.org; stable@vger.kernel.org; Ray, Mark C (Global Solutions Engineering (GSE)) <mark.ray@hpe.com>
+Subject: Re: [PATCH] blk-mq: avoid sysfs buffer overflow by too many CPU cores
 
-	  if (argc < 4) {
-		  fprintf(stderr, usage);
-		  return 1;
-	  }
+On Thu, Aug 15, 2019 at 02:35:35PM +0200, Greg KH wrote:
+> On Thu, Aug 15, 2019 at 08:29:10PM +0800, Ming Lei wrote:
+> > On Thu, Aug 15, 2019 at 02:24:19PM +0200, Greg KH wrote:
+> > > On Thu, Aug 15, 2019 at 08:15:18PM +0800, Ming Lei wrote:
+> > > > It is reported that sysfs buffer overflow can be triggered in 
+> > > > case of too many CPU cores(>841 on 4K PAGE_SIZE) when showing 
+> > > > CPUs in one hctx.
+> > > > 
+> > > > So use snprintf for avoiding the potential buffer overflow.
+> > > > 
+> > > > Cc: stable@vger.kernel.org
+> > > > Cc: Mark Ray <mark.ray@hpe.com>
+> > > > Fixes: 676141e48af7("blk-mq: don't dump CPU -> hw queue map on 
+> > > > driver load")
+> > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > ---
+> > > >  block/blk-mq-sysfs.c | 30 ++++++++++++++++++------------
+> > > >  1 file changed, 18 insertions(+), 12 deletions(-)
+> > > > 
+> > > > diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c index 
+> > > > d6e1a9bd7131..e75f41a98415 100644
+> > > > --- a/block/blk-mq-sysfs.c
+> > > > +++ b/block/blk-mq-sysfs.c
+> > > > @@ -164,22 +164,28 @@ static ssize_t blk_mq_hw_sysfs_nr_reserved_tags_show(struct blk_mq_hw_ctx *hctx,
+> > > >  	return sprintf(page, "%u\n", hctx->tags->nr_reserved_tags);  }
+> > > >  
+> > > > +/* avoid overflow by too many CPU cores */
+> > > >  static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx 
+> > > > *hctx, char *page)  {
+> > > > -	unsigned int i, first = 1;
+> > > > -	ssize_t ret = 0;
+> > > > -
+> > > > -	for_each_cpu(i, hctx->cpumask) {
+> > > > -		if (first)
+> > > > -			ret += sprintf(ret + page, "%u", i);
+> > > > -		else
+> > > > -			ret += sprintf(ret + page, ", %u", i);
+> > > > -
+> > > > -		first = 0;
+> > > > +	unsigned int cpu = cpumask_first(hctx->cpumask);
+> > > > +	ssize_t len = snprintf(page, PAGE_SIZE - 1, "%u", cpu);
+> > > > +	int last_len = len;
+> > > > +
+> > > > +	while ((cpu = cpumask_next(cpu, hctx->cpumask)) < nr_cpu_ids) {
+> > > > +		int cur_len = snprintf(page + len, PAGE_SIZE - 1 - len,
+> > > > +				       ", %u", cpu);
+> > > > +		if (cur_len >= PAGE_SIZE - 1 - len) {
+> > > > +			len -= last_len;
+> > > > +			len += snprintf(page + len, PAGE_SIZE - 1 - len,
+> > > > +					"...");
+> > > > +			break;
+> > > > +		}
+> > > > +		len += cur_len;
+> > > > +		last_len = cur_len;
+> > > >  	}
+> > > >  
+> > > > -	ret += sprintf(ret + page, "\n");
+> > > > -	return ret;
+> > > > +	len += snprintf(page + len, PAGE_SIZE - 1 - len, "\n");
+> > > > +	return len;
+> > > >  }
+> > > >
+> > > 
+> > > What????
+> > > 
+> > > sysfs is "one value per file".  You should NEVER have to care 
+> > > about the size of the sysfs buffer.  If you do, you are doing something wrong.
+> > > 
+> > > What excatly are you trying to show in this sysfs file?  I can't 
+> > > seem to find the Documenatation/ABI/ entry for it, am I just 
+> > > missing it because I don't know the filename for it?
+> > 
+> > It is /sys/block/$DEV/mq/$N/cpu_list, all CPUs in this hctx($N) will 
+> > be shown via sysfs buffer. The buffer size is one PAGE, how can it 
+> > hold when there are too many CPUs(close to 1K)?
+> 
+> Looks like I only see 1 cpu listed on my machines in those files, what 
+> am I doing wrong?
 
-	  fd = open(argv[1], O_WRONLY);
-	  if (fd < 0) {
-		  perror("open");
-		  return 1;
-	  }
+It depends on machine. The issue is reported on one machine with 896 CPU cores, when 4K buffer can only hold 841 cores.
 
-	  start = strtoul(argv[2], &endp, 0);
-	  if (*endp != '\0') {
-		  fprintf(stderr, usage);
-		  return 1;
-	  }
+> 
+> Also, I don't see cpu_list in any of the documentation files, so I 
+> have no idea what you are trying to have this file show.
+> 
+> And again, "one value per file" is the sysfs rule.  "all cpus in the 
+> system" is not "one value" :)
 
-	  size = strtoul(argv[3], &endp, 0);
-	  if (*endp != '\0') {
-		  fprintf(stderr, usage);
-		  return 1;
-	  }
+I agree, and this file shouldn't be there, given each CPU will have one kobject dir under the hctx dir.
 
-	  end = start + size;
+We may kill the 'cpu_list' attribute, is there anyone who objects?
 
-	  while (1) {
-		  for (pos = start; pos < end; ) {
-			  long bread, bwritten = 0;
 
-			  if (lseek(fd, pos, SEEK_SET) < 0) {
-				  perror("lseek");
-				  return 1;
-			  }
-
-			  bread = read(0, buf, sizeof(buf) < end - pos ?
-					       sizeof(buf) : end - pos);
-			  if (bread < 0) {
-				  perror("read");
-				  return 1;
-			  }
-			  if (bread == 0)
-				  return 0;
-
-			  while (bwritten < bread) {
-				  long this;
-
-				  this = write(fd, buf + bwritten,
-					       bread - bwritten);
-				  if (this < 0) {
-					  perror("write");
-					  return 1;
-				  }
-
-				  bwritten += this;
-				  pos += bwritten;
-			  }
-		  }
-	  }
-  }
-
-repro.sh::
-
-  #!/bin/bash
-
-  set -e
-  set -x
-
-  sysctl -w vm.dirty_expire_centisecs=300000
-  sysctl -w vm.dirty_writeback_centisecs=300000
-  sysctl -w vm.dirtytime_expire_seconds=300000
-  echo 3 > /proc/sys/vm/drop_caches
-
-  TEST=/sys/fs/cgroup/test
-  A=$TEST/A
-  B=$TEST/B
-
-  mkdir -p $A $B
-  echo "+memory +io" > $TEST/cgroup.subtree_control
-  echo $((1<<30)) > $A/memory.high
-  echo $((32<<30)) > $B/memory.high
-
-  rm -f testfile
-  touch testfile
-  fallocate -l 4G testfile
-
-  echo "Starting B"
-
-  (echo $BASHPID > $B/cgroup.procs
-   pv -q --rate-limit 70M < /dev/urandom | ./write-range testfile $((2<<30)) $((2<<30))) &
-
-  echo "Waiting 10s to ensure B claims the testfile inode"
-  sleep 5
-  sync
-  sleep 5
-  sync
-  echo "Starting A"
-
-  (echo $BASHPID > $A/cgroup.procs
-   pv < /dev/urandom | ./write-range testfile 0 $((2<<30)))
-
-v2: Added comments explaining why the specific intervals are being used.
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- include/linux/backing-dev-defs.h |    1 
- include/linux/memcontrol.h       |   39 +++++++++++
- mm/memcontrol.c                  |  132 +++++++++++++++++++++++++++++++++++++++
- mm/page-writeback.c              |    4 +
- 4 files changed, 176 insertions(+)
-
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -63,6 +63,7 @@ enum wb_reason {
- 	 * so it has a mismatch name.
- 	 */
- 	WB_REASON_FORKER_THREAD,
-+	WB_REASON_FOREIGN_FLUSH,
- 
- 	WB_REASON_MAX,
- };
---- a/include/linux/memcontrol.h
-+++ b/include/linux/memcontrol.h
-@@ -184,6 +184,23 @@ struct memcg_padding {
- #endif
- 
- /*
-+ * Remember four most recent foreign writebacks with dirty pages in this
-+ * cgroup.  Inode sharing is expected to be uncommon and, even if we miss
-+ * one in a given round, we're likely to catch it later if it keeps
-+ * foreign-dirtying, so a fairly low count should be enough.
-+ *
-+ * See mem_cgroup_track_foreign_dirty_slowpath() for details.
-+ */
-+#define MEMCG_CGWB_FRN_CNT	4
-+
-+struct memcg_cgwb_frn {
-+	u64 bdi_id;			/* bdi->id of the foreign inode */
-+	int memcg_id;			/* memcg->css.id of foreign inode */
-+	u64 at;				/* jiffies_64 at the time of dirtying */
-+	struct wb_completion done;	/* tracks in-flight foreign writebacks */
-+};
-+
-+/*
-  * The memory controller data structure. The memory controller controls both
-  * page cache and RSS per cgroup. We would eventually like to provide
-  * statistics based on the statistics developed by Rik Van Riel for clock-pro,
-@@ -307,6 +324,7 @@ struct mem_cgroup {
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	struct list_head cgwb_list;
- 	struct wb_domain cgwb_domain;
-+	struct memcg_cgwb_frn cgwb_frn[MEMCG_CGWB_FRN_CNT];
- #endif
- 
- 	/* List of events which userspace want to receive */
-@@ -1237,6 +1255,18 @@ void mem_cgroup_wb_stats(struct bdi_writ
- 			 unsigned long *pheadroom, unsigned long *pdirty,
- 			 unsigned long *pwriteback);
- 
-+void mem_cgroup_track_foreign_dirty_slowpath(struct page *page,
-+					     struct bdi_writeback *wb);
-+
-+static inline void mem_cgroup_track_foreign_dirty(struct page *page,
-+						  struct bdi_writeback *wb)
-+{
-+	if (unlikely(&page->mem_cgroup->css != wb->memcg_css))
-+		mem_cgroup_track_foreign_dirty_slowpath(page, wb);
-+}
-+
-+void mem_cgroup_flush_foreign(struct bdi_writeback *wb);
-+
- #else	/* CONFIG_CGROUP_WRITEBACK */
- 
- static inline struct wb_domain *mem_cgroup_wb_domain(struct bdi_writeback *wb)
-@@ -1252,6 +1282,15 @@ static inline void mem_cgroup_wb_stats(s
- {
- }
- 
-+static inline void mem_cgroup_track_foreign_dirty(struct page *page,
-+						  struct bdi_writeback *wb)
-+{
-+}
-+
-+static inline void mem_cgroup_flush_foreign(struct bdi_writeback *wb)
-+{
-+}
-+
- #endif	/* CONFIG_CGROUP_WRITEBACK */
- 
- struct sock;
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -87,6 +87,10 @@ int do_swap_account __read_mostly;
- #define do_swap_account		0
- #endif
- 
-+#ifdef CONFIG_CGROUP_WRITEBACK
-+static DECLARE_WAIT_QUEUE_HEAD(memcg_cgwb_frn_waitq);
-+#endif
-+
- /* Whether legacy memory+swap accounting is active */
- static bool do_memsw_account(void)
- {
-@@ -4184,6 +4188,125 @@ void mem_cgroup_wb_stats(struct bdi_writ
- 	}
- }
- 
-+/*
-+ * Foreign dirty flushing
-+ *
-+ * There's an inherent mismatch between memcg and writeback.  The former
-+ * trackes ownership per-page while the latter per-inode.  This was a
-+ * deliberate design decision because honoring per-page ownership in the
-+ * writeback path is complicated, may lead to higher CPU and IO overheads
-+ * and deemed unnecessary given that write-sharing an inode across
-+ * different cgroups isn't a common use-case.
-+ *
-+ * Combined with inode majority-writer ownership switching, this works well
-+ * enough in most cases but there are some pathological cases.  For
-+ * example, let's say there are two cgroups A and B which keep writing to
-+ * different but confined parts of the same inode.  B owns the inode and
-+ * A's memory is limited far below B's.  A's dirty ratio can rise enough to
-+ * trigger balance_dirty_pages() sleeps but B's can be low enough to avoid
-+ * triggering background writeback.  A will be slowed down without a way to
-+ * make writeback of the dirty pages happen.
-+ *
-+ * Conditions like the above can lead to a cgroup getting repatedly and
-+ * severely throttled after making some progress after each
-+ * dirty_expire_interval while the underyling IO device is almost
-+ * completely idle.
-+ *
-+ * Solving this problem completely requires matching the ownership tracking
-+ * granularities between memcg and writeback in either direction.  However,
-+ * the more egregious behaviors can be avoided by simply remembering the
-+ * most recent foreign dirtying events and initiating remote flushes on
-+ * them when local writeback isn't enough to keep the memory clean enough.
-+ *
-+ * The following two functions implement such mechanism.  When a foreign
-+ * page - a page whose memcg and writeback ownerships don't match - is
-+ * dirtied, mem_cgroup_track_foreign_dirty() records the inode owning
-+ * bdi_writeback on the page owning memcg.  When balance_dirty_pages()
-+ * decides that the memcg needs to sleep due to high dirty ratio, it calls
-+ * mem_cgroup_flush_foreign() which queues writeback on the recorded
-+ * foreign bdi_writebacks which haven't expired.  Both the numbers of
-+ * recorded bdi_writebacks and concurrent in-flight foreign writebacks are
-+ * limited to MEMCG_CGWB_FRN_CNT.
-+ *
-+ * The mechanism only remembers IDs and doesn't hold any object references.
-+ * As being wrong occasionally doesn't matter, updates and accesses to the
-+ * records are lockless and racy.
-+ */
-+void mem_cgroup_track_foreign_dirty_slowpath(struct page *page,
-+					     struct bdi_writeback *wb)
-+{
-+	struct mem_cgroup *memcg = page->mem_cgroup;
-+	struct memcg_cgwb_frn *frn;
-+	u64 now = jiffies_64;
-+	u64 oldest_at = now;
-+	int oldest = -1;
-+	int i;
-+
-+	/*
-+	 * Pick the slot to use.  If there is already a slot for @wb, keep
-+	 * using it.  If not replace the oldest one which isn't being
-+	 * written out.
-+	 */
-+	for (i = 0; i < MEMCG_CGWB_FRN_CNT; i++) {
-+		frn = &memcg->cgwb_frn[i];
-+		if (frn->bdi_id == wb->bdi->id &&
-+		    frn->memcg_id == wb->memcg_css->id)
-+			break;
-+		if (frn->at < oldest_at && atomic_read(&frn->done.cnt) == 1) {
-+			oldest = i;
-+			oldest_at = frn->at;
-+		}
-+	}
-+
-+	if (i < MEMCG_CGWB_FRN_CNT) {
-+		/*
-+		 * Re-using an existing one.  Update timestamp lazily to
-+		 * avoid making the cacheline hot.  We want them to be
-+		 * reasonably up-to-date and significantly shorter than
-+		 * dirty_expire_interval as that's what expires the record.
-+		 * Use the shorter of 1s and dirty_expire_interval / 8.
-+		 */
-+		unsigned long update_intv =
-+			min_t(unsigned long, HZ,
-+			      msecs_to_jiffies(dirty_expire_interval * 10) / 8);
-+
-+		if (frn->at < now - update_intv)
-+			frn->at = now;
-+	} else if (oldest >= 0) {
-+		/* replace the oldest free one */
-+		frn = &memcg->cgwb_frn[oldest];
-+		frn->bdi_id = wb->bdi->id;
-+		frn->memcg_id = wb->memcg_css->id;
-+		frn->at = now;
-+	}
-+}
-+
-+/* issue foreign writeback flushes for recorded foreign dirtying events */
-+void mem_cgroup_flush_foreign(struct bdi_writeback *wb)
-+{
-+	struct mem_cgroup *memcg = mem_cgroup_from_css(wb->memcg_css);
-+	unsigned long intv = msecs_to_jiffies(dirty_expire_interval * 10);
-+	u64 now = jiffies_64;
-+	int i;
-+
-+	for (i = 0; i < MEMCG_CGWB_FRN_CNT; i++) {
-+		struct memcg_cgwb_frn *frn = &memcg->cgwb_frn[i];
-+
-+		/*
-+		 * If the record is older than dirty_expire_interval,
-+		 * writeback on it has already started.  No need to kick it
-+		 * off again.  Also, don't start a new one if there's
-+		 * already one in flight.
-+		 */
-+		if (frn->at > now - intv && atomic_read(&frn->done.cnt) == 1) {
-+			frn->at = 0;
-+			cgroup_writeback_by_id(frn->bdi_id, frn->memcg_id,
-+					       LONG_MAX, WB_REASON_FOREIGN_FLUSH,
-+					       &frn->done);
-+		}
-+	}
-+}
-+
- #else	/* CONFIG_CGROUP_WRITEBACK */
- 
- static int memcg_wb_domain_init(struct mem_cgroup *memcg, gfp_t gfp)
-@@ -4700,6 +4823,7 @@ static struct mem_cgroup *mem_cgroup_all
- 	struct mem_cgroup *memcg;
- 	unsigned int size;
- 	int node;
-+	int __maybe_unused i;
- 
- 	size = sizeof(struct mem_cgroup);
- 	size += nr_node_ids * sizeof(struct mem_cgroup_per_node *);
-@@ -4743,6 +4867,9 @@ static struct mem_cgroup *mem_cgroup_all
- #endif
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	INIT_LIST_HEAD(&memcg->cgwb_list);
-+	for (i = 0; i < MEMCG_CGWB_FRN_CNT; i++)
-+		memcg->cgwb_frn[i].done =
-+			__WB_COMPLETION_INIT(&memcg_cgwb_frn_waitq);
- #endif
- 	idr_replace(&mem_cgroup_idr, memcg, memcg->id.id);
- 	return memcg;
-@@ -4872,7 +4999,12 @@ static void mem_cgroup_css_released(stru
- static void mem_cgroup_css_free(struct cgroup_subsys_state *css)
- {
- 	struct mem_cgroup *memcg = mem_cgroup_from_css(css);
-+	int __maybe_unused i;
- 
-+#ifdef CONFIG_CGROUP_WRITEBACK
-+	for (i = 0; i < MEMCG_CGWB_FRN_CNT; i++)
-+		wb_wait_for_completion(&memcg->cgwb_frn[i].done);
-+#endif
- 	if (cgroup_subsys_on_dfl(memory_cgrp_subsys) && !cgroup_memory_nosocket)
- 		static_branch_dec(&memcg_sockets_enabled_key);
- 
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -1667,6 +1667,8 @@ static void balance_dirty_pages(struct b
- 		if (unlikely(!writeback_in_progress(wb)))
- 			wb_start_background_writeback(wb);
- 
-+		mem_cgroup_flush_foreign(wb);
-+
- 		/*
- 		 * Calculate global domain's pos_ratio and select the
- 		 * global dtc by default.
-@@ -2427,6 +2429,8 @@ void account_page_dirtied(struct page *p
- 		task_io_account_write(PAGE_SIZE);
- 		current->nr_dirtied++;
- 		this_cpu_inc(bdp_ratelimits);
-+
-+		mem_cgroup_track_foreign_dirty(page, wb);
- 	}
- }
- 
+Thanks,
+Ming
