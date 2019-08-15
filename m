@@ -2,99 +2,105 @@ Return-Path: <SRS0=WP4r=WL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F51C3A59C
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 12:13:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB69C3A59C
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 12:15:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8301F206C1
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 12:13:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 020DD206C2
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 12:15:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731425AbfHOMNB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 08:13:01 -0400
-Received: from mao.bsc.es ([84.88.52.34]:34795 "EHLO opsmail01.bsc.es"
+        id S1730464AbfHOMPa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 08:15:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54570 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726098AbfHOMNB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 08:13:01 -0400
-X-Greylist: delayed 564 seconds by postgrey-1.27 at vger.kernel.org; Thu, 15 Aug 2019 08:13:00 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by opsmail01.bsc.es (Postfix) with ESMTP id 3A5232EC2E8;
-        Thu, 15 Aug 2019 14:03:35 +0200 (CEST)
-Received: from opsmail01.bsc.es ([127.0.0.1])
- by localhost (opswc01.bsc.es [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 13495-10; Thu, 15 Aug 2019 14:03:34 +0200 (CEST)
-Received: from opswc01.bsc.es (localhost [127.0.0.1])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        id S1726352AbfHOMPa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Aug 2019 08:15:30 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by opsmail01.bsc.es (Postfix) with ESMTPS id A541A169D9C;
-        Thu, 15 Aug 2019 14:03:34 +0200 (CEST)
-Received: (from filter@localhost)
-        by opswc01.bsc.es (8.13.6/8.13.6/Submit) id x7FC3YpC026248;
-        Thu, 15 Aug 2019 14:03:34 +0200
-Received: from rocks (unknown [10.100.11.7])
-        (using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))
-        (No client certificate requested)
-        by opsmail01.bsc.es (Postfix) with ESMTPSA id EB0A615DA32;
-        Thu, 15 Aug 2019 14:03:28 +0200 (CEST)
-Date:   Thu, 15 Aug 2019 14:03:22 +0200
-From:   Aleix Roca Nonell <aleix.rocanonell@bsc.es>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, aleix.rocanonell@bsc.es
-Subject: [PATCH] io_uring: fix manual setup of iov_iter for fixed buffers
-Message-ID: <20190815120322.GA19630@rocks>
+        by mx1.redhat.com (Postfix) with ESMTPS id EA688C0092D1;
+        Thu, 15 Aug 2019 12:15:29 +0000 (UTC)
+Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EF84D5C22F;
+        Thu, 15 Aug 2019 12:15:26 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        stable@vger.kernel.org, Mark Ray <mark.ray@hpe.com>
+Subject: [PATCH] blk-mq: avoid sysfs buffer overflow by too many CPU cores
+Date:   Thu, 15 Aug 2019 20:15:18 +0800
+Message-Id: <20190815121518.16675-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Copyrighted-Material: Please visit http://www.bsc.es/disclaimer
-X-Virus-Scanned: amavisd-new at bsc.es
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 15 Aug 2019 12:15:30 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit bd11b3a391e3 ("io_uring: don't use iov_iter_advance() for fixed
-buffers") introduced an optimization to avoid using the slow
-iov_iter_advance by manually populating the iov_iter iterator in some
-cases.
+It is reported that sysfs buffer overflow can be triggered in case
+of too many CPU cores(>841 on 4K PAGE_SIZE) when showing CPUs in
+one hctx.
 
-However, the computation of the iterator count field was erroneous: The
-first bvec was always accounted for an extent of page size even if the
-bvec length was smaller.
+So use snprintf for avoiding the potential buffer overflow.
 
-In consequence, some I/O operations on fixed buffers were unable to
-operate on the full extent of the buffer, consistently skipping some
-bytes at the end of it.
-
-Fixes: bd11b3a391e3 ("io_uring: don't use iov_iter_advance() for fixed buffers")
 Cc: stable@vger.kernel.org
-Signed-off-by: Aleix Roca Nonell <aleix.rocanonell@bsc.es>
+Cc: Mark Ray <mark.ray@hpe.com>
+Fixes: 676141e48af7("blk-mq: don't dump CPU -> hw queue map on driver load")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/io_uring.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ block/blk-mq-sysfs.c | 30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index d542f1cf4428..aa25b5bbd4ae 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -1097,10 +1097,8 @@ static int io_import_fixed(struct io_ring_ctx *ctx, int rw,
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index d6e1a9bd7131..e75f41a98415 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -164,22 +164,28 @@ static ssize_t blk_mq_hw_sysfs_nr_reserved_tags_show(struct blk_mq_hw_ctx *hctx,
+ 	return sprintf(page, "%u\n", hctx->tags->nr_reserved_tags);
+ }
  
- 			iter->bvec = bvec + seg_skip;
- 			iter->nr_segs -= seg_skip;
--			iter->count -= (seg_skip << PAGE_SHIFT);
-+			iter->count -= bvec->bv_len + offset;
- 			iter->iov_offset = offset & ~PAGE_MASK;
--			if (iter->iov_offset)
--				iter->count -= iter->iov_offset;
- 		}
++/* avoid overflow by too many CPU cores */
+ static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx *hctx, char *page)
+ {
+-	unsigned int i, first = 1;
+-	ssize_t ret = 0;
+-
+-	for_each_cpu(i, hctx->cpumask) {
+-		if (first)
+-			ret += sprintf(ret + page, "%u", i);
+-		else
+-			ret += sprintf(ret + page, ", %u", i);
+-
+-		first = 0;
++	unsigned int cpu = cpumask_first(hctx->cpumask);
++	ssize_t len = snprintf(page, PAGE_SIZE - 1, "%u", cpu);
++	int last_len = len;
++
++	while ((cpu = cpumask_next(cpu, hctx->cpumask)) < nr_cpu_ids) {
++		int cur_len = snprintf(page + len, PAGE_SIZE - 1 - len,
++				       ", %u", cpu);
++		if (cur_len >= PAGE_SIZE - 1 - len) {
++			len -= last_len;
++			len += snprintf(page + len, PAGE_SIZE - 1 - len,
++					"...");
++			break;
++		}
++		len += cur_len;
++		last_len = cur_len;
  	}
  
+-	ret += sprintf(ret + page, "\n");
+-	return ret;
++	len += snprintf(page + len, PAGE_SIZE - 1 - len, "\n");
++	return len;
+ }
+ 
+ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_nr_tags = {
 -- 
-2.12.0
+2.20.1
 
-
-http://bsc.es/disclaimer
