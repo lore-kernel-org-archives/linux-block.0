@@ -6,55 +6,62 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8CCC3A589
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 17:25:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 617AAC3A589
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 17:30:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F97B20644
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 17:25:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36D892064A
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 17:30:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730444AbfHORZB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 13:25:01 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:37569 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730282AbfHORZB (ORCPT
+        id S1730653AbfHORas (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 13:30:48 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:35242 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730598AbfHORas (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 13:25:01 -0400
-Received: by mail-ot1-f66.google.com with SMTP id f17so7179069otq.4
-        for <linux-block@vger.kernel.org>; Thu, 15 Aug 2019 10:25:01 -0700 (PDT)
+        Thu, 15 Aug 2019 13:30:48 -0400
+Received: by mail-pg1-f193.google.com with SMTP id n4so1596381pgv.2;
+        Thu, 15 Aug 2019 10:30:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=7XUkgWHsoYr+9qJH7gY0FNPB406RMOgVzJRnvTPV01A=;
-        b=IvuVG8RO6qi4V6OGisvbEEdjMiI6+70uJBl6Hm3juLax1MxN49YeXm/5iAwnpMqiNA
-         dVz4jLPrGIcZOPCSZlSZqcoF5u9kl2q7zc2yPJr+jFA20l/+EVeywoB+pjFQqeAv7DKq
-         CARxkx90p8AwbV9kFS1bdC6XauS8YTnGuLGR7y5ONee3Tqzp+xgdeKF2kVcCWAUls6iG
-         mcV227Lfu77YdwZhe2IX62LL3TOeNStSj0IfI+yw+9NkYUjKT+tTou2pJ6E2J8PEz/rI
-         p3dy4nIh13D64eCaZWmwQ4S6j2lMF5p2iOE8e8Cm6jcp+eTw45IYWm3Q5ZB8EyDrYFU9
-         DiUA==
-X-Gm-Message-State: APjAAAVMeqyRqXEzl1IVinBTm7Promo0Id6oKWqXyXLkhMjJeyAhx8st
-        hF0gZeqY4aiCicjUYEjqRb8=
-X-Google-Smtp-Source: APXvYqzrKUWp0c2ZIhbsF9m1CLVFRB3lEed0AnijUDhowC3XgoZMlbS6OasJR+hLQbS3BWO5SlrGkA==
-X-Received: by 2002:a05:6830:18d6:: with SMTP id v22mr998122ote.13.1565889901004;
-        Thu, 15 Aug 2019 10:25:01 -0700 (PDT)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id 94sm1134475otl.62.2019.08.15.10.24.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Aug 2019 10:25:00 -0700 (PDT)
-Subject: Re: [PATCH] nvme: Fix cntlid validation when not using NVMEoF
-To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
-        linux-nvme@lists.infradead.org
-Cc:     linux-block@vger.kernel.org, kbusch@kernel.org, axboe@fb.com,
-        hch@lst.de
-References: <20190814142610.2164-1-gpiccoli@canonical.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <18251667-7b5e-789e-a1f0-78f3cbfe1b85@grimberg.me>
-Date:   Thu, 15 Aug 2019 10:24:58 -0700
+        bh=QnlfD1u/saq7YabHTTJM2fFau3y80kmE4WZcEZvSBiM=;
+        b=ueGM7pgLLQOxkbaLXR1h3fvwzCdNAz6YI0mFOBYCD8CK/sfpTYeK4iWKnjjxuANFBl
+         8QtO9FRdHQQT0+Rio/tDTmZcxxbGNXX6OjjZPaahH15Pc1zJZ6dExkdWnWid3PoLT14x
+         wEqdrwngFrTPx4fdstFaRonutiZuL6H7mUWCgC507vQrhMOuey16RL+lwKlvCS1iRFSr
+         haTvAB70nbHzu06cD3+E5i89NoBDRJXDCkToGNmJz8TAZ5VZacUsgLKisSdfW054M27l
+         I8DHzGn4rzYvm6X7R3A8zbvn2QTDayDnoxK845y7LsuiaGeoO1icJzvIahkZefRxWYt6
+         rEpw==
+X-Gm-Message-State: APjAAAVed+YvHIxiHhEK0F2nJ2mw5CoLEkhEJYV6E7ut057yBlkq9YDw
+        1/tOY3Y3YumCByA00wUZXPc=
+X-Google-Smtp-Source: APXvYqzHLHWkQAegNa1jIJY7/77XgqulqNeMSvORhvP8TO0Ntzgv66iP0wjodakvJ7RdKgVabvaQFg==
+X-Received: by 2002:aa7:91d3:: with SMTP id z19mr6500679pfa.135.1565890247488;
+        Thu, 15 Aug 2019 10:30:47 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id x9sm2529062pgp.75.2019.08.15.10.30.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Aug 2019 10:30:46 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v3 00/20] sg: add v4 interface
+To:     dgilbert@interlog.com, James Bottomley <jejb@linux.vnet.ibm.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org
+Cc:     martin.petersen@oracle.com, hare@suse.de,
+        Arnd Bergmann <arnd@arndb.de>,
+        Tony Battersby <tonyb@cybernetics.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20190807114252.2565-1-dgilbert@interlog.com>
+ <1565291455.3435.48.camel@linux.vnet.ibm.com>
+ <7edab448-22cc-493a-f745-acc5be38f6a5@interlog.com>
+ <1565305243.25619.27.camel@linux.vnet.ibm.com>
+ <51e7cdfb-7921-9368-9b78-90ba5ac50c77@interlog.com>
+Message-ID: <6606add1-7ae7-5d8d-e660-d267164981d9@acm.org>
+Date:   Thu, 15 Aug 2019 10:30:45 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190814142610.2164-1-gpiccoli@canonical.com>
+In-Reply-To: <51e7cdfb-7921-9368-9b78-90ba5ac50c77@interlog.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -63,4 +70,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Pulling this to nvme-5.3-rc
+On 8/13/19 9:19 PM, Douglas Gilbert wrote:
+> Bart Van Assche hinted at a better API design but didn't present
+> it. If he did, that would be the first time an alternate API
+> design was presented for async usage in the 20 years that I have
+> been associated with the driver.
+
+I would like to start from the use cases instead of the implementation 
+of a new SG/IO interface. My employer uses the SG/IO interface for 
+controlling SMR and HSMR disks. What we need is the ability to discover, 
+read, write and configure such disks, support for the non-standard HSMR 
+flex protocol, the ability to give certain users or groups access to a 
+subset of the LBAs and also the ability to make that information 
+persistent. I think that such functionality could be implemented by 
+extending LVM and by adding support for all ZBC commands we need in the 
+block layer, device mapper layer and also in the asynchronous I/O layer. 
+The block, dm and aio layers already support submitting commands 
+asynchronously but do not yet support all the ZBC commands that we use.
+
+Are there any SG/IO use cases that have not yet been mentioned in this 
+e-mail thread? If SMR and HSMR are the primary use cases for SG/IO, 
+should asynchronous command support be added in the SG/IO layer or 
+should rather ZBC support in the block, dm and aio layers be improved?
+
+Thanks,
+
+Bart.
