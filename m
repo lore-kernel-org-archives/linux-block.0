@@ -2,148 +2,265 @@ Return-Path: <SRS0=WP4r=WL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 281CAC41514
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 12:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F7D6C3A589
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 12:47:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 09A6C2133F
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 12:43:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEB122084D
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 12:47:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=Mellanox.com header.i=@Mellanox.com header.b="acN6uK7a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730330AbfHOMne (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 08:43:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35716 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725977AbfHOMne (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 08:43:34 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D5560308A9E0;
-        Thu, 15 Aug 2019 12:43:33 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 401A48CBAE;
-        Thu, 15 Aug 2019 12:43:27 +0000 (UTC)
-Date:   Thu, 15 Aug 2019 20:43:22 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        stable@vger.kernel.org, Mark Ray <mark.ray@hpe.com>
-Subject: Re: [PATCH] blk-mq: avoid sysfs buffer overflow by too many CPU cores
-Message-ID: <20190815124321.GB28032@ming.t460p>
-References: <20190815121518.16675-1-ming.lei@redhat.com>
- <20190815122419.GA31891@kroah.com>
- <20190815122909.GA28032@ming.t460p>
- <20190815123535.GA29217@kroah.com>
+        id S1729838AbfHOMrW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 08:47:22 -0400
+Received: from mail-eopbgr80078.outbound.protection.outlook.com ([40.107.8.78]:3262
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725977AbfHOMrV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Aug 2019 08:47:21 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JjtnFhlaf1LguE37MKXL4S9X0b7ouQAuDuB6KLrLudC6ygUdmKsbYn5JW9XT3o9eyY5qqcNB5o8/uqXNyTfMCVAuq5Go3NZ0DKq290wQzkCXDoPzxTAi8NErBYMTlG/IwyBdAHJjPBFVS3HDwLjA8ylY/Gqy7TPCBhfUk5SAsPA2QBQkn8VcfdlZ2pWYqAJvNlIlAMotG3jTgVwikJrYE+B5DeaTrlxsfBxVusiSAPh1wjY/Hm7nMgEJoDLX86dS1kiU4ffWJmzrOw90Yb7CJr78kpraOt5vmLUqXGLGgmFyhzITmC8188B2vZz+qC7JUKcK7wXnqTP18je0EqBPCA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YQieUppWTPN5s0q+2YP8EPrBtQkxpuVTjMWl7KBSNH4=;
+ b=YIlRIRHkOc/Fpav6qES9INOaQgM6LXNuGwvjjxEbzF74Kd0vX184tItrX8XjwCIV7t/4+W6o0f8gpjqX7k1UqNX3dUNGNCuxivNFY/W5wMVsT6ssUAl0dccqc5IY9YvKvvFknZhZ/Umc6Rol/WjO7CfkZpQmnjup+wWYSS579Tbe9r7uXn7cria2dYyX7G5g9VL6xyK8m/8WWX5xxNbOgSo0jwRp6w2mku60QM2cA5M+qrfE8GWxWTYlGC/jQ77p5D+SknXIZA1RXH3F/QtvohHfMVBDoYetVF0Nt/fyG4jfD5GSWVJT3SQkhazmALEJm0gBuwQ5hMFNLja9GFjgag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 193.47.165.251) smtp.rcpttodomain=raithlin.com smtp.mailfrom=mellanox.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=mellanox.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YQieUppWTPN5s0q+2YP8EPrBtQkxpuVTjMWl7KBSNH4=;
+ b=acN6uK7aO5ejSvaaZDcBgP/HcukYY2DRa4UJ1kLBNV5+oNaNXqN5Vh54ej4IzzrivKBwAwed0+0WJluY90ktIgbYX37hf0UM+wV+qDqTDgLWG+Wdxsd+j38SpMJ1FT5tvpuo68T//ASGShkAwq9wDCCu3aipvT3quXtwhQbqPA0=
+Received: from DB6PR05CA0030.eurprd05.prod.outlook.com (2603:10a6:6:14::43) by
+ AM5PR0502MB3060.eurprd05.prod.outlook.com (2603:10a6:203:95::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2157.18; Thu, 15 Aug
+ 2019 12:47:15 +0000
+Received: from DB5EUR03FT029.eop-EUR03.prod.protection.outlook.com
+ (2a01:111:f400:7e0a::200) by DB6PR05CA0030.outlook.office365.com
+ (2603:10a6:6:14::43) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.2157.16 via Frontend
+ Transport; Thu, 15 Aug 2019 12:47:14 +0000
+Authentication-Results: spf=pass (sender IP is 193.47.165.251)
+ smtp.mailfrom=mellanox.com; raithlin.com; dkim=none (message not signed)
+ header.d=none;raithlin.com; dmarc=pass action=none header.from=mellanox.com;
+Received-SPF: Pass (protection.outlook.com: domain of mellanox.com designates
+ 193.47.165.251 as permitted sender) receiver=protection.outlook.com;
+ client-ip=193.47.165.251; helo=mtlcas13.mtl.com;
+Received: from mtlcas13.mtl.com (193.47.165.251) by
+ DB5EUR03FT029.mail.protection.outlook.com (10.152.20.131) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.2178.16 via Frontend Transport; Thu, 15 Aug 2019 12:47:14 +0000
+Received: from MTLCAS13.mtl.com (10.0.8.78) by mtlcas13.mtl.com (10.0.8.78)
+ with Microsoft SMTP Server (TLS) id 15.0.1178.4; Thu, 15 Aug 2019 15:47:13
+ +0300
+Received: from MTLCAS01.mtl.com (10.0.8.71) by MTLCAS13.mtl.com (10.0.8.78)
+ with Microsoft SMTP Server (TLS) id 15.0.1178.4 via Frontend Transport; Thu,
+ 15 Aug 2019 15:47:13 +0300
+Received: from [10.223.0.54] (10.223.0.54) by MTLCAS01.mtl.com (10.0.8.71)
+ with Microsoft SMTP Server (TLS) id 14.3.301.0; Thu, 15 Aug 2019 15:46:16
+ +0300
+Subject: Re: [PATCH v7 11/14] nvmet-configfs: introduce passthru configfs
+ interface
+To:     Logan Gunthorpe <logang@deltatee.com>,
+        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
+CC:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        "Keith Busch" <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20190801234514.7941-1-logang@deltatee.com>
+ <20190801234514.7941-12-logang@deltatee.com>
+From:   Max Gurtovoy <maxg@mellanox.com>
+Message-ID: <28a807ae-fbba-5016-3b71-04baa121e522@mellanox.com>
+Date:   Thu, 15 Aug 2019 15:46:16 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190815123535.GA29217@kroah.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Thu, 15 Aug 2019 12:43:33 +0000 (UTC)
+In-Reply-To: <20190801234514.7941-12-logang@deltatee.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.223.0.54]
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:193.47.165.251;IPV:NLI;CTRY:IL;EFV:NLI;SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(396003)(376002)(346002)(2980300002)(199004)(189003)(31686004)(53546011)(81156014)(16526019)(8676002)(65826007)(186003)(81166006)(70206006)(70586007)(478600001)(4326008)(305945005)(2486003)(126002)(7416002)(486006)(106002)(64126003)(76176011)(23676004)(6116002)(336012)(356004)(16576012)(110136005)(229853002)(446003)(2616005)(316002)(5660300002)(14444005)(2201001)(58126008)(50466002)(11346002)(476003)(47776003)(86362001)(230700001)(26005)(54906003)(6246003)(65806001)(65956001)(2906002)(31696002)(3846002)(36756003)(53936002)(7736002)(8936002)(3940600001)(2101003);DIR:OUT;SFP:1101;SCL:1;SRVR:AM5PR0502MB3060;H:mtlcas13.mtl.com;FPR:;SPF:Pass;LANG:en;PTR:InfoDomainNonexistent;A:1;MX:1;
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a612fff5-8cea-4e9d-76fd-08d7217eb2c9
+X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(4709080)(1401327)(2017052603328)(7193020);SRVR:AM5PR0502MB3060;
+X-MS-TrafficTypeDiagnostic: AM5PR0502MB3060:
+X-Microsoft-Antispam-PRVS: <AM5PR0502MB30607A8B61A7E0D7A8E3A447B6AC0@AM5PR0502MB3060.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1303;
+X-Forefront-PRVS: 01304918F3
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Message-Info: n6yJUHEmdFuQfHM9LWDRjHEZLbksBC6aPsfsv6Dv6o0AG+ht3nomV+bdjUcxDwfQOtIfMjCgPQtTn9iUSXx/WB4N7Ar1IMyK3UAVRM6PsS5uFFueb9nqUVjGalzdyGmXF89xICpEBjElhV94OSOOw7kHVNup68wTMcCpTAYG8VcMJ3Vk62bLCuTqzumvBMxOHytHbDWTwMhRquRO5TERHq4lL/fcgLPQsNViRtDx0hakrWwLbp4lTteIENvkXeK1sQVPgt72278VSipFSiJG/Aig6tG/wVJLHCRHUWnywPd+cljArD9cwMlHJvJYa9pP/zLhJx489b0OcwfXzcaD5B892DwxvaY8cMog8SXRtv6CV21mEzdMgDEISeW2F1LN8n0r6e965q6FzQCTeDHwZUr62Db0BNRJQ+fTYfKvXIQ=
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2019 12:47:14.3046
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a612fff5-8cea-4e9d-76fd-08d7217eb2c9
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=a652971c-7d2e-4d9b-a6a4-d149256f461b;Ip=[193.47.165.251];Helo=[mtlcas13.mtl.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0502MB3060
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 15, 2019 at 02:35:35PM +0200, Greg KH wrote:
-> On Thu, Aug 15, 2019 at 08:29:10PM +0800, Ming Lei wrote:
-> > On Thu, Aug 15, 2019 at 02:24:19PM +0200, Greg KH wrote:
-> > > On Thu, Aug 15, 2019 at 08:15:18PM +0800, Ming Lei wrote:
-> > > > It is reported that sysfs buffer overflow can be triggered in case
-> > > > of too many CPU cores(>841 on 4K PAGE_SIZE) when showing CPUs in
-> > > > one hctx.
-> > > > 
-> > > > So use snprintf for avoiding the potential buffer overflow.
-> > > > 
-> > > > Cc: stable@vger.kernel.org
-> > > > Cc: Mark Ray <mark.ray@hpe.com>
-> > > > Fixes: 676141e48af7("blk-mq: don't dump CPU -> hw queue map on driver load")
-> > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > > ---
-> > > >  block/blk-mq-sysfs.c | 30 ++++++++++++++++++------------
-> > > >  1 file changed, 18 insertions(+), 12 deletions(-)
-> > > > 
-> > > > diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-> > > > index d6e1a9bd7131..e75f41a98415 100644
-> > > > --- a/block/blk-mq-sysfs.c
-> > > > +++ b/block/blk-mq-sysfs.c
-> > > > @@ -164,22 +164,28 @@ static ssize_t blk_mq_hw_sysfs_nr_reserved_tags_show(struct blk_mq_hw_ctx *hctx,
-> > > >  	return sprintf(page, "%u\n", hctx->tags->nr_reserved_tags);
-> > > >  }
-> > > >  
-> > > > +/* avoid overflow by too many CPU cores */
-> > > >  static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx *hctx, char *page)
-> > > >  {
-> > > > -	unsigned int i, first = 1;
-> > > > -	ssize_t ret = 0;
-> > > > -
-> > > > -	for_each_cpu(i, hctx->cpumask) {
-> > > > -		if (first)
-> > > > -			ret += sprintf(ret + page, "%u", i);
-> > > > -		else
-> > > > -			ret += sprintf(ret + page, ", %u", i);
-> > > > -
-> > > > -		first = 0;
-> > > > +	unsigned int cpu = cpumask_first(hctx->cpumask);
-> > > > +	ssize_t len = snprintf(page, PAGE_SIZE - 1, "%u", cpu);
-> > > > +	int last_len = len;
-> > > > +
-> > > > +	while ((cpu = cpumask_next(cpu, hctx->cpumask)) < nr_cpu_ids) {
-> > > > +		int cur_len = snprintf(page + len, PAGE_SIZE - 1 - len,
-> > > > +				       ", %u", cpu);
-> > > > +		if (cur_len >= PAGE_SIZE - 1 - len) {
-> > > > +			len -= last_len;
-> > > > +			len += snprintf(page + len, PAGE_SIZE - 1 - len,
-> > > > +					"...");
-> > > > +			break;
-> > > > +		}
-> > > > +		len += cur_len;
-> > > > +		last_len = cur_len;
-> > > >  	}
-> > > >  
-> > > > -	ret += sprintf(ret + page, "\n");
-> > > > -	return ret;
-> > > > +	len += snprintf(page + len, PAGE_SIZE - 1 - len, "\n");
-> > > > +	return len;
-> > > >  }
-> > > >
-> > > 
-> > > What????
-> > > 
-> > > sysfs is "one value per file".  You should NEVER have to care about the
-> > > size of the sysfs buffer.  If you do, you are doing something wrong.
-> > > 
-> > > What excatly are you trying to show in this sysfs file?  I can't seem to
-> > > find the Documenatation/ABI/ entry for it, am I just missing it because
-> > > I don't know the filename for it?
-> > 
-> > It is /sys/block/$DEV/mq/$N/cpu_list, all CPUs in this hctx($N) will be
-> > shown via sysfs buffer. The buffer size is one PAGE, how can it hold when
-> > there are too many CPUs(close to 1K)?
-> 
-> Looks like I only see 1 cpu listed on my machines in those files, what
-> am I doing wrong?
 
-It depends on machine. The issue is reported on one machine with 896 CPU
-cores, when 4K buffer can only hold 841 cores.
+On 8/2/2019 2:45 AM, Logan Gunthorpe wrote:
+> When CONFIG_NVME_TARGET_PASSTHRU as 'passthru' directory will
+> be added to each subsystem. The directory is similar to a namespace
+> and has two attributes: device_path and enable. The user must set the
+> path to the nvme controller's char device and write '1' to enable the
+> subsystem to use passthru.
+>
+> Any given subsystem is prevented from enabling both a regular namespace
+> and the passthru device. If one is enabled, enabling the other will
+> produce an error.
+>
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+> ---
+>   drivers/nvme/target/configfs.c | 99 ++++++++++++++++++++++++++++++++++
+>   drivers/nvme/target/nvmet.h    |  1 +
+>   2 files changed, 100 insertions(+)
+>
+> diff --git a/drivers/nvme/target/configfs.c b/drivers/nvme/target/configfs.c
+> index 98613a45bd3b..b15d64c19f58 100644
+> --- a/drivers/nvme/target/configfs.c
+> +++ b/drivers/nvme/target/configfs.c
+> @@ -615,6 +615,103 @@ static const struct config_item_type nvmet_namespaces_type = {
+>   	.ct_owner		= THIS_MODULE,
+>   };
+>   
+> +#ifdef CONFIG_NVME_TARGET_PASSTHRU
+> +
+> +static ssize_t nvmet_passthru_device_path_show(struct config_item *item,
+> +		char *page)
+> +{
+> +	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
+> +
+> +	return snprintf(page, PAGE_SIZE, "%s\n", subsys->passthru_ctrl_path);
+> +}
+> +
+> +static ssize_t nvmet_passthru_device_path_store(struct config_item *item,
+> +		const char *page, size_t count)
+> +{
+> +	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
+> +	int ret = -ENOMEM;
 
-> 
-> Also, I don't see cpu_list in any of the documentation files, so I have
-> no idea what you are trying to have this file show.
-> 
-> And again, "one value per file" is the sysfs rule.  "all cpus in the
-> system" is not "one value" :)
+seems like a redundant initialization.
 
-I agree, and this file shouldn't be there, given each CPU will have one
-kobject dir under the hctx dir.
-
-We may kill the 'cpu_list' attribute, is there anyone who objects?
-
-
-Thanks,
-Ming
+> +	size_t len;
+> +
+> +	mutex_lock(&subsys->lock);
+> +
+> +	ret = -EBUSY;
+> +	if (subsys->passthru_ctrl)
+> +		goto out_unlock;
+> +
+> +	ret = -EINVAL;
+> +	len = strcspn(page, "\n");
+> +	if (!len)
+> +		goto out_unlock;
+> +
+> +	kfree(subsys->passthru_ctrl_path);
+> +	ret = -ENOMEM;
+> +	subsys->passthru_ctrl_path = kstrndup(page, len, GFP_KERNEL);
+> +	if (!subsys->passthru_ctrl_path)
+> +		goto out_unlock;
+> +
+> +	mutex_unlock(&subsys->lock);
+> +
+> +	return count;
+> +out_unlock:
+> +	mutex_unlock(&subsys->lock);
+> +	return ret;
+> +}
+> +CONFIGFS_ATTR(nvmet_passthru_, device_path);
+> +
+> +static ssize_t nvmet_passthru_enable_show(struct config_item *item,
+> +		char *page)
+> +{
+> +	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
+> +
+> +	return sprintf(page, "%d\n", subsys->passthru_ctrl ? 1 : 0);
+> +}
+> +
+> +static ssize_t nvmet_passthru_enable_store(struct config_item *item,
+> +		const char *page, size_t count)
+> +{
+> +	struct nvmet_subsys *subsys = to_subsys(item->ci_parent);
+> +	bool enable;
+> +	int ret = 0;
+> +
+> +	if (strtobool(page, &enable))
+> +		return -EINVAL;
+> +
+> +	if (enable)
+> +		ret = nvmet_passthru_ctrl_enable(subsys);
+> +	else
+> +		nvmet_passthru_ctrl_disable(subsys);
+> +
+> +	return ret ? ret : count;
+> +}
+> +CONFIGFS_ATTR(nvmet_passthru_, enable);
+> +
+> +static struct configfs_attribute *nvmet_passthru_attrs[] = {
+> +	&nvmet_passthru_attr_device_path,
+> +	&nvmet_passthru_attr_enable,
+> +	NULL,
+> +};
+> +
+> +static const struct config_item_type nvmet_passthru_type = {
+> +	.ct_attrs		= nvmet_passthru_attrs,
+> +	.ct_owner		= THIS_MODULE,
+> +};
+> +
+> +static void nvmet_add_passthru_group(struct nvmet_subsys *subsys)
+> +{
+> +	config_group_init_type_name(&subsys->passthru_group,
+> +				    "passthru", &nvmet_passthru_type);
+> +	configfs_add_default_group(&subsys->passthru_group,
+> +				   &subsys->group);
+> +}
+> +
+> +#else /* CONFIG_NVME_TARGET_PASSTHRU */
+> +
+> +static void nvmet_add_passthru_group(struct nvmet_subsys *subsys)
+> +{
+> +}
+> +
+> +#endif /* CONFIG_NVME_TARGET_PASSTHRU */
+> +
+>   static int nvmet_port_subsys_allow_link(struct config_item *parent,
+>   		struct config_item *target)
+>   {
+> @@ -915,6 +1012,8 @@ static struct config_group *nvmet_subsys_make(struct config_group *group,
+>   	configfs_add_default_group(&subsys->allowed_hosts_group,
+>   			&subsys->group);
+>   
+> +	nvmet_add_passthru_group(subsys);
+> +
+>   	return &subsys->group;
+>   }
+>   
+> diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+> index 6436cb990905..f9c593f1305d 100644
+> --- a/drivers/nvme/target/nvmet.h
+> +++ b/drivers/nvme/target/nvmet.h
+> @@ -231,6 +231,7 @@ struct nvmet_subsys {
+>   #ifdef CONFIG_NVME_TARGET_PASSTHRU
+>   	struct nvme_ctrl	*passthru_ctrl;
+>   	char			*passthru_ctrl_path;
+> +	struct config_group	passthru_group;
+>   #endif /* CONFIG_NVME_TARGET_PASSTHRU */
+>   };
+>   
