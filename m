@@ -2,97 +2,109 @@ Return-Path: <SRS0=WP4r=WL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC083C3A589
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 15:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F06C3A589
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 15:59:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8CF02084D
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 15:43:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565883788;
-	bh=PtR4c3rjcIUUCv9H4wJwnlW3N998/ZWb7IwzftyWl6o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ou/ogcf62Lo8cqhQlCFiF2xDG8eRzwjsSnO1tauI8SjYepSrNyiREq0ccKyq7M8Gl
-	 tUL4vkfH+1XTpglfNzdA3VAF6NlDybCy6P5Hddlqc2FP8G+Ujxg3vXmPE8Uaa60qfD
-	 6ugioUJ8Ryey3i8+2wn5DL8DWfIy7oQfFtsKl7jM=
+	by mail.kernel.org (Postfix) with ESMTP id BB6B72084D
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 15:59:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730464AbfHOPnI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 11:43:08 -0400
-Received: from mail-qk1-f181.google.com ([209.85.222.181]:39948 "EHLO
-        mail-qk1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729975AbfHOPnI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 11:43:08 -0400
-Received: by mail-qk1-f181.google.com with SMTP id s145so2163573qke.7;
-        Thu, 15 Aug 2019 08:43:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=VSR3T6Q49rCFXPPoyb9XFgF2ejksN7y0WyTo3YMYamM=;
-        b=hyuuAh2CNIxYP3ggj8gDm8R4p/9az4kHrRaL6c7xkvVmp5KasB2iSYzUaAGIeZjGiM
-         A95PrUyUJC+0/lW0z1W+odNW7+/4tOmRmm6g86Fh0uQd7iEZ7NQH9paD1ey8Ro+yUg4g
-         y3VeNucMGXfPbFqNNe2fdHGkico4kMYi0IGp8QW1kdMhBhiJeExKMtbS0t6bdR0K3WmR
-         I+szM8wY4iywtp965t3+afNr0ujT0/Y5OO7fs8HNBxXO9ilORnMG3/ZqeRVzaRoWWy1f
-         y2cWJTQHxaLlPv/FNGs6kLzLnFQz0yqnp8YocfIMbukfVsK2R/XaBg8GPyF6ZzZ2cszC
-         /M0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=VSR3T6Q49rCFXPPoyb9XFgF2ejksN7y0WyTo3YMYamM=;
-        b=EjloV0XjoAmOIvLGFfVPg1P84FlQFPrH/tvWIYhxhVvGEYmB/HVLIBRHcp4OVKqvwl
-         BLRUocCrWnBKA/6mTqkfsQiuqJ5VKyvOfboQi2PeZ5KLDR67nAjw8QigSbKhZsFTpK3S
-         4C9BBA/IU/KV7W+kP7OTt0OKmlB4xnIT48VWCz1vhEUPofFnDpq6aa59jN/tkKDqpilp
-         E7GCVq3qwNjEH9TtvYIUJy7sc6LIb/gOTBw3Eq6wc7n7J0NCq+XWYuZ1ohDH6N+wQ0ZC
-         BQVGroU/sPg3wgGLvsZkQv2eol2+HsSLWEZMh/zxQF/Y3yq6WJnnw1rJeIuvmfMX/5mF
-         dT2Q==
-X-Gm-Message-State: APjAAAW5KXfABT7cd3ki68psaNhwvzoGXwSg6oLSZ9gNl6SWQdeQRxJQ
-        VRJZ2t+gDRKKsqh74HX2DTI=
-X-Google-Smtp-Source: APXvYqxzLjuzQD27bfrn2cScIeA+V2HcpeVzSikxHaN5jBJPh/YwChCQxz2+g7+fHLFfxda2FIzOsw==
-X-Received: by 2002:a37:270a:: with SMTP id n10mr4625997qkn.434.1565883786758;
-        Thu, 15 Aug 2019 08:43:06 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::1:25cd])
-        by smtp.gmail.com with ESMTPSA id t2sm1529090qkm.34.2019.08.15.08.43.05
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Aug 2019 08:43:06 -0700 (PDT)
-Date:   Thu, 15 Aug 2019 08:43:02 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     axboe@kernel.dk, hannes@cmpxchg.org, mhocko@kernel.org,
-        vdavydov.dev@gmail.com, cgroups@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@fb.com, guro@fb.com,
-        akpm@linux-foundation.org
-Subject: Re: [PATCH 3/4] writeback, memcg: Implement cgroup_writeback_by_id()
-Message-ID: <20190815154302.GB588936@devbig004.ftw2.facebook.com>
-References: <20190803140155.181190-1-tj@kernel.org>
- <20190803140155.181190-4-tj@kernel.org>
- <20190815140535.GJ14313@quack2.suse.cz>
+        id S1728927AbfHOP77 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 11:59:59 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:59178 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728886AbfHOP77 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Aug 2019 11:59:59 -0400
+Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([70.73.163.230] helo=[192.168.11.155])
+        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.89)
+        (envelope-from <logang@deltatee.com>)
+        id 1hyIAB-0000kk-MY; Thu, 15 Aug 2019 09:59:44 -0600
+To:     Max Gurtovoy <maxg@mellanox.com>, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20190801234514.7941-1-logang@deltatee.com>
+ <20190801234514.7941-2-logang@deltatee.com>
+ <563baec2-61f6-5705-d751-1eee75370e66@mellanox.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <3dc99450-bd6d-b994-4b4c-1af225565c2f@deltatee.com>
+Date:   Thu, 15 Aug 2019 09:59:39 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190815140535.GJ14313@quack2.suse.cz>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <563baec2-61f6-5705-d751-1eee75370e66@mellanox.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 70.73.163.230
+X-SA-Exim-Rcpt-To: sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, axboe@fb.com, kbusch@kernel.org, sagi@grimberg.me, hch@lst.de, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, maxg@mellanox.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v7 01/14] nvme-core: introduce nvme_ctrl_get_by_path()
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 15, 2019 at 04:05:35PM +0200, Jan Kara wrote:
-> > +int cgroup_writeback_by_id(u64 bdi_id, int memcg_id, unsigned long nr_pages,
-> > +			   enum wb_reason reason, struct wb_completion *done);
-> > +int writeback_by_id(int id, unsigned long nr, enum wb_reason reason,
-> > +		    struct wb_completion *done);
+
+
+On 2019-08-15 5:46 a.m., Max Gurtovoy wrote:
 > 
-> I guess this writeback_by_id() is stale? I didn't find it anywhere else...
+> On 8/2/2019 2:45 AM, Logan Gunthorpe wrote:
+>> nvme_ctrl_get_by_path() is analagous to blkdev_get_by_path() except it
+>> gets a struct nvme_ctrl from the path to its char dev (/dev/nvme0).
+>> It makes use of filp_open() to open the file and uses the private
+>> data to obtain a pointer to the struct nvme_ctrl. If the fops of the
+>> file do not match, -EINVAL is returned.
+>>
+>> The purpose of this function is to support NVMe-OF target passthru.
+>>
+>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>> ---
+>>   drivers/nvme/host/core.c | 24 ++++++++++++++++++++++++
+>>   drivers/nvme/host/nvme.h |  2 ++
+>>   2 files changed, 26 insertions(+)
+>>
+>> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+>> index e6ee6f2a3da6..f72334f34a30 100644
+>> --- a/drivers/nvme/host/core.c
+>> +++ b/drivers/nvme/host/core.c
+>> @@ -2817,6 +2817,30 @@ static const struct file_operations
+>> nvme_dev_fops = {
+>>       .compat_ioctl    = nvme_dev_ioctl,
+>>   };
+>>   +struct nvme_ctrl *nvme_ctrl_get_by_path(const char *path)
+>> +{
+>> +    struct nvme_ctrl *ctrl;
+>> +    struct file *f;
+>> +
+>> +    f = filp_open(path, O_RDWR, 0);
+>> +    if (IS_ERR(f))
+>> +        return ERR_CAST(f);
+>> +
+>> +    if (f->f_op != &nvme_dev_fops) {
+>> +        ctrl = ERR_PTR(-EINVAL);
+>> +        goto out_close;
+>> +    }
+> 
+> Logan,
+> 
+> this means that the PT is for nvme-pci and also nvme-fabrics as well.
+> 
+> Is this the intention ? or we want to restrict it to pci only.
 
-Yes, removed.
+Yes, in theory, someone could passthru an nvme-fabrics controller or
+they could passthru a passthru'd passthru'd nvme-fabrics controller.
+This probably isn't a good idea but I don't know that we need to
+specifically reject it. If you think we should I could figure out a way
+to filter by pci controllers only.
 
-Thanks.
-
--- 
-tejun
+Logan
