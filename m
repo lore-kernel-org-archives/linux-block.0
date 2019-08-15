@@ -2,86 +2,105 @@ Return-Path: <SRS0=WP4r=WL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADAC3C3A589
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 16:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 643F4C3A589
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 16:12:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88B0C20644
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 16:08:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3921C2083B
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 16:12:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1565885540;
+	bh=Kb2LiuIF1S/oXcqeHW1qMfCRG37dm3QbSZje55wpusU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=M+s9zHPTA6Ve0A+SJjTCd6uhPTPpaMFae6F7UCbsQw9gyNXL4JjglwSVYF8ibE83c
+	 9OsS7ODtxvpWBANjD6eWpK3dZVTdffkGe8D1+o+Q9Cpn5rG0g/23GM5A/e84iTCnv6
+	 0EVc6titMXCX+mR37iRzHVPMkdDC1CLL+fXmw980=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729507AbfHOQIr convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 12:08:47 -0400
-Received: from mga09.intel.com ([134.134.136.24]:18515 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728956AbfHOQIq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 12:08:46 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Aug 2019 09:08:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,389,1559545200"; 
-   d="scan'208";a="188532545"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by orsmga002.jf.intel.com with ESMTP; 15 Aug 2019 09:08:46 -0700
-Received: from fmsmsx152.amr.corp.intel.com (10.18.125.5) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 15 Aug 2019 09:08:45 -0700
-Received: from fmsmsx102.amr.corp.intel.com ([169.254.10.170]) by
- FMSMSX152.amr.corp.intel.com ([169.254.6.42]) with mapi id 14.03.0439.000;
- Thu, 15 Aug 2019 09:08:45 -0700
-From:   "Rajashekar, Revanth" <revanth.rajashekar@intel.com>
-To:     Scott Bauer <sbauer@plzdonthack.me>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "Derrick, Jonathan" <jonathan.derrick@intel.com>
-Subject: RE: [PATCH 3/3] block: sed-opal: OPAL_METHOD_LENGTH defined twice
-Thread-Topic: [PATCH 3/3] block: sed-opal: OPAL_METHOD_LENGTH defined twice
-Thread-Index: AQHVUh/4y1FQ9N75BUeIBH7jRP9Kt6b8Dw+AgABSc6A=
-Date:   Thu, 15 Aug 2019 16:08:45 +0000
-Message-ID: <834CCEEEEBB3654A923D02183C9F5D0108003F4B@FMSMSX102.amr.corp.intel.com>
-References: <20190813214340.15533-1-revanth.rajashekar@intel.com>
- <20190813214340.15533-4-revanth.rajashekar@intel.com>
- <20190815040741.GC31938@hacktheplanet>
-In-Reply-To: <20190815040741.GC31938@hacktheplanet>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDM3Mzc2NjktMzUwMy00NTVjLWJmZjctMDljY2U5MWQxN2U5IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiQ2V3ZmMrMUxnb1F1cW1vZ21rYkw0RUU2eVNDXC9laHVtMDVxTTRyb0VvVW1WTTZTcVZ1bHpEeTRJQUNiT1lEV3gifQ==
-x-originating-ip: [10.1.200.107]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1729565AbfHOQMP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 12:12:15 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:42095 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729151AbfHOQMP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Aug 2019 12:12:15 -0400
+Received: by mail-qt1-f194.google.com with SMTP id t12so2870936qtp.9;
+        Thu, 15 Aug 2019 09:12:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=iTIKIuhQjFmLzffUqNs0d7EM6m2UJCFz471NWYlW/kA=;
+        b=QXjkEAHzvaI4d+a1jTu1uuBdBcwkiUcidF6xSV/xQKF2N7ucXBCF5Hej38FIPF0Lm3
+         9fWE+N6hf68OLIhzBONo5J5LQOEGzbqPKECQp+aEdwFdT+opMpMJ1qGxqzQD9gdQCPEz
+         IecizOukDzYwhTyD2KWejogmiAgKaK1vXPLIaF4L9biBH+TFPKprcr2WQ/6fGoTrK2rx
+         p6Un0uytpeqSTUTd8k+dvepjTTMJOAFXt4wObsUiZTFbAJFHR3q+4a3Y/b8ZvK/foXDm
+         wpA60ZcOdP6GWCrYCNX13gHb4P/T2mGkfQelkmBGCL+lGa6+8NnbqBd7hYAfkgZPkPEV
+         CS9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=iTIKIuhQjFmLzffUqNs0d7EM6m2UJCFz471NWYlW/kA=;
+        b=DshGSZyBDDUsy6n0MdXUVPNma+jMuvlxlFrUV5h7A9AeJz9Nevh/ZRjX1hRnWsoQqH
+         IVWDB/OOyqs4n6nDeuPap1i8UtdE2uYP+dLnKlQ1Xr441meYWrUunrkQWVpAfLuCRCik
+         ysGyKelbR2Np/zJErNvm+FlR+Hcmd4XHpR/TRH42oSODMXVfblXvsi9HB5bSndgKjmha
+         50lydEXjH0Z0psxIc2rcs4qwha8eQN0v0sbzHigXyDe0dP8FCz3VHOpUwSMtcJ+F8Uh3
+         QU7OzYGkmU63aNRi2LO7hsLy4uEvEqp8R6koRceXbbZjFCYSk2rkt8Abf13ht5NHCfbZ
+         hQUQ==
+X-Gm-Message-State: APjAAAVjqL2yviom4OtbQgwb1fO41o+JVXMkiLziG0MbPcXRrU1+WCEW
+        n4uFlrdt8aMdJhR77Ppp2DI=
+X-Google-Smtp-Source: APXvYqyI+etnk5089VErOMk8XqgTxfwAkSptHHANrHUw1yrHJeZLiH5w0UkWbcFYiSOmm16KjfaZlA==
+X-Received: by 2002:ac8:6b8f:: with SMTP id z15mr4797796qts.62.1565885534276;
+        Thu, 15 Aug 2019 09:12:14 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::1:25cd])
+        by smtp.gmail.com with ESMTPSA id a21sm1430581qtj.5.2019.08.15.09.12.13
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 15 Aug 2019 09:12:13 -0700 (PDT)
+Date:   Thu, 15 Aug 2019 09:12:11 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     axboe@kernel.dk, hannes@cmpxchg.org, mhocko@kernel.org,
+        vdavydov.dev@gmail.com, cgroups@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com, guro@fb.com,
+        akpm@linux-foundation.org
+Subject: Re: [PATCH 3/4] writeback, memcg: Implement cgroup_writeback_by_id()
+Message-ID: <20190815161211.GC588936@devbig004.ftw2.facebook.com>
+References: <20190803140155.181190-1-tj@kernel.org>
+ <20190803140155.181190-4-tj@kernel.org>
+ <20190815145421.GN14313@quack2.suse.cz>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190815145421.GN14313@quack2.suse.cz>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The re-definition error is thrown only when 2 different values are assigned to the same #define variable.
-But in this case, the same value is defined twice... hence the compiler doesn't throw error.
+On Thu, Aug 15, 2019 at 04:54:21PM +0200, Jan Kara wrote:
+> > +	/* and find the associated wb */
+> > +	wb = wb_get_create(bdi, memcg_css, GFP_NOWAIT | __GFP_NOWARN);
+> > +	if (!wb) {
+> > +		ret = -ENOMEM;
+> > +		goto out_css_put;
+> > +	}
+> 
+> One more thought: You don't want the "_create" part here, do you? If
+> there's any point in writing back using this wb, it must be attached to
+> some inode and thus it must exist. In the normal case wb_get_create() will
+> just fetch the reference and be done with it but when you feed garbage into
+> this function due to id going stale or frn structures getting corrupted due
+> to concurrent access, you can be creating bogus wb structures in bdi...
 
-Thank you :)
-Revanth Rajashekar
------Original Message-----
-From: Scott Bauer [mailto:sbauer@plzdonthack.me] 
-Sent: Wednesday, August 14, 2019 10:08 PM
-To: Rajashekar, Revanth <revanth.rajashekar@intel.com>
-Cc: linux-block@vger.kernel.org; Derrick, Jonathan <jonathan.derrick@intel.com>
-Subject: Re: [PATCH 3/3] block: sed-opal: OPAL_METHOD_LENGTH defined twice
+Yeah, it can create wbs unnecessarily which isn't critical but also is
+easy to fix.  Will update.
 
-On Tue, Aug 13, 2019 at 03:43:40PM -0600, Revanth Rajashekar wrote:
-> Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
-Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
+Thanks.
 
-Two things,
-Can we also change the title of this commit to:
-"Removed duplicate OPAL_METHOD_LENGTH definition"
-2nd, I'm dumb as hell now adays, why doesn't this throw a compiler error for multiple declarations?
+-- 
+tejun
