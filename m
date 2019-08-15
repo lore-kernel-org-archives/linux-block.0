@@ -2,107 +2,97 @@ Return-Path: <SRS0=WP4r=WL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F1FC3A589
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 14:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC083C3A589
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 15:43:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1917F20656
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 14:57:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="bhktrSAq"
+	by mail.kernel.org (Postfix) with ESMTP id B8CF02084D
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 15:43:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1565883788;
+	bh=PtR4c3rjcIUUCv9H4wJwnlW3N998/ZWb7IwzftyWl6o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ou/ogcf62Lo8cqhQlCFiF2xDG8eRzwjsSnO1tauI8SjYepSrNyiREq0ccKyq7M8Gl
+	 tUL4vkfH+1XTpglfNzdA3VAF6NlDybCy6P5Hddlqc2FP8G+Ujxg3vXmPE8Uaa60qfD
+	 6ugioUJ8Ryey3i8+2wn5DL8DWfIy7oQfFtsKl7jM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731340AbfHOO5k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 10:57:40 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:36172 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729818AbfHOO5k (ORCPT
+        id S1730464AbfHOPnI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 11:43:08 -0400
+Received: from mail-qk1-f181.google.com ([209.85.222.181]:39948 "EHLO
+        mail-qk1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729975AbfHOPnI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 10:57:40 -0400
-Received: by mail-lj1-f194.google.com with SMTP id u15so2503878ljl.3
-        for <linux-block@vger.kernel.org>; Thu, 15 Aug 2019 07:57:38 -0700 (PDT)
+        Thu, 15 Aug 2019 11:43:08 -0400
+Received: by mail-qk1-f181.google.com with SMTP id s145so2163573qke.7;
+        Thu, 15 Aug 2019 08:43:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UPE/R7dk1PRW4fz9vq+RV8lPmiFDXVaOGpxZBaywzos=;
-        b=bhktrSAq2ebXuUMlotB3r4hNLUEjLMFMqFzHRJWuSwfrGwo18FrUderietEAXPL+T9
-         d/wc7hvHdj6X2uZ3KOFI3MdsNM9sRxthqttD8sH39xh4RllH4Y7BhXmKlznmLujipKKa
-         wN4oPfY/UFCb9e1HqEHgTSJRo/y0T7NWp3EunitU/zQyVdSKXLsau5mDr7z3C99T5qQx
-         fRbaC9NJnKtq7X/QFcz61tNLw8Km7PFMrhruxFRjsH2DVkQt6mQZvQSAK1n1m8wC8aSK
-         zz/ip/EHHSc94JfJRnhOa4RPgG1zKYHM0DZ1GIAP8Sxd4P0m1Fe3hOPJkMEFbevdRGGF
-         ridw==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=VSR3T6Q49rCFXPPoyb9XFgF2ejksN7y0WyTo3YMYamM=;
+        b=hyuuAh2CNIxYP3ggj8gDm8R4p/9az4kHrRaL6c7xkvVmp5KasB2iSYzUaAGIeZjGiM
+         A95PrUyUJC+0/lW0z1W+odNW7+/4tOmRmm6g86Fh0uQd7iEZ7NQH9paD1ey8Ro+yUg4g
+         y3VeNucMGXfPbFqNNe2fdHGkico4kMYi0IGp8QW1kdMhBhiJeExKMtbS0t6bdR0K3WmR
+         I+szM8wY4iywtp965t3+afNr0ujT0/Y5OO7fs8HNBxXO9ilORnMG3/ZqeRVzaRoWWy1f
+         y2cWJTQHxaLlPv/FNGs6kLzLnFQz0yqnp8YocfIMbukfVsK2R/XaBg8GPyF6ZzZ2cszC
+         /M0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UPE/R7dk1PRW4fz9vq+RV8lPmiFDXVaOGpxZBaywzos=;
-        b=TBtmVxqu6i5bymBj0IYZWHau3kyUdS8DbYxRrfXPk1+H1CdHH6ODzgMMty3X03qFYA
-         TBp0tntex9NxX2gHxvcHSuwr9CMevxx+y1WYLxAiiohEf6Cpkd3NOHUZxnF3N9zvTo2/
-         veKBY+wpSsr7HM+7Is5JI1E5/fbIJWVKrgpT4rmdjPQEKEv9YyLuX25pb4GWDtHMWWt2
-         APeVxAYY7x10Qum+q5TJ8sjAAl5mgpQagexUXNcCCwG8J6RWdEzf2oolZRS5bT8tbMee
-         JEB5GB2lCSFPj3PA+EcxbOFg93KT8JfWkVtHCE28qETt2qtfyKz9esONF899/8jwhb0S
-         JaUA==
-X-Gm-Message-State: APjAAAVmW5q+bzkq2NPGhAxCfZHKRJ68J9OHRaG74yRr5a5S+fefQIYC
-        7uEK84AA41i0VP3dPGzNII7wyaUQ9CMcKhlQWxeZOQ==
-X-Google-Smtp-Source: APXvYqx8kBH1+wRLS/yGdm+aRT258MQm7az0BIAH5tA8X8DE1Rya7NvYSJ/zmx1zxfnJVVhU6dpgv2yrSpICirgs/ps=
-X-Received: by 2002:a2e:860d:: with SMTP id a13mr2918768lji.215.1565881058066;
- Thu, 15 Aug 2019 07:57:38 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=VSR3T6Q49rCFXPPoyb9XFgF2ejksN7y0WyTo3YMYamM=;
+        b=EjloV0XjoAmOIvLGFfVPg1P84FlQFPrH/tvWIYhxhVvGEYmB/HVLIBRHcp4OVKqvwl
+         BLRUocCrWnBKA/6mTqkfsQiuqJ5VKyvOfboQi2PeZ5KLDR67nAjw8QigSbKhZsFTpK3S
+         4C9BBA/IU/KV7W+kP7OTt0OKmlB4xnIT48VWCz1vhEUPofFnDpq6aa59jN/tkKDqpilp
+         E7GCVq3qwNjEH9TtvYIUJy7sc6LIb/gOTBw3Eq6wc7n7J0NCq+XWYuZ1ohDH6N+wQ0ZC
+         BQVGroU/sPg3wgGLvsZkQv2eol2+HsSLWEZMh/zxQF/Y3yq6WJnnw1rJeIuvmfMX/5mF
+         dT2Q==
+X-Gm-Message-State: APjAAAW5KXfABT7cd3ki68psaNhwvzoGXwSg6oLSZ9gNl6SWQdeQRxJQ
+        VRJZ2t+gDRKKsqh74HX2DTI=
+X-Google-Smtp-Source: APXvYqxzLjuzQD27bfrn2cScIeA+V2HcpeVzSikxHaN5jBJPh/YwChCQxz2+g7+fHLFfxda2FIzOsw==
+X-Received: by 2002:a37:270a:: with SMTP id n10mr4625997qkn.434.1565883786758;
+        Thu, 15 Aug 2019 08:43:06 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::1:25cd])
+        by smtp.gmail.com with ESMTPSA id t2sm1529090qkm.34.2019.08.15.08.43.05
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 15 Aug 2019 08:43:06 -0700 (PDT)
+Date:   Thu, 15 Aug 2019 08:43:02 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     axboe@kernel.dk, hannes@cmpxchg.org, mhocko@kernel.org,
+        vdavydov.dev@gmail.com, cgroups@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com, guro@fb.com,
+        akpm@linux-foundation.org
+Subject: Re: [PATCH 3/4] writeback, memcg: Implement cgroup_writeback_by_id()
+Message-ID: <20190815154302.GB588936@devbig004.ftw2.facebook.com>
+References: <20190803140155.181190-1-tj@kernel.org>
+ <20190803140155.181190-4-tj@kernel.org>
+ <20190815140535.GJ14313@quack2.suse.cz>
 MIME-Version: 1.0
-References: <20190814103244.92518-1-maco@android.com> <20190814113348.GA525@ming.t460p>
- <CAB0TPYHdaOTUKf5ix-oU7cXsV12ZW6YDYBsG+VKr6zk=RCW2NA@mail.gmail.com> <20190814114646.GA14561@ming.t460p>
-In-Reply-To: <20190814114646.GA14561@ming.t460p>
-From:   Martijn Coenen <maco@android.com>
-Date:   Thu, 15 Aug 2019 15:57:27 +0100
-Message-ID: <CAB0TPYGc8H1pJZrDX1r5wO1gyYV9rzgi3acT9mp-vxxrdA-pyA@mail.gmail.com>
-Subject: Re: [PATCH] RFC: loop: Avoid calling blk_mq_freeze_queue() when possible.
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>, kernel-team@android.com,
-        Narayan Kamath <narayan@google.com>,
-        Dario Freni <dariofreni@google.com>,
-        Nikita Ioffe <ioffe@google.com>,
-        Jiyong Park <jiyong@google.com>,
-        Martijn Coenen <maco@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190815140535.GJ14313@quack2.suse.cz>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 14, 2019 at 12:47 PM Ming Lei <ming.lei@redhat.com> wrote:
-> blk_queue_init_done() is only called in blk_queue_init_done() for
-> this purpose, so this approach should be fine, IMO.
+On Thu, Aug 15, 2019 at 04:05:35PM +0200, Jan Kara wrote:
+> > +int cgroup_writeback_by_id(u64 bdi_id, int memcg_id, unsigned long nr_pages,
+> > +			   enum wb_reason reason, struct wb_completion *done);
+> > +int writeback_by_id(int id, unsigned long nr, enum wb_reason reason,
+> > +		    struct wb_completion *done);
+> 
+> I guess this writeback_by_id() is stale? I didn't find it anywhere else...
 
-I was thinking somebody might add more stuff to "init" in the future,
-and then that new stuff would now no longer be executed for the loop
-driver. The name "init" is pretty generic...but if that's not a
-concern I'm happy with your proposal as well. There's one more
-"freeze" I'd like to get rid of - we also call LOOP_SET_STATUS(64),
-and there's a freeze in there because lo->transfer is modified. That
-makes sense, but I was hoping we can make that freeze conditional on
-whether lo->transfer would actually change value; if it stays the
-same, I think freezing is not necessary.
+Yes, removed.
 
->
-> > switching q_usage_counter to per-cpu mode in the block layer in
-> > general, until the first request comes in?
->
-> This approach may not help your issue on loop, IO request comes
-> just after disk is added, such as by systemd, or reading partition table.
+Thanks.
 
-That's a good point, I thought we could avoid the partition scan, but
-on some Android devices we'll have max_part set, and there will be a
-partition scan.
-
-Thanks,
-Martijn
-
->
-> However, loop only starts to handle IO really after it becomes 'Lo_bound'.
->
-> thanks,
-> Ming
+-- 
+tejun
