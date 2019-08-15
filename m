@@ -1,120 +1,82 @@
-Return-Path: <SRS0=ptuj=WK=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=WP4r=WL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27F5CC433FF
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:57:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5D6C32753
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 01:27:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F3F6F216F4
-	for <linux-block@archiver.kernel.org>; Wed, 14 Aug 2019 20:57:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65408208C2
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 01:27:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728871AbfHNU5f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Aug 2019 16:57:35 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:50785 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726166AbfHNU5f (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Aug 2019 16:57:35 -0400
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1MPowd-1hckJz13UB-00MpFs; Wed, 14 Aug 2019 22:57:32 +0200
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     linux-kernel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v5 17/18] pktcdvd: add compat_ioctl handler
-Date:   Wed, 14 Aug 2019 22:54:52 +0200
-Message-Id: <20190814205521.122180-8-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
-In-Reply-To: <20190814204259.120942-1-arnd@arndb.de>
-References: <20190814204259.120942-1-arnd@arndb.de>
+        id S1728233AbfHOB1U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Aug 2019 21:27:20 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:57076 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727822AbfHOB1U (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Aug 2019 21:27:20 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 8239D636284E109C16C6;
+        Thu, 15 Aug 2019 09:27:18 +0800 (CST)
+Received: from [127.0.0.1] (10.184.194.169) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Thu, 15 Aug 2019
+ 09:27:14 +0800
+Subject: Re: [PATCH] nbd: add a missed nbd_config_put() in nbd_xmit_timeout()
+To:     <josef@toxicpanda.com>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>
+References: <1565613086-13776-1-git-send-email-sunke32@huawei.com>
+From:   "sunke (E)" <sunke32@huawei.com>
+Message-ID: <05b3cd4a-d2c1-5ad7-7a39-64bac470032a@huawei.com>
+Date:   Thu, 15 Aug 2019 09:27:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <1565613086-13776-1-git-send-email-sunke32@huawei.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:vtBRrSTbxRM+4N7JG/SqINjMT8OwhCCnfEV9GLfJMlj7zzHmXqL
- wFcQBgM7/r/60w0dHWdIX39QTgYM4f/6oLGxqnTXmb0CHbl9e834v0p2Rmzje1ZTzLFB0d4
- ArUarrUL7+s3fgxa94yevKS1w3wmtdSr7o3Jo/MviF7gzdbq7Vr5Sa0PLjOc3+0XsDb7ayd
- Im2A9aO8g12wUfvh63IzQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:oXxoA9Saf5U=:wn2CxSLASoltE+VPtsKsmS
- DbM3bcSOL5toXC7kI5Wz6RafyaM3cAUqLlE3zjj3c2paNf19x+xqkxDbfmVmBPA63QSHuNvlo
- aNikgXHDUJ8bhRVl3ntnHP/QQQhffoJlfbuIOka54SfVt754KI6HKMfBnl1uLRKT5k4+4ItGZ
- /itPTJ3SDZA1hRH4ZojXudrHRYkPWnJmzt4GYzIPq3Ewf2uH0vIg2s4swG5LPGrVV4gMiUiXf
- 3b3TQPCWgpHmS4mBiAigr/vnrj7Ps7Lr3BVqSAR8ioWfzXjnFesSIO3H8YHlIB5VZCYnozlpK
- rpXwIG8gGgfZejIX2FD5CW+2QCT766pjpVsSiQlCWlsREd7u4WNA+CcS3CX7WaAIKx0z8vSe5
- 7obgtro6nmMuqzOTcjPLrfLt4NQNPitX7upsF5WWyhUiMBqMnhBb95qBmr61t1yaR30GgYaKa
- nmKXPddvpCL8Dx+/T2jw2Eh7FDG5rr/H6Sh/ti8cH0/L0PBate4GA8OTM6yV3dwtOdSIMJEmO
- GcI941L57d5nOl7fZDJe2DxZyjKA6RG9kcEr17w+Ff/hJ6CbTGBAhwHDt9WMZsplcRj7LdJoO
- yv14a5pkTALtpSrjJd9JhqIn1MVYvyoTPee7UiU5MUtw366JG52QkMRjoDzcC7CBKlnrDDJDX
- 47JwnZHHclHBGahHLCJehDayQgvWpgjncjEbJpYMi5AVfW8LQrzJZ1Ue1XnaOM4sMLkd2HJJb
- zRdDmZjFRSEBmUUiGjtz5uyZGpGQ34zVToeIOg==
+X-Originating-IP: [10.184.194.169]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-pkt_ioctl() implements the generic SCSI_IOCTL_SEND_COMMAND
-and some cdrom ioctls by forwarding to the underlying block
-device. For compat_ioctl handling, this always takes a
-roundtrip through fs/compat_ioctl.c that we should try
-to avoid, at least for the compatible commands.
+ping
 
-CDROM_SEND_PACKET is an exception here, it requires special
-translation in compat_blkdev_driver_ioctl().
-
-CDROM_LAST_WRITTEN has no compat handling at the moment.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/block/pktcdvd.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
-
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 024060165afa..b5950b7851b0 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2664,6 +2664,28 @@ static int pkt_ioctl(struct block_device *bdev, fmode_t mode, unsigned int cmd,
- 	return ret;
- }
- 
-+#ifdef CONFIG_COMPAT
-+static int pkt_compat_ioctl(struct block_device *bdev, fmode_t mode, unsigned int cmd, unsigned long arg)
-+{
-+	switch (cmd) {
-+	/* compatible */
-+	case CDROMEJECT:
-+	case CDROMMULTISESSION:
-+	case CDROMREADTOCENTRY:
-+	case SCSI_IOCTL_SEND_COMMAND:
-+		return pkt_ioctl(bdev, mode, cmd, (unsigned long)compat_ptr(arg));
-+
-+
-+	/* FIXME: no handler so far */
-+	case CDROM_LAST_WRITTEN:
-+	/* handled in compat_blkdev_driver_ioctl */
-+	case CDROM_SEND_PACKET:
-+	default:
-+		return -ENOIOCTLCMD;
-+	}
-+}
-+#endif
-+
- static unsigned int pkt_check_events(struct gendisk *disk,
- 				     unsigned int clearing)
- {
-@@ -2685,6 +2707,9 @@ static const struct block_device_operations pktcdvd_ops = {
- 	.open =			pkt_open,
- 	.release =		pkt_close,
- 	.ioctl =		pkt_ioctl,
-+#ifdef CONFIG_COMPAT
-+	.ioctl =		pkt_compat_ioctl,
-+#endif
- 	.check_events =		pkt_check_events,
- };
- 
--- 
-2.20.0
+ÔÚ 2019/8/12 20:31, Sun Ke Ð´µÀ:
+> When try to get the lock failed, before return, execute the
+> nbd_config_put() to decrease the nbd->config_refs.
+> 
+> If the nbd->config_refs is added but not decreased. Then will not
+> execute nbd_clear_sock() in nbd_config_put(). bd->task_setup will
+> not be cleared away. Finally, print"Device being setup by another
+> task" in nbd_add_sock() and nbd device can not be reused.
+> 
+> Fixes: 8f3ea35929a0 ("nbd: handle unexpected replies better")
+> Signed-off-by: Sun Ke <sunke32@huawei.com>
+> ---
+>   drivers/block/nbd.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index e21d2de..a69a90a 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -357,8 +357,10 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+>   	}
+>   	config = nbd->config;
+>   
+> -	if (!mutex_trylock(&cmd->lock))
+> +	if (!mutex_trylock(&cmd->lock)) {
+> +		nbd_config_put(nbd);
+>   		return BLK_EH_RESET_TIMER;
+> +	}
+>   
+>   	if (config->num_connections > 1) {
+>   		dev_err_ratelimited(nbd_to_dev(nbd),
+> 
 
