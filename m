@@ -2,124 +2,159 @@ Return-Path: <SRS0=WP4r=WL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF63C3A589
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 13:01:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AC9FC3A59C
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 13:21:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1BF27206C1
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 13:01:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1198D2171F
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 13:21:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1565875281;
+	bh=IKvd9ep/LvdPvoBiD0svn7cm7EBinWy+0SE78eVwSrc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Jx3xH/SU0jGA2R/1dbBEz/CgTi6FKf854D7fnY4o8iw5Z4mIdnGryeZ5QEy+dEchJ
+	 2oQhAXAgc7fSKS+k0Pqw7Gjsdr37JuEoNXAVyy+H5PtPBv/FjejdoBSE3G7xvKqnwY
+	 7vIUlPjoSvTtdnFGgOQSW6D52Su/SwvOAmMAasAY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729818AbfHONBx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 09:01:53 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:44489 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726109AbfHONBx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 09:01:53 -0400
-Received: from mail-qk1-f199.google.com ([209.85.222.199])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <gpiccoli@canonical.com>)
-        id 1hyFO3-0007X8-9P
-        for linux-block@vger.kernel.org; Thu, 15 Aug 2019 13:01:51 +0000
-Received: by mail-qk1-f199.google.com with SMTP id r200so1952785qke.19
-        for <linux-block@vger.kernel.org>; Thu, 15 Aug 2019 06:01:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=WcgGhKrzEqQFcbftTHdoLG8OGi4gCwQvJKGdNd0Y8Mc=;
-        b=jxJhqyM+c5hSRfg7gHuFB5lako9GhDNR6rHNK+nNhR1bVxX4dXj7EMYTTPrEH6ay5/
-         98IMgz1cM2UJuajpCYsCFUDVfeLeAV6IeVcFpHUXopNmTYxR/o6Nam1WBK8CGvhDaxGX
-         AURAkDaMFsZEDwF74/+wqk6WZY3rGdQCq0yQkvmrD1moG15M1XLgi23L0fC2Oy/jT2kV
-         wC4Dh4cG4DOx7Ko3ZqNNGnF6+zDW9Ze2vPv24brs+1DG8ky0cW2PV6xlV/T/emecseNJ
-         x4D27EBQ1E0nPjwM8UhIAQfcJq6kWxgs69S34fyvvL+m4+9AlfylF5w4eibMTciA/gGT
-         80ng==
-X-Gm-Message-State: APjAAAUIx0J/jks74ZbFCGovzFozxWXl/nDWDGFD24jH740zfRg7uA2Y
-        xoz38Rbkv6AZuQJ9hPmQaXMaWc17TaYJgKYhnifW6uA66lxtA/h653C6sfNJh23bnxp4gRxyuTt
-        DNS6my6+0bMvKoOpJNZJg70+RAt9dL4mpU3A+1RQb
-X-Received: by 2002:a37:9c88:: with SMTP id f130mr3837759qke.494.1565874110546;
-        Thu, 15 Aug 2019 06:01:50 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyn7TqrI2aPfIK5FkKXReFXUa6cToRv5dkS287uBNrZhKNDXoFPigPVQKtNordm0tBgQ55XYw==
-X-Received: by 2002:a37:9c88:: with SMTP id f130mr3837738qke.494.1565874110392;
-        Thu, 15 Aug 2019 06:01:50 -0700 (PDT)
-Received: from [192.168.1.75] ([191.13.19.2])
-        by smtp.gmail.com with ESMTPSA id g207sm1345819qke.11.2019.08.15.06.01.45
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Aug 2019 06:01:48 -0700 (PDT)
-Subject: Re: [PATCH] nvme: Use first ctrl->instance id as subsystem id
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "jay.vosburgh@canonical.com" <jay.vosburgh@canonical.com>,
-        Dan Streetman <dan.streetman@canonical.com>
-References: <20190814142836.2322-1-gpiccoli@canonical.com>
- <20190814160640.GA3256@localhost.localdomain>
- <abfc4bd0-f4f0-5655-81ee-ec32d3516f35@canonical.com>
- <20190814162754.GB3256@localhost.localdomain>
- <b5b471cc-8935-cf96-d55a-a7dc731cb0d6@canonical.com>
- <20190814190814.GC3256@localhost.localdomain>
-From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
- mQENBFpVBxcBCADPNKmu2iNKLepiv8+Ssx7+fVR8lrL7cvakMNFPXsXk+f0Bgq9NazNKWJIn
- Qxpa1iEWTZcLS8ikjatHMECJJqWlt2YcjU5MGbH1mZh+bT3RxrJRhxONz5e5YILyNp7jX+Vh
- 30rhj3J0vdrlIhPS8/bAt5tvTb3ceWEic9mWZMsosPavsKVcLIO6iZFlzXVu2WJ9cov8eQM/
- irIgzvmFEcRyiQ4K+XUhuA0ccGwgvoJv4/GWVPJFHfMX9+dat0Ev8HQEbN/mko/bUS4Wprdv
- 7HR5tP9efSLucnsVzay0O6niZ61e5c97oUa9bdqHyApkCnGgKCpg7OZqLMM9Y3EcdMIJABEB
- AAG0LUd1aWxoZXJtZSBHLiBQaWNjb2xpIDxncGljY29saUBjYW5vbmljYWwuY29tPokBNwQT
- AQgAIQUCWmClvQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRDOR5EF9K/7Gza3B/9d
- 5yczvEwvlh6ksYq+juyuElLvNwMFuyMPsvMfP38UslU8S3lf+ETukN1S8XVdeq9yscwtsRW/
- 4YoUwHinJGRovqy8gFlm3SAtjfdqysgJqUJwBmOtcsHkmvFXJmPPGVoH9rMCUr9s6VDPox8f
- q2W5M7XE9YpsfchS/0fMn+DenhQpV3W6pbLtuDvH/81GKrhxO8whSEkByZbbc+mqRhUSTdN3
- iMpRL0sULKPVYbVMbQEAnfJJ1LDkPqlTikAgt3peP7AaSpGs1e3pFzSEEW1VD2jIUmmDku0D
- LmTHRl4t9KpbU/H2/OPZkrm7809QovJGRAxjLLPcYOAP7DUeltveuQENBFpVBxcBCADbxD6J
- aNw/KgiSsbx5Sv8nNqO1ObTjhDR1wJw+02Bar9DGuFvx5/qs3ArSZkl8qX0X9Vhptk8rYnkn
- pfcrtPBYLoux8zmrGPA5vRgK2ItvSc0WN31YR/6nqnMfeC4CumFa/yLl26uzHJa5RYYQ47jg
- kZPehpc7IqEQ5IKy6cCKjgAkuvM1rDP1kWQ9noVhTUFr2SYVTT/WBHqUWorjhu57/OREo+Tl
- nxI1KrnmW0DbF52tYoHLt85dK10HQrV35OEFXuz0QPSNrYJT0CZHpUprkUxrupDgkM+2F5LI
- bIcaIQ4uDMWRyHpDbczQtmTke0x41AeIND3GUc+PQ4hWGp9XABEBAAGJAR8EGAEIAAkFAlpV
- BxcCGwwACgkQzkeRBfSv+xv1wwgAj39/45O3eHN5pK0XMyiRF4ihH9p1+8JVfBoSQw7AJ6oU
- 1Hoa+sZnlag/l2GTjC8dfEGNoZd3aRxqfkTrpu2TcfT6jIAsxGjnu+fUCoRNZzmjvRziw3T8
- egSPz+GbNXrTXB8g/nc9mqHPPprOiVHDSK8aGoBqkQAPZDjUtRwVx112wtaQwArT2+bDbb/Y
- Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
- kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
- X18zwLgdiQ==
-Message-ID: <9edcb6b3-806c-a422-8d44-c1ab49ce0b57@canonical.com>
-Date:   Thu, 15 Aug 2019 10:01:43 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1732079AbfHONVU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 09:21:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53522 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731822AbfHONVU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Aug 2019 09:21:20 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 89AFD2083B;
+        Thu, 15 Aug 2019 13:21:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1565875279;
+        bh=IKvd9ep/LvdPvoBiD0svn7cm7EBinWy+0SE78eVwSrc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BdX8hQ1L5YTUu5ywY3yao9h+h3vmKUbMZugoJ5H3U7QyAjB8nicDFFF+GTLDGkAKN
+         DZAWYKKRZGzkdOiGV+lPWhPb36+jlDiiOSWHqpwuVWKgLXqNaUX7xqCBS9FCgtUby9
+         iL2lfV7znw0Ig1yr1qTIxVZovDrhvbMDab0kmEOI=
+Date:   Thu, 15 Aug 2019 15:21:16 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        stable@vger.kernel.org, Mark Ray <mark.ray@hpe.com>
+Subject: Re: [PATCH] blk-mq: avoid sysfs buffer overflow by too many CPU cores
+Message-ID: <20190815132116.GB21644@kroah.com>
+References: <20190815121518.16675-1-ming.lei@redhat.com>
+ <20190815122419.GA31891@kroah.com>
+ <20190815122909.GA28032@ming.t460p>
+ <20190815123535.GA29217@kroah.com>
+ <20190815124321.GB28032@ming.t460p>
 MIME-Version: 1.0
-In-Reply-To: <20190814190814.GC3256@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190815124321.GB28032@ming.t460p>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 14/08/2019 16:08, Keith Busch wrote:
-> On Wed, Aug 14, 2019 at 11:29:17AM -0700, Guilherme G. Piccoli wrote:
->> It is a suggestion from my colleague Dan (CCed here), something like:
->> for non-multipath nvme, keep nvmeC and nvmeCnN (C=controller ida,
->> N=namespace); for multipath nvme, use nvmeScCnN (S=subsystem ida).
+On Thu, Aug 15, 2019 at 08:43:22PM +0800, Ming Lei wrote:
+> On Thu, Aug 15, 2019 at 02:35:35PM +0200, Greg KH wrote:
+> > On Thu, Aug 15, 2019 at 08:29:10PM +0800, Ming Lei wrote:
+> > > On Thu, Aug 15, 2019 at 02:24:19PM +0200, Greg KH wrote:
+> > > > On Thu, Aug 15, 2019 at 08:15:18PM +0800, Ming Lei wrote:
+> > > > > It is reported that sysfs buffer overflow can be triggered in case
+> > > > > of too many CPU cores(>841 on 4K PAGE_SIZE) when showing CPUs in
+> > > > > one hctx.
+> > > > > 
+> > > > > So use snprintf for avoiding the potential buffer overflow.
+> > > > > 
+> > > > > Cc: stable@vger.kernel.org
+> > > > > Cc: Mark Ray <mark.ray@hpe.com>
+> > > > > Fixes: 676141e48af7("blk-mq: don't dump CPU -> hw queue map on driver load")
+> > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > > ---
+> > > > >  block/blk-mq-sysfs.c | 30 ++++++++++++++++++------------
+> > > > >  1 file changed, 18 insertions(+), 12 deletions(-)
+> > > > > 
+> > > > > diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+> > > > > index d6e1a9bd7131..e75f41a98415 100644
+> > > > > --- a/block/blk-mq-sysfs.c
+> > > > > +++ b/block/blk-mq-sysfs.c
+> > > > > @@ -164,22 +164,28 @@ static ssize_t blk_mq_hw_sysfs_nr_reserved_tags_show(struct blk_mq_hw_ctx *hctx,
+> > > > >  	return sprintf(page, "%u\n", hctx->tags->nr_reserved_tags);
+> > > > >  }
+> > > > >  
+> > > > > +/* avoid overflow by too many CPU cores */
+> > > > >  static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx *hctx, char *page)
+> > > > >  {
+> > > > > -	unsigned int i, first = 1;
+> > > > > -	ssize_t ret = 0;
+> > > > > -
+> > > > > -	for_each_cpu(i, hctx->cpumask) {
+> > > > > -		if (first)
+> > > > > -			ret += sprintf(ret + page, "%u", i);
+> > > > > -		else
+> > > > > -			ret += sprintf(ret + page, ", %u", i);
+> > > > > -
+> > > > > -		first = 0;
+> > > > > +	unsigned int cpu = cpumask_first(hctx->cpumask);
+> > > > > +	ssize_t len = snprintf(page, PAGE_SIZE - 1, "%u", cpu);
+> > > > > +	int last_len = len;
+> > > > > +
+> > > > > +	while ((cpu = cpumask_next(cpu, hctx->cpumask)) < nr_cpu_ids) {
+> > > > > +		int cur_len = snprintf(page + len, PAGE_SIZE - 1 - len,
+> > > > > +				       ", %u", cpu);
+> > > > > +		if (cur_len >= PAGE_SIZE - 1 - len) {
+> > > > > +			len -= last_len;
+> > > > > +			len += snprintf(page + len, PAGE_SIZE - 1 - len,
+> > > > > +					"...");
+> > > > > +			break;
+> > > > > +		}
+> > > > > +		len += cur_len;
+> > > > > +		last_len = cur_len;
+> > > > >  	}
+> > > > >  
+> > > > > -	ret += sprintf(ret + page, "\n");
+> > > > > -	return ret;
+> > > > > +	len += snprintf(page + len, PAGE_SIZE - 1 - len, "\n");
+> > > > > +	return len;
+> > > > >  }
+> > > > >
+> > > > 
+> > > > What????
+> > > > 
+> > > > sysfs is "one value per file".  You should NEVER have to care about the
+> > > > size of the sysfs buffer.  If you do, you are doing something wrong.
+> > > > 
+> > > > What excatly are you trying to show in this sysfs file?  I can't seem to
+> > > > find the Documenatation/ABI/ entry for it, am I just missing it because
+> > > > I don't know the filename for it?
+> > > 
+> > > It is /sys/block/$DEV/mq/$N/cpu_list, all CPUs in this hctx($N) will be
+> > > shown via sysfs buffer. The buffer size is one PAGE, how can it hold when
+> > > there are too many CPUs(close to 1K)?
+> > 
+> > Looks like I only see 1 cpu listed on my machines in those files, what
+> > am I doing wrong?
 > 
-> This will inevitably lead to collisions. The existing naming scheme was
-> selected specifically to avoid that problem.
+> It depends on machine. The issue is reported on one machine with 896 CPU
+> cores, when 4K buffer can only hold 841 cores.
 > 
+> > 
+> > Also, I don't see cpu_list in any of the documentation files, so I have
+> > no idea what you are trying to have this file show.
+> > 
+> > And again, "one value per file" is the sysfs rule.  "all cpus in the
+> > system" is not "one value" :)
+> 
+> I agree, and this file shouldn't be there, given each CPU will have one
+> kobject dir under the hctx dir.
+> 
+> We may kill the 'cpu_list' attribute, is there anyone who objects?
 
-Thanks again for the discussion Keith! So, I guess the way to go is
-really the kernel parameter in case users want to fallback to the old
-numbering (and only if they're not using multipath).
+Given that it was never documented, perhaps no one actually uses it :)
 
-Cheers,
-
-
-Guilherme
+greg k-h
