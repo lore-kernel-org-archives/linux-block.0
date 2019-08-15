@@ -2,97 +2,103 @@ Return-Path: <SRS0=WP4r=WL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 617AAC3A589
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 17:30:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E65C3A589
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 17:31:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 36D892064A
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 17:30:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6ABA7205C9
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 17:31:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1565890313;
+	bh=3iUYKByNYBFk5zG5BT8CONxHJptvPtEgevu/nQr5NxM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=DYzciaDrICoI5hhUJZZJI8TJfz658DdVvh/QAkx9PNT0yZPOLe2pkzbYblpeFnOQs
+	 HnSdQi6YO+h2hUhocX68k97AqlyXGtQ6Q9IbGdDufut9mUY0V4xonSBRzbp/2vkwD1
+	 VyL/z4UawXDhq/is8+TUD5i1YH8gHvPV9N9YUP+M=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730653AbfHORas (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 13:30:48 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:35242 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730598AbfHORas (ORCPT
+        id S1728662AbfHORbx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 13:31:53 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:34314 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726098AbfHORbw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 13:30:48 -0400
-Received: by mail-pg1-f193.google.com with SMTP id n4so1596381pgv.2;
-        Thu, 15 Aug 2019 10:30:47 -0700 (PDT)
+        Thu, 15 Aug 2019 13:31:52 -0400
+Received: by mail-qk1-f193.google.com with SMTP id m10so2528402qkk.1;
+        Thu, 15 Aug 2019 10:31:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=no35aRJk15zFWg1jR8wwX86QzYLoUfFHVUo7VWQ/svc=;
+        b=N47XHCOSmAXueVA0YYaev8/a4K3QvUHId7wqDd1kKuzb9i0XsPGZt3JSFV4fwHmm1o
+         079FfdNxA44u+Lpn9KWO67P5gdQDjS8yLNUwxRyP+az0D6idFOXOvoIL6oT/ByHrYA+e
+         5x2GXXGdhLQUUhHxcna9tpQrgumRatQu40F/xy7UzP2oUcoOJ5ObUyU55Ybx+CjVdZVf
+         ZGK+QWvr7EafhXZLjXcXxcSaDgonosEcUP9Kh6/WmBW5wIhcwJ7Gd5u11eGiOYvLgYRX
+         ruJyUluXJcICik/5Pis1nVgLz6wleggRuqyNbfxBltc6VpOrVEuqmr44g/tLfUNGnReK
+         /wxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=QnlfD1u/saq7YabHTTJM2fFau3y80kmE4WZcEZvSBiM=;
-        b=ueGM7pgLLQOxkbaLXR1h3fvwzCdNAz6YI0mFOBYCD8CK/sfpTYeK4iWKnjjxuANFBl
-         8QtO9FRdHQQT0+Rio/tDTmZcxxbGNXX6OjjZPaahH15Pc1zJZ6dExkdWnWid3PoLT14x
-         wEqdrwngFrTPx4fdstFaRonutiZuL6H7mUWCgC507vQrhMOuey16RL+lwKlvCS1iRFSr
-         haTvAB70nbHzu06cD3+E5i89NoBDRJXDCkToGNmJz8TAZ5VZacUsgLKisSdfW054M27l
-         I8DHzGn4rzYvm6X7R3A8zbvn2QTDayDnoxK845y7LsuiaGeoO1icJzvIahkZefRxWYt6
-         rEpw==
-X-Gm-Message-State: APjAAAVed+YvHIxiHhEK0F2nJ2mw5CoLEkhEJYV6E7ut057yBlkq9YDw
-        1/tOY3Y3YumCByA00wUZXPc=
-X-Google-Smtp-Source: APXvYqzHLHWkQAegNa1jIJY7/77XgqulqNeMSvORhvP8TO0Ntzgv66iP0wjodakvJ7RdKgVabvaQFg==
-X-Received: by 2002:aa7:91d3:: with SMTP id z19mr6500679pfa.135.1565890247488;
-        Thu, 15 Aug 2019 10:30:47 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id x9sm2529062pgp.75.2019.08.15.10.30.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Aug 2019 10:30:46 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH v3 00/20] sg: add v4 interface
-To:     dgilbert@interlog.com, James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org
-Cc:     martin.petersen@oracle.com, hare@suse.de,
-        Arnd Bergmann <arnd@arndb.de>,
-        Tony Battersby <tonyb@cybernetics.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20190807114252.2565-1-dgilbert@interlog.com>
- <1565291455.3435.48.camel@linux.vnet.ibm.com>
- <7edab448-22cc-493a-f745-acc5be38f6a5@interlog.com>
- <1565305243.25619.27.camel@linux.vnet.ibm.com>
- <51e7cdfb-7921-9368-9b78-90ba5ac50c77@interlog.com>
-Message-ID: <6606add1-7ae7-5d8d-e660-d267164981d9@acm.org>
-Date:   Thu, 15 Aug 2019 10:30:45 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=no35aRJk15zFWg1jR8wwX86QzYLoUfFHVUo7VWQ/svc=;
+        b=LAhr5b4LaF3OckGln8l8++cxyNw+taN8eKEypTdvjAW5FfSa62SK0RTiRUC5PIv/Y7
+         c4CKp2gPG8gJC10xiPWskoxsGjKF3mXl6YzO0LFrWTHaDP5uGGtqV1N91u9fvO+PP3gI
+         RwoAVdkphHbfTibxxGI9f94wG4LO0uGyxPIPoZrTw5hX/OtNgjytNYaJSm5bFuRj8tV7
+         s95QZR6bC0hTudDARsBRqwow6n3HAYWXeYLxtIpZxbVtpO7IxFwh55knd17D9bqbGtjY
+         JSZmhj1d3c2EiJcWZqWjSUFS7QcnwwDSN4YwVPz50AkWBNyjobtviZ1+AACRVpgcgaUz
+         vkmA==
+X-Gm-Message-State: APjAAAXyGYUTXOiLbsOEDLp5Rt9JBaz4c1t9taYJMKR1yDGTvivHnowg
+        2H2NJBiP7QNDs2L1NLaKm2A=
+X-Google-Smtp-Source: APXvYqwTF1AugQK16mXeTAc3YHU1jdzIKEshxpTbcRaCWmkGxQukcPJXecgkAY0Igu5HQb1bcCAfWw==
+X-Received: by 2002:a37:aa57:: with SMTP id t84mr5056219qke.34.1565890311488;
+        Thu, 15 Aug 2019 10:31:51 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::1:25cd])
+        by smtp.gmail.com with ESMTPSA id v24sm1928599qth.33.2019.08.15.10.31.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 15 Aug 2019 10:31:50 -0700 (PDT)
+Date:   Thu, 15 Aug 2019 10:31:48 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     axboe@kernel.dk, hannes@cmpxchg.org, mhocko@kernel.org,
+        vdavydov.dev@gmail.com, cgroups@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com, guro@fb.com,
+        akpm@linux-foundation.org
+Subject: Re: [PATCH 4/4] writeback, memcg: Implement foreign dirty flushing
+Message-ID: <20190815173148.GD588936@devbig004.ftw2.facebook.com>
+References: <20190803140155.181190-1-tj@kernel.org>
+ <20190803140155.181190-5-tj@kernel.org>
+ <20190815143404.GK14313@quack2.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <51e7cdfb-7921-9368-9b78-90ba5ac50c77@interlog.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190815143404.GK14313@quack2.suse.cz>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/13/19 9:19 PM, Douglas Gilbert wrote:
-> Bart Van Assche hinted at a better API design but didn't present
-> it. If he did, that would be the first time an alternate API
-> design was presented for async usage in the 20 years that I have
-> been associated with the driver.
+Hello, Jan.
 
-I would like to start from the use cases instead of the implementation 
-of a new SG/IO interface. My employer uses the SG/IO interface for 
-controlling SMR and HSMR disks. What we need is the ability to discover, 
-read, write and configure such disks, support for the non-standard HSMR 
-flex protocol, the ability to give certain users or groups access to a 
-subset of the LBAs and also the ability to make that information 
-persistent. I think that such functionality could be implemented by 
-extending LVM and by adding support for all ZBC commands we need in the 
-block layer, device mapper layer and also in the asynchronous I/O layer. 
-The block, dm and aio layers already support submitting commands 
-asynchronously but do not yet support all the ZBC commands that we use.
+On Thu, Aug 15, 2019 at 04:34:04PM +0200, Jan Kara wrote:
+> I have to say I'm a bit nervous about the completely lockless handling
+> here. I understand that garbage in the cgwb_frn will just result in this
+> mechanism not working and possibly flushing wrong wb's but still it seems a
+> bit fragile. But I don't see any cheap way of synchronizing this so I guess
+> let's try how this will work in practice.
 
-Are there any SG/IO use cases that have not yet been mentioned in this 
-e-mail thread? If SMR and HSMR are the primary use cases for SG/IO, 
-should asynchronous command support be added in the SG/IO layer or 
-should rather ZBC support in the block, dm and aio layers be improved?
+Yeah, this approach is fundamentally best-effort, so I went for low
+overhead and mostly correct operation.  If something like this doesn't
+cut it (w/ bug fixes and some polishing over time), my gut feeling is
+that we probably should bite the bullet and synchronize cgroup memory
+and inode ownerships rather than pushing further on inherently
+imprecise mitigation mechanisms.
 
-Thanks,
+Thanks.
 
-Bart.
+-- 
+tejun
