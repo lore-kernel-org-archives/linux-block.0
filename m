@@ -2,102 +2,141 @@ Return-Path: <SRS0=WP4r=WL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CCCC3A589
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 16:34:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D25C3A589
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 17:00:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20EA920578
-	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 16:34:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04302206C1
+	for <linux-block@archiver.kernel.org>; Thu, 15 Aug 2019 17:00:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k3H9xxK5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZQ/7Hu4/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731969AbfHOQe6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 12:34:58 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:46114 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730156AbfHOQe6 (ORCPT
+        id S1730298AbfHORAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 13:00:20 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:37944 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729084AbfHORAU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 12:34:58 -0400
-Received: by mail-wr1-f67.google.com with SMTP id z1so2719328wru.13;
-        Thu, 15 Aug 2019 09:34:56 -0700 (PDT)
+        Thu, 15 Aug 2019 13:00:20 -0400
+Received: by mail-pg1-f195.google.com with SMTP id e11so1548102pga.5;
+        Thu, 15 Aug 2019 10:00:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZEfHwjG9N7iHX8ZUQFtAly9eYKVm35bhOLQ3YSQSUqs=;
-        b=k3H9xxK5XwKo6ni03t5dNepf9zvvZPX0K0P+Rj0+R+d2xgyd8S71Wnw6qmlQtExo6W
-         HoQHlqwRWxLZnjOJX0YsUX2HJpZfpSc9GNFmqhJllOcXBpqzTwdJq+b26z8gLHmgF0Wk
-         BEs2obOnQ0BSlI0S2g83zTzy0nTMAnbML/vCYsLB+J5tvHnxYeti0Y7PBLLltwWVWHhQ
-         vX07Movo4p+zNu0VzFsy5pSqfcLfgjVRsIw6mu+ndADyN5r1Telo1eaG/54SMcbBqN2d
-         7k50g3rwoBcmrfSusd5XFaJ5GLstlfgWfSh6UL+BKeZQP9BThWiFmN0KUEDI1/dPU3YC
-         Y7bQ==
+        h=from:to:cc:subject:date:message-id;
+        bh=ph3z3OX8TOm5fwkAgRwuk2oCHCA8KPoeo401VRgwoe0=;
+        b=ZQ/7Hu4/sNsp8P9rB8y0CcfXjOCycDWN9wMK1l3dxNYCOfXGLJfJoSLk2m5ZxIgDI9
+         6hvcMsvosXJeqRB9oAinRqmjqE3aAXn+tgtapg9cbek2Q7hw5Id0q8X+zopGl6EkEf9X
+         ed0vzgfaWGDtww7QZa8gT6ijqkvs2CZg25ntL8/gJQx7WeW2YyI/ThflGKeFlQEsMbMd
+         b9vVrUUc0qbbld2fTyVB7qG8D+uKTn0lFyuOG0ps4lphlxNA7M3Wxv9DvEm+4wdvsgOF
+         4GfGXlr6+WVKtxmDqLnMRlh/ZC3z9SviTVLtXk9CyPStuMj3EvDGeNGYVruj2yOzXymT
+         canA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZEfHwjG9N7iHX8ZUQFtAly9eYKVm35bhOLQ3YSQSUqs=;
-        b=aXdWiRtikExGYiSuo4L3ngx8qnq55D2BDhQQ8SXZc2JqhFzbjs40JESiJqs60g4Ip/
-         UVETNfs6Jryd4sQ+ZWggc42Dn7p6+n9TZeozwyeC7ZyKllfTQhrbLUY71Ma+4O3O9OQg
-         cv/11C3tTdBKiKsFhtxRqx1RzIOZqt+jbJ4NqZW3dUkluC3uicEcXdHHX4TTp+m2hQt7
-         I4+DHWHJ+7A/ioETEylaX/kaBAMlE7G0F3XyNsP1o+G3PyVKzVQ7Od3P9Cx5toooVIsA
-         FWU3eE3jY9K6fr53uByS1DgCOOwmpKuCgd4sghza4f/ATohPqU6k/u/dYukdhHff4seO
-         NmUQ==
-X-Gm-Message-State: APjAAAWmj7mLncFcde1nRjp30MCT7qqcj5N5WjegT4ryrXW3v1sBsqZo
-        JA/6cm14Ch/cI0C4hu2xZF4YSAEJc9EhkZgdQsA=
-X-Google-Smtp-Source: APXvYqzG5kqXWgwL2+xEhTWxHtT5Xl5CZ06ZoRoALleqe6tLsCTLHX2skX6B6gIWHtosFoKmVW++A78TeZ6XFunWey4=
-X-Received: by 2002:adf:e4c6:: with SMTP id v6mr6043426wrm.315.1565886896202;
- Thu, 15 Aug 2019 09:34:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190814103244.92518-1-maco@android.com> <20190814113348.GA525@ming.t460p>
- <CAB0TPYHdaOTUKf5ix-oU7cXsV12ZW6YDYBsG+VKr6zk=RCW2NA@mail.gmail.com>
- <20190814114646.GA14561@ming.t460p> <CAB0TPYGc8H1pJZrDX1r5wO1gyYV9rzgi3acT9mp-vxxrdA-pyA@mail.gmail.com>
-In-Reply-To: <CAB0TPYGc8H1pJZrDX1r5wO1gyYV9rzgi3acT9mp-vxxrdA-pyA@mail.gmail.com>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Fri, 16 Aug 2019 00:34:44 +0800
-Message-ID: <CACVXFVP0JrpUgterqHs5bvCQn7L9a-XrjDCD3BmQOLe+rgC1KQ@mail.gmail.com>
-Subject: Re: [PATCH] RFC: loop: Avoid calling blk_mq_freeze_queue() when possible.
-To:     Martijn Coenen <maco@android.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>, kernel-team@android.com,
-        Narayan Kamath <narayan@google.com>,
-        Dario Freni <dariofreni@google.com>,
-        Nikita Ioffe <ioffe@google.com>,
-        Jiyong Park <jiyong@google.com>,
-        Martijn Coenen <maco@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=ph3z3OX8TOm5fwkAgRwuk2oCHCA8KPoeo401VRgwoe0=;
+        b=RHR9ByOOqanL0WdtE/gBpK6P754Agl78WrHdGCQYDOviVLCnbcXaqihf0gvi0Dsi6c
+         M8axqII7EptzviAnMmOzKcSmnVHygE+HALp0lNaFAaPecOAEoujoSRiQ3oKJ5WRZuyck
+         yiik0g9JI45QUgG2F1upA+m3jNyqQv8nQB3lnSxIBcQWrJ4uN2ECc7XmJjjrM/t6e771
+         Bkb3abW9GPi5JCd8YNZAHdECuwUHNsUhe55oD6+EG/C/Hxc1vHY8xFVr6Q9wb5gbK6N7
+         2NTt6EPE9rR4/7iSuP/wsZeyCR5ipTy8Y5mEt7xiatkUbyrPx7cWH/c/TLcHsvC+q0wR
+         IUZA==
+X-Gm-Message-State: APjAAAUNjf+kElAl9CZ23yIjOkNQVHEYDn97L8DWHbbFCgJrkJjXsfFP
+        KIBesJPvCHwKJOeIy+C6KUui42ttx1M=
+X-Google-Smtp-Source: APXvYqz/zgCzBeEtq6Iu3Pe068aerxZosiJXoZW7RjfE1TBygzwr+M+jnrQhmwlssyfQxZDRWNxBAQ==
+X-Received: by 2002:a17:90a:2764:: with SMTP id o91mr3128474pje.57.1565888419088;
+        Thu, 15 Aug 2019 10:00:19 -0700 (PDT)
+Received: from mita-MS-7A45.lan ([240f:34:212d:1:12:b19f:559d:7305])
+        by smtp.gmail.com with ESMTPSA id b30sm3943942pfr.117.2019.08.15.10.00.11
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Thu, 15 Aug 2019 10:00:17 -0700 (PDT)
+From:   Akinobu Mita <akinobu.mita@gmail.com>
+To:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+Cc:     Akinobu Mita <akinobu.mita@gmail.com>,
+        Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>,
+        Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+        Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        GOTO Masanori <gotom@debian.or.jp>,
+        YOKOTA Hiroshi <yokota@netlab.is.tsukuba.ac.jp>,
+        Hannes Reinecke <hare@suse.com>
+Subject: [PATCH v4 0/5] introduce LED block device activity trigger
+Date:   Fri, 16 Aug 2019 01:59:54 +0900
+Message-Id: <1565888399-21550-1-git-send-email-akinobu.mita@gmail.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 15, 2019 at 11:38 PM Martijn Coenen <maco@android.com> wrote:
->
-> On Wed, Aug 14, 2019 at 12:47 PM Ming Lei <ming.lei@redhat.com> wrote:
-> > blk_queue_init_done() is only called in blk_queue_init_done() for
-> > this purpose, so this approach should be fine, IMO.
->
-> I was thinking somebody might add more stuff to "init" in the future,
-> and then that new stuff would now no longer be executed for the loop
-> driver. The name "init" is pretty generic...but if that's not a
-> concern I'm happy with your proposal as well. There's one more
-> "freeze" I'd like to get rid of - we also call LOOP_SET_STATUS(64),
-> and there's a freeze in there because lo->transfer is modified. That
-> makes sense, but I was hoping we can make that freeze conditional on
-> whether lo->transfer would actually change value; if it stays the
-> same, I think freezing is not necessary.
+This work is inspired by the report on linux-nvme mailing list.
 
-The queue freeze in SET_STATUS may not be avoided, not only
-.transfer, there are also .lo_offset, .size, filename, dio and others.
+disk-activity trigger not working for nvme disk:
+http://lists.infradead.org/pipermail/linux-nvme/2019-July/025253.html
 
-If nothing will change, why does the userspace bother to send
-SET_STATUS?
+This LED block device activity trigger works with any block devices.
 
+* v4
+- Squash patch 'add interface to stop and restart polling disk stats' into
+  the ledtrig-blk introduction patch
+- Rename 'led' to 'led_trig' in struct ledtrig_blk
 
-Thanks,
-Ming Lei
+* v3
+- Avoid the name collision with LED_OFF and LED_ON
+- Add ABI documentation
+- Add more detail to Kconfig help text
+
+* v2
+- Remove "move declaration of led_stop_software_blink() to linux/leds.h" patch
+- Move the trigger implementation to drivers/leds/trigger
+- s/blk_ledtrig/ledtrig_blk/
+- Add CONFIG_LEDS_TRIGGER_BLOCK
+- Fix wrong bitops usages
+- Add interface to stop and restart polling disk stats
+- Stop polling disk stats for scsi disk during runtime suspend
+
+Akinobu Mita (5):
+  block: umem: rename LED_* macros to MEMCTRL_LED_*
+  scsi: mvsas: rename LED_* enums to SGPIO_LED_*
+  scsi: nsp32: rename LED_* macros to EXT_PORT_LED_*
+  block: introduce LED block device activity trigger
+  scsi: sd: stop polling disk stats by ledtrig-blk during runtime
+    suspend
+
+ .../ABI/testing/sysfs-class-led-trigger-blk        |  37 +++
+ block/genhd.c                                      |   2 +
+ drivers/block/umem.c                               |  20 +-
+ drivers/block/umem.h                               |  20 +-
+ drivers/leds/trigger/Kconfig                       |   9 +
+ drivers/leds/trigger/Makefile                      |   1 +
+ drivers/leds/trigger/ledtrig-blk.c                 | 259 +++++++++++++++++++++
+ drivers/scsi/mvsas/mv_94xx.c                       |   2 +-
+ drivers/scsi/mvsas/mv_94xx.h                       |  24 +-
+ drivers/scsi/nsp32.c                               |   7 +-
+ drivers/scsi/nsp32.h                               |   4 +-
+ drivers/scsi/sd.c                                  |  40 ++--
+ include/linux/genhd.h                              |   3 +
+ include/linux/leds.h                               |  38 +++
+ 14 files changed, 411 insertions(+), 55 deletions(-)
+ create mode 100644 Documentation/ABI/testing/sysfs-class-led-trigger-blk
+ create mode 100644 drivers/leds/trigger/ledtrig-blk.c
+
+Cc: Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>
+Cc: Jacek Anaszewski <jacek.anaszewski@gmail.com>
+Cc: Pavel Machek <pavel@ucw.cz>
+Cc: Dan Murphy <dmurphy@ti.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: GOTO Masanori <gotom@debian.or.jp>
+Cc: YOKOTA Hiroshi <yokota@netlab.is.tsukuba.ac.jp>
+Cc: Hannes Reinecke <hare@suse.com>
+-- 
+2.7.4
+
