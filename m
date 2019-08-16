@@ -2,118 +2,126 @@ Return-Path: <SRS0=fyvH=WM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C27C41514
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 18:44:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AF4C41514
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 19:48:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C3B42086C
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 18:44:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8101D2173E
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 19:48:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727516AbfHPSop (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Aug 2019 14:44:45 -0400
-Received: from smtp.infotech.no ([82.134.31.41]:58942 "EHLO smtp.infotech.no"
+        id S1727611AbfHPTsX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Aug 2019 15:48:23 -0400
+Received: from sauhun.de ([88.99.104.3]:48312 "EHLO pokefinder.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727067AbfHPSop (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Aug 2019 14:44:45 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id 53F012042A1;
-        Fri, 16 Aug 2019 20:44:42 +0200 (CEST)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id uI+AIVgJXuGD; Fri, 16 Aug 2019 20:44:40 +0200 (CEST)
-Received: from [192.168.48.23] (host-23-251-188-50.dyn.295.ca [23.251.188.50])
-        by smtp.infotech.no (Postfix) with ESMTPA id EFDD020414F;
-        Fri, 16 Aug 2019 20:44:38 +0200 (CEST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH v3 00/20] sg: add v4 interface
-To:     Bart Van Assche <bvanassche@acm.org>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org
-Cc:     martin.petersen@oracle.com, hare@suse.de,
-        Arnd Bergmann <arnd@arndb.de>,
-        Tony Battersby <tonyb@cybernetics.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Christian Franke <Christian.Franke@t-online.de>
-References: <20190807114252.2565-1-dgilbert@interlog.com>
- <1565291455.3435.48.camel@linux.vnet.ibm.com>
- <7edab448-22cc-493a-f745-acc5be38f6a5@interlog.com>
- <1565305243.25619.27.camel@linux.vnet.ibm.com>
- <51e7cdfb-7921-9368-9b78-90ba5ac50c77@interlog.com>
- <6606add1-7ae7-5d8d-e660-d267164981d9@acm.org>
- <d0c60641-0607-a9c4-e79d-b6e850ef8682@interlog.com>
- <e25e6a74-4d54-3d91-d48d-ba9c91b2a874@acm.org>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <fcc2cbb3-92f2-ad37-fffe-ff2c77f8b2e1@interlog.com>
-Date:   Fri, 16 Aug 2019 14:44:39 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726527AbfHPTsX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Aug 2019 15:48:23 -0400
+Received: from localhost (p54B33308.dip0.t-ipconnect.de [84.179.51.8])
+        by pokefinder.org (Postfix) with ESMTPSA id 1A8D44A14FE;
+        Fri, 16 Aug 2019 21:48:21 +0200 (CEST)
+Date:   Fri, 16 Aug 2019 21:48:20 +0200
+From:   Wolfram Sang <wsa@the-dreams.de>
+To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc:     ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
+        robin.murphy@arm.com, joro@8bytes.org, axboe@kernel.dk,
+        wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH v9 2/5] iommu/dma: Add a new dma_map_ops of
+ get_merge_boundary()
+Message-ID: <20190816194820.GB6886@kunai>
+References: <1564129876-28261-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+ <1564129876-28261-3-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 MIME-Version: 1.0
-In-Reply-To: <e25e6a74-4d54-3d91-d48d-ba9c91b2a874@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="H+4ONPRPur6+Ovig"
+Content-Disposition: inline
+In-Reply-To: <1564129876-28261-3-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019-08-16 2:10 p.m., Bart Van Assche wrote:
-> On 8/16/19 8:59 AM, Douglas Gilbert wrote:
->> On 2019-08-15 1:30 p.m., Bart Van Assche wrote:
->>> HSMR disks. What we need is the ability to discover, read, write and 
->>> configure such disks, support for the non-standard HSMR flex protocol, the 
->>> ability to give certain users or groups access to a subset of the LBAs and 
->>> also the ability to make that information persistent. I think that such 
->>> functionality could be implemented by extending LVM and by adding support for 
->>> all ZBC commands we need in the block layer, device mapper layer and also in 
->>> the asynchronous I/O layer. The block, dm and aio layers already support 
->>> submitting commands asynchronously but do not yet support all the ZBC 
->>> commands that we use.
->>
->> I believe that you will find that the more layers of abstraction that are
->> placed between the actual device and the OS level API, the more difficult
->> the discovery process will be. And in some cases you will need to get to
->> a management layer to let those management functions "pass-through" those
->> layers. Some RAID card drivers take advantage of the no_uld_attach flag in
->> scsi_device to expose real devices, but only to the sg/bsg interface for
->> management purposes (for utilities like smartmontools) and do not produce
->> sd device nodes.
-> 
-> Isn't the very purpose of an operating system to provide device drivers and 
-> other abstraction layers such that not every application has to implement these?
-> 
-> My opinion is that using SG/IO to control SMR disks is suboptimal. A very 
-> powerful feature of the Linux block layer is the ability to stack block drivers. 
-> SG/IO is fundamentally incompatible with stacking block drivers. Stacking 
-> requires having access to the LBA, request size and other block layer request 
-> attributes. I don't think that we want to add code for parsing SCSI, NVMe 
-> pass-through commands etc. in block drivers as the device mapper.
-> 
-> Hence my proposal to improve support in the block layer for ZBC instead of using 
-> SG/IO to control SMR disks.
 
-Please go right ahead. I just don't see why it should be at the expense
-of this patchset or the sg pass-through in general.
+--H+4ONPRPur6+Ovig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Wearing another hat as the smartmontools SCSI maintainer, I know of no
-supported OS or RAID product that has the infrastructure you talk about
-for SMART information. The industry assumption seems to be that the
-information will be pulled out at the real device level by a command set
-pass-through. And RAID products present an issue if they don't support
-a "no_uld_attach" type mechanism. The issue is that they then need to
-offer a proprietary pass-through mechanism *** to bypass the virtual
-device presented to the OS in order to get to the individual _real_
-storage devices holding the SMART information. Sub-optimal maybe, but
-still effective.
+On Fri, Jul 26, 2019 at 05:31:13PM +0900, Yoshihiro Shimoda wrote:
+> This patch adds a new dma_map_ops of get_merge_boundary() to
+> expose the DMA merge boundary if the domain type is IOMMU_DOMAIN_DMA.
+>=20
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
 
-Doug Gilbert
+Joerg, can we have your ack for this patch so Christoph can take this
+series via his tree?
 
+Thanks,
 
-*** and to their credit (IMO) several RAID "big boys" have sent the
-     smartmontools project working code to navigate their proprietary
-     pass-through mechanisms. Better that than us needing to beg for it.
+   Wolfram
+
+> ---
+>  drivers/iommu/dma-iommu.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>=20
+> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+> index a7f9c3e..2992ce4 100644
+> --- a/drivers/iommu/dma-iommu.c
+> +++ b/drivers/iommu/dma-iommu.c
+> @@ -1085,6 +1085,16 @@ static int iommu_dma_get_sgtable(struct device *de=
+v, struct sg_table *sgt,
+>  	return ret;
+>  }
+> =20
+> +static unsigned long iommu_dma_get_merge_boundary(struct device *dev)
+> +{
+> +	struct iommu_domain *domain =3D iommu_get_dma_domain(dev);
+> +
+> +	if (domain->type !=3D IOMMU_DOMAIN_DMA)
+> +		return 0;	/* can't merge */
+> +
+> +	return (1UL << __ffs(domain->pgsize_bitmap)) - 1;
+> +}
+> +
+>  static const struct dma_map_ops iommu_dma_ops =3D {
+>  	.alloc			=3D iommu_dma_alloc,
+>  	.free			=3D iommu_dma_free,
+> @@ -1100,6 +1110,7 @@ static const struct dma_map_ops iommu_dma_ops =3D {
+>  	.sync_sg_for_device	=3D iommu_dma_sync_sg_for_device,
+>  	.map_resource		=3D iommu_dma_map_resource,
+>  	.unmap_resource		=3D iommu_dma_unmap_resource,
+> +	.get_merge_boundary	=3D iommu_dma_get_merge_boundary,
+>  };
+> =20
+>  /*
+> --=20
+> 2.7.4
+>=20
+
+--H+4ONPRPur6+Ovig
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAl1XCIQACgkQFA3kzBSg
+KbZ8OBAApd6wfSbUGk8bR2bHXmdMHPFIldoc2rP9hr9PM+q3qiQINrZttJrWtrDG
+LFHddbWI0gio2yyl/e+9g5QRBF4rRzcLDhJxRSqn8KfAvxu4jU19HAN2rjboS7zl
+R0MNVdj+uBCaxvDVXKfuRa+HUUGKtJCTB0Pp79iMJcVL/fq3emVy9cJIwp/K5Z5W
+srwNpawQ2wPlC7IY293k+SJL9VCgGG3zMgsyQnQ5ZFZeybkBwsbltc9bw53HwA5G
+MgHUt37Csrg+6V+5RlJx4LSY3J03x6N0h+CqSSohD24vNq3TRjoQQT6/yX+BgkDU
+BtsT1CB/Ff1ehHSy4yHJc0+AGuLMx8dDhv2QKI+ZNWIbRkVcT5LYoygsdTAZ5w3n
+uf59EWdIV2MvpK80WimH25kXMtlTWMmHbWmm3hjpmLFAypp3ZIFn4olIQ7l1Gi2k
+jg8dAH4uA4Mu70cWApfnk/ujiSaBtvIfuTFqKcWRmML/liD8Wm+JhDoZzxw0dax5
+RPu8KBIR0W/2DLZ8bKKaDzP3I5rzcBEbyrdVosgADXwPiX2ILq1et21iSz7+Z7G6
+bidUnMWjOwlP1hhMOiZnzj2uZd9uhwpg87Iz7nY8PMrpJQbSQiJctt2FVfV+/xwq
+DPFYl62HmlAiU8J9dEoRIHeo49sW5PO4uTBlMT+F2uLqfugrQns=
+=70Bs
+-----END PGP SIGNATURE-----
+
+--H+4ONPRPur6+Ovig--
