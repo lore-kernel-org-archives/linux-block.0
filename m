@@ -2,93 +2,76 @@ Return-Path: <SRS0=fyvH=WM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CEF5C3A59C
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 17:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB7A2C3A59C
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 17:24:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 18AA02171F
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 17:19:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565975969;
-	bh=d3vXNMjJuc+AuuMg2NCJKt1v5kziFN/XifDdhLiK8eI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=eQ8V06+hCUrP/HLX/FJKni5RnvTfRSPAqbtd+E1K+olwJtMwIPdw4J6XoaXxGF/Xz
-	 luFJxeAVLYdigFEz5uRicMJMv5E2L2u6fhTXV5i6pFp/oFZ7JmFs3uZ4kcVEbmG0Qh
-	 7jLGRZywMNdBqncGGKmuGfqkjneD7xfW9MeWR98w=
+	by mail.kernel.org (Postfix) with ESMTP id 9F6B72086C
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 17:24:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727034AbfHPRT2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Aug 2019 13:19:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48960 "EHLO mail.kernel.org"
+        id S1727044AbfHPRYK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Aug 2019 13:24:10 -0400
+Received: from mga01.intel.com ([192.55.52.88]:15218 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726943AbfHPRT2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Aug 2019 13:19:28 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AD6D720665;
-        Fri, 16 Aug 2019 17:19:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565975967;
-        bh=d3vXNMjJuc+AuuMg2NCJKt1v5kziFN/XifDdhLiK8eI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ccyDKIcOWfjWHcQBSGv62ZwodpkYh4GWBDztoOmyVkELSLia758t56f9/kKEPkN7Y
-         4piks8OG3LmjFyTBU3fLzKzpQTZhXleZdJe2r+jaKUADpo90nkNjWE3xMC5eFCdDYK
-         DD5L9r6EzdvhUABrgL9TQmOSwwOaX6ssfiq4Rhn0=
-Date:   Fri, 16 Aug 2019 19:19:24 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Douglas Gilbert <dgilbert@interlog.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, martin.petersen@oracle.com,
-        hare@suse.de, Arnd Bergmann <arnd@arndb.de>,
-        Tony Battersby <tonyb@cybernetics.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v3 00/20] sg: add v4 interface
-Message-ID: <20190816171924.GB20411@kroah.com>
-References: <20190807114252.2565-1-dgilbert@interlog.com>
- <1565291455.3435.48.camel@linux.vnet.ibm.com>
- <7edab448-22cc-493a-f745-acc5be38f6a5@interlog.com>
- <1565305243.25619.27.camel@linux.vnet.ibm.com>
- <51e7cdfb-7921-9368-9b78-90ba5ac50c77@interlog.com>
- <6606add1-7ae7-5d8d-e660-d267164981d9@acm.org>
- <d0c60641-0607-a9c4-e79d-b6e850ef8682@interlog.com>
+        id S1726822AbfHPRYK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Aug 2019 13:24:10 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Aug 2019 10:24:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,394,1559545200"; 
+   d="scan'208";a="168107160"
+Received: from tassilo.jf.intel.com (HELO tassilo.localdomain) ([10.7.201.137])
+  by orsmga007.jf.intel.com with ESMTP; 16 Aug 2019 10:24:09 -0700
+Received: by tassilo.localdomain (Postfix, from userid 1000)
+        id 839F43019B6; Fri, 16 Aug 2019 10:24:09 -0700 (PDT)
+Date:   Fri, 16 Aug 2019 10:24:09 -0700
+From:   Andi Kleen <ak@linux.intel.com>
+To:     Theodore Ts'o <tytso@mit.edu>
+Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [REGRESSION] commit c2b3c170db610 causes blktests block/002
+ failure
+Message-ID: <20190816172409.GA3216@tassilo.jf.intel.com>
+References: <20190609181423.GA24173@mit.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d0c60641-0607-a9c4-e79d-b6e850ef8682@interlog.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20190609181423.GA24173@mit.edu>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 16, 2019 at 11:59:04AM -0400, Douglas Gilbert wrote:
-> On 2019-08-15 1:30 p.m., Bart Van Assche wrote:
-> > On 8/13/19 9:19 PM, Douglas Gilbert wrote:
-> > > Bart Van Assche hinted at a better API design but didn't present
-> > > it. If he did, that would be the first time an alternate API
-> > > design was presented for async usage in the 20 years that I have
-> > > been associated with the driver.
-> > 
-> > I would like to start from the use cases instead of the implementation
-> > of a new SG/IO interface. My employer uses the SG/IO interface for
-> > controlling SMR and
+> The git bisect log (see attached) pointed at this commit:
+
+bisect must be wrong. The commit only changes the perf tool, so cannot
+break anything in the kernel.
+
+-Andi
+
 > 
-> There is no "new" SG/IO interface. Linux has broken the ability of char
-> drivers to safely use the read() and write() system calls. This
-> adversely impacts the bsg and sg drivers. In response the following
-> replacement mappings have been suggested in my first sg patchset:
-
-I don't understand what you mean by "broken the ability of char drivers
-to use the read() and write() system calls."
-
-What changed, when did it change, what broke, and why can't we "fix" it
-if it really is broken?
-
-thanks,
-
-greg k-h
+> commit c2b3c170db610896e4e633cba2135045333811c2 (HEAD, refs/bisect/bad)
+> Author: Andi Kleen <ak@linux.intel.com>
+> Date:   Tue Mar 26 15:18:20 2019 -0700
+> 
+>     perf stat: Revert checks for duration_time
+>     
+>     This reverts e864c5ca145e ("perf stat: Hide internal duration_time
+>     counter") but doing it manually since the code has now moved to a
+>     different file.
+>     
+>     The next patch will properly implement duration_time as a full event, so
+>     no need to hide it anymore.
+>     
+>     Signed-off-by: Andi Kleen <ak@linux.intel.com>
+>     Acked-by: Jiri Olsa <jolsa@kernel.org>
+>     Link: http://lkml.kernel.org/r/20190326221823.11518-2-andi@firstfloor.org
+>     Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+> 
+> Is this a known issue?
