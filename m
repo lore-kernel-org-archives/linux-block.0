@@ -3,100 +3,160 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D12DEC3A59C
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 15:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF12C3A59C
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 15:45:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2DA82086C
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 15:45:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D9ED206C2
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 15:45:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727356AbfHPPpb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Aug 2019 11:45:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53314 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727345AbfHPPpb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Aug 2019 11:45:31 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E60F4302C087;
-        Fri, 16 Aug 2019 15:45:30 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 38C675C1D6;
-        Fri, 16 Aug 2019 15:45:22 +0000 (UTC)
-Date:   Fri, 16 Aug 2019 23:45:15 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Mike Snitzer <snitzer@redhat.com>
-Subject: Re: [PATCH] block: don't acquire .sysfs_lock before removing mq &
- iosched kobjects
-Message-ID: <20190816154513.GA29878@ming.t460p>
-References: <20190816135506.29253-1-ming.lei@redhat.com>
- <14a9ae85-0d65-483d-30f7-d692c4058e46@acm.org>
+        id S1727364AbfHPPpm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Aug 2019 11:45:42 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60788 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727345AbfHPPpm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Aug 2019 11:45:42 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id E8AACAE1C;
+        Fri, 16 Aug 2019 15:45:37 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 3EB341E4009; Fri, 16 Aug 2019 17:45:37 +0200 (CEST)
+Date:   Fri, 16 Aug 2019 17:45:37 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, jack@suse.cz, hannes@cmpxchg.org,
+        mhocko@kernel.org, vdavydov.dev@gmail.com, cgroups@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com, guro@fb.com,
+        akpm@linux-foundation.org
+Subject: Re: [PATCH 3/5] writeback: Separate out wb_get_lookup() from
+ wb_get_create()
+Message-ID: <20190816154537.GG3041@quack2.suse.cz>
+References: <20190815195619.GA2263813@devbig004.ftw2.facebook.com>
+ <20190815195823.GD2263813@devbig004.ftw2.facebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <14a9ae85-0d65-483d-30f7-d692c4058e46@acm.org>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Fri, 16 Aug 2019 15:45:31 +0000 (UTC)
+In-Reply-To: <20190815195823.GD2263813@devbig004.ftw2.facebook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 16, 2019 at 08:31:06AM -0700, Bart Van Assche wrote:
-> On 8/16/19 6:55 AM, Ming Lei wrote:
-> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> > index 977c659dcd18..46f033b48917 100644
-> > --- a/block/blk-sysfs.c
-> > +++ b/block/blk-sysfs.c
-> > @@ -1021,6 +1021,7 @@ EXPORT_SYMBOL_GPL(blk_register_queue);
-> >   void blk_unregister_queue(struct gendisk *disk)
-> >   {
-> >   	struct request_queue *q = disk->queue;
-> > +	bool has_elevator;
-> >   	if (WARN_ON(!q))
-> >   		return;
-> > @@ -1035,8 +1036,9 @@ void blk_unregister_queue(struct gendisk *disk)
-> >   	 * concurrent elv_iosched_store() calls.
-> >   	 */
-> >   	mutex_lock(&q->sysfs_lock);
-> > -
-> >   	blk_queue_flag_clear(QUEUE_FLAG_REGISTERED, q);
-> > +	has_elevator = q->elevator;
-> > +	mutex_unlock(&q->sysfs_lock);
+On Thu 15-08-19 12:58:23, Tejun Heo wrote:
+> Separate out wb_get_lookup() which doesn't try to create one if there
+> isn't already one from wb_get_create().  This will be used by later
+> patches.
 > 
-> blk_queue_flag_clear() modifies queue flags atomically so no need to hold
-> sysfs_lock around calls of that function.
+> Signed-off-by: Tejun Heo <tj@kernel.org>
 
-If you take a look at the above comment, you will see why the sysfs lock
-is needed.
+Looks good to me. You can add:
 
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  include/linux/backing-dev.h |    2 +
+>  mm/backing-dev.c            |   55 +++++++++++++++++++++++++++++---------------
+>  2 files changed, 39 insertions(+), 18 deletions(-)
 > 
-> > @@ -1044,16 +1046,13 @@ void blk_unregister_queue(struct gendisk *disk)
-> >   	 */
-> >   	if (queue_is_mq(q))
-> >   		blk_mq_unregister_dev(disk_to_dev(disk), q);
-> > -	mutex_unlock(&q->sysfs_lock);
-> >   	kobject_uevent(&q->kobj, KOBJ_REMOVE);
-> >   	kobject_del(&q->kobj);
-> >   	blk_trace_remove_sysfs(disk_to_dev(disk));
-> > -	mutex_lock(&q->sysfs_lock);
-> > -	if (q->elevator)
-> > +	if (has_elevator)
-> >   		elv_unregister_queue(q);
-> > -	mutex_unlock(&q->sysfs_lock);
-> 
-> Have you considered to move the q->elevator check into
-> elv_unregister_queue() such that no new 'has_elevator' variable has to be
-> introduced in this function?
-
-No, I'd keep to read 'q->elevator' with .sysfs_lock.
-
-Thanks,
-Ming
+> --- a/include/linux/backing-dev.h
+> +++ b/include/linux/backing-dev.h
+> @@ -230,6 +230,8 @@ static inline int bdi_sched_wait(void *w
+>  struct bdi_writeback_congested *
+>  wb_congested_get_create(struct backing_dev_info *bdi, int blkcg_id, gfp_t gfp);
+>  void wb_congested_put(struct bdi_writeback_congested *congested);
+> +struct bdi_writeback *wb_get_lookup(struct backing_dev_info *bdi,
+> +				    struct cgroup_subsys_state *memcg_css);
+>  struct bdi_writeback *wb_get_create(struct backing_dev_info *bdi,
+>  				    struct cgroup_subsys_state *memcg_css,
+>  				    gfp_t gfp);
+> --- a/mm/backing-dev.c
+> +++ b/mm/backing-dev.c
+> @@ -618,13 +618,12 @@ out_put:
+>  }
+>  
+>  /**
+> - * wb_get_create - get wb for a given memcg, create if necessary
+> + * wb_get_lookup - get wb for a given memcg
+>   * @bdi: target bdi
+>   * @memcg_css: cgroup_subsys_state of the target memcg (must have positive ref)
+> - * @gfp: allocation mask to use
+>   *
+> - * Try to get the wb for @memcg_css on @bdi.  If it doesn't exist, try to
+> - * create one.  The returned wb has its refcount incremented.
+> + * Try to get the wb for @memcg_css on @bdi.  The returned wb has its
+> + * refcount incremented.
+>   *
+>   * This function uses css_get() on @memcg_css and thus expects its refcnt
+>   * to be positive on invocation.  IOW, rcu_read_lock() protection on
+> @@ -641,6 +640,39 @@ out_put:
+>   * each lookup.  On mismatch, the existing wb is discarded and a new one is
+>   * created.
+>   */
+> +struct bdi_writeback *wb_get_lookup(struct backing_dev_info *bdi,
+> +				    struct cgroup_subsys_state *memcg_css)
+> +{
+> +	struct bdi_writeback *wb;
+> +
+> +	if (!memcg_css->parent)
+> +		return &bdi->wb;
+> +
+> +	rcu_read_lock();
+> +	wb = radix_tree_lookup(&bdi->cgwb_tree, memcg_css->id);
+> +	if (wb) {
+> +		struct cgroup_subsys_state *blkcg_css;
+> +
+> +		/* see whether the blkcg association has changed */
+> +		blkcg_css = cgroup_get_e_css(memcg_css->cgroup, &io_cgrp_subsys);
+> +		if (unlikely(wb->blkcg_css != blkcg_css || !wb_tryget(wb)))
+> +			wb = NULL;
+> +		css_put(blkcg_css);
+> +	}
+> +	rcu_read_unlock();
+> +
+> +	return wb;
+> +}
+> +
+> +/**
+> + * wb_get_create - get wb for a given memcg, create if necessary
+> + * @bdi: target bdi
+> + * @memcg_css: cgroup_subsys_state of the target memcg (must have positive ref)
+> + * @gfp: allocation mask to use
+> + *
+> + * Try to get the wb for @memcg_css on @bdi.  If it doesn't exist, try to
+> + * create one.  See wb_get_lookup() for more details.
+> + */
+>  struct bdi_writeback *wb_get_create(struct backing_dev_info *bdi,
+>  				    struct cgroup_subsys_state *memcg_css,
+>  				    gfp_t gfp)
+> @@ -653,20 +685,7 @@ struct bdi_writeback *wb_get_create(stru
+>  		return &bdi->wb;
+>  
+>  	do {
+> -		rcu_read_lock();
+> -		wb = radix_tree_lookup(&bdi->cgwb_tree, memcg_css->id);
+> -		if (wb) {
+> -			struct cgroup_subsys_state *blkcg_css;
+> -
+> -			/* see whether the blkcg association has changed */
+> -			blkcg_css = cgroup_get_e_css(memcg_css->cgroup,
+> -						     &io_cgrp_subsys);
+> -			if (unlikely(wb->blkcg_css != blkcg_css ||
+> -				     !wb_tryget(wb)))
+> -				wb = NULL;
+> -			css_put(blkcg_css);
+> -		}
+> -		rcu_read_unlock();
+> +		wb = wb_get_lookup(bdi, memcg_css);
+>  	} while (!wb && !cgwb_create(bdi, memcg_css, gfp));
+>  
+>  	return wb;
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
