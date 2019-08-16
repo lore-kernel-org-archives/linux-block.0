@@ -2,111 +2,195 @@ Return-Path: <SRS0=fyvH=WM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E178C3A59E
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 18:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B3F1C3A59D
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 18:17:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52D11206C1
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 18:10:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1578B206C1
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 18:17:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sQmKl6pF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727525AbfHPSKj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Aug 2019 14:10:39 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:42738 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727451AbfHPSKj (ORCPT
+        id S1727381AbfHPSRX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Aug 2019 14:17:23 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36503 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727200AbfHPSRX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Aug 2019 14:10:39 -0400
-Received: by mail-pg1-f195.google.com with SMTP id p3so3311154pgb.9;
-        Fri, 16 Aug 2019 11:10:38 -0700 (PDT)
+        Fri, 16 Aug 2019 14:17:23 -0400
+Received: by mail-wr1-f68.google.com with SMTP id r3so2392571wrt.3
+        for <linux-block@vger.kernel.org>; Fri, 16 Aug 2019 11:17:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=lxbKfa4ISoztLIjMd6DEgXa2A9ZSrMBVFcHAhR0c5ZY=;
+        b=sQmKl6pFL/HMyjrb2LNeSTmjOtmdsAAVlPSq2ZJkeylDKNcMTzCVWJug5tEyHTqBHJ
+         CRFAIo75L3ckfk0j+VyCc80njYk4+jFMVfAdJgGdoJujBvk3RoVwO2Pajwrafppa5eiB
+         /4plsxkyF9sZx+BeiOalnJ79Hsk//lk39PjotJl7Jw/296ZXWykYN+AlfnjYLOX6RsEv
+         XQJX/7f5ibKtOZ1nVlWSMbBAogUhXeRr4c4L+hUsFAuKfAMQ1YFqogalH4a/lV+Vt5B/
+         qtNc1kibWxcr8x/4INb9Kn9dsxiaxlq5YQbZcUBvLM6mH5329ny0HFzmSIloXjPr4PdQ
+         +hPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=g3Rtqd5AFTZf6nYXP6J7lz92csL9uIjbEcEcwtwYRRw=;
-        b=Jq4VaaH4kjvkY+bBzy6ZR/qjaNtLa60CNfuddJ7dFI32pOT9VqSciVfTKLiPoprFlE
-         c77tQX3tW/hyN53z7TYnONFVShHUViMEuAp+KcDGFgfer5j2GFOjauuSKiaz3um9w/BL
-         8welwAb4+hucBIja7WyOmUWVz9lG6j2XqDbfH9/RNbHd+VzFWW4CyKuATTQuONJHJRqT
-         2dgOegzS97pA8dlJD8ZqmFtSXTfsJVtcmziGS6KdQI0eJVRh6s0xFIcyUMnAGf7zZL5H
-         KqRLBkzW64Eb/akbut6L1Gl3VUWGdbSxy11HRyyZ7Qc/ab0sekcl7VYjeZCdeW7cM/oB
-         tGTg==
-X-Gm-Message-State: APjAAAX/PGD7aDJ8hNOWhxTn8+VAN/QCH4smYgw1HDvrg+zXSlNVthe1
-        +WZBb/2By0wLUWxQNoVRB1U=
-X-Google-Smtp-Source: APXvYqwefgCTm02Zk4vb33Cg30dAXglQjkJZ1DqupmIjiFqWo/tqNkyv6kdrlQM/1wCeaX8SRLSVrA==
-X-Received: by 2002:a17:90a:ca0f:: with SMTP id x15mr8251943pjt.82.1565979038433;
-        Fri, 16 Aug 2019 11:10:38 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id u3sm4159655pjn.5.2019.08.16.11.10.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Aug 2019 11:10:37 -0700 (PDT)
-Subject: Re: [PATCH v3 00/20] sg: add v4 interface
-To:     dgilbert@interlog.com, James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org
-Cc:     martin.petersen@oracle.com, hare@suse.de,
-        Arnd Bergmann <arnd@arndb.de>,
-        Tony Battersby <tonyb@cybernetics.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20190807114252.2565-1-dgilbert@interlog.com>
- <1565291455.3435.48.camel@linux.vnet.ibm.com>
- <7edab448-22cc-493a-f745-acc5be38f6a5@interlog.com>
- <1565305243.25619.27.camel@linux.vnet.ibm.com>
- <51e7cdfb-7921-9368-9b78-90ba5ac50c77@interlog.com>
- <6606add1-7ae7-5d8d-e660-d267164981d9@acm.org>
- <d0c60641-0607-a9c4-e79d-b6e850ef8682@interlog.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <e25e6a74-4d54-3d91-d48d-ba9c91b2a874@acm.org>
-Date:   Fri, 16 Aug 2019 11:10:36 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <d0c60641-0607-a9c4-e79d-b6e850ef8682@interlog.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=lxbKfa4ISoztLIjMd6DEgXa2A9ZSrMBVFcHAhR0c5ZY=;
+        b=UYZvwXfqrWtMrDvigNTvOzP/6tA+TmXUskAAEfc4+oIYDb+WFDc50hsj24Nks4L6Eu
+         vzam3904cQ4Ioiq7k56pI2y6Fw/eTza+pXJuukEmXgpsH1ttDHHQKHFAzTdsZCQQtTAy
+         ctpvoZGZtkkVqm08bmIkm6UEvSRVvI/f9Kkn4+8zdK4WZymH5FWiv19/s2NYie7DMtHx
+         Pbhk596l4hxLwZHupKgsx15Vc3QnvEw37ZSsOlkr4DFrEuMdP9y7oVMsdGcFwoMHSXh6
+         lw+XNkrW9YG/SLlcHS+7DpXAX362r99MfWUz5xNxW+Sb0z9yTK9G8UDZFEa3XX1GcjyJ
+         A3Qw==
+X-Gm-Message-State: APjAAAW+T8Z7Ztg+DSAmN6xmxg40gYUyXgBWH0wE+XAKRF+7rFcbA8q+
+        HWSdsaVFIyQ9wfsxyU9XhyQaejufXo8=
+X-Google-Smtp-Source: APXvYqzNL6M1ZKlYd1S2iAgw1E9UAQOWBgYwSckUmDm3//IQfQwuKYnQpHaY92B+TYzMI26Vb2E5jg==
+X-Received: by 2002:adf:fc81:: with SMTP id g1mr12322678wrr.78.1565979440870;
+        Fri, 16 Aug 2019 11:17:20 -0700 (PDT)
+Received: from [192.168.0.101] (88-147-32-115.dyn.eolo.it. [88.147.32.115])
+        by smtp.gmail.com with ESMTPSA id m23sm9354049wml.41.2019.08.16.11.17.19
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 16 Aug 2019 11:17:20 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: io.latency controller apparently not working
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20190816175931.cxpdko44cuyq7trj@MacBook-Pro-91.local>
+Date:   Fri, 16 Aug 2019 20:17:19 +0200
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        noreply-spamdigest via bfq-iosched 
+        <bfq-iosched@googlegroups.com>, Tejun Heo <tj@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <88488E82-E360-45B0-B010-209190D32892@linaro.org>
+References: <22878C62-54B8-41BA-B90C-1C5414F3060F@linaro.org>
+ <20190816132124.ggedqxrhi5povqlo@macbook-pro-91.dhcp.thefacebook.com>
+ <1842D618-3E31-47FE-8B9C-F26BF1F5349C@linaro.org>
+ <20190816175931.cxpdko44cuyq7trj@MacBook-Pro-91.local>
+To:     Josef Bacik <josef@toxicpanda.com>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/16/19 8:59 AM, Douglas Gilbert wrote:
-> On 2019-08-15 1:30 p.m., Bart Van Assche wrote:
->> HSMR disks. What we need is the ability to discover, read, write and 
->> configure such disks, support for the non-standard HSMR flex protocol, 
->> the ability to give certain users or groups access to a subset of the 
->> LBAs and also the ability to make that information persistent. I think 
->> that such functionality could be implemented by extending LVM and by 
->> adding support for all ZBC commands we need in the block layer, device 
->> mapper layer and also in the asynchronous I/O layer. The block, dm and 
->> aio layers already support submitting commands asynchronously but do 
->> not yet support all the ZBC commands that we use.
-> 
-> I believe that you will find that the more layers of abstraction that are
-> placed between the actual device and the OS level API, the more difficult
-> the discovery process will be. And in some cases you will need to get to
-> a management layer to let those management functions "pass-through" those
-> layers. Some RAID card drivers take advantage of the no_uld_attach flag in
-> scsi_device to expose real devices, but only to the sg/bsg interface for
-> management purposes (for utilities like smartmontools) and do not produce
-> sd device nodes.
 
-Isn't the very purpose of an operating system to provide device drivers 
-and other abstraction layers such that not every application has to 
-implement these?
 
-My opinion is that using SG/IO to control SMR disks is suboptimal. A 
-very powerful feature of the Linux block layer is the ability to stack 
-block drivers. SG/IO is fundamentally incompatible with stacking block 
-drivers. Stacking requires having access to the LBA, request size and 
-other block layer request attributes. I don't think that we want to add 
-code for parsing SCSI, NVMe pass-through commands etc. in block drivers 
-as the device mapper.
+> Il giorno 16 ago 2019, alle ore 19:59, Josef Bacik =
+<josef@toxicpanda.com> ha scritto:
+>=20
+> On Fri, Aug 16, 2019 at 07:52:40PM +0200, Paolo Valente wrote:
+>>=20
+>>=20
+>>> Il giorno 16 ago 2019, alle ore 15:21, Josef Bacik =
+<josef@toxicpanda.com> ha scritto:
+>>>=20
+>>> On Fri, Aug 16, 2019 at 12:57:41PM +0200, Paolo Valente wrote:
+>>>> Hi,
+>>>> I happened to test the io.latency controller, to make a comparison
+>>>> between this controller and BFQ.  But io.latency seems not to work,
+>>>> i.e., not to reduce latency compared with what happens with no I/O
+>>>> control at all.  Here is a summary of the results for one of the
+>>>> workloads I tested, on three different devices (latencies in ms):
+>>>>=20
+>>>>            no I/O control        io.latency         BFQ
+>>>> NVMe SSD     1.9                   1.9                0.07
+>>>> SATA SSD     39                    56                 0.7
+>>>> HDD          4500                  4500               11
+>>>>=20
+>>>> I have put all details on hardware, OS, scenarios and results in =
+the
+>>>> attached pdf.  For your convenience, I'm pasting the source file =
+too.
+>>>>=20
+>>>=20
+>>> Do you have the fio jobs you use for this?
+>>=20
+>> The script mentioned in the draft (executed with the command line
+>> reported in the draft), executes one fio instance for the target
+>> process, and one fio instance for each interferer.  I couldn't do =
+with
+>> just one fio instance executing all jobs, because the weight =
+parameter
+>> doesn't work in fio jobfiles for some reason, and because the ioprio
+>> class cannot be set for individual jobs.
+>>=20
+>> In particular, the script generates a job with the following
+>> parameters for the target process:
+>>=20
+>> ioengine=3Dsync
+>> loops=3D10000
+>> direct=3D0
+>> readwrite=3Drandread
+>> fdatasync=3D0
+>> bs=3D4k
+>> thread=3D0
+>> filename=3D/mnt/scsi_debug/largefile_interfered0
+>> iodepth=3D1
+>> numjobs=3D1
+>> invalidate=3D1
+>>=20
+>> and a job with the following parameters for each of the interferers,
+>> in case, e.g., of a workload made of reads:
+>>=20
+>> ioengine=3Dsync
+>> direct=3D0
+>> readwrite=3Dread
+>> fdatasync=3D0
+>> bs=3D4k
+>> filename=3D/mnt/scsi_debug/largefileX
+>> invalidate=3D1
+>>=20
+>> Should you fail to reproduce this issue by creating groups, setting
+>> latencies and starting fio jobs manually, what if you try by just
+>> executing my script?  Maybe this could help us spot the culprit more
+>> quickly.
+>=20
+> Ah ok, you are doing it on a mountpoint.
 
-Hence my proposal to improve support in the block layer for ZBC instead 
-of using SG/IO to control SMR disks.
+Yep
 
-Bart.
+>  Are you using btrfs?
+
+ext4
+
+>  Cause otherwise
+> you are going to have a sad time.
+
+Could you elaborate more on this?  I/O seems to be controllable on ext4.
+
+>  The other thing is you are using buffered,
+
+Actually, the problem is suffered by sync random reads, which always
+hit the disk in this test.
+
+> which may or may not hit the disk.  This is what I use to test =
+io.latency
+>=20
+> https://patchwork.kernel.org/patch/10714425/
+>=20
+> I had to massage it since it didn't apply directly, but running this =
+against the
+> actual block device, with O_DIRECT so I'm sure to be measure the =
+actual impact
+> of the controller, it all works out fine.
+
+I'm not getting why non-direct sync reads, or buffered writes, should
+be uncontrollable.  As a trivial example, BFQ in this tests controls
+I/O as expected, and keeps latency extremely low.
+
+What am I missing?
+
+Thanks,
+Paolo
+
+>  Thanks,
+>=20
+> Josef
 
