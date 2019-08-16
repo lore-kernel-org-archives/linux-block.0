@@ -2,112 +2,70 @@ Return-Path: <SRS0=fyvH=WM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94B6EC3A59D
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 21:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E478CC3A59D
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 22:11:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6247C206C1
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 21:13:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fE4nIzv3"
+	by mail.kernel.org (Postfix) with ESMTP id BE5392077C
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 22:11:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727726AbfHPVNs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Aug 2019 17:13:48 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:45530 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727649AbfHPVNr (ORCPT
+        id S1727734AbfHPWLK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Aug 2019 18:11:10 -0400
+Received: from mail-pg1-f179.google.com ([209.85.215.179]:42629 "EHLO
+        mail-pg1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727682AbfHPWLK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Aug 2019 17:13:47 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7GL8YwN010691;
-        Fri, 16 Aug 2019 21:13:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2019-08-05;
- bh=cHWyiwwwMElLoUgLHe+NGSuxdarj4fkXyz/Y4z+UbFQ=;
- b=fE4nIzv3L1zktcSNWF/R1+8L53jxaAUio58kJJ7gdARN0an4n442JouixdW93KjjDKwx
- Pnb+IFDYWdAZ7p27lPAy4koR8CMr2iJ9qEO7kiqCZTbUPFw2l5NYvD1Q6mfXsIrUb2my
- rpTtc7CwOEoqwXuDDTsITaN44GpmZoWLyrpVun37GdgeHFY9A9jyk7I+r5fbOorndMZK
- EStpbT4G2ycjzHbS2iH3U0cBkakipjow+JIv6FSous/KY1Q19dKzLybuh+iGe+s8QlvF
- ZxSPrRCOjMInwZO3wFxdKO21lbrF5AM+exRNJu6ZPqF/lNNQnEogZ1h0ne3A1rj9x7go +Q== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2u9pjr2h4m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 16 Aug 2019 21:13:45 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7GL8ClX003676;
-        Fri, 16 Aug 2019 21:13:44 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2udscpt3e8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 16 Aug 2019 21:13:44 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7GLDioO030632;
-        Fri, 16 Aug 2019 21:13:44 GMT
-Received: from jubi-laptop.us.oracle.com (/10.11.23.49)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 16 Aug 2019 14:13:44 -0700
-From:   Junxiao Bi <junxiao.bi@oracle.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, junxiao.bi@oracle.com
-Subject: [PATCH] block: remove queue_head
-Date:   Fri, 16 Aug 2019 14:12:33 -0700
-Message-Id: <20190816211233.22414-1-junxiao.bi@oracle.com>
-X-Mailer: git-send-email 2.17.1
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9351 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908160215
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9351 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908160215
+        Fri, 16 Aug 2019 18:11:10 -0400
+Received: by mail-pg1-f179.google.com with SMTP id p3so3582471pgb.9
+        for <linux-block@vger.kernel.org>; Fri, 16 Aug 2019 15:11:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9BeqtshRdXM/xAm62Z46+A77Geb2d8faBObQR/vfpxw=;
+        b=fHa86avcjmwEnXlpca4nJ1trOQR4eJ1GoACvDIpgGoTs08e92GJwwCcW4iaWDO3IzK
+         TKwlDNkbTE1xZsLrLJSqVrsKLNiHREO9oBZZ6SRJ9nujXdWThXyU2lR1H8VE4kko5E+k
+         rMMcSkcxJKFM8ed2Z1yRn3SwlQyyQoP8gmOw0RfPGVeWKS76oNvMgj5g2dKfAk/vCWI+
+         G1lcWWxSYx6GFVGrz5RRh3oTLNBlZwzIT0V/Nv6POEweDtpprZdZfJpaXXKUuF3XGhA4
+         xC4Dj4HkIHqYEswqCDzQYAm76r/MchnHYPkrsYBgd4ZaGbvAmWOzVcbSAKPMDtbFj+m3
+         tl0Q==
+X-Gm-Message-State: APjAAAXbZyA5uPrbFzTpACF9MZKhZuH3aIxnrB2qOSVkqqnhAb6lseQ6
+        cccpBWAP/IgUYlp9NZ1li3AF/SdukKA=
+X-Google-Smtp-Source: APXvYqxCi5CBaHrkAoG0aIKBWTaJ+UNb2z7+47M9z/5dmMMQnkX3EKqczvZnRxx0Cv+RVJEOJBgFTg==
+X-Received: by 2002:a62:76d5:: with SMTP id r204mr12667682pfc.252.1565993469251;
+        Fri, 16 Aug 2019 15:11:09 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id i9sm4408783pjj.2.2019.08.16.15.11.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Aug 2019 15:11:08 -0700 (PDT)
+Subject: Re: [PATCH] block: remove queue_head
+To:     Junxiao Bi <junxiao.bi@oracle.com>, linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk
+References: <20190816211233.22414-1-junxiao.bi@oracle.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <78ef5725-5c2c-5bdf-0145-ffaf61e58f04@acm.org>
+Date:   Fri, 16 Aug 2019 15:11:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190816211233.22414-1-junxiao.bi@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The dispatch list was not used any more as lagency block gone.
+On 8/16/19 2:12 PM, Junxiao Bi wrote:
+> The dispatch list was not used any more as lagency block gone.
+                                              ^^^^^^^
+                                              legacy?
 
-Signed-off-by: Junxiao Bi <junxiao.bi@oracle.com>
----
- block/blk-core.c       | 1 -
- include/linux/blkdev.h | 4 ----
- 2 files changed, 5 deletions(-)
+Anyway:
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d0cc6e14d2f0..82c9c1ef1de6 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -479,7 +479,6 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	if (!q)
- 		return NULL;
- 
--	INIT_LIST_HEAD(&q->queue_head);
- 	q->last_merge = NULL;
- 
- 	q->id = ida_simple_get(&blk_queue_ida, 0, 0, gfp_mask);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1ef375dafb1c..680c4d08f1a2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -391,10 +391,6 @@ static inline int blkdev_reset_zones_ioctl(struct block_device *bdev,
- #endif /* CONFIG_BLK_DEV_ZONED */
- 
- struct request_queue {
--	/*
--	 * Together with queue_head for cacheline sharing
--	 */
--	struct list_head	queue_head;
- 	struct request		*last_merge;
- 	struct elevator_queue	*elevator;
- 
--- 
-2.17.1
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
