@@ -2,121 +2,127 @@ Return-Path: <SRS0=fyvH=WM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F371C3A589
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 00:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E919C3A589
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 00:48:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B7DF2086C
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 00:03:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mRa0hS4x"
+	by mail.kernel.org (Postfix) with ESMTP id 164B12086C
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 00:48:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726163AbfHPADn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Aug 2019 20:03:43 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:40377 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726139AbfHPADm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Aug 2019 20:03:42 -0400
-Received: by mail-io1-f68.google.com with SMTP id t6so2798912ios.7
-        for <linux-block@vger.kernel.org>; Thu, 15 Aug 2019 17:03:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iXs4frHkVp6VUNeQ5gGQhfiB6xxjh3OuHCvn6ipEVTI=;
-        b=mRa0hS4x8IexSCpeyArhYqaFRrnov7u2h5IghDcC2yWiZ9CcXrb7FR4t3UGKFMc/mF
-         qzX3bg8JKnom03eYVxLiQcwt2I27bOB3as++FszqysxLVpnN1QEkQksARpOraToXjtrF
-         +aOxU55U68znhUk+FAhz4uc+L4/Pg3iQneWbbUNusLl0TzlKxbdwp6mAZlVyAq7z5FEG
-         NgqmEzjvHGWUXFg4g6tpL90UqSDQ5InZaYCHKhsa9txuPduVOw+kKWsrcRg8qUTuqXAB
-         GbbQRP38axqTRKGd7Sb2uP9+G2Qo+317c7FqYbzvMPniHhXzYxdGFbcFkkRo54CJtuPD
-         b1yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iXs4frHkVp6VUNeQ5gGQhfiB6xxjh3OuHCvn6ipEVTI=;
-        b=gaMEbO1cR6YLKHO7zz7+XLORHUN3XkzPl5Zy2ClKI/bj7yRnweaCSZ1bPXDdZpCj39
-         D2onmQfmmmnYPDCIiBCX3xJilu7Hfx6TXg4l8g4V6SEH35mCNenhrlZW/0PQA0cy+ANy
-         h6FPQr0UC6ibp54b+AWP+wWvf9d5sT0u+4MCsvBHYq82sLN29uMM/VK+AAhCsw7ItIyu
-         dCJEgPz9Qk5zI1No2NePN3Jpe3KpQ+WzUUYq205a6RfGemMFAVziB7BvV0MO0wDnxJop
-         DPaq8eELyaXydP9tsoxnXknlMFzHgU4IW5om7bQadNGa/H68ok3geryDdGdpLDu8P5Qa
-         bSrA==
-X-Gm-Message-State: APjAAAXlB7aK7y/cRAM37EDoTfEnELo93cl41RemxaJBLdtEnXmU5Y20
-        Uz4EWi9T/gYV5jv0cYA23863+nAybwQjICAJj4U=
-X-Google-Smtp-Source: APXvYqyzNZZfvmhyelUp9YYRUnoAg2o3dqNGQ0oWU8oA3Qyjx/+bSAP+ERzAWyY3PG0ywynql83843+jgQ1bwEo5ohM=
-X-Received: by 2002:a5d:9942:: with SMTP id v2mr2933633ios.177.1565913821841;
- Thu, 15 Aug 2019 17:03:41 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190812123933.24814-1-jusual@redhat.com> <592fe38c-1fa2-9ba5-cd6c-da69c95edb33@acm.org>
- <75c89da5-2ec1-9725-62c8-f6abd3a24202@kernel.dk> <CAMDeoFXJ3r_axyrDWwHkbz-9o42WyT-rcTfXZjrmmp7GK82brA@mail.gmail.com>
-In-Reply-To: <CAMDeoFXJ3r_axyrDWwHkbz-9o42WyT-rcTfXZjrmmp7GK82brA@mail.gmail.com>
-From:   Hrvoje Zeba <zeba.hrvoje@gmail.com>
-Date:   Thu, 15 Aug 2019 20:03:30 -0400
-Message-ID: <CAEsUgYiAXkjSFHpUOfqd9rwSMhmG4OnK7fa-f=uHddZNGVuRzg@mail.gmail.com>
-Subject: Re: [PATCH] liburing/barrier.h: Add prefix io_uring to barriers
-To:     Julia Suvorova <jusual@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, Stefan Hajnoczi <stefanha@gmail.com>,
-        Aarushi Mehta <mehta.aaru20@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726097AbfHPAsN convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Aug 2019 20:48:13 -0400
+Received: from smtpbgeu1.qq.com ([52.59.177.22]:42468 "EHLO smtpbgeu1.qq.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726032AbfHPAsN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Aug 2019 20:48:13 -0400
+X-QQ-mid: bizesmtp25t1565916486tsazjz13
+Received: from [192.168.142.168] (unknown [218.76.23.26])
+        by esmtp10.qq.com (ESMTP) with 
+        id ; Fri, 16 Aug 2019 08:48:05 +0800 (CST)
+X-QQ-SSF: 00400000002000R0XR80B00A0000000
+X-QQ-FEAT: 2UlNO5OcGzn4EhUU3HuLRyzBowu7/dHYBcZ+yF33wKUJvgdVxOD/J+V0WJx11
+        lXixha+KTk/cAQU6IGH5rgPX5+p9BJI7fr+l7H6iL0KXfEAY3nqkKn2TAWShOk5uHMYLG4C
+        7LjMbEbLVRDC0px9hEo1XTDuaTr8AIaHB7VF45k0CyY91m6H5qhjV4R8ctVuIZphcn0H10k
+        OTDF98yq9gbd2C1hSQbyA88cQLyy9BvUTE+QoP59xVrH5thxr9frh7BeGn//8jskEZHLgeU
+        cnobfp8RXoxvoZjVf73jvompaF6WMw+stzcKDmsv2tbXMxlvXcr6Oxiw/445wn7yoDiGu75
+        b4ljvgoX0jJiVANc7VF5WBhhqG9/g==
+X-QQ-GoodBg: 2
+Content-Type: text/plain;
+        charset=gb2312
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH 1/2] io_uring: fix issue when IOSQE_IO_DRAIN pass with
+ IOSQE_IO_LINK
+From:   Jackie Liu <liuyun01@kylinos.cn>
+In-Reply-To: <d72a6911-d1fb-5c88-7992-8d4715ddbcc8@kernel.dk>
+Date:   Fri, 16 Aug 2019 08:48:05 +0800
+Cc:     linux-block@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <6EC9DDF3-3142-4FE1-831B-E5A823FBFC51@kylinos.cn>
+References: <1565775322-10296-1-git-send-email-liuyun01@kylinos.cn>
+ <d72a6911-d1fb-5c88-7992-8d4715ddbcc8@kernel.dk>
+To:     Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign1
+X-QQ-Bgrelay: 1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 14, 2019 at 11:24 AM Julia Suvorova <jusual@redhat.com> wrote:
->
-> On Mon, Aug 12, 2019 at 6:03 PM Jens Axboe <axboe@kernel.dk> wrote:
-> >
-> > On 8/12/19 7:55 AM, Bart Van Assche wrote:
-> > > On 8/12/19 5:39 AM, Julia Suvorova wrote:
-> > >> -#define mb()        asm volatile("mfence" ::: "memory")
-> > >> -#define rmb()       asm volatile("lfence" ::: "memory")
-> > >> -#define wmb()       asm volatile("sfence" ::: "memory")
-> > >> -#define smp_rmb() barrier()
-> > >> -#define smp_wmb() barrier()
-> > >> +#define io_uring_mb()               asm volatile("mfence" ::: "memory")
-> > >> +#define io_uring_rmb()              asm volatile("lfence" ::: "memory")
-> > >> +#define io_uring_wmb()              asm volatile("sfence" ::: "memory")
-> > >> +#define io_uring_smp_rmb()  io_uring_barrier()
-> > >> +#define io_uring_smp_wmb()  io_uring_barrier()
-> > >
-> > > Do users of liburing need these macros? If not, have you considered to
-> > > move these macros to a new header file that is only used inside liburing
-> > > and such that these macros are no longer visible to liburing users?
-> >
-> > The exposed API should not need any explicit barriers from the user,
-> > so this suggestion makes a lot of sense to me.
->
-> How about moving the definition of io_uring_cqe_seen() with whole
-> io_uring_cq_advance() and io_uring_for_each_cqe() from liburing.h to
-> queue.c? This way we can cover all barriers, and leave barrier.h local.
->
-> Do you need io_uring_cq_advance and io_uring_for_each_cqe in the
-> library?
->
 
-This is one of the usage patterns:
+在 2019年8月16日，01:07，Jens Axboe <axboe@kernel.dk> 写道：
 
-io_uring_cqe* cqe;
-int head;
-int count = 0;
+> 
+> On 8/14/19 3:35 AM, Jackie Liu wrote:
+>> Suppose there are three IOs here, and their order is as follows:
+>> 
+>> Submit:
+>> 	[1] IO_LINK
+>> 	    |
+>> 	    |---  [2] IO_LINK | IO_DRAIN
+>> 		      |
+>> 		      |- [3] NORMAL_IO
+>> 
+>> In theory, they all need to be inserted into the Link-list, but flag
+>> IO_DRAIN we have, io[2] and io[3] will be inserted into the defer_list,
+>> and finally, io[3] and io[2] will be processed at the same time.
+>> 
+>> Now, it is directly forbidden to pass these two flags at the same time.
+>> 
+>> Fixes: 9e645e1105c ("io_uring: add support for sqe links")
+>> Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
+>> ---
+>>  fs/io_uring.c | 7 ++++++-
+>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/fs/io_uring.c b/fs/io_uring.c
+>> index d542f1c..05ee628 100644
+>> --- a/fs/io_uring.c
+>> +++ b/fs/io_uring.c
+>> @@ -2074,10 +2074,13 @@ static void io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+>>  {
+>>  	struct io_uring_sqe *sqe_copy;
+>>  	struct io_kiocb *req;
+>> +	unsigned int flags;
+>>  	int ret;
+>> 
+>> +	flags = READ_ONCE(s->sqe->flags);
+>>  	/* enforce forwards compatibility on users */
+>> -	if (unlikely(s->sqe->flags & ~SQE_VALID_FLAGS)) {
+>> +	if (unlikely((flags & ~SQE_VALID_FLAGS) ||
+>> +		     (flags & (IOSQE_IO_DRAIN | IOSQE_IO_LINK)))) {
+> 
+> This doesn't look right, as any setting of either DRAIN or LINK would now
+> fail?
+> 
+> Did you mean something ala:
+> 
+> 	if ((flags & (IOSQE_IO_DRAIN | IOSQE_IO_LINK)) ==
+> 	    (IOSQE_IO_DRAIN | IOSQE_IO_LINK)) {
+> 		... fail ...
+> 	}
+> 
+> which makes me worried that you didn't test this at all...
+> 
+> -- 
+> Jens Axboe
 
-io_uring_for_each_cqe(&m_io_uring, head, cqe)
-{
-    /* ... */
-    count++;
-}
+Oh, yes, it's my fault, I just simulated it in my head, thank you for pointing out.
+I think I'd add an [RFC PATCH] next time. 
 
-io_uring_cq_advance(&m_io_uring, count);
+For this issue, I have two solutions, first is this, just avoid passing DRAIN and LINK at
+the same time; second is allow, let the SQE following LINK inherit the DRAIN flag, but
+It's more complicated, I prefer the first one.
+
+I will rewrite this patch later, with a real test. Thanks again.
+
+--
+Jackie Liu
 
 
-A little bit more performance is squeezed out this way.
 
-
-Hrvoje Zeba
