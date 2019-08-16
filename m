@@ -6,68 +6,63 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 133A6C3A59D
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 13:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 290BBC3A59C
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 13:48:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E69342064A
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 13:45:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 071362064A
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 13:48:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726742AbfHPNp6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Aug 2019 09:45:58 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:54931 "EHLO
+        id S1727278AbfHPNs1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Aug 2019 09:48:27 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:54968 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727261AbfHPNp6 (ORCPT
+        with ESMTP id S1727300AbfHPNs1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Aug 2019 09:45:58 -0400
-Received: from mail-qk1-f199.google.com ([209.85.222.199])
+        Fri, 16 Aug 2019 09:48:27 -0400
+Received: from mail-qt1-f198.google.com ([209.85.160.198])
         by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
         (Exim 4.76)
         (envelope-from <gpiccoli@canonical.com>)
-        id 1hycYF-0001bs-Rc
-        for linux-block@vger.kernel.org; Fri, 16 Aug 2019 13:45:56 +0000
-Received: by mail-qk1-f199.google.com with SMTP id d11so5305657qkb.20
-        for <linux-block@vger.kernel.org>; Fri, 16 Aug 2019 06:45:55 -0700 (PDT)
+        id 1hycaf-0001r8-TZ
+        for linux-block@vger.kernel.org; Fri, 16 Aug 2019 13:48:26 +0000
+Received: by mail-qt1-f198.google.com with SMTP id c22so5940007qta.8
+        for <linux-block@vger.kernel.org>; Fri, 16 Aug 2019 06:48:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+        h=x-gm-message-state:subject:from:to:cc:references:openpgp:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=yQ7ZqGhNs6hoTT3VOscezDfSlNkxdejGDFgNpEXCUTQ=;
-        b=aVsTVeRZ1IJ5pha1+x/ZRb0T2Uc9nCJ408YWb3sit6QEboMMZdI5Mi351bhUS3Tznu
-         GNNsECyi5biWlU6Sb/Vo18IafDxG0xcRkKGfTy+mdUR9//9CVzc7Tg8j9+bKadt0mdQN
-         Kqdt8ctY0rR+PsqoQC2eZUwmLm0kBt6E5SgT0tVU9S93a6qQwZcWh6H3DmPgKoEB4VJA
-         +0jnnCo8tuvnejVjGsQS0AgCFxXUAmk4p6jfTz1xeBx+XIHTsDtLlFlA6f8CfOjNiK+J
-         J3YBnApkfAeNvXRaWcyZ4umMZUlW2WecHQUtB7kR2/94Ki2kPcXcVkPdmqypvMNSrqea
-         FwzQ==
-X-Gm-Message-State: APjAAAUE0Bk539R75Uci6UTDfsqEifxZcLJDWxJ3DaS1i9UxZvhGTy0X
-        OPhc+XgBRFT9gt5OxMZWNQbuzuhXzaXuFZnecvinH86qHwvDxLqJWD9AXiH8dy8GwmK+8r4HlvC
-        KfNVHqG2ricndtcNJfgh1/WzsNHx4bPPDBCA+MdhH
-X-Received: by 2002:a05:620a:1456:: with SMTP id i22mr8551561qkl.272.1565963154825;
-        Fri, 16 Aug 2019 06:45:54 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw5gXfy/6A7axKULrd+X/hnmjkeHFTrxSIH2xhnbcphEt8DuTT36yrjtyewW/+PSg2DVsc4Hw==
-X-Received: by 2002:a05:620a:1456:: with SMTP id i22mr8551542qkl.272.1565963154691;
-        Fri, 16 Aug 2019 06:45:54 -0700 (PDT)
+        bh=79d/sdbXYtwwOa4n/jMG+dfgVY7Mn4hMqbid0OI3YuY=;
+        b=b97TfY71qovxz3KyB3vRPHhDK3NM0tRxw4LUmIz4sOFX7qPiknuHU2Q5VWJ4VdkeP2
+         0XX2Hvn19NPHLT9/Qb1pVh5UsHOjmIT+AJtFulfok+sS0JStKorCThrBfCf6IMBrxwCC
+         b2q93kB9lcezrndS0eP2i+k1tIULsAQeob474myghAtKZNJBYk7U0Lt1OzricEC+NfX3
+         LIqSvl7XK/AryC5fIqKl2jGO9B0fq6IsZhHYqaQhw0ualY9CflKB+4vuup4DGprm5BoN
+         UyH/IKkBH/RX+AwZ3cN1OpFJkjLhmnwBoZtM5LVg1Q6hCsIjBw3Dl8iNNP4H7LBDjtbJ
+         dTQQ==
+X-Gm-Message-State: APjAAAUgl36mB2rYKHSPYdywkuDxv44u5MzGBAn25b8mGpUA1BSx24+v
+        460QGlDFcYKdkhTH3CccP1w/8o9X/nZRcdwoUqEimpIkGBj58KbTPbyPhLV372VeR7OrgUWv1Yi
+        JD63Vj1BZc4p3CorsXVo11dfGVlJQqvPRBUlhWwuF
+X-Received: by 2002:ac8:5053:: with SMTP id h19mr8734966qtm.196.1565963304914;
+        Fri, 16 Aug 2019 06:48:24 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy+eQMJ4sK3OxMayt6beDeiCE3aW7VAeep53Nvc9Y39FVuY4gVpby6z0uWwsqhOuvJf18sOxw==
+X-Received: by 2002:ac8:5053:: with SMTP id h19mr8734946qtm.196.1565963304788;
+        Fri, 16 Aug 2019 06:48:24 -0700 (PDT)
 Received: from [192.168.1.203] ([191.13.19.2])
-        by smtp.gmail.com with ESMTPSA id u45sm2749604qta.13.2019.08.16.06.45.51
+        by smtp.gmail.com with ESMTPSA id e15sm2185377qtr.51.2019.08.16.06.48.21
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 16 Aug 2019 06:45:53 -0700 (PDT)
-Subject: Re: [PATCH] md/raid0: Fail BIOs if their underlying block device is
- gone
-To:     Song Liu <songliubraving@fb.com>
-Cc:     Song Liu <liu.song.a23@gmail.com>, NeilBrown <neilb@suse.com>,
-        linux-raid <linux-raid@vger.kernel.org>,
-        Jay Vosburgh <jay.vosburgh@canonical.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Neil F Brown <nfbrown@suse.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20190729193359.11040-1-gpiccoli@canonical.com>
- <87zhkwl6ya.fsf@notabene.neil.brown.name>
- <6400083b-3cf3-cbc6-650a-c3ae6629b14c@canonical.com>
- <CAPhsuW69YrpHqBCOob2b5wzzWS9FM087sfe3iC0odX8kZWRwmA@mail.gmail.com>
- <CAPhsuW5zB=Kik4rq9YA-xBer7Z-h-23QV4WSCWe-jvhFgGc0Cw@mail.gmail.com>
- <9674ca8f-4325-3023-8a1d-39782103f55d@canonical.com>
- <72C166DF-3984-4330-8C60-BBDA07358771@fb.com>
+        Fri, 16 Aug 2019 06:48:24 -0700 (PDT)
+Subject: Re: [PATCH 1/2] md/raid0: Introduce new array state 'broken' for
+ raid0
 From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
+To:     Song Liu <liu.song.a23@gmail.com>
+Cc:     linux-raid <linux-raid@vger.kernel.org>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Jay Vosburgh <jay.vosburgh@canonical.com>,
+        NeilBrown <neilb@suse.com>, Song Liu <songliubraving@fb.com>
+References: <20190729203135.12934-1-gpiccoli@canonical.com>
+ <20190729203135.12934-2-gpiccoli@canonical.com>
+ <CAPhsuW5n9TCZjVT3QnFhHkbfPTvh7ifFiNXypOHouL5ByZS7+w@mail.gmail.com>
+ <037ef0ef-1a34-f522-6b31-e388906a87fa@canonical.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
  mQENBFpVBxcBCADPNKmu2iNKLepiv8+Ssx7+fVR8lrL7cvakMNFPXsXk+f0Bgq9NazNKWJIn
@@ -93,12 +88,12 @@ Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
  Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
  kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
  X18zwLgdiQ==
-Message-ID: <47eea35a-c932-66e6-159e-37936b8e60f6@canonical.com>
-Date:   Fri, 16 Aug 2019 10:45:48 -0300
+Message-ID: <5c63662a-2cea-bcd7-9f09-b09a68a156c4@canonical.com>
+Date:   Fri, 16 Aug 2019 10:48:19 -0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <72C166DF-3984-4330-8C60-BBDA07358771@fb.com>
+In-Reply-To: <037ef0ef-1a34-f522-6b31-e388906a87fa@canonical.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -107,32 +102,8 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 01/08/2019 19:43, Song Liu wrote:
-> 
-> [...]
->> Hi Song, thanks for the feedback! After changing the patch and testing a
->> bit, it behaves exactly as you said, we got either valid data read from
->> the healthy devices or -EIO for the data tentatively read from the
->> failed/missing array members.
-> 
-> Thanks for testing this out. 
-> 
->>
->> So, I'll resubmit with that change. Also, I've noticed clearing the
->> BROKEN flag seem unnecessary, if user stops the array in order to fix
->> the missing member, it'll require a re-assembly and the array is gonna
->> work again.
->>
->> Do you / Neil considers this fix relevant to md/linear too? If so, I can
->> also include that in the V2.
-> 
-> Yes, please also include fix for md/linear. 
-> 
-> Song
-> 
-
 V2 just sent:
-lore.kernel.org/linux-block/20190816133441.29350-1-gpiccoli@canonical.com
+lore.kernel.org/linux-block/20190816134059.29751-1-gpiccoli@canonical.com
 
 Thanks,
 
