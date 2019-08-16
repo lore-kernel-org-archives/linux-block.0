@@ -6,89 +6,75 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF7BDC3A59C
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 16:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8395C3A59E
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 16:09:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 840E221726
-	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 16:02:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FAD92086C
+	for <linux-block@archiver.kernel.org>; Fri, 16 Aug 2019 16:09:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727738AbfHPQC7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Aug 2019 12:02:59 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39564 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727377AbfHPQC6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Aug 2019 12:02:58 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 3F51EAF97;
-        Fri, 16 Aug 2019 16:02:57 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id A3BC71E4009; Fri, 16 Aug 2019 18:02:56 +0200 (CEST)
-Date:   Fri, 16 Aug 2019 18:02:56 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     axboe@kernel.dk, jack@suse.cz, hannes@cmpxchg.org,
-        mhocko@kernel.org, vdavydov.dev@gmail.com, cgroups@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@fb.com, guro@fb.com,
-        akpm@linux-foundation.org
-Subject: Re: [PATCH 5/5] writeback, memcg: Implement foreign dirty flushing
-Message-ID: <20190816160256.GI3041@quack2.suse.cz>
-References: <20190815195619.GA2263813@devbig004.ftw2.facebook.com>
- <20190815195930.GF2263813@devbig004.ftw2.facebook.com>
+        id S1727491AbfHPQJE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Aug 2019 12:09:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35996 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727357AbfHPQJD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Aug 2019 12:09:03 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C4478882EA;
+        Fri, 16 Aug 2019 16:09:03 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C2223786;
+        Fri, 16 Aug 2019 16:08:56 +0000 (UTC)
+Date:   Sat, 17 Aug 2019 00:08:51 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, stable@vger.kernel.org,
+        Mark Ray <mark.ray@hpe.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH] blk-mq: remove blk_mq_hw_sysfs_cpus
+Message-ID: <20190816160826.GB29878@ming.t460p>
+References: <20190816074849.7197-1-ming.lei@redhat.com>
+ <5baa0c28-6e12-5a61-0254-de0e49cf1596@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190815195930.GF2263813@devbig004.ftw2.facebook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <5baa0c28-6e12-5a61-0254-de0e49cf1596@kernel.dk>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 16 Aug 2019 16:09:03 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 15-08-19 12:59:30, Tejun Heo wrote:
-> +/* issue foreign writeback flushes for recorded foreign dirtying events */
-> +void mem_cgroup_flush_foreign(struct bdi_writeback *wb)
-> +{
-> +	struct mem_cgroup *memcg = mem_cgroup_from_css(wb->memcg_css);
-> +	unsigned long intv = msecs_to_jiffies(dirty_expire_interval * 10);
-> +	u64 now = jiffies_64;
-> +	int i;
-> +
-> +	for (i = 0; i < MEMCG_CGWB_FRN_CNT; i++) {
-> +		struct memcg_cgwb_frn *frn = &memcg->cgwb_frn[i];
-> +
-> +		/*
-> +		 * If the record is older than dirty_expire_interval,
-> +		 * writeback on it has already started.  No need to kick it
-> +		 * off again.  Also, don't start a new one if there's
-> +		 * already one in flight.
-> +		 */
-> +		if (frn->at > now - intv && atomic_read(&frn->done.cnt) == 1) {
-> +			frn->at = 0;
-> +			cgroup_writeback_by_id(frn->bdi_id, frn->memcg_id,
-> +					       LONG_MAX, WB_REASON_FOREIGN_FLUSH,
-> +					       &frn->done);
-> +		}
+On Fri, Aug 16, 2019 at 08:20:42AM -0600, Jens Axboe wrote:
+> On 8/16/19 1:48 AM, Ming Lei wrote:
+> > It is reported that sysfs buffer overflow can be triggered in case
+> > of too many CPU cores(>841 on 4K PAGE_SIZE) when showing CPUs in
+> > blk_mq_hw_sysfs_cpus_show().
+> > 
+> > This info isn't useful, given users may retrieve the CPU list
+> > from sw queue entries under same kobject dir, so far not see
+> > any active users.
+> > 
+> > So remove the entry as suggested by Greg.
+> 
+> I think that's a bit frivolous, there could very well be scripts or
+> apps that use it. Let's just fix the overflow.
 
-Hum, two concerns here still:
+I am fine with either way.
 
-1) You ask to writeback LONG_MAX pages. That means that you give up any
-livelock avoidance for the flusher work and you can writeback almost
-forever if someone is busily dirtying pages in the wb. I think you need to
-pick something like amount of dirty pages in the given wb (that would have
-to be fetched after everything is looked up) or just some arbitrary
-reasonably small constant like 1024 (but then I guess there's no guarantee
-stuck memcg will make any progress and you've invalidated the frn entry
-here).
+There are two fixes:
 
-2) When you invalidate frn entry here by writing 0 to 'at', it's likely to get
-reused soon. Possibly while the writeback is still running. And then you
-won't start any writeback for the new entry because of the
-atomic_read(&frn->done.cnt) == 1 check. This seems like it could happen
-pretty frequently?
+1) without format change:
+https://lore.kernel.org/linux-block/c5b1b6f3-d461-9379-7e5c-6c6bee6a7bd5@kernel.dk/T/#t
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2) format change:
+https://lore.kernel.org/linux-block/20190816070948.GD1368@kroah.com/T/#t
+
+If either one isn't fine, please let me know, and I will cook new one for you.
+
+
+Thanks,
+Ming
