@@ -2,145 +2,605 @@ Return-Path: <SRS0=5ZWj=WP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C35DC3A59B
-	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 09:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E330C3A59B
+	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 09:18:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B6F0205F4
-	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 09:06:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D71202184D
+	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 09:18:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="UWaHk5oE"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yoPg8MOb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727072AbfHSJGb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Aug 2019 05:06:31 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:46625 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727068AbfHSJGb (ORCPT
+        id S1727142AbfHSJSU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Aug 2019 05:18:20 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:41218 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727077AbfHSJSU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Aug 2019 05:06:31 -0400
-Received: by mail-lj1-f193.google.com with SMTP id f9so1013217ljc.13
-        for <linux-block@vger.kernel.org>; Mon, 19 Aug 2019 02:06:30 -0700 (PDT)
+        Mon, 19 Aug 2019 05:18:20 -0400
+Received: by mail-wr1-f67.google.com with SMTP id j16so7895271wrr.8
+        for <linux-block@vger.kernel.org>; Mon, 19 Aug 2019 02:18:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=go6Fia+2oUYQIymod2azs8D08VfJ/HmbYRyQmFxd89A=;
-        b=UWaHk5oEerHfLKS2cmpeDCb3YNnTl9A8bKmqgSH7efWz9q53FNMXuzRnaeKO+ydNdw
-         wo8FWZXd9/UFnUKOg2uDtbJkvdqzqPfr4Kz+AUk3Nwno3GaWfpNOLpgZdzCPoOHC3FPF
-         +268WiGdzDOGSb14MjnwrlZ/vziwSQU3B4vxMXWaIUZF4cTw7a36iyLusBHI9EnlCSup
-         t8P+iT0HhgGWvE/vj/X+2d9hR82TDvjtbvNBlOtgyCbMkGFLW3T0ruzP+mhs7qY77wjP
-         QhAKuuo9kMCP8alNtVj34LY7HEAVt/s0aD8cQHwVTNsey8jme1viz8Wvs8+Irj0Tp6nG
-         xXaQ==
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=36pdWbCmfbZnPMwCV/Ybva+8N9D2OWKhunbSilk+/tc=;
+        b=yoPg8MOb9gNTnEs1xECw7F+OBN6bb3Iwzw6t/W0Uf+5UpAxxa4UFxTE81jNKKYUJsn
+         a/4nuri1bJwawFUOgXH7JjQThRTfzk3ugjRATjjuU9bnU7HWW97VV5nVETrEtc0zFwWn
+         DAkGNY7zVqUtJlHKee4ugwBIX9NpS340tO/ethSSv/xLphAKK3VcgRPyGAbuM4JGfF6y
+         OaZcFl4Muw9XCrew7y0Lz3AGWjeHuZj/AGumzDkFvx8TKeFEL+1vZIQIGfH6JG59jRBM
+         V+VP6nstE0xZI0Mzg8W8+y9eKSHtO/4Uc/P+Ui6iLlLjggHklSfZyJxQlziqu7/X525f
+         XTvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=go6Fia+2oUYQIymod2azs8D08VfJ/HmbYRyQmFxd89A=;
-        b=M74Q8x/AKNRnpWst5h55RLw/KrAUOTZQpgnz8LhgUuaIHObYFahEWiRjOmxf3giWU0
-         lohlDejmjqZuIT/aJjkERngNsb4KqVgXcIbQDsgVSvFFs1nvtBPoGrZVyWk4a7b/1SAE
-         +77kRqGXK7QBgRi67zQZXznlfkg/0GmsKtMT9kF1xHlimIA4WAIi1o+CcQsh2sQYZ8Ur
-         u4ixqybxewl1P3Dr328rp95JiwAeZwNtYEIE7DDH2CzokF99TOZu0BsXNOsa2XB6pi27
-         7h35iHjDNNhWOFYlNpj8BuqMfsTOzTRJ4zryA9icPrVWHtGift6YsLFLVkRSqU8bDQQB
-         vtWQ==
-X-Gm-Message-State: APjAAAXZf5dNEAqqBuNH11d/WKnFECbXn5PNZXJ8/3znrOFBAR2/CiLN
-        ++z6wFvhlERVV3ufMfcYCXK/BvAEaDoAZKTHakT5iQ==
-X-Google-Smtp-Source: APXvYqzHfH2e05Zqc2osyVo+KtOEUYoxk9EXt9fxGHWlfCkmBrUFmllOuebgrzndF2yz2wS2Q08N4RmmSgUM3w+pa/c=
-X-Received: by 2002:a2e:9903:: with SMTP id v3mr10537275lji.37.1566205589781;
- Mon, 19 Aug 2019 02:06:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190814103244.92518-1-maco@android.com> <20190814113348.GA525@ming.t460p>
-In-Reply-To: <20190814113348.GA525@ming.t460p>
-From:   Martijn Coenen <maco@android.com>
-Date:   Mon, 19 Aug 2019 11:06:18 +0200
-Message-ID: <CAB0TPYFzgm7pJvXfYYER6qqHM3J8dU7WXWv8ct51e2CGctydzw@mail.gmail.com>
-Subject: Re: [PATCH] RFC: loop: Avoid calling blk_mq_freeze_queue() when possible.
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>, kernel-team@android.com,
-        Narayan Kamath <narayan@google.com>,
-        Dario Freni <dariofreni@google.com>,
-        Nikita Ioffe <ioffe@google.com>,
-        Jiyong Park <jiyong@google.com>,
-        Martijn Coenen <maco@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=36pdWbCmfbZnPMwCV/Ybva+8N9D2OWKhunbSilk+/tc=;
+        b=K1d4TT5GNuPysfbq5Kd24TdM8LNgau1dBhZT+e38UdDrev9B3p0J9/nKVPJ/qVbFLe
+         0OppclOGjfsRvuagxzLL62v27zJXeovYsJbMIVIz1yhH3m+S2eeTKFEPsJCQY6m4oEdh
+         yAsXY/znDgO2vP7dJfLqhBDe/gipLhVix1WQiluXoVMuI80Io1e18H50vT1ObZ8Uw5LM
+         wt7ThJDsWxrQ7jEUZDg2Gx6Y4BuqX82zDpbonov5G+JzneheK3RfadVgi97/kSxYHqWo
+         8C19uyAjvEhY54OLO5qbHynqH6zGdDvMVvRYilrrcPekqrWQghbPsv26L0zbNIPw/qKI
+         wKxg==
+X-Gm-Message-State: APjAAAX8LyDY3YlXBYxdXNl3s6eHCrjcnskUUanhhcnAoCZNFGIwLD6s
+        8gnCmS6MNUTUkiE1BhqYdth9NRRaI0g=
+X-Google-Smtp-Source: APXvYqxlBYSKpc+5YfKc9Aw5tsNH7c5B8eYN+K6nN0TInV0bVNYIX87noNRlo4ug4Vd9TUXoDx/HvQ==
+X-Received: by 2002:a5d:5543:: with SMTP id g3mr26468200wrw.166.1566206295850;
+        Mon, 19 Aug 2019 02:18:15 -0700 (PDT)
+Received: from [192.168.0.101] (88-147-64-215.dyn.eolo.it. [88.147.64.215])
+        by smtp.gmail.com with ESMTPSA id b4sm9776673wma.5.2019.08.19.02.18.14
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 19 Aug 2019 02:18:15 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: 5.1.21 Dell 2950 terrible swraid5 I/O performance with swraid on
+ top of Perc 5/i raid0/jbod
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20190819070823.GH12521@merlins.org>
+Date:   Mon, 19 Aug 2019 11:18:13 +0200
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        linux-raid@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5DCAD3D8-07B6-4A5D-A3C1-A1DF4055C5BD@linaro.org>
+References: <20190819070823.GH12521@merlins.org>
+To:     Marc MERLIN <marc@merlins.org>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 14, 2019 at 1:34 PM Ming Lei <ming.lei@redhat.com> wrote:
-> Another candidate is to not switch to q_usage_counter's percpu mode
-> until loop becomes Lo_bound, and this way may be more clean.
 
-I was thinking about this more; our current sequence is:
 
-1) LOOP_SET_FD
-2) LOOP_SET_STATUS64 // for lo_offset/lo_sizelimit
-3) LOOP_SET_BLOCK_SIZE // to make sure block size is correct for DIO
-4) LOOP_SET_DIRECT_IO // to enable DIO
+> Il giorno 19 ago 2019, alle ore 09:08, Marc MERLIN <marc@merlins.org> =
+ha scritto:
+>=20
+> (Please Cc me on replies so that I can see them more quickly)
+>=20
+> Dear Block Folks,
+>=20
 
-I noticed that LOOP_SET_FD already tries to configure DIO if the
-underlying file is opened with O_DIRECT; but in this case, it will
-still fail, because the logical block size of the loop queue must
-exceed the logical I/O size of the backing device. But the default
-logical block size of mq is 512.
+Hi Marc,
 
-One idea to fix is to call blk_queue_logical_block_size() as part of
-LOOP_SET_FD, to match the block size of the backing fs in case the
-backing file is opened with O_DIRECT; you could argue that if the
-backing file is opened with O_DIRECT, this is what the user wanted
-anyway. This would allow us to get rid of the latter two ioctl's and
-already save quite some time.
+> I just inherited a Dell 2950 with a Perc 5/i.
+> I really don't want to use that Perc 5/i card, but from all the =
+reading
+> I did, there is no IT/unraid mode for it, so I was stuck setting the 6
+> 2TB drives as 6 independent raid0 drives using the card.
+> I wish I could just bypass the card and connect the drives directly to =
+a
+> sata card, but the case and backplane do not seem to make this =
+possible.
+>=20
+> I'm getting very weird and effectively unusable I/O performance if
+> do I do swraid resync which is throttled at 5MB/s
+>=20
+> By bad, I mean bad, see this (in more details below):
+> Timing buffered disk reads:   2 MB in 36.15 seconds =3D  56.65 kB/sec
+>=20
+> Dear linux-raid folks,
+>=20
+> I realize I have a perc 5/i card underneath I've very much like to =
+remove,
+> but can't on that system.
+> Still, I'm hitting some quite unexpected swraid performance, including
+> a kernel warning and raid unclean shutdown on sysrq poweroff.
+>=20
+>=20
+> So, the 6 perc5/i raid0 drives show up in linux as 6 drives, I
+> partitioned them and created various software raid slices on top
+> (raid1, raid5 and raid6).  They work fine, but there is something very
+> wrong with a block layer somewhere. If I send a bunch of writes, the
+> IO scheduler seems to introduce terrible latency where my whole system
+> hangs for a few seconds trying to read simple binaries while from what =
+I
+> can tell, the I/O platters spend all their time writing the backlog of
+> what's being sent.
+>=20
+
+Solving this kind of problem is one of the goals of the BFQ I/O =
+scheduler [1].
+Have you tried?  If you want to, then start by swathing to BFQ in both =
+the
+physical and the virtual block devices in your stack.
 
 Thanks,
-Martijn
+Paolo
 
->
-> Something like the following patch:
->
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index a7461f482467..8791f9242583 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -1015,6 +1015,9 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
->          */
->         bdgrab(bdev);
->         mutex_unlock(&loop_ctl_mutex);
-> +
-> +       percpu_ref_switch_to_percpu(&lo->lo_queue->q_usage_counter);
-> +
->         if (partscan)
->                 loop_reread_partitions(lo, bdev);
->         if (claimed_bdev)
-> @@ -1171,6 +1174,8 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
->         lo->lo_state = Lo_unbound;
->         mutex_unlock(&loop_ctl_mutex);
->
-> +       percpu_ref_switch_to_atomic(&lo->lo_queue->q_usage_counter, NULL);
-> +
->         /*
->          * Need not hold loop_ctl_mutex to fput backing file.
->          * Calling fput holding loop_ctl_mutex triggers a circular
-> @@ -2003,6 +2008,12 @@ static int loop_add(struct loop_device **l, int i)
->         }
->         lo->lo_queue->queuedata = lo;
->
-> +       /*
-> +        * cheat block layer for not switching to q_usage_counter's
-> +        * percpu mode before loop becomes Lo_bound
-> +        */
-> +       blk_queue_flag_set(QUEUE_FLAG_INIT_DONE, lo->lo_queue);
-> +
->         blk_queue_max_hw_sectors(lo->lo_queue, BLK_DEF_MAX_SECTORS);
->
->         /*
->
->
-> thanks,
-> Ming
+[1] https://algo.ing.unimo.it/people/paolo/BFQ/
+
+> You'll read below that somehow I have a swraid6 running on those 6 =
+drives
+> and that seems to run at ok speed. But I have a bigger swraid5 across =
+the
+> same 6 drives, and that runs at terrible speed right now.
+>=20
+>=20
+> I tried to disable the card's write cache to let linux and its 32GB of
+> RAM, do it better, but I didn't see a real improvement:
+> newmagic:~# megacli -LDSetProp -DisDskCache -L0 -a0  (0,1,2,3,4,5)
+> newmagic:~# megacli -LDGetProp -DskCache -Lall -a0
+>> Adapter 0-VD 0(target id: 0): Disk Write Cache : Disabled
+>> Adapter 0-VD 1(target id: 1): Disk Write Cache : Disabled
+>> Adapter 0-VD 2(target id: 2): Disk Write Cache : Disabled
+>> Adapter 0-VD 3(target id: 3): Disk Write Cache : Disabled
+>> Adapter 0-VD 4(target id: 4): Disk Write Cache : Disabled
+>> Adapter 0-VD 5(target id: 5): Disk Write Cache : Disabled
+>=20
+> For the raid card, I installed the last bios I could find, and here is =
+what it says.
+>> megasas: 07.707.51.00-rc1
+>> megaraid_sas 0000:02:0e.0: PCI IRQ 78 -> rerouted to legacy IRQ 18
+>> megaraid_sas 0000:02:0e.0: FW now in Ready state
+>> megaraid_sas 0000:02:0e.0: 63 bit DMA mask and 32 bit consistent mask
+>> megaraid_sas 0000:02:0e.0: firmware supports msix	: (0)
+>> megaraid_sas 0000:02:0e.0: current msix/online cpus	: (0/4)
+>> megaraid_sas 0000:02:0e.0: RDPQ mode	: (disabled)
+>> megaraid_sas 0000:02:0e.0: controller type	: MR(256MB)
+>> megaraid_sas 0000:02:0e.0: Online Controller Reset(OCR)	: =
+Enabled
+>> megaraid_sas 0000:02:0e.0: Secure JBOD support	: No
+>> megaraid_sas 0000:02:0e.0: NVMe passthru support	: No
+>> megaraid_sas 0000:02:0e.0: FW provided TM TaskAbort/Reset timeout	=
+: 0 secs/0 secs
+>> megaraid_sas 0000:02:0e.0: megasas_init_mfi: fw_support_ieee=3D0
+>> megaraid_sas 0000:02:0e.0: INIT adapter done
+>> megaraid_sas 0000:02:0e.0: fw state:c0000000
+>> megaraid_sas 0000:02:0e.0: Jbod map is not supported =
+megasas_setup_jbod_map 5388
+>> megaraid_sas 0000:02:0e.0: fwstate:c0000000, dis_OCR=3D0
+>> megaraid_sas 0000:02:0e.0: MR_DCMD_PD_LIST_QUERY not supported by =
+firmware
+>> megaraid_sas 0000:02:0e.0: DCMD not supported by firmware - =
+megasas_ld_list_query 4590
+>> megaraid_sas 0000:02:0e.0: pci id		: =
+(0x1028)/(0x0015)/(0x1028)/(0x1f03)
+>> megaraid_sas 0000:02:0e.0: unevenspan support	: no
+>> megaraid_sas 0000:02:0e.0: firmware crash dump	: no
+>> megaraid_sas 0000:02:0e.0: jbod sync map		: no
+>=20
+> I'm also only getting about 5MB/s sustained write speed, which is
+> pathetic. I have lots of servers with normal sata cards, software =
+raid,
+> and I get 50 to 100MB/s normally.
+> I'm hoping the Perc 5/i card is not _that_ bad?  See below.
+> md0 : active raid1 sde1[4] sdb1[1] sdd1[3] sda1[0] sdc1[2] sdf1[5]
+>      975872 blocks super 1.2 [6/6] [UUUUUU]
+> md1 : active raid6 sde3[4] sdb3[1] sdd3[3] sdf3[5] sda3[0] sdc3[2]
+>      419164160 blocks super 1.2 level 6, 512k chunk, algorithm 2 [6/6] =
+[UUUUUU]
+>=20
+> md2 : active raid6 sde5[4] sdb5[1] sdf5[5] sdd5[3] sdc5[2] sda5[0]
+>      1677193216 blocks super 1.2 level 6, 512k chunk, algorithm 2 =
+[6/6] [UUUUUU]
+>      bitmap: 1/4 pages [4KB], 65536KB chunk
+>=20
+> md3 : active raid5 sde6[4] sdb6[1] sdd6[3] sdf6[6] sdc6[2] sda6[0]
+>      7118330880 blocks super 1.2 level 5, 512k chunk, algorithm 2 =
+[6/5] [UUUUU_]
+>      [=3D>...................]  recovery =3D  7.7% =
+(109702192/1423666176) finish=3D5790.5min speed=3D3781K/sec
+>      bitmap: 0/11 pages [0KB], 65536KB chunk
+>=20
+> If I access drives plugged directly into the motherboard's sata port, =
+I
+> get perfect speed. I've also added an SSD with bcache to frontload one
+> of the raid arrays that is so slow, and sure enough, it becomes =
+usuable.
+> When my system is slow as crap due to this issue, I can do full speed
+> I/O to a different drive plugged into the motherboard's Sata chip (but =
+due=20
+> to the case, the drive is actually sitting on the motherboard, there =
+is=20
+> nowhere to mount it).
+>=20
+> The main problem is all my raids are using the same 6 devices, so if
+> anything spams them with a huge queue, I/O is completely starved for =
+the
+> other devices.
+> The terrible write performance, which on top of being bad, prevents
+> pretty much any other I/O to those drives.
+>=20
+> After an unclean shutdown explained below, a resync on the same drives =
+but the other 2 raid arrays,
+> is much faster and does not make the system unresponsive.
+> md1 : active raid6 sda3[0] sdb3[1] sdf3[5] sdc3[2] sde3[4] sdd3[3]
+>      419164160 blocks super 1.2 level 6, 512k chunk, algorithm 2 [6/6] =
+[UUUUUU]
+>      [=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D>..]  =
+resync =3D 91.1% (95553272/104791040) finish=3D1.7min speed=3D86952K/sec
+>=20
+>=20
+> If I start the recovery or a big copy/rsync towards md2, things get so =
+slow that other IO
+> hangs for multiple seconds or even 2mn or more sometimes. Yes, that =
+was the stock debian=20
+> kernel, but similar problems with 5.1.21:
+>> [13900.007277] INFO: task sendmail:30862 blocked for more than 120 =
+seconds.
+>> [13900.030181]       Not tainted 4.19.0-5-amd64 #1 Debian =
+4.19.37-5+deb10u2
+>> [13900.053131] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" =
+disables this message.
+>> [13900.078495] sendmail        D    0 30862  30812 0x00000000
+>> [13900.099272] Call Trace:
+>> [13900.113941]  ? __schedule+0x2a2/0x870
+>> [13900.131022]  ? lookup_fast+0xc8/0x2e0
+>> [13900.148085]  schedule+0x28/0x80
+>> [13900.163959]  rwsem_down_write_failed+0x183/0x3a0
+>> [13900.182741]  ? inode_permission+0xbe/0x180
+>> [13900.200431]  call_rwsem_down_write_failed+0x13/0x20
+>> [13900.219731]  down_write+0x29/0x40
+>> [13900.235849]  path_openat+0x615/0x15c0
+>> [13900.252665]  ? mem_cgroup_commit_charge+0x7a/0x560
+>> [13900.271680]  do_filp_open+0x93/0x100
+>> [13900.288163]  ? __check_object_size+0x15d/0x189
+>> [13900.306276]  do_sys_open+0x186/0x210
+>> [13900.322529]  do_syscall_64+0x53/0x110
+>> [13900.338867]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>> [13900.358047] RIP: 0033:0x7fa715212c8b
+>> [13900.374306] Code: Bad RIP value.
+>> [13900.389850] RSP: 002b:00007ffc26ba42a0 EFLAGS: 00000246 ORIG_RAX: =
+0000000000000101
+>> [13900.414289] RAX: ffffffffffffffda RBX: 00005584ee809978 RCX: =
+00007fa715212c8b
+>> [13900.437957] RDX: 00000000000000c2 RSI: 00005584ee8198f0 RDI: =
+00000000ffffff9c
+>> [13900.461660] RBP: 00005584ee8198f0 R08: 0000000000007fdd R09: =
+0000000000000000
+>> [13900.485361] R10: 00000000000001a0 R11: 0000000000000246 R12: =
+0000000000000000
+>> [13900.509096] R13: 0000000000000000 R14: 000000000000000a R15: =
+0000000000000000
+>=20
+> I know I can slow down raid recovery speed, to be able to use the =
+system I actually have to do this:
+> echo 1000 > /proc/sys/dev/raid/speed_limit_min
+> of course, at 1MB/s, it will take weeks to resync...
+>=20
+> At this point, you could ask if my drives are ok speed wise, and we =
+already have the raid6 resync
+> I showed above at over 80MB/s
+>=20
+> I did some basic I/O read-write tests when the resync wasn't running:
+>> dd if=3D/dev/mdx of=3D/dev/null bs=3D1M count=3D40000
+>> f=3D/var/space/test; dd if=3D/dev/zero of=3D$f bs=3D1M count=3D3000 =
+conv=3Dfdatasync; \rm $f
+>>=20
+>> dd read test: /dev/md0 419430400 bytes (419 MB, 400 MiB) copied, =
+3.13387 s, 134 MB/s, hdparm -t 208.18MB/s
+>> dd104857600 bytes (105 MB, 100 MiB) copied, 16.1961 s, 6.5 MB/s
+>>=20
+>> /dev/md1 419430400 bytes (419 MB, 400 MiB) copied, 1.58549 s, 265 =
+MB/s, hdparm -t 335.11MB/s
+>> 3145728000 bytes (3.1 GB, 2.9 GiB) copied, 6.51223 s, 483 MB/s
+>>=20
+>> /dev/md2 419430400 bytes (419 MB, 400 MiB) copied, 1.75172 s, 239 =
+MB/s, hdparm -t 256.08MB/s
+>> 3145728000 bytes (3.1 GB, 2.9 GiB) copied, 5.25801 s, 598 MB/s
+>>=20
+>> /dev/md3 419430400 bytes (419 MB, 400 MiB) copied, 1.81613 s, 231 =
+MB/s, hdparm -t 382.33MB/s
+>=20
+> Then, when it's running at a mere 4MB/s and apparently spamming all =
+the I/O available:
+> newmagic:~# for i in md0 md1 md2 md3; do hdparm -t /dev/$i; done
+>=20
+> /dev/md0:
+> HDIO_DRIVE_CMD(identify) failed: Inappropriate ioctl for device
+> Timing buffered disk reads: 190 MB in  3.00 seconds =3D  63.26 MB/sec
+>=20
+> /dev/md1:
+> HDIO_DRIVE_CMD(identify) failed: Inappropriate ioctl for device
+> Timing buffered disk reads:   4 MB in  3.21 seconds =3D   1.25 MB/sec
+> ^[
+> /dev/md2:
+> HDIO_DRIVE_CMD(identify) failed: Inappropriate ioctl for device
+> Timing buffered disk reads:   6 MB in  9.08 seconds =3D 676.33 kB/sec
+>=20
+> /dev/md3:
+> HDIO_DRIVE_CMD(identify) failed: Inappropriate ioctl for device
+> Timing buffered disk reads:   2 MB in 36.15 seconds =3D  56.65 kB/sec
+>=20
+>=20
+> I also maybe found a bug in software raid during shutoff:
+>> [14847.171978] sysrq: SysRq : Power Off
+>> [14852.341924] WARNING: CPU: 0 PID: 2530 at drivers/md/md.c:8180 =
+md_write_inc+0x15/0x40 [md_mod]
+>> [14852.359192] Modules linked in: fuse ufs qnx4 hfsplus hfs minix =
+vfat msdos fat jfs xfs dm_mod cpuid ipt_MASQUERADE ipt_REJECT =
+nf_reject_ipv4 xt_tcpudp xt_state xt_conntrack nf_log_ipv4 nf_log_common =
+xt_LOG nft_compat nft_counter nft_chain_nat_ipv4 nf_nat_ipv4 nf_nat =
+nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nft_chain_route_ipv4 =
+nf_tables nfnetlink binfmt_misc ext4 crc16 mbcache jbd2 fscrypto ecb =
+crypto_simd cryptd glue_helper aes_x86_64 ipmi_ssif radeon coretemp ttm =
+drm_kms_helper kvm drm evdev dcdbas iTCO_wdt iTCO_vendor_support =
+serio_raw irqbypass sg pcspkr rng_core i2c_algo_bit ipmi_si i5000_edac =
+ipmi_devintf i5k_amb ipmi_msghandler button ip_tables x_tables autofs4 =
+btrfs zstd_decompress zstd_compress xxhash raid10 raid0 multipath linear =
+sata_sil24 e1000e r8169 realtek libphy mii uas usb_storage
+>> [14852.502352]  raid456 async_raid6_recov async_memcpy async_pq =
+async_xor async_tx xor raid1 raid6_pq libcrc32c crc32c_generic =
+hid_generic bcache crc64 usbhid md_mod hid ses enclosure sr_mod =
+scsi_transport_sas cdrom sd_mod ata_generic uhci_hcd ehci_pci ehci_hcd =
+ata_piix libata psmouse lpc_ich megaraid_sas usbcore scsi_mod usb_common =
+bnx2
+>> [14852.562340] CPU: 0 PID: 2530 Comm: sendmail Not tainted =
+4.19.0-5-amd64 #1 Debian 4.19.37-5+deb10u2
+>> [14852.580463] Hardware name: Dell Inc. PowerEdge 2950/0DT021, BIOS =
+2.7.0 10/30/2010
+>> [14852.595607] RIP: 0010:md_write_inc+0x15/0x40 [md_mod]
+>> [14852.605820] Code: ff e8 9f 54 32 f3 66 66 2e 0f 1f 84 00 00 00 00 =
+00 0f 1f 40 00 66 66 66 66 90 f6 46 10 01 74 1b 8b 97 c4 01 00 00 85 d2 =
+74 12 <0f> 0b 48 8b 87 e0 02 00 00 a8 03 75 0e 65 48 ff 00 c3 8b 47 40 =
+85
+>> [14852.643807] RSP: 0000:ffffb1c287767ac0 EFLAGS: 00010002
+>> [14852.654378] RAX: ffff9615c93a4cf8 RBX: ffff9615c93a4910 RCX: =
+0000000000000001
+>> [14852.668807] RDX: 0000000000000001 RSI: ffff96162aa17f00 RDI: =
+ffff961625000000
+>> [14852.683235] RBP: ffff9615c93a4978 R08: 0000000000000000 R09: =
+ffff961624c3a918
+>> [14852.697661] R10: 0000000000000000 R11: ffff961625a1f800 R12: =
+0000000000000001
+>> [14852.712089] R13: 0000000000000001 R14: ffff961623b6e000 R15: =
+ffff96162aa17f00
+>> [14852.726518] FS:  00007f2ca54d3f40(0000) GS:ffff96162fa00000(0000) =
+knlGS:0000000000000000
+>> [14852.742891] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> [14852.754505] CR2: 00007f8e63e501c0 CR3: 000000031fb6e000 CR4: =
+00000000000006f0
+>> [14852.768931] Call Trace:
+>> [14852.773891]  add_stripe_bio+0x205/0x7c0 [raid456]
+>> [14852.783405]  raid5_make_request+0x1bd/0xb60 [raid456]
+>> [14852.793619]  ? finish_wait+0x80/0x80
+>> [14852.800851]  ? finish_wait+0x80/0x80
+>> [14852.808093]  md_handle_request+0x119/0x190 [md_mod]
+>> [14852.817964]  md_make_request+0x78/0x160 [md_mod]
+>> [14852.827311]  generic_make_request+0x1a4/0x410
+>> [14852.836116]  submit_bio+0x45/0x140
+>> [14852.842991]  ? guard_bio_eod+0x32/0x100
+>> [14852.850747]  submit_bh_wbc+0x163/0x190
+>> [14852.858377]  write_all_supers+0x22f/0xa60 [btrfs]
+>> [14852.867905]  btrfs_commit_transaction+0x581/0x870 [btrfs]
+>> [14852.878819]  ? finish_wait+0x80/0x80
+>> [14852.886071]  btrfs_sync_file+0x380/0x3d0 [btrfs]
+>> [14852.895415]  do_fsync+0x38/0x70
+>> [14852.901764]  __x64_sys_fsync+0x10/0x20
+>> [14852.909342]  do_syscall_64+0x53/0x110
+>> [14852.916742]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>> [14852.926952] RIP: 0033:0x7f2ca6944a71
+>> [14852.934185] Code: 6d a5 00 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff =
+eb b1 0f 1f 80 00 00 00 00 8b 05 da e9 00 00 85 c0 75 16 b8 4a 00 00 00 =
+0f 05 <48> 3d 00 f0 ff ff 77 3f c3 66 0f 1f 44 00 00 53 89 fb 48 83 ec =
+10
+>> [14852.972172] RSP: 002b:00007fffe32a0368 EFLAGS: 00000246 ORIG_RAX: =
+000000000000004a
+>> [14852.987483] RAX: ffffffffffffffda RBX: 000056297ca540d0 RCX: =
+00007f2ca6944a71
+>> [14853.001908] RDX: 0000000000000000 RSI: 000056297ca541b0 RDI: =
+0000000000000004
+>> [14853.016334] RBP: 00000000000001d7 R08: 000056297ca541b0 R09: =
+00007f2ca54d3f40
+>> [14853.030760] R10: 7541203831202c6e R11: 0000000000000246 R12: =
+000056297bfbe369
+>> [14853.045189] R13: 00007fffe32a03b0 R14: 000000000000000a R15: =
+0000000000000000
+>> [14853.059617] ---[ end trace 407005be9d52ae9f ]---
+>> [14854.715315] md: md3: recovery interrupted.
+>> [14877.083807] bcache: bcache_reboot() Stopping all devices:
+>> [14879.097334] bcache: bcache_reboot() Timeout waiting for devices to =
+be closed
+>> [14879.111948] sd 4:0:0:0: [sdh] Synchronizing SCSI cache
+>> [14879.122617] sd 4:0:0:0: [sdh] Stopping disk
+>> [14879.615609] sd 3:0:0:0: [sdg] Synchronizing SCSI cache
+>> [14879.626667] sd 3:0:0:0: [sdg] Stopping disk
+>> [14881.520158] sd 0:2:2:0: [sdc] tag#684 FAILED Result: =
+hostbyte=3DDID_NO_CONNECT driverbyte=3DDRIVER_OK
+>> [14881.538216] sd 0:2:2:0: [sdc] tag#684 CDB: Write(10) 2a 00 13 17 =
+1f e8 00 00 08 00
+>> [14881.553614] print_req_error: I/O error, dev sdc, sector 320282600
+>> [14881.566001] sd 0:2:4:0: [sde] tag#684 FAILED Result: =
+hostbyte=3DDID_NO_CONNECT driverbyte=3DDRIVER_OK
+>> [14881.583982] sd 0:2:4:0: [sde] tag#684 CDB: Write(10) 2a 00 13 17 =
+1f e8 00 00 08 00
+>> [14881.599303] print_req_error: I/O error, dev sde, sector 320282600
+>> [14881.611638] sd 0:2:5:0: [sdf] tag#684 FAILED Result: =
+hostbyte=3DDID_NO_CONNECT driverbyte=3DDRIVER_OK
+>> [14881.629587] sd 0:2:5:0: [sdf] tag#684 CDB: Write(10) 2a 00 13 17 =
+1f e8 00 00 08 00
+>> [14881.661536] print_req_error: I/O error, dev sdf, sector 320282600
+>> [14881.690648] sd 0:2:5:0: [sdf] tag#684 FAILED Result: =
+hostbyte=3DDID_NO_CONNECT driverbyte=3DDRIVER_OK
+>> [14881.725455] sd 0:2:5:0: [sdf] tag#684 CDB: Write(10) 2a 00 13 17 =
+20 00 00 02 80 00
+>> [14881.757640] print_req_error: I/O error, dev sdf, sector 320282624
+>> [14881.786840] sd 0:2:3:0: [sdd] tag#684 FAILED Result: =
+hostbyte=3DDID_NO_CONNECT driverbyte=3DDRIVER_OK
+>> [14881.821202] sd 0:2:3:0: [sdd] tag#684 CDB: Write(10) 2a 00 13 17 =
+1f e8 00 00 08 00
+>> [14881.852497] print_req_error: I/O error, dev sdd, sector 320282600
+>> [14881.880392] sd 0:2:0:0: [sda] tag#684 FAILED Result: =
+hostbyte=3DDID_NO_CONNECT driverbyte=3DDRIVER_OK
+>> [14881.913429] sd 0:2:0:0: [sda] tag#684 CDB: Write(10) 2a 00 13 17 =
+1f e8 00 00 08 00
+>> [14881.943303] print_req_error: I/O error, dev sda, sector 320282600
+>> [14881.969675] sd 0:2:1:0: [sdb] tag#684 FAILED Result: =
+hostbyte=3DDID_NO_CONNECT driverbyte=3DDRIVER_OK
+>> [14882.001626] sd 0:2:1:0: [sdb] tag#684 CDB: Write(10) 2a 00 13 17 =
+1f e8 00 00 08 00
+>> [14882.030904] print_req_error: I/O error, dev sdb, sector 320282600
+>> [14882.057411] sd 0:2:4:0: [sde] tag#299 FAILED Result: =
+hostbyte=3DDID_NO_CONNECT driverbyte=3DDRIVER_OK
+>> [14882.088845] sd 0:2:4:0: [sde] tag#299 CDB: Write(10) 2a 00 13 17 =
+20 00 00 02 80 00
+>> [14882.117051] print_req_error: I/O error, dev sde, sector 320282624
+>> [14882.142352] sd 0:2:5:0: [sdf] tag#299 FAILED Result: =
+hostbyte=3DDID_NO_CONNECT driverbyte=3DDRIVER_OK
+>> [14882.142430] sd 0:2:4:0: [sde] tag#300 FAILED Result: =
+hostbyte=3DDID_NO_CONNECT driverbyte=3DDRIVER_OK
+>> [14882.173313] sd 0:2:5:0: [sdf] tag#299 CDB: Write(10) 2a 00 13 17 =
+22 80 00 01 80 00
+>> [14882.173315] print_req_error: I/O error, dev sdf, sector 320283264
+>> [14882.257818] sd 0:2:4:0: [sde] tag#300 CDB: Write(10) 2a 00 13 17 =
+22 80 00 01 80 00
+>> [14882.286196] print_req_error: I/O error, dev sde, sector 320283264
+>> [14882.372678] md: super_written gets error=3D10
+>> [14882.394226] md/raid:md2: Disk failure on sdc5, disabling device.
+>> [14882.394226] md/raid:md2: Operation continuing on 5 devices.
+>> [14882.396634] md: super_written gets error=3D10
+>> [14882.443706] md: super_written gets error=3D10
+>> [14882.465231] md/raid:md2: Disk failure on sde5, disabling device.
+>> [14882.465231] md/raid:md2: Operation continuing on 4 devices.
+>> [14885.396071] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.423090] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.450404] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.476946] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.503344] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.530389] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.563027] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.589494] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.615995] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.642142] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.667968] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.693224] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.717937] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.743191] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.767407] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14885.792214] bcache: bch_count_backing_io_errors() md2: IO error on =
+backing device, unrecoverable
+>> [14890.416424] btrfs_dev_stat_print_on_error: 1409 callbacks =
+suppressed
+>> [14890.416429] BTRFS error (device bcache0): bdev /dev/bcache0 errs: =
+wr 1417, rd 0, flush 0, corrupt 0, gen 0
+>> [14890.460838] BTRFS error (device bcache0): bdev /dev/bcache0 errs: =
+wr 1418, rd 0, flush 0, corrupt 0, gen 0
+>> [14890.486347] BTRFS error (device bcache0): bdev /dev/bcache0 errs: =
+wr 1419, rd 0, flush 0, corrupt 0, gen 0
+>> [14890.511308] BTRFS error (device bcache0): bdev /dev/bcache0 errs: =
+wr 1420, rd 0, flush 0, corrupt 0, gen 0
+>> [14890.536129] Emergency Sync complete
+>> [14891.398791] ACPI: Preparing to enter system sleep state S5
+>> [14891.460410] reboot: Power down
+>> [14891.471830] acpi_power_off called
+>=20
+>=20
+> megacli -LdPdInfo -a0  output for the first drive below. =20
+>> Number of Virtual Disks: 6
+>> Virtual Drive: 0 (Target Id: 0)
+>> Name                :0
+>> RAID Level          : Primary-0, Secondary-0, RAID Level Qualifier-0
+>> Size                : 1.818 TB
+>> Sector Size         : 512
+>> Parity Size         : 0
+>> State               : Optimal
+>> Strip Size          : 64 KB
+>> Number Of Drives    : 1
+>> Span Depth          : 1
+>> Default Cache Policy: WriteBack, ReadAheadNone, Direct, No Write =
+Cache if Bad BBU
+>> Current Cache Policy: WriteBack, ReadAheadNone, Direct, No Write =
+Cache if Bad BBU
+>> Default Access Policy: Read/Write
+>> Current Access Policy: Read/Write
+>> Disk Cache Policy   : Disabled
+>> Encryption Type     : None
+>> Is VD Cached: No
+>> Number of Spans: 1
+>> Span: 0 - Number of PDs: 1
+>>=20
+>> PD: 0 Information
+>> Enclosure Device ID: 8
+>> Slot Number: 0
+>> Drive's position: DiskGroup: 0, Span: 0, Arm: 0
+>> Enclosure position: N/A
+>> Device Id: 0
+>> WWN:=20
+>> Sequence Number: 2
+>> Media Error Count: 0
+>> Other Error Count: 1
+>> Predictive Failure Count: 0
+>> Last Predictive Failure Event Seq Number: 0
+>> PD Type: SATA
+>>=20
+>> Raw Size: 1.819 TB [0xe8e088b0 Sectors]
+>> Non Coerced Size: 1.818 TB [0xe8d088b0 Sectors]
+>> Coerced Size: 1.818 TB [0xe8d00000 Sectors]
+>> Sector Size:  0
+>> Firmware state: Online, Spun Up
+>> Device Firmware Level: AB50
+>> Shield Counter: 0
+>> Successful diagnostics completion on :  N/A
+>> SAS Address(0):
+>> 0x1221000000000000
+>> Connected Port Number: 0=20
+>> Inquiry Data:      WD-WMAZA0374092WDC WD20EARS-00MVWB0                =
+    50.0AB50
+>> FDE Capable: Not Capable
+>> FDE Enable: Disable
+>> Secured: Unsecured
+>> Locked: Unlocked
+>> Needs EKM Attention: No
+>> Foreign State: None=20
+>> Device Speed: Unknown=20
+>> Link Speed: Unknown=20
+>> Media Type: Hard Disk Device
+>> Drive Temperature : N/A
+>> PI Eligibility:  No=20
+>> Drive is formatted for PI information:  No
+>> PI: No PI
+>> Port-0 :
+>> Port status: Active
+>> Port's Linkspeed: Unknown=20
+>> Drive has flagged a S.M.A.R.T alert : No
+>=20
+> Thanks,
+> Marc
+> --=20
+> "A mouse is a device used to point at the xterm you want to type in" - =
+A.S.R.
+> Microsoft is to operating systems ....
+>                                      .... what McDonalds is to gourmet =
+cooking
+> Home page: http://marc.merlins.org/                       | PGP =
+7F55D5F27AAF9D08
+
