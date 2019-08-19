@@ -6,80 +6,86 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C008C3A59B
-	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 03:56:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A52C3A59B
+	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 03:58:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1D9322087E
-	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 03:56:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7CBF2087E
+	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 03:58:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726295AbfHSD4Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Aug 2019 23:56:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46272 "EHLO mx1.redhat.com"
+        id S1726370AbfHSD6T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Aug 2019 23:58:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43282 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726162AbfHSD4Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Aug 2019 23:56:25 -0400
+        id S1726281AbfHSD6T (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Aug 2019 23:58:19 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 23E2D3091782;
-        Mon, 19 Aug 2019 03:56:25 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 425D43082B13;
+        Mon, 19 Aug 2019 03:58:19 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E9D61001B11;
-        Mon, 19 Aug 2019 03:56:19 +0000 (UTC)
-Date:   Mon, 19 Aug 2019 11:56:14 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9175E1001B11;
+        Mon, 19 Aug 2019 03:58:14 +0000 (UTC)
+Date:   Mon, 19 Aug 2019 11:58:09 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Pan Bian <bianpan2016@163.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH V2] block/bio-integrity: fix mismatched alloc free
-Message-ID: <20190819035613.GC3086@ming.t460p>
-References: <1566176353-20157-1-git-send-email-bianpan2016@163.com>
+To:     Junxiao Bi <junxiao.bi@oracle.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH] block: remove queue_head
+Message-ID: <20190819035808.GD3086@ming.t460p>
+References: <20190816211233.22414-1-junxiao.bi@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1566176353-20157-1-git-send-email-bianpan2016@163.com>
+In-Reply-To: <20190816211233.22414-1-junxiao.bi@oracle.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Mon, 19 Aug 2019 03:56:25 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Mon, 19 Aug 2019 03:58:19 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 19, 2019 at 08:59:13AM +0800, Pan Bian wrote:
-> The function kmalloc rather than mempool_alloc is called to allocate
-> memory when the memory pool is unavailable. However, mempool_alloc is
-> used to release the memory chunck in both cases when error occurs. This
-> patch fixes the bug.
+On Fri, Aug 16, 2019 at 02:12:33PM -0700, Junxiao Bi wrote:
+> The dispatch list was not used any more as lagency block gone.
 > 
-> Fixes: 9f060e2231c ("block: Convert integrity to bvec_alloc_bs()")
-> Signed-off-by: Pan Bian <bianpan2016@163.com>
-> Cc: stable@vger.kernel.org
+> Signed-off-by: Junxiao Bi <junxiao.bi@oracle.com>
 > ---
-> V2: add Fixes and CC tags
-> ---
->  block/bio-integrity.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  block/blk-core.c       | 1 -
+>  include/linux/blkdev.h | 4 ----
+>  2 files changed, 5 deletions(-)
 > 
-> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-> index fb95dbb..011dfc8 100644
-> --- a/block/bio-integrity.c
-> +++ b/block/bio-integrity.c
-> @@ -75,7 +75,10 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index d0cc6e14d2f0..82c9c1ef1de6 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -479,7 +479,6 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+>  	if (!q)
+>  		return NULL;
 >  
->  	return bip;
->  err:
-> -	mempool_free(bip, &bs->bio_integrity_pool);
-> +	if (!bs || !mempool_initialized(&bs->bio_integrity_pool))
-> +		kfree(bip);
-> +	else
-> +		mempool_free(bip, &bs->bio_integrity_pool);
->  	return ERR_PTR(-ENOMEM);
->  }
->  EXPORT_SYMBOL(bio_integrity_alloc);
+> -	INIT_LIST_HEAD(&q->queue_head);
+>  	q->last_merge = NULL;
+>  
+>  	q->id = ida_simple_get(&blk_queue_ida, 0, 0, gfp_mask);
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 1ef375dafb1c..680c4d08f1a2 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -391,10 +391,6 @@ static inline int blkdev_reset_zones_ioctl(struct block_device *bdev,
+>  #endif /* CONFIG_BLK_DEV_ZONED */
+>  
+>  struct request_queue {
+> -	/*
+> -	 * Together with queue_head for cacheline sharing
+> -	 */
+> -	struct list_head	queue_head;
+>  	struct request		*last_merge;
+>  	struct elevator_queue	*elevator;
+>  
+> -- 
+> 2.17.1
+> 
 
-'err' is still reached in case that 'bs' is valid, so fix nothing.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-
-Thanks,
+thanks,
 Ming
