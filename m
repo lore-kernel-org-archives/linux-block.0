@@ -5,85 +5,84 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B49C3A589
-	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 01:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 368B4C3A589
+	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 01:15:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD98F2184E
-	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 01:11:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 073862146E
+	for <linux-block@archiver.kernel.org>; Mon, 19 Aug 2019 01:15:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="fqHzFLxv"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="kQznfR5Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726139AbfHSBLM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Aug 2019 21:11:12 -0400
-Received: from mail-m974.mail.163.com ([123.126.97.4]:56622 "EHLO
-        mail-m974.mail.163.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726028AbfHSBLL (ORCPT
+        id S1726139AbfHSBPU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Aug 2019 21:15:20 -0400
+Received: from mail-m975.mail.163.com ([123.126.97.5]:43174 "EHLO
+        mail-m975.mail.163.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726120AbfHSBPT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Aug 2019 21:11:11 -0400
-X-Greylist: delayed 908 seconds by postgrey-1.27 at vger.kernel.org; Sun, 18 Aug 2019 21:11:10 EDT
+        Sun, 18 Aug 2019 21:15:19 -0400
+X-Greylist: delayed 908 seconds by postgrey-1.27 at vger.kernel.org; Sun, 18 Aug 2019 21:15:18 EDT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id; bh=AhlZq954DUs1td47Fp
-        1YzSTZ4wsM4BL8ljtYCpk7jqE=; b=fqHzFLxv2+v/O2kxlBHQBazdO8j4C/U2g3
-        7IiWVcWp6JTJQzCEw7b2x9wZk+MF9L6WhiulOJH9b3OP/Xeb0MfVGPP8FI1V44sK
-        8XQ5hdC3uc+CSyZ3hTa2Af27IfDtSN6IBbyW+N9/Y+GsP8k8dJ6ouD0KDMm7BBQ3
-        VsIX2kdpo=
+        s=s110527; h=From:Subject:Date:Message-Id; bh=/7j5TCVh3LyFbojbI4
+        zNhdc3Dow0JvOr+GRNkDNVxl8=; b=kQznfR5YSJzolkAfLVeQQ1cW4idq5qSjkO
+        fq9sNlZqNk2dTpYeS8RoTSXNMyAvTY7enb0Mjt0XZOkrKU0gH3XKCB+G9inbziIQ
+        XNJSmMPaBKs/UbpSzmBL0Ryx7L9XpgZzgtqgVK3noBpiPws0xd9rgN1MfIMEVGbM
+        xfxzAeZ+8=
 Received: from localhost.localdomain (unknown [202.112.113.212])
-        by smtp4 (Coremail) with SMTP id HNxpCgDHeKB981ld3QyRCw--.171S3;
-        Mon, 19 Aug 2019 08:55:37 +0800 (CST)
+        by smtp5 (Coremail) with SMTP id HdxpCgB3jbRn9FldfQ_WAg--.240S3;
+        Mon, 19 Aug 2019 09:00:07 +0800 (CST)
 From:   Pan Bian <bianpan2016@163.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Pan Bian <bianpan2016@163.com>, stable@vger.kernel.org
-Subject: [PATCH V2] block: fix a mismatched alloc free in bio_alloc_bioset
-Date:   Mon, 19 Aug 2019 08:55:20 +0800
-Message-Id: <1566176120-19924-1-git-send-email-bianpan2016@163.com>
+Subject: [PATCH V2] block/bio-integrity: fix mismatched alloc free
+Date:   Mon, 19 Aug 2019 08:59:13 +0800
+Message-Id: <1566176353-20157-1-git-send-email-bianpan2016@163.com>
 X-Mailer: git-send-email 2.7.4
-X-CM-TRANSID: HNxpCgDHeKB981ld3QyRCw--.171S3
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Jr4xGF43JF4fCF4DJw1UJrb_yoWfAFb_Ka
-        10qrs7JFykXFW7CwnFkrW8Zr409rWfGr48uF13t3y3Jry5GFn3ZwnFqr95Wrs7CrWxuFyY
-        v395WF15tr17tjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUb6wZ3UUUUU==
+X-CM-TRANSID: HdxpCgB3jbRn9FldfQ_WAg--.240S3
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKr1UuFyUuw15CF1kZFyUGFg_yoWDZFc_Ka
+        yv9r93ArnYvF4xCw12yFy7Ar4vvr4fXF1rXFyaqrWaqFyxAry3A3s7Xr95XFs7Wr97urnx
+        uryvqwnFqw17KjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUb8wIPUUUUU==
 X-Originating-IP: [202.112.113.212]
-X-CM-SenderInfo: held01tdqsiiqw6rljoofrz/xtbBZAkWclQHGZll7gAAsR
+X-CM-SenderInfo: held01tdqsiiqw6rljoofrz/xtbBzwkWclaD4ImCBQABsY
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The function kmalloc is called to allocate memory if bs is NULL.
-However, mempool_free is used to release the memory chunk even if bs is
-NULL in the error hanlding code. This patch checks bs and use the
-correct function to release memory.
+The function kmalloc rather than mempool_alloc is called to allocate
+memory when the memory pool is unavailable. However, mempool_alloc is
+used to release the memory chunck in both cases when error occurs. This
+patch fixes the bug.
 
-
-Fixes: 3f86a82aeb ("block: Consolidate bio_alloc_bioset(), bio_kmalloc()")
+Fixes: 9f060e2231c ("block: Convert integrity to bvec_alloc_bs()")
 Signed-off-by: Pan Bian <bianpan2016@163.com>
 Cc: stable@vger.kernel.org
 ---
-V2: add Fixes and Cc tags
+V2: add Fixes and CC tags
 ---
- block/bio.c | 5 ++++-
+ block/bio-integrity.c | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 299a0e7..c5f5238 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -515,7 +515,10 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
- 	return bio;
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index fb95dbb..011dfc8 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -75,7 +75,10 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
  
- err_free:
--	mempool_free(p, &bs->bio_pool);
-+	if (!bs)
-+		kfree(p);
+ 	return bip;
+ err:
+-	mempool_free(bip, &bs->bio_integrity_pool);
++	if (!bs || !mempool_initialized(&bs->bio_integrity_pool))
++		kfree(bip);
 +	else
-+		mempool_free(p, &bs->bio_pool);
- 	return NULL;
++		mempool_free(bip, &bs->bio_integrity_pool);
+ 	return ERR_PTR(-ENOMEM);
  }
- EXPORT_SYMBOL(bio_alloc_bioset);
+ EXPORT_SYMBOL(bio_integrity_alloc);
 -- 
 2.7.4
 
