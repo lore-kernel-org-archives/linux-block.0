@@ -2,137 +2,140 @@ Return-Path: <SRS0=6fCZ=WQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C95C3A589
-	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 10:48:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2026EC3A589
+	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 12:42:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E01C2082F
-	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 10:48:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dgG7nSae"
+	by mail.kernel.org (Postfix) with ESMTP id EFB4A22CF7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 12:42:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729510AbfHTKsO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Aug 2019 06:48:14 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43221 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728545AbfHTKsO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Aug 2019 06:48:14 -0400
-Received: by mail-wr1-f65.google.com with SMTP id y8so11867948wrn.10
-        for <linux-block@vger.kernel.org>; Tue, 20 Aug 2019 03:48:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=8YhdYjqe+CTt77YsPRFesv990RDPmX6UdhabR8/j8l8=;
-        b=dgG7nSaegDa/f34PzKpV/NDTRDbAf4Tn8ESgBGCCvyBUctxq98sGkgyEW3giHSJqxI
-         yUlLAH58TbPebsNICnhxbv2FhjuVdm71H1yyw5DTYaHXUr2mcxTajrDMX8YQgXP6K59l
-         KMlqgNId7X/0kUtpLyRyUbCvjdArWdQ99nv9N56pBQaxb3fB9btAbzRfZfUnDKcyc653
-         FieTVsewJyyWcgh+hruCD2sviZgKsiiLWf5EamLzSfUSXhw0pHGE0djlhbWl5DfBK/qL
-         x+kZDh5BOO4jY2T8+YBs/0azHTKHddDMvZO7kBrbJSv/Sg/eUgpzfCZxDVIdodTyN4C4
-         JChA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=8YhdYjqe+CTt77YsPRFesv990RDPmX6UdhabR8/j8l8=;
-        b=CwtSzL0+ue5Mreu9acSw5FL2QqnwGo+Y91ecov72fDKVeX84Z/rgyhffeWVEUQ20pP
-         isVCNY6o73dXq/f9bJDeOYIqon7hB9a9XLpIqixF/ji1TWcZkGuq0iuP6NBStfvP+Ghr
-         1mMRj3+3R8xJro2phr9dOTtbfhEpJpGWLQ6qHYEEULscWacm/GUU0DNOBbsyXERsEM45
-         meu1fGSxtxMD973k6LgqLztgZ4n6vYHa7yaX6iDnTlOTzdaJ8t+jS8U1ys9fcoCN5OZq
-         1IlplrVAVQbo5eVvosDl8i6qcrrOvIXl47bXHvIMlq5SV5QH+VTz696E+08qgLJwupXx
-         QLCw==
-X-Gm-Message-State: APjAAAWkS/Op8r35sWXS308B/eqx7mi5pbkc9NBjsabF3ysJJKoJulu6
-        gneVA96dZepJ9zXb1rOdi7Q2nQ==
-X-Google-Smtp-Source: APXvYqwc3MstBJr5Jkxt0X3//Ms1r9i69Vio0VuTKiCfoKN0uTDQcpIcE5vYcPNH7zQIlsf1GoelnQ==
-X-Received: by 2002:a5d:5450:: with SMTP id w16mr20045745wrv.174.1566298092001;
-        Tue, 20 Aug 2019 03:48:12 -0700 (PDT)
-Received: from [192.168.0.101] (88-147-37-138.dyn.eolo.it. [88.147.37.138])
-        by smtp.gmail.com with ESMTPSA id c11sm14244247wrs.86.2019.08.20.03.48.10
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Aug 2019 03:48:11 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCHSET block/for-next] IO cost model based work-conserving
- porportional controller
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20190614175642.GA657710@devbig004.ftw2.facebook.com>
-Date:   Tue, 20 Aug 2019 12:48:09 +0200
-Cc:     Jens Axboe <axboe@kernel.dk>, newella@fb.com, clm@fb.com,
-        Josef Bacik <josef@toxicpanda.com>, dennisz@fb.com,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>, kernel-team@fb.com,
-        cgroups@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-        kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
-        bpf@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <5A63F937-F7B5-4D09-9DB4-C73D6F571D50@linaro.org>
-References: <20190614015620.1587672-1-tj@kernel.org>
- <20190614175642.GA657710@devbig004.ftw2.facebook.com>
-To:     Tejun Heo <tj@kernel.org>
-X-Mailer: Apple Mail (2.3445.104.8)
+        id S1729672AbfHTMmp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Aug 2019 08:42:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43034 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727006AbfHTMmp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Aug 2019 08:42:45 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 06B9830860DC;
+        Tue, 20 Aug 2019 12:42:45 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.43.2.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A5C2E5C21F;
+        Tue, 20 Aug 2019 12:42:41 +0000 (UTC)
+From:   Julia Suvorova <jusual@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Stefan Hajnoczi <stefanha@gmail.com>,
+        Aarushi Mehta <mehta.aaru20@gmail.com>,
+        Julia Suvorova <jusual@redhat.com>
+Subject: [PATCH] liburing/barrier.h: Add prefix to arm barriers
+Date:   Tue, 20 Aug 2019 14:42:36 +0200
+Message-Id: <20190820124236.19608-1-jusual@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Tue, 20 Aug 2019 12:42:45 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Rename the newly added arm barriers and READ/WRITE_ONCE
+to avoid using popular names.
 
+Signed-off-by: Julia Suvorova <jusual@redhat.com>
+---
+ src/include/liburing/barrier.h | 46 +++++++++++++++++-----------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
 
-> Il giorno 14 giu 2019, alle ore 19:56, Tejun Heo <tj@kernel.org> ha =
-scritto:
->=20
-> On Thu, Jun 13, 2019 at 06:56:10PM -0700, Tejun Heo wrote:
-> ...
->> The patchset is also available in the following git branch.
->>=20
->> git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git =
-review-iow
->=20
-> Updated patchset available in the following branch.  Just build fixes
-> and cosmetic changes for now.
->=20
->  git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git =
-review-iow-v2
->=20
-
-Hi Tejun,
-I'm running the kernel in your tree above, in an Ubuntu 18.04.
-
-After unmounting the v1 blkio controller that gets mounted at startup
-I have created v2 root as follows
-
-$ mount -t cgroup2 none /cgroup
-
-Then I have:
-$ ls /cgroup
-cgroup.controllers  cgroup.max.descendants  cgroup.stat             =
-cgroup.threads  io.weight.cost_model  system.slice
-cgroup.max.depth    cgroup.procs            cgroup.subtree_control  =
-init.scope      io.weight.qos         user.slice
-
-But the following command gives no output:
-$ cat /cgroup/io.weight.qos=20
-
-And, above all,
-$ echo 1 > /cgroup/io.weight.qos=20
-bash: echo: write error: Invalid argument
-
-No complain in the kernel log.
-
-What am I doing wrong? How can I make the controller work?
-
-Thanks,
-Paolo
-
-> Thanks.
->=20
-> --=20
-> tejun
+diff --git a/src/include/liburing/barrier.h b/src/include/liburing/barrier.h
+index 8efa6dd..fc40a8a 100644
+--- a/src/include/liburing/barrier.h
++++ b/src/include/liburing/barrier.h
+@@ -26,9 +26,9 @@ after the acquire operation executes. This is implemented using
+ #define io_uring_barrier()	__asm__ __volatile__("": : :"memory")
+ 
+ /* From tools/virtio/linux/compiler.h */
+-#define WRITE_ONCE(var, val) \
++#define IO_URING_WRITE_ONCE(var, val) \
+ 	(*((volatile __typeof(val) *)(&(var))) = (val))
+-#define READ_ONCE(var) (*((volatile __typeof(var) *)(&(var))))
++#define IO_URING_READ_ONCE(var) (*((volatile __typeof(var) *)(&(var))))
+ 
+ 
+ #if defined(__x86_64__) || defined(__i386__)
+@@ -49,27 +49,27 @@ after the acquire operation executes. This is implemented using
+ #define io_uring_smp_store_release(p, v)	\
+ do {						\
+ 	io_uring_barrier();			\
+-	WRITE_ONCE(*(p), (v));			\
++	IO_URING_WRITE_ONCE(*(p), (v));		\
+ } while (0)
+ 
+-#define io_uring_smp_load_acquire(p)		\
+-({						\
+-	__typeof(*p) ___p1 = READ_ONCE(*(p));	\
+-	io_uring_barrier();			\
+-	___p1;					\
++#define io_uring_smp_load_acquire(p)			\
++({							\
++	__typeof(*p) ___p1 = IO_URING_READ_ONCE(*(p));	\
++	io_uring_barrier();				\
++	___p1;						\
+ })
+ 
+ #elif defined(__aarch64__)
+ /* Adapted from arch/arm64/include/asm/barrier.h */
+-#define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
+-#define dsb(opt)	asm volatile("dsb " #opt : : : "memory")
++#define io_uring_dmb(opt)	asm volatile("dmb " #opt : : : "memory")
++#define io_uring_dsb(opt)	asm volatile("dsb " #opt : : : "memory")
+ 
+-#define mb()		dsb(sy)
+-#define rmb()		dsb(ld)
+-#define wmb()		dsb(st)
+-#define smp_mb()	dmb(ish)
+-#define smp_rmb()	dmb(ishld)
+-#define smp_wmb()	dmb(ishst)
++#define io_uring_mb()		io_uring_dsb(sy)
++#define io_uring_rmb()		io_uring_dsb(ld)
++#define io_uring_wmb()		io_uring_dsb(st)
++#define io_uring_smp_mb()	io_uring_dmb(ish)
++#define io_uring_smp_rmb()	io_uring_dmb(ishld)
++#define io_uring_smp_wmb()	io_uring_dmb(ishst)
+ 
+ #else /* defined(__x86_64__) || defined(__i386__) || defined(__aarch64__) */
+ /*
+@@ -83,19 +83,19 @@ do {						\
+ /* From tools/include/asm/barrier.h */
+ 
+ #ifndef io_uring_smp_store_release
+-# define io_uring_smp_store_release(p, v)	\
++#define io_uring_smp_store_release(p, v)	\
+ do {						\
+ 	io_uring_smp_mb();			\
+-	WRITE_ONCE(*p, v);			\
++	IO_URING_WRITE_ONCE(*p, v);		\
+ } while (0)
+ #endif
+ 
+ #ifndef io_uring_smp_load_acquire
+-# define io_uring_smp_load_acquire(p)		\
+-({						\
+-	__typeof(*p) ___p1 = READ_ONCE(*p);	\
+-	io_uring_smp_mb();			\
+-	___p1;					\
++#define io_uring_smp_load_acquire(p)			\
++({							\
++	__typeof(*p) ___p1 = IO_URING_READ_ONCE(*p);	\
++	io_uring_smp_mb();				\
++	___p1;						\
+ })
+ #endif
+ 
+-- 
+2.21.0
 
