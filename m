@@ -2,136 +2,67 @@ Return-Path: <SRS0=6fCZ=WQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A890FC3A5A1
-	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 01:50:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0A5C3A589
+	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 05:49:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E95822DBF
-	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 01:50:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesasgroup.onmicrosoft.com header.i=@renesasgroup.onmicrosoft.com header.b="n3qvq91z"
+	by mail.kernel.org (Postfix) with ESMTP id ED103214DA
+	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 05:49:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728777AbfHTBur (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Aug 2019 21:50:47 -0400
-Received: from mail-eopbgr1410131.outbound.protection.outlook.com ([40.107.141.131]:33890
-        "EHLO JPN01-OS2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728615AbfHTBuq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Aug 2019 21:50:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DMN2fOe8L0LToDCs8HGFWIqeMyGWL4OffW5P44dLiFpPpgqhZ93dQc9NshNEa+NsvDcHobEsvusJWzcF+4TpyT4mr/sNAT8m2QTnB6AUwaiocrh0P3O0LaHbdt1f/BZ5FIpjQx3TLTVbgECPnWmS+6Q2mVGtQcfHcZ5cdtYY9ZoQ//01ZV3JPFmW4ealokAZTTugpgBUOR+HatyKBeaGqDRzazCWskKEpyoXRCbehwrQtg9yIx981yCQEtieyb1+AwecIulOLltIOxHbv9FCzDN8ttRT/MY4ScSmT1EKAQI3Pe6FCF9kn8Jp4lEztiUqcn05A0NlBCQivVMkmIiuzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aVxckdJMTPqdoC7iY2p6aIZ6vWGLg7FI+fcHx/E4U8M=;
- b=ZAbRQTey654TqavXAlLj7IN/A52EH4PHCT+g1CAbz/wCrOlrY0aVKHk0QdznfNzao2RjWN2kRkTA3tQSqeK1CLhkjwAu17G+WFpb06Zt/wY2zYkuRi86CXajKGmygHnlKDez24idKUICdeFvYLgL4Ds3HRzebzXaI77WQU2DO07VikN6pbF2ekOq+S2I/s/925i3qXgSLxXU3TZGAeVAtvcrWZNnDB6Sw7DfMRayS4lHMYNZ1n7q4nr6N3vNPt1PmKIfB6YKA8AD/orbJWPRwc/ITCYdxP5XsRPp/i8VSWXN9atQhhI1ugggiWiWLwqZ1qRXnzvlHU+CgOkAcIIABw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=renesasgroup.onmicrosoft.com; s=selector2-renesasgroup-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aVxckdJMTPqdoC7iY2p6aIZ6vWGLg7FI+fcHx/E4U8M=;
- b=n3qvq91zCjjC2bc3jVeo8u2FTqA04g6wOZlnipu0WJRPcrDp6Rt48hmuU80Wp0ubUH6nxnghYQOMKMX+eUNLFAbK7f87mcrzeObfKET6hfEu4atydvKVfdFyG8vPd+O733WIfzodggmsG4hBWkLHYJBXI5pUsdZJwF6YB6Y0INY=
-Received: from TYAPR01MB4544.jpnprd01.prod.outlook.com (20.179.175.203) by
- TYAPR01MB5231.jpnprd01.prod.outlook.com (20.179.173.145) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2178.16; Tue, 20 Aug 2019 01:50:43 +0000
-Received: from TYAPR01MB4544.jpnprd01.prod.outlook.com
- ([fe80::6564:f61f:f179:facf]) by TYAPR01MB4544.jpnprd01.prod.outlook.com
- ([fe80::6564:f61f:f179:facf%5]) with mapi id 15.20.2178.018; Tue, 20 Aug 2019
- 01:50:43 +0000
-From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To:     Jens Axboe <axboe@kernel.dk>, Wolfram Sang <wsa@the-dreams.de>
-CC:     "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-        "hch@lst.de" <hch@lst.de>,
-        "m.szyprowski@samsung.com" <m.szyprowski@samsung.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "wsa+renesas@sang-engineering.com" <wsa+renesas@sang-engineering.com>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-renesas-soc@vger.kernel.org" 
-        <linux-renesas-soc@vger.kernel.org>
-Subject: RE: [PATCH v9 3/5] block: sort headers on blk-setting.c
-Thread-Topic: [PATCH v9 3/5] block: sort headers on blk-setting.c
-Thread-Index: AQHVQ4yofFMPRBcpeUW9xg5SuKaKh6b+UJkAgARkGACAALaGAA==
-Date:   Tue, 20 Aug 2019 01:50:43 +0000
-Message-ID: <TYAPR01MB454435B8DB5ECFC1291C8037D8AB0@TYAPR01MB4544.jpnprd01.prod.outlook.com>
-References: <1564129876-28261-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
- <1564129876-28261-4-git-send-email-yoshihiro.shimoda.uh@renesas.com>
- <20190816195026.GC6886@kunai>
- <6ed6c62d-d773-71ec-382b-acd850e3dff1@kernel.dk>
-In-Reply-To: <6ed6c62d-d773-71ec-382b-acd850e3dff1@kernel.dk>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=yoshihiro.shimoda.uh@renesas.com; 
-x-originating-ip: [118.238.235.108]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5e1f438e-5a83-4486-e54c-08d72510d010
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:TYAPR01MB5231;
-x-ms-traffictypediagnostic: TYAPR01MB5231:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <TYAPR01MB52310F263CA877C35A5FA37AD8AB0@TYAPR01MB5231.jpnprd01.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 013568035E
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(376002)(366004)(346002)(136003)(39860400002)(396003)(199004)(189003)(8936002)(5660300002)(54906003)(99286004)(66066001)(186003)(7416002)(52536014)(110136005)(26005)(316002)(7736002)(11346002)(305945005)(476003)(74316002)(6506007)(102836004)(7696005)(446003)(81166006)(81156014)(8676002)(4744005)(486006)(76176011)(53546011)(9686003)(966005)(478600001)(3846002)(71200400001)(71190400001)(66946007)(76116006)(6306002)(14454004)(6116002)(55016002)(4326008)(86362001)(66476007)(66446008)(66556008)(53936002)(33656002)(6436002)(64756008)(6246003)(229853002)(14444005)(2906002)(25786009)(256004)(6606295002);DIR:OUT;SFP:1102;SCL:1;SRVR:TYAPR01MB5231;H:TYAPR01MB4544.jpnprd01.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: renesas.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: ae8D1Z5scuDAlcMrYznVoorm+wWGA8KU0f2QmEmqR7elcQIi+0IH/ZhJP+Rot+FTfn0EhLVycma9dS5JHRBWYiRCfpB6PCSBj9Vey8uMFxkPDqEaSLifr9nhbAg/YKrOiFnY0B/S1Bw7dja4v/I7Fuj4q9/ICizK/zqDd76Nc0+X7w7EDzz2uiKZj9RXZKrDypg4nl5DqDHVSPU6lPEWlZqWGHDue2PGFMQleDatXRVdRK1mAHt6loK/zuavc9aZNG5kz1A353fz8NfTeL5lbk017MssWTj5DRqUwBW0hu8rwom3OubxTcFN+Jf5rkBKRxJXcLCGeEQ5LcOkcYUiTFpUOEF2wUO02DOxksfWYGSofdW57k+A/UJJmTjUyEVvWyFM6AIqgQx+IWFKCPbuzQgrTIGGXjmiVLbgc5+o7lE=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1729091AbfHTFtO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Aug 2019 01:49:14 -0400
+Received: from guest-port.merlins.org ([173.11.111.148]:49457 "EHLO
+        mail1.merlins.org" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+        with ESMTP id S1727006AbfHTFtN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Aug 2019 01:49:13 -0400
+Received: from merlin by mail1.merlins.org with local (Exim 4.92 #3)
+        id 1hzx16-0004Q8-Bl by authid <merlin>; Mon, 19 Aug 2019 22:49:12 -0700
+Date:   Mon, 19 Aug 2019 22:49:12 -0700
+From:   Marc MERLIN <marc@merlins.org>
+To:     o1bigtenor <o1bigtenor@gmail.com>
+Cc:     linux-block@vger.kernel.org,
+        Linux-RAID <linux-raid@vger.kernel.org>
+Subject: Re: 5.1.21 Dell 2950 terrible swraid5 I/O performance with swraid on top of Perc 5/i raid0/jbod
+Message-ID: <20190820054912.GJ5431@merlins.org>
+References: <20190819070823.GH12521@merlins.org> <CAPpdf5-82P0ri7KB34g_eWS6SKdVapCgUtYphwOL6E+HUwimcg@mail.gmail.com>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e1f438e-5a83-4486-e54c-08d72510d010
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Aug 2019 01:50:43.4958
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: J/NbfKvsS5K+drkLeU+mk2vASrT5ywosMOBJVPncM0UB2pb9FbMlDN5+iMUpFsfd9qs0jWoy5GOOzCTKNj1kcxv21nkoIzN2br/v7UBbcBsXJ4A4p91XroZxdGv3fcEY
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYAPR01MB5231
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPpdf5-82P0ri7KB34g_eWS6SKdVapCgUtYphwOL6E+HUwimcg@mail.gmail.com>
+X-Sysadmin: BOFH
+X-URL:  http://marc.merlins.org/
+User-Agent: Mutt/1.5.13 (2006-08-11)
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Mail-From: marc@merlins.org
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Mon, Aug 19, 2019 at 06:42:23AM -0500, o1bigtenor wrote:
+> Not to discourage you from a possibly interesting and fruitful endeavor
+> but when I bought myself a slightly newer dell server I traded out the
+> PERC card for a newer version (model 700 IIRC) and then I things
+> were quite a big different. Said board, bought used, wasn't very
+> expensive. YMMV
 
-> From: Jens Axboe, Sent: Monday, August 19, 2019 11:54 PM
->=20
-> On 8/16/19 1:50 PM, Wolfram Sang wrote:
-> > On Fri, Jul 26, 2019 at 05:31:14PM +0900, Yoshihiro Shimoda wrote:
-> >> This patch sorts the headers in alphabetic order to ease
-> >> the maintenance for this part.
-> >>
-> >> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-> >> Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-> >> Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
-> >> ---
-> >
-> > Jens, can we have your ack for this patch so Christoph can take this
-> > series via his tree (also for patch 4/5)?
->=20
-> Please just drop this patch.
+Well, just received my H700 today, plugged it in, not everything is perfect
+because I'm missing a cable, but sure enough, my rebuild speeds got 8 times
+faster and the system stopped hanging all the time if I do any I/O.
 
-I'm afraid, but would you also review the following patch?
-https://marc.info/?l=3Dlinux-block&m=3D156412995120069&w=3D2
-This patch 4/5 is a main patch of the block subsystem on this patch series.
+I still think there was something fairly unexpected/wrong with the Perc 5/i
+outside of it being a cheap card, but I have other things to worry about to
+spend more time to find out :)
+That said, if anyone wants the card for cost of shipping (US only please,
+shipping abroad is too much of a pain), let me know and I'll give it to you.
 
-Best regards,
-Yoshihiro Shimoda
-
-> --
-> Jens Axboe
-
+Marc
+-- 
+"A mouse is a device used to point at the xterm you want to type in" - A.S.R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet cooking
+Home page: http://marc.merlins.org/  
