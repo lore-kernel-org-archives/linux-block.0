@@ -6,35 +6,37 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F8B9C3A59E
-	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 07:45:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26301C3A59E
+	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 08:13:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 50A8A22DCC
-	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 07:45:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 042C823A77
+	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 08:13:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729181AbfHTHps (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Aug 2019 03:45:48 -0400
-Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:43574 "EHLO
-        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726049AbfHTHps (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Aug 2019 03:45:48 -0400
-Received: from dread.disaster.area (pa49-195-190-67.pa.nsw.optusnet.com.au [49.195.190.67])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 1B72143D5AA;
-        Tue, 20 Aug 2019 17:45:44 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92)
-        (envelope-from <david@fromorbit.com>)
-        id 1hzyom-0003xG-Lj; Tue, 20 Aug 2019 17:44:36 +1000
-Date:   Tue, 20 Aug 2019 17:44:36 +1000
-From:   Dave Chinner <david@fromorbit.com>
+        id S1729246AbfHTINl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Aug 2019 04:13:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49356 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726049AbfHTINl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Aug 2019 04:13:41 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id EB3A4C0035C2;
+        Tue, 20 Aug 2019 08:13:40 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-30.pek2.redhat.com [10.72.8.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A026D18C70;
+        Tue, 20 Aug 2019 08:13:32 +0000 (UTC)
+Date:   Tue, 20 Aug 2019 16:13:26 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     "hch@lst.de" <hch@lst.de>
-Cc:     "Verma, Vishal L" <vishal.l.verma@intel.com>,
+Cc:     Dave Chinner <david@fromorbit.com>,
+        "Verma, Vishal L" <vishal.l.verma@intel.com>,
         "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
         "Williams, Dan J" <dan.j.williams@intel.com>,
         "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+        linux-block@vger.kernel.org
 Subject: Re: 5.3-rc1 regression with XFS log recovery
-Message-ID: <20190820074436.GD1119@dread.disaster.area>
+Message-ID: <20190820081325.GA21032@ming.t460p>
 References: <20190818074140.GA18648@lst.de>
  <20190818173426.GA32311@lst.de>
  <20190819000831.GX6129@dread.disaster.area>
@@ -49,13 +51,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190820055320.GB27501@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.2 cv=FNpr/6gs c=1 sm=1 tr=0
-        a=TR82T6zjGmBjdfWdGgpkDw==:117 a=TR82T6zjGmBjdfWdGgpkDw==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=FmdZ9Uzk2mMA:10
-        a=7-415B0cAAAA:8 a=GkOCTHbDHqshCKWEzgMA:9 a=CjuIK1q_8ugA:10
-        a=biEYGPWJfzWAr4FL6Ov7:22
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 20 Aug 2019 08:13:41 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -101,6 +99,12 @@ On Tue, Aug 20, 2019 at 07:53:20AM +0200, hch@lst.de wrote:
 > > 000000006ceca91e	0	768	0x7d004e
 > > 
 > > You should be able to guess what the problems are from this.
+
+The problem should be that offset of '768' is passed to bio_add_page().
+
+It should be one slub buffer used for block IO, looks an old unsolved
+problem.
+
 > > 
 > > Both pmem and brd are _sector_ based. We've done a partial sector
 > > copy on the first bvec, then the second bvec has started the copy
@@ -113,46 +117,11 @@ On Tue, Aug 20, 2019 at 07:53:20AM +0200, hch@lst.de wrote:
 > > copied the same partial sector twice.
 > 
 > Yes.  I think bio_for_each_segment is buggy here, as it should not
-> blindly split by pages.  CcingMing as he wrote much of this code.  I'll
-> also dig into fixing it, but I just arrived in Japan and might be a
-> little jetlagged.
-> 
-> > There's nothing quite like being repeatedly bitten by the same
-> > misalignment bug because there's no validation in the infrastructure
-> > that could catch it immediately and throw a useful warning/error
-> > message.
-> 
-> The xen block driver doesn't use bio_for_each_segment, so it isn't
-> exactly the same but a very related issue. 
+> blindly split by pages.
 
-Both stem from the fact that nothing in the block layer validates
-memory alignment constraints. Xenblk, pmem and brd all return 511 to
-queue_dma_alignment(), and all break when passed memory that isn't
-aligned to 512 bytes.  There aren't even debug options we can turn
-on that would tell use this is happening. Instead, we start with
-data corruption and have to work backwards to find the needle in the
-haystack from there. EIO and a WARN_ONCE would be a massive
-improvement here....
+bio_for_each_segment() just keeps the original interface as before
+introducing multi-page bvec.
 
-> Maybe until we sort
-> all this mess out we just need to depend on !SLUB_DEBUG for XFS?
 
-SLUB_DEBUG=y by itself doesn't cause problems - I run that
-all the time because otherwise there's no /proc/slabinfo with slub.
-
-I used KASAN to get the above alignment behaviour - it's
-SLUB_DEBUG_ON=y that perturbs the alignment, and I think the same
-thing can happen with SLAB_DEBUG=y, so there's several dependencies
-we'd have to add here.
-
-Is there any way we can pass kmalloc a "use aligned heap" GFP flag
-so that it allocates from the -rcl slabs to guarantee alignment
-rather than the standard slabs that change alignment with config
-options?
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Thanks,
+Ming
