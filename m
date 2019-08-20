@@ -2,107 +2,87 @@ Return-Path: <SRS0=6fCZ=WQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C55E2C3A589
-	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 15:35:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61046C3A59E
+	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 16:31:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 95C5922CE3
-	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 15:35:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xC/bqvMR"
+	by mail.kernel.org (Postfix) with ESMTP id 41C80230F2
+	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 16:31:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730204AbfHTPfM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Aug 2019 11:35:12 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:44969 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730105AbfHTPfM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Aug 2019 11:35:12 -0400
-Received: by mail-io1-f68.google.com with SMTP id j4so13023023iop.11
-        for <linux-block@vger.kernel.org>; Tue, 20 Aug 2019 08:35:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=zDLheKP6pGdQfFEeB4dyMPXQqCp/tXAIcEa2C9CtwRg=;
-        b=xC/bqvMRmPicB0aCaUMSBRrAXb2Nm+wZMFmPlr0tjDAIMEW/2sAnrVBjEvboVJSsH9
-         fHkrGztAVyhHHrDvyegww5R7bN5F+6t8qWrQtIdF9FY/Sjen9mVQoA6QFS7zb+KM6YhY
-         D3pnk6076y8t7kLZ0lMTaB4Ox2hfHDM/1VZ4RJ05sM2EHTFuXAcju7E68IUBTUSySof3
-         UAL/VsAlf5y/gosIfth7eeRGHEI6N1/Pa4QN1aZ7a4kF1h1jxxu0l17VK1ZktSrd2Ff/
-         qxTBTdJOVTsiFZ86xAbDs25icv+EStK6AdwGC7bAQJ35UoJr5ne7a0EPS+BkwIFGXR6Y
-         2ZpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zDLheKP6pGdQfFEeB4dyMPXQqCp/tXAIcEa2C9CtwRg=;
-        b=d9mWimQZrFOudRMfhn4e0RwCf6+fqhyDcDW56ipcdc65+W8jqpQWg5048QkdkQtdOo
-         ysXREDlghiBICLlwTdTCu4A0RhdvhSegEbiYra0Ezwe+xGvu07sP8rS9Ki34JjmuzEbQ
-         j5p/tzWXZnfxsgJwvdkyEnWxIdTT2RWc0NZalR5rNDL21Ue860w0GcP4QYalRbfS5Dmb
-         UOUx1oRNqQeq8xGTuINUvqNnxI+z3B1bFsSSg13VZRkq83YYcCwGVBfu30JettluaKLi
-         TLapRSRYMUAY3vWWOnNfEv5L/tII/N/zptoNLayjsVxWOPz4UNp6kY/kDWzstjjg2Bfz
-         pY5w==
-X-Gm-Message-State: APjAAAX/cblu5zZ22qHXGpOBHYSW0l2OLzq69fXoXBXQsH2LwX9kSLsG
-        +SK/7/hjDK7QtO5GjoiK+X+faA==
-X-Google-Smtp-Source: APXvYqx1tMaTMjVdog5AZ4klO2jUQwzDhmH8+fDMxgGw0oQrLy/41LqimRPj0pD/TdP1NQUqTosi6A==
-X-Received: by 2002:a6b:2cc7:: with SMTP id s190mr23753210ios.164.1566315311367;
-        Tue, 20 Aug 2019 08:35:11 -0700 (PDT)
-Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id w5sm23799041iom.33.2019.08.20.08.35.10
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Aug 2019 08:35:10 -0700 (PDT)
-Subject: Re: [PATCH v3 0/3] block: sed-opal: Code Cleanup Patches
-To:     Revanth Rajashekar <revanth.rajashekar@intel.com>,
-        linux-block@vger.kernel.org
-Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
-        Scott Bauer <sbauer@plzdonthack.me>
-References: <20190820153051.24704-1-revanth.rajashekar@intel.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2a4299af-2310-b34d-7129-90ab592976fe@kernel.dk>
-Date:   Tue, 20 Aug 2019 09:35:09 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190820153051.24704-1-revanth.rajashekar@intel.com>
-Content-Type: text/plain; charset=utf-8
+        id S1729900AbfHTQa7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Aug 2019 12:30:59 -0400
+Received: from mga01.intel.com ([192.55.52.88]:7313 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726981AbfHTQa7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Aug 2019 12:30:59 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Aug 2019 09:30:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,408,1559545200"; 
+   d="scan'208";a="185956463"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by FMSMGA003.fm.intel.com with ESMTP; 20 Aug 2019 09:30:57 -0700
+Received: from FMSMSX110.amr.corp.intel.com (10.18.116.10) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 20 Aug 2019 09:30:57 -0700
+Received: from fmsmsx113.amr.corp.intel.com ([169.254.13.127]) by
+ FMSMSX110.amr.corp.intel.com ([169.254.14.63]) with mapi id 14.03.0439.000;
+ Tue, 20 Aug 2019 09:30:57 -0700
+From:   "Verma, Vishal L" <vishal.l.verma@intel.com>
+To:     "hch@lst.de" <hch@lst.de>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC:     "Williams, Dan J" <dan.j.williams@intel.com>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "david@fromorbit.com" <david@fromorbit.com>,
+        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: 5.3-rc1 regression with XFS log recovery
+Thread-Topic: 5.3-rc1 regression with XFS log recovery
+Thread-Index: AQHVVHWHW9jyoVVDjkW5IFS3q2GBzqcA9LwAgAAIcACAAKWeAIAAbhuAgAA90wCAAAYTAIAAAzOAgAABtICAAAMbAIABkriAgAAUDACAACclAIAAE9WAgAB3KwA=
+Date:   Tue, 20 Aug 2019 16:30:56 +0000
+Message-ID: <70d0f825df98351d586285e0629fff16ce345438.camel@intel.com>
+References: <20190818173426.GA32311@lst.de>
+         <20190819000831.GX6129@dread.disaster.area> <20190819034948.GA14261@lst.de>
+         <20190819041132.GA14492@lst.de> <20190819042259.GZ6129@dread.disaster.area>
+         <20190819042905.GA15613@lst.de> <20190819044012.GA15800@lst.de>
+         <20190820044135.GC1119@dread.disaster.area> <20190820055320.GB27501@lst.de>
+         <20190820081325.GA21032@ming.t460p> <20190820092424.GB21032@ming.t460p>
+In-Reply-To: <20190820092424.GB21032@ming.t460p>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+x-originating-ip: [10.232.112.185]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <96E25D766D03C448814B99ECAA06EBF4@intel.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/20/19 9:30 AM, Revanth Rajashekar wrote:
-> This series of patch is a cleanup for sed-opal in kernel 5.4. It
-> 1. Adds/removes spaces.
-> 2. Removes an always false conditional statement.
-> 3. Removes duplicate OPAL_METHOD_LENGTH definition.
-> 
-> These cleanup patches are submitted with the intend to submit a new feature
-> after this.
-> 
-> Changes from v2:
-> 	1. Added reviewed-bys
-> 
-> Changes from v1:
-> 	1. Fixed up commit messages
-> 
-> Revanth Rajashekar (3):
->    block: sed-opal: Add/remove spaces
->    block: sed-opal: Remove always false conditional statement
->    block: sed-opal: Removed duplicate OPAL_METHOD_LENGTH definition
-> 
->   block/opal_proto.h |  5 +----
->   block/sed-opal.c   | 49 ++++++++++++++++++++++++++++++++++++++--------
->   2 files changed, 42 insertions(+), 12 deletions(-)
-
-Applied, adding a commit message for patch #3. Don't use empty commit
-messages.
-
--- 
-Jens Axboe
-
+T24gVHVlLCAyMDE5LTA4LTIwIGF0IDE3OjI0ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gDQo+
+IEl0IGNhbiBiZSBxdWl0ZSBoYXJkIHRvIGRlYWwgd2l0aCBub24tNTEyIGFsaWduZWQgc2VjdG9y
+IGJ1ZmZlciwgc2luY2UNCj4gb25lIHNlY3RvciBidWZmZXIgbWF5IGNyb3NzIHR3byBwYWdlcywg
+c28gZmFyIG9uZSB3b3JrYXJvdW5kIEkgdGhvdWdodA0KPiBvZiBpcyB0byBub3QgbWVyZ2Ugc3Vj
+aCBJTyBidWZmZXIgaW50byBvbmUgYnZlYy4NCj4gDQo+IFZlcm1hLCBjb3VsZCB5b3UgdHJ5IHRo
+ZSBmb2xsb3dpbmcgcGF0Y2g/DQoNCkhpIE1pbmcsDQoNCkkgY2FuIGhpdCB0aGUgc2FtZSBmYWls
+dXJlIHdpdGggdGhpcyBwYXRjaC4NCkZ1bGwgdGhyZWFkLCBpbiBjYXNlIHlvdSBoYXZlbid0IGFs
+cmVhZHkgc2VlbiBpdDoNCmh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LXhmcy9lNDlhNmEz
+YTI0NGRiMDU1OTk1NzY5ZWI4NDRjMjgxZjkzZTUwYWI5LmNhbWVsQGludGVsLmNvbS8NCg0KPiAN
+Cj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jpby5jIGIvYmxvY2svYmlvLmMNCj4gaW5kZXggMjRhNDk2
+ZjVkMmUyLi40OWRlYWIyYWM4YzQgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jpby5jDQo+ICsrKyBi
+L2Jsb2NrL2Jpby5jDQo+IEBAIC03NjksNiArNzY5LDkgQEAgYm9vbCBfX2Jpb190cnlfbWVyZ2Vf
+cGFnZShzdHJ1Y3QgYmlvICpiaW8sIHN0cnVjdA0KPiBwYWdlICpwYWdlLA0KPiAgCWlmIChXQVJO
+X09OX09OQ0UoYmlvX2ZsYWdnZWQoYmlvLCBCSU9fQ0xPTkVEKSkpDQo+ICAJCXJldHVybiBmYWxz
+ZTsNCj4gIA0KPiArCWlmIChvZmYgJiA1MTEpDQo+ICsJCXJldHVybiBmYWxzZTsNCj4gKw0KPiAg
+CWlmIChiaW8tPmJpX3ZjbnQgPiAwKSB7DQo+ICAJCXN0cnVjdCBiaW9fdmVjICpidiA9ICZiaW8t
+PmJpX2lvX3ZlY1tiaW8tPmJpX3ZjbnQgLSAxXTsNCj4gIA0KPiANCj4gVGhhbmtzLA0KPiBNaW5n
+DQoNCg==
