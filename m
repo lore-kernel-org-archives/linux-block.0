@@ -2,146 +2,143 @@ Return-Path: <SRS0=wMiD=WR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCCA9C3A5A0
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 11:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDB7C41514
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 11:58:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D7BB22D6D
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 11:42:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P0QAHNOG"
+	by mail.kernel.org (Postfix) with ESMTP id 0B0B322CF7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 11:58:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726715AbfHULmq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 07:42:46 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:41699 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726371AbfHULmp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 07:42:45 -0400
-Received: by mail-pl1-f195.google.com with SMTP id m9so1192496pls.8;
-        Wed, 21 Aug 2019 04:42:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=TwHGeez/RfJBGCWUFQviRPJubwEqFBJQJB4zD1JJmuc=;
-        b=P0QAHNOG6Y+iBFj92LnQFxve4oHsWH/KqJJhCefazh0V65BXiiJGPQ+0X8GsD4Cj8P
-         mstqQRlL2UKNEXd78XpiEaQXiwW68wYwTJ7gv/0Ie9PED6gUE8KQFDF5SMe5KQJkvcQ8
-         Yz8gMHHXzYJIdB3I6M4CBEn6bfNPcOSpJUscq9GgEPqrnHv8yqv3P0BPIVx9soL9IFH4
-         rl3lT4mkLEsbgeHFAugXAjWrYBLer0liGu9Z+Rr2G4BVreI73trQHpqXqe6pdGgf5CJY
-         Blcx3DcmQtiJtecTPIMEREiGlhSgDa3L18qh+dxisEbMnIweJHrcv8gFHnaDJT1Pzxyb
-         EePg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TwHGeez/RfJBGCWUFQviRPJubwEqFBJQJB4zD1JJmuc=;
-        b=dFEZqPU98qQM30MLXzEZH/8TyutwFnrM55nq6V5jHzi9RrSKYaDMEmczplSByRTn46
-         YaxCYTPnIrvz6mlpyc+JESgxmK1BA45+Y8tjjMLbbiRU7hJ+2wtL6m+/UCbF/SnXKolz
-         i/WUMGb6sH/n5r07DZ3fpceTqD/Xpm4mGmK7eIWJ+44DJ8jF1uDg1WAV/1OcycHLQ+qQ
-         e5KK/K/NVmB3D5bIuDQW47JNVi8MlusjiVClAHNJWsYsmr0gsQZ6bA/R0T6uvgiMtQT/
-         LycNWZ8qMa2UziRD7qMuWgeXErWtv/IxBGSSV0BeWIFQ+OhbYaxy35OrtikR9NPU8bBo
-         KpuQ==
-X-Gm-Message-State: APjAAAXTo/dFrlO1MislZRyp1GKmrJ0hCG7O2cHr8OMPvca9Na38uBrZ
-        YaRGv6Zl0bYxrm2hZm7A/0mYUpMd
-X-Google-Smtp-Source: APXvYqxlvNv7fcxtiJHSV6t0CI1seR6gl8Ysv5jSE/N+Lp8uRI/7GyHy2SZu25I7f5K7ORSsRHTdWw==
-X-Received: by 2002:a17:902:29e6:: with SMTP id h93mr11888040plb.39.1566387764865;
-        Wed, 21 Aug 2019 04:42:44 -0700 (PDT)
-Received: from [0.0.0.0] ([47.244.239.6])
-        by smtp.gmail.com with ESMTPSA id 185sm25238017pfd.125.2019.08.21.04.42.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Aug 2019 04:42:44 -0700 (PDT)
-Subject: Issues about the merge_bvec_fn callback in 3.10 series
-To:     linux-block@vger.kernel.org, linux-raid@vger.kernel.org
-References: <S1732749AbfE3EBS/20190530040119Z+834@vger.kernel.org>
-From:   Jianchao Wang <jianchao.wan9@gmail.com>
-Message-ID: <e93566fe-febf-5e99-d3e9-96a0c1f6ba13@gmail.com>
-Date:   Wed, 21 Aug 2019 19:42:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101
- Thunderbird/67.0
+        id S1726966AbfHUL57 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 07:57:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41768 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726960AbfHUL57 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Aug 2019 07:57:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1BD3381106;
+        Wed, 21 Aug 2019 11:57:59 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.70.39.226])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B2E305D6B0;
+        Wed, 21 Aug 2019 11:57:56 +0000 (UTC)
+From:   xiubli@redhat.com
+To:     josef@toxicpanda.com, axboe@kernel.dk
+Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-kernel@vger.kernel.org,
+        Xiubo Li <xiubli@redhat.com>
+Subject: [PATCH v2] nbd: fix possible page fault for nbd disk
+Date:   Wed, 21 Aug 2019 17:27:53 +0530
+Message-Id: <20190821115753.3911-1-xiubli@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <S1732749AbfE3EBS/20190530040119Z+834@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 21 Aug 2019 11:57:59 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi dear all
+From: Xiubo Li <xiubli@redhat.com>
 
-This is a question in older kernel versions.
+When the NBD_CFLAG_DESTROY_ON_DISCONNECT flag is set and at the same
+time when the socket is closed due to the server daemon is restarted,
+just before the last DISCONNET is totally done if we start a new connection
+by using the old nbd_index, there will be crashing randomly, like:
 
-We are using 3.10 series kernel in our production. And we encountered issue as below,
+<3>[  110.151949] block nbd1: Receive control failed (result -32)
+<1>[  110.152024] BUG: unable to handle page fault for address: 0000058000000840
+<1>[  110.152063] #PF: supervisor read access in kernel mode
+<1>[  110.152083] #PF: error_code(0x0000) - not-present page
+<6>[  110.152094] PGD 0 P4D 0
+<4>[  110.152106] Oops: 0000 [#1] SMP PTI
+<4>[  110.152120] CPU: 0 PID: 6698 Comm: kworker/u5:1 Kdump: loaded Not tainted 5.3.0-rc4+ #2
+<4>[  110.152136] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+<4>[  110.152166] Workqueue: knbd-recv recv_work [nbd]
+<4>[  110.152187] RIP: 0010:__dev_printk+0xd/0x67
+<4>[  110.152206] Code: 10 e8 c5 fd ff ff 48 8b 4c 24 18 65 48 33 0c 25 28 00 [...]
+<4>[  110.152244] RSP: 0018:ffffa41581f13d18 EFLAGS: 00010206
+<4>[  110.152256] RAX: ffffa41581f13d30 RBX: ffff96dd7374e900 RCX: 0000000000000000
+<4>[  110.152271] RDX: ffffa41581f13d20 RSI: 00000580000007f0 RDI: ffffffff970ec24f
+<4>[  110.152285] RBP: ffffa41581f13d80 R08: ffff96dd7fc17908 R09: 0000000000002e56
+<4>[  110.152299] R10: ffffffff970ec24f R11: 0000000000000003 R12: ffff96dd7374e900
+<4>[  110.152313] R13: 0000000000000000 R14: ffff96dd7374e9d8 R15: ffff96dd6e3b02c8
+<4>[  110.152329] FS:  0000000000000000(0000) GS:ffff96dd7fc00000(0000) knlGS:0000000000000000
+<4>[  110.152362] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+<4>[  110.152383] CR2: 0000058000000840 CR3: 0000000067cc6002 CR4: 00000000001606f0
+<4>[  110.152401] Call Trace:
+<4>[  110.152422]  _dev_err+0x6c/0x83
+<4>[  110.152435]  nbd_read_stat.cold+0xda/0x578 [nbd]
+<4>[  110.152448]  ? __switch_to_asm+0x34/0x70
+<4>[  110.152468]  ? __switch_to_asm+0x40/0x70
+<4>[  110.152478]  ? __switch_to_asm+0x34/0x70
+<4>[  110.152491]  ? __switch_to_asm+0x40/0x70
+<4>[  110.152501]  ? __switch_to_asm+0x34/0x70
+<4>[  110.152511]  ? __switch_to_asm+0x40/0x70
+<4>[  110.152522]  ? __switch_to_asm+0x34/0x70
+<4>[  110.152533]  recv_work+0x35/0x9e [nbd]
+<4>[  110.152547]  process_one_work+0x19d/0x340
+<4>[  110.152558]  worker_thread+0x50/0x3b0
+<4>[  110.152568]  kthread+0xfb/0x130
+<4>[  110.152577]  ? process_one_work+0x340/0x340
+<4>[  110.152609]  ? kthread_park+0x80/0x80
+<4>[  110.152637]  ret_from_fork+0x35/0x40
 
-When add a page into a bio, .merge_bvec_fn will be invoked down to the bottom,
-and the bio->bi_rw would be saved into bvec_merge_data.bi_rw as the following code,
+This is very easy to reproduce by running the nbd-runner.
 
-__bio_add_page
+Signed-off-by: Xiubo Li <xiubli@redhat.com>
 ---
-	if (q->merge_bvec_fn) {
-		struct  bvm = {
-			.bi_bdev = bio->bi_bdev,
-			.bi_sector = bio->bi_iter.bi_sector,
-			.bi_size = bio->bi_iter.bi_size,
-			.bi_rw = bio->bi_rw,
-		};
+ drivers/block/nbd.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-		/*
-		 * merge_bvec_fn() returns number of bytes it can accept
-		 * at this offset
-		 */
-		if (q->merge_bvec_fn(q, &bvm, bvec) < bvec->bv_len) {
-			bvec->bv_page = NULL;
-			bvec->bv_len = 0;
-			bvec->bv_offset = 0;
-			return 0;
-		}
-	}
----
-
-However, it seems that the bio->bi_rw has not been set at the moment (set by submit_bio), 
-so it is always zero.
-
-We have a raid5 and the raid5_mergeable_bvec would always handle the write as read and then
-we always get a write bio with a stripe chunk size which is not expected and would degrade the
-performance. This is code,
-
-raid5_mergeable_bvec
----
-	if ((bvm->bi_rw & 1) == WRITE)
-		return biovec->bv_len; /* always allow writes to be mergeable */
-
-	if (mddev->new_chunk_sectors < mddev->chunk_sectors)
-		chunk_sectors = mddev->new_chunk_sectors;
-	max =  (chunk_sectors - ((sector & (chunk_sectors - 1)) + bio_sectors)) << 9;
-	if (max < 0) max = 0;
-	if (max <= biovec->bv_len && bio_sectors == 0)
-		return biovec->bv_len;
-	else
-		return max;
-
----
-
-I have checked   
-v3.10.108
-v3.18.140
-v4.1.49
-but there seems not fix for it.
-
-And maybe it would be fixed until 
-8ae126660fddbeebb9251a174e6fa45b6ad8f932
-block: kill merge_bvec_fn() completely
-
-Would anyone please give some suggestion on this ?
-Any comment will be welcomed.
-
-Thanks in advance
-Jianchao
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index e21d2ded732b..b07b4452d696 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -112,6 +112,8 @@ struct nbd_device {
+ 	struct list_head list;
+ 	struct task_struct *task_recv;
+ 	struct task_struct *task_setup;
++
++	bool shutting_down;
+ };
+ 
+ #define NBD_CMD_REQUEUED	1
+@@ -230,8 +232,8 @@ static void nbd_put(struct nbd_device *nbd)
+ 	if (refcount_dec_and_mutex_lock(&nbd->refs,
+ 					&nbd_index_mutex)) {
+ 		idr_remove(&nbd_index_idr, nbd->index);
+-		mutex_unlock(&nbd_index_mutex);
+ 		nbd_dev_remove(nbd);
++		mutex_unlock(&nbd_index_mutex);
+ 	}
+ }
+ 
+@@ -1103,6 +1105,7 @@ static int nbd_disconnect(struct nbd_device *nbd)
+ 
+ 	dev_info(disk_to_dev(nbd->disk), "NBD_DISCONNECT\n");
+ 	set_bit(NBD_DISCONNECT_REQUESTED, &config->runtime_flags);
++	nbd->shutting_down = true;
+ 	send_disconnects(nbd);
+ 	return 0;
+ }
+@@ -1761,6 +1764,12 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+ 		mutex_unlock(&nbd_index_mutex);
+ 		return -EINVAL;
+ 	}
++
++	if (nbd->shutting_down) {
++		mutex_unlock(&nbd_index_mutex);
++		goto again;
++	}
++
+ 	if (!refcount_inc_not_zero(&nbd->refs)) {
+ 		mutex_unlock(&nbd_index_mutex);
+ 		if (index == -1)
+-- 
+2.21.0
 
