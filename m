@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 601FCC3A59E
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 09:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4418EC3A59E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 09:15:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 358B822DA7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 09:15:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21E5622DA7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 09:15:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726386AbfHUJPk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 05:15:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51108 "EHLO mx1.redhat.com"
+        id S1726558AbfHUJPv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 05:15:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43740 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726353AbfHUJPk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 05:15:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1726541AbfHUJPv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Aug 2019 05:15:51 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 902F985546;
-        Wed, 21 Aug 2019 09:15:40 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3B4BDC0740CD;
+        Wed, 21 Aug 2019 09:15:51 +0000 (UTC)
 Received: from localhost (ovpn-8-29.pek2.redhat.com [10.72.8.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CC3E62B9DC;
-        Wed, 21 Aug 2019 09:15:39 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E2E9D60BF3;
+        Wed, 21 Aug 2019 09:15:42 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -34,30 +34,22 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Greg KH <gregkh@linuxfoundation.org>,
         Mike Snitzer <snitzer@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH V2 4/6] blk-mq: don't hold q->sysfs_lock in blk_mq_realloc_hw_ctxs()
-Date:   Wed, 21 Aug 2019 17:15:04 +0800
-Message-Id: <20190821091506.21196-5-ming.lei@redhat.com>
+Subject: [PATCH V2 5/6] block: add helper for checking if queue is registered
+Date:   Wed, 21 Aug 2019 17:15:05 +0800
+Message-Id: <20190821091506.21196-6-ming.lei@redhat.com>
 In-Reply-To: <20190821091506.21196-1-ming.lei@redhat.com>
 References: <20190821091506.21196-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 21 Aug 2019 09:15:40 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Wed, 21 Aug 2019 09:15:51 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_realloc_hw_ctxs() is called from blk_mq_init_allocated_queue()
-and blk_mq_update_nr_hw_queues(). For the former caller, the kobject
-isn't exposed to userspace yet. For the latter caller, sysfs/debugfs
-is un-registered before updating nr_hw_queues.
-
-On the other hand, commit 2f8f1336a48b ("blk-mq: always free hctx after
-request queue is freed") moves freeing hctx into queue's release
-handler, so there won't be race with queue release path too.
-
-So don't hold q->sysfs_lock in blk_mq_realloc_hw_ctxs().
+There are 4 users which check if queue is registered, so add one helper
+to check it.
 
 Cc: Christoph Hellwig <hch@infradead.org>
 Cc: Hannes Reinecke <hare@suse.com>
@@ -66,30 +58,72 @@ Cc: Mike Snitzer <snitzer@redhat.com>
 Cc: Bart Van Assche <bvanassche@acm.org>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 3 ---
- 1 file changed, 3 deletions(-)
+ block/blk-sysfs.c      | 4 ++--
+ block/blk-wbt.c        | 2 +-
+ block/elevator.c       | 2 +-
+ include/linux/blkdev.h | 1 +
+ 4 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b0ee0cac737f..d4c8692aca1f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2768,8 +2768,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 	int i, j, end;
- 	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 977c659dcd18..5b0b5224cfd4 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -942,7 +942,7 @@ int blk_register_queue(struct gendisk *disk)
+ 	if (WARN_ON(!q))
+ 		return -ENXIO;
  
--	/* protect against switching io scheduler  */
--	mutex_lock(&q->sysfs_lock);
- 	for (i = 0; i < set->nr_hw_queues; i++) {
- 		int node;
- 		struct blk_mq_hw_ctx *hctx;
-@@ -2820,7 +2818,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 			hctxs[j] = NULL;
- 		}
- 	}
--	mutex_unlock(&q->sysfs_lock);
- }
+-	WARN_ONCE(test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags),
++	WARN_ONCE(blk_queue_registered(q),
+ 		  "%s is registering an already registered queue\n",
+ 		  kobject_name(&dev->kobj));
+ 	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+@@ -1026,7 +1026,7 @@ void blk_unregister_queue(struct gendisk *disk)
+ 		return;
  
- /*
+ 	/* Return early if disk->queue was never registered. */
+-	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
++	if (!blk_queue_registered(q))
+ 		return;
+ 
+ 	/*
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 313f45a37e9d..c4d3089e47f7 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -656,7 +656,7 @@ void wbt_enable_default(struct request_queue *q)
+ 		return;
+ 
+ 	/* Queue not registered? Maybe shutting down... */
+-	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
++	if (!blk_queue_registered(q))
+ 		return;
+ 
+ 	if (queue_is_mq(q) && IS_ENABLED(CONFIG_BLK_WBT_MQ))
+diff --git a/block/elevator.c b/block/elevator.c
+index 37b918dc4676..7449a5836b52 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -660,7 +660,7 @@ static int __elevator_change(struct request_queue *q, const char *name)
+ 	struct elevator_type *e;
+ 
+ 	/* Make sure queue is not in the middle of being removed */
+-	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
++	if (!blk_queue_registered(q))
+ 		return -ENOENT;
+ 
+ 	/*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 167bf879f072..6041755984f4 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -647,6 +647,7 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
+ #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
+ #define blk_queue_pm_only(q)	atomic_read(&(q)->pm_only)
+ #define blk_queue_fua(q)	test_bit(QUEUE_FLAG_FUA, &(q)->queue_flags)
++#define blk_queue_registered(q)	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
+ 
+ extern void blk_set_pm_only(struct request_queue *q);
+ extern void blk_clear_pm_only(struct request_queue *q);
 -- 
 2.20.1
 
