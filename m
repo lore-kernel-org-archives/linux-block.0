@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84199C3A59E
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 09:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C7EFC3A59E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 09:15:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 575A72339F
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 09:15:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C5622339F
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 09:15:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726484AbfHUJP3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 05:15:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45355 "EHLO mx1.redhat.com"
+        id S1726448AbfHUJPh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 05:15:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51533 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726386AbfHUJP3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 05:15:29 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S1726353AbfHUJPh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Aug 2019 05:15:37 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 69F821801580;
-        Wed, 21 Aug 2019 09:15:29 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6669A1801580;
+        Wed, 21 Aug 2019 09:15:37 +0000 (UTC)
 Received: from localhost (ovpn-8-29.pek2.redhat.com [10.72.8.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 29A455D9E1;
-        Wed, 21 Aug 2019 09:15:23 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 111FC2B9D7;
+        Wed, 21 Aug 2019 09:15:31 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -34,33 +34,30 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Greg KH <gregkh@linuxfoundation.org>,
         Mike Snitzer <snitzer@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH V2 2/6] block: don't hold q->sysfs_lock in elevator_init_mq
-Date:   Wed, 21 Aug 2019 17:15:02 +0800
-Message-Id: <20190821091506.21196-3-ming.lei@redhat.com>
+Subject: [PATCH V2 3/6] blk-mq: don't hold q->sysfs_lock in blk_mq_map_swqueue
+Date:   Wed, 21 Aug 2019 17:15:03 +0800
+Message-Id: <20190821091506.21196-4-ming.lei@redhat.com>
 In-Reply-To: <20190821091506.21196-1-ming.lei@redhat.com>
 References: <20190821091506.21196-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.63]); Wed, 21 Aug 2019 09:15:29 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.63]); Wed, 21 Aug 2019 09:15:37 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The original comment says:
+blk_mq_map_swqueue() is called from blk_mq_init_allocated_queue()
+and blk_mq_update_nr_hw_queues(). For the former caller, the kobject
+isn't exposed to userspace yet. For the latter caller, sysfs/debugfs
+is un-registered before updating nr_hw_queues.
 
-	q->sysfs_lock must be held to provide mutual exclusion between
-	elevator_switch() and here.
+On the other hand, commit 2f8f1336a48b ("blk-mq: always free hctx after
+request queue is freed") moves freeing hctx into queue's release
+handler, so there won't be race with queue release path too.
 
-Which is simply wrong. elevator_init_mq() is only called from
-blk_mq_init_allocated_queue, which is always called before the request
-queue is registered via blk_register_queue(), for dm-rq or normal rq
-based driver. However, queue's kobject is just exposed added to sysfs
-in blk_register_queue(). So there isn't such race between elevator_switch()
-and elevator_init_mq().
-
-So avoid to hold q->sysfs_lock in elevator_init_mq().
+So don't hold q->sysfs_lock in blk_mq_map_swqueue().
 
 Cc: Christoph Hellwig <hch@infradead.org>
 Cc: Hannes Reinecke <hare@suse.com>
@@ -69,43 +66,34 @@ Cc: Mike Snitzer <snitzer@redhat.com>
 Cc: Bart Van Assche <bvanassche@acm.org>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/elevator.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ block/blk-mq.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 2f17d66d0e61..37b918dc4676 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -608,22 +608,22 @@ int elevator_init_mq(struct request_queue *q)
- 		return 0;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6968de9d7402..b0ee0cac737f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2456,11 +2456,6 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 	struct blk_mq_ctx *ctx;
+ 	struct blk_mq_tag_set *set = q->tag_set;
  
- 	/*
--	 * q->sysfs_lock must be held to provide mutual exclusion between
--	 * elevator_switch() and here.
-+	 * We are called from blk_mq_init_allocated_queue() only, at that
-+	 * time the request queue isn't registered yet, so the queue
-+	 * kobject isn't exposed to userspace. No need to worry about race
-+	 * with elevator_switch(), and no need to hold q->sysfs_lock.
- 	 */
+-	/*
+-	 * Avoid others reading imcomplete hctx->cpumask through sysfs
+-	 */
 -	mutex_lock(&q->sysfs_lock);
- 	if (unlikely(q->elevator))
--		goto out_unlock;
-+		goto out;
+-
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		cpumask_clear(hctx->cpumask);
+ 		hctx->nr_ctx = 0;
+@@ -2521,8 +2516,6 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 					HCTX_TYPE_DEFAULT, i);
+ 	}
  
- 	e = elevator_get(q, "mq-deadline", false);
- 	if (!e)
--		goto out_unlock;
-+		goto out;
- 
- 	err = blk_mq_init_sched(q, e);
- 	if (err)
- 		elevator_put(e);
--out_unlock:
 -	mutex_unlock(&q->sysfs_lock);
-+out:
- 	return err;
- }
- 
+-
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		/*
+ 		 * If no software queues are mapped to this hardware queue,
 -- 
 2.20.1
 
