@@ -2,154 +2,142 @@ Return-Path: <SRS0=wMiD=WR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5BA4C3A59E
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 06:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A783FC3A59E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 06:14:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A00922D6D
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 06:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 792B622D6D
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 06:14:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="DaD9OB1n"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="U3TeQ/kN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727752AbfHUGN6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 02:13:58 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:45763 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727481AbfHUGN5 (ORCPT
+        id S1727771AbfHUGO2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 02:14:28 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:46971 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727766AbfHUGO1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 02:13:57 -0400
+        Wed, 21 Aug 2019 02:14:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1566368037; x=1597904037;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=azZDoPJ9i+Ak+dWcyy0BtIJhy96EbKkRr6W6u0sc/zQ=;
-  b=DaD9OB1nyTTl6RVDMalXAnvzOB6sVQg9aj7+9gYktCHQerMx4XmSw48b
-   gcOPvFcA4ywf+zrK/+YeCtEzecN3SjlndrRpxC6lhWQTX491zDV+BENK9
-   XUPkZ8QL4xW/8bCtN3BnRArqwLcLHwggiC66Nq5RwVxjlOfVRlSCd8jJr
-   bN3ePnkb3CfkZSDguDBhYp/FlQN9j/TjeUh1UGRPPCZniksM288mHCT7L
-   d3uJCmUxzzIoIBFNXEsawhSSgQepnkGWuT7IAmZGRgTtALEWyp7/hIlYN
-   wf1KJ01htOaLggQWZkGPzVkm/yXR7nqpD5AQHCWP2rFEQc5UKa9yk6DVL
-   w==;
-IronPort-SDR: L8px+SmLopy92/c8IFlhUQLsPiXbAxs1+yxHccGRNXdNlfhvX7QfyGqk7ABYJc7uauf/Kq1e96
- XnXaNVguSsMDZXp4907njtjELMe59uBGyZyxIO7MUKuUCdAkrc8jZdR9liP3Hy8Qb8gAELcPue
- EdzBSAP2sOdzQ5DJnISJlpEwTQWVcU6YdCs09Eq5T/cfc4CmH+s87GwbSVspRfmTP9a284ClVD
- B8mgT29gi89/qcDXmNY9Nex+XbjDTXTJ9n4zRVFGYfHAKMsAx6oR/e7a97p6ADSEWT95dCsoLV
- I0c=
+  t=1566368067; x=1597904067;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tDUu6OfCZAgiE5vxUUEYM/lctnZ4+mN4P7Ofucvf8cQ=;
+  b=U3TeQ/kNaQEo/PP7G+aywy008U42TqagGyaR4u0t4WYD5mE5cutelY2C
+   UuZaw9uTdr9YO05YlNeWDauTg3mOUMg7fTb3HXVFUbzKSfRrLAPedB0ug
+   x4+anxeYg9bSjhN6/46HhwIM8nAHs84A/yQ6wsc+aqwdlZWzQCWzSfTNU
+   KiWwJNz/MCGNip3sn8vMHkuQBCyF9Ev54WkNXLhz+A3Zj/Ccv+ShkxRyn
+   FguTniEu31IkK6u5zCuPbQ1iTKDoH/wU74fIpLELRyfLquMW6CKHVjoGc
+   b/x50SjddGGEC4ILVqbrxVzizaQYIMIIuOjPk4Vt2DCLPAUin2RjDTSTG
+   g==;
+IronPort-SDR: LJ0R37Oh/N4BMTk3QCJLeOipE5+YAVfqop3RjJ/7N14C1rrm5wf1yx3yU2fczm5MzpjZUFGLND
+ jp1MN+8NP195UREN36Vb0/RzHdQiHrUJq32AbaZuPuBEfwFUe1t0eXHpCCyy5MaUnvVSZgPx++
+ l6L4IpyZeRQ/9vP64drs3KrLLW0m7zEI8JTiS32ydH12/JwV6Jxk3vO/P+Z3k2nT0dxdW9kdz8
+ 0QDdrwSQLE0mxk+UGV53KehVJ0YzSlUPSONv8SfsYeM904T+FYKDu4rkpR5NtUCo9jdUMcF9jH
+ d6A=
 X-IronPort-AV: E=Sophos;i="5.64,411,1559491200"; 
-   d="scan'208";a="120898312"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Aug 2019 14:13:57 +0800
-IronPort-SDR: 0NFKxJ4nFiePXE/q3kNaXyzTIdF1NUKePzVYZ5Bd30ORNSLxKcklqK1C2ZwRQLAzn+madpdEiN
- 6YxKhH/6b73OiaDlymbKzXojJZnO2wtAFPO+i9XIL5Zpcf+DUTL3tfQy5/2SPnE94ue1Q/nAkP
- FaC7p8uC9K6sjUW8HTdQ/id2HebG+ELhRZ14jvyx3PqO8khDmeQC8e3abwkjz/8bd5fehZfrKa
- 9fVVhehk7XP2dMOLDkRw3m7vkXrcaSu0bHPvxFycDhpRdmEuKPzbUyXETPpxR2m6vvLyV1K6ib
- ALMKfl1J1schX6EvX8ZoAWbh
+   d="scan'208";a="222880761"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 21 Aug 2019 14:14:26 +0800
+IronPort-SDR: /O7wFZQldCUIL+T8y8WVggEkv65ATU1bGJShtCI8CGyzmcODwY22mTfZsq1PmAlq095Ubqav5+
+ 2w/sjO5AUPZ5c4DiNFevk5QEZF9RVaSSmd++C0s5IjDqIwoiTYw58aKIj1xQort+WLDVxg+vwr
+ Y2w7nib7UP+cUWYFHATV1SIeU357dbpjxDwLXTHsr3Rq1aFZqHuSlPlC2S1V7h+VDNM7uYAz79
+ j8MFySR3/9JkZQBFkLld8q0QJYTy2kpXTFP+JwbBbrNH97Riuw4K9SF6qW6P5hqouzIFGIoLHY
+ x+4XICGaJizl7/S2rBhUZY6f
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2019 23:11:18 -0700
-IronPort-SDR: ogp9yKyK0180MbK+Fl7+jMMdyTPBCn3oY7cDVJHT9j8n+YbP7k1CunSEZP8lStmAXViUdUYD37
- +akx/s4EXmvhYRZoFUrVGjnZfP+QeMr42F5+YPGbWxXrlzXKjivmBIeNUrQRdbIQWIN0Tmfl4b
- nXwc3sHq/6tJylKWDROohYjKChMWdoGr3V0Is9JgIHTihlAlMoB74yR8CZUNnXY0lukNSaiXpK
- QaWh60DLcg5C6WOCBKoFz4iC5GYOsQZm3YGgHejJW2Ed77tggzP1QcFpGgr3cX/4GqmwTUktfg
- IBA=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2019 23:11:49 -0700
+IronPort-SDR: ZGZ6fU+fR5RzuuKyQ2BV7Qtj88cD9Ywgd0u1B2kvbxKN/qhuT5iNaowYnD43Mmvlu5PKoVZxFu
+ EwuFv5WC4mXRvu1Ot2FMKpU7WEJTvW8+WuLi+qEjPsNYZ7a1WaPn3nzKPMvQTxa+AP6VJ7jrhh
+ yDltPRtYNqQZHfK0/qhkoQE7+cYR6iw0FLrIjEhPi7rl5kCUe1BDydqeNMnl4XwqCi6Ihev3Rh
+ 5960wvlRjEiKwa7McvK8/Zoh2N34Yk0PQUrrYQBNjhsSvbtu2ZY5ExsJRLBEA81+ZpGG/t3gaq
+ ce4=
 WDCIronportException: Internal
 Received: from cvenusqemu.hgst.com ([10.202.66.73])
-  by uls-op-cesaip01.wdc.com with ESMTP; 20 Aug 2019 23:13:57 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 20 Aug 2019 23:14:26 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
-Cc:     hch@lst.de, axboe@kernel.dk,
+Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
+        linux-btrace@vger.kernel.org, xen-devel@lists.xenproject.org,
+        kent.overstreet@gmail.com, yuchao0@huawei.com, jaegeuk@kernel.org,
+        damien.lemoal@wdc.com, konrad.wilk@oracle.com,
+        roger.pau@citrix.com, bvanassche@acm.org,
+        linux-scsi@vger.kernel.org,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V3 6/6] null_blk: create a helper for req completion
-Date:   Tue, 20 Aug 2019 23:13:14 -0700
-Message-Id: <20190821061314.3262-7-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V5 0/9] block: use right accessor to read nr_sects
+Date:   Tue, 20 Aug 2019 23:14:14 -0700
+Message-Id: <20190821061423.3408-1-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20190821061314.3262-1-chaitanya.kulkarni@wdc.com>
-References: <20190821061314.3262-1-chaitanya.kulkarni@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch creates a helper function for handling the request
-completion in the null_handle_cmd().
+Hi,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- drivers/block/null_blk_main.c | 49 +++++++++++++++++++----------------
- 1 file changed, 27 insertions(+), 22 deletions(-)
+In the blk-zoned, bcache, f2fs, target-pscsi, xen and blktrace
+implementation block device->hd_part->number of sectors field is
+accessed directly without any appropriate locking or accessor function. 
+There is an existing accessor function present in the in 
+include/linux/genhd.h which should be used to read the
+bdev->hd_part->nr_sects.
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 501af79bffb2..fe12ec59b3a6 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1202,6 +1202,32 @@ static inline blk_status_t null_handle_zoned(struct nullb_cmd *cmd,
- 	return sts;
- }
- 
-+static inline void nullb_handle_cmd_completion(struct nullb_cmd *cmd)
-+{
-+	/* Complete IO by inline, softirq or timer */
-+	switch (cmd->nq->dev->irqmode) {
-+	case NULL_IRQ_SOFTIRQ:
-+		switch (cmd->nq->dev->queue_mode) {
-+		case NULL_Q_MQ:
-+			blk_mq_complete_request(cmd->rq);
-+			break;
-+		case NULL_Q_BIO:
-+			/*
-+			 * XXX: no proper submitting cpu information available.
-+			 */
-+			end_cmd(cmd);
-+			break;
-+		}
-+		break;
-+	case NULL_IRQ_NONE:
-+		end_cmd(cmd);
-+		break;
-+	case NULL_IRQ_TIMER:
-+		null_cmd_end_timer(cmd);
-+		break;
-+	}
-+}
-+
- static blk_status_t null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
- 				    sector_t nr_sectors, enum req_opf op)
- {
-@@ -1233,28 +1259,7 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
- 		cmd->error = null_handle_zoned(cmd, op, sector, nr_sectors);
- 
- out:
--	/* Complete IO by inline, softirq or timer */
--	switch (dev->irqmode) {
--	case NULL_IRQ_SOFTIRQ:
--		switch (dev->queue_mode)  {
--		case NULL_Q_MQ:
--			blk_mq_complete_request(cmd->rq);
--			break;
--		case NULL_Q_BIO:
--			/*
--			 * XXX: no proper submitting cpu information available.
--			 */
--			end_cmd(cmd);
--			break;
--		}
--		break;
--	case NULL_IRQ_NONE:
--		end_cmd(cmd);
--		break;
--	case NULL_IRQ_TIMER:
--		null_cmd_end_timer(cmd);
--		break;
--	}
-+	nullb_handle_cmd_completion(cmd);
- 	return BLK_STS_OK;
- }
- 
+From ${KERN_DIR}/include/linux/genhd.h:-
+<snip>
+714 /*
+715  * Any access of part->nr_sects which is not protected by partition
+716  * bd_mutex or gendisk bdev bd_mutex, should be done using this
+717  * accessor function.
+718  *
+719  * Code written along the lines of i_size_read() and i_size_write().
+720  * CONFIG_PREEMPT case optimizes the case of UP kernel with preemption
+721  * on.
+722  */
+723 static inline sector_t part_nr_sects_read(struct hd_struct *part)
+724 {
+<snip>
+
+This patch series introduces a helper function on the top of the
+part_nr_sects_read() and removes the all direct accesses to the
+bdev->hd_part->nr_sects.
+
+This series is based on :-
+
+1. Repo :-
+   git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git.
+2. Branch :- for-next.
+
+Changes from V4:-
+
+1. Adjust code for latest branch.
+
+Chaitanya Kulkarni (9):
+  block: add a helper function to read nr_setcs
+  blk-zoned: update blkdev_nr_zones() with helper
+  blk-zoned: update blkdev_report_zone() with helper
+  blk-zoned: update blkdev_reset_zones() with helper
+  bcache: update cached_dev_init() with helper
+  f2fs: use helper in init_blkz_info()
+  blktrace: use helper in blk_trace_setup_lba()
+  target/pscsi: use helper in pscsi_get_blocks()
+  xen/blkback: use helper in vbd_sz()
+
+ block/blk-zoned.c                  | 12 ++++++------
+ drivers/block/xen-blkback/common.h |  2 +-
+ drivers/md/bcache/super.c          |  2 +-
+ drivers/target/target_core_pscsi.c |  2 +-
+ fs/f2fs/super.c                    |  2 +-
+ include/linux/blkdev.h             |  5 +++++
+ kernel/trace/blktrace.c            |  2 +-
+ 7 files changed, 16 insertions(+), 11 deletions(-)
+
 -- 
 2.17.0
 
