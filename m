@@ -2,72 +2,111 @@ Return-Path: <SRS0=wMiD=WR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A6DC3A59E
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 15:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D7DDC3A59E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 16:00:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 70F1F22CF7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 15:57:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60FA82339E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 16:00:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1566403242;
+	bh=z+I+ll9JzvSq5sT40Ie4Oipb+E0vOsXvpvHBtoHoKVE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=kE40vR22rgQAtuZ08RPde3gTHQCYQ7OJFmph3BHX6AvVPbw1mKYzEWD4ItdTtX9+x
+	 lV8CC7bI2QDi4Gv9VSUgODFHN2YMhQnAgsGZkbxY+jEtTcvgg/lsIbEk/KFXfUJcAw
+	 HJzWUEfM2oGF5+HTcfxqj5T+gwPj24NT6MD0rraI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727120AbfHUP5j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 11:57:39 -0400
-Received: from mail-pf1-f176.google.com ([209.85.210.176]:45633 "EHLO
-        mail-pf1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726828AbfHUP5i (ORCPT
+        id S1727553AbfHUQAl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 12:00:41 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:44857 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727158AbfHUQAl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 11:57:38 -0400
-Received: by mail-pf1-f176.google.com with SMTP id w26so1685225pfq.12
-        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2019 08:57:38 -0700 (PDT)
+        Wed, 21 Aug 2019 12:00:41 -0400
+Received: by mail-qk1-f194.google.com with SMTP id d79so2244259qke.11;
+        Wed, 21 Aug 2019 09:00:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=SkQ1iRQmedFusEhYknXF0m0szFVCfve43ayyHL3P7UE=;
+        b=PfRGf7dJmGlq/vFV6Y+jNfBdQj9FXFXpgr4U2sqHZkOOzikZqcKARWfm/Ay9cjoDSU
+         SCX+h5EJLGStrV2y6/OzsiFWSydoRDIB8xs/LthT66NJMLZAYtyRP5nrnZgOEeHiNyJk
+         1bf35F88LlY3ZL6xZzCIEGGOZVVSZr2saC2AonVkeLUBSZKclxcjROkdE6IhiIiZK18A
+         z1eW4eMKnZKE5uALGEnUQyOrqFkSKIT6AjOY4D73Eu6oZ+ZkI6UO+7WVtIvPOc7iPQV5
+         aAxUr8psXAumVPPm2Vln5wKADn3tcXCg2XrJ+MksLKbdQw0SqjF2hpb4xY0Ud7EO5OH2
+         B8bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=G3jXO4XrOXQgUzu5m07uD2jAZyM7+jubCsDqjvIpibQ=;
-        b=SXwbxGu6gpGK1sFdKkrhsCBx3xZrgVzQWJ2Z1NugZpjcf+iEKEdzIQ269+zkH+aPjY
-         qSGI22zZpQ+GdqaBcO5yRXxMoMtahw6i5mqfTPqUC5HjRnLcGnznU/r+juVES4pHEvtN
-         qU52tDvcaa5+lIv3PJ2/+OQDB1wDX1CVr9WXlX5BlGfe7vvheCOY963IQbJ3qScnrdUH
-         ye7ZSz+co30jCMbb3zFQh2yOJXmh/x6hoOHaIub74oQF9duORkOhEMg7bC0AwjOWEsRX
-         dNF4J+gKMqqeqEfDNK8HAPbJs/UxKdem1wbyvjtcgVEGdMrx4n9nqyu6xvRDtFVoLMLm
-         BTzw==
-X-Gm-Message-State: APjAAAWlcFRicI1QvN4LBjKkkYww7hf2kZySRyM9SoYlgQi3fKLCxo3m
-        ZDb4mbq7e8nd+Wx6RPMkrq4=
-X-Google-Smtp-Source: APXvYqx++yXs71KIQvOrGgHi+Yav/frCxu/p0e1scIXH4jwhNM9+Qu4vJCp0Hi9ux54eu7cTxY4iKQ==
-X-Received: by 2002:a17:90a:d593:: with SMTP id v19mr681730pju.1.1566403058092;
-        Wed, 21 Aug 2019 08:57:38 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id s72sm31953795pgc.92.2019.08.21.08.57.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Aug 2019 08:57:37 -0700 (PDT)
-Subject: Re: [PATCH V2 5/6] block: add helper for checking if queue is
- registered
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Mike Snitzer <snitzer@redhat.com>
-References: <20190821091506.21196-1-ming.lei@redhat.com>
- <20190821091506.21196-6-ming.lei@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <a7f8b78c-bdc9-f8b8-64bd-f279cc246354@acm.org>
-Date:   Wed, 21 Aug 2019 08:57:36 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=SkQ1iRQmedFusEhYknXF0m0szFVCfve43ayyHL3P7UE=;
+        b=c0tISbAsv4wpwue6Ehj1RzHwKDpIYuLEDDM8VbXDdYoOBuJCo5q7H0TIVLJIlc4WNe
+         BoWIusBC5VCoKrxKYjh81yFZka2Oq5+tIJO4F/piwde1KsOPZiy2QyC78IgfgM1fD9pS
+         PwhC7Ikw+cOGMh/MiFyzFya8f/DY8JFpFRH0Jkyy+5MT8RSfJNHfWBG2bp2koNiXwmhK
+         eQ0EJmHACi5xn6FH98JxzrYmxduiqx4vD15SJhDLM6prs5mLjrR6vz9qxGV9RkALq2hZ
+         /x+emHSjeWeTrfilRP6dGpAuEZufZh1T+1SlBQoTWvR9w3hL+9O6N7ub8af/0BDbY+9v
+         +jhg==
+X-Gm-Message-State: APjAAAUE1x9Lv27kfbcKbfQ1P9q8zY6waEW8B21OEl+E2hc9cBarXxy1
+        XE6BCJKaxx7AltntHhC7TRs=
+X-Google-Smtp-Source: APXvYqygD4G25/4+1lbrU9OJUBtreiUUAzC3687HWTZ5HRPAeIzC0XOf19SJJBxuWv+Hi3cQWG/YHA==
+X-Received: by 2002:a37:395:: with SMTP id 143mr32776745qkd.317.1566403240448;
+        Wed, 21 Aug 2019 09:00:40 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::1:1f05])
+        by smtp.gmail.com with ESMTPSA id s58sm11388981qth.59.2019.08.21.09.00.38
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 21 Aug 2019 09:00:39 -0700 (PDT)
+Date:   Wed, 21 Aug 2019 09:00:37 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     axboe@kernel.dk, hannes@cmpxchg.org, mhocko@kernel.org,
+        vdavydov.dev@gmail.com, cgroups@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com, guro@fb.com,
+        akpm@linux-foundation.org
+Subject: Re: [PATCH 5/5] writeback, memcg: Implement foreign dirty flushing
+Message-ID: <20190821160037.GK2263813@devbig004.ftw2.facebook.com>
+References: <20190815195619.GA2263813@devbig004.ftw2.facebook.com>
+ <20190815195930.GF2263813@devbig004.ftw2.facebook.com>
+ <20190816160256.GI3041@quack2.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20190821091506.21196-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190816160256.GI3041@quack2.suse.cz>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/21/19 2:15 AM, Ming Lei wrote:
-> There are 4 users which check if queue is registered, so add one helper
-> to check it.
+Hello,
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+On Fri, Aug 16, 2019 at 06:02:56PM +0200, Jan Kara wrote:
+> 1) You ask to writeback LONG_MAX pages. That means that you give up any
+> livelock avoidance for the flusher work and you can writeback almost
+> forever if someone is busily dirtying pages in the wb. I think you need to
+> pick something like amount of dirty pages in the given wb (that would have
+> to be fetched after everything is looked up) or just some arbitrary
+> reasonably small constant like 1024 (but then I guess there's no guarantee
+> stuck memcg will make any progress and you've invalidated the frn entry
+> here).
+
+I see.  Yeah, I think the right thing to do would be feeding the
+number of dirty pages or limiting it to one full sweep.  I'll look
+into it.
+
+> 2) When you invalidate frn entry here by writing 0 to 'at', it's likely to get
+> reused soon. Possibly while the writeback is still running. And then you
+> won't start any writeback for the new entry because of the
+> atomic_read(&frn->done.cnt) == 1 check. This seems like it could happen
+> pretty frequently?
+
+Hmm... yeah, the clearing might not make sense.  I'll remove that.
+
+Thanks.
+
+-- 
+tejun
