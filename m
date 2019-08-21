@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16053C3A59E
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 06:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7462C3A59E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 06:12:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB71B22D6D
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 06:12:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD92F233A1
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 06:12:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="MVYTaY+a"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="L9thsney"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727793AbfHUGMM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 02:12:12 -0400
+        id S1727842AbfHUGMQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 02:12:16 -0400
 Received: from esa1.hgst.iphmx.com ([68.232.141.245]:46795 "EHLO
         esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726907AbfHUGMM (ORCPT
+        with ESMTP id S1726907AbfHUGMP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 02:12:12 -0400
+        Wed, 21 Aug 2019 02:12:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1566367931; x=1597903931;
+  t=1566367935; x=1597903935;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=IQBOi/8x2aPXJQodxMci9ho96QkK0SGrpMvvwAC0Yto=;
-  b=MVYTaY+axZIwZq2Z5fN06ikEaYgy7nDfDynlxSbCunfTeO77hO/cvK4z
-   UtyYQX+CQIEPcg1jJLo01zWCtAYCZkZTT5Ocm+/p2+Ynsdfy7ci4eHUBi
-   Bh5koo1wogCVGzRB4JeCCh6ABWTBsQgkP+KkpiRNmRkJnDHiclMynPnP9
-   fTAEK9/9nFq8zOmbD55gNVXYFF3yEwdRvE0d0hT7K+IdP+SFATdNrdlZp
-   9RURLQBlsqEE7alxrb7qzzZ2pK7v6kn2JWNbIjbLP0Xc3eYoPMVhlN6LQ
-   HoOELsXDpGz7i1kBp1r3V3gMD/WxJqIQoq7ZBAdEnfQSPMZSOLBaThdkV
-   w==;
-IronPort-SDR: l6h9q+UQNcygL/sw5ISEVwJuagVrFScnT0LcYS7/hlbcfe7D1vZc4suRg8bLLtY+duz94IaO7x
- TdalDAjisYYOPI72xRa6LfscQH2oDqWSV3IVDgVJ4Qt1heiPZyX7zOezoZIVJBT9tpHEHH9Z5D
- mwz6D+nyshQWoQc5PjdFeV/Awqs9pEdQe8PZKz+7BQRdGFIHhf85JREnQz55gSuutzUHIIZPIr
- 2PIOY05cMHTQRTsnuQaOVGngGqEPJQkH1/PnH8twP2l7np7IIuYxX3DGPrjkzrw3uDDpOWRSt9
- pYk=
+  bh=+CgoZ/ocgNTcJulImr9CQRjUBIQXXYEnN/SGKq6sN0A=;
+  b=L9thsneyQ2NpAkJntZxSiAV/KsaUZfENhWaO9UHIu4JKTaad33SFi4/W
+   A5iIs0aWZ2f66CzHUqITZRnLiHt0Cf17CMmmcLKMWeLNsqe/Kk0t6/5jI
+   cu8MaxRC46J5g9pAAVT4Q5VjW8cEepaOf4EGj1rItF0sHjHg+GxEC5jXf
+   qh3l+NnUWsmaiHnWH9WZIfBgIs2zErPe2ph9hYh/U4+bmQJOUpUvMPzok
+   O/psDPavD+S4YGzGMC9WqgLWz0fuhQqJT7gRDqPY6STfQyNLbHlKy/IJ+
+   5I8EMyK3mEmzYTTbzf1wuTqstzDBpJfVs/zg57wKNUcy5pQaxbXXLasqt
+   A==;
+IronPort-SDR: idT4I6Fc0qhb3Ee8FQ+uQIvGfwUeyKb8oTQB0sGxIeZodY0Dbjo9pRiV4+D9y7dt6Hd5QQrF/C
+ 3PWuw1nLiIQ6bBRy+PMTnElm3wgZgo+CXdjxPXeUhXQmtqachZhN44g70XhPWYU5c6eXsmoCFd
+ i0Y001g+7ZEfu65r0kb6q6XGU5mpK6EgLbyJM8p7qaME552qJWaDM32elJdBV5K8iCGF7xtuPG
+ SNfzx63URsX3X4T6h/rbptyHvd7u7XT1vReVmTRxvattrYGYvkLA1NfiREhNopQ73scexS7UFH
+ rKQ=
 X-IronPort-AV: E=Sophos;i="5.64,411,1559491200"; 
-   d="scan'208";a="222880648"
+   d="scan'208";a="222880652"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Aug 2019 14:12:10 +0800
-IronPort-SDR: T2KdlgKrX1nPg/2Y3uANxYe3qPeIN/uJ2bS+HOZ7Rc1kCkHmSuXVrI0w830oWcKVSjs+tIPMkq
- ApRv02fIqcQRd0KTq7lJYj2g8DaXLPvMMUHiBZ0a3my+G78gYazo5wAV5ujSUahas07YjzIGuW
- 2UmEFyV4/M4yUP2AuoU/GXBV1/a5g4akLJjgIOWML0abmdf4JWXACE/TN2QLKDI8acVZXyihhm
- Zeh1mcXPL5Lb1/dwBWw50+il/c0wItDNwJEGmrvE1HV0NPVJVRwJRTdTYcQxIsZqMxhLbmEYVZ
- 3DhApw1f14UQ3+0RTJfz3+Tj
+  by ob1.hgst.iphmx.com with ESMTP; 21 Aug 2019 14:12:15 +0800
+IronPort-SDR: SEILRXt/SrKK9cVWnBLZ5+A6JeNZXHsWF/BPEw4LmzGGuta5NlB+FU/ObDM6m98FE6fxaDPnBY
+ veszYp8Oj5Wp/kkF47lO/Irprx70hOf2umM5ysuHrUOLvrZxh6CEwg6x/undDjXioT7Yh+8ZE9
+ oiDn0bGyW4Vz5oKuEX7ovQWJVSfdWfMKRw5SZyHhOXq7sESoJ0fruj1IGuNIGe9K/dSNDSdx2h
+ 6Mpp9xMtEt2J0aPwulNpNl0RrSnAjYhUewbzDMHmRWVdIy9AzmvX4Ct+cSgCN7g0Sh8OpXSEpF
+ ASnGsBz/Rfvk/6XVn0sXdggJ
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2019 23:09:32 -0700
-IronPort-SDR: AIMcuy8tdm6xX8+Jt0W34QdH3QJwXPMUaMbGUq3eMZr7Uj83yeOf3a12DwieIpMVdntIIx4TFk
- 8mWJOWbw2sxE0l1HQc8ALAHi0OHr51VwvYI9Y26CZXfy8lLsC28R4xRB11cPBA+hL3AdqMbzwT
- Rv3mvRirvY5N9IOgwlWwrKktBykOdcjL1EDGhSKQnzqrCBzpJQpBuBk4i1E452FD3c8yR5EXWo
- 3Ij6CkvLZ09tkv1uX697Rfxtu/Kc6KZmDH98LuV3jAq8Ncp8T9UOiuSQr9RUXokpzjqqSDNqWM
- dHk=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2019 23:09:36 -0700
+IronPort-SDR: sf7UIrSw9Rwk5i9k5zjrBIF8/J99H8bua9MgofLvz7gP8vI6jev9ZrbFxENI6ilJJrVy2+8phw
+ ZhdwDObYg43YZ8AALd1vaSgZiClBAB1+uprCkj77f+dCa1Cd8PSBaEITkhEV+h+SHRhnmsK3Jn
+ oWeGaexsKRK6qECNtc38lqdOlHPe9QIrKSHcMSc9Rm5EwaxsGdk3Hdle5Ybwp5Mvl9X1BeNZBo
+ VD4fvhALty0ykjJbHvr0pRRIBC297CtsIhNepap0S6t5U1wiKEzFXx+kHx/N/xcLiAvW0bKgHP
+ KU4=
 WDCIronportException: Internal
 Received: from cvenusqemu.hgst.com ([10.202.66.73])
-  by uls-op-cesaip01.wdc.com with ESMTP; 20 Aug 2019 23:12:10 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 20 Aug 2019 23:12:15 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     axboe@kernel.dk, Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V2 2/3] block: set ioprio for flush bio
-Date:   Tue, 20 Aug 2019 23:11:55 -0700
-Message-Id: <20190821061156.3127-3-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V2 3/3] block: set ioprio for discard, write-zeroes etc
+Date:   Tue, 20 Aug 2019 23:11:56 -0700
+Message-Id: <20190821061156.3127-4-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.17.0
 In-Reply-To: <20190821061156.3127-1-chaitanya.kulkarni@wdc.com>
 References: <20190821061156.3127-1-chaitanya.kulkarni@wdc.com>
@@ -73,26 +73,50 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Set the current process's iopriority for flush bio.
+Set the current process's iopriority for discard.
 
 Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- block/blk-flush.c | 1 +
- 1 file changed, 1 insertion(+)
+ block/blk-lib.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index aedd9320e605..642a01b72a8b 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -445,6 +445,7 @@ int blkdev_issue_flush(struct block_device *bdev, gfp_t gfp_mask,
- 	bio = bio_alloc(gfp_mask, 0);
- 	bio_set_dev(bio, bdev);
- 	bio->bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
-+	bio_set_prio(bio, get_current_ioprio());
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 5f2c429d4378..500a857e5d9f 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -64,6 +64,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio_set_op_attrs(bio, op, 0);
++		bio_set_prio(bio, get_current_ioprio());
  
- 	ret = submit_bio_wait(bio);
+ 		bio->bi_iter.bi_size = req_sects << 9;
+ 		sector += req_sects;
+@@ -162,6 +163,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 		bio->bi_io_vec->bv_offset = 0;
+ 		bio->bi_io_vec->bv_len = bdev_logical_block_size(bdev);
+ 		bio_set_op_attrs(bio, REQ_OP_WRITE_SAME, 0);
++		bio_set_prio(bio, get_current_ioprio());
  
+ 		if (nr_sects > max_write_same_sectors) {
+ 			bio->bi_iter.bi_size = max_write_same_sectors << 9;
+@@ -234,6 +236,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio->bi_opf = REQ_OP_WRITE_ZEROES;
++		bio_set_prio(bio, get_current_ioprio());
+ 		if (flags & BLKDEV_ZERO_NOUNMAP)
+ 			bio->bi_opf |= REQ_NOUNMAP;
+ 
+@@ -286,6 +289,7 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
++		bio_set_prio(bio, get_current_ioprio());
+ 
+ 		while (nr_sects != 0) {
+ 			sz = min((sector_t) PAGE_SIZE, nr_sects << 9);
 -- 
 2.17.0
 
