@@ -2,87 +2,102 @@ Return-Path: <SRS0=wMiD=WR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B30C3A5A0
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 12:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0703FC3A59E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 14:16:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2FB982339F
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 12:10:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1mTbly5h"
+	by mail.kernel.org (Postfix) with ESMTP id D67E8233A2
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 14:16:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727929AbfHUMJz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 08:09:55 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:43865 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727325AbfHUMJz (ORCPT
+        id S1726371AbfHUOQl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 10:16:41 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:58533 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729307AbfHUOQk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 08:09:55 -0400
-Received: by mail-pl1-f195.google.com with SMTP id 4so1225871pld.10
-        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2019 05:09:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=UT6yE/roxwyyBSRfLOwrFlilraLjBXjoNWJQAsldDVo=;
-        b=1mTbly5hNN6suDS+BwBXn5tZNQRoJv3U+6eGIZWkxOpX8gp4MfK0srbyshCamPl8cE
-         oynbwAZaUVd3iYuDw/fFqllqnUyyMdhGmWDFTWD0+uRBHO1RABomqwNTPTloesNaBCP/
-         OF0wNlT1X2HUApuEYt9hqsB3ukfCOmKOxQ9VlFGyTVla9DArrhzV46cf0e1hqSL0Em1S
-         kMKT+OUOB39Lc9u+MllIcA6W2VixaWAmIOOCqIPym//+KF+bJLzrXd5uXWfD6RF+tn8O
-         fEItbmLNgpz+3xyfCw5xuoCb8BCqv/jPsevOVEPakCBbt5mOdjvlnK19JQHJXISJTFII
-         +AuQ==
+        Wed, 21 Aug 2019 10:16:40 -0400
+Received: from mail-pl1-f199.google.com ([209.85.214.199])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <gpiccoli@canonical.com>)
+        id 1i0RPi-0001QU-OL
+        for linux-block@vger.kernel.org; Wed, 21 Aug 2019 14:16:38 +0000
+Received: by mail-pl1-f199.google.com with SMTP id b30so1549142pla.16
+        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2019 07:16:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=UT6yE/roxwyyBSRfLOwrFlilraLjBXjoNWJQAsldDVo=;
-        b=orKrbljR17i4xKb0636sQCiGnevAhFefKjDv38OFqjt+XtaZfQmOXQPf6ZRgbRFSME
-         rvhHDPSZupCSZMHRWVqYP8Q4kxNQOqSI5qNfS6vBss6H7H8Ni175GCjm23HupUxKO1dO
-         xqP9QCubvnnHQnCBjS9lQd19GDVEc3FLcdhEzNLFNGxi5gpJHgmefb1auo4KWjcw3CxH
-         OgMsYdaGFAWRW/2UHDR7bxbO16n9lUOFiY5DXjzveMfQkea/PFObip26rZXhTC2iKyQK
-         urcJ3o1rcjLsXi6Zrr2mz3jBs9REdcs6JvI/uabRU+W07LYJG9ig0AieCsizt6w6oZpj
-         zYsg==
-X-Gm-Message-State: APjAAAW25uS2k9d37Ia8x6LD6WL7goj13CIaMr9mBH4bdLkl8aykJgQn
-        3Xa2r2PLCRsfPqcMw/KG68QXUQ==
-X-Google-Smtp-Source: APXvYqxsoe31YiWALXWqRLHXasZTZR3nM8GXNUHwTUUu4EkoxYDPJeCxhjU4HkYSZ/HpLNbIJ9AOOg==
-X-Received: by 2002:a17:902:a410:: with SMTP id p16mr17723995plq.150.1566389394293;
-        Wed, 21 Aug 2019 05:09:54 -0700 (PDT)
-Received: from [192.168.1.188] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id z4sm22521476pfg.166.2019.08.21.05.09.51
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=Go+GEHhUcbN1bHosP4BsuQGAO6IN3p1GHI03GXEZEAE=;
+        b=WqUerRKLBotz+u9UMT934Ns87lRucXNG4KRLi+FM7mWmzoHD/iVlnmcKBFe7kq0U2F
+         SPR68QYkAyfjsFmflct4DMZL10MKA17+gFXF6CNlCf7h1qwa7twnZkBFpqcbQqRfXfH4
+         mrDv7JVa8mN85mngLDUFSO117HWcS0XDlTLwhhASJLYuBnc4u57H2xlr/9PUjRlS9uLL
+         FZHMZyph75CZtmCp7sP7jcdqfgmYaNEaEPmSz5uyhBToZVm3Q2GN0pANuGEDKQZfUDLn
+         DZJLJWP0JxAd+1WkAIc9bfTYcHqDfy50vR7k0+SmfqrZ1tB5qOsm50x0QA+lCCqEVFLP
+         PaIQ==
+X-Gm-Message-State: APjAAAUTLZeg7KMVR7AE7BCK8ZpeuT7SL423rnA9TOG1jfHB0PvpSgC5
+        Afnb/aWi/X9cKXhiMBTvo+4iUCxs7wcVcc5bsK05iN0Eb9cu8XJCvCG3FXiMjNqb0X2IPTrUowZ
+        cPqhnCZ8fNdhCqpPIO3Zc2VUv8ar8s+yV+3174Mdh
+X-Received: by 2002:a17:90b:8e:: with SMTP id bb14mr204490pjb.35.1566396996932;
+        Wed, 21 Aug 2019 07:16:36 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxAjW0ZfAAXYn4C5kkD1j8vOncVe99b8Y9EmPCf9G9eITmAA4IV8N6JlbdPHP10+0fky8YxRw==
+X-Received: by 2002:a17:90b:8e:: with SMTP id bb14mr204473pjb.35.1566396996764;
+        Wed, 21 Aug 2019 07:16:36 -0700 (PDT)
+Received: from [192.168.1.75] ([191.13.61.137])
+        by smtp.gmail.com with ESMTPSA id g36sm41138577pgb.78.2019.08.21.07.16.31
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 21 Aug 2019 05:09:53 -0700 (PDT)
-Subject: Re: [PATCH 5/9] block: support diskcipher
-To:     "boojin.kim" <boojin.kim@samsung.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     'Herbert Xu' <herbert@gondor.apana.org.au>,
-        "'David S. Miller'" <davem@davemloft.net>,
-        'Eric Biggers' <ebiggers@kernel.org>,
-        "'Theodore Y. Ts'o'" <tytso@mit.edu>, 'Chao Yu' <chao@kernel.org>,
-        'Jaegeuk Kim' <jaegeuk@kernel.org>,
-        'Andreas Dilger' <adilger.kernel@dilger.ca>,
-        dm-devel@redhat.com, 'Mike Snitzer' <snitzer@redhat.com>,
-        'Alasdair Kergon' <agk@redhat.com>,
-        'Krzysztof Kozlowski' <krzk@kernel.org>,
-        'Kukjin Kim' <kgene@kernel.org>,
-        'Jaehoon Chung' <jh80.chung@samsung.com>,
-        'Ulf Hansson' <ulf.hansson@linaro.org>,
-        linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-References: <CGME20190821064226epcas2p2835b8a9084988b79107e54abfc5e7dab@epcas2p2.samsung.com>
- <004101d557eb$98b00060$ca100120$@samsung.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6ea5e5db-4dd4-719f-3b3e-b89099636ea6@kernel.dk>
-Date:   Wed, 21 Aug 2019 06:09:50 -0600
+        Wed, 21 Aug 2019 07:16:35 -0700 (PDT)
+Subject: Re: [PATCH v2 1/2] md raid0/linear: Introduce new array state
+ 'broken'
+To:     Song Liu <songliubraving@fb.com>
+Cc:     Song Liu <liu.song.a23@gmail.com>,
+        linux-raid <linux-raid@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        Jay Vosburgh <jay.vosburgh@canonical.com>,
+        NeilBrown <neilb@suse.com>
+References: <20190816134059.29751-1-gpiccoli@canonical.com>
+ <CAPhsuW7aGze5p9DgNAe=KakJGXTNqRZpNCtvi8nKxzS2MPXrNQ@mail.gmail.com>
+ <1f16110b-b798-806f-638b-57bbbedfea49@canonical.com>
+ <1725F15D-7CA2-4B8D-949A-4D8078D53AA9@fb.com>
+ <4c95f76c-dfbc-150c-2950-d34521d1e39d@canonical.com>
+ <8E880472-67DA-4597-AFAD-0DAFFD223620@fb.com>
+From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
+ mQENBFpVBxcBCADPNKmu2iNKLepiv8+Ssx7+fVR8lrL7cvakMNFPXsXk+f0Bgq9NazNKWJIn
+ Qxpa1iEWTZcLS8ikjatHMECJJqWlt2YcjU5MGbH1mZh+bT3RxrJRhxONz5e5YILyNp7jX+Vh
+ 30rhj3J0vdrlIhPS8/bAt5tvTb3ceWEic9mWZMsosPavsKVcLIO6iZFlzXVu2WJ9cov8eQM/
+ irIgzvmFEcRyiQ4K+XUhuA0ccGwgvoJv4/GWVPJFHfMX9+dat0Ev8HQEbN/mko/bUS4Wprdv
+ 7HR5tP9efSLucnsVzay0O6niZ61e5c97oUa9bdqHyApkCnGgKCpg7OZqLMM9Y3EcdMIJABEB
+ AAG0LUd1aWxoZXJtZSBHLiBQaWNjb2xpIDxncGljY29saUBjYW5vbmljYWwuY29tPokBNwQT
+ AQgAIQUCWmClvQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRDOR5EF9K/7Gza3B/9d
+ 5yczvEwvlh6ksYq+juyuElLvNwMFuyMPsvMfP38UslU8S3lf+ETukN1S8XVdeq9yscwtsRW/
+ 4YoUwHinJGRovqy8gFlm3SAtjfdqysgJqUJwBmOtcsHkmvFXJmPPGVoH9rMCUr9s6VDPox8f
+ q2W5M7XE9YpsfchS/0fMn+DenhQpV3W6pbLtuDvH/81GKrhxO8whSEkByZbbc+mqRhUSTdN3
+ iMpRL0sULKPVYbVMbQEAnfJJ1LDkPqlTikAgt3peP7AaSpGs1e3pFzSEEW1VD2jIUmmDku0D
+ LmTHRl4t9KpbU/H2/OPZkrm7809QovJGRAxjLLPcYOAP7DUeltveuQENBFpVBxcBCADbxD6J
+ aNw/KgiSsbx5Sv8nNqO1ObTjhDR1wJw+02Bar9DGuFvx5/qs3ArSZkl8qX0X9Vhptk8rYnkn
+ pfcrtPBYLoux8zmrGPA5vRgK2ItvSc0WN31YR/6nqnMfeC4CumFa/yLl26uzHJa5RYYQ47jg
+ kZPehpc7IqEQ5IKy6cCKjgAkuvM1rDP1kWQ9noVhTUFr2SYVTT/WBHqUWorjhu57/OREo+Tl
+ nxI1KrnmW0DbF52tYoHLt85dK10HQrV35OEFXuz0QPSNrYJT0CZHpUprkUxrupDgkM+2F5LI
+ bIcaIQ4uDMWRyHpDbczQtmTke0x41AeIND3GUc+PQ4hWGp9XABEBAAGJAR8EGAEIAAkFAlpV
+ BxcCGwwACgkQzkeRBfSv+xv1wwgAj39/45O3eHN5pK0XMyiRF4ihH9p1+8JVfBoSQw7AJ6oU
+ 1Hoa+sZnlag/l2GTjC8dfEGNoZd3aRxqfkTrpu2TcfT6jIAsxGjnu+fUCoRNZzmjvRziw3T8
+ egSPz+GbNXrTXB8g/nc9mqHPPprOiVHDSK8aGoBqkQAPZDjUtRwVx112wtaQwArT2+bDbb/Y
+ Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
+ kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
+ X18zwLgdiQ==
+Message-ID: <c35cd395-fc54-24c0-1175-d3ea0ab0413d@canonical.com>
+Date:   Wed, 21 Aug 2019 11:16:25 -0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <004101d557eb$98b00060$ca100120$@samsung.com>
+In-Reply-To: <8E880472-67DA-4597-AFAD-0DAFFD223620@fb.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -91,31 +106,26 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/21/19 12:42 AM, boojin.kim wrote:
-> This patch supports crypto information to be maintained via BIO
-> and passed to the storage driver.
+On 19/08/2019 18:57, Song Liu wrote:
+> [...]
+> How about we test this when we do clear_bit(Faulty..)? And maybe also in 
+> add_new_disk()?
 > 
-> To do this, 'bi_aux_private', 'REQ_CYPTE' and 'bi_dun' are added
-> to the block layer.
+> Thanks,
+> Song
 > 
-> 'bi_aux_private' is added for loading additional private information into
-> BIO.
-> 'REQ_CRYPT' is added to distinguish that bi_aux_private is being used
-> for diskcipher.
-> F2FS among encryption users uses DUN(device unit number) as
-> the IV(initial vector) for cryptographic operations.
-> DUN is stored in 'bi_dun' of bi_iter as a specific value for each BIO.
-> 
-> Before attempting to merge the two BIOs, the operation is also added to
-> verify that the crypto information contained in two BIOs is consistent.
 
-This isn't going to happen. With this, and the inline encryption
-proposed by Google, we'll bloat the bio even more. At least the Google
-approach didn't include bio iter changes as well.
+Song, thanks for the suggestions. I've been working in the refactor, so
+far it's working fine. But I cannot re-add a member to raid0/linear
+without performing a full stop (with "mdadm --stop"), and in this case
+md_clean() will clear the flag. Restarting array this way works fine.
 
-Please work it out between yourselves so we can have a single, clean
-abstraction that works for both.
+If I try writing 'inactive' to array_state, I cannot reinsert the member
+to the array. That said, I don't think we need to worry in clearing
+MD_BROKEN for RAID0/LINEAR, and it makes things far easier.
+Are you ok with that? I'll submit V3 after our discussion.
 
--- 
-Jens Axboe
+Thanks,
 
+
+Guilherme
