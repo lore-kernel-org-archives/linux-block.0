@@ -2,86 +2,93 @@ Return-Path: <SRS0=wMiD=WR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63684C3A59E
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 15:41:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FDB9C3A59E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 15:44:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D84D22DA7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 15:41:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 387A222DA7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 15:44:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1566402247;
+	bh=Rvf9YghnoPKjXklr+lbYCQc4fN06lE+T07xEGELvoDw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=rBHXcsVCz1FmpOm+/noSPL1oo2CnpoUIZHCyE6qF+72LZ20R1a47i8PVf1Flzz+7T
+	 AKmTlrWV1q+64V/Qndpa417QYSlPnoASLfBW6J+Cd7aspojng6KmJabSp1DskeAbS/
+	 5iX1fdMG7fHul8TDpfkBevDcqIlgLAKGjlqVtdrM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727226AbfHUPlf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 11:41:35 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:34920 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726802AbfHUPlf (ORCPT
+        id S1727894AbfHUPoG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 11:44:06 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:46746 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727553AbfHUPoG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 11:41:35 -0400
-Received: by mail-pl1-f196.google.com with SMTP id gn20so1536695plb.2
-        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2019 08:41:35 -0700 (PDT)
+        Wed, 21 Aug 2019 11:44:06 -0400
+Received: by mail-qk1-f196.google.com with SMTP id p13so2188944qkg.13;
+        Wed, 21 Aug 2019 08:44:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=WsaM9eIl3JXCekJs4SyvVa1WU1qEuim85t6paiIn/CI=;
+        b=gBwwCIlRoRsncPrLfulxtiNtBqDslrrk01qoUakj7ROxgUCe2Z1Jkie5QrOYx6cy1t
+         ittH90Nf5mi+zTDNL+DT/YD22t+Gq4e4G1xT2KXF/IWYBadFqyiJVb1YtkbDxqokGJbz
+         2FUoS6prtlCz8ZqXUlLW/C+7dfISWWedqHkc26+Sgeb1Mqp2ByRaRx/BYT26Raskd9fG
+         dZjhnF77bE+uuLLYKItQJogKGqIj7IlYf1ScdYDDqpVrQjz0D4D0XBpaB0hrYBHvxLq/
+         4vetyes91YzvtHonebCbwxVB9w4U7blReA094/muNGax4e8R6EiuBSsk9XlEvN3/ON/Q
+         mn7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=crisZJ7D+vC3F3uLPwL+1nRE93mFXssO3OIJRXjUNTg=;
-        b=OEzIbrfgXUEXy+cLl1Xs75P3qXuE3U9SeJQCvMO6a7cgOP1i8QJCZw0+dMC6U7JAtC
-         5/ZWBZgoRbLu0fLrUSTLCXDzHBAH0fGUymf5Rz4Df7ejIBccFiK0QMMDrQtkzXC32IZ7
-         VzPEG+2PAnClPkGTXELh2mELYQDOwU/Ip+EkEIiPmgCPykEGm0QjytGjsTNGDx4rxxqD
-         Cw7JfZ1z8AFIbUNv804Ea+y3nS6656cOxAEjWUZDep05PC0HEhlrpw8gpXwME/th1lw0
-         Ldd7NoNVwnkW/t49OXm45TZApOH79EWtJsQVtSATJc9jyUPEGlsAYVF1sS5AwK6ofrdr
-         QrCg==
-X-Gm-Message-State: APjAAAVFR5N4RU9hxOHQTJAC9LUylDpEEdUfxR7z+uvDj7HKb8K06zRh
-        IxPIAgW8yQA83ULqah2Ol1I=
-X-Google-Smtp-Source: APXvYqzDA0GtTXF7S+CLebYfnQ9gp8K9UCz2HD8DHvCg7X7E0HHqKOpTNiwf8rBHUHoGpz15c8Akbw==
-X-Received: by 2002:a17:902:d690:: with SMTP id v16mr19309438ply.318.1566402094589;
-        Wed, 21 Aug 2019 08:41:34 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id y16sm25598684pfn.173.2019.08.21.08.41.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Aug 2019 08:41:33 -0700 (PDT)
-Subject: Re: [PATCH] block: don't acquire .sysfs_lock before removing mq &
- iosched kobjects
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Mike Snitzer <snitzer@redhat.com>
-References: <20190816135506.29253-1-ming.lei@redhat.com>
- <09092247-1623-57ff-6297-1abd9a8cc8a2@acm.org>
- <20190821030052.GD24167@ming.t460p>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <d27b430e-ed9b-7de7-5947-c93f1753c529@acm.org>
-Date:   Wed, 21 Aug 2019 08:41:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=WsaM9eIl3JXCekJs4SyvVa1WU1qEuim85t6paiIn/CI=;
+        b=FL+kYhAHDCr1z9tg7egO3tgoYVjsPgTrnQQmMOatTqndvwWqAaKNNlF/Yipv0TltsH
+         MBVwMrY3JWhOpcZKrisU9Hski//xTqISoSTseS34Qm7C5Cp8HYJwXvC4tghkglklZvnx
+         SFirOgQi++FUUDMJkpdfv7Zl87uD5SrPFT1oDNJ4r+Cxcki6iDFnCRlISwrr7O3tAF+l
+         3YQkUJOOyFiqiIj9Tn4P7xPxVbD0Dd+/Wo13cQ8aMy94i2+8kPqp5ips1+nZ6GAMCfvX
+         6NCL3jotSMn4A+/Y/Sq7xrL//4prXptLf7ymxsi6sAF+2UbRYC0y63cIiRQ9zAODYvBl
+         6Lzw==
+X-Gm-Message-State: APjAAAX6tuADOYs0IVz6qnfo19mpwuv7i8crTjwqE39CNzkfKKghU/0R
+        gXBSJkjLoQofoBxSoNP8lTs=
+X-Google-Smtp-Source: APXvYqyoo7O4zfbKH6+h9K44hSm5hrR8vMIas7kYusKUQEoRDkhQgiXDaxkhQ2c9BF00wPuPLVmdAw==
+X-Received: by 2002:a37:8c07:: with SMTP id o7mr16922667qkd.491.1566402245255;
+        Wed, 21 Aug 2019 08:44:05 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::1:1f05])
+        by smtp.gmail.com with ESMTPSA id r4sm10171491qtt.90.2019.08.21.08.44.04
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 21 Aug 2019 08:44:04 -0700 (PDT)
+Date:   Wed, 21 Aug 2019 08:44:02 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Fam Zheng <zhengfeiran@bytedance.com>
+Cc:     linux-kernel@vger.kernel.org, axboe@kernel.dk, fam@euphon.net,
+        paolo.valente@linaro.org, duanxiongchun@bytedance.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        zhangjiachen.jc@bytedance.com
+Subject: Re: [PATCH v2 3/3] bfq: Add per-device weight
+Message-ID: <20190821154402.GI2263813@devbig004.ftw2.facebook.com>
+References: <20190805063807.9494-1-zhengfeiran@bytedance.com>
+ <20190805063807.9494-4-zhengfeiran@bytedance.com>
 MIME-Version: 1.0
-In-Reply-To: <20190821030052.GD24167@ming.t460p>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190805063807.9494-4-zhengfeiran@bytedance.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/20/19 8:00 PM, Ming Lei wrote:
-> On Tue, Aug 20, 2019 at 02:21:10PM -0700, Bart Van Assche wrote:
->> -	/*
->> -	 * Remove the sysfs attributes before unregistering the queue data
->> -	 * structures that can be modified through sysfs.
->> -	 */
->>   	if (queue_is_mq(q))
->> -		blk_mq_unregister_dev(disk_to_dev(disk), q);
->> -	mutex_unlock(&q->sysfs_lock);
->> -
->> +		kobject_uevent(q->mq_kobj, KOBJ_REMOVE);
-> 
-> Could you explain why you move the above line here?
+On Mon, Aug 05, 2019 at 02:38:07PM +0800, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <zhengfeiran@bytedance.com>
 
-I'm not sure whether kobject_del() deletes any objects attached to the 
-deleted kobj. This change ensures that kobject_uevent() is called before 
-the parent object of q->mq_kobj is deleted.
+Looks good to me.
 
-Bart.
+ Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
+-- 
+tejun
