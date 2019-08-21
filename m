@@ -1,4 +1,4 @@
-Return-Path: <SRS0=6fCZ=WQ=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=wMiD=WR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,37 +6,39 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C8AC3A59E
-	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 23:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D008C3A59E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 01:56:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5147A206B7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Aug 2019 23:54:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C58D22DD3
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 01:56:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726294AbfHTXye (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Aug 2019 19:54:34 -0400
-Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:55849 "EHLO
-        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726151AbfHTXye (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Aug 2019 19:54:34 -0400
-Received: from dread.disaster.area (pa49-195-190-67.pa.nsw.optusnet.com.au [49.195.190.67])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 1F28A43E4DC;
-        Wed, 21 Aug 2019 09:54:30 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92)
-        (envelope-from <david@fromorbit.com>)
-        id 1i0DwI-0001eZ-LB; Wed, 21 Aug 2019 09:53:22 +1000
-Date:   Wed, 21 Aug 2019 09:53:22 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     "Verma, Vishal L" <vishal.l.verma@intel.com>
-Cc:     "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
+        id S1726606AbfHUB4j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Aug 2019 21:56:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43532 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726592AbfHUB4i (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Aug 2019 21:56:38 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3304F3082E03;
+        Wed, 21 Aug 2019 01:56:38 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2ECF710016EA;
+        Wed, 21 Aug 2019 01:56:30 +0000 (UTC)
+Date:   Wed, 21 Aug 2019 09:56:26 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     "hch@lst.de" <hch@lst.de>,
+        "Verma, Vishal L" <vishal.l.verma@intel.com>,
         "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
         "Williams, Dan J" <dan.j.williams@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "darrick.wong@oracle.com" <darrick.wong@oracle.com>
+        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
+        linux-block@vger.kernel.org
 Subject: Re: 5.3-rc1 regression with XFS log recovery
-Message-ID: <20190820235322.GJ1119@dread.disaster.area>
-References: <20190819041132.GA14492@lst.de>
+Message-ID: <20190821015624.GA24167@ming.t460p>
+References: <20190819034948.GA14261@lst.de>
+ <20190819041132.GA14492@lst.de>
  <20190819042259.GZ6129@dread.disaster.area>
  <20190819042905.GA15613@lst.de>
  <20190819044012.GA15800@lst.de>
@@ -45,107 +47,126 @@ References: <20190819041132.GA14492@lst.de>
  <20190820081325.GA21032@ming.t460p>
  <20190820092424.GB21032@ming.t460p>
  <20190820214408.GG1119@dread.disaster.area>
- <85bde038615a6a82d79708fd04944671ca8580c5.camel@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <85bde038615a6a82d79708fd04944671ca8580c5.camel@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.2 cv=D+Q3ErZj c=1 sm=1 tr=0
-        a=TR82T6zjGmBjdfWdGgpkDw==:117 a=TR82T6zjGmBjdfWdGgpkDw==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=FmdZ9Uzk2mMA:10
-        a=7-415B0cAAAA:8 a=Xv0y9uns91YydaQQMxwA:9 a=-ec80IMEu3Jzm-bp:21
-        a=6fXaY66gyORZkQyz:21 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <20190820214408.GG1119@dread.disaster.area>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Wed, 21 Aug 2019 01:56:38 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 20, 2019 at 10:08:38PM +0000, Verma, Vishal L wrote:
-> On Wed, 2019-08-21 at 07:44 +1000, Dave Chinner wrote:
+On Wed, Aug 21, 2019 at 07:44:09AM +1000, Dave Chinner wrote:
+> On Tue, Aug 20, 2019 at 05:24:25PM +0800, Ming Lei wrote:
+> > On Tue, Aug 20, 2019 at 04:13:26PM +0800, Ming Lei wrote:
+> > > On Tue, Aug 20, 2019 at 07:53:20AM +0200, hch@lst.de wrote:
+> > > > On Tue, Aug 20, 2019 at 02:41:35PM +1000, Dave Chinner wrote:
+> > > > > > With the following debug patch.  Based on that I think I'll just
+> > > > > > formally submit the vmalloc switch as we're at -rc5, and then we
+> > > > > > can restart the unaligned slub allocation drama..
+> > > > > 
+> > > > > This still doesn't make sense to me, because the pmem and brd code
+> > > > > have no aligment limitations in their make_request code - they can
+> > > > > handle byte adressing and should not have any problem at all with
+> > > > > 8 byte aligned memory in bios.
+> > > > > 
+> > > > > Digging a little furhter, I note that both brd and pmem use
+> > > > > identical mechanisms to marshall data in and out of bios, so they
+> > > > > are likely to have the same issue.
+> > > > > 
+> > > > > So, brd_make_request() does:
+> > > > > 
+> > > > >         bio_for_each_segment(bvec, bio, iter) {
+> > > > >                 unsigned int len = bvec.bv_len;
+> > > > >                 int err;
+> > > > > 
+> > > > >                 err = brd_do_bvec(brd, bvec.bv_page, len, bvec.bv_offset,
+> > > > >                                   bio_op(bio), sector);
+> > > > >                 if (err)
+> > > > >                         goto io_error;
+> > > > >                 sector += len >> SECTOR_SHIFT;
+> > > > >         }
+> > > > > 
+> > > > > So, the code behind bio_for_each_segment() splits multi-page bvecs
+> > > > > into individual pages, which are passed to brd_do_bvec(). An
+> > > > > unaligned 4kB io traces out as:
+> > > > > 
+> > > > >  [  121.295550] p,o,l,s 00000000a77f0146,768,3328,0x7d0048
+> > > > >  [  121.297635] p,o,l,s 000000006ceca91e,0,768,0x7d004e
+> > > > > 
+> > > > > i.e. page		offset	len	sector
+> > > > > 00000000a77f0146	768	3328	0x7d0048
+> > > > > 000000006ceca91e	0	768	0x7d004e
+> > > > > 
+> > > > > You should be able to guess what the problems are from this.
+> > > 
+> > > The problem should be that offset of '768' is passed to bio_add_page().
 > > 
-> > However, the case here is that:
+> > It can be quite hard to deal with non-512 aligned sector buffer, since
+> > one sector buffer may cross two pages, so far one workaround I thought
+> > of is to not merge such IO buffer into one bvec.
 > > 
-> > > > > > i.e. page		offset	len	sector
-> > > > > > 00000000a77f0146	768	3328	0x7d0048
-> > > > > > 000000006ceca91e	0	768	0x7d004e
+> > Verma, could you try the following patch?
 > > 
-> > The second page added to the bvec is actually offset alignedr. Hence
-> > the check would do nothing on the first page because the bvec array
-> > is empty (so goes into a new bvec anyway), and the check on the
-> > second page would do nothing an it would merge with first because
-> > the offset is aligned correctly. In both cases, the length of the
-> > segment is not aligned, so that needs to be checked, too.
-> > 
-> > IOWs, I think the check needs to be in bio_add_page, it needs to
-> > check both the offset and length for alignment, and it needs to grab
-> > the alignment from queue_dma_alignment(), not use a hard coded value
-> > of 511.
-> > 
-> So something like this?
+> > diff --git a/block/bio.c b/block/bio.c
+> > index 24a496f5d2e2..49deab2ac8c4 100644
+> > --- a/block/bio.c
+> > +++ b/block/bio.c
+> > @@ -769,6 +769,9 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+> >  	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
+> >  		return false;
+> >  
+> > +	if (off & 511)
+> > +		return false;
 > 
-> diff --git a/block/bio.c b/block/bio.c
-> index 299a0e7651ec..80f449d23e5a 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -822,8 +822,12 @@ EXPORT_SYMBOL_GPL(__bio_add_page);
->  int bio_add_page(struct bio *bio, struct page *page,
->                  unsigned int len, unsigned int offset)
->  {
-> +       struct request_queue *q = bio->bi_disk->queue;
->         bool same_page = false;
->  
-> +       if (offset & queue_dma_alignment(q) || len & queue_dma_alignment(q))
-> +               return 0;
-> +
->         if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
->                 if (bio_full(bio, len))
->                         return 0;
+> What does this acheive? It only prevents the unaligned segment from
+> being merged, it doesn't prevent it from being added to a new bvec.
+
+The current issue is that block layer won't handle such case, as I
+mentioned, one sector buffer may cross two pages, then it can't be
+splitted successfully, so simply put into one new bvec just as
+before enabling multi-page bvec.
+
 > 
-> I tried this, but the 'mount' just hangs - which looks like it might be
-> due to xfs_rw_bdev() doing:
+> However, the case here is that:
 > 
->   while (bio_add_page(bio, page, len, off) != len) {
+> > > > > i.e. page		offset	len	sector
+> > > > > 00000000a77f0146	768	3328	0x7d0048
+> > > > > 000000006ceca91e	0	768	0x7d004e
+> 
+> The second page added to the bvec is actually offset alignedr. Hence
+> the check would do nothing on the first page because the bvec array
+> is empty (so goes into a new bvec anyway), and the check on the
+> second page would do nothing an it would merge with first because
+> the offset is aligned correctly. In both cases, the length of the
+> segment is not aligned, so that needs to be checked, too.
 
-That's the return of zero that causes the loop to make no progress.
-i.e. a return of 0 means "won't fit in bio, allocate a new bio
-and try again". It's not an error return, so always returning zero
-will eventually chew up all your memory allocating bios it
-doesn't use, because submit_bio() doesn't return errors on chained
-bios until the final bio in the chain is completed.
+What the patch changes is the bvec stored in bio, the above bvec is
+actually built in-flight.
 
-Add a bio_add_page_checked() function that does exactly the same
-this as bio_add_page(), but add the
+So if the 1st page added to bio is (768, 512), then finally
+bio_for_each_segment() will generate the 1st page as (768, 512), then
+everything will be fine.
 
-	if (WARN_ON_ONCE((offset | len) & queue_dma_alignment(q)))
-		return -EIO;
+> 
+> IOWs, I think the check needs to be in bio_add_page, it needs to
+> check both the offset and length for alignment, and it needs to grab
 
-to it and change the xfs code to:
+The length has to be 512 aligned, otherwise it is simply bug in fs.
 
-	while ((len = bio_add_page_checked(bio, page, len, off)) != len) {
-		if (len < 0) {
-			/*
-			 * submit the bio to wait on the rest of the
-			 * chain to complete, then return an error.
-			 * This is a really shitty failure on write, as we
-			 * will have just done a partial write and
-			 * effectively corrupted something on disk.
-			 */
-			submit_bio_wait(bio);
-			return len;
-		}
-		....
-	}
+> the alignment from queue_dma_alignment(), not use a hard coded value
+> of 511.
 
-We probably should change all the XFS calls to bio_add_page to
-bio_add_page_checked() while we are at it, because we have the
-same alignment problem through xfs_buf.c and, potentially, on iclogs
-via xfs_log.c as iclogs are allocated with kmem_alloc_large(), too.
+Now the policy for bio_add_page() is to not checking any queue limit
+given we don't know what is the actual limit for the finally IO, even the
+queue isn't set when bio_add_page() is called.
 
-Cheers,
+If the upper layer won't pass slub buffer which is > PAGE_SIZE, block
+layer may handle it well without the 512 alignment check.
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+
+Thanks,
+Ming
