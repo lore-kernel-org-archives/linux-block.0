@@ -2,221 +2,171 @@ Return-Path: <SRS0=wMiD=WR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22351C3A5A1
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 07:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21835C3A5A0
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 07:57:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E1D4922D6D
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 07:57:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m1Xurgto"
+	by mail.kernel.org (Postfix) with ESMTP id 0107E233A2
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 07:57:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726291AbfHUH5T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 03:57:19 -0400
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:40165 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726479AbfHUH5T (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 03:57:19 -0400
-Received: by mail-pf1-f202.google.com with SMTP id e18so1052058pfj.7
-        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2019 00:57:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=qBYw6rmUbKKC3VdJzzhZFbO54DY8EqjVVgF8hqQ2BVM=;
-        b=m1XurgtoPK+fka2z8sNyW0/MqfW9/U9hjy3nSxr5IPDOY+nWylWHuogp9jrVH5zFCF
-         GRsgogC4tQFk3Yzt2zQT9kLISOv5wsMBdy297GHb/QuCYDrRmyg2JdtW+8NtfbPKafxi
-         MoLg4eK/kitx8SnWOv3uhXpr8bDQGHHsBReb86MT16AaTYiI4ybrwjzBQhOsUVclUYKi
-         h2r8/Dd7NUpMxrwKnp57d20sNxfcj6ISWEOSO/xFG1m1dMw4JodcZVcOlV72zDWzTlT4
-         5wuG+eNl+GhXM1Qy3JjnLN/UwBFCyLiLUmtCEd4Xvs+uLqtP4gboeKPIJ038cFUHYTcZ
-         v+NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=qBYw6rmUbKKC3VdJzzhZFbO54DY8EqjVVgF8hqQ2BVM=;
-        b=SFojz3lHAX89S1wBJmU3uTsYj8TW0sHuSuY7GjXaM6WuM5zMRNPAeRsxcRRdisV3X6
-         qUSRmtIZ2yza5vkT5Iv3rlLw4kKvMIr5lIECLHoRhhV/q6GPy4aFi8ddGm1iOFx1LBbS
-         izoF7wocFf7DjpXDj0vDDc+77jyzk5ePr/R+xGZFCH5XVti1uhQBB/gXnwTCrB9VTyam
-         yJNvMQn4+RWrN8g0GIqTYSZ0Qp0CmBZuxiXLtPpauBJBU7ag5CilvYcTqQjbqRrl+X5U
-         vTx+kvB6uwLvnEnjOUsLiMDpfXZeLlrDYNxYf50HZpXOVzB+ShaqkiLdzvZ7tTglJ/mf
-         HwGw==
-X-Gm-Message-State: APjAAAVG2hrzzkt0GSvHnx7qm4xWaMOMblKhcKsIRXNyyoiy2hYfD5KI
-        P601vuq/h3bJtbWoiNNXsmNOS3E4U6eakGapOTOMGapXxeq0TK1Xa1NFCdRkhArsY+miXvgHcuZ
-        7k4Ny/IIacL58Ud4FG1IbU1+eBG7wFUZt865i05zvGtWtR6/eGQASiYcqVEzzFQ22bwyT
-X-Google-Smtp-Source: APXvYqyYG592CW3rXQWgTZpbKT/mH3YUzFok7GJ5iJ9kysnTWjWo+ii3lu2lURgc1SAlWfNK2GglwL02dCI=
-X-Received: by 2002:a65:4507:: with SMTP id n7mr27027863pgq.86.1566374238228;
- Wed, 21 Aug 2019 00:57:18 -0700 (PDT)
-Date:   Wed, 21 Aug 2019 00:57:06 -0700
-Message-Id: <20190821075714.65140-1-satyat@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.23.0.rc1.153.gdeed80330f-goog
-Subject: [PATCH v4 0/8] Inline Encryption Support
-From:   Satya Tangirala <satyat@google.com>
-To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net
-Cc:     Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>,
-        Satya Tangirala <satyat@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726479AbfHUH5X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 03:57:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55288 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726899AbfHUH5W (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Aug 2019 03:57:22 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 50C48307D88D;
+        Wed, 21 Aug 2019 07:57:22 +0000 (UTC)
+Received: from [10.72.12.72] (ovpn-12-72.pek2.redhat.com [10.72.12.72])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F1D5E2C8D2;
+        Wed, 21 Aug 2019 07:57:19 +0000 (UTC)
+Subject: Re: [PATCH] nbd: fix possible page fault for nbd disk
+To:     josef@toxicpanda.com, axboe@kernel.dk
+Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-kernel@vger.kernel.org
+References: <20190821070148.8502-1-xiubli@redhat.com>
+From:   Xiubo Li <xiubli@redhat.com>
+Message-ID: <042aed1d-9a42-a27d-fad9-47cdf35c38af@redhat.com>
+Date:   Wed, 21 Aug 2019 15:57:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190821070148.8502-1-xiubli@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Wed, 21 Aug 2019 07:57:22 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch series adds support for Inline Encryption to the block layer,
-UFS, fscrypt and f2fs.
+FYI.
 
-Inline Encryption hardware allows software to specify an encryption context
-(an encryption key, crypto algorithm, data unit num, data unit size, etc.)
-along with a data transfer request to a storage device, and the inline
-encryption hardware will use that context to en/decrypt the data. The
-inline encryption hardware is part of the storage device, and it
-conceptually sits on the data path between system memory and the storage
-device. Inline Encryption hardware has become increasingly common, and we
-want to support it in the kernel.
+This patch still have some problems.
 
-Inline Encryption hardware implementations often function around the
-concept of a limited number of "keyslots", which can hold an encryption
-context each. The storage device can be directed to en/decrypt any
-particular request with the encryption context stored in any particular
-keyslot.
+Will check it more.
+Thanks.
 
-Patch 1 introduces a Keyslot Manager to efficiently manage keyslots.
-The keyslot manager also functions as the interface that blk-crypto
-(introduced in Path 3), will use to program keys into inline encryption
-hardware. For more information on the Keyslot Manager, refer to
-documentation found in block/keyslot-manager.c and linux/keyslot-manager.h.
+On 2019/8/21 15:01, xiubli@redhat.com wrote:
+> From: Xiubo Li <xiubli@redhat.com>
+>
+> When the NBD_CFLAG_DESTROY_ON_DISCONNECT flag is set and at the same
+> time when the socket is closed due to the server daemon is restarted,
+> there will be crashing randomly, like:
+>
+> <3>[  110.151949] block nbd1: Receive control failed (result -32)
+> <1>[  110.152024] BUG: unable to handle page fault for address: 0000058000000840
+> <1>[  110.152063] #PF: supervisor read access in kernel mode
+> <1>[  110.152083] #PF: error_code(0x0000) - not-present page
+> <6>[  110.152094] PGD 0 P4D 0
+> <4>[  110.152106] Oops: 0000 [#1] SMP PTI
+> <4>[  110.152120] CPU: 0 PID: 6698 Comm: kworker/u5:1 Kdump: loaded Not tainted 5.3.0-rc4+ #2
+> <4>[  110.152136] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+> <4>[  110.152166] Workqueue: knbd-recv recv_work [nbd]
+> <4>[  110.152187] RIP: 0010:__dev_printk+0xd/0x67
+> <4>[  110.152206] Code: 10 e8 c5 fd ff ff 48 8b 4c 24 18 65 48 33 0c 25 28 00 [...]
+> <4>[  110.152244] RSP: 0018:ffffa41581f13d18 EFLAGS: 00010206
+> <4>[  110.152256] RAX: ffffa41581f13d30 RBX: ffff96dd7374e900 RCX: 0000000000000000
+> <4>[  110.152271] RDX: ffffa41581f13d20 RSI: 00000580000007f0 RDI: ffffffff970ec24f
+> <4>[  110.152285] RBP: ffffa41581f13d80 R08: ffff96dd7fc17908 R09: 0000000000002e56
+> <4>[  110.152299] R10: ffffffff970ec24f R11: 0000000000000003 R12: ffff96dd7374e900
+> <4>[  110.152313] R13: 0000000000000000 R14: ffff96dd7374e9d8 R15: ffff96dd6e3b02c8
+> <4>[  110.152329] FS:  0000000000000000(0000) GS:ffff96dd7fc00000(0000) knlGS:0000000000000000
+> <4>[  110.152362] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> <4>[  110.152383] CR2: 0000058000000840 CR3: 0000000067cc6002 CR4: 00000000001606f0
+> <4>[  110.152401] Call Trace:
+> <4>[  110.152422]  _dev_err+0x6c/0x83
+> <4>[  110.152435]  nbd_read_stat.cold+0xda/0x578 [nbd]
+> <4>[  110.152448]  ? __switch_to_asm+0x34/0x70
+> <4>[  110.152468]  ? __switch_to_asm+0x40/0x70
+> <4>[  110.152478]  ? __switch_to_asm+0x34/0x70
+> <4>[  110.152491]  ? __switch_to_asm+0x40/0x70
+> <4>[  110.152501]  ? __switch_to_asm+0x34/0x70
+> <4>[  110.152511]  ? __switch_to_asm+0x40/0x70
+> <4>[  110.152522]  ? __switch_to_asm+0x34/0x70
+> <4>[  110.152533]  recv_work+0x35/0x9e [nbd]
+> <4>[  110.152547]  process_one_work+0x19d/0x340
+> <4>[  110.152558]  worker_thread+0x50/0x3b0
+> <4>[  110.152568]  kthread+0xfb/0x130
+> <4>[  110.152577]  ? process_one_work+0x340/0x340
+> <4>[  110.152609]  ? kthread_park+0x80/0x80
+> <4>[  110.152637]  ret_from_fork+0x35/0x40
+>
+> This is very easy to reproduce by running the nbd-runner.
+>
+> Signed-off-by: Xiubo Li <xiubli@redhat.com>
+> ---
+>   drivers/block/nbd.c | 15 +++++++++++++--
+>   1 file changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index e21d2ded732b..bf5e4227c54d 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -26,6 +26,7 @@
+>   #include <linux/ioctl.h>
+>   #include <linux/mutex.h>
+>   #include <linux/compiler.h>
+> +#include <linux/completion.h>
+>   #include <linux/err.h>
+>   #include <linux/kernel.h>
+>   #include <linux/slab.h>
+> @@ -112,6 +113,8 @@ struct nbd_device {
+>   	struct list_head list;
+>   	struct task_struct *task_recv;
+>   	struct task_struct *task_setup;
+> +
+> +	struct completion complete;
+>   };
+>   
+>   #define NBD_CMD_REQUEUED	1
+> @@ -231,6 +234,13 @@ static void nbd_put(struct nbd_device *nbd)
+>   					&nbd_index_mutex)) {
+>   		idr_remove(&nbd_index_idr, nbd->index);
+>   		mutex_unlock(&nbd_index_mutex);
+> +
+> +		/* Wait untill the recv_work exit */
+> +		wait_for_completion(&nbd->complete);
+> +
+> +		kfree(nbd->config);
+> +		nbd->config = NULL;
+> +
+>   		nbd_dev_remove(nbd);
+>   	}
+>   }
+> @@ -1134,8 +1144,6 @@ static void nbd_config_put(struct nbd_device *nbd)
+>   			}
+>   			kfree(config->socks);
+>   		}
+> -		kfree(nbd->config);
+> -		nbd->config = NULL;
+>   
+>   		nbd->tag_set.timeout = 0;
+>   		nbd->disk->queue->limits.discard_granularity = 0;
+> @@ -1143,6 +1151,8 @@ static void nbd_config_put(struct nbd_device *nbd)
+>   		blk_queue_max_discard_sectors(nbd->disk->queue, UINT_MAX);
+>   		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, nbd->disk->queue);
+>   
+> +		complete(&nbd->complete);
+> +
+>   		mutex_unlock(&nbd->config_lock);
+>   		nbd_put(nbd);
+>   		module_put(THIS_MODULE);
+> @@ -1596,6 +1606,7 @@ static int nbd_dev_add(int index)
+>   	nbd->tag_set.flags = BLK_MQ_F_SHOULD_MERGE |
+>   		BLK_MQ_F_BLOCKING;
+>   	nbd->tag_set.driver_data = nbd;
+> +	init_completion(&nbd->complete);
+>   
+>   	err = blk_mq_alloc_tag_set(&nbd->tag_set);
+>   	if (err)
 
-Patch 2 introduces struct bio_crypt_ctx, and a ptr to one in struct bio,
-which allows struct bio to represent an encryption context that can be
-passed down the storage stack from the filesystem layer to the storage
-driver.
-
-Patch 3 introduces blk-crypto. Blk-crypto delegates crypto operations to
-inline encryption hardware when available, and also contains a software
-fallback to the kernel crypto API. Blk-crypto also makes it possible for
-layered devices like device mapper to make use of inline encryption
-hardware. Given that blk-crypto works as a software fallback, we are
-considering removing file content en/decryption from fscrypt and simply
-using blk-crypto in a future patch. For more details on blk-crypto, refer
-to Documentation/block/blk-crypto.txt.
-
-Patches 4-6 add support for inline encryption into the UFS driver according
-to the JEDEC UFS HCI v2.1 specification. Inline encryption support for
-other drivers (like eMMC) may be added in the same way - the device driver
-should set up a Keyslot Manager in the device's request_queue (refer to
-the UFS crypto additions in ufshcd-crypto.c and ufshcd.c for an example).
-
-Patches 7 and 8 add support to fscrypt and f2fs, so that we have
-a complete stack that can make use of inline encryption.
-
-There have been a few patch sets addressing Inline Encryption Support in
-the past. Briefly, this patch set differs from those as follows:
-
-1) "crypto: qce: ice: Add support for Inline Crypto Engine"
-is specific to certain hardware, while our patch set's Inline
-Encryption support for UFS is implemented according to the JEDEC UFS
-specification.
-
-2) "scsi: ufs: UFS Host Controller crypto changes" registers inline
-encryption support as a kernel crypto algorithm. Our patch views inline
-encryption as being fundamentally different from a generic crypto
-provider (in that inline encryption is tied to a device), and so does
-not use the kernel crypto API to represent inline encryption hardware.
-
-3) "scsi: ufs: add real time/inline crypto support to UFS HCD" requires
-the device mapper to work - our patch does not.
-
-Changes v3 => v4:
- - Fixed the issue with allocating crypto_skcipher in
-   blk_crypto_keyslot_program.
- - bio_crypto_alloc_ctx is now mempool backed.
- - In f2fs, a bio's bi_crypt_context is now set up when the
-   bio is allocated, rather than just before the bio is
-   submitted - this fixes bugs in certain cases, like when an
-   encrypted block is being moved without decryption.
- - Lots of refactoring and cleanup of blk-crypto - thanks Eric!
-
-Changes v2 => v3:
- - Overhauled keyslot manager's get keyslot logic and optimized LRU.
- - Block crypto en/decryption fallback now supports data unit sizes
-   that divide the bvec length (instead of requiring each bvec's length
-   to be the same as the data unit size).
- - fscrypt master key is now keyed additionally by super_block and
-   ci_ctfm != NULL.
- - all references of "hw encryption" are replaced by inline encryption.
- - address various other review comments from Eric.
-
-Changes v1 => v2:
- - Block layer and UFS changes are split into 3 patches each.
- - We now only have a ptr to a struct bio_crypt_ctx in struct bio, instead
-   of the struct itself.
- - struct bio_crypt_ctx no longer has flags.
- - blk-crypto now correctly handles the case when it fails to init
-   (because of insufficient memory), but kernel continues to boot.
- - ufshcd-crypto now works on big endian cpus.
- - Many cleanups.
-
-Satya Tangirala (8):
-  block: Keyslot Manager for Inline Encryption
-  block: Add encryption context to struct bio
-  block: blk-crypto for Inline Encryption
-  scsi: ufs: UFS driver v2.1 spec crypto additions
-  scsi: ufs: UFS crypto API
-  scsi: ufs: Add inline encryption support to UFS
-  fscrypt: wire up fscrypt to use blk-crypto
-  f2fs: Wire up f2fs to use inline encryption via fscrypt
-
- Documentation/block/inline-encryption.txt | 186 ++++++
- block/Kconfig                             |  10 +
- block/Makefile                            |   2 +
- block/bio-crypt-ctx.c                     | 142 +++++
- block/bio.c                               |  23 +-
- block/blk-core.c                          |  14 +-
- block/blk-crypto.c                        | 737 ++++++++++++++++++++++
- block/blk-merge.c                         |  35 +-
- block/bounce.c                            |  15 +-
- block/keyslot-manager.c                   | 351 +++++++++++
- drivers/md/dm.c                           |  15 +-
- drivers/scsi/ufs/Kconfig                  |  10 +
- drivers/scsi/ufs/Makefile                 |   1 +
- drivers/scsi/ufs/ufshcd-crypto.c          | 429 +++++++++++++
- drivers/scsi/ufs/ufshcd-crypto.h          |  86 +++
- drivers/scsi/ufs/ufshcd.c                 |  85 ++-
- drivers/scsi/ufs/ufshcd.h                 |  29 +
- drivers/scsi/ufs/ufshci.h                 |  67 +-
- fs/crypto/Kconfig                         |   6 +
- fs/crypto/bio.c                           | 137 +++-
- fs/crypto/fscrypt_private.h               |  23 +
- fs/crypto/keyinfo.c                       | 107 +++-
- fs/crypto/policy.c                        |   6 +
- fs/f2fs/data.c                            | 127 +++-
- fs/f2fs/super.c                           |  15 +-
- include/linux/bio-crypt-ctx.h             | 233 +++++++
- include/linux/bio.h                       |   1 +
- include/linux/blk-crypto.h                |  47 ++
- include/linux/blk_types.h                 |   6 +
- include/linux/blkdev.h                    |   6 +
- include/linux/fscrypt.h                   |  72 +++
- include/linux/keyslot-manager.h           |  94 +++
- include/uapi/linux/fs.h                   |   3 +-
- 33 files changed, 3034 insertions(+), 86 deletions(-)
- create mode 100644 Documentation/block/inline-encryption.txt
- create mode 100644 block/bio-crypt-ctx.c
- create mode 100644 block/blk-crypto.c
- create mode 100644 block/keyslot-manager.c
- create mode 100644 drivers/scsi/ufs/ufshcd-crypto.c
- create mode 100644 drivers/scsi/ufs/ufshcd-crypto.h
- create mode 100644 include/linux/bio-crypt-ctx.h
- create mode 100644 include/linux/blk-crypto.h
- create mode 100644 include/linux/keyslot-manager.h
-
--- 
-2.23.0.rc1.153.gdeed80330f-goog
 
