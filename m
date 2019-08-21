@@ -2,93 +2,100 @@ Return-Path: <SRS0=wMiD=WR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FDB9C3A59E
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 15:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE0DC3A59E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 15:51:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 387A222DA7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 15:44:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1566402247;
-	bh=Rvf9YghnoPKjXklr+lbYCQc4fN06lE+T07xEGELvoDw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=rBHXcsVCz1FmpOm+/noSPL1oo2CnpoUIZHCyE6qF+72LZ20R1a47i8PVf1Flzz+7T
-	 AKmTlrWV1q+64V/Qndpa417QYSlPnoASLfBW6J+Cd7aspojng6KmJabSp1DskeAbS/
-	 5iX1fdMG7fHul8TDpfkBevDcqIlgLAKGjlqVtdrM=
+	by mail.kernel.org (Postfix) with ESMTP id 9895622DA7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 15:51:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727894AbfHUPoG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 11:44:06 -0400
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:46746 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727553AbfHUPoG (ORCPT
+        id S1727316AbfHUPvJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 11:51:09 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:32920 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726785AbfHUPvI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 11:44:06 -0400
-Received: by mail-qk1-f196.google.com with SMTP id p13so2188944qkg.13;
-        Wed, 21 Aug 2019 08:44:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=WsaM9eIl3JXCekJs4SyvVa1WU1qEuim85t6paiIn/CI=;
-        b=gBwwCIlRoRsncPrLfulxtiNtBqDslrrk01qoUakj7ROxgUCe2Z1Jkie5QrOYx6cy1t
-         ittH90Nf5mi+zTDNL+DT/YD22t+Gq4e4G1xT2KXF/IWYBadFqyiJVb1YtkbDxqokGJbz
-         2FUoS6prtlCz8ZqXUlLW/C+7dfISWWedqHkc26+Sgeb1Mqp2ByRaRx/BYT26Raskd9fG
-         dZjhnF77bE+uuLLYKItQJogKGqIj7IlYf1ScdYDDqpVrQjz0D4D0XBpaB0hrYBHvxLq/
-         4vetyes91YzvtHonebCbwxVB9w4U7blReA094/muNGax4e8R6EiuBSsk9XlEvN3/ON/Q
-         mn7Q==
+        Wed, 21 Aug 2019 11:51:08 -0400
+Received: by mail-pf1-f195.google.com with SMTP id g2so1707334pfq.0
+        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2019 08:51:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=WsaM9eIl3JXCekJs4SyvVa1WU1qEuim85t6paiIn/CI=;
-        b=FL+kYhAHDCr1z9tg7egO3tgoYVjsPgTrnQQmMOatTqndvwWqAaKNNlF/Yipv0TltsH
-         MBVwMrY3JWhOpcZKrisU9Hski//xTqISoSTseS34Qm7C5Cp8HYJwXvC4tghkglklZvnx
-         SFirOgQi++FUUDMJkpdfv7Zl87uD5SrPFT1oDNJ4r+Cxcki6iDFnCRlISwrr7O3tAF+l
-         3YQkUJOOyFiqiIj9Tn4P7xPxVbD0Dd+/Wo13cQ8aMy94i2+8kPqp5ips1+nZ6GAMCfvX
-         6NCL3jotSMn4A+/Y/Sq7xrL//4prXptLf7ymxsi6sAF+2UbRYC0y63cIiRQ9zAODYvBl
-         6Lzw==
-X-Gm-Message-State: APjAAAX6tuADOYs0IVz6qnfo19mpwuv7i8crTjwqE39CNzkfKKghU/0R
-        gXBSJkjLoQofoBxSoNP8lTs=
-X-Google-Smtp-Source: APXvYqyoo7O4zfbKH6+h9K44hSm5hrR8vMIas7kYusKUQEoRDkhQgiXDaxkhQ2c9BF00wPuPLVmdAw==
-X-Received: by 2002:a37:8c07:: with SMTP id o7mr16922667qkd.491.1566402245255;
-        Wed, 21 Aug 2019 08:44:05 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::1:1f05])
-        by smtp.gmail.com with ESMTPSA id r4sm10171491qtt.90.2019.08.21.08.44.04
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 21 Aug 2019 08:44:04 -0700 (PDT)
-Date:   Wed, 21 Aug 2019 08:44:02 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Fam Zheng <zhengfeiran@bytedance.com>
-Cc:     linux-kernel@vger.kernel.org, axboe@kernel.dk, fam@euphon.net,
-        paolo.valente@linaro.org, duanxiongchun@bytedance.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        zhangjiachen.jc@bytedance.com
-Subject: Re: [PATCH v2 3/3] bfq: Add per-device weight
-Message-ID: <20190821154402.GI2263813@devbig004.ftw2.facebook.com>
-References: <20190805063807.9494-1-zhengfeiran@bytedance.com>
- <20190805063807.9494-4-zhengfeiran@bytedance.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kCrsK39MiFEY4PvJcNALkgLa/S1Jtal2ikj4JSkZ1Lo=;
+        b=JDnWmdARVkXVlYgVcmLNCMP5PVVVy2vfO2f36f5qCWs9OtrtxQQ8REFsn14ru5ll/r
+         PP83nq6zoP4Hn4NQmftnH/NdWU2CP5ME0OygPBwaUiG1mc9DbkE7drwx981WUwwt/3AW
+         oIz+Gh/cJH2PAH9Uw/YB6EU9t3NyrxXaIk7R4mwcEBrgl9oS1m9t4vUPle1iQq4K7CyE
+         zgJz2pi25opCGM95Rfz+Aiu8nM8o/xyOmP0dCNJ/SRgB/KDIj+Cd3onTEAvTNkdLg/N3
+         5mCknuoT1uUeplQ5ah3n8AKQV+SPfhmeAQacbHg0eZJcHBEwVGZdQEKcfI2zykIqz/sO
+         0Xbw==
+X-Gm-Message-State: APjAAAWnl53G/lZqCyraRmCfmG9YXlQpIfTpJu57y6kKvE1fG8EPfLUf
+        w4mobgvC3jzCoUF+ZDUdSK0=
+X-Google-Smtp-Source: APXvYqw/Totpd9t3Nol6CzdnOVetzvM0YLz5D50yweiXbVNPhz+dprDx8M4H61CQjkXH64cuBdljWw==
+X-Received: by 2002:a62:1941:: with SMTP id 62mr36473422pfz.188.1566402668105;
+        Wed, 21 Aug 2019 08:51:08 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id 65sm40193098pff.148.2019.08.21.08.51.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Aug 2019 08:51:07 -0700 (PDT)
+Subject: Re: [PATCH V2 2/6] block: don't hold q->sysfs_lock in
+ elevator_init_mq
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Mike Snitzer <snitzer@redhat.com>
+References: <20190821091506.21196-1-ming.lei@redhat.com>
+ <20190821091506.21196-3-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <aa6c97a6-dade-5996-1e61-e56c1f6fea5b@acm.org>
+Date:   Wed, 21 Aug 2019 08:51:06 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190805063807.9494-4-zhengfeiran@bytedance.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190821091506.21196-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 05, 2019 at 02:38:07PM +0800, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <zhengfeiran@bytedance.com>
+On 8/21/19 2:15 AM, Ming Lei wrote:
+> The original comment says:
+> 
+> 	q->sysfs_lock must be held to provide mutual exclusion between
+> 	elevator_switch() and here.
+> 
+> Which is simply wrong. elevator_init_mq() is only called from
+> blk_mq_init_allocated_queue, which is always called before the request
+> queue is registered via blk_register_queue(), for dm-rq or normal rq
+> based driver. However, queue's kobject is just exposed added to sysfs
+                                             ^^^^^^^^^^^^
+                                             only?
+> in blk_register_queue(). So there isn't such race between elevator_switch()
+> and elevator_init_mq().
+> 
+> So avoid to hold q->sysfs_lock in elevator_init_mq().
+[ ... ]
+>   	/*
+> -	 * q->sysfs_lock must be held to provide mutual exclusion between
+> -	 * elevator_switch() and here.
+> +	 * We are called from blk_mq_init_allocated_queue() only, at that
+> +	 * time the request queue isn't registered yet, so the queue
+> +	 * kobject isn't exposed to userspace. No need to worry about race
+> +	 * with elevator_switch(), and no need to hold q->sysfs_lock.
+>   	 */
 
-Looks good to me.
+How about replacing this comment with the following:
 
- Acked-by: Tejun Heo <tj@kernel.org>
+WARN_ON_ONCE(test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags));
 
-Thanks.
+Anyway:
 
--- 
-tejun
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
