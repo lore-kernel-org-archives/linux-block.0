@@ -6,87 +6,117 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9995C3A59E
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 00:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1103C41514
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 00:38:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE50F22CE3
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 00:09:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A966122DD3
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 00:38:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727629AbfHVAJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 20:09:30 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:39564 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726828AbfHVAJa (ORCPT
+        id S1728480AbfHVAi6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 20:38:58 -0400
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:58089 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727291AbfHVAi6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 20:09:30 -0400
-Received: by mail-wm1-f65.google.com with SMTP id i63so3872834wmg.4;
-        Wed, 21 Aug 2019 17:09:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=32/0yIVdzlJ2KJ3NplTUO5+v34KMaLLDclpZ7tzJ9aE=;
-        b=XFklBSV1ROpQHezo5lCXW6jYtyDmA7+IaKiARuK6gJadBKQ6t9IsUF+lJHd3ctp6DR
-         EG9mWqQgn35EdGLTGl2lsrVOh/JLzYrLDLZD4GH2jgI6l4slYeDi9js90BlNdDOxLX4l
-         2l1zjaGglt+QzvERRNqy+Ftw9z7BmxC7p2/Dfm/wUzLn0bWSB+Y/9/Ja2IPFzH5b+JZL
-         sn3ZbwzZLEe8ErXiSEgU4cUm5iY7/RoMaTHp3f2OOVoRr15iiHpHjqlqHSApm5jWi9dC
-         j7OWRhx7f2Om+zpynK3XovyzQYaU48ZlwKJuAHQtJIqQxgyAkpKFOtxN9HOiwFkHCroJ
-         0s6A==
-X-Gm-Message-State: APjAAAVANRDHLtpelZYVXCO4luEWska1FhKRGHLuri9D6M30WGm+UEBu
-        NWZSF7ZrUKT4zRpV3yUyrbY=
-X-Google-Smtp-Source: APXvYqwuT0kmih8HKsX3ht5823hsz+gh7dNnKBV5RVKrdbL46NznsoXAK7FHnNlGyRd4vEhe81JUTw==
-X-Received: by 2002:a1c:2314:: with SMTP id j20mr2598763wmj.152.1566432568173;
-        Wed, 21 Aug 2019 17:09:28 -0700 (PDT)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id r16sm50444348wrc.81.2019.08.21.17.09.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 21 Aug 2019 17:09:27 -0700 (PDT)
-Subject: Re: [PATCH v7 08/14] nvmet-core: allow one host per passthru-ctrl
-To:     Max Gurtovoy <maxg@mellanox.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Stephen Bates <sbates@raithlin.com>, Jens Axboe <axboe@fb.com>,
-        Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-References: <20190801234514.7941-1-logang@deltatee.com>
- <20190801234514.7941-9-logang@deltatee.com>
- <05a74e81-1dbd-725f-1369-5ca5c5918db1@mellanox.com>
- <a6b9db95-a7f0-d1f6-1fa2-8dc13a6aa29e@deltatee.com>
- <5717f515-e051-c420-07b7-299bcfcd1f32@mellanox.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <b0921c72-93f1-f67a-c4b3-31baeb1c39cb@grimberg.me>
-Date:   Wed, 21 Aug 2019 17:09:23 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 21 Aug 2019 20:38:58 -0400
+Received: from dread.disaster.area (pa49-195-190-67.pa.nsw.optusnet.com.au [49.195.190.67])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 5849143E43C;
+        Thu, 22 Aug 2019 10:38:52 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92)
+        (envelope-from <david@fromorbit.com>)
+        id 1i0b6n-0004U6-2z; Thu, 22 Aug 2019 10:37:45 +1000
+Date:   Thu, 22 Aug 2019 10:37:45 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-xfs@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/3] xfs: alignment check bio buffers
+Message-ID: <20190822003745.GS1119@dread.disaster.area>
+References: <20190821083820.11725-1-david@fromorbit.com>
+ <20190821083820.11725-4-david@fromorbit.com>
+ <20190821232945.GC24904@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <5717f515-e051-c420-07b7-299bcfcd1f32@mellanox.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190821232945.GC24904@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0
+        a=TR82T6zjGmBjdfWdGgpkDw==:117 a=TR82T6zjGmBjdfWdGgpkDw==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=FmdZ9Uzk2mMA:10
+        a=20KFwNOVAAAA:8 a=7-415B0cAAAA:8 a=rU67Zy6-Q7zb79vJh6YA:9
+        a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-> I don't understand why we don't limit a regular ctrl to single access 
-> and we do it for the PT ctrl.
+On Wed, Aug 21, 2019 at 04:29:45PM -0700, Christoph Hellwig wrote:
+> On Wed, Aug 21, 2019 at 06:38:20PM +1000, Dave Chinner wrote:
+> > From: Dave Chinner <dchinner@redhat.com>
+> > 
+> > Add memory buffer alignment validation checks to bios built in XFS
+> > to catch bugs that will result in silent data corruption in block
+> > drivers that cannot handle unaligned memory buffers but don't
+> > validate the incoming buffer alignment is correct.
+> > 
+> > Known drivers with these issues are xenblk, brd and pmem.
+> > 
+> > Despite there being nothing XFS specific to xfs_bio_add_page(), this
+> > function was created to do the required validation because the block
+> > layer developers that keep telling us that is not possible to
+> > validate buffer alignment in bio_add_page(), and even if it was
+> > possible it would be too much overhead to do at runtime.
 > 
-> I guess the block layer helps to sync between multiple access in 
-> parallel but we can do it as well.
+> I really don't think we should life this to XFS, but instead fix it
+> in the block layer.  And that is not only because I have a pending
+> series lifting bits you are touching to the block layer..
+
+I agree, but....
+
 > 
-> Also, let's say you limit the access to this subsystem to 1 user, the 
-> bdev is still accessibly for local user and also you can create a 
-> different subsystem that will use this device (PT and non-PT ctrl).
+> > +int
+> > +xfs_bio_add_page(
+> > +	struct bio	*bio,
+> > +	struct page	*page,
+> > +	unsigned int	len,
+> > +	unsigned int	offset)
+> > +{
+> > +	struct request_queue	*q = bio->bi_disk->queue;
+> > +	bool		same_page = false;
+> > +
+> > +	if (WARN_ON_ONCE(!blk_rq_aligned(q, len, offset)))
+> > +		return -EIO;
+> > +
+> > +	if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
+> > +		if (bio_full(bio, len))
+> > +			return 0;
+> > +		__bio_add_page(bio, page, len, offset);
+> > +	}
+> > +	return len;
 > 
-> Sagi,
-> 
-> can you explain the trouble you meant and how this limitation solve it ?
+> I know Jens disagree, but with the amount of bugs we've been hitting
+> thangs to slub (and I'm pretty sure we have a more hiding outside of
+> XFS) I think we need to add the blk_rq_aligned check to bio_add_page.
 
-Its different to emulate the controller with all its admin
-commands vs. passing it through to the nvme device.. (think of format nvm)
+... I'm not prepared to fight this battle to get this initial fix
+into the code. Get the fix merged, then we can 
 
+> Note that all current callers of bio_add_page can only really check
+> for the return value != the added len anyway, so it is not going to
+> make anything worse.
 
+It does make things worse - it turns multi-bio chaining loops like
+the one xfs_rw_bdev() into an endless loop as they don't make
+progress - they just keep allocating a new bio and retrying the same
+badly aligned buffer and failing. So if we want an alignment failure
+to error out, callers need to handle the failure, not treat it like
+a full bio.
 
+Cheers,
+
+Dave.
+
+-- 
+Dave Chinner
+david@fromorbit.com
