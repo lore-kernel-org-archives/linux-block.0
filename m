@@ -2,101 +2,112 @@ Return-Path: <SRS0=L3Py=WS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA41C3A5A1
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 19:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26849C3A5A1
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 19:52:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3ACCB233FC
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 19:41:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F01302339F
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 19:52:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391999AbfHVTlr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Aug 2019 15:41:47 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:50158 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731942AbfHVTlr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Aug 2019 15:41:47 -0400
-Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([70.73.163.230] helo=[192.168.11.155])
-        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1i0sxm-0002GA-Tu; Thu, 22 Aug 2019 13:41:39 -0600
-To:     Sagi Grimberg <sagi@grimberg.me>, Max Gurtovoy <maxg@mellanox.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Stephen Bates <sbates@raithlin.com>, Jens Axboe <axboe@fb.com>,
-        Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-References: <20190801234514.7941-1-logang@deltatee.com>
- <20190801234514.7941-9-logang@deltatee.com>
- <05a74e81-1dbd-725f-1369-5ca5c5918db1@mellanox.com>
- <a6b9db95-a7f0-d1f6-1fa2-8dc13a6aa29e@deltatee.com>
- <5717f515-e051-c420-07b7-299bcfcd1f32@mellanox.com>
- <b0921c72-93f1-f67a-c4b3-31baeb1c39cb@grimberg.me>
- <b352c7f1-2629-e72f-9c85-785e0cf7c2c1@mellanox.com>
- <24e2ddd0-4b2a-8092-cf91-df8c0fb482e5@grimberg.me>
- <e4430207-7def-8776-0289-0d58689dc0cd@grimberg.me>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <5e53b732-5c33-c331-0c77-d52d5075306a@deltatee.com>
-Date:   Thu, 22 Aug 2019 13:41:32 -0600
+        id S1729069AbfHVTw5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Aug 2019 15:52:57 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:38568 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726206AbfHVTw5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Aug 2019 15:52:57 -0400
+Received: by mail-pf1-f196.google.com with SMTP id o70so4669655pfg.5
+        for <linux-block@vger.kernel.org>; Thu, 22 Aug 2019 12:52:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=DK8QaPljbev5PJxNCaiQinBv791dt3WlySGZV+hYP0g=;
+        b=ILAsfsIavuo11uskJFpRMT2qy49LLjxsexyu+5OWLYuTY0062D06/tRISSJ+rMMFUu
+         H/BGkBbdLjedU6BWT854b+KReU875fhUSl+oYyIVVF4dEBBnY4Q/1uxMjCHOBVqsbXKW
+         lcfg80W83Jn/8e841smWleGp0VDrC8i2kN+2+hYnubNQIiqf+EUJGRpJvX0WR78dOgJf
+         f8qVCqsXX8jLYw1gqbnnqrNbCoRuCLnuKJ6XhYNnvdaS01Dlc/MXAO3NMQ1lLk9ArgvZ
+         eP0LNlxSOWGy4Y/11P4N+YhD3LGRnMTybQAl2uHxQ4rD/ewZvaWV5gheIFT4IkJRYrZI
+         E/5Q==
+X-Gm-Message-State: APjAAAXNvXM/Ycl/0bbs0JaHCzPBj5yimD8G/zrGMMhMW8xX/E6Rj9oT
+        p/wFyCmv1+l8OTgpMinRjsg=
+X-Google-Smtp-Source: APXvYqxFXO9GO7aaeYxNfT66ERAZqY9ISyplkQayz+FEXAVBN7vo1Q5/tU/wqLxns3ysqEFW4FoLGA==
+X-Received: by 2002:a63:2c8:: with SMTP id 191mr757304pgc.139.1566503576433;
+        Thu, 22 Aug 2019 12:52:56 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id d12sm230697pfn.11.2019.08.22.12.52.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Aug 2019 12:52:55 -0700 (PDT)
+Subject: Re: [PATCH V2 6/6] block: split .sysfs_lock into two locks
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Mike Snitzer <snitzer@redhat.com>
+References: <20190821091506.21196-1-ming.lei@redhat.com>
+ <20190821091506.21196-7-ming.lei@redhat.com>
+ <6d97a960-52b5-5134-5382-dff73be00722@acm.org>
+ <20190822012839.GB28635@ming.t460p>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <04b567f5-df49-3d44-1707-14fe8445843e@acm.org>
+Date:   Thu, 22 Aug 2019 12:52:54 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <e4430207-7def-8776-0289-0d58689dc0cd@grimberg.me>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190822012839.GB28635@ming.t460p>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 70.73.163.230
-X-SA-Exim-Rcpt-To: hch@lst.de, kbusch@kernel.org, axboe@fb.com, sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, maxg@mellanox.com, sagi@grimberg.me
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v7 08/14] nvmet-core: allow one host per passthru-ctrl
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2019-08-22 1:17 p.m., Sagi Grimberg wrote:
-> 
->>>>> I don't understand why we don't limit a regular ctrl to single
->>>>> access and we do it for the PT ctrl.
->>>>>
->>>>> I guess the block layer helps to sync between multiple access in
->>>>> parallel but we can do it as well.
->>>>>
->>>>> Also, let's say you limit the access to this subsystem to 1 user,
->>>>> the bdev is still accessibly for local user and also you can create
->>>>> a different subsystem that will use this device (PT and non-PT ctrl).
->>>>>
->>>>> Sagi,
->>>>>
->>>>> can you explain the trouble you meant and how this limitation solve
->>>>> it ?
->>>>
->>>> Its different to emulate the controller with all its admin
->>>> commands vs. passing it through to the nvme device.. (think of
->>>> format nvm)
->>>>
->>>>
->>>>
->>> we don't need to support format command for PT ctrl as we don't
->>> support other commands such create_sq/cq.
+On 8/21/19 6:28 PM, Ming Lei wrote:
+> On Wed, Aug 21, 2019 at 09:18:08AM -0700, Bart Van Assche wrote:
+>> On 8/21/19 2:15 AM, Ming Lei wrote:
+>>> diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+>>> index 31bbf10d8149..a4cc40ddda86 100644
+>>> --- a/block/blk-mq-sysfs.c
+>>> +++ b/block/blk-mq-sysfs.c
+>>> @@ -247,7 +247,7 @@ void blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+>>>    	struct blk_mq_hw_ctx *hctx;
+>>>    	int i;
+>>> -	lockdep_assert_held(&q->sysfs_lock);
+>>> +	lockdep_assert_held(&q->sysfs_dir_lock);
+>>>    	queue_for_each_hw_ctx(q, hctx, i)
+>>>    		blk_mq_unregister_hctx(hctx);
+>>> @@ -297,7 +297,7 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
+>>>    	int ret, i;
+>>>    	WARN_ON_ONCE(!q->kobj.parent);
+>>> -	lockdep_assert_held(&q->sysfs_lock);
+>>> +	lockdep_assert_held(&q->sysfs_dir_lock);
+>>>    	ret = kobject_add(q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
+>>>    	if (ret < 0)
 >>
->> That is just an example, basically every command that we are not aware
->> of we simply passthru to the drive without knowing the implications
->> on a multi-host environment..
+>> blk_mq_unregister_dev and __blk_mq_register_dev() are only used by
+>> blk_register_queue() and blk_unregister_queue(). It is the responsibility of
+>> the callers of these function to serialize request queue registration and
+>> unregistration. Is it really necessary to hold a mutex around the
+>> blk_mq_unregister_dev and __blk_mq_register_dev() calls? Or in other words,
+>> can it ever happen that multiple threads invoke one or both functions
+>> concurrently?
 > 
-> If we were to change the logic of nvmet_parse_passthru_admin_cmd to
-> have the default case do nvmet_parse_admin_cmd, and only have
-> the vendor-specific space opcodes do nvmet_passthru_execute_cmd
-> then I could not see at the moment how we can break a multi-host
-> export...
+> hctx kobjects can be removed and re-added via blk_mq_update_nr_hw_queues()
+> which may be called at the same time when queue is registering or
+> un-registering.
 
-That makes sense. I'll make that change and resend a v8 next week.
+Shouldn't blk_register_queue() and blk_unregister_queue() be serialized 
+against blk_mq_update_nr_hw_queues()? Allowing these calls to proceed 
+concurrently complicates the block layer and makes the block layer code 
+harder to review than necessary. I don't think that it would help any 
+block driver to allow these calls to proceed concurrently.
 
-Logan
+Thanks,
+
+Bart.
