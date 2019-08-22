@@ -2,124 +2,165 @@ Return-Path: <SRS0=L3Py=WS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 001CAC3A5A1
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 16:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56CF8C3A5A1
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 17:40:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D08C521743
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 16:20:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3600C23405
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 17:40:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388500AbfHVQUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Aug 2019 12:20:44 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:41684 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729718AbfHVQUo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Aug 2019 12:20:44 -0400
-Received: from mail-qt1-f200.google.com ([209.85.160.200])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <gpiccoli@canonical.com>)
-        id 1i0pkt-0000Hh-05
-        for linux-block@vger.kernel.org; Thu, 22 Aug 2019 16:16:07 +0000
-Received: by mail-qt1-f200.google.com with SMTP id z15so7067027qts.0
-        for <linux-block@vger.kernel.org>; Thu, 22 Aug 2019 09:16:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=q0aNycXsSnwLf3vqQdFLiM1ZARJzzFHaCgk1ijpSvsE=;
-        b=VHW/CNJcFuGuigYdMok/iS38RbfYzc/BLVwKz7VnLfXYL+wUCegRsMIrzfNmyIpKg4
-         JcZibkGkpfVpjQoNeoOSVsTZvTmfi8m63SBmViTKkNKC3tmUc27Z1p3bzjpKYZX/RiHU
-         iBI/dLGAUtIcOOPnnbuivFgKZZzSrKwI3u+IxkRtxZfEyUVaci07Cd3dxmVo+QX0OYPo
-         xcbHzcty7Vpp4BnA9Sme6XLI3l26gN8TApEhBJ5Rf9mYmChGuIjtuyAqrF50w9/TE0pR
-         PVIqNeVbed1LVTm9Trb+CTvZ62gAxvKV899+HfRSeyg8AgucIsV7gu8UbtG7kk5fAx89
-         ydKw==
-X-Gm-Message-State: APjAAAWb09WGZTe+iHGO2luh/JGk8jDFtV+2yNEeatG8JvrRruw/CkF2
-        UsRReGBYmux8VvchtiQWoq45g3mThUQzRvbzK2GJ87MoRGDGJp6sbkefuz5GwLRh81fRsZPfdQA
-        xYQ6+WKBtUVr2PInyIFgMHfRmnet599mMVIj2nvKp
-X-Received: by 2002:a05:620a:1287:: with SMTP id w7mr14090795qki.25.1566490566251;
-        Thu, 22 Aug 2019 09:16:06 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxW81skd/ojKHMqB2NA2J1P9pBOYLY8x774SefeP60xASWhlQBa5s02ATMEO0flfPVfXfvQCA==
-X-Received: by 2002:a05:620a:1287:: with SMTP id w7mr14090776qki.25.1566490566142;
-        Thu, 22 Aug 2019 09:16:06 -0700 (PDT)
-Received: from [192.168.1.75] ([191.13.61.137])
-        by smtp.gmail.com with ESMTPSA id b127sm72453qkc.22.2019.08.22.09.16.03
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 22 Aug 2019 09:16:05 -0700 (PDT)
-Subject: Re: [PATCH v2 1/2] md raid0/linear: Introduce new array state
- 'broken'
-To:     Song Liu <songliubraving@fb.com>
-Cc:     Song Liu <liu.song.a23@gmail.com>,
-        linux-raid <linux-raid@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Jay Vosburgh <jay.vosburgh@canonical.com>,
-        NeilBrown <neilb@suse.com>
-References: <20190816134059.29751-1-gpiccoli@canonical.com>
- <CAPhsuW7aGze5p9DgNAe=KakJGXTNqRZpNCtvi8nKxzS2MPXrNQ@mail.gmail.com>
- <1f16110b-b798-806f-638b-57bbbedfea49@canonical.com>
- <1725F15D-7CA2-4B8D-949A-4D8078D53AA9@fb.com>
- <4c95f76c-dfbc-150c-2950-d34521d1e39d@canonical.com>
- <8E880472-67DA-4597-AFAD-0DAFFD223620@fb.com>
- <c35cd395-fc54-24c0-1175-d3ea0ab0413d@canonical.com>
- <B7287054-70AC-47A8-BA5A-4D3D7C3F689F@fb.com>
- <d0a3709e-c3a9-c0b1-c3c1-bf5a6d6932af@canonical.com>
- <EB40716A-CD63-46B1-97B8-B8C039E08548@fb.com>
-From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
- mQENBFpVBxcBCADPNKmu2iNKLepiv8+Ssx7+fVR8lrL7cvakMNFPXsXk+f0Bgq9NazNKWJIn
- Qxpa1iEWTZcLS8ikjatHMECJJqWlt2YcjU5MGbH1mZh+bT3RxrJRhxONz5e5YILyNp7jX+Vh
- 30rhj3J0vdrlIhPS8/bAt5tvTb3ceWEic9mWZMsosPavsKVcLIO6iZFlzXVu2WJ9cov8eQM/
- irIgzvmFEcRyiQ4K+XUhuA0ccGwgvoJv4/GWVPJFHfMX9+dat0Ev8HQEbN/mko/bUS4Wprdv
- 7HR5tP9efSLucnsVzay0O6niZ61e5c97oUa9bdqHyApkCnGgKCpg7OZqLMM9Y3EcdMIJABEB
- AAG0LUd1aWxoZXJtZSBHLiBQaWNjb2xpIDxncGljY29saUBjYW5vbmljYWwuY29tPokBNwQT
- AQgAIQUCWmClvQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRDOR5EF9K/7Gza3B/9d
- 5yczvEwvlh6ksYq+juyuElLvNwMFuyMPsvMfP38UslU8S3lf+ETukN1S8XVdeq9yscwtsRW/
- 4YoUwHinJGRovqy8gFlm3SAtjfdqysgJqUJwBmOtcsHkmvFXJmPPGVoH9rMCUr9s6VDPox8f
- q2W5M7XE9YpsfchS/0fMn+DenhQpV3W6pbLtuDvH/81GKrhxO8whSEkByZbbc+mqRhUSTdN3
- iMpRL0sULKPVYbVMbQEAnfJJ1LDkPqlTikAgt3peP7AaSpGs1e3pFzSEEW1VD2jIUmmDku0D
- LmTHRl4t9KpbU/H2/OPZkrm7809QovJGRAxjLLPcYOAP7DUeltveuQENBFpVBxcBCADbxD6J
- aNw/KgiSsbx5Sv8nNqO1ObTjhDR1wJw+02Bar9DGuFvx5/qs3ArSZkl8qX0X9Vhptk8rYnkn
- pfcrtPBYLoux8zmrGPA5vRgK2ItvSc0WN31YR/6nqnMfeC4CumFa/yLl26uzHJa5RYYQ47jg
- kZPehpc7IqEQ5IKy6cCKjgAkuvM1rDP1kWQ9noVhTUFr2SYVTT/WBHqUWorjhu57/OREo+Tl
- nxI1KrnmW0DbF52tYoHLt85dK10HQrV35OEFXuz0QPSNrYJT0CZHpUprkUxrupDgkM+2F5LI
- bIcaIQ4uDMWRyHpDbczQtmTke0x41AeIND3GUc+PQ4hWGp9XABEBAAGJAR8EGAEIAAkFAlpV
- BxcCGwwACgkQzkeRBfSv+xv1wwgAj39/45O3eHN5pK0XMyiRF4ihH9p1+8JVfBoSQw7AJ6oU
- 1Hoa+sZnlag/l2GTjC8dfEGNoZd3aRxqfkTrpu2TcfT6jIAsxGjnu+fUCoRNZzmjvRziw3T8
- egSPz+GbNXrTXB8g/nc9mqHPPprOiVHDSK8aGoBqkQAPZDjUtRwVx112wtaQwArT2+bDbb/Y
- Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
- kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
- X18zwLgdiQ==
-Message-ID: <f6c361ea-5f46-5a13-2b53-e48e404c91e2@canonical.com>
-Date:   Thu, 22 Aug 2019 13:16:02 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2392837AbfHVRkG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Aug 2019 13:40:06 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5202 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2392832AbfHVRkF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Aug 2019 13:40:05 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 0396EF9CAEFA3B24BC08;
+        Fri, 23 Aug 2019 01:40:00 +0800 (CST)
+Received: from [127.0.0.1] (10.202.227.238) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Fri, 23 Aug 2019
+ 01:39:49 +0800
+Subject: Re: [PATCH V2 0/5] blk-mq: improvement on handling IO during CPU
+ hotplug
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+References: <20190812134312.16732-1-ming.lei@redhat.com>
+CC:     <linux-block@vger.kernel.org>, Minwoo Im <minwoo.im.dev@gmail.com>,
+        "Bart Van Assche" <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        "Christoph Hellwig" <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>,
+        chenxiang <chenxiang66@hisilicon.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <a2f9e930-1b9c-dc95-78f8-70df9460669d@huawei.com>
+Date:   Thu, 22 Aug 2019 18:39:43 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-In-Reply-To: <EB40716A-CD63-46B1-97B8-B8C039E08548@fb.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20190812134312.16732-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.238]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21/08/2019 16:22, Song Liu wrote:
-> [...] 
-> 
-> I think this makes sense. Please send the patch and we can discuss
-> further while looking at the code. 
+On 12/08/2019 14:43, Ming Lei wrote:
+> Hi,
+>
+> Thomas mentioned:
+>     "
+>      That was the constraint of managed interrupts from the very beginning:
+>
+>       The driver/subsystem has to quiesce the interrupt line and the associated
+>       queue _before_ it gets shutdown in CPU unplug and not fiddle with it
+>       until it's restarted by the core when the CPU is plugged in again.
+>     "
+>
+> But no drivers or blk-mq do that before one hctx becomes dead(all
+> CPUs for one hctx are offline), and even it is worse, blk-mq stills tries
+> to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead().
+>
+> This patchset tries to address the issue by two stages:
+>
+> 1) add one new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE
+>
+> - mark the hctx as internal stopped, and drain all in-flight requests
+> if the hctx is going to be dead.
+>
+> 2) re-submit IO in the state of CPUHP_BLK_MQ_DEAD after the hctx becomes dead
+>
+> - steal bios from the request, and resubmit them via generic_make_request(),
+> then these IO will be mapped to other live hctx for dispatch
+>
+> Please comment & review, thanks!
+>
+> V2:
+> 	- patch4 & patch 5 in V1 have been merged to block tree, so remove
+> 	  them
+> 	- address comments from John Garry and Minwoo
+>
+>
+> Ming Lei (5):
+>   blk-mq: add new state of BLK_MQ_S_INTERNAL_STOPPED
+>   blk-mq: add blk-mq flag of BLK_MQ_F_NO_MANAGED_IRQ
+>   blk-mq: stop to handle IO before hctx's all CPUs become offline
+>   blk-mq: re-submit IO in case that hctx is dead
+>   blk-mq: handle requests dispatched from IO scheduler in case that hctx
+>     is dead
 
-Thanks Song, just sent the V3:
-lore.kernel.org/linux-block/20190822161318.26236-1-gpiccoli@canonical.com
+Hi Ming,
+
+This looks to fix the hotplug issue for me.
+
+Previously I could manufacture a scenario while running fio where I got 
+IO timeouts, like this:
+
+root@(none)$ echo 0 > ./sys/devices/system/cpu/cpu0/online
+[  296.897627] process 891 (fio) no longer affine to cpu0
+[  296.898488] process 893 (fio) no longer affine to cpu0
+[  296.910270] process 890 (fio) no longer affine to cpu0
+[  296.927322] IRQ 775: no longer affine to CPU0
+[  296.932762] CPU0: shutdown
+[  296.935469] psci: CPU0 killed.
+root@(none)$ [  326.971962] sas: Enter sas_scsi_recover_host busy: 61 
+failed: 61
+[  326.977978] sas: sas_scsi_find_task: aborting task 0x00000000e2cdc79b
+root@(none)$ [  333.047964] hisi_sas_v3_hw 0000:74:02.0: internal task 
+abort: timeout and not done.
+[  333.055616] hisi_sas_v3_hw 0000:74:02.0: abort task: internal abort (-5)
+[  333.062306] sas: sas_scsi_find_task: querying task 0x00000000e2cdc79b
+[  333.068776] sas: sas_scsi_find_task: task 0x00000000e2cdc79b not at LU
+[  333.075295] sas: task 0x00000000e2cdc79b is not at LU: I_T recover
+[  333.081464] sas: I_T nexus reset for dev 5000c500a7b95a49
+
+Please notice the 30-second delay for the SCSI IO timeout.
+
+And now I don't see it; here's a sample for irq shutdown:
+root@(none)$ echo 0 > ./sys/devices/system/cpu/cpu0/online
+[  344.608148] process 849 (fio) no longer affine to cpu0
+[  344.608639] process 848 (fio) no longer affine to cpu0
+[  344.609454] process 850 (fio) no longer affine to cpu0
+[  344.643481] process 847 (fio) no longer affine to cpu0
+[  346.213842] IRQ 775: no longer affine to CPU0
+[  346.219712] CPU0: shutdown
+[  346.222425] psci: CPU0 killed.
+
+Please notice the ~1.5s pause, which would be the queue draining.
+
+So FWIW:
+Tested-by: John Garry <john.garry@huawei.com>
+
+JFYI, I tested on 5.3-rc5 and cherry-picked 
+https://github.com/ming1/linux/commit/0d2cd3c99bb0fe81d2c0ca5d68e02bdc4521d4d6 
+and "blk-mq: add callback of .cleanup_rq".
 
 Cheers,
+John
+
+>
+>  block/blk-mq-debugfs.c     |   2 +
+>  block/blk-mq-tag.c         |   2 +-
+>  block/blk-mq-tag.h         |   2 +
+>  block/blk-mq.c             | 143 +++++++++++++++++++++++++++++++++----
+>  block/blk-mq.h             |   3 +-
+>  drivers/block/loop.c       |   2 +-
+>  drivers/md/dm-rq.c         |   2 +-
+>  include/linux/blk-mq.h     |   5 ++
+>  include/linux/cpuhotplug.h |   1 +
+>  9 files changed, 146 insertions(+), 16 deletions(-)
+>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Keith Busch <keith.busch@intel.com>
+>
 
 
-Guilherme
