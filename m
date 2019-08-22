@@ -2,129 +2,141 @@ Return-Path: <SRS0=L3Py=WS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B3DAC3A5A1
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 02:50:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 951FDC3A5A2
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 04:50:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5080F22DD3
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 02:50:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PsXwEloZ"
+	by mail.kernel.org (Postfix) with ESMTP id 74BB9233FC
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 04:50:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727953AbfHVCuQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 22:50:16 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36199 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727038AbfHVCuQ (ORCPT
+        id S1730989AbfHVEuQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Aug 2019 00:50:16 -0400
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:34734 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729695AbfHVEuQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 22:50:16 -0400
-Received: by mail-wm1-f67.google.com with SMTP id g67so4134452wme.1;
-        Wed, 21 Aug 2019 19:50:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HVokBFt07/DgufHpWotptreZYXyNwxuPF5AIlwru9dA=;
-        b=PsXwEloZGZx+BXlcCZ5EtNdrue+bNuEBfro6xjpy3h3o/tKFUF7/PLoGmoqZ8pznKg
-         DrEF1/CtsRpVg5khE6Cj3pxRBO3+u8HvDOSN8s+1spQPevvCFcwbpMcp2sjazy4Imofr
-         dMARb/9tfUX+LmHfKcEmI5FNqkm+ZcKa9O3ogzS4oiFZfMS3yT17bsYkTC5eAtZ3QOys
-         XX2RPYjDMMcgFZtmAGW3H3NDnd+7b/R0i63GNZqJgjgNeVyzwTHHbZpEVdft6gk0McwH
-         1Ylbj/Th2679ZiY032YZm1S+ITaaLrGbx8HUeENzZf/Jl3/Ke0xVMD+bfcc4Ur0i4ixC
-         FFOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HVokBFt07/DgufHpWotptreZYXyNwxuPF5AIlwru9dA=;
-        b=I2adumwnzfRGpq7Gyan7vmjAp7iRm3CSq0gwSXhlKSQnAe9XXP1lGGsjmOS8kDD5Ux
-         5oqocoRKnDHOyjMb9xHBWqxcmeZRDv8CTu0qOiozqJsW/v8mGmGFyh3vkdbTUCdj6XeH
-         eKS3ip/ISPBVaAUDrKpTCNHHsB6ZBpjN/UC9l2aAU6QmJCpKmtVzXtO+xmd00GM0pIKW
-         DH7P5NOvhd6J8iM/FYIzPQgOiEpDOF8nevfpwv7Bp1ADCRvJFcWc8TFPj1/JHhKcfPm2
-         IApAo02ELjJTx35wT0GO6Z5xZRkrsDhzhNBauG1oF2VMOZrWqBzKI3CI0q8LjK5h+J2p
-         EEYg==
-X-Gm-Message-State: APjAAAXIurlOEeaeN2Fy61PwEp0ZLKmvu91UBGu9+tBWguB+KPf9QR3l
-        D6x1TPgSY6jkQjRswMa+raL/bU5MBDFjeVVuyXPBX0xc6Qx5Dg==
-X-Google-Smtp-Source: APXvYqz8VqvKvEydwbqVxluMjivQJ0VzLf0WMXLfH/qFVPTg6LNbbpKm9yM4T0KPgEb6oiGhNau9Elt7K7OBE3jW0zw=
-X-Received: by 2002:a1c:a615:: with SMTP id p21mr3138182wme.121.1566442214348;
- Wed, 21 Aug 2019 19:50:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190821083820.11725-1-david@fromorbit.com> <20190821083820.11725-4-david@fromorbit.com>
- <20190821232945.GC24904@infradead.org>
-In-Reply-To: <20190821232945.GC24904@infradead.org>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Thu, 22 Aug 2019 10:50:02 +0800
-Message-ID: <CACVXFVN93h7QrFvZNVQQwYZg_n0wGXwn=XZztMJrNbdjzzSpKQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] xfs: alignment check bio buffers
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Dave Chinner <david@fromorbit.com>,
+        Thu, 22 Aug 2019 00:50:16 -0400
+Received: from dread.disaster.area (pa49-195-190-67.pa.nsw.optusnet.com.au [49.195.190.67])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id C567B43F2FB;
+        Thu, 22 Aug 2019 14:50:12 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92)
+        (envelope-from <david@fromorbit.com>)
+        id 1i0f21-0005zK-Gf; Thu, 22 Aug 2019 14:49:05 +1000
+Date:   Thu, 22 Aug 2019 14:49:05 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Ming Lei <tom.leiming@gmail.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
         "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
         Jens Axboe <axboe@kernel.dk>,
         linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 3/3] xfs: alignment check bio buffers
+Message-ID: <20190822044905.GU1119@dread.disaster.area>
+References: <20190821083820.11725-1-david@fromorbit.com>
+ <20190821083820.11725-4-david@fromorbit.com>
+ <20190821232945.GC24904@infradead.org>
+ <CACVXFVN93h7QrFvZNVQQwYZg_n0wGXwn=XZztMJrNbdjzzSpKQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACVXFVN93h7QrFvZNVQQwYZg_n0wGXwn=XZztMJrNbdjzzSpKQ@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0
+        a=TR82T6zjGmBjdfWdGgpkDw==:117 a=TR82T6zjGmBjdfWdGgpkDw==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=FmdZ9Uzk2mMA:10
+        a=JfrnYn6hAAAA:8 a=20KFwNOVAAAA:8 a=7-415B0cAAAA:8 a=c6poJhFP8yU8P8LWmo4A:9
+        a=CjuIK1q_8ugA:10 a=1CNFftbPRP8L7MoqJWF3:22 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 22, 2019 at 8:06 AM Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Wed, Aug 21, 2019 at 06:38:20PM +1000, Dave Chinner wrote:
-> > From: Dave Chinner <dchinner@redhat.com>
+On Thu, Aug 22, 2019 at 10:50:02AM +0800, Ming Lei wrote:
+> On Thu, Aug 22, 2019 at 8:06 AM Christoph Hellwig <hch@infradead.org> wrote:
 > >
-> > Add memory buffer alignment validation checks to bios built in XFS
-> > to catch bugs that will result in silent data corruption in block
-> > drivers that cannot handle unaligned memory buffers but don't
-> > validate the incoming buffer alignment is correct.
+> > On Wed, Aug 21, 2019 at 06:38:20PM +1000, Dave Chinner wrote:
+> > > From: Dave Chinner <dchinner@redhat.com>
+> > >
+> > > Add memory buffer alignment validation checks to bios built in XFS
+> > > to catch bugs that will result in silent data corruption in block
+> > > drivers that cannot handle unaligned memory buffers but don't
+> > > validate the incoming buffer alignment is correct.
+> > >
+> > > Known drivers with these issues are xenblk, brd and pmem.
+> > >
+> > > Despite there being nothing XFS specific to xfs_bio_add_page(), this
+> > > function was created to do the required validation because the block
+> > > layer developers that keep telling us that is not possible to
+> > > validate buffer alignment in bio_add_page(), and even if it was
+> > > possible it would be too much overhead to do at runtime.
 > >
-> > Known drivers with these issues are xenblk, brd and pmem.
+> > I really don't think we should life this to XFS, but instead fix it
+> > in the block layer.  And that is not only because I have a pending
+> > series lifting bits you are touching to the block layer..
 > >
-> > Despite there being nothing XFS specific to xfs_bio_add_page(), this
-> > function was created to do the required validation because the block
-> > layer developers that keep telling us that is not possible to
-> > validate buffer alignment in bio_add_page(), and even if it was
-> > possible it would be too much overhead to do at runtime.
->
-> I really don't think we should life this to XFS, but instead fix it
-> in the block layer.  And that is not only because I have a pending
-> series lifting bits you are touching to the block layer..
->
-> > +int
-> > +xfs_bio_add_page(
-> > +     struct bio      *bio,
-> > +     struct page     *page,
-> > +     unsigned int    len,
-> > +     unsigned int    offset)
-> > +{
-> > +     struct request_queue    *q = bio->bi_disk->queue;
-> > +     bool            same_page = false;
-> > +
-> > +     if (WARN_ON_ONCE(!blk_rq_aligned(q, len, offset)))
-> > +             return -EIO;
-> > +
-> > +     if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
-> > +             if (bio_full(bio, len))
-> > +                     return 0;
-> > +             __bio_add_page(bio, page, len, offset);
-> > +     }
-> > +     return len;
->
-> I know Jens disagree, but with the amount of bugs we've been hitting
-> thangs to slub (and I'm pretty sure we have a more hiding outside of
-> XFS) I think we need to add the blk_rq_aligned check to bio_add_page.
+> > > +int
+> > > +xfs_bio_add_page(
+> > > +     struct bio      *bio,
+> > > +     struct page     *page,
+> > > +     unsigned int    len,
+> > > +     unsigned int    offset)
+> > > +{
+> > > +     struct request_queue    *q = bio->bi_disk->queue;
+> > > +     bool            same_page = false;
+> > > +
+> > > +     if (WARN_ON_ONCE(!blk_rq_aligned(q, len, offset)))
+> > > +             return -EIO;
+> > > +
+> > > +     if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
+> > > +             if (bio_full(bio, len))
+> > > +                     return 0;
+> > > +             __bio_add_page(bio, page, len, offset);
+> > > +     }
+> > > +     return len;
+> >
+> > I know Jens disagree, but with the amount of bugs we've been hitting
+> > thangs to slub (and I'm pretty sure we have a more hiding outside of
+> > XFS) I think we need to add the blk_rq_aligned check to bio_add_page.
+> 
+> It isn't correct to blk_rq_aligned() here because 'len' has to be logical block
+> size aligned, instead of DMA aligned only.
 
-It isn't correct to blk_rq_aligned() here because 'len' has to be logical block
-size aligned, instead of DMA aligned only.
+News to me.
 
-Also not sure all users may setup bio->bi_disk well before adding page to bio,
-since it is allowed to do that now.
+AFAIA, the overall _IO_ that is being built needs to be a multiple
+of the logical block size in total size (i.e. bio->bi_iter.size)
+because sub sector IO is not allowed. But queue DMA limits are not
+defined in sectors - they define the scatter/gather DMA capability
+of the hardware, and that's what individual segments (bvecs) need to
+align to.  That's what blk_rq_aligned() checks here - that the bvec
+segment aligns to what the underlying driver(s) requires, not that
+the entire IO is sector sized and aligned.
 
-If slub buffer crosses two pages, block layer may not handle it at all
-even though
-un-aligned 'offset' issue is solved.
+Also, think about multipage bvecs - the pages we are spanning here
+are contiguous pages, so this should end up merging them and turning
+it into a single multipage bvec whose length is sector size
+aligned...
 
-Thanks,
-Ming Lei
+> Also not sure all users may setup bio->bi_disk well before adding page to bio,
+> since it is allowed to do that now.
+
+XFS does, so I just don't care about random users of bio_add_page()
+in this patch. Somebody else can run the block layer gauntlet to get
+these checks moved into generic code and they've already been
+rejected twice as unnecessary.
+
+> If slub buffer crosses two pages, block layer may not handle it at all
+> even though
+> un-aligned 'offset' issue is solved.
+
+A slub buffer crossing two _contiguous_ pages should end up merged
+as a multipage bvec. But I'm curious, what does adding multiple
+contiguous pages to a bio actually break?
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
