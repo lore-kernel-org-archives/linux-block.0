@@ -1,104 +1,92 @@
-Return-Path: <SRS0=wMiD=WR=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=L3Py=WS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 955F2C3A5A1
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 23:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9995C3A59E
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 00:09:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 682EA233A1
-	for <linux-block@archiver.kernel.org>; Wed, 21 Aug 2019 23:29:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YXxEylS1"
+	by mail.kernel.org (Postfix) with ESMTP id AE50F22CE3
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 00:09:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729076AbfHUX3q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Aug 2019 19:29:46 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:56824 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728605AbfHUX3q (ORCPT
+        id S1727629AbfHVAJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Aug 2019 20:09:30 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:39564 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726828AbfHVAJa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Aug 2019 19:29:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=aHYhu/BO6JRiwvcQs+qhaKTsW8NlTKBRxI7/+gLWijc=; b=YXxEylS1qcsNDflm4wX/sr9Hd
-        gQP+ZpZ50Gpzp9IZ+3P758X4NUwWvQ4ICxwEron/q3VBlMN3A33Wj73W/IKMyudUP3NXMAUqGga6K
-        enM0IW9e8mB8UHQ6hiZ3yelJkR0SNuWfys+tCnv7bNAYgmZqWg3wNHXTjZyCP4TND3k+sVI3uxIgo
-        z+U/oXZ4/Xkqtkh+sV6/xYABoVsvBqEbrD0my9eZotzD3OLKqjqhTKg90VU8KGepCJg/f9/R1HQHF
-        L9W9K5ljZ1OhhE9XHv/59UpD415MrJ+LMhTq5ywJdkv4muQ1/DyJZszcuU17KImtYbD900RDc4xNB
-        c7r6c33+g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1i0a2z-0002G7-TK; Wed, 21 Aug 2019 23:29:45 +0000
-Date:   Wed, 21 Aug 2019 16:29:45 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     linux-xfs@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/3] xfs: alignment check bio buffers
-Message-ID: <20190821232945.GC24904@infradead.org>
-References: <20190821083820.11725-1-david@fromorbit.com>
- <20190821083820.11725-4-david@fromorbit.com>
+        Wed, 21 Aug 2019 20:09:30 -0400
+Received: by mail-wm1-f65.google.com with SMTP id i63so3872834wmg.4;
+        Wed, 21 Aug 2019 17:09:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=32/0yIVdzlJ2KJ3NplTUO5+v34KMaLLDclpZ7tzJ9aE=;
+        b=XFklBSV1ROpQHezo5lCXW6jYtyDmA7+IaKiARuK6gJadBKQ6t9IsUF+lJHd3ctp6DR
+         EG9mWqQgn35EdGLTGl2lsrVOh/JLzYrLDLZD4GH2jgI6l4slYeDi9js90BlNdDOxLX4l
+         2l1zjaGglt+QzvERRNqy+Ftw9z7BmxC7p2/Dfm/wUzLn0bWSB+Y/9/Ja2IPFzH5b+JZL
+         sn3ZbwzZLEe8ErXiSEgU4cUm5iY7/RoMaTHp3f2OOVoRr15iiHpHjqlqHSApm5jWi9dC
+         j7OWRhx7f2Om+zpynK3XovyzQYaU48ZlwKJuAHQtJIqQxgyAkpKFOtxN9HOiwFkHCroJ
+         0s6A==
+X-Gm-Message-State: APjAAAVANRDHLtpelZYVXCO4luEWska1FhKRGHLuri9D6M30WGm+UEBu
+        NWZSF7ZrUKT4zRpV3yUyrbY=
+X-Google-Smtp-Source: APXvYqwuT0kmih8HKsX3ht5823hsz+gh7dNnKBV5RVKrdbL46NznsoXAK7FHnNlGyRd4vEhe81JUTw==
+X-Received: by 2002:a1c:2314:: with SMTP id j20mr2598763wmj.152.1566432568173;
+        Wed, 21 Aug 2019 17:09:28 -0700 (PDT)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id r16sm50444348wrc.81.2019.08.21.17.09.25
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 21 Aug 2019 17:09:27 -0700 (PDT)
+Subject: Re: [PATCH v7 08/14] nvmet-core: allow one host per passthru-ctrl
+To:     Max Gurtovoy <maxg@mellanox.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Stephen Bates <sbates@raithlin.com>, Jens Axboe <axboe@fb.com>,
+        Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+References: <20190801234514.7941-1-logang@deltatee.com>
+ <20190801234514.7941-9-logang@deltatee.com>
+ <05a74e81-1dbd-725f-1369-5ca5c5918db1@mellanox.com>
+ <a6b9db95-a7f0-d1f6-1fa2-8dc13a6aa29e@deltatee.com>
+ <5717f515-e051-c420-07b7-299bcfcd1f32@mellanox.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <b0921c72-93f1-f67a-c4b3-31baeb1c39cb@grimberg.me>
+Date:   Wed, 21 Aug 2019 17:09:23 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190821083820.11725-4-david@fromorbit.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <5717f515-e051-c420-07b7-299bcfcd1f32@mellanox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 06:38:20PM +1000, Dave Chinner wrote:
-> From: Dave Chinner <dchinner@redhat.com>
+
+> I don't understand why we don't limit a regular ctrl to single access 
+> and we do it for the PT ctrl.
 > 
-> Add memory buffer alignment validation checks to bios built in XFS
-> to catch bugs that will result in silent data corruption in block
-> drivers that cannot handle unaligned memory buffers but don't
-> validate the incoming buffer alignment is correct.
+> I guess the block layer helps to sync between multiple access in 
+> parallel but we can do it as well.
 > 
-> Known drivers with these issues are xenblk, brd and pmem.
+> Also, let's say you limit the access to this subsystem to 1 user, the 
+> bdev is still accessibly for local user and also you can create a 
+> different subsystem that will use this device (PT and non-PT ctrl).
 > 
-> Despite there being nothing XFS specific to xfs_bio_add_page(), this
-> function was created to do the required validation because the block
-> layer developers that keep telling us that is not possible to
-> validate buffer alignment in bio_add_page(), and even if it was
-> possible it would be too much overhead to do at runtime.
+> Sagi,
+> 
+> can you explain the trouble you meant and how this limitation solve it ?
 
-I really don't think we should life this to XFS, but instead fix it
-in the block layer.  And that is not only because I have a pending
-series lifting bits you are touching to the block layer..
+Its different to emulate the controller with all its admin
+commands vs. passing it through to the nvme device.. (think of format nvm)
 
-> +int
-> +xfs_bio_add_page(
-> +	struct bio	*bio,
-> +	struct page	*page,
-> +	unsigned int	len,
-> +	unsigned int	offset)
-> +{
-> +	struct request_queue	*q = bio->bi_disk->queue;
-> +	bool		same_page = false;
-> +
-> +	if (WARN_ON_ONCE(!blk_rq_aligned(q, len, offset)))
-> +		return -EIO;
-> +
-> +	if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
-> +		if (bio_full(bio, len))
-> +			return 0;
-> +		__bio_add_page(bio, page, len, offset);
-> +	}
-> +	return len;
 
-I know Jens disagree, but with the amount of bugs we've been hitting
-thangs to slub (and I'm pretty sure we have a more hiding outside of
-XFS) I think we need to add the blk_rq_aligned check to bio_add_page.
 
-Note that all current callers of bio_add_page can only really check
-for the return value != the added len anyway, so it is not going to
-make anything worse.
