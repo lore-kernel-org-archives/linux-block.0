@@ -2,72 +2,222 @@ Return-Path: <SRS0=L3Py=WS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DAE0C3A5A2
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 08:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFF4C3A59D
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 08:37:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DEC32233FC
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 08:08:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HaF1Q3kC"
+	by mail.kernel.org (Postfix) with ESMTP id 58B1E23405
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 08:37:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1566463062;
+	bh=XE3xK9iG8Wy7wo/kPx8rxFjUegSzi/UaDRIOdgmeG7Q=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=MJjZL3ICroEhSASp3V6eSJ4qqAR6IVDI0Ks4mDU639WzJY3elalPA/s1tg0I/slMN
+	 Qp/q9xxsTEU9TbfNvqLKgUYmrahPFt82teWcpIPY0A085iXYOu1SgO6DTJejW4tQSr
+	 H+SJyl5A8W1yiKIDPYoEx6rXZHnk3fKYhMEATapQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729996AbfHVIIy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Aug 2019 04:08:54 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:59232 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725797AbfHVIIy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Aug 2019 04:08:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=3luk0WZFILmulq3SzIcGIM5H4ck6s8KaJKFMwyisg1w=; b=HaF1Q3kCYcon9jUg+8bS6Hbe9
-        QqhH8hL2BnaN2g91hjeAJfI7G+GxSTfmnAhquEncpWPGZF8L7iZXSwgK5i0/IUYZ7up8eQ1B7lKN8
-        Xp3dZ09xYb7ZmYa9JEDpj11huGO/8edwb3kENc8P5qBxyZmpCSbT/VrH+HjzqDznrKOL03YFgEgR4
-        LRSoo7A7yyjmOon1lnP35GbheXppLuiRpDKpQB4qmZzlScDKmOsWIqWKjDHyxvISmENybI+Bx0eo3
-        hZzOllRfG9iJe2E9XLdd4OhBoO4Ll2dPaFQYB0G1FDCssXpy92800XQKaslMxNR9xu1W2FZQZ8Pft
-        Z7gC+L0kQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1i0i9M-0003m8-O3; Thu, 22 Aug 2019 08:08:52 +0000
-Date:   Thu, 22 Aug 2019 01:08:52 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Ming Lei <tom.leiming@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 3/3] xfs: alignment check bio buffers
-Message-ID: <20190822080852.GC31346@infradead.org>
-References: <20190821083820.11725-1-david@fromorbit.com>
- <20190821083820.11725-4-david@fromorbit.com>
- <20190821232945.GC24904@infradead.org>
- <CACVXFVN93h7QrFvZNVQQwYZg_n0wGXwn=XZztMJrNbdjzzSpKQ@mail.gmail.com>
- <20190822044905.GU1119@dread.disaster.area>
+        id S1731681AbfHVIhl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Aug 2019 04:37:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41742 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731984AbfHVIhl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Aug 2019 04:37:41 -0400
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 339BF23427;
+        Thu, 22 Aug 2019 08:37:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1566463059;
+        bh=XE3xK9iG8Wy7wo/kPx8rxFjUegSzi/UaDRIOdgmeG7Q=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=jhs218aNaLA4Bq8OPujJ/oKGM90+zjHunggojHGSt42VmXqMKgeNTPazw8Mmev1Je
+         JwhDX50NdqNblLusEM/+477jQps0EsJvAhuJqHOEuGRyDPBMUO588mLhb49EyqUQu8
+         uON7wCWTLLCkC28QdqMP+2McwTT40RKkfLdU2OOE=
+Received: by mail-lj1-f179.google.com with SMTP id h15so4731563ljg.10;
+        Thu, 22 Aug 2019 01:37:39 -0700 (PDT)
+X-Gm-Message-State: APjAAAUcc0ABIBYnRNScEKkjjmWx5PaRSzszsLzE/+EP/xYyiZg5h/FE
+        Sa9AOW+KamagdVqYkkTgrrcY3FsZEDr0mzYDlhc=
+X-Google-Smtp-Source: APXvYqxXD3xVQJzrJLwcWiHpcv+TEgK10V+ZrGUMTV7We6eP5yS2aPqV9SO+VlhvYHW+opZdR7L81464kePe1T4gEFc=
+X-Received: by 2002:a2e:b4d4:: with SMTP id r20mr21412900ljm.5.1566463057314;
+ Thu, 22 Aug 2019 01:37:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190822044905.GU1119@dread.disaster.area>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <CGME20190821064211epcas2p43ed73f4fd126bcc5b470c9136db6aabc@epcas2p4.samsung.com>
+ <003d01d557eb$8f6ca210$ae45e630$@samsung.com>
+In-Reply-To: <003d01d557eb$8f6ca210$ae45e630$@samsung.com>
+From:   Krzysztof Kozlowski <krzk@kernel.org>
+Date:   Thu, 22 Aug 2019 10:37:26 +0200
+X-Gmail-Original-Message-ID: <CAJKOXPdK3ZzQXjzPZLzu5q0HZsL1vohQ4UxYTONcWdtDbEe2ng@mail.gmail.com>
+Message-ID: <CAJKOXPdK3ZzQXjzPZLzu5q0HZsL1vohQ4UxYTONcWdtDbEe2ng@mail.gmail.com>
+Subject: Re: [PATCH 1/9] crypt: Add diskcipher
+To:     "boojin.kim" <boojin.kim@samsung.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>, dm-devel@redhat.com,
+        Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Kukjin Kim <kgene@kernel.org>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-fscrypt@vger.kernel.org, linux-mmc@vger.kernel.org,
+        "linux-samsung-soc@vger.kernel.org" 
+        <linux-samsung-soc@vger.kernel.org>, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 22, 2019 at 02:49:05PM +1000, Dave Chinner wrote:
-> On Thu, Aug 22, 2019 at 10:50:02AM +0800, Ming Lei wrote:
-> > It isn't correct to blk_rq_aligned() here because 'len' has to be logical block
-> > size aligned, instead of DMA aligned only.
+On Wed, 21 Aug 2019 at 08:42, boojin.kim <boojin.kim@samsung.com> wrote:
+>
+> Diskcipher supports cryptographic operations of inline crypto engines like
+> FMP. Inline crypto engine refers to hardware and solutions implemented
+> to encrypt data stored in storage device.
+>
+> When encrypting using the FMP, Additional control is required
+> to carry and maintain the crypto information between
+> the encryption user(fscrypt, DM-crypt) and FMP driver.
+> Diskcipher provides this control.
+>
+> Diskcipher is a symmetric key cipher in linux crypto API to support FMP.
+> FMP are registered with the cihper algorithm that uses diskcipher.
+>
+> Diskcipher has three major steps.
+> The first step is to assign a cipher and set the key.
+> The second step is to pass the cipher through the BIO to the storage
+> driver.
+> The third step is to get the cipher from BIO and request a crypt
+> to FMP algorithm.
+>
+> In the first step, encryption users such as fscrypt or dm-crypt
+> allocate/release a diskcipher and set key into the diskcipher.
+> Diskcipher provides allocate(), free(), and setkey() that are similar
+> to existing ciphers.
+>
+> In the second step, BIO is used to pass the diskcipher to the storage
+> driver.
+> The BIO submitters such as ext4, f2fs and DM-crypt set diskcipher to BIO.
+> Diskcipher provides the set () API for this.
+>
+> In the third step, the storage driver extracts the diskcipher from the BIO
+> and requests the actual encryption behavior to inline crypto engine driver.
+> Diskcipher provides get() and crypt() APIs for this.
+>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: David S. Miller <davem@davemloft.net>
+> Signed-off-by: Boojin Kim <boojin.kim@samsung.com>
+> ---
+>  crypto/Kconfig              |   9 ++
+>  crypto/Makefile             |   1 +
+>  crypto/diskcipher.c         | 349
+> ++++++++++++++++++++++++++++++++++++++++++++
+>  crypto/testmgr.c            | 157 ++++++++++++++++++++
+>  include/crypto/diskcipher.h | 245 +++++++++++++++++++++++++++++++
+>  include/linux/crypto.h      |   1 +
+>  6 files changed, 762 insertions(+)
+>  create mode 100644 crypto/diskcipher.c
+>  create mode 100644 include/crypto/diskcipher.h
+>
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 455a335..382d43a 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -1636,6 +1636,15 @@ config CRYPTO_TWOFISH_AVX_X86_64
+>           See also:
+>           <http://www.schneier.com/twofish.html>
+>
+> +config CRYPTO_DISKCIPHER
+> +       bool "Diskcipher support"
+> +       default n
+> +       help
+> +         Disk cipher algorithm
+> +
+> +         This cipher supports the crypt operation of the block host device
+> +         that has inline crypto engine.
+> +
+>  comment "Compression"
+>
+>  config CRYPTO_DEFLATE
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index 0d2cdd5..71df76a 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -165,6 +165,7 @@ obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
+>  obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
+>  obj-$(CONFIG_CRYPTO_OFB) += ofb.o
+>  obj-$(CONFIG_CRYPTO_ECC) += ecc.o
+> +obj-$(CONFIG_CRYPTO_DISKCIPHER) += diskcipher.o
+>
+>  ecdh_generic-y += ecdh.o
+>  ecdh_generic-y += ecdh_helper.o
+> diff --git a/crypto/diskcipher.c b/crypto/diskcipher.c
+> new file mode 100644
+> index 0000000..ffe95a5
+> --- /dev/null
+> +++ b/crypto/diskcipher.c
+> @@ -0,0 +1,349 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Copyright (C) 2017 Samsung Electronics Co., Ltd.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/blkdev.h>
+> +#include <linux/errno.h>
+> +#include <linux/module.h>
+> +#include <linux/seq_file.h>
+> +#include <linux/string.h>
+> +#include <linux/crypto.h>
+> +#include <crypto/algapi.h>
+> +#include <crypto/diskcipher.h>
+> +#include <linux/delay.h>
+> +#include <linux/mm_types.h>
+> +#include <linux/fs.h>
+> +#include <linux/fscrypt.h>
+> +
+> +#include "internal.h"
+> +
+> +static int crypto_diskcipher_check(struct bio *bio)
+> +{
+> +       struct crypto_diskcipher *ci = NULL;
+> +       struct inode *inode = NULL;
+> +       struct page *page = NULL;
+> +
+> +       if (!bio) {
+> +               pr_err("%s: doesn't exist bio\n", __func__);
+> +               return 0;
+> +       }
+> +
+> +       /* enc without fscrypt */
+> +       ci = bio->bi_aux_private;
+> +       if (!ci->inode)
+> +               return 0;
+> +       if (ci->algo == 0)
+> +               return 0;
+> +
+> +       page = bio->bi_io_vec[0].bv_page;
+> +       if (!page || PageAnon(page) || !page->mapping ||
+> !page->mapping->host)
 
-Even if len would have to be a multiple of the sector size, that doesn't
-mean calling blk_rq_aligned would be incorrect, just possibly not
-catching all issues.
+Your patch looks corrupted - wrapped by mailer. The easiest way
+usually is to use git format-patch and git send-email - then you do
+not have to worry about formatting etc.
 
-But as Dave outlined I don't think it is a problem in any way.
+Best regards,
+Krzysztof
