@@ -2,88 +2,77 @@ Return-Path: <SRS0=L3Py=WS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51003C3A59D
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 09:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D8D0C3A5A2
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 10:18:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 32B5E23400
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 09:36:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64C3C233FE
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 10:18:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731618AbfHVJf7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Aug 2019 05:35:59 -0400
-Received: from sauhun.de ([88.99.104.3]:57998 "EHLO pokefinder.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725987AbfHVJf7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Aug 2019 05:35:59 -0400
-Received: from localhost (p54B3343F.dip0.t-ipconnect.de [84.179.52.63])
-        by pokefinder.org (Postfix) with ESMTPSA id D54622C2686;
-        Thu, 22 Aug 2019 11:35:56 +0200 (CEST)
-Date:   Thu, 22 Aug 2019 11:35:56 +0200
-From:   Wolfram Sang <wsa@the-dreams.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
-        robin.murphy@arm.com, joro@8bytes.org,
-        wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH v9 3/5] block: sort headers on blk-setting.c
-Message-ID: <20190822093556.ludte2vtp77fiaax@katana>
-References: <1564129876-28261-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
- <1564129876-28261-4-git-send-email-yoshihiro.shimoda.uh@renesas.com>
- <20190816195026.GC6886@kunai>
- <6ed6c62d-d773-71ec-382b-acd850e3dff1@kernel.dk>
+        id S2387518AbfHVKSN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Aug 2019 06:18:13 -0400
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:33056 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731865AbfHVKSN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Aug 2019 06:18:13 -0400
+Received: from dread.disaster.area (pa49-195-190-67.pa.nsw.optusnet.com.au [49.195.190.67])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id F115E43DB5C;
+        Thu, 22 Aug 2019 20:18:09 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92)
+        (envelope-from <david@fromorbit.com>)
+        id 1i0k9P-0008Vs-0n; Thu, 22 Aug 2019 20:17:03 +1000
+Date:   Thu, 22 Aug 2019 20:17:03 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-xfs@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/3] xfs: alignment check bio buffers
+Message-ID: <20190822101702.GZ1119@dread.disaster.area>
+References: <20190821083820.11725-1-david@fromorbit.com>
+ <20190821083820.11725-4-david@fromorbit.com>
+ <20190821232945.GC24904@infradead.org>
+ <20190822003745.GS1119@dread.disaster.area>
+ <20190822080312.GB31346@infradead.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="kgj75bivo7t7ncfe"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6ed6c62d-d773-71ec-382b-acd850e3dff1@kernel.dk>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20190822080312.GB31346@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0
+        a=TR82T6zjGmBjdfWdGgpkDw==:117 a=TR82T6zjGmBjdfWdGgpkDw==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=FmdZ9Uzk2mMA:10
+        a=7-415B0cAAAA:8 a=bebQB_2F4QBTV_OL05sA:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Aug 22, 2019 at 01:03:12AM -0700, Christoph Hellwig wrote:
+> On Thu, Aug 22, 2019 at 10:37:45AM +1000, Dave Chinner wrote:
+> > > I know Jens disagree, but with the amount of bugs we've been hitting
+> > > thangs to slub (and I'm pretty sure we have a more hiding outside of
+> > > XFS) I think we need to add the blk_rq_aligned check to bio_add_page.
+> > 
+> > ... I'm not prepared to fight this battle to get this initial fix
+> > into the code. Get the fix merged, then we can 
+> 
+> Well, the initial fix are the first two patches.  This patch really
+> just adds a safety belt.  I'll happily take over the effort to get
+> sensible checks in the block code if you give me a couple weeks,
+> in the meantime I'd prefer if we could skip this third patch for now.
 
---kgj75bivo7t7ncfe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Fine by me. I'll just repost the current versions of the first two
+patches (now three) in the morning.
 
-Hi Jens,
+Cheers,
 
-thanks for the feedback.
-
-> Please just drop this patch.
-
-OK, we will do. And patch 4/5? Is it OK or do you need some more time to
-think about it?
-
-Regards,
-
-   Wolfram
-
-
---kgj75bivo7t7ncfe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAl1eYfcACgkQFA3kzBSg
-KbaLww/+Ke0gLqx1XCJqev3VRm9mm9T+lYoT5L7RlOSw7vRIZSGbZ5TtRLZvKmsY
-Kec20o8ozIAuXKsYsOZ3TC2sMh+ntcnP+Gaadoj0pSB3APqT/KdCae9q31zL5DV5
-JoJUfQs9OKhNT1kiQgSa3lkZdOsFheB0k1e8l0lnZJOga68dRFcOA57Vx0vFm5UC
-dobMpbGoF/aLRfF7rPOdGGy1kZ+8L1+TVLrK97YTlHFrrSlAT2l4HBHAn0gCUOxD
-7naLN2w4PQ1fLHVfEAZQHp5wg1XTYjyBIHj3hafLdvxXFtJZmlZDKQ+cTMFD9Ht1
-EKW18HKFyUhzrdBgmOlizxqybL5lOpJhFXXE9KZsFVgpbKW6+WtPpzmRk02UagF0
-N5zPf7TqQLWzUzxDT9zR4baTy074i+Oazzv5ur9GTCk48JFLdtTNhW4BXCj55ksZ
-lkYmbKBNxfI6V8rZn9zhJNJAXAi9Vq6mHJnTLfIHIvcTT2uWJ67Mg8kbB5I9NJ4K
-APmuIvXoss/cgXllOwkUZO7A6Z4HCbAS4H5M5seSqJ3DBf4wN0DR6ihOlktho0vz
-LTsI5Kqi65RZbtJFfLWmHp2HhHEJbt8zZqvrTivv9uv23lS3tfKLzHReTSW5yJIa
-d40nFCayfsQPfE2+FqK49Nvw4KBcH7q0TtUhwsb4is/iHnV/Nvc=
-=QW4f
------END PGP SIGNATURE-----
-
---kgj75bivo7t7ncfe--
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
