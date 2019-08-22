@@ -2,142 +2,144 @@ Return-Path: <SRS0=L3Py=WS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31780C3A59D
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 08:50:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1134AC3A59D
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 08:58:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB49D233A0
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 08:50:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB70A214DA
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 08:58:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=Mellanox.com header.i=@Mellanox.com header.b="hiYyr9FW"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rws6jNKs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730934AbfHVIuu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Aug 2019 04:50:50 -0400
-Received: from mail-eopbgr130059.outbound.protection.outlook.com ([40.107.13.59]:40933
-        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730488AbfHVIuu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Aug 2019 04:50:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZssP3R6H2QtWg+Nm3knsDOp2nGmQJRpuDYMu6YVlfDlGetcfA5Fba0cqJi9UlnvZouJlZNiweA/aOYxf/1DZVwSLXr2GR/IBH3k1gBN0fszYV1ZBVNB+a2oWovX5db0JxeSglQgIDvgaH71JaWojmq8Jct7+qzKtsxZxcNwzAWdC8ukEJN/Q1yRg6Ria/jIki+mReordJfoqAlmoJtYliJGqFJw0IH6Y2k9ydaalkh1A0Rr5IOqJSbGMql4tTQR4nDUMWk9/cvZxN2kyxaMRWCksomirkx0yKh9OwaEFfBzdxbH/qI7ZSV/QvzJEQdIRF1+Yib3tm6Hb/nDfPoDGZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PnLoCxABMtAX3omr7pMVdNrggxZn5x0JCJL9YY/zEKA=;
- b=BXpG7yCygj9zq9ubBo10zgOiZshBNe5OKbfyKQxVmU5TqYFhDNAaH+bDHzqDfa2EHXpDszaf+dPRagfC6N+eujZit0I/MHBU+9Nu5/+nW4VBS3orCVQSuZmoHZoJy86zDj3mwNG81KikXvr0xcQOOqPSOy4Ok6bfs7kK3Hq6X6n8t3OP7s8fDYtYr5ZlDQ0ANiMtMCOFWn9ZyjOAoU3rw+UbVuW/JPpdjPw0CEutkHBSxyG4R6hLmiT5M7RZInNFjRe7m6ILyVeJGSrfp0fwhPpLRMSlOzRqp8KUiiLSz0AO3B8oIRIKjqlpZd/wxHxxlPHzuMzIoIxpUXrYp+Nfjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 193.47.165.251) smtp.rcpttodomain=lst.de smtp.mailfrom=mellanox.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=mellanox.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PnLoCxABMtAX3omr7pMVdNrggxZn5x0JCJL9YY/zEKA=;
- b=hiYyr9FWm9jxV+GF78d5r8usBa3UtpqshgDKSq1chOglmrtzuUILr6b2nwL2b7fzi/CKBAsygH5cX6tjYVGS4ZJ/m2KD/dYI58zQ56pRUQlpt1cc2oS1HC1LfBL5Hi5AMK3ONdOXM/twEbi9uq5UkBJH4GG1wb0DEsi4Ja7TOXw=
-Received: from DB6PR05CA0024.eurprd05.prod.outlook.com (2603:10a6:6:14::37) by
- HE1PR05MB3386.eurprd05.prod.outlook.com (2603:10a6:7:33::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2178.18; Thu, 22 Aug 2019 08:50:44 +0000
-Received: from AM5EUR03FT008.eop-EUR03.prod.protection.outlook.com
- (2a01:111:f400:7e08::203) by DB6PR05CA0024.outlook.office365.com
- (2603:10a6:6:14::37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2199.14 via Frontend
- Transport; Thu, 22 Aug 2019 08:50:44 +0000
-Authentication-Results: spf=pass (sender IP is 193.47.165.251)
- smtp.mailfrom=mellanox.com; lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=pass action=none header.from=mellanox.com;
-Received-SPF: Pass (protection.outlook.com: domain of mellanox.com designates
- 193.47.165.251 as permitted sender) receiver=protection.outlook.com;
- client-ip=193.47.165.251; helo=mtlcas13.mtl.com;
-Received: from mtlcas13.mtl.com (193.47.165.251) by
- AM5EUR03FT008.mail.protection.outlook.com (10.152.16.123) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.2199.13 via Frontend Transport; Thu, 22 Aug 2019 08:50:43 +0000
-Received: from MTLCAS13.mtl.com (10.0.8.78) by mtlcas13.mtl.com (10.0.8.78)
- with Microsoft SMTP Server (TLS) id 15.0.1178.4; Thu, 22 Aug 2019 11:50:43
- +0300
-Received: from MTLCAS01.mtl.com (10.0.8.71) by MTLCAS13.mtl.com (10.0.8.78)
- with Microsoft SMTP Server (TLS) id 15.0.1178.4 via Frontend Transport; Thu,
- 22 Aug 2019 11:50:43 +0300
-Received: from [10.223.0.54] (10.223.0.54) by MTLCAS01.mtl.com (10.0.8.71)
- with Microsoft SMTP Server (TLS) id 14.3.301.0; Thu, 22 Aug 2019 11:50:41
- +0300
-Subject: Re: [PATCH v7 08/14] nvmet-core: allow one host per passthru-ctrl
-To:     Sagi Grimberg <sagi@grimberg.me>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
-CC:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Stephen Bates <sbates@raithlin.com>, Jens Axboe <axboe@fb.com>,
-        Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-References: <20190801234514.7941-1-logang@deltatee.com>
- <20190801234514.7941-9-logang@deltatee.com>
- <05a74e81-1dbd-725f-1369-5ca5c5918db1@mellanox.com>
- <a6b9db95-a7f0-d1f6-1fa2-8dc13a6aa29e@deltatee.com>
- <5717f515-e051-c420-07b7-299bcfcd1f32@mellanox.com>
- <b0921c72-93f1-f67a-c4b3-31baeb1c39cb@grimberg.me>
-From:   Max Gurtovoy <maxg@mellanox.com>
-Message-ID: <b352c7f1-2629-e72f-9c85-785e0cf7c2c1@mellanox.com>
-Date:   Thu, 22 Aug 2019 11:50:41 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <b0921c72-93f1-f67a-c4b3-31baeb1c39cb@grimberg.me>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.223.0.54]
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:193.47.165.251;IPV:NLI;CTRY:IL;EFV:NLI;SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(376002)(346002)(136003)(396003)(2980300002)(189003)(199004)(305945005)(4744005)(229853002)(81166006)(2201001)(14444005)(6116002)(65956001)(336012)(2616005)(2906002)(126002)(7416002)(476003)(7736002)(47776003)(81156014)(65806001)(8676002)(356004)(86362001)(446003)(11346002)(31696002)(110136005)(8936002)(70206006)(16526019)(76176011)(54906003)(5660300002)(58126008)(70586007)(26005)(53546011)(16576012)(2486003)(23676004)(230700001)(31686004)(50466002)(53936002)(4326008)(3846002)(486006)(6246003)(106002)(478600001)(36756003)(36906005)(186003)(316002)(3940600001)(2101003);DIR:OUT;SFP:1101;SCL:1;SRVR:HE1PR05MB3386;H:mtlcas13.mtl.com;FPR:;SPF:Pass;LANG:en;PTR:InfoDomainNonexistent;MX:1;A:1;
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 27cf8248-09ad-4689-adf4-08d726ddd199
-X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600166)(711020)(4605104)(4709080)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:HE1PR05MB3386;
-X-MS-TrafficTypeDiagnostic: HE1PR05MB3386:
-X-Microsoft-Antispam-PRVS: <HE1PR05MB3386A59D748B094A15D251A2B6A50@HE1PR05MB3386.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
-X-Forefront-PRVS: 01371B902F
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Message-Info: o0D3b+LPtTFxEh6LIDZnvyDQ85SdBeQ9jRo13on+wTps+/+Ghi97u9iUcX57HNTYC0DUjkmQjCxNZknXihOm9caoL0CUeM47rfcUcH42VzoVauuCoXpugbFqU1lptvENkI38SGjSC5qudpcaNXfxeqSEOXO8vC/glKaEkTqLs2dgAFfH7e+JNXYRsQj3N1g9Smy7c3ZikJusnMYTecvOq/tSGS/tevJcBxJf3XxVfN0ccOncUuZWr5ziw/qvLiUKbQBOjrD3oDikCV7iiHTHVk710rsR2FwbdFYlACbw6k/JDZp16wubYMm/ETbeRNIetdLZ73VjpIMSNbdY7DaU3yxysZ0nvSuyilwShH1qiLgkgYnzB5EzPtJ6flAolw8gJJBunVLYu5JzFaIP/nrasmaEBeZW/t6ShIMk7RH8MMM=
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2019 08:50:43.8478
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 27cf8248-09ad-4689-adf4-08d726ddd199
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=a652971c-7d2e-4d9b-a6a4-d149256f461b;Ip=[193.47.165.251];Helo=[mtlcas13.mtl.com]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR05MB3386
+        id S1732832AbfHVI61 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Aug 2019 04:58:27 -0400
+Received: from mail-wm1-f53.google.com ([209.85.128.53]:56248 "EHLO
+        mail-wm1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732828AbfHVI61 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Aug 2019 04:58:27 -0400
+Received: by mail-wm1-f53.google.com with SMTP id f72so4804485wmf.5
+        for <linux-block@vger.kernel.org>; Thu, 22 Aug 2019 01:58:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=HwcMDsi2XQejCpwJcqSON0QYDIy6of9C4lFX3vq5Vd8=;
+        b=rws6jNKsi1M8Rkg+o1TcSh47k+MBIMlZ2PG9GVoXpHOHN3MDWajZ42qf2bwZzNxViW
+         DAkPKntHOYRZpDPuvQBKP7zUv/xa/jRR6w1y4bYMxRKUh79SEfgnY5pr5iHYPMjsgAXC
+         tHtspKL5+LLP11iVlGZn7uqXQIsYg61EWdpwaohwUKU3vfXKzvl5DkkrMzXQtl+wnfPB
+         JStOH5mMiyjBhPn0AYgSLb0WOsyjKgkMJnEmj3SR0AeYOSficjQrUV73JMO1ziA+o0Jb
+         fVTYxfpb0LpU0FytZ+oQndnyNIff/g8nsrg8CJDfgs0FuxT66v2GorScxqX5dSepeJNF
+         /zXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=HwcMDsi2XQejCpwJcqSON0QYDIy6of9C4lFX3vq5Vd8=;
+        b=hAgiM84kIPqEAGwLadhAm2EbweU5P1F6tq1UyU4UPbbL/ye9WgOT60sCVptoXrVPpq
+         icP5/GsndXSSxnZ9zI9QnbzBKlh5b6oFM8umsiu3mONLnn9Ydl4s1V4qbfQSDbwE3TXW
+         51EEN7ROVP7yZB5uoWiJDXKsVTxwq1fvgkThGDk6VnRmJqWJ8iK+e9RNFVywiNsZ8EGp
+         mWy9vbZxNwhQBPzARkWbpQQYb1q/YavivT0+UB33FwH6hNS0UVaNS8K5P9ejoWWuT+Ca
+         syDBtNFbvsgWr67/fJD1wxgzHHHQi/CHQLzj6emJvdRqQLaLfkhmFmU9lzf3htgBhuJc
+         eIcg==
+X-Gm-Message-State: APjAAAWxivZN7liNFerzRL4VxFUBzLJzbAyw/+tu8xX8QutfNDbIDzW/
+        bjnWdCDE3uoyS8AELGClEId9ng==
+X-Google-Smtp-Source: APXvYqzgkuUd3Clm72tSW8GGQTeQfG2PdkhGXmhwJPw5o1ZGmT8q4h5wuwHYjYXTZwrWLB1jLkoBHg==
+X-Received: by 2002:a1c:cc09:: with SMTP id h9mr4860686wmb.32.1566464305103;
+        Thu, 22 Aug 2019 01:58:25 -0700 (PDT)
+Received: from [192.168.0.100] (146-241-115-105.dyn.eolo.it. [146.241.115.105])
+        by smtp.gmail.com with ESMTPSA id t198sm6286486wmt.39.2019.08.22.01.58.23
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 22 Aug 2019 01:58:24 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [PATCHSET block/for-next] IO cost model based work-conserving
+ porportional controller
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20190820151903.GH2263813@devbig004.ftw2.facebook.com>
+Date:   Thu, 22 Aug 2019 10:58:22 +0200
+Cc:     Jens Axboe <axboe@kernel.dk>, newella@fb.com, clm@fb.com,
+        Josef Bacik <josef@toxicpanda.com>, dennisz@fb.com,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>, kernel-team@fb.com,
+        cgroups@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+        kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
+        bpf@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <9EB760CE-0028-4766-AE9D-6E90028D8579@linaro.org>
+References: <20190614015620.1587672-1-tj@kernel.org>
+ <20190614175642.GA657710@devbig004.ftw2.facebook.com>
+ <5A63F937-F7B5-4D09-9DB4-C73D6F571D50@linaro.org>
+ <B5E431F7-549D-4FC4-A098-D074DF9586A1@linaro.org>
+ <20190820151903.GH2263813@devbig004.ftw2.facebook.com>
+To:     Tejun Heo <tj@kernel.org>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On 8/22/2019 3:09 AM, Sagi Grimberg wrote:
->
->> I don't understand why we don't limit a regular ctrl to single access 
->> and we do it for the PT ctrl.
->>
->> I guess the block layer helps to sync between multiple access in 
->> parallel but we can do it as well.
->>
->> Also, let's say you limit the access to this subsystem to 1 user, the 
->> bdev is still accessibly for local user and also you can create a 
->> different subsystem that will use this device (PT and non-PT ctrl).
->>
->> Sagi,
->>
->> can you explain the trouble you meant and how this limitation solve it ?
->
-> Its different to emulate the controller with all its admin
-> commands vs. passing it through to the nvme device.. (think of format 
-> nvm)
->
->
->
-we don't need to support format command for PT ctrl as we don't support 
-other commands such create_sq/cq.
+
+> Il giorno 20 ago 2019, alle ore 17:19, Tejun Heo <tj@kernel.org> ha =
+scritto:
+>=20
+> Hello, Paolo.
+>=20
+> On Tue, Aug 20, 2019 at 05:04:25PM +0200, Paolo Valente wrote:
+>> and makes one fio instance generate I/O for each group.  The =
+bandwidth
+>> reported above is that reported by the fio instance emulating the
+>> target client.
+>>=20
+>> Am I missing something?
+>=20
+> If you didn't configure QoS targets, the controller is using device
+> qdepth saturation as the sole guidance in determining whether the
+> device needs throttling.  Please try configuring the target latencies.
+> The bandwidth you see for single stream of rand ios should have direct
+> correlation with how the latency targets are configured.  The head
+> letter for the patchset has some examples.
+>=20
+
+Ok, I tried with the parameters reported for a SATA SSD:
+
+rpct=3D95.00 rlat=3D10000 wpct=3D95.00 wlat=3D20000 min=3D50.00 =
+max=3D400.00
+
+and with a simpler configuration [1]: one target doing random reads
+and only four interferers doing sequential reads, with all the
+processes (groups) having the same weight.
+
+But there seemed to be little or no control on I/O, because the target
+got only 1.84 MB/s, against 1.15 MB/s without any control.
+
+So I tried with rlat=3D1000 and rlat=3D100.
+
+Control did improve, with same results for both values of rlat.  The
+problem is that these results still seem rather bad, both in terms of
+throughput guaranteed to the target and in terms of total throughput.
+Here are results compared with BFQ (throughputs measured in MB/s):
+
+                           io.weight            BFQ
+target's throughput        3.415                6.224       =20
+total throughput           159.14               321.375
+
+Am I doing something else wrong?
+
+Thanks,
+Paolo
+
+[1] sudo ./bandwidth-latency.sh -t randread -s none -b weight -n 4
+
+> Thanks.
+>=20
+> --=20
+> tejun
 
