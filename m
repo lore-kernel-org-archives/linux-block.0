@@ -6,74 +6,127 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71EF6C3A5A2
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 10:20:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ECE6C3A59D
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 10:38:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 474BF206BB
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 10:20:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A9C6205ED
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 10:38:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387529AbfHVKUL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Aug 2019 06:20:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55472 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726142AbfHVKUL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Aug 2019 06:20:11 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4FAFA3082A6C;
-        Thu, 22 Aug 2019 10:20:11 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-30.pek2.redhat.com [10.72.8.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 46B1460BF3;
-        Thu, 22 Aug 2019 10:20:04 +0000 (UTC)
-Date:   Thu, 22 Aug 2019 18:20:00 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 3/3] xfs: alignment check bio buffers
-Message-ID: <20190822101958.GA9632@ming.t460p>
-References: <20190821083820.11725-1-david@fromorbit.com>
- <20190821083820.11725-4-david@fromorbit.com>
- <20190821232945.GC24904@infradead.org>
- <CACVXFVN93h7QrFvZNVQQwYZg_n0wGXwn=XZztMJrNbdjzzSpKQ@mail.gmail.com>
- <20190822044905.GU1119@dread.disaster.area>
- <20190822080852.GC31346@infradead.org>
+        id S2387631AbfHVKid (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Aug 2019 06:38:33 -0400
+Received: from mx2.suse.de ([195.135.220.15]:32850 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729113AbfHVKid (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Aug 2019 06:38:33 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 46E78B05C;
+        Thu, 22 Aug 2019 10:38:31 +0000 (UTC)
+To:     linux-raid@vger.kernel.org, Song Liu <songliubraving@fb.com>
+From:   Coly Li <colyli@suse.de>
+Subject: [RFC] How to handle an ugly md raid0 sector map bug ?
+Openpgp: preference=signencrypt
+Organization: SUSE Labs
+Cc:     NeilBrown <neilb@suse.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <10ca59ff-f1ba-1464-030a-0d73ff25d2de@suse.de>
+Date:   Thu, 22 Aug 2019 18:38:25 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190822080852.GC31346@infradead.org>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Thu, 22 Aug 2019 10:20:11 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 22, 2019 at 01:08:52AM -0700, Christoph Hellwig wrote:
-> On Thu, Aug 22, 2019 at 02:49:05PM +1000, Dave Chinner wrote:
-> > On Thu, Aug 22, 2019 at 10:50:02AM +0800, Ming Lei wrote:
-> > > It isn't correct to blk_rq_aligned() here because 'len' has to be logical block
-> > > size aligned, instead of DMA aligned only.
-> 
-> Even if len would have to be a multiple of the sector size, that doesn't
-> mean calling blk_rq_aligned would be incorrect, just possibly not
-> catching all issues.
+Hi folks,
 
-In theory, fs bio shouldn't care any DMA limits, which should have been done
-on splitted bio for doing IO to device.
+First line: This bug only influences md raid0 device which applies all
+the following conditions,
+1) Assembled by component disks with different sizes.
+2) Created and used under Linux kernel before (including) Linux v3.12,
+then upgrade to Linux kernel after (including) Linux v3.13.
+3) New data are written to md raid0 in new kernel >= Linux v3.13.
+Then the md raid0 may have inconsistent sector mapping and experience
+data corruption.
 
-Also .dma_alignment isn't considered in blk_stack_limits(), so in case
-of DM, MD or other stacking drivers, fs code won't know the accurate
-.dma_alignment of underlying queues at all, and the stacking driver's
-queue dma alignment is still 512.
+Recently I receive a bug report that customer encounter file system
+corruption after upgrading their kernel from Linux 3.12 to 4.4. It turns
+out to be the underlying md raid0 corruption after the kernel upgrade.
 
-Also suppose the check is added, I am a bit curious how fs code handles the
-failure, so could you explain a bit about the failure handling?
+I find it is because a sector map bug in md raid0 code include and
+before Linux v3.12. Here is the buggy code piece I copied from stable
+Linux v3.12.74 drivers/md/raid0.c:raid0_make_request(),
 
-Thanks, 
-Ming
+547         sector_offset = bio->bi_sector;
+548         zone = find_zone(mddev->private, &sector_offset);
+549         tmp_dev = map_sector(mddev, zone, bio->bi_sector,
+550                              &sector_offset);
+
+At line 548 after find_zone() returns, sector_offset is updated to be an
+offset inside current zone. Then at line 549 the third parameter of
+calling map_sector() should be the updated sector_offset, but
+bio->bi_sector (original LBA or md raid0 device) is used. If the raid0
+device has *multiple zones*, except the first zone, the mapping <dev,
+sector> pair returned by map_sector() for all rested zones are
+unexpected and wrong.
+
+The buggy code was introduced since Linux v2.6.31 in commit fbb704efb784
+("md: raid0 :Enables chunk size other than powers of 2."), unfortunate
+the mistaken mapping calculation has stable and unique result too, so it
+works without obvious problem until commit 20d0189b1012 ("block:
+Introduce new bio_split()") merged into Linux v3.13.
+
+This patch fixed the mistaken mapping in the following lines of change,
+654 -       sector_offset = bio->bi_iter.bi_sector;
+655 -       zone = find_zone(mddev->private, &sector_offset);
+656 -       tmp_dev = map_sector(mddev, zone, bio->bi_iter.bi_sector,
+657 -                            &sector_offset);
+
+694 +               zone = find_zone(mddev->private, &sector);
+695 +               tmp_dev = map_sector(mddev, zone, sector, &sector);
+At line 695 of this patch, the third parameter of calling map_sector()
+is fixed to 'sector', this is the correct value which contains the
+sector offset inside the corresponding zone.
+
+The this patch implicitly *changes* md raid0 on-disk layout. If a md
+raid0 has component disks with *different* sizes, then it will contain
+multiple zones. If such multiple zones raid0 device is created before
+Linux v3.13, all data chunks after first zone will be mapped to
+different location in kernel after (including) Linux v3.13. The result
+is, data written in the LBA after first zone will be treated as
+corruption. A worse case is, if the md raid0 has data chunks filled in
+first md raid0 zone in Linux v3.12 (or earlier kernels), then update to
+Linux v3.13 (or later kernels) and fill more data chunks in second and
+rested zone. Then in neither Linux v3.12 no Linux v3.13, there is always
+partial data corrupted.
+
+Currently there is no way to tell whether a md raid0 device is mapped in
+wrong calculation in kernel before (including) Linux v3.12 or in correct
+calculation in kernels after (including) Linux v3.13. If a md raid0
+device (contains multiple zones) created and used crossing these kernel
+version, there is possibility and different mapping calculation
+generation different/inconsistent on-disk layout in different md raid0
+zones, and results data corruption.
+
+For our enterprise Linux products we can handle it properly for a few
+product number of kernels. But for upstream and stable kernels, I don't
+have idea how to fix this ugly problem in a generic way.
+
+Neil Brown discussed with me offline, he proposed a temporary workaround
+that only permit to assemble md raid0 device with identical component
+disk size, and reject to assemble md raid0 device with component disks
+with different sizes. We can stop this workaround when there is a proper
+way to fix the problem.
+
+I suggest our developer community to work together for a solution, this
+is the motivation I post this email for your comments.
+
+Thanks in advance.
+
+-- 
+
+Coly Li
