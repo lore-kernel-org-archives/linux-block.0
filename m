@@ -2,144 +2,88 @@ Return-Path: <SRS0=L3Py=WS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1134AC3A59D
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 08:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51003C3A59D
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 09:36:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB70A214DA
-	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 08:58:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rws6jNKs"
+	by mail.kernel.org (Postfix) with ESMTP id 32B5E23400
+	for <linux-block@archiver.kernel.org>; Thu, 22 Aug 2019 09:36:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732832AbfHVI61 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Aug 2019 04:58:27 -0400
-Received: from mail-wm1-f53.google.com ([209.85.128.53]:56248 "EHLO
-        mail-wm1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732828AbfHVI61 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Aug 2019 04:58:27 -0400
-Received: by mail-wm1-f53.google.com with SMTP id f72so4804485wmf.5
-        for <linux-block@vger.kernel.org>; Thu, 22 Aug 2019 01:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=HwcMDsi2XQejCpwJcqSON0QYDIy6of9C4lFX3vq5Vd8=;
-        b=rws6jNKsi1M8Rkg+o1TcSh47k+MBIMlZ2PG9GVoXpHOHN3MDWajZ42qf2bwZzNxViW
-         DAkPKntHOYRZpDPuvQBKP7zUv/xa/jRR6w1y4bYMxRKUh79SEfgnY5pr5iHYPMjsgAXC
-         tHtspKL5+LLP11iVlGZn7uqXQIsYg61EWdpwaohwUKU3vfXKzvl5DkkrMzXQtl+wnfPB
-         JStOH5mMiyjBhPn0AYgSLb0WOsyjKgkMJnEmj3SR0AeYOSficjQrUV73JMO1ziA+o0Jb
-         fVTYxfpb0LpU0FytZ+oQndnyNIff/g8nsrg8CJDfgs0FuxT66v2GorScxqX5dSepeJNF
-         /zXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=HwcMDsi2XQejCpwJcqSON0QYDIy6of9C4lFX3vq5Vd8=;
-        b=hAgiM84kIPqEAGwLadhAm2EbweU5P1F6tq1UyU4UPbbL/ye9WgOT60sCVptoXrVPpq
-         icP5/GsndXSSxnZ9zI9QnbzBKlh5b6oFM8umsiu3mONLnn9Ydl4s1V4qbfQSDbwE3TXW
-         51EEN7ROVP7yZB5uoWiJDXKsVTxwq1fvgkThGDk6VnRmJqWJ8iK+e9RNFVywiNsZ8EGp
-         mWy9vbZxNwhQBPzARkWbpQQYb1q/YavivT0+UB33FwH6hNS0UVaNS8K5P9ejoWWuT+Ca
-         syDBtNFbvsgWr67/fJD1wxgzHHHQi/CHQLzj6emJvdRqQLaLfkhmFmU9lzf3htgBhuJc
-         eIcg==
-X-Gm-Message-State: APjAAAWxivZN7liNFerzRL4VxFUBzLJzbAyw/+tu8xX8QutfNDbIDzW/
-        bjnWdCDE3uoyS8AELGClEId9ng==
-X-Google-Smtp-Source: APXvYqzgkuUd3Clm72tSW8GGQTeQfG2PdkhGXmhwJPw5o1ZGmT8q4h5wuwHYjYXTZwrWLB1jLkoBHg==
-X-Received: by 2002:a1c:cc09:: with SMTP id h9mr4860686wmb.32.1566464305103;
-        Thu, 22 Aug 2019 01:58:25 -0700 (PDT)
-Received: from [192.168.0.100] (146-241-115-105.dyn.eolo.it. [146.241.115.105])
-        by smtp.gmail.com with ESMTPSA id t198sm6286486wmt.39.2019.08.22.01.58.23
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 22 Aug 2019 01:58:24 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCHSET block/for-next] IO cost model based work-conserving
- porportional controller
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20190820151903.GH2263813@devbig004.ftw2.facebook.com>
-Date:   Thu, 22 Aug 2019 10:58:22 +0200
-Cc:     Jens Axboe <axboe@kernel.dk>, newella@fb.com, clm@fb.com,
-        Josef Bacik <josef@toxicpanda.com>, dennisz@fb.com,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>, kernel-team@fb.com,
-        cgroups@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-        kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
-        bpf@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <9EB760CE-0028-4766-AE9D-6E90028D8579@linaro.org>
-References: <20190614015620.1587672-1-tj@kernel.org>
- <20190614175642.GA657710@devbig004.ftw2.facebook.com>
- <5A63F937-F7B5-4D09-9DB4-C73D6F571D50@linaro.org>
- <B5E431F7-549D-4FC4-A098-D074DF9586A1@linaro.org>
- <20190820151903.GH2263813@devbig004.ftw2.facebook.com>
-To:     Tejun Heo <tj@kernel.org>
-X-Mailer: Apple Mail (2.3445.104.8)
+        id S1731618AbfHVJf7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Aug 2019 05:35:59 -0400
+Received: from sauhun.de ([88.99.104.3]:57998 "EHLO pokefinder.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725987AbfHVJf7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Aug 2019 05:35:59 -0400
+Received: from localhost (p54B3343F.dip0.t-ipconnect.de [84.179.52.63])
+        by pokefinder.org (Postfix) with ESMTPSA id D54622C2686;
+        Thu, 22 Aug 2019 11:35:56 +0200 (CEST)
+Date:   Thu, 22 Aug 2019 11:35:56 +0200
+From:   Wolfram Sang <wsa@the-dreams.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
+        robin.murphy@arm.com, joro@8bytes.org,
+        wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH v9 3/5] block: sort headers on blk-setting.c
+Message-ID: <20190822093556.ludte2vtp77fiaax@katana>
+References: <1564129876-28261-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+ <1564129876-28261-4-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+ <20190816195026.GC6886@kunai>
+ <6ed6c62d-d773-71ec-382b-acd850e3dff1@kernel.dk>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="kgj75bivo7t7ncfe"
+Content-Disposition: inline
+In-Reply-To: <6ed6c62d-d773-71ec-382b-acd850e3dff1@kernel.dk>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
+--kgj75bivo7t7ncfe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Il giorno 20 ago 2019, alle ore 17:19, Tejun Heo <tj@kernel.org> ha =
-scritto:
->=20
-> Hello, Paolo.
->=20
-> On Tue, Aug 20, 2019 at 05:04:25PM +0200, Paolo Valente wrote:
->> and makes one fio instance generate I/O for each group.  The =
-bandwidth
->> reported above is that reported by the fio instance emulating the
->> target client.
->>=20
->> Am I missing something?
->=20
-> If you didn't configure QoS targets, the controller is using device
-> qdepth saturation as the sole guidance in determining whether the
-> device needs throttling.  Please try configuring the target latencies.
-> The bandwidth you see for single stream of rand ios should have direct
-> correlation with how the latency targets are configured.  The head
-> letter for the patchset has some examples.
->=20
+Hi Jens,
 
-Ok, I tried with the parameters reported for a SATA SSD:
+thanks for the feedback.
 
-rpct=3D95.00 rlat=3D10000 wpct=3D95.00 wlat=3D20000 min=3D50.00 =
-max=3D400.00
+> Please just drop this patch.
 
-and with a simpler configuration [1]: one target doing random reads
-and only four interferers doing sequential reads, with all the
-processes (groups) having the same weight.
+OK, we will do. And patch 4/5? Is it OK or do you need some more time to
+think about it?
 
-But there seemed to be little or no control on I/O, because the target
-got only 1.84 MB/s, against 1.15 MB/s without any control.
+Regards,
 
-So I tried with rlat=3D1000 and rlat=3D100.
+   Wolfram
 
-Control did improve, with same results for both values of rlat.  The
-problem is that these results still seem rather bad, both in terms of
-throughput guaranteed to the target and in terms of total throughput.
-Here are results compared with BFQ (throughputs measured in MB/s):
 
-                           io.weight            BFQ
-target's throughput        3.415                6.224       =20
-total throughput           159.14               321.375
+--kgj75bivo7t7ncfe
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Am I doing something else wrong?
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
-Paolo
+iQIzBAABCAAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAl1eYfcACgkQFA3kzBSg
+KbaLww/+Ke0gLqx1XCJqev3VRm9mm9T+lYoT5L7RlOSw7vRIZSGbZ5TtRLZvKmsY
+Kec20o8ozIAuXKsYsOZ3TC2sMh+ntcnP+Gaadoj0pSB3APqT/KdCae9q31zL5DV5
+JoJUfQs9OKhNT1kiQgSa3lkZdOsFheB0k1e8l0lnZJOga68dRFcOA57Vx0vFm5UC
+dobMpbGoF/aLRfF7rPOdGGy1kZ+8L1+TVLrK97YTlHFrrSlAT2l4HBHAn0gCUOxD
+7naLN2w4PQ1fLHVfEAZQHp5wg1XTYjyBIHj3hafLdvxXFtJZmlZDKQ+cTMFD9Ht1
+EKW18HKFyUhzrdBgmOlizxqybL5lOpJhFXXE9KZsFVgpbKW6+WtPpzmRk02UagF0
+N5zPf7TqQLWzUzxDT9zR4baTy074i+Oazzv5ur9GTCk48JFLdtTNhW4BXCj55ksZ
+lkYmbKBNxfI6V8rZn9zhJNJAXAi9Vq6mHJnTLfIHIvcTT2uWJ67Mg8kbB5I9NJ4K
+APmuIvXoss/cgXllOwkUZO7A6Z4HCbAS4H5M5seSqJ3DBf4wN0DR6ihOlktho0vz
+LTsI5Kqi65RZbtJFfLWmHp2HhHEJbt8zZqvrTivv9uv23lS3tfKLzHReTSW5yJIa
+d40nFCayfsQPfE2+FqK49Nvw4KBcH7q0TtUhwsb4is/iHnV/Nvc=
+=QW4f
+-----END PGP SIGNATURE-----
 
-[1] sudo ./bandwidth-latency.sh -t randread -s none -b weight -n 4
-
-> Thanks.
->=20
-> --=20
-> tejun
-
+--kgj75bivo7t7ncfe--
