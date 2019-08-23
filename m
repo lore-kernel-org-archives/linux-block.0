@@ -2,212 +2,187 @@ Return-Path: <SRS0=MRnn=WT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE3FC3A5A2
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 16:58:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52737C3A5A2
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 17:04:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C01221019
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 16:58:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21C4F21019
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 17:04:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726985AbfHWQ6n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Aug 2019 12:58:43 -0400
-Received: from mga06.intel.com ([134.134.136.31]:50252 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726901AbfHWQ6n (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Aug 2019 12:58:43 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Aug 2019 09:58:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,422,1559545200"; 
-   d="p7s'?scan'208";a="184262884"
-Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
-  by orsmga006.jf.intel.com with ESMTP; 23 Aug 2019 09:58:42 -0700
-Received: from orsmsx162.amr.corp.intel.com (10.22.240.85) by
- ORSMSX109.amr.corp.intel.com (10.22.240.7) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 23 Aug 2019 09:58:42 -0700
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.119]) by
- ORSMSX162.amr.corp.intel.com ([169.254.3.73]) with mapi id 14.03.0439.000;
- Fri, 23 Aug 2019 09:58:42 -0700
-From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
-To:     "Rajashekar, Revanth" <revanth.rajashekar@intel.com>,
+        id S1727705AbfHWREG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Aug 2019 13:04:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:53584 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727388AbfHWREG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Aug 2019 13:04:06 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 36026AC0C;
+        Fri, 23 Aug 2019 17:04:04 +0000 (UTC)
+Subject: Re: [RFC] How to handle an ugly md raid0 sector map bug ?
+To:     Song Liu <songliubraving@fb.com>
+Cc:     NeilBrown <neilb@suse.com>,
+        linux-raid <linux-raid@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>,
-        "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>
-Subject: Re: [PATCH 3/3] block: sed-opal: Add support to read/write opal
- tables generically
-Thread-Topic: [PATCH 3/3] block: sed-opal: Add support to read/write opal
- tables generically
-Thread-Index: AQHVWFPv9reGpILH7UiRlHLlRaEEMKcJbLcA
-Date:   Fri, 23 Aug 2019 16:58:41 +0000
-Message-ID: <675202326ac755344e46bbd9fc9b76ce60eceac6.camel@intel.com>
-References: <20190821191051.3535-1-revanth.rajashekar@intel.com>
-         <20190821191051.3535-4-revanth.rajashekar@intel.com>
-In-Reply-To: <20190821191051.3535-4-revanth.rajashekar@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.232.115.165]
-Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-JcPgA9RWLLWtEhy1jdmM"
+References: <10ca59ff-f1ba-1464-030a-0d73ff25d2de@suse.de>
+ <87blwghhq7.fsf@notabene.neil.brown.name>
+ <FBF1B443-64C9-472A-9F41-5303738C0DC7@fb.com>
+From:   Coly Li <colyli@suse.de>
+Openpgp: preference=signencrypt
+Organization: SUSE Labs
+Message-ID: <f3c41c4b-5b1d-bd2f-ad2d-9aa5108ad798@suse.de>
+Date:   Sat, 24 Aug 2019 01:03:55 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <FBF1B443-64C9-472A-9F41-5303738C0DC7@fb.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---=-JcPgA9RWLLWtEhy1jdmM
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 2019/8/24 12:37 上午, Song Liu wrote:
+> Thanks Coly and Neil. 
+> 
+>> On Aug 22, 2019, at 5:02 PM, NeilBrown <neilb@suse.com> wrote:
+>>
+>> On Thu, Aug 22 2019, Coly Li wrote:
+>>
+>>> Hi folks,
+>>>
+>>> First line: This bug only influences md raid0 device which applies all
+>>> the following conditions,
+>>> 1) Assembled by component disks with different sizes.
+>>> 2) Created and used under Linux kernel before (including) Linux v3.12,
+>>> then upgrade to Linux kernel after (including) Linux v3.13.
+>>> 3) New data are written to md raid0 in new kernel >= Linux v3.13.
+>>> Then the md raid0 may have inconsistent sector mapping and experience
+>>> data corruption.
+>>>
+>>> Recently I receive a bug report that customer encounter file system
+>>> corruption after upgrading their kernel from Linux 3.12 to 4.4. It turns
+>>> out to be the underlying md raid0 corruption after the kernel upgrade.
+>>>
+>>> I find it is because a sector map bug in md raid0 code include and
+>>> before Linux v3.12. Here is the buggy code piece I copied from stable
+>>> Linux v3.12.74 drivers/md/raid0.c:raid0_make_request(),
+>>>
+>>> 547         sector_offset = bio->bi_sector;
+>>> 548         zone = find_zone(mddev->private, &sector_offset);
+>>> 549         tmp_dev = map_sector(mddev, zone, bio->bi_sector,
+>>> 550                              &sector_offset);
+>>
+>> I don't think this code is buggy.  The mapping may not be the mapping
+>> you would expect, but it is the mapping that md/raid0 had always used up
+>> to this time.
+>>
+>>>
+>>> At line 548 after find_zone() returns, sector_offset is updated to be an
+>>> offset inside current zone. Then at line 549 the third parameter of
+>>> calling map_sector() should be the updated sector_offset, but
+>>> bio->bi_sector (original LBA or md raid0 device) is used. If the raid0
+>>> device has *multiple zones*, except the first zone, the mapping <dev,
+>>> sector> pair returned by map_sector() for all rested zones are
+>>> unexpected and wrong.
+>>>
+>>> The buggy code was introduced since Linux v2.6.31 in commit fbb704efb784
+>>> ("md: raid0 :Enables chunk size other than powers of 2."), unfortunate
+>>> the mistaken mapping calculation has stable and unique result too, so it
+>>> works without obvious problem until commit 20d0189b1012 ("block:
+>>> Introduce new bio_split()") merged into Linux v3.13.
+>>>
+>>> This patch fixed the mistaken mapping in the following lines of change,
+>>> 654 -       sector_offset = bio->bi_iter.bi_sector;
+>>> 655 -       zone = find_zone(mddev->private, &sector_offset);
+>>> 656 -       tmp_dev = map_sector(mddev, zone, bio->bi_iter.bi_sector,
+>>> 657 -                            &sector_offset);
+>>>
+>>> 694 +               zone = find_zone(mddev->private, &sector);
+>>> 695 +               tmp_dev = map_sector(mddev, zone, sector, &sector);
+>>> At line 695 of this patch, the third parameter of calling map_sector()
+>>> is fixed to 'sector', this is the correct value which contains the
+>>> sector offset inside the corresponding zone.
+>>
+>> This is buggy because, as you say, the third argument to map_sector has
+>> changed.
+>> Previously it was bio->bi_iter.bi_sector.  Now it is 'sector' which
+>> find_zone has just modified.
+>>
+>>>
+>>> The this patch implicitly *changes* md raid0 on-disk layout. If a md
+>>> raid0 has component disks with *different* sizes, then it will contain
+>>> multiple zones. If such multiple zones raid0 device is created before
+>>> Linux v3.13, all data chunks after first zone will be mapped to
+>>> different location in kernel after (including) Linux v3.13. The result
+>>> is, data written in the LBA after first zone will be treated as
+>>> corruption. A worse case is, if the md raid0 has data chunks filled in
+>>> first md raid0 zone in Linux v3.12 (or earlier kernels), then update to
+>>> Linux v3.13 (or later kernels) and fill more data chunks in second and
+>>> rested zone. Then in neither Linux v3.12 no Linux v3.13, there is always
+>>> partial data corrupted.
+>>>
+>>> Currently there is no way to tell whether a md raid0 device is mapped in
+>>> wrong calculation in kernel before (including) Linux v3.12 or in correct
+>>> calculation in kernels after (including) Linux v3.13. If a md raid0
+>>> device (contains multiple zones) created and used crossing these kernel
+>>> version, there is possibility and different mapping calculation
+>>> generation different/inconsistent on-disk layout in different md raid0
+>>> zones, and results data corruption.
+>>>
+>>> For our enterprise Linux products we can handle it properly for a few
+>>> product number of kernels. But for upstream and stable kernels, I don't
+>>> have idea how to fix this ugly problem in a generic way.
+>>>
+>>> Neil Brown discussed with me offline, he proposed a temporary workaround
+>>> that only permit to assemble md raid0 device with identical component
+>>> disk size, and reject to assemble md raid0 device with component disks
+>>> with different sizes. We can stop this workaround when there is a proper
+>>> way to fix the problem.
+>>>
+>>> I suggest our developer community to work together for a solution, this
+>>> is the motivation I post this email for your comments.
+>>
+>> There are four separate cases that we need to consider:
+>> - v1.x metadata
+>> - v0.90 metadata
+>> - LVM metadata (via dm-raid)
+>> - no metadata (array created with "mdadm --build").
+>>
+>> For v1.x metadata, I think we can add a new "feature_map" flag.
+>> If this flag isn't set, raid0 with non-uniform device sizes will not be
+>> assembled.
+>> If it is set, then:
+>>  if 'layout' is 0, use the old mapping
+>>  if 'layout' is 1, use the new mapping
+>>
+>> For v0.90 metadata we don't have feature-flags.  We could
+>> The gvalid_words field is unused and always set to zero.
+>> So we could start storing some feature bits there.
+>>
+>> For LVM/dm-raid, I suspect it doesn't support varying
+>> sized devices, but we would need to check.
+>>
+>> For "no metadata" arrays ... we could possibly just stop supporting
+>> them - I doubt they are used much.
+> 
+> So for an existing array, we really cannot tell whether it is broken or 
+> not, right? If this is the case, we only need to worry about new arrays.
+> 
+> For new arrays, I guess we can only allow v1.x raid0 to have non-uniform
+> devices sizes, and use the new feature_map bit. 
+> 
+> Would this work? If so, we only have 1 case to work on. 
 
-+David
-
-On Wed, 2019-08-21 at 13:10 -0600, Revanth Rajashekar wrote:
-> This feature gives the user RW access to any opal table with admin1
-> authority.
->=20
-> The flags described in the new structure determines if the user
-> wants to read/write the data. Flags are checked for valid values in
-> order to allow future features to be added to the ioctl.
->=20
-> Previously exposed opal UIDs allows the user to easily select the
-> desired table to retrieve its UID.
->=20
-> The ioctl provides a size and offset field and internally will loop
-> data accesses to return the full data block.
->=20
-> The ioctl provides a private field with the intentiont to accommodate
-> any future expansions to the ioctl.
->=20
-> Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
-> ---
->  block/sed-opal.c              | 140 ++++++++++++++++++++++++++++++++++
->  include/linux/sed-opal.h      |   1 +
->  include/uapi/linux/sed-opal.h |  16 ++++
->  3 files changed, 157 insertions(+)
->=20
-> diff --git a/block/sed-opal.c b/block/sed-opal.c
-> index 7179582730b6..3f41fc56f3cb 100644
-> --- a/block/sed-opal.c
-> +++ b/block/sed-opal.c
-> @@ -1896,6 +1896,108 @@ static int get_msid_cpin_pin(struct opal_dev *dev=
-, void *data)
->  	return 0;
->  }
->=20
-> +static int write_table_data(struct opal_dev *dev, void *data)
-> +{
-> +	struct opal_read_write_table *write_tbl =3D data;
-> +
-> +	return generic_table_write_data(dev, write_tbl->data, write_tbl->offset=
-,
-> +					write_tbl->size, write_tbl->table_uid);
-> +}
-> +
-> +static int read_table_data_cont(struct opal_dev *dev)
-> +{
-> +	int err =3D 0;
-> +	const char *data_read;
-> +
-> +	err =3D parse_and_check_status(dev);
-> +	if (err)
-> +		return err;
-> +
-> +	dev->prev_d_len =3D response_get_string(&dev->parsed, 1, &data_read);
-> +
-> +	dev->prev_data =3D data_read;
-> +	if (!dev->prev_data) {
-> +		pr_debug("%s: Couldn't read data from the table.\n", __func__);
-> +		return OPAL_INVAL_PARAM;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * IO_BUFFER_LENGTH =3D 2048
-> + * sizeof(header) =3D 56
-> + * No. of Token Bytes in the Response =3D 11
-> + * MAX size of data that can be carried in response buffer
-> + * at a time is : 2048 - (56 + 11) =3D 1981 =3D 0x7BD.
-> + */
-> +#define OPAL_MAX_READ_TABLE (0x7BD)
-This is the only part I'm concerned about, but I'm not aware of any
-condition in the spec allowing for the response to have extra fields
-that would overflow the buffer.
-
-
-
-[snip]
-
---=-JcPgA9RWLLWtEhy1jdmM
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-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
-PNauajAtxgRKfqfSMb+IcL/VXiPtVZOxVq+CTZeDJkaEmn/79vg8OYxpR+YhFF+tGlKf/Zc4id1P
-AgMBAAGjggI3MIICMzAdBgNVHQ4EFgQU4oawcWXM1cPGdwGcIszDfjORVZAwHwYDVR0jBBgwFoAU
-HmkqtNwo/kcYTiELP7ysES/wmPUwZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5pbnRlbC5j
-b20vcmVwb3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENB
-JTIwNEEuY3JsMIGfBggrBgEFBQcBAQSBkjCBjzBpBggrBgEFBQcwAoZdaHR0cDovL3d3dy5pbnRl
-bC5jb20vcmVwb3NpdG9yeS9jZXJ0aWZpY2F0ZXMvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIw
-SXNzdWluZyUyMENBJTIwNEEuY3J0MCIGCCsGAQUFBzABhhZodHRwOi8vb2NzcC5pbnRlbC5jb20v
-MAsGA1UdDwQEAwIHgDA8BgkrBgEEAYI3FQcELzAtBiUrBgEEAYI3FQiGw4x1hJnlUYP9gSiFjp9T
-gpHACWeB3r05lfBDAgFkAgEJMB8GA1UdJQQYMBYGCCsGAQUFBwMEBgorBgEEAYI3CgMMMCkGCSsG
-AQQBgjcVCgQcMBowCgYIKwYBBQUHAwQwDAYKKwYBBAGCNwoDDDBRBgNVHREESjBIoCoGCisGAQQB
-gjcUAgOgHAwaam9uYXRoYW4uZGVycmlja0BpbnRlbC5jb22BGmpvbmF0aGFuLmRlcnJpY2tAaW50
-ZWwuY29tMA0GCSqGSIb3DQEBBQUAA4IBAQBxGkHe05DNpYel4b9WbbyQqD1G6y6YA6C93TjKULZi
-p8+gO1LL096ixD44+frVm3jtXMikoadRHQJmBJdzsCywNE1KgtrYF0k4zRWr7a28nyfGgQe4UHHD
-7ARyZFeGd7AKSQ1y4/LU57I2Aw2HKx9/PXavv1JXjjO2/bqTfnZDJTQmOQ0nvlO3/gvbbABxZHqz
-NtfHZsQWS7s+Elk2xGUQ0Po2pMCQoaPo9R96mm+84UP9q3OvSqMoaZwfzoUeAx2wGJYl0h3S+ABr
-CPVfCgq9qnmVCn5DyHWE3V/BRjJCoILLBLxAxnmSdH4pF6wJ6pYRLEw9qoyNhpzGUIJU/Lk1MYIC
-FzCCAhMCAQEwgZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBD
-bGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFs
-IEJhc2ljIElzc3VpbmcgQ0EgNEECEzMAAMamAkocC+WQNPgAAAAAxqYwCQYFKw4DAhoFAKBdMBgG
-CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDgyMzE2NTg0MFowIwYJ
-KoZIhvcNAQkEMRYEFN+UPR/o9P4mKtE0BjUV/EAHE014MA0GCSqGSIb3DQEBAQUABIIBACfpridZ
-IJYUveWe4kI6KjVB3YgTzIzhXlv4ntimJHnoOjiZ9ZSqy1HlxZVXLPo7rYbX4aCguZntjMhPcJn7
-o56hWB5ltlSVzkzJSMX+VvWQGHD9AHVNlqYDiHGifqIGzZnv67G5odrq1YR5woWb+2E/12RSfxF0
-/CaIkhuRQiY2JMo0X/1KwNc1iVetP41HUWxCR8jnh4dO3Lz383XsNUpNXxR4Fbcy7mZA2g9g1fpV
-INta81MiLOmouiFNO0Iu4WAkRTWcvmwPtVgYcWqk4cgU9Dqr4Kyj+LoSmszPcUzHu96/DxNEJGIh
-ZaNSjoUz7siwqZAaj2p6TYscWAzZluwAAAAAAAA=
+It seems v1.2 support started since Linux v2.16, so it may also have
+problem for multiple zones.
 
 
---=-JcPgA9RWLLWtEhy1jdmM--
+-- 
+
+Coly Li
