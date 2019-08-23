@@ -2,86 +2,120 @@ Return-Path: <SRS0=MRnn=WT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7928C41514
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 00:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D98D6C3A5A1
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 00:15:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8411023405
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 00:14:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A095F2173E
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 00:15:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lHAvxhJZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="I7lw6jGI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728235AbfHWAOm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Aug 2019 20:14:42 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:41512 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727714AbfHWAOm (ORCPT
+        id S1728256AbfHWAPb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Aug 2019 20:15:31 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:30872 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727783AbfHWAPa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Aug 2019 20:14:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=EEPeXKHeyHPUF+mY9X4HgzOAHDW9xJaBlJDYUqhQ3Ro=; b=lHAvxhJZHEMfcwQC1ogHhZeLJ
-        FFTWoV11nQerSX0KwMBjOZpUeIcPiYTfGZqRKA3TOLiqRFOWCALI40p1y9XiIiEKUV1PIDLGoSH3m
-        Cm9jp8uKQj+uAaZyCKLbTkP/FU1MQZpVGSc7bn/NcSRiMvFC2b2EHhKccahuo5CLVNEq1kEX658/D
-        R3cEgxmObspdHeitQ7kvEHKWtyuuQE5OOla+XXzLKuhw/yj7+UDarxySHY6QuTblwOYMGLAjDRRVV
-        uImimL0DO3a6gnIQlgq/mM0mF/0DxzY/u51Lzycztqp/n/4lNdcCd5bP1hfzdO36OJ9VjJF8Vb5Jd
-        niYiDJUBg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1i0xE0-0000pm-NP; Fri, 23 Aug 2019 00:14:40 +0000
-Date:   Thu, 22 Aug 2019 17:14:40 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <david@fromorbit.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 3/3] xfs: alignment check bio buffers
-Message-ID: <20190823001440.GA32209@infradead.org>
-References: <20190821083820.11725-1-david@fromorbit.com>
- <20190821083820.11725-4-david@fromorbit.com>
- <20190821232945.GC24904@infradead.org>
- <CACVXFVN93h7QrFvZNVQQwYZg_n0wGXwn=XZztMJrNbdjzzSpKQ@mail.gmail.com>
- <20190822044905.GU1119@dread.disaster.area>
- <20190822080852.GC31346@infradead.org>
- <20190822101958.GA9632@ming.t460p>
+        Thu, 22 Aug 2019 20:15:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1566519330; x=1598055330;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=NVzjKfjVqM0tEBBsmDVJCQ0K1dgI4f105BIsAh1iws0=;
+  b=I7lw6jGIljJwz2Mahag+t3UpVwJm47gStzszLY1av+31e6eiDZtl6STq
+   OJNrXe+WGNTx0oYHMnDUQiNtGNQOCJ5hkxq7QpzPofzCj+d9srZsaOPwe
+   djK48RxhoWQWYvIn6zZ0WKmXlL96urFwamReRFDuWvrs9QuedRfOIOzdb
+   rfohTNkZZ/W4wtN+OHiqraqsACdA6caoTj1alEUL30FitCXAXJgx39GkU
+   uq71upWJSf/vaXyA5g8Col6KdzIzCNos1zxgr/zyYcTulHohSQprvmnoP
+   tXW95KXvGpU5OaNk29S87aAL1h9nU799VaM/KZPFgxrv/XVslPy0JhGPZ
+   w==;
+IronPort-SDR: wUsR5vV0uORbY9B7FcYFRJ/5m0pza/lk7GRNCd8bpjnj/LSLvcXX++0CABsU+w2/bY3nYBPgYh
+ uOKX7oFuAzvqgUJSVZmVS5PUp1D1hK6zrt3o353/xaAX/DcG9GKRlWrbUQe76lIdrkQc9/q90M
+ OioA3JVp/ZwR1lPxVOCPZ2cvT6K78EKinC+14rjz7NvDAi/rJJD3phlPlLsWf1aBzsNOkRBzrX
+ 4QdPs8sBEnvMRNW2w5w2sQ3DDoJRc0di2u2fBkZXblBFkThlv0bZmP9j2BYEE8NRNPShO+ALWB
+ BJo=
+X-IronPort-AV: E=Sophos;i="5.64,419,1559491200"; 
+   d="scan'208";a="121063662"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 23 Aug 2019 08:15:30 +0800
+IronPort-SDR: 6NABK5qhD+NuVHpaAtVr+BQJxwGGNTeib8slIJUGtA2UAuvJ/Bbe7WH06QZFlWQQ+Nct0yN9+t
+ md77V12BzvSbiBRFaMsVUCGf6JSp5Xm6kvsFDmNtOHIt+Jny6VmTdQ/GKoVsW7/+GmVQW5YIq5
+ tthXWutzB/BSzQu7Bvx8YWnsQ7djqTIk4yhmQnSCwLggg6U9BA6e3rzQrO3oprSfE42fRe7acc
+ yFYfXdcZAfGtnLOn1Hmyz4Ij5Kx0ELB5GcmVPvFXeTaKTo1SIxlK+xE/ngYwry2x5XzKYkoWtA
+ cgqnXCRsLDvREfcV6uTkNDSe
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2019 17:12:49 -0700
+IronPort-SDR: E9+3aFmMK7s0pzPt3SKVyzeeK8AZrhfJhmQkH+bTx4UXqzAcJg6wtr69+hQJibNvZlAe/4JjGk
+ sGbhyvNJkDadt6a4EuFj1RWTt1sb65wVCQqPIhoEL7WjNnL2b13wCJ8pMYwPXuzNPKOwgPDB4h
+ Y1pKLhBgyITVV/JSM6LJm79wx/giJXfl74Utwd238dmUGLEUm8LUWdysSyIxLQqfDDeZG2mhB9
+ LLJb9But4IT8YyHVOoEKj0ylOie4hKLdQxnRhsQLL0YM190S7c3MhlrVeXhV/ok72LKrBo7YFj
+ /2k=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip01.wdc.com with ESMTP; 22 Aug 2019 17:15:29 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 0/7] Elevator cleanups and improvements
+Date:   Fri, 23 Aug 2019 09:15:21 +0900
+Message-Id: <20190823001528.5673-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190822101958.GA9632@ming.t460p>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 22, 2019 at 06:20:00PM +0800, Ming Lei wrote:
-> In theory, fs bio shouldn't care any DMA limits, which should have been done
-> on splitted bio for doing IO to device.
-> 
-> Also .dma_alignment isn't considered in blk_stack_limits(), so in case
-> of DM, MD or other stacking drivers, fs code won't know the accurate
-> .dma_alignment of underlying queues at all, and the stacking driver's
-> queue dma alignment is still 512.
+This patch series implements some cleanup of the elevator initialization
+code and introduces elevator features identification and device matching
+to enhance checks for elevator/device compatibility and fitness.
 
-Trying to handling alignment lower down means bounce buffering, so I
-don't think trying to hndle it is a sane idea.  I'd be much happier to
-say non-passthrough bios need 512 byte alignment, period.  That should
-cover all the sane cases and we can easily check for it.  The occasional
-device that would need larger alignment just needs to deal with it.
+The first 3 patches of the series are simple cleanups which simplify and
+streamline elevator initialization for newly allocated device queues.
 
-> Also suppose the check is added, I am a bit curious how fs code handles the
-> failure, so could you explain a bit about the failure handling?
+The following two patches introduce elevator features control which
+allow defining features and function that an elevator supports and match
+these against features required by a block device driver. With this, the
+sysfs elevator list for a device always only shows elevators matching
+the features that a particular device requires, with the exception of
+the none elevator which has no features but is always available for use
+with any device.
 
-Even just an assert is a a start.  But a bio_add_page variant with
-saner return value semantic would be helpful, and I have some ideas
-there that I need to try out first.
+The first feature defined is for zoned block device write order control
+through zone write locking which prevents the use of any scheduler that
+does not support this feature with zoned devices.
+
+The last 2 patches of this series rework the default elevator selection
+and initialization to allow for the feature matching to work,
+simultaneously addressing cases not currently well supported, namely,
+multi-queue zoned block devices.
+
+Damien Le Moal (7):
+  block: Cleanup elevator_init_mq() use
+  block: Change elevator_init_mq() to always succeed
+  block: Remove sysfs lock from elevator_init_rq()
+  block: Introduce elevator features
+  block: Introduce zoned block device elevator feature
+  block: Improve default elevator selection
+  block: Delay default elevator initialization
+
+ block/blk-mq.c                |  10 ---
+ block/blk-settings.c          |  15 ++++
+ block/blk.h                   |   2 +-
+ block/elevator.c              | 144 +++++++++++++++++++++++++---------
+ block/genhd.c                 |   3 +
+ block/mq-deadline.c           |   1 +
+ drivers/block/null_blk_main.c |   5 ++
+ drivers/scsi/sd_zbc.c         |   2 +
+ include/linux/blkdev.h        |   4 +
+ include/linux/elevator.h      |   8 ++
+ 10 files changed, 147 insertions(+), 47 deletions(-)
+
+-- 
+2.21.0
+
