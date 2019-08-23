@@ -2,158 +2,157 @@ Return-Path: <SRS0=MRnn=WT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E637C3A5A3
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 12:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF210C3A5A2
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 15:41:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1148122CEC
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 12:58:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1ED021019
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 15:41:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KkX1YSy1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ki9tAwKf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393371AbfHWM6V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Aug 2019 08:58:21 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:32856 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389430AbfHWM6V (ORCPT
+        id S2405883AbfHWPl5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Aug 2019 11:41:57 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:44114 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726824AbfHWPl4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Aug 2019 08:58:21 -0400
-Received: by mail-io1-f67.google.com with SMTP id z3so19896897iog.0
-        for <linux-block@vger.kernel.org>; Fri, 23 Aug 2019 05:58:20 -0700 (PDT)
+        Fri, 23 Aug 2019 11:41:56 -0400
+Received: by mail-qt1-f194.google.com with SMTP id 44so11566507qtg.11
+        for <linux-block@vger.kernel.org>; Fri, 23 Aug 2019 08:41:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=I00VSte5pro9MFfzs2ZQvPdVMUipipTiKgGdaBQKoYg=;
-        b=KkX1YSy1spowJhMf4nt0sS1GiG9wl1Q/GtwqzhvA+wzcUwnn6/e17yBU4MbSJcIHOy
-         TOg41CBRFgHRWxFx277frT5pYUFsK/XSr0xG9rGNORnNA/A07aDh5EkfKjuI3nSTLVIm
-         eEhrzj3JxNoyXWs1BsKM5lCoIPotLbRTAzIba93o9kNAjADe5iOrQ2uggSeyAMNjdUx4
-         SreYR97yZnHYESaj9uH6IAFtPAb2x815/c9oxTRU55zQBpfuLSpiExPvHs3zyY0BKvH1
-         er0APdcyCo1bbLQQRjIVLVSe66/dtfv+AbejchaNtpIn6e9R5a6Sqm31JnvKJG/k+Stk
-         jErA==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=S58Ut6awFbXGbTVwROsmK/yvGl2uzNqGRXDVfJ8fjtI=;
+        b=ki9tAwKfBTW+y3PAASIHa/Uk8nGbCOtOz6jBgofCXyvNpOpeNoUh7A9JQVIgtFBEHy
+         ASoGvShJr0/fZeQxP70KehnjJ1LzMEtYjTeESjC7jjOfFc+NTcJf0uWDjVFuqViJPoUn
+         IVvQHVb+CQM2wZlj6DGLVwZiuI2tT6/9ub9GiyW+gxFYeqZMzs+MVXimKmSGq+h2r09v
+         PIZFhxYG0UCdblZDYzzy36IBTCc0kOsizhL4fFn6571TiWXAJyRhxx+beCFLkfvgxpV2
+         gjUyZV8xABXR2PT0s/32YGRDFTbvP6AEATq/Ai/HgNqtKfZ1UqsZHMFaU+cdwzsG9vd8
+         iwbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=I00VSte5pro9MFfzs2ZQvPdVMUipipTiKgGdaBQKoYg=;
-        b=N+GnfY1484LfuqWvcH+Bxatf9T51k98ahEwEeUuDWHYQxEgBAA2dGKXlLym+g11TW4
-         6kxZxJYXtmO/TMshg26PXlT+Vk+U/JB8fTZEWRVxKlqhCV2u/oPEpiQ21aZ9sgdNdbn0
-         U51ZwpS+5akkAUv7DYqorkX5nmSxp/QvbVN2AdAVf+3S2i1VLpCtjP0gqk20O5RnmYDQ
-         BnFnoVIaZh2CZ2MaSxryLOOdMwG3FNM8R4/ZBC8cqoJEZ+ThKANNihBCw2kpSn1vgUiR
-         gvCHnmWkCxnPggE9muUdowSCmUu3JXNe+0pYttctgXY+IfrMkVMtt0auaKnBhlY5aPjf
-         K0kA==
-X-Gm-Message-State: APjAAAXs5X73jCsAy5Y9XEmdSMUBT6vB0yGvxAtluo0vd99Jgml9rzuX
-        LnhGJOzG16DvBWLqqrsjkhjq9A==
-X-Google-Smtp-Source: APXvYqzQQ287n5s/HXH6WQvjjD6bvAz1vCdp2m4qyBppgdxouyxbAymX4x1UAYbSB8TdilJWk20gJA==
-X-Received: by 2002:a02:9988:: with SMTP id a8mr4809673jal.127.1566565100208;
-        Fri, 23 Aug 2019 05:58:20 -0700 (PDT)
-Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id d6sm3272892iod.17.2019.08.23.05.58.19
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mime-version:content-disposition:user-agent;
+        bh=S58Ut6awFbXGbTVwROsmK/yvGl2uzNqGRXDVfJ8fjtI=;
+        b=QzADXbubm+KjlqrS5ynUbZUTS+NMBjlRvlRwycyey4CBdeu8KE4k02fnXIjlx9JqBk
+         26X8bGYP4IpFwvrWG9b959s7VrX50Js/dqR9rOz1R3n9iBKZv15FjVCykpiX0OEpQNMq
+         4gSl/UqlHUcWF8UmP2SLhrmcUh7qsJHmtDTcwrpnsMZ9Z3GnPXF50LsB810nba9HG2yc
+         108Yhja9ZPgAbC7zmJ0E6QwjeksoRybRvFyI/v5vHV1BlKN+sIqgNfZSdBGqi51D0y1S
+         9avrRqeIUMN8b3c77iCxiI5qCYCjOnitQPsWKw/A1Si2DmWKNsvinVzAtkYTHhqxnr+9
+         cWkA==
+X-Gm-Message-State: APjAAAU+dHMBZUfOzPRiR7f/i2EFICwodTn0mHXtBkeXe3rjiTGbfNv7
+        9fE5NZNBXOCQQl32U67VLdQ=
+X-Google-Smtp-Source: APXvYqwSnfUlkGS1tztrmwyBgMgAlVfIZEhOrURhEbQ5oVj4HH644m2tOyUdMAQ5G9Z8Vjuels2YZQ==
+X-Received: by 2002:ac8:4a8f:: with SMTP id l15mr5442837qtq.29.1566574915981;
+        Fri, 23 Aug 2019 08:41:55 -0700 (PDT)
+Received: from localhost (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id x145sm1667988qka.106.2019.08.23.08.41.54
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 23 Aug 2019 05:58:19 -0700 (PDT)
-Subject: Re: [PATCH V4 0/6] null_blk: simplify null_handle_cmd()
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     hch@lst.de
-References: <20190823044519.3939-1-chaitanya.kulkarni@wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <49e1b4d0-c5ef-8054-e387-b7c1cedf5070@kernel.dk>
-Date:   Fri, 23 Aug 2019 06:58:18 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 23 Aug 2019 08:41:55 -0700 (PDT)
+Date:   Fri, 23 Aug 2019 11:41:53 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Bryan Gurney <bgurney@redhat.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Wenwen Wang <wenwen@cs.uga.edu>,
+        ZhangXiaoxu <zhangxiaoxu5@huawei.com>
+Subject: [git pull] device mapper fixes for 5.3-rc6
+Message-ID: <20190823154153.GA24648@lobo>
 MIME-Version: 1.0
-In-Reply-To: <20190823044519.3939-1-chaitanya.kulkarni@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/22/19 10:45 PM, Chaitanya Kulkarni wrote:
-> Hi,
-> 
-> The core function where we handle the request null_handle_cmd() in the
-> null_blk does various things based on how null_blk is configured :-
-> 
-> 1. Handle throttling.
-> 2. Handle badblocks.
-> 3. Handle Memory backed device operations.
-> 4. Handle Zoned Block device operations.
-> 5. Completion of the requests.
-> 
-> With all the above functionality present in the one function,
-> null_handle_cmd() is growing and becoming unreasonably lengthy when
-> we want to add more features such as new Zone requests which is being
-> worked on (See [1], [2]).
-> 
-> This is a cleanup patch-series which refactors the code in the
-> null_handle_cmd(). We create a clear interface for each of the above
-> mentioned functionality which leads to having null_handle_cmd() more
-> clear and easy to manage with future changes. Please have a look at
-> NVMe PCIe Driver (nvme_queue_rq()) (See [3]) which has a similar code
-> structure and nicely structured code for doing various things such as
-> setting up commands, mapping of the block layer requests, mapping
-> PRPs/SGLs, handling integrity requests and finally submitting the
-> NVMe Command etc.
-> 
-> With this patch-series we fix the following issues with the current
-> code :-
-> 
-> 1. Get rid of the multiple nesting levels (> 2).
-> 2. Easy to read, debug and extend the code for specific feature.
-> 3. Get rid of the various line foldings which are there in the code
->     due to multiple level of nesting under if conditions.
-> 4. Precise definition for the null_handle_cmd() and clear error
->     handling as helpers are responsible for handling errors.
-> 
-> Regards,
-> Chaitanya
-> 
-> [1] https://www.spinics.net/lists/linux-block/msg41884.html
-> [2] https://www.spinics.net/lists/linux-block/msg41883.html
-> [3] https://github.com/torvalds/linux/blob/master/drivers/nvme/host/pci.c
-> 
-> * Changes from V3:-
-> 1. Rename nullb_handle_cmd_completion () -> nullb_complete_cmd().
-> 2. Move null_handle_zoned() to null_blk_zoned.c and adjust rest of the
->     code in null_blk_zoned.c.
-> 3. Fixed the bug in null_handle_cmd() for REQ_OP_ZONE_RESET_ALL.
-> 
-> * Changes from V2:-
-> 1. Adjust the code to latest upstream code.
-> 
-> * Changes from V1:-
-> 1. Move bio vs req code into the callers for the null_handle_cmd() and
->     add required arguments to simplify the code in the same function.
-> 2. Get rid of the extra braces for the null_handle_zoned().
-> 3. Get rid of the multiple returns style and the goto.
-> 4. For throttling, code keep the check in the caller.
-> 5. Add uniform code format for setting the cmd->error in the
->     null_handle_cmd() and make required code changes so that each
->     feature specific function will return blk_status_t value.
-> 
-> Chaitanya Kulkarni (6):
->    null_blk: move duplicate code to callers
->    null_blk: create a helper for throttling
->    null_blk: create a helper for badblocks
->    null_blk: create a helper for mem-backed ops
->    null_blk: create a helper for zoned devices
->    null_blk: create a helper for req completion
-> 
->   drivers/block/null_blk.h       |  13 +--
->   drivers/block/null_blk_main.c  | 162 +++++++++++++++++----------------
->   drivers/block/null_blk_zoned.c |  38 +++++---
->   3 files changed, 115 insertions(+), 98 deletions(-)
+Hi Linus,
 
-Applied, thanks.
+More fixes than usual from DM at this stage in a release but...
 
--- 
-Jens Axboe
+The following changes since commit d45331b00ddb179e291766617259261c112db872:
 
+  Linux 5.3-rc4 (2019-08-11 13:26:41 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.3/dm-fixes-2
+
+for you to fetch changes up to 1cfd5d3399e87167b7f9157ef99daa0e959f395d:
+
+  dm table: fix invalid memory accesses with too high sector number (2019-08-23 10:11:42 -0400)
+
+Please pull, thanks!
+Mike
+
+----------------------------------------------------------------
+- Revert a DM bufio change from during the 5.3 merge window now that a
+  proper fix has been made to the block loopback driver.
+
+- Fix DM kcopyd to wakeup so failed subjobs get completed.
+
+- Various fixes to DM zoned target to address error handling, and other
+  small tweaks (SPDX license identifiers and fix typos).
+
+- Fix DM integrity range locking race by tracking whether journal has
+  changed.
+
+- Fix DM dust target to detect reads of badblocks beyond the first 512b
+  sector (applicable if blocksize is larger than 512b).
+
+- Fix DM persistent-data issue in both the DM btree and DM
+  space-map-metadata interfaces.
+
+- Fix out of bounds memory access with certain DM table configurations.
+
+----------------------------------------------------------------
+Bryan Gurney (1):
+      dm dust: use dust block size for badblocklist index
+
+Dan Carpenter (1):
+      dm zoned: fix potential NULL dereference in dmz_do_reclaim()
+
+Dmitry Fomichev (6):
+      dm kcopyd: always complete failed jobs
+      dm zoned: improve error handling in reclaim
+      dm zoned: improve error handling in i/o map code
+      dm zoned: properly handle backing device failure
+      dm zoned: add SPDX license identifiers
+      dm zoned: fix a few typos
+
+Mikulas Patocka (3):
+      Revert "dm bufio: fix deadlock with loop device"
+      dm integrity: fix a crash due to BUG_ON in __journal_read_write()
+      dm table: fix invalid memory accesses with too high sector number
+
+Wenwen Wang (1):
+      dm raid: add missing cleanup in raid_ctr()
+
+ZhangXiaoxu (2):
+      dm btree: fix order of block initialization in btree_split_beneath
+      dm space map metadata: fix missing store of apply_bops() return value
+
+ drivers/md/dm-bufio.c                              |  4 +-
+ drivers/md/dm-dust.c                               | 11 +++-
+ drivers/md/dm-integrity.c                          | 15 +++++
+ drivers/md/dm-kcopyd.c                             |  5 +-
+ drivers/md/dm-raid.c                               |  2 +-
+ drivers/md/dm-table.c                              |  5 +-
+ drivers/md/dm-zoned-metadata.c                     | 68 ++++++++++++++++------
+ drivers/md/dm-zoned-reclaim.c                      | 47 +++++++++++----
+ drivers/md/dm-zoned-target.c                       | 68 +++++++++++++++++++---
+ drivers/md/dm-zoned.h                              | 11 ++++
+ drivers/md/persistent-data/dm-btree.c              | 31 +++++-----
+ drivers/md/persistent-data/dm-space-map-metadata.c |  2 +-
+ 12 files changed, 209 insertions(+), 60 deletions(-)
