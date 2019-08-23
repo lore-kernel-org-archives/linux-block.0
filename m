@@ -2,70 +2,65 @@ Return-Path: <SRS0=MRnn=WT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A05BC3A5A2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B14E3C3A5A3
 	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 23:01:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3EE2121726
+	by mail.kernel.org (Postfix) with ESMTP id 802972339D
 	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 23:01:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=permerror (0-bit key) header.d=manuel-bentele.de header.i=@manuel-bentele.de header.b="snLw+KTg"
+	dkim=permerror (0-bit key) header.d=manuel-bentele.de header.i=@manuel-bentele.de header.b="Cq1UfjGR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726999AbfHWXBr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727012AbfHWXBr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 23 Aug 2019 19:01:47 -0400
-Received: from host1.nc.manuel-bentele.de ([92.60.37.180]:55820 "EHLO
+Received: from host1.nc.manuel-bentele.de ([92.60.37.180]:55824 "EHLO
         host1.nc.manuel-bentele.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726378AbfHWXBr (ORCPT
+        by vger.kernel.org with ESMTP id S1726394AbfHWXBr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 23 Aug 2019 19:01:47 -0400
 Received: from localhost (localhost [127.0.0.1]) (Authenticated sender: development@manuel-bentele.de)
-        by host1.nc.manuel-bentele.de (Postcow) with ESMTPSA id 6D47A641F5;
-        Sat, 24 Aug 2019 00:56:21 +0200 (CEST)
+        by host1.nc.manuel-bentele.de (Postcow) with ESMTPSA id 9127E61074;
+        Sat, 24 Aug 2019 00:56:19 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manuel-bentele.de;
-        s=dkim; t=1566600981;
+        s=dkim; t=1566600979;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uXLbQgjGWhzcWqU3zQqfArsgI0EbAZYxCwHXS4sPZVM=;
-        b=snLw+KTgelGP6K+PwXLx1iMZrfaLe7rr6rE6ISwvKGiR+Fxi1117rffMMIyRRA7GSmi5OJ
-        HIH4mkv9iHnutxvjRFryOEXXL6tLIwPr70jsPrsqRHXNEMRpKSpt6apcuc6+EY8h1T5y3w
-        GlJ9IJJimJ+1XhtJDnA/hHvmRKognOcJz0a1by0gxHteUuO2ys2LnW76HwUAnaNTXr6IRD
-        FcJpaTmhqPVVR+ptWestHwEMYZgTxDJDSzLpvYWauDZzJQwBg4yb1uVgsqLB3TF8inoLZt
-        elTX5Guto5YfQ3XnVqN4+QPtHamhynsCUEmD2oImgAAC5zowoYut0fh9Gkt/qg==
+         content-transfer-encoding:content-transfer-encoding;
+        bh=riHdRnNo+HsesHIQ23avKTZJLiqbwQpIeEPOHREcZ0Y=;
+        b=Cq1UfjGRNaPdThyl557vlEKv6Cah3hl/CU+5AzdSsbiWcJQ59AJk033toCqfvXE/GaC4Ve
+        eTWtyKEaDIL5BvUwkqb4XvQC4DHeNo2I/+0MK1sbkusSYYt7RBEJMilHdGAc4J/jUncLPZ
+        VUjFMv1yZpCCANwJeVAQpqtQNNz+9T0NzAdjszaavMo5atxdsc/s3YWNQJ7MFxrBzndpwa
+        LlSzFO7E/gE1DzGmvB8ShgUP/d/5c+1WwG1vO7HEpKFFjfDRP72k/fMEPti+iFwEoY6hK9
+        2a7EEXNLL40h5ARpoRQdXyr17eH0ReWA2xpnQR9cbzpHwRnOmGrtiSGoT0LFGw==
 From:   development@manuel-bentele.de
 To:     linux-block@vger.kernel.org
 Cc:     Manuel Bentele <development@manuel-bentele.de>
-Subject: [PATCH 3/5] doc: driver-api: add loop file format subsystem API documentation
-Date:   Sat, 24 Aug 2019 00:56:17 +0200
-Message-Id: <20190823225619.15530-4-development@manuel-bentele.de>
-In-Reply-To: <20190823225619.15530-1-development@manuel-bentele.de>
-References: <20190823225619.15530-1-development@manuel-bentele.de>
+Subject: [PATCH 0/5] block: loop: add file format subsystem and QCOW2 file format driver
+Date:   Sat, 24 Aug 2019 00:56:14 +0200
+Message-Id: <20190823225619.15530-1-development@manuel-bentele.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=manuel-bentele.de; s=dkim; t=1566600981;
+        d=manuel-bentele.de; s=dkim; t=1566600979;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uXLbQgjGWhzcWqU3zQqfArsgI0EbAZYxCwHXS4sPZVM=;
-        b=NGzEcMqVUTN/0cu1ffMRn/KUTkLaPBxwkfFhEMfU36VIaRxXs4fXEmxSFBGHWebUmiBb+Z
-        CdA1dnrF1LssKLWlKTPFxtT4XUGKC9BqicKfhG1MXMCaCriRDV/kcifiUbg9QnlkYvnon5
-        H3KdDeUtGA+h9e3y+N7EZtvrO+swow4EgcvvZ/kyowYsrrAB4jTloJW3JspRV+cViEgrM8
-        8FXI0iI4pqb6Wvz1yUXVrqd29fOqcyQfELXwvR+x1s0CvNnmM23C4NyMlH7IMSu2IbXGVU
-        moWnrV9jA/tr4duibkFIveARtb/zoOptKE/b4whYqLi0CB8BQVHeufBjTXgByQ==
-ARC-Seal: i=1; s=dkim; d=manuel-bentele.de; t=1566600981; a=rsa-sha256;
+         content-transfer-encoding:content-transfer-encoding;
+        bh=riHdRnNo+HsesHIQ23avKTZJLiqbwQpIeEPOHREcZ0Y=;
+        b=NMEeUeUcfPH8POHiAgY9M3zflaf2t6oYT51jt2WAu018z0cF3Y7uLeduoWnRZrBC2zHJg5
+        xaoHQo3732aAqOwwmgo/IarsDA5t9a0NciG00lGhUfGVgImI5i336IpbNX0oRUp1nerCS1
+        fUFZmQ/YwaTYvLsaFOfkjb2Cmk0j5oHftcMlUDD0NeGNwzm1wq7WcYv28eyDxWzh/L+ctD
+        2oX3Qa3IlDr5f2mpMXmEnpksglLkJ1GrPY9E2EjfL7M3ASUZ5q1sp1HJPWWLIcivX5+mPz
+        QBdRdQNanIHpjKM/OT0t+1REOmA8dUmsD3ftOq/FwRYmDuJ5kRZwOodnC13ruQ==
+ARC-Seal: i=1; s=dkim; d=manuel-bentele.de; t=1566600979; a=rsa-sha256;
         cv=none;
-        b=rMSJbbZrC0YPYX9pAg6z/tXLd7zxD6xWy1tqjn3m7krogQ1QpekvYG0bJOCj3iOVsWI2xw
-        jAI6g68ONSvnwjexHT+mUGZx3D7qliCgvzdNkRUp2RCMr3EDnuNsuNcn/aFPvu8DCrvPrs
-        ePp0a+82NxbhoEdq28Ei5g/oi3H+qFH9hL9qZ37KmcA4gv5718CIQbU0b/EzJaoLFBtEqp
-        2NO6Gkb8GkKYjBrLwLRK5z5YEMJLN9BqPS2dd/rT/xcHQ/Wc7cgCNBPhsgKGsWw+sDeqXQ
-        FVxDENIdHt+LaA6y3JXU9fZww+YN0E7IRPQM3WWMUZ0WVMrLHv6PGrEkRrSUbA==
+        b=JSdCzF9gtl+ecYNE8es5lTWloEceQ/pMyJjZ6IxCoQcA1bfKkl8pJIYvcdxAqt1XcHPApO
+        3O0JWI9lxQ7FOPtXcwnbX3v4NA97giQkNYQGB6c0KPuKD1/ylrhoqffIIRm5DroX5Dwzra
+        P5nWYb+OVu3UuYagPYdurcOWmJePCo6d1K9lhR6B+aEowyarSpXqr9O4Cr9tQNRybwxZZp
+        p4rnYnppCsbd4or8xlcbgLGSFBIqlWmDMyG6SWfThZzBegcpPpkI10ufjpe4V7CcpIRR+8
+        FTnEaOUQU/WNUqvjL9TU+kGlbSYToZJuRKPeBMHPsod5aREzIw+vJIEn6BhRxg==
 ARC-Authentication-Results: i=1;
         host1.nc.manuel-bentele.de;
         auth=pass smtp.auth=development@manuel-bentele.de smtp.mailfrom=development@manuel-bentele.de
@@ -76,174 +71,318 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Manuel Bentele <development@manuel-bentele.de>
 
-The entire API of the file format subsystem for loop devices is documented
-in the reST kernel documentation format. The documentation deals with the
-description of the internal API of the file format subsystem to access its
-functionality and adds a section on how to write own loop file format
-drivers using the driver API of the subsystem.
+Hi
 
-Signed-off-by: Manuel Bentele <development@manuel-bentele.de>
----
- Documentation/driver-api/index.rst         |   1 +
- Documentation/driver-api/loop-file-fmt.rst | 137 +++++++++++++++++++++
- 2 files changed, 138 insertions(+)
+Regarding to the following discussion [1] on the mailing list I show you 
+the result of my work as announced at the end of the discussion [2].
+
+The discussion was about the project topic of how to implement the 
+reading/writing of QCOW2 in the kernel. The project focuses on an read-only 
+in-kernel QCOW2 implementation to increase the read/write performance 
+and tries to avoid nbd. Furthermore, the project is part of a project 
+series to develop a in-kernel network boot infrastructure that has no need 
+for any user space interaction (e.g. nbd) anymore.
+
+During the discussion, it turned out that the implementation as device 
+mapper target is not applicable. The device mapper stacks different 
+functionality such as compression or encryption on multiple block device 
+layers whereas an implementation for the QCOW2 container format provides 
+these functionalities on one block device layer. Using FUSE is also not 
+possible due to performance reasons and user space interaction.
+
+Therefore, I propose the extension of the loop device module. I created a 
+new file format subsystem which is part of the loop device module. The file 
+format subsystem abstracts the direct file access and provides an driver 
+API to implement various disk file formats such as QCOW2, VDI and VMDK. 
+File format drivers are implemented as kernel modules and can be registered 
+by the file format subsystem.
+
+The patch series contains documentation for the file format subsystem and 
+the loop device module, too. Also, it provides a default RAW file format 
+driver and a read-only QCOW2 driver. The RAW file format driver is based on 
+the file specific parts of the existing loop device implementation and 
+preserves the default behaviour of a loop device. More specific information 
+can be found in the commit logs of the following patches.
+
+Regards,
+Manuel
+
+[1] https://www.spinics.net/lists/linux-block/msg39538.html
+[2] https://www.spinics.net/lists/linux-block/msg40479.html
+
+Manuel Bentele (5):
+  block: loop: add file format subsystem for loop devices
+  doc: admin-guide: add loop block device documentation
+  doc: driver-api: add loop file format subsystem API documentation
+  block: loop: add QCOW2 loop file format driver (read-only)
+  doc: admin-guide: add QCOW2 file format to loop device documentation
+
+ Documentation/admin-guide/blockdev/index.rst  |   1 +
+ Documentation/admin-guide/blockdev/loop.rst   |  85 ++
+ Documentation/driver-api/index.rst            |   1 +
+ Documentation/driver-api/loop-file-fmt.rst    | 137 +++
+ arch/alpha/configs/defconfig                  |   1 +
+ arch/arc/configs/axs103_defconfig             |   1 +
+ arch/arc/configs/axs103_smp_defconfig         |   1 +
+ arch/arm/configs/am200epdkit_defconfig        |   1 +
+ arch/arm/configs/aspeed_g4_defconfig          |   1 +
+ arch/arm/configs/aspeed_g5_defconfig          |   1 +
+ arch/arm/configs/assabet_defconfig            |   1 +
+ arch/arm/configs/at91_dt_defconfig            |   1 +
+ arch/arm/configs/axm55xx_defconfig            |   1 +
+ arch/arm/configs/badge4_defconfig             |   1 +
+ arch/arm/configs/cerfcube_defconfig           |   1 +
+ arch/arm/configs/cm_x2xx_defconfig            |   1 +
+ arch/arm/configs/cm_x300_defconfig            |   1 +
+ arch/arm/configs/cns3420vb_defconfig          |   1 +
+ arch/arm/configs/colibri_pxa270_defconfig     |   1 +
+ arch/arm/configs/collie_defconfig             |   1 +
+ arch/arm/configs/corgi_defconfig              |   1 +
+ arch/arm/configs/davinci_all_defconfig        |   1 +
+ arch/arm/configs/dove_defconfig               |   1 +
+ arch/arm/configs/em_x270_defconfig            |   1 +
+ arch/arm/configs/eseries_pxa_defconfig        |   1 +
+ arch/arm/configs/exynos_defconfig             |   1 +
+ arch/arm/configs/ezx_defconfig                |   1 +
+ arch/arm/configs/footbridge_defconfig         |   1 +
+ arch/arm/configs/h3600_defconfig              |   1 +
+ arch/arm/configs/imote2_defconfig             |   1 +
+ arch/arm/configs/imx_v6_v7_defconfig          |   1 +
+ arch/arm/configs/integrator_defconfig         |   1 +
+ arch/arm/configs/iop32x_defconfig             |   1 +
+ arch/arm/configs/ixp4xx_defconfig             |   1 +
+ arch/arm/configs/jornada720_defconfig         |   1 +
+ arch/arm/configs/keystone_defconfig           |   1 +
+ arch/arm/configs/lpc32xx_defconfig            |   1 +
+ arch/arm/configs/milbeaut_m10v_defconfig      |   1 +
+ arch/arm/configs/mini2440_defconfig           |   1 +
+ arch/arm/configs/multi_v5_defconfig           |   1 +
+ arch/arm/configs/multi_v7_defconfig           |   1 +
+ arch/arm/configs/mv78xx0_defconfig            |   1 +
+ arch/arm/configs/mvebu_v5_defconfig           |   1 +
+ arch/arm/configs/netwinder_defconfig          |   1 +
+ arch/arm/configs/nhk8815_defconfig            |   1 +
+ arch/arm/configs/omap1_defconfig              |   1 +
+ arch/arm/configs/omap2plus_defconfig          |   1 +
+ arch/arm/configs/orion5x_defconfig            |   1 +
+ arch/arm/configs/oxnas_v6_defconfig           |   1 +
+ arch/arm/configs/palmz72_defconfig            |   1 +
+ arch/arm/configs/pleb_defconfig               |   1 +
+ arch/arm/configs/prima2_defconfig             |   1 +
+ arch/arm/configs/pxa3xx_defconfig             |   1 +
+ arch/arm/configs/pxa_defconfig                |   1 +
+ arch/arm/configs/qcom_defconfig               |   1 +
+ arch/arm/configs/rpc_defconfig                |   1 +
+ arch/arm/configs/s3c2410_defconfig            |   1 +
+ arch/arm/configs/s3c6400_defconfig            |   1 +
+ arch/arm/configs/s5pv210_defconfig            |   1 +
+ arch/arm/configs/sama5_defconfig              |   1 +
+ arch/arm/configs/simpad_defconfig             |   1 +
+ arch/arm/configs/socfpga_defconfig            |   1 +
+ arch/arm/configs/spitz_defconfig              |   1 +
+ arch/arm/configs/tango4_defconfig             |   1 +
+ arch/arm/configs/tegra_defconfig              |   1 +
+ arch/arm/configs/trizeps4_defconfig           |   1 +
+ arch/arm/configs/viper_defconfig              |   1 +
+ arch/arm/configs/zeus_defconfig               |   1 +
+ arch/arm/configs/zx_defconfig                 |   1 +
+ arch/arm64/configs/defconfig                  |   1 +
+ arch/c6x/configs/dsk6455_defconfig            |   1 +
+ arch/c6x/configs/evmc6457_defconfig           |   1 +
+ arch/c6x/configs/evmc6472_defconfig           |   1 +
+ arch/c6x/configs/evmc6474_defconfig           |   1 +
+ arch/c6x/configs/evmc6678_defconfig           |   1 +
+ arch/csky/configs/defconfig                   |   1 +
+ arch/hexagon/configs/comet_defconfig          |   1 +
+ arch/ia64/configs/bigsur_defconfig            |   1 +
+ arch/ia64/configs/generic_defconfig           |   1 +
+ arch/ia64/configs/gensparse_defconfig         |   1 +
+ arch/ia64/configs/tiger_defconfig             |   1 +
+ arch/ia64/configs/zx1_defconfig               |   1 +
+ arch/m68k/configs/amiga_defconfig             |   1 +
+ arch/m68k/configs/apollo_defconfig            |   1 +
+ arch/m68k/configs/atari_defconfig             |   1 +
+ arch/m68k/configs/bvme6000_defconfig          |   1 +
+ arch/m68k/configs/hp300_defconfig             |   1 +
+ arch/m68k/configs/mac_defconfig               |   1 +
+ arch/m68k/configs/multi_defconfig             |   1 +
+ arch/m68k/configs/mvme147_defconfig           |   1 +
+ arch/m68k/configs/mvme16x_defconfig           |   1 +
+ arch/m68k/configs/q40_defconfig               |   1 +
+ arch/m68k/configs/sun3_defconfig              |   1 +
+ arch/m68k/configs/sun3x_defconfig             |   1 +
+ arch/mips/configs/bigsur_defconfig            |   1 +
+ arch/mips/configs/cavium_octeon_defconfig     |   1 +
+ arch/mips/configs/cobalt_defconfig            |   1 +
+ arch/mips/configs/decstation_64_defconfig     |   1 +
+ arch/mips/configs/decstation_defconfig        |   1 +
+ arch/mips/configs/decstation_r4k_defconfig    |   1 +
+ arch/mips/configs/fuloong2e_defconfig         |   1 +
+ arch/mips/configs/generic/board-ocelot.config |   1 +
+ arch/mips/configs/gpr_defconfig               |   1 +
+ arch/mips/configs/ip27_defconfig              |   1 +
+ arch/mips/configs/ip32_defconfig              |   1 +
+ arch/mips/configs/jazz_defconfig              |   1 +
+ arch/mips/configs/lemote2f_defconfig          |   1 +
+ arch/mips/configs/loongson1b_defconfig        |   1 +
+ arch/mips/configs/loongson1c_defconfig        |   1 +
+ arch/mips/configs/loongson3_defconfig         |   1 +
+ arch/mips/configs/malta_defconfig             |   1 +
+ arch/mips/configs/malta_kvm_defconfig         |   1 +
+ arch/mips/configs/malta_kvm_guest_defconfig   |   1 +
+ arch/mips/configs/malta_qemu_32r6_defconfig   |   1 +
+ arch/mips/configs/maltaaprp_defconfig         |   1 +
+ arch/mips/configs/maltasmvp_defconfig         |   1 +
+ arch/mips/configs/maltasmvp_eva_defconfig     |   1 +
+ arch/mips/configs/maltaup_defconfig           |   1 +
+ arch/mips/configs/maltaup_xpa_defconfig       |   1 +
+ arch/mips/configs/markeins_defconfig          |   1 +
+ arch/mips/configs/mips_paravirt_defconfig     |   1 +
+ arch/mips/configs/nlm_xlp_defconfig           |   1 +
+ arch/mips/configs/nlm_xlr_defconfig           |   1 +
+ arch/mips/configs/pic32mzda_defconfig         |   1 +
+ arch/mips/configs/pistachio_defconfig         |   1 +
+ arch/mips/configs/pnx8335_stb225_defconfig    |   1 +
+ arch/mips/configs/rbtx49xx_defconfig          |   1 +
+ arch/mips/configs/rm200_defconfig             |   1 +
+ arch/mips/configs/tb0219_defconfig            |   1 +
+ arch/mips/configs/tb0226_defconfig            |   1 +
+ arch/mips/configs/tb0287_defconfig            |   1 +
+ arch/nios2/configs/10m50_defconfig            |   1 +
+ arch/nios2/configs/3c120_defconfig            |   1 +
+ arch/parisc/configs/712_defconfig             |   1 +
+ arch/parisc/configs/a500_defconfig            |   1 +
+ arch/parisc/configs/b180_defconfig            |   1 +
+ arch/parisc/configs/c3000_defconfig           |   1 +
+ arch/parisc/configs/c8000_defconfig           |   1 +
+ arch/parisc/configs/defconfig                 |   1 +
+ arch/parisc/configs/generic-32bit_defconfig   |   1 +
+ arch/parisc/configs/generic-64bit_defconfig   |   1 +
+ arch/powerpc/configs/40x/virtex_defconfig     |   1 +
+ arch/powerpc/configs/44x/sam440ep_defconfig   |   1 +
+ arch/powerpc/configs/44x/virtex5_defconfig    |   1 +
+ arch/powerpc/configs/52xx/cm5200_defconfig    |   1 +
+ arch/powerpc/configs/52xx/lite5200b_defconfig |   1 +
+ arch/powerpc/configs/52xx/motionpro_defconfig |   1 +
+ arch/powerpc/configs/52xx/tqm5200_defconfig   |   1 +
+ arch/powerpc/configs/83xx/asp8347_defconfig   |   1 +
+ .../configs/83xx/mpc8313_rdb_defconfig        |   1 +
+ .../configs/83xx/mpc8315_rdb_defconfig        |   1 +
+ .../configs/83xx/mpc832x_mds_defconfig        |   1 +
+ .../configs/83xx/mpc832x_rdb_defconfig        |   1 +
+ .../configs/83xx/mpc834x_itx_defconfig        |   1 +
+ .../configs/83xx/mpc834x_itxgp_defconfig      |   1 +
+ .../configs/83xx/mpc834x_mds_defconfig        |   1 +
+ .../configs/83xx/mpc836x_mds_defconfig        |   1 +
+ .../configs/83xx/mpc836x_rdk_defconfig        |   1 +
+ .../configs/83xx/mpc837x_mds_defconfig        |   1 +
+ .../configs/83xx/mpc837x_rdb_defconfig        |   1 +
+ arch/powerpc/configs/85xx/ge_imp3a_defconfig  |   1 +
+ arch/powerpc/configs/85xx/ksi8560_defconfig   |   1 +
+ .../configs/85xx/mpc8540_ads_defconfig        |   1 +
+ .../configs/85xx/mpc8560_ads_defconfig        |   1 +
+ .../configs/85xx/mpc85xx_cds_defconfig        |   1 +
+ arch/powerpc/configs/85xx/sbc8548_defconfig   |   1 +
+ arch/powerpc/configs/85xx/socrates_defconfig  |   1 +
+ arch/powerpc/configs/85xx/stx_gp3_defconfig   |   1 +
+ arch/powerpc/configs/85xx/tqm8540_defconfig   |   1 +
+ arch/powerpc/configs/85xx/tqm8541_defconfig   |   1 +
+ arch/powerpc/configs/85xx/tqm8548_defconfig   |   1 +
+ arch/powerpc/configs/85xx/tqm8555_defconfig   |   1 +
+ arch/powerpc/configs/85xx/tqm8560_defconfig   |   1 +
+ .../configs/85xx/xes_mpc85xx_defconfig        |   1 +
+ arch/powerpc/configs/amigaone_defconfig       |   1 +
+ arch/powerpc/configs/cell_defconfig           |   1 +
+ arch/powerpc/configs/chrp32_defconfig         |   1 +
+ arch/powerpc/configs/ep8248e_defconfig        |   1 +
+ arch/powerpc/configs/fsl-emb-nonhw.config     |   1 +
+ arch/powerpc/configs/g5_defconfig             |   1 +
+ arch/powerpc/configs/gamecube_defconfig       |   1 +
+ arch/powerpc/configs/holly_defconfig          |   1 +
+ arch/powerpc/configs/linkstation_defconfig    |   1 +
+ arch/powerpc/configs/mgcoge_defconfig         |   1 +
+ arch/powerpc/configs/mpc5200_defconfig        |   1 +
+ arch/powerpc/configs/mpc7448_hpc2_defconfig   |   1 +
+ arch/powerpc/configs/mpc8272_ads_defconfig    |   1 +
+ arch/powerpc/configs/mpc83xx_defconfig        |   1 +
+ arch/powerpc/configs/mpc866_ads_defconfig     |   1 +
+ arch/powerpc/configs/mvme5100_defconfig       |   1 +
+ arch/powerpc/configs/pasemi_defconfig         |   1 +
+ arch/powerpc/configs/pmac32_defconfig         |   1 +
+ arch/powerpc/configs/powernv_defconfig        |   1 +
+ arch/powerpc/configs/ppc64_defconfig          |   1 +
+ arch/powerpc/configs/ppc64e_defconfig         |   1 +
+ arch/powerpc/configs/ppc6xx_defconfig         |   1 +
+ arch/powerpc/configs/pq2fads_defconfig        |   1 +
+ arch/powerpc/configs/ps3_defconfig            |   1 +
+ arch/powerpc/configs/pseries_defconfig        |   1 +
+ arch/powerpc/configs/skiroot_defconfig        |   1 +
+ arch/powerpc/configs/wii_defconfig            |   1 +
+ arch/riscv/configs/defconfig                  |   1 +
+ arch/riscv/configs/rv32_defconfig             |   1 +
+ arch/s390/configs/debug_defconfig             |   1 +
+ arch/s390/configs/defconfig                   |   1 +
+ arch/sh/configs/cayman_defconfig              |   1 +
+ arch/sh/configs/landisk_defconfig             |   1 +
+ arch/sh/configs/lboxre2_defconfig             |   1 +
+ arch/sh/configs/rsk7264_defconfig             |   1 +
+ arch/sh/configs/sdk7780_defconfig             |   1 +
+ arch/sh/configs/sdk7786_defconfig             |   1 +
+ arch/sh/configs/se7206_defconfig              |   1 +
+ arch/sh/configs/se7780_defconfig              |   1 +
+ arch/sh/configs/sh03_defconfig                |   1 +
+ arch/sh/configs/sh2007_defconfig              |   1 +
+ arch/sh/configs/sh7785lcr_32bit_defconfig     |   1 +
+ arch/sh/configs/shmin_defconfig               |   1 +
+ arch/sh/configs/titan_defconfig               |   1 +
+ arch/sparc/configs/sparc32_defconfig          |   1 +
+ arch/sparc/configs/sparc64_defconfig          |   1 +
+ arch/um/configs/i386_defconfig                |   1 +
+ arch/um/configs/x86_64_defconfig              |   1 +
+ arch/unicore32/configs/defconfig              |   1 +
+ arch/x86/configs/i386_defconfig               |   1 +
+ arch/x86/configs/x86_64_defconfig             |   1 +
+ arch/xtensa/configs/audio_kc705_defconfig     |   1 +
+ arch/xtensa/configs/cadence_csp_defconfig     |   1 +
+ arch/xtensa/configs/generic_kc705_defconfig   |   1 +
+ arch/xtensa/configs/nommu_kc705_defconfig     |   1 +
+ arch/xtensa/configs/smp_lx200_defconfig       |   1 +
+ arch/xtensa/configs/virt_defconfig            |   1 +
+ drivers/block/Kconfig                         |  73 +-
+ drivers/block/Makefile                        |   4 +-
+ drivers/block/loop/Kconfig                    |  93 ++
+ drivers/block/loop/Makefile                   |  13 +
+ drivers/block/{ => loop}/cryptoloop.c         |   2 +-
+ drivers/block/loop/loop_file_fmt.c            | 328 ++++++
+ drivers/block/loop/loop_file_fmt.h            | 351 +++++++
+ drivers/block/loop/loop_file_fmt_qcow_cache.c | 218 ++++
+ drivers/block/loop/loop_file_fmt_qcow_cache.h |  51 +
+ .../block/loop/loop_file_fmt_qcow_cluster.c   | 270 +++++
+ .../block/loop/loop_file_fmt_qcow_cluster.h   |  23 +
+ drivers/block/loop/loop_file_fmt_qcow_main.c  | 945 ++++++++++++++++++
+ drivers/block/loop/loop_file_fmt_qcow_main.h  | 417 ++++++++
+ drivers/block/loop/loop_file_fmt_raw.c        | 449 +++++++++
+ drivers/block/{loop.c => loop/loop_main.c}    | 567 ++++-------
+ drivers/block/{loop.h => loop/loop_main.h}    |  14 +-
+ include/uapi/linux/loop.h                     |  14 +-
+ 248 files changed, 3861 insertions(+), 422 deletions(-)
+ create mode 100644 Documentation/admin-guide/blockdev/loop.rst
  create mode 100644 Documentation/driver-api/loop-file-fmt.rst
+ create mode 100644 drivers/block/loop/Kconfig
+ create mode 100644 drivers/block/loop/Makefile
+ rename drivers/block/{ => loop}/cryptoloop.c (99%)
+ create mode 100644 drivers/block/loop/loop_file_fmt.c
+ create mode 100644 drivers/block/loop/loop_file_fmt.h
+ create mode 100644 drivers/block/loop/loop_file_fmt_qcow_cache.c
+ create mode 100644 drivers/block/loop/loop_file_fmt_qcow_cache.h
+ create mode 100644 drivers/block/loop/loop_file_fmt_qcow_cluster.c
+ create mode 100644 drivers/block/loop/loop_file_fmt_qcow_cluster.h
+ create mode 100644 drivers/block/loop/loop_file_fmt_qcow_main.c
+ create mode 100644 drivers/block/loop/loop_file_fmt_qcow_main.h
+ create mode 100644 drivers/block/loop/loop_file_fmt_raw.c
+ rename drivers/block/{loop.c => loop/loop_main.c} (86%)
+ rename drivers/block/{loop.h => loop/loop_main.h} (92%)
 
-diff --git a/Documentation/driver-api/index.rst b/Documentation/driver-api/index.rst
-index 38e638abe3eb..88736bd668f3 100644
---- a/Documentation/driver-api/index.rst
-+++ b/Documentation/driver-api/index.rst
-@@ -51,6 +51,7 @@ available subsections can be seen below.
-    mmc/index
-    nvdimm/index
-    w1
-+   loop-file-fmt
-    rapidio/index
-    s390-drivers
-    vme
-diff --git a/Documentation/driver-api/loop-file-fmt.rst b/Documentation/driver-api/loop-file-fmt.rst
-new file mode 100644
-index 000000000000..1f47b19bdef0
---- /dev/null
-+++ b/Documentation/driver-api/loop-file-fmt.rst
-@@ -0,0 +1,137 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+===========================================
-+Loopback block device file format subsystem
-+===========================================
-+
-+This document outlines the file format subsystem used in the loopback block
-+device module. This subsystem deals with the abstraction of direct file access
-+to allow the implementation of various disk file formats. The subsystem can
-+handle ...
-+
-+   - read
-+   - write
-+   - discard
-+   - flush
-+   - sector size
-+
-+... operations of a loop device.
-+
-+Therefore, the subsystem provides an internal API for the loop device module to
-+access its functionality and exports a file format driver API to implement any
-+file format driver for loop devices.
-+
-+
-+Use the file format subsystem
-+=============================
-+
-+At the moment, the file format subsystem is only intended to be used from the
-+loopback device module to provide a specific file format implementation per
-+configured loop device. Therefore, the loop device module can use the following
-+internal file format API functions to set up loop file formats and access the
-+file format subsystem.
-+
-+
-+Internal subsystem API
-+----------------------
-+
-+.. kernel-doc:: drivers/block/loop/loop_file_fmt.h
-+   :functions: loop_file_fmt_alloc loop_file_fmt_free \
-+               loop_file_fmt_set_lo loop_file_fmt_get_lo
-+               loop_file_fmt_init loop_file_fmt_exit \
-+               loop_file_fmt_read loop_file_fmt_read_aio \
-+               loop_file_fmt_write loop_file_fmt_write_aio \
-+               loop_file_fmt_discard loop_file_fmt_flush \
-+               loop_file_fmt_sector_size loop_file_fmt_change
-+
-+
-+Finite state machine
-+--------------------
-+
-+To prevent a misuse of the internal file format API, the file format subsystem
-+implements an finite state machine. The state machine consists of two states
-+and a transition for each internal API function. The state
-+*file_fmt_uninitialized* of a loop file format denotes that the file format is
-+already allocated but not initialized. After the initialization, the file
-+format's state is set to *file_fmt_initialized*. In this state, all IO related
-+file format operations can be accessed.
-+
-+.. note:: If an internal API call does not succeed the file format's state \
-+          does not change accordingly to its transition and remains in the \
-+          original state before the API call.
-+
-+The entire implemented finite state machine looks like the following:
-+
-+.. kernel-render:: DOT
-+   :alt: loop file format states
-+   :caption: File format states and transitions
-+
-+   digraph file_fmt_states {
-+       rankdir = LR;
-+       node [ shape = point,        label = "" ] ENTRY, EXIT;
-+       node [ shape = circle,       label = "file_fmt_uninitialized" ] UN;
-+       node [ shape = doublecircle, label = "file_fmt_initialized" ]   IN;
-+       subgraph helper {
-+           rank = "same";
-+           ENTRY -> UN   [ label = "loop_file_fmt_alloc()" ];
-+           UN    -> EXIT [ label = "loop_file_fmt_free()" ];
-+       }
-+       UN    -> IN   [ label = "loop_file_fmt_init()" ];
-+       IN    -> UN   [ label = "loop_file_fmt_exit()" ];
-+       IN    -> IN   [ label = "loop_file_fmt_read()\nloop_file_fmt_read_aio()\nloop_file_fmt_write()\n loop_file_fmt_write_aio()\nloop_file_fmt_discard()\nloop_file_fmt_flush()\nloop_file_fmt_sector_size()\nloop_file_fmt_change()" ];
-+   }
-+
-+
-+Write file format drivers
-+=========================
-+
-+A file format driver for the loop file format subsystem is implemented as
-+kernel module. In the kernel module's code, the file format driver structure is
-+statically allocated and must be initialized. An example definition would look
-+like::
-+
-+   struct loop_file_fmt_driver raw_file_fmt_driver = {
-+       .name          = "RAW",
-+       .file_fmt_type = LO_FILE_FMT_RAW,
-+       .ops           = &raw_file_fmt_ops,
-+       .owner         = THIS_MODULE
-+   };
-+
-+The definition assigns a *name* to the file format driver. The *file_fmt_type*
-+field is set to the file format type that the driver implements. The *owner*
-+specifies the driver's owner and is used to lock the kernel module of the
-+driver if the file format driver is in use. The most important field of a loop
-+file format driver is the specification of its implementation. Therefore, the
-+*ops* field proposes all file format operations that the driver implement by
-+link to a statically allocated operations structure.
-+
-+.. note:: All fields of the **loop_file_fmt_driver** structure must be \
-+          initialized and set up accordingly, otherwise the driver does not \
-+          work properly.
-+
-+An example of such an operations structure looks like::
-+
-+   struct loop_file_fmt_ops raw_file_fmt_ops = {
-+       .init        = NULL,
-+       .exit        = NULL,
-+       .read        = raw_file_fmt_read,
-+       .write       = raw_file_fmt_write,
-+       .read_aio    = raw_file_fmt_read_aio,
-+       .write_aio   = raw_file_fmt_write_aio,
-+       .discard     = raw_file_fmt_discard,
-+       .flush       = raw_file_fmt_flush,
-+       .sector_size = raw_file_fmt_sector_size
-+   };
-+
-+The operations structure consists of a bunch of functions pointers which are
-+set in this example to some functions of the binary raw disk file format
-+implemented in the example driver. If a function is not available in the
-+driver's implementation the function pointer in the operations structure must
-+be set to *NULL*.
-+
-+If all definitions are available and set up correctly the driver can be
-+registered and later on unregistered by using the following functions exported
-+by the file format subsystem:
-+
-+.. kernel-doc:: drivers/block/loop/loop_file_fmt.h
-+   :functions: loop_file_fmt_register_driver loop_file_fmt_unregister_driver
 -- 
 2.23.0
 
