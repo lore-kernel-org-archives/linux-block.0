@@ -2,154 +2,158 @@ Return-Path: <SRS0=MRnn=WT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4617AC3A5A4
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 00:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A04A1C3A5A1
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 01:04:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A09023401
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 00:50:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="qjJP3CPD"
+	by mail.kernel.org (Postfix) with ESMTP id 753C82173E
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 01:04:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731436AbfHWAuu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Aug 2019 20:50:50 -0400
-Received: from mailout3.samsung.com ([203.254.224.33]:38832 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731521AbfHWAuu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Aug 2019 20:50:50 -0400
-Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190823005045epoutp03cb2b3a33f92a14911610b59d64a5b2d4~9ZvRk74Oz2268722687epoutp03C
-        for <linux-block@vger.kernel.org>; Fri, 23 Aug 2019 00:50:45 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190823005045epoutp03cb2b3a33f92a14911610b59d64a5b2d4~9ZvRk74Oz2268722687epoutp03C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1566521445;
-        bh=f2ThUHwqU6SxyDkaBykTiPQlcm0wcRMy3IpQiQiChcs=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=qjJP3CPDZUoPqC+TllhSHlEzayDCNEEA/ZeZhRffZlSa6IWzZNyyy/WghomGNCSH3
-         Ll12acSDQNebr7Gm85XsT73lLM+iAcMPvCd+fTuz8IXicflKfBccxTrV2stA77r50K
-         SbznIaYWExt+HtvjAggHXAnol3/leqScWyxLjaic=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas2p4.samsung.com (KnoxPortal) with ESMTP id
-        20190823005044epcas2p4d26d2085b61ee54bd5954b1c574ebbe6~9ZvRA3S2Y1951719517epcas2p4w;
-        Fri, 23 Aug 2019 00:50:44 +0000 (GMT)
-Received: from epsmges2p2.samsung.com (unknown [182.195.40.184]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 46F2rL3vD7zMqYkk; Fri, 23 Aug
-        2019 00:50:42 +0000 (GMT)
-Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
-        epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        5E.38.04149.2683F5D5; Fri, 23 Aug 2019 09:50:42 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas2p3.samsung.com (KnoxPortal) with ESMTPA id
-        20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6~9ZvObUZVL1059310593epcas2p3U;
-        Fri, 23 Aug 2019 00:50:41 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20190823005041epsmtrp1e67b842e0eeb29d74f2dcb22b227f249~9ZvOaIzfb2194621946epsmtrp1o;
-        Fri, 23 Aug 2019 00:50:41 +0000 (GMT)
-X-AuditID: b6c32a46-fd5ff70000001035-b2-5d5f38625f08
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        F7.1A.03706.1683F5D5; Fri, 23 Aug 2019 09:50:41 +0900 (KST)
-Received: from KORDO035251 (unknown [12.36.165.204]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20190823005041epsmtip2748af0669304060f493849067826a76f~9ZvOI_Fjj0682606826epsmtip2h;
-        Fri, 23 Aug 2019 00:50:41 +0000 (GMT)
-From:   "boojin.kim" <boojin.kim@samsung.com>
-To:     "'Krzysztof Kozlowski'" <krzk@kernel.org>
-Cc:     "'Herbert Xu'" <herbert@gondor.apana.org.au>,
-        "'David S. Miller'" <davem@davemloft.net>,
-        "'Eric Biggers'" <ebiggers@kernel.org>,
-        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
-        "'Chao Yu'" <chao@kernel.org>,
-        "'Jaegeuk Kim'" <jaegeuk@kernel.org>,
-        "'Andreas Dilger'" <adilger.kernel@dilger.ca>,
-        "'Theodore Ts'o'" <tytso@mit.edu>, <dm-devel@redhat.com>,
-        "'Mike Snitzer'" <snitzer@redhat.com>,
-        "'Alasdair Kergon'" <agk@redhat.com>,
-        "'Jens Axboe'" <axboe@kernel.dk>,
-        "'Krzysztof Kozlowski'" <krzk@kernel.org>,
-        "'Kukjin Kim'" <kgene@kernel.org>,
-        "'Jaehoon Chung'" <jh80.chung@samsung.com>,
-        "'Ulf Hansson'" <ulf.hansson@linaro.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-fscrypt@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <linux-samsung-soc@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-ext4@vger.kernel.org>,
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        <linux-samsung-soc@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH 1/9] crypt: Add diskcipher
-Date:   Fri, 23 Aug 2019 09:50:41 +0900
-Message-ID: <00da01d5594c$c9d87390$5d895ab0$@samsung.com>
+        id S1732179AbfHWBEW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Aug 2019 21:04:22 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33546 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730401AbfHWBEW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Aug 2019 21:04:22 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 96BE2AEF3;
+        Fri, 23 Aug 2019 01:04:20 +0000 (UTC)
+From:   NeilBrown <neilb@suse.com>
+To:     Jianchao Wang <jianchao.wan9@gmail.com>,
+        linux-block@vger.kernel.org, linux-raid@vger.kernel.org
+Date:   Fri, 23 Aug 2019 11:04:13 +1000
+Subject: Re: Issues about the merge_bvec_fn callback in 3.10 series
+In-Reply-To: <e93566fe-febf-5e99-d3e9-96a0c1f6ba13@gmail.com>
+References: <S1732749AbfE3EBS/20190530040119Z+834@vger.kernel.org> <e93566fe-febf-5e99-d3e9-96a0c1f6ba13@gmail.com>
+Message-ID: <878srkheuq.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 14.0
-Thread-Index: AdVZTE1TDvDE+uWuReO+5O58h7ifGg==
-Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprFLsWRmVeSWpSXmKPExsWy7bCmhW6SRXysweKVkhZfv3SwWKw/dYzZ
-        YvXdfjaL01PPMlnMOd/CYrH33WxWi7V7/jBbdL+SsXiyfhazxY1fbawW/Y9fM1ucP7+B3WLT
-        42usFntvaVvcv/eTyWLmvDtsFpcWuVu8mveNxWLP3pMsFpd3zWGzOPK/n9Fixvl9TBZtG78y
-        WrT2/GS3OL423EHSY8vKm0weLZvLPbYdUPW4fLbUY9OqTjaPO9f2sHlsXlLvsXvBZyaPpjNH
-        mT3e77vK5tG3ZRWjx+dNcgE8UTk2GamJKalFCql5yfkpmXnptkrewfHO8aZmBoa6hpYW5koK
-        eYm5qbZKLj4Bum6ZOUC/KymUJeaUAoUCEouLlfTtbIryS0tSFTLyi0tslVILUnIKDA0L9IoT
-        c4tL89L1kvNzrQwNDIxMgSoTcjI6Ly5kKvjFXLFyz1PWBsaJzF2MnBwSAiYSL6bdBLK5OIQE
-        djBKHLn/Csr5xCix9PRDFgjnG6PEowUX2GFafl3vYoNI7GWUuPn/HVTLS0aJna+nsoBUsQlo
-        S2w+vooRxBYR0JXYfGM5O0gRs8A/doknnw6BFQkL6EnMeLCYCcRmEVCV2PysF2gsBwevgKXE
-        q49qIGFeAUGJkzOfgJUzC8hLbH87B+pwBYkdZ19DzdeTeN4xnR2iRkRidmcb2EESAj/ZJSb9
-        ameBaHCR6JtwBcoWlnh1fAvUO1ISL/vboOx6iavLFrNDNPcwSpz5BZMwlpj1rJ0R5DhmAU2J
-        9bv0QUwJAWWJI7egbuOT6Dj8lx0izCvR0SYE0agiMffTZSaIsJTEh546iLCHRPPBDrYJjIqz
-        kDw5C8mTs5A8Mwth7QJGllWMYqkFxbnpqcVGBUbIkb2JEZwvtNx2MC4553OIUYCDUYmHt6Aj
-        LlaINbGsuDL3EKMEB7OSCG/ZRKAQb0piZVVqUX58UWlOavEhRlNgFExklhJNzgfmsrySeENT
-        IzMzA0tTC1MzIwslcd5N3DdjhATSE0tSs1NTC1KLYPqYODilGhhb2VZ9bj/4j9m9Iuf7vUUs
-        J3MWHf0j1lTS2eO4QTdzw8b5G6K8pjDqvjtzN9nhxX13G1vnkq0G1TZrtL/4bHvHupRDP5rx
-        VqSo+KHqV+sObK02DLrOElD9o+/Xi+W1bfOcdJRutyZXXz9cM4dTcjbnAX/x5gzHh1uvntDf
-        efu79KO5c470TF6hxFKckWioxVxUnAgA7+Q96S0EAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrFIsWRmVeSWpSXmKPExsWy7bCSvG6iRXyswZrzuhZfv3SwWKw/dYzZ
-        YvXdfjaL01PPMlnMOd/CYrH33WxWi7V7/jBbdL+SsXiyfhazxY1fbawW/Y9fM1ucP7+B3WLT
-        42usFntvaVvcv/eTyWLmvDtsFpcWuVu8mveNxWLP3pMsFpd3zWGzOPK/n9Fixvl9TBZtG78y
-        WrT2/GS3OL423EHSY8vKm0weLZvLPbYdUPW4fLbUY9OqTjaPO9f2sHlsXlLvsXvBZyaPpjNH
-        mT3e77vK5tG3ZRWjx+dNcgE8UVw2Kak5mWWpRfp2CVwZnRcXMhX8Yq5YuecpawPjROYuRk4O
-        CQETiV/Xu9i6GLk4hAR2M0qc+72aHSIhJbG1fQ9UkbDE/ZYjrBBFzxklDhw4BVbEJqAtsfn4
-        KkYQW0RAV2LzjeVgcWaBaRwSuz6Ig9jCAnoSMx4sZgKxWQRUJTY/6wXaxsHBK2Ap8eqjGkiY
-        V0BQ4uTMJywgYWag8raNjBBT5CW2v50DdYKCxI6zr6E26Uk875gOtUlEYnZnG/MERsFZSCbN
-        Qpg0C8mkWUg6FjCyrGKUTC0ozk3PLTYsMMxLLdcrTswtLs1L10vOz93ECE4BWpo7GC8viT/E
-        KMDBqMTDW9ARFyvEmlhWXJl7iFGCg1lJhLdsIlCINyWxsiq1KD++qDQntfgQozQHi5I479O8
-        Y5FCAumJJanZqakFqUUwWSYOTqkGxpkCz5+oMws9PX3b/Iwkf+SF3W8rQ53jHge67jXfcttX
-        XfWf/YkDt2PWHm6XO/JJRet0fPHMFRtncfxadl8yhy+f9dwq5ZWcKeFMbiHrX7L3Sj37OZvd
-        4obsuk/CfvZi882OzLqbKXEtsXAff8/CwM0+Hnof3BSz71z2LO/ouybA31ka2n+AWYmlOCPR
-        UIu5qDgRAIuCqND9AgAA
-X-CMS-MailID: 20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6
-References: <CGME20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6@epcas2p3.samsung.com>
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 22 Aug 2019 at 17:37, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Aug 21 2019, Jianchao Wang wrote:
+
+> Hi dear all
 >
-> Your patch looks corrupted - wrapped by mailer. The easiest way
-> usually is to use git format-patch and git send-email - then you do
-> not have to worry about formatting etc.
+> This is a question in older kernel versions.
 >
-> Best regards,
-> Krzysztof
+> We are using 3.10 series kernel in our production. And we encountered iss=
+ue as below,
+>
+> When add a page into a bio, .merge_bvec_fn will be invoked down to the bo=
+ttom,
+> and the bio->bi_rw would be saved into bvec_merge_data.bi_rw as the follo=
+wing code,
+>
+> __bio_add_page
+> ---
+> 	if (q->merge_bvec_fn) {
+> 		struct  bvm =3D {
+> 			.bi_bdev =3D bio->bi_bdev,
+> 			.bi_sector =3D bio->bi_iter.bi_sector,
+> 			.bi_size =3D bio->bi_iter.bi_size,
+> 			.bi_rw =3D bio->bi_rw,
+> 		};
+>
+> 		/*
+> 		 * merge_bvec_fn() returns number of bytes it can accept
+> 		 * at this offset
+> 		 */
+> 		if (q->merge_bvec_fn(q, &bvm, bvec) < bvec->bv_len) {
+> 			bvec->bv_page =3D NULL;
+> 			bvec->bv_len =3D 0;
+> 			bvec->bv_offset =3D 0;
+> 			return 0;
+> 		}
+> 	}
+> ---
+>
+> However, it seems that the bio->bi_rw has not been set at the moment (set=
+ by submit_bio),=20
+> so it is always zero.
 
-I'm using outlook instead of 'git send-email' because of workplace policy.
-It's probably broken when I copied the code.
-Thanks for your notice. I will be more careful.
+Yeah, that's a problem.
 
-Thanks for your reply
-Boojin Kim.
+>
+> We have a raid5 and the raid5_mergeable_bvec would always handle the writ=
+e as read and then
+> we always get a write bio with a stripe chunk size which is not expected =
+and would degrade the
+> performance. This is code,
+>
+> raid5_mergeable_bvec
+> ---
+> 	if ((bvm->bi_rw & 1) =3D=3D WRITE)
+> 		return biovec->bv_len; /* always allow writes to be mergeable */
+>
+> 	if (mddev->new_chunk_sectors < mddev->chunk_sectors)
+> 		chunk_sectors =3D mddev->new_chunk_sectors;
+> 	max =3D  (chunk_sectors - ((sector & (chunk_sectors - 1)) + bio_sectors)=
+) << 9;
+> 	if (max < 0) max =3D 0;
+> 	if (max <=3D biovec->bv_len && bio_sectors =3D=3D 0)
+> 		return biovec->bv_len;
+> 	else
+> 		return max;
+>
+> ---
+>
+> I have checked=20=20=20
+> v3.10.108
+> v3.18.140
+> v4.1.49
+> but there seems not fix for it.
+>
+> And maybe it would be fixed until=20
+> 8ae126660fddbeebb9251a174e6fa45b6ad8f932
+> block: kill merge_bvec_fn() completely
+>
+> Would anyone please give some suggestion on this ?
 
+One option would be to make sure that ->bi_rw is set before
+bio_add_page is called.
+There are about 80 calls, so that isn't trivial, but you might not care
+about several of them.
+
+You could backport the 'kill merge_bvec_fn' patch if you like, but I
+wouldn't.  The change of introducing a bug is much higher.
+
+NeilBrown
+
+
+> Any comment will be welcomed.
+>
+> Thanks in advance
+> Jianchao
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAl1fO40ACgkQOeye3VZi
+gbnPuhAAw9AVIrNm82y9sI3q39S4Oka6YICVerF4ZtVvGUMUS7BtwVF1IY9md7gr
+7++hb36y9njAviHpOxiL6kg2FH0J7tS8iWyi+ia9v1+hqT6MzdrBqqlsE7V/rdts
+MnYZEOkQrrmZuqSUPzp29BlIcngQyiXKWdTek6rhr5XGM/WNaPGiemWD3Rc99Ukk
+z3EYj1oo+60CNPYnNHUji1nXCMz2eZ4jN3spHIQdc2w7+vOA3QqwY/rLLvVgyVob
+92zTE9B+XPktjajKA9yrIXbtWB4+peABQ+FDxiRmzoE3gRH4sQsRE9+rEatMhoFr
+lE2rp2xWhVdrkkGyNAqfKYUSOKgMorE6zod+MSWw7okH5XzMcqDtGmIC9Bt+seAe
+RdFvKkDHDFUiSrEmFzSpVSHqUEwze8x7LHLOhV8xczXeLZuKayl2yXHYqOuceXTC
+/Spqlr70QK7+WXXjCuHXS8a1Mh9fD/EdhoqMh11Uot+sYkMVKYFVZNuyVDteKTiX
+pqz6tNSmNydFME0lXakvLFydONBhFRsntNsGrwFkBhqrb0CBHBIMfv5i2ubouGhN
+Bn6spG65dJkA2TZ1wsQ9Yg4hAxlCfkZA6S1O+08RQvIUk40VJPk/HmyQyy6LsZet
+a98tkJTYhTx+dL2DHMR3EJXiw9wJ5DwyuyXLQXmiddgW4oYFFVE=
+=RCE3
+-----END PGP SIGNATURE-----
+--=-=-=--
