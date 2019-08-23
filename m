@@ -2,169 +2,154 @@ Return-Path: <SRS0=MRnn=WT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA15C3A5A3
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 00:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4617AC3A5A4
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 00:50:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9489A2173E
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 00:15:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A09023401
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 00:50:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GYlhlWf9"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="qjJP3CPD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728297AbfHWAPg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Aug 2019 20:15:36 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:30877 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728224AbfHWAPg (ORCPT
+        id S1731436AbfHWAuu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Aug 2019 20:50:50 -0400
+Received: from mailout3.samsung.com ([203.254.224.33]:38832 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731521AbfHWAuu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Aug 2019 20:15:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1566519335; x=1598055335;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=gtr27q1T5jaqplfXgBqq2AoDZe91muleoBZ33dLpJ34=;
-  b=GYlhlWf9hObVEJLOr+u3qThdicBn5b9hrMLHfRQxYQ+6sGUbxwldfWpR
-   +5MLXARBYIvjbG37YutkkLu8mkYJdChjfhsYQ/PtfV8BYx1Qd/vPt3Kvu
-   YM70btNIkRyzn2vhyRoNc9DFGAgZ0DyBmN5BY52ZjEvXnH1BZc3IvzlRz
-   ZwEdnRoj9E14p5NBOAW+cY6EsaAE2WY4cg1gD6OTWV/deG0GQtZjeg96j
-   MBD0fnGLxGMYeRsDajyAM07gjgy9bFU5G2wuFspMHbj0/B1GJl7gOQbwm
-   c4ClfXb5feCnsoQqQpF3WtQmR5LW5QaCbZRhT5UPYbEVmfeijzJSjYcvn
-   w==;
-IronPort-SDR: mF9kPbEBb88pRuND6oE98yWOuoqMDOOXm2/ijr296mOxg4PwjvFWDrsE/FZ5Esv+K6nT7VnP83
- OoM25q7exJC1rdLNBp+6Yo3GhEKug+D8cXNH+NyazsbPK1aXRnY2e/pq7l8/I2zbtl23/b+n+Z
- W5UWhnwNrCJF8rS7oKeU9lxqhyMQpGu75Y+8fu1oJ//KdqhdO2OrErWoYbRyltdsOs4OWgZ3zQ
- 1+lIzMphm5WVk3TC/224dWidOLT/0YROKipzWdHnpxxZkd5n0l3ONkzqAMApBLK+iTy2Cn1tv0
- kMg=
-X-IronPort-AV: E=Sophos;i="5.64,419,1559491200"; 
-   d="scan'208";a="121063671"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 23 Aug 2019 08:15:34 +0800
-IronPort-SDR: zHbvVgtDShhXEAn2vXNsnwmtc5+BUT/PnUrjB7rawW9KJOJS7oshFXL69w+tW9IgnDAHqRyScV
- d5GAOXsR9HpzuI8lTxy+gWlYqsjABK5rDmANh23TXVMnZta0ZauYzjX2m14B/rClH9aAooCC+x
- SIaObDONXMT/J7gdDveCErxkdosF8CdqeVMNoYjBUMlxKmX4Min8FD5yeNT9//A7Pv2ZT+eG+K
- 0J3kiG0uIfUTY5aNgBrzdV0FLTt1E0EbWMIJWCTVBm4GLL43bBxBLP8QhKSyDVORMy/RtotzVa
- xQ/A49XPo5LTdcAWBHX8IaT0
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2019 17:12:53 -0700
-IronPort-SDR: TDSawHVk5v+e/BdIxiCgG7NHjWRW2BqiIed+YnI4kpFP8OV9iISCK5/khNrM8ymTn2AvRxssET
- 443VsbVND3HjV87R9dD2yRWGaAEmnCv3zZ0QYJcoq2FmwkwvHKWSrQ1SvoX/O96z+qzoKt+qB2
- dFC/jrbQoDlzXRCAmVQpRplsLPpIkt7Fwoft7VYKfzaLVZvnE78spGJvwWFwzYzsXwVoFBKmbA
- 4h9Tqt5iA1s9qDhMQHTbX1MvPChQLYun5rOsRxKSpnuKC3t0Oyx8w51JMwgyQjH+G7vgZLPKtK
- Z58=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 22 Aug 2019 17:15:33 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 6/7] block: Improve default elevator selection
-Date:   Fri, 23 Aug 2019 09:15:27 +0900
-Message-Id: <20190823001528.5673-7-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190823001528.5673-1-damien.lemoal@wdc.com>
-References: <20190823001528.5673-1-damien.lemoal@wdc.com>
+        Thu, 22 Aug 2019 20:50:50 -0400
+Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190823005045epoutp03cb2b3a33f92a14911610b59d64a5b2d4~9ZvRk74Oz2268722687epoutp03C
+        for <linux-block@vger.kernel.org>; Fri, 23 Aug 2019 00:50:45 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190823005045epoutp03cb2b3a33f92a14911610b59d64a5b2d4~9ZvRk74Oz2268722687epoutp03C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1566521445;
+        bh=f2ThUHwqU6SxyDkaBykTiPQlcm0wcRMy3IpQiQiChcs=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=qjJP3CPDZUoPqC+TllhSHlEzayDCNEEA/ZeZhRffZlSa6IWzZNyyy/WghomGNCSH3
+         Ll12acSDQNebr7Gm85XsT73lLM+iAcMPvCd+fTuz8IXicflKfBccxTrV2stA77r50K
+         SbznIaYWExt+HtvjAggHXAnol3/leqScWyxLjaic=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas2p4.samsung.com (KnoxPortal) with ESMTP id
+        20190823005044epcas2p4d26d2085b61ee54bd5954b1c574ebbe6~9ZvRA3S2Y1951719517epcas2p4w;
+        Fri, 23 Aug 2019 00:50:44 +0000 (GMT)
+Received: from epsmges2p2.samsung.com (unknown [182.195.40.184]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 46F2rL3vD7zMqYkk; Fri, 23 Aug
+        2019 00:50:42 +0000 (GMT)
+Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
+        epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        5E.38.04149.2683F5D5; Fri, 23 Aug 2019 09:50:42 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas2p3.samsung.com (KnoxPortal) with ESMTPA id
+        20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6~9ZvObUZVL1059310593epcas2p3U;
+        Fri, 23 Aug 2019 00:50:41 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20190823005041epsmtrp1e67b842e0eeb29d74f2dcb22b227f249~9ZvOaIzfb2194621946epsmtrp1o;
+        Fri, 23 Aug 2019 00:50:41 +0000 (GMT)
+X-AuditID: b6c32a46-fd5ff70000001035-b2-5d5f38625f08
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F7.1A.03706.1683F5D5; Fri, 23 Aug 2019 09:50:41 +0900 (KST)
+Received: from KORDO035251 (unknown [12.36.165.204]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20190823005041epsmtip2748af0669304060f493849067826a76f~9ZvOI_Fjj0682606826epsmtip2h;
+        Fri, 23 Aug 2019 00:50:41 +0000 (GMT)
+From:   "boojin.kim" <boojin.kim@samsung.com>
+To:     "'Krzysztof Kozlowski'" <krzk@kernel.org>
+Cc:     "'Herbert Xu'" <herbert@gondor.apana.org.au>,
+        "'David S. Miller'" <davem@davemloft.net>,
+        "'Eric Biggers'" <ebiggers@kernel.org>,
+        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
+        "'Chao Yu'" <chao@kernel.org>,
+        "'Jaegeuk Kim'" <jaegeuk@kernel.org>,
+        "'Andreas Dilger'" <adilger.kernel@dilger.ca>,
+        "'Theodore Ts'o'" <tytso@mit.edu>, <dm-devel@redhat.com>,
+        "'Mike Snitzer'" <snitzer@redhat.com>,
+        "'Alasdair Kergon'" <agk@redhat.com>,
+        "'Jens Axboe'" <axboe@kernel.dk>,
+        "'Krzysztof Kozlowski'" <krzk@kernel.org>,
+        "'Kukjin Kim'" <kgene@kernel.org>,
+        "'Jaehoon Chung'" <jh80.chung@samsung.com>,
+        "'Ulf Hansson'" <ulf.hansson@linaro.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-fscrypt@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <linux-samsung-soc@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-ext4@vger.kernel.org>,
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        <linux-samsung-soc@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH 1/9] crypt: Add diskcipher
+Date:   Fri, 23 Aug 2019 09:50:41 +0900
+Message-ID: <00da01d5594c$c9d87390$5d895ab0$@samsung.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 14.0
+Thread-Index: AdVZTE1TDvDE+uWuReO+5O58h7ifGg==
+Content-Language: ko
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprFLsWRmVeSWpSXmKPExsWy7bCmhW6SRXysweKVkhZfv3SwWKw/dYzZ
+        YvXdfjaL01PPMlnMOd/CYrH33WxWi7V7/jBbdL+SsXiyfhazxY1fbawW/Y9fM1ucP7+B3WLT
+        42usFntvaVvcv/eTyWLmvDtsFpcWuVu8mveNxWLP3pMsFpd3zWGzOPK/n9Fixvl9TBZtG78y
+        WrT2/GS3OL423EHSY8vKm0weLZvLPbYdUPW4fLbUY9OqTjaPO9f2sHlsXlLvsXvBZyaPpjNH
+        mT3e77vK5tG3ZRWjx+dNcgE8UTk2GamJKalFCql5yfkpmXnptkrewfHO8aZmBoa6hpYW5koK
+        eYm5qbZKLj4Bum6ZOUC/KymUJeaUAoUCEouLlfTtbIryS0tSFTLyi0tslVILUnIKDA0L9IoT
+        c4tL89L1kvNzrQwNDIxMgSoTcjI6Ly5kKvjFXLFyz1PWBsaJzF2MnBwSAiYSL6bdBLK5OIQE
+        djBKHLn/Csr5xCix9PRDFgjnG6PEowUX2GFafl3vYoNI7GWUuPn/HVTLS0aJna+nsoBUsQlo
+        S2w+vooRxBYR0JXYfGM5O0gRs8A/doknnw6BFQkL6EnMeLCYCcRmEVCV2PysF2gsBwevgKXE
+        q49qIGFeAUGJkzOfgJUzC8hLbH87B+pwBYkdZ19DzdeTeN4xnR2iRkRidmcb2EESAj/ZJSb9
+        ameBaHCR6JtwBcoWlnh1fAvUO1ISL/vboOx6iavLFrNDNPcwSpz5BZMwlpj1rJ0R5DhmAU2J
+        9bv0QUwJAWWJI7egbuOT6Dj8lx0izCvR0SYE0agiMffTZSaIsJTEh546iLCHRPPBDrYJjIqz
+        kDw5C8mTs5A8Mwth7QJGllWMYqkFxbnpqcVGBUbIkb2JEZwvtNx2MC4553OIUYCDUYmHt6Aj
+        LlaINbGsuDL3EKMEB7OSCG/ZRKAQb0piZVVqUX58UWlOavEhRlNgFExklhJNzgfmsrySeENT
+        IzMzA0tTC1MzIwslcd5N3DdjhATSE0tSs1NTC1KLYPqYODilGhhb2VZ9bj/4j9m9Iuf7vUUs
+        J3MWHf0j1lTS2eO4QTdzw8b5G6K8pjDqvjtzN9nhxX13G1vnkq0G1TZrtL/4bHvHupRDP5rx
+        VqSo+KHqV+sObK02DLrOElD9o+/Xi+W1bfOcdJRutyZXXz9cM4dTcjbnAX/x5gzHh1uvntDf
+        efu79KO5c470TF6hxFKckWioxVxUnAgA7+Q96S0EAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrFIsWRmVeSWpSXmKPExsWy7bCSvG6iRXyswZrzuhZfv3SwWKw/dYzZ
+        YvXdfjaL01PPMlnMOd/CYrH33WxWi7V7/jBbdL+SsXiyfhazxY1fbawW/Y9fM1ucP7+B3WLT
+        42usFntvaVvcv/eTyWLmvDtsFpcWuVu8mveNxWLP3pMsFpd3zWGzOPK/n9Fixvl9TBZtG78y
+        WrT2/GS3OL423EHSY8vKm0weLZvLPbYdUPW4fLbUY9OqTjaPO9f2sHlsXlLvsXvBZyaPpjNH
+        mT3e77vK5tG3ZRWjx+dNcgE8UVw2Kak5mWWpRfp2CVwZnRcXMhX8Yq5YuecpawPjROYuRk4O
+        CQETiV/Xu9i6GLk4hAR2M0qc+72aHSIhJbG1fQ9UkbDE/ZYjrBBFzxklDhw4BVbEJqAtsfn4
+        KkYQW0RAV2LzjeVgcWaBaRwSuz6Ig9jCAnoSMx4sZgKxWQRUJTY/6wXaxsHBK2Ap8eqjGkiY
+        V0BQ4uTMJywgYWag8raNjBBT5CW2v50DdYKCxI6zr6E26Uk875gOtUlEYnZnG/MERsFZSCbN
+        Qpg0C8mkWUg6FjCyrGKUTC0ozk3PLTYsMMxLLdcrTswtLs1L10vOz93ECE4BWpo7GC8viT/E
+        KMDBqMTDW9ARFyvEmlhWXJl7iFGCg1lJhLdsIlCINyWxsiq1KD++qDQntfgQozQHi5I479O8
+        Y5FCAumJJanZqakFqUUwWSYOTqkGxpkCz5+oMws9PX3b/Iwkf+SF3W8rQ53jHge67jXfcttX
+        XfWf/YkDt2PWHm6XO/JJRet0fPHMFRtncfxadl8yhy+f9dwq5ZWcKeFMbiHrX7L3Sj37OZvd
+        4obsuk/CfvZi882OzLqbKXEtsXAff8/CwM0+Hnof3BSz71z2LO/ouybA31ka2n+AWYmlOCPR
+        UIu5qDgRAIuCqND9AgAA
+X-CMS-MailID: 20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6
+References: <CGME20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6@epcas2p3.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For block devices that do not specify required features, preserve the
-current default elevator selection (mq-deadline for single queue
-devices, none for multi-queue devices). For devices specifying a
-required feature (e.g. zoned block devices ELEVATOR_F_ZONED_BLOCK_DEV
-feature), select the first available elevator providing the required
-features. In all cases, default to "none" if no elevator is available or
-if the initialization of the default elevator fails.
+On Wed, 22 Aug 2019 at 17:37, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>
+> Your patch looks corrupted - wrapped by mailer. The easiest way
+> usually is to use git format-patch and git send-email - then you do
+> not have to worry about formatting etc.
+>
+> Best regards,
+> Krzysztof
 
-This change allows in particular the selection of the correct
-mq-deadline elevator for zoned block devices that are also multi-queue,
-such as null_blk devices with zoned mode enabled or any SMR disk
-connected to a smartpqi HBA (and exposed as multi-queue devices by the
-HBA).
+I'm using outlook instead of 'git send-email' because of workplace policy.
+It's probably broken when I copied the code.
+Thanks for your notice. I will be more careful.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/elevator.c | 50 +++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 45 insertions(+), 5 deletions(-)
-
-diff --git a/block/elevator.c b/block/elevator.c
-index de11beb32893..ec75dfee7e96 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -626,14 +626,51 @@ static inline bool elv_support_iosched(struct request_queue *q)
- }
- 
- /*
-- * For blk-mq devices supporting IO scheduling, we default to using mq-deadline,
-- * if available, for single queue devices. If deadline isn't available OR
-- * deadline initialization fails OR we have multiple queues, default to "none".
-+ * For single queue devices, default to using mq-deadline. If we have multiple
-+ * queues or mq-deadline is not available, default to "none".
-+ */
-+static struct elevator_type *elevator_get_default(struct request_queue *q)
-+{
-+	if (q->nr_hw_queues != 1)
-+		return NULL;
-+
-+	return elevator_get(q, "mq-deadline", false);
-+}
-+
-+/*
-+ * Get the first elevator providing the features required by the request queue.
-+ * Default to "none" if no matching elevator is found.
-+ */
-+static struct elevator_type *elevator_get_by_features(struct request_queue *q)
-+{
-+	struct elevator_type *e;
-+
-+	spin_lock(&elv_list_lock);
-+
-+	list_for_each_entry(e, &elv_list, list) {
-+		if (elv_support_features(e->elevator_features,
-+					 q->required_elevator_features))
-+			break;
-+	}
-+
-+	if (e && !try_module_get(e->elevator_owner))
-+		e = NULL;
-+
-+	spin_unlock(&elv_list_lock);
-+
-+	return e;
-+}
-+
-+/*
-+ * For a device queue that has no required features, use the default elevator
-+ * settings. Otherwise, use the first elevator available matching the required
-+ * features. If no suitable elevator is find or if the chosen elevator
-+ * initialization fails, fall back to the "none" elevator (no elevator).
-  */
- void elevator_init_mq(struct request_queue *q)
- {
- 	struct elevator_type *e;
--	int err = 0;
-+	int err;
- 
- 	if (!elv_support_iosched(q))
- 		return;
-@@ -644,7 +681,10 @@ void elevator_init_mq(struct request_queue *q)
- 	if (unlikely(q->elevator))
- 		return;
- 
--	e = elevator_get(q, "mq-deadline", false);
-+	if (!q->required_elevator_features)
-+		e = elevator_get_default(q);
-+	else
-+		e = elevator_get_by_features(q);
- 	if (!e)
- 		return;
- 
--- 
-2.21.0
+Thanks for your reply
+Boojin Kim.
 
