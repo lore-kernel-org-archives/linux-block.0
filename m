@@ -2,126 +2,158 @@ Return-Path: <SRS0=MRnn=WT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26647C3A5A2
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 11:41:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E637C3A5A3
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 12:58:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F18FF22CEC
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 11:41:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1148122CEC
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 12:58:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KkX1YSy1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731551AbfHWLlp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Aug 2019 07:41:45 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41882 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732963AbfHWLlo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Aug 2019 07:41:44 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id DB82DB06B;
-        Fri, 23 Aug 2019 11:41:42 +0000 (UTC)
-Subject: Re: [PATCH 5/7] block: Introduce zoned block device elevator feature
-To:     Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <20190823001528.5673-1-damien.lemoal@wdc.com>
- <20190823001528.5673-6-damien.lemoal@wdc.com>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <fe418eb7-a4cf-2093-652c-e2e2e730757f@suse.de>
-Date:   Fri, 23 Aug 2019 13:41:42 +0200
+        id S2393371AbfHWM6V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Aug 2019 08:58:21 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:32856 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389430AbfHWM6V (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Aug 2019 08:58:21 -0400
+Received: by mail-io1-f67.google.com with SMTP id z3so19896897iog.0
+        for <linux-block@vger.kernel.org>; Fri, 23 Aug 2019 05:58:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=I00VSte5pro9MFfzs2ZQvPdVMUipipTiKgGdaBQKoYg=;
+        b=KkX1YSy1spowJhMf4nt0sS1GiG9wl1Q/GtwqzhvA+wzcUwnn6/e17yBU4MbSJcIHOy
+         TOg41CBRFgHRWxFx277frT5pYUFsK/XSr0xG9rGNORnNA/A07aDh5EkfKjuI3nSTLVIm
+         eEhrzj3JxNoyXWs1BsKM5lCoIPotLbRTAzIba93o9kNAjADe5iOrQ2uggSeyAMNjdUx4
+         SreYR97yZnHYESaj9uH6IAFtPAb2x815/c9oxTRU55zQBpfuLSpiExPvHs3zyY0BKvH1
+         er0APdcyCo1bbLQQRjIVLVSe66/dtfv+AbejchaNtpIn6e9R5a6Sqm31JnvKJG/k+Stk
+         jErA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=I00VSte5pro9MFfzs2ZQvPdVMUipipTiKgGdaBQKoYg=;
+        b=N+GnfY1484LfuqWvcH+Bxatf9T51k98ahEwEeUuDWHYQxEgBAA2dGKXlLym+g11TW4
+         6kxZxJYXtmO/TMshg26PXlT+Vk+U/JB8fTZEWRVxKlqhCV2u/oPEpiQ21aZ9sgdNdbn0
+         U51ZwpS+5akkAUv7DYqorkX5nmSxp/QvbVN2AdAVf+3S2i1VLpCtjP0gqk20O5RnmYDQ
+         BnFnoVIaZh2CZ2MaSxryLOOdMwG3FNM8R4/ZBC8cqoJEZ+ThKANNihBCw2kpSn1vgUiR
+         gvCHnmWkCxnPggE9muUdowSCmUu3JXNe+0pYttctgXY+IfrMkVMtt0auaKnBhlY5aPjf
+         K0kA==
+X-Gm-Message-State: APjAAAXs5X73jCsAy5Y9XEmdSMUBT6vB0yGvxAtluo0vd99Jgml9rzuX
+        LnhGJOzG16DvBWLqqrsjkhjq9A==
+X-Google-Smtp-Source: APXvYqzQQ287n5s/HXH6WQvjjD6bvAz1vCdp2m4qyBppgdxouyxbAymX4x1UAYbSB8TdilJWk20gJA==
+X-Received: by 2002:a02:9988:: with SMTP id a8mr4809673jal.127.1566565100208;
+        Fri, 23 Aug 2019 05:58:20 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id d6sm3272892iod.17.2019.08.23.05.58.19
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 23 Aug 2019 05:58:19 -0700 (PDT)
+Subject: Re: [PATCH V4 0/6] null_blk: simplify null_handle_cmd()
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org
+Cc:     hch@lst.de
+References: <20190823044519.3939-1-chaitanya.kulkarni@wdc.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <49e1b4d0-c5ef-8054-e387-b7c1cedf5070@kernel.dk>
+Date:   Fri, 23 Aug 2019 06:58:18 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190823001528.5673-6-damien.lemoal@wdc.com>
+In-Reply-To: <20190823044519.3939-1-chaitanya.kulkarni@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 23/08/2019 02:15, Damien Le Moal wrote:
-> Introduce the elevator feature ELEVATOR_F_ZONED_BLOCK_DEV to indicate
-> that an elevator supports zoned block device write ordering control.
+On 8/22/19 10:45 PM, Chaitanya Kulkarni wrote:
+> Hi,
 > 
-> Mark the mq-deadline as supporting this feature which is implemented
-> using zone write locking. SCSI zoned block device scan and null_blk
-> device creation with zoned mode enabled are also modified to require
-> this feature using the helper blk_queue_required_elevator_features().
+> The core function where we handle the request null_handle_cmd() in the
+> null_blk does various things based on how null_blk is configured :-
 > 
-> This requirement can always be satisfied as the mq-deadline scheduler is
-> always selected for in-kernel compilation when CONFIG_BLK_DEV_ZONED
-> (zoned block device support) is enabled.
+> 1. Handle throttling.
+> 2. Handle badblocks.
+> 3. Handle Memory backed device operations.
+> 4. Handle Zoned Block device operations.
+> 5. Completion of the requests.
+> 
+> With all the above functionality present in the one function,
+> null_handle_cmd() is growing and becoming unreasonably lengthy when
+> we want to add more features such as new Zone requests which is being
+> worked on (See [1], [2]).
+> 
+> This is a cleanup patch-series which refactors the code in the
+> null_handle_cmd(). We create a clear interface for each of the above
+> mentioned functionality which leads to having null_handle_cmd() more
+> clear and easy to manage with future changes. Please have a look at
+> NVMe PCIe Driver (nvme_queue_rq()) (See [3]) which has a similar code
+> structure and nicely structured code for doing various things such as
+> setting up commands, mapping of the block layer requests, mapping
+> PRPs/SGLs, handling integrity requests and finally submitting the
+> NVMe Command etc.
+> 
+> With this patch-series we fix the following issues with the current
+> code :-
+> 
+> 1. Get rid of the multiple nesting levels (> 2).
+> 2. Easy to read, debug and extend the code for specific feature.
+> 3. Get rid of the various line foldings which are there in the code
+>     due to multiple level of nesting under if conditions.
+> 4. Precise definition for the null_handle_cmd() and clear error
+>     handling as helpers are responsible for handling errors.
+> 
+> Regards,
+> Chaitanya
+> 
+> [1] https://www.spinics.net/lists/linux-block/msg41884.html
+> [2] https://www.spinics.net/lists/linux-block/msg41883.html
+> [3] https://github.com/torvalds/linux/blob/master/drivers/nvme/host/pci.c
+> 
+> * Changes from V3:-
+> 1. Rename nullb_handle_cmd_completion () -> nullb_complete_cmd().
+> 2. Move null_handle_zoned() to null_blk_zoned.c and adjust rest of the
+>     code in null_blk_zoned.c.
+> 3. Fixed the bug in null_handle_cmd() for REQ_OP_ZONE_RESET_ALL.
+> 
+> * Changes from V2:-
+> 1. Adjust the code to latest upstream code.
+> 
+> * Changes from V1:-
+> 1. Move bio vs req code into the callers for the null_handle_cmd() and
+>     add required arguments to simplify the code in the same function.
+> 2. Get rid of the extra braces for the null_handle_zoned().
+> 3. Get rid of the multiple returns style and the goto.
+> 4. For throttling, code keep the check in the caller.
+> 5. Add uniform code format for setting the cmd->error in the
+>     null_handle_cmd() and make required code changes so that each
+>     feature specific function will return blk_status_t value.
+> 
+> Chaitanya Kulkarni (6):
+>    null_blk: move duplicate code to callers
+>    null_blk: create a helper for throttling
+>    null_blk: create a helper for badblocks
+>    null_blk: create a helper for mem-backed ops
+>    null_blk: create a helper for zoned devices
+>    null_blk: create a helper for req completion
+> 
+>   drivers/block/null_blk.h       |  13 +--
+>   drivers/block/null_blk_main.c  | 162 +++++++++++++++++----------------
+>   drivers/block/null_blk_zoned.c |  38 +++++---
+>   3 files changed, 115 insertions(+), 98 deletions(-)
 
-Hmm I would have preferred this to be split into two patches, one
-introducing the features (not just ELEVATOR_F_ZONED_BLOCK_DEV but also
-the features you describe in 4/7) and mark all schedulers with the
-feature bits and then one pulling the requirement of
-ELEVATOR_F_ZONED_BLOCK_DEV in null_blk and sd.
-
+Applied, thanks.
 
 -- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Jens Axboe
+
