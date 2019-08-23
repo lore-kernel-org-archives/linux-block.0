@@ -6,27 +6,27 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCBADC3A5A2
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 11:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26647C3A5A2
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 11:41:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A59A8233A0
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 11:19:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F18FF22CEC
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 11:41:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731550AbfHWLTS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Aug 2019 07:19:18 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37524 "EHLO mx1.suse.de"
+        id S1731551AbfHWLlp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Aug 2019 07:41:45 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41882 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730512AbfHWLTR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Aug 2019 07:19:17 -0400
+        id S1732963AbfHWLlo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Aug 2019 07:41:44 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id C513BB009;
-        Fri, 23 Aug 2019 11:19:15 +0000 (UTC)
-Subject: Re: [PATCH 4/7] block: Introduce elevator features
+        by mx1.suse.de (Postfix) with ESMTP id DB82DB06B;
+        Fri, 23 Aug 2019 11:41:42 +0000 (UTC)
+Subject: Re: [PATCH 5/7] block: Introduce zoned block device elevator feature
 To:     Damien Le Moal <damien.lemoal@wdc.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 References: <20190823001528.5673-1-damien.lemoal@wdc.com>
- <20190823001528.5673-5-damien.lemoal@wdc.com>
+ <20190823001528.5673-6-damien.lemoal@wdc.com>
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
@@ -84,12 +84,12 @@ Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
  l2t2TyTuHm7wVUY2J3gJYgG723/PUGW4LaoqNrYQUr/rqo6NXw6c+EglRpm1BdpkwPwAng63
  W5VOQMdnozD2RsDM5GfA4aEFi5m00tE+8XPICCtkduyWw+Z+zIqYk2v+zraPLs9Gs0X2C7X0
  yvqY9voUoJjG6skkOToGZbqtMX9K4GOv9JAxVs075QRXL3brHtHONDt6udYobzz+
-Message-ID: <090a5a66-ff2a-01cf-a8ed-6f61e0261613@suse.de>
-Date:   Fri, 23 Aug 2019 13:19:15 +0200
+Message-ID: <fe418eb7-a4cf-2093-652c-e2e2e730757f@suse.de>
+Date:   Fri, 23 Aug 2019 13:41:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190823001528.5673-5-damien.lemoal@wdc.com>
+In-Reply-To: <20190823001528.5673-6-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -99,21 +99,25 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 23/08/2019 02:15, Damien Le Moal wrote:
-> -static struct elevator_type *elevator_find(const char *name)
-> +static struct elevator_type *elevator_find(const char *name,
-> +					   unsigned long required_features)
+> Introduce the elevator feature ELEVATOR_F_ZONED_BLOCK_DEV to indicate
+> that an elevator supports zoned block device write ordering control.
+> 
+> Mark the mq-deadline as supporting this feature which is implemented
+> using zone write locking. SCSI zoned block device scan and null_blk
+> device creation with zoned mode enabled are also modified to require
+> this feature using the helper blk_queue_required_elevator_features().
+> 
+> This requirement can always be satisfied as the mq-deadline scheduler is
+> always selected for in-kernel compilation when CONFIG_BLK_DEV_ZONED
+> (zoned block device support) is enabled.
 
-[...]
-> +	const unsigned long elevator_features;
+Hmm I would have preferred this to be split into two patches, one
+introducing the features (not just ELEVATOR_F_ZONED_BLOCK_DEV but also
+the features you describe in 4/7) and mark all schedulers with the
+feature bits and then one pulling the requirement of
+ELEVATOR_F_ZONED_BLOCK_DEV in null_blk and sd.
 
 
-Wouldn't it make more sens to have a defined number of bits for the
-features 'unsigned long' means 64 possible features on 64bit and 32 on
-32 bit? Better make it explicit (u64 or u32 depending on how many
-features you think you'll need).
-
-Byte,
-	Johannes
 -- 
 Johannes Thumshirn                            SUSE Labs Filesystems
 jthumshirn@suse.de                                +49 911 74053 689
