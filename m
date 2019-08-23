@@ -6,27 +6,27 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0C09C3A5A2
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 08:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD84C3A5A2
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 08:54:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BD9EE22CEC
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 08:08:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 740392070B
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 08:54:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731926AbfHWIIF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Aug 2019 04:08:05 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39630 "EHLO mx1.suse.de"
+        id S2389289AbfHWIyq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Aug 2019 04:54:46 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54228 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731543AbfHWIIE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Aug 2019 04:08:04 -0400
+        id S1731252AbfHWIyq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Aug 2019 04:54:46 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id DE9EEAF79;
-        Fri, 23 Aug 2019 08:08:02 +0000 (UTC)
-Subject: Re: [PATCH 1/7] block: Cleanup elevator_init_mq() use
+        by mx1.suse.de (Postfix) with ESMTP id B0053B061;
+        Fri, 23 Aug 2019 08:54:44 +0000 (UTC)
+Subject: Re: [PATCH 2/7] block: Change elevator_init_mq() to always succeed
 To:     Damien Le Moal <damien.lemoal@wdc.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 References: <20190823001528.5673-1-damien.lemoal@wdc.com>
- <20190823001528.5673-2-damien.lemoal@wdc.com>
+ <20190823001528.5673-3-damien.lemoal@wdc.com>
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
@@ -84,12 +84,12 @@ Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
  l2t2TyTuHm7wVUY2J3gJYgG723/PUGW4LaoqNrYQUr/rqo6NXw6c+EglRpm1BdpkwPwAng63
  W5VOQMdnozD2RsDM5GfA4aEFi5m00tE+8XPICCtkduyWw+Z+zIqYk2v+zraPLs9Gs0X2C7X0
  yvqY9voUoJjG6skkOToGZbqtMX9K4GOv9JAxVs075QRXL3brHtHONDt6udYobzz+
-Message-ID: <bac8b995-ccdd-5e95-1d80-f33559ad4abf@suse.de>
-Date:   Fri, 23 Aug 2019 10:08:02 +0200
+Message-ID: <8b8a1456-9bb4-309e-b5b4-5ded863a3766@suse.de>
+Date:   Fri, 23 Aug 2019 10:54:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190823001528.5673-2-damien.lemoal@wdc.com>
+In-Reply-To: <20190823001528.5673-3-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -100,6 +100,7 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Looks good,
 Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+
 -- 
 Johannes Thumshirn                            SUSE Labs Filesystems
 jthumshirn@suse.de                                +49 911 74053 689
