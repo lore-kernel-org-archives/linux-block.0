@@ -2,157 +2,137 @@ Return-Path: <SRS0=MRnn=WT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF210C3A5A2
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 15:41:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB5B4C3A5A2
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 16:00:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C1ED021019
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 15:41:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 815D8206E0
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 16:00:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ki9tAwKf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kGVFTI4b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405883AbfHWPl5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Aug 2019 11:41:57 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:44114 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726824AbfHWPl4 (ORCPT
+        id S1733222AbfHWQA6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Aug 2019 12:00:58 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:37720 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726964AbfHWQA5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Aug 2019 11:41:56 -0400
-Received: by mail-qt1-f194.google.com with SMTP id 44so11566507qtg.11
-        for <linux-block@vger.kernel.org>; Fri, 23 Aug 2019 08:41:56 -0700 (PDT)
+        Fri, 23 Aug 2019 12:00:57 -0400
+Received: by mail-pl1-f195.google.com with SMTP id bj8so5811258plb.4;
+        Fri, 23 Aug 2019 09:00:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=S58Ut6awFbXGbTVwROsmK/yvGl2uzNqGRXDVfJ8fjtI=;
-        b=ki9tAwKfBTW+y3PAASIHa/Uk8nGbCOtOz6jBgofCXyvNpOpeNoUh7A9JQVIgtFBEHy
-         ASoGvShJr0/fZeQxP70KehnjJ1LzMEtYjTeESjC7jjOfFc+NTcJf0uWDjVFuqViJPoUn
-         IVvQHVb+CQM2wZlj6DGLVwZiuI2tT6/9ub9GiyW+gxFYeqZMzs+MVXimKmSGq+h2r09v
-         PIZFhxYG0UCdblZDYzzy36IBTCc0kOsizhL4fFn6571TiWXAJyRhxx+beCFLkfvgxpV2
-         gjUyZV8xABXR2PT0s/32YGRDFTbvP6AEATq/Ai/HgNqtKfZ1UqsZHMFaU+cdwzsG9vd8
-         iwbw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=07Egtsx8BTLakWMyam+EKjHQWLxH1naEmDIZmgusaPw=;
+        b=kGVFTI4bDL3B5jc2VlVW5iNmXRnUns2ue0ZpTj/fDStyBw8Q9ba/aDJhVLlhhdjQ1j
+         ogGV58sT2dQmXFH+ghLlgsrPhOGFZmx0WW6SiMtPKUin6e8nSlYRMn+AYzE9fzIK6wor
+         0pqaY5SeWurvg9cHY1LON3iXEhKyCq8YJJ/HmRTRXn2m4qthUFlq0FoItb2VpMQzvjpL
+         ZF56Ogp+uaJxM/+62vHmbmSphGhTT0dvJJVSf9FciAyb1QaRotXxvCMY86+MfEttowlS
+         bJZCN82/usH7zyQ3DUI4O4NqGizfKpQvdN0qp5jWlp85bmS+20xviHSD63RHYaEG8N6w
+         sf7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition:user-agent;
-        bh=S58Ut6awFbXGbTVwROsmK/yvGl2uzNqGRXDVfJ8fjtI=;
-        b=QzADXbubm+KjlqrS5ynUbZUTS+NMBjlRvlRwycyey4CBdeu8KE4k02fnXIjlx9JqBk
-         26X8bGYP4IpFwvrWG9b959s7VrX50Js/dqR9rOz1R3n9iBKZv15FjVCykpiX0OEpQNMq
-         4gSl/UqlHUcWF8UmP2SLhrmcUh7qsJHmtDTcwrpnsMZ9Z3GnPXF50LsB810nba9HG2yc
-         108Yhja9ZPgAbC7zmJ0E6QwjeksoRybRvFyI/v5vHV1BlKN+sIqgNfZSdBGqi51D0y1S
-         9avrRqeIUMN8b3c77iCxiI5qCYCjOnitQPsWKw/A1Si2DmWKNsvinVzAtkYTHhqxnr+9
-         cWkA==
-X-Gm-Message-State: APjAAAU+dHMBZUfOzPRiR7f/i2EFICwodTn0mHXtBkeXe3rjiTGbfNv7
-        9fE5NZNBXOCQQl32U67VLdQ=
-X-Google-Smtp-Source: APXvYqwSnfUlkGS1tztrmwyBgMgAlVfIZEhOrURhEbQ5oVj4HH644m2tOyUdMAQ5G9Z8Vjuels2YZQ==
-X-Received: by 2002:ac8:4a8f:: with SMTP id l15mr5442837qtq.29.1566574915981;
-        Fri, 23 Aug 2019 08:41:55 -0700 (PDT)
-Received: from localhost (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id x145sm1667988qka.106.2019.08.23.08.41.54
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 23 Aug 2019 08:41:55 -0700 (PDT)
-Date:   Fri, 23 Aug 2019 11:41:53 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Bryan Gurney <bgurney@redhat.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Wenwen Wang <wenwen@cs.uga.edu>,
-        ZhangXiaoxu <zhangxiaoxu5@huawei.com>
-Subject: [git pull] device mapper fixes for 5.3-rc6
-Message-ID: <20190823154153.GA24648@lobo>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=07Egtsx8BTLakWMyam+EKjHQWLxH1naEmDIZmgusaPw=;
+        b=CVF3AoJZ1WVsTf0+DVnXXiI2MzvO7UlYLWtvgaMQRBJJsiQiDPkwnqlZcqY55hUjjR
+         ZfqpSaAKDLDuAiCyb/SMGbBEXfadeyEfNkKAowVDs/GxmOvoX6aog92u9jBMQP+gBWSQ
+         X3ic4apyBpAvQ+DpXlBMa3z92MffUYuJVCtI7eJVK55teKw51cVN6w0wXac1Rcx2Y8uj
+         oQHBHax827hGQEI3o6W59n5m7sAAeYj8B2ouhnjdw60Z6bSPxh4ppJDW3gEzyMnQFk6r
+         7PFnw5LaEGOa9uSpkxhmYpRA9OVxGrQhoCW/tABILQ9VRms9hHzV7TMta14/CiDGvmCp
+         +2NA==
+X-Gm-Message-State: APjAAAViUHC8fh5JrjEWVYYdSEkDkL3y/ImXueHGmID+W0f5e/qotXC/
+        Df0oKYXkpUKuVBE6ve5ySjhCMHW7AYUxPNdIr1g=
+X-Google-Smtp-Source: APXvYqwxreGNcoRuFbMgXFknH7qbT7cPrnLAnQlAAkT7aQK81Y52MAYNqO9wNzUbU3CbY9CwNUKZ4CQXxpNGir8SmPw=
+X-Received: by 2002:a17:902:a715:: with SMTP id w21mr5383370plq.274.1566576056998;
+ Fri, 23 Aug 2019 09:00:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.11.4 (2019-03-13)
+References: <1565888399-21550-1-git-send-email-akinobu.mita@gmail.com>
+ <1565888399-21550-5-git-send-email-akinobu.mita@gmail.com>
+ <20190817145509.GA18381@amd> <925633c4-a459-5e84-9c9a-502a504fdc82@gmail.com>
+ <20190819143842.GA25401@amd> <7c4c4853-7e3a-0618-92a0-337e248e2b4c@gmail.com> <c937b7e0-02c6-ae9a-aaf7-16a2ef29886d@gmail.com>
+In-Reply-To: <c937b7e0-02c6-ae9a-aaf7-16a2ef29886d@gmail.com>
+From:   Akinobu Mita <akinobu.mita@gmail.com>
+Date:   Sat, 24 Aug 2019 01:00:45 +0900
+Message-ID: <CAC5umyjxkeR3rhf3XZvwkxLvc-0ENEkQfOLnk8A12Qazr9Et8w@mail.gmail.com>
+Subject: Re: [PATCH v4 4/5] block: introduce LED block device activity trigger
+To:     Jacek Anaszewski <jacek.anaszewski@gmail.com>
+Cc:     Pavel Machek <pavel@ucw.cz>, linux-block@vger.kernel.org,
+        linux-leds@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org,
+        Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>,
+        Dan Murphy <dmurphy@ti.com>, Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+2019=E5=B9=B48=E6=9C=8820=E6=97=A5(=E7=81=AB) 3:38 Jacek Anaszewski <jacek.=
+anaszewski@gmail.com>:
+>
+> On 8/19/19 8:22 PM, Jacek Anaszewski wrote:
+> > On 8/19/19 4:38 PM, Pavel Machek wrote:
+> >> On Sat 2019-08-17 22:07:43, Jacek Anaszewski wrote:
+> >>> On 8/17/19 4:55 PM, Pavel Machek wrote:
+> >>>> On Fri 2019-08-16 01:59:58, Akinobu Mita wrote:
+> >>>>> This allows LEDs to be controlled by block device activity.
+> >>>>>
+> >>>>> We already have ledtrig-disk (LED disk activity trigger), but the l=
+ower
+> >>>>> level disk drivers need to utilize ledtrig_disk_activity() to make =
+the
+> >>>>> LED blink.
+> >>>>>
+> >>>>> The LED block device trigger doesn't require the lower level driver=
+s to
+> >>>>> have any instrumentation. The activity is collected by polling the =
+disk
+> >>>>> stats.
+> >>>>>
+> >>>>> Example:
+> >>>>>
+> >>>>> echo block-nvme0n1 > /sys/class/leds/diy/trigger
+> >>>>
+> >>>> Lets use one trigger "block" and have the device as a parameter,
+> >>>> please.
+> >>>>
+> >>>> We already have 1000 cpu triggers on 1000 cpu machines, and yes, its=
+ a
+> >>>> disaster we'll need to fix. Lets not repeat the same mistake here.
+> >>>>
+> >>>> I guess it may be slightly more work. Sorry about that.
+> >>>
+> >>> We should be able to list available block devices to set,
+> >>> so the problem would be not avoided anyway.
+> >>
+> >> Should we? We need to list triggers, but we may not list all the devic=
+es...
+> >
+> > This is similar to usbport trigger that lists available
+> > ports as files in a sub-directory. We might eventually go
+> > in this direction.
+>
+> I must withdraw this statement. This is not similar to usbport
+> trigger. The difference is that with ledtrig-block we have separate
+> triggers per each device and I am not aware if there is some centralized
+> mechanism similar to blocking_notifier_chain (usb_notifier_list
+> in drivers/usb/core/notify.c) available for block devices, that
+> would allow to gather all available block devs under common trigger.
+>
+> Moreover I remember Greg once discouraged using notifier chains
+> as they are unsafe, so we would need some other solution anyway.
 
-More fixes than usual from DM at this stage in a release but...
-
-The following changes since commit d45331b00ddb179e291766617259261c112db872:
-
-  Linux 5.3-rc4 (2019-08-11 13:26:41 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.3/dm-fixes-2
-
-for you to fetch changes up to 1cfd5d3399e87167b7f9157ef99daa0e959f395d:
-
-  dm table: fix invalid memory accesses with too high sector number (2019-08-23 10:11:42 -0400)
-
-Please pull, thanks!
-Mike
-
-----------------------------------------------------------------
-- Revert a DM bufio change from during the 5.3 merge window now that a
-  proper fix has been made to the block loopback driver.
-
-- Fix DM kcopyd to wakeup so failed subjobs get completed.
-
-- Various fixes to DM zoned target to address error handling, and other
-  small tweaks (SPDX license identifiers and fix typos).
-
-- Fix DM integrity range locking race by tracking whether journal has
-  changed.
-
-- Fix DM dust target to detect reads of badblocks beyond the first 512b
-  sector (applicable if blocksize is larger than 512b).
-
-- Fix DM persistent-data issue in both the DM btree and DM
-  space-map-metadata interfaces.
-
-- Fix out of bounds memory access with certain DM table configurations.
-
-----------------------------------------------------------------
-Bryan Gurney (1):
-      dm dust: use dust block size for badblocklist index
-
-Dan Carpenter (1):
-      dm zoned: fix potential NULL dereference in dmz_do_reclaim()
-
-Dmitry Fomichev (6):
-      dm kcopyd: always complete failed jobs
-      dm zoned: improve error handling in reclaim
-      dm zoned: improve error handling in i/o map code
-      dm zoned: properly handle backing device failure
-      dm zoned: add SPDX license identifiers
-      dm zoned: fix a few typos
-
-Mikulas Patocka (3):
-      Revert "dm bufio: fix deadlock with loop device"
-      dm integrity: fix a crash due to BUG_ON in __journal_read_write()
-      dm table: fix invalid memory accesses with too high sector number
-
-Wenwen Wang (1):
-      dm raid: add missing cleanup in raid_ctr()
-
-ZhangXiaoxu (2):
-      dm btree: fix order of block initialization in btree_split_beneath
-      dm space map metadata: fix missing store of apply_bops() return value
-
- drivers/md/dm-bufio.c                              |  4 +-
- drivers/md/dm-dust.c                               | 11 +++-
- drivers/md/dm-integrity.c                          | 15 +++++
- drivers/md/dm-kcopyd.c                             |  5 +-
- drivers/md/dm-raid.c                               |  2 +-
- drivers/md/dm-table.c                              |  5 +-
- drivers/md/dm-zoned-metadata.c                     | 68 ++++++++++++++++------
- drivers/md/dm-zoned-reclaim.c                      | 47 +++++++++++----
- drivers/md/dm-zoned-target.c                       | 68 +++++++++++++++++++---
- drivers/md/dm-zoned.h                              | 11 ++++
- drivers/md/persistent-data/dm-btree.c              | 31 +++++-----
- drivers/md/persistent-data/dm-space-map-metadata.c |  2 +-
- 12 files changed, 209 insertions(+), 60 deletions(-)
+I start thinking that we should implement the LED block device activity
+trigger in userspace.  The userspace application firstly activates
+one-shot LED trigger and periodically reads /sys/block/<disk>/stat and
+writes /sys/class/leds/<led>/shot if there is any disk activity.
