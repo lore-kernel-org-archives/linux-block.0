@@ -2,31 +2,31 @@ Return-Path: <SRS0=MRnn=WT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD84C3A5A2
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 08:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4505AC3A5A2
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 09:00:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 740392070B
-	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 08:54:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DC8522CE3
+	for <linux-block@archiver.kernel.org>; Fri, 23 Aug 2019 09:00:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389289AbfHWIyq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Aug 2019 04:54:46 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54228 "EHLO mx1.suse.de"
+        id S2388865AbfHWJAg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Aug 2019 05:00:36 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55458 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731252AbfHWIyq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Aug 2019 04:54:46 -0400
+        id S1732254AbfHWJAg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Aug 2019 05:00:36 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id B0053B061;
-        Fri, 23 Aug 2019 08:54:44 +0000 (UTC)
-Subject: Re: [PATCH 2/7] block: Change elevator_init_mq() to always succeed
+        by mx1.suse.de (Postfix) with ESMTP id 5AB09B066;
+        Fri, 23 Aug 2019 09:00:34 +0000 (UTC)
+Subject: Re: [PATCH 3/7] block: Remove sysfs lock from elevator_init_rq()
 To:     Damien Le Moal <damien.lemoal@wdc.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 References: <20190823001528.5673-1-damien.lemoal@wdc.com>
- <20190823001528.5673-3-damien.lemoal@wdc.com>
+ <20190823001528.5673-4-damien.lemoal@wdc.com>
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
@@ -84,12 +84,12 @@ Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
  l2t2TyTuHm7wVUY2J3gJYgG723/PUGW4LaoqNrYQUr/rqo6NXw6c+EglRpm1BdpkwPwAng63
  W5VOQMdnozD2RsDM5GfA4aEFi5m00tE+8XPICCtkduyWw+Z+zIqYk2v+zraPLs9Gs0X2C7X0
  yvqY9voUoJjG6skkOToGZbqtMX9K4GOv9JAxVs075QRXL3brHtHONDt6udYobzz+
-Message-ID: <8b8a1456-9bb4-309e-b5b4-5ded863a3766@suse.de>
-Date:   Fri, 23 Aug 2019 10:54:44 +0200
+Message-ID: <08137c4c-96e4-b3dc-c9d5-dd49c79d8db2@suse.de>
+Date:   Fri, 23 Aug 2019 11:00:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190823001528.5673-3-damien.lemoal@wdc.com>
+In-Reply-To: <20190823001528.5673-4-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -98,9 +98,12 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+On 23/08/2019 02:15, Damien Le Moal wrote:
+> Since elevator_init_rq() is called before the device queue is registered
+elevator_init_mq() ~^ (and in Subject)
 
+Otherwise:
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
 Johannes Thumshirn                            SUSE Labs Filesystems
 jthumshirn@suse.de                                +49 911 74053 689
