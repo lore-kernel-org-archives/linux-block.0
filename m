@@ -2,100 +2,69 @@ Return-Path: <SRS0=sRwj=WW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 414CAC3A59E
-	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 06:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A80C3A59F
+	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 11:16:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F8DE2173E
-	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 06:36:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ko288Hno"
+	by mail.kernel.org (Postfix) with ESMTP id 455F22070B
+	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 11:16:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729737AbfHZGgX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Aug 2019 02:36:23 -0400
-Received: from mail-wm1-f44.google.com ([209.85.128.44]:33373 "EHLO
-        mail-wm1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725806AbfHZGgX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Aug 2019 02:36:23 -0400
-Received: by mail-wm1-f44.google.com with SMTP id p77so13615847wme.0
-        for <linux-block@vger.kernel.org>; Sun, 25 Aug 2019 23:36:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=iVlNOvcGkxOW82lX/stt8mZNXgPWFfdeCPzC+y26i1w=;
-        b=Ko288HnotBth8jQ1QLLaxPiIBMWT0CGuHCphEGfWiVxL3InXCHOVU/SvqRYl+8Uk7I
-         maRDjlOXSxFfzYnf7uhq9Zva9futXeSmVAMYxChtvlzzMGTZEPl2c++crWSqiz+vYzQW
-         /Cp3r2Uzy2vuRJ/YpuiMHfXMNBcmbxXQqfN6vuE7WQjy7ZLKu6bWXHe1bW5va0Zpsb3+
-         24VCf/amP3DuZFxAtkt45Q2mSJSfihWLPi301wjgoam+Op4sqi1ZCxEN0VxTPwmi4xhQ
-         AOGPUweB+T7vdpITeG+1HnPM4JAZH4qdY5b2eJyXWsk7G5mO6LrO3oWxUD+ZKN3G51bo
-         EcYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=iVlNOvcGkxOW82lX/stt8mZNXgPWFfdeCPzC+y26i1w=;
-        b=bS9qiAhs3URU5KTvorYm3M3Xbj6ZRFxbv8s4zfrMgQxhuJL1BxPYWr1pdXjOOM+naZ
-         /2OXkq2qEiLYXGFC1sX7bIcDhMVbOFpwoNpx+cd/FQ4CV07rV5BrmDBpaVatJNiOzAtC
-         lFGxLRgcvLeEGkpYQybjbM6Cvkwm+uNRYHsAskmobGbeIAqzE3ISn09aD4cvU78rWyFh
-         L9Vp7YCt2HDBs6Bdf2E5ny9SonpD8fcOygA2FXj0d/12jxi7oD9TKhtfn1SXWgEuSief
-         TJg38cRUDZ0Ym8lo6TiJ78RvlWHzIA4gTvW2whI3ILHZu1L7Ad/unobdPyCclJwySIlM
-         i+Jg==
-X-Gm-Message-State: APjAAAXQZRw2d2hl+nXDMg9fzJGW4unEBPMOYA5eWdJlpGVc0uqRR7DC
-        9KJiDqCO/ZDtGSZK6oOHttgMqA==
-X-Google-Smtp-Source: APXvYqxeDKmCc4R7qDu9NLMZxvNDLyI1C0C8kWTJH/SP6ir/91jdtAoyr5HCDj0WTBHBHifnG3U8zQ==
-X-Received: by 2002:a1c:c1c1:: with SMTP id r184mr19660385wmf.9.1566801381131;
-        Sun, 25 Aug 2019 23:36:21 -0700 (PDT)
-Received: from [192.168.0.100] (84-33-66-180.dyn.eolo.it. [84.33.66.180])
-        by smtp.gmail.com with ESMTPSA id x26sm8363112wmj.42.2019.08.25.23.36.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 25 Aug 2019 23:36:20 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH v2 3/3] bfq: Add per-device weight
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20190821154402.GI2263813@devbig004.ftw2.facebook.com>
-Date:   Mon, 26 Aug 2019 08:36:17 +0200
-Cc:     Fam Zheng <zhengfeiran@bytedance.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Fam Zheng <fam@euphon.net>,
-        duanxiongchun@bytedance.com, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, zhangjiachen.jc@bytedance.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <C2F0BE1E-9CAA-4FBD-80D8-C18ECCE3FD4B@linaro.org>
-References: <20190805063807.9494-1-zhengfeiran@bytedance.com>
- <20190805063807.9494-4-zhengfeiran@bytedance.com>
- <20190821154402.GI2263813@devbig004.ftw2.facebook.com>
-To:     Tejun Heo <tj@kernel.org>
-X-Mailer: Apple Mail (2.3445.104.8)
+        id S1731186AbfHZLQn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Aug 2019 07:16:43 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60034 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726497AbfHZLQn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Aug 2019 07:16:43 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 84FD5AC26;
+        Mon, 26 Aug 2019 11:16:41 +0000 (UTC)
+From:   Vlastimil Babka <vbabka@suse.cz>
+To:     Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+Cc:     linux-kernel@vger.kernel.org, Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-btrfs@vger.kernel.org, Vlastimil Babka <vbabka@suse.cz>
+Subject: [PATCH v2 0/2] guarantee natural alignment for kmalloc()
+Date:   Mon, 26 Aug 2019 13:16:25 +0200
+Message-Id: <20190826111627.7505-1-vbabka@suse.cz>
+X-Mailer: git-send-email 2.22.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
-do you think this series could now be queued for 5.4?
+After a while, here's v2 of the series, also discussed at LSF/MM [1].
+I've updated the documentation bits and expanded changelog. Also measured
+effect on SLOB, and found it to be within noise. That required first adding
+some accounting for SLOB, which I believe is useful in general, so that
+became Patch 1. All other details are in Patch 2 changelog.
 
-Thanks,
-Paolo
+[1] https://lwn.net/Articles/787740/
 
-> Il giorno 21 ago 2019, alle ore 17:44, Tejun Heo <tj@kernel.org> ha =
-scritto:
->=20
-> On Mon, Aug 05, 2019 at 02:38:07PM +0800, Fam Zheng wrote:
->> Signed-off-by: Fam Zheng <zhengfeiran@bytedance.com>
->=20
-> Looks good to me.
->=20
-> Acked-by: Tejun Heo <tj@kernel.org>
->=20
-> Thanks.
->=20
-> --=20
-> tejun
+Vlastimil Babka (2):
+  mm, sl[ou]b: improve memory accounting
+  mm, sl[aou]b: guarantee natural alignment for kmalloc(power-of-two)
+
+ Documentation/core-api/memory-allocation.rst |  4 ++
+ include/linux/slab.h                         |  4 ++
+ mm/slab_common.c                             | 19 +++++-
+ mm/slob.c                                    | 62 +++++++++++++++-----
+ mm/slub.c                                    | 14 ++++-
+ 5 files changed, 82 insertions(+), 21 deletions(-)
+
+-- 
+2.22.1
 
