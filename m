@@ -2,279 +2,247 @@ Return-Path: <SRS0=sRwj=WW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1DD1C3A5A6
-	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 16:07:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 510CBC3A59F
+	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 16:24:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B7B2C20828
-	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 16:07:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1566835651;
-	bh=v6adb07fgKTpxyfblv9LM8Id3Y7Bpl/Uvyroh0v+vVQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=2TDZyJmNVM6MBqCqCDrZCeSAwYVtTh7kSfEQgX6pulz+JH5aBbwYnx2JgrCEomLRO
-	 krz7F1jBE6TdNelBlF0+yOcuBh8BMQY/naQYU1MW1VgzicBode8RpjpY4IgH3vUwex
-	 3f9Z4tqXlYJv9CBOrMUta1lg13JNQJtybk0p2bdA=
+	by mail.kernel.org (Postfix) with ESMTP id 21F952080C
+	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 16:24:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732497AbfHZQHI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Aug 2019 12:07:08 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:40594 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729338AbfHZQHH (ORCPT
+        id S1729274AbfHZQYG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Aug 2019 12:24:06 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:45794 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728683AbfHZQYG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Aug 2019 12:07:07 -0400
-Received: by mail-qk1-f194.google.com with SMTP id s145so14445798qke.7;
-        Mon, 26 Aug 2019 09:07:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=VLHZ6ZNZgqY5/GiQqVLdmuLaStLAgiw+ZiX1K52HrY4=;
-        b=sNwCMXNqcvEyA4KghlQTGzgEiPrT39GgcA2FeeuElZKbfhHirdQcRItctuijuXXqOq
-         kytMlb6po4B16uaQagwe48+I9ETxfswFZRqdvHwf/nJPr0VxltfNOfbOm3qUiHNDy0o+
-         Vb/zF0BsMWZ/8iEhiNJIH8d8bYf5FlD8PT2vThdCDoX76yUthkG/kml9sRZe4ubIcTIF
-         K5gPNKO3yvicvLQJ/RMICafnmg94MSCTsyHfDXelWtzsBERuEqohmd+/N5d+f0sIiBec
-         3BI8y4q4wS3W3ITTG7UpWqM7DxxS0a4Hmk1tuYbee9Hh4moHaIRq/pqif4gBMk6aRXHo
-         E6fA==
+        Mon, 26 Aug 2019 12:24:06 -0400
+Received: by mail-pf1-f195.google.com with SMTP id w26so12086776pfq.12
+        for <linux-block@vger.kernel.org>; Mon, 26 Aug 2019 09:24:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=VLHZ6ZNZgqY5/GiQqVLdmuLaStLAgiw+ZiX1K52HrY4=;
-        b=i59/8GUbaOlxmpPtDwX9OlJrmMYn3wLmdUDZ/7e7syLQEbll3v8kkMsXmvcD1KNltN
-         E4sDq5Gv13NhwVvJivgYw9xSniePAg9K+oDrpZjrdFllwyImgWNyU4ZPcAZLIHrJ0bDn
-         rr5CHUIws9lfUuay+gAOMNM3xKkf73J+DECUFjDPtqXJD6muaDFIxm2xjEkMLI4WSdMF
-         w7Icd4OAHCGzksefj3anW8ZNZKfiZOkAkaGGw6FvTnMEsu2F7mfs8fmRuyfBRccqzYu+
-         D2PKcmrtTrp7o/155tGudv5xg91EweyOFPe2yQJo9cCIgcQ1vvBSK7Me8bVOa2F1vUn3
-         dcMA==
-X-Gm-Message-State: APjAAAVxMYbB+ND1sQnqcO5KLL3SWNlkh9jVzVaqUSHS1Jwxs5Kvu7Ly
-        vLUNdr+ZXrYDyzmWoc4V5TY=
-X-Google-Smtp-Source: APXvYqwlluVR2FGCz1GaYgZtKsTrXxdhegOASK8N9AFXHtVRxexC+pNnumgVk+Ouc0c5UQRW6sJBeQ==
-X-Received: by 2002:a37:454:: with SMTP id 81mr16595509qke.153.1566835626129;
-        Mon, 26 Aug 2019 09:07:06 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::d081])
-        by smtp.gmail.com with ESMTPSA id 20sm6237089qkg.59.2019.08.26.09.07.05
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Aug 2019 09:07:05 -0700 (PDT)
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, jack@suse.cz, hannes@cmpxchg.org,
-        mhocko@kernel.org, vdavydov.dev@gmail.com
-Cc:     cgroups@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, guro@fb.com, akpm@linux-foundation.org,
-        Tejun Heo <tj@kernel.org>
-Subject: [PATCH 1/5] writeback: Generalize and expose wb_completion
-Date:   Mon, 26 Aug 2019 09:06:52 -0700
-Message-Id: <20190826160656.870307-2-tj@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190826160656.870307-1-tj@kernel.org>
-References: <20190826160656.870307-1-tj@kernel.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xVHNyYBK0KwLvolOFlKOV3Y1dVggj7fK6L2swHbmA9s=;
+        b=bDcX2g2zpUX3N5QPAaWU6H4rpxKSAdbLpgDb3F0sOryAnzf0Ic8yj8/10oqDgWbaRF
+         m11F8HDemT9a8iWoeBRSNhslykPHS2mrtCDKp80Tzi2X45ljGE9jDcvAaOzPDQNECQrj
+         zbKUgU9zWdIJgzkbiL5IobWKFyXblqJBAZZD1EBpQliHvSd6VCQV9d0zzkDdMivSe3Jr
+         IemY14V5HfVims1d6OKWLnvNnWKw3cGdbp/SNXurmQLvWyUg0Kb/KNdep6fkI6hnC133
+         dsGCja6zkobqVleBp/8CgMr5P413xpaiZOqT9p2TO/jN4Ck8o4qybvPHuZDGBNDPhZiq
+         rCFQ==
+X-Gm-Message-State: APjAAAU+qUgZaHvk34LdUHTQzZyLcV4Tu62KTeiMj+u5B1og2WOIlylZ
+        JmxFte/K53CIHRUbjA2FMmjKMXfV
+X-Google-Smtp-Source: APXvYqylNyQxO7RSayP1zvicya+zIolIKAH9aIApZQFB5uFjy7nESptQoOu90ShXKbLjsUOy6HeDhA==
+X-Received: by 2002:a63:2043:: with SMTP id r3mr17245573pgm.311.1566836645281;
+        Mon, 26 Aug 2019 09:24:05 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id a189sm13233227pfa.60.2019.08.26.09.24.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Aug 2019 09:24:04 -0700 (PDT)
+Subject: Re: [PATCH V3 5/5] block: split .sysfs_lock into two locks
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Mike Snitzer <snitzer@redhat.com>
+References: <20190826025146.31158-1-ming.lei@redhat.com>
+ <20190826025146.31158-6-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <6499b212-fa8c-7d19-8149-43c8ad1e950d@acm.org>
+Date:   Mon, 26 Aug 2019 09:24:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190826025146.31158-6-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-wb_completion is used to track writeback completions.  We want to use
-it from memcg side for foreign inode flushes.  This patch updates it
-to remember the target waitq instead of assuming bdi->wb_waitq and
-expose it outside of fs-writeback.c.
+On 8/25/19 7:51 PM, Ming Lei wrote:
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 5b0b5224cfd4..5941a0176f87 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -938,6 +938,7 @@ int blk_register_queue(struct gendisk *disk)
+>   	int ret;
+>   	struct device *dev = disk_to_dev(disk);
+>   	struct request_queue *q = disk->queue;
+> +	bool has_elevator = false;
+>   
+>   	if (WARN_ON(!q))
+>   		return -ENXIO;
+> @@ -945,7 +946,6 @@ int blk_register_queue(struct gendisk *disk)
+>   	WARN_ONCE(blk_queue_registered(q),
+>   		  "%s is registering an already registered queue\n",
+>   		  kobject_name(&dev->kobj));
+> -	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+>   
+>   	/*
+>   	 * SCSI probing may synchronously create and destroy a lot of
+> @@ -966,7 +966,7 @@ int blk_register_queue(struct gendisk *disk)
+>   		return ret;
+>   
+>   	/* Prevent changes through sysfs until registration is completed. */
+> -	mutex_lock(&q->sysfs_lock);
+> +	mutex_lock(&q->sysfs_dir_lock);
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reviewed-by: Jan Kara <jack@suse.cz>
----
- fs/fs-writeback.c                | 47 ++++++++++----------------------
- include/linux/backing-dev-defs.h | 20 ++++++++++++++
- include/linux/backing-dev.h      |  2 ++
- 3 files changed, 36 insertions(+), 33 deletions(-)
+Does mutex_lock(&q->sysfs_dir_lock) really protect against changes of 
+the I/O scheduler through sysfs or does it only protect against 
+concurrent sysfs object creation and removal? In other words, should the 
+comment above this mutex lock call be updated?
 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index fddd8abd839a..9442f1fd6460 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -36,10 +36,6 @@
-  */
- #define MIN_WRITEBACK_PAGES	(4096UL >> (PAGE_SHIFT - 10))
- 
--struct wb_completion {
--	atomic_t		cnt;
--};
--
- /*
-  * Passed into wb_writeback(), essentially a subset of writeback_control
-  */
-@@ -60,19 +56,6 @@ struct wb_writeback_work {
- 	struct wb_completion *done;	/* set if the caller waits */
- };
- 
--/*
-- * If one wants to wait for one or more wb_writeback_works, each work's
-- * ->done should be set to a wb_completion defined using the following
-- * macro.  Once all work items are issued with wb_queue_work(), the caller
-- * can wait for the completion of all using wb_wait_for_completion().  Work
-- * items which are waited upon aren't freed automatically on completion.
-- */
--#define DEFINE_WB_COMPLETION_ONSTACK(cmpl)				\
--	struct wb_completion cmpl = {					\
--		.cnt		= ATOMIC_INIT(1),			\
--	}
--
--
- /*
-  * If an inode is constantly having its pages dirtied, but then the
-  * updates stop dirtytime_expire_interval seconds in the past, it's
-@@ -182,7 +165,7 @@ static void finish_writeback_work(struct bdi_writeback *wb,
- 	if (work->auto_free)
- 		kfree(work);
- 	if (done && atomic_dec_and_test(&done->cnt))
--		wake_up_all(&wb->bdi->wb_waitq);
-+		wake_up_all(done->waitq);
- }
- 
- static void wb_queue_work(struct bdi_writeback *wb,
-@@ -206,20 +189,18 @@ static void wb_queue_work(struct bdi_writeback *wb,
- 
- /**
-  * wb_wait_for_completion - wait for completion of bdi_writeback_works
-- * @bdi: bdi work items were issued to
-  * @done: target wb_completion
-  *
-  * Wait for one or more work items issued to @bdi with their ->done field
-- * set to @done, which should have been defined with
-- * DEFINE_WB_COMPLETION_ONSTACK().  This function returns after all such
-- * work items are completed.  Work items which are waited upon aren't freed
-+ * set to @done, which should have been initialized with
-+ * DEFINE_WB_COMPLETION().  This function returns after all such work items
-+ * are completed.  Work items which are waited upon aren't freed
-  * automatically on completion.
-  */
--static void wb_wait_for_completion(struct backing_dev_info *bdi,
--				   struct wb_completion *done)
-+void wb_wait_for_completion(struct wb_completion *done)
- {
- 	atomic_dec(&done->cnt);		/* put down the initial count */
--	wait_event(bdi->wb_waitq, !atomic_read(&done->cnt));
-+	wait_event(*done->waitq, !atomic_read(&done->cnt));
- }
- 
- #ifdef CONFIG_CGROUP_WRITEBACK
-@@ -854,7 +835,7 @@ static void bdi_split_work_to_wbs(struct backing_dev_info *bdi,
- restart:
- 	rcu_read_lock();
- 	list_for_each_entry_continue_rcu(wb, &bdi->wb_list, bdi_node) {
--		DEFINE_WB_COMPLETION_ONSTACK(fallback_work_done);
-+		DEFINE_WB_COMPLETION(fallback_work_done, bdi);
- 		struct wb_writeback_work fallback_work;
- 		struct wb_writeback_work *work;
- 		long nr_pages;
-@@ -901,7 +882,7 @@ static void bdi_split_work_to_wbs(struct backing_dev_info *bdi,
- 		last_wb = wb;
- 
- 		rcu_read_unlock();
--		wb_wait_for_completion(bdi, &fallback_work_done);
-+		wb_wait_for_completion(&fallback_work_done);
- 		goto restart;
- 	}
- 	rcu_read_unlock();
-@@ -2373,7 +2354,8 @@ static void wait_sb_inodes(struct super_block *sb)
- static void __writeback_inodes_sb_nr(struct super_block *sb, unsigned long nr,
- 				     enum wb_reason reason, bool skip_if_busy)
- {
--	DEFINE_WB_COMPLETION_ONSTACK(done);
-+	struct backing_dev_info *bdi = sb->s_bdi;
-+	DEFINE_WB_COMPLETION(done, bdi);
- 	struct wb_writeback_work work = {
- 		.sb			= sb,
- 		.sync_mode		= WB_SYNC_NONE,
-@@ -2382,14 +2364,13 @@ static void __writeback_inodes_sb_nr(struct super_block *sb, unsigned long nr,
- 		.nr_pages		= nr,
- 		.reason			= reason,
- 	};
--	struct backing_dev_info *bdi = sb->s_bdi;
- 
- 	if (!bdi_has_dirty_io(bdi) || bdi == &noop_backing_dev_info)
- 		return;
- 	WARN_ON(!rwsem_is_locked(&sb->s_umount));
- 
- 	bdi_split_work_to_wbs(sb->s_bdi, &work, skip_if_busy);
--	wb_wait_for_completion(bdi, &done);
-+	wb_wait_for_completion(&done);
- }
- 
- /**
-@@ -2451,7 +2432,8 @@ EXPORT_SYMBOL(try_to_writeback_inodes_sb);
-  */
- void sync_inodes_sb(struct super_block *sb)
- {
--	DEFINE_WB_COMPLETION_ONSTACK(done);
-+	struct backing_dev_info *bdi = sb->s_bdi;
-+	DEFINE_WB_COMPLETION(done, bdi);
- 	struct wb_writeback_work work = {
- 		.sb		= sb,
- 		.sync_mode	= WB_SYNC_ALL,
-@@ -2461,7 +2443,6 @@ void sync_inodes_sb(struct super_block *sb)
- 		.reason		= WB_REASON_SYNC,
- 		.for_sync	= 1,
- 	};
--	struct backing_dev_info *bdi = sb->s_bdi;
- 
- 	/*
- 	 * Can't skip on !bdi_has_dirty() because we should wait for !dirty
-@@ -2475,7 +2456,7 @@ void sync_inodes_sb(struct super_block *sb)
- 	/* protect against inode wb switch, see inode_switch_wbs_work_fn() */
- 	bdi_down_write_wb_switch_rwsem(bdi);
- 	bdi_split_work_to_wbs(bdi, &work, false);
--	wb_wait_for_completion(bdi, &done);
-+	wb_wait_for_completion(&done);
- 	bdi_up_write_wb_switch_rwsem(bdi);
- 
- 	wait_sb_inodes(sb);
-diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-index 6a1a8a314d85..8fb740178d5d 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -67,6 +67,26 @@ enum wb_reason {
- 	WB_REASON_MAX,
- };
- 
-+struct wb_completion {
-+	atomic_t		cnt;
-+	wait_queue_head_t	*waitq;
-+};
-+
-+#define __WB_COMPLETION_INIT(_waitq)	\
-+	(struct wb_completion){ .cnt = ATOMIC_INIT(1), .waitq = (_waitq) }
-+
-+/*
-+ * If one wants to wait for one or more wb_writeback_works, each work's
-+ * ->done should be set to a wb_completion defined using the following
-+ * macro.  Once all work items are issued with wb_queue_work(), the caller
-+ * can wait for the completion of all using wb_wait_for_completion().  Work
-+ * items which are waited upon aren't freed automatically on completion.
-+ */
-+#define WB_COMPLETION_INIT(bdi)		__WB_COMPLETION_INIT(&(bdi)->wb_waitq)
-+
-+#define DEFINE_WB_COMPLETION(cmpl, bdi)	\
-+	struct wb_completion cmpl = WB_COMPLETION_INIT(bdi)
-+
- /*
-  * For cgroup writeback, multiple wb's may map to the same blkcg.  Those
-  * wb's can operate mostly independently but should share the congested
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index 35b31d176f74..02650b1253a2 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -44,6 +44,8 @@ void wb_start_background_writeback(struct bdi_writeback *wb);
- void wb_workfn(struct work_struct *work);
- void wb_wakeup_delayed(struct bdi_writeback *wb);
- 
-+void wb_wait_for_completion(struct wb_completion *done);
-+
- extern spinlock_t bdi_lock;
- extern struct list_head bdi_list;
- 
--- 
-2.17.1
+> @@ -987,26 +987,37 @@ int blk_register_queue(struct gendisk *disk)
+>   		blk_mq_debugfs_register(q);
+>   	}
+>   
+> -	kobject_uevent(&q->kobj, KOBJ_ADD);
+> -
+> -	wbt_enable_default(q);
+> -
+> -	blk_throtl_register_queue(q);
+> -
+> +	/*
+> +	 * The queue's kobject ADD uevent isn't sent out, also the
+> +	 * flag of QUEUE_FLAG_REGISTERED isn't set yet, so elevator
+> +	 * switch won't happen at all.
+> +	 */
+>   	if (q->elevator) {
+> -		ret = elv_register_queue(q);
+> +		ret = elv_register_queue(q, false);
+>   		if (ret) {
+> -			mutex_unlock(&q->sysfs_lock);
+> -			kobject_uevent(&q->kobj, KOBJ_REMOVE);
+> +			mutex_unlock(&q->sysfs_dir_lock);
+>   			kobject_del(&q->kobj);
+>   			blk_trace_remove_sysfs(dev);
+>   			kobject_put(&dev->kobj);
+>   			return ret;
+>   		}
+> +		has_elevator = true;
+>   	}
 
+I think the reference to the kobject ADD event in the comment is 
+misleading. If e.g. a request queue is registered, unregistered and 
+reregistered quickly, can it happen that a udev rule for the ADD event 
+triggered by the first registration is executed in the middle of the 
+second registration? Is setting the REGISTERED flag later sufficient to 
+fix the race against scheduler changes through sysfs? If so, how about 
+leaving out the reference to the kobject ADD event from the above comment?
+
+> +	mutex_lock(&q->sysfs_lock);
+> +	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+> +	wbt_enable_default(q);
+> +	blk_throtl_register_queue(q);
+> +	mutex_unlock(&q->sysfs_lock);
+> +
+> +	/* Now everything is ready and send out KOBJ_ADD uevent */
+> +	kobject_uevent(&q->kobj, KOBJ_ADD);
+> +	if (has_elevator)
+> +		kobject_uevent(&q->elevator->kobj, KOBJ_ADD);
+
+Can it happen that immediately after mutex_unlock(&q->sysfs_lock) a 
+script removes the I/O scheduler and hence makes the value of the 
+'has_elevator' variable stale? In other words, should emitting KOBJ_ADD 
+also be protected by sysfs_lock?
+
+> @@ -1021,6 +1032,7 @@ EXPORT_SYMBOL_GPL(blk_register_queue);
+>   void blk_unregister_queue(struct gendisk *disk)
+>   {
+>   	struct request_queue *q = disk->queue;
+> +	bool has_elevator;
+>   
+>   	if (WARN_ON(!q))
+>   		return;
+> @@ -1035,25 +1047,25 @@ void blk_unregister_queue(struct gendisk *disk)
+>   	 * concurrent elv_iosched_store() calls.
+>   	 */
+>   	mutex_lock(&q->sysfs_lock);
+> -
+>   	blk_queue_flag_clear(QUEUE_FLAG_REGISTERED, q);
+> +	has_elevator = !!q->elevator;
+> +	mutex_unlock(&q->sysfs_lock);
+>   
+> +	mutex_lock(&q->sysfs_dir_lock);
+>   	/*
+>   	 * Remove the sysfs attributes before unregistering the queue data
+>   	 * structures that can be modified through sysfs.
+>   	 */
+>   	if (queue_is_mq(q))
+>   		blk_mq_unregister_dev(disk_to_dev(disk), q);
+> -	mutex_unlock(&q->sysfs_lock);
+>   
+>   	kobject_uevent(&q->kobj, KOBJ_REMOVE);
+>   	kobject_del(&q->kobj);
+>   	blk_trace_remove_sysfs(disk_to_dev(disk));
+>   
+> -	mutex_lock(&q->sysfs_lock);
+> -	if (q->elevator)
+> +	if (has_elevator)
+>   		elv_unregister_queue(q);
+> -	mutex_unlock(&q->sysfs_lock);
+> +	mutex_unlock(&q->sysfs_dir_lock);
+
+Is it safe to call elv_unregister_queue() if no I/O scheduler is 
+associated with a request queue? If so, have you considered to leave out 
+the 'has_elevator' variable from this function?
+
+> @@ -567,10 +580,23 @@ int elevator_switch_mq(struct request_queue *q,
+>   	lockdep_assert_held(&q->sysfs_lock);
+>   
+>   	if (q->elevator) {
+> -		if (q->elevator->registered)
+> +		if (q->elevator->registered) {
+> +			mutex_unlock(&q->sysfs_lock);
+> +
+>   			elv_unregister_queue(q);
+> +
+> +			mutex_lock(&q->sysfs_lock);
+> +		}
+>   		ioc_clear_queue(q);
+>   		elevator_exit(q, q->elevator);
+> +
+> +		/*
+> +		 * sysfs_lock may be dropped, so re-check if queue is
+> +		 * unregistered. If yes, don't switch to new elevator
+> +		 * any more
+> +		 */
+> +		if (!blk_queue_registered(q))
+> +			return 0;
+>   	}
+
+So elevator_switch_mq() is called with sysfs_lock held and releases and 
+reacquires that mutex? What will happen if e.g. syzbot writes into 
+/sys/block/*/queue/scheduler from multiple threads concurrently? Can 
+that lead to multiple concurrent calls of elv_register_queue() and 
+elv_unregister_queue()? Can that e.g. cause concurrent calls of the 
+following code from elv_register_queue(): kobject_add(&e->kobj, 
+&q->kobj, "%s", "iosched")?
+
+Is it even possible to fix this lock inversion by introducing only one 
+new mutex? I think the sysfs directories and attributes referenced by 
+this patch are as follows:
+
+/sys/block/<q>/queue
+/sys/block/<q>/queue/attr
+/sys/block/<q>/queue/iosched/attr
+/sys/block/<q>/mq
+/sys/block/<q>/mq/<n>
+/sys/block/<q>/mq/<n>/attr
+
+Isn't the traditional approach to protect such a hierarchy to use one 
+mutex per level? E.g. one mutex to serialize "queue" and "mq" 
+manipulations (sysfs_dir_lock?), one mutex to protect the queue/attr 
+attributes (sysfs_lock?), one mutex to serialize kobj creation in the mq 
+directory, one mutex to protect the mq/<n>/attr attributes and one mutex 
+to protect the I/O scheduler attributes?
+
+Thanks,
+
+Bart.
