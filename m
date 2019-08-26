@@ -2,104 +2,164 @@ Return-Path: <SRS0=sRwj=WW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CCEC3A59F
-	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 17:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0199BC3A59F
+	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 18:18:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A11F2184D
-	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 17:38:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7D4620850
+	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 18:18:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730835AbfHZRix (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Aug 2019 13:38:53 -0400
-Received: from vsmx012.vodafonemail.xion.oxcs.net ([153.92.174.90]:32865 "EHLO
-        vsmx012.vodafonemail.xion.oxcs.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729466AbfHZRix (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Aug 2019 13:38:53 -0400
-Received: from vsmx004.vodafonemail.xion.oxcs.net (unknown [192.168.75.198])
-        by mta-8-out.mta.xion.oxcs.net (Postfix) with ESMTP id E3171F34CCC;
-        Mon, 26 Aug 2019 17:38:50 +0000 (UTC)
-Received: from lazy.lzy (unknown [87.157.113.162])
-        by mta-8-out.mta.xion.oxcs.net (Postfix) with ESMTPA id 4A10119A968;
-        Mon, 26 Aug 2019 17:38:35 +0000 (UTC)
-Received: from lazy.lzy (localhost [127.0.0.1])
-        by lazy.lzy (8.15.2/8.14.5) with ESMTPS id x7QHcYGp004219
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-        Mon, 26 Aug 2019 19:38:34 +0200
-Received: (from red@localhost)
-        by lazy.lzy (8.15.2/8.15.2/Submit) id x7QHcXtE004218;
-        Mon, 26 Aug 2019 19:38:33 +0200
-Date:   Mon, 26 Aug 2019 19:38:33 +0200
-From:   Piergiorgio Sartor <piergiorgio.sartor@nexgo.de>
-To:     Piergiorgio Sartor <piergiorgio.sartor@nexgo.de>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Jens Axboe <axboe@kernel.dk>,
-        USB list <linux-usb@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Kernel development list <linux-kernel@vger.kernel.org>
-Subject: Re: reeze while write on external usb 3.0 hard disk [Bug 204095]
-Message-ID: <20190826173833.GA4166@lazy.lzy>
-References: <20190817095422.GA4200@lazy.lzy>
- <Pine.LNX.4.44L0.1908191009490.1506-100000@iolanthe.rowland.org>
- <20190820072326.GD28968@lst.de>
- <20190820163722.GA2991@lazy.lzy>
+        id S1733190AbfHZSSC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Aug 2019 14:18:02 -0400
+Received: from ms.lwn.net ([45.79.88.28]:58840 "EHLO ms.lwn.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387768AbfHZSSC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Aug 2019 14:18:02 -0400
+Received: from lwn.net (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id C72BB300;
+        Mon, 26 Aug 2019 18:18:00 +0000 (UTC)
+Date:   Mon, 26 Aug 2019 12:17:59 -0600
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v4 3/8] block: blk-crypto for Inline Encryption
+Message-ID: <20190826121759.6fa594b7@lwn.net>
+In-Reply-To: <20190821075714.65140-4-satyat@google.com>
+References: <20190821075714.65140-1-satyat@google.com>
+        <20190821075714.65140-4-satyat@google.com>
+Organization: LWN.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190820163722.GA2991@lazy.lzy>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-VADE-STATUS: LEGIT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 20, 2019 at 06:37:22PM +0200, Piergiorgio Sartor wrote:
-> On Tue, Aug 20, 2019 at 09:23:26AM +0200, Christoph Hellwig wrote:
-> > On Mon, Aug 19, 2019 at 10:14:25AM -0400, Alan Stern wrote:
-> > > Let's bring this to the attention of some more people.
-> > > 
-> > > It looks like the bug that was supposed to be fixed by commit
-> > > d74ffae8b8dd ("usb-storage: Add a limitation for
-> > > blk_queue_max_hw_sectors()"), which is part of 5.2.5, but apparently
-> > > the bug still occurs.
-> > 
-> > Piergiorgio,
-> > 
-> > can you dump the content of max_hw_sectors_kb file for your USB storage
-> > device and send that to this thread?
+On Wed, 21 Aug 2019 00:57:09 -0700
+Satya Tangirala <satyat@google.com> wrote:
+
+> We introduce blk-crypto, which manages programming keyslots for struct
+> bios. With blk-crypto, filesystems only need to call bio_crypt_set_ctx with
+> the encryption key, algorithm and data_unit_num; they don't have to worry
+> about getting a keyslot for each encryption context, as blk-crypto handles
+> that. Blk-crypto also makes it possible for layered devices like device
+> mapper to make use of inline encryption hardware.
 > 
-> Hi all,
+> Blk-crypto delegates crypto operations to inline encryption hardware when
+> available, and also contains a software fallback to the kernel crypto API.
+> For more details, refer to Documentation/block/blk-crypto.txt.
+
+So that file doesn't seem to exist; did you mean inline-encryption.txt
+here?
+
+> Signed-off-by: Satya Tangirala <satyat@google.com>
+> ---
+>  Documentation/block/inline-encryption.txt | 186 ++++++
+>  block/Kconfig                             |   2 +
+>  block/Makefile                            |   3 +-
+>  block/bio-crypt-ctx.c                     |   7 +-
+>  block/bio.c                               |   5 +
+>  block/blk-core.c                          |  11 +-
+>  block/blk-crypto.c                        | 737 ++++++++++++++++++++++
+>  include/linux/bio-crypt-ctx.h             |   7 +
+>  include/linux/blk-crypto.h                |  47 ++
+>  9 files changed, 1002 insertions(+), 3 deletions(-)
+>  create mode 100644 Documentation/block/inline-encryption.txt
+>  create mode 100644 block/blk-crypto.c
+>  create mode 100644 include/linux/blk-crypto.h
 > 
-> for both kernels, 5.1.20 (working) and 5.2.8 (not working),
-> the content of /sys/dev/x:y/queue/max_hw_sectors_kb is 512
-> for USB storage devices (2.0 and 3.0).
-> 
-> This is for the PC showing the issue.
-> 
-> In an other PC, which does not show the issus at the moment,
-> the values are 120, for USB2.0, and 256, for USB3.0.
+> diff --git a/Documentation/block/inline-encryption.txt b/Documentation/block/inline-encryption.txt
+> new file mode 100644
+> index 000000000000..925611a5ea65
+> --- /dev/null
+> +++ b/Documentation/block/inline-encryption.txt
 
-Hi again,
+So we've been doing our best to get rid of .txt files in the documentation
+tree.  I'd really be a lot happier if this were an RST file instead.  The
+good news is that it's already 99% RST, so little would have to change.
 
-any news on this?
+See the info in Documentation/doc-guide for details.
 
-Is there anything I can do to help?
+> @@ -0,0 +1,186 @@
+> +BLK-CRYPTO and KEYSLOT MANAGER
+> +===========================
+> +
+> +CONTENTS
+> +1. Objective
+> +2. Constraints and notes
+> +3. Design
+> +4. Blk-crypto
+> + 4-1 What does blk-crypto do on bio submission
+> +5. Layered Devices
+> +6. Future optimizations for layered devices
 
-Should I report this somewhere else too?
+RST would generate this TOC for you, so you can take it out.
 
-Currently this is quite a huge problem for me,
-since the only working external storage is an
-old 1394 HDD...
+> +1. Objective
+> +============
+> +
+> +We want to support inline encryption (IE) in the kernel.
+> +To allow for testing, we also want a crypto API fallback when actual
+> +IE hardware is absent. We also want IE to work with layered devices
+> +like dm and loopback (i.e. we want to be able to use the IE hardware
+> +of the underlying devices if present, or else fall back to crypto API
+> +en/decryption).
+> +
+> +
+> +2. Constraints and notes
+> +========================
+> +
+> +1) IE hardware have a limited number of “keyslots” that can be programmed
 
-Thanks,
+Some people get irate when they encounter non-ASCII characters in the docs;
+that includes "smart quotes".
 
-bye,
+Also, s/have/has/
 
--- 
+> +with an encryption context (key, algorithm, data unit size, etc.) at any time.
+> +One can specify a keyslot in a data request made to the device, and the
+> +device will en/decrypt the data using the encryption context programmed into
+> +that specified keyslot. When possible, we want to make multiple requests with
+> +the same encryption context share the same keyslot.
+> +
+> +2) We need a way for filesystems to specify an encryption context to use for
+> +en/decrypting a struct bio, and a device driver (like UFS) needs to be able
+> +to use that encryption context when it processes the bio.
+> +
+> +3) We need a way for device drivers to expose their capabilities in a unified
+> +way to the upper layers.
+> +
+> +
+> +3. Design
+> +=========
+> +
+> +We add a struct bio_crypt_ctx to struct bio that can represent an
+> +encryption context, because we need to be able to pass this encryption
+> +context from the FS layer to the device driver to act upon.
+> +
+> +While IE hardware works on the notion of keyslots, the FS layer has no
+> +knowledge of keyslots - it simply wants to specify an encryption context to
+> +use while en/decrypting a bio.
+> +
+> +We introduce a keyslot manager (KSM) that handles the translation from
+> +encryption contexts specified by the FS to keyslots on the IE hardware.
 
-piergiorgio
+So...if this were RST, you could have directives to pull in the nice
+kerneldoc comments you've already put into the source.
+
+I'll stop here...presumably I've made my point by now :)
+
+Thanks for documenting this subsystem!
+
+jon
