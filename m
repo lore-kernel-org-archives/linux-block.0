@@ -2,232 +2,324 @@ Return-Path: <SRS0=A22s=WX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA9CC3A5A6
-	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 21:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB15C3A5A6
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 22:34:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9FFE520656
-	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 21:23:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k15hrvDz"
+	by mail.kernel.org (Postfix) with ESMTP id E87B22184D
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 22:34:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1566945262;
+	bh=z3xopfZ51WkV8awSgGyWZJzCisrDG8pyxGkIqqDVBSE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=va1yOZi5i97c+qNGCc5u/S15XEDV7+cro3HfeFygYyNTmvqK8wpTG8Yy9cAw/YYJc
+	 eua5yRI6gtQtzg8hpKEyYKOH2uOj9haXdTC5RjqREsWIBz71W/ZpyywAm64E92mlh6
+	 JOqlQCisKZ0/LYRvgHwxSp+yo3Gb/mcdVrP8NwHM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728972AbfH0VXT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Aug 2019 17:23:19 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34852 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726675AbfH0VXT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Aug 2019 17:23:19 -0400
-Received: by mail-wr1-f65.google.com with SMTP id k2so283979wrq.2;
-        Tue, 27 Aug 2019 14:23:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pTOaZhW5xKtnT1x8xRBR+lYJlD1bPd7S9+Vr1x5mo0c=;
-        b=k15hrvDzSkku9LhKt4Dw7rN5H5/wnPa5DLw2TxVQi9ZwArGhWd0Bq6pcX7CLvAme9f
-         vujFTq4VbRK80hSNZXfgYzkt7nmoJEZukM+3t0q4bv9a6JgkRK6iJFjsjSPGsQJ+2JrC
-         HP9YCDUHmub9O9iG6bOWZTl/iWQXjCm/athaXNwoqlGq+la0uegJnH6Pz4pXkvS+ngXp
-         u3g7kLmnKo1fMhze/vyb6DVBuZste+cB8J5Ewg4wHYs0Aahb260NPhW6uCxw8/BlK95u
-         K8PcgYnn8BBpozs2i3R6x1EZxl3OYzep37PIWYmoiMx4rpp2RZrNvUX55u6Jbxv0r5Ma
-         recw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=pTOaZhW5xKtnT1x8xRBR+lYJlD1bPd7S9+Vr1x5mo0c=;
-        b=IEEfk+J6v6LuxVaTPfLUTRsAlX71daCqtwxJbidEk4NEuifFlk1OEWS6EVXXZCl5MZ
-         cZo9Y4iH7tnqfOjFg1drEJ+b61hsqI8ZU/LTLYoBxkBOWooyiRwrNelhQP/CN8xcl/Jn
-         ivO7kfak2IBgU8/pjH7BiVqGK0Rzm45AGii71pwAiDawyA4KqUpp6OORj/gdzZGnI9XX
-         0TvH6uvE8lOatM7YYkjQtpaZmDlpkYtZ6YVgjKIsiu4CgJP7Yx5XkOCHGYRpVugCRJgJ
-         21yHS8XHuhfN/bAa2D+jgh0tAs0N6RPS5iYaXoDhehU0QjzahdCWkAuEybQTnJtvdttQ
-         ZddQ==
-X-Gm-Message-State: APjAAAVjgJDGAq5qhaoKc8bnVt6YId101pJ+SVpjY4h+eGFS6Cv0C378
-        CNb09ANOkIwCxiJs1HDF1memyIwR
-X-Google-Smtp-Source: APXvYqwch/WIGFqX8UdlE+stqLlGzDb6mAAO+ADMOVPkX0a9I6jBXMkZldGyPc5HrWWioaq5b/AYSQ==
-X-Received: by 2002:adf:f281:: with SMTP id k1mr262269wro.154.1566940996262;
-        Tue, 27 Aug 2019 14:23:16 -0700 (PDT)
-Received: from [192.168.1.19] (ckl27.neoplus.adsl.tpnet.pl. [83.31.87.27])
-        by smtp.gmail.com with ESMTPSA id f13sm252179wrr.5.2019.08.27.14.23.14
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 27 Aug 2019 14:23:15 -0700 (PDT)
-Subject: Re: [PATCH v4 4/5] block: introduce LED block device activity trigger
-To:     Akinobu Mita <akinobu.mita@gmail.com>
-Cc:     Pavel Machek <pavel@ucw.cz>, linux-block@vger.kernel.org,
-        linux-leds@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org,
-        Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>,
-        Dan Murphy <dmurphy@ti.com>, Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.com>
-References: <1565888399-21550-1-git-send-email-akinobu.mita@gmail.com>
- <1565888399-21550-5-git-send-email-akinobu.mita@gmail.com>
- <20190817145509.GA18381@amd> <925633c4-a459-5e84-9c9a-502a504fdc82@gmail.com>
- <20190819143842.GA25401@amd> <7c4c4853-7e3a-0618-92a0-337e248e2b4c@gmail.com>
- <c937b7e0-02c6-ae9a-aaf7-16a2ef29886d@gmail.com>
- <CAC5umyjxkeR3rhf3XZvwkxLvc-0ENEkQfOLnk8A12Qazr9Et8w@mail.gmail.com>
- <86309c4f-bcee-182c-369f-fcc883f379c6@gmail.com>
- <CAC5umyibEMrxhZv0TyS6hYHR+oyj2Oby+LVsjrYmMV8u-chXRQ@mail.gmail.com>
-From:   Jacek Anaszewski <jacek.anaszewski@gmail.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jacek.anaszewski@gmail.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <1f7928a1-61ba-72f0-fd03-2208856cd8b8@gmail.com>
-Date:   Tue, 27 Aug 2019 23:23:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726030AbfH0WeV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Aug 2019 18:34:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60552 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725989AbfH0WeV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Aug 2019 18:34:21 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B50CF20856;
+        Tue, 27 Aug 2019 22:34:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1566945259;
+        bh=z3xopfZ51WkV8awSgGyWZJzCisrDG8pyxGkIqqDVBSE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=IHnbWObz7IdfNCr+53RBoZHkmbFKif0Ubb3U5DkhOtvlRer9YxXdAsIT9YoL7Kidv
+         Q22s8MGqTqqZZeT2DNSgZhSuqMttd550jyK2IOBeMRSVdo96htJcCV2bX9pl4maVMR
+         Z2Gg+MPSg2Ep+r0t8NHplneXUJkCyIiA254+HXT8=
+Date:   Tue, 27 Aug 2019 15:34:17 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v4 3/8] block: blk-crypto for Inline Encryption
+Message-ID: <20190827223415.GC27166@gmail.com>
+Mail-Followup-To: Satya Tangirala <satyat@google.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+References: <20190821075714.65140-1-satyat@google.com>
+ <20190821075714.65140-4-satyat@google.com>
 MIME-Version: 1.0
-In-Reply-To: <CAC5umyibEMrxhZv0TyS6hYHR+oyj2Oby+LVsjrYmMV8u-chXRQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190821075714.65140-4-satyat@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/27/19 4:03 PM, Akinobu Mita wrote:
-> 2019年8月25日(日) 0:53 Jacek Anaszewski <jacek.anaszewski@gmail.com>:
->>
->> On 8/23/19 6:00 PM, Akinobu Mita wrote:
->>> 2019年8月20日(火) 3:38 Jacek Anaszewski <jacek.anaszewski@gmail.com>:
->>>>
->>>> On 8/19/19 8:22 PM, Jacek Anaszewski wrote:
->>>>> On 8/19/19 4:38 PM, Pavel Machek wrote:
->>>>>> On Sat 2019-08-17 22:07:43, Jacek Anaszewski wrote:
->>>>>>> On 8/17/19 4:55 PM, Pavel Machek wrote:
->>>>>>>> On Fri 2019-08-16 01:59:58, Akinobu Mita wrote:
->>>>>>>>> This allows LEDs to be controlled by block device activity.
->>>>>>>>>
->>>>>>>>> We already have ledtrig-disk (LED disk activity trigger), but the lower
->>>>>>>>> level disk drivers need to utilize ledtrig_disk_activity() to make the
->>>>>>>>> LED blink.
->>>>>>>>>
->>>>>>>>> The LED block device trigger doesn't require the lower level drivers to
->>>>>>>>> have any instrumentation. The activity is collected by polling the disk
->>>>>>>>> stats.
->>>>>>>>>
->>>>>>>>> Example:
->>>>>>>>>
->>>>>>>>> echo block-nvme0n1 > /sys/class/leds/diy/trigger
->>>>>>>>
->>>>>>>> Lets use one trigger "block" and have the device as a parameter,
->>>>>>>> please.
->>>>>>>>
->>>>>>>> We already have 1000 cpu triggers on 1000 cpu machines, and yes, its a
->>>>>>>> disaster we'll need to fix. Lets not repeat the same mistake here.
->>>>>>>>
->>>>>>>> I guess it may be slightly more work. Sorry about that.
->>>>>>>
->>>>>>> We should be able to list available block devices to set,
->>>>>>> so the problem would be not avoided anyway.
->>>>>>
->>>>>> Should we? We need to list triggers, but we may not list all the devices...
->>>>>
->>>>> This is similar to usbport trigger that lists available
->>>>> ports as files in a sub-directory. We might eventually go
->>>>> in this direction.
->>>>
->>>> I must withdraw this statement. This is not similar to usbport
->>>> trigger. The difference is that with ledtrig-block we have separate
->>>> triggers per each device and I am not aware if there is some centralized
->>>> mechanism similar to blocking_notifier_chain (usb_notifier_list
->>>> in drivers/usb/core/notify.c) available for block devices, that
->>>> would allow to gather all available block devs under common trigger.
->>>>
->>>> Moreover I remember Greg once discouraged using notifier chains
->>>> as they are unsafe, so we would need some other solution anyway.
->>>
->>> I start thinking that we should implement the LED block device activity
->>> trigger in userspace.  The userspace application firstly activates
->>> one-shot LED trigger and periodically reads /sys/block/<disk>/stat and
->>> writes /sys/class/leds/<led>/shot if there is any disk activity.
->>
->> This would suboptimal solution. I have another idea - let's get back
->> to the implementation of ledtrig-blk in genhd.c. We would be registering
->> one trigger on module initialization in a function with __init modifier.
->> Then we would need to add/remove triggers to the ledtrig-blk in
->> register_blkdev()/unregister_blkdev(). And registered triggers would
->> be listed in block_devs directory created by the trigger.
->>
->> You can compare how drivers/usb/core/ledtrig-usbport.c maintains
->> similar directory of usb ports.
-> 
-> It could be possible, but I have yet another idea.  What about introducing
-> /proc/led-triggers and /sys/class/leds/<led>/current-trigger?
-> The /sys/class/leds/<led>/trigger will be obsoleted by these two files.
-> 
-> The /proc/led-triggers is read only and no PAGE_SIZE limitation by the
-> seq_file interface.  So we can list all triggers in this file.
-> 
-> The /sys/class/leds/<led>/current-trigger is almost identical to
-> /sys/class/leds/<led>/trigger.  The only difference is that
-> 'current-trigger' only shows the current trigger name.
+On Wed, Aug 21, 2019 at 12:57:09AM -0700, Satya Tangirala wrote:
+> diff --git a/block/blk-crypto.c b/block/blk-crypto.c
+> new file mode 100644
+> index 000000000000..c8f06264a0f5
+> --- /dev/null
+> +++ b/block/blk-crypto.c
+> @@ -0,0 +1,737 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright 2019 Google LLC
+> + */
+> +
+> +/*
+> + * Refer to Documentation/block/inline-encryption.txt for detailed explanation.
+> + */
+> +
+> +#ifdef pr_fmt
+> +#undef pr_fmt
+> +#endif
 
-There's not need to come up with yet another trigger interface.
-We just need to convert sysfs trigger attribute type to binary.
+This is the beginning of the file, so the
 
--- 
-Best regards,
-Jacek Anaszewski
+#ifdef pr_fmt
+#undef pr_fmt
+#endif
+
+is unnecessary.
+
+> +static struct blk_crypto_keyslot {
+> +	struct crypto_skcipher *tfm;
+> +	enum blk_crypto_mode_num crypto_mode;
+> +	u8 key[BLK_CRYPTO_MAX_KEY_SIZE];
+> +	struct crypto_skcipher *tfms[ARRAY_SIZE(blk_crypto_modes)];
+> +} *blk_crypto_keyslots;
+
+It would be helpful if there was a comment somewhere explaining what's going on
+with the crypto tfms now, like:
+
+/*
+ * Allocating a crypto tfm during I/O can deadlock, so we have to preallocate
+ * all a mode's tfms when that mode starts being used.  Since each mode may need
+ * all the keyslots at some point, each mode needs its own tfm for each keyslot;
+ * thus, a keyslot may contain tfms for multiple modes.  However, to match the
+ * behavior of real inline encryption hardware (which only supports a single
+ * encryption context per keyslot), we only allow one tfm per keyslot to be used
+ * at a time.  Unused tfms have their keys cleared.
+ */
+
+Otherwise it's not at all obvious what's going on.
+
+> +
+> +static struct mutex tfms_lock[ARRAY_SIZE(blk_crypto_modes)];
+> +static bool tfms_inited[ARRAY_SIZE(blk_crypto_modes)];
+> +
+> +struct work_mem {
+> +	struct work_struct crypto_work;
+> +	struct bio *bio;
+> +};
+> +
+> +/* The following few vars are only used during the crypto API fallback */
+> +static struct keyslot_manager *blk_crypto_ksm;
+> +static struct workqueue_struct *blk_crypto_wq;
+> +static mempool_t *blk_crypto_page_pool;
+> +static struct kmem_cache *blk_crypto_work_mem_cache;
+> +
+> +bool bio_crypt_swhandled(struct bio *bio)
+> +{
+> +	return bio_has_crypt_ctx(bio) &&
+> +	       bio->bi_crypt_context->processing_ksm == blk_crypto_ksm;
+> +}
+> +
+> +static const u8 zeroes[BLK_CRYPTO_MAX_KEY_SIZE];
+> +static void evict_keyslot(unsigned int slot)
+> +{
+> +	struct blk_crypto_keyslot *slotp = &blk_crypto_keyslots[slot];
+> +	enum blk_crypto_mode_num crypto_mode = slotp->crypto_mode;
+> +
+> +	/* Clear the key in the skcipher */
+> +	crypto_skcipher_setkey(slotp->tfms[crypto_mode], zeroes,
+> +			       blk_crypto_modes[crypto_mode].keysize);
+> +	memzero_explicit(slotp->key, BLK_CRYPTO_MAX_KEY_SIZE);
+> +}
+
+Unfortunately setting the all-zeroes key won't work, because the all-zeroes key
+fails the "weak key" check for XTS, as its two halves are the same.
+
+Presumably this wasn't noticed during testing because the return value of
+crypto_skcipher_setkey() is ignored.  So I suggest adding a WARN_ON():
+
+	err = crypto_skcipher_setkey(slotp->tfms[crypto_mode], blank_key,
+				     blk_crypto_modes[crypto_mode].keysize);
+	WARN_ON(err);
+
+Then for the actual fix, maybe set a random key instead of an all-zeroes one?
+
+> +
+> +static int blk_crypto_keyslot_program(void *priv, const u8 *key,
+> +				      enum blk_crypto_mode_num crypto_mode,
+> +				      unsigned int data_unit_size,
+> +				      unsigned int slot)
+> +{
+> +	struct blk_crypto_keyslot *slotp = &blk_crypto_keyslots[slot];
+> +	const struct blk_crypto_mode *mode = &blk_crypto_modes[crypto_mode];
+> +	size_t keysize = mode->keysize;
+> +	int err;
+> +
+> +	if (crypto_mode != slotp->crypto_mode) {
+> +		evict_keyslot(slot);
+> +		slotp->crypto_mode = crypto_mode;
+> +	}
+
+Currently the crypto_mode of every blk_crypto_keyslot starts out as AES_256_XTS
+(0).  So if the user starts by choosing some other mode, this will immediately
+call evict_keyslot() and crash dereferencing a NULL pointer.
+
+To fix this, how about initializing all the modes to
+BLK_ENCRYPTION_MODE_INVALID?
+
+Then here the code would need to be:
+
+	if (crypto_mode != slotp->crypto_mode &&
+	    slotp->crypto_mode != BLK_ENCRYPTION_MODE_INVALID)
+		evict_keyslot(slot);
+
+And evict_keyslot() should invalidate the crypto_mode:
+
+static void evict_keyslot(unsigned int slot)
+{
+	...
+
+	slotp->crypto_mode = BLK_ENCRYPTION_MODE_INVALID;
+}
+
+> +
+> +static int blk_crypto_keyslot_evict(void *priv, const u8 *key,
+> +				    enum blk_crypto_mode_num crypto_mode,
+> +				    unsigned int data_unit_size,
+> +				    unsigned int slot)
+> +{
+> +	evict_keyslot(slot);
+> +	return 0;
+> +}
+
+It might be useful to have a WARN_ON() here if the keyslot isn't in use
+(i.e., if slotp->crypto_mode == BLK_ENCRYPTION_MODE_INVALID).
+
+> +int blk_crypto_submit_bio(struct bio **bio_ptr)
+> +{
+> +	struct bio *bio = *bio_ptr;
+> +	struct request_queue *q;
+> +	int err;
+> +	struct bio_crypt_ctx *crypt_ctx;
+> +
+> +	if (!bio_has_crypt_ctx(bio) || !bio_has_data(bio))
+> +		return 0;
+> +
+> +	/*
+> +	 * When a read bio is marked for sw decryption, its bi_iter is saved
+> +	 * so that when we decrypt the bio later, we know what part of it was
+> +	 * marked for sw decryption (when the bio is passed down after
+> +	 * blk_crypto_submit bio, it may be split or advanced so we cannot rely
+> +	 * on the bi_iter while decrypting in blk_crypto_endio)
+> +	 */
+> +	if (bio_crypt_swhandled(bio))
+> +		return 0;
+> +
+> +	err = bio_crypt_check_alignment(bio);
+> +	if (err)
+> +		goto out;
+
+Need to set ->bi_status if bio_crypt_check_alignment() fails.
+
+> +bool blk_crypto_endio(struct bio *bio)
+> +{
+> +	if (!bio_has_crypt_ctx(bio))
+> +		return true;
+> +
+> +	if (bio_crypt_swhandled(bio)) {
+> +		/*
+> +		 * The only bios that are swhandled when they reach here
+> +		 * are those with bio_data_dir(bio) == READ, since WRITE
+> +		 * bios that are encrypted by the crypto API fallback are
+> +		 * handled by blk_crypto_encrypt_endio.
+> +		 */
+> +
+> +		/* If there was an IO error, don't decrypt. */
+> +		if (bio->bi_status)
+> +			return true;
+> +
+> +		blk_crypto_queue_decrypt_bio(bio);
+> +		return false;
+> +	}
+> +
+> +	if (bio_has_crypt_ctx(bio) && bio_crypt_has_keyslot(bio))
+> +		bio_crypt_ctx_release_keyslot(bio);
+
+No need to check bio_has_crypt_ctx(bio) here, as it was already checked above.
+
+> +int blk_crypto_mode_alloc_ciphers(enum blk_crypto_mode_num mode_num)
+> +{
+> +	struct blk_crypto_keyslot *slotp;
+> +	int err = 0;
+> +	int i;
+> +
+> +	/* Fast path */
+> +	if (likely(READ_ONCE(tfms_inited[mode_num]))) {
+> +		/*
+> +		 * Ensure that updates to blk_crypto_keyslots[i].tfms[mode_num]
+> +		 * for each i are visible before we try to access them.
+> +		 */
+> +		smp_rmb();
+> +		return 0;
+> +	}
+
+I think we want smp_load_acquire() here.
+
+	/* pairs with smp_store_release() below */
+	if (smp_load_acquire(&tfms_inited[mode_num]))
+		return 0;
+
+> +
+> +	mutex_lock(&tfms_lock[mode_num]);
+> +	if (likely(tfms_inited[mode_num]))
+> +		goto out;
+> +
+> +	for (i = 0; i < blk_crypto_num_keyslots; i++) {
+> +		slotp = &blk_crypto_keyslots[i];
+> +		slotp->tfms[mode_num] = crypto_alloc_skcipher(
+> +					blk_crypto_modes[mode_num].cipher_str,
+> +					0, 0);
+> +		if (IS_ERR(slotp->tfms[mode_num])) {
+> +			err = PTR_ERR(slotp->tfms[mode_num]);
+> +			slotp->tfms[mode_num] = NULL;
+> +			goto out_free_tfms;
+> +		}
+> +
+> +		crypto_skcipher_set_flags(slotp->tfms[mode_num],
+> +					  CRYPTO_TFM_REQ_FORBID_WEAK_KEYS);
+> +	}
+> +
+> +	/*
+> +	 * Ensure that updates to blk_crypto_keyslots[i].tfms[mode_num]
+> +	 * for each i are visible before we set tfms_inited[mode_num].
+> +	 */
+> +	smp_wmb();
+> +	WRITE_ONCE(tfms_inited[mode_num], true);
+> +	goto out;
+
+... and smp_store_release() here.
+
+	/* pairs with smp_load_acquire() above */
+	smp_store_release(&tfms_inited[mode_num], true);
+	goto out;
+
+- Eric
