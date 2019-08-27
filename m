@@ -1,139 +1,186 @@
-Return-Path: <SRS0=sRwj=WW=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=A22s=WX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 895BAC3A59F
-	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 19:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E6DC3A5A6
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 08:33:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 584D523427
-	for <linux-block@archiver.kernel.org>; Mon, 26 Aug 2019 19:27:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E89A2173E
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 08:33:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="XieTwwnC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731340AbfHZT1l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Aug 2019 15:27:41 -0400
-Received: from mga06.intel.com ([134.134.136.31]:39480 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729201AbfHZT1l (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Aug 2019 15:27:41 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Aug 2019 12:27:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,433,1559545200"; 
-   d="scan'208";a="187692582"
-Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
-  by FMSMGA003.fm.intel.com with ESMTP; 26 Aug 2019 12:27:40 -0700
-Received: from orsmsx115.amr.corp.intel.com (10.22.240.11) by
- ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 26 Aug 2019 12:27:39 -0700
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.119]) by
- ORSMSX115.amr.corp.intel.com ([169.254.4.103]) with mapi id 14.03.0439.000;
- Mon, 26 Aug 2019 12:27:39 -0700
-From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
-To:     "Rajashekar, Revanth" <revanth.rajashekar@intel.com>,
-        "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>
-CC:     "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 3/3] block: sed-opal: Add support to read/write opal
- tables generically
-Thread-Topic: [PATCH 3/3] block: sed-opal: Add support to read/write opal
- tables generically
-Thread-Index: AQHVWFPv9reGpILH7UiRlHLlRaEEMKcMxn4AgAGG1gA=
-Date:   Mon, 26 Aug 2019 19:27:38 +0000
-Message-ID: <c48b10f43cd6b5cf859ea1376b32604ac0ff7113.camel@intel.com>
-References: <20190821191051.3535-1-revanth.rajashekar@intel.com>
-         <20190821191051.3535-4-revanth.rajashekar@intel.com>
-         <20190825200846.GA30738@hacktheplanet>
-In-Reply-To: <20190825200846.GA30738@hacktheplanet>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.232.115.165]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E4DB83793D430E428819D93C662AA702@intel.com>
-Content-Transfer-Encoding: base64
+        id S1728762AbfH0Idn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Aug 2019 04:33:43 -0400
+Received: from mailout3.samsung.com ([203.254.224.33]:59596 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729284AbfH0Idm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Aug 2019 04:33:42 -0400
+Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190827083339epoutp03782dc187a781a620df559bfff9f8ffcb~_uolLPE4V3067930679epoutp03Z
+        for <linux-block@vger.kernel.org>; Tue, 27 Aug 2019 08:33:39 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190827083339epoutp03782dc187a781a620df559bfff9f8ffcb~_uolLPE4V3067930679epoutp03Z
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1566894819;
+        bh=GR9SjpQC1GTjk5IEkgnMXdybEfO+M4pHWDvq1CPw910=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=XieTwwnC97cxvDUoQbpnT0JSA6n+Fk+S7VdNGOrPiXy28E/jsUBLsPbTLacpBVmq4
+         bf6CJ3I4sO0pBCk0d7teQmVffD1IwjV4K5W0fRZ5VVEidrxI4HknvQW4rKJFd+yMLG
+         kHKbAIJD4wTWpVa9zk1tfYfSw5p+LvA6qAUlqSxI=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
+        20190827083338epcas2p1bd702579931911d8ebfa6ae3218ca896~_uokazBY00556005560epcas2p1x;
+        Tue, 27 Aug 2019 08:33:38 +0000 (GMT)
+Received: from epsmges2p3.samsung.com (unknown [182.195.40.190]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 46Hhwc2X60zMqYkg; Tue, 27 Aug
+        2019 08:33:36 +0000 (GMT)
+Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
+        epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F2.4A.04068.FDAE46D5; Tue, 27 Aug 2019 17:33:35 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas2p1.samsung.com (KnoxPortal) with ESMTPA id
+        20190827083334epcas2p115d479190b9a72c886f66569add78203~_uog_kpL90324603246epcas2p1z;
+        Tue, 27 Aug 2019 08:33:34 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20190827083334epsmtrp1f673cf2781a7bd9de3d4862d267c9cf9~_uog9Ynxl2654126541epsmtrp1O;
+        Tue, 27 Aug 2019 08:33:34 +0000 (GMT)
+X-AuditID: b6c32a47-5a1ff70000000fe4-07-5d64eadfc43f
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        07.26.03638.EDAE46D5; Tue, 27 Aug 2019 17:33:34 +0900 (KST)
+Received: from KORDO035251 (unknown [12.36.165.204]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20190827083334epsmtip186318bd933a57fdbaadd80afd23bc675~_uogrxHdu2027020270epsmtip14;
+        Tue, 27 Aug 2019 08:33:34 +0000 (GMT)
+From:   "boojin.kim" <boojin.kim@samsung.com>
+To:     "'Satya Tangirala'" <satyat@google.com>
+Cc:     "'Herbert Xu'" <herbert@gondor.apana.org.au>,
+        "'David S. Miller'" <davem@davemloft.net>,
+        "'Eric Biggers'" <ebiggers@kernel.org>,
+        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
+        "'Chao Yu'" <chao@kernel.org>,
+        "'Jaegeuk Kim'" <jaegeuk@kernel.org>,
+        "'Andreas Dilger'" <adilger.kernel@dilger.ca>,
+        "'Theodore Ts'o'" <tytso@mit.edu>, <dm-devel@redhat.com>,
+        "'Mike Snitzer'" <snitzer@redhat.com>,
+        "'Alasdair Kergon'" <agk@redhat.com>,
+        "'Jens Axboe'" <axboe@kernel.dk>,
+        "'Krzysztof Kozlowski'" <krzk@kernel.org>,
+        "'Kukjin Kim'" <kgene@kernel.org>,
+        "'Jaehoon Chung'" <jh80.chung@samsung.com>,
+        "'Ulf Hansson'" <ulf.hansson@linaro.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-fscrypt@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <linux-samsung-soc@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-ext4@vger.kernel.org>,
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        <linux-samsung-soc@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH 5/9] block: support diskcipher
+Date:   Tue, 27 Aug 2019 17:33:33 +0900
+Message-ID: <03b201d55cb2$1d4d31b0$57e79510$@samsung.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 14.0
+Thread-Index: AdVcd9wJ7O+zjwFDS522TgVlMugkdw==
+Content-Language: ko
+X-Brightmail-Tracker: H4sIAAAAAAAAA01TfUwTdxjOr3e9nrguR0H2S/dhd9Nk1VDaasuPTUyjZl4y48jIdDGScmkv
+        hawfl16LuizDIdRa2TqzGWZhDnSTWUNwhQFDSqQyGIyPRSIBo9PMzii6LxASiI71OMz473mf
+        93nyfuUlMVWDQk2Wun2c1806aSINb7uizc2+NWUv0ne3pKHZR0EcNQ/2YejCzTCBfj45LEN1
+        o5U4iv9ZK0dNXY8xdHzqBZRsjmBoYiEgR+E7DzA0OnpRgWJ3xuUofn0juvXrvAydOn2DQFfP
+        7ERTp+dw1BUfwNFYZx2BehfDAH0x2i1D4Qs3CRT4bhagqup5Bepv2mtRM63nJ2VMZcsBpu3y
+        eqY+5mfGhv1MLHqMYG6MdxFMy9flzKX6GRlTMfQjxvzVfY1gPmmNAmYm9lKBcp9zSwnH2jmv
+        hnPbPPZStyOffrPQut1qMusN2YY8lEtr3KyLy6d37CrIfqPUmVoCrSljnf4UVcAKAp2zdYvX
+        4/dxmhKP4MunOd7u5A0GXiewLsHvduhsHtdrBr3eaEopi50lE008P688ONb3EDsMaleHAElC
+        ajP8aOSDEEgjVVQHgPfOHsGlYBrAip/qZCGwKhXMARjvyxCxaKhcuKeQRHEAByd+B1JwH8C5
+        2k6FqCKojbClPwpEnJnCv109LxdFGPWvAianE7iYyKCMsCp0fKkETq2HwcV/CBErqTzYM9AA
+        JJwOB04ll/QYtRa2/1GHSW1oYMfwg+UCOjgTGpZLmkxYeyyAicUgVUXCiiO9QDLsgPUnLi+b
+        M+BUf6tCwmp4PxxYxuXw2rmzCslcDeDQwtPEJhi5exSIG8MoLWzuzJGW9wrsvb7c27MweOWJ
+        QqKVMBhQScZ18MvpMZlEq+Hf1R9KNAOrex+CT8HLkRVDRlYMGVkxTOT/svUAj4IsjhdcDk4w
+        8ptWnjoGlt5jw84O0DayKwEoEtDPKOGQrUglZ8uEQ64EgCRGZyqdOWyRSmlnD73PeT1Wr9/J
+        CQlgSt3gBKZeY/Okns3tsxpMRrNZn2dCJrMR0c8pY6sn96soB+vj3uM4nvM+9cnIVerDIN02
+        fu57SyxrbXLP0OdvJb552/bxtjaQ9Qt99N2yrdp9dw2O8FfrZm9nYo4n6WHLyeIcoX22/VEj
+        z4Efgo7bI9pOy+sN5c9/++rg9sLduYXbbKhmT7Jmc4PHduazdw7WWCcDOosR2ot79Iv7df12
+        VmjcbT4QfzzQ+OKilulJdERpXChhDRswr8D+B8P/EWw0BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrMIsWRmVeSWpSXmKPExsWy7bCSnO69VymxBrcXqlh8/dLBYrH+1DFm
+        i9V3+9ksTk89y2Qx53wLi8Xed7NZLdbu+cNs0f1KxuLJ+lnMFjd+tbFa9D9+zWxx/vwGdotN
+        j6+xWuy9pW1x/95PJouZ8+6wWVxa5G7xat43Fos9e0+yWFzeNYfN4sj/fkaLGef3MVn0r77L
+        ZtG28SujRWvPT3aL42vDHaQ8tqy8yeTRsrncY9sBVY8Fm0o9Lp8t9di0qpPN4861PWwem5fU
+        e+xe8JnJo+nMUWaP9/uusnn0bVnF6PF5k1wAbxSXTUpqTmZZapG+XQJXxo21BQU/eSsuH3vD
+        3MA4m7uLkZNDQsBEouXXC/YuRi4OIYHdjBKXOpcxQySkJLa274GyhSXutxxhhSh6ziix7Mtx
+        FpAEm4C2xObjqxhBbBEg+9GllawgNrPANA6JXR/EQWxhASOJ1q5uJhCbRUBVouP/RzYQm1fA
+        UuLgyYWMELagxMmZT4BmcgD16km0bWSEGCMvsf3tHKgbFCR2nH0NtUpP4nPXWahVIhKzO9uY
+        JzAKzkIyaRbCpFlIJs1C0rGAkWUVo2RqQXFuem6xYYFRXmq5XnFibnFpXrpecn7uJkZwUtDS
+        2sF44kT8IUYBDkYlHl6JM8mxQqyJZcWVuYcYJTiYlUR4c/QTY4V4UxIrq1KL8uOLSnNSiw8x
+        SnOwKInzyucfixQSSE8sSc1OTS1ILYLJMnFwSjUwzu+6tX/72stKzWKemrbqW3KZJgeK77oX
+        vnmD0Nlwy8yz3/uF2aTDk6Q9mT01RQOT/X7MEFBaXeui9Fboo4K3zMMdi7im3nry/vQ537ua
+        eclstddPhB5dfjO89nnTGwtpTb6aTJ2Dh/PtuYV0nv6MZ5ELzkkLcbJeUyojuOHt6spPUS78
+        wjxKLMUZiYZazEXFiQDWZLGyBgMAAA==
+X-CMS-MailID: 20190827083334epcas2p115d479190b9a72c886f66569add78203
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20190827083334epcas2p115d479190b9a72c886f66569add78203
+References: <CGME20190827083334epcas2p115d479190b9a72c886f66569add78203@epcas2p1.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gU3VuLCAyMDE5LTA4LTI1IGF0IDE2OjA4IC0wNDAwLCBTY290dCBCYXVlciB3cm90ZToNCj4g
-T24gV2VkLCBBdWcgMjEsIDIwMTkgYXQgMDE6MTA6NTFQTSAtMDYwMCwgUmV2YW50aCBSYWphc2hl
-a2FyIHdyb3RlOg0KPiANCj4gW3NuaXBdDQo+IA0KPiA+IFRoZSBpb2N0bCBwcm92aWRlcyBhIHBy
-aXZhdGUgZmllbGQgd2l0aCB0aGUgaW50ZW50aW9udCB0byBhY2NvbW1vZGF0ZQ0KPiA+IGFueSBm
-dXR1cmUgZXhwYW5zaW9ucyB0byB0aGUgaW9jdGwuDQo+IA0KPiBzcGVsbGluZyAoaW50ZW50aW9u
-dCkgDQo+IA0KPiBbc25pcF0NCj4gDQo+ID4gKyAqIElPX0JVRkZFUl9MRU5HVEggPSAyMDQ4DQo+
-ID4gKyAqIHNpemVvZihoZWFkZXIpID0gNTYNCj4gPiArICogTm8uIG9mIFRva2VuIEJ5dGVzIGlu
-IHRoZSBSZXNwb25zZSA9IDExDQo+ID4gKyAqIE1BWCBzaXplIG9mIGRhdGEgdGhhdCBjYW4gYmUg
-Y2FycmllZCBpbiByZXNwb25zZSBidWZmZXINCj4gPiArICogYXQgYSB0aW1lIGlzIDogMjA0OCAt
-ICg1NiArIDExKSA9IDE5ODEgPSAweDdCRC4NCj4gPiArICovDQo+ID4gKyNkZWZpbmUgT1BBTF9N
-QVhfUkVBRF9UQUJMRSAoMHg3QkQpDQo+ID4gKw0KPiA+ICtzdGF0aWMgaW50IHJlYWRfdGFibGVf
-ZGF0YShzdHJ1Y3Qgb3BhbF9kZXYgKmRldiwgdm9pZCAqZGF0YSkNCj4gPiArew0KPiA+ICsJCWRz
-dCA9ICh1OCBfX3VzZXIgKikodWludHB0cl90KXJlYWRfdGJsLT5kYXRhOw0KPiA+ICsJCWlmIChj
-b3B5X3RvX3VzZXIoZHN0ICsgb2ZmLCBkZXYtPnByZXZfZGF0YSwgZGV2LT5wcmV2X2RfbGVuKSkg
-ew0KPiA+ICsJCQlwcl9kZWJ1ZygiRXJyb3IgY29weWluZyBkYXRhIHRvIHVzZXJzcGFjZVxuIik7
-DQo+ID4gKwkJCWVyciA9IC1FRkFVTFQ7DQo+ID4gKwkJCWJyZWFrOw0KPiA+ICsJCX0NCj4gDQo+
-IEknbSB3aXRoIEpvbiBvbiB0aGlzIG9uZS4gRXZlbiB0aG91Z2ggdGhlIHNwZWMgc2F5cyB3ZSBo
-YXZlIGEgbWF4IHNpemUsIGxldHMgbm90IHB1dCBvdXIgdHJ1c3QgaW4gZmlybXdhcmUgZW5naW5l
-ZXJzLg0KPiBBIHNpbXBsZSBpZiBjaGVjayBpcyBlYXN5IHRvIHBsYWNlIGJlZm9yZSB0aGUgQ1RV
-IGFuZCB3aWxsIHNvbHZlIGFueSBmdXR1cmUgd3RmIGRlYnVnZ2luZyBvbiBhIHVzZXJsYW5kIHBy
-b2dyYW0uDQo+IA0KPiANCkkgdGhpbmsgd2UgY291bGQgZG8gdGhhdCBhcyB3ZWxsIGFzIHNwZWNp
-ZnkgdGhlDQpNYXhSZXNwb25zZUNvbVBhY2tldFNpemU9SU9fQlVGRkVSX0xFTkdUSCBpbiB0aGUg
-Y29tbWFuZA0KaHR0cHM6Ly90cnVzdGVkY29tcHV0aW5nZ3JvdXAub3JnL3dwLWNvbnRlbnQvdXBs
-b2Fkcy9UQ0dfU3RvcmFnZV9PcGFsX1NTQ19BcHBsaWNhdGlvbl9Ob3RlXzEtMDBfMS0wMC1GaW5h
-bC5wZGYNCjMuMi4xLjIuMSBIb3N0IHRvIFRQZXIgUHJvcGVydGllcyBpbnZvY2F0aW9uDQoNCj4g
-DQo+IA0KPiANCj4gPiArc3RhdGljIGludCBvcGFsX2dlbmVyaWNfcmVhZF93cml0ZV90YWJsZShz
-dHJ1Y3Qgb3BhbF9kZXYgKmRldiwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBzdHJ1Y3Qgb3BhbF9yZWFkX3dyaXRlX3RhYmxlICpyd190YmwpDQo+ID4gK3sN
-Cj4gPiArCWNvbnN0IHN0cnVjdCBvcGFsX3N0ZXAgd3JpdGVfdGFibGVfc3RlcHNbXSA9IHsNCj4g
-PiArCQl7IHN0YXJ0X2FkbWluMUxTUF9vcGFsX3Nlc3Npb24sICZyd190YmwtPmtleSB9LA0KPiA+
-ICsJCXsgd3JpdGVfdGFibGVfZGF0YSwgcndfdGJsIH0sDQo+ID4gKwkJeyBlbmRfb3BhbF9zZXNz
-aW9uLCB9DQo+ID4gKwl9Ow0KPiA+ICsNCj4gPiArCWNvbnN0IHN0cnVjdCBvcGFsX3N0ZXAgcmVh
-ZF90YWJsZV9zdGVwc1tdID0gew0KPiA+ICsJCXsgc3RhcnRfYWRtaW4xTFNQX29wYWxfc2Vzc2lv
-biwgJnJ3X3RibC0+a2V5IH0sDQo+ID4gKwkJeyByZWFkX3RhYmxlX2RhdGEsIHJ3X3RibCB9LA0K
-PiA+ICsJCXsgZW5kX29wYWxfc2Vzc2lvbiwgfQ0KPiA+ICsJfTsNCj4gPiArCWludCByZXQgPSAw
-Ow0KPiA+ICsNCj4gPiArCW11dGV4X2xvY2soJmRldi0+ZGV2X2xvY2spOw0KPiA+ICsJc2V0dXBf
-b3BhbF9kZXYoZGV2KTsNCj4gPiArCWlmIChyd190YmwtPmZsYWdzICYgT1BBTF9UQUJMRV9SRUFE
-KSB7DQo+ID4gKwkJaWYgKHJ3X3RibC0+c2l6ZSA+IDApDQo+ID4gKwkJCXJldCA9IGV4ZWN1dGVf
-c3RlcHMoZGV2LCByZWFkX3RhYmxlX3N0ZXBzLA0KPiA+ICsJCQkJCSAgICBBUlJBWV9TSVpFKHJl
-YWRfdGFibGVfc3RlcHMpKTsNCj4gPiArCX0gZWxzZSBpZiAocndfdGJsLT5mbGFncyAmIE9QQUxf
-VEFCTEVfV1JJVEUpIHsNCj4gPiArCQlpZiAocndfdGJsLT5zaXplID4gMCkNCj4gPiArCQkJcmV0
-ID0gZXhlY3V0ZV9zdGVwcyhkZXYsIHdyaXRlX3RhYmxlX3N0ZXBzLA0KPiA+ICsJCQkJCSAgICBB
-UlJBWV9TSVpFKHdyaXRlX3RhYmxlX3N0ZXBzKSk7DQo+ID4gKwl9IGVsc2Ugew0KPiA+ICsJCXBy
-X2RlYnVnKCJJbnZhbGlkIGJpdCBzZXQgaW4gdGhlIGZsYWcuXG4iKTsNCj4gPiArCQlyZXQgPSAt
-RUlOVkFMOw0KPiA+ICsJfQ0KPiA+ICsJbXV0ZXhfdW5sb2NrKCZkZXYtPmRldl9sb2NrKTsNCj4g
-PiArDQo+ID4gKwlyZXR1cm4gcmV0Ow0KPiA+ICt9DQo+IA0KPiBEbyB3ZSBleHBlY3QgdG8gYWRk
-IG1vcmUgZmxhZ3MgaW4gdGhlIGZ1dHVyZT8gSSBhc2sgYmVjYXVzZSB0aGlzIGZ1bmN0aW9uIGNh
-biBxdWlja2x5IGdldCBvdXQNCj4gb2YgaGFuZCB3aXRoIHJlZ2FyZCB0byB0aGUgZWxzZSBpZiBj
-aGFpbiBhbmQgdGhlIGZ1bmN0aW9uIHRhYmxlIGxpc3QgYWJvdmUuIElmIHdlIHRoaW5rIHdlJ3Jl
-IGdvaW5nDQo+IHRvIGFkZCBtb3JlIGZsYWdzIGluIHRoZSBmdXR1cmUgbGV0cyBzbGFwIGEgc3dp
-dGNoIHN0YXRlbWVudCBpbiBoZXJlIHRvIGNhbGwgb3BhbF90YWJsZV93cml0ZSgpIGFuZA0KPiBv
-cGFsX3RhYmxlX3JlYWQoKS4gV2UgY2FuIGRlYWwgd2l0aCB0aGF0IGluIHRoZSBmdXR1cmUgSSBn
-dWVzcywgSSBqdXN0IGRvbid0IHdhbnQgYSAzMDAwIGxpbmUgZnVuY3Rpb24uDQo+IA0KPiANCkkg
-aGFkIGltYWdpbmVkIHBvdGVudGlhbGx5IGNoYWluaW5nIEFDUyBzZXR0aW5ncyBpbiB0aGUgcmVh
-ZC93cml0ZQ0KDQpZb3UgY291bGQgYWRkIGEgZmxhZyB0aGF0IHNheXMgJ3ByaXZhdGUnIGlzIGFu
-b3RoZXIgb3IgbXVsdGlwbGUgdGFibGUNCnJlYWQvd3JpdGVzLCBhbmQgdGhlIHByaXZhdGUgcG9p
-bnRzIHRvIGEgZGVzY3JpcHRvciBlcXVhbCB0byB0aGUgaW9jdGwNCnN0cnVjdC4NCg0KSSdtIG9r
-IHdpdGggY2hhbmdpbmcgaWYvZWxzZSB0byBzd2l0Y2guIFdoaWNoZXZlciBsb29rcyBiZXR0ZXIu
-DQoNCg0KPiANCj4gDQo+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC9zZWQtb3Bh
-bC5oIGIvaW5jbHVkZS91YXBpL2xpbnV4L3NlZC1vcGFsLmgNCj4gPiBpbmRleCA1OWVlZDBiZGZm
-ZDMuLmE4MDNlZDA1MzRkYSAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL3VhcGkvbGludXgvc2Vk
-LW9wYWwuaA0KPiA+ICsrKyBiL2luY2x1ZGUvdWFwaS9saW51eC9zZWQtb3BhbC5oDQo+ID4gK3N0
-cnVjdCBvcGFsX3JlYWRfd3JpdGVfdGFibGUgew0KPiA+ICsJc3RydWN0IG9wYWxfa2V5IGtleTsN
-Cj4gPiArCWNvbnN0IF9fdTY0IGRhdGE7DQo+ID4gKwljb25zdCBfX3U4IHRhYmxlX3VpZFtPUEFM
-X1VJRF9MRU5HVEhdOw0KPiA+ICsJX191NjQgb2Zmc2V0Ow0KPiA+ICsJX191NjQgc2l6ZTsNCj4g
-PiArCSNkZWZpbmUgT1BBTF9UQUJMRV9SRUFEICgxIDw8IDApDQo+ID4gKwkjZGVmaW5lIE9QQUxf
-VEFCTEVfV1JJVEUgKDEgPDwgMSkNCj4gPiArCV9fdTY0IGZsYWdzOw0KPiA+ICsJX191NjQgcHJp
-djsNCj4gPiArfTsNCj4gDQo+IFR3byB0aGluZ3MsIGNhbiB5b3UgZG91YmxlIGNoZWNrIHRoZSBw
-YWhvbGUgb24gdGhpcyBzdHJ1Y3QgKEdvb2dsZSBpdCBvciBhc2sgSm9uIGhlIGtub3dzKS4NCkkn
-bGwgbWFrZSBzdXJlIHdlIGRvbid0IGJyZWFrIHBhZGRpbmcgYW5kIGFsaWdubWVudCBmb3IgdjIN
-Cg0KPiBTZWNvbmQsIGNhbiB5b3UgbGlmdCB0aG9zZSBkZWZpbmVzIGludG8gRW51bWVyYXRpb25z
-IG9yIG91dCBvZiB0aGUgc3RydWN0PyBJcyB0aGVyZSBhIHJlYXNvbg0KPiB0aGV5J3JlIGluIHRo
-ZXJlPw0KSnVzdCBzZWVtcyB0byBiZSBjb21tb24gY29kaW5nIHN0eWxlIGZvciBmbGFncywgZXgg
-ZmQuaA0KDQo+IA0K
+On Wed, Aug 21, 2019 at 5:10 AM Satya Tangirala <satyat@kernel.dk> wrote:
+> 
+> Hi Boojin,
+>
+> We're very keen to make sure that our approach to inline encryption can
+> work with diverse hardware, including Samsung's FMP hardware; if you
+> can see any issues with using our approach with your hardware please
+> let us know.
+>
+> We understand that a possible concern for getting FMP working with our
+> patch series for Inline Encryption Support at
+>
+>
+https://lore.kernel.org/linux-block/20190821075714.65140-1-satyat@google.com
+/
+>
+> is that unlike some inline encryption hardware (and also unlike the JEDEC
+> UFS v2.1 spec), FMP doesn't have the concept of a limited number of
+> keyslots - to address that difference we have a "passthrough keyslot
+> manager", which we put up on top of our patch series for inline encryption
+> support at
+>
+> https://android-review.googlesource.com/c/kernel/common/+/980137/2
+>
+> Setting up a passthrough keyslot manager in the request queue of a
+> device allows the device to receive a bio's encryption context as-is with
+> the bio, which is what FMP would prefer. Are there any issues with
+> using the passthrough keyslot manager for FMP?
+>
+> Thanks!
+> Satya
+
+Dear Satya.
+Keyslot manager is a good solution for ICE. And probably no issue for FMP.
+But, I think it's complicated for FMP because FMP doesn't need
+any keyslot control.
+Crypto API that FMP's using is simply, stable, and supports test. 
+FMP has been mass producing and certificating using crypto APIs
+for several years. 
+So I wants to keep  our current crypto API solution.
+But, I'm looking at your patch.  And I will keep examining at your patch
+because our goal is to run the FMP on the mainline kernel.
+
+Thanks for your reply.
+Boojin Kim.
+
