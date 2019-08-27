@@ -6,69 +6,66 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F79C3A5A3
-	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 15:23:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F65C3A5A3
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 15:50:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE2EE206BF
-	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 15:23:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AFE42186A
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 15:50:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="figx/Q98"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fr6b8a9q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730088AbfH0PXN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Aug 2019 11:23:13 -0400
-Received: from mail-io1-f49.google.com ([209.85.166.49]:40259 "EHLO
-        mail-io1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730047AbfH0PXM (ORCPT
+        id S1726871AbfH0Puw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Aug 2019 11:50:52 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:35385 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726190AbfH0Puv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Aug 2019 11:23:12 -0400
-Received: by mail-io1-f49.google.com with SMTP id t6so47227780ios.7
-        for <linux-block@vger.kernel.org>; Tue, 27 Aug 2019 08:23:12 -0700 (PDT)
+        Tue, 27 Aug 2019 11:50:51 -0400
+Received: by mail-io1-f65.google.com with SMTP id b10so38393754ioj.2
+        for <linux-block@vger.kernel.org>; Tue, 27 Aug 2019 08:50:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=EialagdAgnBtYjzH6H0eO9CyoHJZ48U2U5aIVIJeUoo=;
-        b=figx/Q98kEpCBkqo3lxQ6atjRtKnOZ/vizqGhR6ya8V3vn3+aFl2oTLswEK1VjnEMg
-         An75CIk3RkB52JqKH80uhifoZiBjBgP+rPZNgE/8ipmRd77Ok9Xb6Y+4IeWDeVn8lmKd
-         ySMOZk1uc2qMWNtBcJuL843WNs9SFPe/F1JQBw+7MCJe3UdkDKvttcuwKgwAi9oppUSI
-         vRtaD9Uy56A0NEqyv6qNzLxcz1F6B3uV/Dp3f7ve6N1FqXtz+1EzyKNRy7GFif41nKI3
-         nQoC9QQViIIaBRegMiHx06KhObDFDXWzNvmgR56X0UTpzB2kBNE2KFkzbQ9//Alh90Yc
-         O4RA==
+        bh=J/zl30sApN55b1e/tvmUbX7uFNIjsgJONZu60b+r4Mg=;
+        b=fr6b8a9qmXHHD1YOMA8Rit045HOzbgKfkTOSInm2y43VlCpq7BpsMLc5DilVzQWt4a
+         cSMwBllVNT38KVWJYiGwJrwP2piXYCZpmdWvVhghse8f3izw+27fxKy45LvIBveNrYJd
+         PH2ng8ckwfoxWUclcjbMYozhziEdocMuzBR4gUF6p38gm85XGnAhN/2JqJkk0mMGy3p4
+         ysLw7Y2z+nF31S4KUDpuWARb9d1JDrbeLK1R9XJ5YYSCxsjsLU1TlmdTEvN+1xZuCf+1
+         3clWCl3pOSMT7kogwKenQQpGvzK+jswBDxPA3NOC8IwWRXFv6ioXAY2d2haxu3o3tpuc
+         qWfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=EialagdAgnBtYjzH6H0eO9CyoHJZ48U2U5aIVIJeUoo=;
-        b=VPTKqgAN4L6m7kg/3fd5uBWVA6KyNnrOva3APDsAiBDihErcBZQYlLHZPrPJYTR6BV
-         eeKfmgcP5JLyRIEtldU1Deg3/5T9oDPA9ltpAu5zs/xzA1yVmGGo1+qOcjrgixiy2Ojo
-         HdqozEt7V1MFe8UPcEoHavAbaqrr7lqPmFJWLphp4g6znCkWtkT3JK+UH0YT2D1eDoLN
-         wkxOQUhI8oCNv2gQYNHqCvJGKL+vNW/NOYHspTD399keRbML23ZnS4VFDaOZZWEWwwlf
-         03+o+L/JMR747nKZlYz6xJnvnZk3r3Vf5rF+Doxj9Awp9chGLllxBv1z2xW5B9l3B2rN
-         dsGA==
-X-Gm-Message-State: APjAAAU2OyfU+fUY/gYZWpGid97qvaWSDiWxgsj/rZX8xDvNsOmztHTj
-        DroTfpOrd3w9zJLh1rueRTRyVg==
-X-Google-Smtp-Source: APXvYqzTjEDUFcepnEf1WEiRSh5mor0Y5ZzBDG+MemPieFRR8sXBVkJz4+O2iILrDrCaJ4x8THmZFQ==
-X-Received: by 2002:a6b:3943:: with SMTP id g64mr24044809ioa.225.1566919391746;
-        Tue, 27 Aug 2019 08:23:11 -0700 (PDT)
+        bh=J/zl30sApN55b1e/tvmUbX7uFNIjsgJONZu60b+r4Mg=;
+        b=Z1SOgsAxTir7L3LXNLXIxKFQ2zTR3iw1KxyMtyqgF4Wa8DLfPPZ12zS/2x5v9C81Od
+         zbesKOejXTMep7X7f6NCvlA/AoSnj7FB5qnpAQ/r0su4KS8MWzIAhNLXdz+JYdh/rGGz
+         VXeJEEbJCtURy2ueeKBrp1fAjYMPI3Lj7YHdmtns/fEat4YsV6bT2kts+s8kJS3KT0cu
+         wzsjdWjO18t/Ef296mVYUTZnsVz1xnXRjv92u8m7FkJ5ZomQ+xWS5KLem69/u6/ILSog
+         RJVB52XsA9iserCRszLMaTbDigIK9tP9w0gMPobgq1OdjLB/u/pleJRZhXoSjOUz5g0N
+         Oqvg==
+X-Gm-Message-State: APjAAAVJEVVVrdXEzFQvYadvyhUhy1/dU4hwBpjTcbyGPoaY1NV2n8Wj
+        jkJ9EungRxfF2lOpDm/PB53HcbTQTz013A==
+X-Google-Smtp-Source: APXvYqwywX7eWlXpOR3JggrEL91GvfmCBYDyR0AcpkU9fafw3oReMBVgJtQl/CihypQNR+z+5yBVPA==
+X-Received: by 2002:a05:6638:2aa:: with SMTP id d10mr19423358jaq.89.1566921050286;
+        Tue, 27 Aug 2019 08:50:50 -0700 (PDT)
 Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id u24sm13275659iot.38.2019.08.27.08.23.10
+        by smtp.gmail.com with ESMTPSA id e19sm12631619iom.57.2019.08.27.08.50.48
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 27 Aug 2019 08:23:10 -0700 (PDT)
-Subject: Re: [PATCHSET v3] writeback, memcg: Implement foreign inode flushing
-To:     Tejun Heo <tj@kernel.org>, jack@suse.cz, hannes@cmpxchg.org,
-        mhocko@kernel.org, vdavydov.dev@gmail.com
-Cc:     cgroups@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, guro@fb.com, akpm@linux-foundation.org
-References: <20190826160656.870307-1-tj@kernel.org>
+        Tue, 27 Aug 2019 08:50:49 -0700 (PDT)
+Subject: Re: [PATCH] io_uring: allocate the two rings together
+To:     Hristo Venev <hristo@venev.name>
+Cc:     linux-block@vger.kernel.org
+References: <20190826172346.8341-1-hristo@venev.name>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <15a5a6e8-90bf-726b-f68c-db91f1afc651@kernel.dk>
-Date:   Tue, 27 Aug 2019 09:23:09 -0600
+Message-ID: <80e0e408-f602-4446-d244-60f9d4ce9c71@kernel.dk>
+Date:   Tue, 27 Aug 2019 09:50:48 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190826160656.870307-1-tj@kernel.org>
+In-Reply-To: <20190826172346.8341-1-hristo@venev.name>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,69 +74,21 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/26/19 10:06 AM, Tejun Heo wrote:
-> Hello,
+On 8/26/19 11:23 AM, Hristo Venev wrote:
+> Both the sq and the cq rings have sizes just over a power of two, and
+> the sq ring is significantly smaller. By bundling them in a single
+> alllocation, we get the sq ring for free.
 > 
-> Changes from v1[1]:
-> 
-> * More comments explaining the parameters.
-> 
-> * 0003-writeback-Separate-out-wb_get_lookup-from-wb_get_create.patch
->    added and avoid spuriously creating missing wbs for foreign
->    flushing.
-> 
-> Changes from v2[2]:
-> 
-> * Added livelock avoidance and applied other smaller changes suggested
->    by Jan.
-> 
-> There's an inherent mismatch between memcg and writeback.  The former
-> trackes ownership per-page while the latter per-inode.  This was a
-> deliberate design decision because honoring per-page ownership in the
-> writeback path is complicated, may lead to higher CPU and IO overheads
-> and deemed unnecessary given that write-sharing an inode across
-> different cgroups isn't a common use-case.
-> 
-> Combined with inode majority-writer ownership switching, this works
-> well enough in most cases but there are some pathological cases.  For
-> example, let's say there are two cgroups A and B which keep writing to
-> different but confined parts of the same inode.  B owns the inode and
-> A's memory is limited far below B's.  A's dirty ratio can rise enough
-> to trigger balance_dirty_pages() sleeps but B's can be low enough to
-> avoid triggering background writeback.  A will be slowed down without
-> a way to make writeback of the dirty pages happen.
-> 
-> This patchset implements foreign dirty recording and foreign mechanism
-> so that when a memcg encounters a condition as above it can trigger
-> flushes on bdi_writebacks which can clean its pages.  Please see the
-> last patch for more details.
-> 
-> This patchset contains the following four patches.
-> 
->   0001-writeback-Generalize-and-expose-wb_completion.patch
->   0002-bdi-Add-bdi-id.patch
->   0003-writeback-Separate-out-wb_get_lookup-from-wb_get_create.patch
->   0004-writeback-memcg-Implement-cgroup_writeback_by_id.patch
->   0005-writeback-memcg-Implement-foreign-dirty-flushing.patch
-> 
-> 0001-0004 are prep patches which expose wb_completion and implement
-> bdi->id and flushing by bdi and memcg IDs.
-> 
-> 0005 implements foreign inode flushing.
-> 
-> Thanks.  diffstat follows.
-> 
->   fs/fs-writeback.c                |  130 ++++++++++++++++++++++++++++---------
->   include/linux/backing-dev-defs.h |   23 ++++++
->   include/linux/backing-dev.h      |    5 +
->   include/linux/memcontrol.h       |   39 +++++++++++
->   include/linux/writeback.h        |    2
->   mm/backing-dev.c                 |  120 +++++++++++++++++++++++++++++-----
->   mm/memcontrol.c                  |  134 +++++++++++++++++++++++++++++++++++++++
->   mm/page-writeback.c              |    4 +
->   8 files changed, 404 insertions(+), 53 deletions(-)
+> This also means that IORING_OFF_SQ_RING and IORING_OFF_CQ_RING now mean
+> the same thing. If we indicate this to userspace, we can save a mmap
+> call.
 
-Applied for 5.4, thanks Tejun.
+This looks pretty good to me. My only worry was ending up with sq and
+cq cacheline sharing, but the alignment of the io_uring struct itself
+should prevent that nicely.
+
+Outside of going for a cleanup, have you observed any wins from this
+change?
 
 -- 
 Jens Axboe
