@@ -2,165 +2,498 @@ Return-Path: <SRS0=A22s=WX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC95DC3A5A4
-	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 14:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45656C3A5A3
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 14:47:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9B2CF20828
-	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 14:03:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X4MqDOM3"
+	by mail.kernel.org (Postfix) with ESMTP id 13F1320828
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 14:47:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728649AbfH0OD5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Aug 2019 10:03:57 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:45210 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726170AbfH0OD5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Aug 2019 10:03:57 -0400
-Received: by mail-pg1-f194.google.com with SMTP id o13so12747601pgp.12;
-        Tue, 27 Aug 2019 07:03:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=vRyuTS5qz2XPINcB7iLgtQKJC9f4ym0cl5Z9n4olkJ8=;
-        b=X4MqDOM3NpQlq8zFabAVi3zXT4qB4XT9H6oeKNPetlhQBOGhSnr2vDJQJ1nOTRLmx0
-         asfst4+807osIwzlK7laI+rw8CkMci9NUI+M5+yuH2S89cMVQpfzFFh9M70Q5dMx13fB
-         iFnS1uZWk3x6p9vX0QsOMWwEQUW9jIvsjgBWowHP13/SWeeVPVCRfaQ7Zfy29eN2aVJe
-         X/rEaEbDeLvvyFm0Juwyrdy2laaATjJ5dXTXkiISX1oQf9oZKGF5rzyW4GGE8+ckkgGD
-         PPJ5kBhYm3Gp97NE6PYwKqReGMlJyKe8vZnBHZz36EoHkSNoDXPY/GRaReFhgdSKEFVE
-         JrUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=vRyuTS5qz2XPINcB7iLgtQKJC9f4ym0cl5Z9n4olkJ8=;
-        b=h0JdUZ0rVgJaKaJhcvZkq0SNlvdhn8aa1lg9+Neuq2zOptFdJudLnaWY+uSCej4n+1
-         r3XEw9iss8TAfw6n59czAmrB3uDWXhQE8YpePAAr55iqtc1D3waVQo++udHWkiqdj3md
-         FcwvwOER39nS6UAqe5utkJO4tistEj1rNM5y5WItBO6AnbidBreqJ9s1Z846MuohHl8I
-         zi3HcAcQ7nCVJsSugsoOJYZMbr9iu8zGbDcR5tlIq+gChfxE5iKMoiJL2PFX0LQY5BNc
-         /pP/uhcW2IxygRu10zoTC8B3Zt1h8sUGy+b5ouIwuaoDytlB97s3ojtWmoRSv5rUsYvo
-         FuZw==
-X-Gm-Message-State: APjAAAXT8iUFefl6Jp8kxxJmHpXmPYz1Lj3l+fgBuHts2/OB7cgkTv05
-        xFE0wkzSACayfpnDi84vA8COZwqq+5w+9bcrJDs=
-X-Google-Smtp-Source: APXvYqxC9fDdQGPHmEP/2yp/CfPRcllwn+ny0Utliu9P6xDn54VSI5qHeGbP0PWgfwoT5mwG9D1Ws/3vWFNeZl4ytJs=
-X-Received: by 2002:aa7:8007:: with SMTP id j7mr26172131pfi.154.1566914636187;
- Tue, 27 Aug 2019 07:03:56 -0700 (PDT)
+        id S1726675AbfH0OrJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Aug 2019 10:47:09 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58182 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725920AbfH0OrJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Aug 2019 10:47:09 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 5F514ACC1;
+        Tue, 27 Aug 2019 14:47:07 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id ED3841E4362; Tue, 27 Aug 2019 16:47:06 +0200 (CEST)
+Date:   Tue, 27 Aug 2019 16:47:06 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, jack@suse.cz, hannes@cmpxchg.org,
+        mhocko@kernel.org, vdavydov.dev@gmail.com, cgroups@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com, guro@fb.com,
+        akpm@linux-foundation.org
+Subject: Re: [PATCH 5/5] writeback, memcg: Implement foreign dirty flushing
+Message-ID: <20190827144706.GC10098@quack2.suse.cz>
+References: <20190826160656.870307-1-tj@kernel.org>
+ <20190826160656.870307-6-tj@kernel.org>
 MIME-Version: 1.0
-References: <1565888399-21550-1-git-send-email-akinobu.mita@gmail.com>
- <1565888399-21550-5-git-send-email-akinobu.mita@gmail.com>
- <20190817145509.GA18381@amd> <925633c4-a459-5e84-9c9a-502a504fdc82@gmail.com>
- <20190819143842.GA25401@amd> <7c4c4853-7e3a-0618-92a0-337e248e2b4c@gmail.com>
- <c937b7e0-02c6-ae9a-aaf7-16a2ef29886d@gmail.com> <CAC5umyjxkeR3rhf3XZvwkxLvc-0ENEkQfOLnk8A12Qazr9Et8w@mail.gmail.com>
- <86309c4f-bcee-182c-369f-fcc883f379c6@gmail.com>
-In-Reply-To: <86309c4f-bcee-182c-369f-fcc883f379c6@gmail.com>
-From:   Akinobu Mita <akinobu.mita@gmail.com>
-Date:   Tue, 27 Aug 2019 23:03:45 +0900
-Message-ID: <CAC5umyibEMrxhZv0TyS6hYHR+oyj2Oby+LVsjrYmMV8u-chXRQ@mail.gmail.com>
-Subject: Re: [PATCH v4 4/5] block: introduce LED block device activity trigger
-To:     Jacek Anaszewski <jacek.anaszewski@gmail.com>
-Cc:     Pavel Machek <pavel@ucw.cz>, linux-block@vger.kernel.org,
-        linux-leds@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org,
-        Frank Steiner <fsteiner-mail1@bio.ifi.lmu.de>,
-        Dan Murphy <dmurphy@ti.com>, Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190826160656.870307-6-tj@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-2019=E5=B9=B48=E6=9C=8825=E6=97=A5(=E6=97=A5) 0:53 Jacek Anaszewski <jacek.=
-anaszewski@gmail.com>:
->
-> On 8/23/19 6:00 PM, Akinobu Mita wrote:
-> > 2019=E5=B9=B48=E6=9C=8820=E6=97=A5(=E7=81=AB) 3:38 Jacek Anaszewski <ja=
-cek.anaszewski@gmail.com>:
-> >>
-> >> On 8/19/19 8:22 PM, Jacek Anaszewski wrote:
-> >>> On 8/19/19 4:38 PM, Pavel Machek wrote:
-> >>>> On Sat 2019-08-17 22:07:43, Jacek Anaszewski wrote:
-> >>>>> On 8/17/19 4:55 PM, Pavel Machek wrote:
-> >>>>>> On Fri 2019-08-16 01:59:58, Akinobu Mita wrote:
-> >>>>>>> This allows LEDs to be controlled by block device activity.
-> >>>>>>>
-> >>>>>>> We already have ledtrig-disk (LED disk activity trigger), but the=
- lower
-> >>>>>>> level disk drivers need to utilize ledtrig_disk_activity() to mak=
-e the
-> >>>>>>> LED blink.
-> >>>>>>>
-> >>>>>>> The LED block device trigger doesn't require the lower level driv=
-ers to
-> >>>>>>> have any instrumentation. The activity is collected by polling th=
-e disk
-> >>>>>>> stats.
-> >>>>>>>
-> >>>>>>> Example:
-> >>>>>>>
-> >>>>>>> echo block-nvme0n1 > /sys/class/leds/diy/trigger
-> >>>>>>
-> >>>>>> Lets use one trigger "block" and have the device as a parameter,
-> >>>>>> please.
-> >>>>>>
-> >>>>>> We already have 1000 cpu triggers on 1000 cpu machines, and yes, i=
-ts a
-> >>>>>> disaster we'll need to fix. Lets not repeat the same mistake here.
-> >>>>>>
-> >>>>>> I guess it may be slightly more work. Sorry about that.
-> >>>>>
-> >>>>> We should be able to list available block devices to set,
-> >>>>> so the problem would be not avoided anyway.
-> >>>>
-> >>>> Should we? We need to list triggers, but we may not list all the dev=
-ices...
-> >>>
-> >>> This is similar to usbport trigger that lists available
-> >>> ports as files in a sub-directory. We might eventually go
-> >>> in this direction.
-> >>
-> >> I must withdraw this statement. This is not similar to usbport
-> >> trigger. The difference is that with ledtrig-block we have separate
-> >> triggers per each device and I am not aware if there is some centraliz=
-ed
-> >> mechanism similar to blocking_notifier_chain (usb_notifier_list
-> >> in drivers/usb/core/notify.c) available for block devices, that
-> >> would allow to gather all available block devs under common trigger.
-> >>
-> >> Moreover I remember Greg once discouraged using notifier chains
-> >> as they are unsafe, so we would need some other solution anyway.
-> >
-> > I start thinking that we should implement the LED block device activity
-> > trigger in userspace.  The userspace application firstly activates
-> > one-shot LED trigger and periodically reads /sys/block/<disk>/stat and
-> > writes /sys/class/leds/<led>/shot if there is any disk activity.
->
-> This would suboptimal solution. I have another idea - let's get back
-> to the implementation of ledtrig-blk in genhd.c. We would be registering
-> one trigger on module initialization in a function with __init modifier.
-> Then we would need to add/remove triggers to the ledtrig-blk in
-> register_blkdev()/unregister_blkdev(). And registered triggers would
-> be listed in block_devs directory created by the trigger.
->
-> You can compare how drivers/usb/core/ledtrig-usbport.c maintains
-> similar directory of usb ports.
+On Mon 26-08-19 09:06:56, Tejun Heo wrote:
+> There's an inherent mismatch between memcg and writeback.  The former
+> trackes ownership per-page while the latter per-inode.  This was a
+> deliberate design decision because honoring per-page ownership in the
+> writeback path is complicated, may lead to higher CPU and IO overheads
+> and deemed unnecessary given that write-sharing an inode across
+> different cgroups isn't a common use-case.
+> 
+> Combined with inode majority-writer ownership switching, this works
+> well enough in most cases but there are some pathological cases.  For
+> example, let's say there are two cgroups A and B which keep writing to
+> different but confined parts of the same inode.  B owns the inode and
+> A's memory is limited far below B's.  A's dirty ratio can rise enough
+> to trigger balance_dirty_pages() sleeps but B's can be low enough to
+> avoid triggering background writeback.  A will be slowed down without
+> a way to make writeback of the dirty pages happen.
+> 
+> This patch implements foreign dirty recording and foreign mechanism so
+> that when a memcg encounters a condition as above it can trigger
+> flushes on bdi_writebacks which can clean its pages.  Please see the
+> comment on top of mem_cgroup_track_foreign_dirty_slowpath() for
+> details.
+> 
+> A reproducer follows.
+> 
+> write-range.c::
+> 
+>   #include <stdio.h>
+>   #include <stdlib.h>
+>   #include <unistd.h>
+>   #include <fcntl.h>
+>   #include <sys/types.h>
+> 
+>   static const char *usage = "write-range FILE START SIZE\n";
+> 
+>   int main(int argc, char **argv)
+>   {
+> 	  int fd;
+> 	  unsigned long start, size, end, pos;
+> 	  char *endp;
+> 	  char buf[4096];
+> 
+> 	  if (argc < 4) {
+> 		  fprintf(stderr, usage);
+> 		  return 1;
+> 	  }
+> 
+> 	  fd = open(argv[1], O_WRONLY);
+> 	  if (fd < 0) {
+> 		  perror("open");
+> 		  return 1;
+> 	  }
+> 
+> 	  start = strtoul(argv[2], &endp, 0);
+> 	  if (*endp != '\0') {
+> 		  fprintf(stderr, usage);
+> 		  return 1;
+> 	  }
+> 
+> 	  size = strtoul(argv[3], &endp, 0);
+> 	  if (*endp != '\0') {
+> 		  fprintf(stderr, usage);
+> 		  return 1;
+> 	  }
+> 
+> 	  end = start + size;
+> 
+> 	  while (1) {
+> 		  for (pos = start; pos < end; ) {
+> 			  long bread, bwritten = 0;
+> 
+> 			  if (lseek(fd, pos, SEEK_SET) < 0) {
+> 				  perror("lseek");
+> 				  return 1;
+> 			  }
+> 
+> 			  bread = read(0, buf, sizeof(buf) < end - pos ?
+> 					       sizeof(buf) : end - pos);
+> 			  if (bread < 0) {
+> 				  perror("read");
+> 				  return 1;
+> 			  }
+> 			  if (bread == 0)
+> 				  return 0;
+> 
+> 			  while (bwritten < bread) {
+> 				  long this;
+> 
+> 				  this = write(fd, buf + bwritten,
+> 					       bread - bwritten);
+> 				  if (this < 0) {
+> 					  perror("write");
+> 					  return 1;
+> 				  }
+> 
+> 				  bwritten += this;
+> 				  pos += bwritten;
+> 			  }
+> 		  }
+> 	  }
+>   }
+> 
+> repro.sh::
+> 
+>   #!/bin/bash
+> 
+>   set -e
+>   set -x
+> 
+>   sysctl -w vm.dirty_expire_centisecs=300000
+>   sysctl -w vm.dirty_writeback_centisecs=300000
+>   sysctl -w vm.dirtytime_expire_seconds=300000
+>   echo 3 > /proc/sys/vm/drop_caches
+> 
+>   TEST=/sys/fs/cgroup/test
+>   A=$TEST/A
+>   B=$TEST/B
+> 
+>   mkdir -p $A $B
+>   echo "+memory +io" > $TEST/cgroup.subtree_control
+>   echo $((1<<30)) > $A/memory.high
+>   echo $((32<<30)) > $B/memory.high
+> 
+>   rm -f testfile
+>   touch testfile
+>   fallocate -l 4G testfile
+> 
+>   echo "Starting B"
+> 
+>   (echo $BASHPID > $B/cgroup.procs
+>    pv -q --rate-limit 70M < /dev/urandom | ./write-range testfile $((2<<30)) $((2<<30))) &
+> 
+>   echo "Waiting 10s to ensure B claims the testfile inode"
+>   sleep 5
+>   sync
+>   sleep 5
+>   sync
+>   echo "Starting A"
+> 
+>   (echo $BASHPID > $A/cgroup.procs
+>    pv < /dev/urandom | ./write-range testfile 0 $((2<<30)))
+> 
+> v2: Added comments explaining why the specific intervals are being used.
+> 
+> v3: Use 0 @nr when calling cgroup_writeback_by_id() to use best-effort
+>     flushing while avoding possible livelocks.
+> 
+> v4: Use get_jiffies_64() and time_before/after64() instead of raw
+>     jiffies_64 and arthimetic comparisons as suggested by Jan.
+> 
+> Signed-off-by: Tejun Heo <tj@kernel.org>
 
-It could be possible, but I have yet another idea.  What about introducing
-/proc/led-triggers and /sys/class/leds/<led>/current-trigger?
-The /sys/class/leds/<led>/trigger will be obsoleted by these two files.
+The patch looks good to me. You can add:
 
-The /proc/led-triggers is read only and no PAGE_SIZE limitation by the
-seq_file interface.  So we can list all triggers in this file.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-The /sys/class/leds/<led>/current-trigger is almost identical to
-/sys/class/leds/<led>/trigger.  The only difference is that
-'current-trigger' only shows the current trigger name.
+								Honza
+
+> ---
+>  include/linux/backing-dev-defs.h |   1 +
+>  include/linux/memcontrol.h       |  39 +++++++++
+>  mm/memcontrol.c                  | 134 +++++++++++++++++++++++++++++++
+>  mm/page-writeback.c              |   4 +
+>  4 files changed, 178 insertions(+)
+> 
+> diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+> index 1075f2552cfc..4fc87dee005a 100644
+> --- a/include/linux/backing-dev-defs.h
+> +++ b/include/linux/backing-dev-defs.h
+> @@ -63,6 +63,7 @@ enum wb_reason {
+>  	 * so it has a mismatch name.
+>  	 */
+>  	WB_REASON_FORKER_THREAD,
+> +	WB_REASON_FOREIGN_FLUSH,
+>  
+>  	WB_REASON_MAX,
+>  };
+> diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
+> index 2cd4359cb38c..ad8f1a397ae4 100644
+> --- a/include/linux/memcontrol.h
+> +++ b/include/linux/memcontrol.h
+> @@ -183,6 +183,23 @@ struct memcg_padding {
+>  #define MEMCG_PADDING(name)
+>  #endif
+>  
+> +/*
+> + * Remember four most recent foreign writebacks with dirty pages in this
+> + * cgroup.  Inode sharing is expected to be uncommon and, even if we miss
+> + * one in a given round, we're likely to catch it later if it keeps
+> + * foreign-dirtying, so a fairly low count should be enough.
+> + *
+> + * See mem_cgroup_track_foreign_dirty_slowpath() for details.
+> + */
+> +#define MEMCG_CGWB_FRN_CNT	4
+> +
+> +struct memcg_cgwb_frn {
+> +	u64 bdi_id;			/* bdi->id of the foreign inode */
+> +	int memcg_id;			/* memcg->css.id of foreign inode */
+> +	u64 at;				/* jiffies_64 at the time of dirtying */
+> +	struct wb_completion done;	/* tracks in-flight foreign writebacks */
+> +};
+> +
+>  /*
+>   * The memory controller data structure. The memory controller controls both
+>   * page cache and RSS per cgroup. We would eventually like to provide
+> @@ -307,6 +324,7 @@ struct mem_cgroup {
+>  #ifdef CONFIG_CGROUP_WRITEBACK
+>  	struct list_head cgwb_list;
+>  	struct wb_domain cgwb_domain;
+> +	struct memcg_cgwb_frn cgwb_frn[MEMCG_CGWB_FRN_CNT];
+>  #endif
+>  
+>  	/* List of events which userspace want to receive */
+> @@ -1237,6 +1255,18 @@ void mem_cgroup_wb_stats(struct bdi_writeback *wb, unsigned long *pfilepages,
+>  			 unsigned long *pheadroom, unsigned long *pdirty,
+>  			 unsigned long *pwriteback);
+>  
+> +void mem_cgroup_track_foreign_dirty_slowpath(struct page *page,
+> +					     struct bdi_writeback *wb);
+> +
+> +static inline void mem_cgroup_track_foreign_dirty(struct page *page,
+> +						  struct bdi_writeback *wb)
+> +{
+> +	if (unlikely(&page->mem_cgroup->css != wb->memcg_css))
+> +		mem_cgroup_track_foreign_dirty_slowpath(page, wb);
+> +}
+> +
+> +void mem_cgroup_flush_foreign(struct bdi_writeback *wb);
+> +
+>  #else	/* CONFIG_CGROUP_WRITEBACK */
+>  
+>  static inline struct wb_domain *mem_cgroup_wb_domain(struct bdi_writeback *wb)
+> @@ -1252,6 +1282,15 @@ static inline void mem_cgroup_wb_stats(struct bdi_writeback *wb,
+>  {
+>  }
+>  
+> +static inline void mem_cgroup_track_foreign_dirty(struct page *page,
+> +						  struct bdi_writeback *wb)
+> +{
+> +}
+> +
+> +static inline void mem_cgroup_flush_foreign(struct bdi_writeback *wb)
+> +{
+> +}
+> +
+>  #endif	/* CONFIG_CGROUP_WRITEBACK */
+>  
+>  struct sock;
+> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> index 26e2999af608..eb626a290d93 100644
+> --- a/mm/memcontrol.c
+> +++ b/mm/memcontrol.c
+> @@ -87,6 +87,10 @@ int do_swap_account __read_mostly;
+>  #define do_swap_account		0
+>  #endif
+>  
+> +#ifdef CONFIG_CGROUP_WRITEBACK
+> +static DECLARE_WAIT_QUEUE_HEAD(memcg_cgwb_frn_waitq);
+> +#endif
+> +
+>  /* Whether legacy memory+swap accounting is active */
+>  static bool do_memsw_account(void)
+>  {
+> @@ -4238,6 +4242,127 @@ void mem_cgroup_wb_stats(struct bdi_writeback *wb, unsigned long *pfilepages,
+>  	}
+>  }
+>  
+> +/*
+> + * Foreign dirty flushing
+> + *
+> + * There's an inherent mismatch between memcg and writeback.  The former
+> + * trackes ownership per-page while the latter per-inode.  This was a
+> + * deliberate design decision because honoring per-page ownership in the
+> + * writeback path is complicated, may lead to higher CPU and IO overheads
+> + * and deemed unnecessary given that write-sharing an inode across
+> + * different cgroups isn't a common use-case.
+> + *
+> + * Combined with inode majority-writer ownership switching, this works well
+> + * enough in most cases but there are some pathological cases.  For
+> + * example, let's say there are two cgroups A and B which keep writing to
+> + * different but confined parts of the same inode.  B owns the inode and
+> + * A's memory is limited far below B's.  A's dirty ratio can rise enough to
+> + * trigger balance_dirty_pages() sleeps but B's can be low enough to avoid
+> + * triggering background writeback.  A will be slowed down without a way to
+> + * make writeback of the dirty pages happen.
+> + *
+> + * Conditions like the above can lead to a cgroup getting repatedly and
+> + * severely throttled after making some progress after each
+> + * dirty_expire_interval while the underyling IO device is almost
+> + * completely idle.
+> + *
+> + * Solving this problem completely requires matching the ownership tracking
+> + * granularities between memcg and writeback in either direction.  However,
+> + * the more egregious behaviors can be avoided by simply remembering the
+> + * most recent foreign dirtying events and initiating remote flushes on
+> + * them when local writeback isn't enough to keep the memory clean enough.
+> + *
+> + * The following two functions implement such mechanism.  When a foreign
+> + * page - a page whose memcg and writeback ownerships don't match - is
+> + * dirtied, mem_cgroup_track_foreign_dirty() records the inode owning
+> + * bdi_writeback on the page owning memcg.  When balance_dirty_pages()
+> + * decides that the memcg needs to sleep due to high dirty ratio, it calls
+> + * mem_cgroup_flush_foreign() which queues writeback on the recorded
+> + * foreign bdi_writebacks which haven't expired.  Both the numbers of
+> + * recorded bdi_writebacks and concurrent in-flight foreign writebacks are
+> + * limited to MEMCG_CGWB_FRN_CNT.
+> + *
+> + * The mechanism only remembers IDs and doesn't hold any object references.
+> + * As being wrong occasionally doesn't matter, updates and accesses to the
+> + * records are lockless and racy.
+> + */
+> +void mem_cgroup_track_foreign_dirty_slowpath(struct page *page,
+> +					     struct bdi_writeback *wb)
+> +{
+> +	struct mem_cgroup *memcg = page->mem_cgroup;
+> +	struct memcg_cgwb_frn *frn;
+> +	u64 now = get_jiffies_64();
+> +	u64 oldest_at = now;
+> +	int oldest = -1;
+> +	int i;
+> +
+> +	/*
+> +	 * Pick the slot to use.  If there is already a slot for @wb, keep
+> +	 * using it.  If not replace the oldest one which isn't being
+> +	 * written out.
+> +	 */
+> +	for (i = 0; i < MEMCG_CGWB_FRN_CNT; i++) {
+> +		frn = &memcg->cgwb_frn[i];
+> +		if (frn->bdi_id == wb->bdi->id &&
+> +		    frn->memcg_id == wb->memcg_css->id)
+> +			break;
+> +		if (time_before64(frn->at, oldest_at) &&
+> +		    atomic_read(&frn->done.cnt) == 1) {
+> +			oldest = i;
+> +			oldest_at = frn->at;
+> +		}
+> +	}
+> +
+> +	if (i < MEMCG_CGWB_FRN_CNT) {
+> +		/*
+> +		 * Re-using an existing one.  Update timestamp lazily to
+> +		 * avoid making the cacheline hot.  We want them to be
+> +		 * reasonably up-to-date and significantly shorter than
+> +		 * dirty_expire_interval as that's what expires the record.
+> +		 * Use the shorter of 1s and dirty_expire_interval / 8.
+> +		 */
+> +		unsigned long update_intv =
+> +			min_t(unsigned long, HZ,
+> +			      msecs_to_jiffies(dirty_expire_interval * 10) / 8);
+> +
+> +		if (time_before64(frn->at, now - update_intv))
+> +			frn->at = now;
+> +	} else if (oldest >= 0) {
+> +		/* replace the oldest free one */
+> +		frn = &memcg->cgwb_frn[oldest];
+> +		frn->bdi_id = wb->bdi->id;
+> +		frn->memcg_id = wb->memcg_css->id;
+> +		frn->at = now;
+> +	}
+> +}
+> +
+> +/* issue foreign writeback flushes for recorded foreign dirtying events */
+> +void mem_cgroup_flush_foreign(struct bdi_writeback *wb)
+> +{
+> +	struct mem_cgroup *memcg = mem_cgroup_from_css(wb->memcg_css);
+> +	unsigned long intv = msecs_to_jiffies(dirty_expire_interval * 10);
+> +	u64 now = jiffies_64;
+> +	int i;
+> +
+> +	for (i = 0; i < MEMCG_CGWB_FRN_CNT; i++) {
+> +		struct memcg_cgwb_frn *frn = &memcg->cgwb_frn[i];
+> +
+> +		/*
+> +		 * If the record is older than dirty_expire_interval,
+> +		 * writeback on it has already started.  No need to kick it
+> +		 * off again.  Also, don't start a new one if there's
+> +		 * already one in flight.
+> +		 */
+> +		if (time_after64(frn->at, now - intv) &&
+> +		    atomic_read(&frn->done.cnt) == 1) {
+> +			frn->at = 0;
+> +			cgroup_writeback_by_id(frn->bdi_id, frn->memcg_id, 0,
+> +					       WB_REASON_FOREIGN_FLUSH,
+> +					       &frn->done);
+> +		}
+> +	}
+> +}
+> +
+>  #else	/* CONFIG_CGROUP_WRITEBACK */
+>  
+>  static int memcg_wb_domain_init(struct mem_cgroup *memcg, gfp_t gfp)
+> @@ -4760,6 +4885,7 @@ static struct mem_cgroup *mem_cgroup_alloc(void)
+>  	struct mem_cgroup *memcg;
+>  	unsigned int size;
+>  	int node;
+> +	int __maybe_unused i;
+>  
+>  	size = sizeof(struct mem_cgroup);
+>  	size += nr_node_ids * sizeof(struct mem_cgroup_per_node *);
+> @@ -4803,6 +4929,9 @@ static struct mem_cgroup *mem_cgroup_alloc(void)
+>  #endif
+>  #ifdef CONFIG_CGROUP_WRITEBACK
+>  	INIT_LIST_HEAD(&memcg->cgwb_list);
+> +	for (i = 0; i < MEMCG_CGWB_FRN_CNT; i++)
+> +		memcg->cgwb_frn[i].done =
+> +			__WB_COMPLETION_INIT(&memcg_cgwb_frn_waitq);
+>  #endif
+>  	idr_replace(&mem_cgroup_idr, memcg, memcg->id.id);
+>  	return memcg;
+> @@ -4932,7 +5061,12 @@ static void mem_cgroup_css_released(struct cgroup_subsys_state *css)
+>  static void mem_cgroup_css_free(struct cgroup_subsys_state *css)
+>  {
+>  	struct mem_cgroup *memcg = mem_cgroup_from_css(css);
+> +	int __maybe_unused i;
+>  
+> +#ifdef CONFIG_CGROUP_WRITEBACK
+> +	for (i = 0; i < MEMCG_CGWB_FRN_CNT; i++)
+> +		wb_wait_for_completion(&memcg->cgwb_frn[i].done);
+> +#endif
+>  	if (cgroup_subsys_on_dfl(memory_cgrp_subsys) && !cgroup_memory_nosocket)
+>  		static_branch_dec(&memcg_sockets_enabled_key);
+>  
+> diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+> index 1804f64ff43c..50055d2e4ea8 100644
+> --- a/mm/page-writeback.c
+> +++ b/mm/page-writeback.c
+> @@ -1667,6 +1667,8 @@ static void balance_dirty_pages(struct bdi_writeback *wb,
+>  		if (unlikely(!writeback_in_progress(wb)))
+>  			wb_start_background_writeback(wb);
+>  
+> +		mem_cgroup_flush_foreign(wb);
+> +
+>  		/*
+>  		 * Calculate global domain's pos_ratio and select the
+>  		 * global dtc by default.
+> @@ -2427,6 +2429,8 @@ void account_page_dirtied(struct page *page, struct address_space *mapping)
+>  		task_io_account_write(PAGE_SIZE);
+>  		current->nr_dirtied++;
+>  		this_cpu_inc(bdp_ratelimits);
+> +
+> +		mem_cgroup_track_foreign_dirty(page, wb);
+>  	}
+>  }
+>  
+> -- 
+> 2.17.1
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
