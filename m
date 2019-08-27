@@ -2,99 +2,109 @@ Return-Path: <SRS0=A22s=WX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B60C3A5A3
-	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 16:40:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F24E5C3A5A6
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 16:41:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CF201204EC
-	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 16:40:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="afmZcDKT"
+	by mail.kernel.org (Postfix) with ESMTP id CAFB721881
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 16:41:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727633AbfH0Qks (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Aug 2019 12:40:48 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:42990 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727401AbfH0Qks (ORCPT
+        id S1728312AbfH0QlL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Aug 2019 12:41:11 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:52634 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727401AbfH0QlL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Aug 2019 12:40:48 -0400
-Received: by mail-io1-f66.google.com with SMTP id e20so47697866iob.9
-        for <linux-block@vger.kernel.org>; Tue, 27 Aug 2019 09:40:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=WxqIZ7hBym91EeqvkxTLORsUCq5q+ufriq9PT4cLg0I=;
-        b=afmZcDKTkX8pa6zKr4/foKCZgTWa6wXgJ0FYYbIZf1X8NrE56c9HTWQS7ZnA8zh0a8
-         3oNrkZ5IH6JfcUFcw0egGrZZJefqiPIW9/Sw8KgHAn1KRJnwiw4XUnEoQ+V8qv/uBICo
-         YOk6e/LYL69L5x+/4FA+mWtpY/PSAfCglRy9vD80g5H4BOghfKYSfqgyDHZY4SV9GSEm
-         5u5xxYyFtZy0XF13CAeFH161FwEPZVG7c1Saxdqw3wezLCnzpZuuZclSswOETlS8qY42
-         GAFpVab6WLchqC1x2qTs72NM2D82btFdhldz80FFxu/uMQNYMpHBCBpCOeQFDUalpwE/
-         C5Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=WxqIZ7hBym91EeqvkxTLORsUCq5q+ufriq9PT4cLg0I=;
-        b=U7+WFjI0WZAnEEP2umcA5KdmdvYUOaK4IkFtrMN4trqs/i1vGOkTkmsDsF0hKI1YRA
-         ybYhnH3pXtiHNXC4n/sebr4+OabljpHz2N60KNYqfV3wRW6655h9i08T7+2WAd+zBH8K
-         HacaSOI98XHLOiBbCtSBt2qtJQxmZoEiu0O91k8sm13BpfwKo/W9TfA+62/2Kj1cmNY2
-         /PKvoFfzrM44ehphoLaePJC2tXZjb3UOyEjqQfDnZKdzqzXKdBZ0necjSZxC+KsSkbyO
-         Z7BFoFESUlN7Ru6CMtqe6/Yrkfdpxlh2CfOv8JeopYxyvuol/KdOrSoFD1zgwESEpa7E
-         F0jA==
-X-Gm-Message-State: APjAAAVbkGVHzh4twenOwh9FDmtcDBMOIFi+eRGauqpA4SOoPWDi49kS
-        OXhIGvBeHYk5IF2sRl8wiOnnvw==
-X-Google-Smtp-Source: APXvYqxkwqxqrZx4eFUSZ+gWXptakBRrBID4eDkEg+UR8mw/8VBctTtUVUfrP/NAV/4Z8knJzNgfXg==
-X-Received: by 2002:a02:3004:: with SMTP id q4mr23651468jaq.55.1566924047337;
-        Tue, 27 Aug 2019 09:40:47 -0700 (PDT)
-Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id p9sm14510450ios.1.2019.08.27.09.40.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 27 Aug 2019 09:40:46 -0700 (PDT)
-Subject: Re: [PATCH V4 0/5] block: don't acquire .sysfs_lock before removing
- mq & iosched kobjects
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-References: <20190827110148.808-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0e383447-e82d-6962-683a-7b12f7466a2c@kernel.dk>
-Date:   Tue, 27 Aug 2019 10:40:45 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 27 Aug 2019 12:41:11 -0400
+Received: from callcc.thunk.org (guestnat-104-133-0-111.corp.google.com [104.133.0.111] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x7RGeCWG021084
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Aug 2019 12:40:13 -0400
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id 70A4F42049E; Tue, 27 Aug 2019 12:40:12 -0400 (EDT)
+Date:   Tue, 27 Aug 2019 12:40:12 -0400
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     "boojin.kim" <boojin.kim@samsung.com>
+Cc:     "'Satya Tangirala'" <satyat@google.com>,
+        "'Herbert Xu'" <herbert@gondor.apana.org.au>,
+        "'David S. Miller'" <davem@davemloft.net>,
+        "'Eric Biggers'" <ebiggers@kernel.org>,
+        "'Chao Yu'" <chao@kernel.org>,
+        "'Jaegeuk Kim'" <jaegeuk@kernel.org>,
+        "'Andreas Dilger'" <adilger.kernel@dilger.ca>, dm-devel@redhat.com,
+        "'Mike Snitzer'" <snitzer@redhat.com>,
+        "'Alasdair Kergon'" <agk@redhat.com>,
+        "'Jens Axboe'" <axboe@kernel.dk>,
+        "'Krzysztof Kozlowski'" <krzk@kernel.org>,
+        "'Kukjin Kim'" <kgene@kernel.org>,
+        "'Jaehoon Chung'" <jh80.chung@samsung.com>,
+        "'Ulf Hansson'" <ulf.hansson@linaro.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 5/9] block: support diskcipher
+Message-ID: <20190827164012.GN28066@mit.edu>
+Mail-Followup-To: "Theodore Y. Ts'o" <tytso@mit.edu>,
+        "boojin.kim" <boojin.kim@samsung.com>,
+        'Satya Tangirala' <satyat@google.com>,
+        'Herbert Xu' <herbert@gondor.apana.org.au>,
+        "'David S. Miller'" <davem@davemloft.net>,
+        'Eric Biggers' <ebiggers@kernel.org>, 'Chao Yu' <chao@kernel.org>,
+        'Jaegeuk Kim' <jaegeuk@kernel.org>,
+        'Andreas Dilger' <adilger.kernel@dilger.ca>, dm-devel@redhat.com,
+        'Mike Snitzer' <snitzer@redhat.com>,
+        'Alasdair Kergon' <agk@redhat.com>, 'Jens Axboe' <axboe@kernel.dk>,
+        'Krzysztof Kozlowski' <krzk@kernel.org>,
+        'Kukjin Kim' <kgene@kernel.org>,
+        'Jaehoon Chung' <jh80.chung@samsung.com>,
+        'Ulf Hansson' <ulf.hansson@linaro.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
+References: <CGME20190827083334epcas2p115d479190b9a72c886f66569add78203@epcas2p1.samsung.com>
+ <03b201d55cb2$1d4d31b0$57e79510$@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <20190827110148.808-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <03b201d55cb2$1d4d31b0$57e79510$@samsung.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/27/19 5:01 AM, Ming Lei wrote:
-> Hi,
+On Tue, Aug 27, 2019 at 05:33:33PM +0900, boojin.kim wrote:
 > 
-> The 1st 3 patches cleans up current uses on q->sysfs_lock.
-> 
-> The 4th patch adds one helper for checking if queue is registered.
-> 
-> The last patch splits .sysfs_lock into two locks: one is only for
-> sync .store/.show from sysfs, the other one is for pretecting kobjects
-> registering/unregistering. Meantime avoid to acquire .sysfs_lock when
-> removing mq & iosched kobjects, so that the reported deadlock can
-> be fixed.
+> Dear Satya.
+> Keyslot manager is a good solution for ICE. And probably no issue for FMP.
+> But, I think it's complicated for FMP because FMP doesn't need
+> any keyslot control.
 
-Thanks Ming, and Bart for diligent reviews. Applied for 5.4.
+Hi Boojin,
 
--- 
-Jens Axboe
+I think the important thing to realize here is that there are a large
+number of hardware devices for which the keyslot manager *is* needed.
+And from the upstream kernel's perspective, supporting two different
+schemes for supporting the inline encryption feature is more
+complexity than just supporting one which is general enough to support
+a wider variety of hardware devices.
 
+If you want somethig which is only good for the hardware platform you
+are charged to support, that's fine if it's only going to be in a
+Samsung-specific kernel.  But if your goal is to get something that
+works upstream, especially if it requires changes in core layers of
+the kernel, it's important that it's general enough to support most,
+if not all, if the hardware devices in the industry.
+
+Regards,
+
+					- Ted
