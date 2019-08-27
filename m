@@ -2,185 +2,266 @@ Return-Path: <SRS0=A22s=WX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E6DC3A5A6
-	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 08:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25924C3A5A3
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 10:38:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E89A2173E
-	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 08:33:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="XieTwwnC"
+	by mail.kernel.org (Postfix) with ESMTP id E5B58204EC
+	for <linux-block@archiver.kernel.org>; Tue, 27 Aug 2019 10:38:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728762AbfH0Idn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Aug 2019 04:33:43 -0400
-Received: from mailout3.samsung.com ([203.254.224.33]:59596 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729284AbfH0Idm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Aug 2019 04:33:42 -0400
-Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190827083339epoutp03782dc187a781a620df559bfff9f8ffcb~_uolLPE4V3067930679epoutp03Z
-        for <linux-block@vger.kernel.org>; Tue, 27 Aug 2019 08:33:39 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190827083339epoutp03782dc187a781a620df559bfff9f8ffcb~_uolLPE4V3067930679epoutp03Z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1566894819;
-        bh=GR9SjpQC1GTjk5IEkgnMXdybEfO+M4pHWDvq1CPw910=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=XieTwwnC97cxvDUoQbpnT0JSA6n+Fk+S7VdNGOrPiXy28E/jsUBLsPbTLacpBVmq4
-         bf6CJ3I4sO0pBCk0d7teQmVffD1IwjV4K5W0fRZ5VVEidrxI4HknvQW4rKJFd+yMLG
-         kHKbAIJD4wTWpVa9zk1tfYfSw5p+LvA6qAUlqSxI=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
-        20190827083338epcas2p1bd702579931911d8ebfa6ae3218ca896~_uokazBY00556005560epcas2p1x;
-        Tue, 27 Aug 2019 08:33:38 +0000 (GMT)
-Received: from epsmges2p3.samsung.com (unknown [182.195.40.190]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 46Hhwc2X60zMqYkg; Tue, 27 Aug
-        2019 08:33:36 +0000 (GMT)
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-        epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        F2.4A.04068.FDAE46D5; Tue, 27 Aug 2019 17:33:35 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas2p1.samsung.com (KnoxPortal) with ESMTPA id
-        20190827083334epcas2p115d479190b9a72c886f66569add78203~_uog_kpL90324603246epcas2p1z;
-        Tue, 27 Aug 2019 08:33:34 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20190827083334epsmtrp1f673cf2781a7bd9de3d4862d267c9cf9~_uog9Ynxl2654126541epsmtrp1O;
-        Tue, 27 Aug 2019 08:33:34 +0000 (GMT)
-X-AuditID: b6c32a47-5a1ff70000000fe4-07-5d64eadfc43f
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        07.26.03638.EDAE46D5; Tue, 27 Aug 2019 17:33:34 +0900 (KST)
-Received: from KORDO035251 (unknown [12.36.165.204]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20190827083334epsmtip186318bd933a57fdbaadd80afd23bc675~_uogrxHdu2027020270epsmtip14;
-        Tue, 27 Aug 2019 08:33:34 +0000 (GMT)
-From:   "boojin.kim" <boojin.kim@samsung.com>
-To:     "'Satya Tangirala'" <satyat@google.com>
-Cc:     "'Herbert Xu'" <herbert@gondor.apana.org.au>,
-        "'David S. Miller'" <davem@davemloft.net>,
-        "'Eric Biggers'" <ebiggers@kernel.org>,
-        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
-        "'Chao Yu'" <chao@kernel.org>,
-        "'Jaegeuk Kim'" <jaegeuk@kernel.org>,
-        "'Andreas Dilger'" <adilger.kernel@dilger.ca>,
-        "'Theodore Ts'o'" <tytso@mit.edu>, <dm-devel@redhat.com>,
-        "'Mike Snitzer'" <snitzer@redhat.com>,
-        "'Alasdair Kergon'" <agk@redhat.com>,
-        "'Jens Axboe'" <axboe@kernel.dk>,
-        "'Krzysztof Kozlowski'" <krzk@kernel.org>,
-        "'Kukjin Kim'" <kgene@kernel.org>,
-        "'Jaehoon Chung'" <jh80.chung@samsung.com>,
-        "'Ulf Hansson'" <ulf.hansson@linaro.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-fscrypt@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <linux-samsung-soc@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-ext4@vger.kernel.org>,
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        <linux-samsung-soc@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH 5/9] block: support diskcipher
-Date:   Tue, 27 Aug 2019 17:33:33 +0900
-Message-ID: <03b201d55cb2$1d4d31b0$57e79510$@samsung.com>
+        id S1729161AbfH0KiA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Aug 2019 06:38:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43184 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725912AbfH0KiA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Aug 2019 06:38:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A4F458B5FF0;
+        Tue, 27 Aug 2019 10:37:59 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-27.pek2.redhat.com [10.72.8.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 796EC5D9CD;
+        Tue, 27 Aug 2019 10:37:50 +0000 (UTC)
+Date:   Tue, 27 Aug 2019 18:37:45 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [PATCH V3 5/5] block: split .sysfs_lock into two locks
+Message-ID: <20190827103744.GD30871@ming.t460p>
+References: <20190826025146.31158-1-ming.lei@redhat.com>
+ <20190826025146.31158-6-ming.lei@redhat.com>
+ <6499b212-fa8c-7d19-8149-43c8ad1e950d@acm.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 14.0
-Thread-Index: AdVcd9wJ7O+zjwFDS522TgVlMugkdw==
-Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA01TfUwTdxjOr3e9nrguR0H2S/dhd9Nk1VDaasuPTUyjZl4y48jIdDGScmkv
-        hawfl16LuizDIdRa2TqzGWZhDnSTWUNwhQFDSqQyGIyPRSIBo9PMzii6LxASiI71OMz473mf
-        93nyfuUlMVWDQk2Wun2c1806aSINb7uizc2+NWUv0ne3pKHZR0EcNQ/2YejCzTCBfj45LEN1
-        o5U4iv9ZK0dNXY8xdHzqBZRsjmBoYiEgR+E7DzA0OnpRgWJ3xuUofn0juvXrvAydOn2DQFfP
-        7ERTp+dw1BUfwNFYZx2BehfDAH0x2i1D4Qs3CRT4bhagqup5Bepv2mtRM63nJ2VMZcsBpu3y
-        eqY+5mfGhv1MLHqMYG6MdxFMy9flzKX6GRlTMfQjxvzVfY1gPmmNAmYm9lKBcp9zSwnH2jmv
-        hnPbPPZStyOffrPQut1qMusN2YY8lEtr3KyLy6d37CrIfqPUmVoCrSljnf4UVcAKAp2zdYvX
-        4/dxmhKP4MunOd7u5A0GXiewLsHvduhsHtdrBr3eaEopi50lE008P688ONb3EDsMaleHAElC
-        ajP8aOSDEEgjVVQHgPfOHsGlYBrAip/qZCGwKhXMARjvyxCxaKhcuKeQRHEAByd+B1JwH8C5
-        2k6FqCKojbClPwpEnJnCv109LxdFGPWvAianE7iYyKCMsCp0fKkETq2HwcV/CBErqTzYM9AA
-        JJwOB04ll/QYtRa2/1GHSW1oYMfwg+UCOjgTGpZLmkxYeyyAicUgVUXCiiO9QDLsgPUnLi+b
-        M+BUf6tCwmp4PxxYxuXw2rmzCslcDeDQwtPEJhi5exSIG8MoLWzuzJGW9wrsvb7c27MweOWJ
-        QqKVMBhQScZ18MvpMZlEq+Hf1R9KNAOrex+CT8HLkRVDRlYMGVkxTOT/svUAj4IsjhdcDk4w
-        8ptWnjoGlt5jw84O0DayKwEoEtDPKOGQrUglZ8uEQ64EgCRGZyqdOWyRSmlnD73PeT1Wr9/J
-        CQlgSt3gBKZeY/Okns3tsxpMRrNZn2dCJrMR0c8pY6sn96soB+vj3uM4nvM+9cnIVerDIN02
-        fu57SyxrbXLP0OdvJb552/bxtjaQ9Qt99N2yrdp9dw2O8FfrZm9nYo4n6WHLyeIcoX22/VEj
-        z4Efgo7bI9pOy+sN5c9/++rg9sLduYXbbKhmT7Jmc4PHduazdw7WWCcDOosR2ot79Iv7df12
-        VmjcbT4QfzzQ+OKilulJdERpXChhDRswr8D+B8P/EWw0BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrMIsWRmVeSWpSXmKPExsWy7bCSnO69VymxBrcXqlh8/dLBYrH+1DFm
-        i9V3+9ksTk89y2Qx53wLi8Xed7NZLdbu+cNs0f1KxuLJ+lnMFjd+tbFa9D9+zWxx/vwGdotN
-        j6+xWuy9pW1x/95PJouZ8+6wWVxa5G7xat43Fos9e0+yWFzeNYfN4sj/fkaLGef3MVn0r77L
-        ZtG28SujRWvPT3aL42vDHaQ8tqy8yeTRsrncY9sBVY8Fm0o9Lp8t9di0qpPN4861PWwem5fU
-        e+xe8JnJo+nMUWaP9/uusnn0bVnF6PF5k1wAbxSXTUpqTmZZapG+XQJXxo21BQU/eSsuH3vD
-        3MA4m7uLkZNDQsBEouXXC/YuRi4OIYHdjBKXOpcxQySkJLa274GyhSXutxxhhSh6ziix7Mtx
-        FpAEm4C2xObjqxhBbBEg+9GllawgNrPANA6JXR/EQWxhASOJ1q5uJhCbRUBVouP/RzYQm1fA
-        UuLgyYWMELagxMmZT4BmcgD16km0bWSEGCMvsf3tHKgbFCR2nH0NtUpP4nPXWahVIhKzO9uY
-        JzAKzkIyaRbCpFlIJs1C0rGAkWUVo2RqQXFuem6xYYFRXmq5XnFibnFpXrpecn7uJkZwUtDS
-        2sF44kT8IUYBDkYlHl6JM8mxQqyJZcWVuYcYJTiYlUR4c/QTY4V4UxIrq1KL8uOLSnNSiw8x
-        SnOwKInzyucfixQSSE8sSc1OTS1ILYLJMnFwSjUwzu+6tX/72stKzWKemrbqW3KZJgeK77oX
-        vnmD0Nlwy8yz3/uF2aTDk6Q9mT01RQOT/X7MEFBaXeui9Fboo4K3zMMdi7im3nry/vQ537ua
-        eclstddPhB5dfjO89nnTGwtpTb6aTJ2Dh/PtuYV0nv6MZ5ELzkkLcbJeUyojuOHt6spPUS78
-        wjxKLMUZiYZazEXFiQDWZLGyBgMAAA==
-X-CMS-MailID: 20190827083334epcas2p115d479190b9a72c886f66569add78203
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20190827083334epcas2p115d479190b9a72c886f66569add78203
-References: <CGME20190827083334epcas2p115d479190b9a72c886f66569add78203@epcas2p1.samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6499b212-fa8c-7d19-8149-43c8ad1e950d@acm.org>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Tue, 27 Aug 2019 10:37:59 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 5:10 AM Satya Tangirala <satyat@kernel.dk> wrote:
+On Mon, Aug 26, 2019 at 09:24:03AM -0700, Bart Van Assche wrote:
+> On 8/25/19 7:51 PM, Ming Lei wrote:
+> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> > index 5b0b5224cfd4..5941a0176f87 100644
+> > --- a/block/blk-sysfs.c
+> > +++ b/block/blk-sysfs.c
+> > @@ -938,6 +938,7 @@ int blk_register_queue(struct gendisk *disk)
+> >   	int ret;
+> >   	struct device *dev = disk_to_dev(disk);
+> >   	struct request_queue *q = disk->queue;
+> > +	bool has_elevator = false;
+> >   	if (WARN_ON(!q))
+> >   		return -ENXIO;
+> > @@ -945,7 +946,6 @@ int blk_register_queue(struct gendisk *disk)
+> >   	WARN_ONCE(blk_queue_registered(q),
+> >   		  "%s is registering an already registered queue\n",
+> >   		  kobject_name(&dev->kobj));
+> > -	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+> >   	/*
+> >   	 * SCSI probing may synchronously create and destroy a lot of
+> > @@ -966,7 +966,7 @@ int blk_register_queue(struct gendisk *disk)
+> >   		return ret;
+> >   	/* Prevent changes through sysfs until registration is completed. */
+> > -	mutex_lock(&q->sysfs_lock);
+> > +	mutex_lock(&q->sysfs_dir_lock);
 > 
-> Hi Boojin,
->
-> We're very keen to make sure that our approach to inline encryption can
-> work with diverse hardware, including Samsung's FMP hardware; if you
-> can see any issues with using our approach with your hardware please
-> let us know.
->
-> We understand that a possible concern for getting FMP working with our
-> patch series for Inline Encryption Support at
->
->
-https://lore.kernel.org/linux-block/20190821075714.65140-1-satyat@google.com
-/
->
-> is that unlike some inline encryption hardware (and also unlike the JEDEC
-> UFS v2.1 spec), FMP doesn't have the concept of a limited number of
-> keyslots - to address that difference we have a "passthrough keyslot
-> manager", which we put up on top of our patch series for inline encryption
-> support at
->
-> https://android-review.googlesource.com/c/kernel/common/+/980137/2
->
-> Setting up a passthrough keyslot manager in the request queue of a
-> device allows the device to receive a bio's encryption context as-is with
-> the bio, which is what FMP would prefer. Are there any issues with
-> using the passthrough keyslot manager for FMP?
->
-> Thanks!
-> Satya
+> Does mutex_lock(&q->sysfs_dir_lock) really protect against changes of the
+> I/O scheduler through sysfs or does it only protect against concurrent sysfs
+> object creation and removal?
 
-Dear Satya.
-Keyslot manager is a good solution for ICE. And probably no issue for FMP.
-But, I think it's complicated for FMP because FMP doesn't need
-any keyslot control.
-Crypto API that FMP's using is simply, stable, and supports test. 
-FMP has been mass producing and certificating using crypto APIs
-for several years. 
-So I wants to keep  our current crypto API solution.
-But, I'm looking at your patch.  And I will keep examining at your patch
-because our goal is to run the FMP on the mainline kernel.
+It is only for protecting against concurrent sysfs object creation and removal.
 
-Thanks for your reply.
-Boojin Kim.
+> In other words, should the comment above this
+> mutex lock call be updated?
 
+Yeah, it should be removed.
+
+> 
+> > @@ -987,26 +987,37 @@ int blk_register_queue(struct gendisk *disk)
+> >   		blk_mq_debugfs_register(q);
+> >   	}
+> > -	kobject_uevent(&q->kobj, KOBJ_ADD);
+> > -
+> > -	wbt_enable_default(q);
+> > -
+> > -	blk_throtl_register_queue(q);
+> > -
+> > +	/*
+> > +	 * The queue's kobject ADD uevent isn't sent out, also the
+> > +	 * flag of QUEUE_FLAG_REGISTERED isn't set yet, so elevator
+> > +	 * switch won't happen at all.
+> > +	 */
+> >   	if (q->elevator) {
+> > -		ret = elv_register_queue(q);
+> > +		ret = elv_register_queue(q, false);
+> >   		if (ret) {
+> > -			mutex_unlock(&q->sysfs_lock);
+> > -			kobject_uevent(&q->kobj, KOBJ_REMOVE);
+> > +			mutex_unlock(&q->sysfs_dir_lock);
+> >   			kobject_del(&q->kobj);
+> >   			blk_trace_remove_sysfs(dev);
+> >   			kobject_put(&dev->kobj);
+> >   			return ret;
+> >   		}
+> > +		has_elevator = true;
+> >   	}
+> 
+> I think the reference to the kobject ADD event in the comment is misleading.
+> If e.g. a request queue is registered, unregistered and reregistered
+> quickly, can it happen that a udev rule for the ADD event triggered by the
+> first registration is executed in the middle of the second registration? Is
+
+It should happen, but this patch doesn't change anything about this
+behavior.
+
+> setting the REGISTERED flag later sufficient to fix the race against
+> scheduler changes through sysfs?
+
+Yes, it is enough. 
+
+> If so, how about leaving out the reference
+> to the kobject ADD event from the above comment?
+
+OK.
+
+> 
+> > +	mutex_lock(&q->sysfs_lock);
+> > +	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+> > +	wbt_enable_default(q);
+> > +	blk_throtl_register_queue(q);
+> > +	mutex_unlock(&q->sysfs_lock);
+> > +
+> > +	/* Now everything is ready and send out KOBJ_ADD uevent */
+> > +	kobject_uevent(&q->kobj, KOBJ_ADD);
+> > +	if (has_elevator)
+> > +		kobject_uevent(&q->elevator->kobj, KOBJ_ADD);
+> 
+> Can it happen that immediately after mutex_unlock(&q->sysfs_lock) a script
+> removes the I/O scheduler and hence makes the value of the 'has_elevator'
+> variable stale? In other words, should emitting KOBJ_ADD also be protected
+> by sysfs_lock?
+
+Good catch, it could be fine to hold syfs_lock for emitting KOBJ_ADD.
+
+> 
+> > @@ -1021,6 +1032,7 @@ EXPORT_SYMBOL_GPL(blk_register_queue);
+> >   void blk_unregister_queue(struct gendisk *disk)
+> >   {
+> >   	struct request_queue *q = disk->queue;
+> > +	bool has_elevator;
+> >   	if (WARN_ON(!q))
+> >   		return;
+> > @@ -1035,25 +1047,25 @@ void blk_unregister_queue(struct gendisk *disk)
+> >   	 * concurrent elv_iosched_store() calls.
+> >   	 */
+> >   	mutex_lock(&q->sysfs_lock);
+> > -
+> >   	blk_queue_flag_clear(QUEUE_FLAG_REGISTERED, q);
+> > +	has_elevator = !!q->elevator;
+> > +	mutex_unlock(&q->sysfs_lock);
+> > +	mutex_lock(&q->sysfs_dir_lock);
+> >   	/*
+> >   	 * Remove the sysfs attributes before unregistering the queue data
+> >   	 * structures that can be modified through sysfs.
+> >   	 */
+> >   	if (queue_is_mq(q))
+> >   		blk_mq_unregister_dev(disk_to_dev(disk), q);
+> > -	mutex_unlock(&q->sysfs_lock);
+> >   	kobject_uevent(&q->kobj, KOBJ_REMOVE);
+> >   	kobject_del(&q->kobj);
+> >   	blk_trace_remove_sysfs(disk_to_dev(disk));
+> > -	mutex_lock(&q->sysfs_lock);
+> > -	if (q->elevator)
+> > +	if (has_elevator)
+> >   		elv_unregister_queue(q);
+> > -	mutex_unlock(&q->sysfs_lock);
+> > +	mutex_unlock(&q->sysfs_dir_lock);
+> 
+> Is it safe to call elv_unregister_queue() if no I/O scheduler is associated
+> with a request queue?
+
+No, q->elevator has to be valid for elv_unregister_queue().
+
+>If so, have you considered to leave out the
+> 'has_elevator' variable from this function?
+> 
+> > @@ -567,10 +580,23 @@ int elevator_switch_mq(struct request_queue *q,
+> >   	lockdep_assert_held(&q->sysfs_lock);
+> >   	if (q->elevator) {
+> > -		if (q->elevator->registered)
+> > +		if (q->elevator->registered) {
+> > +			mutex_unlock(&q->sysfs_lock);
+> > +
+> >   			elv_unregister_queue(q);
+> > +
+> > +			mutex_lock(&q->sysfs_lock);
+> > +		}
+> >   		ioc_clear_queue(q);
+> >   		elevator_exit(q, q->elevator);
+> > +
+> > +		/*
+> > +		 * sysfs_lock may be dropped, so re-check if queue is
+> > +		 * unregistered. If yes, don't switch to new elevator
+> > +		 * any more
+> > +		 */
+> > +		if (!blk_queue_registered(q))
+> > +			return 0;
+> >   	}
+> 
+> So elevator_switch_mq() is called with sysfs_lock held and releases and
+> reacquires that mutex?
+
+Yes.
+
+> What will happen if e.g. syzbot writes into
+> /sys/block/*/queue/scheduler from multiple threads concurrently? Can that
+
+It can't happen, sysfs's write on same file is always exclusively protected
+by one mutex, see kernfs_fop_write(), and should be same for normal fs too.
+
+> lead to multiple concurrent calls of elv_register_queue() and
+> elv_unregister_queue()? Can that e.g. cause concurrent calls of the
+> following code from elv_register_queue(): kobject_add(&e->kobj, &q->kobj,
+> "%s", "iosched")?
+
+No, it won't happen.
+
+> 
+> Is it even possible to fix this lock inversion by introducing only one new
+> mutex? I think the sysfs directories and attributes referenced by this patch
+> are as follows:
+> 
+> /sys/block/<q>/queue
+> /sys/block/<q>/queue/attr
+> /sys/block/<q>/queue/iosched/attr
+> /sys/block/<q>/mq
+> /sys/block/<q>/mq/<n>
+> /sys/block/<q>/mq/<n>/attr
+> 
+> Isn't the traditional approach to protect such a hierarchy to use one mutex
+> per level? E.g. one mutex to serialize "queue" and "mq" manipulations
+> (sysfs_dir_lock?), one mutex to protect the queue/attr attributes
+> (sysfs_lock?), one mutex to serialize kobj creation in the mq directory, one
+> mutex to protect the mq/<n>/attr attributes and one mutex to protect the I/O
+> scheduler attributes?
+
+This patch keeps to use sysfs_lock for protecting attributes show/write,
+meantime don't use it for serializing kobj creation & removal, so far
+looks good.
+
+I will address your above comments and post V4 for further review.
+
+Thanks,
+Ming
