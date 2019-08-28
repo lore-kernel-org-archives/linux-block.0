@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F169C3A5A1
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:54:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 522EFC3A5A7
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:54:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A332233A1
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:54:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31BCF22DA7
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:54:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727190AbfH1Vyl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Aug 2019 17:54:41 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:46460 "EHLO ale.deltatee.com"
+        id S1727270AbfH1Vyn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Aug 2019 17:54:43 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:46502 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727124AbfH1Vyk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 17:54:40 -0400
+        id S1727213AbfH1Vym (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Aug 2019 17:54:42 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1i35tj-00071e-NN; Wed, 28 Aug 2019 15:54:39 -0600
+        id 1i35tj-00071j-NS; Wed, 28 Aug 2019 15:54:41 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1i35ti-0001Cp-CH; Wed, 28 Aug 2019 15:54:34 -0600
+        id 1i35ti-0001D4-Qg; Wed, 28 Aug 2019 15:54:34 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
@@ -36,8 +36,8 @@ Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
         Stephen Bates <sbates@raithlin.com>,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Wed, 28 Aug 2019 15:54:19 -0600
-Message-Id: <20190828215429.4572-4-logang@deltatee.com>
+Date:   Wed, 28 Aug 2019 15:54:24 -0600
+Message-Id: <20190828215429.4572-9-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190828215429.4572-1-logang@deltatee.com>
 References: <20190828215429.4572-1-logang@deltatee.com>
@@ -46,7 +46,7 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, maxg@mellanox.com, sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, chaitanya.kulkarni@wdc.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v8 03/13] nvmet: add return value to  nvmet_add_async_event()
+Subject: [PATCH v8 08/13] nvmet-core: don't check the data len for pt-ctrl
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -56,66 +56,45 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 
-Change the return value for nvmet_add_async_event().
-
-This change is needed for the target passthru code which will
-submit async events on namespaces changes and can fail the command
-should adding the event fail (on -ENOMEM).
+Right now, data_len is calculated before the transfer len after we
+parse the command, With passthru interface we allow VUCs (Vendor-Unique
+Commands). In order to make the code simple and compact, instead of
+assigning the data len or each VUC in the command parse function
+just use the transfer len as it is. This may result in error if expected
+data_len != transfer_len.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 [logang@deltatee.com:
- * fleshed out commit message
- * change to using int as a return type instead of bool
-]
+   * added definition of VUC to the commit message and comment
+   * use nvmet_req_passthru_ctrl() helper seeing we can't dereference
+     subsys->passthru_ctrl if CONFIG_NVME_TARGET_PASSTHRU is not set]
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/nvme/target/core.c  | 6 ++++--
- drivers/nvme/target/nvmet.h | 2 +-
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ drivers/nvme/target/core.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
-index 3a67e244e568..d6dcb86d8be7 100644
+index 986b2511d284..f9d46354f9ae 100644
 --- a/drivers/nvme/target/core.c
 +++ b/drivers/nvme/target/core.c
-@@ -173,14 +173,14 @@ static void nvmet_async_event_work(struct work_struct *work)
- 	}
- }
+@@ -942,7 +942,16 @@ EXPORT_SYMBOL_GPL(nvmet_req_uninit);
  
--void nvmet_add_async_event(struct nvmet_ctrl *ctrl, u8 event_type,
-+int nvmet_add_async_event(struct nvmet_ctrl *ctrl, u8 event_type,
- 		u8 event_info, u8 log_page)
+ void nvmet_req_execute(struct nvmet_req *req)
  {
- 	struct nvmet_async_event *aen;
- 
- 	aen = kmalloc(sizeof(*aen), GFP_KERNEL);
- 	if (!aen)
--		return;
-+		return -ENOMEM;
- 
- 	aen->event_type = event_type;
- 	aen->event_info = event_info;
-@@ -191,6 +191,8 @@ void nvmet_add_async_event(struct nvmet_ctrl *ctrl, u8 event_type,
- 	mutex_unlock(&ctrl->lock);
- 
- 	schedule_work(&ctrl->async_event_work);
-+
-+	return 0;
- }
- 
- static void nvmet_add_to_changed_ns_log(struct nvmet_ctrl *ctrl, __le32 nsid)
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index c51f8dd01dc4..3d313a6452cc 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -441,7 +441,7 @@ void nvmet_port_disc_changed(struct nvmet_port *port,
- 		struct nvmet_subsys *subsys);
- void nvmet_subsys_disc_changed(struct nvmet_subsys *subsys,
- 		struct nvmet_host *host);
--void nvmet_add_async_event(struct nvmet_ctrl *ctrl, u8 event_type,
-+int nvmet_add_async_event(struct nvmet_ctrl *ctrl, u8 event_type,
- 		u8 event_info, u8 log_page);
- 
- #define NVMET_QUEUE_SIZE	1024
+-	if (unlikely(req->data_len != req->transfer_len)) {
++	/*
++	 * data_len is calculated before the transfer len after we parse
++	 * the command, With passthru interface we allow VUC (Vendor-Unique
++	 * Commands)'s. In order to make the code simple and compact,
++	 * instead of assinging the dala len for each VUC in the command
++	 * parse function just use the transfer len as it is. This may
++	 * result in error if expected data_len != transfer_len.
++	 */
++	if (!(req->sq->ctrl && nvmet_req_passthru_ctrl(req)) &&
++	    unlikely(req->data_len != req->transfer_len)) {
+ 		req->error_loc = offsetof(struct nvme_common_command, dptr);
+ 		nvmet_req_complete(req, NVME_SC_SGL_INVALID_DATA | NVME_SC_DNR);
+ 	} else
 -- 
 2.20.1
 
