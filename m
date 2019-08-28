@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AABC5C3A5A6
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D218C3A5A1
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:06:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7FF7D233A1
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:06:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5183623405
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:06:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567030012;
-	bh=lbBFBStJVQLdXd+dZqWHfnVeP57XLwfB5WxA6yZA7zg=;
+	s=default; t=1567030014;
+	bh=t9x9rbzNvp7ynlcpOVCqDS91TRnSExLwxkklh7/+s1c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=yxn7ly+U9aO+YP+Mu3RVTMndDTg33VqiCLg5yeUSJbMWTbm3hn3SAELxzrGjIg1aH
-	 PVTPRi2CkGtMbnDyog7072yqZFWT+jUlWhxZFtOKoYSE+EoED4hQvrKQyyMxW46NRY
-	 Evv6EvoPkWdz31N0hvlsGGvWr+2WLpU4FJO5HwTc=
+	b=1GYyFw3J7bLX0Y1iKAf1lzih+K60ocn3fcogJ/NJedJ5mTeygHZG9Oe4b9Fe1Z9RS
+	 LMdmaahm9FCdCQNRHpe0XrKPkyqrFm/TKcqyPVLs/T1a8jI/qZb+t+Tg8BMhoKWTvY
+	 3hJVV2csx+mXWdoL0kOUdOIFgN8zvuZ8+QZu7brU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727234AbfH1WGX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Aug 2019 18:06:23 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:43449 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727223AbfH1WGW (ORCPT
+        id S1727125AbfH1WGQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Aug 2019 18:06:16 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:46115 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727116AbfH1WGP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 18:06:22 -0400
-Received: by mail-qt1-f193.google.com with SMTP id b11so1360042qtp.10;
-        Wed, 28 Aug 2019 15:06:21 -0700 (PDT)
+        Wed, 28 Aug 2019 18:06:15 -0400
+Received: by mail-qk1-f195.google.com with SMTP id p13so1151746qkg.13;
+        Wed, 28 Aug 2019 15:06:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=hJvU7rmwIge55OnvUhbefmrBEQ8Ym4OUDfM2nXYs6sA=;
-        b=SUgVVk64RTHaoNIAgijUQpv5HFB6s5wym3N8KbvF1Kc7aCU6csB6QYObFfyzY8vUbh
-         ztdsAAzEtjIkTyPPRC+AbKzmE+Nj2jr+KTv0+dcdEZaUYlwfYB2psX7HCXapsFsT8+xO
-         yRvCZHXiYqCghYOsRiWYTdo272wq51qBwE1O/jYvO/2yIq9VCLaXQ/0BYIURYI5QZAup
-         5uYMv2EtMN8INwx9dZNqqMCeYILSznb+vCd3ejsyK/aTforkB7PbaBlQLYLLD+46p6nA
-         akh+AIfRpdVylk+QNtbhTvYkAnZ2eWZxN9ECBdY4tWEQeGu6CwFgXSnh8madvm70Nhix
-         NdVQ==
+        bh=85wyZs3HMu6iXK+wZ0W8BFNcrkDk5YmJ/FXIK4MM3S8=;
+        b=cG+3/ed+q1RdEnqmWH4ftRcuxyp4xnZQof6cm/OxQXjNXAi+nZbBEnX10Jw0NfVdM/
+         O9nEbP/1s2E7IfITAwQTVpdRRflbD/FAQK83XRL36CN8o8HwKTzka1Sny7JjJYreVXbA
+         4rYCz2XdATy2L/df9Y743cFRjramsvYTkyDu5QoTrZTrpylaHzR4hB9NVfaoGSKfD+ME
+         7iVYTTPjGExBhPoYs5HYXOjn5qKYoYoM1cj95smDJWQKRv4ztSF8H2y0h3fz7iVw2QFh
+         7DJ1YBNI3TTW9LtcBctjZ7kYYWKeOwe8cWb3EhhKI82e/f3cST1zRbpMzdMyfE7I15fU
+         hJdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=hJvU7rmwIge55OnvUhbefmrBEQ8Ym4OUDfM2nXYs6sA=;
-        b=XtDAv7QgR+LKs6hFy45kzXeRsFejJ/FxqACPF9gUUKLXJ28P3Bu+x5oJMk0g/sfRCG
-         l9GjdjMPJHF9c2vgzX4GDWwE59JZaDdHeWIZh2F+m/XYupimBgYPHywdtIshT5WJWRPJ
-         bgRU8MGwe73ZZK8+z+TnsJHWlh64ka6ffourn7rQfmnim4rg6+mGqA+pDpuqEbTPHzSH
-         JzJYnznOar7bLYXnetHPTtmIwrpMj7zctOhlpeFKA0+JmVeP2901Re5MBW5MA3JMAx7A
-         zrvX3d3Lhn+pkMvnVnl8Gli0EF66ESWwE36tu39f5XxLuoFfM2fqkj7/QcIpfIi7IjEi
-         d0lA==
-X-Gm-Message-State: APjAAAVGrR/TTZ28xhmCWy896+tF1A6FOqny7YEeoL/L52fVIcNf+g91
-        DkuGBjT6WjFRurlPqMeDSgvVHRtp
-X-Google-Smtp-Source: APXvYqxa/K7gZv6PsgzXX3UTvABDLpDMm2GDIyW1SzL1E0NepgWD4mZBk8MUMhDkyL/oavJ0AJJN6w==
-X-Received: by 2002:ac8:4456:: with SMTP id m22mr6617252qtn.326.1567029980929;
-        Wed, 28 Aug 2019 15:06:20 -0700 (PDT)
+        bh=85wyZs3HMu6iXK+wZ0W8BFNcrkDk5YmJ/FXIK4MM3S8=;
+        b=b5lX1435WIterR4643kS06/mWyWCF944aWMKGdBZSFIfVksuaLTHS3QLNODfOB6Wv1
+         R0qhG+H2o0Cpp2cs+5/3TyG0mDj5b1+SaivRibIt1JnpmpD5+e+KvSPh8danb4CmGbyV
+         01oUtlZBIBbOCcsdq81NGRQe6mU1QGL8LX46PoTMsb6bi+0YZSqI/xS9yeDTVn3zPGQU
+         rR6SSNjbi6T2iedRZBVCNhbVyvPxk0GrLzYZYVDlxuwpl22Gvmh8g2tRrzcsaS2wcXNk
+         Jujr+13718a8m7lCQdyndz8tl8R12/tHTpGI0KRUMIwc/uUO/urdYL464X3lB0yvm2x3
+         fZLQ==
+X-Gm-Message-State: APjAAAUmrkSY4ydGjYfOxEs9ncQLGy5iHeJIMX5F7+I3oqLXnR6PL6f7
+        d6KnvVBAR+Nl7FrP1cdbF4I=
+X-Google-Smtp-Source: APXvYqy7/z2dUjl+mXRhpdeons/i/EZxNOJzaBdfT9TxPNEFa74lslcRCiGyFc6x+EqwdYa9bPooPA==
+X-Received: by 2002:a05:620a:1134:: with SMTP id p20mr6459763qkk.434.1567029974498;
+        Wed, 28 Aug 2019 15:06:14 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:500::1:c231])
-        by smtp.gmail.com with ESMTPSA id g24sm338594qtc.38.2019.08.28.15.06.20
+        by smtp.gmail.com with ESMTPSA id c26sm19949qtk.93.2019.08.28.15.06.13
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 28 Aug 2019 15:06:20 -0700 (PDT)
+        Wed, 28 Aug 2019 15:06:13 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
         dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         kernel-team@fb.com, cgroups@vger.kernel.org,
         Tejun Heo <tj@kernel.org>
-Subject: [PATCH 07/10] blk-mq: add optional request->alloc_time_ns
-Date:   Wed, 28 Aug 2019 15:05:57 -0700
-Message-Id: <20190828220600.2527417-8-tj@kernel.org>
+Subject: [PATCH 04/10] block/rq_qos: add rq_qos_merge()
+Date:   Wed, 28 Aug 2019 15:05:54 -0700
+Message-Id: <20190828220600.2527417-5-tj@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190828220600.2527417-1-tj@kernel.org>
 References: <20190828220600.2527417-1-tj@kernel.org>
@@ -76,129 +76,98 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are currently two start time timestamps - start_time_ns and
-io_start_time_ns.  The former marks the request allocation and and the
-second issue-to-device time.  The planned io.weight controller needs
-to measure the total time bios take to execute after it leaves rq_qos
-including the time spent waiting for request to become available,
-which can easily dominate on saturated devices.
-
-This patch adds request->alloc_time_ns which records when the request
-allocation attempt started.  As it isn't used for the usual stats,
-make it optional behind CONFIG_BLK_RQ_ALLOC_TIME and
-QUEUE_FLAG_RQ_ALLOC_TIME so that it can be compiled out when there are
-no users and it's active only on queues which need it even when
-compiled in.
-
-v2: s/pre_start_time/alloc_time/ and add CONFIG_BLK_RQ_ALLOC_TIME
-    gating as suggested by Jens.
+Add a merge hook for rq_qos.  This will be used by io.weight.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
- block/Kconfig          |  3 +++
- block/blk-mq.c         | 13 +++++++++++--
- include/linux/blkdev.h | 13 ++++++++++++-
- 3 files changed, 26 insertions(+), 3 deletions(-)
+ block/blk-core.c   | 4 ++++
+ block/blk-rq-qos.c | 9 +++++++++
+ block/blk-rq-qos.h | 9 +++++++++
+ 3 files changed, 22 insertions(+)
 
-diff --git a/block/Kconfig b/block/Kconfig
-index 8b5f8e560eb4..1b62ad6d0e12 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -26,6 +26,9 @@ menuconfig BLOCK
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 77807a5d7f9e..875e8d105067 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -604,6 +604,7 @@ bool bio_attempt_back_merge(struct request *req, struct bio *bio,
+ 		return false;
  
- if BLOCK
+ 	trace_block_bio_backmerge(req->q, req, bio);
++	rq_qos_merge(req->q, req, bio);
  
-+config BLK_RQ_ALLOC_TIME
-+	bool
+ 	if ((req->cmd_flags & REQ_FAILFAST_MASK) != ff)
+ 		blk_rq_set_mixed_merge(req);
+@@ -625,6 +626,7 @@ bool bio_attempt_front_merge(struct request *req, struct bio *bio,
+ 		return false;
+ 
+ 	trace_block_bio_frontmerge(req->q, req, bio);
++	rq_qos_merge(req->q, req, bio);
+ 
+ 	if ((req->cmd_flags & REQ_FAILFAST_MASK) != ff)
+ 		blk_rq_set_mixed_merge(req);
+@@ -650,6 +652,8 @@ bool bio_attempt_discard_merge(struct request_queue *q, struct request *req,
+ 	    blk_rq_get_max_sectors(req, blk_rq_pos(req)))
+ 		goto no_merge;
+ 
++	rq_qos_merge(q, req, bio);
 +
- config BLK_SCSI_REQUEST
- 	bool
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f6620a30752e..b622029b19ea 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -291,7 +291,7 @@ static inline bool blk_mq_need_time_stamp(struct request *rq)
+ 	req->biotail->bi_next = bio;
+ 	req->biotail = bio;
+ 	req->__data_len += bio->bi_iter.bi_size;
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index 3954c0dc1443..f4eea78f5cc1 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -83,6 +83,15 @@ void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio)
+ 	} while (rqos);
  }
  
- static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
--		unsigned int tag, unsigned int op)
-+		unsigned int tag, unsigned int op, u64 alloc_time_ns)
++void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio)
++{
++	do {
++		if (rqos->ops->merge)
++			rqos->ops->merge(rqos, rq, bio);
++		rqos = rqos->next;
++	} while (rqos);
++}
++
+ void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio)
  {
- 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
- 	struct request *rq = tags->static_rqs[tag];
-@@ -325,6 +325,9 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	RB_CLEAR_NODE(&rq->rb_node);
- 	rq->rq_disk = NULL;
- 	rq->part = NULL;
-+#ifdef CONFIG_BLK_RQ_ALLOC_TIME
-+	rq->alloc_time_ns = alloc_time_ns;
-+#endif
- 	if (blk_mq_need_time_stamp(rq))
- 		rq->start_time_ns = ktime_get_ns();
- 	else
-@@ -356,8 +359,14 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 	struct request *rq;
- 	unsigned int tag;
- 	bool clear_ctx_on_error = false;
-+	u64 alloc_time_ns = 0;
+ 	do {
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index 2300e038b9fa..8e426a8505b6 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -35,6 +35,7 @@ struct rq_qos {
+ struct rq_qos_ops {
+ 	void (*throttle)(struct rq_qos *, struct bio *);
+ 	void (*track)(struct rq_qos *, struct request *, struct bio *);
++	void (*merge)(struct rq_qos *, struct request *, struct bio *);
+ 	void (*issue)(struct rq_qos *, struct request *);
+ 	void (*requeue)(struct rq_qos *, struct request *);
+ 	void (*done)(struct rq_qos *, struct request *);
+@@ -135,6 +136,7 @@ void __rq_qos_issue(struct rq_qos *rqos, struct request *rq);
+ void __rq_qos_requeue(struct rq_qos *rqos, struct request *rq);
+ void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio);
+ void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio);
++void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio);
+ void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio);
  
- 	blk_queue_enter_live(q);
+ static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
+@@ -185,6 +187,13 @@ static inline void rq_qos_track(struct request_queue *q, struct request *rq,
+ 		__rq_qos_track(q->rq_qos, rq, bio);
+ }
+ 
++static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
++				struct bio *bio)
++{
++	if (q->rq_qos)
++		__rq_qos_merge(q->rq_qos, rq, bio);
++}
 +
-+	/* alloc_time includes depth and tag waits */
-+	if (blk_queue_rq_alloc_time(q))
-+		alloc_time_ns = ktime_get_ns();
-+
- 	data->q = q;
- 	if (likely(!data->ctx)) {
- 		data->ctx = blk_mq_get_ctx(q);
-@@ -393,7 +402,7 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 		return NULL;
- 	}
+ void rq_qos_exit(struct request_queue *);
  
--	rq = blk_mq_rq_ctx_init(data, tag, data->cmd_flags);
-+	rq = blk_mq_rq_ctx_init(data, tag, data->cmd_flags, alloc_time_ns);
- 	if (!op_is_flush(data->cmd_flags)) {
- 		rq->elv.icq = NULL;
- 		if (e && e->type->ops.prepare_request) {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1ac790178787..d0ad21e4771b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -194,7 +194,11 @@ struct request {
- 
- 	struct gendisk *rq_disk;
- 	struct hd_struct *part;
--	/* Time that I/O was submitted to the kernel. */
-+#ifdef CONFIG_BLK_RQ_ALLOC_TIME
-+	/* Time that the first bio started allocating this request. */
-+	u64 alloc_time_ns;
-+#endif
-+	/* Time that this request was allocated for this IO. */
- 	u64 start_time_ns;
- 	/* Time that I/O was submitted to the device. */
- 	u64 io_start_time_ns;
-@@ -609,6 +613,7 @@ struct request_queue {
- #define QUEUE_FLAG_QUIESCED	24	/* queue has been quiesced */
- #define QUEUE_FLAG_PCI_P2PDMA	25	/* device supports PCI p2p requests */
- #define QUEUE_FLAG_ZONE_RESETALL 26	/* supports Zone Reset All */
-+#define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
- 
- #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP))
-@@ -637,6 +642,12 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
- 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
- #define blk_queue_pci_p2pdma(q)	\
- 	test_bit(QUEUE_FLAG_PCI_P2PDMA, &(q)->queue_flags)
-+#ifdef CONFIG_BLK_RQ_ALLOC_TIME
-+#define blk_queue_rq_alloc_time(q)	\
-+	test_bit(QUEUE_FLAG_RQ_ALLOC_TIME, &(q)->queue_flags)
-+#else
-+#define blk_queue_rq_alloc_time(q)	false
-+#endif
- 
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
+ #endif
 -- 
 2.17.1
 
