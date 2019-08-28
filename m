@@ -2,198 +2,94 @@ Return-Path: <SRS0=wI0I=WY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB550C3A5A1
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:07:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EB78C3A5A6
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:24:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A45BB22CED
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:07:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567030020;
-	bh=/Hgt4DFw6pvxSrgzImLOtXjWw46Y5hlXX6S+DnFHjZc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=z7lwgoT+mCL00IQV2nWjn09CCnD1QEs7jxicqg26aFU9Ejf+ftEQ84R/4U29Ip8/M
-	 JelKNlZpxXHKqKIgYFAtNZdGvAIv2jkWovv7dQcNhygEDCmRL0+DkouRkY9sBIMz8u
-	 uNCh5JJJDNTCvTMc66dHDb0qtsmiuS3NI4621ylM=
+	by mail.kernel.org (Postfix) with ESMTP id 6E1C3217F5
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:24:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727017AbfH1WGK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Aug 2019 18:06:10 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:35163 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726839AbfH1WGJ (ORCPT
+        id S1726907AbfH1WYb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Aug 2019 18:24:31 -0400
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:58774 "EHLO
+        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726828AbfH1WYb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 18:06:09 -0400
-Received: by mail-qt1-f194.google.com with SMTP id u34so1420061qte.2;
-        Wed, 28 Aug 2019 15:06:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=E79NtAzOgIUAizJwIesUtiv2mCB5ZP/4rNwX4GMcwPI=;
-        b=aYzG7U0qx200TAfF6SANRqpsqmzCpyPAG6ywyYSvuykYASu2JfqjduSvQDq0IbeRh/
-         Qygo2r9DYfVqyC/MO929R8Pz0U0y3Ijgwy856gR0/8/C/vAv0TAhwXKimEPwkppjV1C9
-         EmbbgDfwv/x0e1SAuE3/QLuzafbLQCQrvkeyfQcu9/E0v84XvW5eKCUn4JjkmM88k1m9
-         mt+jC2UUw1ckafk+3PxhG707zlguMjx+uEy6X/6bM3FVcJ/l+00fLe2GzdhiJ5Lj59sK
-         5QrpyeR4p5hzEiF+ME0aA+UwrZg/jLzVnwSJ5cQ6yMvip/dick/WiQKYI1oeahebMC36
-         Y+lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=E79NtAzOgIUAizJwIesUtiv2mCB5ZP/4rNwX4GMcwPI=;
-        b=Oa+jozsc6KJWw0lLWI7zs5jXR4CicYqvMS3aNxg5NnEsq9SkXyIizfh5wD2RxokNfG
-         /e3nLzy/+ju0FQb2DicIvE7AtfKfIuLuYABV+zkq3TAIfWtDzaT/KCQUdB33fnI/kgpI
-         rEFXzhj/iQ7wYd48UUGavgfGby09POxeIRB5xk5+cvvGp94zpeUetA4mq7sjDE6N/LEB
-         MP1PM55bG2BAvV5ArLu/iRBi1RmTOCKE7iWwG9TZ9Rnd6VDtAvfx0cBEpbXXLmwEx2np
-         XGjJGcXBrMv7dkdMT7Qr1KpkGVQ9YX79hyQzYWqEmVnLH7Cz3s2by/HQ/RjEOYEqdGES
-         rlog==
-X-Gm-Message-State: APjAAAWTfSWxQyo2nOFVNXhSh/u9CRncRyy7ZK+vkx46kD1P3Ei4a7Q3
-        25NvPvBtKZyO0UWnNHHhfKc=
-X-Google-Smtp-Source: APXvYqx9vU3VKTWbwI+ywDQtC5OCaqsdO0JrIAO9I1jKI5YTwkUUNkFnToF+7r2alN0q6k5ThAt0tw==
-X-Received: by 2002:ac8:64a:: with SMTP id e10mr6635078qth.30.1567029968213;
-        Wed, 28 Aug 2019 15:06:08 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::1:c231])
-        by smtp.gmail.com with ESMTPSA id l8sm332778qti.65.2019.08.28.15.06.07
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 28 Aug 2019 15:06:07 -0700 (PDT)
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
-        dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel-team@fb.com, cgroups@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>
-Subject: [PATCH 01/10] blkcg: pass @q and @blkcg into blkcg_pol_alloc_pd_fn()
-Date:   Wed, 28 Aug 2019 15:05:51 -0700
-Message-Id: <20190828220600.2527417-2-tj@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190828220600.2527417-1-tj@kernel.org>
-References: <20190828220600.2527417-1-tj@kernel.org>
+        Wed, 28 Aug 2019 18:24:31 -0400
+Received: from dread.disaster.area (pa49-181-255-194.pa.nsw.optusnet.com.au [49.181.255.194])
+        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 0CD40361493;
+        Thu, 29 Aug 2019 08:24:24 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92)
+        (envelope-from <david@fromorbit.com>)
+        id 1i36MY-0004x3-2B; Thu, 29 Aug 2019 08:24:22 +1000
+Date:   Thu, 29 Aug 2019 08:24:22 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Christopher Lameter <cl@linux.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
+ kmalloc(power-of-two)
+Message-ID: <20190828222422.GL1119@dread.disaster.area>
+References: <20190826111627.7505-1-vbabka@suse.cz>
+ <20190826111627.7505-3-vbabka@suse.cz>
+ <0100016cd98bb2c1-a2af7539-706f-47ba-a68e-5f6a91f2f495-000000@email.amazonses.com>
+ <20190828194607.GB6590@bombadil.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190828194607.GB6590@bombadil.infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0
+        a=YO9NNpcXwc8z/SaoS+iAiA==:117 a=YO9NNpcXwc8z/SaoS+iAiA==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=FmdZ9Uzk2mMA:10
+        a=7-415B0cAAAA:8 a=wUb5uO5YJnghlZLzW24A:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of @node, pass in @q and @blkcg so that the alloc function has
-more context.  This doesn't cause any behavior change and will be used
-by io.weight implementation.
+On Wed, Aug 28, 2019 at 12:46:08PM -0700, Matthew Wilcox wrote:
+> On Wed, Aug 28, 2019 at 06:45:07PM +0000, Christopher Lameter wrote:
+> > I still think implicit exceptions to alignments are a bad idea. Those need
+> > to be explicity specified and that is possible using kmem_cache_create().
+> 
+> I swear we covered this last time the topic came up, but XFS would need
+> to create special slab caches for each size between 512 and PAGE_SIZE.
+> Potentially larger, depending on whether the MM developers are willing to
+> guarantee that kmalloc(PAGE_SIZE * 2, GFP_KERNEL) will return a PAGE_SIZE
+> aligned block of memory indefinitely.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- block/bfq-cgroup.c         | 5 +++--
- block/blk-cgroup.c         | 6 +++---
- block/blk-iolatency.c      | 6 ++++--
- block/blk-throttle.c       | 6 ++++--
- include/linux/blk-cgroup.h | 3 ++-
- 5 files changed, 16 insertions(+), 10 deletions(-)
+Page size alignment of multi-page heap allocations is ncessary. The
+current behaviour w/ KASAN is to offset so a 8KB allocation spans 3
+pages and is not page aligned. That causes just as much in way
+of alignment problems as unaligned objects in multi-object-per-page
+slabs.
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 0f6cd688924f..e6fb537b4bfc 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -501,11 +501,12 @@ static void bfq_cpd_free(struct blkcg_policy_data *cpd)
- 	kfree(cpd_to_bfqgd(cpd));
- }
- 
--static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, int node)
-+static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, struct request_queue *q,
-+					     struct blkcg *blkcg)
- {
- 	struct bfq_group *bfqg;
- 
--	bfqg = kzalloc_node(sizeof(*bfqg), gfp, node);
-+	bfqg = kzalloc_node(sizeof(*bfqg), gfp, q->node);
- 	if (!bfqg)
- 		return NULL;
- 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 55a7dc227dfb..6a82ca3fb5cf 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -175,7 +175,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
- 			continue;
- 
- 		/* alloc per-policy data and attach it to blkg */
--		pd = pol->pd_alloc_fn(gfp_mask, q->node);
-+		pd = pol->pd_alloc_fn(gfp_mask, q, blkcg);
- 		if (!pd)
- 			goto err_free;
- 
-@@ -1346,7 +1346,7 @@ int blkcg_activate_policy(struct request_queue *q,
- 		blk_mq_freeze_queue(q);
- pd_prealloc:
- 	if (!pd_prealloc) {
--		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q->node);
-+		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q, &blkcg_root);
- 		if (!pd_prealloc) {
- 			ret = -ENOMEM;
- 			goto out_bypass_end;
-@@ -1362,7 +1362,7 @@ int blkcg_activate_policy(struct request_queue *q,
- 		if (blkg->pd[pol->plid])
- 			continue;
- 
--		pd = pol->pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN, q->node);
-+		pd = pol->pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN, q, &blkcg_root);
- 		if (!pd)
- 			swap(pd, pd_prealloc);
- 		if (!pd) {
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 0fff7b56df0e..46fa6449f4bb 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -934,11 +934,13 @@ static size_t iolatency_pd_stat(struct blkg_policy_data *pd, char *buf,
- }
- 
- 
--static struct blkg_policy_data *iolatency_pd_alloc(gfp_t gfp, int node)
-+static struct blkg_policy_data *iolatency_pd_alloc(gfp_t gfp,
-+						   struct request_queue *q,
-+						   struct blkcg *blkcg)
- {
- 	struct iolatency_grp *iolat;
- 
--	iolat = kzalloc_node(sizeof(*iolat), gfp, node);
-+	iolat = kzalloc_node(sizeof(*iolat), gfp, q->node);
- 	if (!iolat)
- 		return NULL;
- 	iolat->stats = __alloc_percpu_gfp(sizeof(struct latency_stat),
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 8ab6c8153223..0445c998c377 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -478,12 +478,14 @@ static void throtl_service_queue_init(struct throtl_service_queue *sq)
- 	timer_setup(&sq->pending_timer, throtl_pending_timer_fn, 0);
- }
- 
--static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
-+static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
-+						struct request_queue *q,
-+						struct blkcg *blkcg)
- {
- 	struct throtl_grp *tg;
- 	int rw;
- 
--	tg = kzalloc_node(sizeof(*tg), gfp, node);
-+	tg = kzalloc_node(sizeof(*tg), gfp, q->node);
- 	if (!tg)
- 		return NULL;
- 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 0bb79d858a13..261248e88eb1 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -149,7 +149,8 @@ typedef struct blkcg_policy_data *(blkcg_pol_alloc_cpd_fn)(gfp_t gfp);
- typedef void (blkcg_pol_init_cpd_fn)(struct blkcg_policy_data *cpd);
- typedef void (blkcg_pol_free_cpd_fn)(struct blkcg_policy_data *cpd);
- typedef void (blkcg_pol_bind_cpd_fn)(struct blkcg_policy_data *cpd);
--typedef struct blkg_policy_data *(blkcg_pol_alloc_pd_fn)(gfp_t gfp, int node);
-+typedef struct blkg_policy_data *(blkcg_pol_alloc_pd_fn)(gfp_t gfp,
-+				struct request_queue *q, struct blkcg *blkcg);
- typedef void (blkcg_pol_init_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_online_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_offline_pd_fn)(struct blkg_policy_data *pd);
+As I said in the lastest discussion of this problem on XFS (pmem
+devices w/ KASAN enabled), all we -need- is a GFP flag that tells the
+slab allocator to give us naturally aligned object or fail if it
+can't. I don't care how that gets implemented (e.g. another set of
+heap slabs like the -rcl slabs), I just don't want every high level
+subsystem that allocates heap memory for IO buffers to have to
+implement their own aligned slab caches.
+
+Cheers,
+
+Dave.
 -- 
-2.17.1
-
+Dave Chinner
+david@fromorbit.com
