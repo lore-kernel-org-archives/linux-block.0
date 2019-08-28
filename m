@@ -5,65 +5,65 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61207C3A5A3
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 01:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB164C3A5A3
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 01:19:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3498B20856
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 01:18:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EB1F217F5
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 01:19:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vFvxbBFa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RCJ81QIR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726178AbfH1BS5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Aug 2019 21:18:57 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:36827 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726111AbfH1BS5 (ORCPT
+        id S1726394AbfH1BTA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Aug 2019 21:19:00 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:33574 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726111AbfH1BTA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Aug 2019 21:18:57 -0400
-Received: by mail-qk1-f193.google.com with SMTP id d23so993808qko.3;
-        Tue, 27 Aug 2019 18:18:56 -0700 (PDT)
+        Tue, 27 Aug 2019 21:19:00 -0400
+Received: by mail-qt1-f195.google.com with SMTP id v38so1197379qtb.0;
+        Tue, 27 Aug 2019 18:18:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=4UMoPJbaS+HILDC/GqKxBvU1ofhLXKohaWmvXThn4dw=;
-        b=vFvxbBFaOIXzzfbp7BKHJquxQgB9Mq3c1GbH85ihrV40TAdrL85HF3kXFWbhLQDmcc
-         PzMZrXY2SPg0z5gFrUidN8hnExad9hfC2y12psAbzp7YCCBX6tgSVVJ2MmqZgJq70NPo
-         uplnrCAzJ4cBrb3gU7KYisbTnyjGlmNlBtpo29qNy7dr5eiXSdQKIWWyK4eWKAOZBOa/
-         aPPrTXAaLHeXHBgi1EQCPqUvg4oF/FIRH6UrkcCUWIs0VVyr2puAl+nnQE0i83GJ7sEd
-         vEnJbM1iMMOuRGNPqL4jiUvTz8XguRdVl17D9V2LUxvXy4sWp428pDJpwuMD4uNHcJco
-         9eVw==
+        bh=H/zWx5WlB3nENmtbRbPuzIKekfVdMqCEHjiTFb/pfsU=;
+        b=RCJ81QIRVA/fla9LD3Pc/NBZ2Oq98RnqZQKHs0usc0PGCDB39OiPgD5eJcpO4Hb6cB
+         0FFZm7itCTMW3EXkh47Dwtut3HLD3IwYbo0RYFbIQn5iVCiqV3XUJvcX5QwBwGeou7M8
+         tAsfHQ3x7BQ0spYrXLi2/ByyeP9kJtLw5U5SrP3bwvOfTEfxk1TuWtOJ3JvCWwj/wcva
+         91HCAYHgzLBEc61fV/Y2F0mByX5LLSdSD76RQKUTMt8/K/1eJYfRVqzh+ooDEP833TqO
+         WnUN0IJt5Tq0zXsfsbKkiZtuNMpqTrN0rwHKu9Cu+/opvUILXr4sLzsJkI/ho2ZD0WiL
+         N3ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=4UMoPJbaS+HILDC/GqKxBvU1ofhLXKohaWmvXThn4dw=;
-        b=pgL73/+l28scOfn72h+i3maDzaTJDVmrf2Ghm49h+v19eejri+cQxbO8hefD+XPa6V
-         je6sRAPQjPrQJNxRJF8IaTBWdgBWMi9ZyiDjgLh1akcNIaJdSn9Z4kWtPeJtuRyMjzZ6
-         zzeoMMTVl+wS6KfGsO5RVsw26z6o7yS1rXuBrCXw6hSPmA/W8sd6uoQqHNQtQB1Oilzu
-         ClQzlVjGLrjzQdq1CxNkJJ+pPqykoaTHybHLZtYY7lsdo5/1NVF4hcxdwEekm616TIgw
-         CUxYHUAwWiVwgHdQhcCOCs0skhczbS7oXtzqSZdNZh+e5ZzcileqoGTdKAge1SfGo4MF
-         /Otg==
-X-Gm-Message-State: APjAAAUite6hTGvkrlZ1KjQJnGiQimZNiQbrwcV1Y2sZqSOwRVMOPIMe
-        nieWusx0cZmFLFGb0lSABY+/EYQgicA=
-X-Google-Smtp-Source: APXvYqzEWI3AdOwIBSkqqG4zyoM76vYakiIvHxJYvC6LtOKR8/JjkNvPy0WcnEySh1XNXZQ62YZ5tA==
-X-Received: by 2002:a37:91c6:: with SMTP id t189mr1557506qkd.59.1566955136070;
-        Tue, 27 Aug 2019 18:18:56 -0700 (PDT)
+        bh=H/zWx5WlB3nENmtbRbPuzIKekfVdMqCEHjiTFb/pfsU=;
+        b=Jt0nubWjaiS7QzabNmwFzdTN0DIKJE4VaLXvo4aQR/CVrBWVxgwaUjjRbcsGRVKF1P
+         Pe/0Lzxs9vi9fKgDn1SqMGFVM1Q1BTPl1MiXQqW6BaEQzyNUFJAza0SYhPvJOS0Kvyjt
+         dNBcYVpmNiNmzmtEkjI8lSk/g4mRHI03ZqQ8Oqiyf0Uzho+2KxkYnBeQSVuYOK9/DyYo
+         f0MhcIZIiGnepduAv8+84QOO7Uzf3am7kyLvyZYjgcHGia+QpXjA56OvJFhavxhpxAdu
+         Gy4rZG37dAcP06nrDJTMaWJBJYPe007jPBTw9DojMBrlf9aTdUr0ekuX0obIDLEbZsy0
+         rSIQ==
+X-Gm-Message-State: APjAAAVP74y5OFwToqFF+Z7+dBmzA8GASMM5l2dZ4t6SliGXYo7sbmuR
+        cvxYyNfZ0oyfRwWxhHbmPEYHEstKBEc=
+X-Google-Smtp-Source: APXvYqwQronOCwnN+3+wzhhV58Z1Lte4D5uR7qD5f9VY5jxwDqgV4O7blMTPqOuXYhoM6ZhT8RB6sw==
+X-Received: by 2002:ac8:128b:: with SMTP id y11mr1839866qti.229.1566955139075;
+        Tue, 27 Aug 2019 18:18:59 -0700 (PDT)
 Received: from localhost.localdomain ([186.212.48.84])
-        by smtp.gmail.com with ESMTPSA id c201sm499231qke.128.2019.08.27.18.18.53
+        by smtp.gmail.com with ESMTPSA id c201sm499231qke.128.2019.08.27.18.18.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2019 18:18:55 -0700 (PDT)
+        Tue, 27 Aug 2019 18:18:58 -0700 (PDT)
 From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
 To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         axboe@kernel.dk
 Cc:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
-        Hannes Reinecke <hare@suse.com>, Bob Liu <bob.liu@oracle.com>
-Subject: [RESEND PATCH 1/4] block: elevator.c: Remove now unused elevator= argument
-Date:   Tue, 27 Aug 2019 22:19:27 -0300
-Message-Id: <20190828011930.29791-2-marcos.souza.org@gmail.com>
+        Hannes Reinecke <hare@suse.com>
+Subject: [RESEND PATCH 2/4] kernel-parameters.txt: Remove elevator argument
+Date:   Tue, 27 Aug 2019 22:19:28 -0300
+Message-Id: <20190828011930.29791-3-marcos.souza.org@gmail.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190828011930.29791-1-marcos.souza.org@gmail.com>
 References: <20190828011930.29791-1-marcos.souza.org@gmail.com>
@@ -74,42 +74,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since the inclusion of blk-mq, elevator argument was not being
-considered anymore, and it's utility died long with the legacy IO path,
-now removed too.
+This argument was not being used since the legacy IO path was removed,
+when blk-mq was enabled by default. So removed it from the kernel
+parameters documentation.
 
 Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
 Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
 ---
- block/elevator.c | 14 --------------
- 1 file changed, 14 deletions(-)
+ Documentation/admin-guide/kernel-parameters.txt | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 2f17d66d0e61..f56d9c7d5cbc 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -135,20 +135,6 @@ static struct elevator_type *elevator_get(struct request_queue *q,
- 	return e;
- }
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index f1c433daef6b..7d2738c7d49b 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -1199,12 +1199,6 @@
+ 			See comment before function elanfreq_setup() in
+ 			arch/x86/kernel/cpu/cpufreq/elanfreq.c.
  
--static char chosen_elevator[ELV_NAME_MAX];
+-	elevator=	[IOSCHED]
+-			Format: { "mq-deadline" | "kyber" | "bfq" }
+-			See Documentation/block/deadline-iosched.txt,
+-			Documentation/block/kyber-iosched.txt and
+-			Documentation/block/bfq-iosched.txt for details.
 -
--static int __init elevator_setup(char *str)
--{
--	/*
--	 * Be backwards-compatible with previous kernels, so users
--	 * won't get the wrong elevator.
--	 */
--	strncpy(chosen_elevator, str, sizeof(chosen_elevator) - 1);
--	return 1;
--}
--
--__setup("elevator=", elevator_setup);
--
- static struct kobj_type elv_ktype;
- 
- struct elevator_queue *elevator_alloc(struct request_queue *q,
+ 	elfcorehdr=[size[KMG]@]offset[KMG] [IA64,PPC,SH,X86,S390]
+ 			Specifies physical address of start of kernel core
+ 			image elf header and optionally the size. Generally
 -- 
 2.22.0
 
