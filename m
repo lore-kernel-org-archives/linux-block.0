@@ -4,28 +4,29 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29215C3A5A7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBBCEC3A5A1
 	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 12:37:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F1E842173E
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 12:37:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD5212339E
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 12:37:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726474AbfH1Mha (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726515AbfH1Mha (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 28 Aug 2019 08:37:30 -0400
-Received: from relmlor1.renesas.com ([210.160.252.171]:61999 "EHLO
+Received: from relmlor1.renesas.com ([210.160.252.171]:63354 "EHLO
         relmlie5.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726415AbfH1Mh3 (ORCPT
+        by vger.kernel.org with ESMTP id S1726300AbfH1Mha (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 08:37:29 -0400
+        Wed, 28 Aug 2019 08:37:30 -0400
 X-IronPort-AV: E=Sophos;i="5.64,441,1559487600"; 
-   d="scan'208";a="25152955"
+   d="scan'208";a="25152958"
 Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
   by relmlie5.idc.renesas.com with ESMTP; 28 Aug 2019 21:37:26 +0900
 Received: from localhost.localdomain (unknown [10.166.17.210])
-        by relmlir5.idc.renesas.com (Postfix) with ESMTP id C9D3940062B8;
-        Wed, 28 Aug 2019 21:37:25 +0900 (JST)
+        by relmlir5.idc.renesas.com (Postfix) with ESMTP id 1C34940062B8;
+        Wed, 28 Aug 2019 21:37:26 +0900 (JST)
 From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 To:     ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
         robin.murphy@arm.com, joro@8bytes.org, axboe@kernel.dk
@@ -33,9 +34,9 @@ Cc:     wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
         iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
         linux-renesas-soc@vger.kernel.org,
         Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Subject: [PATCH v10 2/4] iommu/dma: Add a new dma_map_ops of get_merge_boundary()
-Date:   Wed, 28 Aug 2019 21:35:41 +0900
-Message-Id: <1566995743-5614-3-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+Subject: [PATCH v10 4/4] mmc: queue: Use bigger segments if DMA MAP layer can merge the segments
+Date:   Wed, 28 Aug 2019 21:35:43 +0900
+Message-Id: <1566995743-5614-5-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1566995743-5614-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
 References: <1566995743-5614-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
@@ -44,42 +45,111 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds a new dma_map_ops of get_merge_boundary() to
-expose the DMA merge boundary if the domain type is IOMMU_DOMAIN_DMA.
+When the max_segs of a mmc host is smaller than 512, the mmc
+subsystem tries to use 512 segments if DMA MAP layer can merge
+the segments, and then the mmc subsystem exposes such information
+to the block layer by using blk_queue_can_use_dma_map_merging().
 
 Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
 Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
-Acked-by: Joerg Roedel <jroedel@suse.de>
 ---
- drivers/iommu/dma-iommu.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/mmc/core/queue.c | 35 ++++++++++++++++++++++++++++++++---
+ include/linux/mmc/host.h |  1 +
+ 2 files changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-index de68b4a..ad861bd 100644
---- a/drivers/iommu/dma-iommu.c
-+++ b/drivers/iommu/dma-iommu.c
-@@ -1091,6 +1091,13 @@ static int iommu_dma_get_sgtable(struct device *dev, struct sg_table *sgt,
- 	return ret;
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index 7102e2e..1e29b30 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -21,6 +21,8 @@
+ #include "card.h"
+ #include "host.h"
+ 
++#define MMC_DMA_MAP_MERGE_SEGMENTS	512
++
+ static inline bool mmc_cqe_dcmd_busy(struct mmc_queue *mq)
+ {
+ 	/* Allow only 1 DCMD at a time */
+@@ -193,6 +195,12 @@ static void mmc_queue_setup_discard(struct request_queue *q,
+ 		blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
  }
  
-+static unsigned long iommu_dma_get_merge_boundary(struct device *dev)
++static unsigned int mmc_get_max_segments(struct mmc_host *host)
 +{
-+	struct iommu_domain *domain = iommu_get_dma_domain(dev);
-+
-+	return (1UL << __ffs(domain->pgsize_bitmap)) - 1;
++	return host->can_dma_map_merge ? MMC_DMA_MAP_MERGE_SEGMENTS :
++					 host->max_segs;
 +}
 +
- static const struct dma_map_ops iommu_dma_ops = {
- 	.alloc			= iommu_dma_alloc,
- 	.free			= iommu_dma_free,
-@@ -1106,6 +1113,7 @@ static const struct dma_map_ops iommu_dma_ops = {
- 	.sync_sg_for_device	= iommu_dma_sync_sg_for_device,
- 	.map_resource		= iommu_dma_map_resource,
- 	.unmap_resource		= iommu_dma_unmap_resource,
-+	.get_merge_boundary	= iommu_dma_get_merge_boundary,
- };
+ /**
+  * mmc_init_request() - initialize the MMC-specific per-request data
+  * @q: the request queue
+@@ -206,7 +214,7 @@ static int __mmc_init_request(struct mmc_queue *mq, struct request *req,
+ 	struct mmc_card *card = mq->card;
+ 	struct mmc_host *host = card->host;
  
- /*
+-	mq_rq->sg = mmc_alloc_sg(host->max_segs, gfp);
++	mq_rq->sg = mmc_alloc_sg(mmc_get_max_segments(host), gfp);
+ 	if (!mq_rq->sg)
+ 		return -ENOMEM;
+ 
+@@ -362,13 +370,23 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
+ 		blk_queue_bounce_limit(mq->queue, BLK_BOUNCE_HIGH);
+ 	blk_queue_max_hw_sectors(mq->queue,
+ 		min(host->max_blk_count, host->max_req_size / 512));
+-	blk_queue_max_segments(mq->queue, host->max_segs);
++	if (host->can_dma_map_merge)
++		WARN(!blk_queue_can_use_dma_map_merging(mq->queue,
++							mmc_dev(host)),
++		     "merging was advertised but not possible");
++	blk_queue_max_segments(mq->queue, mmc_get_max_segments(host));
+ 
+ 	if (mmc_card_mmc(card))
+ 		block_size = card->ext_csd.data_sector_size;
+ 
+ 	blk_queue_logical_block_size(mq->queue, block_size);
+-	blk_queue_max_segment_size(mq->queue,
++	/*
++	 * After blk_queue_can_use_dma_map_merging() was called with succeed,
++	 * since it calls blk_queue_virt_boundary(), the mmc should not call
++	 * both blk_queue_max_segment_size().
++	 */
++	if (!host->can_dma_map_merge)
++		blk_queue_max_segment_size(mq->queue,
+ 			round_down(host->max_seg_size, block_size));
+ 
+ 	dma_set_max_seg_size(mmc_dev(host), queue_max_segment_size(mq->queue));
+@@ -418,6 +436,17 @@ int mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card)
+ 	mq->tag_set.cmd_size = sizeof(struct mmc_queue_req);
+ 	mq->tag_set.driver_data = mq;
+ 
++	/*
++	 * Since blk_mq_alloc_tag_set() calls .init_request() of mmc_mq_ops,
++	 * the host->can_dma_map_merge should be set before to get max_segs
++	 * from mmc_get_max_segments().
++	 */
++	if (host->max_segs < MMC_DMA_MAP_MERGE_SEGMENTS &&
++	    dma_get_merge_boundary(mmc_dev(host)))
++		host->can_dma_map_merge = 1;
++	else
++		host->can_dma_map_merge = 0;
++
+ 	ret = blk_mq_alloc_tag_set(&mq->tag_set);
+ 	if (ret)
+ 		return ret;
+diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
+index 4a351cb..c5662b3 100644
+--- a/include/linux/mmc/host.h
++++ b/include/linux/mmc/host.h
+@@ -396,6 +396,7 @@ struct mmc_host {
+ 	unsigned int		retune_paused:1; /* re-tuning is temporarily disabled */
+ 	unsigned int		use_blk_mq:1;	/* use blk-mq */
+ 	unsigned int		retune_crc_disable:1; /* don't trigger retune upon crc */
++	unsigned int		can_dma_map_merge:1; /* merging can be used */
+ 
+ 	int			rescan_disable;	/* disable card detection */
+ 	int			rescan_entered;	/* used with nonremovable devices */
 -- 
 2.7.4
 
