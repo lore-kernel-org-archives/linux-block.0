@@ -2,120 +2,106 @@ Return-Path: <SRS0=wI0I=WY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4DA2C3A5A1
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 09:21:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E44CFC3A5A1
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 10:32:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7CF712054F
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 09:21:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7F6A22DA7
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 10:32:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="LdiAWQz8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726421AbfH1JVL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Aug 2019 05:21:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:62009 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726378AbfH1JVL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 05:21:11 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 635EF4E83E;
-        Wed, 28 Aug 2019 09:21:11 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-32.pek2.redhat.com [10.72.8.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 510B71001938;
-        Wed, 28 Aug 2019 09:21:02 +0000 (UTC)
-Date:   Wed, 28 Aug 2019 17:20:58 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Gopal Tiwari <gtiwari@redhat.com>, dmilburn@redhat.com
-Subject: Re: [PATCH 10/15] nvme-pci: do not build a scatterlist to map
- metadata
-Message-ID: <20190828092057.GA15524@ming.t460p>
-References: <20190321231037.25104-1-hch@lst.de>
- <20190321231037.25104-11-hch@lst.de>
+        id S1726796AbfH1Kce (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Aug 2019 06:32:34 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:35741 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726328AbfH1Kcd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Aug 2019 06:32:33 -0400
+Received: by mail-ed1-f65.google.com with SMTP id t50so2460269edd.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Aug 2019 03:32:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=android.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=42lKVdjnjP4y6DAxlLSWlI9cd0CLM9DFEKL56/c6DVw=;
+        b=LdiAWQz8Af5L8jx+Wh3U4VqhqVfqQ2nc41g+8FcxYVXCVZgUhXbvRt4IkV8itEgTBW
+         gWFgViHvq+lZ9XXK7aoa9BEnyC+qauttQ/X34wCpfVIVMgf96bcioED+1DFVG6apguD4
+         AVpgddIDLb87Or3hp/EnVICZa3P1EsEx1sabaUWZQqJksQ1jHVZhpmquwmb10/Rhj/N8
+         tJ7arB02huszVrlcJtqiyIwF10FNfBxFNJSk26FXUdsPlH9Y/qsezyKWZXQ+2yLEYH8H
+         DdVYHdquI9Xu/lcf9SDLdVl9EFm8NhN5j4WM+wbL0e6zvmN0lUjIus1My77l9d9ihuhD
+         QpEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=42lKVdjnjP4y6DAxlLSWlI9cd0CLM9DFEKL56/c6DVw=;
+        b=uI8EdCOOfaZBGKLNSBrasIDYkNYDz/simexX8g3/RXfgp05xkWekxb2iaUkRIP2LHo
+         1L10a6swyYvjIZOr91xkO0yY7mAoPLVlAnrhU2Cbwzp24eDuJfAboDXEZauiribEeJGc
+         sbNPZSp4NBgGLJjnmSaO4i3WoogQmF7BBEPj+g6v4Dk/E07DbDoT/EeEmwEZKoGNdb1D
+         RM/Tn7B8Fi8DZKiuVwSjezg5YCHeVWQe4iAfI7ahV1LRHrvWb6xdbTKmQc30SS1WEQgK
+         CPu3ldFe/2eD0BswbLNSt2aiO1nGG1c+EM+rSPOqyN4Ws+KHoUnwkqRZndl8HYbRX25J
+         xzNA==
+X-Gm-Message-State: APjAAAUOtZaCAOPTZmoqF2bXRnxjOvdDBXyFabKBCbNoRBTGRAIMnJ4Q
+        xLNhd4neRA0G57ioA6PdRp93RQ==
+X-Google-Smtp-Source: APXvYqxtYAhqfsawL7tpy/qloMqvOXRgeb+f/jy3T/I1yom2OrgxLgDW7GEBfCJaXBk5T0R3jZNceg==
+X-Received: by 2002:a17:906:1944:: with SMTP id b4mr2528225eje.44.1566988351953;
+        Wed, 28 Aug 2019 03:32:31 -0700 (PDT)
+Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
+        by smtp.gmail.com with ESMTPSA id z9sm366543edr.54.2019.08.28.03.32.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Aug 2019 03:32:31 -0700 (PDT)
+From:   Martijn Coenen <maco@android.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        gregkh@linuxfoundatio.org, kernel-team@android.com,
+        narayan@google.com, dariofreni@google.com, ioffe@google.com,
+        jiyong@google.com, maco@google.com,
+        Martijn Coenen <maco@android.com>
+Subject: [PATCH] loop: change queue block size to match when using DIO.
+Date:   Wed, 28 Aug 2019 12:32:29 +0200
+Message-Id: <20190828103229.191853-1-maco@android.com>
+X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190321231037.25104-11-hch@lst.de>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Wed, 28 Aug 2019 09:21:11 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 21, 2019 at 04:10:32PM -0700, Christoph Hellwig wrote:
-> We always have exactly one segment, so we can simply call dma_map_bvec.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/nvme/host/pci.c | 23 ++++++++++-------------
->  1 file changed, 10 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index bc4ee869fe82..a7dad24e0406 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -221,7 +221,7 @@ struct nvme_iod {
->  	int npages;		/* In the PRP list. 0 means small pool in use */
->  	int nents;		/* Used in scatterlist */
->  	dma_addr_t first_dma;
-> -	struct scatterlist meta_sg; /* metadata requires single contiguous buffer */
-> +	dma_addr_t meta_dma;
->  	struct scatterlist *sg;
->  	struct scatterlist inline_sg[0];
->  };
-> @@ -592,13 +592,16 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
->  	dma_addr_t dma_addr = iod->first_dma, next_dma_addr;
->  	int i;
->  
-> +	if (blk_integrity_rq(req)) {
-> +		dma_unmap_page(dev->dev, iod->meta_dma,
-> +				rq_integrity_vec(req)->bv_len, dma_dir);
-> +	}
-> +
->  	if (iod->nents) {
->  		/* P2PDMA requests do not need to be unmapped */
->  		if (!is_pci_p2pdma_page(sg_page(iod->sg)))
->  			dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
->  
-> -		if (blk_integrity_rq(req))
-> -			dma_unmap_sg(dev->dev, &iod->meta_sg, 1, dma_dir);
->  	}
->  
->  	if (iod->npages == 0)
-> @@ -861,17 +864,11 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
->  
->  	ret = BLK_STS_IOERR;
->  	if (blk_integrity_rq(req)) {
-> -		if (blk_rq_count_integrity_sg(q, req->bio) != 1)
-> -			goto out;
-> -
-> -		sg_init_table(&iod->meta_sg, 1);
-> -		if (blk_rq_map_integrity_sg(q, req->bio, &iod->meta_sg) != 1)
-> -			goto out;
-> -
-> -		if (!dma_map_sg(dev->dev, &iod->meta_sg, 1, dma_dir))
-> +		iod->meta_dma = dma_map_bvec(dev->dev, rq_integrity_vec(req),
-> +				dma_dir, 0);
+The loop driver assumes that if the passed in fd is opened with
+O_DIRECT, the caller wants to use direct I/O on the loop device.
+However, if the underlying filesystem has a different block size than
+the loop block queue, direct I/O can't be enabled. Instead of requiring
+userspace to manually change the blocksize and re-enable direct I/O,
+just change the queue block size to match.
 
-Hi Christoph,
+Signed-off-by: Martijn Coenen <maco@android.com>
+---
+ drivers/block/loop.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-When one bio is enough big, the generated integrity data could cross
-more than one pages even though the data is still in single segment.
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index ab7ca5989097a..1138162ff6c4d 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -994,6 +994,12 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	if (!(lo_flags & LO_FLAGS_READ_ONLY) && file->f_op->fsync)
+ 		blk_queue_write_cache(lo->lo_queue, true, false);
+ 
++	if (io_is_direct(lo->lo_backing_file) && inode->i_sb->s_bdev) {
++		/* In case of direct I/O, match underlying block size */
++		blk_queue_logical_block_size(lo->lo_queue,
++				bdev_logical_block_size(inode->i_sb->s_bdev));
++	}
++
+ 	loop_update_rotational(lo);
+ 	loop_update_dio(lo);
+ 	set_capacity(lo->lo_disk, size);
+-- 
+2.23.0.187.g17f5b7556c-goog
 
-However, we don't convert to multi-page bvec for bio_integrity_prep(),
-and each page may consume one bvec, so is it possible for this patch to
-cause issues in case of NVMe's protection? Since this patch supposes
-that there is only one bvec for integrity data.
-
-BTW, not see such kind of report, just a concern in theory.
-
-thanks,
-Ming
