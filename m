@@ -2,125 +2,132 @@ Return-Path: <SRS0=wI0I=WY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 285F0C3A5A1
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 11:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F741C3A5A6
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 12:37:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 05DD722CF8
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 11:11:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2EC022DA7
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 12:37:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726407AbfH1LL7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Aug 2019 07:11:59 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48660 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725991AbfH1LL7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 07:11:59 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id EEB6AADBF;
-        Wed, 28 Aug 2019 11:11:56 +0000 (UTC)
-Subject: Re: [PATCH v2 3/7] block: Introduce elevator features
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-References: <20190828022947.23364-1-damien.lemoal@wdc.com>
- <20190828022947.23364-4-damien.lemoal@wdc.com>
- <69e86ed3-348a-ac8c-d3ac-550fa8972246@suse.de>
- <BYAPR04MB5816FDDCF4080943AA408956E7A30@BYAPR04MB5816.namprd04.prod.outlook.com>
- <a0275d93-0454-3cc5-faf4-77210ac03928@suse.de>
- <BYAPR04MB581631931C13FD237F3F932BE7A30@BYAPR04MB5816.namprd04.prod.outlook.com>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <365d31b1-dc24-c3bb-84ab-bac08c833d7b@suse.de>
-Date:   Wed, 28 Aug 2019 13:11:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB581631931C13FD237F3F932BE7A30@BYAPR04MB5816.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1726429AbfH1Mh2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Aug 2019 08:37:28 -0400
+Received: from relmlor1.renesas.com ([210.160.252.171]:61999 "EHLO
+        relmlie5.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726300AbfH1Mh1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Aug 2019 08:37:27 -0400
+X-IronPort-AV: E=Sophos;i="5.64,441,1559487600"; 
+   d="scan'208";a="25152952"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie5.idc.renesas.com with ESMTP; 28 Aug 2019 21:37:25 +0900
+Received: from localhost.localdomain (unknown [10.166.17.210])
+        by relmlir5.idc.renesas.com (Postfix) with ESMTP id 9AC484000916;
+        Wed, 28 Aug 2019 21:37:25 +0900 (JST)
+From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To:     ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
+        robin.murphy@arm.com, joro@8bytes.org, axboe@kernel.dk
+Cc:     wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: [PATCH v10 0/4] treewide: improve R-Car SDHI performance
+Date:   Wed, 28 Aug 2019 21:35:39 +0900
+Message-Id: <1566995743-5614-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 28/08/2019 13:08, Damien Le Moal wrote:
-> I changed from unsigned long to unsigned int, which is always 32bits on any
-> arch, no ? I preferred the use of unsigned int over u32/u64 as these look more
-> like low level driver stuff... Did I miss something ?
+This patch series is based on linux-next.git / next-20190828 tag.
 
-Ah no OK then, my mistake. My brain autocompleted to 'unsigned long'
-when I read it.
+Since SDHI host internal DMAC of the R-Car Gen3 cannot handle two or
+more segments, the performance rate (especially, eMMC HS400 reading)
+is not good. However, if IOMMU is enabled on the DMAC, since IOMMU will
+map multiple scatter gather buffers as one contignous iova, the DMAC can
+handle the iova as well and then the performance rate is possible to
+improve. In fact, I have measured the performance by using bonnie++,
+"Sequential Input - block" rate was improved on r8a7795.
 
+To achieve this, this patch series modifies IOMMU and Block subsystem
+at first. This patch series is strictly depended on each subsystem
+modification, so that I submit it as treewide.
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Changes from v9:
+ - Rebase on next-20190828.
+ - Drop a blk-setting.c patch to sort headers.
+ - Remove an unnecessary condition on patch 2/4.
+ - Add Joerg-san's Reviewed-by into patch 2/4.
+ - Fix a condition on patch 4/4 not to call blk_queue_max_segment_size()
+   as the comment.
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=151067
+
+Changes from v8:
+ - Rebase on next-20190726.
+ - Use "1UL" instead of just "1" for iommu_dma_get_merge_boundary().
+ - Add Simon-san's Reviewed-by into all patches.
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=149023
+
+Changes from v7:
+ - Rebase on next-20190722 (v5.3-rc1 + next branches of subsystems)
+ - Add some Reviewed-by.
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=135391
+
+Changes from v6:
+ - [1/5 for DMA MAP] A new patch.
+ - [2/5 for IOMMU] A new patch.
+ - [3/5 for BLOCK] Add Reviewed-by.
+ - [4/5 for BLOCK] Use a new DMA MAP API instead of device_iommu_mapped().
+ - [5/5 for MMC] Likewise, and some minor fix.
+ - Remove patch 4/5 of v6 from this v7 patch series.
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=131769
+
+Changes from v5:
+ - Almost all patches are new code.
+ - [4/5 for MMC] This is a refactor patch so that I don't add any
+   {Tested,Reviewed}-by tags.
+ - [5/5 for MMC] Modify MMC subsystem to use bigger segments instead of
+   the renesas_sdhi driver.
+ - [5/5 for MMC] Use BLK_MAX_SEGMENTS (128) instead of local value
+   SDHI_MAX_SEGS_IN_IOMMU (512). Even if we use BLK_MAX_SEGMENTS,
+   the performance is still good.
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=127511
+
+Changes from v4:
+ - [DMA MAPPING] Add a new device_dma_parameters for iova contiguous.
+ - [IOMMU] Add a new capable for "merging" segments.
+ - [IOMMU] Add a capable ops into the ipmmu-vmsa driver.
+ - [MMC] Sort headers in renesas_sdhi_core.c.
+ - [MMC] Remove the following codes that made on v3 that can be achieved by
+	 DMA MAPPING and IOMMU subsystem:
+ -- Check if R-Car Gen3 IPMMU is used or not on patch 3.
+ -- Check if all multiple segment buffers are aligned to PAGE_SIZE on patch 3.
+https://patchwork.kernel.org/project/linux-renesas-soc/list/?series=125593
+
+Changes from v3:
+ - Use a helper function device_iommu_mapped on patch 1 and 3.
+ - Check if R-Car Gen3 IPMMU is used or not on patch 3.
+
+Yoshihiro Shimoda (4):
+  dma: Introduce dma_get_merge_boundary()
+  iommu/dma: Add a new dma_map_ops of get_merge_boundary()
+  block: add a helper function to merge the segments
+  mmc: queue: Use bigger segments if DMA MAP layer can merge the
+    segments
+
+ Documentation/DMA-API.txt   |  8 ++++++++
+ block/blk-settings.c        | 23 +++++++++++++++++++++++
+ drivers/iommu/dma-iommu.c   |  8 ++++++++
+ drivers/mmc/core/queue.c    | 35 ++++++++++++++++++++++++++++++++---
+ include/linux/blkdev.h      |  2 ++
+ include/linux/dma-mapping.h |  6 ++++++
+ include/linux/mmc/host.h    |  1 +
+ kernel/dma/mapping.c        | 11 +++++++++++
+ 8 files changed, 91 insertions(+), 3 deletions(-)
+
 -- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE Software Solutions Germany GmbH
-Maxfeldstr. 5
-90409 Nürnberg
-Germany
-(HRB 247165, AG München)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.7.4
+
