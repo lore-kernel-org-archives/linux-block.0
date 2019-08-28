@@ -2,31 +2,30 @@ Return-Path: <SRS0=wI0I=WY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74D85C3A5A4
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F169C3A5A1
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:54:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 53E0B2339E
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:54:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A332233A1
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:54:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726583AbfH1Vyi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Aug 2019 17:54:38 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:46438 "EHLO ale.deltatee.com"
+        id S1727190AbfH1Vyl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Aug 2019 17:54:41 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:46460 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726400AbfH1Vyi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 17:54:38 -0400
+        id S1727124AbfH1Vyk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Aug 2019 17:54:40 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1i35tj-00071g-NO; Wed, 28 Aug 2019 15:54:37 -0600
+        id 1i35tj-00071e-NN; Wed, 28 Aug 2019 15:54:39 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1i35ti-0001Cv-I1; Wed, 28 Aug 2019 15:54:34 -0600
+        id 1i35ti-0001Cp-CH; Wed, 28 Aug 2019 15:54:34 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
@@ -37,8 +36,8 @@ Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
         Stephen Bates <sbates@raithlin.com>,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Wed, 28 Aug 2019 15:54:21 -0600
-Message-Id: <20190828215429.4572-6-logang@deltatee.com>
+Date:   Wed, 28 Aug 2019 15:54:19 -0600
+Message-Id: <20190828215429.4572-4-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190828215429.4572-1-logang@deltatee.com>
 References: <20190828215429.4572-1-logang@deltatee.com>
@@ -47,7 +46,7 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, maxg@mellanox.com, sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, chaitanya.kulkarni@wdc.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v8 05/13] nvmet-passthru: update KConfig with config passthru option
+Subject: [PATCH v8 03/13] nvmet: add return value to  nvmet_add_async_event()
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -57,38 +56,66 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 
-This patch updates KConfig file for the NVMeOF target where we add new
-option so that user can selectively enable/disable passthru code.
+Change the return value for nvmet_add_async_event().
+
+This change is needed for the target passthru code which will
+submit async events on namespaces changes and can fail the command
+should adding the event fail (on -ENOMEM).
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-[logang@deltatee.com: fixed some of the wording in the help message]
+[logang@deltatee.com:
+ * fleshed out commit message
+ * change to using int as a return type instead of bool
+]
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Max Gurtovoy <maxg@mellanox.com>
 ---
- drivers/nvme/target/Kconfig | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ drivers/nvme/target/core.c  | 6 ++++--
+ drivers/nvme/target/nvmet.h | 2 +-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
-index d7f48c0fb311..2478cb5a932d 100644
---- a/drivers/nvme/target/Kconfig
-+++ b/drivers/nvme/target/Kconfig
-@@ -15,6 +15,16 @@ config NVME_TARGET
- 	  To configure the NVMe target you probably want to use the nvmetcli
- 	  tool from http://git.infradead.org/users/hch/nvmetcli.git.
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index 3a67e244e568..d6dcb86d8be7 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -173,14 +173,14 @@ static void nvmet_async_event_work(struct work_struct *work)
+ 	}
+ }
  
-+config NVME_TARGET_PASSTHRU
-+	bool "NVMe Target Passthrough support"
-+	depends on NVME_CORE
-+	depends on NVME_TARGET
-+	help
-+	  This enables target side NVMe passthru controller support for the
-+	  NVMe Over Fabrics protocol. It allows for hosts to manage and
-+	  directly access an actual NVMe controller residing on the target
-+	  side, incuding executing Vendor Unique Commands.
+-void nvmet_add_async_event(struct nvmet_ctrl *ctrl, u8 event_type,
++int nvmet_add_async_event(struct nvmet_ctrl *ctrl, u8 event_type,
+ 		u8 event_info, u8 log_page)
+ {
+ 	struct nvmet_async_event *aen;
+ 
+ 	aen = kmalloc(sizeof(*aen), GFP_KERNEL);
+ 	if (!aen)
+-		return;
++		return -ENOMEM;
+ 
+ 	aen->event_type = event_type;
+ 	aen->event_info = event_info;
+@@ -191,6 +191,8 @@ void nvmet_add_async_event(struct nvmet_ctrl *ctrl, u8 event_type,
+ 	mutex_unlock(&ctrl->lock);
+ 
+ 	schedule_work(&ctrl->async_event_work);
 +
- config NVME_TARGET_LOOP
- 	tristate "NVMe loopback device support"
- 	depends on NVME_TARGET
++	return 0;
+ }
+ 
+ static void nvmet_add_to_changed_ns_log(struct nvmet_ctrl *ctrl, __le32 nsid)
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index c51f8dd01dc4..3d313a6452cc 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -441,7 +441,7 @@ void nvmet_port_disc_changed(struct nvmet_port *port,
+ 		struct nvmet_subsys *subsys);
+ void nvmet_subsys_disc_changed(struct nvmet_subsys *subsys,
+ 		struct nvmet_host *host);
+-void nvmet_add_async_event(struct nvmet_ctrl *ctrl, u8 event_type,
++int nvmet_add_async_event(struct nvmet_ctrl *ctrl, u8 event_type,
+ 		u8 event_info, u8 log_page);
+ 
+ #define NVMET_QUEUE_SIZE	1024
 -- 
 2.20.1
 
