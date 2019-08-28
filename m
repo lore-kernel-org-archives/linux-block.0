@@ -2,87 +2,172 @@ Return-Path: <SRS0=wI0I=WY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A9CDC3A5A1
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 04:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E9F5C3A5A1
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 04:40:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 62406217F5
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 04:06:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 343E62189D
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 04:40:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=euphon.net header.i=fam@euphon.net header.b="gKntHUbp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="fHiw8lNF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726024AbfH1EGr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Aug 2019 00:06:47 -0400
-Received: from sender3-op-o12.zoho.com.cn ([124.251.121.243]:17869 "EHLO
-        sender3-op-o12.zoho.com.cn" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725497AbfH1EGr (ORCPT
+        id S1726154AbfH1EkX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Aug 2019 00:40:23 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:6867 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725862AbfH1EkX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 00:06:47 -0400
-X-Greylist: delayed 924 seconds by postgrey-1.27 at vger.kernel.org; Wed, 28 Aug 2019 00:06:46 EDT
-ARC-Seal: i=1; a=rsa-sha256; t=1566964261; cv=none; 
-        d=zoho.com.cn; s=zohoarc; 
-        b=nC0x4IFtr5oUkqo7CJopOuSOhRR5Uj5vv7ozu9uG51mRfJHG04y/d8q19F3JJjvyFIue4GIq6lCYQdVAC4rQDOUAOs8nhMo2nupo3oq/oSKfPKH0TE3Q9cmmU6JOBsaNWtmXKDRBvOWpssbX8X8LyzrYX+IDRTO3ZLCPFLGx92k=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com.cn; s=zohoarc; 
-        t=1566964261; h=Content-Type:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To:ARC-Authentication-Results; 
-        bh=kZZ0SaUSYboCypvlsV1KXUwzNEviRw5SwLxgGnE8zzY=; 
-        b=RZWvI+EBuMXc7SdAQBjrfAPV51T1la8dCfa1BgIvCmhQBFM8sIesVFfnVa7Ay/lPCraO//X5XhYfZ/MCYGyYWwRg1bNYk9OyEg1p6JVbuBrl3YopBQLnNSys54inM3FcV/GwWY4abp/58f+eYSlW+RgdThRFIu95xftdh7wunuM=
-ARC-Authentication-Results: i=1; mx.zoho.com.cn;
-        dkim=pass  header.i=euphon.net;
-        spf=pass  smtp.mailfrom=fam@euphon.net;
-        dmarc=pass header.from=<fam@euphon.net> header.from=<fam@euphon.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1566964261;
-        s=zoho; d=euphon.net; i=fam@euphon.net;
-        h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To;
-        l=522; bh=kZZ0SaUSYboCypvlsV1KXUwzNEviRw5SwLxgGnE8zzY=;
-        b=gKntHUbpwtEPWYsG8RAFSvgvTifHJiZkg0vZjQvPumRN9CB0yaXDLVlxxcTjfXxU
-        ZsYBpyud35mPITI8gubkdPsc6N8m82VpRlujPxbqsV6jFCGarVssE8zSEnomCZmJ2gE
-        M0vRNjeXrf8TtvD1IZdzdga5MoM4tn2JwiI/IadU=
-Received: from localhost (120.52.147.46 [120.52.147.46]) by mx.zoho.com.cn
-        with SMTPS id 1566964259915588.9970437337977; Wed, 28 Aug 2019 11:50:59 +0800 (CST)
-Date:   Wed, 28 Aug 2019 11:50:55 +0800
-From:   Fam Zheng <fam@euphon.net>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        Tejun Heo <tj@kernel.org>,
-        Fam Zheng <zhengfeiran@bytedance.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        duanxiongchun@bytedance.com, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, zhangjiachen.jc@bytedance.com
-Subject: Re: [PATCH v2 3/3] bfq: Add per-device weight
-Message-ID: <20190828035055.GA16893@magic>
-References: <20190805063807.9494-1-zhengfeiran@bytedance.com>
- <20190805063807.9494-4-zhengfeiran@bytedance.com>
- <20190821154402.GI2263813@devbig004.ftw2.facebook.com>
- <C2F0BE1E-9CAA-4FBD-80D8-C18ECCE3FD4B@linaro.org>
- <fff76a58-65e7-7060-0329-aef15c422639@kernel.dk>
+        Wed, 28 Aug 2019 00:40:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1566967223; x=1598503223;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yYmwTzjmt1KjiHSuzT1/YH/U5kzvWF3eLuwcY6UTprk=;
+  b=fHiw8lNFTpGok40S0xltjKiKJzJ3lbvbaufQ6OvNCe50aMCCVfTM1tgH
+   0+rTh5Tg1ei06AFi+GT1mCEWDy6nFQ1KN2ulDDedj7/CXzW+ON+VuvwF4
+   LGgOTlNFxUXl4ork7d7ET7j/evyBkacARzTPYuPPPa2/Xy/5oAJHC5p4v
+   yksKssvrNhvAmTVGKn37UKD68Eo5GVBUoMeN75SRqxJzWSKAWbgeOFUD2
+   Fk+SnVYgEjLlsoGiN+4we1jn6VADkayvQ1dMlvyvBCjMPVjPvkqG+7cey
+   dhiuBxDcaEAiPdz9PwlxE/tNdwy85Qqbe257jLt+C04rLVxWJ8WExgiS3
+   Q==;
+IronPort-SDR: /ktbm+FZrhyYWjPcKce1E8qmif1gEU0Uu7wf4vuj65vSfilRpl8oBFzptpZLceVXQNx6QIlvGt
+ Y0gCxc9M2wsEXCdc/gU3aABGJZ4Vh4pBjqDt+Rsky4aRAfi9pMnY69fBQbOI5ImUGRmvyOM6Lh
+ pmP9ULDYxSUTWheX06w3scJSPEbCRCeZVZUtzteX9u6IX73b90EjoX6iHb/55nHqiYTuidG5Ru
+ 0fIw99vodrC3qU7oXd25GJLr2iLnLQpKf/ZLjMuiesRHQ0Dln5b8NjbYCLcZ7iXQrZg1VhRfQ+
+ wEU=
+X-IronPort-AV: E=Sophos;i="5.64,439,1559491200"; 
+   d="scan'208";a="117741157"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Aug 2019 12:40:22 +0800
+IronPort-SDR: uRGxQHTG5FMf33pYWanD+nQXa1NRTKo+7HXztcnMbe6CG2BwTxuTIo92blN3MXa3NOe+Jjl9EC
+ esIxzauCOZ8TPLGb8aeqIWEm7+2wBz6ByYjLEwUpc2+aHnVGVxs4/ezLNXnmIiRetafawTVE7C
+ JbSJVDT4I8VuXkWNouDcivU3mAJzBuNqCYuinyfKci8+Js1UrjUq/VUqHNWHLGeYYKV6E+G1ZL
+ lgYCYbsnuGCDh81kN5zf/VFR3p/49dtma+ieR/UBtRqEj6hv9jlaNEvgscMRbirwh66NwirXzT
+ 5B9E0N72s1l9zYO5gwQQSyEk
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2019 21:37:32 -0700
+IronPort-SDR: CaaTwcJHzqgVkDZJUGFJfK3yGPobA6nC5jS4KMegQGCpl1f0W1qteSeQnSL47gtJFGviA34GWV
+ Kw0izig8vKYVzjJb8a9L1eQquajzGtk2vyhhLcFz6NwbaqsJFsHurQPYIJOQX8hpoFUOGEqJxc
+ 21Jot+Thi54I41gMidkot0vLf1Av9o9b3AW6J371O0ELfpdGnumGFR2cET7Ig2CDSP+GCVcqyz
+ iwIv240YJmPpb+GQMHzeHj8+3mnnXPIPjIzKLrPdhGye2RocH2UaaOySJImuGPKMq8A+rliMJ/
+ YM4=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip01.wdc.com with ESMTP; 27 Aug 2019 21:40:21 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Hans Holmberg <Hans.Holmberg@wdc.com>
+Subject: [PATCH] block: mq-deadline: Fix queue restart handling
+Date:   Wed, 28 Aug 2019 13:40:20 +0900
+Message-Id: <20190828044020.23915-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fff76a58-65e7-7060-0329-aef15c422639@kernel.dk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-ZohoCNMailClient: External
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 08/26 07:59, Jens Axboe wrote:
-> On 8/26/19 12:36 AM, Paolo Valente wrote:
-> > Hi Jens,
-> > do you think this series could now be queued for 5.4?
-> 
-> The most glaring oversight in this series, is that the meat of it,
-> patch #3, doesn't even have a commit message. The cover letter
-> essentially looks like it should have been the commit message for
-> that patch.
-> 
-> Please resend with acks/reviews collected, and ensure that all
-> patches have a reasonable commit message.
+Commit 7211aef86f79 ("block: mq-deadline: Fix write completion
+handling") added a call to blk_mq_sched_mark_restart_hctx() in
+dd_dispatch_request() to make sure that write request dispatching does
+not stall when all target zones are locked. This fix left a subtle race
+when a write completion happens during a dispatch execution on another
+CPU:
 
-Will do. Thanks!
+CPU 0: Dispatch			CPU1: write completion
 
-Fam
+dd_dispatch_request()
+    lock(&dd->lock);
+    ...
+    lock(&dd->zone_lock);	dd_finish_request()
+    rq = find request		lock(&dd->zone_lock);
+    unlock(&dd->zone_lock);
+    				zone write unlock
+				unlock(&dd->zone_lock);
+				...
+				__blk_mq_free_request
+                                      check restart flag (not set)
+				      -> queue not run
+    ...
+    if (!rq && have writes)
+        blk_mq_sched_mark_restart_hctx()
+    unlock(&dd->lock)
+
+Since the dispatch context finishes after the write request completion
+handling, marking the queue as needing a restart is not seen from
+__blk_mq_free_request() and blk_mq_sched_restart() not executed leading
+to the dispatch stall under 100% write workloads.
+
+Fix this by moving the call to blk_mq_sched_mark_restart_hctx() from
+dd_dispatch_request() into dd_finish_request() under the zone lock to
+ensure full mutual exclusion between write request dispatch selection
+and zone unlock on write request completion.
+
+Fixes: 7211aef86f79 ("block: mq-deadline: Fix write completion handling")
+Cc: stable@vger.kernel.org
+Reported-by: Hans Holmberg <Hans.Holmberg@wdc.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ block/mq-deadline.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index a17466f310f4..b490f47fd553 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -377,13 +377,6 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd)
+  * hardware queue, but we may return a request that is for a
+  * different hardware queue. This is because mq-deadline has shared
+  * state for all hardware queues, in terms of sorting, FIFOs, etc.
+- *
+- * For a zoned block device, __dd_dispatch_request() may return NULL
+- * if all the queued write requests are directed at zones that are already
+- * locked due to on-going write requests. In this case, make sure to mark
+- * the queue as needing a restart to ensure that the queue is run again
+- * and the pending writes dispatched once the target zones for the ongoing
+- * write requests are unlocked in dd_finish_request().
+  */
+ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ {
+@@ -392,9 +385,6 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 
+ 	spin_lock(&dd->lock);
+ 	rq = __dd_dispatch_request(dd);
+-	if (!rq && blk_queue_is_zoned(hctx->queue) &&
+-	    !list_empty(&dd->fifo_list[WRITE]))
+-		blk_mq_sched_mark_restart_hctx(hctx);
+ 	spin_unlock(&dd->lock);
+ 
+ 	return rq;
+@@ -561,6 +551,13 @@ static void dd_prepare_request(struct request *rq, struct bio *bio)
+  * spinlock so that the zone is never unlocked while deadline_fifo_request()
+  * or deadline_next_request() are executing. This function is called for
+  * all requests, whether or not these requests complete successfully.
++ *
++ * For a zoned block device, __dd_dispatch_request() may have stopped
++ * dispatching requests if all the queued requests are write requests directed
++ * at zones that are already locked due to on-going write requests. To ensure
++ * write request dispatch progress in this case, mark the queue as needing a
++ * restart to ensure that the queue is run again after completion of the
++ * request and zones being unlocked.
+  */
+ static void dd_finish_request(struct request *rq)
+ {
+@@ -572,6 +569,8 @@ static void dd_finish_request(struct request *rq)
+ 
+ 		spin_lock_irqsave(&dd->zone_lock, flags);
+ 		blk_req_zone_write_unlock(rq);
++		if (!list_empty(&dd->fifo_list[WRITE]))
++			blk_mq_sched_mark_restart_hctx(rq->mq_hctx);
+ 		spin_unlock_irqrestore(&dd->zone_lock, flags);
+ 	}
+ }
+-- 
+2.21.0
 
