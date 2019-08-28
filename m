@@ -2,138 +2,93 @@ Return-Path: <SRS0=wI0I=WY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 461B9C3A5A1
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 19:46:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74D85C3A5A4
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:54:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A07222CF8
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 19:46:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Rm8Ri2tE"
+	by mail.kernel.org (Postfix) with ESMTP id 53E0B2339E
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:54:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726617AbfH1TqO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Aug 2019 15:46:14 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:60686 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726591AbfH1TqO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 15:46:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Transfer-Encoding
-        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=hgz1R5QUT/3HwdqWiBoXJEjgsTAkIAv2dRGNBsyqnxk=; b=Rm8Ri2tEMBapDNdB3tS8NGKJBM
-        z5Rq8Hj5vRSAxcFpyrTIzaG/+MT4NsQnvWV7/mV2hJF6gRa7y6uflXN/pKocPsEW3+1uIDcqhDT/d
-        nVn5GK/ST6ZnS4k1deCvzxjlhOzDyvPUBhbmsaCbiqSy4yWGM5TlmlSbxvkYeV7PUGjKfq11w4O6d
-        B6K21kFHA5FEY7Y5poC9Rbup6llyf0SFLQyUZGcPNKUtyKUUKmtqXMwj9rmC4ynL+BB6is1FCaG0v
-        5RDdSskGb5hOH0jTQ1cq94H/Lpm3HBF4RN3Hl/sqRH3RcAUqISgadxnEhq3e2+jm9c50kgmalm08Y
-        v6mF9MJw==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1i33tQ-0004Z6-3n; Wed, 28 Aug 2019 19:46:08 +0000
-Date:   Wed, 28 Aug 2019 12:46:08 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christopher Lameter <cl@linux.com>
-Cc:     Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
- kmalloc(power-of-two)
-Message-ID: <20190828194607.GB6590@bombadil.infradead.org>
-References: <20190826111627.7505-1-vbabka@suse.cz>
- <20190826111627.7505-3-vbabka@suse.cz>
- <0100016cd98bb2c1-a2af7539-706f-47ba-a68e-5f6a91f2f495-000000@email.amazonses.com>
+        id S1726583AbfH1Vyi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Aug 2019 17:54:38 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:46438 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726400AbfH1Vyi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Aug 2019 17:54:38 -0400
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1i35tj-00071g-NO; Wed, 28 Aug 2019 15:54:37 -0600
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1i35ti-0001Cv-I1; Wed, 28 Aug 2019 15:54:34 -0600
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Wed, 28 Aug 2019 15:54:21 -0600
+Message-Id: <20190828215429.4572-6-logang@deltatee.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190828215429.4572-1-logang@deltatee.com>
+References: <20190828215429.4572-1-logang@deltatee.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <0100016cd98bb2c1-a2af7539-706f-47ba-a68e-5f6a91f2f495-000000@email.amazonses.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, maxg@mellanox.com, sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, chaitanya.kulkarni@wdc.com, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [PATCH v8 05/13] nvmet-passthru: update KConfig with config passthru option
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 28, 2019 at 06:45:07PM +0000, Christopher Lameter wrote:
-> > Ideally we should provide to mm users what they need without difficult
-> > workarounds or own reimplementations, so let's make the kmalloc() alignment to
-> > size explicitly guaranteed for power-of-two sizes under all configurations.
-> 
-> The objection remains that this will create exceptions for the general
-> notion that all kmalloc caches are aligned to KMALLOC_MINALIGN which may
+From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 
-Hmm?  kmalloc caches will be aligned to both KMALLOC_MINALIGN and the
-natural alignment of the object.
+This patch updates KConfig file for the NVMeOF target where we add new
+option so that user can selectively enable/disable passthru code.
 
-> be suprising and it limits the optimizations that slab allocators may use
-> for optimizing data use. The SLOB allocator was designed in such a way
-> that data wastage is limited. The changes here sabotage that goal and show
-> that future slab allocators may be similarly constrained with the
-> exceptional alignents implemented. Additional debugging features etc etc
-> must all support the exceptional alignment requirements.
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+[logang@deltatee.com: fixed some of the wording in the help message]
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Max Gurtovoy <maxg@mellanox.com>
+---
+ drivers/nvme/target/Kconfig | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-While I sympathise with the poor programmer who has to write the
-fourth implementation of the sl*b interface, it's more for the pain of
-picking a new letter than the pain of needing to honour the alignment
-of allocations.
+diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
+index d7f48c0fb311..2478cb5a932d 100644
+--- a/drivers/nvme/target/Kconfig
++++ b/drivers/nvme/target/Kconfig
+@@ -15,6 +15,16 @@ config NVME_TARGET
+ 	  To configure the NVMe target you probably want to use the nvmetcli
+ 	  tool from http://git.infradead.org/users/hch/nvmetcli.git.
+ 
++config NVME_TARGET_PASSTHRU
++	bool "NVMe Target Passthrough support"
++	depends on NVME_CORE
++	depends on NVME_TARGET
++	help
++	  This enables target side NVMe passthru controller support for the
++	  NVMe Over Fabrics protocol. It allows for hosts to manage and
++	  directly access an actual NVMe controller residing on the target
++	  side, incuding executing Vendor Unique Commands.
++
+ config NVME_TARGET_LOOP
+ 	tristate "NVMe loopback device support"
+ 	depends on NVME_TARGET
+-- 
+2.20.1
 
-There are many places in the kernel which assume alignment.  They break
-when it's not supplied.  I believe we have a better overall system if
-the MM developers provide stronger guarantees than the MM consumers have
-to work around only weak guarantees.
-
-> > * SLOB has no implicit alignment so this patch adds it explicitly for
-> >   kmalloc(). The potential downside is increased fragmentation. While
-> >   pathological allocation scenarios are certainly possible, in my testing,
-> >   after booting a x86_64 kernel+userspace with virtme, around 16MB memory
-> >   was consumed by slab pages both before and after the patch, with difference
-> >   in the noise.
-> 
-> This change to slob will cause a significant additional use of memory. The
-> advertised advantage of SLOB is that *minimal* memory will be used since
-> it is targeted for embedded systems. Different types of slab objects of
-> varying sizes can be allocated in the same memory page to reduce
-> allocation overhead.
-
-Did you not read the part where he said the difference was in the noise?
-
-> The result of this patch is just to use more memory to be safe from
-> certain pathologies where one subsystem was relying on an alignment that
-> was not specified. That is why this approach should not be called
-> �natural" but "implicit alignment". The one using the slab cache is not
-> aware that the slab allocator provides objects aligned in a special way
-> (which is in general not needed. There seems to be a single pathological
-> case that needs to be addressed and I thought that was due to some
-> brokenness in the hardware?).
-
-It turns out there are lots of places which assume this, including the
-pmem driver, the ramdisk driver and a few other similar drivers.
-
-> It is better to ensure that subsystems that require special alignment
-> explicitly tell the allocator about this.
-
-But it's not the subsystems which have this limitation which do the
-allocation; it's the subsystems who allocate the memory that they then
-pass to the subsystems.  So you're forcing communication of these limits
-up & down the stack.
-
-> I still think implicit exceptions to alignments are a bad idea. Those need
-> to be explicity specified and that is possible using kmem_cache_create().
-
-I swear we covered this last time the topic came up, but XFS would need
-to create special slab caches for each size between 512 and PAGE_SIZE.
-Potentially larger, depending on whether the MM developers are willing to
-guarantee that kmalloc(PAGE_SIZE * 2, GFP_KERNEL) will return a PAGE_SIZE
-aligned block of memory indefinitely.
