@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A4BBC3A5A1
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E185AC3A5A1
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:06:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5CD9522CED
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:06:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9E5C22CED
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:06:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567029973;
-	bh=bzCnLcG3oLQx9aEH2UOvGPbJ+fSM8FD+BUnvAwQshIo=;
+	s=default; t=1567029980;
+	bh=MCS3zQNPLE2zpanP40ifRjCt/CfH37K6Nubnx1wmHxY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=FxJO6pu6vEGA35EVrdvVGVKv00i0RMdrkucvcB74EwqD/f3KHy91r5/WSrDkOBZiG
-	 Jvtgbof6ViTtJEdeelevZ8MSisA32KHhoUjqsfljnwy/RXuLd77AtYFo+vZ/4PCW//
-	 AYhtAng0HsiIKhKZLWiE799X72i2Yyna48A9SgkY=
+	b=jCMjPR6uQqV0QYXHu5ff7vRqQps9k39/0noRIRE6HyGUa/PrJY+/N6F2i5HEvWrbS
+	 lHoiieaJDtbFQgSbtsfXvLRtujZMeyEr44u6p5g/YBcdU8zpU70fxz+m3+74AAovdo
+	 fCAukOi9vId1J6AsM5WW9Akid4pe6XoTE16/Heok=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727063AbfH1WGL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Aug 2019 18:06:11 -0400
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:40534 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727022AbfH1WGL (ORCPT
+        id S1727171AbfH1WGS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Aug 2019 18:06:18 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:44715 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727122AbfH1WGR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 18:06:11 -0400
-Received: by mail-qk1-f195.google.com with SMTP id f10so1195356qkg.7;
-        Wed, 28 Aug 2019 15:06:11 -0700 (PDT)
+        Wed, 28 Aug 2019 18:06:17 -0400
+Received: by mail-qk1-f193.google.com with SMTP id y22so1173545qkb.11;
+        Wed, 28 Aug 2019 15:06:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=77lPCJVMbm2iaN6uswmaTozVPtpjzTspO9i1Ih4UGx0=;
-        b=lkuKDlvcQJNAPDyWqh7z64PzAcgiPoVACIt2kCEHwITSzvm4646qx3UMoaXftENKBP
-         qLyFOZlWg14FxVymoH+uPbQl5Gnj4yAngGhap+ZB4Fye+TKJ5t9O9oP3sOU0ECzPLIOu
-         wxBCfu1/n/dbUAViCv+xm4hkJguZeixMibUkeKzeq++SwfncBv9StsMNCnbev2XjWe8s
-         s+aivSvYkDNyXnvuS80dFmkhr36IlGtUhus4hZmcE4BNJGEROllypy8x7eOngTefjfPV
-         NtY5z2iL8XeBKR+WnmNvi5CAGSiOehrdsB49BDNYDXU7nwVWydGk6Zc/AFGP+5IcHCPw
-         q23A==
+        bh=L+YRqyiflweMa0Bu/dDtFQvA/LQwTs9SzCm/uqKjFOk=;
+        b=rA4EAMmAnZZZH0i17OBiHl450SYX95lUTK3bKgi9bqQTirqUbxosbOc49Esd3EJ4zD
+         UXL7uXudI/bfoid8QqIwRyAGfeR9IDpaclXDCsX52LWKdM/5oWhH7Z8mgqxiKgCtTJ51
+         OqwB7yu7HfjdWxqF8jvXvat98Yu5DwsE7lQWAk4eJXFmZ1GWMkiwWY60L2H4O50XdNJT
+         gwqkWsGoWXGlvwFDt+tkLXxOF1CYgpBtKIB6t0wOF+2bwIWIr7DLMpdbkkwmE91iA3qj
+         JBxUCZEeH6tpiC3KkxFVyLpjwq9FyXgHncYItaSXg0AjJ/AdLWnBF3pFvzFwSnsQgkCw
+         /oaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=77lPCJVMbm2iaN6uswmaTozVPtpjzTspO9i1Ih4UGx0=;
-        b=UiKcRkA1+LVWqJvMI2BV/f5g6HbKIirZTg3+JavqPgAivwbSjvkBNXOmt7FRn23gwz
-         /TeCfJ5blSkl7iTTUAExclk/M2RWJ9NLlUV8kQB8Sy3NsrEf3vcMKSMjG77jtUBJr35Q
-         QKhL8bHxmYjsKXXXhRect/n1zQvxnNKvZqjvD2jUHV5OWJK6qLVve9zVX08tM7FJchEa
-         ecLxC54nyoLDk3uIHo70QWxabRPOw6tiXqLknbmKVeV+3w/P1mjiYipMTQZZfy6OaUko
-         A00Y9RVjXlREovIvuIK6/Ou/s50Sah4PgB6Pc8fB895SNZ2Zi6nTFcyth5uwECnf2uQa
-         vGjA==
-X-Gm-Message-State: APjAAAWOOaO+GhDFj28+fKYoZdSm2Wk7SHEL/pvLLpHI52u1u4NRe+ui
-        Viug0aCrK+3HO4Up56XdglQ=
-X-Google-Smtp-Source: APXvYqybsop+rPif36RViqdPSukYZagr2iIr1DIQccne6MS6izAVmTZCxv4F+8qAhV4mOwjUkACQ2Q==
-X-Received: by 2002:a37:a090:: with SMTP id j138mr6458649qke.83.1567029970424;
-        Wed, 28 Aug 2019 15:06:10 -0700 (PDT)
+        bh=L+YRqyiflweMa0Bu/dDtFQvA/LQwTs9SzCm/uqKjFOk=;
+        b=Q/RlDBH36dkUL345VaSeTYiiRgo7I1b6H5VS6yyIxvJV3YH8TvaVqtdwhkgiTv5bhK
+         vj3mMcAJFy7dSEI0wu81jFE4rWmlI7AxK882C2u5mib9o5Zl3vtBjWBJp+82Ct4I0n84
+         eT92ZzY6xsXd/0rzWZcJbC+rWI6EPlfzdESbsHLx3cd+v5K5de8alGy3t/hRj/Mx+fPy
+         yEaX9A088h+L97SuUqzaKUBLXWWOxGEQqp2wBqPWlyZu8YBRGtDlZlHYabD0xf/SfAAN
+         gNfBBj+tkuA9x+yUW0uUWDcNoHvOvOUGLao7qzEGuF/LG1GzjEEvu1/e8hVQICy8WcvH
+         PgCw==
+X-Gm-Message-State: APjAAAXyAIpxL1SIJpyv0+PEpx134+FjWHCmtx51/u7TLM3p0IypANO5
+        S1p3lep1n8J1mvfUP2Tz26Q=
+X-Google-Smtp-Source: APXvYqxrthj+iB3lwR02fb/ae6tAGJXIF13gRA1NWSzOiZUITp09XSNWVKu7JQeHbQaGQTS6o2mJhg==
+X-Received: by 2002:a37:8d6:: with SMTP id 205mr6224582qki.308.1567029976601;
+        Wed, 28 Aug 2019 15:06:16 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:500::1:c231])
-        by smtp.gmail.com with ESMTPSA id u16sm204671qkj.107.2019.08.28.15.06.09
+        by smtp.gmail.com with ESMTPSA id u22sm235660qtq.13.2019.08.28.15.06.15
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 28 Aug 2019 15:06:09 -0700 (PDT)
+        Wed, 28 Aug 2019 15:06:15 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk, newella@fb.com, clm@fb.com, josef@toxicpanda.com,
         dennisz@fb.com, lizefan@huawei.com, hannes@cmpxchg.org
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         kernel-team@fb.com, cgroups@vger.kernel.org,
         Tejun Heo <tj@kernel.org>
-Subject: [PATCH 02/10] blkcg: make ->cpd_init_fn() optional
-Date:   Wed, 28 Aug 2019 15:05:52 -0700
-Message-Id: <20190828220600.2527417-3-tj@kernel.org>
+Subject: [PATCH 05/10] block/rq_qos: implement rq_qos_ops->queue_depth_changed()
+Date:   Wed, 28 Aug 2019 15:05:55 -0700
+Message-Id: <20190828220600.2527417-6-tj@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190828220600.2527417-1-tj@kernel.org>
 References: <20190828220600.2527417-1-tj@kernel.org>
@@ -76,28 +76,158 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For policies which can do enough initialization from ->cpd_alloc_fn(),
-make ->cpd_init_fn() optional.
+wbt already gets queue depth changed notification through
+wbt_set_queue_depth().  Generalize it into
+rq_qos_ops->queue_depth_changed() so that other rq_qos policies can
+easily hook into the events too.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-cgroup.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ block/blk-rq-qos.c   |  9 +++++++++
+ block/blk-rq-qos.h   |  8 ++++++++
+ block/blk-settings.c |  2 +-
+ block/blk-wbt.c      | 18 ++++++++----------
+ block/blk-wbt.h      |  4 ----
+ 5 files changed, 26 insertions(+), 15 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 6a82ca3fb5cf..78ccbdcfe723 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1475,7 +1475,8 @@ int blkcg_policy_register(struct blkcg_policy *pol)
- 			blkcg->cpd[pol->plid] = cpd;
- 			cpd->blkcg = blkcg;
- 			cpd->plid = pol->plid;
--			pol->cpd_init_fn(cpd);
-+			if (pol->cpd_init_fn)
-+				pol->cpd_init_fn(cpd);
- 		}
- 	}
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index f4eea78f5cc1..61b635bc2a31 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -101,6 +101,15 @@ void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio)
+ 	} while (rqos);
+ }
  
++void __rq_qos_queue_depth_changed(struct rq_qos *rqos)
++{
++	do {
++		if (rqos->ops->queue_depth_changed)
++			rqos->ops->queue_depth_changed(rqos);
++		rqos = rqos->next;
++	} while (rqos);
++}
++
+ /*
+  * Return true, if we can't increase the depth further by scaling
+  */
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index 8e426a8505b6..e15b6907b76d 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -41,6 +41,7 @@ struct rq_qos_ops {
+ 	void (*done)(struct rq_qos *, struct request *);
+ 	void (*done_bio)(struct rq_qos *, struct bio *);
+ 	void (*cleanup)(struct rq_qos *, struct bio *);
++	void (*queue_depth_changed)(struct rq_qos *);
+ 	void (*exit)(struct rq_qos *);
+ 	const struct blk_mq_debugfs_attr *debugfs_attrs;
+ };
+@@ -138,6 +139,7 @@ void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio);
+ void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio);
+ void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio);
+ void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio);
++void __rq_qos_queue_depth_changed(struct rq_qos *rqos);
+ 
+ static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
+ {
+@@ -194,6 +196,12 @@ static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
+ 		__rq_qos_merge(q->rq_qos, rq, bio);
+ }
+ 
++static inline void rq_qos_queue_depth_changed(struct request_queue *q)
++{
++	if (q->rq_qos)
++		__rq_qos_queue_depth_changed(q->rq_qos);
++}
++
+ void rq_qos_exit(struct request_queue *);
+ 
+ #endif
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 2c1831207a8f..a058997b9cce 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -805,7 +805,7 @@ EXPORT_SYMBOL(blk_queue_update_dma_alignment);
+ void blk_set_queue_depth(struct request_queue *q, unsigned int depth)
+ {
+ 	q->queue_depth = depth;
+-	wbt_set_queue_depth(q, depth);
++	rq_qos_queue_depth_changed(q);
+ }
+ EXPORT_SYMBOL(blk_set_queue_depth);
+ 
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index c4d3089e47f7..8af553a0ba00 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -629,15 +629,6 @@ static void wbt_requeue(struct rq_qos *rqos, struct request *rq)
+ 	}
+ }
+ 
+-void wbt_set_queue_depth(struct request_queue *q, unsigned int depth)
+-{
+-	struct rq_qos *rqos = wbt_rq_qos(q);
+-	if (rqos) {
+-		RQWB(rqos)->rq_depth.queue_depth = depth;
+-		__wbt_update_limits(RQWB(rqos));
+-	}
+-}
+-
+ void wbt_set_write_cache(struct request_queue *q, bool write_cache_on)
+ {
+ 	struct rq_qos *rqos = wbt_rq_qos(q);
+@@ -689,6 +680,12 @@ static int wbt_data_dir(const struct request *rq)
+ 	return -1;
+ }
+ 
++static void wbt_queue_depth_changed(struct rq_qos *rqos)
++{
++	RQWB(rqos)->rq_depth.queue_depth = blk_queue_depth(rqos->q);
++	__wbt_update_limits(RQWB(rqos));
++}
++
+ static void wbt_exit(struct rq_qos *rqos)
+ {
+ 	struct rq_wb *rwb = RQWB(rqos);
+@@ -811,6 +808,7 @@ static struct rq_qos_ops wbt_rqos_ops = {
+ 	.requeue = wbt_requeue,
+ 	.done = wbt_done,
+ 	.cleanup = wbt_cleanup,
++	.queue_depth_changed = wbt_queue_depth_changed,
+ 	.exit = wbt_exit,
+ #ifdef CONFIG_BLK_DEBUG_FS
+ 	.debugfs_attrs = wbt_debugfs_attrs,
+@@ -853,7 +851,7 @@ int wbt_init(struct request_queue *q)
+ 
+ 	rwb->min_lat_nsec = wbt_default_latency_nsec(q);
+ 
+-	wbt_set_queue_depth(q, blk_queue_depth(q));
++	wbt_queue_depth_changed(&rwb->rqos);
+ 	wbt_set_write_cache(q, test_bit(QUEUE_FLAG_WC, &q->queue_flags));
+ 
+ 	return 0;
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index f47218d5b3b2..8e4e37660971 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -95,7 +95,6 @@ void wbt_enable_default(struct request_queue *);
+ u64 wbt_get_min_lat(struct request_queue *q);
+ void wbt_set_min_lat(struct request_queue *q, u64 val);
+ 
+-void wbt_set_queue_depth(struct request_queue *, unsigned int);
+ void wbt_set_write_cache(struct request_queue *, bool);
+ 
+ u64 wbt_default_latency_nsec(struct request_queue *);
+@@ -118,9 +117,6 @@ static inline void wbt_disable_default(struct request_queue *q)
+ static inline void wbt_enable_default(struct request_queue *q)
+ {
+ }
+-static inline void wbt_set_queue_depth(struct request_queue *q, unsigned int depth)
+-{
+-}
+ static inline void wbt_set_write_cache(struct request_queue *q, bool wc)
+ {
+ }
 -- 
 2.17.1
 
