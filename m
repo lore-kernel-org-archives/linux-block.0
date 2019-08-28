@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C6FAC3A5A4
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 197A1C3A5A1
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:55:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7472E2339E
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:55:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC4B62339E
+	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 21:55:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726937AbfH1Vzh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Aug 2019 17:55:37 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:46448 "EHLO ale.deltatee.com"
+        id S1726945AbfH1Vyi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Aug 2019 17:54:38 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:46434 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727103AbfH1Vyj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 17:54:39 -0400
+        id S1726583AbfH1Vyh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Aug 2019 17:54:37 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1i35tj-00071c-NH; Wed, 28 Aug 2019 15:54:38 -0600
+        id 1i35tj-00071o-NI; Wed, 28 Aug 2019 15:54:36 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1i35ti-0001Cj-5n; Wed, 28 Aug 2019 15:54:34 -0600
+        id 1i35tj-0001DJ-Bh; Wed, 28 Aug 2019 15:54:35 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
@@ -35,8 +35,8 @@ Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
         Max Gurtovoy <maxg@mellanox.com>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Wed, 28 Aug 2019 15:54:17 -0600
-Message-Id: <20190828215429.4572-2-logang@deltatee.com>
+Date:   Wed, 28 Aug 2019 15:54:29 -0600
+Message-Id: <20190828215429.4572-14-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190828215429.4572-1-logang@deltatee.com>
 References: <20190828215429.4572-1-logang@deltatee.com>
@@ -45,7 +45,7 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, Chaitanya.Kulkarni@wdc.com, maxg@mellanox.com, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v8 01/13] nvme-core: introduce nvme_ctrl_get_by_path()
+Subject: [PATCH v8 13/13] nvmet-passthru: support block accounting
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -53,69 +53,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-nvme_ctrl_get_by_path() is analagous to blkdev_get_by_path() except it
-gets a struct nvme_ctrl from the path to its char dev (/dev/nvme0).
-It makes use of filp_open() to open the file and uses the private
-data to obtain a pointer to the struct nvme_ctrl. If the fops of the
-file do not match, -EINVAL is returned.
+Support block disk accounting by setting the RQF_IO_STAT flag
+and gendisk in the request.
 
-The purpose of this function is to support NVMe-OF target passthru.
+After this change, IO counts will be reflected correctly in
+/proc/diskstats for drives being used by passthru.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Max Gurtovoy <maxg@mellanox.com>
 ---
- drivers/nvme/host/core.c | 24 ++++++++++++++++++++++++
- drivers/nvme/host/nvme.h |  2 ++
- 2 files changed, 26 insertions(+)
+ drivers/nvme/target/io-cmd-passthru.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index d3d6b7bd6903..776eff8c5ba7 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2834,6 +2834,30 @@ static const struct file_operations nvme_dev_fops = {
- 	.compat_ioctl	= nvme_dev_ioctl,
- };
+diff --git a/drivers/nvme/target/io-cmd-passthru.c b/drivers/nvme/target/io-cmd-passthru.c
+index 7557927a3451..63f12750a80d 100644
+--- a/drivers/nvme/target/io-cmd-passthru.c
++++ b/drivers/nvme/target/io-cmd-passthru.c
+@@ -410,6 +410,9 @@ static struct request *nvmet_passthru_blk_make_request(struct nvmet_req *req,
+ 	if (unlikely(IS_ERR(rq)))
+ 		return rq;
  
-+struct nvme_ctrl *nvme_ctrl_get_by_path(const char *path)
-+{
-+	struct nvme_ctrl *ctrl;
-+	struct file *f;
++	if (blk_queue_io_stat(q) && cmd->common.opcode != nvme_cmd_flush)
++		rq->rq_flags |= RQF_IO_STAT;
 +
-+	f = filp_open(path, O_RDWR, 0);
-+	if (IS_ERR(f))
-+		return ERR_CAST(f);
-+
-+	if (f->f_op != &nvme_dev_fops) {
-+		ctrl = ERR_PTR(-EINVAL);
-+		goto out_close;
-+	}
-+
-+	ctrl = f->private_data;
-+	nvme_get_ctrl(ctrl);
-+
-+out_close:
-+	filp_close(f, NULL);
-+
-+	return ctrl;
-+}
-+EXPORT_SYMBOL_GPL(nvme_ctrl_get_by_path);
-+
- static ssize_t nvme_sysfs_reset(struct device *dev,
- 				struct device_attribute *attr, const char *buf,
- 				size_t count)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 2d678fb968c7..42d59445ae6b 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -489,6 +489,8 @@ int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp,
- extern const struct attribute_group *nvme_ns_id_attr_groups[];
- extern const struct block_device_operations nvme_ns_head_ops;
+ 	if (req->sg_cnt) {
+ 		ret = nvmet_passthru_map_sg(req, rq);
+ 		if (unlikely(ret)) {
+@@ -474,7 +477,7 @@ static void nvmet_passthru_execute_cmd(struct nvmet_req *req)
  
-+struct nvme_ctrl *nvme_ctrl_get_by_path(const char *path);
-+
- #ifdef CONFIG_NVME_MULTIPATH
- static inline bool nvme_ctrl_use_ana(struct nvme_ctrl *ctrl)
- {
+ 	rq->end_io_data = req;
+ 	if (req->sq->qid != 0) {
+-		blk_execute_rq_nowait(rq->q, NULL, rq, 0,
++		blk_execute_rq_nowait(rq->q, ns->disk, rq, 0,
+ 				      nvmet_passthru_req_done);
+ 	} else {
+ 		req->p.rq = rq;
 -- 
 2.20.1
 
