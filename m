@@ -4,49 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD927C3A59F
-	for <linux-block@archiver.kernel.org>; Thu, 29 Aug 2019 18:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 811EBC3A59F
+	for <linux-block@archiver.kernel.org>; Thu, 29 Aug 2019 18:27:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 867892339E
-	for <linux-block@archiver.kernel.org>; Thu, 29 Aug 2019 18:15:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5077A20578
+	for <linux-block@archiver.kernel.org>; Thu, 29 Aug 2019 18:27:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567102508;
-	bh=XZKfI7GPEXf1VuEVjRMuwNrmQbjMSQI1t/1wy7dJtws=;
+	s=default; t=1567103222;
+	bh=loIvfXxJrf4NnIrQL+3Q5C5MQVuqdI6QAgWsWx7KpkI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=DTQ+bnWsJONsxqeZnHrIuzwps9XmkPPmu/nXSP2wIl4UwPbL9lKpO0sdxwRmMYrWd
-	 nobHYbi4eFzGOVGUKBuDt9L2+01vxaVXfOKnlXCGgYhLN4rizzMhs+SahDZ2gIiASa
-	 7GBK5+b/UvhUwC3HVwjdpoSmUlVdmfYkVbfBqCkY=
+	b=NF39qCV19yM1Jjso1sm/VXAoY6bCiWVaedRYs+B87buM4MJgYf+l5OggCsC1U7bJe
+	 UcEN/9RWczs6afOTjBnQwCkyI3o5jDf8mr4PQz8iAeOsjgezGMapoq2onCmGEv2Su4
+	 88nHGAu+YTV6hGAkmlPtyiKOLQd6GP5NtspR3/Sc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729160AbfH2SPG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Aug 2019 14:15:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56752 "EHLO mail.kernel.org"
+        id S1728165AbfH2SPl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Aug 2019 14:15:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57424 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729149AbfH2SPG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Aug 2019 14:15:06 -0400
+        id S1729392AbfH2SPk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Aug 2019 14:15:40 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0AE3B2189D;
-        Thu, 29 Aug 2019 18:15:03 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1DE8623426;
+        Thu, 29 Aug 2019 18:15:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567102504;
-        bh=XZKfI7GPEXf1VuEVjRMuwNrmQbjMSQI1t/1wy7dJtws=;
+        s=default; t=1567102539;
+        bh=loIvfXxJrf4NnIrQL+3Q5C5MQVuqdI6QAgWsWx7KpkI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EG/RO7LrTqEtX2vI8SM4WzWeIq1YiDXozI8GnQSPTV8mQhz3NkAvoivYHDeu4mXfJ
-         vZwvUBelD6AIsfJ45wMkPjqHeugAnxJbp4tCQrnwmK44nYftOWxwSdixhheRVGgQ28
-         ff3a1/t41lb+J4Ng8BsScz4lAEMFI3HZFuPX6gp4=
+        b=EWqzyOoPT4goMXfx+Kt39TfL85PyvRwTuzy895mBm1fCv+ASCfadrEh1WTU6eSi6c
+         dvjolowhRkaqITsxHIfHDpMCEkZaN8vOfveHLGzfEiH4Dbcr7jGithnIjib8fDm/X4
+         wEdoO0C8fDQ0o2bdhPu6GFhyAnSoy+tATPnisUVw=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Jeffrey M . Birnbaum" <jmbnyc@gmail.com>,
-        Sasha Levin <sashal@kernel.org>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 55/76] io_uring: fix potential hang with polled IO
-Date:   Thu, 29 Aug 2019 14:12:50 -0400
-Message-Id: <20190829181311.7562-55-sashal@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.2 74/76] io_uring: add need_resched() check in inner poll loop
+Date:   Thu, 29 Aug 2019 14:13:09 -0400
+Message-Id: <20190829181311.7562-74-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190829181311.7562-1-sashal@kernel.org>
 References: <20190829181311.7562-1-sashal@kernel.org>
@@ -61,103 +60,52 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jens Axboe <axboe@kernel.dk>
 
-[ Upstream commit 500f9fbadef86466a435726192f4ca4df7d94236 ]
+[ Upstream commit 08f5439f1df25a6cf6cf4c72cf6c13025599ce67 ]
 
-If a request issue ends up being punted to async context to avoid
-blocking, we can get into a situation where the original application
-enters the poll loop for that very request before it has been issued.
-This should not be an issue, except that the polling will hold the
-io_uring uring_ctx mutex for the duration of the poll. When the async
-worker has actually issued the request, it needs to acquire this mutex
-to add the request to the poll issued list. Since the application
-polling is already holding this mutex, the workqueue sleeps on the
-mutex forever, and the application thus never gets a chance to poll for
-the very request it was interested in.
+The outer poll loop checks for whether we need to reschedule, and
+returns to userspace if we do. However, it's possible to get stuck
+in the inner loop as well, if the CPU we are running on needs to
+reschedule to finish the IO work.
 
-Fix this by ensuring that the polling drops the uring_ctx occasionally
-if it's not making any progress.
+Add the need_resched() check in the inner loop as well. This fixes
+a potential hang if the kernel is configured with
+CONFIG_PREEMPT_VOLUNTARY=y.
 
-Reported-by: Jeffrey M. Birnbaum <jmbnyc@gmail.com>
+Reported-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Tested-by: Sagi Grimberg <sagi@grimberg.me>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/io_uring.c | 36 +++++++++++++++++++++++++-----------
- 1 file changed, 25 insertions(+), 11 deletions(-)
+ fs/io_uring.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 61018559e8fe6..5bb01d84f38d3 100644
+index 83e3cede11220..03cd8f5bba850 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -743,11 +743,34 @@ static void io_iopoll_reap_events(struct io_ring_ctx *ctx)
- static int io_iopoll_check(struct io_ring_ctx *ctx, unsigned *nr_events,
- 			   long min)
+@@ -716,7 +716,7 @@ static int io_do_iopoll(struct io_ring_ctx *ctx, unsigned int *nr_events,
+ static int io_iopoll_getevents(struct io_ring_ctx *ctx, unsigned int *nr_events,
+ 				long min)
  {
--	int ret = 0;
-+	int iters, ret = 0;
+-	while (!list_empty(&ctx->poll_list)) {
++	while (!list_empty(&ctx->poll_list) && !need_resched()) {
+ 		int ret;
+ 
+ 		ret = io_do_iopoll(ctx, nr_events, min);
+@@ -743,6 +743,12 @@ static void io_iopoll_reap_events(struct io_ring_ctx *ctx)
+ 		unsigned int nr_events = 0;
+ 
+ 		io_iopoll_getevents(ctx, &nr_events, 1);
 +
-+	/*
-+	 * We disallow the app entering submit/complete with polling, but we
-+	 * still need to lock the ring to prevent racing with polled issue
-+	 * that got punted to a workqueue.
-+	 */
-+	mutex_lock(&ctx->uring_lock);
- 
-+	iters = 0;
- 	do {
- 		int tmin = 0;
- 
 +		/*
-+		 * If a submit got punted to a workqueue, we can have the
-+		 * application entering polling for a command before it gets
-+		 * issued. That app will hold the uring_lock for the duration
-+		 * of the poll right here, so we need to take a breather every
-+		 * now and then to ensure that the issue has a chance to add
-+		 * the poll to the issued list. Otherwise we can spin here
-+		 * forever, while the workqueue is stuck trying to acquire the
-+		 * very same mutex.
++		 * Ensure we allow local-to-the-cpu processing to take place,
++		 * in this case we need to ensure that we reap all events.
 +		 */
-+		if (!(++iters & 7)) {
-+			mutex_unlock(&ctx->uring_lock);
-+			mutex_lock(&ctx->uring_lock);
-+		}
-+
- 		if (*nr_events < min)
- 			tmin = min - *nr_events;
- 
-@@ -757,6 +780,7 @@ static int io_iopoll_check(struct io_ring_ctx *ctx, unsigned *nr_events,
- 		ret = 0;
- 	} while (min && !*nr_events && !need_resched());
- 
-+	mutex_unlock(&ctx->uring_lock);
- 	return ret;
++		cond_resched();
+ 	}
+ 	mutex_unlock(&ctx->uring_lock);
  }
- 
-@@ -2073,15 +2097,7 @@ static int io_sq_thread(void *data)
- 			unsigned nr_events = 0;
- 
- 			if (ctx->flags & IORING_SETUP_IOPOLL) {
--				/*
--				 * We disallow the app entering submit/complete
--				 * with polling, but we still need to lock the
--				 * ring to prevent racing with polled issue
--				 * that got punted to a workqueue.
--				 */
--				mutex_lock(&ctx->uring_lock);
- 				io_iopoll_check(ctx, &nr_events, 0);
--				mutex_unlock(&ctx->uring_lock);
- 			} else {
- 				/*
- 				 * Normal IO, just pretend everything completed.
-@@ -2978,9 +2994,7 @@ SYSCALL_DEFINE6(io_uring_enter, unsigned int, fd, u32, to_submit,
- 		min_complete = min(min_complete, ctx->cq_entries);
- 
- 		if (ctx->flags & IORING_SETUP_IOPOLL) {
--			mutex_lock(&ctx->uring_lock);
- 			ret = io_iopoll_check(ctx, &nr_events, min_complete);
--			mutex_unlock(&ctx->uring_lock);
- 		} else {
- 			ret = io_cqring_wait(ctx, min_complete, sig, sigsz);
- 		}
 -- 
 2.20.1
 
