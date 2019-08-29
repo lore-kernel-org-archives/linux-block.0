@@ -1,95 +1,93 @@
-Return-Path: <SRS0=wI0I=WY=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=37yO=WZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EB78C3A5A6
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:24:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B14FC3A5A1
+	for <linux-block@archiver.kernel.org>; Thu, 29 Aug 2019 03:29:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E1C3217F5
-	for <linux-block@archiver.kernel.org>; Wed, 28 Aug 2019 22:24:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38D7A22CED
+	for <linux-block@archiver.kernel.org>; Thu, 29 Aug 2019 03:29:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YcVaHG7J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726907AbfH1WYb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Aug 2019 18:24:31 -0400
-Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:58774 "EHLO
-        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726828AbfH1WYb (ORCPT
+        id S1726245AbfH2D3E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Aug 2019 23:29:04 -0400
+Received: from mail-pl1-f176.google.com ([209.85.214.176]:33035 "EHLO
+        mail-pl1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725844AbfH2D3E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Aug 2019 18:24:31 -0400
-Received: from dread.disaster.area (pa49-181-255-194.pa.nsw.optusnet.com.au [49.181.255.194])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 0CD40361493;
-        Thu, 29 Aug 2019 08:24:24 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92)
-        (envelope-from <david@fromorbit.com>)
-        id 1i36MY-0004x3-2B; Thu, 29 Aug 2019 08:24:22 +1000
-Date:   Thu, 29 Aug 2019 08:24:22 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Christopher Lameter <cl@linux.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
- kmalloc(power-of-two)
-Message-ID: <20190828222422.GL1119@dread.disaster.area>
-References: <20190826111627.7505-1-vbabka@suse.cz>
- <20190826111627.7505-3-vbabka@suse.cz>
- <0100016cd98bb2c1-a2af7539-706f-47ba-a68e-5f6a91f2f495-000000@email.amazonses.com>
- <20190828194607.GB6590@bombadil.infradead.org>
+        Wed, 28 Aug 2019 23:29:04 -0400
+Received: by mail-pl1-f176.google.com with SMTP id go14so922175plb.0
+        for <linux-block@vger.kernel.org>; Wed, 28 Aug 2019 20:29:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=JGxbE50uXwCgfhAfE1eTU8tNsVQiLS6htVfulohzZj4=;
+        b=YcVaHG7J8kEUDEEpnsah1aC33aFF/zVr9WtxqWBS/dVq90U/A5AgzuMSwi522I98nE
+         JO8rA9dtet4C9wMyT2ZBAADep7t6cOkCV8+4UOo6nfksXdT4Rd6v/g4xKys4wjTQvkAG
+         hhvxC14TXxXJauZWxqVQU8IzKF66W5niRk7fIdp8Ix9De6qGWEOhuAMoe6kKLhTxxf6t
+         TtHfwstOlHFEUJr66LCpaRJWxc52yQZRenzaX/zb/M98dxweJf6eqPo1jJ1hhg+UCw3G
+         Saes9+wAsSIoIkuN0nuZqPYVFo3jt6AceCpIOvGpk/p1tGh3dX2TQzyPA8xsqopw8kJA
+         0RqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JGxbE50uXwCgfhAfE1eTU8tNsVQiLS6htVfulohzZj4=;
+        b=K1fLTR+G8LEnCNIhxA53hgqyC3O/NncFWsfB0OhDDcugyOv9oDU7Riugeo2Ia1Lw7M
+         Da+7wkntor7N8CxzwJztayVnXYA+jrC1cWszvuvudU0hWtlTU2YOFJ5tpvw6TfRM7Zny
+         VOwHZE8T+5GantzbzjCG1ucIo3f7ArghbuNSV3FmKdENCTRyPQVxoV4xius/y2fWk/j6
+         nMEUb1Oy6Oa06hC1hzX5S5Rv9B5PjRkzW1Zq/iUB6+HVsU6FH1Ovl3UMP6zDQvGaK0KD
+         ot52IH3sSTSSF3fQBoU8fsEoIkZsb1gIDGUH2L4iYW/+z48SCJXCct0c68CyU3Xofq02
+         H4YQ==
+X-Gm-Message-State: APjAAAVBJeLSwfmCapO9sDtSuVFALsOAzCrPsSP1kKmXI7OiJmavvBSY
+        0sgm1YgarMC0MMFdY5R501ClVA==
+X-Google-Smtp-Source: APXvYqz+BYvMbypoZoZy80tENbu+/0EycC793rpafApGirMRqvp3VXLwhMl4+uoaKwWdC97/mFhG0w==
+X-Received: by 2002:a17:902:8543:: with SMTP id d3mr7863103plo.80.1567049343394;
+        Wed, 28 Aug 2019 20:29:03 -0700 (PDT)
+Received: from [192.168.1.188] (66.29.164.166.static.utbb.net. [66.29.164.166])
+        by smtp.gmail.com with ESMTPSA id 136sm859015pfz.123.2019.08.28.20.29.01
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 28 Aug 2019 20:29:02 -0700 (PDT)
+Subject: Re: [PATCHSET v3 block/for-linus] IO cost model based work-conserving
+ porportional controller
+To:     Tejun Heo <tj@kernel.org>, newella@fb.com, clm@fb.com,
+        josef@toxicpanda.com, dennisz@fb.com, lizefan@huawei.com,
+        hannes@cmpxchg.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com, cgroups@vger.kernel.org
+References: <20190828220600.2527417-1-tj@kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f48b98fa-b33e-b3d3-2657-04f599e710fd@kernel.dk>
+Date:   Wed, 28 Aug 2019 21:29:00 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190828194607.GB6590@bombadil.infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.2 cv=P6RKvmIu c=1 sm=1 tr=0
-        a=YO9NNpcXwc8z/SaoS+iAiA==:117 a=YO9NNpcXwc8z/SaoS+iAiA==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=FmdZ9Uzk2mMA:10
-        a=7-415B0cAAAA:8 a=wUb5uO5YJnghlZLzW24A:9 a=CjuIK1q_8ugA:10
-        a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <20190828220600.2527417-1-tj@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 28, 2019 at 12:46:08PM -0700, Matthew Wilcox wrote:
-> On Wed, Aug 28, 2019 at 06:45:07PM +0000, Christopher Lameter wrote:
-> > I still think implicit exceptions to alignments are a bad idea. Those need
-> > to be explicity specified and that is possible using kmem_cache_create().
+On 8/28/19 4:05 PM, Tejun Heo wrote:
+> Changes from v2[2]:
 > 
-> I swear we covered this last time the topic came up, but XFS would need
-> to create special slab caches for each size between 512 and PAGE_SIZE.
-> Potentially larger, depending on whether the MM developers are willing to
-> guarantee that kmalloc(PAGE_SIZE * 2, GFP_KERNEL) will return a PAGE_SIZE
-> aligned block of memory indefinitely.
+> * Fixed a divide-by-zero bug in current_hweight().
+> 
+> * pre_start_time and friends renamed to alloc_time and now has its own
+>    CONFIG option which is selected by IOCOST.
 
-Page size alignment of multi-page heap allocations is ncessary. The
-current behaviour w/ KASAN is to offset so a 8KB allocation spans 3
-pages and is not page aligned. That causes just as much in way
-of alignment problems as unaligned objects in multi-object-per-page
-slabs.
+This looks fine to me now, I've queued it up for 5.4.
 
-As I said in the lastest discussion of this problem on XFS (pmem
-devices w/ KASAN enabled), all we -need- is a GFP flag that tells the
-slab allocator to give us naturally aligned object or fail if it
-can't. I don't care how that gets implemented (e.g. another set of
-heap slabs like the -rcl slabs), I just don't want every high level
-subsystem that allocates heap memory for IO buffers to have to
-implement their own aligned slab caches.
-
-Cheers,
-
-Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+Jens Axboe
+
