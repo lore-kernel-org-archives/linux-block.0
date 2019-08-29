@@ -2,98 +2,162 @@ Return-Path: <SRS0=37yO=WZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52FB5C3A59F
-	for <linux-block@archiver.kernel.org>; Thu, 29 Aug 2019 15:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD927C3A59F
+	for <linux-block@archiver.kernel.org>; Thu, 29 Aug 2019 18:15:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 29C672339E
-	for <linux-block@archiver.kernel.org>; Thu, 29 Aug 2019 15:57:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 867892339E
+	for <linux-block@archiver.kernel.org>; Thu, 29 Aug 2019 18:15:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567094221;
-	bh=GH+G3KhfXBYkwpmbU7OZvIlQ/eRTz2PByiDMYCeFpAQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=dEPg/lbKjjvU33nu72iF4RZ9py7NM0jUJvqv0iEOSyXsi7qq6v6nCV5NexQZc6K60
-	 xSOoKAI/Kmzl2cADwg276xBbVca7KRT2stl1YfeP5mgpg4BScxDLjMxbl3GOs28x4r
-	 xYYig7TNRCbLgFhWGJwONfJnq9Iss5C8OQBSTr50=
+	s=default; t=1567102508;
+	bh=XZKfI7GPEXf1VuEVjRMuwNrmQbjMSQI1t/1wy7dJtws=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=DTQ+bnWsJONsxqeZnHrIuzwps9XmkPPmu/nXSP2wIl4UwPbL9lKpO0sdxwRmMYrWd
+	 nobHYbi4eFzGOVGUKBuDt9L2+01vxaVXfOKnlXCGgYhLN4rizzMhs+SahDZ2gIiASa
+	 7GBK5+b/UvhUwC3HVwjdpoSmUlVdmfYkVbfBqCkY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727125AbfH2P45 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Aug 2019 11:56:57 -0400
-Received: from mail-qk1-f181.google.com ([209.85.222.181]:38391 "EHLO
-        mail-qk1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726973AbfH2P44 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Aug 2019 11:56:56 -0400
-Received: by mail-qk1-f181.google.com with SMTP id u190so3400367qkh.5;
-        Thu, 29 Aug 2019 08:56:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=ebjcblE+kxdokmjeo9JfTde5NEZGUN+yLxUfBY00nF0=;
-        b=D6977bRWi1U1MlPh/embKVUWFf1b3dSi7HwF68a6Mxi7L1SX4VR41iIkKqE9csKH21
-         lSTOObC3A8BZMuxVngiF5uG4UyUVcCAB5sDGK7ymiIBLNoXs5c0d2Vlyp/Rpn+TbemRE
-         xgNPEP34ZOt8Io4+LBH0ANDzoMVi0qykZJre8+VSiMd8R+c3HFAc0la2j7tnXrQq3Pdp
-         diSk/fkxCKAl2xIPI1MUBFfEFZS9nKz0Noa95bmVacsOIDsgWfmdQ4MidxyALvP6HtUd
-         mmb14y5r20iOBDzFHghRCvYy0T2+O5vDGGgeQw5lKkA/KpPZSCfJxWq/tPkxug6hR9iB
-         K+Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ebjcblE+kxdokmjeo9JfTde5NEZGUN+yLxUfBY00nF0=;
-        b=jnOUnVY37/3OCeRI6Iy3VVDO5Aa8Aih5SxXx1kTBqApTNYj9oZJAoEDa5mrb55ayD3
-         bUv8Tuk2k3Pr5ZWhXfT+Z97UHrDk7ibMgS99UbpmGYUaO0NmdkVcvay8nCbCtx3YVEdu
-         wmlGFzMgpJD3GS8WOsUIWXiEbzxVSc4OL5GL9X2XOEq2ZIGWztQh3EIRAlWMfcK6YSwT
-         7cg/hMzkr5OeYrznW+/b96S1V3B5Vl8q50RNZwsJuEqxfC7Pc9ub8QQd9pYBsCkC5iJu
-         BLp2dFgqT1ZdzRJG5n/IwVYYUyaNQZspvhP0/FY5MpDS+gLTvblL3mPNV5fDTbSgvkHd
-         AopA==
-X-Gm-Message-State: APjAAAXke4aQITcNGfYc+mRxZpl1Lq0B//XcI9Hl000aqp8wrkIOA45V
-        qyeilj+DJ67KGkHmbFogLbQ=
-X-Google-Smtp-Source: APXvYqwXmV4hUrqstIaOTbYKZJXxOp9tDSiRcx+99d4cEtCYCoB/CZjxOfbWhYwxNpuvf5hnjTawIw==
-X-Received: by 2002:a37:494:: with SMTP id 142mr9783672qke.239.1567094215485;
-        Thu, 29 Aug 2019 08:56:55 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::1:7e32])
-        by smtp.gmail.com with ESMTPSA id q25sm1291885qkm.30.2019.08.29.08.56.54
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 29 Aug 2019 08:56:54 -0700 (PDT)
-Date:   Thu, 29 Aug 2019 08:56:53 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, newella@fb.com, clm@fb.com,
-        Josef Bacik <josef@toxicpanda.com>, dennisz@fb.com,
-        Li Zefan <lizefan@huawei.com>, hannes@cmpxchg.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel-team@fb.com, cgroups@vger.kernel.org
-Subject: Re: [PATCHSET v3 block/for-linus] IO cost model based
- work-conserving porportional controller
-Message-ID: <20190829155653.GW2263813@devbig004.ftw2.facebook.com>
-References: <20190828220600.2527417-1-tj@kernel.org>
- <50384CF8-39F1-461C-9EC0-7314671E5604@linaro.org>
+        id S1729160AbfH2SPG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Aug 2019 14:15:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56752 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729149AbfH2SPG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Aug 2019 14:15:06 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0AE3B2189D;
+        Thu, 29 Aug 2019 18:15:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1567102504;
+        bh=XZKfI7GPEXf1VuEVjRMuwNrmQbjMSQI1t/1wy7dJtws=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=EG/RO7LrTqEtX2vI8SM4WzWeIq1YiDXozI8GnQSPTV8mQhz3NkAvoivYHDeu4mXfJ
+         vZwvUBelD6AIsfJ45wMkPjqHeugAnxJbp4tCQrnwmK44nYftOWxwSdixhheRVGgQ28
+         ff3a1/t41lb+J4Ng8BsScz4lAEMFI3HZFuPX6gp4=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Jeffrey M . Birnbaum" <jmbnyc@gmail.com>,
+        Sasha Levin <sashal@kernel.org>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.2 55/76] io_uring: fix potential hang with polled IO
+Date:   Thu, 29 Aug 2019 14:12:50 -0400
+Message-Id: <20190829181311.7562-55-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190829181311.7562-1-sashal@kernel.org>
+References: <20190829181311.7562-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <50384CF8-39F1-461C-9EC0-7314671E5604@linaro.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 29, 2019 at 05:54:38PM +0200, Paolo Valente wrote:
-> I see an important interface problem.  Userspace has been waiting for
-> io.weight to become eventually the file name for setting the weight
-> for the proportional-share policy [1,2].  If you use that name, how
-> will we solve this?
+From: Jens Axboe <axboe@kernel.dk>
 
-So, my plan is just disabling iocost if bfq is selected as the io
-scheduler.  It makes no sense to use them together anyway.  What do
-you wanna do about the existing interface files prefixed with bfq?
-Just rename them?
+[ Upstream commit 500f9fbadef86466a435726192f4ca4df7d94236 ]
 
-Thanks.
+If a request issue ends up being punted to async context to avoid
+blocking, we can get into a situation where the original application
+enters the poll loop for that very request before it has been issued.
+This should not be an issue, except that the polling will hold the
+io_uring uring_ctx mutex for the duration of the poll. When the async
+worker has actually issued the request, it needs to acquire this mutex
+to add the request to the poll issued list. Since the application
+polling is already holding this mutex, the workqueue sleeps on the
+mutex forever, and the application thus never gets a chance to poll for
+the very request it was interested in.
 
+Fix this by ensuring that the polling drops the uring_ctx occasionally
+if it's not making any progress.
+
+Reported-by: Jeffrey M. Birnbaum <jmbnyc@gmail.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/io_uring.c | 36 +++++++++++++++++++++++++-----------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 61018559e8fe6..5bb01d84f38d3 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -743,11 +743,34 @@ static void io_iopoll_reap_events(struct io_ring_ctx *ctx)
+ static int io_iopoll_check(struct io_ring_ctx *ctx, unsigned *nr_events,
+ 			   long min)
+ {
+-	int ret = 0;
++	int iters, ret = 0;
++
++	/*
++	 * We disallow the app entering submit/complete with polling, but we
++	 * still need to lock the ring to prevent racing with polled issue
++	 * that got punted to a workqueue.
++	 */
++	mutex_lock(&ctx->uring_lock);
+ 
++	iters = 0;
+ 	do {
+ 		int tmin = 0;
+ 
++		/*
++		 * If a submit got punted to a workqueue, we can have the
++		 * application entering polling for a command before it gets
++		 * issued. That app will hold the uring_lock for the duration
++		 * of the poll right here, so we need to take a breather every
++		 * now and then to ensure that the issue has a chance to add
++		 * the poll to the issued list. Otherwise we can spin here
++		 * forever, while the workqueue is stuck trying to acquire the
++		 * very same mutex.
++		 */
++		if (!(++iters & 7)) {
++			mutex_unlock(&ctx->uring_lock);
++			mutex_lock(&ctx->uring_lock);
++		}
++
+ 		if (*nr_events < min)
+ 			tmin = min - *nr_events;
+ 
+@@ -757,6 +780,7 @@ static int io_iopoll_check(struct io_ring_ctx *ctx, unsigned *nr_events,
+ 		ret = 0;
+ 	} while (min && !*nr_events && !need_resched());
+ 
++	mutex_unlock(&ctx->uring_lock);
+ 	return ret;
+ }
+ 
+@@ -2073,15 +2097,7 @@ static int io_sq_thread(void *data)
+ 			unsigned nr_events = 0;
+ 
+ 			if (ctx->flags & IORING_SETUP_IOPOLL) {
+-				/*
+-				 * We disallow the app entering submit/complete
+-				 * with polling, but we still need to lock the
+-				 * ring to prevent racing with polled issue
+-				 * that got punted to a workqueue.
+-				 */
+-				mutex_lock(&ctx->uring_lock);
+ 				io_iopoll_check(ctx, &nr_events, 0);
+-				mutex_unlock(&ctx->uring_lock);
+ 			} else {
+ 				/*
+ 				 * Normal IO, just pretend everything completed.
+@@ -2978,9 +2994,7 @@ SYSCALL_DEFINE6(io_uring_enter, unsigned int, fd, u32, to_submit,
+ 		min_complete = min(min_complete, ctx->cq_entries);
+ 
+ 		if (ctx->flags & IORING_SETUP_IOPOLL) {
+-			mutex_lock(&ctx->uring_lock);
+ 			ret = io_iopoll_check(ctx, &nr_events, min_complete);
+-			mutex_unlock(&ctx->uring_lock);
+ 		} else {
+ 			ret = io_cqring_wait(ctx, min_complete, sig, sigsz);
+ 		}
 -- 
-tejun
+2.20.1
+
