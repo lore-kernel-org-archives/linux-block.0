@@ -2,101 +2,84 @@ Return-Path: <SRS0=imVF=W2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A899C3A5A4
-	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 13:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 661E4C3A5A4
+	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 13:16:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A1842186A
-	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 13:11:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567170669;
-	bh=Mau+FX6QqKbBeeFFOIdNLvT5gJ7/SzPuH+9/dkCPm0w=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=l6n/hhsXs2rtDF/+wUzzzjKoCiiYdRR+yXQdHdfpEix+R6CSQaGAgyilYdh2Pgp1K
-	 ikWB+dW9LT0+c3VVVyub1qH7O2peKICJXq+YxbPY/6jTMdidT5syz3hvbF9i1UP/Ey
-	 5I6cwgqc1vylihmqDsYV0j9/NfyxhyoOgYWkJIxs=
+	by mail.kernel.org (Postfix) with ESMTP id 382A421897
+	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 13:16:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lgZ6msSP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727926AbfH3NLE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Aug 2019 09:11:04 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:43769 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727751AbfH3NLC (ORCPT
+        id S1727999AbfH3NQc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Aug 2019 09:16:32 -0400
+Received: from mail-io1-f46.google.com ([209.85.166.46]:33493 "EHLO
+        mail-io1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727434AbfH3NQc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Aug 2019 09:11:02 -0400
-Received: by mail-qk1-f193.google.com with SMTP id m2so6016822qkd.10;
-        Fri, 30 Aug 2019 06:11:02 -0700 (PDT)
+        Fri, 30 Aug 2019 09:16:32 -0400
+Received: by mail-io1-f46.google.com with SMTP id z3so13949016iog.0
+        for <linux-block@vger.kernel.org>; Fri, 30 Aug 2019 06:16:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=Pzf7XPCUmMJwHP1K5Kjcy/17KGNO9s1GqGEYtleLQJk=;
-        b=ndCeD0CURVeX3KquL48qNjyaJ6CEXjp1nZ8VWkPrAPEA0hYNfCxrIHQFAt4avXxffr
-         O3GUMxdIe1++IlRdFBFHdXOIoVU9I5E26AqyCNbFhmVblP9MADOekf6fUX9VFzKhV6SW
-         TOaTNELuiM2eww/zpvob5IAQUiwiZGgynIIMPmcaGP2DTryJob3QkL2OckzMX4w1C+YW
-         9mNqKL9Gd7Lmnal1jfIj7gZwljkPOd8XWtLB74de/vyHKAqY+SlYAW+dPq+rx+JGm+v7
-         i8eBGvb6wb6PQum7QEYm2x79fHnvBUBu1jK1dukHfNyKJXBEhgJTmoo4WiALrD6hQ1E8
-         F65w==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ao7Wdofaa1sKJzWGbAawdHt4adOohg/VMTdip0vQIa4=;
+        b=lgZ6msSPYo88sZa7ohX40wFMd3R9PsCKmRzFiRBVGvPEXWMUsGmTNK/bJNOMRsj8ZY
+         WXeeZfOewC/GXAZFxEMiiN6P/Am+zJTjqZinv1txwUjp8aNd590Kl5fYCgOZ+zUZ0czY
+         ZD/aT5v1ON/tS5f5hfu8TujR454GHVSfiTqeZpx2YLxG2WsIntIRy1IrsfGSmLuE/PR1
+         anFGybLfMZbEsbMWKi52Lc0Lc4p1TDrpcit8uv+X6hV39EZMs7OJztcsb4aZcufQiAOj
+         wJ3LztiUU7V0AIYp8KeRpZaeMl2TjKeRJoy0deDf5vgEa8gM/Tyf5dlQ065BHPCvywVz
+         xn1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition:user-agent;
-        bh=Pzf7XPCUmMJwHP1K5Kjcy/17KGNO9s1GqGEYtleLQJk=;
-        b=lRuaTnvat4DO4NsWEbw+BSa/kf9wD8/SjT8MHrHTcXxv4JocNYVepr0gEZzwMnwnNi
-         CVALlNsfsx4oNHOsXjBuoIiPB1P4Y94CuwmxcC4b3CwIKm29yuxN0fJXdy2TBI7gVa3z
-         0ObX1N1Qz8DU2QqyozC56FnkklWe6o/7HJJWHi4dp8Ouqqk6n8Hn1jdwNfmAINyeGtXV
-         iObOgwovW3k9ZCwtsIwE8y3d4WxZ5GIc+cWovcsvpEXvNi/0fS4jumOZ0gZhKWVHdZMK
-         LRLSrySnRICorTFSnd9TTvpc0TQIxnRR4NNoU6cUFvUSrAJzOCgMcncuJmCVwhzyYXoR
-         qeNA==
-X-Gm-Message-State: APjAAAX+mS/jg8l0zR1mKkEHHp4+qIuAtXmjQXtsqrpfHYIy6XRdbliH
-        cuE4C0MNphDAj6RpmBjRd6g=
-X-Google-Smtp-Source: APXvYqweVJ7LuaqcKXPFM2tTBmyeDqjMAPN7OoITBSURFzKueGayFf/y4o1HyQhOaO0hQKVM/c5x0Q==
-X-Received: by 2002:ae9:f804:: with SMTP id x4mr15131130qkh.178.1567170661695;
-        Fri, 30 Aug 2019 06:11:01 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::1b80])
-        by smtp.gmail.com with ESMTPSA id r63sm697992qtd.95.2019.08.30.06.11.00
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ao7Wdofaa1sKJzWGbAawdHt4adOohg/VMTdip0vQIa4=;
+        b=kpjlSid5S42+25zbbhd/CCnFaLG4ANdDTJ9mTFM2Sp1PCW9axG6RfIzFjfv/2K/mcr
+         mfd6mCEjRON9uOB7QpZX1HvWHX6p6CFvCSWSuzOYKFfPUax+ONHyEcxqaNX+DFP0Bljc
+         Avc7mVFhPky8ZvCDeP+w1T3xL0vPuhm7ybvvLopwdVI59x/X0nvo96iM5CFgqo4/USkE
+         j0ITxoBs3GKe+0OHUbSifB7PDBCT0X6dSDMS6h/rx4dIbQE5AXNlHsVvQgi+83vkFtQ/
+         j4PPd7tq6cz3CN1jxAQt78KopmKczRdycBf/S3TWOdixhZH88DhT17RBP8xysVn9nXWd
+         M8eQ==
+X-Gm-Message-State: APjAAAUfX/vdqPdoOWeoq0Ykeo5dmjRGDmxz2hBnzl65/bAn4kPVcK3E
+        KsZJ1OCfgxNE/5uU1h9Dvqm+KA==
+X-Google-Smtp-Source: APXvYqyZwQo3R9eCAX7RKQJl8KgsD+8eb15pZBdtUzfE/XNeCx4wyJxuH9bF237vIg2miKtu62M59g==
+X-Received: by 2002:a05:6602:c7:: with SMTP id z7mr18714299ioe.130.1567170991487;
+        Fri, 30 Aug 2019 06:16:31 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id l13sm5866169iob.73.2019.08.30.06.16.29
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Aug 2019 06:11:01 -0700 (PDT)
-Date:   Fri, 30 Aug 2019 06:10:58 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH block/for-next] blkcg: add missing NULL check in
+        Fri, 30 Aug 2019 06:16:30 -0700 (PDT)
+Subject: Re: [PATCH block/for-next] blkcg: add missing NULL check in
  ioc_cpd_alloc()
-Message-ID: <20190830131058.GY2263813@devbig004.ftw2.facebook.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190830131058.GY2263813@devbig004.ftw2.facebook.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <24a39d46-5c3e-9e45-bfaf-6d92448aea99@kernel.dk>
+Date:   Fri, 30 Aug 2019 07:16:29 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190830131058.GY2263813@devbig004.ftw2.facebook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ioc_cpd_alloc() forgot to check NULL return from kzalloc().  Add it.
+On 8/30/19 7:10 AM, Tejun Heo wrote:
+> ioc_cpd_alloc() forgot to check NULL return from kzalloc().  Add it.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reported-by: kbuild test robot <lkp@intel.com>
----
- block/blk-iocost.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Applied, thanks.
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 9c8046ac5925..2aae8ec391ef 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1888,8 +1888,10 @@ static struct blkcg_policy_data *ioc_cpd_alloc(gfp_t gfp)
- 	struct ioc_cgrp *iocc;
- 
- 	iocc = kzalloc(sizeof(struct ioc_cgrp), gfp);
--	iocc->dfl_weight = CGROUP_WEIGHT_DFL;
-+	if (!iocc)
-+		return NULL;
- 
-+	iocc->dfl_weight = CGROUP_WEIGHT_DFL;
- 	return &iocc->cpd;
- }
- 
+-- 
+Jens Axboe
+
