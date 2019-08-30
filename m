@@ -2,183 +2,105 @@ Return-Path: <SRS0=imVF=W2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 156D4C3A5A6
-	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 15:48:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 063F5C3A59B
+	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 15:49:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DEA7E23427
-	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 15:48:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=tycho.nsa.gov header.i=@tycho.nsa.gov header.b="AADPPeKU"
+	by mail.kernel.org (Postfix) with ESMTP id C9A7E23428
+	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 15:49:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1567180165;
+	bh=nXSVc79MwADtvMh03MpKMbHC0zBWv30zWalqSvd2N88=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=zeyAdMnqt3GGcGy42la3odYxQm/xcNlVzGaBo9RhxRnfNMYVunRQS66CiWnyFiilf
+	 K/me+T0NY95I/8ETTR/i+EmPt0hlq9+1MWUzPVDK/ZH9kMj/xb7OX+iZAe6u37cEYF
+	 gDYuI3so/etnAzGsbmjVlG+8Hf3rCMuwMWo8JufY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728088AbfH3Psb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Aug 2019 11:48:31 -0400
-Received: from UHIL19PA39.eemsg.mail.mil ([214.24.21.198]:24364 "EHLO
-        UHIL19PA39.eemsg.mail.mil" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727135AbfH3Psb (ORCPT
+        id S1727791AbfH3PtZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Aug 2019 11:49:25 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:43964 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727304AbfH3PtZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Aug 2019 11:48:31 -0400
-X-Greylist: delayed 430 seconds by postgrey-1.27 at vger.kernel.org; Fri, 30 Aug 2019 11:48:30 EDT
-X-EEMSG-check-017: 19910871|UHIL19PA39_ESA_OUT05.csd.disa.mil
-X-IronPort-AV: E=Sophos;i="5.64,447,1559520000"; 
-   d="scan'208";a="19910871"
-Received: from emsm-gh1-uea11.ncsc.mil ([214.29.60.3])
-  by UHIL19PA39.eemsg.mail.mil with ESMTP/TLS/DHE-RSA-AES256-SHA256; 30 Aug 2019 15:41:18 +0000
+        Fri, 30 Aug 2019 11:49:25 -0400
+Received: by mail-qt1-f196.google.com with SMTP id b11so8052706qtp.10;
+        Fri, 30 Aug 2019 08:49:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tycho.nsa.gov; i=@tycho.nsa.gov; q=dns/txt;
-  s=tycho.nsa.gov; t=1567179679; x=1598715679;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=0BD40FUiWz6a0ni0oCrJsaBl2kWWx61EIcww3i0zvGI=;
-  b=AADPPeKUHZuYNXAmtYlcXHKG/4ZfSEuDvmQ1AGq5TSIzJnbTJBmihiRZ
-   66f0QYUPf/SodyDZkzXIgfSGXz+yuUeOfgkEBY9KeJPlDts9GFj9y8fMg
-   3sUrOghGIVKgAPR9r7Y8+8JOrsyoEeWdHZth4Whx/AJdEO5jnIOcmXW0E
-   033EUd316xDvNm0ZO6lFtVuC6fcRusM2LHNzmEubvJz0wREpWnZJCt0yW
-   +o05dx8B9xe9Veav/pD1R5+POEQgJgF/r35+Ih1ej9z6Rk1QJDEkHK4Qu
-   EZsPYtZWl2WSd6vE/GnczJp9rIIbtOe2Ubs7+klU4qIhSp2sXEBK/8buE
-   g==;
-X-IronPort-AV: E=Sophos;i="5.64,447,1559520000"; 
-   d="scan'208";a="32186112"
-IronPort-PHdr: =?us-ascii?q?9a23=3AQW2cuBEgLS9uDm6gg0Ru8J1GYnF86YWxBRYc79?=
- =?us-ascii?q?8ds5kLTJ76ocq4bnLW6fgltlLVR4KTs6sC17OM9fm+BSdQsN6oizMrSNR0TR?=
- =?us-ascii?q?gLiMEbzUQLIfWuLgnFFsPsdDEwB89YVVVorDmROElRH9viNRWJ+iXhpTEdFQ?=
- =?us-ascii?q?/iOgVrO+/7BpDdj9it1+C15pbffxhEiCCybL9vMhm6txjdu8gZjIdtKas8zg?=
- =?us-ascii?q?bCr2dVdehR2W5mP0+YkQzm5se38p5j8iBQtOwk+sVdT6j0fLk2QKJBAjg+PG?=
- =?us-ascii?q?87+MPktR/YTQuS/XQcSXkZkgBJAwfe8h73WIr6vzbguep83CmaOtD2TawxVD?=
- =?us-ascii?q?+/4apnVAPkhSEaPDMi7mrZltJ/g75aoBK5phxw3YjUYJ2ONPFjeq/RZM4WSX?=
- =?us-ascii?q?ZdUspUUSFODJm8b48SBOQfO+hWoZT2q18XoRawAQSgAeXiwSJKiHDrx603y/?=
- =?us-ascii?q?kvHx/I3AIgHNwAvnrbo9r3O6gOXu6417XIwDfZYv9KxTvw5orFfxY8qv+MR7?=
- =?us-ascii?q?Jwds/RxFEyGQPZkFqQsYzlMC2T1u8Qrmab6vBvVeari2E5qwB6vz+ixtwxhY?=
- =?us-ascii?q?nSnY8V1lDF+jl5wIYyP9G4TlV7bsS+HJtfsCGaKZJ7T8U/SG9roCY30qAKtJ?=
- =?us-ascii?q?G0cSQQyJkr2gTTZ+KIfoSW+B7vSeCcKipiin1/YrKwnROy/FClyu37S8a7zk?=
- =?us-ascii?q?5HrjFAktnQrnAN0AHT6tSfRvt94Eih3TGP2hjP6u5eO0A0lLfbK4U7zr4slp?=
- =?us-ascii?q?scrUTDHijslEXwkKCWbVkr9vKt6+TmZrXqvp6cN4lqhQHiKqkih8OyDOsiPg?=
- =?us-ascii?q?UOQmSX4/qw2bL98UHjXblGlvg2nbPYsJDeK8QbvKm5AwpN34Y49hm/FCyr0M?=
- =?us-ascii?q?gYnHYbLFJFfwiLj47yO17UOvz4AvC/g0q0nDdx2//GJqHhAonKLnXbjbjhfb?=
- =?us-ascii?q?F96kBCxwo3ydBf/IlZCqsfL/3uWk/+rsDYAgUlPAyzxubtEM992Z8GWWKTHq?=
- =?us-ascii?q?+ZN7vfsUGJ5uI1JOmBf44Utyj7K/gk+f7il3s5mV4bfam00pobcne4Hu5pI0?=
- =?us-ascii?q?mDfHrsgc8LEX0WsQomUOzqlFqCXCZPaHmoRKIz+DE6BZm9DYjfRoCimqGB3C?=
- =?us-ascii?q?m/HpJIfGBKE0yDHm3ye4qYXPcMbTqYItV9nTwcSbihV4gh2AmhtA/g1bVnIe?=
- =?us-ascii?q?nU+i0DuJLn1dh14fDTlB489TxzEsSd1XyCQHtonmMJQD822rpzoUtnyleMya?=
- =?us-ascii?q?J4meBXFcRP5/NVVQc3LZjcz+1mBND1XgLOZMyJREy7TdWnHT4xTs4xzMEKY0?=
- =?us-ascii?q?tmGtijgBHD3yy3DLMPi7OLA5k0+LrG33ftP8Z912rG1K45glk8WMRPK3Ophq?=
- =?us-ascii?q?hk+gjPB47GjUCZmLykdKgG2i7C6nuDx3KUvE5ESA5wTbnFXXcHa0TKrdT5/E?=
- =?us-ascii?q?LCT6SyCbQmKARBz9WPJbBQatLzkFVGQunsOM7Eb2KwnGe6HQyIya+UbIr2Z2?=
- =?us-ascii?q?Ud2z3QCEsanAET53aGNA4+Bii6o2/FEjxuGkzgY1n2/el9tny7VEk0wB+Ob0?=
- =?us-ascii?q?F70Lq14BEVj+SGS/wPxrIEpDshqzJsEVa53tLWDceApgV4cKVBetMy+0xK1X?=
- =?us-ascii?q?zWtwNjJJysNaNiiUAEcwRxoUzu0w97CoJakcgltHkq1hZ9KbqE0FNdcDOVxZ?=
- =?us-ascii?q?TwOrzRKmnv8xGjcrXW1U/C39aL4KcP6eg4qlX6sAGsEUot7mhn091L3HaH+J?=
- =?us-ascii?q?XKAxQdUYjrXkY06Rd6vbfabTc554/O0n1sK6a0uCfY2901HOsl1gqgf9BHPa?=
- =?us-ascii?q?OAFQ/yFdAaBse3JOwkgFimcwwLPP5M+64wJM6mafSG17CxPOp6nzKpk35H4I?=
- =?us-ascii?q?Zj3UKI7SZ8TfTI35kdyfGCwgSHTyv8jEumss3vnYBEZDcSHnewyCT9HoFRfq?=
- =?us-ascii?q?xycJ0VCWehPcK33M9yh53zVH5C8l6sGVcG1NWueRqIYFz3xRdQ2lgPoXy7hS?=
- =?us-ascii?q?u4yCR5kzUorqqZwSzPzP3uewEDOm5MWGZijkzhIZa7j98ERkikdQspmwW/5U?=
- =?us-ascii?q?b82adboL5zL27JQUdHZyL2NX1tUrOstrqeZM5C8JcosSRRUOShblGWU739rA?=
- =?us-ascii?q?UA0yPlAWRewCs2dy+luprnhRx2kmGdI2hprHrfZ85wwQ3T5NvGRf5ejXI6Q3?=
- =?us-ascii?q?xUgCfWChCcOMak+dGP38PPsuehWmalTbVJfCXrxJ/Gvyy+sz5EGxq6ysuvl8?=
- =?us-ascii?q?XnHA5y6iry091nRG2ctxrnSpX63KS9d+R8dw9nA0GquJkyIZ13joZl3MJY4n?=
- =?us-ascii?q?MdnJjAuCNcwGo=3D?=
-X-IPAS-Result: =?us-ascii?q?A2A6CgD3Qmld/wHyM5BmHgEGBwaBZ4FuKoFAMiqEIY8LT?=
- =?us-ascii?q?gEBAQEBBoE2iW+RJgkBAQEBAQEBAQE0AQIBAYQ/AoJgIzgTAgsBAQEEAQEBA?=
- =?us-ascii?q?QEGAwEBbIU6gjopAYJmAQEBAQIBIwQRQRALDgYEAgImAgJXBg0GAgEBgl8/g?=
- =?us-ascii?q?XcFD60lfzOFSoM2gUmBDCiLeBh4gQeBESeCaz6HT4JYBJVCiA2OQIIpgieJU?=
- =?us-ascii?q?YhZBhuYYi2oGCGBWCsIAhgIIQ+DJ4JOF44+IwMwgQYBAY4rAQE?=
-Received: from tarius.tycho.ncsc.mil ([144.51.242.1])
-  by emsm-gh1-uea11.NCSC.MIL with ESMTP; 30 Aug 2019 15:41:18 +0000
-Received: from moss-pluto.infosec.tycho.ncsc.mil (moss-pluto [192.168.25.131])
-        by tarius.tycho.ncsc.mil (8.14.4/8.14.4) with ESMTP id x7UFfGwf014909;
-        Fri, 30 Aug 2019 11:41:16 -0400
-Subject: Re: [PATCH 10/11] selinux: Implement the watch_key security hook [ver
- #7]
-To:     David Howells <dhowells@redhat.com>
-Cc:     viro@zeniv.linux.org.uk, Casey Schaufler <casey@schaufler-ca.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        nicolas.dichtel@6wind.com, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <21eb33e8-5624-0124-8690-bbea41a1b589@tycho.nsa.gov>
- <156717343223.2204.15875738850129174524.stgit@warthog.procyon.org.uk>
- <156717352079.2204.16378075382991665807.stgit@warthog.procyon.org.uk>
- <13308.1567176090@warthog.procyon.org.uk>
-From:   Stephen Smalley <sds@tycho.nsa.gov>
-Message-ID: <87de7cc1-435e-1b56-afec-bc041c193317@tycho.nsa.gov>
-Date:   Fri, 30 Aug 2019 11:41:16 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=EWG1xprHq5soDnqsOoV5sXd5YRcA3js3J4A3/q6CGlU=;
+        b=Wgqj8hYGo0A/I1gghmpb6uViT1RJgL5Ci/oQGuwImhV3JUnrMed5W6Api9CJ4JKZmb
+         jY/ufazdF5ggWnW70uWNMlWT1cKToe11F9WFbdSXajVHeyCRRXDzkotHY3xf9VDEyA7A
+         JQD4yjvtNO20WNyKTLvfU88pTkfrk+FZ+BIdC9xtrc/qTUdY1cOmUC5IhhdbwCJTm9eD
+         I/znZT9RBs31QbkRncZVHi5g8UE2o2JQDMWWxc1jXx3BISZ4D3lq4/F14jhTzfMfOpih
+         8isdIRt9jNllkKjnRdMIH7l4sV1Gojj5gdUHbt0KActpBD/L3fu/QUTTMOuteCilHqth
+         G4sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=EWG1xprHq5soDnqsOoV5sXd5YRcA3js3J4A3/q6CGlU=;
+        b=Yz+XfjDcGp+BsuDUxQQOFhUYRz+8+sfctyuk7or5hB1KR5DAwoGRWtMZa1+8naKzBa
+         j7uA8Bdw3evI5uvyLP1YddIAtO9THfhKTARSQco8GTOB3VuP5130LjTkQOFCeYC6SmUR
+         GJ6OCOZeazi046lq2/5n8FX8gR2UCDOfMt8VxTinAdeBki3acwFUAcGt2U0+qbC2QSgp
+         lNXZmga8BJo8qmkR+nywe2EwRP9SwlWZFAoISKULUEgKniDuJDMtbsvkc7bGH3dEUeBA
+         knB7+8IBtGistFEaM0EIvfQejQk8uHNYRSVRR+c9notF/B8P7HVjh+kRFSO9CIbYZMdZ
+         kKsQ==
+X-Gm-Message-State: APjAAAWhTAA1O8LYLs2Xd5YPBxgkLUuHX8cZiyFSUfDAbOTZNP1mXCwZ
+        A+LHax2PCuLIUPi621o9iOM=
+X-Google-Smtp-Source: APXvYqyFRZU9QBAkzb28H9Q+R/5xB+7uaYqUf2sCiz0G9RGsOQcoyI03rNeLOsDzNUFbov3MavZYTQ==
+X-Received: by 2002:ac8:363c:: with SMTP id m57mr9461040qtb.240.1567180163904;
+        Fri, 30 Aug 2019 08:49:23 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::d0dd])
+        by smtp.gmail.com with ESMTPSA id y67sm2965672qkd.40.2019.08.30.08.49.23
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 30 Aug 2019 08:49:23 -0700 (PDT)
+Date:   Fri, 30 Aug 2019 08:49:21 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH block/for-next] writeback: add tracepoints for cgroup
+ foreign writebacks
+Message-ID: <20190830154921.GZ2263813@devbig004.ftw2.facebook.com>
+References: <20190829224701.GX2263813@devbig004.ftw2.facebook.com>
+ <20190830154023.GC25069@quack2.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <13308.1567176090@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190830154023.GC25069@quack2.suse.cz>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/30/19 10:41 AM, David Howells wrote:
-> How about the attached instead, then?
+Hello, Jan.
 
-Works for me.
-
+On Fri, Aug 30, 2019 at 05:40:23PM +0200, Jan Kara wrote:
+> > +	TP_fast_assign(
+> > +		strncpy(__entry->name,	dev_name(wb->bdi->dev), 32);
+> > +		__entry->bdi_id		= wb->bdi->id;
+> > +		__entry->ino		= page->mapping->host->i_ino;
+> > +		__entry->memcg_id	= wb->memcg_css->id;
+> > +		__entry->cgroup_ino	= __trace_wb_assign_cgroup(wb);
+> > +		__entry->page_cgroup_ino = page->mem_cgroup->css.cgroup->kn->id.ino;
+> > +	),
 > 
-> David
-> ---
-> commit 00444a695b35c602230ac2cabb4f1d7e94e3966d
-> Author: David Howells <dhowells@redhat.com>
-> Date:   Thu Aug 29 17:01:34 2019 +0100
-> 
->      selinux: Implement the watch_key security hook
->      
->      Implement the watch_key security hook to make sure that a key grants the
->      caller View permission in order to set a watch on a key.
->      
->      For the moment, the watch_devices security hook is left unimplemented as
->      it's not obvious what the object should be since the queue is global and
->      didn't previously exist.
->      
->      Signed-off-by: David Howells <dhowells@redhat.com>
+> Are the page dereferences above safe? I suppose lock_page_memcg() protects
+> the page->mem_cgroup->css.cgroup->kn->id dereference? But page->mapping
+> does not seem to be protected by page lock?
 
-Acked-by: Stephen Smalley <sds@tycho.nsa.gov>
+Hah, I assumed it would work because there are preceding if
+(page_mapping()) tests in the dirty paths -
+e.g. __set_page_dirty_nobuffers().  Oh, regardless of that assumption,
+I should have used page_mapping().
 
-> 
-> diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-> index 74dd46de01b6..88df06969bed 100644
-> --- a/security/selinux/hooks.c
-> +++ b/security/selinux/hooks.c
-> @@ -6533,6 +6533,17 @@ static int selinux_key_getsecurity(struct key *key, char **_buffer)
->   	*_buffer = context;
->   	return rc;
->   }
-> +
-> +#ifdef CONFIG_KEY_NOTIFICATIONS
-> +static int selinux_watch_key(struct key *key)
-> +{
-> +	struct key_security_struct *ksec = key->security;
-> +	u32 sid = current_sid();
-> +
-> +	return avc_has_perm(&selinux_state,
-> +			    sid, ksec->sid, SECCLASS_KEY, KEY_NEED_VIEW, NULL);
-> +}
-> +#endif
->   #endif
->   
->   #ifdef CONFIG_SECURITY_INFINIBAND
-> @@ -6965,6 +6976,9 @@ static struct security_hook_list selinux_hooks[] __lsm_ro_after_init = {
->   	LSM_HOOK_INIT(key_free, selinux_key_free),
->   	LSM_HOOK_INIT(key_permission, selinux_key_permission),
->   	LSM_HOOK_INIT(key_getsecurity, selinux_key_getsecurity),
-> +#ifdef CONFIG_KEY_NOTIFICATIONS
-> +	LSM_HOOK_INIT(watch_key, selinux_watch_key),
-> +#endif
->   #endif
->   
->   #ifdef CONFIG_AUDIT
-> 
+Thanks.
 
+-- 
+tejun
