@@ -2,147 +2,85 @@ Return-Path: <SRS0=imVF=W2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD46C3A59B
-	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 17:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B41C3A5A6
+	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 17:41:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 689562342F
-	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 17:09:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567184948;
-	bh=gMd5xlYG8lJ3Gus8qIlNByXHRVxU/bMgXRnvywdLzM0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=RZmy8NOcuTrSXYrx0GSCOEyoaFS70a06Wjbzkr1OhklnIlrEpRMhqpdBp2mCGdzca
-	 ocv131AaeuIfrIRI6CNT/Hj0wYS/IzdeUP3UFTgWc1Hi1QUKm4u1tRuahcTEzVCTRI
-	 5F47gCIhfv1IcTEv+gwRx+U+uTyeGvRlNFF0wjYs=
+	by mail.kernel.org (Postfix) with ESMTP id 5031523428
+	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 17:41:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="jOwxuN0/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727304AbfH3RJH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Aug 2019 13:09:07 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:33670 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727434AbfH3RJH (ORCPT
+        id S1727940AbfH3Rlr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Aug 2019 13:41:47 -0400
+Received: from a9-46.smtp-out.amazonses.com ([54.240.9.46]:43362 "EHLO
+        a9-46.smtp-out.amazonses.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727914AbfH3Rlr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Aug 2019 13:09:07 -0400
-Received: by mail-qt1-f196.google.com with SMTP id r5so3106293qtd.0;
-        Fri, 30 Aug 2019 10:09:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=zag/cCurJuI8nINltP1hM69M5M7TCZ8LCVJ1Mr2Rw9E=;
-        b=RNe+Qb5zoZXx6K4SAJ2I3Zg7N1BzEmvVWiTNb0YF2zfqjTcYHkhY9qX1bi4d8i1FGk
-         r5oLZLXJoqeIx4V+/2k8Uv0HumpF+RyOTfj0Obk43jaimI4UPKRoRV6sd0+isOli0V6o
-         X/madbTdHMGYh6q4hdTGhhNmB7eXSHU51hbAXjzsLDtOemDAqfHt0oziuvXhYvxstwjB
-         XZmdVp1cjPl3cE06OpN8T/DhyL6ZzMy/O6kX3eiJBeAjDnjWeLGrOTe4i3Pa/GZJ3ehq
-         X4lvG6Sn8TJrrFHAFfCPHo5waWEh9mJYemvG+wBOheerm120wHxeVbQYCwcpl2ctQLcl
-         XFOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=zag/cCurJuI8nINltP1hM69M5M7TCZ8LCVJ1Mr2Rw9E=;
-        b=R3c7vYX+xMsRuU5gHFsDCFpVQhxIFYEflBWv32WGAf/oV+zRCYPXpehT6+H/DcWjzm
-         yFtQahp+n9GilQsEygo/zRQlG58ithiiKpBnhwX6w5xc5uD27IZn57pGaVT0JZEN3ASg
-         dwMmKFiISeBPa3FIxvaea8HpInfsOol7B09CAc/rRpZ4NymwcEwmNj0YQYTS8lNxAX3J
-         C7s7JcgVocy9dEUWUa7Q7G0Yfe8X3f9+y/Cxp/t1zsjFKpJkWlaPPAvbCfPjn1XhzQcg
-         NQNITuaMxttKg2fponWnFMkNO6bo8ttUu2IaAAQA0Qg20RRax7C1A74NHewwr+ckFMZp
-         sIDQ==
-X-Gm-Message-State: APjAAAW2WFYWZtcQTbe73JEaFgHBLKFeVpeKOfCA/Za4gLkq2LGZIQ2y
-        Dt18+3NQrOGKU2n/AHzFneM=
-X-Google-Smtp-Source: APXvYqwchRBbgZEE4wNHzNdKzi1iP+TxhWNP/ayEstj1LZU/qPNuW9VAzfDU9gQJLA47VKDIagx+Lg==
-X-Received: by 2002:a0c:a0e6:: with SMTP id c93mr6195303qva.109.1567184946122;
-        Fri, 30 Aug 2019 10:09:06 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::677e])
-        by smtp.gmail.com with ESMTPSA id c14sm1789122qta.80.2019.08.30.10.09.05
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Aug 2019 10:09:05 -0700 (PDT)
-Date:   Fri, 30 Aug 2019 10:09:03 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH block/for-next] writeback: add tracepoints for cgroup
- foreign writebacks
-Message-ID: <20190830170903.GB2263813@devbig004.ftw2.facebook.com>
-References: <20190829224701.GX2263813@devbig004.ftw2.facebook.com>
- <20190830154023.GC25069@quack2.suse.cz>
- <20190830154921.GZ2263813@devbig004.ftw2.facebook.com>
- <20190830164211.GD25069@quack2.suse.cz>
+        Fri, 30 Aug 2019 13:41:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+        s=6gbrjpgwjskckoa6a5zn6fwqkn67xbtw; d=amazonses.com; t=1567186906;
+        h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:MIME-Version:Content-Type:Feedback-ID;
+        bh=O4l8bfyB+VvL+95TNWx4FpZqRMWRe8LWpmXp151rZPQ=;
+        b=jOwxuN0/GsY64oKXgfJmdwBB+AXtX2WpGHqJuhQjx2ptbH8DVIIqkqyXxRD8yOn8
+        GV8ejswyFu4wYPPvC5trc2TJ+u/8YK8DHJOysSHUEOvy5EY/yEQJyv85OgQB3tVrNRO
+        oEjKdNcHWMyjIds//broy3iaTxgNIeqHLNuDl3dY=
+Date:   Fri, 30 Aug 2019 17:41:46 +0000
+From:   Christopher Lameter <cl@linux.com>
+X-X-Sender: cl@nuc-kabylake
+To:     Michal Hocko <mhocko@kernel.org>
+cc:     Matthew Wilcox <willy@infradead.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dave Chinner <david@fromorbit.com>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
+ kmalloc(power-of-two)
+In-Reply-To: <20190829073921.GA21880@dhcp22.suse.cz>
+Message-ID: <0100016ce39e6bb9-ad20e033-f3f4-4e6d-85d6-87e7d07823ae-000000@email.amazonses.com>
+References: <20190826111627.7505-1-vbabka@suse.cz> <20190826111627.7505-3-vbabka@suse.cz> <0100016cd98bb2c1-a2af7539-706f-47ba-a68e-5f6a91f2f495-000000@email.amazonses.com> <20190828194607.GB6590@bombadil.infradead.org>
+ <20190829073921.GA21880@dhcp22.suse.cz>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190830164211.GD25069@quack2.suse.cz>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain; charset=US-ASCII
+X-SES-Outgoing: 2019.08.30-54.240.9.46
+Feedback-ID: 1.us-east-1.fQZZZ0Xtj2+TD7V5apTT/NrT6QKuPgzCT/IC7XYgDKI=:AmazonSES
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Jan.
+On Thu, 29 Aug 2019, Michal Hocko wrote:
 
-On Fri, Aug 30, 2019 at 06:42:11PM +0200, Jan Kara wrote:
-> Well, but if you look at __set_page_dirty_nobuffers() it is careful. It
-> does:
-> 
-> struct address_space *mapping = page_mapping(page);
-> 
-> if (!mapping) {
-> 	bail
-> }
-> ... use mapping
-> 
-> Exactly because page->mapping can become NULL under your hands if you don't
-> hold page lock. So I think you either need something similar in your
-> tracepoint or handle this in the caller.
+> > There are many places in the kernel which assume alignment.  They break
+> > when it's not supplied.  I believe we have a better overall system if
+> > the MM developers provide stronger guarantees than the MM consumers have
+> > to work around only weak guarantees.
+>
+> I absolutely agree. A hypothetical benefit of a new implementation
+> doesn't outweigh the complexity the existing code has to jump over or
+> worse is not aware of and it is broken silently. My general experience
+> is that the later is more likely with a large variety of drivers we have
+> in the tree and odd things they do in general.
 
-So, account_page_dirtied() is called from two places.
 
-__set_page_dirty() and __set_page_dirty_nobuffers().  The following is
-from the latter.
+The current behavior without special alignment for these caches has been
+in the wild for over a decade. And this is now coming up?
 
-	lock_page_memcg(page);
-	if (!TestSetPageDirty(page)) {
-		struct address_space *mapping = page_mapping(page);
-		...
+There is one case now it seems with a broken hardware that has issues and
+we now move to an alignment requirement from the slabs with exceptions and
+this and that?
 
-		if (!mapping) {
-			unlock_page_memcg(page);
-			return 1;
-		}
-
-		xa_lock_irqsave(&mapping->i_pages, flags);
-		BUG_ON(page_mapping(page) != mapping);
-		WARN_ON_ONCE(!PagePrivate(page) && !PageUptodate(page));
-		account_page_dirtied(page, mapping);
-		...
-
-If I'm reading it right, it's saying that at this point if mapping
-exists after setting page dirty, it must not change while locking
-i_pages.
-
-__set_page_dirty_nobuffers() is more brief but seems to be making the
-same assumption.
-
-	xa_lock_irqsave(&mapping->i_pages, flags);
-	if (page->mapping) {	/* Race with truncate? */
-		WARN_ON_ONCE(warn && !PageUptodate(page));
-		account_page_dirtied(page, mapping);
-		__xa_set_mark(&mapping->i_pages, page_index(page),
-				PAGECACHE_TAG_DIRTY);
-	}
-	xa_unlock_irqrestore(&mapping->i_pages, flags);
-
-Both are clearly assuming that once i_pages is locked, mapping can't
-change.  So, inside account_page_dirtied(), mapping clearly can't
-change.  The TP in question - track_foreign_dirty - is invoked from
-mem_cgroup_track_foreign_dirty() which is only called from
-account_page_dirty(), so I'm failing to see how mapping would change
-there.
-
-Thanks.
-
--- 
-tejun
+If there is an exceptional alignment requirement then that needs to be
+communicated to the allocator. A special flag or create a special
+kmem_cache or something.
