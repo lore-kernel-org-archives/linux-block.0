@@ -2,85 +2,158 @@ Return-Path: <SRS0=imVF=W2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B41C3A5A6
-	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 17:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B6CC3A5A6
+	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 19:01:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5031523428
-	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 17:41:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E2D523429
+	for <linux-block@archiver.kernel.org>; Fri, 30 Aug 2019 19:01:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="jOwxuN0/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ysna8C+J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727940AbfH3Rlr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Aug 2019 13:41:47 -0400
-Received: from a9-46.smtp-out.amazonses.com ([54.240.9.46]:43362 "EHLO
-        a9-46.smtp-out.amazonses.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727914AbfH3Rlr (ORCPT
+        id S1728031AbfH3TB0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Aug 2019 15:01:26 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:43890 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727304AbfH3TB0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Aug 2019 13:41:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=6gbrjpgwjskckoa6a5zn6fwqkn67xbtw; d=amazonses.com; t=1567186906;
-        h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:MIME-Version:Content-Type:Feedback-ID;
-        bh=O4l8bfyB+VvL+95TNWx4FpZqRMWRe8LWpmXp151rZPQ=;
-        b=jOwxuN0/GsY64oKXgfJmdwBB+AXtX2WpGHqJuhQjx2ptbH8DVIIqkqyXxRD8yOn8
-        GV8ejswyFu4wYPPvC5trc2TJ+u/8YK8DHJOysSHUEOvy5EY/yEQJyv85OgQB3tVrNRO
-        oEjKdNcHWMyjIds//broy3iaTxgNIeqHLNuDl3dY=
-Date:   Fri, 30 Aug 2019 17:41:46 +0000
-From:   Christopher Lameter <cl@linux.com>
-X-X-Sender: cl@nuc-kabylake
-To:     Michal Hocko <mhocko@kernel.org>
-cc:     Matthew Wilcox <willy@infradead.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
- kmalloc(power-of-two)
-In-Reply-To: <20190829073921.GA21880@dhcp22.suse.cz>
-Message-ID: <0100016ce39e6bb9-ad20e033-f3f4-4e6d-85d6-87e7d07823ae-000000@email.amazonses.com>
-References: <20190826111627.7505-1-vbabka@suse.cz> <20190826111627.7505-3-vbabka@suse.cz> <0100016cd98bb2c1-a2af7539-706f-47ba-a68e-5f6a91f2f495-000000@email.amazonses.com> <20190828194607.GB6590@bombadil.infradead.org>
- <20190829073921.GA21880@dhcp22.suse.cz>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-SES-Outgoing: 2019.08.30-54.240.9.46
-Feedback-ID: 1.us-east-1.fQZZZ0Xtj2+TD7V5apTT/NrT6QKuPgzCT/IC7XYgDKI=:AmazonSES
+        Fri, 30 Aug 2019 15:01:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Message-Id:Date:Subject:Cc:To:From:
+        Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=jLKj9srI163SIZUhloLUDG7FNhI8KgJujJBygc6monI=; b=Ysna8C+JFecxIP9dmIAc9SzhW
+        t4pkvHWpYCcWbUUFCtc4roHjV9BDoDv868vWyH3ZedwotfVMROiELstDsL7dXeNaMi7kQld35+ptu
+        Cz2xZ3PkM53HhYHvgnAx+NfR3NImUKQIxwu/1p0wmQMqObTWB+lGcERPntl0UGTkZGGOui1y0XwUG
+        dkBJaAOkvVUXEMJPIviJC0d2mvhhF5cVHD5wa0GsfHia8lgQLq7qUAYOn0AurLVQcZ0a5q+Dt1tOE
+        emJ7TpA3IuFlsTsc8adfMZrDksARWl131Ev8Gev2qrucmc/Q2mh93prjTWp7QgIot4lqAP4+/teqr
+        t/aOCfpxw==;
+Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1i3m9F-0004Ja-Tl; Fri, 30 Aug 2019 19:01:25 +0000
+From:   Sagi Grimberg <sagi@grimberg.me>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>
+Subject: [GIT PULL] nvme updates for 5.4
+Date:   Fri, 30 Aug 2019 12:01:24 -0700
+Message-Id: <20190830190124.11961-1-sagi@grimberg.me>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 29 Aug 2019, Michal Hocko wrote:
+Hey Jens,
 
-> > There are many places in the kernel which assume alignment.  They break
-> > when it's not supplied.  I believe we have a better overall system if
-> > the MM developers provide stronger guarantees than the MM consumers have
-> > to work around only weak guarantees.
->
-> I absolutely agree. A hypothetical benefit of a new implementation
-> doesn't outweigh the complexity the existing code has to jump over or
-> worse is not aware of and it is broken silently. My general experience
-> is that the later is more likely with a large variety of drivers we have
-> in the tree and odd things they do in general.
+First pull request for 5.4. Note that we do have some more patchsets
+in the pipe, but we'll have them settle first in the nvme tree.
 
+Also, note that there will be a merge conflict with 5.3-rc fixes on
+the nvme quirk enumeration from the Apple work-around patches from Ben
+and the LiteON quirk cb32de1b7e25 ("nvme: Add quirk for LiteON CL1 devices
+running FW 22301111"). The fix pretty trivial, as the quirks enums simply
+need to increment.
 
-The current behavior without special alignment for these caches has been
-in the wild for over a decade. And this is now coming up?
+I have the fixed series in a branch:
 
-There is one case now it seems with a broken hardware that has issues and
-we now move to an alignment requirement from the slabs with exceptions and
-this and that?
+  git://git.infradead.org/nvme.git nvme-resolve-5.4-conflict
 
-If there is an exceptional alignment requirement then that needs to be
-communicated to the allocator. A special flag or create a special
-kmem_cache or something.
+The nvme updates include:
+- ana log parse fix from Anton
+- nvme quirks support for Apple devices from Ben
+- fix missing bio completion tracing for multipath stack devices from Hannes and
+  Mikhail
+- IP TOS settings for nvme rdma and tcp transports from Israel
+- rq_dma_dir cleanups from Israel
+- tracing for Get LBA Status command from Minwoo
+- Some nvme-tcp cleanups from Minwoo, Potnuri and Myself
+- Some consolidation between the fabrics transports for handling the CAP
+  register
+- reset race with ns scanning fix for fabrics (move fabrics commands to
+  a dedicated request queue with a different lifetime from the admin
+  request queue).
+
+The following changes since commit 3532e7227243beb0b782266dc05c40b6184ad051:
+
+  blkcg: fix missing free on error path of blk_iocost_init() (2019-08-29 09:59:14 -0600)
+
+are available in the Git repository at:
+
+  git://git.infradead.org/nvme.git nvme-5.4 
+
+for you to fetch changes up to bc31c1eea99de9a8e65b011483716236af52f7ed:
+
+  nvme-rdma: Use rq_dma_dir macro (2019-08-29 12:55:03 -0700)
+
+----------------------------------------------------------------
+Anton Eidelman (1):
+      nvme-multipath: fix ana log nsid lookup when nsid is not found
+
+Benjamin Herrenschmidt (4):
+      nvme-pci: Pass the queue to SQ_SIZE/CQ_SIZE macros
+      nvme-pci: Add support for variable IO SQ element size
+      nvme-pci: Add support for Apple 2018+ models
+      nvme-pci: Support shared tags across queues for Apple 2018 controllers
+
+Hannes Reinecke (1):
+      nvme: trace bio completion
+
+Israel Rukshin (8):
+      nvme-fabrics: Add type of service (TOS) configuration
+      nvme-rdma: Add TOS for rdma transport
+      nvme-tcp: Use struct nvme_ctrl directly
+      nvme-tcp: Add TOS for tcp transport
+      nvmet-tcp: Add TOS for tcp transport
+      nvme-pci: Tidy up nvme_unmap_data
+      nvme-fc: Use rq_dma_dir macro
+      nvme-rdma: Use rq_dma_dir macro
+
+Minwoo Im (5):
+      nvme: tcp: selects CRYPTO_CRC32C for nvme-tcp
+      nvme: add Get LBA Status command opcode
+      nvme: trace: support for Get LBA Status opcode parsed
+      nvme: trace: parse Get LBA Status command in detail
+      nvmet: trace: parse Get LBA Status command in detail
+
+Potnuri Bharat Teja (1):
+      nvme-tcp: Use protocol specific operations while reading socket
+
+Sagi Grimberg (9):
+      nvme-tcp: cleanup nvme_tcp_recv_pdu
+      nvme: have nvme_init_identify set ctrl->cap
+      nvme-pci: set ctrl sqsize to the device q_depth
+      nvme: move sqsize setting to the core
+      nvme: don't pass cap to nvme_disable_ctrl
+      nvme-tcp: support simple polling
+      nvmet-tcp: fix possible NULL deref
+      nvmet-tcp: fix possible memory leak
+      nvme: make fabrics command run on a separate request queue
+
+Tom Wu (1):
+      nvmet: fix data units read and written counters in SMART log
+
+ drivers/nvme/host/Kconfig       |   1 +
+ drivers/nvme/host/core.c        |  37 +++++------
+ drivers/nvme/host/fabrics.c     |  26 ++++++--
+ drivers/nvme/host/fabrics.h     |   3 +
+ drivers/nvme/host/fc.c          |  34 +++++------
+ drivers/nvme/host/multipath.c   |   8 ++-
+ drivers/nvme/host/nvme.h        |  36 ++++++++++-
+ drivers/nvme/host/pci.c         |  99 +++++++++++++++++++++++-------
+ drivers/nvme/host/rdma.c        |  53 ++++++++--------
+ drivers/nvme/host/tcp.c         | 132 ++++++++++++++++++++++++++++------------
+ drivers/nvme/host/trace.c       |  18 ++++++
+ drivers/nvme/target/admin-cmd.c |  14 +++--
+ drivers/nvme/target/loop.c      |  28 ++++-----
+ drivers/nvme/target/tcp.c       |  24 ++++++--
+ drivers/nvme/target/trace.c     |  18 ++++++
+ include/linux/nvme.h            |   5 +-
+ 16 files changed, 379 insertions(+), 157 deletions(-)
