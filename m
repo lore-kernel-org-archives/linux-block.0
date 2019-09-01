@@ -1,115 +1,105 @@
-Return-Path: <SRS0=aEwy=W3=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=xSfi=W4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC913C3A59F
-	for <linux-block@archiver.kernel.org>; Sat, 31 Aug 2019 11:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C442FC3A5A6
+	for <linux-block@archiver.kernel.org>; Sun,  1 Sep 2019 00:52:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 84F1922CE9
-	for <linux-block@archiver.kernel.org>; Sat, 31 Aug 2019 11:20:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567250419;
-	bh=hXei5bZ7WBN0X4Ji/gcuTN/I8JDxgNxSrJTH1V+inng=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=bR5iIN2FkPkOr7s1kcHfKqzsEksRULRT/OEAZ/DCzLBX9WZSNGeevkTmv1tnCht7B
-	 R9V4mCnbgbSMVEitmrZe0qRuvRCABsFi4xlaoPwTMv0KSBrbR3A8740YSeolmtah3k
-	 HT/zNI22VDvVrhTn8/YStXhUMRgDZBJ8SlCO4ngQ=
+	by mail.kernel.org (Postfix) with ESMTP id 8BA762186A
+	for <linux-block@archiver.kernel.org>; Sun,  1 Sep 2019 00:52:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eBz5M1QV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726740AbfHaLUQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 31 Aug 2019 07:20:16 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:34201 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726062AbfHaLUQ (ORCPT
+        id S1728514AbfIAAwM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 31 Aug 2019 20:52:12 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:56238 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726150AbfIAAwL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 31 Aug 2019 07:20:16 -0400
-Received: by mail-qt1-f193.google.com with SMTP id a13so10597425qtj.1;
-        Sat, 31 Aug 2019 04:20:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=LvmGRX4LOdsdUyhqS2DocPUCGusSGnHnPDwLS+tUYBw=;
-        b=PK/UUpMIz6vGKESR/qWrB73mE5YrMA3srDYvsuYkZrvinUDXGVxGQ5MG3gdvcVS07j
-         ZfANEcE/6el1beaQ4LSh3G1MTb05PufyP/OU6Q0VQOb2cDAcrIxDzvSZv+FYVzrntCvQ
-         tTWEaEuJyTtf8N2g7gXdNHT7+q8SLvbxI/heNodCYdg+heOHOoAdjPP4Vsu3obkzZWSe
-         H5W7JInfDelMo6SSnpOS6d0F9x0aIdjeq9YYKXaxhbj3w9W8nmYuGb4t7T/SW7pQKzB/
-         097wawu8tSWVKZF9uRH0rbsWAQ5AUeikdovBIDTVghW4ccY/51t6WwfqP70a9c4bACZh
-         jL9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=LvmGRX4LOdsdUyhqS2DocPUCGusSGnHnPDwLS+tUYBw=;
-        b=XqbXTdgCk0QLUjU09c18Ppvk5AVQOuGwEWyovFBFhLiSBv+AZP5Lb8vgvqRpOUPYsS
-         I19cLFyA4qaSYnEWy+XeI/nhdcroYwEgg82J+4vo7lT1eY1iDlJpidarz+Ic3WYhsPun
-         wtc5/82vpJjK/LTiX+E08PNY1U8Uu+2lOgy8baWMqJTolSW33HJOysjsLu2nzduVo5IH
-         FfuIKtVyodwKhd0CxQ57EMb5eXWbKodUlRom782fpYpwaXJirlUcjEHL2ZeQlzxnKv4A
-         dxI9JOdFMp7jhNTxvvDmNgnd4Qp9Jnv9Rvdmz0zTAhVZCU0oSROaZKqgxLCyO+1BZ6Aw
-         0hYQ==
-X-Gm-Message-State: APjAAAV8VuD4LHHuMkoeOCWHz8x2+BOXt5UJFCZrGbNXj+PPKWP5wIuX
-        UnJsNMNjGDpVdZdn7dW8/4w=
-X-Google-Smtp-Source: APXvYqxlmdRha80klC3NPhknthgVd3QVg1cGBUKDxmEcoq0Bjs+/s8SS3U82mQXt9So7bUSlMmHy0A==
-X-Received: by 2002:ad4:4a92:: with SMTP id h18mr13034019qvx.235.1567250414665;
-        Sat, 31 Aug 2019 04:20:14 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::3986])
-        by smtp.gmail.com with ESMTPSA id t15sm1442361qti.12.2019.08.31.04.20.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 31 Aug 2019 04:20:13 -0700 (PDT)
-Date:   Sat, 31 Aug 2019 04:20:10 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, newella@fb.com, clm@fb.com,
-        Josef Bacik <josef@toxicpanda.com>, dennisz@fb.com,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>, kernel-team@fb.com,
-        cgroups@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-        kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
-        bpf@vger.kernel.org
-Subject: Re: [PATCHSET block/for-next] IO cost model based work-conserving
- porportional controller
-Message-ID: <20190831112010.GG2263813@devbig004.ftw2.facebook.com>
-References: <20190614015620.1587672-1-tj@kernel.org>
- <20190614175642.GA657710@devbig004.ftw2.facebook.com>
- <5A63F937-F7B5-4D09-9DB4-C73D6F571D50@linaro.org>
- <B5E431F7-549D-4FC4-A098-D074DF9586A1@linaro.org>
- <20190820151903.GH2263813@devbig004.ftw2.facebook.com>
- <9EB760CE-0028-4766-AE9D-6E90028D8579@linaro.org>
- <20190831065358.GF2263813@devbig004.ftw2.facebook.com>
- <73CA9E04-DD93-47E4-B0FE-0A12EC991DEF@linaro.org>
+        Sat, 31 Aug 2019 20:52:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=jXXM66EKtvmEAYvb1Llji9/A136eINaxlL5uqBe0OBY=; b=eBz5M1QVpKJZMQDzXUQ9MXhMT
+        rIK2EkzUbSraojFclMxJ7OU+sf7tbq9mwzo0REl3yaDUt2YpbGdUBXr1PBULu2aic9sZuNzSPwoCp
+        owngjkSk9HrwVrtscNCYj+aZ/17/cGG88hXmrwj3PKy0BJCvg4ElKAVolJU/MnnAZSwlpMqAmc62e
+        AMUhgpKdATQQ056Kf77qv58BUxrXE6ktixwa0beiRV9gpk+ZAtbCCa1VAH88gCyyf5jTc6PxLSazv
+        wV7o8Fq43JPBfe5nZRIUcQcvYRvRzMraHjUnFk9kNgyg6rLAwcalK0UgYckSGwX3KhjlxftyTplES
+        EIwb3V+yg==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
+        id 1i4E69-0007JD-OE; Sun, 01 Sep 2019 00:52:05 +0000
+Date:   Sat, 31 Aug 2019 17:52:05 -0700
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christopher Lameter <cl@linux.com>
+Cc:     Michal Hocko <mhocko@kernel.org>, Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dave Chinner <david@fromorbit.com>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
+ kmalloc(power-of-two)
+Message-ID: <20190901005205.GA2431@bombadil.infradead.org>
+References: <20190826111627.7505-1-vbabka@suse.cz>
+ <20190826111627.7505-3-vbabka@suse.cz>
+ <0100016cd98bb2c1-a2af7539-706f-47ba-a68e-5f6a91f2f495-000000@email.amazonses.com>
+ <20190828194607.GB6590@bombadil.infradead.org>
+ <20190829073921.GA21880@dhcp22.suse.cz>
+ <0100016ce39e6bb9-ad20e033-f3f4-4e6d-85d6-87e7d07823ae-000000@email.amazonses.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <73CA9E04-DD93-47E4-B0FE-0A12EC991DEF@linaro.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <0100016ce39e6bb9-ad20e033-f3f4-4e6d-85d6-87e7d07823ae-000000@email.amazonses.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Sat, Aug 31, 2019 at 09:10:26AM +0200, Paolo Valente wrote:
-> Hi Tejun,
-> thank you very much for this extra information, I'll try the
-> configuration you suggest.  In this respect, is this still the branch
-> to use
+On Fri, Aug 30, 2019 at 05:41:46PM +0000, Christopher Lameter wrote:
+> On Thu, 29 Aug 2019, Michal Hocko wrote:
+> > > There are many places in the kernel which assume alignment.  They break
+> > > when it's not supplied.  I believe we have a better overall system if
+> > > the MM developers provide stronger guarantees than the MM consumers have
+> > > to work around only weak guarantees.
+> >
+> > I absolutely agree. A hypothetical benefit of a new implementation
+> > doesn't outweigh the complexity the existing code has to jump over or
+> > worse is not aware of and it is broken silently. My general experience
+> > is that the later is more likely with a large variety of drivers we have
+> > in the tree and odd things they do in general.
 > 
-> https://kernel.googlesource.com/pub/scm/linux/kernel/git/tj/cgroup/+/refs/heads/review-iocost-v2
-> 
-> also after the issue spotted two days ago [1]?
+> The current behavior without special alignment for these caches has been
+> in the wild for over a decade. And this is now coming up?
 
-block/for-next is the branch which has all the updates.
+In the wild ... and rarely enabled.  When it is enabled, it may or may
+not be noticed as data corruption, or tripping other debugging asserts.
+Users then turn off the rare debugging option.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+> There is one case now it seems with a broken hardware that has issues and
+> we now move to an alignment requirement from the slabs with exceptions and
+> this and that?
 
-Thanks.
+Perhaps you could try reading what hasa been written instead of sticking
+to a strawman of your own invention?
 
--- 
-tejun
+> If there is an exceptional alignment requirement then that needs to be
+> communicated to the allocator. A special flag or create a special
+> kmem_cache or something.
+
+The only way I'd agree to that is if we deliberately misalign every
+allocation that doesn't have this special flag set.  Because right now,
+breakage happens everywhere when these debug options are enabled, and
+the very people who need to be helped are being hurt by the debugging.
