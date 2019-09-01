@@ -2,104 +2,105 @@ Return-Path: <SRS0=xSfi=W4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C442FC3A5A6
-	for <linux-block@archiver.kernel.org>; Sun,  1 Sep 2019 00:52:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9AC5C3A5A7
+	for <linux-block@archiver.kernel.org>; Sun,  1 Sep 2019 23:28:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8BA762186A
-	for <linux-block@archiver.kernel.org>; Sun,  1 Sep 2019 00:52:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFD4621874
+	for <linux-block@archiver.kernel.org>; Sun,  1 Sep 2019 23:28:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eBz5M1QV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqg/I6iS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728514AbfIAAwM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 31 Aug 2019 20:52:12 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:56238 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726150AbfIAAwL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 31 Aug 2019 20:52:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=jXXM66EKtvmEAYvb1Llji9/A136eINaxlL5uqBe0OBY=; b=eBz5M1QVpKJZMQDzXUQ9MXhMT
-        rIK2EkzUbSraojFclMxJ7OU+sf7tbq9mwzo0REl3yaDUt2YpbGdUBXr1PBULu2aic9sZuNzSPwoCp
-        owngjkSk9HrwVrtscNCYj+aZ/17/cGG88hXmrwj3PKy0BJCvg4ElKAVolJU/MnnAZSwlpMqAmc62e
-        AMUhgpKdATQQ056Kf77qv58BUxrXE6ktixwa0beiRV9gpk+ZAtbCCa1VAH88gCyyf5jTc6PxLSazv
-        wV7o8Fq43JPBfe5nZRIUcQcvYRvRzMraHjUnFk9kNgyg6rLAwcalK0UgYckSGwX3KhjlxftyTplES
-        EIwb3V+yg==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1i4E69-0007JD-OE; Sun, 01 Sep 2019 00:52:05 +0000
-Date:   Sat, 31 Aug 2019 17:52:05 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christopher Lameter <cl@linux.com>
-Cc:     Michal Hocko <mhocko@kernel.org>, Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
- kmalloc(power-of-two)
-Message-ID: <20190901005205.GA2431@bombadil.infradead.org>
-References: <20190826111627.7505-1-vbabka@suse.cz>
- <20190826111627.7505-3-vbabka@suse.cz>
- <0100016cd98bb2c1-a2af7539-706f-47ba-a68e-5f6a91f2f495-000000@email.amazonses.com>
- <20190828194607.GB6590@bombadil.infradead.org>
- <20190829073921.GA21880@dhcp22.suse.cz>
- <0100016ce39e6bb9-ad20e033-f3f4-4e6d-85d6-87e7d07823ae-000000@email.amazonses.com>
+        id S1729178AbfIAX16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 1 Sep 2019 19:27:58 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:37789 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728942AbfIAX16 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 1 Sep 2019 19:27:58 -0400
+Received: by mail-qt1-f195.google.com with SMTP id y26so13922833qto.4;
+        Sun, 01 Sep 2019 16:27:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=Y8jkqSuPFdPnoX723SsaKyeUfWimpBxUfbqYRxBxDds=;
+        b=jqg/I6iShn3Fg6wz7IPpDO6qfKvnGjG2bs1mVk/ks7ZLF3YNdQogYTmen+Yv/ECfsl
+         b26GM+tx2oAPQQvo+b1FMPNrgw1J7xxhgJgKQwq6KtPlqCYezstGNqjOTp3mCM6nsbSk
+         TqxyskcQNRpZZlw5da9rfEzaWMIi6C9nB7mBDWAvNy4OKhCbENRIVmNRA2d6CFwi0lVT
+         wxg0UO3LY2N3Q8EHT2bbkAagkD07yVaBp7qyQfSkP1AJOYJC9Mj6LM0RumhzWibkT2To
+         xWA+YXl87CMnk7HXufPPy0qvmsTtNq9UFbUZZ81McQJxvPvLX6OoE57+leVxHK7hawwo
+         9pGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Y8jkqSuPFdPnoX723SsaKyeUfWimpBxUfbqYRxBxDds=;
+        b=fx+pk/bQp+M0BT8poLkfWkP7ACOJTnr7W76SokEkxNgfpdt8J/8hBB9r/c1UUROlIV
+         5bNk1ew9CHX4u9LbPNaOM1COdPuy5xbhioOcKCSr2V9lEB77D27CUCwimZJwFulF1wxn
+         12QJSRDIpoOc8GHA9Ry4q2l2xYOn7ffiGt64sZMUGEmLtL6AEggw9zeTDB+c7nFgrJ+l
+         DiMxt0cfFKC1URX1U0ikVwcxOUlnMWvS4cuYjDDAvJcDTyUDLVHT7sDhR4UK/zllsTtD
+         zXYXjPoT6EdD6Axjyzm8xTEQi7TQK6jsAINfH1OPqDdN5cUz+tic33vxg/ODtI/5PtcF
+         Cpsg==
+X-Gm-Message-State: APjAAAUY1rPcoITNrlrwLjX7iNh6rC3s8rvNyeWdUbRpjzwa2sdHdH5m
+        kPkQD/3ivtK4F6rJmClq9hqeVgUw
+X-Google-Smtp-Source: APXvYqzco0F9EmfwZ/1kHDU11uj+Zergy+gM1PfzN4m+wpbd41/LhwlIA3Oie2Df8OwMN0E0BZ9Feg==
+X-Received: by 2002:a0c:9c0e:: with SMTP id v14mr5422669qve.84.1567380477080;
+        Sun, 01 Sep 2019 16:27:57 -0700 (PDT)
+Received: from localhost.localdomain (200.146.53.87.dynamic.dialup.gvt.net.br. [200.146.53.87])
+        by smtp.gmail.com with ESMTPSA id p59sm5684085qtd.75.2019.09.01.16.27.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Sep 2019 16:27:55 -0700 (PDT)
+From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+Cc:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+Subject: [PATCH v2 0/4] Remove elevator kernel parameter
+Date:   Sun,  1 Sep 2019 20:29:12 -0300
+Message-Id: <20190901232916.4692-1-marcos.souza.org@gmail.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190828011930.29791-5-marcos.souza.org@gmail.com>
+References: <20190828011930.29791-5-marcos.souza.org@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0100016ce39e6bb9-ad20e033-f3f4-4e6d-85d6-87e7d07823ae-000000@email.amazonses.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 30, 2019 at 05:41:46PM +0000, Christopher Lameter wrote:
-> On Thu, 29 Aug 2019, Michal Hocko wrote:
-> > > There are many places in the kernel which assume alignment.  They break
-> > > when it's not supplied.  I believe we have a better overall system if
-> > > the MM developers provide stronger guarantees than the MM consumers have
-> > > to work around only weak guarantees.
-> >
-> > I absolutely agree. A hypothetical benefit of a new implementation
-> > doesn't outweigh the complexity the existing code has to jump over or
-> > worse is not aware of and it is broken silently. My general experience
-> > is that the later is more likely with a large variety of drivers we have
-> > in the tree and odd things they do in general.
-> 
-> The current behavior without special alignment for these caches has been
-> in the wild for over a decade. And this is now coming up?
+Since the last RESEND[1], I found that I used an old block/for-next to base my
+changes. This version is just a rebase over
+8ba64588ef2136ff7561fb2047d53debed8a7b56 ("Merge branch 'for-5.4/libata' into
+for-next"), solving minor conflicts.
 
-In the wild ... and rarely enabled.  When it is enabled, it may or may
-not be noticed as data corruption, or tripping other debugging asserts.
-Users then turn off the rare debugging option.
+Original cover letter:
+After the first patch sent[2], together with some background from Jens[3], this
+patchset aims to remove completely elevator kernel parameter, since it is not
+being used since blk-mq was set by default.
 
-> There is one case now it seems with a broken hardware that has issues and
-> we now move to an alignment requirement from the slabs with exceptions and
-> this and that?
+Along with elevator code, some documentation was also updated to remove elevator
+references.
 
-Perhaps you could try reading what hasa been written instead of sticking
-to a strawman of your own invention?
+[1]: https://lkml.org/lkml/2019/8/27/1648
+[2]: https://lkml.org/lkml/2019/7/12/1008
+[3]: https://lkml.org/lkml/2019/7/13/232
 
-> If there is an exceptional alignment requirement then that needs to be
-> communicated to the allocator. A special flag or create a special
-> kmem_cache or something.
+Marcos Paulo de Souza (4):
+  block: elevator.c: Remove now unused elevator= argument
+  kernel-parameters.txt: Remove elevator argument
+  Documenation: switching-sched: Remove notes about elevator argument
+  Documentation:kernel-per-CPU-kthreads.txt: Remove reference to
+    elevator=
 
-The only way I'd agree to that is if we deliberately misalign every
-allocation that doesn't have this special flag set.  Because right now,
-breakage happens everywhere when these debug options are enabled, and
-the very people who need to be helped are being hurt by the debugging.
+ Documentation/admin-guide/kernel-parameters.txt    |  6 ------
+ .../admin-guide/kernel-per-CPU-kthreads.rst        |  8 +++-----
+ Documentation/block/switching-sched.rst            |  4 ----
+ block/elevator.c                                   | 14 --------------
+ 4 files changed, 3 insertions(+), 29 deletions(-)
+
+-- 
+2.22.0
+
