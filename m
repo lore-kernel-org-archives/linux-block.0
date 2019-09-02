@@ -2,106 +2,223 @@ Return-Path: <SRS0=3Les=W5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D4FC3A59E
-	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 19:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F3DC3A59E
+	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 19:43:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 62B7821883
-	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 19:37:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A81DD214AE
+	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 19:43:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="AevTDV+w"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BebKuUrS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727109AbfIBThw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Sep 2019 15:37:52 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:43046 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727085AbfIBThw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Sep 2019 15:37:52 -0400
-Received: by mail-lj1-f196.google.com with SMTP id d5so2806600lja.10
-        for <linux-block@vger.kernel.org>; Mon, 02 Sep 2019 12:37:51 -0700 (PDT)
+        id S1727236AbfIBTnb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Sep 2019 15:43:31 -0400
+Received: from mail-wm1-f41.google.com ([209.85.128.41]:33112 "EHLO
+        mail-wm1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727242AbfIBTnb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Sep 2019 15:43:31 -0400
+Received: by mail-wm1-f41.google.com with SMTP id r17so12657013wme.0
+        for <linux-block@vger.kernel.org>; Mon, 02 Sep 2019 12:43:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AFBZbglnhDy4wm5KdZCDkbStrJH9o3uKwcmY8dacc3U=;
-        b=AevTDV+wfZYm4W85EBlJwOhCTN+owzObRyYtnPAQFD9/ZgMrEnTKiGX58KaVOPa13I
-         11thWv5CuiaFG67Jnn/Nq9bD6NUm6apCyTlNAYKrvxt82lJbbf5ayGtiXHKhT4drocDv
-         w+3YtZf7XvMMhfHpEMaAJuG8GUVBo69b2HEGXLW9A1NYB+CWg83i3mAV2Xk2rTaJfu6f
-         7TC/yrOfrM9VRLm3fO7Xpls5a0IjzKa1pCL3bGf3xd5HuqIGVlj3dXwMDtTaOqieVFHm
-         O/cjl4xsqVeluMXLAc4Gd6xl6EVowBMyiNDCzVmGqpGegsL94u3akkN279Ml0VhzZc80
-         8sFg==
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Sa03S6vEaays6dcwuYI8guBUuYko9RawE4hVY+9UpC8=;
+        b=BebKuUrSweQBwv0My872r+2E+xquJKJLkKur8VeFveAtv5Kws3D8yRbfd6llwL7CD+
+         vQ6mWe+fX/v0STRDq3y229V4cwZ+SfFd5SH7KRuRRI11maUdXjBJKUeNAOmIfTKz3P6f
+         z/3SmnepCCNDB+HR2/PrxovHEDh5LNyfihh8jNjKyd3J78FO1mSLZ5lEmtZ0u6fRwpJO
+         vHHThZy3detC2aU7/DQxGxjYIWSUUKDQ3fNXi6qAjt9L8OHURlgvzgF9BTBzYp/KSQ/4
+         2m1xKUrsW0eW5atL9/YuiIozolpsv3irV1igpRFbJptV63CD2SXYDYRTmpK8HAB/5fSl
+         FwRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AFBZbglnhDy4wm5KdZCDkbStrJH9o3uKwcmY8dacc3U=;
-        b=V7BvSJdnrwspRyqzh0dfpHZtMwttuu/MyFtN+etQBqPOz71NT1XN6gPy7evpERS7+C
-         mB+51gAaOUerP+VeIpfCHSD+HisDLVvr/S4NQhSIohcQefBQXXY7F5JkZ0N0RGpYMciS
-         ukdFrqtznf+8C/qNsjzHfWN5OsOzmpul1OnXew2RlJyTYvunEsvjUhG2g85+FIr8pKZg
-         DBazC1cV9psnuk9W64t5lYxIYvS6/Hl32QTiN5KcCGWWGJrjMdraC0GrYWn91gBtgs4E
-         5uQ9swJfoXPdB6dreQC1X+vp4IgsErD04F6heme7V3Qs77+ANGX09OZV8M6SOM9UVg+P
-         FBwA==
-X-Gm-Message-State: APjAAAUHyvfyePggEuWEh8QhVyXJI1Sj9EOfK3KHO8s0AyiZXAfcFk8C
-        FyaiafLMlUQ1mR7xMFo8QItg1fe6tx5vclfHhTKQlg==
-X-Google-Smtp-Source: APXvYqxbBRxUy282JBaawD5vQL/kXq0ZGive67XU+QMHi+fOK/RZkHJV2tjtlXbDP9XgKqI+yMTqKPPHKZ3O1jw4hjA=
-X-Received: by 2002:a2e:3c12:: with SMTP id j18mr10752018lja.50.1567453070510;
- Mon, 02 Sep 2019 12:37:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190828103229.191853-1-maco@android.com> <20190830155024.GA23882@infradead.org>
-In-Reply-To: <20190830155024.GA23882@infradead.org>
-From:   Martijn Coenen <maco@android.com>
-Date:   Mon, 2 Sep 2019 21:37:39 +0200
-Message-ID: <CAB0TPYELq72hjHvyFVmaAFZPCaSSxV-j6znM8peezqtep6i-1A@mail.gmail.com>
-Subject: Re: [PATCH] loop: change queue block size to match when using DIO.
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, kernel-team@android.com,
-        Narayan Kamath <narayan@google.com>,
-        Dario Freni <dariofreni@google.com>,
-        Nikita Ioffe <ioffe@google.com>,
-        Jiyong Park <jiyong@google.com>,
-        Martijn Coenen <maco@google.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Sa03S6vEaays6dcwuYI8guBUuYko9RawE4hVY+9UpC8=;
+        b=NNA30na55qrbHn+PHnCyuACvC5l80gXo5GV4SenCzUI0zc+GOqd262yvp43pU4HgM9
+         8ogPt+ntMqezmzwqKZLjSvnlbUl8fqphrQ7ZoeNV/637Rx1Zq4n9GmALYQXRYoXGCLWy
+         g/rqelQn9Wa1UfzIrcsjQ6TE30hpWuZhgQ+RIaCgawoJ6WCAuLLiztRR/FsYwwZ7jzKZ
+         99u24xO3YX35zC6xkvrWmhHyVhATNWHWCQFYwr1FqlSz4nIDu8zZ+I6/BHh7PAjtaewL
+         +rdRQmtxdxKHEBM96+Slytz76cVbVrtTfx/y90BAH2z/xG2GG2EbMjeLwf5lp67jyWqg
+         kzLA==
+X-Gm-Message-State: APjAAAU8bl+E0AFl8HbNQsvlohia8A4Tq2FRhbO1AfoCaBf3S29ZXiDw
+        GcFOlyovUCEF7xTDdCbte6QOuA==
+X-Google-Smtp-Source: APXvYqyudjJGOzIp0Q7gzh3z6YJmCayZ4onrFg/fn97YusYXGCgpQdPA9pNGV6h1MiuJXj0WAPgr7w==
+X-Received: by 2002:a1c:a617:: with SMTP id p23mr18296789wme.166.1567453408094;
+        Mon, 02 Sep 2019 12:43:28 -0700 (PDT)
+Received: from [192.168.0.101] (88-147-40-76.dyn.eolo.it. [88.147.40.76])
+        by smtp.gmail.com with ESMTPSA id v186sm36076972wmb.5.2019.09.02.12.43.26
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 02 Sep 2019 12:43:27 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [PATCHSET block/for-next] IO cost model based work-conserving
+ porportional controller
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20190902155652.GH2263813@devbig004.ftw2.facebook.com>
+Date:   Mon, 2 Sep 2019 21:43:25 +0200
+Cc:     Jens Axboe <axboe@kernel.dk>, newella@fb.com, clm@fb.com,
+        Josef Bacik <josef@toxicpanda.com>, dennisz@fb.com,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>, kernel-team@fb.com,
+        cgroups@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+        kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
+        bpf@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D9F6BC6D-FEB3-40CA-A33C-F501AE4434F0@linaro.org>
+References: <20190614015620.1587672-1-tj@kernel.org>
+ <20190614175642.GA657710@devbig004.ftw2.facebook.com>
+ <5A63F937-F7B5-4D09-9DB4-C73D6F571D50@linaro.org>
+ <B5E431F7-549D-4FC4-A098-D074DF9586A1@linaro.org>
+ <20190820151903.GH2263813@devbig004.ftw2.facebook.com>
+ <9EB760CE-0028-4766-AE9D-6E90028D8579@linaro.org>
+ <20190831065358.GF2263813@devbig004.ftw2.facebook.com>
+ <88C7DC68-680E-49BB-9699-509B9B0B12A0@linaro.org>
+ <20190902155652.GH2263813@devbig004.ftw2.facebook.com>
+To:     Tejun Heo <tj@kernel.org>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 30, 2019 at 5:50 PM Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Wed, Aug 28, 2019 at 12:32:29PM +0200, Martijn Coenen wrote:
-> > The loop driver assumes that if the passed in fd is opened with
-> > O_DIRECT, the caller wants to use direct I/O on the loop device.
-> > However, if the underlying filesystem has a different block size than
-> > the loop block queue, direct I/O can't be enabled. Instead of requiring
-> > userspace to manually change the blocksize and re-enable direct I/O,
-> > just change the queue block size to match.
->
-> Why can't we enable the block device in that case?  All the usual
-> block filesystems support 512 byte aligned direct I/O with a 4k
-> file system block size (as long as the underlying block device
-> sector size is also 512 bytes).
 
-Sorry, I didn't word that correctly: it's not the logical block size
-of the filesystem, but the logical block size of the underlying block
-device that loop's queue must match (or exceed). With the current loop
-code, if the backing file is opened with O_DIRECT and resides on a
-block device with a 512 bytes logical block size, the loop device will
-correctly use direct I/O. If instead the backing file happened to
-reside on a block device with a 4k logical block size, the loop device
-would silently fall back to cached mode. I think there's a benefit in
-the behavior being consistent independent of the block size of the
-backing device, and I don't see a good reason for not automatically
-switching loop's logical/physical queue sizes to match the backing
-device in this specific case.
 
-Will send a v2.
+> Il giorno 2 set 2019, alle ore 17:56, Tejun Heo <tj@kernel.org> ha =
+scritto:
+>=20
+> On Mon, Sep 02, 2019 at 05:45:50PM +0200, Paolo Valente wrote:
+>> Thanks for this extra explanations.  It is a little bit difficult for
+>> me to understand how the min/max teaks for exactly, but you did give
+>> me the general idea.
+>=20
+> It just limits how far high and low the IO issue rate, measured in
+> cost, can go.  ie. if max is at 200%, the controller won't issue more
+> than twice of what the cost model says 100% is.
+>=20
+>> Are these results in line with your expectations?  If they are, then
+>> I'd like to extend benchmarks to more mixes of workloads.  Or should =
+I
+>> try some other QoS configuration first?
+>=20
+> They aren't.  Can you please include the content of io.cost.qos and
+> io.cost.model before each run?  Note that partial writes to subset of
+> parameters don't clear other parameters.
+>=20
+
+Yep.  I've added the printing of the two parameters in the script, and
+I'm pasting the whole output, in case you could get also some other
+useful piece of information from it.
+
+$ sudo ./bandwidth-latency.sh -t randread -s none -b weight -n 7 -d 20
+Switching to none for sda
+echo "8:0 enable=3D1 rpct=3D95 rlat=3D2500 wpct=3D95 wlat=3D5000" > =
+/cgroup/io.cost.qos
+/cgroup/io.cost.qos 8:0 enable=3D1 ctrl=3Duser rpct=3D95.00 rlat=3D2500 =
+wpct=3D95.00 wlat=3D5000 min=3D1.00 max=3D10000.00
+/cgroup/io.cost.model 8:0 ctrl=3Dauto model=3Dlinear rbps=3D488636629 =
+rseqiops=3D8932 rrandiops=3D8518 wbps=3D427891549 wseqiops=3D28755 =
+wrandiops=3D21940
+Not changing weight/limits for interferer group 0
+Not changing weight/limits for interferer group 1
+Not changing weight/limits for interferer group 2
+Not changing weight/limits for interferer group 3
+Not changing weight/limits for interferer group 4
+Not changing weight/limits for interferer group 5
+Not changing weight/limits for interferer group 6
+Not changing weight/limits for interfered
+Starting Interferer group 0
+start_fio_jobs InterfererGroup0 0 default read MAX linear 1 1 0 0 4k =
+/home/paolo/local-S/bandwidth-latency/../workfiles/largefile0
+Starting Interferer group 1
+start_fio_jobs InterfererGroup1 0 default read MAX linear 1 1 0 0 4k =
+/home/paolo/local-S/bandwidth-latency/../workfiles/largefile1
+Starting Interferer group 2
+start_fio_jobs InterfererGroup2 0 default read MAX linear 1 1 0 0 4k =
+/home/paolo/local-S/bandwidth-latency/../workfiles/largefile2
+Starting Interferer group 3
+start_fio_jobs InterfererGroup3 0 default read MAX linear 1 1 0 0 4k =
+/home/paolo/local-S/bandwidth-latency/../workfiles/largefile3
+Starting Interferer group 4
+start_fio_jobs InterfererGroup4 0 default read MAX linear 1 1 0 0 4k =
+/home/paolo/local-S/bandwidth-latency/../workfiles/largefile4
+Starting Interferer group 5
+start_fio_jobs InterfererGroup5 0 default read MAX linear 1 1 0 0 4k =
+/home/paolo/local-S/bandwidth-latency/../workfiles/largefile5
+Starting Interferer group 6
+start_fio_jobs InterfererGroup6 0 default read MAX linear 1 1 0 0 4k =
+/home/paolo/local-S/bandwidth-latency/../workfiles/largefile6
+Linux 5.3.0-rc6+ (paolo-ThinkPad-W520) 	02/09/2019 	_x86_64_	=
+(8 CPU)
+
+02/09/2019 21:39:11
+Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
+sda              66.53         5.22         0.10       1385         27
+
+start_fio_jobs interfered 20 default randread MAX poisson 1 1 0 0 4k =
+/home/paolo/local-S/bandwidth-latency/../workfiles/largefile_interfered0
+02/09/2019 21:39:14
+Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
+sda             154.67        20.63         0.05         61          0
+
+02/09/2019 21:39:17
+Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
+sda             453.00        64.27         0.00        192          0
+
+02/09/2019 21:39:20
+Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
+sda             675.33        95.99         0.00        287          0
+
+02/09/2019 21:39:23
+Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
+sda            1907.67       348.61         0.00       1045          0
+
+02/09/2019 21:39:26
+Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
+sda            2414.67       462.98         0.00       1388          0
+
+02/09/2019 21:39:29
+Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
+sda            2429.67       438.71         0.00       1316          0
+
+02/09/2019 21:39:32
+Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
+sda            2437.00       475.79         0.00       1427          0
+
+02/09/2019 21:39:35
+Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
+sda            2162.33       346.97         0.00       1040          0
+
+Results for one rand reader against 7 seq readers (I/O depth 1), =
+weight-none with weights: (default, default)
+Aggregated throughput:
+         min         max         avg     std_dev     conf99%
+       64.27      475.79     319.046     171.233     1011.97
+Read throughput:
+         min         max         avg     std_dev     conf99%
+       64.27      475.79     319.046     171.233     1011.97
+Write throughput:
+         min         max         avg     std_dev     conf99%
+           0           0           0           0           0
+Interfered total throughput:
+         min         max         avg     std_dev
+       1.032       4.455       2.266    0.742696
+Interfered per-request total latency:
+         min         max         avg     std_dev
+        0.11      12.005      1.7545    0.878281
 
 Thanks,
-Martijn
+Paolo
+
+
+> Thanks.
+>=20
+> --=20
+> tejun
+
