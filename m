@@ -2,75 +2,42 @@ Return-Path: <SRS0=3Les=W5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1978DC3A59E
-	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 21:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CF6AC3A5A7
+	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 23:02:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5E2E22CF7
-	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 21:47:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="j/KvpmYK"
+	by mail.kernel.org (Postfix) with ESMTP id 3D284216C8
+	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 23:02:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727604AbfIBVrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Sep 2019 17:47:04 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:43565 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726933AbfIBVrE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Sep 2019 17:47:04 -0400
-Received: by mail-pl1-f193.google.com with SMTP id 4so6982549pld.10
-        for <linux-block@vger.kernel.org>; Mon, 02 Sep 2019 14:47:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=bE3CAGhnJZegvIyfQXiX7dFDWRKDXbLDv++b0LQi4ZA=;
-        b=j/KvpmYKp5WcE2QOK0RAlwqt+IgtxvzMAxVB8SmfSj0/pOnQV6c2CsE3AhMxEGZ7LO
-         QHoUNeRRlAwj6j2iwtZMqBLNwFsXOT9docsS2b86DNBZRE7vNX7MG+axOrC0MA0QnjMK
-         luQSr0KbW9tQ2SEmb7nPpFCRhkC0RIOVXlh6YM9O9Sg5g4VbVYdjagxeLsMMSHm1rQ8e
-         aMJlnnuzI09Dj53mES7Bzt4WXwZ7m8nyMMU4IWG3o+BPiGpZheP82fcUcJgEI2yw7ZfR
-         eqQhoJTb5btqwS+2uAS9Etps6GRDO9Glz3AxMp0Z2mFP73H+Vhjy02G6cpdk6gJVBPny
-         pEbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bE3CAGhnJZegvIyfQXiX7dFDWRKDXbLDv++b0LQi4ZA=;
-        b=UEzQu9sv4L/Nc3m+3O9N1c0+i3NyqTE4mpQmYjtP2S/7pkY35ea2Psi6d6zzYQMMSa
-         8LNCIy/l3lQDZ+PSVP2zuzim/ZEmtAYd3nZ8tYgwiUy+7HBuObCt1a3Dcn98fggNAc8Z
-         urwj6iVnBRwjt91mJvhuMtco34vHmC9Fz3fHr7GhL+WiMk4FUt6ttYn/KaYZ44Dp31PC
-         uKuUrjpmJwSPs8lOcdpWhrpQau8D6pay8CHx8rRQyq14/84crFEFxd8K7w1wXh0dz4A0
-         mp4cbnFxET6Xrpa3LkDwmp4NVUnfhEK02BB2ALF2MvLj7uVK7g8MzGvYGwxQPWT/hGta
-         lj8A==
-X-Gm-Message-State: APjAAAXoBYgjdfxCwaG80COdpcYIi7p7xhKz1rMqnRW8In9ZSMz6bg+b
-        2bmVvwrH8OUhVp8+5pB5OfwKsg==
-X-Google-Smtp-Source: APXvYqyJzfQKPBEQy19FPz3Lq5G4NPwWwbdV/9eJxkhq7nV/UN/iSGM54S9/O1hVayoRRjcFiYFOTA==
-X-Received: by 2002:a17:902:b48c:: with SMTP id y12mr5329126plr.92.1567460823386;
-        Mon, 02 Sep 2019 14:47:03 -0700 (PDT)
-Received: from [192.168.1.188] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id 71sm20770525pfw.157.2019.09.02.14.47.01
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 02 Sep 2019 14:47:02 -0700 (PDT)
-Subject: Re: [PATCH v10 3/4] block: add a helper function to merge the
- segments
-To:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        ulf.hansson@linaro.org, hch@lst.de, m.szyprowski@samsung.com,
-        robin.murphy@arm.com, joro@8bytes.org
-Cc:     wsa+renesas@sang-engineering.com, linux-mmc@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org
-References: <1566995743-5614-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
- <1566995743-5614-4-git-send-email-yoshihiro.shimoda.uh@renesas.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e549e8e7-9dfe-6f68-2148-f49a9089db37@kernel.dk>
-Date:   Mon, 2 Sep 2019 15:47:00 -0600
+        id S1726785AbfIBXCu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Sep 2019 19:02:50 -0400
+Received: from foss.arm.com ([217.140.110.172]:58592 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726775AbfIBXCu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 2 Sep 2019 19:02:50 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 82626344;
+        Mon,  2 Sep 2019 16:02:49 -0700 (PDT)
+Received: from [10.0.2.15] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2D2563F59C;
+        Mon,  2 Sep 2019 16:02:48 -0700 (PDT)
+Subject: Re: [PATCH] sched: make struct task_struct::state 32-bit
+To:     Alexey Dobriyan <adobriyan@gmail.com>, mingo@redhat.com,
+        peterz@infradead.org
+Cc:     linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com, axboe@kernel.dk,
+        aarcange@redhat.com
+References: <20190902210558.GA23013@avx2>
+From:   Valentin Schneider <valentin.schneider@arm.com>
+Message-ID: <7b94004e-4a65-462b-cd6b-5cbd23d607bf@arm.com>
+Date:   Tue, 3 Sep 2019 00:02:38 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1566995743-5614-4-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+In-Reply-To: <20190902210558.GA23013@avx2>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,12 +46,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/28/19 6:35 AM, Yoshihiro Shimoda wrote:
-> This patch adds a helper function whether a queue can merge
-> the segments by the DMA MAP layer (e.g. via IOMMU).
+Hi,
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+On 02/09/2019 22:05, Alexey Dobriyan wrote:
+> 32-bit accesses are shorter than 64-bit accesses on x86_64.
+> Nothing uses 64-bitness of ->state.
+> 
+> Space savings are ~2KB on F30 kernel config.
+> 
+> Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+> ---
 
--- 
-Jens Axboe
+Interestingly this has been volatile long since forever (or 2002, which is
+my take on "forever" given the history tree), although the task states
+seem to have never gone above 0x1000 (the current TASK_STATE_MAX).
 
+[...]
+
+> --- a/include/linux/sched.h
+> +++ b/include/linux/sched.h
+> @@ -643,7 +643,7 @@ struct task_struct {
+>  	struct thread_info		thread_info;
+>  #endif
+>  	/* -1 unrunnable, 0 runnable, >0 stopped: */
+> -	volatile long			state;
+> +	volatile int			state;
+
+This leads to having some padding after this field (w/o randomization):
+
+struct task_struct {
+	struct thread_info         thread_info;          /*     0    24 */
+	volatile int               state;                /*    24     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	void *                     stack;                /*    32     8 */
+
+Though seeing as this is also the boundary of the randomized layout we can't
+really do much better without changing the boundary itself. So much for
+cacheline use :/
+
+Anyway, task_struct doesn't shrink but we can cut some corners in the asm,
+I guess that's fine?
+
+[...]
