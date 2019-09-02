@@ -2,113 +2,106 @@ Return-Path: <SRS0=3Les=W5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 649D7C3A5A7
-	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 15:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D4FC3A59E
+	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 19:37:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E27621883
-	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 15:56:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567439819;
-	bh=8jGuyB8P3nZGdTFXO6LUqTCNbYpDTLpLsjOKmyadqxA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=MGzfWxX67FsUa/UNdb8QdxUBMwGuE/QeEG8xEDkTHpO6oLPSKv14UOEmPrpASydap
-	 gBPWTYCgJwGXb5YZwls7mJJwpQ/BDv315CCTQbqInCc8PbUN2s+5cd+0CsOT9QtHBl
-	 cHNwwAj08pOvbR3Z9E2iRQ9xCXOiZ6M0qfYXJHX0=
+	by mail.kernel.org (Postfix) with ESMTP id 62B7821883
+	for <linux-block@archiver.kernel.org>; Mon,  2 Sep 2019 19:37:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="AevTDV+w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725999AbfIBP46 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Sep 2019 11:56:58 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:36576 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725830AbfIBP46 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Sep 2019 11:56:58 -0400
-Received: by mail-qt1-f195.google.com with SMTP id o12so4476798qtf.3;
-        Mon, 02 Sep 2019 08:56:57 -0700 (PDT)
+        id S1727109AbfIBThw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Sep 2019 15:37:52 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:43046 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727085AbfIBThw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Sep 2019 15:37:52 -0400
+Received: by mail-lj1-f196.google.com with SMTP id d5so2806600lja.10
+        for <linux-block@vger.kernel.org>; Mon, 02 Sep 2019 12:37:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=ExZmdHMEcHQFC7Ma718ILSpw2fAuwQcwKpYKAS2PKzU=;
-        b=NBcl9afAeyIyBTtymn4baMsgwrbOW8VMDzEIyIBoQSV9u7cX7EYdGBRzis7ZX/ofpq
-         Eiq5zWUgDS1gThudbRGxRuvdIUSdeecCrmUw079Af0u8M/E6FSRgmZHiOxsZjI5CBWG5
-         xzSIJhkMt5d+lPpg9TlKK47Qatxcd6yQmdLH3uhmLr5L0t+3NMIx6cxkrVGeZt5TP/mr
-         vka8smR3nHLaVPmLT0w4ERN8kHG9ccOolEdLvs33DjgmNHa4AuZJzswXawbOwoVCsPKO
-         ccmuA9Kklssq36S2AsrmMchUiCxpSabHThI0e8Siu5IQ46aUHsDqRbCh4qQ+x/QRQ5jw
-         DNBg==
+        d=android.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AFBZbglnhDy4wm5KdZCDkbStrJH9o3uKwcmY8dacc3U=;
+        b=AevTDV+wfZYm4W85EBlJwOhCTN+owzObRyYtnPAQFD9/ZgMrEnTKiGX58KaVOPa13I
+         11thWv5CuiaFG67Jnn/Nq9bD6NUm6apCyTlNAYKrvxt82lJbbf5ayGtiXHKhT4drocDv
+         w+3YtZf7XvMMhfHpEMaAJuG8GUVBo69b2HEGXLW9A1NYB+CWg83i3mAV2Xk2rTaJfu6f
+         7TC/yrOfrM9VRLm3fO7Xpls5a0IjzKa1pCL3bGf3xd5HuqIGVlj3dXwMDtTaOqieVFHm
+         O/cjl4xsqVeluMXLAc4Gd6xl6EVowBMyiNDCzVmGqpGegsL94u3akkN279Ml0VhzZc80
+         8sFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ExZmdHMEcHQFC7Ma718ILSpw2fAuwQcwKpYKAS2PKzU=;
-        b=EhUa36szXeqWF/7q8rK8Kw/VG+MRzJ+IQ7UP2tKFFkmnMSA9LuGrQromN9w6NroEv+
-         +OPPOLQ4BFKzXxQcUc0Dq10bR1HDm1pvE4vC1Wo6UbJxBBN0jznNpgh0HDEXCo7A+fV0
-         Ut+sef1WSyPtbIBzgMY3jG/lqsVEweR+qkhjyn3RBJlVu2FJLPyYTuPv4bbQvPpknhMd
-         pz1TiofwXw0j3KPNKx/7cH4155hNgiZ8Peg69e8TntKvvg1F1LIUvOFhUrd8Ax7Frbq6
-         0XG/PZBKl/5ErRe/Zq/U/p9T0+3D+QySP1IzLDt8p1S3EeGYSqVALEr+g5OI4qF7UvRI
-         V5DQ==
-X-Gm-Message-State: APjAAAUHnq2MU9wGtQK4v2taed/0Cr+IDgAxqJh+6/o0X2J/Zhxa8MSb
-        +EUxGDLHy0WHUzKJ1i2O96E=
-X-Google-Smtp-Source: APXvYqxZPoOm1dNg+OLvFCqScXvp0FQHGzmfZw2XcPn98Gg1Hxy3v5Li17BKVh+KBJvgoi5M7BmC1g==
-X-Received: by 2002:a0c:94a4:: with SMTP id j33mr18939469qvj.135.1567439816945;
-        Mon, 02 Sep 2019 08:56:56 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::4a24])
-        by smtp.gmail.com with ESMTPSA id q42sm8430483qtc.52.2019.09.02.08.56.55
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 02 Sep 2019 08:56:56 -0700 (PDT)
-Date:   Mon, 2 Sep 2019 08:56:52 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, newella@fb.com, clm@fb.com,
-        Josef Bacik <josef@toxicpanda.com>, dennisz@fb.com,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>, kernel-team@fb.com,
-        cgroups@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-        kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
-        bpf@vger.kernel.org
-Subject: Re: [PATCHSET block/for-next] IO cost model based work-conserving
- porportional controller
-Message-ID: <20190902155652.GH2263813@devbig004.ftw2.facebook.com>
-References: <20190614015620.1587672-1-tj@kernel.org>
- <20190614175642.GA657710@devbig004.ftw2.facebook.com>
- <5A63F937-F7B5-4D09-9DB4-C73D6F571D50@linaro.org>
- <B5E431F7-549D-4FC4-A098-D074DF9586A1@linaro.org>
- <20190820151903.GH2263813@devbig004.ftw2.facebook.com>
- <9EB760CE-0028-4766-AE9D-6E90028D8579@linaro.org>
- <20190831065358.GF2263813@devbig004.ftw2.facebook.com>
- <88C7DC68-680E-49BB-9699-509B9B0B12A0@linaro.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AFBZbglnhDy4wm5KdZCDkbStrJH9o3uKwcmY8dacc3U=;
+        b=V7BvSJdnrwspRyqzh0dfpHZtMwttuu/MyFtN+etQBqPOz71NT1XN6gPy7evpERS7+C
+         mB+51gAaOUerP+VeIpfCHSD+HisDLVvr/S4NQhSIohcQefBQXXY7F5JkZ0N0RGpYMciS
+         ukdFrqtznf+8C/qNsjzHfWN5OsOzmpul1OnXew2RlJyTYvunEsvjUhG2g85+FIr8pKZg
+         DBazC1cV9psnuk9W64t5lYxIYvS6/Hl32QTiN5KcCGWWGJrjMdraC0GrYWn91gBtgs4E
+         5uQ9swJfoXPdB6dreQC1X+vp4IgsErD04F6heme7V3Qs77+ANGX09OZV8M6SOM9UVg+P
+         FBwA==
+X-Gm-Message-State: APjAAAUHyvfyePggEuWEh8QhVyXJI1Sj9EOfK3KHO8s0AyiZXAfcFk8C
+        FyaiafLMlUQ1mR7xMFo8QItg1fe6tx5vclfHhTKQlg==
+X-Google-Smtp-Source: APXvYqxbBRxUy282JBaawD5vQL/kXq0ZGive67XU+QMHi+fOK/RZkHJV2tjtlXbDP9XgKqI+yMTqKPPHKZ3O1jw4hjA=
+X-Received: by 2002:a2e:3c12:: with SMTP id j18mr10752018lja.50.1567453070510;
+ Mon, 02 Sep 2019 12:37:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <88C7DC68-680E-49BB-9699-509B9B0B12A0@linaro.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <20190828103229.191853-1-maco@android.com> <20190830155024.GA23882@infradead.org>
+In-Reply-To: <20190830155024.GA23882@infradead.org>
+From:   Martijn Coenen <maco@android.com>
+Date:   Mon, 2 Sep 2019 21:37:39 +0200
+Message-ID: <CAB0TPYELq72hjHvyFVmaAFZPCaSSxV-j6znM8peezqtep6i-1A@mail.gmail.com>
+Subject: Re: [PATCH] loop: change queue block size to match when using DIO.
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, kernel-team@android.com,
+        Narayan Kamath <narayan@google.com>,
+        Dario Freni <dariofreni@google.com>,
+        Nikita Ioffe <ioffe@google.com>,
+        Jiyong Park <jiyong@google.com>,
+        Martijn Coenen <maco@google.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 02, 2019 at 05:45:50PM +0200, Paolo Valente wrote:
-> Thanks for this extra explanations.  It is a little bit difficult for
-> me to understand how the min/max teaks for exactly, but you did give
-> me the general idea.
+On Fri, Aug 30, 2019 at 5:50 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Wed, Aug 28, 2019 at 12:32:29PM +0200, Martijn Coenen wrote:
+> > The loop driver assumes that if the passed in fd is opened with
+> > O_DIRECT, the caller wants to use direct I/O on the loop device.
+> > However, if the underlying filesystem has a different block size than
+> > the loop block queue, direct I/O can't be enabled. Instead of requiring
+> > userspace to manually change the blocksize and re-enable direct I/O,
+> > just change the queue block size to match.
+>
+> Why can't we enable the block device in that case?  All the usual
+> block filesystems support 512 byte aligned direct I/O with a 4k
+> file system block size (as long as the underlying block device
+> sector size is also 512 bytes).
 
-It just limits how far high and low the IO issue rate, measured in
-cost, can go.  ie. if max is at 200%, the controller won't issue more
-than twice of what the cost model says 100% is.
+Sorry, I didn't word that correctly: it's not the logical block size
+of the filesystem, but the logical block size of the underlying block
+device that loop's queue must match (or exceed). With the current loop
+code, if the backing file is opened with O_DIRECT and resides on a
+block device with a 512 bytes logical block size, the loop device will
+correctly use direct I/O. If instead the backing file happened to
+reside on a block device with a 4k logical block size, the loop device
+would silently fall back to cached mode. I think there's a benefit in
+the behavior being consistent independent of the block size of the
+backing device, and I don't see a good reason for not automatically
+switching loop's logical/physical queue sizes to match the backing
+device in this specific case.
 
-> Are these results in line with your expectations?  If they are, then
-> I'd like to extend benchmarks to more mixes of workloads.  Or should I
-> try some other QoS configuration first?
+Will send a v2.
 
-They aren't.  Can you please include the content of io.cost.qos and
-io.cost.model before each run?  Note that partial writes to subset of
-parameters don't clear other parameters.
-
-Thanks.
-
--- 
-tejun
+Thanks,
+Martijn
