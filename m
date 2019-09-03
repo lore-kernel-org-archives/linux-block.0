@@ -2,126 +2,88 @@ Return-Path: <SRS0=Gq2m=W6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A5CC3A5A2
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 19:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82319C3A5A5
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 20:13:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 82A8C20882
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 19:53:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 570CF21897
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 20:13:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="Cn915Kxo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726079AbfICTxf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Sep 2019 15:53:35 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:57681 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725962AbfICTxe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Sep 2019 15:53:34 -0400
-Received: from mail-pf1-f200.google.com ([209.85.210.200])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <gpiccoli@canonical.com>)
-        id 1i5Ers-0005Tj-Q4
-        for linux-block@vger.kernel.org; Tue, 03 Sep 2019 19:53:33 +0000
-Received: by mail-pf1-f200.google.com with SMTP id z23so1372502pfn.0
-        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2019 12:53:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:cc:references:to:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=m4/iGFxysoqiJX5l6xY9vaEh4ZOwU9TUKtScGeLuxk4=;
-        b=sXwK7ge7PeexaNGGJOIl88gBilacDmTI/vr77uQpLuNQo1ADMj7IZP4raTQpxCwOHl
-         UwLvWgSOPIy45WHf1BmkICvVh2/kdFRDnGMLiAkIEpPGDfSTSMhAGtTckZIVlOj4bm0e
-         2zdHohfT37YEX02zbnLgutJfrcrBVkNwKTjJmUpllwhaPpc1L1pA1x+rRvgEJpPtNWFg
-         ayXg7GcAh5pCu51jHoPzaORBFuHwAyG8LkNd7OZvr9s5JA0kVjrRp9iogxZ8m7CLhBIH
-         dTAJlaq5PHh+mM6wE69/19NpfWtE97IQBxHntdZLEXdZ6wiZc43+OMOLOVN8rMnuS89W
-         CUig==
-X-Gm-Message-State: APjAAAULFnXbpajff7HHCQUCgoKHoZ2BkgBRwAxHWVx9FlmAsMw4wc4M
-        LkVqaRvT4SHrfojA3hOuJsFYza6ldp/z+qnTic5Y0k6gUaQQBiYynNSYI5GanN7XrFx8d8JlL+u
-        IsBC8IoGiTf+XSa/T0vCYMjfbqIp2NVvch5bAd4KK
-X-Received: by 2002:a17:90a:c086:: with SMTP id o6mr1041229pjs.24.1567540411620;
-        Tue, 03 Sep 2019 12:53:31 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwiwXv/UYVHujb2Lh/xxxZ5lvm9Dvm2/i4Zu0bum67gm5u4ULLDhXn+dzw+u/pQGQ1xWX4NCw==
-X-Received: by 2002:a17:90a:c086:: with SMTP id o6mr1041217pjs.24.1567540411500;
-        Tue, 03 Sep 2019 12:53:31 -0700 (PDT)
-Received: from [192.168.1.203] (201-93-37-171.dial-up.telesp.net.br. [201.93.37.171])
-        by smtp.gmail.com with ESMTPSA id d20sm24787555pfq.88.2019.09.03.12.53.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 03 Sep 2019 12:53:30 -0700 (PDT)
-Subject: Re: [PATCH v3 1/2] md raid0/linear: Mark array as 'broken' and fail
- BIOs if a member is gone
-From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Cc:     Song Liu <songliubraving@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Jay Vosburgh <jay.vosburgh@canonical.com>,
-        Song Liu <liu.song.a23@gmail.com>, NeilBrown <neilb@suse.com>
-References: <20190822161318.26236-1-gpiccoli@canonical.com>
- <73C4747E-7A9E-4833-8393-B6A06C935DBE@fb.com>
- <8163258e-839c-e0b8-fc4b-74c94c9dae1d@canonical.com>
- <F0E716F8-76EC-4315-933D-A547B52F1D27@fb.com>
- <5D68FEBC.9060709@youngman.org.uk>
- <CAHD1Q_ypdBKhYRVLrg_kf4L8LdXk8rgiiSQjtmoC=jyRv5M5jQ@mail.gmail.com>
-To:     Wols Lists <antlists@youngman.org.uk>,
-        linux-raid <linux-raid@vger.kernel.org>
-Openpgp: preference=signencrypt
-Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
- mQENBFpVBxcBCADPNKmu2iNKLepiv8+Ssx7+fVR8lrL7cvakMNFPXsXk+f0Bgq9NazNKWJIn
- Qxpa1iEWTZcLS8ikjatHMECJJqWlt2YcjU5MGbH1mZh+bT3RxrJRhxONz5e5YILyNp7jX+Vh
- 30rhj3J0vdrlIhPS8/bAt5tvTb3ceWEic9mWZMsosPavsKVcLIO6iZFlzXVu2WJ9cov8eQM/
- irIgzvmFEcRyiQ4K+XUhuA0ccGwgvoJv4/GWVPJFHfMX9+dat0Ev8HQEbN/mko/bUS4Wprdv
- 7HR5tP9efSLucnsVzay0O6niZ61e5c97oUa9bdqHyApkCnGgKCpg7OZqLMM9Y3EcdMIJABEB
- AAG0LUd1aWxoZXJtZSBHLiBQaWNjb2xpIDxncGljY29saUBjYW5vbmljYWwuY29tPokBNwQT
- AQgAIQUCWmClvQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRDOR5EF9K/7Gza3B/9d
- 5yczvEwvlh6ksYq+juyuElLvNwMFuyMPsvMfP38UslU8S3lf+ETukN1S8XVdeq9yscwtsRW/
- 4YoUwHinJGRovqy8gFlm3SAtjfdqysgJqUJwBmOtcsHkmvFXJmPPGVoH9rMCUr9s6VDPox8f
- q2W5M7XE9YpsfchS/0fMn+DenhQpV3W6pbLtuDvH/81GKrhxO8whSEkByZbbc+mqRhUSTdN3
- iMpRL0sULKPVYbVMbQEAnfJJ1LDkPqlTikAgt3peP7AaSpGs1e3pFzSEEW1VD2jIUmmDku0D
- LmTHRl4t9KpbU/H2/OPZkrm7809QovJGRAxjLLPcYOAP7DUeltveuQENBFpVBxcBCADbxD6J
- aNw/KgiSsbx5Sv8nNqO1ObTjhDR1wJw+02Bar9DGuFvx5/qs3ArSZkl8qX0X9Vhptk8rYnkn
- pfcrtPBYLoux8zmrGPA5vRgK2ItvSc0WN31YR/6nqnMfeC4CumFa/yLl26uzHJa5RYYQ47jg
- kZPehpc7IqEQ5IKy6cCKjgAkuvM1rDP1kWQ9noVhTUFr2SYVTT/WBHqUWorjhu57/OREo+Tl
- nxI1KrnmW0DbF52tYoHLt85dK10HQrV35OEFXuz0QPSNrYJT0CZHpUprkUxrupDgkM+2F5LI
- bIcaIQ4uDMWRyHpDbczQtmTke0x41AeIND3GUc+PQ4hWGp9XABEBAAGJAR8EGAEIAAkFAlpV
- BxcCGwwACgkQzkeRBfSv+xv1wwgAj39/45O3eHN5pK0XMyiRF4ihH9p1+8JVfBoSQw7AJ6oU
- 1Hoa+sZnlag/l2GTjC8dfEGNoZd3aRxqfkTrpu2TcfT6jIAsxGjnu+fUCoRNZzmjvRziw3T8
- egSPz+GbNXrTXB8g/nc9mqHPPprOiVHDSK8aGoBqkQAPZDjUtRwVx112wtaQwArT2+bDbb/Y
- Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
- kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
- X18zwLgdiQ==
-Message-ID: <8a55b0b6-25a9-d76b-1a6a-8aaed8bde8a7@canonical.com>
-Date:   Tue, 3 Sep 2019 16:53:20 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727522AbfICUNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Sep 2019 16:13:47 -0400
+Received: from a9-36.smtp-out.amazonses.com ([54.240.9.36]:59984 "EHLO
+        a9-36.smtp-out.amazonses.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725882AbfICUNr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Sep 2019 16:13:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+        s=6gbrjpgwjskckoa6a5zn6fwqkn67xbtw; d=amazonses.com; t=1567541625;
+        h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:MIME-Version:Content-Type:Feedback-ID;
+        bh=3CTlLgcwUNm+oBDTSqVhwT6v0ROJvSsfzOlbmJ233Hs=;
+        b=Cn915KxoRAOo3PmJZOOm/ld4evNzr6pLGhw1L27Pj4A6Fs/aZr4YyJgWGbjjuYtj
+        jeVgNkAMHrsCuy8IfzOPqbjM31SPPbl46ewrDDjxMgWc5IdaUb6qSn4OWC/M8d9fnKh
+        6hQcvnAzb8uFmTKLv3L+pNjqUii1U+7KYP92y6TI=
+Date:   Tue, 3 Sep 2019 20:13:45 +0000
+From:   Christopher Lameter <cl@linux.com>
+X-X-Sender: cl@nuc-kabylake
+To:     Matthew Wilcox <willy@infradead.org>
+cc:     Michal Hocko <mhocko@kernel.org>, Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dave Chinner <david@fromorbit.com>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
+ kmalloc(power-of-two)
+In-Reply-To: <20190901005205.GA2431@bombadil.infradead.org>
+Message-ID: <0100016cf8c3033d-bbcc9ba3-2d59-4654-a7c2-8ba094f8a7de-000000@email.amazonses.com>
+References: <20190826111627.7505-1-vbabka@suse.cz> <20190826111627.7505-3-vbabka@suse.cz> <0100016cd98bb2c1-a2af7539-706f-47ba-a68e-5f6a91f2f495-000000@email.amazonses.com> <20190828194607.GB6590@bombadil.infradead.org> <20190829073921.GA21880@dhcp22.suse.cz>
+ <0100016ce39e6bb9-ad20e033-f3f4-4e6d-85d6-87e7d07823ae-000000@email.amazonses.com> <20190901005205.GA2431@bombadil.infradead.org>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <CAHD1Q_ypdBKhYRVLrg_kf4L8LdXk8rgiiSQjtmoC=jyRv5M5jQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+X-SES-Outgoing: 2019.09.03-54.240.9.36
+Feedback-ID: 1.us-east-1.fQZZZ0Xtj2+TD7V5apTT/NrT6QKuPgzCT/IC7XYgDKI=:AmazonSES
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 30/08/2019 08:25, Guilherme Piccoli wrote:
-> Thanks a lot for all the suggestions Song, Neil and Wol - I'll
-> implement them and resubmit
-> (hopefully) Monday.
-> 
-> Cheers,
-> 
-> 
-> Guilherme
-> 
+On Sat, 31 Aug 2019, Matthew Wilcox wrote:
 
-V4 sent:
-https://lore.kernel.org/linux-block/20190903194901.13524-1-gpiccoli@canonical.com/T/#t
+> > The current behavior without special alignment for these caches has been
+> > in the wild for over a decade. And this is now coming up?
+>
+> In the wild ... and rarely enabled.  When it is enabled, it may or may
+> not be noticed as data corruption, or tripping other debugging asserts.
+> Users then turn off the rare debugging option.
 
-Wols, in order to reduce code size and for clarity, I've kept the helper
-as "is_mddev_broken()" - thanks for the suggestion anyway!
-Cheers,
+Its enabled in all full debug session as far as I know. Fedora for
+example has been running this for ages to find breakage in device drivers
+etc etc.
 
+> > If there is an exceptional alignment requirement then that needs to be
+> > communicated to the allocator. A special flag or create a special
+> > kmem_cache or something.
+>
+> The only way I'd agree to that is if we deliberately misalign every
+> allocation that doesn't have this special flag set.  Because right now,
+> breakage happens everywhere when these debug options are enabled, and
+> the very people who need to be helped are being hurt by the debugging.
 
-Guilherme
+That is customarily occurring for testing by adding "slub_debug" to the
+kernel commandline (or adding debug kernel options) and since my
+information is that this is done frequently (and has been for over a
+decade now) I am having a hard time believing the stories of great
+breakage here. These drivers were not tested with debugging on before?
+Never ran with a debug kernel?
