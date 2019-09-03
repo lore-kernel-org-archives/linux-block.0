@@ -2,277 +2,281 @@ Return-Path: <SRS0=Gq2m=W6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 215F3C3A5A2
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 11:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45810C3A5A7
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 12:51:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ED398233A1
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 11:37:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9C5920870
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 12:51:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PlkqjMBp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728934AbfICLgt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Sep 2019 07:36:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49818 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727005AbfICLgr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Sep 2019 07:36:47 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E024AC00A16E
-        for <linux-block@vger.kernel.org>; Tue,  3 Sep 2019 11:36:46 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id n6so8628990wrw.14
-        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2019 04:36:46 -0700 (PDT)
+        id S1728538AbfICMve (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Sep 2019 08:51:34 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:35610 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726631AbfICMve (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Sep 2019 08:51:34 -0400
+Received: by mail-pl1-f195.google.com with SMTP id gn20so7847605plb.2;
+        Tue, 03 Sep 2019 05:51:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=TNk9IGlPVK1NdSpsB9QxgWnU7LxyXG6TJSpdCnPvcps=;
+        b=PlkqjMBpGaEEopswRSqx1ppklTkOOKC5tczf/NyjD0+LP/6o1/tXcZMCaVC40Gh46Z
+         +0toRojAC547HzfHdAYcGCoc38jSHKMM3oAr2xSEFNn3ESjD15bTY7tbD6RAJNTG7cS3
+         wJEvoNYLXl0VIhWmtaOGLzRyU1Etw8o/LzwBKeP5SCjkqSHq2js6XN8lC4fFkco7Wz6P
+         0s6pP4N1Zj+uWoGRFxtK8AIyr1QkZYQG/g6iH1AYFrrIXNvYscILxZfrsyiYWcg1Ew9Y
+         65CxNuY46rJAiNeG/BwTZYYCZLThPItBDhusyGI4gQgawTn+ifwjAX+v8CB7EFHuqt97
+         xzFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=+R6u9BwnxHtMmSw8yzvUPcyLZu2IYokosGRavDc1YJk=;
-        b=dl2DISgI8I+28BqWnNS28KdAZO3BHUmIDnFbvNXBHBpZ18QxC/0qzgqp6O1PyPENHT
-         vpje23mQlruRmt/X/VKEuSo86juSCGONvXcAb5NLe9ZPTW9kXKB1njO8mckhv3MQqMbI
-         GxUQEVRBB3tjeIBbb2N+5sffK+gLb9AfDiso9my3z0X2sQV1tpgPkA0dyl4703xgdyij
-         icB+2IXWiYn1BHrM2s0HU0gekSNaKH7C5TA7pFpTSXKb+JjlS1J4bb1Xf7m+3jrrdCBO
-         A52fDmf6hh+z39w22tcJDMRERd+oiZ76kY0IT8SFsyVKXvyFoHxeAaijEv2sg7t+hL1Y
-         JjmQ==
-X-Gm-Message-State: APjAAAXWIGN8/UfCjbjrFLMP95pGOQ1W9jGXRVuoUVwZefTOaCtmCjwK
-        Ofe2s2C5FMdY0GjEAi04Jt7jiMsiN52qDCN9PJIr/Kc02bYRPTr/bygjXQBsmeKQWtdfYGnHyJG
-        1CTfkQDHvSntLgZ8Uru3ynro=
-X-Received: by 2002:a05:600c:24d0:: with SMTP id 16mr40897760wmu.83.1567510605637;
-        Tue, 03 Sep 2019 04:36:45 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzNzoTb5kcCzSeUblWBr3WZS6gFDMXCvybTGTUc/KXpnyf6okjLS075SUWlCDpw2Sh6TqadCg==
-X-Received: by 2002:a05:600c:24d0:: with SMTP id 16mr40897738wmu.83.1567510605375;
-        Tue, 03 Sep 2019 04:36:45 -0700 (PDT)
-Received: from miu.piliscsaba.redhat.com (catv-212-96-48-140.catv.broadband.hu. [212.96.48.140])
-        by smtp.gmail.com with ESMTPSA id v186sm40446906wmb.5.2019.09.03.04.36.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2019 04:36:44 -0700 (PDT)
-From:   Miklos Szeredi <mszeredi@redhat.com>
-To:     virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org
-Cc:     David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>
-Subject: [PATCH v4 01/16] vfs: Create fs_context-aware mount_bdev() replacement
-Date:   Tue,  3 Sep 2019 13:36:25 +0200
-Message-Id: <20190903113640.7984-2-mszeredi@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190903113640.7984-1-mszeredi@redhat.com>
-References: <20190903113640.7984-1-mszeredi@redhat.com>
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=TNk9IGlPVK1NdSpsB9QxgWnU7LxyXG6TJSpdCnPvcps=;
+        b=sc7a13a0rIMama0z/9bQKOJKc0wB2o6e3751E7GW+a97I+4rQ8VL74WmJVeaYfR317
+         HPp3ejzafVDuZ2YJc1bsCJPBb2ntxRTCeoaxvtKvQGJslG66QV7zS50WJLC5AwWukS0O
+         iNsALDk61rkh1kniesd/fTuJrYRWJjWVyw4tPlMoaucmmxMa21fx3InkArZbjOl5sZb8
+         mvpe+LO2pR7WPUrhSh8ELj5YihADcVpbLjBOAbDT0BfyUG74nAgw5dTTJNrusX5upy+8
+         vUbnTkpEzIHa38avKivkHPWvLvUUfBv3h6A4P+8P7MuB+E41F31/FcN9CHNqo2hOJGNu
+         QDBg==
+X-Gm-Message-State: APjAAAUYaojL+Dix+LBA9fNIfakVhluyupFQIJVzTugynZrr2seQlZaZ
+        d7rUw8MmDbn5rG4F7Q+MM0A=
+X-Google-Smtp-Source: APXvYqwKqxznM6zQU3HZTapz8CigzSVKi3gwBMTP0WSJy/KSSehiI9IBnjYNqmxFn6WeFDq4F2/zxA==
+X-Received: by 2002:a17:902:9689:: with SMTP id n9mr35703585plp.3.1567515092655;
+        Tue, 03 Sep 2019 05:51:32 -0700 (PDT)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id 71sm4293971pfw.147.2019.09.03.05.51.30
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 03 Sep 2019 05:51:31 -0700 (PDT)
+Date:   Tue, 3 Sep 2019 05:51:29 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     David Howells <dhowells@redhat.com>
+Cc:     viro@zeniv.linux.org.uk, Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 08/11] usb: Add USB subsystem notifications [ver #7]
+Message-ID: <20190903125129.GA18838@roeck-us.net>
+References: <156717343223.2204.15875738850129174524.stgit@warthog.procyon.org.uk>
+ <156717350329.2204.7056537095039252263.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <156717350329.2204.7056537095039252263.stgit@warthog.procyon.org.uk>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: David Howells <dhowells@redhat.com>
+On Fri, Aug 30, 2019 at 02:58:23PM +0100, David Howells wrote:
+> Add a USB subsystem notification mechanism whereby notifications about
+> hardware events such as device connection, disconnection, reset and I/O
+> errors, can be reported to a monitoring process asynchronously.
+> 
+> Firstly, an event queue needs to be created:
+> 
+> 	fd = open("/dev/event_queue", O_RDWR);
+> 	ioctl(fd, IOC_WATCH_QUEUE_SET_SIZE, page_size << n);
+> 
+> then a notification can be set up to report USB notifications via that
+> queue:
+> 
+> 	struct watch_notification_filter filter = {
+> 		.nr_filters = 1,
+> 		.filters = {
+> 			[0] = {
+> 				.type = WATCH_TYPE_USB_NOTIFY,
+> 				.subtype_filter[0] = UINT_MAX;
+> 			},
+> 		},
+> 	};
+> 	ioctl(fd, IOC_WATCH_QUEUE_SET_FILTER, &filter);
+> 	notify_devices(fd, 12);
+> 
+> After that, records will be placed into the queue when events occur on a
+> USB device or bus.  Records are of the following format:
+> 
+> 	struct usb_notification {
+> 		struct watch_notification watch;
+> 		__u32	error;
+> 		__u32	reserved;
+> 		__u8	name_len;
+> 		__u8	name[0];
+> 	} *n;
+> 
+> Where:
+> 
+> 	n->watch.type will be WATCH_TYPE_USB_NOTIFY
+> 
+> 	n->watch.subtype will be the type of notification, such as
+> 	NOTIFY_USB_DEVICE_ADD.
+> 
+> 	n->watch.info & WATCH_INFO_LENGTH will indicate the length of the
+> 	record.
+> 
+> 	n->watch.info & WATCH_INFO_ID will be the second argument to
+> 	device_notify(), shifted.
+> 
+> 	n->error and n->reserved are intended to convey information such as
+> 	error codes, but are currently not used
+> 
+> 	n->name_len and n->name convey the USB device name as an
+> 	unterminated string.  This may be truncated - it is currently
+> 	limited to a maximum 63 chars.
+> 
+> Note that it is permissible for event records to be of variable length -
+> or, at least, the length may be dependent on the subtype.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> cc: linux-usb@vger.kernel.org
+> ---
+> 
+>  Documentation/watch_queue.rst    |    9 ++++++
+>  drivers/usb/core/Kconfig         |    9 ++++++
+>  drivers/usb/core/devio.c         |   56 ++++++++++++++++++++++++++++++++++++++
+>  drivers/usb/core/hub.c           |    4 +++
+>  include/linux/usb.h              |   18 ++++++++++++
+>  include/uapi/linux/watch_queue.h |   30 ++++++++++++++++++++
+>  6 files changed, 125 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/watch_queue.rst b/Documentation/watch_queue.rst
+> index 5cc9c6924727..4087a8e670a8 100644
+> --- a/Documentation/watch_queue.rst
+> +++ b/Documentation/watch_queue.rst
+> @@ -11,6 +11,8 @@ receive notifications from the kernel.  This can be used in conjunction with::
+>  
+>      * Block layer event notifications
+>  
+> +    * USB subsystem event notifications
+> +
+>  
+>  The notifications buffers can be enabled by:
+>  
+> @@ -315,6 +317,13 @@ Any particular buffer can be fed from multiple sources.  Sources include:
+>      or temporary link loss.  Watches of this type are set on the global device
+>      watch list.
+>  
+> +  * WATCH_TYPE_USB_NOTIFY
+> +
+> +    Notifications of this type indicate USB subsystem events, such as
+> +    attachment, removal, reset and I/O errors.  Separate events are generated
+> +    for buses and devices.  Watchpoints of this type are set on the global
+> +    device watch list.
+> +
+>  
+>  Event Filtering
+>  ===============
+> diff --git a/drivers/usb/core/Kconfig b/drivers/usb/core/Kconfig
+> index ecaacc8ed311..57e7b649e48b 100644
+> --- a/drivers/usb/core/Kconfig
+> +++ b/drivers/usb/core/Kconfig
+> @@ -102,3 +102,12 @@ config USB_AUTOSUSPEND_DELAY
+>  	  The default value Linux has always had is 2 seconds.  Change
+>  	  this value if you want a different delay and cannot modify
+>  	  the command line or module parameter.
+> +
+> +config USB_NOTIFICATIONS
+> +	bool "Provide USB hardware event notifications"
+> +	depends on USB && DEVICE_NOTIFICATIONS
+> +	help
+> +	  This option provides support for getting hardware event notifications
+> +	  on USB devices and interfaces.  This makes use of the
+> +	  /dev/watch_queue misc device to handle the notification buffer.
+> +	  device_notify(2) is used to set/remove watches.
+> diff --git a/drivers/usb/core/devio.c b/drivers/usb/core/devio.c
+> index 9063ede411ae..b8572e4d6a1b 100644
+> --- a/drivers/usb/core/devio.c
+> +++ b/drivers/usb/core/devio.c
+> @@ -41,6 +41,7 @@
+>  #include <linux/dma-mapping.h>
+>  #include <asm/byteorder.h>
+>  #include <linux/moduleparam.h>
+> +#include <linux/watch_queue.h>
+>  
+>  #include "usb.h"
+>  
+> @@ -2660,13 +2661,68 @@ static void usbdev_remove(struct usb_device *udev)
+>  	}
+>  }
+>  
+> +#ifdef CONFIG_USB_NOTIFICATIONS
+> +static noinline void post_usb_notification(const char *devname,
+> +					   enum usb_notification_type subtype,
+> +					   u32 error)
+> +{
+> +	unsigned int gran = WATCH_LENGTH_GRANULARITY;
+> +	unsigned int name_len, n_len;
+> +	u64 id = 0; /* Might want to put a dev# here. */
+> +
+> +	struct {
+> +		struct usb_notification n;
+> +		char more_name[USB_NOTIFICATION_MAX_NAME_LEN -
+> +			       (sizeof(struct usb_notification) -
+> +				offsetof(struct usb_notification, name))];
+> +	} n;
+> +
+> +	name_len = strlen(devname);
+> +	name_len = min_t(size_t, name_len, USB_NOTIFICATION_MAX_NAME_LEN);
+> +	n_len = round_up(offsetof(struct usb_notification, name) + name_len,
+> +			 gran) / gran;
+> +
+> +	memset(&n, 0, sizeof(n));
+> +	memcpy(n.n.name, devname, n_len);
+> +
+> +	n.n.watch.type		= WATCH_TYPE_USB_NOTIFY;
+> +	n.n.watch.subtype	= subtype;
+> +	n.n.watch.info		= n_len;
+> +	n.n.error		= error;
+> +	n.n.name_len		= name_len;
+> +
+> +	post_device_notification(&n.n.watch, id);
+> +}
+> +
+> +void post_usb_device_notification(const struct usb_device *udev,
+> +				  enum usb_notification_type subtype, u32 error)
+> +{
+> +	post_usb_notification(dev_name(&udev->dev), subtype, error);
+> +}
+> +
+> +void post_usb_bus_notification(const struct usb_bus *ubus,
+> +			       enum usb_notification_type subtype, u32 error)
+> +{
+> +	post_usb_notification(ubus->bus_name, subtype, error);
+> +}
+> +#endif
+> +
+>  static int usbdev_notify(struct notifier_block *self,
+>  			       unsigned long action, void *dev)
+>  {
+>  	switch (action) {
+>  	case USB_DEVICE_ADD:
+> +		post_usb_device_notification(dev, NOTIFY_USB_DEVICE_ADD, 0);
+>  		break;
+>  	case USB_DEVICE_REMOVE:
+> +		post_usb_device_notification(dev, NOTIFY_USB_DEVICE_REMOVE, 0);
+> +		usbdev_remove(dev);
+> +		break;
+> +	case USB_BUS_ADD:
+> +		post_usb_bus_notification(dev, NOTIFY_USB_BUS_ADD, 0);
+> +		break;
+> +	case USB_BUS_REMOVE:
+> +		post_usb_bus_notification(dev, NOTIFY_USB_BUS_REMOVE, 0);
+>  		usbdev_remove(dev);
 
-Create a function, vfs_get_block_super(), that is fs_context-aware and a
-replacement for mount_bdev().  It caches the block device pointer and file
-open mode in the fs_context struct so that this information can be passed
-into sget_fc()'s test and set functions.
+This added call to usbdev_remove() results in a crash when running
+the qemu "tosa" emulation. Removing the call fixes the problem.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: linux-block@vger.kernel.org
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
----
- fs/fs_context.c            |   2 +
- fs/super.c                 | 111 ++++++++++++++++++++++++++++++++++++-
- include/linux/fs_context.h |   9 +++
- 3 files changed, 121 insertions(+), 1 deletion(-)
-
-diff --git a/fs/fs_context.c b/fs/fs_context.c
-index 103643c68e3f..270ecae32216 100644
---- a/fs/fs_context.c
-+++ b/fs/fs_context.c
-@@ -501,6 +501,8 @@ void put_fs_context(struct fs_context *fc)
- 
- 	if (fc->need_free && fc->ops && fc->ops->free)
- 		fc->ops->free(fc);
-+	if (fc->dev_destructor)
-+		fc->dev_destructor(fc);
- 
- 	security_free_mnt_opts(&fc->security);
- 	put_net(fc->net_ns);
-diff --git a/fs/super.c b/fs/super.c
-index 5960578a4076..80b56bc7d2db 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1212,6 +1212,110 @@ int get_tree_single(struct fs_context *fc,
- EXPORT_SYMBOL(get_tree_single);
- 
- #ifdef CONFIG_BLOCK
-+static void fc_bdev_destructor(struct fs_context *fc)
-+{
-+	if (fc->bdev) {
-+		blkdev_put(fc->bdev, fc->bdev_mode);
-+		fc->bdev = NULL;
-+	}
-+}
-+
-+static int set_bdev_super_fc(struct super_block *s, struct fs_context *fc)
-+{
-+	s->s_mode = fc->bdev_mode;
-+	s->s_bdev = fc->bdev;
-+	s->s_dev = s->s_bdev->bd_dev;
-+	s->s_bdi = bdi_get(s->s_bdev->bd_bdi);
-+	fc->bdev = NULL;
-+	return 0;
-+}
-+
-+static int test_bdev_super_fc(struct super_block *s, struct fs_context *fc)
-+{
-+	return s->s_bdev == fc->bdev;
-+}
-+
-+/**
-+ * vfs_get_block_super - Get a superblock based on a single block device
-+ * @fc: The filesystem context holding the parameters
-+ * @keying: How to distinguish superblocks
-+ * @fill_super: Helper to initialise a new superblock
-+ */
-+int vfs_get_block_super(struct fs_context *fc,
-+			int (*fill_super)(struct super_block *,
-+					  struct fs_context *))
-+{
-+	struct block_device *bdev;
-+	struct super_block *s;
-+	int error = 0;
-+
-+	fc->bdev_mode = FMODE_READ | FMODE_EXCL;
-+	if (!(fc->sb_flags & SB_RDONLY))
-+		fc->bdev_mode |= FMODE_WRITE;
-+
-+	if (!fc->source)
-+		return invalf(fc, "No source specified");
-+
-+	bdev = blkdev_get_by_path(fc->source, fc->bdev_mode, fc->fs_type);
-+	if (IS_ERR(bdev)) {
-+		errorf(fc, "%s: Can't open blockdev", fc->source);
-+		return PTR_ERR(bdev);
-+	}
-+
-+	fc->dev_destructor = fc_bdev_destructor;
-+	fc->bdev = bdev;
-+
-+	/* Once the superblock is inserted into the list by sget_fc(), s_umount
-+	 * will protect the lockfs code from trying to start a snapshot while
-+	 * we are mounting
-+	 */
-+	mutex_lock(&bdev->bd_fsfreeze_mutex);
-+	if (bdev->bd_fsfreeze_count > 0) {
-+		mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+		warnf(fc, "%pg: Can't mount, blockdev is frozen", bdev);
-+		return -EBUSY;
-+	}
-+
-+	fc->sb_flags |= SB_NOSEC;
-+	s = sget_fc(fc, test_bdev_super_fc, set_bdev_super_fc);
-+	mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+	if (IS_ERR(s))
-+		return PTR_ERR(s);
-+
-+	if (s->s_root) {
-+		/* Don't summarily change the RO/RW state. */
-+		if ((fc->sb_flags ^ s->s_flags) & SB_RDONLY) {
-+			warnf(fc, "%pg: Can't mount, would change RO state", bdev);
-+			error = -EBUSY;
-+			goto error_sb;
-+		}
-+
-+		/* Leave fc->bdev to fc_bdev_destructor() to clean up to avoid
-+		 * locking conflicts.
-+		 */
-+	} else {
-+		snprintf(s->s_id, sizeof(s->s_id), "%pg", bdev);
-+		sb_set_blocksize(s, block_size(bdev));
-+		error = fill_super(s, fc);
-+		if (error)
-+			goto error_sb;
-+
-+		s->s_flags |= SB_ACTIVE;
-+		bdev->bd_super = s;
-+	}
-+
-+	BUG_ON(fc->root);
-+	fc->root = dget(s->s_root);
-+	return 0;
-+
-+error_sb:
-+	deactivate_locked_super(s);
-+	/* Leave fc->bdev to fc_bdev_destructor() to clean up */
-+	return error;
-+}
-+EXPORT_SYMBOL(vfs_get_block_super);
-+
-+
- static int set_bdev_super(struct super_block *s, void *data)
- {
- 	s->s_bdev = data;
-@@ -1411,8 +1515,13 @@ int vfs_get_tree(struct fs_context *fc)
- 	 * on the superblock.
- 	 */
- 	error = fc->ops->get_tree(fc);
--	if (error < 0)
-+	if (error < 0) {
-+		if (fc->dev_destructor) {
-+			fc->dev_destructor(fc);
-+			fc->dev_destructor = NULL;
-+		}
- 		return error;
-+	}
- 
- 	if (!fc->root) {
- 		pr_err("Filesystem %s get_tree() didn't set fc->root\n",
-diff --git a/include/linux/fs_context.h b/include/linux/fs_context.h
-index 7c6fe3d47fa6..ed5b4349671e 100644
---- a/include/linux/fs_context.h
-+++ b/include/linux/fs_context.h
-@@ -88,6 +88,9 @@ struct fs_context {
- 	struct mutex		uapi_mutex;	/* Userspace access mutex */
- 	struct file_system_type	*fs_type;
- 	void			*fs_private;	/* The filesystem's context */
-+	union {
-+		struct block_device *bdev;	/* The backing blockdev (if applicable) */
-+	};
- 	struct dentry		*root;		/* The root and superblock */
- 	struct user_namespace	*user_ns;	/* The user namespace for this mount */
- 	struct net		*net_ns;	/* The network namespace for this mount */
-@@ -97,6 +100,7 @@ struct fs_context {
- 	const char		*subtype;	/* The subtype to set on the superblock */
- 	void			*security;	/* Linux S&M options */
- 	void			*s_fs_info;	/* Proposed s_fs_info */
-+	fmode_t			bdev_mode;	/* File open mode for bdev */
- 	unsigned int		sb_flags;	/* Proposed superblock flags (SB_*) */
- 	unsigned int		sb_flags_mask;	/* Superblock flags that were changed */
- 	unsigned int		s_iflags;	/* OR'd with sb->s_iflags */
-@@ -105,6 +109,7 @@ struct fs_context {
- 	enum fs_context_phase	phase:8;	/* The phase the context is in */
- 	bool			need_free:1;	/* Need to call ops->free() */
- 	bool			global:1;	/* Goes into &init_user_ns */
-+	void (*dev_destructor)(struct fs_context *fc); /* For block or mtd */
- };
- 
- struct fs_context_operations {
-@@ -154,6 +159,10 @@ extern int get_tree_single(struct fs_context *fc,
- 			 int (*fill_super)(struct super_block *sb,
- 					   struct fs_context *fc));
- 
-+extern int vfs_get_block_super(struct fs_context *fc,
-+			       int (*fill_super)(struct super_block *sb,
-+						 struct fs_context *fc));
-+
- extern const struct file_operations fscontext_fops;
- 
- /*
--- 
-2.21.0
-
+Guenter
