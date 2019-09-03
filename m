@@ -2,168 +2,118 @@ Return-Path: <SRS0=Gq2m=W6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FB6FC3A59E
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 00:45:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 276C8C3A5A5
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 05:00:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B58922D6D
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 00:45:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D128C22CF8
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 05:00:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=renesasgroup.onmicrosoft.com header.i=@renesasgroup.onmicrosoft.com header.b="USjzy7So"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725867AbfICApT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Sep 2019 20:45:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56362 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725807AbfICApT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Sep 2019 20:45:19 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 57A1443D5B;
-        Tue,  3 Sep 2019 00:45:18 +0000 (UTC)
-Received: from [10.72.12.60] (ovpn-12-60.pek2.redhat.com [10.72.12.60])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E4014196AE;
-        Tue,  3 Sep 2019 00:45:15 +0000 (UTC)
-Subject: Re: [PATCH 2/2 v3] nbd: fix possible page fault for nbd disk
-To:     Mike Christie <mchristi@redhat.com>, josef@toxicpanda.com,
-        axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org
-References: <20190822075923.11996-1-xiubli@redhat.com>
- <20190822075923.11996-3-xiubli@redhat.com> <5D686498.5090602@redhat.com>
- <78d16d10-1d06-6ce1-7c51-64c42e51f549@redhat.com>
- <5D6D89ED.6020700@redhat.com>
-From:   Xiubo Li <xiubli@redhat.com>
-Message-ID: <e3c0f330-26b4-a305-8e36-b452e46bed8f@redhat.com>
-Date:   Tue, 3 Sep 2019 08:45:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1725895AbfICFAF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Sep 2019 01:00:05 -0400
+Received: from mail-eopbgr1400107.outbound.protection.outlook.com ([40.107.140.107]:50880
+        "EHLO JPN01-TY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725839AbfICFAE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Sep 2019 01:00:04 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K7fbkjlp64I2ci5WUGUJKHqyBkD7alG2kg+OGRg3U8hCv2sepe5Q0tLeBRDPEat8OqmAl6m6PlGd3OlFEXCoVLCpeQks/iQ2/ab5vzrVLSxqmtPQ2DyNxzXXLEued9aVwnPoW4ffc1BsU5wWpPGoauTUS0t7H6y0Ipcjmccp40AGzJvHwqsk4L+A3jrXi4iDlJJdZn4XsDJmdrfOMbqpIjCUMYFiDKvuZeD57Mgh2pRxO88jVPUDyb+vjrtvzeXJWS6A3mqYWClBp5EssogQcNpZnieeuCKB7rvSIfiNYR4R/QB5UgFHRFFbb7AAQZwhuBE1S9GAOmxvA6nsprHwbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SXD+SBckSe+Z8yo7gtaaBVi7lWWoaPlWlwifIMxq6/U=;
+ b=O1ra65j8G1xZgYBinbDgTB/wxPuHAsjowGRWrRx0q1uILcB8R7uvCE8wONwgESrhMnZQveLrvd/nSSZoHYlVTQF2JPBYUt0TQeeBHGNOfoIVoA/gr9NbSYc6TbRkLGRCTQMYtchplMuZF5KBN+L4ttIBaQEHXK0pDjVmj+IZxH1pjnb9w4BsyEe9KD9x7L5IcoABAS5ZVNUPmtprrUlDt4nhu3p+hCx3ATKwkJb0mXIhaho5zaGG+SlCQGpGOKsQo89ZOBqlyTHOpKkF3soIba2wkoP0yMSy8rdvFYd2EChAqEGXs05Cy6EAdzbSKM/dfIHX2cfuCMocNWGD89/w/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
+ dkim=pass header.d=renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=renesasgroup.onmicrosoft.com; s=selector2-renesasgroup-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SXD+SBckSe+Z8yo7gtaaBVi7lWWoaPlWlwifIMxq6/U=;
+ b=USjzy7So2BlzN4ieuZLaLDXvMzBGWCP7hVwBWWsKfYXTxau4VUrzYRO1CDnjFkxL+KDyd1INgwmiy60YKFNDNCpW8XOKUy2L7BaR8T6Qe58iPUQ6F2o+DrIh3xst5KwzUoo3XF6fuwspul3aZdoeuwqZ/8vw2+u61Nwvr7ikrPw=
+Received: from TYAPR01MB4544.jpnprd01.prod.outlook.com (20.179.175.203) by
+ TYAPR01MB5261.jpnprd01.prod.outlook.com (20.179.174.13) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2220.20; Tue, 3 Sep 2019 05:00:00 +0000
+Received: from TYAPR01MB4544.jpnprd01.prod.outlook.com
+ ([fe80::6564:f61f:f179:facf]) by TYAPR01MB4544.jpnprd01.prod.outlook.com
+ ([fe80::6564:f61f:f179:facf%5]) with mapi id 15.20.2220.022; Tue, 3 Sep 2019
+ 04:59:59 +0000
+From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To:     "hch@lst.de" <hch@lst.de>
+CC:     "wsa+renesas@sang-engineering.com" <wsa+renesas@sang-engineering.com>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-renesas-soc@vger.kernel.org" 
+        <linux-renesas-soc@vger.kernel.org>,
+        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+        "m.szyprowski@samsung.com" <m.szyprowski@samsung.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "joro@8bytes.org" <joro@8bytes.org>, Jens Axboe <axboe@kernel.dk>
+Subject: RE: [PATCH v10 3/4] block: add a helper function to merge the
+ segments
+Thread-Topic: [PATCH v10 3/4] block: add a helper function to merge the
+ segments
+Thread-Index: AQHVXZ1a3dgM7EWWT0y+9VldzhpkbqcY9KsAgAB3rzA=
+Date:   Tue, 3 Sep 2019 04:59:59 +0000
+Message-ID: <TYAPR01MB454492ADBC8561C0BEC6F449D8B90@TYAPR01MB4544.jpnprd01.prod.outlook.com>
+References: <1566995743-5614-1-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+ <1566995743-5614-4-git-send-email-yoshihiro.shimoda.uh@renesas.com>
+ <e549e8e7-9dfe-6f68-2148-f49a9089db37@kernel.dk>
+In-Reply-To: <e549e8e7-9dfe-6f68-2148-f49a9089db37@kernel.dk>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=yoshihiro.shimoda.uh@renesas.com; 
+x-originating-ip: [150.249.235.54]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c23cddcb-a146-4b0b-6c50-08d7302b92bf
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:TYAPR01MB5261;
+x-ms-traffictypediagnostic: TYAPR01MB5261:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <TYAPR01MB526160FEDC18B4A092612921D8B90@TYAPR01MB5261.jpnprd01.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1728;
+x-forefront-prvs: 01494FA7F7
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(136003)(39860400002)(376002)(346002)(396003)(189003)(199004)(229853002)(6246003)(53936002)(6116002)(3846002)(86362001)(66066001)(64756008)(66476007)(2501003)(74316002)(66446008)(76116006)(66556008)(66946007)(11346002)(256004)(446003)(6306002)(305945005)(486006)(6436002)(9686003)(2351001)(7736002)(476003)(7416002)(33656002)(7696005)(76176011)(81166006)(8676002)(81156014)(1730700003)(14454004)(71200400001)(71190400001)(478600001)(55016002)(5640700003)(5660300002)(6916009)(54906003)(966005)(8936002)(102836004)(316002)(2906002)(52536014)(4744005)(53546011)(26005)(6506007)(4326008)(186003)(25786009)(99286004);DIR:OUT;SFP:1102;SCL:1;SRVR:TYAPR01MB5261;H:TYAPR01MB4544.jpnprd01.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: renesas.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: ADt0wtdOc96t6xdi6ndL0r5U1Jnl7o87NW7u8VLzwU8sAwtI1aS1rDtcBOWItnJo3ywnnAH7m36FFuQiAuK0hXsevUlHTpCHfVSZ/W6mFgPE+GSB7SuLGXFOS/AygMCEyBcbH39NIRs3tOn5sJBC16nUXihvV9oLxDBbKSzPtPToddDi42Chnl1Jimh/hs/sQsX8IeNAF6Dz9O42WD1z1xCGIiMcfEXuXBNthQ3pqBKFVE4RRJPzRdAG6QItYb0+XVU6uqJLMiDnqSgHEVSmB2CoDt4c631mICaBrnCRN+DG8PTGy69ZLAkiurNE4i5WShm3hyIgQ9qnoExijmTw86W/TXVUPpUqVBZ16qDwrIrcUAFOQ/Q6kr2p4SvI+jKU6LlzE6LBM0+4AFWrzFXrFdXSksgxhIFytxuUByM8WNA=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <5D6D89ED.6020700@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.71]); Tue, 03 Sep 2019 00:45:18 +0000 (UTC)
+X-OriginatorOrg: renesas.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c23cddcb-a146-4b0b-6c50-08d7302b92bf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Sep 2019 04:59:59.8261
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /B1qWuEj4szLarxo3RBa6I3dAqvyf+WiQNqAmIjjWgyPFmvo5UjZz2UvMNAojJgVnzbMRdzBWu6q23woPKvPggz6gmC4880S+hr9TqYhVnWGejDXWHX1JTvGjebKmJmi
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYAPR01MB5261
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/9/3 5:30, Mike Christie wrote:
-> On 08/29/2019 07:58 PM, Xiubo Li wrote:
->> On 2019/8/30 7:49, Mike Christie wrote:
->>> On 08/22/2019 02:59 AM, xiubli@redhat.com wrote:
-[...]
->>> @@ -1596,6 +1614,7 @@ static int nbd_dev_add(int index)
->>>        nbd->tag_set.flags = BLK_MQ_F_SHOULD_MERGE |
->>>            BLK_MQ_F_BLOCKING;
->>>        nbd->tag_set.driver_data = nbd;
->>> +    init_completion(&nbd->destroy_complete);
->>>          err = blk_mq_alloc_tag_set(&nbd->tag_set);
->>>        if (err)
->>> @@ -1761,6 +1780,16 @@ static int nbd_genl_connect(struct sk_buff
->>> *skb, struct genl_info *info)
->>>            mutex_unlock(&nbd_index_mutex);
->>>            return -EINVAL;
->>>        }
->>> +
->>> +    if (test_bit(NBD_DESTROY_ON_DISCONNECT, &nbd->flags) &&
->>> Why does this have to be set? If this is not set would you end up
->>> hitting the config_refs check:
->>>
->>> if (refcount_read(&nbd->config_refs)) {
->>>
->>> and possibly returning failure?
->> Yeah, this is a good question. Before I have also tried to fix it with
->> this, but it still won't work for me.
->>
->>  From my test cases almost more than 50% times, the crash will be hit in
->> the gap just after the nbd->config already been released, and before the
->> nbd itself not yet, so the nbd->config_refs will be 0.
->>
->>
->>> If you moved the complete() to nbd_config_put would it work if this bit
->>> was set or not?
->> Tried it already, it still won't work.
->>
->> There is one case that when disconnecting the nbd device, the userspace
->> service will do the open()/release()  things, please see [1], and the
->> sequence is not the same every time, if the
->> NBD_CFLAG_DESTROY_ON_DISCONNECT bit is set the crash still exists.
->>
->> So sometimes when the nbd_put() called from the nbd_config_put(), the
->> &nbd->refs in nbd_put won't be 0, it could be 1. And it will be 0 just
->> after the release() is triggered later.
->>
->> So I just place the complete() before "free(nbd);", or there will be
->> another Call trace will be seen very often:
-> Did this happen because you race with
->
-> nbd_put->nbd_dev_remove->del_gendisk->device_del->sysfs_remove_dir
->
-> ? If so, does that still happen after you moved
->
-> mutex_unlock(&nbd_index_mutex);
->
-> in nbd_put?
-
-Currently with this fix, there is no any Call Traces anymore from my 
-test cases. I ran the test for almost a whole night long without any 
-problem.
-
-
->   It seems before that part of your patch was added we could
-> hit this race and got the duplicate sysfs entry trace below:
->
-> 1. nbd_put -> idr_remove.
-> 2. nbd_put drops mutex.
-> 3. nbd_genl_connect takes mutex (index != -1 for this call).
-> 4. nbd_genl_connect-> idr_find fails due to remove in #1.
-> 5. nbd_genl_connect->nbd_dev_add is then able to try to add the device
-> to sysfs before the nbd_put->nbd_dev_remove path has deleted the device.
-
-Yeah, it is. Just before the old stale sysfs entry is totally 
-removed/released, the nbd driver is trying to create it again with the 
-same nbd_index.
-
-
->
-> When you now do the idr and sysfs removal and idr addition/search and
-> sysfs addition all under the nbd_index_mutex it shouldn't happen anymore.
->
-Correctly.
-
-Thanks,
-BRs
-
-
->
->
->>     2489 Aug 20 18:10:04 lxbfd2 kernel: sysfs: cannot create duplicate
->> filename '/devices/virtual/block/nbd0'
->>     2490 Aug 20 18:10:04 lxbfd2 kernel: CPU: 0 PID: 8635 Comm: nbd-clid
->> Kdump: loaded Tainted: G      D 5.1.18-300.fc30.x86_64 #1
->>     2491 Aug 20 18:10:04 lxbfd2 kernel: Hardware name: Red Hat KVM, BIOS
->> 0.5.1 01/01/2011
->>     2492 Aug 20 18:10:04 lxbfd2 kernel: Call Trace:
->>     2493 Aug 20 18:10:04 lxbfd2 kernel: dump_stack+0x5c/0x80
->>     2494 Aug 20 18:10:04 lxbfd2 kernel: sysfs_warn_dup.cold+0x17/0x2d
->>     2495 Aug 20 18:10:04 lxbfd2 kernel: sysfs_create_dir_ns+0xb6/0xd0
->>     2496 Aug 20 18:10:04 lxbfd2 kernel: kobject_add_internal+0xb7/0x280
->>     2497 Aug 20 18:10:04 lxbfd2 kernel: kobject_add+0x7e/0xb0
->>     2498 Aug 20 18:10:04 lxbfd2 kernel: ? _cond_resched+0x15/0x30
->>     2499 Aug 20 18:10:04 lxbfd2 kernel: device_add+0x12b/0x690
->>     2500 Aug 20 18:10:04 lxbfd2 kernel: __device_add_disk+0x1b5/0x470
->>     2501 Aug 20 18:10:04 lxbfd2 kernel: nbd_dev_add+0x21d/0x2b0 [nbd]
->>     2502 Aug 20 18:10:04 lxbfd2 kernel: nbd_genl_connect+0x16e/0x630 [nbd]
->>     2503 Aug 20 18:10:04 lxbfd2 kernel: genl_family_rcv_msg+0x1a9/0x3b0
->>     2504 Aug 20 18:10:04 lxbfd2 kernel: ? __switch_to_asm+0x35/0x70
->>     2505 Aug 20 18:10:04 lxbfd2 kernel: ? __switch_to_asm+0x41/0x70
->>     2506 Aug 20 18:10:04 lxbfd2 kernel: ? __switch_to+0x11f/0x4c0
->>     2507 Aug 20 18:10:04 lxbfd2 kernel: ? __switch_to_asm+0x41/0x70
->>     [...]
->>
-
+SGkgQ2hyaXN0b3BoLA0KDQpOb3cgdGhpcyBwYXRjaCBzZXJpZXMgZ290IHtBY2ssUmV2aWV3fWVk
+LWJ5IGZyb20gZWFjaCBtYWludGFpbmVyLg0KaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9yZy9w
+cm9qZWN0L2xpbnV4LXJlbmVzYXMtc29jL2xpc3QvP3Nlcmllcz0xNjY1MDENCg0KU28sIHdvdWxk
+IHlvdSBwaWNrIHRoaXMgdXAgdGhyb3VnaCB0aGUgZG1hLW1hcHBpbmcgdHJlZSBhcyB5b3Ugc2Fp
+ZCBiZWZvcmU/DQoNCj4gRnJvbTogSmVucyBBeGJvZSwgU2VudDogVHVlc2RheSwgU2VwdGVtYmVy
+IDMsIDIwMTkgNjo0NyBBTQ0KPiANCj4gT24gOC8yOC8xOSA2OjM1IEFNLCBZb3NoaWhpcm8gU2hp
+bW9kYSB3cm90ZToNCj4gPiBUaGlzIHBhdGNoIGFkZHMgYSBoZWxwZXIgZnVuY3Rpb24gd2hldGhl
+ciBhIHF1ZXVlIGNhbiBtZXJnZQ0KPiA+IHRoZSBzZWdtZW50cyBieSB0aGUgRE1BIE1BUCBsYXll
+ciAoZS5nLiB2aWEgSU9NTVUpLg0KPiANCj4gUmV2aWV3ZWQtYnk6IEplbnMgQXhib2UgPGF4Ym9l
+QGtlcm5lbC5kaz4NCg0KSmVucywgdGhhbmsgeW91IGZvciB5b3VyIHJldmlldyENCg0KQmVzdCBy
+ZWdhcmRzLA0KWW9zaGloaXJvIFNoaW1vZGENCg0K
