@@ -2,199 +2,153 @@ Return-Path: <SRS0=Gq2m=W6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC4D8C3A5A2
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 21:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DECEC3A5A2
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 22:16:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7536222CF8
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 21:57:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6962121883
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 22:16:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="Di8Hi0P0";
-	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="bl9ZEPoD"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="Lx0my6aI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726593AbfICV5B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Sep 2019 17:57:01 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:41374 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726490AbfICV5A (ORCPT
+        id S1726635AbfICWQO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Sep 2019 18:16:14 -0400
+Received: from sonic307-16.consmr.mail.ne1.yahoo.com ([66.163.190.39]:44611
+        "EHLO sonic307-16.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726465AbfICWQO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Sep 2019 17:57:00 -0400
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id x83LtYvN013876;
-        Tue, 3 Sep 2019 14:56:28 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=facebook;
- bh=ryFHb4Q/c8EEyIZNE5ad6Kn69I8Ia0hGduIMd7KO+bY=;
- b=Di8Hi0P0T2ZYoTphkELXRUIy8u+iDztIzf2r3WjRSSBTMQzVZjejxQzzNxfdiVRZKqlC
- oV9y3G0rVTPzbOUrHOHpirigSXjGn29qX2r/B4w+miodQfyKtEfLfTemDJPm2IVbIkpI
- N8mPdyHngSsHo2LrHLIVQ8hfUs6ho1Hbzhs= 
-Received: from mail.thefacebook.com (mailout.thefacebook.com [199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2usqs7am34-5
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Tue, 03 Sep 2019 14:56:28 -0700
-Received: from prn-hub01.TheFacebook.com (2620:10d:c081:35::125) by
- prn-hub06.TheFacebook.com (2620:10d:c081:35::130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.1.1713.5; Tue, 3 Sep 2019 14:56:27 -0700
-Received: from NAM03-BY2-obe.outbound.protection.outlook.com (192.168.54.28)
- by o365-in.thefacebook.com (192.168.16.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.1.1713.5
- via Frontend Transport; Tue, 3 Sep 2019 14:56:27 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RyY2hsWwokI8KXPmK2rb9sMm4Y9OuJxXvLw9SJHc1RBeBQ51KexNPWH1qtzIkvK9f3diUBrRhsx6UirDCkl7pCzQ4Huz++nJMpMd42rHEpwS60KWrKgATEHFvzXcI9Xi/AcSXk0BgbLoVqFiR0uQBWB9BeNbOOiVB5jey80vm2M0bELYeQz+OfpJbay/RL31NQ1K+B+6aA+OaiJ/I3pKz4+sjAZ4l5qjOz87hhCK5z9AQcVXemhXeiUTKtCrtQ9oIh+iCRwDn1vtV6Klt4gklJK4KQEzVu7ITokge0AWwuewsfHje9uAvnAesgX3zbsHdLnZmEYNvpsxodma215kWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ryFHb4Q/c8EEyIZNE5ad6Kn69I8Ia0hGduIMd7KO+bY=;
- b=geCnnmI/2yWMllbjaFM7VvfoiakiFaPD1VIupKjn/8ljTeZlZKw3JYhjN1bc7Lxx7QOVQUzIoOX4r8XBE/B3fWyFYi3Dthhk/uXK9FgQFzX90WB11o6QzbBceVtDYiWWHpldRzXwdf4LpvXVPaK4BzBO15aJjrYXx9aYesr6SDXchdWw+I8HTYBkgErD5RNYv/g+nMoxjdOT6p6yIpsughxAx7vXQh9Cm0Vt297+MsKJFACwUVASoHR2jqNBppC5YMVf+fI+35AtbuV7QrkKFUnbcVei5UyApUqAbAHHov4+MfGmIgaZ7xgT4QJEOMrPnSX9ZVNWCCBFQbP1i1bm6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
- header.d=fb.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
- s=selector2-fb-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ryFHb4Q/c8EEyIZNE5ad6Kn69I8Ia0hGduIMd7KO+bY=;
- b=bl9ZEPoDqQb8i4CY3OxmhhUvn1cMbf+teFUr/HNXG1uAcaJ6d1+usw24pPhtoEm6O30eIr78/1DssMHl6vjAza8eDxvYsVnd0OJHJ12A6XYoYxz8sr4KiTHXlFdRvj6Lrk2J1wbiiMsg8EsxxXp1cmCfTtKNg3MKV/PhXPYcpgk=
-Received: from MWHPR15MB1165.namprd15.prod.outlook.com (10.175.3.22) by
- MWHPR15MB1295.namprd15.prod.outlook.com (10.175.2.136) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2220.21; Tue, 3 Sep 2019 21:56:26 +0000
-Received: from MWHPR15MB1165.namprd15.prod.outlook.com
- ([fe80::a828:5750:379d:b9a1]) by MWHPR15MB1165.namprd15.prod.outlook.com
- ([fe80::a828:5750:379d:b9a1%8]) with mapi id 15.20.2220.022; Tue, 3 Sep 2019
- 21:56:26 +0000
-From:   Song Liu <songliubraving@fb.com>
-To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-CC:     linux-raid <linux-raid@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "jay.vosburgh@canonical.com" <jay.vosburgh@canonical.com>,
-        "liu.song.a23@gmail.com" <liu.song.a23@gmail.com>,
-        "nfbrown@suse.com" <nfbrown@suse.com>,
-        "jes.sorensen@gmail.com" <jes.sorensen@gmail.com>,
-        NeilBrown <neilb@suse.de>
-Subject: Re: [PATCH v4 1/2] md raid0/linear: Mark array as 'broken' and fail
- BIOs if a member is gone
-Thread-Topic: [PATCH v4 1/2] md raid0/linear: Mark array as 'broken' and fail
- BIOs if a member is gone
-Thread-Index: AQHVYpC0zfxAhEUkzE+4bGia4xat3acaf7qA
-Date:   Tue, 3 Sep 2019 21:56:26 +0000
-Message-ID: <E393EAA5-6A9D-464A-A70E-56A258559712@fb.com>
-References: <20190903194901.13524-1-gpiccoli@canonical.com>
-In-Reply-To: <20190903194901.13524-1-gpiccoli@canonical.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3445.104.11)
-x-originating-ip: [2620:10d:c090:200::1:c3ed]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c6f0f101-b8ce-4383-9cf3-08d730b9919d
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MWHPR15MB1295;
-x-ms-traffictypediagnostic: MWHPR15MB1295:
-x-microsoft-antispam-prvs: <MWHPR15MB1295846D1D2C5084E1808006B3B90@MWHPR15MB1295.namprd15.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 01494FA7F7
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(39860400002)(366004)(396003)(376002)(199004)(189003)(46003)(186003)(4326008)(99286004)(50226002)(14454004)(478600001)(8936002)(256004)(316002)(14444005)(305945005)(71190400001)(71200400001)(6512007)(7736002)(36756003)(86362001)(102836004)(6246003)(2906002)(54906003)(33656002)(76176011)(5660300002)(486006)(6506007)(76116006)(8676002)(81156014)(6436002)(11346002)(476003)(2616005)(53936002)(81166006)(229853002)(25786009)(446003)(6486002)(6916009)(66946007)(66446008)(64756008)(66556008)(66476007)(6116002)(57306001)(53546011);DIR:OUT;SFP:1102;SCL:1;SRVR:MWHPR15MB1295;H:MWHPR15MB1165.namprd15.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: fb.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: KSs2vdN1Brpd22icsPkDIHhvqa7K7e7N5d9GLtjP97TF/E2Tg8Wv24Wu7X0+otjtdjKDS12V4qBpC429iFrEzDiG37QgBvifTgFQfQ+MSgk219CqAS1bauqtamgdR/vB8HOk9DJFMYR8pl4y98+jJeCbrj2BcZTRTr/yt+FwJWhCTSYeUzybS9ti2+lYuI+Pt02F46e/7A04gZ8TvuJ56hDvJeGANXcAQbAoxhGUXqKkejEK7XFhYsygFT5TNhT1OcImUiBIfB3STXKm6yU52viveJL5puxr1naCUnKO0uFz6F+ieEgG/ew/jbOv1l746qqhN3GN6h/3K2LOmm2fDhkVKqkvGeLmAMA7a72bPd0mWdL76P2xbknrnu+yBX/sHfEeAtxUpK8Jz75JrVJcHGNDgtix+kz7Go9uCQBUcSA=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <FB31AF236DA4D745910BA0DA75430503@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Tue, 3 Sep 2019 18:16:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1567548973; bh=fha3TjWoq7T+FaehvmjeV2B4PeIjuHcxcWYFtyVJWFE=; h=Subject:To:Cc:References:From:Date:In-Reply-To:From:Subject; b=Lx0my6aIH/Cg1sxMHPeI3XP/XUQJzSTqU0nXgkGK/gOh/yi/qmrs5AeEhcLlu3H8AxRNIM6Vk/F8QFy5oPWr0kOqE03bFr3QL9VMqGqX0boDFD8CliuOPA+HtuLL1FAQPUitGF0O1fbGQhaSZ/6ltXux9o8h/7Qri+k3Nu8DivxalB4zawKW/poiuCTshe7qn+7dEwcMZIZjq3oSiVMq/vz2CxLgtutuzaoEmVx9Vl+epO23HVOc7KRotP4Y2SxXBOcFPC4r4Vu7L2+C7ShoNM2kyLHjqGR7RQ9gLZIjWfx7X97p+vnqhbMG41v+Pj9DHR+ugmLzy94XeQoPXglLyQ==
+X-YMail-OSG: TdI9FxgVM1nYGzUJuT5BfwvBPLfFq_R1rUEfbVcG3oHD6iiI.B99ULNdd_Lx5fK
+ 80mFchTSt6.8HD1fr2iMnmOXCVBsKlYqy8laJz0i2lh3sGIATZYlYLKH1cdwittUZgSE7UMhvC74
+ ronJiEqp62ZRrkZ59n5S7_kCQ9DRkH.MsC3uM_iA55t_g3ioCOBItuuBhoZ0.kIQnn9oRW9YgyfM
+ hY_y3g7jjz6aMzernUXCzxWTrqNj6D1b3QUe5ZrGvS3mbNxiavXjXQ.0rM7Rh410t7GnXTm3ZOrT
+ EP_sOwe0hthexUVRBIHnRRj5GA5vnRIeUa_sFyLTmA0A77zzyS5KR04IE4k3368v1KqHSHFz0_6E
+ 7SfLuqWQntKKz6GoV_AyLp5osYnYr0zhdS1qXCM6BxJhXSCr_EPYVqYyUAxplSJBih5xmOkZU5Mn
+ hOlXNI9vFhPN7zx7LAceTeVarI31vBviSsq2_Q3uF9XljGvLV1.Khunm5HMpMDxDZ8dpkVCvU0Bv
+ 2S1NKamu4jIQoZUkXrZjam6Ynl0.Iqk9jHFGFY8EXR3a1HU5juqjJXa6mNJNebfjhlX5r4Ky.K_W
+ RNpIqYRO1q6uaejpt_edYfBz0aLW.DM1ONFB4FJGsnHWUqW.EMwCPLBbjvyukmK8_GJyKlwXYym4
+ hR6zCm2D9ZGafE4aZgg05xpSUg5vzDz.EK0Ypve5r89ebOwUx4lZ6snJrGChU4DoT2JD3fDHCCn2
+ BJPRO7hsNiIZqpv1cbCNoxSZG8gbw9YSG6qBpVAaYVF_ilKbY1Xp8FlRkKKfFmIVwP6e9n_FSWw1
+ 3l_xZXY15auhhzGcJ7vVYcPF0HzHrax7EHQuKmQ_6AP_pHfEMClbCxSwvgAOhXSQ93M3GG58O_WJ
+ _LgVZ44oms9gNcpqdbOa.Ujg5m4BLbQ3YZYBecYQe_2SK_ygeKjqIo1fVnJwwRU8ftoF4CMIakXW
+ wvsJYLi36mlpx7i5RqfF.DybSiLkMYpQLp0viEXvYNW8nS7.1sIt4gDk.pHSUkkIGcnqka1uP958
+ ui3c7G3CXILYUoC5kaqot9zIcZdjEbG6lQ83Jq8dbtqZkaafimWjw7A9jXgNAXrqaF4hqgpSm9EL
+ T2ctQko37V0lKVUb8yEzjdtHN.2ya9KoBIbI1XBzoFavR3OnaiXCrhghkoXXfCaQuAS8XA67jhpD
+ VUZLmtV3TqeYSHJB5uQhMRTQv7PmjLb5TVKuu7lSz5EzMuSFRbCV58EDBNTWNCRLlTeSb4WJA7iK
+ NNNB9lSOC.YRF7Lx3ryTqGM1dXJsC3i6e.64_mgIrM1iSirvmKd8qqbrBps2hjLyRwgZ9.LAWOW1
+ AODHGOWewFj4ADTWnfHg2_cxAHjwR_gCrtP17YQ--
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.ne1.yahoo.com with HTTP; Tue, 3 Sep 2019 22:16:13 +0000
+Received: by smtp424.mail.ne1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID 31589db2a53534d815576f1e840a33f6;
+          Tue, 03 Sep 2019 22:16:09 +0000 (UTC)
+Subject: Re: [PATCH 11/11] smack: Implement the watch_key and
+ post_notification hooks [untested] [ver #7]
+To:     David Howells <dhowells@redhat.com>
+Cc:     viro@zeniv.linux.org.uk, Stephen Smalley <sds@tycho.nsa.gov>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        casey@schaufler-ca.com
+References: <87bf0363-af77-1e5a-961f-72730e39e3a6@schaufler-ca.com>
+ <e36fa722-a300-2abf-ae9c-a0246fc66d0e@schaufler-ca.com>
+ <156717343223.2204.15875738850129174524.stgit@warthog.procyon.org.uk>
+ <156717352917.2204.17206219813087348132.stgit@warthog.procyon.org.uk>
+ <4910.1567525310@warthog.procyon.org.uk>
+ <11467.1567534014@warthog.procyon.org.uk>
+From:   Casey Schaufler <casey@schaufler-ca.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=casey@schaufler-ca.com; keydata=
+ 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
+ abzjfg==
+Message-ID: <23d61564-026e-b37a-8b16-ce68d5949f6c@schaufler-ca.com>
+Date:   Tue, 3 Sep 2019 15:16:08 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: c6f0f101-b8ce-4383-9cf3-08d730b9919d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Sep 2019 21:56:26.4444
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zpRhbbHrKIFhkLabFsm5A0CIP099HUr/r/IkbSXDVM18mkBGzuZ8KSjJeph+bZzp/cdf1pI8Rc55sKAsKuNUlQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR15MB1295
-X-OriginatorOrg: fb.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.70,1.0.8
- definitions=2019-09-03_05:2019-09-03,2019-09-03 signatures=0
-X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 mlxscore=0
- mlxlogscore=999 impostorscore=0 suspectscore=0 bulkscore=0 clxscore=1011
- lowpriorityscore=0 phishscore=0 priorityscore=1501 adultscore=0
- spamscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1906280000 definitions=main-1909030217
-X-FB-Internal: deliver
+In-Reply-To: <11467.1567534014@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 9/3/2019 11:06 AM, David Howells wrote:
+> Casey Schaufler <casey@schaufler-ca.com> wrote:
+>
+>> Built from your tree.
+> What branch?  keys-next?
 
+I rebuilt with keys-next, updated the tests again, and now
+the suite looks to be running trouble free. I do see a message
+SKIP DUE TO DISABLED SELINUX which I take to mean that there
+is an SELinux specific test.
 
-> On Sep 3, 2019, at 12:49 PM, Guilherme G. Piccoli <gpiccoli@canonical.com=
-> wrote:
->=20
-> Currently md raid0/linear are not provided with any mechanism to validate
-> if an array member got removed or failed. The driver keeps sending BIOs
-> regardless of the state of array members, and kernel shows state 'clean'
-> in the 'array_state' sysfs attribute. This leads to the following
-> situation: if a raid0/linear array member is removed and the array is
-> mounted, some user writing to this array won't realize that errors are
-> happening unless they check dmesg or perform one fsync per written file.
-> Despite udev signaling the member device is gone, 'mdadm' cannot issue th=
-e
-> STOP_ARRAY ioctl successfully, given the array is mounted.
->=20
-> In other words, no -EIO is returned and writes (except direct ones) appea=
-r
-> normal. Meaning the user might think the wrote data is correctly stored i=
-n
-> the array, but instead garbage was written given that raid0 does strippin=
-g
-> (and so, it requires all its members to be working in order to not corrup=
-t
-> data). For md/linear, writes to the available members will work fine, but
-> if the writes go to the missing member(s), it'll cause a file corruption
-> situation, whereas the portion of the writes to the missing devices aren'=
-t
-> written effectively.
->=20
-> This patch changes this behavior: we check if the block device's gendisk
-> is UP when submitting the BIO to the array member, and if it isn't, we fl=
-ag
-> the md device as MD_BROKEN and fail subsequent I/Os to that device; a rea=
-d
-> request to the array requiring data from a valid member is still complete=
-d.
-> While flagging the device as MD_BROKEN, we also show a rate-limited warni=
-ng
-> in the kernel log.
->=20
-> A new array state 'broken' was added too: it mimics the state 'clean' in
-> every aspect, being useful only to distinguish if the array has some memb=
-er
-> missing. We rely on the MD_BROKEN flag to put the array in the 'broken'
-> state. This state cannot be written in 'array_state' as it just shows
-> one or more members of the array are missing but acts like 'clean', it
-> wouldn't make sense to write it.
->=20
-> With this patch, the filesystem reacts much faster to the event of missin=
-g
-> array member: after some I/O errors, ext4 for instance aborts the journal
-> and prevents corruption. Without this change, we're able to keep writing
-> in the disk and after a machine reboot, e2fsck shows some severe fs error=
-s
-> that demand fixing. This patch was tested in ext4 and xfs filesystems, an=
-d
-> requires a 'mdadm' counterpart to handle the 'broken' state.
->=20
-> Cc: Song Liu <songliubraving@fb.com>
-> Reviewed-by: NeilBrown <neilb@suse.de>
-> Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
-
-Applied to md-next.=20
-
-Thanks!=
+>
+>> keyctl move 483362336 1065401533 @s
+>> keyctl_move: Operation not supported
+> Odd.  That should be unconditional if you have CONFIG_KEYS and v5.3-rc1.  Can
+> you try:
+>
+> 	keyctl supports
+>
+> or just:
+>
+> 	keyctl add user a a @s
+>
+> which will give you an id, say 1234, then:
+>
+> 	keyctl move 1234 @s @u
+>
+> see if that works.
+>
+> David
