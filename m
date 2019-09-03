@@ -2,102 +2,79 @@ Return-Path: <SRS0=Gq2m=W6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD157C3A5A7
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 18:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BE5EC3A5A2
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 19:11:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 984D521897
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 18:19:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iXrN3Q7P"
+	by mail.kernel.org (Postfix) with ESMTP id 40D1622D6D
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 19:11:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729843AbfICSTZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Sep 2019 14:19:25 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:41121 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727667AbfICSTZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Sep 2019 14:19:25 -0400
-Received: by mail-wr1-f68.google.com with SMTP id j16so18513385wrr.8;
-        Tue, 03 Sep 2019 11:19:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Ty/2ohLAJ+2sCNPsz6Mg9g82ZAcXCLPeRSTUh8dn1AM=;
-        b=iXrN3Q7PNVG79k4/QPwtJd360wJBFRowaCrtFARluncD92iaxPMac9rPX4B8Hxlta6
-         u/egCzq2FHk7WjWNT5OjHCutDCAyvbBIMEMQuj8Uk4fIXVLKHzupt38V5eoEGLwnfxwW
-         SqBXpSsY/Zq0zJG1z5wQjb1fmAE3V7w/wzzAZ519iQse6X2qAu5JHAI73GwS2t32czqK
-         aEyRcgYkrUFclz9SJ+tw3xs2406lVI/hppCdyT62DYo33sOUME/5kqeaSlong/0UwJNK
-         BC39yQeVjmmfS/aYtMtAzcaVCNQrjnTBP1j/Srlo1GRn0raysle8n1hJupyIU46tYxsy
-         mumA==
+        id S1726009AbfICTLl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Sep 2019 15:11:41 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:37701 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725914AbfICTLl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Sep 2019 15:11:41 -0400
+Received: by mail-oi1-f196.google.com with SMTP id b25so13705201oib.4
+        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2019 12:11:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Ty/2ohLAJ+2sCNPsz6Mg9g82ZAcXCLPeRSTUh8dn1AM=;
-        b=a6O2CJbylSxcnI+FXxqhwa20+OHPsux9nxODLJNNpuay+BzEp2CtZmXl7SFujkVyWi
-         +wxStXpQZ3lXgo1jDDXUbi82x0mTyjaovM4MCjRTmb8DY2he1Djhyk3oHJBcM2f3c/tn
-         iCf5LKPDelXH3cwLhSBmWDjtATYWaroP8sqqgG9VR9GX5Agigvgqs8aZupwk7Ta3VYcm
-         jW9GuvERyDCL5Mjm4a+mUMrCtKqU/RyajS/UWrJpXAWCMTOiO4EZm1WxNGv/qczsY20P
-         yJDYsRUmTJ6RX7Lj+I53qQw9RjZhx0phgoOr+Jk8VLt2vkdONSJ+QGzZ7gg1y12nE5SA
-         Tkmg==
-X-Gm-Message-State: APjAAAUnnXk44zLvxTQ7eMwbEZ19Iz/5dgOZ9j/xfJr8ua8JOv5exYNU
-        x9swyvR/O6uND2suTcHmww==
-X-Google-Smtp-Source: APXvYqxlHBA49WV+BHVeO2PilKn9QU1HiFxpBtiAo0xzOr9c+REPpHiXHtdsI/PxDenk0UyGl0Lj6A==
-X-Received: by 2002:adf:fad0:: with SMTP id a16mr1790618wrs.195.1567534762701;
-        Tue, 03 Sep 2019 11:19:22 -0700 (PDT)
-Received: from avx2 ([46.53.254.228])
-        by smtp.gmail.com with ESMTPSA id t14sm19292468wrs.58.2019.09.03.11.19.21
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=URWBJCKMLF9JrQV153//VBnnjZqNM/DWZOjYUVblmIY=;
+        b=FmgXA1Qy4NeHcNt1G11ne002hvr8bj48ZHDxffh7SgP9mKYGqxB8fs8Queyf5IifsY
+         2LGhH25UprSMxNra4ivQ0N9ZSDYwa0yQKM5u+mFm5VVEV6aXZXb9AxSf3RyksEOQOb76
+         fsgwMW0k3qwBoHxKcFZf/vIL6mMXEwVdw8EpyX06LUF01f8S2Ev3O0Z5bOTUheeHg58B
+         IcOmIqrPcG4Cnc1BXNZtYSzhGTrnOK6vAV475br0QfQJfDaqMMxWC1t8mSHQqVtMa7x/
+         yl5im8sjjhbOjY4THpQ2t2WkrV6rIJm1W9DQXqqO6kp/8raUgq/ScbhsN/Yw7sW0WSvC
+         Q/gg==
+X-Gm-Message-State: APjAAAW5LkISn0r/ImuRKCra8VnUQbrb6xMFkZukmF+99BYIesWtWVPw
+        kCZvV8DanmtWOtt/s05083E=
+X-Google-Smtp-Source: APXvYqw2DmMHc5CE6UqqDkMZBdLNVpTfYTQiChaGEcROJ4Re4A9GNp3jUMs7eGed5eTqcfve2kcSJg==
+X-Received: by 2002:aca:edd4:: with SMTP id l203mr683897oih.52.1567537900120;
+        Tue, 03 Sep 2019 12:11:40 -0700 (PDT)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id e1sm919082otj.48.2019.09.03.12.11.38
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 03 Sep 2019 11:19:22 -0700 (PDT)
-Date:   Tue, 3 Sep 2019 21:19:20 +0300
-From:   Alexey Dobriyan <adobriyan@gmail.com>
-To:     Valentin Schneider <valentin.schneider@arm.com>
-Cc:     mingo@redhat.com, peterz@infradead.org,
-        linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com, axboe@kernel.dk,
-        aarcange@redhat.com
-Subject: Re: [PATCH] sched: make struct task_struct::state 32-bit
-Message-ID: <20190903181920.GA22358@avx2>
-References: <20190902210558.GA23013@avx2>
- <d8ad0be1-4ed7-df74-d415-2b1c9a44bac7@arm.com>
+        Tue, 03 Sep 2019 12:11:39 -0700 (PDT)
+Subject: Re: [PATCH 1/4] block: centrelize PI remapping logic to the block
+ layer
+To:     Max Gurtovoy <maxg@mellanox.com>, linux-block@vger.kernel.org,
+        axboe@kernel.dk, martin.petersen@oracle.com,
+        linux-nvme@lists.infradead.org, keith.busch@intel.com, hch@lst.de
+Cc:     shlomin@mellanox.com, israelr@mellanox.com
+References: <1567523655-23989-1-git-send-email-maxg@mellanox.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <8df57b71-9404-904d-7abd-587942814039@grimberg.me>
+Date:   Tue, 3 Sep 2019 12:11:36 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d8ad0be1-4ed7-df74-d415-2b1c9a44bac7@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <1567523655-23989-1-git-send-email-maxg@mellanox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 03, 2019 at 06:29:06PM +0100, Valentin Schneider wrote:
-> On 02/09/2019 22:05, Alexey Dobriyan wrote:
-> > 32-bit accesses are shorter than 64-bit accesses on x86_64.
-> > Nothing uses 64-bitness of ->state.
 
-> It looks like you missed a few places. There's a long prev_state in
-> sched/core.c::finish_task_switch() for instance.
-> 
-> I suppose that's where coccinelle oughta help but I'm really not fluent
-> in that. Is there a way to make it match p.state accesses with p task_struct?
-> And if so, can we make it change the type of the variable being read from
-> / written to?
+> +	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
+> +	    error == BLK_STS_OK)
+> +		t10_pi_complete(req,
+> +				nr_bytes / queue_logical_block_size(req->q));
+> +
 
-Coccinelle is interesting: basic
+div in this path? better to use  >> ilog2(block_size).
 
-	- foo
-	+ bar
+Also, would be better to have a wrapper in place like:
 
-doesn't find "foo" in function arguments.
-
-I'm scared of coccinelle.
-
-> How did you come up with this changeset, did you pickaxe for some regexp?
-
-No, manually, backtracking up to the call chain.
-Maybe I missed a few places.
+static inline unsigned short blk_integrity_interval(struct request *rq)
+{
+	return queue_logical_block_size(rq->q);
+}
